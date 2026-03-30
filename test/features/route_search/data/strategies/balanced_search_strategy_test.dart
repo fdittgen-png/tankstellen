@@ -46,8 +46,8 @@ void main() {
 
   group('searchAlongRoute — balanced scoring', () {
     test('prefers nearby affordable station over distant cheapest', () async {
-      // Station A: price=1.75, close to route (dist=0.5)
-      // Score = 1.75 + (0.5 * 0.1) = 1.80
+      // Station A: price=1.75, on the route (lat/lng on polyline)
+      // minDist ≈ 0 km, Score ≈ 1.75
       final nearAffordable = makeStation(
         id: 'near_affordable',
         lat: 48.05,
@@ -56,13 +56,13 @@ void main() {
         dist: 0.5,
       );
 
-      // Station B: price=1.73, far from route (dist=3.0)
-      // Score = 1.73 + (3.0 * 0.1) = 2.03
+      // Station B: price=1.50, far from route (~30km off polyline)
+      // minDist ≈ 30 km, Score ≈ 1.50 + (30 * 0.1) = 4.50
       final farCheap = makeStation(
         id: 'far_cheap',
-        lat: 48.12,
-        lng: 2.12,
-        diesel: 1.73,
+        lat: 48.1,
+        lng: 2.5,
+        diesel: 1.50,
         dist: 3.0,
       );
 
@@ -92,7 +92,7 @@ void main() {
       );
 
       expect(results.length, 2);
-      // With balanced scoring: near_affordable scores better (1.80 < 2.03)
+      // near_affordable is on route (score ≈ 1.75), far_cheap is ~30km off (score ≈ 4.50)
       expect(results[0].id, 'near_affordable');
       expect(results[1].id, 'far_cheap');
     });
@@ -153,15 +153,15 @@ void main() {
   group('computeBestStops — balanced scoring', () {
     test('uses balanced score not just price', () {
       // Two stations in same segment:
-      // cheapest by price but far from route
+      // cheapest by price but far from route (~30km off polyline)
       final cheapFar = makeStation(
         id: 'cheap_far',
         lat: 48.0,
-        lng: 2.0,
+        lng: 2.4,
         diesel: 1.60,
         dist: 5.0,
       );
-      // Slightly more expensive but very close to route
+      // Slightly more expensive but on the route
       final affordableNear = makeStation(
         id: 'affordable_near',
         lat: 48.01,
@@ -182,8 +182,8 @@ void main() {
         segmentKm: 50.0, // One big segment, both stations in same segment
       );
 
-      // cheap_far score: 1.60 + (5.0 * 0.1) = 2.10
-      // affordable_near score: 1.65 + (0.2 * 0.1) = 1.67
+      // cheap_far: minDist ≈ 30km, score: 1.60 + (30 * 0.1) = 4.60
+      // affordable_near: minDist ≈ 1km, score: 1.65 + (1 * 0.1) = 1.75
       // Balanced scoring should prefer affordable_near
       expect(bestStops, isNotNull);
       expect(bestStops!.values.contains('affordable_near'), isTrue);

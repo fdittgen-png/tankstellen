@@ -22,6 +22,9 @@ void main() {
       mockStorage = MockHiveStorage();
       when(() => mockStorage.getPriceRecords(any())).thenReturn([]);
       when(() => mockStorage.getPriceHistoryKeys()).thenReturn([]);
+      when(() => mockStorage.getRatings()).thenReturn({});
+      when(() => mockStorage.savePriceRecords(any(), any())).thenAnswer((_) async {});
+      when(() => mockStorage.getRating(any())).thenReturn(null);
       commonOverrides = [
         hiveStorageProvider.overrideWithValue(mockStorage),
         priceHistoryRepositoryProvider.overrideWithValue(

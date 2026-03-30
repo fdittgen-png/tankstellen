@@ -176,14 +176,14 @@ void main() {
       expect(station.displayName, equals('Aral'));
     });
 
-    test('falls back to place when brand is empty', () {
+    test('falls back to street when brand is empty', () {
       final station = _makeStation(brand: '', place: 'München');
-      expect(station.displayName, equals('München'));
+      expect(station.displayName, equals('Teststraße'));
     });
 
-    test('falls back to place when brand is "Station"', () {
+    test('falls back to street when brand is "Station"', () {
       final station = _makeStation(brand: 'Station', place: 'Hamburg');
-      expect(station.displayName, equals('Hamburg'));
+      expect(station.displayName, equals('Teststraße'));
     });
   });
 

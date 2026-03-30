@@ -113,14 +113,14 @@ void main() {
       expect(station.displayName, 'Shell');
     });
 
-    test('returns place when brand is empty', () {
+    test('returns street when brand is empty', () {
       final s = station.copyWith(brand: '');
-      expect(s.displayName, 'Berlin');
+      expect(s.displayName, 'Main St');
     });
 
-    test('returns place when brand is "Station"', () {
+    test('returns street when brand is "Station"', () {
       final s = station.copyWith(brand: 'Station');
-      expect(s.displayName, 'Berlin');
+      expect(s.displayName, 'Main St');
     });
   });
 
