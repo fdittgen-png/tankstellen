@@ -9,40 +9,16 @@ part of 'data_providers.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Provides the sync repository implementation.
-///
-/// Override this in tests with a mock:
-/// ```dart
-/// syncRepositoryProvider.overrideWithValue(MockSyncRepository())
-/// ```
-///
-/// To switch from Supabase to another backend (Firebase, custom):
-/// replace SupabaseSyncRepository with your implementation.
 
 @ProviderFor(syncRepository)
 final syncRepositoryProvider = SyncRepositoryProvider._();
 
 /// Provides the sync repository implementation.
-///
-/// Override this in tests with a mock:
-/// ```dart
-/// syncRepositoryProvider.overrideWithValue(MockSyncRepository())
-/// ```
-///
-/// To switch from Supabase to another backend (Firebase, custom):
-/// replace SupabaseSyncRepository with your implementation.
 
 final class SyncRepositoryProvider
     extends $FunctionalProvider<SyncRepository, SyncRepository, SyncRepository>
     with $Provider<SyncRepository> {
   /// Provides the sync repository implementation.
-  ///
-  /// Override this in tests with a mock:
-  /// ```dart
-  /// syncRepositoryProvider.overrideWithValue(MockSyncRepository())
-  /// ```
-  ///
-  /// To switch from Supabase to another backend (Firebase, custom):
-  /// replace SupabaseSyncRepository with your implementation.
   SyncRepositoryProvider._()
     : super(
         from: null,
@@ -76,7 +52,7 @@ final class SyncRepositoryProvider
   }
 }
 
-String _$syncRepositoryHash() => r'59ffee9d75da3f3f6f7d0d148bbce2cc5b5367b2';
+String _$syncRepositoryHash() => r'da99feb3f8fa54eef569570a686c2de188f8c5fe';
 
 /// Provides the auth repository implementation.
 
@@ -122,4 +98,4 @@ final class AuthRepositoryProvider
   }
 }
 
-String _$authRepositoryHash() => r'ae2a9c7c4226836cd659c3ec8f6f8a02a8913d3b';
+String _$authRepositoryHash() => r'6ef7ec0f4b807a3cb431d36a0c89e726eada3f3a';

@@ -20,10 +20,6 @@ Future<void> _runWithSyncConfig(
   // Force-read to initialize the override
   container.read(syncStateProvider);
 
-  // Use a temporary provider to get a Ref
-  final helperProvider = Provider<void>((ref) {
-    // Store ref for later use — we'll run the action inside listen
-  });
   // We need a Ref, so we use a FutureProvider trick
   late Ref capturedRef;
   final refCapture = Provider<int>((ref) {

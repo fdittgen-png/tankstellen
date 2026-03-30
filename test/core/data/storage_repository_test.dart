@@ -84,6 +84,8 @@ class _MockStorageRepository implements StorageRepository {
   @override Future<void> deleteApiKey() async {}
   @override bool hasApiKey() => false;
   @override String? getEvApiKey() => null;
+  @override bool hasCustomEvApiKey() => false;
+  @override Future<void> setEvApiKey(String key) async {}
 
   @override String? getActiveProfileId() => _settings['active_profile_id'] as String?;
   @override Future<void> setActiveProfileId(String id) async => _settings['active_profile_id'] = id;
@@ -91,6 +93,7 @@ class _MockStorageRepository implements StorageRepository {
   @override List<Map<String, dynamic>> getAllProfiles() => _profiles.values.toList();
   @override Future<void> saveProfile(String id, Map<String, dynamic> p) async => _profiles[id] = p;
   @override Future<void> deleteProfile(String id) async => _profiles.remove(id);
+  @override int get profileCount => _profiles.length;
 
   @override Future<void> savePriceRecords(String id, List<Map<String, dynamic>> r) async {}
   @override List<Map<String, dynamic>> getPriceRecords(String id) => [];
@@ -106,6 +109,7 @@ class _MockStorageRepository implements StorageRepository {
   @override List<Map<String, dynamic>> getItineraries() => [];
   @override Future<void> addItinerary(Map<String, dynamic> i) async {}
   @override Future<void> deleteItinerary(String id) async {}
+  @override Future<void> saveItineraries(List<Map<String, dynamic>> i) async {}
 
   @override Future<void> cacheData(String key, dynamic data) async {}
   @override Map<String, dynamic>? getCachedData(String key, {Duration? maxAge}) => null;
