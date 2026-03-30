@@ -6,8 +6,8 @@ class NotificationService {
   static Future<void> init() async {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const settings = InitializationSettings(android: androidSettings);
-    await _plugin.initialize(settings);
+    const initSettings = InitializationSettings(android: androidSettings);
+    await _plugin.initialize(settings: initSettings);
   }
 
   static Future<void> showPriceAlert({
@@ -25,6 +25,6 @@ class NotificationService {
         priority: Priority.high,
       ),
     );
-    await _plugin.show(id, title, body, details);
+    await _plugin.show(id: id, title: title, body: body, notificationDetails: details);
   }
 }

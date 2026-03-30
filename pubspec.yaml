@@ -24,35 +24,35 @@ dependencies:
   hive_flutter: ^1.1.0
 
   # Maps & Location
-  flutter_map: ^7.0.2
-  flutter_map_marker_cluster: ^1.4.0
+  flutter_map: ^8.2.2
+  flutter_map_marker_cluster: ^8.2.2
   latlong2: ^0.9.1
-  geolocator: ^13.0.2
-  geocoding: ^3.0.0
+  geolocator: ^14.0.2
+  geocoding: ^4.0.0
 
   # Routing
-  go_router: ^14.8.1
+  go_router: ^17.1.0
 
   # UI
   flex_color_scheme: ^8.1.0
   intl: ^0.20.2
   qr_flutter: ^4.1.0
-  mobile_scanner: ^6.0.2
+  mobile_scanner: ^7.2.0
 
   # Data Classes
   freezed_annotation: ^3.0.0
-  json_annotation: ^4.9.0
+  json_annotation: ^4.11.0
 
   # Utilities
   uuid: ^4.5.1
-  connectivity_plus: ^6.1.1
-  shared_preferences: ^2.3.5
+  connectivity_plus: ^7.1.0
+  shared_preferences: ^2.5.5
   url_launcher: ^6.3.1
   flutter_secure_storage: ^10.0.0
-  sentry_flutter: ^9.15.0
+  sentry_flutter: ^9.16.0
   workmanager: ^0.9.0
   shimmer: ^3.0.0
-  flutter_local_notifications: ^18.0.0
+  flutter_local_notifications: ^21.0.0
   supabase_flutter: ^2.8.0
 
 dev_dependencies:
@@ -63,9 +63,9 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
   # Code Generation
-  build_runner: ^2.4.14
-  freezed: ^3.0.0
-  json_serializable: ^6.9.3
+  build_runner: ^2.13.1
+  freezed: ^3.2.5
+  json_serializable: ^6.13.0
   riverpod_generator: ^4.0.3
 
   # Testing
