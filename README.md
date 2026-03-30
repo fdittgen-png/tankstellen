@@ -1,12 +1,12 @@
 # Tankstellen — Free Fuel Price Comparison
 
-[![CI](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml/badge.svg)](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml)
+[![CI](https://github.com/fdittgen-png/tankstellen-app/actions/workflows/ci.yml/badge.svg)](https://github.com/fdittgen-png/tankstellen-app/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/fdittgen-png/tankstellen)](https://github.com/fdittgen-png/tankstellen/releases)
+[![GitHub release](https://img.shields.io/github/v/release/fdittgen-png/tankstellen-app)](https://github.com/fdittgen-png/tankstellen-app/releases)
 [![Flutter](https://img.shields.io/badge/Flutter-3.41-02569B?logo=flutter)](https://flutter.dev)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
-**Tankstellen** is a free, open-source fuel price comparison app for Europe. It shows real-time fuel prices from official government transparency APIs — no ads, no tracking, fully local-first with optional cloud sync.
+**Tankstellen** is a free, open-source fuel price comparison app for Europe and beyond. It shows real-time fuel prices from official government transparency APIs — no ads, no tracking, fully local-first with optional cloud sync.
 
 <!-- Coming soon: F-Droid and Google Play -->
 <!-- [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/de.tankstellen.fuelprices/) -->
@@ -14,78 +14,153 @@
 
 ## Features
 
-- **Real-time prices** from official government sources (Tankerkoenig DE, prix-carburants.gouv.fr, MISE IT, and more)
-- **7 countries live** — Germany, France, Italy, Austria, Spain, Denmark, Argentina
+### Search & Discovery
+- **Real-time prices** from 11 official government sources
 - **GPS or postal code search** — find the cheapest station near you or anywhere
-- **Interactive map** with color-coded price markers, marker clustering for dense areas
-- **Bottom navigation** — Search, Map, Favorites, and Settings always one tap away
+- **Interactive map** with color-coded price markers and marker clustering
+- **EV charging stations** — OpenChargeMap integration with connector types, power levels, and availability
+- **Route search** — find the cheapest fuel stops along your trip with 3 strategies (Uniform, Cheapest, Balanced)
+- **Station ratings** — 1-5 star ratings with local, private, or shared visibility
+
+### Monitoring & Alerts
 - **Price history charts** — 30-day local recording with min/max/avg/trend statistics
-- **Price alerts with push** — set a target price per fuel/station, get notified when it drops (local background check via WorkManager)
-- **"Best time to fill" predictions** — local statistical analysis of daily price patterns from your recorded history
+- **Price alerts** — set a target price per fuel type and station, get push notifications when it drops (hourly background checks via WorkManager)
+- **"Best time to fill" predictions** — statistical analysis of daily price patterns
 - **Fuel calculator** — distance x consumption x price, pre-fills from the selected station
+
+### Organization & Sync
+- **Favorites** — save stations with swipe gestures for quick navigation and removal
 - **Multiple profiles** — switch between vehicles or countries with different fuel preferences
-- **Auto-switch profiles** when crossing borders (GPS-based)
-- **Favorites** — save and quickly check your go-to stations
-- **TankSync** — optional Supabase backend for cross-device sync, server-side alerts, and community price reports
-- **Route search** — plan your trip and find the cheapest stations along the way
-- **EV charging stations** — find nearby charging points with connector/power filters
-- **23 languages** — DE, EN, FR, ES, IT, DA, SV, FI, NL, PL, PT, CS, SK, HU, RO, BG, HR, SL, LT, LV, ET, EL, NB
+- **Auto-switch profiles** when crossing borders (GPS-based country detection)
+- **TankSync** — optional Supabase backend for cross-device sync, server-side alerts, and community reports
+- **Ignored stations** — hide unwanted stations from all results, map, and routes
+
+### Platform & Internationalization
+- **11 countries** — Germany, France, Italy, Austria, Spain, Denmark, Argentina, Portugal, United Kingdom, Australia, Mexico
+- **23 languages** — Bulgarian, Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, German, Greek, Hungarian, Italian, Latvian, Lithuanian, Norwegian, Polish, Portuguese, Romanian, Slovak, Slovenian, Spanish, Swedish
 - **Full offline support** — cached results available without internet
-- **Platform** — Android and iOS
+- **Android** (iOS planned)
 
 ## Privacy First
 
 This app is **local-first** — it works fully without an account, server, or internet connection. The only network requests go directly to the official fuel price APIs and OpenStreetMap for map tiles.
 
-Your API key is stored locally and never shared with anyone except the respective fuel price API. See the full [Privacy Policy](PRIVACY.md).
+Your API key is stored in the platform keystore (Android Keystore) and never shared with anyone except the respective fuel price API. See the full [Privacy Policy](PRIVACY.md).
 
-## How It Works
+## Supported Countries
 
-Fuel prices in many European countries are regulated by law — stations must report price changes to a government agency in real time. Tankstellen reads directly from these free, public APIs:
+| Country | Data Source | Fuel Types | Key Required? |
+|---------|-----------|------------|---------------|
+| Germany | [Tankerkoenig](https://creativecommons.tankerkoenig.de/) (MTS-K) | Super E5, Super E10, Diesel | Yes (free) |
+| France | [prix-carburants.gouv.fr](https://www.prix-carburants.gouv.fr/) | SP95, SP98, E10, Gazole, E85, GPLc | No |
+| Austria | [E-Control](https://www.e-control.at/spritpreisrechner) | Super 95, Super 95 E10, Diesel | No |
+| Spain | [Geoportal Gasolineras](https://geoportalgasolineras.es/) (MITECO) | Gasolina 95/98, Gasoleo A, GLP | No |
+| Italy | [Osservaprezzi](https://osservaprezzi.mise.gov.it/) (MASE) | Benzina, Gasolio, GPL, Metano | No |
+| Denmark | OK / Shell / Q8 | Blyfri 95, Diesel | No |
+| Argentina | [Secretaria de Energia](https://datos.energia.gob.ar/) | Nafta, Gas Oil, GNC | No |
+| Portugal | [DGEG](https://www.dgeg.gov.pt/) | Gasolina 95/98, Gasoleo, GPL Auto | No |
+| United Kingdom | CMA Fuel Finder | Unleaded, Super, Diesel, Premium Diesel | No |
+| Australia | FuelCheck NSW | Unleaded 91/95/98, Diesel, LPG | No |
+| Mexico | [CRE / datos.gob.mx](https://datos.gob.mx/) | Regular, Premium, Diesel | No |
 
-| Country | Data Source | Status | Key Required? |
-|---------|-----------|--------|---------------|
-| Germany | Tankerkoenig (MTS-K) | LIVE | Yes (free) |
-| France | prix-carburants.gouv.fr | LIVE | No |
-| Italy | MISE (MiSE open data) | LIVE | No |
-| Austria | E-Control Spritpreisrechner | LIVE | No |
-| Spain | Ministerio de Industria | LIVE | No |
-| Denmark | OK / Shell / Q8 | LIVE | No |
-| Argentina | Secretaría de Energía | LIVE | No |
+All data sources are official government transparency APIs or regulated open data portals.
+
+## Architecture
+
+```
+lib/
+├── app/                    # App entry point, router, shell
+├── core/                   # Shared infrastructure
+│   ├── background/         # WorkManager periodic tasks
+│   ├── cache/              # CacheManager with TTL management
+│   ├── country/            # Country detection and configuration
+│   ├── error_tracing/      # Error classification and diagnostics
+│   ├── location/           # GPS and geocoding
+│   ├── services/           # API service layer
+│   │   ├── impl/           # 11 country API + demo + geocoding implementations
+│   │   └── mixins/         # Shared parsing helpers
+│   ├── storage/            # Hive local storage
+│   ├── sync/               # Supabase sync service
+│   └── utils/              # Price formatting, station extensions, geo utils
+├── features/               # Feature modules (clean architecture)
+│   ├── alerts/             # Price alert management
+│   ├── calculator/         # Fuel cost calculator
+│   ├── favorites/          # Favorite stations
+│   ├── itinerary/          # Saved routes
+│   ├── map/                # Map view with station markers
+│   ├── price_history/      # Price recording and charts
+│   ├── profile/            # User profiles and settings
+│   ├── report/             # Community price reports
+│   ├── route_search/       # Route optimization (3 strategies)
+│   ├── search/             # Station search + EV charging
+│   ├── setup/              # First-launch configuration
+│   ├── station_detail/     # Individual station view
+│   └── sync/               # TankSync wizard and screens
+└── l10n/                   # 23 language ARB files
+```
+
+### Key Design Patterns
+- **Feature-first clean architecture** — each feature has `data/`, `domain/`, `presentation/`, `providers/`
+- **Service chain with fallback** — Fresh cache -> API -> Stale cache -> Error
+- **Local-first sync** — save locally first, sync to server async, local always wins on conflict
+- **Riverpod with code generation** — `@riverpod` annotations, never manual provider creation
+
+## Tech Stack
+
+| Category | Technology |
+|----------|-----------|
+| Framework | Flutter 3.41 / Dart 3.11 |
+| State Management | Riverpod 3.0 with code generation |
+| Local Storage | Hive 2.2 (key-value) |
+| Networking | Dio 5.x with interceptors |
+| Maps | flutter_map + OpenStreetMap (free, no API key) |
+| Backend (optional) | Supabase (anonymous auth, Postgres, Edge Functions) |
+| Background Tasks | WorkManager (Android) |
+| Notifications | flutter_local_notifications |
+| Crash Reporting | Sentry (privacy-first, optional) |
+| Models | Freezed + json_serializable |
+| Routing | GoRouter with bottom navigation shell |
+| EV Data | OpenChargeMap API |
 
 ## Getting Started
 
-1. Download the latest APK from [GitHub Releases](https://github.com/fdittgen-png/tankstellen/releases) or build from source
+1. Download the latest APK from [GitHub Releases](https://github.com/fdittgen-png/tankstellen-app/releases) or build from source
 2. Choose your country and preferred fuel type
 3. For Germany: register a free API key at [Tankerkoenig](https://creativecommons.tankerkoenig.de/)
 4. Search by GPS or postal code
+
+## Build from Source
+
+```bash
+# Prerequisites: Flutter SDK 3.x, Android SDK, JDK 17
+
+git clone https://github.com/fdittgen-png/tankstellen-app.git
+cd tankstellen-app
+flutter pub get
+dart run build_runner build --delete-conflicting-outputs
+flutter run -d emulator-5554   # Android emulator
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for full development setup and guidelines.
 
 ## TankSync (Optional Cloud Backend)
 
 TankSync is a fully optional Supabase-based backend that unlocks additional features while preserving the app's privacy-first design:
 
-- **Cross-device sync** — favorites and alerts synced across your devices
-- **Server-side price alerts** — real push notifications even when the app is closed
-- **Community price reports** — crowdsourced price corrections for all 7 countries
+- **Cross-device sync** — favorites, alerts, ratings, and ignored stations synced across devices
+- **Server-side price alerts** — push notifications via ntfy.sh even when the app is closed
+- **Community price reports** — crowdsourced price corrections
 - **Extended price history** — server-aggregated history beyond the local 30-day window
+- **Saved itineraries** — store and share route plans across devices
 
 TankSync is:
 - **100% optional** — the app works fully without it
-- **Self-hostable** — you can run your own Supabase instance
-- **Anonymous** — no email or personal data required
-- **Transparent** — every byte stored is visible, exportable, and deletable from within the app
+- **Self-hostable** — run your own Supabase instance
+- **Anonymous** — no email required (optional email auth available)
+- **Transparent** — every byte stored is visible, exportable, and deletable from the app
 - **Free** — runs on the Supabase free tier (500 MB Postgres, 50K requests/month, EU hosting)
 
-## Build from Source
-
-```bash
-# Prerequisites: Flutter SDK 3.x
-
-git clone https://github.com/fdittgen-png/tankstellen.git
-cd tankstellen
-flutter pub get
-flutter run -d emulator-5554   # Android emulator
-```
+Database: 10 tables with Row-Level Security, anonymous + email auth, QR code sharing for database access.
 
 ## The Ethics Behind This Project
 
@@ -94,7 +169,7 @@ Fuel prices are public data — governments mandate real-time price reporting pr
 **Tankstellen takes a different approach:**
 
 - **Public data should stay public.** No paywalls, no premium tiers.
-- **Privacy is non-negotiable.** No user accounts, no analytics SDKs, no data collection. Your location query goes to the API and nowhere else.
+- **Privacy is non-negotiable.** No user accounts required, no analytics SDKs, no data collection. Your location query goes to the API and nowhere else.
 - **No corporate dependencies.** No Google Play Services, no Firebase, no ad networks. The app works with just the official APIs and OpenStreetMap.
 - **Open source, MIT licensed.** Anyone can audit, fork, or improve the code.
 - **Sustainable by choice.** The developer maintains this project voluntarily. If you find it useful, you can support it — but you'll never be pressured to.
@@ -107,15 +182,14 @@ This app is and will always be free, open source, and ad-free. If it saves you m
 - **GitHub:** Star this repo, report bugs, or contribute code
 - **Word of mouth:** Tell a friend who drives
 
-Every donation helps cover the time spent on development, testing, and expanding to new countries.
-
 ## Contributing
 
-Contributions are welcome! Please open an issue first to discuss what you'd like to change.
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-- Report bugs or suggest features via [GitHub Issues](https://github.com/fdittgen-png/tankstellen/issues)
+- Report bugs or suggest features via [GitHub Issues](https://github.com/fdittgen-png/tankstellen-app/issues)
 - Translations: add or improve ARB files in `lib/l10n/`
 - New country APIs: implement the `StationService` interface
+- See [SECURITY.md](SECURITY.md) for reporting vulnerabilities
 
 ## License
 
