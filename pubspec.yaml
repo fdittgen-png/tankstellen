@@ -1,5 +1,5 @@
 name: tankstellen
-description: "Free fuel price comparison app for Europe"
+description: "Free fuel price comparison app — 11 countries, 23 languages, privacy-first"
 publish_to: 'none'
 version: 4.1.0+21
 
@@ -83,5 +83,9 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/icon.png"
+  adaptive_icon_foreground: "assets/icon_foreground.png"
+  adaptive_icon_background: "#2E7D32"
   min_sdk_android: 21
+  web:
+    generate: false
 
