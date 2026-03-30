@@ -1,0 +1,87 @@
+name: tankstellen
+description: "Free fuel price comparison app for Europe"
+publish_to: 'none'
+version: 4.1.0+21
+
+environment:
+  sdk: ^3.11.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^3.0.3
+  riverpod_annotation: ^4.0.2
+
+  # Networking
+  dio: ^5.7.0
+
+  # Local Storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # Maps & Location
+  flutter_map: ^7.0.2
+  flutter_map_marker_cluster: ^1.4.0
+  latlong2: ^0.9.1
+  geolocator: ^13.0.2
+  geocoding: ^3.0.0
+
+  # Routing
+  go_router: ^14.8.1
+
+  # UI
+  flex_color_scheme: ^8.1.0
+  intl: ^0.20.2
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^6.0.2
+
+  # Data Classes
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
+
+  # Utilities
+  uuid: ^4.5.1
+  connectivity_plus: ^6.1.1
+  shared_preferences: ^2.3.5
+  url_launcher: ^6.3.1
+  flutter_secure_storage: ^10.0.0
+  sentry_flutter: ^9.15.0
+  workmanager: ^0.9.0
+  shimmer: ^3.0.0
+  flutter_local_notifications: ^18.0.0
+  supabase_flutter: ^2.8.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+  # Code Generation
+  build_runner: ^2.4.14
+  freezed: ^3.0.0
+  json_serializable: ^6.9.3
+  riverpod_generator: ^4.0.3
+
+  # Testing
+  mocktail: ^1.0.4
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.png"
+  min_sdk_android: 21
+

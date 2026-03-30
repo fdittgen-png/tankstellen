@@ -1,0 +1,16 @@
+class StorageKeys {
+  StorageKeys._();
+
+  static const String apiKey = 'api_key';
+  static const String activeProfileId = 'active_profile_id';
+  static const String favoriteStationIds = 'favorite_station_ids';
+  static const String setupSkipped = 'setup_skipped';
+  static const String userPositionLat = 'user_position_lat';
+  static const String userPositionLng = 'user_position_lng';
+  static const String userPositionTimestamp = 'user_position_timestamp';
+  static const String userPositionSource = 'user_position_source';
+  static const String autoSwitchProfile = 'auto_switch_profile';
+  static const String evApiKey = 'ev_api_key';
+  static const String ignoredStationIds = 'ignored_station_ids';
+  static const String stationRatings = 'station_ratings';
+}

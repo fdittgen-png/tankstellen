@@ -1,0 +1,912 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Norwegian Bokmål (`nb`).
+class AppLocalizationsNb extends AppLocalizations {
+  AppLocalizationsNb([String locale = 'nb']) : super(locale);
+
+  @override
+  String get appTitle => 'Drivstoffpriser';
+
+  @override
+  String get search => 'Søk';
+
+  @override
+  String get favorites => 'Favoritter';
+
+  @override
+  String get map => 'Kart';
+
+  @override
+  String get profile => 'Profil';
+
+  @override
+  String get settings => 'Innstillinger';
+
+  @override
+  String get gpsLocation => 'GPS-posisjon';
+
+  @override
+  String get zipCode => 'Postnummer';
+
+  @override
+  String get zipCodeHint => 'f.eks. 0101';
+
+  @override
+  String get fuelType => 'Drivstoff';
+
+  @override
+  String get searchRadius => 'Radius';
+
+  @override
+  String get searchNearby => 'Bensinstasjoner i nærheten';
+
+  @override
+  String get searchButton => 'Søk';
+
+  @override
+  String get noResults => 'Ingen bensinstasjoner funnet.';
+
+  @override
+  String get startSearch => 'Søk for å finne bensinstasjoner.';
+
+  @override
+  String get open => 'Åpen';
+
+  @override
+  String get closed => 'Stengt';
+
+  @override
+  String distance(String distance) {
+    return '$distance unna';
+  }
+
+  @override
+  String get price => 'Pris';
+
+  @override
+  String get prices => 'Priser';
+
+  @override
+  String get address => 'Adresse';
+
+  @override
+  String get openingHours => 'Åpningstider';
+
+  @override
+  String get open24h => 'Åpent 24 timer';
+
+  @override
+  String get navigate => 'Naviger';
+
+  @override
+  String get retry => 'Prøv igjen';
+
+  @override
+  String get apiKeySetup => 'API-nøkkel';
+
+  @override
+  String get apiKeyDescription =>
+      'Registrer deg én gang for å få en gratis API-nøkkel.';
+
+  @override
+  String get apiKeyLabel => 'API-nøkkel';
+
+  @override
+  String get register => 'Registrering';
+
+  @override
+  String get continueButton => 'Fortsett';
+
+  @override
+  String get welcome => 'Drivstoffpriser';
+
+  @override
+  String get welcomeSubtitle => 'Finn det billigste drivstoffet i nærheten.';
+
+  @override
+  String get profileName => 'Profilnavn';
+
+  @override
+  String get preferredFuel => 'Foretrukket drivstoff';
+
+  @override
+  String get defaultRadius => 'Standard radius';
+
+  @override
+  String get landingScreen => 'Startskjerm';
+
+  @override
+  String get homeZip => 'Hjemmepostnummer';
+
+  @override
+  String get newProfile => 'Ny profil';
+
+  @override
+  String get editProfile => 'Rediger profil';
+
+  @override
+  String get save => 'Lagre';
+
+  @override
+  String get cancel => 'Avbryt';
+
+  @override
+  String get delete => 'Slett';
+
+  @override
+  String get activate => 'Aktiver';
+
+  @override
+  String get configured => 'Konfigurert';
+
+  @override
+  String get notConfigured => 'Ikke konfigurert';
+
+  @override
+  String get about => 'Om';
+
+  @override
+  String get openSource => 'Åpen kildekode (MIT-lisens)';
+
+  @override
+  String get sourceCode => 'Kildekode på GitHub';
+
+  @override
+  String get noFavorites => 'Ingen favoritter ennå';
+
+  @override
+  String get noFavoritesHint =>
+      'Trykk på stjernen ved en bensinstasjon for å lagre den som favoritt.';
+
+  @override
+  String get language => 'Språk';
+
+  @override
+  String get country => 'Land';
+
+  @override
+  String get demoMode => 'Demomodus — eksempeldata vises.';
+
+  @override
+  String get setupLiveData => 'Konfigurer for sanntidsdata';
+
+  @override
+  String get freeNoKey => 'Gratis — ingen nøkkel nødvendig';
+
+  @override
+  String get apiKeyRequired => 'API-nøkkel kreves';
+
+  @override
+  String get skipWithoutKey => 'Fortsett uten nøkkel';
+
+  @override
+  String get dataTransparency => 'Datatransparens';
+
+  @override
+  String get storageAndCache => 'Lagring og hurtigbuffer';
+
+  @override
+  String get clearCache => 'Tøm hurtigbuffer';
+
+  @override
+  String get clearAllData => 'Slett alle data';
+
+  @override
+  String get errorLog => 'Feillogg';
+
+  @override
+  String stationsFound(int count) {
+    return '$count bensinstasjoner funnet';
+  }
+
+  @override
+  String get whatIsShared => 'Hva deles — og med hvem?';
+
+  @override
+  String get gpsCoordinates => 'GPS-koordinater';
+
+  @override
+  String get gpsReason =>
+      'Sendes med hvert søk for å finne nærliggende stasjoner.';
+
+  @override
+  String get postalCodeData => 'Postnummer';
+
+  @override
+  String get postalReason =>
+      'Konverteres til koordinater via geokodingstjenesten.';
+
+  @override
+  String get mapViewport => 'Kartutsnitt';
+
+  @override
+  String get mapReason =>
+      'Kartfliser lastes fra serveren. Ingen personlige data overføres.';
+
+  @override
+  String get apiKeyData => 'API-nøkkel';
+
+  @override
+  String get apiKeyReason =>
+      'Din personlige nøkkel sendes med hver API-forespørsel. Den er knyttet til din e-post.';
+
+  @override
+  String get notShared => 'Deles IKKE:';
+
+  @override
+  String get searchHistory => 'Søkehistorikk';
+
+  @override
+  String get favoritesData => 'Favoritter';
+
+  @override
+  String get profileNames => 'Profilnavn';
+
+  @override
+  String get homeZipData => 'Hjemmepostnummer';
+
+  @override
+  String get usageData => 'Bruksdata';
+
+  @override
+  String get privacyBanner =>
+      'Denne appen har ingen server. Alle data forblir på enheten din. Ingen analyse, sporing eller reklame.';
+
+  @override
+  String get storageUsage => 'Lagringsbruk på denne enheten';
+
+  @override
+  String get settingsLabel => 'Innstillinger';
+
+  @override
+  String get profilesStored => 'profiler lagret';
+
+  @override
+  String get stationsMarked => 'stasjoner merket';
+
+  @override
+  String get cachedResponses => 'hurtigbufrede svar';
+
+  @override
+  String get total => 'Totalt';
+
+  @override
+  String get cacheManagement => 'Hurtigbufferadministrasjon';
+
+  @override
+  String get cacheDescription =>
+      'Hurtigbufferen lagrer API-svar for raskere lasting og frakoblet tilgang.';
+
+  @override
+  String get stationSearch => 'Stasjonssøk';
+
+  @override
+  String get stationDetails => 'Stasjonsdetaljer';
+
+  @override
+  String get priceQuery => 'Prisforespørsel';
+
+  @override
+  String get zipGeocoding => 'Postnummer-geokoding';
+
+  @override
+  String minutes(int n) {
+    return '$n minutter';
+  }
+
+  @override
+  String hours(int n) {
+    return '$n timer';
+  }
+
+  @override
+  String get clearCacheTitle => 'Tøm hurtigbuffer?';
+
+  @override
+  String get clearCacheBody =>
+      'Hurtigbufrede søkeresultater og priser slettes. Profiler, favoritter og innstillinger beholdes.';
+
+  @override
+  String get clearCacheButton => 'Tøm hurtigbuffer';
+
+  @override
+  String get deleteAllTitle => 'Slette alle data?';
+
+  @override
+  String get deleteAllBody =>
+      'Dette sletter permanent alle profiler, favoritter, API-nøkkel, innstillinger og hurtigbuffer. Appen tilbakestilles.';
+
+  @override
+  String get deleteAllButton => 'Slett alt';
+
+  @override
+  String get entries => 'oppføringer';
+
+  @override
+  String get cacheEmpty => 'Hurtigbufferen er tom';
+
+  @override
+  String get noStorage => 'Ingen lagring brukt';
+
+  @override
+  String get apiKeyNote =>
+      'Gratis registrering. Data fra statlige pristransparensorganer.';
+
+  @override
+  String get supportProject => 'Støtt dette prosjektet';
+
+  @override
+  String get supportDescription =>
+      'Denne appen er gratis, åpen kildekode og uten reklame. Hvis du finner den nyttig, vurder å støtte utvikleren.';
+
+  @override
+  String get reportBug => 'Rapporter feil / Foreslå funksjon';
+
+  @override
+  String get privacyPolicy => 'Personvernerklæring';
+
+  @override
+  String get fuels => 'Drivstoff';
+
+  @override
+  String get services => 'Tjenester';
+
+  @override
+  String get zone => 'Sone';
+
+  @override
+  String get highway => 'Motorvei';
+
+  @override
+  String get localStation => 'Lokal stasjon';
+
+  @override
+  String get lastUpdate => 'Siste oppdatering';
+
+  @override
+  String get automate24h => '24t/24 — Automat';
+
+  @override
+  String get refreshPrices => 'Oppdater priser';
+
+  @override
+  String get station => 'Bensinstasjon';
+
+  @override
+  String get locationDenied =>
+      'Plasseringstillatelse nektet. Du kan søke etter postnummer.';
+
+  @override
+  String get demoModeBanner =>
+      'Demomodus. Konfigurer API-nøkkel i innstillinger.';
+
+  @override
+  String get sortDistance => 'Avstand';
+
+  @override
+  String get cheap => 'billig';
+
+  @override
+  String get expensive => 'dyr';
+
+  @override
+  String stationsOnMap(int count) {
+    return '$count stasjoner';
+  }
+
+  @override
+  String get loadingFavorites =>
+      'Laster favoritter...\nSøk etter stasjoner først for å lagre data.';
+
+  @override
+  String get reportPrice => 'Rapporter pris';
+
+  @override
+  String get whatsWrong => 'Hva er galt?';
+
+  @override
+  String get correctPrice => 'Korrekt pris (f.eks. 15,79)';
+
+  @override
+  String get sendReport => 'Send rapport';
+
+  @override
+  String get reportSent => 'Rapport sendt. Takk!';
+
+  @override
+  String get enterValidPrice => 'Vennligst oppgi en gyldig pris';
+
+  @override
+  String get cacheCleared => 'Hurtigbuffer tømt.';
+
+  @override
+  String get yourPosition => 'Din posisjon';
+
+  @override
+  String get positionUnknown => 'Posisjon ukjent';
+
+  @override
+  String get distancesFromCenter => 'Avstander fra søkesentrum';
+
+  @override
+  String get autoUpdatePosition => 'Oppdater posisjon automatisk';
+
+  @override
+  String get autoUpdateDescription => 'Oppdater GPS-posisjon før hvert søk';
+
+  @override
+  String get location => 'Plassering';
+
+  @override
+  String get switchProfileTitle => 'Land endret';
+
+  @override
+  String switchProfilePrompt(String country, String profile) {
+    return 'Du er nå i $country. Bytte til profil \"$profile\"?';
+  }
+
+  @override
+  String switchedToProfile(String profile, String country) {
+    return 'Byttet til profil \"$profile\" ($country)';
+  }
+
+  @override
+  String get noProfileForCountryTitle => 'Ingen profil for dette landet';
+
+  @override
+  String noProfileForCountry(String country) {
+    return 'Du er i $country, men ingen profil er konfigurert. Opprett en i Innstillinger.';
+  }
+
+  @override
+  String get autoSwitchProfile => 'Automatisk profilbytte';
+
+  @override
+  String get autoSwitchDescription =>
+      'Bytt profil automatisk ved grensepassering';
+
+  @override
+  String get switchProfile => 'Bytt';
+
+  @override
+  String get dismiss => 'Lukk';
+
+  @override
+  String get profileCountry => 'Land';
+
+  @override
+  String get profileLanguage => 'Språk';
+
+  @override
+  String get settingsStorageDetail => 'API-nøkkel, aktiv profil';
+
+  @override
+  String get allFuels => 'Alle';
+
+  @override
+  String get priceAlerts => 'Prisalarmer';
+
+  @override
+  String get noPriceAlerts => 'Ingen prisalarmer';
+
+  @override
+  String get noPriceAlertsHint =>
+      'Opprett en alarm fra en stasjons detaljside.';
+
+  @override
+  String alertDeleted(String name) {
+    return 'Alarm \"$name\" slettet';
+  }
+
+  @override
+  String get createAlert => 'Opprett prisalarm';
+
+  @override
+  String currentPrice(String price) {
+    return 'Nåværende pris: $price';
+  }
+
+  @override
+  String get targetPrice => 'Målpris (EUR)';
+
+  @override
+  String get enterPrice => 'Oppgi en pris';
+
+  @override
+  String get invalidPrice => 'Ugyldig pris';
+
+  @override
+  String get priceTooHigh => 'Prisen er for høy';
+
+  @override
+  String get create => 'Opprett';
+
+  @override
+  String get alertCreated => 'Prisalarm opprettet';
+
+  @override
+  String get wrongE5Price => 'Feil Super E5-pris';
+
+  @override
+  String get wrongE10Price => 'Feil Super E10-pris';
+
+  @override
+  String get wrongDieselPrice => 'Feil dieselpris';
+
+  @override
+  String get wrongStatusOpen => 'Vist som åpen, men stengt';
+
+  @override
+  String get wrongStatusClosed => 'Vist som stengt, men åpen';
+
+  @override
+  String get searchAlongRouteLabel => 'Langs ruten';
+
+  @override
+  String get searchEvStations => 'Søk ladestasjoner';
+
+  @override
+  String get allStations => 'Alle stasjoner';
+
+  @override
+  String get bestStops => 'Beste stopp';
+
+  @override
+  String get openInMaps => 'Åpne i Kart';
+
+  @override
+  String get noStationsAlongRoute => 'Ingen stasjoner funnet langs ruten';
+
+  @override
+  String get evOperational => 'I drift';
+
+  @override
+  String get evStatusUnknown => 'Status ukjent';
+
+  @override
+  String evConnectors(int count) {
+    return 'Kontakter ($count punkter)';
+  }
+
+  @override
+  String get evNoConnectors => 'Ingen kontaktdetaljer tilgjengelig';
+
+  @override
+  String get evUsageCost => 'Brukskostnad';
+
+  @override
+  String get evPricingUnavailable => 'Prising ikke tilgjengelig fra leverandør';
+
+  @override
+  String get evLastUpdated => 'Sist oppdatert';
+
+  @override
+  String get evUnknown => 'Ukjent';
+
+  @override
+  String get evDataAttribution => 'Data fra OpenChargeMap (felleskilde)';
+
+  @override
+  String get evStatusDisclaimer =>
+      'Status gjenspeiler kanskje ikke tilgjengelighet i sanntid. Trykk oppdater for å hente siste data.';
+
+  @override
+  String get evNavigateToStation => 'Naviger til stasjon';
+
+  @override
+  String get evRefreshStatus => 'Oppdater status';
+
+  @override
+  String get evStatusUpdated => 'Status oppdatert';
+
+  @override
+  String get evStationNotFound =>
+      'Kunne ikke oppdatere — stasjon ikke funnet i nærheten';
+
+  @override
+  String get addedToFavorites => 'Lagt til i favoritter';
+
+  @override
+  String get removedFromFavorites => 'Fjernet fra favoritter';
+
+  @override
+  String get addFavorite => 'Legg til i favoritter';
+
+  @override
+  String get removeFavorite => 'Fjern fra favoritter';
+
+  @override
+  String get currentLocation => 'Nåværende posisjon';
+
+  @override
+  String get gpsError => 'GPS-feil';
+
+  @override
+  String get couldNotResolve => 'Kunne ikke bestemme start eller destinasjon';
+
+  @override
+  String get start => 'Start';
+
+  @override
+  String get destination => 'Destinasjon';
+
+  @override
+  String get cityAddressOrGps => 'By, adresse eller GPS';
+
+  @override
+  String get cityOrAddress => 'By eller adresse';
+
+  @override
+  String get useGps => 'Bruk GPS';
+
+  @override
+  String get stop => 'Stopp';
+
+  @override
+  String stopN(int n) {
+    return 'Stopp $n';
+  }
+
+  @override
+  String get addStop => 'Legg til stopp';
+
+  @override
+  String get searchAlongRoute => 'Søk langs ruten';
+
+  @override
+  String get cheapest => 'Billigst';
+
+  @override
+  String nStations(int count) {
+    return '$count stasjoner';
+  }
+
+  @override
+  String nBest(int count) {
+    return '$count beste';
+  }
+
+  @override
+  String get fuelPricesTankerkoenig => 'Drivstoffpriser (Tankerkoenig)';
+
+  @override
+  String get requiredForFuelSearch => 'Påkrevd for drivstoffprissøk i Tyskland';
+
+  @override
+  String get evChargingOpenChargeMap => 'EV-lading (OpenChargeMap)';
+
+  @override
+  String get customKey => 'Egendefinert nøkkel';
+
+  @override
+  String get appDefaultKey => 'Standard app-nøkkel';
+
+  @override
+  String get optionalOverrideKey =>
+      'Valgfritt: erstatt den innebygde app-nøkkelen med din egen';
+
+  @override
+  String get requiredForEvSearch => 'Påkrevd for søk etter EV-ladestasjoner';
+
+  @override
+  String get edit => 'Rediger';
+
+  @override
+  String get fuelPricesApiKey => 'Drivstoffpriser API-nøkkel';
+
+  @override
+  String get tankerkoenigApiKey => 'Tankerkoenig API-nøkkel';
+
+  @override
+  String get evChargingApiKey => 'EV-lading API-nøkkel';
+
+  @override
+  String get openChargeMapApiKey => 'OpenChargeMap API-nøkkel';
+
+  @override
+  String get routeSegment => 'Rutesegment';
+
+  @override
+  String showCheapestEveryNKm(int km) {
+    return 'Vis billigste stasjon for hver $km km langs ruten';
+  }
+
+  @override
+  String get avoidHighways => 'Unngå motorveier';
+
+  @override
+  String get avoidHighwaysDesc =>
+      'Ruteberegning unngår bompenger og motorveier';
+
+  @override
+  String get showFuelStations => 'Vis bensinstasjoner';
+
+  @override
+  String get showFuelStationsDesc =>
+      'Inkluder bensin-, diesel-, LPG-, CNG-stasjoner';
+
+  @override
+  String get showEvStations => 'Vis ladestasjoner';
+
+  @override
+  String get showEvStationsDesc =>
+      'Inkluder elektriske ladestasjoner i søkeresultater';
+
+  @override
+  String get noStationsAlongThisRoute =>
+      'Ingen stasjoner funnet langs denne ruten.';
+
+  @override
+  String get fuelCostCalculator => 'Drivstoffkostnadsberegner';
+
+  @override
+  String get distanceKm => 'Avstand (km)';
+
+  @override
+  String get consumptionL100km => 'Forbruk (L/100km)';
+
+  @override
+  String get fuelPriceEurL => 'Drivstoffpris (EUR/L)';
+
+  @override
+  String get tripCost => 'Turkostnad';
+
+  @override
+  String get fuelNeeded => 'Nødvendig drivstoff';
+
+  @override
+  String get totalCost => 'Totalkostnad';
+
+  @override
+  String get enterCalcValues =>
+      'Oppgi avstand, forbruk og pris for å beregne turkostnaden';
+
+  @override
+  String get priceHistory => 'Prishistorikk';
+
+  @override
+  String get noPriceHistory => 'Ingen prishistorikk ennå';
+
+  @override
+  String get noHourlyData => 'Ingen timedata';
+
+  @override
+  String get noStatistics => 'Ingen statistikk tilgjengelig';
+
+  @override
+  String get statMin => 'Min';
+
+  @override
+  String get statMax => 'Maks';
+
+  @override
+  String get statAvg => 'Snitt';
+
+  @override
+  String get showAllFuelTypes => 'Vis alle drivstofftyper';
+
+  @override
+  String get connected => 'Tilkoblet';
+
+  @override
+  String get notConnected => 'Ikke tilkoblet';
+
+  @override
+  String get connectTankSync => 'Koble til TankSync';
+
+  @override
+  String get disconnectTankSync => 'Koble fra TankSync';
+
+  @override
+  String get viewMyData => 'Se mine data';
+
+  @override
+  String get optionalCloudSync =>
+      'Valgfri skysynkronisering for alarmer, favoritter og push-varsler';
+
+  @override
+  String get tapToUpdateGps => 'Trykk for å oppdatere GPS-posisjon';
+
+  @override
+  String get gpsAutoUpdateHint =>
+      'GPS-posisjonen hentes automatisk ved søk. Du kan også oppdatere den manuelt her.';
+
+  @override
+  String get clearGpsConfirm =>
+      'Tøm lagret GPS-posisjon? Du kan oppdatere den igjen når som helst.';
+
+  @override
+  String get pageNotFound => 'Siden ble ikke funnet';
+
+  @override
+  String get deleteAllServerData => 'Slett alle serverdata';
+
+  @override
+  String get deleteServerDataConfirm => 'Slette alle serverdata?';
+
+  @override
+  String get deleteEverything => 'Slett alt';
+
+  @override
+  String get allDataDeleted => 'Alle serverdata slettet';
+
+  @override
+  String get disconnectConfirm => 'Koble fra TankSync?';
+
+  @override
+  String get disconnect => 'Koble fra';
+
+  @override
+  String get myServerData => 'Mine serverdata';
+
+  @override
+  String get anonymousUuid => 'Anonym UUID';
+
+  @override
+  String get server => 'Server';
+
+  @override
+  String get syncedData => 'Synkroniserte data';
+
+  @override
+  String get pushTokens => 'Push-tokener';
+
+  @override
+  String get priceReports => 'Prisrapporter';
+
+  @override
+  String get totalItems => 'Totalt antall';
+
+  @override
+  String get estimatedSize => 'Estimert størrelse';
+
+  @override
+  String get viewRawJson => 'Se rådata som JSON';
+
+  @override
+  String get exportJson => 'Eksporter som JSON (utklippstavle)';
+
+  @override
+  String get jsonCopied => 'JSON kopiert til utklippstavlen';
+
+  @override
+  String get rawDataJson => 'Rådata (JSON)';
+
+  @override
+  String get close => 'Lukk';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get continueAsGuest => 'Continue as guest';
+
+  @override
+  String get createAccount => 'Create account';
+
+  @override
+  String get signIn => 'Sign in';
+
+  @override
+  String get upgradeToEmail => 'Create email account';
+
+  @override
+  String get savedRoutes => 'Saved Routes';
+
+  @override
+  String get noSavedRoutes => 'No saved routes';
+
+  @override
+  String get noSavedRoutesHint =>
+      'Search along a route and save it for quick access later.';
+
+  @override
+  String get saveRoute => 'Save route';
+
+  @override
+  String get routeName => 'Route name';
+}

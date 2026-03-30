@@ -1,0 +1,4 @@
+{
+  "ok": false,
+  "message": "apikey nicht angegeben, bitte den Parameter \"apikey\" mit einem gültigen API-Key übergeben."
+}

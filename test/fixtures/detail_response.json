@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "license": "CC BY 4.0 - https://creativecommons.tankerkoenig.de",
+  "data": "MTS-K",
+  "status": "ok",
+  "station": {
+    "id": "51d4b660-a095-1aa0-e100-80009459e03a",
+    "name": "Aral Tankstelle am Hauptbahnhof",
+    "brand": "ARAL",
+    "street": "Hauptstraße",
+    "houseNumber": "42",
+    "postCode": 10115,
+    "place": "Berlin",
+    "lat": 52.521,
+    "lng": 13.438,
+    "openingTimes": [
+      {"text": "Mo-Fr", "start": "06:00:00", "end": "22:00:00"},
+      {"text": "Samstag", "start": "07:00:00", "end": "22:00:00"},
+      {"text": "Sonntag", "start": "08:00:00", "end": "20:00:00"}
+    ],
+    "overrides": ["24.12. geschlossen", "31.12. bis 14:00"],
+    "wholeDay": false,
+    "isOpen": true,
+    "e5": 1.459,
+    "e10": 1.439,
+    "diesel": 1.359,
+    "state": null
+  }
+}

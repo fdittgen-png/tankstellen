@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 432 432">
+  <!-- Adaptive icon foreground: content within 66% safe zone (centered in 432x432) -->
+  <!-- Pump body -->
+  <rect x="100" y="60" width="180" height="290" rx="22" fill="white"/>
+  <!-- Screen -->
+  <rect x="120" y="85" width="140" height="100" rx="12" fill="#0D47A1"/>
+  <!-- Price bars -->
+  <rect x="135" y="100" width="110" height="20" rx="10" fill="#4CAF50"/>
+  <rect x="135" y="126" width="88" height="20" rx="10" fill="#FFC107"/>
+  <rect x="135" y="152" width="66" height="20" rx="10" fill="#F44336"/>
+  <!-- Nozzle -->
+  <path d="M 280 130 L 330 130 Q 355 130 355 105 L 355 55 Q 355 35 335 35 L 310 35"
+        fill="none" stroke="white" stroke-width="16" stroke-linecap="round"/>
+  <rect x="295" y="20" width="30" height="30" rx="6" fill="white"/>
+  <!-- Euro -->
+  <circle cx="190" cy="270" r="32" fill="none" stroke="white" stroke-width="10"/>
+  <rect x="195" y="235" width="35" height="70" fill="#0D47A1"/>
+  <rect x="155" y="261" width="50" height="8" rx="4" fill="white"/>
+  <rect x="155" y="275" width="50" height="8" rx="4" fill="white"/>
+  <!-- Arrow -->
+  <path d="M 190 390 L 160 360 L 176 360 L 176 330 L 204 330 L 204 360 L 220 360 Z" fill="#4CAF50"/>
+</svg>

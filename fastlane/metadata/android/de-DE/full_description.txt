@@ -1,0 +1,35 @@
+Tankstellen ist eine kostenlose Open-Source-App zum Vergleich von Kraftstoffpreisen, die Ihnen hilft, das guenstigste Benzin und Diesel in Ihrer Naehe zu finden. Datenschutz steht im Mittelpunkt: keine Werbung, kein Tracking, keine Telemetrie. Ihre Standortdaten verlassen niemals Ihr Geraet, es sei denn, Sie aktivieren die optionale Cloud-Synchronisation.
+
+FUNKTIONEN
+
+- Echtzeit-Kraftstoffpreise von offiziellen Regierungs-APIs in 7 europaeischen Laendern: Deutschland (Tankerkoenig/MTS-K), Frankreich (Prix Carburants), Italien (MASE/MiSE), Spanien (Geoportal), Polen (UOKiK), Oesterreich (Spritpreisrechner) und Kroatien (MINGOR)
+- Interaktive Karte mit OpenStreetMap-Kacheln und Marker-Clustering fuer schnelles Navigieren auch in dichten Stadtgebieten
+- Suche nach Stadtname, Postleitzahl oder GPS-Position mit einstellbarem Radius
+- Favoritenliste fuer schnellen Zugriff auf Ihre Stammtankstellen
+- Preisverlauf-Diagramme zur Ermittlung des besten Tankzeitpunkts
+- Hintergrund-Preisalarme mit lokalen Benachrichtigungen, wenn Preise unter Ihren Zielwert fallen
+- Material 3 Design mit hellem und dunklem Thema
+- Vollstaendige Lokalisierung in 10 Sprachen: Deutsch, Englisch, Franzoesisch, Italienisch, Spanisch, Polnisch, Kroatisch, Niederlaendisch, Portugiesisch und Tuerkisch
+
+DATENSCHUTZ
+
+Tankstellen benoetigt die Standortberechtigung nur bei der aktiven Suche nach Tankstellen in der Naehe. Kein Konto erforderlich. Es werden keine Daten an Dritte uebermittelt. Die App funktioniert vollstaendig offline fuer zwischengespeicherte Ergebnisse.
+
+OPTIONALE CLOUD-SYNCHRONISATION (TankSync)
+
+Fuer Benutzer, die Favoriten und Preisalarme geraeteuebergreifend synchronisieren moechten, unterstuetzt Tankstellen ein optionales selbst gehostetes Supabase-Backend namens TankSync. Sie betreiben Ihre eigene Instanz, geben URL und anonymen Schluessel ein, und die App synchronisiert Ihre Daten auf Ihren eigenen Server. Volle Datentransparenz: Sie koennen jederzeit alles, was auf dem Server gespeichert ist, einsehen, exportieren oder loeschen.
+
+Push-Benachrichtigungen fuer Preisalarme werden ueber ntfy.sh geliefert, einen Open-Source-Push-Benachrichtigungsdienst, sodass keine Google Play Services oder Firebase erforderlich sind.
+
+OPEN SOURCE
+
+Tankstellen ist unter MIT lizenziert. Der vollstaendige Quellcode, Supabase-Migrationsskripte und die Deployment-Dokumentation sind auf GitHub verfuegbar. Beitraege und Uebersetzungen sind willkommen.
+
+UNTERSTUETZTE PLATTFORMEN
+
+- Android (primaere Zielplattform, einschliesslich Android Auto)
+- Chromebook (ueber Android-APK)
+
+TECHNISCHE DETAILS
+
+Entwickelt mit Flutter und Riverpod fuer State Management. Alle Daten werden lokal mit Hive gespeichert. Netzwerkanfragen laufen ueber eine Service-Abstraktionsschicht mit automatischen Fallback-Ketten und Caching. Die App respektiert API-Ratenlimits und cached Antworten, um den Netzwerkverbrauch zu minimieren.

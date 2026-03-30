@@ -1,0 +1,912 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Croatian (`hr`).
+class AppLocalizationsHr extends AppLocalizations {
+  AppLocalizationsHr([String locale = 'hr']) : super(locale);
+
+  @override
+  String get appTitle => 'Cijene goriva';
+
+  @override
+  String get search => 'Pretraži';
+
+  @override
+  String get favorites => 'Favoriti';
+
+  @override
+  String get map => 'Karta';
+
+  @override
+  String get profile => 'Profil';
+
+  @override
+  String get settings => 'Postavke';
+
+  @override
+  String get gpsLocation => 'GPS lokacija';
+
+  @override
+  String get zipCode => 'Poštanski broj';
+
+  @override
+  String get zipCodeHint => 'npr. 10000';
+
+  @override
+  String get fuelType => 'Gorivo';
+
+  @override
+  String get searchRadius => 'Radijus';
+
+  @override
+  String get searchNearby => 'Benzinske postaje u blizini';
+
+  @override
+  String get searchButton => 'Pretraži';
+
+  @override
+  String get noResults => 'Benzinske postaje nisu pronađene.';
+
+  @override
+  String get startSearch => 'Pretražite za pronalaženje benzinskih postaja.';
+
+  @override
+  String get open => 'Otvoreno';
+
+  @override
+  String get closed => 'Zatvoreno';
+
+  @override
+  String distance(String distance) {
+    return '$distance daleko';
+  }
+
+  @override
+  String get price => 'Cijena';
+
+  @override
+  String get prices => 'Cijene';
+
+  @override
+  String get address => 'Adresa';
+
+  @override
+  String get openingHours => 'Radno vrijeme';
+
+  @override
+  String get open24h => 'Otvoreno 24 sata';
+
+  @override
+  String get navigate => 'Navigiraj';
+
+  @override
+  String get retry => 'Pokušaj ponovo';
+
+  @override
+  String get apiKeySetup => 'API ključ';
+
+  @override
+  String get apiKeyDescription =>
+      'Registrirajte se jednom za besplatni API ključ.';
+
+  @override
+  String get apiKeyLabel => 'API ključ';
+
+  @override
+  String get register => 'Registracija';
+
+  @override
+  String get continueButton => 'Nastavi';
+
+  @override
+  String get welcome => 'Cijene goriva';
+
+  @override
+  String get welcomeSubtitle => 'Pronađite najjeftinije gorivo u blizini.';
+
+  @override
+  String get profileName => 'Naziv profila';
+
+  @override
+  String get preferredFuel => 'Preferirano gorivo';
+
+  @override
+  String get defaultRadius => 'Zadani radijus';
+
+  @override
+  String get landingScreen => 'Početni zaslon';
+
+  @override
+  String get homeZip => 'Kućni poštanski broj';
+
+  @override
+  String get newProfile => 'Novi profil';
+
+  @override
+  String get editProfile => 'Uredi profil';
+
+  @override
+  String get save => 'Spremi';
+
+  @override
+  String get cancel => 'Odustani';
+
+  @override
+  String get delete => 'Obriši';
+
+  @override
+  String get activate => 'Aktiviraj';
+
+  @override
+  String get configured => 'Konfigurirano';
+
+  @override
+  String get notConfigured => 'Nije konfigurirano';
+
+  @override
+  String get about => 'O aplikaciji';
+
+  @override
+  String get openSource => 'Otvoreni kod (MIT licenca)';
+
+  @override
+  String get sourceCode => 'Izvorni kod na GitHubu';
+
+  @override
+  String get noFavorites => 'Nema favorita';
+
+  @override
+  String get noFavoritesHint =>
+      'Dodirnite zvjezdicu na postaji da je spremite kao favorita.';
+
+  @override
+  String get language => 'Jezik';
+
+  @override
+  String get country => 'Država';
+
+  @override
+  String get demoMode => 'Demo način — prikazani primjeri podataka.';
+
+  @override
+  String get setupLiveData => 'Postavke za stvarne podatke';
+
+  @override
+  String get freeNoKey => 'Besplatno — ključ nije potreban';
+
+  @override
+  String get apiKeyRequired => 'Potreban API ključ';
+
+  @override
+  String get skipWithoutKey => 'Nastavi bez ključa';
+
+  @override
+  String get dataTransparency => 'Transparentnost podataka';
+
+  @override
+  String get storageAndCache => 'Pohrana i predmemorija';
+
+  @override
+  String get clearCache => 'Očisti predmemoriju';
+
+  @override
+  String get clearAllData => 'Obriši sve podatke';
+
+  @override
+  String get errorLog => 'Dnevnik grešaka';
+
+  @override
+  String stationsFound(int count) {
+    return 'Pronađeno $count postaja';
+  }
+
+  @override
+  String get whatIsShared => 'Što se dijeli — i s kim?';
+
+  @override
+  String get gpsCoordinates => 'GPS koordinate';
+
+  @override
+  String get gpsReason =>
+      'Šalju se sa svakom pretragom za pronalaženje obližnjih postaja.';
+
+  @override
+  String get postalCodeData => 'Poštanski broj';
+
+  @override
+  String get postalReason => 'Pretvara se u koordinate putem geokodiranja.';
+
+  @override
+  String get mapViewport => 'Prikaz karte';
+
+  @override
+  String get mapReason =>
+      'Pločice karte učitavaju se s poslužitelja. Osobni podaci se ne prenose.';
+
+  @override
+  String get apiKeyData => 'API ključ';
+
+  @override
+  String get apiKeyReason =>
+      'Vaš osobni ključ šalje se sa svakim API zahtjevom. Povezan je s vašom e-poštom.';
+
+  @override
+  String get notShared => 'NE dijeli se:';
+
+  @override
+  String get searchHistory => 'Povijest pretraživanja';
+
+  @override
+  String get favoritesData => 'Favoriti';
+
+  @override
+  String get profileNames => 'Nazivi profila';
+
+  @override
+  String get homeZipData => 'Kućni poštanski broj';
+
+  @override
+  String get usageData => 'Podaci o korištenju';
+
+  @override
+  String get privacyBanner =>
+      'Ova aplikacija nema poslužitelj. Svi podaci ostaju na vašem uređaju. Bez analitike, praćenja ili reklama.';
+
+  @override
+  String get storageUsage => 'Korištenje pohrane na ovom uređaju';
+
+  @override
+  String get settingsLabel => 'Postavke';
+
+  @override
+  String get profilesStored => 'spremljenih profila';
+
+  @override
+  String get stationsMarked => 'označenih postaja';
+
+  @override
+  String get cachedResponses => 'predmemoriranih odgovora';
+
+  @override
+  String get total => 'Ukupno';
+
+  @override
+  String get cacheManagement => 'Upravljanje predmemorijom';
+
+  @override
+  String get cacheDescription =>
+      'Predmemorija pohranjuje API odgovore za brže učitavanje i offline pristup.';
+
+  @override
+  String get stationSearch => 'Pretraživanje postaja';
+
+  @override
+  String get stationDetails => 'Detalji postaje';
+
+  @override
+  String get priceQuery => 'Upit o cijeni';
+
+  @override
+  String get zipGeocoding => 'Geokodiranje poštanskog broja';
+
+  @override
+  String minutes(int n) {
+    return '$n minuta';
+  }
+
+  @override
+  String hours(int n) {
+    return '$n sati';
+  }
+
+  @override
+  String get clearCacheTitle => 'Očistiti predmemoriju?';
+
+  @override
+  String get clearCacheBody =>
+      'Predmemorirani rezultati pretrage i cijene bit će obrisani. Profili, favoriti i postavke su sačuvani.';
+
+  @override
+  String get clearCacheButton => 'Očisti predmemoriju';
+
+  @override
+  String get deleteAllTitle => 'Obrisati sve podatke?';
+
+  @override
+  String get deleteAllBody =>
+      'Ovo trajno briše sve profile, favorite, API ključ, postavke i predmemoriju. Aplikacija će se resetirati.';
+
+  @override
+  String get deleteAllButton => 'Obriši sve';
+
+  @override
+  String get entries => 'unosa';
+
+  @override
+  String get cacheEmpty => 'Predmemorija je prazna';
+
+  @override
+  String get noStorage => 'Nema korištene pohrane';
+
+  @override
+  String get apiKeyNote =>
+      'Besplatna registracija. Podaci od vladinih agencija za transparentnost cijena.';
+
+  @override
+  String get supportProject => 'Podržite ovaj projekt';
+
+  @override
+  String get supportDescription =>
+      'Ova aplikacija je besplatna, otvorenog koda i bez reklama. Ako je smatrate korisnom, razmislite o podršci razvojnom programeru.';
+
+  @override
+  String get reportBug => 'Prijavi grešku / Predloži značajku';
+
+  @override
+  String get privacyPolicy => 'Pravila o privatnosti';
+
+  @override
+  String get fuels => 'Goriva';
+
+  @override
+  String get services => 'Usluge';
+
+  @override
+  String get zone => 'Zona';
+
+  @override
+  String get highway => 'Autocesta';
+
+  @override
+  String get localStation => 'Lokalna postaja';
+
+  @override
+  String get lastUpdate => 'Zadnje ažuriranje';
+
+  @override
+  String get automate24h => '24h/24 — Automat';
+
+  @override
+  String get refreshPrices => 'Osvježi cijene';
+
+  @override
+  String get station => 'Benzinska postaja';
+
+  @override
+  String get locationDenied =>
+      'Dopuštenje lokacije odbijeno. Možete pretraživati po poštanskom broju.';
+
+  @override
+  String get demoModeBanner =>
+      'Demo način. Konfigurirajte API ključ u postavkama.';
+
+  @override
+  String get sortDistance => 'Udaljenost';
+
+  @override
+  String get cheap => 'jeftino';
+
+  @override
+  String get expensive => 'skupo';
+
+  @override
+  String stationsOnMap(int count) {
+    return '$count postaja';
+  }
+
+  @override
+  String get loadingFavorites =>
+      'Učitavanje favorita...\nNajprije pretražite postaje za spremanje podataka.';
+
+  @override
+  String get reportPrice => 'Prijavi cijenu';
+
+  @override
+  String get whatsWrong => 'Što nije u redu?';
+
+  @override
+  String get correctPrice => 'Ispravna cijena (npr. 1,459)';
+
+  @override
+  String get sendReport => 'Pošalji prijavu';
+
+  @override
+  String get reportSent => 'Prijava poslana. Hvala!';
+
+  @override
+  String get enterValidPrice => 'Unesite valjanu cijenu';
+
+  @override
+  String get cacheCleared => 'Predmemorija očišćena.';
+
+  @override
+  String get yourPosition => 'Vaša pozicija';
+
+  @override
+  String get positionUnknown => 'Pozicija nepoznata';
+
+  @override
+  String get distancesFromCenter => 'Udaljenosti od centra pretrage';
+
+  @override
+  String get autoUpdatePosition => 'Automatsko ažuriranje pozicije';
+
+  @override
+  String get autoUpdateDescription =>
+      'Ažuriraj GPS poziciju prije svake pretrage';
+
+  @override
+  String get location => 'Lokacija';
+
+  @override
+  String get switchProfileTitle => 'Država promijenjena';
+
+  @override
+  String switchProfilePrompt(String country, String profile) {
+    return 'Sada ste u $country. Prebaciti na profil \"$profile\"?';
+  }
+
+  @override
+  String switchedToProfile(String profile, String country) {
+    return 'Prebačeno na profil \"$profile\" ($country)';
+  }
+
+  @override
+  String get noProfileForCountryTitle => 'Nema profila za ovu državu';
+
+  @override
+  String noProfileForCountry(String country) {
+    return 'Nalazite se u $country, ali nema konfiguriranog profila. Izradite jedan u Postavkama.';
+  }
+
+  @override
+  String get autoSwitchProfile => 'Automatska promjena profila';
+
+  @override
+  String get autoSwitchDescription =>
+      'Automatski promijeni profil pri prelasku granice';
+
+  @override
+  String get switchProfile => 'Prebaci';
+
+  @override
+  String get dismiss => 'Zatvori';
+
+  @override
+  String get profileCountry => 'Država';
+
+  @override
+  String get profileLanguage => 'Jezik';
+
+  @override
+  String get settingsStorageDetail => 'API ključ, aktivni profil';
+
+  @override
+  String get allFuels => 'Sve';
+
+  @override
+  String get priceAlerts => 'Cjenovne obavijesti';
+
+  @override
+  String get noPriceAlerts => 'Nema cjenovnih obavijesti';
+
+  @override
+  String get noPriceAlertsHint =>
+      'Izradite obavijest sa stranice detalja postaje.';
+
+  @override
+  String alertDeleted(String name) {
+    return 'Obavijest \"$name\" obrisana';
+  }
+
+  @override
+  String get createAlert => 'Izradi cjenovnu obavijest';
+
+  @override
+  String currentPrice(String price) {
+    return 'Trenutna cijena: $price';
+  }
+
+  @override
+  String get targetPrice => 'Ciljna cijena (EUR)';
+
+  @override
+  String get enterPrice => 'Unesite cijenu';
+
+  @override
+  String get invalidPrice => 'Nevažeća cijena';
+
+  @override
+  String get priceTooHigh => 'Cijena previsoka';
+
+  @override
+  String get create => 'Izradi';
+
+  @override
+  String get alertCreated => 'Cenovna obavijest izrađena';
+
+  @override
+  String get wrongE5Price => 'Pogrešna cijena Super E5';
+
+  @override
+  String get wrongE10Price => 'Pogrešna cijena Super E10';
+
+  @override
+  String get wrongDieselPrice => 'Pogrešna cijena dizela';
+
+  @override
+  String get wrongStatusOpen => 'Prikazano kao otvoreno, ali zatvoreno';
+
+  @override
+  String get wrongStatusClosed => 'Prikazano kao zatvoreno, ali otvoreno';
+
+  @override
+  String get searchAlongRouteLabel => 'Duž rute';
+
+  @override
+  String get searchEvStations => 'Pretraži stanice za punjenje';
+
+  @override
+  String get allStations => 'Sve postaje';
+
+  @override
+  String get bestStops => 'Najbolja zaustavljanja';
+
+  @override
+  String get openInMaps => 'Otvori u Kartama';
+
+  @override
+  String get noStationsAlongRoute => 'Postaje duž rute nisu pronađene';
+
+  @override
+  String get evOperational => 'U funkciji';
+
+  @override
+  String get evStatusUnknown => 'Status nepoznat';
+
+  @override
+  String evConnectors(int count) {
+    return 'Priključci ($count točaka)';
+  }
+
+  @override
+  String get evNoConnectors => 'Nema dostupnih detalja o priključcima';
+
+  @override
+  String get evUsageCost => 'Trošak korištenja';
+
+  @override
+  String get evPricingUnavailable => 'Cijena nije dostupna od pružatelja';
+
+  @override
+  String get evLastUpdated => 'Zadnje ažurirano';
+
+  @override
+  String get evUnknown => 'Nepoznato';
+
+  @override
+  String get evDataAttribution => 'Podaci iz OpenChargeMap (izvor zajednice)';
+
+  @override
+  String get evStatusDisclaimer =>
+      'Status možda ne odražava dostupnost u stvarnom vremenu. Dodirnite osvježi za najnovije podatke.';
+
+  @override
+  String get evNavigateToStation => 'Navigiraj do postaje';
+
+  @override
+  String get evRefreshStatus => 'Osvježi status';
+
+  @override
+  String get evStatusUpdated => 'Status ažuriran';
+
+  @override
+  String get evStationNotFound =>
+      'Nije moguće osvježiti — postaja nije pronađena u blizini';
+
+  @override
+  String get addedToFavorites => 'Dodano u favorite';
+
+  @override
+  String get removedFromFavorites => 'Uklonjeno iz favorita';
+
+  @override
+  String get addFavorite => 'Dodaj u favorite';
+
+  @override
+  String get removeFavorite => 'Ukloni iz favorita';
+
+  @override
+  String get currentLocation => 'Trenutna lokacija';
+
+  @override
+  String get gpsError => 'GPS greška';
+
+  @override
+  String get couldNotResolve => 'Nije moguće odrediti početak ili odredište';
+
+  @override
+  String get start => 'Početak';
+
+  @override
+  String get destination => 'Odredište';
+
+  @override
+  String get cityAddressOrGps => 'Grad, adresa ili GPS';
+
+  @override
+  String get cityOrAddress => 'Grad ili adresa';
+
+  @override
+  String get useGps => 'Koristi GPS';
+
+  @override
+  String get stop => 'Zaustavljanje';
+
+  @override
+  String stopN(int n) {
+    return 'Zaustavljanje $n';
+  }
+
+  @override
+  String get addStop => 'Dodaj zaustavljanje';
+
+  @override
+  String get searchAlongRoute => 'Pretraži duž rute';
+
+  @override
+  String get cheapest => 'Najjeftinija';
+
+  @override
+  String nStations(int count) {
+    return '$count postaja';
+  }
+
+  @override
+  String nBest(int count) {
+    return '$count najboljih';
+  }
+
+  @override
+  String get fuelPricesTankerkoenig => 'Cijene goriva (Tankerkoenig)';
+
+  @override
+  String get requiredForFuelSearch =>
+      'Potrebno za pretraživanje cijena goriva u Njemačkoj';
+
+  @override
+  String get evChargingOpenChargeMap => 'EV punjenje (OpenChargeMap)';
+
+  @override
+  String get customKey => 'Prilagođeni ključ';
+
+  @override
+  String get appDefaultKey => 'Zadani ključ aplikacije';
+
+  @override
+  String get optionalOverrideKey =>
+      'Neobavezno: zamijenite ugrađeni ključ svojim vlastitim';
+
+  @override
+  String get requiredForEvSearch =>
+      'Potrebno za pretraživanje EV stanica za punjenje';
+
+  @override
+  String get edit => 'Uredi';
+
+  @override
+  String get fuelPricesApiKey => 'API ključ cijena goriva';
+
+  @override
+  String get tankerkoenigApiKey => 'API ključ Tankerkoenig';
+
+  @override
+  String get evChargingApiKey => 'API ključ EV punjenja';
+
+  @override
+  String get openChargeMapApiKey => 'API ključ OpenChargeMap';
+
+  @override
+  String get routeSegment => 'Segment rute';
+
+  @override
+  String showCheapestEveryNKm(int km) {
+    return 'Prikaži najjeftiniju postaju svakih $km km duž rute';
+  }
+
+  @override
+  String get avoidHighways => 'Izbjegavaj autoceste';
+
+  @override
+  String get avoidHighwaysDesc =>
+      'Izračun rute izbjegava cestarine i autoceste';
+
+  @override
+  String get showFuelStations => 'Prikaži benzinske postaje';
+
+  @override
+  String get showFuelStationsDesc => 'Uključi benzin, dizel, LPG, CNG postaje';
+
+  @override
+  String get showEvStations => 'Prikaži stanice za punjenje';
+
+  @override
+  String get showEvStationsDesc =>
+      'Uključi električne stanice za punjenje u rezultatima';
+
+  @override
+  String get noStationsAlongThisRoute => 'Nisu pronađene postaje duž ove rute.';
+
+  @override
+  String get fuelCostCalculator => 'Kalkulator troškova goriva';
+
+  @override
+  String get distanceKm => 'Udaljenost (km)';
+
+  @override
+  String get consumptionL100km => 'Potrošnja (L/100km)';
+
+  @override
+  String get fuelPriceEurL => 'Cijena goriva (EUR/L)';
+
+  @override
+  String get tripCost => 'Trošak putovanja';
+
+  @override
+  String get fuelNeeded => 'Potrebno gorivo';
+
+  @override
+  String get totalCost => 'Ukupni trošak';
+
+  @override
+  String get enterCalcValues =>
+      'Unesite udaljenost, potrošnju i cijenu za izračun troška putovanja';
+
+  @override
+  String get priceHistory => 'Povijest cijena';
+
+  @override
+  String get noPriceHistory => 'Još nema povijesti cijena';
+
+  @override
+  String get noHourlyData => 'Nema satnih podataka';
+
+  @override
+  String get noStatistics => 'Nema dostupnih statistika';
+
+  @override
+  String get statMin => 'Min';
+
+  @override
+  String get statMax => 'Maks';
+
+  @override
+  String get statAvg => 'Pros';
+
+  @override
+  String get showAllFuelTypes => 'Prikaži sve vrste goriva';
+
+  @override
+  String get connected => 'Spojeno';
+
+  @override
+  String get notConnected => 'Nije spojeno';
+
+  @override
+  String get connectTankSync => 'Spoji TankSync';
+
+  @override
+  String get disconnectTankSync => 'Odspoji TankSync';
+
+  @override
+  String get viewMyData => 'Pogledaj moje podatke';
+
+  @override
+  String get optionalCloudSync =>
+      'Neobavezna sinkronizacija u oblaku za obavijesti, favorite i push obavijesti';
+
+  @override
+  String get tapToUpdateGps => 'Dodirnite za ažuriranje GPS pozicije';
+
+  @override
+  String get gpsAutoUpdateHint =>
+      'GPS pozicija se automatski dobiva pri pretrazi. Možete je ažurirati i ručno ovdje.';
+
+  @override
+  String get clearGpsConfirm =>
+      'Obrisati spremljenu GPS poziciju? Možete je ažurirati ponovno u bilo kojem trenutku.';
+
+  @override
+  String get pageNotFound => 'Stranica nije pronađena';
+
+  @override
+  String get deleteAllServerData => 'Obriši sve podatke s poslužitelja';
+
+  @override
+  String get deleteServerDataConfirm => 'Obrisati sve podatke s poslužitelja?';
+
+  @override
+  String get deleteEverything => 'Obriši sve';
+
+  @override
+  String get allDataDeleted => 'Svi podaci s poslužitelja obrisani';
+
+  @override
+  String get disconnectConfirm => 'Odspojiti TankSync?';
+
+  @override
+  String get disconnect => 'Odspoji';
+
+  @override
+  String get myServerData => 'Moji podaci na poslužitelju';
+
+  @override
+  String get anonymousUuid => 'Anonimni UUID';
+
+  @override
+  String get server => 'Poslužitelj';
+
+  @override
+  String get syncedData => 'Sinkronizirani podaci';
+
+  @override
+  String get pushTokens => 'Push tokeni';
+
+  @override
+  String get priceReports => 'Prijave cijena';
+
+  @override
+  String get totalItems => 'Ukupno stavki';
+
+  @override
+  String get estimatedSize => 'Procijenjena veličina';
+
+  @override
+  String get viewRawJson => 'Pogledaj neobrađene podatke kao JSON';
+
+  @override
+  String get exportJson => 'Izvezi kao JSON (međuspremnik)';
+
+  @override
+  String get jsonCopied => 'JSON kopiran u međuspremnik';
+
+  @override
+  String get rawDataJson => 'Neobrađeni podaci (JSON)';
+
+  @override
+  String get close => 'Zatvori';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get continueAsGuest => 'Continue as guest';
+
+  @override
+  String get createAccount => 'Create account';
+
+  @override
+  String get signIn => 'Sign in';
+
+  @override
+  String get upgradeToEmail => 'Create email account';
+
+  @override
+  String get savedRoutes => 'Saved Routes';
+
+  @override
+  String get noSavedRoutes => 'No saved routes';
+
+  @override
+  String get noSavedRoutesHint =>
+      'Search along a route and save it for quick access later.';
+
+  @override
+  String get saveRoute => 'Save route';
+
+  @override
+  String get routeName => 'Route name';
+}

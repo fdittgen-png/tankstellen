@@ -1,0 +1,9 @@
+v3.0.0 — Major release
+• Material 3 bottom navigation
+• Background price alerts with local notifications
+• "Best time to fill" predictions from price history
+• Optional TankSync backend (Supabase) for cross-device sync
+• Shimmer loading states
+• Map marker clustering
+• Search cancel tokens (no more race conditions)
+• Android-focused (dropped Windows/Web)

@@ -1,0 +1,35 @@
+Tankstellen est une application gratuite et open source de comparaison des prix des carburants qui vous aide a trouver l'essence et le diesel les moins chers pres de chez vous. Concue avec la vie privee comme principe fondamental, elle ne contient aucune publicite, aucun tracage et aucune telemetrie. Vos donnees de localisation ne quittent jamais votre appareil, sauf si vous activez la synchronisation cloud optionnelle.
+
+FONCTIONNALITES
+
+- Prix des carburants en temps reel provenant des API gouvernementales officielles dans 7 pays europeens : Allemagne (Tankerkoenig/MTS-K), France (Prix Carburants), Italie (MASE/MiSE), Espagne (Geoportal), Pologne (UOKiK), Autriche (Spritpreisrechner) et Croatie (MINGOR)
+- Carte interactive avec tuiles OpenStreetMap et regroupement de marqueurs pour une navigation rapide meme dans les zones urbaines denses
+- Recherche par nom de ville, code postal ou position GPS avec rayon configurable
+- Liste de favoris pour un acces rapide a vos stations habituelles
+- Graphiques d'historique des prix pour identifier le meilleur moment pour faire le plein
+- Alertes de prix en arriere-plan avec notifications locales quand les prix descendent sous votre seuil
+- Design Material 3 avec themes clair et sombre
+- Localisation complete en 10 langues : allemand, anglais, francais, italien, espagnol, polonais, croate, neerlandais, portugais et turc
+
+VIE PRIVEE
+
+Tankstellen ne demande la permission de localisation que lors de la recherche active de stations a proximite. Aucun compte necessaire. Aucune donnee n'est collectee ou transmise a un tiers. L'application fonctionne entierement hors ligne pour les resultats mis en cache.
+
+SYNCHRONISATION CLOUD OPTIONNELLE (TankSync)
+
+Pour les utilisateurs souhaitant synchroniser leurs favoris et alertes de prix entre plusieurs appareils, Tankstellen prend en charge un backend Supabase auto-heberge optionnel appele TankSync. Vous deployez votre propre instance, entrez l'URL et la cle anonyme, et l'application synchronise vos donnees sur votre propre serveur. Transparence totale des donnees : vous pouvez consulter, exporter ou supprimer tout ce qui est stocke sur le serveur a tout moment depuis l'application.
+
+Les notifications push pour les alertes de prix sont envoyees via ntfy.sh, un service de notifications push open source, de sorte qu'aucun Google Play Services ni Firebase n'est necessaire.
+
+OPEN SOURCE
+
+Tankstellen est sous licence MIT. Le code source complet, les scripts de migration Supabase et la documentation de deploiement sont disponibles sur GitHub. Les contributions et traductions sont les bienvenues.
+
+PLATEFORMES SUPPORTEES
+
+- Android (plateforme cible principale, y compris Android Auto)
+- Chromebook (via APK Android)
+
+DETAILS TECHNIQUES
+
+Developpe avec Flutter et Riverpod pour la gestion d'etat. Toutes les donnees sont stockees localement avec Hive. Les requetes reseau passent par une couche d'abstraction de services avec des chaines de repli automatiques et du cache. L'application respecte les limites de debit des API et met en cache les reponses pour minimiser l'utilisation du reseau.

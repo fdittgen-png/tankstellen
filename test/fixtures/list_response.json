@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "license": "CC BY 4.0 - https://creativecommons.tankerkoenig.de",
+  "data": "MTS-K",
+  "status": "ok",
+  "stations": [
+    {
+      "id": "51d4b660-a095-1aa0-e100-80009459e03a",
+      "name": "Aral Tankstelle",
+      "brand": "ARAL",
+      "street": "Hauptstraße",
+      "houseNumber": "42",
+      "postCode": 10115,
+      "place": "Berlin",
+      "lat": 52.521,
+      "lng": 13.438,
+      "dist": 2.3,
+      "diesel": 1.359,
+      "e5": 1.459,
+      "e10": 1.439,
+      "isOpen": true
+    },
+    {
+      "id": "aabb1234-0000-1111-2222-333344445555",
+      "name": "Freie Tankstelle Dresden",
+      "brand": "",
+      "street": "Dresdner Str.",
+      "houseNumber": "1",
+      "postCode": 1067,
+      "place": "Dresden",
+      "lat": 51.054,
+      "lng": 13.741,
+      "dist": 5.1,
+      "diesel": 1.349,
+      "e5": null,
+      "e10": 1.429,
+      "isOpen": true
+    },
+    {
+      "id": "ccdd5678-aaaa-bbbb-cccc-ddddeeeeffff",
+      "name": "JET Tankstelle",
+      "brand": "JET",
+      "street": "Berliner Allee",
+      "houseNumber": null,
+      "postCode": 10115,
+      "place": "Berlin",
+      "lat": 52.519,
+      "lng": 13.441,
+      "dist": 1.2,
+      "diesel": null,
+      "e5": null,
+      "e10": null,
+      "isOpen": false
+    }
+  ]
+}

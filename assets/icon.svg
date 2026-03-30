@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Background -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1976D2"/>
+      <stop offset="100%" style="stop-color:#0D47A1"/>
+    </linearGradient>
+    <linearGradient id="priceGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4CAF50"/>
+      <stop offset="50%" style="stop-color:#FFC107"/>
+      <stop offset="100%" style="stop-color:#F44336"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" rx="200" fill="url(#bg)"/>
+
+  <!-- Fuel pump body -->
+  <rect x="260" y="220" width="320" height="500" rx="35" fill="white"/>
+
+  <!-- Price display screen -->
+  <rect x="295" y="265" width="250" height="160" rx="18" fill="#0D47A1"/>
+
+  <!-- Price comparison bars (green → yellow → red) -->
+  <rect x="320" y="290" width="200" height="30" rx="15" fill="#4CAF50"/>
+  <rect x="320" y="330" width="160" height="30" rx="15" fill="#FFC107"/>
+  <rect x="320" y="370" width="120" height="30" rx="15" fill="#F44336"/>
+
+  <!-- Nozzle hose -->
+  <path d="M 580 360 L 680 360 Q 740 360 740 300 L 740 200 Q 740 160 700 160 L 640 160"
+        fill="none" stroke="white" stroke-width="28" stroke-linecap="round"/>
+
+  <!-- Nozzle tip -->
+  <rect x="610" y="135" width="55" height="55" rx="10" fill="white"/>
+
+  <!-- Euro symbol -->
+  <g transform="translate(420, 570)">
+    <circle cx="0" cy="0" r="60" fill="none" stroke="white" stroke-width="18"/>
+    <rect x="5" y="-65" width="65" height="130" fill="#1976D2"/>
+    <rect x="-55" y="-15" width="85" height="14" rx="7" fill="white"/>
+    <rect x="-55" y="8" width="85" height="14" rx="7" fill="white"/>
+  </g>
+
+  <!-- Down arrow (savings indicator) -->
+  <path d="M 420 780 L 365 725 L 395 725 L 395 670 L 445 670 L 445 725 L 475 725 Z"
+        fill="#4CAF50"/>
+</svg>
