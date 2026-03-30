@@ -215,7 +215,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              station.brand.isNotEmpty ? station.brand : station.name,
+                              station.displayName,
                               style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,

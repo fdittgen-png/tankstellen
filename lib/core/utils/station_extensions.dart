@@ -2,8 +2,15 @@ import '../../features/search/domain/entities/fuel_type.dart';
 import '../../features/search/domain/entities/station.dart';
 
 extension StationDisplay on Station {
+  /// User-facing station name: brand if meaningful, otherwise street or place.
+  /// Used everywhere a station needs a short label (cards, maps, navigation).
   String get displayName =>
-      brand.isNotEmpty && brand != 'Station' ? brand : place;
+      brand.isNotEmpty && brand != 'Station' && brand != 'Autoroute'
+          ? brand
+          : street.isNotEmpty ? street : name.isNotEmpty ? name : place;
+
+  /// Label for navigation apps (maps, Android Auto, CarPlay).
+  String get navLabel => displayName;
 
   String get displayAddress =>
       houseNumber != null ? '$street $houseNumber' : street;

@@ -8,6 +8,7 @@ import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/services/location_search_service.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -723,7 +724,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   void _openStationInMaps(Station station) {
     NavigationUtils.openInMaps(
       station.lat, station.lng,
-      label: station.brand.isNotEmpty ? station.brand : station.street,
+      label: station.displayName,
     );
   }
 

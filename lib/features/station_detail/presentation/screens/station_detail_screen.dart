@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/utils/navigation_utils.dart';
+import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/storage/hive_storage.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/sync/sync_service.dart';
@@ -324,7 +325,7 @@ class StationDetailScreen extends ConsumerWidget {
   Future<void> _openNavigation(Station station) async {
     await NavigationUtils.openInMaps(
       station.lat, station.lng,
-      label: station.brand.isNotEmpty ? station.brand : station.street,
+      label: station.displayName,
     );
   }
 }

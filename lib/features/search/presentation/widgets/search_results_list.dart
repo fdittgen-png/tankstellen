@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/utils/navigation_utils.dart';
+import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/utils/price_utils.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -34,7 +35,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
   void _openStationInMaps(Station station) {
     NavigationUtils.openInMaps(
       station.lat, station.lng,
-      label: station.brand.isNotEmpty ? station.brand : station.street,
+      label: station.displayName,
     );
   }
 
@@ -131,7 +132,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
                       ref.read(ignoredStationsProvider.notifier).add(station.id);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('${station.brand.isNotEmpty ? station.brand : station.name} hidden'),
+                          content: Text('${station.displayName} hidden'),
                           action: SnackBarAction(
                             label: 'Undo',
                             onPressed: () => ref

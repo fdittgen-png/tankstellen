@@ -2,6 +2,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../constants/app_constants.dart';
+import '../data/storage_repository.dart';
 import 'storage_keys.dart';
 
 part 'hive_storage.g.dart';
@@ -11,7 +12,7 @@ HiveStorage hiveStorage(Ref ref) {
   return HiveStorage();
 }
 
-class HiveStorage {
+class HiveStorage implements StorageRepository {
   static const String _settingsBox = 'settings';
   static const String _favoritesBox = 'favorites';
   static const String _cacheBox = 'cache';

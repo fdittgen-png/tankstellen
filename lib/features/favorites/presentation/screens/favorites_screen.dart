@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/utils/navigation_utils.dart';
+import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -163,7 +164,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                   itemCount: result.data.length,
                   itemBuilder: (context, index) {
                     final station = result.data[index];
-                    final label = station.brand.isNotEmpty ? station.brand : station.street;
+                    final label = station.displayName;
                     // Swipe right → navigate, swipe left → remove favorite
                     return Dismissible(
                       key: ValueKey('fav-${station.id}'),

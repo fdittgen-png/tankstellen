@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+import '../data/storage_repository.dart';
 import '../storage/hive_storage.dart';
 
 class LocationConsentDialog {
   static const String _consentKey = 'location_consent_given';
 
-  static bool hasConsent(HiveStorage storage) {
+  /// Check consent using the abstract StorageRepository.
+  static bool hasConsent(StorageRepository storage) {
     return storage.getSetting(_consentKey) == true;
   }
 
-  static Future<void> recordConsent(HiveStorage storage) async {
+  /// Record consent using the abstract StorageRepository.
+  static Future<void> recordConsent(StorageRepository storage) async {
     await storage.putSetting(_consentKey, true);
+  }
+
+  /// Legacy overload for backward compatibility with HiveStorage.
+  @Deprecated('Use StorageRepository overload instead')
+  static bool hasConsentLegacy(HiveStorage storage) {
+    return storage.getSetting(_consentKey) == true;
   }
 
   static Future<bool> show(BuildContext context) async {
