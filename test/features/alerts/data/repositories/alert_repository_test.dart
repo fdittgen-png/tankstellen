@@ -105,6 +105,142 @@ void main() {
     expect(alerts.first.targetPrice, 1.30);
   });
 
+  test('deleteAlert with non-existent id does nothing', () async {
+    await repo.saveAlert(makeAlert(id: 'a1'));
+    await repo.deleteAlert('non_existent');
+
+    final alerts = repo.getAlerts();
+    expect(alerts, hasLength(1));
+    expect(alerts.first.id, 'a1');
+  });
+
+  test('saveAlert preserves other alerts when updating', () async {
+    await repo.saveAlert(makeAlert(id: 'a1', targetPrice: 1.50));
+    await repo.saveAlert(makeAlert(id: 'a2', targetPrice: 1.60));
+    await repo.saveAlert(makeAlert(id: 'a1', targetPrice: 1.30));
+
+    final alerts = repo.getAlerts();
+    expect(alerts, hasLength(2));
+    final a1 = alerts.firstWhere((a) => a.id == 'a1');
+    final a2 = alerts.firstWhere((a) => a.id == 'a2');
+    expect(a1.targetPrice, 1.30);
+    expect(a2.targetPrice, 1.60);
+  });
+
+  test('saveAlert and getAlerts preserve fuel type', () async {
+    await repo.saveAlert(makeAlert(id: 'a1', fuelType: FuelType.e10));
+    await repo.saveAlert(makeAlert(id: 'a2', fuelType: FuelType.lpg));
+
+    final alerts = repo.getAlerts();
+    expect(alerts[0].fuelType, FuelType.e10);
+    expect(alerts[1].fuelType, FuelType.lpg);
+  });
+
+  test('evaluateAlerts returns empty list when no stations match alert stationIds', () async {
+    await repo.saveAlert(makeAlert(
+      id: 'a1',
+      stationId: 'unknown_station',
+      fuelType: FuelType.diesel,
+      targetPrice: 2.00,
+    ));
+
+    final stations = [makeStation(id: 'station_1', diesel: 1.50)];
+    final triggered = repo.evaluateAlerts(stations);
+    expect(triggered, isEmpty);
+  });
+
+  test('evaluateAlerts returns empty list when no fuel price available', () async {
+    await repo.saveAlert(makeAlert(
+      id: 'a1',
+      stationId: 'station_1',
+      fuelType: FuelType.lpg, // No LPG price in the makeStation
+      targetPrice: 2.00,
+    ));
+
+    final stations = [makeStation(id: 'station_1', diesel: 1.50)];
+    final triggered = repo.evaluateAlerts(stations);
+    expect(triggered, isEmpty);
+  });
+
+  test('evaluateAlerts triggers when price equals target exactly', () async {
+    await repo.saveAlert(makeAlert(
+      id: 'a1',
+      stationId: 'station_1',
+      fuelType: FuelType.diesel,
+      targetPrice: 1.50,
+    ));
+
+    final stations = [makeStation(id: 'station_1', diesel: 1.50)];
+    final triggered = repo.evaluateAlerts(stations);
+    expect(triggered, hasLength(1));
+  });
+
+  test('evaluateAlerts does not trigger when price is above target', () async {
+    await repo.saveAlert(makeAlert(
+      id: 'a1',
+      stationId: 'station_1',
+      fuelType: FuelType.diesel,
+      targetPrice: 1.40,
+    ));
+
+    final stations = [makeStation(id: 'station_1', diesel: 1.50)];
+    final triggered = repo.evaluateAlerts(stations);
+    expect(triggered, isEmpty);
+  });
+
+  test('evaluateAlerts triggers multiple alerts for different stations', () async {
+    await repo.saveAlert(makeAlert(
+      id: 'a1',
+      stationId: 'station_1',
+      fuelType: FuelType.diesel,
+      targetPrice: 1.60,
+    ));
+    await repo.saveAlert(makeAlert(
+      id: 'a2',
+      stationId: 'station_2',
+      fuelType: FuelType.e5,
+      targetPrice: 1.80,
+    ));
+
+    final stations = [
+      makeStation(id: 'station_1', diesel: 1.55),
+      makeStation(id: 'station_2', e5: 1.70),
+    ];
+
+    final triggered = repo.evaluateAlerts(stations);
+    expect(triggered, hasLength(2));
+  });
+
+  test('evaluateAlerts sets lastTriggeredAt on triggered alerts', () async {
+    await repo.saveAlert(makeAlert(
+      id: 'a1',
+      stationId: 'station_1',
+      fuelType: FuelType.diesel,
+      targetPrice: 2.00,
+    ));
+
+    final stations = [makeStation(id: 'station_1', diesel: 1.50)];
+    final triggered = repo.evaluateAlerts(stations);
+
+    expect(triggered.first.lastTriggeredAt, isNotNull);
+    // Should be roughly now
+    final diff = DateTime.now().difference(triggered.first.lastTriggeredAt!);
+    expect(diff.inSeconds, lessThan(5));
+  });
+
+  test('evaluateAlerts with e10 fuel type', () async {
+    await repo.saveAlert(makeAlert(
+      id: 'a1',
+      stationId: 'station_1',
+      fuelType: FuelType.e10,
+      targetPrice: 1.60,
+    ));
+
+    final stations = [makeStation(id: 'station_1', e10: 1.50)];
+    final triggered = repo.evaluateAlerts(stations);
+    expect(triggered, hasLength(1));
+  });
+
   test('evaluateAlerts returns triggered alerts when price meets target', () async {
     await repo.saveAlert(makeAlert(
       id: 'a1',

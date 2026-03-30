@@ -1,0 +1,24 @@
+changelog:
+  exclude:
+    labels:
+      - "chore"
+  categories:
+    - title: "New Features"
+      labels:
+        - "type/feature"
+        - "type/enhancement"
+        - "enhancement"
+    - title: "Bug Fixes"
+      labels:
+        - "type/bug"
+        - "bug"
+    - title: "Maintenance"
+      labels:
+        - "type/refactor"
+        - "type/test"
+        - "type/docs"
+        - "type/chore"
+        - "documentation"
+    - title: "Other Changes"
+      labels:
+        - "*"

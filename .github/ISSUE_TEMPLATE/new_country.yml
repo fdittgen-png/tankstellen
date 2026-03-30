@@ -1,0 +1,52 @@
+name: New Country API
+description: Request or propose support for a new country's fuel price data
+labels: ["type/feature", "new-country"]
+body:
+  - type: input
+    id: country
+    attributes:
+      label: Country
+      description: Which country should be added?
+    validations:
+      required: true
+
+  - type: input
+    id: datasource
+    attributes:
+      label: Data source URL
+      description: Link to the official fuel price API or data portal, if known.
+      placeholder: https://...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: api_free
+    attributes:
+      label: Is the API free / open?
+      options:
+        - "Yes — free, no registration"
+        - "Yes — free, but requires registration"
+        - "Partially free (rate-limited)"
+        - "Paid / restricted"
+        - "Unknown"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: format
+    attributes:
+      label: Data format
+      options:
+        - JSON
+        - XML
+        - CSV
+        - Other
+        - Unknown
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Any relevant regulations, documentation, or existing implementations.

@@ -13,6 +13,10 @@
 *.pro text eol=lf
 *.toml text eol=lf
 
+# Generated files — collapse in GitHub PR diffs
+*.g.dart linguist-generated=true
+*.freezed.dart linguist-generated=true
+
 *.png binary
 *.jpg binary
 *.jpeg binary

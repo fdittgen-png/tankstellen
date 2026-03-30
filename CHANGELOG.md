@@ -1,6 +1,9 @@
 # Changelog
 
-## v4.1.0 (2026-03-29) — Build 19
+All notable changes to this project will be documented in this file.
+Format based on [Keep a Changelog](https://keepachangelog.com/).
+
+## [4.1.0] - 2026-03-29 (Build 19)
 
 ### New Features
 
@@ -125,7 +128,7 @@
 
 ---
 
-## v4.0.0 (2026-03-28) — Build 18
+## [4.0.0] - 2026-03-28 (Build 18)
 
 ### Route Search — "Cheapest Stations Along My Route"
 - Enter start + destination (with autocomplete on ALL fields) + optional stops
