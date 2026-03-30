@@ -2,4 +2,10 @@ blank_issues_enabled: false
 contact_links:
   - name: Question or Discussion
     url: https://github.com/fdittgen-png/tankstellen-app/discussions
-    about: Ask questions or start a discussion (when Discussions is enabled)
+    about: Ask questions or start a discussion
+  - name: Tankerkoenig API (Germany)
+    url: https://creativecommons.tankerkoenig.de/
+    about: Register for a free German fuel price API key
+  - name: Security Vulnerability
+    url: https://github.com/fdittgen-png/tankstellen/blob/master/SECURITY.md
+    about: Report security issues privately (do NOT open a public issue)

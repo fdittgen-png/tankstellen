@@ -1,0 +1,39 @@
+name: Documentation Issue
+description: Report incorrect, missing, or unclear documentation
+labels: ["type/docs", "needs-triage"]
+body:
+  - type: dropdown
+    id: doc_type
+    attributes:
+      label: Documentation type
+      options:
+        - README
+        - CONTRIBUTING guide
+        - Code comments / docstrings
+        - API documentation
+        - Setup / installation instructions
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Current documentation
+      description: What does the documentation currently say? Link or quote the relevant section.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested improvement
+      description: What should it say instead? Why is the current version incorrect or unclear?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Any other context, screenshots, or links.

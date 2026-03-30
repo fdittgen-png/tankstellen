@@ -3,6 +3,8 @@
 [![CI](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml/badge.svg)](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/fdittgen-png/tankstellen)](https://github.com/fdittgen-png/tankstellen/releases)
+[![Flutter](https://img.shields.io/badge/Flutter-3.41-02569B?logo=flutter)](https://flutter.dev)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
 **Tankstellen** is a free, open-source fuel price comparison app for Europe. It shows real-time fuel prices from official government transparency APIs — no ads, no tracking, fully local-first with optional cloud sync.
 
