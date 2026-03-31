@@ -52,6 +52,7 @@ void main() {
     test('remove() removes station ID from list', () async {
       when(() => mockStorage.getFavoriteIds()).thenReturn(['station-1']);
       when(() => mockStorage.removeFavorite(any())).thenAnswer((_) async {});
+      when(() => mockStorage.removeFavoriteStationData(any())).thenAnswer((_) async {});
       when(() => mockStorage.getRatings()).thenReturn({});
       when(() => mockStorage.removeRating(any())).thenAnswer((_) async {});
       when(() => mockStorage.clearPriceHistoryForStation(any())).thenAnswer((_) async {});
@@ -82,6 +83,7 @@ void main() {
     test('toggle() removes if already present', () async {
       when(() => mockStorage.getFavoriteIds()).thenReturn(['station-1']);
       when(() => mockStorage.removeFavorite(any())).thenAnswer((_) async {});
+      when(() => mockStorage.removeFavoriteStationData(any())).thenAnswer((_) async {});
       when(() => mockStorage.getRatings()).thenReturn({});
       when(() => mockStorage.removeRating(any())).thenAnswer((_) async {});
       when(() => mockStorage.clearPriceHistoryForStation(any())).thenAnswer((_) async {});

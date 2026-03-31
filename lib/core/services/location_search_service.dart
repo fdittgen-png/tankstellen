@@ -38,11 +38,24 @@ class LocationSearchService {
           headers: {'User-Agent': AppConstants.userAgent},
         ));
 
-  /// Detect what the user entered.
+  /// Detect what the user entered: GPS (empty), ZIP (digits/postal pattern), or city (text).
+  ///
+  /// Uses the first characters to decide:
+  /// - Empty → GPS
+  /// - Starts with digit → ZIP (even partial, e.g. "750" while typing "75020")
+  /// - Starts with letter → city name search
+  /// - Matches country postal code regex → definitely ZIP
   LocationInputType detectInputType(String input, CountryConfig country) {
     final trimmed = input.trim();
     if (trimmed.isEmpty) return LocationInputType.gps;
-    if (RegExp(r'^\d+$').hasMatch(trimmed)) return LocationInputType.zip;
+    // If it matches the country's postal code regex exactly → ZIP
+    if (RegExp(country.postalCodeRegex).hasMatch(trimmed)) {
+      return LocationInputType.zip;
+    }
+    // If it starts with a digit → assume ZIP (user still typing)
+    if (trimmed.codeUnitAt(0) >= 48 && trimmed.codeUnitAt(0) <= 57) {
+      return LocationInputType.zip;
+    }
     return LocationInputType.city;
   }
 

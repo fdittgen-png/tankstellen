@@ -47,6 +47,11 @@ class NearbyMapView extends ConsumerWidget {
         final center = StationMapLayers.centerOf(stations);
         final zoom = StationMapLayers.zoomForRadius(searchRadiusKm);
 
+        // Move map to new center when search results change
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          try { mapController.move(center, zoom); } catch (_) {}
+        });
+
         return Column(
           children: [
             ServiceStatusBanner(result: result),

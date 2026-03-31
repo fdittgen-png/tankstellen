@@ -1,7 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../core/cache/cache_manager.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/storage/hive_storage.dart';
@@ -31,21 +30,16 @@ class Favorites extends _$Favorites {
 
   /// Add a station to favorites.
   ///
-  /// If [stationData] is provided, the full station object is cached in
-  /// [CacheManager] so the favorites screen can show details even offline.
+  /// Persists both the station ID and the full Station JSON permanently
+  /// in Hive. The JSON never expires (unlike CacheManager entries) so
+  /// the favorites screen always has data to display.
   Future<void> add(String stationId, {Station? stationData}) async {
     final storage = ref.read(hiveStorageProvider);
     await storage.addFavorite(stationId);
 
-    // Cache full station data for offline display on favorites screen
+    // Persist full station data permanently (survives cache eviction / app restart)
     if (stationData != null) {
-      final cache = ref.read(cacheManagerProvider);
-      await cache.put(
-        CacheKey.stationData(stationId),
-        stationData.toJson(),
-        ttl: CacheTtl.stationData,
-        source: ServiceSource.cache,
-      );
+      await storage.saveFavoriteStationData(stationId, stationData.toJson());
     }
 
     state = storage.getFavoriteIds();
@@ -64,6 +58,7 @@ class Favorites extends _$Favorites {
   Future<void> remove(String stationId) async {
     final storage = ref.read(hiveStorageProvider);
     await storage.removeFavorite(stationId);
+    await storage.removeFavoriteStationData(stationId);
     state = storage.getFavoriteIds();
 
     // Clean up associated data (rating + price history)
@@ -93,14 +88,14 @@ bool isFavorite(Ref ref, String stationId) {
   return favorites.contains(stationId);
 }
 
-/// Loads cached station data for favorites and refreshes prices.
+/// Loads station data for favorites and refreshes prices.
 ///
-/// ## Data flow:
-/// 1. Read cached Station objects from CacheManager (30-min TTL)
-/// 2. Check connectivity — if offline, return cached data with `isStale: true`
-/// 3. If online, batch-refresh prices via StationService.getPrices()
-/// 4. Merge fresh prices into cached stations, update cache
-/// 5. On API failure, fall back to cached data with stale flag
+/// ## Data flow (local-first):
+/// 1. Load persisted Station objects from Hive (permanent, never expires)
+/// 2. Check connectivity — if offline, return persisted data with `isStale: true`
+/// 3. If online, refresh prices via StationService.getPrices()
+/// 4. Merge fresh prices into stations, persist updated data back
+/// 5. On API failure, serve persisted data with stale flag
 @riverpod
 class FavoriteStations extends _$FavoriteStations {
   @override
@@ -126,25 +121,30 @@ class FavoriteStations extends _$FavoriteStations {
     state = const AsyncValue.loading();
 
     try {
-      final cache = ref.read(cacheManagerProvider);
+      final storage = ref.read(hiveStorageProvider);
 
-      // Step 1: Load from local cache (instant, works offline)
+      // Step 1: Load persisted station data from Hive (permanent, never expires)
       final stations = <Station>[];
       for (final id in favoriteIds) {
-        final cached = cache.get(CacheKey.stationData(id));
-        if (cached != null) {
+        final data = storage.getFavoriteStationData(id);
+        if (data != null) {
           try {
-            stations.add(Station.fromJson(cached.payload));
-          } on FormatException catch (_) {}
+            stations.add(Station.fromJson(data));
+          } catch (e) {
+            debugPrint('FavoriteStations: parse error for $id: $e');
+          }
+        } else {
+          debugPrint('FavoriteStations: no persisted data for $id');
         }
       }
+
+      debugPrint('FavoriteStations: loaded ${stations.length}/${favoriteIds.length} from storage');
 
       // Step 2: Check connectivity
       final connectivity = await Connectivity().checkConnectivity();
       final isOffline = connectivity.contains(ConnectivityResult.none);
 
       if (isOffline) {
-        debugPrint('FavoriteStations: offline, serving ${stations.length} cached');
         state = AsyncValue.data(ServiceResult(
           data: stations,
           source: ServiceSource.cache,
@@ -159,7 +159,7 @@ class FavoriteStations extends _$FavoriteStations {
       try {
         final pricesResult = await stationService.getPrices(favoriteIds);
 
-        // Step 4: Merge fresh prices into cached stations
+        // Step 4: Merge fresh prices into stations
         final updated = stations.map((s) {
           final fresh = pricesResult.data[s.id];
           if (fresh == null) return s;
@@ -171,14 +171,9 @@ class FavoriteStations extends _$FavoriteStations {
           );
         }).toList();
 
-        // Update cache with fresh data
+        // Persist updated data back to Hive
         for (final s in updated) {
-          await cache.put(
-            CacheKey.stationData(s.id),
-            s.toJson(),
-            ttl: CacheTtl.stationData,
-            source: ServiceSource.cache,
-          );
+          await storage.saveFavoriteStationData(s.id, s.toJson());
         }
 
         state = AsyncValue.data(ServiceResult(
@@ -189,7 +184,7 @@ class FavoriteStations extends _$FavoriteStations {
           errors: pricesResult.errors,
         ));
       } on Exception catch (e) {
-        // Step 5: API failed — serve cached data with stale flag
+        // Step 5: Price API failed — serve persisted data with stale flag
         debugPrint('Favorites price refresh failed: $e');
         state = AsyncValue.data(ServiceResult(
           data: stations,

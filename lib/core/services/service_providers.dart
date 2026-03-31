@@ -164,7 +164,7 @@ GeocodingChain geocodingChain(Ref ref) {
   final country = ref.watch(activeCountryProvider);
   return GeocodingChain(
     [
-      NativeGeocodingProvider(), // Android/iOS only
+      NativeGeocodingProvider(countryName: country.name), // Android/iOS only
       NominatimGeocodingProvider(countryCode: country.code), // All platforms
     ],
     cache,
