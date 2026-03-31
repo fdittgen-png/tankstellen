@@ -55,12 +55,12 @@ credentials.json
 .vscode/settings.json
 .vscode/launch.json
 
-# Local AI assistant and session files
+# Local IDE and tool configuration
 .claude/
 .copilot/
+.cursor/
 .remember/
 copilot/
-CLAUDE.md
 
 # Development documentation (kept in docs/ for reference)
 docs/

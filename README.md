@@ -1,8 +1,8 @@
 # Tankstellen — Free Fuel Price Comparison
 
-[![CI](https://github.com/fdittgen-png/tankstellen-app/actions/workflows/ci.yml/badge.svg)](https://github.com/fdittgen-png/tankstellen-app/actions/workflows/ci.yml)
+[![CI](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml/badge.svg)](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/fdittgen-png/tankstellen-app)](https://github.com/fdittgen-png/tankstellen-app/releases)
+[![GitHub release](https://img.shields.io/github/v/release/fdittgen-png/tankstellen)](https://github.com/fdittgen-png/tankstellen/releases)
 [![Flutter](https://img.shields.io/badge/Flutter-3.41-02569B?logo=flutter)](https://flutter.dev)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
@@ -124,7 +124,7 @@ lib/
 
 ## Getting Started
 
-1. Download the latest APK from [GitHub Releases](https://github.com/fdittgen-png/tankstellen-app/releases) or build from source
+1. Download the latest APK from [GitHub Releases](https://github.com/fdittgen-png/tankstellen/releases) or build from source
 2. Choose your country and preferred fuel type
 3. For Germany: register a free API key at [Tankerkoenig](https://creativecommons.tankerkoenig.de/)
 4. Search by GPS or postal code
@@ -134,8 +134,8 @@ lib/
 ```bash
 # Prerequisites: Flutter SDK 3.x, Android SDK, JDK 17
 
-git clone https://github.com/fdittgen-png/tankstellen-app.git
-cd tankstellen-app
+git clone https://github.com/fdittgen-png/tankstellen.git
+cd tankstellen
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 flutter run -d emulator-5554   # Android emulator
@@ -186,7 +186,7 @@ This app is and will always be free, open source, and ad-free. If it saves you m
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-- Report bugs or suggest features via [GitHub Issues](https://github.com/fdittgen-png/tankstellen-app/issues)
+- Report bugs or suggest features via [GitHub Issues](https://github.com/fdittgen-png/tankstellen/issues)
 - Translations: add or improve ARB files in `lib/l10n/`
 - New country APIs: implement the `StationService` interface
 - See [SECURITY.md](SECURITY.md) for reporting vulnerabilities

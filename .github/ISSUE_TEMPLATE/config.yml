@@ -1,7 +1,7 @@
 blank_issues_enabled: false
 contact_links:
   - name: Question or Discussion
-    url: https://github.com/fdittgen-png/tankstellen-app/discussions
+    url: https://github.com/fdittgen-png/tankstellen/discussions
     about: Ask questions or start a discussion
   - name: Tankerkoenig API (Germany)
     url: https://creativecommons.tankerkoenig.de/
