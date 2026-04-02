@@ -28,7 +28,7 @@ class IgnoredStations extends _$IgnoredStations {
     state = storage.getIgnoredIds();
 
     await SyncHelper.syncIfEnabled(ref, 'IgnoredStations.add',
-      (userId) => SyncService.syncIgnoredStations(state, userId),
+      () => SyncService.syncIgnoredStations(state),
     );
   }
 
@@ -39,7 +39,7 @@ class IgnoredStations extends _$IgnoredStations {
     state = storage.getIgnoredIds();
 
     await SyncHelper.syncIfEnabled(ref, 'IgnoredStations.remove',
-      (userId) => SyncService.syncIgnoredStations(state, userId),
+      () => SyncService.syncIgnoredStations(state),
     );
   }
 

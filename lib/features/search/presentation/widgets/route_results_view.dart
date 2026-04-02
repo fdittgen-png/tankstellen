@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
@@ -66,6 +68,10 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
         final visibleStations = result.stations
             .where((s) => !ignoredIds.contains(s.id))
             .toList();
+
+        // Sort stations by position along the route (drive order)
+        _sortByRoutePosition(visibleStations, result.route.geometry);
+
         final allFuelStations = visibleStations.whereType<FuelStationResult>().toList();
         final displayItems = _resultMode == RouteResultMode.bestStops
             ? _filterBestStops(allFuelStations, result)
@@ -227,6 +233,40 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
         isCheapest: item.id == result.cheapestId,
       ),
     );
+  }
+
+  /// Sort stations by their position along the route polyline.
+  ///
+  /// For each station, finds the nearest polyline point index — this
+  /// represents how far along the route the station is. Stations
+  /// near the start of the route appear first.
+  void _sortByRoutePosition(
+    List<SearchResultItem> items,
+    List<LatLng> polyline,
+  ) {
+    if (polyline.isEmpty) return;
+
+    // Sample every 3rd point for performance on long routes
+    final step = polyline.length > 300 ? 3 : 1;
+
+    double nearestPolylineIndex(double lat, double lng) {
+      double minDist = double.infinity;
+      int bestIdx = 0;
+      for (int i = 0; i < polyline.length; i += step) {
+        final d = distanceKm(lat, lng, polyline[i].latitude, polyline[i].longitude);
+        if (d < minDist) {
+          minDist = d;
+          bestIdx = i;
+        }
+      }
+      return bestIdx.toDouble();
+    }
+
+    items.sort((a, b) {
+      final posA = nearestPolylineIndex(a.lat, a.lng);
+      final posB = nearestPolylineIndex(b.lat, b.lng);
+      return posA.compareTo(posB);
+    });
   }
 
   /// Filter to only the cheapest station per route segment.

@@ -154,6 +154,38 @@ class HiveStorage implements StorageRepository {
 
   bool isFavorite(String id) => getFavoriteIds().contains(id);
 
+  // Favorite Station Data (permanent, never expires)
+
+  /// Persist full station JSON for a favorite.
+  Future<void> saveFavoriteStationData(String stationId, Map<String, dynamic> data) async {
+    final all = _getFavoriteStationDataRaw();
+    all[stationId] = data;
+    await _favorites.put(StorageKeys.favoriteStationData, all);
+  }
+
+  /// Get persisted station JSON for a single favorite.
+  Map<String, dynamic>? getFavoriteStationData(String stationId) {
+    final raw = _getFavoriteStationDataRaw()[stationId];
+    if (raw is Map) return Map<String, dynamic>.from(raw);
+    return null;
+  }
+
+  /// Get all persisted favorite station data.
+  Map<String, dynamic> getAllFavoriteStationData() => _getFavoriteStationDataRaw();
+
+  /// Remove persisted station data when unfavoriting.
+  Future<void> removeFavoriteStationData(String stationId) async {
+    final all = _getFavoriteStationDataRaw();
+    all.remove(stationId);
+    await _favorites.put(StorageKeys.favoriteStationData, all);
+  }
+
+  Map<String, dynamic> _getFavoriteStationDataRaw() {
+    final raw = _favorites.get(StorageKeys.favoriteStationData);
+    if (raw is Map) return Map<String, dynamic>.from(raw);
+    return {};
+  }
+
   // Ignored Stations
   List<String> getIgnoredIds() {
     final ids = _favorites.get(StorageKeys.ignoredStationIds);

@@ -13,4 +13,5 @@ class StorageKeys {
   static const String evApiKey = 'ev_api_key';
   static const String ignoredStationIds = 'ignored_station_ids';
   static const String stationRatings = 'station_ratings';
+  static const String favoriteStationData = 'favorite_station_data';
 }

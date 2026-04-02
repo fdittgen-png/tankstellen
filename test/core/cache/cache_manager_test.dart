@@ -304,6 +304,111 @@ void main() {
     });
   });
 
+  group('CacheManager - evictExpired with batchLimit', () {
+    test('evictExpired respects batchLimit parameter', () async {
+      // Insert 3 very old entries
+      for (int i = 0; i < 3; i++) {
+        await fakeStorage.cacheData('old-$i', {
+          'payload': {'stale': true},
+          'storedAt':
+              DateTime.now().subtract(const Duration(hours: 1)).millisecondsSinceEpoch,
+          'source': ServiceSource.cache.index,
+          'ttlMs': 1,
+        });
+      }
+
+      expect(cache.entryCount, equals(3));
+
+      // Evict with batchLimit of 2 — should only process first 2 keys
+      final evicted = await cache.evictExpired(batchLimit: 2);
+      expect(evicted, equals(2));
+      // One entry should remain
+      expect(cache.entryCount, equals(1));
+    });
+
+    test('evictExpired skips entries within 3x TTL', () async {
+      // TTL = 1 hour, age = 2 hours => 2h < 3h => should NOT be evicted
+      await fakeStorage.cacheData('recent-expired', {
+        'payload': {'data': 'still ok'},
+        'storedAt':
+            DateTime.now().subtract(const Duration(hours: 2)).millisecondsSinceEpoch,
+        'source': ServiceSource.cache.index,
+        'ttlMs': const Duration(hours: 1).inMilliseconds,
+      });
+
+      final evicted = await cache.evictExpired();
+      expect(evicted, equals(0));
+      expect(cache.get('recent-expired'), isNotNull);
+    });
+
+    test('evictExpired handles empty cache', () async {
+      final evicted = await cache.evictExpired();
+      expect(evicted, equals(0));
+    });
+
+    test('evictExpired handles mixed fresh and very old entries', () async {
+      // Very old (should be evicted): TTL=1ms, age=1h
+      await fakeStorage.cacheData('ancient', {
+        'payload': {'old': true},
+        'storedAt':
+            DateTime.now().subtract(const Duration(hours: 1)).millisecondsSinceEpoch,
+        'source': ServiceSource.cache.index,
+        'ttlMs': 1,
+      });
+
+      // Fresh (should be kept): TTL=24h, age=0
+      await cache.put(
+        'brand-new',
+        {'new': true},
+        ttl: const Duration(hours: 24),
+        source: ServiceSource.cache,
+      );
+
+      // Expired but within 3x TTL (should be kept): TTL=1h, age=2h
+      await fakeStorage.cacheData('mildly-old', {
+        'payload': {'mild': true},
+        'storedAt':
+            DateTime.now().subtract(const Duration(hours: 2)).millisecondsSinceEpoch,
+        'source': ServiceSource.cache.index,
+        'ttlMs': const Duration(hours: 1).inMilliseconds,
+      });
+
+      final evicted = await cache.evictExpired();
+      expect(evicted, equals(1)); // only 'ancient'
+      expect(cache.get('ancient'), isNull);
+      expect(cache.get('brand-new'), isNotNull);
+      expect(cache.get('mildly-old'), isNotNull);
+    });
+  });
+
+  group('CacheManager - invalidate edge cases', () {
+    test('invalidate then put same key works', () async {
+      await cache.put('key', {'v': 1}, ttl: const Duration(minutes: 5), source: ServiceSource.cache);
+      await cache.invalidate('key');
+      expect(cache.get('key'), isNull);
+
+      await cache.put('key', {'v': 2}, ttl: const Duration(minutes: 5), source: ServiceSource.cache);
+      final entry = cache.get('key');
+      expect(entry, isNotNull);
+      expect(entry!.payload['v'], equals(2));
+    });
+  });
+
+  group('CacheManager - clearAll edge cases', () {
+    test('clearAll on empty cache does not throw', () async {
+      await cache.clearAll();
+      expect(cache.entryCount, equals(0));
+    });
+
+    test('clearAll then put works', () async {
+      await cache.put('x', {'v': 1}, ttl: const Duration(minutes: 5), source: ServiceSource.cache);
+      await cache.clearAll();
+      await cache.put('y', {'v': 2}, ttl: const Duration(minutes: 5), source: ServiceSource.cache);
+      expect(cache.entryCount, equals(1));
+      expect(cache.get('y'), isNotNull);
+    });
+  });
+
   group('CacheKey', () {
     test('stationSearch generates consistent key with coordinates', () {
       final key = CacheKey.stationSearch(52.520, 13.405, 10.0, 'e5');
@@ -319,6 +424,32 @@ void main() {
         countryCode: 'FR',
       );
       expect(key, equals('search:FR:48.856:2.352:5.0:diesel'));
+    });
+
+    test('stationSearch includes postalCode when provided', () {
+      final key = CacheKey.stationSearch(
+        48.856, 2.352, 5.0, 'diesel',
+        postalCode: '75001',
+      );
+      expect(key, contains('75001'));
+    });
+
+    test('stationSearch includes locationName when provided', () {
+      final key = CacheKey.stationSearch(
+        48.856, 2.352, 5.0, 'diesel',
+        locationName: 'Paris',
+      );
+      expect(key, contains('Paris'));
+    });
+
+    test('stationSearch prefers postalCode over locationName', () {
+      final key = CacheKey.stationSearch(
+        48.856, 2.352, 5.0, 'diesel',
+        postalCode: '75001',
+        locationName: 'Paris',
+      );
+      expect(key, contains('75001'));
+      expect(key, isNot(contains('Paris')));
     });
 
     test('stationDetail uses id', () {

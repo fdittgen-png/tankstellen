@@ -90,6 +90,62 @@ void main() {
         equals(LocationInputType.city),
       );
     });
+
+    test('returns zip for French postal code 75020', () {
+      expect(
+        service.detectInputType('75020', Countries.france),
+        equals(LocationInputType.zip),
+      );
+    });
+
+    test('returns zip for Austrian 4-digit code', () {
+      expect(
+        service.detectInputType('1010', Countries.austria),
+        equals(LocationInputType.zip),
+      );
+    });
+
+    test('returns zip for partial digit input (user still typing)', () {
+      expect(
+        service.detectInputType('750', Countries.france),
+        equals(LocationInputType.zip),
+      );
+    });
+
+    test('returns city for input starting with letter', () {
+      expect(
+        service.detectInputType('Paris', Countries.france),
+        equals(LocationInputType.city),
+      );
+    });
+
+    test('returns city for accented characters', () {
+      expect(
+        service.detectInputType('Pézenas', Countries.france),
+        equals(LocationInputType.city),
+      );
+    });
+
+    test('returns zip for Spanish 5-digit code', () {
+      expect(
+        service.detectInputType('28001', Countries.spain),
+        equals(LocationInputType.zip),
+      );
+    });
+
+    test('returns zip for Italian 5-digit code', () {
+      expect(
+        service.detectInputType('00100', Countries.italy),
+        equals(LocationInputType.zip),
+      );
+    });
+
+    test('returns zip for Danish 4-digit code', () {
+      expect(
+        service.detectInputType('1000', Countries.denmark),
+        equals(LocationInputType.zip),
+      );
+    });
   });
 
   group('searchCities', () {

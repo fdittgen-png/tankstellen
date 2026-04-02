@@ -27,9 +27,8 @@ class SyncService {
   /// Sync favorites: merges local and server sets.
   /// Uses the authenticated session's user ID (NOT a provided one).
   static Future<List<String>> syncFavorites(
-    List<String> localFavoriteIds, [
-    String? ignoredUserId, // kept for API compat, ignored
-  ]) async {
+    List<String> localFavoriteIds,
+  ) async {
     final client = _client;
     final userId = _authenticatedUserId;
     if (client == null || userId == null) {
@@ -97,9 +96,8 @@ class SyncService {
 
   /// Sync ignored stations: merges local and server sets.
   static Future<List<String>> syncIgnoredStations(
-    List<String> localIgnoredIds, [
-    String? ignoredUserId,
-  ]) async {
+    List<String> localIgnoredIds,
+  ) async {
     final client = _client;
     final userId = _authenticatedUserId;
     if (client == null || userId == null) {
@@ -234,9 +232,8 @@ class SyncService {
 
   /// Sync alerts: merges local and server sets.
   static Future<List<PriceAlert>> syncAlerts(
-    List<PriceAlert> localAlerts, [
-    String? ignoredUserId,
-  ]) async {
+    List<PriceAlert> localAlerts,
+  ) async {
     final client = _client;
     final userId = _authenticatedUserId;
     if (client == null || userId == null) {
@@ -300,7 +297,7 @@ class SyncService {
   // ---------------------------------------------------------------------------
 
   /// Fetch all user data. Uses authenticated session userId.
-  static Future<Map<String, dynamic>> fetchAllUserData([String? ignoredParam]) async {
+  static Future<Map<String, dynamic>> fetchAllUserData() async {
     final client = _client;
     final userId = _authenticatedUserId;
     if (client == null || userId == null) {
@@ -420,7 +417,7 @@ class SyncService {
   }
 
   /// Delete all user data from the server.
-  static Future<void> deleteAllUserData([String? ignoredParam]) async {
+  static Future<void> deleteAllUserData() async {
     final client = _client;
     final userId = _authenticatedUserId;
     if (client == null || userId == null) return;

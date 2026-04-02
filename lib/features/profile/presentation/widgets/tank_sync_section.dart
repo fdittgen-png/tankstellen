@@ -49,9 +49,16 @@ class TankSyncSection extends ConsumerWidget {
       if (!syncConfig.hasEmail)
         ListTile(
           leading: const Icon(Icons.email_outlined),
-          title: const Text('Upgrade to email'),
+          title: const Text('Switch to email'),
           subtitle: const Text('Keep data, add sign-in from other devices'),
           onTap: () => context.push('/auth'),
+        )
+      else
+        ListTile(
+          leading: const Icon(Icons.person_outline),
+          title: const Text('Switch to anonymous'),
+          subtitle: const Text('Keep local data, use new anonymous session'),
+          onTap: () => _confirmSwitchToAnonymous(context, ref),
         ),
       const Divider(indent: 16, endIndent: 16),
       ListTile(
@@ -77,13 +84,14 @@ class TankSyncSection extends ConsumerWidget {
         subtitle: const Text('Stop syncing (local data kept)'),
         onTap: () => _confirmDisconnect(context, ref),
       ),
-      ListTile(
-        leading: Icon(Icons.delete_forever, color: theme.colorScheme.error),
-        title: Text('Delete account',
-            style: TextStyle(color: theme.colorScheme.error)),
-        subtitle: const Text('Remove all server data permanently'),
-        onTap: () => _confirmDeleteAccount(context, ref),
-      ),
+      if (syncConfig.mode != SyncMode.community)
+        ListTile(
+          leading: Icon(Icons.delete_forever, color: theme.colorScheme.error),
+          title: Text('Delete account',
+              style: TextStyle(color: theme.colorScheme.error)),
+          subtitle: const Text('Remove all server data permanently'),
+          onTap: () => _confirmDeleteAccount(context, ref),
+        ),
     ];
   }
 
@@ -169,6 +177,50 @@ class TankSyncSection extends ConsumerWidget {
           const SnackBar(
               content: Text('Account deleted. Local data preserved.')),
         );
+      }
+    }
+  }
+
+  Future<void> _confirmSwitchToAnonymous(
+      BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        icon: const Icon(Icons.swap_horiz, size: 48),
+        title: const Text('Switch to anonymous?'),
+        content: const Text(
+          'You will be signed out of your email account and continue '
+          'with a new anonymous session.\n\n'
+          'Your local data (favorites, alerts) is kept on this device '
+          'and will be synced to the new anonymous account.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Switch'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      try {
+        await ref.read(syncStateProvider.notifier).switchToAnonymous();
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Switched to anonymous session')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to switch: $e')),
+          );
+        }
       }
     }
   }

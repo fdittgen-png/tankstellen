@@ -106,6 +106,15 @@ CREATE TABLE IF NOT EXISTS public.station_ratings (
   UNIQUE(user_id, station_id)
 );
 
+CREATE TABLE IF NOT EXISTS public.database_owner (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.users(id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_database_owner_singleton
+  ON public.database_owner ((true));
+
 -- ═══════════════════════════════════════════════════════════════════
 -- ROW LEVEL SECURITY
 -- ═══════════════════════════════════════════════════════════════════

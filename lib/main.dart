@@ -10,6 +10,7 @@ import 'core/error_tracing/storage/trace_storage.dart';
 import 'core/error_tracing/trace_recorder.dart';
 import 'core/notifications/notification_service.dart';
 import 'core/storage/hive_storage.dart';
+import 'core/sync/community_config.dart';
 import 'core/sync/supabase_client.dart';
 import 'features/profile/data/repositories/profile_repository.dart';
 
@@ -49,6 +50,9 @@ Future<void> main() async {
   final storage = HiveStorage();
   final sentryDsn = storage.getSetting('sentry_dsn') as String?;
 
+  // Load community config from bundled asset (for TankSync community mode)
+  await CommunityConfig.load();
+
   // Optionally initialize TankSync if configured
   final syncEnabled = storage.getSetting('sync_enabled') as bool? ?? false;
   if (syncEnabled) {
@@ -76,7 +80,9 @@ Future<void> main() async {
               {'id': sessionId},
               onConflict: 'id',
             );
-          } catch (_) {}
+          } catch (e) {
+            debugPrint('TankSync: users upsert failed: $e');
+          }
         }
         debugPrint('TankSync: ready, userId=$sessionId');
       } catch (e) {

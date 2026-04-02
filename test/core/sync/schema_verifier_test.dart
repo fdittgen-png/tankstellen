@@ -15,13 +15,14 @@ void main() {
       ]));
     });
 
-    test('optionalTables contains exactly 4 expected tables', () {
-      expect(SchemaVerifier.optionalTables, hasLength(4));
+    test('optionalTables contains exactly 5 expected tables', () {
+      expect(SchemaVerifier.optionalTables, hasLength(5));
       expect(SchemaVerifier.optionalTables, containsAll([
         'price_reports',
         'itineraries',
         'ignored_stations',
         'station_ratings',
+        'database_owner',
       ]));
     });
   });

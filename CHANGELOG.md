@@ -3,6 +3,73 @@
 All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [4.3.0] - 2026-03-31 (Build 4001)
+
+### Bug Fixes
+
+**Favorites — Complete Rework**
+- FIXED: Favorites screen showing grey/empty despite having saved stations
+- Root cause: 3 out of 4 call sites called `toggle(stationId)` without passing station data, so only the ID was saved — no station JSON was persisted to Hive
+- `station_detail_screen`: now passes loaded station detail to `toggle()` when favoriting
+- `loadAndRefresh()`: automatically fetches station details from API for any favorites that have no persisted data (handles sync imports, legacy data, and edge cases)
+- Favorites screen: typed `AsyncValue` parameter properly (was raw `AsyncValue` which could cause silent failures in release mode)
+
+**Favorites Storage (from 4.1.1)**
+- Rewritten favorites storage from expiring `CacheManager` (30-min TTL) to permanent Hive storage
+- Station JSON persists across cache eviction and app restarts
+- ZIP geocoding now uses the active country profile (was hardcoded)
+- Route search results sorted by driving order (was unsorted)
+
+### Testing
+
++38 new tests (27 favorites, 18 alerts — was 11 + 9)
+
+**Favorites Provider Tests (27 total, was 11)**
+
+| Test | What it catches |
+|------|----------------|
+| `add() with stationData persists JSON` | Verifies station data actually saved to Hive |
+| `add() without stationData skips save` | Documents the null-data path |
+| `toggle() passes stationData through` | End-to-end toggle with data |
+| `remove() cleans up rating + history` | Cascading delete verification |
+| `remove() survives cleanup errors` | Resilience to corrupted storage |
+| `loadAndRefresh() loads from storage` | Full storage → provider → data flow |
+| `loadAndRefresh() fetches missing data` | **The key test** — catches the original bug |
+| `loadAndRefresh() merges fresh prices` | Price refresh into persisted stations |
+| `loadAndRefresh() persists updated prices` | Verifies write-back to Hive |
+| `loadAndRefresh() API failure → stale data` | Graceful degradation |
+| `loadAndRefresh() missing + API fail` | No data + no API = empty, not crash |
+| `loadAndRefresh() offline → stale data` | Offline path (was never tested) |
+| `loadAndRefresh() offline + no data` | Orphan IDs + offline |
+| `loadAndRefresh() skips corrupted JSON` | Invalid storage doesn't crash screen |
+| `loadAndRefresh() multiple stations order` | List ordering preserved |
+| `loadAndRefresh() mix persisted + missing` | Some from Hive, some fetched from API |
+| `Station JSON round-trip` | Serialization correctness |
+
+**Alert Provider Tests (18 total, was 9)**
+
+| Test | What it catches |
+|------|----------------|
+| `addAlert() saves correct data` | Verifies actual saved JSON content |
+| `removeAlert() non-existent id` | Edge case doesn't crash |
+| `toggleAlert() non-existent id` | No save called for missing alert |
+| `toggleAlert() saves correct data` | Verifies `isActive: false` in saved JSON |
+| `getAlertStationIds() deduplication` | Unique active station IDs |
+| `getAlertStationIds() no active alerts` | Returns empty list |
+| `multiple add/remove operations` | Sequential state consistency |
+| `PriceAlert JSON round-trip` | All fields including `lastTriggeredAt` |
+| `PriceAlert fromJson all fuel types` | Every `FuelType` enum value round-trips |
+
+### Why Tests Didn't Catch the Bug Before
+
+1. **No tests for `FavoriteStations.loadAndRefresh()`** — the entire load flow was untested
+2. **Mocks hid serialization bugs** — `MockHiveStorage` never verified `saveFavoriteStationData()` was called
+3. **Tests never tested `stationData: null`** — the common production path (detail screen, sync) was untested
+4. **Offline path never executed** — connectivity was always mocked as wifi
+5. **Screen test only checked scaffolding** — never tested data rendering, state transitions, or error states
+
+---
+
 ## [4.1.0] - 2026-03-29 (Build 19)
 
 ### New Features

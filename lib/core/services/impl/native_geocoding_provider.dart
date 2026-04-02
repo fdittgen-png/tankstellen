@@ -8,7 +8,13 @@ import '../service_result.dart';
 
 /// Geocoding via native platform APIs (Android/iOS only).
 /// Uses the `geocoding` package which wraps platform geocoders.
+/// Country-aware: passes the correct country name for ZIP resolution.
 class NativeGeocodingProvider implements GeocodingProvider {
+  final String _countryName;
+
+  NativeGeocodingProvider({String countryName = 'Deutschland'})
+      : _countryName = countryName;
+
   @override
   ServiceSource get source => ServiceSource.nativeGeocoding;
 
@@ -24,7 +30,7 @@ class NativeGeocodingProvider implements GeocodingProvider {
   ) async {
     try {
       final locations = await geo.locationFromAddress(
-        '$zipCode, Deutschland',
+        '$zipCode, $_countryName',
       );
       if (locations.isEmpty) {
         throw LocationException(

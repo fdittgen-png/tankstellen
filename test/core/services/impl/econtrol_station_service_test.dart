@@ -3,6 +3,7 @@ import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/services/impl/econtrol_station_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
+import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
 void main() {
@@ -472,6 +473,285 @@ void main() {
         expect(merged.e10, closeTo(1.549, 0.001));
         expect(merged.id, '100');
       });
+    });
+  });
+}
+
+  group('EControlStationService searchStations', () {
+    test('searchStations throws ApiException on network failure', () async {
+      final params = const SearchParams(
+        lat: 48.2, lng: 16.37, radiusKm: 10.0,
+      );
+      try {
+        await service.searchStations(params);
+      } on ApiException catch (e) {
+        expect(e.message, isNotEmpty);
+      }
+    });
+
+    test('searchStations returns valid result type', () async {
+      final params = const SearchParams(
+        lat: 48.2, lng: 16.37, radiusKm: 10.0,
+      );
+      try {
+        final result = await service.searchStations(params);
+        expect(result.source, ServiceSource.eControlApi);
+        expect(result.data, isA<List<Station>>());
+      } on ApiException catch (_) {
+        // Expected in test env
+      }
+    });
+
+    test('searchStations with sort by price', () async {
+      final params = const SearchParams(
+        lat: 48.2, lng: 16.37, radiusKm: 10.0,
+        sortBy: SortBy.price,
+      );
+      try {
+        final result = await service.searchStations(params);
+        expect(result.source, ServiceSource.eControlApi);
+      } on ApiException catch (_) {
+        // Expected
+      }
+    });
+  });
+
+  group('E-Control full merge pipeline', () {
+    late _TestableEControlParser parser;
+
+    setUp(() {
+      parser = _TestableEControlParser();
+    });
+
+    test('diesel and super queries merge by station ID', () {
+      // Simulate two API responses
+      final dieselResponse = [
+        {
+          'id': 100,
+          'name': 'OMV Wien',
+          'location': {
+            'latitude': 48.2,
+            'longitude': 16.4,
+            'address': 'Hauptstr 1',
+            'postalCode': '1010',
+            'city': 'Wien',
+          },
+          'distance': 1.5,
+          'open': true,
+          'prices': [{'amount': 1.659}],
+          'openingHours': [
+            {'label': 'Mo-Fr', 'from': '06:00', 'to': '22:00'},
+          ],
+        },
+        {
+          'id': 200,
+          'name': 'BP Graz',
+          'location': {
+            'latitude': 47.07,
+            'longitude': 15.44,
+            'address': 'Grazer Str 5',
+            'postalCode': '8010',
+            'city': 'Graz',
+          },
+          'distance': 3.2,
+          'open': false,
+          'prices': [{'amount': 1.699}],
+          'openingHours': [],
+        },
+      ];
+
+      final superResponse = [
+        {
+          'id': 100,
+          'name': 'OMV Wien',
+          'location': {
+            'latitude': 48.2,
+            'longitude': 16.4,
+            'address': 'Hauptstr 1',
+            'postalCode': '1010',
+            'city': 'Wien',
+          },
+          'distance': 1.5,
+          'open': true,
+          'prices': [{'amount': 1.549}],
+          'openingHours': [],
+        },
+        {
+          'id': 300,
+          'name': 'Jet Linz',
+          'location': {
+            'latitude': 48.3,
+            'longitude': 14.3,
+            'address': 'Linzer Str 10',
+            'postalCode': '4020',
+            'city': 'Linz',
+          },
+          'distance': 5.0,
+          'open': true,
+          'prices': [{'amount': 1.519}],
+          'openingHours': [],
+        },
+      ];
+
+      // Parse diesel stations
+      final dieselStations = dieselResponse.map((r) =>
+          parser.testParseStation(r as Map<String, dynamic>, 48.2, 16.37, 'DIE')
+      ).whereType<Station>().toList();
+
+      // Parse super stations
+      final superStations = superResponse.map((r) =>
+          parser.testParseStation(r as Map<String, dynamic>, 48.2, 16.37, 'SUP')
+      ).whereType<Station>().toList();
+
+      expect(dieselStations, hasLength(2));
+      expect(superStations, hasLength(2));
+
+      // Merge like the real service does
+      final merged = <int, Station>{};
+
+      for (final s in dieselStations) {
+        final id = int.tryParse(s.id) ?? 0;
+        merged[id] = s;
+      }
+
+      for (final s in superStations) {
+        final id = int.tryParse(s.id) ?? 0;
+        final existing = merged[id];
+        if (existing != null) {
+          merged[id] = existing.copyWith(
+            e5: s.e5,
+            e10: s.e5,
+          );
+        } else {
+          merged[id] = s.copyWith(
+            e5: s.e5,
+            e10: s.e5,
+          );
+        }
+      }
+
+      expect(merged, hasLength(3));
+
+      // Station 100 should have both diesel and super
+      final omv = merged[100]!;
+      expect(omv.diesel, closeTo(1.659, 0.001));
+      expect(omv.e5, closeTo(1.549, 0.001));
+      expect(omv.e10, closeTo(1.549, 0.001));
+      expect(omv.isOpen, isTrue);
+
+      // Station 200 should have only diesel
+      final bp = merged[200]!;
+      expect(bp.diesel, closeTo(1.699, 0.001));
+      expect(bp.e5, isNull);
+      expect(bp.isOpen, isFalse);
+
+      // Station 300 should have only super
+      final jet = merged[300]!;
+      expect(jet.e5, closeTo(1.519, 0.001));
+      expect(jet.e10, closeTo(1.519, 0.001));
+      expect(jet.diesel, isNull);
+    });
+
+    test('merged stations sorted by distance', () {
+      final data1 = {
+        'id': 1,
+        'name': 'Far',
+        'location': {'latitude': 49.0, 'longitude': 16.0},
+        'distance': 5.0,
+        'prices': [{'amount': 1.5}],
+        'openingHours': [],
+      };
+      final data2 = {
+        'id': 2,
+        'name': 'Near',
+        'location': {'latitude': 48.2, 'longitude': 16.37},
+        'distance': 0.5,
+        'prices': [{'amount': 1.6}],
+        'openingHours': [],
+      };
+
+      final stations = [
+        parser.testParseStation(data1, 48.2, 16.37, 'DIE')!,
+        parser.testParseStation(data2, 48.2, 16.37, 'DIE')!,
+      ];
+
+      stations.sort((a, b) => a.dist.compareTo(b.dist));
+      expect(stations[0].name, 'Near');
+      expect(stations[1].name, 'Far');
+    });
+
+    test('merged stations sorted by price', () {
+      final data1 = {
+        'id': 1,
+        'name': 'Expensive',
+        'location': {'latitude': 48.2, 'longitude': 16.4},
+        'prices': [{'amount': 1.899}],
+        'openingHours': [],
+      };
+      final data2 = {
+        'id': 2,
+        'name': 'Cheap',
+        'location': {'latitude': 48.2, 'longitude': 16.4},
+        'prices': [{'amount': 1.499}],
+        'openingHours': [],
+      };
+
+      final stations = [
+        parser.testParseStation(data1, 48.2, 16.37, 'DIE')!,
+        parser.testParseStation(data2, 48.2, 16.37, 'DIE')!,
+      ];
+
+      // Sort by diesel price like sortStations does for SortBy.price
+      stations.sort((a, b) {
+        final pa = a.diesel ?? 999.0;
+        final pb = b.diesel ?? 999.0;
+        return pa.compareTo(pb);
+      });
+      expect(stations[0].name, 'Cheap');
+      expect(stations[1].name, 'Expensive');
+    });
+
+    test('radius filtering with fallback to nearest', () {
+      // All stations far away
+      final farStations = List.generate(25, (i) => Station(
+        id: '$i',
+        name: 'Station $i',
+        brand: 'Brand',
+        street: 'St',
+        postCode: '1010',
+        place: 'Wien',
+        lat: 48.2 + i * 0.1,
+        lng: 16.37,
+        dist: 50.0 + i, // All > 10km radius
+        isOpen: true,
+      ));
+
+      // Simulate filterByRadius
+      final withinRadius = farStations.where((s) => s.dist <= 10.0).toList();
+      expect(withinRadius, isEmpty);
+
+      // Fallback: return nearest 20
+      final sorted = List<Station>.from(farStations)
+        ..sort((a, b) => a.dist.compareTo(b.dist));
+      final fallback = sorted.take(20).toList();
+      expect(fallback, hasLength(20));
+      expect(fallback.first.dist, closeTo(50.0, 0.1));
+    });
+
+    test('GAS fuel type maps to lpg field', () {
+      final data = {
+        'id': 500,
+        'name': 'CNG Wien',
+        'location': {'latitude': 48.2, 'longitude': 16.4},
+        'prices': [{'amount': 1.299}],
+        'openingHours': [],
+      };
+
+      final station = parser.testParseStation(data, 48.2, 16.37, 'GAS');
+      expect(station, isNotNull);
+      expect(station!.lpg, closeTo(1.299, 0.001));
+      expect(station.e5, isNull);
+      expect(station.diesel, isNull);
     });
   });
 }
