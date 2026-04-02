@@ -25,6 +25,7 @@ class SchemaVerifier {
     'itineraries',
     'ignored_stations',
     'station_ratings',
+    'database_owner',
   ];
 
   /// Check which required tables exist in the database.

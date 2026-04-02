@@ -7,14 +7,15 @@ import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/storage/hive_storage.dart';
 import '../../../../l10n/app_localizations.dart';
 
-/// Authentication screen for upgrading anonymous account to email
-/// or creating a new email account.
+/// Authentication screen for switching between anonymous and email accounts.
 ///
 /// Features:
+/// - Switch anonymous → email (sign up or sign in)
+/// - Switch email → anonymous (with confirmation)
 /// - Password visibility toggle
 /// - Confirm password on sign-up
 /// - Proper error messages
-/// - Guest option (only when not connected)
+/// - Works for all sync modes (community, private, joinExisting)
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
 
@@ -116,10 +117,29 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     }
   }
 
+  Future<void> _switchToAnonymous() async {
+    setState(() { _isLoading = true; _error = null; });
+    try {
+      await ref.read(syncStateProvider.notifier).switchToAnonymous();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Switched to anonymous session')),
+        );
+        context.pop();
+      }
+    } catch (e) {
+      setState(() => _error = e.toString());
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+    final syncConfig = ref.watch(syncStateProvider);
+    final isEmailUser = syncConfig.hasEmail;
 
     return Scaffold(
       appBar: AppBar(
@@ -128,8 +148,52 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       body: ListView(
         padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.of(context).viewPadding.bottom),
         children: [
-          // Show guest option only if not already connected
-          if (!TankSyncClient.isConnected) ...[
+          // Current auth status card
+          if (isEmailUser) ...[
+            // Connected with email — show status + switch to anonymous
+            Card(
+              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.verified_user, size: 20, color: theme.colorScheme.primary),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Signed in as ${syncConfig.userEmail}',
+                            style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Your data syncs across all devices with this email.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: const Text('Switch to anonymous'),
+                subtitle: const Text('Continue without email, new anonymous session'),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                onTap: _isLoading ? null : _switchToAnonymous,
+              ),
+            ),
+            const SizedBox(height: 16),
+          ] else if (!TankSyncClient.isConnected) ...[
+            // Not connected at all — show guest option
             Card(
               child: ListTile(
                 leading: const Icon(Icons.person_outline),
@@ -147,17 +211,21 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             ]),
             const SizedBox(height: 16),
           ] else ...[
+            // Connected as anonymous — show upgrade prompt
             Card(
               color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
-              child: const Padding(
-                padding: EdgeInsets.all(16),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    Icon(Icons.info_outline, size: 20),
-                    SizedBox(width: 12),
+                    const Icon(Icons.person_outline, size: 20),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'You\'re connected as guest. Add an email to sign in from other devices and protect your data.',
+                        'You\'re connected as guest '
+                        '(${syncConfig.userId?.substring(0, 8) ?? ""}...). '
+                        'Add an email to sign in from other devices.',
+                        style: theme.textTheme.bodySmall,
                       ),
                     ),
                   ],
@@ -167,8 +235,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             const SizedBox(height: 16),
           ],
 
-          // Email auth card
-          Card(
+          // Email auth card — shown when not already signed in with email
+          if (!isEmailUser) Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -295,34 +363,53 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               ),
             ),
           ),
+          // Error display (for switch-to-anonymous or guest errors)
+          if (isEmailUser && _error != null) ...[
+            const SizedBox(height: 8),
+            Card(
+              color: theme.colorScheme.error.withValues(alpha: 0.1),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    Icon(Icons.error_outline, size: 16, color: theme.colorScheme.error),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(_error!, style: TextStyle(color: theme.colorScheme.error, fontSize: 12))),
+                  ],
+                ),
+              ),
+            ),
+          ],
+
           const SizedBox(height: 16),
 
           // Info card
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.info_outline, size: 18),
-                      const SizedBox(width: 8),
-                      Text('Why create an account?', style: theme.textTheme.titleSmall),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '• Sync favorites, alerts, and saved routes across devices\n'
-                    '• Prepare a route on your phone, use it in your car\n'
-                    '• No data is shared with third parties\n'
-                    '• You can delete your account at any time',
-                    style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                  ),
-                ],
+          if (!isEmailUser)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.info_outline, size: 18),
+                        const SizedBox(width: 8),
+                        Text('Why create an account?', style: theme.textTheme.titleSmall),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '• Sync favorites, alerts, and saved routes across devices\n'
+                      '• Prepare a route on your phone, use it in your car\n'
+                      '• No data is shared with third parties\n'
+                      '• You can delete your account at any time',
+                      style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

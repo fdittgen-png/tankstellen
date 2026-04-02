@@ -60,7 +60,8 @@ class StationDetailScreen extends ConsumerWidget {
               color: isFav ? Colors.amber : null,
             ),
             onPressed: () {
-              ref.read(favoritesProvider.notifier).toggle(stationId);
+              final station = detailAsync.value?.data.station;
+              ref.read(favoritesProvider.notifier).toggle(stationId, stationData: station);
             },
           ),
         ],

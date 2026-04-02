@@ -2,6 +2,8 @@ import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
+import 'package:tankstellen/core/sync/sync_config.dart';
+import 'package:tankstellen/core/sync/sync_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
@@ -136,7 +138,14 @@ class _FixedUserPosition extends UserPosition {
       storage.override,
       activeCountryOverride(country),
       favoritesOverride(favoriteIds),
+      syncStateProvider.overrideWith(() => _DisabledSyncState()),
     ],
     mockStorage: storage.mock,
   );
+}
+
+/// SyncState that returns a disabled config (no sync, no Supabase calls).
+class _DisabledSyncState extends SyncState {
+  @override
+  SyncConfig build() => const SyncConfig();
 }

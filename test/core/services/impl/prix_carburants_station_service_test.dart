@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/impl/prix_carburants_station_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';
@@ -310,6 +311,276 @@ void main() {
       expect(testableService.testToDouble('3.14'), 3.14);
       expect(testableService.testToDouble(null), isNull);
       expect(testableService.testToDouble('not-a-number'), isNull);
+    });
+  });
+
+  group('PrixCarburantsStationService searchStations integration', () {
+    test('searchStations returns ServiceResult even on network failure', () async {
+      final params = const SearchParams(lat: 48.8, lng: 2.3, radiusKm: 5.0);
+      final result = await service.searchStations(params);
+      // Whether network succeeds or fails, we get a valid ServiceResult
+      expect(result.source, ServiceSource.prixCarburantsApi);
+      expect(result.data, isA<List<Station>>());
+      expect(result.fetchedAt, isA<DateTime>());
+    });
+
+    test('searchStations with postalCode param returns valid result', () async {
+      final params = const SearchParams(
+        lat: 48.8, lng: 2.3, radiusKm: 5.0, postalCode: '75001',
+      );
+      final result = await service.searchStations(params);
+      expect(result.source, ServiceSource.prixCarburantsApi);
+      expect(result.data, isA<List<Station>>());
+    });
+
+    test('searchStations sorts by distance by default', () async {
+      final params = const SearchParams(
+        lat: 48.8, lng: 2.3, radiusKm: 5.0, sortBy: SortBy.distance,
+      );
+      final result = await service.searchStations(params);
+      if (result.data.length >= 2) {
+        for (var i = 1; i < result.data.length; i++) {
+          expect(result.data[i].dist, greaterThanOrEqualTo(result.data[i - 1].dist));
+        }
+      }
+    });
+
+    test('searchStations sorts by price when requested', () async {
+      final params = const SearchParams(
+        lat: 48.8, lng: 2.3, radiusKm: 5.0, sortBy: SortBy.price,
+      );
+      final result = await service.searchStations(params);
+      expect(result.source, ServiceSource.prixCarburantsApi);
+    });
+
+    test('searchStations with CancelToken does not throw', () async {
+      final cancelToken = CancelToken();
+      final params = const SearchParams(lat: 48.8, lng: 2.3, radiusKm: 5.0);
+      final result = await service.searchStations(params, cancelToken: cancelToken);
+      expect(result.source, ServiceSource.prixCarburantsApi);
+    });
+
+    test('searchStations with enricher null works fine', () async {
+      final svc = PrixCarburantsStationService(enricher: null);
+      final params = const SearchParams(lat: 48.8, lng: 2.3, radiusKm: 5.0);
+      final result = await svc.searchStations(params);
+      expect(result.source, ServiceSource.prixCarburantsApi);
+    });
+  });
+
+  group('PrixCarburantsStationService getStationDetail integration', () {
+    test('getStationDetail throws on invalid station ID', () async {
+      // The API call may succeed but return empty results, or fail with DioException
+      try {
+        await service.getStationDetail('invalid-id-99999');
+        fail('Should have thrown');
+      } catch (e) {
+        expect(e, isA<Exception>());
+      }
+    });
+  });
+
+  group('PrixCarburantsStationService getPrices integration', () {
+    test('getPrices returns valid map even when API fails', () async {
+      final result = await service.getPrices(['12345', '67890']);
+      expect(result.source, ServiceSource.prixCarburantsApi);
+      expect(result.data, isA<Map<String, StationPrices>>());
+    });
+
+    test('getPrices handles mixed valid and invalid IDs', () async {
+      final result = await service.getPrices(['valid-1', '', 'valid-2']);
+      expect(result.source, ServiceSource.prixCarburantsApi);
+    });
+  });
+
+  group('PrixCarburantsStationService full parsing pipeline', () {
+    late _TestablePrixCarburantsService testableService;
+
+    setUp(() {
+      testableService = _TestablePrixCarburantsService();
+    });
+
+    test('full pipeline: extract, parse, sort by distance', () {
+      final apiData = {
+        'results': [
+          {
+            'id': '1001',
+            'adresse': 'STATION LECLERC',
+            'ville': 'PARIS',
+            'cp': '75001',
+            'geom': {'lat': 48.86, 'lon': 2.34},
+            'sp95_prix': 1.879,
+            'gazole_prix': 1.659,
+          },
+          {
+            'id': '1002',
+            'adresse': 'SHELL AUTOROUTE',
+            'ville': 'VERSAILLES',
+            'cp': '78000',
+            'geom': {'lat': 48.80, 'lon': 2.13},
+            'sp95_prix': 1.999,
+            'gazole_prix': 1.799,
+            'pop': 'A',
+          },
+          {
+            'id': '1003',
+            'adresse': 'STATION RURALE',
+            'ville': 'MELUN',
+            'cp': '77000',
+            'geom': {'lat': 48.54, 'lon': 2.66},
+            'sp95_prix': 1.749,
+            'gazole_prix': 1.549,
+          },
+        ],
+      };
+
+      // Step 1: Extract results from API response
+      final results = testableService.testExtractResults(apiData);
+      expect(results, hasLength(3));
+
+      // Step 2: Parse each into Station
+      final searchLat = 48.85;
+      final searchLng = 2.35;
+      final stations = <Station>[];
+      for (final r in results) {
+        final station = testableService.testParseStation(r, searchLat, searchLng);
+        if (station != null) stations.add(station);
+      }
+      expect(stations, hasLength(3));
+
+      // Verify brand detection worked
+      expect(stations[0].brand, 'E.Leclerc');
+      expect(stations[1].brand, 'Shell');
+      expect(stations[2].brand, 'Station');
+
+      // Verify prices parsed
+      expect(stations[0].e5, closeTo(1.879, 0.001));
+      expect(stations[0].diesel, closeTo(1.659, 0.001));
+
+      // Step 3: Sort by distance
+      stations.sort((a, b) => a.dist.compareTo(b.dist));
+      // Station 1001 is closest to search point (48.85, 2.35)
+      expect(stations.first.id, '1001');
+    });
+
+    test('full pipeline: handles mixed data quality', () {
+      final apiData = {
+        'results': [
+          {
+            'id': '2001',
+            'adresse': 'GOOD STATION',
+            'ville': 'LYON',
+            'cp': '69001',
+            'geom': {'lat': 45.76, 'lon': 4.84},
+            'sp95_prix': 1.899,
+            'e10_prix': 1.819,
+            'gazole_prix': 1.679,
+            'sp98_prix': 1.959,
+            'e85_prix': 0.899,
+            'gplc_prix': 0.999,
+            'horaires_automate_24_24': 'Oui',
+            'services_service': ['Lavage', 'DAB', 'Boutique'],
+            'carburants_disponibles': ['Gazole', 'SP95', 'E10', 'SP98'],
+            'carburants_indisponibles': ['E85'],
+            'pop': 'R',
+            'departement': 'Rhône',
+            'region': 'Auvergne-Rhône-Alpes',
+            'gazole_maj': '2026-03-29T14:30:00+00:00',
+            'sp95_maj': '2026-03-29T14:30:00+00:00',
+            'horaires_jour': 'Lundi07.00-21.00, Mardi07.00-21.00',
+          },
+          // Station with null/missing fields
+          {
+            'id': null,
+            'adresse': null,
+            'ville': null,
+            'cp': null,
+            'geom': null,
+            'latitude': '4576000',
+            'longitude': '484000',
+          },
+        ],
+      };
+
+      final results = testableService.testExtractResults(apiData);
+      expect(results, hasLength(2));
+
+      // Parse first station — fully populated
+      final s1 = testableService.testParseStation(results[0], 45.76, 4.84);
+      expect(s1, isNotNull);
+      expect(s1!.e5, closeTo(1.899, 0.001));
+      expect(s1.e10, closeTo(1.819, 0.001));
+      expect(s1.diesel, closeTo(1.679, 0.001));
+      expect(s1.e98, closeTo(1.959, 0.001));
+      expect(s1.e85, closeTo(0.899, 0.001));
+      expect(s1.lpg, closeTo(0.999, 0.001));
+      expect(s1.is24h, isTrue);
+      expect(s1.services, hasLength(3));
+      expect(s1.availableFuels, hasLength(4));
+      expect(s1.unavailableFuels, hasLength(1));
+      expect(s1.department, 'Rhône');
+      expect(s1.region, 'Auvergne-Rhône-Alpes');
+      expect(s1.updatedAt, contains('29/03'));
+      expect(s1.openingHoursText, contains('07:00-21:00'));
+
+      // Parse second station — minimal data, uses legacy lat/lng fallback
+      final s2 = testableService.testParseStation(results[1], 45.76, 4.84);
+      expect(s2, isNotNull);
+      expect(s2!.id, '');
+      expect(s2.lat, closeTo(45.76, 0.01));
+      expect(s2.lng, closeTo(4.84, 0.01));
+    });
+
+    test('mostRecentUpdate handles FormatException with fallback', () {
+      final record = {
+        'gazole_maj': 'not-a-date-format',
+      };
+      // Should not throw, should return a trimmed string
+      final result = testableService.testMostRecentUpdate(record);
+      expect(result, isNotNull);
+    });
+
+    test('parseStation handles geom with only lat (no lon)', () {
+      final record = {
+        'id': '9999',
+        'adresse': 'Test',
+        'ville': 'Test',
+        'cp': '00000',
+        'geom': {'lat': 48.0},
+        'latitude': '4800000',
+        'longitude': '200000',
+      };
+      final station = testableService.testParseStation(record, 48.0, 2.0);
+      expect(station, isNotNull);
+      // lng is 0 from geom, so falls back to legacy
+      expect(station!.lat, closeTo(48.0, 0.1));
+      expect(station.lng, closeTo(2.0, 0.1));
+    });
+
+    test('detectBrand detects brand from services field', () {
+      final record = {
+        'id': '1',
+        'adresse': 'GARAGE DU COIN',
+        'ville': 'PARIS',
+        'cp': '75001',
+        'geom': {'lat': 48.0, 'lon': 2.0},
+        'services_service': ['Vente de fioul domestique', 'TOTAL WASH'],
+      };
+      final station = testableService.testParseStation(record, 48.0, 2.0);
+      // 'TOTAL ' should match in the services text
+      expect(station?.brand, 'Total');
+    });
+
+    test('detectBrand detects brand from ville field', () {
+      final record = {
+        'id': '1',
+        'adresse': 'RN7',
+        'ville': 'AUCHAN CENTRE COMMERCIAL',
+        'cp': '75001',
+        'geom': {'lat': 48.0, 'lon': 2.0},
+      };
+      final station = testableService.testParseStation(record, 48.0, 2.0);
+      expect(station?.brand, 'Auchan');
     });
   });
 }

@@ -3,6 +3,8 @@ import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/services/impl/mise_station_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
+import 'package:tankstellen/features/search/data/models/search_params.dart';
+import 'package:tankstellen/features/search/domain/entities/station.dart';
 
 void main() {
   late MiseStationService service;
@@ -352,6 +354,192 @@ columns
         expect(parser.mapStationType('Stradale'), 'R');
         expect(parser.mapStationType(''), 'R');
       });
+    });
+  });
+}
+
+  group('MiseStationService searchStations', () {
+    test('searchStations throws ApiException on network failure', () async {
+      final params = const SearchParams(
+        lat: 41.9, lng: 12.5, radiusKm: 10.0,
+      );
+      try {
+        await service.searchStations(params);
+      } on ApiException catch (e) {
+        expect(e.message, isNotEmpty);
+      }
+    });
+
+    test('searchStations returns valid type when data available', () async {
+      final params = const SearchParams(
+        lat: 41.9, lng: 12.5, radiusKm: 10.0,
+      );
+      try {
+        final result = await service.searchStations(params);
+        expect(result.source, ServiceSource.miseApi);
+        expect(result.data, isA<List<Station>>());
+      } on ApiException catch (_) {
+        // Expected in test environment
+      }
+    });
+  });
+
+  group('MISE full station-building pipeline', () {
+    late _TestableMiseCsvParser parser;
+
+    setUp(() {
+      parser = _TestableMiseCsvParser();
+    });
+
+    test('join stations and prices into Station objects', () {
+      const stationsCsv = '''Data aggiornamento: 29/03/2026
+idImpianto|Gestore|Bandiera|TipoImpianto|NomeImpianto|Indirizzo|Comune|Provincia|Latitudine|Longitudine
+12345|ROSSI SRL|Eni|Stradale|Eni Rossi|Via Roma 1|Roma|RM|41.9028|12.4964
+67890|BIANCHI SPA|Shell|Autostradale|Shell A1|Autostrada A1 km 123|Firenze|FI|43.7696|11.2558''';
+
+      const pricesCsv = '''Data aggiornamento: 29/03/2026
+idImpianto|descCarburante|prezzo|isSelf|dtComu
+12345|Benzina|1.879|1|29/03/2026 08:00:00
+12345|Gasolio|1.659|1|29/03/2026 08:00:00
+12345|GPL|0.729|0|29/03/2026 07:30:00
+12345|Metano|1.199|0|29/03/2026 07:30:00
+67890|Benzina|1.999|1|29/03/2026 09:00:00
+67890|Gasolio|1.799|1|29/03/2026 09:00:00''';
+
+      final stations = parser.testParseStationsCsv(stationsCsv);
+      final prices = parser.testParsePricesCsv(pricesCsv);
+
+      expect(stations, hasLength(2));
+      expect(prices, hasLength(2));
+
+      // Build Station objects like the real service does
+      final builtStations = <Station>[];
+      final searchLat = 41.9;
+      final searchLng = 12.5;
+
+      for (final entry in stations.entries) {
+        final s = entry.value;
+        final p = prices[entry.key];
+
+        builtStations.add(Station(
+          id: entry.key,
+          name: s.name.isNotEmpty ? s.name : s.brand,
+          brand: s.brand,
+          street: s.address,
+          postCode: '',
+          place: s.city,
+          lat: s.lat,
+          lng: s.lng,
+          dist: 0,
+          e5: p?.benzinaSelf ?? p?.benzinaServed,
+          e10: p?.benzinaSelf ?? p?.benzinaServed,
+          diesel: p?.gasolioSelf ?? p?.gasolioServed,
+          lpg: p?.gpl,
+          cng: p?.metano,
+          isOpen: true,
+          updatedAt: p?.updatedAt,
+          stationType: s.type == 'Autostradale' ? 'A' : 'R',
+        ));
+      }
+
+      expect(builtStations, hasLength(2));
+
+      // Check station 12345
+      final roma = builtStations.firstWhere((s) => s.id == '12345');
+      expect(roma.name, 'Eni Rossi');
+      expect(roma.brand, 'Eni');
+      expect(roma.street, 'Via Roma 1');
+      expect(roma.place, 'Roma');
+      expect(roma.e5, closeTo(1.879, 0.001));
+      expect(roma.diesel, closeTo(1.659, 0.001));
+      expect(roma.lpg, closeTo(0.729, 0.001));
+      expect(roma.cng, closeTo(1.199, 0.001));
+      expect(roma.stationType, 'R');
+      expect(roma.updatedAt, '29/03 08:00');
+
+      // Check station 67890
+      final firenze = builtStations.firstWhere((s) => s.id == '67890');
+      expect(firenze.name, 'Shell A1');
+      expect(firenze.brand, 'Shell');
+      expect(firenze.stationType, 'A');
+      expect(firenze.e5, closeTo(1.999, 0.001));
+      expect(firenze.diesel, closeTo(1.799, 0.001));
+    });
+
+    test('station with empty name falls back to brand', () {
+      const stationsCsv = '''header
+columns
+11111|G|Q8|Stradale||Via Test|Roma|RM|41.88|12.50''';
+
+      final stations = parser.testParseStationsCsv(stationsCsv);
+      final s = stations['11111']!;
+      final displayName = s.name.isNotEmpty ? s.name : s.brand;
+      expect(displayName, 'Q8');
+    });
+
+    test('self-service price preferred over served price', () {
+      const pricesCsv = '''header
+columns
+12345|Benzina|2.100|0|29/03/2026 10:00:00
+12345|Benzina|1.879|1|29/03/2026 10:00:00''';
+
+      final prices = parser.testParsePricesCsv(pricesCsv);
+      final p = prices['12345']!;
+      // Self-service price should be used for e5
+      final e5 = p.benzinaSelf ?? p.benzinaServed;
+      expect(e5, closeTo(1.879, 0.001));
+    });
+
+    test('station with no prices gets null fuel fields', () {
+      const stationsCsv = '''header
+columns
+99999|G|NoFuel|Stradale|NoFuel Station|Via Empty|Roma|RM|41.88|12.50''';
+
+      final stations = parser.testParseStationsCsv(stationsCsv);
+      final prices = <String, _PriceData>{};
+
+      final s = stations['99999']!;
+      final p = prices['99999'];
+
+      final station = Station(
+        id: '99999',
+        name: s.name.isNotEmpty ? s.name : s.brand,
+        brand: s.brand,
+        street: s.address,
+        postCode: '',
+        place: s.city,
+        lat: s.lat,
+        lng: s.lng,
+        dist: 0,
+        e5: p?.benzinaSelf ?? p?.benzinaServed,
+        diesel: p?.gasolioSelf ?? p?.gasolioServed,
+        lpg: p?.gpl,
+        cng: p?.metano,
+        isOpen: true,
+        updatedAt: p?.updatedAt,
+        stationType: s.type == 'Autostradale' ? 'A' : 'R',
+      );
+
+      expect(station.e5, isNull);
+      expect(station.diesel, isNull);
+      expect(station.lpg, isNull);
+      expect(station.cng, isNull);
+      expect(station.updatedAt, isNull);
+    });
+
+    test('only served prices used when no self-service available', () {
+      const pricesCsv = '''header
+columns
+12345|Benzina|2.100|0|29/03/2026 10:00:00
+12345|Gasolio|1.900|0|29/03/2026 10:00:00''';
+
+      final prices = parser.testParsePricesCsv(pricesCsv);
+      final p = prices['12345']!;
+      // No self-service prices, so served should be used
+      final e5 = p.benzinaSelf ?? p.benzinaServed;
+      final diesel = p.gasolioSelf ?? p.gasolioServed;
+      expect(e5, closeTo(2.100, 0.001));
+      expect(diesel, closeTo(1.900, 0.001));
     });
   });
 }

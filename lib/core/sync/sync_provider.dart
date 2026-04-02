@@ -84,6 +84,11 @@ class SyncState extends _$SyncState {
   }
 
   /// Sign in with email (upgrade from anonymous or fresh sign-in).
+  ///
+  /// After auth transition, triggers a full sync to upload local data
+  /// (favorites, ignored stations, ratings) to the new user account.
+  /// Without this, favorites added during the anonymous session would
+  /// be orphaned on the server under the old anonymous UUID.
   Future<void> signInWithEmail(String email, String password, {bool isSignUp = true}) async {
     String? userId;
     if (isSignUp) {
@@ -103,11 +108,67 @@ class SyncState extends _$SyncState {
         mode: state.mode,
         userEmail: email,
       );
+
+      // Sync local data to the new user account (non-blocking).
+      // Critical: without this, favorites/ratings added during the
+      // anonymous session would never appear under the email account.
+      _performInitialSync(storage);
+    }
+  }
+
+  /// Switch from email account back to anonymous.
+  ///
+  /// Signs out the current email session, re-authenticates anonymously,
+  /// and syncs local data to the new anonymous account. Local data is
+  /// preserved — only the server-side identity changes.
+  Future<void> switchToAnonymous() async {
+    final storage = ref.read(hiveStorageProvider);
+
+    try {
+      // Sign out current email session
+      await TankSyncClient.signOut();
+
+      // Re-initialize (signOut resets the _initialized flag)
+      if (state.supabaseUrl != null && state.supabaseAnonKey != null) {
+        await TankSyncClient.init(
+          url: state.supabaseUrl!,
+          anonKey: state.supabaseAnonKey!,
+        );
+      }
+
+      // Sign in anonymously — gets a fresh UUID
+      final userId = await TankSyncClient.signInAnonymously();
+
+      if (userId != null) {
+        await storage.putSetting('sync_user_id', userId);
+      }
+
+      state = SyncConfig(
+        enabled: state.enabled,
+        supabaseUrl: state.supabaseUrl,
+        supabaseAnonKey: state.supabaseAnonKey,
+        userId: userId,
+        mode: state.mode,
+        userEmail: null,
+      );
+
+      // Sync local data to the new anonymous account
+      _performInitialSync(storage);
+    } catch (e) {
+      debugPrint('switchToAnonymous failed: $e');
+      rethrow;
     }
   }
 
   /// Delete the user's account: wipe server data, sign out, clear local sync state.
+  ///
+  /// Blocked in community mode to prevent accidental mass deletion
+  /// of the shared database. Users must disconnect first.
   Future<void> deleteAccount() async {
+    if (state.mode == SyncMode.community) {
+      debugPrint('deleteAccount: blocked in community mode');
+      return;
+    }
     try {
       await SyncService.deleteAllUserData();
       await TankSyncClient.signOut();

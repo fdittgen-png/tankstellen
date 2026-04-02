@@ -51,11 +51,11 @@ class AlertNotifier extends _$AlertNotifier {
   Future<void> _syncAlertsIfConnected() async {
     try {
       final syncState = ref.read(syncStateProvider);
-      if (syncState.enabled && syncState.userId != null) {
-        await SyncService.syncAlerts(state, syncState.userId!);
+      if (syncState.enabled) {
+        await SyncService.syncAlerts(state);
       }
-    } catch (e) { debugPrint('Silent catch: ');
-      // Don't block local operation if sync fails
+    } catch (e) {
+      debugPrint('AlertProvider: sync failed: $e');
     }
   }
 

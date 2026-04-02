@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/sync/supabase_client.dart';
+import '../../../../core/sync/sync_config.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/sync/sync_service.dart';
 import '../../../alerts/providers/alert_provider.dart';
@@ -51,7 +52,9 @@ class _DataTransparencyScreenState
         if (uid != null) {
           try {
             await TankSyncClient.client!.from('users').upsert({'id': uid}, onConflict: 'id');
-          } catch (_) {}
+          } catch (e) {
+            debugPrint('DataTransparency: users upsert failed: $e');
+          }
         }
       }
 
@@ -203,7 +206,7 @@ class _DataTransparencyScreenState
 
     setState(() => _loading = true);
     try {
-      await SyncService.deleteAllUserData(userId);
+      await SyncService.deleteAllUserData();
       await _loadData();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -367,16 +370,39 @@ class _DataTransparencyScreenState
                       ),
                       const SizedBox(height: 24),
 
-                      // Destructive actions
-                      FilledButton.icon(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: Colors.red,
+                      // Destructive actions — disabled for community mode
+                      if (syncConfig.mode == SyncMode.community) ...[
+                        const Card(
+                          color: Color(0xFFFFF3E0),
+                          child: Padding(
+                            padding: EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                Icon(Icons.info_outline, color: Color(0xFFE65100)),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Data deletion is not available in community '
+                                    'mode. Disconnect first, or use a private database.',
+                                    style: TextStyle(fontSize: 13),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                        onPressed: _deleteAllData,
-                        icon: const Icon(Icons.delete_forever),
-                        label: const Text('Delete all server data'),
-                      ),
-                      const SizedBox(height: 8),
+                        const SizedBox(height: 8),
+                      ] else ...[
+                        FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.red,
+                          ),
+                          onPressed: _deleteAllData,
+                          icon: const Icon(Icons.delete_forever),
+                          label: const Text('Delete all server data'),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
                       OutlinedButton.icon(
                         onPressed: _disconnect,
                         icon: const Icon(Icons.link_off),

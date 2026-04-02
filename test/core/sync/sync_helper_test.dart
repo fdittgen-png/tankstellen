@@ -37,9 +37,8 @@ Future<void> _runWithSyncConfig(
 
 void main() {
   group('SyncHelper.syncIfEnabled', () {
-    test('calls syncFn with userId when sync is enabled and userId is set',
-        () async {
-      String? receivedUserId;
+    test('calls syncFn when sync is enabled', () async {
+      bool wasCalled = false;
 
       await _runWithSyncConfig(
         const SyncConfig(
@@ -51,13 +50,13 @@ void main() {
         (ref) => SyncHelper.syncIfEnabled(
           ref,
           'test-context',
-          (userId) async {
-            receivedUserId = userId;
+          () async {
+            wasCalled = true;
           },
         ),
       );
 
-      expect(receivedUserId, 'user-123');
+      expect(wasCalled, isTrue);
     });
 
     test('does NOT call syncFn when sync is disabled', () async {
@@ -71,7 +70,7 @@ void main() {
         (ref) => SyncHelper.syncIfEnabled(
           ref,
           'test-context',
-          (userId) async {
+          () async {
             wasCalled = true;
           },
         ),
@@ -80,7 +79,9 @@ void main() {
       expect(wasCalled, isFalse);
     });
 
-    test('does NOT call syncFn when userId is null', () async {
+    test('calls syncFn when enabled even if Hive userId is null', () async {
+      // This is the key fix: SyncService uses session userId, not Hive's.
+      // SyncHelper should not block sync just because Hive userId is null.
       bool wasCalled = false;
 
       await _runWithSyncConfig(
@@ -93,13 +94,15 @@ void main() {
         (ref) => SyncHelper.syncIfEnabled(
           ref,
           'test-context',
-          (userId) async {
+          () async {
             wasCalled = true;
           },
         ),
       );
 
-      expect(wasCalled, isFalse);
+      expect(wasCalled, isTrue,
+          reason: 'SyncService checks session auth independently — '
+              'SyncHelper should not duplicate that check');
     });
 
     test('catches syncFn exception silently without rethrowing', () async {
@@ -114,44 +117,18 @@ void main() {
         (ref) => SyncHelper.syncIfEnabled(
           ref,
           'test-context',
-          (userId) async {
+          () async {
             throw Exception('Sync failed!');
           },
         ),
       );
 
-      // If we reach here, the exception was caught silently
-      expect(true, isTrue);
-    });
-
-    test('does NOT call syncFn when enabled but userId empty string treated as set',
-        () async {
-      // Edge case: userId is empty string (truthy but empty)
-      String? receivedUserId;
-
-      await _runWithSyncConfig(
-        const SyncConfig(
-          enabled: true,
-          userId: '',
-          supabaseUrl: 'https://test.supabase.co',
-          supabaseAnonKey: 'test-key',
-        ),
-        (ref) => SyncHelper.syncIfEnabled(
-          ref,
-          'test-context',
-          (userId) async {
-            receivedUserId = userId;
-          },
-        ),
-      );
-
-      // Empty string is not null, so syncFn should be called
-      expect(receivedUserId, '');
+      // Reaching here without throwing confirms the exception was caught
     });
   });
 
   group('SyncHelper.fireAndForget', () {
-    test('calls syncFn when sync is enabled and userId is set', () async {
+    test('calls syncFn when sync is enabled', () async {
       bool wasCalled = false;
 
       await _runWithSyncConfig(
@@ -193,30 +170,7 @@ void main() {
       expect(wasCalled, isFalse);
     });
 
-    test('does NOT call syncFn when userId is null', () async {
-      bool wasCalled = false;
-
-      await _runWithSyncConfig(
-        const SyncConfig(
-          enabled: true,
-          userId: null,
-          supabaseUrl: 'https://test.supabase.co',
-          supabaseAnonKey: 'test-key',
-        ),
-        (ref) => SyncHelper.fireAndForget(
-          ref,
-          'test-context',
-          () async {
-            wasCalled = true;
-          },
-        ),
-      );
-
-      expect(wasCalled, isFalse);
-    });
-
     test('catches syncFn exception silently without rethrowing', () async {
-      // Should complete without throwing
       await _runWithSyncConfig(
         const SyncConfig(
           enabled: true,
@@ -233,7 +187,6 @@ void main() {
         ),
       );
 
-      // If we reach here, the exception was caught silently
       expect(true, isTrue);
     });
   });

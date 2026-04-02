@@ -17,48 +17,44 @@ import 'sync_provider.dart';
 /// Usage:
 /// ```dart
 /// await SyncHelper.syncIfEnabled(ref, 'Favorites',
-///   (userId) => SyncService.syncFavorites(state, userId),
+///   () => SyncService.syncFavorites(state),
 /// );
 /// ```
 class SyncHelper {
   SyncHelper._();
 
-  /// Execute [syncFn] only if TankSync is enabled and a user ID exists.
+  /// Execute [syncFn] only if TankSync is enabled.
   ///
   /// [ref] — Riverpod ref for reading sync state.
   /// [context] — Human-readable name for debug logging (e.g., 'Favorites').
-  /// [syncFn] — The sync operation to perform, receiving the authenticated userId.
+  /// [syncFn] — The sync operation to perform.
+  ///
+  /// The sync function does NOT receive a userId because SyncService always
+  /// reads the authenticated userId from the active JWT session — NOT from
+  /// Hive storage. Checking `syncState.enabled` is sufficient; the session
+  /// userId is validated inside SyncService methods.
   ///
   /// Failures are caught silently with a debug log — sync must never block
   /// local operations.
   static Future<void> syncIfEnabled(
     Ref ref,
     String context,
-    Future<void> Function(String userId) syncFn,
-  ) async {
-    try {
-      final syncState = ref.read(syncStateProvider);
-      if (syncState.enabled && syncState.userId != null) {
-        await syncFn(syncState.userId!);
-      }
-    } catch (e) {
-      debugPrint('SyncHelper[$context]: sync failed: $e');
-    }
-  }
-
-  /// Execute [syncFn] without userId parameter (for fire-and-forget operations).
-  static Future<void> fireAndForget(
-    Ref ref,
-    String context,
     Future<void> Function() syncFn,
   ) async {
     try {
       final syncState = ref.read(syncStateProvider);
-      if (syncState.enabled && syncState.userId != null) {
+      if (syncState.enabled) {
         await syncFn();
       }
     } catch (e) {
       debugPrint('SyncHelper[$context]: sync failed: $e');
     }
   }
+
+  /// Alias for [syncIfEnabled] — both use the same guard logic.
+  static Future<void> fireAndForget(
+    Ref ref,
+    String context,
+    Future<void> Function() syncFn,
+  ) => syncIfEnabled(ref, context, syncFn);
 }

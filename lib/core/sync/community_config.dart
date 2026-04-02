@@ -1,32 +1,73 @@
-/// Pre-configured credentials for the Tankstellen Community database.
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+
+/// Pre-configured credentials for the TankSync community database.
 ///
-/// This is the shared database that all community users connect to.
-/// Credentials can be overridden at build time via `--dart-define`:
+/// Credentials are loaded from (in priority order):
+/// 1. `--dart-define` build-time overrides
+/// 2. `assets/tanksync_config.json` (external config file)
 ///
+/// The external config file allows updating credentials without code changes.
+/// Run `supabase/create-project.sh` to generate a new config file.
+///
+/// ## Build-time override
 /// ```bash
 /// flutter build apk --dart-define=COMMUNITY_SUPABASE_URL=https://...
 ///                    --dart-define=COMMUNITY_SUPABASE_ANON_KEY=eyJ...
 /// ```
-///
-/// ## Reusability
-/// Other apps can replace this class with their own community config.
-/// The sync module does not reference this class directly — it's only
-/// used by the UI layer when the user selects "Community" mode.
 class CommunityConfig {
   CommunityConfig._();
 
+  /// Build-time override via `--dart-define`.
+  static const _defineUrl = String.fromEnvironment('COMMUNITY_SUPABASE_URL');
+  static const _defineKey = String.fromEnvironment('COMMUNITY_SUPABASE_ANON_KEY');
+
+  /// Cached values loaded from the config file.
+  static String? _cachedUrl;
+  static String? _cachedKey;
+  static bool _loaded = false;
+
+  /// Load credentials from `assets/tanksync_config.json`.
+  /// Safe to call multiple times — subsequent calls are no-ops.
+  static Future<void> load() async {
+    if (_loaded) return;
+    _loaded = true;
+
+    try {
+      final jsonStr = await rootBundle.loadString('assets/tanksync_config.json');
+      final config = json.decode(jsonStr) as Map<String, dynamic>;
+      _cachedUrl = config['supabase_url'] as String?;
+      _cachedKey = config['supabase_anon_key'] as String?;
+    } catch (e) {
+      debugPrint('CommunityConfig: failed to load asset: $e');
+    }
+  }
+
   /// Supabase project URL for the community database.
-  static const supabaseUrl = String.fromEnvironment(
-    'COMMUNITY_SUPABASE_URL',
-    defaultValue: 'https://tpxflmcpumtmehslcixx.supabase.co',
-  );
+  /// Priority: --dart-define > config file
+  static String get supabaseUrl {
+    if (_defineUrl.isNotEmpty) return _defineUrl;
+    return _cachedUrl ?? '';
+  }
 
   /// Supabase anonymous key for the community database.
-  static const supabaseAnonKey = String.fromEnvironment(
-    'COMMUNITY_SUPABASE_ANON_KEY',
-    defaultValue:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'
-        '.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRweGZsbWNwdW10bWVoc2xjaXh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2Mzg0NjYsImV4cCI6MjA5MDIxNDQ2Nn0'
-        '.94L8m6ew6R7P2sOhTJJatLYdFqYLmQACyxCmYKlhGXc',
-  );
+  /// Priority: --dart-define > config file
+  static String get supabaseAnonKey {
+    if (_defineKey.isNotEmpty) return _defineKey;
+    return _cachedKey ?? '';
+  }
+
+  /// Whether valid credentials are available.
+  static bool get isConfigured =>
+      supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
+
+  /// Reset cached state. Only for testing.
+  @visibleForTesting
+  static void reset() {
+    _loaded = false;
+    _cachedUrl = null;
+    _cachedKey = null;
+  }
 }

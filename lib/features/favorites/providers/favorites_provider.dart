@@ -46,7 +46,7 @@ class Favorites extends _$Favorites {
 
     // Non-blocking server sync (local operation already complete)
     await SyncHelper.syncIfEnabled(ref, 'Favorites.add',
-      (userId) => SyncService.syncFavorites(state, userId),
+      () => SyncService.syncFavorites(state),
     );
   }
 
@@ -138,7 +138,11 @@ class FavoriteStations extends _$FavoriteStations {
         }
       }
 
-      debugPrint('FavoriteStations: loaded ${stations.length}/${favoriteIds.length} from storage');
+      // Step 1b: For IDs with no persisted data, try to fetch from API
+      final missingIds = favoriteIds.where((id) => !stations.any((s) => s.id == id)).toList();
+
+      debugPrint('FavoriteStations: loaded ${stations.length}/${favoriteIds.length} from storage'
+          '${missingIds.isNotEmpty ? ', ${missingIds.length} missing' : ''}');
 
       // Step 2: Check connectivity
       final connectivity = await Connectivity().checkConnectivity();
@@ -154,9 +158,23 @@ class FavoriteStations extends _$FavoriteStations {
         return;
       }
 
-      // Step 3: Online — refresh prices via batch API
+      // Step 3: Online — fetch missing station details + refresh prices
       final stationService = ref.read(stationServiceProvider);
       try {
+        // Fetch full station data for IDs that had no persisted data
+        if (missingIds.isNotEmpty) {
+          for (final id in missingIds) {
+            try {
+              final detail = await stationService.getStationDetail(id);
+              final s = detail.data.station;
+              stations.add(s);
+              await storage.saveFavoriteStationData(id, s.toJson());
+            } catch (e) {
+              debugPrint('FavoriteStations: could not fetch detail for $id: $e');
+            }
+          }
+        }
+
         final pricesResult = await stationService.getPrices(favoriteIds);
 
         // Step 4: Merge fresh prices into stations

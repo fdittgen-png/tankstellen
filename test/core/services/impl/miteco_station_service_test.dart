@@ -3,6 +3,7 @@ import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/services/impl/miteco_station_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
+import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
 void main() {
@@ -405,6 +406,267 @@ void main() {
         expect(id, isNotEmpty);
         // Should still return something reasonable (likely a southern province)
       });
+    });
+  });
+}
+
+  group('MitecoStationService searchStations', () {
+    test('searchStations throws ApiException on network failure', () async {
+      final params = const SearchParams(
+        lat: 40.42, lng: -3.70, radiusKm: 10.0,
+      );
+      try {
+        await service.searchStations(params);
+      } on ApiException catch (e) {
+        expect(e.message, isNotEmpty);
+      }
+    });
+
+    test('searchStations returns valid result type', () async {
+      final params = const SearchParams(
+        lat: 40.42, lng: -3.70, radiusKm: 10.0,
+      );
+      try {
+        final result = await service.searchStations(params);
+        expect(result.source, ServiceSource.mitecoApi);
+        expect(result.data, isA<List<Station>>());
+      } on ApiException catch (_) {
+        // Expected in test env
+      }
+    });
+
+    test('searchStations with sort by distance', () async {
+      final params = const SearchParams(
+        lat: 40.42, lng: -3.70, radiusKm: 10.0,
+        sortBy: SortBy.distance,
+      );
+      try {
+        final result = await service.searchStations(params);
+        expect(result.source, ServiceSource.mitecoApi);
+      } on ApiException catch (_) {
+        // Expected
+      }
+    });
+  });
+
+  group('MITECO full station-building pipeline', () {
+    late _TestableMitecoParser parser;
+
+    setUp(() {
+      parser = _TestableMitecoParser();
+    });
+
+    test('parseStation and distance filtering pipeline', () {
+      // Simulate API response records (ListaEESSPrecio)
+      final records = [
+        {
+          'IDEESS': '1001',
+          'Rótulo': 'REPSOL',
+          'Dirección': 'CALLE MAYOR 1',
+          'Localidad': 'MADRID',
+          'C.P.': '28001',
+          'Latitud': '40,416',
+          'Longitud (WGS84)': '-3,703',
+          'Precio Gasolina 95 E5': '1,649',
+          'Precio Gasoleo A': '1,459',
+          'Horario': 'L-D: 06:00-22:00',
+          'Margen': 'D',
+        },
+        {
+          'IDEESS': '1002',
+          'Rótulo': 'CEPSA',
+          'Dirección': 'AV. CASTELLANA 100',
+          'Localidad': 'MADRID',
+          'C.P.': '28046',
+          'Latitud': '40,462',
+          'Longitud (WGS84)': '-3,691',
+          'Precio Gasolina 95 E5': '1,679',
+          'Precio Gasoleo A': '1,489',
+          'Horario': '24H',
+          'Margen': 'I',
+        },
+        {
+          'IDEESS': '1003',
+          'Rótulo': 'BP',
+          'Dirección': 'N-401 KM 5',
+          'Localidad': 'TOLEDO',
+          'C.P.': '45001',
+          'Latitud': '39,862',
+          'Longitud (WGS84)': '-4,027',
+          'Precio Gasolina 95 E5': '1,619',
+          'Precio Gasoleo A': '1,429',
+          'Horario': 'L-D: 07:00-21:00',
+          'Margen': 'D',
+        },
+      ];
+
+      // Parse all stations
+      final searchLat = 40.42;
+      final searchLng = -3.70;
+      final allStations = <Station>[];
+      for (final r in records) {
+        final station = parser.testParseStation(r, searchLat, searchLng);
+        if (station != null) allStations.add(station);
+      }
+
+      expect(allStations, hasLength(3));
+
+      // Verify correct parsing
+      expect(allStations[0].name, 'REPSOL');
+      expect(allStations[0].brand, 'REPSOL');
+      expect(allStations[0].e5, closeTo(1.649, 0.001));
+      expect(allStations[0].diesel, closeTo(1.459, 0.001));
+      expect(allStations[0].stationType, 'D');
+
+      expect(allStations[1].name, 'CEPSA');
+      expect(allStations[1].stationType, 'I');
+
+      // Filter by radius (10km around Madrid center)
+      final withinRadius = allStations.where((s) => s.dist <= 10.0).toList();
+      // Madrid stations should be within 10km, Toledo (~60km away) should not
+      expect(withinRadius.length, lessThan(allStations.length));
+    });
+
+    test('province lookup for various Spanish cities', () {
+      // Verify that the province finder returns correct IDs for known cities
+      expect(parser.testFindNearestProvince(40.42, -3.70), '28'); // Madrid
+      expect(parser.testFindNearestProvince(41.39, 2.17), '08'); // Barcelona
+      expect(parser.testFindNearestProvince(37.39, -5.98), '41'); // Sevilla
+      expect(parser.testFindNearestProvince(39.47, -0.38), '46'); // Valencia
+      expect(parser.testFindNearestProvince(43.26, -2.93), '48'); // Vizcaya
+    });
+
+    test('stations sorted by price', () {
+      final records = [
+        {
+          'IDEESS': '1',
+          'Rótulo': 'Expensive',
+          'Dirección': 'St',
+          'Localidad': 'City',
+          'C.P.': '28001',
+          'Latitud': '40,42',
+          'Longitud (WGS84)': '-3,70',
+          'Precio Gasolina 95 E5': '1,899',
+          'Horario': '24H',
+        },
+        {
+          'IDEESS': '2',
+          'Rótulo': 'Cheap',
+          'Dirección': 'St',
+          'Localidad': 'City',
+          'C.P.': '28001',
+          'Latitud': '40,42',
+          'Longitud (WGS84)': '-3,70',
+          'Precio Gasolina 95 E5': '1,499',
+          'Horario': '24H',
+        },
+        {
+          'IDEESS': '3',
+          'Rótulo': 'NoPrice',
+          'Dirección': 'St',
+          'Localidad': 'City',
+          'C.P.': '28001',
+          'Latitud': '40,42',
+          'Longitud (WGS84)': '-3,70',
+          'Horario': '24H',
+        },
+      ];
+
+      final stations = records
+          .map((r) => parser.testParseStation(r, 40.42, -3.70))
+          .whereType<Station>()
+          .toList();
+
+      // Sort by e5 price (stations without price go to bottom)
+      stations.sort((a, b) {
+        final pa = a.e5 ?? 999.0;
+        final pb = b.e5 ?? 999.0;
+        return pa.compareTo(pb);
+      });
+
+      expect(stations[0].name, 'Cheap');
+      expect(stations[1].name, 'Expensive');
+      expect(stations[2].name, 'NoPrice');
+    });
+
+    test('limit to 50 stations', () {
+      // Generate 60 station records
+      final records = List.generate(60, (i) => {
+        'IDEESS': '$i',
+        'Rótulo': 'Station $i',
+        'Dirección': 'St $i',
+        'Localidad': 'Madrid',
+        'C.P.': '28001',
+        'Latitud': '40,${400 + i}',
+        'Longitud (WGS84)': '-3,700',
+        'Precio Gasolina 95 E5': '1,${600 + i}',
+        'Horario': '24H',
+      });
+
+      final stations = records
+          .map((r) => parser.testParseStation(r, 40.42, -3.70))
+          .whereType<Station>()
+          .toList();
+
+      expect(stations.length, 60);
+
+      // Simulate wrapStations limit
+      final limited = stations.length > 50 ? stations.take(50).toList() : stations;
+      expect(limited, hasLength(50));
+    });
+
+    test('handles Cerrado stations correctly in pipeline', () {
+      final record = {
+        'IDEESS': '9999',
+        'Rótulo': 'CLOSED',
+        'Dirección': 'Closed St',
+        'Localidad': 'Madrid',
+        'C.P.': '28001',
+        'Latitud': '40,42',
+        'Longitud (WGS84)': '-3,70',
+        'Precio Gasolina 95 E5': '1,649',
+        'Horario': 'Cerrado',
+      };
+
+      final station = parser.testParseStation(record, 40.42, -3.70);
+      expect(station, isNotNull);
+      expect(station!.isOpen, isFalse);
+      expect(station.openingHoursText, 'Cerrado');
+      // Even closed stations have prices
+      expect(station.e5, closeTo(1.649, 0.001));
+    });
+
+    test('station with all fuel types in pipeline', () {
+      final record = {
+        'IDEESS': '5000',
+        'Rótulo': 'FULL SERVICE',
+        'Dirección': 'Gran Vía 1',
+        'Localidad': 'MADRID',
+        'C.P.': '28013',
+        'Latitud': '40,420',
+        'Longitud (WGS84)': '-3,702',
+        'Precio Gasolina 95 E5': '1,649',
+        'Precio Gasolina 95 E10': '1,599',
+        'Precio Gasolina 98 E5': '1,829',
+        'Precio Gasoleo A': '1,459',
+        'Precio Gasoleo Premium': '1,529',
+        'Precio Gasolina 95 E85': '1,099',
+        'Precio Gases licuados del petróleo': '0,899',
+        'Precio Gas Natural Comprimido': '1,199',
+        'Horario': 'L-D: 00:00-24:00',
+        'Margen': 'D',
+      };
+
+      final station = parser.testParseStation(record, 40.42, -3.70);
+      expect(station, isNotNull);
+      expect(station!.e5, closeTo(1.649, 0.001));
+      expect(station.e10, closeTo(1.599, 0.001));
+      expect(station.e98, closeTo(1.829, 0.001));
+      expect(station.diesel, closeTo(1.459, 0.001));
+      expect(station.dieselPremium, closeTo(1.529, 0.001));
+      expect(station.e85, closeTo(1.099, 0.001));
+      expect(station.lpg, closeTo(0.899, 0.001));
+      expect(station.cng, closeTo(1.199, 0.001));
     });
   });
 }

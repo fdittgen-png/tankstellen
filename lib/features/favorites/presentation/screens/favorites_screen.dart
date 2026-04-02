@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/utils/navigation_utils.dart';
+import '../../../../core/utils/station_extensions.dart';
+import '../../../../core/widgets/shimmer_placeholder.dart';
+import '../../../search/domain/entities/station.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -36,6 +41,17 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     final l10n = AppLocalizations.of(context);
     final favoriteIds = ref.watch(favoritesProvider);
     final stationsState = ref.watch(favoriteStationsProvider);
+
+    // Reload favorites when the auth identity changes
+    // (anonymous → email, reconnect, disconnect, etc.)
+    ref.listen(
+      syncStateProvider.select((s) => s.userId),
+      (prev, next) {
+        if (prev != next) {
+          ref.read(favoriteStationsProvider.notifier).loadAndRefresh();
+        }
+      },
+    );
 
     return DefaultTabController(
       length: 2,
@@ -73,7 +89,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     BuildContext context,
     AppLocalizations? l10n,
     List<String> favoriteIds,
-    AsyncValue stationsState,
+    AsyncValue<ServiceResult<List<Station>>> stationsState,
   ) {
     if (favoriteIds.isEmpty) {
       return Center(
@@ -119,37 +135,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     return stationsState.when(
       data: (result) {
         if (result.data.isEmpty) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.sync, size: 48, color: Colors.grey.shade400),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Loading favorites...',
-                    style: Theme.of(context).textTheme.titleMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n?.noFavoritesHint ?? 'Search for stations first so their data can be cached.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton.icon(
-                    onPressed: () => context.go('/'),
-                    icon: const Icon(Icons.search),
-                    label: Text(l10n?.search ?? 'Search Stations'),
-                  ),
-                ],
-              ),
-            ),
-          );
+          // Favorites exist in Hive but station data not loaded yet — show
+          // a warm loading state instead of the old confusing "search first" message
+          return const _FavoritesLoadingView();
         }
         return RefreshIndicator(
           onRefresh: () async {
@@ -235,7 +223,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           ),
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const _FavoritesLoadingView(),
       error: (error, _) => Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -336,5 +324,104 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         },
       );
     });
+  }
+}
+
+/// Professional loading view with shimmer skeleton + pulsing fuel icon + reassuring text.
+///
+/// Shown while favorites are loading after app start, auth transitions,
+/// or when station data hasn't been cached yet.
+class _FavoritesLoadingView extends StatefulWidget {
+  const _FavoritesLoadingView();
+
+  @override
+  State<_FavoritesLoadingView> createState() => _FavoritesLoadingViewState();
+}
+
+class _FavoritesLoadingViewState extends State<_FavoritesLoadingView>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulseController;
+  late final Animation<double> _pulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+    _pulseAnimation = Tween<double>(begin: 0.6, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      children: [
+        // Reassuring header with pulsing icon
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+          child: Row(
+            children: [
+              FadeTransition(
+                opacity: _pulseAnimation,
+                child: Icon(
+                  Icons.local_gas_station_rounded,
+                  size: 28,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 300),
+                      style: theme.textTheme.titleSmall!.copyWith(
+                        color: theme.colorScheme.onSurface,
+                      ),
+                      child: const Text('Updating your favorites...'),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Fetching the latest prices',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        // Animated progress bar
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(2),
+            child: const LinearProgressIndicator(minHeight: 3),
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Shimmer skeleton cards
+        const Expanded(
+          child: SingleChildScrollView(
+            physics: NeverScrollableScrollPhysics(),
+            child: ShimmerStationList(count: 6),
+          ),
+        ),
+      ],
+    );
   }
 }
