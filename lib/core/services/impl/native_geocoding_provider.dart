@@ -1,6 +1,6 @@
 import 'dart:io' show Platform;
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import '../../error/exceptions.dart';
 import '../geocoding_provider.dart';
@@ -54,7 +54,8 @@ class NativeGeocodingProvider implements GeocodingProvider {
       final placemarks = await geo.placemarkFromCoordinates(lat, lng);
       if (placemarks.isEmpty) return null;
       return placemarks.first.isoCountryCode;
-    } on Exception catch (_) {
+    } on Exception catch (e) {
+      debugPrint('Native country detection failed: $e');
       return null;
     }
   }
@@ -68,7 +69,8 @@ class NativeGeocodingProvider implements GeocodingProvider {
       return [place.postalCode, place.locality]
           .where((s) => s != null && s.isNotEmpty)
           .join(' ');
-    } on Exception catch (_) {
+    } on Exception catch (e) {
+      debugPrint('Native reverse geocoding failed: $e');
       return '$lat, $lng';
     }
   }

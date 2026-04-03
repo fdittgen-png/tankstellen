@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../constants/app_constants.dart';
 import '../../storage/hive_storage.dart';
@@ -23,7 +24,8 @@ class TraceUploader {
     if (raw == null) return TraceUploadConfig.disabled;
     try {
       return TraceUploadConfig.fromJson(Map<String, dynamic>.from(raw as Map));
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      debugPrint('TraceUploader: config parse failed: $e');
       return TraceUploadConfig.disabled;
     }
   }
@@ -53,8 +55,8 @@ class TraceUploader {
         },
       ));
       await dio.post(config.serverUrl!, data: trace.toJson());
-    } on DioException catch (_) {
-      // Upload failure must never cause secondary errors.
+    } on DioException catch (e) {
+      debugPrint('TraceUploader: upload failed: $e');
     }
   }
 }

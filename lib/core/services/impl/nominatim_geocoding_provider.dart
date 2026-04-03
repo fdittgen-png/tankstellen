@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../error/exceptions.dart';
 import '../geocoding_provider.dart';
 import '../service_config.dart';
@@ -98,7 +99,8 @@ class NominatimGeocodingProvider implements GeocodingProvider {
       return [address['postcode'], address['city'] ?? address['town'] ?? address['village']]
           .where((s) => s != null && s.toString().isNotEmpty)
           .join(' ');
-    } on DioException catch (_) {
+    } on DioException catch (e) {
+      debugPrint('Nominatim reverse geocoding failed: $e');
       return '$lat, $lng';
     }
   }
@@ -120,7 +122,8 @@ class NominatimGeocodingProvider implements GeocodingProvider {
       final address = response.data?['address'] as Map<String, dynamic>?;
       final code = address?['country_code'] as String?;
       return code?.toUpperCase();
-    } on DioException catch (_) {
+    } on DioException catch (e) {
+      debugPrint('Nominatim country detection failed: $e');
       return null;
     }
   }

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/country/country_provider.dart';
 import '../../../core/error/exceptions.dart';
@@ -69,8 +70,8 @@ class SearchState extends _$SearchState {
 
     try {
       await ref.read(userPositionProvider.notifier).updateFromGps();
-    } on Exception catch (_) {
-      // Silently fail — don't block the search
+    } on Exception catch (e) {
+      debugPrint('GPS auto-update failed: $e');
     }
   }
 
@@ -134,8 +135,8 @@ class SearchState extends _$SearchState {
           }
         }
         ref.read(searchLocationProvider.notifier).set(address);
-      } on Exception catch (_) {
-        // GPS coordinates will still be used via geo query
+      } on Exception catch (e) {
+        debugPrint('Reverse geocoding failed: $e');
       }
 
       final profile = ref.read(activeProfileProvider);
@@ -187,7 +188,7 @@ class SearchState extends _$SearchState {
           coordsResult.data.lat, coordsResult.data.lng,
         );
         cityName = addrResult.data;
-      } on Exception catch (_) {}
+      } on Exception catch (e) { debugPrint('ZIP reverse geocoding failed: $e'); }
 
       // Show resolved location in UI
       ref.read(searchLocationProvider.notifier).set(

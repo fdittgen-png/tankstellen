@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../../core/storage/hive_storage.dart';
 import '../models/price_record.dart';
@@ -119,7 +120,8 @@ class PriceHistoryRepository {
         .map((map) {
           try {
             return PriceRecord.fromJson(Map<String, dynamic>.from(map));
-          } catch (_) {
+          } catch (e) {
+            debugPrint('PriceRecord parse failed: $e');
             return null;
           }
         })

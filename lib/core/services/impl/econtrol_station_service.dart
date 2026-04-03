@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../../features/search/data/models/search_params.dart';
 import '../../../features/search/domain/entities/station.dart';
 import '../dio_factory.dart';
@@ -144,7 +145,8 @@ class EControlStationService with StationServiceHelpers implements StationServic
         isOpen: isOpen,
         openingHoursText: hoursText.isNotEmpty ? hoursText : null,
       );
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      debugPrint('E-Control station parse failed: $e');
       return null;
     }
   }

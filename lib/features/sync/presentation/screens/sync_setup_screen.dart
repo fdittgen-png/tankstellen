@@ -120,7 +120,8 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
         _urlController.text = json['url']?.toString() ?? '';
         _keyController.text = json['key']?.toString() ?? '';
         setState(() {});
-      } catch (_) {
+      } catch (e) {
+        debugPrint('QR code parse failed: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Invalid QR code format')),

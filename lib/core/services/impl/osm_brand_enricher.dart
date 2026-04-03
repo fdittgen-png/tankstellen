@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../constants/app_constants.dart';
 import '../../storage/hive_storage.dart';
@@ -109,7 +110,7 @@ class OsmBrandEnricher {
           _storage.putSetting('brand_${s.id}', nearest.name);
         }
       }
-    } on DioException catch (_) {}
+    } on DioException catch (e) { debugPrint('OSM brand enrichment failed: $e'); }
   }
 
   List<Station> _applyCachedBrands(List<Station> stations) {

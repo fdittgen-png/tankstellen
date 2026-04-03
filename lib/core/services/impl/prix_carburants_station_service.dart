@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../../features/search/data/models/search_params.dart';
 import '../../../features/search/domain/entities/station.dart';
 import 'osm_brand_enricher.dart';
@@ -82,7 +83,8 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
         'limit': 50,
       }, cancelToken: cancelToken);
       return _extractResults(response.data);
-    } on DioException catch (_) {
+    } on DioException catch (e) {
+      debugPrint('Prix-Carburants ZIP fetch failed: $e');
       return [];
     }
   }
@@ -101,7 +103,8 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
         'limit': 50,
       }, cancelToken: cancelToken);
       return _extractResults(response.data);
-    } on DioException catch (_) {
+    } on DioException catch (e) {
+      debugPrint('Prix-Carburants geo fetch failed: $e');
       return [];
     }
   }
@@ -162,7 +165,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
             status: 'open',
           );
         }
-      } on DioException catch (_) {}
+      } on DioException catch (e) { debugPrint('Prix-Carburants detail fetch failed: $e'); }
     }
     return ServiceResult(
       data: prices,
@@ -217,7 +220,8 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
         department: r['departement']?.toString(),
         region: r['region']?.toString(),
       );
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      debugPrint('Prix-Carburants station parse failed: $e');
       return null;
     }
   }
@@ -237,7 +241,8 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     try {
       final dt = DateTime.parse(dates.first);
       return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      debugPrint('Prix-Carburants date parse failed: $e');
       return dates.first.substring(0, 16).replaceAll('T', ' ');
     }
   }
