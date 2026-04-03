@@ -47,8 +47,24 @@ class SearchScreen extends ConsumerStatefulWidget {
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   bool _filtersExpanded = true;
   bool _searchBarExpanded = true;
-  bool _autoSearchTriggered = false;
   RouteSearchStrategyType _selectedStrategy = RouteSearchStrategyType.uniform;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final profile = ref.read(activeProfileProvider);
+      if (profile?.landingScreen == LandingScreen.cheapest) {
+        final zip = profile?.homeZipCode;
+        if (zip != null && zip.isNotEmpty) {
+          _performZipSearch(zip);
+        } else {
+          _performGpsSearch();
+        }
+      }
+    });
+  }
 
   // ---------------------------------------------------------------------------
   // Search actions
@@ -148,25 +164,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
-    // Auto-search for "cheapest nearby" landing screen
-    if (!_autoSearchTriggered) {
-      _autoSearchTriggered = true;
-      final profile = ref.read(activeProfileProvider);
-      if (profile?.landingScreen == LandingScreen.cheapest) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-          final zip = profile?.homeZipCode;
-          if (zip != null && zip.isNotEmpty) {
-            _performZipSearch(zip);
-          } else {
-            _performGpsSearch();
-          }
-        });
-      }
-    }
-
     if (isLandscape && !_searchBarExpanded && _filtersExpanded) {
-      _filtersExpanded = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() => _filtersExpanded = false);
+      });
     }
 
     return Scaffold(
