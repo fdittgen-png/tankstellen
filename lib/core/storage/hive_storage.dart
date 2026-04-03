@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -20,8 +23,72 @@ class HiveStorage implements StorageRepository {
   static const String _priceHistoryBox = 'price_history';
   static const String _alertsBox = 'alerts';
 
+  static const _encryptedBoxes = {_settingsBox, _profilesBox};
+  static const _hiveEncryptionKeyName = 'hive_encryption_key';
+
+  static Future<HiveAesCipher> _loadCipher() async {
+    const secureStorage = FlutterSecureStorage();
+    final existing = await secureStorage.read(key: _hiveEncryptionKeyName);
+    if (existing != null) {
+      final keyBytes = base64Url.decode(existing);
+      return HiveAesCipher(keyBytes);
+    }
+    final key = Hive.generateSecureKey();
+    await secureStorage.write(
+      key: _hiveEncryptionKeyName,
+      value: base64UrlEncode(key),
+    );
+    return HiveAesCipher(key);
+  }
+
+  static Future<void> _migrateToEncrypted(String boxName, HiveAesCipher cipher) async {
+    Box oldBox;
+    try {
+      oldBox = await Hive.openBox('${boxName}_migration_check');
+      await oldBox.close();
+      await Hive.deleteBoxFromDisk('${boxName}_migration_check');
+      oldBox = await Hive.openBox(boxName);
+    } catch (e) {
+      debugPrint('Hive migration: $boxName already encrypted or empty');
+      return;
+    }
+    if (oldBox.isEmpty) {
+      await oldBox.close();
+      return;
+    }
+    final entries = Map<dynamic, dynamic>.from(oldBox.toMap());
+    await oldBox.close();
+    await Hive.deleteBoxFromDisk(boxName);
+    final encryptedBox = await Hive.openBox(boxName, encryptionCipher: cipher);
+    for (final entry in entries.entries) {
+      await encryptedBox.put(entry.key, entry.value);
+    }
+    await encryptedBox.close();
+    debugPrint('Hive migration: $boxName migrated to encrypted (${entries.length} entries)');
+  }
+
   static Future<void> init() async {
     await Hive.initFlutter();
+    final cipher = await _loadCipher();
+    for (final boxName in _encryptedBoxes) {
+      try {
+        final box = await Hive.openBox(boxName, encryptionCipher: cipher);
+        await box.close();
+      } catch (e) {
+        debugPrint('Hive: migrating $boxName to encrypted storage');
+        await _migrateToEncrypted(boxName, cipher);
+      }
+    }
+    await Hive.openBox(_settingsBox, encryptionCipher: cipher);
+    await Hive.openBox(_profilesBox, encryptionCipher: cipher);
+    await Hive.openBox(_favoritesBox);
+    await Hive.openBox(_cacheBox);
+    await Hive.openBox(_priceHistoryBox);
+    await Hive.openBox(_alertsBox);
+  }
+
+  @visibleForTesting
+  static Future<void> initForTest() async {
     await Hive.openBox(_settingsBox);
     await Hive.openBox(_favoritesBox);
     await Hive.openBox(_cacheBox);
