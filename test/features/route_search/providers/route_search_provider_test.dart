@@ -5,6 +5,7 @@ import 'package:tankstellen/features/route_search/data/strategies/uniform_search
 import 'package:tankstellen/features/route_search/data/strategies/cheapest_search_strategy.dart';
 import 'package:tankstellen/features/route_search/data/strategies/balanced_search_strategy.dart';
 import 'package:tankstellen/features/route_search/domain/entities/route_info.dart';
+import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:latlong2/latlong.dart';
@@ -124,6 +125,72 @@ void main() {
       expect(fuelResult.lat, 52.52);
       expect(fuelResult.lng, 13.41);
       expect(fuelResult.dist, 3.5);
+    });
+  });
+
+  group('Multi-country route search', () {
+    test('uniform strategy collects stations from per-point query function', () async {
+      // Simulate a cross-border route: Berlin (DE) → Paris (FR)
+      final route = RouteInfo(
+        geometry: [
+          const LatLng(52.52, 13.41), // Berlin
+          const LatLng(48.86, 2.35),  // Paris
+        ],
+        distanceKm: 1050.0,
+        durationMinutes: 600.0,
+        samplePoints: [
+          const LatLng(52.52, 13.41), // DE
+          const LatLng(50.94, 6.96),  // DE (Cologne)
+          const LatLng(49.50, 3.50),  // FR (Picardy)
+          const LatLng(48.86, 2.35),  // FR (Paris)
+        ],
+      );
+
+      // Fake query function that returns different stations based on coordinates
+      final queriedPoints = <LatLng>[];
+      Future<List<SearchResultItem>> fakeQuery({
+        required double lat,
+        required double lng,
+        required double radiusKm,
+        required FuelType fuelType,
+      }) async {
+        queriedPoints.add(LatLng(lat, lng));
+        // Return a station tagged with the queried lat for identification
+        return [
+          FuelStationResult(Station(
+            id: 'st-${lat.toStringAsFixed(2)}',
+            name: 'Station at $lat',
+            brand: lat > 50 ? 'Shell DE' : 'Total FR',
+            street: 'Test',
+            postCode: '00000',
+            place: 'Test',
+            lat: lat,
+            lng: lng,
+            dist: 1.0,
+            isOpen: true,
+            e10: 1.50,
+          )),
+        ];
+      }
+
+      final strategy = UniformSearchStrategy();
+      final results = await strategy.searchAlongRoute(
+        route: route,
+        fuelType: FuelType.e10,
+        searchRadiusKm: 15.0,
+        queryStations: fakeQuery,
+      );
+
+      // All 4 sample points should have been queried
+      expect(queriedPoints.length, 4);
+
+      // Results should contain stations from both "DE" and "FR" points
+      final brands = results
+          .whereType<FuelStationResult>()
+          .map((r) => r.station.brand)
+          .toSet();
+      expect(brands, contains('Shell DE'));
+      expect(brands, contains('Total FR'));
     });
   });
 }

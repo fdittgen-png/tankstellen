@@ -146,32 +146,21 @@ class RouteSearchState extends _$RouteSearchState {
     }
   }
 
-  /// Build a query function that uses the correct country-specific service.
+  /// Build a query function that detects country per sample point.
+  ///
+  /// Cross-border routes (e.g. Berlin→Paris) traverse multiple countries.
+  /// Each query resolves the country from its coordinates and uses the
+  /// matching country-specific station service.
   Future<StationQueryFunction> _buildQueryFunction(
     RouteInfo route,
     FuelType fuelType,
   ) async {
-    // Detect country from route start point
-    String? routeCountry;
-    if (route.samplePoints.isNotEmpty) {
-      try {
-        final geocoding = ref.read(geocodingChainProvider);
-        routeCountry = await geocoding.coordinatesToCountryCode(
-          route.samplePoints.first.latitude,
-          route.samplePoints.first.longitude,
-        );
-        debugPrint('RouteSearch: detected route country=$routeCountry');
-      } catch (e) {
-        debugPrint('RouteSearch: country detection failed: $e');
-      }
-    }
+    final geocoding = ref.read(geocodingChainProvider);
+    final fallbackService = ref.read(stationServiceProvider);
 
-    final StationService stationService;
-    if (routeCountry != null) {
-      stationService = stationServiceForCountry(ref, routeCountry);
-    } else {
-      stationService = ref.read(stationServiceProvider);
-    }
+    // Cache: country code per sample point to avoid redundant geocoding
+    String? lastCountry;
+    StationService? lastService;
 
     return ({
       required double lat,
@@ -179,6 +168,27 @@ class RouteSearchState extends _$RouteSearchState {
       required double radiusKm,
       required FuelType fuelType,
     }) async {
+      // Detect country for this specific point
+      String? country;
+      try {
+        country = await geocoding.coordinatesToCountryCode(lat, lng);
+      } catch (e) {
+        debugPrint('RouteSearch: country detection failed at $lat,$lng: $e');
+      }
+
+      // Reuse cached service if country unchanged
+      final StationService service;
+      if (country != null && country == lastCountry && lastService != null) {
+        service = lastService!;
+      } else if (country != null) {
+        service = stationServiceForCountry(ref, country);
+        lastCountry = country;
+        lastService = service;
+        debugPrint('RouteSearch: switched to country=$country at $lat,$lng');
+      } else {
+        service = fallbackService;
+      }
+
       final params = SearchParams(
         lat: lat,
         lng: lng,
@@ -186,7 +196,7 @@ class RouteSearchState extends _$RouteSearchState {
         fuelType: fuelType,
         sortBy: SortBy.price,
       );
-      final result = await stationService.searchStations(params);
+      final result = await service.searchStations(params);
       return result.data.map((s) => FuelStationResult(s) as SearchResultItem).toList();
     };
   }
@@ -201,18 +211,30 @@ class RouteSearchState extends _$RouteSearchState {
       throw const ApiException(message: 'OpenChargeMap API key required');
     }
 
-    final country = ref.read(activeCountryProvider);
+    final geocoding = ref.read(geocodingChainProvider);
+    final fallbackCountry = ref.read(activeCountryProvider).code;
     final service = EVChargingService(apiKey: apiKey);
     final seen = <String>{};
     final results = <SearchResultItem>[];
 
     for (final point in route.samplePoints) {
       try {
+        // Detect country per sample point for cross-border routes
+        String countryCode = fallbackCountry;
+        try {
+          final detected = await geocoding.coordinatesToCountryCode(
+            point.latitude, point.longitude,
+          );
+          if (detected != null) countryCode = detected;
+        } catch (e) {
+          debugPrint('RouteSearch EV: country detection failed: $e');
+        }
+
         final result = await service.searchStations(
           lat: point.latitude,
           lng: point.longitude,
           radiusKm: radiusKm,
-          countryCode: country.code,
+          countryCode: countryCode,
           maxResults: 20,
         );
         for (final station in result.data) {
@@ -220,8 +242,8 @@ class RouteSearchState extends _$RouteSearchState {
             results.add(EVStationResult(station));
           }
         }
-      } catch (_) {
-        // Skip failed sample points
+      } catch (e) {
+        debugPrint('RouteSearch EV: sample point query failed: $e');
       }
     }
 
