@@ -56,7 +56,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           return SliverFillRemaining(
             child: Center(
               child: Text(
-                'No stations found along this route.',
+                l10n?.noStationsAlongThisRoute ?? 'No stations found along this route.',
                 style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),

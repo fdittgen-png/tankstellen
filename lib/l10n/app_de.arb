@@ -307,5 +307,19 @@
   "noSavedRoutes": "Keine gespeicherten Routen",
   "noSavedRoutesHint": "Suche entlang einer Route und speichere sie fuer schnellen Zugriff.",
   "saveRoute": "Route speichern",
-  "routeName": "Routenname"
+  "routeName": "Routenname",
+
+  "itineraryDeleted": "{name} gelöscht",
+  "@itineraryDeleted": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "loadingRoute": "Route wird geladen: {name}",
+  "@loadingRoute": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "refreshFailed": "Aktualisierung fehlgeschlagen. Bitte erneut versuchen."
 }

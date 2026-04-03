@@ -64,7 +64,7 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Refresh failed: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)?.refreshFailed ?? 'Refresh failed. Please try again.')),
         );
       }
     } finally {
