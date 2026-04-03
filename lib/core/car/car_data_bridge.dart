@@ -30,6 +30,7 @@ class CarDataBridge {
     required Future<List<Map<String, dynamic>>> Function(double lat, double lng, double radiusKm) onSearchNearby,
     required Future<List<Map<String, dynamic>>> Function() onGetFavorites,
     required Future<Map<String, dynamic>?> Function(String stationId) onGetStationDetail,
+    required String appVersion,
   }) {
     _channel.setMethodCallHandler((call) async {
       switch (call.method) {
@@ -47,7 +48,7 @@ class CarDataBridge {
           return await onGetStationDetail(id);
 
         case 'getAppVersion':
-          return '4.1.0';
+          return appVersion;
 
         default:
           throw MissingPluginException('Method ${call.method} not implemented');
