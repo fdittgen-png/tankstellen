@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/country/country_provider.dart';
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/data/storage_repository.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class ApiKeySection extends ConsumerWidget {
@@ -11,7 +12,7 @@ class ApiKeySection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final storage = ref.watch(hiveStorageProvider);
+    final storage = ref.watch(apiKeyStorageProvider);
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final country = ref.watch(activeCountryProvider);
@@ -150,7 +151,7 @@ class ApiKeySection extends ConsumerWidget {
   }
 
   Future<void> _editApiKey(
-      BuildContext context, WidgetRef ref, HiveStorage storage) async {
+      BuildContext context, WidgetRef ref, ApiKeyStorage storage) async {
     final controller = TextEditingController(
       text: storage.getApiKey() ?? '',
     );
@@ -182,13 +183,13 @@ class ApiKeySection extends ConsumerWidget {
     if (result != null && result.isNotEmpty) {
       await storage.setApiKey(result);
       // Force rebuild to show updated status
-      ref.invalidate(hiveStorageProvider);
+      ref.invalidate(apiKeyStorageProvider);
     }
     controller.dispose();
   }
 
   Future<void> _editEvApiKey(
-      BuildContext context, WidgetRef ref, HiveStorage storage) async {
+      BuildContext context, WidgetRef ref, ApiKeyStorage storage) async {
     final controller = TextEditingController(
       text: storage.getEvApiKey() ?? '',
     );
@@ -220,7 +221,7 @@ class ApiKeySection extends ConsumerWidget {
     if (result != null && result.isNotEmpty) {
       await storage.setEvApiKey(result);
       // Force rebuild to show updated status
-      ref.invalidate(hiveStorageProvider);
+      ref.invalidate(apiKeyStorageProvider);
     }
     controller.dispose();
   }

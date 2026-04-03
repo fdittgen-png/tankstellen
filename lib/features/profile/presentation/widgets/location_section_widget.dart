@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/location/user_position_provider.dart';
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/repositories/profile_repository.dart';
@@ -134,9 +134,9 @@ class _LocationSectionWidgetState
   }
 
   Widget _buildAutoSwitchToggle(ThemeData theme, AppLocalizations? l) {
-    final storage = ref.read(hiveStorageProvider);
+    final settings = ref.read(settingsStorageProvider);
     final autoSwitch =
-        storage.getSetting(StorageKeys.autoSwitchProfile) as bool? ?? false;
+        settings.getSetting(StorageKeys.autoSwitchProfile) as bool? ?? false;
 
     return SwitchListTile(
       contentPadding: EdgeInsets.zero,
@@ -154,7 +154,7 @@ class _LocationSectionWidgetState
       value: autoSwitch,
       onChanged: (value) {
         ref
-            .read(hiveStorageProvider)
+            .read(settingsStorageProvider)
             .putSetting(StorageKeys.autoSwitchProfile, value);
         setState(() {});
       },

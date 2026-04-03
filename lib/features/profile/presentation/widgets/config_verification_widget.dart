@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../providers/profile_provider.dart';
 
@@ -15,15 +15,17 @@ class ConfigVerificationWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final storage = ref.read(hiveStorageProvider);
+    final apiKeys = ref.read(apiKeyStorageProvider);
+    final settings = ref.read(settingsStorageProvider);
+    final mgmt = ref.read(storageManagementProvider);
     final syncConfig = ref.watch(syncStateProvider);
     final profile = ref.watch(activeProfileProvider);
-    final hasApiKey = storage.hasApiKey();
+    final hasApiKey = apiKeys.hasApiKey();
     final isEmail = syncConfig.hasEmail;
-    final favCount = storage.getFavoriteIds().length;
-    final alertCount = storage.alertCount;
-    final ignoredCount = storage.getIgnoredIds().length;
-    final ratingsCount = storage.getRatings().length;
+    final favCount = mgmt.favoriteCount;
+    final alertCount = mgmt.alertCount;
+    final ignoredCount = mgmt.getIgnoredIds().length;
+    final ratingsCount = mgmt.getRatings().length;
     final ratingMode = profile?.ratingMode ?? 'local';
 
     return Card(
@@ -54,7 +56,7 @@ class ConfigVerificationWidget extends ConsumerWidget {
                 value: hasApiKey ? 'Configured' : 'Not set (demo mode)',
                 status: hasApiKey ? _Status.ok : _Status.warning),
             _ConfigRow(icon: Icons.ev_station, label: 'EV charging API key',
-                value: storage.hasCustomEvApiKey() ? 'Custom key' : 'Default (shared)',
+                value: apiKeys.hasCustomEvApiKey() ? 'Custom key' : 'Default (shared)',
                 status: _Status.ok),
 
             const Divider(height: 24),
@@ -92,7 +94,7 @@ class ConfigVerificationWidget extends ConsumerWidget {
                         ? 'Private (synced)'
                         : 'Shared (public)'),
             _ConfigRow(icon: Icons.location_on, label: 'GPS position',
-                value: storage.getSetting('user_position_lat') != null ? 'Stored' : 'Not stored',
+                value: settings.getSetting('user_position_lat') != null ? 'Stored' : 'Not stored',
                 privacy: 'Local only (never synced)'),
             _ConfigRow(icon: Icons.key, label: 'API keys',
                 value: hasApiKey ? 'Stored' : 'Not set',

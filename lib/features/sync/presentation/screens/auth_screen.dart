@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Authentication screen for switching between anonymous and email accounts.
@@ -46,8 +46,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     try {
       final userId = await TankSyncClient.signInAnonymously();
       if (userId != null) {
-        final storage = ref.read(hiveStorageProvider);
-        await storage.putSetting('sync_user_id', userId);
+        final settings = ref.read(settingsStorageProvider);
+        await settings.putSetting('sync_user_id', userId);
         ref.invalidate(syncStateProvider);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

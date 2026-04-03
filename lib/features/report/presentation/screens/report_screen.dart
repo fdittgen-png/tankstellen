@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -73,8 +73,8 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
 
     setState(() => _isSubmitting = true);
     try {
-      final storage = ref.read(hiveStorageProvider);
-      final apiKey = storage.getApiKey();
+      final apiKeys = ref.read(apiKeyStorageProvider);
+      final apiKey = apiKeys.getApiKey();
 
       final dio = Dio(BaseOptions(
         baseUrl: ApiConstants.baseUrl,

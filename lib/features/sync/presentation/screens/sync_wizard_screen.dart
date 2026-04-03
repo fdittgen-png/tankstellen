@@ -7,7 +7,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/schema_verifier.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
@@ -653,11 +653,11 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
         } else {
           userId = await TankSyncClient.signInWithEmail(_emailController.text.trim(), _passwordController.text);
         }
-        final storage = ref.read(hiveStorageProvider);
-        await storage.putSetting('sync_enabled', true);
-        await storage.putSetting('supabase_url', url);
-        await storage.putSetting('supabase_anon_key', key);
-        if (userId != null) await storage.putSetting('sync_user_id', userId);
+        final settings = ref.read(settingsStorageProvider);
+        await settings.putSetting('sync_enabled', true);
+        await settings.putSetting('supabase_url', url);
+        await settings.putSetting('supabase_anon_key', key);
+        if (userId != null) await settings.putSetting('sync_user_id', userId);
         ref.invalidate(syncStateProvider);
       } else {
         await ref.read(syncStateProvider.notifier).connect(url, key);

@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/language/language_provider.dart';
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/data/repositories/profile_repository.dart';
 import '../../../profile/providers/profile_provider.dart';
@@ -62,8 +62,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
         }
         return;
       }
-      final storage = ref.read(hiveStorageProvider);
-      await storage.setApiKey(apiKey);
+      final apiKeys = ref.read(apiKeyStorageProvider);
+      await apiKeys.setApiKey(apiKey);
       await _finishSetup();
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -71,8 +71,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   }
 
   Future<void> _finishSetup() async {
-    final storage = ref.read(hiveStorageProvider);
-    await storage.skipSetup();
+    final settings = ref.read(settingsStorageProvider);
+    await settings.skipSetup();
 
     final country = ref.read(activeCountryProvider);
     final language = ref.read(activeLanguageProvider);
