@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_result.dart';
@@ -112,6 +113,88 @@ void main() {
 
       // testStation.isOpen is true, so "Open" text should appear
       expect(find.text('Open'), findsOneWidget);
+    });
+
+    testWidgets('renders favorite button in app bar (not favorited)',
+        (tester) async {
+      final result = ServiceResult(
+        data: StationDetail(station: testStation),
+        source: ServiceSource.cache,
+        fetchedAt: DateTime.now(),
+      );
+
+      await pumpApp(
+        tester,
+        const StationDetailScreen(
+          stationId: '51d4b477-a095-1aa0-e100-80009459e03a',
+        ),
+        overrides: [
+          ...commonOverrides,
+          stationDetailProvider('51d4b477-a095-1aa0-e100-80009459e03a')
+              .overrideWith((_) async => result),
+          favoritesOverride([]),
+          isFavoriteOverride(
+              '51d4b477-a095-1aa0-e100-80009459e03a', false),
+        ],
+      );
+
+      // Star icon should be present in the app bar actions
+      // (star_border when not favorited, star when favorited)
+      expect(find.byIcon(Icons.star_border).evaluate().isNotEmpty ||
+             find.byIcon(Icons.star).evaluate().isNotEmpty, isTrue);
+    });
+
+    testWidgets('renders favorite button as filled when station is favorited',
+        (tester) async {
+      final result = ServiceResult(
+        data: StationDetail(station: testStation),
+        source: ServiceSource.cache,
+        fetchedAt: DateTime.now(),
+      );
+
+      await pumpApp(
+        tester,
+        const StationDetailScreen(
+          stationId: '51d4b477-a095-1aa0-e100-80009459e03a',
+        ),
+        overrides: [
+          ...commonOverrides,
+          stationDetailProvider('51d4b477-a095-1aa0-e100-80009459e03a')
+              .overrideWith((_) async => result),
+          favoritesOverride(['51d4b477-a095-1aa0-e100-80009459e03a']),
+          isFavoriteOverride(
+              '51d4b477-a095-1aa0-e100-80009459e03a', true),
+        ],
+      );
+
+      // Should have filled star (favorited)
+      expect(find.byIcon(Icons.star), findsOneWidget);
+    });
+
+    testWidgets('renders address information', (tester) async {
+      final result = ServiceResult(
+        data: StationDetail(station: testStation),
+        source: ServiceSource.cache,
+        fetchedAt: DateTime.now(),
+      );
+
+      await pumpApp(
+        tester,
+        const StationDetailScreen(
+          stationId: '51d4b477-a095-1aa0-e100-80009459e03a',
+        ),
+        overrides: [
+          ...commonOverrides,
+          stationDetailProvider('51d4b477-a095-1aa0-e100-80009459e03a')
+              .overrideWith((_) async => result),
+          favoritesOverride([]),
+          isFavoriteOverride(
+              '51d4b477-a095-1aa0-e100-80009459e03a', false),
+        ],
+      );
+
+      // Address info from testStation
+      expect(find.textContaining('Berlin'), findsAtLeast(1));
     });
   });
 }

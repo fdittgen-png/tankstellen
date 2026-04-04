@@ -140,5 +140,54 @@ void main() {
       expect(find.byType(Scaffold), findsAtLeast(1));
       expect(find.text('Search to find fuel stations.'), findsOneWidget);
     });
+
+    testWidgets('typing a zip code in location input accepts input',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchScreen(),
+        overrides: [
+          ...test.overrides,
+          userPositionNullOverride(),
+        ],
+      );
+
+      // Find the text field inside LocationInput and enter a zip code
+      final textField = find.byType(TextField).first;
+      expect(textField, findsOneWidget);
+
+      await tester.enterText(textField, '10115');
+      await tester.pump();
+
+      // The entered text should be visible
+      expect(find.text('10115'), findsOneWidget);
+    });
+
+    testWidgets('clearing location input resets to empty', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchScreen(),
+        overrides: [
+          ...test.overrides,
+          userPositionNullOverride(),
+        ],
+      );
+
+      final textField = find.byType(TextField).first;
+      await tester.enterText(textField, '10115');
+      await tester.pump();
+      expect(find.text('10115'), findsOneWidget);
+
+      // Clear the text
+      await tester.enterText(textField, '');
+      await tester.pump();
+      expect(find.text('10115'), findsNothing);
+    });
   });
 }
