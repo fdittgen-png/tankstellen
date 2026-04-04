@@ -6,6 +6,7 @@ import 'package:workmanager/workmanager.dart';
 import '../../features/alerts/data/repositories/alert_repository.dart';
 import '../../features/price_history/data/models/price_record.dart';
 import '../../features/search/domain/entities/fuel_type.dart';
+import '../../features/widget/data/home_widget_service.dart';
 import '../notifications/notification_service.dart';
 import '../storage/hive_storage.dart';
 
@@ -216,6 +217,9 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     } else {
       debugPrint('BackgroundService: ${activeAlerts.length} active alerts, ${prices.length} prices available');
     }
+
+    // 6. Update home screen widget with latest favorite prices
+    await HomeWidgetService.updateWidget(storage);
   } catch (e) {
     debugPrint('BackgroundService: task failed: $e');
   }

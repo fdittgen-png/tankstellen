@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_description">Shows fuel prices for your favorite stations</string>
+    <string name="widget_name">Fuel Prices</string>
+</resources>
