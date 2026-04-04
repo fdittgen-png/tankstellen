@@ -1825,6 +1825,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Route name'**
   String get routeName;
+
+  /// No description provided for @itineraryDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} deleted'**
+  String itineraryDeleted(String name);
+
+  /// No description provided for @loadingRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading route: {name}'**
+  String loadingRoute(String name);
+
+  /// No description provided for @refreshFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh failed. Please try again.'**
+  String get refreshFailed;
 }
 
 class _AppLocalizationsDelegate

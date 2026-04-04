@@ -307,5 +307,19 @@
   "noSavedRoutes": "No saved routes",
   "noSavedRoutesHint": "Search along a route and save it for quick access later.",
   "saveRoute": "Save route",
-  "routeName": "Route name"
+  "routeName": "Route name",
+
+  "itineraryDeleted": "{name} deleted",
+  "@itineraryDeleted": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "loadingRoute": "Loading route: {name}",
+  "@loadingRoute": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "refreshFailed": "Refresh failed. Please try again."
 }

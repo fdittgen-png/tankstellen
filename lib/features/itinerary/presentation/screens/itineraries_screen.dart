@@ -57,7 +57,7 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
                     onDismissed: () {
                       ref.read(itineraryProvider.notifier).delete(it.id);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('${it.name} deleted')),
+                        SnackBar(content: Text(AppLocalizations.of(context)?.itineraryDeleted(it.name) ?? '${it.name} deleted')),
                       );
                     },
                     child: ListTile(
@@ -107,7 +107,7 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
     context.go('/');
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Loading route: ${it.name}')),
+      SnackBar(content: Text(AppLocalizations.of(context)?.loadingRoute(it.name) ?? 'Loading route: ${it.name}')),
     );
   }
 

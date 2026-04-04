@@ -917,4 +917,17 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get routeName => 'Nom de l\'itinéraire';
+
+  @override
+  String itineraryDeleted(String name) {
+    return '$name deleted';
+  }
+
+  @override
+  String loadingRoute(String name) {
+    return 'Loading route: $name';
+  }
+
+  @override
+  String get refreshFailed => 'Refresh failed. Please try again.';
 }
