@@ -7,6 +7,7 @@ import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
 import '../../domain/route_search_strategy.dart';
+import '../helpers/batch_query_helper.dart';
 
 /// Balanced strategy: finds stations with a good balance between
 /// price and distance from route (minimal detour).
@@ -28,32 +29,15 @@ class BalancedSearchStrategy implements RouteSearchStrategy {
     required StationQueryFunction queryStations,
     double? maxDetourKm,
   }) async {
-    final seen = <String>{};
-    final results = <SearchResultItem>[];
-
     debugPrint('BalancedSearch: querying ${route.samplePoints.length} points with radius=${searchRadiusKm}km');
 
-    for (var i = 0; i < route.samplePoints.length; i++) {
-      final point = route.samplePoints[i];
-      try {
-        final stations = await queryStations(
-          lat: point.latitude,
-          lng: point.longitude,
-          radiusKm: searchRadiusKm,
-          fuelType: fuelType,
-        );
-        for (final item in stations) {
-          if (seen.add(item.id)) {
-            results.add(item);
-          }
-        }
-      } catch (e) {
-        debugPrint('BalancedSearch: point $i FAILED: $e');
-      }
-      if (i < route.samplePoints.length - 1) {
-        await Future<void>.delayed(const Duration(milliseconds: 500));
-      }
-    }
+    const batchHelper = BatchQueryHelper(batchSize: 4);
+    final results = await batchHelper.queryAll(
+      samplePoints: route.samplePoints,
+      queryStations: queryStations,
+      fuelType: fuelType,
+      searchRadiusKm: searchRadiusKm,
+    );
 
     // Filter by detour distance
     final detourLimit = maxDetourKm ?? searchRadiusKm;

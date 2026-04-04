@@ -7,6 +7,7 @@ import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
 import '../../domain/route_search_strategy.dart';
+import '../helpers/batch_query_helper.dart';
 
 /// Strategy that prioritizes finding the cheapest stations along the route.
 ///
@@ -27,36 +28,23 @@ class CheapestSearchStrategy implements RouteSearchStrategy {
     required StationQueryFunction queryStations,
     double? maxDetourKm,
   }) async {
-    final seen = <String>{};
-    final results = <SearchResultItem>[];
-
     // Use wider radius but sample every other point for speed
     final effectiveRadius = searchRadiusKm * 1.5;
     final step = route.samplePoints.length > 10 ? 2 : 1;
+    final sampledPoints = [
+      for (var i = 0; i < route.samplePoints.length; i += step)
+        route.samplePoints[i],
+    ];
 
-    debugPrint('CheapestSearch: querying ${(route.samplePoints.length / step).ceil()} points with radius=${effectiveRadius.toStringAsFixed(1)}km');
+    debugPrint('CheapestSearch: querying ${sampledPoints.length} points with radius=${effectiveRadius.toStringAsFixed(1)}km');
 
-    for (var i = 0; i < route.samplePoints.length; i += step) {
-      final point = route.samplePoints[i];
-      try {
-        final stations = await queryStations(
-          lat: point.latitude,
-          lng: point.longitude,
-          radiusKm: effectiveRadius,
-          fuelType: fuelType,
-        );
-        for (final item in stations) {
-          if (seen.add(item.id)) {
-            results.add(item);
-          }
-        }
-      } catch (e) {
-        debugPrint('CheapestSearch: point $i FAILED: $e');
-      }
-      if (i + step < route.samplePoints.length) {
-        await Future<void>.delayed(const Duration(milliseconds: 500));
-      }
-    }
+    const batchHelper = BatchQueryHelper(batchSize: 4);
+    final results = await batchHelper.queryAll(
+      samplePoints: sampledPoints,
+      queryStations: queryStations,
+      fuelType: fuelType,
+      searchRadiusKm: effectiveRadius,
+    );
 
     // Filter by detour distance (more generous for cheapest strategy)
     final detourLimit = (maxDetourKm ?? searchRadiusKm) * 1.5;
