@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'app/app.dart';
 import 'core/background/background_service.dart';
@@ -92,13 +93,17 @@ Future<void> main() async {
   }
 
   if (sentryDsn != null && sentryDsn.isNotEmpty) {
+    // Read version from pubspec.yaml metadata at runtime
+    final packageInfo = await PackageInfo.fromPlatform();
+    final release = 'tankstellen@${packageInfo.version}+${packageInfo.buildNumber}';
+
     // Sentry enabled — use SentryFlutter to capture errors
     await SentryFlutter.init(
       (options) {
         options.dsn = sentryDsn;
         options.tracesSampleRate = 0.2; // 20% of transactions
         options.environment = 'production';
-        options.release = 'fuel-prices@1.0.0';
+        options.release = release;
       },
       appRunner: () => _runApp(container),
     );
