@@ -118,5 +118,27 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('rebuild does not re-trigger auto-search side effects',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchScreen(),
+        overrides: [
+          ...test.overrides,
+          userPositionNullOverride(),
+        ],
+      );
+
+      await tester.pump();
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.byType(Scaffold), findsAtLeast(1));
+      expect(find.text('Search to find fuel stations.'), findsOneWidget);
+    });
   });
 }
