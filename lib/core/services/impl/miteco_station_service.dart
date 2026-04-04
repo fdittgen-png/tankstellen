@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../../features/search/data/models/search_params.dart';
 import '../../../features/search/domain/entities/station.dart';
 import '../../error/exceptions.dart';
@@ -216,7 +217,8 @@ class MitecoStationService with StationServiceHelpers, CachedDatasetMixin implem
         openingHoursText: horario.isNotEmpty ? horario : null,
         stationType: r['Margen']?.toString(),
       );
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      debugPrint('MITECO station parse failed: $e');
       return null;
     }
   }

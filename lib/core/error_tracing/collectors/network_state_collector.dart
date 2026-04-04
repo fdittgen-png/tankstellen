@@ -1,4 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import '../models/error_trace.dart';
 
 class NetworkStateCollector {
@@ -16,7 +17,8 @@ class NetworkStateCollector {
         type = 'ethernet';
       }
       return NetworkSnapshot(isOnline: isOnline, connectivityType: type);
-    } on Exception catch (_) {
+    } on Exception catch (e) {
+      debugPrint('NetworkStateCollector: connectivity check failed: $e');
       return const NetworkSnapshot(isOnline: false, connectivityType: 'unknown');
     }
   }

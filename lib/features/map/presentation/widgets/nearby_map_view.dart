@@ -49,7 +49,7 @@ class NearbyMapView extends ConsumerWidget {
 
         // Move map to new center when search results change
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          try { mapController.move(center, zoom); } catch (_) {}
+          try { mapController.move(center, zoom); } catch (e) { debugPrint('Map move failed: $e'); }
         });
 
         return Column(

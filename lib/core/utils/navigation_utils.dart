@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Centralized navigation utility for opening stations in external maps apps.
@@ -26,8 +27,8 @@ class NavigationUtils {
     try {
       final launched = await launchUrl(geoUri, mode: LaunchMode.externalApplication);
       if (launched) return;
-    } on Exception catch (_) {
-      // geo: scheme not supported (rare on modern Android/iOS)
+    } on Exception catch (e) {
+      debugPrint('Navigation geo: URI failed: $e');
     }
 
     // Fallback: Google Maps web URL — works universally via browser.

@@ -97,7 +97,7 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
             });
             await ref.read(alertProvider.notifier).addAlert(alert);
             addedAlerts++;
-          } catch (_) {}
+          } catch (e) { debugPrint('Alert import failed: $e'); }
         }
       }
 

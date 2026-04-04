@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../../features/search/data/models/search_params.dart';
 import '../../../features/search/domain/entities/station.dart';
 import '../dio_factory.dart';
@@ -117,7 +118,8 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           updatedAt: _formatIsoTime(r['last_updated_time']?.toString()),
         );
       }).whereType<Station>().toList();
-    } on DioException catch (_) {
+    } on DioException catch (e) {
+      debugPrint('DK OK fetch failed: $e');
       return [];
     }
   }
@@ -168,7 +170,8 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           ),
         );
       }).whereType<Station>().toList();
-    } on DioException catch (_) {
+    } on DioException catch (e) {
+      debugPrint('DK Shell fetch failed: $e');
       return [];
     }
   }
@@ -188,7 +191,8 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           '${dt.month.toString().padLeft(2, '0')} '
           '${dt.hour.toString().padLeft(2, '0')}:'
           '${dt.minute.toString().padLeft(2, '0')}';
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      debugPrint('DK date parse failed: $e');
       return null;
     }
   }

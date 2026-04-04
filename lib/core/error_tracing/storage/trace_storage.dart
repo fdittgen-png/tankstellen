@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/error_trace.dart';
@@ -28,7 +29,8 @@ class TraceStorage {
         .map((raw) {
           try {
             return ErrorTrace.fromJson(Map<String, dynamic>.from(raw as Map));
-          } on FormatException catch (_) {
+          } on FormatException catch (e) {
+            debugPrint('TraceStorage: trace parse failed: $e');
             return null;
           }
         })
@@ -42,7 +44,8 @@ class TraceStorage {
     if (raw == null) return null;
     try {
       return ErrorTrace.fromJson(Map<String, dynamic>.from(raw as Map));
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      debugPrint('TraceStorage: trace parse failed: $e');
       return null;
     }
   }

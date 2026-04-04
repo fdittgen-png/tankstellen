@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../features/search/data/models/search_params.dart';
 import '../../features/search/domain/entities/station.dart';
@@ -191,7 +192,8 @@ class StationServiceChain implements StationService {
       return list
           .map((j) => Station.fromJson(Map<String, dynamic>.from(j as Map)))
           .toList();
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      debugPrint('Cache: station list parse failed: $e');
       return null;
     }
   }
@@ -219,7 +221,8 @@ class StationServiceChain implements StationService {
         wholeDay: data['wholeDay'] as bool? ?? false,
         state: data['state'] as String?,
       );
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      debugPrint('Cache: station detail parse failed: $e');
       return null;
     }
   }
@@ -235,7 +238,8 @@ class StationServiceChain implements StationService {
       return raw.map(
         (k, v) => MapEntry(k, StationPrices.fromJson(Map<String, dynamic>.from(v as Map))),
       );
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      debugPrint('Cache: prices parse failed: $e');
       return null;
     }
   }

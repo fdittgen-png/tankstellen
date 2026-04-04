@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../../core/services/dio_factory.dart';
 import '../../../../core/services/mixins/station_service_helpers.dart';
@@ -124,7 +125,8 @@ class EVChargingService with StationServiceHelpers {
         updatedAt: _formatDate(item['DateLastStatusUpdate']?.toString()),
         countryCode: addr['Country']?['ISOCode']?.toString(),
       );
-    } catch (_) {
+    } catch (e) {
+      debugPrint('EV station parse failed: $e');
       return null;
     }
   }
@@ -168,7 +170,8 @@ class EVChargingService with StationServiceHelpers {
     try {
       final dt = DateTime.parse(iso);
       return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
-    } catch (_) {
+    } catch (e) {
+      debugPrint('EV date parse failed: $e');
       return null;
     }
   }

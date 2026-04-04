@@ -619,7 +619,8 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
         _urlController.text = json['url']?.toString() ?? '';
         _keyController.text = json['key']?.toString() ?? '';
         setState(() => _mode = _WizardMode.auth);
-      } catch (_) {
+      } catch (e) {
+        debugPrint('QR code parse failed: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Invalid QR code — expected TankSync format')),
         );

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../features/search/data/models/search_params.dart';
 import '../../../features/search/domain/entities/station.dart';
@@ -92,7 +93,8 @@ class PortugalStationService with StationServiceHelpers implements StationServic
             lpg: gpl,
             isOpen: true,
           ));
-        } catch (_) {
+        } catch (e) {
+          debugPrint('PT station parse failed: $e');
           continue;
         }
       }
