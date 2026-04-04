@@ -1,11 +1,11 @@
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/data/storage_repository.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../search/domain/entities/station.dart';
 import '../models/price_alert.dart';
 
-/// Repository for managing price alerts, backed by Hive storage.
+/// Repository for managing price alerts, backed by [AlertStorage].
 class AlertRepository {
-  final HiveStorage _storage;
+  final AlertStorage _storage;
 
   AlertRepository(this._storage);
 

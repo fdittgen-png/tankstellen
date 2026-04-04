@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../../../search/domain/entities/fuel_type.dart';
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/data/storage_repository.dart';
 import '../models/price_record.dart';
 
 /// Trend direction for a fuel price over a time window.
@@ -23,10 +23,10 @@ class PriceStats {
   });
 }
 
-/// Persists price snapshots per station via [HiveStorage] and provides
+/// Persists price snapshots per station via [PriceHistoryStorage] and provides
 /// query/aggregation methods for price history analysis.
 class PriceHistoryRepository {
-  final HiveStorage _storage;
+  final PriceHistoryStorage _storage;
 
   PriceHistoryRepository(this._storage);
 
