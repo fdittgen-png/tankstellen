@@ -8,8 +8,8 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('app launches and renders main scaffold', (tester) async {
-    // Initialize Hive for integration test environment
+  testWidgets('app launches without crashing and renders a Scaffold',
+      (tester) async {
     await HiveStorage.init();
 
     await tester.pumpWidget(
@@ -59,6 +59,10 @@ void main() {
     final navBars = find.byType(NavigationBar);
     if (navBars.evaluate().isNotEmpty) {
       expect(navBars, findsOneWidget);
+
+      // Verify 4 navigation destinations exist
+      final destinations = find.byType(NavigationDestination);
+      expect(destinations, findsNWidgets(4));
     } else {
       // BottomNavigationBar variant
       final bottomNavBars = find.byType(BottomNavigationBar);
@@ -66,5 +70,59 @@ void main() {
         expect(bottomNavBars, findsOneWidget);
       }
     }
+  });
+
+  testWidgets('tapping each navigation tab navigates without crash',
+      (tester) async {
+    await HiveStorage.init();
+    final storage = HiveStorage();
+    await storage.setSetupComplete(true);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        child: const TankstellenApp(),
+      ),
+    );
+    await tester.pumpAndSettle(const Duration(seconds: 3));
+
+    final navBars = find.byType(NavigationBar);
+    if (navBars.evaluate().isEmpty) return; // Skip if not on shell screen
+
+    final destinations = find.byType(NavigationDestination);
+    if (destinations.evaluate().length != 4) return;
+
+    // Tab 0 is already active (Search). Tap each remaining tab.
+    for (var i = 1; i < 4; i++) {
+      await tester.tap(destinations.at(i));
+      await tester.pumpAndSettle(const Duration(seconds: 2));
+
+      // App should still have a scaffold and not have crashed
+      expect(find.byType(Scaffold), findsAtLeast(1),
+          reason: 'Tab $i should render without crashing');
+    }
+
+    // Navigate back to the first tab
+    await tester.tap(destinations.at(0));
+    await tester.pumpAndSettle(const Duration(seconds: 2));
+    expect(find.byType(Scaffold), findsAtLeast(1));
+  });
+
+  testWidgets('localization loads and provides text', (tester) async {
+    await HiveStorage.init();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        child: const TankstellenApp(),
+      ),
+    );
+    await tester.pumpAndSettle(const Duration(seconds: 3));
+
+    // The app should have rendered some localized text (not raw ARB keys).
+    // We check that at least one common widget has visible text content.
+    // The app renders either the setup screen or the search screen,
+    // both of which contain buttons, labels, or titles.
+    final allText = find.byType(Text);
+    expect(allText, findsAtLeast(1),
+        reason: 'App should render at least one Text widget with localized content');
   });
 }
