@@ -1,0 +1,189 @@
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  group('No hardcoded secrets', () {
+    late List<File> dartFiles;
+
+    setUp(() {
+      final libDir = Directory('lib');
+      expect(libDir.existsSync(), isTrue, reason: 'lib/ directory must exist');
+
+      dartFiles = libDir
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.dart'))
+          .where((f) => !f.path.endsWith('.g.dart'))
+          .where((f) => !f.path.endsWith('.freezed.dart'))
+          .toList();
+    });
+
+    test('found Dart source files to scan', () {
+      expect(dartFiles, isNotEmpty,
+          reason: 'Should find at least one .dart file in lib/');
+      expect(dartFiles.length, greaterThan(10));
+    });
+
+    test('no hardcoded API key assignments', () {
+      // Pattern: apiKey = "actual-value" or apiKey: "actual-value"
+      // Excludes empty strings, placeholder hints, and the intentional
+      // OpenChargeMap shared key in AppConstants.
+      final apiKeyPattern = RegExp(
+        r'''(?:apiKey|api_key|apikey)\s*[:=]\s*['"][a-zA-Z0-9_\-]{8,}['"]''',
+        caseSensitive: false,
+      );
+
+      final violations = <String>[];
+
+      for (final file in dartFiles) {
+        final content = file.readAsStringSync();
+        final lines = content.split('\n');
+
+        for (var i = 0; i < lines.length; i++) {
+          final line = lines[i];
+          if (apiKeyPattern.hasMatch(line)) {
+            // Exclude the intentional shared OpenChargeMap API key
+            if (line.contains('openChargeMapApiKey')) continue;
+            // Exclude hint text and label text (UI strings)
+            if (line.contains('hintText') || line.contains('labelText')) {
+              continue;
+            }
+            // Exclude storage key constants (names, not values)
+            if (line.contains("static const String") &&
+                line.contains("= '") &&
+                RegExp(r"= '[a-z_]+'").hasMatch(line)) {
+              continue;
+            }
+            // Exclude comments
+            if (line.trimLeft().startsWith('//')) continue;
+            violations.add('${file.path}:${i + 1}: $line');
+          }
+        }
+      }
+
+      if (violations.isNotEmpty) {
+        fail(
+          'Found ${violations.length} potential hardcoded API key(s):\n'
+          '${violations.join('\n')}',
+        );
+      }
+    });
+
+    test('no hardcoded JWT tokens', () {
+      // JWT format: eyJ<base64>.<base64>.<base64>
+      final jwtPattern = RegExp(
+        r'''['"]eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}['"]''',
+      );
+
+      final violations = <String>[];
+
+      for (final file in dartFiles) {
+        final content = file.readAsStringSync();
+        final lines = content.split('\n');
+
+        for (var i = 0; i < lines.length; i++) {
+          final line = lines[i];
+          if (jwtPattern.hasMatch(line)) {
+            // Skip comments
+            if (line.trimLeft().startsWith('//')) continue;
+            violations.add('${file.path}:${i + 1}: $line');
+          }
+        }
+      }
+
+      if (violations.isNotEmpty) {
+        fail(
+          'Found ${violations.length} potential hardcoded JWT(s):\n'
+          '${violations.join('\n')}',
+        );
+      }
+    });
+
+    test('no hardcoded UUIDs used as secret values', () {
+      // UUIDs in assignments that look like secrets (not IDs or keys used for lookups)
+      // Pattern: secret/password/token = "uuid"
+      final uuidSecretPattern = RegExp(
+        r'''(?:secret|password|token|credential)\s*[:=]\s*['"][0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}['"]''',
+        caseSensitive: false,
+      );
+
+      final violations = <String>[];
+
+      for (final file in dartFiles) {
+        final content = file.readAsStringSync();
+        final lines = content.split('\n');
+
+        for (var i = 0; i < lines.length; i++) {
+          final line = lines[i];
+          if (uuidSecretPattern.hasMatch(line)) {
+            if (line.trimLeft().startsWith('//')) continue;
+            violations.add('${file.path}:${i + 1}: $line');
+          }
+        }
+      }
+
+      if (violations.isNotEmpty) {
+        fail(
+          'Found ${violations.length} potential hardcoded secret UUID(s):\n'
+          '${violations.join('\n')}',
+        );
+      }
+    });
+
+    test('no Supabase URLs or anon keys hardcoded', () {
+      // Supabase anon keys are JWTs starting with eyJ...
+      // Supabase project URLs match: https://<project-ref>.supabase.co
+      final supabaseUrlPattern = RegExp(
+        r'''['"]https://[a-z0-9]+\.supabase\.co['"]''',
+      );
+
+      final violations = <String>[];
+
+      for (final file in dartFiles) {
+        final content = file.readAsStringSync();
+        final lines = content.split('\n');
+
+        for (var i = 0; i < lines.length; i++) {
+          final line = lines[i];
+          if (supabaseUrlPattern.hasMatch(line)) {
+            // Skip comments
+            if (line.trimLeft().startsWith('//')) continue;
+            // Skip env/config loading patterns
+            if (line.contains('env') || line.contains('ENV')) continue;
+            violations.add('${file.path}:${i + 1}: $line');
+          }
+        }
+      }
+
+      if (violations.isNotEmpty) {
+        fail(
+          'Found ${violations.length} potential hardcoded Supabase URL(s):\n'
+          '${violations.join('\n')}',
+        );
+      }
+    });
+
+    test('no private keys or PEM blocks', () {
+      final pemPattern = RegExp(
+        r'-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----',
+      );
+
+      final violations = <String>[];
+
+      for (final file in dartFiles) {
+        final content = file.readAsStringSync();
+        if (pemPattern.hasMatch(content)) {
+          violations.add(file.path);
+        }
+      }
+
+      if (violations.isNotEmpty) {
+        fail(
+          'Found private key PEM block(s) in:\n'
+          '${violations.join('\n')}',
+        );
+      }
+    });
+  });
+}
