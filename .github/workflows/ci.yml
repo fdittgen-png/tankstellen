@@ -5,6 +5,8 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  schedule:
+    - cron: '0 6 * * 0'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -77,6 +79,50 @@ jobs:
             fi
           fi
       - run: flutter pub outdated --no-dev-dependencies
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: OSV vulnerability scan
+        uses: google/osv-scanner-action/osv-scanner-action@v2
+        with:
+          scan-args: |-
+            --lockfile=pubspec.lock
+
+  license-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Check for GPL dependencies
+        run: |
+          FORBIDDEN=""
+          for pkg in $(dart pub deps --no-dev --style=compact 2>/dev/null | tail -n +2 | sed 's/ .*//'); do
+            LICENSE_FILE=$(find ~/.pub-cache/hosted/pub.dev/"$pkg"* -maxdepth 1 -iname "LICENSE*" 2>/dev/null | head -1)
+            if [ -n "$LICENSE_FILE" ]; then
+              if grep -qiE "GNU General Public License|GPL-2|GPL-3|LGPL" "$LICENSE_FILE" 2>/dev/null; then
+                if ! grep -qi "LGPL" "$LICENSE_FILE" 2>/dev/null || grep -qi "GPL-3" "$LICENSE_FILE" 2>/dev/null; then
+                  FORBIDDEN="$FORBIDDEN\n  - $pkg"
+                fi
+              fi
+            fi
+          done
+          if [ -n "$FORBIDDEN" ]; then
+            echo "::error::GPL-licensed dependencies found:$FORBIDDEN"
+            echo "All dependencies must be MIT/BSD/Apache compatible (MIT project)."
+            exit 1
+          fi
+          echo "License check passed — no GPL dependencies found."
 
   build-android:
     runs-on: ubuntu-latest
