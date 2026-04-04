@@ -13,12 +13,7 @@ void main() {
   setUp(() async {
     tempDir = await Directory.systemTemp.createTemp('hive_storage_test_');
     Hive.init(tempDir.path);
-    await Hive.openBox('settings');
-    await Hive.openBox('favorites');
-    await Hive.openBox('cache');
-    await Hive.openBox('profiles');
-    await Hive.openBox('price_history');
-    await Hive.openBox('alerts');
+    await HiveStorage.initForTest();
     storage = HiveStorage();
   });
 
