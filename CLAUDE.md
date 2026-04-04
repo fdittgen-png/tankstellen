@@ -193,6 +193,9 @@ Never commit directly to `master`. `master` is always deployable.
 - `/test-coverage` — Analyze line-level coverage, suggest improvements
 - `/test-accessibility` — Run accessibility guideline checks on screens
 
+### Build Commands
+- `/build-release` — Bump build number, build AAB + APKs, copy to OneDrive, commit bump
+
 ### Rules
 - **Never write code without explicit user confirmation** — always present a plan first
 - **Always write tests** for new or changed code — no exceptions
