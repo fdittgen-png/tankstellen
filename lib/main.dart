@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -61,31 +62,35 @@ Future<void> main() async {
     final key = storage.getSetting('supabase_anon_key') as String?;
     if (url != null && key != null) {
       try {
-        await TankSyncClient.init(url: url, anonKey: key);
-        // Re-authenticate if session expired
-        if (TankSyncClient.client?.auth.currentUser == null) {
-          debugPrint('TankSync: session expired, re-authenticating...');
-          await TankSyncClient.signInAnonymously();
-        }
-        // ALWAYS sync stored userId with the active session
-        final sessionId = TankSyncClient.client?.auth.currentUser?.id;
-        final storedId = storage.getSetting('sync_user_id') as String?;
-        if (sessionId != null && sessionId != storedId) {
-          debugPrint('TankSync: userId changed $storedId → $sessionId');
-          await storage.putSetting('sync_user_id', sessionId);
-        }
-        // Ensure public.users row exists (FK constraint requirement)
-        if (sessionId != null) {
-          try {
-            await TankSyncClient.client!.from('users').upsert(
-              {'id': sessionId},
-              onConflict: 'id',
-            );
-          } catch (e) {
-            debugPrint('TankSync: users upsert failed: $e');
+        await Future(() async {
+          await TankSyncClient.init(url: url, anonKey: key);
+          // Re-authenticate if session expired
+          if (TankSyncClient.client?.auth.currentUser == null) {
+            debugPrint('TankSync: session expired, re-authenticating...');
+            await TankSyncClient.signInAnonymously();
           }
-        }
-        debugPrint('TankSync: ready, userId=$sessionId');
+          // ALWAYS sync stored userId with the active session
+          final sessionId = TankSyncClient.client?.auth.currentUser?.id;
+          final storedId = storage.getSetting('sync_user_id') as String?;
+          if (sessionId != null && sessionId != storedId) {
+            debugPrint('TankSync: userId changed $storedId → $sessionId');
+            await storage.putSetting('sync_user_id', sessionId);
+          }
+          // Ensure public.users row exists (FK constraint requirement)
+          if (sessionId != null) {
+            try {
+              await TankSyncClient.client!.from('users').upsert(
+                {'id': sessionId},
+                onConflict: 'id',
+              );
+            } catch (e) {
+              debugPrint('TankSync: users upsert failed: $e');
+            }
+          }
+          debugPrint('TankSync: ready, userId=$sessionId');
+        }).timeout(const Duration(seconds: 8));
+      } on TimeoutException {
+        debugPrint('TankSync: init timed out after 8s, proceeding without sync');
       } catch (e) {
         debugPrint('TankSync init failed: $e');
       }
