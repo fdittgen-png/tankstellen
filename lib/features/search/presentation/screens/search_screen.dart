@@ -7,7 +7,7 @@ import '../../../../core/location/location_consent.dart';
 import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/services/location_search_service.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -85,8 +85,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Future<void> _performGpsSearch() async {
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
-    final storage = ref.read(hiveStorageProvider);
-    if (!LocationConsentDialog.hasConsent(storage)) {
+    final settings = ref.read(settingsStorageProvider);
+    if (!LocationConsentDialog.hasConsent(settings)) {
       if (!mounted) return;
       final consented = await LocationConsentDialog.show(context);
       if (!consented) {
@@ -100,7 +100,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         }
         return;
       }
-      await LocationConsentDialog.recordConsent(storage);
+      await LocationConsentDialog.recordConsent(settings);
     }
     setState(() { _filtersExpanded = false; _searchBarExpanded = false; });
 
@@ -255,13 +255,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         SliverToBoxAdapter(
           child: UserPositionBar(
             onUpdatePosition: () async {
-              final storage = ref.read(hiveStorageProvider);
+              final settings = ref.read(settingsStorageProvider);
               final messenger = ScaffoldMessenger.of(context);
-              if (!LocationConsentDialog.hasConsent(storage)) {
+              if (!LocationConsentDialog.hasConsent(settings)) {
                 if (!mounted) return;
                 final consented = await LocationConsentDialog.show(context);
                 if (!consented) return;
-                await LocationConsentDialog.recordConsent(storage);
+                await LocationConsentDialog.recordConsent(settings);
               }
               try {
                 await ref.read(userPositionProvider.notifier).updateFromGps();

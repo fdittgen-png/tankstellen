@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../core/cache/cache_manager.dart';
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'storage_bar.dart';
 
@@ -17,8 +17,8 @@ class StorageSection extends ConsumerStatefulWidget {
 class _StorageSectionState extends ConsumerState<StorageSection> {
   @override
   Widget build(BuildContext context) {
-    final storage = ref.read(hiveStorageProvider);
-    final stats = storage.storageStats;
+    final storageMgmt = ref.read(storageManagementProvider);
+    final stats = storageMgmt.storageStats;
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
@@ -43,22 +43,22 @@ class _StorageSectionState extends ConsumerState<StorageSection> {
                   theme.colorScheme.primary,
                 ),
                 StorageSegment(
-                  '${l?.profile ?? "Profile"} (${storage.profileCount})',
+                  '${l?.profile ?? "Profile"} (${storageMgmt.profileCount})',
                   stats.profiles,
                   theme.colorScheme.secondary,
                 ),
                 StorageSegment(
-                  '${l?.favorites ?? "Favorites"} (${storage.favoriteCount})',
+                  '${l?.favorites ?? "Favorites"} (${storageMgmt.favoriteCount})',
                   stats.favorites,
                   theme.colorScheme.tertiary,
                 ),
                 StorageSegment(
-                  'Cache (${storage.cacheEntryCount} ${l?.entries ?? "entries"})',
+                  'Cache (${storageMgmt.cacheEntryCount} ${l?.entries ?? "entries"})',
                   stats.cache,
                   theme.colorScheme.error.withValues(alpha: 0.7),
                 ),
                 StorageSegment(
-                  'Price History (${storage.priceHistoryEntryCount})',
+                  'Price History (${storageMgmt.priceHistoryEntryCount})',
                   stats.priceHistory,
                   Colors.orange.withValues(alpha: 0.7),
                 ),
@@ -76,47 +76,47 @@ class _StorageSectionState extends ConsumerState<StorageSection> {
             StorageDetailRow(
               label: 'Profile',
               detail:
-                  '${storage.profileCount} ${l?.profilesStored ?? 'profiles'}',
+                  '${storageMgmt.profileCount} ${l?.profilesStored ?? 'profiles'}',
               bytes: stats.profiles,
               color: theme.colorScheme.secondary,
             ),
             StorageDetailRow(
               label: l?.favorites ?? 'Favorites',
               detail:
-                  '${storage.favoriteCount} ${l?.stationsMarked ?? 'stations'}',
+                  '${storageMgmt.favoriteCount} ${l?.stationsMarked ?? 'stations'}',
               bytes: stats.favorites,
               color: theme.colorScheme.tertiary,
             ),
             StorageDetailRow(
               label: 'Cache',
               detail:
-                  '${storage.cacheEntryCount} ${l?.cachedResponses ?? 'cached'}',
+                  '${storageMgmt.cacheEntryCount} ${l?.cachedResponses ?? 'cached'}',
               bytes: stats.cache,
               color: theme.colorScheme.error.withValues(alpha: 0.7),
             ),
             StorageDetailRow(
               label: 'Price History',
               detail:
-                  '${storage.priceHistoryEntryCount} stations tracked',
+                  '${storageMgmt.priceHistoryEntryCount} stations tracked',
               bytes: stats.priceHistory,
               color: Colors.orange.withValues(alpha: 0.7),
             ),
             StorageDetailRow(
               label: l?.priceAlerts ?? 'Alerts',
-              detail: '${storage.alertCount} configured',
+              detail: '${storageMgmt.alertCount} configured',
               bytes: stats.alerts,
               color: Colors.amber.withValues(alpha: 0.7),
             ),
             StorageDetailRow(
               label: 'Ignored',
-              detail: '${storage.getIgnoredIds().length} stations hidden',
-              bytes: storage.getIgnoredIds().length * 64,
+              detail: '${storageMgmt.getIgnoredIds().length} stations hidden',
+              bytes: storageMgmt.getIgnoredIds().length * 64,
               color: Colors.grey,
             ),
             StorageDetailRow(
               label: 'Ratings',
-              detail: '${storage.getRatings().length} stations rated',
-              bytes: storage.getRatings().length * 64,
+              detail: '${storageMgmt.getRatings().length} stations rated',
+              bytes: storageMgmt.getRatings().length * 64,
               color: Colors.amber,
             ),
             const Divider(height: 32),
@@ -157,13 +157,13 @@ class _StorageSectionState extends ConsumerState<StorageSection> {
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: storage.cacheEntryCount > 0
+                    onPressed: storageMgmt.cacheEntryCount > 0
                         ? () => _clearCache(context)
                         : null,
                     icon: const Icon(Icons.delete_sweep),
                     label: Text(
-                      storage.cacheEntryCount > 0
-                          ? '${l?.clearCacheButton ?? "Clear cache"} (${storage.cacheEntryCount} ${l?.entries ?? "entries"})'
+                      storageMgmt.cacheEntryCount > 0
+                          ? '${l?.clearCacheButton ?? "Clear cache"} (${storageMgmt.cacheEntryCount} ${l?.entries ?? "entries"})'
                           : l?.cacheEmpty ?? 'Cache is empty',
                     ),
                   ),
@@ -262,10 +262,10 @@ class _StorageSectionState extends ConsumerState<StorageSection> {
     );
 
     if (confirmed == true) {
-      final storage = ref.read(hiveStorageProvider);
-      await storage.clearCache();
-      await storage.clearPriceHistory();
-      await storage.deleteApiKey();
+      final storageMgmt = ref.read(storageManagementProvider);
+      await storageMgmt.clearCache();
+      await storageMgmt.clearPriceHistory();
+      await storageMgmt.deleteApiKey();
       for (final boxName in ['settings', 'favorites', 'profiles']) {
         final box = Hive.box(boxName);
         await box.clear();

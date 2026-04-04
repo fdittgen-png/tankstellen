@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -37,8 +37,8 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
   Future<void> _refreshStation() async {
     setState(() => _isRefreshing = true);
     try {
-      final storage = ref.read(hiveStorageProvider);
-      final apiKey = storage.getEvApiKey() ?? AppConstants.openChargeMapApiKey;
+      final apiKeys = ref.read(apiKeyStorageProvider);
+      final apiKey = apiKeys.getEvApiKey() ?? AppConstants.openChargeMapApiKey;
       final service = EVChargingService(apiKey: apiKey);
       final result = await service.searchStations(
         lat: _station.lat,

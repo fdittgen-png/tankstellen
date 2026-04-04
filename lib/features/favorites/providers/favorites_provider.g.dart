@@ -68,7 +68,7 @@ final class FavoritesProvider
   }
 }
 
-String _$favoritesHash() => r'eaf6917fbc2ae8f7238519c3e93ffb77655c7ee6';
+String _$favoritesHash() => r'b19310178145c484fa60ed84f5eabfdea959cf5a';
 
 /// Manages the user's list of favorite station IDs.
 ///
@@ -183,40 +183,40 @@ final class IsFavoriteFamily extends $Family
   String toString() => r'isFavoriteProvider';
 }
 
-/// Loads cached station data for favorites and refreshes prices.
+/// Loads station data for favorites and refreshes prices.
 ///
-/// ## Data flow:
-/// 1. Read cached Station objects from CacheManager (30-min TTL)
-/// 2. Check connectivity — if offline, return cached data with `isStale: true`
-/// 3. If online, batch-refresh prices via StationService.getPrices()
-/// 4. Merge fresh prices into cached stations, update cache
-/// 5. On API failure, fall back to cached data with stale flag
+/// ## Data flow (local-first):
+/// 1. Load persisted Station objects from Hive (permanent, never expires)
+/// 2. Check connectivity — if offline, return persisted data with `isStale: true`
+/// 3. If online, refresh prices via StationService.getPrices()
+/// 4. Merge fresh prices into stations, persist updated data back
+/// 5. On API failure, serve persisted data with stale flag
 
 @ProviderFor(FavoriteStations)
 final favoriteStationsProvider = FavoriteStationsProvider._();
 
-/// Loads cached station data for favorites and refreshes prices.
+/// Loads station data for favorites and refreshes prices.
 ///
-/// ## Data flow:
-/// 1. Read cached Station objects from CacheManager (30-min TTL)
-/// 2. Check connectivity — if offline, return cached data with `isStale: true`
-/// 3. If online, batch-refresh prices via StationService.getPrices()
-/// 4. Merge fresh prices into cached stations, update cache
-/// 5. On API failure, fall back to cached data with stale flag
+/// ## Data flow (local-first):
+/// 1. Load persisted Station objects from Hive (permanent, never expires)
+/// 2. Check connectivity — if offline, return persisted data with `isStale: true`
+/// 3. If online, refresh prices via StationService.getPrices()
+/// 4. Merge fresh prices into stations, persist updated data back
+/// 5. On API failure, serve persisted data with stale flag
 final class FavoriteStationsProvider
     extends
         $NotifierProvider<
           FavoriteStations,
           AsyncValue<ServiceResult<List<Station>>>
         > {
-  /// Loads cached station data for favorites and refreshes prices.
+  /// Loads station data for favorites and refreshes prices.
   ///
-  /// ## Data flow:
-  /// 1. Read cached Station objects from CacheManager (30-min TTL)
-  /// 2. Check connectivity — if offline, return cached data with `isStale: true`
-  /// 3. If online, batch-refresh prices via StationService.getPrices()
-  /// 4. Merge fresh prices into cached stations, update cache
-  /// 5. On API failure, fall back to cached data with stale flag
+  /// ## Data flow (local-first):
+  /// 1. Load persisted Station objects from Hive (permanent, never expires)
+  /// 2. Check connectivity — if offline, return persisted data with `isStale: true`
+  /// 3. If online, refresh prices via StationService.getPrices()
+  /// 4. Merge fresh prices into stations, persist updated data back
+  /// 5. On API failure, serve persisted data with stale flag
   FavoriteStationsProvider._()
     : super(
         from: null,
@@ -245,16 +245,16 @@ final class FavoriteStationsProvider
   }
 }
 
-String _$favoriteStationsHash() => r'5aa2012b25b1d51c87c23d2635e1c44ff815b012';
+String _$favoriteStationsHash() => r'3b569d570e9167392d5d53da321f2c2aaaca219e';
 
-/// Loads cached station data for favorites and refreshes prices.
+/// Loads station data for favorites and refreshes prices.
 ///
-/// ## Data flow:
-/// 1. Read cached Station objects from CacheManager (30-min TTL)
-/// 2. Check connectivity — if offline, return cached data with `isStale: true`
-/// 3. If online, batch-refresh prices via StationService.getPrices()
-/// 4. Merge fresh prices into cached stations, update cache
-/// 5. On API failure, fall back to cached data with stale flag
+/// ## Data flow (local-first):
+/// 1. Load persisted Station objects from Hive (permanent, never expires)
+/// 2. Check connectivity — if offline, return persisted data with `isStale: true`
+/// 3. If online, refresh prices via StationService.getPrices()
+/// 4. Merge fresh prices into stations, persist updated data back
+/// 5. On API failure, serve persisted data with stale flag
 
 abstract class _$FavoriteStations
     extends $Notifier<AsyncValue<ServiceResult<List<Station>>>> {

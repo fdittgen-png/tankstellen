@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/sync/sync_service.dart';
 import '../../../../core/theme/fuel_colors.dart';
@@ -428,7 +428,7 @@ class _PriceHistorySectionState extends ConsumerState<_PriceHistorySection> {
     try {
       final rows = await SyncService.fetchPriceHistory(widget.stationId);
       if (rows.isNotEmpty && mounted) {
-        final storage = ref.read(hiveStorageProvider);
+        final storageMgmt = ref.read(storageManagementProvider);
         final records = rows.map((r) => {
           'stationId': r['station_id'],
           'recordedAt': r['recorded_at'],
@@ -440,7 +440,7 @@ class _PriceHistorySectionState extends ConsumerState<_PriceHistorySection> {
           'lpg': r['lpg'],
           'cng': r['cng'],
         }).toList();
-        await storage.savePriceRecords(widget.stationId, records);
+        await storageMgmt.savePriceRecords(widget.stationId, records);
         ref.invalidate(priceHistoryProvider(widget.stationId));
       }
     } catch (e) {

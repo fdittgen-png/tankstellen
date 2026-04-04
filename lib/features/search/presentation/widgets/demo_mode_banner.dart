@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/country/country_config.dart';
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Shows a demo-mode banner for API-key countries, or a country info bar for free APIs.
@@ -13,7 +13,7 @@ class DemoModeBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(apiKeyStorageProvider);
     final l10n = AppLocalizations.of(context);
 
     if (country.requiresApiKey && !storage.hasApiKey()) {
