@@ -2,17 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../../core/sync/sync_config.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../widgets/auth_form_widget.dart';
+import '../widgets/qr_scanner_screen.dart';
+import '../widgets/sync_credentials_step.dart';
 import '../widgets/sync_mode_card.dart';
 
-/// Clean 3-step sync setup: Mode → Credentials (if needed) → Auth → Done.
+/// Clean 3-step sync setup: Mode -> Credentials (if needed) -> Auth -> Done.
 ///
 /// ## Architecture
-/// - UI only — no business logic. Delegates all sync operations to [SyncState].
+/// - UI only -- no business logic. Delegates all sync operations to [SyncState].
 /// - Reusable widgets: [SyncModeCard], [AuthFormWidget] are app-agnostic.
 /// - Database credentials abstracted via [SyncState.connectCommunity()] and
 ///   [SyncState.connect(url, key)].
@@ -65,9 +66,9 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
     _selectedMode = mode;
     setState(() {
       if (mode == SyncMode.community) {
-        _step = _Step.auth; // No credentials needed
+        _step = _Step.auth;
       } else {
-        _step = _Step.credentials; // Need URL + key
+        _step = _Step.credentials;
       }
     });
   }
@@ -83,7 +84,6 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
     try {
       final syncNotifier = ref.read(syncStateProvider.notifier);
 
-      // Step 1: Connect to database
       if (_selectedMode == SyncMode.community) {
         await syncNotifier.connectCommunity();
       } else {
@@ -92,14 +92,12 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
         await syncNotifier.connect(url, key, mode: _selectedMode);
       }
 
-      // Step 2: Email auth (if chosen)
       if (isEmail && email != null && password != null) {
         await syncNotifier.signInWithEmail(email, password, isSignUp: isSignUp);
       }
 
       if (mounted) setState(() => _step = _Step.done);
 
-      // Auto-close after brief success display
       await Future<void>.delayed(const Duration(milliseconds: 1500));
       if (mounted) Navigator.pop(context);
     } catch (e) {
@@ -112,7 +110,7 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
   Future<void> _scanQr() async {
     final result = await Navigator.push<String>(
       context,
-      MaterialPageRoute(builder: (_) => const _QrScannerPage()),
+      MaterialPageRoute(builder: (_) => const QrScannerScreen()),
     );
     if (result != null && mounted) {
       try {
@@ -152,14 +150,31 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
       padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + bottomPad),
       children: switch (_step) {
         _Step.mode => _buildModeStep(),
-        _Step.credentials => _buildCredentialsStep(),
-        _Step.auth => _buildAuthStep(),
+        _Step.credentials => [
+          SyncCredentialsStep(
+            selectedMode: _selectedMode,
+            urlController: _urlController,
+            keyController: _keyController,
+            showKey: _showKey,
+            onToggleKeyVisibility: () => setState(() => _showKey = !_showKey),
+            onScanQr: _scanQr,
+            onContinue: (_urlController.text.trim().isNotEmpty && _keyController.text.trim().isNotEmpty)
+                ? () => setState(() => _step = _Step.auth)
+                : null,
+            onChanged: () => setState(() {}),
+          ),
+        ],
+        _Step.auth => [
+          AuthFormWidget(
+            onSubmit: _onAuthSubmit,
+            isLoading: _isLoading,
+            error: _error,
+          ),
+        ],
         _Step.done => _buildDoneStep(),
       },
     );
   }
-
-  // ── Step 1: Choose sync mode ──────────────────────────────────────────
 
   List<Widget> _buildModeStep() {
     final theme = Theme.of(context);
@@ -212,108 +227,6 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
     ];
   }
 
-  // ── Step 2: Credentials (private / join existing) ─────────────────────
-
-  List<Widget> _buildCredentialsStep() {
-    final theme = Theme.of(context);
-    final hasInput = _urlController.text.trim().isNotEmpty && _keyController.text.trim().isNotEmpty;
-    final keyLen = _keyController.text.length;
-
-    return [
-      if (_selectedMode == SyncMode.joinExisting) ...[
-        FilledButton.icon(
-          onPressed: _scanQr,
-          icon: const Icon(Icons.qr_code_scanner),
-          label: const Text('Scan QR Code'),
-          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          'Ask the database owner to show their QR code',
-          style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 16),
-        const Row(children: [
-          Expanded(child: Divider()),
-          Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Text('or enter manually')),
-          Expanded(child: Divider()),
-        ]),
-        const SizedBox(height: 16),
-      ],
-
-      if (_selectedMode == SyncMode.private) ...[
-        Text(
-          'Enter your Supabase project credentials. You can find them in your dashboard under Settings > API.',
-          style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-        ),
-        const SizedBox(height: 16),
-      ],
-
-      TextField(
-        controller: _urlController,
-        decoration: const InputDecoration(
-          labelText: 'Database URL',
-          hintText: 'https://your-project.supabase.co',
-          border: OutlineInputBorder(),
-          prefixIcon: Icon(Icons.link, size: 18),
-          isDense: true,
-        ),
-        maxLines: 1,
-        onChanged: (_) => setState(() {}),
-      ),
-      const SizedBox(height: 12),
-      TextField(
-        controller: _keyController,
-        decoration: InputDecoration(
-          labelText: 'Access Key',
-          hintText: 'eyJhbGciOiJIUzI1NiIs...',
-          border: const OutlineInputBorder(),
-          prefixIcon: const Icon(Icons.key, size: 18),
-          isDense: true,
-          suffixIcon: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (keyLen > 0)
-                Padding(
-                  padding: const EdgeInsets.only(right: 4),
-                  child: Text('$keyLen', style: TextStyle(fontSize: 10,
-                    color: keyLen >= 200 ? Colors.green : Colors.orange)),
-                ),
-              IconButton(
-                icon: Icon(_showKey ? Icons.visibility_off : Icons.visibility, size: 18),
-                onPressed: () => setState(() => _showKey = !_showKey),
-              ),
-            ],
-          ),
-        ),
-        obscureText: !_showKey,
-        maxLines: _showKey ? 3 : 1,
-        style: TextStyle(fontSize: _showKey ? 10 : 13),
-        onChanged: (_) => setState(() {}),
-      ),
-      const SizedBox(height: 20),
-      FilledButton(
-        onPressed: hasInput ? () => setState(() => _step = _Step.auth) : null,
-        child: const Text('Continue'),
-      ),
-    ];
-  }
-
-  // ── Step 3: Authentication ────────────────────────────────────────────
-
-  List<Widget> _buildAuthStep() {
-    return [
-      AuthFormWidget(
-        onSubmit: _onAuthSubmit,
-        isLoading: _isLoading,
-        error: _error,
-      ),
-    ];
-  }
-
-  // ── Step 4: Done ──────────────────────────────────────────────────────
-
   List<Widget> _buildDoneStep() {
     final theme = Theme.of(context);
     return [
@@ -328,33 +241,5 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
         textAlign: TextAlign.center,
       ),
     ];
-  }
-}
-
-// ── QR Scanner (extracted) ──────────────────────────────────────────────
-
-class _QrScannerPage extends StatefulWidget {
-  const _QrScannerPage();
-  @override
-  State<_QrScannerPage> createState() => _QrScannerPageState();
-}
-
-class _QrScannerPageState extends State<_QrScannerPage> {
-  bool _scanned = false;
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Scan QR Code')),
-      body: MobileScanner(
-        onDetect: (capture) {
-          if (_scanned) return;
-          final barcode = capture.barcodes.firstOrNull;
-          if (barcode?.rawValue != null) {
-            _scanned = true;
-            Navigator.pop(context, barcode!.rawValue);
-          }
-        },
-      ),
-    );
   }
 }
