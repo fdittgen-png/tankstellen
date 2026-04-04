@@ -15,6 +15,7 @@ import 'core/storage/hive_storage.dart';
 import 'core/sync/community_config.dart';
 import 'core/sync/supabase_client.dart';
 import 'features/profile/data/repositories/profile_repository.dart';
+import 'features/widget/data/home_widget_service.dart';
 
 /// App entry point. Initialization order matters:
 ///
@@ -42,9 +43,10 @@ Future<void> main() async {
   final profileRepo = ProfileRepository(HiveStorage());
   await profileRepo.migrateProfileCountryLanguage();
 
-  // Initialize local notifications and background task scheduler
+  // Initialize local notifications, background tasks, and home widget
   await NotificationService.init();
   await BackgroundService.init();
+  await HomeWidgetService.init();
 
   final container = ProviderContainer();
 
