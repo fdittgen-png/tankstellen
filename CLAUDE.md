@@ -177,6 +177,42 @@ Never commit directly to `master`. `master` is always deployable.
 - Always check changelogs for breaking changes before major bumps
 - License audit: all dependencies must be MIT/BSD/Apache compatible (no GPL)
 
+## Backlog Workflow (Claude Code Integration)
+
+### Commands
+- `/backlog` — View all open issues grouped by priority and milestone
+- `/pick-task` — AI-ranked suggestion for the best next task (waits for confirmation)
+- `/implement` or `/implement 19` — Plan and implement an issue (plan mode -> user confirms -> code)
+- `/ship` — Run checks, commit, push, create PR, update project board
+- `/review` — Review current branch changes against master
+
+### Testing Commands
+- `/test` or `/test <path>` — Run tests, parse results, diagnose failures
+- `/test-write <file>` — Write tests for a specific file or feature
+- `/test-gaps` — Find untested files, prioritized by risk
+- `/test-coverage` — Analyze line-level coverage, suggest improvements
+- `/test-accessibility` — Run accessibility guideline checks on screens
+
+### Rules
+- **Never write code without explicit user confirmation** — always present a plan first
+- **Always write tests** for new or changed code — no exceptions
+- Always run `flutter analyze` and `flutter test` before shipping
+- Always link PRs to issues with `Closes #N` in the PR body
+
+### Testing Pyramid (70/20/10)
+- **Unit (70%)**: Providers, services, models, utils, error classification, cache TTL
+- **Widget (20%)**: Individual widgets, user interactions, state-driven UI, accessibility
+- **Integration (10%)**: Full user flows, deep links, navigation guards
+
+### Test Conventions
+- Prefer fakes over mocks for service layer tests
+- Use `pumpApp` from `test/helpers/pump_app.dart` for widget tests
+- Use `standardTestOverrides` from `test/helpers/mock_providers.dart`
+- Test error classification exhaustively (8+ error categories)
+- Test cache TTL behavior: fresh hit, stale hit, miss
+- Test service chain fallback: API success, API fail + stale cache, all fail
+- Every screen should pass `meetsGuideline(androidTapTargetGuideline)`
+
 ## Flutter/Dart Best Practices & Patterns
 
 ### State Management (Riverpod)
