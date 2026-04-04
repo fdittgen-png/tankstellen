@@ -63,6 +63,19 @@ android {
             }
         }
     }
+
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("play") {
+            dimension = "distribution"
+            // Default: Google Play distribution (GMS available)
+        }
+        create("fdroid") {
+            dimension = "distribution"
+            // F-Droid: no GMS, force Android LocationManager
+            buildConfigField("boolean", "FORCE_LOCATION_MANAGER", "true")
+        }
+    }
 }
 
 dependencies {
