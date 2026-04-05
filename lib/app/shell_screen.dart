@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../core/utils/frame_callbacks.dart';
 import '../l10n/app_localizations.dart';
 
 /// The main app shell with bottom navigation bar and page transitions.
@@ -119,8 +120,8 @@ class _ShellScreenState extends State<ShellScreen> with TickerProviderStateMixin
     // Keep in sync with go_router's actual index (e.g. deep link or redirect)
     final routerIndex = widget.navigationShell.currentIndex;
     if (routerIndex != _currentIndex && !_isTransitioning) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && routerIndex != _currentIndex) {
+      safePostFrame(() {
+        if (routerIndex != _currentIndex) {
           setState(() => _currentIndex = routerIndex);
         }
       });

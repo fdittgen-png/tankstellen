@@ -8,6 +8,7 @@ import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/services/location_search_service.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/utils/frame_callbacks.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -52,8 +53,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+    safePostFrame(() {
       final profile = ref.read(activeProfileProvider);
       if (profile?.landingScreen == LandingScreen.cheapest) {
         final zip = profile?.homeZipCode;
@@ -165,8 +165,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         MediaQuery.of(context).orientation == Orientation.landscape;
 
     if (isLandscape && !_searchBarExpanded && _filtersExpanded) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) setState(() => _filtersExpanded = false);
+      safePostFrame(() {
+        setState(() => _filtersExpanded = false);
       });
     }
 

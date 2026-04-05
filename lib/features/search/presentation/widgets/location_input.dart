@@ -5,6 +5,7 @@ import '../../../../core/country/country_config.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/services/location_search_provider.dart';
 import '../../../../core/services/location_search_service.dart';
+import '../../../../core/utils/frame_callbacks.dart';
 import '../../../profile/providers/profile_provider.dart';
 
 /// Unified location input: auto-detects GPS (empty), ZIP (digits), or city (text).
@@ -38,7 +39,7 @@ class _LocationInputState extends ConsumerState<LocationInput> {
   void initState() {
     super.initState();
     // Pre-fill with profile's home zip code if configured
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    safePostFrame(() {
       final profile = ref.read(activeProfileProvider);
       if (profile?.homeZipCode != null && profile!.homeZipCode!.isNotEmpty) {
         _controller.text = profile.homeZipCode!;
