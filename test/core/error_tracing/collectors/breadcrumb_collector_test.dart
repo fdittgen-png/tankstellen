@@ -80,7 +80,7 @@ void main() {
 
       final crumbs = BreadcrumbCollector.snapshot();
       expect(
-        () => (crumbs as List<Breadcrumb>).add(
+        () => crumbs.add(
           Breadcrumb(timestamp: DateTime.now(), action: 'hack'),
         ),
         throwsA(isA<UnsupportedError>()),

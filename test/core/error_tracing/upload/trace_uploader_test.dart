@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
 import 'package:tankstellen/core/error_tracing/models/error_trace.dart';
 import 'package:tankstellen/core/error_tracing/upload/trace_upload_config.dart';
 import 'package:tankstellen/core/error_tracing/upload/trace_uploader.dart';

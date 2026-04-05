@@ -33,7 +33,6 @@ void main() {
       );
 
       // Simulate native→Dart call via the binary messenger
-      const channel = MethodChannel('com.tankstellen/car');
       final codec = const StandardMethodCodec();
       final message = codec.encodeMethodCall(const MethodCall('getAppVersion'));
       final responseBytes = await TestDefaultBinaryMessengerBinding
@@ -51,7 +50,6 @@ void main() {
         appVersion: '5.0.0+100',
       );
 
-      const channel = MethodChannel('com.tankstellen/car');
       final codec = const StandardMethodCodec();
       final message = codec.encodeMethodCall(const MethodCall('getAppVersion'));
       final responseBytes = await TestDefaultBinaryMessengerBinding

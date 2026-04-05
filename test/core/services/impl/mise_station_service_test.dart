@@ -413,8 +413,6 @@ idImpianto|descCarburante|prezzo|isSelf|dtComu
 
       // Build Station objects like the real service does
       final builtStations = <Station>[];
-      final searchLat = 41.9;
-      final searchLng = 12.5;
 
       for (final entry in stations.entries) {
         final s = entry.value;
