@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:dio/dio.dart';
@@ -46,7 +47,7 @@ Dio tankerkoenigDio(Ref ref) {
   // Inject API key from user settings
   dio.interceptors.add(_ApiKeyInterceptor(ref));
   // Stagger requests to avoid thundering herd
-  dio.interceptors.add(_RateLimitInterceptor());
+  dio.interceptors.add(RateLimitInterceptor());
   // Record HTTP errors in trace log
   dio.interceptors.add(DioTraceInterceptor(ref));
 
@@ -190,24 +191,46 @@ class _ApiKeyInterceptor extends Interceptor {
   }
 }
 
-class _RateLimitInterceptor extends Interceptor {
-  static final _random = Random();
+/// Interceptor that serialises requests by delaying if the previous request
+/// occurred within [minInterval]. The added delay has randomised jitter to
+/// avoid thundering-herd against rate-limited APIs (Tankerkoenig et al.).
+class RateLimitInterceptor extends Interceptor {
+  RateLimitInterceptor({
+    this.minInterval = const Duration(seconds: 2),
+    this.jitterBaseMs = 500,
+    this.jitterRangeMs = 2500,
+    Random? random,
+  }) : _random = random ?? Random();
+
+  final Duration minInterval;
+  final int jitterBaseMs;
+  final int jitterRangeMs;
+  final Random _random;
   DateTime? _lastRequest;
+  Future<void> _gate = Future.value();
 
   @override
   Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    if (_lastRequest != null) {
-      final elapsed = DateTime.now().difference(_lastRequest!);
-      if (elapsed < const Duration(seconds: 2)) {
-        await Future<void>.delayed(
-          Duration(milliseconds: 500 + _random.nextInt(2500)),
-        );
+    // Serialise by chaining each call onto the previous one.
+    final previous = _gate;
+    final current = Completer<void>();
+    _gate = current.future;
+    try {
+      await previous;
+      if (_lastRequest != null) {
+        final elapsed = DateTime.now().difference(_lastRequest!);
+        if (elapsed < minInterval) {
+          final jitter = jitterRangeMs > 0 ? _random.nextInt(jitterRangeMs) : 0;
+          await Future<void>.delayed(Duration(milliseconds: jitterBaseMs + jitter));
+        }
       }
+      _lastRequest = DateTime.now();
+    } finally {
+      current.complete();
     }
-    _lastRequest = DateTime.now();
     handler.next(options);
   }
 }

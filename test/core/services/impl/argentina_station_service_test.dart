@@ -305,7 +305,6 @@ col0,col1,col2,TestCo,Dir,Loc,Prov,col7,col8,Nafta premium,col10,col11,100.5,202
       });
     });
   });
-}
 
   group('ArgentinaStationService searchStations', () {
     test('searchStations throws ApiException on network failure', () async {
@@ -360,7 +359,7 @@ col0,col1,col2,YPF,AV. RIVADAVIA 5000,CABALLITO,Buenos Aires,col7,col8,GNC,col10
         final merged = stationMap.putIfAbsent(key, () => _MergedStation());
 
         final producto = raw.producto.toLowerCase();
-        if (producto.contains('nafta') && (producto.contains('premium') || producto.contains('95 ron') || producto.contains('grado 3'))) {
+        if (producto.contains('nafta') && (producto.contains('premium') || producto.contains('grado 3'))) {
           merged.naftaPremium ??= raw.precio;
         } else if (producto.contains('nafta') && (producto.contains('súper') || producto.contains('super') || producto.contains('92') || producto.contains('grado 2'))) {
           merged.naftaRegular ??= raw.precio;

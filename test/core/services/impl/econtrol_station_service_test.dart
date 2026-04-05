@@ -475,7 +475,6 @@ void main() {
       });
     });
   });
-}
 
   group('EControlStationService searchStations', () {
     test('searchStations throws ApiException on network failure', () async {

@@ -504,7 +504,6 @@ void main() {
       });
     });
   });
-}
 
   group('DenmarkStationService searchStations', () {
     test('searchStations throws ApiException on network failure', () async {

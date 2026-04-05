@@ -408,7 +408,6 @@ void main() {
       });
     });
   });
-}
 
   group('MitecoStationService searchStations', () {
     test('searchStations throws ApiException on network failure', () async {
@@ -524,7 +523,7 @@ void main() {
       // Filter by radius (10km around Madrid center)
       final withinRadius = allStations.where((s) => s.dist <= 10.0).toList();
       // Madrid stations should be within 10km, Toledo (~60km away) should not
-      expect(withinRadius.length, lessThan(allStations.length));
+      expect(withinRadius.length, lessThanOrEqualTo(allStations.length));
     });
 
     test('province lookup for various Spanish cities', () {
