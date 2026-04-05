@@ -30,12 +30,35 @@ import '../storage/hive_storage.dart';
 class BackgroundService {
   static const _priceRefreshTask = 'priceRefresh';
 
+  /// How often WorkManager attempts to refresh prices.
+  /// Android may delay based on battery/Doze mode; 1h is the minimum WorkManager honors reliably.
+  static const refreshInterval = Duration(hours: 1);
+
+  /// Max IDs accepted per Tankerkoenig batch prices request.
+  static const tankerkoenigBatchSize = 10;
+
+  /// Skip writing a new price-history record if the last one is more recent than this.
+  /// Avoids duplicate points when the BG task runs faster than prices actually change.
+  static const priceHistoryDedupWindow = Duration(minutes: 60);
+
+  /// Keep this much price-history per station, older points are trimmed.
+  static const priceHistoryRetention = Duration(days: 30);
+
+  /// Do not re-fire the same alert within this window, prevents notification spam.
+  static const alertRetriggerCooldown = Duration(hours: 4);
+
+  /// Connect timeout for Tankerkoenig prices batch requests in the BG isolate.
+  static const bgConnectTimeout = Duration(seconds: 10);
+
+  /// Receive timeout for Tankerkoenig prices batch requests in the BG isolate.
+  static const bgReceiveTimeout = Duration(seconds: 15);
+
   static Future<void> init() async {
     await Workmanager().initialize(callbackDispatcher);
     await Workmanager().registerPeriodicTask(
       _priceRefreshTask,
       _priceRefreshTask,
-      frequency: const Duration(hours: 1),
+      frequency: refreshInterval,
       constraints: Constraints(networkType: NetworkType.connected),
     );
   }
@@ -88,15 +111,16 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     if (apiKey != null && apiKey.isNotEmpty) {
       try {
         final dio = Dio(BaseOptions(
-          connectTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 15),
+          connectTimeout: BackgroundService.bgConnectTimeout,
+          receiveTimeout: BackgroundService.bgReceiveTimeout,
         ));
 
-        // Tankerkoenig prices endpoint (batch, up to 10 IDs)
-        for (var i = 0; i < allStationIds.length; i += 10) {
+        // Tankerkoenig prices endpoint (batch)
+        const batchSize = BackgroundService.tankerkoenigBatchSize;
+        for (var i = 0; i < allStationIds.length; i += batchSize) {
           final batch = allStationIds.sublist(
             i,
-            i + 10 > allStationIds.length ? allStationIds.length : i + 10,
+            i + batchSize > allStationIds.length ? allStationIds.length : i + batchSize,
           );
           final ids = batch.join(',');
           final response = await dio.get(
@@ -134,17 +158,18 @@ Future<void> _refreshPricesAndCheckAlerts() async {
           diesel: (p['diesel'] as num?)?.toDouble(),
         );
 
-        // Deduplicate: only save if last record is > 60 min ago
+        // Deduplicate: only save if last record is older than dedup window
         final existing = storage.getPriceRecords(stationId);
         final shouldSave = existing.isEmpty ||
-            now.difference(DateTime.parse(existing.last['recordedAt'] as String)).inMinutes > 60;
+            now.difference(DateTime.parse(existing.last['recordedAt'] as String)) >
+                BackgroundService.priceHistoryDedupWindow;
         if (shouldSave) {
           final records = [
             ...existing,
             record.toJson(),
           ];
-          // Keep only last 30 days
-          final cutoff = now.subtract(const Duration(days: 30));
+          // Trim to retention window
+          final cutoff = now.subtract(BackgroundService.priceHistoryRetention);
           final trimmed = records.where((r) {
             final ts = DateTime.tryParse(r['recordedAt']?.toString() ?? '');
             return ts != null && ts.isAfter(cutoff);
@@ -196,9 +221,10 @@ Future<void> _refreshPricesAndCheckAlerts() async {
         }
 
         if (currentPrice != null && currentPrice <= alert.targetPrice) {
-          // Don't re-trigger within 4 hours
+          // Honor re-trigger cooldown
           if (alert.lastTriggeredAt != null &&
-              now.difference(alert.lastTriggeredAt!).inHours < 4) {
+              now.difference(alert.lastTriggeredAt!) <
+                  BackgroundService.alertRetriggerCooldown) {
             continue;
           }
 
