@@ -6,7 +6,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/app/router.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
-import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
