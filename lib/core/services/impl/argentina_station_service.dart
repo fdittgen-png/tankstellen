@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import '../../../features/search/data/models/search_params.dart';
 import '../../../features/search/domain/entities/station.dart';
@@ -54,8 +55,7 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
       // before merging, so we keep the raw-record filtering inline.
       var filtered = nearbyRaw.where((e) => e.dist <= params.radiusKm).toList();
       if (filtered.isEmpty && nearbyRaw.isNotEmpty) {
-        nearbyRaw.sort((a, b) => a.dist.compareTo(b.dist));
-        filtered = nearbyRaw.take(200).toList();
+        filtered = nearbyRaw.sortedBy<num>((e) => e.dist).take(200).toList();
       }
 
       for (final entry in filtered) {
