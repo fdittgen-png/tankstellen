@@ -88,6 +88,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
                 return _buildDismissibleCard(context, l10n, item, fuelType, result);
               } else if (item is EVStationResult) {
                 return EVStationCard(
+                  key: ValueKey('route-ev-${item.station.id}'),
                   result: item,
                   onTap: () => context.push('/ev-station', extra: item.station),
                 );

@@ -398,6 +398,7 @@ class _CityAutocompleteFieldState extends State<_CityAutocompleteField> {
                 itemBuilder: (context, index) {
                   final city = _suggestions[index];
                   return ListTile(
+                    key: ValueKey('city-${city.lat}-${city.lng}-${city.name}'),
                     dense: true,
                     visualDensity: VisualDensity.compact,
                     leading: const Icon(Icons.place, size: 16),

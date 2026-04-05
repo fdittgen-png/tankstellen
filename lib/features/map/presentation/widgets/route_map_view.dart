@@ -168,6 +168,7 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
           final isSelected = _selectedStationIds.contains(station.id);
           final price = station.priceFor(widget.selectedFuel);
           return GestureDetector(
+            key: ValueKey('route-station-${station.id}'),
             onTap: () => setState(() {
               if (isSelected) {
                 _selectedStationIds.remove(station.id);

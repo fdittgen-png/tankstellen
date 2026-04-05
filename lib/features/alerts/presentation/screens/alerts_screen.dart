@@ -55,7 +55,7 @@ class AlertsScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemBuilder: (context, index) {
                 final alert = alerts[index];
-                return _AlertListTile(alert: alert);
+                return _AlertListTile(key: ValueKey(alert.id), alert: alert);
               },
             ),
     );
@@ -65,7 +65,7 @@ class AlertsScreen extends ConsumerWidget {
 class _AlertListTile extends ConsumerWidget {
   final PriceAlert alert;
 
-  const _AlertListTile({required this.alert});
+  const _AlertListTile({super.key, required this.alert});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
