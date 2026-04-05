@@ -21,8 +21,33 @@ import '../features/sync/presentation/screens/data_transparency_screen.dart';
 import '../features/sync/presentation/screens/link_device_screen.dart';
 import '../features/sync/presentation/screens/sync_setup_screen.dart';
 import 'shell_screen.dart';
+import 'station_id_validator.dart';
 
 part 'router.g.dart';
+
+Widget _invalidIdScreen(BuildContext context, String path) {
+  return Scaffold(
+    appBar: AppBar(title: const Text('Invalid link')),
+    body: Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.link_off, size: 64, color: Colors.grey),
+          const SizedBox(height: 16),
+          Text(
+            'The link "$path" is not valid.',
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          FilledButton(
+            onPressed: () => context.go('/'),
+            child: const Text('Home'),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
 @riverpod
 GoRouter router(Ref ref) {
@@ -126,15 +151,21 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/station/:id/history',
         builder: (context, state) {
-          final id = state.pathParameters['id']!;
-          return PriceHistoryScreen(stationId: id);
+          final id = state.pathParameters['id'];
+          if (!isValidStationId(id)) {
+            return _invalidIdScreen(context, state.matchedLocation);
+          }
+          return PriceHistoryScreen(stationId: id!);
         },
       ),
       GoRoute(
         path: '/station/:id',
         builder: (context, state) {
-          final id = state.pathParameters['id']!;
-          return StationDetailScreen(stationId: id);
+          final id = state.pathParameters['id'];
+          if (!isValidStationId(id)) {
+            return _invalidIdScreen(context, state.matchedLocation);
+          }
+          return StationDetailScreen(stationId: id!);
         },
       ),
       GoRoute(
@@ -147,8 +178,11 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/report/:id',
         builder: (context, state) {
-          final id = state.pathParameters['id']!;
-          return ReportScreen(stationId: id);
+          final id = state.pathParameters['id'];
+          if (!isValidStationId(id)) {
+            return _invalidIdScreen(context, state.matchedLocation);
+          }
+          return ReportScreen(stationId: id!);
         },
       ),
       GoRoute(
