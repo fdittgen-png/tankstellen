@@ -317,6 +317,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               (context, index) {
                 final station = result.data[index];
                 return EVStationCard(
+                  key: ValueKey('ev-${station.id}'),
                   result: EVStationResult(station),
                   onTap: () => context.push('/ev-station', extra: station),
                 );

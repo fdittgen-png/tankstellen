@@ -202,6 +202,7 @@ class _LocationInputState extends ConsumerState<LocationInput> {
                 final city = _suggestions[i];
                 final isSelected = _selectedCity == city;
                 return ListTile(
+                  key: ValueKey('city-${city.lat}-${city.lng}-${city.name}'),
                   dense: true,
                   selected: isSelected,
                   leading: const Icon(Icons.place, size: 18),

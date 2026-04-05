@@ -125,6 +125,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
                   final station = sorted[index];
                   final isFav = ref.watch(isFavoriteProvider(station.id));
                   return _SwipeableStationCard(
+                    key: ValueKey('station-${station.id}'),
                     station: station,
                     isFavorite: isFav,
                     onNavigate: () => _openStationInMaps(station),
@@ -170,6 +171,7 @@ class _SwipeableStationCard extends ConsumerWidget {
   final VoidCallback onFavoriteTap;
 
   const _SwipeableStationCard({
+    super.key,
     required this.station,
     required this.isFavorite,
     required this.onNavigate,
