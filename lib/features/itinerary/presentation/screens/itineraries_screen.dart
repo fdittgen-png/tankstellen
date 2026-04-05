@@ -9,7 +9,7 @@ import '../../../route_search/domain/entities/route_info.dart';
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/providers/search_mode_provider.dart';
-import '../../../search/data/models/search_params.dart';
+import '../../../search/domain/entities/search_mode.dart';
 import '../../providers/itinerary_provider.dart';
 
 class ItinerariesScreen extends ConsumerStatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../data/models/search_params.dart';
+import '../domain/entities/search_mode.dart';
 
 part 'search_mode_provider.g.dart';
 
