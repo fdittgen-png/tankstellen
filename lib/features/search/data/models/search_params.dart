@@ -1,5 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/fuel_type.dart';
+// Re-export SearchMode so existing data-layer callers keep working while
+// presentation imports it straight from domain/.
+export '../../domain/entities/search_mode.dart';
 
 part 'search_params.freezed.dart';
 
@@ -26,11 +29,3 @@ enum SortBy {
   const SortBy(this.apiValue, this.displayName);
 }
 
-enum SearchMode {
-  nearby('nearby', 'Around me'),
-  route('route', 'Along route');
-
-  final String apiValue;
-  final String displayName;
-  const SearchMode(this.apiValue, this.displayName);
-}
