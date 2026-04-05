@@ -6,6 +6,7 @@ import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../../core/theme/fuel_colors.dart';
@@ -92,42 +93,16 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     AsyncValue<ServiceResult<List<Station>>> stationsState,
   ) {
     if (favoriteIds.isEmpty) {
-      return Center(
-        child: Semantics(
-          label: 'No favorites yet. Tap the star on a station to save it as a favorite.',
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.star_outline, size: 80, color: Colors.grey,
-                semanticLabel: 'Empty favorites',
-              ),
-              const SizedBox(height: 24),
-              Text(
-                l10n?.noFavorites ?? 'No favorites yet',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.grey[600],
-                ),
-              ),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Text(
-                  l10n?.noFavoritesHint ??
-                  'Tap the star on a station to save it here',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[500],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              FilledButton.icon(
-                onPressed: () => context.go('/'),
-                icon: const Icon(Icons.search),
-                label: Text(l10n?.search ?? 'Search Stations'),
-              ),
-            ],
-          ),
+      return Semantics(
+        label: 'No favorites yet. Tap the star on a station to save it as a favorite.',
+        child: EmptyState(
+          icon: Icons.star_outline,
+          iconSize: 80,
+          title: l10n?.noFavorites ?? 'No favorites yet',
+          subtitle: l10n?.noFavoritesHint ??
+              'Tap the star on a station to save it here',
+          actionLabel: l10n?.search ?? 'Search Stations',
+          onAction: () => context.go('/'),
         ),
       );
     }
@@ -248,31 +223,11 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     return Consumer(builder: (context, ref, _) {
       final alerts = ref.watch(alertProvider);
       if (alerts.isEmpty) {
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.notifications_off_outlined,
-                    size: 64, color: Colors.grey.shade400),
-                const SizedBox(height: 16),
-                Text(
-                  l10n?.noPriceAlerts ?? 'No price alerts',
-                  style: Theme.of(context).textTheme.titleMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n?.noPriceAlertsHint ?? 'Create an alert from a station\'s detail page.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey.shade600,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
+        return EmptyState(
+          icon: Icons.notifications_off_outlined,
+          title: l10n?.noPriceAlerts ?? 'No price alerts',
+          subtitle: l10n?.noPriceAlertsHint ??
+              'Create an alert from a station\'s detail page.',
         );
       }
       return ListView.builder(

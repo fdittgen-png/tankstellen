@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/models/price_alert.dart';
 import '../../providers/alert_provider.dart';
@@ -12,7 +13,6 @@ class AlertsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final alerts = ref.watch(alertProvider);
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
@@ -24,31 +24,11 @@ class AlertsScreen extends ConsumerWidget {
         ),
       ),
       body: alerts.isEmpty
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.notifications_off_outlined,
-                        size: 64, color: Colors.grey.shade400),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n?.noPriceAlerts ?? 'No price alerts',
-                      style: theme.textTheme.titleMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n?.noPriceAlertsHint ?? 'Create an alert from a station\'s detail page.',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey.shade600,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
+          ? EmptyState(
+              icon: Icons.notifications_off_outlined,
+              title: l10n?.noPriceAlerts ?? 'No price alerts',
+              subtitle: l10n?.noPriceAlertsHint ??
+                  'Create an alert from a station\'s detail page.',
             )
           : ListView.builder(
               itemCount: alerts.length,
