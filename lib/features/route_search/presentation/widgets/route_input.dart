@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../../core/location/location_service.dart';
 import '../../../../core/services/location_search_provider.dart';
 import '../../../../core/services/location_search_service.dart';
+import '../../../../core/utils/frame_callbacks.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/route_info.dart';
 
@@ -39,7 +40,7 @@ class _RouteInputState extends ConsumerState<RouteInput> {
   void initState() {
     super.initState();
     // Auto-fill start with current position so user doesn't have to tap GPS
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    safePostFrame(() {
       if (!_autoGpsTriggered) {
         _autoGpsTriggered = true;
         _useGpsForStart();
