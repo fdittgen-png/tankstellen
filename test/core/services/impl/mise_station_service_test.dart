@@ -356,7 +356,6 @@ columns
       });
     });
   });
-}
 
   group('MiseStationService searchStations', () {
     test('searchStations throws ApiException on network failure', () async {
@@ -401,8 +400,8 @@ idImpianto|Gestore|Bandiera|TipoImpianto|NomeImpianto|Indirizzo|Comune|Provincia
 idImpianto|descCarburante|prezzo|isSelf|dtComu
 12345|Benzina|1.879|1|29/03/2026 08:00:00
 12345|Gasolio|1.659|1|29/03/2026 08:00:00
-12345|GPL|0.729|0|29/03/2026 07:30:00
-12345|Metano|1.199|0|29/03/2026 07:30:00
+12345|GPL|0.729|0|29/03/2026 08:00:00
+12345|Metano|1.199|0|29/03/2026 08:00:00
 67890|Benzina|1.999|1|29/03/2026 09:00:00
 67890|Gasolio|1.799|1|29/03/2026 09:00:00''';
 

@@ -45,7 +45,7 @@ void main() {
     await HiveStorage.init();
     // Mark setup as complete so we reach the shell screen
     final storage = HiveStorage();
-    await storage.setSetupComplete(true);
+    await storage.skipSetup();
 
     await tester.pumpWidget(
       ProviderScope(
@@ -76,7 +76,7 @@ void main() {
       (tester) async {
     await HiveStorage.init();
     final storage = HiveStorage();
-    await storage.setSetupComplete(true);
+    await storage.skipSetup();
 
     await tester.pumpWidget(
       ProviderScope(
