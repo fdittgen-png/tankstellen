@@ -27,8 +27,7 @@ void main() {
 
     test('no hardcoded API key assignments', () {
       // Pattern: apiKey = "actual-value" or apiKey: "actual-value"
-      // Excludes empty strings, placeholder hints, and the intentional
-      // OpenChargeMap shared key in AppConstants.
+      // Excludes empty strings and placeholder hints.
       final apiKeyPattern = RegExp(
         r'''(?:apiKey|api_key|apikey)\s*[:=]\s*['"][a-zA-Z0-9_\-]{8,}['"]''',
         caseSensitive: false,
@@ -43,7 +42,7 @@ void main() {
         for (var i = 0; i < lines.length; i++) {
           final line = lines[i];
           if (apiKeyPattern.hasMatch(line)) {
-            // Exclude the intentional shared OpenChargeMap API key
+            // Exclude l10n getter names (label translations, not actual keys)
             if (line.contains('openChargeMapApiKey')) continue;
             // Exclude hint text and label text (UI strings)
             if (line.contains('hintText') || line.contains('labelText')) {

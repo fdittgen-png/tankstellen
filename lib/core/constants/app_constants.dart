@@ -46,10 +46,6 @@ class AppConstants {
   static const String githubIssuesUrl =
       'https://github.com/fdittgen-png/tankstellen/issues';
 
-  /// Default OpenChargeMap API key (app-level, shared by all users).
-  /// Users can override this in Settings if they register their own key.
-  static const String openChargeMapApiKey = '04b3ed8e-cc1e-4149-9f64-17bc45f95472';
-
   /// Sentinel value for price sorting when a station has no price for the selected fuel.
   /// Ensures stations without prices sort to the bottom of the list.
   static const double noPriceSentinel = 999.0;
