@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import 'service_result.dart';
 
 /// Abstract interface for coordinate resolution (ZIP → lat/lng and reverse).
@@ -13,13 +15,22 @@ abstract class GeocodingProvider {
   bool get isAvailable;
 
   /// Convert a German ZIP code (PLZ) to coordinates.
-  Future<({double lat, double lng})> zipCodeToCoordinates(String zipCode);
+  Future<({double lat, double lng})> zipCodeToCoordinates(
+    String zipCode, {
+    CancelToken? cancelToken,
+  });
 
   /// Convert coordinates to a human-readable address.
-  Future<String> coordinatesToAddress(double lat, double lng);
+  Future<String> coordinatesToAddress(
+    double lat, double lng, {
+    CancelToken? cancelToken,
+  });
 
   /// Reverse-geocode coordinates to an ISO country code (e.g. 'DE', 'FR').
   /// Returns null if not supported or if the call fails.
-  Future<String?> coordinatesToCountryCode(double lat, double lng) async =>
+  Future<String?> coordinatesToCountryCode(
+    double lat, double lng, {
+    CancelToken? cancelToken,
+  }) async =>
       null;
 }

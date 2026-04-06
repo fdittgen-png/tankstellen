@@ -63,6 +63,7 @@ class LocationSearchService {
   Future<List<ResolvedLocation>> searchCities(
     String query, {
     List<String> countryCodes = const [],
+    CancelToken? cancelToken,
   }) async {
     if (query.trim().length < 2) return [];
 
@@ -94,6 +95,7 @@ class LocationSearchService {
           'limit': '8',
           'addressdetails': '1',
         },
+        cancelToken: cancelToken,
       );
 
       if (response.data is! List) return [];

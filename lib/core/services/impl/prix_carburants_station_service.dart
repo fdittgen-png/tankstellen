@@ -66,7 +66,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
 
     // Enrich with brand names from OpenStreetMap (best-effort)
     final enriched = _enricher != null
-        ? await _enricher.enrich(stations)
+        ? await _enricher.enrich(stations, cancelToken: cancelToken)
         : stations;
 
     return ServiceResult(

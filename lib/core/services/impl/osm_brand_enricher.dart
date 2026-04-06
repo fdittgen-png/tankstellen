@@ -28,7 +28,10 @@ class OsmBrandEnricher {
 
   static DateTime? _lastRequest;
 
-  Future<List<Station>> enrich(List<Station> stations) async {
+  Future<List<Station>> enrich(
+    List<Station> stations, {
+    CancelToken? cancelToken,
+  }) async {
     if (stations.isEmpty) return stations;
 
     var result = _applyCachedBrands(stations);
@@ -36,7 +39,7 @@ class OsmBrandEnricher {
     final uncached = result.where(_needsBrand).toList();
     if (uncached.isEmpty) return result;
 
-    await _fetchBrandsFromNominatim(stations);
+    await _fetchBrandsFromNominatim(stations, cancelToken: cancelToken);
     result = _applyCachedBrands(result);
 
     return result;
@@ -45,7 +48,10 @@ class OsmBrandEnricher {
   bool _needsBrand(Station s) =>
       s.brand.isEmpty || s.brand == 'Station' || s.brand == 'Autoroute';
 
-  Future<void> _fetchBrandsFromNominatim(List<Station> stations) async {
+  Future<void> _fetchBrandsFromNominatim(
+    List<Station> stations, {
+    CancelToken? cancelToken,
+  }) async {
     if (_lastRequest != null) {
       final elapsed = DateTime.now().difference(_lastRequest!);
       if (elapsed < const Duration(seconds: 2)) {
@@ -77,6 +83,7 @@ class OsmBrandEnricher {
           'viewbox': '$minLng,$minLat,$maxLng,$maxLat',
           'bounded': '1',
         },
+        cancelToken: cancelToken,
       );
 
       final results = response.data;
