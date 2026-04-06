@@ -76,7 +76,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       setState(() => _error = 'Please enter a valid email address');
       return;
     }
-    if (password.length < 6) {
+    if (_isSignUp && password.length < 6) {
       setState(() => _error = 'Password must be at least 6 characters');
       return;
     }
