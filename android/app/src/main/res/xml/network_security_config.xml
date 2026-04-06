@@ -5,8 +5,21 @@
             <certificates src="system" />
         </trust-anchors>
     </base-config>
-    <!-- Argentina open data server only supports HTTP -->
+    <!--
+        Argentina open data server (Secretaría de Energía) only supports HTTP.
+        Their SSL certificate is expired, so HTTPS is not usable.
+        Certificate pinning cannot be applied to cleartext HTTP connections.
+
+        Mitigation: Application-layer integrity validation checks the CSV
+        response structure (expected headers, column count, data types) to
+        detect MITM injection or response tampering.
+
+        Scope: Only datos.energia.gob.ar is permitted for cleartext.
+        All other domains require HTTPS (enforced by base-config above).
+
+        TODO: Re-evaluate when Argentina renews their SSL certificate.
+    -->
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">datos.energia.gob.ar</domain>
+        <domain includeSubdomains="false">datos.energia.gob.ar</domain>
     </domain-config>
 </network-security-config>

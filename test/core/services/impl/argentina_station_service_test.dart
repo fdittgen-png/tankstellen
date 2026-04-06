@@ -334,6 +334,68 @@ col0,col1,col2,TestCo,Dir,Loc,Prov,col7,col8,Nafta premium,col10,col11,100.5,202
     });
   });
 
+  group('Argentina CSV integrity validation', () {
+    late _TestableArgentinaCsvParser parser;
+
+    setUp(() {
+      parser = _TestableArgentinaCsvParser();
+    });
+
+    test('accepts valid header with all expected columns', () {
+      const csv =
+          'idempresa,empresa,idbandera,direccion,localidad,provincia,tipo,producto,precio,latitud,longitud,extra\n'
+          'col0,col1,col2,YPF,Dir,Loc,Prov,col7,col8,Nafta,col10,col11,100.0,2026-01-01,col14,YPF,-34.5,-58.9,col18,col19';
+
+      // Should not throw
+      expect(
+        () => parser.testParseCsv(csv, validateHeader: true),
+        returnsNormally,
+      );
+    });
+
+    test('rejects CSV with missing empresa column', () {
+      const csv = 'id,direccion,localidad,producto,precio,latitud,longitud';
+      expect(
+        () => parser.testParseCsv(csv, validateHeader: true),
+        throwsFormatException,
+      );
+    });
+
+    test('rejects CSV with missing precio column', () {
+      const csv = 'empresa,direccion,localidad,producto,latitud,longitud';
+      expect(
+        () => parser.testParseCsv(csv, validateHeader: true),
+        throwsFormatException,
+      );
+    });
+
+    test('rejects completely bogus header (MITM injection)', () {
+      const csv = '<html><body>Hacked!</body></html>';
+      expect(
+        () => parser.testParseCsv(csv, validateHeader: true),
+        throwsFormatException,
+      );
+    });
+
+    test('rejects empty header line', () {
+      const csv = '\ncol0,col1,col2';
+      expect(
+        () => parser.testParseCsv(csv, validateHeader: true),
+        throwsFormatException,
+      );
+    });
+
+    test('error message mentions integrity check', () {
+      const csv = 'bogus,header,line';
+      try {
+        parser.testParseCsv(csv, validateHeader: true);
+        fail('Should have thrown FormatException');
+      } on FormatException catch (e) {
+        expect(e.message, contains('integrity check'));
+      }
+    });
+  });
+
   group('Argentina full merge and station-building pipeline', () {
     late _TestableArgentinaCsvParser parser;
 
@@ -473,12 +535,35 @@ col0,col1,col2,YPF,Dir,Loc,Prov,col7,col8,Nafta premium,col10,col11,800.0,2026-0
   });
 }
 
+/// Expected CSV header columns (mirrors the service's validation).
+const _expectedHeaderColumns = [
+  'empresa',
+  'direccion',
+  'localidad',
+  'producto',
+  'precio',
+  'latitud',
+  'longitud',
+];
+
 /// Replicates Argentina CSV parsing logic for isolated testing.
 class _TestableArgentinaCsvParser {
-  List<_RawStation> testParseCsv(String csv) {
+  List<_RawStation> testParseCsv(String csv, {bool validateHeader = false}) {
     final stations = <_RawStation>[];
     final lines = csv.split('\n');
     if (lines.isEmpty) return stations;
+
+    if (validateHeader) {
+      final header = lines.first.toLowerCase();
+      for (final col in _expectedHeaderColumns) {
+        if (!header.contains(col)) {
+          throw FormatException(
+            'Argentina CSV integrity check failed: '
+            'missing expected column "$col" in header.',
+          );
+        }
+      }
+    }
 
     for (var i = 1; i < lines.length; i++) {
       final parts = testParseCsvLine(lines[i]);
