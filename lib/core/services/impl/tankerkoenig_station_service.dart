@@ -149,7 +149,7 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
   void _checkOk(dynamic data) {
     if (data is Map<String, dynamic> && data['ok'] != true) {
       throw ApiException(
-        message: data['message']?.toString() ?? 'Unbekannter API-Fehler',
+        message: data['message']?.toString() ?? 'Unknown API error',
       );
     }
   }

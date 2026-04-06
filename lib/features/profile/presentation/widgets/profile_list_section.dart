@@ -46,7 +46,7 @@ class ProfileListSection extends ConsumerWidget {
                             .read(activeProfileProvider.notifier)
                             .switchProfile(profile.id);
                       },
-                      child: const Text('Aktivieren'),
+                      child: Text(AppLocalizations.of(context)?.activate ?? 'Activate'),
                     ),
                   IconButton(
                     icon: const Icon(Icons.edit),
@@ -132,7 +132,7 @@ class ProfileListSection extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Abbrechen'),
+            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, controller.text),

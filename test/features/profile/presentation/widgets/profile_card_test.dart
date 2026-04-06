@@ -73,11 +73,11 @@ void main() {
       // Active profile uses person (filled) icon, not person_outline.
       expect(find.byIcon(Icons.person), findsOneWidget);
       expect(find.byIcon(Icons.person_outline), findsNothing);
-      // No Aktivieren button for the active profile.
-      expect(find.text('Aktivieren'), findsNothing);
+      // No Activate button for the active profile.
+      expect(find.text('Activate'), findsNothing);
     });
 
-    testWidgets('shows Aktivieren button for inactive profile',
+    testWidgets('shows Activate button for inactive profile',
         (tester) async {
       // profile-1 is active, profile-2 is inactive
       when(() => mockRepo.getActiveProfile()).thenReturn(_testProfile);
@@ -95,8 +95,8 @@ void main() {
         ],
       );
 
-      // The inactive profile should show an Aktivieren button.
-      expect(find.text('Aktivieren'), findsOneWidget);
+      // The inactive profile should show an Activate button.
+      expect(find.text('Activate'), findsOneWidget);
       // The inactive profile uses person_outline icon.
       expect(find.byIcon(Icons.person_outline), findsOneWidget);
     });
