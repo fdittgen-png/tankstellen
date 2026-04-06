@@ -1,9 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/constants/api_constants.dart';
-import '../../../../core/constants/app_constants.dart';
+import '../../../../core/error/exceptions.dart';
+import '../../../../core/services/report_service.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
@@ -75,33 +74,21 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
     try {
       final apiKeys = ref.read(apiKeyStorageProvider);
       final apiKey = apiKeys.getApiKey();
+      final price = _selectedType!.needsPrice
+          ? double.tryParse(_priceController.text.replaceAll(',', '.'))
+          : null;
 
-      final dio = Dio(BaseOptions(
-        baseUrl: ApiConstants.baseUrl,
-        headers: {'User-Agent': AppConstants.userAgent},
-      ));
-
-      await dio.post(
-        ApiConstants.complaintEndpoint,
-        data: {
-          'id': widget.stationId,
-          'type': _selectedType!.apiValue,
-          if (_selectedType!.needsPrice)
-            'correction': double.tryParse(
-              _priceController.text.replaceAll(',', '.'),
-            ),
-          'apikey': apiKey,
-        },
+      await ReportService().submitComplaint(
+        stationId: widget.stationId,
+        reportType: _selectedType!.apiValue,
+        apiKey: apiKey,
+        correction: price,
       );
 
       // Also submit to Supabase community reports if connected
       if (_selectedType!.needsPrice && TankSyncClient.isConnected) {
         final syncConfig = ref.read(syncStateProvider);
-        final price = double.tryParse(
-          _priceController.text.replaceAll(',', '.'),
-        );
         if (price != null && syncConfig.userId != null) {
-          // Map report type to fuel type string
           final fuelType = switch (_selectedType!) {
             ReportType.wrongE5 => 'e5',
             ReportType.wrongE10 => 'e10',
@@ -128,7 +115,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
         );
         context.pop();
       }
-    } on DioException catch (e) {
+    } on ApiException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
