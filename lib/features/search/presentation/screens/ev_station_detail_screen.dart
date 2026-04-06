@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/theme/fuel_colors.dart';
@@ -39,7 +38,13 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
     setState(() => _isRefreshing = true);
     try {
       final apiKeys = ref.read(apiKeyStorageProvider);
-      final apiKey = apiKeys.getEvApiKey() ?? AppConstants.openChargeMapApiKey;
+      final apiKey = apiKeys.getEvApiKey();
+      if (apiKey == null || apiKey.isEmpty) {
+        if (mounted) {
+          setState(() => _isRefreshing = false);
+        }
+        return;
+      }
       final service = EVChargingService(apiKey: apiKey);
       final result = await service.searchStations(
         lat: _station.lat,

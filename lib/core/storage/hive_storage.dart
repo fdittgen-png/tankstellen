@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../constants/app_constants.dart';
 import '../data/storage_repository.dart';
 import 'storage_keys.dart';
 
@@ -146,9 +145,9 @@ class HiveStorage implements StorageRepository {
     _evApiKeyCache = await _secureStorage.read(key: StorageKeys.evApiKey);
   }
 
-  String? getEvApiKey() => _evApiKeyCache ?? AppConstants.openChargeMapApiKey;
+  String? getEvApiKey() => _evApiKeyCache;
 
-  bool hasEvApiKey() => true; // Always true since we have a default key
+  bool hasEvApiKey() => _evApiKeyCache != null && _evApiKeyCache!.isNotEmpty;
 
   bool hasCustomEvApiKey() => _evApiKeyCache != null && _evApiKeyCache!.isNotEmpty;
 

@@ -562,14 +562,12 @@ void main() {
       expect(storage.hasApiKey(), isFalse);
     });
 
-    test('hasEvApiKey always returns true (default key exists)', () {
-      expect(storage.hasEvApiKey(), isTrue);
+    test('hasEvApiKey returns false when no key set', () {
+      expect(storage.hasEvApiKey(), isFalse);
     });
 
-    test('getEvApiKey returns default key when no custom key set', () {
-      // Should return AppConstants.openChargeMapApiKey
-      expect(storage.getEvApiKey(), isNotNull);
-      expect(storage.getEvApiKey()!.isNotEmpty, isTrue);
+    test('getEvApiKey returns null when no key set', () {
+      expect(storage.getEvApiKey(), isNull);
     });
 
     test('hasCustomEvApiKey returns false when no custom key set', () {
