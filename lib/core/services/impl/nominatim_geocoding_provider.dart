@@ -30,8 +30,9 @@ class NominatimGeocodingProvider implements GeocodingProvider {
 
   @override
   Future<({double lat, double lng})> zipCodeToCoordinates(
-    String zipCode,
-  ) async {
+    String zipCode, {
+    CancelToken? cancelToken,
+  }) async {
     await _enforceRateLimit();
 
     try {
@@ -44,6 +45,7 @@ class NominatimGeocodingProvider implements GeocodingProvider {
           'format': 'json',
           'limit': '1',
         },
+        cancelToken: cancelToken,
       );
 
       final results = response.data;
@@ -73,7 +75,10 @@ class NominatimGeocodingProvider implements GeocodingProvider {
   }
 
   @override
-  Future<String> coordinatesToAddress(double lat, double lng) async {
+  Future<String> coordinatesToAddress(
+    double lat, double lng, {
+    CancelToken? cancelToken,
+  }) async {
     await _enforceRateLimit();
 
     try {
@@ -86,6 +91,7 @@ class NominatimGeocodingProvider implements GeocodingProvider {
           'format': 'json',
           'zoom': '16',
         },
+        cancelToken: cancelToken,
       );
 
       final data = response.data;
@@ -106,7 +112,10 @@ class NominatimGeocodingProvider implements GeocodingProvider {
   }
 
   @override
-  Future<String?> coordinatesToCountryCode(double lat, double lng) async {
+  Future<String?> coordinatesToCountryCode(
+    double lat, double lng, {
+    CancelToken? cancelToken,
+  }) async {
     await _enforceRateLimit();
     try {
       _lastRequest = DateTime.now();
@@ -118,6 +127,7 @@ class NominatimGeocodingProvider implements GeocodingProvider {
           'format': 'json',
           'zoom': '3', // country-level zoom, minimal data
         },
+        cancelToken: cancelToken,
       );
       final address = response.data?['address'] as Map<String, dynamic>?;
       final code = address?['country_code'] as String?;

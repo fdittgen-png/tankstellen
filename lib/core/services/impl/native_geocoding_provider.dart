@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import '../../error/exceptions.dart';
@@ -26,8 +27,9 @@ class NativeGeocodingProvider implements GeocodingProvider {
 
   @override
   Future<({double lat, double lng})> zipCodeToCoordinates(
-    String zipCode,
-  ) async {
+    String zipCode, {
+    CancelToken? cancelToken,
+  }) async {
     try {
       final locations = await geo.locationFromAddress(
         '$zipCode, $_countryName',
@@ -48,7 +50,10 @@ class NativeGeocodingProvider implements GeocodingProvider {
   }
 
   @override
-  Future<String?> coordinatesToCountryCode(double lat, double lng) async {
+  Future<String?> coordinatesToCountryCode(
+    double lat, double lng, {
+    CancelToken? cancelToken,
+  }) async {
     if (!isAvailable) return null;
     try {
       final placemarks = await geo.placemarkFromCoordinates(lat, lng);
@@ -61,7 +66,10 @@ class NativeGeocodingProvider implements GeocodingProvider {
   }
 
   @override
-  Future<String> coordinatesToAddress(double lat, double lng) async {
+  Future<String> coordinatesToAddress(
+    double lat, double lng, {
+    CancelToken? cancelToken,
+  }) async {
     try {
       final placemarks = await geo.placemarkFromCoordinates(lat, lng);
       if (placemarks.isEmpty) return '$lat, $lng';

@@ -125,6 +125,7 @@ class SearchState extends _$SearchState {
         );
         final address = await nominatim.coordinatesToAddress(
           position.latitude, position.longitude,
+          cancelToken: cancelToken,
         );
         // Nominatim returns "34120 Pézenas" format
         final parts = address.split(' ');
@@ -179,13 +180,14 @@ class SearchState extends _$SearchState {
       await _autoUpdatePositionIfEnabled();
 
       final geocoding = ref.read(geocodingChainProvider);
-      final coordsResult = await geocoding.zipCodeToCoordinates(zipCode);
+      final coordsResult = await geocoding.zipCodeToCoordinates(zipCode, cancelToken: cancelToken);
 
       // Resolve city name for display
       String? cityName;
       try {
         final addrResult = await geocoding.coordinatesToAddress(
           coordsResult.data.lat, coordsResult.data.lng,
+          cancelToken: cancelToken,
         );
         cityName = addrResult.data;
       } on Exception catch (e) { debugPrint('ZIP reverse geocoding failed: $e'); }

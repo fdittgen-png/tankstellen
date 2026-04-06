@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../cache/cache_manager.dart';
 import '../error/exceptions.dart';
 import 'geocoding_provider.dart';
@@ -20,8 +22,9 @@ class GeocodingChain {
   GeocodingChain(this._providers, this._cache);
 
   Future<ServiceResult<({double lat, double lng})>> zipCodeToCoordinates(
-    String zipCode,
-  ) async {
+    String zipCode, {
+    CancelToken? cancelToken,
+  }) async {
     final cacheKey = CacheKey.geocodeZip(zipCode);
     final errors = <ServiceError>[];
 
@@ -43,7 +46,7 @@ class GeocodingChain {
       if (!provider.isAvailable) continue;
 
       try {
-        final coords = await provider.zipCodeToCoordinates(zipCode);
+        final coords = await provider.zipCodeToCoordinates(zipCode, cancelToken: cancelToken);
         final result = ServiceResult(
           data: coords,
           source: provider.source,
@@ -89,8 +92,9 @@ class GeocodingChain {
   }
 
   Future<ServiceResult<String>> coordinatesToAddress(
-    double lat, double lng,
-  ) async {
+    double lat, double lng, {
+    CancelToken? cancelToken,
+  }) async {
     final cacheKey = CacheKey.reverseGeocode(lat, lng);
     final errors = <ServiceError>[];
 
@@ -109,7 +113,7 @@ class GeocodingChain {
       if (!provider.isAvailable) continue;
 
       try {
-        final address = await provider.coordinatesToAddress(lat, lng);
+        final address = await provider.coordinatesToAddress(lat, lng, cancelToken: cancelToken);
         await _cache.put(
           cacheKey,
           {'address': address},
@@ -155,7 +159,10 @@ class GeocodingChain {
 
   /// Reverse-geocode coordinates to an ISO country code.
   /// Tries providers in order, returns first non-null result.
-  Future<String?> coordinatesToCountryCode(double lat, double lng) async {
+  Future<String?> coordinatesToCountryCode(
+    double lat, double lng, {
+    CancelToken? cancelToken,
+  }) async {
     // Check cache first
     final cacheKey = 'country:${lat.toStringAsFixed(2)}:${lng.toStringAsFixed(2)}';
     final fresh = _cache.getFresh(cacheKey);
@@ -165,7 +172,7 @@ class GeocodingChain {
 
     for (final provider in _providers) {
       if (!provider.isAvailable) continue;
-      final code = await provider.coordinatesToCountryCode(lat, lng);
+      final code = await provider.coordinatesToCountryCode(lat, lng, cancelToken: cancelToken);
       if (code != null) {
         await _cache.put(
           cacheKey,
