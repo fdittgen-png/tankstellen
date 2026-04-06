@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'argentina_fuel_classifier.dart';
 import '../../../features/search/data/models/search_params.dart';
 import '../../../features/search/domain/entities/station.dart';
@@ -127,7 +128,7 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
     }
 
     final response = await _dio.get<String>(_csvUrl, cancelToken: cancelToken);
-    _cachedStations = _parseCsv(response.data ?? '');
+    _cachedStations = await compute(_parseCsv, response.data ?? '');
     markDatasetRefreshed();
   }
 
@@ -144,7 +145,7 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
     'longitud',
   ];
 
-  List<_RawStation> _parseCsv(String csv) {
+  static List<_RawStation> _parseCsv(String csv) {
     final stations = <_RawStation>[];
     final lines = const LineSplitter().convert(csv);
 

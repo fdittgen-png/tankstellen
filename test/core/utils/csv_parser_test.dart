@@ -160,6 +160,18 @@ void main() {
       );
     });
 
+    test('Argentina CSV parsing runs in compute() isolate', () {
+      final source = File(
+        'lib/core/services/impl/argentina_station_service.dart',
+      ).readAsStringSync();
+
+      expect(
+        source.contains('compute(_parseCsv'),
+        isTrue,
+        reason: 'Argentina CSV parsing should use compute() for background isolate',
+      );
+    });
+
     test('MISE service uses CsvParser instead of inline parser', () {
       final source = File(
         'lib/core/services/impl/mise_station_service.dart',
