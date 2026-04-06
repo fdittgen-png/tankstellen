@@ -24,6 +24,24 @@ void main() {
         greaterThanOrEqualTo(1),
       );
     });
+
+    test('charging refresh interval is shorter than standard', () {
+      expect(
+        BackgroundService.chargingRefreshInterval.inMinutes,
+        lessThan(BackgroundService.refreshInterval.inMinutes),
+      );
+    });
+
+    test('standard refresh interval is 1 hour', () {
+      expect(BackgroundService.refreshInterval, const Duration(hours: 1));
+    });
+
+    test('charging refresh interval is 30 minutes', () {
+      expect(
+        BackgroundService.chargingRefreshInterval,
+        const Duration(minutes: 30),
+      );
+    });
   });
 
   group('HiveStorage.initInIsolate', () {
@@ -103,6 +121,57 @@ void main() {
         source.contains('json_extensions.dart'),
         isTrue,
         reason: 'Background service should import SafeJsonAccessors',
+      );
+    });
+
+    test('background service registers two periodic tasks for adaptive scheduling', () {
+      final source = File(
+        'lib/core/background/background_service.dart',
+      ).readAsStringSync();
+
+      // Must register both a standard and a charging task
+      expect(
+        source.contains('priceRefresh'),
+        isTrue,
+        reason: 'Must register standard priceRefresh task',
+      );
+      expect(
+        source.contains('priceRefreshCharging'),
+        isTrue,
+        reason: 'Must register priceRefreshCharging task for when device is plugged in',
+      );
+    });
+
+    test('background service uses battery-aware WorkManager constraints', () {
+      final source = File(
+        'lib/core/background/background_service.dart',
+      ).readAsStringSync();
+
+      // Standard task should require battery not low
+      expect(
+        source.contains('requiresBatteryNotLow: true'),
+        isTrue,
+        reason: 'Standard task must skip when battery is low',
+      );
+
+      // Charging task should require device to be charging
+      expect(
+        source.contains('requiresCharging: true'),
+        isTrue,
+        reason: 'Charging task must only run when plugged in',
+      );
+    });
+
+    test('callback dispatcher handles both task names', () {
+      final source = File(
+        'lib/core/background/background_service.dart',
+      ).readAsStringSync();
+
+      // The dispatcher should check for both task names
+      expect(
+        source.contains('_priceRefreshChargingTask'),
+        isTrue,
+        reason: 'Callback dispatcher must handle the charging task',
       );
     });
   });
