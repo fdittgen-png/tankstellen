@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/alerts/data/models/price_alert.dart';
 import '../../features/itinerary/domain/entities/saved_itinerary.dart';
+import '../utils/json_extensions.dart';
 import 'supabase_client.dart';
 
 /// Orchestrates two-way sync between local Hive storage and Supabase.
@@ -42,8 +43,10 @@ class SyncService {
           .from('favorites')
           .select('station_id')
           .eq('user_id', userId);
-      final serverIds =
-          (serverRows as List).map((r) => r['station_id'] as String).toSet();
+      final serverIds = serverRows
+          .map((r) => r.getString('station_id'))
+          .whereType<String>()
+          .toSet();
       final localIds = localFavoriteIds.toSet();
 
       debugPrint('SyncService.syncFavorites: local=${localIds.length}, server=${serverIds.length}, userId=$userId');
@@ -110,8 +113,10 @@ class SyncService {
           .from('ignored_stations')
           .select('station_id')
           .eq('user_id', userId);
-      final serverIds =
-          (serverRows as List).map((r) => r['station_id'] as String).toSet();
+      final serverIds = serverRows
+          .map((r) => r.getString('station_id'))
+          .whereType<String>()
+          .toSet();
       final localIds = localIgnoredIds.toSet();
 
       debugPrint('SyncService.syncIgnoredStations: local=${localIds.length}, server=${serverIds.length}');
@@ -189,10 +194,15 @@ class SyncService {
           .from('station_ratings')
           .select('station_id, rating')
           .eq('user_id', userId);
-      return {
-        for (final r in (rows as List))
-          r['station_id'] as String: (r['rating'] as num).toInt(),
-      };
+      final result = <String, int>{};
+      for (final r in rows) {
+        final stationId = r.getString('station_id');
+        final rating = r.getInt('rating');
+        if (stationId != null && rating != null) {
+          result[stationId] = rating;
+        }
+      }
+      return result;
     } catch (e) {
       debugPrint('SyncService.fetchRatings FAILED: $e');
       return {};
@@ -219,7 +229,7 @@ class SyncService {
           .eq('station_id', stationId)
           .gte('recorded_at', cutoff)
           .order('recorded_at', ascending: true);
-      return (rows as List).cast<Map<String, dynamic>>();
+      return List<Map<String, dynamic>>.from(rows);
     } catch (e) {
       debugPrint('SyncService.fetchPriceHistory FAILED: $e');
       return [];
@@ -244,8 +254,10 @@ class SyncService {
     try {
       final serverRows =
           await client.from('alerts').select().eq('user_id', userId);
-      final serverAlertIds =
-          (serverRows as List).map((r) => r['id'] as String).toSet();
+      final serverAlertIds = serverRows
+          .map((r) => r.getString('id'))
+          .whereType<String>()
+          .toSet();
       final localAlertIds = localAlerts.map((a) => a.id).toSet();
 
       debugPrint('SyncService.syncAlerts: local=${localAlertIds.length}, server=${serverAlertIds.length}');
@@ -272,16 +284,16 @@ class SyncService {
 
       // Download server-only alerts
       final serverOnly =
-          (serverRows as List).where((r) => !localAlertIds.contains(r['id']));
+          serverRows.where((r) => !localAlertIds.contains(r.getString('id')));
       final downloaded = serverOnly.map((r) {
         return PriceAlert.fromJson({
-          'id': r['id'],
-          'stationId': r['station_id'],
-          'stationName': r['station_name'],
-          'fuelType': r['fuel_type'],
-          'targetPrice': (r['target_price'] as num).toDouble(),
-          'isActive': r['is_active'] ?? true,
-          'createdAt': r['created_at'],
+          'id': r.getString('id') ?? '',
+          'stationId': r.getString('station_id') ?? '',
+          'stationName': r.getString('station_name') ?? '',
+          'fuelType': r.getString('fuel_type') ?? '',
+          'targetPrice': r.getDouble('target_price') ?? 0.0,
+          'isActive': r.getBool('is_active') ?? true,
+          'createdAt': r.getString('created_at') ?? '',
         });
       }).toList();
 
@@ -318,7 +330,7 @@ class SyncService {
       final itineraries =
           await client.from('itineraries').select().eq('user_id', userId);
 
-      debugPrint('SyncService.fetchAllUserData: favorites=${(favorites as List).length}, alerts=${(alerts as List).length}');
+      debugPrint('SyncService.fetchAllUserData: favorites=${favorites.length}, alerts=${alerts.length}');
 
       return {
         'favorites': favorites,
@@ -377,18 +389,24 @@ class SyncService {
           .eq('user_id', userId)
           .order('updated_at', ascending: false);
 
-      return (rows as List).map((r) {
+      return rows.map((r) {
+        final createdAtStr = r.getString('created_at');
+        final updatedAtStr = r.getString('updated_at');
         return SavedItinerary(
-          id: r['id'] as String,
-          name: r['name'] as String,
-          waypoints: (r['waypoints'] as List).cast<Map<String, dynamic>>(),
-          distanceKm: (r['distance_km'] as num).toDouble(),
-          durationMinutes: (r['duration_minutes'] as num).toDouble(),
-          avoidHighways: r['avoid_highways'] as bool? ?? false,
-          fuelType: r['fuel_type'] as String? ?? 'e10',
-          selectedStationIds: (r['selected_station_ids'] as List?)?.cast<String>() ?? [],
-          createdAt: DateTime.parse(r['created_at'] as String),
-          updatedAt: DateTime.parse(r['updated_at'] as String),
+          id: r.getString('id') ?? '',
+          name: r.getString('name') ?? '',
+          waypoints: r.getList<Map<String, dynamic>>('waypoints'),
+          distanceKm: r.getDouble('distance_km') ?? 0.0,
+          durationMinutes: r.getDouble('duration_minutes') ?? 0.0,
+          avoidHighways: r.getBool('avoid_highways') ?? false,
+          fuelType: r.getString('fuel_type') ?? 'e10',
+          selectedStationIds: r.getList<String>('selected_station_ids'),
+          createdAt: createdAtStr != null
+              ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
+              : DateTime.now(),
+          updatedAt: updatedAtStr != null
+              ? DateTime.tryParse(updatedAtStr) ?? DateTime.now()
+              : DateTime.now(),
         );
       }).toList();
     } catch (e) {
