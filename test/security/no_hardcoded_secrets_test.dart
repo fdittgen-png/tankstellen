@@ -164,6 +164,28 @@ void main() {
       }
     });
 
+    test('network_security_config restricts cleartext to Argentina only', () {
+      final configFile = File(
+        'android/app/src/main/res/xml/network_security_config.xml',
+      );
+      expect(configFile.existsSync(), isTrue,
+          reason: 'network_security_config.xml must exist');
+
+      final content = configFile.readAsStringSync();
+
+      // Base config must deny cleartext
+      expect(content, contains('cleartextTrafficPermitted="false"'));
+
+      // Only datos.energia.gob.ar should have cleartext permitted
+      final cleartextDomains = RegExp(
+        r'<domain-config\s+cleartextTrafficPermitted="true">'
+        r'[\s\S]*?<domain[^>]*>([^<]+)</domain>',
+      ).allMatches(content).map((m) => m.group(1)).toList();
+
+      expect(cleartextDomains, hasLength(1));
+      expect(cleartextDomains.first, 'datos.energia.gob.ar');
+    });
+
     test('CarAppService does not use ALLOW_ALL_HOSTS_VALIDATOR in release', () {
       final carAppFile = File(
         'android/app/src/main/kotlin/de/tankstellen/tankstellen/TankstellenCarAppService.kt',

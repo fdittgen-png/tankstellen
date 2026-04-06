@@ -130,12 +130,36 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
     markDatasetRefreshed();
   }
 
+  /// Expected CSV header columns from the Argentina open data endpoint.
+  /// Used as an integrity check to detect MITM tampering or format changes
+  /// since the endpoint only supports HTTP (no TLS protection).
+  static const _expectedHeaderColumns = [
+    'empresa',
+    'direccion',
+    'localidad',
+    'producto',
+    'precio',
+    'latitud',
+    'longitud',
+  ];
+
   List<_RawStation> _parseCsv(String csv) {
     final stations = <_RawStation>[];
     final lines = const LineSplitter().convert(csv);
 
-    // First line is header
+    // First line is header — validate structure as MITM protection
     if (lines.isEmpty) return stations;
+
+    final header = lines.first.toLowerCase();
+    for (final col in _expectedHeaderColumns) {
+      if (!header.contains(col)) {
+        throw FormatException(
+          'Argentina CSV integrity check failed: '
+          'missing expected column "$col" in header. '
+          'Possible data tampering or API format change.',
+        );
+      }
+    }
 
     for (var i = 1; i < lines.length; i++) {
       // CSV with comma separator, fields may be quoted
