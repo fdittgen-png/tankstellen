@@ -7,6 +7,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class TankSyncClient {
   static bool _initialized = false;
 
+  /// Max retry attempts for the public.users upsert after auth signup/signin.
+  static const maxUpsertRetries = 3;
+
+  /// Base delay for exponential backoff between upsert retries.
+  static const upsertRetryBaseDelay = Duration(milliseconds: 500);
+
   /// Initialize the Supabase client. Safe to call multiple times — subsequent
   /// calls are no-ops.
   static Future<void> init({
@@ -52,17 +58,7 @@ class TankSyncClient {
     final response = await c.auth.signInAnonymously();
     final userId = response.user?.id;
     if (userId != null) {
-      // Ensure user exists in public.users table.
-      // Supabase auth creates auth.users but NOT public.users.
-      // The FK constraint on favorites/alerts requires public.users to exist.
-      try {
-        await c.from('users').upsert(
-          {'id': userId},
-          onConflict: 'id',
-        );
-      } catch (e) {
-        debugPrint('TankSync: users upsert failed: $e');
-      }
+      await _ensurePublicUser(c, userId);
     }
     return userId;
   }
@@ -77,11 +73,7 @@ class TankSyncClient {
     );
     final userId = response.user?.id;
     if (userId != null) {
-      try {
-        await c.from('users').upsert({'id': userId}, onConflict: 'id');
-      } catch (e) {
-        debugPrint('TankSync: users upsert failed: $e');
-      }
+      await _ensurePublicUser(c, userId);
     }
     return userId;
   }
@@ -96,13 +88,50 @@ class TankSyncClient {
     );
     final userId = response.user?.id;
     if (userId != null) {
-      try {
-        await c.from('users').upsert({'id': userId}, onConflict: 'id');
-      } catch (e) {
-        debugPrint('TankSync: users upsert failed: $e');
-      }
+      await _ensurePublicUser(c, userId);
     }
     return userId;
+  }
+
+  /// Ensure the user exists in `public.users` (required by FK constraints
+  /// on favorites/alerts). Retries with exponential backoff; if all retries
+  /// fail, signs out to restore consistent state and rethrows.
+  static Future<void> _ensurePublicUser(
+    SupabaseClient c,
+    String userId,
+  ) async {
+    Object? lastError;
+    for (var attempt = 0; attempt < maxUpsertRetries; attempt++) {
+      try {
+        await c.from('users').upsert({'id': userId}, onConflict: 'id');
+        return; // success
+      } catch (e) {
+        lastError = e;
+        debugPrint(
+          'TankSync: users upsert attempt ${attempt + 1}/$maxUpsertRetries failed: $e',
+        );
+        if (attempt < maxUpsertRetries - 1) {
+          await Future<void>.delayed(
+            upsertRetryBaseDelay * (1 << attempt),
+          );
+        }
+      }
+    }
+
+    // All retries exhausted — sign out to prevent inconsistent state
+    // where auth.users exists but public.users doesn't.
+    debugPrint('TankSync: users upsert failed after $maxUpsertRetries attempts, signing out');
+    try {
+      await c.auth.signOut();
+    } catch (e) {
+      debugPrint('TankSync: sign-out after upsert failure also failed: $e');
+    }
+    _initialized = false;
+    throw StateError(
+      'Failed to create public.users row after $maxUpsertRetries attempts. '
+      'Signed out to prevent inconsistent state. '
+      'Original error: $lastError',
+    );
   }
 
   /// Get the current user's email (null for anonymous users).
