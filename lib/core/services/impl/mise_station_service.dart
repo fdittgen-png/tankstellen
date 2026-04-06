@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import '../../../features/search/data/models/search_params.dart';
 import '../../../features/search/domain/entities/station.dart';
@@ -9,6 +7,7 @@ import '../mixins/cached_dataset_mixin.dart';
 import '../mixins/station_service_helpers.dart';
 import '../service_result.dart';
 import '../station_service.dart';
+import '../utils/csv_parser.dart';
 
 /// Italian fuel prices from MIMIT (ex-MISE) open data CSV files.
 /// Free, no API key, no registration. Updated daily at 08:00.
@@ -102,25 +101,23 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
 
   Map<String, _StationData> _parseStationsCsv(String csv) {
     final stations = <String, _StationData>{};
-    final lines = const LineSplitter().convert(csv);
+    final rows = CsvParser.parseAll(csv, skipLines: 2, separator: '|');
 
-    // Skip first line (date header) and second line (column headers)
-    for (var i = 2; i < lines.length; i++) {
-      final parts = lines[i].split('|');
+    for (final parts in rows) {
       if (parts.length < 10) continue;
 
-      final id = parts[0].trim();
-      final lat = double.tryParse(parts[8].trim()) ?? 0;
-      final lng = double.tryParse(parts[9].trim()) ?? 0;
+      final id = parts[0];
+      final lat = double.tryParse(parts[8]) ?? 0;
+      final lng = double.tryParse(parts[9]) ?? 0;
       if (lat == 0 || lng == 0) continue;
 
       stations[id] = _StationData(
-        brand: parts[2].trim(),
-        type: parts[3].trim(),
-        name: parts[4].trim(),
-        address: parts[5].trim(),
-        city: parts[6].trim(),
-        province: parts[7].trim(),
+        brand: parts[2],
+        type: parts[3],
+        name: parts[4],
+        address: parts[5],
+        city: parts[6],
+        province: parts[7],
         lat: lat,
         lng: lng,
       );
@@ -130,18 +127,16 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
 
   Map<String, _PriceData> _parsePricesCsv(String csv) {
     final prices = <String, _PriceData>{};
-    final lines = const LineSplitter().convert(csv);
+    final rows = CsvParser.parseAll(csv, skipLines: 2, separator: '|');
 
-    // Skip first line (date header) and second line (column headers)
-    for (var i = 2; i < lines.length; i++) {
-      final parts = lines[i].split('|');
+    for (final parts in rows) {
       if (parts.length < 5) continue;
 
-      final id = parts[0].trim();
-      final fuel = parts[1].trim().toLowerCase();
-      final price = double.tryParse(parts[2].trim());
-      final isSelf = parts[3].trim() == '1';
-      final dateStr = parts[4].trim();
+      final id = parts[0];
+      final fuel = parts[1].toLowerCase();
+      final price = double.tryParse(parts[2]);
+      final isSelf = parts[3] == '1';
+      final dateStr = parts[4];
 
       if (price == null) continue;
 

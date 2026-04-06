@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/utils/csv_parser.dart';
 
@@ -137,6 +139,54 @@ void main() {
 
     test('handles leading/trailing whitespace', () {
       expect(CsvParser.parseCommaDouble(' 1,50 '), closeTo(1.50, 0.01));
+    });
+  });
+
+  group('CsvParser adoption regression', () {
+    test('Argentina service uses CsvParser instead of inline parser', () {
+      final source = File(
+        'lib/core/services/impl/argentina_station_service.dart',
+      ).readAsStringSync();
+
+      expect(
+        source.contains('CsvParser.parseLine'),
+        isTrue,
+        reason: 'Argentina service should use CsvParser.parseLine',
+      );
+      expect(
+        source.contains('_parseCsvLine'),
+        isFalse,
+        reason: 'Argentina service should not have a private _parseCsvLine method',
+      );
+    });
+
+    test('MISE service uses CsvParser instead of inline parser', () {
+      final source = File(
+        'lib/core/services/impl/mise_station_service.dart',
+      ).readAsStringSync();
+
+      expect(
+        source.contains('CsvParser.parseAll'),
+        isTrue,
+        reason: 'MISE service should use CsvParser.parseAll',
+      );
+      expect(
+        source.contains('LineSplitter'),
+        isFalse,
+        reason: 'MISE service should not use LineSplitter directly',
+      );
+    });
+
+    test('both services import csv_parser.dart', () {
+      final argSource = File(
+        'lib/core/services/impl/argentina_station_service.dart',
+      ).readAsStringSync();
+      final miseSource = File(
+        'lib/core/services/impl/mise_station_service.dart',
+      ).readAsStringSync();
+
+      expect(argSource, contains('csv_parser.dart'));
+      expect(miseSource, contains('csv_parser.dart'));
     });
   });
 }
