@@ -10,6 +10,7 @@ import '../../../alerts/providers/alert_provider.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
+import '../../../../core/utils/navigation_utils.dart';
 import '../../providers/station_detail_provider.dart';
 import '../widgets/price_history_section.dart';
 import '../widgets/price_tile.dart';
@@ -35,6 +36,17 @@ class StationDetailScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.directions),
+            onPressed: () {
+              final station = detailAsync.value?.data.station;
+              if (station != null) {
+                NavigationUtils.openInMaps(station.lat, station.lng,
+                    label: station.brand.isNotEmpty ? station.brand : station.street);
+              }
+            },
+            tooltip: l10n?.navigate ?? 'Navigate',
+          ),
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () => _showCreateAlertDialog(context, ref),
