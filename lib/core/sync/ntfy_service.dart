@@ -1,12 +1,14 @@
 import 'package:dio/dio.dart';
 
+import '../services/dio_factory.dart';
+
 /// Client for ntfy.sh push notification service.
 /// Used when TankSync is connected and user opts into real-time push.
 class NtfyService {
   static const _baseUrl = 'https://ntfy.sh';
   final Dio _dio;
 
-  NtfyService({Dio? dio}) : _dio = dio ?? Dio();
+  NtfyService({Dio? dio}) : _dio = dio ?? DioFactory.create();
 
   /// Subscribe to a topic (generate unique per user).
   String generateTopic(String userId) => 'tankstellen-$userId';

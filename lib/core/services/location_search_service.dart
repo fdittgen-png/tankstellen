@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import '../cache/cache_manager.dart';
-import '../constants/app_constants.dart';
 import '../country/country_config.dart';
+import 'dio_factory.dart';
 import '../services/service_result.dart';
 
 /// A resolved location from user input (GPS, ZIP, or city search).
@@ -32,11 +32,10 @@ class LocationSearchService {
   DateTime _lastRequest = DateTime.fromMillisecondsSinceEpoch(0);
 
   LocationSearchService(this._cache)
-      : _dio = Dio(BaseOptions(
+      : _dio = DioFactory.create(
           connectTimeout: const Duration(seconds: 5),
           receiveTimeout: const Duration(seconds: 5),
-          headers: {'User-Agent': AppConstants.userAgent},
-        ));
+        );
 
   /// Detect what the user entered: GPS (empty), ZIP (digits/postal pattern), or city (text).
   ///

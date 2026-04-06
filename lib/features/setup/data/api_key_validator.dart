@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import '../../../core/constants/api_constants.dart';
+import '../../../core/services/dio_factory.dart';
 
 /// Result of an API key validation attempt.
 class ApiKeyValidationResult {
@@ -13,12 +14,7 @@ class ApiKeyValidator {
   final Dio _dio;
 
   ApiKeyValidator({Dio? dio})
-      : _dio = dio ??
-            Dio(BaseOptions(
-              baseUrl: ApiConstants.baseUrl,
-              connectTimeout: const Duration(seconds: 10),
-              receiveTimeout: const Duration(seconds: 10),
-            ));
+      : _dio = dio ?? DioFactory.create(baseUrl: ApiConstants.baseUrl);
 
   Future<ApiKeyValidationResult> validate(String apiKey) async {
     try {

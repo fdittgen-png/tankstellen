@@ -2,8 +2,8 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../constants/app_constants.dart';
 import '../../storage/hive_storage.dart';
+import '../dio_factory.dart';
 import '../../../features/search/domain/entities/station.dart';
 
 part 'osm_brand_enricher.g.dart';
@@ -21,11 +21,10 @@ class OsmBrandEnricher {
 
   OsmBrandEnricher(this._storage);
 
-  static final _dio = Dio(BaseOptions(
+  static final _dio = DioFactory.create(
     connectTimeout: const Duration(seconds: 8),
     receiveTimeout: const Duration(seconds: 10),
-    headers: {'User-Agent': AppConstants.userAgent},
-  ));
+  );
 
   static DateTime? _lastRequest;
 

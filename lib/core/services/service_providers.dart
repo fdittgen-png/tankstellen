@@ -7,6 +7,7 @@ import '../cache/cache_manager.dart';
 import '../country/country_provider.dart';
 import '../error_tracing/integrations/dio_trace_interceptor.dart';
 import '../storage/hive_storage.dart';
+import 'dio_factory.dart';
 import 'geocoding_chain.dart';
 import 'impl/demo_station_service.dart';
 import 'impl/argentina_station_service.dart';
@@ -37,12 +38,11 @@ part 'service_providers.g.dart';
 @riverpod
 Dio tankerkoenigDio(Ref ref) {
   final config = ServiceConfigs.tankerkoenig;
-  final dio = Dio(BaseOptions(
+  final dio = DioFactory.create(
     baseUrl: config.baseUrl,
     connectTimeout: config.connectTimeout,
     receiveTimeout: config.receiveTimeout,
-    headers: config.headers,
-  ));
+  );
 
   // Inject API key from user settings
   dio.interceptors.add(_ApiKeyInterceptor(ref));
