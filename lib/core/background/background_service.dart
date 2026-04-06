@@ -27,13 +27,25 @@ import 'background_retry.dart';
 /// 3. Update cached station data with fresh prices
 /// 4. Evaluate alert thresholds and fire local push notifications
 ///
-/// ## Frequency: Every 1 hour (Android may delay based on battery/Doze mode)
+/// ## Frequency: Adaptive based on battery/charger state
+/// - **Charging**: every 30 minutes (more frequent updates while plugged in)
+/// - **On battery (not low)**: every 1 hour (standard interval)
+/// - **Low battery**: tasks are skipped by WorkManager constraints
+///
+/// This is achieved by registering two periodic tasks with different
+/// WorkManager constraints, rather than checking battery state in the isolate
+/// (battery_plus does not work reliably in background isolates).
 class BackgroundService {
   static const _priceRefreshTask = 'priceRefresh';
+  static const _priceRefreshChargingTask = 'priceRefreshCharging';
 
-  /// How often WorkManager attempts to refresh prices.
-  /// Android may delay based on battery/Doze mode; 1h is the minimum WorkManager honors reliably.
+  /// Standard refresh interval when on battery (not low).
+  /// Android may delay based on Doze mode; 1h is the minimum WorkManager honors reliably.
   static const refreshInterval = Duration(hours: 1);
+
+  /// Faster refresh interval when the device is charging.
+  /// Plugged-in users get fresher prices without battery impact.
+  static const chargingRefreshInterval = Duration(minutes: 30);
 
   /// Max IDs accepted per Tankerkoenig batch prices request.
   static const tankerkoenigBatchSize = 10;
@@ -62,11 +74,29 @@ class BackgroundService {
 
   static Future<void> init() async {
     await Workmanager().initialize(callbackDispatcher);
+
+    // Standard task: runs every 1h when battery is not low.
+    // Skipped automatically by Android when battery drops below ~15%.
     await Workmanager().registerPeriodicTask(
       _priceRefreshTask,
       _priceRefreshTask,
       frequency: refreshInterval,
-      constraints: Constraints(networkType: NetworkType.connected),
+      constraints: Constraints(
+        networkType: NetworkType.connected,
+        requiresBatteryNotLow: true,
+      ),
+    );
+
+    // Charging task: runs every 30min when device is plugged in.
+    // Gives fresher prices at no battery cost.
+    await Workmanager().registerPeriodicTask(
+      _priceRefreshChargingTask,
+      _priceRefreshChargingTask,
+      frequency: chargingRefreshInterval,
+      constraints: Constraints(
+        networkType: NetworkType.connected,
+        requiresCharging: true,
+      ),
     );
   }
 }
@@ -74,7 +104,9 @@ class BackgroundService {
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
-    if (task == BackgroundService._priceRefreshTask) {
+    if (task == BackgroundService._priceRefreshTask ||
+        task == BackgroundService._priceRefreshChargingTask) {
+      debugPrint('BackgroundService: running task "$task"');
       await _refreshPricesAndCheckAlerts();
     }
     return true;
