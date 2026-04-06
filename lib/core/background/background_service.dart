@@ -8,6 +8,7 @@ import '../../features/search/domain/entities/fuel_type.dart';
 import '../../features/widget/data/home_widget_service.dart';
 import '../notifications/notification_service.dart';
 import '../storage/hive_storage.dart';
+import '../utils/json_extensions.dart';
 import 'background_retry.dart';
 
 /// Manages periodic background tasks via Android WorkManager.
@@ -134,10 +135,15 @@ Future<void> _refreshPricesAndCheckAlerts() async {
           ),
         );
         if (data != null && data['ok'] == true && data['prices'] != null) {
-          final rawPrices = data['prices'] as Map<String, dynamic>;
-          for (final entry in rawPrices.entries) {
-            if (entry.value is Map) {
-              prices[entry.key] = Map<String, dynamic>.from(entry.value as Map);
+          final rawPrices = data.getMap('prices');
+          if (rawPrices != null) {
+            for (final entry in rawPrices.entries) {
+              final value = entry.value;
+              if (value is Map<String, dynamic>) {
+                prices[entry.key] = value;
+              } else if (value is Map) {
+                prices[entry.key] = Map<String, dynamic>.from(value);
+              }
             }
           }
         }
@@ -155,15 +161,19 @@ Future<void> _refreshPricesAndCheckAlerts() async {
         final record = PriceRecord(
           stationId: stationId,
           recordedAt: now,
-          e5: (p['e5'] as num?)?.toDouble(),
-          e10: (p['e10'] as num?)?.toDouble(),
-          diesel: (p['diesel'] as num?)?.toDouble(),
+          e5: p.getDouble('e5'),
+          e10: p.getDouble('e10'),
+          diesel: p.getDouble('diesel'),
         );
 
         // Deduplicate: only save if last record is older than dedup window
         final existing = storage.getPriceRecords(stationId);
+        final lastRecordedAt = existing.isNotEmpty
+            ? DateTime.tryParse(existing.last['recordedAt']?.toString() ?? '')
+            : null;
         final shouldSave = existing.isEmpty ||
-            now.difference(DateTime.parse(existing.last['recordedAt'] as String)) >
+            lastRecordedAt == null ||
+            now.difference(lastRecordedAt) >
                 BackgroundService.priceHistoryDedupWindow;
         if (shouldSave) {
           final records = [
@@ -188,11 +198,15 @@ Future<void> _refreshPricesAndCheckAlerts() async {
         if (p['status'] == 'no prices') continue;
 
         final cached = storage.getCachedData('station:$stationId');
-        if (cached != null && cached['data'] is Map) {
-          final stationData = Map<String, dynamic>.from(cached['data'] as Map);
-          if (p['e5'] != null) stationData['e5'] = (p['e5'] as num).toDouble();
-          if (p['e10'] != null) stationData['e10'] = (p['e10'] as num).toDouble();
-          if (p['diesel'] != null) stationData['diesel'] = (p['diesel'] as num).toDouble();
+        final cachedData = cached?.getMap('data');
+        if (cachedData != null) {
+          final stationData = Map<String, dynamic>.from(cachedData);
+          final e5 = p.getDouble('e5');
+          final e10 = p.getDouble('e10');
+          final diesel = p.getDouble('diesel');
+          if (e5 != null) stationData['e5'] = e5;
+          if (e10 != null) stationData['e10'] = e10;
+          if (diesel != null) stationData['diesel'] = diesel;
           stationData['isOpen'] = p['status'] == 'open';
           await storage.cacheData('station:$stationId', stationData);
         }
@@ -213,11 +227,11 @@ Future<void> _refreshPricesAndCheckAlerts() async {
         double? currentPrice;
         switch (alert.fuelType) {
           case FuelType.e5:
-            currentPrice = (stationPrices['e5'] as num?)?.toDouble();
+            currentPrice = stationPrices.getDouble('e5');
           case FuelType.e10:
-            currentPrice = (stationPrices['e10'] as num?)?.toDouble();
+            currentPrice = stationPrices.getDouble('e10');
           case FuelType.diesel:
-            currentPrice = (stationPrices['diesel'] as num?)?.toDouble();
+            currentPrice = stationPrices.getDouble('diesel');
           default:
             continue;
         }
