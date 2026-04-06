@@ -11,6 +11,7 @@ import '../mixins/cached_dataset_mixin.dart';
 import '../mixins/station_service_helpers.dart';
 import '../service_result.dart';
 import '../station_service.dart';
+import '../utils/csv_parser.dart';
 
 /// Argentine fuel prices from Secretaría de Energía open data.
 /// Free, no API key. CSV with station-level prices + coordinates.
@@ -163,7 +164,7 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
 
     for (var i = 1; i < lines.length; i++) {
       // CSV with comma separator, fields may be quoted
-      final parts = _parseCsvLine(lines[i]);
+      final parts = CsvParser.parseLine(lines[i]);
       if (parts.length < 19) continue;
 
       final lat = double.tryParse(parts[16]) ?? 0;
@@ -185,27 +186,6 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
       ));
     }
     return stations;
-  }
-
-  /// Simple CSV line parser that handles quoted fields.
-  List<String> _parseCsvLine(String line) {
-    final result = <String>[];
-    var current = StringBuffer();
-    var inQuotes = false;
-
-    for (var i = 0; i < line.length; i++) {
-      final c = line[i];
-      if (c == '"') {
-        inQuotes = !inQuotes;
-      } else if (c == ',' && !inQuotes) {
-        result.add(current.toString().trim());
-        current = StringBuffer();
-      } else {
-        current.write(c);
-      }
-    }
-    result.add(current.toString().trim());
-    return result;
   }
 
   @override
