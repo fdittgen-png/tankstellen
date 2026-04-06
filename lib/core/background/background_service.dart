@@ -9,6 +9,7 @@ import '../../features/search/domain/entities/fuel_type.dart';
 import '../../features/widget/data/home_widget_service.dart';
 import '../notifications/notification_service.dart';
 import '../storage/hive_storage.dart';
+import 'background_retry.dart';
 
 /// Manages periodic background tasks via Android WorkManager.
 ///
@@ -52,6 +53,12 @@ class BackgroundService {
 
   /// Receive timeout for Tankerkoenig prices batch requests in the BG isolate.
   static const bgReceiveTimeout = Duration(seconds: 15);
+
+  /// Max retry attempts for transient network failures in the background task.
+  static const maxRetryAttempts = 3;
+
+  /// Base delay for exponential backoff between retries.
+  static const retryBaseDelay = Duration(seconds: 2);
 
   static Future<void> init() async {
     await Workmanager().initialize(callbackDispatcher);
@@ -109,38 +116,39 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     final now = DateTime.now();
     final prices = <String, Map<String, dynamic>>{};
     if (apiKey != null && apiKey.isNotEmpty) {
-      try {
-        final dio = Dio(BaseOptions(
-          connectTimeout: BackgroundService.bgConnectTimeout,
-          receiveTimeout: BackgroundService.bgReceiveTimeout,
-        ));
+      final dio = Dio(BaseOptions(
+        connectTimeout: BackgroundService.bgConnectTimeout,
+        receiveTimeout: BackgroundService.bgReceiveTimeout,
+      ));
 
-        // Tankerkoenig prices endpoint (batch)
-        const batchSize = BackgroundService.tankerkoenigBatchSize;
-        for (var i = 0; i < allStationIds.length; i += batchSize) {
-          final batch = allStationIds.sublist(
-            i,
-            i + batchSize > allStationIds.length ? allStationIds.length : i + batchSize,
-          );
-          final ids = batch.join(',');
-          final response = await dio.get(
-            'https://creativecommons.tankerkoenig.de/json/prices.php',
-            queryParameters: {'ids': ids, 'apikey': apiKey},
-          );
-          final data = response.data as Map<String, dynamic>;
-          if (data['ok'] == true && data['prices'] != null) {
-            final rawPrices = data['prices'] as Map<String, dynamic>;
-            for (final entry in rawPrices.entries) {
-              if (entry.value is Map) {
-                prices[entry.key] = Map<String, dynamic>.from(entry.value as Map);
-              }
+      // Tankerkoenig prices endpoint (batch) with retry
+      const batchSize = BackgroundService.tankerkoenigBatchSize;
+      for (var i = 0; i < allStationIds.length; i += batchSize) {
+        final batch = allStationIds.sublist(
+          i,
+          i + batchSize > allStationIds.length ? allStationIds.length : i + batchSize,
+        );
+        final ids = batch.join(',');
+
+        final data = await fetchWithRetry(
+          dio: dio,
+          url: 'https://creativecommons.tankerkoenig.de/json/prices.php',
+          queryParameters: {'ids': ids, 'apikey': apiKey},
+          config: const BackgroundRetryConfig(
+            maxAttempts: BackgroundService.maxRetryAttempts,
+            baseDelay: BackgroundService.retryBaseDelay,
+          ),
+        );
+        if (data != null && data['ok'] == true && data['prices'] != null) {
+          final rawPrices = data['prices'] as Map<String, dynamic>;
+          for (final entry in rawPrices.entries) {
+            if (entry.value is Map) {
+              prices[entry.key] = Map<String, dynamic>.from(entry.value as Map);
             }
           }
         }
-        debugPrint('BackgroundService: fetched prices for ${prices.length} stations');
-      } catch (e) {
-        debugPrint('BackgroundService: price fetch failed: $e');
       }
+      debugPrint('BackgroundService: fetched prices for ${prices.length} stations');
     }
 
     // 3. Record price history for each station
@@ -197,7 +205,7 @@ Future<void> _refreshPricesAndCheckAlerts() async {
       }
     }
 
-    // 5. Evaluate alerts
+    // 5. Evaluate alerts (prices may be empty if all retries failed)
     final activeAlerts = alerts.where((a) => a.isActive).toList();
 
     if (activeAlerts.isNotEmpty && prices.isNotEmpty) {
