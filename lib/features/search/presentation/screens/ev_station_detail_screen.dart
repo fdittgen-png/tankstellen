@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/widgets/star_rating.dart';
@@ -73,10 +73,8 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
   }
 
   void _navigateToStation() {
-    final url = 'https://www.google.com/maps/dir/?api=1'
-        '&destination=${_station.lat},${_station.lng}'
-        '&travelmode=driving';
-    launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    NavigationUtils.openInMaps(_station.lat, _station.lng,
+        label: _station.name);
   }
 
   @override
