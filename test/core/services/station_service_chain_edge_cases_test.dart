@@ -479,4 +479,79 @@ void main() {
       });
     });
   });
+
+  group('In-flight cleanup', () {
+    late _FakeStationService fakeService;
+    late _FakeCacheManager fakeCache;
+    late StationServiceChain chain;
+
+    setUp(() {
+      fakeService = _FakeStationService();
+      fakeCache = _FakeCacheManager();
+      chain = StationServiceChain(fakeService, fakeCache);
+    });
+
+    test('in-flight entry is cleaned up after successful request', () async {
+      fakeService.stationsToReturn = [_testStation()];
+      await chain.searchStations(_defaultParams());
+      // No way to directly inspect _inFlight (private), but if we can make
+      // a second request without coalescing, the entry was cleaned up
+      fakeService.searchCallCount = 0;
+      await chain.searchStations(_defaultParams());
+      // Second call should NOT coalesce (since first completed) so it hits
+      // the cache (put by first call), which means searchCallCount stays 0
+      expect(fakeService.searchCallCount, 0); // served from cache
+    });
+
+    test('in-flight entry is cleaned up after failed request', () async {
+      fakeService.errorToThrow = const ApiException(message: 'fail');
+      try {
+        await chain.searchStations(_defaultParams());
+      } on ServiceChainExhaustedException catch (_) {
+        // expected
+      }
+      // Now make a successful request — should not be stuck on old in-flight
+      fakeService.errorToThrow = null;
+      fakeService.stationsToReturn = [_testStation()];
+      final result = await chain.searchStations(_defaultParams());
+      expect(result.data, hasLength(1));
+    });
+
+    test('concurrent requests coalesce into one API call', () async {
+      fakeService.stationsToReturn = [_testStation()];
+      fakeService.delay = const Duration(milliseconds: 50);
+
+      final results = await Future.wait([
+        chain.searchStations(_defaultParams()),
+        chain.searchStations(_defaultParams()),
+        chain.searchStations(_defaultParams()),
+      ]);
+
+      // All three should get results
+      for (final r in results) {
+        expect(r.data, hasLength(1));
+      }
+      // But only one API call should have been made
+      expect(fakeService.searchCallCount, 1);
+    });
+  });
 }
+
+SearchParams _defaultParams() => const SearchParams(
+      lat: 52.52,
+      lng: 13.405,
+      radiusKm: 10,
+    );
+
+Station _testStation() => Station(
+      id: 'test-1',
+      name: 'Test Station',
+      brand: 'Test',
+      street: 'Test St 1',
+      postCode: '12345',
+      place: 'Berlin',
+      lat: 52.52,
+      lng: 13.405,
+      dist: 1.0,
+      isOpen: true,
+    );

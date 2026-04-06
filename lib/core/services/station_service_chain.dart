@@ -25,7 +25,13 @@ class StationServiceChain implements StationService {
 
   /// In-flight request deduplication: concurrent calls for the same cache key
   /// share a single Future instead of hitting the API multiple times.
+  /// Entries are removed in the finally block of [_throughChain] and also
+  /// evicted if older than [_inFlightMaxAge] to prevent leaks.
   final _inFlight = <String, Future<ServiceResult<dynamic>>>{};
+  final _inFlightTimestamps = <String, DateTime>{};
+
+  /// Max time an entry can stay in _inFlight before forced eviction.
+  static const _inFlightMaxAge = Duration(minutes: 2);
 
   StationServiceChain(this._primary, this._cache, {
     ServiceSource errorSource = ServiceSource.tankerkoenigApi,
@@ -47,16 +53,22 @@ class StationServiceChain implements StationService {
     required Duration ttl,
     bool Function(T data)? isValid,
   }) async {
+    // Evict any stale in-flight entries that were not cleaned up
+    _evictStaleInFlight();
+
     // Coalesce: if an identical request is already in-flight, await it
     if (_inFlight.containsKey(cacheKey)) {
       final result = await _inFlight[cacheKey]!;
-      return ServiceResult<T>(
-        data: result.data as T,
-        source: result.source,
-        fetchedAt: result.fetchedAt,
-        isStale: result.isStale,
-        errors: result.errors,
-      );
+      if (result.data is T) {
+        return ServiceResult<T>(
+          data: result.data as T,
+          source: result.source,
+          fetchedAt: result.fetchedAt,
+          isStale: result.isStale,
+          errors: result.errors,
+        );
+      }
+      // Type mismatch from coalesced result — fall through to fresh request
     }
 
     final future = _executeChain<T>(
@@ -68,10 +80,12 @@ class StationServiceChain implements StationService {
       isValid: isValid,
     );
     _inFlight[cacheKey] = future;
+    _inFlightTimestamps[cacheKey] = DateTime.now();
     try {
       return await future;
     } finally {
       _inFlight.remove(cacheKey);
+      _inFlightTimestamps.remove(cacheKey);
     }
   }
 
@@ -178,6 +192,21 @@ class StationServiceChain implements StationService {
         deserialize: _deserializePrices,
         ttl: CacheTtl.prices,
       );
+
+  /// Remove in-flight entries older than [_inFlightMaxAge].
+  /// Guards against orphaned futures from unhandled exceptions or timeouts.
+  void _evictStaleInFlight() {
+    final now = DateTime.now();
+    final staleKeys = _inFlightTimestamps.entries
+        .where((e) => now.difference(e.value) > _inFlightMaxAge)
+        .map((e) => e.key)
+        .toList();
+    for (final key in staleKeys) {
+      _inFlight.remove(key);
+      _inFlightTimestamps.remove(key);
+      debugPrint('StationServiceChain: evicted stale in-flight entry: $key');
+    }
+  }
 
   // --- Serialization helpers (JSON-safe for Hive storage) ---
 
