@@ -31,8 +31,8 @@ class LocationService {
     if (permission == LocationPermission.deniedForever) {
       throw const LocationException(
         message:
-            'Standortberechtigung wurde dauerhaft verweigert. '
-            'Bitte aktivieren Sie sie in den Einstellungen.',
+            'Location permission permanently denied. '
+            'Please enable it in Settings.',
       );
     }
 
