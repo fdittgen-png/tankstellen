@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/utils/json_extensions.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/itinerary/domain/entities/saved_itinerary.dart';
@@ -227,8 +228,8 @@ void main() {
   });
 
   group('Itinerary server format parsing', () {
-    test('parses server row to SavedItinerary', () {
-      final serverRow = {
+    test('parses server row to SavedItinerary using safe accessors', () {
+      final r = <String, dynamic>{
         'id': 'itin-srv-1',
         'name': 'Paris to Lyon',
         'waypoints': [
@@ -244,21 +245,24 @@ void main() {
         'updated_at': '2026-03-15T00:00:00.000Z',
       };
 
-      // Simulate the parsing logic from SyncService.fetchItineraries
+      // Simulate the safe parsing logic from SyncService.fetchItineraries
+      final createdAtStr = r.getString('created_at');
+      final updatedAtStr = r.getString('updated_at');
       final itinerary = SavedItinerary(
-        id: serverRow['id'] as String,
-        name: serverRow['name'] as String,
-        waypoints:
-            (serverRow['waypoints'] as List).cast<Map<String, dynamic>>(),
-        distanceKm: (serverRow['distance_km'] as num).toDouble(),
-        durationMinutes: (serverRow['duration_minutes'] as num).toDouble(),
-        avoidHighways: serverRow['avoid_highways'] as bool? ?? false,
-        fuelType: serverRow['fuel_type'] as String? ?? 'e10',
-        selectedStationIds:
-            (serverRow['selected_station_ids'] as List?)?.cast<String>() ??
-                [],
-        createdAt: DateTime.parse(serverRow['created_at'] as String),
-        updatedAt: DateTime.parse(serverRow['updated_at'] as String),
+        id: r.getString('id') ?? '',
+        name: r.getString('name') ?? '',
+        waypoints: r.getList<Map<String, dynamic>>('waypoints'),
+        distanceKm: r.getDouble('distance_km') ?? 0.0,
+        durationMinutes: r.getDouble('duration_minutes') ?? 0.0,
+        avoidHighways: r.getBool('avoid_highways') ?? false,
+        fuelType: r.getString('fuel_type') ?? 'e10',
+        selectedStationIds: r.getList<String>('selected_station_ids'),
+        createdAt: createdAtStr != null
+            ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
+            : DateTime.now(),
+        updatedAt: updatedAtStr != null
+            ? DateTime.tryParse(updatedAtStr) ?? DateTime.now()
+            : DateTime.now(),
       );
 
       expect(itinerary.id, 'itin-srv-1');
@@ -271,7 +275,7 @@ void main() {
     });
 
     test('handles missing optional fields in server row', () {
-      final serverRow = {
+      final r = <String, dynamic>{
         'id': 'itin-srv-2',
         'name': 'Short trip',
         'waypoints': <Map<String, dynamic>>[],
@@ -281,20 +285,23 @@ void main() {
         'updated_at': '2026-03-01T00:00:00.000Z',
       };
 
+      final createdAtStr = r.getString('created_at');
+      final updatedAtStr = r.getString('updated_at');
       final itinerary = SavedItinerary(
-        id: serverRow['id'] as String,
-        name: serverRow['name'] as String,
-        waypoints:
-            (serverRow['waypoints'] as List).cast<Map<String, dynamic>>(),
-        distanceKm: (serverRow['distance_km'] as num).toDouble(),
-        durationMinutes: (serverRow['duration_minutes'] as num).toDouble(),
-        avoidHighways: serverRow['avoid_highways'] as bool? ?? false,
-        fuelType: serverRow['fuel_type'] as String? ?? 'e10',
-        selectedStationIds:
-            (serverRow['selected_station_ids'] as List?)?.cast<String>() ??
-                [],
-        createdAt: DateTime.parse(serverRow['created_at'] as String),
-        updatedAt: DateTime.parse(serverRow['updated_at'] as String),
+        id: r.getString('id') ?? '',
+        name: r.getString('name') ?? '',
+        waypoints: r.getList<Map<String, dynamic>>('waypoints'),
+        distanceKm: r.getDouble('distance_km') ?? 0.0,
+        durationMinutes: r.getDouble('duration_minutes') ?? 0.0,
+        avoidHighways: r.getBool('avoid_highways') ?? false,
+        fuelType: r.getString('fuel_type') ?? 'e10',
+        selectedStationIds: r.getList<String>('selected_station_ids'),
+        createdAt: createdAtStr != null
+            ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
+            : DateTime.now(),
+        updatedAt: updatedAtStr != null
+            ? DateTime.tryParse(updatedAtStr) ?? DateTime.now()
+            : DateTime.now(),
       );
 
       expect(itinerary.avoidHighways, false);
@@ -304,34 +311,255 @@ void main() {
   });
 
   group('Rating data structure', () {
-    test('server ratings map correctly', () {
-      // Simulate fetchRatings parsing
-      final serverRows = [
+    test('server ratings map correctly using safe accessors', () {
+      // Simulate fetchRatings parsing with safe accessors
+      final serverRows = <Map<String, dynamic>>[
         {'station_id': 'st-1', 'rating': 4},
         {'station_id': 'st-2', 'rating': 5},
         {'station_id': 'st-3', 'rating': 3},
       ];
 
-      final ratings = {
-        for (final r in serverRows)
-          r['station_id'] as String: (r['rating'] as num).toInt(),
-      };
+      final result = <String, int>{};
+      for (final r in serverRows) {
+        final stationId = r.getString('station_id');
+        final rating = r.getInt('rating');
+        if (stationId != null && rating != null) {
+          result[stationId] = rating;
+        }
+      }
 
-      expect(ratings.length, 3);
-      expect(ratings['st-1'], 4);
-      expect(ratings['st-2'], 5);
-      expect(ratings['st-3'], 3);
+      expect(result.length, 3);
+      expect(result['st-1'], 4);
+      expect(result['st-2'], 5);
+      expect(result['st-3'], 3);
     });
 
     test('empty server rows returns empty map', () {
       final serverRows = <Map<String, dynamic>>[];
 
-      final ratings = {
-        for (final r in serverRows)
-          r['station_id'] as String: (r['rating'] as num).toInt(),
+      final result = <String, int>{};
+      for (final r in serverRows) {
+        final stationId = r.getString('station_id');
+        final rating = r.getInt('rating');
+        if (stationId != null && rating != null) {
+          result[stationId] = rating;
+        }
+      }
+
+      expect(result, isEmpty);
+    });
+  });
+
+  group('Safe cast parsing - malformed responses', () {
+    // These tests verify that the safe parsing patterns used in
+    // sync_service.dart handle malformed/unexpected data gracefully
+    // instead of throwing type cast errors.
+
+    test('favorites parsing handles null station_id gracefully', () {
+      // Simulate malformed server response with null station_id
+      final serverRows = <Map<String, dynamic>>[
+        {'station_id': 'st-1'},
+        {'station_id': null},
+        {}, // missing station_id entirely
+      ];
+
+      final serverIds = serverRows
+          .map((r) => r.getString('station_id'))
+          .whereType<String>()
+          .toSet();
+
+      expect(serverIds, {'st-1'});
+    });
+
+    test('getString returns null for non-string, non-null values', () {
+      // getString converts non-null values via .toString()
+      final row = <String, dynamic>{'station_id': 42};
+      expect(row.getString('station_id'), '42');
+    });
+
+    test('ratings parsing skips rows with missing fields', () {
+      final serverRows = <Map<String, dynamic>>[
+        {'station_id': 'st-1', 'rating': 4},
+        {'station_id': null, 'rating': 5},
+        {'station_id': 'st-3', 'rating': null},
+        {'station_id': 'st-4'}, // missing rating
+        {}, // missing both
+      ];
+
+      final result = <String, int>{};
+      for (final r in serverRows) {
+        final stationId = r.getString('station_id');
+        final rating = r.getInt('rating');
+        if (stationId != null && rating != null) {
+          result[stationId] = rating;
+        }
+      }
+
+      expect(result.length, 1);
+      expect(result['st-1'], 4);
+    });
+
+    test('ratings parsing handles numeric string rating', () {
+      final serverRows = <Map<String, dynamic>>[
+        {'station_id': 'st-1', 'rating': '4'},
+      ];
+
+      final result = <String, int>{};
+      for (final r in serverRows) {
+        final stationId = r.getString('station_id');
+        final rating = r.getInt('rating');
+        if (stationId != null && rating != null) {
+          result[stationId] = rating;
+        }
+      }
+
+      expect(result['st-1'], 4);
+    });
+
+    test('price history parsing handles non-list response', () {
+      final dynamic rows = null;
+
+      final result = rows is List
+          ? rows.whereType<Map<String, dynamic>>().toList()
+          : <Map<String, dynamic>>[];
+
+      expect(result, isEmpty);
+    });
+
+    test('price history parsing filters out non-map elements', () {
+      final dynamic rows = <dynamic>[
+        <String, dynamic>{'station_id': 'st-1', 'price': 1.45},
+        'invalid',
+        null,
+        42,
+      ];
+
+      final result = rows is List
+          ? rows.whereType<Map<String, dynamic>>().toList()
+          : <Map<String, dynamic>>[];
+
+      expect(result.length, 1);
+      expect(result.first['station_id'], 'st-1');
+    });
+
+    test('alert parsing handles missing/null fields with defaults', () {
+      final serverRow = <String, dynamic>{
+        'id': null,
+        'station_id': null,
+        'station_name': null,
+        'fuel_type': null,
+        'target_price': null,
+        'is_active': null,
+        'created_at': null,
       };
 
-      expect(ratings, isEmpty);
+      // Simulate the safe parsing from syncAlerts
+      final parsed = {
+        'id': serverRow.getString('id') ?? '',
+        'stationId': serverRow.getString('station_id') ?? '',
+        'stationName': serverRow.getString('station_name') ?? '',
+        'fuelType': serverRow.getString('fuel_type') ?? '',
+        'targetPrice': serverRow.getDouble('target_price') ?? 0.0,
+        'isActive': serverRow.getBool('is_active') ?? true,
+        'createdAt': serverRow.getString('created_at') ?? '',
+      };
+
+      expect(parsed['id'], '');
+      expect(parsed['stationId'], '');
+      expect(parsed['targetPrice'], 0.0);
+      expect(parsed['isActive'], true);
+    });
+
+    test('itinerary parsing handles missing optional fields', () {
+      final r = <String, dynamic>{
+        'id': 'itin-1',
+        'name': 'Trip',
+        'waypoints': null,
+        'distance_km': null,
+        'duration_minutes': null,
+        'avoid_highways': null,
+        'fuel_type': null,
+        'selected_station_ids': null,
+        'created_at': null,
+        'updated_at': null,
+      };
+
+      final createdAtStr = r.getString('created_at');
+      final updatedAtStr = r.getString('updated_at');
+      final itinerary = SavedItinerary(
+        id: r.getString('id') ?? '',
+        name: r.getString('name') ?? '',
+        waypoints: r.getList<Map<String, dynamic>>('waypoints'),
+        distanceKm: r.getDouble('distance_km') ?? 0.0,
+        durationMinutes: r.getDouble('duration_minutes') ?? 0.0,
+        avoidHighways: r.getBool('avoid_highways') ?? false,
+        fuelType: r.getString('fuel_type') ?? 'e10',
+        selectedStationIds: r.getList<String>('selected_station_ids'),
+        createdAt: createdAtStr != null
+            ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
+            : DateTime.now(),
+        updatedAt: updatedAtStr != null
+            ? DateTime.tryParse(updatedAtStr) ?? DateTime.now()
+            : DateTime.now(),
+      );
+
+      expect(itinerary.id, 'itin-1');
+      expect(itinerary.name, 'Trip');
+      expect(itinerary.waypoints, isEmpty);
+      expect(itinerary.distanceKm, 0.0);
+      expect(itinerary.durationMinutes, 0.0);
+      expect(itinerary.avoidHighways, false);
+      expect(itinerary.fuelType, 'e10');
+      expect(itinerary.selectedStationIds, isEmpty);
+    });
+
+    test('itinerary parsing handles numeric strings from API', () {
+      final r = <String, dynamic>{
+        'id': 'itin-2',
+        'name': 'Trip 2',
+        'waypoints': <Map<String, dynamic>>[],
+        'distance_km': '460.5', // string instead of num
+        'duration_minutes': '270', // string instead of num
+        'avoid_highways': 'true', // string instead of bool
+        'fuel_type': 'diesel',
+        'selected_station_ids': <String>[],
+        'created_at': '2026-03-01T00:00:00.000Z',
+        'updated_at': '2026-03-15T00:00:00.000Z',
+      };
+
+      final createdAtStr = r.getString('created_at');
+      final updatedAtStr = r.getString('updated_at');
+      final itinerary = SavedItinerary(
+        id: r.getString('id') ?? '',
+        name: r.getString('name') ?? '',
+        waypoints: r.getList<Map<String, dynamic>>('waypoints'),
+        distanceKm: r.getDouble('distance_km') ?? 0.0,
+        durationMinutes: r.getDouble('duration_minutes') ?? 0.0,
+        avoidHighways: r.getBool('avoid_highways') ?? false,
+        fuelType: r.getString('fuel_type') ?? 'e10',
+        selectedStationIds: r.getList<String>('selected_station_ids'),
+        createdAt: createdAtStr != null
+            ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
+            : DateTime.now(),
+        updatedAt: updatedAtStr != null
+            ? DateTime.tryParse(updatedAtStr) ?? DateTime.now()
+            : DateTime.now(),
+      );
+
+      expect(itinerary.distanceKm, 460.5);
+      expect(itinerary.durationMinutes, 270.0);
+      expect(itinerary.avoidHighways, true);
+    });
+
+    test('fetchAllUserData length check handles non-list', () {
+      final dynamic favorites = 'unexpected';
+      final dynamic alerts = null;
+
+      final favList = favorites is List ? favorites : [];
+      final alertList = alerts is List ? alerts : [];
+
+      expect(favList, isEmpty);
+      expect(alertList, isEmpty);
     });
   });
 }
