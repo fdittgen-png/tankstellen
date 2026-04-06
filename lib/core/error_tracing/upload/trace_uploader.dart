@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../constants/app_constants.dart';
+import '../../services/dio_factory.dart';
 import '../../storage/hive_storage.dart';
 import '../models/error_trace.dart';
 import 'trace_upload_config.dart';
@@ -44,17 +44,19 @@ class TraceUploader {
     }
 
     try {
-      final dio = Dio(BaseOptions(
+      final dio = DioFactory.create(
         connectTimeout: const Duration(seconds: 5),
         receiveTimeout: const Duration(seconds: 5),
-        headers: {
-          'User-Agent': AppConstants.userAgent,
+      );
+      await dio.post(
+        config.serverUrl!,
+        data: trace.toJson(),
+        options: Options(headers: {
           'Content-Type': 'application/json',
           if (config.authToken != null && config.authToken!.isNotEmpty)
             'Authorization': 'Bearer ${config.authToken}',
-        },
-      ));
-      await dio.post(config.serverUrl!, data: trace.toJson());
+        }),
+      );
     } on DioException catch (e) {
       debugPrint('TraceUploader: upload failed: $e');
     }

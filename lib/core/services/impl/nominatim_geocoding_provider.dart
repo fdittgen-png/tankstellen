@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../../error/exceptions.dart';
+import '../dio_factory.dart';
 import '../geocoding_provider.dart';
 import '../service_config.dart';
 import '../service_result.dart';
@@ -15,12 +16,11 @@ class NominatimGeocodingProvider implements GeocodingProvider {
 
   NominatimGeocodingProvider({String countryCode = 'de'})
       : _countryCode = countryCode.toLowerCase(),
-        _dio = Dio(BaseOptions(
+        _dio = DioFactory.create(
           baseUrl: ServiceConfigs.nominatim.baseUrl,
           connectTimeout: ServiceConfigs.nominatim.connectTimeout,
           receiveTimeout: ServiceConfigs.nominatim.receiveTimeout,
-          headers: ServiceConfigs.nominatim.headers,
-        ));
+        );
 
   @override
   ServiceSource get source => ServiceSource.nominatimGeocoding;
