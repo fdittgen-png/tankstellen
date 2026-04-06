@@ -47,20 +47,21 @@ class TankSyncClient {
   /// Returns the user ID on success, or `null` if the client is not ready.
   /// Also ensures the user exists in `public.users` (required by FK constraints).
   static Future<String?> signInAnonymously() async {
-    if (client == null) return null;
-    final response = await client!.auth.signInAnonymously();
+    final c = client;
+    if (c == null) return null;
+    final response = await c.auth.signInAnonymously();
     final userId = response.user?.id;
     if (userId != null) {
       // Ensure user exists in public.users table.
       // Supabase auth creates auth.users but NOT public.users.
       // The FK constraint on favorites/alerts requires public.users to exist.
       try {
-        await client!.from('users').upsert(
+        await c.from('users').upsert(
           {'id': userId},
           onConflict: 'id',
         );
-      } catch (e) { debugPrint('Silent catch: $e');
-        // Ignore — user may already exist
+      } catch (e) {
+        debugPrint('TankSync: users upsert failed: $e');
       }
     }
     return userId;
@@ -68,32 +69,38 @@ class TankSyncClient {
 
   /// Sign up with email and password. Creates both auth.users and public.users rows.
   static Future<String?> signUpWithEmail(String email, String password) async {
-    if (client == null) return null;
-    final response = await client!.auth.signUp(
+    final c = client;
+    if (c == null) return null;
+    final response = await c.auth.signUp(
       email: email,
       password: password,
     );
     final userId = response.user?.id;
     if (userId != null) {
       try {
-        await client!.from('users').upsert({'id': userId}, onConflict: 'id');
-      } catch (e) { debugPrint('Silent catch: $e');}
+        await c.from('users').upsert({'id': userId}, onConflict: 'id');
+      } catch (e) {
+        debugPrint('TankSync: users upsert failed: $e');
+      }
     }
     return userId;
   }
 
   /// Sign in with existing email account.
   static Future<String?> signInWithEmail(String email, String password) async {
-    if (client == null) return null;
-    final response = await client!.auth.signInWithPassword(
+    final c = client;
+    if (c == null) return null;
+    final response = await c.auth.signInWithPassword(
       email: email,
       password: password,
     );
     final userId = response.user?.id;
     if (userId != null) {
       try {
-        await client!.from('users').upsert({'id': userId}, onConflict: 'id');
-      } catch (e) { debugPrint('Silent catch: $e');}
+        await c.from('users').upsert({'id': userId}, onConflict: 'id');
+      } catch (e) {
+        debugPrint('TankSync: users upsert failed: $e');
+      }
     }
     return userId;
   }
@@ -102,14 +109,16 @@ class TankSyncClient {
   static String? get currentEmail => client?.auth.currentUser?.email;
 
   /// Whether the current user has an email account (not anonymous).
-  static bool get hasEmailAccount =>
-      client?.auth.currentUser?.email != null &&
-      client!.auth.currentUser!.email!.isNotEmpty;
+  static bool get hasEmailAccount {
+    final email = client?.auth.currentUser?.email;
+    return email != null && email.isNotEmpty;
+  }
 
   /// Sign out and reset the initialisation flag so [init] can be called again.
   static Future<void> signOut() async {
-    if (client == null) return;
-    await client!.auth.signOut();
+    final c = client;
+    if (c == null) return;
+    await c.auth.signOut();
     _initialized = false;
   }
 }
