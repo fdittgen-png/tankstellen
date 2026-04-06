@@ -164,6 +164,46 @@ void main() {
       }
     });
 
+    test('CarAppService does not use ALLOW_ALL_HOSTS_VALIDATOR in release', () {
+      final carAppFile = File(
+        'android/app/src/main/kotlin/de/tankstellen/tankstellen/TankstellenCarAppService.kt',
+      );
+      expect(carAppFile.existsSync(), isTrue,
+          reason: 'CarAppService.kt must exist');
+
+      final content = carAppFile.readAsStringSync();
+      final lines = content.split('\n');
+
+      // Find lines that use ALLOW_ALL_HOSTS_VALIDATOR outside the debug block
+      // The only acceptable use is inside the debug-only if-branch
+      var inDebugBlock = false;
+      final violations = <String>[];
+
+      for (var i = 0; i < lines.length; i++) {
+        final line = lines[i];
+        // Track when we enter the debug-only branch
+        if (line.contains('FLAG_DEBUGGABLE')) {
+          inDebugBlock = true;
+          continue;
+        }
+        if (inDebugBlock && line.contains('ALLOW_ALL_HOSTS_VALIDATOR')) {
+          inDebugBlock = false; // consume the debug-only usage
+          continue;
+        }
+        if (line.contains('ALLOW_ALL_HOSTS_VALIDATOR')) {
+          violations.add('Line ${i + 1}: $line');
+        }
+      }
+
+      if (violations.isNotEmpty) {
+        fail(
+          'ALLOW_ALL_HOSTS_VALIDATOR used outside debug block:\n'
+          '${violations.join('\n')}\n'
+          'Release builds must use HostValidator.Builder with allowlisted hosts.',
+        );
+      }
+    });
+
     test('no private keys or PEM blocks', () {
       final pemPattern = RegExp(
         r'-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----',

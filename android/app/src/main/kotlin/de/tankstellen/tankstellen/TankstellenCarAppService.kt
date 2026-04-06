@@ -28,12 +28,15 @@ import androidx.car.app.validation.HostValidator
 class TankstellenCarAppService : CarAppService() {
 
     override fun createHostValidator(): HostValidator {
-        // Allow all hosts in debug, restrict in release
-        return if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
-            HostValidator.ALLOW_ALL_HOSTS_VALIDATOR
-        } else {
-            HostValidator.ALLOW_ALL_HOSTS_VALIDATOR // TODO: restrict for production
+        // Allow all hosts in debug builds for testing
+        if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+            return HostValidator.ALLOW_ALL_HOSTS_VALIDATOR
         }
+
+        // In release, only allow known Android Auto host packages
+        return HostValidator.Builder(applicationContext)
+            .addAllowedHosts(androidx.car.app.R.array.hosts_allowlist_sample)
+            .build()
     }
 
     override fun onCreateSession(sessionInfo: SessionInfo): Session {
