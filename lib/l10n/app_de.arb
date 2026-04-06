@@ -321,5 +321,8 @@
       "name": { "type": "String" }
     }
   },
-  "refreshFailed": "Aktualisierung fehlgeschlagen. Bitte erneut versuchen."
+  "refreshFailed": "Aktualisierung fehlgeschlagen. Bitte erneut versuchen.",
+  "deleteProfileTitle": "Profil löschen?",
+  "deleteProfileBody": "Dieses Profil und seine Einstellungen werden unwiderruflich gelöscht.",
+  "deleteProfileConfirm": "Profil löschen"
 }

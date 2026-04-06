@@ -18,7 +18,13 @@
   "open": "Auki",
   "closed": "Suljettu",
   "distance": "{distance} päässä",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Hinta",
   "prices": "Hinnat",
   "address": "Osoite",
@@ -64,14 +70,26 @@
   "clearAllData": "Poista kaikki tiedot",
   "errorLog": "Virheloki",
   "stationsFound": "{count} asemaa löytyi",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "locationDenied": "Sijaintilupa evätty. Voit hakea postinumerolla.",
   "demoModeBanner": "Demotila. Määritä API-avain asetuksissa.",
   "sortDistance": "Etäisyys",
   "cheap": "halpa",
   "expensive": "kallis",
   "stationsOnMap": "{count} asemaa",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Ladataan suosikkeja...\nHae asemia ensin tietojen tallentamiseksi.",
   "reportPrice": "Ilmoita hinta",
   "whatsWrong": "Mikä on vialla?",
@@ -88,12 +106,36 @@
   "location": "Sijainti",
   "switchProfileTitle": "Maa vaihtui",
   "switchProfilePrompt": "Olet nyt maassa {country}. Vaihda profiiliin \"{profile}\"?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Vaihdettu profiiliin \"{profile}\" ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Ei profiilia tälle maalle",
   "noProfileForCountry": "Olet maassa {country}, mutta profiilia ei ole määritetty. Luo sellainen Asetuksissa.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Automaattinen profiilivaihto",
   "autoSwitchDescription": "Vaihda profiilia automaattisesti rajan ylittyessä",
   "switchProfile": "Vaihda",
@@ -130,9 +172,21 @@
   "priceQuery": "Hintakysely",
   "zipGeocoding": "Postinumeron geokoodaus",
   "minutes": "{n} minuuttia",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} tuntia",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Tyhjennä välimuisti?",
   "clearCacheBody": "Välimuistissa olevat hakutulokset ja hinnat poistetaan. Profiilit, suosikit ja asetukset säilytetään.",
   "clearCacheButton": "Tyhjennä välimuisti",
@@ -155,38 +209,55 @@
   "lastUpdate": "Viimeisin päivitys",
   "automate24h": "24t/24 — Automaatti",
   "refreshPrices": "Päivitä hinnat",
-  "station": "Huoltoasema"
-  ,"allFuels": "Kaikki",
+  "station": "Huoltoasema",
+  "allFuels": "Kaikki",
   "priceAlerts": "Hintahälytykset",
   "noPriceAlerts": "Ei hintahälytyksiä",
   "noPriceAlertsHint": "Luo hälytys aseman tietosivulta.",
   "alertDeleted": "Hälytys \"{name}\" poistettu",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Luo hintahälytys",
   "currentPrice": "Nykyinen hinta: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Tavoitehinta (EUR)",
   "enterPrice": "Anna hinta",
   "invalidPrice": "Virheellinen hinta",
   "priceTooHigh": "Hinta liian korkea",
   "create": "Luo",
-  "alertCreated": "Hintahälytys luotu"
-  ,"wrongE5Price": "Väärä Super E5 hinta"
-  ,"wrongE10Price": "Väärä Super E10 hinta"
-  ,"wrongDieselPrice": "Väärä Diesel hinta"
-  ,"wrongStatusOpen": "Näytetään avoimena, mutta suljettu"
-  ,"wrongStatusClosed": "Näytetään suljettuna, mutta avoinna"
-  ,"searchAlongRouteLabel": "Reitin varrella"
-  ,"searchEvStations": "Etsi latausasemia"
-  ,"allStations": "Kaikki asemat"
-  ,"bestStops": "Parhaat pysähdykset"
-  ,"openInMaps": "Avaa Kartoissa"
-  ,"noStationsAlongRoute": "Ei asemia reitin varrella",
-
+  "alertCreated": "Hintahälytys luotu",
+  "wrongE5Price": "Väärä Super E5 hinta",
+  "wrongE10Price": "Väärä Super E10 hinta",
+  "wrongDieselPrice": "Väärä Diesel hinta",
+  "wrongStatusOpen": "Näytetään avoimena, mutta suljettu",
+  "wrongStatusClosed": "Näytetään suljettuna, mutta avoinna",
+  "searchAlongRouteLabel": "Reitin varrella",
+  "searchEvStations": "Etsi latausasemia",
+  "allStations": "Kaikki asemat",
+  "bestStops": "Parhaat pysähdykset",
+  "openInMaps": "Avaa Kartoissa",
+  "noStationsAlongRoute": "Ei asemia reitin varrella",
   "evOperational": "Toiminnassa",
   "evStatusUnknown": "Tila tuntematon",
   "evConnectors": "Liittimet ({count} pistettä)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Ei liitintietoja saatavilla",
   "evUsageCost": "Käyttökustannus",
   "evPricingUnavailable": "Hintatietoa ei saatavilla palveluntarjoajalta",
@@ -198,7 +269,6 @@
   "evRefreshStatus": "Päivitä tila",
   "evStatusUpdated": "Tila päivitetty",
   "evStationNotFound": "Päivitys epäonnistui — asemaa ei löytynyt läheltä",
-
   "addedToFavorites": "Lisätty suosikkeihin",
   "removedFromFavorites": "Poistettu suosikeista",
   "addFavorite": "Lisää suosikkeihin",
@@ -206,7 +276,6 @@
   "currentLocation": "Nykyinen sijainti",
   "gpsError": "GPS-virhe",
   "couldNotResolve": "Lähtöpaikkaa tai määränpäätä ei voitu selvittää",
-
   "start": "Lähtö",
   "destination": "Määränpää",
   "cityAddressOrGps": "Kaupunki, osoite tai GPS",
@@ -214,15 +283,32 @@
   "useGps": "Käytä GPS:ää",
   "stop": "Pysähdys",
   "stopN": "Pysähdys {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Lisää pysähdys",
   "searchAlongRoute": "Hae reitin varrelta",
   "cheapest": "Halvin",
   "nStations": "{count} asemaa",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} parasta",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Polttoainehinnat (Tankerkoenig)",
   "requiredForFuelSearch": "Vaaditaan polttoainehintahakuun Saksassa",
   "evChargingOpenChargeMap": "Sähköauton lataus (OpenChargeMap)",
@@ -235,10 +321,15 @@
   "tankerkoenigApiKey": "Tankerkoenig API-avain",
   "evChargingApiKey": "Sähköauton lataus API-avain",
   "openChargeMapApiKey": "OpenChargeMap API-avain",
-
   "routeSegment": "Reittisegmentti",
   "showCheapestEveryNKm": "Näytä halvin asema joka {km} km reitin varrella",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Vältä moottoriteitä",
   "avoidHighwaysDesc": "Reitinlaskenta välttää maksullisia teitä ja moottoriteitä",
   "showFuelStations": "Näytä huoltoasemat",
@@ -246,7 +337,6 @@
   "showEvStations": "Näytä latausasemat",
   "showEvStationsDesc": "Sisällytä sähköauton latausasemat hakutuloksiin",
   "noStationsAlongThisRoute": "Ei asemia tämän reitin varrella.",
-
   "fuelCostCalculator": "Polttoainekustannuslaskin",
   "distanceKm": "Matka (km)",
   "consumptionL100km": "Kulutus (L/100km)",
@@ -255,7 +345,6 @@
   "fuelNeeded": "Tarvittava polttoaine",
   "totalCost": "Kokonaiskustannus",
   "enterCalcValues": "Syötä matka, kulutus ja hinta laskeaksesi matkan kustannuksen",
-
   "priceHistory": "Hintahistoria",
   "noPriceHistory": "Ei hintahistoriaa vielä",
   "noHourlyData": "Ei tuntidataa",
@@ -264,7 +353,6 @@
   "statMax": "Max",
   "statAvg": "Ka",
   "showAllFuelTypes": "Näytä kaikki polttoainetyypit",
-
   "connected": "Yhdistetty",
   "notConnected": "Ei yhdistetty",
   "connectTankSync": "Yhdistä TankSync",
@@ -274,7 +362,6 @@
   "tapToUpdateGps": "Napauta päivittääksesi GPS-sijainnin",
   "gpsAutoUpdateHint": "GPS-sijainti haetaan automaattisesti hakiessa. Voit myös päivittää sen manuaalisesti täällä.",
   "clearGpsConfirm": "Tyhjennä tallennettu GPS-sijainti? Voit päivittää sen uudelleen milloin tahansa.",
-
   "pageNotFound": "Sivua ei löytynyt",
   "deleteAllServerData": "Poista kaikki palvelintiedot",
   "deleteServerDataConfirm": "Poista kaikki palvelintiedot?",
@@ -282,7 +369,6 @@
   "allDataDeleted": "Kaikki palvelintiedot poistettu",
   "disconnectConfirm": "Katkaise TankSync?",
   "disconnect": "Katkaise",
-
   "myServerData": "Omat palvelintiedot",
   "anonymousUuid": "Anonyymi UUID",
   "server": "Palvelin",
@@ -295,5 +381,8 @@
   "exportJson": "Vie JSON-muodossa (leikepöytä)",
   "jsonCopied": "JSON kopioitu leikepöydälle",
   "rawDataJson": "Raakadata (JSON)",
-  "close": "Sulje"
+  "close": "Sulje",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }

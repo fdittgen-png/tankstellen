@@ -18,7 +18,13 @@
   "open": "Atvērts",
   "closed": "Slēgts",
   "distance": "{distance} attālumā",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Cena",
   "prices": "Cenas",
   "address": "Adrese",
@@ -64,7 +70,13 @@
   "clearAllData": "Dzēst visus datus",
   "errorLog": "Kļūdu žurnāls",
   "stationsFound": "Atrastas {count} stacijas",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "whatIsShared": "Kas tiek kopīgots — un ar ko?",
   "gpsCoordinates": "GPS koordinātas",
   "gpsReason": "Tiek nosūtītas ar katru meklējumu, lai atrastu tuvumā esošās stacijas.",
@@ -94,9 +106,21 @@
   "priceQuery": "Cenu pieprasījums",
   "zipGeocoding": "Pasta indeksa ģeokodēšana",
   "minutes": "{n} minūtes",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} stundas",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Iztīrīt kešatmiņu?",
   "clearCacheBody": "Kešatmiņā saglabātie meklēšanas rezultāti un cenas tiks dzēsti. Profili, izlase un iestatījumi tiks saglabāti.",
   "clearCacheButton": "Iztīrīt kešatmiņu",
@@ -126,7 +150,13 @@
   "cheap": "lēti",
   "expensive": "dārgi",
   "stationsOnMap": "{count} stacijas",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Ielādē izlasi...\nVispirms meklējiet stacijas, lai saglabātu datus.",
   "reportPrice": "Ziņot par cenu",
   "whatsWrong": "Kas nav pareizi?",
@@ -143,12 +173,36 @@
   "location": "Atrašanās vieta",
   "switchProfileTitle": "Valsts mainīta",
   "switchProfilePrompt": "Jūs tagad esat {country}. Pārslēgt uz profilu \"{profile}\"?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Pārslēgts uz profilu \"{profile}\" ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Nav profila šai valstij",
   "noProfileForCountry": "Jūs esat {country}, bet profils nav konfigurēts. Izveidojiet to Iestatījumos.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Automātiska profila maiņa",
   "autoSwitchDescription": "Automātiski mainīt profilu, šķērsojot robežu",
   "switchProfile": "Pārslēgt",
@@ -161,10 +215,22 @@
   "noPriceAlerts": "Nav cenu brīdinājumu",
   "noPriceAlertsHint": "Izveidojiet brīdinājumu no stacijas detaļu lapas.",
   "alertDeleted": "Brīdinājums \"{name}\" dzēsts",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Izveidot cenu brīdinājumu",
   "currentPrice": "Pašreizējā cena: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Mērķa cena (EUR)",
   "enterPrice": "Ievadiet cenu",
   "invalidPrice": "Nederīga cena",
@@ -182,11 +248,16 @@
   "bestStops": "Labākās pieturas",
   "openInMaps": "Atvērt Kartēs",
   "noStationsAlongRoute": "Stacijas gar maršrutu nav atrastas",
-
   "evOperational": "Darbojas",
   "evStatusUnknown": "Statuss nezināms",
   "evConnectors": "Savienotāji ({count} punkti)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Nav pieejama savienotāju informācija",
   "evUsageCost": "Lietošanas izmaksas",
   "evPricingUnavailable": "Cenu informācija nav pieejama no pakalpojumu sniedzēja",
@@ -198,7 +269,6 @@
   "evRefreshStatus": "Atjaunināt statusu",
   "evStatusUpdated": "Statuss atjaunināts",
   "evStationNotFound": "Nevar atjaunināt — stacija nav atrasta tuvumā",
-
   "addedToFavorites": "Pievienots izlasei",
   "removedFromFavorites": "Noņemts no izlases",
   "addFavorite": "Pievienot izlasei",
@@ -206,7 +276,6 @@
   "currentLocation": "Pašreizējā atrašanās vieta",
   "gpsError": "GPS kļūda",
   "couldNotResolve": "Nevar noteikt sākumu vai galamērķi",
-
   "start": "Sākums",
   "destination": "Galamērķis",
   "cityAddressOrGps": "Pilsēta, adrese vai GPS",
@@ -214,15 +283,32 @@
   "useGps": "Izmantot GPS",
   "stop": "Pietura",
   "stopN": "Pietura {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Pievienot pieturu",
   "searchAlongRoute": "Meklēt gar maršrutu",
   "cheapest": "Lētākā",
   "nStations": "{count} stacijas",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} labākās",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Degvielas cenas (Tankerkoenig)",
   "requiredForFuelSearch": "Nepieciešams degvielas cenu meklēšanai Vācijā",
   "evChargingOpenChargeMap": "EV uzlāde (OpenChargeMap)",
@@ -235,10 +321,15 @@
   "tankerkoenigApiKey": "Tankerkoenig API atslēga",
   "evChargingApiKey": "EV uzlādes API atslēga",
   "openChargeMapApiKey": "OpenChargeMap API atslēga",
-
   "routeSegment": "Maršruta segments",
   "showCheapestEveryNKm": "Rādīt lētāko staciju ik {km} km gar maršrutu",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Izvairīties no automaģistrālēm",
   "avoidHighwaysDesc": "Maršruta aprēķins izvairās no maksas ceļiem un automaģistrālēm",
   "showFuelStations": "Rādīt degvielas uzpildes stacijas",
@@ -246,7 +337,6 @@
   "showEvStations": "Rādīt uzlādes stacijas",
   "showEvStationsDesc": "Iekļaut elektriskās uzlādes stacijas meklēšanas rezultātos",
   "noStationsAlongThisRoute": "Stacijas gar šo maršrutu nav atrastas.",
-
   "fuelCostCalculator": "Degvielas izmaksu kalkulators",
   "distanceKm": "Attālums (km)",
   "consumptionL100km": "Patēriņš (L/100km)",
@@ -255,7 +345,6 @@
   "fuelNeeded": "Nepieciešamā degviela",
   "totalCost": "Kopējās izmaksas",
   "enterCalcValues": "Ievadiet attālumu, patēriņu un cenu, lai aprēķinātu brauciena izmaksas",
-
   "priceHistory": "Cenu vēsture",
   "noPriceHistory": "Vēl nav cenu vēstures",
   "noHourlyData": "Nav stundu datu",
@@ -264,7 +353,6 @@
   "statMax": "Maks",
   "statAvg": "Vid",
   "showAllFuelTypes": "Rādīt visus degvielas veidus",
-
   "connected": "Savienots",
   "notConnected": "Nav savienots",
   "connectTankSync": "Savienot TankSync",
@@ -274,7 +362,6 @@
   "tapToUpdateGps": "Pieskarieties, lai atjauninātu GPS pozīciju",
   "gpsAutoUpdateHint": "GPS pozīcija tiek iegūta automātiski, meklējot. Varat to arī manuāli atjaunināt šeit.",
   "clearGpsConfirm": "Notīrīt saglabāto GPS pozīciju? Varat to atjaunināt jebkurā laikā.",
-
   "pageNotFound": "Lapa nav atrasta",
   "deleteAllServerData": "Dzēst visus servera datus",
   "deleteServerDataConfirm": "Dzēst visus servera datus?",
@@ -282,7 +369,6 @@
   "allDataDeleted": "Visi servera dati dzēsti",
   "disconnectConfirm": "Atvienot TankSync?",
   "disconnect": "Atvienot",
-
   "myServerData": "Mani servera dati",
   "anonymousUuid": "Anonīms UUID",
   "server": "Serveris",
@@ -295,5 +381,8 @@
   "exportJson": "Eksportēt kā JSON (starpliktuve)",
   "jsonCopied": "JSON nokopēts starpliktuvē",
   "rawDataJson": "Neapstrādāti dati (JSON)",
-  "close": "Aizvērt"
+  "close": "Aizvērt",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }

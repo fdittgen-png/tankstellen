@@ -18,7 +18,13 @@
   "open": "Deschis",
   "closed": "Închis",
   "distance": "la {distance}",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Preț",
   "prices": "Prețuri",
   "address": "Adresă",
@@ -64,7 +70,13 @@
   "clearAllData": "Șterge toate datele",
   "errorLog": "Jurnal erori",
   "stationsFound": "{count} benzinării găsite",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "whatIsShared": "Ce se partajează — și cu cine?",
   "gpsCoordinates": "Coordonate GPS",
   "gpsReason": "Trimise la fiecare căutare pentru a găsi benzinării în apropiere.",
@@ -94,9 +106,21 @@
   "priceQuery": "Interogare prețuri",
   "zipGeocoding": "Geocodificare cod poștal",
   "minutes": "{n} minute",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} ore",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Golești cache-ul?",
   "clearCacheBody": "Rezultatele căutărilor și prețurile din cache vor fi șterse. Profilurile, favoritele și setările sunt păstrate.",
   "clearCacheButton": "Golește cache",
@@ -126,7 +150,13 @@
   "cheap": "ieftin",
   "expensive": "scump",
   "stationsOnMap": "{count} benzinării",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Se încarcă favoritele...\nCăutați benzinării mai întâi pentru a salva date.",
   "reportPrice": "Raportează preț",
   "whatsWrong": "Ce nu este corect?",
@@ -143,12 +173,36 @@
   "location": "Locație",
   "switchProfileTitle": "Țară schimbată",
   "switchProfilePrompt": "Sunteți acum în {country}. Comutați la profilul \"{profile}\"?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Comutat la profilul \"{profile}\" ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Niciun profil pentru această țară",
   "noProfileForCountry": "Sunteți în {country}, dar niciun profil nu este configurat. Creați unul în Setări.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Comutare automată a profilului",
   "autoSwitchDescription": "Comută profilul automat la trecerea frontierei",
   "switchProfile": "Comută",
@@ -161,10 +215,22 @@
   "noPriceAlerts": "Fără alerte de preț",
   "noPriceAlertsHint": "Creați o alertă din pagina de detalii a unei benzinării.",
   "alertDeleted": "Alertă \"{name}\" ștearsă",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Creează alertă de preț",
   "currentPrice": "Preț curent: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Preț țintă (EUR)",
   "enterPrice": "Introduceți un preț",
   "invalidPrice": "Preț invalid",
@@ -182,11 +248,16 @@
   "bestStops": "Cele mai bune opriri",
   "openInMaps": "Deschide în Hărți",
   "noStationsAlongRoute": "Nu s-au găsit stații de-a lungul rutei",
-
   "evOperational": "Operațională",
   "evStatusUnknown": "Stare necunoscută",
   "evConnectors": "Conectori ({count} puncte)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Fără detalii conectori disponibile",
   "evUsageCost": "Cost de utilizare",
   "evPricingUnavailable": "Prețuri indisponibile de la furnizor",
@@ -198,7 +269,6 @@
   "evRefreshStatus": "Actualizare stare",
   "evStatusUpdated": "Stare actualizată",
   "evStationNotFound": "Nu s-a putut actualiza — stație negăsită în apropiere",
-
   "addedToFavorites": "Adăugat la favorite",
   "removedFromFavorites": "Eliminat din favorite",
   "addFavorite": "Adaugă la favorite",
@@ -206,7 +276,6 @@
   "currentLocation": "Locația curentă",
   "gpsError": "Eroare GPS",
   "couldNotResolve": "Nu s-a putut determina punctul de plecare sau destinația",
-
   "start": "Start",
   "destination": "Destinație",
   "cityAddressOrGps": "Oraș, adresă sau GPS",
@@ -214,15 +283,32 @@
   "useGps": "Folosește GPS",
   "stop": "Oprire",
   "stopN": "Oprire {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Adaugă oprire",
   "searchAlongRoute": "Caută de-a lungul rutei",
   "cheapest": "Cea mai ieftină",
   "nStations": "{count} stații",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} cele mai bune",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Prețuri carburanți (Tankerkoenig)",
   "requiredForFuelSearch": "Necesar pentru căutarea prețurilor de carburanți în Germania",
   "evChargingOpenChargeMap": "Încărcare EV (OpenChargeMap)",
@@ -235,10 +321,15 @@
   "tankerkoenigApiKey": "Cheie API Tankerkoenig",
   "evChargingApiKey": "Cheie API încărcare EV",
   "openChargeMapApiKey": "Cheie API OpenChargeMap",
-
   "routeSegment": "Segment rută",
   "showCheapestEveryNKm": "Arată cea mai ieftină stație la fiecare {km} km de-a lungul rutei",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Evită autostrăzile",
   "avoidHighwaysDesc": "Calculul rutei evită drumurile cu taxă și autostrăzile",
   "showFuelStations": "Arată benzinăriile",
@@ -246,7 +337,6 @@
   "showEvStations": "Arată stații de încărcare",
   "showEvStationsDesc": "Include stații de încărcare electrică în rezultate",
   "noStationsAlongThisRoute": "Nu s-au găsit stații de-a lungul acestei rute.",
-
   "fuelCostCalculator": "Calculator cost carburant",
   "distanceKm": "Distanță (km)",
   "consumptionL100km": "Consum (L/100km)",
@@ -255,7 +345,6 @@
   "fuelNeeded": "Carburant necesar",
   "totalCost": "Cost total",
   "enterCalcValues": "Introduceți distanța, consumul și prețul pentru a calcula costul călătoriei",
-
   "priceHistory": "Istoric prețuri",
   "noPriceHistory": "Încă nu există istoric de prețuri",
   "noHourlyData": "Fără date orare",
@@ -264,7 +353,6 @@
   "statMax": "Max",
   "statAvg": "Med",
   "showAllFuelTypes": "Arată toate tipurile de carburant",
-
   "connected": "Conectat",
   "notConnected": "Neconectat",
   "connectTankSync": "Conectare TankSync",
@@ -274,7 +362,6 @@
   "tapToUpdateGps": "Atingeți pentru a actualiza poziția GPS",
   "gpsAutoUpdateHint": "Poziția GPS este obținută automat la căutare. O puteți actualiza și manual aici.",
   "clearGpsConfirm": "Ștergeți poziția GPS stocată? O puteți actualiza oricând.",
-
   "pageNotFound": "Pagină negăsită",
   "deleteAllServerData": "Șterge toate datele de pe server",
   "deleteServerDataConfirm": "Ștergeți toate datele de pe server?",
@@ -282,7 +369,6 @@
   "allDataDeleted": "Toate datele de pe server șterse",
   "disconnectConfirm": "Deconectați TankSync?",
   "disconnect": "Deconectare",
-
   "myServerData": "Datele mele de pe server",
   "anonymousUuid": "UUID anonim",
   "server": "Server",
@@ -295,5 +381,8 @@
   "exportJson": "Exportă ca JSON (clipboard)",
   "jsonCopied": "JSON copiat în clipboard",
   "rawDataJson": "Date brute (JSON)",
-  "close": "Închide"
+  "close": "Închide",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }

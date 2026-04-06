@@ -18,7 +18,13 @@
   "open": "Open",
   "closed": "Gesloten",
   "distance": "{distance} verderop",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Prijs",
   "prices": "Prijzen",
   "address": "Adres",
@@ -64,14 +70,26 @@
   "clearAllData": "Alle gegevens verwijderen",
   "errorLog": "Foutenlogboek",
   "stationsFound": "{count} tankstations gevonden",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "locationDenied": "Locatietoestemming geweigerd. U kunt zoeken op postcode.",
   "demoModeBanner": "Demomodus. Configureer API-sleutel in instellingen.",
   "sortDistance": "Afstand",
   "cheap": "goedkoop",
   "expensive": "duur",
   "stationsOnMap": "{count} stations",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Favorieten laden...\nZoek eerst naar stations om gegevens op te slaan.",
   "reportPrice": "Prijs melden",
   "whatsWrong": "Wat klopt er niet?",
@@ -88,12 +106,36 @@
   "location": "Locatie",
   "switchProfileTitle": "Land gewijzigd",
   "switchProfilePrompt": "U bent nu in {country}. Overschakelen naar profiel \"{profile}\"?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Overgeschakeld naar profiel \"{profile}\" ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Geen profiel voor dit land",
   "noProfileForCountry": "U bent in {country}, maar er is geen profiel geconfigureerd. Maak er een aan in Instellingen.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Automatisch profiel wisselen",
   "autoSwitchDescription": "Profiel automatisch wisselen bij grensovergang",
   "switchProfile": "Wisselen",
@@ -130,9 +172,21 @@
   "priceQuery": "Prijsopvraag",
   "zipGeocoding": "Postcode-geocodering",
   "minutes": "{n} minuten",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} uur",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Cache wissen?",
   "clearCacheBody": "Gecachte zoekresultaten en prijzen worden verwijderd. Profielen, favorieten en instellingen blijven bewaard.",
   "clearCacheButton": "Cache wissen",
@@ -155,38 +209,55 @@
   "lastUpdate": "Laatste update",
   "automate24h": "24u/24 — Automaat",
   "refreshPrices": "Prijzen vernieuwen",
-  "station": "Tankstation"
-  ,"allFuels": "Alle",
+  "station": "Tankstation",
+  "allFuels": "Alle",
   "priceAlerts": "Prijswaarschuwingen",
   "noPriceAlerts": "Geen prijswaarschuwingen",
   "noPriceAlertsHint": "Maak een waarschuwing aan vanaf de detailpagina van een station.",
   "alertDeleted": "Waarschuwing \"{name}\" verwijderd",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Prijswaarschuwing aanmaken",
   "currentPrice": "Huidige prijs: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Doelprijs (EUR)",
   "enterPrice": "Voer een prijs in",
   "invalidPrice": "Ongeldige prijs",
   "priceTooHigh": "Prijs te hoog",
   "create": "Aanmaken",
-  "alertCreated": "Prijswaarschuwing aangemaakt"
-  ,"wrongE5Price": "Verkeerde Super E5 prijs"
-  ,"wrongE10Price": "Verkeerde Super E10 prijs"
-  ,"wrongDieselPrice": "Verkeerde Diesel prijs"
-  ,"wrongStatusOpen": "Getoond als open, maar gesloten"
-  ,"wrongStatusClosed": "Getoond als gesloten, maar open"
-  ,"searchAlongRouteLabel": "Langs de route"
-  ,"searchEvStations": "Zoek laadstations"
-  ,"allStations": "Alle stations"
-  ,"bestStops": "Beste stops"
-  ,"openInMaps": "Openen in Kaarten"
-  ,"noStationsAlongRoute": "Geen stations gevonden langs de route",
-
+  "alertCreated": "Prijswaarschuwing aangemaakt",
+  "wrongE5Price": "Verkeerde Super E5 prijs",
+  "wrongE10Price": "Verkeerde Super E10 prijs",
+  "wrongDieselPrice": "Verkeerde Diesel prijs",
+  "wrongStatusOpen": "Getoond als open, maar gesloten",
+  "wrongStatusClosed": "Getoond als gesloten, maar open",
+  "searchAlongRouteLabel": "Langs de route",
+  "searchEvStations": "Zoek laadstations",
+  "allStations": "Alle stations",
+  "bestStops": "Beste stops",
+  "openInMaps": "Openen in Kaarten",
+  "noStationsAlongRoute": "Geen stations gevonden langs de route",
   "evOperational": "Operationeel",
   "evStatusUnknown": "Status onbekend",
   "evConnectors": "Connectoren ({count} punten)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Geen connectordetails beschikbaar",
   "evUsageCost": "Gebruikskosten",
   "evPricingUnavailable": "Prijsinformatie niet beschikbaar van aanbieder",
@@ -198,7 +269,6 @@
   "evRefreshStatus": "Status vernieuwen",
   "evStatusUpdated": "Status bijgewerkt",
   "evStationNotFound": "Kan niet vernieuwen — station niet in de buurt gevonden",
-
   "addedToFavorites": "Toegevoegd aan favorieten",
   "removedFromFavorites": "Verwijderd uit favorieten",
   "addFavorite": "Toevoegen aan favorieten",
@@ -206,7 +276,6 @@
   "currentLocation": "Huidige locatie",
   "gpsError": "GPS-fout",
   "couldNotResolve": "Kan start of bestemming niet bepalen",
-
   "start": "Start",
   "destination": "Bestemming",
   "cityAddressOrGps": "Stad, adres of GPS",
@@ -214,15 +283,32 @@
   "useGps": "GPS gebruiken",
   "stop": "Stop",
   "stopN": "Stop {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Stop toevoegen",
   "searchAlongRoute": "Zoek langs de route",
   "cheapest": "Goedkoopste",
   "nStations": "{count} stations",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} beste",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Brandstofprijzen (Tankerkoenig)",
   "requiredForFuelSearch": "Vereist voor brandstofprijzen zoeken in Duitsland",
   "evChargingOpenChargeMap": "EV-laden (OpenChargeMap)",
@@ -235,10 +321,15 @@
   "tankerkoenigApiKey": "Tankerkoenig API-sleutel",
   "evChargingApiKey": "EV-laden API-sleutel",
   "openChargeMapApiKey": "OpenChargeMap API-sleutel",
-
   "routeSegment": "Routesegment",
   "showCheapestEveryNKm": "Toon goedkoopste station elke {km} km langs de route",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Snelwegen vermijden",
   "avoidHighwaysDesc": "Routeberekening vermijdt tolwegen en snelwegen",
   "showFuelStations": "Tankstations tonen",
@@ -246,7 +337,6 @@
   "showEvStations": "Laadstations tonen",
   "showEvStationsDesc": "Elektrische laadstations opnemen in zoekresultaten",
   "noStationsAlongThisRoute": "Geen stations gevonden langs deze route.",
-
   "fuelCostCalculator": "Brandstofkostencalculator",
   "distanceKm": "Afstand (km)",
   "consumptionL100km": "Verbruik (L/100km)",
@@ -255,7 +345,6 @@
   "fuelNeeded": "Benodigde brandstof",
   "totalCost": "Totale kosten",
   "enterCalcValues": "Voer afstand, verbruik en prijs in om de ritkosten te berekenen",
-
   "priceHistory": "Prijsgeschiedenis",
   "noPriceHistory": "Nog geen prijsgeschiedenis",
   "noHourlyData": "Geen uurgegevens",
@@ -264,7 +353,6 @@
   "statMax": "Max",
   "statAvg": "Gem",
   "showAllFuelTypes": "Alle brandstofsoorten tonen",
-
   "connected": "Verbonden",
   "notConnected": "Niet verbonden",
   "connectTankSync": "TankSync verbinden",
@@ -274,7 +362,6 @@
   "tapToUpdateGps": "Tik om GPS-positie bij te werken",
   "gpsAutoUpdateHint": "De GPS-positie wordt automatisch verkregen bij het zoeken. U kunt deze hier ook handmatig bijwerken.",
   "clearGpsConfirm": "Opgeslagen GPS-positie wissen? U kunt deze op elk moment opnieuw bijwerken.",
-
   "pageNotFound": "Pagina niet gevonden",
   "deleteAllServerData": "Alle servergegevens verwijderen",
   "deleteServerDataConfirm": "Alle servergegevens verwijderen?",
@@ -282,7 +369,6 @@
   "allDataDeleted": "Alle servergegevens verwijderd",
   "disconnectConfirm": "TankSync loskoppelen?",
   "disconnect": "Loskoppelen",
-
   "myServerData": "Mijn servergegevens",
   "anonymousUuid": "Anonieme UUID",
   "server": "Server",
@@ -295,5 +381,8 @@
   "exportJson": "Exporteren als JSON (klembord)",
   "jsonCopied": "JSON gekopieerd naar klembord",
   "rawDataJson": "Ruwe gegevens (JSON)",
-  "close": "Sluiten"
+  "close": "Sluiten",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }

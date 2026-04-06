@@ -18,7 +18,13 @@
   "open": "Åben",
   "closed": "Lukket",
   "distance": "{distance} væk",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Pris",
   "prices": "Priser",
   "address": "Adresse",
@@ -64,14 +70,26 @@
   "clearAllData": "Slet alle data",
   "errorLog": "Fejllog",
   "stationsFound": "{count} tankstationer fundet",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "locationDenied": "Placeringstilladelse nægtet. Du kan søge efter postnummer.",
   "demoModeBanner": "Demo-tilstand. Konfigurer API-nøgle i indstillinger.",
   "sortDistance": "Afstand",
   "cheap": "billig",
   "expensive": "dyr",
   "stationsOnMap": "{count} stationer",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Indlæser favoritter...\nSøg først efter stationer for at gemme data.",
   "reportPrice": "Rapportér pris",
   "whatsWrong": "Hvad er galt?",
@@ -88,12 +106,36 @@
   "location": "Placering",
   "switchProfileTitle": "Land ændret",
   "switchProfilePrompt": "Du er nu i {country}. Skift til profil \"{profile}\"?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Skiftet til profil \"{profile}\" ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Ingen profil for dette land",
   "noProfileForCountry": "Du er i {country}, men ingen profil er konfigureret. Opret en i Indstillinger.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Automatisk profilskift",
   "autoSwitchDescription": "Skift profil automatisk ved grænseoverskridelse",
   "switchProfile": "Skift",
@@ -130,9 +172,21 @@
   "priceQuery": "Prisforespørgsel",
   "zipGeocoding": "Postnummer-geokodning",
   "minutes": "{n} minutter",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} timer",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Ryd cache?",
   "clearCacheBody": "Cachelagrede søgeresultater og priser slettes. Profiler, favoritter og indstillinger bevares.",
   "clearCacheButton": "Ryd cache",
@@ -155,38 +209,55 @@
   "lastUpdate": "Seneste opdatering",
   "automate24h": "24t/24 — Automat",
   "refreshPrices": "Opdater priser",
-  "station": "Tankstation"
-  ,"allFuels": "Alle",
+  "station": "Tankstation",
+  "allFuels": "Alle",
   "priceAlerts": "Prisalarmer",
   "noPriceAlerts": "Ingen prisalarmer",
   "noPriceAlertsHint": "Opret en alarm fra en stations detaljeside.",
   "alertDeleted": "Alarm \"{name}\" slettet",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Opret prisalarm",
   "currentPrice": "Aktuel pris: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Målpris (EUR)",
   "enterPrice": "Indtast en pris",
   "invalidPrice": "Ugyldig pris",
   "priceTooHigh": "Pris for høj",
   "create": "Opret",
-  "alertCreated": "Prisalarm oprettet"
-  ,"wrongE5Price": "Forkert Super E5 pris"
-  ,"wrongE10Price": "Forkert Super E10 pris"
-  ,"wrongDieselPrice": "Forkert Diesel pris"
-  ,"wrongStatusOpen": "Vist som åben, men lukket"
-  ,"wrongStatusClosed": "Vist som lukket, men åben"
-  ,"searchAlongRouteLabel": "Langs ruten"
-  ,"searchEvStations": "Søg ladestationer"
-  ,"allStations": "Alle stationer"
-  ,"bestStops": "Bedste stop"
-  ,"openInMaps": "Åbn i Kort"
-  ,"noStationsAlongRoute": "Ingen stationer fundet langs ruten",
-
+  "alertCreated": "Prisalarm oprettet",
+  "wrongE5Price": "Forkert Super E5 pris",
+  "wrongE10Price": "Forkert Super E10 pris",
+  "wrongDieselPrice": "Forkert Diesel pris",
+  "wrongStatusOpen": "Vist som åben, men lukket",
+  "wrongStatusClosed": "Vist som lukket, men åben",
+  "searchAlongRouteLabel": "Langs ruten",
+  "searchEvStations": "Søg ladestationer",
+  "allStations": "Alle stationer",
+  "bestStops": "Bedste stop",
+  "openInMaps": "Åbn i Kort",
+  "noStationsAlongRoute": "Ingen stationer fundet langs ruten",
   "evOperational": "I drift",
   "evStatusUnknown": "Status ukendt",
   "evConnectors": "Stik ({count} punkter)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Ingen stikdetaljer tilgængelige",
   "evUsageCost": "Brugsomkostninger",
   "evPricingUnavailable": "Pris ikke tilgængelig fra udbyderen",
@@ -198,7 +269,6 @@
   "evRefreshStatus": "Opdater status",
   "evStatusUpdated": "Status opdateret",
   "evStationNotFound": "Kunne ikke opdatere — station ikke fundet i nærheden",
-
   "addedToFavorites": "Tilføjet til favoritter",
   "removedFromFavorites": "Fjernet fra favoritter",
   "addFavorite": "Tilføj til favoritter",
@@ -206,7 +276,6 @@
   "currentLocation": "Aktuel placering",
   "gpsError": "GPS-fejl",
   "couldNotResolve": "Kunne ikke bestemme start eller destination",
-
   "start": "Start",
   "destination": "Destination",
   "cityAddressOrGps": "By, adresse eller GPS",
@@ -214,15 +283,32 @@
   "useGps": "Brug GPS",
   "stop": "Stop",
   "stopN": "Stop {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Tilføj stop",
   "searchAlongRoute": "Søg langs ruten",
   "cheapest": "Billigste",
   "nStations": "{count} stationer",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} bedste",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Brændstofpriser (Tankerkoenig)",
   "requiredForFuelSearch": "Påkrævet til brændstofprissøgning i Tyskland",
   "evChargingOpenChargeMap": "EV-opladning (OpenChargeMap)",
@@ -235,10 +321,15 @@
   "tankerkoenigApiKey": "Tankerkoenig API-nøgle",
   "evChargingApiKey": "EV-opladning API-nøgle",
   "openChargeMapApiKey": "OpenChargeMap API-nøgle",
-
   "routeSegment": "Rutesegment",
   "showCheapestEveryNKm": "Vis billigste station for hver {km} km langs ruten",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Undgå motorveje",
   "avoidHighwaysDesc": "Ruteberegning undgår betalingsveje og motorveje",
   "showFuelStations": "Vis tankstationer",
@@ -246,7 +337,6 @@
   "showEvStations": "Vis ladestationer",
   "showEvStationsDesc": "Inkluder elektriske ladestationer i søgeresultater",
   "noStationsAlongThisRoute": "Ingen stationer fundet langs denne rute.",
-
   "fuelCostCalculator": "Brændstofomkostningsberegner",
   "distanceKm": "Afstand (km)",
   "consumptionL100km": "Forbrug (L/100km)",
@@ -255,7 +345,6 @@
   "fuelNeeded": "Nødvendigt brændstof",
   "totalCost": "Samlede omkostninger",
   "enterCalcValues": "Indtast afstand, forbrug og pris for at beregne turomkostningen",
-
   "priceHistory": "Prishistorik",
   "noPriceHistory": "Ingen prishistorik endnu",
   "noHourlyData": "Ingen timedata",
@@ -264,7 +353,6 @@
   "statMax": "Maks",
   "statAvg": "Gns",
   "showAllFuelTypes": "Vis alle brændstoftyper",
-
   "connected": "Forbundet",
   "notConnected": "Ikke forbundet",
   "connectTankSync": "Forbind TankSync",
@@ -274,7 +362,6 @@
   "tapToUpdateGps": "Tryk for at opdatere GPS-position",
   "gpsAutoUpdateHint": "GPS-positionen hentes automatisk ved søgning. Du kan også opdatere den manuelt her.",
   "clearGpsConfirm": "Ryd den gemte GPS-position? Du kan opdatere den igen når som helst.",
-
   "pageNotFound": "Side ikke fundet",
   "deleteAllServerData": "Slet alle serverdata",
   "deleteServerDataConfirm": "Slet alle serverdata?",
@@ -282,7 +369,6 @@
   "allDataDeleted": "Alle serverdata slettet",
   "disconnectConfirm": "Afbryd TankSync?",
   "disconnect": "Afbryd",
-
   "myServerData": "Mine serverdata",
   "anonymousUuid": "Anonym UUID",
   "server": "Server",
@@ -295,5 +381,8 @@
   "exportJson": "Eksportér som JSON (udklipsholder)",
   "jsonCopied": "JSON kopieret til udklipsholder",
   "rawDataJson": "Rådata (JSON)",
-  "close": "Luk"
+  "close": "Luk",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }

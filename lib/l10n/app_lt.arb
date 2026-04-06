@@ -18,7 +18,13 @@
   "open": "Atidaryta",
   "closed": "Uždaryta",
   "distance": "{distance} atstumu",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Kaina",
   "prices": "Kainos",
   "address": "Adresas",
@@ -64,7 +70,13 @@
   "clearAllData": "Ištrinti visus duomenis",
   "errorLog": "Klaidų žurnalas",
   "stationsFound": "Rasta {count} degalinių",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "whatIsShared": "Kas dalijama — ir su kuo?",
   "gpsCoordinates": "GPS koordinatės",
   "gpsReason": "Siunčiamos su kiekviena paieška netoliese esančių stočių radimui.",
@@ -94,9 +106,21 @@
   "priceQuery": "Kainos užklausa",
   "zipGeocoding": "Pašto kodo geokodavimas",
   "minutes": "{n} minučių",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} valandų",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Išvalyti podėlį?",
   "clearCacheBody": "Podėlyje esantys paieškos rezultatai ir kainos bus ištrinti. Profiliai, mėgstami ir nustatymai išsaugomi.",
   "clearCacheButton": "Išvalyti podėlį",
@@ -126,7 +150,13 @@
   "cheap": "pigu",
   "expensive": "brangu",
   "stationsOnMap": "{count} stočių",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Įkeliami mėgstami...\nPirmiausia ieškokite stočių duomenims išsaugoti.",
   "reportPrice": "Pranešti apie kainą",
   "whatsWrong": "Kas negerai?",
@@ -143,12 +173,36 @@
   "location": "Vieta",
   "switchProfileTitle": "Šalis pasikeitė",
   "switchProfilePrompt": "Dabar esate {country}. Perjungti į profilį \"{profile}\"?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Perjungta į profilį \"{profile}\" ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Nėra profilio šiai šaliai",
   "noProfileForCountry": "Esate {country}, bet profilis nesukonfigūruotas. Sukurkite jį Nustatymuose.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Automatinis profilio perjungimas",
   "autoSwitchDescription": "Automatiškai perjungti profilį kertant sieną",
   "switchProfile": "Perjungti",
@@ -161,10 +215,22 @@
   "noPriceAlerts": "Nėra kainų įspėjimų",
   "noPriceAlertsHint": "Sukurkite įspėjimą iš stoties informacijos puslapio.",
   "alertDeleted": "Įspėjimas \"{name}\" ištrintas",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Sukurti kainos įspėjimą",
   "currentPrice": "Dabartinė kaina: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Tikslinė kaina (EUR)",
   "enterPrice": "Įveskite kainą",
   "invalidPrice": "Neteisinga kaina",
@@ -182,11 +248,16 @@
   "bestStops": "Geriausios stotelės",
   "openInMaps": "Atidaryti Žemėlapiuose",
   "noStationsAlongRoute": "Stočių palei maršrutą nerasta",
-
   "evOperational": "Veikianti",
   "evStatusUnknown": "Būsena nežinoma",
   "evConnectors": "Jungtys ({count} taškų)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Nėra jungčių informacijos",
   "evUsageCost": "Naudojimo kaina",
   "evPricingUnavailable": "Kainodara neprieinama iš teikėjo",
@@ -198,7 +269,6 @@
   "evRefreshStatus": "Atnaujinti būseną",
   "evStatusUpdated": "Būsena atnaujinta",
   "evStationNotFound": "Nepavyko atnaujinti — stotis nerasta netoliese",
-
   "addedToFavorites": "Pridėta prie mėgstamų",
   "removedFromFavorites": "Pašalinta iš mėgstamų",
   "addFavorite": "Pridėti prie mėgstamų",
@@ -206,7 +276,6 @@
   "currentLocation": "Dabartinė vieta",
   "gpsError": "GPS klaida",
   "couldNotResolve": "Nepavyko nustatyti pradžios ar tikslo",
-
   "start": "Pradžia",
   "destination": "Tikslas",
   "cityAddressOrGps": "Miestas, adresas arba GPS",
@@ -214,15 +283,32 @@
   "useGps": "Naudoti GPS",
   "stop": "Stotelė",
   "stopN": "Stotelė {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Pridėti stotelę",
   "searchAlongRoute": "Ieškoti palei maršrutą",
   "cheapest": "Pigiausia",
   "nStations": "{count} stočių",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} geriausių",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Degalų kainos (Tankerkoenig)",
   "requiredForFuelSearch": "Reikalingas degalų kainų paieškai Vokietijoje",
   "evChargingOpenChargeMap": "EV įkrovimas (OpenChargeMap)",
@@ -235,10 +321,15 @@
   "tankerkoenigApiKey": "Tankerkoenig API raktas",
   "evChargingApiKey": "EV įkrovimo API raktas",
   "openChargeMapApiKey": "OpenChargeMap API raktas",
-
   "routeSegment": "Maršruto segmentas",
   "showCheapestEveryNKm": "Rodyti pigiausią stotį kas {km} km palei maršrutą",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Vengti greitkelių",
   "avoidHighwaysDesc": "Maršruto skaičiavimas vengia mokamų kelių ir greitkelių",
   "showFuelStations": "Rodyti degalines",
@@ -246,7 +337,6 @@
   "showEvStations": "Rodyti įkrovimo stotis",
   "showEvStationsDesc": "Įtraukti elektrinius įkrovimo stotis į rezultatus",
   "noStationsAlongThisRoute": "Stočių palei šį maršrutą nerasta.",
-
   "fuelCostCalculator": "Degalų kaštų skaičiuoklė",
   "distanceKm": "Atstumas (km)",
   "consumptionL100km": "Sąnaudos (L/100km)",
@@ -255,7 +345,6 @@
   "fuelNeeded": "Reikalingi degalai",
   "totalCost": "Bendra kaina",
   "enterCalcValues": "Įveskite atstumą, sąnaudas ir kainą kelionės kainos apskaičiavimui",
-
   "priceHistory": "Kainų istorija",
   "noPriceHistory": "Kainų istorijos dar nėra",
   "noHourlyData": "Nėra valandinių duomenų",
@@ -264,7 +353,6 @@
   "statMax": "Maks",
   "statAvg": "Vid",
   "showAllFuelTypes": "Rodyti visus degalų tipus",
-
   "connected": "Prisijungta",
   "notConnected": "Neprisijungta",
   "connectTankSync": "Prijungti TankSync",
@@ -274,7 +362,6 @@
   "tapToUpdateGps": "Bakstelėkite GPS pozicijos atnaujinimui",
   "gpsAutoUpdateHint": "GPS pozicija gaunama automatiškai ieškant. Čia galite ją atnaujinti ir rankiniu būdu.",
   "clearGpsConfirm": "Išvalyti išsaugotą GPS poziciją? Galite ją bet kada atnaujinti iš naujo.",
-
   "pageNotFound": "Puslapis nerastas",
   "deleteAllServerData": "Ištrinti visus serverio duomenis",
   "deleteServerDataConfirm": "Ištrinti visus serverio duomenis?",
@@ -282,7 +369,6 @@
   "allDataDeleted": "Visi serverio duomenys ištrinti",
   "disconnectConfirm": "Atjungti TankSync?",
   "disconnect": "Atjungti",
-
   "myServerData": "Mano serverio duomenys",
   "anonymousUuid": "Anoniminis UUID",
   "server": "Serveris",
@@ -295,5 +381,8 @@
   "exportJson": "Eksportuoti kaip JSON (iškarpinė)",
   "jsonCopied": "JSON nukopijuotas į iškarpinę",
   "rawDataJson": "Neapdoroti duomenys (JSON)",
-  "close": "Uždaryti"
+  "close": "Uždaryti",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }

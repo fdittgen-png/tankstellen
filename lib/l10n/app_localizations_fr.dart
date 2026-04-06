@@ -930,4 +930,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get refreshFailed => 'Refresh failed. Please try again.';
+
+  @override
+  String get deleteProfileTitle => 'Supprimer le profil ?';
+
+  @override
+  String get deleteProfileBody =>
+      'Ce profil et ses paramètres seront définitivement supprimés. Cette action est irréversible.';
+
+  @override
+  String get deleteProfileConfirm => 'Supprimer le profil';
 }

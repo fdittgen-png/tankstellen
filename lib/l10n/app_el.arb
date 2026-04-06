@@ -18,7 +18,13 @@
   "open": "Ανοιχτό",
   "closed": "Κλειστό",
   "distance": "{distance} μακριά",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Τιμή",
   "prices": "Τιμές",
   "address": "Διεύθυνση",
@@ -64,7 +70,13 @@
   "clearAllData": "Διαγραφή όλων των δεδομένων",
   "errorLog": "Αρχείο σφαλμάτων",
   "stationsFound": "Βρέθηκαν {count} βενζινάδικα",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "whatIsShared": "Τι κοινοποιείται — και σε ποιον;",
   "gpsCoordinates": "Συντεταγμένες GPS",
   "gpsReason": "Αποστέλλονται με κάθε αναζήτηση για εύρεση κοντινών σταθμών.",
@@ -94,9 +106,21 @@
   "priceQuery": "Αίτημα τιμών",
   "zipGeocoding": "Γεωκωδικοποίηση Τ.Κ.",
   "minutes": "{n} λεπτά",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} ώρες",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Εκκαθάριση προσωρινής μνήμης;",
   "clearCacheBody": "Τα αποθηκευμένα αποτελέσματα αναζήτησης και τιμές θα διαγραφούν. Τα προφίλ, αγαπημένα και ρυθμίσεις διατηρούνται.",
   "clearCacheButton": "Εκκαθάριση",
@@ -126,7 +150,13 @@
   "cheap": "φθηνό",
   "expensive": "ακριβό",
   "stationsOnMap": "{count} σταθμοί",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Φόρτωση αγαπημένων...\nΑναζητήστε πρώτα σταθμούς για αποθήκευση δεδομένων.",
   "reportPrice": "Αναφορά τιμής",
   "whatsWrong": "Τι δεν πάει καλά;",
@@ -143,12 +173,36 @@
   "location": "Τοποθεσία",
   "switchProfileTitle": "Χώρα άλλαξε",
   "switchProfilePrompt": "Βρίσκεστε τώρα στη χώρα {country}. Εναλλαγή στο προφίλ \"{profile}\";",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Εναλλαγή στο προφίλ \"{profile}\" ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Κανένα προφίλ για αυτή τη χώρα",
   "noProfileForCountry": "Βρίσκεστε στη χώρα {country}, αλλά δεν έχει ρυθμιστεί προφίλ. Δημιουργήστε ένα στις Ρυθμίσεις.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Αυτόματη εναλλαγή προφίλ",
   "autoSwitchDescription": "Αυτόματη εναλλαγή προφίλ κατά τη διέλευση συνόρων",
   "switchProfile": "Εναλλαγή",
@@ -161,10 +215,22 @@
   "noPriceAlerts": "Χωρίς ειδοποιήσεις τιμών",
   "noPriceAlertsHint": "Δημιουργήστε ειδοποίηση από τη σελίδα λεπτομερειών ενός σταθμού.",
   "alertDeleted": "Ειδοποίηση \"{name}\" διαγράφηκε",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Δημιουργία ειδοποίησης τιμής",
   "currentPrice": "Τρέχουσα τιμή: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Τιμή-στόχος (EUR)",
   "enterPrice": "Εισάγετε μια τιμή",
   "invalidPrice": "Μη έγκυρη τιμή",
@@ -182,11 +248,16 @@
   "bestStops": "Καλύτερες στάσεις",
   "openInMaps": "Άνοιγμα στους Χάρτες",
   "noStationsAlongRoute": "Δεν βρέθηκαν σταθμοί κατά μήκος της διαδρομής",
-
   "evOperational": "Σε λειτουργία",
   "evStatusUnknown": "Κατάσταση άγνωστη",
   "evConnectors": "Σύνδεσμοι ({count} σημεία)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Δεν υπάρχουν λεπτομέρειες συνδέσμων",
   "evUsageCost": "Κόστος χρήσης",
   "evPricingUnavailable": "Τιμολόγηση μη διαθέσιμη από τον πάροχο",
@@ -198,7 +269,6 @@
   "evRefreshStatus": "Ανανέωση κατάστασης",
   "evStatusUpdated": "Κατάσταση ενημερώθηκε",
   "evStationNotFound": "Δεν ήταν δυνατή η ανανέωση — ο σταθμός δεν βρέθηκε κοντά",
-
   "addedToFavorites": "Προστέθηκε στα αγαπημένα",
   "removedFromFavorites": "Αφαιρέθηκε από τα αγαπημένα",
   "addFavorite": "Προσθήκη στα αγαπημένα",
@@ -206,7 +276,6 @@
   "currentLocation": "Τρέχουσα τοποθεσία",
   "gpsError": "Σφάλμα GPS",
   "couldNotResolve": "Δεν ήταν δυνατός ο προσδιορισμός αφετηρίας ή προορισμού",
-
   "start": "Αφετηρία",
   "destination": "Προορισμός",
   "cityAddressOrGps": "Πόλη, διεύθυνση ή GPS",
@@ -214,15 +283,32 @@
   "useGps": "Χρήση GPS",
   "stop": "Στάση",
   "stopN": "Στάση {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Προσθήκη στάσης",
   "searchAlongRoute": "Αναζήτηση κατά μήκος διαδρομής",
   "cheapest": "Φθηνότερο",
   "nStations": "{count} σταθμοί",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} καλύτεροι",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Τιμές καυσίμων (Tankerkoenig)",
   "requiredForFuelSearch": "Απαιτείται για αναζήτηση τιμών καυσίμων στη Γερμανία",
   "evChargingOpenChargeMap": "Φόρτιση EV (OpenChargeMap)",
@@ -235,10 +321,15 @@
   "tankerkoenigApiKey": "Κλειδί API Tankerkoenig",
   "evChargingApiKey": "Κλειδί API φόρτισης EV",
   "openChargeMapApiKey": "Κλειδί API OpenChargeMap",
-
   "routeSegment": "Τμήμα διαδρομής",
   "showCheapestEveryNKm": "Εμφάνιση φθηνότερου σταθμού κάθε {km} χλμ κατά μήκος της διαδρομής",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Αποφυγή αυτοκινητοδρόμων",
   "avoidHighwaysDesc": "Ο υπολογισμός διαδρομής αποφεύγει δρόμους με διόδια και αυτοκινητοδρόμους",
   "showFuelStations": "Εμφάνιση βενζινάδικων",
@@ -246,7 +337,6 @@
   "showEvStations": "Εμφάνιση σταθμών φόρτισης",
   "showEvStationsDesc": "Συμπερίληψη ηλεκτρικών σταθμών φόρτισης στα αποτελέσματα",
   "noStationsAlongThisRoute": "Δεν βρέθηκαν σταθμοί κατά μήκος αυτής της διαδρομής.",
-
   "fuelCostCalculator": "Υπολογιστής κόστους καυσίμου",
   "distanceKm": "Απόσταση (χλμ)",
   "consumptionL100km": "Κατανάλωση (L/100χλμ)",
@@ -255,7 +345,6 @@
   "fuelNeeded": "Απαιτούμενο καύσιμο",
   "totalCost": "Συνολικό κόστος",
   "enterCalcValues": "Εισάγετε απόσταση, κατανάλωση και τιμή για υπολογισμό κόστους ταξιδιού",
-
   "priceHistory": "Ιστορικό τιμών",
   "noPriceHistory": "Δεν υπάρχει ακόμη ιστορικό τιμών",
   "noHourlyData": "Χωρίς ωριαία δεδομένα",
@@ -264,7 +353,6 @@
   "statMax": "Μέγ",
   "statAvg": "Μέσ",
   "showAllFuelTypes": "Εμφάνιση όλων των τύπων καυσίμου",
-
   "connected": "Συνδεδεμένο",
   "notConnected": "Μη συνδεδεμένο",
   "connectTankSync": "Σύνδεση TankSync",
@@ -274,7 +362,6 @@
   "tapToUpdateGps": "Πατήστε για ενημέρωση θέσης GPS",
   "gpsAutoUpdateHint": "Η θέση GPS αποκτάται αυτόματα κατά την αναζήτηση. Μπορείτε επίσης να την ενημερώσετε χειροκίνητα εδώ.",
   "clearGpsConfirm": "Διαγραφή αποθηκευμένης θέσης GPS; Μπορείτε να την ενημερώσετε ξανά ανά πάσα στιγμή.",
-
   "pageNotFound": "Η σελίδα δεν βρέθηκε",
   "deleteAllServerData": "Διαγραφή όλων των δεδομένων διακομιστή",
   "deleteServerDataConfirm": "Διαγραφή όλων των δεδομένων διακομιστή;",
@@ -282,7 +369,6 @@
   "allDataDeleted": "Όλα τα δεδομένα διακομιστή διαγράφηκαν",
   "disconnectConfirm": "Αποσύνδεση TankSync;",
   "disconnect": "Αποσύνδεση",
-
   "myServerData": "Τα δεδομένα μου στον διακομιστή",
   "anonymousUuid": "Ανώνυμο UUID",
   "server": "Διακομιστής",
@@ -295,5 +381,8 @@
   "exportJson": "Εξαγωγή ως JSON (πρόχειρο)",
   "jsonCopied": "JSON αντιγράφηκε στο πρόχειρο",
   "rawDataJson": "Ακατέργαστα δεδομένα (JSON)",
-  "close": "Κλείσιμο"
+  "close": "Κλείσιμο",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }

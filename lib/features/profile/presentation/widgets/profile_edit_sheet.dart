@@ -61,6 +61,43 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
     super.dispose();
   }
 
+  Future<void> _confirmDelete(BuildContext ctx) async {
+    final l10n = AppLocalizations.of(ctx);
+    final confirmed = await showDialog<bool>(
+      context: ctx,
+      builder: (context) => AlertDialog(
+        icon: Icon(
+          Icons.warning_amber_rounded,
+          color: Theme.of(context).colorScheme.error,
+          size: 48,
+        ),
+        title: Text(l10n?.deleteProfileTitle ?? 'Delete profile?'),
+        content: Text(
+          l10n?.deleteProfileBody ??
+              'This profile and its settings will be permanently deleted. This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n?.cancel ?? 'Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n?.deleteProfileConfirm ?? 'Delete profile'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      widget.onDelete!();
+      Navigator.pop(ctx);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
@@ -299,10 +336,7 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
                   if (widget.onDelete != null) ...[
                   const SizedBox(width: 16),
                   OutlinedButton(
-                    onPressed: () {
-                      widget.onDelete!();
-                      Navigator.pop(context);
-                    },
+                    onPressed: () => _confirmDelete(context),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red,
                     ),

@@ -18,7 +18,13 @@
   "open": "Aberto",
   "closed": "Fechado",
   "distance": "a {distance}",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Preço",
   "prices": "Preços",
   "address": "Morada",
@@ -64,7 +70,13 @@
   "clearAllData": "Eliminar todos os dados",
   "errorLog": "Registo de erros",
   "stationsFound": "{count} postos encontrados",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "whatIsShared": "O que é partilhado — e com quem?",
   "gpsCoordinates": "Coordenadas GPS",
   "gpsReason": "Enviadas em cada pesquisa para encontrar postos próximos.",
@@ -94,9 +106,21 @@
   "priceQuery": "Consulta de preços",
   "zipGeocoding": "Geocodificação de código postal",
   "minutes": "{n} minutos",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} horas",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Limpar cache?",
   "clearCacheBody": "Os resultados de pesquisa e preços em cache serão eliminados. Perfis, favoritos e definições são preservados.",
   "clearCacheButton": "Limpar cache",
@@ -126,7 +150,13 @@
   "cheap": "barato",
   "expensive": "caro",
   "stationsOnMap": "{count} postos",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "A carregar favoritos...\nPesquise postos primeiro para guardar dados.",
   "reportPrice": "Reportar preço",
   "whatsWrong": "O que está errado?",
@@ -143,12 +173,36 @@
   "location": "Localização",
   "switchProfileTitle": "País alterado",
   "switchProfilePrompt": "Está agora em {country}. Mudar para o perfil \"{profile}\"?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Mudou para o perfil \"{profile}\" ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Sem perfil para este país",
   "noProfileForCountry": "Está em {country}, mas não há perfil configurado. Crie um nas Definições.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Mudança automática de perfil",
   "autoSwitchDescription": "Mudar perfil automaticamente ao cruzar fronteiras",
   "switchProfile": "Mudar",
@@ -161,10 +215,22 @@
   "noPriceAlerts": "Sem alertas de preço",
   "noPriceAlertsHint": "Crie um alerta a partir da página de detalhes de um posto.",
   "alertDeleted": "Alerta \"{name}\" eliminado",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Criar alerta de preço",
   "currentPrice": "Preço atual: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Preço alvo (EUR)",
   "enterPrice": "Introduza um preço",
   "invalidPrice": "Preço inválido",
@@ -182,11 +248,16 @@
   "bestStops": "Melhores paragens",
   "openInMaps": "Abrir em Mapas",
   "noStationsAlongRoute": "Nenhum posto encontrado ao longo da rota",
-
   "evOperational": "Operacional",
   "evStatusUnknown": "Estado desconhecido",
   "evConnectors": "Conectores ({count} pontos)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Sem detalhes de conectores disponíveis",
   "evUsageCost": "Custo de utilização",
   "evPricingUnavailable": "Preço não disponível do fornecedor",
@@ -198,7 +269,6 @@
   "evRefreshStatus": "Atualizar estado",
   "evStatusUpdated": "Estado atualizado",
   "evStationNotFound": "Não foi possível atualizar — posto não encontrado nas proximidades",
-
   "addedToFavorites": "Adicionado aos favoritos",
   "removedFromFavorites": "Removido dos favoritos",
   "addFavorite": "Adicionar aos favoritos",
@@ -206,7 +276,6 @@
   "currentLocation": "Localização atual",
   "gpsError": "Erro GPS",
   "couldNotResolve": "Não foi possível resolver início ou destino",
-
   "start": "Início",
   "destination": "Destino",
   "cityAddressOrGps": "Cidade, morada ou GPS",
@@ -214,15 +283,32 @@
   "useGps": "Usar GPS",
   "stop": "Paragem",
   "stopN": "Paragem {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Adicionar paragem",
   "searchAlongRoute": "Pesquisar ao longo da rota",
   "cheapest": "Mais barato",
   "nStations": "{count} postos",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} melhores",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Preços de combustível (Tankerkoenig)",
   "requiredForFuelSearch": "Necessário para pesquisa de preços de combustível na Alemanha",
   "evChargingOpenChargeMap": "Carregamento EV (OpenChargeMap)",
@@ -235,10 +321,15 @@
   "tankerkoenigApiKey": "Chave API Tankerkoenig",
   "evChargingApiKey": "Chave API carregamento EV",
   "openChargeMapApiKey": "Chave API OpenChargeMap",
-
   "routeSegment": "Segmento da rota",
   "showCheapestEveryNKm": "Mostrar posto mais barato a cada {km} km ao longo da rota",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Evitar autoestradas",
   "avoidHighwaysDesc": "O cálculo da rota evita portagens e autoestradas",
   "showFuelStations": "Mostrar postos de combustível",
@@ -246,7 +337,6 @@
   "showEvStations": "Mostrar postos de carregamento",
   "showEvStationsDesc": "Incluir postos de carregamento elétrico nos resultados",
   "noStationsAlongThisRoute": "Nenhum posto encontrado ao longo desta rota.",
-
   "fuelCostCalculator": "Calculadora de custo de combustível",
   "distanceKm": "Distância (km)",
   "consumptionL100km": "Consumo (L/100km)",
@@ -255,7 +345,6 @@
   "fuelNeeded": "Combustível necessário",
   "totalCost": "Custo total",
   "enterCalcValues": "Introduza distância, consumo e preço para calcular o custo da viagem",
-
   "priceHistory": "Histórico de preços",
   "noPriceHistory": "Sem histórico de preços ainda",
   "noHourlyData": "Sem dados horários",
@@ -264,7 +353,6 @@
   "statMax": "Máx",
   "statAvg": "Méd",
   "showAllFuelTypes": "Mostrar todos os tipos de combustível",
-
   "connected": "Ligado",
   "notConnected": "Não ligado",
   "connectTankSync": "Ligar TankSync",
@@ -274,7 +362,6 @@
   "tapToUpdateGps": "Toque para atualizar a posição GPS",
   "gpsAutoUpdateHint": "A posição GPS é obtida automaticamente ao pesquisar. Também pode atualizá-la manualmente aqui.",
   "clearGpsConfirm": "Limpar a posição GPS guardada? Pode atualizá-la novamente a qualquer momento.",
-
   "pageNotFound": "Página não encontrada",
   "deleteAllServerData": "Eliminar todos os dados do servidor",
   "deleteServerDataConfirm": "Eliminar todos os dados do servidor?",
@@ -282,7 +369,6 @@
   "allDataDeleted": "Todos os dados do servidor eliminados",
   "disconnectConfirm": "Desligar TankSync?",
   "disconnect": "Desligar",
-
   "myServerData": "Os meus dados do servidor",
   "anonymousUuid": "UUID anónimo",
   "server": "Servidor",
@@ -295,5 +381,8 @@
   "exportJson": "Exportar como JSON (área de transferência)",
   "jsonCopied": "JSON copiado para a área de transferência",
   "rawDataJson": "Dados brutos (JSON)",
-  "close": "Fechar"
+  "close": "Fechar",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }
