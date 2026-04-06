@@ -6,6 +6,7 @@ import '../../features/alerts/data/repositories/alert_repository.dart';
 import '../../features/price_history/data/models/price_record.dart';
 import '../../features/search/domain/entities/fuel_type.dart';
 import '../../features/widget/data/home_widget_service.dart';
+import '../constants/field_names.dart';
 import '../notifications/notification_service.dart';
 import '../storage/hive_storage.dart';
 import '../utils/json_extensions.dart';
@@ -166,8 +167,8 @@ Future<void> _refreshPricesAndCheckAlerts() async {
             baseDelay: BackgroundService.retryBaseDelay,
           ),
         );
-        if (data != null && data['ok'] == true && data['prices'] != null) {
-          final rawPrices = data.getMap('prices');
+        if (data != null && data[TankerkoenigFields.ok] == true && data[TankerkoenigFields.prices] != null) {
+          final rawPrices = data.getMap(TankerkoenigFields.prices);
           if (rawPrices != null) {
             for (final entry in rawPrices.entries) {
               final value = entry.value;
@@ -188,14 +189,14 @@ Future<void> _refreshPricesAndCheckAlerts() async {
       for (final entry in prices.entries) {
         final stationId = entry.key;
         final p = entry.value;
-        if (p['status'] == 'no prices') continue;
+        if (p[TankerkoenigFields.status] == TankerkoenigFields.statusNoPrices) continue;
 
         final record = PriceRecord(
           stationId: stationId,
           recordedAt: now,
-          e5: p.getDouble('e5'),
-          e10: p.getDouble('e10'),
-          diesel: p.getDouble('diesel'),
+          e5: p.getDouble(TankerkoenigFields.e5),
+          e10: p.getDouble(TankerkoenigFields.e10),
+          diesel: p.getDouble(TankerkoenigFields.diesel),
         );
 
         // Deduplicate: only save if last record is older than dedup window
@@ -227,19 +228,19 @@ Future<void> _refreshPricesAndCheckAlerts() async {
       for (final entry in prices.entries) {
         final stationId = entry.key;
         final p = entry.value;
-        if (p['status'] == 'no prices') continue;
+        if (p[TankerkoenigFields.status] == TankerkoenigFields.statusNoPrices) continue;
 
         final cached = storage.getCachedData('station:$stationId');
         final cachedData = cached?.getMap('data');
         if (cachedData != null) {
           final stationData = Map<String, dynamic>.from(cachedData);
-          final e5 = p.getDouble('e5');
-          final e10 = p.getDouble('e10');
-          final diesel = p.getDouble('diesel');
-          if (e5 != null) stationData['e5'] = e5;
-          if (e10 != null) stationData['e10'] = e10;
-          if (diesel != null) stationData['diesel'] = diesel;
-          stationData['isOpen'] = p['status'] == 'open';
+          final e5 = p.getDouble(TankerkoenigFields.e5);
+          final e10 = p.getDouble(TankerkoenigFields.e10);
+          final diesel = p.getDouble(TankerkoenigFields.diesel);
+          if (e5 != null) stationData[TankerkoenigFields.e5] = e5;
+          if (e10 != null) stationData[TankerkoenigFields.e10] = e10;
+          if (diesel != null) stationData[TankerkoenigFields.diesel] = diesel;
+          stationData[TankerkoenigFields.isOpen] = p[TankerkoenigFields.status] == TankerkoenigFields.statusOpen;
           await storage.cacheData('station:$stationId', stationData);
         }
       }
@@ -254,16 +255,16 @@ Future<void> _refreshPricesAndCheckAlerts() async {
 
       for (final alert in activeAlerts) {
         final stationPrices = prices[alert.stationId];
-        if (stationPrices == null || stationPrices['status'] == 'no prices') continue;
+        if (stationPrices == null || stationPrices[TankerkoenigFields.status] == TankerkoenigFields.statusNoPrices) continue;
 
         double? currentPrice;
         switch (alert.fuelType) {
           case FuelType.e5:
-            currentPrice = stationPrices.getDouble('e5');
+            currentPrice = stationPrices.getDouble(TankerkoenigFields.e5);
           case FuelType.e10:
-            currentPrice = stationPrices.getDouble('e10');
+            currentPrice = stationPrices.getDouble(TankerkoenigFields.e10);
           case FuelType.diesel:
-            currentPrice = stationPrices.getDouble('diesel');
+            currentPrice = stationPrices.getDouble(TankerkoenigFields.diesel);
           default:
             continue;
         }
