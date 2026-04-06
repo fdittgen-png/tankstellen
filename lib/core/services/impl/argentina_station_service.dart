@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
+import 'argentina_fuel_classifier.dart';
 import '../../../features/search/data/models/search_params.dart';
 import '../../../features/search/domain/entities/station.dart';
 import '../../utils/geo_utils.dart';
@@ -68,21 +69,21 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
           dist: dist,
         ));
 
-        // Map fuel types
-        // CSV product names: "Nafta (premium) de más de 95 Ron",
-        //   "Nafta (súper) entre 92 y 95 Ron",
-        //   "Gas Oil Grado 2", "Gas Oil Grado 3", "GNC"
-        final producto = raw.producto.toLowerCase();
-        if (producto.contains('nafta') && (producto.contains('premium') || producto.contains('95 ron') || producto.contains('grado 3'))) {
-          merged.naftaPremium ??= raw.precio;
-        } else if (producto.contains('nafta') && (producto.contains('súper') || producto.contains('super') || producto.contains('92') || producto.contains('grado 2'))) {
-          merged.naftaRegular ??= raw.precio;
-        } else if (producto.contains('gas oil') && (producto.contains('grado 3') || producto.contains('premium'))) {
-          merged.dieselPremium ??= raw.precio;
-        } else if (producto.contains('gas oil') && (producto.contains('grado 2') || !producto.contains('grado 3'))) {
-          merged.dieselRegular ??= raw.precio;
-        } else if (producto.contains('gnc')) {
-          merged.gnc ??= raw.precio;
+        // Map fuel types — classification lives in classifyArgentinaProduct
+        // so it can be unit-tested against the API's quirky product strings.
+        switch (classifyArgentinaProduct(raw.producto)) {
+          case ArgentinaFuelCategory.naftaPremium:
+            merged.naftaPremium ??= raw.precio;
+          case ArgentinaFuelCategory.naftaRegular:
+            merged.naftaRegular ??= raw.precio;
+          case ArgentinaFuelCategory.dieselPremium:
+            merged.dieselPremium ??= raw.precio;
+          case ArgentinaFuelCategory.dieselRegular:
+            merged.dieselRegular ??= raw.precio;
+          case ArgentinaFuelCategory.gnc:
+            merged.gnc ??= raw.precio;
+          case null:
+            break;
         }
       }
 
