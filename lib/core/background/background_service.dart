@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../../features/alerts/data/repositories/alert_repository.dart';
@@ -85,13 +84,8 @@ void callbackDispatcher() {
 /// evaluate alerts, and fire notifications.
 Future<void> _refreshPricesAndCheckAlerts() async {
   try {
-    // Initialize Hive in isolate
-    await Hive.initFlutter();
-    await Hive.openBox('settings');
-    await Hive.openBox('favorites');
-    await Hive.openBox('alerts');
-    await Hive.openBox('cache');
-    await Hive.openBox('price_history');
+    // Initialize Hive in isolate with proper encryption
+    await HiveStorage.initInIsolate();
 
     final storage = HiveStorage();
 

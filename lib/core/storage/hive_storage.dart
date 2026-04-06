@@ -86,6 +86,20 @@ class HiveStorage implements StorageRepository {
     await Hive.openBox(_alertsBox);
   }
 
+  /// Initialize Hive in a background isolate with proper encryption.
+  /// Background isolates (WorkManager) run in separate Dart isolates and
+  /// must re-initialize Hive. This ensures encrypted boxes use the same
+  /// cipher as the main isolate.
+  static Future<void> initInIsolate() async {
+    await Hive.initFlutter();
+    final cipher = await _loadCipher();
+    await Hive.openBox(_settingsBox, encryptionCipher: cipher);
+    await Hive.openBox(_favoritesBox);
+    await Hive.openBox(_alertsBox);
+    await Hive.openBox(_cacheBox);
+    await Hive.openBox(_priceHistoryBox);
+  }
+
   @visibleForTesting
   static Future<void> initForTest() async {
     await Hive.openBox(_settingsBox);
