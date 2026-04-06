@@ -307,5 +307,8 @@
   "noSavedRoutes": "Aucun itinéraire enregistré",
   "noSavedRoutesHint": "Recherchez le long d'un itinéraire et enregistrez-le pour un accès rapide.",
   "saveRoute": "Enregistrer l'itinéraire",
-  "routeName": "Nom de l'itinéraire"
+  "routeName": "Nom de l'itinéraire",
+  "deleteProfileTitle": "Supprimer le profil ?",
+  "deleteProfileBody": "Ce profil et ses paramètres seront définitivement supprimés. Cette action est irréversible.",
+  "deleteProfileConfirm": "Supprimer le profil"
 }

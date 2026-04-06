@@ -1843,6 +1843,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Refresh failed. Please try again.'**
   String get refreshFailed;
+
+  /// No description provided for @deleteProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete profile?'**
+  String get deleteProfileTitle;
+
+  /// No description provided for @deleteProfileBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This profile and its settings will be permanently deleted. This cannot be undone.'**
+  String get deleteProfileBody;
+
+  /// No description provided for @deleteProfileConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete profile'**
+  String get deleteProfileConfirm;
 }
 
 class _AppLocalizationsDelegate

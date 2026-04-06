@@ -321,5 +321,8 @@
       "name": { "type": "String" }
     }
   },
-  "refreshFailed": "Refresh failed. Please try again."
+  "refreshFailed": "Refresh failed. Please try again.",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }

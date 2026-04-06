@@ -18,7 +18,13 @@
   "open": "Otvorené",
   "closed": "Zatvorené",
   "distance": "{distance} ďaleko",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Cena",
   "prices": "Ceny",
   "address": "Adresa",
@@ -64,7 +70,13 @@
   "clearAllData": "Vymazať všetky údaje",
   "errorLog": "Protokol chýb",
   "stationsFound": "Nájdených {count} staníc",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "whatIsShared": "Čo sa zdieľa — a s kým?",
   "gpsCoordinates": "Súradnice GPS",
   "gpsReason": "Odosielané s každým vyhľadávaním na nájdenie blízkych staníc.",
@@ -94,9 +106,21 @@
   "priceQuery": "Dopyt na cenu",
   "zipGeocoding": "Geokódovanie PSČ",
   "minutes": "{n} minút",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} hodín",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Vymazať vyrovnávaciu pamäť?",
   "clearCacheBody": "Uložené výsledky hľadania a ceny budú vymazané. Profily, obľúbené a nastavenia zostanú zachované.",
   "clearCacheButton": "Vymazať vyrovnávaciu pamäť",
@@ -126,7 +150,13 @@
   "cheap": "lacné",
   "expensive": "drahé",
   "stationsOnMap": "{count} staníc",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Načítavanie obľúbených...\nNajprv vyhľadajte stanice na uloženie údajov.",
   "reportPrice": "Nahlásiť cenu",
   "whatsWrong": "Čo nie je v poriadku?",
@@ -143,12 +173,36 @@
   "location": "Poloha",
   "switchProfileTitle": "Krajina zmenená",
   "switchProfilePrompt": "Nachádzate sa v {country}. Prepnúť na profil \"{profile}\"?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Prepnuté na profil \"{profile}\" ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Žiadny profil pre túto krajinu",
   "noProfileForCountry": "Nachádzate sa v {country}, ale nie je nakonfigurovaný žiadny profil. Vytvorte ho v Nastaveniach.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Automatické prepnutie profilu",
   "autoSwitchDescription": "Automaticky prepnúť profil pri prekročení hraníc",
   "switchProfile": "Prepnúť",
@@ -161,10 +215,22 @@
   "noPriceAlerts": "Žiadne cenové upozornenia",
   "noPriceAlertsHint": "Vytvorte upozornenie zo stránky s podrobnosťami stanice.",
   "alertDeleted": "Upozornenie \"{name}\" vymazané",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Vytvoriť cenové upozornenie",
   "currentPrice": "Aktuálna cena: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Cieľová cena (EUR)",
   "enterPrice": "Zadajte cenu",
   "invalidPrice": "Neplatná cena",
@@ -182,11 +248,16 @@
   "bestStops": "Najlepšie zastávky",
   "openInMaps": "Otvoriť v Mapách",
   "noStationsAlongRoute": "Pozdĺž trasy neboli nájdené žiadne stanice",
-
   "evOperational": "V prevádzke",
   "evStatusUnknown": "Stav neznámy",
   "evConnectors": "Konektory ({count} bodov)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Žiadne podrobnosti o konektoroch",
   "evUsageCost": "Náklady na použitie",
   "evPricingUnavailable": "Ceny nie sú k dispozícii od poskytovateľa",
@@ -198,7 +269,6 @@
   "evRefreshStatus": "Aktualizovať stav",
   "evStatusUpdated": "Stav aktualizovaný",
   "evStationNotFound": "Nie je možné aktualizovať — stanica nenájdená v okolí",
-
   "addedToFavorites": "Pridané do obľúbených",
   "removedFromFavorites": "Odstránené z obľúbených",
   "addFavorite": "Pridať do obľúbených",
@@ -206,7 +276,6 @@
   "currentLocation": "Aktuálna poloha",
   "gpsError": "Chyba GPS",
   "couldNotResolve": "Nie je možné určiť štart alebo cieľ",
-
   "start": "Štart",
   "destination": "Cieľ",
   "cityAddressOrGps": "Mesto, adresa alebo GPS",
@@ -214,15 +283,32 @@
   "useGps": "Použiť GPS",
   "stop": "Zastávka",
   "stopN": "Zastávka {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Pridať zastávku",
   "searchAlongRoute": "Hľadať pozdĺž trasy",
   "cheapest": "Najlacnejšia",
   "nStations": "{count} staníc",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} najlepších",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Ceny palív (Tankerkoenig)",
   "requiredForFuelSearch": "Vyžadované pre vyhľadávanie cien palív v Nemecku",
   "evChargingOpenChargeMap": "Nabíjanie EV (OpenChargeMap)",
@@ -235,10 +321,15 @@
   "tankerkoenigApiKey": "Kľúč API Tankerkoenig",
   "evChargingApiKey": "Kľúč API nabíjania EV",
   "openChargeMapApiKey": "Kľúč API OpenChargeMap",
-
   "routeSegment": "Úsek trasy",
   "showCheapestEveryNKm": "Zobraziť najlacnejšiu stanicu každých {km} km pozdĺž trasy",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Vyhnúť sa diaľniciam",
   "avoidHighwaysDesc": "Výpočet trasy sa vyhýba spoplatneným cestám a diaľniciam",
   "showFuelStations": "Zobraziť čerpacie stanice",
@@ -246,7 +337,6 @@
   "showEvStations": "Zobraziť nabíjacie stanice",
   "showEvStationsDesc": "Zahrnúť elektrické nabíjacie stanice vo výsledkoch",
   "noStationsAlongThisRoute": "Pozdĺž tejto trasy neboli nájdené žiadne stanice.",
-
   "fuelCostCalculator": "Kalkulačka nákladov na palivo",
   "distanceKm": "Vzdialenosť (km)",
   "consumptionL100km": "Spotreba (L/100km)",
@@ -255,7 +345,6 @@
   "fuelNeeded": "Potrebné palivo",
   "totalCost": "Celkové náklady",
   "enterCalcValues": "Zadajte vzdialenosť, spotrebu a cenu pre výpočet nákladov na cestu",
-
   "priceHistory": "História cien",
   "noPriceHistory": "Zatiaľ žiadna história cien",
   "noHourlyData": "Žiadne hodinové údaje",
@@ -264,7 +353,6 @@
   "statMax": "Max",
   "statAvg": "Priem",
   "showAllFuelTypes": "Zobraziť všetky typy palív",
-
   "connected": "Pripojené",
   "notConnected": "Nepripojené",
   "connectTankSync": "Pripojiť TankSync",
@@ -274,7 +362,6 @@
   "tapToUpdateGps": "Ťuknite pre aktualizáciu polohy GPS",
   "gpsAutoUpdateHint": "Poloha GPS sa získava automaticky pri hľadaní. Môžete ju tiež aktualizovať manuálne tu.",
   "clearGpsConfirm": "Vymazať uloženú polohu GPS? Môžete ju kedykoľvek znova aktualizovať.",
-
   "pageNotFound": "Stránka nenájdená",
   "deleteAllServerData": "Vymazať všetky údaje servera",
   "deleteServerDataConfirm": "Vymazať všetky údaje servera?",
@@ -282,7 +369,6 @@
   "allDataDeleted": "Všetky údaje servera vymazané",
   "disconnectConfirm": "Odpojiť TankSync?",
   "disconnect": "Odpojiť",
-
   "myServerData": "Moje údaje na serveri",
   "anonymousUuid": "Anonymné UUID",
   "server": "Server",
@@ -295,5 +381,8 @@
   "exportJson": "Exportovať ako JSON (schránka)",
   "jsonCopied": "JSON skopírovaný do schránky",
   "rawDataJson": "Surové údaje (JSON)",
-  "close": "Zavrieť"
+  "close": "Zavrieť",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }

@@ -18,7 +18,13 @@
   "open": "Abierto",
   "closed": "Cerrado",
   "distance": "a {distance}",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Precio",
   "prices": "Precios",
   "address": "Dirección",
@@ -64,14 +70,26 @@
   "clearAllData": "Eliminar todos los datos",
   "errorLog": "Registro de errores",
   "stationsFound": "{count} gasolineras encontradas",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "locationDenied": "Permiso de ubicación denegado. Puede buscar por código postal.",
   "demoModeBanner": "Modo demo. Configure la clave API en ajustes.",
   "sortDistance": "Distancia",
   "cheap": "barato",
   "expensive": "caro",
   "stationsOnMap": "{count} estaciones",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Cargando favoritos...\nBusque estaciones primero para guardar datos.",
   "reportPrice": "Reportar precio",
   "whatsWrong": "¿Qué está mal?",
@@ -88,12 +106,36 @@
   "location": "Ubicación",
   "switchProfileTitle": "País cambiado",
   "switchProfilePrompt": "Estás en {country}. ¿Cambiar al perfil \"{profile}\"?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Cambiado al perfil \"{profile}\" ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Sin perfil para este país",
   "noProfileForCountry": "Estás en {country}, pero no hay un perfil configurado. Crea uno en Ajustes.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Cambio automático de perfil",
   "autoSwitchDescription": "Cambiar perfil automáticamente al cruzar fronteras",
   "switchProfile": "Cambiar",
@@ -130,9 +172,21 @@
   "priceQuery": "Consulta de precios",
   "zipGeocoding": "Geocodificación de código postal",
   "minutes": "{n} minutos",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} horas",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "¿Limpiar caché?",
   "clearCacheBody": "Los resultados de búsqueda y precios en caché se eliminarán. Los perfiles, favoritos y ajustes se conservan.",
   "clearCacheButton": "Limpiar caché",
@@ -155,38 +209,55 @@
   "lastUpdate": "Última actualización",
   "automate24h": "24h/24 — Automático",
   "refreshPrices": "Actualizar precios",
-  "station": "Estación"
-  ,"allFuels": "Todos",
+  "station": "Estación",
+  "allFuels": "Todos",
   "priceAlerts": "Alertas de precio",
   "noPriceAlerts": "Sin alertas de precio",
   "noPriceAlertsHint": "Crea una alerta desde la página de detalle de una gasolinera.",
   "alertDeleted": "Alerta \"{name}\" eliminada",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Crear alerta de precio",
   "currentPrice": "Precio actual: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Precio objetivo (EUR)",
   "enterPrice": "Introduzca un precio",
   "invalidPrice": "Precio no válido",
   "priceTooHigh": "Precio demasiado alto",
   "create": "Crear",
-  "alertCreated": "Alerta de precio creada"
-  ,"wrongE5Price": "Precio Super E5 incorrecto"
-  ,"wrongE10Price": "Precio Super E10 incorrecto"
-  ,"wrongDieselPrice": "Precio Diésel incorrecto"
-  ,"wrongStatusOpen": "Aparece abierto, pero cerrado"
-  ,"wrongStatusClosed": "Aparece cerrado, pero abierto"
-  ,"searchAlongRouteLabel": "A lo largo de la ruta"
-  ,"searchEvStations": "Buscar estaciones de carga"
-  ,"allStations": "Todas las estaciones"
-  ,"bestStops": "Mejores paradas"
-  ,"openInMaps": "Abrir en Mapas"
-  ,"noStationsAlongRoute": "No se encontraron estaciones a lo largo de la ruta",
-
+  "alertCreated": "Alerta de precio creada",
+  "wrongE5Price": "Precio Super E5 incorrecto",
+  "wrongE10Price": "Precio Super E10 incorrecto",
+  "wrongDieselPrice": "Precio Diésel incorrecto",
+  "wrongStatusOpen": "Aparece abierto, pero cerrado",
+  "wrongStatusClosed": "Aparece cerrado, pero abierto",
+  "searchAlongRouteLabel": "A lo largo de la ruta",
+  "searchEvStations": "Buscar estaciones de carga",
+  "allStations": "Todas las estaciones",
+  "bestStops": "Mejores paradas",
+  "openInMaps": "Abrir en Mapas",
+  "noStationsAlongRoute": "No se encontraron estaciones a lo largo de la ruta",
   "evOperational": "Operativa",
   "evStatusUnknown": "Estado desconocido",
   "evConnectors": "Conectores ({count} puntos)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Sin detalles de conectores disponibles",
   "evUsageCost": "Coste de uso",
   "evPricingUnavailable": "Precio no disponible del proveedor",
@@ -198,7 +269,6 @@
   "evRefreshStatus": "Actualizar estado",
   "evStatusUpdated": "Estado actualizado",
   "evStationNotFound": "No se pudo actualizar — estación no encontrada cerca",
-
   "addedToFavorites": "Añadido a favoritos",
   "removedFromFavorites": "Eliminado de favoritos",
   "addFavorite": "Añadir a favoritos",
@@ -206,7 +276,6 @@
   "currentLocation": "Ubicación actual",
   "gpsError": "Error GPS",
   "couldNotResolve": "No se pudo resolver el inicio o el destino",
-
   "start": "Inicio",
   "destination": "Destino",
   "cityAddressOrGps": "Ciudad, dirección o GPS",
@@ -214,15 +283,32 @@
   "useGps": "Usar GPS",
   "stop": "Parada",
   "stopN": "Parada {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Añadir parada",
   "searchAlongRoute": "Buscar a lo largo de la ruta",
   "cheapest": "Más barata",
   "nStations": "{count} estaciones",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} mejores",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Precios de combustible (Tankerkoenig)",
   "requiredForFuelSearch": "Requerido para buscar precios de combustible en Alemania",
   "evChargingOpenChargeMap": "Carga EV (OpenChargeMap)",
@@ -235,10 +321,15 @@
   "tankerkoenigApiKey": "Clave API Tankerkoenig",
   "evChargingApiKey": "Clave API carga EV",
   "openChargeMapApiKey": "Clave API OpenChargeMap",
-
   "routeSegment": "Segmento de ruta",
   "showCheapestEveryNKm": "Mostrar estación más barata cada {km} km a lo largo de la ruta",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Evitar autopistas",
   "avoidHighwaysDesc": "El cálculo de ruta evita carreteras de peaje y autopistas",
   "showFuelStations": "Mostrar gasolineras",
@@ -246,7 +337,6 @@
   "showEvStations": "Mostrar estaciones de carga",
   "showEvStationsDesc": "Incluir estaciones de carga eléctrica en los resultados",
   "noStationsAlongThisRoute": "No se encontraron estaciones a lo largo de esta ruta.",
-
   "fuelCostCalculator": "Calculadora de coste de combustible",
   "distanceKm": "Distancia (km)",
   "consumptionL100km": "Consumo (L/100km)",
@@ -255,7 +345,6 @@
   "fuelNeeded": "Combustible necesario",
   "totalCost": "Coste total",
   "enterCalcValues": "Introduzca distancia, consumo y precio para calcular el coste del viaje",
-
   "priceHistory": "Historial de precios",
   "noPriceHistory": "Aún no hay historial de precios",
   "noHourlyData": "Sin datos por hora",
@@ -264,7 +353,6 @@
   "statMax": "Máx",
   "statAvg": "Prom",
   "showAllFuelTypes": "Mostrar todos los tipos de combustible",
-
   "connected": "Conectado",
   "notConnected": "No conectado",
   "connectTankSync": "Conectar TankSync",
@@ -274,7 +362,6 @@
   "tapToUpdateGps": "Toque para actualizar la posición GPS",
   "gpsAutoUpdateHint": "La posición GPS se adquiere automáticamente al buscar. También puede actualizarla manualmente aquí.",
   "clearGpsConfirm": "¿Borrar la posición GPS almacenada? Puede actualizarla en cualquier momento.",
-
   "pageNotFound": "Página no encontrada",
   "deleteAllServerData": "Eliminar todos los datos del servidor",
   "deleteServerDataConfirm": "¿Eliminar todos los datos del servidor?",
@@ -282,7 +369,6 @@
   "allDataDeleted": "Todos los datos del servidor eliminados",
   "disconnectConfirm": "¿Desconectar TankSync?",
   "disconnect": "Desconectar",
-
   "myServerData": "Mis datos del servidor",
   "anonymousUuid": "UUID anónimo",
   "server": "Servidor",
@@ -296,16 +382,17 @@
   "jsonCopied": "JSON copiado al portapapeles",
   "rawDataJson": "Datos brutos (JSON)",
   "close": "Cerrar",
-
   "account": "Cuenta",
   "continueAsGuest": "Continuar como invitado",
   "createAccount": "Crear cuenta",
   "signIn": "Iniciar sesión",
   "upgradeToEmail": "Crear cuenta de correo",
-
   "savedRoutes": "Rutas guardadas",
   "noSavedRoutes": "Sin rutas guardadas",
   "noSavedRoutesHint": "Busca a lo largo de una ruta y guárdala para acceso rápido.",
   "saveRoute": "Guardar ruta",
-  "routeName": "Nombre de la ruta"
+  "routeName": "Nombre de la ruta",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }

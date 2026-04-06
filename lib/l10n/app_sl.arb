@@ -18,7 +18,13 @@
   "open": "Odprto",
   "closed": "Zaprto",
   "distance": "{distance} stran",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Cena",
   "prices": "Cene",
   "address": "Naslov",
@@ -64,7 +70,13 @@
   "clearAllData": "Izbriši vse podatke",
   "errorLog": "Dnevnik napak",
   "stationsFound": "Najdenih {count} postaj",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "whatIsShared": "Kaj se deli — in s kom?",
   "gpsCoordinates": "GPS koordinate",
   "gpsReason": "Pošljejo se z vsakim iskanjem za iskanje bližnjih postaj.",
@@ -94,9 +106,21 @@
   "priceQuery": "Poizvedba o ceni",
   "zipGeocoding": "Geokodiranje poštne številke",
   "minutes": "{n} minut",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} ur",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Počistiti predpomnilnik?",
   "clearCacheBody": "Predpomnjeni rezultati iskanja in cene bodo izbrisani. Profili, priljubljene in nastavitve so ohranjeni.",
   "clearCacheButton": "Počisti predpomnilnik",
@@ -126,7 +150,13 @@
   "cheap": "poceni",
   "expensive": "drago",
   "stationsOnMap": "{count} postaj",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Nalaganje priljubljenih...\nNajprej poiščite postaje za shranjevanje podatkov.",
   "reportPrice": "Prijavi ceno",
   "whatsWrong": "Kaj ni v redu?",
@@ -143,12 +173,36 @@
   "location": "Lokacija",
   "switchProfileTitle": "Država spremenjena",
   "switchProfilePrompt": "Zdaj ste v {country}. Preklopiti na profil \"{profile}\"?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Preklopljeno na profil \"{profile}\" ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Ni profila za to državo",
   "noProfileForCountry": "Ste v {country}, vendar ni nastavljenega profila. Ustvarite ga v Nastavitvah.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Samodejna zamenjava profila",
   "autoSwitchDescription": "Samodejno zamenjaj profil ob prečkanju meje",
   "switchProfile": "Zamenjaj",
@@ -161,10 +215,22 @@
   "noPriceAlerts": "Ni cenovnih opozoril",
   "noPriceAlertsHint": "Ustvarite opozorilo s strani s podrobnostmi postaje.",
   "alertDeleted": "Opozorilo \"{name}\" izbrisano",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Ustvari cenovno opozorilo",
   "currentPrice": "Trenutna cena: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Ciljna cena (EUR)",
   "enterPrice": "Vnesite ceno",
   "invalidPrice": "Neveljavna cena",
@@ -182,11 +248,16 @@
   "bestStops": "Najboljše postanke",
   "openInMaps": "Odpri v Zemljevidih",
   "noStationsAlongRoute": "Vzdolž poti ni najdenih postaj",
-
   "evOperational": "V obratovanju",
   "evStatusUnknown": "Status neznan",
   "evConnectors": "Priključki ({count} točk)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Ni podrobnosti o priključkih",
   "evUsageCost": "Stroški uporabe",
   "evPricingUnavailable": "Cenik ni na voljo od ponudnika",
@@ -198,7 +269,6 @@
   "evRefreshStatus": "Osveži status",
   "evStatusUpdated": "Status posodobljen",
   "evStationNotFound": "Ni mogoče osvežiti — postaja ni najdena v bližini",
-
   "addedToFavorites": "Dodano med priljubljene",
   "removedFromFavorites": "Odstranjeno iz priljubljenih",
   "addFavorite": "Dodaj med priljubljene",
@@ -206,7 +276,6 @@
   "currentLocation": "Trenutna lokacija",
   "gpsError": "GPS napaka",
   "couldNotResolve": "Ni mogoče določiti začetka ali cilja",
-
   "start": "Začetek",
   "destination": "Cilj",
   "cityAddressOrGps": "Mesto, naslov ali GPS",
@@ -214,15 +283,32 @@
   "useGps": "Uporabi GPS",
   "stop": "Postanek",
   "stopN": "Postanek {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Dodaj postanek",
   "searchAlongRoute": "Iskanje vzdolž poti",
   "cheapest": "Najcenejša",
   "nStations": "{count} postaj",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} najboljših",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Cene goriv (Tankerkoenig)",
   "requiredForFuelSearch": "Potrebno za iskanje cen goriv v Nemčiji",
   "evChargingOpenChargeMap": "Polnjenje EV (OpenChargeMap)",
@@ -235,10 +321,15 @@
   "tankerkoenigApiKey": "API ključ Tankerkoenig",
   "evChargingApiKey": "API ključ polnjenja EV",
   "openChargeMapApiKey": "API ključ OpenChargeMap",
-
   "routeSegment": "Segment poti",
   "showCheapestEveryNKm": "Prikaži najcenejšo postajo vsakih {km} km vzdolž poti",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Izogibaj se avtocestam",
   "avoidHighwaysDesc": "Izračun poti se izogiba cestninjenim cestam in avtocestam",
   "showFuelStations": "Prikaži bencinske postaje",
@@ -246,7 +337,6 @@
   "showEvStations": "Prikaži polnilne postaje",
   "showEvStationsDesc": "Vključi električne polnilne postaje v rezultatih",
   "noStationsAlongThisRoute": "Vzdolž te poti ni najdenih postaj.",
-
   "fuelCostCalculator": "Kalkulator stroškov goriva",
   "distanceKm": "Razdalja (km)",
   "consumptionL100km": "Poraba (L/100km)",
@@ -255,7 +345,6 @@
   "fuelNeeded": "Potrebno gorivo",
   "totalCost": "Skupni stroški",
   "enterCalcValues": "Vnesite razdaljo, porabo in ceno za izračun stroškov potovanja",
-
   "priceHistory": "Zgodovina cen",
   "noPriceHistory": "Še ni zgodovine cen",
   "noHourlyData": "Ni urnih podatkov",
@@ -264,7 +353,6 @@
   "statMax": "Maks",
   "statAvg": "Povp",
   "showAllFuelTypes": "Prikaži vse vrste goriv",
-
   "connected": "Povezano",
   "notConnected": "Ni povezano",
   "connectTankSync": "Poveži TankSync",
@@ -274,7 +362,6 @@
   "tapToUpdateGps": "Tapnite za posodobitev GPS pozicije",
   "gpsAutoUpdateHint": "GPS pozicija se samodejno pridobi ob iskanju. Tukaj jo lahko tudi ročno posodobite.",
   "clearGpsConfirm": "Počistiti shranjeno GPS pozicijo? Kadar koli jo lahko znova posodobite.",
-
   "pageNotFound": "Stran ni najdena",
   "deleteAllServerData": "Izbriši vse podatke strežnika",
   "deleteServerDataConfirm": "Izbrisati vse podatke strežnika?",
@@ -282,7 +369,6 @@
   "allDataDeleted": "Vsi podatki strežnika izbrisani",
   "disconnectConfirm": "Prekiniti TankSync?",
   "disconnect": "Prekini",
-
   "myServerData": "Moji podatki na strežniku",
   "anonymousUuid": "Anonimni UUID",
   "server": "Strežnik",
@@ -295,5 +381,8 @@
   "exportJson": "Izvozi kot JSON (odložišče)",
   "jsonCopied": "JSON kopiran v odložišče",
   "rawDataJson": "Surovi podatki (JSON)",
-  "close": "Zapri"
+  "close": "Zapri",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }

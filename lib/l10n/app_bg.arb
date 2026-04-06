@@ -18,7 +18,13 @@
   "open": "Отворено",
   "closed": "Затворено",
   "distance": "на {distance}",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Цена",
   "prices": "Цени",
   "address": "Адрес",
@@ -64,7 +70,13 @@
   "clearAllData": "Изтриване на всички данни",
   "errorLog": "Дневник на грешките",
   "stationsFound": "Намерени {count} бензиностанции",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "whatIsShared": "Какво се споделя — и с кого?",
   "gpsCoordinates": "GPS координати",
   "gpsReason": "Изпращат се при всяко търсене за намиране на близки станции.",
@@ -94,9 +106,21 @@
   "priceQuery": "Запитване за цена",
   "zipGeocoding": "Геокодиране на пощенски код",
   "minutes": "{n} минути",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} часа",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Изчистване на кеша?",
   "clearCacheBody": "Кешираните резултати от търсене и цени ще бъдат изтрити. Профилите, любимите и настройките се запазват.",
   "clearCacheButton": "Изчисти кеша",
@@ -126,7 +150,13 @@
   "cheap": "евтино",
   "expensive": "скъпо",
   "stationsOnMap": "{count} станции",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Зареждане на любими...\nПърво потърсете станции, за да запазите данни.",
   "reportPrice": "Докладване на цена",
   "whatsWrong": "Какво не е наред?",
@@ -143,12 +173,36 @@
   "location": "Местоположение",
   "switchProfileTitle": "Държавата е сменена",
   "switchProfilePrompt": "Сега сте в {country}. Превключване към профил \"{profile}\"?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Превключено към профил \"{profile}\" ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Няма профил за тази държава",
   "noProfileForCountry": "Намирате се в {country}, но няма конфигуриран профил. Създайте един в Настройки.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Автоматично превключване на профил",
   "autoSwitchDescription": "Автоматично превключване на профила при преминаване на граница",
   "switchProfile": "Превключи",
@@ -161,10 +215,22 @@
   "noPriceAlerts": "Няма ценови сигнали",
   "noPriceAlertsHint": "Създайте сигнал от страницата с детайли на станция.",
   "alertDeleted": "Сигнал \"{name}\" изтрит",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Създаване на ценови сигнал",
   "currentPrice": "Текуща цена: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Целева цена (EUR)",
   "enterPrice": "Въведете цена",
   "invalidPrice": "Невалидна цена",
@@ -182,11 +248,16 @@
   "bestStops": "Най-добри спирки",
   "openInMaps": "Отвори в Карти",
   "noStationsAlongRoute": "Не са намерени станции по маршрута",
-
   "evOperational": "В експлоатация",
   "evStatusUnknown": "Състояние неизвестно",
   "evConnectors": "Конектори ({count} точки)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Няма налични детайли за конекторите",
   "evUsageCost": "Разходи за ползване",
   "evPricingUnavailable": "Ценова информация не е налична от доставчика",
@@ -198,7 +269,6 @@
   "evRefreshStatus": "Обновяване на състоянието",
   "evStatusUpdated": "Състоянието е обновено",
   "evStationNotFound": "Не може да се обнови — станцията не е намерена наблизо",
-
   "addedToFavorites": "Добавено в любими",
   "removedFromFavorites": "Премахнато от любими",
   "addFavorite": "Добави в любими",
@@ -206,7 +276,6 @@
   "currentLocation": "Текущо местоположение",
   "gpsError": "GPS грешка",
   "couldNotResolve": "Не може да се определи начало или дестинация",
-
   "start": "Начало",
   "destination": "Дестинация",
   "cityAddressOrGps": "Град, адрес или GPS",
@@ -214,15 +283,32 @@
   "useGps": "Използвай GPS",
   "stop": "Спирка",
   "stopN": "Спирка {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Добави спирка",
   "searchAlongRoute": "Търсене по маршрута",
   "cheapest": "Най-евтина",
   "nStations": "{count} станции",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} най-добри",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Цени на горива (Tankerkoenig)",
   "requiredForFuelSearch": "Необходим за търсене на цени на горива в Германия",
   "evChargingOpenChargeMap": "EV зареждане (OpenChargeMap)",
@@ -235,10 +321,15 @@
   "tankerkoenigApiKey": "API ключ Tankerkoenig",
   "evChargingApiKey": "API ключ за EV зареждане",
   "openChargeMapApiKey": "API ключ OpenChargeMap",
-
   "routeSegment": "Сегмент на маршрута",
   "showCheapestEveryNKm": "Показвай най-евтината станция на всеки {km} км по маршрута",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Избягвай магистрали",
   "avoidHighwaysDesc": "Изчисляването на маршрута избягва платени пътища и магистрали",
   "showFuelStations": "Показвай бензиностанции",
@@ -246,7 +337,6 @@
   "showEvStations": "Показвай зарядни станции",
   "showEvStationsDesc": "Включи електрически зарядни станции в резултатите",
   "noStationsAlongThisRoute": "Не са намерени станции по този маршрут.",
-
   "fuelCostCalculator": "Калкулатор за разход на гориво",
   "distanceKm": "Разстояние (км)",
   "consumptionL100km": "Разход (L/100км)",
@@ -255,7 +345,6 @@
   "fuelNeeded": "Необходимо гориво",
   "totalCost": "Общ разход",
   "enterCalcValues": "Въведете разстояние, разход и цена за изчисляване на разхода за пътуването",
-
   "priceHistory": "Ценова история",
   "noPriceHistory": "Все още няма ценова история",
   "noHourlyData": "Няма почасови данни",
@@ -264,7 +353,6 @@
   "statMax": "Макс",
   "statAvg": "Ср",
   "showAllFuelTypes": "Показване на всички видове горива",
-
   "connected": "Свързано",
   "notConnected": "Не е свързано",
   "connectTankSync": "Свързване с TankSync",
@@ -274,7 +362,6 @@
   "tapToUpdateGps": "Натиснете за обновяване на GPS позицията",
   "gpsAutoUpdateHint": "GPS позицията се получава автоматично при търсене. Можете също да я обновите ръчно тук.",
   "clearGpsConfirm": "Изтриване на запазената GPS позиция? Можете да я обновите отново по всяко време.",
-
   "pageNotFound": "Страницата не е намерена",
   "deleteAllServerData": "Изтриване на всички данни от сървъра",
   "deleteServerDataConfirm": "Изтриване на всички данни от сървъра?",
@@ -282,7 +369,6 @@
   "allDataDeleted": "Всички данни от сървъра са изтрити",
   "disconnectConfirm": "Прекъсване на TankSync?",
   "disconnect": "Прекъсни",
-
   "myServerData": "Моите данни на сървъра",
   "anonymousUuid": "Анонимен UUID",
   "server": "Сървър",
@@ -295,5 +381,8 @@
   "exportJson": "Експорт като JSON (клипборд)",
   "jsonCopied": "JSON копиран в клипборда",
   "rawDataJson": "Необработени данни (JSON)",
-  "close": "Затвори"
+  "close": "Затвори",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }

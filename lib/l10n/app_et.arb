@@ -18,7 +18,13 @@
   "open": "Avatud",
   "closed": "Suletud",
   "distance": "{distance} kaugusel",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Hind",
   "prices": "Hinnad",
   "address": "Aadress",
@@ -64,7 +70,13 @@
   "clearAllData": "Kustuta kõik andmed",
   "errorLog": "Vigade logi",
   "stationsFound": "Leiti {count} tanklat",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "whatIsShared": "Mida jagatakse — ja kellega?",
   "gpsCoordinates": "GPS koordinaadid",
   "gpsReason": "Saadetakse iga otsinguga lähedalolevate jaamade leidmiseks.",
@@ -94,9 +106,21 @@
   "priceQuery": "Hinnapäring",
   "zipGeocoding": "Postiindeksi geokodeerimine",
   "minutes": "{n} minutit",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} tundi",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Tühjenda vahemälu?",
   "clearCacheBody": "Vahemällu salvestatud otsingutulemused ja hinnad kustutatakse. Profiilid, lemmikud ja seaded säilitatakse.",
   "clearCacheButton": "Tühjenda vahemälu",
@@ -126,7 +150,13 @@
   "cheap": "odav",
   "expensive": "kallis",
   "stationsOnMap": "{count} tanklat",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Lemmikute laadimine...\nOtsige kõigepealt tanklasid andmete salvestamiseks.",
   "reportPrice": "Teata hinnast",
   "whatsWrong": "Mis on valesti?",
@@ -143,12 +173,36 @@
   "location": "Asukoht",
   "switchProfileTitle": "Riik muutus",
   "switchProfilePrompt": "Olete nüüd riigis {country}. Lülituda profiilile \"{profile}\"?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Lülitatud profiilile \"{profile}\" ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Selle riigi jaoks pole profiili",
   "noProfileForCountry": "Olete riigis {country}, kuid profiili pole seadistatud. Looge see Seadetes.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Automaatne profiili vahetamine",
   "autoSwitchDescription": "Vaheta profiili automaatselt piiri ületamisel",
   "switchProfile": "Vaheta",
@@ -161,10 +215,22 @@
   "noPriceAlerts": "Hinnahoiatusi pole",
   "noPriceAlertsHint": "Looge hoiatus jaama üksikasjade lehelt.",
   "alertDeleted": "Hoiatus \"{name}\" kustutatud",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Loo hinnahoiatus",
   "currentPrice": "Praegune hind: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Sihthind (EUR)",
   "enterPrice": "Sisestage hind",
   "invalidPrice": "Kehtetu hind",
@@ -182,11 +248,16 @@
   "bestStops": "Parimad peatused",
   "openInMaps": "Ava Kaartides",
   "noStationsAlongRoute": "Marsruudi ääres jaamu ei leitud",
-
   "evOperational": "Töökorras",
   "evStatusUnknown": "Olek teadmata",
   "evConnectors": "Pistikud ({count} punkti)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Pistiku üksikasjad pole saadaval",
   "evUsageCost": "Kasutuskulu",
   "evPricingUnavailable": "Hinnateave teenusepakkujalt pole saadaval",
@@ -198,7 +269,6 @@
   "evRefreshStatus": "Uuenda olekut",
   "evStatusUpdated": "Olek uuendatud",
   "evStationNotFound": "Ei saanud uuendada — jaama ei leitud lähedusest",
-
   "addedToFavorites": "Lisatud lemmikutesse",
   "removedFromFavorites": "Eemaldatud lemmikutest",
   "addFavorite": "Lisa lemmikutesse",
@@ -206,7 +276,6 @@
   "currentLocation": "Praegune asukoht",
   "gpsError": "GPS viga",
   "couldNotResolve": "Algus- või sihtpunkti ei saanud määrata",
-
   "start": "Algus",
   "destination": "Sihtkoht",
   "cityAddressOrGps": "Linn, aadress või GPS",
@@ -214,15 +283,32 @@
   "useGps": "Kasuta GPS-i",
   "stop": "Peatus",
   "stopN": "Peatus {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Lisa peatus",
   "searchAlongRoute": "Otsi marsruudi äärest",
   "cheapest": "Odavaim",
   "nStations": "{count} tanklat",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} parimat",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Kütusehinnad (Tankerkoenig)",
   "requiredForFuelSearch": "Vajalik kütusehinnaotsingurks Saksamaal",
   "evChargingOpenChargeMap": "EV laadimine (OpenChargeMap)",
@@ -235,10 +321,15 @@
   "tankerkoenigApiKey": "Tankerkoenig API võti",
   "evChargingApiKey": "EV laadimise API võti",
   "openChargeMapApiKey": "OpenChargeMap API võti",
-
   "routeSegment": "Marsruudi segment",
   "showCheapestEveryNKm": "Näita odavaimat tanklat iga {km} km tagant marsruudil",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Väldi kiirteid",
   "avoidHighwaysDesc": "Marsruudi arvutus väldib tasulisi teid ja kiirteid",
   "showFuelStations": "Näita tanklasid",
@@ -246,7 +337,6 @@
   "showEvStations": "Näita laadimisjaamu",
   "showEvStationsDesc": "Kaasa elektrilaadimise jaamad otsingutulemustes",
   "noStationsAlongThisRoute": "Selle marsruudi äärest jaamu ei leitud.",
-
   "fuelCostCalculator": "Kütusekulude kalkulaator",
   "distanceKm": "Kaugus (km)",
   "consumptionL100km": "Tarbimine (L/100km)",
@@ -255,7 +345,6 @@
   "fuelNeeded": "Vajalik kütus",
   "totalCost": "Kogukulu",
   "enterCalcValues": "Sisestage kaugus, tarbimine ja hind reisikulu arvutamiseks",
-
   "priceHistory": "Hinnaajalugu",
   "noPriceHistory": "Hinnaajalugu puudub",
   "noHourlyData": "Tunniandmed puuduvad",
@@ -264,7 +353,6 @@
   "statMax": "Max",
   "statAvg": "Kesk",
   "showAllFuelTypes": "Näita kõiki kütuseliike",
-
   "connected": "Ühendatud",
   "notConnected": "Ühendamata",
   "connectTankSync": "Ühenda TankSync",
@@ -274,7 +362,6 @@
   "tapToUpdateGps": "Puudutage GPS asukoha uuendamiseks",
   "gpsAutoUpdateHint": "GPS asukoht hangitakse automaatselt otsimisel. Saate seda ka käsitsi siin uuendada.",
   "clearGpsConfirm": "Kustutada salvestatud GPS asukoht? Saate seda igal ajal uuendada.",
-
   "pageNotFound": "Lehte ei leitud",
   "deleteAllServerData": "Kustuta kõik serveriandmed",
   "deleteServerDataConfirm": "Kustutada kõik serveriandmed?",
@@ -282,7 +369,6 @@
   "allDataDeleted": "Kõik serveriandmed kustutatud",
   "disconnectConfirm": "Katkestada TankSync?",
   "disconnect": "Katkesta",
-
   "myServerData": "Minu serveriandmed",
   "anonymousUuid": "Anonüümne UUID",
   "server": "Server",
@@ -295,5 +381,8 @@
   "exportJson": "Ekspordi JSON-ina (lõikelaud)",
   "jsonCopied": "JSON kopeeritud lõikelauale",
   "rawDataJson": "Toorandmed (JSON)",
-  "close": "Sulge"
+  "close": "Sulge",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }

@@ -18,7 +18,13 @@
   "open": "Nyitva",
   "closed": "Zárva",
   "distance": "{distance} távolságra",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Ár",
   "prices": "Árak",
   "address": "Cím",
@@ -64,7 +70,13 @@
   "clearAllData": "Összes adat törlése",
   "errorLog": "Hibanapló",
   "stationsFound": "{count} kút találva",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "whatIsShared": "Mi kerül megosztásra — és kivel?",
   "gpsCoordinates": "GPS-koordináták",
   "gpsReason": "Minden kereséssel elküldve a közeli kutak megtalálásához.",
@@ -94,9 +106,21 @@
   "priceQuery": "Árlekérdezés",
   "zipGeocoding": "Irányítószám geokódolás",
   "minutes": "{n} perc",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} óra",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Gyorsítótár törlése?",
   "clearCacheBody": "A tárolt keresési eredmények és árak törlődnek. A profilok, kedvencek és beállítások megmaradnak.",
   "clearCacheButton": "Gyorsítótár törlése",
@@ -126,7 +150,13 @@
   "cheap": "olcsó",
   "expensive": "drága",
   "stationsOnMap": "{count} kút",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Kedvencek betöltése...\nElőször keressen kutakat az adatok mentéséhez.",
   "reportPrice": "Ár bejelentése",
   "whatsWrong": "Mi a probléma?",
@@ -143,12 +173,36 @@
   "location": "Helyzet",
   "switchProfileTitle": "Ország megváltozott",
   "switchProfilePrompt": "Most {country} területén van. Váltás a(z) \"{profile}\" profilra?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Átváltva a(z) \"{profile}\" profilra ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Nincs profil ehhez az országhoz",
   "noProfileForCountry": "{country} területén van, de nincs beállított profil. Hozzon létre egyet a Beállításokban.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Automatikus profilváltás",
   "autoSwitchDescription": "Profil automatikus váltása határátlépéskor",
   "switchProfile": "Váltás",
@@ -161,10 +215,22 @@
   "noPriceAlerts": "Nincsenek ár riasztások",
   "noPriceAlertsHint": "Hozzon létre riasztást egy kút részletes oldalán.",
   "alertDeleted": "\"{name}\" riasztás törölve",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Ár riasztás létrehozása",
   "currentPrice": "Aktuális ár: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Célár (EUR)",
   "enterPrice": "Adjon meg egy árat",
   "invalidPrice": "Érvénytelen ár",
@@ -182,11 +248,16 @@
   "bestStops": "Legjobb megállók",
   "openInMaps": "Megnyitás Térképben",
   "noStationsAlongRoute": "Nem találhatók állomások az útvonal mentén",
-
   "evOperational": "Üzemel",
   "evStatusUnknown": "Állapot ismeretlen",
   "evConnectors": "Csatlakozók ({count} pont)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Nincsenek csatlakozó részletek",
   "evUsageCost": "Használati költség",
   "evPricingUnavailable": "Árazás nem elérhető a szolgáltatótól",
@@ -198,7 +269,6 @@
   "evRefreshStatus": "Állapot frissítése",
   "evStatusUpdated": "Állapot frissítve",
   "evStationNotFound": "Nem sikerült frissíteni — állomás nem található a közelben",
-
   "addedToFavorites": "Hozzáadva a kedvencekhez",
   "removedFromFavorites": "Eltávolítva a kedvencekből",
   "addFavorite": "Hozzáadás a kedvencekhez",
@@ -206,7 +276,6 @@
   "currentLocation": "Jelenlegi helyzet",
   "gpsError": "GPS hiba",
   "couldNotResolve": "Nem sikerült feloldani a kiindulást vagy a célt",
-
   "start": "Indulás",
   "destination": "Úticél",
   "cityAddressOrGps": "Város, cím vagy GPS",
@@ -214,15 +283,32 @@
   "useGps": "GPS használata",
   "stop": "Megálló",
   "stopN": "Megálló {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Megálló hozzáadása",
   "searchAlongRoute": "Keresés az útvonal mentén",
   "cheapest": "Legolcsóbb",
   "nStations": "{count} kút",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} legjobb",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Üzemanyagárak (Tankerkoenig)",
   "requiredForFuelSearch": "Szükséges az üzemanyag-árkereséshez Németországban",
   "evChargingOpenChargeMap": "EV töltés (OpenChargeMap)",
@@ -235,10 +321,15 @@
   "tankerkoenigApiKey": "Tankerkoenig API-kulcs",
   "evChargingApiKey": "EV töltés API-kulcs",
   "openChargeMapApiKey": "OpenChargeMap API-kulcs",
-
   "routeSegment": "Útvonalszakasz",
   "showCheapestEveryNKm": "Legolcsóbb kút mutatása {km} km-enként az útvonal mentén",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Autópályák elkerülése",
   "avoidHighwaysDesc": "Az útvonaltervezés elkerüli a fizetős utakat és autópályákat",
   "showFuelStations": "Benzinkutak mutatása",
@@ -246,7 +337,6 @@
   "showEvStations": "Töltőállomások mutatása",
   "showEvStationsDesc": "Elektromos töltőállomások bevonása a keresési eredményekbe",
   "noStationsAlongThisRoute": "Nem találhatók állomások ezen útvonal mentén.",
-
   "fuelCostCalculator": "Üzemanyagköltség-kalkulátor",
   "distanceKm": "Távolság (km)",
   "consumptionL100km": "Fogyasztás (L/100km)",
@@ -255,7 +345,6 @@
   "fuelNeeded": "Szükséges üzemanyag",
   "totalCost": "Összköltség",
   "enterCalcValues": "Adja meg a távolságot, fogyasztást és árat az útköltség kiszámításához",
-
   "priceHistory": "Ártörténet",
   "noPriceHistory": "Még nincs ártörténet",
   "noHourlyData": "Nincsenek óránkénti adatok",
@@ -264,7 +353,6 @@
   "statMax": "Max",
   "statAvg": "Átl",
   "showAllFuelTypes": "Összes üzemanyagtípus mutatása",
-
   "connected": "Csatlakoztatva",
   "notConnected": "Nincs csatlakoztatva",
   "connectTankSync": "TankSync csatlakoztatása",
@@ -274,7 +362,6 @@
   "tapToUpdateGps": "Érintse meg a GPS-pozíció frissítéséhez",
   "gpsAutoUpdateHint": "A GPS-pozíció automatikusan lekérdezésre kerül kereséskor. Itt manuálisan is frissítheti.",
   "clearGpsConfirm": "Tárolt GPS-pozíció törlése? Bármikor frissítheti újra.",
-
   "pageNotFound": "Az oldal nem található",
   "deleteAllServerData": "Összes szerveradat törlése",
   "deleteServerDataConfirm": "Törli az összes szerveradatot?",
@@ -282,7 +369,6 @@
   "allDataDeleted": "Összes szerveradat törölve",
   "disconnectConfirm": "TankSync leválasztása?",
   "disconnect": "Leválasztás",
-
   "myServerData": "Szerveradataim",
   "anonymousUuid": "Anonim UUID",
   "server": "Szerver",
@@ -295,5 +381,8 @@
   "exportJson": "Exportálás JSON-ként (vágólap)",
   "jsonCopied": "JSON vágólapra másolva",
   "rawDataJson": "Nyers adatok (JSON)",
-  "close": "Bezárás"
+  "close": "Bezárás",
+  "deleteProfileTitle": "Delete profile?",
+  "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
+  "deleteProfileConfirm": "Delete profile"
 }

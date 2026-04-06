@@ -926,4 +926,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get refreshFailed => 'Refresh failed. Please try again.';
+
+  @override
+  String get deleteProfileTitle => 'Delete profile?';
+
+  @override
+  String get deleteProfileBody =>
+      'This profile and its settings will be permanently deleted. This cannot be undone.';
+
+  @override
+  String get deleteProfileConfirm => 'Delete profile';
 }
