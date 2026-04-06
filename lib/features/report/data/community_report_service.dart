@@ -1,5 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/constants/field_names.dart';
+
 /// Service for submitting and retrieving community price reports.
 class CommunityReportService {
   /// Submit a price report.
@@ -16,12 +18,12 @@ class CommunityReportService {
   }) async {
     // If Supabase connected, insert into price_reports table
     if (supabaseClient != null && supabaseUserId != null) {
-      await supabaseClient.from('price_reports').insert({
-        'reporter_id': supabaseUserId,
-        'station_id': stationId,
-        'country_code': countryCode,
-        'fuel_type': fuelType,
-        'reported_price': reportedPrice,
+      await supabaseClient.from(SyncFields.reportsTable).insert({
+        SyncFields.reporterId: supabaseUserId,
+        SyncFields.stationId: stationId,
+        SyncFields.countryCode: countryCode,
+        SyncFields.fuelType: fuelType,
+        SyncFields.reportedPrice: reportedPrice,
       });
     }
     // For Germany, the existing Tankerkoenig complaint endpoint
@@ -34,12 +36,12 @@ class CommunityReportService {
     required SupabaseClient client,
   }) async {
     final response = await client
-        .from('price_reports')
+        .from(SyncFields.reportsTable)
         .select()
-        .eq('station_id', stationId)
-        .gte('reported_at',
+        .eq(SyncFields.stationId, stationId)
+        .gte(SyncFields.reportedAt,
             DateTime.now().subtract(const Duration(hours: 2)).toIso8601String())
-        .order('reported_at', ascending: false);
+        .order(SyncFields.reportedAt, ascending: false);
     return List<Map<String, dynamic>>.from(response);
   }
 }
