@@ -196,6 +196,9 @@ Never commit directly to `master`. `master` is always deployable.
 ### Build Commands
 - `/build-release` — Bump build number, build AAB + APKs, copy to OneDrive, commit bump
 
+### Fix Loop Command
+- `/tankstellenfix` — **Autonomous issue-fix loop.** Picks highest-priority issue, analyzes, implements with tests, ships via PR, merges, validates, compacts, then loops. MANDATORY workflow for all issue resolution — never fix issues ad-hoc.
+
 ### Rules
 - **Never write code without explicit user confirmation** — always present a plan first
 - **Always write tests** for new or changed code — no exceptions
