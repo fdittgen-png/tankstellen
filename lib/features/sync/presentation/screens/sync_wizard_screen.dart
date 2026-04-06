@@ -213,7 +213,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
       final url = _sanitizeUrl(_urlController.text);
       final key = _sanitizeKey(_keyController.text);
 
-      if (_useEmail && _emailController.text.isNotEmpty && _passwordController.text.length >= 6) {
+      if (_useEmail && _emailController.text.isNotEmpty && (_isSignUp ? _passwordController.text.length >= 6 : _passwordController.text.isNotEmpty)) {
         await TankSyncClient.init(url: url, anonKey: key);
         String? userId;
         if (_isSignUp) {

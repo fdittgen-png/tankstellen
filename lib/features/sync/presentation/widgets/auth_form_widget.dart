@@ -45,7 +45,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     final password = _passwordController.text;
     if (email.isEmpty) return 'Please enter your email';
     if (!email.contains('@')) return 'Invalid email address';
-    if (password.length < 6) return 'Password must be at least 6 characters';
+    if (_isSignUp && password.length < 6) return 'Password must be at least 6 characters';
     if (_isSignUp && password != _confirmController.text) {
       return 'Passwords do not match';
     }
