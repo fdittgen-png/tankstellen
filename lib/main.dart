@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -31,6 +31,13 @@ import 'features/widget/data/home_widget_service.dart';
 /// 10. Run app with global error handlers
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Silence all debugPrint output in release builds.
+  // debugPrint is NOT stripped by the compiler, so it leaks to logcat/console
+  // in production — exposing user IDs, API responses, sync errors, etc.
+  if (kReleaseMode) {
+    debugPrint = (String? message, {int? wrapWidth}) {};
+  }
   await HiveStorage.init();
   await HiveStorage.loadApiKey();
   await TraceStorage.init();
