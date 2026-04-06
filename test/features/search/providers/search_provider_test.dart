@@ -47,6 +47,7 @@ void main() {
       radiusKm: 10,
       fuelType: FuelType.all,
     ));
+    registerFallbackValue(CancelToken());
   });
 
   ProviderContainer createContainer() {
@@ -176,13 +177,13 @@ void main() {
     });
 
     test('searchByZipCode sets loading then data', () async {
-      when(() => mockGeocoding.zipCodeToCoordinates('10115'))
+      when(() => mockGeocoding.zipCodeToCoordinates('10115', cancelToken: any(named: 'cancelToken')))
           .thenAnswer((_) async => ServiceResult(
                 data: (lat: 52.52, lng: 13.41),
                 source: ServiceSource.nominatimGeocoding,
                 fetchedAt: DateTime.now(),
               ));
-      when(() => mockGeocoding.coordinatesToAddress(any(), any()))
+      when(() => mockGeocoding.coordinatesToAddress(any(), any(), cancelToken: any(named: 'cancelToken')))
           .thenAnswer((_) async => ServiceResult(
                 data: 'Berlin',
                 source: ServiceSource.nominatimGeocoding,
@@ -208,7 +209,7 @@ void main() {
     });
 
     test('searchByZipCode handles ServiceChainExhaustedException', () async {
-      when(() => mockGeocoding.zipCodeToCoordinates('99999'))
+      when(() => mockGeocoding.zipCodeToCoordinates('99999', cancelToken: any(named: 'cancelToken')))
           .thenThrow(const ServiceChainExhaustedException(errors: []));
 
       final container = createContainer();
@@ -305,14 +306,14 @@ void main() {
         occurredAt: DateTime.now(),
       );
 
-      when(() => mockGeocoding.zipCodeToCoordinates('10115'))
+      when(() => mockGeocoding.zipCodeToCoordinates('10115', cancelToken: any(named: 'cancelToken')))
           .thenAnswer((_) async => ServiceResult(
                 data: (lat: 52.52, lng: 13.41),
                 source: ServiceSource.nominatimGeocoding,
                 fetchedAt: DateTime.now(),
                 errors: [geocodingError],
               ));
-      when(() => mockGeocoding.coordinatesToAddress(any(), any()))
+      when(() => mockGeocoding.coordinatesToAddress(any(), any(), cancelToken: any(named: 'cancelToken')))
           .thenAnswer((_) async => ServiceResult(
                 data: 'Berlin',
                 source: ServiceSource.nominatimGeocoding,
@@ -414,13 +415,13 @@ void main() {
     });
 
     test('searchByZipCode handles geocoding address failure gracefully', () async {
-      when(() => mockGeocoding.zipCodeToCoordinates('10115'))
+      when(() => mockGeocoding.zipCodeToCoordinates('10115', cancelToken: any(named: 'cancelToken')))
           .thenAnswer((_) async => ServiceResult(
                 data: (lat: 52.52, lng: 13.41),
                 source: ServiceSource.nominatimGeocoding,
                 fetchedAt: DateTime.now(),
               ));
-      when(() => mockGeocoding.coordinatesToAddress(any(), any()))
+      when(() => mockGeocoding.coordinatesToAddress(any(), any(), cancelToken: any(named: 'cancelToken')))
           .thenThrow(Exception('Geocoding failed'));
       when(() => mockStationService.searchStations(any(),
               cancelToken: any(named: 'cancelToken')))
@@ -441,13 +442,13 @@ void main() {
     });
 
     test('searchByZipCode sets searchLocation with zip and city', () async {
-      when(() => mockGeocoding.zipCodeToCoordinates('75001'))
+      when(() => mockGeocoding.zipCodeToCoordinates('75001', cancelToken: any(named: 'cancelToken')))
           .thenAnswer((_) async => ServiceResult(
                 data: (lat: 48.86, lng: 2.34),
                 source: ServiceSource.nominatimGeocoding,
                 fetchedAt: DateTime.now(),
               ));
-      when(() => mockGeocoding.coordinatesToAddress(any(), any()))
+      when(() => mockGeocoding.coordinatesToAddress(any(), any(), cancelToken: any(named: 'cancelToken')))
           .thenAnswer((_) async => ServiceResult(
                 data: 'Paris',
                 source: ServiceSource.nominatimGeocoding,
@@ -496,13 +497,13 @@ void main() {
 
     test('searchByZipCode recalculates distances from user position',
         () async {
-      when(() => mockGeocoding.zipCodeToCoordinates('10115'))
+      when(() => mockGeocoding.zipCodeToCoordinates('10115', cancelToken: any(named: 'cancelToken')))
           .thenAnswer((_) async => ServiceResult(
                 data: (lat: 52.52, lng: 13.41),
                 source: ServiceSource.nominatimGeocoding,
                 fetchedAt: DateTime.now(),
               ));
-      when(() => mockGeocoding.coordinatesToAddress(any(), any()))
+      when(() => mockGeocoding.coordinatesToAddress(any(), any(), cancelToken: any(named: 'cancelToken')))
           .thenAnswer((_) async => ServiceResult(
                 data: 'Berlin',
                 source: ServiceSource.nominatimGeocoding,
