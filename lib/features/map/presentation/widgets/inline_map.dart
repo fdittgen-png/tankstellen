@@ -15,7 +15,19 @@ class InlineMap extends ConsumerStatefulWidget {
 }
 
 class _InlineMapState extends ConsumerState<InlineMap> {
-  final _mapController = MapController();
+  late final MapController _mapController;
+
+  @override
+  void initState() {
+    super.initState();
+    _mapController = MapController();
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
