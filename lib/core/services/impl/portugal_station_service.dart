@@ -108,10 +108,7 @@ class PortugalStationService with StationServiceHelpers implements StationServic
         fetchedAt: DateTime.now(),
       );
     } on DioException catch (e) {
-      throw ApiException(
-        message: e.message ?? 'DGEG API error',
-        statusCode: e.response?.statusCode,
-      );
+      throwApiException(e, defaultMessage: 'DGEG API error');
     }
   }
 

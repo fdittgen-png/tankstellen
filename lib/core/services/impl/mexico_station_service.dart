@@ -89,10 +89,7 @@ class MexicoStationService with StationServiceHelpers, CachedDatasetMixin implem
         fetchedAt: DateTime.now(),
       );
     } on DioException catch (e) {
-      throw ApiException(
-        message: e.message ?? 'CRE API error',
-        statusCode: e.response?.statusCode,
-      );
+      throwApiException(e, defaultMessage: 'CRE API error');
     }
   }
 
