@@ -1,11 +1,14 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/storage_repository.dart';
-import 'storage_keys.dart';
+import 'hive_boxes.dart';
+import 'stores/alerts_hive_store.dart';
+import 'stores/cache_hive_store.dart';
+import 'stores/favorites_hive_store.dart';
+import 'stores/price_history_hive_store.dart';
+import 'stores/profiles_hive_store.dart';
+import 'stores/settings_hive_store.dart';
 
 part 'hive_storage.g.dart';
 
@@ -14,465 +17,249 @@ HiveStorage hiveStorage(Ref ref) {
   return HiveStorage();
 }
 
+/// Facade that composes all domain-specific Hive stores into one
+/// [StorageRepository].
+///
+/// Individual domain logic lives in the `stores/` directory:
+/// - [SettingsHiveStore] — app settings + API keys
+/// - [FavoritesHiveStore] — favorites, ignored stations, ratings
+/// - [ProfilesHiveStore] — user search profiles
+/// - [CacheHiveStore] — API response cache + itineraries
+/// - [PriceHistoryHiveStore] — 30-day price records
+/// - [AlertsHiveStore] — price alerts
+///
+/// This class delegates all interface methods to the appropriate store.
+/// Static lifecycle methods (init, loadApiKey) delegate to [HiveBoxes]
+/// and [SettingsHiveStore].
 class HiveStorage implements StorageRepository {
-  static const String _settingsBox = 'settings';
-  static const String _favoritesBox = 'favorites';
-  static const String _cacheBox = 'cache';
-  static const String _profilesBox = 'profiles';
-  static const String _priceHistoryBox = 'price_history';
-  static const String _alertsBox = 'alerts';
+  final SettingsHiveStore _settings = SettingsHiveStore();
+  final FavoritesHiveStore _favorites = FavoritesHiveStore();
+  final ProfilesHiveStore _profiles = ProfilesHiveStore();
+  final CacheHiveStore _cache = CacheHiveStore();
+  final PriceHistoryHiveStore _priceHistory = PriceHistoryHiveStore();
+  final AlertsHiveStore _alerts = AlertsHiveStore();
 
-  static const _encryptedBoxes = {_settingsBox, _profilesBox};
-  static const _hiveEncryptionKeyName = 'hive_encryption_key';
+  // ---------------------------------------------------------------------------
+  // Lifecycle (static — called before providers are created)
+  // ---------------------------------------------------------------------------
 
-  static Future<HiveAesCipher> _loadCipher() async {
-    const secureStorage = FlutterSecureStorage();
-    final existing = await secureStorage.read(key: _hiveEncryptionKeyName);
-    if (existing != null) {
-      final keyBytes = base64Url.decode(existing);
-      return HiveAesCipher(keyBytes);
-    }
-    final key = Hive.generateSecureKey();
-    await secureStorage.write(
-      key: _hiveEncryptionKeyName,
-      value: base64UrlEncode(key),
-    );
-    return HiveAesCipher(key);
-  }
+  static Future<void> init() => HiveBoxes.init();
 
-  static Future<void> _migrateToEncrypted(String boxName, HiveAesCipher cipher) async {
-    Box oldBox;
-    try {
-      oldBox = await Hive.openBox('${boxName}_migration_check');
-      await oldBox.close();
-      await Hive.deleteBoxFromDisk('${boxName}_migration_check');
-      oldBox = await Hive.openBox(boxName);
-    } catch (e) {
-      debugPrint('Hive migration: $boxName already encrypted or empty');
-      return;
-    }
-    if (oldBox.isEmpty) {
-      await oldBox.close();
-      return;
-    }
-    final entries = Map<dynamic, dynamic>.from(oldBox.toMap());
-    await oldBox.close();
-    await Hive.deleteBoxFromDisk(boxName);
-    final encryptedBox = await Hive.openBox(boxName, encryptionCipher: cipher);
-    for (final entry in entries.entries) {
-      await encryptedBox.put(entry.key, entry.value);
-    }
-    await encryptedBox.close();
-    debugPrint('Hive migration: $boxName migrated to encrypted (${entries.length} entries)');
-  }
-
-  static Future<void> init() async {
-    await Hive.initFlutter();
-    final cipher = await _loadCipher();
-    for (final boxName in _encryptedBoxes) {
-      try {
-        final box = await Hive.openBox(boxName, encryptionCipher: cipher);
-        await box.close();
-      } catch (e) {
-        debugPrint('Hive: migrating $boxName to encrypted storage');
-        await _migrateToEncrypted(boxName, cipher);
-      }
-    }
-    await Hive.openBox(_settingsBox, encryptionCipher: cipher);
-    await Hive.openBox(_profilesBox, encryptionCipher: cipher);
-    await Hive.openBox(_favoritesBox);
-    await Hive.openBox(_cacheBox);
-    await Hive.openBox(_priceHistoryBox);
-    await Hive.openBox(_alertsBox);
-  }
-
-  /// Initialize Hive in a background isolate with proper encryption.
-  /// Background isolates (WorkManager) run in separate Dart isolates and
-  /// must re-initialize Hive. This ensures encrypted boxes use the same
-  /// cipher as the main isolate.
-  ///
-  /// **Important:** Call [closeIsolateBoxes] when done to release file handles
-  /// and prevent corruption from concurrent access with the main isolate.
-  static Future<void> initInIsolate() async {
-    await Hive.initFlutter();
-    final cipher = await _loadCipher();
-    await Hive.openBox(_settingsBox, encryptionCipher: cipher);
-    await Hive.openBox(_favoritesBox);
-    await Hive.openBox(_alertsBox);
-    await Hive.openBox(_cacheBox);
-    await Hive.openBox(_priceHistoryBox);
-  }
+  static Future<void> initInIsolate() => HiveBoxes.initInIsolate();
 
   /// Close all Hive boxes opened by [initInIsolate].
   ///
   /// Must be called at the end of every background task to release file
   /// handles and prevent race conditions with the main isolate.
-  static Future<void> closeIsolateBoxes() async {
-    final boxNames = [
-      _settingsBox,
-      _favoritesBox,
-      _alertsBox,
-      _cacheBox,
-      _priceHistoryBox,
-    ];
-    for (final name in boxNames) {
-      try {
-        if (Hive.isBoxOpen(name)) {
-          await Hive.box(name).close();
-        }
-      } catch (e) {
-        debugPrint('HiveStorage: failed to close box "$name": $e');
-      }
-    }
-  }
+  static Future<void> closeIsolateBoxes() => HiveBoxes.closeIsolateBoxes();
 
   @visibleForTesting
-  static Future<void> initForTest() async {
-    await Hive.openBox(_settingsBox);
-    await Hive.openBox(_favoritesBox);
-    await Hive.openBox(_cacheBox);
-    await Hive.openBox(_profilesBox);
-    await Hive.openBox(_priceHistoryBox);
-    await Hive.openBox(_alertsBox);
-  }
+  // ignore: invalid_use_of_visible_for_testing_member
+  static Future<void> initForTest() => HiveBoxes.initForTest();
 
-  Box get _settings => Hive.box(_settingsBox);
-  Box get _favorites => Hive.box(_favoritesBox);
-  Box get _cache => Hive.box(_cacheBox);
-  Box get _profiles => Hive.box(_profilesBox);
-  Box get _priceHistory => Hive.box(_priceHistoryBox);
-  Box get _alerts => Hive.box(_alertsBox);
+  static Future<void> loadApiKey() => SettingsHiveStore.loadApiKey();
 
-  // Generic settings access (used by TraceUploader config, etc.)
-  dynamic getSetting(String key) => _settings.get(key);
+  // ---------------------------------------------------------------------------
+  // SettingsStorage
+  // ---------------------------------------------------------------------------
+  @override
+  dynamic getSetting(String key) => _settings.getSetting(key);
+  @override
   Future<void> putSetting(String key, dynamic value) =>
-      _settings.put(key, value);
+      _settings.putSetting(key, value);
+  @override
+  bool get isSetupComplete => _settings.isSetupComplete;
+  @override
+  bool get isSetupSkipped => _settings.isSetupSkipped;
+  @override
+  Future<void> skipSetup() => _settings.skipSetup();
+  @override
+  Future<void> resetSetupSkip() => _settings.resetSetupSkip();
 
-  // API Key — stored in platform secure enclave, NOT in plain Hive.
-  // On Android: Android Keystore. On Windows: DPAPI. On iOS: Keychain.
-  static const _secureStorage = FlutterSecureStorage();
+  // ---------------------------------------------------------------------------
+  // ApiKeyStorage
+  // ---------------------------------------------------------------------------
+  @override
+  String? getApiKey() => _settings.getApiKey();
+  @override
+  Future<void> setApiKey(String key) => _settings.setApiKey(key);
+  @override
+  Future<void> deleteApiKey() => _settings.deleteApiKey();
+  @override
+  bool hasApiKey() => _settings.hasApiKey();
+  @override
+  String? getEvApiKey() => _settings.getEvApiKey();
+  @override
+  bool hasEvApiKey() => _settings.hasEvApiKey();
+  @override
+  bool hasCustomEvApiKey() => _settings.hasCustomEvApiKey();
+  @override
+  Future<void> setEvApiKey(String key) => _settings.setEvApiKey(key);
 
-  // In-memory cache to avoid async reads on every API call.
-  static String? _apiKeyCache;
-
-  /// Load API key from secure storage into memory. Call once at startup.
-  static Future<void> loadApiKey() async {
-    _apiKeyCache = await _secureStorage.read(key: StorageKeys.apiKey);
-    await loadEvApiKey();
-  }
-
-  String? getApiKey() => _apiKeyCache;
-
-  Future<void> setApiKey(String key) async {
-    await _secureStorage.write(key: StorageKeys.apiKey, value: key);
-    _apiKeyCache = key;
-  }
-
-  Future<void> deleteApiKey() async {
-    await _secureStorage.delete(key: StorageKeys.apiKey);
-    _apiKeyCache = null;
-  }
-
-  bool hasApiKey() {
-    final key = getApiKey();
-    return key != null && key.isNotEmpty;
-  }
-
-  // EV Charging API key (OpenChargeMap)
-  static String? _evApiKeyCache;
-
-  static Future<void> loadEvApiKey() async {
-    _evApiKeyCache = await _secureStorage.read(key: StorageKeys.evApiKey);
-  }
-
-  String? getEvApiKey() => _evApiKeyCache;
-
-  bool hasEvApiKey() => _evApiKeyCache != null && _evApiKeyCache!.isNotEmpty;
-
-  bool hasCustomEvApiKey() => _evApiKeyCache != null && _evApiKeyCache!.isNotEmpty;
-
-  Future<void> setEvApiKey(String key) async {
-    await _secureStorage.write(key: StorageKeys.evApiKey, value: key);
-    _evApiKeyCache = key;
-  }
-
-  // Setup skip (demo mode)
-  bool get isSetupComplete =>
-      hasApiKey() ||
-      (_settings.get(StorageKeys.setupSkipped) == true);
-
-  bool get isSetupSkipped =>
-      _settings.get(StorageKeys.setupSkipped) == true;
-
-  Future<void> skipSetup() =>
-      _settings.put(StorageKeys.setupSkipped, true);
-
-  Future<void> resetSetupSkip() =>
-      _settings.delete(StorageKeys.setupSkipped);
-
-  // Active Profile
-  String? getActiveProfileId() =>
-      _settings.get(StorageKeys.activeProfileId) as String?;
-  Future<void> setActiveProfileId(String id) =>
-      _settings.put(StorageKeys.activeProfileId, id);
-
-  // Profiles
-  Map<String, dynamic>? getProfile(String id) {
-    final data = _profiles.get(id);
-    return _toStringDynamicMap(data);
-  }
-
-  List<Map<String, dynamic>> getAllProfiles() {
-    return _profiles.values
-        .map((e) => _toStringDynamicMap(e))
-        .whereType<Map<String, dynamic>>()
-        .toList();
-  }
-
-  Future<void> saveProfile(String id, Map<String, dynamic> profile) =>
-      _profiles.put(id, profile);
-
-  Future<void> deleteProfile(String id) => _profiles.delete(id);
-
-  // Favorites
-  List<String> getFavoriteIds() {
-    final ids = _favorites.get(StorageKeys.favoriteStationIds);
-    if (ids == null) return [];
-    return List<String>.from(ids as List);
-  }
-
+  // ---------------------------------------------------------------------------
+  // FavoriteStorage
+  // ---------------------------------------------------------------------------
+  @override
+  List<String> getFavoriteIds() => _favorites.getFavoriteIds();
+  @override
   Future<void> setFavoriteIds(List<String> ids) =>
-      _favorites.put(StorageKeys.favoriteStationIds, ids);
+      _favorites.setFavoriteIds(ids);
+  @override
+  Future<void> addFavorite(String id) => _favorites.addFavorite(id);
+  @override
+  Future<void> removeFavorite(String id) => _favorites.removeFavorite(id);
+  @override
+  bool isFavorite(String id) => _favorites.isFavorite(id);
+  @override
+  int get favoriteCount => _favorites.favoriteCount;
+  @override
+  Future<void> saveFavoriteStationData(
+          String stationId, Map<String, dynamic> data) =>
+      _favorites.saveFavoriteStationData(stationId, data);
+  @override
+  Map<String, dynamic>? getFavoriteStationData(String stationId) =>
+      _favorites.getFavoriteStationData(stationId);
+  @override
+  Map<String, dynamic> getAllFavoriteStationData() =>
+      _favorites.getAllFavoriteStationData();
+  @override
+  Future<void> removeFavoriteStationData(String stationId) =>
+      _favorites.removeFavoriteStationData(stationId);
 
-  Future<void> addFavorite(String id) async {
-    final ids = getFavoriteIds();
-    if (!ids.contains(id)) {
-      ids.add(id);
-      await setFavoriteIds(ids);
-    }
-  }
-
-  Future<void> removeFavorite(String id) async {
-    final ids = getFavoriteIds();
-    ids.remove(id);
-    await setFavoriteIds(ids);
-  }
-
-  bool isFavorite(String id) => getFavoriteIds().contains(id);
-
-  // Favorite Station Data (permanent, never expires)
-
-  /// Persist full station JSON for a favorite.
-  Future<void> saveFavoriteStationData(String stationId, Map<String, dynamic> data) async {
-    final all = _getFavoriteStationDataRaw();
-    all[stationId] = data;
-    await _favorites.put(StorageKeys.favoriteStationData, all);
-  }
-
-  /// Get persisted station JSON for a single favorite.
-  Map<String, dynamic>? getFavoriteStationData(String stationId) {
-    final raw = _getFavoriteStationDataRaw()[stationId];
-    if (raw is Map) return Map<String, dynamic>.from(raw);
-    return null;
-  }
-
-  /// Get all persisted favorite station data.
-  Map<String, dynamic> getAllFavoriteStationData() => _getFavoriteStationDataRaw();
-
-  /// Remove persisted station data when unfavoriting.
-  Future<void> removeFavoriteStationData(String stationId) async {
-    final all = _getFavoriteStationDataRaw();
-    all.remove(stationId);
-    await _favorites.put(StorageKeys.favoriteStationData, all);
-  }
-
-  Map<String, dynamic> _getFavoriteStationDataRaw() {
-    final raw = _favorites.get(StorageKeys.favoriteStationData);
-    if (raw is Map) return Map<String, dynamic>.from(raw);
-    return {};
-  }
-
-  // Ignored Stations
-  List<String> getIgnoredIds() {
-    final ids = _favorites.get(StorageKeys.ignoredStationIds);
-    if (ids == null) return [];
-    return List<String>.from(ids as List);
-  }
-
+  // ---------------------------------------------------------------------------
+  // IgnoredStorage
+  // ---------------------------------------------------------------------------
+  @override
+  List<String> getIgnoredIds() => _favorites.getIgnoredIds();
+  @override
   Future<void> setIgnoredIds(List<String> ids) =>
-      _favorites.put(StorageKeys.ignoredStationIds, ids);
+      _favorites.setIgnoredIds(ids);
+  @override
+  Future<void> addIgnored(String id) => _favorites.addIgnored(id);
+  @override
+  Future<void> removeIgnored(String id) => _favorites.removeIgnored(id);
+  @override
+  bool isIgnored(String id) => _favorites.isIgnored(id);
 
-  Future<void> addIgnored(String id) async {
-    final ids = getIgnoredIds();
-    if (!ids.contains(id)) {
-      ids.add(id);
-      await setIgnoredIds(ids);
-    }
-  }
+  // ---------------------------------------------------------------------------
+  // RatingStorage
+  // ---------------------------------------------------------------------------
+  @override
+  Map<String, int> getRatings() => _favorites.getRatings();
+  @override
+  Future<void> setRating(String stationId, int rating) =>
+      _favorites.setRating(stationId, rating);
+  @override
+  Future<void> removeRating(String stationId) =>
+      _favorites.removeRating(stationId);
+  @override
+  int? getRating(String stationId) => _favorites.getRating(stationId);
 
-  Future<void> removeIgnored(String id) async {
-    final ids = getIgnoredIds();
-    ids.remove(id);
-    await setIgnoredIds(ids);
-  }
+  // ---------------------------------------------------------------------------
+  // ProfileStorage
+  // ---------------------------------------------------------------------------
+  @override
+  String? getActiveProfileId() => _profiles.getActiveProfileId();
+  @override
+  Future<void> setActiveProfileId(String id) =>
+      _profiles.setActiveProfileId(id);
+  @override
+  Map<String, dynamic>? getProfile(String id) => _profiles.getProfile(id);
+  @override
+  List<Map<String, dynamic>> getAllProfiles() => _profiles.getAllProfiles();
+  @override
+  Future<void> saveProfile(String id, Map<String, dynamic> profile) =>
+      _profiles.saveProfile(id, profile);
+  @override
+  Future<void> deleteProfile(String id) => _profiles.deleteProfile(id);
+  @override
+  int get profileCount => _profiles.profileCount;
 
-  bool isIgnored(String id) => getIgnoredIds().contains(id);
+  // ---------------------------------------------------------------------------
+  // CacheStorage
+  // ---------------------------------------------------------------------------
+  @override
+  Future<void> cacheData(String key, dynamic data) =>
+      _cache.cacheData(key, data);
+  @override
+  Map<String, dynamic>? getCachedData(String key, {Duration? maxAge}) =>
+      _cache.getCachedData(key, maxAge: maxAge);
+  @override
+  Future<void> clearCache() => _cache.clearCache();
+  @override
+  Iterable<dynamic> get cacheKeys => _cache.cacheKeys;
+  @override
+  Future<void> deleteCacheEntry(String key) => _cache.deleteCacheEntry(key);
+  @override
+  int get cacheEntryCount => _cache.cacheEntryCount;
 
-  // Station Ratings (1-5 stars)
-  Map<String, int> getRatings() {
-    final data = _favorites.get(StorageKeys.stationRatings);
-    if (data == null) return {};
-    if (data is Map) {
-      return Map<String, int>.fromEntries(
-        data.entries.map((e) => MapEntry(e.key.toString(), (e.value as num).toInt())),
-      );
-    }
-    return {};
-  }
-
-  Future<void> setRating(String stationId, int rating) async {
-    final ratings = getRatings();
-    ratings[stationId] = rating;
-    await _favorites.put(StorageKeys.stationRatings, ratings);
-  }
-
-  Future<void> removeRating(String stationId) async {
-    final ratings = getRatings();
-    ratings.remove(stationId);
-    await _favorites.put(StorageKeys.stationRatings, ratings);
-  }
-
-  int? getRating(String stationId) => getRatings()[stationId];
-
-  // Cache
-  Future<void> cacheData(String key, dynamic data) async {
-    await _cache.put(key, {
-      'data': data,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-    });
-  }
-
-  Map<String, dynamic>? getCachedData(String key, {Duration? maxAge}) {
-    final cached = _cache.get(key);
-    if (cached == null) return null;
-
-    // Hive on Android returns _Map<dynamic, dynamic> — must deep-convert
-    final map = _toStringDynamicMap(cached);
-    if (map == null) return null;
-
-    if (maxAge != null) {
-      final timestamp = map['timestamp'] as int?;
-      if (timestamp != null) {
-        final age = DateTime.now().millisecondsSinceEpoch - timestamp;
-        if (age > maxAge.inMilliseconds) return null;
-      }
-    }
-    final data = map['data'];
-    if (data is Map) return _toStringDynamicMap(data);
-    return null;
-  }
-
-  Future<void> clearCache() => _cache.clear();
-
-  /// All cache keys, for eviction iteration.
-  Iterable<dynamic> get cacheKeys => _cache.keys;
-
-  /// Delete a specific cache entry by key.
-  Future<void> deleteCacheEntry(String key) => _cache.delete(key);
-
-  // Price History
-  Future<void> savePriceRecords(
-      String stationId, List<Map<String, dynamic>> records) =>
-      _priceHistory.put(stationId, records);
-
-  List<Map<String, dynamic>> getPriceRecords(String stationId) {
-    final data = _priceHistory.get(stationId);
-    if (data == null) return [];
-    return (data as List)
-        .map((e) => _toStringDynamicMap(e))
-        .whereType<Map<String, dynamic>>()
-        .toList();
-  }
-
-  /// Returns all station IDs that have price history records.
-  List<String> getPriceHistoryKeys() =>
-      _priceHistory.keys.cast<String>().toList();
-
-  /// Clear price history for a single station.
-  Future<void> clearPriceHistoryForStation(String stationId) =>
-      _priceHistory.delete(stationId);
-
-  /// Clear all price history data.
-  Future<void> clearPriceHistory() => _priceHistory.clear();
-
-  // Price Alerts
-  List<Map<String, dynamic>> getAlerts() {
-    final data = _alerts.get('alerts');
-    if (data == null) return [];
-    return (data as List)
-        .map((e) => _toStringDynamicMap(e))
-        .whereType<Map<String, dynamic>>()
-        .toList();
-  }
-
-  Future<void> saveAlerts(List<Map<String, dynamic>> alerts) =>
-      _alerts.put('alerts', alerts);
-
-  Future<void> clearAlerts() => _alerts.clear();
-
-  int get alertCount => getAlerts().length;
-
-  // Itineraries (local-first storage)
-  List<Map<String, dynamic>> getItineraries() {
-    final data = _cache.get('itineraries');
-    if (data == null) return [];
-    return (data as List)
-        .map((e) => _toStringDynamicMap(e))
-        .whereType<Map<String, dynamic>>()
-        .toList();
-  }
-
+  // ---------------------------------------------------------------------------
+  // ItineraryStorage
+  // ---------------------------------------------------------------------------
+  @override
+  List<Map<String, dynamic>> getItineraries() => _cache.getItineraries();
+  @override
   Future<void> saveItineraries(List<Map<String, dynamic>> itineraries) =>
-      _cache.put('itineraries', itineraries);
+      _cache.saveItineraries(itineraries);
+  @override
+  Future<void> addItinerary(Map<String, dynamic> itinerary) =>
+      _cache.addItinerary(itinerary);
+  @override
+  Future<void> deleteItinerary(String id) => _cache.deleteItinerary(id);
 
-  Future<void> addItinerary(Map<String, dynamic> itinerary) async {
-    final list = getItineraries();
-    // Replace if same id, otherwise add
-    final idx = list.indexWhere((i) => i['id'] == itinerary['id']);
-    if (idx >= 0) {
-      list[idx] = itinerary;
-    } else {
-      list.insert(0, itinerary);
-    }
-    await saveItineraries(list);
-  }
+  // ---------------------------------------------------------------------------
+  // PriceHistoryStorage
+  // ---------------------------------------------------------------------------
+  @override
+  Future<void> savePriceRecords(
+          String stationId, List<Map<String, dynamic>> records) =>
+      _priceHistory.savePriceRecords(stationId, records);
+  @override
+  List<Map<String, dynamic>> getPriceRecords(String stationId) =>
+      _priceHistory.getPriceRecords(stationId);
+  @override
+  List<String> getPriceHistoryKeys() => _priceHistory.getPriceHistoryKeys();
+  @override
+  Future<void> clearPriceHistoryForStation(String stationId) =>
+      _priceHistory.clearPriceHistoryForStation(stationId);
+  @override
+  Future<void> clearPriceHistory() => _priceHistory.clearPriceHistory();
+  @override
+  int get priceHistoryEntryCount => _priceHistory.priceHistoryEntryCount;
 
-  Future<void> deleteItinerary(String id) async {
-    final list = getItineraries();
-    list.removeWhere((i) => i['id'] == id);
-    await saveItineraries(list);
-  }
+  // ---------------------------------------------------------------------------
+  // AlertStorage
+  // ---------------------------------------------------------------------------
+  @override
+  List<Map<String, dynamic>> getAlerts() => _alerts.getAlerts();
+  @override
+  Future<void> saveAlerts(List<Map<String, dynamic>> alerts) =>
+      _alerts.saveAlerts(alerts);
+  @override
+  Future<void> clearAlerts() => _alerts.clearAlerts();
+  @override
+  int get alertCount => _alerts.alertCount;
 
-  // Storage statistics
-  int get cacheEntryCount => _cache.length;
-  int get profileCount => _profiles.length;
-  int get favoriteCount => getFavoriteIds().length;
-
-  /// Estimated total storage size across all Hive boxes (bytes).
-  /// Hive doesn't expose exact file sizes, so we estimate from entry count
-  /// and a conservative avg bytes per entry.
-  int get priceHistoryEntryCount => _priceHistory.length;
-
+  // ---------------------------------------------------------------------------
+  // StorageRepository extras
+  // ---------------------------------------------------------------------------
+  @override
   ({int settings, int profiles, int favorites, int cache, int priceHistory, int alerts, int total})
       get storageStats {
-    // Rough estimate: Hive overhead + serialized JSON per entry
-    const avgEntryBytes = 512; // conservative average
-    final settings = _settings.length * avgEntryBytes;
-    final profiles = _profiles.length * avgEntryBytes;
-    final favorites = _favorites.length * 64; // just IDs, small
-    final cache = _cache.length * 2048; // cache entries are larger (full JSON)
-    final priceHistory = _priceHistory.length * 1024; // mid-size lists
-    final alerts = _alerts.length * 256; // small alert objects
+    const avgEntryBytes = 512;
+    final settingsBox = Hive.box(HiveBoxes.settings);
+    final profilesBox = Hive.box(HiveBoxes.profiles);
+    final favoritesBox = Hive.box(HiveBoxes.favorites);
+    final cacheBox = Hive.box(HiveBoxes.cache);
+    final priceHistoryBox = Hive.box(HiveBoxes.priceHistory);
+    final alertsBox = Hive.box(HiveBoxes.alerts);
+
+    final settings = settingsBox.length * avgEntryBytes;
+    final profiles = profilesBox.length * avgEntryBytes;
+    final favorites = favoritesBox.length * 64;
+    final cache = cacheBox.length * 2048;
+    final priceHistory = priceHistoryBox.length * 1024;
+    final alerts = alertsBox.length * 256;
     return (
       settings: settings,
       profiles: profiles,
@@ -482,34 +269,5 @@ class HiveStorage implements StorageRepository {
       alerts: alerts,
       total: settings + profiles + favorites + cache + priceHistory + alerts,
     );
-  }
-
-  /// Safely converts any Hive map to a typed map.
-  /// Returns null if input is not a Map.
-  static Map<String, dynamic>? _toStringDynamicMap(dynamic value) {
-    if (value == null) return null;
-    if (value is Map<String, dynamic>) return _deepConvert(value);
-    if (value is Map) {
-      return _deepConvert(Map<String, dynamic>.fromEntries(
-        value.entries.map((e) => MapEntry(e.key.toString(), e.value)),
-      ));
-    }
-    return null;
-  }
-
-  /// Recursively convert nested Hive `_Map` to `Map<String, dynamic>`.
-  static Map<String, dynamic> _deepConvert(Map<String, dynamic> map) {
-    return map.map((key, value) {
-      if (value is Map && value is! Map<String, dynamic>) {
-        return MapEntry(key, _toStringDynamicMap(value));
-      }
-      if (value is List) {
-        return MapEntry(key, value.map((e) {
-          if (e is Map) return _toStringDynamicMap(e);
-          return e;
-        }).toList());
-      }
-      return MapEntry(key, value);
-    });
   }
 }
