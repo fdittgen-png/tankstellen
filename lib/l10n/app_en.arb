@@ -409,5 +409,14 @@
   "freshnessAgo": "ago",
   "freshnessStale": "Stale",
   "freshnessBadgeSemantics": "Data freshness: {age}",
-  "@freshnessBadgeSemantics": {"placeholders": {"age": {"type": "String"}}}
+  "@freshnessBadgeSemantics": {"placeholders": {"age": {"type": "String"}}},
+  "passwordStrengthWeak": "Weak",
+  "passwordStrengthFair": "Fair",
+  "passwordStrengthStrong": "Strong",
+  "passwordReqMinLength": "At least 8 characters",
+  "passwordReqUppercase": "At least 1 uppercase letter",
+  "passwordReqLowercase": "At least 1 lowercase letter",
+  "passwordReqDigit": "At least 1 number",
+  "passwordReqSpecial": "At least 1 special character",
+  "passwordTooWeak": "Password does not meet all requirements"
 }

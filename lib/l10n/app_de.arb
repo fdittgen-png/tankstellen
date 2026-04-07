@@ -409,5 +409,14 @@
   "freshnessAgo": "her",
   "freshnessStale": "Veraltet",
   "freshnessBadgeSemantics": "Datenaktualität: {age}",
-  "@freshnessBadgeSemantics": {"placeholders": {"age": {"type": "String"}}}
+  "@freshnessBadgeSemantics": {"placeholders": {"age": {"type": "String"}}},
+  "passwordStrengthWeak": "Schwach",
+  "passwordStrengthFair": "Mittel",
+  "passwordStrengthStrong": "Stark",
+  "passwordReqMinLength": "Mindestens 8 Zeichen",
+  "passwordReqUppercase": "Mindestens 1 Großbuchstabe",
+  "passwordReqLowercase": "Mindestens 1 Kleinbuchstabe",
+  "passwordReqDigit": "Mindestens 1 Zahl",
+  "passwordReqSpecial": "Mindestens 1 Sonderzeichen",
+  "passwordTooWeak": "Passwort erfüllt nicht alle Anforderungen"
 }

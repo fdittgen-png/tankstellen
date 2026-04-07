@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/utils/password_validator.dart';
+import '../../../../core/widgets/password_strength_indicator.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -75,8 +77,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       setState(() => _error = 'Please enter a valid email address');
       return;
     }
-    if (_isSignUp && password.length < 6) {
-      setState(() => _error = 'Password must be at least 6 characters');
+    if (_isSignUp && !PasswordValidator.isValid(password)) {
+      final l10n = AppLocalizations.of(context);
+      setState(() => _error = l10n?.passwordTooWeak ?? 'Password does not meet all requirements');
       return;
     }
     if (_isSignUp && password != _confirmController.text) {
@@ -289,7 +292,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     ),
                     obscureText: !_showPassword,
                     enabled: !_isLoading,
+                    onChanged: (_) => setState(() {}),
                   ),
+
+                  // Password strength indicator (sign-up only)
+                  if (_isSignUp)
+                    PasswordStrengthIndicator(password: _passwordController.text),
 
                   // Confirm password field (sign-up only)
                   if (_isSignUp) ...[

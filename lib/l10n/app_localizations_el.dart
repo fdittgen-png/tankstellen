@@ -1182,4 +1182,31 @@ class AppLocalizationsEl extends AppLocalizations {
   String freshnessBadgeSemantics(String age) {
     return 'Data freshness: $age';
   }
+
+  @override
+  String get passwordStrengthWeak => 'Weak';
+
+  @override
+  String get passwordStrengthFair => 'Fair';
+
+  @override
+  String get passwordStrengthStrong => 'Strong';
+
+  @override
+  String get passwordReqMinLength => 'At least 8 characters';
+
+  @override
+  String get passwordReqUppercase => 'At least 1 uppercase letter';
+
+  @override
+  String get passwordReqLowercase => 'At least 1 lowercase letter';
+
+  @override
+  String get passwordReqDigit => 'At least 1 number';
+
+  @override
+  String get passwordReqSpecial => 'At least 1 special character';
+
+  @override
+  String get passwordTooWeak => 'Password does not meet all requirements';
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/password_validator.dart';
+import '../../../../core/widgets/password_strength_indicator.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Reusable authentication form: anonymous or email with password.
 ///
@@ -43,11 +46,14 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
 
   String? _validate() {
     if (!_useEmail) return null; // Anonymous needs no validation
+    final l10n = AppLocalizations.of(context);
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     if (email.isEmpty) return 'Please enter your email';
     if (!email.contains('@')) return 'Invalid email address';
-    if (_isSignUp && password.length < 6) return 'Password must be at least 6 characters';
+    if (_isSignUp && !PasswordValidator.isValid(password)) {
+      return l10n?.passwordTooWeak ?? 'Password does not meet all requirements';
+    }
     if (_isSignUp && password != _confirmController.text) {
       return 'Passwords do not match';
     }
@@ -126,7 +132,10 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
             ),
             obscureText: !_showPassword,
             enabled: !widget.isLoading,
+            onChanged: (_) => setState(() {}),
           ),
+          if (_isSignUp)
+            PasswordStrengthIndicator(password: _passwordController.text),
           if (_isSignUp) ...[
             const SizedBox(height: 10),
             TextField(

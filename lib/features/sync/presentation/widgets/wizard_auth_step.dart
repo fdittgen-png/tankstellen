@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/password_strength_indicator.dart';
 import 'wizard_option_card.dart';
 
 /// Authentication step of the sync wizard: anonymous vs email.
@@ -16,6 +17,7 @@ class WizardAuthStep extends StatelessWidget {
   final VoidCallback onToggleSignUp;
   final VoidCallback onTestConnection;
   final VoidCallback onConnect;
+  final VoidCallback? onPasswordChanged;
 
   const WizardAuthStep({
     super.key,
@@ -31,6 +33,7 @@ class WizardAuthStep extends StatelessWidget {
     required this.onToggleSignUp,
     required this.onTestConnection,
     required this.onConnect,
+    this.onPasswordChanged,
   });
 
   @override
@@ -75,14 +78,16 @@ class WizardAuthStep extends StatelessWidget {
           const SizedBox(height: 12),
           TextField(
             controller: passwordController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Password',
-              border: const OutlineInputBorder(),
-              prefixIcon: const Icon(Icons.lock),
-              helperText: isSignUp ? 'Minimum 6 characters' : null,
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.lock),
             ),
             obscureText: true,
+            onChanged: (_) => onPasswordChanged?.call(),
           ),
+          if (isSignUp)
+            PasswordStrengthIndicator(password: passwordController.text),
           const SizedBox(height: 8),
           Align(
             alignment: Alignment.centerRight,
