@@ -8,7 +8,6 @@ import 'package:tankstellen/core/error_tracing/upload/trace_uploader.dart';
 import 'package:tankstellen/core/error_tracing/trace_recorder.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
-import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 
 /// Fake TraceStorage that records calls in memory.
