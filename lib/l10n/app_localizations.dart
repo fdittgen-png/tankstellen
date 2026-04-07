@@ -2269,6 +2269,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter a valid {length}-digit {label}'**
   String invalidPostalCode(String length, String label);
+
+  /// No description provided for @freshnessAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'ago'**
+  String get freshnessAgo;
+
+  /// No description provided for @freshnessStale.
+  ///
+  /// In en, this message translates to:
+  /// **'Stale'**
+  String get freshnessStale;
+
+  /// No description provided for @freshnessBadgeSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Data freshness: {age}'**
+  String freshnessBadgeSemantics(String age);
 }
 
 class _AppLocalizationsDelegate

@@ -1162,4 +1162,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String invalidPostalCode(String length, String label) {
     return 'Please enter a valid $length-digit $label';
   }
+
+  @override
+  String get freshnessAgo => 'ago';
+
+  @override
+  String get freshnessStale => 'Stale';
+
+  @override
+  String freshnessBadgeSemantics(String age) {
+    return 'Data freshness: $age';
+  }
 }

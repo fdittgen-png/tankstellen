@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/services/service_result.dart';
+import '../../../../core/services/widgets/freshness_badge.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/brand_logo.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
@@ -75,7 +77,7 @@ class StationDetailScreen extends ConsumerWidget {
         data: (result) => Column(
           children: [
             ServiceStatusBanner(result: result),
-            Expanded(child: _buildContent(context, ref, result.data)),
+            Expanded(child: _buildContent(context, ref, result.data, result)),
           ],
         ),
         loading: () => const ShimmerStationDetail(),
@@ -87,7 +89,12 @@ class StationDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, StationDetail detail) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    StationDetail detail,
+    ServiceResult<StationDetail> serviceResult,
+  ) {
     final station = detail.station;
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
@@ -98,7 +105,7 @@ class StationDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Open/closed status
+          // Open/closed status + freshness badge
           Row(
             children: [
               Container(
@@ -118,6 +125,8 @@ class StationDetailScreen extends ConsumerWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              const Spacer(),
+              FreshnessBadge(result: serviceResult),
             ],
           ),
           const SizedBox(height: 16),

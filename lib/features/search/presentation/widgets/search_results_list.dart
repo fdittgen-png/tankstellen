@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
+import '../../../../core/services/widgets/freshness_badge.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/utils/price_utils.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -136,12 +137,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
                 ),
               ),
               const SizedBox(width: 4),
-              Text(
-                result.freshnessLabel,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-              ),
+              FreshnessBadge(result: result),
             ],
           ),
         ),

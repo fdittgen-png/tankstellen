@@ -322,5 +322,8 @@
   "errorAllServicesFailed": "Impossible de charger les données. Vérifiez votre connexion.",
   "errorCache": "Erreur de données locales. Essayez de vider le cache.",
   "errorCancelled": "Requête annulée.",
-  "errorUnknown": "Une erreur inattendue est survenue."
+  "errorUnknown": "Une erreur inattendue est survenue.",
+  "freshnessAgo": "il y a",
+  "freshnessStale": "Périmé",
+  "freshnessBadgeSemantics": "Fraîcheur des données : {age}"
 }
