@@ -60,10 +60,15 @@ class BalancedSearchStrategy implements RouteSearchStrategy {
       }
     }
 
-    // Sort by combined score
-    scored.sort((a, b) => a.$2.compareTo(b.$2));
+    // Sort by position along route (itinerary order)
+    final items = scored.map((e) => e.$1).toList();
+    items.sort((a, b) {
+      final da = distanceAlongPolyline(a.lat, a.lng, route.geometry);
+      final db = distanceAlongPolyline(b.lat, b.lng, route.geometry);
+      return da.compareTo(db);
+    });
 
-    return scored.map((e) => e.$1).toList();
+    return items;
   }
 
   @override

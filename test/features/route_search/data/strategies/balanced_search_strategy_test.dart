@@ -44,25 +44,23 @@ void main() {
     strategy = BalancedSearchStrategy();
   });
 
-  group('searchAlongRoute — balanced scoring', () {
-    test('prefers nearby affordable station over distant cheapest', () async {
-      // Station A: price=1.75, on the route (lat/lng on polyline)
-      // minDist ≈ 0 km, Score ≈ 1.75
-      final nearAffordable = makeStation(
-        id: 'near_affordable',
-        lat: 48.05,
-        lng: 2.05,
-        diesel: 1.75,
+  group('searchAlongRoute — itinerary order', () {
+    test('sorts by position along route regardless of price or distance', () async {
+      // Station near end of route
+      final endStation = makeStation(
+        id: 'end',
+        lat: 48.19,
+        lng: 2.19,
+        diesel: 1.50, // Cheapest, closest to route — but near end
         dist: 0.5,
       );
 
-      // Station B: price=1.50, far from route (~30km off polyline)
-      // minDist ≈ 30 km, Score ≈ 1.50 + (30 * 0.1) = 4.50
-      final farCheap = makeStation(
-        id: 'far_cheap',
-        lat: 48.1,
-        lng: 2.5,
-        diesel: 1.50,
+      // Station near start of route
+      final startStation = makeStation(
+        id: 'start',
+        lat: 48.01,
+        lng: 2.01,
+        diesel: 1.95, // Most expensive — but near start
         dist: 3.0,
       );
 
@@ -76,8 +74,8 @@ void main() {
         callCount++;
         if (callCount == 1) {
           return [
-            FuelStationResult(nearAffordable),
-            FuelStationResult(farCheap),
+            FuelStationResult(endStation),
+            FuelStationResult(startStation),
           ];
         }
         return [];
@@ -92,30 +90,34 @@ void main() {
       );
 
       expect(results.length, 2);
-      // near_affordable is on route (score ≈ 1.75), far_cheap is ~30km off (score ≈ 4.50)
-      expect(results[0].id, 'near_affordable');
-      expect(results[1].id, 'far_cheap');
+      // Sorted by position along route, not by score
+      expect(results[0].id, 'start');
+      expect(results[1].id, 'end');
     });
 
-    test('still prefers much cheaper station even if slightly farther', () async {
-      // Station A: price=1.90, close (dist=0.5)
-      // Score = 1.90 + (0.5 * 0.1) = 1.95
-      final nearExpensive = makeStation(
-        id: 'near_exp',
-        lat: 48.05,
-        lng: 2.05,
+    test('three stations sorted by itinerary position', () async {
+      final startStation = makeStation(
+        id: 'start',
+        lat: 48.01,
+        lng: 2.01,
         diesel: 1.90,
         dist: 0.5,
       );
 
-      // Station B: price=1.65, moderate distance (dist=1.5)
-      // Score = 1.65 + (1.5 * 0.1) = 1.80
-      final moderateCheap = makeStation(
-        id: 'mod_cheap',
+      final midStation = makeStation(
+        id: 'mid',
         lat: 48.1,
         lng: 2.1,
         diesel: 1.65,
         dist: 1.5,
+      );
+
+      final endStation = makeStation(
+        id: 'end',
+        lat: 48.19,
+        lng: 2.19,
+        diesel: 1.75,
+        dist: 0.5,
       );
 
       int callCount = 0;
@@ -128,8 +130,9 @@ void main() {
         callCount++;
         if (callCount == 1) {
           return [
-            FuelStationResult(nearExpensive),
-            FuelStationResult(moderateCheap),
+            FuelStationResult(midStation),
+            FuelStationResult(endStation),
+            FuelStationResult(startStation),
           ];
         }
         return [];
@@ -143,10 +146,10 @@ void main() {
         maxDetourKm: 50.0,
       );
 
-      expect(results.length, 2);
-      // mod_cheap scores 1.80, near_exp scores 1.95
-      expect(results[0].id, 'mod_cheap');
-      expect(results[1].id, 'near_exp');
+      expect(results.length, 3);
+      expect(results[0].id, 'start');
+      expect(results[1].id, 'mid');
+      expect(results[2].id, 'end');
     });
   });
 

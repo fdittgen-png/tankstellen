@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/core/utils/geo_utils.dart';
 
 void main() {
@@ -58,6 +59,53 @@ void main() {
       final ab = distanceKm(52.5200, 13.4050, 48.1351, 11.5820);
       final ba = distanceKm(48.1351, 11.5820, 52.5200, 13.4050);
       expect(ab, closeTo(ba, 0.001));
+    });
+  });
+
+  group('distanceAlongPolyline', () {
+    // Simple straight-line polyline: Paris (48.0, 2.0) -> (48.1, 2.1) -> (48.2, 2.2)
+    final polyline = [
+      LatLng(48.0, 2.0),
+      LatLng(48.1, 2.1),
+      LatLng(48.2, 2.2),
+    ];
+
+    test('point near start returns ~0 km', () {
+      final d = distanceAlongPolyline(48.01, 2.01, polyline);
+      expect(d, closeTo(0, 1)); // Near the first vertex
+    });
+
+    test('point near middle returns roughly half-route distance', () {
+      final d = distanceAlongPolyline(48.1, 2.1, polyline);
+      // Distance from start to middle vertex
+      final expected = distanceKm(48.0, 2.0, 48.1, 2.1);
+      expect(d, closeTo(expected, 1));
+    });
+
+    test('point near end returns roughly full-route distance', () {
+      final d = distanceAlongPolyline(48.19, 2.19, polyline);
+      // Should be close to start-to-end cumulative distance
+      final seg1 = distanceKm(48.0, 2.0, 48.1, 2.1);
+      final seg2 = distanceKm(48.1, 2.1, 48.2, 2.2);
+      expect(d, closeTo(seg1 + seg2, 2));
+    });
+
+    test('start < middle < end ordering is preserved', () {
+      final dStart = distanceAlongPolyline(48.01, 2.01, polyline);
+      final dMid = distanceAlongPolyline(48.1, 2.1, polyline);
+      final dEnd = distanceAlongPolyline(48.19, 2.19, polyline);
+      expect(dStart, lessThan(dMid));
+      expect(dMid, lessThan(dEnd));
+    });
+
+    test('empty polyline returns infinity', () {
+      final d = distanceAlongPolyline(48.0, 2.0, []);
+      expect(d, double.infinity);
+    });
+
+    test('single-point polyline returns 0', () {
+      final d = distanceAlongPolyline(48.0, 2.0, [LatLng(48.0, 2.0)]);
+      expect(d, 0.0);
     });
   });
 }

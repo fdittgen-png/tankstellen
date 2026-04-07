@@ -53,15 +53,8 @@ class UniformSearchStrategy implements RouteSearchStrategy {
       }
     }
 
-    // Sort by price
-    filtered.sort((a, b) {
-      if (a is FuelStationResult && b is FuelStationResult) {
-        final pa = a.station.priceFor(fuelType) ?? 999;
-        final pb = b.station.priceFor(fuelType) ?? 999;
-        return pa.compareTo(pb);
-      }
-      return 0;
-    });
+    // Sort by position along route (itinerary order)
+    _sortByItineraryOrder(filtered, route.geometry);
 
     return filtered;
   }
@@ -126,5 +119,17 @@ class UniformSearchStrategy implements RouteSearchStrategy {
       if (d < minDist) minDist = d;
     }
     return minDist;
+  }
+
+  /// Sorts results by their position along the route polyline (itinerary order).
+  void _sortByItineraryOrder(
+    List<SearchResultItem> items,
+    List<LatLng> geometry,
+  ) {
+    items.sort((a, b) {
+      final da = distanceAlongPolyline(a.lat, a.lng, geometry);
+      final db = distanceAlongPolyline(b.lat, b.lng, geometry);
+      return da.compareTo(db);
+    });
   }
 }
