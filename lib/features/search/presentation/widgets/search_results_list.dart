@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/utils/navigation_utils.dart';
+import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/utils/price_utils.dart';
@@ -74,6 +75,21 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
       result[entry.value]![entry.key] = true;
     }
     return result;
+  }
+
+  /// Get min/max price range for tier classification.
+  static (double, double) _getPriceRange(List<Station> stations, FuelType fuel) {
+    double minP = double.infinity;
+    double maxP = 0;
+    for (final s in stations) {
+      final p = s.priceFor(fuel);
+      if (p != null && p > 0) {
+        if (p < minP) minP = p;
+        if (p > maxP) maxP = p;
+      }
+    }
+    if (minP == double.infinity) return (0.0, 0.0);
+    return (minP, maxP);
   }
 
   List<Station> _sortStations(List<Station> stations) {
@@ -164,6 +180,10 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
                   ? _computeCheapestFlags(sorted)
                   : <String, Map<FuelType, bool>>{};
 
+              // Compute price range for tier icons (a11y)
+              final fuelType = ref.watch(selectedFuelTypeProvider);
+              final priceRange = _getPriceRange(sorted, fuelType);
+
               return ListView.builder(
                 itemCount: sorted.length,
                 itemBuilder: (context, index) {
@@ -183,10 +203,17 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
                     );
                   }
 
+                  final tier = priceTierOf(
+                    station.priceFor(fuelType),
+                    priceRange.$1,
+                    priceRange.$2,
+                  );
+
                   return SwipeableStationCard(
                     key: ValueKey('station-${station.id}'),
                     station: station,
                     isFavorite: isFav,
+                    priceTier: tier,
                     onNavigate: () => _openStationInMaps(station),
                     onIgnore: () {
                       ref.read(ignoredStationsProvider.notifier).add(station.id);

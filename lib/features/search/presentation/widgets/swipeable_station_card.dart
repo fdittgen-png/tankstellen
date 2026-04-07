@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/utils/price_tier.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/station.dart';
 import '../../providers/search_provider.dart';
@@ -15,6 +16,7 @@ class SwipeableStationCard extends ConsumerWidget {
   final VoidCallback onIgnore;
   final VoidCallback onTap;
   final VoidCallback onFavoriteTap;
+  final PriceTier? priceTier;
 
   const SwipeableStationCard({
     super.key,
@@ -24,6 +26,7 @@ class SwipeableStationCard extends ConsumerWidget {
     required this.onIgnore,
     required this.onTap,
     required this.onFavoriteTap,
+    this.priceTier,
   });
 
   @override
@@ -78,6 +81,7 @@ class SwipeableStationCard extends ConsumerWidget {
         isFavorite: isFavorite,
         onTap: onTap,
         onFavoriteTap: onFavoriteTap,
+        priceTier: priceTier,
       ),
     );
   }

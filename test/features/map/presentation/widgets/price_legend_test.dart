@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/utils/price_tier.dart';
 import 'package:tankstellen/features/map/presentation/widgets/price_legend.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -54,6 +55,42 @@ void main() {
         return false;
       });
       expect(gradientContainer, findsOneWidget);
+    });
+
+    testWidgets('renders arrow_downward icon for cheap tier', (tester) async {
+      await pumpApp(tester, const PriceLegend());
+
+      expect(
+        find.byIcon(iconForPriceTier(PriceTier.cheap)),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('renders arrow_upward icon for expensive tier', (tester) async {
+      await pumpApp(tester, const PriceLegend());
+
+      expect(
+        find.byIcon(iconForPriceTier(PriceTier.expensive)),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('cheap icon is green colored', (tester) async {
+      await pumpApp(tester, const PriceLegend());
+
+      final cheapIcon = tester.widget<Icon>(
+        find.byIcon(Icons.arrow_downward),
+      );
+      expect(cheapIcon.color, Colors.green);
+    });
+
+    testWidgets('expensive icon is red colored', (tester) async {
+      await pumpApp(tester, const PriceLegend());
+
+      final expensiveIcon = tester.widget<Icon>(
+        find.byIcon(Icons.arrow_upward),
+      );
+      expect(expensiveIcon.color, Colors.red);
     });
 
     testWidgets('gradient goes from green through orange to red',

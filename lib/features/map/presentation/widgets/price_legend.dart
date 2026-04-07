@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/utils/price_tier.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Compact price legend showing the cheap-to-expensive color gradient.
@@ -22,6 +23,7 @@ class PriceLegend extends StatelessWidget {
         return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Icon(iconForPriceTier(PriceTier.cheap), size: 12, color: Colors.green),
           Container(
               width: 12,
               height: 12,
@@ -46,6 +48,7 @@ class PriceLegend extends StatelessWidget {
               height: 12,
               decoration: const BoxDecoration(
                   color: Colors.red, shape: BoxShape.circle)),
+          Icon(iconForPriceTier(PriceTier.expensive), size: 12, color: Colors.red),
         ],
       );
       }),
