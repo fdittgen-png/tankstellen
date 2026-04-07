@@ -352,5 +352,12 @@
   "crossBorderDistance": "~{km} km bis zur Grenze",
   "@crossBorderDistance": {"placeholders": {"km": {"type": "int"}}},
   "crossBorderAvgPrice": "Ø hier: {price} EUR ({count} Tankstellen)",
-  "@crossBorderAvgPrice": {"placeholders": {"price": {"type": "String"}, "count": {"type": "int"}}}
+  "@crossBorderAvgPrice": {"placeholders": {"price": {"type": "String"}, "count": {"type": "int"}}},
+
+  "allPricesView": "Alle Preise",
+  "compactView": "Kompakt",
+  "switchToAllPricesView": "Zur Alle-Preise-Ansicht wechseln",
+  "switchToCompactView": "Zur Kompaktansicht wechseln",
+  "unavailable": "k.A.",
+  "outOfStock": "Ausverkauft"
 }

@@ -1999,6 +1999,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Avg here: {price} EUR ({count} stations)'**
   String crossBorderAvgPrice(String price, int count);
+
+  /// No description provided for @allPricesView.
+  ///
+  /// In en, this message translates to:
+  /// **'All prices'**
+  String get allPricesView;
+
+  /// No description provided for @compactView.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact'**
+  String get compactView;
+
+  /// No description provided for @switchToAllPricesView.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to all-prices view'**
+  String get switchToAllPricesView;
+
+  /// No description provided for @switchToCompactView.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to compact view'**
+  String get switchToCompactView;
+
+  /// No description provided for @unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'N/A'**
+  String get unavailable;
+
+  /// No description provided for @outOfStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Out of stock'**
+  String get outOfStock;
 }
 
 class _AppLocalizationsDelegate

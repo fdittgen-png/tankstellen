@@ -1020,4 +1020,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String crossBorderAvgPrice(String price, int count) {
     return 'Ø hier: $price EUR ($count Tankstellen)';
   }
+
+  @override
+  String get allPricesView => 'Alle Preise';
+
+  @override
+  String get compactView => 'Kompakt';
+
+  @override
+  String get switchToAllPricesView => 'Zur Alle-Preise-Ansicht wechseln';
+
+  @override
+  String get switchToCompactView => 'Zur Kompaktansicht wechseln';
+
+  @override
+  String get unavailable => 'k.A.';
+
+  @override
+  String get outOfStock => 'Ausverkauft';
 }

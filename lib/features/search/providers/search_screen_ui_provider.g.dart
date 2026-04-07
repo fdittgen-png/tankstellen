@@ -134,3 +134,62 @@ abstract class _$SelectedRouteStrategy
     element.handleCreate(ref, build);
   }
 }
+
+/// Whether to show the all-prices detail view instead of the compact card view.
+
+@ProviderFor(AllPricesViewEnabled)
+final allPricesViewEnabledProvider = AllPricesViewEnabledProvider._();
+
+/// Whether to show the all-prices detail view instead of the compact card view.
+final class AllPricesViewEnabledProvider
+    extends $NotifierProvider<AllPricesViewEnabled, bool> {
+  /// Whether to show the all-prices detail view instead of the compact card view.
+  AllPricesViewEnabledProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'allPricesViewEnabledProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$allPricesViewEnabledHash();
+
+  @$internal
+  @override
+  AllPricesViewEnabled create() => AllPricesViewEnabled();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$allPricesViewEnabledHash() =>
+    r'924d65fb587142a85579e732270436519ce54e39';
+
+/// Whether to show the all-prices detail view instead of the compact card view.
+
+abstract class _$AllPricesViewEnabled extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

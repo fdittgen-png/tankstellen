@@ -1016,4 +1016,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String crossBorderAvgPrice(String price, int count) {
     return 'Avg here: $price EUR ($count stations)';
   }
+
+  @override
+  String get allPricesView => 'All prices';
+
+  @override
+  String get compactView => 'Compact';
+
+  @override
+  String get switchToAllPricesView => 'Switch to all-prices view';
+
+  @override
+  String get switchToCompactView => 'Switch to compact view';
+
+  @override
+  String get unavailable => 'N/A';
+
+  @override
+  String get outOfStock => 'Out of stock';
 }
