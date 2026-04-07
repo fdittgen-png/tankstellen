@@ -34,7 +34,7 @@ class AppConstants {
       'https://creativecommons.tankerkoenig.de/';
 
   static const String privacyPolicyUrl =
-      'https://github.com/fdittgen-png/tankstellen/blob/master/PRIVACY.md';
+      'https://fdittgen-png.github.io/tankstellen/';
 
   // Donation links
   static const String paypalUrl = 'https://www.paypal.me/FlorianDITTGEN';

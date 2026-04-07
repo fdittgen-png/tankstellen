@@ -45,7 +45,10 @@ class AboutSection extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip),
-            title: const Text('Privacy Policy'),
+            title: Text(
+              AppLocalizations.of(context)?.privacyPolicy ??
+                  'Privacy Policy',
+            ),
             onTap: () => launchUrl(
               Uri.parse(AppConstants.privacyPolicyUrl),
               mode: LaunchMode.externalApplication,
