@@ -167,7 +167,7 @@ Never commit directly to `master`. `master` is always deployable.
 - **On version tag** (`v*`): creates GitHub Release with auto-generated notes + artifacts
 - **iOS build**: disabled (not ready for distribution)
 - **Dependabot**: weekly PRs for pub + GitHub Actions dependency updates
-- **Coverage**: measured on app code only (excludes l10n, .g.dart, .freezed.dart), threshold 35%
+- **Coverage**: measured on app code only (excludes l10n, .g.dart, .freezed.dart), threshold 45%
 
 ### Dependency Updates
 

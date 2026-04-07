@@ -51,33 +51,7 @@ jobs:
       - run: dart run build_runner build --delete-conflicting-outputs
       - run: flutter test --coverage
       - name: Check coverage threshold
-        run: |
-          if [ -f coverage/lcov.info ]; then
-            # Filter out generated files (l10n, .g.dart, .freezed.dart) from lcov
-            python3 -c "
-          import sys
-          skip = False
-          with open('coverage/lcov.info') as f:
-              with open('coverage/lcov_filtered.info', 'w') as out:
-                  for line in f:
-                      if line.startswith('SF:'):
-                          skip = '.g.dart' in line or '.freezed.dart' in line or 'l10n/app_localizations' in line
-                      if not skip:
-                          out.write(line)
-                      if line.startswith('end_of_record'):
-                          skip = False
-          "
-            TOTAL_LINES=$(grep -c "^DA:" coverage/lcov_filtered.info || true)
-            HIT_LINES=$(grep "^DA:" coverage/lcov_filtered.info | grep -cv ",0$" || true)
-            if [ "$TOTAL_LINES" -gt 0 ]; then
-              COVERAGE=$((HIT_LINES * 100 / TOTAL_LINES))
-              echo "Coverage: $COVERAGE% ($HIT_LINES/$TOTAL_LINES lines, excluding generated code)"
-              if [ "$COVERAGE" -lt 35 ]; then
-                echo "::error::Coverage $COVERAGE% is below 35% threshold"
-                exit 1
-              fi
-            fi
-          fi
+        run: bash scripts/check_coverage.sh
 
 
   security-scan:
