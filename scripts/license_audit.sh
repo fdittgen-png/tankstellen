@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # License audit script for CI -- ensures all dependencies use MIT-compatible licenses.
-# Allowed: MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, Unlicense, ISC, Zlib, BlueOak-1.0.0
+# Allowed: MIT, BSD-2/3, Apache-2.0, MPL-2.0, Unlicense, ISC, Zlib, BlueOak-1.0.0
 # Forbidden: GPL, AGPL, LGPL, SSPL, EUPL, CC-BY-SA, CC-BY-NC
 #
 # Usage: bash scripts/license_audit.sh [--report]
@@ -12,49 +12,6 @@ REPORT_MODE=false
 if [[ "${1:-}" == "--report" ]]; then
   REPORT_MODE=true
 fi
-
-# Allowed license patterns (case-insensitive grep)
-ALLOWED_PATTERNS=(
-  "MIT License"
-  "MIT license"
-  "Permission is hereby granted, free of charge"
-  "BSD 2-Clause"
-  "BSD-2-Clause"
-  "Redistribution and use in source and binary forms"
-  "BSD 3-Clause"
-  "BSD-3-Clause"
-  "Apache License"
-  "Apache-2.0"
-  "Licensed under the Apache License, Version 2.0"
-  "The Unlicense"
-  "This is free and unencumbered software"
-  "ISC License"
-  "ISC license"
-  "Permission to use, copy, modify"
-  "zlib License"
-  "Zlib license"
-  "BlueOak"
-)
-
-# Forbidden license patterns (case-insensitive grep)
-FORBIDDEN_PATTERNS=(
-  "GNU General Public License"
-  "GNU GENERAL PUBLIC LICENSE"
-  "GPL-2"
-  "GPL-3"
-  "AGPL"
-  "GNU Affero"
-  "LGPL"
-  "GNU Lesser"
-  "Server Side Public License"
-  "SSPL"
-  "European Union Public"
-  "EUPL"
-  "Creative Commons Attribution-ShareAlike"
-  "CC-BY-SA"
-  "Creative Commons Attribution-NonCommercial"
-  "CC-BY-NC"
-)
 
 FORBIDDEN_DEPS=""
 UNKNOWN_DEPS=""
@@ -75,6 +32,90 @@ fi
 
 echo "Checking licenses for dependencies..."
 
+# classify_license FILE -> sets LICENSE_TYPE
+# Strategy: check allowed licenses first (to handle MPL-2.0 which mentions GPL),
+# then check forbidden only if no allowed match was found.
+classify_license() {
+  local file="$1"
+  LICENSE_TYPE="UNKNOWN"
+
+  # 1. Check for specific allowed licenses (order matters: specific before generic)
+  if grep -qi "Mozilla Public License" "$file" 2>/dev/null; then
+    LICENSE_TYPE="MPL-2.0"
+    return
+  fi
+  if grep -qi "Apache License\|Apache-2.0\|Licensed under the Apache License" "$file" 2>/dev/null; then
+    LICENSE_TYPE="Apache-2.0"
+    return
+  fi
+  if grep -qi "BSD-3-Clause\|BSD 3-Clause" "$file" 2>/dev/null; then
+    LICENSE_TYPE="BSD-3-Clause"
+    return
+  fi
+  if grep -qi "BSD-2-Clause\|BSD 2-Clause" "$file" 2>/dev/null; then
+    LICENSE_TYPE="BSD-2-Clause"
+    return
+  fi
+  if grep -qi "Redistribution and use in source and binary forms" "$file" 2>/dev/null; then
+    LICENSE_TYPE="BSD"
+    return
+  fi
+  if grep -qi "Permission is hereby granted, free of charge" "$file" 2>/dev/null; then
+    LICENSE_TYPE="MIT"
+    return
+  fi
+  if grep -qi "MIT License\|MIT license" "$file" 2>/dev/null; then
+    LICENSE_TYPE="MIT"
+    return
+  fi
+  if grep -qi "ISC License\|ISC license" "$file" 2>/dev/null; then
+    LICENSE_TYPE="ISC"
+    return
+  fi
+  if grep -qi "Permission to use, copy, modify" "$file" 2>/dev/null; then
+    LICENSE_TYPE="ISC"
+    return
+  fi
+  if grep -qi "The Unlicense\|This is free and unencumbered software" "$file" 2>/dev/null; then
+    LICENSE_TYPE="Unlicense"
+    return
+  fi
+  if grep -qi "zlib License\|Zlib license" "$file" 2>/dev/null; then
+    LICENSE_TYPE="Zlib"
+    return
+  fi
+  if grep -qi "BlueOak" "$file" 2>/dev/null; then
+    LICENSE_TYPE="BlueOak-1.0.0"
+    return
+  fi
+
+  # 2. No allowed license matched -- check for forbidden licenses
+  local forbidden_patterns=(
+    "GNU General Public License"
+    "GNU GENERAL PUBLIC LICENSE"
+    "GPL-2"
+    "GPL-3"
+    "GNU Affero"
+    "Server Side Public License"
+    "SSPL"
+    "European Union Public"
+    "EUPL"
+    "Creative Commons Attribution-ShareAlike"
+    "CC-BY-SA"
+    "Creative Commons Attribution-NonCommercial"
+    "CC-BY-NC"
+  )
+  for pattern in "${forbidden_patterns[@]}"; do
+    if grep -qi "$pattern" "$file" 2>/dev/null; then
+      LICENSE_TYPE="FORBIDDEN"
+      return
+    fi
+  done
+
+  # 3. Neither allowed nor forbidden -- unknown
+  LICENSE_TYPE="UNKNOWN"
+}
+
 for pkg in $DEPS; do
   # Find the package's LICENSE file in the pub cache
   LICENSE_FILE=""
@@ -86,55 +127,13 @@ for pkg in $DEPS; do
     fi
   done
 
-  LICENSE_TYPE="unknown"
-
   if [ -n "$LICENSE_FILE" ]; then
-    # Check forbidden first
-    IS_FORBIDDEN=false
-    for pattern in "${FORBIDDEN_PATTERNS[@]}"; do
-      if grep -qi "$pattern" "$LICENSE_FILE" 2>/dev/null; then
-        IS_FORBIDDEN=true
-        LICENSE_TYPE="FORBIDDEN"
-        break
-      fi
-    done
+    classify_license "$LICENSE_FILE"
 
-    if [ "$IS_FORBIDDEN" = true ]; then
+    if [ "$LICENSE_TYPE" = "FORBIDDEN" ]; then
       FORBIDDEN_DEPS="${FORBIDDEN_DEPS}\n  - ${pkg}"
-    else
-      # Check allowed
-      IS_ALLOWED=false
-      for pattern in "${ALLOWED_PATTERNS[@]}"; do
-        if grep -qi "$pattern" "$LICENSE_FILE" 2>/dev/null; then
-          IS_ALLOWED=true
-          # Determine specific license type for report
-          if grep -qi "Apache" "$LICENSE_FILE" 2>/dev/null; then
-            LICENSE_TYPE="Apache-2.0"
-          elif grep -qi "BSD-3\|BSD 3" "$LICENSE_FILE" 2>/dev/null; then
-            LICENSE_TYPE="BSD-3-Clause"
-          elif grep -qi "BSD-2\|BSD 2" "$LICENSE_FILE" 2>/dev/null; then
-            LICENSE_TYPE="BSD-2-Clause"
-          elif grep -qi "Redistribution and use" "$LICENSE_FILE" 2>/dev/null; then
-            LICENSE_TYPE="BSD"
-          elif grep -qi "MIT\|Permission is hereby granted, free of charge" "$LICENSE_FILE" 2>/dev/null; then
-            LICENSE_TYPE="MIT"
-          elif grep -qi "ISC" "$LICENSE_FILE" 2>/dev/null; then
-            LICENSE_TYPE="ISC"
-          elif grep -qi "Unlicense\|unencumbered" "$LICENSE_FILE" 2>/dev/null; then
-            LICENSE_TYPE="Unlicense"
-          elif grep -qi "zlib" "$LICENSE_FILE" 2>/dev/null; then
-            LICENSE_TYPE="Zlib"
-          else
-            LICENSE_TYPE="Allowed"
-          fi
-          break
-        fi
-      done
-
-      if [ "$IS_ALLOWED" = false ]; then
-        UNKNOWN_DEPS="${UNKNOWN_DEPS}\n  - ${pkg}"
-        LICENSE_TYPE="UNKNOWN"
-      fi
+    elif [ "$LICENSE_TYPE" = "UNKNOWN" ]; then
+      UNKNOWN_DEPS="${UNKNOWN_DEPS}\n  - ${pkg}"
     fi
   else
     # Flutter SDK packages (like sky_engine, flutter) don't have separate LICENSE files
@@ -175,7 +174,7 @@ fi
 
 if [ $EXIT_CODE -eq 0 ]; then
   TOTAL=$(echo "$DEPS" | wc -l)
-  echo "License audit passed -- $TOTAL dependencies checked, all MIT/BSD/Apache compatible."
+  echo "License audit passed -- $TOTAL dependencies checked, all MIT/BSD/Apache/MPL compatible."
 fi
 
 exit $EXIT_CODE

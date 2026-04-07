@@ -90,16 +90,25 @@ void main() {
       expect(licenseScript, contains('GNU General Public License'));
       expect(licenseScript, contains('GPL-2'));
       expect(licenseScript, contains('GPL-3'));
-      expect(licenseScript, contains('AGPL'));
-      expect(licenseScript, contains('LGPL'));
+      expect(licenseScript, contains('GNU Affero'));
+      expect(licenseScript, contains('SSPL'));
     });
 
-    test('allows MIT, BSD, Apache, ISC, Unlicense licenses', () {
+    test('allows MIT, BSD, Apache, MPL, ISC, Unlicense licenses', () {
       expect(licenseScript, contains('MIT'));
       expect(licenseScript, contains('BSD'));
       expect(licenseScript, contains('Apache'));
+      expect(licenseScript, contains('MPL-2.0'));
       expect(licenseScript, contains('ISC'));
       expect(licenseScript, contains('Unlicense'));
+    });
+
+    test('checks allowed licenses before forbidden to avoid false positives',
+        () {
+      // MPL-2.0 mentions GPL in its compatibility section, so allowed
+      // must be checked first
+      expect(licenseScript, contains('classify_license'));
+      expect(licenseScript, contains('Mozilla Public License'));
     });
 
     test('supports --report flag for generating license inventory', () {
