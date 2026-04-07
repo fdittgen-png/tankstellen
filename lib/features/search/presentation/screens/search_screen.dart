@@ -47,7 +47,6 @@ class SearchScreen extends ConsumerStatefulWidget {
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   bool _filtersExpanded = true;
-  bool _searchBarExpanded = true;
   RouteSearchStrategyType _selectedStrategy = RouteSearchStrategyType.uniform;
 
   @override
@@ -73,7 +72,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   void _performRouteSearch(List<RouteWaypoint> waypoints) {
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
-    setState(() { _filtersExpanded = false; _searchBarExpanded = false; });
+    setState(() { _filtersExpanded = false; });
     ref.read(routeSearchStateProvider.notifier).searchAlongRoute(
       waypoints: waypoints,
       fuelType: fuelType,
@@ -102,7 +101,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       }
       await LocationConsentDialog.recordConsent(settings);
     }
-    setState(() { _filtersExpanded = false; _searchBarExpanded = false; });
+    setState(() { _filtersExpanded = false; });
 
     if (fuelType == FuelType.electric) {
       try {
@@ -131,7 +130,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   void _performZipSearch(String zip) {
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
-    setState(() { _filtersExpanded = false; _searchBarExpanded = false; });
+    setState(() { _filtersExpanded = false; });
     ref.read(searchStateProvider.notifier).searchByZipCode(
       zipCode: zip,
       fuelType: fuelType,
@@ -142,7 +141,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   void _performCitySearch(ResolvedLocation city) {
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
-    setState(() { _filtersExpanded = false; _searchBarExpanded = false; });
+    setState(() { _filtersExpanded = false; });
     ref.read(searchStateProvider.notifier).searchByCoordinates(
       lat: city.lat,
       lng: city.lng,
@@ -164,7 +163,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
-    if (isLandscape && !_searchBarExpanded && _filtersExpanded) {
+    if (isLandscape && _filtersExpanded) {
       safePostFrame(() {
         setState(() => _filtersExpanded = false);
       });
@@ -193,98 +192,91 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final l10n = AppLocalizations.of(context);
     final searchMode = ref.watch(activeSearchModeProvider);
 
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(child: DemoModeBanner(country: country)),
-
-        // Search controls
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(16, isLandscape ? 4 : 12, 16, 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Search mode toggle
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ModeChip(
-                          label: l10n?.searchNearby ?? 'Nearby',
-                          icon: Icons.near_me,
-                          selected: searchMode == SearchMode.nearby,
-                          onTap: () => ref.read(activeSearchModeProvider.notifier).set(SearchMode.nearby),
-                        ),
+    return Column(
+      children: [
+        // --- Sticky header: search controls stay visible ---
+        DemoModeBanner(country: country),
+        Padding(
+          padding: EdgeInsets.fromLTRB(16, isLandscape ? 4 : 12, 16, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Search mode toggle
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ModeChip(
+                        label: l10n?.searchNearby ?? 'Nearby',
+                        icon: Icons.near_me,
+                        selected: searchMode == SearchMode.nearby,
+                        onTap: () => ref.read(activeSearchModeProvider.notifier).set(SearchMode.nearby),
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ModeChip(
-                          label: l10n?.searchAlongRouteLabel ?? 'Along route',
-                          icon: Icons.route,
-                          selected: searchMode == SearchMode.route,
-                          onTap: () => ref.read(activeSearchModeProvider.notifier).set(SearchMode.route),
-                        ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ModeChip(
+                        label: l10n?.searchAlongRouteLabel ?? 'Along route',
+                        icon: Icons.route,
+                        selected: searchMode == SearchMode.route,
+                        onTap: () => ref.read(activeSearchModeProvider.notifier).set(SearchMode.route),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                if (searchMode == SearchMode.nearby)
-                  NearbySearchControls(
-                    onGpsSearch: _performGpsSearch,
-                    onZipSearch: _performZipSearch,
-                    onCitySearch: _performCitySearch,
-                    filtersExpanded: _filtersExpanded,
-                    searchBarExpanded: _searchBarExpanded,
-                    onToggleFilters: (v) => setState(() => _filtersExpanded = v),
-                    onToggleSearchBar: (v) => setState(() => _searchBarExpanded = v),
-                    isLandscape: isLandscape,
-                  )
-                else
-                  RouteSearchControls(
-                    onSearch: _performRouteSearch,
-                    selectedStrategy: _selectedStrategy,
-                    onStrategyChanged: (s) => setState(() => _selectedStrategy = s),
-                  ),
-              ],
-            ),
+              ),
+              if (searchMode == SearchMode.nearby)
+                NearbySearchControls(
+                  onGpsSearch: _performGpsSearch,
+                  onZipSearch: _performZipSearch,
+                  onCitySearch: _performCitySearch,
+                  filtersExpanded: _filtersExpanded,
+                  onToggleFilters: (v) => setState(() => _filtersExpanded = v),
+                  isLandscape: isLandscape,
+                )
+              else
+                RouteSearchControls(
+                  onSearch: _performRouteSearch,
+                  selectedStrategy: _selectedStrategy,
+                  onStrategyChanged: (s) => setState(() => _selectedStrategy = s),
+                ),
+            ],
           ),
         ),
-
-        // User position bar
-        SliverToBoxAdapter(
-          child: UserPositionBar(
-            onUpdatePosition: () async {
-              final settings = ref.read(settingsStorageProvider);
-              final messenger = ScaffoldMessenger.of(context);
-              if (!LocationConsentDialog.hasConsent(settings)) {
-                if (!mounted) return;
-                final consented = await LocationConsentDialog.show(context);
-                if (!consented) return;
-                await LocationConsentDialog.recordConsent(settings);
+        UserPositionBar(
+          onUpdatePosition: () async {
+            final settings = ref.read(settingsStorageProvider);
+            final messenger = ScaffoldMessenger.of(context);
+            if (!LocationConsentDialog.hasConsent(settings)) {
+              if (!mounted) return;
+              final consented = await LocationConsentDialog.show(context);
+              if (!consented) return;
+              await LocationConsentDialog.recordConsent(settings);
+            }
+            try {
+              await ref.read(userPositionProvider.notifier).updateFromGps();
+              final state = ref.read(searchStateProvider);
+              if (state.hasValue && state.value!.data.isNotEmpty) {
+                _performGpsSearch();
               }
-              try {
-                await ref.read(userPositionProvider.notifier).updateFromGps();
-                final state = ref.read(searchStateProvider);
-                if (state.hasValue && state.value!.data.isNotEmpty) {
-                  _performGpsSearch();
-                }
-              } catch (e) {
-                if (mounted) {
-                  messenger.showSnackBar(SnackBar(content: Text(e.toString())));
-                }
+            } catch (e) {
+              if (mounted) {
+                messenger.showSnackBar(SnackBar(content: Text(e.toString())));
               }
-            },
-          ),
+            }
+          },
         ),
 
-        // Results
-        _buildResultsSliver(context, l10n, searchState),
+        // --- Scrollable results ---
+        Expanded(
+          child: _buildResults(context, l10n, searchState),
+        ),
       ],
     );
   }
 
-  Widget _buildResultsSliver(
+  Widget _buildResults(
     BuildContext context,
     AppLocalizations? l10n,
     AsyncValue<ServiceResult<List<Station>>> searchState,
@@ -292,9 +284,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final searchMode = ref.watch(activeSearchModeProvider);
     final fuelType = ref.watch(selectedFuelTypeProvider);
 
-    // Route mode
+    // Route mode — RouteResultsView returns slivers, wrap in CustomScrollView
     if (searchMode == SearchMode.route) {
-      return const RouteResultsView();
+      return CustomScrollView(
+        slivers: [const RouteResultsView()],
+      );
     }
 
     // EV mode
@@ -303,33 +297,27 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       return evState.when(
         data: (result) {
           if (result.data.isEmpty) {
-            return SliverFillRemaining(
-              child: EmptyState(
-                icon: Icons.ev_station,
-                title: l10n?.searchEvStations ?? 'Search to find EV charging stations',
-                actionLabel: l10n?.searchNearby ?? 'Search nearby',
-                onAction: _performGpsSearch,
-              ),
+            return EmptyState(
+              icon: Icons.ev_station,
+              title: l10n?.searchEvStations ?? 'Search to find EV charging stations',
+              actionLabel: l10n?.searchNearby ?? 'Search nearby',
+              onAction: _performGpsSearch,
             );
           }
-          return SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final station = result.data[index];
-                return EVStationCard(
-                  key: ValueKey('ev-${station.id}'),
-                  result: EVStationResult(station),
-                  onTap: () => context.push('/ev-station', extra: station),
-                );
-              },
-              childCount: result.data.length,
-            ),
+          return ListView.builder(
+            itemCount: result.data.length,
+            itemBuilder: (context, index) {
+              final station = result.data[index];
+              return EVStationCard(
+                key: ValueKey('ev-${station.id}'),
+                result: EVStationResult(station),
+                onTap: () => context.push('/ev-station', extra: station),
+              );
+            },
           );
         },
-        loading: () => const SliverFillRemaining(child: ShimmerStationList()),
-        error: (error, _) => SliverFillRemaining(
-          child: ServiceChainErrorWidget(error: error, onRetry: _performGpsSearch),
-        ),
+        loading: () => const ShimmerStationList(),
+        error: (error, _) => ServiceChainErrorWidget(error: error, onRetry: _performGpsSearch),
       );
     }
 
@@ -337,23 +325,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return searchState.when(
       data: (result) {
         if (result.data.isEmpty) {
-          return SliverFillRemaining(
-            child: Center(
-              child: Text(
-                l10n?.startSearch ?? 'Search to find fuel stations.',
-                style: const TextStyle(fontSize: 16),
-              ),
+          return Center(
+            child: Text(
+              l10n?.startSearch ?? 'Search to find fuel stations.',
+              style: const TextStyle(fontSize: 16),
             ),
           );
         }
-        return SliverFillRemaining(
-          child: SearchResultsList(result: result, onRefresh: _performGpsSearch),
-        );
+        return SearchResultsList(result: result, onRefresh: _performGpsSearch);
       },
-      loading: () => const SliverFillRemaining(child: ShimmerStationList()),
-      error: (error, _) => SliverFillRemaining(
-        child: ServiceChainErrorWidget(error: error, onRetry: _performGpsSearch),
-      ),
+      loading: () => const ShimmerStationList(),
+      error: (error, _) => ServiceChainErrorWidget(error: error, onRetry: _performGpsSearch),
     );
   }
 }
