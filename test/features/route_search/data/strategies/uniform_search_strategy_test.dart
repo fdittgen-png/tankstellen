@@ -120,23 +120,26 @@ void main() {
       expect(results.any((r) => r.id == 'far1'), isFalse);
     });
 
-    test('sorts results by price ascending', () async {
-      final expensive = makeStation(
-        id: 'exp',
-        lat: 48.05,
-        lng: 2.05,
-        diesel: 1.95,
+    test('sorts results by itinerary order (position along route)', () async {
+      // Station near end of route (lat 48.19 is close to geometry endpoint 48.2)
+      final endStation = makeStation(
+        id: 'end',
+        lat: 48.19,
+        lng: 2.19,
+        diesel: 1.50, // Cheapest — but should appear last
       );
-      final cheap = makeStation(
-        id: 'cheap',
+      // Station near start of route (lat 48.01 is close to geometry start 48.0)
+      final startStation = makeStation(
+        id: 'start',
+        lat: 48.01,
+        lng: 2.01,
+        diesel: 1.95, // Most expensive — but should appear first
+      );
+      // Station in the middle of route
+      final midStation = makeStation(
+        id: 'mid',
         lat: 48.1,
         lng: 2.1,
-        diesel: 1.65,
-      );
-      final mid = makeStation(
-        id: 'mid',
-        lat: 48.15,
-        lng: 2.15,
         diesel: 1.80,
       );
 
@@ -150,9 +153,9 @@ void main() {
         callCount++;
         if (callCount == 1) {
           return [
-            FuelStationResult(expensive),
-            FuelStationResult(cheap),
-            FuelStationResult(mid),
+            FuelStationResult(endStation),
+            FuelStationResult(startStation),
+            FuelStationResult(midStation),
           ];
         }
         return [];
@@ -167,9 +170,10 @@ void main() {
       );
 
       expect(results.length, 3);
-      expect(results[0].id, 'cheap');
+      // Sorted by position along route, not by price
+      expect(results[0].id, 'start');
       expect(results[1].id, 'mid');
-      expect(results[2].id, 'exp');
+      expect(results[2].id, 'end');
     });
   });
 

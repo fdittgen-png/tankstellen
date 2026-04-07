@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/error/exceptions.dart';
+import '../../../core/utils/geo_utils.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/storage/hive_storage.dart';
@@ -247,8 +248,12 @@ class RouteSearchState extends _$RouteSearchState {
       }
     }
 
-    // Sort by distance
-    results.sort((a, b) => a.dist.compareTo(b.dist));
+    // Sort by position along route (itinerary order)
+    results.sort((a, b) {
+      final da = distanceAlongPolyline(a.lat, a.lng, route.geometry);
+      final db = distanceAlongPolyline(b.lat, b.lng, route.geometry);
+      return da.compareTo(db);
+    });
     return results;
   }
 

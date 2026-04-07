@@ -182,18 +182,20 @@ void main() {
       // geodesic distance — the key is that the detour limit is 1.5x
     });
 
-    test('sorts results by price ascending', () async {
-      final expensive = makeStation(
-        id: 'exp',
-        lat: 48.05,
-        lng: 2.05,
-        diesel: 1.95,
+    test('sorts results by itinerary order (position along route)', () async {
+      // Station near end of route
+      final endStation = makeStation(
+        id: 'end',
+        lat: 48.19,
+        lng: 2.19,
+        diesel: 1.50, // Cheapest — but should appear last
       );
-      final cheap = makeStation(
-        id: 'cheap',
-        lat: 48.1,
-        lng: 2.1,
-        diesel: 1.65,
+      // Station near start of route
+      final startStation = makeStation(
+        id: 'start',
+        lat: 48.01,
+        lng: 2.01,
+        diesel: 1.95, // Most expensive — but should appear first
       );
 
       int callCount = 0;
@@ -206,8 +208,8 @@ void main() {
         callCount++;
         if (callCount == 1) {
           return [
-            FuelStationResult(expensive),
-            FuelStationResult(cheap),
+            FuelStationResult(endStation),
+            FuelStationResult(startStation),
           ];
         }
         return [];
@@ -221,16 +223,10 @@ void main() {
         maxDetourKm: 50.0,
       );
 
-      // Verify price-ascending order
-      if (results.length >= 2) {
-        final prices = results
-            .whereType<FuelStationResult>()
-            .map((r) => r.station.diesel ?? 999)
-            .toList();
-        for (int i = 0; i < prices.length - 1; i++) {
-          expect(prices[i], lessThanOrEqualTo(prices[i + 1]));
-        }
-      }
+      // Sorted by position along route, not by price
+      expect(results.length, 2);
+      expect(results[0].id, 'start');
+      expect(results[1].id, 'end');
     });
   });
 }
