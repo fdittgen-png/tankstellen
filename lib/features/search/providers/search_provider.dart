@@ -1,11 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../core/country/country_provider.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/location/location_service.dart';
 import '../../../core/location/user_position_provider.dart';
-import '../../../core/services/impl/nominatim_geocoding_provider.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/utils/geo_utils.dart';
@@ -120,14 +118,13 @@ class SearchState extends _$SearchState {
       // Reverse-geocode GPS to get postal code (used by services like Prix-Carburants)
       String? resolvedPostalCode;
       try {
-        final nominatim = NominatimGeocodingProvider(
-          countryCode: ref.read(activeCountryProvider).code,
-        );
-        final address = await nominatim.coordinatesToAddress(
+        final geocoding = ref.read(geocodingChainProvider);
+        final addrResult = await geocoding.coordinatesToAddress(
           position.latitude, position.longitude,
           cancelToken: cancelToken,
         );
-        // Nominatim returns "34120 Pézenas" format
+        final address = addrResult.data;
+        // Geocoding returns "34120 Pézenas" format
         final parts = address.split(' ');
         for (final part in parts) {
           if (RegExp(r'^\d{4,5}$').hasMatch(part)) {

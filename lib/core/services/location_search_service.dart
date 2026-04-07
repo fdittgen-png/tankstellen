@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../cache/cache_manager.dart';
 import '../country/country_config.dart';
 import 'dio_factory.dart';
+import 'service_config.dart';
 import '../services/service_result.dart';
 
 /// A resolved location from user input (GPS, ZIP, or city search).
@@ -31,10 +32,11 @@ class LocationSearchService {
 
   DateTime _lastRequest = DateTime.fromMillisecondsSinceEpoch(0);
 
-  LocationSearchService(this._cache)
-      : _dio = DioFactory.create(
-          connectTimeout: const Duration(seconds: 5),
-          receiveTimeout: const Duration(seconds: 5),
+  LocationSearchService(this._cache, {Dio? dio})
+      : _dio = dio ?? DioFactory.create(
+          baseUrl: ServiceConfigs.nominatim.baseUrl,
+          connectTimeout: ServiceConfigs.nominatim.connectTimeout,
+          receiveTimeout: ServiceConfigs.nominatim.receiveTimeout,
         );
 
   /// Detect what the user entered: GPS (empty), ZIP (digits/postal pattern), or city (text).
@@ -87,7 +89,7 @@ class LocationSearchService {
 
     try {
       final response = await _dio.get(
-        'https://nominatim.openstreetmap.org/search',
+        '/search',
         queryParameters: {
           'q': query,
           'countrycodes': codes,

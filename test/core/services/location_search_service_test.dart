@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/cache/cache_manager.dart';
@@ -145,6 +146,22 @@ void main() {
         service.detectInputType('1000', Countries.denmark),
         equals(LocationInputType.zip),
       );
+    });
+  });
+
+  group('constructor', () {
+    test('accepts custom Dio instance for provider swapping', () {
+      final customDio = Dio(BaseOptions(baseUrl: 'https://custom.api.example'));
+      final customService = LocationSearchService(mockCache, dio: customDio);
+
+      // Service should be created successfully with custom Dio
+      expect(customService, isA<LocationSearchService>());
+    });
+
+    test('uses default Nominatim Dio when no custom Dio provided', () {
+      // Default constructor should work without explicit Dio
+      final defaultService = LocationSearchService(mockCache);
+      expect(defaultService, isA<LocationSearchService>());
     });
   });
 
