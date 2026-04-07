@@ -52,7 +52,8 @@ jobs:
       - run: flutter test --coverage
       - name: Check coverage threshold
         run: bash scripts/check_coverage.sh
-
+      - name: Check startup time budget
+        run: bash scripts/check_startup_budget.sh
 
   security-scan:
     runs-on: ubuntu-latest
