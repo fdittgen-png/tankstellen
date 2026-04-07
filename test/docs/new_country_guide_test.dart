@@ -122,6 +122,11 @@ void main() {
         final serviceProviders =
             File('lib/core/services/service_providers.dart')
                 .readAsStringSync();
+        final registryFile =
+            File('lib/core/services/country_service_registry.dart');
+        final registryContent = registryFile.existsSync()
+            ? registryFile.readAsStringSync()
+            : '';
 
         final serviceFiles = implDir
             .listSync()
@@ -134,12 +139,13 @@ void main() {
         for (final file in serviceFiles) {
           final fileName = file.uri.pathSegments.last;
 
-          // Check that the file is imported in service_providers.dart
+          // Check that the file is imported in service_providers.dart or registry
           expect(
-            serviceProviders.contains(fileName),
+            serviceProviders.contains(fileName) ||
+                registryContent.contains(fileName),
             isTrue,
             reason:
-                'service_providers.dart must import $fileName',
+                'service_providers.dart or country_service_registry.dart must import $fileName',
           );
         }
       });
