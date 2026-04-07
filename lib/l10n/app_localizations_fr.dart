@@ -943,4 +943,40 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get deleteProfileConfirm => 'Supprimer le profil';
+
+  @override
+  String get errorNetwork => 'Erreur réseau. Vérifiez votre connexion.';
+
+  @override
+  String get errorServer => 'Erreur serveur. Réessayez plus tard.';
+
+  @override
+  String get errorTimeout => 'Délai de connexion dépassé. Réessayez.';
+
+  @override
+  String get errorNoConnection => 'Pas de connexion internet.';
+
+  @override
+  String get errorApiKey => 'Clé API invalide. Vérifiez vos paramètres.';
+
+  @override
+  String get errorLocation => 'Impossible de déterminer votre position.';
+
+  @override
+  String get errorNoApiKey =>
+      'Aucune clé API configurée. Allez dans Paramètres.';
+
+  @override
+  String get errorAllServicesFailed =>
+      'Impossible de charger les données. Vérifiez votre connexion.';
+
+  @override
+  String get errorCache =>
+      'Erreur de données locales. Essayez de vider le cache.';
+
+  @override
+  String get errorCancelled => 'Requête annulée.';
+
+  @override
+  String get errorUnknown => 'Une erreur inattendue est survenue.';
 }

@@ -941,4 +941,41 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get deleteProfileConfirm => 'Profil löschen';
+
+  @override
+  String get errorNetwork => 'Netzwerkfehler. Überprüfe deine Verbindung.';
+
+  @override
+  String get errorServer => 'Serverfehler. Bitte später erneut versuchen.';
+
+  @override
+  String get errorTimeout => 'Zeitüberschreitung. Bitte erneut versuchen.';
+
+  @override
+  String get errorNoConnection => 'Keine Internetverbindung.';
+
+  @override
+  String get errorApiKey =>
+      'Ungültiger API-Schlüssel. Überprüfe deine Einstellungen.';
+
+  @override
+  String get errorLocation => 'Standort konnte nicht ermittelt werden.';
+
+  @override
+  String get errorNoApiKey =>
+      'Kein API-Schlüssel konfiguriert. In Einstellungen hinzufügen.';
+
+  @override
+  String get errorAllServicesFailed =>
+      'Daten konnten nicht geladen werden. Verbindung prüfen.';
+
+  @override
+  String get errorCache =>
+      'Lokaler Datenfehler. Cache leeren und erneut versuchen.';
+
+  @override
+  String get errorCancelled => 'Anfrage wurde abgebrochen.';
+
+  @override
+  String get errorUnknown => 'Ein unerwarteter Fehler ist aufgetreten.';
 }
