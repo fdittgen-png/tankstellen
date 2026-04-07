@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/utils/navigation_utils.dart';
-import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -15,6 +14,9 @@ import '../../../search/domain/entities/search_result_item.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../search/providers/search_provider.dart';
 import '../../../profile/providers/profile_provider.dart';
+import 'route_best_stops_list.dart';
+import 'route_info_bar.dart';
+import 'route_view_mode_chip.dart';
 import 'station_map_layers.dart';
 
 /// View modes for the route map.
@@ -37,7 +39,6 @@ class RouteMapView extends ConsumerStatefulWidget {
   @override
   ConsumerState<RouteMapView> createState() => _RouteMapViewState();
 }
-
 class _RouteMapViewState extends ConsumerState<RouteMapView> {
   RouteViewMode _viewMode = RouteViewMode.allStations;
   final Set<String> _selectedStationIds = {};
@@ -93,12 +94,32 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
           ),
         ),
         if (_viewMode == RouteViewMode.bestStops && displayStations.isNotEmpty)
-          _buildBestStopsList(theme, displayStations),
-        _buildRouteInfoBar(theme, l10n, result, displayStations, allFuelStations),
+          RouteBestStopsList(
+            stations: displayStations,
+            selectedStationIds: _selectedStationIds,
+            selectedFuel: widget.selectedFuel,
+            onToggleStation: (id) => setState(() {
+              if (_selectedStationIds.contains(id)) {
+                _selectedStationIds.remove(id);
+              } else {
+                _selectedStationIds.add(id);
+              }
+            }),
+          ),
+        RouteInfoBar(
+          distanceKm: result.route.distanceKm,
+          durationMinutes: result.route.durationMinutes,
+          stationCountLabel: _viewMode == RouteViewMode.bestStops
+              ? (l10n?.nBest(displayStations.length) ??
+                  '${displayStations.length} best')
+              : (l10n?.nStations(allFuelStations.length) ??
+                  '${allFuelStations.length}'),
+          onSaveRoute: () => _showSaveRouteDialog(context, result),
+          onOpenInMaps: () => _openSelectedInMaps(result),
+        ),
       ],
     );
   }
-
   Widget _buildViewModeToggle(
     ThemeData theme,
     AppLocalizations? l10n,
@@ -110,7 +131,7 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
       color: theme.colorScheme.surfaceContainerHighest,
       child: Row(
         children: [
-          _ViewModeChip(
+          RouteViewModeChip(
             label: l10n?.allStations ?? 'All stations',
             icon: Icons.local_gas_station,
             selected: _viewMode == RouteViewMode.allStations,
@@ -120,7 +141,7 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
             }),
           ),
           const SizedBox(width: 8),
-          _ViewModeChip(
+          RouteViewModeChip(
             label: l10n?.bestStops ?? 'Best stops',
             icon: Icons.star,
             selected: _viewMode == RouteViewMode.bestStops,
@@ -155,98 +176,10 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
       ),
     );
   }
-
-  Widget _buildBestStopsList(ThemeData theme, List<Station> displayStations) {
-    return Container(
-      height: 52,
-      color: theme.colorScheme.surfaceContainerHighest,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        itemCount: displayStations.length,
-        itemBuilder: (context, index) {
-          final station = displayStations[index];
-          final isSelected = _selectedStationIds.contains(station.id);
-          final price = station.priceFor(widget.selectedFuel);
-          final stopNumber = index + 1;
-          return _RouteStationChip(
-            key: ValueKey('route-station-${station.id}'),
-            station: station,
-            stopNumber: stopNumber,
-            isSelected: isSelected,
-            price: price,
-            onTap: () => setState(() {
-              if (isSelected) {
-                _selectedStationIds.remove(station.id);
-              } else {
-                _selectedStationIds.add(station.id);
-              }
-            }),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildRouteInfoBar(
-    ThemeData theme,
-    AppLocalizations? l10n,
-    RouteSearchResult result,
-    List<Station> displayStations,
-    List<Station> allFuelStations,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      color: theme.colorScheme.surfaceContainerHighest,
-      child: Row(
-        children: [
-          Icon(Icons.route, size: 12, color: theme.colorScheme.primary),
-          const SizedBox(width: 4),
-          Text(
-            '${result.route.distanceKm.round()}km · ${result.route.durationMinutes.round()}min',
-            style: theme.textTheme.labelSmall
-                ?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            _viewMode == RouteViewMode.bestStops
-                ? (l10n?.nBest(displayStations.length) ??
-                    '${displayStations.length} best')
-                : (l10n?.nStations(allFuelStations.length) ??
-                    '${allFuelStations.length}'),
-            style: theme.textTheme.labelSmall,
-          ),
-          const Spacer(),
-          IconButton(
-            icon: const Icon(Icons.bookmark_add, size: 14),
-            tooltip: l10n?.saveRoute ?? 'Save route',
-            onPressed: () => _showSaveRouteDialog(context, result),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-            iconSize: 14,
-          ),
-          IconButton(
-            icon: const Icon(Icons.navigation, size: 14),
-            tooltip: l10n?.openInMaps ?? 'Open in Maps',
-            onPressed: () => _openSelectedInMaps(result),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-            iconSize: 14,
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // Helpers
-  // ---------------------------------------------------------------------------
-
   Future<void> _showSaveRouteDialog(
       BuildContext context, RouteSearchResult result) async {
     final controller = TextEditingController();
     final l10n = AppLocalizations.of(context);
-
     final name = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -272,13 +205,11 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
       ),
     );
     controller.dispose();
-
     if (name != null && name.isNotEmpty && mounted) {
       final start = result.route.geometry.first;
       final end = result.route.geometry.last;
       final selectedIds = _selectedStationIds.toList();
       final profile = ref.read(activeProfileProvider);
-
       final success = await ref.read(itineraryProvider.notifier).saveRoute(
         name: name,
         waypoints: [
@@ -297,14 +228,15 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
       if (context.mounted) {
         final l10n = AppLocalizations.of(context);
         if (success) {
-          SnackBarHelper.showSuccess(context, l10n?.routeSaved ?? 'Route saved!');
+          SnackBarHelper.showSuccess(
+              context, l10n?.routeSaved ?? 'Route saved!');
         } else {
-          SnackBarHelper.showError(context, l10n?.routeSaveFailed ?? 'Failed to save route');
+          SnackBarHelper.showError(
+              context, l10n?.routeSaveFailed ?? 'Failed to save route');
         }
       }
     }
   }
-
   List<Station> _getBestStopStations(
     List<Station> allStations,
     RouteSearchResult result,
@@ -319,7 +251,6 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
     final bestIds = segmentMap.values.toSet();
     return allStations.where((s) => bestIds.contains(s.id)).toList();
   }
-
   void _openSelectedInMaps(RouteSearchResult result) {
     final start = result.route.geometry.first;
     final end = result.route.geometry.last;
@@ -343,7 +274,6 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
       waypoints: selectedStations.map((s) => '${s.lat},${s.lng}').toList(),
     );
   }
-
   int _nearestPolylineIndex(double lat, double lng, List<LatLng> polyline) {
     int bestIdx = 0;
     double bestDist = double.infinity;
@@ -359,7 +289,6 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
     }
     return bestIdx;
   }
-
   double _zoomForRoute(double distanceKm) {
     if (distanceKm <= 50) return 10;
     if (distanceKm <= 100) return 9;
@@ -367,191 +296,5 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
     if (distanceKm <= 500) return 7;
     if (distanceKm <= 1000) return 6;
     return 5;
-  }
-}
-
-/// Compact chip for switching between map view modes.
-class _ViewModeChip extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _ViewModeChip({
-    required this.label,
-    required this.icon,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: selected ? theme.colorScheme.primaryContainer : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: selected
-                ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withValues(alpha: 0.3),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon,
-                size: 14,
-                color: selected
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurfaceVariant),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: theme.textTheme.labelSmall?.copyWith(
-                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-                color: selected
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// A chip representing a station stop along the route.
-///
-/// Shows a sequence number badge, station name, price, and distance.
-/// Selected chips use a filled primary style; unselected use an outlined style.
-class _RouteStationChip extends StatelessWidget {
-  final Station station;
-  final int stopNumber;
-  final bool isSelected;
-  final double? price;
-  final VoidCallback onTap;
-
-  const _RouteStationChip({
-    super.key,
-    required this.station,
-    required this.stopNumber,
-    required this.isSelected,
-    required this.price,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    final selectedBg = theme.colorScheme.primary;
-    final selectedFg = theme.colorScheme.onPrimary;
-    final unselectedBg = theme.colorScheme.surface;
-    final unselectedFg = theme.colorScheme.onSurface;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.only(right: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: isSelected ? selectedBg : unselectedBg,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected
-                ? selectedBg
-                : theme.colorScheme.outline.withValues(alpha: 0.3),
-            width: isSelected ? 1.5 : 1,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: selectedBg.withValues(alpha: 0.3),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? selectedFg.withValues(alpha: 0.25)
-                    : theme.colorScheme.primaryContainer,
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                '$stopNumber',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: isSelected
-                      ? selectedFg
-                      : theme.colorScheme.onPrimaryContainer,
-                ),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 110),
-                  child: Text(
-                    station.displayName,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: isSelected ? selectedFg : unselectedFg,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      price != null
-                          ? '${price!.toStringAsFixed(3)}\u20ac'
-                          : '--',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                        color: isSelected
-                            ? selectedFg.withValues(alpha: 0.9)
-                            : Colors.green.shade700,
-                      ),
-                    ),
-                    Text(
-                      ' \u00b7 ${station.dist.toStringAsFixed(1)} km',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: isSelected
-                            ? selectedFg.withValues(alpha: 0.7)
-                            : theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

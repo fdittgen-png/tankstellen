@@ -11,11 +11,12 @@ import '../../../../core/utils/frame_callbacks.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/route_info.dart';
+import 'city_autocomplete_field.dart';
 
 /// Input widget for route-based search: start, optional stops, destination.
 ///
 /// All fields share the same Nominatim-backed city autocomplete via
-/// [_CityAutocompleteField], reusing the existing [LocationSearchService].
+/// [CityAutocompleteField], reusing the existing [LocationSearchService].
 class RouteInput extends ConsumerStatefulWidget {
   final void Function(List<RouteWaypoint> waypoints) onSearch;
 
@@ -71,7 +72,8 @@ class _RouteInputState extends ConsumerState<RouteInput> {
     } catch (e) {
       if (mounted) {
         final l10n = AppLocalizations.of(context);
-        SnackBarHelper.showError(context, '${l10n?.gpsError ?? "GPS error"}: $e');
+        SnackBarHelper.showError(
+            context, '${l10n?.gpsError ?? "GPS error"}: $e');
       }
     }
   }
@@ -91,7 +93,8 @@ class _RouteInputState extends ConsumerState<RouteInput> {
     });
   }
 
-  void _onCitySelected(ResolvedLocation city, TextEditingController controller, void Function(LatLng) setCoords) {
+  void _onCitySelected(ResolvedLocation city,
+      TextEditingController controller, void Function(LatLng) setCoords) {
     controller.text = city.name;
     setCoords(LatLng(city.lat, city.lng));
     setState(() {});
@@ -106,7 +109,8 @@ class _RouteInputState extends ConsumerState<RouteInput> {
 
       // Resolve start if needed
       if (_startCoords == null && _startController.text.isNotEmpty) {
-        final results = await searchService.searchCities(_startController.text);
+        final results =
+            await searchService.searchCities(_startController.text);
         if (results.isNotEmpty) {
           _startCoords = LatLng(results.first.lat, results.first.lng);
         }
@@ -123,7 +127,8 @@ class _RouteInputState extends ConsumerState<RouteInput> {
       // Resolve stops
       for (var i = 0; i < _stopControllers.length; i++) {
         if (_stopCoords[i] == null && _stopControllers[i].text.isNotEmpty) {
-          final results = await searchService.searchCities(_stopControllers[i].text);
+          final results =
+              await searchService.searchCities(_stopControllers[i].text);
           if (results.isNotEmpty) {
             _stopCoords[i] = LatLng(results.first.lat, results.first.lng);
           }
@@ -132,7 +137,10 @@ class _RouteInputState extends ConsumerState<RouteInput> {
 
       if (_startCoords == null || _endCoords == null) {
         if (mounted) {
-          SnackBarHelper.showError(context, AppLocalizations.of(context)?.couldNotResolve ?? 'Could not resolve start or destination');
+          SnackBarHelper.showError(
+              context,
+              AppLocalizations.of(context)?.couldNotResolve ??
+                  'Could not resolve start or destination');
         }
         return;
       }
@@ -160,7 +168,8 @@ class _RouteInputState extends ConsumerState<RouteInput> {
       widget.onSearch(waypoints);
     } catch (e) {
       if (mounted) {
-        SnackBarHelper.showError(context, '${AppLocalizations.of(context)?.errorUnknown ?? "Error"}: $e');
+        SnackBarHelper.showError(context,
+            '${AppLocalizations.of(context)?.errorUnknown ?? "Error"}: $e');
       }
     } finally {
       if (mounted) setState(() => _isSearching = false);
@@ -177,7 +186,7 @@ class _RouteInputState extends ConsumerState<RouteInput> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Start field with autocomplete
-        _CityAutocompleteField(
+        CityAutocompleteField(
           controller: _startController,
           searchService: searchService,
           label: l10n?.start ?? 'Start',
@@ -199,7 +208,7 @@ class _RouteInputState extends ConsumerState<RouteInput> {
         for (var i = 0; i < _stopControllers.length; i++)
           Padding(
             padding: const EdgeInsets.only(bottom: 6),
-            child: _CityAutocompleteField(
+            child: CityAutocompleteField(
               controller: _stopControllers[i],
               searchService: searchService,
               label: '${l10n?.stop ?? "Stop"} ${i + 1}',
@@ -223,7 +232,8 @@ class _RouteInputState extends ConsumerState<RouteInput> {
             child: TextButton.icon(
               onPressed: _addStop,
               icon: const Icon(Icons.add, size: 16),
-              label: Text(l10n?.addStop ?? 'Add stop', style: theme.textTheme.bodySmall),
+              label: Text(l10n?.addStop ?? 'Add stop',
+                  style: theme.textTheme.bodySmall),
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 minimumSize: const Size(0, 32),
@@ -232,7 +242,7 @@ class _RouteInputState extends ConsumerState<RouteInput> {
           ),
 
         // Destination field with autocomplete
-        _CityAutocompleteField(
+        CityAutocompleteField(
           controller: _endController,
           searchService: searchService,
           label: l10n?.destination ?? 'Destination',
@@ -254,195 +264,15 @@ class _RouteInputState extends ConsumerState<RouteInput> {
               : null,
           icon: _isSearching
               ? const SizedBox(
-                  width: 16, height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: Colors.white),
                 )
               : const Icon(Icons.route),
           label: Text(l10n?.searchAlongRoute ?? 'Search along route'),
         ),
       ],
-    );
-  }
-}
-
-/// Reusable text field with debounced city autocomplete suggestions.
-///
-/// Queries [LocationSearchService.searchCities] as the user types (1s debounce)
-/// and shows a dropdown of matching cities. Selecting a city fills the field
-/// and calls [onCitySelected] with the resolved coordinates.
-class _CityAutocompleteField extends StatefulWidget {
-  final TextEditingController controller;
-  final LocationSearchService searchService;
-  final String label;
-  final String hint;
-  final IconData prefixIcon;
-  final Widget? suffixWidget;
-  final void Function(ResolvedLocation city) onCitySelected;
-  final VoidCallback onTextChanged;
-
-  const _CityAutocompleteField({
-    required this.controller,
-    required this.searchService,
-    required this.label,
-    required this.hint,
-    required this.prefixIcon,
-    this.suffixWidget,
-    required this.onCitySelected,
-    required this.onTextChanged,
-  });
-
-  @override
-  State<_CityAutocompleteField> createState() => _CityAutocompleteFieldState();
-}
-
-class _CityAutocompleteFieldState extends State<_CityAutocompleteField> {
-  Timer? _debounce;
-  List<ResolvedLocation> _suggestions = [];
-  bool _showSuggestions = false;
-  bool _isLoading = false;
-  final _focusNode = FocusNode();
-  final _layerLink = LayerLink();
-  OverlayEntry? _overlayEntry;
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode.addListener(_onFocusChange);
-  }
-
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    _focusNode.removeListener(_onFocusChange);
-    _focusNode.dispose();
-    _removeOverlay();
-    super.dispose();
-  }
-
-  void _onFocusChange() {
-    if (!_focusNode.hasFocus) {
-      _removeOverlay();
-    }
-  }
-
-  void _onTextChanged(String value) {
-    widget.onTextChanged();
-    _debounce?.cancel();
-
-    if (value.trim().length < 2) {
-      _removeOverlay();
-      return;
-    }
-
-    // Only search if it looks like a city name (not digits = postal code)
-    if (RegExp(r'^\d+$').hasMatch(value.trim())) {
-      _removeOverlay();
-      return;
-    }
-
-    _debounce = Timer(const Duration(milliseconds: 800), () async {
-      if (!mounted) return;
-      setState(() => _isLoading = true);
-      try {
-        final results = await widget.searchService.searchCities(value.trim());
-        if (mounted) {
-          _suggestions = results.take(5).toList();
-          _showSuggestions = _suggestions.isNotEmpty;
-          _isLoading = false;
-          if (_showSuggestions && _focusNode.hasFocus) {
-            _showOverlay();
-          } else {
-            _removeOverlay();
-          }
-        }
-      } catch (e) {
-        debugPrint('Route autocomplete failed: $e');
-        if (mounted) setState(() => _isLoading = false);
-      }
-    });
-  }
-
-  void _selectCity(ResolvedLocation city) {
-    widget.controller.text = city.name;
-    widget.onCitySelected(city);
-    _removeOverlay();
-    _focusNode.unfocus();
-  }
-
-  void _showOverlay() {
-    _removeOverlay();
-    final overlay = Overlay.of(context);
-    final renderBox = context.findRenderObject() as RenderBox;
-    final size = renderBox.size;
-
-    _overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        width: size.width,
-        child: CompositedTransformFollower(
-          link: _layerLink,
-          showWhenUnlinked: false,
-          offset: Offset(0, size.height + 2),
-          child: Material(
-            elevation: 4,
-            borderRadius: BorderRadius.circular(8),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 200),
-              child: ListView.builder(
-                shrinkWrap: true,
-                padding: EdgeInsets.zero,
-                itemCount: _suggestions.length,
-                itemBuilder: (context, index) {
-                  final city = _suggestions[index];
-                  return ListTile(
-                    key: ValueKey('city-${city.lat}-${city.lng}-${city.name}'),
-                    dense: true,
-                    visualDensity: VisualDensity.compact,
-                    leading: const Icon(Icons.place, size: 16),
-                    title: Text(city.name, style: const TextStyle(fontSize: 13)),
-                    onTap: () => _selectCity(city),
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-    overlay.insert(_overlayEntry!);
-  }
-
-  void _removeOverlay() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-    _showSuggestions = false;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CompositedTransformTarget(
-      link: _layerLink,
-      child: TextField(
-        controller: widget.controller,
-        focusNode: _focusNode,
-        decoration: InputDecoration(
-          labelText: widget.label,
-          hintText: widget.hint,
-          prefixIcon: Icon(widget.prefixIcon, size: 18),
-          suffixIcon: _isLoading
-              ? const Padding(
-                  padding: EdgeInsets.all(12),
-                  child: SizedBox(
-                    width: 16, height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                )
-              : widget.suffixWidget,
-          isDense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        ),
-        onChanged: _onTextChanged,
-        textInputAction: TextInputAction.next,
-      ),
     );
   }
 }
