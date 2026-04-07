@@ -405,5 +405,9 @@
   "deviceCodeCopied": "Device code copied",
   "undo": "Undo",
   "invalidPostalCode": "Please enter a valid {length}-digit {label}",
-  "@invalidPostalCode": {"placeholders": {"length": {"type": "String"}, "label": {"type": "String"}}}
+  "@invalidPostalCode": {"placeholders": {"length": {"type": "String"}, "label": {"type": "String"}}},
+  "freshnessAgo": "ago",
+  "freshnessStale": "Stale",
+  "freshnessBadgeSemantics": "Data freshness: {age}",
+  "@freshnessBadgeSemantics": {"placeholders": {"age": {"type": "String"}}}
 }

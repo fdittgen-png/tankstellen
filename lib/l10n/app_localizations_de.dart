@@ -1178,4 +1178,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String invalidPostalCode(String length, String label) {
     return 'Bitte geben Sie eine gültige $length-stellige $label ein';
   }
+
+  @override
+  String get freshnessAgo => 'her';
+
+  @override
+  String get freshnessStale => 'Veraltet';
+
+  @override
+  String freshnessBadgeSemantics(String age) {
+    return 'Datenaktualität: $age';
+  }
 }

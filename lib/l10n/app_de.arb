@@ -405,5 +405,9 @@
   "deviceCodeCopied": "Gerätecode kopiert",
   "undo": "Rückgängig",
   "invalidPostalCode": "Bitte geben Sie eine gültige {length}-stellige {label} ein",
-  "@invalidPostalCode": {"placeholders": {"length": {"type": "String"}, "label": {"type": "String"}}}
+  "@invalidPostalCode": {"placeholders": {"length": {"type": "String"}, "label": {"type": "String"}}},
+  "freshnessAgo": "her",
+  "freshnessStale": "Veraltet",
+  "freshnessBadgeSemantics": "Datenaktualität: {age}",
+  "@freshnessBadgeSemantics": {"placeholders": {"age": {"type": "String"}}}
 }
