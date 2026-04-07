@@ -13,7 +13,7 @@ void main() {
     testWidgets('renders station brand name', (tester) async {
       await pumpApp(
         tester,
-        StationCard(
+        const StationCard(
           station: testStation,
           selectedFuelType: FuelType.e10,
         ),
@@ -25,7 +25,7 @@ void main() {
     testWidgets('renders station address', (tester) async {
       await pumpApp(
         tester,
-        StationCard(
+        const StationCard(
           station: testStation,
           selectedFuelType: FuelType.e10,
         ),
@@ -39,7 +39,7 @@ void main() {
     testWidgets('renders price for selected fuel type', (tester) async {
       await pumpApp(
         tester,
-        StationCard(
+        const StationCard(
           station: testStation,
           selectedFuelType: FuelType.diesel,
         ),
@@ -59,7 +59,7 @@ void main() {
     testWidgets('renders distance in km', (tester) async {
       await pumpApp(
         tester,
-        StationCard(
+        const StationCard(
           station: testStation,
           selectedFuelType: FuelType.e10,
         ),
@@ -73,7 +73,7 @@ void main() {
       late Color expectedColor;
       await pumpApp(tester, Builder(builder: (context) {
         expectedColor = DarkModeColors.success(context);
-        return StationCard(
+        return const StationCard(
           station: testStation, // isOpen: true
           selectedFuelType: FuelType.e10,
         );
@@ -118,7 +118,7 @@ void main() {
     testWidgets('shows favorite star when isFavorite=true', (tester) async {
       await pumpApp(
         tester,
-        StationCard(
+        const StationCard(
           station: testStation,
           selectedFuelType: FuelType.e10,
           isFavorite: true,
@@ -154,7 +154,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        StationCard(
+        const StationCard(
           station: testStation,
           selectedFuelType: FuelType.e10,
           priceTier: PriceTier.cheap,
@@ -168,7 +168,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        StationCard(
+        const StationCard(
           station: testStation,
           selectedFuelType: FuelType.e10,
           priceTier: PriceTier.average,
@@ -183,7 +183,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        StationCard(
+        const StationCard(
           station: testStation,
           selectedFuelType: FuelType.e10,
           priceTier: PriceTier.expensive,
@@ -197,7 +197,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        StationCard(
+        const StationCard(
           station: testStation,
           selectedFuelType: FuelType.e10,
         ),
@@ -211,7 +211,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        StationCard(
+        const StationCard(
           station: testStation,
           selectedFuelType: FuelType.e10,
           priceTier: PriceTier.unknown,

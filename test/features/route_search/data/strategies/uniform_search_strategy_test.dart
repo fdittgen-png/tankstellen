@@ -9,7 +9,7 @@ import 'package:tankstellen/features/search/domain/entities/station.dart';
 void main() {
   late UniformSearchStrategy strategy;
 
-  final testRoute = RouteInfo(
+  const testRoute = RouteInfo(
     geometry: [LatLng(48.0, 2.0), LatLng(48.1, 2.1), LatLng(48.2, 2.2)],
     distanceKm: 30.0,
     durationMinutes: 25.0,

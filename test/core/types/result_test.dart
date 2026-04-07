@@ -207,10 +207,10 @@ void main() {
 
   group('type safety', () {
     test('Success and Failure with complex types', () {
-      final Result<List<int>, Exception> result = Success(const [1, 2, 3]);
+      const Result<List<int>, Exception> result = Success([1, 2, 3]);
       expect(result.valueOrNull, [1, 2, 3]);
 
-      final Result<List<int>, Exception> failure =
+      const Result<List<int>, Exception> failure =
           Failure(FormatException('bad'));
       expect(failure.errorOrNull, isA<FormatException>());
     });

@@ -12,7 +12,7 @@ void main() {
     testWidgets('renders station brand name', (tester) async {
       await pumpApp(
         tester,
-        AllPricesStationCard(station: testStation),
+        const AllPricesStationCard(station: testStation),
       );
 
       expect(find.text('STAR'), findsOneWidget);
@@ -21,7 +21,7 @@ void main() {
     testWidgets('renders address line when brand is present', (tester) async {
       await pumpApp(
         tester,
-        AllPricesStationCard(station: testStation),
+        const AllPricesStationCard(station: testStation),
       );
 
       expect(find.textContaining('Hauptstr.'), findsOneWidget);
@@ -31,7 +31,7 @@ void main() {
     testWidgets('renders distance', (tester) async {
       await pumpApp(
         tester,
-        AllPricesStationCard(station: testStation),
+        const AllPricesStationCard(station: testStation),
       );
 
       expect(find.textContaining('1,5 km'), findsOneWidget);
@@ -40,7 +40,7 @@ void main() {
     testWidgets('shows open status badge when station is open', (tester) async {
       await pumpApp(
         tester,
-        AllPricesStationCard(station: testStation),
+        const AllPricesStationCard(station: testStation),
       );
 
       expect(find.text('Open'), findsOneWidget);
@@ -63,7 +63,7 @@ void main() {
       // testStation has e5, e10, diesel
       await pumpApp(
         tester,
-        AllPricesStationCard(station: testStation),
+        const AllPricesStationCard(station: testStation),
       );
 
       expect(find.text('E5'), findsOneWidget);
@@ -75,7 +75,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        AllPricesStationCard(station: testStation),
+        const AllPricesStationCard(station: testStation),
       );
 
       // testStation has no e98, e85, lpg, cng prices and they are not in
@@ -88,7 +88,7 @@ void main() {
 
     testWidgets('shows out-of-stock badge for unavailable fuels',
         (tester) async {
-      final stationWithUnavailable = Station(
+      const stationWithUnavailable = Station(
         id: 'test-unavail',
         name: 'Test Station',
         brand: 'TEST',
@@ -105,7 +105,7 @@ void main() {
 
       await pumpApp(
         tester,
-        AllPricesStationCard(station: stationWithUnavailable),
+        const AllPricesStationCard(station: stationWithUnavailable),
       );
 
       expect(find.text('E10'), findsOneWidget);
@@ -115,7 +115,7 @@ void main() {
     testWidgets('renders favorite star when isFavorite=true', (tester) async {
       await pumpApp(
         tester,
-        AllPricesStationCard(
+        const AllPricesStationCard(
           station: testStation,
           isFavorite: true,
         ),
@@ -129,7 +129,7 @@ void main() {
     testWidgets('renders unfilled star when isFavorite=false', (tester) async {
       await pumpApp(
         tester,
-        AllPricesStationCard(
+        const AllPricesStationCard(
           station: testStation,
           isFavorite: false,
         ),
@@ -175,9 +175,9 @@ void main() {
     testWidgets('highlights cheapest price badge', (tester) async {
       await pumpApp(
         tester,
-        AllPricesStationCard(
+        const AllPricesStationCard(
           station: testStation,
-          cheapestFlags: const {FuelType.diesel: true},
+          cheapestFlags: {FuelType.diesel: true},
         ),
       );
 
@@ -186,7 +186,7 @@ void main() {
     });
 
     testWidgets('renders station with all fuel types', (tester) async {
-      final fullStation = Station(
+      const fullStation = Station(
         id: 'full-station',
         name: 'Full Station',
         brand: 'TOTAL',
@@ -206,7 +206,7 @@ void main() {
 
       await pumpApp(
         tester,
-        AllPricesStationCard(station: fullStation),
+        const AllPricesStationCard(station: fullStation),
       );
 
       expect(find.text('E5'), findsOneWidget);
@@ -218,7 +218,7 @@ void main() {
     });
 
     testWidgets('uses street as title when brand is generic', (tester) async {
-      final noBrandStation = Station(
+      const noBrandStation = Station(
         id: 'no-brand',
         name: 'Generic Station',
         brand: 'Station',
@@ -233,7 +233,7 @@ void main() {
 
       await pumpApp(
         tester,
-        AllPricesStationCard(station: noBrandStation),
+        const AllPricesStationCard(station: noBrandStation),
       );
 
       expect(find.text('Rue de la Gare'), findsOneWidget);

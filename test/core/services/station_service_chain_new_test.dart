@@ -20,14 +20,14 @@ void main() {
   late MockCacheManager mockCache;
   late StationServiceChain chain;
 
-  final testParams = SearchParams(
+  const testParams = SearchParams(
     lat: 52.52,
     lng: 13.41,
     radiusKm: 10,
     fuelType: FuelType.e10,
   );
 
-  final testStation = Station(
+  const testStation = Station(
     id: 'abc-123',
     name: 'Test Station',
     brand: 'TEST',

@@ -65,9 +65,9 @@ void main() {
   group('distanceAlongPolyline', () {
     // Simple straight-line polyline: Paris (48.0, 2.0) -> (48.1, 2.1) -> (48.2, 2.2)
     final polyline = [
-      LatLng(48.0, 2.0),
-      LatLng(48.1, 2.1),
-      LatLng(48.2, 2.2),
+      const LatLng(48.0, 2.0),
+      const LatLng(48.1, 2.1),
+      const LatLng(48.2, 2.2),
     ];
 
     test('point near start returns ~0 km', () {
@@ -104,7 +104,7 @@ void main() {
     });
 
     test('single-point polyline returns 0', () {
-      final d = distanceAlongPolyline(48.0, 2.0, [LatLng(48.0, 2.0)]);
+      final d = distanceAlongPolyline(48.0, 2.0, [const LatLng(48.0, 2.0)]);
       expect(d, 0.0);
     });
   });

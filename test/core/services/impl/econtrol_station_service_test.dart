@@ -214,7 +214,7 @@ void main() {
 
     group('merging additional cases', () {
       test('super-only station gets e5 and e10 set', () {
-        final superStation = Station(
+        const superStation = Station(
           id: '200',
           name: 'Shell',
           brand: 'Shell',
@@ -434,7 +434,7 @@ void main() {
 
     group('merging diesel and super queries', () {
       test('merges e5 from SUP into diesel station', () {
-        final dieselStation = Station(
+        const dieselStation = Station(
           id: '100',
           name: 'Test',
           brand: 'OMV',
@@ -448,7 +448,7 @@ void main() {
           isOpen: true,
         );
 
-        final superStation = Station(
+        const superStation = Station(
           id: '100',
           name: 'Test',
           brand: 'OMV',

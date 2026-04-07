@@ -5,7 +5,7 @@ import 'package:tankstellen/features/search/domain/entities/station.dart';
 
 void main() {
   group('FuelStationResult', () {
-    final station = Station(
+    const station = Station(
       id: 'abc-123',
       name: 'My Station',
       brand: 'Aral',
@@ -19,7 +19,7 @@ void main() {
     );
 
     test('delegates lat, lng, dist correctly', () {
-      final result = FuelStationResult(station);
+      const result = FuelStationResult(station);
 
       expect(result.lat, 52.52);
       expect(result.lng, 13.405);
@@ -27,13 +27,13 @@ void main() {
     });
 
     test('delegates id correctly', () {
-      final result = FuelStationResult(station);
+      const result = FuelStationResult(station);
 
       expect(result.id, 'abc-123');
     });
 
     test('displayName uses brand when non-empty and not "Station"', () {
-      final result = FuelStationResult(station);
+      const result = FuelStationResult(station);
 
       expect(result.displayName, 'Aral');
     });
@@ -53,13 +53,13 @@ void main() {
     });
 
     test('displayAddress returns street', () {
-      final result = FuelStationResult(station);
+      const result = FuelStationResult(station);
 
       expect(result.displayAddress, 'Hauptstr. 1');
     });
 
     test('implements SearchResultItem', () {
-      final result = FuelStationResult(station);
+      const result = FuelStationResult(station);
 
       expect(result, isA<SearchResultItem>());
     });
@@ -161,7 +161,7 @@ void main() {
 
   group('Pattern matching', () {
     test('switch works on SearchResultItem sealed class', () {
-      final fuelStation = Station(
+      const fuelStation = Station(
         id: '1',
         name: 'S',
         brand: 'B',
@@ -183,7 +183,7 @@ void main() {
       );
 
       final items = <SearchResultItem>[
-        FuelStationResult(fuelStation),
+        const FuelStationResult(fuelStation),
         const EVStationResult(evStation),
       ];
 

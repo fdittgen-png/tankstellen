@@ -17,7 +17,7 @@ void main() {
 
         await pumpApp(
           tester,
-          DemoModeBanner(country: Countries.germany),
+          const DemoModeBanner(country: Countries.germany),
           overrides: [
             storage.override,
             activeCountryOverride(Countries.germany),
@@ -37,7 +37,7 @@ void main() {
 
         await pumpApp(
           tester,
-          DemoModeBanner(country: Countries.france),
+          const DemoModeBanner(country: Countries.france),
           overrides: [
             storage.override,
             activeCountryOverride(Countries.france),
@@ -62,7 +62,7 @@ void main() {
 
         await pumpApp(
           tester,
-          DemoModeBanner(country: Countries.germany),
+          const DemoModeBanner(country: Countries.germany),
           overrides: [
             storage.override,
             activeCountryOverride(Countries.germany),
@@ -83,7 +83,7 @@ void main() {
 
         await pumpApp(
           tester,
-          DemoModeBanner(country: Countries.germany),
+          const DemoModeBanner(country: Countries.germany),
           overrides: [
             storage.override,
             activeCountryOverride(Countries.germany),

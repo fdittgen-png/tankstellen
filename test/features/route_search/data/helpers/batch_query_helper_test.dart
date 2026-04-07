@@ -65,7 +65,7 @@ void main() {
         }) async {
           // Both points return the same station
           return [
-            FuelStationResult(Station(
+            const FuelStationResult(Station(
               id: 'shared-station',
               name: 'Shared',
               brand: 'Test',

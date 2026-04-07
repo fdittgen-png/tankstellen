@@ -45,7 +45,7 @@ void main() {
                 },
               ));
 
-      final params = SearchParams(lat: 52.52, lng: 13.405, radiusKm: 10.0);
+      const params = SearchParams(lat: 52.52, lng: 13.405, radiusKm: 10.0);
       final result = await service.searchStations(params);
 
       expect(result.data, hasLength(1));
@@ -61,7 +61,7 @@ void main() {
                 data: {'ok': true, 'stations': []},
               ));
 
-      final params = SearchParams(lat: 52.52, lng: 13.405, radiusKm: 10.0);
+      const params = SearchParams(lat: 52.52, lng: 13.405, radiusKm: 10.0);
       final result = await service.searchStations(params);
 
       expect(result.data, isEmpty);
@@ -74,7 +74,7 @@ void main() {
                 data: {'ok': false, 'message': 'Invalid API key'},
               ));
 
-      final params = SearchParams(lat: 52.52, lng: 13.405, radiusKm: 10.0);
+      const params = SearchParams(lat: 52.52, lng: 13.405, radiusKm: 10.0);
       expect(
         () => service.searchStations(params),
         throwsA(isA<ApiException>()),
@@ -88,7 +88,7 @@ void main() {
             requestOptions: RequestOptions(),
           ));
 
-      final params = SearchParams(lat: 52.52, lng: 13.405, radiusKm: 10.0);
+      const params = SearchParams(lat: 52.52, lng: 13.405, radiusKm: 10.0);
       expect(
         () => service.searchStations(params),
         throwsA(isA<AppException>()),

@@ -109,11 +109,11 @@ void main() {
               () => _FixedFavoriteStations(result),
             ),
           ].cast(),
-          child: MaterialApp(
+          child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            locale: const Locale('en'),
-            home: const Scaffold(body: FavoritesScreen()),
+            locale: Locale('en'),
+            home: Scaffold(body: FavoritesScreen()),
           ),
         ),
       );

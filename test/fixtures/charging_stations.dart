@@ -1,6 +1,6 @@
 import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
 
-final testChargingStation = ChargingStation(
+const testChargingStation = ChargingStation(
   id: 'ocm-12345',
   name: 'Test EV Station',
   operator: 'Ionity',
@@ -10,7 +10,7 @@ final testChargingStation = ChargingStation(
   address: 'Unter den Linden 1',
   postCode: '10117',
   place: 'Berlin',
-  connectors: const [
+  connectors: [
     Connector(type: 'CCS Type 2', powerKW: 350, quantity: 4, currentType: 'DC', status: 'Available'),
     Connector(type: 'Type 2', powerKW: 22, quantity: 2, currentType: 'AC'),
     Connector(type: 'CHAdeMO', powerKW: 50, quantity: 1, currentType: 'DC'),
@@ -22,14 +22,14 @@ final testChargingStation = ChargingStation(
   countryCode: 'DE',
 );
 
-final testChargingStationMinimal = ChargingStation(
+const testChargingStationMinimal = ChargingStation(
   id: 'ocm-99',
   name: 'Minimal Station',
   operator: '',
   lat: 48.8566,
   lng: 2.3522,
   address: '',
-  connectors: const [],
+  connectors: [],
 );
 
 final testChargingStationList = [

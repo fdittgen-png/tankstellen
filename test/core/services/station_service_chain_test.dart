@@ -130,7 +130,7 @@ class _TestableChain {
   }
 }
 
-final _testStation = Station(
+const _testStation = Station(
   id: 'test-id',
   name: 'Test Station',
   brand: 'TEST',
@@ -143,7 +143,7 @@ final _testStation = Station(
   e10: 1.459,
 );
 
-final _testParams = SearchParams(
+const _testParams = SearchParams(
   lat: 52.52,
   lng: 13.41,
   radiusKm: 10,

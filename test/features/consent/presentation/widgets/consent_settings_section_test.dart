@@ -34,11 +34,11 @@ void main() {
       overrides: [
         hiveStorageProvider.overrideWithValue(mockStorage),
       ],
-      child: MaterialApp(
+      child: const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: const Scaffold(body: ConsentSettingsSection()),
+        locale: Locale('en'),
+        home: Scaffold(body: ConsentSettingsSection()),
       ),
     );
   }

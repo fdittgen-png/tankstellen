@@ -389,7 +389,7 @@ void main() {
     group('API returns partial data (some fields null)', () {
       test('station with all-null prices is still returned', () async {
         fakeService.stationsToReturn = [
-          Station(
+          const Station(
             id: 'partial',
             name: 'Partial',
             brand: 'TEST',
@@ -413,7 +413,7 @@ void main() {
       test('station with only some prices set is returned correctly',
           () async {
         fakeService.stationsToReturn = [
-          Station(
+          const Station(
             id: 'mixed',
             name: 'Mixed',
             brand: 'TEST',
@@ -543,7 +543,7 @@ SearchParams _defaultParams() => const SearchParams(
       radiusKm: 10,
     );
 
-Station _testStation() => Station(
+Station _testStation() => const Station(
       id: 'test-1',
       name: 'Test Station',
       brand: 'Test',

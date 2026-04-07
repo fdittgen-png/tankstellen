@@ -36,7 +36,7 @@ void main() {
 
     testWidgets('renders station brand when data is loaded', (tester) async {
       final result = ServiceResult(
-        data: StationDetail(station: testStation),
+        data: const StationDetail(station: testStation),
         source: ServiceSource.cache,
         fetchedAt: DateTime.now(),
       );
@@ -62,7 +62,7 @@ void main() {
 
     testWidgets('renders price tiles for fuel types', (tester) async {
       final result = ServiceResult(
-        data: StationDetail(station: testStation),
+        data: const StationDetail(station: testStation),
         source: ServiceSource.cache,
         fetchedAt: DateTime.now(),
       );
@@ -91,7 +91,7 @@ void main() {
     testWidgets('shows open status indicator for open station',
         (tester) async {
       final result = ServiceResult(
-        data: StationDetail(station: testStation), // isOpen: true
+        data: const StationDetail(station: testStation), // isOpen: true
         source: ServiceSource.cache,
         fetchedAt: DateTime.now(),
       );
@@ -118,7 +118,7 @@ void main() {
     testWidgets('renders favorite button in app bar (not favorited)',
         (tester) async {
       final result = ServiceResult(
-        data: StationDetail(station: testStation),
+        data: const StationDetail(station: testStation),
         source: ServiceSource.cache,
         fetchedAt: DateTime.now(),
       );
@@ -147,7 +147,7 @@ void main() {
     testWidgets('renders favorite button as filled when station is favorited',
         (tester) async {
       final result = ServiceResult(
-        data: StationDetail(station: testStation),
+        data: const StationDetail(station: testStation),
         source: ServiceSource.cache,
         fetchedAt: DateTime.now(),
       );
@@ -173,7 +173,7 @@ void main() {
 
     testWidgets('renders address information', (tester) async {
       final result = ServiceResult(
-        data: StationDetail(station: testStation),
+        data: const StationDetail(station: testStation),
         source: ServiceSource.cache,
         fetchedAt: DateTime.now(),
       );

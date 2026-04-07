@@ -37,7 +37,7 @@ void main() {
     });
 
     test('Station model supports all fuel type fields', () {
-      final station = Station(
+      const station = Station(
         id: '34120002',
         name: 'Test',
         brand: 'TotalEnergies',
@@ -72,7 +72,7 @@ void main() {
     });
 
     test('Station.toJson and fromJson roundtrip with new fields', () {
-      final station = Station(
+      const station = Station(
         id: 'test',
         name: 'Test',
         brand: 'Total',

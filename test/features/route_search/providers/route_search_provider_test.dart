@@ -48,14 +48,14 @@ void main() {
 
   group('RouteSearchResult', () {
     test('creates with required fields', () {
-      final route = RouteInfo(
-        geometry: [const LatLng(52.52, 13.41), const LatLng(48.14, 11.58)],
+      const route = RouteInfo(
+        geometry: [LatLng(52.52, 13.41), LatLng(48.14, 11.58)],
         distanceKm: 584.0,
         durationMinutes: 330.0,
-        samplePoints: [const LatLng(52.52, 13.41)],
+        samplePoints: [LatLng(52.52, 13.41)],
       );
 
-      final result = RouteSearchResult(
+      const result = RouteSearchResult(
         route: route,
         stations: [],
       );
@@ -68,14 +68,14 @@ void main() {
     });
 
     test('creates with all fields', () {
-      final route = RouteInfo(
-        geometry: [const LatLng(52.52, 13.41)],
+      const route = RouteInfo(
+        geometry: [LatLng(52.52, 13.41)],
         distanceKm: 100.0,
         durationMinutes: 60.0,
         samplePoints: [],
       );
 
-      final station = Station(
+      const station = Station(
         id: 'st-1',
         name: 'Test Station',
         brand: 'Shell',
@@ -88,7 +88,7 @@ void main() {
         e10: 1.45,
       );
 
-      final result = RouteSearchResult(
+      const result = RouteSearchResult(
         route: route,
         stations: [FuelStationResult(station)],
         cheapestId: 'st-1',
@@ -104,7 +104,7 @@ void main() {
     });
 
     test('stations contain correct display info', () {
-      final station = Station(
+      const station = Station(
         id: 'st-1',
         name: 'Station Name',
         brand: 'Shell',
@@ -118,7 +118,7 @@ void main() {
         e10: 1.459,
       );
 
-      final fuelResult = FuelStationResult(station);
+      const fuelResult = FuelStationResult(station);
 
       expect(fuelResult.displayName, 'Shell');
       expect(fuelResult.displayAddress, 'Hauptstr. 1');
@@ -131,18 +131,18 @@ void main() {
   group('Multi-country route search', () {
     test('uniform strategy collects stations from per-point query function', () async {
       // Simulate a cross-border route: Berlin (DE) → Paris (FR)
-      final route = RouteInfo(
+      const route = RouteInfo(
         geometry: [
-          const LatLng(52.52, 13.41), // Berlin
-          const LatLng(48.86, 2.35),  // Paris
+          LatLng(52.52, 13.41), // Berlin
+          LatLng(48.86, 2.35),  // Paris
         ],
         distanceKm: 1050.0,
         durationMinutes: 600.0,
         samplePoints: [
-          const LatLng(52.52, 13.41), // DE
-          const LatLng(50.94, 6.96),  // DE (Cologne)
-          const LatLng(49.50, 3.50),  // FR (Picardy)
-          const LatLng(48.86, 2.35),  // FR (Paris)
+          LatLng(52.52, 13.41), // DE
+          LatLng(50.94, 6.96),  // DE (Cologne)
+          LatLng(49.50, 3.50),  // FR (Picardy)
+          LatLng(48.86, 2.35),  // FR (Paris)
         ],
       );
 

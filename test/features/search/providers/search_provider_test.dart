@@ -41,7 +41,7 @@ void main() {
     mockGeocoding = MockGeocodingChain();
     when(() => mockStorage.getSetting(any())).thenReturn(null);
 
-    registerFallbackValue(SearchParams(
+    registerFallbackValue(const SearchParams(
       lat: 0,
       lng: 0,
       radiusKm: 10,
@@ -61,7 +61,7 @@ void main() {
     return c;
   }
 
-  final testStation = Station(
+  const testStation = Station(
     id: 'test-1',
     name: 'Test Station',
     brand: 'TEST',
