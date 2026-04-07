@@ -1,25 +1,33 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../cache/cache_manager.dart';
+import '../country/country_bounding_box.dart';
 import '../error/exceptions.dart';
 import 'geocoding_provider.dart';
 import 'service_result.dart';
 
 /// Orchestrates geocoding with fallback chain:
 ///
-///   1. Fresh cache (< TTL) → return immediately
-///   2. Native geocoding (Android/iOS) → cache, return
-///   3. Nominatim geocoding (all platforms) → cache, return
-///   4. Stale cache (any age) → return with isStale=true
+///   1. Fresh cache (< TTL) → validate against country bbox → return
+///   2. Native geocoding (Android/iOS) → validate → cache, return
+///   3. Nominatim geocoding (all platforms) → validate → cache, return
+///   4. Stale cache (any age) → validate → return with isStale=true
 ///   5. All failed → throw ServiceChainExhaustedException
 ///
 /// Providers are tried in insertion order. Only [isAvailable] providers
 /// are attempted. Errors from each step accumulate in the result.
+///
+/// When [countryCode] is provided, coordinates are validated against the
+/// country's bounding box. Results outside the expected country are
+/// rejected and the next provider is tried.
 class GeocodingChain {
   final List<GeocodingProvider> _providers;
   final CacheManager _cache;
+  final String? _countryCode;
 
-  GeocodingChain(this._providers, this._cache);
+  GeocodingChain(this._providers, this._cache, {String? countryCode})
+      : _countryCode = countryCode?.toUpperCase();
 
   Future<ServiceResult<({double lat, double lng})>> zipCodeToCoordinates(
     String zipCode, {
@@ -33,10 +41,17 @@ class GeocodingChain {
     if (fresh != null) {
       final coords = _deserializeCoords(fresh.payload);
       if (coords != null) {
-        return ServiceResult(
-          data: coords,
-          source: fresh.originalSource,
-          fetchedAt: fresh.storedAt,
+        if (_isWithinCountryBounds(coords.lat, coords.lng)) {
+          return ServiceResult(
+            data: coords,
+            source: fresh.originalSource,
+            fetchedAt: fresh.storedAt,
+          );
+        }
+        // Cached coords are outside expected country — skip cache, re-geocode
+        debugPrint(
+          'GeocodingChain: cached coords (${coords.lat}, ${coords.lng}) '
+          'outside $_countryCode bounds, re-geocoding $zipCode',
         );
       }
     }
@@ -47,6 +62,25 @@ class GeocodingChain {
 
       try {
         final coords = await provider.zipCodeToCoordinates(zipCode, cancelToken: cancelToken);
+
+        // Validate coordinates against country bounding box
+        if (!_isWithinCountryBounds(coords.lat, coords.lng)) {
+          final bbox = _countryCode != null
+              ? countryBoundingBoxes[_countryCode]
+              : null;
+          final errorMsg =
+              'Geocoded coordinates (${coords.lat}, ${coords.lng}) for '
+              'postal code $zipCode are outside $_countryCode bounds '
+              '($bbox). Trying next provider.';
+          debugPrint('GeocodingChain: $errorMsg');
+          errors.add(ServiceError(
+            source: provider.source,
+            message: errorMsg,
+            occurredAt: DateTime.now(),
+          ));
+          continue;
+        }
+
         final result = ServiceResult(
           data: coords,
           source: provider.source,
@@ -76,7 +110,7 @@ class GeocodingChain {
     final stale = _cache.get(cacheKey);
     if (stale != null) {
       final coords = _deserializeCoords(stale.payload);
-      if (coords != null) {
+      if (coords != null && _isWithinCountryBounds(coords.lat, coords.lng)) {
         return ServiceResult(
           data: coords,
           source: ServiceSource.cache,
@@ -184,6 +218,15 @@ class GeocodingChain {
       }
     }
     return null;
+  }
+
+  /// Check if coordinates are within the expected country's bounding box.
+  /// Returns true if no country code is set (validation disabled).
+  bool _isWithinCountryBounds(double lat, double lng) {
+    if (_countryCode == null) return true;
+    final bbox = countryBoundingBoxes[_countryCode];
+    if (bbox == null) return true; // Unknown country — skip validation
+    return bbox.contains(lat, lng);
   }
 
   ({double lat, double lng})? _deserializeCoords(Map<String, dynamic> data) {

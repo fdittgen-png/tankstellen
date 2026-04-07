@@ -169,6 +169,7 @@ GeocodingChain geocodingChain(Ref ref) {
       NominatimGeocodingProvider(countryCode: country.code), // All platforms
     ],
     cache,
+    countryCode: country.code,
   );
 }
 
