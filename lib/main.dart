@@ -12,6 +12,7 @@ import 'core/error_tracing/storage/trace_storage.dart';
 import 'core/error_tracing/trace_recorder.dart';
 import 'core/utils/edge_to_edge.dart';
 import 'core/notifications/notification_service.dart';
+import 'core/perf/startup_timer.dart';
 import 'core/storage/hive_storage.dart';
 import 'core/sync/community_config.dart';
 import 'core/sync/supabase_client.dart';
@@ -31,7 +32,10 @@ import 'features/widget/data/home_widget_service.dart';
 /// 9. TankSync/Supabase (optional, user-configured)
 /// 10. Run app with global error handlers
 Future<void> main() async {
+  StartupTimer.instance.start();
+
   WidgetsFlutterBinding.ensureInitialized();
+  StartupTimer.instance.mark('binding');
 
   // Opt in to edge-to-edge display (required for Android 15+).
   // Makes system bars transparent so app content draws behind them.
@@ -45,8 +49,10 @@ Future<void> main() async {
     debugPrint = (String? message, {int? wrapWidth}) {};
   }
   await HiveStorage.init();
+  StartupTimer.instance.mark('hive_init');
   await HiveStorage.loadApiKey();
   await TraceStorage.init();
+  StartupTimer.instance.mark('storage_ready');
 
   // Evict stale cache entries on startup
   final cacheManager = CacheManager(HiveStorage());
@@ -60,6 +66,7 @@ Future<void> main() async {
   await NotificationService.init();
   await BackgroundService.init();
   await HomeWidgetService.init();
+  StartupTimer.instance.mark('services_init');
 
   final container = ProviderContainer();
 
@@ -112,6 +119,8 @@ Future<void> main() async {
     }
   }
 
+  StartupTimer.instance.mark('pre_run_app');
+
   if (sentryDsn != null && sentryDsn.isNotEmpty) {
     // Read version from pubspec.yaml metadata at runtime
     final packageInfo = await PackageInfo.fromPlatform();
@@ -148,6 +157,9 @@ void _runApp(ProviderContainer container) {
     container.read(traceRecorderProvider).record(error, stack);
     return true;
   };
+
+  StartupTimer.instance.mark('first_frame');
+  StartupTimer.instance.finish();
 
   runApp(
     UncontrolledProviderScope(
