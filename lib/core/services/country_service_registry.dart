@@ -14,7 +14,6 @@ import 'impl/miteco_station_service.dart';
 import 'impl/osm_brand_enricher.dart';
 import 'impl/portugal_station_service.dart';
 import 'impl/prix_carburants_station_service.dart';
-import 'impl/tankerkoenig_station_service.dart';
 import 'impl/uk_station_service.dart';
 import 'service_result.dart';
 import 'station_service.dart';
