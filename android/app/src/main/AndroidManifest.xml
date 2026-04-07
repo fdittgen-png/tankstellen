@@ -34,7 +34,8 @@
         <!-- Home screen widget: fuel prices for favorite stations -->
         <receiver
             android:name=".FuelPriceWidgetProvider"
-            android:exported="true">
+            android:exported="true"
+            android:permission="android.permission.BIND_APPWIDGET">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -44,9 +45,12 @@
         </receiver>
 
         <!-- Android Auto car app service -->
+        <!-- exported=true required: Android Auto host binds via this intent-filter.
+             Permission restricts binding to holders of FOREGROUND_SERVICE permission. -->
         <service
             android:name=".TankstellenCarAppService"
-            android:exported="true">
+            android:exported="true"
+            android:permission="android.permission.FOREGROUND_SERVICE">
             <intent-filter>
                 <action android:name="androidx.car.app.CarAppService" />
                 <category android:name="androidx.car.app.category.POI" />
