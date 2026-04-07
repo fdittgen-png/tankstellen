@@ -113,11 +113,11 @@ class EVPricingCard extends StatelessWidget {
 
     return Card(
       child: ListTile(
-        leading: Icon(Icons.payments, color: Colors.grey.shade400),
+        leading: Icon(Icons.payments, color: theme.colorScheme.outline),
         title: Text(l10n?.evUsageCost ?? 'Usage cost'),
         subtitle: Text(
           l10n?.evPricingUnavailable ?? 'Pricing not available from provider',
-          style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey.shade500),
+          style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         ),
       ),
     );

@@ -82,7 +82,7 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
               Text(
                 l10n?.currentPrice(PriceFormatter.formatPrice(widget.currentPrice)) ?? 'Current price: ${PriceFormatter.formatPrice(widget.currentPrice)}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey.shade600,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
               ),
             ],

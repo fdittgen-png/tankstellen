@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/core/utils/price_tier.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
@@ -69,20 +70,21 @@ void main() {
     });
 
     testWidgets('shows open indicator when isOpen=true', (tester) async {
-      await pumpApp(
-        tester,
-        StationCard(
+      late Color expectedColor;
+      await pumpApp(tester, Builder(builder: (context) {
+        expectedColor = DarkModeColors.success(context);
+        return StationCard(
           station: testStation, // isOpen: true
           selectedFuelType: FuelType.e10,
-        ),
-      );
+        );
+      }));
 
-      // The open indicator is a green circle Container
+      // The open indicator is a circle with success color
       final containers = find.byWidgetPredicate((widget) {
         if (widget is Container && widget.decoration is BoxDecoration) {
           final decoration = widget.decoration as BoxDecoration;
           return decoration.shape == BoxShape.circle &&
-              decoration.color == Colors.green;
+              decoration.color == expectedColor;
         }
         return false;
       });
@@ -92,20 +94,21 @@ void main() {
     testWidgets('shows closed indicator when isOpen=false', (tester) async {
       final closedStation = testStationList[2]; // station-expensive, isOpen: false
 
-      await pumpApp(
-        tester,
-        StationCard(
+      late Color expectedColor;
+      await pumpApp(tester, Builder(builder: (context) {
+        expectedColor = DarkModeColors.error(context);
+        return StationCard(
           station: closedStation,
           selectedFuelType: FuelType.e10,
-        ),
-      );
+        );
+      }));
 
-      // The closed indicator is a red circle Container
+      // The closed indicator is a circle with error color
       final containers = find.byWidgetPredicate((widget) {
         if (widget is Container && widget.decoration is BoxDecoration) {
           final decoration = widget.decoration as BoxDecoration;
           return decoration.shape == BoxShape.circle &&
-              decoration.color == Colors.red;
+              decoration.color == expectedColor;
         }
         return false;
       });

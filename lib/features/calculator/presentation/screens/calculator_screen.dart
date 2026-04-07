@@ -164,14 +164,14 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
                     Icon(
                       Icons.calculate_outlined,
                       size: 64,
-                      color: Colors.grey[400],
+                      color: theme.colorScheme.outline,
                     ),
                     const SizedBox(height: 16),
                     Text(
                       l10n?.enterCalcValues ?? 'Enter distance, consumption, and price to calculate trip cost',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyLarge?.copyWith(
-                        color: Colors.grey[500],
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],

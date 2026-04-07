@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import '../../../../core/sync/sync_config.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 
 /// Account info card showing UUID and server URL.
 class AccountInfoCard extends StatelessWidget {
@@ -124,14 +125,14 @@ class DataActionButtons extends StatelessWidget {
 
         // Destructive actions -- disabled for community mode
         if (mode == SyncMode.community) ...[
-          const Card(
-            color: Color(0xFFFFF3E0),
+          Card(
+            color: DarkModeColors.warningSurface(context),
             child: Padding(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline, color: Color(0xFFE65100)),
-                  SizedBox(width: 8),
+                  Icon(Icons.info_outline, color: DarkModeColors.warning(context)),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Data deletion is not available in community '

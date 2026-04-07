@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../data/repositories/price_history_repository.dart';
 
 /// Displays aggregate price statistics (min, max, avg, current) with
@@ -33,12 +34,12 @@ class PriceStatsCard extends StatelessWidget {
           _StatItem(
             label: 'Min',
             value: _formatPrice(stats.min),
-            color: Colors.green,
+            color: DarkModeColors.success(context),
           ),
           _StatItem(
             label: 'Max',
             value: _formatPrice(stats.max),
-            color: Colors.red,
+            color: DarkModeColors.error(context),
           ),
           _StatItem(
             label: 'Avg',
@@ -79,7 +80,7 @@ class _StatItem extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
         ),
         const SizedBox(height: 2),
@@ -104,9 +105,9 @@ class _CurrentWithTrend extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (icon, color) = switch (trend) {
-      PriceTrend.up => (Icons.trending_up, Colors.red),
-      PriceTrend.down => (Icons.trending_down, Colors.green),
-      PriceTrend.stable => (Icons.trending_flat, Colors.grey),
+      PriceTrend.up => (Icons.trending_up, DarkModeColors.error(context)),
+      PriceTrend.down => (Icons.trending_down, DarkModeColors.success(context)),
+      PriceTrend.stable => (Icons.trending_flat, Theme.of(context).colorScheme.onSurfaceVariant),
     };
 
     return Column(
@@ -115,7 +116,7 @@ class _CurrentWithTrend extends StatelessWidget {
         Text(
           'Current',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
         ),
         const SizedBox(height: 2),

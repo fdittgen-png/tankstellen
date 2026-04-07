@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../domain/entities/fuel_type.dart';
@@ -50,8 +51,8 @@ class EVStationCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: station.isOperational == true
-                          ? Colors.green
-                          : Colors.orange,
+                          ? DarkModeColors.success(context)
+                          : DarkModeColors.warning(context),
                     ),
                   ),
                   const Padding(
