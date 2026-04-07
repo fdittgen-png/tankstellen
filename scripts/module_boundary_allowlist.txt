@@ -1,0 +1,7 @@
+# Module Boundary Allowlist
+# Each line allows a specific cross-feature import that cannot be refactored yet.
+# Format: <source_file>:<imported_feature_name>
+# Remove entries as you refactor the dependency away.
+#
+# Example:
+#   lib/features/sync/data/sync_service.dart:search

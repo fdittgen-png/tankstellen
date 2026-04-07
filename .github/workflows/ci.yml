@@ -31,6 +31,8 @@ jobs:
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
       - run: flutter analyze --no-fatal-infos
+      - name: Check feature-module boundaries
+        run: bash scripts/check_module_boundaries.sh
 
   test:
     runs-on: ubuntu-latest
