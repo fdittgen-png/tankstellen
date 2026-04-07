@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/utils/password_validator.dart';
 import '../../../../core/widgets/password_strength_indicator.dart';
 import '../../../../l10n/app_localizations.dart';
 
