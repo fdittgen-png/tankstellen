@@ -4,6 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
 import 'package:tankstellen/features/search/presentation/widgets/location_input.dart';
 import 'package:tankstellen/features/search/presentation/widgets/nearby_search_controls.dart';
+import 'package:tankstellen/features/search/providers/search_screen_ui_provider.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
@@ -21,8 +22,6 @@ void main() {
           onGpsSearch: () {},
           onZipSearch: (_) {},
           onCitySearch: (_) {},
-          filtersExpanded: true,
-          onToggleFilters: (_) {},
           isLandscape: false,
         ),
         overrides: test.overrides,
@@ -43,11 +42,12 @@ void main() {
           onGpsSearch: () {},
           onZipSearch: (_) {},
           onCitySearch: (_) {},
-          filtersExpanded: false,
-          onToggleFilters: (_) {},
           isLandscape: false,
         ),
-        overrides: test.overrides,
+        overrides: [
+          ...test.overrides,
+          filtersExpandedProvider.overrideWith(() => _CollapsedFilters()),
+        ],
       );
 
       // Search bar stays visible regardless of filter state
@@ -65,11 +65,12 @@ void main() {
           onGpsSearch: () {},
           onZipSearch: (_) {},
           onCitySearch: (_) {},
-          filtersExpanded: false,
-          onToggleFilters: (_) {},
           isLandscape: false,
         ),
-        overrides: test.overrides,
+        overrides: [
+          ...test.overrides,
+          filtersExpandedProvider.overrideWith(() => _CollapsedFilters()),
+        ],
       );
 
       // Collapsed filter summary shows tune icon
@@ -92,8 +93,6 @@ void main() {
           onGpsSearch: () {},
           onZipSearch: (_) {},
           onCitySearch: (_) {},
-          filtersExpanded: true,
-          onToggleFilters: (_) {},
           isLandscape: false,
         ),
         overrides: test.overrides,
@@ -112,8 +111,6 @@ void main() {
           onGpsSearch: () {},
           onZipSearch: (_) {},
           onCitySearch: (_) {},
-          filtersExpanded: true,
-          onToggleFilters: (_) {},
           isLandscape: false,
         ),
         overrides: test.overrides,
@@ -122,4 +119,10 @@ void main() {
       expect(find.byType(Slider), findsOneWidget);
     });
   });
+}
+
+/// A [FiltersExpanded] override that starts collapsed.
+class _CollapsedFilters extends FiltersExpanded {
+  @override
+  bool build() => false;
 }

@@ -47,7 +47,7 @@ final class TankerkoenigDioProvider extends $FunctionalProvider<Dio, Dio, Dio>
   }
 }
 
-String _$tankerkoenigDioHash() => r'0db7461e5326dd9ffaae818245ebf1bd48830c2a';
+String _$tankerkoenigDioHash() => r'5ade6219b0e5455fcda1bd7d05904c5eb75a770a';
 
 /// Returns the appropriate station service based on whether an API key
 /// is configured. With key: Tankerkoenig with full fallback chain.
@@ -140,4 +140,4 @@ final class GeocodingChainProvider
   }
 }
 
-String _$geocodingChainHash() => r'9d3e3d6160af0a2bbeafca30eb14d69641cbae4e';
+String _$geocodingChainHash() => r'58e72b3ac8bafb01e903fd9922d65ba82830bc23';

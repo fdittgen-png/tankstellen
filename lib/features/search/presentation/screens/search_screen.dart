@@ -18,9 +18,9 @@ import '../widgets/demo_mode_banner.dart';
 import '../widgets/search_results_list.dart';
 import '../widgets/user_position_bar.dart';
 import '../../../route_search/domain/entities/route_info.dart';
-import '../../../route_search/domain/route_search_strategy.dart';
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../providers/search_mode_provider.dart';
+import '../../providers/search_screen_ui_provider.dart';
 import '../../providers/ev_search_provider.dart';
 import '../../../../core/location/location_service.dart';
 import '../../../../core/services/service_result.dart';
@@ -46,9 +46,6 @@ class SearchScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
-  bool _filtersExpanded = true;
-  RouteSearchStrategyType _selectedStrategy = RouteSearchStrategyType.uniform;
-
   @override
   void initState() {
     super.initState();
@@ -72,12 +69,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   void _performRouteSearch(List<RouteWaypoint> waypoints) {
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
-    setState(() { _filtersExpanded = false; });
+    ref.read(filtersExpandedProvider.notifier).collapse();
     ref.read(routeSearchStateProvider.notifier).searchAlongRoute(
       waypoints: waypoints,
       fuelType: fuelType,
       searchRadiusKm: radius.clamp(1, 10),
-      strategyType: _selectedStrategy,
+      strategyType: ref.read(selectedRouteStrategyProvider),
     );
   }
 
@@ -101,7 +98,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       }
       await LocationConsentDialog.recordConsent(settings);
     }
-    setState(() { _filtersExpanded = false; });
+    ref.read(filtersExpandedProvider.notifier).collapse();
 
     if (fuelType == FuelType.electric) {
       try {
@@ -130,7 +127,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   void _performZipSearch(String zip) {
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
-    setState(() { _filtersExpanded = false; });
+    ref.read(filtersExpandedProvider.notifier).collapse();
     ref.read(searchStateProvider.notifier).searchByZipCode(
       zipCode: zip,
       fuelType: fuelType,
@@ -141,7 +138,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   void _performCitySearch(ResolvedLocation city) {
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
-    setState(() { _filtersExpanded = false; });
+    ref.read(filtersExpandedProvider.notifier).collapse();
     ref.read(searchStateProvider.notifier).searchByCoordinates(
       lat: city.lat,
       lng: city.lng,
@@ -163,9 +160,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
-    if (isLandscape && _filtersExpanded) {
+    final filtersExpanded = ref.watch(filtersExpandedProvider);
+    if (isLandscape && filtersExpanded) {
       safePostFrame(() {
-        setState(() => _filtersExpanded = false);
+        ref.read(filtersExpandedProvider.notifier).collapse();
       });
     }
 
@@ -231,15 +229,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   onGpsSearch: _performGpsSearch,
                   onZipSearch: _performZipSearch,
                   onCitySearch: _performCitySearch,
-                  filtersExpanded: _filtersExpanded,
-                  onToggleFilters: (v) => setState(() => _filtersExpanded = v),
                   isLandscape: isLandscape,
                 )
               else
                 RouteSearchControls(
                   onSearch: _performRouteSearch,
-                  selectedStrategy: _selectedStrategy,
-                  onStrategyChanged: (s) => setState(() => _selectedStrategy = s),
                 ),
             ],
           ),

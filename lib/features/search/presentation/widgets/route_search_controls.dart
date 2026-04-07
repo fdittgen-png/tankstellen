@@ -5,6 +5,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../route_search/presentation/widgets/route_input.dart';
 import '../../../route_search/domain/entities/route_info.dart';
 import '../../../route_search/domain/route_search_strategy.dart';
+import '../../providers/search_screen_ui_provider.dart';
 import 'fuel_type_selector.dart';
 
 /// Controls for "Route" search mode: route input, fuel type selector,
@@ -13,22 +14,15 @@ class RouteSearchControls extends ConsumerWidget {
   const RouteSearchControls({
     super.key,
     required this.onSearch,
-    required this.selectedStrategy,
-    required this.onStrategyChanged,
   });
 
   /// Callback when the user triggers a route search with waypoints.
   final ValueChanged<List<RouteWaypoint>> onSearch;
 
-  /// The currently selected route search strategy.
-  final RouteSearchStrategyType selectedStrategy;
-
-  /// Called when the user picks a different strategy chip.
-  final ValueChanged<RouteSearchStrategyType> onStrategyChanged;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final selectedStrategy = ref.watch(selectedRouteStrategyProvider);
     final theme = Theme.of(context);
 
     return Column(
@@ -52,7 +46,7 @@ class RouteSearchControls extends ConsumerWidget {
                     style: const TextStyle(fontSize: 11),
                   ),
                   selected: selectedStrategy == strategy,
-                  onSelected: (_) => onStrategyChanged(strategy),
+                  onSelected: (_) => ref.read(selectedRouteStrategyProvider.notifier).set(strategy),
                   visualDensity: VisualDensity.compact,
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

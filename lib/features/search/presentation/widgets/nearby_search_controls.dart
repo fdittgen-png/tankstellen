@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/services/location_search_service.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/search_provider.dart';
+import '../../providers/search_screen_ui_provider.dart';
 import 'fuel_type_selector.dart';
 import 'location_input.dart';
 
@@ -15,8 +16,6 @@ class NearbySearchControls extends ConsumerWidget {
     required this.onGpsSearch,
     required this.onZipSearch,
     required this.onCitySearch,
-    required this.filtersExpanded,
-    required this.onToggleFilters,
     required this.isLandscape,
   });
 
@@ -29,12 +28,6 @@ class NearbySearchControls extends ConsumerWidget {
   /// Callback to trigger search by resolved city/location.
   final ValueChanged<ResolvedLocation> onCitySearch;
 
-  /// Whether the filter section (fuel type + radius) is expanded.
-  final bool filtersExpanded;
-
-  /// Toggle the filters collapsed/expanded state.
-  final ValueChanged<bool> onToggleFilters;
-
   /// Whether the device is in landscape orientation.
   final bool isLandscape;
 
@@ -43,6 +36,7 @@ class NearbySearchControls extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final radius = ref.watch(searchRadiusProvider);
     final fuelType = ref.watch(selectedFuelTypeProvider);
+    final filtersExpanded = ref.watch(filtersExpandedProvider);
     final theme = Theme.of(context);
 
     return Column(
@@ -85,7 +79,7 @@ class NearbySearchControls extends ConsumerWidget {
                 if (!isLandscape)
                   FilledButton.icon(
                     onPressed: () {
-                      onToggleFilters(false);
+                      ref.read(filtersExpandedProvider.notifier).collapse();
                       onGpsSearch();
                     },
                     icon: const Icon(Icons.search),
@@ -95,7 +89,7 @@ class NearbySearchControls extends ConsumerWidget {
             ),
           ),
           secondChild: GestureDetector(
-            onTap: () => onToggleFilters(true),
+            onTap: () => ref.read(filtersExpandedProvider.notifier).set(true),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
