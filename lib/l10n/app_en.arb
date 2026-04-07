@@ -336,5 +336,14 @@
   "errorAllServicesFailed": "Could not load data. Check your connection and try again.",
   "errorCache": "Local data error. Try clearing the cache.",
   "errorCancelled": "Request was cancelled.",
-  "errorUnknown": "An unexpected error occurred."
+  "errorUnknown": "An unexpected error occurred.",
+
+  "onboardingWelcomeHint": "Set up the app in a few quick steps.",
+  "onboardingApiKeyDescription": "Register for a free API key, or skip to explore the app with demo data.",
+  "onboardingComplete": "All set!",
+  "onboardingCompleteHint": "You can change these settings anytime in your profile.",
+  "onboardingBack": "Back",
+  "onboardingNext": "Next",
+  "onboardingSkip": "Skip",
+  "onboardingFinish": "Get started"
 }

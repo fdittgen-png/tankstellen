@@ -978,4 +978,31 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get errorUnknown => 'Ein unerwarteter Fehler ist aufgetreten.';
+
+  @override
+  String get onboardingWelcomeHint =>
+      'Richten Sie die App in wenigen Schritten ein.';
+
+  @override
+  String get onboardingApiKeyDescription =>
+      'Registrieren Sie sich für einen kostenlosen API-Schlüssel oder überspringen Sie diesen Schritt für Demo-Daten.';
+
+  @override
+  String get onboardingComplete => 'Alles bereit!';
+
+  @override
+  String get onboardingCompleteHint =>
+      'Sie können diese Einstellungen jederzeit in Ihrem Profil ändern.';
+
+  @override
+  String get onboardingBack => 'Zurück';
+
+  @override
+  String get onboardingNext => 'Weiter';
+
+  @override
+  String get onboardingSkip => 'Überspringen';
+
+  @override
+  String get onboardingFinish => 'Los geht\'s';
 }

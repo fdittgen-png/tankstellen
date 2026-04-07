@@ -7,7 +7,7 @@ import '../features/favorites/presentation/screens/favorites_screen.dart';
 import '../features/map/presentation/screens/map_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
 import '../features/search/presentation/screens/search_screen.dart';
-import '../features/setup/presentation/screens/setup_screen.dart';
+import '../features/setup/presentation/screens/onboarding_wizard_screen.dart';
 import '../features/alerts/presentation/screens/alerts_screen.dart';
 import '../features/calculator/presentation/screens/calculator_screen.dart';
 import '../features/report/presentation/screens/report_screen.dart';
@@ -100,7 +100,7 @@ GoRouter router(Ref ref) {
     routes: [
       GoRoute(
         path: '/setup',
-        builder: (context, state) => const SetupScreen(),
+        builder: (context, state) => const OnboardingWizardScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
