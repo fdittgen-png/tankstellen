@@ -1,0 +1,32 @@
+name: Deploy Privacy Policy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'docs/privacy-policy/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/privacy-policy
+      - id: deployment
+        uses: actions/deploy-pages@v4

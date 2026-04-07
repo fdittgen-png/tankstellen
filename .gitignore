@@ -63,7 +63,10 @@ credentials.json
 copilot/
 
 # Development documentation (kept in docs/ for reference)
-docs/
+docs/*
+# Except: privacy policy (deployed to GitHub Pages) and Play Store docs
+!docs/privacy-policy/
+!docs/play-store/
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
