@@ -86,7 +86,7 @@ StationService stationService(Ref ref) {
   return DemoStationService(countryCode: country.code);
 }
 
-final _countryServiceFactories = <String, StationService Function(Ref, CacheManager)>{
+final _countryServiceFactories = <String, StationService Function(Ref, CacheStrategy)>{
   'FR': (ref, cache) {
     final enricher = ref.watch(osmBrandEnricherProvider);
     return StationServiceChain(

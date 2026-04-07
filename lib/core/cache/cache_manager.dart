@@ -100,6 +100,28 @@ CacheManager cacheManager(Ref ref) {
   return CacheManager(ref.watch(hiveStorageProvider));
 }
 
+/// Minimal cache interface used by service chains ([StationServiceChain],
+/// [GeocodingChain], [LocationSearchService]) to read and write cache
+/// entries without depending on the concrete [CacheManager].
+///
+/// This enables unit-testing chains with a trivial in-memory fake instead
+/// of requiring Hive infrastructure.
+abstract interface class CacheStrategy {
+  /// Store data with metadata envelope.
+  Future<void> put(
+    String key,
+    Map<String, dynamic> data, {
+    required Duration ttl,
+    required ServiceSource source,
+  });
+
+  /// Retrieve cached data regardless of age. Returns null if never cached.
+  CacheEntry? get(String key);
+
+  /// Retrieve cached data only if not expired. Returns null on miss or expiry.
+  CacheEntry? getFresh(String key);
+}
+
 /// Unified cache layer wrapping [HiveStorage].
 ///
 /// All caching in the app goes through this class. Direct calls to
@@ -116,7 +138,7 @@ CacheManager cacheManager(Ref ref) {
 /// The two-tier retrieval strategy:
 /// - [getFresh] -- returns data only if not expired (used as primary)
 /// - [get] -- returns data regardless of age (used as stale fallback)
-class CacheManager {
+class CacheManager implements CacheStrategy {
   final HiveStorage _storage;
 
   CacheManager(this._storage);

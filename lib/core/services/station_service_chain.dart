@@ -19,7 +19,7 @@ import 'station_service.dart';
 /// so the UI can show what went wrong even when data was served.
 class StationServiceChain implements StationService {
   final StationService _primary;
-  final CacheManager _cache;
+  final CacheStrategy _cache;
   final ServiceSource _errorSource;
   final String countryCode;
 

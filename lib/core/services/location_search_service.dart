@@ -26,7 +26,7 @@ enum LocationInputType { gps, zip, city }
 /// Detects input type, searches cities via Nominatim with caching
 /// and rate-limiting (1 req/sec per Nominatim policy).
 class LocationSearchService {
-  final CacheManager _cache;
+  final CacheStrategy _cache;
   final Dio _dio;
 
   DateTime _lastRequest = DateTime.fromMillisecondsSinceEpoch(0);

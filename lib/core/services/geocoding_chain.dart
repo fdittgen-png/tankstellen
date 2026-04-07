@@ -23,7 +23,7 @@ import 'service_result.dart';
 /// rejected and the next provider is tried.
 class GeocodingChain {
   final List<GeocodingProvider> _providers;
-  final CacheManager _cache;
+  final CacheStrategy _cache;
   final String? _countryCode;
 
   GeocodingChain(this._providers, this._cache, {String? countryCode})
