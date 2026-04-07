@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/map/presentation/widgets/route_map_view.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
-
-// The _RouteStationChip is private, so we test it via _buildBestStopsList
-// indirectly. Instead, we test the full RouteMapView best-stops list behavior
-// by extracting testable properties from the rendered widget tree.
 
 void main() {
   // We cannot instantiate _RouteStationChip directly (private), so we test
