@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/price_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../search/domain/entities/fuel_type.dart';
@@ -28,6 +29,7 @@ class StationMarkerBuilder {
     final baseColor = priceColor(price, minPrice, maxPrice);
     final color = pastel ? _toPastel(baseColor) : baseColor;
     final brand = station.displayName;
+    final tier = priceTierOf(price, minPrice, maxPrice);
 
     return Marker(
       point: LatLng(station.lat, station.lng),
@@ -53,13 +55,27 @@ class StationMarkerBuilder {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                price != null ? PriceFormatter.formatPriceCompact(price) : '--',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                  color: pastel ? Colors.black38 : Colors.black87,
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (tier != PriceTier.unknown)
+                    Icon(
+                      iconForPriceTier(tier),
+                      size: 12,
+                      color: pastel ? Colors.black38 : Colors.black87,
+                    ),
+                  Text(
+                    price != null
+                        ? PriceFormatter.formatPriceCompact(price)
+                        : '--',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: pastel ? Colors.black38 : Colors.black87,
+                    ),
+                  ),
+                ],
               ),
               Text(
                 brand,

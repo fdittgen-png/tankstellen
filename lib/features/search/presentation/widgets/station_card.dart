@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/fuel_type.dart';
@@ -14,6 +15,11 @@ class StationCard extends StatelessWidget {
   final bool isFavorite;
   final bool isCheapest;
 
+  /// Optional price tier for accessibility icon indicator.
+  /// When provided, a small arrow icon is shown next to the price
+  /// so colorblind users can distinguish cheap/average/expensive.
+  final PriceTier? priceTier;
+
   const StationCard({
     super.key,
     required this.station,
@@ -22,6 +28,7 @@ class StationCard extends StatelessWidget {
     this.onFavoriteTap,
     this.isFavorite = false,
     this.isCheapest = false,
+    this.priceTier,
   });
 
   /// True if the station has a real brand name (not empty, not generic "Station")
@@ -153,16 +160,32 @@ class StationCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  RichText(
-                    text: PriceFormatter.priceTextSpan(
-                      price,
-                      baseStyle: theme.textTheme.titleLarge!.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: station.isOpen
-                            ? FuelColors.forType(selectedFuelType)
-                            : theme.colorScheme.onSurfaceVariant,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (priceTier != null && priceTier != PriceTier.unknown)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 2),
+                          child: Icon(
+                            iconForPriceTier(priceTier!),
+                            size: 16,
+                            color: station.isOpen
+                                ? FuelColors.forType(selectedFuelType)
+                                : theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      RichText(
+                        text: PriceFormatter.priceTextSpan(
+                          price,
+                          baseStyle: theme.textTheme.titleLarge!.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: station.isOpen
+                                ? FuelColors.forType(selectedFuelType)
+                                : theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                   if (isCheapest)
                     Container(
