@@ -10,7 +10,7 @@ abstract class PriceAlert with _$PriceAlert {
     required String id,
     required String stationId,
     required String stationName,
-    required FuelType fuelType,
+    @FuelTypeJsonConverter() required FuelType fuelType,
     required double targetPrice,
     @Default(true) bool isActive,
     DateTime? lastTriggeredAt,

@@ -33,7 +33,7 @@ abstract class UserProfile with _$UserProfile {
   const factory UserProfile({
     required String id,
     required String name,
-    @Default(FuelType.e10) FuelType preferredFuelType,
+    @FuelTypeJsonConverter() @Default(FuelType.e10) FuelType preferredFuelType,
     @Default(10.0) double defaultSearchRadius,
     @Default(LandingScreen.search) LandingScreen landingScreen,
     @Default([]) List<String> favoriteStationIds,

@@ -259,11 +259,11 @@ Future<void> _refreshPricesAndCheckAlerts() async {
 
         double? currentPrice;
         switch (alert.fuelType) {
-          case FuelType.e5:
+          case FuelTypeE5():
             currentPrice = stationPrices.getDouble(TankerkoenigFields.e5);
-          case FuelType.e10:
+          case FuelTypeE10():
             currentPrice = stationPrices.getDouble(TankerkoenigFields.e10);
-          case FuelType.diesel:
+          case FuelTypeDiesel():
             currentPrice = stationPrices.getDouble(TankerkoenigFields.diesel);
           default:
             continue;

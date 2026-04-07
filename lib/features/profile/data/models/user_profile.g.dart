@@ -9,9 +9,11 @@ part of 'user_profile.dart';
 _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
   id: json['id'] as String,
   name: json['name'] as String,
-  preferredFuelType:
-      $enumDecodeNullable(_$FuelTypeEnumMap, json['preferredFuelType']) ??
-      FuelType.e10,
+  preferredFuelType: json['preferredFuelType'] == null
+      ? FuelType.e10
+      : const FuelTypeJsonConverter().fromJson(
+          json['preferredFuelType'] as String,
+        ),
   defaultSearchRadius:
       (json['defaultSearchRadius'] as num?)?.toDouble() ?? 10.0,
   landingScreen:
@@ -37,7 +39,9 @@ Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
-      'preferredFuelType': _$FuelTypeEnumMap[instance.preferredFuelType]!,
+      'preferredFuelType': const FuelTypeJsonConverter().toJson(
+        instance.preferredFuelType,
+      ),
       'defaultSearchRadius': instance.defaultSearchRadius,
       'landingScreen': _$LandingScreenEnumMap[instance.landingScreen]!,
       'favoriteStationIds': instance.favoriteStationIds,
@@ -51,20 +55,6 @@ Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
       'showElectric': instance.showElectric,
       'ratingMode': instance.ratingMode,
     };
-
-const _$FuelTypeEnumMap = {
-  FuelType.e5: 'e5',
-  FuelType.e10: 'e10',
-  FuelType.e98: 'e98',
-  FuelType.diesel: 'diesel',
-  FuelType.dieselPremium: 'dieselPremium',
-  FuelType.e85: 'e85',
-  FuelType.lpg: 'lpg',
-  FuelType.cng: 'cng',
-  FuelType.hydrogen: 'hydrogen',
-  FuelType.electric: 'electric',
-  FuelType.all: 'all',
-};
 
 const _$LandingScreenEnumMap = {
   LandingScreen.search: 'search',

@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
@@ -140,6 +143,154 @@ void main() {
         expect(types, isNotEmpty,
             reason: 'Country $code should have at least one fuel type');
       }
+    });
+  });
+
+  group('Sealed class properties', () {
+    test('each fuel type has an icon', () {
+      for (final type in FuelType.values) {
+        expect(type.icon, isA<IconData>(),
+            reason: '${type.name} should have an icon');
+      }
+    });
+
+    test('each fuel type has a category', () {
+      for (final type in FuelType.values) {
+        expect(type.category, isA<FuelCategory>(),
+            reason: '${type.name} should have a category');
+      }
+    });
+
+    test('conventional fuel types are classified correctly', () {
+      expect(FuelType.e5.isConventional, isTrue);
+      expect(FuelType.e10.isConventional, isTrue);
+      expect(FuelType.e98.isConventional, isTrue);
+      expect(FuelType.diesel.isConventional, isTrue);
+      expect(FuelType.dieselPremium.isConventional, isTrue);
+    });
+
+    test('alternative fuel types are classified correctly', () {
+      expect(FuelType.e85.isAlternative, isTrue);
+      expect(FuelType.lpg.isAlternative, isTrue);
+      expect(FuelType.cng.isAlternative, isTrue);
+      expect(FuelType.hydrogen.isAlternative, isTrue);
+      expect(FuelType.electric.isAlternative, isTrue);
+    });
+
+    test('meta fuel types are classified correctly', () {
+      expect(FuelType.all.category, FuelCategory.meta);
+      expect(FuelType.all.isConventional, isFalse);
+      expect(FuelType.all.isAlternative, isFalse);
+    });
+
+    test('each fuel type has a unit', () {
+      expect(FuelType.e5.unit, 'EUR/L');
+      expect(FuelType.diesel.unit, 'EUR/L');
+      expect(FuelType.lpg.unit, 'EUR/L');
+      expect(FuelType.cng.unit, 'EUR/kg');
+      expect(FuelType.hydrogen.unit, 'EUR/kg');
+      expect(FuelType.electric.unit, 'EUR/kWh');
+      expect(FuelType.all.unit, isEmpty);
+    });
+
+    test('sealed class enables exhaustive pattern matching', () {
+      // Verify all subtypes are distinct and pattern-matchable
+      for (final type in FuelType.values) {
+        final matched = switch (type) {
+          FuelTypeE5() => 'e5',
+          FuelTypeE10() => 'e10',
+          FuelTypeE98() => 'e98',
+          FuelTypeDiesel() => 'diesel',
+          FuelTypeDieselPremium() => 'dieselPremium',
+          FuelTypeE85() => 'e85',
+          FuelTypeLpg() => 'lpg',
+          FuelTypeCng() => 'cng',
+          FuelTypeHydrogen() => 'hydrogen',
+          FuelTypeElectric() => 'electric',
+          FuelTypeAll() => 'all',
+        };
+        expect(matched, isNotEmpty,
+            reason: '${type.name} should be pattern-matchable');
+      }
+    });
+
+    test('values list contains all 11 fuel types', () {
+      expect(FuelType.values.length, 11);
+    });
+
+    test('identity equality works correctly', () {
+      expect(FuelType.e5 == FuelType.e5, isTrue);
+      expect(FuelType.e5 == FuelType.e10, isFalse);
+      expect(FuelType.fromString('e5') == FuelType.e5, isTrue);
+      expect(identical(FuelType.fromString('e5'), FuelType.e5), isTrue);
+    });
+
+    test('toString returns readable representation', () {
+      expect(FuelType.e5.toString(), 'FuelType.e5');
+      expect(FuelType.diesel.toString(), 'FuelType.diesel');
+      expect(FuelType.dieselPremium.toString(), 'FuelType.diesel_premium');
+    });
+  });
+
+  group('FuelTypeJsonConverter', () {
+    const converter = FuelTypeJsonConverter();
+
+    test('toJson returns apiValue', () {
+      expect(converter.toJson(FuelType.e5), 'e5');
+      expect(converter.toJson(FuelType.diesel), 'diesel');
+      expect(converter.toJson(FuelType.dieselPremium), 'diesel_premium');
+      expect(converter.toJson(FuelType.lpg), 'lpg');
+      expect(converter.toJson(FuelType.cng), 'cng');
+      expect(converter.toJson(FuelType.hydrogen), 'hydrogen');
+    });
+
+    test('fromJson parses apiValue strings', () {
+      expect(converter.fromJson('e5'), FuelType.e5);
+      expect(converter.fromJson('diesel'), FuelType.diesel);
+      expect(converter.fromJson('diesel_premium'), FuelType.dieselPremium);
+      expect(converter.fromJson('lpg'), FuelType.lpg);
+    });
+
+    test('fromJson handles legacy camelCase names', () {
+      expect(converter.fromJson('dieselPremium'), FuelType.dieselPremium);
+    });
+
+    test('roundtrips through JSON', () {
+      for (final type in FuelType.values) {
+        final json = converter.toJson(type);
+        final parsed = converter.fromJson(json);
+        expect(parsed, type,
+            reason: '${type.name} should roundtrip through JSON converter');
+      }
+    });
+
+    test('works with json encode/decode', () {
+      final map = {'fuelType': converter.toJson(FuelType.cng)};
+      final encoded = jsonEncode(map);
+      final decoded = jsonDecode(encoded) as Map<String, dynamic>;
+      expect(converter.fromJson(decoded['fuelType'] as String), FuelType.cng);
+    });
+  });
+
+  group('Backward compatibility', () {
+    test('fromString accepts legacy enum names', () {
+      // The old json_serializable generated code used enum names (camelCase)
+      expect(FuelType.fromString('dieselPremium'), FuelType.dieselPremium);
+    });
+
+    test('static const instances are accessible like enum values', () {
+      // Verify the API surface matches the old enum
+      expect(FuelType.e5, isNotNull);
+      expect(FuelType.e10, isNotNull);
+      expect(FuelType.e98, isNotNull);
+      expect(FuelType.diesel, isNotNull);
+      expect(FuelType.dieselPremium, isNotNull);
+      expect(FuelType.e85, isNotNull);
+      expect(FuelType.lpg, isNotNull);
+      expect(FuelType.cng, isNotNull);
+      expect(FuelType.hydrogen, isNotNull);
+      expect(FuelType.electric, isNotNull);
+      expect(FuelType.all, isNotNull);
     });
   });
 }

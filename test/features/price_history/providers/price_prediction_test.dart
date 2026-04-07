@@ -84,28 +84,17 @@ PricePrediction? _computePrediction(List<PriceRecord> history, FuelType fuelType
 }
 
 double? _priceForFuelType(PriceRecord record, FuelType fuelType) {
-  switch (fuelType) {
-    case FuelType.e5:
-      return record.e5;
-    case FuelType.e10:
-      return record.e10;
-    case FuelType.e98:
-      return record.e98;
-    case FuelType.diesel:
-      return record.diesel;
-    case FuelType.dieselPremium:
-      return record.dieselPremium;
-    case FuelType.e85:
-      return record.e85;
-    case FuelType.lpg:
-      return record.lpg;
-    case FuelType.cng:
-      return record.cng;
-    case FuelType.hydrogen:
-    case FuelType.electric:
-    case FuelType.all:
-      return null;
-  }
+  return switch (fuelType) {
+    FuelTypeE5() => record.e5,
+    FuelTypeE10() => record.e10,
+    FuelTypeE98() => record.e98,
+    FuelTypeDiesel() => record.diesel,
+    FuelTypeDieselPremium() => record.dieselPremium,
+    FuelTypeE85() => record.e85,
+    FuelTypeLpg() => record.lpg,
+    FuelTypeCng() => record.cng,
+    FuelTypeHydrogen() || FuelTypeElectric() || FuelTypeAll() => null,
+  };
 }
 
 String _formatHourRange(int hour) {
