@@ -43,11 +43,11 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 32),
 
           // TankSync
-          _FoldableSection(
+          const _FoldableSection(
             icon: Icons.cloud_outlined,
             title: 'TankSync',
             initiallyExpanded: true,
-            child: const TankSyncSection(),
+            child: TankSyncSection(),
           ),
           const SizedBox(height: 8),
 

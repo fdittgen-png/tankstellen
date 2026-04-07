@@ -65,13 +65,13 @@ class SwipeableStationCard extends ConsumerWidget {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 24),
         color: Colors.orange.shade700,
-        child: Row(
+        child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Hide',
+            Text('Hide',
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            const SizedBox(width: 8),
-            const Icon(Icons.visibility_off, color: Colors.white, size: 20),
+            SizedBox(width: 8),
+            Icon(Icons.visibility_off, color: Colors.white, size: 20),
           ],
         ),
       ),

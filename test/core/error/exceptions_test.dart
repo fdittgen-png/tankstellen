@@ -93,9 +93,9 @@ void main() {
     });
 
     test('toString with errors lists each error', () {
-      final e = ServiceChainExhaustedException(errors: [
-        const ApiException(message: 'down', statusCode: 500),
-        const CacheException(message: 'empty'),
+      const e = ServiceChainExhaustedException(errors: [
+        ApiException(message: 'down', statusCode: 500),
+        CacheException(message: 'empty'),
       ]);
       final str = e.toString();
       expect(str, startsWith('All services failed:'));

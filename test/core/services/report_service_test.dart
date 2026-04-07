@@ -12,7 +12,7 @@ void main() {
       test('succeeds with valid API response', () async {
         final dio = Dio();
         dio.httpClientAdapter = _MockAdapter([
-          _MockResponse(200, {'ok': true, 'message': 'Report accepted'}),
+          const _MockResponse(200, {'ok': true, 'message': 'Report accepted'}),
         ]);
 
         final service = ReportService.withDio(dio);
@@ -30,7 +30,7 @@ void main() {
       test('succeeds without correction for status reports', () async {
         final dio = Dio();
         dio.httpClientAdapter = _MockAdapter([
-          _MockResponse(200, {'ok': true}),
+          const _MockResponse(200, {'ok': true}),
         ]);
 
         final service = ReportService.withDio(dio);
@@ -76,7 +76,7 @@ void main() {
       test('throws ApiException on network error', () async {
         final dio = Dio();
         dio.httpClientAdapter = _MockAdapter([
-          _MockResponse(500, 'Internal Server Error'),
+          const _MockResponse(500, 'Internal Server Error'),
         ]);
 
         final service = ReportService.withDio(dio);
@@ -118,7 +118,7 @@ void main() {
       test('handles non-map response body gracefully', () async {
         final dio = Dio();
         dio.httpClientAdapter = _MockAdapter([
-          _MockResponse(200, 'OK'),
+          const _MockResponse(200, 'OK'),
         ]);
 
         final service = ReportService.withDio(dio);

@@ -4,7 +4,7 @@ import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
 void main() {
-  final station = Station(
+  const station = Station(
     id: '1',
     name: 'Test Station',
     brand: 'Shell',
@@ -86,7 +86,7 @@ void main() {
     });
 
     test('returns null for missing price', () {
-      final s = Station(
+      const s = Station(
         id: '2',
         name: 'Empty',
         brand: '',

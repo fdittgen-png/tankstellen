@@ -15,12 +15,12 @@ void main() {
         (tester) async {
       final test = standardTestOverrides();
 
-      final emptyResult = RouteSearchResult(
+      const emptyResult = RouteSearchResult(
         route: RouteInfo(
-          geometry: [const LatLng(48.0, 2.0), const LatLng(49.0, 3.0)],
+          geometry: [LatLng(48.0, 2.0), LatLng(49.0, 3.0)],
           distanceKm: 100,
           durationMinutes: 60,
-          samplePoints: [const LatLng(48.5, 2.5)],
+          samplePoints: [LatLng(48.5, 2.5)],
         ),
         stations: [],
       );

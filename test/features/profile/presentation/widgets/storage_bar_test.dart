@@ -13,8 +13,8 @@ void main() {
         tester,
         StorageBar(
           segments: [
-            StorageSegment('Settings', 500, Colors.blue),
-            StorageSegment('Cache', 1500, Colors.red),
+            const StorageSegment('Settings', 500, Colors.blue),
+            const StorageSegment('Cache', 1500, Colors.red),
           ],
           totalBytes: 2000,
           theme: testTheme,
@@ -30,7 +30,7 @@ void main() {
         tester,
         StorageBar(
           segments: [
-            StorageSegment('Settings', 0, Colors.blue),
+            const StorageSegment('Settings', 0, Colors.blue),
           ],
           totalBytes: 0,
           theme: testTheme,
@@ -45,7 +45,7 @@ void main() {
     testWidgets('renders label, detail, and formatted bytes', (tester) async {
       await pumpApp(
         tester,
-        StorageDetailRow(
+        const StorageDetailRow(
           label: 'Cache',
           detail: '12 entries',
           bytes: 2048,

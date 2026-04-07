@@ -31,11 +31,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: overrides.cast(),
-          child: MaterialApp(
+          child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            locale: const Locale('en'),
-            home: const DataTransparencyScreen(),
+            locale: Locale('en'),
+            home: DataTransparencyScreen(),
           ),
         ),
       );

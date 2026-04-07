@@ -12,7 +12,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        StationCard(
+        const StationCard(
           station: testStation,
           selectedFuelType: FuelType.e10,
         ),
@@ -45,7 +45,7 @@ void main() {
     testWidgets('StationCard favorite button has tooltip', (tester) async {
       await pumpApp(
         tester,
-        StationCard(
+        const StationCard(
           station: testStation,
           selectedFuelType: FuelType.e10,
           isFavorite: false,
@@ -59,7 +59,7 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        StationCard(
+        const StationCard(
           station: testStation,
           selectedFuelType: FuelType.e10,
           isFavorite: true,

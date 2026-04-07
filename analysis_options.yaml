@@ -14,8 +14,8 @@ analyzer:
     # freezed uses @JsonKey on constructor parameters, which the analyzer
     # flags as invalid. This is a known false positive with freezed.
     invalid_annotation_target: ignore
-    # Gradually adopt const constructors — info only, not blocking
-    prefer_const_constructors: info
+    # Enforce const constructors — all violations must be fixed
+    prefer_const_constructors: error
     prefer_const_declarations: info
     prefer_const_literals_to_create_immutables: info
     # Phase in at info so existing code isn't a wall of red; tighten once clean.

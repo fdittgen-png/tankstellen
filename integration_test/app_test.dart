@@ -13,8 +13,8 @@ void main() {
     await HiveStorage.init();
 
     await tester.pumpWidget(
-      ProviderScope(
-        child: const TankstellenApp(),
+      const ProviderScope(
+        child: TankstellenApp(),
       ),
     );
     await tester.pumpAndSettle(const Duration(seconds: 3));
@@ -28,8 +28,8 @@ void main() {
     await HiveStorage.init();
 
     await tester.pumpWidget(
-      ProviderScope(
-        child: const TankstellenApp(),
+      const ProviderScope(
+        child: TankstellenApp(),
       ),
     );
     await tester.pumpAndSettle(const Duration(seconds: 3));
@@ -48,8 +48,8 @@ void main() {
     await storage.skipSetup();
 
     await tester.pumpWidget(
-      ProviderScope(
-        child: const TankstellenApp(),
+      const ProviderScope(
+        child: TankstellenApp(),
       ),
     );
     await tester.pumpAndSettle(const Duration(seconds: 3));
@@ -79,8 +79,8 @@ void main() {
     await storage.skipSetup();
 
     await tester.pumpWidget(
-      ProviderScope(
-        child: const TankstellenApp(),
+      const ProviderScope(
+        child: TankstellenApp(),
       ),
     );
     await tester.pumpAndSettle(const Duration(seconds: 3));
@@ -111,8 +111,8 @@ void main() {
     await HiveStorage.init();
 
     await tester.pumpWidget(
-      ProviderScope(
-        child: const TankstellenApp(),
+      const ProviderScope(
+        child: TankstellenApp(),
       ),
     );
     await tester.pumpAndSettle(const Duration(seconds: 3));

@@ -274,8 +274,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     // Route mode — RouteResultsView returns slivers, wrap in CustomScrollView
     if (searchMode == SearchMode.route) {
-      return CustomScrollView(
-        slivers: [const RouteResultsView()],
+      return const CustomScrollView(
+        slivers: [RouteResultsView()],
       );
     }
 

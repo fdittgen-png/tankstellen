@@ -31,17 +31,17 @@ void main() {
     });
 
     test('equality works for identical data', () {
-      final a = RouteInfo(
-        geometry: const [LatLng(48.0, 2.0), LatLng(50.0, 8.0)],
+      const a = RouteInfo(
+        geometry: [LatLng(48.0, 2.0), LatLng(50.0, 8.0)],
         distanceKm: 100.0,
         durationMinutes: 60.0,
-        samplePoints: const [LatLng(48.0, 2.0), LatLng(50.0, 8.0)],
+        samplePoints: [LatLng(48.0, 2.0), LatLng(50.0, 8.0)],
       );
-      final b = RouteInfo(
-        geometry: const [LatLng(48.0, 2.0), LatLng(50.0, 8.0)],
+      const b = RouteInfo(
+        geometry: [LatLng(48.0, 2.0), LatLng(50.0, 8.0)],
         distanceKm: 100.0,
         durationMinutes: 60.0,
-        samplePoints: const [LatLng(48.0, 2.0), LatLng(50.0, 8.0)],
+        samplePoints: [LatLng(48.0, 2.0), LatLng(50.0, 8.0)],
       );
 
       expect(a, equals(b));
@@ -49,17 +49,17 @@ void main() {
     });
 
     test('inequality when data differs', () {
-      final a = RouteInfo(
-        geometry: const [LatLng(48.0, 2.0)],
+      const a = RouteInfo(
+        geometry: [LatLng(48.0, 2.0)],
         distanceKm: 100.0,
         durationMinutes: 60.0,
-        samplePoints: const [],
+        samplePoints: [],
       );
-      final b = RouteInfo(
-        geometry: const [LatLng(48.0, 2.0)],
+      const b = RouteInfo(
+        geometry: [LatLng(48.0, 2.0)],
         distanceKm: 200.0,
         durationMinutes: 60.0,
-        samplePoints: const [],
+        samplePoints: [],
       );
 
       expect(a, isNot(equals(b)));

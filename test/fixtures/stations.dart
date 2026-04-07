@@ -3,7 +3,7 @@ import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
 /// A basic station with all fields filled.
-final testStation = Station(
+const testStation = Station(
   id: '51d4b477-a095-1aa0-e100-80009459e03a',
   name: 'Star Tankstelle',
   brand: 'STAR',
@@ -23,7 +23,7 @@ final testStation = Station(
 
 /// Three stations with different prices, useful for sorting tests.
 final testStationList = <Station>[
-  Station(
+  const Station(
     id: 'station-cheap',
     name: 'Günstig Tanken',
     brand: 'JET',
@@ -39,7 +39,7 @@ final testStationList = <Station>[
     diesel: 1.599,
     isOpen: true,
   ),
-  Station(
+  const Station(
     id: 'station-mid',
     name: 'Mittel Tankstelle',
     brand: 'ARAL',
@@ -55,7 +55,7 @@ final testStationList = <Station>[
     diesel: 1.659,
     isOpen: true,
   ),
-  Station(
+  const Station(
     id: 'station-expensive',
     name: 'Premium Fuel',
     brand: 'SHELL',
@@ -74,7 +74,7 @@ final testStationList = <Station>[
 ];
 
 /// A StationDetail wrapping testStation.
-final testStationDetail = StationDetail(
+const testStationDetail = StationDetail(
   station: testStation,
   openingTimes: [
     OpeningTime(text: 'Mo-Fr', start: '06:00', end: '22:00'),

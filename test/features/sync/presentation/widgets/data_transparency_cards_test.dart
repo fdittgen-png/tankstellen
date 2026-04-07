@@ -19,7 +19,7 @@ void main() {
 
   group('AccountInfoCard', () {
     testWidgets('renders user ID and server', (tester) async {
-      final config = SyncConfig(
+      const config = SyncConfig(
         enabled: true,
         userId: 'test-uuid-123',
         supabaseUrl: 'https://test.supabase.co',
@@ -29,7 +29,7 @@ void main() {
 
       await pumpApp(
         tester,
-        AccountInfoCard(syncConfig: config),
+        const AccountInfoCard(syncConfig: config),
       );
 
       expect(find.text('Account'), findsOneWidget);

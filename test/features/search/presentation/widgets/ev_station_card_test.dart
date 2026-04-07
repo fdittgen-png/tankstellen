@@ -7,7 +7,7 @@ import 'package:tankstellen/features/search/presentation/widgets/ev_station_card
 import '../../../../helpers/pump_app.dart';
 
 void main() {
-  final testStation = ChargingStation(
+  const testStation = ChargingStation(
     id: 'ocm-123',
     name: 'Test Charger',
     operator: 'Ionity',
@@ -17,7 +17,7 @@ void main() {
     address: 'Hauptstr. 10',
     postCode: '10115',
     place: 'Berlin',
-    connectors: const [
+    connectors: [
       Connector(type: 'CCS Type 2', powerKW: 350, quantity: 4, currentType: 'DC'),
       Connector(type: 'Type 2', powerKW: 22, quantity: 2, currentType: 'AC'),
     ],
@@ -30,7 +30,7 @@ void main() {
     testWidgets('renders operator name', (tester) async {
       await pumpApp(
         tester,
-        EVStationCard(result: EVStationResult(testStation)),
+        const EVStationCard(result: EVStationResult(testStation)),
       );
 
       expect(find.text('Ionity'), findsOneWidget);
@@ -39,7 +39,7 @@ void main() {
     testWidgets('renders address', (tester) async {
       await pumpApp(
         tester,
-        EVStationCard(result: EVStationResult(testStation)),
+        const EVStationCard(result: EVStationResult(testStation)),
       );
 
       expect(find.textContaining('Hauptstr'), findsOneWidget);
@@ -48,7 +48,7 @@ void main() {
     testWidgets('renders max power in kW', (tester) async {
       await pumpApp(
         tester,
-        EVStationCard(result: EVStationResult(testStation)),
+        const EVStationCard(result: EVStationResult(testStation)),
       );
 
       expect(find.text('350 kW'), findsOneWidget);
@@ -57,7 +57,7 @@ void main() {
     testWidgets('renders connector type chips', (tester) async {
       await pumpApp(
         tester,
-        EVStationCard(result: EVStationResult(testStation)),
+        const EVStationCard(result: EVStationResult(testStation)),
       );
 
       expect(find.text('CCS Type 2'), findsOneWidget);
@@ -67,7 +67,7 @@ void main() {
     testWidgets('renders usage cost', (tester) async {
       await pumpApp(
         tester,
-        EVStationCard(result: EVStationResult(testStation)),
+        const EVStationCard(result: EVStationResult(testStation)),
       );
 
       expect(find.textContaining('0.39'), findsOneWidget);
@@ -78,7 +78,7 @@ void main() {
       await pumpApp(
         tester,
         EVStationCard(
-          result: EVStationResult(testStation),
+          result: const EVStationResult(testStation),
           onTap: () => tapped = true,
         ),
       );
@@ -90,7 +90,7 @@ void main() {
     testWidgets('renders EV station icon', (tester) async {
       await pumpApp(
         tester,
-        EVStationCard(result: EVStationResult(testStation)),
+        const EVStationCard(result: EVStationResult(testStation)),
       );
 
       expect(find.byIcon(Icons.ev_station), findsOneWidget);

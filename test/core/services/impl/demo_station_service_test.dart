@@ -10,7 +10,7 @@ void main() {
     service = DemoStationService(countryCode: 'DE');
   });
 
-  final defaultParams = SearchParams(
+  const defaultParams = SearchParams(
     lat: 52.52,
     lng: 13.405,
     radiusKm: 10.0,
@@ -51,7 +51,7 @@ void main() {
     });
 
     test('sorts by price when requested', () async {
-      final params = SearchParams(
+      const params = SearchParams(
         lat: 52.52,
         lng: 13.405,
         radiusKm: 10.0,
@@ -64,7 +64,7 @@ void main() {
     });
 
     test('sorts by distance when requested', () async {
-      final params = SearchParams(lat: 52.52, lng: 13.405, radiusKm: 10.0, sortBy: SortBy.distance);
+      const params = SearchParams(lat: 52.52, lng: 13.405, radiusKm: 10.0, sortBy: SortBy.distance);
       final result = await service.searchStations(params);
       for (int i = 0; i < result.data.length - 1; i++) {
         expect(result.data[i].dist, lessThanOrEqualTo(result.data[i + 1].dist));
@@ -89,7 +89,7 @@ void main() {
     });
 
     test('uses postal code from params', () async {
-      final params = SearchParams(
+      const params = SearchParams(
         lat: 52.52,
         lng: 13.405,
         radiusKm: 10.0,
@@ -102,7 +102,7 @@ void main() {
     });
 
     test('uses location name from params', () async {
-      final params = SearchParams(
+      const params = SearchParams(
         lat: 52.52,
         lng: 13.405,
         radiusKm: 10.0,

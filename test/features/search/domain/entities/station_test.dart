@@ -59,7 +59,7 @@ void main() {
     });
 
     test('FuelType.all falls back to E5 when E10 is null', () {
-      final station = Station(
+      const station = Station(
         id: 'test',
         name: 'Test',
         brand: 'Test',
@@ -77,7 +77,7 @@ void main() {
     });
 
     test('FuelType.all falls back to diesel when E10 and E5 are null', () {
-      final station = Station(
+      const station = Station(
         id: 'test',
         name: 'Test',
         brand: 'Test',
@@ -95,7 +95,7 @@ void main() {
     });
 
     test('FuelType.all returns null when no prices available', () {
-      final station = Station(
+      const station = Station(
         id: 'test',
         name: 'Test',
         brand: 'Test',
@@ -110,7 +110,7 @@ void main() {
     });
 
     test('handles station with all prices set', () {
-      final station = Station(
+      const station = Station(
         id: 'test',
         name: 'Full Station',
         brand: 'FULL',
@@ -147,7 +147,7 @@ void main() {
     });
 
     test('returns street when brand is empty', () {
-      final station = Station(
+      const station = Station(
         id: 'test',
         name: 'Name',
         brand: '',
@@ -162,7 +162,7 @@ void main() {
     });
 
     test('returns street when brand is generic "Station"', () {
-      final station = Station(
+      const station = Station(
         id: 'test',
         name: 'Name',
         brand: 'Station',
@@ -177,7 +177,7 @@ void main() {
     });
 
     test('returns name when brand and street are empty', () {
-      final station = Station(
+      const station = Station(
         id: 'test',
         name: 'My Station',
         brand: '',
@@ -192,7 +192,7 @@ void main() {
     });
 
     test('returns place as last fallback', () {
-      final station = Station(
+      const station = Station(
         id: 'test',
         name: '',
         brand: '',
@@ -213,7 +213,7 @@ void main() {
     });
 
     test('returns only street when no house number', () {
-      final station = Station(
+      const station = Station(
         id: 'test',
         name: 'Test',
         brand: 'Test',
@@ -236,7 +236,7 @@ void main() {
 
   group('Station null prices', () {
     test('all price fields default to null', () {
-      final station = Station(
+      const station = Station(
         id: 'test',
         name: 'Test',
         brand: 'Test',
@@ -261,7 +261,7 @@ void main() {
 
   group('Station equality', () {
     test('stations with same data are equal (freezed)', () {
-      final station1 = Station(
+      const station1 = Station(
         id: 'same-id',
         name: 'Test',
         brand: 'Brand',
@@ -272,7 +272,7 @@ void main() {
         lng: 13.0,
         isOpen: true,
       );
-      final station2 = Station(
+      const station2 = Station(
         id: 'same-id',
         name: 'Test',
         brand: 'Brand',

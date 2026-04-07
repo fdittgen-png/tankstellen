@@ -135,7 +135,7 @@ void main() {
       testWidgets('renders without errors in RTL', (tester) async {
         await pumpRtlApp(
           tester,
-          StationCard(
+          const StationCard(
             station: testStation,
             selectedFuelType: FuelType.e10,
           ),
@@ -149,7 +149,7 @@ void main() {
       testWidgets('brand text is present in RTL', (tester) async {
         await pumpRtlApp(
           tester,
-          StationCard(
+          const StationCard(
             station: testStation,
             selectedFuelType: FuelType.e10,
           ),
@@ -203,7 +203,7 @@ void main() {
       testWidgets('cheapest badge renders in RTL', (tester) async {
         await pumpRtlApp(
           tester,
-          StationCard(
+          const StationCard(
             station: testStation,
             selectedFuelType: FuelType.e10,
             isCheapest: true,
@@ -216,7 +216,7 @@ void main() {
       testWidgets('semantic label is present in RTL', (tester) async {
         await pumpRtlApp(
           tester,
-          StationCard(
+          const StationCard(
             station: testStation,
             selectedFuelType: FuelType.e10,
           ),
