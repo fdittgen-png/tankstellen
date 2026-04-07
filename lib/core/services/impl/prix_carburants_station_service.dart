@@ -11,22 +11,23 @@ import '../station_service.dart';
 /// Real French fuel price data from Prix-Carburants (gouv.fr).
 /// Free, no API key, no registration. Updated every 10 minutes.
 ///
-/// Strategy: query by postal code first (most reliable), then expand
-/// to nearby postal codes if needed, then fallback to geo query.
+/// Strategy: when a postal code is provided, query the native CP filter
+/// first (100% accurate), then fall back to geo. For GPS searches without
+/// a postal code, query by geo (within_distance) directly.
 class PrixCarburantsStationService with StationServiceHelpers implements StationService {
   final OsmBrandEnricher? _enricher;
+  final Dio _dio;
 
-  PrixCarburantsStationService({OsmBrandEnricher? enricher})
-      : _enricher = enricher;
+  PrixCarburantsStationService({OsmBrandEnricher? enricher, Dio? dio})
+      : _enricher = enricher,
+        _dio = dio ?? DioFactory.create(
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 15),
+        );
 
   static const _baseUrl =
       'https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets'
       '/prix-des-carburants-en-france-flux-instantane-v2/records';
-
-  final Dio _dio = DioFactory.create(
-    connectTimeout: const Duration(seconds: 15),
-    receiveTimeout: const Duration(seconds: 15),
-  );
 
   @override
   Future<ServiceResult<List<Station>>> searchStations(
@@ -35,12 +36,20 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
   }) async {
     List<Map<String, dynamic>> allResults = [];
 
-    // Primary strategy: geo query with within_distance (most accurate)
-    allResults = await _queryByGeo(params.lat, params.lng, params.radiusKm, cancelToken: cancelToken);
+    final hasPostalCode = params.postalCode != null && params.postalCode!.isNotEmpty;
 
-    // Fallback: if geo returns nothing, try by postal code from SearchParams
-    if (allResults.isEmpty && params.postalCode != null && params.postalCode!.isNotEmpty) {
+    if (hasPostalCode) {
+      // Postal code search: use native CP filter first (100% accurate),
+      // fall back to geo only if CP returns empty (e.g., invalid code).
+      // This avoids relying on Nominatim geocoding which returns inaccurate
+      // coordinates for French postal codes (especially Paris arrondissements).
       allResults = await _queryByPostalCode(params.postalCode!, cancelToken: cancelToken);
+      if (allResults.isEmpty) {
+        allResults = await _queryByGeo(params.lat, params.lng, params.radiusKm, cancelToken: cancelToken);
+      }
+    } else {
+      // GPS / coordinate search: geo query is the only option
+      allResults = await _queryByGeo(params.lat, params.lng, params.radiusKm, cancelToken: cancelToken);
     }
 
     // Parse all results into Station objects

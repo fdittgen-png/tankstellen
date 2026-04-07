@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/impl/prix_carburants_station_service.dart';
@@ -583,6 +585,163 @@ void main() {
       expect(station?.brand, 'Auchan');
     });
   });
+
+  group('PrixCarburantsStationService search strategy (#163)', () {
+    /// Helper to build a mock API response with stations in a given postal code.
+    Map<String, dynamic> _makeApiResponse(String cp, int count) {
+      return {
+        'results': List.generate(count, (i) => {
+          'id': '${cp}00$i',
+          'adresse': 'Station $i',
+          'ville': 'Ville-$cp',
+          'cp': cp,
+          'geom': {'lat': 48.85, 'lon': 2.35},
+          'sp95_prix': 1.879,
+          'gazole_prix': 1.659,
+        }),
+      };
+    }
+
+    test('uses postal code query first when postalCode is provided', () async {
+      final adapter = _TrackingMockAdapter();
+      // First request (CP query) returns results
+      adapter.addResponse(_makeApiResponse('75012', 3));
+
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      final params = const SearchParams(
+        lat: 48.84, lng: 2.38, radiusKm: 5.0, postalCode: '75012',
+      );
+      final result = await svc.searchStations(params);
+
+      // Should have made exactly 1 request (CP query), not a geo query
+      expect(adapter.requestCount, 1);
+      expect(adapter.lastRequestUri, contains('cp%3D%2775012%27'));
+      expect(result.data, hasLength(3));
+      expect(result.data.first.postCode, '75012');
+    });
+
+    test('falls back to geo query when postal code returns empty', () async {
+      final adapter = _TrackingMockAdapter();
+      // First request (CP query) returns empty
+      adapter.addResponse({'results': []});
+      // Second request (geo query) returns results
+      adapter.addResponse(_makeApiResponse('75012', 2));
+
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      final params = const SearchParams(
+        lat: 48.84, lng: 2.38, radiusKm: 5.0, postalCode: '75012',
+      );
+      final result = await svc.searchStations(params);
+
+      // Should have made 2 requests: CP (empty) then geo
+      expect(adapter.requestCount, 2);
+      expect(adapter.requestUris[0], contains('cp%3D%2775012%27'));
+      expect(adapter.requestUris[1], contains('within_distance'));
+      expect(result.data, hasLength(2));
+    });
+
+    test('uses geo query directly when no postal code provided', () async {
+      final adapter = _TrackingMockAdapter();
+      // Only geo query
+      adapter.addResponse(_makeApiResponse('75012', 4));
+
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      final params = const SearchParams(
+        lat: 48.84, lng: 2.38, radiusKm: 5.0,
+      );
+      final result = await svc.searchStations(params);
+
+      // Should have made exactly 1 request (geo), never a CP query
+      expect(adapter.requestCount, 1);
+      expect(adapter.lastRequestUri, contains('within_distance'));
+      expect(result.data, hasLength(4));
+    });
+
+    test('does not call geo when postal code query succeeds', () async {
+      final adapter = _TrackingMockAdapter();
+      adapter.addResponse(_makeApiResponse('34120', 5));
+
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      final params = const SearchParams(
+        lat: 43.45, lng: 3.42, radiusKm: 10.0, postalCode: '34120',
+      );
+      final result = await svc.searchStations(params);
+
+      expect(adapter.requestCount, 1);
+      expect(adapter.lastRequestUri, isNot(contains('within_distance')));
+      expect(result.data, hasLength(5));
+    });
+
+    test('empty postal code string is treated as no postal code', () async {
+      final adapter = _TrackingMockAdapter();
+      adapter.addResponse(_makeApiResponse('75001', 2));
+
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      final params = const SearchParams(
+        lat: 48.85, lng: 2.35, radiusKm: 5.0, postalCode: '',
+      );
+      final result = await svc.searchStations(params);
+
+      // Empty postal code -> geo-first path
+      expect(adapter.requestCount, 1);
+      expect(adapter.lastRequestUri, contains('within_distance'));
+      expect(result.data, hasLength(2));
+    });
+  });
+}
+
+/// Mock Dio adapter that tracks requests and returns canned responses.
+class _TrackingMockAdapter implements HttpClientAdapter {
+  final List<Map<String, dynamic>> _responses = [];
+  final List<String> requestUris = [];
+  int _responseIndex = 0;
+
+  int get requestCount => requestUris.length;
+  String get lastRequestUri => requestUris.last;
+
+  void addResponse(Map<String, dynamic> body) {
+    _responses.add(body);
+  }
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<List<int>>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    requestUris.add(options.uri.toString());
+
+    if (_responseIndex >= _responses.length) {
+      throw DioException(
+        requestOptions: options,
+        type: DioExceptionType.unknown,
+        error: 'No more mock responses',
+      );
+    }
+
+    final body = _responses[_responseIndex++];
+    final encoded = jsonEncode(body);
+    return ResponseBody.fromString(
+      encoded,
+      200,
+      headers: {
+        'content-type': ['application/json'],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
 }
 
 /// Testable helper that replicates PrixCarburantsStationService parsing logic.
