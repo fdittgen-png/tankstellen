@@ -112,10 +112,7 @@ class AustraliaStationService with StationServiceHelpers implements StationServi
         fetchedAt: DateTime.now(),
       );
     } on DioException catch (e) {
-      throw ApiException(
-        message: e.message ?? 'FuelCheck API error',
-        statusCode: e.response?.statusCode,
-      );
+      throwApiException(e, defaultMessage: 'FuelCheck API error');
     }
   }
 

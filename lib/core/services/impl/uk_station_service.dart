@@ -99,10 +99,7 @@ class UkStationService with StationServiceHelpers implements StationService {
         fetchedAt: DateTime.now(),
       );
     } on DioException catch (e) {
-      throw ApiException(
-        message: e.message ?? 'UK fuel price API error',
-        statusCode: e.response?.statusCode,
-      );
+      throwApiException(e, defaultMessage: 'UK fuel price API error');
     }
   }
 
