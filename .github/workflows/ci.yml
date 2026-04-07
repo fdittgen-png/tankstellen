@@ -78,7 +78,7 @@ jobs:
               fi
             fi
           fi
-      - run: flutter pub outdated --no-dev-dependencies
+
 
   security-scan:
     runs-on: ubuntu-latest
@@ -95,7 +95,7 @@ jobs:
           scan-args: |-
             --lockfile=pubspec.lock
 
-  license-check:
+  license-audit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -103,26 +103,35 @@ jobs:
         with:
           channel: stable
           cache: true
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
       - run: flutter pub get
-      - name: Check for GPL dependencies
-        run: |
-          FORBIDDEN=""
-          for pkg in $(dart pub deps --no-dev --style=compact 2>/dev/null | tail -n +2 | sed 's/ .*//'); do
-            LICENSE_FILE=$(find ~/.pub-cache/hosted/pub.dev/"$pkg"* -maxdepth 1 -iname "LICENSE*" 2>/dev/null | head -1)
-            if [ -n "$LICENSE_FILE" ]; then
-              if grep -qiE "GNU General Public License|GPL-2|GPL-3|LGPL" "$LICENSE_FILE" 2>/dev/null; then
-                if ! grep -qi "LGPL" "$LICENSE_FILE" 2>/dev/null || grep -qi "GPL-3" "$LICENSE_FILE" 2>/dev/null; then
-                  FORBIDDEN="$FORBIDDEN\n  - $pkg"
-                fi
-              fi
-            fi
-          done
-          if [ -n "$FORBIDDEN" ]; then
-            echo "::error::GPL-licensed dependencies found:$FORBIDDEN"
-            echo "All dependencies must be MIT/BSD/Apache compatible (MIT project)."
-            exit 1
-          fi
-          echo "License check passed — no GPL dependencies found."
+      - name: Audit dependency licenses
+        run: bash scripts/license_audit.sh
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+      - run: flutter pub get
+      - name: Check outdated dependencies and advisories
+        run: bash scripts/pub_outdated_check.sh
 
   build-android:
     runs-on: ubuntu-latest
