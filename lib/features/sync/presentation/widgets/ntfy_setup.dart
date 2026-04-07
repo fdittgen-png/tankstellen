@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/sync/ntfy_service.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// A card widget for the Settings/TankSync section allowing users
 /// to enable ntfy.sh push notifications.
@@ -74,12 +76,7 @@ class _NtfySetupCardState extends ConsumerState<NtfySetupCard> {
     } catch (e) {
       debugPrint('NtfySetupCard: failed to update push_tokens: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to update push notification setting'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBarHelper.showError(context, AppLocalizations.of(context)?.pushUpdateFailed ?? 'Failed to update push notification setting');
       }
     } finally {
       if (mounted) setState(() => _isToggling = false);
@@ -168,9 +165,7 @@ class _NtfySetupCardState extends ConsumerState<NtfySetupCard> {
                     onPressed: () {
                       Clipboard.setData(
                           ClipboardData(text: 'https://ntfy.sh/$_topic'));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Topic URL copied')),
-                      );
+                      SnackBarHelper.show(context, AppLocalizations.of(context)?.topicUrlCopied ?? 'Topic URL copied');
                     },
                   ),
                 ],
@@ -181,20 +176,16 @@ class _NtfySetupCardState extends ConsumerState<NtfySetupCard> {
                     ? null
                     : () async {
                         setState(() => _isSendingTest = true);
-                        final messenger = ScaffoldMessenger.of(context);
                         final success =
                             await _ntfyService.sendTestNotification(_topic!);
                         if (mounted) {
                           setState(() => _isSendingTest = false);
-                          messenger.showSnackBar(
-                            SnackBar(
-                              content: Text(success
-                                  ? 'Test notification sent!'
-                                  : 'Failed to send test notification'),
-                              backgroundColor:
-                                  success ? Colors.green : Colors.red,
-                            ),
-                          );
+                          final l10n = AppLocalizations.of(context);
+                          if (success) {
+                            SnackBarHelper.showSuccess(context, l10n?.testNotificationSent ?? 'Test notification sent!');
+                          } else {
+                            SnackBarHelper.showError(context, l10n?.testNotificationFailed ?? 'Failed to send test notification');
+                          }
                         }
                       },
                 icon: _isSendingTest

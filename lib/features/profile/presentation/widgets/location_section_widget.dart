@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/storage/storage_keys.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../providers/profile_provider.dart';
@@ -192,9 +193,8 @@ class _LocationSectionWidgetState
       await ref.read(userPositionProvider.notifier).updateFromGps();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('GPS error: $e')),
-        );
+        final l10n = AppLocalizations.of(context);
+        SnackBarHelper.showError(context, '${l10n?.gpsError ?? "GPS error"}: $e');
       }
     }
   }

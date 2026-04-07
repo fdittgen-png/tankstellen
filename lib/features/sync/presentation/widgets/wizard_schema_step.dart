@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/sync/schema_verifier.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Schema verification step: shows table status and migration SQL.
 class WizardSchemaStep extends StatelessWidget {
@@ -75,9 +77,7 @@ class WizardSchemaStep extends StatelessWidget {
           FilledButton.icon(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: migrationSql ?? ''));
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('SQL copied to clipboard')),
-              );
+              SnackBarHelper.show(context, AppLocalizations.of(context)?.sqlCopied ?? 'SQL copied to clipboard');
             },
             icon: const Icon(Icons.copy),
             label: const Text('Copy SQL to clipboard'),

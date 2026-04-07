@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-/// Centralized SnackBar utility to eliminate 43+ duplicate
+/// Centralized SnackBar utility to eliminate duplicate
 /// ScaffoldMessenger.of(context).showSnackBar calls.
 ///
 /// Usage:
 /// ```dart
 /// SnackBarHelper.show(context, 'Station added to favorites');
+/// SnackBarHelper.showSuccess(context, 'Report sent');
 /// SnackBarHelper.showWithUndo(context, 'Station hidden', onUndo: () => ...);
 /// SnackBarHelper.showError(context, 'Connection failed');
 /// ```
@@ -20,14 +21,26 @@ class SnackBarHelper {
     );
   }
 
+  /// Show a success snackbar (green background).
+  static void showSuccess(BuildContext context, String message, {Duration duration = const Duration(seconds: 3)}) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        duration: duration,
+      ),
+    );
+  }
+
   /// Show a snackbar with an undo action.
-  static void showWithUndo(BuildContext context, String message, {required VoidCallback onUndo}) {
+  static void showWithUndo(BuildContext context, String message, {required VoidCallback onUndo, String undoLabel = 'Undo'}) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
         duration: const Duration(seconds: 4),
-        action: SnackBarAction(label: 'Undo', onPressed: onUndo),
+        action: SnackBarAction(label: undoLabel, onPressed: onUndo),
       ),
     );
   }

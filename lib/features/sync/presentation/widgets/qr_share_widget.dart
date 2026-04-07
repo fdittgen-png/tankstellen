@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Generates a QR code containing the database credentials for sharing.
 ///
@@ -51,9 +53,7 @@ class QrShareWidget extends ConsumerWidget {
         OutlinedButton.icon(
           onPressed: () {
             Clipboard.setData(ClipboardData(text: qrData));
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Connection data copied')),
-            );
+            SnackBarHelper.show(context, AppLocalizations.of(context)?.connectionDataCopied ?? 'Connection data copied');
           },
           icon: const Icon(Icons.copy, size: 16),
           label: const Text('Copy as text'),

@@ -6,6 +6,7 @@ import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/utils/price_utils.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../domain/entities/fuel_type.dart';
@@ -189,17 +190,14 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
                     onNavigate: () => _openStationInMaps(station),
                     onIgnore: () {
                       ref.read(ignoredStationsProvider.notifier).add(station.id);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('${station.displayName} hidden'),
-                          action: SnackBarAction(
-                            label: 'Undo',
-                            onPressed: () => ref
-                                .read(ignoredStationsProvider.notifier)
-                                .remove(station.id),
-                          ),
-                          duration: const Duration(seconds: 4),
-                        ),
+                      final l10n = AppLocalizations.of(context);
+                      SnackBarHelper.showWithUndo(
+                        context,
+                        l10n?.stationHidden(station.displayName) ?? '${station.displayName} hidden',
+                        undoLabel: l10n?.undo ?? 'Undo',
+                        onUndo: () => ref
+                            .read(ignoredStationsProvider.notifier)
+                            .remove(station.id),
                       );
                     },
                     onTap: () => context.push('/station/${station.id}'),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/profile/providers/profile_provider.dart';
+import '../widgets/snackbar_helper.dart';
 import '../../l10n/app_localizations.dart';
 import 'country_config.dart';
 import 'country_switch_event.dart';
@@ -66,13 +67,7 @@ class _CountrySwitchListenerState extends ConsumerState<CountrySwitchListener> {
     final message = l?.switchedToProfile(profile.name, countryName) ??
         'Switched to profile "${profile.name}" ($countryName)';
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 3),
-      ),
-    );
+    SnackBarHelper.showSuccess(context, message);
     _markDismissed(event.detectedCountryCode);
   }
 

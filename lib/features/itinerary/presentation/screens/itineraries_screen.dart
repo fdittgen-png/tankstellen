@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/swipe_to_delete.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../route_search/domain/entities/route_info.dart';
 import '../../../route_search/providers/route_search_provider.dart';
@@ -56,9 +57,7 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
                     dismissKey: ValueKey(it.id),
                     onDismissed: () {
                       ref.read(itineraryProvider.notifier).delete(it.id);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(AppLocalizations.of(context)?.itineraryDeleted(it.name) ?? '${it.name} deleted')),
-                      );
+                      SnackBarHelper.show(context, AppLocalizations.of(context)?.itineraryDeleted(it.name) ?? '${it.name} deleted');
                     },
                     child: ListTile(
                       leading: const Icon(Icons.route),
@@ -106,9 +105,7 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
     // Navigate to search screen
     context.go('/');
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppLocalizations.of(context)?.loadingRoute(it.name) ?? 'Loading route: ${it.name}')),
-    );
+    SnackBarHelper.show(context, AppLocalizations.of(context)?.loadingRoute(it.name) ?? 'Loading route: ${it.name}');
   }
 
   String _formatDate(DateTime dt) {

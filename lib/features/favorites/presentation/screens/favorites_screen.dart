@@ -11,6 +11,7 @@ import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../alerts/providers/alert_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
@@ -137,17 +138,14 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                         } else {
                           // Remove favorite
                           ref.read(favoritesProvider.notifier).remove(station.id);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('$label removed from favorites'),
-                              action: SnackBarAction(
-                                label: 'Undo',
-                                onPressed: () => ref
-                                    .read(favoritesProvider.notifier)
-                                    .add(station.id, stationData: station),
-                              ),
-                              duration: const Duration(seconds: 4),
-                            ),
+                          final l10nSnack = AppLocalizations.of(context);
+                          SnackBarHelper.showWithUndo(
+                            context,
+                            l10nSnack?.removedFromFavoritesName(label) ?? '$label removed from favorites',
+                            undoLabel: l10nSnack?.undo ?? 'Undo',
+                            onUndo: () => ref
+                                .read(favoritesProvider.notifier)
+                                .add(station.id, stationData: station),
                           );
                           return true;
                         }
@@ -254,9 +252,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             ),
             onDismissed: (_) {
               ref.read(alertProvider.notifier).removeAlert(alert.id);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n?.alertDeleted(alert.stationName) ?? 'Alert "${alert.stationName}" deleted')),
-              );
+              SnackBarHelper.show(context, l10n?.alertDeleted(alert.stationName) ?? 'Alert "${alert.stationName}" deleted');
             },
             child: ListTile(
               leading: Icon(

@@ -8,6 +8,7 @@ import '../../../../core/location/location_service.dart';
 import '../../../../core/services/location_search_provider.dart';
 import '../../../../core/services/location_search_service.dart';
 import '../../../../core/utils/frame_callbacks.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/route_info.dart';
 
@@ -69,9 +70,8 @@ class _RouteInputState extends ConsumerState<RouteInput> {
       setState(() {});
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('GPS error: $e')),
-        );
+        final l10n = AppLocalizations.of(context);
+        SnackBarHelper.showError(context, '${l10n?.gpsError ?? "GPS error"}: $e');
       }
     }
   }
@@ -132,9 +132,7 @@ class _RouteInputState extends ConsumerState<RouteInput> {
 
       if (_startCoords == null || _endCoords == null) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)?.couldNotResolve ?? 'Could not resolve start or destination')),
-          );
+          SnackBarHelper.showError(context, AppLocalizations.of(context)?.couldNotResolve ?? 'Could not resolve start or destination');
         }
         return;
       }
@@ -162,9 +160,7 @@ class _RouteInputState extends ConsumerState<RouteInput> {
       widget.onSearch(waypoints);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        SnackBarHelper.showError(context, '${AppLocalizations.of(context)?.errorUnknown ?? "Error"}: $e');
       }
     } finally {
       if (mounted) setState(() => _isSearching = false);

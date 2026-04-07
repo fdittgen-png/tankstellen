@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/sync/schema_verifier.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
@@ -162,9 +164,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
                 if (mounted) setState(() => _schemaStatus = status);
               },
               onDone: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('TankSync connected!')),
-                );
+                SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.tankSyncConnected ?? 'TankSync connected!');
                 Navigator.pop(context);
               },
             ),
@@ -188,9 +188,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
         setState(() => _mode = _WizardMode.auth);
       } catch (e) {
         debugPrint('QR code parse failed: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid QR code — expected TankSync format')),
-        );
+        SnackBarHelper.showError(context, AppLocalizations.of(context)?.invalidQrCodeTankSync ?? 'Invalid QR code — expected TankSync format');
       }
     }
   }
@@ -236,7 +234,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
       if (schema != null && mounted) {
         final allReady = SchemaVerifier.requiredTables.every((t) => schema[t] == true);
         if (allReady) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('TankSync connected!')));
+          SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.tankSyncConnected ?? 'TankSync connected!');
           Navigator.pop(context);
         } else {
           setState(() {

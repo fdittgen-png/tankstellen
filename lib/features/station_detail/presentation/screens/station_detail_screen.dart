@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/brand_logo.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../alerts/data/models/price_alert.dart';
 import '../../../alerts/presentation/widgets/create_alert_dialog.dart';
@@ -202,9 +203,7 @@ class StationDetailScreen extends ConsumerWidget {
       await ref.read(alertProvider.notifier).addAlert(alert);
       if (context.mounted) {
         final l10n = AppLocalizations.of(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n?.alertCreated ?? 'Price alert created')),
-        );
+        SnackBarHelper.showSuccess(context, l10n?.alertCreated ?? 'Price alert created');
       }
     }
   }

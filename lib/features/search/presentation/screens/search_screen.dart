@@ -11,6 +11,7 @@ import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/frame_callbacks.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../map/presentation/widgets/inline_map.dart';
 import '../../providers/search_provider.dart';
@@ -87,12 +88,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       final consented = await LocationConsentDialog.show(context);
       if (!consented) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context)?.locationDenied ??
-                  'Location permission denied. You can search by postal code.'),
-            ),
-          );
+          SnackBarHelper.show(context, AppLocalizations.of(context)?.locationDenied ??
+              'Location permission denied. You can search by postal code.');
         }
         return;
       }
@@ -111,9 +108,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         );
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('GPS error: $e')),
-          );
+          SnackBarHelper.showError(context, '${AppLocalizations.of(context)?.gpsError ?? "GPS error"}: $e');
         }
       }
     } else {
@@ -241,7 +236,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         UserPositionBar(
           onUpdatePosition: () async {
             final settings = ref.read(settingsStorageProvider);
-            final messenger = ScaffoldMessenger.of(context);
             if (!LocationConsentDialog.hasConsent(settings)) {
               if (!mounted) return;
               final consented = await LocationConsentDialog.show(context);
@@ -256,7 +250,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               }
             } catch (e) {
               if (mounted) {
-                messenger.showSnackBar(SnackBar(content: Text(e.toString())));
+                SnackBarHelper.showError(context, e.toString());
               }
             }
           },
