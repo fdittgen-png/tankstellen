@@ -345,5 +345,12 @@
   "onboardingBack": "Back",
   "onboardingNext": "Next",
   "onboardingSkip": "Skip",
-  "onboardingFinish": "Get started"
+  "onboardingFinish": "Get started",
+
+  "crossBorderNearby": "{country} is nearby",
+  "@crossBorderNearby": {"placeholders": {"country": {"type": "String"}}},
+  "crossBorderDistance": "~{km} km to border",
+  "@crossBorderDistance": {"placeholders": {"km": {"type": "int"}}},
+  "crossBorderAvgPrice": "Avg here: {price} EUR ({count} stations)",
+  "@crossBorderAvgPrice": {"placeholders": {"price": {"type": "String"}, "count": {"type": "int"}}}
 }

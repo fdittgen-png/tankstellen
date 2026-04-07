@@ -345,5 +345,12 @@
   "onboardingBack": "Zurück",
   "onboardingNext": "Weiter",
   "onboardingSkip": "Überspringen",
-  "onboardingFinish": "Los geht's"
+  "onboardingFinish": "Los geht's",
+
+  "crossBorderNearby": "{country} ist in der Nähe",
+  "@crossBorderNearby": {"placeholders": {"country": {"type": "String"}}},
+  "crossBorderDistance": "~{km} km bis zur Grenze",
+  "@crossBorderDistance": {"placeholders": {"km": {"type": "int"}}},
+  "crossBorderAvgPrice": "Ø hier: {price} EUR ({count} Tankstellen)",
+  "@crossBorderAvgPrice": {"placeholders": {"price": {"type": "String"}, "count": {"type": "int"}}}
 }

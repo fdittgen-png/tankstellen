@@ -1005,4 +1005,19 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get onboardingFinish => 'Los geht\'s';
+
+  @override
+  String crossBorderNearby(String country) {
+    return '$country ist in der Nähe';
+  }
+
+  @override
+  String crossBorderDistance(int km) {
+    return '~$km km bis zur Grenze';
+  }
+
+  @override
+  String crossBorderAvgPrice(String price, int count) {
+    return 'Ø hier: $price EUR ($count Tankstellen)';
+  }
 }

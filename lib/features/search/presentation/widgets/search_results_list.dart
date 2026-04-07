@@ -11,6 +11,7 @@ import '../../../favorites/providers/favorites_provider.dart';
 import '../../domain/entities/station.dart';
 import '../../providers/ignored_stations_provider.dart';
 import '../../providers/search_provider.dart';
+import 'cross_border_banner.dart';
 import 'sort_selector.dart';
 import 'swipeable_station_card.dart';
 
@@ -106,6 +107,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
             ],
           ),
         ),
+        const CrossBorderBanner(),
         SortSelector(
           selected: _sortMode,
           onChanged: (mode) => setState(() => _sortMode = mode),
