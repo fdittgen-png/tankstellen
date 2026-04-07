@@ -10,10 +10,11 @@ import '../constants/field_names.dart';
 import '../notifications/notification_service.dart';
 import '../storage/hive_storage.dart';
 import '../utils/json_extensions.dart';
+import 'background_price_fetcher_provider.dart';
 import 'background_retry.dart';
 import 'hive_isolate_lock.dart';
 
-/// Manages periodic background tasks via Android WorkManager.
+/// Constants and callback logic for background price refresh tasks.
 ///
 /// ## Why a separate isolate?
 /// WorkManager runs tasks in a separate Dart isolate (a lightweight thread).
@@ -34,12 +35,19 @@ import 'hive_isolate_lock.dart';
 /// - **On battery (not low)**: every 1 hour (standard interval)
 /// - **Low battery**: tasks are skipped by WorkManager constraints
 ///
-/// This is achieved by registering two periodic tasks with different
-/// WorkManager constraints, rather than checking battery state in the isolate
-/// (battery_plus does not work reliably in background isolates).
+/// ## Platform abstraction
+/// Task scheduling is handled by [BackgroundPriceFetcher] implementations:
+/// - Android: [AndroidBackgroundPriceFetcher] (WorkManager)
+/// - iOS: [IosBackgroundPriceFetcherStub] (no-op placeholder)
+///
+/// Use [createBackgroundPriceFetcher] to get the correct implementation,
+/// then call `init()` to register periodic tasks.
 class BackgroundService {
-  static const _priceRefreshTask = 'priceRefresh';
-  static const _priceRefreshChargingTask = 'priceRefreshCharging';
+  /// Task name for the standard periodic price refresh.
+  static const priceRefreshTask = 'priceRefresh';
+
+  /// Task name for the charging-only periodic price refresh.
+  static const priceRefreshChargingTask = 'priceRefreshCharging';
 
   /// Standard refresh interval when on battery (not low).
   /// Android may delay based on Doze mode; 1h is the minimum WorkManager honors reliably.
@@ -74,40 +82,21 @@ class BackgroundService {
   /// Base delay for exponential backoff between retries.
   static const retryBaseDelay = Duration(seconds: 2);
 
+  /// Initialize background price refresh using the platform-appropriate implementation.
+  ///
+  /// Delegates to [createBackgroundPriceFetcher] which returns the correct
+  /// [BackgroundPriceFetcher] for the current platform.
   static Future<void> init() async {
-    await Workmanager().initialize(callbackDispatcher);
-
-    // Standard task: runs every 1h when battery is not low.
-    // Skipped automatically by Android when battery drops below ~15%.
-    await Workmanager().registerPeriodicTask(
-      _priceRefreshTask,
-      _priceRefreshTask,
-      frequency: refreshInterval,
-      constraints: Constraints(
-        networkType: NetworkType.connected,
-        requiresBatteryNotLow: true,
-      ),
-    );
-
-    // Charging task: runs every 30min when device is plugged in.
-    // Gives fresher prices at no battery cost.
-    await Workmanager().registerPeriodicTask(
-      _priceRefreshChargingTask,
-      _priceRefreshChargingTask,
-      frequency: chargingRefreshInterval,
-      constraints: Constraints(
-        networkType: NetworkType.connected,
-        requiresCharging: true,
-      ),
-    );
+    final fetcher = createBackgroundPriceFetcher();
+    await fetcher.init();
   }
 }
 
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
-    if (task == BackgroundService._priceRefreshTask ||
-        task == BackgroundService._priceRefreshChargingTask) {
+    if (task == BackgroundService.priceRefreshTask ||
+        task == BackgroundService.priceRefreshChargingTask) {
       debugPrint('BackgroundService: running task "$task"');
       await _refreshPricesAndCheckAlerts();
     }

@@ -143,9 +143,9 @@ void main() {
       );
     });
 
-    test('background service uses battery-aware WorkManager constraints', () {
+    test('battery-aware WorkManager constraints are in Android implementation', () {
       final source = File(
-        'lib/core/background/background_service.dart',
+        'lib/core/background/android_background_price_fetcher.dart',
       ).readAsStringSync();
 
       // Standard task should require battery not low
@@ -168,9 +168,9 @@ void main() {
         'lib/core/background/background_service.dart',
       ).readAsStringSync();
 
-      // The dispatcher should check for both task names
+      // The dispatcher should check for both task names via public constants
       expect(
-        source.contains('_priceRefreshChargingTask'),
+        source.contains('BackgroundService.priceRefreshChargingTask'),
         isTrue,
         reason: 'Callback dispatcher must handle the charging task',
       );
