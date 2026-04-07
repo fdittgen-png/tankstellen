@@ -7,7 +7,8 @@ import 'fuel_type_selector.dart';
 import 'location_input.dart';
 
 /// Controls for "Nearby" search mode: location input, fuel type, radius slider,
-/// and search button. Collapses after a search is performed.
+/// and search button. The search bar stays visible (sticky) while filters can
+/// be collapsed after a search is performed.
 class NearbySearchControls extends ConsumerWidget {
   const NearbySearchControls({
     super.key,
@@ -15,9 +16,7 @@ class NearbySearchControls extends ConsumerWidget {
     required this.onZipSearch,
     required this.onCitySearch,
     required this.filtersExpanded,
-    required this.searchBarExpanded,
     required this.onToggleFilters,
-    required this.onToggleSearchBar,
     required this.isLandscape,
   });
 
@@ -33,14 +32,8 @@ class NearbySearchControls extends ConsumerWidget {
   /// Whether the filter section (fuel type + radius) is expanded.
   final bool filtersExpanded;
 
-  /// Whether the search bar is expanded.
-  final bool searchBarExpanded;
-
   /// Toggle the filters collapsed/expanded state.
   final ValueChanged<bool> onToggleFilters;
-
-  /// Toggle the search bar collapsed/expanded state.
-  final ValueChanged<bool> onToggleSearchBar;
 
   /// Whether the device is in landscape orientation.
   final bool isLandscape;
@@ -55,45 +48,11 @@ class NearbySearchControls extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Search bar — foldable after search
-        AnimatedCrossFade(
-          firstChild: LocationInput(
-            onGpsSearch: onGpsSearch,
-            onZipSearch: onZipSearch,
-            onCitySearch: onCitySearch,
-          ),
-          secondChild: GestureDetector(
-            onTap: () => onToggleSearchBar(true),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                border: Border.all(color: theme.colorScheme.outline),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.search, size: 18, color: theme.colorScheme.primary),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      ref.watch(searchLocationProvider).isNotEmpty
-                          ? ref.watch(searchLocationProvider)
-                          : l10n?.search ?? 'Search...',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.primary,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Icon(Icons.expand_more, size: 18, color: theme.colorScheme.primary),
-                ],
-              ),
-            ),
-          ),
-          crossFadeState: searchBarExpanded
-              ? CrossFadeState.showFirst
-              : CrossFadeState.showSecond,
-          duration: const Duration(milliseconds: 200),
+        // Search bar — always visible (sticky)
+        LocationInput(
+          onGpsSearch: onGpsSearch,
+          onZipSearch: onZipSearch,
+          onCitySearch: onCitySearch,
         ),
         // Collapsible filters: fuel type + radius
         AnimatedCrossFade(

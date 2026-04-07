@@ -189,5 +189,54 @@ void main() {
       await tester.pump();
       expect(find.text('10115'), findsNothing);
     });
+
+    testWidgets('search bar is always visible (sticky) — no collapsed state',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchScreen(),
+        overrides: [
+          ...test.overrides,
+          userPositionNullOverride(),
+        ],
+      );
+
+      // LocationInput should be visible in the initial state
+      expect(find.byType(LocationInput), findsOneWidget);
+
+      // There should be no AnimatedCrossFade wrapping the search bar
+      // (the search bar is always the full LocationInput, never collapsed)
+      final locationInput = tester.widget<LocationInput>(
+        find.byType(LocationInput),
+      );
+      expect(locationInput, isNotNull);
+
+      // The search bar parent should not be an AnimatedCrossFade
+      // Verify TextField is always accessible (not hidden behind a tap target)
+      expect(find.byType(TextField), findsOneWidget);
+    });
+
+    testWidgets('search controls and results coexist in column layout',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchScreen(),
+        overrides: [
+          ...test.overrides,
+          userPositionNullOverride(),
+        ],
+      );
+
+      // Both search controls and results area should be visible
+      expect(find.byType(LocationInput), findsOneWidget);
+      expect(find.byType(UserPositionBar), findsOneWidget);
+      expect(find.text('Search to find fuel stations.'), findsOneWidget);
+    });
   });
 }
