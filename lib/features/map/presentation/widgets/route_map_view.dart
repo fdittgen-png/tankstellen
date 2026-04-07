@@ -157,18 +157,23 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
 
   Widget _buildBestStopsList(ThemeData theme, List<Station> displayStations) {
     return Container(
-      height: 44,
+      height: 52,
       color: theme.colorScheme.surfaceContainerHighest,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         itemCount: displayStations.length,
         itemBuilder: (context, index) {
           final station = displayStations[index];
           final isSelected = _selectedStationIds.contains(station.id);
           final price = station.priceFor(widget.selectedFuel);
-          return GestureDetector(
+          final stopNumber = index + 1;
+          return _RouteStationChip(
             key: ValueKey('route-station-${station.id}'),
+            station: station,
+            stopNumber: stopNumber,
+            isSelected: isSelected,
+            price: price,
             onTap: () => setState(() {
               if (isSelected) {
                 _selectedStationIds.remove(station.id);
@@ -176,55 +181,6 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
                 _selectedStationIds.add(station.id);
               }
             }),
-            child: Container(
-              margin: const EdgeInsets.only(right: 3),
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? theme.colorScheme.primaryContainer
-                    : theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(
-                  color: isSelected
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.outline.withValues(alpha: 0.2),
-                  width: isSelected ? 1.5 : 1,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    isSelected
-                        ? Icons.check_circle
-                        : Icons.radio_button_unchecked,
-                    size: 10,
-                    color: isSelected
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.outline,
-                  ),
-                  const SizedBox(width: 3),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        station.displayName,
-                        style: const TextStyle(
-                            fontSize: 9, fontWeight: FontWeight.bold),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        '${price != null ? "${price.toStringAsFixed(3)}\u20ac" : "--"} · ${station.dist}km',
-                        style:
-                            TextStyle(fontSize: 8, color: Colors.green.shade700),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
           );
         },
       ),
@@ -459,6 +415,137 @@ class _ViewModeChip extends StatelessWidget {
                     ? theme.colorScheme.primary
                     : theme.colorScheme.onSurfaceVariant,
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A chip representing a station stop along the route.
+///
+/// Shows a sequence number badge, station name, price, and distance.
+/// Selected chips use a filled primary style; unselected use an outlined style.
+class _RouteStationChip extends StatelessWidget {
+  final Station station;
+  final int stopNumber;
+  final bool isSelected;
+  final double? price;
+  final VoidCallback onTap;
+
+  const _RouteStationChip({
+    super.key,
+    required this.station,
+    required this.stopNumber,
+    required this.isSelected,
+    required this.price,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final selectedBg = theme.colorScheme.primary;
+    final selectedFg = theme.colorScheme.onPrimary;
+    final unselectedBg = theme.colorScheme.surface;
+    final unselectedFg = theme.colorScheme.onSurface;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.only(right: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: isSelected ? selectedBg : unselectedBg,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected
+                ? selectedBg
+                : theme.colorScheme.outline.withValues(alpha: 0.3),
+            width: isSelected ? 1.5 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: selectedBg.withValues(alpha: 0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? selectedFg.withValues(alpha: 0.25)
+                    : theme.colorScheme.primaryContainer,
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                '$stopNumber',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: isSelected
+                      ? selectedFg
+                      : theme.colorScheme.onPrimaryContainer,
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 110),
+                  child: Text(
+                    station.displayName,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected ? selectedFg : unselectedFg,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      price != null
+                          ? '${price!.toStringAsFixed(3)}\u20ac'
+                          : '--',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: isSelected
+                            ? selectedFg.withValues(alpha: 0.9)
+                            : Colors.green.shade700,
+                      ),
+                    ),
+                    Text(
+                      ' \u00b7 ${station.dist.toStringAsFixed(1)} km',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: isSelected
+                            ? selectedFg.withValues(alpha: 0.7)
+                            : theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
