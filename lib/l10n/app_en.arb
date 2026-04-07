@@ -359,5 +359,21 @@
   "switchToAllPricesView": "Switch to all-prices view",
   "switchToCompactView": "Switch to compact view",
   "unavailable": "N/A",
-  "outOfStock": "Out of stock"
+  "outOfStock": "Out of stock",
+
+  "gdprTitle": "Your Privacy",
+  "gdprSubtitle": "This app respects your privacy. Choose which data you want to share. You can change these settings anytime.",
+  "gdprLocationTitle": "Location Access",
+  "gdprLocationDescription": "Your coordinates are sent to the fuel price API to find nearby stations. Location data is never stored on a server and is not used for tracking.",
+  "gdprLocationShort": "Find nearby fuel stations using your location",
+  "gdprErrorReportingTitle": "Error Reporting",
+  "gdprErrorReportingDescription": "Anonymous crash reports help improve the app. No personal data is included. Reports are sent via Sentry only when configured.",
+  "gdprErrorReportingShort": "Send anonymous crash reports to improve the app",
+  "gdprCloudSyncTitle": "Cloud Sync",
+  "gdprCloudSyncDescription": "Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.",
+  "gdprCloudSyncShort": "Sync favorites and alerts across devices",
+  "gdprLegalBasis": "Legal basis: Art. 6(1)(a) GDPR (Consent). You can withdraw consent anytime in Settings.",
+  "gdprAcceptAll": "Accept All",
+  "gdprAcceptSelected": "Accept Selected",
+  "gdprSettingsHint": "You can change your privacy choices at any time."
 }

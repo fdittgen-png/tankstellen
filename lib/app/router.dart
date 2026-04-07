@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../core/error_tracing/integrations/navigation_trace_observer.dart';
+import '../core/storage/storage_keys.dart';
 import '../core/storage/storage_providers.dart';
+import '../features/consent/presentation/screens/gdpr_consent_screen.dart';
 import '../features/favorites/presentation/screens/favorites_screen.dart';
 import '../features/map/presentation/screens/map_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
@@ -54,7 +56,7 @@ GoRouter router(Ref ref) {
   final storage = ref.watch(storageRepositoryProvider);
 
   return GoRouter(
-    initialLocation: '/setup',
+    initialLocation: '/consent',
     observers: [NavigationTraceObserver()],
     errorBuilder: (context, state) => Scaffold(
       appBar: AppBar(title: const Text('Page not found')),
@@ -79,9 +81,17 @@ GoRouter router(Ref ref) {
     ),
     redirect: (context, state) {
       // Read live from storage each redirect — not cached at provider creation
+      final hasConsent = storage.getSetting(StorageKeys.gdprConsentGiven) == true;
+      final isConsent = state.matchedLocation == '/consent';
       final isReady = storage.isSetupComplete;
       final isSetup = state.matchedLocation == '/setup';
-      if (!isReady && !isSetup) return '/setup';
+
+      // Step 1: GDPR consent must be given before anything else
+      if (!hasConsent && !isConsent) return '/consent';
+      if (hasConsent && isConsent) return isReady ? '/' : '/setup';
+
+      // Step 2: Setup (onboarding) must be complete before main app
+      if (!isReady && !isSetup && !isConsent) return '/setup';
       if (isReady && isSetup) {
         // Route to profile landing screen preference
         final profileId = storage.getActiveProfileId();
@@ -98,6 +108,10 @@ GoRouter router(Ref ref) {
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/consent',
+        builder: (context, state) => const GdprConsentScreen(),
+      ),
       GoRoute(
         path: '/setup',
         builder: (context, state) => const OnboardingWizardScreen(),
