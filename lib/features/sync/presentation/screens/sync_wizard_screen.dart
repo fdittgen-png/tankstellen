@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/utils/password_validator.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/sync/schema_verifier.dart';
@@ -154,6 +155,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
               onToggleSignUp: () => setState(() => _isSignUp = !_isSignUp),
               onTestConnection: _testConnection,
               onConnect: _connect,
+              onPasswordChanged: () => setState(() {}),
             ),
           if (_mode == _WizardMode.schema)
             WizardSchemaStep(
@@ -211,7 +213,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
       final url = _sanitizeUrl(_urlController.text);
       final key = _sanitizeKey(_keyController.text);
 
-      if (_useEmail && _emailController.text.isNotEmpty && (_isSignUp ? _passwordController.text.length >= 6 : _passwordController.text.isNotEmpty)) {
+      if (_useEmail && _emailController.text.isNotEmpty && (_isSignUp ? PasswordValidator.isValid(_passwordController.text) : _passwordController.text.isNotEmpty)) {
         await TankSyncClient.init(url: url, anonKey: key);
         String? userId;
         if (_isSignUp) {

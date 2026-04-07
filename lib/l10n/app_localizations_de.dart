@@ -1189,4 +1189,31 @@ class AppLocalizationsDe extends AppLocalizations {
   String freshnessBadgeSemantics(String age) {
     return 'Datenaktualität: $age';
   }
+
+  @override
+  String get passwordStrengthWeak => 'Schwach';
+
+  @override
+  String get passwordStrengthFair => 'Mittel';
+
+  @override
+  String get passwordStrengthStrong => 'Stark';
+
+  @override
+  String get passwordReqMinLength => 'Mindestens 8 Zeichen';
+
+  @override
+  String get passwordReqUppercase => 'Mindestens 1 Großbuchstabe';
+
+  @override
+  String get passwordReqLowercase => 'Mindestens 1 Kleinbuchstabe';
+
+  @override
+  String get passwordReqDigit => 'Mindestens 1 Zahl';
+
+  @override
+  String get passwordReqSpecial => 'Mindestens 1 Sonderzeichen';
+
+  @override
+  String get passwordTooWeak => 'Passwort erfüllt nicht alle Anforderungen';
 }

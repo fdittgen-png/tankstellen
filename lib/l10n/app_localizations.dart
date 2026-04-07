@@ -2287,6 +2287,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Data freshness: {age}'**
   String freshnessBadgeSemantics(String age);
+
+  /// No description provided for @passwordStrengthWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak'**
+  String get passwordStrengthWeak;
+
+  /// No description provided for @passwordStrengthFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get passwordStrengthFair;
+
+  /// No description provided for @passwordStrengthStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get passwordStrengthStrong;
+
+  /// No description provided for @passwordReqMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'At least 8 characters'**
+  String get passwordReqMinLength;
+
+  /// No description provided for @passwordReqUppercase.
+  ///
+  /// In en, this message translates to:
+  /// **'At least 1 uppercase letter'**
+  String get passwordReqUppercase;
+
+  /// No description provided for @passwordReqLowercase.
+  ///
+  /// In en, this message translates to:
+  /// **'At least 1 lowercase letter'**
+  String get passwordReqLowercase;
+
+  /// No description provided for @passwordReqDigit.
+  ///
+  /// In en, this message translates to:
+  /// **'At least 1 number'**
+  String get passwordReqDigit;
+
+  /// No description provided for @passwordReqSpecial.
+  ///
+  /// In en, this message translates to:
+  /// **'At least 1 special character'**
+  String get passwordReqSpecial;
+
+  /// No description provided for @passwordTooWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Password does not meet all requirements'**
+  String get passwordTooWeak;
 }
 
 class _AppLocalizationsDelegate
