@@ -2,21 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/service_result.dart';
+import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/utils/navigation_utils.dart';
-import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/empty_state.dart';
-import '../../../../core/widgets/shimmer_placeholder.dart';
-import '../../../search/domain/entities/station.dart';
-import '../../../../core/theme/fuel_colors.dart';
-import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../search/domain/entities/station.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../alerts/providers/alert_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/presentation/widgets/station_card.dart';
 import '../../providers/favorites_provider.dart';
+import '../widgets/alerts_tab.dart';
+import '../widgets/favorites_loading_view.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});
@@ -45,7 +43,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     final stationsState = ref.watch(favoriteStationsProvider);
 
     // Reload favorites when the auth identity changes
-    // (anonymous → email, reconnect, disconnect, etc.)
+    // (anonymous -> email, reconnect, disconnect, etc.)
     ref.listen(
       syncStateProvider.select((s) => s.userId),
       (prev, next) {
@@ -80,7 +78,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         body: TabBarView(
           children: [
             _buildFavoritesTab(context, l10n, favoriteIds, stationsState),
-            _buildAlertsTab(context, l10n),
+            const AlertsTab(),
           ],
         ),
       ),
@@ -95,7 +93,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
   ) {
     if (favoriteIds.isEmpty) {
       return Semantics(
-        label: 'No favorites yet. Tap the star on a station to save it as a favorite.',
+        label:
+            'No favorites yet. Tap the star on a station to save it as a favorite.',
         child: EmptyState(
           icon: Icons.star_outline,
           iconSize: 80,
@@ -111,9 +110,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     return stationsState.when(
       data: (result) {
         if (result.data.isEmpty) {
-          // Favorites exist in Hive but station data not loaded yet — show
-          // a warm loading state instead of the old confusing "search first" message
-          return const _FavoritesLoadingView();
+          return const FavoritesLoadingView();
         }
         return RefreshIndicator(
           onRefresh: () async {
@@ -128,7 +125,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                   itemBuilder: (context, index) {
                     final station = result.data[index];
                     final label = station.displayName;
-                    // Swipe right → navigate, swipe left → remove favorite
+                    // Swipe right -> navigate, swipe left -> remove favorite
                     return Dismissible(
                       key: ValueKey('fav-${station.id}'),
                       confirmDismiss: (direction) async {
@@ -137,11 +134,14 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                           return false;
                         } else {
                           // Remove favorite
-                          ref.read(favoritesProvider.notifier).remove(station.id);
+                          ref
+                              .read(favoritesProvider.notifier)
+                              .remove(station.id);
                           final l10nSnack = AppLocalizations.of(context);
                           SnackBarHelper.showWithUndo(
                             context,
-                            l10nSnack?.removedFromFavoritesName(label) ?? '$label removed from favorites',
+                            l10nSnack?.removedFromFavoritesName(label) ??
+                                '$label removed from favorites',
                             undoLabel: l10nSnack?.undo ?? 'Undo',
                             onUndo: () => ref
                                 .read(favoritesProvider.notifier)
@@ -157,10 +157,13 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.navigation, color: Colors.white, size: 20),
+                            Icon(Icons.navigation,
+                                color: Colors.white, size: 20),
                             SizedBox(width: 8),
                             Text('Navigate',
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),
@@ -172,7 +175,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text('Remove',
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
                             SizedBox(width: 8),
                             Icon(Icons.delete, color: Colors.white, size: 20),
                           ],
@@ -185,7 +190,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                         isFavorite: true,
                         onTap: () => context.push('/station/${station.id}'),
                         onFavoriteTap: () {
-                          ref.read(favoritesProvider.notifier).remove(station.id);
+                          ref
+                              .read(favoritesProvider.notifier)
+                              .remove(station.id);
                         },
                       ),
                     );
@@ -196,7 +203,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           ),
         );
       },
-      loading: () => const _FavoritesLoadingView(),
+      loading: () => const FavoritesLoadingView(),
       error: (error, _) => Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -214,165 +221,6 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildAlertsTab(BuildContext context, AppLocalizations? l10n) {
-    return Consumer(builder: (context, ref, _) {
-      final alerts = ref.watch(alertProvider);
-      if (alerts.isEmpty) {
-        return EmptyState(
-          icon: Icons.notifications_off_outlined,
-          title: l10n?.noPriceAlerts ?? 'No price alerts',
-          subtitle: l10n?.noPriceAlertsHint ??
-              'Create an alert from a station\'s detail page.',
-        );
-      }
-      return ListView.builder(
-        itemCount: alerts.length,
-        itemBuilder: (context, index) {
-          final alert = alerts[index];
-          // Swipe left to delete alert
-          return Dismissible(
-            key: ValueKey(alert.id),
-            direction: DismissDirection.endToStart,
-            background: Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(right: 24),
-              color: Colors.red,
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Delete',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  SizedBox(width: 8),
-                  Icon(Icons.delete, color: Colors.white, size: 20),
-                ],
-              ),
-            ),
-            onDismissed: (_) {
-              ref.read(alertProvider.notifier).removeAlert(alert.id);
-              SnackBarHelper.show(context, l10n?.alertDeleted(alert.stationName) ?? 'Alert "${alert.stationName}" deleted');
-            },
-            child: ListTile(
-              leading: Icon(
-                alert.isActive ? Icons.notifications_active : Icons.notifications_off,
-                color: alert.isActive ? FuelColors.forType(alert.fuelType) : Colors.grey,
-              ),
-              title: Text(alert.stationName),
-              subtitle: Text(
-                '${alert.fuelType.displayName} \u2264 ${PriceFormatter.formatPrice(alert.targetPrice)}',
-                style: TextStyle(color: alert.isActive ? FuelColors.forType(alert.fuelType) : Colors.grey),
-              ),
-              trailing: Switch(
-                value: alert.isActive,
-                onChanged: (_) => ref.read(alertProvider.notifier).toggleAlert(alert.id),
-              ),
-              // Tap to open station detail (shows price history)
-              onTap: () => context.push('/station/${alert.stationId}'),
-            ),
-          );
-        },
-      );
-    });
-  }
-}
-
-/// Professional loading view with shimmer skeleton + pulsing fuel icon + reassuring text.
-///
-/// Shown while favorites are loading after app start, auth transitions,
-/// or when station data hasn't been cached yet.
-class _FavoritesLoadingView extends StatefulWidget {
-  const _FavoritesLoadingView();
-
-  @override
-  State<_FavoritesLoadingView> createState() => _FavoritesLoadingViewState();
-}
-
-class _FavoritesLoadingViewState extends State<_FavoritesLoadingView>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _pulseController;
-  late final Animation<double> _pulseAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat(reverse: true);
-    _pulseAnimation = Tween<double>(begin: 0.6, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Column(
-      children: [
-        // Reassuring header with pulsing icon
-        Padding(
-          padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
-          child: Row(
-            children: [
-              FadeTransition(
-                opacity: _pulseAnimation,
-                child: Icon(
-                  Icons.local_gas_station_rounded,
-                  size: 28,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AnimatedDefaultTextStyle(
-                      duration: const Duration(milliseconds: 300),
-                      style: theme.textTheme.titleSmall!.copyWith(
-                        color: theme.colorScheme.onSurface,
-                      ),
-                      child: const Text('Updating your favorites...'),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Fetching the latest prices',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        // Animated progress bar
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(2),
-            child: const LinearProgressIndicator(minHeight: 3),
-          ),
-        ),
-        const SizedBox(height: 16),
-        // Shimmer skeleton cards
-        const Expanded(
-          child: SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
-            child: ShimmerStationList(count: 6),
-          ),
-        ),
-      ],
     );
   }
 }
