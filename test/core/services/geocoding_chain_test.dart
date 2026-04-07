@@ -189,6 +189,190 @@ void main() {
     });
   });
 
+  group('zipCodeToCoordinates — bounding box validation', () {
+    late GeocodingChain deChain;
+    late GeocodingChain frChain;
+    late GeocodingChain gbChain;
+
+    setUp(() {
+      deChain = GeocodingChain([providerA, providerB], mockCache, countryCode: 'DE');
+      frChain = GeocodingChain([providerA, providerB], mockCache, countryCode: 'FR');
+      gbChain = GeocodingChain([providerA, providerB], mockCache, countryCode: 'GB');
+    });
+
+    test('accepts coordinates within Germany bounding box', () async {
+      when(() => mockCache.getFresh('geo:zip:10115')).thenReturn(null);
+      when(() => providerA.zipCodeToCoordinates('10115'))
+          .thenAnswer((_) async => (lat: 52.52, lng: 13.41)); // Berlin
+      when(() => mockCache.put(
+            any(), any(),
+            ttl: any(named: 'ttl'), source: any(named: 'source'),
+          )).thenAnswer((_) async {});
+
+      final result = await deChain.zipCodeToCoordinates('10115');
+
+      expect(result.data.lat, 52.52);
+      expect(result.data.lng, 13.41);
+      expect(result.errors, isEmpty);
+    });
+
+    test('rejects coordinates outside Germany and tries next provider', () async {
+      when(() => mockCache.getFresh('geo:zip:10115')).thenReturn(null);
+      // Provider A returns Paris coordinates (outside DE)
+      when(() => providerA.zipCodeToCoordinates('10115'))
+          .thenAnswer((_) async => (lat: 48.86, lng: 2.35));
+      // Provider B returns correct Berlin coordinates
+      when(() => providerB.zipCodeToCoordinates('10115'))
+          .thenAnswer((_) async => (lat: 52.52, lng: 13.41));
+      when(() => mockCache.put(
+            any(), any(),
+            ttl: any(named: 'ttl'), source: any(named: 'source'),
+          )).thenAnswer((_) async {});
+
+      final result = await deChain.zipCodeToCoordinates('10115');
+
+      expect(result.data.lat, 52.52);
+      expect(result.data.lng, 13.41);
+      expect(result.source, ServiceSource.nominatimGeocoding);
+      expect(result.errors.length, 1);
+      expect(result.errors.first.message, contains('outside DE bounds'));
+    });
+
+    test('rejects coordinates from ocean for France', () async {
+      when(() => mockCache.getFresh('geo:zip:75012')).thenReturn(null);
+      // Provider A returns ocean coordinates
+      when(() => providerA.zipCodeToCoordinates('75012'))
+          .thenAnswer((_) async => (lat: 0.0, lng: 0.0));
+      // Provider B returns correct Paris coordinates
+      when(() => providerB.zipCodeToCoordinates('75012'))
+          .thenAnswer((_) async => (lat: 48.84, lng: 2.39));
+      when(() => mockCache.put(
+            any(), any(),
+            ttl: any(named: 'ttl'), source: any(named: 'source'),
+          )).thenAnswer((_) async {});
+
+      final result = await frChain.zipCodeToCoordinates('75012');
+
+      expect(result.data.lat, 48.84);
+      expect(result.data.lng, 2.39);
+      expect(result.errors.length, 1);
+    });
+
+    test('rejects coordinates from wrong country for UK', () async {
+      when(() => mockCache.getFresh('geo:zip:SW1A 1AA')).thenReturn(null);
+      // Provider A returns Sydney coordinates (wrong hemisphere!)
+      when(() => providerA.zipCodeToCoordinates('SW1A 1AA'))
+          .thenAnswer((_) async => (lat: -33.87, lng: 151.21));
+      // Provider B returns correct London coordinates
+      when(() => providerB.zipCodeToCoordinates('SW1A 1AA'))
+          .thenAnswer((_) async => (lat: 51.50, lng: -0.14));
+      when(() => mockCache.put(
+            any(), any(),
+            ttl: any(named: 'ttl'), source: any(named: 'source'),
+          )).thenAnswer((_) async {});
+
+      final result = await gbChain.zipCodeToCoordinates('SW1A 1AA');
+
+      expect(result.data.lat, 51.50);
+      expect(result.data.lng, -0.14);
+      expect(result.errors.length, 1);
+      expect(result.errors.first.message, contains('outside GB bounds'));
+    });
+
+    test('throws when all providers return out-of-bounds coordinates', () async {
+      when(() => mockCache.getFresh('geo:zip:10115')).thenReturn(null);
+      // Both providers return coordinates outside Germany
+      when(() => providerA.zipCodeToCoordinates('10115'))
+          .thenAnswer((_) async => (lat: 48.86, lng: 2.35)); // Paris
+      when(() => providerB.zipCodeToCoordinates('10115'))
+          .thenAnswer((_) async => (lat: -34.60, lng: -58.38)); // Buenos Aires
+      when(() => mockCache.get('geo:zip:10115')).thenReturn(null);
+
+      expect(
+        () => deChain.zipCodeToCoordinates('10115'),
+        throwsA(isA<ServiceChainExhaustedException>()),
+      );
+    });
+
+    test('rejects stale cache with out-of-bounds coordinates', () async {
+      when(() => mockCache.getFresh('geo:zip:10115')).thenReturn(null);
+      when(() => providerA.zipCodeToCoordinates('10115'))
+          .thenThrow(Exception('fail'));
+      when(() => providerB.zipCodeToCoordinates('10115'))
+          .thenThrow(Exception('fail'));
+      // Stale cache has coordinates from wrong country
+      when(() => mockCache.get('geo:zip:10115')).thenReturn(CacheEntry(
+        payload: {'lat': 48.86, 'lng': 2.35}, // Paris, not Germany
+        storedAt: DateTime.now().subtract(const Duration(hours: 48)),
+        originalSource: ServiceSource.nominatimGeocoding,
+        ttl: CacheTtl.geocode,
+      ));
+
+      expect(
+        () => deChain.zipCodeToCoordinates('10115'),
+        throwsA(isA<ServiceChainExhaustedException>()),
+      );
+    });
+
+    test('rejects fresh cache with out-of-bounds coordinates and re-geocodes', () async {
+      // Fresh cache has wrong coordinates
+      when(() => mockCache.getFresh('geo:zip:10115')).thenReturn(CacheEntry(
+        payload: {'lat': 48.86, 'lng': 2.35}, // Paris, not Germany
+        storedAt: DateTime.now(),
+        originalSource: ServiceSource.nominatimGeocoding,
+        ttl: CacheTtl.geocode,
+      ));
+      // Provider returns correct coordinates
+      when(() => providerA.zipCodeToCoordinates('10115'))
+          .thenAnswer((_) async => (lat: 52.52, lng: 13.41));
+      when(() => mockCache.put(
+            any(), any(),
+            ttl: any(named: 'ttl'), source: any(named: 'source'),
+          )).thenAnswer((_) async {});
+
+      final result = await deChain.zipCodeToCoordinates('10115');
+
+      expect(result.data.lat, 52.52);
+      verify(() => providerA.zipCodeToCoordinates('10115')).called(1);
+    });
+
+    test('no validation when countryCode is null', () async {
+      // Chain without country code (original behavior)
+      final noCountryChain = GeocodingChain([providerA], mockCache);
+
+      when(() => mockCache.getFresh('geo:zip:10115')).thenReturn(null);
+      // Returns coordinates from wrong continent — accepted without validation
+      when(() => providerA.zipCodeToCoordinates('10115'))
+          .thenAnswer((_) async => (lat: -33.87, lng: 151.21));
+      when(() => mockCache.put(
+            any(), any(),
+            ttl: any(named: 'ttl'), source: any(named: 'source'),
+          )).thenAnswer((_) async {});
+
+      final result = await noCountryChain.zipCodeToCoordinates('10115');
+
+      expect(result.data.lat, -33.87);
+      expect(result.errors, isEmpty);
+    });
+
+    test('no validation for unknown country code', () async {
+      final unknownChain = GeocodingChain([providerA], mockCache, countryCode: 'ZZ');
+
+      when(() => mockCache.getFresh('geo:zip:12345')).thenReturn(null);
+      when(() => providerA.zipCodeToCoordinates('12345'))
+          .thenAnswer((_) async => (lat: 0.0, lng: 0.0));
+      when(() => mockCache.put(
+            any(), any(),
+            ttl: any(named: 'ttl'), source: any(named: 'source'),
+          )).thenAnswer((_) async {});
+
+      final result = await unknownChain.zipCodeToCoordinates('12345');
+
+      expect(result.data.lat, 0.0);
+      expect(result.errors, isEmpty);
+    });
+  });
+
   group('coordinatesToAddress', () {
     test('returns fresh cache hit', () async {
       when(() => mockCache.getFresh(any())).thenReturn(CacheEntry(
