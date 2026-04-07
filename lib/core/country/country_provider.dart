@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/profile/providers/profile_provider.dart';
 import '../../features/profile/data/repositories/profile_repository.dart';
-import '../storage/hive_storage.dart';
+import '../storage/storage_providers.dart';
 import 'country_config.dart';
 
 part 'country_provider.g.dart';
@@ -22,7 +22,7 @@ class ActiveCountry extends _$ActiveCountry {
     }
 
     // Priority 2: persisted setting (legacy / migration)
-    final storage = ref.watch(hiveStorageProvider);
+    final storage = ref.watch(storageRepositoryProvider);
     final savedCode = storage.getSetting(_storageKey) as String?;
     if (savedCode != null) {
       return Countries.byCode(savedCode) ?? _detectFromLocale();
@@ -40,7 +40,7 @@ class ActiveCountry extends _$ActiveCountry {
   /// User explicitly selects a country.
   Future<void> select(CountryConfig country) async {
     // Update legacy storage
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     await storage.putSetting(_storageKey, country.code);
 
     // Update active profile if it exists

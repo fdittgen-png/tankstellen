@@ -68,7 +68,7 @@ final class FavoritesProvider
   }
 }
 
-String _$favoritesHash() => r'b19310178145c484fa60ed84f5eabfdea959cf5a';
+String _$favoritesHash() => r'6a2dd0d2a07ddc58f4c91e23a406722861c833e8';
 
 /// Manages the user's list of favorite station IDs.
 ///
@@ -245,7 +245,7 @@ final class FavoriteStationsProvider
   }
 }
 
-String _$favoriteStationsHash() => r'3b569d570e9167392d5d53da321f2c2aaaca219e';
+String _$favoriteStationsHash() => r'28057deab1398e89c8423e5dd03ca4737205a0df';
 
 /// Loads station data for favorites and refreshes prices.
 ///

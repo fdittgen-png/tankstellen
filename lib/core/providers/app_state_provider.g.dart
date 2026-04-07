@@ -51,7 +51,7 @@ final class HasApiKeyProvider extends $FunctionalProvider<bool, bool, bool>
   }
 }
 
-String _$hasApiKeyHash() => r'6ba26caa7bf1dff6250a00525aa89c809746261a';
+String _$hasApiKeyHash() => r'9927ae0b513afe69898707f03a015b769948e062';
 
 /// Whether a custom EV API key is configured.
 
@@ -97,7 +97,7 @@ final class HasCustomEvApiKeyProvider
   }
 }
 
-String _$hasCustomEvApiKeyHash() => r'faa5e8b46e227a417ff7f77dedc493e20a24e1a8';
+String _$hasCustomEvApiKeyHash() => r'5b58e9c3a30dbd76727b5e940c51c57c76a5e93a';
 
 /// Whether the app setup (API key or skip) is complete.
 
@@ -143,7 +143,7 @@ final class IsSetupCompleteProvider
   }
 }
 
-String _$isSetupCompleteHash() => r'fb0038e02bad17d5f9836dd6cf57c9e564523ac5';
+String _$isSetupCompleteHash() => r'ed2c5f5152a724dd00ef88c3070746e00f19d7e3';
 
 /// Whether the app is in demo mode (setup skipped, no API key).
 
@@ -188,7 +188,7 @@ final class IsDemoModeProvider extends $FunctionalProvider<bool, bool, bool>
   }
 }
 
-String _$isDemoModeHash() => r'30ebd662324ba53ee87c57d135bd2282ae14cc08';
+String _$isDemoModeHash() => r'36e1fc7f0ba8650fba7bfb3eab5cb284ab5a90f7';
 
 /// Whether location consent has been given.
 
@@ -235,7 +235,7 @@ final class HasLocationConsentProvider
 }
 
 String _$hasLocationConsentHash() =>
-    r'2ba6bd77ff5b05913c3904a4550165740a60731e';
+    r'a6178ce1dcc1a981a60588415802c2c19301ce89';
 
 /// Record location consent.
 
@@ -273,7 +273,7 @@ final class LocationConsentProvider
   }
 }
 
-String _$locationConsentHash() => r'bf7800cc44bf31cc8690f86647211ad4861f1b2b';
+String _$locationConsentHash() => r'4c60c0829286038445f3fdc8e3417943823b2d51';
 
 /// Record location consent.
 
@@ -331,7 +331,7 @@ final class AutoSwitchProfileProvider
   }
 }
 
-String _$autoSwitchProfileHash() => r'ea721a5762558ca12b20d343e87401241d7072cd';
+String _$autoSwitchProfileHash() => r'd9ca4989633b5d2e0734810d113d179a8493523f';
 
 /// Auto-switch profile setting.
 
@@ -397,4 +397,4 @@ final class StorageStatsProvider
   }
 }
 
-String _$storageStatsHash() => r'91eca83a16b105fe7bfb91f0ab4d43bed045ca12';
+String _$storageStatsHash() => r'0bd96d7fdac0c73e4cb62e88007daea25f2c0c94';

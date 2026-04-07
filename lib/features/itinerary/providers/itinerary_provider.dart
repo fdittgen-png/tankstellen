@@ -2,7 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../core/storage/hive_storage.dart';
+import '../../../core/data/storage_repository.dart';
+import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_service.dart';
 import '../../../core/sync/sync_provider.dart';
 import '../domain/entities/saved_itinerary.dart';
@@ -19,14 +20,14 @@ class ItineraryNotifier extends _$ItineraryNotifier {
   @override
   List<SavedItinerary> build() {
     // Start with local data immediately
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     final local = _fromStorage(storage);
     // Kick off async merge in background
     Future.microtask(() => _loadAndMerge());
     return local;
   }
 
-  List<SavedItinerary> _fromStorage(HiveStorage storage) {
+  List<SavedItinerary> _fromStorage(ItineraryStorage storage) {
     try {
       return storage.getItineraries().map((r) {
         return SavedItinerary(
@@ -58,7 +59,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
       final serverItineraries = await SyncService.fetchItineraries();
       if (serverItineraries.isEmpty) return;
 
-      final storage = ref.read(hiveStorageProvider);
+      final storage = ref.read(storageRepositoryProvider);
       final localIds = state.map((i) => i.id).toSet();
 
       // Merge: add server-only items, local items win on conflict
@@ -120,7 +121,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
     );
 
     // 1. Save locally first
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     await storage.addItinerary(_toMap(itinerary));
     state = [itinerary, ...state];
 
@@ -137,7 +138,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
   /// Delete an itinerary — local + server.
   Future<void> delete(String id) async {
     // 1. Delete locally
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     await storage.deleteItinerary(id);
     state = state.where((i) => i.id != id).toList();
 

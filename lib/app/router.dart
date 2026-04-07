@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../core/error_tracing/integrations/navigation_trace_observer.dart';
-import '../core/storage/hive_storage.dart';
+import '../core/storage/storage_providers.dart';
 import '../features/favorites/presentation/screens/favorites_screen.dart';
 import '../features/map/presentation/screens/map_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
@@ -51,7 +51,7 @@ Widget _invalidIdScreen(BuildContext context, String path) {
 
 @riverpod
 GoRouter router(Ref ref) {
-  final storage = ref.watch(hiveStorageProvider);
+  final storage = ref.watch(storageRepositoryProvider);
 
   return GoRouter(
     initialLocation: '/setup',

@@ -99,7 +99,7 @@ final class StationServiceProvider
   }
 }
 
-String _$stationServiceHash() => r'9ccd3e52855632293f6c1d21e8914a729d3c3d31';
+String _$stationServiceHash() => r'9a4f37e4936e1a923e3c47c2a116889e6416718b';
 
 @ProviderFor(geocodingChain)
 final geocodingChainProvider = GeocodingChainProvider._();

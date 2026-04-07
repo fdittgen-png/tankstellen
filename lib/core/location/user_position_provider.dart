@@ -1,5 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../storage/hive_storage.dart';
+import '../storage/storage_providers.dart';
 import '../storage/storage_keys.dart';
 import 'location_service.dart';
 
@@ -26,7 +26,7 @@ class UserPosition extends _$UserPosition {
   @override
   UserPositionData? build() {
     // Load persisted position from storage
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     final lat = storage.getSetting(StorageKeys.userPositionLat) as double?;
     final lng = storage.getSetting(StorageKeys.userPositionLng) as double?;
     final ts = storage.getSetting(StorageKeys.userPositionTimestamp) as int?;
@@ -61,7 +61,7 @@ class UserPosition extends _$UserPosition {
   }
 
   void clear() {
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     storage.putSetting(StorageKeys.userPositionLat, null);
     storage.putSetting(StorageKeys.userPositionLng, null);
     storage.putSetting(StorageKeys.userPositionTimestamp, null);
@@ -71,7 +71,7 @@ class UserPosition extends _$UserPosition {
 
   void _persist(double lat, double lng, String source) {
     final now = DateTime.now();
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     storage.putSetting(StorageKeys.userPositionLat, lat);
     storage.putSetting(StorageKeys.userPositionLng, lng);
     storage.putSetting(StorageKeys.userPositionTimestamp, now.millisecondsSinceEpoch);

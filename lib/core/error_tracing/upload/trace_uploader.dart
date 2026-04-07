@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../data/storage_repository.dart';
 import '../../services/dio_factory.dart';
-import '../../storage/hive_storage.dart';
+import '../../storage/storage_providers.dart';
 import '../models/error_trace.dart';
 import 'trace_upload_config.dart';
 
@@ -10,11 +11,11 @@ part 'trace_uploader.g.dart';
 
 @Riverpod(keepAlive: true)
 TraceUploader traceUploader(Ref ref) {
-  return TraceUploader(ref.watch(hiveStorageProvider));
+  return TraceUploader(ref.watch(storageRepositoryProvider));
 }
 
 class TraceUploader {
-  final HiveStorage _storage;
+  final SettingsStorage _storage;
   static const String _configKey = 'trace_upload_config';
 
   TraceUploader(this._storage);

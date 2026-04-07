@@ -41,7 +41,7 @@ final class UserPositionProvider
   }
 }
 
-String _$userPositionHash() => r'8b4458d287ff086ac7bf73a73477509db3851d77';
+String _$userPositionHash() => r'05edbca12d5ad7b8fbda4d65c48f71f0dde7cc0d';
 
 abstract class _$UserPosition extends $Notifier<UserPositionData?> {
   UserPositionData? build();

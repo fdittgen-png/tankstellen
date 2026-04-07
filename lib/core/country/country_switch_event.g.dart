@@ -62,4 +62,4 @@ final class CountrySwitchEventProvider
 }
 
 String _$countrySwitchEventHash() =>
-    r'c8720509b6523347c73553d239106fb8c9b2b1ab';
+    r'f980c2200703b101916172cb76e815156d6d4e4b';

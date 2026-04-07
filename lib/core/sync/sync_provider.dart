@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../storage/hive_storage.dart';
+import '../data/storage_repository.dart';
+import '../storage/storage_providers.dart';
 import 'community_config.dart';
 import 'supabase_client.dart';
 import 'sync_config.dart';
@@ -24,7 +25,7 @@ part 'sync_provider.g.dart';
 class SyncState extends _$SyncState {
   @override
   SyncConfig build() {
-    final storage = ref.watch(hiveStorageProvider);
+    final storage = ref.watch(storageRepositoryProvider);
     final modeStr = storage.getSetting('sync_mode') as String?;
     return SyncConfig(
       enabled: storage.getSetting('sync_enabled') as bool? ?? false,
@@ -53,7 +54,7 @@ class SyncState extends _$SyncState {
     final cleanUrl = url.replaceAll(RegExp(r'\s+'), '').replaceAll(RegExp(r'/+$'), '');
     final cleanKey = anonKey.replaceAll(RegExp(r'\s+'), '');
 
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     try {
       await TankSyncClient.init(url: cleanUrl, anonKey: cleanKey);
       final userId = await TankSyncClient.signInAnonymously();
@@ -98,7 +99,7 @@ class SyncState extends _$SyncState {
     }
 
     if (userId != null) {
-      final storage = ref.read(hiveStorageProvider);
+      final storage = ref.read(storageRepositoryProvider);
       await storage.putSetting('sync_user_id', userId);
       state = SyncConfig(
         enabled: state.enabled,
@@ -122,7 +123,7 @@ class SyncState extends _$SyncState {
   /// and syncs local data to the new anonymous account. Local data is
   /// preserved — only the server-side identity changes.
   Future<void> switchToAnonymous() async {
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
 
     try {
       // Sign out current email session
@@ -180,7 +181,7 @@ class SyncState extends _$SyncState {
 
   /// Disconnect and clear all sync settings. Local data is preserved.
   Future<void> disconnect() async {
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     try {
       await TankSyncClient.signOut();
     } catch (e) {
@@ -196,7 +197,7 @@ class SyncState extends _$SyncState {
     state = const SyncConfig();
   }
 
-  void _performInitialSync(HiveStorage storage) {
+  void _performInitialSync(StorageRepository storage) {
     Future.microtask(() async {
       try {
         final favIds = storage.getFavoriteIds();

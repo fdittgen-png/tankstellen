@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/profile/data/models/user_profile.dart';
 import '../../features/profile/providers/profile_provider.dart';
-import '../storage/hive_storage.dart';
+import '../storage/storage_providers.dart';
 import '../storage/storage_keys.dart';
 import 'country_detection_provider.dart';
 import 'country_provider.dart';
@@ -39,7 +39,7 @@ CountrySwitchEvent? countrySwitchEvent(Ref ref) {
       .toList();
   final matchingProfile = match.isNotEmpty ? match.first : null;
 
-  final storage = ref.read(hiveStorageProvider);
+  final storage = ref.read(storageRepositoryProvider);
   final autoSwitch =
       storage.getSetting(StorageKeys.autoSwitchProfile) as bool? ?? false;
 

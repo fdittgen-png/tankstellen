@@ -55,7 +55,7 @@ final class PriceHistoryRepositoryProvider
 }
 
 String _$priceHistoryRepositoryHash() =>
-    r'd6559811a1fb87cc97461b7611fcf788e0d4a041';
+    r'f73e38765adc67ed624b1362fc98e859a136d950';
 
 @ProviderFor(priceHistory)
 final priceHistoryProvider = PriceHistoryFamily._();

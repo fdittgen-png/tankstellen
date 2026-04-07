@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error_tracing/models/error_trace.dart';
 import 'package:tankstellen/core/error_tracing/upload/trace_upload_config.dart';
 import 'package:tankstellen/core/error_tracing/upload/trace_uploader.dart';
-import 'package:tankstellen/core/storage/hive_storage.dart';
+import 'package:tankstellen/core/data/storage_repository.dart';
 
 ErrorTrace _makeTrace() {
   return ErrorTrace(
@@ -27,8 +27,8 @@ ErrorTrace _makeTrace() {
   );
 }
 
-/// Fake HiveStorage that works without real Hive initialization.
-class _FakeHiveStorage extends HiveStorage {
+/// Fake SettingsStorage that works without real Hive initialization.
+class _FakeSettingsStorage implements SettingsStorage {
   final _settings = <String, dynamic>{};
 
   @override
@@ -38,6 +38,18 @@ class _FakeHiveStorage extends HiveStorage {
   Future<void> putSetting(String key, dynamic value) async {
     _settings[key] = value;
   }
+
+  @override
+  bool get isSetupComplete => false;
+
+  @override
+  bool get isSetupSkipped => false;
+
+  @override
+  Future<void> skipSetup() async {}
+
+  @override
+  Future<void> resetSetupSkip() async {}
 }
 
 void main() {
@@ -85,11 +97,11 @@ void main() {
   });
 
   group('TraceUploader', () {
-    late _FakeHiveStorage fakeStorage;
+    late _FakeSettingsStorage fakeStorage;
     late TraceUploader uploader;
 
     setUp(() {
-      fakeStorage = _FakeHiveStorage();
+      fakeStorage = _FakeSettingsStorage();
       uploader = TraceUploader(fakeStorage);
     });
 

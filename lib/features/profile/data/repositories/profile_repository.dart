@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
-import '../../../../core/storage/hive_storage.dart';
+import '../../../../core/data/storage_repository.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../models/user_profile.dart';
 
@@ -8,11 +9,11 @@ part 'profile_repository.g.dart';
 
 @Riverpod(keepAlive: true)
 ProfileRepository profileRepository(Ref ref) {
-  return ProfileRepository(ref.watch(hiveStorageProvider));
+  return ProfileRepository(ref.watch(storageRepositoryProvider));
 }
 
 class ProfileRepository {
-  final HiveStorage _storage;
+  final StorageRepository _storage;
   static const _uuid = Uuid();
 
   ProfileRepository(this._storage);
