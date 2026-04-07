@@ -8,9 +8,12 @@ import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/utils/price_utils.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/providers/favorites_provider.dart';
+import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/station.dart';
 import '../../providers/ignored_stations_provider.dart';
 import '../../providers/search_provider.dart';
+import '../../providers/search_screen_ui_provider.dart';
+import 'all_prices_station_card.dart';
 import 'cross_border_banner.dart';
 import 'sort_selector.dart';
 import 'swipeable_station_card.dart';
@@ -38,6 +41,38 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
       station.lat, station.lng,
       label: station.displayName,
     );
+  }
+
+  /// Computes which station has the cheapest price for each fuel type.
+  Map<String, Map<FuelType, bool>> _computeCheapestFlags(List<Station> stations) {
+    if (stations.isEmpty) return {};
+
+    final cheapest = <FuelType, double>{};
+    final cheapestIds = <FuelType, String>{};
+
+    const fuelTypes = [
+      FuelType.e5, FuelType.e10, FuelType.e98, FuelType.diesel,
+      FuelType.dieselPremium, FuelType.e85, FuelType.lpg, FuelType.cng,
+    ];
+
+    for (final ft in fuelTypes) {
+      for (final s in stations) {
+        final price = s.priceFor(ft);
+        if (price != null && price > 0) {
+          if (!cheapest.containsKey(ft) || price < cheapest[ft]!) {
+            cheapest[ft] = price;
+            cheapestIds[ft] = s.id;
+          }
+        }
+      }
+    }
+
+    final result = <String, Map<FuelType, bool>>{};
+    for (final entry in cheapestIds.entries) {
+      result.putIfAbsent(entry.value, () => {});
+      result[entry.value]![entry.key] = true;
+    }
+    return result;
   }
 
   List<Station> _sortStations(List<Station> stations) {
@@ -84,6 +119,8 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
                   );
                 }),
               ),
+              _ViewToggleButton(),
+              const SizedBox(width: 4),
               Semantics(
                 label: 'Show stations on map',
                 button: true,
@@ -121,11 +158,30 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
                   .where((s) => !ignoredIds.contains(s.id))
                   .toList();
               final sorted = _sortStations(filtered);
+              final allPrices = ref.watch(allPricesViewEnabledProvider);
+              final cheapestMap = allPrices
+                  ? _computeCheapestFlags(sorted)
+                  : <String, Map<FuelType, bool>>{};
+
               return ListView.builder(
                 itemCount: sorted.length,
                 itemBuilder: (context, index) {
                   final station = sorted[index];
                   final isFav = ref.watch(isFavoriteProvider(station.id));
+
+                  if (allPrices) {
+                    return AllPricesStationCard(
+                      key: ValueKey('all-prices-${station.id}'),
+                      station: station,
+                      isFavorite: isFav,
+                      cheapestFlags: cheapestMap[station.id] ?? const {},
+                      onTap: () => context.push('/station/${station.id}'),
+                      onFavoriteTap: () => ref
+                          .read(favoritesProvider.notifier)
+                          .toggle(station.id, stationData: station),
+                    );
+                  }
+
                   return SwipeableStationCard(
                     key: ValueKey('station-${station.id}'),
                     station: station,
@@ -157,6 +213,36 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Toggle button to switch between compact card view and all-prices detail view.
+class _ViewToggleButton extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final allPrices = ref.watch(allPricesViewEnabledProvider);
+    final l10n = AppLocalizations.of(context);
+
+    return Semantics(
+      label: allPrices
+          ? (l10n?.switchToCompactView ?? 'Switch to compact view')
+          : (l10n?.switchToAllPricesView ?? 'Switch to all-prices view'),
+      button: true,
+      child: InkWell(
+        onTap: () => ref
+            .read(allPricesViewEnabledProvider.notifier)
+            .toggle(),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          child: Icon(
+            allPrices ? Icons.view_list : Icons.view_agenda,
+            size: 18,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+      ),
     );
   }
 }

@@ -352,5 +352,12 @@
   "crossBorderDistance": "~{km} km to border",
   "@crossBorderDistance": {"placeholders": {"km": {"type": "int"}}},
   "crossBorderAvgPrice": "Avg here: {price} EUR ({count} stations)",
-  "@crossBorderAvgPrice": {"placeholders": {"price": {"type": "String"}, "count": {"type": "int"}}}
+  "@crossBorderAvgPrice": {"placeholders": {"price": {"type": "String"}, "count": {"type": "int"}}},
+
+  "allPricesView": "All prices",
+  "compactView": "Compact",
+  "switchToAllPricesView": "Switch to all-prices view",
+  "switchToCompactView": "Switch to compact view",
+  "unavailable": "N/A",
+  "outOfStock": "Out of stock"
 }

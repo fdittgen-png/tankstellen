@@ -26,3 +26,14 @@ class SelectedRouteStrategy extends _$SelectedRouteStrategy {
 
   void set(RouteSearchStrategyType value) => state = value;
 }
+
+/// Whether to show the all-prices detail view instead of the compact card view.
+@riverpod
+class AllPricesViewEnabled extends _$AllPricesViewEnabled {
+  @override
+  bool build() => false;
+
+  void toggle() => state = !state;
+
+  void set(bool value) => state = value;
+}

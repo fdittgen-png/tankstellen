@@ -98,4 +98,41 @@ void main() {
       }
     });
   });
+
+  group('AllPricesViewEnabled', () {
+    test('defaults to false', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      expect(container.read(allPricesViewEnabledProvider), isFalse);
+    });
+
+    test('toggle() flips state', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      expect(container.read(allPricesViewEnabledProvider), isFalse);
+      container.read(allPricesViewEnabledProvider.notifier).toggle();
+      expect(container.read(allPricesViewEnabledProvider), isTrue);
+      container.read(allPricesViewEnabledProvider.notifier).toggle();
+      expect(container.read(allPricesViewEnabledProvider), isFalse);
+    });
+
+    test('set(true) enables all-prices view', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      container.read(allPricesViewEnabledProvider.notifier).set(true);
+      expect(container.read(allPricesViewEnabledProvider), isTrue);
+    });
+
+    test('set(false) disables all-prices view', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      container.read(allPricesViewEnabledProvider.notifier).set(true);
+      container.read(allPricesViewEnabledProvider.notifier).set(false);
+      expect(container.read(allPricesViewEnabledProvider), isFalse);
+    });
+  });
 }
