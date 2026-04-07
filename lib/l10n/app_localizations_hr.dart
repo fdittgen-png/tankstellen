@@ -336,6 +336,10 @@ class AppLocalizationsHr extends AppLocalizations {
       'Besplatna registracija. Podaci od vladinih agencija za transparentnost cijena.';
 
   @override
+  String get apiKeyFormatError =>
+      'Nevažeći format — očekivan UUID (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Podržite ovaj projekt';
 
   @override

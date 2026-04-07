@@ -131,6 +131,7 @@
   "cacheEmpty": "Podėlis tuščias",
   "noStorage": "Saugykla nenaudojama",
   "apiKeyNote": "Nemokama registracija. Duomenys iš vyriausybinių kainų skaidrumo agentūrų.",
+  "apiKeyFormatError": "Netinkamas formatas — tikėtinas UUID (8-4-4-4-12)",
   "supportProject": "Palaikykite šį projektą",
   "supportDescription": "Ši programa yra nemokama, atviro kodo ir be reklamų. Jei manote, kad ji naudinga, apsvarstykite galimybę paremti kūrėją.",
   "reportBug": "Pranešti apie klaidą / Pasiūlyti funkciją",

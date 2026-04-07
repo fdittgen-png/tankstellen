@@ -197,6 +197,7 @@
   "cacheEmpty": "De cache is leeg",
   "noStorage": "Geen opslag gebruikt",
   "apiKeyNote": "Gratis registratie. Gegevens van overheidsinstanties voor prijstransparantie.",
+  "apiKeyFormatError": "Ongeldig formaat — UUID verwacht (8-4-4-4-12)",
   "supportProject": "Steun dit project",
   "supportDescription": "Deze app is gratis, open source en zonder advertenties. Als u het nuttig vindt, overweeg de ontwikkelaar te steunen.",
   "reportBug": "Bug melden / Functie voorstellen",

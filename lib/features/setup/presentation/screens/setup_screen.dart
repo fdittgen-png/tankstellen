@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +11,7 @@ import '../../../../core/storage/storage_providers.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/data/repositories/profile_repository.dart';
 import '../../../profile/providers/profile_provider.dart';
+import '../../data/api_key_validator.dart';
 import '../../providers/api_key_validator_provider.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
@@ -22,10 +25,39 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   final _apiKeyController = TextEditingController();
   bool _isLoading = false;
 
+  /// Tracks whether the current API key input has valid UUID format.
+  /// `null` means the field is empty (no validation state shown).
+  bool? _isFormatValid;
+
+  Timer? _debounceTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _apiKeyController.addListener(_onApiKeyChanged);
+  }
+
   @override
   void dispose() {
+    _debounceTimer?.cancel();
+    _apiKeyController.removeListener(_onApiKeyChanged);
     _apiKeyController.dispose();
     super.dispose();
+  }
+
+  void _onApiKeyChanged() {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
+      final text = _apiKeyController.text.trim();
+      setState(() {
+        if (text.isEmpty) {
+          _isFormatValid = null;
+        } else {
+          _isFormatValid = ApiKeyValidator.isValidUuidFormat(text);
+        }
+      });
+    });
   }
 
   Future<void> _continue() async {
@@ -89,6 +121,14 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     ref.read(activeProfileProvider.notifier).refresh();
 
     if (mounted) context.go('/');
+  }
+
+  Widget? _buildFormatIndicator() {
+    if (_isFormatValid == null) return null;
+    if (_isFormatValid!) {
+      return const Icon(Icons.check_circle, color: Colors.green);
+    }
+    return const Icon(Icons.error_outline, color: Colors.red);
   }
 
   @override
@@ -277,11 +317,16 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                 const SizedBox(height: 16),
                 TextField(
                   controller: _apiKeyController,
-                  decoration: const InputDecoration(
-                    labelText: 'API Key',
+                  decoration: InputDecoration(
+                    labelText: l10n?.apiKeyLabel ?? 'API Key',
                     hintText: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
-                    prefixIcon: Icon(Icons.key),
-                    border: OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.key),
+                    border: const OutlineInputBorder(),
+                    suffixIcon: _buildFormatIndicator(),
+                    errorText: _isFormatValid == false
+                        ? (l10n?.apiKeyFormatError ??
+                            'Invalid format — expected UUID (8-4-4-4-12)')
+                        : null,
                   ),
                 ),
                 const SizedBox(height: 8),

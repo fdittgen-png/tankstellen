@@ -337,6 +337,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'Безплатна регистрация. Данни от държавни агенции за ценова прозрачност.';
 
   @override
+  String get apiKeyFormatError =>
+      'Невалиден формат — очакван UUID (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Подкрепете този проект';
 
   @override

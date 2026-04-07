@@ -337,6 +337,10 @@ class AppLocalizationsLt extends AppLocalizations {
       'Nemokama registracija. Duomenys iš vyriausybinių kainų skaidrumo agentūrų.';
 
   @override
+  String get apiKeyFormatError =>
+      'Netinkamas formatas — tikėtinas UUID (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Palaikykite šį projektą';
 
   @override

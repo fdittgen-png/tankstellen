@@ -758,6 +758,12 @@ abstract class AppLocalizations {
   /// **'Free registration. Data from government price transparency agencies.'**
   String get apiKeyNote;
 
+  /// No description provided for @apiKeyFormatError.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid format — expected UUID (8-4-4-4-12)'**
+  String get apiKeyFormatError;
+
   /// No description provided for @supportProject.
   ///
   /// In en, this message translates to:

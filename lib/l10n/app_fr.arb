@@ -107,6 +107,7 @@
   "cacheEmpty": "Le cache est vide",
   "noStorage": "Aucun stockage utilisé",
   "apiKeyNote": "Inscription gratuite. Données des agences gouvernementales de transparence des prix.",
+  "apiKeyFormatError": "Format invalide — UUID attendu (8-4-4-4-12)",
   "supportProject": "Soutenir ce projet",
   "supportDescription": "Cette application est gratuite, open source et sans publicité. Si vous la trouvez utile, pensez à soutenir le développeur.",
   "reportBug": "Signaler un bug / Suggérer une amélioration",

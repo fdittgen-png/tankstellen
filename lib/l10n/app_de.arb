@@ -107,6 +107,7 @@
   "cacheEmpty": "Cache ist leer",
   "noStorage": "Kein Speicher belegt",
   "apiKeyNote": "Kostenlose Registrierung. Daten von den Markttransparenzstellen.",
+  "apiKeyFormatError": "Ungültiges Format — UUID erwartet (8-4-4-4-12)",
   "supportProject": "Dieses Projekt unterstützen",
   "supportDescription": "Diese App ist kostenlos, Open Source und ohne Werbung. Wenn Sie sie nützlich finden, unterstützen Sie den Entwickler.",
   "reportBug": "Fehler melden / Funktion vorschlagen",

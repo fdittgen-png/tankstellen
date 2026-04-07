@@ -337,6 +337,10 @@ class AppLocalizationsLv extends AppLocalizations {
       'Bezmaksas reģistrācija. Dati no valdības cenu caurredzamības aģentūrām.';
 
   @override
+  String get apiKeyFormatError =>
+      'Nederīgs formāts — gaidīts UUID (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Atbalstiet šo projektu';
 
   @override

@@ -95,4 +95,84 @@ void main() {
     final defaultValidator = ApiKeyValidator();
     expect(defaultValidator, isNotNull);
   });
+
+  group('isValidUuidFormat', () {
+    test('accepts valid UUID v4 format', () {
+      expect(
+        ApiKeyValidator.isValidUuidFormat(
+            '12345678-1234-1234-1234-123456789abc'),
+        true,
+      );
+    });
+
+    test('accepts uppercase hex characters', () {
+      expect(
+        ApiKeyValidator.isValidUuidFormat(
+            'ABCDEF01-2345-6789-ABCD-EF0123456789'),
+        true,
+      );
+    });
+
+    test('accepts mixed case hex characters', () {
+      expect(
+        ApiKeyValidator.isValidUuidFormat(
+            'abCDef01-2345-6789-AbCd-ef0123456789'),
+        true,
+      );
+    });
+
+    test('trims whitespace before validation', () {
+      expect(
+        ApiKeyValidator.isValidUuidFormat(
+            '  12345678-1234-1234-1234-123456789abc  '),
+        true,
+      );
+    });
+
+    test('rejects empty string', () {
+      expect(ApiKeyValidator.isValidUuidFormat(''), false);
+    });
+
+    test('rejects string without dashes', () {
+      expect(
+        ApiKeyValidator.isValidUuidFormat('1234567812341234123412345678abcd'),
+        false,
+      );
+    });
+
+    test('rejects wrong segment lengths', () {
+      expect(
+        ApiKeyValidator.isValidUuidFormat(
+            '1234567-1234-1234-1234-123456789abc'),
+        false,
+      );
+    });
+
+    test('rejects non-hex characters', () {
+      expect(
+        ApiKeyValidator.isValidUuidFormat(
+            'GHIJKLMN-1234-1234-1234-123456789abc'),
+        false,
+      );
+    });
+
+    test('rejects partial UUID', () {
+      expect(
+        ApiKeyValidator.isValidUuidFormat('12345678-1234'),
+        false,
+      );
+    });
+
+    test('rejects UUID with extra segment', () {
+      expect(
+        ApiKeyValidator.isValidUuidFormat(
+            '12345678-1234-1234-1234-123456789abc-extra'),
+        false,
+      );
+    });
+
+    test('rejects random text', () {
+      expect(ApiKeyValidator.isValidUuidFormat('not-a-valid-key'), false);
+    });
+  });
 }

@@ -335,6 +335,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Free registration. Data from government price transparency agencies.';
 
   @override
+  String get apiKeyFormatError => 'Invalid format — expected UUID (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Support this project';
 
   @override

@@ -337,6 +337,10 @@ class AppLocalizationsSl extends AppLocalizations {
       'Brezplačna registracija. Podatki od vladnih agencij za cenovno preglednost.';
 
   @override
+  String get apiKeyFormatError =>
+      'Neveljavna oblika — pričakovan UUID (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Podprite ta projekt';
 
   @override

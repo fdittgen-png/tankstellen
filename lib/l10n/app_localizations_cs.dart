@@ -337,6 +337,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Bezplatná registrace. Data od vládních agentur pro cenovou transparentnost.';
 
   @override
+  String get apiKeyFormatError =>
+      'Neplatný formát — očekáváno UUID (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Podpořte tento projekt';
 
   @override
