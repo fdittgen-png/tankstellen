@@ -1001,4 +1001,19 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get onboardingFinish => 'Get started';
+
+  @override
+  String crossBorderNearby(String country) {
+    return '$country is nearby';
+  }
+
+  @override
+  String crossBorderDistance(int km) {
+    return '~$km km to border';
+  }
+
+  @override
+  String crossBorderAvgPrice(String price, int count) {
+    return 'Avg here: $price EUR ($count stations)';
+  }
 }

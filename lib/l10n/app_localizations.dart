@@ -1981,6 +1981,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Get started'**
   String get onboardingFinish;
+
+  /// No description provided for @crossBorderNearby.
+  ///
+  /// In en, this message translates to:
+  /// **'{country} is nearby'**
+  String crossBorderNearby(String country);
+
+  /// No description provided for @crossBorderDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'~{km} km to border'**
+  String crossBorderDistance(int km);
+
+  /// No description provided for @crossBorderAvgPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg here: {price} EUR ({count} stations)'**
+  String crossBorderAvgPrice(String price, int count);
 }
 
 class _AppLocalizationsDelegate
