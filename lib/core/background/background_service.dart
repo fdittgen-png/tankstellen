@@ -11,6 +11,7 @@ import '../notifications/notification_service.dart';
 import '../storage/hive_storage.dart';
 import '../utils/json_extensions.dart';
 import 'background_retry.dart';
+import 'hive_isolate_lock.dart';
 
 /// Manages periodic background tasks via Android WorkManager.
 ///
@@ -116,8 +117,20 @@ void callbackDispatcher() {
 
 /// Background task: fetch latest prices for favorites, record history,
 /// evaluate alerts, and fire notifications.
+///
+/// Uses [HiveIsolateLock] to prevent concurrent Hive access with the main
+/// isolate, and closes all Hive boxes when done to release file handles.
 Future<void> _refreshPricesAndCheckAlerts() async {
+  HiveIsolateLock? lock;
   try {
+    // Acquire file-based lock to prevent concurrent Hive access
+    lock = await HiveIsolateLock.create();
+    final acquired = await lock.acquire();
+    if (!acquired) {
+      debugPrint('BackgroundService: could not acquire Hive lock, skipping task');
+      return;
+    }
+
     // Initialize Hive in isolate with proper encryption
     await HiveStorage.initInIsolate();
 
@@ -297,5 +310,14 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     await HomeWidgetService.updateWidget(storage);
   } catch (e) {
     debugPrint('BackgroundService: task failed: $e');
+  } finally {
+    // Always close Hive boxes and release lock, even on failure.
+    // This prevents file handle leaks and stale locks.
+    try {
+      await HiveStorage.closeIsolateBoxes();
+    } catch (e) {
+      debugPrint('BackgroundService: failed to close Hive boxes: $e');
+    }
+    lock?.release();
   }
 }

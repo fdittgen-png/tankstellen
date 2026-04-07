@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/background/background_service.dart';
+import 'package:tankstellen/core/background/hive_isolate_lock.dart';
 import 'package:tankstellen/core/notifications/notification_service.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/utils/json_extensions.dart';
@@ -346,6 +347,80 @@ void main() {
       expect(prices.containsKey('station-1'), isTrue);
       expect(prices.containsKey('station-2'), isTrue);
       expect(prices.containsKey('station-3'), isFalse);
+    });
+  });
+
+  group('Hive isolate safety', () {
+    test('background service acquires lock before Hive access', () {
+      final source = File(
+        'lib/core/background/background_service.dart',
+      ).readAsStringSync();
+
+      // Must import hive_isolate_lock
+      expect(
+        source.contains('hive_isolate_lock.dart'),
+        isTrue,
+        reason: 'Background service must import HiveIsolateLock',
+      );
+
+      // Must acquire lock before initInIsolate
+      final lockAcquireIndex = source.indexOf('lock.acquire()');
+      final initIndex = source.indexOf('initInIsolate()');
+      expect(
+        lockAcquireIndex,
+        lessThan(initIndex),
+        reason: 'Lock must be acquired before Hive initialization',
+      );
+    });
+
+    test('background service closes Hive boxes in finally block', () {
+      final source = File(
+        'lib/core/background/background_service.dart',
+      ).readAsStringSync();
+
+      // Must call closeIsolateBoxes
+      expect(
+        source.contains('closeIsolateBoxes'),
+        isTrue,
+        reason: 'Background service must close Hive boxes after use',
+      );
+
+      // Must release lock
+      expect(
+        source.contains('lock?.release()'),
+        isTrue,
+        reason: 'Background service must release lock in finally block',
+      );
+
+      // closeIsolateBoxes and release must be in a finally block
+      final finallyIndex = source.indexOf('} finally {');
+      final closeIndex = source.indexOf('closeIsolateBoxes');
+      expect(
+        finallyIndex,
+        lessThan(closeIndex),
+        reason: 'Box closing must happen in a finally block',
+      );
+    });
+
+    test('background service skips task when lock is unavailable', () {
+      final source = File(
+        'lib/core/background/background_service.dart',
+      ).readAsStringSync();
+
+      // Must check lock acquisition result and return early if failed
+      expect(
+        source.contains('if (!acquired)'),
+        isTrue,
+        reason: 'Background service must check lock acquisition and skip if failed',
+      );
+    });
+
+    test('HiveStorage.closeIsolateBoxes method exists', () {
+      expect(HiveStorage.closeIsolateBoxes, isA<Function>());
+    });
+
+    test('HiveIsolateLock.create method exists', () {
+      expect(HiveIsolateLock.create, isA<Function>());
     });
   });
 

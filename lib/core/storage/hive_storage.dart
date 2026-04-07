@@ -90,6 +90,9 @@ class HiveStorage implements StorageRepository {
   /// Background isolates (WorkManager) run in separate Dart isolates and
   /// must re-initialize Hive. This ensures encrypted boxes use the same
   /// cipher as the main isolate.
+  ///
+  /// **Important:** Call [closeIsolateBoxes] when done to release file handles
+  /// and prevent corruption from concurrent access with the main isolate.
   static Future<void> initInIsolate() async {
     await Hive.initFlutter();
     final cipher = await _loadCipher();
@@ -98,6 +101,29 @@ class HiveStorage implements StorageRepository {
     await Hive.openBox(_alertsBox);
     await Hive.openBox(_cacheBox);
     await Hive.openBox(_priceHistoryBox);
+  }
+
+  /// Close all Hive boxes opened by [initInIsolate].
+  ///
+  /// Must be called at the end of every background task to release file
+  /// handles and prevent race conditions with the main isolate.
+  static Future<void> closeIsolateBoxes() async {
+    final boxNames = [
+      _settingsBox,
+      _favoritesBox,
+      _alertsBox,
+      _cacheBox,
+      _priceHistoryBox,
+    ];
+    for (final name in boxNames) {
+      try {
+        if (Hive.isBoxOpen(name)) {
+          await Hive.box(name).close();
+        }
+      } catch (e) {
+        debugPrint('HiveStorage: failed to close box "$name": $e');
+      }
+    }
   }
 
   @visibleForTesting

@@ -551,6 +551,49 @@ void main() {
   });
 
   // ---------------------------------------------------------------------------
+  // Isolate Box Lifecycle
+  // ---------------------------------------------------------------------------
+  group('Isolate Box Lifecycle', () {
+    test('closeIsolateBoxes closes all open boxes without error', () async {
+      // Boxes are already open from setUp via initForTest
+      await HiveStorage.closeIsolateBoxes();
+
+      // After closing, boxes should not be accessible
+      // Re-open for other tests in tearDown
+      expect(Hive.isBoxOpen('settings'), isFalse);
+      expect(Hive.isBoxOpen('favorites'), isFalse);
+      expect(Hive.isBoxOpen('alerts'), isFalse);
+      expect(Hive.isBoxOpen('cache'), isFalse);
+      expect(Hive.isBoxOpen('price_history'), isFalse);
+
+      // Re-open boxes so tearDown (Hive.close()) works cleanly
+      await HiveStorage.initForTest();
+    });
+
+    test('closeIsolateBoxes is safe to call when boxes are already closed', () async {
+      await HiveStorage.closeIsolateBoxes();
+
+      // Calling again should not throw
+      await HiveStorage.closeIsolateBoxes();
+
+      // Re-open for other tests
+      await HiveStorage.initForTest();
+    });
+
+    test('closeIsolateBoxes does not close profiles box', () async {
+      // profiles box is only opened by main isolate init, not initInIsolate
+      // closeIsolateBoxes should only close the 5 boxes that initInIsolate opens
+      await HiveStorage.closeIsolateBoxes();
+
+      // profiles box should still be open (it was opened by initForTest)
+      expect(Hive.isBoxOpen('profiles'), isTrue);
+
+      // Re-open for other tests
+      await HiveStorage.initForTest();
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // API Key (in-memory cache only — cannot test secure storage in unit tests)
   // ---------------------------------------------------------------------------
   group('API Key (in-memory)', () {
