@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# License audit script for CI — ensures all dependencies use MIT-compatible licenses.
+# License audit script for CI -- ensures all dependencies use MIT-compatible licenses.
 # Allowed: MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, Unlicense, ISC, Zlib, BlueOak-1.0.0
 # Forbidden: GPL, AGPL, LGPL, SSPL, EUPL, CC-BY-SA, CC-BY-NC
 #
 # Usage: bash scripts/license_audit.sh [--report]
 #   --report  Generate docs/DEPENDENCY_LICENSES.md inventory
 
-set -euo pipefail
+set -uo pipefail
 
 REPORT_MODE=false
 if [[ "${1:-}" == "--report" ]]; then
@@ -61,17 +61,30 @@ UNKNOWN_DEPS=""
 REPORT_LINES=""
 EXIT_CODE=0
 
-# Get all non-dev dependencies (skip first line which is the project name)
-DEPS=$(dart pub deps --no-dev --style=compact 2>/dev/null | tail -n +2 | sed 's/ .*//' | sort -u)
+# Determine pub cache location
+PUB_CACHE="${PUB_CACHE:-$HOME/.pub-cache}"
+
+# Get all non-dev dependencies: parse lines starting with "- " from compact output
+DEPS=$(dart pub deps --no-dev --style=compact 2>/dev/null | grep '^- ' | sed 's/^- //' | sed 's/ .*//' | sort -u || true)
+
+if [ -z "$DEPS" ]; then
+  echo "::warning::Could not parse dependencies from dart pub deps"
+  echo "License audit skipped."
+  exit 0
+fi
+
+echo "Checking licenses for dependencies..."
 
 for pkg in $DEPS; do
   # Find the package's LICENSE file in the pub cache
-  LICENSE_FILE=$(find ~/.pub-cache/hosted/pub.dev/"${pkg}-"* -maxdepth 1 -iname "LICENSE*" 2>/dev/null | head -1)
-
-  if [ -z "$LICENSE_FILE" ]; then
-    # Try hosted subdirectories
-    LICENSE_FILE=$(find ~/.pub-cache/hosted/pub.dev/"${pkg}"* -maxdepth 2 -iname "LICENSE*" 2>/dev/null | head -1)
-  fi
+  LICENSE_FILE=""
+  # shellcheck disable=SC2086
+  for candidate in "$PUB_CACHE"/hosted/pub.dev/${pkg}-*/LICENSE* "$PUB_CACHE"/hosted/pub.dev/${pkg}-*/license*; do
+    if [ -f "$candidate" ]; then
+      LICENSE_FILE="$candidate"
+      break
+    fi
+  done
 
   LICENSE_TYPE="unknown"
 
@@ -124,7 +137,7 @@ for pkg in $DEPS; do
       fi
     fi
   else
-    # Flutter SDK packages (like sky_engine) don't have separate LICENSE files
+    # Flutter SDK packages (like sky_engine, flutter) don't have separate LICENSE files
     # They are covered by the Flutter SDK license (BSD-3-Clause)
     LICENSE_TYPE="Flutter SDK (BSD-3-Clause)"
   fi
@@ -157,12 +170,12 @@ fi
 if [ -n "$UNKNOWN_DEPS" ]; then
   echo "::warning::Dependencies with unrecognized licenses:$(echo -e "$UNKNOWN_DEPS")"
   echo "Please verify these manually and add their license patterns to the audit script."
-  # Unknown licenses are a warning, not a failure — manual review needed
+  # Unknown licenses are a warning, not a failure -- manual review needed
 fi
 
 if [ $EXIT_CODE -eq 0 ]; then
-  TOTAL=$(echo "$DEPS" | wc -w)
-  echo "License audit passed — $TOTAL dependencies checked, all MIT/BSD/Apache compatible."
+  TOTAL=$(echo "$DEPS" | wc -l)
+  echo "License audit passed -- $TOTAL dependencies checked, all MIT/BSD/Apache compatible."
 fi
 
 exit $EXIT_CODE

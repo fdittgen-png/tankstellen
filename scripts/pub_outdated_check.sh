@@ -7,7 +7,7 @@
 #
 # Usage: bash scripts/pub_outdated_check.sh
 
-set -euo pipefail
+set -uo pipefail
 
 EXIT_CODE=0
 
