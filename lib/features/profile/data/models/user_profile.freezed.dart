@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserProfile {
 
- String get id; String get name; FuelType get preferredFuelType; double get defaultSearchRadius; LandingScreen get landingScreen; List<String> get favoriteStationIds; String? get homeZipCode; bool get autoUpdatePosition; String? get countryCode; String? get languageCode; double get routeSegmentKm; bool get avoidHighways; bool get showFuel; bool get showElectric;/// Rating sharing mode:
+ String get id; String get name;@FuelTypeJsonConverter() FuelType get preferredFuelType; double get defaultSearchRadius; LandingScreen get landingScreen; List<String> get favoriteStationIds; String? get homeZipCode; bool get autoUpdatePosition; String? get countryCode; String? get languageCode; double get routeSegmentKm; bool get avoidHighways; bool get showFuel; bool get showElectric;/// Rating sharing mode:
 /// - 'local' — ratings saved only on this device
 /// - 'private' — synced with user's database but not shared
 /// - 'shared' — visible to all users of the database
@@ -52,7 +52,7 @@ abstract mixin class $UserProfileCopyWith<$Res>  {
   factory $UserProfileCopyWith(UserProfile value, $Res Function(UserProfile) _then) = _$UserProfileCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways, bool showFuel, bool showElectric, String ratingMode
+ String id, String name,@FuelTypeJsonConverter() FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways, bool showFuel, bool showElectric, String ratingMode
 });
 
 
@@ -171,7 +171,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserProfile() when $default != null:
 return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode);case _:
@@ -192,7 +192,7 @@ return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchR
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode)  $default,) {final _that = this;
 switch (_that) {
 case _UserProfile():
 return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode);case _:
@@ -212,7 +212,7 @@ return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchR
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode)?  $default,) {final _that = this;
 switch (_that) {
 case _UserProfile() when $default != null:
 return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode);case _:
@@ -227,12 +227,12 @@ return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchR
 @JsonSerializable()
 
 class _UserProfile implements UserProfile {
-  const _UserProfile({required this.id, required this.name, this.preferredFuelType = FuelType.e10, this.defaultSearchRadius = 10.0, this.landingScreen = LandingScreen.search, final  List<String> favoriteStationIds = const [], this.homeZipCode, this.autoUpdatePosition = false, this.countryCode, this.languageCode, this.routeSegmentKm = 50.0, this.avoidHighways = false, this.showFuel = true, this.showElectric = true, this.ratingMode = 'local'}): _favoriteStationIds = favoriteStationIds;
+  const _UserProfile({required this.id, required this.name, @FuelTypeJsonConverter() this.preferredFuelType = FuelType.e10, this.defaultSearchRadius = 10.0, this.landingScreen = LandingScreen.search, final  List<String> favoriteStationIds = const [], this.homeZipCode, this.autoUpdatePosition = false, this.countryCode, this.languageCode, this.routeSegmentKm = 50.0, this.avoidHighways = false, this.showFuel = true, this.showElectric = true, this.ratingMode = 'local'}): _favoriteStationIds = favoriteStationIds;
   factory _UserProfile.fromJson(Map<String, dynamic> json) => _$UserProfileFromJson(json);
 
 @override final  String id;
 @override final  String name;
-@override@JsonKey() final  FuelType preferredFuelType;
+@override@JsonKey()@FuelTypeJsonConverter() final  FuelType preferredFuelType;
 @override@JsonKey() final  double defaultSearchRadius;
 @override@JsonKey() final  LandingScreen landingScreen;
  final  List<String> _favoriteStationIds;
@@ -289,7 +289,7 @@ abstract mixin class _$UserProfileCopyWith<$Res> implements $UserProfileCopyWith
   factory _$UserProfileCopyWith(_UserProfile value, $Res Function(_UserProfile) _then) = __$UserProfileCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways, bool showFuel, bool showElectric, String ratingMode
+ String id, String name,@FuelTypeJsonConverter() FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways, bool showFuel, bool showElectric, String ratingMode
 });
 
 

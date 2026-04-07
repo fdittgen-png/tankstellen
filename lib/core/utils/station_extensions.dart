@@ -23,17 +23,17 @@ extension StationDisplay on Station {
   /// order: E10 → E5 → Diesel.
   double? priceFor(FuelType fuelType) {
     return switch (fuelType) {
-      FuelType.e5 => e5,
-      FuelType.e10 => e10,
-      FuelType.e98 => e98,
-      FuelType.diesel => diesel,
-      FuelType.dieselPremium => dieselPremium,
-      FuelType.e85 => e85,
-      FuelType.lpg => lpg,
-      FuelType.cng => cng,
-      FuelType.hydrogen => null,
-      FuelType.electric => null,
-      FuelType.all => e10 ?? e5 ?? diesel,
+      FuelTypeE5() => e5,
+      FuelTypeE10() => e10,
+      FuelTypeE98() => e98,
+      FuelTypeDiesel() => diesel,
+      FuelTypeDieselPremium() => dieselPremium,
+      FuelTypeE85() => e85,
+      FuelTypeLpg() => lpg,
+      FuelTypeCng() => cng,
+      FuelTypeHydrogen() => null,
+      FuelTypeElectric() => null,
+      FuelTypeAll() => e10 ?? e5 ?? diesel,
     };
   }
 }

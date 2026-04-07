@@ -5,19 +5,19 @@ import 'station_extensions.dart';
 
 /// Returns the price of the given [fuelType] for [station], or null if unavailable.
 double? priceForFuelType(Station station, FuelType fuelType) {
-  switch (fuelType) {
-    case FuelType.e5: return station.e5;
-    case FuelType.e10: return station.e10;
-    case FuelType.e98: return station.e98;
-    case FuelType.diesel: return station.diesel;
-    case FuelType.dieselPremium: return station.dieselPremium;
-    case FuelType.e85: return station.e85;
-    case FuelType.lpg: return station.lpg;
-    case FuelType.cng: return station.cng;
-    case FuelType.hydrogen: return null;
-    case FuelType.electric: return null;
-    case FuelType.all: return station.e10 ?? station.e5 ?? station.diesel;
-  }
+  return switch (fuelType) {
+    FuelTypeE5() => station.e5,
+    FuelTypeE10() => station.e10,
+    FuelTypeE98() => station.e98,
+    FuelTypeDiesel() => station.diesel,
+    FuelTypeDieselPremium() => station.dieselPremium,
+    FuelTypeE85() => station.e85,
+    FuelTypeLpg() => station.lpg,
+    FuelTypeCng() => station.cng,
+    FuelTypeHydrogen() => null,
+    FuelTypeElectric() => null,
+    FuelTypeAll() => station.e10 ?? station.e5 ?? station.diesel,
+  };
 }
 
 /// Compares two stations by price for [fuelType]. Stations without a price sort last.

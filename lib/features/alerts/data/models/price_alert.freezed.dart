@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PriceAlert {
 
- String get id; String get stationId; String get stationName; FuelType get fuelType; double get targetPrice; bool get isActive; DateTime? get lastTriggeredAt; DateTime get createdAt;
+ String get id; String get stationId; String get stationName;@FuelTypeJsonConverter() FuelType get fuelType; double get targetPrice; bool get isActive; DateTime? get lastTriggeredAt; DateTime get createdAt;
 /// Create a copy of PriceAlert
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $PriceAlertCopyWith<$Res>  {
   factory $PriceAlertCopyWith(PriceAlert value, $Res Function(PriceAlert) _then) = _$PriceAlertCopyWithImpl;
 @useResult
 $Res call({
- String id, String stationId, String stationName, FuelType fuelType, double targetPrice, bool isActive, DateTime? lastTriggeredAt, DateTime createdAt
+ String id, String stationId, String stationName,@FuelTypeJsonConverter() FuelType fuelType, double targetPrice, bool isActive, DateTime? lastTriggeredAt, DateTime createdAt
 });
 
 
@@ -160,7 +160,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String stationId,  String stationName,  FuelType fuelType,  double targetPrice,  bool isActive,  DateTime? lastTriggeredAt,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String stationId,  String stationName, @FuelTypeJsonConverter()  FuelType fuelType,  double targetPrice,  bool isActive,  DateTime? lastTriggeredAt,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PriceAlert() when $default != null:
 return $default(_that.id,_that.stationId,_that.stationName,_that.fuelType,_that.targetPrice,_that.isActive,_that.lastTriggeredAt,_that.createdAt);case _:
@@ -181,7 +181,7 @@ return $default(_that.id,_that.stationId,_that.stationName,_that.fuelType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String stationId,  String stationName,  FuelType fuelType,  double targetPrice,  bool isActive,  DateTime? lastTriggeredAt,  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String stationId,  String stationName, @FuelTypeJsonConverter()  FuelType fuelType,  double targetPrice,  bool isActive,  DateTime? lastTriggeredAt,  DateTime createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _PriceAlert():
 return $default(_that.id,_that.stationId,_that.stationName,_that.fuelType,_that.targetPrice,_that.isActive,_that.lastTriggeredAt,_that.createdAt);case _:
@@ -201,7 +201,7 @@ return $default(_that.id,_that.stationId,_that.stationName,_that.fuelType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String stationId,  String stationName,  FuelType fuelType,  double targetPrice,  bool isActive,  DateTime? lastTriggeredAt,  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String stationId,  String stationName, @FuelTypeJsonConverter()  FuelType fuelType,  double targetPrice,  bool isActive,  DateTime? lastTriggeredAt,  DateTime createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _PriceAlert() when $default != null:
 return $default(_that.id,_that.stationId,_that.stationName,_that.fuelType,_that.targetPrice,_that.isActive,_that.lastTriggeredAt,_that.createdAt);case _:
@@ -216,13 +216,13 @@ return $default(_that.id,_that.stationId,_that.stationName,_that.fuelType,_that.
 @JsonSerializable()
 
 class _PriceAlert implements PriceAlert {
-  const _PriceAlert({required this.id, required this.stationId, required this.stationName, required this.fuelType, required this.targetPrice, this.isActive = true, this.lastTriggeredAt, required this.createdAt});
+  const _PriceAlert({required this.id, required this.stationId, required this.stationName, @FuelTypeJsonConverter() required this.fuelType, required this.targetPrice, this.isActive = true, this.lastTriggeredAt, required this.createdAt});
   factory _PriceAlert.fromJson(Map<String, dynamic> json) => _$PriceAlertFromJson(json);
 
 @override final  String id;
 @override final  String stationId;
 @override final  String stationName;
-@override final  FuelType fuelType;
+@override@FuelTypeJsonConverter() final  FuelType fuelType;
 @override final  double targetPrice;
 @override@JsonKey() final  bool isActive;
 @override final  DateTime? lastTriggeredAt;
@@ -261,7 +261,7 @@ abstract mixin class _$PriceAlertCopyWith<$Res> implements $PriceAlertCopyWith<$
   factory _$PriceAlertCopyWith(_PriceAlert value, $Res Function(_PriceAlert) _then) = __$PriceAlertCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String stationId, String stationName, FuelType fuelType, double targetPrice, bool isActive, DateTime? lastTriggeredAt, DateTime createdAt
+ String id, String stationId, String stationName,@FuelTypeJsonConverter() FuelType fuelType, double targetPrice, bool isActive, DateTime? lastTriggeredAt, DateTime createdAt
 });
 
 
