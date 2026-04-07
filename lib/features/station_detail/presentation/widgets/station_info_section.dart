@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -48,9 +49,9 @@ class StationInfoSection extends StatelessWidget {
         Text(l10n?.openingHours ?? 'Opening hours', style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
         if (station.is24h)
-          const ListTile(
-            leading: Icon(Icons.schedule, color: Colors.green),
-            title: Text('24h/24 — Automate'),
+          ListTile(
+            leading: Icon(Icons.schedule, color: DarkModeColors.success(context)),
+            title: const Text('24h/24 — Automate'),
           )
         else if (station.openingHoursText != null && station.openingHoursText!.isNotEmpty)
           ...station.openingHoursText!.split('\n').map((line) => ListTile(
@@ -84,13 +85,13 @@ class StationInfoSection extends StatelessWidget {
               ...station.availableFuels.map((f) => Chip(
                     label: Text(f, style: const TextStyle(fontSize: 12)),
                     visualDensity: VisualDensity.compact,
-                    backgroundColor: Colors.green.shade50,
-                    side: BorderSide(color: Colors.green.shade200),
+                    backgroundColor: DarkModeColors.successSurface(context),
+                    side: BorderSide(color: DarkModeColors.success(context).withValues(alpha: 0.4)),
                   )),
               ...station.unavailableFuels.map((f) => Chip(
-                    label: Text(f, style: TextStyle(fontSize: 12, color: Colors.grey.shade600, decoration: TextDecoration.lineThrough)),
+                    label: Text(f, style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant, decoration: TextDecoration.lineThrough)),
                     visualDensity: VisualDensity.compact,
-                    backgroundColor: Colors.grey.shade100,
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
                   )),
             ],
           ),

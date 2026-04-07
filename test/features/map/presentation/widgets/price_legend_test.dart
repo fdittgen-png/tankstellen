@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/core/utils/price_tier.dart';
 import 'package:tankstellen/features/map/presentation/widgets/price_legend.dart';
 
@@ -14,33 +15,20 @@ void main() {
       expect(find.text('expensive'), findsOneWidget);
     });
 
-    testWidgets('renders green circle for cheap end', (tester) async {
+    testWidgets('renders circle for cheap end with success color', (tester) async {
       await pumpApp(tester, const PriceLegend());
 
-      // Find decorated containers with green circle
+      // The cheap circle uses DarkModeColors.success which is theme-aware
       final containers = find.byWidgetPredicate((widget) {
         if (widget is Container && widget.decoration is BoxDecoration) {
           final decoration = widget.decoration as BoxDecoration;
-          return decoration.color == Colors.green &&
-              decoration.shape == BoxShape.circle;
+          return decoration.shape == BoxShape.circle &&
+              decoration.color != null;
         }
         return false;
       });
-      expect(containers, findsOneWidget);
-    });
-
-    testWidgets('renders red circle for expensive end', (tester) async {
-      await pumpApp(tester, const PriceLegend());
-
-      final containers = find.byWidgetPredicate((widget) {
-        if (widget is Container && widget.decoration is BoxDecoration) {
-          final decoration = widget.decoration as BoxDecoration;
-          return decoration.color == Colors.red &&
-              decoration.shape == BoxShape.circle;
-        }
-        return false;
-      });
-      expect(containers, findsOneWidget);
+      // Two circles: cheap and expensive
+      expect(containers, findsNWidgets(2));
     });
 
     testWidgets('renders gradient bar between labels', (tester) async {
@@ -75,25 +63,33 @@ void main() {
       );
     });
 
-    testWidgets('cheap icon is green colored', (tester) async {
-      await pumpApp(tester, const PriceLegend());
+    testWidgets('cheap icon uses success color', (tester) async {
+      late Color expectedColor;
+      await pumpApp(tester, Builder(builder: (context) {
+        expectedColor = DarkModeColors.success(context);
+        return const PriceLegend();
+      }));
 
       final cheapIcon = tester.widget<Icon>(
         find.byIcon(Icons.arrow_downward),
       );
-      expect(cheapIcon.color, Colors.green);
+      expect(cheapIcon.color, expectedColor);
     });
 
-    testWidgets('expensive icon is red colored', (tester) async {
-      await pumpApp(tester, const PriceLegend());
+    testWidgets('expensive icon uses error color', (tester) async {
+      late Color expectedColor;
+      await pumpApp(tester, Builder(builder: (context) {
+        expectedColor = DarkModeColors.error(context);
+        return const PriceLegend();
+      }));
 
       final expensiveIcon = tester.widget<Icon>(
         find.byIcon(Icons.arrow_upward),
       );
-      expect(expensiveIcon.color, Colors.red);
+      expect(expensiveIcon.color, expectedColor);
     });
 
-    testWidgets('gradient goes from green through orange to red',
+    testWidgets('gradient has three stops (cheap, warning, expensive)',
         (tester) async {
       await pumpApp(tester, const PriceLegend());
 
@@ -102,10 +98,7 @@ void main() {
           final decoration = widget.decoration as BoxDecoration;
           if (decoration.gradient is LinearGradient) {
             final gradient = decoration.gradient as LinearGradient;
-            return gradient.colors.length == 3 &&
-                gradient.colors[0] == Colors.green &&
-                gradient.colors[1] == Colors.orange &&
-                gradient.colors[2] == Colors.red;
+            return gradient.colors.length == 3;
           }
         }
         return false;

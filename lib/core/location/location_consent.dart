@@ -45,7 +45,7 @@ class LocationConsentDialog {
               const SizedBox(height: 16),
               Text(t.revoke, style: const TextStyle(fontSize: 13)),
               const SizedBox(height: 12),
-              Text(t.legal, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+              Text(t.legal, style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant)),
             ],
           ),
         ),

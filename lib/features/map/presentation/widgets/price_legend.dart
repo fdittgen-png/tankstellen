@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -8,14 +9,17 @@ class PriceLegend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cheapColor = DarkModeColors.success(context);
+    final expensiveColor = DarkModeColors.error(context);
+    final overlayBg = DarkModeColors.mapOverlay(context);
+    final shadowColor = DarkModeColors.mapOverlayShadow(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.9),
+        color: overlayBg,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
-          BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15), blurRadius: 4),
+          BoxShadow(color: shadowColor, blurRadius: 4),
         ],
       ),
       child: Builder(builder: (context) {
@@ -23,22 +27,22 @@ class PriceLegend extends StatelessWidget {
         return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(iconForPriceTier(PriceTier.cheap), size: 12, color: Colors.green),
+          Icon(iconForPriceTier(PriceTier.cheap), size: 12, color: cheapColor),
           Container(
               width: 12,
               height: 12,
-              decoration: const BoxDecoration(
-                  color: Colors.green, shape: BoxShape.circle)),
+              decoration: BoxDecoration(
+                  color: cheapColor, shape: BoxShape.circle)),
           const SizedBox(width: 4),
           Text(l10n?.cheap ?? 'cheap', style: const TextStyle(fontSize: 10)),
           Container(
             width: 40,
             height: 4,
             margin: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                  colors: [Colors.green, Colors.orange, Colors.red]),
-              borderRadius: BorderRadius.all(Radius.circular(2)),
+                  colors: [cheapColor, DarkModeColors.warning(context), expensiveColor]),
+              borderRadius: const BorderRadius.all(Radius.circular(2)),
             ),
           ),
           Text(l10n?.expensive ?? 'expensive', style: const TextStyle(fontSize: 10)),
@@ -46,9 +50,9 @@ class PriceLegend extends StatelessWidget {
           Container(
               width: 12,
               height: 12,
-              decoration: const BoxDecoration(
-                  color: Colors.red, shape: BoxShape.circle)),
-          Icon(iconForPriceTier(PriceTier.expensive), size: 12, color: Colors.red),
+              decoration: BoxDecoration(
+                  color: expensiveColor, shape: BoxShape.circle)),
+          Icon(iconForPriceTier(PriceTier.expensive), size: 12, color: expensiveColor),
         ],
       );
       }),
@@ -75,10 +79,10 @@ class ZoomButton extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: DarkModeColors.mapOverlay(context),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, size: 20, color: Colors.black87),
+          child: Icon(icon, size: 20, color: DarkModeColors.mapOverlayIcon(context)),
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/freshness_badge.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/brand_logo.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -112,7 +113,9 @@ class StationDetailScreen extends ConsumerWidget {
                 width: 16, height: 16,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: station.isOpen ? Colors.green : Colors.red,
+                  color: station.isOpen
+                      ? DarkModeColors.success(context)
+                      : DarkModeColors.error(context),
                 ),
               ),
               const SizedBox(width: 8),
@@ -121,7 +124,9 @@ class StationDetailScreen extends ConsumerWidget {
                     ? (l10n?.open ?? 'Open')
                     : (l10n?.closed ?? 'Closed'),
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: station.isOpen ? Colors.green : Colors.red,
+                  color: station.isOpen
+                      ? DarkModeColors.success(context)
+                      : DarkModeColors.error(context),
                   fontWeight: FontWeight.bold,
                 ),
               ),

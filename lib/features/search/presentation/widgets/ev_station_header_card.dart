@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/charging_station.dart';
 
@@ -32,7 +33,9 @@ class EVStationHeaderCard extends StatelessWidget {
                   height: 14,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: station.isOperational == true ? Colors.green : Colors.orange,
+                    color: station.isOperational == true
+                        ? DarkModeColors.success(context)
+                        : DarkModeColors.warning(context),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -41,7 +44,9 @@ class EVStationHeaderCard extends StatelessWidget {
                       ? (l10n?.evOperational ?? 'Operational')
                       : (l10n?.evStatusUnknown ?? 'Status unknown'),
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: station.isOperational == true ? Colors.green : Colors.orange,
+                    color: station.isOperational == true
+                        ? DarkModeColors.success(context)
+                        : DarkModeColors.warning(context),
                     fontWeight: FontWeight.w600,
                   ),
                 ),

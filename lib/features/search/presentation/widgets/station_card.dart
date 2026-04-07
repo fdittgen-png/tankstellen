@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/price_tier.dart';
@@ -65,7 +66,7 @@ class StationCard extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border(
               left: BorderSide(
-                color: isCheapest ? Colors.green : fuelColor,
+                color: isCheapest ? DarkModeColors.success(context) : fuelColor,
                 width: isCheapest ? 6 : 4,
               ),
             ),
@@ -82,7 +83,9 @@ class StationCard extends StatelessWidget {
                     height: 12,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: station.isOpen ? Colors.green : Colors.red,
+                      color: station.isOpen
+                          ? DarkModeColors.success(context)
+                          : DarkModeColors.error(context),
                     ),
                   ),
                   if (station.is24h)
@@ -192,11 +195,11 @@ class StationCard extends StatelessWidget {
                       margin: const EdgeInsets.only(top: 4),
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                       decoration: BoxDecoration(
-                        color: Colors.green.withValues(alpha: 0.15),
+                        color: DarkModeColors.successSurface(context),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(AppLocalizations.of(context)?.cheapest ?? 'Cheapest',
-                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.green)),
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: DarkModeColors.success(context))),
                     ),
                   if (selectedFuelType == FuelType.all && !isCheapest) ...[
                     const SizedBox(height: 2),
