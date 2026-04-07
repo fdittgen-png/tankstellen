@@ -1861,6 +1861,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete profile'**
   String get deleteProfileConfirm;
+
+  /// No description provided for @errorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Network error. Check your connection.'**
+  String get errorNetwork;
+
+  /// No description provided for @errorServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Server error. Please try again later.'**
+  String get errorServer;
+
+  /// No description provided for @errorTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection timed out. Please try again.'**
+  String get errorTimeout;
+
+  /// No description provided for @errorNoConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection.'**
+  String get errorNoConnection;
+
+  /// No description provided for @errorApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid API key. Check your settings.'**
+  String get errorApiKey;
+
+  /// No description provided for @errorLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not determine your location.'**
+  String get errorLocation;
+
+  /// No description provided for @errorNoApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'No API key configured. Go to Settings to add one.'**
+  String get errorNoApiKey;
+
+  /// No description provided for @errorAllServicesFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load data. Check your connection and try again.'**
+  String get errorAllServicesFailed;
+
+  /// No description provided for @errorCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Local data error. Try clearing the cache.'**
+  String get errorCache;
+
+  /// No description provided for @errorCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Request was cancelled.'**
+  String get errorCancelled;
+
+  /// No description provided for @errorUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'An unexpected error occurred.'**
+  String get errorUnknown;
 }
 
 class _AppLocalizationsDelegate

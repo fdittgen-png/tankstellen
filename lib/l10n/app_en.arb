@@ -324,5 +324,16 @@
   "refreshFailed": "Refresh failed. Please try again.",
   "deleteProfileTitle": "Delete profile?",
   "deleteProfileBody": "This profile and its settings will be permanently deleted. This cannot be undone.",
-  "deleteProfileConfirm": "Delete profile"
+  "deleteProfileConfirm": "Delete profile",
+  "errorNetwork": "Network error. Check your connection.",
+  "errorServer": "Server error. Please try again later.",
+  "errorTimeout": "Connection timed out. Please try again.",
+  "errorNoConnection": "No internet connection.",
+  "errorApiKey": "Invalid API key. Check your settings.",
+  "errorLocation": "Could not determine your location.",
+  "errorNoApiKey": "No API key configured. Go to Settings to add one.",
+  "errorAllServicesFailed": "Could not load data. Check your connection and try again.",
+  "errorCache": "Local data error. Try clearing the cache.",
+  "errorCancelled": "Request was cancelled.",
+  "errorUnknown": "An unexpected error occurred."
 }

@@ -936,4 +936,39 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get deleteProfileConfirm => 'Delete profile';
+
+  @override
+  String get errorNetwork => 'Network error. Check your connection.';
+
+  @override
+  String get errorServer => 'Server error. Please try again later.';
+
+  @override
+  String get errorTimeout => 'Connection timed out. Please try again.';
+
+  @override
+  String get errorNoConnection => 'No internet connection.';
+
+  @override
+  String get errorApiKey => 'Invalid API key. Check your settings.';
+
+  @override
+  String get errorLocation => 'Could not determine your location.';
+
+  @override
+  String get errorNoApiKey =>
+      'No API key configured. Go to Settings to add one.';
+
+  @override
+  String get errorAllServicesFailed =>
+      'Could not load data. Check your connection and try again.';
+
+  @override
+  String get errorCache => 'Local data error. Try clearing the cache.';
+
+  @override
+  String get errorCancelled => 'Request was cancelled.';
+
+  @override
+  String get errorUnknown => 'An unexpected error occurred.';
 }

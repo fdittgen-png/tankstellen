@@ -324,5 +324,16 @@
   "refreshFailed": "Aktualisierung fehlgeschlagen. Bitte erneut versuchen.",
   "deleteProfileTitle": "Profil löschen?",
   "deleteProfileBody": "Dieses Profil und seine Einstellungen werden unwiderruflich gelöscht.",
-  "deleteProfileConfirm": "Profil löschen"
+  "deleteProfileConfirm": "Profil löschen",
+  "errorNetwork": "Netzwerkfehler. Überprüfe deine Verbindung.",
+  "errorServer": "Serverfehler. Bitte später erneut versuchen.",
+  "errorTimeout": "Zeitüberschreitung. Bitte erneut versuchen.",
+  "errorNoConnection": "Keine Internetverbindung.",
+  "errorApiKey": "Ungültiger API-Schlüssel. Überprüfe deine Einstellungen.",
+  "errorLocation": "Standort konnte nicht ermittelt werden.",
+  "errorNoApiKey": "Kein API-Schlüssel konfiguriert. In Einstellungen hinzufügen.",
+  "errorAllServicesFailed": "Daten konnten nicht geladen werden. Verbindung prüfen.",
+  "errorCache": "Lokaler Datenfehler. Cache leeren und erneut versuchen.",
+  "errorCancelled": "Anfrage wurde abgebrochen.",
+  "errorUnknown": "Ein unerwarteter Fehler ist aufgetreten."
 }

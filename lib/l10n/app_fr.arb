@@ -310,5 +310,16 @@
   "routeName": "Nom de l'itinéraire",
   "deleteProfileTitle": "Supprimer le profil ?",
   "deleteProfileBody": "Ce profil et ses paramètres seront définitivement supprimés. Cette action est irréversible.",
-  "deleteProfileConfirm": "Supprimer le profil"
+  "deleteProfileConfirm": "Supprimer le profil",
+  "errorNetwork": "Erreur réseau. Vérifiez votre connexion.",
+  "errorServer": "Erreur serveur. Réessayez plus tard.",
+  "errorTimeout": "Délai de connexion dépassé. Réessayez.",
+  "errorNoConnection": "Pas de connexion internet.",
+  "errorApiKey": "Clé API invalide. Vérifiez vos paramètres.",
+  "errorLocation": "Impossible de déterminer votre position.",
+  "errorNoApiKey": "Aucune clé API configurée. Allez dans Paramètres.",
+  "errorAllServicesFailed": "Impossible de charger les données. Vérifiez votre connexion.",
+  "errorCache": "Erreur de données locales. Essayez de vider le cache.",
+  "errorCancelled": "Requête annulée.",
+  "errorUnknown": "Une erreur inattendue est survenue."
 }
