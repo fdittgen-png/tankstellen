@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/widgets/brand_logo.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../alerts/data/models/price_alert.dart';
@@ -120,17 +121,33 @@ class StationDetailScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
 
-          // Name & Brand
-          Text(
-            station.brand.isNotEmpty && station.brand != 'Station'
-                ? station.brand
-                : station.street,
-            style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+          // Brand logo + Name
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              BrandLogo(brand: station.brand, size: 48),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      station.brand.isNotEmpty && station.brand != 'Station'
+                          ? station.brand
+                          : station.street,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (station.brand.isNotEmpty &&
+                        station.brand != 'Station' &&
+                        station.brand != station.street)
+                      Text(station.street, style: theme.textTheme.bodyLarge),
+                  ],
+                ),
+              ),
+            ],
           ),
-          if (station.brand.isNotEmpty &&
-              station.brand != 'Station' &&
-              station.brand != station.street)
-            Text(station.street, style: theme.textTheme.bodyLarge),
           const SizedBox(height: 24),
 
           // Prices
