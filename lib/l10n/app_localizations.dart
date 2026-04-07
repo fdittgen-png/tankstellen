@@ -2035,6 +2035,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Out of stock'**
   String get outOfStock;
+
+  /// No description provided for @gdprTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Privacy'**
+  String get gdprTitle;
+
+  /// No description provided for @gdprSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This app respects your privacy. Choose which data you want to share. You can change these settings anytime.'**
+  String get gdprSubtitle;
+
+  /// No description provided for @gdprLocationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location Access'**
+  String get gdprLocationTitle;
+
+  /// No description provided for @gdprLocationDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your coordinates are sent to the fuel price API to find nearby stations. Location data is never stored on a server and is not used for tracking.'**
+  String get gdprLocationDescription;
+
+  /// No description provided for @gdprLocationShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Find nearby fuel stations using your location'**
+  String get gdprLocationShort;
+
+  /// No description provided for @gdprErrorReportingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Error Reporting'**
+  String get gdprErrorReportingTitle;
+
+  /// No description provided for @gdprErrorReportingDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous crash reports help improve the app. No personal data is included. Reports are sent via Sentry only when configured.'**
+  String get gdprErrorReportingDescription;
+
+  /// No description provided for @gdprErrorReportingShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Send anonymous crash reports to improve the app'**
+  String get gdprErrorReportingShort;
+
+  /// No description provided for @gdprCloudSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Sync'**
+  String get gdprCloudSyncTitle;
+
+  /// No description provided for @gdprCloudSyncDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.'**
+  String get gdprCloudSyncDescription;
+
+  /// No description provided for @gdprCloudSyncShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync favorites and alerts across devices'**
+  String get gdprCloudSyncShort;
+
+  /// No description provided for @gdprLegalBasis.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal basis: Art. 6(1)(a) GDPR (Consent). You can withdraw consent anytime in Settings.'**
+  String get gdprLegalBasis;
+
+  /// No description provided for @gdprAcceptAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept All'**
+  String get gdprAcceptAll;
+
+  /// No description provided for @gdprAcceptSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept Selected'**
+  String get gdprAcceptSelected;
+
+  /// No description provided for @gdprSettingsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You can change your privacy choices at any time.'**
+  String get gdprSettingsHint;
 }
 
 class _AppLocalizationsDelegate

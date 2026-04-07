@@ -14,4 +14,8 @@ class StorageKeys {
   static const String ignoredStationIds = 'ignored_station_ids';
   static const String stationRatings = 'station_ratings';
   static const String favoriteStationData = 'favorite_station_data';
+  static const String gdprConsentGiven = 'gdpr_consent_given';
+  static const String consentLocation = 'consent_location';
+  static const String consentErrorReporting = 'consent_error_reporting';
+  static const String consentCloudSync = 'consent_cloud_sync';
 }

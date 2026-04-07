@@ -1038,4 +1038,58 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get outOfStock => 'Ausverkauft';
+
+  @override
+  String get gdprTitle => 'Ihre Privatsphäre';
+
+  @override
+  String get gdprSubtitle =>
+      'Diese App respektiert Ihre Privatsphäre. Wählen Sie, welche Daten Sie teilen möchten. Sie können diese Einstellungen jederzeit ändern.';
+
+  @override
+  String get gdprLocationTitle => 'Standortzugriff';
+
+  @override
+  String get gdprLocationDescription =>
+      'Ihre Koordinaten werden an die Kraftstoffpreis-API gesendet, um Tankstellen in der Nähe zu finden. Standortdaten werden nie auf einem Server gespeichert und nicht für Tracking verwendet.';
+
+  @override
+  String get gdprLocationShort =>
+      'Tankstellen in der Nähe über Ihren Standort finden';
+
+  @override
+  String get gdprErrorReportingTitle => 'Fehlermeldungen';
+
+  @override
+  String get gdprErrorReportingDescription =>
+      'Anonyme Absturzberichte helfen, die App zu verbessern. Keine persönlichen Daten enthalten. Berichte werden nur bei Konfiguration über Sentry gesendet.';
+
+  @override
+  String get gdprErrorReportingShort =>
+      'Anonyme Absturzberichte zur Verbesserung der App senden';
+
+  @override
+  String get gdprCloudSyncTitle => 'Cloud-Synchronisierung';
+
+  @override
+  String get gdprCloudSyncDescription =>
+      'Favoriten und Preisalarme geräteübergreifend über TankSync synchronisieren. Verwendet anonyme Authentifizierung. Ihre Daten werden verschlüsselt übertragen.';
+
+  @override
+  String get gdprCloudSyncShort =>
+      'Favoriten und Alarme geräteübergreifend synchronisieren';
+
+  @override
+  String get gdprLegalBasis =>
+      'Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung). Sie können Ihre Einwilligung jederzeit in den Einstellungen widerrufen.';
+
+  @override
+  String get gdprAcceptAll => 'Alle akzeptieren';
+
+  @override
+  String get gdprAcceptSelected => 'Auswahl akzeptieren';
+
+  @override
+  String get gdprSettingsHint =>
+      'Sie können Ihre Datenschutzeinstellungen jederzeit ändern.';
 }

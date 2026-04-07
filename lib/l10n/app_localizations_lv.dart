@@ -1034,4 +1034,57 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get outOfStock => 'Out of stock';
+
+  @override
+  String get gdprTitle => 'Your Privacy';
+
+  @override
+  String get gdprSubtitle =>
+      'This app respects your privacy. Choose which data you want to share. You can change these settings anytime.';
+
+  @override
+  String get gdprLocationTitle => 'Location Access';
+
+  @override
+  String get gdprLocationDescription =>
+      'Your coordinates are sent to the fuel price API to find nearby stations. Location data is never stored on a server and is not used for tracking.';
+
+  @override
+  String get gdprLocationShort =>
+      'Find nearby fuel stations using your location';
+
+  @override
+  String get gdprErrorReportingTitle => 'Error Reporting';
+
+  @override
+  String get gdprErrorReportingDescription =>
+      'Anonymous crash reports help improve the app. No personal data is included. Reports are sent via Sentry only when configured.';
+
+  @override
+  String get gdprErrorReportingShort =>
+      'Send anonymous crash reports to improve the app';
+
+  @override
+  String get gdprCloudSyncTitle => 'Cloud Sync';
+
+  @override
+  String get gdprCloudSyncDescription =>
+      'Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.';
+
+  @override
+  String get gdprCloudSyncShort => 'Sync favorites and alerts across devices';
+
+  @override
+  String get gdprLegalBasis =>
+      'Legal basis: Art. 6(1)(a) GDPR (Consent). You can withdraw consent anytime in Settings.';
+
+  @override
+  String get gdprAcceptAll => 'Accept All';
+
+  @override
+  String get gdprAcceptSelected => 'Accept Selected';
+
+  @override
+  String get gdprSettingsHint =>
+      'You can change your privacy choices at any time.';
 }

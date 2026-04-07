@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/providers/app_state_provider.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
+import 'package:tankstellen/core/storage/storage_keys.dart';
 
 import '../../mocks/mocks.dart';
 
@@ -103,6 +104,81 @@ void main() {
 
       verify(() => mockStorage.putSetting('location_consent', true)).called(1);
       expect(c.read(locationConsentProvider), isTrue);
+    });
+  });
+
+  group('hasGdprConsent', () {
+    test('returns false when no consent given', () {
+      when(() => mockStorage.getSetting(StorageKeys.gdprConsentGiven))
+          .thenReturn(null);
+      final c = createContainer();
+      expect(c.read(hasGdprConsentProvider), isFalse);
+    });
+
+    test('returns true when consent given', () {
+      when(() => mockStorage.getSetting(StorageKeys.gdprConsentGiven))
+          .thenReturn(true);
+      final c = createContainer();
+      expect(c.read(hasGdprConsentProvider), isTrue);
+    });
+  });
+
+  group('GdprConsent', () {
+    test('build returns all false when no consent saved', () {
+      final c = createContainer();
+      final state = c.read(gdprConsentProvider);
+      expect(state.location, isFalse);
+      expect(state.errorReporting, isFalse);
+      expect(state.cloudSync, isFalse);
+    });
+
+    test('build reflects stored values', () {
+      when(() => mockStorage.getSetting(StorageKeys.consentLocation))
+          .thenReturn(true);
+      when(() => mockStorage.getSetting(StorageKeys.consentErrorReporting))
+          .thenReturn(false);
+      when(() => mockStorage.getSetting(StorageKeys.consentCloudSync))
+          .thenReturn(true);
+
+      final c = createContainer();
+      final state = c.read(gdprConsentProvider);
+      expect(state.location, isTrue);
+      expect(state.errorReporting, isFalse);
+      expect(state.cloudSync, isTrue);
+    });
+
+    test('save persists all consent values and sets gdprConsentGiven',
+        () async {
+      when(() => mockStorage.putSetting(any(), any()))
+          .thenAnswer((_) async {});
+
+      final c = createContainer();
+      await c.read(gdprConsentProvider.notifier).save(
+            location: true,
+            errorReporting: false,
+            cloudSync: true,
+          );
+
+      verify(() =>
+              mockStorage.putSetting(StorageKeys.gdprConsentGiven, true))
+          .called(1);
+      verify(() =>
+              mockStorage.putSetting(StorageKeys.consentLocation, true))
+          .called(1);
+      verify(() => mockStorage.putSetting(
+              StorageKeys.consentErrorReporting, false))
+          .called(1);
+      verify(() =>
+              mockStorage.putSetting(StorageKeys.consentCloudSync, true))
+          .called(1);
+      // Also updates legacy location_consent key
+      verify(() => mockStorage.putSetting('location_consent', true))
+          .called(1);
+
+      final state = c.read(gdprConsentProvider);
+      expect(state.location, isTrue);
+      expect(state.errorReporting, isFalse);
+      expect(state.cloudSync, isTrue);
     });
   });
 }

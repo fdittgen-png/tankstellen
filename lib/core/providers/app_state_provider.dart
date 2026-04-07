@@ -71,6 +71,46 @@ class AutoSwitchProfile extends _$AutoSwitchProfile {
   }
 }
 
+/// Whether GDPR consent has been given (any choices made).
+@riverpod
+bool hasGdprConsent(Ref ref) {
+  final storage = ref.watch(storageRepositoryProvider);
+  return storage.getSetting(StorageKeys.gdprConsentGiven) == true;
+}
+
+/// GDPR consent state: location, error reporting, cloud sync.
+@Riverpod(keepAlive: true)
+class GdprConsent extends _$GdprConsent {
+  @override
+  ({bool location, bool errorReporting, bool cloudSync}) build() {
+    final storage = ref.watch(storageRepositoryProvider);
+    return (
+      location: storage.getSetting(StorageKeys.consentLocation) as bool? ?? false,
+      errorReporting: storage.getSetting(StorageKeys.consentErrorReporting) as bool? ?? false,
+      cloudSync: storage.getSetting(StorageKeys.consentCloudSync) as bool? ?? false,
+    );
+  }
+
+  Future<void> save({
+    required bool location,
+    required bool errorReporting,
+    required bool cloudSync,
+  }) async {
+    final storage = ref.read(storageRepositoryProvider);
+    await storage.putSetting(StorageKeys.gdprConsentGiven, true);
+    await storage.putSetting(StorageKeys.consentLocation, location);
+    await storage.putSetting(StorageKeys.consentErrorReporting, errorReporting);
+    await storage.putSetting(StorageKeys.consentCloudSync, cloudSync);
+    // Also update the legacy location_consent key for backward compatibility
+    await storage.putSetting('location_consent', location);
+    state = (
+      location: location,
+      errorReporting: errorReporting,
+      cloudSync: cloudSync,
+    );
+  }
+}
+
 /// Storage statistics for the settings page.
 class StorageStats {
   final int favoriteCount;

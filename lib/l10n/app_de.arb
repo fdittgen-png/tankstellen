@@ -359,5 +359,21 @@
   "switchToAllPricesView": "Zur Alle-Preise-Ansicht wechseln",
   "switchToCompactView": "Zur Kompaktansicht wechseln",
   "unavailable": "k.A.",
-  "outOfStock": "Ausverkauft"
+  "outOfStock": "Ausverkauft",
+
+  "gdprTitle": "Ihre Privatsphäre",
+  "gdprSubtitle": "Diese App respektiert Ihre Privatsphäre. Wählen Sie, welche Daten Sie teilen möchten. Sie können diese Einstellungen jederzeit ändern.",
+  "gdprLocationTitle": "Standortzugriff",
+  "gdprLocationDescription": "Ihre Koordinaten werden an die Kraftstoffpreis-API gesendet, um Tankstellen in der Nähe zu finden. Standortdaten werden nie auf einem Server gespeichert und nicht für Tracking verwendet.",
+  "gdprLocationShort": "Tankstellen in der Nähe über Ihren Standort finden",
+  "gdprErrorReportingTitle": "Fehlermeldungen",
+  "gdprErrorReportingDescription": "Anonyme Absturzberichte helfen, die App zu verbessern. Keine persönlichen Daten enthalten. Berichte werden nur bei Konfiguration über Sentry gesendet.",
+  "gdprErrorReportingShort": "Anonyme Absturzberichte zur Verbesserung der App senden",
+  "gdprCloudSyncTitle": "Cloud-Synchronisierung",
+  "gdprCloudSyncDescription": "Favoriten und Preisalarme geräteübergreifend über TankSync synchronisieren. Verwendet anonyme Authentifizierung. Ihre Daten werden verschlüsselt übertragen.",
+  "gdprCloudSyncShort": "Favoriten und Alarme geräteübergreifend synchronisieren",
+  "gdprLegalBasis": "Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung). Sie können Ihre Einwilligung jederzeit in den Einstellungen widerrufen.",
+  "gdprAcceptAll": "Alle akzeptieren",
+  "gdprAcceptSelected": "Auswahl akzeptieren",
+  "gdprSettingsHint": "Sie können Ihre Datenschutzeinstellungen jederzeit ändern."
 }

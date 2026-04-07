@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../consent/presentation/widgets/consent_settings_section.dart';
 import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
 import '../widgets/config_verification_widget.dart';
@@ -80,6 +81,14 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           const AboutSection(),
           const SizedBox(height: 32),
+
+          // Privacy & Consent
+          _FoldableSection(
+            icon: Icons.privacy_tip_outlined,
+            title: l?.gdprTitle ?? 'Privacy',
+            child: const ConsentSettingsSection(),
+          ),
+          const SizedBox(height: 8),
 
           // Configuration Verification
           const _SectionHeader(
