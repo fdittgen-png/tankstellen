@@ -1,5 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../core/storage/hive_storage.dart';
+import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../../../core/sync/sync_service.dart';
 import '../../profile/providers/profile_provider.dart';
@@ -18,14 +18,14 @@ part 'station_rating_provider.g.dart';
 class StationRatings extends _$StationRatings {
   @override
   Map<String, int> build() {
-    final storage = ref.watch(hiveStorageProvider);
+    final storage = ref.watch(storageRepositoryProvider);
     return storage.getRatings();
   }
 
   /// Rate a station (1-5 stars). Syncs based on profile rating mode.
   Future<void> rate(String stationId, int rating) async {
     final clamped = rating.clamp(1, 5);
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     await storage.setRating(stationId, clamped);
     state = storage.getRatings();
 
@@ -42,7 +42,7 @@ class StationRatings extends _$StationRatings {
 
   /// Remove a rating. Called when station is removed from favorites.
   Future<void> remove(String stationId) async {
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     await storage.removeRating(stationId);
     state = storage.getRatings();
 

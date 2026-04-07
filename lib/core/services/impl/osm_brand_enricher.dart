@@ -2,7 +2,8 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../storage/hive_storage.dart';
+import '../../data/storage_repository.dart';
+import '../../storage/storage_providers.dart';
 import '../dio_factory.dart';
 import '../../../features/search/domain/entities/station.dart';
 
@@ -10,13 +11,13 @@ part 'osm_brand_enricher.g.dart';
 
 @Riverpod(keepAlive: true)
 OsmBrandEnricher osmBrandEnricher(Ref ref) {
-  return OsmBrandEnricher(ref.watch(hiveStorageProvider));
+  return OsmBrandEnricher(ref.watch(storageRepositoryProvider));
 }
 
 /// Enriches fuel stations with brand names using Nominatim search.
-/// Brands are cached persistently in Hive for instant lookup.
+/// Brands are cached persistently for instant lookup.
 class OsmBrandEnricher {
-  final HiveStorage _storage;
+  final SettingsStorage _storage;
   final Map<String, String> _sessionCache = {};
 
   OsmBrandEnricher(this._storage);

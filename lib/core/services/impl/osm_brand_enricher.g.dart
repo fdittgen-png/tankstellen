@@ -53,4 +53,4 @@ final class OsmBrandEnricherProvider
   }
 }
 
-String _$osmBrandEnricherHash() => r'577ef820fa936e54b553d8535a1840cdea7e9e67';
+String _$osmBrandEnricherHash() => r'da1d91d4c77ca3075b0a0481797b198ac92f8f37';

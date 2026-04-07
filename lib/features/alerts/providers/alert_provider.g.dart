@@ -49,7 +49,7 @@ final class AlertRepositoryProvider
   }
 }
 
-String _$alertRepositoryHash() => r'7560d4fc7b5c1b047758e5f5f4dd23eac00f7222';
+String _$alertRepositoryHash() => r'fc65d74649a3f18c253681736b245db8f6e43249';
 
 @ProviderFor(AlertNotifier)
 final alertProvider = AlertNotifierProvider._();

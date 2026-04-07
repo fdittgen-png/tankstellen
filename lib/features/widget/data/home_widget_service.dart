@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 
-import '../../../core/storage/hive_storage.dart';
+import '../../../core/data/storage_repository.dart';
 
 /// Manages the Android home screen widget data.
 ///
@@ -21,7 +21,7 @@ class HomeWidgetService {
   ///
   /// Called from background_service after price refresh, and from
   /// the app when favorites change.
-  static Future<void> updateWidget(HiveStorage storage) async {
+  static Future<void> updateWidget(FavoriteStorage storage) async {
     try {
       final favoriteIds = storage.getFavoriteIds();
       if (favoriteIds.isEmpty) {

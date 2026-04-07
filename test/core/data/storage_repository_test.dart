@@ -62,14 +62,23 @@ class _MockStorageRepository implements StorageRepository {
   final _settings = <String, dynamic>{};
   final _profiles = <String, Map<String, dynamic>>{};
 
+  final _favoriteStationData = <String, Map<String, dynamic>>{};
+
   @override List<String> getFavoriteIds() => List.from(_favorites);
+  @override Future<void> setFavoriteIds(List<String> ids) async { _favorites..clear()..addAll(ids); }
   @override Future<void> addFavorite(String id) async => _favorites.add(id);
   @override Future<void> removeFavorite(String id) async => _favorites.remove(id);
   @override bool isFavorite(String id) => _favorites.contains(id);
+  @override Future<void> saveFavoriteStationData(String id, Map<String, dynamic> data) async => _favoriteStationData[id] = data;
+  @override Map<String, dynamic>? getFavoriteStationData(String id) => _favoriteStationData[id];
+  @override Map<String, dynamic> getAllFavoriteStationData() => Map.from(_favoriteStationData);
+  @override Future<void> removeFavoriteStationData(String id) async => _favoriteStationData.remove(id);
 
   @override List<String> getIgnoredIds() => List.from(_ignored);
+  @override Future<void> setIgnoredIds(List<String> ids) async { _ignored..clear()..addAll(ids); }
   @override Future<void> addIgnored(String id) async => _ignored.add(id);
   @override Future<void> removeIgnored(String id) async => _ignored.remove(id);
+  @override bool isIgnored(String id) => _ignored.contains(id);
 
   @override Map<String, int> getRatings() => Map.from(_ratings);
   @override Future<void> setRating(String id, int r) async => _ratings[id] = r;
@@ -84,6 +93,7 @@ class _MockStorageRepository implements StorageRepository {
   @override Future<void> deleteApiKey() async {}
   @override bool hasApiKey() => false;
   @override String? getEvApiKey() => null;
+  @override bool hasEvApiKey() => false;
   @override bool hasCustomEvApiKey() => false;
   @override Future<void> setEvApiKey(String key) async {}
 
@@ -118,8 +128,15 @@ class _MockStorageRepository implements StorageRepository {
   @override bool get isSetupComplete => false;
   @override bool get isSetupSkipped => false;
   @override Future<void> skipSetup() async {}
+  @override Future<void> resetSetupSkip() async {}
 
   @override int get cacheEntryCount => 0;
+  @override Iterable<dynamic> get cacheKeys => [];
+  @override Future<void> deleteCacheEntry(String key) async {}
   @override int get priceHistoryEntryCount => 0;
   @override int get favoriteCount => _favorites.length;
+
+  @override
+  ({int settings, int profiles, int favorites, int cache, int priceHistory, int alerts, int total})
+      get storageStats => (settings: 0, profiles: 0, favorites: 0, cache: 0, priceHistory: 0, alerts: 0, total: 0);
 }

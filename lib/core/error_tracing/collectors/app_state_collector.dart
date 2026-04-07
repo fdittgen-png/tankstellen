@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../storage/hive_storage.dart';
+import '../../storage/storage_providers.dart';
 import '../models/error_trace.dart';
 
 class AppStateCollector {
@@ -12,7 +12,7 @@ class AppStateCollector {
   static void updateLastSearch(String params) => _lastSearchParams = params;
 
   static AppStateSnapshot collect(Ref ref) {
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     final profileId = storage.getActiveProfileId();
     final profile = profileId != null ? storage.getProfile(profileId) : null;
 

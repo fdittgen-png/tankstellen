@@ -6,7 +6,7 @@ import '../../../core/error/exceptions.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/station_service.dart';
-import '../../../core/storage/hive_storage.dart';
+import '../../../core/storage/storage_providers.dart';
 import '../../../core/country/country_provider.dart';
 import '../../../core/utils/station_extensions.dart';
 import '../../search/data/models/search_params.dart';
@@ -206,7 +206,7 @@ class RouteSearchState extends _$RouteSearchState {
     RouteInfo route,
     double radiusKm,
   ) async {
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     final apiKey = storage.getEvApiKey();
     if (apiKey == null || apiKey.isEmpty) {
       throw const ApiException(message: 'OpenChargeMap API key required');

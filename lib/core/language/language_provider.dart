@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/profile/providers/profile_provider.dart';
 import '../../features/profile/data/repositories/profile_repository.dart';
-import '../storage/hive_storage.dart';
+import '../storage/storage_providers.dart';
 
 part 'language_provider.g.dart';
 
@@ -81,7 +81,7 @@ class ActiveLanguage extends _$ActiveLanguage {
     }
 
     // Priority 2: persisted setting (legacy / migration)
-    final storage = ref.watch(hiveStorageProvider);
+    final storage = ref.watch(storageRepositoryProvider);
     final saved = storage.getSetting(_storageKey) as String?;
     if (saved != null) {
       return AppLanguages.byCode(saved) ?? AppLanguages.fromSystem();
@@ -91,7 +91,7 @@ class ActiveLanguage extends _$ActiveLanguage {
 
   Future<void> select(AppLanguage language) async {
     // Update legacy storage
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     await storage.putSetting(_storageKey, language.code);
 
     // Update active profile if it exists

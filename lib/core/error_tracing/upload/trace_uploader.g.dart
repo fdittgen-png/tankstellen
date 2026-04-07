@@ -48,4 +48,4 @@ final class TraceUploaderProvider
   }
 }
 
-String _$traceUploaderHash() => r'c61121b7597531bd17d9dc4bd70e6a99573ce609';
+String _$traceUploaderHash() => r'1adf891296dd10477a71c5543d1fbbea425913a0';

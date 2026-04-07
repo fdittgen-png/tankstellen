@@ -7,17 +7,26 @@
 /// Favorite station storage.
 abstract class FavoriteStorage {
   List<String> getFavoriteIds();
+  Future<void> setFavoriteIds(List<String> ids);
   Future<void> addFavorite(String id);
   Future<void> removeFavorite(String id);
   bool isFavorite(String id);
   int get favoriteCount;
+
+  // Favorite station data (permanent, never expires)
+  Future<void> saveFavoriteStationData(String stationId, Map<String, dynamic> data);
+  Map<String, dynamic>? getFavoriteStationData(String stationId);
+  Map<String, dynamic> getAllFavoriteStationData();
+  Future<void> removeFavoriteStationData(String stationId);
 }
 
 /// Ignored station storage.
 abstract class IgnoredStorage {
   List<String> getIgnoredIds();
+  Future<void> setIgnoredIds(List<String> ids);
   Future<void> addIgnored(String id);
   Future<void> removeIgnored(String id);
+  bool isIgnored(String id);
 }
 
 /// Station rating storage.
@@ -35,6 +44,7 @@ abstract class SettingsStorage {
   bool get isSetupComplete;
   bool get isSetupSkipped;
   Future<void> skipSetup();
+  Future<void> resetSetupSkip();
 }
 
 /// API key secure storage.
@@ -44,6 +54,7 @@ abstract class ApiKeyStorage {
   Future<void> deleteApiKey();
   bool hasApiKey();
   String? getEvApiKey();
+  bool hasEvApiKey();
   bool hasCustomEvApiKey();
   Future<void> setEvApiKey(String key);
 }
@@ -91,6 +102,8 @@ abstract class CacheStorage {
   Map<String, dynamic>? getCachedData(String key, {Duration? maxAge});
   Future<void> clearCache();
   int get cacheEntryCount;
+  Iterable<dynamic> get cacheKeys;
+  Future<void> deleteCacheEntry(String key);
 }
 
 /// Composite interface that implements all segregated storage interfaces.
@@ -99,4 +112,8 @@ abstract class CacheStorage {
 abstract class StorageRepository implements
     FavoriteStorage, IgnoredStorage, RatingStorage, SettingsStorage,
     ApiKeyStorage, ProfileStorage, PriceHistoryStorage, AlertStorage,
-    ItineraryStorage, CacheStorage {}
+    ItineraryStorage, CacheStorage {
+  /// Estimated storage size across all data domains (bytes).
+  ({int settings, int profiles, int favorites, int cache, int priceHistory, int alerts, int total})
+      get storageStats;
+}

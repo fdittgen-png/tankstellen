@@ -1,12 +1,15 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/error_tracing/models/error_trace.dart';
 import 'package:tankstellen/core/error_tracing/storage/trace_storage.dart';
 import 'package:tankstellen/core/error_tracing/upload/trace_uploader.dart';
 import 'package:tankstellen/core/error_tracing/trace_recorder.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
+import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
+import 'package:tankstellen/core/storage/storage_providers.dart';
 
 /// Fake TraceStorage that records calls in memory.
 class _FakeTraceStorage extends TraceStorage {
@@ -25,8 +28,11 @@ class _FakeTraceStorage extends TraceStorage {
       stored.where((t) => t.id == id).firstOrNull;
 }
 
-/// Minimal fake HiveStorage for the uploader constructor.
-class _FakeHiveStorage extends HiveStorage {
+/// Minimal fake StorageRepository for provider overrides.
+class _FakeStorageRepository extends Mock implements StorageRepository {}
+
+/// Minimal fake SettingsStorage for the uploader constructor.
+class _FakeSettingsStorage implements SettingsStorage {
   @override
   dynamic getSetting(String key) => null;
 
@@ -34,10 +40,16 @@ class _FakeHiveStorage extends HiveStorage {
   Future<void> putSetting(String key, dynamic value) async {}
 
   @override
-  String? getActiveProfileId() => null;
+  bool get isSetupComplete => false;
 
   @override
-  Map<String, dynamic>? getProfile(String id) => null;
+  bool get isSetupSkipped => false;
+
+  @override
+  Future<void> skipSetup() async {}
+
+  @override
+  Future<void> resetSetupSkip() async {}
 }
 
 /// Fake TraceUploader that does nothing.
@@ -45,7 +57,7 @@ class _FakeTraceUploader extends TraceUploader {
   bool uploadCalled = false;
   ErrorTrace? lastTrace;
 
-  _FakeTraceUploader() : super(_FakeHiveStorage());
+  _FakeTraceUploader() : super(_FakeSettingsStorage());
 
   @override
   Future<void> uploadIfEnabled(ErrorTrace trace) async {
@@ -78,9 +90,9 @@ void main() {
     storage = _FakeTraceStorage();
     uploader = _FakeTraceUploader();
 
-    // Provide overrides so HiveStorage-dependent providers don't fail.
+    // Provide overrides so storage-dependent providers don't fail.
     container = ProviderContainer(overrides: [
-      hiveStorageProvider.overrideWithValue(_FakeHiveStorage()),
+      storageRepositoryProvider.overrideWithValue(_FakeStorageRepository()),
     ]);
 
     // Capture a Ref from the container via a temporary provider.

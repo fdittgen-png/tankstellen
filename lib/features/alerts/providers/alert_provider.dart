@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../core/storage/hive_storage.dart';
+import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_provider.dart';
 import '../../../core/sync/sync_service.dart';
 import '../data/models/price_alert.dart';
@@ -10,7 +10,7 @@ part 'alert_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 AlertRepository alertRepository(Ref ref) {
-  final storage = ref.watch(hiveStorageProvider);
+  final storage = ref.watch(storageRepositoryProvider);
   return AlertRepository(storage);
 }
 

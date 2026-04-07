@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../data/storage_repository.dart';
 import '../services/service_result.dart';
-import '../storage/hive_storage.dart';
+import '../storage/storage_providers.dart';
 
 part 'cache_manager.g.dart';
 
@@ -97,7 +98,7 @@ class CacheEntry {
 
 @Riverpod(keepAlive: true)
 CacheManager cacheManager(Ref ref) {
-  return CacheManager(ref.watch(hiveStorageProvider));
+  return CacheManager(ref.watch(storageRepositoryProvider));
 }
 
 /// Minimal cache interface used by service chains ([StationServiceChain],
@@ -122,10 +123,10 @@ abstract interface class CacheStrategy {
   CacheEntry? getFresh(String key);
 }
 
-/// Unified cache layer wrapping [HiveStorage].
+/// Unified cache layer wrapping [CacheStorage].
 ///
 /// All caching in the app goes through this class. Direct calls to
-/// `HiveStorage.cacheData` are forbidden elsewhere in the codebase.
+/// `CacheStorage.cacheData` are forbidden elsewhere in the codebase.
 /// This ensures consistent TTL handling, key formatting, metadata
 /// envelopes, and staleness semantics.
 ///
@@ -139,7 +140,7 @@ abstract interface class CacheStrategy {
 /// - [getFresh] -- returns data only if not expired (used as primary)
 /// - [get] -- returns data regardless of age (used as stale fallback)
 class CacheManager implements CacheStrategy {
-  final HiveStorage _storage;
+  final CacheStorage _storage;
 
   CacheManager(this._storage);
 

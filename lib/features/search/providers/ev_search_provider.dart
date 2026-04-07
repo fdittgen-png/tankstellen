@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/error/exceptions.dart';
 import '../../../core/services/service_result.dart';
-import '../../../core/storage/hive_storage.dart';
+import '../../../core/storage/storage_providers.dart';
 import '../../../core/country/country_provider.dart';
 import '../data/services/ev_charging_service.dart';
 import '../domain/entities/charging_station.dart';
@@ -29,7 +29,7 @@ class EVSearchState extends _$EVSearchState {
   }) async {
     state = const AsyncValue.loading();
     try {
-      final storage = ref.read(hiveStorageProvider);
+      final storage = ref.read(storageRepositoryProvider);
       final apiKey = storage.getEvApiKey();
       if (apiKey == null || apiKey.isEmpty) {
         throw const ApiException(

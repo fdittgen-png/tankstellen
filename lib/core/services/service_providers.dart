@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../cache/cache_manager.dart';
 import '../country/country_provider.dart';
 import '../error_tracing/integrations/dio_trace_interceptor.dart';
-import '../storage/hive_storage.dart';
+import '../storage/storage_providers.dart';
 import 'dio_factory.dart';
 import 'geocoding_chain.dart';
 import 'impl/demo_station_service.dart';
@@ -63,7 +63,7 @@ Dio tankerkoenigDio(Ref ref) {
 /// Without key: demo data so the app works immediately.
 @riverpod
 StationService stationService(Ref ref) {
-  final storage = ref.watch(hiveStorageProvider);
+  final storage = ref.watch(storageRepositoryProvider);
   final country = ref.watch(activeCountryProvider);
   final cache = ref.watch(cacheManagerProvider);
 
@@ -141,7 +141,7 @@ StationService stationServiceForCountry(Ref ref, String countryCode) {
   final cache = ref.read(cacheManagerProvider);
 
   if (countryCode == 'DE') {
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     if (!storage.hasApiKey()) return DemoStationService(countryCode: 'DE');
     final dio = ref.read(tankerkoenigDioProvider);
     return StationServiceChain(
@@ -183,7 +183,7 @@ class _ApiKeyInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final storage = _ref.read(hiveStorageProvider);
+    final storage = _ref.read(storageRepositoryProvider);
     final apiKey = storage.getApiKey();
     if (apiKey != null && apiKey.isNotEmpty) {
       options.queryParameters['apikey'] = apiKey;

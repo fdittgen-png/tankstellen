@@ -1,41 +1,41 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../storage/hive_storage.dart';
 import '../storage/storage_keys.dart';
+import '../storage/storage_providers.dart';
 
 part 'app_state_provider.g.dart';
 
 /// Whether the Tankerkoenig API key is configured.
 @riverpod
 bool hasApiKey(Ref ref) {
-  final storage = ref.watch(hiveStorageProvider);
+  final storage = ref.watch(storageRepositoryProvider);
   return storage.hasApiKey();
 }
 
 /// Whether a custom EV API key is configured.
 @riverpod
 bool hasCustomEvApiKey(Ref ref) {
-  final storage = ref.watch(hiveStorageProvider);
+  final storage = ref.watch(storageRepositoryProvider);
   return storage.hasCustomEvApiKey();
 }
 
 /// Whether the app setup (API key or skip) is complete.
 @riverpod
 bool isSetupComplete(Ref ref) {
-  final storage = ref.watch(hiveStorageProvider);
+  final storage = ref.watch(storageRepositoryProvider);
   return storage.isSetupComplete;
 }
 
 /// Whether the app is in demo mode (setup skipped, no API key).
 @riverpod
 bool isDemoMode(Ref ref) {
-  final storage = ref.watch(hiveStorageProvider);
+  final storage = ref.watch(storageRepositoryProvider);
   return storage.isSetupSkipped && !storage.hasApiKey();
 }
 
 /// Whether location consent has been given.
 @riverpod
 bool hasLocationConsent(Ref ref) {
-  final storage = ref.watch(hiveStorageProvider);
+  final storage = ref.watch(storageRepositoryProvider);
   return storage.getSetting('location_consent') == true;
 }
 
@@ -44,12 +44,12 @@ bool hasLocationConsent(Ref ref) {
 class LocationConsent extends _$LocationConsent {
   @override
   bool build() {
-    final storage = ref.watch(hiveStorageProvider);
+    final storage = ref.watch(storageRepositoryProvider);
     return storage.getSetting('location_consent') == true;
   }
 
   Future<void> grant() async {
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     await storage.putSetting('location_consent', true);
     state = true;
   }
@@ -60,12 +60,12 @@ class LocationConsent extends _$LocationConsent {
 class AutoSwitchProfile extends _$AutoSwitchProfile {
   @override
   bool build() {
-    final storage = ref.watch(hiveStorageProvider);
+    final storage = ref.watch(storageRepositoryProvider);
     return storage.getSetting(StorageKeys.autoSwitchProfile) as bool? ?? false;
   }
 
   Future<void> set(bool value) async {
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     await storage.putSetting(StorageKeys.autoSwitchProfile, value);
     state = value;
   }
@@ -101,7 +101,7 @@ class StorageStats {
 /// Aggregated storage stats — used by config verification and storage section.
 @riverpod
 StorageStats storageStats(Ref ref) {
-  final storage = ref.watch(hiveStorageProvider);
+  final storage = ref.watch(storageRepositoryProvider);
   return StorageStats(
     favoriteCount: storage.getFavoriteIds().length,
     alertCount: storage.alertCount,

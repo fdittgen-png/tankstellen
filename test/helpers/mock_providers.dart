@@ -2,6 +2,7 @@ import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
+import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
@@ -10,9 +11,20 @@ import 'package:tankstellen/features/search/providers/search_provider.dart';
 
 import '../mocks/mocks.dart';
 
-/// Creates an override for [hiveStorageProvider] using a [MockHiveStorage].
+/// Creates an override for [storageRepositoryProvider] using a [MockStorageRepository].
 ///
 /// Returns both the override and the mock so callers can configure stubs.
+({Object override, MockStorageRepository mock}) mockStorageRepositoryOverride() {
+  final mock = MockStorageRepository();
+  return (
+    override: storageRepositoryProvider.overrideWithValue(mock),
+    mock: mock,
+  );
+}
+
+/// Legacy alias — creates an override for [hiveStorageProvider] using a [MockHiveStorage].
+///
+/// Prefer [mockStorageRepositoryOverride] for new tests.
 ({Object override, MockHiveStorage mock}) mockHiveStorageOverride() {
   final mock = MockHiveStorage();
   return (
@@ -126,13 +138,13 @@ class _FixedUserPosition extends UserPosition {
 }
 
 /// Convenience: returns a standard set of overrides for widget tests
-/// that need a MockHiveStorage with no API key and Germany as country.
-({List<Object> overrides, MockHiveStorage mockStorage})
+/// that need a MockStorageRepository with no API key and Germany as country.
+({List<Object> overrides, MockStorageRepository mockStorage})
     standardTestOverrides({
   CountryConfig country = Countries.germany,
   List<String> favoriteIds = const [],
 }) {
-  final storage = mockHiveStorageOverride();
+  final storage = mockStorageRepositoryOverride();
   return (
     overrides: [
       storage.override,

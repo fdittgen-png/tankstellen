@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
-import '../../../core/storage/hive_storage.dart';
+import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../../../core/sync/sync_service.dart';
 import '../../search/domain/entities/station.dart';
@@ -24,7 +24,7 @@ part 'favorites_provider.g.dart';
 class Favorites extends _$Favorites {
   @override
   List<String> build() {
-    final storage = ref.watch(hiveStorageProvider);
+    final storage = ref.watch(storageRepositoryProvider);
     return storage.getFavoriteIds();
   }
 
@@ -34,7 +34,7 @@ class Favorites extends _$Favorites {
   /// in Hive. The JSON never expires (unlike CacheManager entries) so
   /// the favorites screen always has data to display.
   Future<void> add(String stationId, {Station? stationData}) async {
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     await storage.addFavorite(stationId);
 
     // Persist full station data permanently (survives cache eviction / app restart)
@@ -56,7 +56,7 @@ class Favorites extends _$Favorites {
   /// when the user explicitly removes a favorite, we delete from
   /// local storage, server, and all associated data (rating, history).
   Future<void> remove(String stationId) async {
-    final storage = ref.read(hiveStorageProvider);
+    final storage = ref.read(storageRepositoryProvider);
     await storage.removeFavorite(stationId);
     await storage.removeFavoriteStationData(stationId);
     state = storage.getFavoriteIds();
@@ -121,7 +121,7 @@ class FavoriteStations extends _$FavoriteStations {
     state = const AsyncValue.loading();
 
     try {
-      final storage = ref.read(hiveStorageProvider);
+      final storage = ref.read(storageRepositoryProvider);
 
       // Step 1: Load persisted station data from Hive (permanent, never expires)
       final stations = <Station>[];
