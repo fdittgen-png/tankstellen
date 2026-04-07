@@ -336,5 +336,14 @@
   "errorAllServicesFailed": "Daten konnten nicht geladen werden. Verbindung prüfen.",
   "errorCache": "Lokaler Datenfehler. Cache leeren und erneut versuchen.",
   "errorCancelled": "Anfrage wurde abgebrochen.",
-  "errorUnknown": "Ein unerwarteter Fehler ist aufgetreten."
+  "errorUnknown": "Ein unerwarteter Fehler ist aufgetreten.",
+
+  "onboardingWelcomeHint": "Richten Sie die App in wenigen Schritten ein.",
+  "onboardingApiKeyDescription": "Registrieren Sie sich für einen kostenlosen API-Schlüssel oder überspringen Sie diesen Schritt für Demo-Daten.",
+  "onboardingComplete": "Alles bereit!",
+  "onboardingCompleteHint": "Sie können diese Einstellungen jederzeit in Ihrem Profil ändern.",
+  "onboardingBack": "Zurück",
+  "onboardingNext": "Weiter",
+  "onboardingSkip": "Überspringen",
+  "onboardingFinish": "Los geht's"
 }

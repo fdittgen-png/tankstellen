@@ -1933,6 +1933,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'An unexpected error occurred.'**
   String get errorUnknown;
+
+  /// No description provided for @onboardingWelcomeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up the app in a few quick steps.'**
+  String get onboardingWelcomeHint;
+
+  /// No description provided for @onboardingApiKeyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Register for a free API key, or skip to explore the app with demo data.'**
+  String get onboardingApiKeyDescription;
+
+  /// No description provided for @onboardingComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'All set!'**
+  String get onboardingComplete;
+
+  /// No description provided for @onboardingCompleteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You can change these settings anytime in your profile.'**
+  String get onboardingCompleteHint;
+
+  /// No description provided for @onboardingBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get onboardingBack;
+
+  /// No description provided for @onboardingNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboardingNext;
+
+  /// No description provided for @onboardingSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboardingSkip;
+
+  /// No description provided for @onboardingFinish.
+  ///
+  /// In en, this message translates to:
+  /// **'Get started'**
+  String get onboardingFinish;
 }
 
 class _AppLocalizationsDelegate

@@ -969,4 +969,30 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get errorUnknown => 'An unexpected error occurred.';
+
+  @override
+  String get onboardingWelcomeHint => 'Set up the app in a few quick steps.';
+
+  @override
+  String get onboardingApiKeyDescription =>
+      'Register for a free API key, or skip to explore the app with demo data.';
+
+  @override
+  String get onboardingComplete => 'All set!';
+
+  @override
+  String get onboardingCompleteHint =>
+      'You can change these settings anytime in your profile.';
+
+  @override
+  String get onboardingBack => 'Back';
+
+  @override
+  String get onboardingNext => 'Next';
+
+  @override
+  String get onboardingSkip => 'Skip';
+
+  @override
+  String get onboardingFinish => 'Get started';
 }
