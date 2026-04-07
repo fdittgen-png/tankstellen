@@ -10,6 +10,7 @@ import 'core/background/background_service.dart';
 import 'core/cache/cache_manager.dart';
 import 'core/error_tracing/storage/trace_storage.dart';
 import 'core/error_tracing/trace_recorder.dart';
+import 'core/utils/edge_to_edge.dart';
 import 'core/notifications/notification_service.dart';
 import 'core/storage/hive_storage.dart';
 import 'core/sync/community_config.dart';
@@ -31,6 +32,11 @@ import 'features/widget/data/home_widget_service.dart';
 /// 10. Run app with global error handlers
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Opt in to edge-to-edge display (required for Android 15+).
+  // Makes system bars transparent so app content draws behind them.
+  // Individual screens handle insets via SafeArea or MediaQuery.viewPadding.
+  EdgeToEdge.enable();
 
   // Silence all debugPrint output in release builds.
   // debugPrint is NOT stripped by the compiler, so it leaks to logcat/console
