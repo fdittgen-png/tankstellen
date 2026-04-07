@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../../sync/presentation/widgets/qr_share_widget.dart';
 import '../../../../core/sync/sync_config.dart';
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Displays TankSync cloud sync status and actions.
 ///
@@ -173,10 +175,7 @@ class TankSyncSection extends ConsumerWidget {
     if (confirmed == true && context.mounted) {
       await ref.read(syncStateProvider.notifier).deleteAccount();
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Account deleted. Local data preserved.')),
-        );
+        SnackBarHelper.show(context, AppLocalizations.of(context)?.accountDeleted ?? 'Account deleted. Local data preserved.');
       }
     }
   }
@@ -211,15 +210,11 @@ class TankSyncSection extends ConsumerWidget {
       try {
         await ref.read(syncStateProvider.notifier).switchToAnonymous();
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Switched to anonymous session')),
-          );
+          SnackBarHelper.show(context, AppLocalizations.of(context)?.switchedToAnonymous ?? 'Switched to anonymous session');
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to switch: $e')),
-          );
+          SnackBarHelper.showError(context, AppLocalizations.of(context)?.failedToSwitch(e.toString()) ?? 'Failed to switch: $e');
         }
       }
     }

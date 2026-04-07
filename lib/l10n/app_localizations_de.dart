@@ -1092,4 +1092,90 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get gdprSettingsHint =>
       'Sie können Ihre Datenschutzeinstellungen jederzeit ändern.';
+
+  @override
+  String get routeSaved => 'Route gespeichert!';
+
+  @override
+  String get routeSaveFailed => 'Route konnte nicht gespeichert werden';
+
+  @override
+  String get sqlCopied => 'SQL in Zwischenablage kopiert';
+
+  @override
+  String get connectionDataCopied => 'Verbindungsdaten kopiert';
+
+  @override
+  String get accountDeleted => 'Konto gelöscht. Lokale Daten bleiben erhalten.';
+
+  @override
+  String get switchedToAnonymous => 'Zu anonymer Sitzung gewechselt';
+
+  @override
+  String failedToSwitch(String error) {
+    return 'Wechsel fehlgeschlagen: $error';
+  }
+
+  @override
+  String get topicUrlCopied => 'Themen-URL kopiert';
+
+  @override
+  String get testNotificationSent => 'Testbenachrichtigung gesendet!';
+
+  @override
+  String get testNotificationFailed =>
+      'Testbenachrichtigung konnte nicht gesendet werden';
+
+  @override
+  String get pushUpdateFailed =>
+      'Push-Benachrichtigungseinstellung konnte nicht aktualisiert werden';
+
+  @override
+  String get connectedAsGuest => 'Als Gast verbunden';
+
+  @override
+  String get accountCreated => 'Konto erstellt!';
+
+  @override
+  String get signedIn => 'Angemeldet!';
+
+  @override
+  String stationHidden(String name) {
+    return '$name ausgeblendet';
+  }
+
+  @override
+  String removedFromFavoritesName(String name) {
+    return '$name aus Favoriten entfernt';
+  }
+
+  @override
+  String invalidApiKey(String error) {
+    return 'Ungültiger API-Schlüssel: $error';
+  }
+
+  @override
+  String get invalidQrCode => 'Ungültiges QR-Code-Format';
+
+  @override
+  String get invalidQrCodeTankSync =>
+      'Ungültiger QR-Code — TankSync-Format erwartet';
+
+  @override
+  String get tankSyncConnected => 'TankSync verbunden!';
+
+  @override
+  String get syncCompleted =>
+      'Synchronisierung abgeschlossen — Daten aktualisiert';
+
+  @override
+  String get deviceCodeCopied => 'Gerätecode kopiert';
+
+  @override
+  String get undo => 'Rückgängig';
+
+  @override
+  String invalidPostalCode(String length, String label) {
+    return 'Bitte geben Sie eine gültige $length-stellige $label ein';
+  }
 }

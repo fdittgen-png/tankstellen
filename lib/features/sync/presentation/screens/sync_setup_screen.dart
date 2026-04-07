@@ -8,6 +8,8 @@ import '../../../../core/sync/sync_provider.dart';
 import '../widgets/auth_form_widget.dart';
 import '../widgets/qr_scanner_screen.dart';
 import '../widgets/sync_credentials_step.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../widgets/sync_mode_card.dart';
 
 /// Clean 3-step sync setup: Mode -> Credentials (if needed) -> Auth -> Done.
@@ -121,9 +123,7 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
       } catch (e) {
         debugPrint('QR code parse failed: $e');
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Invalid QR code format')),
-          );
+          SnackBarHelper.showError(context, AppLocalizations.of(context)?.invalidQrCode ?? 'Invalid QR code format');
         }
       }
     }

@@ -1081,4 +1081,87 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String get gdprSettingsHint =>
       'You can change your privacy choices at any time.';
+
+  @override
+  String get routeSaved => 'Route saved!';
+
+  @override
+  String get routeSaveFailed => 'Failed to save route';
+
+  @override
+  String get sqlCopied => 'SQL copied to clipboard';
+
+  @override
+  String get connectionDataCopied => 'Connection data copied';
+
+  @override
+  String get accountDeleted => 'Account deleted. Local data preserved.';
+
+  @override
+  String get switchedToAnonymous => 'Switched to anonymous session';
+
+  @override
+  String failedToSwitch(String error) {
+    return 'Failed to switch: $error';
+  }
+
+  @override
+  String get topicUrlCopied => 'Topic URL copied';
+
+  @override
+  String get testNotificationSent => 'Test notification sent!';
+
+  @override
+  String get testNotificationFailed => 'Failed to send test notification';
+
+  @override
+  String get pushUpdateFailed => 'Failed to update push notification setting';
+
+  @override
+  String get connectedAsGuest => 'Connected as guest';
+
+  @override
+  String get accountCreated => 'Account created!';
+
+  @override
+  String get signedIn => 'Signed in!';
+
+  @override
+  String stationHidden(String name) {
+    return '$name hidden';
+  }
+
+  @override
+  String removedFromFavoritesName(String name) {
+    return '$name removed from favorites';
+  }
+
+  @override
+  String invalidApiKey(String error) {
+    return 'Invalid API key: $error';
+  }
+
+  @override
+  String get invalidQrCode => 'Invalid QR code format';
+
+  @override
+  String get invalidQrCodeTankSync =>
+      'Invalid QR code — expected TankSync format';
+
+  @override
+  String get tankSyncConnected => 'TankSync connected!';
+
+  @override
+  String get syncCompleted => 'Sync completed — data refreshed';
+
+  @override
+  String get deviceCodeCopied => 'Device code copied';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String invalidPostalCode(String length, String label) {
+    return 'Please enter a valid $length-digit $label';
+  }
 }

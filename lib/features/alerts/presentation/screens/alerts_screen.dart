@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/models/price_alert.dart';
 import '../../providers/alert_provider.dart';
@@ -63,9 +64,7 @@ class _AlertListTile extends ConsumerWidget {
       ),
       onDismissed: (_) {
         ref.read(alertProvider.notifier).removeAlert(alert.id);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n?.alertDeleted(alert.stationName) ?? 'Alert "${alert.stationName}" deleted')),
-        );
+        SnackBarHelper.show(context, l10n?.alertDeleted(alert.stationName) ?? 'Alert "${alert.stationName}" deleted');
       },
       child: ListTile(
         leading: Icon(

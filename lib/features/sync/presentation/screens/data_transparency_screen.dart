@@ -9,6 +9,8 @@ import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/sync/sync_service.dart';
 import '../../../alerts/providers/alert_provider.dart';
 import '../../../favorites/providers/favorites_provider.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../widgets/data_transparency_cards.dart';
 
 /// Shows all data stored on the server for the current user.
@@ -67,9 +69,7 @@ class _DataTransparencyScreenState
 
     await _loadData();
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sync completed — data refreshed')),
-      );
+      SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.syncCompleted ?? 'Sync completed — data refreshed');
     }
   }
 
@@ -129,9 +129,7 @@ class _DataTransparencyScreenState
     if (_data == null) return;
     await Clipboard.setData(ClipboardData(text: _prettyJson(_data!)));
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('JSON copied to clipboard')),
-    );
+    SnackBarHelper.show(context, AppLocalizations.of(context)?.jsonCopied ?? 'JSON copied to clipboard');
   }
 
   Future<void> _deleteAllData() async {
@@ -165,9 +163,7 @@ class _DataTransparencyScreenState
       await SyncService.deleteAllUserData();
       await _loadData();
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('All server data deleted')),
-      );
+      SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.allDataDeleted ?? 'All server data deleted');
     } catch (e) {
       setState(() { _error = e.toString(); _loading = false; });
     }

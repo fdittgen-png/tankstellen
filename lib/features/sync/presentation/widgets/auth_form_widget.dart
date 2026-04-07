@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/snackbar_helper.dart';
+
 /// Reusable authentication form: anonymous or email with password.
 ///
 /// Designed to be app-agnostic. Any app needing Supabase auth can use this.
@@ -55,7 +57,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
   void _submit() {
     final error = _validate();
     if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      SnackBarHelper.showError(context, error);
       return;
     }
     widget.onSubmit(

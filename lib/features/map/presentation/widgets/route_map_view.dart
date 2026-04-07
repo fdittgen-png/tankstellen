@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../itinerary/providers/itinerary_provider.dart';
 import '../../../route_search/domain/entities/route_info.dart';
@@ -294,11 +295,12 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
       );
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text(success ? 'Route saved!' : 'Failed to save route')),
-        );
+        final l10n = AppLocalizations.of(context);
+        if (success) {
+          SnackBarHelper.showSuccess(context, l10n?.routeSaved ?? 'Route saved!');
+        } else {
+          SnackBarHelper.showError(context, l10n?.routeSaveFailed ?? 'Failed to save route');
+        }
       }
     }
   }

@@ -6,6 +6,7 @@ import '../../../../core/services/report_service.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/community_report_service.dart';
 
@@ -62,11 +63,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
     final l10n = AppLocalizations.of(context);
     if (_selectedType == null) return;
     if (_selectedType!.needsPrice && _priceController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content:
-                Text(l10n?.enterValidPrice ?? 'Please enter a valid price')),
-      );
+      SnackBarHelper.showError(context, l10n?.enterValidPrice ?? 'Please enter a valid price');
       return;
     }
 
@@ -107,22 +104,12 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n?.reportSent ?? 'Report sent. Thank you!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        SnackBarHelper.showSuccess(context, l10n?.reportSent ?? 'Report sent. Thank you!');
         context.pop();
       }
     } on ApiException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${l10n?.retry ?? "Error"}: ${e.message}'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        SnackBarHelper.showError(context, '${l10n?.retry ?? "Error"}: ${e.message}');
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);

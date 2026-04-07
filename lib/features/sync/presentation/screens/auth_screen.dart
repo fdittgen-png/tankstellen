@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Authentication screen for switching between anonymous and email accounts.
@@ -50,9 +51,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         await settings.putSetting('sync_user_id', userId);
         ref.invalidate(syncStateProvider);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Connected as guest')),
-          );
+          SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.connectedAsGuest ?? 'Connected as guest');
           context.pop();
         }
       }
@@ -94,9 +93,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_isSignUp ? 'Account created!' : 'Signed in!')),
-        );
+        final l10n = AppLocalizations.of(context);
+        SnackBarHelper.showSuccess(context, _isSignUp ? (l10n?.accountCreated ?? 'Account created!') : (l10n?.signedIn ?? 'Signed in!'));
         context.pop();
       }
     } catch (e) {
@@ -122,9 +120,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     try {
       await ref.read(syncStateProvider.notifier).switchToAnonymous();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Switched to anonymous session')),
-        );
+        SnackBarHelper.show(context, AppLocalizations.of(context)?.switchedToAnonymous ?? 'Switched to anonymous session');
         context.pop();
       }
     } catch (e) {

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../core/cache/cache_manager.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'storage_bar.dart';
 
@@ -221,9 +222,7 @@ class _StorageSectionState extends ConsumerState<StorageSection> {
       await cache.clearAll();
       if (mounted) {
         setState(() {});
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cache cleared.')),
-        );
+        SnackBarHelper.show(context, AppLocalizations.of(context)?.cacheCleared ?? 'Cache cleared.');
       }
     }
   }

@@ -7,6 +7,7 @@ import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../../route_search/providers/route_search_provider.dart';
@@ -180,17 +181,13 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
         } else {
           ref.read(ignoredStationsProvider.notifier).add(item.id);
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  '${item.station.brand.isNotEmpty ? item.station.brand : item.station.name} hidden',
-                ),
-                action: SnackBarAction(
-                  label: 'Undo',
-                  onPressed: () => ref.read(ignoredStationsProvider.notifier).remove(item.id),
-                ),
-                duration: const Duration(seconds: 4),
-              ),
+            final stationLabel = item.station.brand.isNotEmpty ? item.station.brand : item.station.name;
+            final l10n = AppLocalizations.of(context);
+            SnackBarHelper.showWithUndo(
+              context,
+              l10n?.stationHidden(stationLabel) ?? '$stationLabel hidden',
+              undoLabel: l10n?.undo ?? 'Undo',
+              onUndo: () => ref.read(ignoredStationsProvider.notifier).remove(item.id),
             );
           }
           return true;

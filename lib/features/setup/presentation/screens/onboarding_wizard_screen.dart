@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/language/language_provider.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/data/repositories/profile_repository.dart';
 import '../../../profile/providers/profile_provider.dart';
@@ -106,12 +107,8 @@ class _OnboardingWizardScreenState
       final result = await validator.validate(apiKey);
       if (!result.isValid) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Invalid API key: ${result.errorMessage}'),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
+          final l10n = AppLocalizations.of(context);
+          SnackBarHelper.showError(context, l10n?.invalidApiKey(result.errorMessage ?? '') ?? 'Invalid API key: ${result.errorMessage}');
         }
         return false;
       }

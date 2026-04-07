@@ -2125,6 +2125,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You can change your privacy choices at any time.'**
   String get gdprSettingsHint;
+
+  /// No description provided for @routeSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Route saved!'**
+  String get routeSaved;
+
+  /// No description provided for @routeSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save route'**
+  String get routeSaveFailed;
+
+  /// No description provided for @sqlCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'SQL copied to clipboard'**
+  String get sqlCopied;
+
+  /// No description provided for @connectionDataCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection data copied'**
+  String get connectionDataCopied;
+
+  /// No description provided for @accountDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Account deleted. Local data preserved.'**
+  String get accountDeleted;
+
+  /// No description provided for @switchedToAnonymous.
+  ///
+  /// In en, this message translates to:
+  /// **'Switched to anonymous session'**
+  String get switchedToAnonymous;
+
+  /// No description provided for @failedToSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to switch: {error}'**
+  String failedToSwitch(String error);
+
+  /// No description provided for @topicUrlCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Topic URL copied'**
+  String get topicUrlCopied;
+
+  /// No description provided for @testNotificationSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Test notification sent!'**
+  String get testNotificationSent;
+
+  /// No description provided for @testNotificationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send test notification'**
+  String get testNotificationFailed;
+
+  /// No description provided for @pushUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update push notification setting'**
+  String get pushUpdateFailed;
+
+  /// No description provided for @connectedAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected as guest'**
+  String get connectedAsGuest;
+
+  /// No description provided for @accountCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Account created!'**
+  String get accountCreated;
+
+  /// No description provided for @signedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in!'**
+  String get signedIn;
+
+  /// No description provided for @stationHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} hidden'**
+  String stationHidden(String name);
+
+  /// No description provided for @removedFromFavoritesName.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} removed from favorites'**
+  String removedFromFavoritesName(String name);
+
+  /// No description provided for @invalidApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid API key: {error}'**
+  String invalidApiKey(String error);
+
+  /// No description provided for @invalidQrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid QR code format'**
+  String get invalidQrCode;
+
+  /// No description provided for @invalidQrCodeTankSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid QR code — expected TankSync format'**
+  String get invalidQrCodeTankSync;
+
+  /// No description provided for @tankSyncConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'TankSync connected!'**
+  String get tankSyncConnected;
+
+  /// No description provided for @syncCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync completed — data refreshed'**
+  String get syncCompleted;
+
+  /// No description provided for @deviceCodeCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Device code copied'**
+  String get deviceCodeCopied;
+
+  /// No description provided for @undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// No description provided for @invalidPostalCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid {length}-digit {label}'**
+  String invalidPostalCode(String length, String label);
 }
 
 class _AppLocalizationsDelegate

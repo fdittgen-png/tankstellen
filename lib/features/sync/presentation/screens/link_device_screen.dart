@@ -6,6 +6,8 @@ import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_service.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../../alerts/providers/alert_provider.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../alerts/data/models/price_alert.dart';
 
 class LinkDeviceScreen extends ConsumerStatefulWidget {
@@ -176,10 +178,7 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
                             tooltip: 'Copy code',
                             onPressed: () {
                               Clipboard.setData(ClipboardData(text: _myId!));
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Device code copied')),
-                              );
+                              SnackBarHelper.show(context, AppLocalizations.of(context)?.deviceCodeCopied ?? 'Device code copied');
                             },
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(

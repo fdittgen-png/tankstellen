@@ -6,6 +6,8 @@ import '../../../../core/country/country_provider.dart';
 import '../../../../core/services/location_search_provider.dart';
 import '../../../../core/services/location_search_service.dart';
 import '../../../../core/utils/frame_callbacks.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
 
 /// Unified location input: auto-detects GPS (empty), ZIP (digits), or city (text).
@@ -103,13 +105,11 @@ class _LocationInputState extends ConsumerState<LocationInput> {
         if (RegExp(country.postalCodeRegex).hasMatch(text)) {
           widget.onZipSearch(text);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Please enter a valid ${country.postalCodeLength}-digit '
-                '${country.postalCodeLabel}',
-              ),
-            ),
+          final l10n = AppLocalizations.of(context);
+          SnackBarHelper.showError(
+            context,
+            l10n?.invalidPostalCode(country.postalCodeLength.toString(), country.postalCodeLabel) ??
+                'Please enter a valid ${country.postalCodeLength}-digit ${country.postalCodeLabel}',
           );
         }
       case LocationInputType.city:

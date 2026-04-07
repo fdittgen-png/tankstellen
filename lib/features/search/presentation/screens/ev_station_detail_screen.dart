@@ -5,6 +5,7 @@ import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/widgets/star_rating.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../data/services/ev_charging_service.dart';
@@ -57,20 +58,14 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
       if (refreshed != null && mounted) {
         setState(() => _station = refreshed);
         final l10n = AppLocalizations.of(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n?.evStatusUpdated ?? 'Status updated'), duration: const Duration(seconds: 2)),
-        );
+        SnackBarHelper.showSuccess(context, l10n?.evStatusUpdated ?? 'Status updated');
       } else if (mounted) {
         final l10n = AppLocalizations.of(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n?.evStationNotFound ?? 'Could not refresh — station not found nearby')),
-        );
+        SnackBarHelper.showError(context, l10n?.evStationNotFound ?? 'Could not refresh — station not found nearby');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)?.refreshFailed ?? 'Refresh failed. Please try again.')),
-        );
+        SnackBarHelper.showError(context, AppLocalizations.of(context)?.refreshFailed ?? 'Refresh failed. Please try again.');
       }
     } finally {
       if (mounted) setState(() => _isRefreshing = false);
@@ -104,11 +99,10 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
               tooltip: isFav ? (l10n?.removeFavorite ?? 'Remove from favorites') : (l10n?.addFavorite ?? 'Add to favorites'),
               onPressed: () {
                 ref.read(favoritesProvider.notifier).toggle(station.id);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(isFav ? (l10n?.removedFromFavorites ?? 'Removed from favorites') : (l10n?.addedToFavorites ?? 'Added to favorites')),
-                    duration: const Duration(seconds: 2),
-                  ),
+                SnackBarHelper.show(
+                  context,
+                  isFav ? (l10n?.removedFromFavorites ?? 'Removed from favorites') : (l10n?.addedToFavorites ?? 'Added to favorites'),
+                  duration: const Duration(seconds: 2),
                 );
               },
             );
