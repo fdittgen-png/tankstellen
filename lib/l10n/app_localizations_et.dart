@@ -337,6 +337,9 @@ class AppLocalizationsEt extends AppLocalizations {
       'Tasuta registreerumine. Andmed riiklike hinnaläbipaistvuse asutuste käest.';
 
   @override
+  String get apiKeyFormatError => 'Vigane vorming — oodatav UUID (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Toetage seda projekti';
 
   @override

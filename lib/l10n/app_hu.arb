@@ -131,6 +131,7 @@
   "cacheEmpty": "A gyorsítótár üres",
   "noStorage": "Nincs felhasznált tárhely",
   "apiKeyNote": "Ingyenes regisztráció. Adatok a kormányzati ártranszparencia-ügynökségektől.",
+  "apiKeyFormatError": "Érvénytelen formátum — UUID elvárva (8-4-4-4-12)",
   "supportProject": "Támogassa a projektet",
   "supportDescription": "Ez az alkalmazás ingyenes, nyílt forráskódú és reklámmentes. Ha hasznosnak találja, fontolja meg a fejlesztő támogatását.",
   "reportBug": "Hiba bejelentése / Funkció javaslata",

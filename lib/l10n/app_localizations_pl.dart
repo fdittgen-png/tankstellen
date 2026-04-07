@@ -337,6 +337,10 @@ class AppLocalizationsPl extends AppLocalizations {
       'Bezpłatna rejestracja. Dane od rządowych agencji przejrzystości cen.';
 
   @override
+  String get apiKeyFormatError =>
+      'Nieprawidłowy format — oczekiwany UUID (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Wesprzyj ten projekt';
 
   @override

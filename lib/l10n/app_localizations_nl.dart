@@ -338,6 +338,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Gratis registratie. Gegevens van overheidsinstanties voor prijstransparantie.';
 
   @override
+  String get apiKeyFormatError =>
+      'Ongeldig formaat — UUID verwacht (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Steun dit project';
 
   @override

@@ -337,6 +337,10 @@ class AppLocalizationsNb extends AppLocalizations {
       'Gratis registrering. Data fra statlige pristransparensorganer.';
 
   @override
+  String get apiKeyFormatError =>
+      'Ugyldig format — forventet UUID (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Støtt dette prosjektet';
 
   @override

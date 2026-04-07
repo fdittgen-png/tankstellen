@@ -338,6 +338,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ingyenes regisztráció. Adatok a kormányzati ártranszparencia-ügynökségektől.';
 
   @override
+  String get apiKeyFormatError =>
+      'Érvénytelen formátum — UUID elvárva (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Támogassa a projektet';
 
   @override

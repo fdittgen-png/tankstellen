@@ -197,6 +197,7 @@
   "cacheEmpty": "Pamięć podręczna jest pusta",
   "noStorage": "Brak wykorzystanej pamięci",
   "apiKeyNote": "Bezpłatna rejestracja. Dane od rządowych agencji przejrzystości cen.",
+  "apiKeyFormatError": "Nieprawidłowy format — oczekiwany UUID (8-4-4-4-12)",
   "supportProject": "Wesprzyj ten projekt",
   "supportDescription": "Ta aplikacja jest darmowa, open source i bez reklam. Jeśli jest przydatna, rozważ wsparcie dewelopera.",
   "reportBug": "Zgłoś błąd / Zaproponuj funkcję",

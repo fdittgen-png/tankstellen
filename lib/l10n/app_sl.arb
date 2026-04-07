@@ -131,6 +131,7 @@
   "cacheEmpty": "Predpomnilnik je prazen",
   "noStorage": "Ni uporabljene shrambe",
   "apiKeyNote": "Brezplačna registracija. Podatki od vladnih agencij za cenovno preglednost.",
+  "apiKeyFormatError": "Neveljavna oblika — pričakovan UUID (8-4-4-4-12)",
   "supportProject": "Podprite ta projekt",
   "supportDescription": "Ta aplikacija je brezplačna, odprtokodna in brez oglasov. Če jo smatrate za koristno, razmislite o podpori razvijalcu.",
   "reportBug": "Prijavi napako / Predlagaj funkcijo",

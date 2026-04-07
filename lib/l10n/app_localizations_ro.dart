@@ -338,6 +338,9 @@ class AppLocalizationsRo extends AppLocalizations {
       'Înregistrare gratuită. Date de la agențiile guvernamentale de transparență a prețurilor.';
 
   @override
+  String get apiKeyFormatError => 'Format invalid — UUID așteptat (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Susțineți acest proiect';
 
   @override

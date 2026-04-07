@@ -197,6 +197,7 @@
   "cacheEmpty": "Cachen er tom",
   "noStorage": "Ingen lagring brugt",
   "apiKeyNote": "Gratis registrering. Data fra statslige pristransparensorganer.",
+  "apiKeyFormatError": "Ugyldigt format — forventet UUID (8-4-4-4-12)",
   "supportProject": "Støt dette projekt",
   "supportDescription": "Denne app er gratis, open source og uden reklamer. Hvis du finder den nyttig, overvej at støtte udvikleren.",
   "reportBug": "Rapportér fejl / Foreslå funktion",

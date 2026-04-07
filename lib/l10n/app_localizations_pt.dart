@@ -338,6 +338,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Registo gratuito. Dados de agências governamentais de transparência de preços.';
 
   @override
+  String get apiKeyFormatError =>
+      'Formato inválido — UUID esperado (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Apoiar este projeto';
 
   @override

@@ -197,6 +197,7 @@
   "cacheEmpty": "La cache è vuota",
   "noStorage": "Nessuno spazio utilizzato",
   "apiKeyNote": "Registrazione gratuita. Dati dalle agenzie governative per la trasparenza dei prezzi.",
+  "apiKeyFormatError": "Formato non valido — UUID previsto (8-4-4-4-12)",
   "supportProject": "Supporta questo progetto",
   "supportDescription": "Questa app è gratuita, open source e senza pubblicità. Se la trovi utile, considera di supportare lo sviluppatore.",
   "reportBug": "Segnala un bug / Suggerisci una funzione",

@@ -337,6 +337,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Kostenlose Registrierung. Daten von den Markttransparenzstellen.';
 
   @override
+  String get apiKeyFormatError =>
+      'Ungültiges Format — UUID erwartet (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Dieses Projekt unterstützen';
 
   @override

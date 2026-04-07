@@ -131,6 +131,7 @@
   "cacheEmpty": "Cache-ul este gol",
   "noStorage": "Fără stocare utilizată",
   "apiKeyNote": "Înregistrare gratuită. Date de la agențiile guvernamentale de transparență a prețurilor.",
+  "apiKeyFormatError": "Format invalid — UUID așteptat (8-4-4-4-12)",
   "supportProject": "Susțineți acest proiect",
   "supportDescription": "Această aplicație este gratuită, open source și fără reclame. Dacă o găsiți utilă, luați în considerare susținerea dezvoltatorului.",
   "reportBug": "Raportează eroare / Sugerează funcție",

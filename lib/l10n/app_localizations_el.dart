@@ -336,6 +336,10 @@ class AppLocalizationsEl extends AppLocalizations {
       'Δωρεάν εγγραφή. Δεδομένα από κρατικούς φορείς διαφάνειας τιμών.';
 
   @override
+  String get apiKeyFormatError =>
+      'Μη έγκυρη μορφή — αναμενόμενο UUID (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Υποστηρίξτε αυτό το έργο';
 
   @override

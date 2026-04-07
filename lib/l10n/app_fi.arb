@@ -197,6 +197,7 @@
   "cacheEmpty": "Välimuisti on tyhjä",
   "noStorage": "Ei tallennustilaa käytössä",
   "apiKeyNote": "Ilmainen rekisteröinti. Tiedot valtion hintatransparenssitoimistoilta.",
+  "apiKeyFormatError": "Virheellinen muoto — odotettu UUID (8-4-4-4-12)",
   "supportProject": "Tue tätä projektia",
   "supportDescription": "Tämä sovellus on ilmainen, avoimen lähdekoodin ja mainokseton. Jos se on hyödyllinen, harkitse kehittäjän tukemista.",
   "reportBug": "Ilmoita virheestä / Ehdota ominaisuutta",

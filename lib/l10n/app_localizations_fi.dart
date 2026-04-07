@@ -337,6 +337,10 @@ class AppLocalizationsFi extends AppLocalizations {
       'Ilmainen rekisteröinti. Tiedot valtion hintatransparenssitoimistoilta.';
 
   @override
+  String get apiKeyFormatError =>
+      'Virheellinen muoto — odotettu UUID (8-4-4-4-12)';
+
+  @override
   String get supportProject => 'Tue tätä projektia';
 
   @override

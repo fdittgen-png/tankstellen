@@ -131,6 +131,7 @@
   "cacheEmpty": "Mezipaměť je prázdná",
   "noStorage": "Žádné využité úložiště",
   "apiKeyNote": "Bezplatná registrace. Data od vládních agentur pro cenovou transparentnost.",
+  "apiKeyFormatError": "Neplatný formát — očekáváno UUID (8-4-4-4-12)",
   "supportProject": "Podpořte tento projekt",
   "supportDescription": "Tato aplikace je zdarma, s otevřeným zdrojovým kódem a bez reklam. Pokud ji považujete za užitečnou, zvažte podporu vývojáře.",
   "reportBug": "Nahlásit chybu / Navrhnout funkci",

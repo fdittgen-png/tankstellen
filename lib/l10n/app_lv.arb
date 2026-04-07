@@ -131,6 +131,7 @@
   "cacheEmpty": "Kešatmiņa ir tukša",
   "noStorage": "Krātuve netiek izmantota",
   "apiKeyNote": "Bezmaksas reģistrācija. Dati no valdības cenu caurredzamības aģentūrām.",
+  "apiKeyFormatError": "Nederīgs formāts — gaidīts UUID (8-4-4-4-12)",
   "supportProject": "Atbalstiet šo projektu",
   "supportDescription": "Šī lietotne ir bezmaksas, atvērtā koda un bez reklāmām. Ja tā jums šķiet noderīga, apsveriet iespēju atbalstīt izstrādātāju.",
   "reportBug": "Ziņot par kļūdu / Ieteikt funkciju",

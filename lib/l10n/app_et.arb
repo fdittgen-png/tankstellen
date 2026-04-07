@@ -131,6 +131,7 @@
   "cacheEmpty": "Vahemälu on tühi",
   "noStorage": "Salvestusruum pole kasutuses",
   "apiKeyNote": "Tasuta registreerumine. Andmed riiklike hinnaläbipaistvuse asutuste käest.",
+  "apiKeyFormatError": "Vigane vorming — oodatav UUID (8-4-4-4-12)",
   "supportProject": "Toetage seda projekti",
   "supportDescription": "See rakendus on tasuta, avatud lähtekoodiga ja reklaamivaba. Kui leiate selle kasulikuks, kaaluge arendaja toetamist.",
   "reportBug": "Teata veast / Soovita funktsiooni",

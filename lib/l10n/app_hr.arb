@@ -131,6 +131,7 @@
   "cacheEmpty": "Predmemorija je prazna",
   "noStorage": "Nema korištene pohrane",
   "apiKeyNote": "Besplatna registracija. Podaci od vladinih agencija za transparentnost cijena.",
+  "apiKeyFormatError": "Nevažeći format — očekivan UUID (8-4-4-4-12)",
   "supportProject": "Podržite ovaj projekt",
   "supportDescription": "Ova aplikacija je besplatna, otvorenog koda i bez reklama. Ako je smatrate korisnom, razmislite o podršci razvojnom programeru.",
   "reportBug": "Prijavi grešku / Predloži značajku",
