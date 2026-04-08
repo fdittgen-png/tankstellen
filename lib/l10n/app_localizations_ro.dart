@@ -1229,4 +1229,13 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Active';
+
+  @override
+  String get alertStatsToday => 'Astăzi';
+
+  @override
+  String get alertStatsThisWeek => 'Săptămâna aceasta';
 }

@@ -1230,4 +1230,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Ativos';
+
+  @override
+  String get alertStatsToday => 'Hoje';
+
+  @override
+  String get alertStatsThisWeek => 'Esta semana';
 }

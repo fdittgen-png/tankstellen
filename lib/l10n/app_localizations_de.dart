@@ -1238,4 +1238,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Verstanden';
+
+  @override
+  String get alertStatsActive => 'Aktiv';
+
+  @override
+  String get alertStatsToday => 'Heute';
+
+  @override
+  String get alertStatsThisWeek => 'Diese Woche';
 }

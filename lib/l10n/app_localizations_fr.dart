@@ -1234,4 +1234,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Actives';
+
+  @override
+  String get alertStatsToday => 'Aujourd\'hui';
+
+  @override
+  String get alertStatsThisWeek => 'Cette semaine';
 }

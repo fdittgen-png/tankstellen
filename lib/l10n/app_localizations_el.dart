@@ -1231,4 +1231,13 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Ενεργές';
+
+  @override
+  String get alertStatsToday => 'Σήμερα';
+
+  @override
+  String get alertStatsThisWeek => 'Αυτή την εβδομάδα';
 }

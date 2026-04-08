@@ -326,4 +326,7 @@
   "freshnessAgo": "il y a",
   "freshnessStale": "Périmé",
   "freshnessBadgeSemantics": "Fraîcheur des données : {age}"
+  ,"alertStatsActive": "Actives"
+  ,"alertStatsToday": "Aujourd'hui"
+  ,"alertStatsThisWeek": "Cette semaine"
 }

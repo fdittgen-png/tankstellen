@@ -7,6 +7,7 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/models/price_alert.dart';
 import '../../providers/alert_provider.dart';
+import '../widgets/alert_statistics_card.dart';
 
 class AlertsScreen extends ConsumerWidget {
   const AlertsScreen({super.key});
@@ -32,10 +33,13 @@ class AlertsScreen extends ConsumerWidget {
                   'Create an alert from a station\'s detail page.',
             )
           : ListView.builder(
-              itemCount: alerts.length,
+              itemCount: alerts.length + 1,
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemBuilder: (context, index) {
-                final alert = alerts[index];
+                if (index == 0) {
+                  return const AlertStatisticsCard();
+                }
+                final alert = alerts[index - 1];
                 return _AlertListTile(key: ValueKey(alert.id), alert: alert);
               },
             ),

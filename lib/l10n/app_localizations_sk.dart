@@ -1230,4 +1230,13 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Aktívne';
+
+  @override
+  String get alertStatsToday => 'Dnes';
+
+  @override
+  String get alertStatsThisWeek => 'Tento týždeň';
 }

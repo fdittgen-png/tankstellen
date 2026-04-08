@@ -1227,4 +1227,13 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Aktiiviset';
+
+  @override
+  String get alertStatsToday => 'Tänään';
+
+  @override
+  String get alertStatsThisWeek => 'Tällä viikolla';
 }

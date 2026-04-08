@@ -1230,4 +1230,13 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Aktīvas';
+
+  @override
+  String get alertStatsToday => 'Šodien';
+
+  @override
+  String get alertStatsThisWeek => 'Šo nedēļu';
 }

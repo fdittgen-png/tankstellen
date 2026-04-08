@@ -1222,4 +1222,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Active';
+
+  @override
+  String get alertStatsToday => 'Today';
+
+  @override
+  String get alertStatsThisWeek => 'This week';
 }
