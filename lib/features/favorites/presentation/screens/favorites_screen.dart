@@ -15,6 +15,7 @@ import '../../../search/presentation/widgets/station_card.dart';
 import '../../providers/favorites_provider.dart';
 import '../widgets/alerts_tab.dart';
 import '../widgets/favorites_loading_view.dart';
+import '../widgets/swipe_tutorial_banner.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});
@@ -122,6 +123,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           child: Column(
             children: [
               ServiceStatusBanner(result: result),
+              const SwipeTutorialBanner(),
               Expanded(
                 child: ListView.builder(
                   itemCount: result.data.length,

@@ -1220,4 +1220,11 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get brandFilterNoHighway => 'No highway';
+
+  @override
+  String get swipeTutorialMessage =>
+      'Swipe right to navigate, swipe left to remove';
+
+  @override
+  String get swipeTutorialDismiss => 'Got it';
 }

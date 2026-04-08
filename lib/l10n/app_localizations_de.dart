@@ -1231,4 +1231,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get brandFilterNoHighway => 'Keine Autobahn';
+
+  @override
+  String get swipeTutorialMessage =>
+      'Nach rechts wischen zum Navigieren, nach links zum Entfernen';
+
+  @override
+  String get swipeTutorialDismiss => 'Verstanden';
 }

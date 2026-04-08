@@ -423,5 +423,7 @@
   "passwordReqSpecial": "Mindestens 1 Sonderzeichen",
   "passwordTooWeak": "Passwort erfüllt nicht alle Anforderungen",
   "brandFilterAll": "Alle",
-  "brandFilterNoHighway": "Keine Autobahn"
+  "brandFilterNoHighway": "Keine Autobahn",
+  "swipeTutorialMessage": "Nach rechts wischen zum Navigieren, nach links zum Entfernen",
+  "swipeTutorialDismiss": "Verstanden"
 }
