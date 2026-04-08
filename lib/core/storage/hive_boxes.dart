@@ -19,7 +19,14 @@ class HiveBoxes {
   static const String priceHistory = 'price_history';
   static const String alerts = 'alerts';
 
-  static const _encryptedBoxes = {settings, profiles};
+  static const _encryptedBoxes = {
+    settings,
+    profiles,
+    favorites,
+    cache,
+    priceHistory,
+    alerts,
+  };
   static const _hiveEncryptionKeyName = 'hive_encryption_key';
 
   static Future<HiveAesCipher> _loadCipher() async {
@@ -81,10 +88,10 @@ class HiveBoxes {
     }
     await Hive.openBox(settings, encryptionCipher: cipher);
     await Hive.openBox(profiles, encryptionCipher: cipher);
-    await Hive.openBox(favorites);
-    await Hive.openBox(cache);
-    await Hive.openBox(priceHistory);
-    await Hive.openBox(alerts);
+    await Hive.openBox(favorites, encryptionCipher: cipher);
+    await Hive.openBox(cache, encryptionCipher: cipher);
+    await Hive.openBox(priceHistory, encryptionCipher: cipher);
+    await Hive.openBox(alerts, encryptionCipher: cipher);
   }
 
   /// Initialize Hive in a background isolate with proper encryption.
@@ -92,10 +99,10 @@ class HiveBoxes {
     await Hive.initFlutter();
     final cipher = await _loadCipher();
     await Hive.openBox(settings, encryptionCipher: cipher);
-    await Hive.openBox(favorites);
-    await Hive.openBox(alerts);
-    await Hive.openBox(cache);
-    await Hive.openBox(priceHistory);
+    await Hive.openBox(favorites, encryptionCipher: cipher);
+    await Hive.openBox(alerts, encryptionCipher: cipher);
+    await Hive.openBox(cache, encryptionCipher: cipher);
+    await Hive.openBox(priceHistory, encryptionCipher: cipher);
   }
 
   /// Close all Hive boxes opened by [initInIsolate].
