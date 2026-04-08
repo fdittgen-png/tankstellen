@@ -1405,4 +1405,11 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get voiceAnnouncementCooldown => 'Repeat interval';
+
+  @override
+  String get nearestStations => 'Legkozelebbi kutjak';
+
+  @override
+  String get nearestStationsHint =>
+      'Talalja meg a legkozelebbi kutjakat a jelenlegi helyzete alapjan';
 }

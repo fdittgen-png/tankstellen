@@ -1398,4 +1398,11 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get voiceAnnouncementCooldown => 'Repeat interval';
+
+  @override
+  String get nearestStations => 'Najblizje postaje';
+
+  @override
+  String get nearestStationsHint =>
+      'Poiscite najblizje postaje z vaso trenutno lokacijo';
 }

@@ -408,5 +408,7 @@
   "amenityRestaurant": "Comida",
   "amenityAtm": "Multibanco",
   "amenityWifi": "WiFi",
-  "amenityEv": "Recarga"
+  "amenityEv": "Recarga",
+  "nearestStations": "Postos mais proximos",
+  "nearestStationsHint": "Encontre os postos mais proximos com a sua localizacao atual"
 }

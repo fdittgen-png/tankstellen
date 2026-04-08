@@ -408,5 +408,7 @@
   "amenityRestaurant": "Food",
   "amenityAtm": "ATM",
   "amenityWifi": "WiFi",
-  "amenityEv": "EV"
+  "amenityEv": "EV",
+  "nearestStations": "Lahimad jaamad",
+  "nearestStationsHint": "Leidke lahimad jaamad oma praeguse asukoha jargi"
 }

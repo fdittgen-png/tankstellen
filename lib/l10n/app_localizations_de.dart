@@ -1413,4 +1413,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get voiceAnnouncementCooldown => 'Wiederholungsintervall';
+
+  @override
+  String get nearestStations => 'Nächste Tankstellen';
+
+  @override
+  String get nearestStationsHint =>
+      'Die nächstgelegenen Tankstellen über Ihren Standort finden';
 }

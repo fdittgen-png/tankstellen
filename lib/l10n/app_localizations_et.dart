@@ -1398,4 +1398,11 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get voiceAnnouncementCooldown => 'Repeat interval';
+
+  @override
+  String get nearestStations => 'Lahimad jaamad';
+
+  @override
+  String get nearestStationsHint =>
+      'Leidke lahimad jaamad oma praeguse asukoha jargi';
 }

@@ -418,5 +418,7 @@
   "amenityRestaurant": "Cibo",
   "amenityAtm": "Bancomat",
   "amenityWifi": "WiFi",
-  "amenityEv": "Ricarica"
+  "amenityEv": "Ricarica",
+  "nearestStations": "Stazioni piu vicine",
+  "nearestStationsHint": "Trova le stazioni piu vicine con la tua posizione attuale"
 }

@@ -1402,4 +1402,11 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get voiceAnnouncementCooldown => 'Repeat interval';
+
+  @override
+  String get nearestStations => 'Narmaste stationer';
+
+  @override
+  String get nearestStationsHint =>
+      'Hitta de narmaste stationerna med din nuvarande position';
 }

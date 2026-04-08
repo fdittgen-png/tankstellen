@@ -61,4 +61,5 @@ const _$LandingScreenEnumMap = {
   LandingScreen.favorites: 'favorites',
   LandingScreen.map: 'map',
   LandingScreen.cheapest: 'cheapest',
+  LandingScreen.nearest: 'nearest',
 };

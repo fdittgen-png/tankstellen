@@ -408,5 +408,7 @@
   "amenityRestaurant": "Food",
   "amenityAtm": "ATM",
   "amenityWifi": "WiFi",
-  "amenityEv": "EV"
+  "amenityEv": "EV",
+  "nearestStations": "Artimiausios degalines",
+  "nearestStationsHint": "Raskite artimiausias degalines pagal jusu dabartine vieta"
 }
