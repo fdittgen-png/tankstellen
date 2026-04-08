@@ -1404,4 +1404,11 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get voiceAnnouncementCooldown => 'Repeat interval';
+
+  @override
+  String get nearestStations => 'Tuvakias degvielas uzpildes stacijas';
+
+  @override
+  String get nearestStationsHint =>
+      'Atrodiet tuvakias degvielas uzpildes stacijas pec jusu pasreizejas atrasanas vietas';
 }

@@ -1401,4 +1401,11 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get voiceAnnouncementCooldown => 'Repeat interval';
+
+  @override
+  String get nearestStations => 'Lahimmat asemat';
+
+  @override
+  String get nearestStationsHint =>
+      'Loyda lahimmat asemat nykyisella sijainnillasi';
 }

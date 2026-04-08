@@ -79,10 +79,11 @@ void main() {
       final selectable = LandingScreen.values
           .where((s) => s != LandingScreen.map)
           .toList();
-      expect(selectable.length, 3);
+      expect(selectable.length, 4);
       expect(selectable, contains(LandingScreen.search));
       expect(selectable, contains(LandingScreen.favorites));
       expect(selectable, contains(LandingScreen.cheapest));
+      expect(selectable, contains(LandingScreen.nearest));
       expect(selectable, isNot(contains(LandingScreen.map)));
     });
   });

@@ -1405,4 +1405,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get voiceAnnouncementCooldown => 'Repeat interval';
+
+  @override
+  String get nearestStations => 'Dichtstbijzijnde stations';
+
+  @override
+  String get nearestStationsHint =>
+      'Vind de dichtstbijzijnde stations met uw huidige locatie';
 }

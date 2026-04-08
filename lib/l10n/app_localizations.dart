@@ -2706,6 +2706,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Repeat interval'**
   String get voiceAnnouncementCooldown;
+
+  /// No description provided for @nearestStations.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearest stations'**
+  String get nearestStations;
+
+  /// No description provided for @nearestStationsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Find the closest stations using your current location'**
+  String get nearestStationsHint;
 }
 
 class _AppLocalizationsDelegate

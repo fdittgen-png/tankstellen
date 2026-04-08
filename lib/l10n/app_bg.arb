@@ -408,5 +408,7 @@
   "amenityRestaurant": "Food",
   "amenityAtm": "ATM",
   "amenityWifi": "WiFi",
-  "amenityEv": "EV"
+  "amenityEv": "EV",
+  "nearestStations": "Nai-blizki stantsii",
+  "nearestStationsHint": "Namerete nai-blizkite stantsii chrez vashata aktualna pozitsiya"
 }

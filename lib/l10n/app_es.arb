@@ -418,5 +418,7 @@
   "amenityRestaurant": "Comida",
   "amenityAtm": "Cajero",
   "amenityWifi": "WiFi",
-  "amenityEv": "Carga EV"
+  "amenityEv": "Carga EV",
+  "nearestStations": "Estaciones cercanas",
+  "nearestStationsHint": "Encontrar las estaciones mas cercanas con su ubicacion actual"
 }

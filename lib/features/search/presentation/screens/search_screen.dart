@@ -33,6 +33,7 @@ import '../widgets/ev_station_card.dart';
 import '../../../profile/data/models/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../widgets/mode_chip.dart';
+import '../widgets/nearest_shortcut_card.dart';
 import '../widgets/nearby_search_controls.dart';
 import '../widgets/route_search_controls.dart';
 import '../widgets/route_results_view.dart';
@@ -59,6 +60,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         } else {
           _performGpsSearch();
         }
+      } else if (profile?.landingScreen == LandingScreen.nearest) {
+        _performGpsSearch();
       }
     });
   }
@@ -323,9 +326,21 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       data: (result) {
         if (result.data.isEmpty) {
           return Center(
-            child: Text(
-              l10n?.startSearch ?? 'Search to find fuel stations.',
-              style: const TextStyle(fontSize: 16),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  NearestShortcutCard(onTap: _performGpsSearch),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n?.startSearch ?? 'Search to find fuel stations.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }

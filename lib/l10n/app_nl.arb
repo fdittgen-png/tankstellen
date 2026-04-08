@@ -408,5 +408,7 @@
   "amenityRestaurant": "Eten",
   "amenityAtm": "Pinautomaat",
   "amenityWifi": "WiFi",
-  "amenityEv": "Oplaadpunt"
+  "amenityEv": "Oplaadpunt",
+  "nearestStations": "Dichtstbijzijnde stations",
+  "nearestStationsHint": "Vind de dichtstbijzijnde stations met uw huidige locatie"
 }

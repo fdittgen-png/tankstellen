@@ -1405,4 +1405,11 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get voiceAnnouncementCooldown => 'Repeat interval';
+
+  @override
+  String get nearestStations => 'Kontinoteroi stathmoi';
+
+  @override
+  String get nearestStationsHint =>
+      'Vreite tous kontinoterous stathmous me tin trexousa topothesia sas';
 }

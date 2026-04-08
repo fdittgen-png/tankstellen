@@ -421,5 +421,7 @@
   "amenityRestaurant": "Resto",
   "amenityAtm": "DAB",
   "amenityWifi": "WiFi",
-  "amenityEv": "Recharge"
+  "amenityEv": "Recharge",
+  "nearestStations": "Stations les plus proches",
+  "nearestStationsHint": "Trouver les stations les plus proches avec votre position actuelle"
 }

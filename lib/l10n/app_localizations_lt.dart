@@ -1402,4 +1402,11 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get voiceAnnouncementCooldown => 'Repeat interval';
+
+  @override
+  String get nearestStations => 'Artimiausios degalines';
+
+  @override
+  String get nearestStationsHint =>
+      'Raskite artimiausias degalines pagal jusu dabartine vieta';
 }

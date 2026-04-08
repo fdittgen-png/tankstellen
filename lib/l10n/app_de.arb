@@ -628,12 +628,22 @@
   "voiceAnnouncementCheapFuel": "{station}, {distance} Kilometer voraus, {fuelType} {price}",
   "@voiceAnnouncementCheapFuel": {
     "placeholders": {
-      "station": { "type": "String" },
-      "distance": { "type": "String" },
-      "fuelType": { "type": "String" },
-      "price": { "type": "String" }
+      "station": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      },
+      "fuelType": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
     }
   },
   "voiceAnnouncementProximityRadius": "Ansage-Radius",
-  "voiceAnnouncementCooldown": "Wiederholungsintervall"
+  "voiceAnnouncementCooldown": "Wiederholungsintervall",
+  "nearestStations": "Nächste Tankstellen",
+  "nearestStationsHint": "Die nächstgelegenen Tankstellen über Ihren Standort finden"
 }

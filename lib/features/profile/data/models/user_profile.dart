@@ -8,7 +8,8 @@ enum LandingScreen {
   search('search'),
   favorites('favorites'),
   map('map'),
-  cheapest('cheapest');
+  cheapest('cheapest'),
+  nearest('nearest');
 
   final String key;
   const LandingScreen(this.key);
@@ -20,6 +21,7 @@ enum LandingScreen {
       'favorites': {'en': 'Favorites', 'de': 'Favoriten', 'fr': 'Favoris', 'es': 'Favoritos', 'it': 'Preferiti', 'nl': 'Favorieten', 'da': 'Favoritter', 'sv': 'Favoriter', 'fi': 'Suosikit', 'pl': 'Ulubione'},
       'map': {'en': 'Map', 'de': 'Karte', 'fr': 'Carte', 'es': 'Mapa', 'it': 'Mappa', 'nl': 'Kaart', 'da': 'Kort', 'sv': 'Karta', 'fi': 'Kartta', 'pl': 'Mapa'},
       'cheapest': {'en': 'Cheapest nearby', 'de': 'Günstigste', 'fr': 'Moins cher', 'es': 'Más barato', 'it': 'Più economico', 'nl': 'Goedkoopste', 'da': 'Billigste', 'sv': 'Billigast', 'fi': 'Halvin', 'pl': 'Najtańsze'},
+      'nearest': {'en': 'Nearest stations', 'de': 'Nächste Tankstellen', 'fr': 'À proximité', 'es': 'Estaciones cercanas', 'it': 'Stazioni vicine', 'nl': 'Dichtstbijzijnde', 'da': 'Nærmeste', 'sv': 'Närmaste', 'fi': 'Lähimmät', 'pl': 'Najbliższe'},
     };
     return names[key]?[languageCode] ?? names[key]?['en'] ?? key;
   }

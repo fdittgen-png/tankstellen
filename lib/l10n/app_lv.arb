@@ -408,5 +408,7 @@
   "amenityRestaurant": "Food",
   "amenityAtm": "ATM",
   "amenityWifi": "WiFi",
-  "amenityEv": "EV"
+  "amenityEv": "EV",
+  "nearestStations": "Tuvakias degvielas uzpildes stacijas",
+  "nearestStationsHint": "Atrodiet tuvakias degvielas uzpildes stacijas pec jusu pasreizejas atrasanas vietas"
 }

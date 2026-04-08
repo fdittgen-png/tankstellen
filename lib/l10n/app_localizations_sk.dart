@@ -1404,4 +1404,11 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get voiceAnnouncementCooldown => 'Repeat interval';
+
+  @override
+  String get nearestStations => 'Najblizsie stanice';
+
+  @override
+  String get nearestStationsHint =>
+      'Najdite najblizsie stanice podla vasej aktualnej polohy';
 }

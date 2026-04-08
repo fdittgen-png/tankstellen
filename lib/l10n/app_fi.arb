@@ -408,5 +408,7 @@
   "amenityRestaurant": "Food",
   "amenityAtm": "ATM",
   "amenityWifi": "WiFi",
-  "amenityEv": "EV"
+  "amenityEv": "EV",
+  "nearestStations": "Lahimmat asemat",
+  "nearestStationsHint": "Loyda lahimmat asemat nykyisella sijainnillasi"
 }

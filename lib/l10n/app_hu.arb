@@ -408,5 +408,7 @@
   "amenityRestaurant": "Food",
   "amenityAtm": "ATM",
   "amenityWifi": "WiFi",
-  "amenityEv": "EV"
+  "amenityEv": "EV",
+  "nearestStations": "Legkozelebbi kutjak",
+  "nearestStationsHint": "Talalja meg a legkozelebbi kutjakat a jelenlegi helyzete alapjan"
 }

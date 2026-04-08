@@ -1408,4 +1408,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get voiceAnnouncementCooldown => 'Repeat interval';
+
+  @override
+  String get nearestStations => 'Stations les plus proches';
+
+  @override
+  String get nearestStationsHint =>
+      'Trouver les stations les plus proches avec votre position actuelle';
 }
