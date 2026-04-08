@@ -1,5 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
+import 'package:tankstellen/features/search/presentation/widgets/location_input.dart';
+
+import '../../../../helpers/mock_providers.dart';
+import '../../../../helpers/pump_app.dart';
 
 void main() {
   group('Location input zip prefill logic', () {
@@ -97,6 +103,79 @@ void main() {
       ];
       final canDelete = profiles.length > 1;
       expect(canDelete, isTrue);
+    });
+  });
+
+  group('LocationInput accessibility', () {
+    testWidgets('TextField is not wrapped in nested Semantics(textField: true)',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        LocationInput(
+          onGpsSearch: () {},
+          onZipSearch: (_) {},
+          onCitySearch: (_) {},
+        ),
+        overrides: test.overrides,
+      );
+
+      // TextField should be present
+      expect(find.byType(TextField), findsOneWidget);
+
+      // There should be no explicit Semantics widget with textField: true
+      // wrapping the TextField (the old code had this causing nested semantics)
+      final semanticsWidgets = tester
+          .widgetList<Semantics>(find.byType(Semantics))
+          .where((s) => s.properties.textField == true);
+      expect(semanticsWidgets, isEmpty,
+          reason:
+              'TextField should not be wrapped in Semantics(textField: true)');
+    });
+
+    testWidgets('TextField has accessible label via InputDecoration.labelText',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        LocationInput(
+          onGpsSearch: () {},
+          onZipSearch: (_) {},
+          onCitySearch: (_) {},
+        ),
+        overrides: test.overrides,
+      );
+
+      // The TextField uses labelText for screen reader accessibility
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(textField.decoration?.labelText, 'Location search field');
+
+      handle.dispose();
+    });
+
+    testWidgets('GPS button has tooltip for screen readers', (tester) async {
+      final handle = tester.ensureSemantics();
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        LocationInput(
+          onGpsSearch: () {},
+          onZipSearch: (_) {},
+          onCitySearch: (_) {},
+        ),
+        overrides: test.overrides,
+      );
+
+      expect(find.byTooltip('Use GPS location'), findsOneWidget);
+
+      handle.dispose();
     });
   });
 }

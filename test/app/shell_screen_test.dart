@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/app/shell_screen.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
@@ -193,6 +194,82 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       expect(find.text('ProfileScreen'), findsOneWidget);
+    });
+
+    testWidgets('real ShellScreen navigation bar icons have semantic labels',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+
+      // Build a router that uses the real ShellScreen (not the test mock)
+      final router = GoRouter(
+        initialLocation: '/',
+        routes: [
+          StatefulShellRoute.indexedStack(
+            builder: (context, state, navigationShell) {
+              return ShellScreen(navigationShell: navigationShell);
+            },
+            branches: [
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: '/',
+                    builder: (context, state) =>
+                        const Center(child: Text('SearchScreen')),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: '/map',
+                    builder: (context, state) =>
+                        const Center(child: Text('MapScreen')),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: '/favorites',
+                    builder: (context, state) =>
+                        const Center(child: Text('FavoritesScreen')),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
+                    path: '/profile',
+                    builder: (context, state) =>
+                        const Center(child: Text('ProfileScreen')),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: overrides.cast(),
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pump(const Duration(seconds: 1));
+
+      // Each nav item should have a Semantics node with the correct label
+      expect(find.bySemanticsLabel('Search'), findsOneWidget);
+      expect(find.bySemanticsLabel('Map'), findsOneWidget);
+      expect(find.bySemanticsLabel('Favorites'), findsOneWidget);
+      expect(find.bySemanticsLabel('Settings'), findsOneWidget);
+
+      handle.dispose();
     });
   });
 }

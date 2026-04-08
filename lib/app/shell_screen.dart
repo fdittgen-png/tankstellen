@@ -216,7 +216,12 @@ class _AnimatedNavBar extends StatelessWidget {
           final item = items[i];
 
           return Expanded(
-            child: InkWell(
+            child: Semantics(
+              label: item.label,
+              button: true,
+              selected: selected,
+              excludeSemantics: true,
+              child: InkWell(
               onTap: () => onTap(i),
               splashColor: theme.colorScheme.primary.withValues(alpha: 0.1),
               highlightColor: Colors.transparent,
@@ -248,6 +253,7 @@ class _AnimatedNavBar extends StatelessWidget {
                   ],
                 ],
               ),
+            ),
             ),
           );
         }),
