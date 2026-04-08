@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/background/background_service.dart';
 import 'package:tankstellen/core/background/hive_isolate_lock.dart';
+import 'package:tankstellen/core/notifications/local_notification_service.dart';
 import 'package:tankstellen/core/notifications/notification_service.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/utils/json_extensions.dart';
@@ -425,10 +426,9 @@ void main() {
   });
 
   group('NotificationService', () {
-    test('NotificationService.init method exists', () {
-      // Verify the init method exists on NotificationService.
-      // Actual initialization requires platform channels (Android/iOS).
-      expect(NotificationService.init, isA<Function>());
+    test('LocalNotificationService implements NotificationService', () {
+      final service = LocalNotificationService();
+      expect(service, isA<NotificationService>());
     });
   });
 }

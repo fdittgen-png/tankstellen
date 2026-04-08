@@ -11,7 +11,7 @@ import 'core/cache/cache_manager.dart';
 import 'core/error_tracing/storage/trace_storage.dart';
 import 'core/error_tracing/trace_recorder.dart';
 import 'core/utils/edge_to_edge.dart';
-import 'core/notifications/notification_service.dart';
+import 'core/notifications/local_notification_service.dart';
 import 'core/perf/startup_timer.dart';
 import 'core/storage/hive_storage.dart';
 import 'core/sync/community_config.dart';
@@ -71,7 +71,7 @@ Future<void> main() async {
   await profileRepo.migrateProfileCountryLanguage();
 
   // Initialize local notifications, background tasks, and home widget
-  await NotificationService.init();
+  await LocalNotificationService().initialize();
   await BackgroundService.init();
   await HomeWidgetService.init();
   StartupTimer.instance.mark('services_init');
