@@ -10,22 +10,17 @@ import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
 import '../../../../fixtures/stations.dart';
-import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 
 void main() {
   group('DrivingBottomBar', () {
     testWidgets('renders three buttons', (tester) async {
-      bool recenterTapped = false;
-      bool nearestTapped = false;
-      bool exitTapped = false;
-
       await pumpApp(
         tester,
         DrivingBottomBar(
-          onRecenter: () => recenterTapped = true,
-          onNearestStation: () => nearestTapped = true,
-          onExit: () => exitTapped = true,
+          onRecenter: () {},
+          onNearestStation: () {},
+          onExit: () {},
         ),
       );
 
@@ -141,7 +136,7 @@ void main() {
     testWidgets('shows brand name, distance, and price', (tester) async {
       await pumpApp(
         tester,
-        DrivingStationSheet(
+        const DrivingStationSheet(
           station: testStation,
           fuelType: FuelType.e10,
         ),
@@ -158,7 +153,7 @@ void main() {
     testWidgets('navigate button has 72dp height', (tester) async {
       await pumpApp(
         tester,
-        DrivingStationSheet(
+        const DrivingStationSheet(
           station: testStation,
           fuelType: FuelType.e10,
         ),
