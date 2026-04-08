@@ -1,0 +1,157 @@
+# Tankstellen
+
+**Free fuel price comparison app for Europe and beyond** — 11 countries, 23 languages, privacy-first.
+
+[![CI](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml/badge.svg)](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Flutter](https://img.shields.io/badge/Flutter-3.41-blue.svg)](https://flutter.dev)
+
+Tankstellen helps drivers find the cheapest fuel nearby, along a route, or in a specific city. It aggregates real-time prices from official government APIs — no scraping, no tracking, no ads.
+
+## Features
+
+- **Real-time prices** from official government data sources
+- **11 countries** — Germany, France, Austria, Spain, Italy, Denmark, Portugal, UK, Argentina, Australia, Mexico
+- **23 languages** — from Bulgarian to Swedish
+- **Route search** — find the cheapest station along your planned route
+- **Price alerts** — get notified when prices drop below your threshold
+- **Price history & predictions** — 30-day charts and "best time to fill" analysis
+- **Favorites** — quick access to your regular stations with swipe actions
+- **Home screen widget** — see prices without opening the app
+- **Offline-capable** — local-first architecture with smart caching
+- **Cross-device sync** — optional TankSync cloud backend (self-hostable via Supabase)
+- **Privacy-first** — no Firebase, no Google Play Services, no tracking, GDPR-compliant
+- **Accessibility** — meets Android tap target guidelines, semantic labels throughout
+
+## Screenshots
+
+<!-- TODO: Add screenshots -->
+
+## Getting Started
+
+### Prerequisites
+
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) (stable channel, 3.41+)
+- Android SDK with at least one emulator or connected device
+- JDK 17
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/fdittgen-png/tankstellen.git
+cd tankstellen
+
+# Install dependencies
+flutter pub get
+
+# Run code generation
+dart run build_runner build --delete-conflicting-outputs
+
+# Launch on a connected device or emulator
+flutter run
+```
+
+### API Keys
+
+Tankstellen uses official government fuel price APIs. Some require a free API key:
+
+| Country | API | Key Required |
+|---------|-----|:------------:|
+| Germany | [Tankerkoenig](https://creativecommons.tankerkoenig.de/) | Yes (free) |
+| France | [Prix Carburants](https://www.prix-carburants.gouv.fr/) | No |
+| Austria | [E-Control](https://www.e-control.at/) | No |
+| Spain | [MiTECO](https://sedeaplicaciones.mineco.gob.es/) | No |
+| Italy | [MISE](https://dgsaie.mise.gov.it/) | No |
+
+Keys are stored securely on-device (Android Keystore) — never embedded in source code.
+
+## Architecture
+
+```
+lib/
+  app/              # App entry, routing, theme
+  core/
+    cache/          # Unified CacheManager with TTLs
+    services/       # Abstract interfaces + country implementations
+    storage/        # Hive local storage
+    sync/           # TankSync cloud backend (optional)
+    error_tracing/  # Structured error capture
+  features/
+    search/         # City/postal code search
+    map/            # Interactive map with clustering
+    favorites/      # Saved stations with swipe actions
+    alerts/         # Price drop notifications
+    calculator/     # Trip cost calculator
+    price_history/  # 30-day charts & predictions
+    route_search/   # Along-the-route cheapest station
+    station_detail/ # Station info, prices, reports
+    profile/        # Settings & preferences
+    sync/           # Cross-device sync UI
+    widget/         # Home screen widget
+    ...
+```
+
+**Key patterns:**
+- Feature-first clean architecture with data / domain / presentation layers
+- Riverpod 3.0 with code generation for state management
+- Service abstraction with 4-step fallback: fresh cache → API → stale cache → error
+- All API responses wrapped in `ServiceResult<T>` with source tracking
+
+## Development
+
+```bash
+# Run tests
+flutter test
+
+# Run tests with coverage
+flutter test --coverage
+
+# Static analysis (must pass with zero warnings)
+flutter analyze
+
+# Code generation (after changing models/providers)
+dart run build_runner build --delete-conflicting-outputs
+
+# Build release APK
+flutter build apk --release
+```
+
+### Adding a New Country
+
+The app is designed to be easily extensible. Each country has its own service implementation behind the `StationService` interface. See `lib/core/services/impl/` for examples.
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Flutter 3.41 / Dart 3.11 |
+| State | Riverpod 3.0 with code generation |
+| Storage | Hive (local-first) + optional Supabase |
+| Networking | Dio 5.x with interceptors |
+| Maps | flutter_map + OpenStreetMap (no Google dependency) |
+| Data Classes | Freezed + json_serializable |
+| Background | WorkManager for periodic alert checks |
+| CI/CD | GitHub Actions — analyze, test, build, release |
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+**Quick summary:**
+
+1. Open an issue first — describe the bug or feature before writing code
+2. Branch from `master` — use conventional branch names (`feat/`, `fix/`, `refactor/`)
+3. Write tests — every change needs tests
+4. Run checks — `flutter analyze` and `flutter test` must pass
+5. Keep PRs small — under 400 lines changed (excluding generated files)
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Fuel price data provided by official government APIs of each supported country
+- Maps powered by [OpenStreetMap](https://www.openstreetmap.org/) contributors
+- Built with [Flutter](https://flutter.dev) and the amazing Dart ecosystem
