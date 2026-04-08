@@ -399,5 +399,14 @@
   "errorUnknown": "An unexpected error occurred.",
   "alertStatsActive": "Ενεργές",
   "alertStatsToday": "Σήμερα",
-  "alertStatsThisWeek": "Αυτή την εβδομάδα"
+  "alertStatsThisWeek": "Αυτή την εβδομάδα",
+  "amenities": "Amenities",
+  "amenityShop": "Shop",
+  "amenityCarWash": "Car Wash",
+  "amenityAirPump": "Air",
+  "amenityToilet": "WC",
+  "amenityRestaurant": "Food",
+  "amenityAtm": "ATM",
+  "amenityWifi": "WiFi",
+  "amenityEv": "EV"
 }

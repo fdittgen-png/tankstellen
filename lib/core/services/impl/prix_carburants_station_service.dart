@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../../../features/search/data/models/search_params.dart';
 import '../../../features/search/domain/entities/station.dart';
+import '../../../features/search/domain/entities/station_amenity.dart';
 import 'osm_brand_enricher.dart';
 import '../dio_factory.dart';
 import '../mixins/station_service_helpers.dart';
@@ -223,6 +224,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
         is24h: r['horaires_automate_24_24'] == 'Oui',
         openingHoursText: _parseOpeningHours(r['horaires_jour']),
         services: _parseServices(r['services_service']),
+        amenities: parseAmenitiesFromServices(_parseServices(r['services_service'])),
         availableFuels: _parseStringList(r['carburants_disponibles']),
         unavailableFuels: _parseStringList(r['carburants_indisponibles']),
         stationType: r['pop']?.toString(),

@@ -1325,4 +1325,31 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get no => 'No';
+
+  @override
+  String get amenities => 'Voorzieningen';
+
+  @override
+  String get amenityShop => 'Winkel';
+
+  @override
+  String get amenityCarWash => 'Wasstraat';
+
+  @override
+  String get amenityAirPump => 'Lucht';
+
+  @override
+  String get amenityToilet => 'WC';
+
+  @override
+  String get amenityRestaurant => 'Eten';
+
+  @override
+  String get amenityAtm => 'Pinautomaat';
+
+  @override
+  String get amenityWifi => 'WiFi';
+
+  @override
+  String get amenityEv => 'Oplaadpunt';
 }

@@ -399,5 +399,14 @@
   "errorUnknown": "An unexpected error occurred.",
   "alertStatsActive": "Aktīvas",
   "alertStatsToday": "Šodien",
-  "alertStatsThisWeek": "Šo nedēļu"
+  "alertStatsThisWeek": "Šo nedēļu",
+  "amenities": "Amenities",
+  "amenityShop": "Shop",
+  "amenityCarWash": "Car Wash",
+  "amenityAirPump": "Air",
+  "amenityToilet": "WC",
+  "amenityRestaurant": "Food",
+  "amenityAtm": "ATM",
+  "amenityWifi": "WiFi",
+  "amenityEv": "EV"
 }

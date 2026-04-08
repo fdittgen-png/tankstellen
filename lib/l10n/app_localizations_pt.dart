@@ -1324,4 +1324,31 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get no => 'No';
+
+  @override
+  String get amenities => 'Comodidades';
+
+  @override
+  String get amenityShop => 'Loja';
+
+  @override
+  String get amenityCarWash => 'Lavagem';
+
+  @override
+  String get amenityAirPump => 'Ar';
+
+  @override
+  String get amenityToilet => 'WC';
+
+  @override
+  String get amenityRestaurant => 'Comida';
+
+  @override
+  String get amenityAtm => 'Multibanco';
+
+  @override
+  String get amenityWifi => 'WiFi';
+
+  @override
+  String get amenityEv => 'Recarga';
 }

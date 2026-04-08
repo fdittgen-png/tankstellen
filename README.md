@@ -145,6 +145,22 @@ Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed g
 3. Write tests — every change needs tests
 4. Run checks — `flutter analyze` and `flutter test` must pass
 5. Keep PRs small — under 400 lines changed (excluding generated files)
+Contributions are welcome! Please follow these guidelines:
+
+1. **Open an issue first** — describe the bug or feature before writing code
+2. **Branch from `master`** — use conventional branch names (`feat/`, `fix/`, `refactor/`)
+3. **Write tests** — every change needs tests (unit, widget, or integration)
+4. **Run checks** — `flutter analyze` and `flutter test` must pass
+5. **Keep PRs small** — under 400 lines changed (excluding generated files)
+6. **Conventional commits** — `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
+
+### Commit Messages
+
+```
+feat: add price alerts for Portugal stations
+fix: prevent duplicate API calls during rapid scroll
+refactor: extract cache TTL constants to config
+```
 
 ## License
 

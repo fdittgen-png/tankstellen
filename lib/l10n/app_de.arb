@@ -597,5 +597,14 @@
   "privacyDeleteBody": "Dies löscht unwiderruflich:\n\n- Alle Favoriten und Stationsdaten\n- Alle Suchprofile\n- Alle Preisalarme\n- Allen Preisverlauf\n- Alle zwischengespeicherten Daten\n- Ihren API-Schlüssel\n- Alle App-Einstellungen\n\nDie App wird auf den Ausgangszustand zurückgesetzt. Diese Aktion kann nicht rückgängig gemacht werden.",
   "privacyDeleteConfirm": "Alles löschen",
   "yes": "Ja",
-  "no": "Nein"
+  "no": "Nein",
+  "amenities": "Ausstattung",
+  "amenityShop": "Shop",
+  "amenityCarWash": "Waschanlage",
+  "amenityAirPump": "Luft",
+  "amenityToilet": "WC",
+  "amenityRestaurant": "Essen",
+  "amenityAtm": "Geldautomat",
+  "amenityWifi": "WLAN",
+  "amenityEv": "E-Laden"
 }

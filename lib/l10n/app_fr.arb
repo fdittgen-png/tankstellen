@@ -412,5 +412,14 @@
   "freshnessBadgeSemantics": "Fraîcheur des données : {age}",
   "alertStatsActive": "Actives",
   "alertStatsToday": "Aujourd'hui",
-  "alertStatsThisWeek": "Cette semaine"
+  "alertStatsThisWeek": "Cette semaine",
+  "amenities": "Équipements",
+  "amenityShop": "Boutique",
+  "amenityCarWash": "Lavage",
+  "amenityAirPump": "Air",
+  "amenityToilet": "WC",
+  "amenityRestaurant": "Resto",
+  "amenityAtm": "DAB",
+  "amenityWifi": "WiFi",
+  "amenityEv": "Recharge"
 }

@@ -7,6 +7,7 @@ import '../../../../core/utils/station_extensions.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/station.dart';
+import 'amenity_chips.dart';
 
 class StationCard extends StatelessWidget {
   final Station station;
@@ -155,6 +156,10 @@ class StationCard extends StatelessWidget {
                         ],
                       ],
                     ),
+                    if (station.amenities.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      AmenityChips(amenities: station.amenities),
+                    ],
                   ],
                 ),
               ),

@@ -2563,6 +2563,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No'**
   String get no;
+
+  /// No description provided for @amenities.
+  ///
+  /// In en, this message translates to:
+  /// **'Amenities'**
+  String get amenities;
+
+  /// No description provided for @amenityShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop'**
+  String get amenityShop;
+
+  /// No description provided for @amenityCarWash.
+  ///
+  /// In en, this message translates to:
+  /// **'Car Wash'**
+  String get amenityCarWash;
+
+  /// No description provided for @amenityAirPump.
+  ///
+  /// In en, this message translates to:
+  /// **'Air'**
+  String get amenityAirPump;
+
+  /// No description provided for @amenityToilet.
+  ///
+  /// In en, this message translates to:
+  /// **'WC'**
+  String get amenityToilet;
+
+  /// No description provided for @amenityRestaurant.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get amenityRestaurant;
+
+  /// No description provided for @amenityAtm.
+  ///
+  /// In en, this message translates to:
+  /// **'ATM'**
+  String get amenityAtm;
+
+  /// No description provided for @amenityWifi.
+  ///
+  /// In en, this message translates to:
+  /// **'WiFi'**
+  String get amenityWifi;
+
+  /// No description provided for @amenityEv.
+  ///
+  /// In en, this message translates to:
+  /// **'EV'**
+  String get amenityEv;
 }
 
 class _AppLocalizationsDelegate
