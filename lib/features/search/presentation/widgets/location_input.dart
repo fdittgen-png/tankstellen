@@ -137,14 +137,13 @@ class _LocationInputState extends ConsumerState<LocationInput> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Semantics(
-          label: 'Location search field',
-          textField: true,
-          child: TextField(
+        TextField(
           controller: _controller,
           focusNode: _focusNode,
           decoration: InputDecoration(
             hintText: _hintText(country),
+            labelText: 'Location search field',
+            floatingLabelBehavior: FloatingLabelBehavior.never,
             prefixIcon: Icon(_prefixIcon),
             border: const OutlineInputBorder(),
             suffixIcon: Row(
@@ -182,7 +181,6 @@ class _LocationInputState extends ConsumerState<LocationInput> {
           ),
           onChanged: _onChanged,
           onSubmitted: (_) => _submit(),
-        ),
         ),
         // City suggestions dropdown
         if (_suggestions.isNotEmpty)
