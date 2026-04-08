@@ -49,23 +49,32 @@ final class TankerkoenigDioProvider extends $FunctionalProvider<Dio, Dio, Dio>
 
 String _$tankerkoenigDioHash() => r'5ade6219b0e5455fcda1bd7d05904c5eb75a770a';
 
-/// Returns the appropriate station service based on whether an API key
-/// is configured. With key: Tankerkoenig with full fallback chain.
-/// Without key: demo data so the app works immediately.
+/// Returns the appropriate station service based on the active country
+/// and whether an API key is configured.
+///
+/// Uses [CountryServiceRegistry] to look up the correct service factory.
+/// Countries that require an API key (e.g. DE) fall back to demo data
+/// when no key is configured.
 
 @ProviderFor(stationService)
 final stationServiceProvider = StationServiceProvider._();
 
-/// Returns the appropriate station service based on whether an API key
-/// is configured. With key: Tankerkoenig with full fallback chain.
-/// Without key: demo data so the app works immediately.
+/// Returns the appropriate station service based on the active country
+/// and whether an API key is configured.
+///
+/// Uses [CountryServiceRegistry] to look up the correct service factory.
+/// Countries that require an API key (e.g. DE) fall back to demo data
+/// when no key is configured.
 
 final class StationServiceProvider
     extends $FunctionalProvider<StationService, StationService, StationService>
     with $Provider<StationService> {
-  /// Returns the appropriate station service based on whether an API key
-  /// is configured. With key: Tankerkoenig with full fallback chain.
-  /// Without key: demo data so the app works immediately.
+  /// Returns the appropriate station service based on the active country
+  /// and whether an API key is configured.
+  ///
+  /// Uses [CountryServiceRegistry] to look up the correct service factory.
+  /// Countries that require an API key (e.g. DE) fall back to demo data
+  /// when no key is configured.
   StationServiceProvider._()
     : super(
         from: null,
@@ -99,7 +108,7 @@ final class StationServiceProvider
   }
 }
 
-String _$stationServiceHash() => r'9a4f37e4936e1a923e3c47c2a116889e6416718b';
+String _$stationServiceHash() => r'67078979202079f40e27b6893f6f83287e9571e7';
 
 @ProviderFor(geocodingChain)
 final geocodingChainProvider = GeocodingChainProvider._();
