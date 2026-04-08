@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/driving/presentation/screens/driving_mode_screen.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_bottom_bar.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_station_sheet.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/safety_disclaimer_dialog.dart';
