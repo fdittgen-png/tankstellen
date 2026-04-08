@@ -37,6 +37,36 @@ Future<void> pumpApp(
   await tester.pumpAndSettle();
 }
 
+/// Convenience wrapper that pumps a widget with a custom [TextScaler].
+///
+/// Useful for verifying that layouts do not overflow at larger
+/// text scaling factors (e.g. 1.5x, 2.0x accessibility settings).
+Future<void> pumpScaledApp(
+  WidgetTester tester,
+  Widget child, {
+  required double textScaleFactor,
+  List<Object>? overrides,
+  Locale locale = const Locale('en'),
+}) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: overrides?.cast() ?? [],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: locale,
+        home: MediaQuery(
+          data: MediaQueryData(
+            textScaler: TextScaler.linear(textScaleFactor),
+          ),
+          child: Scaffold(body: child),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
 /// Convenience wrapper that pumps a widget in an RTL text direction.
 ///
 /// Useful for verifying that layouts, alignment, and icon placement
