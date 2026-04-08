@@ -11,6 +11,7 @@ import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/presentation/screens/search_screen.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 import 'package:tankstellen/features/setup/presentation/screens/setup_screen.dart';
+import 'package:tankstellen/features/sync/presentation/screens/sync_setup_screen.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../helpers/mock_providers.dart';
@@ -35,6 +36,7 @@ class _EmptySearchState extends SearchState {
     ));
   }
 }
+
 
 /// Fixed FavoriteStations that returns empty results (no async work).
 class _EmptyFavoriteStations extends FavoriteStations {
@@ -221,6 +223,41 @@ void main() {
       testWidgets('meets labeled tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const SetupScreen(),
+            overrides: _overrides());
+
+        await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+        handle.dispose();
+      });
+    });
+
+    // -----------------------------------------------------------------------
+    // StationDetailScreen: Semantics added in production code but guideline
+    // test deferred — the screen has deep provider chains (price history,
+    // ratings, storage management) that require extensive mocking.
+    // -----------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------
+    // SyncSetupScreen
+    // -----------------------------------------------------------------------
+    group('SyncSetupScreen', () {
+      List<Object> _overrides() {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        return test.overrides;
+      }
+
+      testWidgets('meets Android tap target guideline', (tester) async {
+        final handle = tester.ensureSemantics();
+        await _pumpScreen(tester, const SyncSetupScreen(),
+            overrides: _overrides());
+
+        await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+        handle.dispose();
+      });
+
+      testWidgets('meets labeled tap target guideline', (tester) async {
+        final handle = tester.ensureSemantics();
+        await _pumpScreen(tester, const SyncSetupScreen(),
             overrides: _overrides());
 
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));

@@ -143,18 +143,24 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 16),
-              Icon(
-                Icons.local_gas_station,
-                size: 72,
-                color: theme.colorScheme.primary,
+              Semantics(
+                excludeSemantics: true,
+                child: Icon(
+                  Icons.local_gas_station,
+                  size: 72,
+                  color: theme.colorScheme.primary,
+                ),
               ),
               const SizedBox(height: 16),
-              Text(
-                l10n?.welcome ?? 'Fuel Prices',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+              Semantics(
+                header: true,
+                child: Text(
+                  l10n?.welcome ?? 'Fuel Prices',
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
@@ -216,69 +222,82 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               const SizedBox(height: 24),
 
               // ── Country-specific info ──
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            country.flag,
-                            style: const TextStyle(fontSize: 24),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  country.name,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  'Data: ${country.apiProvider ?? 'Demo'}',
-                                  style: theme.textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Status badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: country.requiresApiKey
-                                  ? Colors.orange.shade100
-                                  : Colors.green.shade100,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              country.requiresApiKey
-                                  ? 'API key required'
-                                  : 'Free — no key needed',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: country.requiresApiKey
-                                    ? Colors.orange.shade800
-                                    : Colors.green.shade800,
+              Semantics(
+                label: '${country.name}, data source: ${country.apiProvider ?? 'Demo'}, '
+                    '${country.requiresApiKey ? 'API key required' : 'Free, no key needed'}, '
+                    'fuel types: ${country.fuelTypes.join(', ')}',
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            ExcludeSemantics(
+                              child: Text(
+                                country.flag,
+                                style: const TextStyle(fontSize: 24),
                               ),
                             ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ExcludeSemantics(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      country.name,
+                                      style: theme.textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Data: ${country.apiProvider ?? 'Demo'}',
+                                      style: theme.textTheme.bodySmall,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            // Status badge
+                            ExcludeSemantics(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: country.requiresApiKey
+                                      ? Colors.orange.shade100
+                                      : Colors.green.shade100,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  country.requiresApiKey
+                                      ? 'API key required'
+                                      : 'Free — no key needed',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: country.requiresApiKey
+                                        ? Colors.orange.shade800
+                                        : Colors.green.shade800,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        ExcludeSemantics(
+                          child: Text(
+                            'Fuel types: ${country.fuelTypes.join(', ')}',
+                            style: theme.textTheme.bodySmall,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Fuel types: ${country.fuelTypes.join(', ')}',
-                        style: theme.textTheme.bodySmall,
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -338,21 +357,29 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               ],
 
               // ── Continue button ──
-              FilledButton.icon(
-                onPressed: _isLoading ? null : _continue,
-                icon: const Icon(Icons.arrow_forward),
+              Semantics(
+                button: true,
                 label: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(
-                        country.requiresApiKey &&
-                                _apiKeyController.text.trim().isEmpty
-                            ? 'Continue with demo data'
-                            : 'Continue',
-                      ),
+                    ? 'Loading'
+                    : (country.requiresApiKey && _apiKeyController.text.trim().isEmpty
+                        ? 'Continue with demo data'
+                        : 'Continue'),
+                child: FilledButton.icon(
+                  onPressed: _isLoading ? null : _continue,
+                  icon: const Icon(Icons.arrow_forward),
+                  label: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          country.requiresApiKey &&
+                                  _apiKeyController.text.trim().isEmpty
+                              ? 'Continue with demo data'
+                              : 'Continue',
+                        ),
+                ),
               ),
 
               const SizedBox(height: 24),

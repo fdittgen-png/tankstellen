@@ -133,8 +133,15 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_title),
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: _onBack),
+        title: Semantics(
+          header: true,
+          child: Text(_title),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: _onBack,
+          tooltip: 'Back',
+        ),
       ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
@@ -179,7 +186,10 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
   List<Widget> _buildModeStep() {
     final theme = Theme.of(context);
     return [
-      Text('How would you like to sync?', style: theme.textTheme.titleMedium),
+      Semantics(
+        header: true,
+        child: Text('How would you like to sync?', style: theme.textTheme.titleMedium),
+      ),
       const SizedBox(height: 4),
       Text(
         'Your app works fully offline. Cloud sync is optional.',
@@ -187,33 +197,45 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
       ),
       const SizedBox(height: 20),
 
-      SyncModeCard(
-        icon: Icons.public,
-        title: 'Tankstellen Community',
-        subtitle: 'Share favorites & ratings with all users',
-        privacyLabel: 'Shared',
-        privacyColor: Colors.green,
-        onTap: () => _selectMode(SyncMode.community),
+      Semantics(
+        label: 'Tankstellen Community, shared. Share favorites and ratings with all users.',
+        button: true,
+        child: SyncModeCard(
+          icon: Icons.public,
+          title: 'Tankstellen Community',
+          subtitle: 'Share favorites & ratings with all users',
+          privacyLabel: 'Shared',
+          privacyColor: Colors.green,
+          onTap: () => _selectMode(SyncMode.community),
+        ),
       ),
       const SizedBox(height: 10),
 
-      SyncModeCard(
-        icon: Icons.lock_outline,
-        title: 'Private Database',
-        subtitle: 'Your own Supabase — full data control',
-        privacyLabel: 'Private',
-        privacyColor: Colors.blue,
-        onTap: () => _selectMode(SyncMode.private),
+      Semantics(
+        label: 'Private Database, private. Your own Supabase, full data control.',
+        button: true,
+        child: SyncModeCard(
+          icon: Icons.lock_outline,
+          title: 'Private Database',
+          subtitle: 'Your own Supabase — full data control',
+          privacyLabel: 'Private',
+          privacyColor: Colors.blue,
+          onTap: () => _selectMode(SyncMode.private),
+        ),
       ),
       const SizedBox(height: 10),
 
-      SyncModeCard(
-        icon: Icons.group_outlined,
-        title: 'Join a Group',
-        subtitle: 'Family or friends shared database',
-        privacyLabel: 'Group',
-        privacyColor: Colors.orange,
-        onTap: () => _selectMode(SyncMode.joinExisting),
+      Semantics(
+        label: 'Join a Group, group access. Family or friends shared database.',
+        button: true,
+        child: SyncModeCard(
+          icon: Icons.group_outlined,
+          title: 'Join a Group',
+          subtitle: 'Family or friends shared database',
+          privacyLabel: 'Group',
+          privacyColor: Colors.orange,
+          onTap: () => _selectMode(SyncMode.joinExisting),
+        ),
       ),
 
       const SizedBox(height: 24),
@@ -231,14 +253,24 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
     final theme = Theme.of(context);
     return [
       const SizedBox(height: 40),
-      const Icon(Icons.check_circle, size: 64, color: Colors.green),
-      const SizedBox(height: 16),
-      Text('Successfully connected!', style: theme.textTheme.titleLarge, textAlign: TextAlign.center),
-      const SizedBox(height: 8),
-      Text(
-        'Your data will now sync automatically.',
-        style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-        textAlign: TextAlign.center,
+      Semantics(
+        label: 'Successfully connected. Your data will now sync automatically.',
+        liveRegion: true,
+        child: Column(
+          children: [
+            const ExcludeSemantics(
+              child: Icon(Icons.check_circle, size: 64, color: Colors.green),
+            ),
+            const SizedBox(height: 16),
+            Text('Successfully connected!', style: theme.textTheme.titleLarge, textAlign: TextAlign.center),
+            const SizedBox(height: 8),
+            Text(
+              'Your data will now sync automatically.',
+              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     ];
   }
