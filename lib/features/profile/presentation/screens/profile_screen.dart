@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consent/presentation/widgets/consent_settings_section.dart';
 import '../widgets/about_section.dart';
@@ -21,6 +22,7 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -87,6 +89,28 @@ class ProfileScreen extends ConsumerWidget {
             icon: Icons.privacy_tip_outlined,
             title: l?.gdprTitle ?? 'Privacy',
             child: const ConsentSettingsSection(),
+          ),
+          const SizedBox(height: 8),
+
+          // Privacy Dashboard
+          Card(
+            margin: EdgeInsets.zero,
+            child: ListTile(
+              leading: const Icon(Icons.privacy_tip, size: 20),
+              title: Text(
+                l?.privacyDashboardTitle ?? 'Privacy Dashboard',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(
+                l?.privacyDashboardSubtitle ??
+                    'View, export, or delete your data',
+                style: theme.textTheme.bodySmall,
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/privacy-dashboard'),
+            ),
           ),
           const SizedBox(height: 8),
 

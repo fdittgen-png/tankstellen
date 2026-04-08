@@ -406,8 +406,8 @@
   "errorAllServicesFailed": "Could not load data. Check your connection and try again.",
   "errorCache": "Local data error. Try clearing the cache.",
   "errorCancelled": "Request was cancelled.",
-  "errorUnknown": "An unexpected error occurred."
-  ,"alertStatsActive": "Attivi"
-  ,"alertStatsToday": "Oggi"
-  ,"alertStatsThisWeek": "Questa settimana"
+  "errorUnknown": "An unexpected error occurred.",
+  "alertStatsActive": "Attivi",
+  "alertStatsToday": "Oggi",
+  "alertStatsThisWeek": "Questa settimana"
 }

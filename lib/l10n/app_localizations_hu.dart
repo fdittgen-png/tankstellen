@@ -1240,4 +1240,89 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get alertStatsThisWeek => 'Ezen a héten';
+
+  @override
+  String get privacyDashboardTitle => 'Privacy Dashboard';
+
+  @override
+  String get privacyDashboardSubtitle => 'View, export, or delete your data';
+
+  @override
+  String get privacyDashboardBanner =>
+      'Your data belongs to you. Here you can see everything this app stores, export it, or delete it.';
+
+  @override
+  String get privacyLocalData => 'Data on this device';
+
+  @override
+  String get privacyIgnoredStations => 'Ignored stations';
+
+  @override
+  String get privacyRatings => 'Station ratings';
+
+  @override
+  String get privacyPriceHistory => 'Price history stations';
+
+  @override
+  String get privacyProfiles => 'Search profiles';
+
+  @override
+  String get privacyItineraries => 'Saved routes';
+
+  @override
+  String get privacyCacheEntries => 'Cache entries';
+
+  @override
+  String get privacyApiKey => 'API key stored';
+
+  @override
+  String get privacyEvApiKey => 'EV API key stored';
+
+  @override
+  String get privacyEstimatedSize => 'Estimated storage';
+
+  @override
+  String get privacySyncedData => 'Cloud sync (TankSync)';
+
+  @override
+  String get privacySyncDisabled =>
+      'Cloud sync is disabled. All data stays on this device only.';
+
+  @override
+  String get privacySyncMode => 'Sync mode';
+
+  @override
+  String get privacySyncUserId => 'User ID';
+
+  @override
+  String get privacySyncDescription =>
+      'When sync is enabled, favorites, alerts, ignored stations, and ratings are also stored on the TankSync server.';
+
+  @override
+  String get privacyViewServerData => 'View server data';
+
+  @override
+  String get privacyExportButton => 'Export all data as JSON';
+
+  @override
+  String get privacyExportSuccess => 'Data exported to clipboard';
+
+  @override
+  String get privacyDeleteButton => 'Delete all data';
+
+  @override
+  String get privacyDeleteTitle => 'Delete all data?';
+
+  @override
+  String get privacyDeleteBody =>
+      'This will permanently delete:\n\n- All favorites and station data\n- All search profiles\n- All price alerts\n- All price history\n- All cached data\n- Your API key\n- All app settings\n\nThe app will reset to its initial state. This action cannot be undone.';
+
+  @override
+  String get privacyDeleteConfirm => 'Delete everything';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
 }

@@ -2401,6 +2401,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This week'**
   String get alertStatsThisWeek;
+
+  /// No description provided for @privacyDashboardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Dashboard'**
+  String get privacyDashboardTitle;
+
+  /// No description provided for @privacyDashboardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View, export, or delete your data'**
+  String get privacyDashboardSubtitle;
+
+  /// No description provided for @privacyDashboardBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data belongs to you. Here you can see everything this app stores, export it, or delete it.'**
+  String get privacyDashboardBanner;
+
+  /// No description provided for @privacyLocalData.
+  ///
+  /// In en, this message translates to:
+  /// **'Data on this device'**
+  String get privacyLocalData;
+
+  /// No description provided for @privacyIgnoredStations.
+  ///
+  /// In en, this message translates to:
+  /// **'Ignored stations'**
+  String get privacyIgnoredStations;
+
+  /// No description provided for @privacyRatings.
+  ///
+  /// In en, this message translates to:
+  /// **'Station ratings'**
+  String get privacyRatings;
+
+  /// No description provided for @privacyPriceHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Price history stations'**
+  String get privacyPriceHistory;
+
+  /// No description provided for @privacyProfiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Search profiles'**
+  String get privacyProfiles;
+
+  /// No description provided for @privacyItineraries.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved routes'**
+  String get privacyItineraries;
+
+  /// No description provided for @privacyCacheEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache entries'**
+  String get privacyCacheEntries;
+
+  /// No description provided for @privacyApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'API key stored'**
+  String get privacyApiKey;
+
+  /// No description provided for @privacyEvApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'EV API key stored'**
+  String get privacyEvApiKey;
+
+  /// No description provided for @privacyEstimatedSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated storage'**
+  String get privacyEstimatedSize;
+
+  /// No description provided for @privacySyncedData.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync (TankSync)'**
+  String get privacySyncedData;
+
+  /// No description provided for @privacySyncDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync is disabled. All data stays on this device only.'**
+  String get privacySyncDisabled;
+
+  /// No description provided for @privacySyncMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync mode'**
+  String get privacySyncMode;
+
+  /// No description provided for @privacySyncUserId.
+  ///
+  /// In en, this message translates to:
+  /// **'User ID'**
+  String get privacySyncUserId;
+
+  /// No description provided for @privacySyncDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'When sync is enabled, favorites, alerts, ignored stations, and ratings are also stored on the TankSync server.'**
+  String get privacySyncDescription;
+
+  /// No description provided for @privacyViewServerData.
+  ///
+  /// In en, this message translates to:
+  /// **'View server data'**
+  String get privacyViewServerData;
+
+  /// No description provided for @privacyExportButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Export all data as JSON'**
+  String get privacyExportButton;
+
+  /// No description provided for @privacyExportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Data exported to clipboard'**
+  String get privacyExportSuccess;
+
+  /// No description provided for @privacyDeleteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all data'**
+  String get privacyDeleteButton;
+
+  /// No description provided for @privacyDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all data?'**
+  String get privacyDeleteTitle;
+
+  /// No description provided for @privacyDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete:\n\n- All favorites and station data\n- All search profiles\n- All price alerts\n- All price history\n- All cached data\n- Your API key\n- All app settings\n\nThe app will reset to its initial state. This action cannot be undone.'**
+  String get privacyDeleteBody;
+
+  /// No description provided for @privacyDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete everything'**
+  String get privacyDeleteConfirm;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
 }
 
 class _AppLocalizationsDelegate
