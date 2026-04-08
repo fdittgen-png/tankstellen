@@ -1,0 +1,183 @@
+name: Deploy to Play Store
+
+# Triggered automatically on version tags, or manually for rollout promotion.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - promote-rollout
+          - deploy-internal
+        default: promote-rollout
+      rollout_percentage:
+        description: 'Production rollout percentage (for promote-rollout)'
+        required: false
+        type: choice
+        options:
+          - '1'
+          - '5'
+          - '10'
+          - '25'
+          - '50'
+          - '100'
+        default: '5'
+      track_from:
+        description: 'Source track (for promote-rollout)'
+        required: false
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+        default: internal
+      aab_run_id:
+        description: 'CI run ID to download AAB from (for deploy-internal, leave empty for latest)'
+        required: false
+        type: string
+
+concurrency:
+  group: play-store-deploy
+  cancel-in-progress: false
+
+env:
+  AAB_PATH: app-play-release.aab
+  PACKAGE_NAME: com.dittgen.tankstellen
+
+jobs:
+  # --- Job 1: Deploy AAB to Play Store internal track ---
+  deploy-internal:
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy-internal')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+            echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+          else
+            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+            echo "tag=$LATEST_TAG" >> "$GITHUB_OUTPUT"
+            echo "version=${LATEST_TAG#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Wait for CI build to complete
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo "Waiting for CI workflow to produce AAB artifact..."
+          # Give CI time to start
+          sleep 30
+          # Poll for up to 30 minutes
+          for i in $(seq 1 60); do
+            RUN_ID=$(gh run list --workflow=ci.yml --branch="${{ steps.version.outputs.tag }}" \
+              --json databaseId,status --jq '.[] | select(.status == "completed") | .databaseId' \
+              | head -1)
+            if [[ -n "$RUN_ID" ]]; then
+              echo "CI run $RUN_ID completed."
+              echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+              break
+            fi
+            echo "Attempt $i/60 — CI not done yet, waiting 30s..."
+            sleep 30
+          done
+          if [[ -z "$RUN_ID" ]]; then
+            echo "::error::CI build did not complete within 30 minutes"
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: ci_run
+
+      - name: Download AAB artifact
+        run: |
+          if [[ -n "${{ github.event.inputs.aab_run_id }}" ]]; then
+            RUN_ID="${{ github.event.inputs.aab_run_id }}"
+          elif [[ -n "${{ steps.ci_run.outputs.run_id }}" ]]; then
+            RUN_ID="${{ steps.ci_run.outputs.run_id }}"
+          else
+            # Find latest successful CI run
+            RUN_ID=$(gh run list --workflow=ci.yml --status=success \
+              --json databaseId --jq '.[0].databaseId')
+          fi
+          echo "Downloading AAB from CI run $RUN_ID"
+          gh run download "$RUN_ID" --name android-aab --dir ./artifact
+          cp ./artifact/${{ env.AAB_PATH }} ./${{ env.AAB_PATH }}
+          ls -lh ./${{ env.AAB_PATH }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload AAB to Play Store (internal track)
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          packageName: ${{ env.PACKAGE_NAME }}
+          releaseFiles: ${{ env.AAB_PATH }}
+          track: internal
+          status: completed
+          releaseName: ${{ steps.version.outputs.tag }}
+
+      - name: Summary
+        run: |
+          echo "## Play Store Deploy Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Version:** ${{ steps.version.outputs.tag }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Track:** internal" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Status:** Uploaded successfully" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Next steps" >> "$GITHUB_STEP_SUMMARY"
+          echo "1. Test on internal track for 3-5 days" >> "$GITHUB_STEP_SUMMARY"
+          echo "2. Promote via workflow dispatch: *promote-rollout* with desired percentage" >> "$GITHUB_STEP_SUMMARY"
+
+  # --- Job 2: Promote release through tracks / staged rollout ---
+  promote-rollout:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'promote-rollout'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install google-api-python-client
+        run: pip install google-api-python-client google-auth
+
+      - name: Promote release
+        env:
+          PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          PACKAGE_NAME: ${{ env.PACKAGE_NAME }}
+          TRACK_FROM: ${{ github.event.inputs.track_from }}
+          ROLLOUT_PERCENTAGE: ${{ github.event.inputs.rollout_percentage }}
+        run: bash scripts/promote_play_store.sh
+
+      - name: Summary
+        run: |
+          PERCENT="${{ github.event.inputs.rollout_percentage }}"
+          FROM="${{ github.event.inputs.track_from }}"
+          if [[ "$PERCENT" == "100" ]]; then
+            TARGET="production (full rollout)"
+          else
+            TARGET="production (${PERCENT}% staged rollout)"
+          fi
+          echo "## Rollout Promotion Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **From track:** $FROM" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **To:** $TARGET" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [[ "$PERCENT" != "100" ]]; then
+            echo "### Next rollout stage" >> "$GITHUB_STEP_SUMMARY"
+            echo "Run this workflow again with a higher percentage when ready." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Full rollout complete." >> "$GITHUB_STEP_SUMMARY"
+          fi
