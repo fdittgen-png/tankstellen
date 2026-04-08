@@ -1382,4 +1382,35 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get drivingSafetyAccept => 'Verstanden';
+
+  @override
+  String get voiceAnnouncementsTitle => 'Sprachansagen';
+
+  @override
+  String get voiceAnnouncementsDescription =>
+      'Günstige Tankstellen beim Fahren ansagen';
+
+  @override
+  String get voiceAnnouncementsEnabled => 'Sprachansagen aktivieren';
+
+  @override
+  String voiceAnnouncementThreshold(String price) {
+    return 'Nur unter $price';
+  }
+
+  @override
+  String voiceAnnouncementCheapFuel(
+    String station,
+    String distance,
+    String fuelType,
+    String price,
+  ) {
+    return '$station, $distance Kilometer voraus, $fuelType $price';
+  }
+
+  @override
+  String get voiceAnnouncementProximityRadius => 'Ansage-Radius';
+
+  @override
+  String get voiceAnnouncementCooldown => 'Wiederholungsintervall';
 }

@@ -613,5 +613,27 @@
   "drivingTapToUnlock": "Tippen zum Entsperren",
   "drivingSafetyTitle": "Sicherheitshinweis",
   "drivingSafetyMessage": "Bedienen Sie die App nicht während der Fahrt. Halten Sie an einem sicheren Ort an, bevor Sie den Bildschirm bedienen. Der Fahrer ist jederzeit für die sichere Führung des Fahrzeugs verantwortlich.",
-  "drivingSafetyAccept": "Verstanden"
+  "drivingSafetyAccept": "Verstanden",
+  "voiceAnnouncementsTitle": "Sprachansagen",
+  "voiceAnnouncementsDescription": "Günstige Tankstellen beim Fahren ansagen",
+  "voiceAnnouncementsEnabled": "Sprachansagen aktivieren",
+  "voiceAnnouncementThreshold": "Nur unter {price}",
+  "@voiceAnnouncementThreshold": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceAnnouncementCheapFuel": "{station}, {distance} Kilometer voraus, {fuelType} {price}",
+  "@voiceAnnouncementCheapFuel": {
+    "placeholders": {
+      "station": { "type": "String" },
+      "distance": { "type": "String" },
+      "fuelType": { "type": "String" },
+      "price": { "type": "String" }
+    }
+  },
+  "voiceAnnouncementProximityRadius": "Ansage-Radius",
+  "voiceAnnouncementCooldown": "Wiederholungsintervall"
 }
