@@ -42,4 +42,15 @@ class GeolocatorWrapper {
   ) {
     return Geolocator.distanceBetween(startLat, startLng, endLat, endLng);
   }
+
+  /// Returns a stream of position updates for continuous location tracking.
+  ///
+  /// Used by movement detection in driving mode.
+  Stream<Position> getPositionStream({
+    LocationSettings? locationSettings,
+  }) {
+    return Geolocator.getPositionStream(
+      locationSettings: locationSettings,
+    );
+  }
 }
