@@ -2371,6 +2371,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No highway'**
   String get brandFilterNoHighway;
+
+  /// No description provided for @swipeTutorialMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe right to navigate, swipe left to remove'**
+  String get swipeTutorialMessage;
+
+  /// No description provided for @swipeTutorialDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get swipeTutorialDismiss;
 }
 
 class _AppLocalizationsDelegate

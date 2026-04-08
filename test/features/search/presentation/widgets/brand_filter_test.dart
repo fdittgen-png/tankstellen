@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/brand_filter_chips.dart';
@@ -188,7 +187,7 @@ void main() {
     testWidgets('skips empty brand names', (tester) async {
       await pumpApp(
         tester,
-        BrandFilterChips(stations: [_shellStation, _emptyBrandStation]),
+        const BrandFilterChips(stations: [_shellStation, _emptyBrandStation]),
       );
 
       // Only All and SHELL should show
@@ -270,7 +269,7 @@ void main() {
 
       await pumpApp(
         tester,
-        BrandFilterChips(stations: [zStation, aStation]),
+        const BrandFilterChips(stations: [zStation, aStation]),
       );
 
       // Both should be visible

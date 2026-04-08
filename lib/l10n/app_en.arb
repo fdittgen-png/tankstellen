@@ -423,5 +423,7 @@
   "passwordReqSpecial": "At least 1 special character",
   "passwordTooWeak": "Password does not meet all requirements",
   "brandFilterAll": "All",
-  "brandFilterNoHighway": "No highway"
+  "brandFilterNoHighway": "No highway",
+  "swipeTutorialMessage": "Swipe right to navigate, swipe left to remove",
+  "swipeTutorialDismiss": "Got it"
 }
