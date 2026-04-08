@@ -198,6 +198,12 @@ void main() {
 
     testWidgets('real ShellScreen navigation bar icons have semantic labels',
         (tester) async {
+      // Force phone-size screen so bottom nav bar is rendered (not NavigationRail)
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       final handle = tester.ensureSemantics();
 
       // Build a router that uses the real ShellScreen (not the test mock)

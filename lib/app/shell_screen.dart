@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../core/utils/frame_callbacks.dart';
 import '../l10n/app_localizations.dart';
+import 'responsive_search_layout.dart';
 
-/// The main app shell with bottom navigation bar and page transitions.
+/// The main app shell with adaptive navigation.
 ///
 /// ## Architecture:
 /// go_router uses `StatefulShellRoute.indexedStack` which preserves each
 /// tab's widget tree in memory (so scroll position, form data, etc. persist
 /// when switching tabs). This widget wraps the shell with:
+/// - NavigationRail on medium/expanded screens (>= 600dp)
+/// - Bottom navigation bar on compact screens (< 600dp)
 /// - Smooth slide+fade transition animations between tabs
-/// - Horizontal swipe gesture for tab switching
+/// - Horizontal swipe gesture for tab switching (compact only)
 /// - Bouncing icon animation on selection
 /// - System navigation bar padding to avoid overlap with Android buttons
 ///
@@ -128,6 +131,7 @@ class _ShellScreenState extends State<ShellScreen> with TickerProviderStateMixin
     }
 
     final l10n = AppLocalizations.of(context);
+    final screenSize = screenSizeOf(context);
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
     final destinations = [
@@ -137,23 +141,47 @@ class _ShellScreenState extends State<ShellScreen> with TickerProviderStateMixin
       _NavItem(Icons.settings_outlined, Icons.settings, l10n?.settings ?? 'Settings'),
     ];
 
-    return Scaffold(
-      body: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onHorizontalDragEnd: _onHorizontalDragEnd,
-        child: AnimatedBuilder(
-          animation: _transitionController,
-          builder: (context, _) {
-            return SlideTransition(
-              position: _slideInAnim,
-              child: FadeTransition(
-                opacity: _fadeAnim,
-                child: widget.navigationShell,
-              ),
-            );
-          },
-        ),
+    final body = GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onHorizontalDragEnd: screenSize == ScreenSize.compact
+          ? _onHorizontalDragEnd
+          : null,
+      child: AnimatedBuilder(
+        animation: _transitionController,
+        builder: (context, _) {
+          return SlideTransition(
+            position: _slideInAnim,
+            child: FadeTransition(
+              opacity: _fadeAnim,
+              child: widget.navigationShell,
+            ),
+          );
+        },
       ),
+    );
+
+    // Wide screens: use NavigationRail instead of bottom nav
+    if (screenSize != ScreenSize.compact) {
+      return Scaffold(
+        body: Row(
+          children: [
+            _AdaptiveNavigationRail(
+              items: destinations,
+              currentIndex: _currentIndex,
+              iconControllers: _iconControllers,
+              extended: screenSize == ScreenSize.expanded,
+              onTap: _goToPage,
+            ),
+            const VerticalDivider(width: 1, thickness: 1),
+            Expanded(child: body),
+          ],
+        ),
+      );
+    }
+
+    // Compact screens: bottom navigation bar
+    return Scaffold(
+      body: body,
       bottomNavigationBar: _AnimatedNavBar(
         items: destinations,
         currentIndex: _currentIndex,
@@ -170,6 +198,68 @@ class _NavItem {
   final IconData filledIcon;
   final String label;
   const _NavItem(this.outlinedIcon, this.filledIcon, this.label);
+}
+
+/// NavigationRail for medium and expanded screen sizes.
+///
+/// Shows labels and wider rail on expanded screens (> 840dp).
+/// Shows icons-only rail on medium screens (600-840dp).
+class _AdaptiveNavigationRail extends StatelessWidget {
+  final List<_NavItem> items;
+  final int currentIndex;
+  final List<AnimationController> iconControllers;
+  final bool extended;
+  final ValueChanged<int> onTap;
+
+  const _AdaptiveNavigationRail({
+    required this.items,
+    required this.currentIndex,
+    required this.iconControllers,
+    required this.extended,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return NavigationRail(
+      selectedIndex: currentIndex,
+      onDestinationSelected: onTap,
+      extended: extended,
+      minWidth: 56,
+      minExtendedWidth: 180,
+      labelType: extended
+          ? NavigationRailLabelType.none
+          : NavigationRailLabelType.selected,
+      selectedIconTheme: IconThemeData(color: theme.colorScheme.primary),
+      unselectedIconTheme: IconThemeData(
+        color: theme.colorScheme.onSurfaceVariant,
+      ),
+      destinations: List.generate(items.length, (i) {
+        final item = items[i];
+        final selected = i == currentIndex;
+        return NavigationRailDestination(
+          icon: _BounceIcon(
+            controller: iconControllers[i],
+            selected: false,
+            icon: item.outlinedIcon,
+            iconSize: 24,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          selectedIcon: _BounceIcon(
+            controller: iconControllers[i],
+            selected: true,
+            icon: item.filledIcon,
+            iconSize: 24,
+            color: theme.colorScheme.primary,
+          ),
+          label: Text(item.label),
+          padding: EdgeInsets.symmetric(vertical: selected ? 4 : 0),
+        );
+      }),
+    );
+  }
 }
 
 class _AnimatedNavBar extends StatelessWidget {
