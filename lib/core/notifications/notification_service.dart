@@ -1,30 +1,26 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+/// Abstract notification service interface.
+///
+/// Decouples notification logic from the concrete plugin so that
+/// alternative backends (e.g. FCM, ntfy push relay) can be swapped in
+/// without changing call sites. The default implementation is
+/// [LocalNotificationService] which wraps `flutter_local_notifications`.
+abstract class NotificationService {
+  /// Initialize the notification subsystem (channels, permissions, etc.).
+  Future<void> initialize();
 
-class NotificationService {
-  static final _plugin = FlutterLocalNotificationsPlugin();
-
-  static Future<void> init() async {
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettings = InitializationSettings(android: androidSettings);
-    await _plugin.initialize(settings: initSettings);
-  }
-
-  static Future<void> showPriceAlert({
+  /// Display a price-alert notification.
+  ///
+  /// [id] should be stable per station so that re-triggers update
+  /// the existing notification instead of creating duplicates.
+  Future<void> showPriceAlert({
     required int id,
     required String title,
     required String body,
-  }) async {
-    const details = NotificationDetails(
-      android: AndroidNotificationDetails(
-        'price_alerts',
-        'Price Alerts',
-        channelDescription:
-            'Notifications when fuel prices drop below your target',
-        importance: Importance.high,
-        priority: Priority.high,
-      ),
-    );
-    await _plugin.show(id: id, title: title, body: body, notificationDetails: details);
-  }
+  });
+
+  /// Cancel a specific notification by its [id].
+  Future<void> cancelNotification(int id);
+
+  /// Cancel all active notifications.
+  Future<void> cancelAll();
 }

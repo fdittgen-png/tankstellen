@@ -7,7 +7,7 @@ import '../../features/price_history/data/models/price_record.dart';
 import '../../features/search/domain/entities/fuel_type.dart';
 import '../../features/widget/data/home_widget_service.dart';
 import '../constants/field_names.dart';
-import '../notifications/notification_service.dart';
+import '../notifications/local_notification_service.dart';
 import '../storage/hive_storage.dart';
 import '../utils/json_extensions.dart';
 import 'background_price_fetcher_provider.dart';
@@ -252,7 +252,8 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     final activeAlerts = alerts.where((a) => a.isActive).toList();
 
     if (activeAlerts.isNotEmpty && prices.isNotEmpty) {
-      await NotificationService.init();
+      final notifier = LocalNotificationService();
+      await notifier.initialize();
       int notificationCount = 0;
 
       for (final alert in activeAlerts) {
@@ -279,7 +280,7 @@ Future<void> _refreshPricesAndCheckAlerts() async {
             continue;
           }
 
-          await NotificationService.showPriceAlert(
+          await notifier.showPriceAlert(
             id: alert.stationId.hashCode,
             title: '${alert.stationName} - ${alert.fuelType.displayName}',
             body: '${currentPrice.toStringAsFixed(3)} \u20ac (target: ${alert.targetPrice.toStringAsFixed(3)} \u20ac)',
