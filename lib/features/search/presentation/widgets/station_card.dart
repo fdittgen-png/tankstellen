@@ -137,20 +137,26 @@ class StationCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        Text(
-                          PriceFormatter.formatDistance(station.dist),
-                          style: theme.textTheme.bodySmall,
+                        Flexible(
+                          child: Text(
+                            PriceFormatter.formatDistance(station.dist),
+                            style: theme.textTheme.bodySmall,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                         if (station.updatedAt != null) ...[
                           const SizedBox(width: 8),
                           Icon(Icons.update, size: 12,
                               color: theme.colorScheme.onSurfaceVariant),
                           const SizedBox(width: 2),
-                          Text(
-                            station.updatedAt!,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              fontSize: 11,
-                              color: theme.colorScheme.onSurfaceVariant,
+                          Flexible(
+                            child: Text(
+                              station.updatedAt!,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                fontSize: 11,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -165,54 +171,61 @@ class StationCard extends StatelessWidget {
               ),
 
               // Price — superscript 9/10ths cent (European standard)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (priceTier != null && priceTier != PriceTier.unknown)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 2),
-                          child: Icon(
-                            iconForPriceTier(priceTier!),
-                            size: 16,
-                            color: station.isOpen
-                                ? FuelColors.forType(selectedFuelType)
-                                : theme.colorScheme.onSurfaceVariant,
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (priceTier != null && priceTier != PriceTier.unknown)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 2),
+                            child: Icon(
+                              iconForPriceTier(priceTier!),
+                              size: 16,
+                              color: station.isOpen
+                                  ? FuelColors.forType(selectedFuelType)
+                                  : theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        Flexible(
+                          child: RichText(
+                            overflow: TextOverflow.ellipsis,
+                            text: PriceFormatter.priceTextSpan(
+                              price,
+                              baseStyle: theme.textTheme.titleLarge!.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: station.isOpen
+                                    ? FuelColors.forType(selectedFuelType)
+                                    : theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
                           ),
                         ),
-                      RichText(
-                        text: PriceFormatter.priceTextSpan(
-                          price,
-                          baseStyle: theme.textTheme.titleLarge!.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: station.isOpen
-                                ? FuelColors.forType(selectedFuelType)
-                                : theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (isCheapest)
-                    Container(
-                      margin: const EdgeInsets.only(top: 4),
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: DarkModeColors.successSurface(context),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(AppLocalizations.of(context)?.cheapest ?? 'Cheapest',
-                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: DarkModeColors.success(context))),
+                      ],
                     ),
-                  if (selectedFuelType == FuelType.all && !isCheapest) ...[
-                    const SizedBox(height: 2),
-                    _PriceRow(label: 'E5', price: station.e5, fuelType: FuelType.e5),
-                    _PriceRow(label: 'E10', price: station.e10, fuelType: FuelType.e10),
-                    _PriceRow(label: 'Diesel', price: station.diesel, fuelType: FuelType.diesel),
+                    if (isCheapest)
+                      Container(
+                        margin: const EdgeInsets.only(top: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: DarkModeColors.successSurface(context),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(AppLocalizations.of(context)?.cheapest ?? 'Cheapest',
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: DarkModeColors.success(context)),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    if (selectedFuelType == FuelType.all && !isCheapest) ...[
+                      const SizedBox(height: 2),
+                      _PriceRow(label: 'E5', price: station.e5, fuelType: FuelType.e5),
+                      _PriceRow(label: 'E10', price: station.e10, fuelType: FuelType.e10),
+                      _PriceRow(label: 'Diesel', price: station.diesel, fuelType: FuelType.diesel),
+                    ],
                   ],
-                ],
+                ),
               ),
 
               // Favorite button
