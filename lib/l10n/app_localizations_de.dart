@@ -1360,4 +1360,26 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get amenityEv => 'E-Laden';
+
+  @override
+  String get drivingMode => 'Fahrmodus';
+
+  @override
+  String get drivingExit => 'Beenden';
+
+  @override
+  String get drivingNearestStation => 'Nächste';
+
+  @override
+  String get drivingTapToUnlock => 'Tippen zum Entsperren';
+
+  @override
+  String get drivingSafetyTitle => 'Sicherheitshinweis';
+
+  @override
+  String get drivingSafetyMessage =>
+      'Bedienen Sie die App nicht während der Fahrt. Halten Sie an einem sicheren Ort an, bevor Sie den Bildschirm bedienen. Der Fahrer ist jederzeit für die sichere Führung des Fahrzeugs verantwortlich.';
+
+  @override
+  String get drivingSafetyAccept => 'Verstanden';
 }

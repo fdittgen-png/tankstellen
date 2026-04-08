@@ -606,5 +606,12 @@
   "amenityRestaurant": "Food",
   "amenityAtm": "ATM",
   "amenityWifi": "WiFi",
-  "amenityEv": "EV"
+  "amenityEv": "EV",
+  "drivingMode": "Driving Mode",
+  "drivingExit": "Exit",
+  "drivingNearestStation": "Nearest",
+  "drivingTapToUnlock": "Tap to unlock",
+  "drivingSafetyTitle": "Safety Notice",
+  "drivingSafetyMessage": "Do not operate the app while driving. Pull over to a safe location before interacting with the screen. The driver is responsible for safe operation of the vehicle at all times.",
+  "drivingSafetyAccept": "I understand"
 }

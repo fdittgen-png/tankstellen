@@ -606,5 +606,12 @@
   "amenityRestaurant": "Essen",
   "amenityAtm": "Geldautomat",
   "amenityWifi": "WLAN",
-  "amenityEv": "E-Laden"
+  "amenityEv": "E-Laden",
+  "drivingMode": "Fahrmodus",
+  "drivingExit": "Beenden",
+  "drivingNearestStation": "Nächste",
+  "drivingTapToUnlock": "Tippen zum Entsperren",
+  "drivingSafetyTitle": "Sicherheitshinweis",
+  "drivingSafetyMessage": "Bedienen Sie die App nicht während der Fahrt. Halten Sie an einem sicheren Ort an, bevor Sie den Bildschirm bedienen. Der Fahrer ist jederzeit für die sichere Führung des Fahrzeugs verantwortlich.",
+  "drivingSafetyAccept": "Verstanden"
 }

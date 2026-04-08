@@ -2617,6 +2617,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'EV'**
   String get amenityEv;
+
+  /// No description provided for @drivingMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Driving Mode'**
+  String get drivingMode;
+
+  /// No description provided for @drivingExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get drivingExit;
+
+  /// No description provided for @drivingNearestStation.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearest'**
+  String get drivingNearestStation;
+
+  /// No description provided for @drivingTapToUnlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to unlock'**
+  String get drivingTapToUnlock;
+
+  /// No description provided for @drivingSafetyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety Notice'**
+  String get drivingSafetyTitle;
+
+  /// No description provided for @drivingSafetyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Do not operate the app while driving. Pull over to a safe location before interacting with the screen. The driver is responsible for safe operation of the vehicle at all times.'**
+  String get drivingSafetyMessage;
+
+  /// No description provided for @drivingSafetyAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand'**
+  String get drivingSafetyAccept;
 }
 
 class _AppLocalizationsDelegate

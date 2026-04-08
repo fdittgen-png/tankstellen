@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../driving/presentation/widgets/driving_mode_fab.dart';
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../../search/providers/search_provider.dart';
 import '../widgets/nearby_map_view.dart';
@@ -51,6 +52,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           titleSpacing: 12,
         ),
       ),
+      floatingActionButton: const DrivingModeFab(),
       body: hasRouteResults
           ? RouteMapView(
               routeResult: routeState.value!,
