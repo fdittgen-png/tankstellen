@@ -1349,4 +1349,26 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get amenityEv => 'EV';
+
+  @override
+  String get drivingMode => 'Driving Mode';
+
+  @override
+  String get drivingExit => 'Exit';
+
+  @override
+  String get drivingNearestStation => 'Nearest';
+
+  @override
+  String get drivingTapToUnlock => 'Tap to unlock';
+
+  @override
+  String get drivingSafetyTitle => 'Safety Notice';
+
+  @override
+  String get drivingSafetyMessage =>
+      'Do not operate the app while driving. Pull over to a safe location before interacting with the screen. The driver is responsible for safe operation of the vehicle at all times.';
+
+  @override
+  String get drivingSafetyAccept => 'I understand';
 }
