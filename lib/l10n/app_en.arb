@@ -613,5 +613,27 @@
   "drivingTapToUnlock": "Tap to unlock",
   "drivingSafetyTitle": "Safety Notice",
   "drivingSafetyMessage": "Do not operate the app while driving. Pull over to a safe location before interacting with the screen. The driver is responsible for safe operation of the vehicle at all times.",
-  "drivingSafetyAccept": "I understand"
+  "drivingSafetyAccept": "I understand",
+  "voiceAnnouncementsTitle": "Voice Announcements",
+  "voiceAnnouncementsDescription": "Announce nearby cheap stations while driving",
+  "voiceAnnouncementsEnabled": "Enable voice announcements",
+  "voiceAnnouncementThreshold": "Only below {price}",
+  "@voiceAnnouncementThreshold": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceAnnouncementCheapFuel": "{station}, {distance} kilometers ahead, {fuelType} {price}",
+  "@voiceAnnouncementCheapFuel": {
+    "placeholders": {
+      "station": { "type": "String" },
+      "distance": { "type": "String" },
+      "fuelType": { "type": "String" },
+      "price": { "type": "String" }
+    }
+  },
+  "voiceAnnouncementProximityRadius": "Announcement radius",
+  "voiceAnnouncementCooldown": "Repeat interval"
 }

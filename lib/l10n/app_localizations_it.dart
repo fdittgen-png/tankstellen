@@ -1373,4 +1373,35 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get drivingSafetyAccept => 'I understand';
+
+  @override
+  String get voiceAnnouncementsTitle => 'Voice Announcements';
+
+  @override
+  String get voiceAnnouncementsDescription =>
+      'Announce nearby cheap stations while driving';
+
+  @override
+  String get voiceAnnouncementsEnabled => 'Enable voice announcements';
+
+  @override
+  String voiceAnnouncementThreshold(String price) {
+    return 'Only below $price';
+  }
+
+  @override
+  String voiceAnnouncementCheapFuel(
+    String station,
+    String distance,
+    String fuelType,
+    String price,
+  ) {
+    return '$station, $distance kilometers ahead, $fuelType $price';
+  }
+
+  @override
+  String get voiceAnnouncementProximityRadius => 'Announcement radius';
+
+  @override
+  String get voiceAnnouncementCooldown => 'Repeat interval';
 }

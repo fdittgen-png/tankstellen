@@ -2659,6 +2659,53 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'I understand'**
   String get drivingSafetyAccept;
+
+  /// No description provided for @voiceAnnouncementsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice Announcements'**
+  String get voiceAnnouncementsTitle;
+
+  /// No description provided for @voiceAnnouncementsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Announce nearby cheap stations while driving'**
+  String get voiceAnnouncementsDescription;
+
+  /// No description provided for @voiceAnnouncementsEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable voice announcements'**
+  String get voiceAnnouncementsEnabled;
+
+  /// No description provided for @voiceAnnouncementThreshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Only below {price}'**
+  String voiceAnnouncementThreshold(String price);
+
+  /// No description provided for @voiceAnnouncementCheapFuel.
+  ///
+  /// In en, this message translates to:
+  /// **'{station}, {distance} kilometers ahead, {fuelType} {price}'**
+  String voiceAnnouncementCheapFuel(
+    String station,
+    String distance,
+    String fuelType,
+    String price,
+  );
+
+  /// No description provided for @voiceAnnouncementProximityRadius.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement radius'**
+  String get voiceAnnouncementProximityRadius;
+
+  /// No description provided for @voiceAnnouncementCooldown.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat interval'**
+  String get voiceAnnouncementCooldown;
 }
 
 class _AppLocalizationsDelegate
