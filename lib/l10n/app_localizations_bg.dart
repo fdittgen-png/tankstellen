@@ -1229,4 +1229,13 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Активни';
+
+  @override
+  String get alertStatsToday => 'Днес';
+
+  @override
+  String get alertStatsThisWeek => 'Тази седмица';
 }

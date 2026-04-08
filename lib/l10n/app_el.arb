@@ -397,4 +397,7 @@
   "errorCache": "Local data error. Try clearing the cache.",
   "errorCancelled": "Request was cancelled.",
   "errorUnknown": "An unexpected error occurred."
+  ,"alertStatsActive": "Ενεργές"
+  ,"alertStatsToday": "Σήμερα"
+  ,"alertStatsThisWeek": "Αυτή την εβδομάδα"
 }

@@ -1231,4 +1231,13 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Aktív';
+
+  @override
+  String get alertStatsToday => 'Ma';
+
+  @override
+  String get alertStatsThisWeek => 'Ezen a héten';
 }

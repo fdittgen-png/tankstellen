@@ -1224,4 +1224,13 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Aktivni';
+
+  @override
+  String get alertStatsToday => 'Danes';
+
+  @override
+  String get alertStatsThisWeek => 'Ta teden';
 }

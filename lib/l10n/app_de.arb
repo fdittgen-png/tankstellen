@@ -425,5 +425,8 @@
   "brandFilterAll": "Alle",
   "brandFilterNoHighway": "Keine Autobahn",
   "swipeTutorialMessage": "Nach rechts wischen zum Navigieren, nach links zum Entfernen",
-  "swipeTutorialDismiss": "Verstanden"
+  "swipeTutorialDismiss": "Verstanden",
+  "alertStatsActive": "Aktiv",
+  "alertStatsToday": "Heute",
+  "alertStatsThisWeek": "Diese Woche"
 }

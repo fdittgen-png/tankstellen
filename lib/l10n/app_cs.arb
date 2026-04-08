@@ -397,4 +397,7 @@
   "errorCache": "Local data error. Try clearing the cache.",
   "errorCancelled": "Request was cancelled.",
   "errorUnknown": "An unexpected error occurred."
+  ,"alertStatsActive": "Aktivni"
+  ,"alertStatsToday": "Dnes"
+  ,"alertStatsThisWeek": "Tento tyden"
 }

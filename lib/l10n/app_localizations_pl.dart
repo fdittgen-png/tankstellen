@@ -1229,4 +1229,13 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Aktywne';
+
+  @override
+  String get alertStatsToday => 'Dzisiaj';
+
+  @override
+  String get alertStatsThisWeek => 'W tym tygodniu';
 }

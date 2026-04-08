@@ -2383,6 +2383,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Got it'**
   String get swipeTutorialDismiss;
+
+  /// No description provided for @alertStatsActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get alertStatsActive;
+
+  /// No description provided for @alertStatsToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get alertStatsToday;
+
+  /// No description provided for @alertStatsThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get alertStatsThisWeek;
 }
 
 class _AppLocalizationsDelegate

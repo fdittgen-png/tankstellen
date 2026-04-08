@@ -1229,4 +1229,13 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Aktivni';
+
+  @override
+  String get alertStatsToday => 'Dnes';
+
+  @override
+  String get alertStatsThisWeek => 'Tento tyden';
 }

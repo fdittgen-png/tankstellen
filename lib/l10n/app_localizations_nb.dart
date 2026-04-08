@@ -1226,4 +1226,13 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Aktive';
+
+  @override
+  String get alertStatsToday => 'I dag';
+
+  @override
+  String get alertStatsThisWeek => 'Denne uken';
 }

@@ -1224,4 +1224,13 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get swipeTutorialDismiss => 'Got it';
+
+  @override
+  String get alertStatsActive => 'Aktiivsed';
+
+  @override
+  String get alertStatsToday => 'Täna';
+
+  @override
+  String get alertStatsThisWeek => 'Sel nädalal';
 }
