@@ -7,22 +7,12 @@ import '../cache/cache_manager.dart';
 import '../country/country_provider.dart';
 import '../error_tracing/integrations/dio_trace_interceptor.dart';
 import '../storage/storage_providers.dart';
+import 'country_service_registry.dart';
 import 'dio_factory.dart';
 import 'geocoding_chain.dart';
 import 'impl/demo_station_service.dart';
-import 'impl/argentina_station_service.dart';
-import 'impl/denmark_station_service.dart';
-import 'impl/econtrol_station_service.dart';
-import 'impl/mise_station_service.dart';
-import 'impl/miteco_station_service.dart';
 import 'impl/native_geocoding_provider.dart';
-import 'impl/prix_carburants_station_service.dart';
 import 'impl/nominatim_geocoding_provider.dart';
-import 'impl/osm_brand_enricher.dart';
-import 'impl/portugal_station_service.dart';
-import 'impl/uk_station_service.dart';
-import 'impl/australia_station_service.dart';
-import 'impl/mexico_station_service.dart';
 import 'impl/tankerkoenig_station_service.dart';
 import 'service_config.dart';
 import 'service_result.dart';
@@ -58,19 +48,38 @@ Dio tankerkoenigDio(Ref ref) {
 // Station service with full fallback chain
 // ---------------------------------------------------------------------------
 
-/// Returns the appropriate station service based on whether an API key
-/// is configured. With key: Tankerkoenig with full fallback chain.
-/// Without key: demo data so the app works immediately.
+/// Returns the appropriate station service based on the active country
+/// and whether an API key is configured.
+///
+/// Uses [CountryServiceRegistry] to look up the correct service factory.
+/// Countries that require an API key (e.g. DE) fall back to demo data
+/// when no key is configured.
 @riverpod
 StationService stationService(Ref ref) {
-  final storage = ref.watch(storageRepositoryProvider);
   final country = ref.watch(activeCountryProvider);
-  final cache = ref.watch(cacheManagerProvider);
+  return _resolveServiceForCountry(ref, country.code);
+}
 
-  // Germany requires API key
-  if (country.code == 'DE') {
+/// Get a station service for a specific country code.
+/// Used by route search to query the correct API for each country
+/// the route passes through (instead of using the profile's active country).
+StationService stationServiceForCountry(Ref ref, String countryCode) =>
+    _resolveServiceForCountry(ref, countryCode);
+
+/// Shared resolution logic used by both [stationService] and
+/// [stationServiceForCountry].
+///
+/// Germany is special-cased because its Dio instance requires the API key
+/// interceptor from [tankerkoenigDioProvider]. All other countries use
+/// [CountryServiceRegistry.buildService] directly.
+StationService _resolveServiceForCountry(Ref ref, String countryCode) {
+  final cache = ref.read(cacheManagerProvider);
+
+  // Germany needs special handling: API key check + dedicated Dio instance
+  if (countryCode == 'DE') {
+    final storage = ref.read(storageRepositoryProvider);
     if (!storage.hasApiKey()) return DemoStationService(countryCode: 'DE');
-    final dio = ref.watch(tankerkoenigDioProvider);
+    final dio = ref.read(tankerkoenigDioProvider);
     return StationServiceChain(
       TankerkoenigStationService(dio),
       cache,
@@ -79,80 +88,7 @@ StationService stationService(Ref ref) {
     );
   }
 
-  // Registry-based dispatch for all other countries
-  final factory = _countryServiceFactories[country.code];
-  if (factory != null) return factory(ref, cache);
-
-  return DemoStationService(countryCode: country.code);
-}
-
-final _countryServiceFactories = <String, StationService Function(Ref, CacheStrategy)>{
-  'FR': (ref, cache) {
-    final enricher = ref.watch(osmBrandEnricherProvider);
-    return StationServiceChain(
-      PrixCarburantsStationService(enricher: enricher),
-      cache,
-      errorSource: ServiceSource.prixCarburantsApi,
-      countryCode: 'FR',
-    );
-  },
-  'AT': (ref, cache) => StationServiceChain(
-    EControlStationService(), cache,
-    errorSource: ServiceSource.eControlApi, countryCode: 'AT',
-  ),
-  'ES': (ref, cache) => StationServiceChain(
-    MitecoStationService(), cache,
-    errorSource: ServiceSource.mitecoApi, countryCode: 'ES',
-  ),
-  'IT': (ref, cache) => StationServiceChain(
-    MiseStationService(), cache,
-    errorSource: ServiceSource.miseApi, countryCode: 'IT',
-  ),
-  'DK': (ref, cache) => StationServiceChain(
-    DenmarkStationService(), cache,
-    errorSource: ServiceSource.denmarkApi, countryCode: 'DK',
-  ),
-  'AR': (ref, cache) => StationServiceChain(
-    ArgentinaStationService(), cache,
-    errorSource: ServiceSource.argentinaApi, countryCode: 'AR',
-  ),
-  'PT': (ref, cache) => StationServiceChain(
-    PortugalStationService(), cache,
-    errorSource: ServiceSource.portugalApi, countryCode: 'PT',
-  ),
-  'GB': (ref, cache) => StationServiceChain(
-    UkStationService(), cache,
-    errorSource: ServiceSource.ukApi, countryCode: 'GB',
-  ),
-  'AU': (ref, cache) => StationServiceChain(
-    AustraliaStationService(), cache,
-    errorSource: ServiceSource.australiaApi, countryCode: 'AU',
-  ),
-  'MX': (ref, cache) => StationServiceChain(
-    MexicoStationService(), cache,
-    errorSource: ServiceSource.mexicoApi, countryCode: 'MX',
-  ),
-};
-
-/// Get a station service for a specific country code.
-/// Used by route search to query the correct API for each country
-/// the route passes through (instead of using the profile's active country).
-StationService stationServiceForCountry(Ref ref, String countryCode) {
-  final cache = ref.read(cacheManagerProvider);
-
-  if (countryCode == 'DE') {
-    final storage = ref.read(storageRepositoryProvider);
-    if (!storage.hasApiKey()) return DemoStationService(countryCode: 'DE');
-    final dio = ref.read(tankerkoenigDioProvider);
-    return StationServiceChain(
-      TankerkoenigStationService(dio), cache,
-      errorSource: ServiceSource.tankerkoenigApi, countryCode: 'DE',
-    );
-  }
-
-  final factory = _countryServiceFactories[countryCode];
-  if (factory != null) return factory(ref, cache);
-  return DemoStationService(countryCode: countryCode);
+  return CountryServiceRegistry.buildService(countryCode, ref, cache);
 }
 
 // ---------------------------------------------------------------------------

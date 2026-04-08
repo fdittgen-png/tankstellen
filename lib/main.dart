@@ -15,6 +15,7 @@ import 'core/notifications/notification_service.dart';
 import 'core/perf/startup_timer.dart';
 import 'core/storage/hive_storage.dart';
 import 'core/sync/community_config.dart';
+import 'core/services/country_service_registry.dart';
 import 'core/sync/supabase_client.dart';
 import 'features/profile/data/repositories/profile_repository.dart';
 import 'features/widget/data/home_widget_service.dart';
@@ -53,6 +54,13 @@ Future<void> main() async {
   await HiveStorage.loadApiKey();
   await TraceStorage.init();
   StartupTimer.instance.mark('storage_ready');
+
+  // Verify all countries have registered service implementations.
+  // Fails fast in debug mode if country_config.dart and the registry diverge.
+  assert(() {
+    CountryServiceRegistry.assertAllCountriesRegistered();
+    return true;
+  }());
 
   // Evict stale cache entries on startup
   final cacheManager = CacheManager(HiveStorage());
