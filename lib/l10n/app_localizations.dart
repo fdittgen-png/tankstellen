@@ -860,6 +860,24 @@ abstract class AppLocalizations {
   /// **'Distance'**
   String get sortDistance;
 
+  /// No description provided for @sortOpen24h.
+  ///
+  /// In en, this message translates to:
+  /// **'24h'**
+  String get sortOpen24h;
+
+  /// No description provided for @sortRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get sortRating;
+
+  /// No description provided for @sortPriceDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Price/km'**
+  String get sortPriceDistance;
+
   /// No description provided for @cheap.
   ///
   /// In en, this message translates to:

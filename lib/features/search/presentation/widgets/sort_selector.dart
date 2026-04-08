@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 
-enum SortMode { distance, price, name }
+enum SortMode { distance, price, name, open24h, rating, priceDistance }
 
 class SortSelector extends StatelessWidget {
   final SortMode selected;
@@ -18,29 +18,53 @@ class SortSelector extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          _SortChip(
-            label: l10n?.sortDistance ?? 'Distance',
-            icon: Icons.near_me,
-            selected: selected == SortMode.distance,
-            onSelected: () => onChanged(SortMode.distance),
-          ),
-          const SizedBox(width: 6),
-          _SortChip(
-            label: l10n?.price ?? 'Price',
-            icon: Icons.euro,
-            selected: selected == SortMode.price,
-            onSelected: () => onChanged(SortMode.price),
-          ),
-          const SizedBox(width: 6),
-          _SortChip(
-            label: 'A-Z',
-            icon: Icons.sort_by_alpha,
-            selected: selected == SortMode.name,
-            onSelected: () => onChanged(SortMode.name),
-          ),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _SortChip(
+              label: l10n?.sortDistance ?? 'Distance',
+              icon: Icons.near_me,
+              selected: selected == SortMode.distance,
+              onSelected: () => onChanged(SortMode.distance),
+            ),
+            const SizedBox(width: 6),
+            _SortChip(
+              label: l10n?.price ?? 'Price',
+              icon: Icons.euro,
+              selected: selected == SortMode.price,
+              onSelected: () => onChanged(SortMode.price),
+            ),
+            const SizedBox(width: 6),
+            _SortChip(
+              label: 'A-Z',
+              icon: Icons.sort_by_alpha,
+              selected: selected == SortMode.name,
+              onSelected: () => onChanged(SortMode.name),
+            ),
+            const SizedBox(width: 6),
+            _SortChip(
+              label: l10n?.sortOpen24h ?? '24h',
+              icon: Icons.schedule,
+              selected: selected == SortMode.open24h,
+              onSelected: () => onChanged(SortMode.open24h),
+            ),
+            const SizedBox(width: 6),
+            _SortChip(
+              label: l10n?.sortRating ?? 'Rating',
+              icon: Icons.star,
+              selected: selected == SortMode.rating,
+              onSelected: () => onChanged(SortMode.rating),
+            ),
+            const SizedBox(width: 6),
+            _SortChip(
+              label: l10n?.sortPriceDistance ?? 'Price/km',
+              icon: Icons.balance,
+              selected: selected == SortMode.priceDistance,
+              onSelected: () => onChanged(SortMode.priceDistance),
+            ),
+          ],
+        ),
       ),
     );
   }

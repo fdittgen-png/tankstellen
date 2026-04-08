@@ -392,6 +392,15 @@ class AppLocalizationsNb extends AppLocalizations {
   String get sortDistance => 'Avstand';
 
   @override
+  String get sortOpen24h => '24h';
+
+  @override
+  String get sortRating => 'Rating';
+
+  @override
+  String get sortPriceDistance => 'Price/km';
+
+  @override
   String get cheap => 'billig';
 
   @override

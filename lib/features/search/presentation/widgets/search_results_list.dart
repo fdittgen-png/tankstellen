@@ -16,6 +16,7 @@ import '../../domain/entities/station.dart';
 import '../../providers/ignored_stations_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
+import '../../providers/station_rating_provider.dart';
 import 'all_prices_station_card.dart';
 import 'cross_border_banner.dart';
 import 'sort_selector.dart';
@@ -104,6 +105,13 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
         sorted.sort((a, b) => compareByPrice(a, b, fuelType));
       case SortMode.name:
         sorted.sort((a, b) => compareByName(a, b));
+      case SortMode.open24h:
+        sorted.sort((a, b) => compareByOpen24h(a, b));
+      case SortMode.rating:
+        final ratings = ref.read(stationRatingsProvider);
+        sorted.sort((a, b) => compareByRating(a, b, ratings));
+      case SortMode.priceDistance:
+        sorted.sort((a, b) => compareByPriceDistance(a, b, fuelType));
     }
     return sorted;
   }
