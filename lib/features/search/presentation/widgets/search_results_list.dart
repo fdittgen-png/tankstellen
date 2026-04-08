@@ -15,9 +15,11 @@ import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/station.dart';
 import '../../providers/ignored_stations_provider.dart';
 import '../../providers/search_provider.dart';
+import '../../providers/brand_filter_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
 import '../../providers/station_rating_provider.dart';
 import 'all_prices_station_card.dart';
+import 'brand_filter_chips.dart';
 import 'cross_border_banner.dart';
 import 'sort_selector.dart';
 import 'swipeable_station_card.dart';
@@ -170,14 +172,28 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
           selected: _sortMode,
           onChanged: (mode) => setState(() => _sortMode = mode),
         ),
+        BrandFilterChips(
+          stations: result.data
+              .where((s) => !ignoredIds.contains(s.id))
+              .toList(),
+        ),
         Expanded(
           child: RefreshIndicator(
             onRefresh: () async => widget.onRefresh(),
             child: Builder(builder: (context) {
               // Filter out ignored stations
-              final filtered = result.data
+              final afterIgnored = result.data
                   .where((s) => !ignoredIds.contains(s.id))
                   .toList();
+
+              // Apply brand and highway filters
+              final selectedBrands = ref.watch(selectedBrandsProvider);
+              final excludeHighway = ref.watch(excludeHighwayStationsProvider);
+              final filtered = applyBrandFilter(
+                afterIgnored,
+                selectedBrands: selectedBrands,
+                excludeHighway: excludeHighway,
+              );
               final sorted = _sortStations(filtered);
               final allPrices = ref.watch(allPricesViewEnabledProvider);
               final cheapestMap = allPrices
