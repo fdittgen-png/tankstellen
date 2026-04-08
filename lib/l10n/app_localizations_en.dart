@@ -1209,4 +1209,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordTooWeak => 'Password does not meet all requirements';
+
+  @override
+  String get brandFilterAll => 'All';
+
+  @override
+  String get brandFilterNoHighway => 'No highway';
 }

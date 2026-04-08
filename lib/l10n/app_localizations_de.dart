@@ -1225,4 +1225,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get passwordTooWeak => 'Passwort erfüllt nicht alle Anforderungen';
+
+  @override
+  String get brandFilterAll => 'Alle';
+
+  @override
+  String get brandFilterNoHighway => 'Keine Autobahn';
 }

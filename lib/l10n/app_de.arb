@@ -421,5 +421,7 @@
   "passwordReqLowercase": "Mindestens 1 Kleinbuchstabe",
   "passwordReqDigit": "Mindestens 1 Zahl",
   "passwordReqSpecial": "Mindestens 1 Sonderzeichen",
-  "passwordTooWeak": "Passwort erfüllt nicht alle Anforderungen"
+  "passwordTooWeak": "Passwort erfüllt nicht alle Anforderungen",
+  "brandFilterAll": "Alle",
+  "brandFilterNoHighway": "Keine Autobahn"
 }

@@ -421,5 +421,7 @@
   "passwordReqLowercase": "At least 1 lowercase letter",
   "passwordReqDigit": "At least 1 number",
   "passwordReqSpecial": "At least 1 special character",
-  "passwordTooWeak": "Password does not meet all requirements"
+  "passwordTooWeak": "Password does not meet all requirements",
+  "brandFilterAll": "All",
+  "brandFilterNoHighway": "No highway"
 }

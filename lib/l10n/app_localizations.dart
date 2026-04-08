@@ -2359,6 +2359,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password does not meet all requirements'**
   String get passwordTooWeak;
+
+  /// No description provided for @brandFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get brandFilterAll;
+
+  /// No description provided for @brandFilterNoHighway.
+  ///
+  /// In en, this message translates to:
+  /// **'No highway'**
+  String get brandFilterNoHighway;
 }
 
 class _AppLocalizationsDelegate
