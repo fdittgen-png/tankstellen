@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:meta/meta.dart';
 import '../../error/exceptions.dart';
 import '../dio_factory.dart';
 import '../geocoding_provider.dart';
@@ -9,14 +10,19 @@ import '../service_result.dart';
 /// Geocoding via OpenStreetMap Nominatim API.
 /// Available on all platforms. Enforces 1 req/sec rate limit.
 /// Country-aware: passes the correct country code to Nominatim.
+///
+/// For French arrondissement postal codes (Paris 75001–75020,
+/// Lyon 69001–69009, Marseille 13001–13016), a city hint is added
+/// to prevent Nominatim from returning coordinates outside the
+/// target area.
 class NominatimGeocodingProvider implements GeocodingProvider {
   final Dio _dio;
   final String _countryCode;
   DateTime? _lastRequest;
 
-  NominatimGeocodingProvider({String countryCode = 'de'})
+  NominatimGeocodingProvider({String countryCode = 'de', @visibleForTesting Dio? dio})
       : _countryCode = countryCode.toLowerCase(),
-        _dio = DioFactory.create(
+        _dio = dio ?? DioFactory.create(
           baseUrl: ServiceConfigs.nominatim.baseUrl,
           connectTimeout: ServiceConfigs.nominatim.connectTimeout,
           receiveTimeout: ServiceConfigs.nominatim.receiveTimeout,
@@ -37,14 +43,23 @@ class NominatimGeocodingProvider implements GeocodingProvider {
 
     try {
       _lastRequest = DateTime.now();
+      final queryParams = <String, String>{
+        'postalcode': zipCode,
+        'country': _countryCode,
+        'format': 'json',
+        'limit': '1',
+      };
+
+      // Add city hint for French arrondissement postal codes to
+      // prevent Nominatim from returning wrong centroids.
+      final cityHint = _frenchCityHint(zipCode);
+      if (cityHint != null) {
+        queryParams['city'] = cityHint;
+      }
+
       final response = await _dio.get<List<dynamic>>(
         '/search',
-        queryParameters: {
-          'postalcode': zipCode,
-          'country': _countryCode,
-          'format': 'json',
-          'limit': '1',
-        },
+        queryParameters: queryParams,
         cancelToken: cancelToken,
       );
 
@@ -136,6 +151,26 @@ class NominatimGeocodingProvider implements GeocodingProvider {
       debugPrint('Nominatim country detection failed: $e');
       return null;
     }
+  }
+
+  /// Returns a city name hint for French arrondissement postal codes.
+  ///
+  /// Paris (75001–75020), Lyon (69001–69009), and Marseille (13001–13016)
+  /// use per-arrondissement postal codes that Nominatim resolves unreliably
+  /// without a city hint. Returns `null` for non-French or non-arrondissement
+  /// codes.
+  String? _frenchCityHint(String zipCode) {
+    if (_countryCode != 'fr') return null;
+    if (zipCode.length != 5) return null;
+
+    final code = int.tryParse(zipCode);
+    if (code == null) return null;
+
+    if (code >= 75001 && code <= 75020) return 'Paris';
+    if (code >= 69001 && code <= 69009) return 'Lyon';
+    if (code >= 13001 && code <= 13016) return 'Marseille';
+
+    return null;
   }
 
   Future<void> _enforceRateLimit() async {
