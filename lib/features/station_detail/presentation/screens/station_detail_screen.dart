@@ -35,10 +35,14 @@ class StationDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)?.search ?? 'Station'),
+        title: Semantics(
+          header: true,
+          child: Text(AppLocalizations.of(context)?.search ?? 'Station'),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
+          tooltip: 'Back',
         ),
         actions: [
           IconButton(
@@ -71,6 +75,7 @@ class StationDetailScreen extends ConsumerWidget {
               final station = detailAsync.value?.data.station;
               ref.read(favoritesProvider.notifier).toggle(stationId, stationData: station);
             },
+            tooltip: isFav ? 'Remove from favorites' : 'Add to favorites',
           ),
         ],
       ),
@@ -107,66 +112,82 @@ class StationDetailScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Open/closed status + freshness badge
-          Row(
-            children: [
-              Container(
-                width: 16, height: 16,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: station.isOpen
-                      ? DarkModeColors.success(context)
-                      : DarkModeColors.error(context),
+          Semantics(
+            label: 'Station is ${station.isOpen ? 'open' : 'closed'}',
+            child: Row(
+              children: [
+                ExcludeSemantics(
+                  child: Container(
+                    width: 16, height: 16,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: station.isOpen
+                          ? DarkModeColors.success(context)
+                          : DarkModeColors.error(context),
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                station.isOpen
-                    ? (l10n?.open ?? 'Open')
-                    : (l10n?.closed ?? 'Closed'),
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: station.isOpen
-                      ? DarkModeColors.success(context)
-                      : DarkModeColors.error(context),
-                  fontWeight: FontWeight.bold,
+                const SizedBox(width: 8),
+                ExcludeSemantics(
+                  child: Text(
+                    station.isOpen
+                        ? (l10n?.open ?? 'Open')
+                        : (l10n?.closed ?? 'Closed'),
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: station.isOpen
+                          ? DarkModeColors.success(context)
+                          : DarkModeColors.error(context),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-              ),
-              const Spacer(),
-              FreshnessBadge(result: serviceResult),
-            ],
+                const Spacer(),
+                FreshnessBadge(result: serviceResult),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
 
           // Brand logo + Name
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              BrandLogo(brand: station.brand, size: 48),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      station.brand.isNotEmpty && station.brand != 'Station'
-                          ? station.brand
-                          : station.street,
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
+          Semantics(
+            label: '${station.brand.isNotEmpty && station.brand != 'Station' ? station.brand : station.street}'
+                '${station.brand.isNotEmpty && station.brand != 'Station' && station.brand != station.street ? ', ${station.street}' : ''}',
+            header: true,
+            excludeSemantics: true,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                BrandLogo(brand: station.brand, size: 48),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        station.brand.isNotEmpty && station.brand != 'Station'
+                            ? station.brand
+                            : station.street,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    if (station.brand.isNotEmpty &&
-                        station.brand != 'Station' &&
-                        station.brand != station.street)
-                      Text(station.street, style: theme.textTheme.bodyLarge),
-                  ],
+                      if (station.brand.isNotEmpty &&
+                          station.brand != 'Station' &&
+                          station.brand != station.street)
+                        Text(station.street, style: theme.textTheme.bodyLarge),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 24),
 
           // Prices
-          Text(l10n?.prices ?? 'Prices', style: theme.textTheme.titleMedium),
+          Semantics(
+            header: true,
+            child: Text(l10n?.prices ?? 'Prices', style: theme.textTheme.titleMedium),
+          ),
           const SizedBox(height: 8),
           PriceTile(label: 'Super E5', price: station.e5, fuelType: FuelType.e5),
           PriceTile(label: 'Super E10', price: station.e10, fuelType: FuelType.e10),
@@ -186,7 +207,10 @@ class StationDetailScreen extends ConsumerWidget {
 
           // Price History
           const SizedBox(height: 24),
-          Text(l10n?.priceHistory ?? 'Price History', style: theme.textTheme.titleMedium),
+          Semantics(
+            header: true,
+            child: Text(l10n?.priceHistory ?? 'Price History', style: theme.textTheme.titleMedium),
+          ),
           const SizedBox(height: 8),
           PriceHistorySection(stationId: stationId, station: station),
         ],

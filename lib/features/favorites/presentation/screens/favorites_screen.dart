@@ -57,7 +57,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(l10n?.favorites ?? 'Favorites'),
+          title: Semantics(
+            header: true,
+            child: Text(l10n?.favorites ?? 'Favorites'),
+          ),
           actions: [
             if (favoriteIds.isNotEmpty)
               IconButton(
@@ -150,37 +153,43 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                           return true;
                         }
                       },
-                      background: Container(
-                        alignment: Alignment.centerLeft,
-                        padding: const EdgeInsets.only(left: 24),
-                        color: Theme.of(context).colorScheme.primary,
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.navigation,
-                                color: Colors.white, size: 20),
-                            SizedBox(width: 8),
-                            Text('Navigate',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
-                          ],
+                      background: Semantics(
+                        label: 'Navigate to $label',
+                        child: Container(
+                          alignment: Alignment.centerLeft,
+                          padding: const EdgeInsets.only(left: 24),
+                          color: Theme.of(context).colorScheme.primary,
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.navigation,
+                                  color: Colors.white, size: 20),
+                              SizedBox(width: 8),
+                              Text('Navigate',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold)),
+                            ],
+                          ),
                         ),
                       ),
-                      secondaryBackground: Container(
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 24),
-                        color: Colors.red,
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('Remove',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
-                            SizedBox(width: 8),
-                            Icon(Icons.delete, color: Colors.white, size: 20),
-                          ],
+                      secondaryBackground: Semantics(
+                        label: 'Remove $label from favorites',
+                        child: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 24),
+                          color: Colors.red,
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('Remove',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold)),
+                              SizedBox(width: 8),
+                              Icon(Icons.delete, color: Colors.white, size: 20),
+                            ],
+                          ),
                         ),
                       ),
                       child: StationCard(
@@ -204,21 +213,24 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         );
       },
       loading: () => const FavoritesLoadingView(),
-      error: (error, _) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 48),
-            const SizedBox(height: 16),
-            Text(error.toString(), textAlign: TextAlign.center),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () {
-                ref.read(favoriteStationsProvider.notifier).loadAndRefresh();
-              },
-              child: Text(l10n?.retry ?? 'Retry'),
-            ),
-          ],
+      error: (error, _) => Semantics(
+        label: 'Error loading favorites: ${error.toString()}',
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, size: 48),
+              const SizedBox(height: 16),
+              Text(error.toString(), textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () {
+                  ref.read(favoriteStationsProvider.notifier).loadAndRefresh();
+                },
+                child: Text(l10n?.retry ?? 'Retry'),
+              ),
+            ],
+          ),
         ),
       ),
     );

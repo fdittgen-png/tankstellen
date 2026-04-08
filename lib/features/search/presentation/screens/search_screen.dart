@@ -164,7 +164,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n?.appTitle ?? 'Fuel Prices'),
+        title: Semantics(
+          header: true,
+          child: Text(l10n?.appTitle ?? 'Fuel Prices'),
+        ),
         toolbarHeight: isLandscape ? 40 : null,
       ),
       body: isWide
@@ -195,28 +198,31 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Search mode toggle
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: ModeChip(
-                        label: l10n?.searchNearby ?? 'Nearby',
-                        icon: Icons.near_me,
-                        selected: searchMode == SearchMode.nearby,
-                        onTap: () => ref.read(activeSearchModeProvider.notifier).set(SearchMode.nearby),
+              Semantics(
+                label: 'Search mode',
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ModeChip(
+                          label: l10n?.searchNearby ?? 'Nearby',
+                          icon: Icons.near_me,
+                          selected: searchMode == SearchMode.nearby,
+                          onTap: () => ref.read(activeSearchModeProvider.notifier).set(SearchMode.nearby),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ModeChip(
-                        label: l10n?.searchAlongRouteLabel ?? 'Along route',
-                        icon: Icons.route,
-                        selected: searchMode == SearchMode.route,
-                        onTap: () => ref.read(activeSearchModeProvider.notifier).set(SearchMode.route),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ModeChip(
+                          label: l10n?.searchAlongRouteLabel ?? 'Along route',
+                          icon: Icons.route,
+                          selected: searchMode == SearchMode.route,
+                          onTap: () => ref.read(activeSearchModeProvider.notifier).set(SearchMode.route),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               if (searchMode == SearchMode.nearby)
@@ -258,7 +264,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
         // --- Scrollable results ---
         Expanded(
-          child: _buildResults(context, l10n, searchState),
+          child: Semantics(
+            label: 'Search results',
+            child: _buildResults(context, l10n, searchState),
+          ),
         ),
       ],
     );
