@@ -7,6 +7,7 @@ import '../core/storage/storage_providers.dart';
 import '../features/consent/presentation/screens/gdpr_consent_screen.dart';
 import '../features/favorites/presentation/screens/favorites_screen.dart';
 import '../features/map/presentation/screens/map_screen.dart';
+import '../features/profile/presentation/screens/privacy_dashboard_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
 import '../features/search/presentation/screens/search_screen.dart';
 import '../features/setup/presentation/screens/onboarding_wizard_screen.dart';
@@ -218,6 +219,10 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/itineraries',
         builder: (context, state) => const ItinerariesScreen(),
+      ),
+      GoRoute(
+        path: '/privacy-dashboard',
+        builder: (context, state) => const PrivacyDashboardScreen(),
       ),
     ],
   );

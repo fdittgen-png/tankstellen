@@ -18,7 +18,13 @@
   "open": "Open",
   "closed": "Closed",
   "distance": "{distance} away",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Price",
   "prices": "Prices",
   "address": "Address",
@@ -64,7 +70,13 @@
   "clearAllData": "Delete all data",
   "errorLog": "Error log",
   "stationsFound": "{count} stations found",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "whatIsShared": "What is shared — and with whom?",
   "gpsCoordinates": "GPS coordinates",
   "gpsReason": "Sent with every location search to find nearby stations.",
@@ -94,9 +106,21 @@
   "priceQuery": "Price query",
   "zipGeocoding": "Postal code geocoding",
   "minutes": "{n} minutes",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} hours",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Clear cache?",
   "clearCacheBody": "Cached search results and prices will be deleted. Profiles, favorites and settings are preserved.",
   "clearCacheButton": "Clear cache",
@@ -130,7 +154,13 @@
   "cheap": "cheap",
   "expensive": "expensive",
   "stationsOnMap": "{count} stations",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Loading favorites...\nSearch for stations first to save data.",
   "reportPrice": "Report price",
   "whatsWrong": "What's wrong?",
@@ -147,50 +177,91 @@
   "location": "Location",
   "switchProfileTitle": "Country changed",
   "switchProfilePrompt": "You are now in {country}. Switch to profile \"{profile}\"?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Switched to profile \"{profile}\" ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "No profile for this country",
   "noProfileForCountry": "You are in {country}, but no profile is configured for it. Create one in Settings.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Auto-switch profile",
   "autoSwitchDescription": "Automatically switch profile when crossing borders",
   "switchProfile": "Switch",
   "dismiss": "Dismiss",
   "profileCountry": "Country",
   "profileLanguage": "Language",
-  "settingsStorageDetail": "API key, active profile"
-  ,"allFuels": "All",
+  "settingsStorageDetail": "API key, active profile",
+  "allFuels": "All",
   "priceAlerts": "Price Alerts",
   "noPriceAlerts": "No price alerts",
   "noPriceAlertsHint": "Create an alert from a station's detail page.",
   "alertDeleted": "Alert \"{name}\" deleted",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Create Price Alert",
   "currentPrice": "Current price: {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Target price (EUR)",
   "enterPrice": "Please enter a price",
   "invalidPrice": "Invalid price",
   "priceTooHigh": "Price too high",
   "create": "Create",
-  "alertCreated": "Price alert created"
-  ,"wrongE5Price": "Wrong Super E5 price"
-  ,"wrongE10Price": "Wrong Super E10 price"
-  ,"wrongDieselPrice": "Wrong Diesel price"
-  ,"wrongStatusOpen": "Shown as open, but closed"
-  ,"wrongStatusClosed": "Shown as closed, but open"
-  ,"searchAlongRouteLabel": "Along route"
-  ,"searchEvStations": "Search to find EV charging stations"
-  ,"allStations": "All stations"
-  ,"bestStops": "Best stops"
-  ,"openInMaps": "Open in Maps"
-  ,"noStationsAlongRoute": "No stations found along route",
-
+  "alertCreated": "Price alert created",
+  "wrongE5Price": "Wrong Super E5 price",
+  "wrongE10Price": "Wrong Super E10 price",
+  "wrongDieselPrice": "Wrong Diesel price",
+  "wrongStatusOpen": "Shown as open, but closed",
+  "wrongStatusClosed": "Shown as closed, but open",
+  "searchAlongRouteLabel": "Along route",
+  "searchEvStations": "Search to find EV charging stations",
+  "allStations": "All stations",
+  "bestStops": "Best stops",
+  "openInMaps": "Open in Maps",
+  "noStationsAlongRoute": "No stations found along route",
   "evOperational": "Operational",
   "evStatusUnknown": "Status unknown",
   "evConnectors": "Connectors ({count} points)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "No connector details available",
   "evUsageCost": "Usage cost",
   "evPricingUnavailable": "Pricing not available from provider",
@@ -202,7 +273,6 @@
   "evRefreshStatus": "Refresh status",
   "evStatusUpdated": "Status updated",
   "evStationNotFound": "Could not refresh — station not found nearby",
-
   "addedToFavorites": "Added to favorites",
   "removedFromFavorites": "Removed from favorites",
   "addFavorite": "Add to favorites",
@@ -210,7 +280,6 @@
   "currentLocation": "Current location",
   "gpsError": "GPS error",
   "couldNotResolve": "Could not resolve start or destination",
-
   "start": "Start",
   "destination": "Destination",
   "cityAddressOrGps": "City, address, or GPS",
@@ -218,15 +287,32 @@
   "useGps": "Use GPS",
   "stop": "Stop",
   "stopN": "Stop {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Add stop",
   "searchAlongRoute": "Search along route",
   "cheapest": "Cheapest",
   "nStations": "{count} stations",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} best",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Fuel prices (Tankerkoenig)",
   "requiredForFuelSearch": "Required for fuel price search in Germany",
   "evChargingOpenChargeMap": "EV Charging (OpenChargeMap)",
@@ -239,10 +325,15 @@
   "tankerkoenigApiKey": "Tankerkoenig API Key",
   "evChargingApiKey": "EV Charging API Key",
   "openChargeMapApiKey": "OpenChargeMap API Key",
-
   "routeSegment": "Route segment",
   "showCheapestEveryNKm": "Show cheapest station every {km} km along route",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Avoid highways",
   "avoidHighwaysDesc": "Route calculation avoids toll roads and highways",
   "showFuelStations": "Show fuel stations",
@@ -250,7 +341,6 @@
   "showEvStations": "Show EV charging stations",
   "showEvStationsDesc": "Include electric charging stations in search results",
   "noStationsAlongThisRoute": "No stations found along this route.",
-
   "fuelCostCalculator": "Fuel Cost Calculator",
   "distanceKm": "Distance (km)",
   "consumptionL100km": "Consumption (L/100km)",
@@ -259,7 +349,6 @@
   "fuelNeeded": "Fuel needed",
   "totalCost": "Total cost",
   "enterCalcValues": "Enter distance, consumption, and price to calculate trip cost",
-
   "priceHistory": "Price History",
   "noPriceHistory": "No price history yet",
   "noHourlyData": "No hourly data",
@@ -268,7 +357,6 @@
   "statMax": "Max",
   "statAvg": "Avg",
   "showAllFuelTypes": "Show all fuel types",
-
   "connected": "Connected",
   "notConnected": "Not connected",
   "connectTankSync": "Connect TankSync",
@@ -278,7 +366,6 @@
   "tapToUpdateGps": "Tap to update GPS position",
   "gpsAutoUpdateHint": "GPS position is acquired automatically when you search. You can also update it manually here.",
   "clearGpsConfirm": "Clear the stored GPS position? You can update it again at any time.",
-
   "pageNotFound": "Page not found",
   "deleteAllServerData": "Delete all server data",
   "deleteServerDataConfirm": "Delete all server data?",
@@ -286,7 +373,6 @@
   "allDataDeleted": "All server data deleted",
   "disconnectConfirm": "Disconnect TankSync?",
   "disconnect": "Disconnect",
-
   "myServerData": "My server data",
   "anonymousUuid": "Anonymous UUID",
   "server": "Server",
@@ -300,29 +386,30 @@
   "jsonCopied": "JSON copied to clipboard",
   "rawDataJson": "Raw data (JSON)",
   "close": "Close",
-
   "account": "Account",
   "continueAsGuest": "Continue as guest",
   "createAccount": "Create account",
   "signIn": "Sign in",
   "upgradeToEmail": "Create email account",
-
   "savedRoutes": "Saved Routes",
   "noSavedRoutes": "No saved routes",
   "noSavedRoutesHint": "Search along a route and save it for quick access later.",
   "saveRoute": "Save route",
   "routeName": "Route name",
-
   "itineraryDeleted": "{name} deleted",
   "@itineraryDeleted": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "loadingRoute": "Loading route: {name}",
   "@loadingRoute": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "refreshFailed": "Refresh failed. Please try again.",
@@ -340,7 +427,6 @@
   "errorCache": "Local data error. Try clearing the cache.",
   "errorCancelled": "Request was cancelled.",
   "errorUnknown": "An unexpected error occurred.",
-
   "onboardingWelcomeHint": "Set up the app in a few quick steps.",
   "onboardingApiKeyDescription": "Register for a free API key, or skip to explore the app with demo data.",
   "onboardingComplete": "All set!",
@@ -349,21 +435,39 @@
   "onboardingNext": "Next",
   "onboardingSkip": "Skip",
   "onboardingFinish": "Get started",
-
   "crossBorderNearby": "{country} is nearby",
-  "@crossBorderNearby": {"placeholders": {"country": {"type": "String"}}},
+  "@crossBorderNearby": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "crossBorderDistance": "~{km} km to border",
-  "@crossBorderDistance": {"placeholders": {"km": {"type": "int"}}},
+  "@crossBorderDistance": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "crossBorderAvgPrice": "Avg here: {price} EUR ({count} stations)",
-  "@crossBorderAvgPrice": {"placeholders": {"price": {"type": "String"}, "count": {"type": "int"}}},
-
+  "@crossBorderAvgPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "allPricesView": "All prices",
   "compactView": "Compact",
   "switchToAllPricesView": "Switch to all-prices view",
   "switchToCompactView": "Switch to compact view",
   "unavailable": "N/A",
   "outOfStock": "Out of stock",
-
   "gdprTitle": "Your Privacy",
   "gdprSubtitle": "This app respects your privacy. Choose which data you want to share. You can change these settings anytime.",
   "gdprLocationTitle": "Location Access",
@@ -379,7 +483,6 @@
   "gdprAcceptAll": "Accept All",
   "gdprAcceptSelected": "Accept Selected",
   "gdprSettingsHint": "You can change your privacy choices at any time.",
-
   "routeSaved": "Route saved!",
   "routeSaveFailed": "Failed to save route",
   "sqlCopied": "SQL copied to clipboard",
@@ -387,7 +490,13 @@
   "accountDeleted": "Account deleted. Local data preserved.",
   "switchedToAnonymous": "Switched to anonymous session",
   "failedToSwitch": "Failed to switch: {error}",
-  "@failedToSwitch": {"placeholders": {"error": {"type": "String"}}},
+  "@failedToSwitch": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "topicUrlCopied": "Topic URL copied",
   "testNotificationSent": "Test notification sent!",
   "testNotificationFailed": "Failed to send test notification",
@@ -396,11 +505,29 @@
   "accountCreated": "Account created!",
   "signedIn": "Signed in!",
   "stationHidden": "{name} hidden",
-  "@stationHidden": {"placeholders": {"name": {"type": "String"}}},
+  "@stationHidden": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "removedFromFavoritesName": "{name} removed from favorites",
-  "@removedFromFavoritesName": {"placeholders": {"name": {"type": "String"}}},
+  "@removedFromFavoritesName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "invalidApiKey": "Invalid API key: {error}",
-  "@invalidApiKey": {"placeholders": {"error": {"type": "String"}}},
+  "@invalidApiKey": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "invalidQrCode": "Invalid QR code format",
   "invalidQrCodeTankSync": "Invalid QR code — expected TankSync format",
   "tankSyncConnected": "TankSync connected!",
@@ -408,11 +535,26 @@
   "deviceCodeCopied": "Device code copied",
   "undo": "Undo",
   "invalidPostalCode": "Please enter a valid {length}-digit {label}",
-  "@invalidPostalCode": {"placeholders": {"length": {"type": "String"}, "label": {"type": "String"}}},
+  "@invalidPostalCode": {
+    "placeholders": {
+      "length": {
+        "type": "String"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
   "freshnessAgo": "ago",
   "freshnessStale": "Stale",
   "freshnessBadgeSemantics": "Data freshness: {age}",
-  "@freshnessBadgeSemantics": {"placeholders": {"age": {"type": "String"}}},
+  "@freshnessBadgeSemantics": {
+    "placeholders": {
+      "age": {
+        "type": "String"
+      }
+    }
+  },
   "passwordStrengthWeak": "Weak",
   "passwordStrengthFair": "Fair",
   "passwordStrengthStrong": "Strong",
@@ -428,5 +570,32 @@
   "swipeTutorialDismiss": "Got it",
   "alertStatsActive": "Active",
   "alertStatsToday": "Today",
-  "alertStatsThisWeek": "This week"
+  "alertStatsThisWeek": "This week",
+  "privacyDashboardTitle": "Privacy Dashboard",
+  "privacyDashboardSubtitle": "View, export, or delete your data",
+  "privacyDashboardBanner": "Your data belongs to you. Here you can see everything this app stores, export it, or delete it.",
+  "privacyLocalData": "Data on this device",
+  "privacyIgnoredStations": "Ignored stations",
+  "privacyRatings": "Station ratings",
+  "privacyPriceHistory": "Price history stations",
+  "privacyProfiles": "Search profiles",
+  "privacyItineraries": "Saved routes",
+  "privacyCacheEntries": "Cache entries",
+  "privacyApiKey": "API key stored",
+  "privacyEvApiKey": "EV API key stored",
+  "privacyEstimatedSize": "Estimated storage",
+  "privacySyncedData": "Cloud sync (TankSync)",
+  "privacySyncDisabled": "Cloud sync is disabled. All data stays on this device only.",
+  "privacySyncMode": "Sync mode",
+  "privacySyncUserId": "User ID",
+  "privacySyncDescription": "When sync is enabled, favorites, alerts, ignored stations, and ratings are also stored on the TankSync server.",
+  "privacyViewServerData": "View server data",
+  "privacyExportButton": "Export all data as JSON",
+  "privacyExportSuccess": "Data exported to clipboard",
+  "privacyDeleteButton": "Delete all data",
+  "privacyDeleteTitle": "Delete all data?",
+  "privacyDeleteBody": "This will permanently delete:\n\n- All favorites and station data\n- All search profiles\n- All price alerts\n- All price history\n- All cached data\n- Your API key\n- All app settings\n\nThe app will reset to its initial state. This action cannot be undone.",
+  "privacyDeleteConfirm": "Delete everything",
+  "yes": "Yes",
+  "no": "No"
 }

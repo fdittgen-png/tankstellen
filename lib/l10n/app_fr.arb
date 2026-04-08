@@ -18,7 +18,13 @@
   "open": "Ouvert",
   "closed": "Fermé",
   "distance": "à {distance}",
-  "@distance": { "placeholders": { "distance": {"type": "String"} } },
+  "@distance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
   "price": "Prix",
   "prices": "Prix",
   "address": "Adresse",
@@ -64,7 +70,13 @@
   "clearAllData": "Supprimer toutes les données",
   "errorLog": "Journal d'erreurs",
   "stationsFound": "{count} stations trouvées",
-  "@stationsFound": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "whatIsShared": "Quelles données sont partagées — et avec qui ?",
   "gpsCoordinates": "Coordonnées GPS",
   "gpsReason": "Envoyées à chaque recherche pour trouver les stations proches.",
@@ -94,9 +106,21 @@
   "priceQuery": "Requête prix",
   "zipGeocoding": "Géocodage code postal",
   "minutes": "{n} minutes",
-  "@minutes": { "placeholders": { "n": {"type": "int"} } },
+  "@minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "hours": "{n} heures",
-  "@hours": { "placeholders": { "n": {"type": "int"} } },
+  "@hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "clearCacheTitle": "Vider le cache ?",
   "clearCacheBody": "Les résultats de recherche et prix en cache seront supprimés. Profils, favoris et paramètres sont conservés.",
   "clearCacheButton": "Vider le cache",
@@ -127,7 +151,13 @@
   "cheap": "bon marché",
   "expensive": "cher",
   "stationsOnMap": "{count} stations",
-  "@stationsOnMap": { "placeholders": { "count": {"type": "int"} } },
+  "@stationsOnMap": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "loadingFavorites": "Chargement des favoris...\nRecherchez d'abord des stations pour enregistrer des données.",
   "reportPrice": "Signaler un prix",
   "whatsWrong": "Quel est le problème ?",
@@ -144,50 +174,91 @@
   "location": "Localisation",
   "switchProfileTitle": "Pays changé",
   "switchProfilePrompt": "Vous êtes maintenant en {country}. Passer au profil \"{profile}\" ?",
-  "@switchProfilePrompt": { "placeholders": { "country": { "type": "String" }, "profile": { "type": "String" } } },
+  "@switchProfilePrompt": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "profile": {
+        "type": "String"
+      }
+    }
+  },
   "switchedToProfile": "Profil \"{profile}\" activé ({country})",
-  "@switchedToProfile": { "placeholders": { "profile": { "type": "String" }, "country": { "type": "String" } } },
+  "@switchedToProfile": {
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "noProfileForCountryTitle": "Aucun profil pour ce pays",
   "noProfileForCountry": "Vous êtes en {country}, mais aucun profil n'est configuré. Créez-en un dans les Réglages.",
-  "@noProfileForCountry": { "placeholders": { "country": { "type": "String" } } },
+  "@noProfileForCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "autoSwitchProfile": "Changement automatique de profil",
   "autoSwitchDescription": "Changer de profil automatiquement en traversant une frontière",
   "switchProfile": "Changer",
   "dismiss": "Fermer",
   "profileCountry": "Pays",
   "profileLanguage": "Langue",
-  "settingsStorageDetail": "Clé API, profil actif"
-  ,"allFuels": "Tous",
+  "settingsStorageDetail": "Clé API, profil actif",
+  "allFuels": "Tous",
   "priceAlerts": "Alertes de prix",
   "noPriceAlerts": "Aucune alerte de prix",
   "noPriceAlertsHint": "Créez une alerte depuis la page détail d'une station.",
   "alertDeleted": "Alerte \"{name}\" supprimée",
-  "@alertDeleted": {"placeholders": {"name": {"type": "String"}}},
+  "@alertDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createAlert": "Créer une alerte de prix",
   "currentPrice": "Prix actuel : {price}",
-  "@currentPrice": {"placeholders": {"price": {"type": "String"}}},
+  "@currentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
   "targetPrice": "Prix cible (EUR)",
   "enterPrice": "Veuillez entrer un prix",
   "invalidPrice": "Prix invalide",
   "priceTooHigh": "Prix trop élevé",
   "create": "Créer",
-  "alertCreated": "Alerte de prix créée"
-  ,"wrongE5Price": "Prix Super E5 incorrect"
-  ,"wrongE10Price": "Prix Super E10 incorrect"
-  ,"wrongDieselPrice": "Prix Diesel incorrect"
-  ,"wrongStatusOpen": "Affiché ouvert, mais fermé"
-  ,"wrongStatusClosed": "Affiché fermé, mais ouvert"
-  ,"searchAlongRouteLabel": "Le long du trajet"
-  ,"searchEvStations": "Recherchez des bornes de recharge"
-  ,"allStations": "Toutes les stations"
-  ,"bestStops": "Meilleurs arrêts"
-  ,"openInMaps": "Ouvrir dans Maps"
-  ,"noStationsAlongRoute": "Aucune station trouvée le long du trajet",
-
+  "alertCreated": "Alerte de prix créée",
+  "wrongE5Price": "Prix Super E5 incorrect",
+  "wrongE10Price": "Prix Super E10 incorrect",
+  "wrongDieselPrice": "Prix Diesel incorrect",
+  "wrongStatusOpen": "Affiché ouvert, mais fermé",
+  "wrongStatusClosed": "Affiché fermé, mais ouvert",
+  "searchAlongRouteLabel": "Le long du trajet",
+  "searchEvStations": "Recherchez des bornes de recharge",
+  "allStations": "Toutes les stations",
+  "bestStops": "Meilleurs arrêts",
+  "openInMaps": "Ouvrir dans Maps",
+  "noStationsAlongRoute": "Aucune station trouvée le long du trajet",
   "evOperational": "En service",
   "evStatusUnknown": "Statut inconnu",
   "evConnectors": "Connecteurs ({count} points)",
-  "@evConnectors": {"placeholders": {"count": {"type": "int"}}},
+  "@evConnectors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "evNoConnectors": "Aucun détail de connecteur disponible",
   "evUsageCost": "Coût d'utilisation",
   "evPricingUnavailable": "Tarification non disponible auprès du fournisseur",
@@ -199,7 +270,6 @@
   "evRefreshStatus": "Actualiser le statut",
   "evStatusUpdated": "Statut mis à jour",
   "evStationNotFound": "Impossible d'actualiser — station introuvable à proximité",
-
   "addedToFavorites": "Ajouté aux favoris",
   "removedFromFavorites": "Retiré des favoris",
   "addFavorite": "Ajouter aux favoris",
@@ -207,7 +277,6 @@
   "currentLocation": "Position actuelle",
   "gpsError": "Erreur GPS",
   "couldNotResolve": "Impossible de résoudre le départ ou la destination",
-
   "start": "Départ",
   "destination": "Destination",
   "cityAddressOrGps": "Ville, adresse ou GPS",
@@ -215,15 +284,32 @@
   "useGps": "Utiliser le GPS",
   "stop": "Étape",
   "stopN": "Étape {n}",
-  "@stopN": {"placeholders": {"n": {"type": "int"}}},
+  "@stopN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "addStop": "Ajouter une étape",
   "searchAlongRoute": "Rechercher le long du trajet",
   "cheapest": "Le moins cher",
   "nStations": "{count} stations",
-  "@nStations": {"placeholders": {"count": {"type": "int"}}},
+  "@nStations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "nBest": "{count} meilleures",
-  "@nBest": {"placeholders": {"count": {"type": "int"}}},
-
+  "@nBest": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fuelPricesTankerkoenig": "Prix carburants (Tankerkoenig)",
   "requiredForFuelSearch": "Requis pour la recherche de prix de carburant en Allemagne",
   "evChargingOpenChargeMap": "Recharge EV (OpenChargeMap)",
@@ -236,10 +322,15 @@
   "tankerkoenigApiKey": "Clé API Tankerkoenig",
   "evChargingApiKey": "Clé API recharge EV",
   "openChargeMapApiKey": "Clé API OpenChargeMap",
-
   "routeSegment": "Segment de trajet",
   "showCheapestEveryNKm": "Afficher la station la moins chère tous les {km} km le long du trajet",
-  "@showCheapestEveryNKm": {"placeholders": {"km": {"type": "int"}}},
+  "@showCheapestEveryNKm": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "avoidHighways": "Éviter les autoroutes",
   "avoidHighwaysDesc": "Le calcul d'itinéraire évite les routes à péage et les autoroutes",
   "showFuelStations": "Afficher les stations-service",
@@ -247,7 +338,6 @@
   "showEvStations": "Afficher les bornes de recharge",
   "showEvStationsDesc": "Inclure les bornes de recharge électrique dans les résultats",
   "noStationsAlongThisRoute": "Aucune station trouvée le long de ce trajet.",
-
   "fuelCostCalculator": "Calculateur de coût carburant",
   "distanceKm": "Distance (km)",
   "consumptionL100km": "Consommation (L/100km)",
@@ -256,7 +346,6 @@
   "fuelNeeded": "Carburant nécessaire",
   "totalCost": "Coût total",
   "enterCalcValues": "Saisissez la distance, la consommation et le prix pour calculer le coût du trajet",
-
   "priceHistory": "Historique des prix",
   "noPriceHistory": "Pas encore d'historique de prix",
   "noHourlyData": "Pas de données horaires",
@@ -265,7 +354,6 @@
   "statMax": "Max",
   "statAvg": "Moy",
   "showAllFuelTypes": "Afficher tous les types de carburant",
-
   "connected": "Connecté",
   "notConnected": "Non connecté",
   "connectTankSync": "Connecter TankSync",
@@ -275,7 +363,6 @@
   "tapToUpdateGps": "Appuyez pour mettre à jour la position GPS",
   "gpsAutoUpdateHint": "La position GPS est acquise automatiquement lors de la recherche. Vous pouvez aussi la mettre à jour manuellement ici.",
   "clearGpsConfirm": "Effacer la position GPS enregistrée ? Vous pourrez la mettre à jour à tout moment.",
-
   "pageNotFound": "Page introuvable",
   "deleteAllServerData": "Supprimer toutes les données serveur",
   "deleteServerDataConfirm": "Supprimer toutes les données serveur ?",
@@ -283,7 +370,6 @@
   "allDataDeleted": "Toutes les données serveur supprimées",
   "disconnectConfirm": "Déconnecter TankSync ?",
   "disconnect": "Déconnecter",
-
   "myServerData": "Mes données serveur",
   "anonymousUuid": "UUID anonyme",
   "server": "Serveur",
@@ -297,13 +383,11 @@
   "jsonCopied": "JSON copié dans le presse-papiers",
   "rawDataJson": "Données brutes (JSON)",
   "close": "Fermer",
-
   "account": "Compte",
   "continueAsGuest": "Continuer en tant qu'invité",
   "createAccount": "Créer un compte",
   "signIn": "Se connecter",
   "upgradeToEmail": "Créer un compte e-mail",
-
   "savedRoutes": "Itinéraires enregistrés",
   "noSavedRoutes": "Aucun itinéraire enregistré",
   "noSavedRoutesHint": "Recherchez le long d'un itinéraire et enregistrez-le pour un accès rapide.",
@@ -325,8 +409,8 @@
   "errorUnknown": "Une erreur inattendue est survenue.",
   "freshnessAgo": "il y a",
   "freshnessStale": "Périmé",
-  "freshnessBadgeSemantics": "Fraîcheur des données : {age}"
-  ,"alertStatsActive": "Actives"
-  ,"alertStatsToday": "Aujourd'hui"
-  ,"alertStatsThisWeek": "Cette semaine"
+  "freshnessBadgeSemantics": "Fraîcheur des données : {age}",
+  "alertStatsActive": "Actives",
+  "alertStatsToday": "Aujourd'hui",
+  "alertStatsThisWeek": "Cette semaine"
 }

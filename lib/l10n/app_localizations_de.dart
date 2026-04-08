@@ -1247,4 +1247,90 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get alertStatsThisWeek => 'Diese Woche';
+
+  @override
+  String get privacyDashboardTitle => 'Datenschutz-Dashboard';
+
+  @override
+  String get privacyDashboardSubtitle =>
+      'Daten anzeigen, exportieren oder löschen';
+
+  @override
+  String get privacyDashboardBanner =>
+      'Ihre Daten gehören Ihnen. Hier sehen Sie alles, was diese App speichert, und können es exportieren oder löschen.';
+
+  @override
+  String get privacyLocalData => 'Daten auf diesem Gerät';
+
+  @override
+  String get privacyIgnoredStations => 'Ausgeblendete Stationen';
+
+  @override
+  String get privacyRatings => 'Stationsbewertungen';
+
+  @override
+  String get privacyPriceHistory => 'Preisverlauf-Stationen';
+
+  @override
+  String get privacyProfiles => 'Suchprofile';
+
+  @override
+  String get privacyItineraries => 'Gespeicherte Routen';
+
+  @override
+  String get privacyCacheEntries => 'Cache-Einträge';
+
+  @override
+  String get privacyApiKey => 'API-Schlüssel gespeichert';
+
+  @override
+  String get privacyEvApiKey => 'EV-API-Schlüssel gespeichert';
+
+  @override
+  String get privacyEstimatedSize => 'Geschätzter Speicherverbrauch';
+
+  @override
+  String get privacySyncedData => 'Cloud-Sync (TankSync)';
+
+  @override
+  String get privacySyncDisabled =>
+      'Cloud-Sync ist deaktiviert. Alle Daten bleiben nur auf diesem Gerät.';
+
+  @override
+  String get privacySyncMode => 'Sync-Modus';
+
+  @override
+  String get privacySyncUserId => 'Benutzer-ID';
+
+  @override
+  String get privacySyncDescription =>
+      'Bei aktiviertem Sync werden Favoriten, Alarme, ausgeblendete Stationen und Bewertungen auch auf dem TankSync-Server gespeichert.';
+
+  @override
+  String get privacyViewServerData => 'Serverdaten anzeigen';
+
+  @override
+  String get privacyExportButton => 'Alle Daten als JSON exportieren';
+
+  @override
+  String get privacyExportSuccess => 'Daten in die Zwischenablage exportiert';
+
+  @override
+  String get privacyDeleteButton => 'Alle Daten löschen';
+
+  @override
+  String get privacyDeleteTitle => 'Alle Daten löschen?';
+
+  @override
+  String get privacyDeleteBody =>
+      'Dies löscht unwiderruflich:\n\n- Alle Favoriten und Stationsdaten\n- Alle Suchprofile\n- Alle Preisalarme\n- Allen Preisverlauf\n- Alle zwischengespeicherten Daten\n- Ihren API-Schlüssel\n- Alle App-Einstellungen\n\nDie App wird auf den Ausgangszustand zurückgesetzt. Diese Aktion kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get privacyDeleteConfirm => 'Alles löschen';
+
+  @override
+  String get yes => 'Ja';
+
+  @override
+  String get no => 'Nein';
 }
