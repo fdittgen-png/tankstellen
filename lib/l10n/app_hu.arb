@@ -399,5 +399,14 @@
   "errorUnknown": "An unexpected error occurred.",
   "alertStatsActive": "Aktív",
   "alertStatsToday": "Ma",
-  "alertStatsThisWeek": "Ezen a héten"
+  "alertStatsThisWeek": "Ezen a héten",
+  "amenities": "Amenities",
+  "amenityShop": "Shop",
+  "amenityCarWash": "Car Wash",
+  "amenityAirPump": "Air",
+  "amenityToilet": "WC",
+  "amenityRestaurant": "Food",
+  "amenityAtm": "ATM",
+  "amenityWifi": "WiFi",
+  "amenityEv": "EV"
 }

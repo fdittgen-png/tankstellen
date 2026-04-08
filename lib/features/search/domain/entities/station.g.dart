@@ -45,6 +45,9 @@ _Station _$StationFromJson(Map<String, dynamic> json) => _Station(
   stationType: json['stationType'] as String?,
   department: json['department'] as String?,
   region: json['region'] as String?,
+  amenities: json['amenities'] == null
+      ? const {}
+      : _amenitiesFromJson(json['amenities']),
 );
 
 Map<String, dynamic> _$StationToJson(_Station instance) => <String, dynamic>{
@@ -76,6 +79,7 @@ Map<String, dynamic> _$StationToJson(_Station instance) => <String, dynamic>{
   'stationType': instance.stationType,
   'department': instance.department,
   'region': instance.region,
+  'amenities': _amenitiesToJson(instance.amenities),
 };
 
 _OpeningTime _$OpeningTimeFromJson(Map<String, dynamic> json) => _OpeningTime(

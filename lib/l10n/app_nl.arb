@@ -399,5 +399,14 @@
   "errorUnknown": "An unexpected error occurred.",
   "alertStatsActive": "Actief",
   "alertStatsToday": "Vandaag",
-  "alertStatsThisWeek": "Deze week"
+  "alertStatsThisWeek": "Deze week",
+  "amenities": "Voorzieningen",
+  "amenityShop": "Winkel",
+  "amenityCarWash": "Wasstraat",
+  "amenityAirPump": "Lucht",
+  "amenityToilet": "WC",
+  "amenityRestaurant": "Eten",
+  "amenityAtm": "Pinautomaat",
+  "amenityWifi": "WiFi",
+  "amenityEv": "Oplaadpunt"
 }

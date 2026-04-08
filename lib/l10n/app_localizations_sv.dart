@@ -1322,4 +1322,31 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get no => 'No';
+
+  @override
+  String get amenities => 'Amenities';
+
+  @override
+  String get amenityShop => 'Shop';
+
+  @override
+  String get amenityCarWash => 'Car Wash';
+
+  @override
+  String get amenityAirPump => 'Air';
+
+  @override
+  String get amenityToilet => 'WC';
+
+  @override
+  String get amenityRestaurant => 'Food';
+
+  @override
+  String get amenityAtm => 'ATM';
+
+  @override
+  String get amenityWifi => 'WiFi';
+
+  @override
+  String get amenityEv => 'EV';
 }

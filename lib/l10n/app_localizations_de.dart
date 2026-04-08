@@ -1333,4 +1333,31 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get no => 'Nein';
+
+  @override
+  String get amenities => 'Ausstattung';
+
+  @override
+  String get amenityShop => 'Shop';
+
+  @override
+  String get amenityCarWash => 'Waschanlage';
+
+  @override
+  String get amenityAirPump => 'Luft';
+
+  @override
+  String get amenityToilet => 'WC';
+
+  @override
+  String get amenityRestaurant => 'Essen';
+
+  @override
+  String get amenityAtm => 'Geldautomat';
+
+  @override
+  String get amenityWifi => 'WLAN';
+
+  @override
+  String get amenityEv => 'E-Laden';
 }

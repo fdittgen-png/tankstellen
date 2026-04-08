@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'station_amenity.dart';
+
 part 'station.freezed.dart';
 part 'station.g.dart';
 
@@ -34,6 +36,8 @@ abstract class Station with _$Station {
     String? stationType,  // "R" retail, "A" autoroute
     String? department,
     String? region,
+    @JsonKey(fromJson: _amenitiesFromJson, toJson: _amenitiesToJson)
+    @Default({}) Set<StationAmenity> amenities,
   }) = _Station;
 
   factory Station.fromJson(Map<String, dynamic> json) =>
@@ -47,6 +51,22 @@ String _postCodeToString(dynamic value) =>
 /// Handles price as num, false (closed station), or null → double?.
 double? _priceFromJson(dynamic value) =>
     value is num ? value.toDouble() : null;
+
+/// Deserializes amenities from JSON list of enum name strings.
+Set<StationAmenity> _amenitiesFromJson(dynamic value) {
+  if (value is! List) return const {};
+  return value
+      .map((e) {
+        final name = e.toString();
+        return StationAmenity.values.where((a) => a.name == name).firstOrNull;
+      })
+      .whereType<StationAmenity>()
+      .toSet();
+}
+
+/// Serializes amenities to JSON list of enum name strings.
+List<String> _amenitiesToJson(Set<StationAmenity> amenities) =>
+    amenities.map((a) => a.name).toList();
 
 @freezed
 abstract class StationDetail with _$StationDetail {

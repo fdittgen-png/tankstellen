@@ -1324,4 +1324,31 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get no => 'No';
+
+  @override
+  String get amenities => 'Servicios';
+
+  @override
+  String get amenityShop => 'Tienda';
+
+  @override
+  String get amenityCarWash => 'Lavado';
+
+  @override
+  String get amenityAirPump => 'Aire';
+
+  @override
+  String get amenityToilet => 'WC';
+
+  @override
+  String get amenityRestaurant => 'Comida';
+
+  @override
+  String get amenityAtm => 'Cajero';
+
+  @override
+  String get amenityWifi => 'WiFi';
+
+  @override
+  String get amenityEv => 'Carga EV';
 }

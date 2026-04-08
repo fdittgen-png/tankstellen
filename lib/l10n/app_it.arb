@@ -409,5 +409,14 @@
   "errorUnknown": "An unexpected error occurred.",
   "alertStatsActive": "Attivi",
   "alertStatsToday": "Oggi",
-  "alertStatsThisWeek": "Questa settimana"
+  "alertStatsThisWeek": "Questa settimana",
+  "amenities": "Dotazioni",
+  "amenityShop": "Negozio",
+  "amenityCarWash": "Lavaggio",
+  "amenityAirPump": "Aria",
+  "amenityToilet": "WC",
+  "amenityRestaurant": "Cibo",
+  "amenityAtm": "Bancomat",
+  "amenityWifi": "WiFi",
+  "amenityEv": "Ricarica"
 }

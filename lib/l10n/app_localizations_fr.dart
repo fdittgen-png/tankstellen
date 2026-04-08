@@ -1328,4 +1328,31 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get no => 'No';
+
+  @override
+  String get amenities => 'Équipements';
+
+  @override
+  String get amenityShop => 'Boutique';
+
+  @override
+  String get amenityCarWash => 'Lavage';
+
+  @override
+  String get amenityAirPump => 'Air';
+
+  @override
+  String get amenityToilet => 'WC';
+
+  @override
+  String get amenityRestaurant => 'Resto';
+
+  @override
+  String get amenityAtm => 'DAB';
+
+  @override
+  String get amenityWifi => 'WiFi';
+
+  @override
+  String get amenityEv => 'Recharge';
 }

@@ -597,5 +597,14 @@
   "privacyDeleteBody": "This will permanently delete:\n\n- All favorites and station data\n- All search profiles\n- All price alerts\n- All price history\n- All cached data\n- Your API key\n- All app settings\n\nThe app will reset to its initial state. This action cannot be undone.",
   "privacyDeleteConfirm": "Delete everything",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "amenities": "Amenities",
+  "amenityShop": "Shop",
+  "amenityCarWash": "Car Wash",
+  "amenityAirPump": "Air",
+  "amenityToilet": "WC",
+  "amenityRestaurant": "Food",
+  "amenityAtm": "ATM",
+  "amenityWifi": "WiFi",
+  "amenityEv": "EV"
 }

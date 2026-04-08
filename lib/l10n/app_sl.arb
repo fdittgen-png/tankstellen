@@ -399,5 +399,14 @@
   "errorUnknown": "An unexpected error occurred.",
   "alertStatsActive": "Aktivni",
   "alertStatsToday": "Danes",
-  "alertStatsThisWeek": "Ta teden"
+  "alertStatsThisWeek": "Ta teden",
+  "amenities": "Amenities",
+  "amenityShop": "Shop",
+  "amenityCarWash": "Car Wash",
+  "amenityAirPump": "Air",
+  "amenityToilet": "WC",
+  "amenityRestaurant": "Food",
+  "amenityAtm": "ATM",
+  "amenityWifi": "WiFi",
+  "amenityEv": "EV"
 }
