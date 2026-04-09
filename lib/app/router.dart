@@ -18,6 +18,7 @@ import '../features/price_history/presentation/screens/price_history_screen.dart
 import '../features/search/presentation/screens/ev_station_detail_screen.dart';
 import '../features/search/domain/entities/charging_station.dart';
 import '../features/station_detail/presentation/screens/station_detail_screen.dart';
+import '../features/driving/presentation/screens/driving_mode_screen.dart';
 import '../features/itinerary/presentation/screens/itineraries_screen.dart';
 import '../features/sync/presentation/screens/auth_screen.dart';
 import '../features/sync/presentation/screens/data_transparency_screen.dart';
@@ -154,6 +155,10 @@ GoRouter router(Ref ref) {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: '/driving',
+        builder: (context, state) => const DrivingModeScreen(),
       ),
       GoRoute(
         path: '/alerts',

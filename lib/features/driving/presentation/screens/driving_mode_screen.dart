@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/price_utils.dart';
@@ -43,12 +45,19 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
     super.initState();
     _mapController = MapController();
     _resetInactivityTimer();
+    // Enter immersive full-screen mode — hides status bar and nav bar
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
 
   @override
   void dispose() {
     _inactivityTimer?.cancel();
     _mapController.dispose();
+    // Restore normal system UI when leaving driving mode
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
     super.dispose();
   }
 
@@ -96,7 +105,7 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
                 onRecenter: () => _recenter(searchState),
                 onNearestStation: () =>
                     _navigateToNearest(context, searchState, selectedFuel),
-                onExit: () => Navigator.of(context).pop(),
+                onExit: () => context.go('/map'),
               ),
             ),
             // Auto-lock overlay

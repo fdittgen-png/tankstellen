@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/features/driving/presentation/screens/driving_mode_screen.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_bottom_bar.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_station_sheet.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/safety_disclaimer_dialog.dart';
@@ -7,8 +11,10 @@ import 'package:tankstellen/features/driving/presentation/widgets/driving_marker
 import 'package:tankstellen/features/driving/presentation/widgets/driving_mode_fab.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/features/search/providers/search_provider.dart';
 
 import '../../../../fixtures/stations.dart';
+import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 
 void main() {
@@ -313,4 +319,74 @@ void main() {
       expect(find.byType(FloatingActionButton), findsOneWidget);
     });
   });
+
+  group('DrivingModeScreen fullscreen', () {
+    testWidgets('enters immersive mode on init', (tester) async {
+      final log = <MethodCall>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async {
+          log.add(call);
+          return null;
+        },
+      );
+
+      await pumpApp(
+        tester,
+        const DrivingModeScreen(),
+        overrides: _drivingScreenOverrides(),
+      );
+
+      final immersiveCall = log.where(
+        (c) => c.method == 'SystemChrome.setEnabledSystemUIMode',
+      );
+      expect(immersiveCall, isNotEmpty,
+          reason: 'Should call setEnabledSystemUIMode on init');
+
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      );
+    });
+
+    testWidgets('screen uses Scaffold without bottomNavigationBar',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const DrivingModeScreen(),
+        overrides: _drivingScreenOverrides(),
+      );
+
+      // DrivingModeScreen should use a plain Scaffold with no
+      // bottomNavigationBar — the driving bottom bar is a floating overlay
+      // positioned inside a Stack, not a Scaffold property.
+      final scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
+      expect(scaffold.bottomNavigationBar, isNull,
+          reason: 'Driving mode must not have a Scaffold bottomNavigationBar');
+    });
+  });
+}
+
+/// Overrides needed to render DrivingModeScreen in isolation.
+///
+/// The screen watches [searchStateProvider] and [selectedFuelTypeProvider],
+/// so we provide empty / default values to avoid real API calls.
+List<Object> _drivingScreenOverrides() {
+  final std = standardTestOverrides();
+  return [
+    ...std.overrides,
+    searchStateProvider.overrideWith(() => _EmptySearchState()),
+  ];
+}
+
+/// A search state notifier that returns empty data.
+class _EmptySearchState extends SearchState {
+  @override
+  AsyncValue<ServiceResult<List<Station>>> build() {
+    return AsyncValue.data(ServiceResult(
+      data: const [],
+      source: ServiceSource.cache,
+      fetchedAt: DateTime.now(),
+    ));
+  }
 }
