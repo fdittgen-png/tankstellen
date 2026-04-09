@@ -193,10 +193,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     return Column(
       children: [
-        // --- Sticky header: search controls stay visible ---
+        // --- Compact header: country info + search controls ---
         DemoModeBanner(country: country),
         Padding(
-          padding: EdgeInsets.fromLTRB(16, isLandscape ? 4 : 12, 16, 0),
+          padding: EdgeInsets.fromLTRB(16, isLandscape ? 2 : 6, 16, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -204,7 +204,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               Semantics(
                 label: 'Search mode',
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
+                  padding: const EdgeInsets.only(bottom: 2),
                   child: Row(
                     children: [
                       Expanded(

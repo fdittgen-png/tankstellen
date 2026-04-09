@@ -34,14 +34,17 @@ class DemoModeBanner extends ConsumerWidget {
 
     if (!country.requiresApiKey) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
         child: Row(
           children: [
-            Text(country.flag, style: const TextStyle(fontSize: 16)),
-            const SizedBox(width: 8),
-            Text(
-              '${country.name} — ${country.apiProvider}',
-              style: Theme.of(context).textTheme.bodySmall,
+            Text(country.flag, style: const TextStyle(fontSize: 14)),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                '${country.name} \u2014 ${country.apiProvider}',
+                style: Theme.of(context).textTheme.labelSmall,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
