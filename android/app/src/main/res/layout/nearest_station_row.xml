@@ -9,7 +9,7 @@
 
     <!-- Station name -->
     <TextView
-        android:id="@+id/station_name"
+        android:id="@+id/nearest_station_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -18,20 +18,30 @@
         android:maxLines="1"
         android:ellipsize="end" />
 
+    <!-- Distance -->
+    <TextView
+        android:id="@+id/nearest_station_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:textColor="?android:attr/textColorSecondary"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp" />
+
     <!-- E10 price -->
     <TextView
-        android:id="@+id/station_e10"
+        android:id="@+id/nearest_station_e10"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12sp"
         android:textStyle="bold"
         android:textColor="#1B5E20"
-        android:paddingStart="8dp"
+        android:paddingStart="4dp"
         android:paddingEnd="4dp" />
 
     <!-- Diesel price -->
     <TextView
-        android:id="@+id/station_diesel"
+        android:id="@+id/nearest_station_diesel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12sp"

@@ -2,4 +2,8 @@
 <resources>
     <string name="widget_description">Shows fuel prices for your favorite stations</string>
     <string name="widget_name">Fuel Prices</string>
+    <string name="widget_empty">Add favorites to see prices here</string>
+    <string name="nearest_widget_description">Shows fuel prices for the nearest stations</string>
+    <string name="nearest_widget_name">Nearest Stations</string>
+    <string name="nearest_widget_empty">Add favorites and enable GPS to see nearby stations</string>
 </resources>

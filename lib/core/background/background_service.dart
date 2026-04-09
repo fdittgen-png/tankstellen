@@ -296,8 +296,9 @@ Future<void> _refreshPricesAndCheckAlerts() async {
       debugPrint('BackgroundService: ${activeAlerts.length} active alerts, ${prices.length} prices available');
     }
 
-    // 6. Update home screen widget with latest favorite prices
+    // 6. Update home screen widgets with latest favorite prices
     await HomeWidgetService.updateWidget(storage);
+    await HomeWidgetService.updateNearestWidget(storage, storage);
   } catch (e) {
     debugPrint('BackgroundService: task failed: $e');
   } finally {

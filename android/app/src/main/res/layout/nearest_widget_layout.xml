@@ -5,9 +5,9 @@
     android:orientation="vertical"
     android:padding="8dp"
     android:background="@drawable/widget_background"
-    android:id="@+id/widget_root">
+    android:id="@+id/nearest_widget_root">
 
-    <!-- Header row: app name + last update -->
+    <!-- Header row: title + last update -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,13 +19,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/widget_name"
+            android:text="@string/nearest_widget_name"
             android:textSize="13sp"
             android:textStyle="bold"
             android:textColor="?android:attr/textColorPrimary" />
 
         <TextView
-            android:id="@+id/widget_updated_at"
+            android:id="@+id/nearest_updated_at"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
@@ -35,17 +35,17 @@
 
     <!-- Station list (up to 3 visible) -->
     <LinearLayout
-        android:id="@+id/station_list"
+        android:id="@+id/nearest_station_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" />
 
     <!-- Empty state -->
     <TextView
-        android:id="@+id/widget_empty"
+        android:id="@+id/nearest_empty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/widget_empty"
+        android:text="@string/nearest_widget_empty"
         android:textSize="12sp"
         android:textColor="?android:attr/textColorSecondary"
         android:gravity="center"

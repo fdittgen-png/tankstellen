@@ -44,6 +44,19 @@
                 android:resource="@xml/fuel_widget_info" />
         </receiver>
 
+        <!-- Home screen widget: nearest stations with prices and distance -->
+        <receiver
+            android:name=".NearestWidgetProvider"
+            android:exported="true"
+            android:permission="android.permission.BIND_APPWIDGET">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/nearest_widget_info" />
+        </receiver>
+
         <!-- Android Auto car app service -->
         <!-- exported=true required: Android Auto host binds via this intent-filter.
              Permission restricts binding to holders of FOREGROUND_SERVICE permission. -->
