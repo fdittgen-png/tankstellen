@@ -12,6 +12,7 @@ import '../../../search/domain/entities/station.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/presentation/widgets/station_card.dart';
+import '../../../profile/providers/profile_provider.dart';
 import '../../providers/favorites_provider.dart';
 import '../widgets/alerts_tab.dart';
 import '../widgets/favorites_loading_view.dart';
@@ -199,6 +200,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                         station: station,
                         selectedFuelType: FuelType.all,
                         isFavorite: true,
+                        profileFuelType: ref.watch(activeProfileProvider)?.preferredFuelType,
                         onTap: () => context.push('/station/${station.id}'),
                         onFavoriteTap: () {
                           ref

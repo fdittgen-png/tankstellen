@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/theme/dark_mode_colors.dart';
+import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/core/utils/price_tier.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
@@ -359,6 +360,137 @@ void main() {
       await tester.pump();
 
       expect(favTapped, isTrue);
+    });
+
+    group('profile fuel highlight in all-fuels view', () {
+      testWidgets('shows all three price rows when FuelType.all selected',
+          (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.all,
+          ),
+        );
+
+        expect(find.text('E5: '), findsOneWidget);
+        expect(find.text('E10: '), findsOneWidget);
+        expect(find.text('Diesel: '), findsOneWidget);
+      });
+
+      testWidgets(
+          'profile fuel row has larger dot when profileFuelType matches',
+          (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.all,
+            profileFuelType: FuelType.e10,
+          ),
+        );
+
+        // The E10 row should have a larger dot (8px) while others have 6px
+        final containers = find.byWidgetPredicate((widget) {
+          if (widget is Container && widget.decoration is BoxDecoration) {
+            final decoration = widget.decoration as BoxDecoration;
+            final constraints = widget.constraints;
+            return decoration.shape == BoxShape.circle &&
+                constraints != null &&
+                constraints.maxWidth == 8.0 &&
+                constraints.maxHeight == 8.0;
+          }
+          return false;
+        });
+        // One 8px dot for the highlighted E10 row
+        expect(containers, findsOneWidget);
+      });
+
+      testWidgets(
+          'profile fuel row label uses fuel-type color',
+          (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.all,
+            profileFuelType: FuelType.diesel,
+          ),
+        );
+
+        // The Diesel label should use the diesel fuel color
+        final dieselColor = FuelColors.forType(FuelType.diesel);
+        final dieselLabel = find.text('Diesel: ');
+        expect(dieselLabel, findsOneWidget);
+
+        final textWidget = tester.widget<Text>(dieselLabel);
+        expect(textWidget.style?.color, dieselColor);
+      });
+
+      testWidgets(
+          'non-profile fuel rows do not use fuel-type label color',
+          (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.all,
+            profileFuelType: FuelType.diesel,
+          ),
+        );
+
+        // E5 label should NOT have the E5 fuel-type color
+        final e5Label = find.text('E5: ');
+        expect(e5Label, findsOneWidget);
+
+        final e5Text = tester.widget<Text>(e5Label);
+        final e5FuelColor = FuelColors.forType(FuelType.e5);
+        expect(e5Text.style?.color, isNot(equals(e5FuelColor)));
+      });
+
+      testWidgets(
+          'no highlight when profileFuelType is null',
+          (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.all,
+            // profileFuelType defaults to null
+          ),
+        );
+
+        // All dots should be 6px (no 8px highlighted dots)
+        final largeDots = find.byWidgetPredicate((widget) {
+          if (widget is Container && widget.decoration is BoxDecoration) {
+            final decoration = widget.decoration as BoxDecoration;
+            final constraints = widget.constraints;
+            return decoration.shape == BoxShape.circle &&
+                constraints != null &&
+                constraints.maxWidth == 8.0;
+          }
+          return false;
+        });
+        expect(largeDots, findsNothing);
+      });
+
+      testWidgets(
+          'no price rows when single fuel type selected (not all)',
+          (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.e10,
+            profileFuelType: FuelType.e10,
+          ),
+        );
+
+        // Should not show the all-fuels price rows
+        expect(find.text('E5: '), findsNothing);
+        expect(find.text('E10: '), findsNothing);
+        expect(find.text('Diesel: '), findsNothing);
+      });
     });
   });
 }

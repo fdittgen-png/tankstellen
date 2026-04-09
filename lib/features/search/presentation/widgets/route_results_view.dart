@@ -15,6 +15,7 @@ import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_result_item.dart';
 import '../../providers/ignored_stations_provider.dart';
 import '../../providers/search_provider.dart';
+import '../../../profile/providers/profile_provider.dart';
 import 'ev_station_card.dart';
 import 'mode_chip.dart';
 import 'station_card.dart';
@@ -225,6 +226,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
         station: item.station,
         selectedFuelType: fuelType,
         isFavorite: ref.watch(isFavoriteProvider(item.id)),
+        profileFuelType: ref.watch(activeProfileProvider)?.preferredFuelType,
         onTap: () => context.push('/station/${item.id}'),
         onFavoriteTap: () => ref.read(favoritesProvider.notifier)
             .toggle(item.id, stationData: item.station),

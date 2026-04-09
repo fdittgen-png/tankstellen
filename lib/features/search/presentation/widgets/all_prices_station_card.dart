@@ -17,6 +17,11 @@ class AllPricesStationCard extends StatelessWidget {
   final bool isFavorite;
   final Map<FuelType, bool> cheapestFlags;
 
+  /// The user's preferred fuel type from their profile.
+  /// When provided, the matching fuel badge is rendered larger and with a
+  /// thicker border to make it visually dominant.
+  final FuelType? profileFuelType;
+
   const AllPricesStationCard({
     super.key,
     required this.station,
@@ -24,6 +29,7 @@ class AllPricesStationCard extends StatelessWidget {
     this.onFavoriteTap,
     this.isFavorite = false,
     this.cheapestFlags = const {},
+    this.profileFuelType,
   });
 
   bool get _hasBrand =>
@@ -177,6 +183,8 @@ class AllPricesStationCard extends StatelessWidget {
         fuelType: fuelType,
         isUnavailable: isUnavailable,
         isCheapest: cheapestFlags[fuelType] ?? false,
+        isProfileFuel: profileFuelType != null &&
+            profileFuelType!.apiValue == fuelType.apiValue,
       ));
     }
 
@@ -191,12 +199,17 @@ class _FuelBadge extends StatelessWidget {
   final bool isUnavailable;
   final bool isCheapest;
 
+  /// When true, this badge is the user's preferred fuel type and should be
+  /// rendered larger with a thicker border to stand out.
+  final bool isProfileFuel;
+
   const _FuelBadge({
     required this.label,
     required this.price,
     required this.fuelType,
     this.isUnavailable = false,
     this.isCheapest = false,
+    this.isProfileFuel = false,
   });
 
   @override
@@ -205,13 +218,27 @@ class _FuelBadge extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final color = FuelColors.forType(fuelType);
 
+    final isHighlighted = isProfileFuel && !isUnavailable;
+
     final borderColor = isCheapest ? Colors.green : color;
     final bgColor = isCheapest
         ? Colors.green.withValues(alpha: 0.1)
-        : FuelColors.forTypeLight(fuelType);
+        : isHighlighted
+            ? FuelColors.forType(fuelType).withValues(alpha: 0.22)
+            : FuelColors.forTypeLight(fuelType);
+
+    final borderWidth = isCheapest ? 1.5 : (isHighlighted ? 1.5 : 0.5);
+    final labelFontSize = isHighlighted ? 11.0 : 10.0;
+    final priceFontSize = isHighlighted ? 13.0 : 11.0;
+    final dotSize = isHighlighted ? 8.0 : 6.0;
+    final verticalPadding = isHighlighted ? 5.0 : 4.0;
+    final horizontalPadding = isHighlighted ? 10.0 : 8.0;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        vertical: verticalPadding,
+      ),
       decoration: BoxDecoration(
         color: isUnavailable
             ? theme.colorScheme.surfaceContainerHighest
@@ -221,15 +248,15 @@ class _FuelBadge extends StatelessWidget {
           color: isUnavailable
               ? theme.colorScheme.outlineVariant
               : borderColor,
-          width: isCheapest ? 1.5 : 0.5,
+          width: borderWidth,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 6,
-            height: 6,
+            width: dotSize,
+            height: dotSize,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isUnavailable
@@ -241,8 +268,8 @@ class _FuelBadge extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
+              fontSize: labelFontSize,
+              fontWeight: isHighlighted ? FontWeight.bold : FontWeight.w600,
               color: isUnavailable
                   ? theme.colorScheme.onSurfaceVariant
                   : color,
@@ -254,11 +281,13 @@ class _FuelBadge extends StatelessWidget {
                 ? (l10n?.outOfStock ?? 'Out of stock')
                 : PriceFormatter.formatPriceCompact(price),
             style: TextStyle(
-              fontSize: 11,
+              fontSize: priceFontSize,
               fontWeight: FontWeight.bold,
               color: isUnavailable
                   ? theme.colorScheme.onSurfaceVariant
-                  : theme.colorScheme.onSurface,
+                  : isHighlighted
+                      ? color
+                      : theme.colorScheme.onSurface,
             ),
           ),
         ],

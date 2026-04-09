@@ -26,6 +26,12 @@ class StationCard extends StatelessWidget {
   /// When provided, small star icons are shown above the price area.
   final int? rating;
 
+  /// The user's preferred fuel type from their profile.
+  /// When [selectedFuelType] is [FuelType.all], the matching price row
+  /// is rendered larger and with the fuel-type color to make it visually
+  /// dominant.
+  final FuelType? profileFuelType;
+
   const StationCard({
     super.key,
     required this.station,
@@ -36,6 +42,7 @@ class StationCard extends StatelessWidget {
     this.isCheapest = false,
     this.priceTier,
     this.rating,
+    this.profileFuelType,
   });
 
   /// True if the station has a real brand name (not empty, not generic "Station")
@@ -275,16 +282,19 @@ class StationCard extends StatelessWidget {
                         label: 'E5',
                         price: station.e5,
                         fuelType: FuelType.e5,
+                        isProfileFuel: profileFuelType is FuelTypeE5,
                       ),
                       _PriceRow(
                         label: 'E10',
                         price: station.e10,
                         fuelType: FuelType.e10,
+                        isProfileFuel: profileFuelType is FuelTypeE10,
                       ),
                       _PriceRow(
                         label: 'Diesel',
                         price: station.diesel,
                         fuelType: FuelType.diesel,
+                        isProfileFuel: profileFuelType is FuelTypeDiesel,
                       ),
                     ],
                   ],
@@ -324,34 +334,53 @@ class _PriceRow extends StatelessWidget {
   final double? price;
   final FuelType fuelType;
 
+  /// When true, this row is the user's preferred fuel type and should be
+  /// rendered larger with the fuel-type color to stand out.
+  final bool isProfileFuel;
+
   const _PriceRow({
     required this.label,
     required this.price,
     required this.fuelType,
+    this.isProfileFuel = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final fuelColor = FuelColors.forType(fuelType);
     final color = price != null
-        ? FuelColors.forType(fuelType)
-        : Theme.of(context).colorScheme.onSurfaceVariant;
+        ? fuelColor
+        : theme.colorScheme.onSurfaceVariant;
+
+    final dotSize = isProfileFuel ? 8.0 : 6.0;
+    final fontSize = isProfileFuel ? 12.0 : null; // null = labelSmall default
+    final fontWeight = isProfileFuel ? FontWeight.bold : FontWeight.w600;
+    final labelWeight = isProfileFuel ? FontWeight.w600 : FontWeight.normal;
+    final labelColor = isProfileFuel ? fuelColor : null;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 6,
-          height: 6,
+          width: dotSize,
+          height: dotSize,
           margin: const EdgeInsets.only(right: 4),
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         Text(
           '$label: ',
-          style: Theme.of(context).textTheme.labelSmall,
+          style: theme.textTheme.labelSmall?.copyWith(
+            fontSize: fontSize,
+            fontWeight: labelWeight,
+            color: labelColor,
+          ),
         ),
         Text(
           PriceFormatter.formatPriceCompact(price),
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.w600,
+          style: theme.textTheme.labelSmall?.copyWith(
+                fontSize: fontSize,
+                fontWeight: fontWeight,
                 color: color,
               ),
         ),

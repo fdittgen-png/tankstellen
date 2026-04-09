@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/all_prices_station_card.dart';
@@ -237,6 +238,157 @@ void main() {
       );
 
       expect(find.text('Rue de la Gare'), findsOneWidget);
+    });
+
+    group('profile fuel highlight', () {
+      testWidgets('profile fuel badge has larger dot', (tester) async {
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(
+            station: testStation,
+            profileFuelType: FuelType.e10,
+          ),
+        );
+
+        // The highlighted E10 badge should have an 8px dot
+        final largeDots = find.byWidgetPredicate((widget) {
+          if (widget is Container && widget.decoration is BoxDecoration) {
+            final decoration = widget.decoration as BoxDecoration;
+            final constraints = widget.constraints;
+            return decoration.shape == BoxShape.circle &&
+                constraints != null &&
+                constraints.maxWidth == 8.0 &&
+                constraints.maxHeight == 8.0;
+          }
+          return false;
+        });
+        expect(largeDots, findsOneWidget);
+      });
+
+      testWidgets('profile fuel badge price uses fuel-type color',
+          (tester) async {
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(
+            station: testStation,
+            profileFuelType: FuelType.diesel,
+          ),
+        );
+
+        // Find the diesel price text and check it uses the diesel color
+        final dieselColor = FuelColors.forType(FuelType.diesel);
+        // The price for diesel is 1.659 -> compact format
+        // Check that the Diesel label text has bold fontWeight
+        final dieselLabels = find.text('Diesel');
+        expect(dieselLabels, findsOneWidget);
+
+        final labelWidget = tester.widget<Text>(dieselLabels);
+        expect(labelWidget.style?.fontWeight, FontWeight.bold);
+        expect(labelWidget.style?.color, dieselColor);
+      });
+
+      testWidgets('non-profile fuel badges remain at default size',
+          (tester) async {
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(
+            station: testStation,
+            profileFuelType: FuelType.diesel,
+          ),
+        );
+
+        // E5 and E10 labels should have w600 weight (not bold)
+        final e5Label = find.text('E5');
+        expect(e5Label, findsOneWidget);
+
+        final e5Text = tester.widget<Text>(e5Label);
+        expect(e5Text.style?.fontWeight, FontWeight.w600);
+        expect(e5Text.style?.fontSize, 10.0);
+      });
+
+      testWidgets('no highlight when profileFuelType is null',
+          (tester) async {
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(station: testStation),
+        );
+
+        // All dots should be 6px (default size)
+        final largeDots = find.byWidgetPredicate((widget) {
+          if (widget is Container && widget.decoration is BoxDecoration) {
+            final decoration = widget.decoration as BoxDecoration;
+            final constraints = widget.constraints;
+            return decoration.shape == BoxShape.circle &&
+                constraints != null &&
+                constraints.maxWidth == 8.0;
+          }
+          return false;
+        });
+        expect(largeDots, findsNothing);
+      });
+
+      testWidgets(
+          'profile fuel badge has thicker border',
+          (tester) async {
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(
+            station: testStation,
+            profileFuelType: FuelType.e10,
+          ),
+        );
+
+        // Find containers with 1.5 border width (highlighted badge)
+        final highlightedBadges = find.byWidgetPredicate((widget) {
+          if (widget is Container && widget.decoration is BoxDecoration) {
+            final decoration = widget.decoration as BoxDecoration;
+            if (decoration.border is Border) {
+              final border = decoration.border as Border;
+              return border.top.width == 1.5 &&
+                  decoration.borderRadius != null;
+            }
+          }
+          return false;
+        });
+        // At least one badge with thick border (the profile fuel)
+        expect(highlightedBadges, findsWidgets);
+      });
+
+      testWidgets(
+          'unavailable fuel is not highlighted even when it matches profile',
+          (tester) async {
+        const stationWithUnavailable = Station(
+          id: 'test-unavail',
+          name: 'Test Station',
+          brand: 'TEST',
+          street: 'Test Str.',
+          postCode: '12345',
+          place: 'Berlin',
+          lat: 52.52,
+          lng: 13.40,
+          e5: 1.859,
+          diesel: 1.659,
+          isOpen: true,
+          unavailableFuels: ['e10'],
+        );
+
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(
+            station: stationWithUnavailable,
+            profileFuelType: FuelType.e10,
+          ),
+        );
+
+        // E10 badge should exist but show "Out of stock", not highlighted
+        expect(find.text('Out of stock'), findsOneWidget);
+
+        // The E10 label should NOT have bold weight (unavailable overrides highlight)
+        final e10Label = find.text('E10');
+        expect(e10Label, findsOneWidget);
+        final e10Text = tester.widget<Text>(e10Label);
+        expect(e10Text.style?.fontWeight, FontWeight.w600);
+      });
     });
   });
 }
