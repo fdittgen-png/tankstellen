@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/service_result.dart';
-import '../../../../core/services/widgets/freshness_badge.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/brand_logo.dart';
@@ -16,6 +15,7 @@ import '../../../favorites/providers/favorites_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../../core/utils/navigation_utils.dart';
+import '../../../search/providers/station_rating_provider.dart';
 import '../../providers/station_detail_provider.dart';
 import '../widgets/price_history_section.dart';
 import '../widgets/price_tile.dart';
@@ -111,42 +111,57 @@ class StationDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Open/closed status + freshness badge
-          Semantics(
-            label: 'Station is ${station.isOpen ? 'open' : 'closed'}',
-            child: Row(
-              children: [
-                ExcludeSemantics(
-                  child: Container(
-                    width: 16, height: 16,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: station.isOpen
-                          ? DarkModeColors.success(context)
-                          : DarkModeColors.error(context),
-                    ),
+          // Open/closed status + freshness inline + rating stars (top-right)
+          Row(
+            children: [
+              Expanded(
+                child: Semantics(
+                  label: 'Station is ${station.isOpen ? 'open' : 'closed'}',
+                  child: Row(
+                    children: [
+                      ExcludeSemantics(
+                        child: Container(
+                          width: 12, height: 12,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: station.isOpen
+                                ? DarkModeColors.success(context)
+                                : DarkModeColors.error(context),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      ExcludeSemantics(
+                        child: Text(
+                          _buildStatusText(station, serviceResult, l10n),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: station.isOpen
+                                ? DarkModeColors.success(context)
+                                : DarkModeColors.error(context),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                ExcludeSemantics(
-                  child: Text(
-                    station.isOpen
-                        ? (l10n?.open ?? 'Open')
-                        : (l10n?.closed ?? 'Closed'),
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: station.isOpen
-                          ? DarkModeColors.success(context)
-                          : DarkModeColors.error(context),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                FreshnessBadge(result: serviceResult),
-              ],
-            ),
+              ),
+              // Compact rating stars (top-right)
+              Consumer(builder: (context, ref, _) {
+                final rating = ref.watch(stationRatingProvider(stationId));
+                if (rating == null) return const SizedBox.shrink();
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(5, (i) => Icon(
+                    i < rating ? Icons.star : Icons.star_border,
+                    size: 16,
+                    color: i < rating ? Colors.amber : Colors.grey.shade400,
+                  )),
+                );
+              }),
+            ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           // Brand logo + Name
           Semantics(
@@ -181,14 +196,14 @@ class StationDetailScreen extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
-          // Prices
+          // Prices (compact)
           Semantics(
             header: true,
             child: Text(l10n?.prices ?? 'Prices', style: theme.textTheme.titleMedium),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           PriceTile(label: 'Super E5', price: station.e5, fuelType: FuelType.e5),
           PriceTile(label: 'Super E10', price: station.e10, fuelType: FuelType.e10),
           PriceTile(label: 'Diesel', price: station.diesel, fuelType: FuelType.diesel),
@@ -196,12 +211,12 @@ class StationDetailScreen extends ConsumerWidget {
           if (station.e85 != null) PriceTile(label: 'E85', price: station.e85, fuelType: FuelType.e85),
           if (station.lpg != null) PriceTile(label: 'LPG', price: station.lpg, fuelType: FuelType.lpg),
           if (station.cng != null) PriceTile(label: 'CNG', price: station.cng, fuelType: FuelType.cng),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
-          // Address, opening hours, fuels, services, location
+          // Address, opening hours, fuels, location (services moved to bottom)
           StationInfoSection(station: station, detail: detail),
 
-          // Rating
+          // Rating (interactive)
           const SizedBox(height: 16),
           StationRatingSection(stationId: stationId),
 
@@ -216,6 +231,20 @@ class StationDetailScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  /// Builds status text combining open/closed with freshness, e.g. "Open — < 1 min ago".
+  String _buildStatusText(
+    Station station,
+    ServiceResult<StationDetail> result,
+    AppLocalizations? l10n,
+  ) {
+    final status = station.isOpen
+        ? (l10n?.open ?? 'Open')
+        : (l10n?.closed ?? 'Closed');
+    final agoSuffix = l10n?.freshnessAgo ?? 'ago';
+    final freshness = result.freshnessLabel;
+    return '$status — $freshness $agoSuffix';
   }
 
   Future<void> _showCreateAlertDialog(BuildContext context, WidgetRef ref) async {

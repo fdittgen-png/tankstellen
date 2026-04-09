@@ -20,16 +20,21 @@ class PriceTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = price != null ? FuelColors.forType(fuelType) : Colors.grey;
-    return ListTile(
-      dense: true,
-      leading: Icon(Icons.local_gas_station, color: color),
-      title: Text(label),
-      trailing: Text(
-        PriceFormatter.formatPrice(price),
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(Icons.local_gas_station, color: color, size: 20),
+          const SizedBox(width: 8),
+          Expanded(child: Text(label, style: Theme.of(context).textTheme.bodyMedium)),
+          Text(
+            PriceFormatter.formatPrice(price),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+          ),
+        ],
       ),
     );
   }

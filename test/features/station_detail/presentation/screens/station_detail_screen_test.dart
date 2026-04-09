@@ -88,7 +88,7 @@ void main() {
       expect(find.text('Diesel'), findsOneWidget);
     });
 
-    testWidgets('shows open status indicator for open station',
+    testWidgets('shows open status with freshness inline',
         (tester) async {
       final result = ServiceResult(
         data: const StationDetail(station: testStation), // isOpen: true
@@ -111,8 +111,73 @@ void main() {
         ],
       );
 
-      // testStation.isOpen is true, so "Open" text should appear
-      expect(find.text('Open'), findsOneWidget);
+      // Status text should contain "Open" combined with freshness
+      // e.g. "Open — < 1 min ago"
+      expect(find.textContaining('Open'), findsAtLeast(1));
+      expect(find.textContaining('ago'), findsAtLeast(1));
+    });
+
+    testWidgets('does not render separate FreshnessBadge widget',
+        (tester) async {
+      final result = ServiceResult(
+        data: const StationDetail(station: testStation),
+        source: ServiceSource.cache,
+        fetchedAt: DateTime.now(),
+      );
+
+      await pumpApp(
+        tester,
+        const StationDetailScreen(
+          stationId: '51d4b477-a095-1aa0-e100-80009459e03a',
+        ),
+        overrides: [
+          ...commonOverrides,
+          stationDetailProvider('51d4b477-a095-1aa0-e100-80009459e03a')
+              .overrideWith((_) async => result),
+          favoritesOverride([]),
+          isFavoriteOverride(
+              '51d4b477-a095-1aa0-e100-80009459e03a', false),
+        ],
+      );
+
+      // FreshnessBadge widget should no longer be used
+      // (freshness is inline in status text now)
+      expect(
+        find.byWidgetPredicate((w) => w.runtimeType.toString() == 'FreshnessBadge'),
+        findsNothing,
+      );
+    });
+
+    testWidgets('shows rating stars when station has a rating',
+        (tester) async {
+      when(() => mockStorage.getRating(any())).thenReturn(4);
+      when(() => mockStorage.getRatings())
+          .thenReturn({'51d4b477-a095-1aa0-e100-80009459e03a': 4});
+
+      final result = ServiceResult(
+        data: const StationDetail(station: testStation),
+        source: ServiceSource.cache,
+        fetchedAt: DateTime.now(),
+      );
+
+      await pumpApp(
+        tester,
+        const StationDetailScreen(
+          stationId: '51d4b477-a095-1aa0-e100-80009459e03a',
+        ),
+        overrides: [
+          ...commonOverrides,
+          stationDetailProvider('51d4b477-a095-1aa0-e100-80009459e03a')
+              .overrideWith((_) async => result),
+          favoritesOverride([]),
+          isFavoriteOverride(
+              '51d4b477-a095-1aa0-e100-80009459e03a', false),
+        ],
+      );
+
+      // Compact star icons should be in the top-right area
+      // (16px stars from the inline Consumer)
+      expect(find.byIcon(Icons.star), findsWidgets);
     });
 
     testWidgets('renders favorite button in app bar (not favorited)',
@@ -139,7 +204,6 @@ void main() {
       );
 
       // Star icon should be present in the app bar actions
-      // (star_border when not favorited, star when favorited)
       expect(find.byIcon(Icons.star_border).evaluate().isNotEmpty ||
              find.byIcon(Icons.star).evaluate().isNotEmpty, isTrue);
     });
@@ -168,7 +232,7 @@ void main() {
       );
 
       // Should have filled star (favorited)
-      expect(find.byIcon(Icons.star), findsOneWidget);
+      expect(find.byIcon(Icons.star), findsWidgets);
     });
 
     testWidgets('renders address information', (tester) async {
