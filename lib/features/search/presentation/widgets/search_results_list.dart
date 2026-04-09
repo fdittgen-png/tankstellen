@@ -229,11 +229,14 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
                     priceRange.$2,
                   );
 
+                  final stationRating = ref.watch(stationRatingProvider(station.id));
+
                   return SwipeableStationCard(
                     key: ValueKey('station-${station.id}'),
                     station: station,
                     isFavorite: isFav,
                     priceTier: tier,
+                    rating: stationRating,
                     onNavigate: () => _openStationInMaps(station),
                     onIgnore: () {
                       ref.read(ignoredStationsProvider.notifier).add(station.id);
