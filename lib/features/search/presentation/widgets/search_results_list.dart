@@ -18,6 +18,7 @@ import '../../providers/search_provider.dart';
 import '../../providers/brand_filter_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
 import '../../providers/station_rating_provider.dart';
+import '../../../profile/providers/profile_provider.dart';
 import 'all_prices_station_card.dart';
 import 'brand_filter_chips.dart';
 import 'cross_border_banner.dart';
@@ -203,6 +204,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
               // Compute price range for tier icons (a11y)
               final fuelType = ref.watch(selectedFuelTypeProvider);
               final priceRange = _getPriceRange(sorted, fuelType);
+              final profileFuel = ref.watch(activeProfileProvider)?.preferredFuelType;
 
               return ListView.builder(
                 itemCount: sorted.length,
@@ -216,6 +218,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
                       station: station,
                       isFavorite: isFav,
                       cheapestFlags: cheapestMap[station.id] ?? const {},
+                      profileFuelType: profileFuel,
                       onTap: () => context.push('/station/${station.id}'),
                       onFavoriteTap: () => ref
                           .read(favoritesProvider.notifier)
@@ -237,6 +240,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
                     isFavorite: isFav,
                     priceTier: tier,
                     rating: stationRating,
+                    profileFuelType: profileFuel,
                     onNavigate: () => _openStationInMaps(station),
                     onIgnore: () {
                       ref.read(ignoredStationsProvider.notifier).add(station.id);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/station.dart';
 import '../../providers/search_provider.dart';
 import 'station_card.dart';
@@ -19,6 +20,9 @@ class SwipeableStationCard extends ConsumerWidget {
   final PriceTier? priceTier;
   final int? rating;
 
+  /// The user's preferred fuel type from their profile.
+  final FuelType? profileFuelType;
+
   const SwipeableStationCard({
     super.key,
     required this.station,
@@ -29,6 +33,7 @@ class SwipeableStationCard extends ConsumerWidget {
     required this.onFavoriteTap,
     this.priceTier,
     this.rating,
+    this.profileFuelType,
   });
 
   @override
@@ -85,6 +90,7 @@ class SwipeableStationCard extends ConsumerWidget {
         onFavoriteTap: onFavoriteTap,
         priceTier: priceTier,
         rating: rating,
+        profileFuelType: profileFuelType,
       ),
     );
   }
