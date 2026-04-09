@@ -51,7 +51,7 @@ class NearbySearchControls extends ConsumerWidget {
         // Collapsible filters: fuel type + radius
         AnimatedCrossFade(
           firstChild: Padding(
-            padding: EdgeInsets.only(top: isLandscape ? 4 : 10),
+            padding: EdgeInsets.only(top: isLandscape ? 2 : 6),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

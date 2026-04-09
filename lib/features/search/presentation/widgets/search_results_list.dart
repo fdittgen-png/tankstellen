@@ -172,7 +172,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
           selected: _sortMode,
           onChanged: (mode) => setState(() => _sortMode = mode),
         ),
-        BrandFilterChips(
+        _CollapsibleBrandFilters(
           stations: result.data
               .where((s) => !ignoredIds.contains(s.id))
               .toList(),
@@ -259,6 +259,79 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
               );
             }),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Collapsible section that wraps [BrandFilterChips] inside an expandable
+/// toggle. When collapsed, only a "Brands" label with a chevron is shown.
+class _CollapsibleBrandFilters extends ConsumerWidget {
+  final List<Station> stations;
+
+  const _CollapsibleBrandFilters({required this.stations});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final expanded = ref.watch(brandFiltersExpandedProvider);
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final selectedBrands = ref.watch(selectedBrandsProvider);
+    final excludeHighway = ref.watch(excludeHighwayStationsProvider);
+    final hasActiveFilters =
+        selectedBrands.isNotEmpty || excludeHighway;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        InkWell(
+          onTap: () =>
+              ref.read(brandFiltersExpandedProvider.notifier).toggle(),
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Row(
+              children: [
+                Icon(Icons.filter_list, size: 16,
+                    color: theme.colorScheme.primary),
+                const SizedBox(width: 6),
+                Text(
+                  l10n?.brandFilterAll ?? 'Brands',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+                if (hasActiveFilters) ...[
+                  const SizedBox(width: 4),
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
+                const Spacer(),
+                Icon(
+                  expanded
+                      ? Icons.expand_less
+                      : Icons.expand_more,
+                  size: 18,
+                  color: theme.colorScheme.primary,
+                ),
+              ],
+            ),
+          ),
+        ),
+        AnimatedCrossFade(
+          firstChild: BrandFilterChips(stations: stations),
+          secondChild: const SizedBox.shrink(),
+          crossFadeState: expanded
+              ? CrossFadeState.showFirst
+              : CrossFadeState.showSecond,
+          duration: const Duration(milliseconds: 200),
         ),
       ],
     );

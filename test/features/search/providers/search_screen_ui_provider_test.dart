@@ -99,6 +99,43 @@ void main() {
     });
   });
 
+  group('BrandFiltersExpanded', () {
+    test('defaults to false', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      expect(container.read(brandFiltersExpandedProvider), isFalse);
+    });
+
+    test('set(true) expands brand filters', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      container.read(brandFiltersExpandedProvider.notifier).set(true);
+      expect(container.read(brandFiltersExpandedProvider), isTrue);
+    });
+
+    test('toggle() flips state', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      expect(container.read(brandFiltersExpandedProvider), isFalse);
+      container.read(brandFiltersExpandedProvider.notifier).toggle();
+      expect(container.read(brandFiltersExpandedProvider), isTrue);
+      container.read(brandFiltersExpandedProvider.notifier).toggle();
+      expect(container.read(brandFiltersExpandedProvider), isFalse);
+    });
+
+    test('set(false) collapses after expansion', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      container.read(brandFiltersExpandedProvider.notifier).set(true);
+      container.read(brandFiltersExpandedProvider.notifier).set(false);
+      expect(container.read(brandFiltersExpandedProvider), isFalse);
+    });
+  });
+
   group('AllPricesViewEnabled', () {
     test('defaults to false', () {
       final container = ProviderContainer();

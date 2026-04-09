@@ -137,50 +137,67 @@ class _LocationInputState extends ConsumerState<LocationInput> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        TextField(
-          controller: _controller,
-          focusNode: _focusNode,
-          decoration: InputDecoration(
-            hintText: _hintText(country),
-            labelText: 'Location search field',
-            floatingLabelBehavior: FloatingLabelBehavior.never,
-            prefixIcon: Icon(_prefixIcon),
-            border: const OutlineInputBorder(),
-            suffixIcon: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (_isSearching)
-                  const Padding(
-                    padding: EdgeInsets.all(12),
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+        SizedBox(
+          height: 40,
+          child: TextField(
+            controller: _controller,
+            focusNode: _focusNode,
+            style: const TextStyle(fontSize: 14),
+            decoration: InputDecoration(
+              hintText: _hintText(country),
+              labelText: 'Location search field',
+              floatingLabelBehavior: FloatingLabelBehavior.never,
+              isDense: true,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              prefixIcon: Icon(_prefixIcon, size: 20),
+              prefixIconConstraints:
+                  const BoxConstraints(minWidth: 36, minHeight: 36),
+              border: const OutlineInputBorder(),
+              suffixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_isSearching)
+                    const Padding(
+                      padding: EdgeInsets.all(8),
+                      child: SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     ),
-                  ),
-                if (_controller.text.isNotEmpty)
+                  if (_controller.text.isNotEmpty)
+                    IconButton(
+                      icon: const Icon(Icons.clear, size: 18),
+                      tooltip: 'Clear search input',
+                      padding: const EdgeInsets.all(4),
+                      constraints:
+                          const BoxConstraints(minWidth: 32, minHeight: 32),
+                      onPressed: () {
+                        _controller.clear();
+                        _onChanged('');
+                      },
+                    ),
                   IconButton(
-                    icon: const Icon(Icons.clear, size: 20),
-                    tooltip: 'Clear search input',
+                    icon: const Icon(Icons.my_location, size: 18),
+                    tooltip: 'Use GPS location',
+                    padding: const EdgeInsets.all(4),
+                    constraints:
+                        const BoxConstraints(minWidth: 32, minHeight: 32),
                     onPressed: () {
                       _controller.clear();
                       _onChanged('');
+                      widget.onGpsSearch();
                     },
                   ),
-                IconButton(
-                  icon: const Icon(Icons.my_location),
-                  tooltip: 'Use GPS location',
-                  onPressed: () {
-                    _controller.clear();
-                    _onChanged('');
-                    widget.onGpsSearch();
-                  },
-                ),
-              ],
+                ],
+              ),
+              suffixIconConstraints:
+                  const BoxConstraints(minWidth: 36, minHeight: 36),
             ),
+            onChanged: _onChanged,
+            onSubmitted: (_) => _submit(),
           ),
-          onChanged: _onChanged,
-          onSubmitted: (_) => _submit(),
         ),
         // City suggestions dropdown
         if (_suggestions.isNotEmpty)

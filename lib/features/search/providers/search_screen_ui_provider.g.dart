@@ -135,6 +135,69 @@ abstract class _$SelectedRouteStrategy
   }
 }
 
+/// Whether the brand filter chips section is expanded in the search results.
+/// Starts collapsed; the user can expand via an ExpansionTile-like toggle.
+
+@ProviderFor(BrandFiltersExpanded)
+final brandFiltersExpandedProvider = BrandFiltersExpandedProvider._();
+
+/// Whether the brand filter chips section is expanded in the search results.
+/// Starts collapsed; the user can expand via an ExpansionTile-like toggle.
+final class BrandFiltersExpandedProvider
+    extends $NotifierProvider<BrandFiltersExpanded, bool> {
+  /// Whether the brand filter chips section is expanded in the search results.
+  /// Starts collapsed; the user can expand via an ExpansionTile-like toggle.
+  BrandFiltersExpandedProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'brandFiltersExpandedProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$brandFiltersExpandedHash();
+
+  @$internal
+  @override
+  BrandFiltersExpanded create() => BrandFiltersExpanded();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$brandFiltersExpandedHash() =>
+    r'fdf2689d6ec5a84799675be08dcac31351532220';
+
+/// Whether the brand filter chips section is expanded in the search results.
+/// Starts collapsed; the user can expand via an ExpansionTile-like toggle.
+
+abstract class _$BrandFiltersExpanded extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
 /// Whether to show the all-prices detail view instead of the compact card view.
 
 @ProviderFor(AllPricesViewEnabled)

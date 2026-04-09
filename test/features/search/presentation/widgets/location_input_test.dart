@@ -107,6 +107,55 @@ void main() {
     });
   });
 
+  group('LocationInput compact height', () {
+    testWidgets('TextField is wrapped in a 40px SizedBox for compactness',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        LocationInput(
+          onGpsSearch: () {},
+          onZipSearch: (_) {},
+          onCitySearch: (_) {},
+        ),
+        overrides: test.overrides,
+      );
+
+      // Find the SizedBox that constrains the TextField height
+      final sizedBoxFinder = find.ancestor(
+        of: find.byType(TextField),
+        matching: find.byType(SizedBox),
+      );
+
+      // One of the SizedBox ancestors should have height 40
+      final sizedBoxes = tester.widgetList<SizedBox>(sizedBoxFinder);
+      final has40Height = sizedBoxes.any((sb) => sb.height == 40);
+      expect(has40Height, isTrue,
+          reason: 'TextField should be wrapped in SizedBox(height: 40)');
+    });
+
+    testWidgets('TextField uses isDense and compact contentPadding',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        LocationInput(
+          onGpsSearch: () {},
+          onZipSearch: (_) {},
+          onCitySearch: (_) {},
+        ),
+        overrides: test.overrides,
+      );
+
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(textField.decoration?.isDense, isTrue);
+    });
+  });
+
   group('LocationInput accessibility', () {
     testWidgets('TextField is not wrapped in nested Semantics(textField: true)',
         (tester) async {
