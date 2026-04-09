@@ -17,6 +17,7 @@ class SwipeableStationCard extends ConsumerWidget {
   final VoidCallback onTap;
   final VoidCallback onFavoriteTap;
   final PriceTier? priceTier;
+  final int? rating;
 
   const SwipeableStationCard({
     super.key,
@@ -27,6 +28,7 @@ class SwipeableStationCard extends ConsumerWidget {
     required this.onTap,
     required this.onFavoriteTap,
     this.priceTier,
+    this.rating,
   });
 
   @override
@@ -82,6 +84,7 @@ class SwipeableStationCard extends ConsumerWidget {
         onTap: onTap,
         onFavoriteTap: onFavoriteTap,
         priceTier: priceTier,
+        rating: rating,
       ),
     );
   }

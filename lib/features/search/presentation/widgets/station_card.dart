@@ -22,6 +22,10 @@ class StationCard extends StatelessWidget {
   /// so colorblind users can distinguish cheap/average/expensive.
   final PriceTier? priceTier;
 
+  /// Optional user rating (1-5) for this station.
+  /// When provided, small star icons are shown above the price area.
+  final int? rating;
+
   const StationCard({
     super.key,
     required this.station,
@@ -31,6 +35,7 @@ class StationCard extends StatelessWidget {
     this.isFavorite = false,
     this.isCheapest = false,
     this.priceTier,
+    this.rating,
   });
 
   /// True if the station has a real brand name (not empty, not generic "Station")
@@ -58,194 +63,260 @@ class StationCard extends StatelessWidget {
       label: semanticLabel,
       button: true,
       child: Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              left: BorderSide(
-                color: isCheapest ? DarkModeColors.success(context) : fuelColor,
-                width: isCheapest ? 6 : 4,
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                left: BorderSide(
+                  color: isCheapest
+                      ? DarkModeColors.success(context)
+                      : fuelColor,
+                  width: isCheapest ? 6 : 4,
+                ),
               ),
             ),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          child: Row(
-            children: [
-              // Status indicator + 24h badge
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: station.isOpen
-                          ? DarkModeColors.success(context)
-                          : DarkModeColors.error(context),
-                    ),
-                  ),
-                  if (station.is24h)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Text('24h',
-                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.primary)),
-                    ),
-                ],
-              ),
-              const SizedBox(width: 12),
-
-              // Station info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Status indicator + 24h badge
+                Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Title: brand if available, otherwise address
-                    Text(
-                      _hasBrand ? station.brand : station.street,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                    Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: station.isOpen
+                            ? DarkModeColors.success(context)
+                            : DarkModeColors.error(context),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 2),
-                    // Subtitle: address + city on one line if brand shown
-                    if (_hasBrand)
-                      Text(
-                        '${station.street}, ${station.postCode} ${station.place}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )
-                    else
-                      Text(
-                        '${station.postCode} ${station.place}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            PriceFormatter.formatDistance(station.dist),
-                            style: theme.textTheme.bodySmall,
-                            overflow: TextOverflow.ellipsis,
+                    if (station.is24h)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          '24h',
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.primary,
                           ),
                         ),
-                        if (station.updatedAt != null) ...[
-                          const SizedBox(width: 8),
-                          Icon(Icons.update, size: 12,
-                              color: theme.colorScheme.onSurfaceVariant),
-                          const SizedBox(width: 2),
+                      ),
+                  ],
+                ),
+                const SizedBox(width: 12),
+
+                // Station info (left side, takes remaining space)
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _hasBrand ? station.brand : station.street,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      if (_hasBrand)
+                        Text(
+                          '${station.street}, ${station.postCode} ${station.place}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      else
+                        Text(
+                          '${station.postCode} ${station.place}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
                           Flexible(
                             child: Text(
-                              station.updatedAt!,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                fontSize: 11,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
+                              PriceFormatter.formatDistance(station.dist),
+                              style: theme.textTheme.bodySmall,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                          if (station.updatedAt != null) ...[
+                            const SizedBox(width: 8),
+                            Icon(
+                              Icons.update,
+                              size: 12,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 2),
+                            Flexible(
+                              child: Text(
+                                station.updatedAt!,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  fontSize: 11,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
-                    ),
-                    if (station.amenities.isNotEmpty) ...[
-                      const SizedBox(height: 2),
-                      AmenityChips(amenities: station.amenities),
+                      ),
+                      if (station.amenities.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: AmenityChips(amenities: station.amenities),
+                        ),
                     ],
-                  ],
+                  ),
                 ),
-              ),
 
-              // Price — superscript 9/10ths cent (European standard)
-              Flexible(
-                child: Column(
+                const SizedBox(width: 8),
+
+                // Right side: rating + price + favorite (right-aligned)
+                Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
+                    // User rating stars (above price)
+                    if (rating != null && rating! >= 1 && rating! <= 5)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 2),
+                        child: _RatingStars(rating: rating!),
+                      ),
+                    // Price + favorite star on one row, right-aligned
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (priceTier != null && priceTier != PriceTier.unknown)
+                        if (priceTier != null &&
+                            priceTier != PriceTier.unknown)
                           Padding(
                             padding: const EdgeInsets.only(right: 2),
                             child: Icon(
                               iconForPriceTier(priceTier!),
                               size: 16,
                               color: station.isOpen
-                                  ? FuelColors.forType(selectedFuelType)
+                                  ? fuelColor
                                   : theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
-                        Flexible(
-                          child: RichText(
-                            overflow: TextOverflow.ellipsis,
-                            text: PriceFormatter.priceTextSpan(
-                              price,
-                              baseStyle: theme.textTheme.titleLarge!.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: station.isOpen
-                                    ? FuelColors.forType(selectedFuelType)
-                                    : theme.colorScheme.onSurfaceVariant,
-                              ),
+                        RichText(
+                          overflow: TextOverflow.ellipsis,
+                          text: PriceFormatter.priceTextSpan(
+                            price,
+                            baseStyle: theme.textTheme.titleLarge!.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: station.isOpen
+                                  ? fuelColor
+                                  : theme.colorScheme.onSurfaceVariant,
                             ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        // Favorite button — compact, no extra padding
+                        SizedBox(
+                          width: 32,
+                          height: 32,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            icon: Icon(
+                              isFavorite ? Icons.star : Icons.star_border,
+                              color: isFavorite ? Colors.amber : null,
+                              size: 22,
+                            ),
+                            onPressed: onFavoriteTap,
+                            tooltip: isFavorite
+                                ? 'Remove from favorites'
+                                : 'Add to favorites',
                           ),
                         ),
                       ],
                     ),
                     if (isCheapest)
                       Container(
-                        margin: const EdgeInsets.only(top: 4),
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                        margin: const EdgeInsets.only(top: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 1,
+                        ),
                         decoration: BoxDecoration(
                           color: DarkModeColors.successSurface(context),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text(AppLocalizations.of(context)?.cheapest ?? 'Cheapest',
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: DarkModeColors.success(context)),
+                        child: Text(
+                          AppLocalizations.of(context)?.cheapest ?? 'Cheapest',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: DarkModeColors.success(context),
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     if (selectedFuelType == FuelType.all && !isCheapest) ...[
                       const SizedBox(height: 2),
-                      _PriceRow(label: 'E5', price: station.e5, fuelType: FuelType.e5),
-                      _PriceRow(label: 'E10', price: station.e10, fuelType: FuelType.e10),
-                      _PriceRow(label: 'Diesel', price: station.diesel, fuelType: FuelType.diesel),
+                      _PriceRow(
+                        label: 'E5',
+                        price: station.e5,
+                        fuelType: FuelType.e5,
+                      ),
+                      _PriceRow(
+                        label: 'E10',
+                        price: station.e10,
+                        fuelType: FuelType.e10,
+                      ),
+                      _PriceRow(
+                        label: 'Diesel',
+                        price: station.diesel,
+                        fuelType: FuelType.diesel,
+                      ),
                     ],
                   ],
                 ),
-              ),
-
-              // Favorite button
-              IconButton(
-                icon: Icon(
-                  isFavorite ? Icons.star : Icons.star_border,
-                  color: isFavorite ? Colors.amber : null,
-                ),
-                onPressed: onFavoriteTap,
-                tooltip: isFavorite ? 'Remove from favorites' : 'Add to favorites',
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
+}
 
+/// Displays 1-5 small star icons for the user's station rating.
+class _RatingStars extends StatelessWidget {
+  final int rating;
 
+  const _RatingStars({required this.rating});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(5, (i) {
+        return Icon(
+          i < rating ? Icons.star : Icons.star_border,
+          size: 12,
+          color: i < rating ? Colors.amber : Colors.grey.shade400,
+        );
+      }),
+    );
+  }
 }
 
 class _PriceRow extends StatelessWidget {
