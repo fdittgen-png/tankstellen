@@ -3,17 +3,23 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/utils/price_formatter.dart';
-import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/price_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
+
+/// Maximum characters for the brand label before truncation.
+const _maxBrandLength = 14;
 
 /// Utility class for building station markers on the map.
 class StationMarkerBuilder {
   StationMarkerBuilder._();
 
   /// Build a [Marker] for a station, colored by relative price.
+  ///
+  /// The marker shows the brand name prominently on top and the price
+  /// in large bold text below, inside a color-coded rounded badge
+  /// (green = cheap, orange = mid, red = expensive).
   ///
   /// When [pastel] is true, the marker uses muted/pastel colors for
   /// non-selected stations so that selected ones stand out.
@@ -28,20 +34,25 @@ class StationMarkerBuilder {
     final price = priceForFuelType(station, fuel);
     final baseColor = priceColor(price, minPrice, maxPrice);
     final color = pastel ? _toPastel(baseColor) : baseColor;
-    final brand = station.displayName;
-    final tier = priceTierOf(price, minPrice, maxPrice);
+    final brand = _truncateBrand(station.displayName);
 
     return Marker(
       point: LatLng(station.lat, station.lng),
-      width: 100,
-      height: 44,
+      width: 90,
+      height: 48,
       child: GestureDetector(
         onTap: () => GoRouter.of(context).push('/station/${station.id}'),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: pastel ? 0.5 : 0.9),
+            color: color.withValues(alpha: pastel ? 0.5 : 0.92),
             borderRadius: BorderRadius.circular(8),
+            border: pastel
+                ? null
+                : Border.all(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    width: 1,
+                  ),
             boxShadow: pastel
                 ? null
                 : [
@@ -55,36 +66,26 @@ class StationMarkerBuilder {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (tier != PriceTier.unknown)
-                    Icon(
-                      iconForPriceTier(tier),
-                      size: 12,
-                      color: pastel ? Colors.black38 : Colors.black87,
-                    ),
-                  Text(
-                    price != null
-                        ? PriceFormatter.formatPriceCompact(price)
-                        : '--',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                      color: pastel ? Colors.black38 : Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
               Text(
                 brand,
                 style: TextStyle(
+                  fontWeight: FontWeight.w600,
                   fontSize: 9,
-                  color: pastel ? Colors.black26 : Colors.black54,
+                  color: pastel ? Colors.black26 : Colors.black87,
+                  letterSpacing: 0.2,
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
+              ),
+              Text(
+                price != null
+                    ? PriceFormatter.formatPriceCompact(price)
+                    : '--',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: pastel ? Colors.black38 : Colors.black87,
+                ),
               ),
             ],
           ),
@@ -111,5 +112,11 @@ class StationMarkerBuilder {
   static Color _toPastel(Color color) {
     // Blend with white at 60% to create pastel
     return Color.lerp(color, Colors.white, 0.6)!;
+  }
+
+  /// Truncate brand name if longer than [_maxBrandLength].
+  static String _truncateBrand(String brand) {
+    if (brand.length <= _maxBrandLength) return brand;
+    return '${brand.substring(0, _maxBrandLength - 1)}\u2026';
   }
 }
