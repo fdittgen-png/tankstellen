@@ -99,30 +99,6 @@ class StationInfoSection extends StatelessWidget {
           const SizedBox(height: 24),
         ],
 
-        // Amenities (icon chips)
-        if (station.amenities.isNotEmpty) ...[
-          Text(l10n?.amenities ?? 'Amenities', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
-          AmenityChips(amenities: station.amenities, maxVisible: 8),
-          const SizedBox(height: 24),
-        ],
-
-        // Services (raw text from API)
-        if (station.services.isNotEmpty) ...[
-          Text(l10n?.services ?? 'Services', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 6,
-            runSpacing: 4,
-            children: station.services.map((s) => Chip(
-                  avatar: const Icon(Icons.check_circle_outline, size: 16),
-                  label: Text(s, style: const TextStyle(fontSize: 11)),
-                  visualDensity: VisualDensity.compact,
-                )).toList(),
-          ),
-          const SizedBox(height: 24),
-        ],
-
         // Location info
         if (station.department != null || station.region != null) ...[
           Text(l10n?.zone ?? 'Zone', style: theme.textTheme.titleMedium),
@@ -137,15 +113,29 @@ class StationInfoSection extends StatelessWidget {
                 ? Text(l10n?.highway ?? 'Highway')
                 : Text(l10n?.localStation ?? 'Local station'),
           ),
+          const SizedBox(height: 24),
         ],
 
-        // Last update
-        if (station.updatedAt != null) ...[
-          const SizedBox(height: 16),
-          ListTile(
-            dense: true,
-            leading: const Icon(Icons.update),
-            title: Text('Dernière mise à jour: ${station.updatedAt}'),
+        // Amenities (icon chips) — at the bottom
+        if (station.amenities.isNotEmpty) ...[
+          Text(l10n?.amenities ?? 'Amenities', style: theme.textTheme.titleMedium),
+          const SizedBox(height: 8),
+          AmenityChips(amenities: station.amenities, maxVisible: 8),
+          const SizedBox(height: 24),
+        ],
+
+        // Services (raw text from API) — at the bottom
+        if (station.services.isNotEmpty) ...[
+          Text(l10n?.services ?? 'Services', style: theme.textTheme.titleMedium),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            runSpacing: 4,
+            children: station.services.map((s) => Chip(
+                  avatar: const Icon(Icons.check_circle_outline, size: 16),
+                  label: Text(s, style: const TextStyle(fontSize: 11)),
+                  visualDensity: VisualDensity.compact,
+                )).toList(),
           ),
         ],
       ],
