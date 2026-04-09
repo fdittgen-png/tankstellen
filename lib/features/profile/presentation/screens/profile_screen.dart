@@ -6,7 +6,6 @@ import '../../../consent/presentation/widgets/consent_settings_section.dart';
 import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
 import '../widgets/config_verification_widget.dart';
-import '../widgets/data_transparency_section.dart';
 import '../widgets/location_section_widget.dart';
 import '../widgets/profile_list_section.dart';
 import '../widgets/storage_section.dart';
@@ -58,14 +57,6 @@ class ProfileScreen extends ConsumerWidget {
             icon: Icons.key,
             title: l?.apiKeySetup ?? 'API Key',
             child: const ApiKeySection(),
-          ),
-          const SizedBox(height: 8),
-
-          // Data Transparency
-          _FoldableSection(
-            icon: Icons.visibility,
-            title: l?.dataTransparency ?? 'Data transparency',
-            child: const DataTransparencySection(),
           ),
           const SizedBox(height: 8),
 
