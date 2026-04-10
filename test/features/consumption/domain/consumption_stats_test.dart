@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/services/co2_calculator.dart';
 import 'package:tankstellen/features/consumption/domain/entities/consumption_stats.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
@@ -27,8 +28,10 @@ void main() {
       expect(stats.fillUpCount, 0);
       expect(stats.totalLiters, 0);
       expect(stats.totalSpent, 0);
+      expect(stats.totalCo2Kg, 0);
       expect(stats.avgConsumptionL100km, isNull);
       expect(stats.avgCostPerKm, isNull);
+      expect(stats.avgCo2PerKm, isNull);
     });
 
     test('single fill-up reports totals but no consumption', () {
@@ -122,6 +125,78 @@ void main() {
       expect(stats.avgConsumptionL100km, isNull);
       expect(stats.avgCostPerKm, isNull);
       expect(stats.totalLiters, 20);
+    });
+
+    test('totalCo2Kg aggregates across all fill-ups', () {
+      final stats = ConsumptionStats.fromFillUps([
+        _f(
+          id: '1',
+          date: DateTime(2026, 1, 1),
+          liters: 40,
+          cost: 60,
+          odo: 10000,
+          fuelType: FuelType.diesel,
+        ),
+        _f(
+          id: '2',
+          date: DateTime(2026, 1, 15),
+          liters: 50,
+          cost: 80,
+          odo: 11000,
+          fuelType: FuelType.diesel,
+        ),
+      ]);
+      // 90 L diesel * 2.65 kg/L
+      expect(stats.totalCo2Kg,
+          closeTo(90 * Co2Calculator.kgCo2PerLiterDiesel, 0.0001));
+    });
+
+    test('avgCo2PerKm excludes first tank like L/100km', () {
+      // first tank 40 L (odo 10000) ignored for per-km math
+      // second tank 50 L diesel over 1000 km
+      final stats = ConsumptionStats.fromFillUps([
+        _f(
+          id: '1',
+          date: DateTime(2026, 1, 1),
+          liters: 40,
+          cost: 60,
+          odo: 10000,
+          fuelType: FuelType.diesel,
+        ),
+        _f(
+          id: '2',
+          date: DateTime(2026, 1, 15),
+          liters: 50,
+          cost: 80,
+          odo: 11000,
+          fuelType: FuelType.diesel,
+        ),
+      ]);
+      const expectedCo2PerKm =
+          50 * Co2Calculator.kgCo2PerLiterDiesel / 1000;
+      expect(stats.avgCo2PerKm, closeTo(expectedCo2PerKm, 0.0001));
+    });
+
+    test('avgCo2PerKm is null when distance is zero', () {
+      final stats = ConsumptionStats.fromFillUps([
+        _f(
+          id: '1',
+          date: DateTime(2026, 1, 1),
+          liters: 10,
+          cost: 15,
+          odo: 10000,
+          fuelType: FuelType.diesel,
+        ),
+        _f(
+          id: '2',
+          date: DateTime(2026, 1, 2),
+          liters: 10,
+          cost: 15,
+          odo: 10000,
+          fuelType: FuelType.diesel,
+        ),
+      ]);
+      expect(stats.avgCo2PerKm, isNull);
     });
 
     test('three fill-ups: excludes first tank from L/100km', () {
