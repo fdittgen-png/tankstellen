@@ -10,12 +10,12 @@ import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dar
 
 void main() {
   group('EvFilter.matches', () {
-    final stationCcs50Available = ChargingStation(
+    const stationCcs50Available = ChargingStation(
       id: 'a',
       name: 'A',
       latitude: 0,
       longitude: 0,
-      connectors: const [
+      connectors: [
         EvConnector(
           id: 'a1',
           type: ConnectorType.ccs,
@@ -24,12 +24,12 @@ void main() {
         ),
       ],
     );
-    final stationType2Occupied = ChargingStation(
+    const stationType2Occupied = ChargingStation(
       id: 'b',
       name: 'B',
       latitude: 0,
       longitude: 0,
-      connectors: const [
+      connectors: [
         EvConnector(
           id: 'b1',
           type: ConnectorType.type2,
