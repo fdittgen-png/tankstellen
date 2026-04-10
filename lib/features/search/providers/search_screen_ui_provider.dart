@@ -1,7 +1,17 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../route_search/domain/route_search_strategy.dart';
+import '../presentation/widgets/sort_selector.dart';
 
 part 'search_screen_ui_provider.g.dart';
+
+/// The currently selected sort mode for the search results list.
+@riverpod
+class SelectedSortMode extends _$SelectedSortMode {
+  @override
+  SortMode build() => SortMode.distance;
+
+  void set(SortMode value) => state = value;
+}
 
 /// Whether the filter section (fuel type + radius) is expanded on the search
 /// screen. Starts expanded; collapses automatically when a search is triggered

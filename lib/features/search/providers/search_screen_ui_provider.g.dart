@@ -8,6 +8,64 @@ part of 'search_screen_ui_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// The currently selected sort mode for the search results list.
+
+@ProviderFor(SelectedSortMode)
+final selectedSortModeProvider = SelectedSortModeProvider._();
+
+/// The currently selected sort mode for the search results list.
+final class SelectedSortModeProvider
+    extends $NotifierProvider<SelectedSortMode, SortMode> {
+  /// The currently selected sort mode for the search results list.
+  SelectedSortModeProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'selectedSortModeProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$selectedSortModeHash();
+
+  @$internal
+  @override
+  SelectedSortMode create() => SelectedSortMode();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SortMode value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SortMode>(value),
+    );
+  }
+}
+
+String _$selectedSortModeHash() => r'bee5aedaae37772d7269ada2fc72fa69f071a22d';
+
+/// The currently selected sort mode for the search results list.
+
+abstract class _$SelectedSortMode extends $Notifier<SortMode> {
+  SortMode build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<SortMode, SortMode>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<SortMode, SortMode>,
+              SortMode,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
 /// Whether the filter section (fuel type + radius) is expanded on the search
 /// screen. Starts expanded; collapses automatically when a search is triggered
 /// and in landscape orientation.
