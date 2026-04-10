@@ -1,27 +1,13 @@
 import 'package:flutter/foundation.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../../core/data/storage_repository.dart';
+import '../../domain/entities/price_stats.dart';
 import '../models/price_record.dart';
 
-/// Trend direction for a fuel price over a time window.
-enum PriceTrend { up, down, stable }
-
-/// Aggregate statistics for a single fuel type at a station.
-class PriceStats {
-  final double? min;
-  final double? max;
-  final double? avg;
-  final double? current;
-  final PriceTrend trend;
-
-  const PriceStats({
-    this.min,
-    this.max,
-    this.avg,
-    this.current,
-    this.trend = PriceTrend.stable,
-  });
-}
+// Re-export PriceStats / PriceTrend so existing `price_history_repository.dart`
+// consumers continue to compile. New code should import directly from
+// `domain/entities/price_stats.dart`.
+export '../../domain/entities/price_stats.dart';
 
 /// Persists price snapshots per station via [PriceHistoryStorage] and provides
 /// query/aggregation methods for price history analysis.

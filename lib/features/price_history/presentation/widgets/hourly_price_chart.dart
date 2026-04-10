@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../data/models/price_prediction.dart';
+import '../../domain/entities/price_prediction.dart';
 
 /// A vertical bar chart showing average price by hour of day (0-23).
 ///

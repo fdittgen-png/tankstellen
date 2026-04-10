@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
-import '../../data/models/price_alert.dart';
+import '../../domain/entities/price_alert.dart';
 
 /// Dialog for creating a new price alert from the station detail screen.
 ///

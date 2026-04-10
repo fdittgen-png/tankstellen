@@ -1,6 +1,11 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../data/models/user_profile.dart';
+import '../domain/entities/user_profile.dart';
 import '../data/repositories/profile_repository.dart';
+
+// Re-export the generated repository provider so presentation code can read
+// it via the providers/ layer without reaching into data/. The repository
+// class itself stays internal to the data layer.
+export '../data/repositories/profile_repository.dart' show profileRepositoryProvider;
 
 part 'profile_provider.g.dart';
 

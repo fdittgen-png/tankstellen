@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/sync/sync_service.dart';
-import '../../../price_history/data/models/price_record.dart';
+import '../../../price_history/domain/entities/price_record.dart';
 import '../../../price_history/presentation/widgets/price_chart.dart';
 import '../../../price_history/presentation/widgets/price_stats_card.dart';
 import '../../../price_history/providers/price_history_provider.dart';

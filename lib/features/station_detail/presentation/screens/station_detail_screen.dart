@@ -8,7 +8,7 @@ import '../../../../core/widgets/brand_logo.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../alerts/data/models/price_alert.dart';
+import '../../../alerts/domain/entities/price_alert.dart';
 import '../../../alerts/presentation/widgets/create_alert_dialog.dart';
 import '../../../alerts/providers/alert_provider.dart';
 import '../../../favorites/providers/favorites_provider.dart';

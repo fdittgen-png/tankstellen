@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../search/domain/entities/fuel_type.dart';
-import '../../data/models/price_record.dart';
+import '../../domain/entities/price_record.dart';
 
 /// A simple line chart that renders price history using [CustomPainter].
 ///
