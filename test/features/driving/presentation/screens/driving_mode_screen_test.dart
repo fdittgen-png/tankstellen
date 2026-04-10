@@ -254,8 +254,8 @@ void main() {
         onTap: () {},
       );
 
-      expect(marker.width, 120);
-      expect(marker.height, 56);
+      expect(marker.width, 150);
+      expect(marker.height, 62);
       expect(marker.point.latitude, testStation.lat);
       expect(marker.point.longitude, testStation.lng);
     });
@@ -306,8 +306,8 @@ void main() {
         onTap: () {},
       );
 
-      expect(marker.width, 120);
-      expect(marker.height, 56);
+      expect(marker.width, 150);
+      expect(marker.height, 62);
     });
   });
 
