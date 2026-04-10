@@ -5,7 +5,6 @@ import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../data/repositories/profile_repository.dart';
 import '../../providers/profile_provider.dart';
 
 /// GPS position management section for the profile/settings screen.

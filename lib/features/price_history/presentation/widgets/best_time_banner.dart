@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../search/domain/entities/fuel_type.dart';
-import '../../data/models/price_prediction.dart';
+import '../../domain/entities/price_prediction.dart';
 import '../../providers/price_prediction_provider.dart';
 
 /// A compact banner that shows the "best time to fill" recommendation.

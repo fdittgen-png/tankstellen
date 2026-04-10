@@ -5,7 +5,7 @@ import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../data/models/price_alert.dart';
+import '../../domain/entities/price_alert.dart';
 import '../../providers/alert_provider.dart';
 import '../widgets/alert_statistics_card.dart';
 

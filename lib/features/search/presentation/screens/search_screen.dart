@@ -30,7 +30,7 @@ import '../../domain/entities/search_mode.dart';
 import '../../domain/entities/search_result_item.dart';
 import '../../domain/entities/station.dart';
 import '../widgets/ev_station_card.dart';
-import '../../../profile/data/models/user_profile.dart';
+import '../../../profile/domain/entities/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../widgets/mode_chip.dart';
 import '../widgets/nearest_shortcut_card.dart';

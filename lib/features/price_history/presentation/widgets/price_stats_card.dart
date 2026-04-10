@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
-import '../../data/repositories/price_history_repository.dart';
+import '../../domain/entities/price_stats.dart';
 
 /// Displays aggregate price statistics (min, max, avg, current) with
 /// a trend indicator arrow.

@@ -103,6 +103,44 @@ for feature in "${FEATURE_NAMES[@]}"; do
   done < <(find "$feature_path" -name "*.dart" -type f 2>/dev/null)
 done
 
+# -----------------------------------------------------------------------------
+# Presentation -> data layer leak check
+#
+# Presentation code must depend only on `domain/` (entities, use cases) and
+# providers. Importing `data/models/`, `data/repositories/`, or `data/dto/`
+# directly from a presentation file re-creates the tight coupling that issue
+# #56 eliminated.
+# -----------------------------------------------------------------------------
+PRESENTATION_VIOLATIONS=0
+PRESENTATION_VIOLATION_LINES=""
+
+while IFS= read -r dart_file; do
+  [ -f "$dart_file" ] || continue
+  [[ "$dart_file" == *.g.dart ]] && continue
+  [[ "$dart_file" == *.freezed.dart ]] && continue
+
+  # Match both relative imports (`../../data/models/foo.dart`,
+  # `../../../feature/data/repositories/bar.dart`) and absolute package
+  # imports (`package:tankstellen/features/<name>/data/models/foo.dart`).
+  while IFS= read -r import_line; do
+    [ -z "$import_line" ] && continue
+    PRESENTATION_VIOLATIONS=$((PRESENTATION_VIOLATIONS + 1))
+    msg="  $dart_file: $import_line"
+    PRESENTATION_VIOLATION_LINES="${PRESENTATION_VIOLATION_LINES}${msg}\n"
+  done < <(grep -nE "^import .*(data/models|data/repositories|data/dto)/" "$dart_file" 2>/dev/null || true)
+done < <(find "$FEATURES_DIR" -type f -name "*.dart" -path "*/presentation/*" 2>/dev/null)
+
+if [ "$PRESENTATION_VIOLATIONS" -gt 0 ]; then
+  echo "::error::Found $PRESENTATION_VIOLATIONS presentation -> data layer import(s):"
+  echo ""
+  echo -e "$PRESENTATION_VIOLATION_LINES"
+  echo ""
+  echo "Presentation code must only depend on domain entities (domain/entities/)."
+  echo "Move or re-export the type via lib/features/<feature>/domain/entities/"
+  echo "and import the domain path from the widget / screen."
+  VIOLATIONS=$((VIOLATIONS + PRESENTATION_VIOLATIONS))
+fi
+
 if [ "$VIOLATIONS" -gt 0 ]; then
   echo "::error::Found $VIOLATIONS cross-feature import violation(s):"
   echo ""

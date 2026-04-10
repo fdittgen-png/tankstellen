@@ -4,8 +4,7 @@ import '../../../../core/country/country_config.dart';
 import '../../../../core/language/language_provider.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../data/models/user_profile.dart';
-import '../../data/repositories/profile_repository.dart';
+import '../../domain/entities/user_profile.dart';
 import '../../providers/profile_provider.dart';
 import 'profile_edit_sheet.dart';
 

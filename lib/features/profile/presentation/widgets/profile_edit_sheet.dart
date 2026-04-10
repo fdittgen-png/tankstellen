@@ -5,7 +5,7 @@ import '../../../../core/country/country_config.dart';
 import '../../../../core/language/language_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
-import '../../data/models/user_profile.dart';
+import '../../domain/entities/user_profile.dart';
 import '../../providers/profile_edit_provider.dart';
 
 /// Profile edit bottom sheet. Form state (fuel, radius, rating mode, etc.)

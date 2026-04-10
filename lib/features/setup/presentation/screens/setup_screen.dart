@@ -10,7 +10,6 @@ import '../../../../core/language/language_provider.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../profile/data/repositories/profile_repository.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../data/api_key_validator.dart';
 import '../../providers/api_key_validator_provider.dart';
