@@ -666,5 +666,40 @@
   "statTotalSpent": "Gesamt ausgegeben",
   "statFillUpCount": "Tankvorgänge",
   "fieldRequired": "Pflichtfeld",
-  "fieldInvalidNumber": "Ungültige Zahl"
+  "fieldInvalidNumber": "Ungültige Zahl",
+  "carbonDashboardTitle": "CO2-Übersicht",
+  "carbonTabCharts": "Diagramme",
+  "carbonTabAchievements": "Erfolge",
+  "carbonEmptyTitle": "Noch keine Daten",
+  "carbonEmptySubtitle": "Erfasse Tankvorgänge, um deine CO2-Übersicht zu sehen.",
+  "carbonSummaryTotalCost": "Gesamtkosten",
+  "carbonSummaryTotalCo2": "CO2 gesamt",
+  "monthlyCostsTitle": "Monatliche Kosten",
+  "monthlyEmissionsTitle": "Monatliche CO2-Emissionen",
+  "milestonesTitle": "Meilensteine",
+  "milestoneFirstFillUp": "Erster Tankvorgang erfasst",
+  "milestoneTenFillUps": "10 Tankvorgänge erfasst",
+  "milestoneFiftyFillUps": "50 Tankvorgänge erfasst",
+  "milestoneHundredLiters": "100 L erfasst",
+  "milestoneThousandLiters": "1000 L erfasst",
+  "milestoneHundredKgCo2": "100 kg CO2 erfasst",
+  "milestoneOneTonneCo2": "1 Tonne CO2 erfasst",
+  "milestoneThousandKm": "1000 km gefahren",
+  "milestoneTenThousandKm": "10.000 km gefahren",
+  "fuelVsEvTitle": "Sprit vs. E-Auto",
+  "fuelVsEvSubtitle": "CO2-Vergleich für dieselbe gefahrene Strecke",
+  "fuelVsEvYourFuel": "Dein Sprit",
+  "fuelVsEvEquivalent": "E-Auto (äquivalent)",
+  "fuelVsEvDistance": "Strecke",
+  "fuelVsEvDifference": "Differenz",
+  "shareProgress": "Teilen",
+  "shareCopied": "In Zwischenablage kopiert",
+  "shareCo2Message": "Ich habe mit Tankstellen {kg} kg CO2 erfasst.",
+  "@shareCo2Message": {
+    "placeholders": {
+      "kg": {
+        "type": "String"
+      }
+    }
+  }
 }

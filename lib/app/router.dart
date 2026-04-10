@@ -13,6 +13,7 @@ import '../features/search/presentation/screens/search_screen.dart';
 import '../features/setup/presentation/screens/onboarding_wizard_screen.dart';
 import '../features/alerts/presentation/screens/alerts_screen.dart';
 import '../features/calculator/presentation/screens/calculator_screen.dart';
+import '../features/carbon/presentation/screens/carbon_dashboard_screen.dart';
 import '../features/report/presentation/screens/report_screen.dart';
 import '../features/consumption/presentation/screens/add_fill_up_screen.dart';
 import '../features/consumption/presentation/screens/consumption_screen.dart';
@@ -173,6 +174,10 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/consumption',
         builder: (context, state) => const ConsumptionScreen(),
+      ),
+      GoRoute(
+        path: '/carbon',
+        builder: (context, state) => const CarbonDashboardScreen(),
       ),
       GoRoute(
         path: '/consumption/add',

@@ -25,6 +25,14 @@ class ConsumptionScreen extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
+        actions: [
+          IconButton(
+            key: const Key('open_carbon_dashboard'),
+            tooltip: l?.carbonDashboardTitle ?? 'Carbon dashboard',
+            icon: const Icon(Icons.eco_outlined),
+            onPressed: () => context.push('/carbon'),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/consumption/add'),
