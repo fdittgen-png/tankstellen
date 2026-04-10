@@ -592,6 +592,8 @@
   "privacyViewServerData": "View server data",
   "privacyExportButton": "Export all data as JSON",
   "privacyExportSuccess": "Data exported to clipboard",
+  "privacyExportCsvButton": "Export all data as CSV",
+  "privacyExportCsvSuccess": "CSV data exported to clipboard",
   "privacyDeleteButton": "Delete all data",
   "privacyDeleteTitle": "Delete all data?",
   "privacyDeleteBody": "This will permanently delete:\n\n- All favorites and station data\n- All search profiles\n- All price alerts\n- All price history\n- All cached data\n- Your API key\n- All app settings\n\nThe app will reset to its initial state. This action cannot be undone.",

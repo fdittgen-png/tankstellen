@@ -592,6 +592,8 @@
   "privacyViewServerData": "Serverdaten anzeigen",
   "privacyExportButton": "Alle Daten als JSON exportieren",
   "privacyExportSuccess": "Daten in die Zwischenablage exportiert",
+  "privacyExportCsvButton": "Alle Daten als CSV exportieren",
+  "privacyExportCsvSuccess": "CSV-Daten in die Zwischenablage exportiert",
   "privacyDeleteButton": "Alle Daten löschen",
   "privacyDeleteTitle": "Alle Daten löschen?",
   "privacyDeleteBody": "Dies löscht unwiderruflich:\n\n- Alle Favoriten und Stationsdaten\n- Alle Suchprofile\n- Alle Preisalarme\n- Allen Preisverlauf\n- Alle zwischengespeicherten Daten\n- Ihren API-Schlüssel\n- Alle App-Einstellungen\n\nDie App wird auf den Ausgangszustand zurückgesetzt. Diese Aktion kann nicht rückgängig gemacht werden.",

@@ -2528,6 +2528,18 @@ abstract class AppLocalizations {
   /// **'Data exported to clipboard'**
   String get privacyExportSuccess;
 
+  /// No description provided for @privacyExportCsvButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Export all data as CSV'**
+  String get privacyExportCsvButton;
+
+  /// No description provided for @privacyExportCsvSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'CSV data exported to clipboard'**
+  String get privacyExportCsvSuccess;
+
   /// No description provided for @privacyDeleteButton.
   ///
   /// In en, this message translates to:

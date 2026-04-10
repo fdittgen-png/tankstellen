@@ -1307,6 +1307,12 @@ class AppLocalizationsSk extends AppLocalizations {
   String get privacyExportSuccess => 'Data exported to clipboard';
 
   @override
+  String get privacyExportCsvButton => 'Export all data as CSV';
+
+  @override
+  String get privacyExportCsvSuccess => 'CSV data exported to clipboard';
+
+  @override
   String get privacyDeleteButton => 'Delete all data';
 
   @override
