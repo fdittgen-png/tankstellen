@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../../core/services/co2_calculator.dart';
 import 'fill_up.dart';
 
 part 'consumption_stats.freezed.dart';
@@ -18,9 +19,11 @@ abstract class ConsumptionStats with _$ConsumptionStats {
     required double totalLiters,
     required double totalSpent,
     required double totalDistanceKm,
+    @Default(0) double totalCo2Kg,
     double? avgConsumptionL100km,
     double? avgCostPerKm,
     double? avgPricePerLiter,
+    double? avgCo2PerKm,
     DateTime? periodStart,
     DateTime? periodEnd,
   }) = _ConsumptionStats;
@@ -31,6 +34,7 @@ abstract class ConsumptionStats with _$ConsumptionStats {
     totalLiters: 0,
     totalSpent: 0,
     totalDistanceKm: 0,
+    totalCo2Kg: 0,
   );
 
   /// Compute aggregated stats from a list of fill-ups.
@@ -50,6 +54,7 @@ abstract class ConsumptionStats with _$ConsumptionStats {
         sorted.fold<double>(0, (sum, f) => sum + f.liters);
     final totalSpent =
         sorted.fold<double>(0, (sum, f) => sum + f.totalCost);
+    final totalCo2 = Co2Calculator.cumulativeCo2(sorted);
 
     final firstOdo = sorted.first.odometerKm;
     final lastOdo = sorted.last.odometerKm;
@@ -58,6 +63,7 @@ abstract class ConsumptionStats with _$ConsumptionStats {
 
     double? avgL100;
     double? avgCostKm;
+    double? avgCo2Km;
     if (sorted.length >= 2 && totalDistance > 0) {
       // Liters used between first and last fill-up — exclude the first
       // tank since its prior distance is unknown.
@@ -70,6 +76,12 @@ abstract class ConsumptionStats with _$ConsumptionStats {
           .skip(1)
           .fold<double>(0, (sum, f) => sum + f.totalCost);
       avgCostKm = costBetween / totalDistance;
+
+      // CO2 per km — also excludes the first tank for the same reason.
+      final co2Between = Co2Calculator.cumulativeCo2(sorted.skip(1).toList());
+      if (co2Between > 0) {
+        avgCo2Km = co2Between / totalDistance;
+      }
     }
 
     final avgPriceLiter = totalLiters > 0 ? totalSpent / totalLiters : null;
@@ -79,9 +91,11 @@ abstract class ConsumptionStats with _$ConsumptionStats {
       totalLiters: totalLiters,
       totalSpent: totalSpent,
       totalDistanceKm: totalDistance,
+      totalCo2Kg: totalCo2,
       avgConsumptionL100km: avgL100,
       avgCostPerKm: avgCostKm,
       avgPricePerLiter: avgPriceLiter,
+      avgCo2PerKm: avgCo2Km,
       periodStart: sorted.first.date,
       periodEnd: sorted.last.date,
     );
