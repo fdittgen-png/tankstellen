@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/country/country_config.dart';
 import '../../../../core/language/language_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../data/models/user_profile.dart';
+import '../../providers/profile_edit_provider.dart';
 
-class ProfileEditSheet extends StatefulWidget {
+/// Profile edit bottom sheet. Form state (fuel, radius, rating mode, etc.)
+/// lives in [profileEditControllerProvider] so changes trigger selective
+/// rebuilds and survive ephemeral widget rebuilds. Text values for name and
+/// zip code remain in local [TextEditingController]s because controllers must
+/// follow the Flutter widget lifecycle.
+class ProfileEditSheet extends ConsumerStatefulWidget {
   final UserProfile profile;
   final Future<void> Function(UserProfile) onSave;
   final VoidCallback? onDelete;
@@ -18,22 +26,12 @@ class ProfileEditSheet extends StatefulWidget {
   });
 
   @override
-  State<ProfileEditSheet> createState() => _ProfileEditSheetState();
+  ConsumerState<ProfileEditSheet> createState() => _ProfileEditSheetState();
 }
 
-class _ProfileEditSheetState extends State<ProfileEditSheet> {
+class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
   late final TextEditingController _nameController;
   late final TextEditingController _zipController;
-  late FuelType _fuelType;
-  late double _radius;
-  late LandingScreen _landingScreen;
-  late String? _countryCode;
-  late String? _languageCode;
-  late double _routeSegmentKm;
-  late bool _avoidHighways;
-  late bool _showFuel;
-  late bool _showElectric;
-  late String _ratingMode;
 
   @override
   void initState() {
@@ -42,16 +40,6 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
     _zipController = TextEditingController(
       text: widget.profile.homeZipCode ?? '',
     );
-    _fuelType = widget.profile.preferredFuelType;
-    _radius = widget.profile.defaultSearchRadius;
-    _landingScreen = widget.profile.landingScreen;
-    _countryCode = widget.profile.countryCode;
-    _languageCode = widget.profile.languageCode;
-    _routeSegmentKm = widget.profile.routeSegmentKm;
-    _avoidHighways = widget.profile.avoidHighways;
-    _showFuel = widget.profile.showFuel;
-    _showElectric = widget.profile.showElectric;
-    _ratingMode = widget.profile.ratingMode;
   }
 
   @override
@@ -100,6 +88,10 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final editState = ref.watch(profileEditControllerProvider(widget.profile));
+    final editCtrl =
+        ref.read(profileEditControllerProvider(widget.profile).notifier);
+
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
       minChildSize: 0.5,
@@ -126,7 +118,7 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<FuelType>(
-                initialValue: _fuelType,
+                initialValue: editState.fuelType,
                 decoration: InputDecoration(
                   labelText:
                       AppLocalizations.of(context)?.preferredFuel ?? 'Preferred fuel',
@@ -139,7 +131,9 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
                           child: Text(t.displayName),
                         ))
                     .toList(),
-                onChanged: (v) => setState(() => _fuelType = v ?? _fuelType),
+                onChanged: (v) {
+                  if (v != null) editCtrl.setFuelType(v);
+                },
               ),
               const SizedBox(height: 16),
               Row(
@@ -148,15 +142,15 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
                       '${AppLocalizations.of(context)?.defaultRadius ?? "Radius"}:'),
                   Expanded(
                     child: Slider(
-                      value: _radius,
+                      value: editState.radius,
                       min: 1,
                       max: 25,
                       divisions: 24,
-                      label: '${_radius.round()} km',
-                      onChanged: (v) => setState(() => _radius = v),
+                      label: '${editState.radius.round()} km',
+                      onChanged: editCtrl.setRadius,
                     ),
                   ),
-                  Text('${_radius.round()} km'),
+                  Text('${editState.radius.round()} km'),
                 ],
               ),
               const SizedBox(height: 16),
@@ -165,44 +159,43 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
                   Text('${AppLocalizations.of(context)?.routeSegment ?? "Route segment"}:'),
                   Expanded(
                     child: Slider(
-                      value: _routeSegmentKm,
+                      value: editState.routeSegmentKm,
                       min: 50,
                       max: 1000,
                       divisions: 19,
-                      label: '${_routeSegmentKm.round()} km',
-                      onChanged: (v) =>
-                          setState(() => _routeSegmentKm = v),
+                      label: '${editState.routeSegmentKm.round()} km',
+                      onChanged: editCtrl.setRouteSegmentKm,
                     ),
                   ),
-                  Text('${_routeSegmentKm.round()} km'),
+                  Text('${editState.routeSegmentKm.round()} km'),
                 ],
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 4),
                 child: Text(
-                  AppLocalizations.of(context)?.showCheapestEveryNKm(_routeSegmentKm.round()) ?? 'Show cheapest station every ${_routeSegmentKm.round()} km along route',
+                  AppLocalizations.of(context)?.showCheapestEveryNKm(editState.routeSegmentKm.round()) ?? 'Show cheapest station every ${editState.routeSegmentKm.round()} km along route',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ),
               SwitchListTile(
-                value: _avoidHighways,
-                onChanged: (v) => setState(() => _avoidHighways = v),
+                value: editState.avoidHighways,
+                onChanged: editCtrl.setAvoidHighways,
                 title: Text(AppLocalizations.of(context)?.avoidHighways ?? 'Avoid highways'),
                 subtitle: Text(AppLocalizations.of(context)?.avoidHighwaysDesc ?? 'Route calculation avoids toll roads and highways'),
                 dense: true,
               ),
               SwitchListTile(
-                value: _showFuel,
-                onChanged: (v) => setState(() => _showFuel = v),
+                value: editState.showFuel,
+                onChanged: editCtrl.setShowFuel,
                 title: Text(AppLocalizations.of(context)?.showFuelStations ?? 'Show fuel stations'),
                 subtitle: Text(AppLocalizations.of(context)?.showFuelStationsDesc ?? 'Include gas, diesel, LPG, CNG stations'),
                 dense: true,
               ),
               SwitchListTile(
-                value: _showElectric,
-                onChanged: (v) => setState(() => _showElectric = v),
+                value: editState.showElectric,
+                onChanged: editCtrl.setShowElectric,
                 title: Text(AppLocalizations.of(context)?.showEvStations ?? 'Show EV charging stations'),
                 subtitle: Text(AppLocalizations.of(context)?.showEvStationsDesc ?? 'Include electric charging stations in search results'),
                 dense: true,
@@ -217,15 +210,15 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
                   ButtonSegment(value: 'private', label: Text('Private'), icon: Icon(Icons.lock, size: 16)),
                   ButtonSegment(value: 'shared', label: Text('Shared'), icon: Icon(Icons.people, size: 16)),
                 ],
-                selected: {_ratingMode},
-                onSelectionChanged: (s) => setState(() => _ratingMode = s.first),
+                selected: {editState.ratingMode},
+                onSelectionChanged: (s) => editCtrl.setRatingMode(s.first),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 4, top: 4),
                 child: Text(
-                  _ratingMode == 'local'
+                  editState.ratingMode == 'local'
                       ? 'Ratings saved on this device only'
-                      : _ratingMode == 'private'
+                      : editState.ratingMode == 'private'
                           ? 'Synced with your database (not visible to others)'
                           : 'Visible to all users of your database',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -235,7 +228,7 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<LandingScreen>(
-                initialValue: _landingScreen,
+                initialValue: editState.landingScreen,
                 decoration: InputDecoration(
                   labelText:
                       AppLocalizations.of(context)?.landingScreen ?? 'Start screen',
@@ -251,8 +244,9 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
                           )),
                         ))
                     .toList(),
-                onChanged: (v) =>
-                    setState(() => _landingScreen = v ?? _landingScreen),
+                onChanged: (v) {
+                  if (v != null) editCtrl.setLandingScreen(v);
+                },
               ),
               const SizedBox(height: 16),
               Text(
@@ -266,8 +260,8 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
                 children: Countries.all.map((c) {
                   return ChoiceChip(
                     label: Text('${c.flag} ${c.name}'),
-                    selected: c.code == _countryCode,
-                    onSelected: (_) => setState(() => _countryCode = c.code),
+                    selected: c.code == editState.countryCode,
+                    onSelected: (_) => editCtrl.setCountryCode(c.code),
                     visualDensity: VisualDensity.compact,
                   );
                 }).toList(),
@@ -284,9 +278,8 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
                 children: AppLanguages.all.map((l) {
                   return ChoiceChip(
                     label: Text(l.nativeName),
-                    selected: l.code == _languageCode,
-                    onSelected: (_) =>
-                        setState(() => _languageCode = l.code),
+                    selected: l.code == editState.languageCode,
+                    onSelected: (_) => editCtrl.setLanguageCode(l.code),
                     visualDensity: VisualDensity.compact,
                   );
                 }).toList(),
@@ -295,8 +288,8 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
               TextField(
                 controller: _zipController,
                 keyboardType: TextInputType.number,
-                maxLength: _countryCode != null
-                    ? (Countries.byCode(_countryCode!)?.postalCodeLength ?? 5)
+                maxLength: editState.countryCode != null
+                    ? (Countries.byCode(editState.countryCode!)?.postalCodeLength ?? 5)
                     : 5,
                 decoration: InputDecoration(
                   labelText:
@@ -313,19 +306,19 @@ class _ProfileEditSheetState extends State<ProfileEditSheet> {
                       onPressed: () async {
                         final updated = widget.profile.copyWith(
                           name: _nameController.text.trim(),
-                          preferredFuelType: _fuelType,
-                          defaultSearchRadius: _radius,
-                          landingScreen: _landingScreen,
+                          preferredFuelType: editState.fuelType,
+                          defaultSearchRadius: editState.radius,
+                          landingScreen: editState.landingScreen,
                           homeZipCode: _zipController.text.trim().isEmpty
                               ? null
                               : _zipController.text.trim(),
-                          countryCode: _countryCode,
-                          languageCode: _languageCode,
-                          routeSegmentKm: _routeSegmentKm,
-                          avoidHighways: _avoidHighways,
-                          showFuel: _showFuel,
-                          showElectric: _showElectric,
-                          ratingMode: _ratingMode,
+                          countryCode: editState.countryCode,
+                          languageCode: editState.languageCode,
+                          routeSegmentKm: editState.routeSegmentKm,
+                          avoidHighways: editState.avoidHighways,
+                          showFuel: editState.showFuel,
+                          showElectric: editState.showElectric,
+                          ratingMode: editState.ratingMode,
                         );
                         await widget.onSave(updated);
                         if (context.mounted) Navigator.pop(context);

@@ -9,6 +9,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../profile/data/repositories/profile_repository.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../providers/api_key_validator_provider.dart';
+import '../../providers/onboarding_wizard_provider.dart';
 import '../widgets/api_key_step.dart';
 import '../widgets/completion_step.dart';
 import '../widgets/country_language_step.dart';
@@ -24,6 +25,11 @@ import '../widgets/welcome_step.dart';
 /// 4. Done — confirmation and finish
 ///
 /// The API Key step is conditionally shown based on the selected country.
+///
+/// Wizard progress and loading flag live in
+/// [onboardingWizardControllerProvider]; the API-key [TextEditingController]
+/// and the [PageController] remain local because they must follow the
+/// Flutter widget lifecycle.
 class OnboardingWizardScreen extends ConsumerStatefulWidget {
   const OnboardingWizardScreen({super.key});
 
@@ -36,8 +42,6 @@ class _OnboardingWizardScreenState
     extends ConsumerState<OnboardingWizardScreen> {
   final _pageController = PageController();
   final _apiKeyController = TextEditingController();
-  int _currentStep = 0;
-  bool _isLoading = false;
 
   /// Returns the total number of steps based on whether the selected country
   /// requires an API key.
@@ -46,7 +50,7 @@ class _OnboardingWizardScreenState
     return country.requiresApiKey ? 4 : 3;
   }
 
-  bool get _isLastStep => _currentStep == _stepCount - 1;
+  bool _isLastStep(int currentStep) => currentStep == _stepCount - 1;
 
   @override
   void dispose() {
@@ -56,7 +60,7 @@ class _OnboardingWizardScreenState
   }
 
   void _goToStep(int step) {
-    setState(() => _currentStep = step);
+    ref.read(onboardingWizardControllerProvider.notifier).setStep(step);
     _pageController.animateToPage(
       step,
       duration: const Duration(milliseconds: 300),
@@ -64,24 +68,24 @@ class _OnboardingWizardScreenState
     );
   }
 
-  void _next() {
-    if (_isLastStep) {
+  void _next(int currentStep) {
+    if (_isLastStep(currentStep)) {
       _finishOnboarding();
     } else {
-      _goToStep(_currentStep + 1);
+      _goToStep(currentStep + 1);
     }
   }
 
-  void _back() {
-    if (_currentStep > 0) {
-      _goToStep(_currentStep - 1);
+  void _back(int currentStep) {
+    if (currentStep > 0) {
+      _goToStep(currentStep - 1);
     }
   }
 
   /// Skips the current step (for optional steps like API key).
-  void _skip() {
-    if (!_isLastStep) {
-      _goToStep(_currentStep + 1);
+  void _skip(int currentStep) {
+    if (!_isLastStep(currentStep)) {
+      _goToStep(currentStep + 1);
     }
   }
 
@@ -101,7 +105,8 @@ class _OnboardingWizardScreenState
   }
 
   Future<bool> _validateAndSaveKey(String apiKey) async {
-    setState(() => _isLoading = true);
+    final ctrl = ref.read(onboardingWizardControllerProvider.notifier);
+    ctrl.setLoading(true);
     try {
       final validator = ref.read(apiKeyValidatorProvider);
       final result = await validator.validate(apiKey);
@@ -116,12 +121,13 @@ class _OnboardingWizardScreenState
       await apiKeys.setApiKey(apiKey);
       return true;
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) ctrl.setLoading(false);
     }
   }
 
   Future<void> _completeSetup() async {
-    setState(() => _isLoading = true);
+    final ctrl = ref.read(onboardingWizardControllerProvider.notifier);
+    ctrl.setLoading(true);
     try {
       final settings = ref.read(settingsStorageProvider);
       await settings.skipSetup();
@@ -141,15 +147,15 @@ class _OnboardingWizardScreenState
 
       if (mounted) context.go('/');
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) ctrl.setLoading(false);
     }
   }
 
   /// Returns whether the current step is an optional one that can be skipped.
-  bool get _isCurrentStepSkippable {
+  bool _isCurrentStepSkippable(int currentStep) {
     final country = ref.read(activeCountryProvider);
     // The API key step is skippable (index 2 when country requires key)
-    return country.requiresApiKey && _currentStep == 2;
+    return country.requiresApiKey && currentStep == 2;
   }
 
   List<Widget> _buildSteps() {
@@ -167,8 +173,11 @@ class _OnboardingWizardScreenState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    // Watch country to rebuild when it changes (affects step count)
+    // Watch country to rebuild when it changes (affects step count).
     ref.watch(activeCountryProvider);
+    final wizardState = ref.watch(onboardingWizardControllerProvider);
+    final currentStep = wizardState.currentStep;
+    final isLoading = wizardState.isLoading;
     final steps = _buildSteps();
 
     return Scaffold(
@@ -178,13 +187,13 @@ class _OnboardingWizardScreenState
             const SizedBox(height: 16),
             // Progress indicator
             OnboardingProgressIndicator(
-              currentStep: _currentStep,
+              currentStep: currentStep,
               stepCount: _stepCount,
             ),
             const SizedBox(height: 8),
             // Step counter text
             Text(
-              '${_currentStep + 1} / $_stepCount',
+              '${currentStep + 1} / $_stepCount',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -196,7 +205,9 @@ class _OnboardingWizardScreenState
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (index) {
-                  setState(() => _currentStep = index);
+                  ref
+                      .read(onboardingWizardControllerProvider.notifier)
+                      .setStep(index);
                 },
                 children: steps,
               ),
@@ -212,9 +223,9 @@ class _OnboardingWizardScreenState
               child: Row(
                 children: [
                   // Back button
-                  if (_currentStep > 0)
+                  if (currentStep > 0)
                     TextButton.icon(
-                      onPressed: _isLoading ? null : _back,
+                      onPressed: isLoading ? null : () => _back(currentStep),
                       icon: const Icon(Icons.arrow_back),
                       label: Text(l10n?.onboardingBack ?? 'Back'),
                     )
@@ -222,18 +233,19 @@ class _OnboardingWizardScreenState
                     const SizedBox(width: 80),
                   const Spacer(),
                   // Skip button (optional steps)
-                  if (_isCurrentStepSkippable)
+                  if (_isCurrentStepSkippable(currentStep))
                     Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: TextButton(
-                        onPressed: _isLoading ? null : _skip,
+                        onPressed:
+                            isLoading ? null : () => _skip(currentStep),
                         child: Text(l10n?.onboardingSkip ?? 'Skip'),
                       ),
                     ),
                   // Next / Finish button
                   FilledButton.icon(
-                    onPressed: _isLoading ? null : _next,
-                    icon: _isLoading
+                    onPressed: isLoading ? null : () => _next(currentStep),
+                    icon: isLoading
                         ? const SizedBox(
                             height: 18,
                             width: 18,
@@ -241,12 +253,12 @@ class _OnboardingWizardScreenState
                                 CircularProgressIndicator(strokeWidth: 2),
                           )
                         : Icon(
-                            _isLastStep
+                            _isLastStep(currentStep)
                                 ? Icons.check
                                 : Icons.arrow_forward,
                           ),
                     label: Text(
-                      _isLastStep
+                      _isLastStep(currentStep)
                           ? (l10n?.onboardingFinish ?? 'Get started')
                           : (l10n?.onboardingNext ?? 'Next'),
                     ),
