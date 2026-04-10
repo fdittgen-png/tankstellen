@@ -36,3 +36,4 @@ reused. If a decision is reversed, the original ADR is marked
 | 0005 | Service chain fallback pattern     | Accepted |
 | 0006 | 23-language i18n strategy          | Accepted |
 | 0007 | MIT license choice                 | Accepted |
+| 0008 | Storage migration evaluation (v5.x) | Accepted |
