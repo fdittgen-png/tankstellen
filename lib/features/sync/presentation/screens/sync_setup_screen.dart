@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/sync/sync_config.dart';
 import '../../../../core/sync/sync_provider.dart';
+import '../../providers/sync_setup_provider.dart';
 import '../widgets/auth_form_widget.dart';
 import '../widgets/qr_scanner_screen.dart';
 import '../widgets/sync_credentials_step.dart';
@@ -19,6 +20,8 @@ import '../widgets/sync_mode_card.dart';
 /// - Reusable widgets: [SyncModeCard], [AuthFormWidget] are app-agnostic.
 /// - Database credentials abstracted via [SyncState.connectCommunity()] and
 ///   [SyncState.connect(url, key)].
+/// - Wizard step + UI flags live in [syncSetupControllerProvider]; only the
+///   two [TextEditingController]s remain local (Flutter lifecycle).
 class SyncSetupScreen extends ConsumerStatefulWidget {
   const SyncSetupScreen({super.key});
 
@@ -26,16 +29,9 @@ class SyncSetupScreen extends ConsumerStatefulWidget {
   ConsumerState<SyncSetupScreen> createState() => _SyncSetupScreenState();
 }
 
-enum _Step { mode, credentials, auth, done }
-
 class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
-  _Step _step = _Step.mode;
-  SyncMode _selectedMode = SyncMode.none;
   final _urlController = TextEditingController();
   final _keyController = TextEditingController();
-  bool _isLoading = false;
-  String? _error;
-  bool _showKey = false;
 
   @override
   void dispose() {
@@ -44,35 +40,31 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
     super.dispose();
   }
 
-  String get _title => switch (_step) {
-    _Step.mode => 'Connect TankSync',
-    _Step.credentials => _selectedMode == SyncMode.private ? 'Your database' : 'Join a group',
-    _Step.auth => 'Your account',
-    _Step.done => 'Connected!',
-  };
+  String _titleFor(SyncSetupStep step, SyncMode mode) => switch (step) {
+        SyncSetupStep.mode => 'Connect TankSync',
+        SyncSetupStep.credentials =>
+          mode == SyncMode.private ? 'Your database' : 'Join a group',
+        SyncSetupStep.auth => 'Your account',
+        SyncSetupStep.done => 'Connected!',
+      };
 
   void _onBack() {
-    switch (_step) {
-      case _Step.mode:
+    final setup = ref.read(syncSetupControllerProvider);
+    final ctrl = ref.read(syncSetupControllerProvider.notifier);
+    switch (setup.step) {
+      case SyncSetupStep.mode:
         Navigator.pop(context);
-      case _Step.credentials:
-        setState(() => _step = _Step.mode);
-      case _Step.auth:
-        setState(() => _step = _selectedMode == SyncMode.community ? _Step.mode : _Step.credentials);
-      case _Step.done:
+      case SyncSetupStep.credentials:
+        ctrl.goToStep(SyncSetupStep.mode);
+      case SyncSetupStep.auth:
+        ctrl.goToStep(
+          setup.selectedMode == SyncMode.community
+              ? SyncSetupStep.mode
+              : SyncSetupStep.credentials,
+        );
+      case SyncSetupStep.done:
         Navigator.pop(context);
     }
-  }
-
-  void _selectMode(SyncMode mode) {
-    _selectedMode = mode;
-    setState(() {
-      if (mode == SyncMode.community) {
-        _step = _Step.auth;
-      } else {
-        _step = _Step.credentials;
-      }
-    });
   }
 
   Future<void> _onAuthSubmit({
@@ -81,31 +73,34 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
     String? password,
     required bool isSignUp,
   }) async {
-    setState(() { _isLoading = true; _error = null; });
+    final ctrl = ref.read(syncSetupControllerProvider.notifier);
+    final setup = ref.read(syncSetupControllerProvider);
+
+    ctrl.startLoading();
 
     try {
       final syncNotifier = ref.read(syncStateProvider.notifier);
 
-      if (_selectedMode == SyncMode.community) {
+      if (setup.selectedMode == SyncMode.community) {
         await syncNotifier.connectCommunity();
       } else {
         final url = _urlController.text.trim();
         final key = _keyController.text.trim();
-        await syncNotifier.connect(url, key, mode: _selectedMode);
+        await syncNotifier.connect(url, key, mode: setup.selectedMode);
       }
 
       if (isEmail && email != null && password != null) {
         await syncNotifier.signInWithEmail(email, password, isSignUp: isSignUp);
       }
 
-      if (mounted) setState(() => _step = _Step.done);
+      if (!mounted) return;
+      ctrl.goToStep(SyncSetupStep.done);
+      ctrl.stopLoading();
 
       await Future<void>.delayed(const Duration(milliseconds: 1500));
       if (mounted) Navigator.pop(context);
     } catch (e) {
-      if (mounted) setState(() => _error = e.toString());
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) ctrl.setError(e.toString());
     }
   }
 
@@ -119,7 +114,6 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
         final json = jsonDecode(result) as Map<String, dynamic>;
         _urlController.text = json['url']?.toString() ?? '';
         _keyController.text = json['key']?.toString() ?? '';
-        setState(() {});
       } catch (e) {
         debugPrint('QR code parse failed: $e');
         if (mounted) {
@@ -131,11 +125,12 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final setup = ref.watch(syncSetupControllerProvider);
     return Scaffold(
       appBar: AppBar(
         title: Semantics(
           header: true,
-          child: Text(_title),
+          child: Text(_titleFor(setup.step, setup.selectedMode)),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -145,46 +140,56 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
       ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
-        child: _buildStep(),
+        child: _buildStep(setup),
       ),
     );
   }
 
-  Widget _buildStep() {
+  Widget _buildStep(SyncSetupState setup) {
     final bottomPad = MediaQuery.of(context).viewPadding.bottom;
+    final ctrl = ref.read(syncSetupControllerProvider.notifier);
     return ListView(
-      key: ValueKey(_step),
+      key: ValueKey(setup.step),
       padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + bottomPad),
-      children: switch (_step) {
-        _Step.mode => _buildModeStep(),
-        _Step.credentials => [
-          SyncCredentialsStep(
-            selectedMode: _selectedMode,
-            urlController: _urlController,
-            keyController: _keyController,
-            showKey: _showKey,
-            onToggleKeyVisibility: () => setState(() => _showKey = !_showKey),
-            onScanQr: _scanQr,
-            onContinue: (_urlController.text.trim().isNotEmpty && _keyController.text.trim().isNotEmpty)
-                ? () => setState(() => _step = _Step.auth)
-                : null,
-            onChanged: () => setState(() {}),
-          ),
-        ],
-        _Step.auth => [
-          AuthFormWidget(
-            onSubmit: _onAuthSubmit,
-            isLoading: _isLoading,
-            error: _error,
-          ),
-        ],
-        _Step.done => _buildDoneStep(),
+      children: switch (setup.step) {
+        SyncSetupStep.mode => _buildModeStep(),
+        SyncSetupStep.credentials => [
+            ListenableBuilder(
+              listenable: Listenable.merge([_urlController, _keyController]),
+              builder: (context, _) {
+                final canContinue = _urlController.text.trim().isNotEmpty &&
+                    _keyController.text.trim().isNotEmpty;
+                return SyncCredentialsStep(
+                  selectedMode: setup.selectedMode,
+                  urlController: _urlController,
+                  keyController: _keyController,
+                  showKey: setup.showKey,
+                  onToggleKeyVisibility: ctrl.toggleKeyVisibility,
+                  onScanQr: _scanQr,
+                  onContinue: canContinue
+                      ? () => ctrl.goToStep(SyncSetupStep.auth)
+                      : null,
+                  // Rebuild handled by ListenableBuilder above; no-op.
+                  onChanged: () {},
+                );
+              },
+            ),
+          ],
+        SyncSetupStep.auth => [
+            AuthFormWidget(
+              onSubmit: _onAuthSubmit,
+              isLoading: setup.isLoading,
+              error: setup.error,
+            ),
+          ],
+        SyncSetupStep.done => _buildDoneStep(),
       },
     );
   }
 
   List<Widget> _buildModeStep() {
     final theme = Theme.of(context);
+    final ctrl = ref.read(syncSetupControllerProvider.notifier);
     return [
       Semantics(
         header: true,
@@ -206,7 +211,7 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
           subtitle: 'Share favorites & ratings with all users',
           privacyLabel: 'Shared',
           privacyColor: Colors.green,
-          onTap: () => _selectMode(SyncMode.community),
+          onTap: () => ctrl.selectMode(SyncMode.community),
         ),
       ),
       const SizedBox(height: 10),
@@ -220,7 +225,7 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
           subtitle: 'Your own Supabase — full data control',
           privacyLabel: 'Private',
           privacyColor: Colors.blue,
-          onTap: () => _selectMode(SyncMode.private),
+          onTap: () => ctrl.selectMode(SyncMode.private),
         ),
       ),
       const SizedBox(height: 10),
@@ -234,7 +239,7 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
           subtitle: 'Family or friends shared database',
           privacyLabel: 'Group',
           privacyColor: Colors.orange,
-          onTap: () => _selectMode(SyncMode.joinExisting),
+          onTap: () => ctrl.selectMode(SyncMode.joinExisting),
         ),
       ),
 
