@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/location/user_position_provider.dart';
-import '../../../../core/storage/storage_providers.dart';
-import '../../../../core/storage/storage_keys.dart';
+import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/profile_provider.dart';
@@ -11,18 +10,11 @@ import '../../providers/profile_provider.dart';
 ///
 /// Displays the current GPS position status, allows manual GPS updates,
 /// and provides toggles for auto-update and auto-switch profile.
-class LocationSectionWidget extends ConsumerStatefulWidget {
+class LocationSectionWidget extends ConsumerWidget {
   const LocationSectionWidget({super.key});
 
   @override
-  ConsumerState<LocationSectionWidget> createState() =>
-      _LocationSectionWidgetState();
-}
-
-class _LocationSectionWidgetState
-    extends ConsumerState<LocationSectionWidget> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final activeProfile = ref.watch(activeProfileProvider);
     final l = AppLocalizations.of(context);
@@ -33,18 +25,19 @@ class _LocationSectionWidgetState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildGpsStatus(theme, l),
+            _buildGpsStatus(context, ref, theme, l),
             const SizedBox(height: 12),
-            _buildAutoUpdateToggle(theme, activeProfile, l),
+            _buildAutoUpdateToggle(ref, theme, activeProfile, l),
             const Divider(),
-            _buildAutoSwitchToggle(theme, l),
+            _buildAutoSwitchToggle(ref, theme, l),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildGpsStatus(ThemeData theme, AppLocalizations? l) {
+  Widget _buildGpsStatus(BuildContext context, WidgetRef ref, ThemeData theme,
+      AppLocalizations? l) {
     final userPos = ref.watch(userPositionProvider);
 
     if (userPos != null) {
@@ -65,7 +58,7 @@ class _LocationSectionWidgetState
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline, size: 20),
-            onPressed: () => _confirmClearGps(l),
+            onPressed: () => _confirmClearGps(context, ref, l),
             tooltip: l?.delete ?? 'Clear',
           ),
         ],
@@ -76,7 +69,7 @@ class _LocationSectionWidgetState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         InkWell(
-          onTap: () => _updateGps(),
+          onTap: () => _updateGps(context, ref),
           borderRadius: BorderRadius.circular(8),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
@@ -107,8 +100,8 @@ class _LocationSectionWidgetState
     );
   }
 
-  Widget _buildAutoUpdateToggle(
-      ThemeData theme, dynamic activeProfile, AppLocalizations? l) {
+  Widget _buildAutoUpdateToggle(WidgetRef ref, ThemeData theme,
+      dynamic activeProfile, AppLocalizations? l) {
     return SwitchListTile(
       contentPadding: EdgeInsets.zero,
       title: Text(
@@ -133,10 +126,9 @@ class _LocationSectionWidgetState
     );
   }
 
-  Widget _buildAutoSwitchToggle(ThemeData theme, AppLocalizations? l) {
-    final settings = ref.read(settingsStorageProvider);
-    final autoSwitch =
-        settings.getSetting(StorageKeys.autoSwitchProfile) as bool? ?? false;
+  Widget _buildAutoSwitchToggle(
+      WidgetRef ref, ThemeData theme, AppLocalizations? l) {
+    final autoSwitch = ref.watch(autoSwitchProfileProvider);
 
     return SwitchListTile(
       contentPadding: EdgeInsets.zero,
@@ -153,15 +145,13 @@ class _LocationSectionWidgetState
       ),
       value: autoSwitch,
       onChanged: (value) {
-        ref
-            .read(settingsStorageProvider)
-            .putSetting(StorageKeys.autoSwitchProfile, value);
-        setState(() {});
+        ref.read(autoSwitchProfileProvider.notifier).set(value);
       },
     );
   }
 
-  Future<void> _confirmClearGps(AppLocalizations? l) async {
+  Future<void> _confirmClearGps(
+      BuildContext context, WidgetRef ref, AppLocalizations? l) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -187,13 +177,14 @@ class _LocationSectionWidgetState
     }
   }
 
-  Future<void> _updateGps() async {
+  Future<void> _updateGps(BuildContext context, WidgetRef ref) async {
     try {
       await ref.read(userPositionProvider.notifier).updateFromGps();
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         final l10n = AppLocalizations.of(context);
-        SnackBarHelper.showError(context, '${l10n?.gpsError ?? "GPS error"}: $e');
+        SnackBarHelper.showError(
+            context, '${l10n?.gpsError ?? "GPS error"}: $e');
       }
     }
   }

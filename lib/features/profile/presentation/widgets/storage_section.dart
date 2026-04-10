@@ -8,17 +8,12 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'storage_bar.dart';
 
-class StorageSection extends ConsumerStatefulWidget {
+class StorageSection extends ConsumerWidget {
   const StorageSection({super.key});
 
   @override
-  ConsumerState<StorageSection> createState() => _StorageSectionState();
-}
-
-class _StorageSectionState extends ConsumerState<StorageSection> {
-  @override
-  Widget build(BuildContext context) {
-    final storageMgmt = ref.read(storageManagementProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final storageMgmt = ref.watch(storageManagementProvider);
     final stats = storageMgmt.storageStats;
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
@@ -159,7 +154,7 @@ class _StorageSectionState extends ConsumerState<StorageSection> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: storageMgmt.cacheEntryCount > 0
-                        ? () => _clearCache(context)
+                        ? () => _clearCache(context, ref)
                         : null,
                     icon: const Icon(Icons.delete_sweep),
                     label: Text(
@@ -176,7 +171,7 @@ class _StorageSectionState extends ConsumerState<StorageSection> {
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () => _clearAllData(context),
+                    onPressed: () => _clearAllData(context, ref),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: theme.colorScheme.error,
                     ),
@@ -192,7 +187,7 @@ class _StorageSectionState extends ConsumerState<StorageSection> {
     );
   }
 
-  Future<void> _clearCache(BuildContext ctx) async {
+  Future<void> _clearCache(BuildContext ctx, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: ctx,
       builder: (context) => AlertDialog(
@@ -220,14 +215,15 @@ class _StorageSectionState extends ConsumerState<StorageSection> {
     if (confirmed == true) {
       final cache = ref.read(cacheManagerProvider);
       await cache.clearAll();
-      if (mounted) {
-        setState(() {});
-        SnackBarHelper.show(context, AppLocalizations.of(context)?.cacheCleared ?? 'Cache cleared.');
+      ref.invalidate(storageManagementProvider);
+      if (ctx.mounted) {
+        SnackBarHelper.show(
+            ctx, AppLocalizations.of(ctx)?.cacheCleared ?? 'Cache cleared.');
       }
     }
   }
 
-  Future<void> _clearAllData(BuildContext ctx) async {
+  Future<void> _clearAllData(BuildContext ctx, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: ctx,
       builder: (context) => AlertDialog(
@@ -269,8 +265,9 @@ class _StorageSectionState extends ConsumerState<StorageSection> {
         final box = Hive.box(boxName);
         await box.clear();
       }
-      if (mounted) {
-        context.go('/setup');
+      ref.invalidate(storageManagementProvider);
+      if (ctx.mounted) {
+        ctx.go('/setup');
       }
     }
   }
