@@ -1472,4 +1472,91 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get fieldInvalidNumber => 'Invalid number';
+
+  @override
+  String get carbonDashboardTitle => 'Carbon dashboard';
+
+  @override
+  String get carbonTabCharts => 'Charts';
+
+  @override
+  String get carbonTabAchievements => 'Achievements';
+
+  @override
+  String get carbonEmptyTitle => 'No data yet';
+
+  @override
+  String get carbonEmptySubtitle =>
+      'Log fill-ups to see your carbon dashboard.';
+
+  @override
+  String get carbonSummaryTotalCost => 'Total cost';
+
+  @override
+  String get carbonSummaryTotalCo2 => 'Total CO2';
+
+  @override
+  String get monthlyCostsTitle => 'Monthly costs';
+
+  @override
+  String get monthlyEmissionsTitle => 'Monthly CO2 emissions';
+
+  @override
+  String get milestonesTitle => 'Milestones';
+
+  @override
+  String get milestoneFirstFillUp => 'First fill-up logged';
+
+  @override
+  String get milestoneTenFillUps => '10 fill-ups tracked';
+
+  @override
+  String get milestoneFiftyFillUps => '50 fill-ups tracked';
+
+  @override
+  String get milestoneHundredLiters => '100 L tracked';
+
+  @override
+  String get milestoneThousandLiters => '1000 L tracked';
+
+  @override
+  String get milestoneHundredKgCo2 => '100 kg CO2 tracked';
+
+  @override
+  String get milestoneOneTonneCo2 => '1 tonne CO2 tracked';
+
+  @override
+  String get milestoneThousandKm => '1000 km driven';
+
+  @override
+  String get milestoneTenThousandKm => '10,000 km driven';
+
+  @override
+  String get fuelVsEvTitle => 'Fuel vs EV';
+
+  @override
+  String get fuelVsEvSubtitle => 'CO2 comparison for the same distance driven';
+
+  @override
+  String get fuelVsEvYourFuel => 'Your fuel';
+
+  @override
+  String get fuelVsEvEquivalent => 'Equivalent EV';
+
+  @override
+  String get fuelVsEvDistance => 'Distance';
+
+  @override
+  String get fuelVsEvDifference => 'Difference';
+
+  @override
+  String get shareProgress => 'Share';
+
+  @override
+  String get shareCopied => 'Copied to clipboard';
+
+  @override
+  String shareCo2Message(String kg) {
+    return 'I tracked $kg kg CO2 with Tankstellen.';
+  }
 }

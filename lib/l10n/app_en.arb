@@ -666,5 +666,40 @@
   "statTotalSpent": "Total spent",
   "statFillUpCount": "Fill-ups",
   "fieldRequired": "Required",
-  "fieldInvalidNumber": "Invalid number"
+  "fieldInvalidNumber": "Invalid number",
+  "carbonDashboardTitle": "Carbon dashboard",
+  "carbonTabCharts": "Charts",
+  "carbonTabAchievements": "Achievements",
+  "carbonEmptyTitle": "No data yet",
+  "carbonEmptySubtitle": "Log fill-ups to see your carbon dashboard.",
+  "carbonSummaryTotalCost": "Total cost",
+  "carbonSummaryTotalCo2": "Total CO2",
+  "monthlyCostsTitle": "Monthly costs",
+  "monthlyEmissionsTitle": "Monthly CO2 emissions",
+  "milestonesTitle": "Milestones",
+  "milestoneFirstFillUp": "First fill-up logged",
+  "milestoneTenFillUps": "10 fill-ups tracked",
+  "milestoneFiftyFillUps": "50 fill-ups tracked",
+  "milestoneHundredLiters": "100 L tracked",
+  "milestoneThousandLiters": "1000 L tracked",
+  "milestoneHundredKgCo2": "100 kg CO2 tracked",
+  "milestoneOneTonneCo2": "1 tonne CO2 tracked",
+  "milestoneThousandKm": "1000 km driven",
+  "milestoneTenThousandKm": "10,000 km driven",
+  "fuelVsEvTitle": "Fuel vs EV",
+  "fuelVsEvSubtitle": "CO2 comparison for the same distance driven",
+  "fuelVsEvYourFuel": "Your fuel",
+  "fuelVsEvEquivalent": "Equivalent EV",
+  "fuelVsEvDistance": "Distance",
+  "fuelVsEvDifference": "Difference",
+  "shareProgress": "Share",
+  "shareCopied": "Copied to clipboard",
+  "shareCo2Message": "I tracked {kg} kg CO2 with Tankstellen.",
+  "@shareCo2Message": {
+    "placeholders": {
+      "kg": {
+        "type": "String"
+      }
+    }
+  }
 }

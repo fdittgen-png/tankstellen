@@ -1486,4 +1486,91 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get fieldInvalidNumber => 'Ungültige Zahl';
+
+  @override
+  String get carbonDashboardTitle => 'CO2-Übersicht';
+
+  @override
+  String get carbonTabCharts => 'Diagramme';
+
+  @override
+  String get carbonTabAchievements => 'Erfolge';
+
+  @override
+  String get carbonEmptyTitle => 'Noch keine Daten';
+
+  @override
+  String get carbonEmptySubtitle =>
+      'Erfasse Tankvorgänge, um deine CO2-Übersicht zu sehen.';
+
+  @override
+  String get carbonSummaryTotalCost => 'Gesamtkosten';
+
+  @override
+  String get carbonSummaryTotalCo2 => 'CO2 gesamt';
+
+  @override
+  String get monthlyCostsTitle => 'Monatliche Kosten';
+
+  @override
+  String get monthlyEmissionsTitle => 'Monatliche CO2-Emissionen';
+
+  @override
+  String get milestonesTitle => 'Meilensteine';
+
+  @override
+  String get milestoneFirstFillUp => 'Erster Tankvorgang erfasst';
+
+  @override
+  String get milestoneTenFillUps => '10 Tankvorgänge erfasst';
+
+  @override
+  String get milestoneFiftyFillUps => '50 Tankvorgänge erfasst';
+
+  @override
+  String get milestoneHundredLiters => '100 L erfasst';
+
+  @override
+  String get milestoneThousandLiters => '1000 L erfasst';
+
+  @override
+  String get milestoneHundredKgCo2 => '100 kg CO2 erfasst';
+
+  @override
+  String get milestoneOneTonneCo2 => '1 Tonne CO2 erfasst';
+
+  @override
+  String get milestoneThousandKm => '1000 km gefahren';
+
+  @override
+  String get milestoneTenThousandKm => '10.000 km gefahren';
+
+  @override
+  String get fuelVsEvTitle => 'Sprit vs. E-Auto';
+
+  @override
+  String get fuelVsEvSubtitle => 'CO2-Vergleich für dieselbe gefahrene Strecke';
+
+  @override
+  String get fuelVsEvYourFuel => 'Dein Sprit';
+
+  @override
+  String get fuelVsEvEquivalent => 'E-Auto (äquivalent)';
+
+  @override
+  String get fuelVsEvDistance => 'Strecke';
+
+  @override
+  String get fuelVsEvDifference => 'Differenz';
+
+  @override
+  String get shareProgress => 'Teilen';
+
+  @override
+  String get shareCopied => 'In Zwischenablage kopiert';
+
+  @override
+  String shareCo2Message(String kg) {
+    return 'Ich habe mit Tankstellen $kg kg CO2 erfasst.';
+  }
 }
