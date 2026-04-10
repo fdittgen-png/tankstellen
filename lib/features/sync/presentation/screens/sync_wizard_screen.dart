@@ -10,6 +10,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/sync/schema_verifier.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
+import '../../providers/sync_wizard_provider.dart';
 import '../widgets/anon_key_field.dart';
 import '../widgets/qr_scanner_screen.dart';
 import '../widgets/wizard_auth_step.dart';
@@ -26,6 +27,9 @@ import '../widgets/wizard_schema_step.dart';
 ///
 /// After connecting, verifies the database schema and guides the user
 /// to deploy missing tables if needed.
+///
+/// Wizard state (mode, toggles, progress) lives in
+/// [syncWizardControllerProvider]; only text controllers remain local.
 class SyncWizardScreen extends ConsumerStatefulWidget {
   const SyncWizardScreen({super.key});
 
@@ -33,26 +37,21 @@ class SyncWizardScreen extends ConsumerStatefulWidget {
   ConsumerState<SyncWizardScreen> createState() => _SyncWizardScreenState();
 }
 
-enum _WizardMode { choose, createNew, joinExisting, auth, schema }
-
 class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
-  _WizardMode _mode = _WizardMode.choose;
-  int _createStep = 0;
-
   final _urlController = TextEditingController();
   final _keyController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool _testing = false;
-  bool _connecting = false;
-  bool _isSignUp = true;
-  bool _useEmail = false;
-  String? _testResult;
-  bool _testSuccess = false;
-  Map<String, bool>? _schemaStatus;
-  String? _migrationSql;
-  bool _showKey = false;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(syncWizardControllerProvider.notifier).reset();
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -63,12 +62,17 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
     super.dispose();
   }
 
+  SyncWizardController get _notifier =>
+      ref.read(syncWizardControllerProvider.notifier);
+
   Widget _buildKeyField() {
+    final showKey =
+        ref.watch(syncWizardControllerProvider.select((s) => s.showKey));
     return AnonKeyField(
       controller: _keyController,
-      showKey: _showKey,
-      onToggleVisibility: () => setState(() => _showKey = !_showKey),
-      onChanged: () => setState(() {}),
+      showKey: showKey,
+      onToggleVisibility: _notifier.toggleKeyVisibility,
+      onChanged: _notifier.touch,
     );
   }
 
@@ -95,18 +99,19 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final wizard = ref.watch(syncWizardControllerProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Connect TankSync'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            if (_mode == _WizardMode.choose) {
+            if (wizard.mode == SyncWizardMode.choose) {
               Navigator.pop(context);
-            } else if (_mode == _WizardMode.schema) {
-              setState(() => _mode = _WizardMode.auth);
+            } else if (wizard.mode == SyncWizardMode.schema) {
+              _notifier.setMode(SyncWizardMode.auth);
             } else {
-              setState(() => _mode = _WizardMode.choose);
+              _notifier.setMode(SyncWizardMode.choose);
             }
           },
         ),
@@ -114,56 +119,57 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
       body: ListView(
         padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.of(context).viewPadding.bottom),
         children: [
-          if (_mode == _WizardMode.choose)
+          if (wizard.mode == SyncWizardMode.choose)
             WizardChooseMode(
-              onCreateNew: () => setState(() => _mode = _WizardMode.createNew),
-              onJoinExisting: () => setState(() => _mode = _WizardMode.joinExisting),
+              onCreateNew: () => _notifier.setMode(SyncWizardMode.createNew),
+              onJoinExisting: () =>
+                  _notifier.setMode(SyncWizardMode.joinExisting),
             ),
-          if (_mode == _WizardMode.createNew)
+          if (wizard.mode == SyncWizardMode.createNew)
             WizardCreateNew(
-              currentStep: _createStep,
+              currentStep: wizard.createStep,
               urlController: _urlController,
               keyController: _keyController,
               keyField: _buildKeyField(),
-              onBack: () => setState(() => _createStep--),
-              onNext: () => setState(() => _createStep++),
+              onBack: _notifier.decrementStep,
+              onNext: _notifier.incrementStep,
               onContinue: (_urlController.text.isNotEmpty && _keyController.text.isNotEmpty)
-                  ? () => setState(() => _mode = _WizardMode.auth)
+                  ? () => _notifier.setMode(SyncWizardMode.auth)
                   : null,
             ),
-          if (_mode == _WizardMode.joinExisting)
+          if (wizard.mode == SyncWizardMode.joinExisting)
             WizardJoinExisting(
               urlController: _urlController,
               keyController: _keyController,
               keyField: _buildKeyField(),
               onScanQr: _openQrScanner,
               onContinue: (_urlController.text.isNotEmpty && _keyController.text.isNotEmpty)
-                  ? () => setState(() => _mode = _WizardMode.auth)
+                  ? () => _notifier.setMode(SyncWizardMode.auth)
                   : null,
             ),
-          if (_mode == _WizardMode.auth)
+          if (wizard.mode == SyncWizardMode.auth)
             WizardAuthStep(
-              useEmail: _useEmail,
-              isSignUp: _isSignUp,
-              testing: _testing,
-              connecting: _connecting,
-              testResult: _testResult,
-              testSuccess: _testSuccess,
+              useEmail: wizard.useEmail,
+              isSignUp: wizard.isSignUp,
+              testing: wizard.testing,
+              connecting: wizard.connecting,
+              testResult: wizard.testResult,
+              testSuccess: wizard.testSuccess,
               emailController: _emailController,
               passwordController: _passwordController,
-              onUseEmailChanged: (value) => setState(() => _useEmail = value),
-              onToggleSignUp: () => setState(() => _isSignUp = !_isSignUp),
+              onUseEmailChanged: _notifier.setUseEmail,
+              onToggleSignUp: _notifier.toggleSignUp,
               onTestConnection: _testConnection,
               onConnect: _connect,
-              onPasswordChanged: () => setState(() {}),
+              onPasswordChanged: _notifier.touch,
             ),
-          if (_mode == _WizardMode.schema)
+          if (wizard.mode == SyncWizardMode.schema)
             WizardSchemaStep(
-              schemaStatus: _schemaStatus,
-              migrationSql: _migrationSql,
+              schemaStatus: wizard.schemaStatus,
+              migrationSql: wizard.migrationSql,
               onRecheck: () async {
                 final status = await SchemaVerifier.checkSchema();
-                if (mounted) setState(() => _schemaStatus = status);
+                if (mounted) _notifier.updateSchemaStatus(status);
               },
               onDone: () {
                 SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.tankSyncConnected ?? 'TankSync connected!');
@@ -187,7 +193,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
         final json = jsonDecode(result) as Map<String, dynamic>;
         _urlController.text = json['url']?.toString() ?? '';
         _keyController.text = json['key']?.toString() ?? '';
-        setState(() => _mode = _WizardMode.auth);
+        _notifier.setMode(SyncWizardMode.auth);
       } catch (e) {
         debugPrint('QR code parse failed: $e');
         SnackBarHelper.showError(context, AppLocalizations.of(context)?.invalidQrCodeTankSync ?? 'Invalid QR code — expected TankSync format');
@@ -196,27 +202,28 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
   }
 
   Future<void> _testConnection() async {
-    setState(() { _testing = true; _testResult = null; });
+    _notifier.startTesting();
     try {
       final url = _sanitizeUrl(_urlController.text);
       final key = _sanitizeKey(_keyController.text);
       await TankSyncClient.init(url: url, anonKey: key);
-      setState(() { _testResult = 'Connection successful!'; _testSuccess = true; _testing = false; });
+      _notifier.testSucceeded('Connection successful!');
     } catch (e) {
-      setState(() { _testResult = 'Connection failed:\n$e'; _testSuccess = false; _testing = false; });
+      _notifier.testFailed('Connection failed:\n$e');
     }
   }
 
   Future<void> _connect() async {
-    setState(() => _connecting = true);
+    _notifier.setConnecting(true);
     try {
+      final wizard = ref.read(syncWizardControllerProvider);
       final url = _sanitizeUrl(_urlController.text);
       final key = _sanitizeKey(_keyController.text);
 
-      if (_useEmail && _emailController.text.isNotEmpty && (_isSignUp ? PasswordValidator.isValid(_passwordController.text) : _passwordController.text.isNotEmpty)) {
+      if (wizard.useEmail && _emailController.text.isNotEmpty && (wizard.isSignUp ? PasswordValidator.isValid(_passwordController.text) : _passwordController.text.isNotEmpty)) {
         await TankSyncClient.init(url: url, anonKey: key);
         String? userId;
-        if (_isSignUp) {
+        if (wizard.isSignUp) {
           userId = await TankSyncClient.signUpWithEmail(_emailController.text.trim(), _passwordController.text);
         } else {
           userId = await TankSyncClient.signInWithEmail(_emailController.text.trim(), _passwordController.text);
@@ -239,19 +246,18 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
           SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.tankSyncConnected ?? 'TankSync connected!');
           Navigator.pop(context);
         } else {
-          setState(() {
-            _schemaStatus = schema;
-            _migrationSql = SchemaVerifier.getMigrationSql(schema);
-            _mode = _WizardMode.schema;
-          });
+          _notifier.showSchemaStep(
+            schema: schema,
+            migrationSql: SchemaVerifier.getMigrationSql(schema),
+          );
         }
       }
     } catch (e) {
       if (mounted) {
-        setState(() { _testResult = 'Connection failed: $e'; _testSuccess = false; });
+        _notifier.connectFailed('Connection failed: $e');
       }
     } finally {
-      if (mounted) setState(() => _connecting = false);
+      if (mounted) _notifier.setConnecting(false);
     }
   }
 }

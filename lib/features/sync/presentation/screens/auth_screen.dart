@@ -8,6 +8,7 @@ import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/password_validator.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../providers/auth_form_provider.dart';
 import '../widgets/auth_info_card.dart';
 import '../widgets/auth_status_cards.dart';
 import '../widgets/email_auth_card.dart';
@@ -21,6 +22,10 @@ import '../widgets/email_auth_card.dart';
 /// - Confirm password on sign-up
 /// - Proper error messages
 /// - Works for all sync modes (community, private, joinExisting)
+///
+/// Form state (toggles, loading, error) lives in [authFormControllerProvider];
+/// only [TextEditingController]s remain local because they must follow
+/// Flutter's widget lifecycle.
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
 
@@ -32,11 +37,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
-  bool _isSignUp = true;
-  bool _isLoading = false;
-  bool _showPassword = false;
-  bool _showConfirm = false;
-  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    // Reset shared form state for a fresh screen instance.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(authFormControllerProvider.notifier).reset();
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -46,11 +57,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     super.dispose();
   }
 
+  AuthFormController get _formNotifier =>
+      ref.read(authFormControllerProvider.notifier);
+
   Future<void> _continueAsGuest() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+    _formNotifier.setLoading(true);
     try {
       final userId = await TankSyncClient.signInAnonymously();
       if (userId != null) {
@@ -66,50 +77,48 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         }
       }
     } catch (e) {
-      setState(() => _error = e.toString());
+      _formNotifier.setError(e.toString());
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      _formNotifier.setLoading(false);
     }
   }
 
   Future<void> _submitEmail() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
+    final isSignUp = ref.read(authFormControllerProvider).isSignUp;
 
     if (email.isEmpty || password.isEmpty) {
-      setState(() => _error = 'Please enter email and password');
+      _formNotifier.setError('Please enter email and password');
       return;
     }
     if (!email.contains('@')) {
-      setState(() => _error = 'Please enter a valid email address');
+      _formNotifier.setError('Please enter a valid email address');
       return;
     }
-    if (_isSignUp && !PasswordValidator.isValid(password)) {
+    if (isSignUp && !PasswordValidator.isValid(password)) {
       final l10n = AppLocalizations.of(context);
-      setState(() => _error =
+      _formNotifier.setError(
           l10n?.passwordTooWeak ?? 'Password does not meet all requirements');
       return;
     }
-    if (_isSignUp && password != _confirmController.text) {
-      setState(() => _error = 'Passwords do not match');
+    if (isSignUp && password != _confirmController.text) {
+      _formNotifier.setError('Passwords do not match');
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+    _formNotifier.setLoading(true);
     try {
       await ref.read(syncStateProvider.notifier).signInWithEmail(
             email, password,
-            isSignUp: _isSignUp,
+            isSignUp: isSignUp,
           );
 
       if (mounted) {
         final l10n = AppLocalizations.of(context);
         SnackBarHelper.showSuccess(
             context,
-            _isSignUp
+            isSignUp
                 ? (l10n?.accountCreated ?? 'Account created!')
                 : (l10n?.signedIn ?? 'Signed in!'));
         context.pop();
@@ -127,18 +136,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           errorMsg =
               'Please check your email and confirm your account first.';
         }
-        setState(() => _error = errorMsg);
+        _formNotifier.setError(errorMsg);
       }
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      _formNotifier.setLoading(false);
     }
   }
 
   Future<void> _switchToAnonymous() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+    _formNotifier.setLoading(true);
     try {
       await ref.read(syncStateProvider.notifier).switchToAnonymous();
       if (mounted) {
@@ -149,9 +155,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         context.pop();
       }
     } catch (e) {
-      setState(() => _error = e.toString());
+      _formNotifier.setError(e.toString());
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      _formNotifier.setLoading(false);
     }
   }
 
@@ -160,6 +166,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final syncConfig = ref.watch(syncStateProvider);
+    final form = ref.watch(authFormControllerProvider);
     final isEmailUser = syncConfig.hasEmail;
 
     return Scaffold(
@@ -171,12 +178,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           if (isEmailUser)
             EmailUserStatusCard(
               userEmail: syncConfig.userEmail,
-              isLoading: _isLoading,
+              isLoading: form.isLoading,
               onSwitchToAnonymous: _switchToAnonymous,
             )
           else if (!TankSyncClient.isConnected)
             GuestOptionCard(
-              isLoading: _isLoading,
+              isLoading: form.isLoading,
               onContinueAsGuest: _continueAsGuest,
             )
           else
@@ -187,25 +194,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               emailController: _emailController,
               passwordController: _passwordController,
               confirmController: _confirmController,
-              isSignUp: _isSignUp,
-              isLoading: _isLoading,
-              showPassword: _showPassword,
-              showConfirm: _showConfirm,
-              error: _error,
+              isSignUp: form.isSignUp,
+              isLoading: form.isLoading,
+              showPassword: form.showPassword,
+              showConfirm: form.showConfirm,
+              error: form.error,
               onSubmit: _submitEmail,
-              onToggleMode: () => setState(() {
-                _isSignUp = !_isSignUp;
+              onToggleMode: () {
                 _confirmController.clear();
-                _error = null;
-              }),
-              onTogglePassword: () =>
-                  setState(() => _showPassword = !_showPassword),
-              onToggleConfirm: () =>
-                  setState(() => _showConfirm = !_showConfirm),
-              onPasswordChanged: () => setState(() {}),
+                _formNotifier.toggleSignUp();
+              },
+              onTogglePassword: _formNotifier.togglePassword,
+              onToggleConfirm: _formNotifier.toggleConfirm,
+              onPasswordChanged: _formNotifier.touch,
             ),
 
-          if (isEmailUser && _error != null) ...[
+          if (isEmailUser && form.error != null) ...[
             const SizedBox(height: 8),
             Card(
               color: theme.colorScheme.error.withValues(alpha: 0.1),
@@ -217,7 +221,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         size: 16, color: theme.colorScheme.error),
                     const SizedBox(width: 8),
                     Expanded(
-                        child: Text(_error!,
+                        child: Text(form.error!,
                             style: TextStyle(
                                 color: theme.colorScheme.error, fontSize: 12))),
                   ],

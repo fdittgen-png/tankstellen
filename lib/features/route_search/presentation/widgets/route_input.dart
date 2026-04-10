@@ -11,12 +11,17 @@ import '../../../../core/utils/frame_callbacks.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/route_info.dart';
+import '../../providers/route_input_provider.dart';
 import 'city_autocomplete_field.dart';
 
 /// Input widget for route-based search: start, optional stops, destination.
 ///
 /// All fields share the same Nominatim-backed city autocomplete via
 /// [CityAutocompleteField], reusing the existing [LocationSearchService].
+///
+/// State lives in [routeInputControllerProvider]; only the non-shareable
+/// [TextEditingController]s stay in this widget because they must follow
+/// Flutter's lifecycle rules.
 class RouteInput extends ConsumerStatefulWidget {
   final void Function(List<RouteWaypoint> waypoints) onSearch;
 
@@ -31,18 +36,15 @@ class _RouteInputState extends ConsumerState<RouteInput> {
   final _endController = TextEditingController();
   final _stopControllers = <TextEditingController>[];
 
-  LatLng? _startCoords;
-  LatLng? _endCoords;
-  final _stopCoords = <LatLng?>[];
-
-  bool _isSearching = false;
   bool _autoGpsTriggered = false;
 
   @override
   void initState() {
     super.initState();
-    // Auto-fill start with current position so user doesn't have to tap GPS
+    // Reset shared provider state for a fresh widget instance.
     safePostFrame(() {
+      if (!mounted) return;
+      ref.read(routeInputControllerProvider.notifier).reset();
       if (!_autoGpsTriggered) {
         _autoGpsTriggered = true;
         _useGpsForStart();
@@ -64,11 +66,11 @@ class _RouteInputState extends ConsumerState<RouteInput> {
     try {
       final locationService = ref.read(locationServiceProvider);
       final position = await locationService.getCurrentPosition();
-      _startCoords = LatLng(position.latitude, position.longitude);
       if (!mounted) return;
+      final coords = LatLng(position.latitude, position.longitude);
+      ref.read(routeInputControllerProvider.notifier).setStartCoords(coords);
       final l10n = AppLocalizations.of(context);
       _startController.text = l10n?.currentLocation ?? 'Current location';
-      setState(() {});
     } catch (e) {
       if (mounted) {
         final l10n = AppLocalizations.of(context);
@@ -79,63 +81,84 @@ class _RouteInputState extends ConsumerState<RouteInput> {
   }
 
   void _addStop() {
-    setState(() {
-      _stopControllers.add(TextEditingController());
-      _stopCoords.add(null);
-    });
+    _stopControllers.add(TextEditingController());
+    ref.read(routeInputControllerProvider.notifier).addStop();
   }
 
   void _removeStop(int index) {
-    setState(() {
-      _stopControllers[index].dispose();
-      _stopControllers.removeAt(index);
-      _stopCoords.removeAt(index);
-    });
+    _stopControllers[index].dispose();
+    _stopControllers.removeAt(index);
+    ref.read(routeInputControllerProvider.notifier).removeStop(index);
   }
 
-  void _onCitySelected(ResolvedLocation city,
-      TextEditingController controller, void Function(LatLng) setCoords) {
-    controller.text = city.name;
-    setCoords(LatLng(city.lat, city.lng));
-    setState(() {});
+  void _onStartCitySelected(ResolvedLocation city) {
+    _startController.text = city.name;
+    ref
+        .read(routeInputControllerProvider.notifier)
+        .setStartCoords(LatLng(city.lat, city.lng));
+  }
+
+  void _onEndCitySelected(ResolvedLocation city) {
+    _endController.text = city.name;
+    ref
+        .read(routeInputControllerProvider.notifier)
+        .setEndCoords(LatLng(city.lat, city.lng));
+  }
+
+  void _onStopCitySelected(int i, ResolvedLocation city) {
+    _stopControllers[i].text = city.name;
+    ref
+        .read(routeInputControllerProvider.notifier)
+        .setStopCoord(i, LatLng(city.lat, city.lng));
   }
 
   Future<void> _resolveAndSearch() async {
-    if (_isSearching) return;
-    setState(() => _isSearching = true);
+    final routeState = ref.read(routeInputControllerProvider);
+    if (routeState.isSearching) return;
+    final notifier = ref.read(routeInputControllerProvider.notifier);
+    notifier.setSearching(true);
 
     try {
       final searchService = ref.read(locationSearchServiceProvider);
 
+      var startCoords = routeState.startCoords;
+      var endCoords = routeState.endCoords;
+      final stopCoords = List<LatLng?>.from(routeState.stopCoords);
+
       // Resolve start if needed
-      if (_startCoords == null && _startController.text.isNotEmpty) {
+      if (startCoords == null && _startController.text.isNotEmpty) {
         final results =
             await searchService.searchCities(_startController.text);
         if (results.isNotEmpty) {
-          _startCoords = LatLng(results.first.lat, results.first.lng);
+          startCoords = LatLng(results.first.lat, results.first.lng);
+          notifier.setStartCoords(startCoords);
         }
       }
 
       // Resolve end if needed
-      if (_endCoords == null && _endController.text.isNotEmpty) {
+      if (endCoords == null && _endController.text.isNotEmpty) {
         final results = await searchService.searchCities(_endController.text);
         if (results.isNotEmpty) {
-          _endCoords = LatLng(results.first.lat, results.first.lng);
+          endCoords = LatLng(results.first.lat, results.first.lng);
+          notifier.setEndCoords(endCoords);
         }
       }
 
       // Resolve stops
       for (var i = 0; i < _stopControllers.length; i++) {
-        if (_stopCoords[i] == null && _stopControllers[i].text.isNotEmpty) {
+        if (i < stopCoords.length &&
+            stopCoords[i] == null &&
+            _stopControllers[i].text.isNotEmpty) {
           final results =
               await searchService.searchCities(_stopControllers[i].text);
           if (results.isNotEmpty) {
-            _stopCoords[i] = LatLng(results.first.lat, results.first.lng);
+            stopCoords[i] = LatLng(results.first.lat, results.first.lng);
+            notifier.setStopCoord(i, stopCoords[i]);
           }
         }
       }
 
-      if (_startCoords == null || _endCoords == null) {
+      if (startCoords == null || endCoords == null) {
         if (mounted) {
           SnackBarHelper.showError(
               context,
@@ -147,20 +170,20 @@ class _RouteInputState extends ConsumerState<RouteInput> {
 
       final waypoints = <RouteWaypoint>[
         RouteWaypoint(
-          lat: _startCoords!.latitude,
-          lng: _startCoords!.longitude,
+          lat: startCoords.latitude,
+          lng: startCoords.longitude,
           label: _startController.text,
         ),
-        for (var i = 0; i < _stopCoords.length; i++)
-          if (_stopCoords[i] != null)
+        for (var i = 0; i < stopCoords.length; i++)
+          if (stopCoords[i] != null)
             RouteWaypoint(
-              lat: _stopCoords[i]!.latitude,
-              lng: _stopCoords[i]!.longitude,
+              lat: stopCoords[i]!.latitude,
+              lng: stopCoords[i]!.longitude,
               label: _stopControllers[i].text,
             ),
         RouteWaypoint(
-          lat: _endCoords!.latitude,
-          lng: _endCoords!.longitude,
+          lat: endCoords.latitude,
+          lng: endCoords.longitude,
           label: _endController.text,
         ),
       ];
@@ -172,7 +195,7 @@ class _RouteInputState extends ConsumerState<RouteInput> {
             '${AppLocalizations.of(context)?.errorUnknown ?? "Error"}: $e');
       }
     } finally {
-      if (mounted) setState(() => _isSearching = false);
+      if (mounted) notifier.setSearching(false);
     }
   }
 
@@ -181,6 +204,7 @@ class _RouteInputState extends ConsumerState<RouteInput> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final searchService = ref.watch(locationSearchServiceProvider);
+    final routeState = ref.watch(routeInputControllerProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -197,10 +221,9 @@ class _RouteInputState extends ConsumerState<RouteInput> {
             onPressed: _useGpsForStart,
             tooltip: l10n?.useGps ?? 'Use GPS',
           ),
-          onCitySelected: (city) => _onCitySelected(
-            city, _startController, (c) => _startCoords = c,
-          ),
-          onTextChanged: () => _startCoords = null,
+          onCitySelected: _onStartCitySelected,
+          onTextChanged: () =>
+              ref.read(routeInputControllerProvider.notifier).setStartCoords(null),
         ),
         const SizedBox(height: 6),
 
@@ -218,10 +241,10 @@ class _RouteInputState extends ConsumerState<RouteInput> {
                 icon: const Icon(Icons.close, size: 16),
                 onPressed: () => _removeStop(i),
               ),
-              onCitySelected: (city) => _onCitySelected(
-                city, _stopControllers[i], (c) => _stopCoords[i] = c,
-              ),
-              onTextChanged: () => _stopCoords[i] = null,
+              onCitySelected: (city) => _onStopCitySelected(i, city),
+              onTextChanged: () => ref
+                  .read(routeInputControllerProvider.notifier)
+                  .setStopCoord(i, null),
             ),
           ),
 
@@ -248,29 +271,33 @@ class _RouteInputState extends ConsumerState<RouteInput> {
           label: l10n?.destination ?? 'Destination',
           hint: l10n?.cityOrAddress ?? 'City or address',
           prefixIcon: Icons.place,
-          onCitySelected: (city) => _onCitySelected(
-            city, _endController, (c) => _endCoords = c,
-          ),
-          onTextChanged: () => _endCoords = null,
+          onCitySelected: _onEndCitySelected,
+          onTextChanged: () =>
+              ref.read(routeInputControllerProvider.notifier).setEndCoords(null),
         ),
         const SizedBox(height: 8),
 
-        // Search button
-        FilledButton.icon(
-          onPressed: (_startController.text.isNotEmpty &&
-                  _endController.text.isNotEmpty &&
-                  !_isSearching)
-              ? _resolveAndSearch
-              : null,
-          icon: _isSearching
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2, color: Colors.white),
-                )
-              : const Icon(Icons.route),
-          label: Text(l10n?.searchAlongRoute ?? 'Search along route'),
+        // Search button — listens to controllers so it enables as the user
+        // types, without needing setState.
+        ListenableBuilder(
+          listenable: Listenable.merge([_startController, _endController]),
+          builder: (context, _) {
+            final canSearch = _startController.text.isNotEmpty &&
+                _endController.text.isNotEmpty &&
+                !routeState.isSearching;
+            return FilledButton.icon(
+              onPressed: canSearch ? _resolveAndSearch : null,
+              icon: routeState.isSearching
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Icon(Icons.route),
+              label: Text(l10n?.searchAlongRoute ?? 'Search along route'),
+            );
+          },
         ),
       ],
     );

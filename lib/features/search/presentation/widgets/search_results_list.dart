@@ -26,7 +26,7 @@ import 'sort_selector.dart';
 import 'swipeable_station_card.dart';
 
 /// Station list with sort controls, refresh, count bar, and search location header.
-class SearchResultsList extends ConsumerStatefulWidget {
+class SearchResultsList extends ConsumerWidget {
   final ServiceResult<List<Station>> result;
   final VoidCallback onRefresh;
 
@@ -35,13 +35,6 @@ class SearchResultsList extends ConsumerStatefulWidget {
     required this.result,
     required this.onRefresh,
   });
-
-  @override
-  ConsumerState<SearchResultsList> createState() => _SearchResultsListState();
-}
-
-class _SearchResultsListState extends ConsumerState<SearchResultsList> {
-  SortMode _sortMode = SortMode.distance;
 
   void _openStationInMaps(Station station) {
     NavigationUtils.openInMaps(
@@ -97,11 +90,12 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
     return (minP, maxP);
   }
 
-  List<Station> _sortStations(List<Station> stations) {
+  List<Station> _sortStations(
+      List<Station> stations, SortMode sortMode, WidgetRef ref) {
     final sorted = List<Station>.from(stations);
     final fuelType = ref.read(selectedFuelTypeProvider);
 
-    switch (_sortMode) {
+    switch (sortMode) {
       case SortMode.distance:
         sorted.sort((a, b) => a.dist.compareTo(b.dist));
       case SortMode.price:
@@ -120,10 +114,10 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final result = widget.result;
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final ignoredIds = ref.watch(ignoredStationsProvider);
+    final sortMode = ref.watch(selectedSortModeProvider);
 
     return Column(
       children: [
@@ -170,8 +164,9 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
         ),
         const CrossBorderBanner(),
         SortSelector(
-          selected: _sortMode,
-          onChanged: (mode) => setState(() => _sortMode = mode),
+          selected: sortMode,
+          onChanged: (mode) =>
+              ref.read(selectedSortModeProvider.notifier).set(mode),
         ),
         _CollapsibleBrandFilters(
           stations: result.data
@@ -180,7 +175,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
         ),
         Expanded(
           child: RefreshIndicator(
-            onRefresh: () async => widget.onRefresh(),
+            onRefresh: () async => onRefresh(),
             child: Builder(builder: (context) {
               // Filter out ignored stations
               final afterIgnored = result.data
@@ -195,7 +190,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
                 selectedBrands: selectedBrands,
                 excludeHighway: excludeHighway,
               );
-              final sorted = _sortStations(filtered);
+              final sorted = _sortStations(filtered, sortMode, ref);
               final allPrices = ref.watch(allPricesViewEnabledProvider);
               final cheapestMap = allPrices
                   ? _computeCheapestFlags(sorted)
