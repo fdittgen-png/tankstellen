@@ -3192,6 +3192,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'3-pin'**
   String get connectorThreePin;
+
+  /// No description provided for @evShowOnMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Show EV stations'**
+  String get evShowOnMap;
+
+  /// No description provided for @evAvailableOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Available only'**
+  String get evAvailableOnly;
+
+  /// No description provided for @evMinPower.
+  ///
+  /// In en, this message translates to:
+  /// **'Min power'**
+  String get evMinPower;
+
+  /// No description provided for @evMaxPower.
+  ///
+  /// In en, this message translates to:
+  /// **'Max power'**
+  String get evMaxPower;
+
+  /// No description provided for @evOperator.
+  ///
+  /// In en, this message translates to:
+  /// **'Operator'**
+  String get evOperator;
+
+  /// No description provided for @evLastUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Last update'**
+  String get evLastUpdate;
+
+  /// No description provided for @evStatusAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get evStatusAvailable;
+
+  /// No description provided for @evStatusOccupied.
+  ///
+  /// In en, this message translates to:
+  /// **'Occupied'**
+  String get evStatusOccupied;
+
+  /// No description provided for @evStatusOutOfOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Out of order'**
+  String get evStatusOutOfOrder;
 }
 
 class _AppLocalizationsDelegate

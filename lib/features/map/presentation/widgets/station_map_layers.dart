@@ -32,6 +32,10 @@ class StationMapLayers extends StatelessWidget {
   /// Stations IN this set use vivid/flashy colors for quick identification.
   final Set<String>? selectedStationIds;
 
+  /// Additional map layers rendered after the station markers, e.g. the
+  /// EV charging station overlay.
+  final List<Widget> extraLayers;
+
   const StationMapLayers({
     super.key,
     required this.mapController,
@@ -45,6 +49,7 @@ class StationMapLayers extends StatelessWidget {
     this.routePolyline,
     this.showSearchRadius = true,
     this.selectedStationIds,
+    this.extraLayers = const [],
   });
 
   @override
@@ -149,6 +154,8 @@ class StationMapLayers extends StatelessWidget {
               }
               return MarkerLayer(markers: markers);
             }),
+            // Extra layers (e.g. EV overlay)
+            ...extraLayers,
             // Attribution
             const RichAttributionWidget(
               attributions: [

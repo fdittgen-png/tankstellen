@@ -738,5 +738,14 @@
   "connectorTesla": "Tesla",
   "connectorSchuko": "Schuko",
   "connectorType1": "Type 1",
-  "connectorThreePin": "3-pin"
+  "connectorThreePin": "3-pin",
+  "evShowOnMap": "Show EV stations",
+  "evAvailableOnly": "Available only",
+  "evMinPower": "Min power",
+  "evMaxPower": "Max power",
+  "evOperator": "Operator",
+  "evLastUpdate": "Last update",
+  "evStatusAvailable": "Available",
+  "evStatusOccupied": "Occupied",
+  "evStatusOutOfOrder": "Out of order"
 }

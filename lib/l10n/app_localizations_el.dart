@@ -1658,4 +1658,31 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get connectorThreePin => '3-pin';
+
+  @override
+  String get evShowOnMap => 'Show EV stations';
+
+  @override
+  String get evAvailableOnly => 'Available only';
+
+  @override
+  String get evMinPower => 'Min power';
+
+  @override
+  String get evMaxPower => 'Max power';
+
+  @override
+  String get evOperator => 'Operator';
+
+  @override
+  String get evLastUpdate => 'Last update';
+
+  @override
+  String get evStatusAvailable => 'Available';
+
+  @override
+  String get evStatusOccupied => 'Occupied';
+
+  @override
+  String get evStatusOutOfOrder => 'Out of order';
 }

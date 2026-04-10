@@ -3,6 +3,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../driving/presentation/widgets/driving_mode_fab.dart';
+import '../../../ev/presentation/widgets/ev_filter_chips.dart';
+import '../../../ev/presentation/widgets/ev_map_overlay.dart';
+import '../../../ev/providers/ev_providers.dart';
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../../search/providers/search_provider.dart';
 import '../widgets/nearby_map_view.dart';
@@ -38,9 +41,23 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final selectedFuel = ref.watch(selectedFuelTypeProvider);
     final searchRadius = ref.watch(searchRadiusProvider);
     final routeState = ref.watch(routeSearchStateProvider);
+    final showEv = ref.watch(evShowOnMapProvider);
     final l10n = AppLocalizations.of(context);
 
     final hasRouteResults = routeState.hasValue && routeState.value != null;
+
+    final body = hasRouteResults
+        ? RouteMapView(
+            routeResult: routeState.value!,
+            selectedFuel: selectedFuel,
+            mapController: _mapController,
+          )
+        : NearbyMapView(
+            searchState: searchState,
+            selectedFuel: selectedFuel,
+            searchRadiusKm: searchRadius,
+            mapController: _mapController,
+          );
 
     return Scaffold(
       appBar: PreferredSize(
@@ -53,18 +70,23 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ),
       ),
       floatingActionButton: const DrivingModeFab(),
-      body: hasRouteResults
-          ? RouteMapView(
-              routeResult: routeState.value!,
-              selectedFuel: selectedFuel,
-              mapController: _mapController,
-            )
-          : NearbyMapView(
-              searchState: searchState,
-              selectedFuel: selectedFuel,
-              searchRadiusKm: searchRadius,
-              mapController: _mapController,
+      body: Column(
+        children: [
+          if (showEv) const EvFilterChips(),
+          Expanded(
+            child: Stack(
+              children: [
+                body,
+                const Positioned(
+                  left: 16,
+                  top: 16,
+                  child: EvToggleButton(),
+                ),
+              ],
             ),
+          ),
+        ],
+      ),
     );
   }
 }

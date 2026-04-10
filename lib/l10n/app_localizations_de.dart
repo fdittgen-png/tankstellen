@@ -1666,4 +1666,31 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get connectorThreePin => 'Schuko 3-polig';
+
+  @override
+  String get evShowOnMap => 'Ladestationen anzeigen';
+
+  @override
+  String get evAvailableOnly => 'Nur verfügbare';
+
+  @override
+  String get evMinPower => 'Min. Leistung';
+
+  @override
+  String get evMaxPower => 'Max. Leistung';
+
+  @override
+  String get evOperator => 'Betreiber';
+
+  @override
+  String get evLastUpdate => 'Letzte Aktualisierung';
+
+  @override
+  String get evStatusAvailable => 'Verfügbar';
+
+  @override
+  String get evStatusOccupied => 'Belegt';
+
+  @override
+  String get evStatusOutOfOrder => 'Außer Betrieb';
 }

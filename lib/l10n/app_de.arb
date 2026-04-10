@@ -738,5 +738,14 @@
   "connectorTesla": "Tesla",
   "connectorSchuko": "Schuko",
   "connectorType1": "Typ 1",
-  "connectorThreePin": "Schuko 3-polig"
+  "connectorThreePin": "Schuko 3-polig",
+  "evShowOnMap": "Ladestationen anzeigen",
+  "evAvailableOnly": "Nur verfügbare",
+  "evMinPower": "Min. Leistung",
+  "evMaxPower": "Max. Leistung",
+  "evOperator": "Betreiber",
+  "evLastUpdate": "Letzte Aktualisierung",
+  "evStatusAvailable": "Verfügbar",
+  "evStatusOccupied": "Belegt",
+  "evStatusOutOfOrder": "Außer Betrieb"
 }
