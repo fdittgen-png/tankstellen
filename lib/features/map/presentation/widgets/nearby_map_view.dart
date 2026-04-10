@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../ev/presentation/widgets/ev_map_overlay.dart';
+import '../../../ev/providers/ev_providers.dart';
 import 'station_map_layers.dart';
 
 /// Displays a map of nearby stations from the current search results.
@@ -47,6 +50,23 @@ class NearbyMapView extends ConsumerWidget {
         final center = StationMapLayers.centerOf(stations);
         final zoom = StationMapLayers.zoomForRadius(searchRadiusKm);
 
+        final showEv = ref.watch(evShowOnMapProvider);
+        final userPos = ref.read(userPositionProvider);
+        final evLat = userPos?.lat ?? center.latitude;
+        final evLng = userPos?.lng ?? center.longitude;
+        final extraLayers = <Widget>[];
+        if (showEv) {
+          extraLayers.add(
+            EvMapLayer(
+              viewport: EvViewport(
+                latitude: evLat,
+                longitude: evLng,
+                radiusKm: searchRadiusKm,
+              ),
+            ),
+          );
+        }
+
         // Move map to new center when search results change
         WidgetsBinding.instance.addPostFrameCallback((_) {
           try { mapController.move(center, zoom); } catch (e) { debugPrint('Map move failed: $e'); }
@@ -65,6 +85,7 @@ class NearbyMapView extends ConsumerWidget {
                 selectedFuel: selectedFuel,
                 showRecenterButton: true,
                 onRecenter: () => mapController.move(center, zoom),
+                extraLayers: extraLayers,
               ),
             ),
             _buildInfoBar(context, l10n, stations, result),
