@@ -9,6 +9,7 @@ import '../../../../core/utils/frame_callbacks.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
+import '../../providers/location_input_provider.dart';
 
 /// Unified location input: auto-detects GPS (empty), ZIP (digits), or city (text).
 /// Replaces the old 3-tab GPS/ZIP/City UI.
@@ -32,10 +33,6 @@ class _LocationInputState extends ConsumerState<LocationInput> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
   Timer? _debounce;
-  List<ResolvedLocation> _suggestions = [];
-  ResolvedLocation? _selectedCity;
-  bool _isSearching = false;
-  LocationInputType _inputType = LocationInputType.gps;
 
   @override
   void initState() {
@@ -63,11 +60,7 @@ class _LocationInputState extends ConsumerState<LocationInput> {
     final service = ref.read(locationSearchServiceProvider);
     final type = service.detectInputType(value, country);
 
-    setState(() {
-      _inputType = type;
-      _selectedCity = null;
-      if (type != LocationInputType.city) _suggestions = [];
-    });
+    ref.read(locationInputControllerProvider.notifier).setInputType(type);
 
     if (type == LocationInputType.city) {
       _debounce?.cancel();
@@ -79,26 +72,28 @@ class _LocationInputState extends ConsumerState<LocationInput> {
 
   Future<void> _fetchSuggestions(String query) async {
     if (!mounted) return;
-    setState(() => _isSearching = true);
+    final controller = ref.read(locationInputControllerProvider.notifier);
+    controller.setSearching(true);
     try {
       final service = ref.read(locationSearchServiceProvider);
       final results = await service.searchCities(query);
-      if (mounted) setState(() => _suggestions = results);
+      if (mounted) controller.setSuggestions(results);
     } finally {
-      if (mounted) setState(() => _isSearching = false);
+      if (mounted) controller.setSearching(false);
     }
   }
 
   void _submit() {
     final country = ref.read(activeCountryProvider);
+    final uiState = ref.read(locationInputControllerProvider);
     final text = _controller.text.trim();
 
-    if (_selectedCity != null) {
-      widget.onCitySearch(_selectedCity!);
+    if (uiState.selectedCity != null) {
+      widget.onCitySearch(uiState.selectedCity!);
       return;
     }
 
-    switch (_inputType) {
+    switch (uiState.inputType) {
       case LocationInputType.gps:
         widget.onGpsSearch();
       case LocationInputType.zip:
@@ -108,19 +103,20 @@ class _LocationInputState extends ConsumerState<LocationInput> {
           final l10n = AppLocalizations.of(context);
           SnackBarHelper.showError(
             context,
-            l10n?.invalidPostalCode(country.postalCodeLength.toString(), country.postalCodeLabel) ??
+            l10n?.invalidPostalCode(
+                    country.postalCodeLength.toString(), country.postalCodeLabel) ??
                 'Please enter a valid ${country.postalCodeLength}-digit ${country.postalCodeLabel}',
           );
         }
       case LocationInputType.city:
         // If they typed a city but didn't select a suggestion, search anyway
-        if (_suggestions.isNotEmpty) {
-          widget.onCitySearch(_suggestions.first);
+        if (uiState.suggestions.isNotEmpty) {
+          widget.onCitySearch(uiState.suggestions.first);
         }
     }
   }
 
-  IconData get _prefixIcon => switch (_inputType) {
+  IconData _prefixIcon(LocationInputType type) => switch (type) {
         LocationInputType.gps => Icons.my_location,
         LocationInputType.zip => Icons.pin_drop,
         LocationInputType.city => Icons.location_city,
@@ -133,74 +129,81 @@ class _LocationInputState extends ConsumerState<LocationInput> {
   @override
   Widget build(BuildContext context) {
     final country = ref.watch(activeCountryProvider);
+    final uiState = ref.watch(locationInputControllerProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SizedBox(
           height: 40,
-          child: TextField(
-            controller: _controller,
-            focusNode: _focusNode,
-            style: const TextStyle(fontSize: 14),
-            decoration: InputDecoration(
-              hintText: _hintText(country),
-              labelText: 'Location search field',
-              floatingLabelBehavior: FloatingLabelBehavior.never,
-              isDense: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              prefixIcon: Icon(_prefixIcon, size: 20),
-              prefixIconConstraints:
-                  const BoxConstraints(minWidth: 36, minHeight: 36),
-              border: const OutlineInputBorder(),
-              suffixIcon: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (_isSearching)
-                    const Padding(
-                      padding: EdgeInsets.all(8),
-                      child: SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+          child: ListenableBuilder(
+            listenable: _controller,
+            builder: (context, _) {
+              return TextField(
+                controller: _controller,
+                focusNode: _focusNode,
+                style: const TextStyle(fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: _hintText(country),
+                  labelText: 'Location search field',
+                  floatingLabelBehavior: FloatingLabelBehavior.never,
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 8),
+                  prefixIcon: Icon(_prefixIcon(uiState.inputType), size: 20),
+                  prefixIconConstraints:
+                      const BoxConstraints(minWidth: 36, minHeight: 36),
+                  border: const OutlineInputBorder(),
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (uiState.isSearching)
+                        const Padding(
+                          padding: EdgeInsets.all(8),
+                          child: SizedBox(
+                            width: 16,
+                            height: 16,
+                            child:
+                                CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                      if (_controller.text.isNotEmpty)
+                        IconButton(
+                          icon: const Icon(Icons.clear, size: 18),
+                          tooltip: 'Clear search input',
+                          padding: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints(
+                              minWidth: 32, minHeight: 32),
+                          onPressed: () {
+                            _controller.clear();
+                            _onChanged('');
+                          },
+                        ),
+                      IconButton(
+                        icon: const Icon(Icons.my_location, size: 18),
+                        tooltip: 'Use GPS location',
+                        padding: const EdgeInsets.all(4),
+                        constraints: const BoxConstraints(
+                            minWidth: 32, minHeight: 32),
+                        onPressed: () {
+                          _controller.clear();
+                          _onChanged('');
+                          widget.onGpsSearch();
+                        },
                       ),
-                    ),
-                  if (_controller.text.isNotEmpty)
-                    IconButton(
-                      icon: const Icon(Icons.clear, size: 18),
-                      tooltip: 'Clear search input',
-                      padding: const EdgeInsets.all(4),
-                      constraints:
-                          const BoxConstraints(minWidth: 32, minHeight: 32),
-                      onPressed: () {
-                        _controller.clear();
-                        _onChanged('');
-                      },
-                    ),
-                  IconButton(
-                    icon: const Icon(Icons.my_location, size: 18),
-                    tooltip: 'Use GPS location',
-                    padding: const EdgeInsets.all(4),
-                    constraints:
-                        const BoxConstraints(minWidth: 32, minHeight: 32),
-                    onPressed: () {
-                      _controller.clear();
-                      _onChanged('');
-                      widget.onGpsSearch();
-                    },
+                    ],
                   ),
-                ],
-              ),
-              suffixIconConstraints:
-                  const BoxConstraints(minWidth: 36, minHeight: 36),
-            ),
-            onChanged: _onChanged,
-            onSubmitted: (_) => _submit(),
+                  suffixIconConstraints:
+                      const BoxConstraints(minWidth: 36, minHeight: 36),
+                ),
+                onChanged: _onChanged,
+                onSubmitted: (_) => _submit(),
+              );
+            },
           ),
         ),
         // City suggestions dropdown
-        if (_suggestions.isNotEmpty)
+        if (uiState.suggestions.isNotEmpty)
           Container(
             constraints: const BoxConstraints(maxHeight: 200),
             margin: const EdgeInsets.only(top: 4),
@@ -212,10 +215,10 @@ class _LocationInputState extends ConsumerState<LocationInput> {
             ),
             child: ListView.builder(
               shrinkWrap: true,
-              itemCount: _suggestions.length,
+              itemCount: uiState.suggestions.length,
               itemBuilder: (ctx, i) {
-                final city = _suggestions[i];
-                final isSelected = _selectedCity == city;
+                final city = uiState.suggestions[i];
+                final isSelected = uiState.selectedCity == city;
                 return ListTile(
                   key: ValueKey('city-${city.lat}-${city.lng}-${city.name}'),
                   dense: true,
@@ -228,11 +231,10 @@ class _LocationInputState extends ConsumerState<LocationInput> {
                           style: const TextStyle(fontSize: 11))
                       : null,
                   onTap: () {
-                    setState(() {
-                      _selectedCity = city;
-                      _controller.text = city.name;
-                      _suggestions = [];
-                    });
+                    _controller.text = city.name;
+                    ref
+                        .read(locationInputControllerProvider.notifier)
+                        .selectCity(city);
                     widget.onCitySearch(city);
                   },
                 );

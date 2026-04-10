@@ -4,110 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
-import '../../../../core/sync/sync_service.dart';
-import '../../../alerts/providers/alert_provider.dart';
-import '../../../favorites/providers/favorites_provider.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../providers/data_transparency_provider.dart';
 import '../widgets/data_transparency_cards.dart';
 
 /// Shows all data stored on the server for the current user.
-class DataTransparencyScreen extends ConsumerStatefulWidget {
+class DataTransparencyScreen extends ConsumerWidget {
   const DataTransparencyScreen({super.key});
-
-  @override
-  ConsumerState<DataTransparencyScreen> createState() =>
-      _DataTransparencyScreenState();
-}
-
-class _DataTransparencyScreenState
-    extends ConsumerState<DataTransparencyScreen> {
-  Map<String, dynamic>? _data;
-  bool _loading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _forceSyncAndReload() async {
-    setState(() => _loading = true);
-
-    try {
-      final favoriteIds = ref.read(favoritesProvider);
-      debugPrint('DataTransparency: forcing sync of ${favoriteIds.length} local favorites');
-      debugPrint('DataTransparency: auth user = ${TankSyncClient.client?.auth.currentUser?.id}');
-      debugPrint('DataTransparency: client initialized = ${TankSyncClient.isConnected}');
-
-      if (!TankSyncClient.isConnected) {
-        debugPrint('DataTransparency: not connected, attempting re-auth...');
-        await TankSyncClient.signInAnonymously();
-        debugPrint('DataTransparency: re-auth result = ${TankSyncClient.client?.auth.currentUser?.id}');
-      } else {
-        final uid = TankSyncClient.client?.auth.currentUser?.id;
-        if (uid != null) {
-          try {
-            await TankSyncClient.client!.from('users').upsert({'id': uid}, onConflict: 'id');
-          } catch (e) {
-            debugPrint('DataTransparency: users upsert failed: $e');
-          }
-        }
-      }
-
-      await SyncService.syncFavorites(favoriteIds);
-
-      final alerts = ref.read(alertProvider);
-      debugPrint('DataTransparency: syncing ${alerts.length} local alerts');
-      await SyncService.syncAlerts(alerts);
-    } catch (e) {
-      debugPrint('DataTransparency: force sync failed: $e');
-    }
-
-    await _loadData();
-    if (mounted) {
-      SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.syncCompleted ?? 'Sync completed — data refreshed');
-    }
-  }
-
-  Future<void> _loadData() async {
-    final syncConfig = ref.read(syncStateProvider);
-    final storedUserId = syncConfig.userId;
-    final sessionUserId = TankSyncClient.client?.auth.currentUser?.id;
-
-    debugPrint('DataTransparency._loadData: storedUserId=$storedUserId, sessionUserId=$sessionUserId, isConnected=${TankSyncClient.isConnected}');
-
-    if (storedUserId == null && sessionUserId == null) {
-      setState(() {
-        _error = 'No user ID found. Try disconnecting and reconnecting TankSync.';
-        _loading = false;
-      });
-      return;
-    }
-
-    try {
-      final data = await SyncService.fetchAllUserData();
-      if (data.containsKey('error')) {
-        setState(() { _error = data['error'] as String; _loading = false; });
-      } else {
-        setState(() { _data = data; _loading = false; });
-      }
-    } catch (e) {
-      setState(() { _error = e.toString(); _loading = false; });
-    }
-  }
 
   String _prettyJson(Map<String, dynamic> data) {
     return const JsonEncoder.withIndent('  ').convert(data);
   }
 
-  Future<void> _showRawJson() async {
-    if (_data == null) return;
-    final json = _prettyJson(_data!);
-    if (!mounted) return;
+  Future<void> _showRawJson(
+    BuildContext context,
+    Map<String, dynamic> data,
+  ) async {
+    final json = _prettyJson(data);
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -115,27 +30,45 @@ class _DataTransparencyScreenState
         content: SizedBox(
           width: double.maxFinite,
           child: SingleChildScrollView(
-            child: SelectableText(json, style: const TextStyle(fontFamily: 'monospace', fontSize: 12)),
+            child: SelectableText(
+              json,
+              style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+            ),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
         ],
       ),
     );
   }
 
-  Future<void> _exportJson() async {
-    if (_data == null) return;
-    await Clipboard.setData(ClipboardData(text: _prettyJson(_data!)));
-    if (!mounted) return;
-    SnackBarHelper.show(context, AppLocalizations.of(context)?.jsonCopied ?? 'JSON copied to clipboard');
+  Future<void> _exportJson(
+    BuildContext context,
+    Map<String, dynamic> data,
+  ) async {
+    await Clipboard.setData(ClipboardData(text: _prettyJson(data)));
+    if (!context.mounted) return;
+    SnackBarHelper.show(
+      context,
+      AppLocalizations.of(context)?.jsonCopied ?? 'JSON copied to clipboard',
+    );
   }
 
-  Future<void> _deleteAllData() async {
-    final syncConfig = ref.read(syncStateProvider);
-    if (syncConfig.userId == null) return;
+  Future<void> _forceSyncAndReload(BuildContext context, WidgetRef ref) async {
+    await ref.read(dataTransparencyControllerProvider.notifier).forceSyncAndReload();
+    if (!context.mounted) return;
+    SnackBarHelper.showSuccess(
+      context,
+      AppLocalizations.of(context)?.syncCompleted ??
+          'Sync completed — data refreshed',
+    );
+  }
 
+  Future<void> _deleteAllData(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -146,7 +79,10 @@ class _DataTransparencyScreenState
           'not be affected.\n\nThis action cannot be undone.',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(context, true),
@@ -156,20 +92,17 @@ class _DataTransparencyScreenState
       ),
     );
 
-    if (confirmed != true || !mounted) return;
+    if (confirmed != true || !context.mounted) return;
 
-    setState(() => _loading = true);
-    try {
-      await SyncService.deleteAllUserData();
-      await _loadData();
-      if (!mounted) return;
-      SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.allDataDeleted ?? 'All server data deleted');
-    } catch (e) {
-      setState(() { _error = e.toString(); _loading = false; });
-    }
+    await ref.read(dataTransparencyControllerProvider.notifier).deleteAllData();
+    if (!context.mounted) return;
+    SnackBarHelper.showSuccess(
+      context,
+      AppLocalizations.of(context)?.allDataDeleted ?? 'All server data deleted',
+    );
   }
 
-  Future<void> _disconnect() async {
+  Future<void> _disconnect(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -179,32 +112,43 @@ class _DataTransparencyScreenState
           'intact. You can reconnect at any time.',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Disconnect')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Disconnect'),
+          ),
         ],
       ),
     );
 
-    if (confirmed != true || !mounted) return;
+    if (confirmed != true || !context.mounted) return;
     await ref.read(syncStateProvider.notifier).disconnect();
-    if (!mounted) return;
+    if (!context.mounted) return;
     Navigator.pop(context);
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final syncConfig = ref.watch(syncStateProvider);
+    final uiState = ref.watch(dataTransparencyControllerProvider);
     final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(title: const Text('My server data')),
-      body: _loading
+      body: uiState.loading
           ? const Center(child: CircularProgressIndicator())
-          : _error != null
+          : uiState.error != null
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
-                    child: Text(_error!, style: TextStyle(color: theme.colorScheme.error), textAlign: TextAlign.center),
+                    child: Text(
+                      uiState.error!,
+                      style: TextStyle(color: theme.colorScheme.error),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 )
               : ListView(
@@ -212,17 +156,18 @@ class _DataTransparencyScreenState
                   children: [
                     AccountInfoCard(syncConfig: syncConfig),
                     const SizedBox(height: 12),
-                    if (_data != null) ...[
-                      SyncedDataCard(data: _data!),
+                    if (uiState.data != null) ...[
+                      SyncedDataCard(data: uiState.data!),
                       const SizedBox(height: 16),
                       DataActionButtons(
-                        loading: _loading,
+                        loading: uiState.loading,
                         mode: syncConfig.mode,
-                        onSync: _forceSyncAndReload,
-                        onViewRawJson: _showRawJson,
-                        onExportJson: _exportJson,
-                        onDeleteAll: _deleteAllData,
-                        onDisconnect: _disconnect,
+                        onSync: () => _forceSyncAndReload(context, ref),
+                        onViewRawJson: () =>
+                            _showRawJson(context, uiState.data!),
+                        onExportJson: () => _exportJson(context, uiState.data!),
+                        onDeleteAll: () => _deleteAllData(context, ref),
+                        onDisconnect: () => _disconnect(context, ref),
                       ),
                     ],
                   ],
