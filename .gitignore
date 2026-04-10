@@ -57,6 +57,7 @@ credentials.json
 
 # Local IDE and tool configuration
 .claude/
+CLAUDE.md
 .copilot/
 .cursor/
 .remember/
