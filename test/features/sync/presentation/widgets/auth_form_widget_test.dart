@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/sync/presentation/widgets/auth_form_widget.dart';
 
@@ -8,19 +9,22 @@ void main() {
     bool isLoading = false,
     String? error,
   }) async {
+    // Fresh ProviderScope per test so the auth-form toggle state is reset.
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: SingleChildScrollView(
-            child: AuthFormWidget(
-              onSubmit: ({
-                required bool isEmail,
-                String? email,
-                String? password,
-                required bool isSignUp,
-              }) async {},
-              isLoading: isLoading,
-              error: error,
+      ProviderScope(
+        child: MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: AuthFormWidget(
+                onSubmit: ({
+                  required bool isEmail,
+                  String? email,
+                  String? password,
+                  required bool isSignUp,
+                }) async {},
+                isLoading: isLoading,
+                error: error,
+              ),
             ),
           ),
         ),
@@ -92,18 +96,20 @@ void main() {
       testWidgets('sign-in accepts passwords shorter than 6 characters', (tester) async {
         bool submitCalled = false;
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: SingleChildScrollView(
-                child: AuthFormWidget(
-                  onSubmit: ({
-                    required bool isEmail,
-                    String? email,
-                    String? password,
-                    required bool isSignUp,
-                  }) async {
-                    submitCalled = true;
-                  },
+          ProviderScope(
+            child: MaterialApp(
+              home: Scaffold(
+                body: SingleChildScrollView(
+                  child: AuthFormWidget(
+                    onSubmit: ({
+                      required bool isEmail,
+                      String? email,
+                      String? password,
+                      required bool isSignUp,
+                    }) async {
+                      submitCalled = true;
+                    },
+                  ),
                 ),
               ),
             ),
@@ -133,18 +139,20 @@ void main() {
       testWidgets('sign-up rejects passwords shorter than 6 characters', (tester) async {
         bool submitCalled = false;
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: SingleChildScrollView(
-                child: AuthFormWidget(
-                  onSubmit: ({
-                    required bool isEmail,
-                    String? email,
-                    String? password,
-                    required bool isSignUp,
-                  }) async {
-                    submitCalled = true;
-                  },
+          ProviderScope(
+            child: MaterialApp(
+              home: Scaffold(
+                body: SingleChildScrollView(
+                  child: AuthFormWidget(
+                    onSubmit: ({
+                      required bool isEmail,
+                      String? email,
+                      String? password,
+                      required bool isSignUp,
+                    }) async {
+                      submitCalled = true;
+                    },
+                  ),
                 ),
               ),
             ),
