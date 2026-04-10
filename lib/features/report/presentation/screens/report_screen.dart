@@ -9,6 +9,7 @@ import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/community_report_service.dart';
+import '../../providers/report_form_provider.dart';
 
 enum ReportType {
   wrongE5('wrongPetrolPremium'),
@@ -40,6 +41,9 @@ enum ReportType {
   }
 }
 
+/// Screen for submitting a community report about a station. Form state
+/// (selected type, submission progress) lives in [reportFormControllerProvider];
+/// the price text controller is owned locally for lifecycle reasons.
 class ReportScreen extends ConsumerStatefulWidget {
   final String stationId;
   const ReportScreen({super.key, required this.stationId});
@@ -49,9 +53,17 @@ class ReportScreen extends ConsumerStatefulWidget {
 }
 
 class _ReportScreenState extends ConsumerState<ReportScreen> {
-  ReportType? _selectedType;
   final _priceController = TextEditingController();
-  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Reset form state each time the screen is opened.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(reportFormControllerProvider.notifier).selectType(null);
+    });
+  }
 
   @override
   void dispose() {
@@ -61,32 +73,38 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
 
   Future<void> _submit() async {
     final l10n = AppLocalizations.of(context);
-    if (_selectedType == null) return;
-    if (_selectedType!.needsPrice && _priceController.text.isEmpty) {
-      SnackBarHelper.showError(context, l10n?.enterValidPrice ?? 'Please enter a valid price');
+    final form = ref.read(reportFormControllerProvider);
+    final notifier = ref.read(reportFormControllerProvider.notifier);
+    final selectedType = form.selectedType;
+    if (selectedType == null) return;
+    if (selectedType.needsPrice && _priceController.text.isEmpty) {
+      SnackBarHelper.showError(
+        context,
+        l10n?.enterValidPrice ?? 'Please enter a valid price',
+      );
       return;
     }
 
-    setState(() => _isSubmitting = true);
+    notifier.setSubmitting(true);
     try {
       final apiKeys = ref.read(apiKeyStorageProvider);
       final apiKey = apiKeys.getApiKey();
-      final price = _selectedType!.needsPrice
+      final price = selectedType.needsPrice
           ? double.tryParse(_priceController.text.replaceAll(',', '.'))
           : null;
 
       await ReportService().submitComplaint(
         stationId: widget.stationId,
-        reportType: _selectedType!.apiValue,
+        reportType: selectedType.apiValue,
         apiKey: apiKey,
         correction: price,
       );
 
       // Also submit to Supabase community reports if connected
-      if (_selectedType!.needsPrice && TankSyncClient.isConnected) {
+      if (selectedType.needsPrice && TankSyncClient.isConnected) {
         final syncConfig = ref.read(syncStateProvider);
         if (price != null && syncConfig.userId != null) {
-          final fuelType = switch (_selectedType!) {
+          final fuelType = switch (selectedType) {
             ReportType.wrongE5 => 'e5',
             ReportType.wrongE10 => 'e10',
             ReportType.wrongDiesel => 'diesel',
@@ -104,21 +122,31 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
       }
 
       if (mounted) {
-        SnackBarHelper.showSuccess(context, l10n?.reportSent ?? 'Report sent. Thank you!');
+        SnackBarHelper.showSuccess(
+          context,
+          l10n?.reportSent ?? 'Report sent. Thank you!',
+        );
         context.pop();
       }
     } on ApiException catch (e) {
       if (mounted) {
-        SnackBarHelper.showError(context, '${l10n?.retry ?? "Error"}: ${e.message}');
+        SnackBarHelper.showError(
+          context,
+          '${l10n?.retry ?? "Error"}: ${e.message}',
+        );
       }
     } finally {
-      if (mounted) setState(() => _isSubmitting = false);
+      if (mounted) {
+        ref.read(reportFormControllerProvider.notifier).setSubmitting(false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final form = ref.watch(reportFormControllerProvider);
+    final selectedType = form.selectedType;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n?.reportPrice ?? 'Report price'),
@@ -135,13 +163,17 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 12),
-          ...ReportType.values.map((type) => RadioListTile<ReportType>(
-                value: type,
-                groupValue: _selectedType,
-                title: Text(type.displayName(l10n)),
-                onChanged: (v) => setState(() => _selectedType = v),
-              )),
-          if (_selectedType != null && _selectedType!.needsPrice) ...[
+          ...ReportType.values.map(
+            (type) => RadioListTile<ReportType>(
+              value: type,
+              groupValue: selectedType,
+              title: Text(type.displayName(l10n)),
+              onChanged: (v) => ref
+                  .read(reportFormControllerProvider.notifier)
+                  .selectType(v),
+            ),
+          ),
+          if (selectedType != null && selectedType.needsPrice) ...[
             const SizedBox(height: 16),
             TextField(
               controller: _priceController,
@@ -157,8 +189,8 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
           const SizedBox(height: 24),
           FilledButton(
             onPressed:
-                _selectedType != null && !_isSubmitting ? _submit : null,
-            child: _isSubmitting
+                selectedType != null && !form.isSubmitting ? _submit : null,
+            child: form.isSubmitting
                 ? const SizedBox(
                     height: 20,
                     width: 20,

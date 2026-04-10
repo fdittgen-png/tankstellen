@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../providers/gdpr_consent_form_provider.dart';
 
 /// First-launch GDPR consent screen.
 ///
@@ -13,40 +14,37 @@ import '../../../../l10n/app_localizations.dart';
 ///
 /// Consent choices are persisted in HiveStorage and respected
 /// throughout the app. Users can change choices later in Settings.
-class GdprConsentScreen extends ConsumerStatefulWidget {
+///
+/// Pending toggle state lives in [gdprConsentFormControllerProvider];
+/// the persisted consent lives in `gdprConsentProvider`.
+class GdprConsentScreen extends ConsumerWidget {
   const GdprConsentScreen({super.key});
 
-  @override
-  ConsumerState<GdprConsentScreen> createState() => _GdprConsentScreenState();
-}
-
-class _GdprConsentScreenState extends ConsumerState<GdprConsentScreen> {
-  bool _locationConsent = false;
-  bool _errorReportingConsent = false;
-  bool _cloudSyncConsent = false;
-
-  Future<void> _acceptSelected() async {
+  Future<void> _acceptSelected(BuildContext context, WidgetRef ref) async {
+    final form = ref.read(gdprConsentFormControllerProvider);
     await ref.read(gdprConsentProvider.notifier).save(
-          location: _locationConsent,
-          errorReporting: _errorReportingConsent,
-          cloudSync: _cloudSyncConsent,
+          location: form.locationConsent,
+          errorReporting: form.errorReportingConsent,
+          cloudSync: form.cloudSyncConsent,
         );
-    if (mounted) context.go('/setup');
+    if (context.mounted) context.go('/setup');
   }
 
-  Future<void> _acceptAll() async {
+  Future<void> _acceptAll(BuildContext context, WidgetRef ref) async {
     await ref.read(gdprConsentProvider.notifier).save(
           location: true,
           errorReporting: true,
           cloudSync: true,
         );
-    if (mounted) context.go('/setup');
+    if (context.mounted) context.go('/setup');
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+    final form = ref.watch(gdprConsentFormControllerProvider);
+    final notifier = ref.read(gdprConsentFormControllerProvider.notifier);
 
     return Scaffold(
       body: SafeArea(
@@ -88,9 +86,8 @@ class _GdprConsentScreenState extends ConsumerState<GdprConsentScreen> {
                       title: l10n?.gdprLocationTitle ?? 'Location Access',
                       description: l10n?.gdprLocationDescription ??
                           'Your coordinates are sent to the fuel price API to find nearby stations. Location data is never stored on a server and is not used for tracking.',
-                      value: _locationConsent,
-                      onChanged: (v) =>
-                          setState(() => _locationConsent = v),
+                      value: form.locationConsent,
+                      onChanged: notifier.setLocation,
                     ),
                     const SizedBox(height: 16),
 
@@ -101,9 +98,8 @@ class _GdprConsentScreenState extends ConsumerState<GdprConsentScreen> {
                           'Error Reporting',
                       description: l10n?.gdprErrorReportingDescription ??
                           'Anonymous crash reports help improve the app. No personal data is included. Reports are sent via Sentry only when configured.',
-                      value: _errorReportingConsent,
-                      onChanged: (v) =>
-                          setState(() => _errorReportingConsent = v),
+                      value: form.errorReportingConsent,
+                      onChanged: notifier.setErrorReporting,
                     ),
                     const SizedBox(height: 16),
 
@@ -113,9 +109,8 @@ class _GdprConsentScreenState extends ConsumerState<GdprConsentScreen> {
                       title: l10n?.gdprCloudSyncTitle ?? 'Cloud Sync',
                       description: l10n?.gdprCloudSyncDescription ??
                           'Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.',
-                      value: _cloudSyncConsent,
-                      onChanged: (v) =>
-                          setState(() => _cloudSyncConsent = v),
+                      value: form.cloudSyncConsent,
+                      onChanged: notifier.setCloudSync,
                     ),
                     const SizedBox(height: 24),
 
@@ -144,12 +139,12 @@ class _GdprConsentScreenState extends ConsumerState<GdprConsentScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   FilledButton(
-                    onPressed: _acceptAll,
+                    onPressed: () => _acceptAll(context, ref),
                     child: Text(l10n?.gdprAcceptAll ?? 'Accept All'),
                   ),
                   const SizedBox(height: 8),
                   OutlinedButton(
-                    onPressed: _acceptSelected,
+                    onPressed: () => _acceptSelected(context, ref),
                     child: Text(
                         l10n?.gdprAcceptSelected ?? 'Accept Selected'),
                   ),

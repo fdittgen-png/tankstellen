@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/password_validator.dart';
 import '../../../../core/widgets/password_strength_indicator.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../providers/auth_form_widget_provider.dart';
 
 /// Reusable authentication form: anonymous or email with password.
 ///
 /// Designed to be app-agnostic. Any app needing Supabase auth can use this.
 /// Provides email sign-up (with confirm password) and sign-in flows.
-class AuthFormWidget extends StatefulWidget {
+///
+/// Toggle state (useEmail/isSignUp/showPassword/showConfirm) lives in
+/// [authFormWidgetControllerProvider]. Text controllers remain local
+/// since they must be disposed with the widget.
+class AuthFormWidget extends ConsumerStatefulWidget {
   /// Called when authentication succeeds.
   /// [isEmail] is false for anonymous, true for email auth.
-  final Future<void> Function({required bool isEmail, String? email, String? password, required bool isSignUp}) onSubmit;
+  final Future<void> Function({
+    required bool isEmail,
+    String? email,
+    String? password,
+    required bool isSignUp,
+  }) onSubmit;
   final bool isLoading;
   final String? error;
 
@@ -24,14 +35,10 @@ class AuthFormWidget extends StatefulWidget {
   });
 
   @override
-  State<AuthFormWidget> createState() => _AuthFormWidgetState();
+  ConsumerState<AuthFormWidget> createState() => _AuthFormWidgetState();
 }
 
-class _AuthFormWidgetState extends State<AuthFormWidget> {
-  bool _useEmail = false;
-  bool _isSignUp = true;
-  bool _showPassword = false;
-  bool _showConfirm = false;
+class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
@@ -44,67 +51,85 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     super.dispose();
   }
 
-  String? _validate() {
-    if (!_useEmail) return null; // Anonymous needs no validation
+  String? _validate(AuthFormWidgetState form) {
+    if (!form.useEmail) return null; // Anonymous needs no validation
     final l10n = AppLocalizations.of(context);
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     if (email.isEmpty) return 'Please enter your email';
     if (!email.contains('@')) return 'Invalid email address';
-    if (_isSignUp && !PasswordValidator.isValid(password)) {
-      return l10n?.passwordTooWeak ?? 'Password does not meet all requirements';
+    if (form.isSignUp && !PasswordValidator.isValid(password)) {
+      return l10n?.passwordTooWeak ??
+          'Password does not meet all requirements';
     }
-    if (_isSignUp && password != _confirmController.text) {
+    if (form.isSignUp && password != _confirmController.text) {
       return 'Passwords do not match';
     }
     return null;
   }
 
-  void _submit() {
-    final error = _validate();
+  void _submit(AuthFormWidgetState form) {
+    final error = _validate(form);
     if (error != null) {
       SnackBarHelper.showError(context, error);
       return;
     }
     widget.onSubmit(
-      isEmail: _useEmail,
-      email: _useEmail ? _emailController.text.trim() : null,
-      password: _useEmail ? _passwordController.text : null,
-      isSignUp: _isSignUp,
+      isEmail: form.useEmail,
+      email: form.useEmail ? _emailController.text.trim() : null,
+      password: form.useEmail ? _passwordController.text : null,
+      isSignUp: form.isSignUp,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final form = ref.watch(authFormWidgetControllerProvider);
+    final notifier = ref.read(authFormWidgetControllerProvider.notifier);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Choose your account type', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          'Choose your account type',
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 12),
 
         // Anonymous / Email toggle
         SegmentedButton<bool>(
           segments: const [
-            ButtonSegment(value: false, label: Text('Anonymous'), icon: Icon(Icons.person_outline, size: 18)),
-            ButtonSegment(value: true, label: Text('Email'), icon: Icon(Icons.email_outlined, size: 18)),
+            ButtonSegment(
+              value: false,
+              label: Text('Anonymous'),
+              icon: Icon(Icons.person_outline, size: 18),
+            ),
+            ButtonSegment(
+              value: true,
+              label: Text('Email'),
+              icon: Icon(Icons.email_outlined, size: 18),
+            ),
           ],
-          selected: {_useEmail},
-          onSelectionChanged: (s) => setState(() => _useEmail = s.first),
+          selected: {form.useEmail},
+          onSelectionChanged: (s) => notifier.setUseEmail(s.first),
         ),
         const SizedBox(height: 8),
 
         // Description text
         Text(
-          _useEmail
+          form.useEmail
               ? 'Sign in from any device. Recover your data if your phone is lost.'
               : 'Instant access, no email needed. Data tied to this device.',
-          style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
 
         // Email fields
-        if (_useEmail) ...[
+        if (form.useEmail) ...[
           const SizedBox(height: 16),
           TextField(
             controller: _emailController,
@@ -126,17 +151,24 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
               prefixIcon: const Icon(Icons.lock, size: 18),
               isDense: true,
               suffixIcon: IconButton(
-                icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility, size: 18),
-                onPressed: () => setState(() => _showPassword = !_showPassword),
+                icon: Icon(
+                  form.showPassword ? Icons.visibility_off : Icons.visibility,
+                  size: 18,
+                ),
+                onPressed: notifier.togglePassword,
               ),
             ),
-            obscureText: !_showPassword,
+            obscureText: !form.showPassword,
             enabled: !widget.isLoading,
-            onChanged: (_) => setState(() {}),
           ),
-          if (_isSignUp)
-            PasswordStrengthIndicator(password: _passwordController.text),
-          if (_isSignUp) ...[
+          if (form.isSignUp)
+            ListenableBuilder(
+              listenable: _passwordController,
+              builder: (context, _) => PasswordStrengthIndicator(
+                password: _passwordController.text,
+              ),
+            ),
+          if (form.isSignUp) ...[
             const SizedBox(height: 10),
             TextField(
               controller: _confirmController,
@@ -146,11 +178,16 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
                 prefixIcon: const Icon(Icons.lock_outline, size: 18),
                 isDense: true,
                 suffixIcon: IconButton(
-                  icon: Icon(_showConfirm ? Icons.visibility_off : Icons.visibility, size: 18),
-                  onPressed: () => setState(() => _showConfirm = !_showConfirm),
+                  icon: Icon(
+                    form.showConfirm
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    size: 18,
+                  ),
+                  onPressed: notifier.toggleConfirm,
                 ),
               ),
-              obscureText: !_showConfirm,
+              obscureText: !form.showConfirm,
               enabled: !widget.isLoading,
             ),
           ],
@@ -158,12 +195,16 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: widget.isLoading ? null : () => setState(() {
-                _isSignUp = !_isSignUp;
-                _confirmController.clear();
-              }),
+              onPressed: widget.isLoading
+                  ? null
+                  : () {
+                      notifier.toggleSignUp();
+                      _confirmController.clear();
+                    },
               child: Text(
-                _isSignUp ? 'Already have an account? Sign in' : 'Create new account',
+                form.isSignUp
+                    ? 'Already have an account? Sign in'
+                    : 'Create new account',
                 style: const TextStyle(fontSize: 12),
               ),
             ),
@@ -181,9 +222,21 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
             ),
             child: Row(
               children: [
-                Icon(Icons.error_outline, size: 16, color: theme.colorScheme.error),
+                Icon(
+                  Icons.error_outline,
+                  size: 16,
+                  color: theme.colorScheme.error,
+                ),
                 const SizedBox(width: 8),
-                Expanded(child: Text(widget.error!, style: TextStyle(fontSize: 12, color: theme.colorScheme.error))),
+                Expanded(
+                  child: Text(
+                    widget.error!,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -191,13 +244,30 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
 
         const SizedBox(height: 16),
         FilledButton.icon(
-          onPressed: widget.isLoading ? null : _submit,
+          onPressed: widget.isLoading ? null : () => _submit(form),
           icon: widget.isLoading
-              ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : Icon(_useEmail ? (_isSignUp ? Icons.person_add : Icons.login) : Icons.flash_on),
-          label: Text(widget.isLoading ? 'Connecting...'
-              : _useEmail ? (_isSignUp ? 'Create account & connect' : 'Sign in & connect')
-              : 'Connect anonymously'),
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Icon(
+                  form.useEmail
+                      ? (form.isSignUp ? Icons.person_add : Icons.login)
+                      : Icons.flash_on,
+                ),
+          label: Text(
+            widget.isLoading
+                ? 'Connecting...'
+                : form.useEmail
+                    ? (form.isSignUp
+                        ? 'Create account & connect'
+                        : 'Sign in & connect')
+                    : 'Connect anonymously',
+          ),
         ),
       ],
     );
