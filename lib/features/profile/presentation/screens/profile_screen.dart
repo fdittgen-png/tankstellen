@@ -60,6 +60,28 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
 
+          // My vehicles
+          Card(
+            margin: EdgeInsets.zero,
+            child: ListTile(
+              leading: const Icon(Icons.directions_car, size: 20),
+              title: Text(
+                l?.vehiclesMenuTitle ?? 'My vehicles',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(
+                l?.vehiclesMenuSubtitle ??
+                    'Battery, connectors, charging preferences',
+                style: theme.textTheme.bodySmall,
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/vehicles'),
+            ),
+          ),
+          const SizedBox(height: 8),
+
           // Fuel consumption log
           Card(
             margin: EdgeInsets.zero,
