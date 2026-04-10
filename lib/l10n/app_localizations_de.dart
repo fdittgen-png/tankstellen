@@ -1420,4 +1420,63 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get nearestStationsHint =>
       'Die nächstgelegenen Tankstellen über Ihren Standort finden';
+
+  @override
+  String get consumptionLogTitle => 'Verbrauch';
+
+  @override
+  String get consumptionLogMenuTitle => 'Verbrauchs-Log';
+
+  @override
+  String get consumptionLogMenuSubtitle =>
+      'Tankvorgänge erfassen und L/100km berechnen';
+
+  @override
+  String get consumptionStatsTitle => 'Verbrauchsstatistik';
+
+  @override
+  String get addFillUp => 'Tankvorgang hinzufügen';
+
+  @override
+  String get noFillUpsTitle => 'Noch keine Tankvorgänge';
+
+  @override
+  String get noFillUpsSubtitle =>
+      'Erfassen Sie Ihren ersten Tankvorgang, um den Verbrauch zu verfolgen.';
+
+  @override
+  String get fillUpDate => 'Datum';
+
+  @override
+  String get liters => 'Liter';
+
+  @override
+  String get odometerKm => 'Kilometerstand (km)';
+
+  @override
+  String get notesOptional => 'Notizen (optional)';
+
+  @override
+  String get stationPreFilled => 'Tankstelle vorausgefüllt';
+
+  @override
+  String get statAvgConsumption => 'Ø L/100km';
+
+  @override
+  String get statAvgCostPerKm => 'Ø Kosten/km';
+
+  @override
+  String get statTotalLiters => 'Gesamt Liter';
+
+  @override
+  String get statTotalSpent => 'Gesamt ausgegeben';
+
+  @override
+  String get statFillUpCount => 'Tankvorgänge';
+
+  @override
+  String get fieldRequired => 'Pflichtfeld';
+
+  @override
+  String get fieldInvalidNumber => 'Ungültige Zahl';
 }
