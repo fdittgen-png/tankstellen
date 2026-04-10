@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../../../core/export/data_exporter.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -54,6 +55,8 @@ class _PrivacyDashboardScreenState
           // Action buttons
           _ExportButton(onPressed: () => _exportData(context)),
           const SizedBox(height: 12),
+          _ExportCsvButton(onPressed: () => _exportDataCsv(context)),
+          const SizedBox(height: 12),
           _DeleteAllButton(onPressed: () => _deleteAllData(context)),
 
           SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 16),
@@ -70,6 +73,25 @@ class _PrivacyDashboardScreenState
     SnackBarHelper.showSuccess(
       context,
       l?.privacyExportSuccess ?? 'Data exported to clipboard',
+    );
+  }
+
+  Future<void> _exportDataCsv(BuildContext ctx) async {
+    final storage = ref.read(storageRepositoryProvider);
+    final exporter = DataExporter(storage);
+    final parts = exporter.exportAllAsCsv();
+    final buf = StringBuffer();
+    parts.forEach((name, csv) {
+      buf
+        ..writeln('# $name')
+        ..writeln(csv);
+    });
+    await Clipboard.setData(ClipboardData(text: buf.toString()));
+    if (!mounted) return;
+    final l = AppLocalizations.of(context);
+    SnackBarHelper.showSuccess(
+      context,
+      l?.privacyExportCsvSuccess ?? 'CSV data exported to clipboard',
     );
   }
 
@@ -420,6 +442,25 @@ class _ExportButton extends StatelessWidget {
         onPressed: onPressed,
         icon: const Icon(Icons.download),
         label: Text(l?.privacyExportButton ?? 'Export all data as JSON'),
+      ),
+    );
+  }
+}
+
+class _ExportCsvButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _ExportCsvButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        icon: const Icon(Icons.table_chart),
+        label: Text(l?.privacyExportCsvButton ?? 'Export all data as CSV'),
       ),
     );
   }

@@ -1316,6 +1316,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get privacyExportSuccess => 'Daten in die Zwischenablage exportiert';
 
   @override
+  String get privacyExportCsvButton => 'Alle Daten als CSV exportieren';
+
+  @override
+  String get privacyExportCsvSuccess =>
+      'CSV-Daten in die Zwischenablage exportiert';
+
+  @override
   String get privacyDeleteButton => 'Alle Daten löschen';
 
   @override
