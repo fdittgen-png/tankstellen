@@ -54,11 +54,17 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     }
 
     // Parse all results into Station objects
-    final stations = <Station>[];
+    final parsed = <Station>[];
     for (final r in allResults) {
       final station = _parseStation(r, params.lat, params.lng);
-      if (station != null) stations.add(station);
+      if (station != null) parsed.add(station);
     }
+
+    // Filter by radius. The postal-code query (`cp='...'`) returns every
+    // station sharing that code regardless of distance, so without this
+    // post-filter the `radiusKm` parameter would be silently ignored on
+    // the CP path — bug #298.
+    final stations = filterByRadius(parsed, params.radiusKm);
 
     // Sort
     sortStations(stations, params);
@@ -104,12 +110,14 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     double lat, double lng, double radiusKm, {CancelToken? cancelToken}
   ) async {
     // Use within_distance with km unit — the distance() function with meters
-    // is unreliable on this API and often returns 0 results.
-    final radiusInt = radiusKm.round();
+    // is unreliable on this API and often returns 0 results. Preserve one
+    // decimal of precision so sub-km radius selections aren't silently
+    // rounded to the nearest integer.
+    final radiusStr = radiusKm.toStringAsFixed(1);
     try {
       final response = await _dio.get(_baseUrl, queryParameters: {
         'where':
-            "within_distance(geom,geom'POINT($lng $lat)',${radiusInt}km)",
+            "within_distance(geom,geom'POINT($lng $lat)',${radiusStr}km)",
         'limit': 50,
       }, cancelToken: cancelToken);
       return _extractResults(response.data);

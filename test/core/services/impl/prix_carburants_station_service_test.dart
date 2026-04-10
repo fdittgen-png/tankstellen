@@ -698,6 +698,135 @@ void main() {
       expect(result.data, hasLength(2));
     });
   });
+
+  group('PrixCarburantsStationService radius filtering (#298)', () {
+    // Origin: Castelnau de Guers, France (43.45, 3.42).
+    // Stations placed at roughly 0.3, 1.5, 5, 12, 20 km from origin.
+    // Using latitude offsets only: 1° lat ≈ 111 km.
+    Map<String, dynamic> scatteredStations(String cp) {
+      const originLat = 43.45;
+      const originLng = 3.42;
+      double latFor(double km) => originLat + (km / 111.0);
+      return {
+        'results': [
+          {
+            'id': '${cp}01',
+            'adresse': 'Station A',
+            'cp': cp,
+            'geom': {'lat': latFor(0.3), 'lon': originLng},
+            'sp95_prix': 1.80,
+          },
+          {
+            'id': '${cp}02',
+            'adresse': 'Station B',
+            'cp': cp,
+            'geom': {'lat': latFor(1.5), 'lon': originLng},
+            'sp95_prix': 1.82,
+          },
+          {
+            'id': '${cp}03',
+            'adresse': 'Station C',
+            'cp': cp,
+            'geom': {'lat': latFor(5.0), 'lon': originLng},
+            'sp95_prix': 1.84,
+          },
+          {
+            'id': '${cp}04',
+            'adresse': 'Station D',
+            'cp': cp,
+            'geom': {'lat': latFor(12.0), 'lon': originLng},
+            'sp95_prix': 1.86,
+          },
+          {
+            'id': '${cp}05',
+            'adresse': 'Station E',
+            'cp': cp,
+            'geom': {'lat': latFor(20.0), 'lon': originLng},
+            'sp95_prix': 1.88,
+          },
+        ],
+      };
+    }
+
+    test('postal-code path filters stations by radius (regression #298)', () async {
+      final adapter = _TrackingMockAdapter()
+        ..addResponse(scatteredStations('34120'));
+
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      // 2 km radius: should keep only Station A (0.3 km) and Station B (1.5 km).
+      final result = await svc.searchStations(const SearchParams(
+        lat: 43.45, lng: 3.42, radiusKm: 2.0, postalCode: '34120',
+      ));
+
+      expect(adapter.lastRequestUri, contains('cp%3D%2734120%27'),
+          reason: 'should have taken the postal-code path');
+      expect(result.data.map((s) => s.id).toList(), ['3412001', '3412002'],
+          reason: 'only stations within 2 km should remain');
+      for (final s in result.data) {
+        expect(s.dist, lessThanOrEqualTo(2.0));
+      }
+    });
+
+    test('postal-code path with different radii returns different result counts (#298)', () async {
+      final adapter = _TrackingMockAdapter()
+        ..addResponse(scatteredStations('34120'))
+        ..addResponse(scatteredStations('34120'));
+
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      final narrow = await svc.searchStations(const SearchParams(
+        lat: 43.45, lng: 3.42, radiusKm: 1.0, postalCode: '34120',
+      ));
+      final wide = await svc.searchStations(const SearchParams(
+        lat: 43.45, lng: 3.42, radiusKm: 25.0, postalCode: '34120',
+      ));
+
+      // Core contract: the radius parameter must actually narrow results.
+      expect(narrow.data.length, lessThan(wide.data.length),
+          reason: 'radius=1km must return fewer stations than radius=25km');
+      expect(narrow.data.length, 1, reason: 'only the 0.3 km station fits in 1 km');
+      expect(wide.data.length, 5, reason: 'all 5 stations fit in 25 km');
+    });
+
+    test('geo path preserves decimal radius (no integer rounding) (#298)', () async {
+      final adapter = _TrackingMockAdapter()
+        ..addResponse({'results': []});
+
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      await svc.searchStations(const SearchParams(
+        lat: 43.45, lng: 3.42, radiusKm: 1.4,
+      ));
+
+      // Previous behaviour: radiusKm.round() → "1km", losing sub-km precision.
+      // Fixed: the URL must contain the exact decimal value.
+      expect(adapter.lastRequestUri, contains('1.4km'),
+          reason: 'decimal radius must be preserved in the geo query');
+      expect(adapter.lastRequestUri, isNot(contains('1km')),
+          reason: 'must not round to integer km');
+    });
+
+    test('geo path without postal code also respects radius (#298)', () async {
+      final adapter = _TrackingMockAdapter()
+        ..addResponse(scatteredStations('34120'));
+
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      // GPS search with no CP → geo-only path. Even so, the helper
+      // should filter anything the API returned beyond the radius.
+      final result = await svc.searchStations(const SearchParams(
+        lat: 43.45, lng: 3.42, radiusKm: 2.0,
+      ));
+
+      expect(adapter.lastRequestUri, contains('within_distance'));
+      expect(result.data.map((s) => s.id).toList(), ['3412001', '3412002']);
+    });
+  });
 }
 
 /// Mock Dio adapter that tracks requests and returns canned responses.
