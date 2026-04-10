@@ -2718,6 +2718,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Find the closest stations using your current location'**
   String get nearestStationsHint;
+
+  /// No description provided for @consumptionLogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel consumption'**
+  String get consumptionLogTitle;
+
+  /// No description provided for @consumptionLogMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption log'**
+  String get consumptionLogMenuTitle;
+
+  /// No description provided for @consumptionLogMenuSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track fill-ups and calculate L/100km'**
+  String get consumptionLogMenuSubtitle;
+
+  /// No description provided for @consumptionStatsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption stats'**
+  String get consumptionStatsTitle;
+
+  /// No description provided for @addFillUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Add fill-up'**
+  String get addFillUp;
+
+  /// No description provided for @noFillUpsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No fill-ups yet'**
+  String get noFillUpsTitle;
+
+  /// No description provided for @noFillUpsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log your first fill-up to start tracking consumption.'**
+  String get noFillUpsSubtitle;
+
+  /// No description provided for @fillUpDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get fillUpDate;
+
+  /// No description provided for @liters.
+  ///
+  /// In en, this message translates to:
+  /// **'Liters'**
+  String get liters;
+
+  /// No description provided for @odometerKm.
+  ///
+  /// In en, this message translates to:
+  /// **'Odometer (km)'**
+  String get odometerKm;
+
+  /// No description provided for @notesOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes (optional)'**
+  String get notesOptional;
+
+  /// No description provided for @stationPreFilled.
+  ///
+  /// In en, this message translates to:
+  /// **'Station pre-filled'**
+  String get stationPreFilled;
+
+  /// No description provided for @statAvgConsumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg L/100km'**
+  String get statAvgConsumption;
+
+  /// No description provided for @statAvgCostPerKm.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg cost/km'**
+  String get statAvgCostPerKm;
+
+  /// No description provided for @statTotalLiters.
+  ///
+  /// In en, this message translates to:
+  /// **'Total liters'**
+  String get statTotalLiters;
+
+  /// No description provided for @statTotalSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Total spent'**
+  String get statTotalSpent;
+
+  /// No description provided for @statFillUpCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill-ups'**
+  String get statFillUpCount;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get fieldRequired;
+
+  /// No description provided for @fieldInvalidNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid number'**
+  String get fieldInvalidNumber;
 }
 
 class _AppLocalizationsDelegate

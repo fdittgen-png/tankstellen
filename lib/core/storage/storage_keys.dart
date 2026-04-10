@@ -19,4 +19,5 @@ class StorageKeys {
   static const String consentErrorReporting = 'consent_error_reporting';
   static const String consentCloudSync = 'consent_cloud_sync';
   static const String swipeTutorialShown = 'swipe_tutorial_shown';
+  static const String consumptionLog = 'consumption_log';
 }

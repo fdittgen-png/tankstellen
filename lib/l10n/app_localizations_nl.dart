@@ -1412,4 +1412,63 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get nearestStationsHint =>
       'Vind de dichtstbijzijnde stations met uw huidige locatie';
+
+  @override
+  String get consumptionLogTitle => 'Fuel consumption';
+
+  @override
+  String get consumptionLogMenuTitle => 'Consumption log';
+
+  @override
+  String get consumptionLogMenuSubtitle =>
+      'Track fill-ups and calculate L/100km';
+
+  @override
+  String get consumptionStatsTitle => 'Consumption stats';
+
+  @override
+  String get addFillUp => 'Add fill-up';
+
+  @override
+  String get noFillUpsTitle => 'No fill-ups yet';
+
+  @override
+  String get noFillUpsSubtitle =>
+      'Log your first fill-up to start tracking consumption.';
+
+  @override
+  String get fillUpDate => 'Date';
+
+  @override
+  String get liters => 'Liters';
+
+  @override
+  String get odometerKm => 'Odometer (km)';
+
+  @override
+  String get notesOptional => 'Notes (optional)';
+
+  @override
+  String get stationPreFilled => 'Station pre-filled';
+
+  @override
+  String get statAvgConsumption => 'Avg L/100km';
+
+  @override
+  String get statAvgCostPerKm => 'Avg cost/km';
+
+  @override
+  String get statTotalLiters => 'Total liters';
+
+  @override
+  String get statTotalSpent => 'Total spent';
+
+  @override
+  String get statFillUpCount => 'Fill-ups';
+
+  @override
+  String get fieldRequired => 'Required';
+
+  @override
+  String get fieldInvalidNumber => 'Invalid number';
 }

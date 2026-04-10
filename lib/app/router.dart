@@ -14,6 +14,8 @@ import '../features/setup/presentation/screens/onboarding_wizard_screen.dart';
 import '../features/alerts/presentation/screens/alerts_screen.dart';
 import '../features/calculator/presentation/screens/calculator_screen.dart';
 import '../features/report/presentation/screens/report_screen.dart';
+import '../features/consumption/presentation/screens/add_fill_up_screen.dart';
+import '../features/consumption/presentation/screens/consumption_screen.dart';
 import '../features/price_history/presentation/screens/price_history_screen.dart';
 import '../features/search/presentation/screens/ev_station_detail_screen.dart';
 import '../features/search/domain/entities/charging_station.dart';
@@ -167,6 +169,26 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/calculator',
         builder: (context, state) => const CalculatorScreen(),
+      ),
+      GoRoute(
+        path: '/consumption',
+        builder: (context, state) => const ConsumptionScreen(),
+      ),
+      GoRoute(
+        path: '/consumption/add',
+        builder: (context, state) {
+          final extra = state.extra;
+          String? stationId;
+          String? stationName;
+          if (extra is Map) {
+            stationId = extra['stationId']?.toString();
+            stationName = extra['stationName']?.toString();
+          }
+          return AddFillUpScreen(
+            stationId: stationId,
+            stationName: stationName,
+          );
+        },
       ),
       GoRoute(
         path: '/station/:id/history',

@@ -60,6 +60,28 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
 
+          // Fuel consumption log
+          Card(
+            margin: EdgeInsets.zero,
+            child: ListTile(
+              leading: const Icon(Icons.local_gas_station, size: 20),
+              title: Text(
+                l?.consumptionLogMenuTitle ?? 'Consumption log',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(
+                l?.consumptionLogMenuSubtitle ??
+                    'Track fill-ups and calculate L/100km',
+                style: theme.textTheme.bodySmall,
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/consumption'),
+            ),
+          ),
+          const SizedBox(height: 8),
+
           // Storage & Cache
           _FoldableSection(
             icon: Icons.storage,
