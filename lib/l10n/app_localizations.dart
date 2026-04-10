@@ -3012,6 +3012,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'I tracked {kg} kg CO2 with Tankstellen.'**
   String shareCo2Message(String kg);
+
+  /// No description provided for @vehiclesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My vehicles'**
+  String get vehiclesTitle;
+
+  /// No description provided for @vehiclesMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My vehicles'**
+  String get vehiclesMenuTitle;
+
+  /// No description provided for @vehiclesMenuSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery, connectors, charging preferences'**
+  String get vehiclesMenuSubtitle;
+
+  /// No description provided for @vehiclesEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your car to filter by connector and estimate charging costs.'**
+  String get vehiclesEmptyMessage;
+
+  /// No description provided for @vehicleAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add vehicle'**
+  String get vehicleAdd;
+
+  /// No description provided for @vehicleAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add vehicle'**
+  String get vehicleAddTitle;
+
+  /// No description provided for @vehicleEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit vehicle'**
+  String get vehicleEditTitle;
+
+  /// No description provided for @vehicleDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete vehicle?'**
+  String get vehicleDeleteTitle;
+
+  /// No description provided for @vehicleDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove \"{name}\" from your profiles?'**
+  String vehicleDeleteMessage(String name);
+
+  /// No description provided for @vehicleNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get vehicleNameLabel;
+
+  /// No description provided for @vehicleNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. My Tesla Model 3'**
+  String get vehicleNameHint;
+
+  /// No description provided for @vehicleTypeCombustion.
+  ///
+  /// In en, this message translates to:
+  /// **'Combustion'**
+  String get vehicleTypeCombustion;
+
+  /// No description provided for @vehicleTypeHybrid.
+  ///
+  /// In en, this message translates to:
+  /// **'Hybrid'**
+  String get vehicleTypeHybrid;
+
+  /// No description provided for @vehicleTypeEv.
+  ///
+  /// In en, this message translates to:
+  /// **'Electric'**
+  String get vehicleTypeEv;
+
+  /// No description provided for @vehicleEvSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Electric'**
+  String get vehicleEvSectionTitle;
+
+  /// No description provided for @vehicleCombustionSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Combustion'**
+  String get vehicleCombustionSectionTitle;
+
+  /// No description provided for @vehicleBatteryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery capacity (kWh)'**
+  String get vehicleBatteryLabel;
+
+  /// No description provided for @vehicleMaxChargeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Max charging power (kW)'**
+  String get vehicleMaxChargeLabel;
+
+  /// No description provided for @vehicleConnectorsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Supported connectors'**
+  String get vehicleConnectorsLabel;
+
+  /// No description provided for @vehicleMinSocLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Min SoC %'**
+  String get vehicleMinSocLabel;
+
+  /// No description provided for @vehicleMaxSocLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Max SoC %'**
+  String get vehicleMaxSocLabel;
+
+  /// No description provided for @vehicleTankLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank capacity (L)'**
+  String get vehicleTankLabel;
+
+  /// No description provided for @vehiclePreferredFuelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred fuel'**
+  String get vehiclePreferredFuelLabel;
+
+  /// No description provided for @connectorType2.
+  ///
+  /// In en, this message translates to:
+  /// **'Type 2'**
+  String get connectorType2;
+
+  /// No description provided for @connectorCcs.
+  ///
+  /// In en, this message translates to:
+  /// **'CCS'**
+  String get connectorCcs;
+
+  /// No description provided for @connectorChademo.
+  ///
+  /// In en, this message translates to:
+  /// **'CHAdeMO'**
+  String get connectorChademo;
+
+  /// No description provided for @connectorTesla.
+  ///
+  /// In en, this message translates to:
+  /// **'Tesla'**
+  String get connectorTesla;
+
+  /// No description provided for @connectorSchuko.
+  ///
+  /// In en, this message translates to:
+  /// **'Schuko'**
+  String get connectorSchuko;
+
+  /// No description provided for @connectorType1.
+  ///
+  /// In en, this message translates to:
+  /// **'Type 1'**
+  String get connectorType1;
+
+  /// No description provided for @connectorThreePin.
+  ///
+  /// In en, this message translates to:
+  /// **'3-pin'**
+  String get connectorThreePin;
 }
 
 class _AppLocalizationsDelegate

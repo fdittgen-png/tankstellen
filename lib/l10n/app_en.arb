@@ -701,5 +701,42 @@
         "type": "String"
       }
     }
-  }
+  },
+  "vehiclesTitle": "My vehicles",
+  "vehiclesMenuTitle": "My vehicles",
+  "vehiclesMenuSubtitle": "Battery, connectors, charging preferences",
+  "vehiclesEmptyMessage": "Add your car to filter by connector and estimate charging costs.",
+  "vehicleAdd": "Add vehicle",
+  "vehicleAddTitle": "Add vehicle",
+  "vehicleEditTitle": "Edit vehicle",
+  "vehicleDeleteTitle": "Delete vehicle?",
+  "vehicleDeleteMessage": "Remove \"{name}\" from your profiles?",
+  "@vehicleDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "vehicleNameLabel": "Name",
+  "vehicleNameHint": "e.g. My Tesla Model 3",
+  "vehicleTypeCombustion": "Combustion",
+  "vehicleTypeHybrid": "Hybrid",
+  "vehicleTypeEv": "Electric",
+  "vehicleEvSectionTitle": "Electric",
+  "vehicleCombustionSectionTitle": "Combustion",
+  "vehicleBatteryLabel": "Battery capacity (kWh)",
+  "vehicleMaxChargeLabel": "Max charging power (kW)",
+  "vehicleConnectorsLabel": "Supported connectors",
+  "vehicleMinSocLabel": "Min SoC %",
+  "vehicleMaxSocLabel": "Max SoC %",
+  "vehicleTankLabel": "Tank capacity (L)",
+  "vehiclePreferredFuelLabel": "Preferred fuel",
+  "connectorType2": "Type 2",
+  "connectorCcs": "CCS",
+  "connectorChademo": "CHAdeMO",
+  "connectorTesla": "Tesla",
+  "connectorSchuko": "Schuko",
+  "connectorType1": "Type 1",
+  "connectorThreePin": "3-pin"
 }

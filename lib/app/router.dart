@@ -27,6 +27,8 @@ import '../features/sync/presentation/screens/auth_screen.dart';
 import '../features/sync/presentation/screens/data_transparency_screen.dart';
 import '../features/sync/presentation/screens/link_device_screen.dart';
 import '../features/sync/presentation/screens/sync_setup_screen.dart';
+import '../features/vehicle/presentation/screens/edit_vehicle_screen.dart';
+import '../features/vehicle/presentation/screens/vehicle_list_screen.dart';
 import 'shell_screen.dart';
 import 'station_id_validator.dart';
 
@@ -178,6 +180,18 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/carbon',
         builder: (context, state) => const CarbonDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/vehicles',
+        builder: (context, state) => const VehicleListScreen(),
+      ),
+      GoRoute(
+        path: '/vehicles/edit',
+        builder: (context, state) {
+          final extra = state.extra;
+          final vehicleId = extra is String ? extra : null;
+          return EditVehicleScreen(vehicleId: vehicleId);
+        },
       ),
       GoRoute(
         path: '/consumption/add',

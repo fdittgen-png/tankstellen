@@ -1573,4 +1573,97 @@ class AppLocalizationsDe extends AppLocalizations {
   String shareCo2Message(String kg) {
     return 'Ich habe mit Tankstellen $kg kg CO2 erfasst.';
   }
+
+  @override
+  String get vehiclesTitle => 'Meine Fahrzeuge';
+
+  @override
+  String get vehiclesMenuTitle => 'Meine Fahrzeuge';
+
+  @override
+  String get vehiclesMenuSubtitle => 'Batterie, Anschlüsse, Ladevorlieben';
+
+  @override
+  String get vehiclesEmptyMessage =>
+      'Fügen Sie Ihr Fahrzeug hinzu, um nach Anschlüssen zu filtern und Ladekosten zu schätzen.';
+
+  @override
+  String get vehicleAdd => 'Fahrzeug hinzufügen';
+
+  @override
+  String get vehicleAddTitle => 'Fahrzeug hinzufügen';
+
+  @override
+  String get vehicleEditTitle => 'Fahrzeug bearbeiten';
+
+  @override
+  String get vehicleDeleteTitle => 'Fahrzeug löschen?';
+
+  @override
+  String vehicleDeleteMessage(String name) {
+    return '„$name“ aus Ihren Profilen entfernen?';
+  }
+
+  @override
+  String get vehicleNameLabel => 'Name';
+
+  @override
+  String get vehicleNameHint => 'z. B. Mein Tesla Model 3';
+
+  @override
+  String get vehicleTypeCombustion => 'Verbrenner';
+
+  @override
+  String get vehicleTypeHybrid => 'Hybrid';
+
+  @override
+  String get vehicleTypeEv => 'Elektro';
+
+  @override
+  String get vehicleEvSectionTitle => 'Elektro';
+
+  @override
+  String get vehicleCombustionSectionTitle => 'Verbrenner';
+
+  @override
+  String get vehicleBatteryLabel => 'Batteriekapazität (kWh)';
+
+  @override
+  String get vehicleMaxChargeLabel => 'Max. Ladeleistung (kW)';
+
+  @override
+  String get vehicleConnectorsLabel => 'Unterstützte Anschlüsse';
+
+  @override
+  String get vehicleMinSocLabel => 'Min. SoC %';
+
+  @override
+  String get vehicleMaxSocLabel => 'Max. SoC %';
+
+  @override
+  String get vehicleTankLabel => 'Tankvolumen (L)';
+
+  @override
+  String get vehiclePreferredFuelLabel => 'Bevorzugter Kraftstoff';
+
+  @override
+  String get connectorType2 => 'Typ 2';
+
+  @override
+  String get connectorCcs => 'CCS';
+
+  @override
+  String get connectorChademo => 'CHAdeMO';
+
+  @override
+  String get connectorTesla => 'Tesla';
+
+  @override
+  String get connectorSchuko => 'Schuko';
+
+  @override
+  String get connectorType1 => 'Typ 1';
+
+  @override
+  String get connectorThreePin => 'Schuko 3-polig';
 }

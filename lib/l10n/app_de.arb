@@ -701,5 +701,42 @@
         "type": "String"
       }
     }
-  }
+  },
+  "vehiclesTitle": "Meine Fahrzeuge",
+  "vehiclesMenuTitle": "Meine Fahrzeuge",
+  "vehiclesMenuSubtitle": "Batterie, Anschlüsse, Ladevorlieben",
+  "vehiclesEmptyMessage": "Fügen Sie Ihr Fahrzeug hinzu, um nach Anschlüssen zu filtern und Ladekosten zu schätzen.",
+  "vehicleAdd": "Fahrzeug hinzufügen",
+  "vehicleAddTitle": "Fahrzeug hinzufügen",
+  "vehicleEditTitle": "Fahrzeug bearbeiten",
+  "vehicleDeleteTitle": "Fahrzeug löschen?",
+  "vehicleDeleteMessage": "„{name}“ aus Ihren Profilen entfernen?",
+  "@vehicleDeleteMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "vehicleNameLabel": "Name",
+  "vehicleNameHint": "z. B. Mein Tesla Model 3",
+  "vehicleTypeCombustion": "Verbrenner",
+  "vehicleTypeHybrid": "Hybrid",
+  "vehicleTypeEv": "Elektro",
+  "vehicleEvSectionTitle": "Elektro",
+  "vehicleCombustionSectionTitle": "Verbrenner",
+  "vehicleBatteryLabel": "Batteriekapazität (kWh)",
+  "vehicleMaxChargeLabel": "Max. Ladeleistung (kW)",
+  "vehicleConnectorsLabel": "Unterstützte Anschlüsse",
+  "vehicleMinSocLabel": "Min. SoC %",
+  "vehicleMaxSocLabel": "Max. SoC %",
+  "vehicleTankLabel": "Tankvolumen (L)",
+  "vehiclePreferredFuelLabel": "Bevorzugter Kraftstoff",
+  "connectorType2": "Typ 2",
+  "connectorCcs": "CCS",
+  "connectorChademo": "CHAdeMO",
+  "connectorTesla": "Tesla",
+  "connectorSchuko": "Schuko",
+  "connectorType1": "Typ 1",
+  "connectorThreePin": "Schuko 3-polig"
 }
