@@ -48,6 +48,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get searchButton => 'Suchen';
 
   @override
+  String get searchCriteriaTitle => 'Suchkriterien';
+
+  @override
+  String get searchCriteriaOpen => 'Suchen';
+
+  @override
+  String searchCriteriaRadiusBadge(String km) {
+    return 'Im Umkreis von $km km';
+  }
+
+  @override
+  String get searchCriteriaTapToSearch => 'Tippen, um die Suche zu starten';
+
+  @override
   String get noResults => 'Keine Tankstellen gefunden.';
 
   @override

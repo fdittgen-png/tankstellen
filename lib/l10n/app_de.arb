@@ -13,6 +13,17 @@
   "searchRadius": "Umkreis",
   "searchNearby": "Tankstellen in der Nähe",
   "searchButton": "Suchen",
+  "searchCriteriaTitle": "Suchkriterien",
+  "searchCriteriaOpen": "Suchen",
+  "searchCriteriaRadiusBadge": "Im Umkreis von {km} km",
+  "@searchCriteriaRadiusBadge": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "searchCriteriaTapToSearch": "Tippen, um die Suche zu starten",
   "noResults": "Keine Tankstellen gefunden.",
   "startSearch": "Suche starten, um Tankstellen zu finden.",
   "open": "Geöffnet",

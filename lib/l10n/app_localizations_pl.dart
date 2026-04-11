@@ -48,6 +48,20 @@ class AppLocalizationsPl extends AppLocalizations {
   String get searchButton => 'Szukaj';
 
   @override
+  String get searchCriteriaTitle => 'Search criteria';
+
+  @override
+  String get searchCriteriaOpen => 'Search';
+
+  @override
+  String searchCriteriaRadiusBadge(String km) {
+    return 'Within $km km';
+  }
+
+  @override
+  String get searchCriteriaTapToSearch => 'Tap to start searching';
+
+  @override
   String get noResults => 'Nie znaleziono stacji.';
 
   @override

@@ -218,6 +218,30 @@ abstract class AppLocalizations {
   /// **'Search'**
   String get searchButton;
 
+  /// No description provided for @searchCriteriaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search criteria'**
+  String get searchCriteriaTitle;
+
+  /// No description provided for @searchCriteriaOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get searchCriteriaOpen;
+
+  /// No description provided for @searchCriteriaRadiusBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Within {km} km'**
+  String searchCriteriaRadiusBadge(String km);
+
+  /// No description provided for @searchCriteriaTapToSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to start searching'**
+  String get searchCriteriaTapToSearch;
+
   /// No description provided for @noResults.
   ///
   /// In en, this message translates to:

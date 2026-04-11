@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,7 +7,6 @@ import '../../../../app/responsive_search_layout.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/location/location_consent.dart';
 import '../../../../core/location/user_position_provider.dart';
-import '../../../../core/services/location_search_service.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/frame_callbacks.dart';
@@ -17,11 +18,9 @@ import '../../../map/presentation/widgets/inline_map.dart';
 import '../../providers/search_provider.dart';
 import '../widgets/demo_mode_banner.dart';
 import '../widgets/search_results_list.dart';
+import '../widgets/search_summary_bar.dart';
 import '../widgets/user_position_bar.dart';
-import '../../../route_search/domain/entities/route_info.dart';
-import '../../../route_search/providers/route_search_provider.dart';
 import '../../providers/search_mode_provider.dart';
-import '../../providers/search_screen_ui_provider.dart';
 import '../../providers/ev_search_provider.dart';
 import '../../../../core/location/location_service.dart';
 import '../../../../core/services/service_result.dart';
@@ -32,14 +31,14 @@ import '../../domain/entities/station.dart';
 import '../widgets/ev_station_card.dart';
 import '../../../profile/domain/entities/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
-import '../widgets/mode_chip.dart';
 import '../widgets/nearest_shortcut_card.dart';
-import '../widgets/nearby_search_controls.dart';
-import '../widgets/route_search_controls.dart';
 import '../widgets/route_results_view.dart';
 
-/// Main search screen — a thin shell that composes NearbySearchControls,
-/// RouteSearchControls, and RouteResultsView widgets.
+/// Main search screen — results-first layout.
+///
+/// The screen is dominated by the [SearchResultsList]. A compact
+/// [SearchSummaryBar] sits at the top and opens the dedicated
+/// `SearchCriteriaScreen` for editing the active search.
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
@@ -48,20 +47,29 @@ class SearchScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
+  bool _autoSearchAttempted = false;
+
   @override
   void initState() {
     super.initState();
     safePostFrame(() {
+      if (_autoSearchAttempted) return;
+      _autoSearchAttempted = true;
+
+      // Don't clobber an existing search result.
+      final existing = ref.read(searchStateProvider);
+      if (existing.hasValue && existing.value!.data.isNotEmpty) return;
+
       final profile = ref.read(activeProfileProvider);
       if (profile?.landingScreen == LandingScreen.cheapest) {
         final zip = profile?.homeZipCode;
         if (zip != null && zip.isNotEmpty) {
           _performZipSearch(zip);
         } else {
-          _performGpsSearch();
+          _tryGpsSearchIfConsented();
         }
       } else if (profile?.landingScreen == LandingScreen.nearest) {
-        _performGpsSearch();
+        _tryGpsSearchIfConsented();
       }
     });
   }
@@ -70,16 +78,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   // Search actions
   // ---------------------------------------------------------------------------
 
-  void _performRouteSearch(List<RouteWaypoint> waypoints) {
-    final fuelType = ref.read(selectedFuelTypeProvider);
-    final radius = ref.read(searchRadiusProvider);
-    ref.read(filtersExpandedProvider.notifier).collapse();
-    ref.read(routeSearchStateProvider.notifier).searchAlongRoute(
-      waypoints: waypoints,
-      fuelType: fuelType,
-      searchRadiusKm: radius.clamp(1, 10),
-      strategyType: ref.read(selectedRouteStrategyProvider),
-    );
+  /// Launches a GPS search only if location consent has already been granted.
+  ///
+  /// If consent is missing we leave the screen in its empty state — the user
+  /// can still open the criteria screen manually to start a search.
+  void _tryGpsSearchIfConsented() {
+    final settings = ref.read(settingsStorageProvider);
+    if (!LocationConsentDialog.hasConsent(settings)) return;
+    _performGpsSearch();
   }
 
   Future<void> _performGpsSearch() async {
@@ -91,60 +97,48 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       final consented = await LocationConsentDialog.show(context);
       if (!consented) {
         if (mounted) {
-          SnackBarHelper.show(context, AppLocalizations.of(context)?.locationDenied ??
-              'Location permission denied. You can search by postal code.');
+          SnackBarHelper.show(
+              context,
+              AppLocalizations.of(context)?.locationDenied ??
+                  'Location permission denied. You can search by postal code.');
         }
         return;
       }
       await LocationConsentDialog.recordConsent(settings);
     }
-    ref.read(filtersExpandedProvider.notifier).collapse();
 
     if (fuelType == FuelType.electric) {
       try {
         final locationService = ref.read(locationServiceProvider);
         final position = await locationService.getCurrentPosition();
-        ref.read(eVSearchStateProvider.notifier).searchNearby(
-          lat: position.latitude,
-          lng: position.longitude,
-          radiusKm: radius,
-        );
+        unawaited(ref.read(eVSearchStateProvider.notifier).searchNearby(
+              lat: position.latitude,
+              lng: position.longitude,
+              radiusKm: radius,
+            ));
       } catch (e) {
         if (mounted) {
-          SnackBarHelper.showError(context, '${AppLocalizations.of(context)?.gpsError ?? "GPS error"}: $e');
+          SnackBarHelper.showError(
+              context,
+              '${AppLocalizations.of(context)?.gpsError ?? "GPS error"}: $e');
         }
       }
     } else {
-      ref.read(searchStateProvider.notifier).searchByGps(
-        fuelType: fuelType,
-        radiusKm: radius,
-      );
+      unawaited(ref.read(searchStateProvider.notifier).searchByGps(
+            fuelType: fuelType,
+            radiusKm: radius,
+          ));
     }
   }
 
   void _performZipSearch(String zip) {
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
-    ref.read(filtersExpandedProvider.notifier).collapse();
-    ref.read(searchStateProvider.notifier).searchByZipCode(
-      zipCode: zip,
-      fuelType: fuelType,
-      radiusKm: radius,
-    );
-  }
-
-  void _performCitySearch(ResolvedLocation city) {
-    final fuelType = ref.read(selectedFuelTypeProvider);
-    final radius = ref.read(searchRadiusProvider);
-    ref.read(filtersExpandedProvider.notifier).collapse();
-    ref.read(searchStateProvider.notifier).searchByCoordinates(
-      lat: city.lat,
-      lng: city.lng,
-      postalCode: city.postcode,
-      locationName: city.name,
-      fuelType: fuelType,
-      radiusKm: radius,
-    );
+    unawaited(ref.read(searchStateProvider.notifier).searchByZipCode(
+          zipCode: zip,
+          fuelType: fuelType,
+          radiusKm: radius,
+        ));
   }
 
   // ---------------------------------------------------------------------------
@@ -158,13 +152,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
-    final filtersExpanded = ref.watch(filtersExpandedProvider);
-    if (isLandscape && filtersExpanded) {
-      safePostFrame(() {
-        ref.read(filtersExpandedProvider.notifier).collapse();
-      });
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Semantics(
@@ -176,72 +163,25 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       body: isWide
           ? Row(
               children: [
-                Expanded(child: _buildSearchContent(context, isLandscape)),
+                Expanded(child: _buildSearchContent(context)),
                 const VerticalDivider(width: 1),
                 const Expanded(child: InlineMap()),
               ],
             )
-          : _buildSearchContent(context, isLandscape),
+          : _buildSearchContent(context),
     );
   }
 
-  Widget _buildSearchContent(BuildContext context, bool isLandscape) {
-    final searchState = ref.watch(searchStateProvider);
+  Widget _buildSearchContent(BuildContext context) {
     final country = ref.watch(activeCountryProvider);
+    final searchState = ref.watch(searchStateProvider);
     final l10n = AppLocalizations.of(context);
-    final searchMode = ref.watch(activeSearchModeProvider);
 
     return Column(
       children: [
-        // --- Compact header: country info + search controls ---
         DemoModeBanner(country: country),
-        Padding(
-          padding: EdgeInsets.fromLTRB(16, isLandscape ? 2 : 6, 16, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Search mode toggle
-              Semantics(
-                label: 'Search mode',
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 2),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ModeChip(
-                          label: l10n?.searchNearby ?? 'Nearby',
-                          icon: Icons.near_me,
-                          selected: searchMode == SearchMode.nearby,
-                          onTap: () => ref.read(activeSearchModeProvider.notifier).set(SearchMode.nearby),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ModeChip(
-                          label: l10n?.searchAlongRouteLabel ?? 'Along route',
-                          icon: Icons.route,
-                          selected: searchMode == SearchMode.route,
-                          onTap: () => ref.read(activeSearchModeProvider.notifier).set(SearchMode.route),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              if (searchMode == SearchMode.nearby)
-                NearbySearchControls(
-                  onGpsSearch: _performGpsSearch,
-                  onZipSearch: _performZipSearch,
-                  onCitySearch: _performCitySearch,
-                  isLandscape: isLandscape,
-                )
-              else
-                RouteSearchControls(
-                  onSearch: _performRouteSearch,
-                ),
-            ],
-          ),
-        ),
+        // Compact summary bar — top-level entry point for editing criteria.
+        const SearchSummaryBar(),
         UserPositionBar(
           onUpdatePosition: () async {
             final settings = ref.read(settingsStorageProvider);
@@ -255,7 +195,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               await ref.read(userPositionProvider.notifier).updateFromGps();
               final state = ref.read(searchStateProvider);
               if (state.hasValue && state.value!.data.isNotEmpty) {
-                _performGpsSearch();
+                unawaited(_performGpsSearch());
               }
             } catch (e) {
               if (mounted) {
@@ -264,8 +204,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             }
           },
         ),
-
-        // --- Scrollable results ---
+        // Results dominate the remaining vertical space.
         Expanded(
           child: Semantics(
             label: 'Search results',
@@ -299,7 +238,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           if (result.data.isEmpty) {
             return EmptyState(
               icon: Icons.ev_station,
-              title: l10n?.searchEvStations ?? 'Search to find EV charging stations',
+              title: l10n?.searchEvStations ??
+                  'Search to find EV charging stations',
               actionLabel: l10n?.searchNearby ?? 'Search nearby',
               onAction: _performGpsSearch,
             );
@@ -317,7 +257,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           );
         },
         loading: () => const ShimmerStationList(),
-        error: (error, _) => ServiceChainErrorWidget(error: error, onRetry: _performGpsSearch),
+        error: (error, _) =>
+            ServiceChainErrorWidget(error: error, onRetry: _performGpsSearch),
       );
     }
 
@@ -347,7 +288,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         return SearchResultsList(result: result, onRefresh: _performGpsSearch);
       },
       loading: () => const ShimmerStationList(),
-      error: (error, _) => ServiceChainErrorWidget(error: error, onRetry: _performGpsSearch),
+      error: (error, _) =>
+          ServiceChainErrorWidget(error: error, onRetry: _performGpsSearch),
     );
   }
 }

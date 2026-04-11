@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/features/search/presentation/screens/search_screen.dart';
-import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
-import 'package:tankstellen/features/search/presentation/widgets/location_input.dart';
+import 'package:tankstellen/features/search/presentation/widgets/search_summary_bar.dart';
 import 'package:tankstellen/features/search/presentation/widgets/user_position_bar.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 
 void main() {
-  group('SearchScreen', () {
+  group('SearchScreen (results-first layout)', () {
     testWidgets('renders Scaffold', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -24,11 +23,10 @@ void main() {
         ],
       );
 
-      // SearchScreen itself contains a Scaffold (nested inside pumpApp's Scaffold)
       expect(find.byType(Scaffold), findsAtLeast(1));
     });
 
-    testWidgets('renders LocationInput widget', (tester) async {
+    testWidgets('renders the SearchSummaryBar at the top', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
@@ -41,10 +39,12 @@ void main() {
         ],
       );
 
-      expect(find.byType(LocationInput), findsOneWidget);
+      expect(find.byType(SearchSummaryBar), findsOneWidget);
     });
 
-    testWidgets('renders FuelTypeSelector widget', (tester) async {
+    testWidgets('does NOT render the inline LocationInput/FuelTypeSelector',
+        (tester) async {
+      // In the new results-first layout, these live on the criteria screen.
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
@@ -57,29 +57,8 @@ void main() {
         ],
       );
 
-      expect(find.byType(FuelTypeSelector), findsOneWidget);
-    });
-
-    testWidgets('renders Nearby stations button in portrait', (tester) async {
-      // Set portrait phone size so the button is visible
-      tester.view.physicalSize = const Size(400, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-
-      await pumpApp(
-        tester,
-        const SearchScreen(),
-        overrides: [
-          ...test.overrides,
-          userPositionNullOverride(),
-        ],
-      );
-
-      expect(find.text('Nearby stations'), findsWidgets);
+      // No TextField on the results screen — only the summary bar.
+      expect(find.byType(TextField), findsNothing);
     });
 
     testWidgets('renders UserPositionBar', (tester) async {
@@ -112,7 +91,6 @@ void main() {
         ],
       );
 
-      // Default search state has empty data list → shows start search message
       expect(
         find.text('Search to find fuel stations.'),
         findsOneWidget,
@@ -141,8 +119,14 @@ void main() {
       expect(find.text('Search to find fuel stations.'), findsOneWidget);
     });
 
-    testWidgets('typing a zip code in location input accepts input',
+    testWidgets('results area dominates the viewport (≥60% vertical)',
         (tester) async {
+      // Use a fixed-size phone viewport.
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
@@ -155,88 +139,20 @@ void main() {
         ],
       );
 
-      // Find the text field inside LocationInput and enter a zip code
-      final textField = find.byType(TextField).first;
-      expect(textField, findsOneWidget);
+      // The Expanded child (results area) is found via the Semantics label.
+      final resultsFinder = find.bySemanticsLabel('Search results');
+      expect(resultsFinder, findsOneWidget);
 
-      await tester.enterText(textField, '10115');
-      await tester.pump();
-
-      // The entered text should be visible
-      expect(find.text('10115'), findsOneWidget);
-    });
-
-    testWidgets('clearing location input resets to empty', (tester) async {
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-
-      await pumpApp(
-        tester,
-        const SearchScreen(),
-        overrides: [
-          ...test.overrides,
-          userPositionNullOverride(),
-        ],
+      final resultsBox = tester.getSize(resultsFinder.first);
+      final screenHeight = tester.view.physicalSize.height /
+          tester.view.devicePixelRatio;
+      expect(
+        resultsBox.height >= screenHeight * 0.6,
+        isTrue,
+        reason:
+            'Expected results area to be at least 60% of screen height, got '
+            '${resultsBox.height}/${screenHeight}',
       );
-
-      final textField = find.byType(TextField).first;
-      await tester.enterText(textField, '10115');
-      await tester.pump();
-      expect(find.text('10115'), findsOneWidget);
-
-      // Clear the text
-      await tester.enterText(textField, '');
-      await tester.pump();
-      expect(find.text('10115'), findsNothing);
-    });
-
-    testWidgets('search bar is always visible (sticky) — no collapsed state',
-        (tester) async {
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-
-      await pumpApp(
-        tester,
-        const SearchScreen(),
-        overrides: [
-          ...test.overrides,
-          userPositionNullOverride(),
-        ],
-      );
-
-      // LocationInput should be visible in the initial state
-      expect(find.byType(LocationInput), findsOneWidget);
-
-      // There should be no AnimatedCrossFade wrapping the search bar
-      // (the search bar is always the full LocationInput, never collapsed)
-      final locationInput = tester.widget<LocationInput>(
-        find.byType(LocationInput),
-      );
-      expect(locationInput, isNotNull);
-
-      // The search bar parent should not be an AnimatedCrossFade
-      // Verify TextField is always accessible (not hidden behind a tap target)
-      expect(find.byType(TextField), findsOneWidget);
-    });
-
-    testWidgets('search controls and results coexist in column layout',
-        (tester) async {
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-
-      await pumpApp(
-        tester,
-        const SearchScreen(),
-        overrides: [
-          ...test.overrides,
-          userPositionNullOverride(),
-        ],
-      );
-
-      // Both search controls and results area should be visible
-      expect(find.byType(LocationInput), findsOneWidget);
-      expect(find.byType(UserPositionBar), findsOneWidget);
-      expect(find.text('Search to find fuel stations.'), findsOneWidget);
     });
   });
 }
