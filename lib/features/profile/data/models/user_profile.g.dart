@@ -33,6 +33,11 @@ _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
   showFuel: json['showFuel'] as bool? ?? true,
   showElectric: json['showElectric'] as bool? ?? true,
   ratingMode: json['ratingMode'] as String? ?? 'local',
+  preferredAmenities:
+      (json['preferredAmenities'] as List<dynamic>?)
+          ?.map((e) => $enumDecode(_$StationAmenityEnumMap, e))
+          .toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
@@ -54,6 +59,9 @@ Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
       'showFuel': instance.showFuel,
       'showElectric': instance.showElectric,
       'ratingMode': instance.ratingMode,
+      'preferredAmenities': instance.preferredAmenities
+          .map((e) => _$StationAmenityEnumMap[e]!)
+          .toList(),
     };
 
 const _$LandingScreenEnumMap = {
@@ -62,4 +70,15 @@ const _$LandingScreenEnumMap = {
   LandingScreen.map: 'map',
   LandingScreen.cheapest: 'cheapest',
   LandingScreen.nearest: 'nearest',
+};
+
+const _$StationAmenityEnumMap = {
+  StationAmenity.shop: 'shop',
+  StationAmenity.carWash: 'carWash',
+  StationAmenity.airPump: 'airPump',
+  StationAmenity.toilet: 'toilet',
+  StationAmenity.restaurant: 'restaurant',
+  StationAmenity.atm: 'atm',
+  StationAmenity.wifi: 'wifi',
+  StationAmenity.ev: 'ev',
 };

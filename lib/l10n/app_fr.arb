@@ -423,5 +423,9 @@
   "amenityWifi": "WiFi",
   "amenityEv": "Recharge",
   "nearestStations": "Stations les plus proches",
-  "nearestStationsHint": "Trouver les stations les plus proches avec votre position actuelle"
+  "nearestStationsHint": "Trouver les stations les plus proches avec votre position actuelle",
+  "openOnlyFilter": "Ouvertes uniquement",
+  "saveAsDefaults": "Enregistrer comme valeurs par défaut",
+  "criteriaSavedToProfile": "Enregistré comme valeurs par défaut",
+  "profileNotFound": "Aucun profil actif"
 }

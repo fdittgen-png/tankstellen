@@ -758,5 +758,9 @@
   "evLastUpdate": "Letzte Aktualisierung",
   "evStatusAvailable": "Verfügbar",
   "evStatusOccupied": "Belegt",
-  "evStatusOutOfOrder": "Außer Betrieb"
+  "evStatusOutOfOrder": "Außer Betrieb",
+  "openOnlyFilter": "Nur geöffnete",
+  "saveAsDefaults": "Als Standard speichern",
+  "criteriaSavedToProfile": "Als Standard gespeichert",
+  "profileNotFound": "Kein aktives Profil"
 }

@@ -3270,6 +3270,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Out of order'**
   String get evStatusOutOfOrder;
+
+  /// No description provided for @openOnlyFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Open only'**
+  String get openOnlyFilter;
+
+  /// No description provided for @saveAsDefaults.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as my defaults'**
+  String get saveAsDefaults;
+
+  /// No description provided for @criteriaSavedToProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved as defaults'**
+  String get criteriaSavedToProfile;
+
+  /// No description provided for @profileNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No active profile'**
+  String get profileNotFound;
 }
 
 class _AppLocalizationsDelegate

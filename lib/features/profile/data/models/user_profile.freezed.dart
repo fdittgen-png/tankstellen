@@ -19,7 +19,9 @@ mixin _$UserProfile {
 /// - 'local' — ratings saved only on this device
 /// - 'private' — synced with user's database but not shared
 /// - 'shared' — visible to all users of the database
- String get ratingMode;
+ String get ratingMode;/// Amenities the user requires at stations by default (empty = no filter).
+/// Persisted per-profile and loaded into the search criteria screen.
+ List<StationAmenity> get preferredAmenities;
 /// Create a copy of UserProfile
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -32,16 +34,16 @@ $UserProfileCopyWith<UserProfile> get copyWith => _$UserProfileCopyWithImpl<User
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserProfile&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.preferredFuelType, preferredFuelType) || other.preferredFuelType == preferredFuelType)&&(identical(other.defaultSearchRadius, defaultSearchRadius) || other.defaultSearchRadius == defaultSearchRadius)&&(identical(other.landingScreen, landingScreen) || other.landingScreen == landingScreen)&&const DeepCollectionEquality().equals(other.favoriteStationIds, favoriteStationIds)&&(identical(other.homeZipCode, homeZipCode) || other.homeZipCode == homeZipCode)&&(identical(other.autoUpdatePosition, autoUpdatePosition) || other.autoUpdatePosition == autoUpdatePosition)&&(identical(other.countryCode, countryCode) || other.countryCode == countryCode)&&(identical(other.languageCode, languageCode) || other.languageCode == languageCode)&&(identical(other.routeSegmentKm, routeSegmentKm) || other.routeSegmentKm == routeSegmentKm)&&(identical(other.avoidHighways, avoidHighways) || other.avoidHighways == avoidHighways)&&(identical(other.showFuel, showFuel) || other.showFuel == showFuel)&&(identical(other.showElectric, showElectric) || other.showElectric == showElectric)&&(identical(other.ratingMode, ratingMode) || other.ratingMode == ratingMode));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserProfile&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.preferredFuelType, preferredFuelType) || other.preferredFuelType == preferredFuelType)&&(identical(other.defaultSearchRadius, defaultSearchRadius) || other.defaultSearchRadius == defaultSearchRadius)&&(identical(other.landingScreen, landingScreen) || other.landingScreen == landingScreen)&&const DeepCollectionEquality().equals(other.favoriteStationIds, favoriteStationIds)&&(identical(other.homeZipCode, homeZipCode) || other.homeZipCode == homeZipCode)&&(identical(other.autoUpdatePosition, autoUpdatePosition) || other.autoUpdatePosition == autoUpdatePosition)&&(identical(other.countryCode, countryCode) || other.countryCode == countryCode)&&(identical(other.languageCode, languageCode) || other.languageCode == languageCode)&&(identical(other.routeSegmentKm, routeSegmentKm) || other.routeSegmentKm == routeSegmentKm)&&(identical(other.avoidHighways, avoidHighways) || other.avoidHighways == avoidHighways)&&(identical(other.showFuel, showFuel) || other.showFuel == showFuel)&&(identical(other.showElectric, showElectric) || other.showElectric == showElectric)&&(identical(other.ratingMode, ratingMode) || other.ratingMode == ratingMode)&&const DeepCollectionEquality().equals(other.preferredAmenities, preferredAmenities));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,preferredFuelType,defaultSearchRadius,landingScreen,const DeepCollectionEquality().hash(favoriteStationIds),homeZipCode,autoUpdatePosition,countryCode,languageCode,routeSegmentKm,avoidHighways,showFuel,showElectric,ratingMode);
+int get hashCode => Object.hash(runtimeType,id,name,preferredFuelType,defaultSearchRadius,landingScreen,const DeepCollectionEquality().hash(favoriteStationIds),homeZipCode,autoUpdatePosition,countryCode,languageCode,routeSegmentKm,avoidHighways,showFuel,showElectric,ratingMode,const DeepCollectionEquality().hash(preferredAmenities));
 
 @override
 String toString() {
-  return 'UserProfile(id: $id, name: $name, preferredFuelType: $preferredFuelType, defaultSearchRadius: $defaultSearchRadius, landingScreen: $landingScreen, favoriteStationIds: $favoriteStationIds, homeZipCode: $homeZipCode, autoUpdatePosition: $autoUpdatePosition, countryCode: $countryCode, languageCode: $languageCode, routeSegmentKm: $routeSegmentKm, avoidHighways: $avoidHighways, showFuel: $showFuel, showElectric: $showElectric, ratingMode: $ratingMode)';
+  return 'UserProfile(id: $id, name: $name, preferredFuelType: $preferredFuelType, defaultSearchRadius: $defaultSearchRadius, landingScreen: $landingScreen, favoriteStationIds: $favoriteStationIds, homeZipCode: $homeZipCode, autoUpdatePosition: $autoUpdatePosition, countryCode: $countryCode, languageCode: $languageCode, routeSegmentKm: $routeSegmentKm, avoidHighways: $avoidHighways, showFuel: $showFuel, showElectric: $showElectric, ratingMode: $ratingMode, preferredAmenities: $preferredAmenities)';
 }
 
 
@@ -52,7 +54,7 @@ abstract mixin class $UserProfileCopyWith<$Res>  {
   factory $UserProfileCopyWith(UserProfile value, $Res Function(UserProfile) _then) = _$UserProfileCopyWithImpl;
 @useResult
 $Res call({
- String id, String name,@FuelTypeJsonConverter() FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways, bool showFuel, bool showElectric, String ratingMode
+ String id, String name,@FuelTypeJsonConverter() FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways, bool showFuel, bool showElectric, String ratingMode, List<StationAmenity> preferredAmenities
 });
 
 
@@ -69,7 +71,7 @@ class _$UserProfileCopyWithImpl<$Res>
 
 /// Create a copy of UserProfile
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? preferredFuelType = null,Object? defaultSearchRadius = null,Object? landingScreen = null,Object? favoriteStationIds = null,Object? homeZipCode = freezed,Object? autoUpdatePosition = null,Object? countryCode = freezed,Object? languageCode = freezed,Object? routeSegmentKm = null,Object? avoidHighways = null,Object? showFuel = null,Object? showElectric = null,Object? ratingMode = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? preferredFuelType = null,Object? defaultSearchRadius = null,Object? landingScreen = null,Object? favoriteStationIds = null,Object? homeZipCode = freezed,Object? autoUpdatePosition = null,Object? countryCode = freezed,Object? languageCode = freezed,Object? routeSegmentKm = null,Object? avoidHighways = null,Object? showFuel = null,Object? showElectric = null,Object? ratingMode = null,Object? preferredAmenities = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -86,7 +88,8 @@ as double,avoidHighways: null == avoidHighways ? _self.avoidHighways : avoidHigh
 as bool,showFuel: null == showFuel ? _self.showFuel : showFuel // ignore: cast_nullable_to_non_nullable
 as bool,showElectric: null == showElectric ? _self.showElectric : showElectric // ignore: cast_nullable_to_non_nullable
 as bool,ratingMode: null == ratingMode ? _self.ratingMode : ratingMode // ignore: cast_nullable_to_non_nullable
-as String,
+as String,preferredAmenities: null == preferredAmenities ? _self.preferredAmenities : preferredAmenities // ignore: cast_nullable_to_non_nullable
+as List<StationAmenity>,
   ));
 }
 
@@ -171,10 +174,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserProfile() when $default != null:
-return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode);case _:
+return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode,_that.preferredAmenities);case _:
   return orElse();
 
 }
@@ -192,10 +195,10 @@ return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchR
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities)  $default,) {final _that = this;
 switch (_that) {
 case _UserProfile():
-return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode);case _:
+return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode,_that.preferredAmenities);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -212,10 +215,10 @@ return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchR
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities)?  $default,) {final _that = this;
 switch (_that) {
 case _UserProfile() when $default != null:
-return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode);case _:
+return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode,_that.preferredAmenities);case _:
   return null;
 
 }
@@ -227,7 +230,7 @@ return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchR
 @JsonSerializable()
 
 class _UserProfile implements UserProfile {
-  const _UserProfile({required this.id, required this.name, @FuelTypeJsonConverter() this.preferredFuelType = FuelType.e10, this.defaultSearchRadius = 10.0, this.landingScreen = LandingScreen.search, final  List<String> favoriteStationIds = const [], this.homeZipCode, this.autoUpdatePosition = false, this.countryCode, this.languageCode, this.routeSegmentKm = 50.0, this.avoidHighways = false, this.showFuel = true, this.showElectric = true, this.ratingMode = 'local'}): _favoriteStationIds = favoriteStationIds;
+  const _UserProfile({required this.id, required this.name, @FuelTypeJsonConverter() this.preferredFuelType = FuelType.e10, this.defaultSearchRadius = 10.0, this.landingScreen = LandingScreen.search, final  List<String> favoriteStationIds = const [], this.homeZipCode, this.autoUpdatePosition = false, this.countryCode, this.languageCode, this.routeSegmentKm = 50.0, this.avoidHighways = false, this.showFuel = true, this.showElectric = true, this.ratingMode = 'local', final  List<StationAmenity> preferredAmenities = const []}): _favoriteStationIds = favoriteStationIds,_preferredAmenities = preferredAmenities;
   factory _UserProfile.fromJson(Map<String, dynamic> json) => _$UserProfileFromJson(json);
 
 @override final  String id;
@@ -255,6 +258,17 @@ class _UserProfile implements UserProfile {
 /// - 'private' — synced with user's database but not shared
 /// - 'shared' — visible to all users of the database
 @override@JsonKey() final  String ratingMode;
+/// Amenities the user requires at stations by default (empty = no filter).
+/// Persisted per-profile and loaded into the search criteria screen.
+ final  List<StationAmenity> _preferredAmenities;
+/// Amenities the user requires at stations by default (empty = no filter).
+/// Persisted per-profile and loaded into the search criteria screen.
+@override@JsonKey() List<StationAmenity> get preferredAmenities {
+  if (_preferredAmenities is EqualUnmodifiableListView) return _preferredAmenities;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_preferredAmenities);
+}
+
 
 /// Create a copy of UserProfile
 /// with the given fields replaced by the non-null parameter values.
@@ -269,16 +283,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserProfile&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.preferredFuelType, preferredFuelType) || other.preferredFuelType == preferredFuelType)&&(identical(other.defaultSearchRadius, defaultSearchRadius) || other.defaultSearchRadius == defaultSearchRadius)&&(identical(other.landingScreen, landingScreen) || other.landingScreen == landingScreen)&&const DeepCollectionEquality().equals(other._favoriteStationIds, _favoriteStationIds)&&(identical(other.homeZipCode, homeZipCode) || other.homeZipCode == homeZipCode)&&(identical(other.autoUpdatePosition, autoUpdatePosition) || other.autoUpdatePosition == autoUpdatePosition)&&(identical(other.countryCode, countryCode) || other.countryCode == countryCode)&&(identical(other.languageCode, languageCode) || other.languageCode == languageCode)&&(identical(other.routeSegmentKm, routeSegmentKm) || other.routeSegmentKm == routeSegmentKm)&&(identical(other.avoidHighways, avoidHighways) || other.avoidHighways == avoidHighways)&&(identical(other.showFuel, showFuel) || other.showFuel == showFuel)&&(identical(other.showElectric, showElectric) || other.showElectric == showElectric)&&(identical(other.ratingMode, ratingMode) || other.ratingMode == ratingMode));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserProfile&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.preferredFuelType, preferredFuelType) || other.preferredFuelType == preferredFuelType)&&(identical(other.defaultSearchRadius, defaultSearchRadius) || other.defaultSearchRadius == defaultSearchRadius)&&(identical(other.landingScreen, landingScreen) || other.landingScreen == landingScreen)&&const DeepCollectionEquality().equals(other._favoriteStationIds, _favoriteStationIds)&&(identical(other.homeZipCode, homeZipCode) || other.homeZipCode == homeZipCode)&&(identical(other.autoUpdatePosition, autoUpdatePosition) || other.autoUpdatePosition == autoUpdatePosition)&&(identical(other.countryCode, countryCode) || other.countryCode == countryCode)&&(identical(other.languageCode, languageCode) || other.languageCode == languageCode)&&(identical(other.routeSegmentKm, routeSegmentKm) || other.routeSegmentKm == routeSegmentKm)&&(identical(other.avoidHighways, avoidHighways) || other.avoidHighways == avoidHighways)&&(identical(other.showFuel, showFuel) || other.showFuel == showFuel)&&(identical(other.showElectric, showElectric) || other.showElectric == showElectric)&&(identical(other.ratingMode, ratingMode) || other.ratingMode == ratingMode)&&const DeepCollectionEquality().equals(other._preferredAmenities, _preferredAmenities));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,preferredFuelType,defaultSearchRadius,landingScreen,const DeepCollectionEquality().hash(_favoriteStationIds),homeZipCode,autoUpdatePosition,countryCode,languageCode,routeSegmentKm,avoidHighways,showFuel,showElectric,ratingMode);
+int get hashCode => Object.hash(runtimeType,id,name,preferredFuelType,defaultSearchRadius,landingScreen,const DeepCollectionEquality().hash(_favoriteStationIds),homeZipCode,autoUpdatePosition,countryCode,languageCode,routeSegmentKm,avoidHighways,showFuel,showElectric,ratingMode,const DeepCollectionEquality().hash(_preferredAmenities));
 
 @override
 String toString() {
-  return 'UserProfile(id: $id, name: $name, preferredFuelType: $preferredFuelType, defaultSearchRadius: $defaultSearchRadius, landingScreen: $landingScreen, favoriteStationIds: $favoriteStationIds, homeZipCode: $homeZipCode, autoUpdatePosition: $autoUpdatePosition, countryCode: $countryCode, languageCode: $languageCode, routeSegmentKm: $routeSegmentKm, avoidHighways: $avoidHighways, showFuel: $showFuel, showElectric: $showElectric, ratingMode: $ratingMode)';
+  return 'UserProfile(id: $id, name: $name, preferredFuelType: $preferredFuelType, defaultSearchRadius: $defaultSearchRadius, landingScreen: $landingScreen, favoriteStationIds: $favoriteStationIds, homeZipCode: $homeZipCode, autoUpdatePosition: $autoUpdatePosition, countryCode: $countryCode, languageCode: $languageCode, routeSegmentKm: $routeSegmentKm, avoidHighways: $avoidHighways, showFuel: $showFuel, showElectric: $showElectric, ratingMode: $ratingMode, preferredAmenities: $preferredAmenities)';
 }
 
 
@@ -289,7 +303,7 @@ abstract mixin class _$UserProfileCopyWith<$Res> implements $UserProfileCopyWith
   factory _$UserProfileCopyWith(_UserProfile value, $Res Function(_UserProfile) _then) = __$UserProfileCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name,@FuelTypeJsonConverter() FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways, bool showFuel, bool showElectric, String ratingMode
+ String id, String name,@FuelTypeJsonConverter() FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways, bool showFuel, bool showElectric, String ratingMode, List<StationAmenity> preferredAmenities
 });
 
 
@@ -306,7 +320,7 @@ class __$UserProfileCopyWithImpl<$Res>
 
 /// Create a copy of UserProfile
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? preferredFuelType = null,Object? defaultSearchRadius = null,Object? landingScreen = null,Object? favoriteStationIds = null,Object? homeZipCode = freezed,Object? autoUpdatePosition = null,Object? countryCode = freezed,Object? languageCode = freezed,Object? routeSegmentKm = null,Object? avoidHighways = null,Object? showFuel = null,Object? showElectric = null,Object? ratingMode = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? preferredFuelType = null,Object? defaultSearchRadius = null,Object? landingScreen = null,Object? favoriteStationIds = null,Object? homeZipCode = freezed,Object? autoUpdatePosition = null,Object? countryCode = freezed,Object? languageCode = freezed,Object? routeSegmentKm = null,Object? avoidHighways = null,Object? showFuel = null,Object? showElectric = null,Object? ratingMode = null,Object? preferredAmenities = null,}) {
   return _then(_UserProfile(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -323,7 +337,8 @@ as double,avoidHighways: null == avoidHighways ? _self.avoidHighways : avoidHigh
 as bool,showFuel: null == showFuel ? _self.showFuel : showFuel // ignore: cast_nullable_to_non_nullable
 as bool,showElectric: null == showElectric ? _self.showElectric : showElectric // ignore: cast_nullable_to_non_nullable
 as bool,ratingMode: null == ratingMode ? _self.ratingMode : ratingMode // ignore: cast_nullable_to_non_nullable
-as String,
+as String,preferredAmenities: null == preferredAmenities ? _self._preferredAmenities : preferredAmenities // ignore: cast_nullable_to_non_nullable
+as List<StationAmenity>,
   ));
 }
 

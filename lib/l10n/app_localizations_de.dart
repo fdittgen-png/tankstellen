@@ -1707,4 +1707,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get evStatusOutOfOrder => 'Außer Betrieb';
+
+  @override
+  String get openOnlyFilter => 'Nur geöffnete';
+
+  @override
+  String get saveAsDefaults => 'Als Standard speichern';
+
+  @override
+  String get criteriaSavedToProfile => 'Als Standard gespeichert';
+
+  @override
+  String get profileNotFound => 'Kein aktives Profil';
 }
