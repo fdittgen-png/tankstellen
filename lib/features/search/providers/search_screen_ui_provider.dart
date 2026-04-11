@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../route_search/domain/route_search_strategy.dart';
+import '../domain/entities/station_amenity.dart';
 import '../presentation/widgets/sort_selector.dart';
 
 part 'search_screen_ui_provider.g.dart';
@@ -58,4 +59,39 @@ class AllPricesViewEnabled extends _$AllPricesViewEnabled {
   void toggle() => state = !state;
 
   void set(bool value) => state = value;
+}
+
+/// Whether results should be filtered to currently-open stations only.
+/// Toggled from the search criteria screen; consumed by the results list.
+@Riverpod(keepAlive: true)
+class OpenOnlyFilter extends _$OpenOnlyFilter {
+  @override
+  bool build() => false;
+
+  void set(bool value) => state = value;
+
+  void toggle() => state = !state;
+}
+
+/// The set of amenities the user wants stations to provide.
+/// Empty set means "no amenity filter" (all stations pass).
+@Riverpod(keepAlive: true)
+class SelectedAmenities extends _$SelectedAmenities {
+  @override
+  Set<StationAmenity> build() => const <StationAmenity>{};
+
+  void toggle(StationAmenity amenity) {
+    final next = Set<StationAmenity>.from(state);
+    if (next.contains(amenity)) {
+      next.remove(amenity);
+    } else {
+      next.add(amenity);
+    }
+    state = next;
+  }
+
+  void set(Set<StationAmenity> amenities) =>
+      state = Set<StationAmenity>.from(amenities);
+
+  void clear() => state = const <StationAmenity>{};
 }

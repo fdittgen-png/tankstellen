@@ -1702,4 +1702,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get evStatusOutOfOrder => 'Out of order';
+
+  @override
+  String get openOnlyFilter => 'Ouvertes uniquement';
+
+  @override
+  String get saveAsDefaults => 'Enregistrer comme valeurs par défaut';
+
+  @override
+  String get criteriaSavedToProfile => 'Enregistré comme valeurs par défaut';
+
+  @override
+  String get profileNotFound => 'Aucun profil actif';
 }

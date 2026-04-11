@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../search/domain/entities/fuel_type.dart';
+import '../../../search/domain/entities/station_amenity.dart';
 
 part 'user_profile.freezed.dart';
 part 'user_profile.g.dart';
@@ -52,6 +53,9 @@ abstract class UserProfile with _$UserProfile {
     /// - 'private' — synced with user's database but not shared
     /// - 'shared' — visible to all users of the database
     @Default('local') String ratingMode,
+    /// Amenities the user requires at stations by default (empty = no filter).
+    /// Persisted per-profile and loaded into the search criteria screen.
+    @Default([]) List<StationAmenity> preferredAmenities,
   }) = _UserProfile;
 
   factory UserProfile.fromJson(Map<String, dynamic> json) =>
