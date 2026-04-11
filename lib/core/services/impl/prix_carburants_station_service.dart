@@ -38,15 +38,33 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     List<Map<String, dynamic>> allResults = [];
 
     final hasPostalCode = params.postalCode != null && params.postalCode!.isNotEmpty;
+    final hasValidCoords = params.lat != 0 && params.lng != 0;
 
     if (hasPostalCode) {
-      // Postal code search: use native CP filter first (100% accurate),
-      // fall back to geo only if CP returns empty (e.g., invalid code).
-      // This avoids relying on Nominatim geocoding which returns inaccurate
-      // coordinates for French postal codes (especially Paris arrondissements).
-      allResults = await _queryByPostalCode(params.postalCode!, cancelToken: cancelToken);
-      if (allResults.isEmpty) {
-        allResults = await _queryByGeo(params.lat, params.lng, params.radiusKm, cancelToken: cancelToken);
+      // Postal code search strategy:
+      // 1. Run the native CP filter first — fast, 100% accurate for the
+      //    target postal code, and returns stations even when geocoding
+      //    is unreliable (e.g., Paris arrondissements).
+      // 2. ALSO run the geo query when valid coordinates are present, so
+      //    that neighboring postal codes are included when the user picks
+      //    a wider radius. Without this, a GPS search from a rural village
+      //    (which auto-attaches its postal code via reverse geocoding) would
+      //    cap results at the village's own ~5 stations regardless of
+      //    radius — bug #315.
+      // 3. Merge and dedupe by station id.
+      final cpResults = await _queryByPostalCode(params.postalCode!, cancelToken: cancelToken);
+
+      if (hasValidCoords) {
+        final geoResults = await _queryByGeo(params.lat, params.lng, params.radiusKm, cancelToken: cancelToken);
+        allResults = _mergeById(cpResults, geoResults);
+      } else {
+        allResults = cpResults;
+      }
+
+      // Final fallback: if both queries returned nothing (e.g., invalid CP
+      // and no coordinates), give up gracefully.
+      if (allResults.isEmpty && !hasValidCoords) {
+        allResults = const [];
       }
     } else {
       // GPS / coordinate search: geo query is the only option
@@ -125,6 +143,33 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
       debugPrint('Prix-Carburants geo fetch failed: $e');
       return [];
     }
+  }
+
+  /// Merge two raw API result lists, deduplicating by station id.
+  /// Stations from [primary] win when an id collides.
+  List<Map<String, dynamic>> _mergeById(
+    List<Map<String, dynamic>> primary,
+    List<Map<String, dynamic>> secondary,
+  ) {
+    final seen = <String>{};
+    final merged = <Map<String, dynamic>>[];
+    for (final r in primary) {
+      final id = r['id']?.toString() ?? '';
+      if (id.isNotEmpty && seen.add(id)) {
+        merged.add(r);
+      } else if (id.isEmpty) {
+        merged.add(r);
+      }
+    }
+    for (final r in secondary) {
+      final id = r['id']?.toString() ?? '';
+      if (id.isNotEmpty && seen.add(id)) {
+        merged.add(r);
+      } else if (id.isEmpty) {
+        merged.add(r);
+      }
+    }
+    return merged;
   }
 
   List<Map<String, dynamic>> _extractResults(dynamic data) {

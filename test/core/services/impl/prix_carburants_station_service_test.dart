@@ -606,6 +606,8 @@ void main() {
       final adapter = _TrackingMockAdapter();
       // First request (CP query) returns results
       adapter.addResponse(_makeApiResponse('75012', 3));
+      // Second request (geo follow-up for neighboring postal codes — #315)
+      adapter.addResponse({'results': const []});
 
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
@@ -615,9 +617,13 @@ void main() {
       );
       final result = await svc.searchStations(params);
 
-      // Should have made exactly 1 request (CP query), not a geo query
-      expect(adapter.requestCount, 1);
-      expect(adapter.lastRequestUri, contains('cp%3D%2775012%27'));
+      // Per #315, the postal-code path now ALSO calls the geo query so that
+      // neighboring postal codes are included when the user picks a wider radius.
+      expect(adapter.requestCount, 2);
+      expect(adapter.requestUris[0], contains('cp%3D%2775012%27'),
+          reason: 'first call must be the postal-code query');
+      expect(adapter.requestUris[1], contains('within_distance'),
+          reason: 'second call must be the geo query (#315)');
       expect(result.data, hasLength(3));
       expect(result.data.first.postCode, '75012');
     });
@@ -663,9 +669,14 @@ void main() {
       expect(result.data, hasLength(4));
     });
 
-    test('does not call geo when postal code query succeeds', () async {
+    test('always calls geo as well when postal code + valid coords are present (#315)',
+        () async {
+      // Per #315, the cp-only path missed neighboring postal codes within the
+      // requested radius. The fix is to ALWAYS run the geo query in addition
+      // to the cp query when valid coordinates are present.
       final adapter = _TrackingMockAdapter();
       adapter.addResponse(_makeApiResponse('34120', 5));
+      adapter.addResponse({'results': const []}); // geo follow-up
 
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
@@ -675,8 +686,9 @@ void main() {
       );
       final result = await svc.searchStations(params);
 
-      expect(adapter.requestCount, 1);
-      expect(adapter.lastRequestUri, isNot(contains('within_distance')));
+      expect(adapter.requestCount, 2);
+      expect(adapter.requestUris[0], contains('cp%3D%2734120%27'));
+      expect(adapter.requestUris[1], contains('within_distance'));
       expect(result.data, hasLength(5));
     });
 
@@ -750,7 +762,8 @@ void main() {
 
     test('postal-code path filters stations by radius (regression #298)', () async {
       final adapter = _TrackingMockAdapter()
-        ..addResponse(scatteredStations('34120'));
+        ..addResponse(scatteredStations('34120'))
+        ..addResponse({'results': const []}); // geo follow-up returns nothing extra
 
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
@@ -760,7 +773,8 @@ void main() {
         lat: 43.45, lng: 3.42, radiusKm: 2.0, postalCode: '34120',
       ));
 
-      expect(adapter.lastRequestUri, contains('cp%3D%2734120%27'),
+      // First request must be the postal-code query
+      expect(adapter.requestUris.first, contains('cp%3D%2734120%27'),
           reason: 'should have taken the postal-code path');
       expect(result.data.map((s) => s.id).toList(), ['3412001', '3412002'],
           reason: 'only stations within 2 km should remain');
@@ -772,7 +786,9 @@ void main() {
     test('postal-code path with different radii returns different result counts (#298)', () async {
       final adapter = _TrackingMockAdapter()
         ..addResponse(scatteredStations('34120'))
-        ..addResponse(scatteredStations('34120'));
+        ..addResponse({'results': const []}) // geo follow-up for narrow
+        ..addResponse(scatteredStations('34120'))
+        ..addResponse({'results': const []}); // geo follow-up for wide
 
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
@@ -825,6 +841,227 @@ void main() {
 
       expect(adapter.lastRequestUri, contains('within_distance'));
       expect(result.data.map((s) => s.id).toList(), ['3412001', '3412002']);
+    });
+
+    // -------- #315: postal-code search must include neighboring postal codes --------
+
+    test('postal-code path also queries geo to include neighboring postal codes (#315)',
+        () async {
+      // 2 stations in postal code 34120 (the user's village, both very close),
+      // plus 3 stations in neighboring postal codes returned by the geo query.
+      final cpResults = {
+        'results': [
+          {
+            'id': '3412001',
+            'adresse': 'Local A',
+            'cp': '34120',
+            'geom': {'lat': 43.45 + (0.3 / 111), 'lon': 3.42},
+            'sp95_prix': 1.80,
+          },
+          {
+            'id': '3412002',
+            'adresse': 'Local B',
+            'cp': '34120',
+            'geom': {'lat': 43.45 + (1.5 / 111), 'lon': 3.42},
+            'sp95_prix': 1.82,
+          },
+        ],
+      };
+      final geoResults = {
+        'results': [
+          // Same village stations also visible to geo (will be deduped)
+          {
+            'id': '3412001',
+            'adresse': 'Local A',
+            'cp': '34120',
+            'geom': {'lat': 43.45 + (0.3 / 111), 'lon': 3.42},
+            'sp95_prix': 1.80,
+          },
+          // Pézenas (5 km away) — different postal code
+          {
+            'id': '3412003',
+            'adresse': 'Pézenas Total',
+            'cp': '34120',
+            'geom': {'lat': 43.45 + (5.0 / 111), 'lon': 3.42},
+            'sp95_prix': 1.78,
+          },
+          // Mèze (12 km) — different postal code
+          {
+            'id': '3414001',
+            'adresse': 'Mèze Esso',
+            'cp': '34140',
+            'geom': {'lat': 43.45 + (12.0 / 111), 'lon': 3.42},
+            'sp95_prix': 1.76,
+          },
+          // Agde (20 km) — different postal code
+          {
+            'id': '3430001',
+            'adresse': 'Agde Carrefour',
+            'cp': '34300',
+            'geom': {'lat': 43.45 + (20.0 / 111), 'lon': 3.42},
+            'sp95_prix': 1.79,
+          },
+        ],
+      };
+
+      final adapter = _TrackingMockAdapter()
+        ..addResponse(cpResults)
+        ..addResponse(geoResults);
+
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      final result = await svc.searchStations(const SearchParams(
+        lat: 43.45, lng: 3.42, radiusKm: 25.0, postalCode: '34120',
+      ));
+
+      // Both API calls must happen
+      expect(adapter.requestCount, 2,
+          reason: 'postal-code path must call BOTH cp and geo queries when valid coords are present');
+      expect(adapter.requestUris[0], contains('cp%3D%2734120%27'),
+          reason: 'first call is the postal-code query');
+      expect(adapter.requestUris[1], contains('within_distance'),
+          reason: 'second call is the geo query for neighboring postal codes');
+
+      // Should return 5 unique stations (2 local + 3 neighbors), deduped
+      expect(result.data.length, 5,
+          reason: 'merged set should include local + neighboring stations');
+      expect(result.data.map((s) => s.id).toSet(), {
+        '3412001', '3412002', '3412003', '3414001', '3430001',
+      });
+    });
+
+    test('postal-code search: 5km vs 25km returns different counts when neighbors exist (#315)',
+        () async {
+      // The exact bug the user reported in Castelnau-de-Guers: small radius
+      // returns local stations, large radius returns local + neighboring.
+      Map<String, dynamic> cpFixture() => {
+            'results': [
+              {
+                'id': 'local1',
+                'adresse': 'Local 1',
+                'cp': '34120',
+                'geom': {'lat': 43.45 + (0.5 / 111), 'lon': 3.42},
+                'sp95_prix': 1.80,
+              },
+              {
+                'id': 'local2',
+                'adresse': 'Local 2',
+                'cp': '34120',
+                'geom': {'lat': 43.45 + (2.0 / 111), 'lon': 3.42},
+                'sp95_prix': 1.82,
+              },
+            ],
+          };
+      Map<String, dynamic> geoFixtureNarrow() => {
+            'results': [
+              // Same as cp results (within 5km)
+              {
+                'id': 'local1',
+                'adresse': 'Local 1',
+                'cp': '34120',
+                'geom': {'lat': 43.45 + (0.5 / 111), 'lon': 3.42},
+                'sp95_prix': 1.80,
+              },
+              {
+                'id': 'local2',
+                'adresse': 'Local 2',
+                'cp': '34120',
+                'geom': {'lat': 43.45 + (2.0 / 111), 'lon': 3.42},
+                'sp95_prix': 1.82,
+              },
+            ],
+          };
+      Map<String, dynamic> geoFixtureWide() => {
+            'results': [
+              // Local (5km radius would already include these)
+              {
+                'id': 'local1',
+                'adresse': 'Local 1',
+                'cp': '34120',
+                'geom': {'lat': 43.45 + (0.5 / 111), 'lon': 3.42},
+                'sp95_prix': 1.80,
+              },
+              {
+                'id': 'local2',
+                'adresse': 'Local 2',
+                'cp': '34120',
+                'geom': {'lat': 43.45 + (2.0 / 111), 'lon': 3.42},
+                'sp95_prix': 1.82,
+              },
+              // Neighbors (only visible at 25km)
+              {
+                'id': 'neighbor1',
+                'adresse': 'Pézenas',
+                'cp': '34120',
+                'geom': {'lat': 43.45 + (8.0 / 111), 'lon': 3.42},
+                'sp95_prix': 1.78,
+              },
+              {
+                'id': 'neighbor2',
+                'adresse': 'Mèze',
+                'cp': '34140',
+                'geom': {'lat': 43.45 + (15.0 / 111), 'lon': 3.42},
+                'sp95_prix': 1.76,
+              },
+              {
+                'id': 'neighbor3',
+                'adresse': 'Agde',
+                'cp': '34300',
+                'geom': {'lat': 43.45 + (22.0 / 111), 'lon': 3.42},
+                'sp95_prix': 1.79,
+              },
+            ],
+          };
+
+      final adapter = _TrackingMockAdapter()
+        ..addResponse(cpFixture())
+        ..addResponse(geoFixtureNarrow())
+        ..addResponse(cpFixture())
+        ..addResponse(geoFixtureWide());
+
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      final small = await svc.searchStations(const SearchParams(
+        lat: 43.45, lng: 3.42, radiusKm: 5.0, postalCode: '34120',
+      ));
+      final large = await svc.searchStations(const SearchParams(
+        lat: 43.45, lng: 3.42, radiusKm: 25.0, postalCode: '34120',
+      ));
+
+      // Bug #315 contract: large radius MUST return strictly more stations
+      // than small radius when neighboring postal codes are populated.
+      expect(small.data.length, 2,
+          reason: 'only the 2 local stations within 5 km');
+      expect(large.data.length, 5,
+          reason: 'local + 3 neighbors within 25 km');
+      expect(large.data.length, greaterThan(small.data.length),
+          reason: 'BUG #315: 25 km must return more stations than 5 km');
+    });
+
+    test('postal-code path falls back to cp-only when coords are invalid (#315)',
+        () async {
+      // No valid GPS coords (lat=0, lng=0): only the cp query runs.
+      // This preserves the original Paris-arrondissement use case where
+      // Nominatim coords are unreliable.
+      final adapter = _TrackingMockAdapter()
+        ..addResponse(scatteredStations('75001'));
+
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(dio: dio);
+
+      final result = await svc.searchStations(const SearchParams(
+        lat: 0, lng: 0, radiusKm: 25.0, postalCode: '75001',
+      ));
+
+      expect(adapter.requestCount, 1,
+          reason: 'only cp query runs when coords are 0,0');
+      expect(adapter.requestUris.first, contains('cp%3D%2775001%27'));
+      // All 5 fixture stations are at (lat = 43.45 + offset, lng = 3.42)
+      // Distances from (0,0) are huge → filterByRadius fallback triggers,
+      // returning the 20 nearest. We just verify the call shape.
+      expect(result.data, isNotEmpty);
     });
   });
 }
