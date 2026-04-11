@@ -13,6 +13,17 @@
   "searchRadius": "Radius",
   "searchNearby": "Nearby stations",
   "searchButton": "Search",
+  "searchCriteriaTitle": "Search criteria",
+  "searchCriteriaOpen": "Search",
+  "searchCriteriaRadiusBadge": "Within {km} km",
+  "@searchCriteriaRadiusBadge": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "searchCriteriaTapToSearch": "Tap to start searching",
   "noResults": "No stations found.",
   "startSearch": "Search to find fuel stations.",
   "open": "Open",

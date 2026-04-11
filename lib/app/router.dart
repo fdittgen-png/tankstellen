@@ -9,6 +9,7 @@ import '../features/favorites/presentation/screens/favorites_screen.dart';
 import '../features/map/presentation/screens/map_screen.dart';
 import '../features/profile/presentation/screens/privacy_dashboard_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
+import '../features/search/presentation/screens/search_criteria_screen.dart';
 import '../features/search/presentation/screens/search_screen.dart';
 import '../features/setup/presentation/screens/onboarding_wizard_screen.dart';
 import '../features/alerts/presentation/screens/alerts_screen.dart';
@@ -160,6 +161,10 @@ GoRouter router(Ref ref) {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: '/search/criteria',
+        builder: (context, state) => const SearchCriteriaScreen(),
       ),
       GoRoute(
         path: '/driving',

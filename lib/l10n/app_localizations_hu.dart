@@ -48,6 +48,20 @@ class AppLocalizationsHu extends AppLocalizations {
   String get searchButton => 'Keresés';
 
   @override
+  String get searchCriteriaTitle => 'Search criteria';
+
+  @override
+  String get searchCriteriaOpen => 'Search';
+
+  @override
+  String searchCriteriaRadiusBadge(String km) {
+    return 'Within $km km';
+  }
+
+  @override
+  String get searchCriteriaTapToSearch => 'Tap to start searching';
+
+  @override
   String get noResults => 'Nem találhatók benzinkutak.';
 
   @override
