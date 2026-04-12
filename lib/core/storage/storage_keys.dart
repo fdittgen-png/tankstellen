@@ -26,4 +26,6 @@ class StorageKeys {
   static const String evShowOnMap = 'ev_show_on_map';
   static const String evFavoriteStationIds = 'ev_favorite_station_ids';
   static const String evFavoriteStationData = 'ev_favorite_station_data';
+  static const String helpBannerCriteria = 'help_banner_criteria_shown';
+  static const String helpBannerAlerts = 'help_banner_alerts_shown';
 }

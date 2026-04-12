@@ -467,5 +467,7 @@
   "deleteAccountBody": "Toutes vos données seront définitivement supprimées du serveur (favoris, alertes, notes, itinéraires). Les données locales sur cet appareil sont conservées.\n\nCette action est irréversible.",
   "switchToAnonymousTitle": "Passer en anonyme ?",
   "switchToAnonymousBody": "Vous serez déconnecté de votre compte e-mail et continuerez avec une nouvelle session anonyme.\n\nVos données locales (favoris, alertes) restent sur cet appareil et seront synchronisées avec le nouveau compte anonyme.",
-  "switchAction": "Changer"
+  "switchAction": "Changer",
+  "helpBannerCriteria": "Vos valeurs par défaut sont pré-remplies. Ajustez les critères ci-dessous pour affiner votre recherche.",
+  "helpBannerAlerts": "Définissez un seuil de prix pour une station. Vous serez notifié quand les prix passent en dessous. Vérification toutes les 30 minutes."
 }

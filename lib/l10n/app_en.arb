@@ -802,5 +802,7 @@
   "deleteAccountBody": "This permanently deletes all your data from the server (favorites, alerts, ratings, routes). Local data on this device is preserved.\n\nThis cannot be undone.",
   "switchToAnonymousTitle": "Switch to anonymous?",
   "switchToAnonymousBody": "You will be signed out of your email account and continue with a new anonymous session.\n\nYour local data (favorites, alerts) is kept on this device and will be synced to the new anonymous account.",
-  "switchAction": "Switch"
+  "switchAction": "Switch",
+  "helpBannerCriteria": "Your profile defaults are pre-filled. Adjust criteria below to refine your search.",
+  "helpBannerAlerts": "Set a price threshold for a station. You'll be notified when prices drop below it. Checks run every 30 minutes."
 }

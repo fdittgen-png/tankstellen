@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../alerts/providers/alert_provider.dart';
@@ -27,7 +29,16 @@ class AlertsTab extends StatelessWidget {
               'Create an alert from a station\'s detail page.',
         );
       }
-      return ListView.builder(
+      return Column(
+        children: [
+          HelpBanner(
+            storageKey: StorageKeys.helpBannerAlerts,
+            icon: Icons.notifications_active_outlined,
+            message: l10n?.helpBannerAlerts ??
+                'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.',
+          ),
+          Expanded(
+            child: ListView.builder(
         itemCount: alerts.length,
         itemBuilder: (context, index) {
           final alert = alerts[index];
@@ -84,6 +95,9 @@ class AlertsTab extends StatelessWidget {
             ),
           );
         },
+      ),
+          ),
+        ],
       );
     });
   }
