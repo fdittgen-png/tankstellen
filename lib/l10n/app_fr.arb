@@ -476,5 +476,6 @@
   "onboardingRadiusHelper": "Rayon plus grand = plus de résultats",
   "onboardingPrivacy": "Ces paramètres sont stockés uniquement sur votre appareil et ne sont jamais partagés.",
   "onboardingLandingTitle": "Écran d'accueil",
-  "onboardingLandingHint": "Choisissez l'écran qui s'ouvre au lancement de l'application."
+  "onboardingLandingHint": "Choisissez l'écran qui s'ouvre au lancement de l'application.",
+  "scanReceipt": "Scanner le reçu"
 }

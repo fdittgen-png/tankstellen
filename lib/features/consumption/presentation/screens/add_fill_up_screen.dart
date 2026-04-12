@@ -3,8 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
+import '../../data/receipt_scan_service.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
 
@@ -28,6 +30,8 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   final _notesCtrl = TextEditingController();
   DateTime _date = DateTime.now();
   FuelType _fuelType = FuelType.e10;
+  bool _scanning = false;
+  ReceiptScanService? _scanService;
 
   @override
   void dispose() {
@@ -35,7 +39,45 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     _costCtrl.dispose();
     _odoCtrl.dispose();
     _notesCtrl.dispose();
+    _scanService?.dispose();
     super.dispose();
+  }
+
+  Future<void> _scanReceipt() async {
+    setState(() => _scanning = true);
+    try {
+      _scanService ??= ReceiptScanService();
+      final result = await _scanService!.scanReceipt();
+      if (result == null || !mounted) return;
+
+      if (!result.hasData) {
+        SnackBarHelper.show(context, 'No receipt data found — try again');
+        return;
+      }
+
+      setState(() {
+        if (result.liters != null) {
+          _litersCtrl.text = result.liters!.toStringAsFixed(2);
+        }
+        if (result.totalCost != null) {
+          _costCtrl.text = result.totalCost!.toStringAsFixed(2);
+        }
+        if (result.date != null) {
+          _date = result.date!;
+        }
+      });
+
+      if (mounted) {
+        SnackBarHelper.showSuccess(context,
+            'Receipt scanned — verify and adjust values');
+      }
+    } catch (e) {
+      if (mounted) {
+        SnackBarHelper.showError(context, 'Scan failed: $e');
+      }
+    } finally {
+      if (mounted) setState(() => _scanning = false);
+    }
   }
 
   @override
@@ -57,6 +99,19 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            // Scan receipt button
+            OutlinedButton.icon(
+              onPressed: _scanning ? null : _scanReceipt,
+              icon: _scanning
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.document_scanner),
+              label: Text(l?.scanReceipt ?? 'Scan receipt'),
+            ),
+            const SizedBox(height: 12),
             if (widget.stationName != null) ...[
               Card(
                 child: ListTile(
