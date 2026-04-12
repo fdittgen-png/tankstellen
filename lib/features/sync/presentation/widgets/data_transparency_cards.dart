@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/sync/sync_config.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Account info card showing UUID and server URL.
 class AccountInfoCard extends StatelessWidget {
@@ -14,16 +15,17 @@ class AccountInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Account', style: theme.textTheme.titleMedium),
+            Text(l?.account ?? 'Account', style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
-            InfoRow(label: 'Anonymous UUID', value: syncConfig.userId ?? 'Unknown'),
-            InfoRow(label: 'Server', value: syncConfig.supabaseUrl ?? 'Unknown'),
+            InfoRow(label: l?.anonymousUuid ?? 'Anonymous UUID', value: syncConfig.userId ?? 'Unknown'),
+            InfoRow(label: l?.server ?? 'Server', value: syncConfig.supabaseUrl ?? 'Unknown'),
           ],
         ),
       ),
@@ -56,21 +58,22 @@ class SyncedDataCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Synced data', style: theme.textTheme.titleMedium),
+            Text(l?.syncedData ?? 'Synced data', style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
-            InfoRow(label: 'Favorites', value: '${(data['favorites'] as List?)?.length ?? 0}'),
-            InfoRow(label: 'Alerts', value: '${(data['alerts'] as List?)?.length ?? 0}'),
-            InfoRow(label: 'Push tokens', value: '${(data['push_tokens'] as List?)?.length ?? 0}'),
-            InfoRow(label: 'Price reports', value: '${(data['reports'] as List?)?.length ?? 0}'),
+            InfoRow(label: l?.favorites ?? 'Favorites', value: '${(data['favorites'] as List?)?.length ?? 0}'),
+            InfoRow(label: l?.priceAlerts ?? 'Alerts', value: '${(data['alerts'] as List?)?.length ?? 0}'),
+            InfoRow(label: l?.pushTokens ?? 'Push tokens', value: '${(data['push_tokens'] as List?)?.length ?? 0}'),
+            InfoRow(label: l?.priceReports ?? 'Price reports', value: '${(data['reports'] as List?)?.length ?? 0}'),
             const Divider(height: 24),
-            InfoRow(label: 'Total items', value: '${_countItems()}'),
-            InfoRow(label: 'Estimated size', value: _estimateSize()),
+            InfoRow(label: l?.totalItems ?? 'Total items', value: '${_countItems()}'),
+            InfoRow(label: l?.estimatedSize ?? 'Estimated size', value: _estimateSize()),
           ],
         ),
       ),
@@ -101,25 +104,26 @@ class DataActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         FilledButton.icon(
           onPressed: loading ? null : onSync,
           icon: const Icon(Icons.sync),
-          label: const Text('Sync now'),
+          label: Text(l?.syncNow ?? 'Sync now'),
         ),
         const SizedBox(height: 8),
         OutlinedButton.icon(
           onPressed: onViewRawJson,
           icon: const Icon(Icons.code),
-          label: const Text('View raw data as JSON'),
+          label: Text(l?.viewRawJson ?? 'View raw data as JSON'),
         ),
         const SizedBox(height: 8),
         OutlinedButton.icon(
           onPressed: onExportJson,
           icon: const Icon(Icons.copy),
-          label: const Text('Export as JSON (clipboard)'),
+          label: Text(l?.exportJson ?? 'Export as JSON (clipboard)'),
         ),
         const SizedBox(height: 24),
 
@@ -150,14 +154,14 @@ class DataActionButtons extends StatelessWidget {
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: onDeleteAll,
             icon: const Icon(Icons.delete_forever),
-            label: const Text('Delete all server data'),
+            label: Text(l?.deleteAllServerData ?? 'Delete all server data'),
           ),
           const SizedBox(height: 8),
         ],
         OutlinedButton.icon(
           onPressed: onDisconnect,
           icon: const Icon(Icons.link_off),
-          label: const Text('Disconnect TankSync'),
+          label: Text(l?.disconnectTankSync ?? 'Disconnect TankSync'),
         ),
       ],
     );

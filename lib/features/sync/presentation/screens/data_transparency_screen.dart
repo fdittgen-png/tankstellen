@@ -26,7 +26,7 @@ class DataTransparencyScreen extends ConsumerWidget {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Raw data (JSON)'),
+        title: Text(AppLocalizations.of(context)?.rawDataJson ?? 'Raw data (JSON)'),
         content: SizedBox(
           width: double.maxFinite,
           child: SingleChildScrollView(
@@ -39,7 +39,7 @@ class DataTransparencyScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(AppLocalizations.of(context)?.close ?? 'Close'),
           ),
         ],
       ),
@@ -72,21 +72,20 @@ class DataTransparencyScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete all server data?'),
-        content: const Text(
+        title: Text(AppLocalizations.of(context)?.deleteServerDataConfirm ?? 'Delete all server data?'),
+        content: Text(AppLocalizations.of(context)?.deleteAccountBody ??
           'This will permanently remove all your favorites, alerts, push '
           'tokens, and price reports from the server. Your local data will '
-          'not be affected.\n\nThis action cannot be undone.',
-        ),
+          'not be affected.\n\nThis action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete everything'),
+            child: Text(AppLocalizations.of(context)?.deleteEverything ?? 'Delete everything'),
           ),
         ],
       ),
@@ -106,19 +105,18 @@ class DataTransparencyScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Disconnect TankSync?'),
-        content: const Text(
+        title: Text(AppLocalizations.of(context)?.disconnectTitle ?? 'Disconnect TankSync?'),
+        content: Text(AppLocalizations.of(context)?.disconnectBody ??
           'You will be signed out from cloud sync. Your local data remains '
-          'intact. You can reconnect at any time.',
-        ),
+          'intact. You can reconnect at any time.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Disconnect'),
+            child: Text(AppLocalizations.of(context)?.disconnectAction ?? 'Disconnect'),
           ),
         ],
       ),
@@ -137,7 +135,7 @@ class DataTransparencyScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My server data')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)?.myServerData ?? 'My server data')),
       body: uiState.loading
           ? const Center(child: CircularProgressIndicator())
           : uiState.error != null

@@ -1751,4 +1751,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get helpBannerAlerts => 'Définissez un seuil de prix pour une station. Vous serez notifié quand les prix passent en dessous. Vérification toutes les 30 minutes.';
+
+  @override
+  String get syncNow => 'Synchroniser maintenant';
 }
