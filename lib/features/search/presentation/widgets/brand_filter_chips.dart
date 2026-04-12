@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../domain/entities/brand_registry.dart';
 import '../../domain/entities/station.dart';
 import '../../providers/brand_filter_provider.dart';
 
-/// Horizontally scrollable brand filter chips extracted from search results.
+/// Horizontally scrollable brand filter chips with major brands grouped.
 ///
-/// Shows an "All" chip to reset, followed by one chip per unique brand
-/// (sorted alphabetically). Multi-select: tapping a chip toggles it.
-/// Also includes a highway exclusion toggle when any station has
-/// stationType == "A".
+/// Shows an "All" chip to reset, then major brands (from [BrandRegistry]),
+/// then "Others" for independent/unrecognized brands. Also includes a
+/// highway exclusion toggle when highway stations exist.
 class BrandFilterChips extends ConsumerWidget {
-  /// The full unfiltered station list (before brand filtering).
   final List<Station> stations;
 
   const BrandFilterChips({super.key, required this.stations});
@@ -22,12 +21,19 @@ class BrandFilterChips extends ConsumerWidget {
     final selectedBrands = ref.watch(selectedBrandsProvider);
     final excludeHighway = ref.watch(excludeHighwayStationsProvider);
 
-    // Extract unique brands, sorted alphabetically, skip empty
-    final brands = _extractBrands(stations);
-    if (brands.isEmpty) return const SizedBox.shrink();
+    final brandCounts = _extractGroupedBrands(stations);
+    if (brandCounts.isEmpty) return const SizedBox.shrink();
 
     final hasHighwayStations = stations.any((s) => s.stationType == 'A');
     final isAllSelected = selectedBrands.isEmpty;
+
+    // Sort: major brands first (by count descending), "Others" last
+    final sortedBrands = brandCounts.keys.toList()
+      ..sort((a, b) {
+        if (a == BrandRegistry.othersLabel) return 1;
+        if (b == BrandRegistry.othersLabel) return -1;
+        return (brandCounts[b] ?? 0).compareTo(brandCounts[a] ?? 0);
+      });
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -36,45 +42,47 @@ class BrandFilterChips extends ConsumerWidget {
         child: Row(
           children: [
             // "All" chip
-            Semantics(
-              label: '${l10n?.brandFilterAll ?? "All"}${isAllSelected ? ", selected" : ""}',
-              child: ChoiceChip(
-                avatar: const Icon(Icons.select_all, size: 16),
-                label: Text(l10n?.brandFilterAll ?? 'All'),
-                selected: isAllSelected,
-                onSelected: (_) =>
-                    ref.read(selectedBrandsProvider.notifier).clear(),
-                visualDensity: VisualDensity.compact,
-              ),
+            ChoiceChip(
+              avatar: const Icon(Icons.select_all, size: 16),
+              label: Text(l10n?.brandFilterAll ?? 'All'),
+              selected: isAllSelected,
+              onSelected: (_) =>
+                  ref.read(selectedBrandsProvider.notifier).clear(),
+              visualDensity: VisualDensity.compact,
             ),
-            // Highway exclusion chip (only if highway stations exist)
+            // Highway exclusion chip
             if (hasHighwayStations) ...[
               const SizedBox(width: 6),
-              Semantics(
-                label: '${l10n?.brandFilterNoHighway ?? "No highway"}${excludeHighway ? ", selected" : ""}',
-                child: FilterChip(
-                  avatar: const Icon(Icons.no_crash, size: 16),
-                  label: Text(l10n?.brandFilterNoHighway ?? 'No highway'),
-                  selected: excludeHighway,
-                  onSelected: (_) => ref
-                      .read(excludeHighwayStationsProvider.notifier)
-                      .toggle(),
-                  visualDensity: VisualDensity.compact,
-                ),
+              FilterChip(
+                avatar: const Icon(Icons.no_crash, size: 16),
+                label: Text(l10n?.brandFilterNoHighway ?? 'No highway'),
+                selected: excludeHighway,
+                onSelected: (_) => ref
+                    .read(excludeHighwayStationsProvider.notifier)
+                    .toggle(),
+                visualDensity: VisualDensity.compact,
               ),
             ],
-            // Brand chips
-            for (final brand in brands) ...[
+            // Highway-only chip
+            if (hasHighwayStations) ...[
               const SizedBox(width: 6),
-              Semantics(
-                label: '$brand${selectedBrands.contains(brand) ? ", selected" : ""}',
-                child: FilterChip(
-                  label: Text(brand),
-                  selected: selectedBrands.contains(brand),
-                  onSelected: (_) =>
-                      ref.read(selectedBrandsProvider.notifier).toggle(brand),
-                  visualDensity: VisualDensity.compact,
-                ),
+              FilterChip(
+                label: Text(l10n?.brandFilterHighway ?? 'Autoroute'),
+                selected: selectedBrands.contains('Autoroute'),
+                onSelected: (_) =>
+                    ref.read(selectedBrandsProvider.notifier).toggle('Autoroute'),
+                visualDensity: VisualDensity.compact,
+              ),
+            ],
+            // Brand chips (grouped by canonical name)
+            for (final brand in sortedBrands) ...[
+              const SizedBox(width: 6),
+              FilterChip(
+                label: Text('$brand (${brandCounts[brand]})'),
+                selected: selectedBrands.contains(brand),
+                onSelected: (_) =>
+                    ref.read(selectedBrandsProvider.notifier).toggle(brand),
+                visualDensity: VisualDensity.compact,
               ),
             ],
           ],
@@ -83,23 +91,20 @@ class BrandFilterChips extends ConsumerWidget {
     );
   }
 
-  /// Extract unique non-empty brand names, sorted alphabetically.
-  static List<String> _extractBrands(List<Station> stations) {
-    final brandSet = <String>{};
-    for (final s in stations) {
-      final brand = s.brand.trim();
-      if (brand.isNotEmpty) {
-        brandSet.add(brand);
-      }
-    }
-    final sorted = brandSet.toList()..sort();
-    return sorted;
+  /// Group stations by canonical brand name. Returns {brand: count}.
+  static Map<String, int> _extractGroupedBrands(List<Station> stations) {
+    final rawBrands = stations
+        .map((s) => s.brand.trim())
+        .where((b) => b.isNotEmpty)
+        .toList();
+    return BrandRegistry.countByBrand(rawBrands);
   }
 }
 
 /// Applies brand and highway filters to a station list.
 ///
-/// Returns all stations if no filters are active.
+/// Uses [BrandRegistry] to match canonical brand names, so selecting
+/// "TotalEnergies" matches "Total", "Total Access", "TOTALENERGIES", etc.
 List<Station> applyBrandFilter(
   List<Station> stations, {
   required Set<String> selectedBrands,
@@ -108,7 +113,20 @@ List<Station> applyBrandFilter(
   var result = stations;
 
   if (selectedBrands.isNotEmpty) {
-    result = result.where((s) => selectedBrands.contains(s.brand.trim())).toList();
+    result = result.where((s) {
+      final canonical = BrandRegistry.canonicalize(s.brand.trim());
+      final label = canonical ?? BrandRegistry.othersLabel;
+
+      // Check if any selected brand matches
+      if (selectedBrands.contains(label)) return true;
+
+      // Special case: "Autoroute" matches highway stations
+      if (selectedBrands.contains('Autoroute') && s.stationType == 'A') {
+        return true;
+      }
+
+      return false;
+    }).toList();
   }
 
   if (excludeHighway) {
