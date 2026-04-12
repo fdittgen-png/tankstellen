@@ -103,6 +103,26 @@ void main() {
       expect(amenitiesPos.dy, greaterThan(zonePos.dy));
     });
 
+    testWidgets('does not show fuel type chips section', (tester) async {
+      // Fuel types are already shown in the price list — the chip section
+      // was removed as redundant (issue #321).
+      final stationWithFuels = baseStation.copyWith(
+        availableFuels: ['Super E5', 'Super E10', 'Diesel'],
+      );
+      final detail = StationDetail(station: stationWithFuels);
+
+      await pumpApp(
+        tester,
+        SingleChildScrollView(
+          child: StationInfoSection(
+              station: stationWithFuels, detail: detail),
+        ),
+      );
+
+      // "Fuels" section title should not be present
+      expect(find.text('Fuels'), findsNothing);
+    });
+
     testWidgets('does not show separate last-update ListTile', (tester) async {
       final stationWithUpdate = baseStation.copyWith(
         updatedAt: '2026-03-27T10:00:00+01:00',

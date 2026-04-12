@@ -75,30 +75,6 @@ class StationInfoSection extends StatelessWidget {
           ),
         const SizedBox(height: 24),
 
-        // Available fuels
-        if (station.availableFuels.isNotEmpty) ...[
-          Text(l10n?.fuels ?? 'Fuels', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 6,
-            runSpacing: 4,
-            children: [
-              ...station.availableFuels.map((f) => Chip(
-                    label: Text(f, style: const TextStyle(fontSize: 12)),
-                    visualDensity: VisualDensity.compact,
-                    backgroundColor: DarkModeColors.successSurface(context),
-                    side: BorderSide(color: DarkModeColors.success(context).withValues(alpha: 0.4)),
-                  )),
-              ...station.unavailableFuels.map((f) => Chip(
-                    label: Text(f, style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant, decoration: TextDecoration.lineThrough)),
-                    visualDensity: VisualDensity.compact,
-                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                  )),
-            ],
-          ),
-          const SizedBox(height: 24),
-        ],
-
         // Location info
         if (station.department != null || station.region != null) ...[
           Text(l10n?.zone ?? 'Zone', style: theme.textTheme.titleMedium),
