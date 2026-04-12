@@ -805,5 +805,11 @@
   "switchAction": "Wechseln",
   "helpBannerCriteria": "Ihre Profil-Standardwerte sind vorausgefüllt. Passen Sie die Kriterien unten an, um Ihre Suche zu verfeinern.",
   "helpBannerAlerts": "Legen Sie einen Preisgrenzwert für eine Station fest. Sie werden benachrichtigt, wenn die Preise darunter fallen. Prüfungen laufen alle 30 Minuten.",
-  "syncNow": "Jetzt synchronisieren"
+  "syncNow": "Jetzt synchronisieren",
+  "onboardingPreferencesTitle": "Ihre Einstellungen",
+  "onboardingZipHelper": "Wird verwendet, wenn GPS nicht verfügbar ist",
+  "onboardingRadiusHelper": "Größerer Radius = mehr Ergebnisse",
+  "onboardingPrivacy": "Diese Einstellungen werden nur auf Ihrem Gerät gespeichert und niemals geteilt.",
+  "onboardingLandingTitle": "Startbildschirm",
+  "onboardingLandingHint": "Wählen Sie, welcher Bildschirm beim Start der App angezeigt wird."
 }

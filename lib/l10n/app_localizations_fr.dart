@@ -1754,4 +1754,22 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get syncNow => 'Synchroniser maintenant';
+
+  @override
+  String get onboardingPreferencesTitle => 'Vos préférences';
+
+  @override
+  String get onboardingZipHelper => 'Utilisé quand le GPS n\'est pas disponible';
+
+  @override
+  String get onboardingRadiusHelper => 'Rayon plus grand = plus de résultats';
+
+  @override
+  String get onboardingPrivacy => 'Ces paramètres sont stockés uniquement sur votre appareil et ne sont jamais partagés.';
+
+  @override
+  String get onboardingLandingTitle => 'Écran d\'accueil';
+
+  @override
+  String get onboardingLandingHint => 'Choisissez l\'écran qui s\'ouvre au lancement de l\'application.';
 }
