@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/widgets/help_banner.dart';
 
 import '../../helpers/mock_providers.dart';
