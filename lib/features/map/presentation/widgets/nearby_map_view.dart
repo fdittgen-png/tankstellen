@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -47,11 +48,15 @@ class NearbyMapView extends ConsumerWidget {
           );
         }
 
-        final center = StationMapLayers.centerOf(stations);
-        final zoom = StationMapLayers.zoomForRadius(searchRadiusKm);
-
         final showEv = ref.watch(evShowOnMapProvider);
         final userPos = ref.read(userPositionProvider);
+        // Prefer the user's actual position as the radius origin so the
+        // viewport-fit matches the search circle drawn on the map.
+        final center = userPos != null
+            ? LatLng(userPos.lat, userPos.lng)
+            : StationMapLayers.centerOf(stations);
+        final zoom = StationMapLayers.zoomForRadius(searchRadiusKm);
+
         final evLat = userPos?.lat ?? center.latitude;
         final evLng = userPos?.lng ?? center.longitude;
         final extraLayers = <Widget>[];
@@ -67,9 +72,22 @@ class NearbyMapView extends ConsumerWidget {
           );
         }
 
-        // Move map to new center when search results change
+        // Fit map viewport to the search radius when results change so the
+        // user immediately sees the entire searched area instead of having
+        // to zoom out manually.
+        final bounds =
+            StationMapLayers.boundsForRadius(center, searchRadiusKm);
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          try { mapController.move(center, zoom); } catch (e) { debugPrint('Map move failed: $e'); }
+          try {
+            mapController.fitCamera(
+              CameraFit.bounds(
+                bounds: bounds,
+                padding: const EdgeInsets.all(32),
+              ),
+            );
+          } catch (e) {
+            debugPrint('Map fitCamera failed: $e');
+          }
         });
 
         return Column(
@@ -84,7 +102,12 @@ class NearbyMapView extends ConsumerWidget {
                 searchRadiusKm: searchRadiusKm,
                 selectedFuel: selectedFuel,
                 showRecenterButton: true,
-                onRecenter: () => mapController.move(center, zoom),
+                onRecenter: () => mapController.fitCamera(
+                  CameraFit.bounds(
+                    bounds: bounds,
+                    padding: const EdgeInsets.all(32),
+                  ),
+                ),
                 extraLayers: extraLayers,
               ),
             ),
