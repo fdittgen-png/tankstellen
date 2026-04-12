@@ -24,11 +24,13 @@ import '../../providers/search_mode_provider.dart';
 import '../../providers/ev_search_provider.dart';
 import '../../../../core/location/location_service.dart';
 import '../../../../core/services/service_result.dart';
-import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_mode.dart';
 import '../../domain/entities/search_result_item.dart';
 import '../../domain/entities/station.dart';
+import '../../domain/entities/station_type_filter.dart';
+import '../../providers/station_type_filter_provider.dart';
 import '../widgets/ev_station_card.dart';
+import '../widgets/station_type_toggle.dart';
 import '../../../profile/domain/entities/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../widgets/nearest_shortcut_card.dart';
@@ -107,7 +109,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       await LocationConsentDialog.recordConsent(settings);
     }
 
-    if (fuelType == FuelType.electric) {
+    final stationType = ref.read(activeStationTypeFilterProvider);
+    if (stationType == StationTypeFilter.ev) {
       try {
         final locationService = ref.read(locationServiceProvider);
         final position = await locationService.getCurrentPosition();
@@ -180,6 +183,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return Column(
       children: [
         DemoModeBanner(country: country),
+        // Gas / EV mode toggle
+        const StationTypeToggle(),
         // Compact summary bar — top-level entry point for editing criteria.
         const SearchSummaryBar(),
         UserPositionBar(
@@ -221,7 +226,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     AsyncValue<ServiceResult<List<Station>>> searchState,
   ) {
     final searchMode = ref.watch(activeSearchModeProvider);
-    final fuelType = ref.watch(selectedFuelTypeProvider);
+    final stationType = ref.watch(activeStationTypeFilterProvider);
 
     // Route mode — RouteResultsView returns slivers, wrap in CustomScrollView
     if (searchMode == SearchMode.route) {
@@ -231,7 +236,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     }
 
     // EV mode
-    if (fuelType == FuelType.electric) {
+    if (stationType == StationTypeFilter.ev) {
       final evState = ref.watch(eVSearchStateProvider);
       return evState.when(
         data: (result) {
