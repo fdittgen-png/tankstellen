@@ -202,13 +202,13 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
               ),
               // Rating sharing mode
               const SizedBox(height: 16),
-              Text('Station ratings', style: Theme.of(context).textTheme.titleSmall),
+              Text(AppLocalizations.of(context)?.privacyRatings ?? 'Station ratings', style: Theme.of(context).textTheme.titleSmall),
               const SizedBox(height: 4),
               SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(value: 'local', label: Text('Local'), icon: Icon(Icons.phone_android, size: 16)),
-                  ButtonSegment(value: 'private', label: Text('Private'), icon: Icon(Icons.lock, size: 16)),
-                  ButtonSegment(value: 'shared', label: Text('Shared'), icon: Icon(Icons.people, size: 16)),
+                segments: [
+                  ButtonSegment(value: 'local', label: Text(AppLocalizations.of(context)?.ratingModeLocal ?? 'Local'), icon: const Icon(Icons.phone_android, size: 16)),
+                  ButtonSegment(value: 'private', label: Text(AppLocalizations.of(context)?.ratingModePrivate ?? 'Private'), icon: const Icon(Icons.lock, size: 16)),
+                  ButtonSegment(value: 'shared', label: Text(AppLocalizations.of(context)?.ratingModeShared ?? 'Shared'), icon: const Icon(Icons.people, size: 16)),
                 ],
                 selected: {editState.ratingMode},
                 onSelectionChanged: (s) => editCtrl.setRatingMode(s.first),
@@ -217,10 +217,10 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
                 padding: const EdgeInsets.only(left: 4, top: 4),
                 child: Text(
                   editState.ratingMode == 'local'
-                      ? 'Ratings saved on this device only'
+                      ? (AppLocalizations.of(context)?.ratingDescLocal ?? 'Ratings saved on this device only')
                       : editState.ratingMode == 'private'
-                          ? 'Synced with your database (not visible to others)'
-                          : 'Visible to all users of your database',
+                          ? (AppLocalizations.of(context)?.ratingDescPrivate ?? 'Synced with your database (not visible to others)')
+                          : (AppLocalizations.of(context)?.ratingDescShared ?? 'Visible to all users of your database'),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),

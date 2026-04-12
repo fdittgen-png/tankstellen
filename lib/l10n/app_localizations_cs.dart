@@ -1787,4 +1787,22 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get brandFilterHighway => 'Highway';
+
+  @override
+  String get ratingModeLocal => 'Local';
+
+  @override
+  String get ratingModePrivate => 'Private';
+
+  @override
+  String get ratingModeShared => 'Shared';
+
+  @override
+  String get ratingDescLocal => 'Ratings saved on this device only';
+
+  @override
+  String get ratingDescPrivate => 'Synced with your database (not visible to others)';
+
+  @override
+  String get ratingDescShared => 'Visible to all users of your database';
 }

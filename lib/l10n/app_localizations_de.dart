@@ -1787,4 +1787,22 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get brandFilterHighway => 'Autobahn';
+
+  @override
+  String get ratingModeLocal => 'Lokal';
+
+  @override
+  String get ratingModePrivate => 'Privat';
+
+  @override
+  String get ratingModeShared => 'Geteilt';
+
+  @override
+  String get ratingDescLocal => 'Bewertungen nur auf diesem Gerät gespeichert';
+
+  @override
+  String get ratingDescPrivate => 'Mit Ihrer Datenbank synchronisiert (nicht für andere sichtbar)';
+
+  @override
+  String get ratingDescShared => 'Für alle Nutzer Ihrer Datenbank sichtbar';
 }

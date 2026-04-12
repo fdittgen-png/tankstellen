@@ -816,5 +816,11 @@
   "obdConnect": "OBD-II",
   "stationTypeFuel": "Fuel",
   "stationTypeEv": "EV",
-  "brandFilterHighway": "Highway"
+  "brandFilterHighway": "Highway",
+  "ratingModeLocal": "Local",
+  "ratingModePrivate": "Private",
+  "ratingModeShared": "Shared",
+  "ratingDescLocal": "Ratings saved on this device only",
+  "ratingDescPrivate": "Synced with your database (not visible to others)",
+  "ratingDescShared": "Visible to all users of your database"
 }

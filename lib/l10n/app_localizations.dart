@@ -3568,6 +3568,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Highway'**
   String get brandFilterHighway;
+
+  /// No description provided for @ratingModeLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Local'**
+  String get ratingModeLocal;
+
+  /// No description provided for @ratingModePrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get ratingModePrivate;
+
+  /// No description provided for @ratingModeShared.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared'**
+  String get ratingModeShared;
+
+  /// No description provided for @ratingDescLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Ratings saved on this device only'**
+  String get ratingDescLocal;
+
+  /// No description provided for @ratingDescPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced with your database (not visible to others)'**
+  String get ratingDescPrivate;
+
+  /// No description provided for @ratingDescShared.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible to all users of your database'**
+  String get ratingDescShared;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
