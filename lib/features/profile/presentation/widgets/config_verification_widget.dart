@@ -136,14 +136,12 @@ class _ConfigRow extends StatelessWidget {
   final String label;
   final String value;
   final _Status status;
-  final String? privacy;
 
   const _ConfigRow({
     required this.icon,
     required this.label,
     required this.value,
     this.status = _Status.neutral,
-    this.privacy,
   });
 
   @override
@@ -162,20 +160,6 @@ class _ConfigRow extends StatelessWidget {
           Icon(icon, size: 14, color: statusColor),
           const SizedBox(width: 8),
           Expanded(child: Text(label, style: theme.textTheme.bodySmall)),
-          if (privacy != null) ...[
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(privacy!,
-                  style: TextStyle(
-                      fontSize: 9,
-                      color: theme.colorScheme.onSurfaceVariant)),
-            ),
-            const SizedBox(width: 6),
-          ],
           Text(
             value,
             style: theme.textTheme.bodySmall?.copyWith(
