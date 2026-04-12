@@ -83,6 +83,47 @@ void main() {
       expect(find.text('Data transparency'), findsNothing);
     });
 
+    testWidgets('does not render Data & Privacy section title', (tester) async {
+      await pumpApp(
+        tester,
+        const ProfileScreen(),
+        overrides: overrides,
+      );
+
+      // Scroll to the bottom to ensure all widgets are rendered
+      final scrollable = find.byType(Scrollable).first;
+      await tester.scrollUntilVisible(
+        find.text('Configuration & Privacy'),
+        200,
+        scrollable: scrollable,
+      );
+
+      // Data & Privacy section was removed — data counts belong in Privacy Dashboard
+      expect(find.text('Data & Privacy'), findsNothing);
+    });
+
+    testWidgets('does not show Favorites/Alerts/Ignored count tiles',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const ProfileScreen(),
+        overrides: overrides,
+      );
+
+      final scrollable = find.byType(Scrollable).first;
+      await tester.scrollUntilVisible(
+        find.text('Configuration & Privacy'),
+        200,
+        scrollable: scrollable,
+      );
+
+      // These data count rows were removed from the config verification widget
+      expect(find.text('0 stations'), findsNothing);
+      expect(find.text('0 configured'), findsNothing);
+      expect(find.text('0 hidden'), findsNothing);
+      expect(find.text('0 rated'), findsNothing);
+    });
+
     testWidgets('renders Privacy Dashboard navigation link', (tester) async {
       await pumpApp(
         tester,
