@@ -815,5 +815,6 @@
   "scanReceipt": "Scan receipt",
   "obdConnect": "OBD-II",
   "stationTypeFuel": "Fuel",
-  "stationTypeEv": "EV"
+  "stationTypeEv": "EV",
+  "brandFilterHighway": "Highway"
 }
