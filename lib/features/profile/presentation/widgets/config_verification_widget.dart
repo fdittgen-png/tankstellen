@@ -4,11 +4,11 @@ import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../providers/profile_provider.dart';
 
-/// Configuration and privacy verification card.
+/// Configuration verification card.
 ///
 /// Displays a summary of active profile settings, API keys, cloud sync
-/// status, and data privacy information so the user can audit what is
-/// stored and where.
+/// status, and a privacy summary. Detailed data counts are in the
+/// Privacy Dashboard instead.
 class ConfigVerificationWidget extends ConsumerWidget {
   const ConfigVerificationWidget({super.key});
 
@@ -16,17 +16,10 @@ class ConfigVerificationWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final apiKeys = ref.read(apiKeyStorageProvider);
-    final settings = ref.read(settingsStorageProvider);
-    final mgmt = ref.read(storageManagementProvider);
     final syncConfig = ref.watch(syncStateProvider);
     final profile = ref.watch(activeProfileProvider);
     final hasApiKey = apiKeys.hasApiKey();
     final isEmail = syncConfig.hasEmail;
-    final favCount = mgmt.favoriteCount;
-    final alertCount = mgmt.alertCount;
-    final ignoredCount = mgmt.getIgnoredIds().length;
-    final ratingsCount = mgmt.getRatings().length;
-    final ratingMode = profile?.ratingMode ?? 'local';
 
     return Card(
       child: Padding(
@@ -75,33 +68,7 @@ class ConfigVerificationWidget extends ConsumerWidget {
             ],
 
             const Divider(height: 24),
-            _sectionTitle(theme, 'Data & Privacy'),
-            const SizedBox(height: 8),
-            _ConfigRow(icon: Icons.star, label: 'Favorites',
-                value: '$favCount stations',
-                privacy: syncConfig.isConfigured ? 'Synced' : 'Local only'),
-            _ConfigRow(icon: Icons.notifications, label: 'Alerts',
-                value: '$alertCount configured',
-                privacy: syncConfig.isConfigured ? 'Synced' : 'Local only'),
-            _ConfigRow(icon: Icons.visibility_off, label: 'Ignored stations',
-                value: '$ignoredCount hidden',
-                privacy: syncConfig.isConfigured ? 'Synced' : 'Local only'),
-            _ConfigRow(icon: Icons.star_rate, label: 'Ratings',
-                value: '$ratingsCount rated',
-                privacy: ratingMode == 'local'
-                    ? 'Local only'
-                    : ratingMode == 'private'
-                        ? 'Private (synced)'
-                        : 'Shared (public)'),
-            _ConfigRow(icon: Icons.location_on, label: 'GPS position',
-                value: settings.getSetting('user_position_lat') != null ? 'Stored' : 'Not stored',
-                privacy: 'Local only (never synced)'),
-            _ConfigRow(icon: Icons.key, label: 'API keys',
-                value: hasApiKey ? 'Stored' : 'Not set',
-                privacy: 'Encrypted (Keystore/Keychain)'),
-
-            const Divider(height: 24),
-            _buildPrivacySummary(theme, syncConfig, ratingMode, isEmail),
+            _buildPrivacySummary(theme, syncConfig, isEmail),
           ],
         ),
       ),
@@ -117,7 +84,6 @@ class ConfigVerificationWidget extends ConsumerWidget {
   Widget _buildPrivacySummary(
     ThemeData theme,
     dynamic syncConfig,
-    String ratingMode,
     bool isEmail,
   ) {
     return Container(
@@ -144,12 +110,10 @@ class ConfigVerificationWidget extends ConsumerWidget {
           Text(
             syncConfig.isConfigured
                 ? '\u2022 Favorites, alerts, and ignored stations are synced to your private database\n'
-                  '\u2022 Ratings are ${ratingMode == 'shared' ? 'shared with all users' : ratingMode == 'private' ? 'synced privately' : 'stored locally only'}\n'
                   '\u2022 GPS position and API keys never leave your device\n'
                   '\u2022 ${isEmail ? 'Email account enables cross-device access' : 'Anonymous account \u2014 data tied to this device'}'
                 : '\u2022 All data is stored locally on this device only\n'
                   '\u2022 No data is sent to any server\n'
-                  '\u2022 GPS position stored locally for search convenience\n'
                   '\u2022 API keys encrypted in device secure storage',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
