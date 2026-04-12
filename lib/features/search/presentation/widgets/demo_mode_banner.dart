@@ -26,7 +26,7 @@ class DemoModeBanner extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => context.go('/profile'),
-            child: const Text('Setup'),
+            child: Text(l10n?.apiKeySetup ?? 'Setup'),
           ),
         ],
       );

@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/fuel_colors.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/entities/price_record.dart';
 
@@ -20,9 +21,10 @@ class PriceChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (records.isEmpty) {
-      return const SizedBox(
+      final l = AppLocalizations.of(context);
+      return SizedBox(
         height: 120,
-        child: Center(child: Text('No price history yet')),
+        child: Center(child: Text(l?.noPriceHistory ?? 'No price history yet')),
       );
     }
     return SizedBox(

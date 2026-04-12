@@ -32,13 +32,13 @@ class ProfileScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: [
           // Profiles
-          const _SectionHeader(icon: Icons.person, title: 'Profile'),
+          _SectionHeader(icon: Icons.person, title: l?.sectionProfile ?? 'Profile'),
           const SizedBox(height: 8),
           const ProfileListSection(),
           const SizedBox(height: 32),
 
           // Location
-          const _SectionHeader(icon: Icons.my_location, title: 'Location'),
+          _SectionHeader(icon: Icons.my_location, title: l?.sectionLocation ?? 'Location'),
           const SizedBox(height: 8),
           const LocationSectionWidget(),
           const SizedBox(height: 32),
@@ -150,9 +150,9 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 8),
 
           // Configuration Verification
-          const _SectionHeader(
+          _SectionHeader(
             icon: Icons.verified_user,
-            title: 'Configuration & Privacy',
+            title: l?.configAndPrivacy ?? 'Configuration & Privacy',
           ),
           const SizedBox(height: 8),
           const ConfigVerificationWidget(),

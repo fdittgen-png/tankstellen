@@ -42,7 +42,7 @@ class StationDetailScreen extends ConsumerWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
-          tooltip: 'Back',
+          tooltip: AppLocalizations.of(context)?.tooltipBack ?? 'Back',
         ),
         actions: [
           IconButton(

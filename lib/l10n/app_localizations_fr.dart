@@ -1714,4 +1714,45 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get profileNotFound => 'Aucun profil actif';
+
+  @override
+  String get updatingFavorites => 'Mise à jour de vos favoris…';
+
+  @override
+  String get fetchingLatestPrices => 'Récupération des derniers prix';
+
+  @override
+  String get noDataAvailable => 'Pas de données';
+
+  @override
+  String get configAndPrivacy => 'Configuration & Confidentialité';
+
+  @override
+  String get searchToSeeMap => 'Recherchez pour voir les stations sur la carte';
+
+  @override
+  String get evPowerAny => 'Tous';
+
+  @override
+  String evPowerKw(int kw) {
+    return '$kw kW+';
+  }
+
+  @override
+  String get sectionProfile => 'Profil';
+
+  @override
+  String get sectionLocation => 'Localisation';
+
+  @override
+  String get tooltipBack => 'Retour';
+
+  @override
+  String get tooltipClose => 'Fermer';
+
+  @override
+  String get tooltipClearSearch => 'Effacer la recherche';
+
+  @override
+  String get tooltipUseGps => 'Utiliser la position GPS';
 }

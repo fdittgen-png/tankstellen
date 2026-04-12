@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/monthly_summary.dart';
 
 /// A minimal bar chart rendered via [CustomPainter].
@@ -34,9 +35,10 @@ class MonthlyBarChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final onSurface = Theme.of(context).colorScheme.onSurface;
     if (summaries.isEmpty) {
-      return const SizedBox(
+      final l = AppLocalizations.of(context);
+      return SizedBox(
         height: 180,
-        child: Center(child: Text('No data')),
+        child: Center(child: Text(l?.noDataAvailable ?? 'No data')),
       );
     }
     return SizedBox(

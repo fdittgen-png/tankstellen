@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/sync/sync_service.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../price_history/domain/entities/price_record.dart';
 import '../../../price_history/presentation/widgets/price_chart.dart';
 import '../../../price_history/presentation/widgets/price_stats_card.dart';
@@ -118,7 +119,7 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
           alignment: Alignment.centerRight,
           child: TextButton(
             onPressed: () => GoRouter.of(context).push('/station/${widget.stationId}/history'),
-            child: const Text('Show all fuel types'),
+            child: Text(AppLocalizations.of(context)?.showAllFuelTypes ?? 'Show all fuel types'),
           ),
         ),
       ],

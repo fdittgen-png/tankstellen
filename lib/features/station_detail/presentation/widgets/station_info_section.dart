@@ -52,7 +52,7 @@ class StationInfoSection extends StatelessWidget {
         if (station.is24h)
           ListTile(
             leading: Icon(Icons.schedule, color: DarkModeColors.success(context)),
-            title: const Text('24h/24 — Automate'),
+            title: Text(l10n?.automate24h ?? '24h/24 — Automate'),
           )
         else if (station.openingHoursText != null && station.openingHoursText!.isNotEmpty)
           ...station.openingHoursText!.split('\n').map((line) => ListTile(

@@ -1710,4 +1710,45 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get profileNotFound => 'No active profile';
+
+  @override
+  String get updatingFavorites => 'Updating your favorites...';
+
+  @override
+  String get fetchingLatestPrices => 'Fetching the latest prices';
+
+  @override
+  String get noDataAvailable => 'No data';
+
+  @override
+  String get configAndPrivacy => 'Configuration & Privacy';
+
+  @override
+  String get searchToSeeMap => 'Search to see stations on the map';
+
+  @override
+  String get evPowerAny => 'Any';
+
+  @override
+  String evPowerKw(int kw) {
+    return '$kw kW+';
+  }
+
+  @override
+  String get sectionProfile => 'Profile';
+
+  @override
+  String get sectionLocation => 'Location';
+
+  @override
+  String get tooltipBack => 'Back';
+
+  @override
+  String get tooltipClose => 'Close';
+
+  @override
+  String get tooltipClearSearch => 'Clear search input';
+
+  @override
+  String get tooltipUseGps => 'Use GPS location';
 }
