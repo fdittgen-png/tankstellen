@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/station_type_filter.dart';
 import '../../providers/station_type_filter_provider.dart';
 
@@ -10,20 +11,21 @@ class StationTypeToggle extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final filter = ref.watch(activeStationTypeFilterProvider);
+    final l = AppLocalizations.of(context);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: SegmentedButton<StationTypeFilter>(
-        segments: const [
+        segments: [
           ButtonSegment(
             value: StationTypeFilter.fuel,
-            icon: Icon(Icons.local_gas_station, size: 18),
-            label: Text('Fuel'),
+            icon: const Icon(Icons.local_gas_station, size: 18),
+            label: Text(l?.stationTypeFuel ?? 'Fuel'),
           ),
           ButtonSegment(
             value: StationTypeFilter.ev,
-            icon: Icon(Icons.ev_station, size: 18),
-            label: Text('EV'),
+            icon: const Icon(Icons.ev_station, size: 18),
+            label: Text(l?.stationTypeEv ?? 'EV'),
           ),
         ],
         selected: {filter},

@@ -3550,6 +3550,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OBD-II'**
   String get obdConnect;
+
+  /// No description provided for @stationTypeFuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel'**
+  String get stationTypeFuel;
+
+  /// No description provided for @stationTypeEv.
+  ///
+  /// In en, this message translates to:
+  /// **'EV'**
+  String get stationTypeEv;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

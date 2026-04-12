@@ -118,8 +118,6 @@ class FavoriteStations extends _$FavoriteStations {
       return;
     }
 
-    state = const AsyncValue.loading();
-
     try {
       final storage = ref.read(storageRepositoryProvider);
 
@@ -143,6 +141,16 @@ class FavoriteStations extends _$FavoriteStations {
 
       debugPrint('FavoriteStations: loaded ${stations.length}/${favoriteIds.length} from storage'
           '${missingIds.isNotEmpty ? ', ${missingIds.length} missing' : ''}');
+
+      // Show cached data immediately (no shimmer wait)
+      if (stations.isNotEmpty) {
+        state = AsyncValue.data(ServiceResult(
+          data: List.from(stations),
+          source: ServiceSource.cache,
+          fetchedAt: DateTime.now(),
+          isStale: true,
+        ));
+      }
 
       // Step 2: Check connectivity
       final connectivity = await Connectivity().checkConnectivity();

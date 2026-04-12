@@ -1778,4 +1778,10 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get obdConnect => 'OBD-II';
+
+  @override
+  String get stationTypeFuel => 'Fuel';
+
+  @override
+  String get stationTypeEv => 'EV';
 }
