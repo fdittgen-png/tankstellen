@@ -811,5 +811,6 @@
   "onboardingRadiusHelper": "Larger radius = more results",
   "onboardingPrivacy": "These settings are stored only on your device and never shared.",
   "onboardingLandingTitle": "Home screen",
-  "onboardingLandingHint": "Choose which screen opens when you launch the app."
+  "onboardingLandingHint": "Choose which screen opens when you launch the app.",
+  "scanReceipt": "Scan receipt"
 }
