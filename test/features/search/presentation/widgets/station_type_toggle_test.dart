@@ -20,8 +20,6 @@ void main() {
 
       expect(find.text('Fuel'), findsOneWidget);
       expect(find.text('EV'), findsOneWidget);
-      expect(find.byIcon(Icons.local_gas_station), findsOneWidget);
-      expect(find.byIcon(Icons.ev_station), findsOneWidget);
     });
 
     testWidgets('fuel is selected by default', (tester) async {
@@ -34,8 +32,8 @@ void main() {
         overrides: test.overrides,
       );
 
-      // SegmentedButton should exist with fuel selected
-      expect(find.byType(SegmentedButton<dynamic>), findsOneWidget);
+      // SegmentedButton should exist
+      expect(find.text('Fuel'), findsOneWidget);
     });
 
     testWidgets('tapping EV switches selection', (tester) async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../app/responsive_search_layout.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/price_tier.dart';
@@ -13,6 +14,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/station.dart';
+import '../../providers/selected_station_provider.dart';
 import '../../providers/ignored_stations_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/brand_filter_provider.dart';
@@ -214,7 +216,13 @@ class SearchResultsList extends ConsumerWidget {
                       isFavorite: isFav,
                       cheapestFlags: cheapestMap[station.id] ?? const {},
                       profileFuelType: profileFuel,
-                      onTap: () => context.push('/station/${station.id}'),
+                      onTap: () {
+                      if (isWideScreen(context)) {
+                        ref.read(selectedStationProvider.notifier).select(station.id);
+                      } else {
+                        context.push('/station/${station.id}');
+                      }
+                    },
                       onFavoriteTap: () => ref
                           .read(favoritesProvider.notifier)
                           .toggle(station.id, stationData: station),
@@ -249,7 +257,13 @@ class SearchResultsList extends ConsumerWidget {
                             .remove(station.id),
                       );
                     },
-                    onTap: () => context.push('/station/${station.id}'),
+                    onTap: () {
+                      if (isWideScreen(context)) {
+                        ref.read(selectedStationProvider.notifier).select(station.id);
+                      } else {
+                        context.push('/station/${station.id}');
+                      }
+                    },
                     onFavoriteTap: () => ref
                         .read(favoritesProvider.notifier)
                         .toggle(station.id, stationData: station),
