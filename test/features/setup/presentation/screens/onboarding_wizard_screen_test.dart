@@ -16,7 +16,7 @@ void main() {
     setUp(() {
       final std = standardTestOverrides();
       overrides = std.overrides;
-      // Default: Germany (requires API key) => 4 steps
+      // Default: Germany (requires API key) => 6 steps
       when(() => std.mockStorage.isSetupComplete).thenReturn(false);
       when(() => std.mockStorage.isSetupSkipped).thenReturn(false);
       when(() => std.mockStorage.hasApiKey()).thenReturn(false);
@@ -52,8 +52,8 @@ void main() {
         find.byType(OnboardingProgressIndicator),
         findsOneWidget,
       );
-      // Shows step counter
-      expect(find.text('1 / 4'), findsOneWidget);
+      // 6 steps for Germany (Welcome, Country, Preferences, Landing, API Key, Done)
+      expect(find.text('1 / 6'), findsOneWidget);
     });
 
     testWidgets('does not show Back button on first step', (tester) async {
@@ -69,9 +69,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Now on step 2: country/language
-      expect(find.text('2 / 4'), findsOneWidget);
+      expect(find.text('2 / 6'), findsOneWidget);
       expect(find.text('Back'), findsOneWidget);
-      // Country selector should be visible
       expect(find.text('Language'), findsOneWidget);
       expect(find.text('Country'), findsOneWidget);
     });
@@ -82,56 +81,55 @@ void main() {
       // Go to step 2
       await tester.tap(find.text('Next'));
       await tester.pumpAndSettle();
-      expect(find.text('2 / 4'), findsOneWidget);
+      expect(find.text('2 / 6'), findsOneWidget);
 
       // Go back
       await tester.tap(find.text('Back'));
       await tester.pumpAndSettle();
-      expect(find.text('1 / 4'), findsOneWidget);
+      expect(find.text('1 / 6'), findsOneWidget);
     });
 
     testWidgets('shows Skip button on API key step', (tester) async {
       await pumpWizard(tester);
 
-      // Step 1 -> 2
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
+      // Steps 1-4: Welcome -> Country -> Preferences -> Landing
+      for (var i = 0; i < 4; i++) {
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
+      }
 
-      // Step 2 -> 3 (API key step)
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('3 / 4'), findsOneWidget);
+      // Step 5: API key (skippable)
+      expect(find.text('5 / 6'), findsOneWidget);
       expect(find.text('Skip'), findsOneWidget);
     });
 
     testWidgets('Skip button advances past API key step', (tester) async {
       await pumpWizard(tester);
 
-      // Navigate to API key step (step 3)
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
+      // Navigate to API key step (step 5)
+      for (var i = 0; i < 4; i++) {
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
+      }
 
-      expect(find.text('3 / 4'), findsOneWidget);
+      expect(find.text('5 / 6'), findsOneWidget);
 
       // Skip
       await tester.tap(find.text('Skip'));
       await tester.pumpAndSettle();
 
-      expect(find.text('4 / 4'), findsOneWidget);
+      expect(find.text('6 / 6'), findsOneWidget);
       expect(find.text('All set!'), findsOneWidget);
     });
 
     testWidgets('last step shows Get started button', (tester) async {
       await pumpWizard(tester);
 
-      // Navigate to last step
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
+      // Navigate to last step (skip API key)
+      for (var i = 0; i < 4; i++) {
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
+      }
       await tester.tap(find.text('Skip'));
       await tester.pumpAndSettle();
 
@@ -139,7 +137,7 @@ void main() {
       expect(find.byIcon(Icons.check), findsOneWidget);
     });
 
-    testWidgets('3-step flow when country does not require API key',
+    testWidgets('5-step flow when country does not require API key',
         (tester) async {
       final std = standardTestOverrides(country: Countries.france);
       when(() => std.mockStorage.isSetupComplete).thenReturn(false);
@@ -159,21 +157,17 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Should show 3 steps (no API key step)
-      expect(find.text('1 / 3'), findsOneWidget);
+      // 5 steps (Welcome, Country, Preferences, Landing, Done)
+      expect(find.text('1 / 5'), findsOneWidget);
 
-      // Step 1 -> 2
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
-      expect(find.text('2 / 3'), findsOneWidget);
+      // Navigate through all steps
+      for (var i = 0; i < 4; i++) {
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
+      }
 
-      // No Skip button (country/language is not skippable)
-      expect(find.text('Skip'), findsNothing);
-
-      // Step 2 -> 3 (completion)
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
-      expect(find.text('3 / 3'), findsOneWidget);
+      // Should be on completion step
+      expect(find.text('5 / 5'), findsOneWidget);
       expect(find.text('All set!'), findsOneWidget);
       expect(find.text('Get started'), findsOneWidget);
     });
@@ -191,6 +185,33 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Skip'), findsNothing);
+    });
+
+    testWidgets('preferences step shows fuel type chips', (tester) async {
+      await pumpWizard(tester);
+
+      // Navigate to preferences step (step 3)
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('3 / 6'), findsOneWidget);
+      expect(find.text('Your preferences'), findsOneWidget);
+      expect(find.byType(Slider), findsOneWidget);
+    });
+
+    testWidgets('landing screen step shows options', (tester) async {
+      await pumpWizard(tester);
+
+      // Navigate to landing step (step 4)
+      for (var i = 0; i < 3; i++) {
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
+      }
+
+      expect(find.text('4 / 6'), findsOneWidget);
+      expect(find.text('Home screen'), findsOneWidget);
     });
   });
 }

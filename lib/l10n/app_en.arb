@@ -805,5 +805,11 @@
   "switchAction": "Switch",
   "helpBannerCriteria": "Your profile defaults are pre-filled. Adjust criteria below to refine your search.",
   "helpBannerAlerts": "Set a price threshold for a station. You'll be notified when prices drop below it. Checks run every 30 minutes.",
-  "syncNow": "Sync now"
+  "syncNow": "Sync now",
+  "onboardingPreferencesTitle": "Your preferences",
+  "onboardingZipHelper": "Used when GPS is unavailable",
+  "onboardingRadiusHelper": "Larger radius = more results",
+  "onboardingPrivacy": "These settings are stored only on your device and never shared.",
+  "onboardingLandingTitle": "Home screen",
+  "onboardingLandingHint": "Choose which screen opens when you launch the app."
 }

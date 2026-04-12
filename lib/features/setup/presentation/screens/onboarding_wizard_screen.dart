@@ -12,7 +12,9 @@ import '../../providers/onboarding_wizard_provider.dart';
 import '../widgets/api_key_step.dart';
 import '../widgets/completion_step.dart';
 import '../widgets/country_language_step.dart';
+import '../widgets/landing_screen_step.dart';
 import '../widgets/onboarding_progress_indicator.dart';
+import '../widgets/preferences_step.dart';
 import '../widgets/welcome_step.dart';
 
 /// Multi-step onboarding wizard with progress indicator.
@@ -46,7 +48,8 @@ class _OnboardingWizardScreenState
   /// requires an API key.
   int get _stepCount {
     final country = ref.read(activeCountryProvider);
-    return country.requiresApiKey ? 4 : 3;
+    // Welcome, Country, Preferences, Landing, [API Key], Done
+    return country.requiresApiKey ? 6 : 5;
   }
 
   bool _isLastStep(int currentStep) => currentStep == _stepCount - 1;
@@ -133,6 +136,7 @@ class _OnboardingWizardScreenState
 
       final country = ref.read(activeCountryProvider);
       final language = ref.read(activeLanguageProvider);
+      final wizardState = ref.read(onboardingWizardControllerProvider);
 
       final profileRepo = ref.read(profileRepositoryProvider);
       final profile = await profileRepo.ensureDefaultProfile();
@@ -140,6 +144,10 @@ class _OnboardingWizardScreenState
       final updated = profile.copyWith(
         countryCode: country.code,
         languageCode: language.code,
+        homeZipCode: wizardState.homeZipCode,
+        defaultSearchRadius: wizardState.defaultSearchRadius,
+        preferredFuelType: wizardState.preferredFuelType,
+        landingScreen: wizardState.landingScreen,
       );
       await profileRepo.updateProfile(updated);
       ref.read(activeProfileProvider.notifier).refresh();
@@ -153,8 +161,8 @@ class _OnboardingWizardScreenState
   /// Returns whether the current step is an optional one that can be skipped.
   bool _isCurrentStepSkippable(int currentStep) {
     final country = ref.read(activeCountryProvider);
-    // The API key step is skippable (index 2 when country requires key)
-    return country.requiresApiKey && currentStep == 2;
+    // The API key step is skippable (index 4 when country requires key)
+    return country.requiresApiKey && currentStep == 4;
   }
 
   List<Widget> _buildSteps() {
@@ -162,6 +170,8 @@ class _OnboardingWizardScreenState
     return [
       const WelcomeStep(),
       const CountryLanguageStep(),
+      const PreferencesStep(),
+      const LandingScreenStep(),
       if (country.requiresApiKey)
         ApiKeyStep(apiKeyController: _apiKeyController),
       const CompletionStep(),

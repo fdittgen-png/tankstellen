@@ -1754,4 +1754,22 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get syncNow => 'Jetzt synchronisieren';
+
+  @override
+  String get onboardingPreferencesTitle => 'Ihre Einstellungen';
+
+  @override
+  String get onboardingZipHelper => 'Wird verwendet, wenn GPS nicht verfügbar ist';
+
+  @override
+  String get onboardingRadiusHelper => 'Größerer Radius = mehr Ergebnisse';
+
+  @override
+  String get onboardingPrivacy => 'Diese Einstellungen werden nur auf Ihrem Gerät gespeichert und niemals geteilt.';
+
+  @override
+  String get onboardingLandingTitle => 'Startbildschirm';
+
+  @override
+  String get onboardingLandingHint => 'Wählen Sie, welcher Bildschirm beim Start der App angezeigt wird.';
 }

@@ -470,5 +470,11 @@
   "switchAction": "Changer",
   "helpBannerCriteria": "Vos valeurs par défaut sont pré-remplies. Ajustez les critères ci-dessous pour affiner votre recherche.",
   "helpBannerAlerts": "Définissez un seuil de prix pour une station. Vous serez notifié quand les prix passent en dessous. Vérification toutes les 30 minutes.",
-  "syncNow": "Synchroniser maintenant"
+  "syncNow": "Synchroniser maintenant",
+  "onboardingPreferencesTitle": "Vos préférences",
+  "onboardingZipHelper": "Utilisé quand le GPS n'est pas disponible",
+  "onboardingRadiusHelper": "Rayon plus grand = plus de résultats",
+  "onboardingPrivacy": "Ces paramètres sont stockés uniquement sur votre appareil et ne sont jamais partagés.",
+  "onboardingLandingTitle": "Écran d'accueil",
+  "onboardingLandingHint": "Choisissez l'écran qui s'ouvre au lancement de l'application."
 }

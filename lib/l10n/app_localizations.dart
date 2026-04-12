@@ -3502,6 +3502,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sync now'**
   String get syncNow;
+
+  /// No description provided for @onboardingPreferencesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your preferences'**
+  String get onboardingPreferencesTitle;
+
+  /// No description provided for @onboardingZipHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Used when GPS is unavailable'**
+  String get onboardingZipHelper;
+
+  /// No description provided for @onboardingRadiusHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Larger radius = more results'**
+  String get onboardingRadiusHelper;
+
+  /// No description provided for @onboardingPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'These settings are stored only on your device and never shared.'**
+  String get onboardingPrivacy;
+
+  /// No description provided for @onboardingLandingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Home screen'**
+  String get onboardingLandingTitle;
+
+  /// No description provided for @onboardingLandingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which screen opens when you launch the app.'**
+  String get onboardingLandingHint;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
