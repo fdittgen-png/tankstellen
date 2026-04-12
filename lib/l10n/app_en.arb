@@ -812,5 +812,6 @@
   "onboardingPrivacy": "These settings are stored only on your device and never shared.",
   "onboardingLandingTitle": "Home screen",
   "onboardingLandingHint": "Choose which screen opens when you launch the app.",
-  "scanReceipt": "Scan receipt"
+  "scanReceipt": "Scan receipt",
+  "obdConnect": "OBD-II"
 }
