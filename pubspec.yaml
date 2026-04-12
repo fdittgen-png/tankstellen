@@ -1,7 +1,7 @@
 name: tankstellen
 description: "Free fuel price comparison app — 11 countries, 23 languages, privacy-first"
 publish_to: 'none'
-version: 4.3.0+4040
+version: 4.3.0+4050
 
 environment:
   sdk: ^3.11.3
