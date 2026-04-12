@@ -100,26 +100,22 @@ GoRouter router(Ref ref) {
 
       // Step 2: Setup (onboarding) must be complete before main app
       if (!isReady && !isSetup && !isConsent) return '/setup';
-      if (isReady && isSetup) {
+      if (isReady && (isSetup || state.matchedLocation == '/')) {
         // Route to profile landing screen preference
         final profileId = storage.getActiveProfileId();
         if (profileId != null) {
           final profile = storage.getProfile(profileId);
           final landing = profile?['landingScreen']?.toString();
-          // json_serializable stores enum as name: "map", "favorites", etc.
-          // Also handle legacy format "LandingScreen.map"
           switch (landing) {
             case 'favorites':
             case 'LandingScreen.favorites':
-              return '/favorites';
+              if (state.matchedLocation != '/favorites') return '/favorites';
             case 'map':
             case 'LandingScreen.map':
-              return '/map';
-            // 'cheapest', 'nearest', 'search' all go to search screen
-            // (cheapest/nearest trigger auto-search via SearchScreen.initState)
+              if (state.matchedLocation != '/map') return '/map';
           }
         }
-        return '/';
+        if (isSetup) return '/';
       }
       return null;
     },

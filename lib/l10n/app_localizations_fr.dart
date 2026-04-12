@@ -1787,4 +1787,22 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get brandFilterHighway => 'Autoroute';
+
+  @override
+  String get ratingModeLocal => 'Local';
+
+  @override
+  String get ratingModePrivate => 'Privé';
+
+  @override
+  String get ratingModeShared => 'Partagé';
+
+  @override
+  String get ratingDescLocal => 'Notes enregistrées uniquement sur cet appareil';
+
+  @override
+  String get ratingDescPrivate => 'Synchronisé avec votre base de données (non visible par les autres)';
+
+  @override
+  String get ratingDescShared => 'Visible par tous les utilisateurs de votre base de données';
 }

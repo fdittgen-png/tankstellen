@@ -481,5 +481,11 @@
   "obdConnect": "OBD-II",
   "stationTypeFuel": "Carburant",
   "stationTypeEv": "Recharge",
-  "brandFilterHighway": "Autoroute"
+  "brandFilterHighway": "Autoroute",
+  "ratingModeLocal": "Local",
+  "ratingModePrivate": "Privé",
+  "ratingModeShared": "Partagé",
+  "ratingDescLocal": "Notes enregistrées uniquement sur cet appareil",
+  "ratingDescPrivate": "Synchronisé avec votre base de données (non visible par les autres)",
+  "ratingDescShared": "Visible par tous les utilisateurs de votre base de données"
 }
