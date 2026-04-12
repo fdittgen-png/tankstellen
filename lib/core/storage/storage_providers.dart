@@ -24,6 +24,10 @@ SettingsStorage settingsStorage(Ref ref) => ref.watch(storageRepositoryProvider)
 @Riverpod(keepAlive: true)
 FavoriteStorage favoriteStorage(Ref ref) => ref.watch(storageRepositoryProvider);
 
+/// Narrow provider for EV favorite storage operations.
+@Riverpod(keepAlive: true)
+EvFavoriteStorage evFavoriteStorage(Ref ref) => ref.watch(storageRepositoryProvider);
+
 /// Narrow provider for ignored station operations.
 @Riverpod(keepAlive: true)
 IgnoredStorage ignoredStorage(Ref ref) => ref.watch(storageRepositoryProvider);

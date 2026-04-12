@@ -127,6 +127,33 @@ class HiveStorage implements StorageRepository {
       _favorites.removeFavoriteStationData(stationId);
 
   // ---------------------------------------------------------------------------
+  // EvFavoriteStorage
+  // ---------------------------------------------------------------------------
+  @override
+  List<String> getEvFavoriteIds() => _favorites.getEvFavoriteIds();
+  @override
+  Future<void> setEvFavoriteIds(List<String> ids) =>
+      _favorites.setEvFavoriteIds(ids);
+  @override
+  Future<void> addEvFavorite(String id) => _favorites.addEvFavorite(id);
+  @override
+  Future<void> removeEvFavorite(String id) => _favorites.removeEvFavorite(id);
+  @override
+  bool isEvFavorite(String id) => _favorites.isEvFavorite(id);
+  @override
+  int get evFavoriteCount => _favorites.evFavoriteCount;
+  @override
+  Future<void> saveEvFavoriteStationData(
+          String stationId, Map<String, dynamic> data) =>
+      _favorites.saveEvFavoriteStationData(stationId, data);
+  @override
+  Map<String, dynamic>? getEvFavoriteStationData(String stationId) =>
+      _favorites.getEvFavoriteStationData(stationId);
+  @override
+  Future<void> removeEvFavoriteStationData(String stationId) =>
+      _favorites.removeEvFavoriteStationData(stationId);
+
+  // ---------------------------------------------------------------------------
   // IgnoredStorage
   // ---------------------------------------------------------------------------
   @override

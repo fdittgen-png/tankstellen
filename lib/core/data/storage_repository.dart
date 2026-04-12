@@ -20,6 +20,20 @@ abstract class FavoriteStorage {
   Future<void> removeFavoriteStationData(String stationId);
 }
 
+/// EV charging station favorite storage.
+abstract class EvFavoriteStorage {
+  List<String> getEvFavoriteIds();
+  Future<void> setEvFavoriteIds(List<String> ids);
+  Future<void> addEvFavorite(String id);
+  Future<void> removeEvFavorite(String id);
+  bool isEvFavorite(String id);
+  int get evFavoriteCount;
+
+  Future<void> saveEvFavoriteStationData(String stationId, Map<String, dynamic> data);
+  Map<String, dynamic>? getEvFavoriteStationData(String stationId);
+  Future<void> removeEvFavoriteStationData(String stationId);
+}
+
 /// Ignored station storage.
 abstract class IgnoredStorage {
   List<String> getIgnoredIds();
@@ -110,9 +124,9 @@ abstract class CacheStorage {
 /// Used for DI — providers and services receive [StorageRepository],
 /// but can narrow to specific interfaces in their type signatures.
 abstract class StorageRepository implements
-    FavoriteStorage, IgnoredStorage, RatingStorage, SettingsStorage,
-    ApiKeyStorage, ProfileStorage, PriceHistoryStorage, AlertStorage,
-    ItineraryStorage, CacheStorage {
+    FavoriteStorage, EvFavoriteStorage, IgnoredStorage, RatingStorage,
+    SettingsStorage, ApiKeyStorage, ProfileStorage, PriceHistoryStorage,
+    AlertStorage, ItineraryStorage, CacheStorage {
   /// Estimated storage size across all data domains (bytes).
   ({int settings, int profiles, int favorites, int cache, int priceHistory, int alerts, int total})
       get storageStats;

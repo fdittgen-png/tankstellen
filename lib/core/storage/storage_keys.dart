@@ -24,4 +24,6 @@ class StorageKeys {
   static const String activeVehicleProfileId = 'active_vehicle_profile_id';
   static const String evStationsCache = 'ev_stations_cache';
   static const String evShowOnMap = 'ev_show_on_map';
+  static const String evFavoriteStationIds = 'ev_favorite_station_ids';
+  static const String evFavoriteStationData = 'ev_favorite_station_data';
 }

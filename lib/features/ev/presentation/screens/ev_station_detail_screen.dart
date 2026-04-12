@@ -1,29 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../favorites/providers/ev_favorites_provider.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart'
     show ConnectorType;
 import '../../domain/entities/charging_station.dart';
 
-/// Read-only detail view for a single [ChargingStation].
+/// Detail view for a single [ChargingStation] with favorite toggle.
 ///
 /// Shows all connectors, status badges, operator/address metadata, and
-/// the last-update timestamp. Tariff breakdown is stubbed for now — the
-/// detail includes a placeholder row when the connector references a
-/// tariff id we don't yet resolve client-side.
-class EvStationDetailScreen extends StatelessWidget {
+/// the last-update timestamp.
+class EvStationDetailScreen extends ConsumerWidget {
   final ChargingStation station;
 
   const EvStationDetailScreen({super.key, required this.station});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final isFav = ref.watch(isEvFavoriteProvider(station.id));
 
     return Scaffold(
       appBar: AppBar(
         title: Text(station.name),
+        actions: [
+          IconButton(
+            icon: Icon(
+              isFav ? Icons.star : Icons.star_border,
+              color: isFav ? Colors.amber : null,
+            ),
+            tooltip: isFav
+                ? (l10n?.removeFavorite ?? 'Remove from favorites')
+                : (l10n?.addFavorite ?? 'Add to favorites'),
+            onPressed: () {
+              ref
+                  .read(evFavoritesProvider.notifier)
+                  .toggle(station.id, stationData: station);
+              final msg = isFav
+                  ? (l10n?.removedFromFavorites ?? 'Removed from favorites')
+                  : (l10n?.addedToFavorites ?? 'Added to favorites');
+              SnackBarHelper.show(context, msg);
+            },
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

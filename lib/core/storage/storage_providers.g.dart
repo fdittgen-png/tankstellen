@@ -212,6 +212,58 @@ final class FavoriteStorageProvider
 
 String _$favoriteStorageHash() => r'2518dc2862ef2bac8cfe2283fe3ccc9dafab909e';
 
+/// Narrow provider for EV favorite storage operations.
+
+@ProviderFor(evFavoriteStorage)
+final evFavoriteStorageProvider = EvFavoriteStorageProvider._();
+
+/// Narrow provider for EV favorite storage operations.
+
+final class EvFavoriteStorageProvider
+    extends
+        $FunctionalProvider<
+          EvFavoriteStorage,
+          EvFavoriteStorage,
+          EvFavoriteStorage
+        >
+    with $Provider<EvFavoriteStorage> {
+  /// Narrow provider for EV favorite storage operations.
+  EvFavoriteStorageProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'evFavoriteStorageProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$evFavoriteStorageHash();
+
+  @$internal
+  @override
+  $ProviderElement<EvFavoriteStorage> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  EvFavoriteStorage create(Ref ref) {
+    return evFavoriteStorage(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(EvFavoriteStorage value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<EvFavoriteStorage>(value),
+    );
+  }
+}
+
+String _$evFavoriteStorageHash() => r'dd725c080adee2a6615812134a580c29471be85e';
+
 /// Narrow provider for ignored station operations.
 
 @ProviderFor(ignoredStorage)

@@ -9,7 +9,7 @@ import '../storage_keys.dart';
 /// Manages favorite station IDs, persisted station data for offline access,
 /// ignored station IDs, and station ratings.
 class FavoritesHiveStore
-    implements FavoriteStorage, IgnoredStorage, RatingStorage {
+    implements FavoriteStorage, EvFavoriteStorage, IgnoredStorage, RatingStorage {
   Box get _favorites => Hive.box(HiveBoxes.favorites);
 
   // Favorites
@@ -75,6 +75,68 @@ class FavoritesHiveStore
 
   Map<String, dynamic> _getFavoriteStationDataRaw() {
     final raw = _favorites.get(StorageKeys.favoriteStationData);
+    if (raw is Map) return Map<String, dynamic>.from(raw);
+    return {};
+  }
+
+  // EV Favorites
+  @override
+  List<String> getEvFavoriteIds() {
+    final ids = _favorites.get(StorageKeys.evFavoriteStationIds);
+    if (ids == null) return [];
+    return List<String>.from(ids as List);
+  }
+
+  @override
+  Future<void> setEvFavoriteIds(List<String> ids) =>
+      _favorites.put(StorageKeys.evFavoriteStationIds, ids);
+
+  @override
+  Future<void> addEvFavorite(String id) async {
+    final ids = getEvFavoriteIds();
+    if (!ids.contains(id)) {
+      ids.add(id);
+      await setEvFavoriteIds(ids);
+    }
+  }
+
+  @override
+  Future<void> removeEvFavorite(String id) async {
+    final ids = getEvFavoriteIds();
+    ids.remove(id);
+    await setEvFavoriteIds(ids);
+  }
+
+  @override
+  bool isEvFavorite(String id) => getEvFavoriteIds().contains(id);
+
+  @override
+  int get evFavoriteCount => getEvFavoriteIds().length;
+
+  @override
+  Future<void> saveEvFavoriteStationData(
+      String stationId, Map<String, dynamic> data) async {
+    final all = _getEvFavoriteStationDataRaw();
+    all[stationId] = data;
+    await _favorites.put(StorageKeys.evFavoriteStationData, all);
+  }
+
+  @override
+  Map<String, dynamic>? getEvFavoriteStationData(String stationId) {
+    final raw = _getEvFavoriteStationDataRaw()[stationId];
+    if (raw is Map) return Map<String, dynamic>.from(raw);
+    return null;
+  }
+
+  @override
+  Future<void> removeEvFavoriteStationData(String stationId) async {
+    final all = _getEvFavoriteStationDataRaw();
+    all.remove(stationId);
+    await _favorites.put(StorageKeys.evFavoriteStationData, all);
+  }
+
+  Map<String, dynamic> _getEvFavoriteStationDataRaw() {
+    final raw = _favorites.get(StorageKeys.evFavoriteStationData);
     if (raw is Map) return Map<String, dynamic>.from(raw);
     return {};
   }
