@@ -52,11 +52,15 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
     _evApiKeyCache = await _secureStorage.read(key: StorageKeys.evApiKey);
   }
 
-  @override
-  String? getEvApiKey() => _evApiKeyCache;
+  /// Default Open Charge Map API key shipped with the app.
+  /// Users can override this with their own key in Settings.
+  static const defaultEvApiKey = '9612e839-2a49-44b8-a2f6-08f5d197c36a';
 
   @override
-  bool hasEvApiKey() => _evApiKeyCache != null && _evApiKeyCache!.isNotEmpty;
+  String? getEvApiKey() => _evApiKeyCache ?? defaultEvApiKey;
+
+  @override
+  bool hasEvApiKey() => true; // Always true — default key is always available
 
   @override
   bool hasCustomEvApiKey() =>

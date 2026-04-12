@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/providers/ev_favorites_provider.dart';
+import '../../../search/providers/station_rating_provider.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart'
     show ConnectorType;
 import '../../domain/entities/charging_station.dart';
@@ -82,6 +83,9 @@ class EvStationDetailScreen extends ConsumerWidget {
           if (station.connectors.isEmpty)
             Text(l10n?.evNoConnectors ?? 'No connector details available'),
           ...station.connectors.map((c) => _ConnectorTile(connector: c)),
+          const SizedBox(height: 16),
+          // Rating stars
+          _RatingRow(stationId: station.id),
         ],
       ),
     );
@@ -175,6 +179,43 @@ class _ConnectorTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _RatingRow extends ConsumerWidget {
+  final String stationId;
+  const _RatingRow({required this.stationId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final rating = ref.watch(stationRatingProvider(stationId));
+    final theme = Theme.of(context);
+
+    return Row(
+      children: [
+        Text('Rating', style: theme.textTheme.titleSmall),
+        const Spacer(),
+        ...List.generate(5, (i) {
+          final starIndex = i + 1;
+          return GestureDetector(
+            onTap: () =>
+                ref.read(stationRatingsProvider.notifier).rate(stationId, starIndex),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: Icon(
+                (rating != null && starIndex <= rating)
+                    ? Icons.star
+                    : Icons.star_border,
+                size: 28,
+                color: (rating != null && starIndex <= rating)
+                    ? Colors.amber
+                    : Colors.grey.shade400,
+              ),
+            ),
+          );
+        }),
+      ],
     );
   }
 }
