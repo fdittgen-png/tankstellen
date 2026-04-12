@@ -100,10 +100,32 @@ bool isFavorite(Ref ref, String stationId) {
 class FavoriteStations extends _$FavoriteStations {
   @override
   AsyncValue<ServiceResult<List<Station>>> build() {
+    // Load cached station data synchronously so favorites show immediately.
+    final favoriteIds = ref.read(favoritesProvider);
+    if (favoriteIds.isEmpty) {
+      return AsyncValue.data(ServiceResult(
+        data: const [],
+        source: ServiceSource.cache,
+        fetchedAt: DateTime.now(),
+      ));
+    }
+
+    final storage = ref.read(storageRepositoryProvider);
+    final stations = <Station>[];
+    for (final id in favoriteIds) {
+      final data = storage.getFavoriteStationData(id);
+      if (data != null) {
+        try {
+          stations.add(Station.fromJson(data));
+        } catch (_) {}
+      }
+    }
+
     return AsyncValue.data(ServiceResult(
-      data: const [],
+      data: stations,
       source: ServiceSource.cache,
       fetchedAt: DateTime.now(),
+      isStale: true,
     ));
   }
 
