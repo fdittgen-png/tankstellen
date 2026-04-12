@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../search/providers/search_provider.dart';
 import 'station_map_layers.dart';
 
@@ -40,9 +41,9 @@ class _InlineMapState extends ConsumerState<InlineMap> {
         final stations = result.data;
 
         if (stations.isEmpty) {
-          return const EmptyState(
+          return EmptyState(
             icon: Icons.map_outlined,
-            title: 'Search to see stations on the map',
+            title: AppLocalizations.of(context)?.searchToSeeMap ?? 'Search to see stations on the map',
           );
         }
 

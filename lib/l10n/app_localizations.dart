@@ -3294,6 +3294,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No active profile'**
   String get profileNotFound;
+
+  /// No description provided for @updatingFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Updating your favorites...'**
+  String get updatingFavorites;
+
+  /// No description provided for @fetchingLatestPrices.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching the latest prices'**
+  String get fetchingLatestPrices;
+
+  /// No description provided for @noDataAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No data'**
+  String get noDataAvailable;
+
+  /// No description provided for @configAndPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Configuration & Privacy'**
+  String get configAndPrivacy;
+
+  /// No description provided for @searchToSeeMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Search to see stations on the map'**
+  String get searchToSeeMap;
+
+  /// No description provided for @evPowerAny.
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get evPowerAny;
+
+  /// No description provided for @evPowerKw.
+  ///
+  /// In en, this message translates to:
+  /// **'{kw} kW+'**
+  String evPowerKw(int kw);
+
+  /// No description provided for @sectionProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get sectionProfile;
+
+  /// No description provided for @sectionLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get sectionLocation;
+
+  /// No description provided for @tooltipBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get tooltipBack;
+
+  /// No description provided for @tooltipClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get tooltipClose;
+
+  /// No description provided for @tooltipClearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search input'**
+  String get tooltipClearSearch;
+
+  /// No description provided for @tooltipUseGps.
+  ///
+  /// In en, this message translates to:
+  /// **'Use GPS location'**
+  String get tooltipUseGps;
 }
 
 class _AppLocalizationsDelegate

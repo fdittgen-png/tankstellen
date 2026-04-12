@@ -83,13 +83,13 @@ class _PowerDropdown extends StatelessWidget {
     return DropdownButton<double>(
       value: value,
       hint: Text(l10n?.evMinPower ?? 'Min power'),
-      items: const [
-        DropdownMenuItem(value: 0, child: Text('Any')),
-        DropdownMenuItem(value: 11, child: Text('11 kW+')),
-        DropdownMenuItem(value: 22, child: Text('22 kW+')),
-        DropdownMenuItem(value: 50, child: Text('50 kW+')),
-        DropdownMenuItem(value: 150, child: Text('150 kW+')),
-        DropdownMenuItem(value: 300, child: Text('300 kW+')),
+      items: [
+        DropdownMenuItem(value: 0, child: Text(l10n?.evPowerAny ?? 'Any')),
+        DropdownMenuItem(value: 11, child: Text(l10n?.evPowerKw(11) ?? '11 kW+')),
+        DropdownMenuItem(value: 22, child: Text(l10n?.evPowerKw(22) ?? '22 kW+')),
+        DropdownMenuItem(value: 50, child: Text(l10n?.evPowerKw(50) ?? '50 kW+')),
+        DropdownMenuItem(value: 150, child: Text(l10n?.evPowerKw(150) ?? '150 kW+')),
+        DropdownMenuItem(value: 300, child: Text(l10n?.evPowerKw(300) ?? '300 kW+')),
       ],
       onChanged: (v) {
         if (v != null) onChanged(v);

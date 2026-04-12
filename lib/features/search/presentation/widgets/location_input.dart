@@ -170,7 +170,7 @@ class _LocationInputState extends ConsumerState<LocationInput> {
                       if (_controller.text.isNotEmpty)
                         IconButton(
                           icon: const Icon(Icons.clear, size: 18),
-                          tooltip: 'Clear search input',
+                          tooltip: AppLocalizations.of(context)?.tooltipClearSearch ?? 'Clear search input',
                           padding: const EdgeInsets.all(4),
                           constraints: const BoxConstraints(
                               minWidth: 32, minHeight: 32),
@@ -181,7 +181,7 @@ class _LocationInputState extends ConsumerState<LocationInput> {
                         ),
                       IconButton(
                         icon: const Icon(Icons.my_location, size: 18),
-                        tooltip: 'Use GPS location',
+                        tooltip: AppLocalizations.of(context)?.tooltipUseGps ?? 'Use GPS location',
                         padding: const EdgeInsets.all(4),
                         constraints: const BoxConstraints(
                             minWidth: 32, minHeight: 32),

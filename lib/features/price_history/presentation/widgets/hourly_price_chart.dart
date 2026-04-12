@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/price_prediction.dart';
 
 /// A vertical bar chart showing average price by hour of day (0-23).
@@ -17,9 +18,10 @@ class HourlyPriceChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (hourlyAverages.isEmpty) {
-      return const SizedBox(
+      final l = AppLocalizations.of(context);
+      return SizedBox(
         height: 140,
-        child: Center(child: Text('No hourly data')),
+        child: Center(child: Text(l?.noHourlyData ?? 'No hourly data')),
       );
     }
     return SizedBox(

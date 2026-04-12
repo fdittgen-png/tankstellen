@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/shimmer_placeholder.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Professional loading view with shimmer skeleton + pulsing fuel icon + reassuring text.
 ///
@@ -39,6 +40,7 @@ class _FavoritesLoadingViewState extends State<FavoritesLoadingView>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
 
     return Column(
       children: [
@@ -65,11 +67,11 @@ class _FavoritesLoadingViewState extends State<FavoritesLoadingView>
                       style: theme.textTheme.titleSmall!.copyWith(
                         color: theme.colorScheme.onSurface,
                       ),
-                      child: const Text('Updating your favorites...'),
+                      child: Text(l?.updatingFavorites ?? 'Updating your favorites...'),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Fetching the latest prices',
+                      l?.fetchingLatestPrices ?? 'Fetching the latest prices',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),

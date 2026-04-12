@@ -762,5 +762,25 @@
   "openOnlyFilter": "Nur geöffnete",
   "saveAsDefaults": "Als Standard speichern",
   "criteriaSavedToProfile": "Als Standard gespeichert",
-  "profileNotFound": "Kein aktives Profil"
+  "profileNotFound": "Kein aktives Profil",
+  "updatingFavorites": "Favoriten werden aktualisiert…",
+  "fetchingLatestPrices": "Neueste Preise werden geladen",
+  "noDataAvailable": "Keine Daten",
+  "configAndPrivacy": "Konfiguration & Datenschutz",
+  "searchToSeeMap": "Suchen Sie, um Tankstellen auf der Karte zu sehen",
+  "evPowerAny": "Alle",
+  "evPowerKw": "{kw} kW+",
+  "@evPowerKw": {
+    "placeholders": {
+      "kw": {
+        "type": "int"
+      }
+    }
+  },
+  "sectionProfile": "Profil",
+  "sectionLocation": "Standort",
+  "tooltipBack": "Zurück",
+  "tooltipClose": "Schließen",
+  "tooltipClearSearch": "Sucheingabe löschen",
+  "tooltipUseGps": "GPS-Standort verwenden"
 }

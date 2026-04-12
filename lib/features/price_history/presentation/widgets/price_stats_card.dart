@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/price_stats.dart';
 
 /// Displays aggregate price statistics (min, max, avg, current) with
@@ -20,9 +21,10 @@ class PriceStatsCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     if (stats.current == null && stats.min == null) {
-      return const Padding(
-        padding: EdgeInsets.all(16),
-        child: Text('No statistics available'),
+      final l = AppLocalizations.of(context);
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text(l?.noStatistics ?? 'No statistics available'),
       );
     }
 

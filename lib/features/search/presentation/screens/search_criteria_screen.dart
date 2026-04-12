@@ -140,7 +140,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
         title: Text(l10n?.searchCriteriaTitle ?? 'Search criteria'),
         leading: IconButton(
           icon: const Icon(Icons.close),
-          tooltip: 'Close',
+          tooltip: AppLocalizations.of(context)?.tooltipClose ?? 'Close',
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),

@@ -1719,4 +1719,46 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get profileNotFound => 'Kein aktives Profil';
+
+  @override
+  String get updatingFavorites => 'Favoriten werden aktualisiert…';
+
+  @override
+  String get fetchingLatestPrices => 'Neueste Preise werden geladen';
+
+  @override
+  String get noDataAvailable => 'Keine Daten';
+
+  @override
+  String get configAndPrivacy => 'Konfiguration & Datenschutz';
+
+  @override
+  String get searchToSeeMap =>
+      'Suchen Sie, um Tankstellen auf der Karte zu sehen';
+
+  @override
+  String get evPowerAny => 'Alle';
+
+  @override
+  String evPowerKw(int kw) {
+    return '$kw kW+';
+  }
+
+  @override
+  String get sectionProfile => 'Profil';
+
+  @override
+  String get sectionLocation => 'Standort';
+
+  @override
+  String get tooltipBack => 'Zurück';
+
+  @override
+  String get tooltipClose => 'Schließen';
+
+  @override
+  String get tooltipClearSearch => 'Sucheingabe löschen';
+
+  @override
+  String get tooltipUseGps => 'GPS-Standort verwenden';
 }

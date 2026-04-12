@@ -427,5 +427,25 @@
   "openOnlyFilter": "Ouvertes uniquement",
   "saveAsDefaults": "Enregistrer comme valeurs par défaut",
   "criteriaSavedToProfile": "Enregistré comme valeurs par défaut",
-  "profileNotFound": "Aucun profil actif"
+  "profileNotFound": "Aucun profil actif",
+  "updatingFavorites": "Mise à jour de vos favoris…",
+  "fetchingLatestPrices": "Récupération des derniers prix",
+  "noDataAvailable": "Pas de données",
+  "configAndPrivacy": "Configuration & Confidentialité",
+  "searchToSeeMap": "Recherchez pour voir les stations sur la carte",
+  "evPowerAny": "Tous",
+  "evPowerKw": "{kw} kW+",
+  "@evPowerKw": {
+    "placeholders": {
+      "kw": {
+        "type": "int"
+      }
+    }
+  },
+  "sectionProfile": "Profil",
+  "sectionLocation": "Localisation",
+  "tooltipBack": "Retour",
+  "tooltipClose": "Fermer",
+  "tooltipClearSearch": "Effacer la recherche",
+  "tooltipUseGps": "Utiliser la position GPS"
 }
