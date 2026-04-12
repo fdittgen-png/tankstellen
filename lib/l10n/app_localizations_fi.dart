@@ -1748,4 +1748,70 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get tooltipUseGps => 'Use GPS location';
+
+  @override
+  String get switchToEmail => 'Switch to email';
+
+  @override
+  String get switchToEmailSubtitle =>
+      'Keep data, add sign-in from other devices';
+
+  @override
+  String get switchToAnonymousAction => 'Switch to anonymous';
+
+  @override
+  String get switchToAnonymousSubtitle =>
+      'Keep local data, use new anonymous session';
+
+  @override
+  String get linkDevice => 'Link device';
+
+  @override
+  String get shareDatabase => 'Share database';
+
+  @override
+  String get disconnectAction => 'Disconnect';
+
+  @override
+  String get disconnectSubtitle => 'Stop syncing (local data kept)';
+
+  @override
+  String get deleteAccountAction => 'Delete account';
+
+  @override
+  String get deleteAccountSubtitle => 'Remove all server data permanently';
+
+  @override
+  String get localOnly => 'Local only';
+
+  @override
+  String get localOnlySubtitle =>
+      'Optional: sync favorites, alerts, and ratings across devices';
+
+  @override
+  String get setupCloudSync => 'Set up cloud sync';
+
+  @override
+  String get disconnectTitle => 'Disconnect TankSync?';
+
+  @override
+  String get disconnectBody =>
+      'Cloud sync will be disabled. Your local data (favorites, alerts, history) is preserved on this device. Server data is not deleted.';
+
+  @override
+  String get deleteAccountTitle => 'Delete account?';
+
+  @override
+  String get deleteAccountBody =>
+      'This permanently deletes all your data from the server (favorites, alerts, ratings, routes). Local data on this device is preserved.\n\nThis cannot be undone.';
+
+  @override
+  String get switchToAnonymousTitle => 'Switch to anonymous?';
+
+  @override
+  String get switchToAnonymousBody =>
+      'You will be signed out of your email account and continue with a new anonymous session.\n\nYour local data (favorites, alerts) is kept on this device and will be synced to the new anonymous account.';
+
+  @override
+  String get switchAction => 'Switch';
 }

@@ -26,7 +26,7 @@ class TankSyncSection extends ConsumerWidget {
         child: Column(
           children: syncConfig.isConfigured
               ? _buildConnected(context, ref, syncConfig, theme)
-              : _buildDisconnected(context),
+              : _buildDisconnected(context, AppLocalizations.of(context)),
         ),
       ),
     );
@@ -38,6 +38,7 @@ class TankSyncSection extends ConsumerWidget {
     SyncConfig syncConfig,
     ThemeData theme,
   ) {
+    final l = AppLocalizations.of(context);
     return [
       ListTile(
         leading: const Icon(Icons.cloud_done, color: Colors.green),
@@ -51,58 +52,58 @@ class TankSyncSection extends ConsumerWidget {
       if (!syncConfig.hasEmail)
         ListTile(
           leading: const Icon(Icons.email_outlined),
-          title: const Text('Switch to email'),
-          subtitle: const Text('Keep data, add sign-in from other devices'),
+          title: Text(l?.switchToEmail ?? 'Switch to email'),
+          subtitle: Text(l?.switchToEmailSubtitle ?? 'Keep data, add sign-in from other devices'),
           onTap: () => context.push('/auth'),
         )
       else
         ListTile(
           leading: const Icon(Icons.person_outline),
-          title: const Text('Switch to anonymous'),
-          subtitle: const Text('Keep local data, use new anonymous session'),
+          title: Text(l?.switchToAnonymousAction ?? 'Switch to anonymous'),
+          subtitle: Text(l?.switchToAnonymousSubtitle ?? 'Keep local data, use new anonymous session'),
           onTap: () => _confirmSwitchToAnonymous(context, ref),
         ),
       const Divider(indent: 16, endIndent: 16),
       ListTile(
         leading: const Icon(Icons.visibility_outlined),
-        title: const Text('View my data'),
+        title: Text(l?.viewMyData ?? 'View my data'),
         onTap: () => context.push('/data-transparency'),
       ),
       ListTile(
         leading: const Icon(Icons.link),
-        title: const Text('Link device'),
+        title: Text(l?.linkDevice ?? 'Link device'),
         onTap: () => context.push('/link-device'),
       ),
       if (syncConfig.mode != SyncMode.community)
         ListTile(
           leading: const Icon(Icons.qr_code),
-          title: const Text('Share database'),
+          title: Text(l?.shareDatabase ?? 'Share database'),
           onTap: () => _showQrShare(context),
         ),
       const Divider(indent: 16, endIndent: 16),
       ListTile(
         leading: const Icon(Icons.logout),
-        title: const Text('Disconnect'),
-        subtitle: const Text('Stop syncing (local data kept)'),
+        title: Text(l?.disconnectAction ?? 'Disconnect'),
+        subtitle: Text(l?.disconnectSubtitle ?? 'Stop syncing (local data kept)'),
         onTap: () => _confirmDisconnect(context, ref),
       ),
       if (syncConfig.mode != SyncMode.community)
         ListTile(
           leading: Icon(Icons.delete_forever, color: theme.colorScheme.error),
-          title: Text('Delete account',
+          title: Text(l?.deleteAccountAction ?? 'Delete account',
               style: TextStyle(color: theme.colorScheme.error)),
-          subtitle: const Text('Remove all server data permanently'),
+          subtitle: Text(l?.deleteAccountSubtitle ?? 'Remove all server data permanently'),
           onTap: () => _confirmDeleteAccount(context, ref),
         ),
     ];
   }
 
-  List<Widget> _buildDisconnected(BuildContext context) {
+  List<Widget> _buildDisconnected(BuildContext context, AppLocalizations? l) {
     return [
-      const ListTile(
-        leading: Icon(Icons.cloud_off),
-        title: Text('Local only'),
-        subtitle: Text(
+      ListTile(
+        leading: const Icon(Icons.cloud_off),
+        title: Text(l?.localOnly ?? 'Local only'),
+        subtitle: Text(l?.localOnlySubtitle ??
             'Optional: sync favorites, alerts, and ratings across devices'),
       ),
       Padding(
@@ -110,32 +111,32 @@ class TankSyncSection extends ConsumerWidget {
         child: FilledButton.icon(
           onPressed: () => context.push('/sync-setup'),
           icon: const Icon(Icons.cloud_upload),
-          label: const Text('Set up cloud sync'),
+          label: Text(l?.setupCloudSync ?? 'Set up cloud sync'),
         ),
       ),
     ];
   }
 
   Future<void> _confirmDisconnect(BuildContext context, WidgetRef ref) async {
+    final l = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         icon: Icon(Icons.warning_amber,
             color: Theme.of(ctx).colorScheme.error),
-        title: const Text('Disconnect TankSync?'),
-        content: const Text(
+        title: Text(l?.disconnectTitle ?? 'Disconnect TankSync?'),
+        content: Text(l?.disconnectBody ??
           'Cloud sync will be disabled. Your local data (favorites, alerts, history) '
-          'is preserved on this device. Server data is not deleted.',
-        ),
+          'is preserved on this device. Server data is not deleted.'),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+              child: Text(l?.cancel ?? 'Cancel')),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: Theme.of(ctx).colorScheme.error),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Disconnect'),
+            child: Text(l?.disconnectAction ?? 'Disconnect'),
           ),
         ],
       ),
@@ -147,27 +148,27 @@ class TankSyncSection extends ConsumerWidget {
 
   Future<void> _confirmDeleteAccount(
       BuildContext context, WidgetRef ref) async {
+    final l = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         icon: Icon(Icons.warning_amber,
             color: Theme.of(ctx).colorScheme.error, size: 48),
-        title: const Text('Delete account?'),
-        content: const Text(
+        title: Text(l?.deleteAccountTitle ?? 'Delete account?'),
+        content: Text(l?.deleteAccountBody ??
           'This permanently deletes all your data from the server '
           '(favorites, alerts, ratings, routes). '
           'Local data on this device is preserved.\n\n'
-          'This cannot be undone.',
-        ),
+          'This cannot be undone.'),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+              child: Text(l?.cancel ?? 'Cancel')),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: Theme.of(ctx).colorScheme.error),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete everything'),
+            child: Text(l?.deleteEverything ?? 'Delete everything'),
           ),
         ],
       ),
@@ -182,25 +183,25 @@ class TankSyncSection extends ConsumerWidget {
 
   Future<void> _confirmSwitchToAnonymous(
       BuildContext context, WidgetRef ref) async {
+    final l = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         icon: const Icon(Icons.swap_horiz, size: 48),
-        title: const Text('Switch to anonymous?'),
-        content: const Text(
+        title: Text(l?.switchToAnonymousTitle ?? 'Switch to anonymous?'),
+        content: Text(l?.switchToAnonymousBody ??
           'You will be signed out of your email account and continue '
           'with a new anonymous session.\n\n'
           'Your local data (favorites, alerts) is kept on this device '
-          'and will be synced to the new anonymous account.',
-        ),
+          'and will be synced to the new anonymous account.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(l?.cancel ?? 'Cancel'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Switch'),
+            child: Text(l?.switchAction ?? 'Switch'),
           ),
         ],
       ),
@@ -233,7 +234,7 @@ class TankSyncSection extends ConsumerWidget {
               const SizedBox(height: 8),
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('Close'),
+                child: Text(AppLocalizations.of(ctx)?.close ?? 'Close'),
               ),
             ],
           ),

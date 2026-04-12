@@ -1755,4 +1755,72 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tooltipUseGps => 'Utiliser la position GPS';
+
+  @override
+  String get switchToEmail => 'Passer à l\'e-mail';
+
+  @override
+  String get switchToEmailSubtitle =>
+      'Conserver les données, se connecter depuis d\'autres appareils';
+
+  @override
+  String get switchToAnonymousAction => 'Passer en anonyme';
+
+  @override
+  String get switchToAnonymousSubtitle =>
+      'Conserver les données locales, nouvelle session anonyme';
+
+  @override
+  String get linkDevice => 'Lier un appareil';
+
+  @override
+  String get shareDatabase => 'Partager la base de données';
+
+  @override
+  String get disconnectAction => 'Déconnecter';
+
+  @override
+  String get disconnectSubtitle =>
+      'Arrêter la synchronisation (données locales conservées)';
+
+  @override
+  String get deleteAccountAction => 'Supprimer le compte';
+
+  @override
+  String get deleteAccountSubtitle =>
+      'Supprimer définitivement toutes les données serveur';
+
+  @override
+  String get localOnly => 'Local uniquement';
+
+  @override
+  String get localOnlySubtitle =>
+      'Optionnel : synchroniser favoris, alertes et notes entre appareils';
+
+  @override
+  String get setupCloudSync => 'Configurer la synchronisation cloud';
+
+  @override
+  String get disconnectTitle => 'Déconnecter TankSync ?';
+
+  @override
+  String get disconnectBody =>
+      'La synchronisation cloud sera désactivée. Vos données locales (favoris, alertes, historique) sont conservées sur cet appareil. Les données serveur ne sont pas supprimées.';
+
+  @override
+  String get deleteAccountTitle => 'Supprimer le compte ?';
+
+  @override
+  String get deleteAccountBody =>
+      'Toutes vos données seront définitivement supprimées du serveur (favoris, alertes, notes, itinéraires). Les données locales sur cet appareil sont conservées.\n\nCette action est irréversible.';
+
+  @override
+  String get switchToAnonymousTitle => 'Passer en anonyme ?';
+
+  @override
+  String get switchToAnonymousBody =>
+      'Vous serez déconnecté de votre compte e-mail et continuerez avec une nouvelle session anonyme.\n\nVos données locales (favoris, alertes) restent sur cet appareil et seront synchronisées avec le nouveau compte anonyme.';
+
+  @override
+  String get switchAction => 'Changer';
 }
