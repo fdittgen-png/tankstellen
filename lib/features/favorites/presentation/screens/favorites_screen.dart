@@ -13,8 +13,11 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/presentation/widgets/station_card.dart';
 import '../../../profile/providers/profile_provider.dart';
+import '../../../ev/domain/entities/charging_station.dart';
+import '../../providers/ev_favorites_provider.dart';
 import '../../providers/favorites_provider.dart';
 import '../widgets/alerts_tab.dart';
+import '../widgets/ev_favorite_card.dart';
 import '../widgets/favorites_loading_view.dart';
 import '../widgets/swipe_tutorial_banner.dart';
 
@@ -96,7 +99,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     List<String> favoriteIds,
     AsyncValue<ServiceResult<List<Station>>> stationsState,
   ) {
-    if (favoriteIds.isEmpty) {
+    final evStations = ref.watch(evFavoriteStationsProvider);
+    final hasEvFavorites = evStations.isNotEmpty;
+
+    if (favoriteIds.isEmpty && !hasEvFavorites) {
       return Semantics(
         label:
             'No favorites yet. Tap the star on a station to save it as a favorite.',
@@ -112,9 +118,14 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
       );
     }
 
+    // If only EV favorites (no fuel), show them directly
+    if (favoriteIds.isEmpty && hasEvFavorites) {
+      return _buildEvFavoritesSection(context, l10n, evStations);
+    }
+
     return stationsState.when(
       data: (result) {
-        if (result.data.isEmpty) {
+        if (result.data.isEmpty && !hasEvFavorites) {
           return const FavoritesLoadingView();
         }
         return RefreshIndicator(
@@ -123,100 +134,120 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           },
           child: Column(
             children: [
-              ServiceStatusBanner(result: result),
+              if (result.data.isNotEmpty)
+                ServiceStatusBanner(result: result),
               const SwipeTutorialBanner(),
               Expanded(
-                child: ListView.builder(
-                  itemCount: result.data.length,
-                  itemBuilder: (context, index) {
-                    final station = result.data[index];
-                    final label = station.displayName;
-                    // Swipe right -> navigate, swipe left -> remove favorite
-                    return Dismissible(
-                      key: ValueKey('fav-${station.id}'),
-                      confirmDismiss: (direction) async {
-                        if (direction == DismissDirection.startToEnd) {
-                          _openStationInMaps(station.lat, station.lng, label);
-                          return false;
-                        } else {
-                          // Remove favorite
-                          ref
-                              .read(favoritesProvider.notifier)
-                              .remove(station.id);
-                          final l10nSnack = AppLocalizations.of(context);
-                          SnackBarHelper.showWithUndo(
-                            context,
-                            l10nSnack?.removedFromFavoritesName(label) ??
-                                '$label removed from favorites',
-                            undoLabel: l10nSnack?.undo ?? 'Undo',
-                            onUndo: () => ref
+                child: ListView(
+                  children: [
+                    // EV favorites section
+                    if (hasEvFavorites) ...[
+                      _buildEvSectionHeader(context),
+                      ...evStations.map((ev) => EvFavoriteCard(
+                            key: ValueKey('ev-${ev.id}'),
+                            station: ev,
+                            onTap: () => context.push('/ev-station', extra: ev),
+                            onFavoriteTap: () {
+                              ref.read(evFavoritesProvider.notifier).remove(ev.id);
+                              SnackBarHelper.show(
+                                context,
+                                l10n?.removedFromFavorites ?? 'Removed from favorites',
+                              );
+                            },
+                          )),
+                      if (result.data.isNotEmpty)
+                        _buildFuelSectionHeader(context),
+                    ],
+                    // Fuel favorites
+                    ...result.data.map((station) {
+                      final label = station.displayName;
+                      return Dismissible(
+                        key: ValueKey('fav-${station.id}'),
+                        confirmDismiss: (direction) async {
+                          if (direction == DismissDirection.startToEnd) {
+                            _openStationInMaps(station.lat, station.lng, label);
+                            return false;
+                          } else {
+                            ref
                                 .read(favoritesProvider.notifier)
-                                .add(station.id, stationData: station),
-                          );
-                          return true;
-                        }
-                      },
-                      background: Semantics(
-                        label: 'Navigate to $label',
-                        child: Container(
-                          alignment: Alignment.centerLeft,
-                          padding: const EdgeInsets.only(left: 24),
-                          color: Theme.of(context).colorScheme.primary,
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.navigation,
-                                  color: Colors.white, size: 20),
-                              SizedBox(width: 8),
-                              Text('Navigate',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                        ),
-                      ),
-                      secondaryBackground: Semantics(
-                        label: 'Remove $label from favorites',
-                        child: Container(
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.only(right: 24),
-                          color: Colors.red,
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('Remove',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold)),
-                              SizedBox(width: 8),
-                              Icon(Icons.delete, color: Colors.white, size: 20),
-                            ],
-                          ),
-                        ),
-                      ),
-                      child: StationCard(
-                        key: ValueKey(station.id),
-                        station: station,
-                        selectedFuelType: FuelType.all,
-                        isFavorite: true,
-                        profileFuelType: ref.watch(activeProfileProvider)?.preferredFuelType,
-                        onTap: () => context.push('/station/${station.id}'),
-                        onFavoriteTap: () {
-                          ref
-                              .read(favoritesProvider.notifier)
-                              .remove(station.id);
+                                .remove(station.id);
+                            final l10nSnack = AppLocalizations.of(context);
+                            SnackBarHelper.showWithUndo(
+                              context,
+                              l10nSnack?.removedFromFavoritesName(label) ??
+                                  '$label removed from favorites',
+                              undoLabel: l10nSnack?.undo ?? 'Undo',
+                              onUndo: () => ref
+                                  .read(favoritesProvider.notifier)
+                                  .add(station.id, stationData: station),
+                            );
+                            return true;
+                          }
                         },
-                      ),
-                    );
-                  },
+                        background: Semantics(
+                          label: 'Navigate to $label',
+                          child: Container(
+                            alignment: Alignment.centerLeft,
+                            padding: const EdgeInsets.only(left: 24),
+                            color: Theme.of(context).colorScheme.primary,
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.navigation,
+                                    color: Colors.white, size: 20),
+                                SizedBox(width: 8),
+                                Text('Navigate',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                        ),
+                        secondaryBackground: Semantics(
+                          label: 'Remove $label from favorites',
+                          child: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 24),
+                            color: Colors.red,
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('Remove',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold)),
+                                SizedBox(width: 8),
+                                Icon(Icons.delete, color: Colors.white, size: 20),
+                              ],
+                            ),
+                          ),
+                        ),
+                        child: StationCard(
+                          key: ValueKey(station.id),
+                          station: station,
+                          selectedFuelType: FuelType.all,
+                          isFavorite: true,
+                          profileFuelType: ref.watch(activeProfileProvider)?.preferredFuelType,
+                          onTap: () => context.push('/station/${station.id}'),
+                          onFavoriteTap: () {
+                            ref
+                                .read(favoritesProvider.notifier)
+                                .remove(station.id);
+                          },
+                        ),
+                      );
+                    }),
+                  ],
                 ),
               ),
             ],
           ),
         );
       },
-      loading: () => const FavoritesLoadingView(),
+      loading: () => hasEvFavorites
+          ? _buildEvFavoritesSection(context, l10n, evStations)
+          : const FavoritesLoadingView(),
       error: (error, _) => Semantics(
         label: 'Error loading favorites: ${error.toString()}',
         child: Center(
@@ -237,6 +268,58 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildEvSectionHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Row(
+        children: [
+          Icon(Icons.ev_station, size: 16,
+              color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 8),
+          Text('EV Charging', style: Theme.of(context).textTheme.titleSmall),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFuelSectionHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      child: Row(
+        children: [
+          Icon(Icons.local_gas_station, size: 16,
+              color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 8),
+          Text('Fuel Stations', style: Theme.of(context).textTheme.titleSmall),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEvFavoritesSection(
+    BuildContext context,
+    AppLocalizations? l10n,
+    List<ChargingStation> evStations,
+  ) {
+    return ListView(
+      children: [
+        _buildEvSectionHeader(context),
+        ...evStations.map((ev) => EvFavoriteCard(
+              key: ValueKey('ev-${ev.id}'),
+              station: ev,
+              onTap: () => context.push('/ev-station', extra: ev),
+              onFavoriteTap: () {
+                ref.read(evFavoritesProvider.notifier).remove(ev.id);
+                SnackBarHelper.show(
+                  context,
+                  l10n?.removedFromFavorites ?? 'Removed from favorites',
+                );
+              },
+            )),
+      ],
     );
   }
 }

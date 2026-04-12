@@ -248,6 +248,19 @@ class _InMemoryStorageRepository implements StorageRepository {
   @override Map<String, dynamic> getAllFavoriteStationData() => Map.from(_favoriteData);
   @override Future<void> removeFavoriteStationData(String id) async => _favoriteData.remove(id);
 
+  // EvFavoriteStorage
+  final _evFavorites = <String>[];
+  final _evFavoriteData = <String, Map<String, dynamic>>{};
+  @override List<String> getEvFavoriteIds() => List.from(_evFavorites);
+  @override Future<void> setEvFavoriteIds(List<String> ids) async { _evFavorites..clear()..addAll(ids); }
+  @override Future<void> addEvFavorite(String id) async { if (!_evFavorites.contains(id)) _evFavorites.add(id); }
+  @override Future<void> removeEvFavorite(String id) async => _evFavorites.remove(id);
+  @override bool isEvFavorite(String id) => _evFavorites.contains(id);
+  @override int get evFavoriteCount => _evFavorites.length;
+  @override Future<void> saveEvFavoriteStationData(String id, Map<String, dynamic> data) async => _evFavoriteData[id] = data;
+  @override Map<String, dynamic>? getEvFavoriteStationData(String id) => _evFavoriteData[id];
+  @override Future<void> removeEvFavoriteStationData(String id) async => _evFavoriteData.remove(id);
+
   // IgnoredStorage
   @override List<String> getIgnoredIds() => List.from(_ignored);
   @override Future<void> setIgnoredIds(List<String> ids) async { _ignored..clear()..addAll(ids); }

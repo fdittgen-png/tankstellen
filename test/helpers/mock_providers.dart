@@ -1,3 +1,4 @@
+import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
@@ -16,6 +17,9 @@ import '../mocks/mocks.dart';
 /// Returns both the override and the mock so callers can configure stubs.
 ({Object override, MockStorageRepository mock}) mockStorageRepositoryOverride() {
   final mock = MockStorageRepository();
+  // Default stubs for EV favorites (avoid null returns from Mock)
+  when(() => mock.getEvFavoriteIds()).thenReturn([]);
+  when(() => mock.getEvFavoriteStationData(any())).thenReturn(null);
   return (
     override: storageRepositoryProvider.overrideWithValue(mock),
     mock: mock,
