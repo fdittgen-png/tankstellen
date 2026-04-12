@@ -3372,6 +3372,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use GPS location'**
   String get tooltipUseGps;
+
+  /// No description provided for @switchToEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to email'**
+  String get switchToEmail;
+
+  /// No description provided for @switchToEmailSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep data, add sign-in from other devices'**
+  String get switchToEmailSubtitle;
+
+  /// No description provided for @switchToAnonymousAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to anonymous'**
+  String get switchToAnonymousAction;
+
+  /// No description provided for @switchToAnonymousSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep local data, use new anonymous session'**
+  String get switchToAnonymousSubtitle;
+
+  /// No description provided for @linkDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Link device'**
+  String get linkDevice;
+
+  /// No description provided for @shareDatabase.
+  ///
+  /// In en, this message translates to:
+  /// **'Share database'**
+  String get shareDatabase;
+
+  /// No description provided for @disconnectAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get disconnectAction;
+
+  /// No description provided for @disconnectSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop syncing (local data kept)'**
+  String get disconnectSubtitle;
+
+  /// No description provided for @deleteAccountAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get deleteAccountAction;
+
+  /// No description provided for @deleteAccountSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove all server data permanently'**
+  String get deleteAccountSubtitle;
+
+  /// No description provided for @localOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Local only'**
+  String get localOnly;
+
+  /// No description provided for @localOnlySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional: sync favorites, alerts, and ratings across devices'**
+  String get localOnlySubtitle;
+
+  /// No description provided for @setupCloudSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up cloud sync'**
+  String get setupCloudSync;
+
+  /// No description provided for @disconnectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect TankSync?'**
+  String get disconnectTitle;
+
+  /// No description provided for @disconnectBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync will be disabled. Your local data (favorites, alerts, history) is preserved on this device. Server data is not deleted.'**
+  String get disconnectBody;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account?'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes all your data from the server (favorites, alerts, ratings, routes). Local data on this device is preserved.\n\nThis cannot be undone.'**
+  String get deleteAccountBody;
+
+  /// No description provided for @switchToAnonymousTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to anonymous?'**
+  String get switchToAnonymousTitle;
+
+  /// No description provided for @switchToAnonymousBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You will be signed out of your email account and continue with a new anonymous session.\n\nYour local data (favorites, alerts) is kept on this device and will be synced to the new anonymous account.'**
+  String get switchToAnonymousBody;
+
+  /// No description provided for @switchAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch'**
+  String get switchAction;
 }
 
 class _AppLocalizationsDelegate

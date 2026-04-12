@@ -1761,4 +1761,71 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tooltipUseGps => 'GPS-Standort verwenden';
+
+  @override
+  String get switchToEmail => 'Zu E-Mail wechseln';
+
+  @override
+  String get switchToEmailSubtitle =>
+      'Daten behalten, Anmeldung von anderen Geräten';
+
+  @override
+  String get switchToAnonymousAction => 'Zu anonym wechseln';
+
+  @override
+  String get switchToAnonymousSubtitle =>
+      'Lokale Daten behalten, neue anonyme Sitzung';
+
+  @override
+  String get linkDevice => 'Gerät verknüpfen';
+
+  @override
+  String get shareDatabase => 'Datenbank teilen';
+
+  @override
+  String get disconnectAction => 'Trennen';
+
+  @override
+  String get disconnectSubtitle =>
+      'Synchronisierung stoppen (lokale Daten bleiben)';
+
+  @override
+  String get deleteAccountAction => 'Konto löschen';
+
+  @override
+  String get deleteAccountSubtitle => 'Alle Serverdaten dauerhaft entfernen';
+
+  @override
+  String get localOnly => 'Nur lokal';
+
+  @override
+  String get localOnlySubtitle =>
+      'Optional: Favoriten, Alarme und Bewertungen geräteübergreifend synchronisieren';
+
+  @override
+  String get setupCloudSync => 'Cloud-Sync einrichten';
+
+  @override
+  String get disconnectTitle => 'TankSync trennen?';
+
+  @override
+  String get disconnectBody =>
+      'Cloud-Synchronisierung wird deaktiviert. Ihre lokalen Daten (Favoriten, Alarme, Verlauf) bleiben auf diesem Gerät erhalten. Serverdaten werden nicht gelöscht.';
+
+  @override
+  String get deleteAccountTitle => 'Konto löschen?';
+
+  @override
+  String get deleteAccountBody =>
+      'Alle Ihre Daten werden dauerhaft vom Server gelöscht (Favoriten, Alarme, Bewertungen, Routen). Lokale Daten auf diesem Gerät bleiben erhalten.\n\nDies kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get switchToAnonymousTitle => 'Zu anonym wechseln?';
+
+  @override
+  String get switchToAnonymousBody =>
+      'Sie werden von Ihrem E-Mail-Konto abgemeldet und mit einer neuen anonymen Sitzung fortfahren.\n\nIhre lokalen Daten (Favoriten, Alarme) bleiben auf diesem Gerät und werden mit dem neuen anonymen Konto synchronisiert.';
+
+  @override
+  String get switchAction => 'Wechseln';
 }
