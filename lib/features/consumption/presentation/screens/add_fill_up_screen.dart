@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
+import '../../data/obd2/obd2_service.dart';
+import '../../data/obd2/obd2_transport.dart';
 import '../../data/receipt_scan_service.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
@@ -31,6 +33,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   DateTime _date = DateTime.now();
   FuelType _fuelType = FuelType.e10;
   bool _scanning = false;
+  bool _obdReading = false;
   ReceiptScanService? _scanService;
 
   @override
@@ -80,6 +83,45 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     }
   }
 
+  Future<void> _readObd() async {
+    setState(() => _obdReading = true);
+    try {
+      // TODO: Replace FakeObd2Transport with BluetoothObd2Transport
+      // when flutter_blue_plus is integrated and tested on real hardware.
+      final transport = FakeObd2Transport({
+        'ATZ': 'ELM327 v1.5>',
+        'ATE0': 'OK>',
+        'ATL0': 'OK>',
+        'ATH0': 'OK>',
+        'ATSP0': 'OK>',
+        '01A6': 'NO DATA>',
+        '0131': '41 31 4E 20>',
+      });
+      final service = Obd2Service(transport);
+      final connected = await service.connect();
+      if (!connected || !mounted) return;
+
+      final km = await service.readOdometerKm();
+      await service.disconnect();
+
+      if (km != null && mounted) {
+        setState(() {
+          _odoCtrl.text = km.round().toString();
+        });
+        SnackBarHelper.showSuccess(context,
+            'Odometer read: ${km.round()} km');
+      } else if (mounted) {
+        SnackBarHelper.show(context, 'Could not read odometer');
+      }
+    } catch (e) {
+      if (mounted) {
+        SnackBarHelper.showError(context, 'OBD-II error: $e');
+      }
+    } finally {
+      if (mounted) setState(() => _obdReading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -99,17 +141,37 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Scan receipt button
-            OutlinedButton.icon(
-              onPressed: _scanning ? null : _scanReceipt,
-              icon: _scanning
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.document_scanner),
-              label: Text(l?.scanReceipt ?? 'Scan receipt'),
+            // Scan receipt + OBD buttons
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _scanning ? null : _scanReceipt,
+                    icon: _scanning
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.document_scanner),
+                    label: Text(l?.scanReceipt ?? 'Scan receipt'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _obdReading ? null : _readObd,
+                    icon: _obdReading
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.bluetooth),
+                    label: Text(l?.obdConnect ?? 'OBD-II'),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             if (widget.stationName != null) ...[

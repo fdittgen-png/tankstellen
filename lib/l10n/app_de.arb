@@ -812,5 +812,6 @@
   "onboardingPrivacy": "Diese Einstellungen werden nur auf Ihrem Gerät gespeichert und niemals geteilt.",
   "onboardingLandingTitle": "Startbildschirm",
   "onboardingLandingHint": "Wählen Sie, welcher Bildschirm beim Start der App angezeigt wird.",
-  "scanReceipt": "Beleg scannen"
+  "scanReceipt": "Beleg scannen",
+  "obdConnect": "OBD-II"
 }
