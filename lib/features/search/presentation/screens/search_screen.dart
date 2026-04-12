@@ -28,9 +28,11 @@ import '../../domain/entities/search_mode.dart';
 import '../../domain/entities/search_result_item.dart';
 import '../../domain/entities/station.dart';
 import '../../domain/entities/station_type_filter.dart';
+import '../../providers/selected_station_provider.dart';
 import '../../providers/station_type_filter_provider.dart';
 import '../widgets/ev_station_card.dart';
 import '../widgets/station_type_toggle.dart';
+import '../../../station_detail/presentation/widgets/station_detail_inline.dart';
 import '../../../profile/domain/entities/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../widgets/nearest_shortcut_card.dart';
@@ -164,14 +166,27 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         toolbarHeight: isLandscape ? 40 : null,
       ),
       body: isWide
-          ? Row(
-              children: [
-                Expanded(child: _buildSearchContent(context)),
-                const VerticalDivider(width: 1),
-                const Expanded(child: InlineMap()),
-              ],
-            )
+          ? _buildWideLayout(context)
           : _buildSearchContent(context),
+    );
+  }
+
+  Widget _buildWideLayout(BuildContext context) {
+    final selectedId = ref.watch(selectedStationProvider);
+
+    return Row(
+      children: [
+        Expanded(child: _buildSearchContent(context)),
+        const VerticalDivider(width: 1),
+        Expanded(
+          child: selectedId != null
+              ? StationDetailInline(
+                  stationId: selectedId,
+                  onClose: () => ref.read(selectedStationProvider.notifier).clear(),
+                )
+              : const InlineMap(),
+        ),
+      ],
     );
   }
 
