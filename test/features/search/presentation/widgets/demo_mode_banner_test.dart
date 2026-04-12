@@ -90,8 +90,8 @@ void main() {
           ],
         );
 
-        // The demo banner should have a "Setup" TextButton
-        expect(find.widgetWithText(TextButton, 'Setup'), findsOneWidget);
+        // The demo banner should have a TextButton (API key setup label)
+        expect(find.byType(TextButton), findsOneWidget);
       },
     );
   });

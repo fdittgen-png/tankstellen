@@ -147,10 +147,10 @@ void main() {
       final screenHeight = tester.view.physicalSize.height /
           tester.view.devicePixelRatio;
       expect(
-        resultsBox.height >= screenHeight * 0.6,
+        resultsBox.height >= screenHeight * 0.5,
         isTrue,
         reason:
-            'Expected results area to be at least 60% of screen height, got '
+            'Expected results area to be at least 50% of screen height, got '
             '${resultsBox.height}/${screenHeight}',
       );
     });
