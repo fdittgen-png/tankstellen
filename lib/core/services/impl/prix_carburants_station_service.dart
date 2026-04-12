@@ -350,6 +350,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
 
     const brandMap = {
       'TOTALENERGIES': 'TotalEnergies',
+      'TOTAL ACCESS': 'TotalEnergies',
       'TOTAL ': 'Total',
       'LECLERC': 'E.Leclerc',
       'CARREFOUR': 'Carrefour',
@@ -359,7 +360,10 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
       'SUPER U': 'Super U',
       'SYSTEME U': 'Système U',
       'SYSTÈME U': 'Système U',
+      'U EXPRESS': 'Système U',
+      'HYPER U': 'Système U',
       'CASINO': 'Casino',
+      'GEANT CASINO': 'Casino',
       'BP ': 'BP',
       'SHELL': 'Shell',
       'ESSO': 'Esso',
@@ -367,6 +371,15 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
       'VITO': 'Vito',
       'NETTO': 'Netto',
       'DYNEFF': 'Dyneff',
+      'ENI': 'ENI',
+      'AGIP': 'ENI',
+      'Q8 ': 'Q8',
+      'TAMOIL': 'Tamoil',
+      'JET ': 'JET',
+      'LUKOIL': 'Lukoil',
+      'REPSOL': 'Repsol',
+      'CEPSA': 'Cepsa',
+      'GALP': 'Galp',
     };
 
     for (final entry in brandMap.entries) {
