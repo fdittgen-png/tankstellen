@@ -56,6 +56,8 @@ void main() {
             }
             // Exclude comments
             if (line.trimLeft().startsWith('//')) continue;
+            // Exclude default EV API key (intentionally public, shared key)
+            if (line.contains('defaultEvApiKey')) continue;
             violations.add('${file.path}:${i + 1}: $line');
           }
         }

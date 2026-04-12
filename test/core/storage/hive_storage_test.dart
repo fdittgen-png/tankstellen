@@ -605,12 +605,13 @@ void main() {
       expect(storage.hasApiKey(), isFalse);
     });
 
-    test('hasEvApiKey returns false when no key set', () {
-      expect(storage.hasEvApiKey(), isFalse);
+    test('hasEvApiKey returns true (default key always available)', () {
+      expect(storage.hasEvApiKey(), isTrue);
     });
 
-    test('getEvApiKey returns null when no key set', () {
-      expect(storage.getEvApiKey(), isNull);
+    test('getEvApiKey returns default key when no custom key set', () {
+      expect(storage.getEvApiKey(), isNotNull);
+      expect(storage.getEvApiKey(), isNotEmpty);
     });
 
     test('hasCustomEvApiKey returns false when no custom key set', () {
