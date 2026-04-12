@@ -24,14 +24,12 @@ import '../../providers/search_mode_provider.dart';
 import '../../providers/ev_search_provider.dart';
 import '../../../../core/location/location_service.dart';
 import '../../../../core/services/service_result.dart';
+import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_mode.dart';
 import '../../domain/entities/search_result_item.dart';
 import '../../domain/entities/station.dart';
-import '../../domain/entities/station_type_filter.dart';
 import '../../providers/selected_station_provider.dart';
-import '../../providers/station_type_filter_provider.dart';
 import '../widgets/ev_station_card.dart';
-import '../widgets/station_type_toggle.dart';
 import '../../../station_detail/presentation/widgets/station_detail_inline.dart';
 import '../../../profile/domain/entities/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
@@ -111,8 +109,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       await LocationConsentDialog.recordConsent(settings);
     }
 
-    final stationType = ref.read(activeStationTypeFilterProvider);
-    if (stationType == StationTypeFilter.ev) {
+    if (fuelType == FuelType.electric) {
       try {
         final locationService = ref.read(locationServiceProvider);
         final position = await locationService.getCurrentPosition();
@@ -198,8 +195,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return Column(
       children: [
         DemoModeBanner(country: country),
-        // Gas / EV mode toggle
-        const StationTypeToggle(),
         // Compact summary bar — top-level entry point for editing criteria.
         const SearchSummaryBar(),
         UserPositionBar(
@@ -241,7 +236,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     AsyncValue<ServiceResult<List<Station>>> searchState,
   ) {
     final searchMode = ref.watch(activeSearchModeProvider);
-    final stationType = ref.watch(activeStationTypeFilterProvider);
+    final fuelType = ref.watch(selectedFuelTypeProvider);
 
     // Route mode — RouteResultsView returns slivers, wrap in CustomScrollView
     if (searchMode == SearchMode.route) {
@@ -250,8 +245,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       );
     }
 
-    // EV mode
-    if (stationType == StationTypeFilter.ev) {
+    // EV mode (when Electric fuel type is selected)
+    if (fuelType == FuelType.electric) {
       final evState = ref.watch(eVSearchStateProvider);
       return evState.when(
         data: (result) {
