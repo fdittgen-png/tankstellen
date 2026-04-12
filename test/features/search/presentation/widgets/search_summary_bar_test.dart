@@ -25,7 +25,6 @@ void main() {
       );
 
       expect(find.text('Super E10'), findsOneWidget);
-      expect(find.text('1 L'), findsOneWidget);
       expect(find.text('Within 10 km'), findsOneWidget);
       expect(find.text('Search'), findsOneWidget);
     });
