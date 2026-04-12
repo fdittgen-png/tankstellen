@@ -108,8 +108,16 @@ GoRouter router(Ref ref) {
           final landing = profile?['landingScreen']?.toString();
           // json_serializable stores enum as name: "map", "favorites", etc.
           // Also handle legacy format "LandingScreen.map"
-          if (landing == 'favorites' || landing == 'LandingScreen.favorites') return '/favorites';
-          // 'cheapest' and 'map' both go to search — cheapest triggers auto-search there
+          switch (landing) {
+            case 'favorites':
+            case 'LandingScreen.favorites':
+              return '/favorites';
+            case 'map':
+            case 'LandingScreen.map':
+              return '/map';
+            // 'cheapest', 'nearest', 'search' all go to search screen
+            // (cheapest/nearest trigger auto-search via SearchScreen.initState)
+          }
         }
         return '/';
       }
