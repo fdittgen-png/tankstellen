@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
@@ -212,6 +214,28 @@ class StationMapLayers extends StatelessWidget {
     if (radiusKm <= 15) return 11;
     if (radiusKm <= 25) return 10;
     return 9;
+  }
+
+  /// Compute the [LatLngBounds] of a circle of [radiusKm] around [center].
+  ///
+  /// Uses a flat-earth approximation that is accurate enough for the
+  /// search radii we deal with (< 100 km). 1 degree latitude is ~111 km;
+  /// the longitude degree shrinks with the cosine of the latitude.
+  static LatLngBounds boundsForRadius(LatLng center, double radiusKm) {
+    const double kmPerLatDegree = 111.0;
+    final double latDelta = radiusKm / kmPerLatDegree;
+    final double cosLat = math.cos(center.latitude * math.pi / 180.0).abs();
+    // Guard against the poles where cos(lat) approaches zero.
+    final double safeCos = cosLat < 0.01 ? 0.01 : cosLat;
+    final double lngDelta = radiusKm / (kmPerLatDegree * safeCos);
+    final double south = (center.latitude - latDelta).clamp(-90.0, 90.0);
+    final double north = (center.latitude + latDelta).clamp(-90.0, 90.0);
+    final double west = (center.longitude - lngDelta).clamp(-180.0, 180.0);
+    final double east = (center.longitude + lngDelta).clamp(-180.0, 180.0);
+    return LatLngBounds(
+      LatLng(south, west),
+      LatLng(north, east),
+    );
   }
 
   /// Calculate center point from a list of stations.

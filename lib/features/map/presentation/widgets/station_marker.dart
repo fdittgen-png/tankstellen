@@ -8,18 +8,25 @@ import '../../../../core/utils/station_extensions.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 
-/// Maximum characters for the brand label before truncation.
+/// Compact marker dimensions — small enough to fit dozens on screen
+/// while keeping the price legible.
+const double kStationMarkerWidth = 50;
+const double kStationMarkerHeight = 24;
+
+/// Maximum characters for the brand label before truncation (used in
+/// the tap-to-reveal tooltip).
 const _maxBrandLength = 14;
 
 /// Utility class for building station markers on the map.
 class StationMarkerBuilder {
   StationMarkerBuilder._();
 
-  /// Build a [Marker] for a station, colored by relative price.
+  /// Build a compact [Marker] for a station, colored by relative price.
   ///
-  /// The marker shows the brand name prominently on top and the price
-  /// in large bold text below, inside a color-coded rounded badge
-  /// (green = cheap, orange = mid, red = expensive).
+  /// The marker shows only the price in bold inside a color-coded rounded
+  /// badge (green = cheap, orange = mid, red = expensive). Tapping opens
+  /// the station detail page; long-press reveals the brand name as a
+  /// tooltip.
   ///
   /// When [pastel] is true, the marker uses muted/pastel colors for
   /// non-selected stations so that selected ones stand out.
@@ -38,56 +45,49 @@ class StationMarkerBuilder {
 
     return Marker(
       point: LatLng(station.lat, station.lng),
-      width: 90,
-      height: 48,
+      width: kStationMarkerWidth,
+      height: kStationMarkerHeight,
       child: GestureDetector(
         onTap: () => GoRouter.of(context).push('/station/${station.id}'),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: pastel ? 0.5 : 0.92),
-            borderRadius: BorderRadius.circular(8),
-            border: pastel
-                ? null
-                : Border.all(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    width: 1,
-                  ),
-            boxShadow: pastel
-                ? null
-                : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.25),
-                      blurRadius: 4,
-                      offset: const Offset(0, 1),
+        child: Tooltip(
+          message: brand,
+          waitDuration: const Duration(milliseconds: 300),
+          child: Container(
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: pastel ? 0.5 : 0.92),
+              borderRadius: BorderRadius.circular(6),
+              border: pastel
+                  ? null
+                  : Border.all(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      width: 1,
                     ),
-                  ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                brand,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 9,
-                  color: pastel ? Colors.black26 : Colors.black87,
-                  letterSpacing: 0.2,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-              Text(
+              boxShadow: pastel
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.25),
+                        blurRadius: 3,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+            ),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
                 price != null
                     ? PriceFormatter.formatPriceCompact(price)
                     : '--',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 14,
+                  fontSize: 12,
+                  height: 1.0,
                   color: pastel ? Colors.black38 : Colors.black87,
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
