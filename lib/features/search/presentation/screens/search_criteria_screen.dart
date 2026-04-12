@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/location/location_consent.dart';
 import '../../../../core/services/location_search_service.dart';
+import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
@@ -150,6 +152,13 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // First-time help banner
+              HelpBanner(
+                storageKey: StorageKeys.helpBannerCriteria,
+                icon: Icons.lightbulb_outline,
+                message: l10n?.helpBannerCriteria ??
+                    'Your profile defaults are pre-filled. Adjust criteria below to refine your search.',
+              ),
               // Itinerary mode toggle.
               SegmentedButton<SearchMode>(
                 key: const ValueKey('criteria-mode-toggle'),

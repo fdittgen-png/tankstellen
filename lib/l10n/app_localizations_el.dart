@@ -172,8 +172,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get noFavorites => 'Χωρίς αγαπημένα';
 
   @override
-  String get noFavoritesHint =>
-      'Πατήστε το αστέρι σε ένα βενζινάδικο για να το αποθηκεύσετε στα αγαπημένα.';
+  String get noFavoritesHint => 'Πατήστε το αστέρι σε ένα βενζινάδικο για να το αποθηκεύσετε στα αγαπημένα.';
 
   @override
   String get language => 'Γλώσσα';
@@ -223,29 +222,25 @@ class AppLocalizationsEl extends AppLocalizations {
   String get gpsCoordinates => 'Συντεταγμένες GPS';
 
   @override
-  String get gpsReason =>
-      'Αποστέλλονται με κάθε αναζήτηση για εύρεση κοντινών σταθμών.';
+  String get gpsReason => 'Αποστέλλονται με κάθε αναζήτηση για εύρεση κοντινών σταθμών.';
 
   @override
   String get postalCodeData => 'Ταχυδρομικός κώδικας';
 
   @override
-  String get postalReason =>
-      'Μετατρέπεται σε συντεταγμένες μέσω υπηρεσίας γεωκωδικοποίησης.';
+  String get postalReason => 'Μετατρέπεται σε συντεταγμένες μέσω υπηρεσίας γεωκωδικοποίησης.';
 
   @override
   String get mapViewport => 'Προβολή χάρτη';
 
   @override
-  String get mapReason =>
-      'Τα πλακίδια χάρτη φορτώνονται από τον διακομιστή. Δεν μεταδίδονται προσωπικά δεδομένα.';
+  String get mapReason => 'Τα πλακίδια χάρτη φορτώνονται από τον διακομιστή. Δεν μεταδίδονται προσωπικά δεδομένα.';
 
   @override
   String get apiKeyData => 'Κλειδί API';
 
   @override
-  String get apiKeyReason =>
-      'Το προσωπικό σας κλειδί αποστέλλεται με κάθε αίτημα API. Συνδέεται με το e-mail σας.';
+  String get apiKeyReason => 'Το προσωπικό σας κλειδί αποστέλλεται με κάθε αίτημα API. Συνδέεται με το e-mail σας.';
 
   @override
   String get notShared => 'ΔΕΝ κοινοποιείται:';
@@ -266,8 +261,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get usageData => 'Δεδομένα χρήσης';
 
   @override
-  String get privacyBanner =>
-      'Αυτή η εφαρμογή δεν έχει διακομιστή. Όλα τα δεδομένα παραμένουν στη συσκευή σας. Χωρίς αναλύσεις, παρακολούθηση ή διαφημίσεις.';
+  String get privacyBanner => 'Αυτή η εφαρμογή δεν έχει διακομιστή. Όλα τα δεδομένα παραμένουν στη συσκευή σας. Χωρίς αναλύσεις, παρακολούθηση ή διαφημίσεις.';
 
   @override
   String get storageUsage => 'Χρήση αποθηκευτικού χώρου σε αυτή τη συσκευή';
@@ -291,8 +285,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get cacheManagement => 'Διαχείριση προσωρινής μνήμης';
 
   @override
-  String get cacheDescription =>
-      'Η προσωρινή μνήμη αποθηκεύει απαντήσεις API για ταχύτερη φόρτωση και πρόσβαση εκτός σύνδεσης.';
+  String get cacheDescription => 'Η προσωρινή μνήμη αποθηκεύει απαντήσεις API για ταχύτερη φόρτωση και πρόσβαση εκτός σύνδεσης.';
 
   @override
   String get stationSearch => 'Αναζήτηση σταθμών';
@@ -320,8 +313,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get clearCacheTitle => 'Εκκαθάριση προσωρινής μνήμης;';
 
   @override
-  String get clearCacheBody =>
-      'Τα αποθηκευμένα αποτελέσματα αναζήτησης και τιμές θα διαγραφούν. Τα προφίλ, αγαπημένα και ρυθμίσεις διατηρούνται.';
+  String get clearCacheBody => 'Τα αποθηκευμένα αποτελέσματα αναζήτησης και τιμές θα διαγραφούν. Τα προφίλ, αγαπημένα και ρυθμίσεις διατηρούνται.';
 
   @override
   String get clearCacheButton => 'Εκκαθάριση';
@@ -330,8 +322,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get deleteAllTitle => 'Διαγραφή όλων των δεδομένων;';
 
   @override
-  String get deleteAllBody =>
-      'Αυτό θα διαγράψει μόνιμα όλα τα προφίλ, αγαπημένα, κλειδί API, ρυθμίσεις και προσωρινή μνήμη. Η εφαρμογή θα επαναφερθεί.';
+  String get deleteAllBody => 'Αυτό θα διαγράψει μόνιμα όλα τα προφίλ, αγαπημένα, κλειδί API, ρυθμίσεις και προσωρινή μνήμη. Η εφαρμογή θα επαναφερθεί.';
 
   @override
   String get deleteAllButton => 'Διαγραφή όλων';
@@ -346,19 +337,16 @@ class AppLocalizationsEl extends AppLocalizations {
   String get noStorage => 'Χωρίς χρησιμοποιούμενο χώρο';
 
   @override
-  String get apiKeyNote =>
-      'Δωρεάν εγγραφή. Δεδομένα από κρατικούς φορείς διαφάνειας τιμών.';
+  String get apiKeyNote => 'Δωρεάν εγγραφή. Δεδομένα από κρατικούς φορείς διαφάνειας τιμών.';
 
   @override
-  String get apiKeyFormatError =>
-      'Μη έγκυρη μορφή — αναμενόμενο UUID (8-4-4-4-12)';
+  String get apiKeyFormatError => 'Μη έγκυρη μορφή — αναμενόμενο UUID (8-4-4-4-12)';
 
   @override
   String get supportProject => 'Υποστηρίξτε αυτό το έργο';
 
   @override
-  String get supportDescription =>
-      'Αυτή η εφαρμογή είναι δωρεάν, ανοιχτού κώδικα και χωρίς διαφημίσεις. Αν τη βρίσκετε χρήσιμη, σκεφτείτε να υποστηρίξετε τον προγραμματιστή.';
+  String get supportDescription => 'Αυτή η εφαρμογή είναι δωρεάν, ανοιχτού κώδικα και χωρίς διαφημίσεις. Αν τη βρίσκετε χρήσιμη, σκεφτείτε να υποστηρίξετε τον προγραμματιστή.';
 
   @override
   String get reportBug => 'Αναφορά σφάλματος / Πρόταση λειτουργίας';
@@ -394,12 +382,10 @@ class AppLocalizationsEl extends AppLocalizations {
   String get station => 'Βενζινάδικο';
 
   @override
-  String get locationDenied =>
-      'Η άδεια τοποθεσίας απορρίφθηκε. Μπορείτε να αναζητήσετε με Τ.Κ.';
+  String get locationDenied => 'Η άδεια τοποθεσίας απορρίφθηκε. Μπορείτε να αναζητήσετε με Τ.Κ.';
 
   @override
-  String get demoModeBanner =>
-      'Λειτουργία επίδειξης. Ρυθμίστε το κλειδί API στις ρυθμίσεις.';
+  String get demoModeBanner => 'Λειτουργία επίδειξης. Ρυθμίστε το κλειδί API στις ρυθμίσεις.';
 
   @override
   String get sortDistance => 'Απόσταση';
@@ -425,8 +411,7 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String get loadingFavorites =>
-      'Φόρτωση αγαπημένων...\nΑναζητήστε πρώτα σταθμούς για αποθήκευση δεδομένων.';
+  String get loadingFavorites => 'Φόρτωση αγαπημένων...\nΑναζητήστε πρώτα σταθμούς για αποθήκευση δεδομένων.';
 
   @override
   String get reportPrice => 'Αναφορά τιμής';
@@ -462,8 +447,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get autoUpdatePosition => 'Αυτόματη ενημέρωση θέσης';
 
   @override
-  String get autoUpdateDescription =>
-      'Ενημέρωση θέσης GPS πριν από κάθε αναζήτηση';
+  String get autoUpdateDescription => 'Ενημέρωση θέσης GPS πριν από κάθε αναζήτηση';
 
   @override
   String get location => 'Τοποθεσία';
@@ -493,8 +477,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get autoSwitchProfile => 'Αυτόματη εναλλαγή προφίλ';
 
   @override
-  String get autoSwitchDescription =>
-      'Αυτόματη εναλλαγή προφίλ κατά τη διέλευση συνόρων';
+  String get autoSwitchDescription => 'Αυτόματη εναλλαγή προφίλ κατά τη διέλευση συνόρων';
 
   @override
   String get switchProfile => 'Εναλλαγή';
@@ -521,8 +504,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get noPriceAlerts => 'Χωρίς ειδοποιήσεις τιμών';
 
   @override
-  String get noPriceAlertsHint =>
-      'Δημιουργήστε ειδοποίηση από τη σελίδα λεπτομερειών ενός σταθμού.';
+  String get noPriceAlertsHint => 'Δημιουργήστε ειδοποίηση από τη σελίδα λεπτομερειών ενός σταθμού.';
 
   @override
   String alertDeleted(String name) {
@@ -586,8 +568,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get openInMaps => 'Άνοιγμα στους Χάρτες';
 
   @override
-  String get noStationsAlongRoute =>
-      'Δεν βρέθηκαν σταθμοί κατά μήκος της διαδρομής';
+  String get noStationsAlongRoute => 'Δεν βρέθηκαν σταθμοί κατά μήκος της διαδρομής';
 
   @override
   String get evOperational => 'Σε λειτουργία';
@@ -619,8 +600,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get evDataAttribution => 'Δεδομένα από OpenChargeMap (κοινοτική πηγή)';
 
   @override
-  String get evStatusDisclaimer =>
-      'Η κατάσταση μπορεί να μην αντικατοπτρίζει τη διαθεσιμότητα σε πραγματικό χρόνο. Πατήστε ανανέωση για τα τελευταία δεδομένα.';
+  String get evStatusDisclaimer => 'Η κατάσταση μπορεί να μην αντικατοπτρίζει τη διαθεσιμότητα σε πραγματικό χρόνο. Πατήστε ανανέωση για τα τελευταία δεδομένα.';
 
   @override
   String get evNavigateToStation => 'Πλοήγηση στον σταθμό';
@@ -632,8 +612,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get evStatusUpdated => 'Κατάσταση ενημερώθηκε';
 
   @override
-  String get evStationNotFound =>
-      'Δεν ήταν δυνατή η ανανέωση — ο σταθμός δεν βρέθηκε κοντά';
+  String get evStationNotFound => 'Δεν ήταν δυνατή η ανανέωση — ο σταθμός δεν βρέθηκε κοντά';
 
   @override
   String get addedToFavorites => 'Προστέθηκε στα αγαπημένα';
@@ -654,8 +633,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get gpsError => 'Σφάλμα GPS';
 
   @override
-  String get couldNotResolve =>
-      'Δεν ήταν δυνατός ο προσδιορισμός αφετηρίας ή προορισμού';
+  String get couldNotResolve => 'Δεν ήταν δυνατός ο προσδιορισμός αφετηρίας ή προορισμού';
 
   @override
   String get start => 'Αφετηρία';
@@ -703,8 +681,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get fuelPricesTankerkoenig => 'Τιμές καυσίμων (Tankerkoenig)';
 
   @override
-  String get requiredForFuelSearch =>
-      'Απαιτείται για αναζήτηση τιμών καυσίμων στη Γερμανία';
+  String get requiredForFuelSearch => 'Απαιτείται για αναζήτηση τιμών καυσίμων στη Γερμανία';
 
   @override
   String get evChargingOpenChargeMap => 'Φόρτιση EV (OpenChargeMap)';
@@ -716,12 +693,10 @@ class AppLocalizationsEl extends AppLocalizations {
   String get appDefaultKey => 'Προεπιλεγμένο κλειδί εφαρμογής';
 
   @override
-  String get optionalOverrideKey =>
-      'Προαιρετικό: αντικατάσταση του ενσωματωμένου κλειδιού με το δικό σας';
+  String get optionalOverrideKey => 'Προαιρετικό: αντικατάσταση του ενσωματωμένου κλειδιού με το δικό σας';
 
   @override
-  String get requiredForEvSearch =>
-      'Απαιτείται για αναζήτηση σταθμών φόρτισης EV';
+  String get requiredForEvSearch => 'Απαιτείται για αναζήτηση σταθμών φόρτισης EV';
 
   @override
   String get edit => 'Επεξεργασία';
@@ -750,26 +725,22 @@ class AppLocalizationsEl extends AppLocalizations {
   String get avoidHighways => 'Αποφυγή αυτοκινητοδρόμων';
 
   @override
-  String get avoidHighwaysDesc =>
-      'Ο υπολογισμός διαδρομής αποφεύγει δρόμους με διόδια και αυτοκινητοδρόμους';
+  String get avoidHighwaysDesc => 'Ο υπολογισμός διαδρομής αποφεύγει δρόμους με διόδια και αυτοκινητοδρόμους';
 
   @override
   String get showFuelStations => 'Εμφάνιση βενζινάδικων';
 
   @override
-  String get showFuelStationsDesc =>
-      'Συμπερίληψη σταθμών βενζίνης, ντίζελ, LPG, CNG';
+  String get showFuelStationsDesc => 'Συμπερίληψη σταθμών βενζίνης, ντίζελ, LPG, CNG';
 
   @override
   String get showEvStations => 'Εμφάνιση σταθμών φόρτισης';
 
   @override
-  String get showEvStationsDesc =>
-      'Συμπερίληψη ηλεκτρικών σταθμών φόρτισης στα αποτελέσματα';
+  String get showEvStationsDesc => 'Συμπερίληψη ηλεκτρικών σταθμών φόρτισης στα αποτελέσματα';
 
   @override
-  String get noStationsAlongThisRoute =>
-      'Δεν βρέθηκαν σταθμοί κατά μήκος αυτής της διαδρομής.';
+  String get noStationsAlongThisRoute => 'Δεν βρέθηκαν σταθμοί κατά μήκος αυτής της διαδρομής.';
 
   @override
   String get fuelCostCalculator => 'Υπολογιστής κόστους καυσίμου';
@@ -793,8 +764,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get totalCost => 'Συνολικό κόστος';
 
   @override
-  String get enterCalcValues =>
-      'Εισάγετε απόσταση, κατανάλωση και τιμή για υπολογισμό κόστους ταξιδιού';
+  String get enterCalcValues => 'Εισάγετε απόσταση, κατανάλωση και τιμή για υπολογισμό κόστους ταξιδιού';
 
   @override
   String get priceHistory => 'Ιστορικό τιμών';
@@ -836,19 +806,16 @@ class AppLocalizationsEl extends AppLocalizations {
   String get viewMyData => 'Προβολή δεδομένων μου';
 
   @override
-  String get optionalCloudSync =>
-      'Προαιρετικός συγχρονισμός cloud για ειδοποιήσεις, αγαπημένα και push ειδοποιήσεις';
+  String get optionalCloudSync => 'Προαιρετικός συγχρονισμός cloud για ειδοποιήσεις, αγαπημένα και push ειδοποιήσεις';
 
   @override
   String get tapToUpdateGps => 'Πατήστε για ενημέρωση θέσης GPS';
 
   @override
-  String get gpsAutoUpdateHint =>
-      'Η θέση GPS αποκτάται αυτόματα κατά την αναζήτηση. Μπορείτε επίσης να την ενημερώσετε χειροκίνητα εδώ.';
+  String get gpsAutoUpdateHint => 'Η θέση GPS αποκτάται αυτόματα κατά την αναζήτηση. Μπορείτε επίσης να την ενημερώσετε χειροκίνητα εδώ.';
 
   @override
-  String get clearGpsConfirm =>
-      'Διαγραφή αποθηκευμένης θέσης GPS; Μπορείτε να την ενημερώσετε ξανά ανά πάσα στιγμή.';
+  String get clearGpsConfirm => 'Διαγραφή αποθηκευμένης θέσης GPS; Μπορείτε να την ενημερώσετε ξανά ανά πάσα στιγμή.';
 
   @override
   String get pageNotFound => 'Η σελίδα δεν βρέθηκε';
@@ -857,8 +824,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get deleteAllServerData => 'Διαγραφή όλων των δεδομένων διακομιστή';
 
   @override
-  String get deleteServerDataConfirm =>
-      'Διαγραφή όλων των δεδομένων διακομιστή;';
+  String get deleteServerDataConfirm => 'Διαγραφή όλων των δεδομένων διακομιστή;';
 
   @override
   String get deleteEverything => 'Διαγραφή όλων';
@@ -933,8 +899,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get noSavedRoutes => 'No saved routes';
 
   @override
-  String get noSavedRoutesHint =>
-      'Search along a route and save it for quick access later.';
+  String get noSavedRoutesHint => 'Search along a route and save it for quick access later.';
 
   @override
   String get saveRoute => 'Save route';
@@ -959,8 +924,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get deleteProfileTitle => 'Delete profile?';
 
   @override
-  String get deleteProfileBody =>
-      'This profile and its settings will be permanently deleted. This cannot be undone.';
+  String get deleteProfileBody => 'This profile and its settings will be permanently deleted. This cannot be undone.';
 
   @override
   String get deleteProfileConfirm => 'Delete profile';
@@ -984,12 +948,10 @@ class AppLocalizationsEl extends AppLocalizations {
   String get errorLocation => 'Could not determine your location.';
 
   @override
-  String get errorNoApiKey =>
-      'No API key configured. Go to Settings to add one.';
+  String get errorNoApiKey => 'No API key configured. Go to Settings to add one.';
 
   @override
-  String get errorAllServicesFailed =>
-      'Could not load data. Check your connection and try again.';
+  String get errorAllServicesFailed => 'Could not load data. Check your connection and try again.';
 
   @override
   String get errorCache => 'Local data error. Try clearing the cache.';
@@ -1004,15 +966,13 @@ class AppLocalizationsEl extends AppLocalizations {
   String get onboardingWelcomeHint => 'Set up the app in a few quick steps.';
 
   @override
-  String get onboardingApiKeyDescription =>
-      'Register for a free API key, or skip to explore the app with demo data.';
+  String get onboardingApiKeyDescription => 'Register for a free API key, or skip to explore the app with demo data.';
 
   @override
   String get onboardingComplete => 'All set!';
 
   @override
-  String get onboardingCompleteHint =>
-      'You can change these settings anytime in your profile.';
+  String get onboardingCompleteHint => 'You can change these settings anytime in your profile.';
 
   @override
   String get onboardingBack => 'Back';
@@ -1063,44 +1023,37 @@ class AppLocalizationsEl extends AppLocalizations {
   String get gdprTitle => 'Your Privacy';
 
   @override
-  String get gdprSubtitle =>
-      'This app respects your privacy. Choose which data you want to share. You can change these settings anytime.';
+  String get gdprSubtitle => 'This app respects your privacy. Choose which data you want to share. You can change these settings anytime.';
 
   @override
   String get gdprLocationTitle => 'Location Access';
 
   @override
-  String get gdprLocationDescription =>
-      'Your coordinates are sent to the fuel price API to find nearby stations. Location data is never stored on a server and is not used for tracking.';
+  String get gdprLocationDescription => 'Your coordinates are sent to the fuel price API to find nearby stations. Location data is never stored on a server and is not used for tracking.';
 
   @override
-  String get gdprLocationShort =>
-      'Find nearby fuel stations using your location';
+  String get gdprLocationShort => 'Find nearby fuel stations using your location';
 
   @override
   String get gdprErrorReportingTitle => 'Error Reporting';
 
   @override
-  String get gdprErrorReportingDescription =>
-      'Anonymous crash reports help improve the app. No personal data is included. Reports are sent via Sentry only when configured.';
+  String get gdprErrorReportingDescription => 'Anonymous crash reports help improve the app. No personal data is included. Reports are sent via Sentry only when configured.';
 
   @override
-  String get gdprErrorReportingShort =>
-      'Send anonymous crash reports to improve the app';
+  String get gdprErrorReportingShort => 'Send anonymous crash reports to improve the app';
 
   @override
   String get gdprCloudSyncTitle => 'Cloud Sync';
 
   @override
-  String get gdprCloudSyncDescription =>
-      'Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.';
+  String get gdprCloudSyncDescription => 'Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.';
 
   @override
   String get gdprCloudSyncShort => 'Sync favorites and alerts across devices';
 
   @override
-  String get gdprLegalBasis =>
-      'Legal basis: Art. 6(1)(a) GDPR (Consent). You can withdraw consent anytime in Settings.';
+  String get gdprLegalBasis => 'Legal basis: Art. 6(1)(a) GDPR (Consent). You can withdraw consent anytime in Settings.';
 
   @override
   String get gdprAcceptAll => 'Accept All';
@@ -1109,8 +1062,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get gdprAcceptSelected => 'Accept Selected';
 
   @override
-  String get gdprSettingsHint =>
-      'You can change your privacy choices at any time.';
+  String get gdprSettingsHint => 'You can change your privacy choices at any time.';
 
   @override
   String get routeSaved => 'Route saved!';
@@ -1175,8 +1127,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get invalidQrCode => 'Invalid QR code format';
 
   @override
-  String get invalidQrCodeTankSync =>
-      'Invalid QR code — expected TankSync format';
+  String get invalidQrCodeTankSync => 'Invalid QR code — expected TankSync format';
 
   @override
   String get tankSyncConnected => 'TankSync connected!';
@@ -1240,8 +1191,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get brandFilterNoHighway => 'No highway';
 
   @override
-  String get swipeTutorialMessage =>
-      'Swipe right to navigate, swipe left to remove';
+  String get swipeTutorialMessage => 'Swipe right to navigate, swipe left to remove';
 
   @override
   String get swipeTutorialDismiss => 'Got it';
@@ -1262,8 +1212,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get privacyDashboardSubtitle => 'View, export, or delete your data';
 
   @override
-  String get privacyDashboardBanner =>
-      'Your data belongs to you. Here you can see everything this app stores, export it, or delete it.';
+  String get privacyDashboardBanner => 'Your data belongs to you. Here you can see everything this app stores, export it, or delete it.';
 
   @override
   String get privacyLocalData => 'Data on this device';
@@ -1299,8 +1248,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get privacySyncedData => 'Cloud sync (TankSync)';
 
   @override
-  String get privacySyncDisabled =>
-      'Cloud sync is disabled. All data stays on this device only.';
+  String get privacySyncDisabled => 'Cloud sync is disabled. All data stays on this device only.';
 
   @override
   String get privacySyncMode => 'Sync mode';
@@ -1309,8 +1257,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get privacySyncUserId => 'User ID';
 
   @override
-  String get privacySyncDescription =>
-      'When sync is enabled, favorites, alerts, ignored stations, and ratings are also stored on the TankSync server.';
+  String get privacySyncDescription => 'When sync is enabled, favorites, alerts, ignored stations, and ratings are also stored on the TankSync server.';
 
   @override
   String get privacyViewServerData => 'View server data';
@@ -1334,8 +1281,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get privacyDeleteTitle => 'Delete all data?';
 
   @override
-  String get privacyDeleteBody =>
-      'This will permanently delete:\n\n- All favorites and station data\n- All search profiles\n- All price alerts\n- All price history\n- All cached data\n- Your API key\n- All app settings\n\nThe app will reset to its initial state. This action cannot be undone.';
+  String get privacyDeleteBody => 'This will permanently delete:\n\n- All favorites and station data\n- All search profiles\n- All price alerts\n- All price history\n- All cached data\n- Your API key\n- All app settings\n\nThe app will reset to its initial state. This action cannot be undone.';
 
   @override
   String get privacyDeleteConfirm => 'Delete everything';
@@ -1389,8 +1335,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get drivingSafetyTitle => 'Safety Notice';
 
   @override
-  String get drivingSafetyMessage =>
-      'Do not operate the app while driving. Pull over to a safe location before interacting with the screen. The driver is responsible for safe operation of the vehicle at all times.';
+  String get drivingSafetyMessage => 'Do not operate the app while driving. Pull over to a safe location before interacting with the screen. The driver is responsible for safe operation of the vehicle at all times.';
 
   @override
   String get drivingSafetyAccept => 'I understand';
@@ -1399,8 +1344,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get voiceAnnouncementsTitle => 'Voice Announcements';
 
   @override
-  String get voiceAnnouncementsDescription =>
-      'Announce nearby cheap stations while driving';
+  String get voiceAnnouncementsDescription => 'Announce nearby cheap stations while driving';
 
   @override
   String get voiceAnnouncementsEnabled => 'Enable voice announcements';
@@ -1411,12 +1355,7 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String voiceAnnouncementCheapFuel(
-    String station,
-    String distance,
-    String fuelType,
-    String price,
-  ) {
+  String voiceAnnouncementCheapFuel(String station, String distance, String fuelType, String price) {
     return '$station, $distance kilometers ahead, $fuelType $price';
   }
 
@@ -1430,8 +1369,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get nearestStations => 'Kontinoteroi stathmoi';
 
   @override
-  String get nearestStationsHint =>
-      'Vreite tous kontinoterous stathmous me tin trexousa topothesia sas';
+  String get nearestStationsHint => 'Vreite tous kontinoterous stathmous me tin trexousa topothesia sas';
 
   @override
   String get consumptionLogTitle => 'Fuel consumption';
@@ -1440,8 +1378,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get consumptionLogMenuTitle => 'Consumption log';
 
   @override
-  String get consumptionLogMenuSubtitle =>
-      'Track fill-ups and calculate L/100km';
+  String get consumptionLogMenuSubtitle => 'Track fill-ups and calculate L/100km';
 
   @override
   String get consumptionStatsTitle => 'Consumption stats';
@@ -1453,8 +1390,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get noFillUpsTitle => 'No fill-ups yet';
 
   @override
-  String get noFillUpsSubtitle =>
-      'Log your first fill-up to start tracking consumption.';
+  String get noFillUpsSubtitle => 'Log your first fill-up to start tracking consumption.';
 
   @override
   String get fillUpDate => 'Date';
@@ -1505,8 +1441,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get carbonEmptyTitle => 'No data yet';
 
   @override
-  String get carbonEmptySubtitle =>
-      'Log fill-ups to see your carbon dashboard.';
+  String get carbonEmptySubtitle => 'Log fill-ups to see your carbon dashboard.';
 
   @override
   String get carbonSummaryTotalCost => 'Total cost';
@@ -1586,12 +1521,10 @@ class AppLocalizationsEl extends AppLocalizations {
   String get vehiclesMenuTitle => 'My vehicles';
 
   @override
-  String get vehiclesMenuSubtitle =>
-      'Battery, connectors, charging preferences';
+  String get vehiclesMenuSubtitle => 'Battery, connectors, charging preferences';
 
   @override
-  String get vehiclesEmptyMessage =>
-      'Add your car to filter by connector and estimate charging costs.';
+  String get vehiclesEmptyMessage => 'Add your car to filter by connector and estimate charging costs.';
 
   @override
   String get vehicleAdd => 'Add vehicle';
@@ -1757,15 +1690,13 @@ class AppLocalizationsEl extends AppLocalizations {
   String get switchToEmail => 'Switch to email';
 
   @override
-  String get switchToEmailSubtitle =>
-      'Keep data, add sign-in from other devices';
+  String get switchToEmailSubtitle => 'Keep data, add sign-in from other devices';
 
   @override
   String get switchToAnonymousAction => 'Switch to anonymous';
 
   @override
-  String get switchToAnonymousSubtitle =>
-      'Keep local data, use new anonymous session';
+  String get switchToAnonymousSubtitle => 'Keep local data, use new anonymous session';
 
   @override
   String get linkDevice => 'Link device';
@@ -1789,8 +1720,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get localOnly => 'Local only';
 
   @override
-  String get localOnlySubtitle =>
-      'Optional: sync favorites, alerts, and ratings across devices';
+  String get localOnlySubtitle => 'Optional: sync favorites, alerts, and ratings across devices';
 
   @override
   String get setupCloudSync => 'Set up cloud sync';
@@ -1799,23 +1729,26 @@ class AppLocalizationsEl extends AppLocalizations {
   String get disconnectTitle => 'Disconnect TankSync?';
 
   @override
-  String get disconnectBody =>
-      'Cloud sync will be disabled. Your local data (favorites, alerts, history) is preserved on this device. Server data is not deleted.';
+  String get disconnectBody => 'Cloud sync will be disabled. Your local data (favorites, alerts, history) is preserved on this device. Server data is not deleted.';
 
   @override
   String get deleteAccountTitle => 'Delete account?';
 
   @override
-  String get deleteAccountBody =>
-      'This permanently deletes all your data from the server (favorites, alerts, ratings, routes). Local data on this device is preserved.\n\nThis cannot be undone.';
+  String get deleteAccountBody => 'This permanently deletes all your data from the server (favorites, alerts, ratings, routes). Local data on this device is preserved.\n\nThis cannot be undone.';
 
   @override
   String get switchToAnonymousTitle => 'Switch to anonymous?';
 
   @override
-  String get switchToAnonymousBody =>
-      'You will be signed out of your email account and continue with a new anonymous session.\n\nYour local data (favorites, alerts) is kept on this device and will be synced to the new anonymous account.';
+  String get switchToAnonymousBody => 'You will be signed out of your email account and continue with a new anonymous session.\n\nYour local data (favorites, alerts) is kept on this device and will be synced to the new anonymous account.';
 
   @override
   String get switchAction => 'Switch';
+
+  @override
+  String get helpBannerCriteria => 'Your profile defaults are pre-filled. Adjust criteria below to refine your search.';
+
+  @override
+  String get helpBannerAlerts => 'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.';
 }
