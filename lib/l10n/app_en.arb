@@ -804,5 +804,6 @@
   "switchToAnonymousBody": "You will be signed out of your email account and continue with a new anonymous session.\n\nYour local data (favorites, alerts) is kept on this device and will be synced to the new anonymous account.",
   "switchAction": "Switch",
   "helpBannerCriteria": "Your profile defaults are pre-filled. Adjust criteria below to refine your search.",
-  "helpBannerAlerts": "Set a price threshold for a station. You'll be notified when prices drop below it. Checks run every 30 minutes."
+  "helpBannerAlerts": "Set a price threshold for a station. You'll be notified when prices drop below it. Checks run every 30 minutes.",
+  "syncNow": "Sync now"
 }

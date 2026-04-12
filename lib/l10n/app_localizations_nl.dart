@@ -1751,4 +1751,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get helpBannerAlerts => 'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.';
+
+  @override
+  String get syncNow => 'Sync now';
 }
