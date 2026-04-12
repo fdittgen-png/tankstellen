@@ -67,12 +67,6 @@ class SearchSummaryBar extends ConsumerWidget {
                           label: _fuelLabel(context, fuelType),
                         ),
                         const SizedBox(width: 6),
-                        // Quantity chip (fixed 1L default for now)
-                        const _SummaryChip(
-                          icon: Icon(Icons.local_gas_station, size: 16),
-                          label: '1 L',
-                        ),
-                        const SizedBox(width: 6),
                         // Radius badge
                         _SummaryChip(
                           icon: const Icon(Icons.radar, size: 16),

@@ -478,5 +478,7 @@
   "onboardingLandingTitle": "Écran d'accueil",
   "onboardingLandingHint": "Choisissez l'écran qui s'ouvre au lancement de l'application.",
   "scanReceipt": "Scanner le reçu",
-  "obdConnect": "OBD-II"
+  "obdConnect": "OBD-II",
+  "stationTypeFuel": "Carburant",
+  "stationTypeEv": "Recharge"
 }

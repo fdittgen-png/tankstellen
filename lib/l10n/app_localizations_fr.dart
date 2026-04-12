@@ -1778,4 +1778,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get obdConnect => 'OBD-II';
+
+  @override
+  String get stationTypeFuel => 'Carburant';
+
+  @override
+  String get stationTypeEv => 'Recharge';
 }

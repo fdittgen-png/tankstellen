@@ -813,5 +813,7 @@
   "onboardingLandingTitle": "Home screen",
   "onboardingLandingHint": "Choose which screen opens when you launch the app.",
   "scanReceipt": "Scan receipt",
-  "obdConnect": "OBD-II"
+  "obdConnect": "OBD-II",
+  "stationTypeFuel": "Fuel",
+  "stationTypeEv": "EV"
 }

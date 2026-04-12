@@ -813,5 +813,7 @@
   "onboardingLandingTitle": "Startbildschirm",
   "onboardingLandingHint": "Wählen Sie, welcher Bildschirm beim Start der App angezeigt wird.",
   "scanReceipt": "Beleg scannen",
-  "obdConnect": "OBD-II"
+  "obdConnect": "OBD-II",
+  "stationTypeFuel": "Kraftstoff",
+  "stationTypeEv": "Elektro"
 }
