@@ -5,6 +5,8 @@ import 'package:uuid/uuid.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/vehicle_profile.dart';
 import '../../providers/vehicle_providers.dart';
+import '../widgets/vehicle_combustion_section.dart';
+import '../widgets/vehicle_ev_section.dart';
 
 /// Form for adding or editing a [VehicleProfile].
 ///
@@ -79,6 +81,17 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
     final trimmed = text.trim().replaceAll(',', '.');
     if (trimmed.isEmpty) return null;
     return double.tryParse(trimmed);
+  }
+
+  /// Shared validator for the optional numeric inputs on the form. Empty
+  /// values are accepted (they map to `null` in the saved profile); only
+  /// non-empty values that fail to parse get an error message.
+  String? _validateOptionalNumber(String? v) {
+    final l = AppLocalizations.of(context);
+    if (v == null || v.trim().isEmpty) return null;
+    return _parseDouble(v) == null
+        ? (l?.fieldInvalidNumber ?? 'Invalid number')
+        : null;
   }
 
   int _parseIntOr(String text, int fallback) {
@@ -160,122 +173,29 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
             ),
             const SizedBox(height: 24),
             if (showEv) ...[
-              Text(
-                l?.vehicleEvSectionTitle ?? 'Electric',
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _batteryCtrl,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(
-                  labelText: l?.vehicleBatteryLabel ?? 'Battery capacity (kWh)',
-                ),
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return null;
-                  return _parseDouble(v) == null
-                      ? (l?.fieldInvalidNumber ?? 'Invalid number')
-                      : null;
-                },
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _maxKwCtrl,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(
-                  labelText:
-                      l?.vehicleMaxChargeLabel ?? 'Max charging power (kW)',
-                ),
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return null;
-                  return _parseDouble(v) == null
-                      ? (l?.fieldInvalidNumber ?? 'Invalid number')
-                      : null;
-                },
-              ),
-              const SizedBox(height: 16),
-              Text(
-                l?.vehicleConnectorsLabel ?? 'Supported connectors',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: ConnectorType.values.map((c) {
-                  final selected = _connectors.contains(c);
-                  return FilterChip(
-                    label: Text(c.label),
-                    selected: selected,
-                    onSelected: (value) {
-                      setState(() {
-                        if (value) {
-                          _connectors.add(c);
-                        } else {
-                          _connectors.remove(c);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _minSocCtrl,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: l?.vehicleMinSocLabel ?? 'Min SoC %',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _maxSocCtrl,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: l?.vehicleMaxSocLabel ?? 'Max SoC %',
-                      ),
-                    ),
-                  ),
-                ],
+              VehicleEvSection(
+                batteryController: _batteryCtrl,
+                maxChargingKwController: _maxKwCtrl,
+                minSocController: _minSocCtrl,
+                maxSocController: _maxSocCtrl,
+                connectors: _connectors,
+                onToggleConnector: (c) => setState(() {
+                  if (_connectors.contains(c)) {
+                    _connectors.remove(c);
+                  } else {
+                    _connectors.add(c);
+                  }
+                }),
+                numberValidator: _validateOptionalNumber,
               ),
               const SizedBox(height: 24),
             ],
-            if (showCombustion) ...[
-              Text(
-                l?.vehicleCombustionSectionTitle ?? 'Combustion',
-                style: Theme.of(context).textTheme.titleSmall,
+            if (showCombustion)
+              VehicleCombustionSection(
+                tankController: _tankCtrl,
+                fuelTypeController: _fuelTypeCtrl,
+                numberValidator: _validateOptionalNumber,
               ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _tankCtrl,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(
-                  labelText: l?.vehicleTankLabel ?? 'Tank capacity (L)',
-                ),
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return null;
-                  return _parseDouble(v) == null
-                      ? (l?.fieldInvalidNumber ?? 'Invalid number')
-                      : null;
-                },
-              ),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _fuelTypeCtrl,
-                decoration: InputDecoration(
-                  labelText: l?.vehiclePreferredFuelLabel ?? 'Preferred fuel',
-                  hintText: 'e.g. Diesel, E10',
-                ),
-              ),
-            ],
             const SizedBox(height: 32),
             FilledButton.icon(
               onPressed: _save,
