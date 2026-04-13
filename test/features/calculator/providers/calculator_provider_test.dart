@@ -1,6 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-// ignore: depend_on_referenced_packages
-import 'package:riverpod/riverpod.dart';
 import 'package:tankstellen/features/calculator/data/models/trip_calculation.dart';
 import 'package:tankstellen/features/calculator/providers/calculator_provider.dart';
 
