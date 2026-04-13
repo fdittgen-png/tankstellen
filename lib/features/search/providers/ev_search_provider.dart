@@ -32,10 +32,7 @@ class EVSearchState extends _$EVSearchState {
       final storage = ref.read(storageRepositoryProvider);
       final apiKey = storage.getEvApiKey();
       if (apiKey == null || apiKey.isEmpty) {
-        throw const ApiException(
-          message: 'OpenChargeMap API key not configured. '
-              'Set it up in Settings to search for EV charging stations.',
-        );
+        throw const NoEvApiKeyException();
       }
 
       final country = ref.read(activeCountryProvider);

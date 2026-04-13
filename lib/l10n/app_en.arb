@@ -822,5 +822,22 @@
   "ratingModeShared": "Shared",
   "ratingDescLocal": "Ratings saved on this device only",
   "ratingDescPrivate": "Synced with your database (not visible to others)",
-  "ratingDescShared": "Visible to all users of your database"
+  "ratingDescShared": "Visible to all users of your database",
+  "errorNoEvApiKey": "OpenChargeMap API key not configured. Add one in Settings to search EV charging stations.",
+  "offlineLabel": "Offline",
+  "fallbackSummary": "{failed} unavailable. Using {current}.",
+  "@fallbackSummary": {
+    "placeholders": {
+      "failed": { "type": "String" },
+      "current": { "type": "String" }
+    }
+  },
+  "errorTitleApiKey": "API key required",
+  "errorTitleLocation": "Location unavailable",
+  "errorHintNoStations": "Try increasing the search radius or search a different location.",
+  "errorHintApiKey": "Configure your API key in Settings.",
+  "errorHintConnection": "Check your internet connection and try again.",
+  "errorHintRouting": "Route calculation failed. Check your internet connection and try again.",
+  "errorHintFallback": "Try again or search by postal code / city name.",
+  "detailsLabel": "Details"
 }

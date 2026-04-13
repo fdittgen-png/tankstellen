@@ -822,5 +822,16 @@
   "ratingModeShared": "Geteilt",
   "ratingDescLocal": "Bewertungen nur auf diesem Gerät gespeichert",
   "ratingDescPrivate": "Mit Ihrer Datenbank synchronisiert (nicht für andere sichtbar)",
-  "ratingDescShared": "Für alle Nutzer Ihrer Datenbank sichtbar"
+  "ratingDescShared": "Für alle Nutzer Ihrer Datenbank sichtbar",
+  "errorNoEvApiKey": "OpenChargeMap-API-Schlüssel nicht konfiguriert. Fügen Sie einen in den Einstellungen hinzu, um Ladestationen zu suchen.",
+  "offlineLabel": "Offline",
+  "fallbackSummary": "{failed} nicht verfügbar. Verwende {current}.",
+  "errorTitleApiKey": "API-Schlüssel erforderlich",
+  "errorTitleLocation": "Standort nicht verfügbar",
+  "errorHintNoStations": "Erhöhen Sie den Suchradius oder suchen Sie an einem anderen Ort.",
+  "errorHintApiKey": "Konfigurieren Sie Ihren API-Schlüssel in den Einstellungen.",
+  "errorHintConnection": "Prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+  "errorHintRouting": "Routenberechnung fehlgeschlagen. Prüfen Sie Ihre Internetverbindung.",
+  "errorHintFallback": "Versuchen Sie es erneut oder suchen Sie nach Postleitzahl / Stadt.",
+  "detailsLabel": "Details"
 }
