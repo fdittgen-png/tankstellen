@@ -133,6 +133,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
         title: Text(l?.addFillUp ?? 'Add fill-up'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          tooltip: l?.tooltipBack ?? 'Back',
           onPressed: () => context.pop(),
         ),
       ),

@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
+import 'dio_factory.dart';
+
 /// Enriches station brand data from OpenStreetMap via the Overpass API.
 ///
 /// Queries for fuel stations within 50m of given coordinates and returns
@@ -19,10 +21,11 @@ class OsmBrandEnricher {
   static const _radiusMeters = 50;
 
   OsmBrandEnricher({Dio? dio})
-      : _dio = dio ?? Dio(BaseOptions(
-            connectTimeout: const Duration(seconds: 10),
-            receiveTimeout: const Duration(seconds: 10),
-          ));
+      : _dio = dio ??
+            DioFactory.create(
+              connectTimeout: const Duration(seconds: 10),
+              receiveTimeout: const Duration(seconds: 10),
+            );
 
   /// Get the brand name for a fuel station at the given coordinates.
   ///

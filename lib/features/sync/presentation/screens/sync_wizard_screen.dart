@@ -105,6 +105,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
         title: const Text('Connect TankSync'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          tooltip: AppLocalizations.of(context)?.tooltipBack ?? 'Back',
           onPressed: () {
             if (wizard.mode == SyncWizardMode.choose) {
               Navigator.pop(context);

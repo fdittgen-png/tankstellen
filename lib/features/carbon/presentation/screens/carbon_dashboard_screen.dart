@@ -37,6 +37,7 @@ class CarbonDashboardScreen extends ConsumerWidget {
           title: Text(l?.carbonDashboardTitle ?? 'Carbon dashboard'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
+            tooltip: l?.tooltipBack ?? 'Back',
             onPressed: () => context.pop(),
           ),
           bottomOpacity: 1,

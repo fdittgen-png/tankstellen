@@ -61,6 +61,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
         title: Text(l10n?.fuelCostCalculator ?? 'Fuel Cost Calculator'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          tooltip: l10n?.tooltipBack ?? 'Back',
           onPressed: () => context.go('/'),
         ),
       ),

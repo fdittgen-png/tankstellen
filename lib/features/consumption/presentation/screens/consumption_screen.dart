@@ -23,6 +23,7 @@ class ConsumptionScreen extends ConsumerWidget {
         title: Text(l?.consumptionLogTitle ?? 'Fuel consumption'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          tooltip: l?.tooltipBack ?? 'Back',
           onPressed: () => context.pop(),
         ),
         actions: [
