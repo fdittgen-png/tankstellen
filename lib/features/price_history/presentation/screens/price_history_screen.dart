@@ -27,6 +27,7 @@ class PriceHistoryScreen extends ConsumerWidget {
         title: Text(l10n?.priceHistory ?? 'Price History'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          tooltip: l10n?.tooltipBack ?? 'Back',
           onPressed: () => context.pop(),
         ),
       ),

@@ -152,6 +152,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
         title: Text(l10n?.reportPrice ?? 'Report price'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          tooltip: l10n?.tooltipBack ?? 'Back',
           onPressed: () => context.pop(),
         ),
       ),

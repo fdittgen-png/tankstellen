@@ -4,8 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/features/calculator/presentation/screens/calculator_screen.dart';
+import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/consumption/presentation/screens/consumption_screen.dart';
+import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
 import 'package:tankstellen/features/favorites/presentation/screens/favorites_screen.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
+import 'package:tankstellen/features/profile/presentation/screens/privacy_dashboard_screen.dart';
 import 'package:tankstellen/features/profile/presentation/screens/profile_screen.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/presentation/screens/search_screen.dart';
@@ -51,6 +56,15 @@ class _EmptyFavoriteStations extends FavoriteStations {
 
   @override
   Future<void> loadAndRefresh() async {}
+}
+
+/// FillUpList fake that returns a fixed list (no Hive access).
+class _FixedFillUpList extends FillUpList {
+  final List<FillUp> _list;
+  _FixedFillUpList(this._list);
+
+  @override
+  List<FillUp> build() => _list;
 }
 
 /// Pumps a full-screen widget in a MaterialApp with localization + providers.
@@ -258,6 +272,117 @@ void main() {
       testWidgets('meets labeled tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const SyncSetupScreen(),
+            overrides: _overrides());
+
+        await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+        handle.dispose();
+      });
+    });
+
+    // -----------------------------------------------------------------------
+    // CalculatorScreen
+    // -----------------------------------------------------------------------
+    group('CalculatorScreen', () {
+      List<Object> _overrides() {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        return test.overrides;
+      }
+
+      testWidgets('meets Android tap target guideline', (tester) async {
+        final handle = tester.ensureSemantics();
+        await _pumpScreen(tester, const CalculatorScreen(),
+            overrides: _overrides());
+
+        await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+        handle.dispose();
+      });
+
+      testWidgets('meets labeled tap target guideline', (tester) async {
+        final handle = tester.ensureSemantics();
+        await _pumpScreen(tester, const CalculatorScreen(),
+            overrides: _overrides());
+
+        await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+        handle.dispose();
+      });
+    });
+
+    // -----------------------------------------------------------------------
+    // ConsumptionScreen (empty state)
+    // -----------------------------------------------------------------------
+    group('ConsumptionScreen', () {
+      List<Object> _overrides() {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        return [
+          ...test.overrides,
+          fillUpListProvider.overrideWith(() => _FixedFillUpList(const [])),
+        ];
+      }
+
+      testWidgets('meets Android tap target guideline', (tester) async {
+        final handle = tester.ensureSemantics();
+        await _pumpScreen(tester, const ConsumptionScreen(),
+            overrides: _overrides());
+
+        await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+        handle.dispose();
+      });
+
+      testWidgets('meets labeled tap target guideline', (tester) async {
+        final handle = tester.ensureSemantics();
+        await _pumpScreen(tester, const ConsumptionScreen(),
+            overrides: _overrides());
+
+        await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+        handle.dispose();
+      });
+    });
+
+    // -----------------------------------------------------------------------
+    // PrivacyDashboardScreen
+    // -----------------------------------------------------------------------
+    group('PrivacyDashboardScreen', () {
+      List<Object> _overrides() {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasEvApiKey()).thenReturn(false);
+        when(() => test.mockStorage.favoriteCount).thenReturn(0);
+        when(() => test.mockStorage.alertCount).thenReturn(0);
+        when(() => test.mockStorage.profileCount).thenReturn(0);
+        when(() => test.mockStorage.cacheEntryCount).thenReturn(0);
+        when(() => test.mockStorage.getIgnoredIds()).thenReturn(const []);
+        when(() => test.mockStorage.getRatings()).thenReturn(const {});
+        when(() => test.mockStorage.getPriceHistoryKeys()).thenReturn(const []);
+        when(() => test.mockStorage.getItineraries()).thenReturn(const []);
+        when(() => test.mockStorage.storageStats).thenReturn((
+          settings: 0,
+          profiles: 0,
+          favorites: 0,
+          cache: 0,
+          priceHistory: 0,
+          alerts: 0,
+          total: 0,
+        ));
+        // storageRepositoryProvider is already overridden via
+        // standardTestOverrides, so the PrivacyDashboard will pick up the
+        // configured mock above.
+        return test.overrides;
+      }
+
+      testWidgets('meets Android tap target guideline', (tester) async {
+        final handle = tester.ensureSemantics();
+        await _pumpScreen(tester, const PrivacyDashboardScreen(),
+            overrides: _overrides());
+
+        await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+        handle.dispose();
+      });
+
+      testWidgets('meets labeled tap target guideline', (tester) async {
+        final handle = tester.ensureSemantics();
+        await _pumpScreen(tester, const PrivacyDashboardScreen(),
             overrides: _overrides());
 
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
