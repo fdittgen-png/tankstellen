@@ -8,6 +8,7 @@ import '../../features/search/domain/entities/fuel_type.dart';
 import '../../features/widget/data/home_widget_service.dart';
 import '../constants/field_names.dart';
 import '../notifications/local_notification_service.dart';
+import '../services/impl/tankerkoenig_batch_price_fetcher.dart';
 import '../storage/hive_storage.dart';
 import '../utils/json_extensions.dart';
 import 'background_price_fetcher_provider.dart';
@@ -142,49 +143,27 @@ Future<void> _refreshPricesAndCheckAlerts() async {
 
     if (allStationIds.isEmpty) return;
 
-    // 2. Fetch prices for all stations via Tankerkoenig batch endpoint
+    // 2. Fetch prices for all stations via the shared Tankerkoenig batch
+    //    fetcher. The fetcher handles chunking + parsing + retry — see
+    //    TankerkoenigBatchPriceFetcher.
     final now = DateTime.now();
-    final prices = <String, Map<String, dynamic>>{};
-    if (apiKey != null && apiKey.isNotEmpty) {
-      final dio = Dio(BaseOptions(
-        connectTimeout: BackgroundService.bgConnectTimeout,
-        receiveTimeout: BackgroundService.bgReceiveTimeout,
-      ));
-
-      // Tankerkoenig prices endpoint (batch) with retry
-      const batchSize = BackgroundService.tankerkoenigBatchSize;
-      for (var i = 0; i < allStationIds.length; i += batchSize) {
-        final batch = allStationIds.sublist(
-          i,
-          i + batchSize > allStationIds.length ? allStationIds.length : i + batchSize,
-        );
-        final ids = batch.join(',');
-
-        final data = await fetchWithRetry(
-          dio: dio,
-          url: 'https://creativecommons.tankerkoenig.de/json/prices.php',
-          queryParameters: {'ids': ids, 'apikey': apiKey},
-          config: const BackgroundRetryConfig(
-            maxAttempts: BackgroundService.maxRetryAttempts,
-            baseDelay: BackgroundService.retryBaseDelay,
-          ),
-        );
-        if (data != null && data[TankerkoenigFields.ok] == true && data[TankerkoenigFields.prices] != null) {
-          final rawPrices = data.getMap(TankerkoenigFields.prices);
-          if (rawPrices != null) {
-            for (final entry in rawPrices.entries) {
-              final value = entry.value;
-              if (value is Map<String, dynamic>) {
-                prices[entry.key] = value;
-              } else if (value is Map) {
-                prices[entry.key] = Map<String, dynamic>.from(value);
-              }
-            }
-          }
-        }
-      }
-      debugPrint('BackgroundService: fetched prices for ${prices.length} stations');
-    }
+    final dio = Dio(BaseOptions(
+      connectTimeout: BackgroundService.bgConnectTimeout,
+      receiveTimeout: BackgroundService.bgReceiveTimeout,
+    ));
+    final fetcher = TankerkoenigBatchPriceFetcher(
+      dio: dio,
+      batchSize: BackgroundService.tankerkoenigBatchSize,
+      retryConfig: const BackgroundRetryConfig(
+        maxAttempts: BackgroundService.maxRetryAttempts,
+        baseDelay: BackgroundService.retryBaseDelay,
+      ),
+    );
+    final prices = await fetcher.fetchBatch(
+      ids: allStationIds,
+      apiKey: apiKey,
+    );
+    debugPrint('BackgroundService: fetched prices for ${prices.length} stations');
 
     // 3. Record price history for each station
     if (prices.isNotEmpty) {
