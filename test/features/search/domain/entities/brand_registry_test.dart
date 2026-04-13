@@ -97,6 +97,81 @@ void main() {
         expect(brands, contains('Carrefour'));
         expect(brands, contains('Intermarché'));
       });
+
+      test('includes German brands', () {
+        final brands = BrandRegistry.allBrands;
+        expect(brands, contains('Aral'));
+        expect(brands, contains('Orlen'));
+        expect(brands, contains('HEM'));
+      });
+
+      test('includes UK supermarket brands', () {
+        final brands = BrandRegistry.allBrands;
+        expect(brands, contains('Tesco'));
+        expect(brands, contains('Asda'));
+        expect(brands, contains('Morrisons'));
+      });
+
+      test('includes Australian brands', () {
+        final brands = BrandRegistry.allBrands;
+        expect(brands, contains('Ampol'));
+        expect(brands, contains('7-Eleven'));
+      });
+
+      test('includes Mexican brands', () {
+        final brands = BrandRegistry.allBrands;
+        expect(brands, contains('Pemex'));
+        expect(brands, contains('Oxxo Gas'));
+      });
+
+      test('includes Argentine brands', () {
+        final brands = BrandRegistry.allBrands;
+        expect(brands, contains('YPF'));
+        expect(brands, contains('Axion Energy'));
+      });
+    });
+
+    group('regrouping', () {
+      test('Star maps to Orlen (rebranded)', () {
+        expect(BrandRegistry.canonicalize('Star'), 'Orlen');
+        expect(BrandRegistry.canonicalize('STAR'), 'Orlen');
+      });
+
+      test('Avanti maps to OMV (discount sub-brand)', () {
+        expect(BrandRegistry.canonicalize('Avanti'), 'OMV');
+      });
+
+      test('Ingo maps to Circle K (discount brand)', () {
+        expect(BrandRegistry.canonicalize('Ingo'), 'Circle K');
+      });
+
+      test('Statoil maps to Circle K (legacy name)', () {
+        expect(BrandRegistry.canonicalize('Statoil'), 'Circle K');
+      });
+
+      test('Caltex maps to Ampol (rebranded)', () {
+        expect(BrandRegistry.canonicalize('Caltex'), 'Ampol');
+      });
+
+      test('TotalErg maps to TotalEnergies', () {
+        expect(BrandRegistry.canonicalize('TotalErg'), 'TotalEnergies');
+      });
+
+      test('Esso Express maps to Esso', () {
+        expect(BrandRegistry.canonicalize('Esso Express'), 'Esso');
+      });
+
+      test('Moeve maps to Cepsa (rebrand in Portugal)', () {
+        expect(BrandRegistry.canonicalize('Moeve'), 'Cepsa');
+      });
+
+      test('Agip maps to ENI', () {
+        expect(BrandRegistry.canonicalize('Agip'), 'ENI');
+      });
+
+      test('API maps to IP (merged)', () {
+        expect(BrandRegistry.canonicalize('API'), 'IP');
+      });
     });
   });
 }

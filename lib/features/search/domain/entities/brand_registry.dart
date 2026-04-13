@@ -10,49 +10,137 @@ class BrandRegistry {
   /// Keys are canonical brand names used in the filter UI.
   /// Values are all known variations/aliases from API data.
   static const Map<String, List<String>> brandAliases = {
-    // International
-    'TotalEnergies': ['TotalEnergies', 'Total', 'Total Access', 'TOTALENERGIES', 'TOTAL'],
-    'Shell': ['Shell', 'SHELL'],
+    // =========================================================================
+    // International brands (present in multiple countries)
+    // =========================================================================
+    'TotalEnergies': ['TotalEnergies', 'Total', 'Total Access', 'TotalErg',
+        'TOTALENERGIES', 'TOTAL', 'TOTAL ACCESS'],
+    'Shell': ['Shell', 'SHELL', 'Viva Energy'],
     'BP': ['BP', 'bp'],
-    'Esso': ['Esso', 'ESSO'],
+    'Esso': ['Esso', 'ESSO', 'Esso Express', 'ESSO EXPRESS'],
     'AVIA': ['AVIA', 'Avia'],
     'ENI': ['ENI', 'Eni', 'Agip', 'AGIP'],
+    'Q8': ['Q8', 'q8'],
+    'Tamoil': ['Tamoil', 'TAMOIL'],
+    'Lukoil': ['Lukoil', 'LUKOIL'],
+    'Gulf': ['Gulf', 'GULF'],
+    'Texaco': ['Texaco', 'TEXACO'],
 
-    // France — supermarkets
+    // =========================================================================
+    // France 🇫🇷 — supermarkets (61% of fuel volume)
+    // =========================================================================
     'E.Leclerc': ['E.Leclerc', 'Leclerc', 'LECLERC', 'E. LECLERC'],
-    'Carrefour': ['Carrefour', 'CARREFOUR', 'Carrefour Market', 'Carrefour Contact'],
+    'Carrefour': ['Carrefour', 'CARREFOUR', 'Carrefour Market',
+        'Carrefour Contact', 'CARREFOUR MARKET', 'CARREFOUR CONTACT'],
     'Intermarché': ['Intermarché', 'INTERMARCHE', 'Intermarche', 'ITM'],
     'Auchan': ['Auchan', 'AUCHAN'],
-    'Système U': ['Système U', 'Super U', 'SYSTEME U', 'SUPER U', 'U Express', 'Hyper U'],
-    'Casino': ['Casino', 'CASINO', 'Géant Casino'],
+    'Système U': ['Système U', 'Super U', 'SYSTEME U', 'SUPER U',
+        'U Express', 'Hyper U', 'U EXPRESS', 'HYPER U'],
+    'Casino': ['Casino', 'CASINO', 'Géant Casino', 'GEANT CASINO'],
     'Netto': ['Netto', 'NETTO'],
-
-    // Germany
-    'Aral': ['Aral', 'ARAL'],
-    'JET': ['JET', 'Jet'],
-    'STAR': ['STAR', 'Star', 'star'],
-    'HEM': ['HEM', 'Hem'],
-
-    // Austria
-    'OMV': ['OMV'],
-    'Avanti': ['Avanti', 'AVANTI'],
-
-    // Spain
-    'Repsol': ['Repsol', 'REPSOL'],
-    'Cepsa': ['Cepsa', 'CEPSA'],
-    'Galp': ['Galp', 'GALP'],
-
-    // Italy
-    'IP': ['IP'],
-    'Q8': ['Q8'],
-    'Tamoil': ['Tamoil', 'TAMOIL'],
-
-    // Belgium/Luxembourg
-    'Lukoil': ['Lukoil', 'LUKOIL'],
 
     // France — other chains
     'Dyneff': ['Dyneff', 'DYNEFF'],
     'Vito': ['Vito', 'VITO'],
+
+    // =========================================================================
+    // Germany 🇩🇪
+    // =========================================================================
+    'Aral': ['Aral', 'ARAL'],
+    'JET': ['JET', 'Jet'],
+    'Orlen': ['Orlen', 'ORLEN', 'Star', 'STAR', 'star'], // Star rebranded to Orlen
+    'HEM': ['HEM', 'Hem'],
+    'bft': ['bft', 'BFT'],
+    'Westfalen': ['Westfalen', 'WESTFALEN'],
+    'OIL!': ['OIL!', 'OIL'],
+    'Sprint': ['Sprint', 'SPRINT'],
+    'Raiffeisen': ['Raiffeisen', 'RAIFFEISEN'],
+
+    // =========================================================================
+    // Austria 🇦🇹
+    // =========================================================================
+    'OMV': ['OMV', 'Avanti', 'AVANTI'], // Avanti = OMV discount sub-brand
+    'Turmöl': ['Turmöl', 'Turmoel', 'TURMÖL', 'TURMOEL'],
+    'IQ': ['IQ'],
+
+    // =========================================================================
+    // Spain 🇪🇸
+    // =========================================================================
+    'Repsol': ['Repsol', 'REPSOL'],
+    'Cepsa': ['Cepsa', 'CEPSA', 'Moeve', 'MOEVE'], // Moeve = Cepsa rebrand in Portugal
+    'Galp': ['Galp', 'GALP'],
+    'Disa': ['Disa', 'DISA'],
+    'Ballenoil': ['Ballenoil', 'BALLENOIL'],
+    'Plenoil': ['Plenoil', 'PLENOIL'],
+    'Meroil': ['Meroil', 'MEROIL'],
+    'Bonarea': ['Bonarea', 'BONAREA'],
+
+    // =========================================================================
+    // Italy 🇮🇹
+    // =========================================================================
+    'IP': ['IP', 'API', 'API-IP'],
+
+    // =========================================================================
+    // Denmark 🇩🇰
+    // =========================================================================
+    'OK': ['OK', 'ok'],
+    'Circle K': ['Circle K', 'CIRCLE K', 'Statoil', 'Ingo', 'INGO'], // Ingo = Circle K discount
+    'Uno-X': ['Uno-X', 'UNO-X', 'Uno X'],
+    'F24': ['F24'],
+    'Go\'On': ['GoOn', 'Go On', 'GOON'],
+
+    // =========================================================================
+    // Portugal 🇵🇹
+    // =========================================================================
+    'Prio': ['Prio', 'PRIO'],
+
+    // =========================================================================
+    // United Kingdom 🇬🇧 — supermarkets dominate by volume
+    // =========================================================================
+    'Tesco': ['Tesco', 'TESCO'],
+    'Sainsbury\'s': ['Sainsbury\'s', 'SAINSBURYS', 'Sainsburys'],
+    'Asda': ['Asda', 'ASDA'],
+    'Morrisons': ['Morrisons', 'MORRISONS'],
+
+    // =========================================================================
+    // Australia 🇦🇺
+    // =========================================================================
+    'Ampol': ['Ampol', 'AMPOL', 'Caltex', 'CALTEX'], // Caltex rebranded to Ampol
+    '7-Eleven': ['7-Eleven', '7-ELEVEN', '7 Eleven'],
+    'United': ['United', 'UNITED'],
+    'Puma Energy': ['Puma', 'PUMA', 'Puma Energy', 'PUMA ENERGY'],
+    'Liberty': ['Liberty', 'LIBERTY'],
+    'Metro Petroleum': ['Metro', 'Metro Petroleum', 'METRO'],
+
+    // =========================================================================
+    // Mexico 🇲🇽
+    // =========================================================================
+    'Pemex': ['Pemex', 'PEMEX'],
+    'Oxxo Gas': ['Oxxo Gas', 'OXXO GAS', 'OxxoGas'],
+    'G500': ['G500', 'G Quinientos'],
+    'Hidrosina': ['Hidrosina', 'HIDROSINA'],
+    'Chevron': ['Chevron', 'CHEVRON'],
+    'Arco': ['Arco', 'ARCO'],
+    'Valero': ['Valero', 'VALERO'],
+    'Mobil': ['Mobil', 'MOBIL'],
+    'Petro-7': ['Petro-7', 'PETRO-7', 'Petro7'],
+
+    // =========================================================================
+    // Argentina 🇦🇷 — top 4 = 96% of sales
+    // =========================================================================
+    'YPF': ['YPF'],
+    'Axion Energy': ['Axion', 'AXION', 'Axion Energy'],
+    'Dapsa': ['Dapsa', 'DAPSA'],
+    'Refinor': ['Refinor', 'REFINOR'],
+
+    // =========================================================================
+    // Belgium 🇧🇪 & Luxembourg 🇱🇺
+    // =========================================================================
+    'Maes': ['Maes', 'MAES'],
+    'DATS 24': ['DATS 24', 'DATS24', 'Dats 24'],
+    'Octa+': ['Octa+', 'OCTA+', 'Octaplus'],
+    'Power': ['Power', 'POWER', 'Gabriels'],
+    'Goedert': ['Goedert', 'GOEDERT'],
   };
 
   /// The "Others" label for independent/unrecognized brands.
