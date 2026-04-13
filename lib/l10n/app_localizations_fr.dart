@@ -2105,4 +2105,89 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get syncSetupTitleAccount => 'Votre compte';
+
+  @override
+  String get syncWizardBack => 'Retour';
+
+  @override
+  String get syncWizardNext => 'Suivant';
+
+  @override
+  String syncWizardStepOfSteps(int current, int total) {
+    return 'Étape $current sur $total';
+  }
+
+  @override
+  String get syncWizardCreateSupabaseTitle => 'Créer un projet Supabase';
+
+  @override
+  String get syncWizardCreateSupabaseInstructions =>
+      '1. Appuyez sur « Ouvrir Supabase » ci-dessous\n2. Créez un compte gratuit (si vous n\'en avez pas)\n3. Cliquez sur « New Project »\n4. Choisissez un nom et une région\n5. Attendez environ 2 minutes';
+
+  @override
+  String get syncWizardOpenSupabase => 'Ouvrir Supabase';
+
+  @override
+  String get syncWizardEnableAnonTitle => 'Activer les connexions anonymes';
+
+  @override
+  String get syncWizardEnableAnonInstructions =>
+      '1. Dans votre tableau de bord Supabase :\n   Authentication → Providers\n2. Trouvez « Anonymous Sign-ins »\n3. Activez-le\n4. Cliquez sur « Save »';
+
+  @override
+  String get syncWizardOpenAuthSettings =>
+      'Ouvrir les paramètres d\'authentification';
+
+  @override
+  String get syncWizardCopyCredentialsTitle => 'Copier vos identifiants';
+
+  @override
+  String get syncWizardCopyCredentialsInstructions =>
+      '1. Allez dans Settings → API dans votre tableau de bord\n2. Copiez la « Project URL »\n3. Copiez la clé « anon public »\n4. Collez-les ci-dessous';
+
+  @override
+  String get syncWizardOpenApiSettings => 'Ouvrir les paramètres API';
+
+  @override
+  String get syncWizardSupabaseUrlLabel => 'URL Supabase';
+
+  @override
+  String get syncWizardSupabaseUrlHint => 'https://votre-projet.supabase.co';
+
+  @override
+  String get syncWizardJoinExistingTitle => 'Rejoindre une base existante';
+
+  @override
+  String get syncWizardScanQrCode => 'Scanner le QR Code';
+
+  @override
+  String get syncWizardAskOwnerQr =>
+      'Demandez au propriétaire de la base de vous montrer son QR code\n(Paramètres → TankSync → Partager)';
+
+  @override
+  String get syncWizardAskOwnerQrShort =>
+      'Demandez au propriétaire de la base de montrer son QR code';
+
+  @override
+  String get syncWizardEnterManuallyTitle => 'Saisir manuellement';
+
+  @override
+  String get syncWizardOrEnterManually => 'ou saisir manuellement';
+
+  @override
+  String get syncWizardUrlHelperText =>
+      'Les espaces et les sauts de ligne sont automatiquement supprimés';
+
+  @override
+  String get syncCredentialsPrivateHint =>
+      'Entrez les identifiants de votre projet Supabase. Vous les trouverez dans votre tableau de bord sous Settings > API.';
+
+  @override
+  String get syncCredentialsDatabaseUrlLabel => 'URL de la base de données';
+
+  @override
+  String get syncCredentialsAccessKeyLabel => 'Clé d\'accès';
+
+  @override
+  String get syncCredentialsAccessKeyHint => 'eyJhbGciOiJIUzI1NiIs...';
 }

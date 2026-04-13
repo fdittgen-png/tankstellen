@@ -3996,6 +3996,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your account'**
   String get syncSetupTitleAccount;
+
+  /// No description provided for @syncWizardBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get syncWizardBack;
+
+  /// No description provided for @syncWizardNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get syncWizardNext;
+
+  /// No description provided for @syncWizardStepOfSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {current} of {total}'**
+  String syncWizardStepOfSteps(int current, int total);
+
+  /// No description provided for @syncWizardCreateSupabaseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a Supabase project'**
+  String get syncWizardCreateSupabaseTitle;
+
+  /// No description provided for @syncWizardCreateSupabaseInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Tap \"Open Supabase\" below\n2. Create a free account (if you don\'t have one)\n3. Click \"New Project\"\n4. Choose a name and region\n5. Wait ~2 minutes for it to start'**
+  String get syncWizardCreateSupabaseInstructions;
+
+  /// No description provided for @syncWizardOpenSupabase.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Supabase'**
+  String get syncWizardOpenSupabase;
+
+  /// No description provided for @syncWizardEnableAnonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Anonymous Sign-ins'**
+  String get syncWizardEnableAnonTitle;
+
+  /// No description provided for @syncWizardEnableAnonInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'1. In your Supabase dashboard:\n   Authentication → Providers\n2. Find \"Anonymous Sign-ins\"\n3. Toggle it ON\n4. Click \"Save\"'**
+  String get syncWizardEnableAnonInstructions;
+
+  /// No description provided for @syncWizardOpenAuthSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Auth Settings'**
+  String get syncWizardOpenAuthSettings;
+
+  /// No description provided for @syncWizardCopyCredentialsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy your credentials'**
+  String get syncWizardCopyCredentialsTitle;
+
+  /// No description provided for @syncWizardCopyCredentialsInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Go to Settings → API in your dashboard\n2. Copy the \"Project URL\"\n3. Copy the \"anon public\" key\n4. Paste them below'**
+  String get syncWizardCopyCredentialsInstructions;
+
+  /// No description provided for @syncWizardOpenApiSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open API Settings'**
+  String get syncWizardOpenApiSettings;
+
+  /// No description provided for @syncWizardSupabaseUrlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Supabase URL'**
+  String get syncWizardSupabaseUrlLabel;
+
+  /// No description provided for @syncWizardSupabaseUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'https://your-project.supabase.co'**
+  String get syncWizardSupabaseUrlHint;
+
+  /// No description provided for @syncWizardJoinExistingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join an existing database'**
+  String get syncWizardJoinExistingTitle;
+
+  /// No description provided for @syncWizardScanQrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR Code'**
+  String get syncWizardScanQrCode;
+
+  /// No description provided for @syncWizardAskOwnerQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the database owner to show you their QR code\n(Settings → TankSync → Share)'**
+  String get syncWizardAskOwnerQr;
+
+  /// No description provided for @syncWizardAskOwnerQrShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the database owner to show their QR code'**
+  String get syncWizardAskOwnerQrShort;
+
+  /// No description provided for @syncWizardEnterManuallyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter manually'**
+  String get syncWizardEnterManuallyTitle;
+
+  /// No description provided for @syncWizardOrEnterManually.
+  ///
+  /// In en, this message translates to:
+  /// **'or enter manually'**
+  String get syncWizardOrEnterManually;
+
+  /// No description provided for @syncWizardUrlHelperText.
+  ///
+  /// In en, this message translates to:
+  /// **'Whitespace and line breaks removed automatically'**
+  String get syncWizardUrlHelperText;
+
+  /// No description provided for @syncCredentialsPrivateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your Supabase project credentials. You can find them in your dashboard under Settings > API.'**
+  String get syncCredentialsPrivateHint;
+
+  /// No description provided for @syncCredentialsDatabaseUrlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Database URL'**
+  String get syncCredentialsDatabaseUrlLabel;
+
+  /// No description provided for @syncCredentialsAccessKeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Access Key'**
+  String get syncCredentialsAccessKeyLabel;
+
+  /// No description provided for @syncCredentialsAccessKeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'eyJhbGciOiJIUzI1NiIs...'**
+  String get syncCredentialsAccessKeyHint;
 }
 
 class _AppLocalizationsDelegate

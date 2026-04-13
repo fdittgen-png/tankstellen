@@ -551,5 +551,36 @@
   "syncWizardTitleConnect": "Connecter TankSync",
   "syncSetupTitleYourDatabase": "Votre base de données",
   "syncSetupTitleJoinGroup": "Rejoindre un groupe",
-  "syncSetupTitleAccount": "Votre compte"
+  "syncSetupTitleAccount": "Votre compte",
+  "syncWizardBack": "Retour",
+  "syncWizardNext": "Suivant",
+  "syncWizardStepOfSteps": "Étape {current} sur {total}",
+  "@syncWizardStepOfSteps": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "syncWizardCreateSupabaseTitle": "Créer un projet Supabase",
+  "syncWizardCreateSupabaseInstructions": "1. Appuyez sur « Ouvrir Supabase » ci-dessous\n2. Créez un compte gratuit (si vous n'en avez pas)\n3. Cliquez sur « New Project »\n4. Choisissez un nom et une région\n5. Attendez environ 2 minutes",
+  "syncWizardOpenSupabase": "Ouvrir Supabase",
+  "syncWizardEnableAnonTitle": "Activer les connexions anonymes",
+  "syncWizardEnableAnonInstructions": "1. Dans votre tableau de bord Supabase :\n   Authentication → Providers\n2. Trouvez « Anonymous Sign-ins »\n3. Activez-le\n4. Cliquez sur « Save »",
+  "syncWizardOpenAuthSettings": "Ouvrir les paramètres d'authentification",
+  "syncWizardCopyCredentialsTitle": "Copier vos identifiants",
+  "syncWizardCopyCredentialsInstructions": "1. Allez dans Settings → API dans votre tableau de bord\n2. Copiez la « Project URL »\n3. Copiez la clé « anon public »\n4. Collez-les ci-dessous",
+  "syncWizardOpenApiSettings": "Ouvrir les paramètres API",
+  "syncWizardSupabaseUrlLabel": "URL Supabase",
+  "syncWizardSupabaseUrlHint": "https://votre-projet.supabase.co",
+  "syncWizardJoinExistingTitle": "Rejoindre une base existante",
+  "syncWizardScanQrCode": "Scanner le QR Code",
+  "syncWizardAskOwnerQr": "Demandez au propriétaire de la base de vous montrer son QR code\n(Paramètres → TankSync → Partager)",
+  "syncWizardAskOwnerQrShort": "Demandez au propriétaire de la base de montrer son QR code",
+  "syncWizardEnterManuallyTitle": "Saisir manuellement",
+  "syncWizardOrEnterManually": "ou saisir manuellement",
+  "syncWizardUrlHelperText": "Les espaces et les sauts de ligne sont automatiquement supprimés",
+  "syncCredentialsPrivateHint": "Entrez les identifiants de votre projet Supabase. Vous les trouverez dans votre tableau de bord sous Settings > API.",
+  "syncCredentialsDatabaseUrlLabel": "URL de la base de données",
+  "syncCredentialsAccessKeyLabel": "Clé d'accès",
+  "syncCredentialsAccessKeyHint": "eyJhbGciOiJIUzI1NiIs..."
 }

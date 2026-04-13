@@ -886,5 +886,36 @@
   "syncWizardTitleConnect": "TankSync verbinden",
   "syncSetupTitleYourDatabase": "Ihre Datenbank",
   "syncSetupTitleJoinGroup": "Gruppe beitreten",
-  "syncSetupTitleAccount": "Ihr Konto"
+  "syncSetupTitleAccount": "Ihr Konto",
+  "syncWizardBack": "Zurück",
+  "syncWizardNext": "Weiter",
+  "syncWizardStepOfSteps": "Schritt {current} von {total}",
+  "@syncWizardStepOfSteps": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "syncWizardCreateSupabaseTitle": "Supabase-Projekt erstellen",
+  "syncWizardCreateSupabaseInstructions": "1. Unten auf \"Supabase öffnen\" tippen\n2. Kostenloses Konto erstellen (falls noch nicht vorhanden)\n3. Auf \"New Project\" klicken\n4. Namen und Region wählen\n5. Etwa 2 Minuten warten, bis es bereit ist",
+  "syncWizardOpenSupabase": "Supabase öffnen",
+  "syncWizardEnableAnonTitle": "Anonyme Anmeldungen aktivieren",
+  "syncWizardEnableAnonInstructions": "1. Im Supabase-Dashboard:\n   Authentication → Providers\n2. \"Anonymous Sign-ins\" suchen\n3. Aktivieren\n4. \"Save\" klicken",
+  "syncWizardOpenAuthSettings": "Auth-Einstellungen öffnen",
+  "syncWizardCopyCredentialsTitle": "Zugangsdaten kopieren",
+  "syncWizardCopyCredentialsInstructions": "1. Zu Settings → API im Dashboard gehen\n2. \"Project URL\" kopieren\n3. Den \"anon public\"-Schlüssel kopieren\n4. Beide unten einfügen",
+  "syncWizardOpenApiSettings": "API-Einstellungen öffnen",
+  "syncWizardSupabaseUrlLabel": "Supabase-URL",
+  "syncWizardSupabaseUrlHint": "https://ihr-projekt.supabase.co",
+  "syncWizardJoinExistingTitle": "Bestehender Datenbank beitreten",
+  "syncWizardScanQrCode": "QR-Code scannen",
+  "syncWizardAskOwnerQr": "Bitten Sie den Datenbank-Besitzer, den QR-Code zu zeigen\n(Einstellungen → TankSync → Teilen)",
+  "syncWizardAskOwnerQrShort": "Bitten Sie den Datenbank-Besitzer, den QR-Code zu zeigen",
+  "syncWizardEnterManuallyTitle": "Manuell eingeben",
+  "syncWizardOrEnterManually": "oder manuell eingeben",
+  "syncWizardUrlHelperText": "Leerzeichen und Zeilenumbrüche werden automatisch entfernt",
+  "syncCredentialsPrivateHint": "Geben Sie Ihre Supabase-Zugangsdaten ein. Sie finden diese im Dashboard unter Settings > API.",
+  "syncCredentialsDatabaseUrlLabel": "Datenbank-URL",
+  "syncCredentialsAccessKeyLabel": "Zugangsschlüssel",
+  "syncCredentialsAccessKeyHint": "eyJhbGciOiJIUzI1NiIs..."
 }

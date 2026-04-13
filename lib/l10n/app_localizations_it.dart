@@ -2093,4 +2093,88 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get syncSetupTitleAccount => 'Your account';
+
+  @override
+  String get syncWizardBack => 'Back';
+
+  @override
+  String get syncWizardNext => 'Next';
+
+  @override
+  String syncWizardStepOfSteps(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
+  String get syncWizardCreateSupabaseTitle => 'Create a Supabase project';
+
+  @override
+  String get syncWizardCreateSupabaseInstructions =>
+      '1. Tap \"Open Supabase\" below\n2. Create a free account (if you don\'t have one)\n3. Click \"New Project\"\n4. Choose a name and region\n5. Wait ~2 minutes for it to start';
+
+  @override
+  String get syncWizardOpenSupabase => 'Open Supabase';
+
+  @override
+  String get syncWizardEnableAnonTitle => 'Enable Anonymous Sign-ins';
+
+  @override
+  String get syncWizardEnableAnonInstructions =>
+      '1. In your Supabase dashboard:\n   Authentication → Providers\n2. Find \"Anonymous Sign-ins\"\n3. Toggle it ON\n4. Click \"Save\"';
+
+  @override
+  String get syncWizardOpenAuthSettings => 'Open Auth Settings';
+
+  @override
+  String get syncWizardCopyCredentialsTitle => 'Copy your credentials';
+
+  @override
+  String get syncWizardCopyCredentialsInstructions =>
+      '1. Go to Settings → API in your dashboard\n2. Copy the \"Project URL\"\n3. Copy the \"anon public\" key\n4. Paste them below';
+
+  @override
+  String get syncWizardOpenApiSettings => 'Open API Settings';
+
+  @override
+  String get syncWizardSupabaseUrlLabel => 'Supabase URL';
+
+  @override
+  String get syncWizardSupabaseUrlHint => 'https://your-project.supabase.co';
+
+  @override
+  String get syncWizardJoinExistingTitle => 'Join an existing database';
+
+  @override
+  String get syncWizardScanQrCode => 'Scan QR Code';
+
+  @override
+  String get syncWizardAskOwnerQr =>
+      'Ask the database owner to show you their QR code\n(Settings → TankSync → Share)';
+
+  @override
+  String get syncWizardAskOwnerQrShort =>
+      'Ask the database owner to show their QR code';
+
+  @override
+  String get syncWizardEnterManuallyTitle => 'Enter manually';
+
+  @override
+  String get syncWizardOrEnterManually => 'or enter manually';
+
+  @override
+  String get syncWizardUrlHelperText =>
+      'Whitespace and line breaks removed automatically';
+
+  @override
+  String get syncCredentialsPrivateHint =>
+      'Enter your Supabase project credentials. You can find them in your dashboard under Settings > API.';
+
+  @override
+  String get syncCredentialsDatabaseUrlLabel => 'Database URL';
+
+  @override
+  String get syncCredentialsAccessKeyLabel => 'Access Key';
+
+  @override
+  String get syncCredentialsAccessKeyHint => 'eyJhbGciOiJIUzI1NiIs...';
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 /// Guided step-by-step flow for creating a new Supabase project.
 class WizardCreateNew extends StatelessWidget {
   final int currentStep;
@@ -25,7 +27,8 @@ class WizardCreateNew extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final steps = _guideSteps;
+    final l10n = AppLocalizations.of(context);
+    final steps = _guideSteps(l10n);
     final step = steps[currentStep.clamp(0, steps.length - 1)];
 
     return Column(
@@ -38,7 +41,9 @@ class WizardCreateNew extends StatelessWidget {
         ),
         const SizedBox(height: 16),
 
-        Text('Step ${currentStep + 1} of ${steps.length + 1}',
+        Text(
+            l10n?.syncWizardStepOfSteps(currentStep + 1, steps.length + 1) ??
+                'Step ${currentStep + 1} of ${steps.length + 1}',
             style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.primary)),
         const SizedBox(height: 8),
         Text(step.title, style: theme.textTheme.titleMedium),
@@ -64,11 +69,13 @@ class WizardCreateNew extends StatelessWidget {
           const SizedBox(height: 16),
           TextField(
             controller: urlController,
-            decoration: const InputDecoration(
-              labelText: 'Supabase URL',
-              hintText: 'https://your-project.supabase.co',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.link),
+            decoration: InputDecoration(
+              labelText:
+                  l10n?.syncWizardSupabaseUrlLabel ?? 'Supabase URL',
+              hintText: l10n?.syncWizardSupabaseUrlHint ??
+                  'https://your-project.supabase.co',
+              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.link),
             ),
             maxLines: 1,
           ),
@@ -83,13 +90,15 @@ class WizardCreateNew extends StatelessWidget {
             if (currentStep > 0)
               TextButton(
                 onPressed: onBack,
-                child: const Text('Back'),
+                child: Text(l10n?.syncWizardBack ?? 'Back'),
               )
             else
               const SizedBox(),
             FilledButton(
               onPressed: currentStep < 2 ? onNext : onContinue,
-              child: Text(currentStep < 2 ? 'Next' : 'Continue'),
+              child: Text(currentStep < 2
+                  ? (l10n?.syncWizardNext ?? 'Next')
+                  : (l10n?.continueButton ?? 'Continue')),
             ),
           ],
         ),
@@ -97,34 +106,37 @@ class WizardCreateNew extends StatelessWidget {
     );
   }
 
-  static List<_GuideStep> get _guideSteps => const [
+  static List<_GuideStep> _guideSteps(AppLocalizations? l10n) => [
     _GuideStep(
-      title: 'Create a Supabase project',
-      instructions: '1. Tap "Open Supabase" below\n'
-          '2. Create a free account (if you don\'t have one)\n'
-          '3. Click "New Project"\n'
-          '4. Choose a name and region\n'
-          '5. Wait ~2 minutes for it to start',
-      actionLabel: 'Open Supabase',
+      title: l10n?.syncWizardCreateSupabaseTitle ?? 'Create a Supabase project',
+      instructions: l10n?.syncWizardCreateSupabaseInstructions ??
+          '1. Tap "Open Supabase" below\n'
+              '2. Create a free account (if you don\'t have one)\n'
+              '3. Click "New Project"\n'
+              '4. Choose a name and region\n'
+              '5. Wait ~2 minutes for it to start',
+      actionLabel: l10n?.syncWizardOpenSupabase ?? 'Open Supabase',
       actionUrl: 'https://supabase.com/dashboard/new',
     ),
     _GuideStep(
-      title: 'Enable Anonymous Sign-ins',
-      instructions: '1. In your Supabase dashboard:\n'
-          '   Authentication → Providers\n'
-          '2. Find "Anonymous Sign-ins"\n'
-          '3. Toggle it ON\n'
-          '4. Click "Save"',
-      actionLabel: 'Open Auth Settings',
+      title: l10n?.syncWizardEnableAnonTitle ?? 'Enable Anonymous Sign-ins',
+      instructions: l10n?.syncWizardEnableAnonInstructions ??
+          '1. In your Supabase dashboard:\n'
+              '   Authentication → Providers\n'
+              '2. Find "Anonymous Sign-ins"\n'
+              '3. Toggle it ON\n'
+              '4. Click "Save"',
+      actionLabel: l10n?.syncWizardOpenAuthSettings ?? 'Open Auth Settings',
       actionUrl: null,
     ),
     _GuideStep(
-      title: 'Copy your credentials',
-      instructions: '1. Go to Settings → API in your dashboard\n'
-          '2. Copy the "Project URL"\n'
-          '3. Copy the "anon public" key\n'
-          '4. Paste them below',
-      actionLabel: 'Open API Settings',
+      title: l10n?.syncWizardCopyCredentialsTitle ?? 'Copy your credentials',
+      instructions: l10n?.syncWizardCopyCredentialsInstructions ??
+          '1. Go to Settings → API in your dashboard\n'
+              '2. Copy the "Project URL"\n'
+              '3. Copy the "anon public" key\n'
+              '4. Paste them below',
+      actionLabel: l10n?.syncWizardOpenApiSettings ?? 'Open API Settings',
       actionUrl: null,
     ),
   ];

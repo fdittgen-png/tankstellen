@@ -2108,4 +2108,88 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get syncSetupTitleAccount => 'Ihr Konto';
+
+  @override
+  String get syncWizardBack => 'Zurück';
+
+  @override
+  String get syncWizardNext => 'Weiter';
+
+  @override
+  String syncWizardStepOfSteps(int current, int total) {
+    return 'Schritt $current von $total';
+  }
+
+  @override
+  String get syncWizardCreateSupabaseTitle => 'Supabase-Projekt erstellen';
+
+  @override
+  String get syncWizardCreateSupabaseInstructions =>
+      '1. Unten auf \"Supabase öffnen\" tippen\n2. Kostenloses Konto erstellen (falls noch nicht vorhanden)\n3. Auf \"New Project\" klicken\n4. Namen und Region wählen\n5. Etwa 2 Minuten warten, bis es bereit ist';
+
+  @override
+  String get syncWizardOpenSupabase => 'Supabase öffnen';
+
+  @override
+  String get syncWizardEnableAnonTitle => 'Anonyme Anmeldungen aktivieren';
+
+  @override
+  String get syncWizardEnableAnonInstructions =>
+      '1. Im Supabase-Dashboard:\n   Authentication → Providers\n2. \"Anonymous Sign-ins\" suchen\n3. Aktivieren\n4. \"Save\" klicken';
+
+  @override
+  String get syncWizardOpenAuthSettings => 'Auth-Einstellungen öffnen';
+
+  @override
+  String get syncWizardCopyCredentialsTitle => 'Zugangsdaten kopieren';
+
+  @override
+  String get syncWizardCopyCredentialsInstructions =>
+      '1. Zu Settings → API im Dashboard gehen\n2. \"Project URL\" kopieren\n3. Den \"anon public\"-Schlüssel kopieren\n4. Beide unten einfügen';
+
+  @override
+  String get syncWizardOpenApiSettings => 'API-Einstellungen öffnen';
+
+  @override
+  String get syncWizardSupabaseUrlLabel => 'Supabase-URL';
+
+  @override
+  String get syncWizardSupabaseUrlHint => 'https://ihr-projekt.supabase.co';
+
+  @override
+  String get syncWizardJoinExistingTitle => 'Bestehender Datenbank beitreten';
+
+  @override
+  String get syncWizardScanQrCode => 'QR-Code scannen';
+
+  @override
+  String get syncWizardAskOwnerQr =>
+      'Bitten Sie den Datenbank-Besitzer, den QR-Code zu zeigen\n(Einstellungen → TankSync → Teilen)';
+
+  @override
+  String get syncWizardAskOwnerQrShort =>
+      'Bitten Sie den Datenbank-Besitzer, den QR-Code zu zeigen';
+
+  @override
+  String get syncWizardEnterManuallyTitle => 'Manuell eingeben';
+
+  @override
+  String get syncWizardOrEnterManually => 'oder manuell eingeben';
+
+  @override
+  String get syncWizardUrlHelperText =>
+      'Leerzeichen und Zeilenumbrüche werden automatisch entfernt';
+
+  @override
+  String get syncCredentialsPrivateHint =>
+      'Geben Sie Ihre Supabase-Zugangsdaten ein. Sie finden diese im Dashboard unter Settings > API.';
+
+  @override
+  String get syncCredentialsDatabaseUrlLabel => 'Datenbank-URL';
+
+  @override
+  String get syncCredentialsAccessKeyLabel => 'Zugangsschlüssel';
+
+  @override
+  String get syncCredentialsAccessKeyHint => 'eyJhbGciOiJIUzI1NiIs...';
 }
