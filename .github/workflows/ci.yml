@@ -52,8 +52,6 @@ jobs:
           restore-keys: ${{ runner.os }}-pub-
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
-      - name: Regenerate golden files for this platform
-        run: flutter test --update-goldens test/goldens/
       - run: flutter test --coverage
       - name: Check coverage threshold
         run: bash scripts/check_coverage.sh
