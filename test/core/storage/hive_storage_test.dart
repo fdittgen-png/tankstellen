@@ -623,29 +623,72 @@ void main() {
   // Storage Statistics
   // ---------------------------------------------------------------------------
   group('Storage Statistics', () {
-    test('storageStats returns zero totals for empty storage', () {
-      final stats = storage.storageStats;
-      expect(stats.cache, 0);
-      expect(stats.profiles, 0);
-      expect(stats.priceHistory, 0);
-      expect(stats.alerts, 0);
-    });
-
-    test('storageStats updates after adding data', () async {
+    test('storageStats reports on-disk size for every populated box', () async {
+      // Write something to every box so each `.hive` file exists on disk.
+      // (Hive doesn't create the file until the first write.)
+      await storage.putSetting('seed', 'value');
       await storage.saveProfile('p1', {'name': 'A'});
+      await storage.addFavorite('station-1');
       await storage.cacheData('key-1', {'data': 'value'});
       await storage.savePriceRecords('st-1', [{'price': 1.0}]);
+      await storage.saveAlerts([
+        {'stationId': 'st-1', 'fuelType': 'e10', 'threshold': 1.7},
+      ]);
 
       final stats = storage.storageStats;
+      expect(stats.settings, greaterThan(0));
       expect(stats.profiles, greaterThan(0));
+      expect(stats.favorites, greaterThan(0));
       expect(stats.cache, greaterThan(0));
       expect(stats.priceHistory, greaterThan(0));
+      expect(stats.alerts, greaterThan(0));
       expect(stats.total, greaterThan(0));
+    });
+
+    test('storageStats grows after writing data to a box', () async {
+      final beforeProfiles = storage.storageStats.profiles;
+      final beforeCache = storage.storageStats.cache;
+
+      // Write a profile + a cache entry with non-trivial payloads so the
+      // file growth is comfortably larger than the test tolerance.
+      await storage.saveProfile('p1', {
+        'name': 'Test Profile',
+        'description': 'a' * 1000,
+      });
+      await storage.cacheData('key-1', {'payload': 'x' * 4096});
+
+      // Hive flushes lazily on some platforms; force one tick.
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+
+      final after = storage.storageStats;
+      expect(after.profiles, greaterThan(beforeProfiles),
+          reason: 'profiles file should grow after saveProfile');
+      expect(after.cache, greaterThan(beforeCache),
+          reason: 'cache file should grow after cacheData');
+    });
+
+    test('storageStats.total equals the sum of every box', () {
+      final stats = storage.storageStats;
       expect(
         stats.total,
         stats.settings + stats.profiles + stats.favorites +
             stats.cache + stats.priceHistory + stats.alerts,
       );
+    });
+
+    // Regression for issue #427: the old implementation multiplied
+    // `box.length` by a hardcoded constant, so the reported value diverged
+    // wildly from the real file size as compaction kicked in. With the
+    // real-bytes implementation the reported value should track
+    // `File(box.path).lengthSync()` to within rounding.
+    test('storageStats matches File.lengthSync of the underlying box', () {
+      final cacheBox = Hive.box('cache');
+      final cachePath = cacheBox.path;
+      expect(cachePath, isNotNull,
+          reason: 'native Hive box should expose a path');
+      final fileSize = File(cachePath!).lengthSync();
+      final reported = storage.storageStats.cache;
+      expect(reported, equals(fileSize));
     });
 
     test('cacheEntryCount is zero initially', () {

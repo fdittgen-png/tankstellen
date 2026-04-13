@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -280,20 +282,14 @@ class HiveStorage implements StorageRepository {
   @override
   ({int settings, int profiles, int favorites, int cache, int priceHistory, int alerts, int total})
       get storageStats {
-    const avgEntryBytes = 512;
-    final settingsBox = Hive.box(HiveBoxes.settings);
-    final profilesBox = Hive.box(HiveBoxes.profiles);
-    final favoritesBox = Hive.box(HiveBoxes.favorites);
-    final cacheBox = Hive.box(HiveBoxes.cache);
-    final priceHistoryBox = Hive.box(HiveBoxes.priceHistory);
-    final alertsBox = Hive.box(HiveBoxes.alerts);
+    final settings = _boxSizeBytes(HiveBoxes.settings, fallbackPerEntry: 512);
+    final profiles = _boxSizeBytes(HiveBoxes.profiles, fallbackPerEntry: 512);
+    final favorites = _boxSizeBytes(HiveBoxes.favorites, fallbackPerEntry: 64);
+    final cache = _boxSizeBytes(HiveBoxes.cache, fallbackPerEntry: 2048);
+    final priceHistory =
+        _boxSizeBytes(HiveBoxes.priceHistory, fallbackPerEntry: 1024);
+    final alerts = _boxSizeBytes(HiveBoxes.alerts, fallbackPerEntry: 256);
 
-    final settings = settingsBox.length * avgEntryBytes;
-    final profiles = profilesBox.length * avgEntryBytes;
-    final favorites = favoritesBox.length * 64;
-    final cache = cacheBox.length * 2048;
-    final priceHistory = priceHistoryBox.length * 1024;
-    final alerts = alertsBox.length * 256;
     return (
       settings: settings,
       profiles: profiles,
@@ -303,5 +299,31 @@ class HiveStorage implements StorageRepository {
       alerts: alerts,
       total: settings + profiles + favorites + cache + priceHistory + alerts,
     );
+  }
+
+  /// Real on-disk size (in bytes) of the Hive box file when the platform
+  /// exposes it. Falls back to `box.length * fallbackPerEntry` on web (which
+  /// uses IndexedDB and has no `.hive` file) and on any read failure.
+  ///
+  /// The fallback constants are intentionally per-box because price history
+  /// blobs are much larger than alert tuples.
+  @visibleForTesting
+  int boxSizeBytes(String boxName, {required int fallbackPerEntry}) {
+    return _boxSizeBytes(boxName, fallbackPerEntry: fallbackPerEntry);
+  }
+
+  int _boxSizeBytes(String boxName, {required int fallbackPerEntry}) {
+    final box = Hive.box(boxName);
+    if (kIsWeb) return box.length * fallbackPerEntry;
+    final path = box.path;
+    if (path == null) return box.length * fallbackPerEntry;
+    try {
+      final file = File(path);
+      if (!file.existsSync()) return box.length * fallbackPerEntry;
+      return file.lengthSync();
+    } catch (e) {
+      debugPrint('storageStats: lengthSync failed for $boxName: $e');
+      return box.length * fallbackPerEntry;
+    }
   }
 }
