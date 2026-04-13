@@ -183,22 +183,33 @@ void main() {
   });
 
   group('ProfileEditSheet source-level regression', () {
-    test('delete button calls _confirmDelete, not onDelete directly', () {
+    test('delete button routes through _confirmDelete, not onDelete directly', () {
       final source = File(
         'lib/features/profile/presentation/widgets/profile_edit_sheet.dart',
       ).readAsStringSync();
 
+      // The delete button lives in the extracted _SaveDeleteActions widget
+      // and fires an onConfirmDelete callback, which the parent wires to
+      // the _confirmDelete method. Both ends of the wiring must be present.
       expect(
-        source.contains('onPressed: () => _confirmDelete('),
+        source.contains('onConfirmDelete: () => _confirmDelete(context)'),
         isTrue,
-        reason: 'Delete button must use confirmation dialog via _confirmDelete',
+        reason:
+            'Parent must wire onConfirmDelete to _confirmDelete (not onDelete)',
+      );
+      expect(
+        source.contains('onPressed: onConfirmDelete'),
+        isTrue,
+        reason: 'Delete button must invoke the onConfirmDelete callback',
       );
 
-      // Should NOT call onDelete directly in onPressed
+      // Must NOT call onDelete directly from the delete button's onPressed.
       expect(
-        source.contains('onPressed: () {\n                      widget.onDelete!();'),
+        RegExp(r'onPressed:\s*\(\)\s*\{\s*widget\.onDelete!\(\)')
+            .hasMatch(source),
         isFalse,
-        reason: 'Delete button must NOT call onDelete! directly without confirmation',
+        reason:
+            'Delete button must NOT call widget.onDelete! directly from onPressed',
       );
     });
 
