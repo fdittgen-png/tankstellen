@@ -18,7 +18,7 @@ _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
       (json['defaultSearchRadius'] as num?)?.toDouble() ?? 10.0,
   landingScreen:
       $enumDecodeNullable(_$LandingScreenEnumMap, json['landingScreen']) ??
-      LandingScreen.search,
+      LandingScreen.nearest,
   favoriteStationIds:
       (json['favoriteStationIds'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -65,7 +65,6 @@ Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
     };
 
 const _$LandingScreenEnumMap = {
-  LandingScreen.search: 'search',
   LandingScreen.favorites: 'favorites',
   LandingScreen.map: 'map',
   LandingScreen.cheapest: 'cheapest',

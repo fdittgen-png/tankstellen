@@ -50,7 +50,7 @@ void main() {
         expect(profile.name, 'Default');
         expect(profile.preferredFuelType, FuelType.e10);
         expect(profile.defaultSearchRadius, 10.0);
-        expect(profile.landingScreen, LandingScreen.search);
+        expect(profile.landingScreen, LandingScreen.nearest);
       });
 
       test('creates profile with custom values', () async {
@@ -218,7 +218,7 @@ void main() {
       const profile = UserProfile(id: 'abc', name: 'Test');
       expect(profile.preferredFuelType, FuelType.e10);
       expect(profile.defaultSearchRadius, 10.0);
-      expect(profile.landingScreen, LandingScreen.search);
+      expect(profile.landingScreen, LandingScreen.nearest);
       expect(profile.favoriteStationIds, isEmpty);
       expect(profile.autoUpdatePosition, isFalse);
       expect(profile.showFuel, isTrue);
@@ -255,24 +255,80 @@ void main() {
   // -------------------------------------------------------------------------
   group('LandingScreen', () {
     test('has correct English display names', () {
-      expect(LandingScreen.search.displayName, 'Search');
+      expect(LandingScreen.nearest.displayName, 'Nearest stations');
       expect(LandingScreen.favorites.displayName, 'Favorites');
       expect(LandingScreen.map.displayName, 'Map');
       expect(LandingScreen.cheapest.displayName, 'Cheapest nearby');
     });
 
     test('localizedName returns German for de', () {
-      expect(LandingScreen.search.localizedName('de'), 'Suche');
+      expect(LandingScreen.nearest.localizedName('de'), 'Nächste Tankstellen');
       expect(LandingScreen.favorites.localizedName('de'), 'Favoriten');
     });
 
     test('localizedName returns French for fr', () {
-      expect(LandingScreen.search.localizedName('fr'), 'Recherche');
+      expect(LandingScreen.nearest.localizedName('fr'), 'À proximité');
       expect(LandingScreen.favorites.localizedName('fr'), 'Favoris');
     });
 
     test('localizedName falls back to English for unknown language', () {
-      expect(LandingScreen.search.localizedName('xx'), 'Search');
+      expect(LandingScreen.nearest.localizedName('xx'), 'Nearest stations');
+    });
+
+    test('search is removed from the enum', () {
+      final names = LandingScreen.values.map((v) => v.name).toList();
+      expect(names, isNot(contains('search')));
+      expect(LandingScreen.values, hasLength(4));
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // Legacy `search` landing migration
+  // -------------------------------------------------------------------------
+  group('ProfileRepository legacy landingScreen migration', () {
+    late _InMemoryHiveStorage storage;
+    late ProfileRepository repo;
+
+    setUp(() {
+      storage = _InMemoryHiveStorage();
+      repo = ProfileRepository(storage);
+    });
+
+    test('getActiveProfile rewrites legacy "search" value to "nearest"',
+        () async {
+      // Simulate a profile saved before LandingScreen.search was removed.
+      const id = 'legacy-profile';
+      storage._profiles[id] = {
+        'id': id,
+        'name': 'Legacy',
+        'landingScreen': 'search',
+      };
+      storage._activeProfileId = id;
+
+      final profile = repo.getActiveProfile();
+      expect(profile, isNotNull);
+      expect(profile!.landingScreen, LandingScreen.nearest);
+    });
+
+    test('getAllProfiles rewrites legacy "LandingScreen.search" form',
+        () async {
+      storage._profiles['legacy'] = {
+        'id': 'legacy',
+        'name': 'Legacy',
+        'landingScreen': 'LandingScreen.search',
+      };
+      storage._profiles['fresh'] = {
+        'id': 'fresh',
+        'name': 'Fresh',
+        'landingScreen': 'favorites',
+      };
+
+      final all = repo.getAllProfiles();
+      expect(all, hasLength(2));
+      final legacy = all.firstWhere((p) => p.id == 'legacy');
+      final fresh = all.firstWhere((p) => p.id == 'fresh');
+      expect(legacy.landingScreen, LandingScreen.nearest);
+      expect(fresh.landingScreen, LandingScreen.favorites);
     });
   });
 }

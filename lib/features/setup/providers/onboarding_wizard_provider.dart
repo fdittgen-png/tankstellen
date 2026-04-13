@@ -20,7 +20,7 @@ class OnboardingWizardState {
     this.homeZipCode,
     this.defaultSearchRadius = 10.0,
     FuelType? preferredFuelType,
-    this.landingScreen = LandingScreen.search,
+    this.landingScreen = LandingScreen.nearest,
   }) : preferredFuelType = preferredFuelType ?? FuelType.e10;
 
   OnboardingWizardState copyWith({

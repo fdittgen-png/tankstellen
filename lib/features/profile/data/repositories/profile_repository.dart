@@ -23,21 +23,33 @@ class ProfileRepository {
     if (id == null) return null;
     final data = _storage.getProfile(id);
     if (data == null) return null;
-    return UserProfile.fromJson(data);
+    return UserProfile.fromJson(_migrateLegacyLandingScreen(data));
   }
 
   List<UserProfile> getAllProfiles() {
     return _storage
         .getAllProfiles()
-        .map((data) => UserProfile.fromJson(data))
+        .map((data) => UserProfile.fromJson(_migrateLegacyLandingScreen(data)))
         .toList();
+  }
+
+  /// Rewrites the legacy `LandingScreen.search` value (removed in 4.2.0) to
+  /// `nearest` so `fromJson` does not throw on profiles saved before the enum
+  /// was trimmed. `search` was always equivalent to the default distance sort,
+  /// which `nearest` now represents explicitly.
+  Map<String, dynamic> _migrateLegacyLandingScreen(Map<String, dynamic> data) {
+    final landing = data['landingScreen'];
+    if (landing == 'search' || landing == 'LandingScreen.search') {
+      return {...data, 'landingScreen': 'nearest'};
+    }
+    return data;
   }
 
   Future<UserProfile> createProfile({
     required String name,
     FuelType preferredFuelType = FuelType.e10,
     double defaultSearchRadius = 10.0,
-    LandingScreen landingScreen = LandingScreen.search,
+    LandingScreen landingScreen = LandingScreen.nearest,
     String? homeZipCode,
     String? countryCode,
     String? languageCode,

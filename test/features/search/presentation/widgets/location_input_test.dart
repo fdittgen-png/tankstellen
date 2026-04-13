@@ -66,7 +66,7 @@ void main() {
       const profile = UserProfile(
         id: 'test',
         name: 'Test',
-        landingScreen: LandingScreen.search,
+        landingScreen: LandingScreen.favorites,
         homeZipCode: '34540',
       );
       expect(profile.landingScreen, isNot(LandingScreen.cheapest));
@@ -79,12 +79,16 @@ void main() {
       final selectable = LandingScreen.values
           .where((s) => s != LandingScreen.map)
           .toList();
-      expect(selectable.length, 4);
-      expect(selectable, contains(LandingScreen.search));
+      expect(selectable.length, 3);
       expect(selectable, contains(LandingScreen.favorites));
       expect(selectable, contains(LandingScreen.cheapest));
       expect(selectable, contains(LandingScreen.nearest));
       expect(selectable, isNot(contains(LandingScreen.map)));
+    });
+
+    test('search landing option is removed from the enum', () {
+      final names = LandingScreen.values.map((v) => v.name).toList();
+      expect(names, isNot(contains('search')));
     });
   });
 

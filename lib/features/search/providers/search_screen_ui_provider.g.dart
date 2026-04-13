@@ -9,14 +9,26 @@ part of 'search_screen_ui_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// The currently selected sort mode for the search results list.
+///
+/// The initial value derives from the active profile's [LandingScreen]
+/// preference: `cheapest` → price sort, everything else → distance.
+/// Users can still override via [set] from the sort chips.
 
 @ProviderFor(SelectedSortMode)
 final selectedSortModeProvider = SelectedSortModeProvider._();
 
 /// The currently selected sort mode for the search results list.
+///
+/// The initial value derives from the active profile's [LandingScreen]
+/// preference: `cheapest` → price sort, everything else → distance.
+/// Users can still override via [set] from the sort chips.
 final class SelectedSortModeProvider
     extends $NotifierProvider<SelectedSortMode, SortMode> {
   /// The currently selected sort mode for the search results list.
+  ///
+  /// The initial value derives from the active profile's [LandingScreen]
+  /// preference: `cheapest` → price sort, everything else → distance.
+  /// Users can still override via [set] from the sort chips.
   SelectedSortModeProvider._()
     : super(
         from: null,
@@ -44,9 +56,13 @@ final class SelectedSortModeProvider
   }
 }
 
-String _$selectedSortModeHash() => r'bee5aedaae37772d7269ada2fc72fa69f071a22d';
+String _$selectedSortModeHash() => r'a6e2bb0baad440211f4c41c657f5e88fe64d4012';
 
 /// The currently selected sort mode for the search results list.
+///
+/// The initial value derives from the active profile's [LandingScreen]
+/// preference: `cheapest` → price sort, everything else → distance.
+/// Users can still override via [set] from the sort chips.
 
 abstract class _$SelectedSortMode extends $Notifier<SortMode> {
   SortMode build();
