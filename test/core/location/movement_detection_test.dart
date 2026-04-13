@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tankstellen/core/location/geolocator_wrapper.dart';
 import 'package:tankstellen/core/location/movement_detection_provider.dart';
 
