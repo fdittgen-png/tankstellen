@@ -49,6 +49,8 @@ class ProfileListSection extends ConsumerWidget {
                     ),
                   IconButton(
                     icon: const Icon(Icons.edit),
+                    tooltip: AppLocalizations.of(context)?.editProfile ??
+                        'Edit profile',
                     onPressed: () => _editProfile(context, ref, profile),
                   ),
                 ],

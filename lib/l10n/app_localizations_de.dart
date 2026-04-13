@@ -1935,4 +1935,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get detailsLabel => 'Details';
+
+  @override
+  String get remove => 'Entfernen';
+
+  @override
+  String get showKey => 'Schlüssel anzeigen';
+
+  @override
+  String get hideKey => 'Schlüssel verbergen';
 }

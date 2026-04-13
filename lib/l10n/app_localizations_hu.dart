@@ -1923,4 +1923,13 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get detailsLabel => 'Details';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get showKey => 'Show key';
+
+  @override
+  String get hideKey => 'Hide key';
 }

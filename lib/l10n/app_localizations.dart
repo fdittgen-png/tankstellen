@@ -3678,6 +3678,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Details'**
   String get detailsLabel;
+
+  /// No description provided for @remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// No description provided for @showKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Show key'**
+  String get showKey;
+
+  /// No description provided for @hideKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide key'**
+  String get hideKey;
 }
 
 class _AppLocalizationsDelegate

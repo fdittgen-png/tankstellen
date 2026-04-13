@@ -239,6 +239,7 @@ class _RouteInputState extends ConsumerState<RouteInput> {
               prefixIcon: Icons.more_vert,
               suffixWidget: IconButton(
                 icon: const Icon(Icons.close, size: 16),
+                tooltip: l10n?.remove ?? 'Remove',
                 onPressed: () => _removeStop(i),
               ),
               onCitySelected: (city) => _onStopCitySelected(i, city),

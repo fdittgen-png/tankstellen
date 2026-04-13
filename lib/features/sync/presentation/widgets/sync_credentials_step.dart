@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/sync/sync_config.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Credentials input step for private/join-existing sync modes.
 ///
@@ -97,6 +98,9 @@ class SyncCredentialsStep extends StatelessWidget {
                   ),
                 IconButton(
                   icon: Icon(showKey ? Icons.visibility_off : Icons.visibility, size: 18),
+                  tooltip: showKey
+                      ? (AppLocalizations.of(context)?.hideKey ?? 'Hide key')
+                      : (AppLocalizations.of(context)?.showKey ?? 'Show key'),
                   onPressed: onToggleKeyVisibility,
                 ),
               ],
