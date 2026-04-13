@@ -24,6 +24,8 @@ import '../../providers/search_screen_ui_provider.dart';
 import '../widgets/brand_filter_chips.dart';
 import '../widgets/fuel_type_selector.dart';
 import '../widgets/location_input.dart';
+import '../widgets/search_mode_toggle.dart';
+import '../widgets/search_radius_slider.dart';
 
 /// Full-screen modal for editing search criteria (mode, location, fuel, radius,
 /// filters, equipment). Pops on submission and delegates to the relevant
@@ -160,26 +162,10 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                     'Your profile defaults are pre-filled. Adjust criteria below to refine your search.',
               ),
               // Itinerary mode toggle.
-              SegmentedButton<SearchMode>(
-                key: const ValueKey('criteria-mode-toggle'),
-                segments: [
-                  ButtonSegment(
-                    value: SearchMode.nearby,
-                    label: Text(l10n?.searchNearby ?? 'Nearby'),
-                    icon: const Icon(Icons.near_me),
-                  ),
-                  ButtonSegment(
-                    value: SearchMode.route,
-                    label: Text(l10n?.searchAlongRoute ?? 'Along route'),
-                    icon: const Icon(Icons.route),
-                  ),
-                ],
-                selected: {mode},
-                onSelectionChanged: (selected) {
-                  ref
-                      .read(activeSearchModeProvider.notifier)
-                      .set(selected.first);
-                },
+              SearchModeToggle(
+                mode: mode,
+                onChanged: (m) =>
+                    ref.read(activeSearchModeProvider.notifier).set(m),
               ),
               const SizedBox(height: 20),
               if (mode == SearchMode.nearby) ...[
@@ -209,26 +195,10 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
               const SizedBox(height: 8),
               const FuelTypeSelector(),
               const SizedBox(height: 20),
-              Row(
-                children: [
-                  Text(
-                    '${l10n?.searchRadius ?? "Radius"}:',
-                    style: theme.textTheme.titleSmall,
-                  ),
-                  const Spacer(),
-                  Text('${radius.round()} km',
-                      style: theme.textTheme.titleSmall),
-                ],
-              ),
-              Slider(
-                value: radius,
-                min: 1,
-                max: 25,
-                divisions: 24,
-                label: '${radius.round()} km',
-                onChanged: (value) {
-                  ref.read(searchRadiusProvider.notifier).set(value);
-                },
+              SearchRadiusSlider(
+                radiusKm: radius,
+                onChanged: (value) =>
+                    ref.read(searchRadiusProvider.notifier).set(value),
               ),
               const SizedBox(height: 4),
               // "Open only" filter.
