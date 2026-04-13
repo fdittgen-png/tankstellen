@@ -42,13 +42,18 @@ void main() {
   }
 
   group('stationServiceProvider', () {
-    test('returns DemoStationService when DE and no API key', () {
+    test('returns DemoStationService chain when DE and no API key', () {
+      // After #425 the Germany factory lives in CountryServiceRegistry
+      // and the registry wraps every service (including the demo
+      // fallback) in a StationServiceChain. The behaviour is preserved:
+      // demo data still backs the chain, the chain is just the consistent
+      // outer type so callers don't have to special-case Germany either.
       when(() => mockStorage.hasApiKey()).thenReturn(false);
 
       final container = createContainer(country: Countries.germany);
       final service = container.read(stationServiceProvider);
 
-      expect(service, isA<DemoStationService>());
+      expect(service, isA<StationServiceChain>());
     });
 
     test('returns StationServiceChain when DE and API key present', () {

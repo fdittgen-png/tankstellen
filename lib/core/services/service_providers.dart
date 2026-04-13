@@ -7,14 +7,10 @@ import '../storage/storage_providers.dart';
 import 'country_service_registry.dart';
 import 'dio_factory.dart';
 import 'geocoding_chain.dart';
-import 'impl/demo_station_service.dart';
 import 'impl/native_geocoding_provider.dart';
 import 'impl/nominatim_geocoding_provider.dart';
-import 'impl/tankerkoenig_station_service.dart';
 import 'service_config.dart';
-import 'service_result.dart';
 import 'station_service.dart';
-import 'station_service_chain.dart';
 
 part 'service_providers.g.dart';
 
@@ -49,12 +45,12 @@ Dio tankerkoenigDio(Ref ref) {
 // Station service with full fallback chain
 // ---------------------------------------------------------------------------
 
-/// Returns the appropriate station service based on the active country
-/// and whether an API key is configured.
+/// Returns the appropriate station service based on the active country.
 ///
-/// Uses [CountryServiceRegistry] to look up the correct service factory.
-/// Countries that require an API key (e.g. DE) fall back to demo data
-/// when no key is configured.
+/// Delegates to [CountryServiceRegistry], which is the single source of
+/// truth for per-country service wiring — including Germany. Countries
+/// that require an API key fall back to [DemoStationService] from inside
+/// the registry's factory function when no key is configured.
 @riverpod
 StationService stationService(Ref ref) {
   final country = ref.watch(activeCountryProvider);
@@ -67,28 +63,8 @@ StationService stationService(Ref ref) {
 StationService stationServiceForCountry(Ref ref, String countryCode) =>
     _resolveServiceForCountry(ref, countryCode);
 
-/// Shared resolution logic used by both [stationService] and
-/// [stationServiceForCountry].
-///
-/// Germany is special-cased because its Dio instance requires the API key
-/// interceptor from [tankerkoenigDioProvider]. All other countries use
-/// [CountryServiceRegistry.buildService] directly.
 StationService _resolveServiceForCountry(Ref ref, String countryCode) {
   final cache = ref.read(cacheManagerProvider);
-
-  // Germany needs special handling: API key check + dedicated Dio instance
-  if (countryCode == 'DE') {
-    final storage = ref.read(storageRepositoryProvider);
-    if (!storage.hasApiKey()) return DemoStationService(countryCode: 'DE');
-    final dio = ref.read(tankerkoenigDioProvider);
-    return StationServiceChain(
-      TankerkoenigStationService(dio),
-      cache,
-      errorSource: ServiceSource.tankerkoenigApi,
-      countryCode: 'DE',
-    );
-  }
-
   return CountryServiceRegistry.buildService(countryCode, ref, cache);
 }
 
