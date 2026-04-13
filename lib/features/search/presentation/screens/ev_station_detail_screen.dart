@@ -142,7 +142,8 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Your rating', style: theme.textTheme.titleMedium),
+                  Text(l10n?.yourRating ?? 'Your rating',
+                      style: theme.textTheme.titleMedium),
                   const SizedBox(height: 8),
                   Consumer(builder: (context, ref, _) {
                     final rating = ref.watch(stationRatingProvider(station.id));

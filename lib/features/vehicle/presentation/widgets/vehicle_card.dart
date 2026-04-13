@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/vehicle_profile.dart';
 
 /// Compact summary card for one [VehicleProfile].
@@ -62,6 +63,7 @@ class VehicleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final subtitle = _subtitle();
 
     return Card(
@@ -115,12 +117,14 @@ class VehicleCard extends StatelessWidget {
           },
           itemBuilder: (context) => [
             if (!isActive)
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'activate',
-                child: Text('Set active'),
+                child: Text(l10n?.vehicleSetActive ?? 'Set active'),
               ),
-            const PopupMenuItem(value: 'edit', child: Text('Edit')),
-            const PopupMenuItem(value: 'delete', child: Text('Delete')),
+            PopupMenuItem(
+                value: 'edit', child: Text(l10n?.edit ?? 'Edit')),
+            PopupMenuItem(
+                value: 'delete', child: Text(l10n?.delete ?? 'Delete')),
           ],
         ),
         onTap: onTap,

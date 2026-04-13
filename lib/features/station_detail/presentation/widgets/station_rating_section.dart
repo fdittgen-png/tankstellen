@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/widgets/star_rating.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../search/providers/station_rating_provider.dart';
 
 /// User rating section showing interactive star rating for a station.
@@ -13,10 +14,12 @@ class StationRatingSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Your rating', style: theme.textTheme.titleMedium),
+        Text(l10n?.yourRating ?? 'Your rating',
+            style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
         Consumer(builder: (context, ref, _) {
           final rating = ref.watch(stationRatingProvider(stationId));

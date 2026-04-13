@@ -50,14 +50,14 @@ class AlertsTab extends StatelessWidget {
               alignment: Alignment.centerRight,
               padding: const EdgeInsets.only(right: 24),
               color: Colors.red,
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Delete',
-                      style: TextStyle(
+                  Text(l10n?.delete ?? 'Delete',
+                      style: const TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold)),
-                  SizedBox(width: 8),
-                  Icon(Icons.delete, color: Colors.white, size: 20),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.delete, color: Colors.white, size: 20),
                 ],
               ),
             ),

@@ -4356,6 +4356,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites and alerts\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity. Data is merged, not moved.'**
   String get linkDeviceHowItWorksBody;
+
+  /// No description provided for @vehicleSetActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Set active'**
+  String get vehicleSetActive;
+
+  /// No description provided for @swipeHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get swipeHide;
+
+  /// No description provided for @evChargingSection.
+  ///
+  /// In en, this message translates to:
+  /// **'EV Charging'**
+  String get evChargingSection;
+
+  /// No description provided for @fuelStationsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel Stations'**
+  String get fuelStationsSection;
+
+  /// No description provided for @yourRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Your rating'**
+  String get yourRating;
+
+  /// No description provided for @noStorageUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'No storage used'**
+  String get noStorageUsed;
+
+  /// No description provided for @aboutReportBug.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a bug / Suggest a feature'**
+  String get aboutReportBug;
+
+  /// No description provided for @aboutSupportProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Support this project'**
+  String get aboutSupportProject;
+
+  /// No description provided for @aboutSupportDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.'**
+  String get aboutSupportDescription;
 }
 
 class _AppLocalizationsDelegate

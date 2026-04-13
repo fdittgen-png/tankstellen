@@ -66,7 +66,8 @@ class AboutSection extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.bug_report),
-            title: const Text('Report a bug / Suggest a feature'),
+            title: Text(AppLocalizations.of(context)?.aboutReportBug ??
+                'Report a bug / Suggest a feature'),
             onTap: () => launchUrl(
               Uri.parse(AppConstants.githubIssuesUrl),
               mode: LaunchMode.externalApplication,
@@ -77,7 +78,8 @@ class AboutSection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Text(
-              'Support this project',
+              AppLocalizations.of(context)?.aboutSupportProject ??
+                  'Support this project',
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -86,8 +88,9 @@ class AboutSection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              'This app is free, open source, and has no ads. '
-              'If you find it useful, consider supporting the developer.',
+              AppLocalizations.of(context)?.aboutSupportDescription ??
+                  'This app is free, open source, and has no ads. '
+                      'If you find it useful, consider supporting the developer.',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

@@ -963,5 +963,14 @@
   "linkDeviceCodeFieldHint": "Paste the UUID from other device",
   "linkDeviceImportButton": "Import data",
   "linkDeviceHowItWorksTitle": "How it works",
-  "linkDeviceHowItWorksBody": "1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites and alerts\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity. Data is merged, not moved."
+  "linkDeviceHowItWorksBody": "1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites and alerts\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity. Data is merged, not moved.",
+  "vehicleSetActive": "Set active",
+  "swipeHide": "Hide",
+  "evChargingSection": "EV Charging",
+  "fuelStationsSection": "Fuel Stations",
+  "yourRating": "Your rating",
+  "noStorageUsed": "No storage used",
+  "aboutReportBug": "Report a bug / Suggest a feature",
+  "aboutSupportProject": "Support this project",
+  "aboutSupportDescription": "This app is free, open source, and has no ads. If you find it useful, consider supporting the developer."
 }
