@@ -185,7 +185,7 @@ jobs:
             echo "*Auto-generated release from tag \`v${{ steps.version.outputs.version }}\`*"
             echo 'RELEASE_EOF'
           } >> "$GITHUB_OUTPUT"
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           name: v${{ steps.version.outputs.version }}
           body: ${{ steps.body.outputs.body }}
