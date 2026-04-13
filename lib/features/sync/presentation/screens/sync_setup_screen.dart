@@ -11,7 +11,8 @@ import '../widgets/qr_scanner_screen.dart';
 import '../widgets/sync_credentials_step.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../widgets/sync_mode_card.dart';
+import '../widgets/sync_done_step.dart';
+import '../widgets/sync_mode_step.dart';
 
 /// Clean 3-step sync setup: Mode -> Credentials (if needed) -> Auth -> Done.
 ///
@@ -156,7 +157,12 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
       key: ValueKey(setup.step),
       padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + bottomPad),
       children: switch (setup.step) {
-        SyncSetupStep.mode => _buildModeStep(),
+        SyncSetupStep.mode => [
+            SyncModeStep(
+              onSelectMode: ctrl.selectMode,
+              onStayOffline: () => Navigator.pop(context),
+            ),
+          ],
         SyncSetupStep.credentials => [
             ListenableBuilder(
               listenable: Listenable.merge([_urlController, _keyController]),
@@ -186,117 +192,8 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
               error: setup.error,
             ),
           ],
-        SyncSetupStep.done => _buildDoneStep(),
+        SyncSetupStep.done => const [SyncDoneStep()],
       },
     );
-  }
-
-  List<Widget> _buildModeStep() {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
-    final ctrl = ref.read(syncSetupControllerProvider.notifier);
-    return [
-      Semantics(
-        header: true,
-        child: Text(
-          l10n?.syncHowToSyncQuestion ?? 'How would you like to sync?',
-          style: theme.textTheme.titleMedium,
-        ),
-      ),
-      const SizedBox(height: 4),
-      Text(
-        l10n?.syncOfflineDescription ??
-            'Your app works fully offline. Cloud sync is optional.',
-        style: theme.textTheme.bodySmall
-            ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-      ),
-      const SizedBox(height: 20),
-
-      Semantics(
-        label: 'Tankstellen Community, shared. Share favorites and ratings with all users.',
-        button: true,
-        child: SyncModeCard(
-          icon: Icons.public,
-          title: l10n?.syncModeCommunityTitle ?? 'Tankstellen Community',
-          subtitle: l10n?.syncModeCommunitySubtitle ??
-              'Share favorites & ratings with all users',
-          privacyLabel: l10n?.syncPrivacyShared ?? 'Shared',
-          privacyColor: Colors.green,
-          onTap: () => ctrl.selectMode(SyncMode.community),
-        ),
-      ),
-      const SizedBox(height: 10),
-
-      Semantics(
-        label: 'Private Database, private. Your own Supabase, full data control.',
-        button: true,
-        child: SyncModeCard(
-          icon: Icons.lock_outline,
-          title: l10n?.syncModePrivateTitle ?? 'Private Database',
-          subtitle: l10n?.syncModePrivateSubtitle ??
-              'Your own Supabase — full data control',
-          privacyLabel: l10n?.syncPrivacyPrivate ?? 'Private',
-          privacyColor: Colors.blue,
-          onTap: () => ctrl.selectMode(SyncMode.private),
-        ),
-      ),
-      const SizedBox(height: 10),
-
-      Semantics(
-        label: 'Join a Group, group access. Family or friends shared database.',
-        button: true,
-        child: SyncModeCard(
-          icon: Icons.group_outlined,
-          title: l10n?.syncModeGroupTitle ?? 'Join a Group',
-          subtitle:
-              l10n?.syncModeGroupSubtitle ?? 'Family or friends shared database',
-          privacyLabel: l10n?.syncPrivacyGroup ?? 'Group',
-          privacyColor: Colors.orange,
-          onTap: () => ctrl.selectMode(SyncMode.joinExisting),
-        ),
-      ),
-
-      const SizedBox(height: 24),
-      Center(
-        child: TextButton.icon(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.signal_wifi_off, size: 16),
-          label: Text(l10n?.syncStayOfflineButton ?? 'Stay offline'),
-        ),
-      ),
-    ];
-  }
-
-  List<Widget> _buildDoneStep() {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
-    return [
-      const SizedBox(height: 40),
-      Semantics(
-        label: 'Successfully connected. Your data will now sync automatically.',
-        liveRegion: true,
-        child: Column(
-          children: [
-            const ExcludeSemantics(
-              child: Icon(Icons.check_circle, size: 64, color: Colors.green),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              l10n?.syncSuccessTitle ?? 'Successfully connected!',
-              style: theme.textTheme.titleLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n?.syncSuccessDescription ??
-                  'Your data will now sync automatically.',
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    ];
   }
 }
