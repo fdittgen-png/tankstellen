@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../cache/cache_manager.dart';
 import '../country/country_config.dart';
+import '../storage/storage_providers.dart';
 import 'impl/argentina_station_service.dart';
 import 'impl/australia_station_service.dart';
 import 'impl/demo_station_service.dart';
@@ -14,7 +15,9 @@ import 'impl/miteco_station_service.dart';
 import 'impl/osm_brand_enricher.dart';
 import 'impl/portugal_station_service.dart';
 import 'impl/prix_carburants_station_service.dart';
+import 'impl/tankerkoenig_station_service.dart';
 import 'impl/uk_station_service.dart';
+import 'service_providers.dart';
 import 'service_result.dart';
 import 'station_service.dart';
 import 'station_service_chain.dart';
@@ -198,12 +201,20 @@ class CountryServiceRegistry {
 // These are top-level functions (not closures) so they can be used in
 // const CountryServiceEntry constructors.
 
+/// Germany factory. Reads the API-key state from storage and either:
+///  - returns [DemoStationService] when no key is present (so the user sees
+///    realistic-looking data without configuring anything), or
+///  - constructs the real [TankerkoenigStationService] backed by the
+///    rate-limited Dio from [tankerkoenigDioProvider].
+///
+/// This used to live in `service_providers.dart` as a Germany special case;
+/// pulling it into the registry restores the "single source of truth"
+/// invariant the registry promises.
 StationService _createTankerkoenig(Ref ref) {
-  // Dio is injected via the tankerkoenigDioProvider in service_providers.dart.
-  // This factory is only called when an API key is present.
-  throw UnsupportedError(
-    'DE uses tankerkoenigDioProvider — use buildServiceForGermany() instead',
-  );
+  final storage = ref.read(storageRepositoryProvider);
+  if (!storage.hasApiKey()) return DemoStationService(countryCode: 'DE');
+  final dio = ref.read(tankerkoenigDioProvider);
+  return TankerkoenigStationService(dio);
 }
 
 StationService _createPrixCarburants(Ref ref) {

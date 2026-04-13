@@ -47,34 +47,34 @@ final class TankerkoenigDioProvider extends $FunctionalProvider<Dio, Dio, Dio>
   }
 }
 
-String _$tankerkoenigDioHash() => r'5ade6219b0e5455fcda1bd7d05904c5eb75a770a';
+String _$tankerkoenigDioHash() => r'bf30524d1ff9225e6dd29e0a4b92c6cac725a4e3';
 
-/// Returns the appropriate station service based on the active country
-/// and whether an API key is configured.
+/// Returns the appropriate station service based on the active country.
 ///
-/// Uses [CountryServiceRegistry] to look up the correct service factory.
-/// Countries that require an API key (e.g. DE) fall back to demo data
-/// when no key is configured.
+/// Delegates to [CountryServiceRegistry], which is the single source of
+/// truth for per-country service wiring — including Germany. Countries
+/// that require an API key fall back to [DemoStationService] from inside
+/// the registry's factory function when no key is configured.
 
 @ProviderFor(stationService)
 final stationServiceProvider = StationServiceProvider._();
 
-/// Returns the appropriate station service based on the active country
-/// and whether an API key is configured.
+/// Returns the appropriate station service based on the active country.
 ///
-/// Uses [CountryServiceRegistry] to look up the correct service factory.
-/// Countries that require an API key (e.g. DE) fall back to demo data
-/// when no key is configured.
+/// Delegates to [CountryServiceRegistry], which is the single source of
+/// truth for per-country service wiring — including Germany. Countries
+/// that require an API key fall back to [DemoStationService] from inside
+/// the registry's factory function when no key is configured.
 
 final class StationServiceProvider
     extends $FunctionalProvider<StationService, StationService, StationService>
     with $Provider<StationService> {
-  /// Returns the appropriate station service based on the active country
-  /// and whether an API key is configured.
+  /// Returns the appropriate station service based on the active country.
   ///
-  /// Uses [CountryServiceRegistry] to look up the correct service factory.
-  /// Countries that require an API key (e.g. DE) fall back to demo data
-  /// when no key is configured.
+  /// Delegates to [CountryServiceRegistry], which is the single source of
+  /// truth for per-country service wiring — including Germany. Countries
+  /// that require an API key fall back to [DemoStationService] from inside
+  /// the registry's factory function when no key is configured.
   StationServiceProvider._()
     : super(
         from: null,
