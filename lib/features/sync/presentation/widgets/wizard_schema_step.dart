@@ -23,6 +23,7 @@ class WizardSchemaStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     if (schemaStatus == null) {
       return const Center(child: CircularProgressIndicator());
@@ -40,7 +41,9 @@ class WizardSchemaStep extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          allReady ? 'Database ready!' : 'Database needs setup',
+          allReady
+              ? (l10n?.syncDatabaseReady ?? 'Database ready!')
+              : (l10n?.syncDatabaseNeedsSetup ?? 'Database needs setup'),
           style: theme.textTheme.titleMedium,
           textAlign: TextAlign.center,
         ),
@@ -57,7 +60,9 @@ class WizardSchemaStep extends StatelessWidget {
             ),
             title: Text(table, style: theme.textTheme.bodySmall),
             trailing: Text(
-              schemaStatus![table] == true ? 'OK' : 'Missing',
+              schemaStatus![table] == true
+                  ? (l10n?.syncTableStatusOk ?? 'OK')
+                  : (l10n?.syncTableStatusMissing ?? 'Missing'),
               style: TextStyle(
                 fontSize: 11,
                 color: schemaStatus![table] == true ? Colors.green : Colors.red,
@@ -68,25 +73,28 @@ class WizardSchemaStep extends StatelessWidget {
         if (!allReady) ...[
           const SizedBox(height: 16),
           Text(
-            'Copy the SQL below and run it in your Supabase SQL Editor\n'
-            '(Dashboard → SQL Editor → New Query → Paste → Run)',
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            l10n?.syncSqlEditorInstructions ??
+                'Copy the SQL below and run it in your Supabase SQL Editor\n'
+                    '(Dashboard → SQL Editor → New Query → Paste → Run)',
+            style: theme.textTheme.bodySmall
+                ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
           FilledButton.icon(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: migrationSql ?? ''));
-              SnackBarHelper.show(context, AppLocalizations.of(context)?.sqlCopied ?? 'SQL copied to clipboard');
+              SnackBarHelper.show(context,
+                  l10n?.sqlCopied ?? 'SQL copied to clipboard');
             },
             icon: const Icon(Icons.copy),
-            label: const Text('Copy SQL to clipboard'),
+            label: Text(l10n?.syncCopySqlButton ?? 'Copy SQL to clipboard'),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: onRecheck,
             icon: const Icon(Icons.refresh),
-            label: const Text('Re-check schema'),
+            label: Text(l10n?.syncRecheckSchemaButton ?? 'Re-check schema'),
           ),
         ],
 
@@ -94,7 +102,7 @@ class WizardSchemaStep extends StatelessWidget {
           const SizedBox(height: 24),
           FilledButton(
             onPressed: onDone,
-            child: const Text('Done'),
+            child: Text(l10n?.syncDoneButton ?? 'Done'),
           ),
         ],
       ],

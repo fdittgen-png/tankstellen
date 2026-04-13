@@ -20,6 +20,7 @@ class EmailUserStatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Column(
       children: [
@@ -37,7 +38,8 @@ class EmailUserStatusCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Signed in as $userEmail',
+                        l10n?.syncSignedInAs(userEmail ?? '') ??
+                            'Signed in as $userEmail',
                         style: theme.textTheme.titleSmall
                             ?.copyWith(fontWeight: FontWeight.w600),
                       ),
@@ -46,7 +48,8 @@ class EmailUserStatusCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Your data syncs across all devices with this email.',
+                  l10n?.syncEmailDescription ??
+                      'Your data syncs across all devices with this email.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -59,9 +62,10 @@ class EmailUserStatusCard extends StatelessWidget {
         Card(
           child: ListTile(
             leading: const Icon(Icons.person_outline),
-            title: const Text('Switch to anonymous'),
-            subtitle:
-                const Text('Continue without email, new anonymous session'),
+            title: Text(
+                l10n?.syncSwitchToAnonymousTitle ?? 'Switch to anonymous'),
+            subtitle: Text(l10n?.syncSwitchToAnonymousDesc ??
+                'Continue without email, new anonymous session'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: isLoading ? null : onSwitchToAnonymous,
           ),
@@ -93,18 +97,19 @@ class GuestOptionCard extends StatelessWidget {
           child: ListTile(
             leading: const Icon(Icons.person_outline),
             title: Text(l10n?.continueAsGuest ?? 'Continue as guest'),
-            subtitle: const Text('Anonymous, no email needed.'),
+            subtitle: Text(
+                l10n?.syncGuestDescription ?? 'Anonymous, no email needed.'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: isLoading ? null : onContinueAsGuest,
           ),
         ),
         const SizedBox(height: 16),
-        const Row(children: [
-          Expanded(child: Divider()),
+        Row(children: [
+          const Expanded(child: Divider()),
           Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text('or')),
-          Expanded(child: Divider()),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(l10n?.syncOrDivider ?? 'or')),
+          const Expanded(child: Divider()),
         ]),
         const SizedBox(height: 16),
       ],

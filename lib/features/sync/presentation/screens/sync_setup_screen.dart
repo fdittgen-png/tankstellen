@@ -40,13 +40,17 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
     super.dispose();
   }
 
-  String _titleFor(SyncSetupStep step, SyncMode mode) => switch (step) {
-        SyncSetupStep.mode => 'Connect TankSync',
-        SyncSetupStep.credentials =>
-          mode == SyncMode.private ? 'Your database' : 'Join a group',
-        SyncSetupStep.auth => 'Your account',
-        SyncSetupStep.done => 'Connected!',
-      };
+  String _titleFor(SyncSetupStep step, SyncMode mode) {
+    final l10n = AppLocalizations.of(context);
+    return switch (step) {
+      SyncSetupStep.mode => l10n?.syncWizardTitleConnect ?? 'Connect TankSync',
+      SyncSetupStep.credentials => mode == SyncMode.private
+          ? (l10n?.syncSetupTitleYourDatabase ?? 'Your database')
+          : (l10n?.syncSetupTitleJoinGroup ?? 'Join a group'),
+      SyncSetupStep.auth => l10n?.syncSetupTitleAccount ?? 'Your account',
+      SyncSetupStep.done => l10n?.syncSuccessTitle ?? 'Successfully connected!',
+    };
+  }
 
   void _onBack() {
     final setup = ref.read(syncSetupControllerProvider);
@@ -189,16 +193,22 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
 
   List<Widget> _buildModeStep() {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final ctrl = ref.read(syncSetupControllerProvider.notifier);
     return [
       Semantics(
         header: true,
-        child: Text('How would you like to sync?', style: theme.textTheme.titleMedium),
+        child: Text(
+          l10n?.syncHowToSyncQuestion ?? 'How would you like to sync?',
+          style: theme.textTheme.titleMedium,
+        ),
       ),
       const SizedBox(height: 4),
       Text(
-        'Your app works fully offline. Cloud sync is optional.',
-        style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+        l10n?.syncOfflineDescription ??
+            'Your app works fully offline. Cloud sync is optional.',
+        style: theme.textTheme.bodySmall
+            ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
       ),
       const SizedBox(height: 20),
 
@@ -207,9 +217,10 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
         button: true,
         child: SyncModeCard(
           icon: Icons.public,
-          title: 'Tankstellen Community',
-          subtitle: 'Share favorites & ratings with all users',
-          privacyLabel: 'Shared',
+          title: l10n?.syncModeCommunityTitle ?? 'Tankstellen Community',
+          subtitle: l10n?.syncModeCommunitySubtitle ??
+              'Share favorites & ratings with all users',
+          privacyLabel: l10n?.syncPrivacyShared ?? 'Shared',
           privacyColor: Colors.green,
           onTap: () => ctrl.selectMode(SyncMode.community),
         ),
@@ -221,9 +232,10 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
         button: true,
         child: SyncModeCard(
           icon: Icons.lock_outline,
-          title: 'Private Database',
-          subtitle: 'Your own Supabase — full data control',
-          privacyLabel: 'Private',
+          title: l10n?.syncModePrivateTitle ?? 'Private Database',
+          subtitle: l10n?.syncModePrivateSubtitle ??
+              'Your own Supabase — full data control',
+          privacyLabel: l10n?.syncPrivacyPrivate ?? 'Private',
           privacyColor: Colors.blue,
           onTap: () => ctrl.selectMode(SyncMode.private),
         ),
@@ -235,9 +247,10 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
         button: true,
         child: SyncModeCard(
           icon: Icons.group_outlined,
-          title: 'Join a Group',
-          subtitle: 'Family or friends shared database',
-          privacyLabel: 'Group',
+          title: l10n?.syncModeGroupTitle ?? 'Join a Group',
+          subtitle:
+              l10n?.syncModeGroupSubtitle ?? 'Family or friends shared database',
+          privacyLabel: l10n?.syncPrivacyGroup ?? 'Group',
           privacyColor: Colors.orange,
           onTap: () => ctrl.selectMode(SyncMode.joinExisting),
         ),
@@ -248,7 +261,7 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
         child: TextButton.icon(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.signal_wifi_off, size: 16),
-          label: const Text('Stay offline'),
+          label: Text(l10n?.syncStayOfflineButton ?? 'Stay offline'),
         ),
       ),
     ];
@@ -256,6 +269,7 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
 
   List<Widget> _buildDoneStep() {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     return [
       const SizedBox(height: 40),
       Semantics(
@@ -267,11 +281,17 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
               child: Icon(Icons.check_circle, size: 64, color: Colors.green),
             ),
             const SizedBox(height: 16),
-            Text('Successfully connected!', style: theme.textTheme.titleLarge, textAlign: TextAlign.center),
+            Text(
+              l10n?.syncSuccessTitle ?? 'Successfully connected!',
+              style: theme.textTheme.titleLarge,
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 8),
             Text(
-              'Your data will now sync automatically.',
-              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              l10n?.syncSuccessDescription ??
+                  'Your data will now sync automatically.',
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
           ],

@@ -1929,4 +1929,166 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get hideKey => 'Hide key';
+
+  @override
+  String get syncOptionalTitle => 'TankSync is optional';
+
+  @override
+  String get syncOptionalDescription =>
+      'Your app works fully without cloud sync. TankSync lets you sync favorites, alerts, and ratings across devices using Supabase (free tier available).';
+
+  @override
+  String get syncHowToConnectQuestion => 'How would you like to connect?';
+
+  @override
+  String get syncCreateOwnTitle => 'Create my own database';
+
+  @override
+  String get syncCreateOwnSubtitle =>
+      'Free Supabase project — we\'ll guide you step by step';
+
+  @override
+  String get syncJoinExistingTitle => 'Join an existing database';
+
+  @override
+  String get syncJoinExistingSubtitle =>
+      'Scan QR code from the database owner or paste credentials';
+
+  @override
+  String get syncChooseAccountType => 'Choose your account type';
+
+  @override
+  String get syncAccountTypeAnonymous => 'Anonymous';
+
+  @override
+  String get syncAccountTypeAnonymousDesc =>
+      'Instant, no email needed. Data tied to this device.';
+
+  @override
+  String get syncAccountTypeEmail => 'Email Account';
+
+  @override
+  String get syncAccountTypeEmailDesc =>
+      'Sign in from any device. Recover data if phone is lost.';
+
+  @override
+  String get syncHaveAccountSignIn => 'Already have an account? Sign in';
+
+  @override
+  String get syncCreateNewAccount => 'Create new account';
+
+  @override
+  String get syncTestConnection => 'Test Connection';
+
+  @override
+  String get syncTestingConnection => 'Testing...';
+
+  @override
+  String get syncConnectButton => 'Connect';
+
+  @override
+  String get syncConnectingButton => 'Connecting...';
+
+  @override
+  String get syncDatabaseReady => 'Database ready!';
+
+  @override
+  String get syncDatabaseNeedsSetup => 'Database needs setup';
+
+  @override
+  String get syncTableStatusOk => 'OK';
+
+  @override
+  String get syncTableStatusMissing => 'Missing';
+
+  @override
+  String get syncSqlEditorInstructions =>
+      'Copy the SQL below and run it in your Supabase SQL Editor (Dashboard → SQL Editor → New Query → Paste → Run)';
+
+  @override
+  String get syncCopySqlButton => 'Copy SQL to clipboard';
+
+  @override
+  String get syncRecheckSchemaButton => 'Re-check schema';
+
+  @override
+  String get syncDoneButton => 'Done';
+
+  @override
+  String syncSignedInAs(String email) {
+    return 'Signed in as $email';
+  }
+
+  @override
+  String get syncEmailDescription =>
+      'Your data syncs across all devices with this email.';
+
+  @override
+  String get syncSwitchToAnonymousTitle => 'Switch to anonymous';
+
+  @override
+  String get syncSwitchToAnonymousDesc =>
+      'Continue without email, new anonymous session';
+
+  @override
+  String get syncGuestDescription => 'Anonymous, no email needed.';
+
+  @override
+  String get syncOrDivider => 'or';
+
+  @override
+  String get syncHowToSyncQuestion => 'How would you like to sync?';
+
+  @override
+  String get syncOfflineDescription =>
+      'Your app works fully offline. Cloud sync is optional.';
+
+  @override
+  String get syncModeCommunityTitle => 'Tankstellen Community';
+
+  @override
+  String get syncModeCommunitySubtitle =>
+      'Share favorites & ratings with all users';
+
+  @override
+  String get syncModePrivateTitle => 'Private Database';
+
+  @override
+  String get syncModePrivateSubtitle => 'Your own Supabase — full data control';
+
+  @override
+  String get syncModeGroupTitle => 'Join a Group';
+
+  @override
+  String get syncModeGroupSubtitle => 'Family or friends shared database';
+
+  @override
+  String get syncPrivacyShared => 'Shared';
+
+  @override
+  String get syncPrivacyPrivate => 'Private';
+
+  @override
+  String get syncPrivacyGroup => 'Group';
+
+  @override
+  String get syncStayOfflineButton => 'Stay offline';
+
+  @override
+  String get syncSuccessTitle => 'Successfully connected!';
+
+  @override
+  String get syncSuccessDescription => 'Your data will now sync automatically.';
+
+  @override
+  String get syncWizardTitleConnect => 'Connect TankSync';
+
+  @override
+  String get syncSetupTitleYourDatabase => 'Your database';
+
+  @override
+  String get syncSetupTitleJoinGroup => 'Join a group';
+
+  @override
+  String get syncSetupTitleAccount => 'Your account';
 }
