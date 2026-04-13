@@ -3696,6 +3696,306 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hide key'**
   String get hideKey;
+
+  /// No description provided for @syncOptionalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'TankSync is optional'**
+  String get syncOptionalTitle;
+
+  /// No description provided for @syncOptionalDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your app works fully without cloud sync. TankSync lets you sync favorites, alerts, and ratings across devices using Supabase (free tier available).'**
+  String get syncOptionalDescription;
+
+  /// No description provided for @syncHowToConnectQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How would you like to connect?'**
+  String get syncHowToConnectQuestion;
+
+  /// No description provided for @syncCreateOwnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create my own database'**
+  String get syncCreateOwnTitle;
+
+  /// No description provided for @syncCreateOwnSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Supabase project — we\'ll guide you step by step'**
+  String get syncCreateOwnSubtitle;
+
+  /// No description provided for @syncJoinExistingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join an existing database'**
+  String get syncJoinExistingTitle;
+
+  /// No description provided for @syncJoinExistingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR code from the database owner or paste credentials'**
+  String get syncJoinExistingSubtitle;
+
+  /// No description provided for @syncChooseAccountType.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your account type'**
+  String get syncChooseAccountType;
+
+  /// No description provided for @syncAccountTypeAnonymous.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous'**
+  String get syncAccountTypeAnonymous;
+
+  /// No description provided for @syncAccountTypeAnonymousDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant, no email needed. Data tied to this device.'**
+  String get syncAccountTypeAnonymousDesc;
+
+  /// No description provided for @syncAccountTypeEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Account'**
+  String get syncAccountTypeEmail;
+
+  /// No description provided for @syncAccountTypeEmailDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in from any device. Recover data if phone is lost.'**
+  String get syncAccountTypeEmailDesc;
+
+  /// No description provided for @syncHaveAccountSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Sign in'**
+  String get syncHaveAccountSignIn;
+
+  /// No description provided for @syncCreateNewAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create new account'**
+  String get syncCreateNewAccount;
+
+  /// No description provided for @syncTestConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Test Connection'**
+  String get syncTestConnection;
+
+  /// No description provided for @syncTestingConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Testing...'**
+  String get syncTestingConnection;
+
+  /// No description provided for @syncConnectButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect'**
+  String get syncConnectButton;
+
+  /// No description provided for @syncConnectingButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting...'**
+  String get syncConnectingButton;
+
+  /// No description provided for @syncDatabaseReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Database ready!'**
+  String get syncDatabaseReady;
+
+  /// No description provided for @syncDatabaseNeedsSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Database needs setup'**
+  String get syncDatabaseNeedsSetup;
+
+  /// No description provided for @syncTableStatusOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get syncTableStatusOk;
+
+  /// No description provided for @syncTableStatusMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing'**
+  String get syncTableStatusMissing;
+
+  /// No description provided for @syncSqlEditorInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the SQL below and run it in your Supabase SQL Editor (Dashboard → SQL Editor → New Query → Paste → Run)'**
+  String get syncSqlEditorInstructions;
+
+  /// No description provided for @syncCopySqlButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy SQL to clipboard'**
+  String get syncCopySqlButton;
+
+  /// No description provided for @syncRecheckSchemaButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-check schema'**
+  String get syncRecheckSchemaButton;
+
+  /// No description provided for @syncDoneButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get syncDoneButton;
+
+  /// No description provided for @syncSignedInAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {email}'**
+  String syncSignedInAs(String email);
+
+  /// No description provided for @syncEmailDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data syncs across all devices with this email.'**
+  String get syncEmailDescription;
+
+  /// No description provided for @syncSwitchToAnonymousTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to anonymous'**
+  String get syncSwitchToAnonymousTitle;
+
+  /// No description provided for @syncSwitchToAnonymousDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue without email, new anonymous session'**
+  String get syncSwitchToAnonymousDesc;
+
+  /// No description provided for @syncGuestDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous, no email needed.'**
+  String get syncGuestDescription;
+
+  /// No description provided for @syncOrDivider.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get syncOrDivider;
+
+  /// No description provided for @syncHowToSyncQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How would you like to sync?'**
+  String get syncHowToSyncQuestion;
+
+  /// No description provided for @syncOfflineDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your app works fully offline. Cloud sync is optional.'**
+  String get syncOfflineDescription;
+
+  /// No description provided for @syncModeCommunityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tankstellen Community'**
+  String get syncModeCommunityTitle;
+
+  /// No description provided for @syncModeCommunitySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share favorites & ratings with all users'**
+  String get syncModeCommunitySubtitle;
+
+  /// No description provided for @syncModePrivateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Private Database'**
+  String get syncModePrivateTitle;
+
+  /// No description provided for @syncModePrivateSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own Supabase — full data control'**
+  String get syncModePrivateSubtitle;
+
+  /// No description provided for @syncModeGroupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join a Group'**
+  String get syncModeGroupTitle;
+
+  /// No description provided for @syncModeGroupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Family or friends shared database'**
+  String get syncModeGroupSubtitle;
+
+  /// No description provided for @syncPrivacyShared.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared'**
+  String get syncPrivacyShared;
+
+  /// No description provided for @syncPrivacyPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get syncPrivacyPrivate;
+
+  /// No description provided for @syncPrivacyGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get syncPrivacyGroup;
+
+  /// No description provided for @syncStayOfflineButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay offline'**
+  String get syncStayOfflineButton;
+
+  /// No description provided for @syncSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully connected!'**
+  String get syncSuccessTitle;
+
+  /// No description provided for @syncSuccessDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data will now sync automatically.'**
+  String get syncSuccessDescription;
+
+  /// No description provided for @syncWizardTitleConnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect TankSync'**
+  String get syncWizardTitleConnect;
+
+  /// No description provided for @syncSetupTitleYourDatabase.
+  ///
+  /// In en, this message translates to:
+  /// **'Your database'**
+  String get syncSetupTitleYourDatabase;
+
+  /// No description provided for @syncSetupTitleJoinGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Join a group'**
+  String get syncSetupTitleJoinGroup;
+
+  /// No description provided for @syncSetupTitleAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account'**
+  String get syncSetupTitleAccount;
 }
 
 class _AppLocalizationsDelegate
