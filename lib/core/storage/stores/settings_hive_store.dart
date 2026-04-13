@@ -22,6 +22,7 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
   static Future<void> loadApiKey() async {
     _apiKeyCache = await _secureStorage.read(key: StorageKeys.apiKey);
     await loadEvApiKey();
+    await loadSupabaseAnonKey();
   }
 
   @override
@@ -70,6 +71,43 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
   Future<void> setEvApiKey(String key) async {
     await _secureStorage.write(key: StorageKeys.evApiKey, value: key);
     _evApiKeyCache = key;
+  }
+
+  // Supabase anon key — secure storage with in-memory cache.
+  static String? _supabaseAnonKeyCache;
+
+  /// Load the Supabase anon key into memory and migrate any legacy plain-Hive
+  /// value that pre-dates secure storage (issue #389).
+  static Future<void> loadSupabaseAnonKey() async {
+    _supabaseAnonKeyCache =
+        await _secureStorage.read(key: StorageKeys.supabaseAnonKey);
+    if (_supabaseAnonKeyCache != null) return;
+
+    // One-time migration from plain Hive settings.
+    final box = Hive.box(HiveBoxes.settings);
+    final legacy = box.get(StorageKeys.supabaseAnonKey) as String?;
+    if (legacy != null && legacy.isNotEmpty) {
+      await _secureStorage.write(
+          key: StorageKeys.supabaseAnonKey, value: legacy);
+      _supabaseAnonKeyCache = legacy;
+      await box.delete(StorageKeys.supabaseAnonKey);
+    }
+  }
+
+  @override
+  String? getSupabaseAnonKey() => _supabaseAnonKeyCache;
+
+  @override
+  Future<void> setSupabaseAnonKey(String key) async {
+    await _secureStorage.write(
+        key: StorageKeys.supabaseAnonKey, value: key);
+    _supabaseAnonKeyCache = key;
+  }
+
+  @override
+  Future<void> deleteSupabaseAnonKey() async {
+    await _secureStorage.delete(key: StorageKeys.supabaseAnonKey);
+    _supabaseAnonKeyCache = null;
   }
 
   // Generic settings access

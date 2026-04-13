@@ -30,7 +30,7 @@ class SyncState extends _$SyncState {
     return SyncConfig(
       enabled: storage.getSetting('sync_enabled') as bool? ?? false,
       supabaseUrl: storage.getSetting('supabase_url') as String?,
-      supabaseAnonKey: storage.getSetting('supabase_anon_key') as String?,
+      supabaseAnonKey: storage.getSupabaseAnonKey(),
       userId: storage.getSetting('sync_user_id') as String?,
       userEmail: TankSyncClient.currentEmail,
       mode: _parseMode(modeStr),
@@ -61,7 +61,7 @@ class SyncState extends _$SyncState {
 
       await storage.putSetting('sync_enabled', true);
       await storage.putSetting('supabase_url', cleanUrl);
-      await storage.putSetting('supabase_anon_key', cleanKey);
+      await storage.setSupabaseAnonKey(cleanKey);
       await storage.putSetting('sync_mode', mode.name);
       if (userId != null) {
         await storage.putSetting('sync_user_id', userId);
@@ -190,7 +190,7 @@ class SyncState extends _$SyncState {
 
     await storage.putSetting('sync_enabled', false);
     await storage.putSetting('supabase_url', null);
-    await storage.putSetting('supabase_anon_key', null);
+    await storage.deleteSupabaseAnonKey();
     await storage.putSetting('sync_user_id', null);
     await storage.putSetting('sync_mode', null);
 

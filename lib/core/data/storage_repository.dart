@@ -71,6 +71,12 @@ abstract class ApiKeyStorage {
   bool hasEvApiKey();
   bool hasCustomEvApiKey();
   Future<void> setEvApiKey(String key);
+
+  /// Supabase anon key — stored in the platform secure enclave, mirrored
+  /// to an in-memory cache so callers can read synchronously.
+  String? getSupabaseAnonKey();
+  Future<void> setSupabaseAnonKey(String key);
+  Future<void> deleteSupabaseAnonKey();
 }
 
 /// User profile storage.

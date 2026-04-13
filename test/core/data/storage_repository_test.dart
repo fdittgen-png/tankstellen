@@ -49,6 +49,13 @@ void main() {
       // Settings
       await mock.putSetting('key', 'value');
       expect(mock.getSetting('key'), 'value');
+
+      // Supabase anon key (secure storage surface)
+      expect(mock.getSupabaseAnonKey(), isNull);
+      await mock.setSupabaseAnonKey('anon-key-123');
+      expect(mock.getSupabaseAnonKey(), 'anon-key-123');
+      await mock.deleteSupabaseAnonKey();
+      expect(mock.getSupabaseAnonKey(), isNull);
     });
   });
 }
@@ -109,6 +116,14 @@ class _MockStorageRepository implements StorageRepository {
   @override bool hasEvApiKey() => false;
   @override bool hasCustomEvApiKey() => false;
   @override Future<void> setEvApiKey(String key) async {}
+  String? _supabaseAnonKey;
+  @override String? getSupabaseAnonKey() => _supabaseAnonKey;
+  @override Future<void> setSupabaseAnonKey(String key) async {
+    _supabaseAnonKey = key;
+  }
+  @override Future<void> deleteSupabaseAnonKey() async {
+    _supabaseAnonKey = null;
+  }
 
   @override String? getActiveProfileId() => _settings['active_profile_id'] as String?;
   @override Future<void> setActiveProfileId(String id) async => _settings['active_profile_id'] = id;

@@ -89,7 +89,7 @@ Future<void> main() async {
   final syncEnabled = storage.getSetting('sync_enabled') as bool? ?? false;
   if (syncEnabled) {
     final url = storage.getSetting('supabase_url') as String?;
-    final key = storage.getSetting('supabase_anon_key') as String?;
+    final key = storage.getSupabaseAnonKey();
     if (url != null && key != null) {
       try {
         await Future(() async {
