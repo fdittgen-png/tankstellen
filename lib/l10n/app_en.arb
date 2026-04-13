@@ -839,5 +839,8 @@
   "errorHintConnection": "Check your internet connection and try again.",
   "errorHintRouting": "Route calculation failed. Check your internet connection and try again.",
   "errorHintFallback": "Try again or search by postal code / city name.",
-  "detailsLabel": "Details"
+  "detailsLabel": "Details",
+  "remove": "Remove",
+  "showKey": "Show key",
+  "hideKey": "Hide key"
 }

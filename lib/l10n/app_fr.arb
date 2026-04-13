@@ -498,5 +498,8 @@
   "errorHintConnection": "Vérifiez votre connexion internet et réessayez.",
   "errorHintRouting": "Calcul d'itinéraire échoué. Vérifiez votre connexion internet.",
   "errorHintFallback": "Réessayez ou cherchez par code postal / ville.",
-  "detailsLabel": "Détails"
+  "detailsLabel": "Détails",
+  "remove": "Retirer",
+  "showKey": "Afficher la clé",
+  "hideKey": "Masquer la clé"
 }

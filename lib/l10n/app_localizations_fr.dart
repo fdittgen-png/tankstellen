@@ -1931,4 +1931,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get detailsLabel => 'Détails';
+
+  @override
+  String get remove => 'Retirer';
+
+  @override
+  String get showKey => 'Afficher la clé';
+
+  @override
+  String get hideKey => 'Masquer la clé';
 }

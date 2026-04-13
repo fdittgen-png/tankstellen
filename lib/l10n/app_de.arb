@@ -833,5 +833,8 @@
   "errorHintConnection": "Prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
   "errorHintRouting": "Routenberechnung fehlgeschlagen. Prüfen Sie Ihre Internetverbindung.",
   "errorHintFallback": "Versuchen Sie es erneut oder suchen Sie nach Postleitzahl / Stadt.",
-  "detailsLabel": "Details"
+  "detailsLabel": "Details",
+  "remove": "Entfernen",
+  "showKey": "Schlüssel anzeigen",
+  "hideKey": "Schlüssel verbergen"
 }
