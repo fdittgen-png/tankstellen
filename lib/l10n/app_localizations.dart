@@ -4146,6 +4146,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'eyJhbGciOiJIUzI1NiIs...'**
   String get syncCredentialsAccessKeyHint;
+
+  /// No description provided for @authEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get authEmailLabel;
+
+  /// No description provided for @authPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get authPasswordLabel;
+
+  /// No description provided for @authConfirmPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get authConfirmPasswordLabel;
+
+  /// No description provided for @authPleaseEnterEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email'**
+  String get authPleaseEnterEmail;
+
+  /// No description provided for @authInvalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email address'**
+  String get authInvalidEmail;
+
+  /// No description provided for @authPasswordsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get authPasswordsDoNotMatch;
+
+  /// No description provided for @authConnectAnonymously.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect anonymously'**
+  String get authConnectAnonymously;
+
+  /// No description provided for @authCreateAccountAndConnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account & connect'**
+  String get authCreateAccountAndConnect;
+
+  /// No description provided for @authSignInAndConnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in & connect'**
+  String get authSignInAndConnect;
+
+  /// No description provided for @authAnonymousSegment.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous'**
+  String get authAnonymousSegment;
+
+  /// No description provided for @authEmailSegment.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get authEmailSegment;
+
+  /// No description provided for @authAnonymousDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant access, no email needed. Data tied to this device.'**
+  String get authAnonymousDescription;
+
+  /// No description provided for @authEmailDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in from any device. Recover your data if your phone is lost.'**
+  String get authEmailDescription;
+
+  /// No description provided for @authSyncAcrossDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync data automatically across all your devices.'**
+  String get authSyncAcrossDevices;
+
+  /// No description provided for @authNewHereCreateAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'New here? Create account'**
+  String get authNewHereCreateAccount;
+
+  /// No description provided for @ntfyCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Push Notifications (ntfy.sh)'**
+  String get ntfyCardTitle;
+
+  /// No description provided for @ntfyEnableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable ntfy.sh push'**
+  String get ntfyEnableTitle;
+
+  /// No description provided for @ntfyEnableSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive price alerts via ntfy.sh'**
+  String get ntfyEnableSubtitle;
+
+  /// No description provided for @ntfyTopicUrlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Topic URL'**
+  String get ntfyTopicUrlLabel;
+
+  /// No description provided for @ntfyCopyTopicUrlTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy topic URL'**
+  String get ntfyCopyTopicUrlTooltip;
+
+  /// No description provided for @ntfySendTestButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send test notification'**
+  String get ntfySendTestButton;
+
+  /// No description provided for @ntfyFdroidHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Install the ntfy app from F-Droid to receive push notifications on your device.'**
+  String get ntfyFdroidHint;
+
+  /// No description provided for @ntfyConnectFirstHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect TankSync first to enable push notifications.'**
+  String get ntfyConnectFirstHint;
+
+  /// No description provided for @linkDeviceScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Device'**
+  String get linkDeviceScreenTitle;
+
+  /// No description provided for @linkDeviceThisDeviceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'This device'**
+  String get linkDeviceThisDeviceLabel;
+
+  /// No description provided for @linkDeviceShareCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Share this code with your other device:'**
+  String get linkDeviceShareCodeHint;
+
+  /// No description provided for @linkDeviceNotConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Not connected'**
+  String get linkDeviceNotConnected;
+
+  /// No description provided for @linkDeviceCopyCodeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy code'**
+  String get linkDeviceCopyCodeTooltip;
+
+  /// No description provided for @linkDeviceImportSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from another device'**
+  String get linkDeviceImportSectionTitle;
+
+  /// No description provided for @linkDeviceImportDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the device code from your other device to import its favorites and alerts.'**
+  String get linkDeviceImportDescription;
+
+  /// No description provided for @linkDeviceCodeFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Device code'**
+  String get linkDeviceCodeFieldLabel;
+
+  /// No description provided for @linkDeviceCodeFieldHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the UUID from other device'**
+  String get linkDeviceCodeFieldHint;
+
+  /// No description provided for @linkDeviceImportButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Import data'**
+  String get linkDeviceImportButton;
+
+  /// No description provided for @linkDeviceHowItWorksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How it works'**
+  String get linkDeviceHowItWorksTitle;
+
+  /// No description provided for @linkDeviceHowItWorksBody.
+  ///
+  /// In en, this message translates to:
+  /// **'1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites and alerts\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity. Data is merged, not moved.'**
+  String get linkDeviceHowItWorksBody;
 }
 
 class _AppLocalizationsDelegate

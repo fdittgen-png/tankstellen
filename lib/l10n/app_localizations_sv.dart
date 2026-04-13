@@ -2175,4 +2175,117 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get syncCredentialsAccessKeyHint => 'eyJhbGciOiJIUzI1NiIs...';
+
+  @override
+  String get authEmailLabel => 'Email';
+
+  @override
+  String get authPasswordLabel => 'Password';
+
+  @override
+  String get authConfirmPasswordLabel => 'Confirm password';
+
+  @override
+  String get authPleaseEnterEmail => 'Please enter your email';
+
+  @override
+  String get authInvalidEmail => 'Invalid email address';
+
+  @override
+  String get authPasswordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get authConnectAnonymously => 'Connect anonymously';
+
+  @override
+  String get authCreateAccountAndConnect => 'Create account & connect';
+
+  @override
+  String get authSignInAndConnect => 'Sign in & connect';
+
+  @override
+  String get authAnonymousSegment => 'Anonymous';
+
+  @override
+  String get authEmailSegment => 'Email';
+
+  @override
+  String get authAnonymousDescription =>
+      'Instant access, no email needed. Data tied to this device.';
+
+  @override
+  String get authEmailDescription =>
+      'Sign in from any device. Recover your data if your phone is lost.';
+
+  @override
+  String get authSyncAcrossDevices =>
+      'Sync data automatically across all your devices.';
+
+  @override
+  String get authNewHereCreateAccount => 'New here? Create account';
+
+  @override
+  String get ntfyCardTitle => 'Push Notifications (ntfy.sh)';
+
+  @override
+  String get ntfyEnableTitle => 'Enable ntfy.sh push';
+
+  @override
+  String get ntfyEnableSubtitle => 'Receive price alerts via ntfy.sh';
+
+  @override
+  String get ntfyTopicUrlLabel => 'Topic URL';
+
+  @override
+  String get ntfyCopyTopicUrlTooltip => 'Copy topic URL';
+
+  @override
+  String get ntfySendTestButton => 'Send test notification';
+
+  @override
+  String get ntfyFdroidHint =>
+      'Install the ntfy app from F-Droid to receive push notifications on your device.';
+
+  @override
+  String get ntfyConnectFirstHint =>
+      'Connect TankSync first to enable push notifications.';
+
+  @override
+  String get linkDeviceScreenTitle => 'Link Device';
+
+  @override
+  String get linkDeviceThisDeviceLabel => 'This device';
+
+  @override
+  String get linkDeviceShareCodeHint =>
+      'Share this code with your other device:';
+
+  @override
+  String get linkDeviceNotConnected => 'Not connected';
+
+  @override
+  String get linkDeviceCopyCodeTooltip => 'Copy code';
+
+  @override
+  String get linkDeviceImportSectionTitle => 'Import from another device';
+
+  @override
+  String get linkDeviceImportDescription =>
+      'Enter the device code from your other device to import its favorites and alerts.';
+
+  @override
+  String get linkDeviceCodeFieldLabel => 'Device code';
+
+  @override
+  String get linkDeviceCodeFieldHint => 'Paste the UUID from other device';
+
+  @override
+  String get linkDeviceImportButton => 'Import data';
+
+  @override
+  String get linkDeviceHowItWorksTitle => 'How it works';
+
+  @override
+  String get linkDeviceHowItWorksBody =>
+      '1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites and alerts\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity. Data is merged, not moved.';
 }

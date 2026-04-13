@@ -2190,4 +2190,119 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get syncCredentialsAccessKeyHint => 'eyJhbGciOiJIUzI1NiIs...';
+
+  @override
+  String get authEmailLabel => 'E-mail';
+
+  @override
+  String get authPasswordLabel => 'Mot de passe';
+
+  @override
+  String get authConfirmPasswordLabel => 'Confirmer le mot de passe';
+
+  @override
+  String get authPleaseEnterEmail => 'Veuillez saisir votre e-mail';
+
+  @override
+  String get authInvalidEmail => 'Adresse e-mail invalide';
+
+  @override
+  String get authPasswordsDoNotMatch =>
+      'Les mots de passe ne correspondent pas';
+
+  @override
+  String get authConnectAnonymously => 'Se connecter anonymement';
+
+  @override
+  String get authCreateAccountAndConnect => 'Créer un compte et se connecter';
+
+  @override
+  String get authSignInAndConnect => 'Se connecter';
+
+  @override
+  String get authAnonymousSegment => 'Anonyme';
+
+  @override
+  String get authEmailSegment => 'E-mail';
+
+  @override
+  String get authAnonymousDescription =>
+      'Accès instantané, sans e-mail. Données liées à cet appareil.';
+
+  @override
+  String get authEmailDescription =>
+      'Connectez-vous depuis n\'importe quel appareil. Récupérez vos données en cas de perte du téléphone.';
+
+  @override
+  String get authSyncAcrossDevices =>
+      'Synchronisez automatiquement vos données sur tous vos appareils.';
+
+  @override
+  String get authNewHereCreateAccount => 'Nouveau ? Créer un compte';
+
+  @override
+  String get ntfyCardTitle => 'Notifications push (ntfy.sh)';
+
+  @override
+  String get ntfyEnableTitle => 'Activer les push ntfy.sh';
+
+  @override
+  String get ntfyEnableSubtitle => 'Recevez les alertes de prix via ntfy.sh';
+
+  @override
+  String get ntfyTopicUrlLabel => 'URL du topic';
+
+  @override
+  String get ntfyCopyTopicUrlTooltip => 'Copier l\'URL du topic';
+
+  @override
+  String get ntfySendTestButton => 'Envoyer une notification test';
+
+  @override
+  String get ntfyFdroidHint =>
+      'Installez l\'application ntfy depuis F-Droid pour recevoir des notifications push sur votre appareil.';
+
+  @override
+  String get ntfyConnectFirstHint =>
+      'Connectez d\'abord TankSync pour activer les notifications push.';
+
+  @override
+  String get linkDeviceScreenTitle => 'Lier un appareil';
+
+  @override
+  String get linkDeviceThisDeviceLabel => 'Cet appareil';
+
+  @override
+  String get linkDeviceShareCodeHint =>
+      'Partagez ce code avec votre autre appareil :';
+
+  @override
+  String get linkDeviceNotConnected => 'Non connecté';
+
+  @override
+  String get linkDeviceCopyCodeTooltip => 'Copier le code';
+
+  @override
+  String get linkDeviceImportSectionTitle =>
+      'Importer depuis un autre appareil';
+
+  @override
+  String get linkDeviceImportDescription =>
+      'Saisissez le code de votre autre appareil pour importer ses favoris et alertes.';
+
+  @override
+  String get linkDeviceCodeFieldLabel => 'Code de l\'appareil';
+
+  @override
+  String get linkDeviceCodeFieldHint => 'Collez l\'UUID de l\'autre appareil';
+
+  @override
+  String get linkDeviceImportButton => 'Importer les données';
+
+  @override
+  String get linkDeviceHowItWorksTitle => 'Comment ça marche';
+
+  @override
+  String get linkDeviceHowItWorksBody =>
+      '1. Sur l\'appareil A : copiez le code ci-dessus\n2. Sur l\'appareil B : collez-le dans le champ « Code de l\'appareil »\n3. Appuyez sur « Importer les données » pour fusionner favoris et alertes\n4. Les deux appareils auront toutes les données combinées\n\nChaque appareil garde sa propre identité anonyme. Les données sont fusionnées, pas déplacées.';
 }

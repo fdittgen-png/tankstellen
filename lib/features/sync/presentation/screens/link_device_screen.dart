@@ -30,11 +30,12 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final uiState = ref.watch(linkDeviceControllerProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Link Device'),
+        title: Text(l10n?.linkDeviceScreenTitle ?? 'Link Device'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -51,7 +52,7 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
                       const Icon(Icons.smartphone, size: 20),
                       const SizedBox(width: 8),
                       Text(
-                        'This device',
+                        l10n?.linkDeviceThisDeviceLabel ?? 'This device',
                         style: theme.textTheme.titleMedium
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
@@ -59,7 +60,8 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Share this code with your other device:',
+                    l10n?.linkDeviceShareCodeHint ??
+                        'Share this code with your other device:',
                     style: theme.textTheme.bodySmall
                         ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                   ),
@@ -75,7 +77,9 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
                       children: [
                         Expanded(
                           child: SelectableText(
-                            _myId ?? 'Not connected',
+                            _myId ??
+                                (l10n?.linkDeviceNotConnected ??
+                                    'Not connected'),
                             style: theme.textTheme.bodySmall
                                 ?.copyWith(fontFamily: 'monospace'),
                           ),
@@ -83,7 +87,8 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
                         if (_myId != null)
                           IconButton(
                             icon: const Icon(Icons.copy, size: 18),
-                            tooltip: 'Copy code',
+                            tooltip:
+                                l10n?.linkDeviceCopyCodeTooltip ?? 'Copy code',
                             onPressed: () {
                               Clipboard.setData(ClipboardData(text: _myId!));
                               SnackBarHelper.show(
@@ -117,7 +122,8 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
                       const Icon(Icons.link, size: 20),
                       const SizedBox(width: 8),
                       Text(
-                        'Import from another device',
+                        l10n?.linkDeviceImportSectionTitle ??
+                            'Import from another device',
                         style: theme.textTheme.titleMedium
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
@@ -125,7 +131,8 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Enter the device code from your other device to import its favorites and alerts.',
+                    l10n?.linkDeviceImportDescription ??
+                        'Enter the device code from your other device to import its favorites and alerts.',
                     style: theme.textTheme.bodySmall
                         ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                   ),
@@ -142,12 +149,15 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
                         children: [
                           TextField(
                             controller: _codeController,
-                            decoration: const InputDecoration(
-                              labelText: 'Device code',
-                              hintText: 'Paste the UUID from other device',
-                              prefixIcon: Icon(Icons.key, size: 18),
+                            decoration: InputDecoration(
+                              labelText:
+                                  l10n?.linkDeviceCodeFieldLabel ??
+                                      'Device code',
+                              hintText: l10n?.linkDeviceCodeFieldHint ??
+                                  'Paste the UUID from other device',
+                              prefixIcon: const Icon(Icons.key, size: 18),
                               isDense: true,
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 8),
                             ),
                           ),
@@ -165,7 +175,8 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
                                     child: CircularProgressIndicator(
                                         strokeWidth: 2, color: Colors.white))
                                 : const Icon(Icons.sync),
-                            label: const Text('Import data'),
+                            label: Text(
+                                l10n?.linkDeviceImportButton ?? 'Import data'),
                           ),
                         ],
                       );
@@ -198,7 +209,7 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
                       const Icon(Icons.info_outline, size: 20),
                       const SizedBox(width: 8),
                       Text(
-                        'How it works',
+                        l10n?.linkDeviceHowItWorksTitle ?? 'How it works',
                         style: theme.textTheme.titleSmall
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
@@ -206,12 +217,13 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '1. On Device A: copy the device code above\n'
-                    '2. On Device B: paste it in the "Device code" field\n'
-                    '3. Tap "Import data" to merge favorites and alerts\n'
-                    '4. Both devices will have all combined data\n\n'
-                    'Each device keeps its own anonymous identity. '
-                    'Data is merged, not moved.',
+                    l10n?.linkDeviceHowItWorksBody ??
+                        '1. On Device A: copy the device code above\n'
+                            '2. On Device B: paste it in the "Device code" field\n'
+                            '3. Tap "Import data" to merge favorites and alerts\n'
+                            '4. Both devices will have all combined data\n\n'
+                            'Each device keeps its own anonymous identity. '
+                            'Data is merged, not moved.',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
