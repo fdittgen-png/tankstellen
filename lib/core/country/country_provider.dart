@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/profile/providers/profile_provider.dart';
 import '../../features/profile/data/repositories/profile_repository.dart';
 import '../storage/storage_providers.dart';
+import '../utils/price_formatter.dart';
 import 'country_config.dart';
 
 part 'country_provider.g.dart';
@@ -18,17 +19,23 @@ class ActiveCountry extends _$ActiveCountry {
     final profile = ref.watch(activeProfileProvider);
     if (profile?.countryCode != null) {
       final fromProfile = Countries.byCode(profile!.countryCode!);
-      if (fromProfile != null) return fromProfile;
+      if (fromProfile != null) return _applyCountry(fromProfile);
     }
 
     // Priority 2: persisted setting (legacy / migration)
     final storage = ref.watch(storageRepositoryProvider);
     final savedCode = storage.getSetting(_storageKey) as String?;
     if (savedCode != null) {
-      return Countries.byCode(savedCode) ?? _detectFromLocale();
+      return _applyCountry(Countries.byCode(savedCode) ?? _detectFromLocale());
     }
 
-    return _detectFromLocale();
+    return _applyCountry(_detectFromLocale());
+  }
+
+  /// Apply country to price formatter when country changes.
+  CountryConfig _applyCountry(CountryConfig config) {
+    PriceFormatter.setCountry(config.code);
+    return config;
   }
 
   /// Auto-detect country from system locale.
