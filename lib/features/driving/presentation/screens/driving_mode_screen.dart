@@ -6,16 +6,15 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/utils/price_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
-import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../search/providers/search_provider.dart';
 import '../widgets/driving_bottom_bar.dart';
-import '../widgets/driving_marker_builder.dart';
+import '../widgets/driving_lock_overlay.dart';
+import '../widgets/driving_map_view.dart';
 import '../widgets/driving_station_sheet.dart';
+import '../widgets/driving_top_bar.dart';
 
 /// Full-screen driving mode with oversized touch targets and minimal UI.
 ///
@@ -84,6 +83,7 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
   Widget build(BuildContext context) {
     final searchState = ref.watch(searchStateProvider);
     final selectedFuel = ref.watch(selectedFuelTypeProvider);
+    final stations = _extractStations(searchState);
 
     return Scaffold(
       body: GestureDetector(
@@ -92,178 +92,28 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
         onPanDown: (_) => _onUserInteraction(),
         child: Stack(
           children: [
-            // Map layer
-            _buildMap(context, searchState, selectedFuel),
-            // Top bar with fuel type
-            _buildTopBar(context, selectedFuel),
-            // Bottom control bar
+            DrivingMapView(
+              mapController: _mapController,
+              stations: stations,
+              selectedFuel: selectedFuel,
+              onMarkerTap: (station) =>
+                  _showStationSheet(context, station, selectedFuel),
+              onInteraction: _onUserInteraction,
+            ),
+            DrivingTopBar(selectedFuel: selectedFuel),
             Positioned(
               left: 0,
               right: 0,
               bottom: 0,
               child: DrivingBottomBar(
-                onRecenter: () => _recenter(searchState),
+                onRecenter: () => _recenter(stations),
                 onNearestStation: () =>
-                    _navigateToNearest(context, searchState, selectedFuel),
+                    _navigateToNearest(context, stations, selectedFuel),
                 onExit: () => context.go('/map'),
               ),
             ),
-            // Auto-lock overlay
-            if (_isLocked) _buildLockOverlay(context),
+            if (_isLocked) DrivingLockOverlay(onUnlock: _unlock),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMap(
-    BuildContext context,
-    AsyncValue searchState,
-    FuelType selectedFuel,
-  ) {
-    final stations = _extractStations(searchState);
-    if (stations.isEmpty) {
-      return FlutterMap(
-        mapController: _mapController,
-        options: const MapOptions(
-          initialCenter: LatLng(52.52, 13.405),
-          initialZoom: 12,
-        ),
-        children: [
-          TileLayer(
-            urlTemplate: AppConstants.osmTileUrl,
-            userAgentPackageName: AppConstants.osmUserAgent,
-          ),
-        ],
-      );
-    }
-
-    final center = _computeCenter(stations);
-    final priceRange = _getPriceRange(stations, selectedFuel);
-
-    final markers = stations.map((station) {
-      return DrivingMarkerBuilder.build(
-        station,
-        selectedFuel,
-        priceRange.$1,
-        priceRange.$2,
-        onTap: () {
-          _onUserInteraction();
-          _showStationSheet(context, station, selectedFuel);
-        },
-      );
-    }).toList();
-
-    return FlutterMap(
-      mapController: _mapController,
-      options: MapOptions(
-        initialCenter: center,
-        initialZoom: 13,
-        interactionOptions: const InteractionOptions(
-          flags: InteractiveFlag.drag |
-              InteractiveFlag.flingAnimation |
-              InteractiveFlag.doubleTapZoom,
-        ),
-        onTap: (_, _) => _onUserInteraction(),
-      ),
-      children: [
-        TileLayer(
-          urlTemplate: AppConstants.osmTileUrl,
-          userAgentPackageName: AppConstants.osmUserAgent,
-        ),
-        MarkerLayer(markers: markers),
-        const RichAttributionWidget(
-          attributions: [
-            TextSourceAttribution('OpenStreetMap contributors'),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTopBar(BuildContext context, FuelType selectedFuel) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final topPadding = MediaQuery.of(context).viewPadding.top;
-
-    return Positioned(
-      top: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        padding: EdgeInsets.only(
-          top: topPadding + 8,
-          left: 16,
-          right: 16,
-          bottom: 8,
-        ),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              theme.colorScheme.surface.withValues(alpha: 0.9),
-              theme.colorScheme.surface.withValues(alpha: 0.0),
-            ],
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.drive_eta, color: theme.colorScheme.primary, size: 24),
-            const SizedBox(width: 8),
-            Text(
-              l10n?.drivingMode ?? 'Driving Mode',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                selectedFuel.displayName,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onPrimaryContainer,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLockOverlay(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
-    return Positioned.fill(
-      child: GestureDetector(
-        onTap: _unlock,
-        child: Container(
-          color: Colors.black.withValues(alpha: 0.6),
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.lock_outline, size: 64, color: Colors.white70),
-                const SizedBox(height: 16),
-                Text(
-                  l10n?.drivingTapToUnlock ?? 'Tap to unlock',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );
@@ -283,27 +133,24 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
     );
   }
 
-  void _recenter(AsyncValue searchState) {
+  void _recenter(List<Station> stations) {
     _onUserInteraction();
-    final stations = _extractStations(searchState);
     if (stations.isNotEmpty) {
-      final center = _computeCenter(stations);
-      _mapController.move(center, 13);
+      _mapController.move(DrivingMapView.computeCenter(stations), 13);
     }
   }
 
   void _navigateToNearest(
     BuildContext context,
-    AsyncValue searchState,
+    List<Station> stations,
     FuelType selectedFuel,
   ) {
     _onUserInteraction();
-    final stations = _extractStations(searchState);
     if (stations.isEmpty) return;
 
-    // Sort by distance and pick closest with a price
-    final sorted = [...stations]
-      ..sort((a, b) => a.dist.compareTo(b.dist));
+    // Sort by distance and pick the closest station that has a price for
+    // the active fuel; fall back to the absolute nearest if none do.
+    final sorted = [...stations]..sort((a, b) => a.dist.compareTo(b.dist));
     final nearest = sorted.firstWhere(
       (s) => s.priceFor(selectedFuel) != null,
       orElse: () => sorted.first,
@@ -318,31 +165,5 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
     final result = searchState.value;
     if (result == null) return [];
     return result.data as List<Station>? ?? [];
-  }
-
-  LatLng _computeCenter(List<Station> stations) {
-    double sumLat = 0, sumLng = 0;
-    for (final s in stations) {
-      sumLat += s.lat;
-      sumLng += s.lng;
-    }
-    return LatLng(sumLat / stations.length, sumLng / stations.length);
-  }
-
-  static (double, double) _getPriceRange(
-    List<Station> stations,
-    FuelType fuel,
-  ) {
-    double minP = double.infinity;
-    double maxP = 0;
-    for (final s in stations) {
-      final p = priceForFuelType(s, fuel);
-      if (p != null) {
-        if (p < minP) minP = p;
-        if (p > maxP) maxP = p;
-      }
-    }
-    if (minP == double.infinity) return (0, 0);
-    return (minP, maxP);
   }
 }
