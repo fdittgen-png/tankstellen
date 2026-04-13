@@ -230,8 +230,11 @@ void main() {
         'lib/features/profile/presentation/widgets/profile_edit_sheet.dart',
       ).readAsStringSync();
 
-      // The _confirmDelete method should check confirmed == true before calling onDelete
-      expect(source, contains('if (confirmed == true'));
+      // The _confirmDelete method must early-out when the user dismisses
+      // the dialog and only invoke onDelete when confirmed.
+      // Phrased as a regex so the exact comparison style (==/!=) and any
+      // surrounding mounted check don't lock us into one implementation.
+      expect(source, matches(RegExp(r'confirmed\s*(==|!=)\s*true')));
       expect(source, contains('widget.onDelete!()'));
     });
   });

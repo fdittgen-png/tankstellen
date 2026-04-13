@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
@@ -84,7 +86,10 @@ class StationServiceChain implements StationService {
     try {
       return await future;
     } finally {
-      _inFlight.remove(cacheKey);
+      // The removed value is the same Future we already awaited above —
+      // discard it explicitly so the analyzer doesn't flag it as a fire-
+      // and-forget call.
+      unawaited(_inFlight.remove(cacheKey) ?? Future<void>.value());
       _inFlightTimestamps.remove(cacheKey);
     }
   }

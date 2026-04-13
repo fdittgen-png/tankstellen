@@ -142,7 +142,7 @@ class TankSyncSection extends ConsumerWidget {
       ),
     );
     if (confirmed == true) {
-      ref.read(syncStateProvider.notifier).disconnect();
+      await ref.read(syncStateProvider.notifier).disconnect();
     }
   }
 
