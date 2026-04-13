@@ -117,17 +117,24 @@ class ServiceChainErrorWidget extends StatelessWidget {
   }
 
   /// Extract technical details for the expandable section.
+  ///
+  /// Domain exceptions go through [ErrorLocalizer] so the user sees the
+  /// translated message; unknown errors stay as their raw [toString] so the
+  /// expandable section still carries useful debug info.
   List<String> _technicalDetails(AppLocalizations? l10n) {
+    String render(Object e) =>
+        e is AppException ? ErrorLocalizer.localize(e, l10n) : e.toString();
+
     if (error is ServiceChainExhaustedException) {
       final chain = error as ServiceChainExhaustedException;
       return chain.errors.map((e) {
         if (e is ServiceError) {
           return '${e.source.displayName}: ${e.message}';
         }
-        return ErrorLocalizer.localize(e, l10n);
+        return render(e);
       }).toList();
     }
-    return [ErrorLocalizer.localize(error, l10n)];
+    return [render(error)];
   }
 
   @override
