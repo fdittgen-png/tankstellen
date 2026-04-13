@@ -48,6 +48,9 @@ class TraceUploader {
       final dio = DioFactory.create(
         connectTimeout: const Duration(seconds: 5),
         receiveTimeout: const Duration(seconds: 5),
+        // Trace uploads are user/session triggered and must dispatch
+        // immediately — opting out of the default rate limiter.
+        rateLimit: null,
       );
       await dio.post(
         config.serverUrl!,

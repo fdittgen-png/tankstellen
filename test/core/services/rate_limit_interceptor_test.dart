@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/core/services/service_providers.dart';
+import 'package:tankstellen/core/services/rate_limit_interceptor.dart';
 
 /// A seeded Random that always returns 0, removing jitter from tests.
 class _ZeroRandom implements Random {
@@ -70,7 +70,9 @@ void main() {
 
       expect(requestTimestamps, hasLength(2));
       final gap = requestTimestamps[1].difference(requestTimestamps[0]);
-      expect(gap.inMilliseconds, greaterThanOrEqualTo(100));
+      // 5ms slack: Future.delayed precision on slower CI runners is ~1-2ms
+      // and DateTime.now() can round down on Windows.
+      expect(gap.inMilliseconds, greaterThanOrEqualTo(95));
     });
 
     test('concurrent requests are serialized, not parallel', () async {
@@ -84,12 +86,14 @@ void main() {
 
       expect(requestTimestamps, hasLength(3));
 
-      // First request is immediate, 2nd and 3rd are each delayed
+      // First request is immediate, 2nd and 3rd are each delayed.
+      // 5ms slack: Future.delayed precision is ~1-2ms on CI; DateTime.now()
+      // can round down on Windows runners.
       final gap1 = requestTimestamps[1].difference(requestTimestamps[0]);
       final gap2 = requestTimestamps[2].difference(requestTimestamps[1]);
 
-      expect(gap1.inMilliseconds, greaterThanOrEqualTo(100));
-      expect(gap2.inMilliseconds, greaterThanOrEqualTo(100));
+      expect(gap1.inMilliseconds, greaterThanOrEqualTo(95));
+      expect(gap2.inMilliseconds, greaterThanOrEqualTo(95));
     });
   });
 }
