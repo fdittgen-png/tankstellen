@@ -6,6 +6,7 @@ import '../../error/exceptions.dart';
 import '../mixins/station_service_helpers.dart';
 import '../service_result.dart';
 import '../station_service.dart';
+import 'tankerkoenig_batch_price_fetcher.dart';
 
 /// Concrete StationService implementation for the Tankerkoenig API.
 ///
@@ -16,8 +17,13 @@ import '../station_service.dart';
 /// - Wraps all results in ServiceResult with source metadata
 class TankerkoenigStationService with StationServiceHelpers implements StationService {
   final Dio _dio;
+  final TankerkoenigBatchPriceFetcher _priceFetcher;
 
-  TankerkoenigStationService(this._dio);
+  TankerkoenigStationService(this._dio)
+      : _priceFetcher = TankerkoenigBatchPriceFetcher(
+          dio: _dio,
+          batchSize: ApiConstants.maxPriceQueryIds,
+        );
 
   @override
   Future<ServiceResult<List<Station>>> searchStations(
@@ -119,22 +125,16 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
       );
     }
 
-    final queryIds = ids.length > ApiConstants.maxPriceQueryIds
-        ? ids.take(ApiConstants.maxPriceQueryIds).toList()
-        : ids;
-
+    // The batch fetcher chunks `ids` into Tankerkoenig's per-call cap and
+    // merges the responses, so callers (e.g. favorites refresh with >10
+    // stations) get prices for *every* requested station instead of just
+    // the first 10. The API key is added by the Dio interceptor in
+    // service_providers.dart, so we don't pass it here.
     try {
-      final response = await _dio.get(
-        ApiConstants.pricesEndpoint,
-        queryParameters: {'ids': queryIds.join(',')},
+      final raw = await _priceFetcher.fetchBatch(ids: ids);
+      final prices = raw.map(
+        (id, data) => MapEntry(id, StationPrices.fromJson(data)),
       );
-      _checkOk(response.data);
-
-      final pricesJson = response.data['prices'] as Map<String, dynamic>? ?? {};
-      final prices = pricesJson.map((id, data) {
-        final p = data as Map<String, dynamic>;
-        return MapEntry(id, StationPrices.fromJson(p));
-      });
 
       return ServiceResult(
         data: prices,
