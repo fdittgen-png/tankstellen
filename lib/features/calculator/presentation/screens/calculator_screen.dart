@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/calculator_provider.dart';
+import '../widgets/calculator_empty_hint.dart';
+import '../widgets/calculator_input_field.dart';
+import '../widgets/calculator_result_card.dart';
 
 class CalculatorScreen extends ConsumerStatefulWidget {
   final double? initialPrice;
@@ -53,7 +56,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(calculatorProvider);
-    final theme = Theme.of(context);
+    final notifier = ref.read(calculatorProvider.notifier);
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
@@ -68,156 +71,36 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Distance input
-          TextField(
+          CalculatorInputField(
             controller: _distanceController,
-            decoration: InputDecoration(
-              labelText: l10n?.distanceKm ?? 'Distance (km)',
-              hintText: 'e.g. 150',
-              prefixIcon: const Icon(Icons.straighten),
-              border: const OutlineInputBorder(),
-            ),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) {
-              final parsed = double.tryParse(value) ?? 0;
-              ref.read(calculatorProvider.notifier).setDistance(parsed);
-            },
+            labelText: l10n?.distanceKm ?? 'Distance (km)',
+            hintText: 'e.g. 150',
+            icon: Icons.straighten,
+            onParsed: notifier.setDistance,
           ),
           const SizedBox(height: 16),
-
-          // Consumption input
-          TextField(
+          CalculatorInputField(
             controller: _consumptionController,
-            decoration: InputDecoration(
-              labelText: l10n?.consumptionL100km ?? 'Consumption (L/100km)',
-              hintText: 'e.g. 7.0',
-              prefixIcon: const Icon(Icons.local_gas_station),
-              border: const OutlineInputBorder(),
-            ),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) {
-              final parsed = double.tryParse(value) ?? 0;
-              ref.read(calculatorProvider.notifier).setConsumption(parsed);
-            },
+            labelText: l10n?.consumptionL100km ?? 'Consumption (L/100km)',
+            hintText: 'e.g. 7.0',
+            icon: Icons.local_gas_station,
+            onParsed: notifier.setConsumption,
           ),
           const SizedBox(height: 16),
-
-          // Price input
-          TextField(
+          CalculatorInputField(
             controller: _priceController,
-            decoration: InputDecoration(
-              labelText: l10n?.fuelPriceEurL ?? 'Fuel price (\u20ac/L)',
-              hintText: 'e.g. 1.899',
-              prefixIcon: const Icon(Icons.euro),
-              border: const OutlineInputBorder(),
-            ),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            onChanged: (value) {
-              final parsed = double.tryParse(value) ?? 0;
-              ref.read(calculatorProvider.notifier).setPrice(parsed);
-            },
+            labelText: l10n?.fuelPriceEurL ?? 'Fuel price (\u20ac/L)',
+            hintText: 'e.g. 1.899',
+            icon: Icons.euro,
+            onParsed: notifier.setPrice,
           ),
           const SizedBox(height: 32),
-
-          // Result card
           if (state.hasInput)
-            Card(
-              elevation: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.calculate_outlined,
-                      size: 40,
-                      color: theme.colorScheme.primary,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n?.tripCost ?? 'Trip Cost',
-                      style: theme.textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _ResultItem(
-                          label: l10n?.fuelNeeded ?? 'Fuel needed',
-                          value: '${state.calculation.totalLiters.toStringAsFixed(1)} L',
-                        ),
-                        _ResultItem(
-                          label: l10n?.totalCost ?? 'Total cost',
-                          value: '${state.calculation.totalCost.toStringAsFixed(2)} \u20ac',
-                          highlight: true,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            )
+            CalculatorResultCard(state: state)
           else
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.calculate_outlined,
-                      size: 64,
-                      color: theme.colorScheme.outline,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n?.enterCalcValues ?? 'Enter distance, consumption, and price to calculate trip cost',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            const CalculatorEmptyHint(),
         ],
       ),
-    );
-  }
-}
-
-class _ResultItem extends StatelessWidget {
-  final String label;
-  final String value;
-  final bool highlight;
-
-  const _ResultItem({
-    required this.label,
-    required this.value,
-    this.highlight = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: highlight
-              ? theme.textTheme.headlineSmall?.copyWith(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                )
-              : theme.textTheme.titleLarge,
-        ),
-      ],
     );
   }
 }
