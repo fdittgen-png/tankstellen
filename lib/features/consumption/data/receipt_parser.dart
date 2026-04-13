@@ -1,15 +1,22 @@
-/// Parses fuel station receipt text (from OCR) to extract fill-up data.
+/// Structured fields extracted from a fuel receipt by [ReceiptParser].
 ///
-/// Supports common French and German receipt formats. Extracts:
-/// - Liters (volume)
-/// - Total cost (EUR)
-/// - Price per liter
-/// - Date (if found)
+/// All fields are nullable because OCR is best-effort: any combination
+/// may be missing depending on the receipt layout. Use [hasData] to check
+/// whether the parser found anything actionable.
 class ReceiptParseResult {
+  /// Volume dispensed in litres, or `null` if no volume could be parsed.
   final double? liters;
+
+  /// Total amount charged (currency is implicit — typically EUR).
   final double? totalCost;
+
+  /// Unit price per litre as printed on the receipt.
   final double? pricePerLiter;
+
+  /// Receipt date if a recognised format was found.
   final DateTime? date;
+
+  /// Detected station brand (matched against a small built-in list).
   final String? stationName;
 
   const ReceiptParseResult({
@@ -20,13 +27,23 @@ class ReceiptParseResult {
     this.stationName,
   });
 
+  /// `true` when the parser extracted at least volume or total cost.
   bool get hasData => liters != null || totalCost != null;
 }
 
+/// Parses raw OCR text from a fuel station receipt into a
+/// [ReceiptParseResult].
+///
+/// Supports common French and German receipt layouts. The matchers
+/// tolerate decimal commas/dots and the most frequent label variants
+/// (`TOTAL`, `MONTANT`, `BETRAG`, `Volume`, `Prix/L`, etc.).
 class ReceiptParser {
   const ReceiptParser();
 
-  /// Parse OCR text from a fuel receipt.
+  /// Parse OCR [text] from a fuel receipt and return the extracted fields.
+  ///
+  /// The result is always non-null; check [ReceiptParseResult.hasData] to
+  /// know whether the parser recognised anything useful.
   ReceiptParseResult parse(String text) {
     final lines = text.split('\n').map((l) => l.trim()).toList();
     final fullText = lines.join(' ');

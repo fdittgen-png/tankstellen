@@ -22,14 +22,19 @@ class VehicleProfileList extends _$VehicleProfileList {
     return repo.getAll();
   }
 
+  /// Persist [profile] (insert or update by id) and refresh the list.
+  ///
+  /// Also invalidates [activeVehicleProfileProvider] so callers that depend
+  /// on the active vehicle re-read it — saving the first profile auto-sets
+  /// it as active.
   Future<void> save(VehicleProfile profile) async {
     final repo = ref.read(vehicleProfileRepositoryProvider);
     await repo.save(profile);
     state = repo.getAll();
-    // Nudge the active-profile provider in case it just got auto-set.
     ref.invalidate(activeVehicleProfileProvider);
   }
 
+  /// Delete the profile with the given [id] and refresh the list.
   Future<void> remove(String id) async {
     final repo = ref.read(vehicleProfileRepositoryProvider);
     await repo.delete(id);
@@ -37,6 +42,7 @@ class VehicleProfileList extends _$VehicleProfileList {
     ref.invalidate(activeVehicleProfileProvider);
   }
 
+  /// Wipe all stored vehicle profiles. Used when the user resets the app.
   Future<void> clearAll() async {
     final repo = ref.read(vehicleProfileRepositoryProvider);
     await repo.clear();
@@ -55,6 +61,8 @@ class ActiveVehicleProfile extends _$ActiveVehicleProfile {
     return repo.getActive();
   }
 
+  /// Mark the profile with [id] as active and rebuild this provider so
+  /// dependent UI (EV filters, route calculator) picks up the new vehicle.
   Future<void> setActive(String id) async {
     final repo = ref.read(vehicleProfileRepositoryProvider);
     await repo.setActive(id);

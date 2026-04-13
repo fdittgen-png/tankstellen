@@ -12,6 +12,8 @@ class Obd2Service {
 
   Obd2Service(this._transport);
 
+  /// `true` when the underlying [Obd2Transport] currently has an open
+  /// connection to the vehicle's ELM327 adapter.
   bool get isConnected => _transport.isConnected;
 
   /// Connect and initialize the ELM327 adapter.
@@ -88,6 +90,7 @@ class Obd2Service {
     }
   }
 
+  /// Close the transport connection. Safe to call multiple times.
   Future<void> disconnect() async {
     await _transport.disconnect();
   }

@@ -23,24 +23,28 @@ class FillUpList extends _$FillUpList {
     return repo.getAll();
   }
 
+  /// Insert a new fill-up entry and refresh the list.
   Future<void> add(FillUp fillUp) async {
     final repo = ref.read(fillUpRepositoryProvider);
     await repo.save(fillUp);
     state = repo.getAll();
   }
 
+  /// Persist edits to an existing fill-up (matched by id) and refresh.
   Future<void> update(FillUp fillUp) async {
     final repo = ref.read(fillUpRepositoryProvider);
     await repo.save(fillUp);
     state = repo.getAll();
   }
 
+  /// Delete the fill-up with the given [id] and refresh the list.
   Future<void> remove(String id) async {
     final repo = ref.read(fillUpRepositoryProvider);
     await repo.delete(id);
     state = repo.getAll();
   }
 
+  /// Wipe the entire fill-up history. Used by the privacy dashboard.
   Future<void> clearAll() async {
     final repo = ref.read(fillUpRepositoryProvider);
     await repo.clear();
