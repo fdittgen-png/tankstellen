@@ -2305,4 +2305,32 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get linkDeviceHowItWorksBody =>
       '1. Sur l\'appareil A : copiez le code ci-dessus\n2. Sur l\'appareil B : collez-le dans le champ « Code de l\'appareil »\n3. Appuyez sur « Importer les données » pour fusionner favoris et alertes\n4. Les deux appareils auront toutes les données combinées\n\nChaque appareil garde sa propre identité anonyme. Les données sont fusionnées, pas déplacées.';
+
+  @override
+  String get vehicleSetActive => 'Activer';
+
+  @override
+  String get swipeHide => 'Masquer';
+
+  @override
+  String get evChargingSection => 'Recharge EV';
+
+  @override
+  String get fuelStationsSection => 'Stations-service';
+
+  @override
+  String get yourRating => 'Votre note';
+
+  @override
+  String get noStorageUsed => 'Aucun stockage utilisé';
+
+  @override
+  String get aboutReportBug => 'Signaler un bug / Suggérer une fonctionnalité';
+
+  @override
+  String get aboutSupportProject => 'Soutenir ce projet';
+
+  @override
+  String get aboutSupportDescription =>
+      'Cette application est gratuite, open source et sans publicité. Si vous la trouvez utile, soutenez le développeur.';
 }

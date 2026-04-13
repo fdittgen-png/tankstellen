@@ -2284,4 +2284,32 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String get linkDeviceHowItWorksBody =>
       '1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites and alerts\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity. Data is merged, not moved.';
+
+  @override
+  String get vehicleSetActive => 'Set active';
+
+  @override
+  String get swipeHide => 'Hide';
+
+  @override
+  String get evChargingSection => 'EV Charging';
+
+  @override
+  String get fuelStationsSection => 'Fuel Stations';
+
+  @override
+  String get yourRating => 'Your rating';
+
+  @override
+  String get noStorageUsed => 'No storage used';
+
+  @override
+  String get aboutReportBug => 'Report a bug / Suggest a feature';
+
+  @override
+  String get aboutSupportProject => 'Support this project';
+
+  @override
+  String get aboutSupportDescription =>
+      'This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.';
 }

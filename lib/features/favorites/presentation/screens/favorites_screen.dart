@@ -190,14 +190,14 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                             alignment: Alignment.centerLeft,
                             padding: const EdgeInsets.only(left: 24),
                             color: Theme.of(context).colorScheme.primary,
-                            child: const Row(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.navigation,
+                                const Icon(Icons.navigation,
                                     color: Colors.white, size: 20),
-                                SizedBox(width: 8),
-                                Text('Navigate',
-                                    style: TextStyle(
+                                const SizedBox(width: 8),
+                                Text(l10n?.navigate ?? 'Navigate',
+                                    style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold)),
                               ],
@@ -210,15 +210,15 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.only(right: 24),
                             color: Colors.red,
-                            child: const Row(
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text('Remove',
-                                    style: TextStyle(
+                                Text(l10n?.remove ?? 'Remove',
+                                    style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold)),
-                                SizedBox(width: 8),
-                                Icon(Icons.delete, color: Colors.white, size: 20),
+                                const SizedBox(width: 8),
+                                const Icon(Icons.delete, color: Colors.white, size: 20),
                               ],
                             ),
                           ),
@@ -272,6 +272,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
   }
 
   Widget _buildEvSectionHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       child: Row(
@@ -279,13 +280,15 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           Icon(Icons.ev_station, size: 16,
               color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 8),
-          Text('EV Charging', style: Theme.of(context).textTheme.titleSmall),
+          Text(l10n?.evChargingSection ?? 'EV Charging',
+              style: Theme.of(context).textTheme.titleSmall),
         ],
       ),
     );
   }
 
   Widget _buildFuelSectionHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       child: Row(
@@ -293,7 +296,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           Icon(Icons.local_gas_station, size: 16,
               color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 8),
-          Text('Fuel Stations', style: Theme.of(context).textTheme.titleSmall),
+          Text(l10n?.fuelStationsSection ?? 'Fuel Stations',
+              style: Theme.of(context).textTheme.titleSmall),
         ],
       ),
     );

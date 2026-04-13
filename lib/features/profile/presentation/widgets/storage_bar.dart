@@ -34,14 +34,16 @@ class StorageBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (totalBytes == 0) {
+      final l10n = AppLocalizations.of(context);
       return Container(
         height: 24,
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Center(
-          child: Text('No storage used', style: TextStyle(fontSize: 11)),
+        child: Center(
+          child: Text(l10n?.noStorageUsed ?? 'No storage used',
+              style: const TextStyle(fontSize: 11)),
         ),
       );
     }

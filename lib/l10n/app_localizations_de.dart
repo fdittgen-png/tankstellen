@@ -2305,4 +2305,32 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get linkDeviceHowItWorksBody =>
       '1. Auf Gerät A: Gerätecode oben kopieren\n2. Auf Gerät B: in das Feld \"Gerätecode\" einfügen\n3. \"Daten importieren\" tippen, um Favoriten und Alarme zusammenzuführen\n4. Beide Geräte haben dann alle kombinierten Daten\n\nJedes Gerät behält seine eigene anonyme Identität. Daten werden zusammengeführt, nicht verschoben.';
+
+  @override
+  String get vehicleSetActive => 'Aktivieren';
+
+  @override
+  String get swipeHide => 'Ausblenden';
+
+  @override
+  String get evChargingSection => 'Elektro-Laden';
+
+  @override
+  String get fuelStationsSection => 'Tankstellen';
+
+  @override
+  String get yourRating => 'Ihre Bewertung';
+
+  @override
+  String get noStorageUsed => 'Kein Speicher verwendet';
+
+  @override
+  String get aboutReportBug => 'Fehler melden / Funktion vorschlagen';
+
+  @override
+  String get aboutSupportProject => 'Dieses Projekt unterstützen';
+
+  @override
+  String get aboutSupportDescription =>
+      'Diese App ist kostenlos, Open Source und werbefrei. Wenn sie Ihnen gefällt, unterstützen Sie bitte den Entwickler.';
 }

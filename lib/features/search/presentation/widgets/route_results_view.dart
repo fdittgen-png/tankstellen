@@ -212,13 +212,13 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 24),
         color: Colors.orange.shade700,
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Hide',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            SizedBox(width: 8),
-            Icon(Icons.visibility_off, color: Colors.white, size: 20),
+            Text(l10n?.swipeHide ?? 'Hide',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            const SizedBox(width: 8),
+            const Icon(Icons.visibility_off, color: Colors.white, size: 20),
           ],
         ),
       ),

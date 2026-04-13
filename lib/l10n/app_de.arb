@@ -952,5 +952,14 @@
   "linkDeviceCodeFieldHint": "UUID vom anderen Gerät einfügen",
   "linkDeviceImportButton": "Daten importieren",
   "linkDeviceHowItWorksTitle": "So funktioniert es",
-  "linkDeviceHowItWorksBody": "1. Auf Gerät A: Gerätecode oben kopieren\n2. Auf Gerät B: in das Feld \"Gerätecode\" einfügen\n3. \"Daten importieren\" tippen, um Favoriten und Alarme zusammenzuführen\n4. Beide Geräte haben dann alle kombinierten Daten\n\nJedes Gerät behält seine eigene anonyme Identität. Daten werden zusammengeführt, nicht verschoben."
+  "linkDeviceHowItWorksBody": "1. Auf Gerät A: Gerätecode oben kopieren\n2. Auf Gerät B: in das Feld \"Gerätecode\" einfügen\n3. \"Daten importieren\" tippen, um Favoriten und Alarme zusammenzuführen\n4. Beide Geräte haben dann alle kombinierten Daten\n\nJedes Gerät behält seine eigene anonyme Identität. Daten werden zusammengeführt, nicht verschoben.",
+  "vehicleSetActive": "Aktivieren",
+  "swipeHide": "Ausblenden",
+  "evChargingSection": "Elektro-Laden",
+  "fuelStationsSection": "Tankstellen",
+  "yourRating": "Ihre Bewertung",
+  "noStorageUsed": "Kein Speicher verwendet",
+  "aboutReportBug": "Fehler melden / Funktion vorschlagen",
+  "aboutSupportProject": "Dieses Projekt unterstützen",
+  "aboutSupportDescription": "Diese App ist kostenlos, Open Source und werbefrei. Wenn sie Ihnen gefällt, unterstützen Sie bitte den Entwickler."
 }

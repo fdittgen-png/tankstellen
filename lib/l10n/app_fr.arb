@@ -617,5 +617,14 @@
   "linkDeviceCodeFieldHint": "Collez l'UUID de l'autre appareil",
   "linkDeviceImportButton": "Importer les données",
   "linkDeviceHowItWorksTitle": "Comment ça marche",
-  "linkDeviceHowItWorksBody": "1. Sur l'appareil A : copiez le code ci-dessus\n2. Sur l'appareil B : collez-le dans le champ « Code de l'appareil »\n3. Appuyez sur « Importer les données » pour fusionner favoris et alertes\n4. Les deux appareils auront toutes les données combinées\n\nChaque appareil garde sa propre identité anonyme. Les données sont fusionnées, pas déplacées."
+  "linkDeviceHowItWorksBody": "1. Sur l'appareil A : copiez le code ci-dessus\n2. Sur l'appareil B : collez-le dans le champ « Code de l'appareil »\n3. Appuyez sur « Importer les données » pour fusionner favoris et alertes\n4. Les deux appareils auront toutes les données combinées\n\nChaque appareil garde sa propre identité anonyme. Les données sont fusionnées, pas déplacées.",
+  "vehicleSetActive": "Activer",
+  "swipeHide": "Masquer",
+  "evChargingSection": "Recharge EV",
+  "fuelStationsSection": "Stations-service",
+  "yourRating": "Votre note",
+  "noStorageUsed": "Aucun stockage utilisé",
+  "aboutReportBug": "Signaler un bug / Suggérer une fonctionnalité",
+  "aboutSupportProject": "Soutenir ce projet",
+  "aboutSupportDescription": "Cette application est gratuite, open source et sans publicité. Si vous la trouvez utile, soutenez le développeur."
 }
