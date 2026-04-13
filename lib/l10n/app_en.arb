@@ -897,5 +897,36 @@
   "syncWizardTitleConnect": "Connect TankSync",
   "syncSetupTitleYourDatabase": "Your database",
   "syncSetupTitleJoinGroup": "Join a group",
-  "syncSetupTitleAccount": "Your account"
+  "syncSetupTitleAccount": "Your account",
+  "syncWizardBack": "Back",
+  "syncWizardNext": "Next",
+  "syncWizardStepOfSteps": "Step {current} of {total}",
+  "@syncWizardStepOfSteps": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "syncWizardCreateSupabaseTitle": "Create a Supabase project",
+  "syncWizardCreateSupabaseInstructions": "1. Tap \"Open Supabase\" below\n2. Create a free account (if you don't have one)\n3. Click \"New Project\"\n4. Choose a name and region\n5. Wait ~2 minutes for it to start",
+  "syncWizardOpenSupabase": "Open Supabase",
+  "syncWizardEnableAnonTitle": "Enable Anonymous Sign-ins",
+  "syncWizardEnableAnonInstructions": "1. In your Supabase dashboard:\n   Authentication → Providers\n2. Find \"Anonymous Sign-ins\"\n3. Toggle it ON\n4. Click \"Save\"",
+  "syncWizardOpenAuthSettings": "Open Auth Settings",
+  "syncWizardCopyCredentialsTitle": "Copy your credentials",
+  "syncWizardCopyCredentialsInstructions": "1. Go to Settings → API in your dashboard\n2. Copy the \"Project URL\"\n3. Copy the \"anon public\" key\n4. Paste them below",
+  "syncWizardOpenApiSettings": "Open API Settings",
+  "syncWizardSupabaseUrlLabel": "Supabase URL",
+  "syncWizardSupabaseUrlHint": "https://your-project.supabase.co",
+  "syncWizardJoinExistingTitle": "Join an existing database",
+  "syncWizardScanQrCode": "Scan QR Code",
+  "syncWizardAskOwnerQr": "Ask the database owner to show you their QR code\n(Settings → TankSync → Share)",
+  "syncWizardAskOwnerQrShort": "Ask the database owner to show their QR code",
+  "syncWizardEnterManuallyTitle": "Enter manually",
+  "syncWizardOrEnterManually": "or enter manually",
+  "syncWizardUrlHelperText": "Whitespace and line breaks removed automatically",
+  "syncCredentialsPrivateHint": "Enter your Supabase project credentials. You can find them in your dashboard under Settings > API.",
+  "syncCredentialsDatabaseUrlLabel": "Database URL",
+  "syncCredentialsAccessKeyLabel": "Access Key",
+  "syncCredentialsAccessKeyHint": "eyJhbGciOiJIUzI1NiIs..."
 }

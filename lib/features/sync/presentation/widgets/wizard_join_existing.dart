@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 /// Join existing database step: QR scan or manual URL+key entry.
 class WizardJoinExisting extends StatelessWidget {
   final TextEditingController urlController;
@@ -20,45 +22,54 @@ class WizardJoinExisting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Join an existing database', style: theme.textTheme.titleMedium),
+        Text(
+            l10n?.syncWizardJoinExistingTitle ?? 'Join an existing database',
+            style: theme.textTheme.titleMedium),
         const SizedBox(height: 16),
 
         // QR Scanner
         FilledButton.icon(
           onPressed: onScanQr,
           icon: const Icon(Icons.qr_code_scanner),
-          label: const Text('Scan QR Code'),
+          label: Text(l10n?.syncWizardScanQrCode ?? 'Scan QR Code'),
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
         ),
         const SizedBox(height: 8),
         Text(
-          'Ask the database owner to show you their QR code\n(Settings → TankSync → Share)',
+          l10n?.syncWizardAskOwnerQr ??
+              'Ask the database owner to show you their QR code\n(Settings → TankSync → Share)',
           style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
           textAlign: TextAlign.center,
         ),
 
         const SizedBox(height: 24),
-        const Row(children: [
-          Expanded(child: Divider()),
-          Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Text('or')),
-          Expanded(child: Divider()),
+        Row(children: [
+          const Expanded(child: Divider()),
+          Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(l10n?.syncOrDivider ?? 'or')),
+          const Expanded(child: Divider()),
         ]),
         const SizedBox(height: 24),
 
         // Manual entry
-        Text('Enter manually', style: theme.textTheme.titleSmall),
+        Text(l10n?.syncWizardEnterManuallyTitle ?? 'Enter manually',
+            style: theme.textTheme.titleSmall),
         const SizedBox(height: 12),
         TextField(
           controller: urlController,
-          decoration: const InputDecoration(
-            labelText: 'Supabase URL',
-            hintText: 'https://your-project.supabase.co',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.link),
-            helperText: 'Whitespace and line breaks removed automatically',
+          decoration: InputDecoration(
+            labelText: l10n?.syncWizardSupabaseUrlLabel ?? 'Supabase URL',
+            hintText: l10n?.syncWizardSupabaseUrlHint ??
+                'https://your-project.supabase.co',
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.link),
+            helperText: l10n?.syncWizardUrlHelperText ??
+                'Whitespace and line breaks removed automatically',
           ),
           maxLines: 1,
         ),
@@ -67,7 +78,7 @@ class WizardJoinExisting extends StatelessWidget {
         const SizedBox(height: 24),
         FilledButton(
           onPressed: onContinue,
-          child: const Text('Continue'),
+          child: Text(l10n?.continueButton ?? 'Continue'),
         ),
       ],
     );
