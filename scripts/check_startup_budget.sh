@@ -37,10 +37,12 @@ echo "=== Startup Time Budget Check ==="
 echo "Budget: ${BUDGET_MS}ms"
 echo ""
 
-# 1. Check that main.dart has instrumentation markers
-MAIN_FILE="lib/main.dart"
-if [ ! -f "$MAIN_FILE" ]; then
-  echo "::error::$MAIN_FILE not found"
+# 1. Check that the cold-start sequence has instrumentation markers.
+#    Since #424 the cold-start logic lives in lib/app/app_initializer.dart,
+#    not main.dart — we check whichever file holds the markers today.
+INIT_FILE="lib/app/app_initializer.dart"
+if [ ! -f "$INIT_FILE" ]; then
+  echo "::error::$INIT_FILE not found (cold-start sequence missing)"
   exit 1
 fi
 
@@ -48,22 +50,22 @@ MARKERS=("StartupTimer.instance.start()" "StartupTimer.instance.mark(" "StartupT
 MISSING=0
 
 for marker in "${MARKERS[@]}"; do
-  if ! grep -q "$marker" "$MAIN_FILE"; then
+  if ! grep -q "$marker" "$INIT_FILE"; then
     echo "::error::Missing startup instrumentation: $marker"
     MISSING=$((MISSING + 1))
   fi
 done
 
 if [ "$MISSING" -gt 0 ]; then
-  echo "::error::${MISSING} startup instrumentation marker(s) missing from main.dart"
+  echo "::error::${MISSING} startup instrumentation marker(s) missing from ${INIT_FILE}"
   exit 1
 fi
 
 echo "Instrumentation markers: OK"
 
 # 2. Count milestones
-MILESTONE_COUNT=$(grep -c "StartupTimer.instance.mark(" "$MAIN_FILE" || true)
-echo "Milestones in main.dart: ${MILESTONE_COUNT}"
+MILESTONE_COUNT=$(grep -c "StartupTimer.instance.mark(" "$INIT_FILE" || true)
+echo "Milestones in ${INIT_FILE}: ${MILESTONE_COUNT}"
 
 if [ "$MILESTONE_COUNT" -lt 3 ]; then
   echo "::warning::Only ${MILESTONE_COUNT} milestones — consider adding more for better visibility"
