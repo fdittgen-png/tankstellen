@@ -60,8 +60,13 @@ class EvShowOnMap extends _$EvShowOnMap {
 /// Filter criteria applied to [evStationsProvider] results before they
 /// are rendered on the map or station list.
 class EvFilter {
+  /// Connector types the user wants to see (empty = no restriction).
   final Set<ConnectorType> connectorTypes;
+
+  /// Minimum charging power in kW (0 = any).
   final double minPowerKw;
+
+  /// When `true`, hide stations whose connectors are all in use/offline.
   final bool availableOnly;
 
   const EvFilter({
@@ -70,6 +75,7 @@ class EvFilter {
     this.availableOnly = false,
   });
 
+  /// Returns a new [EvFilter] with the supplied fields replaced.
   EvFilter copyWith({
     Set<ConnectorType>? connectorTypes,
     double? minPowerKw,
@@ -124,10 +130,12 @@ class EvFilterController extends _$EvFilterController {
     return EvFilter(connectorTypes: Set<ConnectorType>.from(connectors));
   }
 
+  /// Replace the selected connector set wholesale.
   void setConnectorTypes(Set<ConnectorType> types) {
     state = state.copyWith(connectorTypes: Set<ConnectorType>.from(types));
   }
 
+  /// Toggle a single connector type in the selected set.
   void toggleConnector(ConnectorType type) {
     final next = Set<ConnectorType>.from(state.connectorTypes);
     if (next.contains(type)) {
@@ -138,23 +146,34 @@ class EvFilterController extends _$EvFilterController {
     state = state.copyWith(connectorTypes: next);
   }
 
+  /// Update the minimum-power threshold (0 disables the filter).
   void setMinPowerKw(double value) {
     state = state.copyWith(minPowerKw: value);
   }
 
+  /// Toggle the "available connectors only" switch.
   void setAvailableOnly(bool value) {
     state = state.copyWith(availableOnly: value);
   }
 
+  /// Clear every filter back to the default (show everything).
   void reset() {
     state = const EvFilter();
   }
 }
 
 /// Parameters describing the map viewport for which to fetch EV stations.
+///
+/// Used as the family argument for [evStationsProvider]; equality determines
+/// whether a refetch is needed when the user pans the map.
 class EvViewport {
+  /// Centre latitude of the viewport.
   final double latitude;
+
+  /// Centre longitude of the viewport.
   final double longitude;
+
+  /// Search radius in kilometres around the centre point.
   final double radiusKm;
 
   const EvViewport({
