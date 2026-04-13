@@ -4,14 +4,72 @@ import 'package:intl/intl.dart';
 class PriceFormatter {
   PriceFormatter._();
 
-  static final _fullFormat = NumberFormat('0.000', 'de_DE');
-  static final _distanceFormat = NumberFormat('0.0', 'de_DE');
+  /// Country code → locale mapping for number formatting.
+  /// Comma-decimal countries (most of Europe) use 'de_DE'.
+  /// Period-decimal countries use 'en_US'.
+  static const _localeMap = <String, String>{
+    'DE': 'de_DE',
+    'FR': 'fr_FR',
+    'AT': 'de_AT',
+    'ES': 'es_ES',
+    'IT': 'it_IT',
+    'PT': 'pt_PT',
+    'BE': 'fr_BE',
+    'LU': 'fr_LU',
+    'DK': 'da_DK',
+    'GB': 'en_GB',
+    'AU': 'en_AU',
+    'MX': 'es_MX',
+    'AR': 'es_AR',
+  };
 
-  /// Format price as plain string (e.g., "1,459 EUR").
-  /// For UI with superscript, use [priceTextSpan] instead.
+  /// Currency symbols per country.
+  static const _currencyMap = <String, String>{
+    'DE': '€',
+    'FR': '€',
+    'AT': '€',
+    'ES': '€',
+    'IT': '€',
+    'PT': '€',
+    'BE': '€',
+    'LU': '€',
+    'DK': 'kr',
+    'GB': '£',
+    'AU': '\$',
+    'MX': '\$',
+    'AR': '\$',
+  };
+
+  /// Active country code. Set by the app on country change.
+  static String _activeCountry = 'FR';
+
+  /// Set the active country for price formatting.
+  static void setCountry(String countryCode) {
+    _activeCountry = countryCode.toUpperCase();
+    _cachedFullFormat = null;
+    _cachedDistanceFormat = null;
+  }
+
+  static String get _locale =>
+      _localeMap[_activeCountry] ?? 'en_US';
+
+  static String get currency =>
+      _currencyMap[_activeCountry] ?? '€';
+
+  // Lazy-initialized formatters that reset when country changes.
+  static NumberFormat? _cachedFullFormat;
+  static NumberFormat? _cachedDistanceFormat;
+
+  static NumberFormat get _fullFormat =>
+      _cachedFullFormat ??= NumberFormat('0.000', _locale);
+
+  static NumberFormat get _distanceFormat =>
+      _cachedDistanceFormat ??= NumberFormat('0.0', _locale);
+
+  /// Format price as plain string (e.g., "1,459 €" or "1.459 £").
   static String formatPrice(double? price) {
     if (price == null || price <= 0) return '--';
-    return '${_fullFormat.format(price)} \u20ac';
+    return '${_fullFormat.format(price)} $currency';
   }
 
   /// Format price without currency symbol for compact display.
@@ -21,22 +79,20 @@ class PriceFormatter {
   }
 
   /// Build a TextSpan with the 9/10ths digit in superscript.
-  /// Example: 1,45⁹ € — the standard European fuel price display.
-  ///
-  /// Returns [baseStyle] for "1,45" and a smaller raised style for "9".
+  /// Example: 1,45⁹ € — the standard fuel price display.
   static TextSpan priceTextSpan(
     double? price, {
     required TextStyle baseStyle,
-    String currency = '\u20ac',
+    String? currencyOverride,
   }) {
     if (price == null || price <= 0) {
       return TextSpan(text: '--', style: baseStyle);
     }
 
-    // Split: 1.459 → base "1,45", superscript "9"
-    final full = _fullFormat.format(price); // "1,459"
-    final base = full.substring(0, full.length - 1); // "1,45"
-    final tenths = full.substring(full.length - 1); // "9"
+    final cur = currencyOverride ?? currency;
+    final full = _fullFormat.format(price);
+    final base = full.substring(0, full.length - 1);
+    final tenths = full.substring(full.length - 1);
 
     final superStyle = baseStyle.copyWith(
       fontSize: (baseStyle.fontSize ?? 14) * 0.65,
@@ -53,12 +109,12 @@ class PriceFormatter {
             child: Text(tenths, style: superStyle),
           ),
         ),
-        TextSpan(text: ' $currency', style: baseStyle),
+        TextSpan(text: ' $cur', style: baseStyle),
       ],
     );
   }
 
-  /// Format distance in km (e.g., "2,3 km").
+  /// Format distance in km (e.g., "2,3 km" or "2.3 km").
   static String formatDistance(double? distanceKm) {
     if (distanceKm == null) return '--';
     if (distanceKm < 1) {
