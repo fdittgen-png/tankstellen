@@ -18,19 +18,26 @@ analyzer:
     prefer_const_constructors: error
     prefer_const_declarations: info
     prefer_const_literals_to_create_immutables: info
+    # Safety lints elevated to error (issue #422). Each catches a real
+    # class of bug:
+    #   - use_build_context_synchronously → StateError on widget unmount
+    #   - unawaited_futures → fire-and-forget data persistence races
+    #   - cancel_subscriptions → leaked StreamSubscription on dispose
+    #   - close_sinks → leaked StreamController/IOSink on dispose
+    use_build_context_synchronously: error
+    unawaited_futures: error
+    cancel_subscriptions: error
+    close_sinks: error
     # Phase in at info so existing code isn't a wall of red; tighten once clean.
     avoid_print: info
     avoid_slow_async_io: info
     avoid_type_to_string: info
-    cancel_subscriptions: info
-    close_sinks: info
     no_logic_in_create_state: info
     prefer_void_to_null: info
     test_types_in_equals: info
     throw_in_finally: info
     unnecessary_statements: info
     unrelated_type_equality_checks: info
-    use_build_context_synchronously: info
     valid_regexps: info
 
 linter:
