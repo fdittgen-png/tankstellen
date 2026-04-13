@@ -201,7 +201,7 @@ void main() {
     test('getCachedData returns null when maxAge is exceeded', () async {
       // Manually insert an entry with old timestamp
       final box = Hive.box('cache');
-      box.put('old-key', {
+      await box.put('old-key', {
         'data': {'hello': 'world'},
         'timestamp': DateTime.now()
             .subtract(const Duration(hours: 2))
@@ -226,7 +226,7 @@ void main() {
 
     test('getCachedData without maxAge ignores age', () async {
       final box = Hive.box('cache');
-      box.put('ancient-key', {
+      await box.put('ancient-key', {
         'data': {'old': true},
         'timestamp': 0, // epoch start
       });
@@ -239,7 +239,7 @@ void main() {
       // cacheData wraps in {data: ..., timestamp: ...}
       // If someone stored a non-map as 'data', getCachedData should return null
       final box = Hive.box('cache');
-      box.put('string-data', {
+      await box.put('string-data', {
         'data': 'just a string',
         'timestamp': DateTime.now().millisecondsSinceEpoch,
       });
