@@ -2,28 +2,32 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-/// Verifies that main.dart has startup timing instrumentation in place.
-/// This test reads the source file to ensure timing markers are not
-/// accidentally removed during refactoring.
+/// Verifies that the cold-start sequence has full StartupTimer instrumentation.
+///
+/// The instrumentation used to live in `main.dart`; after #424 the cold-start
+/// flow moved into `lib/app/app_initializer.dart`. This test reads both files
+/// so the markers can't be silently removed during a future refactor.
 void main() {
-  late String mainSource;
+  late String startupSource;
 
   setUpAll(() {
-    final file = File('lib/main.dart');
-    expect(file.existsSync(), isTrue, reason: 'lib/main.dart must exist');
-    mainSource = file.readAsStringSync();
+    // The phased cold-start sequence lives here now.
+    final file = File('lib/app/app_initializer.dart');
+    expect(file.existsSync(), isTrue,
+        reason: 'lib/app/app_initializer.dart must exist (issue #424)');
+    startupSource = file.readAsStringSync();
   });
 
   group('Startup instrumentation', () {
-    test('main.dart imports StartupTimer', () {
-      expect(mainSource, contains("import 'core/perf/startup_timer.dart'"));
+    test('AppInitializer imports StartupTimer', () {
+      expect(startupSource, contains("startup_timer.dart"));
     });
 
-    test('main.dart starts the timer before initialization', () {
-      expect(mainSource, contains('StartupTimer.instance.start()'));
+    test('AppInitializer starts the timer before initialization', () {
+      expect(startupSource, contains('StartupTimer.instance.start()'));
     });
 
-    test('main.dart marks key milestones', () {
+    test('AppInitializer marks key milestones', () {
       // Verify at least the critical milestones are present
       for (final milestone in [
         'binding',
@@ -33,20 +37,24 @@ void main() {
         'first_frame',
       ]) {
         expect(
-          mainSource,
+          startupSource,
           contains("StartupTimer.instance.mark('$milestone')"),
           reason: 'Missing milestone marker: $milestone',
         );
       }
     });
 
-    test('main.dart calls finish()', () {
-      expect(mainSource, contains('StartupTimer.instance.finish()'));
+    test('AppInitializer calls finish()', () {
+      expect(startupSource, contains('StartupTimer.instance.finish()'));
     });
 
     test('timer start comes before finish in source', () {
-      final startIndex = mainSource.indexOf('StartupTimer.instance.start()');
-      final finishIndex = mainSource.indexOf('StartupTimer.instance.finish()');
+      final startIndex =
+          startupSource.indexOf('StartupTimer.instance.start()');
+      final finishIndex =
+          startupSource.indexOf('StartupTimer.instance.finish()');
+      expect(startIndex, isNonNegative);
+      expect(finishIndex, isNonNegative);
       expect(startIndex, lessThan(finishIndex));
     });
   });
