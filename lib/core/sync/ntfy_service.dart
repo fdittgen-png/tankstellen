@@ -8,7 +8,9 @@ class NtfyService {
   static const _baseUrl = 'https://ntfy.sh';
   final Dio _dio;
 
-  NtfyService({Dio? dio}) : _dio = dio ?? DioFactory.create();
+  // Push notifications are user-action triggered (alert firing or test
+  // dispatch); rate-limiting them would defeat the point.
+  NtfyService({Dio? dio}) : _dio = dio ?? DioFactory.create(rateLimit: null);
 
   /// Subscribe to a topic (generate unique per user).
   String generateTopic(String userId) => 'tankstellen-$userId';

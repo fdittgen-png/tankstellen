@@ -1,6 +1,3 @@
-import 'dart:async';
-import 'dart:math';
-
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../cache/cache_manager.dart';
@@ -22,22 +19,26 @@ import 'station_service_chain.dart';
 part 'service_providers.g.dart';
 
 // ---------------------------------------------------------------------------
-// Dio instance for Tankerkoenig (with API key + rate limit interceptors)
+// Dio instance for Tankerkoenig (API key interceptor + default rate limit
+// from DioFactory + trace logging)
 // ---------------------------------------------------------------------------
 
 @riverpod
 Dio tankerkoenigDio(Ref ref) {
   final config = ServiceConfigs.tankerkoenig;
+  // Tankerkoenig's published policy is one request per ~5s; we use 2s with
+  // 500 ms jitter, which combined with the cache + service chain stays well
+  // under the limit while keeping the UI responsive.
   final dio = DioFactory.create(
     baseUrl: config.baseUrl,
     connectTimeout: config.connectTimeout,
     receiveTimeout: config.receiveTimeout,
+    rateLimit: const Duration(seconds: 2),
+    rateLimitJitterRangeMs: 500,
   );
 
   // Inject API key from user settings
   dio.interceptors.add(_ApiKeyInterceptor(ref));
-  // Stagger requests to avoid thundering herd
-  dio.interceptors.add(RateLimitInterceptor());
   // Record HTTP errors in trace log
   dio.interceptors.add(DioTraceInterceptor(ref));
 
@@ -128,46 +129,3 @@ class _ApiKeyInterceptor extends Interceptor {
   }
 }
 
-/// Interceptor that serialises requests by delaying if the previous request
-/// occurred within [minInterval]. The added delay has randomised jitter to
-/// avoid thundering-herd against rate-limited APIs (Tankerkoenig et al.).
-class RateLimitInterceptor extends Interceptor {
-  RateLimitInterceptor({
-    this.minInterval = const Duration(seconds: 2),
-    this.jitterBaseMs = 500,
-    this.jitterRangeMs = 2500,
-    Random? random,
-  }) : _random = random ?? Random();
-
-  final Duration minInterval;
-  final int jitterBaseMs;
-  final int jitterRangeMs;
-  final Random _random;
-  DateTime? _lastRequest;
-  Future<void> _gate = Future.value();
-
-  @override
-  Future<void> onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
-    // Serialise by chaining each call onto the previous one.
-    final previous = _gate;
-    final current = Completer<void>();
-    _gate = current.future;
-    try {
-      await previous;
-      if (_lastRequest != null) {
-        final elapsed = DateTime.now().difference(_lastRequest!);
-        if (elapsed < minInterval) {
-          final jitter = jitterRangeMs > 0 ? _random.nextInt(jitterRangeMs) : 0;
-          await Future<void>.delayed(Duration(milliseconds: jitterBaseMs + jitter));
-        }
-      }
-      _lastRequest = DateTime.now();
-    } finally {
-      current.complete();
-    }
-    handler.next(options);
-  }
-}

@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/core/services/service_providers.dart';
+import 'package:tankstellen/core/services/rate_limit_interceptor.dart';
 
 /// A seeded Random that always returns 0, removing jitter from tests.
 class _ZeroRandom implements Random {

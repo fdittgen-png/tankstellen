@@ -21,7 +21,12 @@ class ReportService {
   final Dio _dio;
 
   ReportService()
-      : _dio = DioFactory.create(baseUrl: ApiConstants.baseUrl);
+      : _dio = DioFactory.create(
+          baseUrl: ApiConstants.baseUrl,
+          // User-triggered single submission — opt out of the default
+          // rate limiter so the form doesn't appear to hang.
+          rateLimit: null,
+        );
 
   /// Visible for testing — accepts a custom Dio instance.
   ReportService.withDio(this._dio);
