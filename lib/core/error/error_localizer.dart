@@ -30,6 +30,11 @@ class ErrorLocalizer {
       return l10n?.errorNoApiKey ?? 'No API key configured. Go to Settings to add one.';
     }
 
+    if (error is NoEvApiKeyException) {
+      return l10n?.errorNoEvApiKey ??
+          'OpenChargeMap API key not configured. Add one in Settings to search EV charging stations.';
+    }
+
     if (error is ServiceChainExhaustedException) {
       return l10n?.errorAllServicesFailed ?? 'Could not load data. Check your connection and try again.';
     }

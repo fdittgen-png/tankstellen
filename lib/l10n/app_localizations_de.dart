@@ -1894,4 +1894,45 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get ratingDescShared => 'Für alle Nutzer Ihrer Datenbank sichtbar';
+
+  @override
+  String get errorNoEvApiKey =>
+      'OpenChargeMap-API-Schlüssel nicht konfiguriert. Fügen Sie einen in den Einstellungen hinzu, um Ladestationen zu suchen.';
+
+  @override
+  String get offlineLabel => 'Offline';
+
+  @override
+  String fallbackSummary(String failed, String current) {
+    return '$failed nicht verfügbar. Verwende $current.';
+  }
+
+  @override
+  String get errorTitleApiKey => 'API-Schlüssel erforderlich';
+
+  @override
+  String get errorTitleLocation => 'Standort nicht verfügbar';
+
+  @override
+  String get errorHintNoStations =>
+      'Erhöhen Sie den Suchradius oder suchen Sie an einem anderen Ort.';
+
+  @override
+  String get errorHintApiKey =>
+      'Konfigurieren Sie Ihren API-Schlüssel in den Einstellungen.';
+
+  @override
+  String get errorHintConnection =>
+      'Prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.';
+
+  @override
+  String get errorHintRouting =>
+      'Routenberechnung fehlgeschlagen. Prüfen Sie Ihre Internetverbindung.';
+
+  @override
+  String get errorHintFallback =>
+      'Versuchen Sie es erneut oder suchen Sie nach Postleitzahl / Stadt.';
+
+  @override
+  String get detailsLabel => 'Details';
 }

@@ -1882,4 +1882,44 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get ratingDescShared => 'Visible to all users of your database';
+
+  @override
+  String get errorNoEvApiKey =>
+      'OpenChargeMap API key not configured. Add one in Settings to search EV charging stations.';
+
+  @override
+  String get offlineLabel => 'Offline';
+
+  @override
+  String fallbackSummary(String failed, String current) {
+    return '$failed unavailable. Using $current.';
+  }
+
+  @override
+  String get errorTitleApiKey => 'API key required';
+
+  @override
+  String get errorTitleLocation => 'Location unavailable';
+
+  @override
+  String get errorHintNoStations =>
+      'Try increasing the search radius or search a different location.';
+
+  @override
+  String get errorHintApiKey => 'Configure your API key in Settings.';
+
+  @override
+  String get errorHintConnection =>
+      'Check your internet connection and try again.';
+
+  @override
+  String get errorHintRouting =>
+      'Route calculation failed. Check your internet connection and try again.';
+
+  @override
+  String get errorHintFallback =>
+      'Try again or search by postal code / city name.';
+
+  @override
+  String get detailsLabel => 'Details';
 }

@@ -55,6 +55,15 @@ void main() {
       expect(msg, contains('Settings'));
     });
 
+    test('NoEvApiKeyException returns OpenChargeMap setup message', () {
+      final msg = ErrorLocalizer.localize(
+        const NoEvApiKeyException(),
+        null,
+      );
+      expect(msg, contains('OpenChargeMap'));
+      expect(msg, contains('Settings'));
+    });
+
     test('ServiceChainExhaustedException returns data load error', () {
       final msg = ErrorLocalizer.localize(
         const ServiceChainExhaustedException(errors: []),

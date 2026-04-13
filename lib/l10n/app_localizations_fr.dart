@@ -1891,4 +1891,44 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get ratingDescShared =>
       'Visible par tous les utilisateurs de votre base de données';
+
+  @override
+  String get errorNoEvApiKey =>
+      'Clé API OpenChargeMap non configurée. Ajoutez-en une dans Paramètres pour rechercher des bornes de recharge.';
+
+  @override
+  String get offlineLabel => 'Hors ligne';
+
+  @override
+  String fallbackSummary(String failed, String current) {
+    return '$failed indisponible. Utilisation de $current.';
+  }
+
+  @override
+  String get errorTitleApiKey => 'Clé API requise';
+
+  @override
+  String get errorTitleLocation => 'Position indisponible';
+
+  @override
+  String get errorHintNoStations =>
+      'Augmentez le rayon de recherche ou cherchez à un autre endroit.';
+
+  @override
+  String get errorHintApiKey => 'Configurez votre clé API dans Paramètres.';
+
+  @override
+  String get errorHintConnection =>
+      'Vérifiez votre connexion internet et réessayez.';
+
+  @override
+  String get errorHintRouting =>
+      'Calcul d\'itinéraire échoué. Vérifiez votre connexion internet.';
+
+  @override
+  String get errorHintFallback =>
+      'Réessayez ou cherchez par code postal / ville.';
+
+  @override
+  String get detailsLabel => 'Détails';
 }

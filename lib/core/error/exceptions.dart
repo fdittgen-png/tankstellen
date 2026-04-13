@@ -46,6 +46,20 @@ class NoApiKeyException extends AppException {
   String toString() => message;
 }
 
+/// Thrown when the user tries to perform an EV charging-station lookup
+/// without an OpenChargeMap key configured. Routed through ErrorLocalizer
+/// so the UI message is translated.
+class NoEvApiKeyException extends AppException {
+  const NoEvApiKeyException();
+
+  @override
+  String get message =>
+      'OpenChargeMap API key not configured. Set it up in Settings to search for EV charging stations.';
+
+  @override
+  String toString() => message;
+}
+
 /// Thrown when every service in a fallback chain has failed,
 /// including the cache. Carries accumulated errors from each step
 /// so the UI can report exactly what went wrong.

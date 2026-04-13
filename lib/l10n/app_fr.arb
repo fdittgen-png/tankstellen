@@ -487,5 +487,16 @@
   "ratingModeShared": "Partagé",
   "ratingDescLocal": "Notes enregistrées uniquement sur cet appareil",
   "ratingDescPrivate": "Synchronisé avec votre base de données (non visible par les autres)",
-  "ratingDescShared": "Visible par tous les utilisateurs de votre base de données"
+  "ratingDescShared": "Visible par tous les utilisateurs de votre base de données",
+  "errorNoEvApiKey": "Clé API OpenChargeMap non configurée. Ajoutez-en une dans Paramètres pour rechercher des bornes de recharge.",
+  "offlineLabel": "Hors ligne",
+  "fallbackSummary": "{failed} indisponible. Utilisation de {current}.",
+  "errorTitleApiKey": "Clé API requise",
+  "errorTitleLocation": "Position indisponible",
+  "errorHintNoStations": "Augmentez le rayon de recherche ou cherchez à un autre endroit.",
+  "errorHintApiKey": "Configurez votre clé API dans Paramètres.",
+  "errorHintConnection": "Vérifiez votre connexion internet et réessayez.",
+  "errorHintRouting": "Calcul d'itinéraire échoué. Vérifiez votre connexion internet.",
+  "errorHintFallback": "Réessayez ou cherchez par code postal / ville.",
+  "detailsLabel": "Détails"
 }

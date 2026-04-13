@@ -165,6 +165,7 @@ void main() {
         const CacheException(message: 'b'),
         const LocationException(message: 'c'),
         const NoApiKeyException(),
+        const NoEvApiKeyException(),
         const ServiceChainExhaustedException(errors: []),
       ];
       for (final e in exceptions) {
@@ -174,6 +175,7 @@ void main() {
           CacheException() => 'cache',
           LocationException() => 'location',
           NoApiKeyException() => 'nokey',
+          NoEvApiKeyException() => 'noevkey',
           ServiceChainExhaustedException() => 'chain',
         };
         expect(result, isNotEmpty);

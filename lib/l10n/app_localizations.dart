@@ -3612,6 +3612,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Visible to all users of your database'**
   String get ratingDescShared;
+
+  /// No description provided for @errorNoEvApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'OpenChargeMap API key not configured. Add one in Settings to search EV charging stations.'**
+  String get errorNoEvApiKey;
+
+  /// No description provided for @offlineLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get offlineLabel;
+
+  /// No description provided for @fallbackSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{failed} unavailable. Using {current}.'**
+  String fallbackSummary(String failed, String current);
+
+  /// No description provided for @errorTitleApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'API key required'**
+  String get errorTitleApiKey;
+
+  /// No description provided for @errorTitleLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location unavailable'**
+  String get errorTitleLocation;
+
+  /// No description provided for @errorHintNoStations.
+  ///
+  /// In en, this message translates to:
+  /// **'Try increasing the search radius or search a different location.'**
+  String get errorHintNoStations;
+
+  /// No description provided for @errorHintApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure your API key in Settings.'**
+  String get errorHintApiKey;
+
+  /// No description provided for @errorHintConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your internet connection and try again.'**
+  String get errorHintConnection;
+
+  /// No description provided for @errorHintRouting.
+  ///
+  /// In en, this message translates to:
+  /// **'Route calculation failed. Check your internet connection and try again.'**
+  String get errorHintRouting;
+
+  /// No description provided for @errorHintFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again or search by postal code / city name.'**
+  String get errorHintFallback;
+
+  /// No description provided for @detailsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get detailsLabel;
 }
 
 class _AppLocalizationsDelegate
