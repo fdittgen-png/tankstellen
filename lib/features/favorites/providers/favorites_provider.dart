@@ -62,8 +62,16 @@ class Favorites extends _$Favorites {
     state = storage.getFavoriteIds();
 
     // Clean up associated data (rating + price history)
-    try { ref.read(stationRatingsProvider.notifier).remove(stationId); } catch (e) { debugPrint('Cleanup: $e'); }
-    try { await storage.clearPriceHistoryForStation(stationId); } catch (e) { debugPrint('Cleanup: $e'); }
+    try {
+      await ref.read(stationRatingsProvider.notifier).remove(stationId);
+    } catch (e) {
+      debugPrint('Cleanup: $e');
+    }
+    try {
+      await storage.clearPriceHistoryForStation(stationId);
+    } catch (e) {
+      debugPrint('Cleanup: $e');
+    }
 
     // Delete from server explicitly
     await SyncHelper.fireAndForget(ref, 'Favorites.remove',

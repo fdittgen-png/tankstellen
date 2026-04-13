@@ -80,10 +80,10 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
       ),
     );
 
-    if (confirmed == true && mounted) {
-      widget.onDelete!();
-      Navigator.pop(ctx);
-    }
+    if (confirmed != true) return;
+    if (!ctx.mounted) return;
+    widget.onDelete!();
+    Navigator.pop(ctx);
   }
 
   @override

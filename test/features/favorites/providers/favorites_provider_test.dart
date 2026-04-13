@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -138,6 +140,46 @@ void main() {
       await container.read(favoritesProvider.notifier).remove('station-1');
 
       verify(() => mockStorage.clearPriceHistoryForStation('station-1')).called(1);
+    });
+
+    // Regression for issue #423: the rating-cleanup call inside remove()
+    // used to be fire-and-forget, which meant a fast follow-up read could
+    // observe a still-present rating. The fix awaits it; this test pins
+    // the awaited ordering so it can't regress.
+    test('remove() awaits the rating cleanup before returning', () async {
+      when(() => mockStorage.getFavoriteIds()).thenReturn(['station-1']);
+      when(() => mockStorage.removeFavorite(any())).thenAnswer((_) async {});
+      when(() => mockStorage.removeFavoriteStationData(any()))
+          .thenAnswer((_) async {});
+      when(() => mockStorage.getRatings()).thenReturn({'station-1': 4});
+      when(() => mockStorage.clearPriceHistoryForStation(any()))
+          .thenAnswer((_) async {});
+
+      // Make removeRating slow so a non-awaiting caller would race past it.
+      final ratingCleanupCompleter = Completer<void>();
+      var ratingCleanupCalled = false;
+      when(() => mockStorage.removeRating(any())).thenAnswer((_) async {
+        ratingCleanupCalled = true;
+        await ratingCleanupCompleter.future;
+      });
+
+      container = createContainer();
+      container.read(favoritesProvider);
+      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
+
+      final removeFuture =
+          container.read(favoritesProvider.notifier).remove('station-1');
+
+      // Yield once so remove() reaches the rating cleanup call.
+      await Future<void>.delayed(Duration.zero);
+      expect(ratingCleanupCalled, isTrue,
+          reason: 'remove() should call rating cleanup before completing');
+      expect(removeFuture, isA<Future<void>>(),
+          reason: 'remove() should still be pending while cleanup is running');
+
+      ratingCleanupCompleter.complete();
+      await removeFuture;
+      verify(() => mockStorage.removeRating('station-1')).called(1);
     });
 
     test('remove() succeeds even if price history cleanup throws', () async {

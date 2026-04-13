@@ -174,13 +174,13 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
       key: ValueKey('swipe-${item.id}'),
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.startToEnd) {
-          NavigationUtils.openInMaps(
+          await NavigationUtils.openInMaps(
             item.station.lat, item.station.lng,
             label: item.station.displayName,
           );
           return false;
         } else {
-          ref.read(ignoredStationsProvider.notifier).add(item.id);
+          await ref.read(ignoredStationsProvider.notifier).add(item.id);
           if (context.mounted) {
             final stationLabel = item.station.brand.isNotEmpty ? item.station.brand : item.station.name;
             final l10n = AppLocalizations.of(context);

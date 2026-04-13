@@ -102,7 +102,7 @@ class _CountrySwitchListenerState extends ConsumerState<CountrySwitchListener> {
     );
 
     if (confirmed == true) {
-      ref.read(activeProfileProvider.notifier).switchProfile(profile.id);
+      await ref.read(activeProfileProvider.notifier).switchProfile(profile.id);
     }
     _markDismissed(event.detectedCountryCode);
   }

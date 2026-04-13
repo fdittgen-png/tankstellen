@@ -213,9 +213,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 unawaited(_performGpsSearch());
               }
             } catch (e) {
-              if (mounted) {
-                SnackBarHelper.showError(context, e.toString());
-              }
+              if (!context.mounted) return;
+              SnackBarHelper.showError(context, e.toString());
             }
           },
         ),

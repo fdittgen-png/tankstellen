@@ -114,7 +114,7 @@ class OsmBrandEnricher {
         }
         if (nearest != null) {
           _sessionCache[s.id] = nearest.name;
-          _storage.putSetting('brand_${s.id}', nearest.name);
+          await _storage.putSetting('brand_${s.id}', nearest.name);
         }
       }
     } on DioException catch (e) { debugPrint('OSM brand enrichment failed: $e'); }

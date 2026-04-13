@@ -168,9 +168,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                             _openStationInMaps(station.lat, station.lng, label);
                             return false;
                           } else {
-                            ref
+                            await ref
                                 .read(favoritesProvider.notifier)
                                 .remove(station.id);
+                            if (!context.mounted) return true;
                             final l10nSnack = AppLocalizations.of(context);
                             SnackBarHelper.showWithUndo(
                               context,
