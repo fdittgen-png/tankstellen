@@ -230,7 +230,7 @@ return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchR
 @JsonSerializable()
 
 class _UserProfile implements UserProfile {
-  const _UserProfile({required this.id, required this.name, @FuelTypeJsonConverter() this.preferredFuelType = FuelType.e10, this.defaultSearchRadius = 10.0, this.landingScreen = LandingScreen.search, final  List<String> favoriteStationIds = const [], this.homeZipCode, this.autoUpdatePosition = false, this.countryCode, this.languageCode, this.routeSegmentKm = 50.0, this.avoidHighways = false, this.showFuel = true, this.showElectric = true, this.ratingMode = 'local', final  List<StationAmenity> preferredAmenities = const []}): _favoriteStationIds = favoriteStationIds,_preferredAmenities = preferredAmenities;
+  const _UserProfile({required this.id, required this.name, @FuelTypeJsonConverter() this.preferredFuelType = FuelType.e10, this.defaultSearchRadius = 10.0, this.landingScreen = LandingScreen.nearest, final  List<String> favoriteStationIds = const [], this.homeZipCode, this.autoUpdatePosition = false, this.countryCode, this.languageCode, this.routeSegmentKm = 50.0, this.avoidHighways = false, this.showFuel = true, this.showElectric = true, this.ratingMode = 'local', final  List<StationAmenity> preferredAmenities = const []}): _favoriteStationIds = favoriteStationIds,_preferredAmenities = preferredAmenities;
   factory _UserProfile.fromJson(Map<String, dynamic> json) => _$UserProfileFromJson(json);
 
 @override final  String id;

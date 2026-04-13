@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../core/data/storage_repository.dart';
 import '../core/error_tracing/integrations/navigation_trace_observer.dart';
 import '../core/storage/storage_keys.dart';
 import '../core/storage/storage_providers.dart';
@@ -34,6 +35,30 @@ import 'shell_screen.dart';
 import 'station_id_validator.dart';
 
 part 'router.g.dart';
+
+/// Resolves the route to land on based on the active profile's
+/// `landingScreen` preference. `cheapest` and `nearest` both open the Search
+/// screen ('/') — the sort order is derived separately by `SelectedSortMode`.
+/// Exposed for unit tests.
+String resolveLandingLocation(StorageRepository storage) {
+  final profileId = storage.getActiveProfileId();
+  if (profileId == null) return '/';
+  final landing = storage.getProfile(profileId)?['landingScreen']?.toString();
+  switch (landing) {
+    case 'favorites':
+    case 'LandingScreen.favorites':
+      return '/favorites';
+    case 'map':
+    case 'LandingScreen.map':
+      return '/map';
+    case 'cheapest':
+    case 'LandingScreen.cheapest':
+    case 'nearest':
+    case 'LandingScreen.nearest':
+    default:
+      return '/';
+  }
+}
 
 Widget _invalidIdScreen(BuildContext context, String path) {
   return Scaffold(
@@ -96,27 +121,16 @@ GoRouter router(Ref ref) {
 
       // Step 1: GDPR consent must be given before anything else
       if (!hasConsent && !isConsent) return '/consent';
-      if (hasConsent && isConsent) return isReady ? '/' : '/setup';
+      if (hasConsent && isConsent) {
+        return isReady ? resolveLandingLocation(storage) : '/setup';
+      }
 
       // Step 2: Setup (onboarding) must be complete before main app
       if (!isReady && !isSetup && !isConsent) return '/setup';
-      if (isReady && (isSetup || state.matchedLocation == '/')) {
-        // Route to profile landing screen preference
-        final profileId = storage.getActiveProfileId();
-        if (profileId != null) {
-          final profile = storage.getProfile(profileId);
-          final landing = profile?['landingScreen']?.toString();
-          switch (landing) {
-            case 'favorites':
-            case 'LandingScreen.favorites':
-              if (state.matchedLocation != '/favorites') return '/favorites';
-            case 'map':
-            case 'LandingScreen.map':
-              if (state.matchedLocation != '/map') return '/map';
-          }
-        }
-        if (isSetup) return '/';
-      }
+      // Landing preference is only applied when leaving the setup flow — not
+      // on every subsequent navigation back to '/', which would trap the
+      // user on their landing tab.
+      if (isReady && isSetup) return resolveLandingLocation(storage);
       return null;
     },
     routes: [

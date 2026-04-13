@@ -16,7 +16,7 @@ final _testProfile = const UserProfile(
   name: 'Home',
   preferredFuelType: FuelType.e10,
   defaultSearchRadius: 10.0,
-  landingScreen: LandingScreen.search,
+  landingScreen: LandingScreen.nearest,
   countryCode: 'DE',
 );
 

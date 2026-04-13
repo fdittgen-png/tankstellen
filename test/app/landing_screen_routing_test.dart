@@ -1,66 +1,91 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/app/router.dart';
+import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 
-void main() {
-  group('LandingScreen routing', () {
-    test('search landing maps to / route', () {
-      const screen = LandingScreen.search;
-      final route = _routeForLanding(screen);
-      expect(route, '/');
-    });
+class _FakeStorage extends Mock implements StorageRepository {
+  final Map<String, Map<String, dynamic>> _profiles = {};
+  String? _activeId;
 
-    test('favorites landing maps to /favorites route', () {
-      const screen = LandingScreen.favorites;
-      final route = _routeForLanding(screen);
-      expect(route, '/favorites');
-    });
+  void setActiveProfile(String id, Map<String, dynamic> profile) {
+    _profiles[id] = profile;
+    _activeId = id;
+  }
 
-    test('map landing maps to /map route', () {
-      const screen = LandingScreen.map;
-      final route = _routeForLanding(screen);
-      expect(route, '/map');
-    });
+  @override
+  String? getActiveProfileId() => _activeId;
 
-    test('cheapest landing maps to / route (auto-search triggers)', () {
-      const screen = LandingScreen.cheapest;
-      final route = _routeForLanding(screen);
-      expect(route, '/');
-    });
-
-    test('nearest landing maps to / route (auto-search triggers)', () {
-      const screen = LandingScreen.nearest;
-      final route = _routeForLanding(screen);
-      expect(route, '/');
-    });
-
-    test('all LandingScreen values produce valid routes', () {
-      for (final screen in LandingScreen.values) {
-        final route = _routeForLanding(screen);
-        expect(route, anyOf('/', '/favorites', '/map'),
-            reason: '$screen should map to a valid route');
-      }
-    });
-
-    test('LandingScreen enum serialization matches router switch', () {
-      // The router reads landing as a string from JSON storage.
-      // Verify all enum names are handled.
-      expect(LandingScreen.search.name, 'search');
-      expect(LandingScreen.favorites.name, 'favorites');
-      expect(LandingScreen.map.name, 'map');
-      expect(LandingScreen.cheapest.name, 'cheapest');
-      expect(LandingScreen.nearest.name, 'nearest');
-    });
-  });
+  @override
+  Map<String, dynamic>? getProfile(String id) => _profiles[id];
 }
 
-/// Mirrors the routing logic in router.dart redirect.
-String _routeForLanding(LandingScreen screen) {
-  switch (screen.name) {
-    case 'favorites':
-      return '/favorites';
-    case 'map':
-      return '/map';
-    default:
-      return '/';
-  }
+void main() {
+  group('resolveLandingLocation', () {
+    test('no active profile → /', () {
+      final storage = _FakeStorage();
+      expect(resolveLandingLocation(storage), '/');
+    });
+
+    test('favorites landing → /favorites', () {
+      final storage = _FakeStorage()
+        ..setActiveProfile('p', {'landingScreen': 'favorites'});
+      expect(resolveLandingLocation(storage), '/favorites');
+    });
+
+    test('legacy "LandingScreen.favorites" prefixed form → /favorites', () {
+      final storage = _FakeStorage()
+        ..setActiveProfile('p', {'landingScreen': 'LandingScreen.favorites'});
+      expect(resolveLandingLocation(storage), '/favorites');
+    });
+
+    test('map landing → /map', () {
+      final storage = _FakeStorage()
+        ..setActiveProfile('p', {'landingScreen': 'map'});
+      expect(resolveLandingLocation(storage), '/map');
+    });
+
+    test('cheapest landing → / (sort is handled separately)', () {
+      final storage = _FakeStorage()
+        ..setActiveProfile('p', {'landingScreen': 'cheapest'});
+      expect(resolveLandingLocation(storage), '/');
+    });
+
+    test('nearest landing → /', () {
+      final storage = _FakeStorage()
+        ..setActiveProfile('p', {'landingScreen': 'nearest'});
+      expect(resolveLandingLocation(storage), '/');
+    });
+
+    test('unknown landing value falls through to /', () {
+      final storage = _FakeStorage()
+        ..setActiveProfile('p', {'landingScreen': 'somethingElse'});
+      expect(resolveLandingLocation(storage), '/');
+    });
+
+    test('missing landingScreen field → /', () {
+      final storage = _FakeStorage()..setActiveProfile('p', {'name': 'X'});
+      expect(resolveLandingLocation(storage), '/');
+    });
+  });
+
+  group('LandingScreen enum', () {
+    test('no longer contains search', () {
+      final names = LandingScreen.values.map((v) => v.name).toList();
+      expect(names, unorderedEquals(['favorites', 'map', 'cheapest', 'nearest']));
+    });
+
+    test('every remaining value resolves to a valid route', () {
+      final storage = _FakeStorage();
+      for (final screen in LandingScreen.values) {
+        storage.setActiveProfile('p', {'landingScreen': screen.name});
+        final route = resolveLandingLocation(storage);
+        expect(
+          route,
+          anyOf('/', '/favorites', '/map'),
+          reason: '$screen should map to a valid route',
+        );
+      }
+    });
+  });
 }

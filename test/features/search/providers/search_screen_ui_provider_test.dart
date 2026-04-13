@@ -1,9 +1,71 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/profile/data/models/user_profile.dart';
+import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/route_search/domain/route_search_strategy.dart';
+import 'package:tankstellen/features/search/presentation/widgets/sort_selector.dart';
 import 'package:tankstellen/features/search/providers/search_screen_ui_provider.dart';
 
+ProviderContainer _containerWithLanding(LandingScreen? landing) {
+  final profile = landing == null
+      ? null
+      : UserProfile(id: 't', name: 'T', landingScreen: landing);
+  final container = ProviderContainer(
+    overrides: [
+      activeProfileProvider.overrideWith(() => _FakeActive(profile)),
+    ],
+  );
+  return container;
+}
+
+class _FakeActive extends ActiveProfile {
+  _FakeActive(this._profile);
+  final UserProfile? _profile;
+  @override
+  UserProfile? build() => _profile;
+}
+
 void main() {
+  group('SelectedSortMode default derived from landing preference', () {
+    test('no profile → distance', () {
+      final container = _containerWithLanding(null);
+      addTearDown(container.dispose);
+      expect(container.read(selectedSortModeProvider), SortMode.distance);
+    });
+
+    test('cheapest landing → price sort', () {
+      final container = _containerWithLanding(LandingScreen.cheapest);
+      addTearDown(container.dispose);
+      expect(container.read(selectedSortModeProvider), SortMode.price);
+    });
+
+    test('nearest landing → distance sort', () {
+      final container = _containerWithLanding(LandingScreen.nearest);
+      addTearDown(container.dispose);
+      expect(container.read(selectedSortModeProvider), SortMode.distance);
+    });
+
+    test('favorites landing → distance sort', () {
+      final container = _containerWithLanding(LandingScreen.favorites);
+      addTearDown(container.dispose);
+      expect(container.read(selectedSortModeProvider), SortMode.distance);
+    });
+
+    test('map landing → distance sort', () {
+      final container = _containerWithLanding(LandingScreen.map);
+      addTearDown(container.dispose);
+      expect(container.read(selectedSortModeProvider), SortMode.distance);
+    });
+
+    test('set() overrides the derived default', () {
+      final container = _containerWithLanding(LandingScreen.cheapest);
+      addTearDown(container.dispose);
+      expect(container.read(selectedSortModeProvider), SortMode.price);
+      container.read(selectedSortModeProvider.notifier).set(SortMode.rating);
+      expect(container.read(selectedSortModeProvider), SortMode.rating);
+    });
+  });
+
   group('FiltersExpanded', () {
     test('defaults to true', () {
       final container = ProviderContainer();

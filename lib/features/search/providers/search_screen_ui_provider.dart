@@ -1,4 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../profile/data/models/user_profile.dart';
+import '../../profile/providers/profile_provider.dart';
 import '../../route_search/domain/route_search_strategy.dart';
 import '../domain/entities/station_amenity.dart';
 import '../presentation/widgets/sort_selector.dart';
@@ -6,10 +8,20 @@ import '../presentation/widgets/sort_selector.dart';
 part 'search_screen_ui_provider.g.dart';
 
 /// The currently selected sort mode for the search results list.
+///
+/// The initial value derives from the active profile's [LandingScreen]
+/// preference: `cheapest` → price sort, everything else → distance.
+/// Users can still override via [set] from the sort chips.
 @riverpod
 class SelectedSortMode extends _$SelectedSortMode {
   @override
-  SortMode build() => SortMode.distance;
+  SortMode build() {
+    final profile = ref.watch(activeProfileProvider);
+    return switch (profile?.landingScreen) {
+      LandingScreen.cheapest => SortMode.price,
+      _ => SortMode.distance,
+    };
+  }
 
   void set(SortMode value) => state = value;
 }

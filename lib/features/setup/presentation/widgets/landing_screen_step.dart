@@ -76,7 +76,6 @@ class LandingScreenStep extends ConsumerWidget {
 
   static IconData _iconFor(LandingScreen screen) {
     return switch (screen) {
-      LandingScreen.search => Icons.search,
       LandingScreen.favorites => Icons.star,
       LandingScreen.map => Icons.map,
       LandingScreen.cheapest => Icons.trending_down,
