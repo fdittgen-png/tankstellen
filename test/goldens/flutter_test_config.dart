@@ -15,9 +15,11 @@ class TolerantGoldenFileComparator extends LocalFileComparator {
   Future<bool> compare(Uint8List imageBytes, Uri golden) async {
     try {
       return await super.compare(imageBytes, golden);
-    } on TestFailure catch (e) {
-      // Extract percentage from message like "0.14%, 687px diff detected"
-      final match = RegExp(r'(\d+\.\d+)%').firstMatch(e.message ?? '');
+    } catch (e) {
+      // Flutter 3.29+ throws FlutterError; older versions throw TestFailure.
+      // Both stringify to a message like:
+      //   'Pixel test failed, 0.15%, 744px diff detected.'
+      final match = RegExp(r'(\d+\.\d+)%').firstMatch(e.toString());
       if (match != null) {
         final diffPercent = double.parse(match.group(1)!) / 100;
         if (diffPercent <= _tolerance) {
