@@ -230,9 +230,10 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
           userId = await TankSyncClient.signInWithEmail(_emailController.text.trim(), _passwordController.text);
         }
         final settings = ref.read(settingsStorageProvider);
+        final apiKeys = ref.read(apiKeyStorageProvider);
         await settings.putSetting('sync_enabled', true);
         await settings.putSetting('supabase_url', url);
-        await settings.putSetting('supabase_anon_key', key);
+        await apiKeys.setSupabaseAnonKey(key);
         if (userId != null) await settings.putSetting('sync_user_id', userId);
         ref.invalidate(syncStateProvider);
       } else {

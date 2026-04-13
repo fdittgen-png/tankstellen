@@ -28,4 +28,5 @@ class StorageKeys {
   static const String evFavoriteStationData = 'ev_favorite_station_data';
   static const String helpBannerCriteria = 'help_banner_criteria_shown';
   static const String helpBannerAlerts = 'help_banner_alerts_shown';
+  static const String supabaseAnonKey = 'supabase_anon_key';
 }

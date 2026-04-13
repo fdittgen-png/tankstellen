@@ -291,6 +291,14 @@ class _InMemoryStorageRepository implements StorageRepository {
   @override bool hasEvApiKey() => false;
   @override bool hasCustomEvApiKey() => false;
   @override Future<void> setEvApiKey(String key) async {}
+  String? _supabaseAnonKey;
+  @override String? getSupabaseAnonKey() => _supabaseAnonKey;
+  @override Future<void> setSupabaseAnonKey(String key) async {
+    _supabaseAnonKey = key;
+  }
+  @override Future<void> deleteSupabaseAnonKey() async {
+    _supabaseAnonKey = null;
+  }
 
   // ProfileStorage
   @override String? getActiveProfileId() => _settings['active_profile_id'] as String?;

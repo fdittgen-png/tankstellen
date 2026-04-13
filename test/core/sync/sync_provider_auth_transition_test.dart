@@ -38,6 +38,11 @@ void main() {
   void stubStorageDefaults() {
     when(() => mockStorage.getSetting(any())).thenReturn(null);
     when(() => mockStorage.putSetting(any(), any())).thenAnswer((_) async {});
+    when(() => mockStorage.getSupabaseAnonKey()).thenReturn(null);
+    when(() => mockStorage.setSupabaseAnonKey(any()))
+        .thenAnswer((_) async {});
+    when(() => mockStorage.deleteSupabaseAnonKey())
+        .thenAnswer((_) async {});
     when(() => mockStorage.getFavoriteIds()).thenReturn([]);
     when(() => mockStorage.getIgnoredIds()).thenReturn([]);
     when(() => mockStorage.getRatings()).thenReturn({});
@@ -92,7 +97,7 @@ void main() {
       // Verify sync settings are cleared
       verify(() => mockStorage.putSetting('sync_enabled', false)).called(1);
       verify(() => mockStorage.putSetting('supabase_url', null)).called(1);
-      verify(() => mockStorage.putSetting('supabase_anon_key', null)).called(1);
+      verify(() => mockStorage.deleteSupabaseAnonKey()).called(1);
       verify(() => mockStorage.putSetting('sync_user_id', null)).called(1);
       verify(() => mockStorage.putSetting('sync_mode', null)).called(1);
 

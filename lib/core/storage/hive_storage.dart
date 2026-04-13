@@ -95,6 +95,13 @@ class HiveStorage implements StorageRepository {
   bool hasCustomEvApiKey() => _settings.hasCustomEvApiKey();
   @override
   Future<void> setEvApiKey(String key) => _settings.setEvApiKey(key);
+  @override
+  String? getSupabaseAnonKey() => _settings.getSupabaseAnonKey();
+  @override
+  Future<void> setSupabaseAnonKey(String key) =>
+      _settings.setSupabaseAnonKey(key);
+  @override
+  Future<void> deleteSupabaseAnonKey() => _settings.deleteSupabaseAnonKey();
 
   // ---------------------------------------------------------------------------
   // FavoriteStorage
