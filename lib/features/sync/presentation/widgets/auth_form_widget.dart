@@ -56,14 +56,18 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
     final l10n = AppLocalizations.of(context);
     final email = _emailController.text.trim();
     final password = _passwordController.text;
-    if (email.isEmpty) return 'Please enter your email';
-    if (!email.contains('@')) return 'Invalid email address';
+    if (email.isEmpty) {
+      return l10n?.authPleaseEnterEmail ?? 'Please enter your email';
+    }
+    if (!email.contains('@')) {
+      return l10n?.authInvalidEmail ?? 'Invalid email address';
+    }
     if (form.isSignUp && !PasswordValidator.isValid(password)) {
       return l10n?.passwordTooWeak ??
           'Password does not meet all requirements';
     }
     if (form.isSignUp && password != _confirmController.text) {
-      return 'Passwords do not match';
+      return l10n?.authPasswordsDoNotMatch ?? 'Passwords do not match';
     }
     return null;
   }
@@ -85,6 +89,7 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final form = ref.watch(authFormWidgetControllerProvider);
     final notifier = ref.read(authFormWidgetControllerProvider.notifier);
 
@@ -92,7 +97,7 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Choose your account type',
+          l10n?.syncChooseAccountType ?? 'Choose your account type',
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -101,16 +106,16 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
 
         // Anonymous / Email toggle
         SegmentedButton<bool>(
-          segments: const [
+          segments: [
             ButtonSegment(
               value: false,
-              label: Text('Anonymous'),
-              icon: Icon(Icons.person_outline, size: 18),
+              label: Text(l10n?.authAnonymousSegment ?? 'Anonymous'),
+              icon: const Icon(Icons.person_outline, size: 18),
             ),
             ButtonSegment(
               value: true,
-              label: Text('Email'),
-              icon: Icon(Icons.email_outlined, size: 18),
+              label: Text(l10n?.authEmailSegment ?? 'Email'),
+              icon: const Icon(Icons.email_outlined, size: 18),
             ),
           ],
           selected: {form.useEmail},
@@ -121,8 +126,10 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
         // Description text
         Text(
           form.useEmail
-              ? 'Sign in from any device. Recover your data if your phone is lost.'
-              : 'Instant access, no email needed. Data tied to this device.',
+              ? (l10n?.authEmailDescription ??
+                  'Sign in from any device. Recover your data if your phone is lost.')
+              : (l10n?.authAnonymousDescription ??
+                  'Instant access, no email needed. Data tied to this device.'),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -133,10 +140,10 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
           const SizedBox(height: 16),
           TextField(
             controller: _emailController,
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.email, size: 18),
+            decoration: InputDecoration(
+              labelText: l10n?.authEmailLabel ?? 'Email',
+              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.email, size: 18),
               isDense: true,
             ),
             keyboardType: TextInputType.emailAddress,
@@ -146,7 +153,7 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
           TextField(
             controller: _passwordController,
             decoration: InputDecoration(
-              labelText: 'Password',
+              labelText: l10n?.authPasswordLabel ?? 'Password',
               border: const OutlineInputBorder(),
               prefixIcon: const Icon(Icons.lock, size: 18),
               isDense: true,
@@ -173,7 +180,8 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
             TextField(
               controller: _confirmController,
               decoration: InputDecoration(
-                labelText: 'Confirm password',
+                labelText:
+                    l10n?.authConfirmPasswordLabel ?? 'Confirm password',
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.lock_outline, size: 18),
                 isDense: true,
@@ -203,8 +211,9 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
                     },
               child: Text(
                 form.isSignUp
-                    ? 'Already have an account? Sign in'
-                    : 'Create new account',
+                    ? (l10n?.syncHaveAccountSignIn ??
+                        'Already have an account? Sign in')
+                    : (l10n?.syncCreateNewAccount ?? 'Create new account'),
                 style: const TextStyle(fontSize: 12),
               ),
             ),
@@ -261,12 +270,13 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
                 ),
           label: Text(
             widget.isLoading
-                ? 'Connecting...'
+                ? (l10n?.syncConnectingButton ?? 'Connecting...')
                 : form.useEmail
                     ? (form.isSignUp
-                        ? 'Create account & connect'
-                        : 'Sign in & connect')
-                    : 'Connect anonymously',
+                        ? (l10n?.authCreateAccountAndConnect ??
+                            'Create account & connect')
+                        : (l10n?.authSignInAndConnect ?? 'Sign in & connect'))
+                    : (l10n?.authConnectAnonymously ?? 'Connect anonymously'),
           ),
         ),
       ],

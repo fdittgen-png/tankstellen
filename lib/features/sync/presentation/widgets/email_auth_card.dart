@@ -65,7 +65,8 @@ class EmailAuthCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Sync data automatically across all your devices.',
+              l10n?.authSyncAcrossDevices ??
+                  'Sync data automatically across all your devices.',
               style: theme.textTheme.bodySmall
                   ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),
@@ -74,10 +75,10 @@ class EmailAuthCard extends StatelessWidget {
             // Email field
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email, size: 18),
+              decoration: InputDecoration(
+                labelText: l10n?.authEmailLabel ?? 'Email',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.email, size: 18),
                 isDense: true,
               ),
               keyboardType: TextInputType.emailAddress,
@@ -89,7 +90,7 @@ class EmailAuthCard extends StatelessWidget {
             TextField(
               controller: passwordController,
               decoration: InputDecoration(
-                labelText: 'Password',
+                labelText: l10n?.authPasswordLabel ?? 'Password',
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.lock, size: 18),
                 isDense: true,
@@ -116,7 +117,8 @@ class EmailAuthCard extends StatelessWidget {
               TextField(
                 controller: confirmController,
                 decoration: InputDecoration(
-                  labelText: 'Confirm password',
+                  labelText:
+                      l10n?.authConfirmPasswordLabel ?? 'Confirm password',
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.lock_outline, size: 18),
                   isDense: true,
@@ -154,8 +156,10 @@ class EmailAuthCard extends StatelessWidget {
               child: TextButton(
                 onPressed: isLoading ? null : onToggleMode,
                 child: Text(isSignUp
-                    ? 'Already have an account? Sign in'
-                    : 'New here? Create account'),
+                    ? (l10n?.syncHaveAccountSignIn ??
+                        'Already have an account? Sign in')
+                    : (l10n?.authNewHereCreateAccount ??
+                        'New here? Create account')),
               ),
             ),
             if (error != null) ...[

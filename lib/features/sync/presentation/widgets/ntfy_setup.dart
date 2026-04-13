@@ -15,6 +15,7 @@ class NtfySetupCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final syncConfig = ref.watch(syncStateProvider);
     final userId = syncConfig.userId;
     final state = ref.watch(ntfySetupControllerProvider);
@@ -45,7 +46,7 @@ class NtfySetupCard extends ConsumerWidget {
                 const Icon(Icons.notifications_active, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  'Push Notifications (ntfy.sh)',
+                  l10n?.ntfyCardTitle ?? 'Push Notifications (ntfy.sh)',
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
               ],
@@ -53,8 +54,9 @@ class NtfySetupCard extends ConsumerWidget {
             const SizedBox(height: 8),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Enable ntfy.sh push'),
-              subtitle: const Text('Receive price alerts via ntfy.sh'),
+              title: Text(l10n?.ntfyEnableTitle ?? 'Enable ntfy.sh push'),
+              subtitle: Text(
+                  l10n?.ntfyEnableSubtitle ?? 'Receive price alerts via ntfy.sh'),
               value: state.enabled,
               secondary: state.isToggling
                   ? const SizedBox(
@@ -80,7 +82,7 @@ class NtfySetupCard extends ConsumerWidget {
               const Divider(),
               const SizedBox(height: 8),
               Text(
-                'Topic URL',
+                l10n?.ntfyTopicUrlLabel ?? 'Topic URL',
                 style: Theme.of(context).textTheme.labelMedium,
               ),
               const SizedBox(height: 4),
@@ -107,7 +109,7 @@ class NtfySetupCard extends ConsumerWidget {
                   const SizedBox(width: 8),
                   IconButton(
                     icon: const Icon(Icons.copy, size: 18),
-                    tooltip: 'Copy topic URL',
+                    tooltip: l10n?.ntfyCopyTopicUrlTooltip ?? 'Copy topic URL',
                     onPressed: () {
                       Clipboard.setData(
                           ClipboardData(text: 'https://ntfy.sh/${state.topic}'));
@@ -149,7 +151,8 @@ class NtfySetupCard extends ConsumerWidget {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.send),
-                label: const Text('Send test notification'),
+                label: Text(
+                    l10n?.ntfySendTestButton ?? 'Send test notification'),
               ),
               const SizedBox(height: 12),
               Row(
@@ -161,7 +164,8 @@ class NtfySetupCard extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Install the ntfy app from F-Droid to receive push notifications on your device.',
+                      l10n?.ntfyFdroidHint ??
+                          'Install the ntfy app from F-Droid to receive push notifications on your device.',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -174,7 +178,8 @@ class NtfySetupCard extends ConsumerWidget {
             if (userId == null) ...[
               const SizedBox(height: 8),
               Text(
-                'Connect TankSync first to enable push notifications.',
+                l10n?.ntfyConnectFirstHint ??
+                    'Connect TankSync first to enable push notifications.',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),

@@ -2192,4 +2192,117 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get syncCredentialsAccessKeyHint => 'eyJhbGciOiJIUzI1NiIs...';
+
+  @override
+  String get authEmailLabel => 'E-Mail';
+
+  @override
+  String get authPasswordLabel => 'Passwort';
+
+  @override
+  String get authConfirmPasswordLabel => 'Passwort bestätigen';
+
+  @override
+  String get authPleaseEnterEmail => 'Bitte E-Mail eingeben';
+
+  @override
+  String get authInvalidEmail => 'Ungültige E-Mail-Adresse';
+
+  @override
+  String get authPasswordsDoNotMatch => 'Passwörter stimmen nicht überein';
+
+  @override
+  String get authConnectAnonymously => 'Anonym verbinden';
+
+  @override
+  String get authCreateAccountAndConnect => 'Konto erstellen & verbinden';
+
+  @override
+  String get authSignInAndConnect => 'Anmelden & verbinden';
+
+  @override
+  String get authAnonymousSegment => 'Anonym';
+
+  @override
+  String get authEmailSegment => 'E-Mail';
+
+  @override
+  String get authAnonymousDescription =>
+      'Sofortiger Zugang, keine E-Mail erforderlich. Daten sind an dieses Gerät gebunden.';
+
+  @override
+  String get authEmailDescription =>
+      'Anmeldung von jedem Gerät. Daten wiederherstellen, falls Handy verloren geht.';
+
+  @override
+  String get authSyncAcrossDevices =>
+      'Daten automatisch auf allen Geräten synchronisieren.';
+
+  @override
+  String get authNewHereCreateAccount => 'Neu hier? Konto erstellen';
+
+  @override
+  String get ntfyCardTitle => 'Push-Benachrichtigungen (ntfy.sh)';
+
+  @override
+  String get ntfyEnableTitle => 'ntfy.sh-Push aktivieren';
+
+  @override
+  String get ntfyEnableSubtitle => 'Preisalarme über ntfy.sh erhalten';
+
+  @override
+  String get ntfyTopicUrlLabel => 'Topic-URL';
+
+  @override
+  String get ntfyCopyTopicUrlTooltip => 'Topic-URL kopieren';
+
+  @override
+  String get ntfySendTestButton => 'Testbenachrichtigung senden';
+
+  @override
+  String get ntfyFdroidHint =>
+      'Installieren Sie die ntfy-App aus F-Droid, um Push-Benachrichtigungen auf Ihrem Gerät zu empfangen.';
+
+  @override
+  String get ntfyConnectFirstHint =>
+      'Verbinden Sie zuerst TankSync, um Push-Benachrichtigungen zu aktivieren.';
+
+  @override
+  String get linkDeviceScreenTitle => 'Gerät verknüpfen';
+
+  @override
+  String get linkDeviceThisDeviceLabel => 'Dieses Gerät';
+
+  @override
+  String get linkDeviceShareCodeHint =>
+      'Teilen Sie diesen Code mit Ihrem anderen Gerät:';
+
+  @override
+  String get linkDeviceNotConnected => 'Nicht verbunden';
+
+  @override
+  String get linkDeviceCopyCodeTooltip => 'Code kopieren';
+
+  @override
+  String get linkDeviceImportSectionTitle => 'Von anderem Gerät importieren';
+
+  @override
+  String get linkDeviceImportDescription =>
+      'Geben Sie den Gerätecode Ihres anderen Geräts ein, um dessen Favoriten und Alarme zu importieren.';
+
+  @override
+  String get linkDeviceCodeFieldLabel => 'Gerätecode';
+
+  @override
+  String get linkDeviceCodeFieldHint => 'UUID vom anderen Gerät einfügen';
+
+  @override
+  String get linkDeviceImportButton => 'Daten importieren';
+
+  @override
+  String get linkDeviceHowItWorksTitle => 'So funktioniert es';
+
+  @override
+  String get linkDeviceHowItWorksBody =>
+      '1. Auf Gerät A: Gerätecode oben kopieren\n2. Auf Gerät B: in das Feld \"Gerätecode\" einfügen\n3. \"Daten importieren\" tippen, um Favoriten und Alarme zusammenzuführen\n4. Beide Geräte haben dann alle kombinierten Daten\n\nJedes Gerät behält seine eigene anonyme Identität. Daten werden zusammengeführt, nicht verschoben.';
 }
