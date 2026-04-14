@@ -1,10 +1,19 @@
+@Tags(['network'])
+library;
+
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Integration tests that verify each country's fuel price API is reachable
 /// and returns valid data. These tests hit real endpoints.
 ///
-/// Run with: flutter test test/core/services/api_connectivity_test.dart
+/// Tagged `network` so the main CI run excludes them — the upstream APIs
+/// (Argentina, Italy MIMIT, Spain MITECO) intermittently time out and
+/// must not block PRs. Run on demand with:
+///
+///   flutter test test/core/services/api_connectivity_test.dart --tags=network
+///
+/// or from a workstation via `flutter test --tags=network`.
 void main() {
   late Dio dio;
 

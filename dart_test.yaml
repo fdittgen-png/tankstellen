@@ -1,0 +1,11 @@
+# Test runner configuration.
+#
+# Declares the tags that test files use so flutter_test doesn't warn
+# about unknown tags. Tag-based exclusions live in the test command
+# itself (see .github/workflows/ci.yml `--exclude-tags=network`).
+tags:
+  network:
+    description: >
+      Tests that hit real third-party APIs over the network. Intermittent
+      upstream timeouts mean these cannot block PRs. Run on demand with
+      `flutter test --tags=network`.
