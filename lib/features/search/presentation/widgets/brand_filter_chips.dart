@@ -21,7 +21,7 @@ class BrandFilterChips extends ConsumerWidget {
     final selectedBrands = ref.watch(selectedBrandsProvider);
     final excludeHighway = ref.watch(excludeHighwayStationsProvider);
 
-    final brandCounts = _extractGroupedBrands(stations);
+    final brandCounts = extractGroupedBrands(stations);
     if (brandCounts.isEmpty) return const SizedBox.shrink();
 
     final hasHighwayStations = stations.any((s) => s.stationType == 'A');
@@ -92,11 +92,19 @@ class BrandFilterChips extends ConsumerWidget {
   }
 
   /// Group stations by canonical brand name. Returns {brand: count}.
-  static Map<String, int> _extractGroupedBrands(List<Station> stations) {
-    final rawBrands = stations
-        .map((s) => s.brand.trim())
-        .where((b) => b.isNotEmpty)
-        .toList();
+  ///
+  /// Previously this silently dropped stations whose brand string was
+  /// empty (via `.where((b) => b.isNotEmpty)`). That caused the chip
+  /// counts to not add up to the total station count — a 10-station
+  /// search could render a chip strip totalling 7, with three stations
+  /// invisible in the filter UI even though they still appeared in the
+  /// results list (#481). The fix passes every station through
+  /// `BrandRegistry.countByBrand`, which handles empty strings by
+  /// bucketing them into `Others` — keeping the chip counts in sync
+  /// with the filter predicate in `applyBrandFilter`.
+  @visibleForTesting
+  static Map<String, int> extractGroupedBrands(List<Station> stations) {
+    final rawBrands = stations.map((s) => s.brand.trim()).toList();
     return BrandRegistry.countByBrand(rawBrands);
   }
 }

@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/storage_repository.dart';
 import '../../storage/storage_providers.dart';
 import '../dio_factory.dart';
+import '../../../features/search/domain/entities/brand_registry.dart';
 import '../../../features/search/domain/entities/station.dart';
 
 part 'osm_brand_enricher.g.dart';
@@ -47,7 +48,10 @@ class OsmBrandEnricher {
   }
 
   bool _needsBrand(Station s) =>
-      s.brand.isEmpty || s.brand == 'Station' || s.brand == 'Autoroute';
+      s.brand.isEmpty ||
+      s.brand == 'Station' || // legacy value from before #482
+      s.brand == BrandRegistry.independentLabel ||
+      s.brand == 'Autoroute';
 
   Future<void> _fetchBrandsFromNominatim(
     List<Station> stations, {
@@ -113,8 +117,11 @@ class OsmBrandEnricher {
           }
         }
         if (nearest != null) {
-          _sessionCache[s.id] = nearest.name;
-          await _storage.putSetting('brand_${s.id}', nearest.name);
+          final sanitized = sanitizeOsmBrand(nearest.name);
+          if (sanitized != null) {
+            _sessionCache[s.id] = sanitized;
+            await _storage.putSetting('brand_${s.id}', sanitized);
+          }
         }
       }
     } on DioException catch (e) { debugPrint('OSM brand enrichment failed: $e'); }
@@ -127,11 +134,64 @@ class OsmBrandEnricher {
       if (cached != null) return s.copyWith(brand: cached);
       final persisted = _storage.getSetting('brand_${s.id}');
       if (persisted is String) {
-        _sessionCache[s.id] = persisted;
-        return s.copyWith(brand: persisted);
+        // Validate on read — anything that fails sanitisation (empty,
+        // too short, "ff", phone-number-looking, etc.) is treated as
+        // a cache miss and the station will be re-enriched. This
+        // evicts any historically-poisoned entries that predate the
+        // #481 fix without needing a full-cache migration pass.
+        final sanitized = sanitizeOsmBrand(persisted);
+        if (sanitized != null) {
+          _sessionCache[s.id] = sanitized;
+          return s.copyWith(brand: sanitized);
+        }
       }
       return s;
     }).toList();
+  }
+
+  /// Validates an OSM `name` field before it is cached as a station
+  /// brand. Rejects implausible / garbage values that would otherwise
+  /// leak into the brand filter chip strip as mystery labels (#481).
+  ///
+  /// A brand string is accepted if it:
+  ///   * trims to at least 3 characters
+  ///   * contains at least one letter
+  ///   * is not obviously non-brand noise (lat/lng, phone number,
+  ///     opening-hours string)
+  ///   * OR is already a known canonical brand or alias in
+  ///     `BrandRegistry.brandAliases`
+  ///
+  /// Returns the trimmed brand if it passes, `null` otherwise. Exposed
+  /// as a static helper so the regression tests can exercise the
+  /// validator directly without spinning up a full enricher.
+  static String? sanitizeOsmBrand(String raw) {
+    final trimmed = raw.trim();
+    if (trimmed.length < 3) return null;
+
+    // Fast path: already a known canonical or alias. No further
+    // sanity checks — we already trust the registry.
+    for (final entry in BrandRegistry.brandAliases.entries) {
+      if (entry.key.toLowerCase() == trimmed.toLowerCase()) return trimmed;
+      for (final alias in entry.value) {
+        if (alias.toLowerCase() == trimmed.toLowerCase()) return trimmed;
+      }
+    }
+
+    // Must contain at least one letter. "1234" / "+33 4 67 ..." → reject.
+    if (!RegExp(r'[A-Za-zÀ-ÖØ-öø-ÿ]').hasMatch(trimmed)) return null;
+
+    // Must not look like a phone number or coordinate string.
+    if (RegExp(r'^\+?\d[\d\s().-]{6,}$').hasMatch(trimmed)) return null;
+
+    // Must not look like a time range ("08:00-20:00", "Mo-Fr 08:00 ...").
+    if (RegExp(r'\d{1,2}:\d{2}').hasMatch(trimmed)) return null;
+
+    // Reject runs of only punctuation / whitespace / very repetitive
+    // short tokens — "ff", "xx", "??", "...".
+    final letters = trimmed.replaceAll(RegExp(r'[^A-Za-zÀ-ÖØ-öø-ÿ]'), '');
+    if (letters.length < 3) return null;
+
+    return trimmed;
   }
 
   static double _distKm(double lat1, double lng1, double lat2, double lng2) {

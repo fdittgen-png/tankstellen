@@ -389,6 +389,11 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     // Fallback: use station type
     final pop = r['pop']?.toString() ?? '';
     if (pop == 'A') return 'Autoroute';
-    return 'Station';
+    // #482 — explicit "genuinely brandless" sentinel instead of the
+    // previous magic string `'Station'`. Detail views can now render a
+    // localised "Station indépendante" row so the user can distinguish
+    // an unbranded independent station from a brand-detection bug.
+    // The sentinel is also observable via `BrandRegistry.independentLabel`.
+    return 'Independent';
   }
 }
