@@ -14,6 +14,8 @@ import '../../data/api_key_validator.dart';
 import '../../providers/api_key_validator_provider.dart';
 import '../widgets/api_key_input_section.dart';
 import '../widgets/country_info_card.dart';
+import '../widgets/country_selector.dart';
+import '../widgets/language_selector.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
   const SetupScreen({super.key});
@@ -139,13 +141,13 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               const SizedBox(height: 16),
               const _SetupHeader(),
               const SizedBox(height: 24),
-              _LanguageSelector(
+              LanguageSelector(
                 selected: language,
                 onSelect: (lang) =>
                     ref.read(activeLanguageProvider.notifier).select(lang),
               ),
               const SizedBox(height: 24),
-              _CountrySelector(
+              CountrySelector(
                 selected: country,
                 onSelect: (c) =>
                     ref.read(activeCountryProvider.notifier).select(c),
@@ -221,78 +223,6 @@ class _SetupHeader extends StatelessWidget {
           l10n?.welcomeSubtitle ?? 'Find the cheapest fuel near you.',
           style: theme.textTheme.bodyLarge,
           textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-}
-
-class _LanguageSelector extends StatelessWidget {
-  final AppLanguage selected;
-  final ValueChanged<AppLanguage> onSelect;
-
-  const _LanguageSelector({required this.selected, required this.onSelect});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(l10n?.language ?? 'Language', style: theme.textTheme.titleMedium),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: AppLanguages.all.map((lang) {
-            final isSelected = lang.code == selected.code;
-            return Semantics(
-              label:
-                  'Language ${lang.nativeName}${isSelected ? ", selected" : ""}',
-              child: ChoiceChip(
-                label: Text(lang.nativeName),
-                selected: isSelected,
-                onSelected: (_) => onSelect(lang),
-                visualDensity: VisualDensity.compact,
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-}
-
-class _CountrySelector extends StatelessWidget {
-  final CountryConfig selected;
-  final ValueChanged<CountryConfig> onSelect;
-
-  const _CountrySelector({required this.selected, required this.onSelect});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(l10n?.country ?? 'Country', style: theme.textTheme.titleMedium),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: Countries.all.map((c) {
-            final isSelected = c.code == selected.code;
-            return Semantics(
-              label: 'Country ${c.name}${isSelected ? ", selected" : ""}',
-              child: ChoiceChip(
-                label: Text('${c.flag} ${c.name}'),
-                selected: isSelected,
-                onSelected: (_) => onSelect(c),
-              ),
-            );
-          }).toList(),
         ),
       ],
     );
