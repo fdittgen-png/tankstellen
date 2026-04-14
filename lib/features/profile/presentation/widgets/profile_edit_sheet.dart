@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/language/language_provider.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../providers/profile_edit_provider.dart';
+import 'profile_fuel_type_dropdown.dart';
 import 'profile_landing_screen_dropdown.dart';
 import 'profile_radius_slider.dart';
 
@@ -119,23 +119,9 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
                 ),
               ),
               const SizedBox(height: 16),
-              DropdownButtonFormField<FuelType>(
-                initialValue: editState.fuelType,
-                decoration: InputDecoration(
-                  labelText:
-                      AppLocalizations.of(context)?.preferredFuel ?? 'Preferred fuel',
-                  border: const OutlineInputBorder(),
-                ),
-                items: FuelType.values
-                    .where((t) => t != FuelType.all)
-                    .map((t) => DropdownMenuItem(
-                          value: t,
-                          child: Text(t.displayName),
-                        ))
-                    .toList(),
-                onChanged: (v) {
-                  if (v != null) editCtrl.setFuelType(v);
-                },
+              ProfileFuelTypeDropdown(
+                value: editState.fuelType,
+                onChanged: editCtrl.setFuelType,
               ),
               const SizedBox(height: 16),
               ProfileRadiusSlider(
