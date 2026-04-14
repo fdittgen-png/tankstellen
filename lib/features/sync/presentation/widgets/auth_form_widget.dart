@@ -6,6 +6,8 @@ import '../../../../core/widgets/password_strength_indicator.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/auth_form_widget_provider.dart';
+import 'auth_form_error_box.dart';
+import 'auth_form_submit_button.dart';
 
 /// Reusable authentication form: anonymous or email with password.
 ///
@@ -223,61 +225,15 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
         // Error display
         if (widget.error != null) ...[
           const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.error.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 16,
-                  color: theme.colorScheme.error,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    widget.error!,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.colorScheme.error,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          AuthFormErrorBox(message: widget.error!),
         ],
 
         const SizedBox(height: 16),
-        FilledButton.icon(
-          onPressed: widget.isLoading ? null : () => _submit(form),
-          icon: widget.isLoading
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-              : Icon(
-                  form.useEmail
-                      ? (form.isSignUp ? Icons.person_add : Icons.login)
-                      : Icons.flash_on,
-                ),
-          label: Text(
-            widget.isLoading
-                ? (l10n?.syncConnectingButton ?? 'Connecting...')
-                : form.useEmail
-                    ? (form.isSignUp
-                        ? (l10n?.authCreateAccountAndConnect ??
-                            'Create account & connect')
-                        : (l10n?.authSignInAndConnect ?? 'Sign in & connect'))
-                    : (l10n?.authConnectAnonymously ?? 'Connect anonymously'),
-          ),
+        AuthFormSubmitButton(
+          isLoading: widget.isLoading,
+          useEmail: form.useEmail,
+          isSignUp: form.isSignUp,
+          onPressed: () => _submit(form),
         ),
       ],
     );

@@ -8,6 +8,7 @@ import '../widgets/api_key_section.dart';
 import '../widgets/config_verification_widget.dart';
 import '../widgets/location_section_widget.dart';
 import '../widgets/profile_list_section.dart';
+import '../widgets/settings_menu_tile.dart';
 import '../widgets/storage_section.dart';
 import '../widgets/tank_sync_section.dart';
 
@@ -21,7 +22,6 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -61,46 +61,22 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 8),
 
           // My vehicles
-          Card(
-            margin: EdgeInsets.zero,
-            child: ListTile(
-              leading: const Icon(Icons.directions_car, size: 20),
-              title: Text(
-                l?.vehiclesMenuTitle ?? 'My vehicles',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Text(
-                l?.vehiclesMenuSubtitle ??
-                    'Battery, connectors, charging preferences',
-                style: theme.textTheme.bodySmall,
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.push('/vehicles'),
-            ),
+          SettingsMenuTile(
+            icon: Icons.directions_car,
+            title: l?.vehiclesMenuTitle ?? 'My vehicles',
+            subtitle: l?.vehiclesMenuSubtitle ??
+                'Battery, connectors, charging preferences',
+            onTap: () => context.push('/vehicles'),
           ),
           const SizedBox(height: 8),
 
           // Fuel consumption log
-          Card(
-            margin: EdgeInsets.zero,
-            child: ListTile(
-              leading: const Icon(Icons.local_gas_station, size: 20),
-              title: Text(
-                l?.consumptionLogMenuTitle ?? 'Consumption log',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Text(
-                l?.consumptionLogMenuSubtitle ??
-                    'Track fill-ups and calculate L/100km',
-                style: theme.textTheme.bodySmall,
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.push('/consumption'),
-            ),
+          SettingsMenuTile(
+            icon: Icons.local_gas_station,
+            title: l?.consumptionLogMenuTitle ?? 'Consumption log',
+            subtitle: l?.consumptionLogMenuSubtitle ??
+                'Track fill-ups and calculate L/100km',
+            onTap: () => context.push('/consumption'),
           ),
           const SizedBox(height: 8),
 
@@ -128,24 +104,12 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 8),
 
           // Privacy Dashboard
-          Card(
-            margin: EdgeInsets.zero,
-            child: ListTile(
-              leading: const Icon(Icons.privacy_tip, size: 20),
-              title: Text(
-                l?.privacyDashboardTitle ?? 'Privacy Dashboard',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Text(
-                l?.privacyDashboardSubtitle ??
-                    'View, export, or delete your data',
-                style: theme.textTheme.bodySmall,
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.push('/privacy-dashboard'),
-            ),
+          SettingsMenuTile(
+            icon: Icons.privacy_tip,
+            title: l?.privacyDashboardTitle ?? 'Privacy Dashboard',
+            subtitle: l?.privacyDashboardSubtitle ??
+                'View, export, or delete your data',
+            onTap: () => context.push('/privacy-dashboard'),
           ),
           const SizedBox(height: 8),
 
