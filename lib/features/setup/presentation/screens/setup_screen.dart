@@ -13,6 +13,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../data/api_key_validator.dart';
 import '../../providers/api_key_validator_provider.dart';
+import '../widgets/country_status_badge.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
   const SetupScreen({super.key});
@@ -344,7 +345,7 @@ class _CountryInfoCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  _CountryStatusBadge(country: country),
+                  CountryStatusBadge(country: country),
                 ],
               ),
               const SizedBox(height: 8),
@@ -362,38 +363,6 @@ class _CountryInfoCard extends StatelessWidget {
   }
 }
 
-class _CountryStatusBadge extends StatelessWidget {
-  final CountryConfig country;
-
-  const _CountryStatusBadge({required this.country});
-
-  @override
-  Widget build(BuildContext context) {
-    return ExcludeSemantics(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: country.requiresApiKey
-              ? Colors.orange.shade100
-              : Colors.green.shade100,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          country.requiresApiKey
-              ? 'API key required'
-              : 'Free — no key needed',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: country.requiresApiKey
-                ? Colors.orange.shade800
-                : Colors.green.shade800,
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class _ApiKeyInputSection extends StatelessWidget {
   final CountryConfig country;
