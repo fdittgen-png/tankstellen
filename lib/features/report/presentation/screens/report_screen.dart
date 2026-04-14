@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/country/country_provider.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/services/report_service.dart';
 import '../../../../core/storage/storage_providers.dart';
@@ -93,32 +94,65 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
           ? double.tryParse(_priceController.text.replaceAll(',', '.'))
           : null;
 
-      await ReportService().submitComplaint(
-        stationId: widget.stationId,
-        reportType: selectedType.apiValue,
-        apiKey: apiKey,
-        correction: price,
-      );
+      // #484 — resolve the reporting backends for the current country
+      // and config. Before this fix the screen always hit the
+      // Tankerkoenig complaint endpoint (which exists only for DE and
+      // requires an API key), so every non-DE user saw a silent failure.
+      // Now:
+      //   - Tankerkoenig: only when country == DE AND a key is set
+      //   - TankSync community reports: whenever TankSync is connected,
+      //     tagged with the user's ACTUAL country (not hardcoded 'DE')
+      //   - If neither backend is available, fail loudly with a
+      //     banner-style error so the user knows their report was not
+      //     sent anywhere.
+      final country = ref.read(activeCountryProvider);
+      final syncConfig = ref.read(syncStateProvider);
+      final canSubmitTankerkoenig = country.code == 'DE' &&
+          apiKey != null &&
+          apiKey.isNotEmpty;
+      final canSubmitTankSync = TankSyncClient.isConnected &&
+          syncConfig.userId != null;
 
-      // Also submit to Supabase community reports if connected
-      if (selectedType.needsPrice && TankSyncClient.isConnected) {
-        final syncConfig = ref.read(syncStateProvider);
-        if (price != null && syncConfig.userId != null) {
-          final fuelType = switch (selectedType) {
-            ReportType.wrongE5 => 'e5',
-            ReportType.wrongE10 => 'e10',
-            ReportType.wrongDiesel => 'diesel',
-            _ => 'unknown',
-          };
-          await CommunityReportService.submitReport(
-            stationId: widget.stationId,
-            fuelType: fuelType,
-            reportedPrice: price,
-            countryCode: 'DE',
-            supabaseUserId: syncConfig.userId,
-            supabaseClient: TankSyncClient.client,
+      if (!canSubmitTankerkoenig && !canSubmitTankSync) {
+        if (mounted) {
+          // TODO: localise via `reportNoBackendAvailable` ARB key when
+          // the next batch of l10n strings is added.
+          SnackBarHelper.showError(
+            context,
+            'Le signalement n\'a pas pu être envoyé : aucun service de '
+            'report n\'est configuré pour ce pays. Activez TankSync dans '
+            'les paramètres pour envoyer des signalements communautaires.',
           );
         }
+        return;
+      }
+
+      if (canSubmitTankerkoenig) {
+        await ReportService().submitComplaint(
+          stationId: widget.stationId,
+          reportType: selectedType.apiValue,
+          apiKey: apiKey,
+          correction: price,
+        );
+      }
+
+      if (canSubmitTankSync && selectedType.needsPrice && price != null) {
+        final fuelType = switch (selectedType) {
+          ReportType.wrongE5 => 'e5',
+          ReportType.wrongE10 => 'e10',
+          ReportType.wrongDiesel => 'diesel',
+          _ => 'unknown',
+        };
+        await CommunityReportService.submitReport(
+          stationId: widget.stationId,
+          fuelType: fuelType,
+          reportedPrice: price,
+          // #484 — was hardcoded to 'DE', mislabelling every non-DE
+          // community report as German data.
+          countryCode: country.code,
+          supabaseUserId: syncConfig.userId,
+          supabaseClient: TankSyncClient.client,
+        );
       }
 
       if (mounted) {
@@ -145,11 +179,32 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     final form = ref.watch(reportFormControllerProvider);
     final selectedType = form.selectedType;
+
+    // #484 — compute the reporting-backends availability up front so
+    // we can both (a) render a banner when nothing is configured and
+    // (b) disable the submit button in the same condition. Keeps the
+    // UI consistent with what _submit() will actually do.
+    final country = ref.watch(activeCountryProvider);
+    final apiKey = ref.watch(apiKeyStorageProvider).getApiKey();
+    final syncConfig = ref.watch(syncStateProvider);
+    final canSubmitTankerkoenig = country.code == 'DE' &&
+        apiKey != null &&
+        apiKey.isNotEmpty;
+    final canSubmitTankSync =
+        TankSyncClient.isConnected && syncConfig.userId != null;
+    final hasAnyBackend = canSubmitTankerkoenig || canSubmitTankSync;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n?.reportPrice ?? 'Report price'),
+        // #484 — was "Signaler un prix" but two of the existing options
+        // (open/closed status) are not about prices and the rework will
+        // add metadata-only report types. Generic "Signaler un problème"
+        // matches the actual scope.
+        // TODO: add `reportIssueTitle` ARB key for localisation.
+        title: const Text('Signaler un problème'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           tooltip: l10n?.tooltipBack ?? 'Back',
@@ -159,9 +214,43 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // #484 — banner telling the user that no reporting backend is
+          // available for their country/config. Previously the form
+          // accepted their input and silently failed on submit.
+          if (!hasAnyBackend) ...[
+            Container(
+              key: const ValueKey('report-no-backend-banner'),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.errorContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.error_outline,
+                      size: 20, color: theme.colorScheme.onErrorContainer),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    // TODO: `reportNoBackendBanner` ARB key for localisation.
+                    child: Text(
+                      'Les signalements ne sont pas disponibles dans ce pays '
+                      'pour le moment. Activez TankSync dans les paramètres '
+                      'pour envoyer des signalements communautaires, ou '
+                      'ajoutez une clé API Tankerkoenig si vous êtes en '
+                      'Allemagne.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onErrorContainer,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
           Text(
             l10n?.whatsWrong ?? "What's wrong?",
-            style: Theme.of(context).textTheme.titleMedium,
+            style: theme.textTheme.titleMedium,
           ),
           const SizedBox(height: 12),
           ...ReportType.values.map(
@@ -169,9 +258,11 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
               value: type,
               groupValue: selectedType,
               title: Text(type.displayName(l10n)),
-              onChanged: (v) => ref
-                  .read(reportFormControllerProvider.notifier)
-                  .selectType(v),
+              onChanged: hasAnyBackend
+                  ? (v) => ref
+                      .read(reportFormControllerProvider.notifier)
+                      .selectType(v)
+                  : null,
             ),
           ),
           if (selectedType != null && selectedType.needsPrice) ...[
@@ -189,8 +280,11 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
           ],
           const SizedBox(height: 24),
           FilledButton(
-            onPressed:
-                selectedType != null && !form.isSubmitting ? _submit : null,
+            onPressed: hasAnyBackend &&
+                    selectedType != null &&
+                    !form.isSubmitting
+                ? _submit
+                : null,
             child: form.isSubmitting
                 ? const SizedBox(
                     height: 20,
