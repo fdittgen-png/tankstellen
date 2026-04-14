@@ -27,6 +27,30 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   void initState() {
     super.initState();
     _mapController = MapController();
+
+    // Nudge the controller after the first paint so the TileLayer
+    // recomputes its visible bounds and starts fetching tiles. Without
+    // this, on the very first visit to the Carte tab (when the shell's
+    // IndexedStack pre-mounts the map offstage with degenerate
+    // constraints), the TileLayer's internal `_TileBoundsAtZoom` reads
+    // the empty bounds, fetches nothing, and the map renders the
+    // markers and the radius circle on a blank white background until
+    // the user pans or pinches the map (#473). The 100 ms delay is
+    // long enough to wait for the first real layout pass while still
+    // being invisible to the user.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (!mounted) return;
+        try {
+          final camera = _mapController.camera;
+          _mapController.move(camera.center, camera.zoom);
+        } catch (_) {
+          // Controller not yet attached to a FlutterMap — the
+          // post-frame callback inside NearbyMapView will pick up the
+          // first real fit and tiles will load on that path instead.
+        }
+      });
+    });
   }
 
   @override
