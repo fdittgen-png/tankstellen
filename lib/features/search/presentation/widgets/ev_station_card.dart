@@ -5,6 +5,7 @@ import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_result_item.dart';
+import 'ev_connector_chips.dart';
 
 class EVStationCard extends StatelessWidget {
   final EVStationResult result;
@@ -136,28 +137,7 @@ class EVStationCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   // Connector type chips
-                  Wrap(
-                    spacing: 4,
-                    runSpacing: 2,
-                    children: connectors.take(3).map((type) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 1),
-                        decoration: BoxDecoration(
-                          color: _connectorColor(type).withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          type,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: _connectorColor(type),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                  EvConnectorChips(connectors: connectors),
                 ],
               ),
             ],
@@ -167,11 +147,4 @@ class EVStationCard extends StatelessWidget {
     );
   }
 
-  Color _connectorColor(String type) {
-    if (type.contains('CCS')) return const Color(0xFF2196F3); // Blue
-    if (type.contains('Type 2')) return const Color(0xFF4CAF50); // Green
-    if (type.contains('CHAdeMO')) return const Color(0xFFFF9800); // Orange
-    if (type.contains('Tesla')) return const Color(0xFFE91E63); // Pink
-    return const Color(0xFF757575); // Grey
-  }
 }
