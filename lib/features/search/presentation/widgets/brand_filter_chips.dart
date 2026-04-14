@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/brand_registry.dart';
 import '../../domain/entities/station.dart';
+import '../../domain/entities/station_amenity.dart';
 import '../../providers/brand_filter_provider.dart';
 
 /// Horizontally scrollable brand filter chips with major brands grouped.
@@ -139,6 +140,37 @@ List<Station> applyBrandFilter(
 
   if (excludeHighway) {
     result = result.where((s) => s.stationType != 'A').toList();
+  }
+
+  return result;
+}
+
+/// Filters stations by required amenities and open-status (#491).
+///
+/// A station passes the amenity filter only if it provides **every**
+/// amenity the user selected (AND semantics, not OR). An empty
+/// [requiredAmenities] set is a no-op. When [openOnly] is true, closed
+/// stations are excluded regardless of amenities.
+///
+/// Previously this logic did not exist: the criteria screen wrote to
+/// `selectedAmenitiesProvider` and `openOnlyFilterProvider` but the
+/// results list never read those providers, so toggling WiFi / Boutique
+/// / "Ouvertes uniquement" had zero effect on the displayed stations.
+List<Station> applyAmenityAndStatusFilters(
+  List<Station> stations, {
+  required Set<StationAmenity> requiredAmenities,
+  required bool openOnly,
+}) {
+  var result = stations;
+
+  if (requiredAmenities.isNotEmpty) {
+    result = result
+        .where((s) => requiredAmenities.every(s.amenities.contains))
+        .toList();
+  }
+
+  if (openOnly) {
+    result = result.where((s) => s.isOpen).toList();
   }
 
   return result;

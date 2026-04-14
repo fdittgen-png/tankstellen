@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/features/search/domain/entities/station_amenity.dart';
 import 'package:tankstellen/features/search/presentation/widgets/brand_filter_chips.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -102,6 +103,118 @@ void main() {
         [stationWithSpaces], selectedBrands: const {'Shell'}, excludeHighway: false,
       );
       expect(result.length, 1);
+    });
+  });
+
+  group('applyAmenityAndStatusFilters (#491)', () {
+    const wifiShopOpen = Station(
+      id: 'a',
+      name: 'A',
+      brand: 'SHELL',
+      street: 'Str',
+      postCode: '10000',
+      place: 'Berlin',
+      lat: 0,
+      lng: 0,
+      isOpen: true,
+      amenities: {StationAmenity.wifi, StationAmenity.shop},
+    );
+    const wifiOnlyClosed = Station(
+      id: 'b',
+      name: 'B',
+      brand: 'ARAL',
+      street: 'Str',
+      postCode: '10000',
+      place: 'Berlin',
+      lat: 0,
+      lng: 0,
+      isOpen: false,
+      amenities: {StationAmenity.wifi},
+    );
+    const shopOnlyOpen = Station(
+      id: 'c',
+      name: 'C',
+      brand: 'JET',
+      street: 'Str',
+      postCode: '10000',
+      place: 'Berlin',
+      lat: 0,
+      lng: 0,
+      isOpen: true,
+      amenities: {StationAmenity.shop},
+    );
+    const noneOpen = Station(
+      id: 'd',
+      name: 'D',
+      brand: 'TOTAL',
+      street: 'Str',
+      postCode: '10000',
+      place: 'Berlin',
+      lat: 0,
+      lng: 0,
+      isOpen: true,
+    );
+
+    final all = [wifiShopOpen, wifiOnlyClosed, shopOnlyOpen, noneOpen];
+
+    test('empty amenity set + openOnly false → no filtering', () {
+      final result = applyAmenityAndStatusFilters(
+        all,
+        requiredAmenities: const {},
+        openOnly: false,
+      );
+      expect(result.length, 4);
+    });
+
+    test('single amenity (wifi) → only stations with wifi pass', () {
+      final result = applyAmenityAndStatusFilters(
+        all,
+        requiredAmenities: const {StationAmenity.wifi},
+        openOnly: false,
+      );
+      expect(result.map((s) => s.id), containsAll(['a', 'b']));
+      expect(result.length, 2);
+    });
+
+    test('multiple amenities use AND semantics, not OR', () {
+      // Require wifi AND shop → only station A has both.
+      final result = applyAmenityAndStatusFilters(
+        all,
+        requiredAmenities: const {StationAmenity.wifi, StationAmenity.shop},
+        openOnly: false,
+      );
+      expect(result.length, 1);
+      expect(result.first.id, 'a');
+    });
+
+    test('openOnly excludes closed stations', () {
+      final result = applyAmenityAndStatusFilters(
+        all,
+        requiredAmenities: const {},
+        openOnly: true,
+      );
+      expect(result.map((s) => s.id), containsAll(['a', 'c', 'd']));
+      expect(result.any((s) => s.id == 'b'), isFalse);
+    });
+
+    test('amenity + openOnly combine — wifi AND open', () {
+      final result = applyAmenityAndStatusFilters(
+        all,
+        requiredAmenities: const {StationAmenity.wifi},
+        openOnly: true,
+      );
+      // B has wifi but is closed → excluded.
+      expect(result.length, 1);
+      expect(result.first.id, 'a');
+    });
+
+    test('station with no amenities fails every non-empty amenity filter', () {
+      final result = applyAmenityAndStatusFilters(
+        [noneOpen],
+        requiredAmenities: const {StationAmenity.shop},
+        openOnly: false,
+      );
+      expect(result, isEmpty);
     });
   });
 

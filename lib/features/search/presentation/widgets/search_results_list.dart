@@ -187,10 +187,22 @@ class SearchResultsList extends ConsumerWidget {
               // Apply brand and highway filters
               final selectedBrands = ref.watch(selectedBrandsProvider);
               final excludeHighway = ref.watch(excludeHighwayStationsProvider);
-              final filtered = applyBrandFilter(
+              final brandFiltered = applyBrandFilter(
                 afterIgnored,
                 selectedBrands: selectedBrands,
                 excludeHighway: excludeHighway,
+              );
+              // #491 — apply amenity + open-only filters. These providers
+              // are written by the criteria screen but were previously
+              // read nowhere, so toggling WiFi / "Ouvertes uniquement" /
+              // any other amenity chip had zero visible effect.
+              final requiredAmenities =
+                  ref.watch(selectedAmenitiesProvider);
+              final openOnly = ref.watch(openOnlyFilterProvider);
+              final filtered = applyAmenityAndStatusFilters(
+                brandFiltered,
+                requiredAmenities: requiredAmenities,
+                openOnly: openOnly,
               );
               final sorted = _sortStations(filtered, sortMode, ref);
               final allPrices = ref.watch(allPricesViewEnabledProvider);
