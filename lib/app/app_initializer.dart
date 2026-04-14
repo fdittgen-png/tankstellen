@@ -68,14 +68,17 @@ class AppInitializer {
 
     StartupTimer.instance.mark('pre_run_app');
 
-    final sentryDsn = storage.getSetting('sentry_dsn') as String?;
-    if (sentryDsn != null && sentryDsn.isNotEmpty) {
+    final dsn = resolveSentryDsn(storage);
+    final consentGiven = storage
+            .getSetting('consent_error_reporting') as bool? ??
+        false;
+    if (dsn.isNotEmpty && consentGiven) {
       final packageInfo = await PackageInfo.fromPlatform();
       final release =
           'tankstellen@${packageInfo.version}+${packageInfo.buildNumber}';
       await SentryFlutter.init(
         (options) {
-          options.dsn = sentryDsn;
+          options.dsn = dsn;
           options.tracesSampleRate = 0.2;
           options.environment = 'production';
           options.release = release;
@@ -85,6 +88,21 @@ class AppInitializer {
     } else {
       _launch(container, appBuilder);
     }
+  }
+
+  /// Resolves the active Sentry DSN at startup. The user-stored
+  /// `sentry_dsn` setting (entered manually via Settings > Diagnostics)
+  /// always wins, otherwise we fall back to the build-time `SENTRY_DSN`
+  /// dart-define. Returns the empty string when neither is configured —
+  /// callers must check `dsn.isNotEmpty` before passing it to
+  /// `SentryFlutter.init` (#476).
+  ///
+  /// Exposed for unit tests.
+  static String resolveSentryDsn(HiveStorage storage) {
+    final stored = storage.getSetting('sentry_dsn') as String?;
+    if (stored != null && stored.isNotEmpty) return stored;
+    const buildDsn = String.fromEnvironment('SENTRY_DSN');
+    return buildDsn;
   }
 
   // ---------------------------------------------------------------------------

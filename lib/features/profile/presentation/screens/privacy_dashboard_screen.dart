@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../../../core/error_tracing/storage/trace_storage.dart';
 import '../../../../core/export/data_exporter.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -52,6 +53,20 @@ class _PrivacyDashboardScreenState
           const SizedBox(height: 12),
           PrivacyExportCsvButton(onPressed: _exportDataCsv),
           const SizedBox(height: 12),
+          // #476 — give users a way to share the locally-recorded error
+          // traces with the maintainer (or with their own bug report)
+          // even when Sentry is not configured. Uses Clipboard so we
+          // don't need a share_plus dependency.
+          OutlinedButton.icon(
+            key: const ValueKey('privacy-export-error-log-button'),
+            onPressed: _exportErrorLog,
+            icon: const Icon(Icons.bug_report_outlined),
+            label: Text(
+              'Copy error log to clipboard '
+              '(${ref.watch(traceStorageProvider).count})',
+            ),
+          ),
+          const SizedBox(height: 12),
           PrivacyDeleteAllButton(onPressed: _deleteAllData),
           SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 16),
         ],
@@ -67,6 +82,17 @@ class _PrivacyDashboardScreenState
     SnackBarHelper.showSuccess(
       context,
       l?.privacyExportSuccess ?? 'Data exported to clipboard',
+    );
+  }
+
+  Future<void> _exportErrorLog() async {
+    final traces = ref.read(traceStorageProvider);
+    final json = traces.exportAsJson();
+    await Clipboard.setData(ClipboardData(text: json));
+    if (!mounted) return;
+    SnackBarHelper.showSuccess(
+      context,
+      'Error log copied to clipboard (${traces.count} entries)',
     );
   }
 

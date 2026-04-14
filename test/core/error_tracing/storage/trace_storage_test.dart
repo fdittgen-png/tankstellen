@@ -146,5 +146,58 @@ void main() {
       expect(traces.first.deviceInfo.os, 'test');
       expect(traces.first.networkState.isOnline, isTrue);
     });
+
+    group('exportAsJson (#476)', () {
+      test('returns an empty traces array when no traces are stored', () {
+        final raw = storage.exportAsJson();
+        final decoded = jsonDecode(raw) as Map<String, dynamic>;
+        expect(decoded['traceCount'], 0);
+        expect(decoded['traces'], isEmpty);
+        expect(decoded['exportedAt'], isA<String>());
+      });
+
+      test('serialises every persisted trace into the traces array',
+          () async {
+        await Hive.box('error_traces')
+            .put('e1', _makePlainJson(id: 'e1'));
+        await Hive.box('error_traces')
+            .put('e2', _makePlainJson(id: 'e2'));
+        await Hive.box('error_traces')
+            .put('e3', _makePlainJson(id: 'e3'));
+
+        final raw = storage.exportAsJson();
+        final decoded = jsonDecode(raw) as Map<String, dynamic>;
+        expect(decoded['traceCount'], 3);
+        final traces = decoded['traces'] as List;
+        expect(traces, hasLength(3));
+        // Every item has the canonical ErrorTrace shape.
+        for (final t in traces) {
+          final m = t as Map<String, dynamic>;
+          expect(m, contains('id'));
+          expect(m, contains('timestamp'));
+          expect(m, contains('errorMessage'));
+        }
+      });
+
+      test('includes an ISO-8601 exportedAt timestamp in UTC', () {
+        final raw = storage.exportAsJson();
+        final decoded = jsonDecode(raw) as Map<String, dynamic>;
+        final ts = decoded['exportedAt'] as String;
+        expect(ts, endsWith('Z'),
+            reason: 'exportedAt should be ISO-8601 UTC for portability');
+        // Round-trip parses cleanly.
+        expect(() => DateTime.parse(ts), returnsNormally);
+      });
+
+      test('output is pretty-printed (uses indentation) for human review',
+          () {
+        final raw = storage.exportAsJson();
+        // JsonEncoder.withIndent uses 2-space indent — the second line
+        // should start with two spaces.
+        final lines = raw.split('\n');
+        expect(lines.length, greaterThan(1));
+        expect(lines[1], startsWith('  '));
+      });
+    });
   });
 }
