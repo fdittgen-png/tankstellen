@@ -16,11 +16,11 @@ import '../../../route_search/providers/route_search_provider.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_mode.dart';
 import '../../domain/entities/station.dart';
-import '../../domain/entities/station_amenity.dart';
 import '../../providers/ev_search_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
+import '../widgets/amenity_filter_wrap.dart';
 import '../widgets/brand_filter_chips.dart';
 import '../widgets/fuel_type_selector.dart';
 import '../widgets/location_input.dart';
@@ -219,7 +219,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                 style: theme.textTheme.titleSmall,
               ),
               const SizedBox(height: 8),
-              _AmenityFilterWrap(
+              AmenityFilterWrap(
                 selected: amenities,
                 onToggle: (a) => ref
                     .read(selectedAmenitiesProvider.notifier)
@@ -269,45 +269,3 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
   }
 }
 
-/// Wrap of FilterChips, one per [StationAmenity].
-class _AmenityFilterWrap extends StatelessWidget {
-  final Set<StationAmenity> selected;
-  final ValueChanged<StationAmenity> onToggle;
-
-  const _AmenityFilterWrap({
-    required this.selected,
-    required this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Wrap(
-      spacing: 8,
-      runSpacing: 4,
-      children: [
-        for (final amenity in StationAmenity.values)
-          FilterChip(
-            key: ValueKey('criteria-amenity-${amenity.name}'),
-            avatar: Icon(amenityIcon(amenity), size: 18),
-            label: Text(_label(amenity, l10n)),
-            selected: selected.contains(amenity),
-            onSelected: (_) => onToggle(amenity),
-          ),
-      ],
-    );
-  }
-
-  String _label(StationAmenity a, AppLocalizations? l10n) {
-    return switch (a) {
-      StationAmenity.shop => l10n?.amenityShop ?? 'Shop',
-      StationAmenity.carWash => l10n?.amenityCarWash ?? 'Car Wash',
-      StationAmenity.airPump => l10n?.amenityAirPump ?? 'Air',
-      StationAmenity.toilet => l10n?.amenityToilet ?? 'WC',
-      StationAmenity.restaurant => l10n?.amenityRestaurant ?? 'Food',
-      StationAmenity.atm => l10n?.amenityAtm ?? 'ATM',
-      StationAmenity.wifi => l10n?.amenityWifi ?? 'WiFi',
-      StationAmenity.ev => l10n?.amenityEv ?? 'EV',
-    };
-  }
-}
