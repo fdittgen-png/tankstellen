@@ -100,20 +100,43 @@ class StationInfoSection extends StatelessWidget {
           const SizedBox(height: 24),
         ],
 
-        // Services (raw text from API) — at the bottom
-        if (station.services.isNotEmpty) ...[
-          Text(l10n?.services ?? 'Services', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 6,
-            runSpacing: 4,
-            children: station.services.map((s) => Chip(
-                  avatar: const Icon(Icons.check_circle_outline, size: 16),
-                  label: Text(s, style: const TextStyle(fontSize: 11)),
-                  visualDensity: VisualDensity.compact,
-                )).toList(),
+        // Services (raw text from API) — at the bottom, collapsed by
+        // default (#483). Highway stations routinely return 10+ services
+        // and previously pushed the price-history section far below the
+        // fold. The ExpansionTile lets users see which services exist at
+        // a glance (via the count in the title) without blowing out the
+        // visual balance of the screen.
+        if (station.services.isNotEmpty)
+          Theme(
+            // Strip the default ExpansionTile dividers so it blends
+            // with the surrounding Column layout.
+            data: theme.copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              key: const ValueKey('station-detail-services-expansion'),
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: const EdgeInsets.only(bottom: 8),
+              initiallyExpanded: false,
+              title: Semantics(
+                header: true,
+                child: Text(
+                  '${l10n?.services ?? "Services"} '
+                  '(${station.services.length})',
+                  style: theme.textTheme.titleMedium,
+                ),
+              ),
+              children: [
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: station.services.map((s) => Chip(
+                        avatar: const Icon(Icons.check_circle_outline, size: 16),
+                        label: Text(s, style: const TextStyle(fontSize: 11)),
+                        visualDensity: VisualDensity.compact,
+                      )).toList(),
+                ),
+              ],
+            ),
           ),
-        ],
       ],
     );
   }
