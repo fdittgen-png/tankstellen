@@ -52,7 +52,11 @@ jobs:
           restore-keys: ${{ runner.os }}-pub-
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
-      - run: flutter test --coverage
+      # Excludes the `network` tag — those tests hit real third-party
+      # APIs (Argentina, Italy MIMIT, etc.) that intermittently time out
+      # and cannot block PRs. Run them on demand with
+      # `flutter test --tags=network` from a workstation.
+      - run: flutter test --coverage --exclude-tags=network
       - name: Check coverage threshold
         run: bash scripts/check_coverage.sh
       - name: Check startup time budget
