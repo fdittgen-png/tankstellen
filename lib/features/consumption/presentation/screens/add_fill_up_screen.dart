@@ -11,6 +11,7 @@ import '../../data/obd2/obd2_transport.dart';
 import '../../data/receipt_scan_service.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
+import '../widgets/fill_up_input_buttons.dart';
 
 /// Form to add a new [FillUp] entry.
 class AddFillUpScreen extends ConsumerStatefulWidget {
@@ -143,36 +144,11 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             // Scan receipt + OBD buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _scanning ? null : _scanReceipt,
-                    icon: _scanning
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.document_scanner),
-                    label: Text(l?.scanReceipt ?? 'Scan receipt'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _obdReading ? null : _readObd,
-                    icon: _obdReading
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.bluetooth),
-                    label: Text(l?.obdConnect ?? 'OBD-II'),
-                  ),
-                ),
-              ],
+            FillUpInputButtons(
+              scanning: _scanning,
+              obdReading: _obdReading,
+              onScanReceipt: _scanReceipt,
+              onReadObd: _readObd,
             ),
             const SizedBox(height: 12),
             if (widget.stationName != null) ...[
