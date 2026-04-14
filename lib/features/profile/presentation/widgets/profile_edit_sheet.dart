@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../providers/profile_edit_provider.dart';
+import 'profile_landing_screen_dropdown.dart';
 
 /// Profile edit bottom sheet. Form state (fuel, radius, rating mode, etc.)
 /// lives in [profileEditControllerProvider] so changes trigger selective
@@ -159,26 +160,9 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
               const SizedBox(height: 16),
               _RatingModeSection(state: editState, ctrl: editCtrl),
               const SizedBox(height: 16),
-              DropdownButtonFormField<LandingScreen>(
-                initialValue: editState.landingScreen,
-                decoration: InputDecoration(
-                  labelText:
-                      AppLocalizations.of(context)?.landingScreen ?? 'Start screen',
-                  border: const OutlineInputBorder(),
-                ),
-                // Exclude 'map' from landing options — map is not a landing screen
-                items: LandingScreen.values
-                    .where((s) => s != LandingScreen.map)
-                    .map((s) => DropdownMenuItem(
-                          value: s,
-                          child: Text(s.localizedName(
-                            Localizations.localeOf(context).languageCode,
-                          )),
-                        ))
-                    .toList(),
-                onChanged: (v) {
-                  if (v != null) editCtrl.setLandingScreen(v);
-                },
+              ProfileLandingScreenDropdown(
+                value: editState.landingScreen,
+                onChanged: editCtrl.setLandingScreen,
               ),
               const SizedBox(height: 16),
               _CountrySection(state: editState, ctrl: editCtrl),
