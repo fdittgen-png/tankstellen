@@ -19,6 +19,7 @@ import '../../providers/favorites_provider.dart';
 import '../widgets/alerts_tab.dart';
 import '../widgets/ev_favorite_card.dart';
 import '../widgets/favorites_loading_view.dart';
+import '../widgets/favorites_section_header.dart';
 import '../widgets/swipe_tutorial_banner.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
@@ -142,7 +143,11 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                   children: [
                     // EV favorites section
                     if (hasEvFavorites) ...[
-                      _buildEvSectionHeader(context),
+                      FavoritesSectionHeader(
+                        icon: Icons.ev_station,
+                        label: l10n?.evChargingSection ?? 'EV Charging',
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                      ),
                       ...evStations.map((ev) => EvFavoriteCard(
                             key: ValueKey('ev-${ev.id}'),
                             station: ev,
@@ -156,7 +161,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                             },
                           )),
                       if (result.data.isNotEmpty)
-                        _buildFuelSectionHeader(context),
+                        FavoritesSectionHeader(
+                          icon: Icons.local_gas_station,
+                          label: l10n?.fuelStationsSection ?? 'Fuel Stations',
+                        ),
                     ],
                     // Fuel favorites
                     ...result.data.map((station) {
@@ -272,38 +280,6 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     );
   }
 
-  Widget _buildEvSectionHeader(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-      child: Row(
-        children: [
-          Icon(Icons.ev_station, size: 16,
-              color: Theme.of(context).colorScheme.primary),
-          const SizedBox(width: 8),
-          Text(l10n?.evChargingSection ?? 'EV Charging',
-              style: Theme.of(context).textTheme.titleSmall),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFuelSectionHeader(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-      child: Row(
-        children: [
-          Icon(Icons.local_gas_station, size: 16,
-              color: Theme.of(context).colorScheme.primary),
-          const SizedBox(width: 8),
-          Text(l10n?.fuelStationsSection ?? 'Fuel Stations',
-              style: Theme.of(context).textTheme.titleSmall),
-        ],
-      ),
-    );
-  }
-
   Widget _buildEvFavoritesSection(
     BuildContext context,
     AppLocalizations? l10n,
@@ -311,7 +287,11 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
   ) {
     return ListView(
       children: [
-        _buildEvSectionHeader(context),
+        FavoritesSectionHeader(
+          icon: Icons.ev_station,
+          label: l10n?.evChargingSection ?? 'EV Charging',
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+        ),
         ...evStations.map((ev) => EvFavoriteCard(
               key: ValueKey('ev-${ev.id}'),
               station: ev,
