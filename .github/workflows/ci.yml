@@ -137,10 +137,36 @@ jobs:
           restore-keys: ${{ runner.os }}-pub-
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
+      # #48 — Decode the release keystore from a GitHub secret into a temp
+      # file, then export the three env vars gradle's resolveReleaseSigning()
+      # helper reads. The keystore file is written to a runner-local path
+      # outside the checkout so it never ends up in an artifact.
+      - name: Decode signing keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ] || [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_ALIAS" ]; then
+            echo "::error::Missing one of ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD / ANDROID_KEY_ALIAS secrets. Release builds require all three — see #48." >&2
+            exit 1
+          fi
+          KEYSTORE_PATH="$RUNNER_TEMP/tankstellen-release.jks"
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
+          if ! [ -s "$KEYSTORE_PATH" ]; then
+            echo "::error::Decoded keystore is empty or invalid base64" >&2
+            exit 1
+          fi
+          echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH" >> "$GITHUB_ENV"
+          echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS" >> "$GITHUB_ENV"
       - name: Build APK (split per ABI)
         run: flutter build apk --release --split-per-abi --flavor play
       - name: Build App Bundle
         run: flutter build appbundle --release --flavor play
+      - name: Clean up decoded keystore
+        if: always()
+        run: rm -f "$RUNNER_TEMP/tankstellen-release.jks"
       - uses: actions/upload-artifact@v7
         with:
           name: android-apk
