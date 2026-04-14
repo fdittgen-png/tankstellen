@@ -8,6 +8,7 @@ import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../providers/profile_edit_provider.dart';
 import 'profile_landing_screen_dropdown.dart';
+import 'profile_radius_slider.dart';
 
 /// Profile edit bottom sheet. Form state (fuel, radius, rating mode, etc.)
 /// lives in [profileEditControllerProvider] so changes trigger selective
@@ -137,22 +138,9 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
                 },
               ),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Text(
-                      '${AppLocalizations.of(context)?.defaultRadius ?? "Radius"}:'),
-                  Expanded(
-                    child: Slider(
-                      value: editState.radius,
-                      min: 1,
-                      max: 25,
-                      divisions: 24,
-                      label: '${editState.radius.round()} km',
-                      onChanged: editCtrl.setRadius,
-                    ),
-                  ),
-                  Text('${editState.radius.round()} km'),
-                ],
+              ProfileRadiusSlider(
+                value: editState.radius,
+                onChanged: editCtrl.setRadius,
               ),
               const SizedBox(height: 16),
               _RouteSegmentSection(state: editState, ctrl: editCtrl),
