@@ -13,11 +13,11 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/presentation/widgets/station_card.dart';
 import '../../../profile/providers/profile_provider.dart';
-import '../../../ev/domain/entities/charging_station.dart';
 import '../../providers/ev_favorites_provider.dart';
 import '../../providers/favorites_provider.dart';
 import '../widgets/alerts_tab.dart';
 import '../widgets/ev_favorite_card.dart';
+import '../widgets/ev_favorites_list_view.dart';
 import '../widgets/favorites_loading_view.dart';
 import '../widgets/favorites_section_header.dart';
 import '../widgets/swipe_tutorial_banner.dart';
@@ -121,7 +121,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 
     // If only EV favorites (no fuel), show them directly
     if (favoriteIds.isEmpty && hasEvFavorites) {
-      return _buildEvFavoritesSection(context, l10n, evStations);
+      return EvFavoritesListView(evStations: evStations);
     }
 
     return stationsState.when(
@@ -255,7 +255,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         );
       },
       loading: () => hasEvFavorites
-          ? _buildEvFavoritesSection(context, l10n, evStations)
+          ? EvFavoritesListView(evStations: evStations)
           : const FavoritesLoadingView(),
       error: (error, _) => Semantics(
         label: 'Error loading favorites: ${error.toString()}',
@@ -280,31 +280,4 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     );
   }
 
-  Widget _buildEvFavoritesSection(
-    BuildContext context,
-    AppLocalizations? l10n,
-    List<ChargingStation> evStations,
-  ) {
-    return ListView(
-      children: [
-        FavoritesSectionHeader(
-          icon: Icons.ev_station,
-          label: l10n?.evChargingSection ?? 'EV Charging',
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-        ),
-        ...evStations.map((ev) => EvFavoriteCard(
-              key: ValueKey('ev-${ev.id}'),
-              station: ev,
-              onTap: () => context.push('/ev-station', extra: ev),
-              onFavoriteTap: () {
-                ref.read(evFavoritesProvider.notifier).remove(ev.id);
-                SnackBarHelper.show(
-                  context,
-                  l10n?.removedFromFavorites ?? 'Removed from favorites',
-                );
-              },
-            )),
-      ],
-    );
-  }
 }
