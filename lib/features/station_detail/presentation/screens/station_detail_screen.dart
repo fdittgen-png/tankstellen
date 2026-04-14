@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
-import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/brand_logo.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -15,12 +14,12 @@ import '../../../favorites/providers/favorites_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../../core/utils/navigation_utils.dart';
-import '../../../search/providers/station_rating_provider.dart';
 import '../../providers/station_detail_provider.dart';
 import '../widgets/price_history_section.dart';
 import '../widgets/price_tile.dart';
 import '../widgets/station_info_section.dart';
 import '../widgets/station_rating_section.dart';
+import '../widgets/station_status_row.dart';
 
 class StationDetailScreen extends ConsumerWidget {
   final String stationId;
@@ -112,54 +111,10 @@ class StationDetailScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Open/closed status + freshness inline + rating stars (top-right)
-          Row(
-            children: [
-              Expanded(
-                child: Semantics(
-                  label: 'Station is ${station.isOpen ? 'open' : 'closed'}',
-                  child: Row(
-                    children: [
-                      ExcludeSemantics(
-                        child: Container(
-                          width: 12, height: 12,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: station.isOpen
-                                ? DarkModeColors.success(context)
-                                : DarkModeColors.error(context),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      ExcludeSemantics(
-                        child: Text(
-                          _buildStatusText(station, serviceResult, l10n),
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: station.isOpen
-                                ? DarkModeColors.success(context)
-                                : DarkModeColors.error(context),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Compact rating stars (top-right)
-              Consumer(builder: (context, ref, _) {
-                final rating = ref.watch(stationRatingProvider(stationId));
-                if (rating == null) return const SizedBox.shrink();
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(5, (i) => Icon(
-                    i < rating ? Icons.star : Icons.star_border,
-                    size: 16,
-                    color: i < rating ? Colors.amber : Colors.grey.shade400,
-                  )),
-                );
-              }),
-            ],
+          StationStatusRow(
+            station: station,
+            serviceResult: serviceResult,
+            stationId: stationId,
           ),
           const SizedBox(height: 12),
 
@@ -231,20 +186,6 @@ class StationDetailScreen extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  /// Builds status text combining open/closed with freshness, e.g. "Open — < 1 min ago".
-  String _buildStatusText(
-    Station station,
-    ServiceResult<StationDetail> result,
-    AppLocalizations? l10n,
-  ) {
-    final status = station.isOpen
-        ? (l10n?.open ?? 'Open')
-        : (l10n?.closed ?? 'Closed');
-    final agoSuffix = l10n?.freshnessAgo ?? 'ago';
-    final freshness = result.freshnessLabel;
-    return '$status — $freshness $agoSuffix';
   }
 
   Future<void> _showCreateAlertDialog(BuildContext context, WidgetRef ref) async {
