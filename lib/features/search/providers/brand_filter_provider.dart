@@ -4,9 +4,11 @@ part 'brand_filter_provider.g.dart';
 
 /// Manages the set of selected brand names for filtering search results.
 ///
-/// Screen-scoped (not keepAlive) — resets when the user navigates away.
-/// Empty set means "show all brands" (no filter active).
-@riverpod
+/// App-lifetime state (keepAlive) so the filter selection survives the
+/// criteria screen ⇄ results screen navigation. Previously screen-scoped,
+/// which auto-disposed the state between navigation frames and silently
+/// reset the filter to empty (#491). Empty set means "show all brands".
+@Riverpod(keepAlive: true)
 class SelectedBrands extends _$SelectedBrands {
   @override
   Set<String> build() => const {};
@@ -30,7 +32,9 @@ class SelectedBrands extends _$SelectedBrands {
 
 /// Whether the motorway/highway station filter is active.
 /// When true, stations with stationType == "A" (autoroute) are excluded.
-@riverpod
+///
+/// keepAlive so the toggle survives navigation, matching [SelectedBrands] (#491).
+@Riverpod(keepAlive: true)
 class ExcludeHighwayStations extends _$ExcludeHighwayStations {
   @override
   bool build() => false;

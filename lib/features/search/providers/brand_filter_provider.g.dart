@@ -10,29 +10,35 @@ part of 'brand_filter_provider.dart';
 // ignore_for_file: type=lint, type=warning
 /// Manages the set of selected brand names for filtering search results.
 ///
-/// Screen-scoped (not keepAlive) — resets when the user navigates away.
-/// Empty set means "show all brands" (no filter active).
+/// App-lifetime state (keepAlive) so the filter selection survives the
+/// criteria screen ⇄ results screen navigation. Previously screen-scoped,
+/// which auto-disposed the state between navigation frames and silently
+/// reset the filter to empty (#491). Empty set means "show all brands".
 
 @ProviderFor(SelectedBrands)
 final selectedBrandsProvider = SelectedBrandsProvider._();
 
 /// Manages the set of selected brand names for filtering search results.
 ///
-/// Screen-scoped (not keepAlive) — resets when the user navigates away.
-/// Empty set means "show all brands" (no filter active).
+/// App-lifetime state (keepAlive) so the filter selection survives the
+/// criteria screen ⇄ results screen navigation. Previously screen-scoped,
+/// which auto-disposed the state between navigation frames and silently
+/// reset the filter to empty (#491). Empty set means "show all brands".
 final class SelectedBrandsProvider
     extends $NotifierProvider<SelectedBrands, Set<String>> {
   /// Manages the set of selected brand names for filtering search results.
   ///
-  /// Screen-scoped (not keepAlive) — resets when the user navigates away.
-  /// Empty set means "show all brands" (no filter active).
+  /// App-lifetime state (keepAlive) so the filter selection survives the
+  /// criteria screen ⇄ results screen navigation. Previously screen-scoped,
+  /// which auto-disposed the state between navigation frames and silently
+  /// reset the filter to empty (#491). Empty set means "show all brands".
   SelectedBrandsProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'selectedBrandsProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -53,12 +59,14 @@ final class SelectedBrandsProvider
   }
 }
 
-String _$selectedBrandsHash() => r'1b406f31ffd0f3d2d9e85cb714fc260df69384de';
+String _$selectedBrandsHash() => r'80ae4d8d00fd95b4aa9b7d86167a257f240488b6';
 
 /// Manages the set of selected brand names for filtering search results.
 ///
-/// Screen-scoped (not keepAlive) — resets when the user navigates away.
-/// Empty set means "show all brands" (no filter active).
+/// App-lifetime state (keepAlive) so the filter selection survives the
+/// criteria screen ⇄ results screen navigation. Previously screen-scoped,
+/// which auto-disposed the state between navigation frames and silently
+/// reset the filter to empty (#491). Empty set means "show all brands".
 
 abstract class _$SelectedBrands extends $Notifier<Set<String>> {
   Set<String> build();
@@ -80,23 +88,29 @@ abstract class _$SelectedBrands extends $Notifier<Set<String>> {
 
 /// Whether the motorway/highway station filter is active.
 /// When true, stations with stationType == "A" (autoroute) are excluded.
+///
+/// keepAlive so the toggle survives navigation, matching [SelectedBrands] (#491).
 
 @ProviderFor(ExcludeHighwayStations)
 final excludeHighwayStationsProvider = ExcludeHighwayStationsProvider._();
 
 /// Whether the motorway/highway station filter is active.
 /// When true, stations with stationType == "A" (autoroute) are excluded.
+///
+/// keepAlive so the toggle survives navigation, matching [SelectedBrands] (#491).
 final class ExcludeHighwayStationsProvider
     extends $NotifierProvider<ExcludeHighwayStations, bool> {
   /// Whether the motorway/highway station filter is active.
   /// When true, stations with stationType == "A" (autoroute) are excluded.
+  ///
+  /// keepAlive so the toggle survives navigation, matching [SelectedBrands] (#491).
   ExcludeHighwayStationsProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'excludeHighwayStationsProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -118,10 +132,12 @@ final class ExcludeHighwayStationsProvider
 }
 
 String _$excludeHighwayStationsHash() =>
-    r'11cf69d65c49220d2904629b9fb8fb5f92df333f';
+    r'c07895ef69caf31407c10ad9dd0d12171116d781';
 
 /// Whether the motorway/highway station filter is active.
 /// When true, stations with stationType == "A" (autoroute) are excluded.
+///
+/// keepAlive so the toggle survives navigation, matching [SelectedBrands] (#491).
 
 abstract class _$ExcludeHighwayStations extends $Notifier<bool> {
   bool build();
