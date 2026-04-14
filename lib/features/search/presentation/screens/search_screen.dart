@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../../app/responsive_search_layout.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/location/location_consent.dart';
@@ -10,26 +9,24 @@ import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/frame_callbacks.dart';
-import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../map/presentation/widgets/inline_map.dart';
+import '../../providers/ev_search_provider.dart';
 import '../../providers/search_provider.dart';
 import '../widgets/demo_mode_banner.dart';
+import '../widgets/ev_search_results_view.dart';
 import '../widgets/search_results_list.dart';
 import '../widgets/search_summary_bar.dart';
 import '../widgets/user_position_bar.dart';
 import '../../providers/search_mode_provider.dart';
-import '../../providers/ev_search_provider.dart';
 import '../../../../core/location/location_service.dart';
 import '../../../../core/services/service_result.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_mode.dart';
-import '../../domain/entities/search_result_item.dart';
 import '../../domain/entities/station.dart';
 import '../../providers/selected_station_provider.dart';
-import '../widgets/ev_station_card.dart';
 import '../../../station_detail/presentation/widgets/station_detail_inline.dart';
 import '../../../profile/domain/entities/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
@@ -246,34 +243,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     // EV mode (when Electric fuel type is selected)
     if (fuelType == FuelType.electric) {
-      final evState = ref.watch(eVSearchStateProvider);
-      return evState.when(
-        data: (result) {
-          if (result.data.isEmpty) {
-            return EmptyState(
-              icon: Icons.ev_station,
-              title: l10n?.searchEvStations ??
-                  'Search to find EV charging stations',
-              actionLabel: l10n?.searchNearby ?? 'Search nearby',
-              onAction: _performGpsSearch,
-            );
-          }
-          return ListView.builder(
-            itemCount: result.data.length,
-            itemBuilder: (context, index) {
-              final station = result.data[index];
-              return EVStationCard(
-                key: ValueKey('ev-${station.id}'),
-                result: EVStationResult(station),
-                onTap: () => context.push('/ev-station', extra: station),
-              );
-            },
-          );
-        },
-        loading: () => const ShimmerStationList(),
-        error: (error, _) =>
-            ServiceChainErrorWidget(error: error, onRetry: _performGpsSearch),
-      );
+      return EvSearchResultsView(onSearch: _performGpsSearch);
     }
 
     // Default: fuel station results
