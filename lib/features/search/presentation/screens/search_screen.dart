@@ -5,33 +5,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/responsive_search_layout.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/location/location_consent.dart';
+import '../../../../core/location/location_service.dart';
 import '../../../../core/location/user_position_provider.dart';
-import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/frame_callbacks.dart';
-import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../map/presentation/widgets/inline_map.dart';
-import '../../providers/ev_search_provider.dart';
-import '../../providers/search_provider.dart';
-import '../widgets/demo_mode_banner.dart';
-import '../widgets/ev_search_results_view.dart';
-import '../widgets/search_results_list.dart';
-import '../widgets/search_summary_bar.dart';
-import '../widgets/user_position_bar.dart';
-import '../../providers/search_mode_provider.dart';
-import '../../../../core/location/location_service.dart';
-import '../../../../core/services/service_result.dart';
-import '../../domain/entities/fuel_type.dart';
-import '../../domain/entities/search_mode.dart';
-import '../../domain/entities/station.dart';
-import '../../providers/selected_station_provider.dart';
-import '../../../station_detail/presentation/widgets/station_detail_inline.dart';
 import '../../../profile/domain/entities/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
-import '../widgets/nearest_shortcut_card.dart';
-import '../widgets/route_results_view.dart';
+import '../../../station_detail/presentation/widgets/station_detail_inline.dart';
+import '../../domain/entities/fuel_type.dart';
+import '../../providers/ev_search_provider.dart';
+import '../../providers/search_provider.dart';
+import '../../providers/selected_station_provider.dart';
+import '../widgets/demo_mode_banner.dart';
+import '../widgets/search_results_content.dart';
+import '../widgets/search_summary_bar.dart';
+import '../widgets/user_position_bar.dart';
 
 /// Main search screen — results-first layout.
 ///
@@ -186,8 +177,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   Widget _buildSearchContent(BuildContext context) {
     final country = ref.watch(activeCountryProvider);
-    final searchState = ref.watch(searchStateProvider);
-    final l10n = AppLocalizations.of(context);
 
     return Column(
       children: [
@@ -219,61 +208,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         Expanded(
           child: Semantics(
             label: 'Search results',
-            child: _buildResults(context, l10n, searchState),
+            child: SearchResultsContent(onGpsRetry: _performGpsSearch),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildResults(
-    BuildContext context,
-    AppLocalizations? l10n,
-    AsyncValue<ServiceResult<List<Station>>> searchState,
-  ) {
-    final searchMode = ref.watch(activeSearchModeProvider);
-    final fuelType = ref.watch(selectedFuelTypeProvider);
-
-    // Route mode — RouteResultsView returns slivers, wrap in CustomScrollView
-    if (searchMode == SearchMode.route) {
-      return const CustomScrollView(
-        slivers: [RouteResultsView()],
-      );
-    }
-
-    // EV mode (when Electric fuel type is selected)
-    if (fuelType == FuelType.electric) {
-      return EvSearchResultsView(onSearch: _performGpsSearch);
-    }
-
-    // Default: fuel station results
-    return searchState.when(
-      data: (result) {
-        if (result.data.isEmpty) {
-          return Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  NearestShortcutCard(onTap: _performGpsSearch),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n?.startSearch ?? 'Search to find fuel stations.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-        return SearchResultsList(result: result, onRefresh: _performGpsSearch);
-      },
-      loading: () => const ShimmerStationList(),
-      error: (error, _) =>
-          ServiceChainErrorWidget(error: error, onRetry: _performGpsSearch),
     );
   }
 }
