@@ -1,56 +1,63 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/report/data/community_report_service.dart';
 
 void main() {
-  group('Community report — local-only mode', () {
-    test('submitReport does not throw when supabase is null', () {
-      // In local-only mode (no TankSync configured), submitting a report
-      // should only use the Tankerkoenig complaint API. The community
-      // report service should gracefully handle a null Supabase client.
-      // Since there is no dedicated CommunityReportService class yet
-      // (reports go through ReportScreen -> Dio directly), we verify
-      // that the concept holds: a null check on the supabase client
-      // should not throw.
-      String? supabaseUrl;
-      expect(() {
-        // Simulate the guard that would exist in a community report service
-        // ignore: unnecessary_null_comparison
-        if (supabaseUrl != null) {
-          // Would submit to Supabase
-        }
-        // No-op in local-only mode — should not throw
-      }, returnsNormally);
-    });
-  });
-
-  group('CommunityBadge', () {
-    testWidgets('renders nothing when reportCount is 0', (tester) async {
-      // A CommunityBadge widget should show nothing when the user
-      // has zero reports. We test this with a minimal placeholder widget
-      // that implements this logic.
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) {
-                const reportCount = 0;
-                // Badge should render as empty container when count is 0
-                if (reportCount == 0) {
-                  return const SizedBox.shrink(key: Key('badge'));
-                }
-                return const Text('Badge');
-              },
-            ),
-          ),
+  group('CommunityReportService.submitReport (#484)', () {
+    test(
+        'throws ArgumentError when neither reportedPrice nor correctionText '
+        'is provided — mirrors the Supabase check constraint',
+        () async {
+      expect(
+        () => CommunityReportService.submitReport(
+          stationId: 'st-1',
+          fuelType: 'e5',
+          countryCode: 'FR',
         ),
+        throwsA(isA<ArgumentError>()),
       );
+    });
 
-      final badge = find.byKey(const Key('badge'));
-      expect(badge, findsOneWidget);
-      // Verify it's a SizedBox.shrink (zero size)
-      final widget = tester.widget<SizedBox>(badge);
-      expect(widget.width, 0.0);
-      expect(widget.height, 0.0);
+    test('throws ArgumentError when correctionText is an empty string',
+        () async {
+      expect(
+        () => CommunityReportService.submitReport(
+          stationId: 'st-1',
+          fuelType: 'name',
+          countryCode: 'FR',
+          correctionText: '',
+        ),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test(
+        'returns normally in local-only mode (no supabaseClient) even with '
+        'a valid price payload — the method is a no-op',
+        () async {
+      await expectLater(
+        CommunityReportService.submitReport(
+          stationId: 'st-1',
+          fuelType: 'e5',
+          countryCode: 'FR',
+          reportedPrice: 1.799,
+        ),
+        completes,
+      );
+    });
+
+    test(
+        'returns normally in local-only mode with a valid metadata '
+        'payload (correctionText only)',
+        () async {
+      await expectLater(
+        CommunityReportService.submitReport(
+          stationId: 'st-1',
+          fuelType: 'name',
+          countryCode: 'FR',
+          correctionText: 'Shell Castelnau',
+        ),
+        completes,
+      );
     });
   });
 }
