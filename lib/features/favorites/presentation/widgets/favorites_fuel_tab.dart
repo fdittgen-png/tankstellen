@@ -1,0 +1,138 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../providers/ev_favorites_provider.dart';
+import '../../providers/favorites_provider.dart';
+import 'ev_favorite_card.dart';
+import 'ev_favorites_list_view.dart';
+import 'favorite_station_dismissible.dart';
+import 'favorites_loading_view.dart';
+import 'favorites_section_header.dart';
+import 'swipe_tutorial_banner.dart';
+
+/// Body of the "Favorites" tab inside `FavoritesScreen`. Owns the four
+/// rendering branches (empty / EV-only / loaded / error) and the EV+fuel
+/// section composition. Pulled out of `favorites_screen.dart` so the
+/// screen's `build` method becomes a thin Scaffold + TabBar shell and so
+/// each branch can be exercised by widget tests in isolation without
+/// constructing a full `DefaultTabController`.
+class FavoritesFuelTab extends ConsumerWidget {
+  const FavoritesFuelTab({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final favoriteIds = ref.watch(favoritesProvider);
+    final stationsState = ref.watch(favoriteStationsProvider);
+    final evStations = ref.watch(evFavoriteStationsProvider);
+    final hasEvFavorites = evStations.isNotEmpty;
+
+    if (favoriteIds.isEmpty && !hasEvFavorites) {
+      return Semantics(
+        label:
+            'No favorites yet. Tap the star on a station to save it as a favorite.',
+        child: EmptyState(
+          icon: Icons.star_outline,
+          iconSize: 80,
+          title: l10n?.noFavorites ?? 'No favorites yet',
+          subtitle: l10n?.noFavoritesHint ??
+              'Tap the star on a station to save it here',
+          actionLabel: l10n?.search ?? 'Search Stations',
+          onAction: () => context.go('/'),
+        ),
+      );
+    }
+
+    if (favoriteIds.isEmpty && hasEvFavorites) {
+      return EvFavoritesListView(evStations: evStations);
+    }
+
+    return stationsState.when(
+      data: (result) {
+        if (result.data.isEmpty && !hasEvFavorites) {
+          return const FavoritesLoadingView();
+        }
+        return RefreshIndicator(
+          onRefresh: () async {
+            await ref.read(favoriteStationsProvider.notifier).loadAndRefresh();
+          },
+          child: Column(
+            children: [
+              if (result.data.isNotEmpty)
+                ServiceStatusBanner(result: result),
+              const SwipeTutorialBanner(),
+              Expanded(
+                child: ListView(
+                  children: [
+                    if (hasEvFavorites) ...[
+                      FavoritesSectionHeader(
+                        icon: Icons.ev_station,
+                        label: l10n?.evChargingSection ?? 'EV Charging',
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                      ),
+                      ...evStations.map((ev) => EvFavoriteCard(
+                            key: ValueKey('ev-${ev.id}'),
+                            station: ev,
+                            onTap: () =>
+                                context.push('/ev-station', extra: ev),
+                            onFavoriteTap: () {
+                              ref
+                                  .read(evFavoritesProvider.notifier)
+                                  .remove(ev.id);
+                              SnackBarHelper.show(
+                                context,
+                                l10n?.removedFromFavorites ??
+                                    'Removed from favorites',
+                              );
+                            },
+                          )),
+                      if (result.data.isNotEmpty)
+                        FavoritesSectionHeader(
+                          icon: Icons.local_gas_station,
+                          label: l10n?.fuelStationsSection ?? 'Fuel Stations',
+                        ),
+                    ],
+                    ...result.data.map(
+                      (station) =>
+                          FavoriteStationDismissible(station: station),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => hasEvFavorites
+          ? EvFavoritesListView(evStations: evStations)
+          : const FavoritesLoadingView(),
+      error: (error, _) => Semantics(
+        label: 'Error loading favorites: ${error.toString()}',
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, size: 48),
+              const SizedBox(height: 16),
+              Text(error.toString(), textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () {
+                  ref
+                      .read(favoriteStationsProvider.notifier)
+                      .loadAndRefresh();
+                },
+                child: Text(l10n?.retry ?? 'Retry'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
