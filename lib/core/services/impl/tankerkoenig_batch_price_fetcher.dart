@@ -40,7 +40,12 @@ class TankerkoenigBatchPriceFetcher {
 
   /// Fetches prices for [ids] in batches of [batchSize] and merges the
   /// results into a single map keyed by station ID. Returns an empty map
-  /// when [ids] is empty or when [apiKey] is null/empty.
+  /// when [ids] is empty.
+  ///
+  /// Pass [apiKey] to send the key as a query parameter directly — used by
+  /// the background isolate where there's no Dio interceptor. In the main
+  /// isolate the key is injected by the Dio interceptor in
+  /// `service_providers.dart` so callers can omit it.
   ///
   /// Failed batches are silently dropped so a partial result is still
   /// useful (e.g. one batch of 10 fails but the other 20 stations still
@@ -48,9 +53,9 @@ class TankerkoenigBatchPriceFetcher {
   /// [BackgroundRetryConfig] before being given up on.
   Future<Map<String, Map<String, dynamic>>> fetchBatch({
     required List<String> ids,
-    required String? apiKey,
+    String? apiKey,
   }) async {
-    if (ids.isEmpty || apiKey == null || apiKey.isEmpty) {
+    if (ids.isEmpty) {
       return const <String, Map<String, dynamic>>{};
     }
 
@@ -66,7 +71,10 @@ class TankerkoenigBatchPriceFetcher {
       final data = await fetchWithRetry(
         dio: _dio,
         url: url,
-        queryParameters: {'ids': joined, 'apikey': apiKey},
+        queryParameters: {
+          'ids': joined,
+          if (apiKey != null && apiKey.isNotEmpty) 'apikey': apiKey,
+        },
         config: retryConfig,
       );
       _mergeBatch(data, into: result);

@@ -54,17 +54,48 @@ void main() {
       expect(result, isEmpty);
     });
 
-    test('returns empty map when apiKey is null', () async {
-      final fetcher = TankerkoenigBatchPriceFetcher(dio: _dioWith([]));
-      final result =
-          await fetcher.fetchBatch(ids: const ['a'], apiKey: null);
-      expect(result, isEmpty);
+    test('omits apikey query parameter when apiKey is null', () async {
+      // Main isolate uses a Dio interceptor to inject the key, so the
+      // fetcher should not send `apikey` itself.
+      final dio = _dioWith([_jsonResponse('{"ok":true,"prices":{}}')]);
+      final adapter = dio.httpClientAdapter as _RecordingAdapter;
+      final fetcher = TankerkoenigBatchPriceFetcher(dio: dio);
+
+      await fetcher.fetchBatch(ids: const ['a']);
+
+      expect(adapter.requests.single.queryParameters.containsKey('apikey'),
+          isFalse);
+      expect(adapter.requests.single.queryParameters['ids'], 'a');
     });
 
-    test('returns empty map when apiKey is empty string', () async {
-      final fetcher = TankerkoenigBatchPriceFetcher(dio: _dioWith([]));
-      final result = await fetcher.fetchBatch(ids: const ['a'], apiKey: '');
-      expect(result, isEmpty);
+    test('omits apikey query parameter when apiKey is empty string', () async {
+      final dio = _dioWith([_jsonResponse('{"ok":true,"prices":{}}')]);
+      final adapter = dio.httpClientAdapter as _RecordingAdapter;
+      final fetcher = TankerkoenigBatchPriceFetcher(dio: dio);
+
+      await fetcher.fetchBatch(ids: const ['a'], apiKey: '');
+
+      expect(adapter.requests.single.queryParameters.containsKey('apikey'),
+          isFalse);
+    });
+
+    test('main-isolate path: 25 ids still chunk into 3 batches', () async {
+      // Regression for #426 — main isolate getPrices used to truncate
+      // `ids.take(10)`; now it must batch the full list.
+      final dio = _dioWith([
+        _jsonResponse('{"ok":true,"prices":{}}'),
+        _jsonResponse('{"ok":true,"prices":{}}'),
+        _jsonResponse('{"ok":true,"prices":{}}'),
+      ]);
+      final adapter = dio.httpClientAdapter as _RecordingAdapter;
+      final fetcher = TankerkoenigBatchPriceFetcher(dio: dio);
+
+      final ids = List.generate(25, (i) => 'station-$i');
+      // No apiKey: simulating the main-isolate path
+      await fetcher.fetchBatch(ids: ids);
+
+      expect(adapter.requests, hasLength(3),
+          reason: '25 ids must produce 3 requests, not be truncated to 10');
     });
 
     test('parses a single batch into the id → price map', () async {
