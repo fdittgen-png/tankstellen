@@ -1,6 +1,11 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_map_layers.dart';
+import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+
+import '../../../../helpers/pump_app.dart';
 
 void main() {
   group('StationMapLayers.zoomForRadius', () {
@@ -68,6 +73,42 @@ void main() {
       expect(bounds.west.isFinite, isTrue);
       expect(bounds.north.isFinite, isTrue);
       expect(bounds.south.isFinite, isTrue);
+    });
+  });
+
+  group('StationMapLayers onMapReady nudge (#496)', () {
+    testWidgets(
+        'FlutterMap is configured with an onMapReady callback so the '
+        'tile layer gets re-triggered once the controller is attached',
+        (tester) async {
+      final controller = MapController();
+      await pumpApp(
+        tester,
+        SizedBox(
+          width: 400,
+          height: 400,
+          child: StationMapLayers(
+            mapController: controller,
+            stations: const [],
+            center: const LatLng(48.8566, 2.3522),
+            zoom: 12,
+            searchRadiusKm: 10,
+            selectedFuel: FuelType.e10,
+          ),
+        ),
+      );
+
+      // The regression from #496 is that MapOptions.onMapReady was null
+      // and the initState-based nudge in MapScreen fires before the
+      // controller attaches. Asserting onMapReady != null locks in the
+      // fix — if someone removes it, this test fails and the tiles go
+      // blank again on cold visits to the Carte tab.
+      final flutterMap = tester.widget<FlutterMap>(find.byType(FlutterMap));
+      expect(flutterMap.options.onMapReady, isNotNull,
+          reason: 'MapOptions.onMapReady must be set so the TileLayer '
+              'retriggers its viewport fetch once the controller '
+              'attaches — otherwise the map renders blank white tiles '
+              'until the user pans (#496)');
     });
   });
 }

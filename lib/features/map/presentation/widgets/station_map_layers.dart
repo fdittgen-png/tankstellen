@@ -69,6 +69,23 @@ class StationMapLayers extends StatelessWidget {
             interactionOptions: const InteractionOptions(
               flags: InteractiveFlag.all,
             ),
+            // #496 — force the TileLayer to refetch tiles once the map
+            // has actually laid out. When the map screen sits inside
+            // StatefulShellRoute.indexedStack, the widget is pre-built
+            // offstage with degenerate constraints and the TileLayer's
+            // viewport is empty. The initState-based nudge in
+            // MapScreen fires before FlutterMap attaches the controller,
+            // so it gets swallowed. onMapReady fires exactly when the
+            // controller is attached AND the map has real constraints,
+            // which is the only reliable moment to nudge.
+            onMapReady: () {
+              try {
+                mapController.move(center, zoom);
+              } catch (_) {
+                // Controller in an unexpected state — skip silently, the
+                // user can still pan to trigger tile loading.
+              }
+            },
           ),
           children: [
             TileLayer(
