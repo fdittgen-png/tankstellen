@@ -63,6 +63,10 @@ List<Object> _readyAppOverrides({
   when(() => test.mockStorage.isSetupComplete).thenReturn(true);
   when(() => test.mockStorage.getSetting(StorageKeys.gdprConsentGiven))
       .thenReturn(true);
+  // #494 — swipe tutorial banner was added to search results, pre-dismiss
+  // it here so the extra banner height doesn't overflow the test viewport.
+  when(() => test.mockStorage.getSetting(StorageKeys.swipeTutorialShown))
+      .thenReturn(true);
   when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
   when(() => test.mockStorage.getRatings()).thenReturn(const <String, int>{});
   when(() => test.mockStorage.getActiveProfileId()).thenReturn('p1');

@@ -1004,30 +1004,31 @@ class AppLocalizationsFr extends AppLocalizations {
   String get errorUnknown => 'Une erreur inattendue est survenue.';
 
   @override
-  String get onboardingWelcomeHint => 'Set up the app in a few quick steps.';
+  String get onboardingWelcomeHint =>
+      'Configurez l\'application en quelques étapes rapides.';
 
   @override
   String get onboardingApiKeyDescription =>
-      'Register for a free API key, or skip to explore the app with demo data.';
+      'Créez une clé API gratuite, ou passez pour explorer l\'application avec des données de démonstration.';
 
   @override
-  String get onboardingComplete => 'All set!';
+  String get onboardingComplete => 'Tout est prêt !';
 
   @override
   String get onboardingCompleteHint =>
-      'You can change these settings anytime in your profile.';
+      'Vous pouvez modifier ces paramètres à tout moment dans votre profil.';
 
   @override
-  String get onboardingBack => 'Back';
+  String get onboardingBack => 'Retour';
 
   @override
-  String get onboardingNext => 'Next';
+  String get onboardingNext => 'Suivant';
 
   @override
-  String get onboardingSkip => 'Skip';
+  String get onboardingSkip => 'Passer';
 
   @override
-  String get onboardingFinish => 'Get started';
+  String get onboardingFinish => 'Commencer';
 
   @override
   String crossBorderNearby(String country) {

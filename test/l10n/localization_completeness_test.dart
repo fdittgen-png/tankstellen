@@ -90,6 +90,21 @@ void main() {
       final germanMissing = missingReport['de'];
       expect(germanMissing, isNull,
           reason: 'German (de) must have all keys from app_en.arb');
+
+      // #495 — French is the primary user locale; the wizard completion
+      // step was shipping in English because French lacked the
+      // `onboarding*` keys. French does not need to be fully complete
+      // yet (huge backlog), but every onboarding key MUST be present so
+      // the onboarding flow is fully localised for French users.
+      final frenchMissing = missingReport['fr'] ?? const <String>[];
+      final frenchMissingOnboarding = frenchMissing
+          .where((k) => k.startsWith('onboarding'))
+          .toList()
+        ..sort();
+      expect(frenchMissingOnboarding, isEmpty,
+          reason: 'French (fr) must have every onboarding* key — the '
+              'wizard is the user\'s first impression of the app and '
+              'must not fall back to English for French users');
     });
 
     test('no locale has extra keys not in app_en.arb', () {
