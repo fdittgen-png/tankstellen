@@ -60,6 +60,9 @@ class SyncFields {
   static const reporterId = 'reporter_id';
   static const reportedPrice = 'reported_price';
   static const reportedAt = 'reported_at';
+  // #484 — nullable text correction for metadata reports (wrong name,
+  // wrong address). Added in migration 20260414000001.
+  static const correctionText = 'correction_text';
 
   // Link codes columns
   static const code = 'code';
