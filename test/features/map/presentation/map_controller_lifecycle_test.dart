@@ -58,5 +58,38 @@ void main() {
         reason: 'MapController should be created in initState, not as field initializer',
       );
     });
+
+    test(
+      'MapScreen.initState schedules a post-frame controller nudge so the '
+      'TileLayer recomputes visible bounds on first paint (regression #473)',
+      () {
+        final source = File(
+          'lib/features/map/presentation/screens/map_screen.dart',
+        ).readAsStringSync();
+
+        // The fix must (a) hook a post-frame callback in initState,
+        // (b) call _mapController.move(...) inside it, and (c) wrap
+        // the move in a try/catch so the controller-not-attached path
+        // does not throw.
+        expect(
+          source.contains('addPostFrameCallback'),
+          isTrue,
+          reason: 'MapScreen.initState must schedule a post-frame callback to '
+              'nudge the MapController on first paint (#473)',
+        );
+        expect(
+          source.contains('_mapController.move'),
+          isTrue,
+          reason: 'The post-frame callback must call MapController.move(...) '
+              'so the TileLayer recomputes its visible bounds (#473)',
+        );
+        expect(
+          source.contains('try {'),
+          isTrue,
+          reason: 'The nudge must be wrapped in try/catch — on the first '
+              'frame the controller may not yet be attached to a FlutterMap',
+        );
+      },
+    );
   });
 }
