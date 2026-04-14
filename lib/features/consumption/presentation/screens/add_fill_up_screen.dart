@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,6 +11,7 @@ import '../../data/receipt_scan_service.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
 import '../widgets/fill_up_input_buttons.dart';
+import '../widgets/fill_up_numeric_field.dart';
 
 /// Form to add a new [FillUp] entry.
 class AddFillUpScreen extends ConsumerStatefulWidget {
@@ -187,42 +187,24 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
               },
             ),
             const SizedBox(height: 12),
-            TextFormField(
+            FillUpNumericField(
               controller: _litersCtrl,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-              ],
-              decoration: InputDecoration(
-                labelText: l?.liters ?? 'Liters',
-                prefixIcon: const Icon(Icons.water_drop_outlined),
-              ),
+              label: l?.liters ?? 'Liters',
+              icon: Icons.water_drop_outlined,
               validator: _positiveNumberValidator,
             ),
             const SizedBox(height: 12),
-            TextFormField(
+            FillUpNumericField(
               controller: _costCtrl,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-              ],
-              decoration: InputDecoration(
-                labelText: l?.totalCost ?? 'Total cost',
-                prefixIcon: const Icon(Icons.euro),
-              ),
+              label: l?.totalCost ?? 'Total cost',
+              icon: Icons.euro,
               validator: _positiveNumberValidator,
             ),
             const SizedBox(height: 12),
-            TextFormField(
+            FillUpNumericField(
               controller: _odoCtrl,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-              ],
-              decoration: InputDecoration(
-                labelText: l?.odometerKm ?? 'Odometer (km)',
-                prefixIcon: const Icon(Icons.speed),
-              ),
+              label: l?.odometerKm ?? 'Odometer (km)',
+              icon: Icons.speed,
               validator: _positiveNumberValidator,
             ),
             const SizedBox(height: 12),
