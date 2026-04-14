@@ -13,7 +13,7 @@ import '../../../profile/providers/profile_provider.dart';
 import '../../data/api_key_validator.dart';
 import '../../providers/api_key_validator_provider.dart';
 import '../widgets/api_key_input_section.dart';
-import '../widgets/country_status_badge.dart';
+import '../widgets/country_info_card.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
   const SetupScreen({super.key});
@@ -151,7 +151,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                     ref.read(activeCountryProvider.notifier).select(c),
               ),
               const SizedBox(height: 24),
-              _CountryInfoCard(country: country),
+              CountryInfoCard(country: country),
               const SizedBox(height: 24),
               if (country.requiresApiKey) ...[
                 ApiKeyInputSection(
@@ -298,71 +298,6 @@ class _CountrySelector extends StatelessWidget {
     );
   }
 }
-
-class _CountryInfoCard extends StatelessWidget {
-  final CountryConfig country;
-
-  const _CountryInfoCard({required this.country});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Semantics(
-      label: '${country.name}, data source: ${country.apiProvider ?? 'Demo'}, '
-          '${country.requiresApiKey ? 'API key required' : 'Free, no key needed'}, '
-          'fuel types: ${country.fuelTypes.join(', ')}',
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  ExcludeSemantics(
-                    child: Text(
-                      country.flag,
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ExcludeSemantics(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            country.name,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            'Data: ${country.apiProvider ?? 'Demo'}',
-                            style: theme.textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  CountryStatusBadge(country: country),
-                ],
-              ),
-              const SizedBox(height: 8),
-              ExcludeSemantics(
-                child: Text(
-                  'Fuel types: ${country.fuelTypes.join(', ')}',
-                  style: theme.textTheme.bodySmall,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 
 class _ContinueButton extends StatelessWidget {
   final bool isLoading;
