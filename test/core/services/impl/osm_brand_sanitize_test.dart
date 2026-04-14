@@ -16,6 +16,21 @@ void main() {
       expect(OsmBrandEnricher.sanitizeOsmBrand('bft'), 'bft');
     });
 
+    test(
+      'accepts legitimate 2-character canonical brands (BP, IP, Q8, OK) — '
+      'the registry check must run BEFORE the length floor, otherwise '
+      'short registry brands get rejected alongside garbage like "ff"',
+      () {
+        expect(OsmBrandEnricher.sanitizeOsmBrand('BP'), 'BP');
+        expect(OsmBrandEnricher.sanitizeOsmBrand('bp'), 'bp');
+        expect(OsmBrandEnricher.sanitizeOsmBrand('IP'), 'IP');
+        expect(OsmBrandEnricher.sanitizeOsmBrand('Q8'), 'Q8');
+        expect(OsmBrandEnricher.sanitizeOsmBrand('q8'), 'q8');
+        expect(OsmBrandEnricher.sanitizeOsmBrand('OK'), 'OK');
+        expect(OsmBrandEnricher.sanitizeOsmBrand('ok'), 'ok');
+      },
+    );
+
     test('accepts plausible unknown brands that at least look like a name', () {
       // Not in the registry but passes the letter / length / punctuation checks.
       expect(

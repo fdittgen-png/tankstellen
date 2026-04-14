@@ -166,16 +166,20 @@ class OsmBrandEnricher {
   /// validator directly without spinning up a full enricher.
   static String? sanitizeOsmBrand(String raw) {
     final trimmed = raw.trim();
-    if (trimmed.length < 3) return null;
+    if (trimmed.isEmpty) return null;
 
-    // Fast path: already a known canonical or alias. No further
-    // sanity checks — we already trust the registry.
+    // Fast path: already a known canonical or alias. Runs BEFORE the
+    // length floor below so legitimate 2-character brands like BP, IP,
+    // OK, Q8 survive the validator. Previously this check came after
+    // the length floor and rejected those as garbage (#481 follow-up).
     for (final entry in BrandRegistry.brandAliases.entries) {
       if (entry.key.toLowerCase() == trimmed.toLowerCase()) return trimmed;
       for (final alias in entry.value) {
         if (alias.toLowerCase() == trimmed.toLowerCase()) return trimmed;
       }
     }
+
+    if (trimmed.length < 3) return null;
 
     // Must contain at least one letter. "1234" / "+33 4 67 ..." → reject.
     if (!RegExp(r'[A-Za-zÀ-ÖØ-öø-ÿ]').hasMatch(trimmed)) return null;
