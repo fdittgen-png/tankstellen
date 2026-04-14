@@ -7,8 +7,12 @@ import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/presentation/widgets/favorites_fuel_tab.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
+import 'package:tankstellen/features/favorites/presentation/widgets/ev_favorite_card.dart';
+import 'package:tankstellen/features/favorites/presentation/widgets/favorite_station_dismissible.dart';
+import 'package:tankstellen/features/favorites/presentation/widgets/favorites_section_header.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
+import '../../../../fixtures/stations.dart';
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 
@@ -60,6 +64,46 @@ void main() {
       expect(find.text('No favorites yet'), findsNothing);
     });
 
+    testWidgets(
+        'renders BOTH the EV section header + EvFavoriteCard AND the Fuel '
+        'section header + FavoriteStationDismissible when the user has '
+        'starred at least one of each (regression guard for #475)',
+        (tester) async {
+      final test = standardTestOverrides(favoriteIds: [testStation.id]);
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
+      when(() => test.mockStorage.getRatings())
+          .thenReturn(const <String, int>{});
+
+      await pumpApp(
+        tester,
+        const Material(child: FavoritesFuelTab()),
+        overrides: [
+          ...test.overrides,
+          favoriteStationsProvider.overrideWith(
+            () => _LoadedFavoriteStations([testStation]),
+          ),
+          evFavoriteStationsProvider.overrideWith(
+            () => _FixedEvFavorites([_evStation()]),
+          ),
+        ].cast(),
+      );
+
+      // Both section headers must be rendered: EV first, then Fuel.
+      expect(find.byType(FavoritesSectionHeader), findsNWidgets(2));
+      // EV card should appear above the fuel card.
+      final evHeader = tester
+          .getCenter(find.byType(FavoritesSectionHeader).first)
+          .dy;
+      final fuelHeader =
+          tester.getCenter(find.byType(FavoritesSectionHeader).last).dy;
+      expect(evHeader, lessThan(fuelHeader),
+          reason: 'EV section header must appear above the Fuel section header');
+
+      expect(find.byType(EvFavoriteCard), findsOneWidget);
+      expect(find.byType(FavoriteStationDismissible), findsOneWidget);
+    });
+
     testWidgets('renders error UI with retry button when stream errors',
         (tester) async {
       final test = standardTestOverrides(favoriteIds: ['stub-id']);
@@ -94,6 +138,23 @@ class _ErroringFavoriteStations extends FavoriteStations {
   AsyncValue<ServiceResult<List<Station>>> build() => AsyncValue.error(
         Exception('boom'),
         StackTrace.current,
+      );
+
+  @override
+  Future<void> loadAndRefresh() async {}
+}
+
+class _LoadedFavoriteStations extends FavoriteStations {
+  _LoadedFavoriteStations(this._stations);
+  final List<Station> _stations;
+
+  @override
+  AsyncValue<ServiceResult<List<Station>>> build() => AsyncValue.data(
+        ServiceResult(
+          data: _stations,
+          source: ServiceSource.cache,
+          fetchedAt: DateTime.now(),
+        ),
       );
 
   @override

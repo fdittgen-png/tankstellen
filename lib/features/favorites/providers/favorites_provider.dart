@@ -108,8 +108,11 @@ bool isFavorite(Ref ref, String stationId) {
 class FavoriteStations extends _$FavoriteStations {
   @override
   AsyncValue<ServiceResult<List<Station>>> build() {
-    // Load cached station data synchronously so favorites show immediately.
-    final favoriteIds = ref.read(favoritesProvider);
+    // Watch (not read) so the provider rebuilds whenever the user adds or
+    // removes a favorite. Without this, the favorites tab keeps the empty
+    // state from the first build and the loading skeleton renders forever
+    // until the app is restarted (#474).
+    final favoriteIds = ref.watch(favoritesProvider);
     if (favoriteIds.isEmpty) {
       return AsyncValue.data(ServiceResult(
         data: const [],
