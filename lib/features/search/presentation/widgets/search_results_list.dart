@@ -11,6 +11,7 @@ import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/utils/price_utils.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../favorites/presentation/widgets/swipe_tutorial_banner.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/station.dart';
@@ -165,6 +166,9 @@ class SearchResultsList extends ConsumerWidget {
           ),
         ),
         const CrossBorderBanner(),
+        // #494 — same swipe-hint banner as the favorites screen. Shows
+        // once until the user taps "Got it", then stays dismissed.
+        const SwipeTutorialBanner(),
         SortSelector(
           selected: sortMode,
           onChanged: (mode) =>

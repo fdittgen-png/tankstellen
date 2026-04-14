@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/widgets/shimmer_placeholder.dart';
+import 'package:tankstellen/features/profile/domain/entities/user_profile.dart';
+import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/nearest_shortcut_card.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_results_content.dart';
@@ -65,6 +67,52 @@ void main() {
       expect(find.text('Search to find fuel stations.'), findsOneWidget);
     });
 
+    testWidgets(
+        '#494 — hides NearestShortcutCard when landing screen is NOT nearest',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        SearchResultsContent(onGpsRetry: noopRetry),
+        overrides: [
+          ...test.overrides,
+          searchStateProvider.overrideWith(() => _EmptySearchState()),
+          activeProfileProvider.overrideWith(
+            () => _FakeActiveProfile(LandingScreen.cheapest),
+          ),
+        ].cast(),
+      );
+
+      expect(find.byType(NearestShortcutCard), findsNothing,
+          reason: 'Shortcut must not push "nearest" at a user who chose '
+              'cheapest as their landing screen');
+      // Empty-state hint text still visible.
+      expect(find.text('Search to find fuel stations.'), findsOneWidget);
+    });
+
+    testWidgets(
+        '#494 — shows NearestShortcutCard when landing screen IS nearest',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        SearchResultsContent(onGpsRetry: noopRetry),
+        overrides: [
+          ...test.overrides,
+          searchStateProvider.overrideWith(() => _EmptySearchState()),
+          activeProfileProvider.overrideWith(
+            () => _FakeActiveProfile(LandingScreen.nearest),
+          ),
+        ].cast(),
+      );
+
+      expect(find.byType(NearestShortcutCard), findsOneWidget);
+    });
+
     testWidgets('shows the SearchResultsList when stations are loaded',
         (tester) async {
       final test = standardTestOverrides();
@@ -116,5 +164,17 @@ class _LoadedSearchState extends SearchState {
           source: ServiceSource.cache,
           fetchedAt: DateTime.now(),
         ),
+      );
+}
+
+class _FakeActiveProfile extends ActiveProfile {
+  _FakeActiveProfile(this._landingScreen);
+  final LandingScreen _landingScreen;
+
+  @override
+  UserProfile? build() => UserProfile(
+        id: 'test',
+        name: 'Test',
+        landingScreen: _landingScreen,
       );
 }

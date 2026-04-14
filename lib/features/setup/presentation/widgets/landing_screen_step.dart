@@ -39,7 +39,13 @@ class LandingScreenStep extends ConsumerWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          ...LandingScreen.values.map((screen) {
+          // #493 — filter out LandingScreen.map to match the profile edit
+          // sheet's dropdown (profile_landing_screen_dropdown.dart), so the
+          // wizard and the profile agree on the same 3 options. Picking a
+          // preference the profile cannot display/edit was confusing.
+          ...LandingScreen.values
+              .where((s) => s != LandingScreen.map)
+              .map((screen) {
             final selected = wizardState.landingScreen == screen;
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
