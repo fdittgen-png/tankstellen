@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -53,6 +55,27 @@ class TraceStorage {
   Future<void> delete(String id) => _box.delete(id);
   Future<void> clearAll() => _box.clear();
   int get count => _box.length;
+
+  /// Serialises every persisted trace into a single JSON document the
+  /// user can email or attach to a GitHub issue. Used by the privacy
+  /// dashboard's "Export error log" action (#476).
+  ///
+  /// Format:
+  /// ```json
+  /// {
+  ///   "exportedAt": "<iso8601>",
+  ///   "traceCount": 12,
+  ///   "traces": [ <ErrorTrace.toJson()>, ... ]
+  /// }
+  /// ```
+  String exportAsJson() {
+    final traces = getAll();
+    return const JsonEncoder.withIndent('  ').convert({
+      'exportedAt': DateTime.now().toUtc().toIso8601String(),
+      'traceCount': traces.length,
+      'traces': traces.map((t) => t.toJson()).toList(),
+    });
+  }
 
   Future<void> _prune() async {
     final cutoff = DateTime.now().subtract(maxAge);

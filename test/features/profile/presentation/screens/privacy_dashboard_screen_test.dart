@@ -1,5 +1,7 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/core/error_tracing/storage/trace_storage.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
@@ -7,6 +9,18 @@ import 'package:tankstellen/features/profile/presentation/screens/privacy_dashbo
 
 import '../../../../helpers/pump_app.dart';
 import '../../../../mocks/mocks.dart';
+
+/// Stub TraceStorage that doesn't touch Hive — the privacy dashboard
+/// reads `count` from the provider during build, and the production
+/// implementation calls `Hive.box('error_traces')` which fails in
+/// widget tests where Hive isn't initialised.
+class _StubTraceStorage extends TraceStorage {
+  @override
+  int get count => 0;
+
+  @override
+  String exportAsJson() => '{"traceCount":0,"traces":[]}';
+}
 
 void main() {
   group('PrivacyDashboardScreen', () {
@@ -39,6 +53,7 @@ void main() {
     List<Object> _overrides() => [
           storageRepositoryProvider.overrideWithValue(mockStorage),
           syncStateProvider.overrideWith(() => _DisabledSyncState()),
+          traceStorageProvider.overrideWithValue(_StubTraceStorage()),
         ];
 
     testWidgets('shows local data counts', (tester) async {
@@ -87,12 +102,41 @@ void main() {
         overrides: [
           storageRepositoryProvider.overrideWithValue(mockStorage),
           syncStateProvider.overrideWith(() => _EnabledSyncState()),
+          traceStorageProvider.overrideWithValue(_StubTraceStorage()),
         ],
       );
 
       expect(find.text('Tankstellen Community'), findsOneWidget);
       expect(find.textContaining('user-abc'), findsOneWidget);
       expect(find.text('View server data'), findsOneWidget);
+    });
+
+    testWidgets(
+        'shows the "Copy error log to clipboard" button labelled with the '
+        'current trace count (#476)', (tester) async {
+      await pumpApp(
+        tester,
+        const PrivacyDashboardScreen(),
+        overrides: _overrides(),
+      );
+
+      // The button lives in the ListView below the fold — scroll it
+      // into view first.
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey('privacy-export-error-log-button')),
+        50.0,
+      );
+
+      // The new button is keyed for stable lookup; the label includes the
+      // count from the (stubbed) TraceStorage which returns 0.
+      expect(
+        find.byKey(const ValueKey('privacy-export-error-log-button')),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('Copy error log to clipboard (0)'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows export button', (tester) async {

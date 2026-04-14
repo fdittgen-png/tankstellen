@@ -126,6 +126,56 @@ void main() {
       expect(body, contains('runApp'));
     });
   });
+
+  group('Sentry observability wiring (#476)', () {
+    test(
+        'resolveSentryDsn prefers the user-stored sentry_dsn setting over '
+        'the build-time SENTRY_DSN dart-define', () {
+      // Source-level invariants: the resolver must read the storage
+      // setting first, then fall back to String.fromEnvironment.
+      final body =
+          _extractMethodBody(initSource, 'static String resolveSentryDsn');
+      expect(body, isNotNull, reason: 'resolveSentryDsn helper must exist');
+      // Storage read happens first.
+      final storedIdx = body!.indexOf("getSetting('sentry_dsn')");
+      final envIdx = body.indexOf('String.fromEnvironment');
+      expect(storedIdx, isNonNegative);
+      expect(envIdx, isNonNegative);
+      expect(storedIdx, lessThan(envIdx),
+          reason: 'storage setting must be checked before the dart-define '
+              'fallback so a power user can override the maintainer DSN');
+      // The dart-define key is exactly SENTRY_DSN (not e.g. SentryDSN or
+      // sentry_dsn — that would silently misalign with the build flag).
+      expect(body, contains("String.fromEnvironment('SENTRY_DSN')"),
+          reason: 'dart-define key must be exactly SENTRY_DSN to match the '
+              'build flag in the release workflow');
+    });
+
+    test(
+        'SentryFlutter.init is gated on (a) DSN non-empty AND '
+        '(b) consent_error_reporting setting being true', () {
+      final body =
+          _extractMethodBody(initSource, 'static Future<void> run');
+      expect(body, isNotNull);
+      // The init must check consent.
+      expect(body, contains('consent_error_reporting'),
+          reason: 'AppInitializer.run must check the user has opted in to '
+              'error reporting before initialising Sentry');
+      // And it must check the DSN is non-empty.
+      expect(body, contains('isNotEmpty'),
+          reason: 'init must guard on DSN.isNotEmpty so an empty SENTRY_DSN '
+              'in the build env never triggers Sentry');
+    });
+
+    test(
+        'main.dart still does NOT reference SentryFlutter — that is owned '
+        'by AppInitializer', () {
+      // Belt and braces: keep the forbidden-symbols list in sync if the
+      // Sentry rollout ever leaks back into main.dart.
+      expect(mainSource, isNot(contains('SentryFlutter')));
+      expect(mainSource, isNot(contains('SENTRY_DSN')));
+    });
+  });
 }
 
 /// Extracts the body of the first method that starts with [signature].
