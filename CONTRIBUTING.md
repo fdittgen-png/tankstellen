@@ -85,6 +85,183 @@ Optional but recommended:
 - Run `dart pub outdated` before adding new packages.
 - Major version bumps get their own `chore/bump-<package>` branch.
 
+## For Junior Devs — A Tour of the Codebase
+
+If you're new to the project (or new to Flutter/Riverpod), start here. This
+section walks you through the architecture in the order you'll meet it
+when reading code, and points at the files that anchor each concept.
+
+### 1. Where the app starts
+
+```
+lib/main.dart                 → 11 lines, calls AppInitializer.run()
+lib/app/app_initializer.dart  → cold-start phases (bootstrap → storage → services → optional → runApp)
+lib/app/app.dart              → TankstellenApp: MaterialApp.router + global wrappers
+lib/app/router.dart           → GoRouter config + consent/setup gating redirects
+lib/app/shell_screen.dart     → bottom navigation + tab transitions
+```
+
+Read these five files in order. By the time you reach `shell_screen.dart`
+you'll understand how a tap on a tab translates into a `goBranch` call
+that flips the visible feature.
+
+### 2. Feature-first layout
+
+Every user-visible piece lives under `lib/features/<name>/` with a
+predictable substructure:
+
+```
+lib/features/<name>/
+├── data/         → repositories, model converters, raw API DTOs
+├── domain/       → freezed entities, enums, business types
+├── presentation/
+│   ├── screens/  → ConsumerWidget / ConsumerStatefulWidget pages
+│   └── widgets/  → small reusable building blocks for those screens
+└── providers/    → @riverpod / @Riverpod(keepAlive: true) state holders
+```
+
+When you add a new feature, mirror this exact layout. When you read
+existing code, look for the `providers/` folder first — it's the entry
+point for understanding how state flows.
+
+### 3. State management (Riverpod 3.0)
+
+We use Riverpod's code-generation flavour exclusively. The two
+annotations you'll see all over the codebase:
+
+- `@riverpod` — screen-scoped state (search results, station detail,
+  price history). The provider disposes when the last listener
+  unsubscribes.
+- `@Riverpod(keepAlive: true)` — app-lifetime state (storage, favorites,
+  profiles, auth, ignored stations). Survives navigation.
+
+Read vs watch:
+
+- `ref.watch(provider)` — inside `build()`. Triggers a rebuild when the
+  provider's value changes.
+- `ref.read(provider.notifier).method()` — inside callbacks. One-shot
+  action, never triggers a rebuild on its own.
+
+Mixing the two carelessly is the most common Riverpod bug — if you
+`watch` inside an `onPressed`, you'll capture a stale value. Always
+`read` for actions, `watch` for UI.
+
+### 4. Service abstraction (`ServiceResult<T>`)
+
+External APIs are never called directly from a provider. Each one is
+wrapped in an abstract interface (`StationService`, `GeocodingProvider`,
+…) and called through `StationServiceChain`, which implements a
+4-step fallback:
+
+```
+fresh cache → API → stale cache → error
+```
+
+Every API response is a `ServiceResult<T>` carrying `data`, `source`
+(`api`, `cache`, `staleCache`, `demo`), `fetchedAt`, and any errors
+that accumulated along the chain. The `ServiceStatusBanner` widget
+reads `result.source` and `result.isStale` to tell the user where the
+data came from. **Never bypass the chain** — it's the single source of
+truth for caching, retry, and request coalescing.
+
+Anchor files:
+
+```
+lib/core/services/service_result.dart
+lib/core/services/station_service_chain.dart
+lib/core/services/country_service_registry.dart
+lib/core/cache/cache_manager.dart
+```
+
+### 5. Storage (Hive + secure storage + sync)
+
+We are **local-first**. Every write hits Hive locally before anything
+hits the network. Sync is best-effort and asynchronous.
+
+- `lib/core/storage/hive_storage.dart` — Hive boxes (settings, favorites,
+  profiles, cache). Use `StorageRepository` (the abstract interface) in
+  new code, not `HiveStorage` directly.
+- `lib/core/storage/storage_keys.dart` — string keys for the settings
+  box. Always reference these constants, never inline strings.
+- API keys and Supabase tokens live in `flutter_secure_storage`
+  (Android Keystore / Windows DPAPI), never Hive.
+
+The cardinal rule for storage: **load from DB, then overwrite with
+local.** Local always wins on conflict. Sync adds and changes, but
+never deletes — only explicit user actions trigger server deletes.
+
+### 6. Localization (ARB)
+
+- All user-facing strings go through `AppLocalizations`. Files live in
+  `lib/l10n/app_*.arb` (one per supported language).
+- After editing an ARB file, regenerate: `flutter gen-l10n` (also runs
+  as part of `flutter pub get`).
+- Always provide an English fallback in code:
+  `l10n?.someKey ?? 'English fallback'`.
+- German (`app_de.arb`) is the primary user language; English is the
+  default fallback.
+
+### 7. How to add a new feature module
+
+1. Create the feature folder layout from §2.
+2. Define your domain entities in `domain/entities/` as freezed classes.
+3. Build a service interface in `data/services/` if you call an external
+   API. Wrap it in `ServiceResult<T>` and register it in
+   `country_service_registry.dart` if it's country-specific.
+4. Write a Riverpod provider in `providers/` that exposes the state to
+   the UI. Use `@Riverpod(keepAlive: true)` only if the data should
+   survive navigation.
+5. Build screens in `presentation/screens/` using `ConsumerWidget` or
+   `ConsumerStatefulWidget`. Keep `build()` under ~150 lines — extract
+   sections to `presentation/widgets/`.
+6. Add a route in `lib/app/router.dart` and (if it's a top-level tab)
+   wire it into `shell_screen.dart`.
+7. Add ARB strings for every user-facing label.
+8. Write tests (see §Testing) for the provider, the service, and at
+   least one widget test for the screen.
+9. Run `dart run build_runner build --delete-conflicting-outputs` to
+   regenerate `.g.dart` / `.freezed.dart` files.
+10. Run `flutter analyze` (must be zero warnings) and
+    `flutter test` (must pass) before opening a PR.
+
+### 8. Common gotchas
+
+- **`package_info_plus` is pinned to `^8.3.1`.** 9.x breaks plugin
+  registration on Android. Don't bump it without a known Flutter SDK
+  fix.
+- **Generated files are committed.** If `.g.dart` / `.freezed.dart`
+  diverges from your source after editing a model, run the build runner
+  and commit the regenerated files.
+- **`context.mounted` after `await`.** Always check `if (!mounted) return;`
+  before touching `BuildContext` after an async gap. The
+  `use_build_context_synchronously` lint is set to `error`, so the
+  analyzer will catch this — but understand *why* it matters.
+- **Don't bypass `CacheManager`.** Calling `HiveStorage.cacheData()`
+  directly skips TTL handling and request coalescing.
+- **Network-tagged tests.** Tests that hit real APIs are tagged
+  `@Tags(['network'])` and excluded from CI by default. Run them on
+  demand with `flutter test --tags=network`.
+- **Consent → setup → main app.** The router has redirects for both
+  GDPR consent and onboarding completion. New screens reachable from
+  outside the shell must respect these gates or you'll trap the user.
+
+### 9. Where to look when you're stuck
+
+- **A provider isn't rebuilding** — check that your `build` method
+  watches the right provider, and that you're not accidentally calling
+  `read` instead of `watch`.
+- **An API call is duplicated** — `StationServiceChain` coalesces
+  in-flight requests by cache key. Check the key generation in the
+  service.
+- **A test passes locally but fails in CI** — first check whether the
+  test is in `test/network/` or hits a real API. The CI excludes
+  `--exclude-tags=network`. Check `dart_test.yaml` for the tag config.
+- **Build runner errors after pulling master** — delete `.dart_tool/`
+  and re-run `dart run build_runner build --delete-conflicting-outputs`.
+
+If you're still stuck, open an issue with the `needs-triage` label and
+include the file paths you were reading + what you tried.
+
 ## Questions?
 
 Open a GitHub issue with the `needs-triage` label, or check existing issues
