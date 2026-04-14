@@ -13,6 +13,7 @@ import '../widgets/api_key_step.dart';
 import '../widgets/completion_step.dart';
 import '../widgets/country_language_step.dart';
 import '../widgets/landing_screen_step.dart';
+import '../widgets/onboarding_navigation_buttons.dart';
 import '../widgets/onboarding_progress_indicator.dart';
 import '../widgets/preferences_step.dart';
 import '../widgets/welcome_step.dart';
@@ -181,7 +182,6 @@ class _OnboardingWizardScreenState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
     // Watch country to rebuild when it changes (affects step count).
     ref.watch(activeCountryProvider);
     final wizardState = ref.watch(onboardingWizardControllerProvider);
@@ -222,58 +222,14 @@ class _OnboardingWizardScreenState
               ),
             ),
             // Navigation buttons
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                32,
-                16,
-                32,
-                16 + MediaQuery.of(context).viewPadding.bottom,
-              ),
-              child: Row(
-                children: [
-                  // Back button
-                  if (currentStep > 0)
-                    TextButton.icon(
-                      onPressed: isLoading ? null : () => _back(currentStep),
-                      icon: const Icon(Icons.arrow_back),
-                      label: Text(l10n?.onboardingBack ?? 'Back'),
-                    )
-                  else
-                    const SizedBox(width: 80),
-                  const Spacer(),
-                  // Skip button (optional steps)
-                  if (_isCurrentStepSkippable(currentStep))
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: TextButton(
-                        onPressed:
-                            isLoading ? null : () => _skip(currentStep),
-                        child: Text(l10n?.onboardingSkip ?? 'Skip'),
-                      ),
-                    ),
-                  // Next / Finish button
-                  FilledButton.icon(
-                    onPressed: isLoading ? null : () => _next(currentStep),
-                    icon: isLoading
-                        ? const SizedBox(
-                            height: 18,
-                            width: 18,
-                            child:
-                                CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Icon(
-                            _isLastStep(currentStep)
-                                ? Icons.check
-                                : Icons.arrow_forward,
-                          ),
-                    label: Text(
-                      _isLastStep(currentStep)
-                          ? (l10n?.onboardingFinish ?? 'Get started')
-                          : (l10n?.onboardingNext ?? 'Next'),
-                    ),
-                  ),
-                ],
-              ),
+            OnboardingNavigationButtons(
+              currentStep: currentStep,
+              isLoading: isLoading,
+              isLastStep: _isLastStep(currentStep),
+              isSkippable: _isCurrentStepSkippable(currentStep),
+              onBack: () => _back(currentStep),
+              onNext: () => _next(currentStep),
+              onSkip: () => _skip(currentStep),
             ),
           ],
         ),
