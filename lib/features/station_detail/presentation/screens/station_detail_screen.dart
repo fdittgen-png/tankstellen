@@ -11,6 +11,7 @@ import '../../../alerts/domain/entities/price_alert.dart';
 import '../../../alerts/presentation/widgets/create_alert_dialog.dart';
 import '../../../alerts/providers/alert_provider.dart';
 import '../../../favorites/providers/favorites_provider.dart';
+import '../../../search/domain/entities/brand_registry.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../../core/utils/navigation_utils.dart';
@@ -20,6 +21,27 @@ import '../widgets/price_tile.dart';
 import '../widgets/station_info_section.dart';
 import '../widgets/station_rating_section.dart';
 import '../widgets/station_status_row.dart';
+
+/// True when the station has a real, displayable brand — i.e. not
+/// empty and not one of the sentinel strings that parsers use when
+/// they cannot detect a brand (`'Station'` is the legacy sentinel,
+/// `BrandRegistry.independentLabel` is the new one from #482). Used
+/// everywhere the detail screen decides whether to render the brand
+/// text or fall back to the street address as the title.
+bool _hasRealBrand(Station s) {
+  if (s.brand.isEmpty) return false;
+  if (s.brand == 'Station') return false;
+  if (s.brand == BrandRegistry.independentLabel) return false;
+  return true;
+}
+
+/// True when the station's brand is the explicit "independent" sentinel
+/// (or the legacy `'Station'` value). The detail view uses this to
+/// render a localised "Station indépendante" subtitle so users can tell
+/// the difference between a genuine independent and a brand-detection
+/// bug (#482).
+bool _isIndependentSentinel(Station s) =>
+    s.brand == BrandRegistry.independentLabel || s.brand == 'Station';
 
 class StationDetailScreen extends ConsumerWidget {
   final String stationId;
@@ -50,7 +72,9 @@ class StationDetailScreen extends ConsumerWidget {
               final station = detailAsync.value?.data.station;
               if (station != null) {
                 NavigationUtils.openInMaps(station.lat, station.lng,
-                    label: station.brand.isNotEmpty ? station.brand : station.street);
+                    label: _hasRealBrand(station)
+                        ? station.brand
+                        : station.street);
               }
             },
             tooltip: l10n?.navigate ?? 'Navigate',
@@ -119,9 +143,17 @@ class StationDetailScreen extends ConsumerWidget {
           const SizedBox(height: 12),
 
           // Brand logo + Name
+          //
+          // #482: stations returned without a recognised brand previously
+          // rendered just the street address, leaving the user unsure
+          // whether the missing brand was a bug or the station genuinely
+          // had no chain affiliation. Now we also show an explicit
+          // "Station indépendante" subtitle when the parser flagged the
+          // station with the independent sentinel.
           Semantics(
-            label: '${station.brand.isNotEmpty && station.brand != 'Station' ? station.brand : station.street}'
-                '${station.brand.isNotEmpty && station.brand != 'Station' && station.brand != station.street ? ', ${station.street}' : ''}',
+            label:
+                '${_hasRealBrand(station) ? station.brand : station.street}'
+                '${_hasRealBrand(station) && station.brand != station.street ? ', ${station.street}' : ''}',
             header: true,
             excludeSemantics: true,
             child: Row(
@@ -134,17 +166,34 @@ class StationDetailScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        station.brand.isNotEmpty && station.brand != 'Station'
+                        _hasRealBrand(station)
                             ? station.brand
                             : station.street,
                         style: theme.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      if (station.brand.isNotEmpty &&
-                          station.brand != 'Station' &&
+                      if (_hasRealBrand(station) &&
                           station.brand != station.street)
                         Text(station.street, style: theme.textTheme.bodyLarge),
+                      if (_isIndependentSentinel(station))
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          // TODO: localise via an `independentStation`
+                          // ARB key when the next batch of l10n keys
+                          // is added. Inline French fallback here
+                          // matches the primary user locale and the
+                          // inline fallback pattern used elsewhere on
+                          // this screen for strings not yet in the
+                          // ARB files.
+                          child: Text(
+                            'Station indépendante',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -192,9 +241,7 @@ class StationDetailScreen extends ConsumerWidget {
     final detailAsync = ref.read(stationDetailProvider(stationId));
     final station = detailAsync.value?.data.station;
     final stationName = station != null
-        ? (station.brand.isNotEmpty && station.brand != 'Station'
-            ? station.brand
-            : station.street)
+        ? (_hasRealBrand(station) ? station.brand : station.street)
         : stationId;
     final currentPrice = station?.diesel ?? station?.e10 ?? station?.e5;
 

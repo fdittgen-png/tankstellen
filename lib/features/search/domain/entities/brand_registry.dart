@@ -146,6 +146,17 @@ class BrandRegistry {
   /// The "Others" label for independent/unrecognized brands.
   static const othersLabel = 'Others';
 
+  /// Sentinel brand used by country parsers when the upstream API has no
+  /// brand field at all (Prix Carburants, and similar) and the heuristic
+  /// address/services detector cannot find a recognisable brand keyword.
+  ///
+  /// Detail views should render this as a localised "Station indépendante"
+  /// row (French) / "Independent station" (English) so the user can tell
+  /// the difference between a genuinely brandless station and a missing
+  /// data bug (#482). Filter chips still bucket this into [othersLabel]
+  /// via [canonicalize] — the sentinel is purely a display signal.
+  static const independentLabel = 'Independent';
+
   /// All canonical brand names (sorted).
   static List<String> get allBrands {
     final brands = brandAliases.keys.toList()..sort();
