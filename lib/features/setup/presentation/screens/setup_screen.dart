@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/country/country_config.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/language/language_provider.dart';
 import '../../../../core/storage/storage_providers.dart';
@@ -16,6 +15,8 @@ import '../widgets/api_key_input_section.dart';
 import '../widgets/country_info_card.dart';
 import '../widgets/country_selector.dart';
 import '../widgets/language_selector.dart';
+import '../widgets/setup_continue_button.dart';
+import '../widgets/setup_header.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
   const SetupScreen({super.key});
@@ -139,7 +140,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 16),
-              const _SetupHeader(),
+              const SetupHeader(),
               const SizedBox(height: 24),
               LanguageSelector(
                 selected: language,
@@ -164,7 +165,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                 ),
                 const SizedBox(height: 24),
               ],
-              _ContinueButton(
+              SetupContinueButton(
                 isLoading: _isLoading,
                 country: country,
                 apiKeyEmpty: _apiKeyController.text.trim().isEmpty,
@@ -180,85 +181,6 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Setup sections — private widgets kept in-file so they share the screen's
-// l10n/theme assumptions and are easy to find while editing the flow.
-// ---------------------------------------------------------------------------
-
-class _SetupHeader extends StatelessWidget {
-  const _SetupHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
-    return Column(
-      children: [
-        Semantics(
-          excludeSemantics: true,
-          child: Icon(
-            Icons.local_gas_station,
-            size: 72,
-            color: theme.colorScheme.primary,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Semantics(
-          header: true,
-          child: Text(
-            l10n?.welcome ?? 'Fuel Prices',
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          l10n?.welcomeSubtitle ?? 'Find the cheapest fuel near you.',
-          style: theme.textTheme.bodyLarge,
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-}
-
-class _ContinueButton extends StatelessWidget {
-  final bool isLoading;
-  final CountryConfig country;
-  final bool apiKeyEmpty;
-  final VoidCallback onPressed;
-
-  const _ContinueButton({
-    required this.isLoading,
-    required this.country,
-    required this.apiKeyEmpty,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final usingDemo = country.requiresApiKey && apiKeyEmpty;
-    final label = usingDemo ? 'Continue with demo data' : 'Continue';
-    return Semantics(
-      button: true,
-      label: isLoading ? 'Loading' : label,
-      child: FilledButton.icon(
-        onPressed: isLoading ? null : onPressed,
-        icon: const Icon(Icons.arrow_forward),
-        label: isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : Text(label),
       ),
     );
   }
