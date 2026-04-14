@@ -13,9 +13,17 @@ Tankstellen helps drivers find the cheapest fuel nearby, along a route, or in a 
 - **Real-time prices** from official government data sources
 - **11 countries** — Germany, France, Austria, Spain, Italy, Denmark, Portugal, UK, Argentina, Australia, Mexico
 - **23 languages** — from Bulgarian to Swedish
-- **Route search** — find the cheapest station along your planned route
+- **Route search** — find the cheapest station along your planned route, with saved itineraries
+- **EV charging** — OpenChargeMap integration with connector type, max power, and pricing
+- **Driving mode** — full-screen, in-car friendly map with large markers and voice announcements
+- **Vehicle profiles** — combustion, hybrid, or EV; battery, connectors, tank capacity
+- **Fuel consumption tracking** — log fill-ups manually, by **receipt scan** (OCR), or via **OBD-II** (ELM327)
+- **Calculator** — tank fill cost, cross-station savings, fuel budget projections
+- **Carbon dashboard** — CO₂ emissions per vehicle with 30-day rolling chart
 - **Price alerts** — get notified when prices drop below your threshold
 - **Price history & predictions** — 30-day charts and "best time to fill" analysis
+- **Brand registry & filter** — country-specific brand recognition, filter by Total / Esso / Shell / etc.
+- **Landing screen selection** — open the app to nearest, cheapest, favorites, or map
 - **Favorites** — quick access to your regular stations with swipe actions
 - **Home screen widget** — see prices without opening the app
 - **Offline-capable** — local-first architecture with smart caching
