@@ -33,7 +33,22 @@ Tankstellen helps drivers find the cheapest fuel nearby, along a route, or in a 
 
 ## Screenshots
 
-<!-- TODO: Add screenshots -->
+Captured on a Samsung S23 Ultra running the **Play** flavour against the live `Prix Carburants` (France) API.
+
+| Search results | Search criteria | Map view |
+|:--:|:--:|:--:|
+| ![Search results — list of nearby stations with prices, distance, and amenity chips](docs/screenshots/search-results.png) | ![Search criteria modal — toggle nearby vs along-route, fuel type, radius, and amenity filters](docs/screenshots/search-criteria.png) | ![Map view — color-coded price markers around the user's GPS position with cheap/expensive legend](docs/screenshots/map-view.png) |
+| Real-time prices ranked by distance, with brand-specific 24h / amenity badges. | Modal sheet for switching between nearby and along-route searches and tweaking filters. | Interactive map with color-coded price markers and a one-tap "driving mode" launcher. |
+
+| Favorites | Price alerts | Profile edit |
+|:--:|:--:|:--:|
+| ![Favorites tab — saved stations with the swipe-to-navigate / swipe-to-remove tutorial banner](docs/screenshots/favorites.png) | ![Price alerts tab — per-station price thresholds with on/off toggles](docs/screenshots/price-alerts.png) | ![Profile edit screen — preferred fuel, default radius, route segment, ratings privacy](docs/screenshots/profile-edit.png) |
+| Saved stations with multi-fuel pricing and swipe-to-navigate / swipe-to-remove gestures. | Threshold-based price alerts that fire once per 30-min background check. | Per-profile preferred fuel, default radius, route segment, and station rating privacy mode. |
+
+| Settings & privacy |   |   |
+|:--:|:--:|:--:|
+| ![Settings screen — configuration & privacy summary listing the active profile, API keys, TankSync state, and a privacy summary block](docs/screenshots/settings.png) |   |   |
+| Configuration & privacy summary: profile, API keys, TankSync auth mode, and a one-glance privacy statement. |   |   |
 
 ## Getting Started
 
