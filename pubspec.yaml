@@ -48,6 +48,7 @@ dependencies:
   # Utilities
   collection: ^1.19.0
   meta: ^1.17.0
+  xml: ^6.6.1
   path_provider: ^2.1.5
   uuid: ^4.5.1
   connectivity_plus: ^7.1.1
