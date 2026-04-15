@@ -10,6 +10,7 @@ import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/privacy_data_provider.dart';
+import '../widgets/config_verification_widget.dart';
 import '../widgets/privacy_dashboard/local_data_card.dart';
 import '../widgets/privacy_dashboard/privacy_action_buttons.dart';
 import '../widgets/privacy_dashboard/privacy_banner.dart';
@@ -44,6 +45,11 @@ class _PrivacyDashboardScreenState
         padding: const EdgeInsets.all(16),
         children: [
           const PrivacyBanner(),
+          const SizedBox(height: 16),
+          // #519 — Configuration & Privacy summary card (moved from the
+          // Settings screen). All privacy information now lives inside
+          // the Privacy Dashboard; the Settings screen links here.
+          const ConfigVerificationWidget(),
           const SizedBox(height: 16),
           LocalDataCard(snapshot: snapshot),
           const SizedBox(height: 16),

@@ -5,7 +5,6 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../consent/presentation/widgets/consent_settings_section.dart';
 import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
-import '../widgets/config_verification_widget.dart';
 import '../widgets/location_section_widget.dart';
 import '../widgets/profile_list_section.dart';
 import '../widgets/settings_menu_tile.dart';
@@ -103,7 +102,13 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
 
-          // Privacy Dashboard
+          // Privacy Dashboard — #519: the "Configuration & Privacy"
+          // card and the ConfigVerificationWidget used to live here on
+          // the Settings screen, forcing users to scroll past a
+          // second-class privacy summary to reach actual settings.
+          // They now live inside the Privacy Dashboard screen itself,
+          // reachable via this tile — one privacy entry point, no
+          // duplicated content.
           SettingsMenuTile(
             icon: Icons.privacy_tip,
             title: l?.privacyDashboardTitle ?? 'Privacy Dashboard',
@@ -111,15 +116,6 @@ class ProfileScreen extends ConsumerWidget {
                 'View, export, or delete your data',
             onTap: () => context.push('/privacy-dashboard'),
           ),
-          const SizedBox(height: 8),
-
-          // Configuration Verification
-          _SectionHeader(
-            icon: Icons.verified_user,
-            title: l?.configAndPrivacy ?? 'Configuration & Privacy',
-          ),
-          const SizedBox(height: 8),
-          const ConfigVerificationWidget(),
           SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 16),
         ],
       ),

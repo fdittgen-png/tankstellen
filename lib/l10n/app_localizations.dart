@@ -836,6 +836,156 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get reportConsentCancel;
 
+  /// No description provided for @configProfileSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get configProfileSection;
+
+  /// No description provided for @configActiveProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Active profile'**
+  String get configActiveProfile;
+
+  /// No description provided for @configPreferredFuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred fuel'**
+  String get configPreferredFuel;
+
+  /// No description provided for @configCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get configCountry;
+
+  /// No description provided for @configRouteSegment.
+  ///
+  /// In en, this message translates to:
+  /// **'Route segment'**
+  String get configRouteSegment;
+
+  /// No description provided for @configApiKeysSection.
+  ///
+  /// In en, this message translates to:
+  /// **'API keys'**
+  String get configApiKeysSection;
+
+  /// No description provided for @configTankerkoenigKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Tankerkoenig API key'**
+  String get configTankerkoenigKey;
+
+  /// No description provided for @configApiKeyConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Configured'**
+  String get configApiKeyConfigured;
+
+  /// No description provided for @configApiKeyNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set (demo mode)'**
+  String get configApiKeyNotSet;
+
+  /// No description provided for @configEvKey.
+  ///
+  /// In en, this message translates to:
+  /// **'EV charging API key'**
+  String get configEvKey;
+
+  /// No description provided for @configEvKeyCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom key'**
+  String get configEvKeyCustom;
+
+  /// No description provided for @configEvKeyShared.
+  ///
+  /// In en, this message translates to:
+  /// **'Default (shared)'**
+  String get configEvKeyShared;
+
+  /// No description provided for @configCloudSyncSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Sync'**
+  String get configCloudSyncSection;
+
+  /// No description provided for @configTankSyncConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get configTankSyncConnected;
+
+  /// No description provided for @configTankSyncDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get configTankSyncDisabled;
+
+  /// No description provided for @configAuthMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Auth mode'**
+  String get configAuthMode;
+
+  /// No description provided for @configAuthEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email (persistent)'**
+  String get configAuthEmail;
+
+  /// No description provided for @configAuthAnonymous.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous (device-only)'**
+  String get configAuthAnonymous;
+
+  /// No description provided for @configDatabase.
+  ///
+  /// In en, this message translates to:
+  /// **'Database'**
+  String get configDatabase;
+
+  /// No description provided for @configPrivacySummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy summary'**
+  String get configPrivacySummary;
+
+  /// No description provided for @configPrivacySummarySynced.
+  ///
+  /// In en, this message translates to:
+  /// **'• Favorites, alerts, and ignored stations are synced to your private database\n• GPS position and API keys never leave your device\n• {authNote}'**
+  String configPrivacySummarySynced(Object authNote);
+
+  /// No description provided for @configPrivacySummaryLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'• All data is stored locally on this device only\n• No data is sent to any server\n• API keys encrypted in device secure storage'**
+  String get configPrivacySummaryLocal;
+
+  /// No description provided for @configAuthNoteEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email account enables cross-device access'**
+  String get configAuthNoteEmail;
+
+  /// No description provided for @configAuthNoteAnonymous.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous account — data tied to this device'**
+  String get configAuthNoteAnonymous;
+
+  /// No description provided for @configNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get configNone;
+
   /// No description provided for @privacyPolicy.
   ///
   /// In en, this message translates to:

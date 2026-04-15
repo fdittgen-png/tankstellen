@@ -382,6 +382,85 @@ class AppLocalizationsIt extends AppLocalizations {
   String get reportConsentCancel => 'Cancel';
 
   @override
+  String get configProfileSection => 'Profile';
+
+  @override
+  String get configActiveProfile => 'Active profile';
+
+  @override
+  String get configPreferredFuel => 'Preferred fuel';
+
+  @override
+  String get configCountry => 'Country';
+
+  @override
+  String get configRouteSegment => 'Route segment';
+
+  @override
+  String get configApiKeysSection => 'API keys';
+
+  @override
+  String get configTankerkoenigKey => 'Tankerkoenig API key';
+
+  @override
+  String get configApiKeyConfigured => 'Configured';
+
+  @override
+  String get configApiKeyNotSet => 'Not set (demo mode)';
+
+  @override
+  String get configEvKey => 'EV charging API key';
+
+  @override
+  String get configEvKeyCustom => 'Custom key';
+
+  @override
+  String get configEvKeyShared => 'Default (shared)';
+
+  @override
+  String get configCloudSyncSection => 'Cloud Sync';
+
+  @override
+  String get configTankSyncConnected => 'Connected';
+
+  @override
+  String get configTankSyncDisabled => 'Disabled';
+
+  @override
+  String get configAuthMode => 'Auth mode';
+
+  @override
+  String get configAuthEmail => 'Email (persistent)';
+
+  @override
+  String get configAuthAnonymous => 'Anonymous (device-only)';
+
+  @override
+  String get configDatabase => 'Database';
+
+  @override
+  String get configPrivacySummary => 'Privacy summary';
+
+  @override
+  String configPrivacySummarySynced(Object authNote) {
+    return '• Favorites, alerts, and ignored stations are synced to your private database\n• GPS position and API keys never leave your device\n• $authNote';
+  }
+
+  @override
+  String get configPrivacySummaryLocal =>
+      '• All data is stored locally on this device only\n• No data is sent to any server\n• API keys encrypted in device secure storage';
+
+  @override
+  String get configAuthNoteEmail => 'Email account enables cross-device access';
+
+  @override
+  String get configAuthNoteAnonymous =>
+      'Anonymous account — data tied to this device';
+
+  @override
+  String get configNone => 'None';
+
+  @override
   String get privacyPolicy => 'Informativa sulla privacy';
 
   @override

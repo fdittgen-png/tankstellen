@@ -381,6 +381,86 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reportConsentCancel => 'Annuler';
 
   @override
+  String get configProfileSection => 'Profil';
+
+  @override
+  String get configActiveProfile => 'Profil actif';
+
+  @override
+  String get configPreferredFuel => 'Carburant préféré';
+
+  @override
+  String get configCountry => 'Pays';
+
+  @override
+  String get configRouteSegment => 'Segment d\'itinéraire';
+
+  @override
+  String get configApiKeysSection => 'Clés API';
+
+  @override
+  String get configTankerkoenigKey => 'Clé API Tankerkoenig';
+
+  @override
+  String get configApiKeyConfigured => 'Configurée';
+
+  @override
+  String get configApiKeyNotSet => 'Non définie (mode démo)';
+
+  @override
+  String get configEvKey => 'Clé API recharge VE';
+
+  @override
+  String get configEvKeyCustom => 'Clé personnalisée';
+
+  @override
+  String get configEvKeyShared => 'Partagée par défaut';
+
+  @override
+  String get configCloudSyncSection => 'Synchronisation';
+
+  @override
+  String get configTankSyncConnected => 'Connectée';
+
+  @override
+  String get configTankSyncDisabled => 'Désactivée';
+
+  @override
+  String get configAuthMode => 'Mode d\'authentification';
+
+  @override
+  String get configAuthEmail => 'E-mail (persistant)';
+
+  @override
+  String get configAuthAnonymous => 'Anonyme (appareil uniquement)';
+
+  @override
+  String get configDatabase => 'Base de données';
+
+  @override
+  String get configPrivacySummary => 'Résumé de confidentialité';
+
+  @override
+  String configPrivacySummarySynced(Object authNote) {
+    return '• Favoris, alertes et stations ignorées sont synchronisés dans votre base de données privée\n• Position GPS et clés API ne quittent jamais votre appareil\n• $authNote';
+  }
+
+  @override
+  String get configPrivacySummaryLocal =>
+      '• Toutes les données sont stockées localement sur cet appareil uniquement\n• Aucune donnée n\'est envoyée à un serveur\n• Clés API chiffrées dans le stockage sécurisé de l\'appareil';
+
+  @override
+  String get configAuthNoteEmail =>
+      'Le compte e-mail permet l\'accès multi-appareils';
+
+  @override
+  String get configAuthNoteAnonymous =>
+      'Compte anonyme — données liées à cet appareil';
+
+  @override
+  String get configNone => 'Aucun';
+
+  @override
   String get privacyPolicy => 'Politique de confidentialité';
 
   @override
