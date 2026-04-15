@@ -1,396 +1,429 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/services/impl/portugal_station_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
-import 'package:tankstellen/core/utils/geo_utils.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/features/search/data/models/search_params.dart';
 
-/// Tests for [PortugalStationService] and its DGEG JSON parsing logic.
-///
-/// The service instantiates Dio internally via `DioFactory.create()`, so we
-/// can't inject a mock HTTP client directly. Instead, we mirror the parsing
-/// logic in a testable helper (`_TestablePortugalParser`) that reproduces the
-/// exact transformation from DGEG JSON payload -> [Station], and cover the
-/// public surface (interface compliance, unsupported endpoints) on the real
-/// service.
+/// Fake HTTP adapter returning a canned DGEG payload.
+class _FakeDgegAdapter implements HttpClientAdapter {
+  _FakeDgegAdapter({required this.reply, this.statusCode = 200});
+
+  final Object reply;
+  final int statusCode;
+  final List<RequestOptions> calls = [];
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<List<int>>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    calls.add(options);
+    final body = reply is String ? reply as String : jsonEncode(reply);
+    return ResponseBody.fromString(
+      body,
+      statusCode,
+      headers: {
+        Headers.contentTypeHeader: ['application/json; charset=utf-8'],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
+Dio _dioWith(_FakeDgegAdapter adapter) {
+  final dio = Dio();
+  dio.httpClientAdapter = adapter;
+  return dio;
+}
+
+PortugalStationService _serviceWith(_FakeDgegAdapter adapter) {
+  return PortugalStationService(
+    dio: _dioWith(adapter),
+    baseUrl: 'https://fake.dgeg/api/PrecoComb',
+  );
+}
+
+/// Shorthand for a DGEG row.
+Map<String, dynamic> _row({
+  required int id,
+  required String name,
+  required double lat,
+  required double lng,
+  required String fuel,
+  required String preco,
+  String brand = 'GALP',
+  String morada = 'Avenida da Liberdade 100',
+  String codPostal = '1250-146',
+  String localidade = 'Lisboa',
+}) {
+  return {
+    'Id': id,
+    'Nome': name,
+    'Marca': brand,
+    'Morada': morada,
+    'CodPostal': codPostal,
+    'Localidade': localidade,
+    'Municipio': 'Lisboa',
+    'Distrito': 'Lisboa',
+    'Latitude': lat,
+    'Longitude': lng,
+    'Combustivel': fuel,
+    'Preco': preco,
+    'DataAtualizacao': '2026-04-14 08:00',
+    'Quantidade': 6051,
+  };
+}
+
+const _lisboaParams = SearchParams(
+  lat: 38.7223,
+  lng: -9.1393,
+  radiusKm: 10,
+);
+
 void main() {
-  late PortugalStationService service;
-
-  setUp(() {
-    service = PortugalStationService();
-  });
-
   group('PortugalStationService (public surface)', () {
     test('implements StationService interface', () {
-      expect(service, isA<StationService>());
+      expect(PortugalStationService(), isA<StationService>());
     });
 
     test('getStationDetail throws ApiException', () {
       expect(
-        () => service.getStationDetail('pt-123'),
+        () => PortugalStationService().getStationDetail('pt-123'),
         throwsA(isA<Exception>()),
       );
     });
 
     test('getPrices returns empty map with correct source', () async {
-      final result = await service.getPrices(['pt-1', 'pt-2']);
+      final result = await PortugalStationService().getPrices(['pt-1']);
       expect(result.data, isEmpty);
       expect(result.source, ServiceSource.portugalApi);
-      expect(result.isStale, isFalse);
     });
 
-    test('getPrices returns empty map for empty id list', () async {
-      final result = await service.getPrices([]);
-      expect(result.data, isEmpty);
-      expect(result.source, ServiceSource.portugalApi);
+    test('defaultFuelTypeIds covers 95 simples + gasoleo simples', () {
+      expect(PortugalStationService.defaultFuelTypeIds, '3201,2101');
     });
   });
 
-  group('DGEG response parsing', () {
-    late _TestablePortugalParser parser;
-
-    setUp(() {
-      parser = _TestablePortugalParser();
-    });
-
-    test('parses a well-formed DGEG response with all fuel types', () {
-      final data = {
+  group('searchStations (PesquisarPostos — #503 fix)', () {
+    test('hits PesquisarPostos with the default fuel ids', () async {
+      final adapter = _FakeDgegAdapter(reply: {
+        'status': true,
+        'mensagem': 'sucesso',
         'resultado': [
-          {
-            'Id': 12345,
-            'CodPosto': 'P12345',
-            'Nome': 'GALP Lisboa Centro',
-            'Marca': 'GALP',
-            'Morada': 'Avenida da Liberdade 100',
-            'CodPostal': '1250-146',
-            'Localidade': 'Lisboa',
-            'Latitude': '38.7223',
-            'Longitude': '-9.1393',
-            'Combustiveis': [
-              {'DescritivoCombustivel': 'Gasolina 95', 'Preco': '1.789'},
-              {'DescritivoCombustivel': 'Gasolina 98', 'Preco': '1.899'},
-              {'DescritivoCombustivel': 'Gasóleo', 'Preco': '1.659'},
-              {'DescritivoCombustivel': 'GPL Auto', 'Preco': '0.899'},
-            ],
-          },
+          _row(
+            id: 1,
+            name: 'GALP Lisboa',
+            lat: 38.7223,
+            lng: -9.1393,
+            fuel: 'Gasolina simples 95',
+            preco: '1,719 €',
+          ),
         ],
-      };
+      });
+      final service = _serviceWith(adapter);
 
-      final stations = parser.parseResponse(data, lat: 38.7223, lng: -9.1393, radiusKm: 5);
+      await service.searchStations(_lisboaParams);
 
-      expect(stations, hasLength(1));
-      final s = stations.first;
-      expect(s.id, 'pt-12345');
-      expect(s.name, 'GALP Lisboa Centro');
-      expect(s.brand, 'GALP');
-      expect(s.street, 'Avenida da Liberdade 100');
-      expect(s.postCode, '1250-146');
-      expect(s.place, 'Lisboa');
-      expect(s.lat, closeTo(38.7223, 0.0001));
-      expect(s.lng, closeTo(-9.1393, 0.0001));
-      expect(s.e5, 1.789);
-      expect(s.e10, 1.789); // Portugal uses 95 as e10 as well
-      expect(s.e98, 1.899);
-      expect(s.diesel, 1.659);
-      expect(s.lpg, 0.899);
-      expect(s.isOpen, isTrue);
+      expect(adapter.calls, hasLength(1));
+      final call = adapter.calls.single;
+      expect(call.uri.path, endsWith('/PesquisarPostos'));
+      expect(call.uri.queryParameters['idsTiposComb'], '3201,2101');
+      expect(call.uri.queryParameters['pagina'], '1');
     });
 
-    test('skips stations outside the search radius', () {
-      final data = {
+    test('merges fuel prices across multiple rows for the same station',
+        () async {
+      final adapter = _FakeDgegAdapter(reply: {
+        'status': true,
+        'mensagem': 'sucesso',
         'resultado': [
+          _row(
+            id: 42,
+            name: 'GALP Lisboa',
+            lat: 38.7223,
+            lng: -9.1393,
+            fuel: 'Gasolina simples 95',
+            preco: '1,719 €',
+          ),
+          _row(
+            id: 42,
+            name: 'GALP Lisboa',
+            lat: 38.7223,
+            lng: -9.1393,
+            fuel: 'Gasóleo simples',
+            preco: '1,599 €',
+          ),
+        ],
+      });
+      final service = _serviceWith(adapter);
+
+      final result = await service.searchStations(_lisboaParams);
+      expect(result.data, hasLength(1));
+      final s = result.data.first;
+      expect(s.id, 'pt-42');
+      expect(s.e5, closeTo(1.719, 0.0001));
+      expect(s.e10, closeTo(1.719, 0.0001),
+          reason: 'PT 95 simples is mirrored into e10 for the UI');
+      expect(s.diesel, closeTo(1.599, 0.0001));
+    });
+
+    test('parses comma-decimal Portuguese prices (1,719 € -> 1.719)',
+        () async {
+      final adapter = _FakeDgegAdapter(reply: {
+        'resultado': [
+          _row(
+            id: 1,
+            name: 'X',
+            lat: 38.7223,
+            lng: -9.1393,
+            fuel: 'Gasolina simples 95',
+            preco: '1,899 €',
+          ),
+        ],
+      });
+      final result = await _serviceWith(adapter).searchStations(_lisboaParams);
+      expect(result.data.first.e5, closeTo(1.899, 0.0001));
+    });
+
+    test('filters stations outside the search radius', () async {
+      final adapter = _FakeDgegAdapter(reply: {
+        'resultado': [
+          _row(
+            id: 1,
+            name: 'Near',
+            lat: 38.7223,
+            lng: -9.1393,
+            fuel: 'Gasolina simples 95',
+            preco: '1,7 €',
+          ),
+          _row(
+            id: 2,
+            name: 'Porto',
+            lat: 41.1579, // ~280km from Lisbon
+            lng: -8.6291,
+            fuel: 'Gasolina simples 95',
+            preco: '1,8 €',
+          ),
+        ],
+      });
+      final result = await _serviceWith(adapter).searchStations(_lisboaParams);
+      expect(result.data, hasLength(1));
+      expect(result.data.first.name, 'Near');
+    });
+
+    test('returns an empty list (not an error) when the API reply '
+        'contains no stations inside the radius', () async {
+      final adapter = _FakeDgegAdapter(reply: {
+        'resultado': [
+          _row(
+            id: 1,
+            name: 'Far away',
+            lat: 41.1579,
+            lng: -8.6291,
+            fuel: 'Gasolina simples 95',
+            preco: '1,8 €',
+          ),
+        ],
+      });
+      final result = await _serviceWith(adapter).searchStations(_lisboaParams);
+      expect(result.data, isEmpty);
+      expect(result.source, ServiceSource.portugalApi);
+    });
+
+    test('throws ApiException on HTTP error (never silent)', () async {
+      final adapter = _FakeDgegAdapter(
+        reply: '<html>500</html>',
+        statusCode: 500,
+      );
+      expect(
+        () => _serviceWith(adapter).searchStations(_lisboaParams),
+        throwsA(isA<ApiException>()),
+      );
+    });
+
+    test('throws when the response is not a JSON object', () async {
+      final adapter = _FakeDgegAdapter(reply: '[]');
+      expect(
+        () => _serviceWith(adapter).searchStations(_lisboaParams),
+        throwsA(isA<ApiException>()),
+      );
+    });
+
+    test('throws when resultado is missing or not a list', () async {
+      final adapter = _FakeDgegAdapter(reply: {
+        'status': true,
+        'mensagem': 'sucesso',
+        // resultado absent
+      });
+      expect(
+        () => _serviceWith(adapter).searchStations(_lisboaParams),
+        throwsA(isA<ApiException>()),
+      );
+    });
+  });
+
+  group('parseAndFilter (exposed parser)', () {
+    test('skips rows missing Latitude / Longitude', () {
+      final stations = PortugalStationService.parseAndFilter(
+        [
           {
             'Id': 1,
+            'Nome': 'No coords',
+            'Combustivel': 'Gasolina simples 95',
+            'Preco': '1,7 €',
+          },
+          {
+            'Id': 2,
+            'Nome': 'Good',
+            'Latitude': 38.7223,
+            'Longitude': -9.1393,
+            'Combustivel': 'Gasolina simples 95',
+            'Preco': '1,7 €',
+          },
+        ],
+        lat: 38.7223,
+        lng: -9.1393,
+        radiusKm: 5,
+      );
+      expect(stations, hasLength(1));
+      expect(stations.first.name, 'Good');
+    });
+
+    test('sorts by distance ascending', () {
+      final stations = PortugalStationService.parseAndFilter(
+        [
+          {
+            'Id': 1,
+            'Nome': 'Far',
+            'Latitude': 38.7500,
+            'Longitude': -9.1393,
+            'Combustivel': 'Gasolina simples 95',
+            'Preco': '1,7 €',
+          },
+          {
+            'Id': 2,
             'Nome': 'Near',
-            'Marca': 'BP',
-            'Morada': '',
-            'CodPostal': '',
-            'Localidade': '',
-            'Latitude': '38.7223',
-            'Longitude': '-9.1393',
-            'Combustiveis': <dynamic>[],
-          },
-          {
-            'Id': 2,
-            'Nome': 'Far (Porto)',
-            'Marca': 'BP',
-            'Morada': '',
-            'CodPostal': '',
-            'Localidade': '',
-            'Latitude': '41.1579',
-            'Longitude': '-8.6291',
-            'Combustiveis': <dynamic>[],
+            'Latitude': 38.7230,
+            'Longitude': -9.1393,
+            'Combustivel': 'Gasolina simples 95',
+            'Preco': '1,7 €',
           },
         ],
-      };
-
-      final stations = parser.parseResponse(data, lat: 38.7223, lng: -9.1393, radiusKm: 50);
-
-      expect(stations, hasLength(1));
-      expect(stations.first.name, 'Near');
-    });
-
-    test('skips stations with unparseable coordinates', () {
-      final data = {
-        'resultado': [
-          {
-            'Id': 1,
-            'Nome': 'Bad coords',
-            'Marca': 'REPSOL',
-            'Morada': '',
-            'CodPostal': '',
-            'Localidade': '',
-            'Latitude': 'not-a-number',
-            'Longitude': 'nope',
-            'Combustiveis': <dynamic>[],
-          },
-          {
-            'Id': 2,
-            'Nome': 'Good coords',
-            'Marca': 'REPSOL',
-            'Morada': '',
-            'CodPostal': '',
-            'Localidade': '',
-            'Latitude': '38.7223',
-            'Longitude': '-9.1393',
-            'Combustiveis': <dynamic>[],
-          },
-        ],
-      };
-
-      final stations = parser.parseResponse(data, lat: 38.7223, lng: -9.1393, radiusKm: 5);
-
-      expect(stations, hasLength(1));
-      expect(stations.first.name, 'Good coords');
-    });
-
-    test('handles missing Combustiveis array gracefully', () {
-      final data = {
-        'resultado': [
-          {
-            'Id': 99,
-            'Nome': 'No prices',
-            'Marca': 'BP',
-            'Morada': 'Rua X',
-            'CodPostal': '1000-001',
-            'Localidade': 'Lisboa',
-            'Latitude': '38.7223',
-            'Longitude': '-9.1393',
-          },
-        ],
-      };
-
-      final stations = parser.parseResponse(data, lat: 38.7223, lng: -9.1393, radiusKm: 10);
-
-      expect(stations, hasLength(1));
-      final s = stations.first;
-      expect(s.e5, isNull);
-      expect(s.e10, isNull);
-      expect(s.e98, isNull);
-      expect(s.diesel, isNull);
-      expect(s.lpg, isNull);
-    });
-
-    test('falls back through Id -> CodPosto -> index for station id', () {
-      final data = {
-        'resultado': [
-          {
-            // No Id, no CodPosto — should fall back to index (0)
-            'Nome': 'Unnamed',
-            'Marca': '',
-            'Morada': '',
-            'CodPostal': '',
-            'Localidade': '',
-            'Latitude': '38.7223',
-            'Longitude': '-9.1393',
-            'Combustiveis': <dynamic>[],
-          },
-          {
-            'CodPosto': 'POST-42',
-            'Nome': 'With CodPosto',
-            'Marca': '',
-            'Morada': '',
-            'CodPostal': '',
-            'Localidade': '',
-            'Latitude': '38.7223',
-            'Longitude': '-9.1393',
-            'Combustiveis': <dynamic>[],
-          },
-        ],
-      };
-
-      final stations = parser.parseResponse(data, lat: 38.7223, lng: -9.1393, radiusKm: 10);
-
-      expect(stations, hasLength(2));
-      // Stations are sorted by distance; both share coords, so order is insertion
-      final ids = stations.map((s) => s.id).toSet();
-      expect(ids, contains('pt-0'));
-      expect(ids, contains('pt-POST-42'));
-    });
-
-    test('returns empty list for empty resultado', () {
-      final stations = parser.parseResponse(
-        {'resultado': <dynamic>[]},
-        lat: 38.7223,
-        lng: -9.1393,
-        radiusKm: 10,
-      );
-      expect(stations, isEmpty);
-    });
-
-    test('returns empty list when resultado key is missing', () {
-      final stations = parser.parseResponse(
-        <String, dynamic>{},
-        lat: 38.7223,
-        lng: -9.1393,
-        radiusKm: 10,
-      );
-      expect(stations, isEmpty);
-    });
-
-    test('caps result list at 50 stations', () {
-      final resultado = <Map<String, dynamic>>[];
-      for (var i = 0; i < 120; i++) {
-        resultado.add({
-          'Id': i,
-          'Nome': 'Station $i',
-          'Marca': 'BP',
-          'Morada': '',
-          'CodPostal': '',
-          'Localidade': '',
-          // Tiny offset to keep all within radius
-          'Latitude': (38.7223 + i * 0.0001).toString(),
-          'Longitude': '-9.1393',
-          'Combustiveis': <dynamic>[],
-        });
-      }
-
-      final stations = parser.parseResponse(
-        {'resultado': resultado},
         lat: 38.7223,
         lng: -9.1393,
         radiusKm: 50,
       );
-
-      expect(stations.length, lessThanOrEqualTo(50));
-    });
-
-    test('sorts stations by distance ascending', () {
-      final data = {
-        'resultado': [
-          {
-            'Id': 1,
-            'Nome': 'Far',
-            'Marca': '',
-            'Morada': '',
-            'CodPostal': '',
-            'Localidade': '',
-            'Latitude': '38.7500',
-            'Longitude': '-9.1393',
-            'Combustiveis': <dynamic>[],
-          },
-          {
-            'Id': 2,
-            'Nome': 'Near',
-            'Marca': '',
-            'Morada': '',
-            'CodPostal': '',
-            'Localidade': '',
-            'Latitude': '38.7230',
-            'Longitude': '-9.1393',
-            'Combustiveis': <dynamic>[],
-          },
-        ],
-      };
-
-      final stations = parser.parseResponse(data, lat: 38.7223, lng: -9.1393, radiusKm: 50);
-
-      expect(stations, hasLength(2));
       expect(stations.first.name, 'Near');
       expect(stations.last.name, 'Far');
     });
 
-    test('matches Diesel variant spelled "Diesel" as well as "Gasóleo"', () {
-      final data = {
-        'resultado': [
+    test('caps results at 50', () {
+      final rows = List.generate(
+        120,
+        (i) => {
+          'Id': i,
+          'Nome': 'S$i',
+          'Latitude': 38.7223 + i * 0.0001,
+          'Longitude': -9.1393,
+          'Combustivel': 'Gasolina simples 95',
+          'Preco': '1,7 €',
+        },
+      );
+      final stations = PortugalStationService.parseAndFilter(
+        rows,
+        lat: 38.7223,
+        lng: -9.1393,
+        radiusKm: 500,
+      );
+      expect(stations, hasLength(50));
+    });
+
+    test('fuel label dispatch: 98 before 95, gasóleo variants, GPL', () {
+      final stations = PortugalStationService.parseAndFilter(
+        [
           {
             'Id': 1,
-            'Nome': 'Diesel spelling',
-            'Marca': '',
-            'Morada': '',
-            'CodPostal': '',
-            'Localidade': '',
-            'Latitude': '38.7223',
-            'Longitude': '-9.1393',
-            'Combustiveis': [
-              {'DescritivoCombustivel': 'Diesel Premium', 'Preco': '1.712'},
-            ],
+            'Nome': 'All fuels',
+            'Latitude': 38.7223,
+            'Longitude': -9.1393,
+            'Combustivel': 'Gasolina simples 98',
+            'Preco': '1,899 €',
+          },
+          {
+            'Id': 1,
+            'Latitude': 38.7223,
+            'Longitude': -9.1393,
+            'Combustivel': 'Gasolina simples 95',
+            'Preco': '1,799 €',
+          },
+          {
+            'Id': 1,
+            'Latitude': 38.7223,
+            'Longitude': -9.1393,
+            'Combustivel': 'Gasóleo simples',
+            'Preco': '1,599 €',
+          },
+          {
+            'Id': 1,
+            'Latitude': 38.7223,
+            'Longitude': -9.1393,
+            'Combustivel': 'GPL Auto',
+            'Preco': '0,899 €',
           },
         ],
-      };
-
-      final stations = parser.parseResponse(data, lat: 38.7223, lng: -9.1393, radiusKm: 5);
-
-      expect(stations.first.diesel, 1.712);
+        lat: 38.7223,
+        lng: -9.1393,
+        radiusKm: 5,
+      );
+      expect(stations, hasLength(1));
+      final s = stations.first;
+      expect(s.e98, closeTo(1.899, 0.0001));
+      expect(s.e5, closeTo(1.799, 0.0001));
+      expect(s.diesel, closeTo(1.599, 0.0001));
+      expect(s.lpg, closeTo(0.899, 0.0001));
     });
   });
-}
 
-/// Mirror of [PortugalStationService]'s DGEG parsing logic so we can unit
-/// test the JSON -> Station mapping without HTTP.
-class _TestablePortugalParser {
-  List<Station> parseResponse(
-    Map<String, dynamic> data, {
-    required double lat,
-    required double lng,
-    required double radiusKm,
-  }) {
-    final resultado = data['resultado'] as List<dynamic>? ?? [];
-    final stations = <Station>[];
+  group('parsePriceForTest (comma-decimal)', () {
+    test('1,719 € -> 1.719', () {
+      expect(
+        PortugalStationService.parsePriceForTest('1,719 €'),
+        closeTo(1.719, 0.0001),
+      );
+    });
 
-    for (final item in resultado) {
-      try {
-        final itemLat = double.tryParse(item['Latitude']?.toString() ?? '');
-        final itemLng = double.tryParse(item['Longitude']?.toString() ?? '');
-        if (itemLat == null || itemLng == null) continue;
+    test('1.719 (already dot) -> 1.719', () {
+      expect(
+        PortugalStationService.parsePriceForTest('1.719'),
+        closeTo(1.719, 0.0001),
+      );
+    });
 
-        final dist = distanceKm(lat, lng, itemLat, itemLng);
-        if (dist > radiusKm) continue;
+    test('empty / whitespace / null -> null', () {
+      expect(PortugalStationService.parsePriceForTest(null), isNull);
+      expect(PortugalStationService.parsePriceForTest(''), isNull);
+      expect(PortugalStationService.parsePriceForTest('   '), isNull);
+    });
 
-        final combustiveis = item['Combustiveis'] as List<dynamic>? ?? [];
-        double? gasolina95, gasolina98, gasoleo, gpl;
-        for (final c in combustiveis) {
-          final tipo = c['DescritivoCombustivel']?.toString() ?? '';
-          final preco = double.tryParse(c['Preco']?.toString() ?? '');
-          if (tipo.contains('95')) gasolina95 = preco;
-          if (tipo.contains('98')) gasolina98 = preco;
-          if (tipo.contains('asóleo') || tipo.contains('Diesel')) gasoleo = preco;
-          if (tipo.contains('GPL')) gpl = preco;
-        }
+    test('non-numeric -> null', () {
+      expect(
+        PortugalStationService.parsePriceForTest('n.d.'),
+        isNull,
+      );
+    });
 
-        stations.add(Station(
-          id: 'pt-${item['Id'] ?? item['CodPosto'] ?? stations.length}',
-          name: item['Nome']?.toString() ?? '',
-          brand: item['Marca']?.toString() ?? '',
-          street: item['Morada']?.toString() ?? '',
-          postCode: item['CodPostal']?.toString() ?? '',
-          place: item['Localidade']?.toString() ?? '',
-          lat: itemLat,
-          lng: itemLng,
-          dist: dist,
-          e5: gasolina95,
-          e10: gasolina95,
-          e98: gasolina98,
-          diesel: gasoleo,
-          lpg: gpl,
-          isOpen: true,
-        ));
-      } catch (_) {
-        continue;
-      }
-    }
-
-    stations.sort((a, b) => a.dist.compareTo(b.dist));
-    return stations.take(50).toList();
-  }
+    test('strips embedded whitespace and euro symbol', () {
+      expect(
+        PortugalStationService.parsePriceForTest(' 1 , 5 9 9 € '),
+        closeTo(1.599, 0.0001),
+      );
+    });
+  });
 }
