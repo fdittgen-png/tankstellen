@@ -229,5 +229,5 @@ StationService _createDenmark(Ref ref) => DenmarkStationService();
 StationService _createArgentina(Ref ref) => ArgentinaStationService();
 StationService _createPortugal(Ref ref) => PortugalStationService();
 StationService _createUk(Ref ref) => UkStationService();
-StationService _createAustralia(Ref ref) => AustraliaStationService();
+StationService _createAustralia(Ref ref) => const AustraliaStationService();
 StationService _createMexico(Ref ref) => MexicoStationService();
