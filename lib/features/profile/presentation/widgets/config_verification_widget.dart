@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../providers/profile_provider.dart';
 
 /// Configuration verification card.
@@ -15,6 +16,7 @@ class ConfigVerificationWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
     final apiKeys = ref.read(apiKeyStorageProvider);
     final syncConfig = ref.watch(syncStateProvider);
     final profile = ref.watch(activeProfileProvider);
@@ -27,48 +29,84 @@ class ConfigVerificationWidget extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _sectionTitle(theme, 'Profile'),
+            _sectionTitle(theme, l?.configProfileSection ?? 'Profile'),
             const SizedBox(height: 8),
-            _ConfigRow(icon: Icons.person, label: 'Active profile',
-                value: profile?.name ?? 'None',
-                status: profile != null ? _Status.ok : _Status.warning),
-            _ConfigRow(icon: Icons.local_gas_station, label: 'Preferred fuel',
-                value: profile?.preferredFuelType.displayName ?? '\u2014',
-                status: _Status.ok),
-            _ConfigRow(icon: Icons.language, label: 'Country',
-                value: profile?.countryCode?.toUpperCase() ?? 'Auto',
-                status: _Status.ok),
-            _ConfigRow(icon: Icons.route, label: 'Route segment',
-                value: '${profile?.routeSegmentKm.round() ?? 50} km',
-                status: _Status.ok),
+            _ConfigRow(
+              icon: Icons.person,
+              label: l?.configActiveProfile ?? 'Active profile',
+              value: profile?.name ?? (l?.configNone ?? 'None'),
+              status: profile != null ? _Status.ok : _Status.warning,
+            ),
+            _ConfigRow(
+              icon: Icons.local_gas_station,
+              label: l?.configPreferredFuel ?? 'Preferred fuel',
+              value: profile?.preferredFuelType.displayName ?? '\u2014',
+              status: _Status.ok,
+            ),
+            _ConfigRow(
+              icon: Icons.language,
+              label: l?.configCountry ?? 'Country',
+              value: profile?.countryCode?.toUpperCase() ?? 'Auto',
+              status: _Status.ok,
+            ),
+            _ConfigRow(
+              icon: Icons.route,
+              label: l?.configRouteSegment ?? 'Route segment',
+              value: '${profile?.routeSegmentKm.round() ?? 50} km',
+              status: _Status.ok,
+            ),
 
             const Divider(height: 24),
-            _sectionTitle(theme, 'API Keys'),
+            _sectionTitle(theme, l?.configApiKeysSection ?? 'API keys'),
             const SizedBox(height: 8),
-            _ConfigRow(icon: Icons.key, label: 'Tankerkoenig API key',
-                value: hasApiKey ? 'Configured' : 'Not set (demo mode)',
-                status: hasApiKey ? _Status.ok : _Status.warning),
-            _ConfigRow(icon: Icons.ev_station, label: 'EV charging API key',
-                value: apiKeys.hasCustomEvApiKey() ? 'Custom key' : 'Default (shared)',
-                status: _Status.ok),
+            _ConfigRow(
+              icon: Icons.key,
+              label: l?.configTankerkoenigKey ?? 'Tankerkoenig API key',
+              value: hasApiKey
+                  ? (l?.configApiKeyConfigured ?? 'Configured')
+                  : (l?.configApiKeyNotSet ?? 'Not set (demo mode)'),
+              status: hasApiKey ? _Status.ok : _Status.warning,
+            ),
+            _ConfigRow(
+              icon: Icons.ev_station,
+              label: l?.configEvKey ?? 'EV charging API key',
+              value: apiKeys.hasCustomEvApiKey()
+                  ? (l?.configEvKeyCustom ?? 'Custom key')
+                  : (l?.configEvKeyShared ?? 'Default (shared)'),
+              status: _Status.ok,
+            ),
 
             const Divider(height: 24),
-            _sectionTitle(theme, 'Cloud Sync'),
+            _sectionTitle(theme, l?.configCloudSyncSection ?? 'Cloud Sync'),
             const SizedBox(height: 8),
-            _ConfigRow(icon: Icons.cloud, label: 'TankSync',
-                value: syncConfig.isConfigured ? 'Connected' : 'Disabled',
-                status: syncConfig.isConfigured ? _Status.ok : _Status.neutral),
+            _ConfigRow(
+              icon: Icons.cloud,
+              label: 'TankSync',
+              value: syncConfig.isConfigured
+                  ? (l?.configTankSyncConnected ?? 'Connected')
+                  : (l?.configTankSyncDisabled ?? 'Disabled'),
+              status:
+                  syncConfig.isConfigured ? _Status.ok : _Status.neutral,
+            ),
             if (syncConfig.isConfigured) ...[
-              _ConfigRow(icon: Icons.security, label: 'Auth mode',
-                  value: isEmail ? 'Email (persistent)' : 'Anonymous (device-only)',
-                  status: isEmail ? _Status.ok : _Status.warning),
-              _ConfigRow(icon: Icons.dns, label: 'Database',
-                  value: syncConfig.supabaseUrl ?? '\u2014',
-                  status: _Status.ok),
+              _ConfigRow(
+                icon: Icons.security,
+                label: l?.configAuthMode ?? 'Auth mode',
+                value: isEmail
+                    ? (l?.configAuthEmail ?? 'Email (persistent)')
+                    : (l?.configAuthAnonymous ?? 'Anonymous (device-only)'),
+                status: isEmail ? _Status.ok : _Status.warning,
+              ),
+              _ConfigRow(
+                icon: Icons.dns,
+                label: l?.configDatabase ?? 'Database',
+                value: syncConfig.supabaseUrl ?? '\u2014',
+                status: _Status.ok,
+              ),
             ],
 
             const Divider(height: 24),
-            _buildPrivacySummary(theme, syncConfig, isEmail),
+            _buildPrivacySummary(context, theme, syncConfig, isEmail),
           ],
         ),
       ),
@@ -82,10 +120,28 @@ class ConfigVerificationWidget extends ConsumerWidget {
   }
 
   Widget _buildPrivacySummary(
+    BuildContext context,
     ThemeData theme,
     dynamic syncConfig,
     bool isEmail,
   ) {
+    final l = AppLocalizations.of(context);
+    final authNote = isEmail
+        ? (l?.configAuthNoteEmail ??
+            'Email account enables cross-device access')
+        : (l?.configAuthNoteAnonymous ??
+            'Anonymous account — data tied to this device');
+    final summaryBody = syncConfig.isConfigured
+        ? (l?.configPrivacySummarySynced(authNote) ??
+            '• Favorites, alerts, and ignored stations are synced to your '
+                'private database\n'
+                '• GPS position and API keys never leave your device\n'
+                '• $authNote')
+        : (l?.configPrivacySummaryLocal ??
+            '• All data is stored locally on this device only\n'
+                '• No data is sent to any server\n'
+                '• API keys encrypted in device secure storage');
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -99,22 +155,18 @@ class ConfigVerificationWidget extends ConsumerWidget {
             children: [
               Icon(Icons.shield, size: 16, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
-              Text('Privacy summary',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
-                  )),
+              Text(
+                l?.configPrivacySummary ?? 'Privacy summary',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            syncConfig.isConfigured
-                ? '\u2022 Favorites, alerts, and ignored stations are synced to your private database\n'
-                  '\u2022 GPS position and API keys never leave your device\n'
-                  '\u2022 ${isEmail ? 'Email account enables cross-device access' : 'Anonymous account \u2014 data tied to this device'}'
-                : '\u2022 All data is stored locally on this device only\n'
-                  '\u2022 No data is sent to any server\n'
-                  '\u2022 API keys encrypted in device secure storage',
+            summaryBody,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

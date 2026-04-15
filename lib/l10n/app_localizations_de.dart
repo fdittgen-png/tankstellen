@@ -381,6 +381,86 @@ class AppLocalizationsDe extends AppLocalizations {
   String get reportConsentCancel => 'Abbrechen';
 
   @override
+  String get configProfileSection => 'Profil';
+
+  @override
+  String get configActiveProfile => 'Aktives Profil';
+
+  @override
+  String get configPreferredFuel => 'Bevorzugter Kraftstoff';
+
+  @override
+  String get configCountry => 'Land';
+
+  @override
+  String get configRouteSegment => 'Streckenabschnitt';
+
+  @override
+  String get configApiKeysSection => 'API-Schlüssel';
+
+  @override
+  String get configTankerkoenigKey => 'Tankerkönig API-Schlüssel';
+
+  @override
+  String get configApiKeyConfigured => 'Konfiguriert';
+
+  @override
+  String get configApiKeyNotSet => 'Nicht gesetzt (Demo-Modus)';
+
+  @override
+  String get configEvKey => 'Ladesäulen API-Schlüssel';
+
+  @override
+  String get configEvKeyCustom => 'Eigener Schlüssel';
+
+  @override
+  String get configEvKeyShared => 'Standard (geteilt)';
+
+  @override
+  String get configCloudSyncSection => 'Cloud-Sync';
+
+  @override
+  String get configTankSyncConnected => 'Verbunden';
+
+  @override
+  String get configTankSyncDisabled => 'Deaktiviert';
+
+  @override
+  String get configAuthMode => 'Anmeldeverfahren';
+
+  @override
+  String get configAuthEmail => 'E-Mail (dauerhaft)';
+
+  @override
+  String get configAuthAnonymous => 'Anonym (nur dieses Gerät)';
+
+  @override
+  String get configDatabase => 'Datenbank';
+
+  @override
+  String get configPrivacySummary => 'Datenschutz-Zusammenfassung';
+
+  @override
+  String configPrivacySummarySynced(Object authNote) {
+    return '• Favoriten, Preisalarme und ignorierte Tankstellen werden in Ihre private Datenbank synchronisiert\n• GPS-Position und API-Schlüssel verlassen Ihr Gerät nie\n• $authNote';
+  }
+
+  @override
+  String get configPrivacySummaryLocal =>
+      '• Alle Daten werden nur lokal auf diesem Gerät gespeichert\n• Es werden keine Daten an einen Server gesendet\n• API-Schlüssel sind im sicheren Gerätespeicher verschlüsselt';
+
+  @override
+  String get configAuthNoteEmail =>
+      'E-Mail-Konto ermöglicht gerätübergreifenden Zugriff';
+
+  @override
+  String get configAuthNoteAnonymous =>
+      'Anonymes Konto — Daten an dieses Gerät gebunden';
+
+  @override
+  String get configNone => 'Keine';
+
+  @override
   String get privacyPolicy => 'Datenschutzerklärung';
 
   @override

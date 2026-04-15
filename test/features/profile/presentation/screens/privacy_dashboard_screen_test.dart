@@ -22,6 +22,18 @@ class _StubTraceStorage extends TraceStorage {
   String exportAsJson() => '{"traceCount":0,"traces":[]}';
 }
 
+/// #519 — the Privacy Dashboard body grew with the
+/// ConfigVerificationWidget card moved in from the Settings screen.
+/// The default 800x600 test surface no longer fits LocalDataCard
+/// below it, and find.text skips off-stage widgets by default. Tests
+/// in this file widen the surface so everything lays out at once.
+const _privacyDashboardTestSize = Size(1200, 2400);
+
+Future<void> _setTallSurface(WidgetTester tester) async {
+  await tester.binding.setSurfaceSize(_privacyDashboardTestSize);
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+}
+
 void main() {
   group('PrivacyDashboardScreen', () {
     late MockStorageRepository mockStorage;
@@ -38,7 +50,9 @@ void main() {
       when(() => mockStorage.cacheEntryCount).thenReturn(15);
       when(() => mockStorage.getItineraries()).thenReturn([{'id': 'r1'}]);
       when(() => mockStorage.hasApiKey()).thenReturn(true);
+      when(() => mockStorage.getApiKey()).thenReturn('key');
       when(() => mockStorage.hasEvApiKey()).thenReturn(false);
+      when(() => mockStorage.hasCustomEvApiKey()).thenReturn(false);
       when(() => mockStorage.storageStats).thenReturn((
         settings: 512,
         profiles: 1024,
@@ -57,6 +71,7 @@ void main() {
         ];
 
     testWidgets('shows local data counts', (tester) async {
+      await _setTallSurface(tester);
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
@@ -70,6 +85,7 @@ void main() {
     });
 
     testWidgets('shows API key status', (tester) async {
+      await _setTallSurface(tester);
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
@@ -83,6 +99,7 @@ void main() {
     });
 
     testWidgets('shows sync disabled message when sync is off', (tester) async {
+      await _setTallSurface(tester);
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
@@ -96,6 +113,7 @@ void main() {
     });
 
     testWidgets('shows sync info when sync is enabled', (tester) async {
+      await _setTallSurface(tester);
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
@@ -114,6 +132,7 @@ void main() {
     testWidgets(
         'shows the "Copy error log to clipboard" button labelled with the '
         'current trace count (#476)', (tester) async {
+      await _setTallSurface(tester);
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
@@ -140,6 +159,7 @@ void main() {
     });
 
     testWidgets('shows export button', (tester) async {
+      await _setTallSurface(tester);
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
@@ -154,6 +174,7 @@ void main() {
     });
 
     testWidgets('shows delete button', (tester) async {
+      await _setTallSurface(tester);
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
@@ -168,6 +189,7 @@ void main() {
     });
 
     testWidgets('delete button shows confirmation dialog', (tester) async {
+      await _setTallSurface(tester);
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
@@ -189,6 +211,7 @@ void main() {
     });
 
     testWidgets('cancel in delete dialog does not delete', (tester) async {
+      await _setTallSurface(tester);
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
@@ -210,6 +233,7 @@ void main() {
     });
 
     testWidgets('shows privacy banner', (tester) async {
+      await _setTallSurface(tester);
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
@@ -223,6 +247,7 @@ void main() {
     });
 
     testWidgets('shows estimated storage size', (tester) async {
+      await _setTallSurface(tester);
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),

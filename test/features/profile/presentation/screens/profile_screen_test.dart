@@ -90,19 +90,15 @@ void main() {
         overrides: overrides,
       );
 
-      // Scroll to the bottom to ensure all widgets are rendered
-      final scrollable = find.byType(Scrollable).first;
-      await tester.scrollUntilVisible(
-        find.text('Configuration & Privacy'),
-        200,
-        scrollable: scrollable,
-      );
-
-      // Data & Privacy section was removed — data counts belong in Privacy Dashboard
+      // #519 — Data & Privacy was removed from the Settings screen
+      // entirely; the ConfigVerificationWidget and its "Configuration
+      // & Privacy" header moved into the Privacy Dashboard. The
+      // Settings screen must contain neither.
       expect(find.text('Data & Privacy'), findsNothing);
+      expect(find.text('Configuration & Privacy'), findsNothing);
     });
 
-    testWidgets('does not show Favorites/Alerts/Ignored count tiles',
+    testWidgets('does not render the ConfigVerificationWidget (#519)',
         (tester) async {
       await pumpApp(
         tester,
@@ -110,14 +106,16 @@ void main() {
         overrides: overrides,
       );
 
-      final scrollable = find.byType(Scrollable).first;
-      await tester.scrollUntilVisible(
-        find.text('Configuration & Privacy'),
-        200,
-        scrollable: scrollable,
-      );
-
-      // These data count rows were removed from the config verification widget
+      // The whole ConfigVerificationWidget now lives inside the
+      // Privacy Dashboard. No hardcoded profile/API key/cloud sync
+      // labels should appear on the Settings screen any more.
+      expect(find.text('Active profile'), findsNothing);
+      expect(find.text('Preferred fuel'), findsNothing);
+      expect(find.text('API keys'), findsNothing);
+      expect(find.text('Cloud Sync'), findsNothing);
+      expect(find.text('Privacy summary'), findsNothing);
+      expect(find.text('Profil actif'), findsNothing);
+      expect(find.text('Résumé de confidentialité'), findsNothing);
       expect(find.text('0 stations'), findsNothing);
       expect(find.text('0 configured'), findsNothing);
       expect(find.text('0 hidden'), findsNothing);
