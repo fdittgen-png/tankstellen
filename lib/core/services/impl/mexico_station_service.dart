@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:xml/xml.dart';
 
 import '../../../features/search/data/models/search_params.dart';
 import '../../../features/search/domain/entities/station.dart';
@@ -8,26 +10,46 @@ import '../dio_factory.dart';
 import '../service_result.dart';
 import '../station_service.dart';
 import '../mixins/station_service_helpers.dart';
-import '../mixins/cached_dataset_mixin.dart';
 
 /// CRE (Comisión Reguladora de Energía) Mexican fuel price service.
 ///
-/// Uses Mexico's open data portal (datos.gob.mx) for fuel station prices.
-/// Free, no API key required. Data updated ~6 times daily.
+/// The previous implementation queried `api.datos.gob.mx/v2/...`
+/// which has been retired — requests simply time out in the TLS
+/// handshake (see #505). Switched to the CRE public publication
+/// hosted on Azure, which is the canonical upstream for the official
+/// Mexican fuel price dataset:
 ///
-/// API: https://datos.gob.mx/busca/dataset/ubicacion-de-gasolineras-y-precios-comerciales-de-gasolina-y-diesel
-class MexicoStationService with StationServiceHelpers, CachedDatasetMixin implements StationService {
-  final Dio _dio = DioFactory.create(
-    connectTimeout: const Duration(seconds: 15),
-    receiveTimeout: const Duration(seconds: 60), // Large dataset
-  );
+/// - `https://publicacionexterna.azurewebsites.net/publicaciones/places`
+///   returns one `<place>` per station with `<name>`, `<cre_id>`, and
+///   `<location><x/><y/></location>` (x = longitude, y = latitude).
+/// - `https://publicacionexterna.azurewebsites.net/publicaciones/prices`
+///   returns one `<place>` per station with one or more
+///   `<gas_price type="regular|premium|diesel">` children. Prices
+///   are Mexican pesos per litre.
+///
+/// Both feeds are joined client-side by `place_id` to produce
+/// fully-populated [Station] records. The merged list is cached for
+/// 4 hours — the CRE dataset updates several times daily but rarely
+/// faster than that.
+class MexicoStationService
+    with StationServiceHelpers
+    implements StationService {
+  final Dio _dio;
+  final String _baseUrl;
 
-  /// datos.gob.mx public fuel prices endpoint — no API key required.
-  /// Returns station names, municipalities, states, and prices for
-  /// Regular, Premium, and Diesel. Updated 6 times daily by CRE.
-  static const _pricesUrl = 'https://api.datos.gob.mx/v2/precio.gasolina.publico';
+  MexicoStationService({
+    Dio? dio,
+    String baseUrl = 'https://publicacionexterna.azurewebsites.net/publicaciones',
+  })  : _dio = dio ??
+            DioFactory.create(
+              connectTimeout: const Duration(seconds: 15),
+              receiveTimeout: const Duration(seconds: 45),
+            ),
+        _baseUrl = baseUrl;
 
-  List<Map<String, dynamic>>? _cachedResults;
+  static const Duration _cacheTtl = Duration(hours: 4);
+
+  List<_CreStation>? _cachedStations;
   DateTime? _lastFetch;
 
   @override
@@ -37,46 +59,25 @@ class MexicoStationService with StationServiceHelpers, CachedDatasetMixin implem
   }) async {
     try {
       await _ensureDataLoaded(cancelToken);
+      final cached = _cachedStations ?? const <_CreStation>[];
 
       final stations = <Station>[];
-
-      for (final item in _cachedResults ?? []) {
-        // datos.gob.mx doesn't always include lat/lng — use Nominatim geocoding
-        // as fallback when coordinates aren't available.
-        // For now, filter by state/municipality matching if no coordinates.
-        final regular = (item['precioRegular'] as num?)?.toDouble();
-        final premium = (item['precioPremium'] as num?)?.toDouble();
-        final diesel = (item['precioDiesel'] as num?)?.toDouble();
-
-        // Try to get coordinates (may not be in this dataset)
-        final lat = (item['latitud'] as num?)?.toDouble();
-        final lng = (item['longitud'] as num?)?.toDouble();
-
-        // If no coordinates, skip distance-based filtering
-        double dist = 0;
-        if (lat != null && lng != null) {
-          dist = distanceKm(params.lat, params.lng, lat, lng);
-          if (dist > params.radiusKm) continue;
-        } else {
-          // Without coordinates, include all results (user filters by municipality)
-          continue; // Skip stations without coordinates
-        }
-
-        final permiso = item['permiso']?.toString() ?? '${stations.length}';
-
+      for (final c in cached) {
+        final dist = distanceKm(params.lat, params.lng, c.lat, c.lng);
+        if (dist > params.radiusKm) continue;
         stations.add(Station(
-          id: 'mx-$permiso',
-          name: item['nombre']?.toString() ?? '',
-          brand: item['nombre']?.toString().split(' ').first ?? '',
+          id: 'mx-${c.id}',
+          name: c.name,
+          brand: c.name.split(' ').first,
           street: '',
           postCode: '',
-          place: '${item['municipio'] ?? ''}, ${item['estado'] ?? ''}',
-          lat: lat,
-          lng: lng,
+          place: '',
+          lat: c.lat,
+          lng: c.lng,
           dist: dist,
-          e5: regular,
-          e10: premium,
-          diesel: diesel,
+          e5: c.regular,
+          e10: c.premium,
+          diesel: c.diesel,
           isOpen: true,
         ));
       }
@@ -94,50 +95,201 @@ class MexicoStationService with StationServiceHelpers, CachedDatasetMixin implem
   }
 
   Future<void> _ensureDataLoaded(CancelToken? cancelToken) async {
-    // Cache for 4 hours (data updates 6x daily)
-    if (_cachedResults != null &&
+    if (_cachedStations != null &&
         _lastFetch != null &&
-        DateTime.now().difference(_lastFetch!).inHours < 4) {
+        DateTime.now().difference(_lastFetch!) < _cacheTtl) {
       return;
     }
 
-    // Fetch from datos.gob.mx — paginated, up to 1000 per page
-    final allResults = <Map<String, dynamic>>[];
-    int page = 1;
-    bool hasMore = true;
-
-    while (hasMore && page <= 20) { // Safety cap at 20 pages
-      final response = await _dio.get(
-        _pricesUrl,
-        queryParameters: {'page': page, 'pageSize': 1000},
+    final responses = await Future.wait([
+      _dio.get<String>(
+        '$_baseUrl/places',
+        options: Options(responseType: ResponseType.plain),
         cancelToken: cancelToken,
-      );
+      ),
+      _dio.get<String>(
+        '$_baseUrl/prices',
+        options: Options(responseType: ResponseType.plain),
+        cancelToken: cancelToken,
+      ),
+    ]);
 
-      final data = response.data;
-      if (data is Map<String, dynamic>) {
-        final results = data['results'] as List<dynamic>? ?? [];
-        if (results.isEmpty) {
-          hasMore = false;
-        } else {
-          allResults.addAll(results.cast<Map<String, dynamic>>());
-          page++;
-        }
-      } else {
-        hasMore = false;
-      }
+    final placesXml = responses[0].data;
+    final pricesXml = responses[1].data;
+    if (placesXml == null || placesXml.isEmpty) {
+      throw const ApiException(
+        message: 'CRE /places feed returned an empty body',
+      );
+    }
+    if (pricesXml == null || pricesXml.isEmpty) {
+      throw const ApiException(
+        message: 'CRE /prices feed returned an empty body',
+      );
     }
 
-    _cachedResults = allResults;
+    _cachedStations = _mergeFeeds(placesXml: placesXml, pricesXml: pricesXml);
     _lastFetch = DateTime.now();
+
+    if (_cachedStations!.isEmpty) {
+      throw const ApiException(
+        message: 'CRE feeds parsed to zero stations (schema change?)',
+      );
+    }
+  }
+
+  /// Parses the `/places` and `/prices` XML feeds and joins them by
+  /// `place_id`. The merged list drives [searchStations] via the
+  /// in-memory cache.
+  static List<_CreStation> _mergeFeeds({
+    required String placesXml,
+    required String pricesXml,
+  }) {
+    final places = _parsePlaces(placesXml);
+    final prices = _parsePrices(pricesXml);
+
+    final merged = <_CreStation>[];
+    for (final entry in places.entries) {
+      final meta = entry.value;
+      final p = prices[entry.key] ?? const _CrePrices();
+      merged.add(_CreStation(
+        id: entry.key,
+        name: meta.name,
+        lat: meta.lat,
+        lng: meta.lng,
+        regular: p.regular,
+        premium: p.premium,
+        diesel: p.diesel,
+      ));
+    }
+    return merged;
+  }
+
+  static Map<String, _CrePlace> _parsePlaces(String xmlString) {
+    final doc = XmlDocument.parse(xmlString);
+    final out = <String, _CrePlace>{};
+    for (final node in doc.findAllElements('place')) {
+      try {
+        final id = node.getAttribute('place_id');
+        if (id == null) continue;
+        final name =
+            node.findElements('name').firstOrNull?.innerText.trim() ?? '';
+        final location = node.findElements('location').firstOrNull;
+        if (location == null) continue;
+        final x = double.tryParse(
+          location.findElements('x').firstOrNull?.innerText.trim() ?? '',
+        );
+        final y = double.tryParse(
+          location.findElements('y').firstOrNull?.innerText.trim() ?? '',
+        );
+        if (x == null || y == null) continue;
+        out[id] = _CrePlace(name: name, lat: y, lng: x);
+      } catch (e) {
+        debugPrint('CRE place parse failed: $e');
+        continue;
+      }
+    }
+    return out;
+  }
+
+  static Map<String, _CrePrices> _parsePrices(String xmlString) {
+    final doc = XmlDocument.parse(xmlString);
+    final out = <String, _CrePrices>{};
+    for (final node in doc.findAllElements('place')) {
+      try {
+        final id = node.getAttribute('place_id');
+        if (id == null) continue;
+        double? regular, premium, diesel;
+        for (final gp in node.findElements('gas_price')) {
+          final type = gp.getAttribute('type');
+          final value = double.tryParse(gp.innerText.trim());
+          if (value == null) continue;
+          switch (type) {
+            case 'regular':
+              regular = value;
+              break;
+            case 'premium':
+              premium = value;
+              break;
+            case 'diesel':
+              diesel = value;
+              break;
+          }
+        }
+        out[id] = _CrePrices(
+          regular: regular,
+          premium: premium,
+          diesel: diesel,
+        );
+      } catch (e) {
+        debugPrint('CRE price parse failed: $e');
+        continue;
+      }
+    }
+    return out;
+  }
+
+  /// Clears the merged-station cache so the next search re-fetches
+  /// both feeds. Intended for tests.
+  @visibleForTesting
+  void clearCacheForTest() {
+    _cachedStations = null;
+    _lastFetch = null;
   }
 
   @override
-  Future<ServiceResult<StationDetail>> getStationDetail(String stationId) async {
-    throw const ApiException(message: 'Station detail not supported for Mexico');
+  Future<ServiceResult<StationDetail>> getStationDetail(
+    String stationId,
+  ) async {
+    throw const ApiException(
+      message: 'Station detail not supported for Mexico',
+    );
   }
 
   @override
-  Future<ServiceResult<Map<String, StationPrices>>> getPrices(List<String> ids) async {
-    return ServiceResult(data: {}, source: ServiceSource.mexicoApi, fetchedAt: DateTime.now());
+  Future<ServiceResult<Map<String, StationPrices>>> getPrices(
+    List<String> ids,
+  ) async {
+    return ServiceResult(
+      data: const {},
+      source: ServiceSource.mexicoApi,
+      fetchedAt: DateTime.now(),
+    );
   }
+}
+
+/// Merged place+price record used for in-memory caching. The public
+/// [Station] is built from this when [MexicoStationService.searchStations]
+/// runs, so the cached shape is whatever is cheapest to build.
+class _CreStation {
+  final String id;
+  final String name;
+  final double lat;
+  final double lng;
+  final double? regular;
+  final double? premium;
+  final double? diesel;
+
+  const _CreStation({
+    required this.id,
+    required this.name,
+    required this.lat,
+    required this.lng,
+    required this.regular,
+    required this.premium,
+    required this.diesel,
+  });
+}
+
+class _CrePlace {
+  final String name;
+  final double lat;
+  final double lng;
+  const _CrePlace({required this.name, required this.lat, required this.lng});
+}
+
+class _CrePrices {
+  final double? regular;
+  final double? premium;
+  final double? diesel;
+  const _CrePrices({this.regular, this.premium, this.diesel});
 }
