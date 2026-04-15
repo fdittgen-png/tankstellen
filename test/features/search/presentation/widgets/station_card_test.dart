@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/core/theme/fuel_colors.dart';
+import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/core/utils/price_tier.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
@@ -490,6 +491,146 @@ void main() {
         expect(find.text('E5: '), findsNothing);
         expect(find.text('E10: '), findsNothing);
         expect(find.text('Diesel: '), findsNothing);
+      });
+    });
+
+    group('per-station currency (#514)', () {
+      String _priceRichText(WidgetTester tester) {
+        // Concatenate all RichText.toPlainText() so the fuel price
+        // RichText (which embeds the superscript 9/10ths digit as a
+        // WidgetSpan) is captured alongside plain fragments.
+        return tester
+            .widgetList<RichText>(find.byType(RichText))
+            .map((r) => r.text.toPlainText())
+            .join('\n');
+      }
+
+      tearDown(() {
+        // Leave the formatter in a stable default so later tests
+        // don't see whatever we set here.
+        PriceFormatter.setCountry('DE');
+      });
+
+      testWidgets(
+          'uk- prefix renders £ even when the active profile is France',
+          (tester) async {
+        PriceFormatter.setCountry('FR');
+
+        const ukStation = Station(
+          id: 'uk-BP1',
+          name: 'BP Victoria',
+          brand: 'BP',
+          street: '1 Victoria St',
+          postCode: 'SW1E 6DE',
+          place: 'London',
+          lat: 51.4975,
+          lng: -0.1357,
+          dist: 1.5,
+          e5: 1.559,
+          e10: 1.459,
+          diesel: 1.529,
+          isOpen: true,
+        );
+
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: ukStation,
+            selectedFuelType: FuelType.e5,
+          ),
+        );
+
+        final rendered = _priceRichText(tester);
+        expect(rendered, contains('£'),
+            reason: 'UK station must render its price in pounds');
+        expect(rendered, isNot(contains('€')),
+            reason: 'UK station must not use the profile € symbol');
+      });
+
+      testWidgets(
+          'pt- prefix keeps € and matches the active FR profile', (tester) async {
+        PriceFormatter.setCountry('FR');
+
+        const ptStation = Station(
+          id: 'pt-42',
+          name: 'GALP Lisboa',
+          brand: 'GALP',
+          street: 'Avenida',
+          postCode: '1250',
+          place: 'Lisboa',
+          lat: 38.7223,
+          lng: -9.1393,
+          dist: 2.5,
+          e5: 1.789,
+          diesel: 1.659,
+          isOpen: true,
+        );
+
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: ptStation,
+            selectedFuelType: FuelType.e5,
+          ),
+        );
+
+        expect(_priceRichText(tester), contains('€'));
+      });
+
+      testWidgets(
+          'unprefixed id (Tankerkoenig) falls back to the active profile '
+          'currency', (tester) async {
+        PriceFormatter.setCountry('GB');
+
+        // testStation has a UUID id (no country prefix), so it must
+        // follow the global PriceFormatter.setCountry.
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.e5,
+          ),
+        );
+
+        final rendered = _priceRichText(tester);
+        expect(rendered, contains('£'),
+            reason: 'unprefixed station must follow the active profile '
+                '(here GB → £)');
+      });
+
+      testWidgets(
+          'mx- prefix renders the peso symbol under a FR profile',
+          (tester) async {
+        PriceFormatter.setCountry('FR');
+
+        const mxStation = Station(
+          id: 'mx-11702',
+          name: 'PEMEX Centro',
+          brand: 'PEMEX',
+          street: '',
+          postCode: '',
+          place: 'Ciudad de México',
+          lat: 19.43,
+          lng: -99.13,
+          dist: 1.2,
+          e5: 22.95,
+          e10: 24.89,
+          diesel: 23.45,
+          isOpen: true,
+        );
+
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: mxStation,
+            selectedFuelType: FuelType.e5,
+          ),
+        );
+
+        final rendered = _priceRichText(tester);
+        expect(rendered, contains('\$'),
+            reason: 'MX station must render the peso \$ symbol');
+        expect(rendered, isNot(contains('€')));
       });
     });
   });

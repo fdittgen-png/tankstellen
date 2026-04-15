@@ -248,4 +248,53 @@ class Countries {
         : localeStr.toUpperCase();
     return byCode(code) ?? germany; // Default fallback
   }
+
+  /// Maps a station id prefix to the country code it came from.
+  ///
+  /// Used by the Favorites list to render each row in its origin
+  /// country's currency (see #514) — otherwise a UK station in a
+  /// French profile would display \`£1.559\` as \`1,559 €\`.
+  ///
+  /// Only country-specific prefixes produce a hit. Services that use
+  /// raw upstream ids (Tankerkoenig UUIDs for DE, Prix-Carburants
+  /// numeric ids for FR, E-Control ids for AT, MITECO \`IDEESS\` for
+  /// ES, MISE registry ids for IT) return \`null\` — the caller falls
+  /// back to the active profile country.
+  ///
+  /// Known prefixes:
+  /// - \`pt-\` → PT (Portugal DGEG, #503)
+  /// - \`uk-\` → GB (UK CMA Fuel Finder, #499)
+  /// - \`au-\` → AU (Australia FuelCheck)
+  /// - \`mx-\` → MX (Mexico CRE)
+  /// - \`ar-\` → AR (Argentina)
+  /// - \`ok-\` / \`shell-\` → DK (Denmark — two retailer-specific feeds)
+  /// - \`demo-\` → null (demo service, no real country)
+  static const Map<String, String> _stationIdPrefixToCountry = {
+    'pt-': 'PT',
+    'uk-': 'GB',
+    'au-': 'AU',
+    'mx-': 'MX',
+    'ar-': 'AR',
+    'ok-': 'DK',
+    'shell-': 'DK',
+  };
+
+  /// Returns the ISO country code inferred from a station id's prefix,
+  /// or \`null\` when the id has no recognised country prefix.
+  static String? countryCodeForStationId(String? stationId) {
+    if (stationId == null || stationId.isEmpty) return null;
+    for (final entry in _stationIdPrefixToCountry.entries) {
+      if (stationId.startsWith(entry.key)) return entry.value;
+    }
+    return null;
+  }
+
+  /// Returns the [CountryConfig] inferred from a station id's prefix,
+  /// or \`null\` when no match is found or the prefix's country is not
+  /// part of [all] (e.g. \`BE\` / \`LU\` — no full config yet).
+  static CountryConfig? countryForStationId(String? stationId) {
+    final code = countryCodeForStationId(stationId);
+    if (code == null) return null;
+    return byCode(code);
+  }
 }
