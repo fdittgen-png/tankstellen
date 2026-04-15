@@ -469,9 +469,11 @@ col0,col1,col2,YPF,AV. RIVADAVIA 5000,CABALLITO,Buenos Aires,col7,col8,Nafta pre
       final rawStations = parser.testParseCsv(csv);
       final raw = rawStations.first;
 
-      // Build station like the service does
+      // Build station like the service does (#516 — id keeps the
+      // `ar-` prefix so Countries.countryForStationId can dispatch
+      // off it).
       final station = Station(
-        id: 'ar-${raw.empresa}-${raw.direccion}'.hashCode.toString(),
+        id: 'ar-${'${raw.empresa}-${raw.direccion}'.hashCode.abs()}',
         name: raw.empresa,
         brand: raw.bandera,
         street: raw.direccion,
@@ -499,6 +501,25 @@ col0,col1,col2,YPF,AV. RIVADAVIA 5000,CABALLITO,Buenos Aires,col7,col8,Nafta pre
       expect(station.isOpen, isTrue);
       expect(station.region, 'Buenos Aires');
       expect(station.updatedAt, '2026-03-20');
+    });
+
+    test('#516: station id keeps the ar- prefix and is stable + unique', () {
+      // The previous form `'ar-\${empresa}-\${direccion}'.hashCode.toString()`
+      // destroyed the prefix into an opaque integer, leaving the
+      // `ar-` dispatch path dead for real Argentine stations.
+      String buildId(String empresa, String direccion) =>
+          'ar-${'$empresa-$direccion'.hashCode.abs()}';
+
+      final a1 = buildId('YPF', 'AV. RIVADAVIA 5000');
+      final a2 = buildId('YPF', 'AV. RIVADAVIA 5000');
+      final b = buildId('SHELL', 'AV. CORRIENTES 1234');
+
+      expect(a1, startsWith('ar-'),
+          reason: '#516: the ar- prefix must survive the hash');
+      expect(a1, equals(a2),
+          reason: 'same (empresa, direccion) → same id (determinism)');
+      expect(a1, isNot(equals(b)),
+          reason: 'different stations must get different ids');
     });
 
     test('stations with zero lat/lng are filtered out during merge', () {

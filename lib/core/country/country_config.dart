@@ -1,3 +1,5 @@
+import 'country_bounding_box.dart';
+
 /// Configuration for each supported country.
 /// Determines which services, fuel types, postal code formats,
 /// and API key requirements apply.
@@ -296,5 +298,37 @@ class Countries {
     final code = countryCodeForStationId(stationId);
     if (code == null) return null;
     return byCode(code);
+  }
+
+  /// Resolves the origin country of a station using:
+  ///
+  /// 1. The id prefix ([countryForStationId]) — fast, canonical,
+  ///    works for new search results from services that prefix their
+  ///    ids (PT, GB, MX, AR, DK retailer-specific, AU, demo).
+  /// 2. A bounding-box match on `lat` / `lng` when the prefix misses
+  ///    — fixes #516 for services that emit raw upstream ids (DE
+  ///    Tankerkoenig UUID, FR Prix-Carburants numeric id, AT
+  ///    E-Control, ES MITECO, IT MISE) and repairs legacy favorites
+  ///    saved before the prefix scheme existed.
+  ///
+  /// Returns \`null\` only when neither path resolves — the caller is
+  /// expected to fall back to the globally-set active profile
+  /// currency in that case.
+  ///
+  /// The prefix always wins over the bounding box. This is
+  /// deliberate: a service that explicitly tags its ids with a
+  /// country code is a stronger signal than a geometric hit test,
+  /// and it keeps existing (#514) behaviour unchanged for the cases
+  /// we already covered.
+  static CountryConfig? countryForStation({
+    required String? id,
+    required double lat,
+    required double lng,
+  }) {
+    final byPrefix = countryForStationId(id);
+    if (byPrefix != null) return byPrefix;
+    final bboxCode = countryCodeFromLatLng(lat, lng);
+    if (bboxCode == null) return null;
+    return byCode(bboxCode);
   }
 }

@@ -91,8 +91,15 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
 
       for (final entry in stationMap.values) {
         final raw = entry.raw;
+        // #516 — preserve the `ar-` prefix so Countries.countryForStationId
+        // can dispatch AR stations off the id alone. The previous form
+        // built `'ar-…'.hashCode.toString()` which discarded the prefix
+        // into an opaque integer, leaving the `ar-` dispatch path in
+        // country_config.dart as dead code for real Argentine stations.
+        final signatureHash =
+            '${raw.empresa}-${raw.direccion}'.hashCode.abs();
         stations.add(Station(
-          id: 'ar-${raw.empresa}-${raw.direccion}'.hashCode.toString(),
+          id: 'ar-$signatureHash',
           name: raw.empresa,
           brand: raw.bandera,
           street: raw.direccion,
