@@ -408,6 +408,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get configApiKeyNotSet => 'Non définie (mode démo)';
 
   @override
+  String get configApiKeyCommunity => 'Clé communautaire par défaut';
+
+  @override
   String get configEvKey => 'Clé API recharge VE';
 
   @override

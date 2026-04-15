@@ -160,6 +160,7 @@
   "configTankerkoenigKey": "Tankerkoenig API key",
   "configApiKeyConfigured": "Configured",
   "configApiKeyNotSet": "Not set (demo mode)",
+  "configApiKeyCommunity": "Default (community key)",
   "configEvKey": "EV charging API key",
   "configEvKeyCustom": "Custom key",
   "configEvKeyShared": "Default (shared)",

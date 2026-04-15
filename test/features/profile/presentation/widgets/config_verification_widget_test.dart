@@ -43,8 +43,13 @@ List<Object> _buildOverrides({
   bool syncEnabled = false,
 }) {
   final mockStorage = MockStorageRepository();
-  when(() => mockStorage.hasApiKey()).thenReturn(hasApiKey);
-  when(() => mockStorage.getApiKey()).thenReturn(hasApiKey ? 'some-key' : null);
+  // #521 — hasApiKey is always true in production (community default
+  // always available). The `hasApiKey` parameter here actually controls
+  // whether the user has set their OWN key on top of the default.
+  when(() => mockStorage.hasApiKey()).thenReturn(true);
+  when(() => mockStorage.hasCustomApiKey()).thenReturn(hasApiKey);
+  when(() => mockStorage.getApiKey())
+      .thenReturn(hasApiKey ? 'custom-key' : 'ff6250b2-a85d-41e5-b483-c052caff0ca9');
   when(() => mockStorage.hasEvApiKey()).thenReturn(false);
   when(() => mockStorage.hasCustomEvApiKey()).thenReturn(false);
 
@@ -116,20 +121,23 @@ void main() {
     });
 
     testWidgets(
-        'Tankerkoenig row shows "Non définie (mode démo)" under FR when '
-        'no key is set', (tester) async {
+        '#521: Tankerkoenig row shows "Clé communautaire par défaut" '
+        'when no custom key is set (FR)', (tester) async {
       await pumpApp(
         tester,
         const ConfigVerificationWidget(),
         overrides: _buildOverrides(profile: _sampleProfile()),
         locale: const Locale('fr'),
       );
-      expect(find.text('Non définie (mode démo)'), findsOneWidget);
+      // The community key is bundled — we never render "demo mode".
+      expect(find.text('Clé communautaire par défaut'), findsOneWidget);
+      expect(find.text('Non définie (mode démo)'), findsNothing);
       expect(find.text('Not set (demo mode)'), findsNothing);
     });
 
-    testWidgets('Tankerkoenig row shows "Configurée" under FR when a key is set',
-        (tester) async {
+    testWidgets(
+        '#521: Tankerkoenig row shows "Configurée" under FR when the '
+        'user has set their own key', (tester) async {
       await pumpApp(
         tester,
         const ConfigVerificationWidget(),
@@ -138,6 +146,7 @@ void main() {
         locale: const Locale('fr'),
       );
       expect(find.text('Configurée'), findsOneWidget);
+      expect(find.text('Clé communautaire par défaut'), findsNothing);
     });
 
     testWidgets('TankSync row shows "Désactivée" under FR when disconnected',

@@ -286,7 +286,8 @@ class _InMemoryStorageRepository implements StorageRepository {
   @override String? getApiKey() => null;
   @override Future<void> setApiKey(String key) async {}
   @override Future<void> deleteApiKey() async {}
-  @override bool hasApiKey() => false;
+  @override bool hasApiKey() => true;
+  @override bool hasCustomApiKey() => false;
   @override String? getEvApiKey() => null;
   @override bool hasEvApiKey() => false;
   @override bool hasCustomEvApiKey() => false;

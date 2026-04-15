@@ -319,9 +319,15 @@ void main() {
       expect(storage.isSetupComplete, isTrue);
     });
 
-    test('isSetupComplete returns false with no api key and no skip', () {
-      // API key cache is null by default and setup not skipped
-      expect(storage.isSetupComplete, isFalse);
+    test(
+        '#521: isSetupComplete is true on a fresh install because the '
+        'community default key is always available', () {
+      // Before #521 this returned false until the user either set a
+      // custom key or explicitly skipped setup. Since the community
+      // key is bundled, there is no "unconfigured" starting state any
+      // more — the onboarding flow can jump straight to the landing
+      // screen.
+      expect(storage.isSetupComplete, isTrue);
     });
   });
 
@@ -597,12 +603,25 @@ void main() {
   // API Key (in-memory cache only — cannot test secure storage in unit tests)
   // ---------------------------------------------------------------------------
   group('API Key (in-memory)', () {
-    test('getApiKey returns null by default', () {
-      expect(storage.getApiKey(), isNull);
+    test(
+        '#521: getApiKey returns the bundled community key when no '
+        'custom key is set', () {
+      final key = storage.getApiKey();
+      expect(key, isNotNull);
+      expect(key, isNotEmpty);
+      // Pin the exact community key — the value is part of the
+      // shipped behaviour and must not drift without review.
+      expect(key, 'ff6250b2-a85d-41e5-b483-c052caff0ca9');
     });
 
-    test('hasApiKey returns false when no key set', () {
-      expect(storage.hasApiKey(), isFalse);
+    test('#521: hasApiKey is always true (community default present)', () {
+      expect(storage.hasApiKey(), isTrue);
+    });
+
+    test(
+        '#521: hasCustomApiKey is false when only the community '
+        'default is available', () {
+      expect(storage.hasCustomApiKey(), isFalse);
     });
 
     test('hasEvApiKey returns true (default key always available)', () {

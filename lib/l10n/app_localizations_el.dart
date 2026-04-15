@@ -407,6 +407,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get configApiKeyNotSet => 'Not set (demo mode)';
 
   @override
+  String get configApiKeyCommunity => 'Default (community key)';
+
+  @override
   String get configEvKey => 'EV charging API key';
 
   @override

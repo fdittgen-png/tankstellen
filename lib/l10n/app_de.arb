@@ -160,6 +160,7 @@
   "configTankerkoenigKey": "Tankerkönig API-Schlüssel",
   "configApiKeyConfigured": "Konfiguriert",
   "configApiKeyNotSet": "Nicht gesetzt (Demo-Modus)",
+  "configApiKeyCommunity": "Standard-Community-Schlüssel",
   "configEvKey": "Ladesäulen API-Schlüssel",
   "configEvKeyCustom": "Eigener Schlüssel",
   "configEvKeyShared": "Standard (geteilt)",

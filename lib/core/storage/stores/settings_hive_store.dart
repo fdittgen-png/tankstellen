@@ -18,6 +18,20 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
   // In-memory cache to avoid async reads on every API call.
   static String? _apiKeyCache;
 
+  /// Default Tankerkoenig **community** API key shipped with the app
+  /// (#521). Every fresh install starts with this key so German search
+  /// returns real data out of the box — no user onboarding required.
+  /// Users who want their own key can still paste one in Settings →
+  /// API Keys → Tankerkoenig; the custom key then overrides this
+  /// default and `hasCustomApiKey()` flips to true.
+  ///
+  /// Rate limits apply to the community key because it is shared
+  /// across all public builds. That trade-off is deliberate — the
+  /// alternative was shipping "demo mode" on first launch, which
+  /// returned zero stations and made the app look broken.
+  static const defaultTankerkoenigKey =
+      'ff6250b2-a85d-41e5-b483-c052caff0ca9';
+
   /// Load API key from secure storage into memory. Call once at startup.
   static Future<void> loadApiKey() async {
     _apiKeyCache = await _secureStorage.read(key: StorageKeys.apiKey);
@@ -26,7 +40,11 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
   }
 
   @override
-  String? getApiKey() => _apiKeyCache;
+  String? getApiKey() {
+    final custom = _apiKeyCache;
+    if (custom != null && custom.isNotEmpty) return custom;
+    return defaultTankerkoenigKey;
+  }
 
   @override
   Future<void> setApiKey(String key) async {
@@ -42,7 +60,15 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
 
   @override
   bool hasApiKey() {
-    final key = getApiKey();
+    // #521 — a Tankerkoenig key is always available (custom or community
+    // default), so the app is never in a "demo mode" with respect to
+    // German search.
+    return true;
+  }
+
+  @override
+  bool hasCustomApiKey() {
+    final key = _apiKeyCache;
     return key != null && key.isNotEmpty;
   }
 

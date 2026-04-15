@@ -5,10 +5,22 @@ import '../storage/storage_providers.dart';
 part 'app_state_provider.g.dart';
 
 /// Whether the Tankerkoenig API key is configured.
+///
+/// Since #521 this is always true — the app ships a community
+/// default. Use [hasCustomApiKey] to tell whether the user set their
+/// own key.
 @riverpod
 bool hasApiKey(Ref ref) {
   final storage = ref.watch(storageRepositoryProvider);
   return storage.hasApiKey();
+}
+
+/// Whether the user has set their **own** Tankerkoenig key, distinct
+/// from the community default bundled in the app (#521).
+@riverpod
+bool hasCustomApiKey(Ref ref) {
+  final storage = ref.watch(storageRepositoryProvider);
+  return storage.hasCustomApiKey();
 }
 
 /// Whether a custom EV API key is configured.
