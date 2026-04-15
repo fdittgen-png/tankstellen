@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/error/exceptions.dart';
+import '../../../../core/error_reporting/error_report_payload.dart';
+import '../../../../core/error_reporting/error_reporter.dart';
+import '../../../../core/error_reporting/error_reporter_context.dart';
 import '../../../../core/services/report_service.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/supabase_client.dart';
@@ -48,9 +51,20 @@ enum ReportType {
 
   /// True when this report type is a free-text metadata correction
   /// (new station name, new address). Takes a text input instead of
-  /// a price input, and submits to TankSync only (Tankerkoenig has
-  /// no endpoint for metadata corrections).
+  /// a price input.
+  ///
+  /// Since #508 these also route to GitHub instead of TankSync —
+  /// wrong metadata is almost always an implementation bug (the API
+  /// returned the wrong field, or our parser mapped it wrong), not
+  /// something a user correction can fix downstream.
   bool get needsText => this == wrongName || this == wrongAddress;
+
+  /// True when this report type files a GitHub issue instead of hitting
+  /// a community-report backend. Station name and address corrections
+  /// are always implementation bugs — shipping them as community edits
+  /// just hides the upstream issue, so we route the user to the
+  /// pre-filled GitHub issue flow built in #500 instead.
+  bool get routesToGitHub => this == wrongName || this == wrongAddress;
 
   /// True when this report type can be submitted to the Tankerkoenig
   /// complaint endpoint. The endpoint supports the original 5 types
@@ -92,6 +106,21 @@ enum ReportType {
     }
   }
 
+  /// Returns the report types that should be visible on the report
+  /// screen for a given country.
+  ///
+  /// - Germany: all 10 types (Tankerkoenig community report covers
+  ///   prices and open/closed status; name/address still route to
+  ///   GitHub because they're implementation bugs).
+  /// - Everywhere else: only the 2 GitHub-routed types. The first 8
+  ///   (price + status) have no meaningful backend outside DE —
+  ///   Tankerkoenig is DE-only, and community price corrections don't
+  ///   feed back into the source-of-truth country APIs.
+  static List<ReportType> visibleForCountry(String countryCode) {
+    if (countryCode == 'DE') return ReportType.values;
+    return const [ReportType.wrongName, ReportType.wrongAddress];
+  }
+
   /// Localized display name for this report type.
   String displayName(AppLocalizations? l10n) {
     switch (this) {
@@ -126,7 +155,17 @@ enum ReportType {
 /// the price text controller is owned locally for lifecycle reasons.
 class ReportScreen extends ConsumerStatefulWidget {
   final String stationId;
-  const ReportScreen({super.key, required this.stationId});
+
+  /// Reporter used for GitHub-routed report types (see #508). Defaults
+  /// to a real [ErrorReporter] that launches the browser after the
+  /// user confirms the consent dialog. Tests inject a fake.
+  final ErrorReporter? reporter;
+
+  const ReportScreen({
+    super.key,
+    required this.stationId,
+    this.reporter,
+  });
 
   @override
   ConsumerState<ReportScreen> createState() => _ReportScreenState();
@@ -191,6 +230,40 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
 
     notifier.setSubmitting(true);
     try {
+      // #508 — name / address errors are implementation bugs, not
+      // community data corrections. Route them to a pre-filled GitHub
+      // issue instead of the Tankerkoenig / TankSync backends.
+      if (selectedType.routesToGitHub) {
+        final country = ref.read(activeCountryProvider);
+        final correction = _textController.text.trim();
+        final payload = ErrorReportPayload(
+          errorType: 'WrongMetadataReport',
+          errorMessage:
+              '${selectedType.fuelTypeColumnValue} reported wrong for '
+                  'station ${widget.stationId}: "$correction"',
+          sourceLabel: country.apiProvider ?? country.name,
+          countryCode: country.code,
+          appVersion: ErrorReporterContext.currentAppVersion(),
+          platform: ErrorReporterContext.currentPlatform(),
+          locale: ErrorReporterContext.currentLocale(context),
+          capturedAt: DateTime.now(),
+        );
+        final launched = await (widget.reporter ?? const ErrorReporter())
+            .reportError(context, payload);
+        if (mounted && launched) {
+          SnackBarHelper.showSuccess(
+            context,
+            l10n?.reportSent ?? 'Report sent. Thank you!',
+          );
+          // Use Navigator.maybePop so the path works both under the
+          // real GoRouter shell and under the plain MaterialApp that
+          // widget tests use — context.pop() would throw
+          // \`No GoRouter found in context\` in tests.
+          await Navigator.of(context).maybePop();
+        }
+        return;
+      }
+
       final apiKeys = ref.read(apiKeyStorageProvider);
       final apiKey = apiKeys.getApiKey();
       final price = selectedType.needsPrice
@@ -310,6 +383,17 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
         TankSyncClient.isConnected && syncConfig.userId != null;
     final hasAnyBackend = canSubmitTankerkoenig || canSubmitTankSync;
 
+    // #508 — GitHub-routed types (wrongName / wrongAddress) need no
+    // backend at all — the reporter opens the consent dialog and hands
+    // off to the browser. So the radio row and submit button are
+    // always usable when such a type is selected, regardless of
+    // Tankerkoenig / TankSync availability.
+    final visibleTypes = ReportType.visibleForCountry(country.code);
+    final allVisibleRouteToGitHub =
+        visibleTypes.every((t) => t.routesToGitHub);
+    final selectedIsGitHubRouted =
+        selectedType != null && selectedType.routesToGitHub;
+
     return Scaffold(
       appBar: AppBar(
         // #484 — was "Signaler un prix" but two of the existing options
@@ -330,7 +414,11 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
           // #484 — banner telling the user that no reporting backend is
           // available for their country/config. Previously the form
           // accepted their input and silently failed on submit.
-          if (!hasAnyBackend) ...[
+          //
+          // #508 — hide the banner when the user only sees GitHub-routed
+          // types (non-DE case), because there's nothing to configure
+          // and the form still works.
+          if (!hasAnyBackend && !allVisibleRouteToGitHub) ...[
             Container(
               key: const ValueKey('report-no-backend-banner'),
               padding: const EdgeInsets.all(12),
@@ -366,12 +454,15 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
             style: theme.textTheme.titleMedium,
           ),
           const SizedBox(height: 12),
-          ...ReportType.values.map(
+          ...visibleTypes.map(
             (type) => RadioListTile<ReportType>(
               value: type,
               groupValue: selectedType,
               title: Text(type.displayName(l10n)),
-              onChanged: hasAnyBackend
+              // #508 — GitHub-routed types are always selectable. The
+              // legacy price/status types remain gated on an available
+              // Tankerkoenig/TankSync backend.
+              onChanged: (type.routesToGitHub || hasAnyBackend)
                   ? (v) => ref
                       .read(reportFormControllerProvider.notifier)
                       .selectType(v)
@@ -408,10 +499,10 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
           ],
           const SizedBox(height: 24),
           FilledButton(
-            onPressed: hasAnyBackend &&
-                    selectedType != null &&
+            onPressed: selectedType != null &&
                     !form.isSubmitting &&
-                    _hasRequiredInput(selectedType)
+                    _hasRequiredInput(selectedType) &&
+                    (selectedIsGitHubRouted || hasAnyBackend)
                 ? _submit
                 : null,
             child: form.isSubmitting
