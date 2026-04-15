@@ -150,5 +150,87 @@ void main() {
       // ProfileScreen body is a ListView
       expect(find.byType(ListView), findsAtLeast(1));
     });
+
+    testWidgets(
+        '#520: AppBar title sits directly under the status bar '
+        '(no doubled top inset, single Scaffold)', (tester) async {
+      // Baseline — a bare Scaffold with an AppBar should place the
+      // title within [statusBarHeight, statusBarHeight + kToolbarHeight].
+      const statusBarHeight = 48.0;
+      await tester.binding.setSurfaceSize(const Size(412, 915));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(
+            padding: EdgeInsets.only(top: statusBarHeight),
+            viewPadding: EdgeInsets.only(top: statusBarHeight),
+            size: Size(412, 915),
+            devicePixelRatio: 1,
+          ),
+          child: MaterialApp(
+            home: Scaffold(
+              appBar: AppBar(title: const Text('BARE_TITLE')),
+              body: const SizedBox.shrink(),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final bareTitleOffset = tester.getTopLeft(find.text('BARE_TITLE')).dy;
+      expect(bareTitleOffset, greaterThanOrEqualTo(statusBarHeight - 4));
+      expect(bareTitleOffset, lessThanOrEqualTo(statusBarHeight + kToolbarHeight));
+    });
+
+    testWidgets(
+        '#520: nested Scaffold (shell pattern) with primary: false on '
+        'the outer keeps the inner AppBar title in the correct band',
+        (tester) async {
+      // Reproduces the shell's structure: an outer Scaffold with no
+      // AppBar (primary: false per #520) wrapping an inner Scaffold
+      // that does have an AppBar. Before #520 the inner AppBar was
+      // pushed down by a duplicated top inset; the primary: false
+      // annotation on the outer Scaffold restores the expected band.
+      const statusBarHeight = 48.0;
+      await tester.binding.setSurfaceSize(const Size(412, 915));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(
+            padding: EdgeInsets.only(top: statusBarHeight),
+            viewPadding: EdgeInsets.only(top: statusBarHeight),
+            size: Size(412, 915),
+            devicePixelRatio: 1,
+          ),
+          child: MaterialApp(
+            home: Scaffold(
+              primary: false, // the #520 fix on ShellScreen
+              body: Scaffold(
+                appBar: AppBar(title: const Text('SHELL_TITLE')),
+                body: const SizedBox.shrink(),
+              ),
+              bottomNavigationBar: const SizedBox(height: 56),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final shellTitleOffset =
+          tester.getTopLeft(find.text('SHELL_TITLE')).dy;
+      expect(
+        shellTitleOffset,
+        greaterThanOrEqualTo(statusBarHeight - 4),
+        reason: 'title must not hide under the status bar',
+      );
+      expect(
+        shellTitleOffset,
+        lessThanOrEqualTo(statusBarHeight + kToolbarHeight),
+        reason: 'nested inner AppBar must not be pushed below the '
+            'first toolbar-sized band — doubled inset regression (#520)',
+      );
+    });
   });
 }
