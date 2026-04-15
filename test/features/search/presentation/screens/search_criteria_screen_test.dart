@@ -265,6 +265,88 @@ void main() {
 
       expect(find.text('8 km'), findsOneWidget);
     });
+
+    group('#522 compaction + l10n', () {
+      testWidgets(
+          'FR locale shows the localised location placeholder '
+          '(not "Location search field")', (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        await pumpApp(
+          tester,
+          const SearchCriteriaScreen(),
+          overrides: [
+            ...test.overrides,
+            selectedFuelTypeOverride(FuelType.e10),
+            searchRadiusOverride(8),
+            userPositionNullOverride(),
+          ],
+          locale: const Locale('fr'),
+        );
+        await tester.pumpAndSettle();
+
+        // Regression guard: the English literal must never render.
+        expect(find.text('Location search field'), findsNothing);
+        // The French placeholder must be visible inside the location
+        // field.
+        expect(find.text('Adresse, code postal ou ville'), findsOneWidget);
+      });
+
+      testWidgets(
+          'FR locale renders the HelpBanner with the translated '
+          '"Compris" dismiss button', (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        // Ensure the banner is shown (not previously dismissed).
+        when(() => test.mockStorage.getSetting(any())).thenReturn(null);
+
+        await pumpApp(
+          tester,
+          const SearchCriteriaScreen(),
+          overrides: [
+            ...test.overrides,
+            selectedFuelTypeOverride(FuelType.e10),
+            searchRadiusOverride(8),
+            userPositionNullOverride(),
+          ],
+          locale: const Locale('fr'),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Compris'), findsOneWidget);
+        expect(find.text('Got it'), findsNothing);
+      });
+
+      testWidgets(
+          'form renders without a vertical overflow at the S23 Ultra '
+          'surface size and 1x text scale', (tester) async {
+        // #522 acceptance: every filter control fits above the fold.
+        await tester.binding.setSurfaceSize(const Size(412, 915));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        await pumpApp(
+          tester,
+          const SearchCriteriaScreen(),
+          overrides: [
+            ...test.overrides,
+            selectedFuelTypeOverride(FuelType.e10),
+            searchRadiusOverride(8),
+            userPositionNullOverride(),
+          ],
+          locale: const Locale('fr'),
+        );
+        await tester.pumpAndSettle();
+
+        // pumpAndSettle would have surfaced any RenderFlex overflow
+        // errors via the tester.takeException() bucket. Draining and
+        // asserting empty locks in the no-overflow invariant.
+        expect(tester.takeException(), isNull);
+      });
+    });
   });
 }
 

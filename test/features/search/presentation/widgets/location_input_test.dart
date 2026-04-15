@@ -205,9 +205,17 @@ void main() {
         overrides: test.overrides,
       );
 
-      // The TextField uses labelText for screen reader accessibility
+      // #522 — the previous form was `labelText: 'Location search field'`
+      // (hardcoded English on every locale). It is now a localised
+      // `hintText` set from `AppLocalizations.searchLocationPlaceholder`
+      // with no separate labelText. Accessibility text for the
+      // screen reader comes from the hint; we assert it is present
+      // and non-empty (the English default for the test's default
+      // locale).
       final textField = tester.widget<TextField>(find.byType(TextField));
-      expect(textField.decoration?.labelText, 'Location search field');
+      expect(textField.decoration?.labelText, isNull);
+      expect(textField.decoration?.hintText, isNotNull);
+      expect(textField.decoration!.hintText!.isNotEmpty, isTrue);
 
       handle.dispose();
     });

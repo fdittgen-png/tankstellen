@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/country/country_config.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/services/location_search_provider.dart';
 import '../../../../core/services/location_search_service.dart';
@@ -122,14 +121,12 @@ class _LocationInputState extends ConsumerState<LocationInput> {
         LocationInputType.city => Icons.location_city,
       };
 
-  String _hintText(CountryConfig country) {
-    return '${country.examplePostalCode}, city name, or empty for GPS';
-  }
-
   @override
   Widget build(BuildContext context) {
-    final country = ref.watch(activeCountryProvider);
     final uiState = ref.watch(locationInputControllerProvider);
+    final l10n = AppLocalizations.of(context);
+    final placeholder = l10n?.searchLocationPlaceholder ??
+        'Address, postal code or city';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -144,8 +141,11 @@ class _LocationInputState extends ConsumerState<LocationInput> {
                 focusNode: _focusNode,
                 style: const TextStyle(fontSize: 14),
                 decoration: InputDecoration(
-                  hintText: _hintText(country),
-                  labelText: 'Location search field',
+                  // #522 — single localised placeholder, no separate
+                  // labelText. Previously the field rendered the
+                  // English literal "Location search field" as a
+                  // non-floating label on every locale.
+                  hintText: placeholder,
                   floatingLabelBehavior: FloatingLabelBehavior.never,
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(
