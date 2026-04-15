@@ -150,6 +150,8 @@
   "configApiKeyConfigured": "Configurée",
   "configApiKeyNotSet": "Non définie (mode démo)",
   "configApiKeyCommunity": "Clé communautaire par défaut",
+  "searchLocationPlaceholder": "Adresse, code postal ou ville",
+  "swipeTutorialDismiss": "Compris",
   "configEvKey": "Clé API recharge VE",
   "configEvKeyCustom": "Clé personnalisée",
   "configEvKeyShared": "Partagée par défaut",

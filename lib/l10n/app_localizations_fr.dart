@@ -411,6 +411,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get configApiKeyCommunity => 'Clé communautaire par défaut';
 
   @override
+  String get searchLocationPlaceholder => 'Adresse, code postal ou ville';
+
+  @override
   String get configEvKey => 'Clé API recharge VE';
 
   @override
@@ -1347,7 +1350,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Swipe right to navigate, swipe left to remove';
 
   @override
-  String get swipeTutorialDismiss => 'Got it';
+  String get swipeTutorialDismiss => 'Compris';
 
   @override
   String get alertStatsActive => 'Actives';

@@ -411,6 +411,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get configApiKeyCommunity => 'Standard-Community-Schlüssel';
 
   @override
+  String get searchLocationPlaceholder => 'Adresse, Postleitzahl oder Stadt';
+
+  @override
   String get configEvKey => 'Ladesäulen API-Schlüssel';
 
   @override

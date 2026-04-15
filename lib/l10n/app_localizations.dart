@@ -896,6 +896,12 @@ abstract class AppLocalizations {
   /// **'Default (community key)'**
   String get configApiKeyCommunity;
 
+  /// No description provided for @searchLocationPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Address, postal code or city'**
+  String get searchLocationPlaceholder;
+
   /// No description provided for @configEvKey.
   ///
   /// In en, this message translates to:

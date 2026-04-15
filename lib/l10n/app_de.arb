@@ -161,6 +161,7 @@
   "configApiKeyConfigured": "Konfiguriert",
   "configApiKeyNotSet": "Nicht gesetzt (Demo-Modus)",
   "configApiKeyCommunity": "Standard-Community-Schlüssel",
+  "searchLocationPlaceholder": "Adresse, Postleitzahl oder Stadt",
   "configEvKey": "Ladesäulen API-Schlüssel",
   "configEvKeyCustom": "Eigener Schlüssel",
   "configEvKeyShared": "Standard (geteilt)",

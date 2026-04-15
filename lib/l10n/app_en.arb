@@ -161,6 +161,7 @@
   "configApiKeyConfigured": "Configured",
   "configApiKeyNotSet": "Not set (demo mode)",
   "configApiKeyCommunity": "Default (community key)",
+  "searchLocationPlaceholder": "Address, postal code or city",
   "configEvKey": "EV charging API key",
   "configEvKeyCustom": "Custom key",
   "configEvKeyShared": "Default (shared)",

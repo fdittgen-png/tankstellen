@@ -412,6 +412,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get configApiKeyCommunity => 'Default (community key)';
 
   @override
+  String get searchLocationPlaceholder => 'Address, postal code or city';
+
+  @override
   String get configEvKey => 'EV charging API key';
 
   @override

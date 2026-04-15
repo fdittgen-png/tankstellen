@@ -150,30 +150,32 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          // #522 — compact the form so every filter fits above the
+          // fold on an S23 Ultra at 1x text scale. Section gaps went
+          // from 20 dp → 12 dp, label-to-control gaps from 8 dp →
+          // 4 dp, and surrounding padding from 16 dp top → 8 dp.
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // First-time help banner
               HelpBanner(
                 storageKey: StorageKeys.helpBannerCriteria,
                 icon: Icons.lightbulb_outline,
                 message: l10n?.helpBannerCriteria ??
                     'Your profile defaults are pre-filled. Adjust criteria below to refine your search.',
               ),
-              // Itinerary mode toggle.
               SearchModeToggle(
                 mode: mode,
                 onChanged: (m) =>
                     ref.read(activeSearchModeProvider.notifier).set(m),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               if (mode == SearchMode.nearby) ...[
                 Text(
                   l10n?.gpsLocation ?? 'Location',
                   style: theme.textTheme.titleSmall,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 LocationInput(
                   onGpsSearch: _performGpsSearch,
                   onZipSearch: _performZipSearch,
@@ -184,27 +186,26 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                   l10n?.searchAlongRoute ?? 'Along route',
                   style: theme.textTheme.titleSmall,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 RouteInput(onSearch: _performRouteSearch),
               ],
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               Text(
                 l10n?.fuelType ?? 'Fuel type',
                 style: theme.textTheme.titleSmall,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               const FuelTypeSelector(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               SearchRadiusSlider(
                 radiusKm: radius,
                 onChanged: (value) =>
                     ref.read(searchRadiusProvider.notifier).set(value),
               ),
-              const SizedBox(height: 4),
-              // "Open only" filter.
               SwitchListTile(
                 key: const ValueKey('criteria-open-only-toggle'),
                 contentPadding: EdgeInsets.zero,
+                dense: true,
                 value: openOnly,
                 onChanged: (value) {
                   ref.read(openOnlyFilterProvider.notifier).set(value);
@@ -212,21 +213,19 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                 title: Text(l10n?.openOnlyFilter ?? 'Open only'),
                 secondary: const Icon(Icons.schedule),
               ),
-              const SizedBox(height: 8),
-              // Equipment filter chips.
+              const SizedBox(height: 4),
               Text(
                 l10n?.amenities ?? 'Amenities',
                 style: theme.textTheme.titleSmall,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               AmenityFilterWrap(
                 selected: amenities,
                 onToggle: (a) => ref
                     .read(selectedAmenitiesProvider.notifier)
                     .toggle(a),
               ),
-              const SizedBox(height: 16),
-              // Brand filter operates on the currently loaded result set.
+              const SizedBox(height: 8),
               Consumer(
                 builder: (context, ref, _) {
                   final state = ref.watch(searchStateProvider);
@@ -237,8 +236,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                   return BrandFilterChips(stations: stations);
                 },
               ),
-              const SizedBox(height: 16),
-              // Save as defaults.
+              const SizedBox(height: 12),
               OutlinedButton.icon(
                 key: const ValueKey('criteria-save-defaults-button'),
                 onPressed: _saveAsDefaults,
@@ -250,7 +248,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                   minimumSize: const Size.fromHeight(44),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               if (mode == SearchMode.nearby)
                 FilledButton.icon(
                   key: const ValueKey('criteria-search-button'),
