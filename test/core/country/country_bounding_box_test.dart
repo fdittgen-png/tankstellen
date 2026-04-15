@@ -149,4 +149,101 @@ void main() {
       expect(countryBoundingBoxes['FR']!.contains(-34.60, -58.38), isFalse);
     });
   });
+
+  group('countryCodeFromLatLng (#516 bbox lookup)', () {
+    // Cross-currency boundaries — these MUST resolve correctly or the
+    // user sees the wrong symbol.
+    test('Paris → FR (EUR, not GB)', () {
+      expect(countryCodeFromLatLng(48.85, 2.35), 'FR');
+    });
+
+    test('Lyon → FR', () {
+      expect(countryCodeFromLatLng(45.75, 4.85), 'FR');
+    });
+
+    test('London → GB (GBP, not FR)', () {
+      expect(countryCodeFromLatLng(51.51, -0.13), 'GB');
+    });
+
+    test('Manchester → GB', () {
+      expect(countryCodeFromLatLng(53.48, -2.24), 'GB');
+    });
+
+    test('Berlin → DE (lng outside FR box)', () {
+      expect(countryCodeFromLatLng(52.52, 13.41), 'DE');
+    });
+
+    test('Copenhagen → DK (DKK, not DE EUR)', () {
+      expect(countryCodeFromLatLng(55.68, 12.57), 'DK');
+    });
+
+    test('Lisbon → PT (PT tested before the generous ES box)', () {
+      expect(countryCodeFromLatLng(38.72, -9.14), 'PT');
+    });
+
+    test('Porto → PT', () {
+      expect(countryCodeFromLatLng(41.16, -8.63), 'PT');
+    });
+
+    test('Madrid → ES', () {
+      expect(countryCodeFromLatLng(40.42, -3.70), 'ES');
+    });
+
+    test('Rome → IT (lng outside FR)', () {
+      expect(countryCodeFromLatLng(41.90, 12.50), 'IT');
+    });
+
+    test('Vienna → AT (lng outside DE and FR)', () {
+      expect(countryCodeFromLatLng(48.21, 16.37), 'AT');
+    });
+
+    test('Sydney → AU', () {
+      expect(countryCodeFromLatLng(-33.87, 151.21), 'AU');
+    });
+
+    test('CDMX → MX', () {
+      expect(countryCodeFromLatLng(19.43, -99.13), 'MX');
+    });
+
+    test('Buenos Aires → AR', () {
+      expect(countryCodeFromLatLng(-34.60, -58.38), 'AR');
+    });
+
+    test('returns null for mid-Atlantic coordinates', () {
+      expect(countryCodeFromLatLng(0.0, -30.0), isNull);
+    });
+
+    test('returns null for mid-Pacific coordinates', () {
+      expect(countryCodeFromLatLng(0.0, -150.0), isNull);
+    });
+
+    test('returns null for Antarctica', () {
+      expect(countryCodeFromLatLng(-80.0, 0.0), isNull);
+    });
+
+    // EU-zone ambiguous points — all that matters is they resolve
+    // to SOME EUR country. For currency dispatch the precise country
+    // code is irrelevant when both candidates share the currency.
+    group('EU-zone ambiguous points resolve to a EUR country', () {
+      final eurCountries = {'FR', 'DE', 'AT', 'IT', 'ES', 'PT', 'BE', 'LU', 'NL'};
+
+      test('Munich lands somewhere in the EUR zone', () {
+        final code = countryCodeFromLatLng(48.14, 11.58);
+        expect(code, isNotNull);
+        expect(eurCountries, contains(code));
+      });
+
+      test('Nice lands somewhere in the EUR zone', () {
+        final code = countryCodeFromLatLng(43.70, 7.27);
+        expect(code, isNotNull);
+        expect(eurCountries, contains(code));
+      });
+
+      test('Salzburg lands somewhere in the EUR zone', () {
+        final code = countryCodeFromLatLng(47.80, 13.05);
+        expect(code, isNotNull);
+        expect(eurCountries, contains(code));
+      });
+    });
+  });
 }

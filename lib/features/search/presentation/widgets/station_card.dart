@@ -54,11 +54,23 @@ class StationCard extends StatelessWidget {
 
   double? get _displayPrice => station.priceFor(selectedFuelType);
 
-  /// Per-station currency symbol derived from the station id's country
-  /// prefix (#514). Returns `null` for ids without a recognised
-  /// prefix — callers fall back to the active profile currency.
-  String? get _stationCurrency =>
-      Countries.countryForStationId(station.id)?.currencySymbol;
+  /// Per-station currency symbol derived from the station's origin
+  /// country (#514 / #516). The resolution order is:
+  ///
+  /// 1. Id prefix (`uk-`, `pt-`, `mx-`, …) for services that tag
+  ///    their ids with a country code.
+  /// 2. Bounding-box match on `lat` / `lng` — catches raw upstream
+  ///    ids (DE Tankerkoenig UUIDs, FR Prix-Carburants numeric ids,
+  ///    AT E-Control, ES MITECO, IT MISE) and repairs legacy
+  ///    favorites saved before the prefix scheme existed.
+  ///
+  /// Returns `null` when neither path resolves — the caller falls
+  /// back to the globally-set active profile currency.
+  String? get _stationCurrency => Countries.countryForStation(
+        id: station.id,
+        lat: station.lat,
+        lng: station.lng,
+      )?.currencySymbol;
 
   @override
   Widget build(BuildContext context) {

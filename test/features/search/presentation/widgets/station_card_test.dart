@@ -578,12 +578,15 @@ void main() {
       });
 
       testWidgets(
-          'unprefixed id (Tankerkoenig) falls back to the active profile '
-          'currency', (tester) async {
+          'unprefixed Tankerkoenig UUID with German coordinates resolves '
+          'to € via bbox fallback (#516)', (tester) async {
+        // Under #516 the bounding-box fallback kicks in when the id
+        // carries no country prefix. testStation has a UUID + Berlin
+        // coords, so it must render with € regardless of the active
+        // profile — previously (#514) it would have fallen through
+        // to the profile currency.
         PriceFormatter.setCountry('GB');
 
-        // testStation has a UUID id (no country prefix), so it must
-        // follow the global PriceFormatter.setCountry.
         await pumpApp(
           tester,
           const StationCard(
@@ -593,9 +596,90 @@ void main() {
         );
 
         final rendered = _priceRichText(tester);
-        expect(rendered, contains('£'),
-            reason: 'unprefixed station must follow the active profile '
-                '(here GB → £)');
+        expect(rendered, contains('€'),
+            reason: 'Berlin coordinates must resolve to DE → € even '
+                'under a GB profile (bbox fallback)');
+        expect(rendered, isNot(contains('£')),
+            reason: 'a German station must not borrow the profile £');
+      });
+
+      testWidgets(
+          '#516: bare-numeric FR Prix-Carburants id at Paris coords '
+          'renders € under a GB profile', (tester) async {
+        // The exact scenario from the bug report screenshot: the
+        // active profile is UK, a favorite French station has a raw
+        // Prix-Carburants numeric id (no fr- prefix), and the old
+        // #514 dispatch fell through to the profile currency (£).
+        // With #516 the bounding-box lookup must pick up the French
+        // coords and render €.
+        PriceFormatter.setCountry('GB');
+
+        const frStation = Station(
+          id: '12345', // Prix-Carburants emits bare numeric ids
+          name: 'Pézenas Carburant',
+          brand: 'INTERMARCHÉ',
+          street: '18 Avenue de Verdun',
+          postCode: '34120',
+          place: 'Pézenas',
+          lat: 43.4612, // Pézenas, Hérault, France
+          lng: 3.4252,
+          dist: 2.5,
+          e5: 1.999,
+          e10: 1.999,
+          diesel: 2.269,
+          isOpen: true,
+        );
+
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: frStation,
+            selectedFuelType: FuelType.e10,
+          ),
+        );
+
+        final rendered = _priceRichText(tester);
+        expect(rendered, contains('€'),
+            reason: 'French coordinates must resolve to FR → € even '
+                'with a bare numeric id and a GB profile');
+        expect(rendered, isNot(contains('£')),
+            reason: 'French station must not inherit the profile £');
+      });
+
+      testWidgets(
+          '#516: uk- prefixed station under a FR profile still renders £',
+          (tester) async {
+        // Mirror of the scenario above — the other direction, to prove
+        // the prefix path still works after #516 changes the resolver.
+        PriceFormatter.setCountry('FR');
+
+        const ukStation = Station(
+          id: 'uk-MFG-Streatham',
+          name: 'MFG Streatham Leigham',
+          brand: 'ESSO',
+          street: '928.3 km',
+          postCode: 'SW16',
+          place: 'London',
+          lat: 51.42,
+          lng: -0.13,
+          dist: 928.3,
+          e5: 1.759,
+          e10: 1.579,
+          diesel: 1.939,
+          isOpen: true,
+        );
+
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: ukStation,
+            selectedFuelType: FuelType.e10,
+          ),
+        );
+
+        final rendered = _priceRichText(tester);
+        expect(rendered, contains('£'));
+        expect(rendered, isNot(contains('€')));
       });
 
       testWidgets(

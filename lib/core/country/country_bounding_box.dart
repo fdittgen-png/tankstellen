@@ -67,3 +67,55 @@ const countryBoundingBoxes = <String, CountryBoundingBox>{
   // Mexico: lat 14.39–32.72, lng -118.37–-86.71 (with margin)
   'MX': CountryBoundingBox(minLat: 14.0, maxLat: 33.0, minLng: -119.0, maxLng: -86.0),
 };
+
+/// Deterministic order used by [countryCodeFromLatLng] to walk
+/// [countryBoundingBoxes]. Small / island / coastal countries come
+/// first so their tight boxes are not shadowed by larger neighbours
+/// whose boxes incidentally overlap them (e.g. `PT`'s Iberian area
+/// is entirely inside `ES`'s box, so we must test `PT` first).
+///
+/// Cross-currency border cases (#516) were the primary motivation —
+/// getting a station misattributed between two euro-zone countries
+/// is invisible at the currency-symbol layer, but a UK/FR or DE/DK
+/// mix-up would flip the rendered symbol.
+///
+/// Ordering rationale:
+/// - `PT` first → its tight box is entirely inside `ES`'s generous
+///   one; Lisbon / Porto must not fall through to ES.
+/// - `GB` / island next → no continental overlap.
+/// - `DK` before `DE` → Copenhagen's lat sits inside DE's box.
+/// - `FR` before `DE` → Alsace (Strasbourg) sits inside both.
+/// - Continental EU countries last (DE) so stations outside every
+///   tighter box still get attributed to something European.
+/// - Non-EU countries last — they don't overlap anyone.
+const List<String> _bboxLookupOrder = [
+  'PT',
+  'GB',
+  'DK',
+  'AT',
+  'FR',
+  'IT',
+  'ES',
+  'DE',
+  'MX',
+  'AR',
+  'AU',
+];
+
+/// Returns the ISO country code whose bounding box contains the
+/// given point, or `null` when no box matches.
+///
+/// Used by `Countries.countryForStation` (#516) as a fallback when a
+/// station id has no country-specific prefix — every supported
+/// service still emits `lat` / `lng`, so the station can still be
+/// attributed to a country via its coordinates even if the id is a
+/// bare upstream identifier (FR Prix-Carburants, DE Tankerkoenig,
+/// AT E-Control, ES MITECO, IT MISE all fall into this case).
+String? countryCodeFromLatLng(double lat, double lng) {
+  for (final code in _bboxLookupOrder) {
+    final box = countryBoundingBoxes[code];
+    if (box == null) continue;
+    if (box.contains(lat, lng)) return code;
+  }
+  return null;
+}

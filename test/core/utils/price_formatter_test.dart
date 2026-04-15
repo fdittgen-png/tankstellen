@@ -215,4 +215,85 @@ void main() {
       expect(Countries.countryForStationId(null), isNull);
     });
   });
+
+  group('Countries.countryForStation (#516 prefix + bbox fallback)', () {
+    test('id prefix wins over bounding-box match', () {
+      // A uk- prefixed id at Paris coordinates must still map to GB.
+      // The service-layer tag is the strongest signal — don't let
+      // geometry override it.
+      final c = Countries.countryForStation(
+        id: 'uk-BP1',
+        lat: 48.85,
+        lng: 2.35,
+      );
+      expect(c?.code, 'GB');
+      expect(c?.currencySymbol, '£');
+    });
+
+    test('bbox fallback catches a bare numeric id at French coords '
+        '(Prix-Carburants shape)', () {
+      final c = Countries.countryForStation(
+        id: '12345',
+        lat: 48.85,
+        lng: 2.35,
+      );
+      expect(c?.code, 'FR');
+      expect(c?.currencySymbol, '€');
+    });
+
+    test('bbox fallback catches a Tankerkoenig UUID at Berlin coords', () {
+      final c = Countries.countryForStation(
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        lat: 52.52,
+        lng: 13.40,
+      );
+      expect(c?.code, 'DE');
+      expect(c?.currencySymbol, '€');
+    });
+
+    test('MITECO IDEESS id at Madrid resolves to ES', () {
+      final c = Countries.countryForStation(
+        id: '42',
+        lat: 40.42,
+        lng: -3.70,
+      );
+      expect(c?.code, 'ES');
+    });
+
+    test('MISE registry id at Rome resolves to IT', () {
+      final c = Countries.countryForStation(
+        id: '99',
+        lat: 41.90,
+        lng: 12.50,
+      );
+      expect(c?.code, 'IT');
+    });
+
+    test('E-Control id at Vienna resolves to AT', () {
+      final c = Countries.countryForStation(
+        id: '123',
+        lat: 48.21,
+        lng: 16.37,
+      );
+      expect(c?.code, 'AT');
+    });
+
+    test('mid-ocean point with unknown id returns null', () {
+      final c = Countries.countryForStation(
+        id: 'raw-42',
+        lat: 0.0,
+        lng: -30.0,
+      );
+      expect(c, isNull);
+    });
+
+    test('null id + French coords still resolves via bbox', () {
+      final c = Countries.countryForStation(
+        id: null,
+        lat: 48.85,
+        lng: 2.35,
+      );
+      expect(c?.code, 'FR');
+    });
+  });
 }
