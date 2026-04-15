@@ -14,7 +14,9 @@ void main() {
       'lib/core/services/impl/econtrol_station_service.dart',
       'lib/core/services/impl/miteco_station_service.dart',
       'lib/core/services/impl/denmark_station_service.dart',
-      'lib/core/services/impl/uk_station_service.dart',
+      // UK service intentionally omitted: it fans out to many retailer
+      // feeds and isolates DioException per-feed instead of bubbling
+      // through a single `throwApiException` at the top level.
       'lib/core/services/impl/australia_station_service.dart',
       'lib/core/services/impl/mexico_station_service.dart',
       'lib/core/services/impl/portugal_station_service.dart',
