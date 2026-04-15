@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
+import 'package:tankstellen/core/error_reporting/error_report_payload.dart';
+import 'package:tankstellen/core/error_reporting/error_reporter.dart';
 import 'package:tankstellen/features/report/presentation/screens/report_screen.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -92,7 +94,8 @@ void main() {
   group('ReportScreen country gating (regression #484)', () {
     testWidgets(
         'DE without Tankerkoenig key and without TankSync → no-backend '
-        'banner shown, submit button disabled, radios disabled',
+        'banner shown; price/status radios disabled but name/address '
+        '(GitHub-routed, #508) stay enabled',
         (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -104,35 +107,61 @@ void main() {
         overrides: test.overrides,
       );
 
-      // Banner is present.
+      // Banner is present — price/status reports still need a backend
+      // in DE, so when neither Tankerkoenig nor TankSync is configured
+      // we surface the banner so the user knows to configure one.
       expect(
         find.byKey(const ValueKey('report-no-backend-banner')),
         findsOneWidget,
       );
 
-      // Scroll the button into view (#484 — 10 radios push it below fold).
-      await tester.scrollUntilVisible(
-        find.byType(FilledButton),
-        120,
-        scrollable: find.byType(Scrollable).first,
-      );
-      // Submit button is disabled.
+      // Walk every radio we can find as we scroll: GitHub-routed types
+      // (wrongName, wrongAddress) must be enabled even without a
+      // backend; everything else must be disabled.
+      //
+      // `true`  → enabled (onChanged != null)
+      // `false` → disabled (onChanged == null)
+      //
+      // Start at the top of the list, then drag DOWN so lazy items
+      // below the fold get built into the tree.
+      final seen = <ReportType, bool>{};
+      final scrollable = find.byType(Scrollable).first;
+      for (var i = 0;
+          i < 20 && seen.length < ReportType.values.length;
+          i++) {
+        for (final radio in tester.widgetList<RadioListTile<ReportType>>(
+            find.byType(RadioListTile<ReportType>))) {
+          seen.putIfAbsent(radio.value, () => radio.onChanged != null);
+        }
+        if (seen.length == ReportType.values.length) break;
+        await tester.drag(scrollable, const Offset(0, -200));
+        await tester.pump();
+      }
+
+      // Now the list is scrolled to (or past) the bottom — the submit
+      // button should be in view. It must be disabled because no
+      // report type is selected yet.
       final button = tester.widget<FilledButton>(find.byType(FilledButton));
       expect(button.onPressed, isNull);
 
-      // Every radio option has a null onChanged (disabled).
-      for (final radio in tester
-          .widgetList<RadioListTile<ReportType>>(
-              find.byType(RadioListTile<ReportType>))) {
-        expect(radio.onChanged, isNull,
-            reason:
-                'radios must be disabled when no backend is available');
+      for (final type in ReportType.values) {
+        expect(seen.containsKey(type), isTrue,
+            reason: '$type must be rendered in DE even without a backend');
+        if (type.routesToGitHub) {
+          expect(seen[type], isTrue,
+              reason:
+                  '$type is GitHub-routed and must stay enabled (#508)');
+        } else {
+          expect(seen[type], isFalse,
+              reason:
+                  '$type needs a backend and must be disabled here');
+        }
       }
     });
 
     testWidgets(
-        'FR without TankSync → no-backend banner shown (Tankerkoenig '
-        'path is DE-only, so non-DE users MUST have TankSync)',
+        'FR without TankSync → no banner, only wrongName + wrongAddress '
+        'visible, both enabled (#508)',
         (tester) async {
       final test = standardTestOverrides(country: Countries.france);
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -143,17 +172,35 @@ void main() {
         const ReportScreen(stationId: 'test-station-1'),
         overrides: test.overrides,
       );
+      await tester.pumpAndSettle();
 
+      // Outside DE, only GitHub-routed types are visible — nothing
+      // needs configuring, so the banner must NOT appear.
       expect(
         find.byKey(const ValueKey('report-no-backend-banner')),
-        findsOneWidget,
+        findsNothing,
       );
+
+      // Exactly two radios, both GitHub-routed, both enabled.
+      final radios = tester
+          .widgetList<RadioListTile<ReportType>>(
+              find.byType(RadioListTile<ReportType>))
+          .toList();
+      expect(radios, hasLength(2));
+      expect(
+        radios.map((r) => r.value).toList(),
+        equals([ReportType.wrongName, ReportType.wrongAddress]),
+      );
+      for (final r in radios) {
+        expect(r.onChanged, isNotNull,
+            reason: 'GitHub-routed radios must be enabled regardless of '
+                'backend availability');
+      }
     });
 
     testWidgets(
-        'FR with TankSync key but no Tankerkoenig key still falls into the '
-        'no-backend case when the sync provider reports as disconnected '
-        '(standardTestOverrides uses _DisabledSyncState by default)',
+        'FR with no sync — submit button enables when wrongAddress is '
+        'selected and text is entered, even without any backend (#508)',
         (tester) async {
       final test = standardTestOverrides(country: Countries.france);
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -164,15 +211,25 @@ void main() {
         const ReportScreen(stationId: 'test-station-1'),
         overrides: test.overrides,
       );
+      await tester.pumpAndSettle();
 
-      // The default sync state in the test helper is _DisabledSyncState
-      // (userId is null), so TankSync is effectively not connected.
-      // This mirrors the real-world scenario where French users without
-      // TankSync configured previously got a silent failure.
-      expect(
-        find.byKey(const ValueKey('report-no-backend-banner')),
-        findsOneWidget,
+      // Select wrongAddress
+      await tester.tap(find.text('Adresse incorrecte'));
+      await tester.pumpAndSettle();
+
+      // Button still disabled without text.
+      var button = tester.widget<FilledButton>(find.byType(FilledButton));
+      expect(button.onPressed, isNull);
+
+      await tester.enterText(
+        find.byKey(const ValueKey('report-correction-text-field')),
+        '42 rue de la République, 34310 Montagnac',
       );
+      await tester.pumpAndSettle();
+
+      button = tester.widget<FilledButton>(find.byType(FilledButton));
+      expect(button.onPressed, isNotNull,
+          reason: 'GitHub-routed reports must work without a backend');
     });
 
     testWidgets(
@@ -340,6 +397,182 @@ void main() {
     });
   });
 
+  group('ReportScreen country-gated visibility (#508)', () {
+    testWidgets(
+        'DE — all 10 report types are rendered', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(true);
+      when(() => test.mockStorage.getApiKey())
+          .thenReturn('11111111-2222-3333-4444-555555555555');
+
+      await pumpApp(
+        tester,
+        const ReportScreen(stationId: 'test-station-1'),
+        overrides: test.overrides,
+      );
+      await tester.pumpAndSettle();
+
+      final seen = <ReportType>{};
+      final scrollable = find.byType(Scrollable).first;
+      for (var i = 0;
+          i < 20 && seen.length < ReportType.values.length;
+          i++) {
+        for (final radio in tester.widgetList<RadioListTile<ReportType>>(
+            find.byType(RadioListTile<ReportType>))) {
+          seen.add(radio.value);
+        }
+        await tester.drag(scrollable, const Offset(0, -200));
+        await tester.pump();
+      }
+      expect(seen, equals(ReportType.values.toSet()));
+    });
+
+    testWidgets('FR — only wrongName + wrongAddress are rendered',
+        (tester) async {
+      final test = standardTestOverrides(country: Countries.france);
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+
+      await pumpApp(
+        tester,
+        const ReportScreen(stationId: 'test-station-1'),
+        overrides: test.overrides,
+      );
+      await tester.pumpAndSettle();
+
+      final values = tester
+          .widgetList<RadioListTile<ReportType>>(
+              find.byType(RadioListTile<ReportType>))
+          .map((r) => r.value)
+          .toList();
+      expect(
+        values,
+        equals(const [ReportType.wrongName, ReportType.wrongAddress]),
+      );
+    });
+
+    test('visibleForCountry returns all types for DE, last 2 for FR/GB', () {
+      expect(
+        ReportType.visibleForCountry('DE'),
+        equals(ReportType.values),
+      );
+      expect(
+        ReportType.visibleForCountry('FR'),
+        equals(const [ReportType.wrongName, ReportType.wrongAddress]),
+      );
+      expect(
+        ReportType.visibleForCountry('GB'),
+        equals(const [ReportType.wrongName, ReportType.wrongAddress]),
+      );
+    });
+
+    test('routesToGitHub covers exactly wrongName + wrongAddress', () {
+      for (final t in ReportType.values) {
+        expect(t.routesToGitHub, t == ReportType.wrongName || t == ReportType.wrongAddress,
+            reason: '$t routesToGitHub is wrong');
+      }
+    });
+  });
+
+  group('ReportScreen GitHub routing (#508)', () {
+    testWidgets(
+        'wrongAddress on FR hands off to ErrorReporter with populated payload',
+        (tester) async {
+      ErrorReportPayload? captured;
+      final reporter = ErrorReporter(launcher: (uri) async => true);
+
+      final test = standardTestOverrides(country: Countries.france);
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+
+      // A wrapped reporter that records the payload on reportError and
+      // then delegates (with consent skipped) to the real one.
+      final recording = _RecordingReporter((p) => captured = p);
+
+      await pumpApp(
+        tester,
+        ReportScreen(
+          stationId: 'station-42',
+          reporter: recording,
+        ),
+        overrides: test.overrides,
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Adresse incorrecte'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.byKey(const ValueKey('report-correction-text-field')),
+        '42 rue de la République',
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      expect(captured, isNotNull, reason: 'reporter must be invoked');
+      expect(captured!.countryCode, 'FR');
+      expect(captured!.errorType, 'WrongMetadataReport');
+      expect(captured!.errorMessage, contains('station-42'));
+      expect(captured!.errorMessage, contains('42 rue de la République'));
+      expect(captured!.sourceLabel, isNotNull);
+
+      // Silence the unused-field lint on `reporter`.
+      expect(reporter, isA<ErrorReporter>());
+    });
+
+    testWidgets(
+        'wrongName on DE still routes to GitHub (not to Tankerkoenig)',
+        (tester) async {
+      ErrorReportPayload? captured;
+      final recording = _RecordingReporter((p) => captured = p);
+
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(true);
+      when(() => test.mockStorage.getApiKey())
+          .thenReturn('11111111-2222-3333-4444-555555555555');
+
+      await pumpApp(
+        tester,
+        ReportScreen(
+          stationId: 'station-99',
+          reporter: recording,
+        ),
+        overrides: test.overrides,
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.text('Nom de la station incorrect'),
+        120,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.text('Nom de la station incorrect'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.byKey(const ValueKey('report-correction-text-field')),
+        'Shell Castelnau',
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.byType(FilledButton),
+        120,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      expect(captured, isNotNull);
+      expect(captured!.countryCode, 'DE');
+      expect(captured!.errorType, 'WrongMetadataReport');
+      expect(captured!.errorMessage, contains('station-99'));
+      expect(captured!.errorMessage, contains('Shell Castelnau'));
+    });
+  });
+
   group('ReportType enum (#484)', () {
     test('fuelTypeColumnValue returns the DB-facing identifier', () {
       expect(ReportType.wrongE5.fuelTypeColumnValue, 'e5');
@@ -383,4 +616,26 @@ void main() {
       }
     });
   });
+}
+
+/// Test double that extends [ErrorReporter] and short-circuits
+/// `reportError` to record the payload — skipping both the consent
+/// dialog and the real browser launcher.
+class _RecordingReporter extends ErrorReporter {
+  _RecordingReporter(this.onReport)
+      : super(launcher: _noopLauncher);
+
+  final void Function(ErrorReportPayload) onReport;
+
+  static Future<bool> _noopLauncher(Uri _) async => true;
+
+  @override
+  Future<bool> reportError(
+    BuildContext context,
+    ErrorReportPayload payload, {
+    bool requireConsent = true,
+  }) async {
+    onReport(payload);
+    return true;
+  }
 }
