@@ -67,9 +67,14 @@ class PriceFormatter {
       _cachedDistanceFormat ??= NumberFormat('0.0', _locale);
 
   /// Format price as plain string (e.g., "1,459 €" or "1.459 £").
-  static String formatPrice(double? price) {
+  ///
+  /// Pass [currencyOverride] to force a specific symbol — used by the
+  /// Favorites list (see #514) to render each row in the origin
+  /// country's currency rather than the globally-set profile currency.
+  static String formatPrice(double? price, {String? currencyOverride}) {
     if (price == null || price <= 0) return '--';
-    return '${_fullFormat.format(price)} $currency';
+    final cur = currencyOverride ?? currency;
+    return '${_fullFormat.format(price)} $cur';
   }
 
   /// Format price without currency symbol for compact display.

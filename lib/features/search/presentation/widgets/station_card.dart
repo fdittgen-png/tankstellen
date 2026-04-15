@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/country/country_config.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
@@ -53,10 +54,20 @@ class StationCard extends StatelessWidget {
 
   double? get _displayPrice => station.priceFor(selectedFuelType);
 
+  /// Per-station currency symbol derived from the station id's country
+  /// prefix (#514). Returns `null` for ids without a recognised
+  /// prefix — callers fall back to the active profile currency.
+  String? get _stationCurrency =>
+      Countries.countryForStationId(station.id)?.currencySymbol;
+
   @override
   Widget build(BuildContext context) {
     final price = _displayPrice;
-    final formattedPrice = PriceFormatter.formatPrice(price);
+    final currencyOverride = _stationCurrency;
+    final formattedPrice = PriceFormatter.formatPrice(
+      price,
+      currencyOverride: currencyOverride,
+    );
     final semanticStatus = station.isOpen ? 'Open' : 'Closed';
     final semanticLabel =
         '${_hasBrand ? station.brand : station.name}, ${station.street}, '
@@ -101,6 +112,7 @@ class StationCard extends StatelessWidget {
                   station: station,
                   selectedFuelType: selectedFuelType,
                   price: price,
+                  currencyOverride: currencyOverride,
                   fuelColor: fuelColor,
                   isFavorite: isFavorite,
                   isCheapest: isCheapest,
@@ -239,6 +251,7 @@ class _StationPriceColumn extends StatelessWidget {
   final Station station;
   final FuelType selectedFuelType;
   final double? price;
+  final String? currencyOverride;
   final Color fuelColor;
   final bool isFavorite;
   final bool isCheapest;
@@ -251,6 +264,7 @@ class _StationPriceColumn extends StatelessWidget {
     required this.station,
     required this.selectedFuelType,
     required this.price,
+    required this.currencyOverride,
     required this.fuelColor,
     required this.isFavorite,
     required this.isCheapest,
@@ -290,6 +304,7 @@ class _StationPriceColumn extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               text: PriceFormatter.priceTextSpan(
                 price,
+                currencyOverride: currencyOverride,
                 baseStyle: theme.textTheme.titleLarge!.copyWith(
                   fontWeight: FontWeight.bold,
                   color: station.isOpen
