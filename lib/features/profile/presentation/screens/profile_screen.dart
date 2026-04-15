@@ -28,19 +28,23 @@ class ProfileScreen extends ConsumerWidget {
       ),
       body: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
+        // #530 — compact vertical spacing. Was `EdgeInsets.all(16)` plus
+        // `SizedBox(height: 32)` between every major section, which ate
+        // ~180 dp of whitespace on a single screen. Tightened to 8 dp
+        // top / 16 dp sides + 16 dp section gaps + 4 dp header-to-body.
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         children: [
           // Profiles
           _SectionHeader(icon: Icons.person, title: l?.sectionProfile ?? 'Profile'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           const ProfileListSection(),
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
 
           // Location
           _SectionHeader(icon: Icons.my_location, title: l?.sectionLocation ?? 'Location'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           const LocationSectionWidget(),
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
 
           // TankSync
           const _FoldableSection(
@@ -85,14 +89,14 @@ class ProfileScreen extends ConsumerWidget {
             title: l?.storageAndCache ?? 'Storage & cache',
             child: const StorageSection(),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
 
           // About
           _SectionHeader(
               icon: Icons.info_outline, title: l?.about ?? 'About'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           const AboutSection(),
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
 
           // Privacy & Consent
           _FoldableSection(
