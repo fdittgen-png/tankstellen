@@ -890,6 +890,12 @@ abstract class AppLocalizations {
   /// **'Not set (demo mode)'**
   String get configApiKeyNotSet;
 
+  /// No description provided for @configApiKeyCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Default (community key)'**
+  String get configApiKeyCommunity;
+
   /// No description provided for @configEvKey.
   ///
   /// In en, this message translates to:

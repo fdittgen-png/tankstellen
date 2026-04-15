@@ -408,6 +408,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get configApiKeyNotSet => 'Nicht gesetzt (Demo-Modus)';
 
   @override
+  String get configApiKeyCommunity => 'Standard-Community-Schlüssel';
+
+  @override
   String get configEvKey => 'Ladesäulen API-Schlüssel';
 
   @override

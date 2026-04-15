@@ -20,7 +20,10 @@ class ConfigVerificationWidget extends ConsumerWidget {
     final apiKeys = ref.read(apiKeyStorageProvider);
     final syncConfig = ref.watch(syncStateProvider);
     final profile = ref.watch(activeProfileProvider);
-    final hasApiKey = apiKeys.hasApiKey();
+    // #521 — hasApiKey is always true now (community default always
+    // available). We render one of two states based on hasCustomApiKey
+    // instead: user-configured key vs shipped default.
+    final hasCustomApiKey = apiKeys.hasCustomApiKey();
     final isEmail = syncConfig.hasEmail;
 
     return Card(
@@ -62,10 +65,15 @@ class ConfigVerificationWidget extends ConsumerWidget {
             _ConfigRow(
               icon: Icons.key,
               label: l?.configTankerkoenigKey ?? 'Tankerkoenig API key',
-              value: hasApiKey
+              // #521 — never render "Not set (demo mode)": the bundled
+              // community key means the app always has a working key.
+              // The row now distinguishes user-set (Configurée / green)
+              // from the community default (same status — real data,
+              // just not the user's own key).
+              value: hasCustomApiKey
                   ? (l?.configApiKeyConfigured ?? 'Configured')
-                  : (l?.configApiKeyNotSet ?? 'Not set (demo mode)'),
-              status: hasApiKey ? _Status.ok : _Status.warning,
+                  : (l?.configApiKeyCommunity ?? 'Default (community key)'),
+              status: _Status.ok,
             ),
             _ConfigRow(
               icon: Icons.ev_station,

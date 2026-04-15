@@ -58,6 +58,9 @@ void main() {
             if (line.trimLeft().startsWith('//')) continue;
             // Exclude default EV API key (intentionally public, shared key)
             if (line.contains('defaultEvApiKey')) continue;
+            // #521 — bundled Tankerkoenig community key (intentionally
+            // public, rate-limited, shared across public builds).
+            if (line.contains('defaultTankerkoenigKey')) continue;
             violations.add('${file.path}:${i + 1}: $line');
           }
         }

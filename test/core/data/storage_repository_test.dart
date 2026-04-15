@@ -18,7 +18,14 @@ void main() {
       expect(mock.getFavoriteIds(), isEmpty);
       expect(mock.getRatings(), isEmpty);
       expect(mock.getIgnoredIds(), isEmpty);
-      expect(mock.hasApiKey(), isFalse);
+      // #521 — hasApiKey is always true (bundled community default);
+      // the custom-key flag is what the UI actually branches on now.
+      expect(mock.hasApiKey(), isTrue);
+      expect(mock.hasCustomApiKey(), isFalse);
+      // The mock's isSetupComplete still returns false because the
+      // mock hasn't been wired to track skipped/custom state — this
+      // test only verifies the interface, not the SettingsHiveStore
+      // implementation, so the old assertion stands.
       expect(mock.isSetupComplete, isFalse);
       expect(mock.alertCount, 0);
       expect(mock.favoriteCount, 0);
@@ -111,7 +118,8 @@ class _MockStorageRepository implements StorageRepository {
   @override String? getApiKey() => null;
   @override Future<void> setApiKey(String key) async {}
   @override Future<void> deleteApiKey() async {}
-  @override bool hasApiKey() => false;
+  @override bool hasApiKey() => true;
+  @override bool hasCustomApiKey() => false;
   @override String? getEvApiKey() => null;
   @override bool hasEvApiKey() => false;
   @override bool hasCustomEvApiKey() => false;

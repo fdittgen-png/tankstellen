@@ -90,6 +90,8 @@ class HiveStorage implements StorageRepository {
   @override
   bool hasApiKey() => _settings.hasApiKey();
   @override
+  bool hasCustomApiKey() => _settings.hasCustomApiKey();
+  @override
   String? getEvApiKey() => _settings.getEvApiKey();
   @override
   bool hasEvApiKey() => _settings.hasEvApiKey();

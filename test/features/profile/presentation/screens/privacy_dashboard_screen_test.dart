@@ -50,6 +50,7 @@ void main() {
       when(() => mockStorage.cacheEntryCount).thenReturn(15);
       when(() => mockStorage.getItineraries()).thenReturn([{'id': 'r1'}]);
       when(() => mockStorage.hasApiKey()).thenReturn(true);
+      when(() => mockStorage.hasCustomApiKey()).thenReturn(true);
       when(() => mockStorage.getApiKey()).thenReturn('key');
       when(() => mockStorage.hasEvApiKey()).thenReturn(false);
       when(() => mockStorage.hasCustomEvApiKey()).thenReturn(false);
