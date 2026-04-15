@@ -8,8 +8,12 @@ import 'package:flutter_test/flutter_test.dart';
 class TolerantGoldenFileComparator extends LocalFileComparator {
   TolerantGoldenFileComparator(super.testFile);
 
-  /// Maximum allowed pixel difference ratio (0.5% = 0.005).
-  static const double _tolerance = 0.005;
+  /// Maximum allowed pixel difference ratio (1.0% = 0.01).
+  ///
+  /// Windows vs Linux sub-pixel font rendering regularly produces
+  /// 0.3–0.8% diffs on text-heavy widgets. 1% is still tight enough
+  /// to catch any real layout or color regression.
+  static const double _tolerance = 0.01;
 
   @override
   Future<bool> compare(Uint8List imageBytes, Uri golden) async {
