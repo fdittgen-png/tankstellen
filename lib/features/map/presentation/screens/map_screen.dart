@@ -61,6 +61,29 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // #529 — nudge the FlutterMap controller whenever a fresh search
+    // result arrives, so the TileLayer re-computes its viewport and
+    // fetches tiles for the new bounds. Without this, switching to
+    // the Carte tab after a search briefly shows blank OSM tiles:
+    // the map widget is pre-built offstage inside the shell's
+    // indexedStack, the `initState` nudge and the one-shot
+    // `onMapReady` (#498) have already fired, and nothing retriggers
+    // a viewport recompute when the search state changes.
+    ref.listen(searchStateProvider, (_, next) {
+      if (next.hasValue && next.value!.data.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          try {
+            final camera = _mapController.camera;
+            _mapController.move(camera.center, camera.zoom);
+          } catch (_) {
+            // Controller not attached yet — the onMapReady fallback
+            // in station_map_layers.dart will handle the first load.
+          }
+        });
+      }
+    });
+
     final searchState = ref.watch(searchStateProvider);
     final selectedFuel = ref.watch(selectedFuelTypeProvider);
     final searchRadius = ref.watch(searchRadiusProvider);
