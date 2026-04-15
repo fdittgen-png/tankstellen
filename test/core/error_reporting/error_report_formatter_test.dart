@@ -143,7 +143,7 @@ void main() {
       expect(url.path, endsWith('/issues/new'));
     });
 
-    test('passes title, body, labels, and template as query params', () {
+    test('passes title, body, and labels as query params', () {
       final url = ErrorReportFormatter.buildIssueUrl(
         _payload(
           sourceLabel: 'CMA Fuel Finder',
@@ -151,13 +151,50 @@ void main() {
           errorType: 'ApiException',
         ),
       );
-      expect(url.queryParameters['template'], 'bug_report.yml');
       expect(url.queryParameters['labels'], 'type/bug,needs-triage');
       expect(
         url.queryParameters['title'],
         'bug: CMA Fuel Finder — ApiException (HTTP 404)',
       );
       expect(url.queryParameters['body'], contains('## What happened'));
+    });
+
+    test('does NOT set a template query param (#506)', () {
+      // GitHub ignores ?body= whenever ?template= is present, so the
+      // reporter must never pass a template — otherwise the rich body
+      // built by buildBody silently never reaches the issue form.
+      final url = ErrorReportFormatter.buildIssueUrl(_payload());
+      expect(url.queryParameters.containsKey('template'), isFalse);
+    });
+
+    test('body query param matches buildBody output verbatim (#506)', () {
+      final payload = _payload(
+        sourceLabel: 'CMA Fuel Finder',
+        statusCode: 404,
+        errorType: 'ApiException',
+      );
+      final url = ErrorReportFormatter.buildIssueUrl(payload);
+      expect(
+        url.queryParameters['body'],
+        ErrorReportFormatter.buildBody(payload),
+      );
+    });
+
+    test('body query param is non-trivially populated (#506)', () {
+      // Regression guard: if a future refactor drops body again, this
+      // test will fire before the bug reaches users.
+      final url = ErrorReportFormatter.buildIssueUrl(
+        _payload(
+          sourceLabel: 'CMA Fuel Finder',
+          statusCode: 404,
+          errorMessage: 'Upstream 404',
+        ),
+      );
+      final body = url.queryParameters['body']!;
+      expect(body.length, greaterThan(200));
+      expect(body, contains('## What happened'));
+      expect(body, contains('## Environment'));
+      expect(body, contains('App version'));
     });
 
     test('url-encodes the title and body safely', () {

@@ -10,7 +10,6 @@ class ErrorReportFormatter {
   const ErrorReportFormatter._();
 
   static const String _labels = 'type/bug,needs-triage';
-  static const String _template = 'bug_report.yml';
 
   /// Short, single-line title suitable for a GitHub issue.
   ///
@@ -89,15 +88,18 @@ class ErrorReportFormatter {
   }
 
   /// Builds the fully-qualified GitHub issue-new URL with title, body,
-  /// labels, and template parameters pre-filled.
+  /// and labels pre-filled.
   ///
-  /// GitHub's `?template=bug_report.yml` form only accepts query params
-  /// for specific fields defined in the template. We additionally pass
-  /// `title` and `body` for platforms that fall back to the plain form.
+  /// We intentionally do **not** pass `template=bug_report.yml` —
+  /// GitHub's issue-new page silently ignores `body=` whenever a
+  /// template is specified, because template mode prefills from
+  /// per-field query params whose keys match the template's `id:`s
+  /// (`description`, `steps`, `expected`, etc.). Since our `buildBody`
+  /// already produces a self-contained Markdown body, dropping the
+  /// template lets the full payload reach the form verbatim.
   static Uri buildIssueUrl(ErrorReportPayload p) {
     final base = Uri.parse('${AppConstants.githubRepoUrl}/issues/new');
     return base.replace(queryParameters: <String, String>{
-      'template': _template,
       'labels': _labels,
       'title': buildTitle(p),
       'body': buildBody(p),
