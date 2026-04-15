@@ -163,6 +163,15 @@ class _ShellScreenState extends State<ShellScreen> with TickerProviderStateMixin
     // Wide screens: use NavigationRail instead of bottom nav
     if (screenSize != ScreenSize.compact) {
       return Scaffold(
+        // #520 — the shell Scaffold has no AppBar of its own, so it must
+        // not claim to be the primary Scaffold. Otherwise Flutter routes
+        // the status-bar inset through the outer Scaffold *and* through
+        // the inner screen's AppBar, producing the doubled gap the user
+        // sees between the Android status bar and the title on every
+        // top-level destination. Setting primary: false tells Flutter
+        // "this Scaffold does not own the top inset — pass it through to
+        // the child verbatim".
+        primary: false,
         body: Row(
           children: [
             _AdaptiveNavigationRail(
@@ -181,6 +190,9 @@ class _ShellScreenState extends State<ShellScreen> with TickerProviderStateMixin
 
     // Compact screens: bottom navigation bar
     return Scaffold(
+      // #520 — see comment in the wide-screen branch above. Same fix,
+      // applied to the compact Scaffold that hosts the bottom nav.
+      primary: false,
       body: body,
       bottomNavigationBar: _AnimatedNavBar(
         items: destinations,
