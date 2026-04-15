@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
+import 'package:tankstellen/core/error_reporting/error_reporter.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('ServiceStatusBanner', () {
@@ -242,6 +244,100 @@ void main() {
       ));
 
       expect(find.textContaining('search radius'), findsOneWidget);
+    });
+
+    group('Report this issue button (#500)', () {
+      Widget wrapWithL10n(Widget child) {
+        return MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: SingleChildScrollView(child: child)),
+        );
+      }
+
+      testWidgets('renders a "Report this issue" button', (tester) async {
+        await tester.pumpWidget(wrapWithL10n(
+          ServiceChainErrorWidget(
+            error: const ApiException(
+              message: 'Upstream broken',
+              statusCode: 404,
+            ),
+            onRetry: () {},
+          ),
+        ));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Report this issue'), findsOneWidget);
+        expect(find.byIcon(Icons.bug_report_outlined), findsOneWidget);
+      });
+
+      testWidgets('tapping report opens the consent dialog, not the browser',
+          (tester) async {
+        Uri? launched;
+        final reporter = ErrorReporter(
+          launcher: (uri) async {
+            launched = uri;
+            return true;
+          },
+        );
+
+        await tester.pumpWidget(wrapWithL10n(
+          ServiceChainErrorWidget(
+            error: const ApiException(
+              message: 'Upstream broken',
+              statusCode: 404,
+            ),
+            onRetry: () {},
+            reporter: reporter,
+            countryCode: 'GB',
+          ),
+        ));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Report this issue'));
+        await tester.pumpAndSettle();
+
+        // Dialog is up; browser has NOT been launched yet.
+        expect(find.text('Open GitHub'), findsOneWidget);
+        expect(find.text('Cancel'), findsOneWidget);
+        expect(launched, isNull);
+
+        // Confirming the dialog now launches the URL.
+        await tester.tap(find.text('Open GitHub'));
+        await tester.pumpAndSettle();
+
+        expect(launched, isNotNull);
+        expect(launched!.toString(), contains('issues/new'));
+        // countryCode propagates through to the generated title.
+        expect(launched!.queryParameters['title'], contains('GB'));
+      });
+
+      testWidgets('cancelling the consent dialog does not launch a URL',
+          (tester) async {
+        Uri? launched;
+        final reporter = ErrorReporter(
+          launcher: (uri) async {
+            launched = uri;
+            return true;
+          },
+        );
+
+        await tester.pumpWidget(wrapWithL10n(
+          ServiceChainErrorWidget(
+            error: Exception('weird error'),
+            onRetry: () {},
+            reporter: reporter,
+          ),
+        ));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Report this issue'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        expect(launched, isNull);
+      });
     });
   });
 }

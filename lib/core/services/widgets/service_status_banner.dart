@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../error/error_localizer.dart';
 import '../../error/exceptions.dart';
+import '../../error_reporting/error_report_payload.dart';
+import '../../error_reporting/error_reporter.dart';
+import '../../error_reporting/error_reporter_context.dart';
 import '../service_result.dart';
 
 /// Displays a banner when data comes from cache or fallback services.
@@ -66,10 +69,20 @@ class ServiceChainErrorWidget extends StatelessWidget {
   final Object error;
   final VoidCallback? onRetry;
 
+  /// Reporter used by the "Report this issue" button. Defaults to a
+  /// real [ErrorReporter] that opens a consent dialog and launches the
+  /// browser. Tests inject a fake.
+  final ErrorReporter? reporter;
+
+  /// Optional country code to include in the report (e.g. `GB`).
+  final String? countryCode;
+
   const ServiceChainErrorWidget({
     super.key,
     required this.error,
     this.onRetry,
+    this.reporter,
+    this.countryCode,
   });
 
   /// Extract a short, user-friendly title from the error.
@@ -137,6 +150,22 @@ class ServiceChainErrorWidget extends StatelessWidget {
     return [render(error)];
   }
 
+  /// Builds the payload and hands off to the injected [ErrorReporter].
+  ///
+  /// The reporter shows its own consent dialog before launching the
+  /// browser, so this method never sends anything off-device on its
+  /// own — the user still has to confirm.
+  void _onReportPressed(BuildContext context) {
+    final payload = ErrorReportPayload.fromError(
+      error,
+      appVersion: ErrorReporterContext.currentAppVersion(),
+      platform: ErrorReporterContext.currentPlatform(),
+      locale: ErrorReporterContext.currentLocale(context),
+      countryCode: countryCode,
+    );
+    (reporter ?? const ErrorReporter()).reportError(context, payload);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -170,6 +199,12 @@ class ServiceChainErrorWidget extends StatelessWidget {
                 icon: const Icon(Icons.refresh),
                 label: Text(l10n?.retry ?? 'Try again'),
               ),
+            const SizedBox(height: 8),
+            TextButton.icon(
+              onPressed: () => _onReportPressed(context),
+              icon: const Icon(Icons.bug_report_outlined, size: 18),
+              label: Text(l10n?.reportThisIssue ?? 'Report this issue'),
+            ),
             const SizedBox(height: 12),
             // Expandable technical details
             Theme(
