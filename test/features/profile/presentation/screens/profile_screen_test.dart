@@ -184,6 +184,60 @@ void main() {
     });
 
     testWidgets(
+        '#528: Scaffold.bottomNavigationBar wrapped in SafeArea(top: false) '
+        'does not double the gesture-bar inset', (tester) async {
+      // Baseline for the #528 fix pattern. A bare bottomNavigationBar
+      // built with SafeArea(top: false) inside it must have its bottom
+      // edge sitting at screenHeight - viewPadding.bottom, not
+      // screenHeight - 2 * viewPadding.bottom (the doubled-inset bug).
+      const gestureBarHeight = 24.0;
+      const barContentHeight = 64.0;
+      await tester.binding.setSurfaceSize(const Size(412, 915));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        const MediaQuery(
+          data: MediaQueryData(
+            padding: EdgeInsets.only(bottom: gestureBarHeight),
+            viewPadding: EdgeInsets.only(bottom: gestureBarHeight),
+            size: Size(412, 915),
+            devicePixelRatio: 1,
+          ),
+          child: MaterialApp(
+            home: Scaffold(
+              body: SizedBox.shrink(),
+              bottomNavigationBar: SafeArea(
+                top: false,
+                child: SizedBox(
+                  key: ValueKey('nav-bar-test'),
+                  height: barContentHeight,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final navBarRect = tester.getRect(find.byKey(const ValueKey('nav-bar-test')));
+      // The SizedBox contents should sit ABOVE the gesture bar, with
+      // its bottom edge at screenHeight - gestureBarHeight. The SafeArea
+      // absorbs the inset so we never get a doubled gap below.
+      expect(
+        navBarRect.bottom,
+        closeTo(915 - gestureBarHeight, 0.5),
+        reason: 'bottom nav content must sit directly above the gesture '
+            'bar — doubled-inset regression (#528)',
+      );
+      expect(
+        navBarRect.height,
+        closeTo(barContentHeight, 0.5),
+        reason: 'SafeArea must not grow the bar height — it should '
+            'only consume the inset from the surrounding space',
+      );
+    });
+
+    testWidgets(
         '#520: nested Scaffold (shell pattern) with primary: false on '
         'the outer keeps the inner AppBar title in the correct band',
         (tester) async {

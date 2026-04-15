@@ -293,13 +293,18 @@ class _AnimatedNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final iconSize = isLandscape ? 20.0 : 24.0;
-    // Respect system navigation bar
-    final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
-    final barHeight = (isLandscape ? 48.0 : 64.0) + bottomPadding;
+    // #528 — wrap the bar in `SafeArea(top: false)` rather than
+    // reading `MediaQuery.viewPadding.bottom` manually. SafeArea
+    // *consumes* the inset, so no ancestor or descendant can
+    // accidentally apply it a second time. Fixes the visible band
+    // of empty space between the bottom nav and the Android gesture
+    // bar on edge-to-edge devices (same class of bug as #520).
+    final barHeight = isLandscape ? 48.0 : 64.0;
 
-    return Container(
+    return SafeArea(
+      top: false,
+      child: Container(
       height: barHeight,
-      padding: EdgeInsets.only(bottom: bottomPadding),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
         boxShadow: [
@@ -359,6 +364,7 @@ class _AnimatedNavBar extends StatelessWidget {
             ),
           );
         }),
+      ),
       ),
     );
   }
