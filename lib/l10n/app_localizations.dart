@@ -806,6 +806,36 @@ abstract class AppLocalizations {
   /// **'Report a bug / Suggest a feature'**
   String get reportBug;
 
+  /// No description provided for @reportThisIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Report this issue'**
+  String get reportThisIssue;
+
+  /// No description provided for @reportConsentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report to GitHub?'**
+  String get reportConsentTitle;
+
+  /// No description provided for @reportConsentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will open a public GitHub issue with the error details below. No GPS coordinates, API keys, or personal data are included.'**
+  String get reportConsentBody;
+
+  /// No description provided for @reportConsentConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Open GitHub'**
+  String get reportConsentConfirm;
+
+  /// No description provided for @reportConsentCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get reportConsentCancel;
+
   /// No description provided for @privacyPolicy.
   ///
   /// In en, this message translates to:

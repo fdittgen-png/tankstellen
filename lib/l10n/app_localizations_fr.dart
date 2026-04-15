@@ -365,6 +365,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reportBug => 'Signaler un bug / Suggérer une amélioration';
 
   @override
+  String get reportThisIssue => 'Signaler ce problème';
+
+  @override
+  String get reportConsentTitle => 'Signaler sur GitHub ?';
+
+  @override
+  String get reportConsentBody =>
+      'Ceci ouvrira une issue publique sur GitHub avec les détails de l\'erreur ci-dessous. Aucune coordonnée GPS, clé API ou donnée personnelle n\'est incluse.';
+
+  @override
+  String get reportConsentConfirm => 'Ouvrir GitHub';
+
+  @override
+  String get reportConsentCancel => 'Annuler';
+
+  @override
   String get privacyPolicy => 'Politique de confidentialité';
 
   @override

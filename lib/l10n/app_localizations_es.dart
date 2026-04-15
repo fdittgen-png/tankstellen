@@ -366,6 +366,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reportBug => 'Reportar error / Sugerir función';
 
   @override
+  String get reportThisIssue => 'Report this issue';
+
+  @override
+  String get reportConsentTitle => 'Report to GitHub?';
+
+  @override
+  String get reportConsentBody =>
+      'This will open a public GitHub issue with the error details below. No GPS coordinates, API keys, or personal data are included.';
+
+  @override
+  String get reportConsentConfirm => 'Open GitHub';
+
+  @override
+  String get reportConsentCancel => 'Cancel';
+
+  @override
   String get privacyPolicy => 'Política de privacidad';
 
   @override
