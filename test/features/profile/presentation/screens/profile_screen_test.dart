@@ -98,6 +98,36 @@ void main() {
       expect(find.text('Configuration & Privacy'), findsNothing);
     });
 
+    testWidgets(
+        '#530: no vertical SizedBox spacer taller than 16 dp on the '
+        'Settings screen body', (tester) async {
+      // Regression guard for #530 — the previous layout had four
+      // `SizedBox(height: 32)` spacers between major sections,
+      // eating ~100 dp of whitespace. A *vertical spacer* is a
+      // `SizedBox` whose width is null / infinite and whose height
+      // exceeds 16 dp. Square boxes (icons) and fixed-width sized
+      // boxes (avatar wrappers) are excluded by the width-is-null
+      // filter.
+      await pumpApp(
+        tester,
+        const ProfileScreen(),
+        overrides: overrides,
+      );
+
+      final verticalSpacers = tester
+          .widgetList<SizedBox>(find.byType(SizedBox))
+          .where((s) => s.width == null)
+          .where((s) => (s.height ?? 0) > 16)
+          .toList();
+
+      expect(
+        verticalSpacers,
+        isEmpty,
+        reason: '#530: no vertical spacer should exceed 16 dp — found '
+            '${verticalSpacers.map((s) => s.height).toList()}',
+      );
+    });
+
     testWidgets('does not render the ConfigVerificationWidget (#519)',
         (tester) async {
       await pumpApp(
