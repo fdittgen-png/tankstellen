@@ -320,14 +320,13 @@ void main() {
     });
 
     test(
-        '#521: isSetupComplete is true on a fresh install because the '
-        'community default key is always available', () {
-      // Before #521 this returned false until the user either set a
-      // custom key or explicitly skipped setup. Since the community
-      // key is bundled, there is no "unconfigured" starting state any
-      // more — the onboarding flow can jump straight to the landing
-      // screen.
-      expect(storage.isSetupComplete, isTrue);
+        '#555: isSetupComplete is false on fresh install — wizard must show',
+        () {
+      // #521 introduced a regression: hasApiKey() became always-true
+      // (community default key), and isSetupComplete depended on it.
+      // This bypassed the onboarding wizard entirely. The fix (#555)
+      // makes isSetupComplete depend only on the setupSkipped flag.
+      expect(storage.isSetupComplete, isFalse);
     });
   });
 

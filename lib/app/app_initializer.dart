@@ -145,6 +145,12 @@ class AppInitializer {
     // Migrate existing profiles to include country/language.
     final profileRepo = ProfileRepository(storage);
     await profileRepo.migrateProfileCountryLanguage();
+
+    // Safety net: guarantee a default profile always exists (#555).
+    // The onboarding wizard calls ensureDefaultProfile() at completion,
+    // but if the wizard was ever skipped (e.g., by the #521 hasApiKey
+    // regression), the app would run without any profile.
+    await profileRepo.ensureDefaultProfile();
   }
 
   // ---------------------------------------------------------------------------
