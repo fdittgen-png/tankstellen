@@ -66,6 +66,7 @@ copilot/
 # Development documentation (kept in docs/ for reference)
 docs/*
 # Except: privacy policy (deployed to GitHub Pages), Play Store docs, contributor guides, README screenshots
+!docs/index.html
 !docs/privacy-policy/
 !docs/play-store/
 !docs/decisions/
