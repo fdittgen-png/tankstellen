@@ -11,10 +11,12 @@ import '../../../alerts/domain/entities/price_alert.dart';
 import '../../../alerts/presentation/widgets/create_alert_dialog.dart';
 import '../../../alerts/providers/alert_provider.dart';
 import '../../../favorites/providers/favorites_provider.dart';
+import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/brand_registry.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../../core/utils/navigation_utils.dart';
+import '../../../../core/utils/station_extensions.dart';
 import '../../providers/station_detail_provider.dart';
 import '../widgets/price_history_section.dart';
 import '../widgets/price_tile.dart';
@@ -215,6 +217,8 @@ class StationDetailScreen extends ConsumerWidget {
           if (station.e85 != null) PriceTile(label: 'E85', price: station.e85, fuelType: FuelType.e85),
           if (station.lpg != null) PriceTile(label: 'LPG', price: station.lpg, fuelType: FuelType.lpg),
           if (station.cng != null) PriceTile(label: 'CNG', price: station.cng, fuelType: FuelType.cng),
+          const SizedBox(height: 12),
+          _LogFillUpButton(station: station),
           const SizedBox(height: 16),
 
           // Address, opening hours, fuels, location (services moved to bottom)
@@ -261,5 +265,70 @@ class StationDetailScreen extends ConsumerWidget {
         SnackBarHelper.showSuccess(context, l10n?.alertCreated ?? 'Price alert created');
       }
     }
+  }
+}
+
+/// "Log fill-up here" button. Reads the active profile's preferred fuel
+/// type and the station's current price for that fuel, then navigates to
+/// [AddFillUpScreen] with both pre-filled so the user only needs to type
+/// liters and odometer.
+class _LogFillUpButton extends ConsumerWidget {
+  final Station station;
+
+  const _LogFillUpButton({required this.station});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(activeProfileProvider);
+    final preferredFuel = profile?.preferredFuelType;
+    // Fall back to any fuel the station reports if the profile fuel isn't
+    // available at this station (e.g. diesel-preferring user at a petrol-only
+    // bio station).
+    final pricedFuel = preferredFuel != null &&
+            station.priceFor(preferredFuel) != null
+        ? preferredFuel
+        : _firstAvailableFuel(station);
+    final pricePerLiter =
+        pricedFuel != null ? station.priceFor(pricedFuel) : null;
+    final stationName = station.brand.isNotEmpty &&
+            station.brand != 'Station' &&
+            station.brand != BrandRegistry.independentLabel
+        ? station.brand
+        : station.street;
+
+    return OutlinedButton.icon(
+      onPressed: () {
+        final extra = <String, Object>{
+          'stationId': station.id,
+          'stationName': stationName,
+        };
+        if (pricedFuel != null) extra['fuelType'] = pricedFuel;
+        if (pricePerLiter != null) extra['pricePerLiter'] = pricePerLiter;
+        context.push('/consumption/add', extra: extra);
+      },
+      icon: const Icon(Icons.local_gas_station_outlined),
+      label: Text(
+        AppLocalizations.of(context)?.addFillUp ?? 'Log fill-up here',
+      ),
+    );
+  }
+
+  /// Returns the first fuel type for which this station has a price, in a
+  /// predictable priority order. Used when the profile fuel isn't available
+  /// at the station, so the button can still pre-fill a reasonable default.
+  static FuelType? _firstAvailableFuel(Station s) {
+    const order = [
+      FuelType.e10,
+      FuelType.e5,
+      FuelType.diesel,
+      FuelType.e98,
+      FuelType.e85,
+      FuelType.lpg,
+      FuelType.cng,
+    ];
+    for (final f in order) {
+      if (s.priceFor(f) != null) return f;
+    }
+    return null;
   }
 }
