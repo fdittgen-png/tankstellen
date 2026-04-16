@@ -75,6 +75,31 @@ class ErrorReportFormatter {
       buf.writeln();
     }
 
+    // Diagnostic context — helps triage without a repro (#524).
+    final hasContext = p.networkState != null || p.searchContext != null;
+    if (hasContext) {
+      buf.writeln('## Context');
+      buf.writeln();
+      if (p.networkState != null) {
+        buf.writeln('- **Network:** ${p.networkState}');
+      }
+      if (p.searchContext != null) {
+        buf.writeln('- **Action:** ${p.searchContext}');
+      }
+      buf.writeln();
+    }
+
+    if (p.stackExcerpt != null && p.stackExcerpt!.isNotEmpty) {
+      buf.writeln('<details><summary>Stack trace (app frames only)</summary>');
+      buf.writeln();
+      buf.writeln('```');
+      buf.writeln(p.stackExcerpt);
+      buf.writeln('```');
+      buf.writeln();
+      buf.writeln('</details>');
+      buf.writeln();
+    }
+
     buf.writeln('## Steps to reproduce');
     buf.writeln();
     buf.writeln('<!-- Add any context about what you were doing -->');

@@ -77,8 +77,13 @@ class SearchResultsContent extends ConsumerWidget {
         return SearchResultsList(result: result, onRefresh: onGpsRetry);
       },
       loading: () => const ShimmerStationList(),
-      error: (error, _) =>
-          ServiceChainErrorWidget(error: error, onRetry: onGpsRetry),
+      error: (error, stackTrace) =>
+          ServiceChainErrorWidget(
+            error: error,
+            onRetry: onGpsRetry,
+            stackTrace: stackTrace,
+            searchContext: 'Station search (${ref.read(selectedFuelTypeProvider).apiValue})',
+          ),
     );
   }
 }

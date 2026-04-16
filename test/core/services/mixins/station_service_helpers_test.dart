@@ -27,7 +27,8 @@ void main() {
       expect(
         () => helper.throwApiException(dioError),
         throwsA(isA<ApiException>()
-            .having((e) => e.message, 'message', 'Connection timeout')
+            .having((e) => e.message, 'message', contains('Connection timeout'))
+            .having((e) => e.message, 'has path', contains('path: /test'))
             .having((e) => e.statusCode, 'statusCode', 503)),
       );
     });
@@ -40,7 +41,7 @@ void main() {
         () =>
             helper.throwApiException(dioError, defaultMessage: 'Custom error'),
         throwsA(isA<ApiException>()
-            .having((e) => e.message, 'message', 'Custom error')),
+            .having((e) => e.message, 'message', contains('Custom error'))),
       );
     });
 
@@ -51,7 +52,8 @@ void main() {
       expect(
         () => helper.throwApiException(dioError),
         throwsA(isA<ApiException>()
-            .having((e) => e.message, 'message', 'Network error')),
+            .having((e) => e.message, 'message', contains('Network error'))
+            .having((e) => e.message, 'has path', contains('path: /test'))),
       );
     });
 

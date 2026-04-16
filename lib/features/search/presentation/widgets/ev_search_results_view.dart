@@ -55,8 +55,13 @@ class EvSearchResultsView extends ConsumerWidget {
         );
       },
       loading: () => const ShimmerStationList(),
-      error: (error, _) =>
-          ServiceChainErrorWidget(error: error, onRetry: onSearch),
+      error: (error, stackTrace) =>
+          ServiceChainErrorWidget(
+            error: error,
+            onRetry: onSearch,
+            stackTrace: stackTrace,
+            searchContext: 'EV charging search',
+          ),
     );
   }
 }

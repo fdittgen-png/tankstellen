@@ -6,7 +6,6 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
@@ -172,10 +171,7 @@ class _EmptyEvFavorites extends EvFavorites {
   List<String> build() => const [];
 }
 
-class _EmptyEvFavoriteStations extends EvFavoriteStations {
-  @override
-  List<ChargingStation> build() => const [];
-}
+
 
 /// SyncState that returns a disabled config (no sync, no Supabase calls).
 class _DisabledSyncState extends SyncState {

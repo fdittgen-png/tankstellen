@@ -39,6 +39,15 @@ class ErrorReportPayload {
   /// Wall clock at which the error was captured.
   final DateTime capturedAt;
 
+  /// First few lines of the stack trace (sanitized, no file paths).
+  final String? stackExcerpt;
+
+  /// Network connectivity state at time of error (e.g. `wifi`, `mobile`, `none`).
+  final String? networkState;
+
+  /// What the user was doing (e.g. `GPS search`, `ZIP search 34120`).
+  final String? searchContext;
+
   const ErrorReportPayload({
     required this.errorType,
     required this.errorMessage,
@@ -50,6 +59,9 @@ class ErrorReportPayload {
     this.countryCode,
     this.sourceLabel,
     this.fallbackChain = const [],
+    this.stackExcerpt,
+    this.networkState,
+    this.searchContext,
   });
 
   /// Builds a payload from an error object, extracting structured fields
@@ -60,6 +72,9 @@ class ErrorReportPayload {
     required String platform,
     required String locale,
     String? countryCode,
+    String? networkState,
+    String? searchContext,
+    StackTrace? stackTrace,
   }) {
     int? statusCode;
     String? sourceLabel;
@@ -99,7 +114,25 @@ class ErrorReportPayload {
       platform: platform,
       locale: locale,
       capturedAt: DateTime.now(),
+      stackExcerpt: _extractStackExcerpt(stackTrace),
+      networkState: networkState,
+      searchContext: searchContext,
     );
+  }
+
+  /// Extracts a short, privacy-safe stack trace excerpt.
+  ///
+  /// Keeps only `package:tankstellen/` frames (no system or third-party
+  /// frames) and limits to 8 lines to fit in a GitHub URL.
+  static String? _extractStackExcerpt(StackTrace? trace) {
+    if (trace == null) return null;
+    final lines = trace.toString().split('\n')
+        .where((l) => l.contains('package:tankstellen/'))
+        .take(8)
+        .map((l) => l.trim())
+        .toList();
+    if (lines.isEmpty) return null;
+    return lines.join('\n');
   }
 
   /// Strips control characters and collapses whitespace so the message
