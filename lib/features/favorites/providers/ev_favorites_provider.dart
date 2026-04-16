@@ -58,13 +58,14 @@ class EvFavoriteStations extends _$EvFavoriteStations {
   @override
   List<ChargingStation> build() {
     // Watch the unified provider so we rebuild when favoritesProvider.toggleEv()
-    // writes to EV storage (#552). Without this, the Favorites tab never sees
-    // newly-added EV favorites.
+    // writes to EV storage (#552). The evFavoritesProvider is keepAlive and
+    // never re-reads storage after its initial build, so we read EV IDs
+    // directly from storage here to get fresh data after every mutation.
     ref.watch(favoritesProvider);
-    final favoriteIds = ref.watch(evFavoritesProvider);
+    final storage = ref.read(storageRepositoryProvider);
+    final favoriteIds = storage.getEvFavoriteIds();
     if (favoriteIds.isEmpty) return const [];
 
-    final storage = ref.read(storageRepositoryProvider);
     final stations = <ChargingStation>[];
 
     for (final id in favoriteIds) {
