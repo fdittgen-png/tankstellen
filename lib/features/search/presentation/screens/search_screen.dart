@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/responsive_search_layout.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/location/location_consent.dart';
-import '../../../../core/location/location_service.dart';
 import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/frame_callbacks.dart';
@@ -15,8 +14,6 @@ import '../../../map/presentation/widgets/inline_map.dart';
 import '../../../profile/domain/entities/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../station_detail/presentation/widgets/station_detail_inline.dart';
-import '../../domain/entities/fuel_type.dart';
-import '../../providers/ev_search_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/selected_station_provider.dart';
 import '../widgets/demo_mode_banner.dart';
@@ -97,28 +94,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       await LocationConsentDialog.recordConsent(settings);
     }
 
-    if (fuelType == FuelType.electric) {
-      try {
-        final locationService = ref.read(locationServiceProvider);
-        final position = await locationService.getCurrentPosition();
-        unawaited(ref.read(eVSearchStateProvider.notifier).searchNearby(
-              lat: position.latitude,
-              lng: position.longitude,
-              radiusKm: radius,
-            ));
-      } catch (e) {
-        if (mounted) {
-          SnackBarHelper.showError(
-              context,
-              '${AppLocalizations.of(context)?.gpsError ?? "GPS error"}: $e');
-        }
-      }
-    } else {
-      unawaited(ref.read(searchStateProvider.notifier).searchByGps(
-            fuelType: fuelType,
-            radiusKm: radius,
-          ));
-    }
+    // SearchState dispatches to EV or fuel service internally based on fuelType.
+    unawaited(ref.read(searchStateProvider.notifier).searchByGps(
+          fuelType: fuelType,
+          radiusKm: radius,
+        ));
   }
 
   void _performZipSearch(String zip) {

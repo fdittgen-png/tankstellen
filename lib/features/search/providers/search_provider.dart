@@ -11,6 +11,7 @@ import '../data/models/search_params.dart';
 import '../domain/entities/fuel_type.dart';
 import '../domain/entities/station.dart';
 import '../../profile/providers/profile_provider.dart';
+import 'ev_search_provider.dart';
 
 part 'search_provider.g.dart';
 
@@ -115,6 +116,22 @@ class SearchState extends _$SearchState {
         position.latitude, position.longitude,
       );
 
+      final profile = ref.read(activeProfileProvider);
+      final resolvedFuelType = fuelType ?? profile?.preferredFuelType ?? FuelType.all;
+      final resolvedRadius = radiusKm ?? profile?.defaultSearchRadius ?? 10.0;
+
+      // EV dispatch: delegate to EVSearchState and return early.
+      // Reset own state so the UI doesn't show a stuck loading spinner.
+      if (resolvedFuelType == FuelType.electric) {
+        await ref.read(eVSearchStateProvider.notifier).searchNearby(
+              lat: position.latitude,
+              lng: position.longitude,
+              radiusKm: resolvedRadius,
+            );
+        state = build();
+        return;
+      }
+
       // Reverse-geocode GPS to get postal code (used by services like Prix-Carburants)
       String? resolvedPostalCode;
       try {
@@ -137,12 +154,11 @@ class SearchState extends _$SearchState {
         debugPrint('Reverse geocoding failed: $e');
       }
 
-      final profile = ref.read(activeProfileProvider);
       final params = SearchParams(
         lat: position.latitude,
         lng: position.longitude,
-        radiusKm: radiusKm ?? profile?.defaultSearchRadius ?? 10.0,
-        fuelType: fuelType ?? profile?.preferredFuelType ?? FuelType.all,
+        radiusKm: resolvedRadius,
+        fuelType: resolvedFuelType,
         sortBy: sortBy ?? SortBy.price,
         postalCode: resolvedPostalCode,
       );
@@ -179,6 +195,22 @@ class SearchState extends _$SearchState {
       final geocoding = ref.read(geocodingChainProvider);
       final coordsResult = await geocoding.zipCodeToCoordinates(zipCode, cancelToken: cancelToken);
 
+      final profile = ref.read(activeProfileProvider);
+      final resolvedFuelType = fuelType ?? profile?.preferredFuelType ?? FuelType.all;
+      final resolvedRadius = radiusKm ?? profile?.defaultSearchRadius ?? 10.0;
+
+      // EV dispatch: geocode the ZIP, then delegate to EVSearchState.
+      // Reset own state so the UI doesn't show a stuck loading spinner.
+      if (resolvedFuelType == FuelType.electric) {
+        await ref.read(eVSearchStateProvider.notifier).searchNearby(
+              lat: coordsResult.data.lat,
+              lng: coordsResult.data.lng,
+              radiusKm: resolvedRadius,
+            );
+        state = build();
+        return;
+      }
+
       // Resolve city name for display
       String? cityName;
       try {
@@ -194,12 +226,11 @@ class SearchState extends _$SearchState {
         '$zipCode ${cityName ?? ''}'.trim(),
       );
 
-      final profile = ref.read(activeProfileProvider);
       final params = SearchParams(
         lat: coordsResult.data.lat,
         lng: coordsResult.data.lng,
-        radiusKm: radiusKm ?? profile?.defaultSearchRadius ?? 10.0,
-        fuelType: fuelType ?? profile?.preferredFuelType ?? FuelType.all,
+        radiusKm: resolvedRadius,
+        fuelType: resolvedFuelType,
         sortBy: sortBy ?? SortBy.price,
         postalCode: zipCode,
         locationName: '$zipCode ${cityName ?? ''}'.trim(),
@@ -252,11 +283,26 @@ class SearchState extends _$SearchState {
       }
 
       final profile = ref.read(activeProfileProvider);
+      final resolvedFuelType = fuelType ?? profile?.preferredFuelType ?? FuelType.all;
+      final resolvedRadius = radiusKm ?? profile?.defaultSearchRadius ?? 10.0;
+
+      // EV dispatch: delegate to EVSearchState with the explicit coordinates.
+      // Reset own state so the UI doesn't show a stuck loading spinner.
+      if (resolvedFuelType == FuelType.electric) {
+        await ref.read(eVSearchStateProvider.notifier).searchNearby(
+              lat: lat,
+              lng: lng,
+              radiusKm: resolvedRadius,
+            );
+        state = build();
+        return;
+      }
+
       final params = SearchParams(
         lat: lat,
         lng: lng,
-        radiusKm: radiusKm ?? profile?.defaultSearchRadius ?? 10.0,
-        fuelType: fuelType ?? profile?.preferredFuelType ?? FuelType.all,
+        radiusKm: resolvedRadius,
+        fuelType: resolvedFuelType,
         postalCode: postalCode,
         locationName: locationName,
       );
@@ -311,4 +357,13 @@ class SearchRadius extends _$SearchRadius {
   void set(double radius) {
     state = radius.clamp(1.0, 25.0);
   }
+}
+
+/// Whether the current search fuel type is electric.
+///
+/// Used by UI widgets to decide between EV and fuel result views without
+/// coupling to `FuelType.electric` directly.
+@riverpod
+bool isEvSearch(Ref ref) {
+  return ref.watch(selectedFuelTypeProvider) == FuelType.electric;
 }
