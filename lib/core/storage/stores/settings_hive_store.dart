@@ -144,10 +144,13 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
   Future<void> putSetting(String key, dynamic value) =>
       _settings.put(key, value);
 
-  // Setup skip (demo mode)
+  // Setup completion — tracks whether the onboarding wizard has been completed
+  // or explicitly skipped. Must NOT depend on hasApiKey() because the bundled
+  // community key (#521) makes hasApiKey() always true, which permanently
+  // bypassed the wizard on fresh install (#555).
   @override
   bool get isSetupComplete =>
-      hasApiKey() || (_settings.get(StorageKeys.setupSkipped) == true);
+      _settings.get(StorageKeys.setupSkipped) == true;
 
   @override
   bool get isSetupSkipped => _settings.get(StorageKeys.setupSkipped) == true;
