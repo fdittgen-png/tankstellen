@@ -66,6 +66,10 @@ void main() {
       when(() => storage.getFavoriteStationData(any())).thenAnswer((inv) {
         return persistedStationData[inv.positionalArguments.first];
       });
+      // EV stubs (unified Favorites.build merges both lists)
+      when(() => storage.getEvFavoriteIds()).thenReturn([]);
+      when(() => storage.isFavorite(any())).thenReturn(true);
+      when(() => storage.isEvFavorite(any())).thenReturn(false);
 
       container = ProviderContainer(
         overrides: [

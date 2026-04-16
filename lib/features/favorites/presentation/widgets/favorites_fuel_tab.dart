@@ -9,18 +9,15 @@ import '../../../../l10n/app_localizations.dart';
 import '../../providers/ev_favorites_provider.dart';
 import '../../providers/favorites_provider.dart';
 import 'ev_favorite_card.dart';
-import 'ev_favorites_list_view.dart';
 import 'favorite_station_dismissible.dart';
 import 'favorites_loading_view.dart';
 import 'favorites_section_header.dart';
 import 'swipe_tutorial_banner.dart';
 
-/// Body of the "Favorites" tab inside `FavoritesScreen`. Owns the four
-/// rendering branches (empty / EV-only / loaded / error) and the EV+fuel
-/// section composition. Pulled out of `favorites_screen.dart` so the
-/// screen's `build` method becomes a thin Scaffold + TabBar shell and so
-/// each branch can be exercised by widget tests in isolation without
-/// constructing a full `DefaultTabController`.
+/// Body of the "Favorites" tab inside `FavoritesScreen`. Renders both fuel
+/// and EV favorites in a single unified list. Uses the merged
+/// [favoritesProvider] for IDs and loads data from [favoriteStationsProvider]
+/// (fuel) and [evFavoriteStationsProvider] (EV).
 class FavoritesFuelTab extends ConsumerWidget {
   const FavoritesFuelTab({super.key});
 
@@ -32,7 +29,7 @@ class FavoritesFuelTab extends ConsumerWidget {
     final evStations = ref.watch(evFavoriteStationsProvider);
     final hasEvFavorites = evStations.isNotEmpty;
 
-    if (favoriteIds.isEmpty && !hasEvFavorites) {
+    if (favoriteIds.isEmpty) {
       return Semantics(
         label:
             'No favorites yet. Tap the star on a station to save it as a favorite.',
@@ -46,10 +43,6 @@ class FavoritesFuelTab extends ConsumerWidget {
           onAction: () => context.go('/'),
         ),
       );
-    }
-
-    if (favoriteIds.isEmpty && hasEvFavorites) {
-      return EvFavoritesListView(evStations: evStations);
     }
 
     return stationsState.when(
@@ -82,7 +75,7 @@ class FavoritesFuelTab extends ConsumerWidget {
                                 context.push('/ev-station', extra: ev),
                             onFavoriteTap: () {
                               ref
-                                  .read(evFavoritesProvider.notifier)
+                                  .read(favoritesProvider.notifier)
                                   .remove(ev.id);
                               SnackBarHelper.show(
                                 context,
@@ -108,9 +101,7 @@ class FavoritesFuelTab extends ConsumerWidget {
           ),
         );
       },
-      loading: () => hasEvFavorites
-          ? EvFavoritesListView(evStations: evStations)
-          : const FavoritesLoadingView(),
+      loading: () => const FavoritesLoadingView(),
       error: (error, _) => Semantics(
         label: 'Error loading favorites: ${error.toString()}',
         child: Center(

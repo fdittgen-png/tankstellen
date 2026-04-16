@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../providers/ev_favorites_provider.dart';
 import '../../providers/favorites_provider.dart';
 import '../widgets/alerts_tab.dart';
 import '../widgets/favorites_fuel_tab.dart';
@@ -26,13 +25,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    // #538 — watch both fuel and EV favorites so the screen rebuilds
-    // when either set changes. The previous code only watched
-    // favoritesProvider (fuel), which meant adding an EV favorite
-    // never triggered a rebuild — the list stayed stale until the
-    // user switched tabs or restarted the app.
+    // favoritesProvider merges both fuel + EV IDs, so watching it
+    // rebuilds on any change to either set.
     final favoriteIds = ref.watch(favoritesProvider);
-    final evFavoriteIds = ref.watch(evFavoritesProvider);
 
     // Reload favorites when the auth identity changes
     // (anonymous -> email, reconnect, disconnect, etc.)
@@ -54,7 +49,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             child: Text(l10n?.favorites ?? 'Favorites'),
           ),
           actions: [
-            if (favoriteIds.isNotEmpty || evFavoriteIds.isNotEmpty)
+            if (favoriteIds.isNotEmpty)
               IconButton(
                 icon: const Icon(Icons.refresh),
                 onPressed: () {

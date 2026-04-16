@@ -46,7 +46,8 @@ void main() {
     testWidgets(
         'renders EV-only list when there are no fuel favorites '
         'but EV favorites exist', (tester) async {
-      final test = standardTestOverrides(favoriteIds: []);
+      // Pass EV ID in favoriteIds so the unified provider sees it.
+      final test = standardTestOverrides(favoriteIds: ['ev-1']);
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
       await pumpApp(

@@ -35,6 +35,11 @@ void main() {
 
   setUp(() {
     mockStorage = MockHiveStorage();
+    // Favorites.build() merges fuel + EV IDs; mock EV as empty by default.
+    when(() => mockStorage.getEvFavoriteIds()).thenReturn([]);
+    // Favorites.remove() checks which storage owns the ID.
+    when(() => mockStorage.isFavorite(any())).thenReturn(true);
+    when(() => mockStorage.isEvFavorite(any())).thenReturn(false);
   });
 
   ProviderContainer createContainer({MockStationService? mockService}) {
