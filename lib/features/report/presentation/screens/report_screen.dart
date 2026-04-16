@@ -13,142 +13,13 @@ import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/community_report_service.dart';
+import '../../domain/entities/report_type.dart';
 import '../../providers/report_form_provider.dart';
+import '../widgets/no_backend_banner.dart';
+import '../widgets/report_input_section.dart';
+import '../widgets/report_type_list.dart';
 
-enum ReportType {
-  // Tankerkoenig-supported price reports. apiValue maps to the types
-  // the Tankerkoenig complaint endpoint recognises.
-  wrongE5('wrongPetrolPremium'),
-  wrongE10('wrongPetrolPremiumE10'),
-  wrongDiesel('wrongDiesel'),
-  // Additional price reports (#484). Tankerkoenig has no endpoint
-  // for these, so they route to TankSync only. The `apiValue` is a
-  // descriptive string for logging but is not sent to Tankerkoenig —
-  // `isTankerkoenigSupported` below controls which backends accept
-  // which types.
-  wrongE85('wrongPetrolE85'),
-  wrongE98('wrongPetrolPremiumE98'),
-  wrongLpg('wrongLpg'),
-  wrongStatusOpen('wrongStatusOpen'),
-  wrongStatusClosed('wrongStatusClosed'),
-  // Metadata reports (#484). These carry a free-text correction
-  // instead of a price. TankSync only.
-  wrongName('wrongName'),
-  wrongAddress('wrongAddress');
-
-  final String apiValue;
-  const ReportType(this.apiValue);
-
-  /// True when this report type needs the user to enter a corrected
-  /// price. Price input replaces the text input in the form.
-  bool get needsPrice =>
-      this == wrongE5 ||
-      this == wrongE10 ||
-      this == wrongDiesel ||
-      this == wrongE85 ||
-      this == wrongE98 ||
-      this == wrongLpg;
-
-  /// True when this report type is a free-text metadata correction
-  /// (new station name, new address). Takes a text input instead of
-  /// a price input.
-  ///
-  /// Since #508 these also route to GitHub instead of TankSync —
-  /// wrong metadata is almost always an implementation bug (the API
-  /// returned the wrong field, or our parser mapped it wrong), not
-  /// something a user correction can fix downstream.
-  bool get needsText => this == wrongName || this == wrongAddress;
-
-  /// True when this report type files a GitHub issue instead of hitting
-  /// a community-report backend. Station name and address corrections
-  /// are always implementation bugs — shipping them as community edits
-  /// just hides the upstream issue, so we route the user to the
-  /// pre-filled GitHub issue flow built in #500 instead.
-  bool get routesToGitHub => this == wrongName || this == wrongAddress;
-
-  /// True when this report type can be submitted to the Tankerkoenig
-  /// complaint endpoint. The endpoint supports the original 5 types
-  /// (E5, E10, diesel, status open, status closed). Everything else
-  /// is TankSync-only.
-  bool get isTankerkoenigSupported =>
-      this == wrongE5 ||
-      this == wrongE10 ||
-      this == wrongDiesel ||
-      this == wrongStatusOpen ||
-      this == wrongStatusClosed;
-
-  /// The Supabase `fuel_type` column value for this report. For price
-  /// reports this is the fuel code; for status and metadata reports
-  /// it's a descriptive identifier so analytics queries can filter
-  /// by report kind.
-  String get fuelTypeColumnValue {
-    switch (this) {
-      case wrongE5:
-        return 'e5';
-      case wrongE10:
-        return 'e10';
-      case wrongDiesel:
-        return 'diesel';
-      case wrongE85:
-        return 'e85';
-      case wrongE98:
-        return 'e98';
-      case wrongLpg:
-        return 'lpg';
-      case wrongStatusOpen:
-        return 'status_open';
-      case wrongStatusClosed:
-        return 'status_closed';
-      case wrongName:
-        return 'name';
-      case wrongAddress:
-        return 'address';
-    }
-  }
-
-  /// Returns the report types that should be visible on the report
-  /// screen for a given country.
-  ///
-  /// - Germany: all 10 types (Tankerkoenig community report covers
-  ///   prices and open/closed status; name/address still route to
-  ///   GitHub because they're implementation bugs).
-  /// - Everywhere else: only the 2 GitHub-routed types. The first 8
-  ///   (price + status) have no meaningful backend outside DE —
-  ///   Tankerkoenig is DE-only, and community price corrections don't
-  ///   feed back into the source-of-truth country APIs.
-  static List<ReportType> visibleForCountry(String countryCode) {
-    if (countryCode == 'DE') return ReportType.values;
-    return const [ReportType.wrongName, ReportType.wrongAddress];
-  }
-
-  /// Localized display name for this report type.
-  String displayName(AppLocalizations? l10n) {
-    switch (this) {
-      case wrongE5:
-        return l10n?.wrongE5Price ?? 'Prix Super E5 incorrect';
-      case wrongE10:
-        return l10n?.wrongE10Price ?? 'Prix Super E10 incorrect';
-      case wrongDiesel:
-        return l10n?.wrongDieselPrice ?? 'Prix Diesel incorrect';
-      // TODO: add ARB keys for the new types. Inline French fallback
-      // matches the primary user locale.
-      case wrongE85:
-        return 'Prix E85 incorrect';
-      case wrongE98:
-        return 'Prix Super 98 incorrect';
-      case wrongLpg:
-        return 'Prix GPL incorrect';
-      case wrongStatusOpen:
-        return l10n?.wrongStatusOpen ?? 'Affiché ouvert, mais fermé';
-      case wrongStatusClosed:
-        return l10n?.wrongStatusClosed ?? 'Affiché fermé, mais ouvert';
-      case wrongName:
-        return 'Nom de la station incorrect';
-      case wrongAddress:
-        return 'Adresse incorrecte';
-    }
-  }
-}
+export '../../domain/entities/report_type.dart';
 
 /// Screen for submitting a community report about a station. Form state
 /// (selected type, submission progress) lives in [reportFormControllerProvider];
@@ -365,7 +236,6 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final form = ref.watch(reportFormControllerProvider);
     final selectedType = form.selectedType;
 
@@ -411,92 +281,21 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // #484 — banner telling the user that no reporting backend is
-          // available for their country/config. Previously the form
-          // accepted their input and silently failed on submit.
-          //
-          // #508 — hide the banner when the user only sees GitHub-routed
-          // types (non-DE case), because there's nothing to configure
-          // and the form still works.
           if (!hasAnyBackend && !allVisibleRouteToGitHub) ...[
-            Container(
-              key: const ValueKey('report-no-backend-banner'),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.errorContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.error_outline,
-                      size: 20, color: theme.colorScheme.onErrorContainer),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    // TODO: `reportNoBackendBanner` ARB key for localisation.
-                    child: Text(
-                      'Les signalements ne sont pas disponibles dans ce pays '
-                      'pour le moment. Activez TankSync dans les paramètres '
-                      'pour envoyer des signalements communautaires, ou '
-                      'ajoutez une clé API Tankerkoenig si vous êtes en '
-                      'Allemagne.',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onErrorContainer,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            const NoBackendBanner(),
             const SizedBox(height: 16),
           ],
-          Text(
-            l10n?.whatsWrong ?? "What's wrong?",
-            style: theme.textTheme.titleMedium,
+          ...buildReportTypeList(
+            context,
+            ref,
+            visibleTypes: visibleTypes,
+            hasAnyBackend: hasAnyBackend,
           ),
-          const SizedBox(height: 12),
-          ...visibleTypes.map(
-            (type) => RadioListTile<ReportType>(
-              value: type,
-              groupValue: selectedType,
-              title: Text(type.displayName(l10n)),
-              // #508 — GitHub-routed types are always selectable. The
-              // legacy price/status types remain gated on an available
-              // Tankerkoenig/TankSync backend.
-              onChanged: (type.routesToGitHub || hasAnyBackend)
-                  ? (v) => ref
-                      .read(reportFormControllerProvider.notifier)
-                      .selectType(v)
-                  : null,
-            ),
+          ReportInputSection(
+            selectedType: selectedType,
+            priceController: _priceController,
+            textController: _textController,
           ),
-          if (selectedType != null && selectedType.needsPrice) ...[
-            const SizedBox(height: 16),
-            TextField(
-              controller: _priceController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(
-                labelText: l10n?.correctPrice ?? 'Correct price (e.g. 1.459)',
-                prefixText: '\u20ac ',
-                border: const OutlineInputBorder(),
-              ),
-            ),
-          ],
-          if (selectedType != null && selectedType.needsText) ...[
-            const SizedBox(height: 16),
-            TextField(
-              key: const ValueKey('report-correction-text-field'),
-              controller: _textController,
-              textCapitalization: TextCapitalization.sentences,
-              decoration: InputDecoration(
-                // TODO: add ARB keys `correctName` / `correctAddress`.
-                labelText: selectedType == ReportType.wrongName
-                    ? 'Nom correct de la station'
-                    : 'Adresse correcte',
-                border: const OutlineInputBorder(),
-              ),
-            ),
-          ],
           const SizedBox(height: 24),
           FilledButton(
             onPressed: selectedType != null &&
