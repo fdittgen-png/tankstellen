@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../ev/domain/entities/charging_station.dart';
+import 'favorites_provider.dart';
 
 part 'ev_favorites_provider.g.dart';
 
@@ -56,6 +57,10 @@ bool isEvFavorite(Ref ref, String stationId) {
 class EvFavoriteStations extends _$EvFavoriteStations {
   @override
   List<ChargingStation> build() {
+    // Watch the unified provider so we rebuild when favoritesProvider.toggleEv()
+    // writes to EV storage (#552). Without this, the Favorites tab never sees
+    // newly-added EV favorites.
+    ref.watch(favoritesProvider);
     final favoriteIds = ref.watch(evFavoritesProvider);
     if (favoriteIds.isEmpty) return const [];
 
