@@ -98,7 +98,10 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
               ),
               tooltip: isFav ? (l10n?.removeFavorite ?? 'Remove from favorites') : (l10n?.addFavorite ?? 'Add to favorites'),
               onPressed: () {
-                ref.read(favoritesProvider.notifier).toggle(station.id);
+                ref.read(favoritesProvider.notifier).toggle(
+                      station.id,
+                      rawJson: station.toJson(),
+                    );
                 SnackBarHelper.show(
                   context,
                   isFav ? (l10n?.removedFromFavorites ?? 'Removed from favorites') : (l10n?.addedToFavorites ?? 'Added to favorites'),
