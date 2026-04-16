@@ -36,23 +36,40 @@ class Favorites extends _$Favorites {
     state = [...storage.getFavoriteIds(), ...storage.getEvFavoriteIds()];
   }
 
-  /// Add a fuel station to favorites.
-  Future<void> add(String stationId, {Station? stationData}) async {
-    final storage = ref.read(storageRepositoryProvider);
-    await storage.addFavorite(stationId);
+  /// Whether a station ID belongs to an EV charging station.
+  ///
+  /// OpenChargeMap IDs are prefixed with `ocm-` by EVChargingService.
+  static bool _isEvId(String id) => id.startsWith('ocm-');
 
-    if (stationData != null) {
-      await storage.saveFavoriteStationData(stationId, stationData.toJson());
+  /// Add a station to favorites. Detects EV stations by ID prefix and
+  /// routes to the correct storage automatically.
+  ///
+  /// Pass [stationData] for fuel stations or [rawJson] for any station
+  /// type (used by the EV detail screen which has a search/ ChargingStation).
+  Future<void> add(String stationId, {Station? stationData, Map<String, dynamic>? rawJson}) async {
+    final storage = ref.read(storageRepositoryProvider);
+
+    if (_isEvId(stationId)) {
+      await storage.addEvFavorite(stationId);
+      final json = rawJson ?? stationData?.toJson();
+      if (json != null) {
+        await storage.saveEvFavoriteStationData(stationId, json);
+      }
+    } else {
+      await storage.addFavorite(stationId);
+      final json = rawJson ?? stationData?.toJson();
+      if (json != null) {
+        await storage.saveFavoriteStationData(stationId, json);
+      }
+      await SyncHelper.syncIfEnabled(ref, 'Favorites.add',
+        () => SyncService.syncFavorites(storage.getFavoriteIds()),
+      );
     }
 
     _reload();
-
-    await SyncHelper.syncIfEnabled(ref, 'Favorites.add',
-      () => SyncService.syncFavorites(storage.getFavoriteIds()),
-    );
   }
 
-  /// Add an EV charging station to favorites.
+  /// Add an EV charging station to favorites (explicit ev/ entity).
   Future<void> addEv(String stationId, {ev.ChargingStation? stationData}) async {
     final storage = ref.read(storageRepositoryProvider);
     await storage.addEvFavorite(stationId);
@@ -98,12 +115,15 @@ class Favorites extends _$Favorites {
     _reload();
   }
 
-  /// Toggle a fuel station's favorite status.
-  Future<void> toggle(String stationId, {Station? stationData}) async {
+  /// Toggle a station's favorite status. EV stations (ocm- prefix) are
+  /// automatically routed to EV storage.
+  ///
+  /// Pass [stationData] for fuel stations or [rawJson] for any type.
+  Future<void> toggle(String stationId, {Station? stationData, Map<String, dynamic>? rawJson}) async {
     if (state.contains(stationId)) {
       await remove(stationId);
     } else {
-      await add(stationId, stationData: stationData);
+      await add(stationId, stationData: stationData, rawJson: rawJson);
     }
   }
 
