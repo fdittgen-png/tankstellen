@@ -9,6 +9,7 @@ import '../../../core/services/service_result.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../data/models/search_params.dart';
 import '../domain/entities/fuel_type.dart';
+import '../domain/entities/search_result_item.dart';
 import '../domain/entities/station.dart';
 import '../../profile/providers/profile_provider.dart';
 import 'ev_search_provider.dart';
@@ -42,7 +43,7 @@ class SearchState extends _$SearchState {
   }
 
   @override
-  AsyncValue<ServiceResult<List<Station>>> build() {
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() {
     return AsyncValue.data(ServiceResult(
       data: const [],
       source: ServiceSource.cache,
@@ -120,15 +121,14 @@ class SearchState extends _$SearchState {
       final resolvedFuelType = fuelType ?? profile?.preferredFuelType ?? FuelType.all;
       final resolvedRadius = radiusKm ?? profile?.defaultSearchRadius ?? 10.0;
 
-      // EV dispatch: delegate to EVSearchState and return early.
-      // Reset own state so the UI doesn't show a stuck loading spinner.
+      // EV dispatch: delegate to EVSearchState, then copy wrapped results.
       if (resolvedFuelType == FuelType.electric) {
         await ref.read(eVSearchStateProvider.notifier).searchNearby(
               lat: position.latitude,
               lng: position.longitude,
               radiusKm: resolvedRadius,
             );
-        state = build();
+        _copyEvResults();
         return;
       }
 
@@ -165,7 +165,7 @@ class SearchState extends _$SearchState {
 
       final stationService = ref.read(stationServiceProvider);
       final result = await stationService.searchStations(params, cancelToken: cancelToken);
-      state = AsyncValue.data(result);
+      state = AsyncValue.data(_wrapFuelResult(result));
     });
   }
 
@@ -200,14 +200,13 @@ class SearchState extends _$SearchState {
       final resolvedRadius = radiusKm ?? profile?.defaultSearchRadius ?? 10.0;
 
       // EV dispatch: geocode the ZIP, then delegate to EVSearchState.
-      // Reset own state so the UI doesn't show a stuck loading spinner.
       if (resolvedFuelType == FuelType.electric) {
         await ref.read(eVSearchStateProvider.notifier).searchNearby(
               lat: coordsResult.data.lat,
               lng: coordsResult.data.lng,
               radiusKm: resolvedRadius,
             );
-        state = build();
+        _copyEvResults();
         return;
       }
 
@@ -248,13 +247,13 @@ class SearchState extends _$SearchState {
         ...result.errors,
       ];
 
-      state = AsyncValue.data(ServiceResult(
+      state = AsyncValue.data(_wrapFuelResult(ServiceResult(
         data: adjustedStations,
         source: result.source,
         fetchedAt: result.fetchedAt,
         isStale: result.isStale || coordsResult.isStale,
         errors: mergedErrors,
-      ));
+      )));
     });
   }
 
@@ -287,14 +286,13 @@ class SearchState extends _$SearchState {
       final resolvedRadius = radiusKm ?? profile?.defaultSearchRadius ?? 10.0;
 
       // EV dispatch: delegate to EVSearchState with the explicit coordinates.
-      // Reset own state so the UI doesn't show a stuck loading spinner.
       if (resolvedFuelType == FuelType.electric) {
         await ref.read(eVSearchStateProvider.notifier).searchNearby(
               lat: lat,
               lng: lng,
               radiusKm: resolvedRadius,
             );
-        state = build();
+        _copyEvResults();
         return;
       }
 
@@ -313,14 +311,44 @@ class SearchState extends _$SearchState {
       // Recalculate distances from user's known position
       final adjustedStations = _recalcDistances(result.data);
 
-      state = AsyncValue.data(ServiceResult(
+      state = AsyncValue.data(_wrapFuelResult(ServiceResult(
         data: adjustedStations,
         source: result.source,
         fetchedAt: result.fetchedAt,
         isStale: result.isStale,
         errors: result.errors,
-      ));
+      )));
     });
+  }
+
+  /// Wraps a fuel [ServiceResult<List<Station>>] as [List<SearchResultItem>].
+  ServiceResult<List<SearchResultItem>> _wrapFuelResult(
+    ServiceResult<List<Station>> result,
+  ) {
+    return ServiceResult(
+      data: result.data.map((s) => FuelStationResult(s) as SearchResultItem).toList(),
+      source: result.source,
+      fetchedAt: result.fetchedAt,
+      isStale: result.isStale,
+      errors: result.errors,
+    );
+  }
+
+  /// Copies EVSearchState results into this provider's state, wrapped as
+  /// [EVStationResult]. Called after [EVSearchState.searchNearby] completes.
+  void _copyEvResults() {
+    final evState = ref.read(eVSearchStateProvider);
+    evState.when(
+      data: (result) {
+        state = AsyncValue.data(ServiceResult(
+          data: result.data.map((cs) => EVStationResult(cs) as SearchResultItem).toList(),
+          source: result.source,
+          fetchedAt: result.fetchedAt,
+        ));
+      },
+      loading: () {},
+      error: (e, st) { state = AsyncValue.error(e, st); },
+    );
   }
 }
 
@@ -359,11 +387,16 @@ class SearchRadius extends _$SearchRadius {
   }
 }
 
-/// Whether the current search fuel type is electric.
+/// Extracts fuel [Station] objects from the unified search results.
 ///
-/// Used by UI widgets to decide between EV and fuel result views without
-/// coupling to `FuelType.electric` directly.
+/// Convenience for consumers that need [List<Station>] (cross-border
+/// comparisons, driving mode, station detail lookup, brand filter chips).
 @riverpod
-bool isEvSearch(Ref ref) {
-  return ref.watch(selectedFuelTypeProvider) == FuelType.electric;
+List<Station> fuelStations(Ref ref) {
+  final searchState = ref.watch(searchStateProvider);
+  if (!searchState.hasValue) return const [];
+  return searchState.value!.data
+      .whereType<FuelStationResult>()
+      .map((r) => r.station)
+      .toList();
 }

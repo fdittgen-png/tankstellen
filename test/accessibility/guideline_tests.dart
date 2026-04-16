@@ -12,6 +12,7 @@ import 'package:tankstellen/features/favorites/presentation/screens/favorites_sc
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/profile/presentation/screens/privacy_dashboard_screen.dart';
 import 'package:tankstellen/features/profile/presentation/screens/profile_screen.dart';
+import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/presentation/screens/search_screen.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
@@ -33,7 +34,7 @@ class _FixedActiveLanguage extends ActiveLanguage {
 /// Fixed SearchState that returns empty results (no async work).
 class _EmptySearchState extends SearchState {
   @override
-  AsyncValue<ServiceResult<List<Station>>> build() {
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() {
     return AsyncValue.data(ServiceResult(
       data: const [],
       source: ServiceSource.cache,

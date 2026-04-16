@@ -86,4 +86,4 @@ final class CrossBorderComparisonsProvider
 }
 
 String _$crossBorderComparisonsHash() =>
-    r'ba42ad765c767090256ac69c11f821138acc6207';
+    r'2b5ae2c92a8a7e804832789baa87b683a5800d22';

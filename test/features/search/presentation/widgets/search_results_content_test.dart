@@ -6,6 +6,7 @@ import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/widgets/shimmer_placeholder.dart';
 import 'package:tankstellen/features/profile/domain/entities/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
+import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/nearest_shortcut_card.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_results_content.dart';
@@ -139,12 +140,12 @@ void main() {
 
 class _LoadingSearchState extends SearchState {
   @override
-  AsyncValue<ServiceResult<List<Station>>> build() => const AsyncValue.loading();
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() => const AsyncValue.loading();
 }
 
 class _EmptySearchState extends SearchState {
   @override
-  AsyncValue<ServiceResult<List<Station>>> build() => AsyncValue.data(
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() => AsyncValue.data(
         ServiceResult(
           data: const [],
           source: ServiceSource.cache,
@@ -158,9 +159,9 @@ class _LoadedSearchState extends SearchState {
   final List<Station> _stations;
 
   @override
-  AsyncValue<ServiceResult<List<Station>>> build() => AsyncValue.data(
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() => AsyncValue.data(
         ServiceResult(
-          data: _stations,
+          data: _stations.map((s) => FuelStationResult(s) as SearchResultItem).toList(),
           source: ServiceSource.cache,
           fetchedAt: DateTime.now(),
         ),

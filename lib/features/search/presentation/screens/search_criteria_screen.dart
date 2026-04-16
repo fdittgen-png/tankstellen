@@ -14,7 +14,6 @@ import '../../../route_search/domain/entities/route_info.dart';
 import '../../../route_search/presentation/widgets/route_input.dart';
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../domain/entities/search_mode.dart';
-import '../../domain/entities/station.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
@@ -224,10 +223,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
               const SizedBox(height: 8),
               Consumer(
                 builder: (context, ref, _) {
-                  final state = ref.watch(searchStateProvider);
-                  final stations = state.hasValue
-                      ? state.value!.data
-                      : const <Station>[];
+                  final stations = ref.watch(fuelStationsProvider);
                   if (stations.isEmpty) return const SizedBox.shrink();
                   return BrandFilterChips(stations: stations);
                 },

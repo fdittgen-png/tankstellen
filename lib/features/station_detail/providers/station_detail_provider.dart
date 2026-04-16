@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
+import '../../search/domain/entities/search_result_item.dart';
 import '../../search/domain/entities/station.dart';
 import '../../search/providers/search_provider.dart';
 
@@ -18,11 +19,12 @@ Future<ServiceResult<StationDetail>> stationDetail(
   if (searchState.hasValue) {
     final searchResults = searchState.value?.data ?? [];
     final fromSearch = searchResults
-        .where((s) => s.id == stationId)
+        .whereType<FuelStationResult>()
+        .where((r) => r.station.id == stationId)
         .firstOrNull;
     if (fromSearch != null) {
       return ServiceResult(
-        data: StationDetail(station: fromSearch),
+        data: StationDetail(station: fromSearch.station),
         source: ServiceSource.cache,
         fetchedAt: DateTime.now(),
       );

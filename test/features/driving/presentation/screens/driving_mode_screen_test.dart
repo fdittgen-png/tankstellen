@@ -10,6 +10,7 @@ import 'package:tankstellen/features/driving/presentation/widgets/safety_disclai
 import 'package:tankstellen/features/driving/presentation/widgets/driving_marker_builder.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_mode_fab.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 
@@ -382,7 +383,7 @@ List<Object> _drivingScreenOverrides() {
 /// A search state notifier that returns empty data.
 class _EmptySearchState extends SearchState {
   @override
-  AsyncValue<ServiceResult<List<Station>>> build() {
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() {
     return AsyncValue.data(ServiceResult(
       data: const [],
       source: ServiceSource.cache,

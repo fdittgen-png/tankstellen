@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../search/domain/entities/search_result_item.dart';
 import '../../../search/providers/search_provider.dart';
 import 'station_map_layers.dart';
 
@@ -38,9 +39,13 @@ class _InlineMapState extends ConsumerState<InlineMap> {
 
     return searchState.when(
       data: (result) {
-        final stations = result.data;
+        final List<SearchResultItem> allItems = result.data;
+        final stations = allItems
+            .whereType<FuelStationResult>()
+            .map((r) => r.station)
+            .toList();
 
-        if (stations.isEmpty) {
+        if (allItems.isEmpty) {
           return EmptyState(
             icon: Icons.map_outlined,
             title: AppLocalizations.of(context)?.searchToSeeMap ?? 'Search to see stations on the map',

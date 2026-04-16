@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/features/map/presentation/screens/map_screen.dart';
+import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 
@@ -20,12 +21,12 @@ import '../../../../helpers/pump_app.dart';
 /// arrives.
 class _SeedableSearchState extends SearchState {
   _SeedableSearchState(this._seed);
-  AsyncValue<ServiceResult<List<Station>>> _seed;
+  AsyncValue<ServiceResult<List<SearchResultItem>>> _seed;
 
   @override
-  AsyncValue<ServiceResult<List<Station>>> build() => _seed;
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() => _seed;
 
-  void emit(AsyncValue<ServiceResult<List<Station>>> next) {
+  void emit(AsyncValue<ServiceResult<List<SearchResultItem>>> next) {
     _seed = next;
     state = next;
   }
@@ -80,7 +81,7 @@ void main() {
 
       final seedable = _SeedableSearchState(
         AsyncValue.data(ServiceResult(
-          data: const <Station>[],
+          data: const <SearchResultItem>[],
           source: ServiceSource.cache,
           fetchedAt: DateTime.now(),
         )),
@@ -99,8 +100,8 @@ void main() {
 
       // Emit a non-empty result — triggers the listener.
       seedable.emit(AsyncValue.data(ServiceResult(
-        data: const <Station>[
-          Station(
+        data: const <SearchResultItem>[
+          FuelStationResult(Station(
             id: 'pt-42',
             name: 'GALP',
             brand: 'GALP',
@@ -112,7 +113,7 @@ void main() {
             dist: 1.0,
             e5: 1.6,
             isOpen: true,
-          ),
+          )),
         ],
         source: ServiceSource.portugalApi,
         fetchedAt: DateTime.now(),
