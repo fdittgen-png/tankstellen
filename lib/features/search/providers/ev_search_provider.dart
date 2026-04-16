@@ -11,7 +11,11 @@ import '../domain/entities/charging_station.dart';
 part 'ev_search_provider.g.dart';
 
 /// Manages EV charging station search, parallel to [SearchState] for fuel.
-@riverpod
+///
+/// Uses `keepAlive` because SearchState dispatches to this notifier
+/// asynchronously — without keepAlive, the auto-dispose fires mid-request
+/// when nothing is watching, causing UnmountedRefException (#550).
+@Riverpod(keepAlive: true)
 class EVSearchState extends _$EVSearchState {
   @override
   AsyncValue<ServiceResult<List<ChargingStation>>> build() {

@@ -9,11 +9,19 @@ part of 'ev_search_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Manages EV charging station search, parallel to [SearchState] for fuel.
+///
+/// Uses `keepAlive` because SearchState dispatches to this notifier
+/// asynchronously — without keepAlive, the auto-dispose fires mid-request
+/// when nothing is watching, causing UnmountedRefException (#550).
 
 @ProviderFor(EVSearchState)
 final eVSearchStateProvider = EVSearchStateProvider._();
 
 /// Manages EV charging station search, parallel to [SearchState] for fuel.
+///
+/// Uses `keepAlive` because SearchState dispatches to this notifier
+/// asynchronously — without keepAlive, the auto-dispose fires mid-request
+/// when nothing is watching, causing UnmountedRefException (#550).
 final class EVSearchStateProvider
     extends
         $NotifierProvider<
@@ -21,13 +29,17 @@ final class EVSearchStateProvider
           AsyncValue<ServiceResult<List<ChargingStation>>>
         > {
   /// Manages EV charging station search, parallel to [SearchState] for fuel.
+  ///
+  /// Uses `keepAlive` because SearchState dispatches to this notifier
+  /// asynchronously — without keepAlive, the auto-dispose fires mid-request
+  /// when nothing is watching, causing UnmountedRefException (#550).
   EVSearchStateProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'eVSearchStateProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -53,9 +65,13 @@ final class EVSearchStateProvider
   }
 }
 
-String _$eVSearchStateHash() => r'0bb1242b016c492e7a4afa40718a8e014fbe7615';
+String _$eVSearchStateHash() => r'1abeea9a16e07862249256998f86d58164047cba';
 
 /// Manages EV charging station search, parallel to [SearchState] for fuel.
+///
+/// Uses `keepAlive` because SearchState dispatches to this notifier
+/// asynchronously — without keepAlive, the auto-dispose fires mid-request
+/// when nothing is watching, causing UnmountedRefException (#550).
 
 abstract class _$EVSearchState
     extends $Notifier<AsyncValue<ServiceResult<List<ChargingStation>>>> {
