@@ -19,7 +19,23 @@ class AddFillUpScreen extends ConsumerStatefulWidget {
   final String? stationId;
   final String? stationName;
 
-  const AddFillUpScreen({super.key, this.stationId, this.stationName});
+  /// Pre-selected fuel type from the station context (e.g. profile fuel type
+  /// when opened from a station detail screen). Defaults to [FuelType.e10]
+  /// when null.
+  final FuelType? preFilledFuelType;
+
+  /// Pre-filled price per liter. When set, the total cost auto-updates as
+  /// the user enters liters — turning the common "known-station" fill-up
+  /// into a two-tap flow (liters + odometer).
+  final double? preFilledPricePerLiter;
+
+  const AddFillUpScreen({
+    super.key,
+    this.stationId,
+    this.stationName,
+    this.preFilledFuelType,
+    this.preFilledPricePerLiter,
+  });
 
   @override
   ConsumerState<AddFillUpScreen> createState() => _AddFillUpScreenState();
@@ -32,10 +48,41 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   final _odoCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
   DateTime _date = DateTime.now();
-  FuelType _fuelType = FuelType.e10;
+  late FuelType _fuelType = widget.preFilledFuelType ?? FuelType.e10;
   bool _scanning = false;
   bool _obdReading = false;
   ReceiptScanService? _scanService;
+
+  @override
+  void initState() {
+    super.initState();
+    final price = widget.preFilledPricePerLiter;
+    if (price != null) {
+      _litersCtrl.addListener(_recomputeCost);
+    }
+  }
+
+  /// Auto-fills the total cost based on the pre-filled price per liter
+  /// and the current liters input. Only runs when the user has not manually
+  /// typed a cost (empty field) — so we don't clobber a scanned receipt.
+  void _recomputeCost() {
+    final price = widget.preFilledPricePerLiter;
+    if (price == null) return;
+    final liters = double.tryParse(_litersCtrl.text.replaceAll(',', '.'));
+    if (liters == null || liters <= 0) return;
+    final current = double.tryParse(_costCtrl.text.replaceAll(',', '.'));
+    // Only overwrite if the user hasn't typed a custom cost. We detect
+    // "user-typed" by checking whether the current value matches a prior
+    // auto-fill: if the field is empty OR exactly matches the previous
+    // auto-computed value, we overwrite.
+    final autoCost = (liters * price).toStringAsFixed(2);
+    if (_costCtrl.text.isEmpty || current == _lastAutoCost) {
+      _costCtrl.text = autoCost;
+      _lastAutoCost = double.tryParse(autoCost);
+    }
+  }
+
+  double? _lastAutoCost;
 
   @override
   void dispose() {

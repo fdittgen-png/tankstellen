@@ -19,6 +19,7 @@ import '../features/carbon/presentation/screens/carbon_dashboard_screen.dart';
 import '../features/report/presentation/screens/report_screen.dart';
 import '../features/consumption/presentation/screens/add_fill_up_screen.dart';
 import '../features/consumption/presentation/screens/consumption_screen.dart';
+import '../features/search/domain/entities/fuel_type.dart';
 import '../features/price_history/presentation/screens/price_history_screen.dart';
 import '../features/search/presentation/screens/ev_station_detail_screen.dart';
 import '../features/search/domain/entities/charging_station.dart';
@@ -222,13 +223,21 @@ GoRouter router(Ref ref) {
           final extra = state.extra;
           String? stationId;
           String? stationName;
+          FuelType? fuelType;
+          double? pricePerLiter;
           if (extra is Map) {
             stationId = extra['stationId']?.toString();
             stationName = extra['stationName']?.toString();
+            final ft = extra['fuelType'];
+            if (ft is FuelType) fuelType = ft;
+            final price = extra['pricePerLiter'];
+            if (price is num) pricePerLiter = price.toDouble();
           }
           return AddFillUpScreen(
             stationId: stationId,
             stationName: stationName,
+            preFilledFuelType: fuelType,
+            preFilledPricePerLiter: pricePerLiter,
           );
         },
       ),
