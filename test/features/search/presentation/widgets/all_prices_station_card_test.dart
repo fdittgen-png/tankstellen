@@ -186,6 +186,108 @@ void main() {
       expect(find.text('Diesel'), findsOneWidget);
     });
 
+    group('champion (cheapest) chip styling (#572)', () {
+      testWidgets('champion chip has filled fuel-type background', (tester) async {
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(
+            station: testStation,
+            cheapestFlags: {FuelType.diesel: true},
+          ),
+        );
+
+        final dieselColor = FuelColors.forType(FuelType.diesel);
+        // Find the Diesel label — walk up to the outer badge Container.
+        final labelFinder = find.text('Diesel');
+        expect(labelFinder, findsOneWidget);
+        final badgeContainer = find
+            .ancestor(
+              of: labelFinder,
+              matching: find.byWidgetPredicate((w) {
+                if (w is Container && w.decoration is BoxDecoration) {
+                  final dec = w.decoration as BoxDecoration;
+                  return dec.borderRadius != null && dec.border is Border;
+                }
+                return false;
+              }),
+            )
+            .first;
+
+        final container = tester.widget<Container>(badgeContainer);
+        final decoration = container.decoration as BoxDecoration;
+        expect(decoration.color, dieselColor,
+            reason: 'Champion chip must use filled fuel-type color, not light alpha.');
+      });
+
+      testWidgets('champion chip text is white for contrast', (tester) async {
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(
+            station: testStation,
+            cheapestFlags: {FuelType.diesel: true},
+          ),
+        );
+
+        final labelWidget = tester.widget<Text>(find.text('Diesel'));
+        expect(labelWidget.style?.color, Colors.white);
+        expect(labelWidget.style?.fontWeight, FontWeight.bold);
+      });
+
+      testWidgets('non-champion chip does not use white text', (tester) async {
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(station: testStation),
+        );
+
+        // Without cheapestFlags, no chip is a champion; label uses the
+        // fuel-type color on a light tinted background (not white-on-solid).
+        final labelWidget = tester.widget<Text>(find.text('Diesel'));
+        expect(labelWidget.style?.color, isNot(Colors.white),
+            reason: 'Non-champion chip must not use white text.');
+      });
+
+      testWidgets('unavailable fuel never becomes champion (cheapestFlag ignored)',
+          (tester) async {
+        const stationWithUnavailable = Station(
+          id: 'u1',
+          name: 'u',
+          brand: 'TOT',
+          street: 's',
+          postCode: '1',
+          place: 'p',
+          lat: 0,
+          lng: 0,
+          e5: 1.5,
+          isOpen: true,
+          unavailableFuels: ['diesel'],
+        );
+
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(
+            station: stationWithUnavailable,
+            cheapestFlags: {FuelType.diesel: true},
+          ),
+        );
+
+        final diesel = tester.widget<Text>(find.text('Diesel'));
+        expect(diesel.style?.color, isNot(Colors.white),
+            reason: 'Out-of-stock fuel must not render as champion.');
+      });
+    });
+
+    group('distance prominence (#572)', () {
+      testWidgets('distance uses bold bodyMedium style', (tester) async {
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(station: testStation),
+        );
+
+        final distanceText = tester.widget<Text>(find.textContaining('km'));
+        expect(distanceText.style?.fontWeight, FontWeight.bold);
+      });
+    });
+
     testWidgets('renders station with all fuel types', (tester) async {
       const fullStation = Station(
         id: 'full-station',

@@ -137,8 +137,9 @@ class AllPricesStationCard extends StatelessWidget {
                   ),
                   Text(
                     PriceFormatter.formatDistance(station.dist),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
                     ),
                   ),
                 ],
@@ -219,15 +220,16 @@ class _FuelBadge extends StatelessWidget {
     final color = FuelColors.forType(fuelType);
 
     final isHighlighted = isProfileFuel && !isUnavailable;
+    final isChampion = isCheapest && !isUnavailable;
 
-    final borderColor = isCheapest ? Colors.green : color;
-    final bgColor = isCheapest
-        ? Colors.green.withValues(alpha: 0.1)
+    final borderColor = isChampion ? color : color;
+    final bgColor = isChampion
+        ? color
         : isHighlighted
             ? FuelColors.forType(fuelType).withValues(alpha: 0.22)
             : FuelColors.forTypeLight(fuelType);
 
-    final borderWidth = isCheapest ? 1.5 : (isHighlighted ? 1.5 : 0.5);
+    final borderWidth = isChampion ? 1.5 : (isHighlighted ? 1.5 : 0.5);
     final labelFontSize = isHighlighted ? 11.0 : 10.0;
     final priceFontSize = isHighlighted ? 13.0 : 11.0;
     final dotSize = isHighlighted ? 8.0 : 6.0;
@@ -261,7 +263,9 @@ class _FuelBadge extends StatelessWidget {
               shape: BoxShape.circle,
               color: isUnavailable
                   ? theme.colorScheme.onSurfaceVariant
-                  : color,
+                  : isChampion
+                      ? Colors.white
+                      : color,
             ),
           ),
           const SizedBox(width: 4),
@@ -269,10 +273,14 @@ class _FuelBadge extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: labelFontSize,
-              fontWeight: isHighlighted ? FontWeight.bold : FontWeight.w600,
+              fontWeight: isHighlighted || isChampion
+                  ? FontWeight.bold
+                  : FontWeight.w600,
               color: isUnavailable
                   ? theme.colorScheme.onSurfaceVariant
-                  : color,
+                  : isChampion
+                      ? Colors.white
+                      : color,
             ),
           ),
           const SizedBox(width: 4),
@@ -285,9 +293,11 @@ class _FuelBadge extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: isUnavailable
                   ? theme.colorScheme.onSurfaceVariant
-                  : isHighlighted
-                      ? color
-                      : theme.colorScheme.onSurface,
+                  : isChampion
+                      ? Colors.white
+                      : isHighlighted
+                          ? color
+                          : theme.colorScheme.onSurface,
             ),
           ),
         ],
