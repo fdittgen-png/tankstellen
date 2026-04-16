@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 
 import '../../../mocks/mocks.dart';
@@ -57,8 +57,11 @@ void main() {
       const station = ChargingStation(
         id: 'ev-1',
         name: 'Test Charger',
-        latitude: 48.0,
-        longitude: 2.0,
+        operator: '',
+        lat: 48.0,
+        lng: 2.0,
+        address: '',
+        connectors: [],
       );
 
       await container
@@ -123,8 +126,8 @@ void main() {
       when(() => mockStorage.getEvFavoriteStationData('ev-1')).thenReturn({
         'id': 'ev-1',
         'name': 'Test Charger',
-        'latitude': 48.0,
-        'longitude': 2.0,
+        'lat': 48.0, 'operator': '', 'address': '',
+        'lng': 2.0,
         'connectors': <dynamic>[],
         'amenities': <dynamic>[],
       });
@@ -139,8 +142,8 @@ void main() {
       when(() => mockStorage.getEvFavoriteStationData('ev-1')).thenReturn({
         'id': 'ev-1',
         'name': 'Test Charger',
-        'latitude': 48.0,
-        'longitude': 2.0,
+        'lat': 48.0, 'operator': '', 'address': '',
+        'lng': 2.0,
         'connectors': <dynamic>[],
         'amenities': <dynamic>[],
       });

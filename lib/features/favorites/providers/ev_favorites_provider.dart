@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/storage_providers.dart';
-import '../../ev/domain/entities/charging_station.dart';
+import '../../search/domain/entities/charging_station.dart';
 import 'favorites_provider.dart';
 
 part 'ev_favorites_provider.g.dart';
@@ -74,17 +74,17 @@ class EvFavoriteStations extends _$EvFavoriteStations {
         try {
           stations.add(ChargingStation.fromJson(data));
         } catch (_) {
-          // The station may have been stored from the search/ ChargingStation
-          // type (which uses lat/lng instead of latitude/longitude). Try to
-          // recover by mapping the fields (#552).
+          // Fallback: manually construct from JSON fields that may use either
+          // lat/lng (search/ format) or latitude/longitude (ev/ format).
           try {
             stations.add(ChargingStation(
               id: data['id']?.toString() ?? id,
               name: data['name']?.toString() ?? '',
-              operator: data['operator']?.toString(),
-              latitude: (data['latitude'] ?? data['lat'] as num?)?.toDouble() ?? 0,
-              longitude: (data['longitude'] ?? data['lng'] as num?)?.toDouble() ?? 0,
-              address: data['address']?.toString(),
+              operator: data['operator']?.toString() ?? '',
+              lat: (data['lat'] ?? data['latitude'] as num?)?.toDouble() ?? 0,
+              lng: (data['lng'] ?? data['longitude'] as num?)?.toDouble() ?? 0,
+              address: data['address']?.toString() ?? '',
+              connectors: const [],
             ));
           } catch (e) {
             debugPrint('EvFavoriteStations: fallback parse error for $id: $e');

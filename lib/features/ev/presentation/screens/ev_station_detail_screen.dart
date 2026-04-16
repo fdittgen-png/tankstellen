@@ -39,7 +39,7 @@ class EvStationDetailScreen extends ConsumerWidget {
             onPressed: () {
               ref
                   .read(favoritesProvider.notifier)
-                  .toggleEv(station.id, stationData: station);
+                  .toggle(station.id, rawJson: station.toJson());
               final msg = isFav
                   ? (l10n?.removedFromFavorites ?? 'Removed from favorites')
                   : (l10n?.addedToFavorites ?? 'Added to favorites');

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../ev/domain/entities/charging_station.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart'
-    show ConnectorType;
+import '../../../search/domain/entities/charging_station.dart';
 
 /// Compact card for an EV charging station in the favorites list.
+///
+/// Uses the canonical `search/` [ChargingStation] type with [Connector]
+/// (simple String fields) rather than the richer `ev/` type.
 class EvFavoriteCard extends StatelessWidget {
   final ChargingStation station;
   final VoidCallback? onTap;
@@ -22,10 +23,14 @@ class EvFavoriteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final available = station.connectors
-        .where((c) => c.status == ConnectorStatus.available)
+    final connectors = station.connectors;
+    final available = connectors
+        .where((c) => c.status?.toLowerCase().contains('available') == true)
         .length;
-    final total = station.connectors.length;
+    final total = connectors.length;
+    final maxPower = connectors.isEmpty
+        ? 0.0
+        : connectors.map((c) => c.powerKW).reduce((a, b) => a > b ? a : b);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -48,9 +53,9 @@ class EvFavoriteCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (station.operator != null)
+                    if (station.operator.isNotEmpty)
                       Text(
-                        station.operator!,
+                        station.operator,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -64,7 +69,7 @@ class EvFavoriteCard extends StatelessWidget {
                             color: theme.colorScheme.onSurfaceVariant),
                         const SizedBox(width: 4),
                         Text(
-                          '${station.maxPowerKw.round()} kW',
+                          '${maxPower.round()} kW',
                           style: theme.textTheme.bodySmall,
                         ),
                         const SizedBox(width: 12),
@@ -84,16 +89,16 @@ class EvFavoriteCard extends StatelessWidget {
                         ],
                       ],
                     ),
-                    if (station.connectors.isNotEmpty)
+                    if (connectors.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Wrap(
                           spacing: 4,
-                          children: station.connectors
+                          children: connectors
                               .map((c) => c.type)
                               .toSet()
                               .map((type) => Chip(
-                                    label: Text(_connectorLabel(type),
+                                    label: Text(type,
                                         style: const TextStyle(fontSize: 10)),
                                     materialTapTargetSize:
                                         MaterialTapTargetSize.shrinkWrap,
@@ -123,17 +128,5 @@ class EvFavoriteCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  static String _connectorLabel(ConnectorType type) {
-    return switch (type) {
-      ConnectorType.type2 => 'Type 2',
-      ConnectorType.ccs => 'CCS',
-      ConnectorType.chademo => 'CHAdeMO',
-      ConnectorType.tesla => 'Tesla',
-      ConnectorType.schuko => 'Schuko',
-      ConnectorType.type1 => 'Type 1',
-      ConnectorType.threePin => '3-pin',
-    };
   }
 }

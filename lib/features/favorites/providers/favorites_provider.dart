@@ -6,7 +6,7 @@ import '../../../core/services/service_result.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../../../core/sync/sync_service.dart';
-import '../../ev/domain/entities/charging_station.dart' as ev;
+import '../../search/domain/entities/charging_station.dart' as search_ev;
 import '../../search/domain/entities/station.dart';
 import '../../search/providers/station_rating_provider.dart';
 
@@ -70,7 +70,7 @@ class Favorites extends _$Favorites {
   }
 
   /// Add an EV charging station to favorites (explicit ev/ entity).
-  Future<void> addEv(String stationId, {ev.ChargingStation? stationData}) async {
+  Future<void> addEv(String stationId, {search_ev.ChargingStation? stationData}) async {
     final storage = ref.read(storageRepositoryProvider);
     await storage.addEvFavorite(stationId);
 
@@ -128,7 +128,7 @@ class Favorites extends _$Favorites {
   }
 
   /// Toggle an EV station's favorite status.
-  Future<void> toggleEv(String stationId, {ev.ChargingStation? stationData}) async {
+  Future<void> toggleEv(String stationId, {search_ev.ChargingStation? stationData}) async {
     if (state.contains(stationId)) {
       await remove(stationId);
     } else {
