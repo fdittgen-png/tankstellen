@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../favorites/providers/ev_favorites_provider.dart';
+import '../../../favorites/providers/favorites_provider.dart';
 import '../../../search/providers/station_rating_provider.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart'
     show ConnectorType;
@@ -22,7 +22,7 @@ class EvStationDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final isFav = ref.watch(isEvFavoriteProvider(station.id));
+    final isFav = ref.watch(isFavoriteProvider(station.id));
 
     return Scaffold(
       appBar: AppBar(
@@ -38,8 +38,8 @@ class EvStationDetailScreen extends ConsumerWidget {
                 : (l10n?.addFavorite ?? 'Add to favorites'),
             onPressed: () {
               ref
-                  .read(evFavoritesProvider.notifier)
-                  .toggle(station.id, stationData: station);
+                  .read(favoritesProvider.notifier)
+                  .toggleEv(station.id, stationData: station);
               final msg = isFav
                   ? (l10n?.removedFromFavorites ?? 'Removed from favorites')
                   : (l10n?.addedToFavorites ?? 'Added to favorites');

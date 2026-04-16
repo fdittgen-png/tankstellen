@@ -68,7 +68,7 @@ final class FavoritesProvider
   }
 }
 
-String _$favoritesHash() => r'1472d9efc6c5f230389b5f23f77f05d1fcef51d2';
+String _$favoritesHash() => r'5c67b0ad123c2c0298db7bea57f88ae2f6c9f341';
 
 /// Manages the user's list of favorite station IDs.
 ///
@@ -98,16 +98,16 @@ abstract class _$Favorites extends $Notifier<List<String>> {
   }
 }
 
-/// Whether a specific station is favorited. Rebuilds when favorites change.
+/// Whether a specific station is favorited (checks both fuel and EV).
 
 @ProviderFor(isFavorite)
 final isFavoriteProvider = IsFavoriteFamily._();
 
-/// Whether a specific station is favorited. Rebuilds when favorites change.
+/// Whether a specific station is favorited (checks both fuel and EV).
 
 final class IsFavoriteProvider extends $FunctionalProvider<bool, bool, bool>
     with $Provider<bool> {
-  /// Whether a specific station is favorited. Rebuilds when favorites change.
+  /// Whether a specific station is favorited (checks both fuel and EV).
   IsFavoriteProvider._({
     required IsFavoriteFamily super.from,
     required String super.argument,
@@ -161,7 +161,7 @@ final class IsFavoriteProvider extends $FunctionalProvider<bool, bool, bool>
 
 String _$isFavoriteHash() => r'407f8aa58c4a51cd73bb614574835fabbf173b80';
 
-/// Whether a specific station is favorited. Rebuilds when favorites change.
+/// Whether a specific station is favorited (checks both fuel and EV).
 
 final class IsFavoriteFamily extends $Family
     with $FunctionalFamilyOverride<bool, String> {
@@ -174,7 +174,7 @@ final class IsFavoriteFamily extends $Family
         isAutoDispose: true,
       );
 
-  /// Whether a specific station is favorited. Rebuilds when favorites change.
+  /// Whether a specific station is favorited (checks both fuel and EV).
 
   IsFavoriteProvider call(String stationId) =>
       IsFavoriteProvider._(argument: stationId, from: this);
@@ -183,40 +183,116 @@ final class IsFavoriteFamily extends $Family
   String toString() => r'isFavoriteProvider';
 }
 
-/// Loads station data for favorites and refreshes prices.
+/// Whether a specific EV station is favorited (backward compatibility alias).
+
+@ProviderFor(isEvFavorite)
+final isEvFavoriteProvider = IsEvFavoriteFamily._();
+
+/// Whether a specific EV station is favorited (backward compatibility alias).
+
+final class IsEvFavoriteProvider extends $FunctionalProvider<bool, bool, bool>
+    with $Provider<bool> {
+  /// Whether a specific EV station is favorited (backward compatibility alias).
+  IsEvFavoriteProvider._({
+    required IsEvFavoriteFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'isEvFavoriteProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$isEvFavoriteHash();
+
+  @override
+  String toString() {
+    return r'isEvFavoriteProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  bool create(Ref ref) {
+    final argument = this.argument as String;
+    return isEvFavorite(ref, argument);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is IsEvFavoriteProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$isEvFavoriteHash() => r'acd73588a221554915fd24b7637376e73cfacdc8';
+
+/// Whether a specific EV station is favorited (backward compatibility alias).
+
+final class IsEvFavoriteFamily extends $Family
+    with $FunctionalFamilyOverride<bool, String> {
+  IsEvFavoriteFamily._()
+    : super(
+        retry: null,
+        name: r'isEvFavoriteProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Whether a specific EV station is favorited (backward compatibility alias).
+
+  IsEvFavoriteProvider call(String stationId) =>
+      IsEvFavoriteProvider._(argument: stationId, from: this);
+
+  @override
+  String toString() => r'isEvFavoriteProvider';
+}
+
+/// Loads fuel station data for favorites and refreshes prices.
 ///
-/// ## Data flow (local-first):
-/// 1. Load persisted Station objects from Hive (permanent, never expires)
-/// 2. Check connectivity — if offline, return persisted data with `isStale: true`
-/// 3. If online, refresh prices via StationService.getPrices()
-/// 4. Merge fresh prices into stations, persist updated data back
-/// 5. On API failure, serve persisted data with stale flag
+/// Returns fuel favorites as [List<Station>]. EV favorites are loaded
+/// separately via [evFavoriteStationsProvider] (different entity format).
+/// The UI merges both into a single list.
 
 @ProviderFor(FavoriteStations)
 final favoriteStationsProvider = FavoriteStationsProvider._();
 
-/// Loads station data for favorites and refreshes prices.
+/// Loads fuel station data for favorites and refreshes prices.
 ///
-/// ## Data flow (local-first):
-/// 1. Load persisted Station objects from Hive (permanent, never expires)
-/// 2. Check connectivity — if offline, return persisted data with `isStale: true`
-/// 3. If online, refresh prices via StationService.getPrices()
-/// 4. Merge fresh prices into stations, persist updated data back
-/// 5. On API failure, serve persisted data with stale flag
+/// Returns fuel favorites as [List<Station>]. EV favorites are loaded
+/// separately via [evFavoriteStationsProvider] (different entity format).
+/// The UI merges both into a single list.
 final class FavoriteStationsProvider
     extends
         $NotifierProvider<
           FavoriteStations,
           AsyncValue<ServiceResult<List<Station>>>
         > {
-  /// Loads station data for favorites and refreshes prices.
+  /// Loads fuel station data for favorites and refreshes prices.
   ///
-  /// ## Data flow (local-first):
-  /// 1. Load persisted Station objects from Hive (permanent, never expires)
-  /// 2. Check connectivity — if offline, return persisted data with `isStale: true`
-  /// 3. If online, refresh prices via StationService.getPrices()
-  /// 4. Merge fresh prices into stations, persist updated data back
-  /// 5. On API failure, serve persisted data with stale flag
+  /// Returns fuel favorites as [List<Station>]. EV favorites are loaded
+  /// separately via [evFavoriteStationsProvider] (different entity format).
+  /// The UI merges both into a single list.
   FavoriteStationsProvider._()
     : super(
         from: null,
@@ -245,16 +321,13 @@ final class FavoriteStationsProvider
   }
 }
 
-String _$favoriteStationsHash() => r'11bdd3e132102a8af0ce92cfc00ea7364afc2493';
+String _$favoriteStationsHash() => r'5a80ff7920b9fa5cd2af4f05f5f1a4e010e9bcce';
 
-/// Loads station data for favorites and refreshes prices.
+/// Loads fuel station data for favorites and refreshes prices.
 ///
-/// ## Data flow (local-first):
-/// 1. Load persisted Station objects from Hive (permanent, never expires)
-/// 2. Check connectivity — if offline, return persisted data with `isStale: true`
-/// 3. If online, refresh prices via StationService.getPrices()
-/// 4. Merge fresh prices into stations, persist updated data back
-/// 5. On API failure, serve persisted data with stale flag
+/// Returns fuel favorites as [List<Station>]. EV favorites are loaded
+/// separately via [evFavoriteStationsProvider] (different entity format).
+/// The UI merges both into a single list.
 
 abstract class _$FavoriteStations
     extends $Notifier<AsyncValue<ServiceResult<List<Station>>>> {

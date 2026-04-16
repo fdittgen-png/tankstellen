@@ -6,6 +6,7 @@ import '../../../core/services/service_result.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../../../core/sync/sync_service.dart';
+import '../../ev/domain/entities/charging_station.dart' as ev;
 import '../../search/domain/entities/station.dart';
 import '../../search/providers/station_rating_provider.dart';
 
@@ -25,61 +26,79 @@ class Favorites extends _$Favorites {
   @override
   List<String> build() {
     final storage = ref.watch(storageRepositoryProvider);
-    return storage.getFavoriteIds();
+    // Merge fuel + EV favorite IDs into a single unified list.
+    return [...storage.getFavoriteIds(), ...storage.getEvFavoriteIds()];
   }
 
-  /// Add a station to favorites.
-  ///
-  /// Persists both the station ID and the full Station JSON permanently
-  /// in Hive. The JSON never expires (unlike CacheManager entries) so
-  /// the favorites screen always has data to display.
+  /// Reload state from storage (call after any mutation).
+  void _reload() {
+    final storage = ref.read(storageRepositoryProvider);
+    state = [...storage.getFavoriteIds(), ...storage.getEvFavoriteIds()];
+  }
+
+  /// Add a fuel station to favorites.
   Future<void> add(String stationId, {Station? stationData}) async {
     final storage = ref.read(storageRepositoryProvider);
     await storage.addFavorite(stationId);
 
-    // Persist full station data permanently (survives cache eviction / app restart)
     if (stationData != null) {
       await storage.saveFavoriteStationData(stationId, stationData.toJson());
     }
 
-    state = storage.getFavoriteIds();
+    _reload();
 
-    // Non-blocking server sync (local operation already complete)
     await SyncHelper.syncIfEnabled(ref, 'Favorites.add',
-      () => SyncService.syncFavorites(state),
+      () => SyncService.syncFavorites(storage.getFavoriteIds()),
     );
   }
 
-  /// Remove a station from favorites.
-  ///
-  /// This is the ONE exception to the "sync never deletes" rule:
-  /// when the user explicitly removes a favorite, we delete from
-  /// local storage, server, and all associated data (rating, history).
+  /// Add an EV charging station to favorites.
+  Future<void> addEv(String stationId, {ev.ChargingStation? stationData}) async {
+    final storage = ref.read(storageRepositoryProvider);
+    await storage.addEvFavorite(stationId);
+
+    if (stationData != null) {
+      await storage.saveEvFavoriteStationData(stationId, stationData.toJson());
+    }
+
+    _reload();
+  }
+
+  /// Remove a station from favorites (checks both fuel and EV storage).
   Future<void> remove(String stationId) async {
     final storage = ref.read(storageRepositoryProvider);
-    await storage.removeFavorite(stationId);
-    await storage.removeFavoriteStationData(stationId);
-    state = storage.getFavoriteIds();
 
-    // Clean up associated data (rating + price history)
-    try {
-      await ref.read(stationRatingsProvider.notifier).remove(stationId);
-    } catch (e) {
-      debugPrint('Cleanup: $e');
-    }
-    try {
-      await storage.clearPriceHistoryForStation(stationId);
-    } catch (e) {
-      debugPrint('Cleanup: $e');
+    // Try fuel storage
+    if (storage.isFavorite(stationId)) {
+      await storage.removeFavorite(stationId);
+      await storage.removeFavoriteStationData(stationId);
+
+      try {
+        await ref.read(stationRatingsProvider.notifier).remove(stationId);
+      } catch (e) {
+        debugPrint('Cleanup: $e');
+      }
+      try {
+        await storage.clearPriceHistoryForStation(stationId);
+      } catch (e) {
+        debugPrint('Cleanup: $e');
+      }
+
+      await SyncHelper.fireAndForget(ref, 'Favorites.remove',
+        () => SyncService.deleteFavorite(stationId),
+      );
     }
 
-    // Delete from server explicitly
-    await SyncHelper.fireAndForget(ref, 'Favorites.remove',
-      () => SyncService.deleteFavorite(stationId),
-    );
+    // Try EV storage
+    if (storage.isEvFavorite(stationId)) {
+      await storage.removeEvFavorite(stationId);
+      await storage.removeEvFavoriteStationData(stationId);
+    }
+
+    _reload();
   }
 
-  /// Toggle favorite status. Pass [stationData] when adding from search results.
+  /// Toggle a fuel station's favorite status.
   Future<void> toggle(String stationId, {Station? stationData}) async {
     if (state.contains(stationId)) {
       await remove(stationId);
@@ -87,33 +106,44 @@ class Favorites extends _$Favorites {
       await add(stationId, stationData: stationData);
     }
   }
+
+  /// Toggle an EV station's favorite status.
+  Future<void> toggleEv(String stationId, {ev.ChargingStation? stationData}) async {
+    if (state.contains(stationId)) {
+      await remove(stationId);
+    } else {
+      await addEv(stationId, stationData: stationData);
+    }
+  }
 }
 
-/// Whether a specific station is favorited. Rebuilds when favorites change.
+/// Whether a specific station is favorited (checks both fuel and EV).
 @riverpod
 bool isFavorite(Ref ref, String stationId) {
   final favorites = ref.watch(favoritesProvider);
   return favorites.contains(stationId);
 }
 
-/// Loads station data for favorites and refreshes prices.
+/// Whether a specific EV station is favorited (backward compatibility alias).
+@riverpod
+bool isEvFavorite(Ref ref, String stationId) {
+  return ref.watch(isFavoriteProvider(stationId));
+}
+
+/// Loads fuel station data for favorites and refreshes prices.
 ///
-/// ## Data flow (local-first):
-/// 1. Load persisted Station objects from Hive (permanent, never expires)
-/// 2. Check connectivity — if offline, return persisted data with `isStale: true`
-/// 3. If online, refresh prices via StationService.getPrices()
-/// 4. Merge fresh prices into stations, persist updated data back
-/// 5. On API failure, serve persisted data with stale flag
+/// Returns fuel favorites as [List<Station>]. EV favorites are loaded
+/// separately via [evFavoriteStationsProvider] (different entity format).
+/// The UI merges both into a single list.
 @riverpod
 class FavoriteStations extends _$FavoriteStations {
   @override
   AsyncValue<ServiceResult<List<Station>>> build() {
-    // Watch (not read) so the provider rebuilds whenever the user adds or
-    // removes a favorite. Without this, the favorites tab keeps the empty
-    // state from the first build and the loading skeleton renders forever
-    // until the app is restarted (#474).
-    final favoriteIds = ref.watch(favoritesProvider);
-    if (favoriteIds.isEmpty) {
+    final allIds = ref.watch(favoritesProvider);
+    final storage = ref.read(storageRepositoryProvider);
+    final fuelIds = storage.getFavoriteIds();
+
+    if (fuelIds.isEmpty) {
       return AsyncValue.data(ServiceResult(
         data: const [],
         source: ServiceSource.cache,
@@ -121,9 +151,8 @@ class FavoriteStations extends _$FavoriteStations {
       ));
     }
 
-    final storage = ref.read(storageRepositoryProvider);
     final stations = <Station>[];
-    for (final id in favoriteIds) {
+    for (final id in fuelIds) {
       final data = storage.getFavoriteStationData(id);
       if (data != null) {
         try {
@@ -131,6 +160,9 @@ class FavoriteStations extends _$FavoriteStations {
         } catch (_) {}
       }
     }
+
+    // Reference allIds to ensure rebuild on any favorite change.
+    debugPrint('FavoriteStations: ${stations.length} fuel / ${allIds.length - fuelIds.length} EV');
 
     return AsyncValue.data(ServiceResult(
       data: stations,
@@ -141,8 +173,10 @@ class FavoriteStations extends _$FavoriteStations {
   }
 
   Future<void> loadAndRefresh() async {
-    final favoriteIds = ref.read(favoritesProvider);
-    if (favoriteIds.isEmpty) {
+    final storage = ref.read(storageRepositoryProvider);
+    final fuelIds = storage.getFavoriteIds();
+
+    if (fuelIds.isEmpty) {
       state = AsyncValue.data(ServiceResult(
         data: const [],
         source: ServiceSource.cache,
@@ -152,11 +186,8 @@ class FavoriteStations extends _$FavoriteStations {
     }
 
     try {
-      final storage = ref.read(storageRepositoryProvider);
-
-      // Step 1: Load persisted station data from Hive (permanent, never expires)
       final stations = <Station>[];
-      for (final id in favoriteIds) {
+      for (final id in fuelIds) {
         final data = storage.getFavoriteStationData(id);
         if (data != null) {
           try {
@@ -164,18 +195,11 @@ class FavoriteStations extends _$FavoriteStations {
           } catch (e) {
             debugPrint('FavoriteStations: parse error for $id: $e');
           }
-        } else {
-          debugPrint('FavoriteStations: no persisted data for $id');
         }
       }
 
-      // Step 1b: For IDs with no persisted data, try to fetch from API
-      final missingIds = favoriteIds.where((id) => !stations.any((s) => s.id == id)).toList();
+      final missingIds = fuelIds.where((id) => !stations.any((s) => s.id == id)).toList();
 
-      debugPrint('FavoriteStations: loaded ${stations.length}/${favoriteIds.length} from storage'
-          '${missingIds.isNotEmpty ? ', ${missingIds.length} missing' : ''}');
-
-      // Show cached data immediately (no shimmer wait)
       if (stations.isNotEmpty) {
         state = AsyncValue.data(ServiceResult(
           data: List.from(stations),
@@ -185,11 +209,8 @@ class FavoriteStations extends _$FavoriteStations {
         ));
       }
 
-      // Step 2: Check connectivity
       final connectivity = await Connectivity().checkConnectivity();
-      final isOffline = connectivity.contains(ConnectivityResult.none);
-
-      if (isOffline) {
+      if (connectivity.contains(ConnectivityResult.none)) {
         state = AsyncValue.data(ServiceResult(
           data: stations,
           source: ServiceSource.cache,
@@ -199,10 +220,8 @@ class FavoriteStations extends _$FavoriteStations {
         return;
       }
 
-      // Step 3: Online — fetch missing station details + refresh prices
       final stationService = ref.read(stationServiceProvider);
       try {
-        // Fetch full station data for IDs that had no persisted data
         if (missingIds.isNotEmpty) {
           for (final id in missingIds) {
             try {
@@ -211,14 +230,13 @@ class FavoriteStations extends _$FavoriteStations {
               stations.add(s);
               await storage.saveFavoriteStationData(id, s.toJson());
             } catch (e) {
-              debugPrint('FavoriteStations: could not fetch detail for $id: $e');
+              debugPrint('FavoriteStations: fetch detail $id: $e');
             }
           }
         }
 
-        final pricesResult = await stationService.getPrices(favoriteIds);
+        final pricesResult = await stationService.getPrices(fuelIds);
 
-        // Step 4: Merge fresh prices into stations
         final updated = stations.map((s) {
           final fresh = pricesResult.data[s.id];
           if (fresh == null) return s;
@@ -230,7 +248,6 @@ class FavoriteStations extends _$FavoriteStations {
           );
         }).toList();
 
-        // Persist updated data back to Hive
         for (final s in updated) {
           await storage.saveFavoriteStationData(s.id, s.toJson());
         }
@@ -243,7 +260,6 @@ class FavoriteStations extends _$FavoriteStations {
           errors: pricesResult.errors,
         ));
       } on Exception catch (e) {
-        // Step 5: Price API failed — serve persisted data with stale flag
         debugPrint('Favorites price refresh failed: $e');
         state = AsyncValue.data(ServiceResult(
           data: stations,
@@ -257,3 +273,4 @@ class FavoriteStations extends _$FavoriteStations {
     }
   }
 }
+

@@ -6,6 +6,8 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
+import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
@@ -17,9 +19,13 @@ import '../mocks/mocks.dart';
 /// Returns both the override and the mock so callers can configure stubs.
 ({Object override, MockStorageRepository mock}) mockStorageRepositoryOverride() {
   final mock = MockStorageRepository();
-  // Default stubs for EV favorites (avoid null returns from Mock)
+  // Default stubs to avoid null returns from Mock
+  when(() => mock.getFavoriteIds()).thenReturn([]);
+  when(() => mock.getFavoriteStationData(any())).thenReturn(null);
   when(() => mock.getEvFavoriteIds()).thenReturn([]);
   when(() => mock.getEvFavoriteStationData(any())).thenReturn(null);
+  when(() => mock.isFavorite(any())).thenReturn(false);
+  when(() => mock.isEvFavorite(any())).thenReturn(false);
   return (
     override: storageRepositoryProvider.overrideWithValue(mock),
     mock: mock,
@@ -154,10 +160,21 @@ class _FixedUserPosition extends UserPosition {
       storage.override,
       activeCountryOverride(country),
       favoritesOverride(favoriteIds),
+      evFavoritesProvider.overrideWith(() => _EmptyEvFavorites()),
       syncStateProvider.overrideWith(() => _DisabledSyncState()),
     ],
     mockStorage: storage.mock,
   );
+}
+
+class _EmptyEvFavorites extends EvFavorites {
+  @override
+  List<String> build() => const [];
+}
+
+class _EmptyEvFavoriteStations extends EvFavoriteStations {
+  @override
+  List<ChargingStation> build() => const [];
 }
 
 /// SyncState that returns a disabled config (no sync, no Supabase calls).
