@@ -2,8 +2,16 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = 'Fuel Prices';
-  static const String appVersion = '4.0.0';
   static const String appPackage = 'de.tankstellen.app';
+
+  /// Runtime app version cached at startup by [AppInitializer].
+  /// Falls back to build-time constant if not yet initialized.
+  static String get appVersion => _runtimeVersion ?? _buildVersion;
+  static const String _buildVersion = '5.0.0';
+  static String? _runtimeVersion;
+
+  /// Called once at startup with the real version from package_info_plus.
+  static void setRuntimeVersion(String version) => _runtimeVersion = version;
 
   // Developer / Publisher
   static const String developerName = 'Florian DITTGEN';
@@ -12,7 +20,7 @@ class AppConstants {
       'https://github.com/fdittgen-png/tankstellen';
 
   /// Shared User-Agent for all HTTP clients.
-  static const String userAgent = '$appPackage/$appVersion';
+  static String get userAgent => '$appPackage/$appVersion';
 
   static const double defaultSearchRadiusKm = 10.0;
   static const double maxSearchRadiusKm = 25.0;
@@ -23,7 +31,7 @@ class AppConstants {
 
   static const String osmTileUrl =
       'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-  static const String osmUserAgent = userAgent;
+  static String get osmUserAgent => userAgent;
 
   static const String tankerkoenigAttribution =
       'Daten von Tankerkoenig.de (CC BY 4.0)';

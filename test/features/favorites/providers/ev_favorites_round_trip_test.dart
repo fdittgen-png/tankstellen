@@ -2,10 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart'
-    as ev_entity;
-import 'package:tankstellen/features/search/domain/entities/charging_station.dart'
-    as search_entity;
+import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 
@@ -23,27 +20,19 @@ void main() {
   late List<String> evIds;
   late Map<String, Map<String, dynamic>> evStationData;
 
-  // The ev/ entity (used by EV detail screen and favorites storage)
-  const testEvStation = ev_entity.ChargingStation(
+  // Canonical search/ ChargingStation — the single type used everywhere now.
+  const testEvStation = ChargingStation(
     id: 'ev-42',
     name: 'Test Charger Paris',
-    latitude: 48.85,
-    longitude: 2.35,
-    address: '1 Rue de Test',
-  );
-
-  // The search/ entity (used by EVStationResult in search results)
-  // This is what the search results list passes to the EV detail screen
-  // via context.push('/ev-station', extra: item.station)
-  const testSearchEvStation = search_entity.ChargingStation(
-    id: 'ev-42',
-    name: 'Test Charger Paris',
-    operator: '',
+    operator: 'Test Operator',
     lat: 48.85,
     lng: 2.35,
     address: '1 Rue de Test',
     connectors: [],
   );
+
+  // Alias for tests that reference the "search" variant (same type now).
+  const testSearchEvStation = testEvStation;
 
   setUp(() {
     mockStorage = MockHiveStorage();
@@ -162,7 +151,7 @@ void main() {
         // The fallback parser should recover the station
         expect(stations, hasLength(1));
         expect(stations.first.id, 'ev-42');
-        expect(stations.first.latitude, 48.85,
+        expect(stations.first.lat, 48.85,
             reason: 'fallback parser reads lat field as latitude');
         expect(stations.first.name, 'Test Charger Paris');
       },
@@ -180,7 +169,7 @@ void main() {
 
         final stations = container.read(evFavoriteStationsProvider);
         expect(stations, hasLength(1));
-        expect(stations.first.latitude, 48.85,
+        expect(stations.first.lat, 48.85,
             reason: 'ev/ ChargingStation preserves coordinates through storage');
       },
     );

@@ -18,7 +18,7 @@ class FlutterMapProvider implements MapProvider {
   String get name => 'OpenStreetMap';
 
   @override
-  TileLayerConfig get tileConfig => const TileLayerConfig(
+  TileLayerConfig get tileConfig => TileLayerConfig(
         urlTemplate: AppConstants.osmTileUrl,
         userAgent: AppConstants.osmUserAgent,
         attribution: AppConstants.osmAttribution,

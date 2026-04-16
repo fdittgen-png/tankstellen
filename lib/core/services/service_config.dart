@@ -25,24 +25,24 @@ class ServiceConfig {
 class ServiceConfigs {
   ServiceConfigs._();
 
-  static const tankerkoenig = ServiceConfig(
+  static final tankerkoenig = ServiceConfig(
     baseUrl: 'https://creativecommons.tankerkoenig.de/json',
     apiKeyParamName: 'apikey',
     headers: {'User-Agent': AppConstants.userAgent},
   );
 
-  static const nominatim = ServiceConfig(
+  static final nominatim = ServiceConfig(
     baseUrl: 'https://nominatim.openstreetmap.org',
     headers: {'User-Agent': AppConstants.userAgent},
   );
 
-  static const osrm = ServiceConfig(
+  static final osrm = ServiceConfig(
     baseUrl: 'https://router.project-osrm.org',
-    receiveTimeout: Duration(seconds: 30),
+    receiveTimeout: const Duration(seconds: 30),
     headers: {'User-Agent': AppConstants.userAgent},
   );
 
-  static const openChargeMap = ServiceConfig(
+  static final openChargeMap = ServiceConfig(
     baseUrl: 'https://api.openchargemap.io/v3',
     apiKeyParamName: 'key',
     headers: {'User-Agent': AppConstants.userAgent},

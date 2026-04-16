@@ -7,6 +7,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../core/background/background_service.dart';
+import '../core/constants/app_constants.dart';
 import '../core/cache/cache_manager.dart';
 import '../core/error_tracing/storage/trace_storage.dart';
 import '../core/error_tracing/trace_recorder.dart';
@@ -65,6 +66,14 @@ class AppInitializer {
     final storage = HiveStorage();
     await CommunityConfig.load();
     await _maybeInitTankSync(storage);
+
+    // Cache runtime version so AppConstants.appVersion is accurate (#570).
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      AppConstants.setRuntimeVersion(
+        '${packageInfo.version}+${packageInfo.buildNumber}',
+      );
+    } catch (_) {}
 
     StartupTimer.instance.mark('pre_run_app');
 
