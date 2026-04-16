@@ -492,5 +492,39 @@ void main() {
         expect(e10Text.style?.fontWeight, FontWeight.w600);
       });
     });
+
+    group('card polish (#592)', () {
+      testWidgets('card has 6dp vertical margin', (tester) async {
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(station: testStation),
+        );
+
+        final card = tester.widget<Card>(find.byType(Card).first);
+        expect(
+          card.margin,
+          const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        );
+      });
+
+      testWidgets('card uses elevation 2 in light mode', (tester) async {
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(station: testStation),
+        );
+        final card = tester.widget<Card>(find.byType(Card).first);
+        expect(card.elevation, 2.0);
+      });
+
+      testWidgets('card has 12dp rounded corners', (tester) async {
+        await pumpApp(
+          tester,
+          const AllPricesStationCard(station: testStation),
+        );
+        final card = tester.widget<Card>(find.byType(Card).first);
+        final shape = card.shape as RoundedRectangleBorder;
+        expect(shape.borderRadius, BorderRadius.circular(12));
+      });
+    });
   });
 }

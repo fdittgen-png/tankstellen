@@ -717,5 +717,73 @@ void main() {
         expect(rendered, isNot(contains('€')));
       });
     });
+
+    group('card polish (#592)', () {
+      testWidgets('card has 6dp vertical margin (breathing room)',
+          (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.e10,
+          ),
+        );
+
+        final card = tester.widget<Card>(find.byType(Card).first);
+        expect(
+          card.margin,
+          const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          reason: 'Vertical margin must be 6dp per #592 spec.',
+        );
+      });
+
+      testWidgets('card uses elevation 2 in light mode', (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.e10,
+          ),
+        );
+
+        final card = tester.widget<Card>(find.byType(Card).first);
+        expect(card.elevation, 2.0);
+      });
+
+      testWidgets('card uses elevation 1 in dark mode', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: ThemeData.dark(),
+            home: const Scaffold(
+              body: StationCard(
+                station: testStation,
+                selectedFuelType: FuelType.e10,
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final card = tester.widget<Card>(find.byType(Card).first);
+        expect(card.elevation, 1.0);
+      });
+
+      testWidgets('card has 12dp rounded corners', (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.e10,
+          ),
+        );
+
+        final card = tester.widget<Card>(find.byType(Card).first);
+        final shape = card.shape as RoundedRectangleBorder;
+        expect(
+          shape.borderRadius,
+          BorderRadius.circular(12),
+        );
+      });
+    });
   });
 }
