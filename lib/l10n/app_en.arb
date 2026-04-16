@@ -820,6 +820,8 @@
   "tooltipClose": "Close",
   "tooltipClearSearch": "Clear search input",
   "tooltipUseGps": "Use GPS location",
+  "tooltipShowPassword": "Show password",
+  "tooltipHidePassword": "Hide password",
   "switchToEmail": "Switch to email",
   "switchToEmailSubtitle": "Keep data, add sign-in from other devices",
   "switchToAnonymousAction": "Switch to anonymous",

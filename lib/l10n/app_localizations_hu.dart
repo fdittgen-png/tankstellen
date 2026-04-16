@@ -1855,6 +1855,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tooltipUseGps => 'Use GPS location';
 
   @override
+  String get tooltipShowPassword => 'Show password';
+
+  @override
+  String get tooltipHidePassword => 'Hide password';
+
+  @override
   String get switchToEmail => 'Switch to email';
 
   @override

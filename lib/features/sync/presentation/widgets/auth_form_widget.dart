@@ -164,6 +164,9 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
                   form.showPassword ? Icons.visibility_off : Icons.visibility,
                   size: 18,
                 ),
+                tooltip: form.showPassword
+                    ? (l10n?.tooltipHidePassword ?? 'Hide password')
+                    : (l10n?.tooltipShowPassword ?? 'Show password'),
                 onPressed: notifier.togglePassword,
               ),
             ),
@@ -194,6 +197,9 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
                         : Icons.visibility,
                     size: 18,
                   ),
+                  tooltip: form.showConfirm
+                      ? (l10n?.tooltipHidePassword ?? 'Hide password')
+                      : (l10n?.tooltipShowPassword ?? 'Show password'),
                   onPressed: notifier.toggleConfirm,
                 ),
               ),

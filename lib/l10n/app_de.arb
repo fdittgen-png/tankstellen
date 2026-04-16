@@ -815,6 +815,8 @@
   "tooltipClose": "Schließen",
   "tooltipClearSearch": "Sucheingabe löschen",
   "tooltipUseGps": "GPS-Standort verwenden",
+  "tooltipShowPassword": "Passwort anzeigen",
+  "tooltipHidePassword": "Passwort verbergen",
   "switchToEmail": "Zu E-Mail wechseln",
   "switchToEmailSubtitle": "Daten behalten, Anmeldung von anderen Geräten",
   "switchToAnonymousAction": "Zu anonym wechseln",

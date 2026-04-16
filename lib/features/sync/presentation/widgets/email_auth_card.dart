@@ -99,6 +99,9 @@ class EmailAuthCard extends StatelessWidget {
                     showPassword ? Icons.visibility_off : Icons.visibility,
                     size: 18,
                   ),
+                  tooltip: showPassword
+                      ? (l10n?.tooltipHidePassword ?? 'Hide password')
+                      : (l10n?.tooltipShowPassword ?? 'Show password'),
                   onPressed: onTogglePassword,
                 ),
               ),
@@ -127,6 +130,9 @@ class EmailAuthCard extends StatelessWidget {
                       showConfirm ? Icons.visibility_off : Icons.visibility,
                       size: 18,
                     ),
+                    tooltip: showConfirm
+                        ? (l10n?.tooltipHidePassword ?? 'Hide password')
+                        : (l10n?.tooltipShowPassword ?? 'Show password'),
                     onPressed: onToggleConfirm,
                   ),
                 ),
