@@ -13,6 +13,13 @@ void main() {
 
   setUp(() {
     mockStorage = MockHiveStorage();
+    // Fuel favorites stubs (unified Favorites.build merges both lists)
+    when(() => mockStorage.getFavoriteIds()).thenReturn([]);
+    when(() => mockStorage.getFavoriteStationData(any())).thenReturn(null);
+    when(() => mockStorage.isFavorite(any())).thenReturn(false);
+    when(() => mockStorage.isEvFavorite(any())).thenReturn(false);
+    when(() => mockStorage.getSetting(any())).thenReturn(null);
+    // EV favorites stubs
     when(() => mockStorage.getEvFavoriteIds()).thenReturn([]);
     when(() => mockStorage.addEvFavorite(any())).thenAnswer((_) async {});
     when(() => mockStorage.removeEvFavorite(any())).thenAnswer((_) async {});
