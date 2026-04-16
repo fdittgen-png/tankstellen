@@ -77,12 +77,24 @@ class ServiceChainErrorWidget extends StatelessWidget {
   /// Optional country code to include in the report (e.g. `GB`).
   final String? countryCode;
 
+  /// What the user was doing when the error occurred (e.g. `GPS search`).
+  final String? searchContext;
+
+  /// Network connectivity at time of error (e.g. `wifi`, `mobile`, `none`).
+  final String? networkState;
+
+  /// Stack trace from the catch site, if available.
+  final StackTrace? stackTrace;
+
   const ServiceChainErrorWidget({
     super.key,
     required this.error,
     this.onRetry,
     this.reporter,
     this.countryCode,
+    this.searchContext,
+    this.networkState,
+    this.stackTrace,
   });
 
   /// Extract a short, user-friendly title from the error.
@@ -162,6 +174,9 @@ class ServiceChainErrorWidget extends StatelessWidget {
       platform: ErrorReporterContext.currentPlatform(),
       locale: ErrorReporterContext.currentLocale(context),
       countryCode: countryCode,
+      networkState: networkState,
+      searchContext: searchContext,
+      stackTrace: stackTrace,
     );
     (reporter ?? const ErrorReporter()).reportError(context, payload);
   }

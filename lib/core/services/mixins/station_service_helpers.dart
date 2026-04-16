@@ -24,10 +24,15 @@ mixin StationServiceHelpers {
 
   /// Convert a [DioException] to an [ApiException] and throw it.
   ///
+  /// Includes the Dio exception type and request path so error reports
+  /// carry enough context to diagnose without a repro (#524).
+  ///
   /// Use in catch blocks: `on DioException catch (e) { throwApiException(e); }`
   Never throwApiException(DioException e, {String defaultMessage = 'Network error'}) {
+    final path = e.requestOptions.uri.replace(queryParameters: {}).path;
+    final detail = e.message ?? defaultMessage;
     throw ApiException(
-      message: e.message ?? defaultMessage,
+      message: '${e.type.name}: $detail (path: $path)',
       statusCode: e.response?.statusCode,
     );
   }
