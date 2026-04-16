@@ -446,22 +446,27 @@ class _ViewToggleButton extends ConsumerWidget {
     final allPrices = ref.watch(allPricesViewEnabledProvider);
     final l10n = AppLocalizations.of(context);
 
+    final label = allPrices
+        ? (l10n?.switchToCompactView ?? 'Switch to compact view')
+        : (l10n?.switchToAllPricesView ?? 'Switch to all-prices view');
+
     return Semantics(
-      label: allPrices
-          ? (l10n?.switchToCompactView ?? 'Switch to compact view')
-          : (l10n?.switchToAllPricesView ?? 'Switch to all-prices view'),
+      label: label,
       button: true,
-      child: InkWell(
-        onTap: () => ref
-            .read(allPricesViewEnabledProvider.notifier)
-            .toggle(),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          child: Icon(
-            allPrices ? Icons.view_list : Icons.view_agenda,
-            size: 18,
-            color: Theme.of(context).colorScheme.primary,
+      child: Tooltip(
+        message: label,
+        child: InkWell(
+          onTap: () => ref
+              .read(allPricesViewEnabledProvider.notifier)
+              .toggle(),
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            child: Icon(
+              allPrices ? Icons.view_list : Icons.view_agenda,
+              size: 18,
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
         ),
       ),
