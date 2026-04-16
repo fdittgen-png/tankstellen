@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/location/location_consent.dart';
+import '../../../../core/location/location_service.dart';
 import '../../../../core/services/location_search_service.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/storage/storage_providers.dart';
@@ -59,13 +60,34 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
       await LocationConsentDialog.recordConsent(settings);
     }
 
+    // #536 — the Electric path must call the EV search notifier, not
+    // the fuel search notifier. The previous code was a no-op read
+    // (`ref.read(eVSearchStateProvider)`) that never invoked
+    // `searchNearby()`. Mirrors the pattern in search_screen.dart:100-115.
     if (fuelType == FuelType.electric) {
-      ref.read(eVSearchStateProvider);
+      try {
+        final locationService = ref.read(locationServiceProvider);
+        final position = await locationService.getCurrentPosition();
+        unawaited(ref.read(eVSearchStateProvider.notifier).searchNearby(
+              lat: position.latitude,
+              lng: position.longitude,
+              radiusKm: radius,
+            ));
+      } catch (e) {
+        if (mounted) {
+          SnackBarHelper.show(
+            context,
+            '${AppLocalizations.of(context)?.gpsError ?? "GPS error"}: $e',
+          );
+        }
+        return;
+      }
+    } else {
+      unawaited(ref.read(searchStateProvider.notifier).searchByGps(
+            fuelType: fuelType,
+            radiusKm: radius,
+          ));
     }
-    unawaited(ref.read(searchStateProvider.notifier).searchByGps(
-          fuelType: fuelType,
-          radiusKm: radius,
-        ));
     if (mounted) Navigator.of(context).pop();
   }
 
