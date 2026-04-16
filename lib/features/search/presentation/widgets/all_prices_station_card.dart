@@ -43,8 +43,12 @@ class AllPricesStationCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       clipBehavior: Clip.antiAlias,
+      elevation: theme.brightness == Brightness.dark ? 1 : 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),

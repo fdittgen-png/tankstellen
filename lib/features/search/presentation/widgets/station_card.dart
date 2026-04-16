@@ -91,8 +91,13 @@ class StationCard extends StatelessWidget {
       label: semanticLabel,
       button: true,
       child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         clipBehavior: Clip.antiAlias,
+        elevation:
+            Theme.of(context).brightness == Brightness.dark ? 1 : 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
