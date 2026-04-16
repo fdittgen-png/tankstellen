@@ -73,8 +73,22 @@ class EvFavoriteStations extends _$EvFavoriteStations {
       if (data != null) {
         try {
           stations.add(ChargingStation.fromJson(data));
-        } catch (e) {
-          debugPrint('EvFavoriteStations: parse error for $id: $e');
+        } catch (_) {
+          // The station may have been stored from the search/ ChargingStation
+          // type (which uses lat/lng instead of latitude/longitude). Try to
+          // recover by mapping the fields (#552).
+          try {
+            stations.add(ChargingStation(
+              id: data['id']?.toString() ?? id,
+              name: data['name']?.toString() ?? '',
+              operator: data['operator']?.toString(),
+              latitude: (data['latitude'] ?? data['lat'] as num?)?.toDouble() ?? 0,
+              longitude: (data['longitude'] ?? data['lng'] as num?)?.toDouble() ?? 0,
+              address: data['address']?.toString(),
+            ));
+          } catch (e) {
+            debugPrint('EvFavoriteStations: fallback parse error for $id: $e');
+          }
         }
       }
     }
