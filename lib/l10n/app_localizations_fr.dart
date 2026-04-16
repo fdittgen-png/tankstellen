@@ -1860,6 +1860,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tooltipUseGps => 'Utiliser la position GPS';
 
   @override
+  String get tooltipShowPassword => 'Show password';
+
+  @override
+  String get tooltipHidePassword => 'Hide password';
+
+  @override
   String get switchToEmail => 'Passer à l\'e-mail';
 
   @override

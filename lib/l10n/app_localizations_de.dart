@@ -1865,6 +1865,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tooltipUseGps => 'GPS-Standort verwenden';
 
   @override
+  String get tooltipShowPassword => 'Passwort anzeigen';
+
+  @override
+  String get tooltipHidePassword => 'Passwort verbergen';
+
+  @override
   String get switchToEmail => 'Zu E-Mail wechseln';
 
   @override

@@ -3565,6 +3565,18 @@ abstract class AppLocalizations {
   /// **'Use GPS location'**
   String get tooltipUseGps;
 
+  /// No description provided for @tooltipShowPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get tooltipShowPassword;
+
+  /// No description provided for @tooltipHidePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get tooltipHidePassword;
+
   /// No description provided for @switchToEmail.
   ///
   /// In en, this message translates to:
