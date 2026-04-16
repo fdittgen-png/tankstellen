@@ -90,24 +90,55 @@ class NearestWidgetProvider : AppWidgetProvider() {
                     val station = stations.getJSONObject(i)
                     val row = RemoteViews(context.packageName, R.layout.nearest_station_row)
 
-                    row.setTextViewText(R.id.nearest_station_name, station.optString("name", "Station"))
+                    // Brand / name
+                    row.setTextViewText(
+                        R.id.nearest_station_name,
+                        station.optString("brand",
+                            station.optString("name", "Station")),
+                    )
 
+                    // Distance
                     val distanceKm = station.optDouble("distance_km", Double.NaN)
                     row.setTextViewText(
                         R.id.nearest_station_distance,
-                        if (!distanceKm.isNaN()) String.format("%.1f km", distanceKm) else "--"
+                        if (!distanceKm.isNaN())
+                            String.format(Locale.getDefault(), "%.1f km", distanceKm)
+                        else "--",
                     )
 
-                    val e10 = station.optDouble("e10", Double.NaN)
-                    val diesel = station.optDouble("diesel", Double.NaN)
+                    // Address
+                    val street = station.optString("street", "")
+                    val postCode = station.optString("postCode", "")
+                    val place = station.optString("place", "")
+                    val addressParts = mutableListOf<String>()
+                    if (street.isNotBlank()) addressParts.add(street)
+                    val cityLine = listOf(postCode, place).filter { it.isNotBlank() }.joinToString(" ")
+                    if (cityLine.isNotBlank()) addressParts.add(cityLine)
+                    row.setTextViewText(R.id.nearest_station_address, addressParts.joinToString(", "))
 
+                    // Main fuel price — profile-preferred, fallback to e10
+                    val currency = station.optString("currency", "")
+                    val prefCode = station.optString("preferred_fuel_code", "")
+                    val prefPrice = station.optDouble("preferred_fuel_price", Double.NaN)
+                    val fallbackE10 = station.optDouble("e10", Double.NaN)
+                    val (label, price) = when {
+                        prefCode.isNotBlank() && !prefPrice.isNaN() ->
+                            prefCode.uppercase(Locale.getDefault()) to prefPrice
+                        !fallbackE10.isNaN() -> "E10" to fallbackE10
+                        else -> "" to Double.NaN
+                    }
+                    row.setTextViewText(R.id.nearest_station_main_label, label)
                     row.setTextViewText(
-                        R.id.nearest_station_e10,
-                        if (!e10.isNaN()) String.format("%.3f", e10) else "--"
+                        R.id.nearest_station_main_price,
+                        if (!price.isNaN())
+                            String.format(Locale.getDefault(), "%.3f %s", price, currency).trim()
+                        else "--",
                     )
+
+                    val isOpen = station.optBoolean("isOpen", false)
                     row.setTextViewText(
-                        R.id.nearest_station_diesel,
-                        if (!diesel.isNaN()) String.format("%.3f", diesel) else "--"
+                        R.id.nearest_station_status,
+                        if (isOpen) "● Open" else "○ Closed",
                     )
 
                     views.addView(R.id.nearest_station_list, row)

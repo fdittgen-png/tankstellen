@@ -91,18 +91,59 @@ class FuelPriceWidgetProvider : AppWidgetProvider() {
                     val station = stations.getJSONObject(i)
                     val row = RemoteViews(context.packageName, R.layout.widget_station_row)
 
-                    row.setTextViewText(R.id.station_name, station.optString("name", "Station"))
-
-                    val e10 = station.optDouble("e10", Double.NaN)
-                    val diesel = station.optDouble("diesel", Double.NaN)
-
+                    // Brand / name (row 1)
                     row.setTextViewText(
-                        R.id.station_e10,
-                        if (!e10.isNaN()) String.format("%.3f", e10) else "--"
+                        R.id.station_name,
+                        station.optString("brand",
+                            station.optString("name", "Station")),
                     )
+
+                    // Distance (row 1 right) — shown only when Flutter provided one
+                    val distanceKm = station.optDouble("distance_km", Double.NaN)
+                    if (!distanceKm.isNaN()) {
+                        row.setTextViewText(
+                            R.id.station_distance,
+                            String.format(Locale.getDefault(), "%.1f km", distanceKm),
+                        )
+                        row.setViewVisibility(R.id.station_distance, View.VISIBLE)
+                    } else {
+                        row.setViewVisibility(R.id.station_distance, View.GONE)
+                    }
+
+                    // Address (row 2): "street, postCode place" — trim empties
+                    val street = station.optString("street", "")
+                    val postCode = station.optString("postCode", "")
+                    val place = station.optString("place", "")
+                    val addressParts = mutableListOf<String>()
+                    if (street.isNotBlank()) addressParts.add(street)
+                    val cityLine = listOf(postCode, place).filter { it.isNotBlank() }.joinToString(" ")
+                    if (cityLine.isNotBlank()) addressParts.add(cityLine)
+                    row.setTextViewText(R.id.station_address, addressParts.joinToString(", "))
+
+                    // Main fuel price (row 3) — profile-preferred, fallback to e10
+                    val currency = station.optString("currency", "")
+                    val prefCode = station.optString("preferred_fuel_code", "")
+                    val prefPrice = station.optDouble("preferred_fuel_price", Double.NaN)
+                    val fallbackE10 = station.optDouble("e10", Double.NaN)
+                    val (label, price) = when {
+                        prefCode.isNotBlank() && !prefPrice.isNaN() ->
+                            prefCode.uppercase(Locale.getDefault()) to prefPrice
+                        !fallbackE10.isNaN() -> "E10" to fallbackE10
+                        else -> "" to Double.NaN
+                    }
+                    row.setTextViewText(R.id.station_main_label, label)
                     row.setTextViewText(
-                        R.id.station_diesel,
-                        if (!diesel.isNaN()) String.format("%.3f", diesel) else "--"
+                        R.id.station_main_price,
+                        if (!price.isNaN())
+                            String.format(Locale.getDefault(), "%.3f %s", price, currency).trim()
+                        else "--",
+                    )
+
+                    // Open/closed chip (row 3 right)
+                    val isOpen = station.optBoolean("isOpen", false)
+                    row.setTextViewText(
+                        R.id.station_status,
+                        if (isOpen) "● Open" else "○ Closed",
                     )
 
                     views.addView(R.id.station_list, row)
