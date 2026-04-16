@@ -34,28 +34,32 @@ class ProfileScreen extends ConsumerWidget {
         // top / 16 dp sides + 16 dp section gaps + 4 dp header-to-body.
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         children: [
-          // Profiles
+          // Profiles — always visible, the primary interaction on the
+          // Settings screen.
           _SectionHeader(icon: Icons.person, title: l?.sectionProfile ?? 'Profile'),
           const SizedBox(height: 4),
           const ProfileListSection(),
           const SizedBox(height: 16),
 
-          // Location
-          _SectionHeader(icon: Icons.my_location, title: l?.sectionLocation ?? 'Location'),
-          const SizedBox(height: 4),
-          const LocationSectionWidget(),
-          const SizedBox(height: 16),
+          // #534 — Location wrapped in _FoldableSection, closed by
+          // default. The user rarely changes location preferences
+          // after the initial setup.
+          _FoldableSection(
+            icon: Icons.my_location,
+            title: l?.sectionLocation ?? 'Location',
+            child: const LocationSectionWidget(),
+          ),
+          const SizedBox(height: 8),
 
-          // TankSync
+          // #534 — TankSync closed by default (was initiallyExpanded: true).
           const _FoldableSection(
             icon: Icons.cloud_outlined,
             title: 'TankSync',
-            initiallyExpanded: true,
             child: TankSyncSection(),
           ),
           const SizedBox(height: 8),
 
-          // API Key
+          // API Key — closed by default (unchanged).
           _FoldableSection(
             icon: Icons.key,
             title: l?.apiKeySetup ?? 'API Key',
@@ -89,14 +93,7 @@ class ProfileScreen extends ConsumerWidget {
             title: l?.storageAndCache ?? 'Storage & cache',
             child: const StorageSection(),
           ),
-          const SizedBox(height: 16),
-
-          // About
-          _SectionHeader(
-              icon: Icons.info_outline, title: l?.about ?? 'About'),
-          const SizedBox(height: 4),
-          const AboutSection(),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
 
           // Privacy & Consent
           _FoldableSection(
@@ -106,13 +103,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
 
-          // Privacy Dashboard — #519: the "Configuration & Privacy"
-          // card and the ConfigVerificationWidget used to live here on
-          // the Settings screen, forcing users to scroll past a
-          // second-class privacy summary to reach actual settings.
-          // They now live inside the Privacy Dashboard screen itself,
-          // reachable via this tile — one privacy entry point, no
-          // duplicated content.
+          // Privacy Dashboard
           SettingsMenuTile(
             icon: Icons.privacy_tip,
             title: l?.privacyDashboardTitle ?? 'Privacy Dashboard',
@@ -120,6 +111,13 @@ class ProfileScreen extends ConsumerWidget {
                 'View, export, or delete your data',
             onTap: () => context.push('/privacy-dashboard'),
           ),
+          const SizedBox(height: 16),
+
+          // #534 — About moved to the very end, below Privacy.
+          _SectionHeader(
+              icon: Icons.info_outline, title: l?.about ?? 'About'),
+          const SizedBox(height: 4),
+          const AboutSection(),
           SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 16),
         ],
       ),
@@ -132,17 +130,19 @@ class ProfileScreen extends ConsumerWidget {
 // ---------------------------------------------------------------------------
 
 /// A foldable/unfoldable settings section with icon, title, and expandable content.
+///
+/// #534 — all sections start **collapsed** (`initiallyExpanded: false` on
+/// the inner `ExpansionTile`). This keeps the Paramètres screen compact
+/// on load and lets the user expand only the section they care about.
 class _FoldableSection extends StatelessWidget {
   final IconData icon;
   final String title;
   final Widget child;
-  final bool initiallyExpanded;
 
   const _FoldableSection({
     required this.icon,
     required this.title,
     required this.child,
-    this.initiallyExpanded = false,
   });
 
   @override
@@ -155,7 +155,7 @@ class _FoldableSection extends StatelessWidget {
         title: Text(title,
             style: theme.textTheme.titleSmall
                 ?.copyWith(fontWeight: FontWeight.bold)),
-        initiallyExpanded: initiallyExpanded,
+        initiallyExpanded: false,
         shape: const Border(),
         collapsedShape: const Border(),
         childrenPadding: const EdgeInsets.only(bottom: 8),
