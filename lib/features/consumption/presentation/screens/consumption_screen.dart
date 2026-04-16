@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../data/csv_exporter.dart';
 import '../../providers/consumption_providers.dart';
 import '../widgets/consumption_stats_card.dart';
 import '../widgets/fill_up_card.dart';
@@ -27,6 +30,22 @@ class ConsumptionScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         actions: [
+          IconButton(
+            key: const Key('export_csv'),
+            tooltip: 'Export CSV',
+            icon: const Icon(Icons.download_outlined),
+            onPressed: fillUps.isEmpty
+                ? null
+                : () async {
+                    final csv = ConsumptionCsvExporter.toCsv(fillUps);
+                    await Clipboard.setData(ClipboardData(text: csv));
+                    if (!context.mounted) return;
+                    SnackBarHelper.show(
+                      context,
+                      'CSV copied to clipboard — paste into a spreadsheet',
+                    );
+                  },
+          ),
           IconButton(
             key: const Key('open_carbon_dashboard'),
             tooltip: l?.carbonDashboardTitle ?? 'Carbon dashboard',
