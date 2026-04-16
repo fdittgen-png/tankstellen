@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/domain/entities/station_amenity.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_results_list.dart';
@@ -81,12 +82,12 @@ Future<void> _pumpList(
   await pumpApp(
     tester,
     SearchResultsList(
-      result: ServiceResult<List<Station>>(
+      result: ServiceResult<List<SearchResultItem>>(
         data: const [
-          _totalWifiOpen,
-          _essoShopClosed,
-          _essoWifiOpen,
-          _independentOpen,
+          FuelStationResult(_totalWifiOpen),
+          FuelStationResult(_essoShopClosed),
+          FuelStationResult(_essoWifiOpen),
+          FuelStationResult(_independentOpen),
         ],
         source: ServiceSource.cache,
         fetchedAt: DateTime(2026, 4, 14),

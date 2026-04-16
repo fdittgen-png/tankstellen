@@ -42,7 +42,7 @@ final class SearchStateProvider
     extends
         $NotifierProvider<
           SearchState,
-          AsyncValue<ServiceResult<List<Station>>>
+          AsyncValue<ServiceResult<List<SearchResultItem>>>
         > {
   /// Manages the station search lifecycle and exposes results as [AsyncValue].
   ///
@@ -76,16 +76,20 @@ final class SearchStateProvider
   SearchState create() => SearchState();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(AsyncValue<ServiceResult<List<Station>>> value) {
+  Override overrideWithValue(
+    AsyncValue<ServiceResult<List<SearchResultItem>>> value,
+  ) {
     return $ProviderOverride(
       origin: this,
       providerOverride:
-          $SyncValueProvider<AsyncValue<ServiceResult<List<Station>>>>(value),
+          $SyncValueProvider<AsyncValue<ServiceResult<List<SearchResultItem>>>>(
+            value,
+          ),
     );
   }
 }
 
-String _$searchStateHash() => r'5f93b006140334ab797ef15b4c3b68f7ffd4b37d';
+String _$searchStateHash() => r'86cc44d3d1916e93b1c7deeded7e981a7bc722b9';
 
 /// Manages the station search lifecycle and exposes results as [AsyncValue].
 ///
@@ -102,25 +106,25 @@ String _$searchStateHash() => r'5f93b006140334ab797ef15b4c3b68f7ffd4b37d';
 /// (fresh cache -> API -> stale cache -> error).
 
 abstract class _$SearchState
-    extends $Notifier<AsyncValue<ServiceResult<List<Station>>>> {
-  AsyncValue<ServiceResult<List<Station>>> build();
+    extends $Notifier<AsyncValue<ServiceResult<List<SearchResultItem>>>> {
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final ref =
         this.ref
             as $Ref<
-              AsyncValue<ServiceResult<List<Station>>>,
-              AsyncValue<ServiceResult<List<Station>>>
+              AsyncValue<ServiceResult<List<SearchResultItem>>>,
+              AsyncValue<ServiceResult<List<SearchResultItem>>>
             >;
     final element =
         ref.element
             as $ClassProviderElement<
               AnyNotifier<
-                AsyncValue<ServiceResult<List<Station>>>,
-                AsyncValue<ServiceResult<List<Station>>>
+                AsyncValue<ServiceResult<List<SearchResultItem>>>,
+                AsyncValue<ServiceResult<List<SearchResultItem>>>
               >,
-              AsyncValue<ServiceResult<List<Station>>>,
+              AsyncValue<ServiceResult<List<SearchResultItem>>>,
               Object?,
               Object?
             >;
@@ -290,56 +294,57 @@ abstract class _$SearchRadius extends $Notifier<double> {
   }
 }
 
-/// Whether the current search fuel type is electric.
+/// Extracts fuel [Station] objects from the unified search results.
 ///
-/// Used by UI widgets to decide between EV and fuel result views without
-/// coupling to `FuelType.electric` directly.
+/// Convenience for consumers that need [List<Station>] (cross-border
+/// comparisons, driving mode, station detail lookup, brand filter chips).
 
-@ProviderFor(isEvSearch)
-final isEvSearchProvider = IsEvSearchProvider._();
+@ProviderFor(fuelStations)
+final fuelStationsProvider = FuelStationsProvider._();
 
-/// Whether the current search fuel type is electric.
+/// Extracts fuel [Station] objects from the unified search results.
 ///
-/// Used by UI widgets to decide between EV and fuel result views without
-/// coupling to `FuelType.electric` directly.
+/// Convenience for consumers that need [List<Station>] (cross-border
+/// comparisons, driving mode, station detail lookup, brand filter chips).
 
-final class IsEvSearchProvider extends $FunctionalProvider<bool, bool, bool>
-    with $Provider<bool> {
-  /// Whether the current search fuel type is electric.
+final class FuelStationsProvider
+    extends $FunctionalProvider<List<Station>, List<Station>, List<Station>>
+    with $Provider<List<Station>> {
+  /// Extracts fuel [Station] objects from the unified search results.
   ///
-  /// Used by UI widgets to decide between EV and fuel result views without
-  /// coupling to `FuelType.electric` directly.
-  IsEvSearchProvider._()
+  /// Convenience for consumers that need [List<Station>] (cross-border
+  /// comparisons, driving mode, station detail lookup, brand filter chips).
+  FuelStationsProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'isEvSearchProvider',
+        name: r'fuelStationsProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$isEvSearchHash();
+  String debugGetCreateSourceHash() => _$fuelStationsHash();
 
   @$internal
   @override
-  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+  $ProviderElement<List<Station>> $createElement($ProviderPointer pointer) =>
       $ProviderElement(pointer);
 
   @override
-  bool create(Ref ref) {
-    return isEvSearch(ref);
+  List<Station> create(Ref ref) {
+    return fuelStations(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(bool value) {
+  Override overrideWithValue(List<Station> value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<bool>(value),
+      providerOverride: $SyncValueProvider<List<Station>>(value),
     );
   }
 }
 
-String _$isEvSearchHash() => r'f2280af5461fbac2ac8f7653f864f5401d692702';
+String _$fuelStationsHash() => r'5238084b6dd78061bafabf616c603bcf7b03077b';

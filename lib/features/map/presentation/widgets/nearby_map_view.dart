@@ -9,6 +9,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/presentation/widgets/ev_map_overlay.dart';
 import '../../../ev/providers/ev_providers.dart';
+import '../../../search/domain/entities/search_result_item.dart';
 import 'station_map_layers.dart';
 
 /// Displays a map of nearby stations from the current search results.
@@ -35,9 +36,15 @@ class NearbyMapView extends ConsumerWidget {
 
     return searchState.when(
       data: (result) {
-        final stations = result.data;
+        // Extract fuel stations for map markers; EV stations are
+        // handled by the separate EvMapLayer overlay.
+        final allItems = result.data as List<SearchResultItem>;
+        final stations = allItems
+            .whereType<FuelStationResult>()
+            .map((r) => r.station)
+            .toList();
 
-        if (stations.isEmpty) {
+        if (allItems.isEmpty) {
           return EmptyState(
             icon: Icons.map_outlined,
             title: l10n?.startSearch ??

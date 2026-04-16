@@ -7,6 +7,7 @@ import 'package:tankstellen/app/shell_screen.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
+import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
@@ -25,7 +26,7 @@ class _FixedActiveLanguage extends ActiveLanguage {
 /// Fixed SearchState returning empty data.
 class _EmptySearchState extends SearchState {
   @override
-  AsyncValue<ServiceResult<List<Station>>> build() {
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() {
     return AsyncValue.data(ServiceResult(
       data: const [],
       source: ServiceSource.cache,

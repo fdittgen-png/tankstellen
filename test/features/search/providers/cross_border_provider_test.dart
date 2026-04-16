@@ -5,6 +5,7 @@ import 'package:tankstellen/core/country/country_provider.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/cross_border_provider.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
@@ -208,9 +209,9 @@ class _FakeSearchState extends SearchState {
   _FakeSearchState(this._stations);
 
   @override
-  AsyncValue<ServiceResult<List<Station>>> build() {
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() {
     return AsyncValue.data(ServiceResult(
-      data: _stations,
+      data: _stations.map((s) => FuelStationResult(s) as SearchResultItem).toList(),
       source: ServiceSource.cache,
       fetchedAt: DateTime.now(),
     ));

@@ -14,6 +14,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/presentation/widgets/swipe_tutorial_banner.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../domain/entities/fuel_type.dart';
+import '../../domain/entities/search_result_item.dart';
 import '../../domain/entities/station.dart';
 import '../../providers/selected_station_provider.dart';
 import '../../providers/ignored_stations_provider.dart';
@@ -25,12 +26,17 @@ import '../../../profile/providers/profile_provider.dart';
 import 'all_prices_station_card.dart';
 import 'brand_filter_chips.dart';
 import 'cross_border_banner.dart';
+import 'ev_station_card.dart';
 import 'sort_selector.dart';
 import 'swipeable_station_card.dart';
 
 /// Station list with sort controls, refresh, count bar, and search location header.
+///
+/// Accepts a unified [List<SearchResultItem>] that may contain both
+/// [FuelStationResult] and [EVStationResult]. Fuel-specific features
+/// (price sorting, brand filtering, cheapest flags) apply only to fuel items.
 class SearchResultsList extends ConsumerWidget {
-  final ServiceResult<List<Station>> result;
+  final ServiceResult<List<SearchResultItem>> result;
   final VoidCallback onRefresh;
 
   const SearchResultsList({
@@ -39,12 +45,9 @@ class SearchResultsList extends ConsumerWidget {
     required this.onRefresh,
   });
 
-  void _openStationInMaps(Station station) {
-    NavigationUtils.openInMaps(
-      station.lat, station.lng,
-      label: station.displayName,
-    );
-  }
+  /// Extracts fuel stations from the unified results list.
+  List<Station> _fuelStations(List<SearchResultItem> items) =>
+      items.whereType<FuelStationResult>().map((r) => r.station).toList();
 
   /// Computes which station has the cheapest price for each fuel type.
   Map<String, Map<FuelType, bool>> _computeCheapestFlags(List<Station> stations) {
@@ -93,25 +96,56 @@ class SearchResultsList extends ConsumerWidget {
     return (minP, maxP);
   }
 
-  List<Station> _sortStations(
-      List<Station> stations, SortMode sortMode, WidgetRef ref) {
-    final sorted = List<Station>.from(stations);
+  List<SearchResultItem> _sortItems(
+      List<SearchResultItem> items, SortMode sortMode, WidgetRef ref) {
+    final sorted = List<SearchResultItem>.from(items);
     final fuelType = ref.read(selectedFuelTypeProvider);
+
+    // EV items always sort by distance — no price data to sort on.
+    if (sorted.every((item) => item is EVStationResult)) {
+      sorted.sort((a, b) => a.dist.compareTo(b.dist));
+      return sorted;
+    }
 
     switch (sortMode) {
       case SortMode.distance:
         sorted.sort((a, b) => a.dist.compareTo(b.dist));
       case SortMode.price:
-        sorted.sort((a, b) => compareByPrice(a, b, fuelType));
+        sorted.sort((a, b) {
+          final sa = a is FuelStationResult ? a.station : null;
+          final sb = b is FuelStationResult ? b.station : null;
+          if (sa != null && sb != null) return compareByPrice(sa, sb, fuelType);
+          return a.dist.compareTo(b.dist);
+        });
       case SortMode.name:
-        sorted.sort((a, b) => compareByName(a, b));
+        sorted.sort((a, b) {
+          final sa = a is FuelStationResult ? a.station : null;
+          final sb = b is FuelStationResult ? b.station : null;
+          if (sa != null && sb != null) return compareByName(sa, sb);
+          return a.displayName.compareTo(b.displayName);
+        });
       case SortMode.open24h:
-        sorted.sort((a, b) => compareByOpen24h(a, b));
+        sorted.sort((a, b) {
+          final sa = a is FuelStationResult ? a.station : null;
+          final sb = b is FuelStationResult ? b.station : null;
+          if (sa != null && sb != null) return compareByOpen24h(sa, sb);
+          return a.dist.compareTo(b.dist);
+        });
       case SortMode.rating:
         final ratings = ref.read(stationRatingsProvider);
-        sorted.sort((a, b) => compareByRating(a, b, ratings));
+        sorted.sort((a, b) {
+          final sa = a is FuelStationResult ? a.station : null;
+          final sb = b is FuelStationResult ? b.station : null;
+          if (sa != null && sb != null) return compareByRating(sa, sb, ratings);
+          return a.dist.compareTo(b.dist);
+        });
       case SortMode.priceDistance:
-        sorted.sort((a, b) => compareByPriceDistance(a, b, fuelType));
+        sorted.sort((a, b) {
+          final sa = a is FuelStationResult ? a.station : null;
+          final sb = b is FuelStationResult ? b.station : null;
+          if (sa != null && sb != null) return compareByPriceDistance(sa, sb, fuelType);
+          return a.dist.compareTo(b.dist);
+        });
     }
     return sorted;
   }
@@ -175,7 +209,7 @@ class SearchResultsList extends ConsumerWidget {
               ref.read(selectedSortModeProvider.notifier).set(mode),
         ),
         _CollapsibleBrandFilters(
-          stations: result.data
+          stations: _fuelStations(result.data)
               .where((s) => !ignoredIds.contains(s.id))
               .toList(),
         ),
@@ -188,108 +222,146 @@ class SearchResultsList extends ConsumerWidget {
                   .where((s) => !ignoredIds.contains(s.id))
                   .toList();
 
-              // Apply brand and highway filters
+              // Apply fuel-specific filters to fuel items; EV items pass through.
               final selectedBrands = ref.watch(selectedBrandsProvider);
               final excludeHighway = ref.watch(excludeHighwayStationsProvider);
-              final brandFiltered = applyBrandFilter(
-                afterIgnored,
-                selectedBrands: selectedBrands,
-                excludeHighway: excludeHighway,
-              );
-              // #491 — apply amenity + open-only filters. These providers
-              // are written by the criteria screen but were previously
-              // read nowhere, so toggling WiFi / "Ouvertes uniquement" /
-              // any other amenity chip had zero visible effect.
-              final requiredAmenities =
-                  ref.watch(selectedAmenitiesProvider);
+              final requiredAmenities = ref.watch(selectedAmenitiesProvider);
               final openOnly = ref.watch(openOnlyFilterProvider);
-              final filtered = applyAmenityAndStatusFilters(
-                brandFiltered,
+
+              // Split into fuel + EV, filter fuel items, then recombine.
+              final fuelItems = afterIgnored.whereType<FuelStationResult>().toList();
+              final evItems = afterIgnored.whereType<EVStationResult>().toList();
+              final fuelFiltered = applyAmenityAndStatusFilters(
+                applyBrandFilter(
+                  fuelItems.map((r) => r.station).toList(),
+                  selectedBrands: selectedBrands,
+                  excludeHighway: excludeHighway,
+                ),
                 requiredAmenities: requiredAmenities,
                 openOnly: openOnly,
               );
-              final sorted = _sortStations(filtered, sortMode, ref);
+              final filteredFuelIds = fuelFiltered.map((s) => s.id).toSet();
+              final filtered = <SearchResultItem>[
+                ...fuelItems.where((r) => filteredFuelIds.contains(r.station.id)),
+                ...evItems,
+              ];
+
+              final sorted = _sortItems(filtered, sortMode, ref);
+              final fuelOnly = _fuelStations(sorted);
               final allPrices = ref.watch(allPricesViewEnabledProvider);
               final cheapestMap = allPrices
-                  ? _computeCheapestFlags(sorted)
+                  ? _computeCheapestFlags(fuelOnly)
                   : <String, Map<FuelType, bool>>{};
 
               // Compute price range for tier icons (a11y)
               final fuelType = ref.watch(selectedFuelTypeProvider);
-              final priceRange = _getPriceRange(sorted, fuelType);
+              final priceRange = _getPriceRange(fuelOnly, fuelType);
               final profileFuel = ref.watch(activeProfileProvider)?.preferredFuelType;
 
               return ListView.builder(
                 itemCount: sorted.length,
                 itemBuilder: (context, index) {
-                  final station = sorted[index];
-                  final isFav = ref.watch(isFavoriteProvider(station.id));
+                  final item = sorted[index];
+                  final isFav = ref.watch(isFavoriteProvider(item.id));
 
-                  if (allPrices) {
-                    return AllPricesStationCard(
-                      key: ValueKey('all-prices-${station.id}'),
+                  return switch (item) {
+                    FuelStationResult(:final station) => _buildFuelCard(
+                      context: context,
+                      ref: ref,
                       station: station,
                       isFavorite: isFav,
-                      cheapestFlags: cheapestMap[station.id] ?? const {},
-                      profileFuelType: profileFuel,
-                      onTap: () {
-                      if (isWideScreen(context)) {
-                        ref.read(selectedStationProvider.notifier).select(station.id);
-                      } else {
-                        context.push('/station/${station.id}');
-                      }
-                    },
-                      onFavoriteTap: () => ref
-                          .read(favoritesProvider.notifier)
-                          .toggle(station.id, stationData: station),
-                    );
-                  }
-
-                  final tier = priceTierOf(
-                    station.priceFor(fuelType),
-                    priceRange.$1,
-                    priceRange.$2,
-                  );
-
-                  final stationRating = ref.watch(stationRatingProvider(station.id));
-
-                  return SwipeableStationCard(
-                    key: ValueKey('station-${station.id}'),
-                    station: station,
-                    isFavorite: isFav,
-                    priceTier: tier,
-                    rating: stationRating,
-                    profileFuelType: profileFuel,
-                    onNavigate: () => _openStationInMaps(station),
-                    onIgnore: () {
-                      ref.read(ignoredStationsProvider.notifier).add(station.id);
-                      final l10n = AppLocalizations.of(context);
-                      SnackBarHelper.showWithUndo(
-                        context,
-                        l10n?.stationHidden(station.displayName) ?? '${station.displayName} hidden',
-                        undoLabel: l10n?.undo ?? 'Undo',
-                        onUndo: () => ref
-                            .read(ignoredStationsProvider.notifier)
-                            .remove(station.id),
-                      );
-                    },
-                    onTap: () {
-                      if (isWideScreen(context)) {
-                        ref.read(selectedStationProvider.notifier).select(station.id);
-                      } else {
-                        context.push('/station/${station.id}');
-                      }
-                    },
-                    onFavoriteTap: () => ref
-                        .read(favoritesProvider.notifier)
-                        .toggle(station.id, stationData: station),
-                  );
+                      allPrices: allPrices,
+                      cheapestMap: cheapestMap,
+                      fuelType: fuelType,
+                      priceRange: priceRange,
+                      profileFuel: profileFuel,
+                    ),
+                    EVStationResult() => EVStationCard(
+                      key: ValueKey('ev-${item.id}'),
+                      result: item,
+                      onTap: () => context.push('/ev-station', extra: item.station),
+                    ),
+                  };
                 },
               );
             }),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildFuelCard({
+    required BuildContext context,
+    required WidgetRef ref,
+    required Station station,
+    required bool isFavorite,
+    required bool allPrices,
+    required Map<String, Map<FuelType, bool>> cheapestMap,
+    required FuelType fuelType,
+    required (double, double) priceRange,
+    required FuelType? profileFuel,
+  }) {
+    if (allPrices) {
+      return AllPricesStationCard(
+        key: ValueKey('all-prices-${station.id}'),
+        station: station,
+        isFavorite: isFavorite,
+        cheapestFlags: cheapestMap[station.id] ?? const {},
+        profileFuelType: profileFuel,
+        onTap: () {
+          if (isWideScreen(context)) {
+            ref.read(selectedStationProvider.notifier).select(station.id);
+          } else {
+            context.push('/station/${station.id}');
+          }
+        },
+        onFavoriteTap: () => ref
+            .read(favoritesProvider.notifier)
+            .toggle(station.id, stationData: station),
+      );
+    }
+
+    final tier = priceTierOf(
+      station.priceFor(fuelType),
+      priceRange.$1,
+      priceRange.$2,
+    );
+    final stationRating = ref.watch(stationRatingProvider(station.id));
+
+    return SwipeableStationCard(
+      key: ValueKey('station-${station.id}'),
+      station: station,
+      isFavorite: isFavorite,
+      priceTier: tier,
+      rating: stationRating,
+      profileFuelType: profileFuel,
+      onNavigate: () => NavigationUtils.openInMaps(
+        station.lat, station.lng,
+        label: station.displayName,
+      ),
+      onIgnore: () {
+        ref.read(ignoredStationsProvider.notifier).add(station.id);
+        final l10n = AppLocalizations.of(context);
+        SnackBarHelper.showWithUndo(
+          context,
+          l10n?.stationHidden(station.displayName) ?? '${station.displayName} hidden',
+          undoLabel: l10n?.undo ?? 'Undo',
+          onUndo: () => ref
+              .read(ignoredStationsProvider.notifier)
+              .remove(station.id),
+        );
+      },
+      onTap: () {
+        if (isWideScreen(context)) {
+          ref.read(selectedStationProvider.notifier).select(station.id);
+        } else {
+          context.push('/station/${station.id}');
+        }
+      },
+      onFavoriteTap: () => ref
+          .read(favoritesProvider.notifier)
+          .toggle(station.id, stationData: station),
     );
   }
 }

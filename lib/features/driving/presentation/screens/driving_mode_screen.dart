@@ -81,9 +81,8 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final searchState = ref.watch(searchStateProvider);
     final selectedFuel = ref.watch(selectedFuelTypeProvider);
-    final stations = _extractStations(searchState);
+    final stations = ref.watch(fuelStationsProvider);
 
     return Scaffold(
       body: GestureDetector(
@@ -160,10 +159,4 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
     _mapController.move(LatLng(nearest.lat, nearest.lng), 15);
   }
 
-  List<Station> _extractStations(AsyncValue searchState) {
-    if (!searchState.hasValue) return [];
-    final result = searchState.value;
-    if (result == null) return [];
-    return result.data as List<Station>? ?? [];
-  }
 }

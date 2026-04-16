@@ -10,6 +10,7 @@ import 'package:tankstellen/features/favorites/presentation/screens/favorites_sc
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/profile_landing_screen_dropdown.dart';
+import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/sort_selector.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
@@ -29,9 +30,9 @@ class _FixedActiveLanguage extends ActiveLanguage {
 /// nothing to look at.
 class _EmptySearchState extends SearchState {
   @override
-  AsyncValue<ServiceResult<List<Station>>> build() => AsyncValue.data(
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() => AsyncValue.data(
         ServiceResult(
-          data: [testStation],
+          data: [const FuelStationResult(testStation)],
           source: ServiceSource.cache,
           fetchedAt: DateTime.now(),
         ),

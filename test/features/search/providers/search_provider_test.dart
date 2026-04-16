@@ -680,25 +680,30 @@ void main() {
     });
   });
 
-  group('isEvSearchProvider', () {
-    test('returns true when selectedFuelType is electric', () {
-      final container = createContainer();
-      container.read(selectedFuelTypeProvider.notifier).select(FuelType.electric);
+  group('fuelStationsProvider', () {
+    test('extracts fuel stations from search results', () async {
+      when(() => mockStationService.searchStations(any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) async => ServiceResult(
+                data: [testStation],
+                source: ServiceSource.tankerkoenigApi,
+                fetchedAt: DateTime.now(),
+              ));
 
-      expect(container.read(isEvSearchProvider), isTrue);
+      final container = createContainer();
+      await container.read(searchStateProvider.notifier).searchByCoordinates(
+            lat: 52.52, lng: 13.41, fuelType: FuelType.e10,
+          );
+
+      final stations = container.read(fuelStationsProvider);
+      expect(stations.length, 1);
+      expect(stations.first.id, 'test-1');
     });
 
-    test('returns false for non-electric fuel types', () {
+    test('returns empty list when no search results', () {
       final container = createContainer();
-      container.read(selectedFuelTypeProvider.notifier).select(FuelType.e10);
-
-      expect(container.read(isEvSearchProvider), isFalse);
-    });
-
-    test('returns false for FuelType.all', () {
-      final container = createContainer();
-      // Default is FuelType.all
-      expect(container.read(isEvSearchProvider), isFalse);
+      final stations = container.read(fuelStationsProvider);
+      expect(stations, isEmpty);
     });
   });
 }

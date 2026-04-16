@@ -9,7 +9,6 @@ import '../../../profile/providers/profile_provider.dart';
 import '../../domain/entities/search_mode.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
-import 'ev_search_results_view.dart';
 import 'nearest_shortcut_card.dart';
 import 'route_results_view.dart';
 import 'search_results_list.dart';
@@ -35,17 +34,12 @@ class SearchResultsContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final searchMode = ref.watch(activeSearchModeProvider);
-    final isEv = ref.watch(isEvSearchProvider);
     final searchState = ref.watch(searchStateProvider);
 
     if (searchMode == SearchMode.route) {
       return const CustomScrollView(
         slivers: [RouteResultsView()],
       );
-    }
-
-    if (isEv) {
-      return EvSearchResultsView(onSearch: onGpsRetry);
     }
 
     // #494 — the nearest-stations shortcut only makes sense for users

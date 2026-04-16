@@ -4,7 +4,6 @@ import '../../../core/country/country_provider.dart';
 import '../../../core/location/user_position_provider.dart';
 import '../../../core/utils/station_extensions.dart';
 import '../domain/entities/cross_border_comparison.dart';
-import '../domain/entities/station.dart';
 import 'search_provider.dart';
 
 part 'cross_border_provider.g.dart';
@@ -25,15 +24,11 @@ List<CrossBorderComparison> crossBorderComparisons(Ref ref) {
   if (position == null) return const [];
 
   final country = ref.watch(activeCountryProvider);
-  final searchState = ref.watch(searchStateProvider);
   final fuelType = ref.watch(selectedFuelTypeProvider);
 
-  // Only compute when we have search results
-  List<Station>? stations;
-  if (searchState.hasValue) {
-    stations = searchState.value?.data;
-  }
-  if (stations == null || stations.isEmpty) return const [];
+  // Only compute when we have fuel station results
+  final stations = ref.watch(fuelStationsProvider);
+  if (stations.isEmpty) return const [];
 
   // Detect nearby borders
   final nearbyBorders = detectNearbyBorders(
