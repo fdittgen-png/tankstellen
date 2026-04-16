@@ -183,10 +183,21 @@ void main() {
   });
 
   group('ProfileEditSheet source-level regression', () {
-    test('delete button routes through _confirmDelete, not onDelete directly', () {
-      final source = File(
+    // _SaveDeleteActions was extracted to a `part of` file via #563, so the
+    // library source is split across two files. Read both and concat so the
+    // regression checks see the full wiring.
+    String readLibrarySource() {
+      final main = File(
         'lib/features/profile/presentation/widgets/profile_edit_sheet.dart',
       ).readAsStringSync();
+      final parts = File(
+        'lib/features/profile/presentation/widgets/profile_edit_sheet_parts.dart',
+      ).readAsStringSync();
+      return '$main\n$parts';
+    }
+
+    test('delete button routes through _confirmDelete, not onDelete directly', () {
+      final source = readLibrarySource();
 
       // The delete button lives in the extracted _SaveDeleteActions widget
       // and fires an onConfirmDelete callback, which the parent wires to
