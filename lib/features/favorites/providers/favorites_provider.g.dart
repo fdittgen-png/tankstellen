@@ -245,7 +245,7 @@ final class FavoriteStationsProvider
   }
 }
 
-String _$favoriteStationsHash() => r'3f07e655c1a1a72ca4d6586b5e5794d69a60cb82';
+String _$favoriteStationsHash() => r'11bdd3e132102a8af0ce92cfc00ea7364afc2493';
 
 /// Loads station data for favorites and refreshes prices.
 ///

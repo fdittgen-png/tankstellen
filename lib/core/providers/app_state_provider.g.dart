@@ -9,15 +9,27 @@ part of 'app_state_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Whether the Tankerkoenig API key is configured.
+///
+/// Since #521 this is always true — the app ships a community
+/// default. Use [hasCustomApiKey] to tell whether the user set their
+/// own key.
 
 @ProviderFor(hasApiKey)
 final hasApiKeyProvider = HasApiKeyProvider._();
 
 /// Whether the Tankerkoenig API key is configured.
+///
+/// Since #521 this is always true — the app ships a community
+/// default. Use [hasCustomApiKey] to tell whether the user set their
+/// own key.
 
 final class HasApiKeyProvider extends $FunctionalProvider<bool, bool, bool>
     with $Provider<bool> {
   /// Whether the Tankerkoenig API key is configured.
+  ///
+  /// Since #521 this is always true — the app ships a community
+  /// default. Use [hasCustomApiKey] to tell whether the user set their
+  /// own key.
   HasApiKeyProvider._()
     : super(
         from: null,
@@ -52,6 +64,55 @@ final class HasApiKeyProvider extends $FunctionalProvider<bool, bool, bool>
 }
 
 String _$hasApiKeyHash() => r'9927ae0b513afe69898707f03a015b769948e062';
+
+/// Whether the user has set their **own** Tankerkoenig key, distinct
+/// from the community default bundled in the app (#521).
+
+@ProviderFor(hasCustomApiKey)
+final hasCustomApiKeyProvider = HasCustomApiKeyProvider._();
+
+/// Whether the user has set their **own** Tankerkoenig key, distinct
+/// from the community default bundled in the app (#521).
+
+final class HasCustomApiKeyProvider
+    extends $FunctionalProvider<bool, bool, bool>
+    with $Provider<bool> {
+  /// Whether the user has set their **own** Tankerkoenig key, distinct
+  /// from the community default bundled in the app (#521).
+  HasCustomApiKeyProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'hasCustomApiKeyProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$hasCustomApiKeyHash();
+
+  @$internal
+  @override
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  bool create(Ref ref) {
+    return hasCustomApiKey(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$hasCustomApiKeyHash() => r'c1825c86532b5661179d05a09d9a079cc6d6abc0';
 
 /// Whether a custom EV API key is configured.
 

@@ -85,7 +85,7 @@ final class SearchStateProvider
   }
 }
 
-String _$searchStateHash() => r'e3429ce9beee0f519e31e3f8c1e1de386d4c32af';
+String _$searchStateHash() => r'5f93b006140334ab797ef15b4c3b68f7ffd4b37d';
 
 /// Manages the station search lifecycle and exposes results as [AsyncValue].
 ///
@@ -289,3 +289,57 @@ abstract class _$SearchRadius extends $Notifier<double> {
     element.handleCreate(ref, build);
   }
 }
+
+/// Whether the current search fuel type is electric.
+///
+/// Used by UI widgets to decide between EV and fuel result views without
+/// coupling to `FuelType.electric` directly.
+
+@ProviderFor(isEvSearch)
+final isEvSearchProvider = IsEvSearchProvider._();
+
+/// Whether the current search fuel type is electric.
+///
+/// Used by UI widgets to decide between EV and fuel result views without
+/// coupling to `FuelType.electric` directly.
+
+final class IsEvSearchProvider extends $FunctionalProvider<bool, bool, bool>
+    with $Provider<bool> {
+  /// Whether the current search fuel type is electric.
+  ///
+  /// Used by UI widgets to decide between EV and fuel result views without
+  /// coupling to `FuelType.electric` directly.
+  IsEvSearchProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'isEvSearchProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$isEvSearchHash();
+
+  @$internal
+  @override
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  bool create(Ref ref) {
+    return isEvSearch(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$isEvSearchHash() => r'f2280af5461fbac2ac8f7653f864f5401d692702';

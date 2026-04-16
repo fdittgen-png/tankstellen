@@ -6,7 +6,6 @@ import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/domain/entities/user_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
-import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_mode.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
@@ -36,7 +35,7 @@ class SearchResultsContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final searchMode = ref.watch(activeSearchModeProvider);
-    final fuelType = ref.watch(selectedFuelTypeProvider);
+    final isEv = ref.watch(isEvSearchProvider);
     final searchState = ref.watch(searchStateProvider);
 
     if (searchMode == SearchMode.route) {
@@ -45,7 +44,7 @@ class SearchResultsContent extends ConsumerWidget {
       );
     }
 
-    if (fuelType == FuelType.electric) {
+    if (isEv) {
       return EvSearchResultsView(onSearch: onGpsRetry);
     }
 
