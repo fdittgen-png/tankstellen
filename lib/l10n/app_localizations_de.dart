@@ -1871,6 +1871,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tooltipHidePassword => 'Passwort verbergen';
 
   @override
+  String get evConnectorsLabel => 'Verfügbare Steckertypen';
+
+  @override
+  String get evConnectorsNone => 'Keine Steckerinformationen';
+
+  @override
   String get switchToEmail => 'Zu E-Mail wechseln';
 
   @override

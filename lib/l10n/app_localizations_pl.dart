@@ -1859,6 +1859,12 @@ class AppLocalizationsPl extends AppLocalizations {
   String get tooltipHidePassword => 'Hide password';
 
   @override
+  String get evConnectorsLabel => 'Available connectors';
+
+  @override
+  String get evConnectorsNone => 'No connector information';
+
+  @override
   String get switchToEmail => 'Switch to email';
 
   @override

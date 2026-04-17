@@ -3577,6 +3577,18 @@ abstract class AppLocalizations {
   /// **'Hide password'**
   String get tooltipHidePassword;
 
+  /// No description provided for @evConnectorsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Available connectors'**
+  String get evConnectorsLabel;
+
+  /// No description provided for @evConnectorsNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No connector information'**
+  String get evConnectorsNone;
+
   /// No description provided for @switchToEmail.
   ///
   /// In en, this message translates to:

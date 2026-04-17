@@ -1866,6 +1866,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tooltipHidePassword => 'Hide password';
 
   @override
+  String get evConnectorsLabel => 'Available connectors';
+
+  @override
+  String get evConnectorsNone => 'No connector information';
+
+  @override
   String get switchToEmail => 'Passer à l\'e-mail';
 
   @override
