@@ -43,11 +43,22 @@ class StationMarkerBuilder {
     final color = pastel ? _toPastel(baseColor) : baseColor;
     final brand = _truncateBrand(station.displayName);
 
+    // Accessibility (#566): TalkBack/VoiceOver read this as "Brand, price
+    // EUR per litre, double-tap to view details" — otherwise the marker is
+    // an opaque gesture target with no announced role or content.
+    final priceLabel = price != null
+        ? PriceFormatter.formatPrice(price)
+        : 'price unavailable';
+    final semanticLabel = '$brand, $priceLabel';
+
     return Marker(
       point: LatLng(station.lat, station.lng),
       width: kStationMarkerWidth,
       height: kStationMarkerHeight,
-      child: GestureDetector(
+      child: Semantics(
+        label: semanticLabel,
+        button: true,
+        child: GestureDetector(
         onTap: () => GoRouter.of(context).push('/station/${station.id}'),
         child: Tooltip(
           message: brand,
@@ -90,6 +101,7 @@ class StationMarkerBuilder {
             ),
           ),
         ),
+      ),
       ),
     );
   }

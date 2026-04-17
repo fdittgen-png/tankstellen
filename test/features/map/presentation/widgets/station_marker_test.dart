@@ -64,7 +64,7 @@ void main() {
         SizedBox(
           width: marker.width,
           height: marker.height,
-          child: (marker.child as GestureDetector).child,
+          child: ((marker.child as Semantics).child as GestureDetector).child,
         ),
       );
 
@@ -100,7 +100,7 @@ void main() {
         SizedBox(
           width: marker.width,
           height: marker.height,
-          child: (marker.child as GestureDetector).child,
+          child: ((marker.child as Semantics).child as GestureDetector).child,
         ),
       );
 
@@ -121,7 +121,7 @@ void main() {
         SizedBox(
           width: marker.width,
           height: marker.height,
-          child: (marker.child as GestureDetector).child,
+          child: ((marker.child as Semantics).child as GestureDetector).child,
         ),
       );
 
@@ -143,13 +143,42 @@ void main() {
         SizedBox(
           width: marker.width,
           height: marker.height,
-          child: (marker.child as GestureDetector).child,
+          child: ((marker.child as Semantics).child as GestureDetector).child,
         ),
       );
 
       final container = tester.widget<Container>(find.byType(Container).last);
       final decoration = container.decoration! as BoxDecoration;
       expect(decoration.color!.a, closeTo(0.5, 0.01));
+    });
+
+    testWidgets(
+        'exposes a Semantics button label combining brand + price (#566)',
+        (tester) async {
+      final marker = StationMarkerBuilder.build(
+        tester.element(find.byType(Container).first),
+        testStation,
+        FuelType.e10,
+        1.50,
+        2.00,
+      );
+      await pumpApp(
+        tester,
+        SizedBox(
+          width: marker.width,
+          height: marker.height,
+          child: marker.child,
+        ),
+      );
+
+      final handle = tester.ensureSemantics();
+      // Assert the marker is announced as a button with brand + price.
+      // testStation has brand 'STAR' and e10 price 1.799.
+      expect(
+        find.bySemanticsLabel(RegExp(r'STAR.*1[.,]7')),
+        findsOneWidget,
+      );
+      handle.dispose();
     });
 
     testWidgets('color-codes marker by price tier', (tester) async {
