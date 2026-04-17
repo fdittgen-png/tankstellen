@@ -1480,6 +1480,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get amenityEv => 'Recharge';
 
   @override
+  String get paymentMethods => 'Moyens de paiement';
+
+  @override
+  String get paymentMethodCash => 'Espèces';
+
+  @override
+  String get paymentMethodCard => 'Carte';
+
+  @override
+  String get paymentMethodContactless => 'Sans contact';
+
+  @override
+  String get paymentMethodFuelCard => 'Carte carburant';
+
+  @override
+  String get paymentMethodApp => 'Appli';
+
+  @override
   String get drivingMode => 'Driving Mode';
 
   @override

@@ -2846,6 +2846,42 @@ abstract class AppLocalizations {
   /// **'EV'**
   String get amenityEv;
 
+  /// No description provided for @paymentMethods.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment methods'**
+  String get paymentMethods;
+
+  /// No description provided for @paymentMethodCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash'**
+  String get paymentMethodCash;
+
+  /// No description provided for @paymentMethodCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Card'**
+  String get paymentMethodCard;
+
+  /// No description provided for @paymentMethodContactless.
+  ///
+  /// In en, this message translates to:
+  /// **'Contactless'**
+  String get paymentMethodContactless;
+
+  /// No description provided for @paymentMethodFuelCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel Card'**
+  String get paymentMethodFuelCard;
+
+  /// No description provided for @paymentMethodApp.
+  ///
+  /// In en, this message translates to:
+  /// **'App'**
+  String get paymentMethodApp;
+
   /// No description provided for @drivingMode.
   ///
   /// In en, this message translates to:

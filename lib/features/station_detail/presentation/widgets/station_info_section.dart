@@ -6,6 +6,7 @@ import '../../../../core/utils/station_extensions.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../search/presentation/widgets/amenity_chips.dart';
+import '../../../search/presentation/widgets/payment_method_chips.dart';
 
 /// Address, opening hours, fuels, services, and location info for a station.
 class StationInfoSection extends StatelessWidget {
@@ -97,6 +98,17 @@ class StationInfoSection extends StatelessWidget {
           Text(l10n?.amenities ?? 'Amenities', style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           AmenityChips(amenities: station.amenities, maxVisible: 8),
+          const SizedBox(height: 24),
+        ],
+
+        // Payment methods (inferred from brand — no API data available)
+        if (station.brand.trim().isNotEmpty) ...[
+          Text(
+            l10n?.paymentMethods ?? 'Payment methods',
+            style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8),
+          PaymentMethodChips(brand: station.brand, maxVisible: 8),
           const SizedBox(height: 24),
         ],
 
