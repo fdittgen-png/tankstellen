@@ -17,6 +17,33 @@ flutter pub get
 flutter run -d emulator-5554
 ```
 
+### Release builds
+
+Debug builds (`flutter run`, `flutter build apk --debug`) work out of the box.
+Release builds (`flutter build apk --release`, `flutter build appbundle --release`)
+require the Android signing keystore to be resolvable or the build will
+**fail with a `GradleException`** — there is no silent fallback to the debug
+key (see [#48](https://github.com/fdittgen-png/tankstellen/issues/48)).
+
+Signing config resolution order on every build:
+
+1. **Environment variables** (preferred) — set these in your shell rc or via
+   `direnv`:
+   ```bash
+   export ANDROID_KEYSTORE_PATH="$HOME/.android/fuel-prices-release.jks"
+   export ANDROID_KEYSTORE_PASSWORD="<your store password>"
+   export ANDROID_KEY_ALIAS="fuel-prices"
+   # optional: ANDROID_KEY_PASSWORD (falls back to store password)
+   ```
+2. **Legacy `android/key.properties`** — still supported for convenience.
+   Gitignored, plaintext, not recommended for multi-dev machines but fine
+   for a single-dev laptop.
+3. **Neither** — release build fails fast with an error naming every env var
+   you need to set.
+
+For CI and the secrets rotation process, see the **Android Release Signing**
+section in the [Security wiki page](https://github.com/fdittgen-png/tankstellen/wiki/Security).
+
 ## Branch and PR Workflow
 
 We follow **GitHub Flow** with conventional commits and squash merges.
@@ -244,6 +271,14 @@ never deletes — only explicit user actions trigger server deletes.
 - **Consent → setup → main app.** The router has redirects for both
   GDPR consent and onboarding completion. New screens reachable from
   outside the shell must respect these gates or you'll trap the user.
+- **Release builds fail without a signing keystore.** As of #48 the
+  build throws a `GradleException` when neither the env vars nor
+  `android/key.properties` are set. This is intentional — the old code
+  silently fell back to the debug signing key, which produced CI
+  release artefacts that couldn't upgrade a real user install. If you
+  hit this error, read the env var names in the error message and set
+  them in your shell rc. See the "Release builds" subsection of
+  "Development Setup" above.
 
 ### 9. Where to look when you're stuck
 
