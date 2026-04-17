@@ -348,7 +348,9 @@ void main() {
       List<Object> _overrides() {
         final test = standardTestOverrides();
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasCustomApiKey()).thenReturn(false);
         when(() => test.mockStorage.hasEvApiKey()).thenReturn(false);
+        when(() => test.mockStorage.hasCustomEvApiKey()).thenReturn(false);
         when(() => test.mockStorage.favoriteCount).thenReturn(0);
         when(() => test.mockStorage.alertCount).thenReturn(0);
         when(() => test.mockStorage.profileCount).thenReturn(0);

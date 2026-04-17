@@ -54,7 +54,13 @@ class TraceStorage {
 
   Future<void> delete(String id) => _box.delete(id);
   Future<void> clearAll() => _box.clear();
-  int get count => _box.length;
+
+  /// Number of persisted traces, or 0 when the box is not yet open.
+  /// Returning 0 instead of throwing lets widgets read `count` during
+  /// their first build in environments (tests, headless builds) where
+  /// `TraceStorage.init()` hasn't been called — production goes through
+  /// AppInitializer which always calls `init()`.
+  int get count => Hive.isBoxOpen(_boxName) ? _box.length : 0;
 
   /// Serialises every persisted trace into a single JSON document the
   /// user can email or attach to a GitHub issue. Used by the privacy
