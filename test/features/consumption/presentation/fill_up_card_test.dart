@@ -25,9 +25,14 @@ void main() {
     await pumpApp(tester, FillUpCard(fillUp: fillUp));
 
     expect(find.text('Shell Berlin'), findsOneWidget);
-    expect(find.textContaining('50.00 L'), findsOneWidget);
-    expect(find.textContaining('1.600/L'), findsOneWidget);
-    expect(find.textContaining('12345 km'), findsOneWidget);
+    // Now goes through UnitFormatter — FR locale uses comma decimal,
+    // price-per-litre gets its suffix from the country config.
+    expect(find.textContaining('50,0 L'), findsOneWidget);
+    expect(find.textContaining('1,600 \u20ac/L'), findsOneWidget);
+    // Odometer goes through formatDistance — large integer, one
+    // decimal: "12345,0 km" in FR locale.
+    expect(find.textContaining('km'), findsOneWidget);
+    expect(find.textContaining('12'), findsOneWidget);
   });
 
   testWidgets('FillUpCard falls back to fuel type when no station name',

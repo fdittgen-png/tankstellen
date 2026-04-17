@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/station_extensions.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
@@ -61,7 +62,7 @@ class DrivingStationSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${station.dist.toStringAsFixed(1)} km',
+                      UnitFormatter.formatDistance(station.dist),
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
