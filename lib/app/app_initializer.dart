@@ -73,7 +73,9 @@ class AppInitializer {
       AppConstants.setRuntimeVersion(
         '${packageInfo.version}+${packageInfo.buildNumber}',
       );
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('PackageInfo.fromPlatform failed (#570): $e');
+    }
 
     StartupTimer.instance.mark('pre_run_app');
 

@@ -177,7 +177,9 @@ class FavoriteStations extends _$FavoriteStations {
       if (data != null) {
         try {
           stations.add(Station.fromJson(data));
-        } catch (_) {}
+        } catch (e) {
+          debugPrint('Skipping corrupt favorite $id: $e');
+        }
       }
     }
 

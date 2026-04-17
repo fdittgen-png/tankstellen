@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 /// Structured fields extracted from a fuel receipt by [ReceiptParser].
 ///
 /// All fields are nullable because OCR is best-effort: any combination
@@ -124,7 +126,9 @@ class ReceiptParser {
         if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
           return DateTime(year, month, day);
         }
-      } catch (_) {}
+      } on FormatException catch (e) {
+        debugPrint('Receipt date parse failed for "${match.group(0)}": $e');
+      }
     }
     return null;
   }
