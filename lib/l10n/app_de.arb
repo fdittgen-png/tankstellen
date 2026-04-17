@@ -658,6 +658,7 @@
   "paymentMethodContactless": "Kontaktlos",
   "paymentMethodFuelCard": "Tankkarte",
   "paymentMethodApp": "App",
+  "payWithApp": "Mit {app} bezahlen",
   "drivingMode": "Fahrmodus",
   "drivingExit": "Beenden",
   "drivingNearestStation": "Nächste",
