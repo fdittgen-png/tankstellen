@@ -2882,6 +2882,12 @@ abstract class AppLocalizations {
   /// **'App'**
   String get paymentMethodApp;
 
+  /// Button label to open a branded station payment app
+  ///
+  /// In en, this message translates to:
+  /// **'Pay with {app}'**
+  String payWithApp(String app);
+
   /// No description provided for @drivingMode.
   ///
   /// In en, this message translates to:

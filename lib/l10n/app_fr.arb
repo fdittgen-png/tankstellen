@@ -461,6 +461,7 @@
   "paymentMethodContactless": "Sans contact",
   "paymentMethodFuelCard": "Carte carburant",
   "paymentMethodApp": "Appli",
+  "payWithApp": "Payer avec {app}",
   "nearestStations": "Stations les plus proches",
   "nearestStationsHint": "Trouver les stations les plus proches avec votre position actuelle",
   "openOnlyFilter": "Ouvertes uniquement",

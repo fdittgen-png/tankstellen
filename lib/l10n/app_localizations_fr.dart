@@ -1498,6 +1498,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get paymentMethodApp => 'Appli';
 
   @override
+  String payWithApp(String app) {
+    return 'Payer avec $app';
+  }
+
+  @override
   String get drivingMode => 'Driving Mode';
 
   @override

@@ -1493,6 +1493,11 @@ class AppLocalizationsEl extends AppLocalizations {
   String get paymentMethodApp => 'App';
 
   @override
+  String payWithApp(String app) {
+    return 'Pay with $app';
+  }
+
+  @override
   String get drivingMode => 'Driving Mode';
 
   @override

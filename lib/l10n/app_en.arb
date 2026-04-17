@@ -663,6 +663,11 @@
   "paymentMethodContactless": "Contactless",
   "paymentMethodFuelCard": "Fuel Card",
   "paymentMethodApp": "App",
+  "payWithApp": "Pay with {app}",
+  "@payWithApp": {
+    "description": "Button label to open a branded station payment app",
+    "placeholders": { "app": { "type": "String", "example": "Shell App" } }
+  },
   "drivingMode": "Driving Mode",
   "drivingExit": "Exit",
   "drivingNearestStation": "Nearest",
