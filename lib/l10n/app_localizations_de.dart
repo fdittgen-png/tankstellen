@@ -1485,6 +1485,24 @@ class AppLocalizationsDe extends AppLocalizations {
   String get amenityEv => 'E-Laden';
 
   @override
+  String get paymentMethods => 'Zahlungsarten';
+
+  @override
+  String get paymentMethodCash => 'Bargeld';
+
+  @override
+  String get paymentMethodCard => 'Karte';
+
+  @override
+  String get paymentMethodContactless => 'Kontaktlos';
+
+  @override
+  String get paymentMethodFuelCard => 'Tankkarte';
+
+  @override
+  String get paymentMethodApp => 'App';
+
+  @override
   String get drivingMode => 'Fahrmodus';
 
   @override

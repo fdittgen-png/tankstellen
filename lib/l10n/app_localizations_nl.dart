@@ -1475,6 +1475,24 @@ class AppLocalizationsNl extends AppLocalizations {
   String get amenityEv => 'Oplaadpunt';
 
   @override
+  String get paymentMethods => 'Payment methods';
+
+  @override
+  String get paymentMethodCash => 'Cash';
+
+  @override
+  String get paymentMethodCard => 'Card';
+
+  @override
+  String get paymentMethodContactless => 'Contactless';
+
+  @override
+  String get paymentMethodFuelCard => 'Fuel Card';
+
+  @override
+  String get paymentMethodApp => 'App';
+
+  @override
   String get drivingMode => 'Driving Mode';
 
   @override
