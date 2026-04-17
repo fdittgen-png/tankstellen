@@ -275,9 +275,19 @@ Future<void> _refreshPricesAndCheckAlerts() async {
       debugPrint('BackgroundService: ${activeAlerts.length} active alerts, ${prices.length} prices available');
     }
 
-    // 6. Update home screen widgets with latest favorite prices
-    await HomeWidgetService.updateWidget(storage);
-    await HomeWidgetService.updateNearestWidget(storage, storage);
+    // 6. Update home screen widgets with latest favorite prices.
+    //    Pass profile + settings storage so the widget can resolve the
+    //    active profile's preferred fuel type and last-known GPS.
+    await HomeWidgetService.updateWidget(
+      storage,
+      profileStorage: storage,
+      settingsStorage: storage,
+    );
+    await HomeWidgetService.updateNearestWidget(
+      storage,
+      storage,
+      profileStorage: storage,
+    );
   } catch (e) {
     debugPrint('BackgroundService: task failed: $e');
   } finally {
