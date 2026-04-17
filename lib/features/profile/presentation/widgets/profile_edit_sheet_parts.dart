@@ -167,7 +167,35 @@ class _CountrySection extends StatelessWidget {
             return ChoiceChip(
               label: Text('${c.flag} ${c.name}'),
               selected: c.code == state.countryCode,
-              onSelected: (_) => ctrl.setCountryCode(c.code),
+              onSelected: (_) async {
+                // Confirm silently-impactful unit changes (currency,
+                // distance, volume, price-per-unit format) before
+                // mutating the profile. Same-unit switches (e.g.
+                // FR ↔ DE, both EUR + km + L + €/L) skip the
+                // dialog. A profile with no country set yet also
+                // skips — there's nothing to warn about.
+                final currentCode = state.countryCode;
+                final current = currentCode == null
+                    ? null
+                    : Countries.byCode(currentCode);
+                if (current == null || current.code == c.code) {
+                  ctrl.setCountryCode(c.code);
+                  return;
+                }
+                if (!countriesDifferInUnits(current, c)) {
+                  ctrl.setCountryCode(c.code);
+                  return;
+                }
+                final confirmed = await showCountryChangeDialog(
+                  context,
+                  from: current,
+                  to: c,
+                );
+                if (!context.mounted) return;
+                if (confirmed) {
+                  ctrl.setCountryCode(c.code);
+                }
+              },
               visualDensity: VisualDensity.compact,
             );
           }).toList(),

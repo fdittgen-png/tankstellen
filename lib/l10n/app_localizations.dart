@@ -410,6 +410,54 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get cancel;
 
+  /// No description provided for @countryChangeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch country?'**
+  String get countryChangeTitle;
+
+  /// No description provided for @countryChangeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Switching to {country} will change:'**
+  String countryChangeBody(String country);
+
+  /// No description provided for @countryChangeCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get countryChangeCurrency;
+
+  /// No description provided for @countryChangeDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get countryChangeDistance;
+
+  /// No description provided for @countryChangeVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get countryChangeVolume;
+
+  /// No description provided for @countryChangePricePerUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Price format'**
+  String get countryChangePricePerUnit;
+
+  /// No description provided for @countryChangeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Existing favorites and fill-up logs are not rewritten; only new entries use the new units.'**
+  String get countryChangeNote;
+
+  /// No description provided for @countryChangeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch'**
+  String get countryChangeConfirm;
+
   /// No description provided for @delete.
   ///
   /// In en, this message translates to:

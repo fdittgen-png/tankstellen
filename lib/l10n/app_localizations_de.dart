@@ -150,6 +150,33 @@ class AppLocalizationsDe extends AppLocalizations {
   String get cancel => 'Abbrechen';
 
   @override
+  String get countryChangeTitle => 'Land wechseln?';
+
+  @override
+  String countryChangeBody(String country) {
+    return 'Der Wechsel nach $country ändert:';
+  }
+
+  @override
+  String get countryChangeCurrency => 'Währung';
+
+  @override
+  String get countryChangeDistance => 'Entfernung';
+
+  @override
+  String get countryChangeVolume => 'Volumen';
+
+  @override
+  String get countryChangePricePerUnit => 'Preisformat';
+
+  @override
+  String get countryChangeNote =>
+      'Vorhandene Favoriten und Tankungen werden nicht umgerechnet; nur neue Einträge verwenden die neuen Einheiten.';
+
+  @override
+  String get countryChangeConfirm => 'Wechseln';
+
+  @override
   String get delete => 'Löschen';
 
   @override
