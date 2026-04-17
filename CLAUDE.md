@@ -288,6 +288,14 @@ Never commit directly to `master`. `master` is always deployable.
 - All user-facing strings via `AppLocalizations.of(context)?.key ?? 'English fallback'`
 - Use `AnimatedCrossFade`, `AnimatedDefaultTextStyle`, `AnimatedContainer` for smooth UI transitions
 
+### Accessibility (#566)
+- **Every `IconButton` must have a `tooltip:`** — `tooltip: l10n?.tooltipX ?? 'X'`. The static scan in `test/accessibility/icon_button_tooltip_coverage_test.dart` enforces this.
+- **Group-label chip wraps** (EV connectors, amenities, filters) with a container `Semantics(label: 'Available connectors: X, Y')` + `ExcludeSemantics` around the chip subtree. TalkBack announcing one coherent label beats a stream of isolated chip texts.
+- **Swipe actions** need TalkBack/VoiceOver alternatives. `Dismissible` primary action always needs a button equivalent somewhere on the card (favorite toggle, tap-to-detail, etc.).
+- **Semantic labels for custom widgets**: station cards expose brand + address + price + open/closed as a single merged Semantics node — not a tree of isolated Text widgets.
+- **Verify new screens against `androidTapTargetGuideline`**: every interactive hit target ≥ 48dp. Use `meetsGuideline(androidTapTargetGuideline)` in widget tests.
+- **No silent `catch (_) {}`** — logs go through `debugPrint` with context. The static scan in `test/lint/no_silent_catch_test.dart` enforces this.
+
 ### Testing
 - **Prefer fakes over mocks** for service layer tests — `_FakeStationService` with explicit `stationsToReturn`
 - Test error classification exhaustively (8+ error categories)
