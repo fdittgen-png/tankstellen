@@ -67,5 +67,30 @@ void main() {
         findsNothing,
       );
     });
+
+    testWidgets(
+        'exposes a group Semantics label listing connectors (#566 a11y)',
+        (tester) async {
+      await pumpChips(tester, connectors: const ['CCS', 'Type 2']);
+      final handle = tester.ensureSemantics();
+
+      // Parent Semantics announces the whole group — no chip-by-chip spam.
+      expect(
+        find.bySemanticsLabel('Available connectors: CCS, Type 2'),
+        findsOneWidget,
+      );
+      handle.dispose();
+    });
+
+    testWidgets('empty list still exposes "no information" Semantics label',
+        (tester) async {
+      await pumpChips(tester, connectors: const []);
+      final handle = tester.ensureSemantics();
+      expect(
+        find.bySemanticsLabel('No connector information'),
+        findsOneWidget,
+      );
+      handle.dispose();
+    });
   });
 }

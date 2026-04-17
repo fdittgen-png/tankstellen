@@ -817,6 +817,8 @@
   "tooltipUseGps": "GPS-Standort verwenden",
   "tooltipShowPassword": "Passwort anzeigen",
   "tooltipHidePassword": "Passwort verbergen",
+  "evConnectorsLabel": "Verfügbare Steckertypen",
+  "evConnectorsNone": "Keine Steckerinformationen",
   "switchToEmail": "Zu E-Mail wechseln",
   "switchToEmailSubtitle": "Daten behalten, Anmeldung von anderen Geräten",
   "switchToAnonymousAction": "Zu anonym wechseln",

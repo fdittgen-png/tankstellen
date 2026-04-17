@@ -822,6 +822,8 @@
   "tooltipUseGps": "Use GPS location",
   "tooltipShowPassword": "Show password",
   "tooltipHidePassword": "Hide password",
+  "evConnectorsLabel": "Available connectors",
+  "evConnectorsNone": "No connector information",
   "switchToEmail": "Switch to email",
   "switchToEmailSubtitle": "Keep data, add sign-in from other devices",
   "switchToAnonymousAction": "Switch to anonymous",
