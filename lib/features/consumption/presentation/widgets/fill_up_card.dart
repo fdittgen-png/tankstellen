@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/fill_up.dart';
 
@@ -17,10 +19,15 @@ class FillUpCard extends StatelessWidget {
 
     final dateStr =
         '${fillUp.date.year}-${_pad(fillUp.date.month)}-${_pad(fillUp.date.day)}';
-    final litersStr = fillUp.liters.toStringAsFixed(2);
-    final costStr = fillUp.totalCost.toStringAsFixed(2);
-    final pplStr = fillUp.pricePerLiter.toStringAsFixed(3);
-    final odoStr = fillUp.odometerKm.toStringAsFixed(0);
+    // Until the FillUp model carries an origin-country code (tracked in
+    // #626 follow-up), fall back to the active country's units. Old
+    // records logged before this change will re-format on the fly when
+    // the user changes country — acceptable as a transitional step.
+    final distance = UnitFormatter.formatDistance(fillUp.odometerKm);
+    final volume = UnitFormatter.formatVolume(fillUp.liters);
+    final costStr =
+        '${fillUp.totalCost.toStringAsFixed(2)} ${PriceFormatter.currency}';
+    final ppl = UnitFormatter.formatPricePerUnit(fillUp.pricePerLiter);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -43,9 +50,9 @@ class FillUpCard extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('$dateStr · $odoStr km'),
+            Text('$dateStr · $distance'),
             Text(
-              '$litersStr L · $costStr · $pplStr/L',
+              '$volume · $costStr · $ppl',
               style: theme.textTheme.bodySmall,
             ),
           ],

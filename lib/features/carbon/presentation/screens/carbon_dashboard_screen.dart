@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/providers/consumption_providers.dart';
@@ -115,7 +116,7 @@ class _ChartsTab extends StatelessWidget {
                   summaries: summaries,
                   valueOf: (s) => s.totalCost,
                   color: theme.colorScheme.primary,
-                  unitLabel: '€',
+                  unitLabel: PriceFormatter.currency,
                 ),
               ],
             ),
@@ -203,7 +204,7 @@ class _SummaryRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${totalCost.toStringAsFixed(0)} €',
+                    '${totalCost.toStringAsFixed(0)} ${PriceFormatter.currency}',
                     style: theme.textTheme.titleLarge,
                   ),
                 ],

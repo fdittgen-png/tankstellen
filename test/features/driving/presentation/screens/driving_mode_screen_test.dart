@@ -151,7 +151,9 @@ void main() {
       // Brand name (displayName for testStation is 'STAR')
       expect(find.text('STAR'), findsOneWidget);
       // Distance
-      expect(find.text('1.5 km'), findsOneWidget);
+      // Distance now goes through UnitFormatter — FR default locale
+      // uses comma decimal.
+      expect(find.text('1,5 km'), findsOneWidget);
       // Navigate button
       expect(find.text('Navigate'), findsOneWidget);
     });
