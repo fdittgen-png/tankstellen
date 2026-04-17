@@ -50,7 +50,9 @@ class ReceiptScanService {
       // Clean up temp file
       try {
         await File(image.path).delete();
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('Receipt temp-file cleanup failed at ${image.path}: $e');
+      }
     }
   }
 

@@ -102,27 +102,12 @@ class FavoritesFuelTab extends ConsumerWidget {
         );
       },
       loading: () => const FavoritesLoadingView(),
-      error: (error, _) => Semantics(
-        label: 'Error loading favorites: ${error.toString()}',
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.error_outline, size: 48),
-              const SizedBox(height: 16),
-              Text(error.toString(), textAlign: TextAlign.center),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: () {
-                  ref
-                      .read(favoriteStationsProvider.notifier)
-                      .loadAndRefresh();
-                },
-                child: Text(l10n?.retry ?? 'Retry'),
-              ),
-            ],
-          ),
-        ),
+      error: (error, stackTrace) => ServiceChainErrorWidget(
+        error: error,
+        stackTrace: stackTrace,
+        searchContext: 'Favorites load',
+        onRetry: () =>
+            ref.read(favoriteStationsProvider.notifier).loadAndRefresh(),
       ),
     );
   }

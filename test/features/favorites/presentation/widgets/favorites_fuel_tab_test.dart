@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
 import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/presentation/widgets/favorites_fuel_tab.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
@@ -122,7 +123,10 @@ void main() {
         ].cast(),
       );
 
-      expect(find.byIcon(Icons.error_outline), findsOneWidget);
+      // #565: favorites error branch now reuses ServiceChainErrorWidget so
+      // error UI is consistent across Search + Favorites + Alerts.
+      expect(find.byType(ServiceChainErrorWidget), findsOneWidget);
+      expect(find.byIcon(Icons.cloud_off), findsOneWidget);
       expect(find.text('Try again'), findsOneWidget);
     });
   });
