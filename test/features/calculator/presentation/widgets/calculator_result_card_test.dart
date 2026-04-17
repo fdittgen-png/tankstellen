@@ -19,9 +19,11 @@ void main() {
       expect(find.text('Trip Cost'), findsOneWidget);
       expect(find.text('Fuel needed'), findsOneWidget);
       expect(find.text('Total cost'), findsOneWidget);
-      // 100 km * 7 L/100km = 7 L
-      expect(find.text('7.0 L'), findsOneWidget);
-      // 7 L * 2 €/L = 14.00 €
+      // 100 km * 7 L/100km = 7 L — volume now renders in the active
+      // country's locale (FR uses comma decimal).
+      expect(find.text('7,0 L'), findsOneWidget);
+      // 7 L * 2 €/L = 14.00 €. Total stays at 2-decimal precision
+      // (trip totals, not fuel-price precision).
       expect(find.text('14.00 \u20ac'), findsOneWidget);
     });
   });

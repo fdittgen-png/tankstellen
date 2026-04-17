@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/station_extensions.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../search/domain/entities/station.dart';
 
 /// A chip representing a station stop along the route.
@@ -104,7 +106,7 @@ class RouteStationChip extends StatelessWidget {
                   children: [
                     Text(
                       price != null
-                          ? '${price!.toStringAsFixed(3)}\u20ac'
+                          ? PriceFormatter.formatPrice(price)
                           : '--',
                       style: TextStyle(
                         fontSize: 10,
@@ -115,7 +117,7 @@ class RouteStationChip extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      ' \u00b7 ${station.dist.toStringAsFixed(1)} km',
+                      ' \u00b7 ${UnitFormatter.formatDistance(station.dist)}',
                       style: TextStyle(
                         fontSize: 10,
                         color: isSelected
