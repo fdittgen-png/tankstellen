@@ -21,6 +21,22 @@ class CountryConfig {
   final String examplePostalCode;
   final String exampleCity;
 
+  /// Distance unit convention for this country: 'km' or 'mi'.
+  /// Defaults to metric km — override only for imperial-distance
+  /// countries (GB road signs use miles, US, …).
+  final String distanceUnit;
+
+  /// Volume unit convention for this country: 'L' or 'gal'.
+  /// Every country currently uses litres; imperial-gallon
+  /// countries (US) will override.
+  final String volumeUnit;
+
+  /// Price-per-unit suffix to render after a fuel price value.
+  /// Common values: '€/L', '£/L', 'p/L' (UK pence-per-litre),
+  /// 'c/L' (AU cents-per-litre), '$/gal' (US).
+  /// Defaults to '€/L' for the EUR-zone metric countries.
+  final String pricePerUnitSuffix;
+
   const CountryConfig({
     required this.code,
     required this.name,
@@ -38,6 +54,9 @@ class CountryConfig {
     this.fuelTypes = const ['E5', 'E10', 'Diesel'],
     this.examplePostalCode = '',
     this.exampleCity = '',
+    this.distanceUnit = 'km',
+    this.volumeUnit = 'L',
+    this.pricePerUnitSuffix = '\u20ac/L',
   });
 }
 
@@ -141,6 +160,7 @@ class Countries {
     fuelTypes: ['Blyfri 95', 'Diesel'],
     examplePostalCode: '1000',
     exampleCity: 'København',
+    pricePerUnitSuffix: 'kr/L',
   );
 
   static const argentina = CountryConfig(
@@ -159,6 +179,7 @@ class Countries {
     fuelTypes: ['Nafta', 'Gas Oil', 'GNC'],
     examplePostalCode: '1000',
     exampleCity: 'Buenos Aires',
+    pricePerUnitSuffix: '\$/L',
   );
 
   // ── New countries (v4.1.0) ──
@@ -193,6 +214,11 @@ class Countries {
     fuelTypes: ['Unleaded', 'Super Unleaded', 'Diesel', 'Premium Diesel'],
     examplePostalCode: 'SW1A 1AA',
     exampleCity: 'London',
+    // UK road signs and speedometers use miles; fuel is still sold by
+    // the litre so volume stays 'L'. Price convention is pence-per-
+    // litre ("p/L") on forecourt signage.
+    distanceUnit: 'mi',
+    pricePerUnitSuffix: 'p/L',
   );
 
   static const australia = CountryConfig(
@@ -210,6 +236,8 @@ class Countries {
     fuelTypes: ['Unleaded 91', 'Unleaded 95', 'Unleaded 98', 'Diesel', 'LPG'],
     examplePostalCode: '2000',
     exampleCity: 'Sydney',
+    // AU forecourts quote cents-per-litre on signage.
+    pricePerUnitSuffix: 'c/L',
   );
 
   static const mexico = CountryConfig(
@@ -227,6 +255,7 @@ class Countries {
     fuelTypes: ['Regular', 'Premium', 'Diesel'],
     examplePostalCode: '06600',
     exampleCity: 'Ciudad de México',
+    pricePerUnitSuffix: '\$/L',
   );
 
   /// All supported countries, ordered for display.

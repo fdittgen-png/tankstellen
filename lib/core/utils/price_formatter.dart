@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
+import 'unit_formatter.dart';
+
 class PriceFormatter {
   PriceFormatter._();
 
@@ -43,11 +45,15 @@ class PriceFormatter {
   /// Active country code. Set by the app on country change.
   static String _activeCountry = 'FR';
 
+  /// ISO code of the country currently set as active. Read-only
+  /// from outside; mutate via [setCountry] to keep derived caches
+  /// (format objects) in sync.
+  static String get activeCountry => _activeCountry;
+
   /// Set the active country for price formatting.
   static void setCountry(String countryCode) {
     _activeCountry = countryCode.toUpperCase();
     _cachedFullFormat = null;
-    _cachedDistanceFormat = null;
   }
 
   static String get _locale =>
@@ -56,15 +62,11 @@ class PriceFormatter {
   static String get currency =>
       _currencyMap[_activeCountry] ?? '€';
 
-  // Lazy-initialized formatters that reset when country changes.
+  // Lazy-initialized formatter that resets when country changes.
   static NumberFormat? _cachedFullFormat;
-  static NumberFormat? _cachedDistanceFormat;
 
   static NumberFormat get _fullFormat =>
       _cachedFullFormat ??= NumberFormat('0.000', _locale);
-
-  static NumberFormat get _distanceFormat =>
-      _cachedDistanceFormat ??= NumberFormat('0.0', _locale);
 
   /// Format price as plain string (e.g., "1,459 €" or "1.459 £").
   ///
@@ -119,13 +121,17 @@ class PriceFormatter {
     );
   }
 
-  /// Format distance in km (e.g., "2,3 km" or "2.3 km").
-  static String formatDistance(double? distanceKm) {
-    if (distanceKm == null) return '--';
-    if (distanceKm < 1) {
-      return '${(distanceKm * 1000).round()} m';
-    }
-    return '${_distanceFormat.format(distanceKm)} km';
+  /// Format distance per the active country's convention. Delegates
+  /// to [UnitFormatter.formatDistance] so the km→mi branch for
+  /// imperial-distance countries (GB, …) lives in one place.
+  ///
+  /// Pass [countryCode] to render a cross-country row (e.g. a DE
+  /// station in the FR favorites list) in the origin country's
+  /// units.
+  static String formatDistance(double? distanceKm, {String? countryCode}) {
+    // Imported lazily via a top-level symbol to avoid a circular
+    // import between price_formatter.dart and unit_formatter.dart.
+    return UnitFormatter.formatDistance(distanceKm, countryCode: countryCode);
   }
 
   /// Get fuel type display name.

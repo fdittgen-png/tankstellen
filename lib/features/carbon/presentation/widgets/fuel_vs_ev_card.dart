@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/milestone.dart';
 
@@ -64,7 +65,7 @@ class FuelVsEvCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               '${l?.fuelVsEvDistance ?? 'Distance'}: '
-              '${distanceKm.toStringAsFixed(0)} km',
+              '${UnitFormatter.formatDistance(distanceKm)}',
               style: theme.textTheme.bodySmall,
             ),
             const SizedBox(height: 8),

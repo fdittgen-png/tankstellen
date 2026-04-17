@@ -42,7 +42,9 @@ void main() {
 
     testWidgets('displays formatted price when available', (tester) async {
       await tester.pumpWidget(buildChip(price: 1.965));
-      expect(find.text('1.965\u20ac'), findsOneWidget);
+      // Price now routes through PriceFormatter — comma decimal in
+      // the default FR locale plus a space before the currency.
+      expect(find.text('1,965 \u20ac'), findsOneWidget);
     });
 
     testWidgets('displays dash when price is null', (tester) async {
@@ -65,7 +67,8 @@ void main() {
         isOpen: testStation.isOpen,
       );
       await tester.pumpWidget(buildChip(station: station));
-      expect(find.textContaining('9.9 km'), findsOneWidget);
+      // Distance now uses the active country's locale (FR → comma).
+      expect(find.textContaining('9,9 km'), findsOneWidget);
     });
 
     testWidgets('selected chip uses primary background color', (tester) async {

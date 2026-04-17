@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/calculator_provider.dart';
 
@@ -39,13 +41,17 @@ class CalculatorResultCard extends StatelessWidget {
               children: [
                 _ResultItem(
                   label: l10n?.fuelNeeded ?? 'Fuel needed',
-                  value:
-                      '${state.calculation.totalLiters.toStringAsFixed(1)} L',
+                  value: UnitFormatter.formatVolume(
+                      state.calculation.totalLiters),
                 ),
                 _ResultItem(
+                  // Trip totals are shown at cent precision, not the
+                  // 3-decimal fuel-price precision, so we don't route
+                  // through formatPrice here — only the currency
+                  // symbol is localised.
                   label: l10n?.totalCost ?? 'Total cost',
                   value:
-                      '${state.calculation.totalCost.toStringAsFixed(2)} \u20ac',
+                      '${state.calculation.totalCost.toStringAsFixed(2)} ${PriceFormatter.currency}',
                   highlight: true,
                 ),
               ],
