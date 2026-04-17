@@ -59,6 +59,17 @@
   "editProfile": "Edit profile",
   "save": "Save",
   "cancel": "Cancel",
+  "countryChangeTitle": "Switch country?",
+  "countryChangeBody": "Switching to {country} will change:",
+  "@countryChangeBody": {
+    "placeholders": { "country": { "type": "String", "example": "United Kingdom" } }
+  },
+  "countryChangeCurrency": "Currency",
+  "countryChangeDistance": "Distance",
+  "countryChangeVolume": "Volume",
+  "countryChangePricePerUnit": "Price format",
+  "countryChangeNote": "Existing favorites and fill-up logs are not rewritten; only new entries use the new units.",
+  "countryChangeConfirm": "Switch",
   "delete": "Delete",
   "activate": "Activate",
   "configured": "Configured",

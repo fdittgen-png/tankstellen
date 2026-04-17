@@ -150,6 +150,33 @@ class AppLocalizationsPt extends AppLocalizations {
   String get cancel => 'Cancelar';
 
   @override
+  String get countryChangeTitle => 'Switch country?';
+
+  @override
+  String countryChangeBody(String country) {
+    return 'Switching to $country will change:';
+  }
+
+  @override
+  String get countryChangeCurrency => 'Currency';
+
+  @override
+  String get countryChangeDistance => 'Distance';
+
+  @override
+  String get countryChangeVolume => 'Volume';
+
+  @override
+  String get countryChangePricePerUnit => 'Price format';
+
+  @override
+  String get countryChangeNote =>
+      'Existing favorites and fill-up logs are not rewritten; only new entries use the new units.';
+
+  @override
+  String get countryChangeConfirm => 'Switch';
+
+  @override
   String get delete => 'Eliminar';
 
   @override
