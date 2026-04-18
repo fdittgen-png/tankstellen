@@ -323,8 +323,14 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
               decoration: InputDecoration(
                 labelText: l?.notesOptional ?? 'Notes (optional)',
                 prefixIcon: const Icon(Icons.edit_note),
+                alignLabelWithHint: true,
+                border: const OutlineInputBorder(),
               ),
-              maxLines: 2,
+              // Larger notes area — user requested more room (#695).
+              minLines: 4,
+              maxLines: 8,
+              keyboardType: TextInputType.multiline,
+              textInputAction: TextInputAction.newline,
             ),
             const SizedBox(height: 24),
             FilledButton.icon(

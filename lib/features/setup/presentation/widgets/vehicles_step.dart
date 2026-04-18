@@ -94,7 +94,9 @@ class VehiclesStep extends ConsumerWidget {
             ),
           const SizedBox(height: 16),
           OutlinedButton.icon(
-            onPressed: () => context.push('/vehicles/new'),
+            // Route for adding a new vehicle is `/vehicles/edit` without
+            // `extra` — that's what the list screen uses too (#695).
+            onPressed: () => context.push('/vehicles/edit'),
             icon: const Icon(Icons.add),
             label: Text(l10n?.vehicleAdd ?? 'Add vehicle'),
           ),

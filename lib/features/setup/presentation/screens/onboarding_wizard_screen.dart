@@ -50,16 +50,20 @@ class _OnboardingWizardScreenState
   /// requires an API key.
   int get _stepCount {
     final country = ref.read(activeCountryProvider);
-    // Welcome, Country, Preferences, Landing, Vehicles, [API Key], Done
+    // Welcome, Country, Vehicles, Preferences, Landing, [API Key], Done
     return country.requiresApiKey ? 7 : 6;
   }
 
-  /// Zero-based index of the Vehicles step (always after Landing).
-  static const int _vehiclesStepIndex = 4;
+  /// Zero-based index of the Vehicles step. Placed BEFORE Preferences so
+  /// the user can pick a vehicle first — the fuel preference can then
+  /// derive from the vehicle's fuel (#695).
+  static const int _vehiclesStepIndex = 2;
 
-  /// Zero-based index of the optional API key step (after Vehicles when
-  /// the country requires a key).
-  int get _apiKeyStepIndex => _vehiclesStepIndex + 1;
+  /// Zero-based index of the optional API key step.
+  int get _apiKeyStepIndex {
+    final country = ref.read(activeCountryProvider);
+    return country.requiresApiKey ? 5 : -1;
+  }
 
   bool _isLastStep(int currentStep) => currentStep == _stepCount - 1;
 
@@ -169,10 +173,9 @@ class _OnboardingWizardScreenState
 
   /// Returns whether the current step is an optional one that can be skipped.
   bool _isCurrentStepSkippable(int currentStep) {
-    final country = ref.read(activeCountryProvider);
     // Vehicles is always skippable; API key is skippable when it shows.
     if (currentStep == _vehiclesStepIndex) return true;
-    return country.requiresApiKey && currentStep == _apiKeyStepIndex;
+    return currentStep == _apiKeyStepIndex && _apiKeyStepIndex != -1;
   }
 
   List<Widget> _buildSteps() {
@@ -180,9 +183,9 @@ class _OnboardingWizardScreenState
     return [
       const WelcomeStep(),
       const CountryLanguageStep(),
+      const VehiclesStep(),
       const PreferencesStep(),
       const LandingScreenStep(),
-      const VehiclesStep(),
       if (country.requiresApiKey)
         ApiKeyStep(apiKeyController: _apiKeyController),
       const CompletionStep(),

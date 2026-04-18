@@ -53,8 +53,9 @@ void main() {
         find.byType(OnboardingProgressIndicator),
         findsOneWidget,
       );
-      // 7 steps for Germany (Welcome, Country, Preferences, Landing,
-      // Vehicles, API Key, Done)
+      // 7 steps for Germany (Welcome, Country, Vehicles, Preferences,
+      // Landing, API Key, Done). Vehicles sits BEFORE Preferences so
+      // the chosen vehicle can derive the fuel preference (#695).
       expect(find.text('1 / 7'), findsOneWidget);
     });
 
@@ -94,11 +95,18 @@ void main() {
     testWidgets('shows Skip button on API key step', (tester) async {
       await pumpWizard(tester);
 
-      // Steps 1-5: Welcome -> Country -> Preferences -> Landing -> Vehicles
-      for (var i = 0; i < 5; i++) {
-        await tester.tap(find.text('Next'));
-        await tester.pumpAndSettle();
-      }
+      // Welcome -> Country -> Vehicles -> Preferences -> Landing
+      // Skip vehicles (step 3) with the Skip button, Next for others.
+      await tester.tap(find.text('Next')); // to Country
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Next')); // to Vehicles
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Skip')); // past Vehicles
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Next')); // to Landing
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Next')); // to API Key
+      await tester.pumpAndSettle();
 
       // Step 6: API key (skippable)
       expect(find.text('6 / 7'), findsOneWidget);
@@ -108,15 +116,21 @@ void main() {
     testWidgets('Skip button advances past API key step', (tester) async {
       await pumpWizard(tester);
 
-      // Navigate to API key step (step 6)
-      for (var i = 0; i < 5; i++) {
-        await tester.tap(find.text('Next'));
-        await tester.pumpAndSettle();
-      }
+      // Reach API key step (6) via: Next, Next, Skip vehicles, Next, Next
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Skip'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
 
       expect(find.text('6 / 7'), findsOneWidget);
 
-      // Skip
+      // Skip API key
       await tester.tap(find.text('Skip'));
       await tester.pumpAndSettle();
 
@@ -127,11 +141,17 @@ void main() {
     testWidgets('last step shows Get started button', (tester) async {
       await pumpWizard(tester);
 
-      // Navigate to last step (skip API key)
-      for (var i = 0; i < 5; i++) {
-        await tester.tap(find.text('Next'));
-        await tester.pumpAndSettle();
-      }
+      // Navigate to last step skipping Vehicles + API Key.
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Skip'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Skip'));
       await tester.pumpAndSettle();
 
@@ -159,14 +179,20 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // 6 steps (Welcome, Country, Preferences, Landing, Vehicles, Done)
+      // 6 steps (Welcome, Country, Vehicles, Preferences, Landing, Done)
       expect(find.text('1 / 6'), findsOneWidget);
 
-      // Navigate through all steps
-      for (var i = 0; i < 5; i++) {
-        await tester.tap(find.text('Next'));
-        await tester.pumpAndSettle();
-      }
+      // Navigate through all steps, skipping Vehicles.
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Skip'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
 
       // Should be on completion step
       expect(find.text('6 / 6'), findsOneWidget);
@@ -192,13 +218,15 @@ void main() {
     testWidgets('preferences step shows fuel type chips', (tester) async {
       await pumpWizard(tester);
 
-      // Navigate to preferences step (step 3)
+      // Navigate to preferences (step 4 — after Welcome/Country/Vehicles).
       await tester.tap(find.text('Next'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Skip')); // skip Vehicles
       await tester.pumpAndSettle();
 
-      expect(find.text('3 / 7'), findsOneWidget);
+      expect(find.text('4 / 7'), findsOneWidget);
       expect(find.text('Your preferences'), findsOneWidget);
       expect(find.byType(Slider), findsOneWidget);
     });
@@ -206,27 +234,27 @@ void main() {
     testWidgets('landing screen step shows options', (tester) async {
       await pumpWizard(tester);
 
-      // Navigate to landing step (step 4)
-      for (var i = 0; i < 3; i++) {
-        await tester.tap(find.text('Next'));
-        await tester.pumpAndSettle();
-      }
-
-      expect(find.text('4 / 7'), findsOneWidget);
-      expect(find.text('Home screen'), findsOneWidget);
-    });
-
-    testWidgets('vehicles step appears between landing and API key',
-        (tester) async {
-      await pumpWizard(tester);
-
-      // Navigate to vehicles step (step 5 — index 4)
+      // Landing is now step 5 (after Vehicles + Preferences).
       for (var i = 0; i < 4; i++) {
         await tester.tap(find.text('Next'));
         await tester.pumpAndSettle();
       }
 
       expect(find.text('5 / 7'), findsOneWidget);
+      expect(find.text('Home screen'), findsOneWidget);
+    });
+
+    testWidgets('vehicles step appears BEFORE preferences (step 3)',
+        (tester) async {
+      await pumpWizard(tester);
+
+      // Vehicles is now step 3 — after Welcome + Country.
+      for (var i = 0; i < 2; i++) {
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
+      }
+
+      expect(find.text('3 / 7'), findsOneWidget);
       expect(find.text('My vehicles (optional)'), findsOneWidget);
       // Vehicles step is skippable.
       expect(find.text('Skip'), findsOneWidget);
