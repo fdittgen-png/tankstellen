@@ -1794,6 +1794,18 @@ class AppLocalizationsDe extends AppLocalizations {
       'Überspringen, um die Einrichtung abzuschließen — Sie können Fahrzeuge jederzeit in den Einstellungen hinzufügen.';
 
   @override
+  String get fillUpVehicleLabel => 'Fahrzeug (optional)';
+
+  @override
+  String get fillUpVehicleNone => 'Kein Fahrzeug';
+
+  @override
+  String get profileDefaultVehicleLabel => 'Standardfahrzeug (optional)';
+
+  @override
+  String get profileDefaultVehicleNone => 'Kein Standard';
+
+  @override
   String get vehicleAdd => 'Fahrzeug hinzufügen';
 
   @override

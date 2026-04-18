@@ -3391,6 +3391,30 @@ abstract class AppLocalizations {
   /// **'Skip to finish setup — you can add vehicles anytime from Settings.'**
   String get vehiclesWizardSkipHint;
 
+  /// No description provided for @fillUpVehicleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle (optional)'**
+  String get fillUpVehicleLabel;
+
+  /// No description provided for @fillUpVehicleNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No vehicle'**
+  String get fillUpVehicleNone;
+
+  /// No description provided for @profileDefaultVehicleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Default vehicle (optional)'**
+  String get profileDefaultVehicleLabel;
+
+  /// No description provided for @profileDefaultVehicleNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No default'**
+  String get profileDefaultVehicleNone;
+
   /// No description provided for @vehicleAdd.
   ///
   /// In en, this message translates to:

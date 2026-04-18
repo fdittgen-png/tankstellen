@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/language/language_provider.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../providers/profile_edit_provider.dart';
 import 'country_change_dialog.dart';
@@ -141,6 +142,8 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
                 value: editState.landingScreen,
                 onChanged: editCtrl.setLandingScreen,
               ),
+              const SizedBox(height: 16),
+              _DefaultVehicleSection(state: editState, ctrl: editCtrl),
               const SizedBox(height: 16),
               _CountrySection(state: editState, ctrl: editCtrl),
               const SizedBox(height: 16),

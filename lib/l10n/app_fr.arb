@@ -695,5 +695,9 @@
       "count": { "type": "int" }
     }
   },
-  "vehiclesWizardSkipHint": "Ignorer pour terminer la configuration — vous pouvez ajouter des véhicules à tout moment depuis les Paramètres."
+  "vehiclesWizardSkipHint": "Ignorer pour terminer la configuration — vous pouvez ajouter des véhicules à tout moment depuis les Paramètres.",
+  "fillUpVehicleLabel": "Véhicule (facultatif)",
+  "fillUpVehicleNone": "Aucun véhicule",
+  "profileDefaultVehicleLabel": "Véhicule par défaut (facultatif)",
+  "profileDefaultVehicleNone": "Aucun par défaut"
 }

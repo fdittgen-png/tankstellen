@@ -777,6 +777,10 @@
     }
   },
   "vehiclesWizardSkipHint": "Überspringen, um die Einrichtung abzuschließen — Sie können Fahrzeuge jederzeit in den Einstellungen hinzufügen.",
+  "fillUpVehicleLabel": "Fahrzeug (optional)",
+  "fillUpVehicleNone": "Kein Fahrzeug",
+  "profileDefaultVehicleLabel": "Standardfahrzeug (optional)",
+  "profileDefaultVehicleNone": "Kein Standard",
   "vehicleAdd": "Fahrzeug hinzufügen",
   "vehicleAddTitle": "Fahrzeug hinzufügen",
   "vehicleEditTitle": "Fahrzeug bearbeiten",

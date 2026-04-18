@@ -804,6 +804,10 @@
     }
   },
   "vehiclesWizardSkipHint": "Skip to finish setup — you can add vehicles anytime from Settings.",
+  "fillUpVehicleLabel": "Vehicle (optional)",
+  "fillUpVehicleNone": "No vehicle",
+  "profileDefaultVehicleLabel": "Default vehicle (optional)",
+  "profileDefaultVehicleNone": "No default",
   "vehicleAdd": "Add vehicle",
   "vehicleAddTitle": "Add vehicle",
   "vehicleEditTitle": "Edit vehicle",

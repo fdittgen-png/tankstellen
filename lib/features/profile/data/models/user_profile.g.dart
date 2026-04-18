@@ -38,6 +38,7 @@ _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
           ?.map((e) => $enumDecode(_$StationAmenityEnumMap, e))
           .toList() ??
       const [],
+  defaultVehicleId: json['defaultVehicleId'] as String?,
 );
 
 Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
@@ -62,6 +63,7 @@ Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
       'preferredAmenities': instance.preferredAmenities
           .map((e) => _$StationAmenityEnumMap[e]!)
           .toList(),
+      'defaultVehicleId': instance.defaultVehicleId,
     };
 
 const _$LandingScreenEnumMap = {

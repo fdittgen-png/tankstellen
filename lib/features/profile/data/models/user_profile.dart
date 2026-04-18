@@ -54,6 +54,11 @@ abstract class UserProfile with _$UserProfile {
     /// Amenities the user requires at stations by default (empty = no filter).
     /// Persisted per-profile and loaded into the search criteria screen.
     @Default([]) List<StationAmenity> preferredAmenities,
+    /// Optional reference to the user's default [VehicleProfile] (#694).
+    /// When set, AddFillUpScreen pre-selects this vehicle. Null keeps the
+    /// vehicle selector empty so the user can still log fill-ups without
+    /// attributing them to any vehicle.
+    String? defaultVehicleId,
   }) = _UserProfile;
 
   factory UserProfile.fromJson(Map<String, dynamic> json) =>

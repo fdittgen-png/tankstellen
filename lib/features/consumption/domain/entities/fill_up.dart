@@ -22,6 +22,11 @@ abstract class FillUp with _$FillUp {
     String? stationId,
     String? stationName,
     String? notes,
+    /// Optional reference to the [VehicleProfile] this fill-up belongs to
+    /// (#694). Null means the user logged the fill-up without attributing
+    /// it to a specific vehicle. Used to group per-vehicle stats and to
+    /// pre-fill the next log entry.
+    String? vehicleId,
   }) = _FillUp;
 
   factory FillUp.fromJson(Map<String, dynamic> json) => _$FillUpFromJson(json);

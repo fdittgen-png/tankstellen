@@ -1782,6 +1782,18 @@ class AppLocalizationsSv extends AppLocalizations {
       'Skip to finish setup — you can add vehicles anytime from Settings.';
 
   @override
+  String get fillUpVehicleLabel => 'Vehicle (optional)';
+
+  @override
+  String get fillUpVehicleNone => 'No vehicle';
+
+  @override
+  String get profileDefaultVehicleLabel => 'Default vehicle (optional)';
+
+  @override
+  String get profileDefaultVehicleNone => 'No default';
+
+  @override
   String get vehicleAdd => 'Add vehicle';
 
   @override
