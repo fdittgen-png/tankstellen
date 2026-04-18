@@ -36,10 +36,14 @@ class EvStationDetailScreen extends ConsumerWidget {
             tooltip: isFav
                 ? (l10n?.removeFavorite ?? 'Remove from favorites')
                 : (l10n?.addFavorite ?? 'Add to favorites'),
-            onPressed: () {
-              ref
+            onPressed: () async {
+              // Await the toggle so the snackbar lies become impossible
+              // and the isFavoriteProvider has flipped before we show
+              // any feedback (#566).
+              await ref
                   .read(favoritesProvider.notifier)
                   .toggle(station.id, rawJson: station.toJson());
+              if (!context.mounted) return;
               final msg = isFav
                   ? (l10n?.removedFromFavorites ?? 'Removed from favorites')
                   : (l10n?.addedToFavorites ?? 'Added to favorites');
