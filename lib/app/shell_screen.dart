@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/utils/frame_callbacks.dart';
 import '../l10n/app_localizations.dart';
+import 'current_shell_branch_provider.dart';
 import 'responsive_search_layout.dart';
 
 /// The main app shell with adaptive navigation.
@@ -20,15 +22,15 @@ import 'responsive_search_layout.dart';
 /// ## Navigation flow:
 /// User taps tab → `_goToPage()` → plays animation → calls `goBranch()`
 /// → go_router switches the visible branch → `navigationShell` renders new page
-class ShellScreen extends StatefulWidget {
+class ShellScreen extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
   const ShellScreen({super.key, required this.navigationShell});
 
   @override
-  State<ShellScreen> createState() => _ShellScreenState();
+  ConsumerState<ShellScreen> createState() => _ShellScreenState();
 }
 
-class _ShellScreenState extends State<ShellScreen> with TickerProviderStateMixin {
+class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderStateMixin {
   late final List<AnimationController> _iconControllers;
   late AnimationController _transitionController;
   late Animation<Offset> _slideInAnim;
@@ -99,6 +101,10 @@ class _ShellScreenState extends State<ShellScreen> with TickerProviderStateMixin
     });
 
     setState(() => _currentIndex = index);
+    // Publish the new branch index so observers (e.g. MapScreen for its
+    // tile-viewport nudge, #696) can react without reaching into this
+    // widget's private state.
+    ref.read(currentShellBranchProvider.notifier).set(index);
 
     // Navigate via go_router — this preserves each branch's state
     widget.navigationShell.goBranch(
@@ -126,6 +132,7 @@ class _ShellScreenState extends State<ShellScreen> with TickerProviderStateMixin
       safePostFrame(() {
         if (routerIndex != _currentIndex) {
           setState(() => _currentIndex = routerIndex);
+          ref.read(currentShellBranchProvider.notifier).set(routerIndex);
         }
       });
     }

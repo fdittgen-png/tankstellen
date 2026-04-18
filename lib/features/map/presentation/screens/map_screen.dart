@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../app/current_shell_branch_provider.dart';
 import '../../../driving/presentation/widgets/driving_mode_fab.dart';
 import '../../../ev/presentation/widgets/ev_filter_chips.dart';
 import '../../../ev/presentation/widgets/ev_map_overlay.dart';
@@ -82,6 +83,26 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           }
         });
       }
+    });
+
+    // #696 — every time the Map tab becomes the active branch, nudge
+    // the controller so the TileLayer recomputes its viewport. Needed
+    // because the shell's IndexedStack pre-mounts every branch with
+    // degenerate constraints and no lifecycle event retriggers when
+    // the user navigates back to the tab later.
+    ref.listen<int>(currentShellBranchProvider, (prev, next) {
+      const mapBranchIndex = 1;
+      if (next != mapBranchIndex || prev == next) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        try {
+          final camera = _mapController.camera;
+          _mapController.move(camera.center, camera.zoom);
+        } catch (_) {
+          // Controller not yet attached — the `onMapReady` fallback
+          // inside StationMapLayers will do the first load.
+        }
+      });
     });
 
     final searchState = ref.watch(searchStateProvider);
