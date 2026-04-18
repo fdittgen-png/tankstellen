@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/eco_score.dart';
 
 /// Compact "eco-score" badge shown on each fill-up card.
@@ -19,18 +20,29 @@ class EcoScoreBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final (icon, color) = _styleFor(score.direction, theme);
 
     final deltaText =
         '${score.deltaPercent >= 0 ? '+' : ''}${score.deltaPercent.toStringAsFixed(0)}%';
     final lp100Text = score.litersPer100Km.toStringAsFixed(1);
-    final tooltip =
+    final avgText = score.rollingAverage.toStringAsFixed(1);
+
+    // Compose the badge text from the localised consumption unit +
+    // the raw delta; the delta itself (+/− and %) is locale-neutral.
+    final consumptionText =
+        l10n?.ecoScoreConsumption(lp100Text) ?? '$lp100Text L/100 km';
+    final badgeText = '$consumptionText · $deltaText';
+
+    final tooltip = l10n?.ecoScoreTooltip(avgText) ??
         'Compared to the rolling average over your last 3 fill-ups '
-        '(${score.rollingAverage.toStringAsFixed(1)} L/100 km).';
+            '($avgText L/100 km).';
+    final semanticsLabel = l10n?.ecoScoreSemantics(lp100Text, deltaText) ??
+        'Consumption $lp100Text L/100 km, $deltaText versus your '
+            'rolling average';
 
     return Semantics(
-      label: 'Consumption $lp100Text L/100 km, $deltaText versus your '
-          'rolling average',
+      label: semanticsLabel,
       child: Tooltip(
         message: tooltip,
         child: Row(
@@ -39,7 +51,7 @@ class EcoScoreBadge extends StatelessWidget {
             Icon(icon, size: 14, color: color),
             const SizedBox(width: 4),
             Text(
-              '$lp100Text L/100 km · $deltaText',
+              badgeText,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: color,
                 fontWeight: FontWeight.w600,

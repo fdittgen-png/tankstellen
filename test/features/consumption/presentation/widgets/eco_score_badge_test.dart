@@ -110,4 +110,36 @@ void main() {
       expect(semantics.label, contains('-10%'));
     });
   });
+
+  group('EcoScoreBadge — localisation', () {
+    testWidgets('French locale renders the French tooltip', (tester) async {
+      await pumpApp(
+        tester,
+        EcoScoreBadge(score: _score(lp100: 5.4, avg: 6.0, delta: -10)),
+        locale: const Locale('fr'),
+      );
+      final tip = tester.widget<Tooltip>(find.byType(Tooltip));
+      expect(tip.message, contains('moyenne glissante'));
+    });
+
+    testWidgets('German locale renders the German tooltip', (tester) async {
+      await pumpApp(
+        tester,
+        EcoScoreBadge(score: _score(lp100: 5.4, avg: 6.0, delta: -10)),
+        locale: const Locale('de'),
+      );
+      final tip = tester.widget<Tooltip>(find.byType(Tooltip));
+      expect(tip.message, contains('Durchschnitt'));
+    });
+
+    testWidgets('English locale renders the English tooltip', (tester) async {
+      await pumpApp(
+        tester,
+        EcoScoreBadge(score: _score(lp100: 5.4, avg: 6.0, delta: -10)),
+        locale: const Locale('en'),
+      );
+      final tip = tester.widget<Tooltip>(find.byType(Tooltip));
+      expect(tip.message, contains('rolling average'));
+    });
+  });
 }

@@ -2936,6 +2936,24 @@ abstract class AppLocalizations {
   /// **'Pay with {app}'**
   String payWithApp(String app);
 
+  /// Fuel consumption number on the eco-score badge
+  ///
+  /// In en, this message translates to:
+  /// **'{value} L/100 km'**
+  String ecoScoreConsumption(String value);
+
+  /// Eco-score badge tooltip explaining the 3-fill-up window
+  ///
+  /// In en, this message translates to:
+  /// **'Compared to the rolling average over your last 3 fill-ups ({avg} L/100 km).'**
+  String ecoScoreTooltip(String avg);
+
+  /// TalkBack / VoiceOver label for the eco-score badge
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption {value} L/100 km, {delta} versus your rolling average'**
+  String ecoScoreSemantics(String value, String delta);
+
   /// No description provided for @drivingMode.
   ///
   /// In en, this message translates to:

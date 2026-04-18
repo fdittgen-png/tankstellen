@@ -1535,6 +1535,21 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String ecoScoreConsumption(String value) {
+    return '$value L/100 km';
+  }
+
+  @override
+  String ecoScoreTooltip(String avg) {
+    return 'Verglichen mit dem Durchschnitt deiner letzten 3 Tankungen ($avg L/100 km).';
+  }
+
+  @override
+  String ecoScoreSemantics(String value, String delta) {
+    return 'Verbrauch $value L/100 km, $delta gegenüber deinem Durchschnitt';
+  }
+
+  @override
   String get drivingMode => 'Fahrmodus';
 
   @override

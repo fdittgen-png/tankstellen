@@ -679,6 +679,24 @@
     "description": "Button label to open a branded station payment app",
     "placeholders": { "app": { "type": "String", "example": "Shell App" } }
   },
+  "ecoScoreConsumption": "{value} L/100 km",
+  "@ecoScoreConsumption": {
+    "description": "Fuel consumption number on the eco-score badge",
+    "placeholders": { "value": { "type": "String", "example": "5.4" } }
+  },
+  "ecoScoreTooltip": "Compared to the rolling average over your last 3 fill-ups ({avg} L/100 km).",
+  "@ecoScoreTooltip": {
+    "description": "Eco-score badge tooltip explaining the 3-fill-up window",
+    "placeholders": { "avg": { "type": "String", "example": "6.0" } }
+  },
+  "ecoScoreSemantics": "Consumption {value} L/100 km, {delta} versus your rolling average",
+  "@ecoScoreSemantics": {
+    "description": "TalkBack / VoiceOver label for the eco-score badge",
+    "placeholders": {
+      "value": { "type": "String", "example": "5.4" },
+      "delta": { "type": "String", "example": "-10%" }
+    }
+  },
   "drivingMode": "Driving Mode",
   "drivingExit": "Exit",
   "drivingNearestStation": "Nearest",
