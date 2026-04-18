@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/services/widgets/service_status_banner.dart';
-import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -29,16 +28,6 @@ class FavoritesFuelTab extends ConsumerWidget {
     final stationsState = ref.watch(favoriteStationsProvider);
     final evStations = ref.watch(evFavoriteStationsProvider);
     final hasEvFavorites = evStations.isNotEmpty;
-
-    // Live diagnostic for #690: count EV ids in storage vs rendered cards.
-    // Any mismatch means a favorite landed an id but lost its station JSON
-    // (orphan) — user can see the count and file a reproducible bug.
-    final storage = ref.read(storageRepositoryProvider);
-    final rawEvIds = storage.getEvFavoriteIds();
-    final rawEvWithData = rawEvIds
-        .where((id) => storage.getEvFavoriteStationData(id) != null)
-        .length;
-    final evMismatch = rawEvIds.length != rawEvWithData;
 
     if (favoriteIds.isEmpty) {
       return Semantics(
@@ -75,25 +64,6 @@ class FavoritesFuelTab extends ConsumerWidget {
             children: [
               if (result.data.isNotEmpty)
                 ServiceStatusBanner(result: result),
-              // Diagnostic banner for #690 — visible on device so the
-              // user can tell us exactly where the EV favorite broke:
-              // N ids in storage, M with station data, K actually rendered.
-              Container(
-                width: double.infinity,
-                color: evMismatch ? Colors.red.shade50 : Colors.blue.shade50,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                child: Text(
-                  'v5016 diag — EV: ${rawEvIds.length} ids / $rawEvWithData with data / '
-                  '${evStations.length} rendered',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: evMismatch
-                        ? Colors.red.shade900
-                        : Colors.blue.shade900,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-              ),
               const SwipeTutorialBanner(),
               Expanded(
                 child: ListView(

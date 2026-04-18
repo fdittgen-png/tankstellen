@@ -1,8 +1,11 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../core/country/country_config.dart';
+import '../../../core/country/country_provider.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
+import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../../../core/sync/sync_service.dart';
@@ -269,25 +272,81 @@ class FavoriteStations extends _$FavoriteStations {
         return;
       }
 
-      final stationService = ref.read(stationServiceProvider);
+      // #695 — favorites can span countries. Refresh each country's
+      // stations with its OWN service, so a favorite from Italy keeps
+      // refreshing even when the active profile is Germany. The active
+      // country's service is reused (not re-resolved) so test overrides
+      // on stationServiceProvider still drive the right instance.
       try {
-        if (missingIds.isNotEmpty) {
-          for (final id in missingIds) {
+        final activeCountryCode =
+            ref.read(activeCountryProvider).code;
+        final activeService = ref.read(stationServiceProvider);
+        StationService serviceFor(String code) =>
+            (code.isEmpty || code == activeCountryCode)
+                ? activeService
+                : stationServiceForCountry(ref, code);
+
+        String countryOf(String id, {double? lat, double? lng}) {
+          final c = (lat != null && lng != null)
+              ? Countries.countryForStation(id: id, lat: lat, lng: lng)
+              : Countries.countryForStationId(id);
+          return c?.code ?? '';
+        }
+
+        final Map<String, List<String>> idsByCountry = {};
+        final Map<String, String> idToCountry = {};
+        for (final s in stations) {
+          final code = countryOf(s.id, lat: s.lat, lng: s.lng);
+          idToCountry[s.id] = code;
+          idsByCountry.putIfAbsent(code, () => []).add(s.id);
+        }
+        for (final id in missingIds) {
+          final code = countryOf(id);
+          idToCountry[id] = code;
+          idsByCountry.putIfAbsent(code, () => []).add(id);
+        }
+
+        // Fetch missing details per-country.
+        for (final entry in idsByCountry.entries) {
+          final code = entry.key;
+          final missingInCountry =
+              entry.value.where(missingIds.contains).toList();
+          if (missingInCountry.isEmpty) continue;
+          final service = serviceFor(code);
+          for (final id in missingInCountry) {
             try {
-              final detail = await stationService.getStationDetail(id);
+              final detail = await service.getStationDetail(id);
               final s = detail.data.station;
               stations.add(s);
               await storage.saveFavoriteStationData(id, s.toJson());
             } catch (e) {
-              debugPrint('FavoriteStations: fetch detail $id: $e');
+              debugPrint('FavoriteStations: fetch detail $id ($code): $e');
             }
           }
         }
 
-        final pricesResult = await stationService.getPrices(fuelIds);
+        // Fetch fresh prices per-country, merge results.
+        final freshPrices = <String, StationPrices>{};
+        ServiceResult<Map<String, StationPrices>>? lastResult;
+        var attemptedCountries = 0;
+        var successCountries = 0;
+        for (final entry in idsByCountry.entries) {
+          final ids = entry.value;
+          if (ids.isEmpty) continue;
+          attemptedCountries++;
+          final service = serviceFor(entry.key);
+          try {
+            final result = await service.getPrices(ids);
+            freshPrices.addAll(result.data);
+            lastResult = result;
+            successCountries++;
+          } on Exception catch (e) {
+            debugPrint('FavoriteStations: prices for ${entry.key} failed: $e');
+          }
+        }
 
         final updated = stations.map((s) {
-          final fresh = pricesResult.data[s.id];
+          final fresh = freshPrices[s.id];
           if (fresh == null) return s;
           return s.copyWith(
             e5: fresh.e5 ?? s.e5,
@@ -298,15 +357,24 @@ class FavoriteStations extends _$FavoriteStations {
         }).toList();
 
         for (final s in updated) {
-          await storage.saveFavoriteStationData(s.id, s.toJson());
+          try {
+            await storage.saveFavoriteStationData(s.id, s.toJson());
+          } catch (e) {
+            debugPrint('FavoriteStations: re-persist ${s.id} failed: $e');
+          }
         }
 
+        // Mark stale when every per-country fetch failed — this matches
+        // the pre-#695 contract where a single failed getPrices produced
+        // stale-cache state so the user knows prices may be outdated.
+        final allFailed =
+            attemptedCountries > 0 && successCountries == 0;
         state = AsyncValue.data(ServiceResult(
           data: updated,
-          source: pricesResult.source,
-          fetchedAt: pricesResult.fetchedAt,
-          isStale: pricesResult.isStale,
-          errors: pricesResult.errors,
+          source: lastResult?.source ?? ServiceSource.cache,
+          fetchedAt: lastResult?.fetchedAt ?? DateTime.now(),
+          isStale: allFailed ? true : (lastResult?.isStale ?? false),
+          errors: lastResult?.errors ?? const [],
         ));
       } on Exception catch (e) {
         debugPrint('Favorites price refresh failed: $e');
