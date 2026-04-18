@@ -91,7 +91,10 @@ class ConsumptionScreen extends ConsumerWidget {
                         .read(fillUpListProvider.notifier)
                         .remove(fillUp.id);
                   },
-                  child: FillUpCard(fillUp: fillUp),
+                  child: FillUpCard(
+                    fillUp: fillUp,
+                    ecoScore: ref.watch(ecoScoreForFillUpProvider(fillUp.id)),
+                  ),
                 );
               },
             ),
