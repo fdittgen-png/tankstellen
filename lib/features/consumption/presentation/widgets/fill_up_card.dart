@@ -3,14 +3,27 @@ import 'package:flutter/material.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../domain/entities/eco_score.dart';
 import '../../domain/entities/fill_up.dart';
+import 'eco_score_badge.dart';
 
 /// Compact card showing a single [FillUp] entry.
+///
+/// When an [ecoScore] is supplied (computed against the user's recent
+/// fill-up history), an eco-score badge appears under the cost line —
+/// turning the card from a passive record into a driving-behaviour
+/// nudge. See issue #676 and the project leitmotiv in CLAUDE.md.
 class FillUpCard extends StatelessWidget {
   final FillUp fillUp;
+  final EcoScore? ecoScore;
   final VoidCallback? onTap;
 
-  const FillUpCard({super.key, required this.fillUp, this.onTap});
+  const FillUpCard({
+    super.key,
+    required this.fillUp,
+    this.ecoScore,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +68,10 @@ class FillUpCard extends StatelessWidget {
               '$volume · $costStr · $ppl',
               style: theme.textTheme.bodySmall,
             ),
+            if (ecoScore != null) ...[
+              const SizedBox(height: 4),
+              EcoScoreBadge(score: ecoScore!),
+            ],
           ],
         ),
         trailing: Text(

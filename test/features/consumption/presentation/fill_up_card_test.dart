@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/domain/entities/consumption_stats.dart';
+import 'package:tankstellen/features/consumption/domain/entities/eco_score.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/consumption_stats_card.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/eco_score_badge.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_card.dart';
-import 'package:tankstellen/features/consumption/domain/entities/consumption_stats.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -49,6 +51,44 @@ void main() {
     await pumpApp(tester, FillUpCard(fillUp: fillUp));
 
     expect(find.text('E10'), findsWidgets);
+  });
+
+  testWidgets('FillUpCard omits the eco-score badge when no score is provided',
+      (tester) async {
+    final fillUp = FillUp(
+      id: 'test',
+      date: DateTime(2026, 3, 15),
+      liters: 40,
+      totalCost: 60,
+      odometerKm: 1000,
+      fuelType: FuelType.e10,
+      stationName: 'Test',
+    );
+    await pumpApp(tester, FillUpCard(fillUp: fillUp));
+    expect(find.byType(EcoScoreBadge), findsNothing);
+  });
+
+  testWidgets('FillUpCard shows the eco-score badge when a score is provided',
+      (tester) async {
+    final fillUp = FillUp(
+      id: 'test',
+      date: DateTime(2026, 3, 15),
+      liters: 40,
+      totalCost: 60,
+      odometerKm: 1000,
+      fuelType: FuelType.e10,
+      stationName: 'Test',
+    );
+    const score = EcoScore(
+      litersPer100Km: 5.4,
+      rollingAverage: 6.0,
+      deltaPercent: -10,
+      direction: EcoScoreDirection.improving,
+    );
+    await pumpApp(tester, FillUpCard(fillUp: fillUp, ecoScore: score));
+    expect(find.byType(EcoScoreBadge), findsOneWidget);
+    // The delta text surfaces from inside the badge.
+    expect(find.textContaining('-10%'), findsOneWidget);
   });
 
   testWidgets('FillUpCard calls onTap when tapped', (tester) async {
