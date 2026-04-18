@@ -57,15 +57,21 @@ class NearbyMapView extends ConsumerWidget {
 
         final showEv = ref.watch(evShowOnMapProvider);
         final userPos = ref.read(userPositionProvider);
-        // Prefer the user's actual position as the radius origin so the
-        // viewport-fit matches the search circle drawn on the map.
-        final center = userPos != null
-            ? LatLng(userPos.lat, userPos.lng)
-            : StationMapLayers.centerOf(stations);
+        // Center the viewport on the SEARCHED area, not the user's GPS.
+        // Otherwise a ZIP/city search from a distant location (e.g. user
+        // in Castelnau-de-Guers searching "Paris") pans the map to the
+        // user's position while the stations sit 700 km away, leaving
+        // the screen empty (#692). Fall back to userPos only when the
+        // result set is empty (no station centroid to compute).
+        final center = stations.isNotEmpty
+            ? StationMapLayers.centerOf(stations)
+            : (userPos != null
+                ? LatLng(userPos.lat, userPos.lng)
+                : const LatLng(0, 0));
         final zoom = StationMapLayers.zoomForRadius(searchRadiusKm);
 
-        final evLat = userPos?.lat ?? center.latitude;
-        final evLng = userPos?.lng ?? center.longitude;
+        final evLat = center.latitude;
+        final evLng = center.longitude;
         final extraLayers = <Widget>[];
         if (showEv) {
           extraLayers.add(

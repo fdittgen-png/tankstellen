@@ -1769,6 +1769,31 @@ class AppLocalizationsDe extends AppLocalizations {
       'Fügen Sie Ihr Fahrzeug hinzu, um nach Anschlüssen zu filtern und Ladekosten zu schätzen.';
 
   @override
+  String get vehiclesWizardTitle => 'Meine Fahrzeuge (optional)';
+
+  @override
+  String get vehiclesWizardSubtitle =>
+      'Fügen Sie Ihr Auto hinzu, um das Verbrauchsprotokoll vorzubelegen und EV-Anschlussfilter zu aktivieren. Sie können diesen Schritt überspringen und Fahrzeuge später hinzufügen.';
+
+  @override
+  String get vehiclesWizardNoneYet => 'Noch kein Fahrzeug konfiguriert.';
+
+  @override
+  String vehiclesWizardYoursList(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fahrzeuge',
+      one: '1 Fahrzeug',
+    );
+    return 'Sie haben $_temp0:';
+  }
+
+  @override
+  String get vehiclesWizardSkipHint =>
+      'Überspringen, um die Einrichtung abzuschließen — Sie können Fahrzeuge jederzeit in den Einstellungen hinzufügen.';
+
+  @override
   String get vehicleAdd => 'Fahrzeug hinzufügen';
 
   @override

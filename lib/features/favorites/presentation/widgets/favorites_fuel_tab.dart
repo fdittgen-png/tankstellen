@@ -98,11 +98,30 @@ class FavoritesFuelTab extends ConsumerWidget {
               Expanded(
                 child: ListView(
                   children: [
+                    // Fuel stations first (#692) — they're the app's primary
+                    // use-case; EV is a secondary section below.
+                    if (result.data.isNotEmpty) ...[
+                      if (hasEvFavorites)
+                        FavoritesSectionHeader(
+                          icon: Icons.local_gas_station,
+                          label: l10n?.fuelStationsSection ?? 'Fuel Stations',
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                        ),
+                      ...result.data.map(
+                        (station) =>
+                            FavoriteStationDismissible(station: station),
+                      ),
+                    ],
                     if (hasEvFavorites) ...[
                       FavoritesSectionHeader(
                         icon: Icons.ev_station,
                         label: l10n?.evChargingSection ?? 'EV Charging',
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                        padding: EdgeInsets.fromLTRB(
+                          16,
+                          result.data.isNotEmpty ? 12 : 8,
+                          16,
+                          4,
+                        ),
                       ),
                       ...evStations.map((ev) => EvFavoriteCard(
                             key: ValueKey('ev-${ev.id}'),
@@ -120,16 +139,7 @@ class FavoritesFuelTab extends ConsumerWidget {
                               );
                             },
                           )),
-                      if (result.data.isNotEmpty)
-                        FavoritesSectionHeader(
-                          icon: Icons.local_gas_station,
-                          label: l10n?.fuelStationsSection ?? 'Fuel Stations',
-                        ),
                     ],
-                    ...result.data.map(
-                      (station) =>
-                          FavoriteStationDismissible(station: station),
-                    ),
                   ],
                 ),
               ),

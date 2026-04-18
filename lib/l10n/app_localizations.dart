@@ -3361,6 +3361,36 @@ abstract class AppLocalizations {
   /// **'Add your car to filter by connector and estimate charging costs.'**
   String get vehiclesEmptyMessage;
 
+  /// No description provided for @vehiclesWizardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My vehicles (optional)'**
+  String get vehiclesWizardTitle;
+
+  /// No description provided for @vehiclesWizardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your car to pre-fill the consumption log and enable EV connector filters. You can skip this and add vehicles later.'**
+  String get vehiclesWizardSubtitle;
+
+  /// No description provided for @vehiclesWizardNoneYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No vehicle configured yet.'**
+  String get vehiclesWizardNoneYet;
+
+  /// No description provided for @vehiclesWizardYoursList.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {count, plural, =1{1 vehicle} other{{count} vehicles}}:'**
+  String vehiclesWizardYoursList(int count);
+
+  /// No description provided for @vehiclesWizardSkipHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip to finish setup — you can add vehicles anytime from Settings.'**
+  String get vehiclesWizardSkipHint;
+
   /// No description provided for @vehicleAdd.
   ///
   /// In en, this message translates to:

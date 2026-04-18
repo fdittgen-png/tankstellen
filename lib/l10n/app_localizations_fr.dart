@@ -1765,6 +1765,32 @@ class AppLocalizationsFr extends AppLocalizations {
       'Add your car to filter by connector and estimate charging costs.';
 
   @override
+  String get vehiclesWizardTitle => 'Mes véhicules (facultatif)';
+
+  @override
+  String get vehiclesWizardSubtitle =>
+      'Ajoutez votre voiture pour pré-remplir le journal de consommation et activer les filtres de connecteurs EV. Vous pouvez ignorer cette étape et ajouter des véhicules plus tard.';
+
+  @override
+  String get vehiclesWizardNoneYet =>
+      'Aucun véhicule configuré pour le moment.';
+
+  @override
+  String vehiclesWizardYoursList(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count véhicules',
+      one: '1 véhicule',
+    );
+    return 'Vous avez $_temp0 :';
+  }
+
+  @override
+  String get vehiclesWizardSkipHint =>
+      'Ignorer pour terminer la configuration — vous pouvez ajouter des véhicules à tout moment depuis les Paramètres.';
+
+  @override
   String get vehicleAdd => 'Add vehicle';
 
   @override

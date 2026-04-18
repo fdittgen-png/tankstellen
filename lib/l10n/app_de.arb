@@ -767,6 +767,16 @@
   "vehiclesMenuTitle": "Meine Fahrzeuge",
   "vehiclesMenuSubtitle": "Batterie, Anschlüsse, Ladevorlieben",
   "vehiclesEmptyMessage": "Fügen Sie Ihr Fahrzeug hinzu, um nach Anschlüssen zu filtern und Ladekosten zu schätzen.",
+  "vehiclesWizardTitle": "Meine Fahrzeuge (optional)",
+  "vehiclesWizardSubtitle": "Fügen Sie Ihr Auto hinzu, um das Verbrauchsprotokoll vorzubelegen und EV-Anschlussfilter zu aktivieren. Sie können diesen Schritt überspringen und Fahrzeuge später hinzufügen.",
+  "vehiclesWizardNoneYet": "Noch kein Fahrzeug konfiguriert.",
+  "vehiclesWizardYoursList": "Sie haben {count, plural, =1{1 Fahrzeug} other{{count} Fahrzeuge}}:",
+  "@vehiclesWizardYoursList": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "vehiclesWizardSkipHint": "Überspringen, um die Einrichtung abzuschließen — Sie können Fahrzeuge jederzeit in den Einstellungen hinzufügen.",
   "vehicleAdd": "Fahrzeug hinzufügen",
   "vehicleAddTitle": "Fahrzeug hinzufügen",
   "vehicleEditTitle": "Fahrzeug bearbeiten",

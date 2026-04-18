@@ -685,5 +685,15 @@
   "noStorageUsed": "Aucun stockage utilisé",
   "aboutReportBug": "Signaler un bug / Suggérer une fonctionnalité",
   "aboutSupportProject": "Soutenir ce projet",
-  "aboutSupportDescription": "Cette application est gratuite, open source et sans publicité. Si vous la trouvez utile, soutenez le développeur."
+  "aboutSupportDescription": "Cette application est gratuite, open source et sans publicité. Si vous la trouvez utile, soutenez le développeur.",
+  "vehiclesWizardTitle": "Mes véhicules (facultatif)",
+  "vehiclesWizardSubtitle": "Ajoutez votre voiture pour pré-remplir le journal de consommation et activer les filtres de connecteurs EV. Vous pouvez ignorer cette étape et ajouter des véhicules plus tard.",
+  "vehiclesWizardNoneYet": "Aucun véhicule configuré pour le moment.",
+  "vehiclesWizardYoursList": "Vous avez {count, plural, =1{1 véhicule} other{{count} véhicules}} :",
+  "@vehiclesWizardYoursList": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "vehiclesWizardSkipHint": "Ignorer pour terminer la configuration — vous pouvez ajouter des véhicules à tout moment depuis les Paramètres."
 }

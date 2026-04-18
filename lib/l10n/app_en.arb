@@ -794,6 +794,16 @@
   "vehiclesMenuTitle": "My vehicles",
   "vehiclesMenuSubtitle": "Battery, connectors, charging preferences",
   "vehiclesEmptyMessage": "Add your car to filter by connector and estimate charging costs.",
+  "vehiclesWizardTitle": "My vehicles (optional)",
+  "vehiclesWizardSubtitle": "Add your car to pre-fill the consumption log and enable EV connector filters. You can skip this and add vehicles later.",
+  "vehiclesWizardNoneYet": "No vehicle configured yet.",
+  "vehiclesWizardYoursList": "You have {count, plural, =1{1 vehicle} other{{count} vehicles}}:",
+  "@vehiclesWizardYoursList": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "vehiclesWizardSkipHint": "Skip to finish setup — you can add vehicles anytime from Settings.",
   "vehicleAdd": "Add vehicle",
   "vehicleAddTitle": "Add vehicle",
   "vehicleEditTitle": "Edit vehicle",

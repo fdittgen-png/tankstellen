@@ -16,6 +16,7 @@ import '../widgets/landing_screen_step.dart';
 import '../widgets/onboarding_navigation_buttons.dart';
 import '../widgets/onboarding_progress_indicator.dart';
 import '../widgets/preferences_step.dart';
+import '../widgets/vehicles_step.dart';
 import '../widgets/welcome_step.dart';
 
 /// Multi-step onboarding wizard with progress indicator.
@@ -49,9 +50,16 @@ class _OnboardingWizardScreenState
   /// requires an API key.
   int get _stepCount {
     final country = ref.read(activeCountryProvider);
-    // Welcome, Country, Preferences, Landing, [API Key], Done
-    return country.requiresApiKey ? 6 : 5;
+    // Welcome, Country, Preferences, Landing, Vehicles, [API Key], Done
+    return country.requiresApiKey ? 7 : 6;
   }
+
+  /// Zero-based index of the Vehicles step (always after Landing).
+  static const int _vehiclesStepIndex = 4;
+
+  /// Zero-based index of the optional API key step (after Vehicles when
+  /// the country requires a key).
+  int get _apiKeyStepIndex => _vehiclesStepIndex + 1;
 
   bool _isLastStep(int currentStep) => currentStep == _stepCount - 1;
 
@@ -162,8 +170,9 @@ class _OnboardingWizardScreenState
   /// Returns whether the current step is an optional one that can be skipped.
   bool _isCurrentStepSkippable(int currentStep) {
     final country = ref.read(activeCountryProvider);
-    // The API key step is skippable (index 4 when country requires key)
-    return country.requiresApiKey && currentStep == 4;
+    // Vehicles is always skippable; API key is skippable when it shows.
+    if (currentStep == _vehiclesStepIndex) return true;
+    return country.requiresApiKey && currentStep == _apiKeyStepIndex;
   }
 
   List<Widget> _buildSteps() {
@@ -173,6 +182,7 @@ class _OnboardingWizardScreenState
       const CountryLanguageStep(),
       const PreferencesStep(),
       const LandingScreenStep(),
+      const VehiclesStep(),
       if (country.requiresApiKey)
         ApiKeyStep(apiKeyController: _apiKeyController),
       const CompletionStep(),
