@@ -107,10 +107,21 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
                       rawJson: station.toJson(),
                     );
                 if (!context.mounted) return;
+                // Temporary diagnostic: surface live storage counts in the
+                // snackbar so a user on an APK without logcat can verify
+                // the favorite actually persisted.
+                final storage = ref.read(storageRepositoryProvider);
+                final evIds = storage.getEvFavoriteIds();
+                final savedCount = evIds
+                    .where((id) => storage.getEvFavoriteStationData(id) != null)
+                    .length;
+                final base = isFav
+                    ? (l10n?.removedFromFavorites ?? 'Removed from favorites')
+                    : (l10n?.addedToFavorites ?? 'Added to favorites');
                 SnackBarHelper.show(
                   context,
-                  isFav ? (l10n?.removedFromFavorites ?? 'Removed from favorites') : (l10n?.addedToFavorites ?? 'Added to favorites'),
-                  duration: const Duration(seconds: 2),
+                  '$base (EV: ${evIds.length} ids / $savedCount saved)',
+                  duration: const Duration(seconds: 3),
                 );
               },
             );

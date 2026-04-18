@@ -4,6 +4,13 @@ import '../../data/storage_repository.dart';
 import '../hive_boxes.dart';
 import '../storage_keys.dart';
 
+/// Hive round-trips deeply nested maps as `Map<dynamic, dynamic>` / `List<dynamic>`
+/// even when the original write was strongly typed. When those payloads are
+/// handed back to freezed's fromJson (which expects `Map<String, dynamic>`
+/// for every nested object), the cast fails and the station silently drops
+/// out of the favorites list (#690). Use the shared deep-converter so every
+/// level matches what fromJson demands.
+
 /// Hive-backed implementation of [FavoriteStorage] and [IgnoredStorage].
 ///
 /// Manages favorite station IDs, persisted station data for offline access,
@@ -124,8 +131,10 @@ class FavoritesHiveStore
   @override
   Map<String, dynamic>? getEvFavoriteStationData(String stationId) {
     final raw = _getEvFavoriteStationDataRaw()[stationId];
-    if (raw is Map) return Map<String, dynamic>.from(raw);
-    return null;
+    if (raw is! Map) return null;
+    // Deep-convert so nested connectors + addresses keep `Map<String, dynamic>`
+    // typing; otherwise ChargingStation.fromJson fails on the inner cast (#690).
+    return HiveBoxes.toStringDynamicMap(raw);
   }
 
   @override
