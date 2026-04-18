@@ -97,11 +97,16 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
                 size: 26,
               ),
               tooltip: isFav ? (l10n?.removeFavorite ?? 'Remove from favorites') : (l10n?.addFavorite ?? 'Add to favorites'),
-              onPressed: () {
-                ref.read(favoritesProvider.notifier).toggle(
+              onPressed: () async {
+                // Await the toggle so the snackbar fires AFTER persistence
+                // and the isFavoriteProvider has flipped. Otherwise a quick
+                // back-navigation can cancel the in-flight Hive write and
+                // leave the favorite half-persisted (#566).
+                await ref.read(favoritesProvider.notifier).toggle(
                       station.id,
                       rawJson: station.toJson(),
                     );
+                if (!context.mounted) return;
                 SnackBarHelper.show(
                   context,
                   isFav ? (l10n?.removedFromFavorites ?? 'Removed from favorites') : (l10n?.addedToFavorites ?? 'Added to favorites'),
