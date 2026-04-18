@@ -699,5 +699,6 @@
   "fillUpVehicleLabel": "Véhicule (facultatif)",
   "fillUpVehicleNone": "Aucun véhicule",
   "profileDefaultVehicleLabel": "Véhicule par défaut (facultatif)",
-  "profileDefaultVehicleNone": "Aucun par défaut"
+  "profileDefaultVehicleNone": "Aucun par défaut",
+  "profileFuelFromVehicleHint": "Le carburant est dérivé de votre véhicule par défaut. Supprimez le véhicule pour choisir un carburant directement."
 }

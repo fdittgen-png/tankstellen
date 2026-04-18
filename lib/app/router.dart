@@ -119,6 +119,12 @@ GoRouter router(Ref ref) {
       final isConsent = state.matchedLocation == '/consent';
       final isReady = storage.isSetupComplete;
       final isSetup = state.matchedLocation == '/setup';
+      // Routes the user can visit FROM inside /setup without the redirect
+      // kicking them back to the wizard (#695). Without this whitelist,
+      // pushing /vehicles/edit during the wizard's Vehicles step rounded
+      // straight back to /setup, making "Add vehicle" appear broken.
+      final isSetupAllowedChild = state.matchedLocation == '/vehicles' ||
+          state.matchedLocation == '/vehicles/edit';
 
       // Step 1: GDPR consent must be given before anything else
       if (!hasConsent && !isConsent) return '/consent';
@@ -127,7 +133,9 @@ GoRouter router(Ref ref) {
       }
 
       // Step 2: Setup (onboarding) must be complete before main app
-      if (!isReady && !isSetup && !isConsent) return '/setup';
+      if (!isReady && !isSetup && !isConsent && !isSetupAllowedChild) {
+        return '/setup';
+      }
       // Landing preference is only applied when leaving the setup flow — not
       // on every subsequent navigation back to '/', which would trap the
       // user on their landing tab.

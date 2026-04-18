@@ -781,6 +781,7 @@
   "fillUpVehicleNone": "Kein Fahrzeug",
   "profileDefaultVehicleLabel": "Standardfahrzeug (optional)",
   "profileDefaultVehicleNone": "Kein Standard",
+  "profileFuelFromVehicleHint": "Kraftstoff wird aus dem Standardfahrzeug abgeleitet. Fahrzeug entfernen, um einen Kraftstoff direkt zu wählen.",
   "vehicleAdd": "Fahrzeug hinzufügen",
   "vehicleAddTitle": "Fahrzeug hinzufügen",
   "vehicleEditTitle": "Fahrzeug bearbeiten",

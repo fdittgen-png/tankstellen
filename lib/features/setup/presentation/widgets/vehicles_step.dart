@@ -93,12 +93,22 @@ class VehiclesStep extends ConsumerWidget {
               ],
             ),
           const SizedBox(height: 16),
-          OutlinedButton.icon(
-            // Route for adding a new vehicle is `/vehicles/edit` without
-            // `extra` — that's what the list screen uses too (#695).
-            onPressed: () => context.push('/vehicles/edit'),
-            icon: const Icon(Icons.add),
-            label: Text(l10n?.vehicleAdd ?? 'Add vehicle'),
+          // Bigger button so the user can't accidentally tap the
+          // wizard's Next/Skip row below it (#695 follow-up).
+          SizedBox(
+            height: 56,
+            child: FilledButton.icon(
+              // Route for a new vehicle: `/vehicles/edit` with no extra.
+              onPressed: () async {
+                // Await the push so the wizard rebuilds after the user
+                // saves/cancels the vehicle edit screen — without the
+                // await, the returned Future is dropped and the step
+                // never re-reads `vehicleProfileListProvider`.
+                await context.push<void>('/vehicles/edit');
+              },
+              icon: const Icon(Icons.add),
+              label: Text(l10n?.vehicleAdd ?? 'Add vehicle'),
+            ),
           ),
           const SizedBox(height: 8),
           Text(

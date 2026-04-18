@@ -279,8 +279,26 @@ class _DefaultVehicleSection extends ConsumerWidget {
           ),
         ),
       ],
-      onChanged: ctrl.setDefaultVehicleId,
+      onChanged: (v) {
+        ctrl.setDefaultVehicleId(v);
+        // When a vehicle is picked, sync the profile's fuel type to
+        // that vehicle's fuel so the search/consumption pickers have
+        // a single consistent source of truth (#695).
+        if (v != null) {
+          final vehicle = vehicles.firstWhere((x) => x.id == v);
+          final derived = _vehicleFuelType(vehicle);
+          if (derived != null) ctrl.setFuelType(derived);
+        }
+      },
     );
+  }
+
+  /// EV → electric; combustion → parsed preferredFuelType; null if not set.
+  FuelType? _vehicleFuelType(VehicleProfile v) {
+    if (v.type == VehicleType.ev) return FuelType.electric;
+    final raw = v.preferredFuelType;
+    if (raw == null || raw.trim().isEmpty) return null;
+    return FuelType.fromString(raw);
   }
 }
 

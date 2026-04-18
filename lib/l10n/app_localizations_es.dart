@@ -1796,6 +1796,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get profileDefaultVehicleNone => 'No default';
 
   @override
+  String get profileFuelFromVehicleHint =>
+      'Fuel type is derived from your default vehicle. Clear the vehicle to pick a fuel directly.';
+
+  @override
   String get vehicleAdd => 'Add vehicle';
 
   @override

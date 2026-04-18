@@ -253,27 +253,10 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
               onTap: _pickDate,
             ),
             const SizedBox(height: 8),
-            DropdownButtonFormField<FuelType>(
-              initialValue: _fuelType,
-              decoration: InputDecoration(
-                labelText: l?.fuelType ?? 'Fuel type',
-                prefixIcon: const Icon(Icons.local_gas_station),
-              ),
-              items: FuelType.values
-                  .where((f) => f != FuelType.all)
-                  .map((f) => DropdownMenuItem(
-                        value: f,
-                        child: Text(f.apiValue.toUpperCase()),
-                      ))
-                  .toList(),
-              onChanged: (v) {
-                if (v != null) setState(() => _fuelType = v);
-              },
-            ),
-            const SizedBox(height: 12),
-            // Vehicle selector (#694). Optional — the user can leave it
-            // empty and still log the fill-up. Pre-filled from the profile's
-            // default vehicle or the active vehicle.
+            // Vehicle selector (#698). When set, fuel is DERIVED from the
+            // vehicle and not user-editable — the vehicle is the single
+            // source of truth. The fuel dropdown only appears when there
+            // is no vehicle selected (or no vehicles are configured).
             if (vehicles.isNotEmpty) ...[
               DropdownButtonFormField<String?>(
                 initialValue: _vehicleId,
@@ -293,7 +276,64 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
                     ),
                   ),
                 ],
-                onChanged: (v) => setState(() => _vehicleId = v),
+                onChanged: (v) {
+                  setState(() {
+                    _vehicleId = v;
+                    // Lock fuel to the vehicle's fuel when selected.
+                    if (v != null) {
+                      final selected =
+                          vehicles.firstWhere((x) => x.id == v);
+                      final derived = _fuelForVehicle(selected);
+                      if (derived != null) _fuelType = derived;
+                    }
+                  });
+                },
+              ),
+              const SizedBox(height: 12),
+              if (_vehicleId != null)
+                _VehicleFuelInfo(
+                  vehicles: vehicles,
+                  vehicleId: _vehicleId!,
+                  fuelType: _fuelType,
+                  onOpenVehicle: () =>
+                      context.push('/vehicles/edit', extra: _vehicleId!),
+                )
+              else
+                DropdownButtonFormField<FuelType>(
+                  initialValue: _fuelType,
+                  decoration: InputDecoration(
+                    labelText: l?.fuelType ?? 'Fuel type',
+                    prefixIcon: const Icon(Icons.local_gas_station),
+                  ),
+                  items: FuelType.values
+                      .where((f) => f != FuelType.all)
+                      .map((f) => DropdownMenuItem(
+                            value: f,
+                            child: Text(f.apiValue.toUpperCase()),
+                          ))
+                      .toList(),
+                  onChanged: (v) {
+                    if (v != null) setState(() => _fuelType = v);
+                  },
+                ),
+              const SizedBox(height: 12),
+            ] else ...[
+              DropdownButtonFormField<FuelType>(
+                initialValue: _fuelType,
+                decoration: InputDecoration(
+                  labelText: l?.fuelType ?? 'Fuel type',
+                  prefixIcon: const Icon(Icons.local_gas_station),
+                ),
+                items: FuelType.values
+                    .where((f) => f != FuelType.all)
+                    .map((f) => DropdownMenuItem(
+                          value: f,
+                          child: Text(f.apiValue.toUpperCase()),
+                        ))
+                    .toList(),
+                onChanged: (v) {
+                  if (v != null) setState(() => _fuelType = v);
+                },
               ),
               const SizedBox(height: 12),
             ],
@@ -394,4 +434,55 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   }
 
   String _pad(int n) => n.toString().padLeft(2, '0');
+
+  /// Resolve the vehicle's fuel type (#698). EV → electric; combustion →
+  /// the stored preferredFuelType parsed back to the typed enum.
+  /// Returns null when the vehicle has no fuel configured.
+  FuelType? _fuelForVehicle(VehicleProfile v) {
+    if (v.type == VehicleType.ev) return FuelType.electric;
+    final raw = v.preferredFuelType;
+    if (raw == null || raw.trim().isEmpty) return null;
+    return FuelType.fromString(raw);
+  }
+}
+
+/// Read-only chip showing the fuel derived from the selected vehicle,
+/// plus a tap-to-open link that takes the user to the vehicle edit
+/// screen so they can change it at the source (#698).
+class _VehicleFuelInfo extends StatelessWidget {
+  final List<VehicleProfile> vehicles;
+  final String vehicleId;
+  final FuelType fuelType;
+  final VoidCallback onOpenVehicle;
+
+  const _VehicleFuelInfo({
+    required this.vehicles,
+    required this.vehicleId,
+    required this.fuelType,
+    required this.onOpenVehicle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final vehicle = vehicles.firstWhere((v) => v.id == vehicleId);
+    return Card(
+      margin: EdgeInsets.zero,
+      color: theme.colorScheme.surfaceContainerHighest,
+      child: ListTile(
+        leading: const Icon(Icons.local_gas_station),
+        title: Text(l?.fuelType ?? 'Fuel type'),
+        subtitle: Text(
+          '${fuelType.apiValue.toUpperCase()}   •   ${vehicle.name}',
+          style: theme.textTheme.bodyMedium,
+        ),
+        trailing: IconButton(
+          icon: const Icon(Icons.open_in_new),
+          tooltip: l?.vehicleEditTitle ?? 'Edit vehicle',
+          onPressed: onOpenVehicle,
+        ),
+      ),
+    );
+  }
 }

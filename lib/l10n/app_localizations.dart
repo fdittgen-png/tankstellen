@@ -3415,6 +3415,12 @@ abstract class AppLocalizations {
   /// **'No default'**
   String get profileDefaultVehicleNone;
 
+  /// No description provided for @profileFuelFromVehicleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel type is derived from your default vehicle. Clear the vehicle to pick a fuel directly.'**
+  String get profileFuelFromVehicleHint;
+
   /// No description provided for @vehicleAdd.
   ///
   /// In en, this message translates to:

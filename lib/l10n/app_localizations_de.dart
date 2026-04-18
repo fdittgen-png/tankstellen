@@ -1806,6 +1806,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get profileDefaultVehicleNone => 'Kein Standard';
 
   @override
+  String get profileFuelFromVehicleHint =>
+      'Kraftstoff wird aus dem Standardfahrzeug abgeleitet. Fahrzeug entfernen, um einen Kraftstoff direkt zu wählen.';
+
+  @override
   String get vehicleAdd => 'Fahrzeug hinzufügen';
 
   @override

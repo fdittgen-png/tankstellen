@@ -808,6 +808,7 @@
   "fillUpVehicleNone": "No vehicle",
   "profileDefaultVehicleLabel": "Default vehicle (optional)",
   "profileDefaultVehicleNone": "No default",
+  "profileFuelFromVehicleHint": "Fuel type is derived from your default vehicle. Clear the vehicle to pick a fuel directly.",
   "vehicleAdd": "Add vehicle",
   "vehicleAddTitle": "Add vehicle",
   "vehicleEditTitle": "Edit vehicle",

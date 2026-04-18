@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/language/language_provider.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../search/domain/entities/fuel_type.dart';
+import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../domain/entities/user_profile.dart';
 import '../../providers/profile_edit_provider.dart';
@@ -123,10 +125,33 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
                 ),
               ),
               const SizedBox(height: 16),
-              ProfileFuelTypeDropdown(
-                value: editState.fuelType,
-                onChanged: editCtrl.setFuelType,
+              // Fuel preference is EITHER derived from the default vehicle
+              // OR picked directly. The dropdown is disabled when a
+              // vehicle is selected, removing the conflict shown in
+              // image #7 (#695).
+              Opacity(
+                opacity: editState.defaultVehicleId != null ? 0.5 : 1.0,
+                child: IgnorePointer(
+                  ignoring: editState.defaultVehicleId != null,
+                  child: ProfileFuelTypeDropdown(
+                    value: editState.fuelType,
+                    onChanged: editCtrl.setFuelType,
+                  ),
+                ),
               ),
+              if (editState.defaultVehicleId != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  AppLocalizations.of(context)?.profileFuelFromVehicleHint ??
+                      'Fuel type is derived from your default vehicle. '
+                          'Clear the vehicle to pick a fuel directly.',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color:
+                            Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontStyle: FontStyle.italic,
+                      ),
+                ),
+              ],
               const SizedBox(height: 16),
               ProfileRadiusSlider(
                 value: editState.radius,

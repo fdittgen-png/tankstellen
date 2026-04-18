@@ -1803,6 +1803,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileDefaultVehicleNone => 'Aucun par défaut';
 
   @override
+  String get profileFuelFromVehicleHint =>
+      'Le carburant est dérivé de votre véhicule par défaut. Supprimez le véhicule pour choisir un carburant directement.';
+
+  @override
   String get vehicleAdd => 'Add vehicle';
 
   @override

@@ -35,7 +35,7 @@ void main() {
       // English localization (the default for pumpApp)
       expect(find.text('My vehicles (optional)'), findsOneWidget);
       expect(find.text('No vehicle configured yet.'), findsOneWidget);
-      expect(find.widgetWithText(OutlinedButton, 'Add vehicle'),
+      expect(find.widgetWithText(FilledButton, 'Add vehicle'),
           findsOneWidget);
       // Skip hint present so the user knows the step is optional.
       expect(
