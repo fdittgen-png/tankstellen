@@ -1,12 +1,23 @@
 # Tankstellen
 
-**Free fuel price comparison app for Europe and beyond** — 11 countries, 23 languages, privacy-first.
+> **Smarter pump. Smarter drive. Save twice.**
+>
+> Every litre saved at the pump is a litre not burned on the road — and a kilogram of CO₂ you kept out of the air. Tankstellen is built to help you save both ways: cheaper fuel _and_ leaner driving.
 
 [![CI](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml/badge.svg)](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Flutter-3.41-blue.svg)](https://flutter.dev)
 
-Tankstellen helps drivers find the cheapest fuel nearby, along a route, or in a specific city. It aggregates real-time prices from official government APIs — no scraping, no tracking, no ads.
+**Free fuel-price comparison for Europe and beyond** — 11 countries, 23 languages, privacy-first.
+
+Tankstellen helps drivers find the cheapest fuel nearby, along a route, or in a specific city, _and_ track their real consumption so they can drive it down over time. It aggregates real-time prices from official government APIs — no scraping, no tracking, no ads.
+
+### The two savings lenses
+
+1. **At the pump.** Live price comparison across countries, along your route, with alerts when prices drop.
+2. **Behind the wheel.** Fill-up log, consumption stats, CO₂ dashboard, and the signals you need to drive more economically over time.
+
+Every feature in the app serves at least one of these two lenses. Features that serve neither don't belong.
 
 ## Features
 
