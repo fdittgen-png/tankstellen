@@ -48,13 +48,39 @@ class Favorites extends _$Favorites {
   /// type (used by the EV detail screen which has a search/ ChargingStation).
   Future<void> add(String stationId, {Station? stationData, Map<String, dynamic>? rawJson}) async {
     final storage = ref.read(storageRepositoryProvider);
+    final isEv = _isEvId(stationId);
+    debugPrint('[Favorites.add] id=$stationId isEv=$isEv rawJsonKeys=${rawJson?.keys.toList()}');
 
-    if (_isEvId(stationId)) {
-      await storage.addEvFavorite(stationId);
+    if (isEv) {
+      // Persist JSON BEFORE the id so a crash between the two writes
+      // cannot leave an id without data (#690). The id is what drives
+      // the reactive rebuild chain; writing it last means every observer
+      // sees a consistent state.
       final json = rawJson ?? stationData?.toJson();
       if (json != null) {
         await storage.saveEvFavoriteStationData(stationId, json);
+        // Verify the write actually landed. On encrypted Hive boxes
+        // with deeply-nested freezed types, put() can silently drop
+        // unsupported payloads. If the readback fails, bail out before
+        // writing the id so we don't leave an orphan.
+        final verify = storage.getEvFavoriteStationData(stationId);
+        if (verify == null) {
+          debugPrint(
+            '[Favorites.add] CRITICAL: JSON save succeeded but readback '
+            'returned null for $stationId. Hive may have dropped the '
+            'payload. Skipping id write to avoid orphan.',
+          );
+          return;
+        }
+        debugPrint(
+          '[Favorites.add] JSON verified for $stationId '
+          '(${verify.keys.length} keys)',
+        );
+      } else {
+        debugPrint('[Favorites.add] WARNING: EV favorite added WITHOUT station JSON');
       }
+      await storage.addEvFavorite(stationId);
+      debugPrint('[Favorites.add] EV storage now has ids=${storage.getEvFavoriteIds()}');
     } else {
       await storage.addFavorite(stationId);
       final json = rawJson ?? stationData?.toJson();
@@ -67,6 +93,7 @@ class Favorites extends _$Favorites {
     }
 
     _reload();
+    debugPrint('[Favorites.add] state after reload=$state');
   }
 
   /// Add an EV charging station to favorites (explicit ev/ entity).

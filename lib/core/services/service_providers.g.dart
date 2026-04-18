@@ -149,4 +149,4 @@ final class GeocodingChainProvider
   }
 }
 
-String _$geocodingChainHash() => r'58e72b3ac8bafb01e903fd9922d65ba82830bc23';
+String _$geocodingChainHash() => r'183b5dfca7535d6a902d97f4c40b3239376b4108';
