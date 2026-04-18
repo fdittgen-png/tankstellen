@@ -1,5 +1,13 @@
 # Tankstellen — Project Context for Claude Code
 
+## Product leitmotiv
+
+**Every feature must help the user either pay less AT the pump or burn less fuel BEHIND the wheel. Both reduce CO₂ — that's the point. If a feature satisfies neither lens, it doesn't belong in Tankstellen.**
+
+Slogan: *Smarter pump. Smarter drive. Save twice.*
+
+When reviewing or scoping a feature, ask: *which lens does this serve?* Price/availability features serve the pump. Consumption-logging, eco-feedback, and driving-behaviour features serve the wheel. Convenience features (payment deep-links, QR scans, icon polish) are fine to ship but don't let them crowd out work on either savings lens.
+
 ## What is this project?
 
 Free, open-source fuel price comparison app for Europe and beyond
