@@ -3,7 +3,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../data/repositories/fill_up_repository.dart';
 import '../domain/entities/consumption_stats.dart';
+import '../domain/entities/eco_score.dart';
 import '../domain/entities/fill_up.dart';
+import '../domain/services/eco_score_calculator.dart';
 
 part 'consumption_providers.g.dart';
 
@@ -57,4 +59,25 @@ class FillUpList extends _$FillUpList {
 ConsumptionStats consumptionStats(Ref ref) {
   final fillUps = ref.watch(fillUpListProvider);
   return ConsumptionStats.fromFillUps(fillUps);
+}
+
+/// Per-fill-up eco-score — compares this tank's L/100 km to the
+/// rolling average over the last 3 same-fuel-type fill-ups.
+///
+/// Returns `null` for fill-ups where the score is not meaningful
+/// (first-ever fill-up, odometer rollback, no same-fuel history).
+/// Callers render nothing when the return is null.
+///
+/// Keyed by fill-up id so the Riverpod graph invalidates just the
+/// affected card when a single fill-up is edited, not the whole list.
+/// See #676 and the project leitmotiv in CLAUDE.md.
+@riverpod
+EcoScore? ecoScoreForFillUp(Ref ref, String fillUpId) {
+  final fillUps = ref.watch(fillUpListProvider);
+  final current = fillUps.where((f) => f.id == fillUpId).firstOrNull;
+  if (current == null) return null;
+  return EcoScoreCalculator.compute(
+    current: current,
+    history: fillUps,
+  );
 }
