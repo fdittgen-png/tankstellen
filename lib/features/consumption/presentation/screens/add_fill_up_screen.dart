@@ -83,9 +83,8 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       } else if (active != null) {
         _vehicleId = active.id;
       }
-    } catch (_) {
-      // Providers may fail when Hive isn't initialized (test env).
-      // Leave _vehicleId null — the selector simply stays empty.
+    } catch (e) {
+      debugPrint('AddFillUp: vehicle provider unavailable: $e');
     }
     _vehicleInitialized = true;
   }
@@ -209,7 +208,8 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     List<VehicleProfile> vehicles;
     try {
       vehicles = ref.watch(vehicleProfileListProvider);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('AddFillUp build: vehicle list unavailable: $e');
       vehicles = const [];
     }
 

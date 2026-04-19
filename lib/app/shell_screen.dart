@@ -46,6 +46,16 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
     super.initState();
     _currentIndex = widget.navigationShell.currentIndex;
 
+    // Publish the INITIAL branch index so MapScreen's visibility listener
+    // fires even on first-run landing where the user never taps a tab
+    // (e.g. landingScreen == cheapest/nearest routes straight to Carte).
+    // Without this the listener only caught later tab flips, leaving
+    // the first visit blank (#709).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(currentShellBranchProvider.notifier).set(_currentIndex);
+    });
+
     _iconControllers = List.generate(
       _pageCount,
       (i) => AnimationController(

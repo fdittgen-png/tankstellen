@@ -44,11 +44,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         if (!mounted) return;
         try {
           final camera = _mapController.camera;
+          // Zoom-jiggle so the TileLayer actually invalidates its
+          // viewport cache — a same-center/same-zoom `move` was a
+          // no-op and kept the blank-tile bug (#709).
+          _mapController.move(camera.center, camera.zoom + 0.0001);
           _mapController.move(camera.center, camera.zoom);
-        } catch (_) {
-          // Controller not yet attached to a FlutterMap — the
-          // post-frame callback inside NearbyMapView will pick up the
-          // first real fit and tiles will load on that path instead.
+        } catch (e) {
+          debugPrint('MapScreen initState nudge: $e');
         }
       });
     });
@@ -76,41 +78,44 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           if (!mounted) return;
           try {
             final camera = _mapController.camera;
+            _mapController.move(camera.center, camera.zoom + 0.0001);
             _mapController.move(camera.center, camera.zoom);
-          } catch (_) {
-            // Controller not attached yet — the onMapReady fallback
-            // in station_map_layers.dart will handle the first load.
+          } catch (e) {
+            debugPrint('MapScreen result-change nudge: $e');
           }
         });
       }
     });
 
-    // #696/#709 — every time the Map tab becomes the active branch,
-    // force the TileLayer to recompute its viewport. A same-center
-    // same-zoom `move` is a no-op that leaves the cached empty viewport
-    // in place, which was why v5021 still showed blank tiles. Jiggle
-    // the zoom by an imperceptible ε so the TileLayer's internal
-    // `_TileBoundsAtZoom` invalidates and refetches. Nested double
-    // post-frame so the first real layout pass completes first.
-    ref.listen<int>(currentShellBranchProvider, (prev, next) {
-      const mapBranchIndex = 1;
-      if (next != mapBranchIndex || prev == next) return;
+    // #696/#709 — every time the Map tab becomes the active branch
+    // (INCLUDING the very first render when the user's landing screen
+    // routes them straight to Carte) force the TileLayer to recompute
+    // its viewport. Zoom-jiggle because a same-center/same-zoom move
+    // is a no-op and leaves the cached empty viewport in place.
+    void nudge() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
           try {
             final camera = _mapController.camera;
-            // Tiny zoom delta forces tile refetch; revert immediately.
             _mapController.move(camera.center, camera.zoom + 0.0001);
             _mapController.move(camera.center, camera.zoom);
-          } catch (_) {
-            // Controller not yet attached — the `onMapReady` fallback
-            // inside StationMapLayers will do the first load.
+          } catch (e) {
+            debugPrint('MapScreen tab-flip nudge: $e');
           }
         });
       });
+    }
+    ref.listen<int>(currentShellBranchProvider, (prev, next) {
+      const mapBranchIndex = 1;
+      if (next != mapBranchIndex) return;
+      nudge();
     });
+    // Also fire on first build of MapScreen itself so the very first
+    // Carte visit (when landingScreen routes straight here) nudges.
+    final currentBranch = ref.read(currentShellBranchProvider);
+    if (currentBranch == 1) nudge();
 
     final searchState = ref.watch(searchStateProvider);
     final selectedFuel = ref.watch(selectedFuelTypeProvider);

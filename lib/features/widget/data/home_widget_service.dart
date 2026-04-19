@@ -171,7 +171,8 @@ class HomeWidgetService {
         if (key != null) {
           try {
             fuel = FuelType.fromString(key);
-          } catch (_) {
+          } catch (e) {
+            debugPrint('HomeWidgetService: unknown fuel "$key": $e');
             fuel = null;
           }
         }

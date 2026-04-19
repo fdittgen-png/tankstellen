@@ -9,7 +9,7 @@ class _CapturingAdapter implements HttpClientAdapter {
   final double lat;
   final double lon;
 
-  _CapturingAdapter();
+  _CapturingAdapter({this.lat = 48.8566, this.lon = 2.3522});
 
   @override
   Future<ResponseBody> fetch(

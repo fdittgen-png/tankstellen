@@ -29,7 +29,8 @@ class ErrorReporterContext {
       if (Platform.isAndroid) return 'Android';
       if (Platform.isIOS) return 'iOS';
       return Platform.operatingSystem;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('currentPlatform: Platform query failed: $e');
       return 'unknown';
     }
   }

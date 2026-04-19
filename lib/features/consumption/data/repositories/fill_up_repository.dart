@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../../../../core/data/storage_repository.dart';
 import '../../../../core/storage/hive_boxes.dart';
 import '../../../../core/storage/storage_keys.dart';
@@ -27,8 +29,8 @@ class FillUpRepository {
       if (map == null) continue;
       try {
         result.add(FillUp.fromJson(map));
-      } catch (_) {
-        // Skip malformed entries rather than crashing the whole list.
+      } catch (e) {
+        debugPrint('FillUpRepository: skipping malformed entry: $e');
       }
     }
     result.sort((a, b) => b.date.compareTo(a.date));
