@@ -110,8 +110,8 @@ void main() {
   );
 
   test(
-    'hybrid default vehicle → falls back to profile until #704 ships '
-    'hybridFuelChoice',
+    'hybrid default vehicle without hybridFuelChoice → vehicle fuel wins '
+    '(#706 defaulted to vehicle ICE side instead of dropping to profile)',
     () {
       const v = VehicleProfile(
         id: 'v1',
@@ -128,8 +128,7 @@ void main() {
         ),
         vehicles: const [v],
       );
-      // Hybrid deliberately skipped here — caller falls back.
-      expect(c.read(effectiveFuelTypeProvider), FuelType.e5);
+      expect(c.read(effectiveFuelTypeProvider), FuelType.e10);
     },
   );
 

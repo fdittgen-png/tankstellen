@@ -59,6 +59,12 @@ abstract class UserProfile with _$UserProfile {
     /// vehicle selector empty so the user can still log fill-ups without
     /// attributing them to any vehicle.
     String? defaultVehicleId,
+    /// Tie-breaker for hybrid default vehicles (#706). Null on
+    /// non-hybrid vehicles. When set to [FuelType.electric], search
+    /// + station filters treat a hybrid like an EV; when set to any
+    /// combustion fuel, they treat it like a petrol/diesel car.
+    /// Defaults to null so existing profiles don't need migration.
+    @FuelTypeJsonConverter() FuelType? hybridFuelChoice,
   }) = _UserProfile;
 
   factory UserProfile.fromJson(Map<String, dynamic> json) =>
