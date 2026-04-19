@@ -163,6 +163,12 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
         if (result.date != null) {
           _date = result.date!;
         }
+        // Only pre-select the fuel when there is no vehicle bound — the
+        // vehicle's configured fuel always wins (#698 single source of
+        // truth for fuel).
+        if (result.fuelType != null && _vehicleId == null) {
+          _fuelType = result.fuelType!;
+        }
       });
 
       if (mounted) {

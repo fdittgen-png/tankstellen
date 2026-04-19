@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
+import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
 void main() {
   const parser = ReceiptParser();
@@ -148,6 +149,60 @@ BETRAG 69,26
       test('hasData false for empty text', () {
         final result = parser.parse('');
         expect(result.hasData, isFalse);
+      });
+
+      test('parses Super U France receipt with TOT TTC + "€ x.xxx/L"', () {
+        // Real Super U Pomerols receipt (#713): price-per-liter has
+        // currency BEFORE the number and total is labelled "TOT TTC".
+        // Previously the generic "€ <amount>" fallback grabbed the unit
+        // price as the total.
+        const receipt = '''
+SUPER U
+CHEMIN DU PORTROU
+34810 POMEROLS
+04 67 00 86 80
+QUITTANCE COPIE
+TRANSACTION ACCEPTEE
+Date 19-04-2026 15:19:27
+*
+Pompe 3    SP95-E10
+Volume     5.24 L
+Prix       € 1.999/L
+TOT TTC    € 10.47
+*
+TVA 20.00 %   € 1.74
+Net           € 8.73
+''';
+        final result = parser.parse(receipt);
+        expect(result.liters, closeTo(5.24, 0.01));
+        expect(result.totalCost, closeTo(10.47, 0.01));
+        expect(result.pricePerLiter, closeTo(1.999, 0.001));
+        expect(result.date, DateTime(2026, 4, 19));
+        expect(result.stationName, 'SUPER U');
+        expect(result.fuelType, FuelType.e10);
+      });
+    });
+
+    group('fuel type detection', () {
+      test('recognises SP95-E10 → FuelType.e10', () {
+        expect(parser.parse('Pompe 3 SP95-E10').fuelType, FuelType.e10);
+      });
+
+      test('recognises Gazole / Diesel / B7 → FuelType.diesel', () {
+        expect(parser.parse('GAZOLE B7\n42 L').fuelType, FuelType.diesel);
+        expect(parser.parse('Diesel 50L').fuelType, FuelType.diesel);
+      });
+
+      test('recognises Super 98 / E98 → FuelType.e98', () {
+        expect(parser.parse('SP98').fuelType, FuelType.e98);
+      });
+
+      test('recognises E85 / Bioéthanol → FuelType.e85', () {
+        expect(parser.parse('Bioéthanol E85').fuelType, FuelType.e85);
+      });
+
+      test('returns null for an unrecognised product string', () {
+        expect(parser.parse('Kerosene jet').fuelType, isNull);
       });
     });
   });
