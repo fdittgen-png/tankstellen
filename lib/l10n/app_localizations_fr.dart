@@ -1820,6 +1820,34 @@ class AppLocalizationsFr extends AppLocalizations {
   String get scanPump => 'Scanner la pompe';
 
   @override
+  String get scanPayment => 'Scanner le QR de paiement';
+
+  @override
+  String get qrPaymentBeneficiary => 'Bénéficiaire';
+
+  @override
+  String get qrPaymentAmount => 'Montant';
+
+  @override
+  String get qrPaymentEpcTitle => 'Virement SEPA';
+
+  @override
+  String get qrPaymentEpcEmpty => 'Aucun champ décodé';
+
+  @override
+  String get qrPaymentOpenInBank => 'Ouvrir dans la banque';
+
+  @override
+  String get qrPaymentLaunchFailed =>
+      'Aucune application ne peut ouvrir ce code';
+
+  @override
+  String get qrPaymentUnknownTitle => 'Code non reconnu';
+
+  @override
+  String get qrPaymentCopyRaw => 'Copier le texte brut';
+
+  @override
   String get vehicleFuelNotSet => 'Non défini';
 
   @override

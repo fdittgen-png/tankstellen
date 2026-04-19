@@ -3445,6 +3445,60 @@ abstract class AppLocalizations {
   /// **'Scan pump'**
   String get scanPump;
 
+  /// No description provided for @scanPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan payment QR'**
+  String get scanPayment;
+
+  /// No description provided for @qrPaymentBeneficiary.
+  ///
+  /// In en, this message translates to:
+  /// **'Beneficiary'**
+  String get qrPaymentBeneficiary;
+
+  /// No description provided for @qrPaymentAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get qrPaymentAmount;
+
+  /// No description provided for @qrPaymentEpcTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SEPA payment'**
+  String get qrPaymentEpcTitle;
+
+  /// No description provided for @qrPaymentEpcEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No fields decoded'**
+  String get qrPaymentEpcEmpty;
+
+  /// No description provided for @qrPaymentOpenInBank.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in bank app'**
+  String get qrPaymentOpenInBank;
+
+  /// No description provided for @qrPaymentLaunchFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'No app available to open this code'**
+  String get qrPaymentLaunchFailed;
+
+  /// No description provided for @qrPaymentUnknownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised code'**
+  String get qrPaymentUnknownTitle;
+
+  /// No description provided for @qrPaymentCopyRaw.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy raw text'**
+  String get qrPaymentCopyRaw;
+
   /// No description provided for @vehicleFuelNotSet.
   ///
   /// In en, this message translates to:

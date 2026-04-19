@@ -1812,6 +1812,33 @@ class AppLocalizationsCs extends AppLocalizations {
   String get scanPump => 'Scan pump';
 
   @override
+  String get scanPayment => 'Scan payment QR';
+
+  @override
+  String get qrPaymentBeneficiary => 'Beneficiary';
+
+  @override
+  String get qrPaymentAmount => 'Amount';
+
+  @override
+  String get qrPaymentEpcTitle => 'SEPA payment';
+
+  @override
+  String get qrPaymentEpcEmpty => 'No fields decoded';
+
+  @override
+  String get qrPaymentOpenInBank => 'Open in bank app';
+
+  @override
+  String get qrPaymentLaunchFailed => 'No app available to open this code';
+
+  @override
+  String get qrPaymentUnknownTitle => 'Unrecognised code';
+
+  @override
+  String get qrPaymentCopyRaw => 'Copy raw text';
+
+  @override
   String get vehicleFuelNotSet => 'Not set';
 
   @override

@@ -17,6 +17,9 @@ import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
+import '../../../payment/domain/qr_payment_decoder.dart';
+import '../../../payment/presentation/scan_payment_dispatcher.dart';
+import '../../../sync/presentation/widgets/qr_scanner_screen.dart';
 import '../../providers/station_detail_provider.dart';
 import '../widgets/price_history_section.dart';
 import '../widgets/price_tile.dart';
@@ -85,6 +88,11 @@ class StationDetailScreen extends ConsumerWidget {
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () => _showCreateAlertDialog(context, ref),
             tooltip: l10n?.createAlert ?? 'Create price alert',
+          ),
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: () => _startScanPayment(context),
+            tooltip: l10n?.scanPayment ?? 'Scan payment QR',
           ),
           IconButton(
             icon: const Icon(Icons.flag_outlined),
@@ -264,6 +272,59 @@ class StationDetailScreen extends ConsumerWidget {
         final l10n = AppLocalizations.of(context);
         SnackBarHelper.showSuccess(context, l10n?.alertCreated ?? 'Price alert created');
       }
+    }
+  }
+
+  /// Opens the mobile_scanner surface, decodes the scanned value and
+  /// dispatches to url_launcher / a confirmation dialog / a fallback
+  /// sheet based on the [QrPaymentTarget] classification (#587).
+  Future<void> _startScanPayment(BuildContext context) async {
+    final raw = await Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (_) => const QrScannerScreen()),
+    );
+    if (raw == null || !context.mounted) return;
+
+    final target = QrPaymentDecoder.decode(raw);
+    final outcome = await ScanPaymentDispatcher.handle(target);
+    if (!context.mounted) return;
+
+    final l10n = AppLocalizations.of(context);
+    switch (outcome) {
+      case ScanPaymentOutcome.launched:
+        break;
+      case ScanPaymentOutcome.launchFailed:
+        SnackBarHelper.showError(
+          context,
+          l10n?.qrPaymentLaunchFailed ??
+              'No app available to open this code',
+        );
+      case ScanPaymentOutcome.confirmEpc:
+        await showDialog<bool>(
+          context: context,
+          builder: (ctx) => ScanPaymentDispatcher.buildEpcDialog(
+            ctx,
+            target as QrPaymentEpc,
+          ),
+        );
+      case ScanPaymentOutcome.unknown:
+        await showDialog<void>(
+          context: context,
+          builder: (ctx) {
+            final unknown = target as QrPaymentUnknown;
+            return AlertDialog(
+              title: Text(
+                l10n?.qrPaymentUnknownTitle ?? 'Unrecognised code',
+              ),
+              content: SelectableText(unknown.raw),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(l10n?.cancel ?? 'Cancel'),
+                ),
+              ],
+            );
+          },
+        );
     }
   }
 }
