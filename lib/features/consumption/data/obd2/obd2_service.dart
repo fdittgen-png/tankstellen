@@ -37,24 +37,63 @@ class Obd2Service {
 
   /// Read the odometer value in km.
   ///
-  /// Tries PID A6 (direct odometer) first, then falls back to PID 31
-  /// (distance since DTC cleared) if not supported.
+  /// Fallback chain (#719):
+  ///   1. PID A6 (standard, only on cars from ~2018+)
+  ///   2. PID 31 (distance since DTC cleared) — proxy, resets on DTC
+  ///   3. Manufacturer Mode 22 PID resolved from the car's VIN
+  ///
+  /// Returns null when every layer fails, so callers can surface
+  /// "odometer not readable for your car" instead of a zero.
   Future<double?> readOdometerKm() async {
     if (!_transport.isConnected) return null;
 
     try {
-      // Try direct odometer first (PID A6)
-      final odometerResponse =
+      // 1. Direct odometer (standard PID A6)
+      final a6 =
           await _transport.sendCommand(Elm327Protocol.odometerCommand);
-      final odometer = Elm327Protocol.parseOdometer(odometerResponse);
+      final odometer = Elm327Protocol.parseOdometer(a6);
       if (odometer != null) return odometer;
 
-      // Fallback: distance since DTC cleared (PID 31)
-      final distResponse = await _transport.sendCommand(
-          Elm327Protocol.distanceSinceDtcClearedCommand);
-      final distance = Elm327Protocol.parseDistanceSinceDtcCleared(distResponse);
+      // 2. Distance since DTC cleared (standard PID 31)
+      final pid31 = await _transport
+          .sendCommand(Elm327Protocol.distanceSinceDtcClearedCommand);
+      final distance = Elm327Protocol.parseDistanceSinceDtcCleared(pid31);
       if (distance != null) return distance.toDouble();
 
+      // 3. Manufacturer Mode 22 fallback. Identify brand from VIN and
+      //    iterate every catalog entry for that brand. Silent failure
+      //    on unknown-brand is intentional — we'd rather return null
+      //    than spam the car with commands it rejects.
+      final vinResponse =
+          await _transport.sendCommand(Elm327Protocol.vinCommand);
+      final vin = Elm327Protocol.parseVin(vinResponse);
+      final brand = vehicleBrandFromVin(vin);
+      if (brand == VehicleBrand.unknown) return null;
+
+      for (final entry in Elm327Protocol.mfgOdometerCatalog) {
+        if (entry.brand != brand) continue;
+        final response = await _transport.sendCommand(entry.command);
+        final value = switch (entry.kind) {
+          MfgOdometerKind.threeBytesKm =>
+            Elm327Protocol.parseMfgOdometer3Byte(
+              response,
+              expectedPidHi: entry.pidHi,
+              expectedPidLo: entry.pidLo,
+            ),
+          MfgOdometerKind.twoBytesKm => Elm327Protocol.parseMfgOdometer2Byte(
+              response,
+              expectedPidHi: entry.pidHi,
+              expectedPidLo: entry.pidLo,
+            ),
+          MfgOdometerKind.twoBytesMilesTimes10 =>
+            Elm327Protocol.parseMfgOdometerMilesTimes10(
+              response,
+              expectedPidHi: entry.pidHi,
+              expectedPidLo: entry.pidLo,
+            ),
+        };
+        if (value != null) return value;
+      }
       return null;
     } catch (e) {
       debugPrint('OBD2 readOdometer failed: $e');
