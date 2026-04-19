@@ -3925,6 +3925,18 @@ abstract class AppLocalizations {
   /// **'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.'**
   String get helpBannerAlerts;
 
+  /// No description provided for @helpBannerConsumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Log every fill-up to track your real-world consumption and CO₂ footprint. Swipe left to delete an entry.'**
+  String get helpBannerConsumption;
+
+  /// No description provided for @helpBannerVehicles.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your vehicles so fill-ups and fuel preferences default correctly. The first vehicle becomes your default.'**
+  String get helpBannerVehicles;
+
   /// No description provided for @syncNow.
   ///
   /// In en, this message translates to:

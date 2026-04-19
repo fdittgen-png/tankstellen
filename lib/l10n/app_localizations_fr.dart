@@ -2074,6 +2074,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Définissez un seuil de prix pour une station. Vous serez notifié quand les prix passent en dessous. Vérification toutes les 30 minutes.';
 
   @override
+  String get helpBannerConsumption =>
+      'Enregistrez chaque plein pour suivre votre consommation réelle et votre empreinte CO₂. Glissez vers la gauche pour supprimer une entrée.';
+
+  @override
+  String get helpBannerVehicles =>
+      'Ajoutez vos véhicules pour que les pleins et préférences carburant soient bien pré-réglés. Le premier véhicule devient le véhicule par défaut.';
+
+  @override
   String get syncNow => 'Synchroniser maintenant';
 
   @override

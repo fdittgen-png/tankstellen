@@ -6,10 +6,6 @@ import 'package:tankstellen/core/services/impl/nominatim_geocoding_provider.dart
 /// arrondissement hints) AND free-text city queries like "Paris" (#690).
 class _CapturingAdapter implements HttpClientAdapter {
   Map<String, dynamic>? capturedQueryParams;
-  final double lat;
-  final double lon;
-
-  _CapturingAdapter({this.lat = 48.8566, this.lon = 2.3522});
 
   @override
   Future<ResponseBody> fetch(
@@ -18,6 +14,8 @@ class _CapturingAdapter implements HttpClientAdapter {
     Future<void>? cancelFuture,
   ) async {
     capturedQueryParams = options.uri.queryParameters;
+    const lat = 48.8566; // Paris — the only fixture these tests exercise.
+    const lon = 2.3522;
     final body = '[{"lat":"$lat","lon":"$lon","display_name":"Test"}]';
     return ResponseBody.fromString(body, 200, headers: {
       'content-type': ['application/json'],

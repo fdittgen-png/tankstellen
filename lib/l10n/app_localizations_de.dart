@@ -2077,6 +2077,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Legen Sie einen Preisgrenzwert für eine Station fest. Sie werden benachrichtigt, wenn die Preise darunter fallen. Prüfungen laufen alle 30 Minuten.';
 
   @override
+  String get helpBannerConsumption =>
+      'Erfassen Sie jede Tankfüllung, um Ihren tatsächlichen Verbrauch und CO₂-Fußabdruck zu verfolgen. Wischen Sie nach links, um einen Eintrag zu löschen.';
+
+  @override
+  String get helpBannerVehicles =>
+      'Fügen Sie Ihre Fahrzeuge hinzu, damit Tankfüllungen und Kraftstoffvorgaben korrekt voreingestellt werden. Das erste Fahrzeug wird zum Standard.';
+
+  @override
   String get syncNow => 'Jetzt synchronisieren';
 
   @override

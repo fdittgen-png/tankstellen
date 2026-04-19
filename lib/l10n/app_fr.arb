@@ -521,6 +521,8 @@
   "switchAction": "Changer",
   "helpBannerCriteria": "Vos valeurs par défaut sont pré-remplies. Ajustez les critères ci-dessous pour affiner votre recherche.",
   "helpBannerAlerts": "Définissez un seuil de prix pour une station. Vous serez notifié quand les prix passent en dessous. Vérification toutes les 30 minutes.",
+  "helpBannerConsumption": "Enregistrez chaque plein pour suivre votre consommation réelle et votre empreinte CO₂. Glissez vers la gauche pour supprimer une entrée.",
+  "helpBannerVehicles": "Ajoutez vos véhicules pour que les pleins et préférences carburant soient bien pré-réglés. Le premier véhicule devient le véhicule par défaut.",
   "syncNow": "Synchroniser maintenant",
   "onboardingPreferencesTitle": "Vos préférences",
   "onboardingZipHelper": "Utilisé quand le GPS n'est pas disponible",

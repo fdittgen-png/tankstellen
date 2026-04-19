@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/csv_exporter.dart';
@@ -74,7 +76,20 @@ class ConsumptionScreen extends ConsumerWidget {
               itemCount: fillUps.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  return ConsumptionStatsCard(stats: stats);
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      HelpBanner(
+                        storageKey: StorageKeys.helpBannerConsumption,
+                        icon: Icons.tips_and_updates_outlined,
+                        message: l?.helpBannerConsumption ??
+                            'Log every fill-up to track your real-world '
+                                'consumption and CO₂ footprint. Swipe left '
+                                'to delete an entry.',
+                      ),
+                      ConsumptionStatsCard(stats: stats),
+                    ],
+                  );
                 }
                 final fillUp = fillUps[index - 1];
                 return Dismissible(

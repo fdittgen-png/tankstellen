@@ -2057,6 +2057,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.';
 
   @override
+  String get helpBannerConsumption =>
+      'Log every fill-up to track your real-world consumption and CO₂ footprint. Swipe left to delete an entry.';
+
+  @override
+  String get helpBannerVehicles =>
+      'Add your vehicles so fill-ups and fuel preferences default correctly. The first vehicle becomes your default.';
+
+  @override
   String get syncNow => 'Sync now';
 
   @override

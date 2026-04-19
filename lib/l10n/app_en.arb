@@ -907,6 +907,8 @@
   "switchAction": "Switch",
   "helpBannerCriteria": "Your profile defaults are pre-filled. Adjust criteria below to refine your search.",
   "helpBannerAlerts": "Set a price threshold for a station. You'll be notified when prices drop below it. Checks run every 30 minutes.",
+  "helpBannerConsumption": "Log every fill-up to track your real-world consumption and CO₂ footprint. Swipe left to delete an entry.",
+  "helpBannerVehicles": "Add your vehicles so fill-ups and fuel preferences default correctly. The first vehicle becomes your default.",
   "syncNow": "Sync now",
   "onboardingPreferencesTitle": "Your preferences",
   "onboardingZipHelper": "Used when GPS is unavailable",
