@@ -6,7 +6,7 @@
     android:minResizeHeight="60dp"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="1800000"
-    android:initialLayout="@layout/nearest_widget_layout"
+    android:initialLayout="@layout/station_widget_layout"
     android:widgetCategory="home_screen"
     android:description="@string/nearest_widget_description"
-    android:previewLayout="@layout/nearest_widget_layout" />
+    android:previewLayout="@layout/station_widget_layout" />

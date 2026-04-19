@@ -7,4 +7,5 @@
     <string name="nearest_widget_name">Nearest Stations</string>
     <string name="nearest_widget_empty">Add favorites and enable GPS to see nearby stations</string>
     <string name="widget_refresh">Refresh</string>
+    <string name="widget_mode_toggle">Switch between favorites and nearest</string>
 </resources>
