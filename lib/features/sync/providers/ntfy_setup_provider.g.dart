@@ -42,7 +42,7 @@ final class NtfySetupControllerProvider
 }
 
 String _$ntfySetupControllerHash() =>
-    r'8ed0e9a17ed5cec6c9e58aa8dde6566bc8001e65';
+    r'a0c123f876898293f522695074da65c414899839';
 
 abstract class _$NtfySetupController extends $Notifier<NtfySetupState> {
   NtfySetupState build();
