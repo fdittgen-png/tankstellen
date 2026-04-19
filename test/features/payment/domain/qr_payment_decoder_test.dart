@@ -30,6 +30,23 @@ void main() {
       expect((r as QrPaymentAppLink).schemeLabel, 'TWINT');
     });
 
+    test('regional EU schemes — Wero/MobilePay/Vipps/Swish/MBWay/Blik (#723)', () {
+      const cases = {
+        'wero://pay/abc': 'Wero',
+        'mobilepay://send?x=1': 'MobilePay',
+        'vipps://pay?id=7': 'Vipps',
+        'swish://payment?data=eyJ...': 'Swish',
+        'mbway://transfer?x=1': 'MB Way',
+        'blik://pay?code=123456': 'Blik',
+      };
+      for (final entry in cases.entries) {
+        final r = QrPaymentDecoder.decode(entry.key);
+        expect(r, isA<QrPaymentAppLink>(),
+            reason: 'expected app link for ${entry.key}');
+        expect((r as QrPaymentAppLink).schemeLabel, entry.value);
+      }
+    });
+
     test('scheme match is case-insensitive', () {
       final r = QrPaymentDecoder.decode('PAYCONIQ://ok');
       expect(r, isA<QrPaymentAppLink>());

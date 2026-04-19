@@ -1834,6 +1834,10 @@ class AppLocalizationsSl extends AppLocalizations {
   String get qrPaymentCopyRaw => 'Copy raw text';
 
   @override
+  String get qrPaymentEpcCopied =>
+      'Bank details copied — paste into your banking app';
+
+  @override
   String get vehicleFuelNotSet => 'Not set';
 
   @override

@@ -716,6 +716,7 @@
   "qrPaymentLaunchFailed": "Aucune application ne peut ouvrir ce code",
   "qrPaymentUnknownTitle": "Code non reconnu",
   "qrPaymentCopyRaw": "Copier le texte brut",
+  "qrPaymentEpcCopied": "Coordonnées copiées — collez dans votre app bancaire",
   "vehicleFuelNotSet": "Non défini",
   "wizardVehicleTapToEdit": "Toucher pour modifier",
   "wizardVehicleDefaultBadge": "Par défaut",

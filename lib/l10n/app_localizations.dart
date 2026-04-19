@@ -3499,6 +3499,12 @@ abstract class AppLocalizations {
   /// **'Copy raw text'**
   String get qrPaymentCopyRaw;
 
+  /// No description provided for @qrPaymentEpcCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank details copied — paste into your banking app'**
+  String get qrPaymentEpcCopied;
+
   /// No description provided for @vehicleFuelNotSet.
   ///
   /// In en, this message translates to:

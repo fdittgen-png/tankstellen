@@ -822,6 +822,7 @@
   "qrPaymentLaunchFailed": "No app available to open this code",
   "qrPaymentUnknownTitle": "Unrecognised code",
   "qrPaymentCopyRaw": "Copy raw text",
+  "qrPaymentEpcCopied": "Bank details copied — paste into your banking app",
   "vehicleFuelNotSet": "Not set",
   "wizardVehicleTapToEdit": "Tap to edit",
   "wizardVehicleDefaultBadge": "Default",

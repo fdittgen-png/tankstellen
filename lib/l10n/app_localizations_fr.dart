@@ -1848,6 +1848,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get qrPaymentCopyRaw => 'Copier le texte brut';
 
   @override
+  String get qrPaymentEpcCopied =>
+      'Coordonnées copiées — collez dans votre app bancaire';
+
+  @override
   String get vehicleFuelNotSet => 'Non défini';
 
   @override

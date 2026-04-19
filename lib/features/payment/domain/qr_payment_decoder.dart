@@ -61,6 +61,13 @@ abstract class QrPaymentDecoder {
     'paypal': 'PayPal',
     'bcr': 'Bizum BCR',
     'satispay': 'Satispay',
+    // #723 — regional EU payment-app schemes we see at gas stations.
+    'wero': 'Wero',
+    'mobilepay': 'MobilePay',
+    'vipps': 'Vipps',
+    'swish': 'Swish',
+    'mbway': 'MB Way',
+    'blik': 'Blik',
   };
 
   /// Classify a raw QR value. Returns one of the sealed

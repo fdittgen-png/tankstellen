@@ -1850,6 +1850,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get qrPaymentCopyRaw => 'Rohtext kopieren';
 
   @override
+  String get qrPaymentEpcCopied =>
+      'Bankdaten kopiert — in Banking-App einfügen';
+
+  @override
   String get vehicleFuelNotSet => 'Nicht gesetzt';
 
   @override

@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 void main() {
   setUp(() {
     _launchedUris.clear();
+    _launcherReturn = true;
     ScanPaymentDispatcher.launcher = _fakeLauncher;
     ScanPaymentDispatcher.probe = _alwaysTrueProbe;
   });
@@ -77,6 +78,64 @@ void main() {
     });
   });
 
+  group('tryLaunchEpc (#720)', () {
+    const sample = QrPaymentEpc(
+      raw: 'BCD',
+      beneficiary: 'ACME GmbH',
+      iban: 'DE89370400440532013000',
+      amountEur: 42.5,
+    );
+
+    test('prefers sepa:// scheme when a handler is installed', () async {
+      ScanPaymentDispatcher.probe = (uri) async => uri.scheme == 'sepa';
+      final outcome = await ScanPaymentDispatcher.tryLaunchEpc(sample);
+      expect(outcome, EpcLaunchOutcome.launched);
+      expect(_launchedUris.single.scheme, 'sepa');
+      expect(
+        _launchedUris.single.queryParameters['iban'],
+        'DE89370400440532013000',
+      );
+      expect(_launchedUris.single.queryParameters['amount'], '42.50');
+    });
+
+    test('falls back to iban:// when sepa is unhandled', () async {
+      ScanPaymentDispatcher.probe = (uri) async => uri.scheme == 'iban';
+      final outcome = await ScanPaymentDispatcher.tryLaunchEpc(sample);
+      expect(outcome, EpcLaunchOutcome.launched);
+      expect(_launchedUris.single.scheme, 'iban');
+    });
+
+    test('falls back to clipboard when no scheme handler exists',
+        () async {
+      ScanPaymentDispatcher.probe = (_) async => false;
+      _clipboardWrites.clear();
+      ScanPaymentDispatcher.clipboardWriter =
+          (text) async => _clipboardWrites.add(text);
+
+      final outcome = await ScanPaymentDispatcher.tryLaunchEpc(sample);
+      expect(outcome, EpcLaunchOutcome.copiedToClipboard);
+      expect(_launchedUris, isEmpty);
+      expect(_clipboardWrites.single, contains('DE89370400440532013000'));
+      expect(_clipboardWrites.single, contains('42.50'));
+    });
+
+    test('clipboard failure surfaces as failed outcome', () async {
+      ScanPaymentDispatcher.probe = (_) async => false;
+      ScanPaymentDispatcher.clipboardWriter =
+          (_) async => throw Exception('no clipboard');
+      final outcome = await ScanPaymentDispatcher.tryLaunchEpc(sample);
+      expect(outcome, EpcLaunchOutcome.failed);
+    });
+
+    test('missing IBAN → failed (cannot copy or launch anything useful)',
+        () async {
+      ScanPaymentDispatcher.probe = (_) async => false;
+      const noIban = QrPaymentEpc(raw: 'BCD', beneficiary: 'ACME');
+      final outcome = await ScanPaymentDispatcher.tryLaunchEpc(noIban);
+      expect(outcome, EpcLaunchOutcome.failed);
+    });
+  });
+
   group('buildEpcDialog (#587)', () {
     testWidgets('renders beneficiary, IBAN, amount rows', (tester) async {
       await _pumpEpcDialog(
@@ -109,6 +168,7 @@ void main() {
 // --- test fakes ---------------------------------------------------
 
 final List<Uri> _launchedUris = [];
+final List<String> _clipboardWrites = [];
 bool _launcherReturn = true;
 
 Future<bool> _fakeLauncher(Uri uri, {LaunchMode mode = LaunchMode.externalApplication}) async {

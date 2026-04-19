@@ -299,13 +299,31 @@ class StationDetailScreen extends ConsumerWidget {
               'No app available to open this code',
         );
       case ScanPaymentOutcome.confirmEpc:
-        await showDialog<bool>(
+        final epc = target as QrPaymentEpc;
+        final confirmed = await showDialog<bool>(
           context: context,
-          builder: (ctx) => ScanPaymentDispatcher.buildEpcDialog(
-            ctx,
-            target as QrPaymentEpc,
-          ),
+          builder: (ctx) => ScanPaymentDispatcher.buildEpcDialog(ctx, epc),
         );
+        if (confirmed == true && context.mounted) {
+          final result = await ScanPaymentDispatcher.tryLaunchEpc(epc);
+          if (!context.mounted) break;
+          switch (result) {
+            case EpcLaunchOutcome.launched:
+              break;
+            case EpcLaunchOutcome.copiedToClipboard:
+              SnackBarHelper.showSuccess(
+                context,
+                l10n?.qrPaymentEpcCopied ??
+                    'Bank details copied — paste into your banking app',
+              );
+            case EpcLaunchOutcome.failed:
+              SnackBarHelper.showError(
+                context,
+                l10n?.qrPaymentLaunchFailed ??
+                    'No app available to open this code',
+              );
+          }
+        }
       case ScanPaymentOutcome.unknown:
         await showDialog<void>(
           context: context,
