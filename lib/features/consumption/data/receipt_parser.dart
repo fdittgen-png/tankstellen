@@ -66,11 +66,81 @@ class ReceiptParser {
     final fullText = lines.join(' ');
 
     final brand = _detectBrand(lines, fullText);
-    return switch (brand) {
+    final initial = switch (brand) {
       'super_u' => _parseSuperU(fullText, lines),
       'carrefour' => _parseCarrefour(fullText, lines),
       _ => _parseGeneric(fullText, lines),
     };
+    return _reconcile(initial);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Cross-field reconciliation
+  // ---------------------------------------------------------------------------
+
+  /// Enforce the `liters × pricePerLiter ≈ totalCost` invariant. OCR
+  /// routinely loses one of the three, and sometimes grabs the unit
+  /// price as the total (the "2 €" vs "10.47 €" bug on a column-layout
+  /// Super U receipt). Post-process so:
+  ///
+  /// - any two known values derive the third;
+  /// - when all three are known but the product check disagrees by
+  ///   more than 15 %, trust the PAIR that agrees (the two biggest
+  ///   hints: total + pricePerLiter are most often correct from the
+  ///   label regex, so liters gets recomputed);
+  /// - nothing is overwritten when only one field is known.
+  ReceiptParseResult _reconcile(ReceiptParseResult r) {
+    final liters = r.liters;
+    final total = r.totalCost;
+    final ppl = r.pricePerLiter;
+
+    // Fill in any single missing field from the other two.
+    if (liters == null && total != null && ppl != null && ppl > 0) {
+      return _copyWith(r, liters: _round(total / ppl, 2));
+    }
+    if (total == null && liters != null && ppl != null) {
+      return _copyWith(r, totalCost: _round(liters * ppl, 2));
+    }
+    if (ppl == null && liters != null && total != null && liters > 0) {
+      return _copyWith(r, pricePerLiter: _round(total / liters, 3));
+    }
+
+    // All three known: sanity-check their product. OCR's most common
+    // mistake is grabbing the unit price as the total (€ 1.999 instead
+    // of € 10.47), which blows this check by an order of magnitude.
+    if (liters != null && total != null && ppl != null) {
+      final expected = liters * ppl;
+      if (expected > 0 && (total - expected).abs() / expected > 0.15) {
+        // Trust the larger-signal pair. pricePerLiter comes from a
+        // label with a "/L" marker — very reliable. liters comes from
+        // an "X L" suffix — reliable too. Recompute the total.
+        return _copyWith(r, totalCost: _round(expected, 2));
+      }
+    }
+    return r;
+  }
+
+  ReceiptParseResult _copyWith(
+    ReceiptParseResult r, {
+    double? liters,
+    double? totalCost,
+    double? pricePerLiter,
+  }) {
+    return ReceiptParseResult(
+      liters: liters ?? r.liters,
+      totalCost: totalCost ?? r.totalCost,
+      pricePerLiter: pricePerLiter ?? r.pricePerLiter,
+      date: r.date,
+      stationName: r.stationName,
+      fuelType: r.fuelType,
+      brandLayout: r.brandLayout,
+    );
+  }
+
+  double _round(double value, int digits) {
+    const pow10 = [1, 10, 100, 1000];
+    final p = pow10[digits.clamp(0, pow10.length - 1)];
+    return (value * p).round() / p;
   }
 
   // ---------------------------------------------------------------------------
@@ -201,19 +271,30 @@ class ReceiptParser {
     return null;
   }
 
-  /// Matches patterns like "42.35 L", "42,35 l", "42.35 litres",
-  /// "VOLUME 42.35", "Quantité = 5.27".
+  /// Matches patterns like "42.35 L", "42,35 l", "42.35litres" (no
+  /// space, happens when OCR eats the separator), "VOLUME 42.35",
+  /// "Quantité = 5.27".
+  ///
+  /// Filters pathological matches: the value must be in [0.1, 300] L,
+  /// the typical fill range for passenger cars (excludes things like
+  /// "20.00" from "TVA 20.00 %" or year fragments from a date).
   double? _extractLiters(String text) {
     final patterns = [
-      // "42.35 L" or "42,35 l" or "42.35 litres"
-      RegExp(r'(\d+[.,]\d+)\s*(?:l(?:itres?)?|L)\b'),
+      // "42.35 L" / "42,35 l" / "5.24L" / "42.35 litres"
+      RegExp(r'(\d{1,3}[.,]\d{1,3})\s*(?:l(?:itres?)?|L)\b'),
       // "VOLUME : 42.35" / "Volume: 42,35" / "Quantité = 5.27"
       RegExp(
-        r'(?:volume|quantit[eé])\s*[:=]?\s*(\d+[.,]\d+)',
+        r'(?:volume|quantit[eé])\s*[:=]?\s*(\d{1,3}[.,]\d{1,3})',
         caseSensitive: false,
       ),
     ];
-    return _matchFirst(text, patterns);
+    for (final pattern in patterns) {
+      for (final match in pattern.allMatches(text)) {
+        final value = _parseDecimal(match.group(1)!);
+        if (value != null && value > 0.1 && value < 300) return value;
+      }
+    }
+    return null;
   }
 
   /// Matches patterns like "TOTAL 58.42", "MONTANT 58,42 EUR",
@@ -235,17 +316,30 @@ class ReceiptParser {
     ]);
     if (labelled != null) return labelled;
 
-    // Fallback: first standalone amount attached to €/EUR that is NOT a
-    // price-per-liter (no "/l" right after).
+    // Heuristic fallback: gather every standalone amount attached to
+    // €/EUR that isn't a price-per-liter (no "/L" suffix), then pick
+    // the LARGEST. Rationale: on a fuel receipt the unit price, tax,
+    // and net all live around the total, but the total is almost
+    // always the biggest number on the paper. Picking "first" grabs
+    // the price-per-liter on column-layout receipts like Super U,
+    // where OCR emits "€ 1.999/L ... € 10.47" — or even skips the
+    // "/L" suffix, so "first" becomes 1.999.
     final currencyPattern = RegExp(
       r'(?:€\s*(\d+[.,]\d+)|(\d+[.,]\d+)\s*(?:€|EUR))(\s*/\s*[lL])?',
     );
+    double? best;
     for (final match in currencyPattern.allMatches(text)) {
-      if (match.group(3) != null) continue; // "/L" suffix → price-per-liter
-      final value = match.group(1) ?? match.group(2);
-      if (value != null) return _parseDecimal(value);
+      if (match.group(3) != null) continue; // "/L" suffix → unit price
+      final raw = match.group(1) ?? match.group(2);
+      if (raw == null) continue;
+      final value = _parseDecimal(raw);
+      if (value == null || value <= 0) continue;
+      // Filter obvious non-totals: nobody's total is < 1 €, nobody's
+      // total is > 10 000 €.
+      if (value < 1 || value > 10000) continue;
+      if (best == null || value > best) best = value;
     }
-    return null;
+    return best;
   }
 
   /// Matches price-per-liter: "1.899 €/L", "€ 1,999/L", "PU: 1,899",

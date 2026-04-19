@@ -7,6 +7,23 @@ import 'package:image_picker/image_picker.dart';
 import 'pump_display_parser.dart';
 import 'receipt_parser.dart';
 
+/// Outcome of a single receipt capture: parsed fields plus the source
+/// OCR text and the path to the captured JPEG on disk. The caller is
+/// responsible for deleting [imagePath] once it no longer needs it — we
+/// keep the file around so the "report bad scan" flow (#713) can share
+/// the photo alongside the user's corrected values.
+class ReceiptScanOutcome {
+  final ReceiptParseResult parse;
+  final String ocrText;
+  final String imagePath;
+
+  const ReceiptScanOutcome({
+    required this.parse,
+    required this.ocrText,
+    required this.imagePath,
+  });
+}
+
 /// Service that captures a photo and runs on-device OCR.
 ///
 /// Uses [ImagePicker] for camera access and [TextRecognizer] from
@@ -33,53 +50,71 @@ class ReceiptScanService {
         _pumpParser = pumpParser ?? const PumpDisplayParser();
 
   /// Opens the camera, captures a receipt photo, runs OCR, and parses
-  /// the result. Returns null if the user cancels the camera.
-  Future<ReceiptParseResult?> scanReceipt() async {
-    final text = await _captureAndRecognise();
-    if (text == null) return null;
-    return _parser.parse(text);
+  /// the result. Returns null if the user cancels the camera or OCR
+  /// fails. The captured photo is NOT deleted — callers hold the path
+  /// from [ReceiptScanOutcome.imagePath] and delete when done (e.g.
+  /// after the form is saved or after the user has shared a bad-scan
+  /// report).
+  Future<ReceiptScanOutcome?> scanReceipt() async {
+    final capture = await _capture();
+    if (capture == null) return null;
+    final text = await _recognise(capture);
+    if (text == null) {
+      await _tryDelete(capture);
+      return null;
+    }
+    return ReceiptScanOutcome(
+      parse: _parser.parse(text),
+      ocrText: text,
+      imagePath: capture,
+    );
   }
 
   /// Opens the camera, captures a pump-display photo, runs OCR, and
   /// parses the three primary values (Betrag / Abgabe / Preis/Liter)
   /// into a [PumpDisplayParseResult]. Returns null if the user
-  /// cancels the camera.
+  /// cancels the camera. The photo is deleted before return — the
+  /// pump-display flow does not feed the bad-scan reporting path.
   Future<PumpDisplayParseResult?> scanPumpDisplay() async {
-    final text = await _captureAndRecognise();
-    if (text == null) return null;
-    return _pumpParser.parse(text);
+    final capture = await _capture();
+    if (capture == null) return null;
+    try {
+      final text = await _recognise(capture);
+      if (text == null) return null;
+      return _pumpParser.parse(text);
+    } finally {
+      await _tryDelete(capture);
+    }
   }
 
-  /// Opens the camera, reads OCR text, and cleans up the temp file.
-  /// Returns null on cancel or OCR failure.
-  Future<String?> _captureAndRecognise() async {
+  Future<String?> _capture() async {
     final image = await _picker.pickImage(
       source: ImageSource.camera,
       preferredCameraDevice: CameraDevice.rear,
       maxWidth: 1920,
       imageQuality: 85,
     );
+    return image?.path;
+  }
 
-    if (image == null) return null;
-
+  Future<String?> _recognise(String path) async {
     try {
-      final inputImage = InputImage.fromFilePath(image.path);
+      final inputImage = InputImage.fromFilePath(path);
       final recognized = await _recognizer.processImage(inputImage);
       final text = recognized.text;
-
       debugPrint('OCR text (${text.length} chars):\n$text');
-
       return text;
     } catch (e) {
       debugPrint('OCR scan failed: $e');
       return null;
-    } finally {
-      // Clean up temp file
-      try {
-        await File(image.path).delete();
-      } catch (e) {
-        debugPrint('OCR temp-file cleanup failed at ${image.path}: $e');
-      }
+    }
+  }
+
+  Future<void> _tryDelete(String path) async {
+    try {
+      await File(path).delete();
+    } catch (e) {
+      debugPrint('OCR temp-file cleanup failed at $path: $e');
     }
   }
 

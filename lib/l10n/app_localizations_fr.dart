@@ -1800,6 +1800,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fillUpVehicleRequired => 'Véhicule requis';
 
   @override
+  String get reportScanError => 'Signaler une erreur de scan';
+
+  @override
   String get vehicleFuelNotSet => 'Non défini';
 
   @override

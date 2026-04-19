@@ -1789,6 +1789,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get fillUpVehicleRequired => 'Vehicle is required';
 
   @override
+  String get reportScanError => 'Report scan error';
+
+  @override
   String get vehicleFuelNotSet => 'Not set';
 
   @override

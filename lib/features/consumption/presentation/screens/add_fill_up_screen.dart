@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/widgets/fuel_type_dropdown.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -14,6 +15,7 @@ import '../../data/obd2/obd2_transport.dart';
 import '../../data/receipt_scan_service.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
+import '../widgets/bad_scan_report_sheet.dart';
 import '../widgets/fill_up_input_buttons.dart';
 import '../widgets/fill_up_numeric_field.dart';
 
@@ -58,6 +60,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   ReceiptScanService? _scanService;
   String? _vehicleId;
   bool _vehicleInitialized = false;
+  ReceiptScanOutcome? _lastScan;
 
   @override
   void initState() {
@@ -171,8 +174,9 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     setState(() => _scanning = true);
     try {
       _scanService ??= ReceiptScanService();
-      final result = await _scanService!.scanReceipt();
-      if (result == null || !mounted) return;
+      final outcome = await _scanService!.scanReceipt();
+      if (outcome == null || !mounted) return;
+      final result = outcome.parse;
 
       if (!result.hasData) {
         SnackBarHelper.show(context, 'No receipt data found — try again');
@@ -195,11 +199,15 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
         if (result.fuelType != null && _vehicleId == null) {
           _fuelType = result.fuelType!;
         }
+        _lastScan = outcome;
       });
 
       if (mounted) {
-        SnackBarHelper.showSuccess(context,
-            'Receipt scanned — verify and adjust values');
+        SnackBarHelper.show(
+          context,
+          'Receipt scanned — verify values. Tap "Report scan error" '
+              'below if anything is off.',
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -438,9 +446,34 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
               icon: const Icon(Icons.save),
               label: Text(l?.save ?? 'Save'),
             ),
+            if (_lastScan != null) ...[
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: _reportBadScan,
+                icon: const Icon(Icons.flag_outlined, size: 18),
+                label: Text(l?.reportScanError ?? 'Report scan error'),
+              ),
+            ],
             SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 16),
           ],
         ),
+      ),
+    );
+  }
+
+  Future<void> _reportBadScan() async {
+    final scan = _lastScan;
+    if (scan == null) return;
+    final liters = double.tryParse(_litersCtrl.text.replaceAll(',', '.'));
+    final cost = double.tryParse(_costCtrl.text.replaceAll(',', '.'));
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => BadScanReportSheet(
+        scan: scan,
+        enteredLiters: liters,
+        enteredTotalCost: cost,
+        appVersion: AppConstants.appVersion,
       ),
     );
   }

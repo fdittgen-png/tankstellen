@@ -701,6 +701,7 @@
   "fillUpVehicleLabel": "Véhicule",
   "fillUpVehicleNone": "Aucun véhicule",
   "fillUpVehicleRequired": "Véhicule requis",
+  "reportScanError": "Signaler une erreur de scan",
   "vehicleFuelNotSet": "Non défini",
   "wizardVehicleTapToEdit": "Toucher pour modifier",
   "wizardVehicleDefaultBadge": "Par défaut",

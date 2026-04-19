@@ -3409,6 +3409,12 @@ abstract class AppLocalizations {
   /// **'Vehicle is required'**
   String get fillUpVehicleRequired;
 
+  /// No description provided for @reportScanError.
+  ///
+  /// In en, this message translates to:
+  /// **'Report scan error'**
+  String get reportScanError;
+
   /// No description provided for @vehicleFuelNotSet.
   ///
   /// In en, this message translates to:

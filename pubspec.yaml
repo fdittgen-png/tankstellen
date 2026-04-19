@@ -1,7 +1,7 @@
 name: tankstellen
 description: "Free fuel price comparison app — 11 countries, 23 languages, privacy-first"
 publish_to: 'none'
-version: 5.0.0+5039
+version: 5.0.0+5040
 
 environment:
   sdk: ^3.11.3
@@ -54,6 +54,7 @@ dependencies:
   connectivity_plus: ^7.1.1
   shared_preferences: ^2.5.5
   url_launcher: ^6.3.1
+  share_plus: ^12.0.2
   flutter_secure_storage: ^10.0.0
   package_info_plus: ^8.3.1
   sentry_flutter: ^9.16.1

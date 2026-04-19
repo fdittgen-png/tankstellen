@@ -807,6 +807,7 @@
   "fillUpVehicleLabel": "Vehicle",
   "fillUpVehicleNone": "No vehicle",
   "fillUpVehicleRequired": "Vehicle is required",
+  "reportScanError": "Report scan error",
   "vehicleFuelNotSet": "Not set",
   "wizardVehicleTapToEdit": "Tap to edit",
   "wizardVehicleDefaultBadge": "Default",

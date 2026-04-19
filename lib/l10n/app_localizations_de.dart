@@ -1803,6 +1803,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fillUpVehicleRequired => 'Fahrzeug erforderlich';
 
   @override
+  String get reportScanError => 'Scan-Fehler melden';
+
+  @override
   String get vehicleFuelNotSet => 'Nicht gesetzt';
 
   @override
