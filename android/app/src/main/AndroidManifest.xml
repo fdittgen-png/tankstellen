@@ -31,7 +31,12 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!-- Home screen widget: fuel prices for favorite stations -->
+        <!-- Home-screen widget: single provider with a header toggle that
+             flips between favorites and nearest-stations modes (#713).
+             The second NearestWidgetProvider receiver was removed to
+             keep only one widget per Tankerkönig-style "Requests on
+             Demand" guidance; the provider class alone serves both
+             modes via SharedPreferences mode state. -->
         <receiver
             android:name=".FuelPriceWidgetProvider"
             android:exported="true"
@@ -42,19 +47,6 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/fuel_widget_info" />
-        </receiver>
-
-        <!-- Home screen widget: nearest stations with prices and distance -->
-        <receiver
-            android:name=".NearestWidgetProvider"
-            android:exported="true"
-            android:permission="android.permission.BIND_APPWIDGET">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/nearest_widget_info" />
         </receiver>
 
         <!-- Android Auto car app service -->

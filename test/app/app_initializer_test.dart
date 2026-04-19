@@ -92,7 +92,16 @@ void main() {
       expect(body, isNotNull);
       expect(body, contains('Future.wait'));
       expect(body, contains('LocalNotificationService'));
-      expect(body, contains('BackgroundService.init'));
+      // Background polling is now gated on active alerts (#713); the
+      // parallel slot may reference the gating helper instead of the
+      // service directly. Either is fine so long as background work
+      // still happens in the same Future.wait slot.
+      expect(
+        body!.contains('BackgroundService.init') ||
+            body.contains('_maybeInitBackground'),
+        isTrue,
+        reason: 'background init (or its gating helper) must run in parallel',
+      );
       expect(body, contains('HomeWidgetService.init'));
     });
 

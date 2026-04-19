@@ -83,13 +83,24 @@ class BackgroundService {
   /// Base delay for exponential backoff between retries.
   static const retryBaseDelay = Duration(seconds: 2);
 
-  /// Initialize background price refresh using the platform-appropriate implementation.
+  /// Initialize background price refresh using the platform-appropriate
+  /// implementation.
   ///
   /// Delegates to [createBackgroundPriceFetcher] which returns the correct
   /// [BackgroundPriceFetcher] for the current platform.
   static Future<void> init() async {
     final fetcher = createBackgroundPriceFetcher();
     await fetcher.init();
+  }
+
+  /// Cancel all scheduled periodic tasks. Called when the user has no
+  /// active alerts left — per the Tankerkönig terms of service
+  /// ("Apps: requests on demand — regular non-user-initiated requests
+  /// are to be avoided"). Price alerts ARE user-consented periodic
+  /// polling; without them, no polling should happen.
+  static Future<void> cancelAll() async {
+    final fetcher = createBackgroundPriceFetcher();
+    await fetcher.cancelAll();
   }
 }
 

@@ -186,9 +186,26 @@ class AppInitializer {
   static Future<void> _initServicesInParallel() async {
     await Future.wait<void>([
       _safe('notifications', LocalNotificationService().initialize),
-      _safe('background', BackgroundService.init),
+      _safe('background', _maybeInitBackground),
       _safe('home_widget', HomeWidgetService.init),
     ]);
+  }
+
+  /// Schedule periodic price polling only when the user has at least one
+  /// active price alert (#713). Alerts are the only user-consented reason
+  /// to poll the station APIs on a regular schedule — per Tankerkönig's
+  /// terms of service, apps must use "requests on demand" and avoid
+  /// regular non-user-initiated requests.
+  static Future<void> _maybeInitBackground() async {
+    final storage = HiveStorage();
+    final rawAlerts = storage.getAlerts();
+    final hasActiveAlert = rawAlerts.any((a) => a['isActive'] == true);
+    if (!hasActiveAlert) {
+      debugPrint(
+          'AppInitializer: skipping background polling — no active alerts');
+      return;
+    }
+    await BackgroundService.init();
   }
 
   static Future<void> _safe(String label, Future<void> Function() body) async {
