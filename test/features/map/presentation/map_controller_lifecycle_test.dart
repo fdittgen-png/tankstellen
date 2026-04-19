@@ -14,10 +14,14 @@ void main() {
         isTrue,
         reason: 'MapScreen must dispose MapController to prevent stale references',
       );
+      // MapScreen REASSIGNS the controller on tab-flip (#709 rebuild
+      // fix), so the field is `late MapController` (non-final) and the
+      // assertion now checks for the non-final declaration.
       expect(
-        source.contains('late final MapController _mapController'),
+        source.contains('late MapController _mapController'),
         isTrue,
-        reason: 'MapController should be late final, created in initState',
+        reason: 'MapController should be late (non-final), created in initState '
+            'and replaced on tab-flip rebuild',
       );
     });
 
@@ -60,34 +64,35 @@ void main() {
     });
 
     test(
-      'MapScreen.initState schedules a post-frame controller nudge so the '
-      'TileLayer recomputes visible bounds on first paint (regression #473)',
+      'MapScreen rebuilds the FlutterMap subtree on every Carte tab-flip '
+      '(regression #709 — zoom-nudge alone left blank tiles on first visit)',
       () {
         final source = File(
           'lib/features/map/presentation/screens/map_screen.dart',
         ).readAsStringSync();
 
-        // The fix must (a) hook a post-frame callback in initState,
-        // (b) call _mapController.move(...) inside it, and (c) wrap
-        // the move in a try/catch so the controller-not-attached path
-        // does not throw.
+        // The fix must (a) listen to currentShellBranchProvider, and
+        // (b) use a ValueKey on a KeyedSubtree wrapping the body so
+        // tab-flip destroys + rebuilds the TileLayer with fresh
+        // constraints, and (c) dispose + recreate the MapController
+        // so the old one isn't bound to the torn-down widget.
         expect(
-          source.contains('addPostFrameCallback'),
+          source.contains('currentShellBranchProvider'),
           isTrue,
-          reason: 'MapScreen.initState must schedule a post-frame callback to '
-              'nudge the MapController on first paint (#473)',
+          reason: 'MapScreen must observe tab flips via '
+              'currentShellBranchProvider to rebuild on Carte visits (#709)',
         );
         expect(
-          source.contains('_mapController.move'),
+          source.contains('KeyedSubtree'),
           isTrue,
-          reason: 'The post-frame callback must call MapController.move(...) '
-              'so the TileLayer recomputes its visible bounds (#473)',
+          reason: 'MapScreen must wrap the map body in a KeyedSubtree so '
+              'the tab-flip ValueKey forces a TileLayer rebuild (#709)',
         );
         expect(
-          source.contains('try {'),
+          source.contains('_mapIncarnation'),
           isTrue,
-          reason: 'The nudge must be wrapped in try/catch — on the first '
-              'frame the controller may not yet be attached to a FlutterMap',
+          reason: 'Rebuild counter must exist so each tab-flip produces a '
+              'distinct key (#709)',
         );
       },
     );
