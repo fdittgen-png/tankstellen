@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#2E7D32</color>
+    <!-- Widget text colors with explicit light/dark variants so dark-mode
+         launchers always get readable contrast — `?android:attr/textColorPrimary`
+         resolved against the launcher's theme and sometimes stayed dark on
+         a dark widget background (#712). -->
+    <color name="widget_text_primary">#1C1B1F</color>
+    <color name="widget_text_secondary">#49454F</color>
+    <color name="widget_icon_tint">#49454F</color>
 </resources>

@@ -33,17 +33,34 @@ class NearestWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent.action == ACTION_OPEN_APP) {
-            val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-            if (launchIntent != null) {
-                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(launchIntent)
+        when (intent.action) {
+            ACTION_OPEN_APP -> {
+                val launchIntent =
+                    context.packageManager.getLaunchIntentForPackage(context.packageName)
+                if (launchIntent != null) {
+                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(launchIntent)
+                }
+            }
+            ACTION_REFRESH -> {
+                val mgr = AppWidgetManager.getInstance(context)
+                val ids = mgr.getAppWidgetIds(
+                    android.content.ComponentName(context, NearestWidgetProvider::class.java)
+                )
+                for (id in ids) updateWidget(context, mgr, id)
+                val launchIntent =
+                    context.packageManager.getLaunchIntentForPackage(context.packageName)
+                if (launchIntent != null) {
+                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(launchIntent)
+                }
             }
         }
     }
 
     companion object {
         private const val ACTION_OPEN_APP = "de.tankstellen.fuelprices.OPEN_NEAREST"
+        private const val ACTION_REFRESH = "de.tankstellen.fuelprices.REFRESH_NEAREST"
         private const val PREFS_NAME = "HomeWidgetPreferences"
 
         private fun updateWidget(
@@ -66,6 +83,16 @@ class NearestWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             views.setOnClickPendingIntent(R.id.nearest_widget_root, pendingIntent)
+
+            // Refresh button — re-renders from cache and opens the app.
+            val refreshIntent = Intent(context, NearestWidgetProvider::class.java).apply {
+                action = ACTION_REFRESH
+            }
+            val refreshPending = PendingIntent.getBroadcast(
+                context, 2, refreshIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            views.setOnClickPendingIntent(R.id.nearest_refresh, refreshPending)
 
             // Parse stations
             val stations = try {

@@ -20,7 +20,7 @@
             android:layout_weight="1"
             android:textSize="13sp"
             android:textStyle="bold"
-            android:textColor="?android:attr/textColorPrimary"
+            android:textColor="@color/widget_text_primary"
             android:maxLines="1"
             android:ellipsize="end" />
 
@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="11sp"
-            android:textColor="?android:attr/textColorSecondary"
+            android:textColor="@color/widget_text_secondary"
             android:paddingStart="6dp"
             android:visibility="gone" />
     </LinearLayout>
@@ -40,7 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="10sp"
-        android:textColor="?android:attr/textColorSecondary"
+        android:textColor="@color/widget_text_secondary"
         android:maxLines="1"
         android:ellipsize="end" />
 
@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="10sp"
-            android:textColor="?android:attr/textColorSecondary"
+            android:textColor="@color/widget_text_secondary"
             android:paddingEnd="4dp" />
 
         <TextView

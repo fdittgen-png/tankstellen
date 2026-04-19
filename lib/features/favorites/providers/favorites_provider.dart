@@ -1,14 +1,18 @@
+import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/country/country_config.dart';
 import '../../../core/country/country_provider.dart';
+import '../../../core/data/storage_repository.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../../../core/sync/sync_service.dart';
+import '../../widget/data/home_widget_service.dart';
 import '../../search/domain/entities/charging_station.dart' as search_ev;
 import '../../search/domain/entities/station.dart';
 import '../../search/providers/station_rating_provider.dart';
@@ -37,6 +41,32 @@ class Favorites extends _$Favorites {
   void _reload() {
     final storage = ref.read(storageRepositoryProvider);
     state = [...storage.getFavoriteIds(), ...storage.getEvFavoriteIds()];
+    // Push the new favorite set to the Android home-screen widget
+    // right away (#712). Previously the widget only updated on the
+    // hourly background task, so users who installed the app and added
+    // favorites saw an empty widget until the first background run.
+    _refreshWidget(storage);
+  }
+
+  /// Fire-and-forget: tells [HomeWidgetService] to rebuild both the
+  /// favorites and nearest widgets from the current Hive state.
+  void _refreshWidget(StorageRepository storage) {
+    unawaited(() async {
+      try {
+        await HomeWidgetService.updateWidget(
+          storage,
+          profileStorage: storage,
+          settingsStorage: storage,
+        );
+        await HomeWidgetService.updateNearestWidget(
+          storage,
+          storage,
+          profileStorage: storage,
+        );
+      } catch (e) {
+        debugPrint('Favorites._refreshWidget: $e');
+      }
+    }());
   }
 
   /// Whether a station ID belongs to an EV charging station.

@@ -6,4 +6,5 @@
     <string name="nearest_widget_description">Shows fuel prices for the nearest stations</string>
     <string name="nearest_widget_name">Nearest Stations</string>
     <string name="nearest_widget_empty">Add favorites and enable GPS to see nearby stations</string>
+    <string name="widget_refresh">Refresh</string>
 </resources>

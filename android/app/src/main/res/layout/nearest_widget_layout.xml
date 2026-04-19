@@ -7,7 +7,7 @@
     android:background="@drawable/widget_background"
     android:id="@+id/nearest_widget_root">
 
-    <!-- Header row: title + last update -->
+    <!-- Header row: title + last update + refresh -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
             android:text="@string/nearest_widget_name"
             android:textSize="13sp"
             android:textStyle="bold"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:textColor="@color/widget_text_primary" />
 
         <TextView
             android:id="@+id/nearest_updated_at"
@@ -30,7 +30,17 @@
             android:layout_height="wrap_content"
             android:text=""
             android:textSize="10sp"
-            android:textColor="?android:attr/textColorSecondary" />
+            android:paddingEnd="6dp"
+            android:textColor="@color/widget_text_secondary" />
+
+        <ImageView
+            android:id="@+id/nearest_refresh"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@android:drawable/ic_popup_sync"
+            android:contentDescription="@string/widget_refresh"
+            android:padding="2dp"
+            android:tint="@color/widget_icon_tint" />
     </LinearLayout>
 
     <!-- Station list (up to 3 visible) -->
@@ -47,7 +57,7 @@
         android:layout_height="wrap_content"
         android:text="@string/nearest_widget_empty"
         android:textSize="12sp"
-        android:textColor="?android:attr/textColorSecondary"
+        android:textColor="@color/widget_text_secondary"
         android:gravity="center"
         android:paddingTop="8dp"
         android:visibility="gone" />

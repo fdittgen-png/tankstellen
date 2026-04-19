@@ -33,18 +33,36 @@ class FuelPriceWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        // Handle tap → open app
-        if (intent.action == ACTION_OPEN_APP) {
-            val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-            if (launchIntent != null) {
-                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(launchIntent)
+        when (intent.action) {
+            ACTION_OPEN_APP -> {
+                val launchIntent =
+                    context.packageManager.getLaunchIntentForPackage(context.packageName)
+                if (launchIntent != null) {
+                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(launchIntent)
+                }
+            }
+            ACTION_REFRESH -> {
+                // Re-render straight from cached SharedPreferences and
+                // open the app so its Riverpod wiring can refresh prices.
+                val mgr = AppWidgetManager.getInstance(context)
+                val ids = mgr.getAppWidgetIds(
+                    android.content.ComponentName(context, FuelPriceWidgetProvider::class.java)
+                )
+                for (id in ids) updateWidget(context, mgr, id)
+                val launchIntent =
+                    context.packageManager.getLaunchIntentForPackage(context.packageName)
+                if (launchIntent != null) {
+                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(launchIntent)
+                }
             }
         }
     }
 
     companion object {
         private const val ACTION_OPEN_APP = "de.tankstellen.fuelprices.OPEN_APP"
+        private const val ACTION_REFRESH = "de.tankstellen.fuelprices.REFRESH_FUEL"
         private const val PREFS_NAME = "HomeWidgetPreferences"
 
         private fun updateWidget(
@@ -67,6 +85,16 @@ class FuelPriceWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             views.setOnClickPendingIntent(R.id.widget_root, pendingIntent)
+
+            // Refresh button — broadcasts a refresh action handled above.
+            val refreshIntent = Intent(context, FuelPriceWidgetProvider::class.java).apply {
+                action = ACTION_REFRESH
+            }
+            val refreshPending = PendingIntent.getBroadcast(
+                context, 1, refreshIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            views.setOnClickPendingIntent(R.id.widget_refresh, refreshPending)
 
             // Parse stations
             val stations = try {
