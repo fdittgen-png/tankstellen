@@ -83,13 +83,30 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         }
       });
     }
+    // Only rebuild on Carte tab-flip. Previously we also rebuilt on
+    // every non-empty searchState change (#529) but that cancels the
+    // TileLayer's in-flight HTTP requests when a price-refresh lands,
+    // leaving the map grey at the initial zoom (#709 regression
+    // reported in the v5026 screenshots). Instead call a lightweight
+    // camera-move on search-result change — the map is already
+    // mounted at that point so a nudge suffices.
     ref.listen<int>(currentShellBranchProvider, (prev, next) {
       const mapBranchIndex = 1;
       if (next != mapBranchIndex) return;
       rebuildMap();
     });
     ref.listen(searchStateProvider, (_, next) {
-      if (next.hasValue && next.value!.data.isNotEmpty) rebuildMap();
+      if (!next.hasValue || next.value!.data.isEmpty) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        try {
+          final camera = _mapController.camera;
+          _mapController.move(camera.center, camera.zoom + 0.0001);
+          _mapController.move(camera.center, camera.zoom);
+        } catch (e) {
+          debugPrint('MapScreen search-change nudge: $e');
+        }
+      });
     });
 
     final searchState = ref.watch(searchStateProvider);
