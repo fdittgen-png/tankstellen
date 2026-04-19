@@ -112,11 +112,11 @@ class PickStationForFillUpScreen extends ConsumerWidget {
     final price = _priceForFuel(station, profileFuel);
     context.pushReplacement(
       '/consumption/add',
-      extra: {
+      extra: <String, Object?>{
         'stationId': station.id,
         'stationName': station.brand.isNotEmpty ? station.brand : station.name,
         'fuelType': profileFuel,
-        ?'pricePerLiter': price,
+        if (price != null) 'pricePerLiter': price,
       },
     );
   }

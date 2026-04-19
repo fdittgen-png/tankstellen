@@ -4,6 +4,21 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
+    <!-- Bluetooth — used by the OBD2 adapter transport (#716). -->
+    <!-- Android <= 11 (API 30) BT permissions. -->
+    <uses-permission android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30"/>
+    <!-- Android 12+ runtime-requested permissions.
+         neverForLocation declares we only scan for OBD2 adapters, not
+         to infer location — avoids the coarse-location prompt. -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+    <uses-feature android:name="android.hardware.bluetooth_le"
+        android:required="false"/>
+
     <application
         android:label="Fuel Prices"
         android:name="${applicationName}"
