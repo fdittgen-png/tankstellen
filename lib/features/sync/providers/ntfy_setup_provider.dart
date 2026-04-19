@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/storage/storage_keys.dart';
+import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/ntfy_service.dart';
 import '../../../core/sync/supabase_client.dart';
 
@@ -91,8 +93,8 @@ class NtfySetupController extends _$NtfySetupController {
         return false;
       }
 
+      final topic = _ntfyService.generateTopic(userId);
       if (value) {
-        final topic = _ntfyService.generateTopic(userId);
         await client.from('push_tokens').upsert({
           'user_id': userId,
           'ntfy_topic': topic,
@@ -102,6 +104,16 @@ class NtfySetupController extends _$NtfySetupController {
         await client.from('push_tokens').update({
           'enabled': false,
         }).eq('user_id', userId);
+      }
+
+      // #580 — mirror to Hive so the background isolate can read it
+      // without reaching into Supabase. Kept in sync on every toggle.
+      try {
+        final storage = ref.read(settingsStorageProvider);
+        await storage.putSetting(StorageKeys.ntfyEnabled, value);
+        await storage.putSetting(StorageKeys.ntfyTopic, topic);
+      } catch (e) {
+        debugPrint('NtfySetupController: failed to mirror to Hive: $e');
       }
 
       state = state.copyWith(enabled: value, isToggling: false);
