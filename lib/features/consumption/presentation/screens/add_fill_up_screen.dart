@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/widgets/fuel_type_dropdown.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
@@ -80,8 +81,11 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       return;
     }
     String? defaultId;
+    FuelType? profilePreferred;
     try {
-      defaultId = ref.read(activeProfileProvider)?.defaultVehicleId;
+      final profile = ref.read(activeProfileProvider);
+      defaultId = profile?.defaultVehicleId;
+      profilePreferred = profile?.preferredFuelType;
     } catch (e) {
       debugPrint('AddFillUp: active profile unavailable: $e');
     }
@@ -98,15 +102,37 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     } else {
       _vehicleId = vehicles.first.id;
     }
-    // Sync the fuel to the resolved vehicle so the summary shows the
-    // right fuel on first paint.
     final selected = vehicles.firstWhere(
       (v) => v.id == _vehicleId,
       orElse: () => vehicles.first,
     );
-    final derived = _fuelForVehicle(selected);
-    if (derived != null) _fuelType = derived;
+    _fuelType = _resolveDefaultFuel(
+      vehicle: selected,
+      profilePreferred: profilePreferred,
+      preFill: widget.preFilledFuelType,
+    );
     _vehicleInitialized = true;
+  }
+
+  /// Default-fuel policy (#713):
+  /// 1. preFilledFuelType (from receipt scan / station context) if it
+  ///    is compatible with the vehicle
+  /// 2. profile's preferredFuelType if compatible — honours "suggest
+  ///    by default the one in the profile" for flex-fuel vehicles
+  /// 3. vehicle's own preferred fuel as the fallback
+  /// 4. FuelType.e10 as the global last-resort default
+  FuelType _resolveDefaultFuel({
+    required VehicleProfile vehicle,
+    FuelType? profilePreferred,
+    FuelType? preFill,
+  }) {
+    final vehicleFuel = _fuelForVehicle(vehicle) ?? FuelType.e10;
+    final compatible = compatibleFuelsFor(vehicleFuel);
+    if (preFill != null && compatible.contains(preFill)) return preFill;
+    if (profilePreferred != null && compatible.contains(profilePreferred)) {
+      return profilePreferred;
+    }
+    return vehicleFuel;
   }
 
   /// Auto-fills the total cost based on the pre-filled price per liter
@@ -361,10 +387,11 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
             ),
             const SizedBox(height: 12),
             if (_vehicleId != null) ...[
-              _VehicleFuelInfo(
+              _VehicleFuelPicker(
                 vehicles: vehicles,
                 vehicleId: _vehicleId!,
                 fuelType: _fuelType,
+                onChanged: (next) => setState(() => _fuelType = next),
                 onOpenVehicle: () =>
                     context.push('/vehicles/edit', extra: _vehicleId!),
               ),
@@ -479,19 +506,28 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   }
 }
 
-/// Read-only chip showing the fuel derived from the selected vehicle,
-/// plus a tap-to-open link that takes the user to the vehicle edit
-/// screen so they can change it at the source (#698).
-class _VehicleFuelInfo extends StatelessWidget {
+/// Fuel picker constrained to the vehicle's compatible fuels (#713).
+///
+/// A petrol car gets [e10, e5, e98, e85]; a diesel car gets
+/// [diesel, dieselPremium]; EV / LPG / CNG / H₂ vehicles pick from
+/// their single applicable fuel only. The initial value is the one
+/// resolved by [_AddFillUpScreenState._resolveDefaultFuel] — profile
+/// preference when compatible, else the vehicle's own fuel — so the
+/// form always loads with the most likely choice but still lets the
+/// user override it for this specific fill-up (e.g. a flex-fuel
+/// E85 car tanking regular SP95 this week).
+class _VehicleFuelPicker extends StatelessWidget {
   final List<VehicleProfile> vehicles;
   final String vehicleId;
   final FuelType fuelType;
+  final ValueChanged<FuelType> onChanged;
   final VoidCallback onOpenVehicle;
 
-  const _VehicleFuelInfo({
+  const _VehicleFuelPicker({
     required this.vehicles,
     required this.vehicleId,
     required this.fuelType,
+    required this.onChanged,
     required this.onOpenVehicle,
   });
 
@@ -500,22 +536,41 @@ class _VehicleFuelInfo extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final vehicle = vehicles.firstWhere((v) => v.id == vehicleId);
-    return Card(
-      margin: EdgeInsets.zero,
-      color: theme.colorScheme.surfaceContainerHighest,
-      child: ListTile(
-        leading: const Icon(Icons.local_gas_station),
-        title: Text(l?.fuelType ?? 'Fuel type'),
-        subtitle: Text(
-          '${fuelType.displayName}   •   ${vehicle.name}',
-          style: theme.textTheme.bodyMedium,
+    final vehicleFuel = _fuelForVehicleStatic(vehicle) ?? FuelType.e10;
+    final compatible = compatibleFuelsFor(vehicleFuel);
+    final value =
+        compatible.contains(fuelType) ? fuelType : compatible.first;
+
+    return Row(
+      children: [
+        Expanded(
+          child: FuelTypeDropdown(
+            value: value,
+            options: compatible,
+            prefixIcon: const Icon(Icons.local_gas_station),
+            labelText: '${l?.fuelType ?? 'Fuel type'} • ${vehicle.name}',
+            onChanged: onChanged,
+          ),
         ),
-        trailing: IconButton(
+        IconButton(
           icon: const Icon(Icons.open_in_new),
           tooltip: l?.vehicleEditTitle ?? 'Edit vehicle',
           onPressed: onOpenVehicle,
+          style: IconButton.styleFrom(
+            foregroundColor: theme.colorScheme.primary,
+          ),
         ),
-      ),
+      ],
     );
+  }
+
+  /// Mirror of [_AddFillUpScreenState._fuelForVehicle] — kept static
+  /// here so the picker can resolve the vehicle's family without
+  /// pulling in a dependency on the parent state.
+  static FuelType? _fuelForVehicleStatic(VehicleProfile v) {
+    if (v.type == VehicleType.ev) return FuelType.electric;
+    final raw = v.preferredFuelType;
+    if (raw == null || raw.trim().isEmpty) return null;
+    return FuelType.fromString(raw);
   }
 }

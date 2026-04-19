@@ -57,25 +57,28 @@ void main() {
       expect(find.text('Station pre-filled'), findsOneWidget);
     });
 
-    testWidgets('preFilledFuelType is surfaced on the fuel info card',
-        (tester) async {
+    testWidgets(
+        'preFilledFuelType is surfaced on the fuel picker when compatible '
+        'with the selected vehicle', (tester) async {
+      // The stub vehicle is a petrol combustion car (no configured
+      // fuel — treated as petrol family); pre-fill with E5 which IS
+      // in the petrol compatibility set.
       await pumpApp(
         tester,
         const AddFillUpScreen(
           stationId: 'abc',
           stationName: 'Total',
-          preFilledFuelType: FuelType.diesel,
+          preFilledFuelType: FuelType.e5,
         ),
         overrides: _withVehicle,
       );
 
-      // Vehicle is now mandatory and auto-selected. Because the stub
-      // vehicle has no configured fuel, the form keeps the passed-in
-      // preFilledFuelType and shows it via the shared displayName
-      // ("Diesel") in the fuel info card (#713).
       expect(
-        find.textContaining(FuelType.diesel.displayName),
+        find.textContaining(FuelType.e5.displayName),
         findsWidgets,
+        reason:
+            'pre-filled E5 must show up in the compatible-fuels picker '
+            '(petrol vehicle accepts E10/E5/E98/E85 — #713).',
       );
     });
 

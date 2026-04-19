@@ -16,6 +16,7 @@ class FuelTypeDropdown extends StatelessWidget {
   final ValueChanged<FuelType> onChanged;
   final String? labelText;
   final Widget? prefixIcon;
+  final List<FuelType>? options;
 
   const FuelTypeDropdown({
     super.key,
@@ -23,11 +24,14 @@ class FuelTypeDropdown extends StatelessWidget {
     required this.onChanged,
     this.labelText,
     this.prefixIcon,
+    this.options,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final items = options ??
+        FuelType.values.where((t) => t != FuelType.all).toList();
     return DropdownButtonFormField<FuelType>(
       initialValue: value,
       decoration: InputDecoration(
@@ -35,8 +39,7 @@ class FuelTypeDropdown extends StatelessWidget {
         border: const OutlineInputBorder(),
         prefixIcon: prefixIcon,
       ),
-      items: FuelType.values
-          .where((t) => t != FuelType.all)
+      items: items
           .map((t) => DropdownMenuItem(
                 value: t,
                 child: Text(t.displayName),
