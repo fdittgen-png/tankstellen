@@ -68,7 +68,7 @@ final class FavoritesProvider
   }
 }
 
-String _$favoritesHash() => r'90e15c837b7d248909ff35d28fc2226a75601269';
+String _$favoritesHash() => r'eeaeaaf2b3ab96588c1b76279fb72409c6f0414e';
 
 /// Manages the user's list of favorite station IDs.
 ///

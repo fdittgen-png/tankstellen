@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/search/domain/entities/fuel_type.dart';
 import '../../l10n/app_localizations.dart';
+import '../country/fuel_type_picker_provider.dart';
 
 /// Shared dropdown for picking a [FuelType]. Uses [FuelType.displayName]
 /// for labels (e.g. "Super E10", "E85 / Bioéthanol", "Electric ⚡") so
@@ -11,7 +13,7 @@ import '../../l10n/app_localizations.dart';
 /// Use [FuelTypeDropdown] when the selection is required (profile, fill-up)
 /// and [NullableFuelTypeDropdown] when "not set" is a legal value
 /// (vehicles, before a fuel is configured).
-class FuelTypeDropdown extends StatelessWidget {
+class FuelTypeDropdown extends ConsumerWidget {
   final FuelType value;
   final ValueChanged<FuelType> onChanged;
   final String? labelText;
@@ -28,10 +30,14 @@ class FuelTypeDropdown extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final items = options ??
-        FuelType.values.where((t) => t != FuelType.all).toList();
+    // #703 — default to the active country's supportedFuelTypes so
+    // switching country re-filters every picker without each call
+    // site having to wire the provider itself. Explicit `options`
+    // still wins.
+    final List<FuelType> items =
+        options ?? ref.watch(fuelTypePickerProvider);
     return DropdownButtonFormField<FuelType>(
       initialValue: value,
       decoration: InputDecoration(
@@ -58,7 +64,7 @@ class FuelTypeDropdown extends StatelessWidget {
 ///
 /// [options] can restrict which fuels appear (e.g. combustion section
 /// hides [FuelType.electric]). Defaults to all non-wildcard fuels.
-class NullableFuelTypeDropdown extends StatelessWidget {
+class NullableFuelTypeDropdown extends ConsumerWidget {
   final FuelType? value;
   final ValueChanged<FuelType?> onChanged;
   final String? labelText;
@@ -77,10 +83,10 @@ class NullableFuelTypeDropdown extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final items = options ??
-        FuelType.values.where((t) => t != FuelType.all).toList();
+    final List<FuelType> items =
+        options ?? ref.watch(fuelTypePickerProvider);
     return DropdownButtonFormField<FuelType?>(
       initialValue: value,
       decoration: InputDecoration(

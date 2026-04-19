@@ -5,18 +5,27 @@ import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
 import '../../helpers/pump_app.dart';
 
+// Every non-wildcard fuel — used to exercise the dropdown without the
+// active-country filter kicking in (#703). Call sites that want the
+// country filter just omit `options:`.
+final _allFuels = FuelType.values.where((t) => t != FuelType.all).toList();
+
 void main() {
   group('FuelTypeDropdown', () {
     testWidgets('shows all non-wildcard fuels by displayName', (tester) async {
       await pumpApp(
         tester,
-        FuelTypeDropdown(value: FuelType.e10, onChanged: (_) {}),
+        FuelTypeDropdown(
+          value: FuelType.e10,
+          onChanged: (_) {},
+          options: _allFuels,
+        ),
       );
 
       await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
       await tester.pumpAndSettle();
 
-      for (final f in FuelType.values.where((t) => t != FuelType.all)) {
+      for (final f in _allFuels) {
         expect(find.text(f.displayName), findsWidgets,
             reason: '${f.displayName} must render with its localized label');
       }
@@ -32,6 +41,7 @@ void main() {
         FuelTypeDropdown(
           value: FuelType.e10,
           onChanged: (v) => picked = v,
+          options: _allFuels,
         ),
       );
 
@@ -49,7 +59,11 @@ void main() {
         (tester) async {
       await pumpApp(
         tester,
-        NullableFuelTypeDropdown(value: null, onChanged: (_) {}),
+        NullableFuelTypeDropdown(
+          value: null,
+          onChanged: (_) {},
+          options: _allFuels,
+        ),
       );
 
       await tester.tap(find.byType(DropdownButtonFormField<FuelType?>));
