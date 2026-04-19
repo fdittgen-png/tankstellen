@@ -52,6 +52,21 @@ class FillUpList extends _$FillUpList {
     await repo.clear();
     state = repo.getAll();
   }
+
+  /// Merge [incoming] fill-ups into local storage. Existing ids are
+  /// overwritten; new ids are added. Returns the number of new entries
+  /// actually inserted. Used by the device-linking flow (#713).
+  Future<int> mergeFrom(Iterable<FillUp> incoming) async {
+    final repo = ref.read(fillUpRepositoryProvider);
+    final localIds = repo.getAll().map((f) => f.id).toSet();
+    var added = 0;
+    for (final f in incoming) {
+      if (!localIds.contains(f.id)) added++;
+      await repo.save(f);
+    }
+    state = repo.getAll();
+    return added;
+  }
 }
 
 /// Aggregated stats derived from the current fill-up list.

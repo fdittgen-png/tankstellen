@@ -151,7 +151,7 @@ void main() {
         isTrue,
         reason:
             'Expected results area to be at least 50% of screen height, got '
-            '${resultsBox.height}/${screenHeight}',
+            '${resultsBox.height}/$screenHeight',
       );
     });
   });

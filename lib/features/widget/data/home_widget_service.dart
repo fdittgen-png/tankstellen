@@ -22,8 +22,10 @@ import '../../search/domain/entities/fuel_type.dart';
 ///
 /// Widget group ID must match the `android:authorities` in AndroidManifest.
 const _widgetGroupId = 'de.tankstellen.fuelprices.widget';
-const _favoritesWidgetAndroidName = 'FuelPriceWidgetProvider';
-const _nearestWidgetAndroidName = 'NearestWidgetProvider';
+// Single provider class (#713) — the widget toggles between favorites
+// and nearest modes internally. The old NearestWidgetProvider receiver
+// was dropped from the manifest.
+const _widgetAndroidName = 'FuelPriceWidgetProvider';
 
 /// Maximum number of stations to include in widget data.
 const _maxWidgetStations = 5;
@@ -50,7 +52,7 @@ class HomeWidgetService {
         await HomeWidget.saveWidgetData('station_count', 0);
         await HomeWidget.saveWidgetData('stations_json', '[]');
         await HomeWidget.updateWidget(
-          androidName: _favoritesWidgetAndroidName,
+          androidName: _widgetAndroidName,
         );
         return;
       }
@@ -65,7 +67,7 @@ class HomeWidgetService {
       );
 
       await HomeWidget.updateWidget(
-        androidName: _favoritesWidgetAndroidName,
+        androidName: _widgetAndroidName,
       );
       debugPrint('HomeWidget: favorites updated with ${stations.length} stations');
     } catch (e) {
@@ -99,7 +101,7 @@ class HomeWidgetService {
           lat == null || lng == null ? 'no_gps' : 'no_favorites',
         );
         await HomeWidget.updateWidget(
-          androidName: _nearestWidgetAndroidName,
+          androidName: _widgetAndroidName,
         );
         return;
       }
@@ -124,7 +126,7 @@ class HomeWidgetService {
       await HomeWidget.saveWidgetData('nearest_lng', lng);
 
       await HomeWidget.updateWidget(
-        androidName: _nearestWidgetAndroidName,
+        androidName: _widgetAndroidName,
       );
       debugPrint('HomeWidget: nearest updated with ${stations.length} stations');
     } catch (e) {
@@ -171,7 +173,8 @@ class HomeWidgetService {
         if (key != null) {
           try {
             fuel = FuelType.fromString(key);
-          } catch (_) {
+          } catch (e) {
+            debugPrint('HomeWidgetService: unknown fuel "$key": $e');
             fuel = null;
           }
         }
@@ -293,7 +296,7 @@ class HomeWidgetService {
       'e10': data['e10'],
       'diesel': data['diesel'],
       'isOpen': data['isOpen'] ?? false,
-      if (currency != null) 'currency': currency,
+      'currency': ?currency,
       if (preferredFuelType != null)
         'preferred_fuel_code': preferredFuelType.apiValue,
       if (preferredFuelType != null) 'preferred_fuel_price': fuelPrice,

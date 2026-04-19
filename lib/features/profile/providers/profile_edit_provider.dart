@@ -19,6 +19,7 @@ class ProfileEditState {
   final bool showFuel;
   final bool showElectric;
   final String ratingMode;
+  final String? defaultVehicleId;
 
   const ProfileEditState({
     required this.fuelType,
@@ -31,6 +32,7 @@ class ProfileEditState {
     required this.showFuel,
     required this.showElectric,
     required this.ratingMode,
+    required this.defaultVehicleId,
   });
 
   factory ProfileEditState.fromProfile(UserProfile p) => ProfileEditState(
@@ -44,6 +46,7 @@ class ProfileEditState {
         showFuel: p.showFuel,
         showElectric: p.showElectric,
         ratingMode: p.ratingMode,
+        defaultVehicleId: p.defaultVehicleId,
       );
 
   ProfileEditState copyWith({
@@ -59,6 +62,8 @@ class ProfileEditState {
     bool? showFuel,
     bool? showElectric,
     String? ratingMode,
+    String? defaultVehicleId,
+    bool clearDefaultVehicle = false,
   }) {
     return ProfileEditState(
       fuelType: fuelType ?? this.fuelType,
@@ -71,6 +76,9 @@ class ProfileEditState {
       showFuel: showFuel ?? this.showFuel,
       showElectric: showElectric ?? this.showElectric,
       ratingMode: ratingMode ?? this.ratingMode,
+      defaultVehicleId: clearDefaultVehicle
+          ? null
+          : (defaultVehicleId ?? this.defaultVehicleId),
     );
   }
 }
@@ -98,4 +106,8 @@ class ProfileEditController extends _$ProfileEditController {
       state = state.copyWith(countryCode: v, clearCountry: v == null);
   void setLanguageCode(String? v) =>
       state = state.copyWith(languageCode: v, clearLanguage: v == null);
+  void setDefaultVehicleId(String? v) => state = state.copyWith(
+        defaultVehicleId: v,
+        clearDefaultVehicle: v == null,
+      );
 }

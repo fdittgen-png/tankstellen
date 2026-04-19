@@ -1,3 +1,4 @@
+import '../../features/search/domain/entities/fuel_type.dart';
 import 'country_bounding_box.dart';
 
 /// Configuration for each supported country.
@@ -18,6 +19,13 @@ class CountryConfig {
   final String? apiProvider;    // 'Tankerkönig', 'Prix-Carburants'
   final String? attribution;
   final List<String> fuelTypes; // Display names for this country
+
+  /// Typed fuel compatibility set (#699). Pickers across the app
+  /// filter their options by this set so adding Italy's CNG or
+  /// removing France's LPG flows through every dropdown in one place.
+  /// Every OCM-covered country must include [FuelType.electric].
+  final Set<FuelType> supportedFuelTypes;
+
   final String examplePostalCode;
   final String exampleCity;
 
@@ -52,6 +60,12 @@ class CountryConfig {
     this.apiProvider,
     this.attribution,
     this.fuelTypes = const ['E5', 'E10', 'Diesel'],
+    this.supportedFuelTypes = const {
+      FuelType.e5,
+      FuelType.e10,
+      FuelType.diesel,
+      FuelType.electric,
+    },
     this.examplePostalCode = '',
     this.exampleCity = '',
     this.distanceUnit = 'km',
@@ -92,6 +106,15 @@ class Countries {
     apiProvider: 'Prix-Carburants (gouv.fr)',
     attribution: 'Données: prix-carburants.gouv.fr',
     fuelTypes: ['SP95', 'SP98', 'E10', 'Gazole', 'E85', 'GPLc'],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.e10,
+      FuelType.e98,
+      FuelType.diesel,
+      FuelType.e85,
+      FuelType.lpg,
+      FuelType.electric,
+    },
     examplePostalCode: '75001',
     exampleCity: 'Lyon',
   );
@@ -124,6 +147,15 @@ class Countries {
     apiProvider: 'Geoportal Gasolineras (MITECO)',
     attribution: 'Datos: geoportalgasolineras.es',
     fuelTypes: ['Gasolina 95', 'Gasolina 98', 'Gasóleo A', 'GLP'],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.e10,
+      FuelType.e98,
+      FuelType.diesel,
+      FuelType.dieselPremium,
+      FuelType.lpg,
+      FuelType.electric,
+    },
     examplePostalCode: '28001',
     exampleCity: 'Madrid',
   );
@@ -140,6 +172,13 @@ class Countries {
     apiProvider: 'Osservaprezzi (MISE)',
     attribution: 'Dati: osservaprezzi.mise.gov.it',
     fuelTypes: ['Benzina', 'Gasolio', 'GPL', 'Metano'],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.diesel,
+      FuelType.lpg,
+      FuelType.cng,
+      FuelType.electric,
+    },
     examplePostalCode: '00100',
     exampleCity: 'Roma',
   );
@@ -158,6 +197,11 @@ class Countries {
     apiProvider: 'OK / Shell / Q8',
     attribution: 'Data: ok.dk, shell.dk, q8.dk',
     fuelTypes: ['Blyfri 95', 'Diesel'],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.diesel,
+      FuelType.electric,
+    },
     examplePostalCode: '1000',
     exampleCity: 'København',
     pricePerUnitSuffix: 'kr/L',
@@ -177,6 +221,12 @@ class Countries {
     apiProvider: 'Secretaría de Energía',
     attribution: 'Datos: datos.energia.gob.ar',
     fuelTypes: ['Nafta', 'Gas Oil', 'GNC'],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.diesel,
+      FuelType.cng,
+      FuelType.electric,
+    },
     examplePostalCode: '1000',
     exampleCity: 'Buenos Aires',
     pricePerUnitSuffix: '\$/L',
@@ -195,6 +245,13 @@ class Countries {
     apiProvider: 'DGEG',
     attribution: 'Dados: DGEG (dgeg.gov.pt)',
     fuelTypes: ['Gasolina 95', 'Gasolina 98', 'Gasóleo', 'GPL Auto'],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.e98,
+      FuelType.diesel,
+      FuelType.lpg,
+      FuelType.electric,
+    },
     examplePostalCode: '1000',
     exampleCity: 'Lisboa',
   );
@@ -212,6 +269,13 @@ class Countries {
     apiProvider: 'CMA Fuel Finder',
     attribution: 'Data: Competition and Markets Authority',
     fuelTypes: ['Unleaded', 'Super Unleaded', 'Diesel', 'Premium Diesel'],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.e98,
+      FuelType.diesel,
+      FuelType.dieselPremium,
+      FuelType.electric,
+    },
     examplePostalCode: 'SW1A 1AA',
     exampleCity: 'London',
     // UK road signs and speedometers use miles; fuel is still sold by
@@ -234,6 +298,14 @@ class Countries {
     apiProvider: 'FuelCheck NSW',
     attribution: 'Data: NSW Government FuelCheck',
     fuelTypes: ['Unleaded 91', 'Unleaded 95', 'Unleaded 98', 'Diesel', 'LPG'],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.e10,
+      FuelType.e98,
+      FuelType.diesel,
+      FuelType.lpg,
+      FuelType.electric,
+    },
     examplePostalCode: '2000',
     exampleCity: 'Sydney',
     // AU forecourts quote cents-per-litre on signage.
@@ -253,6 +325,12 @@ class Countries {
     apiProvider: 'CRE / datos.gob.mx',
     attribution: 'Datos: Comisión Reguladora de Energía',
     fuelTypes: ['Regular', 'Premium', 'Diesel'],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.e98,
+      FuelType.diesel,
+      FuelType.electric,
+    },
     examplePostalCode: '06600',
     exampleCity: 'Ciudad de México',
     pricePerUnitSuffix: '\$/L',

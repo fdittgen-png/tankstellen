@@ -11,6 +11,7 @@ import '../data/models/search_params.dart';
 import '../domain/entities/fuel_type.dart';
 import '../domain/entities/search_result_item.dart';
 import '../domain/entities/station.dart';
+import '../../profile/providers/effective_fuel_type_provider.dart';
 import '../../profile/providers/profile_provider.dart';
 import 'ev_search_provider.dart';
 
@@ -118,7 +119,9 @@ class SearchState extends _$SearchState {
       );
 
       final profile = ref.read(activeProfileProvider);
-      final resolvedFuelType = fuelType ?? profile?.preferredFuelType ?? FuelType.all;
+      // #704 — effective fuel resolves the vehicle-vs-profile hierarchy.
+      final FuelType resolvedFuelType =
+          fuelType ?? ref.read(effectiveFuelTypeProvider);
       final resolvedRadius = radiusKm ?? profile?.defaultSearchRadius ?? 10.0;
 
       // EV dispatch: delegate to EVSearchState, then copy wrapped results.
@@ -196,7 +199,9 @@ class SearchState extends _$SearchState {
       final coordsResult = await geocoding.zipCodeToCoordinates(zipCode, cancelToken: cancelToken);
 
       final profile = ref.read(activeProfileProvider);
-      final resolvedFuelType = fuelType ?? profile?.preferredFuelType ?? FuelType.all;
+      // #704 — effective fuel resolves the vehicle-vs-profile hierarchy.
+      final FuelType resolvedFuelType =
+          fuelType ?? ref.read(effectiveFuelTypeProvider);
       final resolvedRadius = radiusKm ?? profile?.defaultSearchRadius ?? 10.0;
 
       // EV dispatch: geocode the ZIP, then delegate to EVSearchState.
@@ -282,7 +287,9 @@ class SearchState extends _$SearchState {
       }
 
       final profile = ref.read(activeProfileProvider);
-      final resolvedFuelType = fuelType ?? profile?.preferredFuelType ?? FuelType.all;
+      // #704 — effective fuel resolves the vehicle-vs-profile hierarchy.
+      final FuelType resolvedFuelType =
+          fuelType ?? ref.read(effectiveFuelTypeProvider);
       final resolvedRadius = radiusKm ?? profile?.defaultSearchRadius ?? 10.0;
 
       // EV dispatch: delegate to EVSearchState with the explicit coordinates.
@@ -365,8 +372,17 @@ class SearchLocation extends _$SearchLocation {
 class SelectedFuelType extends _$SelectedFuelType {
   @override
   FuelType build() {
+    // Effective fuel (#704): when a profile is configured, the default
+    // vehicle's fuel overrides the profile's own preferredFuelType so
+    // the chips reflect "what does my car actually take" without the
+    // user having to keep profile + vehicle manually in sync.
+    //
+    // No profile yet (fresh install, before the onboarding wizard) →
+    // keep the historical "FuelType.all" wildcard so the first search
+    // doesn't silently filter out non-E10 pumps.
     final profile = ref.watch(activeProfileProvider);
-    return profile?.preferredFuelType ?? FuelType.all;
+    if (profile == null) return FuelType.all;
+    return ref.watch(effectiveFuelTypeProvider);
   }
 
   void select(FuelType type) {

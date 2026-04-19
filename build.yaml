@@ -1,0 +1,10 @@
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          # Deeply serialize nested @JsonSerializable types to Map<String, dynamic>
+          # instead of leaving them as object instances. Without this, Hive (and
+          # any other Map-consumer) sees raw Connector/etc. objects in generated
+          # toJson output and silently drops them on encrypted boxes (#690).
+          explicit_to_json: true

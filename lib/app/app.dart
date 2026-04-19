@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/country/country_switch_listener.dart';
 import '../core/language/language_provider.dart';
+import '../features/widget/presentation/widget_click_listener.dart';
 import '../l10n/app_localizations.dart';
 import 'router.dart';
 import 'theme.dart';
@@ -48,7 +49,11 @@ class TankstellenApp extends ConsumerWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       builder: (context, child) {
-        return CountrySwitchListener(child: child ?? const SizedBox.shrink());
+        return WidgetClickListener(
+          child: CountrySwitchListener(
+            child: child ?? const SizedBox.shrink(),
+          ),
+        );
       },
     );
   }

@@ -39,7 +39,7 @@ void main() {
 
     testWidgets('marks the chip matching `selected` as selected',
         (tester) async {
-      final germany = Countries.germany;
+      const germany = Countries.germany;
       await pumpSelector(
         tester,
         selected: germany,

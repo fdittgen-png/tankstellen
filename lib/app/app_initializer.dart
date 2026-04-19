@@ -125,6 +125,15 @@ class AppInitializer {
     // Opt in to edge-to-edge display (required for Android 15+).
     EdgeToEdge.enable();
 
+    // Enlarge Flutter's ImageCache so OSM map tiles aren't evicted
+    // mid-pan (#711). Default is 100 MB / 1 000 entries; at 15 KB per
+    // tile that's ~6 500 tiles of headroom — still eviction-prone
+    // when map + other images compete. Bump to 200 MB / 2 000 entries.
+    // Map tiles alone at zoom 13 for a 20 km radius ≈ 50 tiles; this
+    // leaves generous breathing room for zoom-in + pan-out browsing.
+    PaintingBinding.instance.imageCache.maximumSize = 2000;
+    PaintingBinding.instance.imageCache.maximumSizeBytes = 200 * 1024 * 1024;
+
     // Silence debugPrint in release — it is NOT stripped by the compiler.
     if (kReleaseMode) {
       debugPrint = (String? message, {int? wrapWidth}) {};
@@ -177,9 +186,26 @@ class AppInitializer {
   static Future<void> _initServicesInParallel() async {
     await Future.wait<void>([
       _safe('notifications', LocalNotificationService().initialize),
-      _safe('background', BackgroundService.init),
+      _safe('background', _maybeInitBackground),
       _safe('home_widget', HomeWidgetService.init),
     ]);
+  }
+
+  /// Schedule periodic price polling only when the user has at least one
+  /// active price alert (#713). Alerts are the only user-consented reason
+  /// to poll the station APIs on a regular schedule — per Tankerkönig's
+  /// terms of service, apps must use "requests on demand" and avoid
+  /// regular non-user-initiated requests.
+  static Future<void> _maybeInitBackground() async {
+    final storage = HiveStorage();
+    final rawAlerts = storage.getAlerts();
+    final hasActiveAlert = rawAlerts.any((a) => a['isActive'] == true);
+    if (!hasActiveAlert) {
+      debugPrint(
+          'AppInitializer: skipping background polling — no active alerts');
+      return;
+    }
+    await BackgroundService.init();
   }
 
   static Future<void> _safe(String label, Future<void> Function() body) async {

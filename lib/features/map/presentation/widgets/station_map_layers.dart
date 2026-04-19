@@ -79,11 +79,16 @@ class StationMapLayers extends StatelessWidget {
             // controller is attached AND the map has real constraints,
             // which is the only reliable moment to nudge.
             onMapReady: () {
+              // Zoom-jiggle: tiny delta then revert so the TileLayer's
+              // `_TileBoundsAtZoom` invalidates its cached-empty viewport
+              // and re-requests tiles (#709). A same-center/same-zoom
+              // move is a no-op and kept the blank viewport on first
+              // load.
               try {
+                mapController.move(center, zoom + 0.0001);
                 mapController.move(center, zoom);
-              } catch (_) {
-                // Controller in an unexpected state — skip silently, the
-                // user can still pan to trigger tile loading.
+              } catch (e) {
+                debugPrint('StationMapLayers onMapReady nudge: $e');
               }
             },
           ),
@@ -91,6 +96,8 @@ class StationMapLayers extends StatelessWidget {
             TileLayer(
               urlTemplate: AppConstants.osmTileUrl,
               userAgentPackageName: AppConstants.osmUserAgent,
+              maxNativeZoom: 19,
+              maxZoom: 19,
             ),
             // Route polyline (if in route search mode)
             if (routePolyline != null && routePolyline!.isNotEmpty)

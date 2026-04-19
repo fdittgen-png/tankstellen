@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../app/current_shell_branch_provider.dart';
 import '../../../driving/presentation/widgets/driving_mode_fab.dart';
 import '../../../ev/presentation/widgets/ev_filter_chips.dart';
 import '../../../ev/presentation/widgets/ev_map_overlay.dart';
@@ -21,36 +22,21 @@ class MapScreen extends ConsumerStatefulWidget {
 }
 
 class _MapScreenState extends ConsumerState<MapScreen> {
-  late final MapController _mapController;
+  late MapController _mapController;
+
+  /// Increments every time the Carte tab becomes visible. Used as a
+  /// ValueKey on the map subtree so a tab-flip DESTROYS the old
+  /// FlutterMap + TileLayer and builds a fresh one with real
+  /// constraints. This is the only reliable cure for the blank-tile
+  /// bug in flutter_map's TileLayer which caches an empty viewport
+  /// when first mounted offstage inside `StatefulShellRoute.indexedStack`
+  /// (#709 — zoom-jiggle was too small, only pan/zoom buttons fixed it).
+  int _mapIncarnation = 0;
 
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
-
-    // Nudge the controller after the first paint so the TileLayer
-    // recomputes its visible bounds and starts fetching tiles. Without
-    // this, on the very first visit to the Carte tab (when the shell's
-    // IndexedStack pre-mounts the map offstage with degenerate
-    // constraints), the TileLayer's internal `_TileBoundsAtZoom` reads
-    // the empty bounds, fetches nothing, and the map renders the
-    // markers and the radius circle on a blank white background until
-    // the user pans or pinches the map (#473). The 100 ms delay is
-    // long enough to wait for the first real layout pass while still
-    // being invisible to the user.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 100), () {
-        if (!mounted) return;
-        try {
-          final camera = _mapController.camera;
-          _mapController.move(camera.center, camera.zoom);
-        } catch (_) {
-          // Controller not yet attached to a FlutterMap — the
-          // post-frame callback inside NearbyMapView will pick up the
-          // first real fit and tiles will load on that path instead.
-        }
-      });
-    });
   }
 
   @override
@@ -69,19 +55,58 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     // indexedStack, the `initState` nudge and the one-shot
     // `onMapReady` (#498) have already fired, and nothing retriggers
     // a viewport recompute when the search state changes.
+    // #709 — force a full TileLayer rebuild on every Carte tab-flip
+    // AND on every fresh search result. `_rebuildMapSubtree()` bumps
+    // `_mapIncarnation` (ValueKey below) so the whole FlutterMap +
+    // TileLayer is torn down and built anew with real constraints.
+    // Same fix applies to #529 (search-result-change).
+    void rebuildMap() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        try {
+          final old = _mapController;
+          setState(() {
+            _mapController = MapController();
+            _mapIncarnation++;
+          });
+          // Dispose the old controller AFTER the rebuild so the old
+          // FlutterMap has already detached from it.
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            try {
+              old.dispose();
+            } catch (e) {
+              debugPrint('MapScreen: old controller dispose: $e');
+            }
+          });
+        } catch (e) {
+          debugPrint('MapScreen rebuild: $e');
+        }
+      });
+    }
+    // Only rebuild on Carte tab-flip. Previously we also rebuilt on
+    // every non-empty searchState change (#529) but that cancels the
+    // TileLayer's in-flight HTTP requests when a price-refresh lands,
+    // leaving the map grey at the initial zoom (#709 regression
+    // reported in the v5026 screenshots). Instead call a lightweight
+    // camera-move on search-result change — the map is already
+    // mounted at that point so a nudge suffices.
+    ref.listen<int>(currentShellBranchProvider, (prev, next) {
+      const mapBranchIndex = 1;
+      if (next != mapBranchIndex) return;
+      rebuildMap();
+    });
     ref.listen(searchStateProvider, (_, next) {
-      if (next.hasValue && next.value!.data.isNotEmpty) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-          try {
-            final camera = _mapController.camera;
-            _mapController.move(camera.center, camera.zoom);
-          } catch (_) {
-            // Controller not attached yet — the onMapReady fallback
-            // in station_map_layers.dart will handle the first load.
-          }
-        });
-      }
+      if (!next.hasValue || next.value!.data.isEmpty) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        try {
+          final camera = _mapController.camera;
+          _mapController.move(camera.center, camera.zoom + 0.0001);
+          _mapController.move(camera.center, camera.zoom);
+        } catch (e) {
+          debugPrint('MapScreen search-change nudge: $e');
+        }
+      });
     });
 
     final searchState = ref.watch(searchStateProvider);
@@ -93,18 +118,25 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     final hasRouteResults = routeState.hasValue && routeState.value != null;
 
-    final body = hasRouteResults
-        ? RouteMapView(
-            routeResult: routeState.value!,
-            selectedFuel: selectedFuel,
-            mapController: _mapController,
-          )
-        : NearbyMapView(
-            searchState: searchState,
-            selectedFuel: selectedFuel,
-            searchRadiusKm: searchRadius,
-            mapController: _mapController,
-          );
+    // Key on `_mapIncarnation` so every Carte tab-flip rebuilds the
+    // FlutterMap + TileLayer from scratch with the real post-layout
+    // constraints (#709). Without this, TileLayer keeps the empty
+    // viewport it captured while offstage.
+    final body = KeyedSubtree(
+      key: ValueKey<int>(_mapIncarnation),
+      child: hasRouteResults
+          ? RouteMapView(
+              routeResult: routeState.value!,
+              selectedFuel: selectedFuel,
+              mapController: _mapController,
+            )
+          : NearbyMapView(
+              searchState: searchState,
+              selectedFuel: selectedFuel,
+              searchRadiusKm: searchRadius,
+              mapController: _mapController,
+            ),
+    );
 
     return Scaffold(
       appBar: PreferredSize(

@@ -215,6 +215,10 @@ class StorageSection extends ConsumerWidget {
     if (confirmed == true) {
       final cache = ref.read(cacheManagerProvider);
       await cache.clearAll();
+      // Also wipe Flutter's in-memory ImageCache so map tiles are
+      // refetched on the next Carte visit (#711).
+      PaintingBinding.instance.imageCache.clear();
+      PaintingBinding.instance.imageCache.clearLiveImages();
       ref.invalidate(storageManagementProvider);
       if (ctx.mounted) {
         SnackBarHelper.show(
@@ -261,6 +265,10 @@ class StorageSection extends ConsumerWidget {
       await storageMgmt.clearCache();
       await storageMgmt.clearPriceHistory();
       await storageMgmt.deleteApiKey();
+      // Drop in-memory tile images too so the rebuilt app sees a
+      // blank slate for the map layer (#711).
+      PaintingBinding.instance.imageCache.clear();
+      PaintingBinding.instance.imageCache.clearLiveImages();
       for (final boxName in ['settings', 'favorites', 'profiles']) {
         final box = Hive.box(boxName);
         await box.clear();

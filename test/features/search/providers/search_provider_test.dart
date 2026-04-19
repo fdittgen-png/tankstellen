@@ -150,6 +150,15 @@ void main() {
       notifier.select(FuelType.e5);
       expect(container.read(selectedFuelTypeProvider), FuelType.e5);
     });
+
+    test(
+        'defaults to FuelType.all when no profile exists — regression guard '
+        'for the #704 effective-fuel migration', () {
+      // No profile → no override source → fuel filter should stay
+      // wildcard so the first search doesn't hide non-E10 pumps.
+      final container = createContainer();
+      expect(container.read(selectedFuelTypeProvider), FuelType.all);
+    });
   });
 
   group('SearchRadius', () {

@@ -1769,6 +1769,117 @@ class AppLocalizationsDe extends AppLocalizations {
       'Fügen Sie Ihr Fahrzeug hinzu, um nach Anschlüssen zu filtern und Ladekosten zu schätzen.';
 
   @override
+  String get vehiclesWizardTitle => 'Meine Fahrzeuge (optional)';
+
+  @override
+  String get vehiclesWizardSubtitle =>
+      'Fügen Sie Ihr Auto hinzu, um das Verbrauchsprotokoll vorzubelegen und EV-Anschlussfilter zu aktivieren. Sie können diesen Schritt überspringen und Fahrzeuge später hinzufügen.';
+
+  @override
+  String get vehiclesWizardNoneYet => 'Noch kein Fahrzeug konfiguriert.';
+
+  @override
+  String vehiclesWizardYoursList(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fahrzeuge',
+      one: '1 Fahrzeug',
+    );
+    return 'Sie haben $_temp0:';
+  }
+
+  @override
+  String get vehiclesWizardSkipHint =>
+      'Überspringen, um die Einrichtung abzuschließen — Sie können Fahrzeuge jederzeit in den Einstellungen hinzufügen.';
+
+  @override
+  String get fillUpVehicleLabel => 'Fahrzeug';
+
+  @override
+  String get fillUpVehicleNone => 'Kein Fahrzeug';
+
+  @override
+  String get fillUpVehicleRequired => 'Fahrzeug erforderlich';
+
+  @override
+  String get reportScanError => 'Scan-Fehler melden';
+
+  @override
+  String get pickStationTitle => 'Tankstelle wählen';
+
+  @override
+  String get pickStationHelper =>
+      'Tankvorgang von einer bekannten Tankstelle starten — Preise, Marke und Kraftstoff werden automatisch übernommen.';
+
+  @override
+  String get pickStationEmpty =>
+      'Noch keine Favoriten — fügen Sie welche aus Suche oder Favoriten hinzu, oder überspringen Sie diesen Schritt.';
+
+  @override
+  String get pickStationSkip => 'Überspringen — ohne Tankstelle eintragen';
+
+  @override
+  String get scanPump => 'Zapfsäule scannen';
+
+  @override
+  String get scanPayment => 'Zahlungs-QR scannen';
+
+  @override
+  String get qrPaymentBeneficiary => 'Empfänger';
+
+  @override
+  String get qrPaymentAmount => 'Betrag';
+
+  @override
+  String get qrPaymentEpcTitle => 'SEPA-Überweisung';
+
+  @override
+  String get qrPaymentEpcEmpty => 'Keine Felder erkannt';
+
+  @override
+  String get qrPaymentOpenInBank => 'In Banking-App öffnen';
+
+  @override
+  String get qrPaymentLaunchFailed => 'Keine App kann diesen Code öffnen';
+
+  @override
+  String get qrPaymentUnknownTitle => 'Code nicht erkannt';
+
+  @override
+  String get qrPaymentCopyRaw => 'Rohtext kopieren';
+
+  @override
+  String get qrPaymentEpcCopied =>
+      'Bankdaten kopiert — in Banking-App einfügen';
+
+  @override
+  String get vehicleFuelNotSet => 'Nicht gesetzt';
+
+  @override
+  String get wizardVehicleTapToEdit => 'Zum Bearbeiten tippen';
+
+  @override
+  String get wizardVehicleDefaultBadge => 'Standard';
+
+  @override
+  String get profileDefaultVehicleLabel => 'Standardfahrzeug (optional)';
+
+  @override
+  String get profileDefaultVehicleNone => 'Kein Standard';
+
+  @override
+  String get profileFuelFromVehicleHint =>
+      'Kraftstoff wird aus dem Standardfahrzeug abgeleitet. Fahrzeug entfernen, um einen Kraftstoff direkt zu wählen.';
+
+  @override
+  String get consumptionNoVehicleTitle => 'Fahrzeug zuerst hinzufügen';
+
+  @override
+  String get consumptionNoVehicleBody =>
+      'Tankvorgänge werden einem Fahrzeug zugeordnet. Fügen Sie Ihr Auto hinzu, um den Verbrauch zu erfassen.';
+
+  @override
   String get vehicleAdd => 'Fahrzeug hinzufügen';
 
   @override
@@ -2015,6 +2126,14 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get helpBannerAlerts =>
       'Legen Sie einen Preisgrenzwert für eine Station fest. Sie werden benachrichtigt, wenn die Preise darunter fallen. Prüfungen laufen alle 30 Minuten.';
+
+  @override
+  String get helpBannerConsumption =>
+      'Erfassen Sie jede Tankfüllung, um Ihren tatsächlichen Verbrauch und CO₂-Fußabdruck zu verfolgen. Wischen Sie nach links, um einen Eintrag zu löschen.';
+
+  @override
+  String get helpBannerVehicles =>
+      'Fügen Sie Ihre Fahrzeuge hinzu, damit Tankfüllungen und Kraftstoffvorgaben korrekt voreingestellt werden. Das erste Fahrzeug wird zum Standard.';
 
   @override
   String get syncNow => 'Jetzt synchronisieren';
@@ -2467,7 +2586,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get linkDeviceImportDescription =>
-      'Geben Sie den Gerätecode Ihres anderen Geräts ein, um dessen Favoriten und Alarme zu importieren.';
+      'Geben Sie den Gerätecode Ihres anderen Geräts ein, um dessen Favoriten, Alarme, Fahrzeuge und Tankprotokoll zu importieren. Jedes Gerät behält sein eigenes Profil und seine Voreinstellungen.';
 
   @override
   String get linkDeviceCodeFieldLabel => 'Gerätecode';
@@ -2483,7 +2602,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get linkDeviceHowItWorksBody =>
-      '1. Auf Gerät A: Gerätecode oben kopieren\n2. Auf Gerät B: in das Feld \"Gerätecode\" einfügen\n3. \"Daten importieren\" tippen, um Favoriten und Alarme zusammenzuführen\n4. Beide Geräte haben dann alle kombinierten Daten\n\nJedes Gerät behält seine eigene anonyme Identität. Daten werden zusammengeführt, nicht verschoben.';
+      '1. Auf Gerät A: Gerätecode oben kopieren\n2. Auf Gerät B: in das Feld \"Gerätecode\" einfügen\n3. \"Daten importieren\" tippen, um Favoriten, Alarme, Fahrzeuge und Tankprotokoll zusammenzuführen\n4. Beide Geräte haben dann alle kombinierten Daten\n\nJedes Gerät behält seine eigene anonyme Identität und sein eigenes Profil (bevorzugter Kraftstoff, Standardfahrzeug, Startbildschirm). Daten werden zusammengeführt, nicht verschoben.';
 
   @override
   String get vehicleSetActive => 'Aktivieren';

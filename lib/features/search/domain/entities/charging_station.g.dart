@@ -38,7 +38,7 @@ Map<String, dynamic> _$ChargingStationToJson(_ChargingStation instance) =>
       'address': instance.address,
       'postCode': instance.postCode,
       'place': instance.place,
-      'connectors': instance.connectors,
+      'connectors': instance.connectors.map((e) => e.toJson()).toList(),
       'totalPoints': instance.totalPoints,
       'isOperational': instance.isOperational,
       'usageCost': instance.usageCost,

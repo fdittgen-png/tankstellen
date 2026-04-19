@@ -308,7 +308,7 @@ col0,col1,col2,TestCo,Dir,Loc,Prov,col7,col8,Nafta premium,col10,col11,100.5,202
 
   group('ArgentinaStationService searchStations', () {
     test('searchStations throws ApiException on network failure', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: -34.6, lng: -58.4, radiusKm: 10.0,
       );
       // The service will try to download the CSV and fail (no network in test)
@@ -321,7 +321,7 @@ col0,col1,col2,TestCo,Dir,Loc,Prov,col7,col8,Nafta premium,col10,col11,100.5,202
     });
 
     test('searchStations returns valid ServiceResult type', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: -34.6, lng: -58.4, radiusKm: 10.0,
       );
       try {

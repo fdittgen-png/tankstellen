@@ -359,7 +359,7 @@ columns
 
   group('MiseStationService searchStations', () {
     test('searchStations throws ApiException on network failure', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 41.9, lng: 12.5, radiusKm: 10.0,
       );
       try {
@@ -370,7 +370,7 @@ columns
     });
 
     test('searchStations returns valid type when data available', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 41.9, lng: 12.5, radiusKm: 10.0,
       );
       try {

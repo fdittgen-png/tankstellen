@@ -344,7 +344,7 @@ void main() {
     // Full screen: SearchScreen in RTL
     // -----------------------------------------------------------------------
     group('SearchScreen RTL', () {
-      List<Object> _overrides() {
+      List<Object> overrides() {
         final test = standardTestOverrides();
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
         return [
@@ -360,7 +360,7 @@ void main() {
         await _pumpRtlScreen(
           tester,
           const SearchScreen(),
-          overrides: _overrides(),
+          overrides: overrides(),
         );
 
         expect(find.byType(SearchScreen), findsOneWidget);
@@ -370,7 +370,7 @@ void main() {
         await _pumpRtlScreen(
           tester,
           const SearchScreen(),
-          overrides: _overrides(),
+          overrides: overrides(),
         );
 
         expect(find.byType(AppBar), findsOneWidget);
@@ -381,7 +381,7 @@ void main() {
     // Full screen: FavoritesScreen in RTL
     // -----------------------------------------------------------------------
     group('FavoritesScreen RTL', () {
-      List<Object> _overrides() {
+      List<Object> overrides() {
         final test = standardTestOverrides(favoriteIds: []);
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
         return [
@@ -396,7 +396,7 @@ void main() {
         await _pumpRtlScreen(
           tester,
           const FavoritesScreen(),
-          overrides: _overrides(),
+          overrides: overrides(),
         );
 
         expect(find.byType(FavoritesScreen), findsOneWidget);
@@ -407,7 +407,7 @@ void main() {
         await _pumpRtlScreen(
           tester,
           const FavoritesScreen(),
-          overrides: _overrides(),
+          overrides: overrides(),
         );
 
         expect(find.byIcon(Icons.star_outline), findsOneWidget);

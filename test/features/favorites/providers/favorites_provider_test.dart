@@ -325,7 +325,7 @@ void main() {
     });
 
     test('loadAndRefresh() fetches missing station data from API', () async {
-      final station = testStation;
+      const station = testStation;
       when(() => mockStorage.getFavoriteIds()).thenReturn([station.id]);
       when(() => mockStorage.getFavoriteStationData(station.id)).thenReturn(null);
       when(() => mockStorage.saveFavoriteStationData(any(), any()))
@@ -334,7 +334,7 @@ void main() {
       final mockService = MockStationService();
       when(() => mockService.getStationDetail(station.id)).thenAnswer(
           (_) async => ServiceResult(
-                data: StationDetail(station: station),
+                data: const StationDetail(station: station),
                 source: ServiceSource.tankerkoenigApi,
                 fetchedAt: DateTime.now(),
               ));
@@ -537,7 +537,7 @@ void main() {
 
     test('loadAndRefresh() handles mix of persisted and missing data', () async {
       final persisted = testStationList[0];
-      final missing = testStation;
+      const missing = testStation;
       when(() => mockStorage.getFavoriteIds())
           .thenReturn([persisted.id, missing.id]);
       when(() => mockStorage.getFavoriteStationData(persisted.id))
@@ -550,7 +550,7 @@ void main() {
       final mockService = MockStationService();
       when(() => mockService.getStationDetail(missing.id)).thenAnswer(
           (_) async => ServiceResult(
-                data: StationDetail(station: missing),
+                data: const StationDetail(station: missing),
                 source: ServiceSource.tankerkoenigApi,
                 fetchedAt: DateTime.now(),
               ));
@@ -569,7 +569,7 @@ void main() {
     });
 
     test('Station JSON round-trip through toJson/fromJson preserves all fields', () {
-      final original = testStation;
+      const original = testStation;
       final json = original.toJson();
       final restored = Station.fromJson(json);
 

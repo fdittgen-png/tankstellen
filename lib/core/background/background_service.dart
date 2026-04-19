@@ -10,6 +10,8 @@ import '../constants/field_names.dart';
 import '../notifications/local_notification_service.dart';
 import '../services/impl/tankerkoenig_batch_price_fetcher.dart';
 import '../storage/hive_storage.dart';
+import '../storage/storage_keys.dart';
+import '../sync/ntfy_service.dart';
 import '../utils/json_extensions.dart';
 import 'background_price_fetcher_provider.dart';
 import 'background_retry.dart';
@@ -83,13 +85,24 @@ class BackgroundService {
   /// Base delay for exponential backoff between retries.
   static const retryBaseDelay = Duration(seconds: 2);
 
-  /// Initialize background price refresh using the platform-appropriate implementation.
+  /// Initialize background price refresh using the platform-appropriate
+  /// implementation.
   ///
   /// Delegates to [createBackgroundPriceFetcher] which returns the correct
   /// [BackgroundPriceFetcher] for the current platform.
   static Future<void> init() async {
     final fetcher = createBackgroundPriceFetcher();
     await fetcher.init();
+  }
+
+  /// Cancel all scheduled periodic tasks. Called when the user has no
+  /// active alerts left — per the Tankerkönig terms of service
+  /// ("Apps: requests on demand — regular non-user-initiated requests
+  /// are to be avoided"). Price alerts ARE user-consented periodic
+  /// polling; without them, no polling should happen.
+  static Future<void> cancelAll() async {
+    final fetcher = createBackgroundPriceFetcher();
+    await fetcher.cancelAll();
   }
 }
 
@@ -235,6 +248,19 @@ Future<void> _refreshPricesAndCheckAlerts() async {
       await notifier.initialize();
       int notificationCount = 0;
 
+      // #580 — ntfy.sh push runs alongside local notification when the
+      // user has configured a topic. Reads Hive settings so no Supabase
+      // / Riverpod access is needed from the background isolate.
+      final ntfyEnabled = storage.getSetting(StorageKeys.ntfyEnabled)
+              as bool? ??
+          false;
+      final ntfyTopic = storage.getSetting(StorageKeys.ntfyTopic) as String?;
+      final ntfyService = (ntfyEnabled &&
+              ntfyTopic != null &&
+              ntfyTopic.isNotEmpty)
+          ? NtfyService()
+          : null;
+
       for (final alert in activeAlerts) {
         final stationPrices = prices[alert.stationId];
         if (stationPrices == null || stationPrices[TankerkoenigFields.status] == TankerkoenigFields.statusNoPrices) continue;
@@ -265,6 +291,22 @@ Future<void> _refreshPricesAndCheckAlerts() async {
             body: '${currentPrice.toStringAsFixed(3)} \u20ac (target: ${alert.targetPrice.toStringAsFixed(3)} \u20ac)',
           );
           notificationCount++;
+
+          // #580 — fire-and-forget ntfy.sh push. Best-effort; a network
+          // hiccup must not block the local notification already fired.
+          if (ntfyService != null) {
+            try {
+              await ntfyService.sendPriceAlert(
+                topic: ntfyTopic!,
+                stationName: alert.stationName,
+                fuelType: alert.fuelType.displayName,
+                currentPrice: currentPrice,
+                targetPrice: alert.targetPrice,
+              );
+            } catch (e) {
+              debugPrint('BackgroundService: ntfy push failed: $e');
+            }
+          }
 
           // Update last triggered
           await repo.saveAlert(alert.copyWith(lastTriggeredAt: now));

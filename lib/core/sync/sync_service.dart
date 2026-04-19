@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/alerts/data/models/price_alert.dart';
+import '../../features/consumption/domain/entities/fill_up.dart';
 import '../../features/itinerary/domain/entities/saved_itinerary.dart';
+import '../../features/vehicle/domain/entities/vehicle_profile.dart';
 import '../utils/json_extensions.dart';
 import 'supabase_client.dart';
 
@@ -444,5 +446,181 @@ class SyncService {
     await client.from('alerts').delete().eq('user_id', userId);
     await client.from('push_tokens').delete().eq('user_id', userId);
     await client.from('price_reports').delete().eq('reporter_id', userId);
+    await client.from('vehicles').delete().eq('user_id', userId);
+    await client.from('fill_ups').delete().eq('user_id', userId);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Vehicles (#713)
+  // ---------------------------------------------------------------------------
+
+  /// Two-way sync of vehicles: uploads local-only, downloads server-only.
+  /// Profiles are NOT synced (each device keeps its own defaulting).
+  static Future<List<VehicleProfile>> syncVehicles(
+    List<VehicleProfile> localVehicles,
+  ) async {
+    final client = _client;
+    final userId = _authenticatedUserId;
+    if (client == null || userId == null) {
+      debugPrint('SyncService.syncVehicles: not authenticated');
+      return localVehicles;
+    }
+
+    try {
+      final serverRows = await client
+          .from('vehicles')
+          .select('id, data')
+          .eq('user_id', userId);
+
+      final serverIds = serverRows
+          .map((r) => r.getString('id'))
+          .whereType<String>()
+          .toSet();
+      final localIds = localVehicles.map((v) => v.id).toSet();
+
+      debugPrint(
+          'SyncService.syncVehicles: local=${localIds.length}, server=${serverIds.length}');
+
+      // Upload local-only vehicles.
+      final localOnly =
+          localVehicles.where((v) => !serverIds.contains(v.id)).toList();
+      if (localOnly.isNotEmpty) {
+        final rows = localOnly
+            .map((v) => {
+                  'id': v.id,
+                  'user_id': userId,
+                  'data': v.toJson(),
+                  'updated_at': DateTime.now().toIso8601String(),
+                })
+            .toList();
+        await client
+            .from('vehicles')
+            .upsert(rows, onConflict: 'user_id,id');
+        debugPrint(
+            'SyncService.syncVehicles: uploaded ${localOnly.length} new vehicles');
+      }
+
+      // Download server-only vehicles.
+      final downloaded = serverRows
+          .where((r) => !localIds.contains(r.getString('id')))
+          .map((r) {
+        final data = r['data'];
+        if (data is Map<String, dynamic>) {
+          try {
+            return VehicleProfile.fromJson(data);
+          } catch (e) {
+            debugPrint('SyncService.syncVehicles decode failed: $e');
+            return null;
+          }
+        }
+        return null;
+      }).whereType<VehicleProfile>().toList();
+
+      return [...localVehicles, ...downloaded];
+    } catch (e) {
+      debugPrint('SyncService.syncVehicles FAILED: $e');
+      return localVehicles;
+    }
+  }
+
+  /// Remove a single vehicle from the server (called on explicit delete).
+  static Future<void> deleteVehicle(String vehicleId) async {
+    final client = _client;
+    final userId = _authenticatedUserId;
+    if (client == null || userId == null) return;
+    try {
+      await client
+          .from('vehicles')
+          .delete()
+          .eq('user_id', userId)
+          .eq('id', vehicleId);
+    } catch (e) {
+      debugPrint('SyncService.deleteVehicle FAILED: $e');
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Consumption logs / fill-ups (#713)
+  // ---------------------------------------------------------------------------
+
+  /// Two-way sync of fill-ups (consumption log): uploads local-only,
+  /// downloads server-only. Deduplication by id.
+  static Future<List<FillUp>> syncFillUps(List<FillUp> localFillUps) async {
+    final client = _client;
+    final userId = _authenticatedUserId;
+    if (client == null || userId == null) {
+      debugPrint('SyncService.syncFillUps: not authenticated');
+      return localFillUps;
+    }
+
+    try {
+      final serverRows = await client
+          .from('fill_ups')
+          .select('id, data')
+          .eq('user_id', userId);
+
+      final serverIds = serverRows
+          .map((r) => r.getString('id'))
+          .whereType<String>()
+          .toSet();
+      final localIds = localFillUps.map((f) => f.id).toSet();
+
+      debugPrint(
+          'SyncService.syncFillUps: local=${localIds.length}, server=${serverIds.length}');
+
+      final localOnly =
+          localFillUps.where((f) => !serverIds.contains(f.id)).toList();
+      if (localOnly.isNotEmpty) {
+        final rows = localOnly
+            .map((f) => {
+                  'id': f.id,
+                  'user_id': userId,
+                  'vehicle_id': f.vehicleId,
+                  'recorded_at': f.date.toIso8601String(),
+                  'data': f.toJson(),
+                  'updated_at': DateTime.now().toIso8601String(),
+                })
+            .toList();
+        await client.from('fill_ups').upsert(rows, onConflict: 'user_id,id');
+        debugPrint(
+            'SyncService.syncFillUps: uploaded ${localOnly.length} new fill-ups');
+      }
+
+      final downloaded = serverRows
+          .where((r) => !localIds.contains(r.getString('id')))
+          .map((r) {
+        final data = r['data'];
+        if (data is Map<String, dynamic>) {
+          try {
+            return FillUp.fromJson(data);
+          } catch (e) {
+            debugPrint('SyncService.syncFillUps decode failed: $e');
+            return null;
+          }
+        }
+        return null;
+      }).whereType<FillUp>().toList();
+
+      return [...localFillUps, ...downloaded];
+    } catch (e) {
+      debugPrint('SyncService.syncFillUps FAILED: $e');
+      return localFillUps;
+    }
+  }
+
+  /// Remove a single fill-up from the server (called on explicit delete).
+  static Future<void> deleteFillUp(String fillUpId) async {
+    final client = _client;
+    final userId = _authenticatedUserId;
+    if (client == null || userId == null) return;
+    try {
+      await client
+          .from('fill_ups')
+          .delete()
+          .eq('user_id', userId)
+          .eq('id', fillUpId);
+    } catch (e) {
+      debugPrint('SyncService.deleteFillUp FAILED: $e');
+    }
   }
 }

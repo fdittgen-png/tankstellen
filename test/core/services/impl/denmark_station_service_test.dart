@@ -507,7 +507,7 @@ void main() {
 
   group('DenmarkStationService searchStations', () {
     test('searchStations throws ApiException on network failure', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 55.67, lng: 12.57, radiusKm: 10.0,
       );
       try {
@@ -518,7 +518,7 @@ void main() {
     });
 
     test('searchStations returns valid result type', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 55.67, lng: 12.57, radiusKm: 10.0,
       );
       try {
@@ -531,7 +531,7 @@ void main() {
     });
 
     test('searchStations with sortBy price returns valid result', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 55.67, lng: 12.57, radiusKm: 10.0,
         sortBy: SortBy.price,
       );
@@ -628,8 +628,8 @@ void main() {
       expect(stations, hasLength(2));
 
       // Simulate distance calculation and filtering (searchLat near København)
-      final searchLat = 55.68;
-      final searchLng = 12.57;
+      const searchLat = 55.68;
+      const searchLng = 12.57;
       final withDist = stations.map((s) {
         final dlat = (s.lat - searchLat).abs();
         final dlng = (s.lng - searchLng).abs();

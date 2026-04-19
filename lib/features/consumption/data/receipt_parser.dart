@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '../../search/domain/entities/fuel_type.dart';
+
 /// Structured fields extracted from a fuel receipt by [ReceiptParser].
 ///
 /// All fields are nullable because OCR is best-effort: any combination
@@ -21,12 +23,23 @@ class ReceiptParseResult {
   /// Detected station brand (matched against a small built-in list).
   final String? stationName;
 
+  /// Detected fuel type from the receipt, e.g. "SP95-E10" → [FuelType.e10].
+  /// Null when the receipt doesn't name a recognisable product.
+  final FuelType? fuelType;
+
+  /// Brand layout the parser used — "super_u", "carrefour", or "generic".
+  /// Exposed so tests and telemetry can verify dispatch went to the
+  /// specialised branch when a well-known receipt layout is scanned.
+  final String brandLayout;
+
   const ReceiptParseResult({
     this.liters,
     this.totalCost,
     this.pricePerLiter,
     this.date,
     this.stationName,
+    this.fuelType,
+    this.brandLayout = 'generic',
   });
 
   /// `true` when the parser extracted at least volume or total cost.
@@ -36,9 +49,11 @@ class ReceiptParseResult {
 /// Parses raw OCR text from a fuel station receipt into a
 /// [ReceiptParseResult].
 ///
-/// Supports common French and German receipt layouts. The matchers
-/// tolerate decimal commas/dots and the most frequent label variants
-/// (`TOTAL`, `MONTANT`, `BETRAG`, `Volume`, `Prix/L`, etc.).
+/// Dispatches to brand-aware rules when the first lines match a known
+/// retailer (Super U, Carrefour today — more as we collect samples) and
+/// falls back to a best-effort generic matcher otherwise. The generic
+/// matcher covers common French / German layouts (TOTAL / MONTANT /
+/// BETRAG + Volume / Quantité + Prix/L / Literpreis).
 class ReceiptParser {
   const ReceiptParser();
 
@@ -50,87 +65,341 @@ class ReceiptParser {
     final lines = text.split('\n').map((l) => l.trim()).toList();
     final fullText = lines.join(' ');
 
+    final brand = _detectBrand(lines, fullText);
+    final initial = switch (brand) {
+      'super_u' => _parseSuperU(fullText, lines),
+      'carrefour' => _parseCarrefour(fullText, lines),
+      _ => _parseGeneric(fullText, lines),
+    };
+    return _reconcile(initial);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Cross-field reconciliation
+  // ---------------------------------------------------------------------------
+
+  /// Enforce the `liters × pricePerLiter ≈ totalCost` invariant. OCR
+  /// routinely loses one of the three, and sometimes grabs the unit
+  /// price as the total (the "2 €" vs "10.47 €" bug on a column-layout
+  /// Super U receipt). Post-process so:
+  ///
+  /// - any two known values derive the third;
+  /// - when all three are known but the product check disagrees by
+  ///   more than 15 %, trust the PAIR that agrees (the two biggest
+  ///   hints: total + pricePerLiter are most often correct from the
+  ///   label regex, so liters gets recomputed);
+  /// - nothing is overwritten when only one field is known.
+  ReceiptParseResult _reconcile(ReceiptParseResult r) {
+    final liters = r.liters;
+    final total = r.totalCost;
+    final ppl = r.pricePerLiter;
+
+    // Fill in any single missing field from the other two.
+    if (liters == null && total != null && ppl != null && ppl > 0) {
+      return _copyWith(r, liters: _round(total / ppl, 2));
+    }
+    if (total == null && liters != null && ppl != null) {
+      return _copyWith(r, totalCost: _round(liters * ppl, 2));
+    }
+    if (ppl == null && liters != null && total != null && liters > 0) {
+      return _copyWith(r, pricePerLiter: _round(total / liters, 3));
+    }
+
+    // All three known: sanity-check their product. OCR's most common
+    // mistake is grabbing the unit price as the total (€ 1.999 instead
+    // of € 10.47), which blows this check by an order of magnitude.
+    if (liters != null && total != null && ppl != null) {
+      final expected = liters * ppl;
+      if (expected > 0 && (total - expected).abs() / expected > 0.15) {
+        // Trust the larger-signal pair. pricePerLiter comes from a
+        // label with a "/L" marker — very reliable. liters comes from
+        // an "X L" suffix — reliable too. Recompute the total.
+        return _copyWith(r, totalCost: _round(expected, 2));
+      }
+    }
+    return r;
+  }
+
+  ReceiptParseResult _copyWith(
+    ReceiptParseResult r, {
+    double? liters,
+    double? totalCost,
+    double? pricePerLiter,
+  }) {
     return ReceiptParseResult(
-      liters: _extractLiters(fullText),
-      totalCost: _extractTotalCost(fullText),
-      pricePerLiter: _extractPricePerLiter(fullText),
-      date: _extractDate(fullText),
-      stationName: _extractStationName(lines),
+      liters: liters ?? r.liters,
+      totalCost: totalCost ?? r.totalCost,
+      pricePerLiter: pricePerLiter ?? r.pricePerLiter,
+      date: r.date,
+      stationName: r.stationName,
+      fuelType: r.fuelType,
+      brandLayout: r.brandLayout,
     );
   }
 
-  /// Matches patterns like "42.35 L", "42,35 l", "42.35 litres", "VOLUME 42.35"
+  double _round(double value, int digits) {
+    const pow10 = [1, 10, 100, 1000];
+    final p = pow10[digits.clamp(0, pow10.length - 1)];
+    return (value * p).round() / p;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Brand detection
+  // ---------------------------------------------------------------------------
+
+  /// Returns a coarse brand key — `super_u`, `carrefour`, `total`, …, or
+  /// `null` when no known retailer is recognised in the first few lines
+  /// or anywhere in the receipt. The key is used to dispatch to
+  /// brand-specific extractors.
+  String? _detectBrand(List<String> lines, String fullText) {
+    final haystack = fullText.toLowerCase();
+    if (haystack.contains('super u') || haystack.contains('système u') ||
+        haystack.contains('systeme u')) {
+      return 'super_u';
+    }
+    if (haystack.contains('carrefour')) return 'carrefour';
+    if (haystack.contains('totalenergies') || haystack.contains('total ')) {
+      return 'total';
+    }
+    if (haystack.contains('intermarché') || haystack.contains('intermarche')) {
+      return 'intermarche';
+    }
+    if (haystack.contains('leclerc')) return 'leclerc';
+    if (haystack.contains('shell')) return 'shell';
+    if (haystack.contains('esso')) return 'esso';
+    if (haystack.contains('aral')) return 'aral';
+    return null;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Brand-specific parsers
+  // ---------------------------------------------------------------------------
+
+  /// Super U / Système U layout. Labels observed on real receipts:
+  ///   Volume   5.24 L
+  ///   Prix     € 1.999/L
+  ///   TOT TTC  € 10.47
+  ReceiptParseResult _parseSuperU(String text, List<String> lines) {
+    return ReceiptParseResult(
+      liters: _extractLiters(text),
+      totalCost: _matchFirst(text, [
+        RegExp(r'tot\s*ttc\s*:?\s*€?\s*(\d+[.,]\d+)', caseSensitive: false),
+        RegExp(r'total\s*ttc\s*:?\s*€?\s*(\d+[.,]\d+)',
+            caseSensitive: false),
+      ]) ?? _extractTotalCost(text),
+      pricePerLiter: _extractPricePerLiter(text),
+      date: _extractDate(text),
+      stationName: _extractStationName(lines),
+      fuelType: _extractFuelType(text),
+      brandLayout: 'super_u',
+    );
+  }
+
+  /// Carrefour / Carrefour Market / Carrefour Express layout. Observed:
+  ///   No pompe    = 6
+  ///   Carburant   = SP95
+  ///   Quantite    = 5.27 L
+  ///   Prix unit.  = 2,028 EUR
+  ///   MONTANT REEL : 10.69 EUR
+  ReceiptParseResult _parseCarrefour(String text, List<String> lines) {
+    return ReceiptParseResult(
+      liters: _matchFirst(text, [
+        RegExp(r'quantit[eé]\s*[:=]\s*(\d+[.,]\d+)', caseSensitive: false),
+      ]) ?? _extractLiters(text),
+      totalCost: _matchFirst(text, [
+        RegExp(r'montant\s*(?:reel|r[eé]el|ttc)?\s*[:=]?\s*€?\s*(\d+[.,]\d+)',
+            caseSensitive: false),
+      ]) ?? _extractTotalCost(text),
+      pricePerLiter: _matchFirst(text, [
+        RegExp(r'prix\s*unit\.?\s*[:=]?\s*€?\s*(\d+[.,]\d{2,3})',
+            caseSensitive: false),
+      ]) ?? _extractPricePerLiter(text),
+      date: _extractDate(text),
+      stationName: _extractStationName(lines),
+      fuelType: _extractFuelType(text),
+      brandLayout: 'carrefour',
+    );
+  }
+
+  /// Generic fallback — everything that isn't a known retailer.
+  ReceiptParseResult _parseGeneric(String text, List<String> lines) {
+    return ReceiptParseResult(
+      liters: _extractLiters(text),
+      totalCost: _extractTotalCost(text),
+      pricePerLiter: _extractPricePerLiter(text),
+      date: _extractDate(text),
+      stationName: _extractStationName(lines),
+      fuelType: _extractFuelType(text),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Shared extractors
+  // ---------------------------------------------------------------------------
+
+  /// Detect the fuel product code on the receipt. Supports European labels
+  /// like "SP95-E10", "Super E10", "E10", "Gazole", "Diesel", "E85",
+  /// "GPL", "GNV/CNG", etc.
+  FuelType? _extractFuelType(String text) {
+    final lower = text.toLowerCase();
+    // Order matters: e10 before e5 so "e10" doesn't slip through as "e".
+    if (RegExp(r'\be10\b|sp95-e10|super\s*e10').hasMatch(lower)) {
+      return FuelType.e10;
+    }
+    if (RegExp(r'\be5\b|sp95(?!\s*-?e10)|super\s*e5').hasMatch(lower)) {
+      return FuelType.e5;
+    }
+    if (RegExp(r'\be98\b|sp98|super\s*98').hasMatch(lower)) {
+      return FuelType.e98;
+    }
+    if (RegExp(r'\be85\b|bio\s*[eé]thanol').hasMatch(lower)) {
+      return FuelType.e85;
+    }
+    if (RegExp(r'diesel\s*premium|premium\s*diesel|gazole\s*premium')
+        .hasMatch(lower)) {
+      return FuelType.dieselPremium;
+    }
+    if (RegExp(r'\bdiesel\b|\bgazole\b|\bb7\b').hasMatch(lower)) {
+      return FuelType.diesel;
+    }
+    if (RegExp(r'\bgpl\b|\blpg\b').hasMatch(lower)) {
+      return FuelType.lpg;
+    }
+    if (RegExp(r'\bgnv\b|\bcng\b').hasMatch(lower)) {
+      return FuelType.cng;
+    }
+    return null;
+  }
+
+  /// Matches patterns like "42.35 L", "42,35 l", "42.35litres" (no
+  /// space, happens when OCR eats the separator), "VOLUME 42.35",
+  /// "Quantité = 5.27".
+  ///
+  /// Filters pathological matches: the value must be in [0.1, 300] L,
+  /// the typical fill range for passenger cars (excludes things like
+  /// "20.00" from "TVA 20.00 %" or year fragments from a date).
   double? _extractLiters(String text) {
     final patterns = [
-      // "42.35 L" or "42,35 l" or "42.35 litres"
-      RegExp(r'(\d+[.,]\d+)\s*(?:l(?:itres?)?|L)\b'),
-      // "VOLUME : 42.35" or "Volume: 42,35"
-      RegExp(r'(?:volume|quantit[eé])\s*:?\s*(\d+[.,]\d+)', caseSensitive: false),
+      // "42.35 L" / "42,35 l" / "5.24L" / "42.35 litres"
+      RegExp(r'(\d{1,3}[.,]\d{1,3})\s*(?:l(?:itres?)?|L)\b'),
+      // "VOLUME : 42.35" / "Volume: 42,35" / "Quantité = 5.27"
+      RegExp(
+        r'(?:volume|quantit[eé])\s*[:=]?\s*(\d{1,3}[.,]\d{1,3})',
+        caseSensitive: false,
+      ),
     ];
-
     for (final pattern in patterns) {
-      final match = pattern.firstMatch(text);
-      if (match != null) {
-        return _parseDecimal(match.group(1)!);
+      for (final match in pattern.allMatches(text)) {
+        final value = _parseDecimal(match.group(1)!);
+        if (value != null && value > 0.1 && value < 300) return value;
       }
     }
     return null;
   }
 
-  /// Matches patterns like "TOTAL 58.42", "MONTANT 58,42 EUR", "€ 58.42"
+  /// Matches patterns like "TOTAL 58.42", "MONTANT 58,42 EUR",
+  /// "TOT TTC 10.47", "MONTANT REEL : 10.69", "€ 58.42".
+  ///
+  /// The generic `€ [amount]` fallback is only used when no explicit label
+  /// matches and the amount is NOT immediately followed by `/L` — otherwise
+  /// we would pick up the unit price as the total.
   double? _extractTotalCost(String text) {
-    final patterns = [
-      // "TOTAL: 58.42" or "TOTAL 58,42 EUR"
-      RegExp(r'(?:total|montant|betrag|summe|gesamt)\s*:?\s*(\d+[.,]\d+)', caseSensitive: false),
-      // "€ 58.42" or "58.42 €" or "58.42 EUR"
-      RegExp(r'€\s*(\d+[.,]\d+)|(\d+[.,]\d+)\s*(?:€|EUR)'),
-    ];
+    final labelled = _matchFirst(text, [
+      // TOTAL / TOT TTC / MONTANT[ REEL / TTC] / TTC / German labels.
+      // Accept ":" or "=" between label and amount, optional €.
+      RegExp(
+        r'(?:total|tot\s*ttc|montant(?:\s*(?:ttc|reel|r[eé]el))?|ttc|'
+        r'betrag|summe|gesamt)'
+        r'\s*[:=]?\s*€?\s*(\d+[.,]\d+)',
+        caseSensitive: false,
+      ),
+    ]);
+    if (labelled != null) return labelled;
 
-    for (final pattern in patterns) {
-      final match = pattern.firstMatch(text);
-      if (match != null) {
-        final value = match.group(1) ?? match.group(2);
-        if (value != null) return _parseDecimal(value);
-      }
+    // Heuristic fallback: gather every standalone amount attached to
+    // €/EUR that isn't a price-per-liter (no "/L" suffix), then pick
+    // the LARGEST. Rationale: on a fuel receipt the unit price, tax,
+    // and net all live around the total, but the total is almost
+    // always the biggest number on the paper. Picking "first" grabs
+    // the price-per-liter on column-layout receipts like Super U,
+    // where OCR emits "€ 1.999/L ... € 10.47" — or even skips the
+    // "/L" suffix, so "first" becomes 1.999.
+    final currencyPattern = RegExp(
+      r'(?:€\s*(\d+[.,]\d+)|(\d+[.,]\d+)\s*(?:€|EUR))(\s*/\s*[lL])?',
+    );
+    double? best;
+    for (final match in currencyPattern.allMatches(text)) {
+      if (match.group(3) != null) continue; // "/L" suffix → unit price
+      final raw = match.group(1) ?? match.group(2);
+      if (raw == null) continue;
+      final value = _parseDecimal(raw);
+      if (value == null || value <= 0) continue;
+      // Filter obvious non-totals: nobody's total is < 1 €, nobody's
+      // total is > 10 000 €.
+      if (value < 1 || value > 10000) continue;
+      if (best == null || value > best) best = value;
     }
-    return null;
+    return best;
   }
 
-  /// Matches patterns like "1.899 €/L", "PU: 1,899", "PRIX/L 1.899"
+  /// Matches price-per-liter: "1.899 €/L", "€ 1,999/L", "PU: 1,899",
+  /// "PRIX/L 1.899", "Prix unit. = 2,028 EUR", "Literpreis: 1.799".
   double? _extractPricePerLiter(String text) {
-    final patterns = [
+    return _matchFirst(text, [
       // "1.899 €/L" or "1,899 EUR/L"
       RegExp(r'(\d+[.,]\d{2,3})\s*(?:€|EUR)\s*/\s*[lL]'),
-      // "PRIX/L: 1.899" or "PU: 1,899" or "Preis/L: 1.899"
-      RegExp(r'(?:prix\s*/\s*l|pu|preis\s*/\s*l|literpreis)\s*:?\s*(\d+[.,]\d{2,3})', caseSensitive: false),
-    ];
+      // "€ 1.999/L" or "EUR 1,999/L" — currency before number
+      RegExp(r'(?:€|EUR)\s*(\d+[.,]\d{2,3})\s*/\s*[lL]'),
+      // Labels: PRIX/L, PU, Preis/L, Literpreis, Prix unit(.), Preis je Liter
+      RegExp(
+        r'(?:prix\s*/\s*l|prix\s*unit\.?|pu|preis\s*/\s*l|'
+        r'preis\s*je\s*liter|literpreis)'
+        r'\s*[:=]?\s*€?\s*(\d+[.,]\d{2,3})',
+        caseSensitive: false,
+      ),
+    ]);
+  }
 
-    for (final pattern in patterns) {
-      final match = pattern.firstMatch(text);
-      if (match != null) {
-        return _parseDecimal(match.group(1)!);
-      }
+  /// Matches common date formats: DD/MM/YYYY, DD.MM.YYYY, DD-MM-YYYY,
+  /// plus 2-digit-year variants like "19/04/26" (assumed 20xx).
+  ///
+  /// Iterates all matches (not just the first) because phone numbers
+  /// like "04.67.77.29.10" look enough like `DD.MM.YY` that the first
+  /// match is often noise. The first match whose day + month pass the
+  /// calendar sanity check wins.
+  DateTime? _extractDate(String text) {
+    // 4-digit year — preferred when present.
+    final fourDigit = RegExp(r'(\d{2})[/.\-](\d{2})[/.\-](\d{4})');
+    for (final match in fourDigit.allMatches(text)) {
+      final d = _buildDate(match.group(1)!, match.group(2)!, match.group(3)!);
+      if (d != null) return d;
+    }
+    // 2-digit year fallback — covers "19/04/26" on Carrefour receipts.
+    final twoDigit =
+        RegExp(r'(?<!\d)(\d{2})[/.\-](\d{2})[/.\-](\d{2})(?!\d)');
+    for (final match in twoDigit.allMatches(text)) {
+      final d = _buildDate(
+        match.group(1)!,
+        match.group(2)!,
+        '20${match.group(3)!}', // assume post-2000 for receipts
+      );
+      if (d != null) return d;
     }
     return null;
   }
 
-  /// Matches common date formats: DD/MM/YYYY, DD.MM.YYYY, DD-MM-YYYY
-  DateTime? _extractDate(String text) {
-    final pattern = RegExp(r'(\d{2})[/.\-](\d{2})[/.\-](\d{4})');
-    final match = pattern.firstMatch(text);
-    if (match != null) {
-      try {
-        final day = int.parse(match.group(1)!);
-        final month = int.parse(match.group(2)!);
-        final year = int.parse(match.group(3)!);
-        if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-          return DateTime(year, month, day);
-        }
-      } on FormatException catch (e) {
-        debugPrint('Receipt date parse failed for "${match.group(0)}": $e');
-      }
+  DateTime? _buildDate(String dayStr, String monthStr, String yearStr) {
+    try {
+      final day = int.parse(dayStr);
+      final month = int.parse(monthStr);
+      final year = int.parse(yearStr);
+      if (month < 1 || month > 12) return null;
+      if (day < 1 || day > 31) return null;
+      return DateTime(year, month, day);
+    } on FormatException catch (e) {
+      debugPrint('Receipt date parse failed for "$dayStr/$monthStr/$yearStr": $e');
+      return null;
     }
-    return null;
   }
 
   /// Try to find a station brand name in the first few lines.
@@ -139,16 +408,30 @@ class ReceiptParser {
       'total', 'totalenergies', 'shell', 'bp', 'aral', 'esso',
       'avia', 'jet', 'elf', 'agip', 'q8', 'omv', 'mol', 'orlen',
       'intermarché', 'intermarche', 'leclerc', 'carrefour', 'auchan',
-      'super u', 'système u', 'casino',
+      'super u', 'système u', 'systeme u', 'casino',
     ];
 
     for (final line in lines.take(5)) {
       final lower = line.toLowerCase().trim();
       for (final brand in brands) {
         // Match brand as a standalone word or the whole line
-        if (lower == brand || lower.startsWith('$brand ') || lower.startsWith('$brand\t')) {
+        if (lower == brand ||
+            lower.startsWith('$brand ') ||
+            lower.startsWith('$brand\t')) {
           return line;
         }
+      }
+    }
+    return null;
+  }
+
+  /// Returns the first successful captured group decimal across
+  /// [patterns], or null if none match.
+  double? _matchFirst(String text, List<RegExp> patterns) {
+    for (final pattern in patterns) {
+      final match = pattern.firstMatch(text);
+      if (match != null && match.group(1) != null) {
+        return _parseDecimal(match.group(1)!);
       }
     }
     return null;

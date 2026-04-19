@@ -16,6 +16,7 @@ import '../widgets/landing_screen_step.dart';
 import '../widgets/onboarding_navigation_buttons.dart';
 import '../widgets/onboarding_progress_indicator.dart';
 import '../widgets/preferences_step.dart';
+import '../widgets/vehicles_step.dart';
 import '../widgets/welcome_step.dart';
 
 /// Multi-step onboarding wizard with progress indicator.
@@ -49,8 +50,19 @@ class _OnboardingWizardScreenState
   /// requires an API key.
   int get _stepCount {
     final country = ref.read(activeCountryProvider);
-    // Welcome, Country, Preferences, Landing, [API Key], Done
-    return country.requiresApiKey ? 6 : 5;
+    // Welcome, Country, Vehicles, Preferences, Landing, [API Key], Done
+    return country.requiresApiKey ? 7 : 6;
+  }
+
+  /// Zero-based index of the Vehicles step. Placed BEFORE Preferences so
+  /// the user can pick a vehicle first — the fuel preference can then
+  /// derive from the vehicle's fuel (#695).
+  static const int _vehiclesStepIndex = 2;
+
+  /// Zero-based index of the optional API key step.
+  int get _apiKeyStepIndex {
+    final country = ref.read(activeCountryProvider);
+    return country.requiresApiKey ? 5 : -1;
   }
 
   bool _isLastStep(int currentStep) => currentStep == _stepCount - 1;
@@ -161,9 +173,9 @@ class _OnboardingWizardScreenState
 
   /// Returns whether the current step is an optional one that can be skipped.
   bool _isCurrentStepSkippable(int currentStep) {
-    final country = ref.read(activeCountryProvider);
-    // The API key step is skippable (index 4 when country requires key)
-    return country.requiresApiKey && currentStep == 4;
+    // Vehicles is always skippable; API key is skippable when it shows.
+    if (currentStep == _vehiclesStepIndex) return true;
+    return currentStep == _apiKeyStepIndex && _apiKeyStepIndex != -1;
   }
 
   List<Widget> _buildSteps() {
@@ -171,6 +183,7 @@ class _OnboardingWizardScreenState
     return [
       const WelcomeStep(),
       const CountryLanguageStep(),
+      const VehiclesStep(),
       const PreferencesStep(),
       const LandingScreenStep(),
       if (country.requiresApiKey)

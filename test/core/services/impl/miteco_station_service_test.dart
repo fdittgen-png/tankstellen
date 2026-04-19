@@ -411,7 +411,7 @@ void main() {
 
   group('MitecoStationService searchStations', () {
     test('searchStations throws ApiException on network failure', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 40.42, lng: -3.70, radiusKm: 10.0,
       );
       try {
@@ -422,7 +422,7 @@ void main() {
     });
 
     test('searchStations returns valid result type', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 40.42, lng: -3.70, radiusKm: 10.0,
       );
       try {
@@ -435,7 +435,7 @@ void main() {
     });
 
     test('searchStations with sort by distance', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 40.42, lng: -3.70, radiusKm: 10.0,
         sortBy: SortBy.distance,
       );
@@ -500,8 +500,8 @@ void main() {
       ];
 
       // Parse all stations
-      final searchLat = 40.42;
-      final searchLng = -3.70;
+      const searchLat = 40.42;
+      const searchLng = -3.70;
       final allStations = <Station>[];
       for (final r in records) {
         final station = parser.testParseStation(r, searchLat, searchLng);

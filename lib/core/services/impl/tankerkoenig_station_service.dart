@@ -8,6 +8,25 @@ import '../service_result.dart';
 import '../station_service.dart';
 import 'tankerkoenig_batch_price_fetcher.dart';
 
+// Key für den Zugriff auf die freie Tankerkönig-Spritpreis-API
+// Für eigenen Key bitte hier https://creativecommons.tankerkoenig.de
+// registrieren.
+//
+// Compliance notes (#713):
+// - No API key is bundled in source — the user supplies their own via
+//   Settings → API keys. See [SettingsHiveStore.getApiKey].
+// - Attribution "Daten von Tankerkoenig.de (CC BY 4.0)" is shown on the
+//   About screen (see [AboutSection]).
+// - Rate limiting: 2s + 500ms random jitter on every request (see
+//   [RateLimitInterceptor] + [tankerkoenigDioProvider]).
+// - Bulk endpoints: favourites + alerts go through
+//   [TankerkoenigBatchPriceFetcher] which batches 10 IDs per request
+//   via `prices.php`.
+// - Background refresh only fires when the user has configured
+//   favourites or active alerts (user-initiated intent).
+// - No implicit result filtering — user-selected brand, amenity, and
+//   open-status filters are opt-in (MTS-K rule).
+
 /// Concrete StationService implementation for the Tankerkoenig API.
 ///
 /// Handles:

@@ -64,35 +64,48 @@ class EvFavoriteStations extends _$EvFavoriteStations {
     ref.watch(favoritesProvider);
     final storage = ref.read(storageRepositoryProvider);
     final favoriteIds = storage.getEvFavoriteIds();
+    debugPrint('[EvFavoriteStations.build] favoriteIds=$favoriteIds');
     if (favoriteIds.isEmpty) return const [];
 
     final stations = <ChargingStation>[];
+    final orphaned = <String>[];
 
     for (final id in favoriteIds) {
       final data = storage.getEvFavoriteStationData(id);
+      debugPrint('[EvFavoriteStations.build] id=$id dataKeys=${data?.keys.toList()}');
       if (data != null) {
         try {
           stations.add(ChargingStation.fromJson(data));
-        } catch (_) {
-          // Fallback: manually construct from JSON fields that may use either
-          // lat/lng (search/ format) or latitude/longitude (ev/ format).
-          try {
-            stations.add(ChargingStation(
-              id: data['id']?.toString() ?? id,
-              name: data['name']?.toString() ?? '',
-              operator: data['operator']?.toString() ?? '',
-              lat: (data['lat'] ?? data['latitude'] as num?)?.toDouble() ?? 0,
-              lng: (data['lng'] ?? data['longitude'] as num?)?.toDouble() ?? 0,
-              address: data['address']?.toString() ?? '',
-              connectors: const [],
-            ));
-          } catch (e) {
-            debugPrint('EvFavoriteStations: fallback parse error for $id: $e');
-          }
+          continue;
+        } catch (e) {
+          debugPrint('[EvFavoriteStations.build] fromJson failed for $id: $e — falling back');
         }
+        // Fallback: manually construct from JSON fields that may use either
+        // lat/lng (search/ format) or latitude/longitude (ev/ format).
+        try {
+          stations.add(ChargingStation(
+            id: data['id']?.toString() ?? id,
+            name: data['name']?.toString() ?? '',
+            operator: data['operator']?.toString() ?? '',
+            lat: (data['lat'] ?? data['latitude'] as num?)?.toDouble() ?? 0,
+            lng: (data['lng'] ?? data['longitude'] as num?)?.toDouble() ?? 0,
+            address: data['address']?.toString() ?? '',
+            connectors: const [],
+          ));
+        } catch (e) {
+          debugPrint('[EvFavoriteStations.build] fallback parse failed for $id: $e');
+          orphaned.add(id);
+        }
+      } else {
+        debugPrint('[EvFavoriteStations.build] MISSING DATA for id=$id');
+        orphaned.add(id);
       }
     }
 
+    if (orphaned.isNotEmpty) {
+      debugPrint('[EvFavoriteStations.build] ${orphaned.length} orphan id(s) skipped: $orphaned');
+    }
+    debugPrint('[EvFavoriteStations.build] returning ${stations.length} stations');
     return stations;
   }
 }

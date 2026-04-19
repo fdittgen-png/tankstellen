@@ -111,10 +111,10 @@ void main() {
       // POI "Esso" at 43.464, 3.427 (far, ~1.5km)
       // Should match to "Total"
 
-      final stationLat = 43.452;
-      final stationLng = 3.418;
-      final poiLat = 43.4521;
-      final poiLng = 3.4181;
+      const stationLat = 43.452;
+      const stationLng = 3.418;
+      const poiLat = 43.4521;
+      const poiLng = 3.4181;
 
       // Simple distance check (in degrees, ~111km per degree)
       final dLat = (poiLat - stationLat).abs();

@@ -40,11 +40,11 @@ Map<String, dynamic> _$ErrorTraceToJson(_ErrorTrace instance) =>
       'errorType': instance.errorType,
       'errorMessage': instance.errorMessage,
       'stackTrace': instance.stackTrace,
-      'deviceInfo': instance.deviceInfo,
-      'appState': instance.appState,
-      'serviceChainState': instance.serviceChainState,
-      'networkState': instance.networkState,
-      'breadcrumbs': instance.breadcrumbs,
+      'deviceInfo': instance.deviceInfo.toJson(),
+      'appState': instance.appState.toJson(),
+      'serviceChainState': instance.serviceChainState?.toJson(),
+      'networkState': instance.networkState.toJson(),
+      'breadcrumbs': instance.breadcrumbs.map((e) => e.toJson()).toList(),
     };
 
 const _$ErrorCategoryEnumMap = {
@@ -111,7 +111,7 @@ _ServiceChainSnapshot _$ServiceChainSnapshotFromJson(
 Map<String, dynamic> _$ServiceChainSnapshotToJson(
   _ServiceChainSnapshot instance,
 ) => <String, dynamic>{
-  'attempts': instance.attempts,
+  'attempts': instance.attempts.map((e) => e.toJson()).toList(),
   'cachedDataAge': instance.cachedDataAge,
 };
 

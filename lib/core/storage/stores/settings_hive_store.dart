@@ -18,19 +18,16 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
   // In-memory cache to avoid async reads on every API call.
   static String? _apiKeyCache;
 
-  /// Default Tankerkoenig **community** API key shipped with the app
-  /// (#521). Every fresh install starts with this key so German search
-  /// returns real data out of the box — no user onboarding required.
-  /// Users who want their own key can still paste one in Settings →
-  /// API Keys → Tankerkoenig; the custom key then overrides this
-  /// default and `hasCustomApiKey()` flips to true.
-  ///
-  /// Rate limits apply to the community key because it is shared
-  /// across all public builds. That trade-off is deliberate — the
-  /// alternative was shipping "demo mode" on first launch, which
-  /// returned zero stations and made the app look broken.
-  static const defaultTankerkoenigKey =
-      'ff6250b2-a85d-41e5-b483-c052caff0ca9';
+  // Key für den Zugriff auf die freie Tankerkönig-Spritpreis-API
+  // Für eigenen Key bitte hier https://creativecommons.tankerkoenig.de
+  // registrieren.
+  //
+  // The Tankerkönig terms of service (#713) forbid publishing any API key
+  // — including demo / community keys — in public source repositories.
+  // The app therefore ships with NO bundled key: the user must register
+  // at creativecommons.tankerkoenig.de and paste their personal key into
+  // Settings → API keys. Until then, Germany falls back to
+  // [DemoStationService] (see `country_service_registry._createTankerkoenig`).
 
   /// Load API key from secure storage into memory. Call once at startup.
   static Future<void> loadApiKey() async {
@@ -42,8 +39,7 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
   @override
   String? getApiKey() {
     final custom = _apiKeyCache;
-    if (custom != null && custom.isNotEmpty) return custom;
-    return defaultTankerkoenigKey;
+    return (custom != null && custom.isNotEmpty) ? custom : null;
   }
 
   @override
@@ -60,17 +56,12 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
 
   @override
   bool hasApiKey() {
-    // #521 — a Tankerkoenig key is always available (custom or community
-    // default), so the app is never in a "demo mode" with respect to
-    // German search.
-    return true;
-  }
-
-  @override
-  bool hasCustomApiKey() {
     final key = _apiKeyCache;
     return key != null && key.isNotEmpty;
   }
+
+  @override
+  bool hasCustomApiKey() => hasApiKey();
 
   // EV Charging API key (OpenChargeMap)
   static String? _evApiKeyCache;

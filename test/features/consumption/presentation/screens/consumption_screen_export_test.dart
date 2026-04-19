@@ -6,6 +6,8 @@ import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/consumption_screen.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -17,6 +19,14 @@ class _FixedFillUpList extends FillUpList {
   List<FillUp> build() => _value;
 }
 
+/// #702 — ConsumptionScreen now watches activeVehicleProfileProvider
+/// to render the Edit-vehicle shortcut. This override keeps it out of
+/// the way of the CSV-export assertions.
+class _NoActiveVehicle extends ActiveVehicleProfile {
+  @override
+  VehicleProfile? build() => null;
+}
+
 Future<void> _pumpScreen(
   WidgetTester tester, {
   required List<FillUp> fillUps,
@@ -26,11 +36,11 @@ Future<void> _pumpScreen(
     routes: [
       GoRoute(
         path: '/consumption',
-        builder: (_, __) => const ConsumptionScreen(),
+        builder: (_, _) => const ConsumptionScreen(),
       ),
       // Minimal stubs so pushes in the screen don't crash.
-      GoRoute(path: '/consumption/add', builder: (_, __) => const SizedBox()),
-      GoRoute(path: '/carbon', builder: (_, __) => const SizedBox()),
+      GoRoute(path: '/consumption/add', builder: (_, _) => const SizedBox()),
+      GoRoute(path: '/carbon', builder: (_, _) => const SizedBox()),
     ],
   );
 
@@ -39,6 +49,7 @@ Future<void> _pumpScreen(
     MaterialApp.router(routerConfig: router),
     overrides: [
       fillUpListProvider.overrideWith(() => _FixedFillUpList(fillUps)),
+      activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
     ],
   );
 }

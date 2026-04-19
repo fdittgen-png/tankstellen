@@ -25,7 +25,7 @@ class EvMapLayer extends ConsumerWidget {
     return async.when(
       data: (stations) => _buildLayer(context, stations),
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 

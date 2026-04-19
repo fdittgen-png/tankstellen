@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:meta/meta.dart';
 import '../../error/exceptions.dart';
 import '../dio_factory.dart';
 import '../geocoding_provider.dart';
@@ -43,18 +42,25 @@ class NominatimGeocodingProvider implements GeocodingProvider {
 
     try {
       _lastRequest = DateTime.now();
+      // Numeric queries use the structured postalcode endpoint (with
+      // French arrondissement city hints). Non-numeric queries like
+      // "Paris" go through the free-text `q=` parameter so the user
+      // can search by city name, not just ZIP (#690).
+      final isNumeric = RegExp(r'^\d+$').hasMatch(zipCode.trim());
       final queryParams = <String, String>{
-        'postalcode': zipCode,
         'country': _countryCode,
         'format': 'json',
         'limit': '1',
       };
 
-      // Add city hint for French arrondissement postal codes to
-      // prevent Nominatim from returning wrong centroids.
-      final cityHint = _frenchCityHint(zipCode);
-      if (cityHint != null) {
-        queryParams['city'] = cityHint;
+      if (isNumeric) {
+        queryParams['postalcode'] = zipCode.trim();
+        final cityHint = _frenchCityHint(zipCode.trim());
+        if (cityHint != null) {
+          queryParams['city'] = cityHint;
+        }
+      } else {
+        queryParams['q'] = zipCode.trim();
       }
 
       final response = await _dio.get<List<dynamic>>(
@@ -66,7 +72,7 @@ class NominatimGeocodingProvider implements GeocodingProvider {
       final results = response.data;
       if (results == null || results.isEmpty) {
         throw LocationException(
-          message: 'No coordinates found for postal code $zipCode '
+          message: 'No coordinates found for "$zipCode" '
               'in country $_countryCode.',
         );
       }
@@ -77,7 +83,7 @@ class NominatimGeocodingProvider implements GeocodingProvider {
 
       if (lat == null || lng == null) {
         throw LocationException(
-          message: 'Invalid coordinates for postal code $zipCode.',
+          message: 'Invalid coordinates for "$zipCode".',
         );
       }
 

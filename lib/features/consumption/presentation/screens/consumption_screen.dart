@@ -3,9 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/csv_exporter.dart';
 import '../../providers/consumption_providers.dart';
 import '../widgets/consumption_stats_card.dart';
@@ -19,6 +22,7 @@ class ConsumptionScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final fillUps = ref.watch(fillUpListProvider);
     final stats = ref.watch(consumptionStatsProvider);
+    final activeVehicle = ref.watch(activeVehicleProfileProvider);
     final l = AppLocalizations.of(context);
 
     return Scaffold(
@@ -52,10 +56,24 @@ class ConsumptionScreen extends ConsumerWidget {
             icon: const Icon(Icons.eco_outlined),
             onPressed: () => context.push('/carbon'),
           ),
+          // Shortcut to edit the active vehicle — the primary
+          // "subject" the consumption log belongs to (#702). Hidden
+          // when no vehicle is configured; the fill-up FAB's empty
+          // state already surfaces the Add-vehicle CTA in that case.
+          if (activeVehicle != null)
+            IconButton(
+              key: const Key('open_active_vehicle'),
+              tooltip: l?.vehicleEditTitle ?? 'Edit vehicle',
+              icon: const Icon(Icons.directions_car_outlined),
+              onPressed: () => context.push(
+                '/vehicles/edit',
+                extra: activeVehicle.id,
+              ),
+            ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/consumption/add'),
+        onPressed: () => context.push('/consumption/pick-station'),
         icon: const Icon(Icons.add),
         label: Text(l?.addFillUp ?? 'Add fill-up'),
       ),
@@ -74,7 +92,20 @@ class ConsumptionScreen extends ConsumerWidget {
               itemCount: fillUps.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  return ConsumptionStatsCard(stats: stats);
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      HelpBanner(
+                        storageKey: StorageKeys.helpBannerConsumption,
+                        icon: Icons.tips_and_updates_outlined,
+                        message: l?.helpBannerConsumption ??
+                            'Log every fill-up to track your real-world '
+                                'consumption and CO₂ footprint. Swipe left '
+                                'to delete an entry.',
+                      ),
+                      ConsumptionStatsCard(stats: stats),
+                    ],
+                  );
                 }
                 final fillUp = fillUps[index - 1];
                 return Dismissible(

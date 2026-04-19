@@ -47,7 +47,13 @@ class FavoritesFuelTab extends ConsumerWidget {
 
     return stationsState.when(
       data: (result) {
-        if (result.data.isEmpty && !hasEvFavorites) {
+        // Only show the loading view if the initial fuel fetch hasn't
+        // returned yet AND there is at least one fuel id to load. If all
+        // favorites are EV, or there are orphan ids without data, fall
+        // through to the list below — showing the EV section (and any
+        // diagnostic banner) is better UX than a spinner forever (#690).
+        final hasFuelIds = favoriteIds.any((id) => !id.startsWith('ocm-'));
+        if (result.data.isEmpty && !hasEvFavorites && hasFuelIds) {
           return const FavoritesLoadingView();
         }
         return RefreshIndicator(
@@ -62,11 +68,30 @@ class FavoritesFuelTab extends ConsumerWidget {
               Expanded(
                 child: ListView(
                   children: [
+                    // Fuel stations first (#692) — they're the app's primary
+                    // use-case; EV is a secondary section below.
+                    if (result.data.isNotEmpty) ...[
+                      if (hasEvFavorites)
+                        FavoritesSectionHeader(
+                          icon: Icons.local_gas_station,
+                          label: l10n?.fuelStationsSection ?? 'Fuel Stations',
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                        ),
+                      ...result.data.map(
+                        (station) =>
+                            FavoriteStationDismissible(station: station),
+                      ),
+                    ],
                     if (hasEvFavorites) ...[
                       FavoritesSectionHeader(
                         icon: Icons.ev_station,
                         label: l10n?.evChargingSection ?? 'EV Charging',
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                        padding: EdgeInsets.fromLTRB(
+                          16,
+                          result.data.isNotEmpty ? 12 : 8,
+                          16,
+                          4,
+                        ),
                       ),
                       ...evStations.map((ev) => EvFavoriteCard(
                             key: ValueKey('ev-${ev.id}'),
@@ -84,16 +109,7 @@ class FavoritesFuelTab extends ConsumerWidget {
                               );
                             },
                           )),
-                      if (result.data.isNotEmpty)
-                        FavoritesSectionHeader(
-                          icon: Icons.local_gas_station,
-                          label: l10n?.fuelStationsSection ?? 'Fuel Stations',
-                        ),
                     ],
-                    ...result.data.map(
-                      (station) =>
-                          FavoriteStationDismissible(station: station),
-                    ),
                   ],
                 ),
               ),

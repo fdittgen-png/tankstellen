@@ -38,6 +38,12 @@ _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
           ?.map((e) => $enumDecode(_$StationAmenityEnumMap, e))
           .toList() ??
       const [],
+  defaultVehicleId: json['defaultVehicleId'] as String?,
+  hybridFuelChoice: _$JsonConverterFromJson<String, FuelType>(
+    json['hybridFuelChoice'],
+    const FuelTypeJsonConverter().fromJson,
+  ),
+  showConsumptionTab: json['showConsumptionTab'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
@@ -62,6 +68,12 @@ Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
       'preferredAmenities': instance.preferredAmenities
           .map((e) => _$StationAmenityEnumMap[e]!)
           .toList(),
+      'defaultVehicleId': instance.defaultVehicleId,
+      'hybridFuelChoice': _$JsonConverterToJson<String, FuelType>(
+        instance.hybridFuelChoice,
+        const FuelTypeJsonConverter().toJson,
+      ),
+      'showConsumptionTab': instance.showConsumptionTab,
     };
 
 const _$LandingScreenEnumMap = {
@@ -81,3 +93,13 @@ const _$StationAmenityEnumMap = {
   StationAmenity.wifi: 'wifi',
   StationAmenity.ev: 'ev',
 };
+
+Value? _$JsonConverterFromJson<Json, Value>(
+  Object? json,
+  Value? Function(Json json) fromJson,
+) => json == null ? null : fromJson(json as Json);
+
+Json? _$JsonConverterToJson<Json, Value>(
+  Value? value,
+  Json? Function(Value value) toJson,
+) => value == null ? null : toJson(value);

@@ -16,7 +16,7 @@ class LocationService {
   LocationService(this._geolocator);
 
   Future<Position> getCurrentPosition() async {
-    bool serviceEnabled = await _geolocator.isLocationServiceEnabled();
+    final bool serviceEnabled = await _geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       throw const LocationException(
         message: 'Standortdienste sind deaktiviert.',

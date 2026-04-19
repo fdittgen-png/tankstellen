@@ -94,7 +94,7 @@ class FuelVsEvCard extends StatelessWidget {
   Future<void> _share(BuildContext context, AppLocalizations? l) async {
     // Privacy-respecting: no location, no cost, just CO2 + app name.
     final text =
-        '${l?.shareCo2Message(fuelCo2Kg.toStringAsFixed(0)) ?? 'I tracked ${fuelCo2Kg.toStringAsFixed(0)} kg CO2 with Tankstellen.'}';
+        l?.shareCo2Message(fuelCo2Kg.toStringAsFixed(0)) ?? 'I tracked ${fuelCo2Kg.toStringAsFixed(0)} kg CO2 with Tankstellen.';
     await Clipboard.setData(ClipboardData(text: text));
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/utils/frame_callbacks.dart';
+import '../features/profile/providers/profile_provider.dart';
+import '../features/vehicle/providers/vehicle_providers.dart';
 import '../l10n/app_localizations.dart';
+import 'current_shell_branch_provider.dart';
 import 'responsive_search_layout.dart';
 
 /// The main app shell with adaptive navigation.
@@ -20,15 +24,15 @@ import 'responsive_search_layout.dart';
 /// ## Navigation flow:
 /// User taps tab → `_goToPage()` → plays animation → calls `goBranch()`
 /// → go_router switches the visible branch → `navigationShell` renders new page
-class ShellScreen extends StatefulWidget {
+class ShellScreen extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
   const ShellScreen({super.key, required this.navigationShell});
 
   @override
-  State<ShellScreen> createState() => _ShellScreenState();
+  ConsumerState<ShellScreen> createState() => _ShellScreenState();
 }
 
-class _ShellScreenState extends State<ShellScreen> with TickerProviderStateMixin {
+class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderStateMixin {
   late final List<AnimationController> _iconControllers;
   late AnimationController _transitionController;
   late Animation<Offset> _slideInAnim;
@@ -37,12 +41,25 @@ class _ShellScreenState extends State<ShellScreen> with TickerProviderStateMixin
   int _currentIndex = 0;
   bool _isTransitioning = false;
 
-  static const _pageCount = 4;
+  /// Upper bound on destination count — the router always registers 5
+  /// branches (see StatefulShellRoute in router.dart), the UI decides
+  /// how many are visible.
+  static const _pageCount = 5;
 
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.navigationShell.currentIndex;
+
+    // Publish the INITIAL branch index so MapScreen's visibility listener
+    // fires even on first-run landing where the user never taps a tab
+    // (e.g. landingScreen == cheapest/nearest routes straight to Carte).
+    // Without this the listener only caught later tab flips, leaving
+    // the first visit blank (#709).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(currentShellBranchProvider.notifier).set(_currentIndex);
+    });
 
     _iconControllers = List.generate(
       _pageCount,
@@ -99,6 +116,10 @@ class _ShellScreenState extends State<ShellScreen> with TickerProviderStateMixin
     });
 
     setState(() => _currentIndex = index);
+    // Publish the new branch index so observers (e.g. MapScreen for its
+    // tile-viewport nudge, #696) can react without reaching into this
+    // widget's private state.
+    ref.read(currentShellBranchProvider.notifier).set(index);
 
     // Navigate via go_router — this preserves each branch's state
     widget.navigationShell.goBranch(
@@ -126,6 +147,7 @@ class _ShellScreenState extends State<ShellScreen> with TickerProviderStateMixin
       safePostFrame(() {
         if (routerIndex != _currentIndex) {
           setState(() => _currentIndex = routerIndex);
+          ref.read(currentShellBranchProvider.notifier).set(routerIndex);
         }
       });
     }
@@ -134,11 +156,36 @@ class _ShellScreenState extends State<ShellScreen> with TickerProviderStateMixin
     final screenSize = screenSizeOf(context);
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
-    final destinations = [
+    // Profile flag + vehicle presence decide whether the 5th tab
+    // (#701) renders. The tab ALWAYS exists as a router branch so
+    // deep links keep working; the UI just hides the nav entry when
+    // the user hasn't opted in or has no vehicle yet.
+    bool showConsumptionTab = false;
+    try {
+      final profile = ref.watch(activeProfileProvider);
+      final vehicles = ref.watch(vehicleProfileListProvider);
+      showConsumptionTab =
+          (profile?.showConsumptionTab ?? false) && vehicles.isNotEmpty;
+    } catch (e) {
+      // Widget tests without a real Hive storage — treat as hidden.
+      debugPrint('ShellScreen: consumption-tab visibility probe: $e');
+    }
+
+    final destinations = <_NavItem>[
       _NavItem(Icons.search_outlined, Icons.search, l10n?.search ?? 'Search'),
       _NavItem(Icons.map_outlined, Icons.map, l10n?.map ?? 'Map'),
       _NavItem(Icons.star_outline, Icons.star, l10n?.favorites ?? 'Favorites'),
-      _NavItem(Icons.settings_outlined, Icons.settings, l10n?.settings ?? 'Settings'),
+      _NavItem(
+        Icons.settings_outlined,
+        Icons.settings,
+        l10n?.settings ?? 'Settings',
+      ),
+      if (showConsumptionTab)
+        _NavItem(
+          Icons.local_gas_station_outlined,
+          Icons.local_gas_station,
+          l10n?.consumptionLogTitle ?? 'Consumption',
+        ),
     ];
 
     final body = GestureDetector(

@@ -122,8 +122,14 @@ void main() {
       // `true`  → enabled (onChanged != null)
       // `false` → disabled (onChanged == null)
       //
-      // Start at the top of the list, then drag DOWN so lazy items
-      // below the fold get built into the tree.
+      // Scroll through every radio, snapshotting each type's enabled
+      // flag. With the #710 RadioGroup migration the radios all live
+      // inside a single RadioGroup widget — ListView sees it as one
+      // child and builds the whole subtree at once — but the drag
+      // pattern still works because the RadioListTiles are always
+      // present in the widget tree from the first frame.
+      //
+      // `true`  → enabled (tappable), `false` → disabled.
       final seen = <ReportType, bool>{};
       final scrollable = find.byType(Scrollable).first;
       for (var i = 0;
@@ -131,16 +137,22 @@ void main() {
           i++) {
         for (final radio in tester.widgetList<RadioListTile<ReportType>>(
             find.byType(RadioListTile<ReportType>))) {
-          seen.putIfAbsent(radio.value, () => radio.onChanged != null);
+          seen.putIfAbsent(radio.value, () => radio.enabled ?? true);
         }
         if (seen.length == ReportType.values.length) break;
         await tester.drag(scrollable, const Offset(0, -200));
         await tester.pump();
       }
 
-      // Now the list is scrolled to (or past) the bottom — the submit
-      // button should be in view. It must be disabled because no
-      // report type is selected yet.
+      // Scroll the submit button into view explicitly — after the
+      // RadioGroup refactor the radios occupy a single ListView slot
+      // and the button's position relative to the fold changed, so
+      // raw drag-until-seen isn't a reliable anchor any more.
+      await tester.scrollUntilVisible(
+        find.byType(FilledButton),
+        120,
+        scrollable: find.byType(Scrollable).first,
+      );
       final button = tester.widget<FilledButton>(find.byType(FilledButton));
       expect(button.onPressed, isNull);
 
@@ -192,7 +204,7 @@ void main() {
         equals([ReportType.wrongName, ReportType.wrongAddress]),
       );
       for (final r in radios) {
-        expect(r.onChanged, isNotNull,
+        expect(r.enabled ?? true, isTrue,
             reason: 'GitHub-routed radios must be enabled regardless of '
                 'backend availability');
       }
@@ -255,7 +267,7 @@ void main() {
       for (final radio in tester
           .widgetList<RadioListTile<ReportType>>(
               find.byType(RadioListTile<ReportType>))) {
-        expect(radio.onChanged, isNotNull,
+        expect(radio.enabled ?? true, isTrue,
             reason: 'radios must be enabled when at least one backend is '
                 'available');
       }
