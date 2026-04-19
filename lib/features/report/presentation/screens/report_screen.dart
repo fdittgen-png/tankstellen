@@ -278,7 +278,15 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: ListView(
+      // RadioGroup sits OUTSIDE the ListView so every lazy-built
+      // RadioListTile can look up the ancestor at any scroll position
+      // (#710). Selection + change propagation flow through the group's
+      // onChanged into the Riverpod controller.
+      body: RadioGroup<ReportType>(
+        groupValue: selectedType,
+        onChanged: (v) =>
+            ref.read(reportFormControllerProvider.notifier).selectType(v),
+        child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           if (!hasAnyBackend && !allVisibleRouteToGitHub) ...[
@@ -313,6 +321,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
                 : Text(l10n?.sendReport ?? 'Send report'),
           ),
         ],
+      ),
       ),
     );
   }

@@ -11,12 +11,12 @@ void main() {
   group('StationMarkerBuilder.priceColor', () {
     test('returns green for cheapest price', () {
       final color = StationMarkerBuilder.priceColor(1.50, 1.50, 1.90);
-      expect(color.green, greaterThan(color.red));
+      expect(color.g, greaterThan(color.r));
     });
 
     test('returns red for most expensive price', () {
       final color = StationMarkerBuilder.priceColor(1.90, 1.50, 1.90);
-      expect(color.red, greaterThan(color.green));
+      expect(color.r, greaterThan(color.g));
     });
 
     test('returns grey for null price', () {
@@ -201,8 +201,8 @@ void main() {
           StationMarkerBuilder.priceColor(1.739, 1.739, 1.859);
       final expensiveColor =
           StationMarkerBuilder.priceColor(1.859, 1.739, 1.859);
-      expect(cheapColor.green, greaterThan(cheapColor.red));
-      expect(expensiveColor.red, greaterThan(expensiveColor.green));
+      expect(cheapColor.g, greaterThan(cheapColor.r));
+      expect(expensiveColor.r, greaterThan(expensiveColor.g));
       expect(cheapMarker.width, kStationMarkerWidth);
       expect(expensiveMarker.width, kStationMarkerWidth);
     });
