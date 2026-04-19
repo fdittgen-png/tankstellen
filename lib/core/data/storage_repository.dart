@@ -64,21 +64,23 @@ abstract class SettingsStorage {
 
 /// API key secure storage.
 abstract class ApiKeyStorage {
-  /// Returns the Tankerkoenig API key — either the user's custom key
-  /// from secure storage, or the bundled community default (#521) when
-  /// the user has not set one. Never returns null in a supported
-  /// configuration.
+  /// Returns the user's personal Tankerkönig API key from secure storage,
+  /// or `null` when no key has been configured. The app ships with NO
+  /// bundled key (#713) — the Tankerkönig terms of service forbid
+  /// publishing any key, including demo keys, on public repositories.
+  /// Users register their free personal key at
+  /// https://creativecommons.tankerkoenig.de.
   String? getApiKey();
   Future<void> setApiKey(String key);
   Future<void> deleteApiKey();
 
-  /// Whether *any* Tankerkoenig key is available — since #521 this is
-  /// always true, because the app ships a default community key.
+  /// Whether the user has configured a personal Tankerkönig key.
+  /// When false, Germany search falls back to [DemoStationService].
   bool hasApiKey();
 
-  /// Whether the user has explicitly set their own Tankerkoenig key
-  /// (distinct from the default community key). Use this in the UI to
-  /// tell "Configurée" from "Clé communautaire par défaut".
+  /// Alias of [hasApiKey] kept for backwards compatibility with older
+  /// callers. Since there is no longer a bundled default key, any
+  /// configured key IS the user's custom key.
   bool hasCustomApiKey();
 
   String? getEvApiKey();

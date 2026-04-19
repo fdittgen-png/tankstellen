@@ -95,6 +95,9 @@ GeocodingChain geocodingChain(Ref ref) {
 // Interceptors (moved from dio_client.dart, now private to this file)
 // ---------------------------------------------------------------------------
 
+// Key für den Zugriff auf die freie Tankerkönig-Spritpreis-API
+// Für eigenen Key bitte hier https://creativecommons.tankerkoenig.de
+// registrieren.
 class _ApiKeyInterceptor extends Interceptor {
   final Ref _ref;
   _ApiKeyInterceptor(this._ref);

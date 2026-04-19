@@ -58,9 +58,9 @@ void main() {
             if (line.trimLeft().startsWith('//')) continue;
             // Exclude default EV API key (intentionally public, shared key)
             if (line.contains('defaultEvApiKey')) continue;
-            // #521 — bundled Tankerkoenig community key (intentionally
-            // public, rate-limited, shared across public builds).
-            if (line.contains('defaultTankerkoenigKey')) continue;
+            // Tankerkönig keys are NEVER allowed in source (#713) — the
+            // vendor TOS forbids publishing keys, including demo keys,
+            // on public repositories. No exemption exists for them.
             violations.add('${file.path}:${i + 1}: $line');
           }
         }
