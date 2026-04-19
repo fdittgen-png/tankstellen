@@ -57,7 +57,7 @@ void main() {
       expect(find.text('Station pre-filled'), findsOneWidget);
     });
 
-    testWidgets('preFilledFuelType is selected in the dropdown',
+    testWidgets('preFilledFuelType is surfaced on the fuel info card',
         (tester) async {
       await pumpApp(
         tester,
@@ -69,9 +69,14 @@ void main() {
         overrides: _withVehicle,
       );
 
-      // No vehicle auto-selects (no profile default, no active);
-      // the fuel dropdown shows the apiValue uppercased.
-      expect(find.text('DIESEL'), findsOneWidget);
+      // Vehicle is now mandatory and auto-selected. Because the stub
+      // vehicle has no configured fuel, the form keeps the passed-in
+      // preFilledFuelType and shows it via the shared displayName
+      // ("Diesel") in the fuel info card (#713).
+      expect(
+        find.textContaining(FuelType.diesel.displayName),
+        findsWidgets,
+      );
     });
 
     testWidgets(
@@ -149,8 +154,8 @@ void main() {
         overrides: _withVehicle,
       );
       // With a vehicle pre-selected, the fuel info card shows the
-      // default e10 fuel type.
-      expect(find.textContaining('E10'), findsWidgets);
+      // default e10 fuel type with its shared displayName (#713).
+      expect(find.textContaining(FuelType.e10.displayName), findsWidgets);
     });
   });
 }

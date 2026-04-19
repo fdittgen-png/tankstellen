@@ -82,8 +82,8 @@ void main() {
         // Open the dropdown.
         await tester.tap(find.byType(DropdownButtonFormField<FuelType?>));
         await tester.pumpAndSettle();
-        // Pick DIESEL (upper-case label from the dropdown).
-        await tester.tap(find.text('DIESEL').last);
+        // Pick "Diesel" (displayName from the shared dropdown, #713).
+        await tester.tap(find.text(FuelType.diesel.displayName).last);
         await tester.pumpAndSettle();
 
         expect(fuel.text, FuelType.diesel.apiValue,
@@ -166,13 +166,12 @@ void main() {
           FuelType.lpg,
           FuelType.cng,
         ]) {
-          expect(find.text(f.apiValue.toUpperCase()), findsWidgets,
-              reason: '${f.apiValue} must appear as an option');
+          expect(find.text(f.displayName), findsWidgets,
+              reason: '${f.displayName} must appear as an option');
         }
-        expect(find.text(FuelType.electric.apiValue.toUpperCase()),
-            findsNothing,
+        expect(find.text(FuelType.electric.displayName), findsNothing,
             reason: 'Electric is configured via the EV section, not here');
-        expect(find.text(FuelType.all.apiValue.toUpperCase()), findsNothing,
+        expect(find.text(FuelType.all.displayName), findsNothing,
             reason: 'The synthetic "all" sentinel must not be pickable');
       },
     );

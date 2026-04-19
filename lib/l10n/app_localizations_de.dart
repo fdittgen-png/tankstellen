@@ -1794,10 +1794,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Überspringen, um die Einrichtung abzuschließen — Sie können Fahrzeuge jederzeit in den Einstellungen hinzufügen.';
 
   @override
-  String get fillUpVehicleLabel => 'Fahrzeug (optional)';
+  String get fillUpVehicleLabel => 'Fahrzeug';
 
   @override
   String get fillUpVehicleNone => 'Kein Fahrzeug';
+
+  @override
+  String get fillUpVehicleRequired => 'Fahrzeug erforderlich';
 
   @override
   String get vehicleFuelNotSet => 'Nicht gesetzt';
@@ -2524,7 +2527,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get linkDeviceImportDescription =>
-      'Geben Sie den Gerätecode Ihres anderen Geräts ein, um dessen Favoriten und Alarme zu importieren.';
+      'Geben Sie den Gerätecode Ihres anderen Geräts ein, um dessen Favoriten, Alarme, Fahrzeuge und Tankprotokoll zu importieren. Jedes Gerät behält sein eigenes Profil und seine Voreinstellungen.';
 
   @override
   String get linkDeviceCodeFieldLabel => 'Gerätecode';
@@ -2540,7 +2543,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get linkDeviceHowItWorksBody =>
-      '1. Auf Gerät A: Gerätecode oben kopieren\n2. Auf Gerät B: in das Feld \"Gerätecode\" einfügen\n3. \"Daten importieren\" tippen, um Favoriten und Alarme zusammenzuführen\n4. Beide Geräte haben dann alle kombinierten Daten\n\nJedes Gerät behält seine eigene anonyme Identität. Daten werden zusammengeführt, nicht verschoben.';
+      '1. Auf Gerät A: Gerätecode oben kopieren\n2. Auf Gerät B: in das Feld \"Gerätecode\" einfügen\n3. \"Daten importieren\" tippen, um Favoriten, Alarme, Fahrzeuge und Tankprotokoll zusammenzuführen\n4. Beide Geräte haben dann alle kombinierten Daten\n\nJedes Gerät behält seine eigene anonyme Identität und sein eigenes Profil (bevorzugter Kraftstoff, Standardfahrzeug, Startbildschirm). Daten werden zusammengeführt, nicht verschoben.';
 
   @override
   String get vehicleSetActive => 'Aktivieren';

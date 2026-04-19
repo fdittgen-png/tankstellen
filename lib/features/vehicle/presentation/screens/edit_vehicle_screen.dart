@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../profile/data/repositories/profile_repository.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/entities/vehicle_profile.dart';

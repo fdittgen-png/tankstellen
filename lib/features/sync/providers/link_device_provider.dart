@@ -5,7 +5,11 @@ import '../../../core/sync/supabase_client.dart';
 import '../../../core/sync/sync_service.dart';
 import '../../alerts/data/models/price_alert.dart';
 import '../../alerts/providers/alert_provider.dart';
+import '../../consumption/domain/entities/fill_up.dart';
+import '../../consumption/providers/consumption_providers.dart';
 import '../../favorites/providers/favorites_provider.dart';
+import '../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../vehicle/providers/vehicle_providers.dart';
 
 part 'link_device_provider.g.dart';
 
@@ -101,13 +105,74 @@ class LinkDeviceController extends _$LinkDeviceController {
         }
       }
 
-      // 5. Sync merged data back to our server account
+      // 5. Fetch + merge the other device's vehicles (#713)
+      int addedVehicles = 0;
+      try {
+        final otherVehicles = await client
+            .from('vehicles')
+            .select('id, data')
+            .eq('user_id', trimmed);
+        final parsed = (otherVehicles as List)
+            .map((r) {
+              final data = (r as Map)['data'];
+              if (data is Map<String, dynamic>) {
+                try {
+                  return VehicleProfile.fromJson(data);
+                } catch (e) {
+                  debugPrint('Vehicle import decode failed: $e');
+                  return null;
+                }
+              }
+              return null;
+            })
+            .whereType<VehicleProfile>()
+            .toList();
+        addedVehicles = await ref
+            .read(vehicleProfileListProvider.notifier)
+            .mergeFrom(parsed);
+      } catch (e) {
+        debugPrint('Vehicle import failed: $e');
+      }
+
+      // 6. Fetch + merge the other device's fill-ups (#713)
+      int addedFillUps = 0;
+      try {
+        final otherFillUps = await client
+            .from('fill_ups')
+            .select('id, data')
+            .eq('user_id', trimmed);
+        final parsed = (otherFillUps as List)
+            .map((r) {
+              final data = (r as Map)['data'];
+              if (data is Map<String, dynamic>) {
+                try {
+                  return FillUp.fromJson(data);
+                } catch (e) {
+                  debugPrint('FillUp import decode failed: $e');
+                  return null;
+                }
+              }
+              return null;
+            })
+            .whereType<FillUp>()
+            .toList();
+        addedFillUps =
+            await ref.read(fillUpListProvider.notifier).mergeFrom(parsed);
+      } catch (e) {
+        debugPrint('FillUp import failed: $e');
+      }
+
+      // 7. Sync merged data back to our server account. Profile is NOT
+      // synced — each device keeps its own local profile + defaulting.
       await SyncService.syncFavorites(ref.read(favoritesProvider));
       await SyncService.syncAlerts(ref.read(alertProvider));
+      await SyncService.syncVehicles(ref.read(vehicleProfileListProvider));
+      await SyncService.syncFillUps(ref.read(fillUpListProvider));
 
       state = LinkDeviceState(
         result:
-            'Linked! Imported $addedFavorites favorites and $addedAlerts alerts.',
+            'Linked! Imported $addedFavorites favorites, $addedAlerts alerts, '
+            '$addedVehicles vehicles, $addedFillUps fill-ups.',
       );
     } catch (e) {
       state = LinkDeviceState(result: 'Link failed: $e');

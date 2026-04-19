@@ -1791,10 +1791,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ignorer pour terminer la configuration — vous pouvez ajouter des véhicules à tout moment depuis les Paramètres.';
 
   @override
-  String get fillUpVehicleLabel => 'Véhicule (facultatif)';
+  String get fillUpVehicleLabel => 'Véhicule';
 
   @override
   String get fillUpVehicleNone => 'Aucun véhicule';
+
+  @override
+  String get fillUpVehicleRequired => 'Véhicule requis';
 
   @override
   String get vehicleFuelNotSet => 'Non défini';
@@ -2526,7 +2529,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get linkDeviceImportDescription =>
-      'Saisissez le code de votre autre appareil pour importer ses favoris et alertes.';
+      'Saisissez le code de votre autre appareil pour importer ses favoris, alertes, véhicules et journal de consommation. Chaque appareil conserve son propre profil et ses préférences.';
 
   @override
   String get linkDeviceCodeFieldLabel => 'Code de l\'appareil';
@@ -2542,7 +2545,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get linkDeviceHowItWorksBody =>
-      '1. Sur l\'appareil A : copiez le code ci-dessus\n2. Sur l\'appareil B : collez-le dans le champ « Code de l\'appareil »\n3. Appuyez sur « Importer les données » pour fusionner favoris et alertes\n4. Les deux appareils auront toutes les données combinées\n\nChaque appareil garde sa propre identité anonyme. Les données sont fusionnées, pas déplacées.';
+      '1. Sur l\'appareil A : copiez le code ci-dessus\n2. Sur l\'appareil B : collez-le dans le champ « Code de l\'appareil »\n3. Appuyez sur « Importer les données » pour fusionner favoris, alertes, véhicules et journal de consommation\n4. Les deux appareils auront toutes les données combinées\n\nChaque appareil garde sa propre identité anonyme et son propre profil (carburant préféré, véhicule par défaut, écran d\'accueil). Les données sont fusionnées, pas déplacées.';
 
   @override
   String get vehicleSetActive => 'Activer';

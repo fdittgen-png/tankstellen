@@ -3394,7 +3394,7 @@ abstract class AppLocalizations {
   /// No description provided for @fillUpVehicleLabel.
   ///
   /// In en, this message translates to:
-  /// **'Vehicle (optional)'**
+  /// **'Vehicle'**
   String get fillUpVehicleLabel;
 
   /// No description provided for @fillUpVehicleNone.
@@ -3402,6 +3402,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No vehicle'**
   String get fillUpVehicleNone;
+
+  /// No description provided for @fillUpVehicleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle is required'**
+  String get fillUpVehicleRequired;
 
   /// No description provided for @vehicleFuelNotSet.
   ///
@@ -4738,7 +4744,7 @@ abstract class AppLocalizations {
   /// No description provided for @linkDeviceImportDescription.
   ///
   /// In en, this message translates to:
-  /// **'Enter the device code from your other device to import its favorites and alerts.'**
+  /// **'Enter the device code from your other device to import its favorites, alerts, vehicles, and consumption log. Each device keeps its own profile and defaults.'**
   String get linkDeviceImportDescription;
 
   /// No description provided for @linkDeviceCodeFieldLabel.
@@ -4768,7 +4774,7 @@ abstract class AppLocalizations {
   /// No description provided for @linkDeviceHowItWorksBody.
   ///
   /// In en, this message translates to:
-  /// **'1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites and alerts\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity. Data is merged, not moved.'**
+  /// **'1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites, alerts, vehicles, and consumption logs\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity and its own profile (preferred fuel, default vehicle, landing screen). Data is merged, not moved.'**
   String get linkDeviceHowItWorksBody;
 
   /// No description provided for @vehicleSetActive.

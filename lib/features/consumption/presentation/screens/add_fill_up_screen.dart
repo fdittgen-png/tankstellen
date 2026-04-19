@@ -69,23 +69,43 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
 
   /// Resolve the initial vehicle selection: prefer the profile's
   /// [UserProfile.defaultVehicleId], fall back to the active vehicle,
-  /// otherwise leave the selector empty (#694). Wrapped in a try/catch
-  /// so that widget tests without Hive setup don't crash on first build.
-  void _initVehicleIfNeeded() {
+  /// otherwise to the first vehicle in the list (vehicle is mandatory —
+  /// #713). Each provider read is wrapped independently so one stray
+  /// failure (e.g. active profile missing in tests) doesn't skip the
+  /// later fallback branches.
+  void _initVehicleIfNeeded(List<VehicleProfile> vehicles) {
     if (_vehicleInitialized) return;
-    try {
-      final profile = ref.read(activeProfileProvider);
-      final vehicles = ref.read(vehicleProfileListProvider);
-      final active = ref.read(activeVehicleProfileProvider);
-      final defaultId = profile?.defaultVehicleId;
-      if (defaultId != null && vehicles.any((v) => v.id == defaultId)) {
-        _vehicleId = defaultId;
-      } else if (active != null) {
-        _vehicleId = active.id;
-      }
-    } catch (e) {
-      debugPrint('AddFillUp: vehicle provider unavailable: $e');
+    if (vehicles.isEmpty) {
+      _vehicleInitialized = true;
+      return;
     }
+    String? defaultId;
+    try {
+      defaultId = ref.read(activeProfileProvider)?.defaultVehicleId;
+    } catch (e) {
+      debugPrint('AddFillUp: active profile unavailable: $e');
+    }
+    String? activeId;
+    try {
+      activeId = ref.read(activeVehicleProfileProvider)?.id;
+    } catch (e) {
+      debugPrint('AddFillUp: active vehicle unavailable: $e');
+    }
+    if (defaultId != null && vehicles.any((v) => v.id == defaultId)) {
+      _vehicleId = defaultId;
+    } else if (activeId != null && vehicles.any((v) => v.id == activeId)) {
+      _vehicleId = activeId;
+    } else {
+      _vehicleId = vehicles.first.id;
+    }
+    // Sync the fuel to the resolved vehicle so the summary shows the
+    // right fuel on first paint.
+    final selected = vehicles.firstWhere(
+      (v) => v.id == _vehicleId,
+      orElse: () => vehicles.first,
+    );
+    final derived = _fuelForVehicle(selected);
+    if (derived != null) _fuelType = derived;
     _vehicleInitialized = true;
   }
 
@@ -202,7 +222,6 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     final l = AppLocalizations.of(context);
     final dateStr =
         '${_date.year}-${_pad(_date.month)}-${_pad(_date.day)}';
-    _initVehicleIfNeeded();
     // Tolerate providers in error state during widget tests without
     // a real Hive storage — the selector simply hides itself (#694).
     List<VehicleProfile> vehicles;
@@ -212,6 +231,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       debugPrint('AddFillUp build: vehicle list unavailable: $e');
       vehicles = const [];
     }
+    _initVehicleIfNeeded(vehicles);
 
     // #706 — consumption requires a vehicle. When none are configured,
     // show an empty-state CTA instead of the full form.
@@ -303,87 +323,44 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
               onTap: _pickDate,
             ),
             const SizedBox(height: 8),
-            // Vehicle selector (#698). When set, fuel is DERIVED from the
-            // vehicle and not user-editable — the vehicle is the single
-            // source of truth. The fuel dropdown only appears when there
-            // is no vehicle selected (or no vehicles are configured).
-            if (vehicles.isNotEmpty) ...[
-              DropdownButtonFormField<String?>(
-                initialValue: _vehicleId,
-                decoration: InputDecoration(
-                  labelText: l?.fillUpVehicleLabel ?? 'Vehicle (optional)',
-                  prefixIcon: const Icon(Icons.directions_car_outlined),
-                ),
-                items: [
-                  DropdownMenuItem<String?>(
-                    value: null,
-                    child: Text(l?.fillUpVehicleNone ?? 'No vehicle'),
-                  ),
-                  ...vehicles.map(
-                    (v) => DropdownMenuItem<String?>(
+            // Vehicle picker (#713). Mandatory — the form is only reachable
+            // when at least one vehicle exists (empty-state above). Fuel is
+            // ALWAYS derived from the selected vehicle, never picked
+            // directly here.
+            DropdownButtonFormField<String>(
+              initialValue: _vehicleId,
+              decoration: InputDecoration(
+                labelText: l?.fillUpVehicleLabel ?? 'Vehicle',
+                prefixIcon: const Icon(Icons.directions_car_outlined),
+              ),
+              items: vehicles
+                  .map(
+                    (v) => DropdownMenuItem<String>(
                       value: v.id,
                       child: Text(v.name),
                     ),
-                  ),
-                ],
-                onChanged: (v) {
-                  setState(() {
-                    _vehicleId = v;
-                    // Lock fuel to the vehicle's fuel when selected.
-                    if (v != null) {
-                      final selected =
-                          vehicles.firstWhere((x) => x.id == v);
-                      final derived = _fuelForVehicle(selected);
-                      if (derived != null) _fuelType = derived;
-                    }
-                  });
-                },
-              ),
-              const SizedBox(height: 12),
-              if (_vehicleId != null)
-                _VehicleFuelInfo(
-                  vehicles: vehicles,
-                  vehicleId: _vehicleId!,
-                  fuelType: _fuelType,
-                  onOpenVehicle: () =>
-                      context.push('/vehicles/edit', extra: _vehicleId!),
-                )
-              else
-                DropdownButtonFormField<FuelType>(
-                  initialValue: _fuelType,
-                  decoration: InputDecoration(
-                    labelText: l?.fuelType ?? 'Fuel type',
-                    prefixIcon: const Icon(Icons.local_gas_station),
-                  ),
-                  items: FuelType.values
-                      .where((f) => f != FuelType.all)
-                      .map((f) => DropdownMenuItem(
-                            value: f,
-                            child: Text(f.apiValue.toUpperCase()),
-                          ))
-                      .toList(),
-                  onChanged: (v) {
-                    if (v != null) setState(() => _fuelType = v);
-                  },
-                ),
-              const SizedBox(height: 12),
-            ] else ...[
-              DropdownButtonFormField<FuelType>(
-                initialValue: _fuelType,
-                decoration: InputDecoration(
-                  labelText: l?.fuelType ?? 'Fuel type',
-                  prefixIcon: const Icon(Icons.local_gas_station),
-                ),
-                items: FuelType.values
-                    .where((f) => f != FuelType.all)
-                    .map((f) => DropdownMenuItem(
-                          value: f,
-                          child: Text(f.apiValue.toUpperCase()),
-                        ))
-                    .toList(),
-                onChanged: (v) {
-                  if (v != null) setState(() => _fuelType = v);
-                },
+                  )
+                  .toList(),
+              validator: (v) =>
+                  v == null ? (l?.fillUpVehicleRequired ?? 'Required') : null,
+              onChanged: (v) {
+                if (v == null) return;
+                setState(() {
+                  _vehicleId = v;
+                  final selected = vehicles.firstWhere((x) => x.id == v);
+                  final derived = _fuelForVehicle(selected);
+                  if (derived != null) _fuelType = derived;
+                });
+              },
+            ),
+            const SizedBox(height: 12),
+            if (_vehicleId != null) ...[
+              _VehicleFuelInfo(
+                vehicles: vehicles,
+                vehicleId: _vehicleId!,
+                fuelType: _fuelType,
+                onOpenVehicle: () =>
+                    context.push('/vehicles/edit', extra: _vehicleId!),
               ),
               const SizedBox(height: 12),
             ],
@@ -524,7 +501,7 @@ class _VehicleFuelInfo extends StatelessWidget {
         leading: const Icon(Icons.local_gas_station),
         title: Text(l?.fuelType ?? 'Fuel type'),
         subtitle: Text(
-          '${fuelType.apiValue.toUpperCase()}   •   ${vehicle.name}',
+          '${fuelType.displayName}   •   ${vehicle.name}',
           style: theme.textTheme.bodyMedium,
         ),
         trailing: IconButton(

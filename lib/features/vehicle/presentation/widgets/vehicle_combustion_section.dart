@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/fuel_type_dropdown.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 
 /// Combustion-engine portion of the [EditVehicleScreen] form. Owns the tank
 /// capacity and preferred fuel inputs.
 ///
-/// The preferred-fuel picker is a typed [FuelType] dropdown with the same
-/// options the search form exposes (minus EV + "all") so the app has a
-/// single source of truth for what the user can pick (#698).
+/// The preferred-fuel picker uses the shared [NullableFuelTypeDropdown] so
+/// every surface (profile, vehicle, fill-up) shows the same polished labels
+/// (#713). Electric and the synthetic "all" sentinel are excluded — EV
+/// fuel is configured via the EV section.
 class VehicleCombustionSection extends StatelessWidget {
   final TextEditingController tankController;
   final TextEditingController fuelTypeController;
@@ -36,11 +38,9 @@ class VehicleCombustionSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final raw = fuelTypeController.text.trim();
-    final resolved = raw.isEmpty ? null : FuelType.fromString(raw);
+    final parsed = raw.isEmpty ? null : FuelType.fromString(raw);
     final currentValue =
-        (resolved != null && _combustionFuels.contains(resolved))
-            ? resolved
-            : null;
+        (parsed != null && _combustionFuels.contains(parsed)) ? parsed : null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -59,24 +59,11 @@ class VehicleCombustionSection extends StatelessWidget {
           validator: numberValidator,
         ),
         const SizedBox(height: 8),
-        DropdownButtonFormField<FuelType?>(
-          initialValue: currentValue,
-          decoration: InputDecoration(
-            labelText: l?.vehiclePreferredFuelLabel ?? 'Preferred fuel',
-            prefixIcon: const Icon(Icons.local_gas_station),
-          ),
-          items: [
-            ..._combustionFuels.map(
-              (f) => DropdownMenuItem<FuelType?>(
-                value: f,
-                child: Text(f.apiValue.toUpperCase()),
-              ),
-            ),
-            DropdownMenuItem<FuelType?>(
-              value: null,
-              child: Text(l?.vehicleFuelNotSet ?? 'Not set'),
-            ),
-          ],
+        NullableFuelTypeDropdown(
+          value: currentValue,
+          labelText: l?.vehiclePreferredFuelLabel ?? 'Preferred fuel',
+          prefixIcon: const Icon(Icons.local_gas_station),
+          options: _combustionFuels,
           onChanged: (v) {
             // Store the canonical apiValue (lower-case) so existing
             // call sites that read the string continue to work.
