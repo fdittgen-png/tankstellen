@@ -96,6 +96,15 @@ class StationMapLayers extends StatelessWidget {
             TileLayer(
               urlTemplate: AppConstants.osmTileUrl,
               userAgentPackageName: AppConstants.osmUserAgent,
+              // Fetch tiles outside the visible rect so panning exposes
+              // already-loaded content instead of grey gaps (#709).
+              // Pairs with the forced FlutterMap rebuild in MapScreen —
+              // together they eliminate the half-rendered-tilemap bug
+              // reported in the 5025 screenshot.
+              keepBuffer: 5,
+              panBuffer: 2,
+              maxNativeZoom: 19,
+              maxZoom: 19,
             ),
             // Route polyline (if in route search mode)
             if (routePolyline != null && routePolyline!.isNotEmpty)
