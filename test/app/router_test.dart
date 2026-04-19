@@ -188,14 +188,14 @@ void main() {
       final goRouter = GoRouter(
         initialLocation: '/',
         routes: [
-          GoRoute(path: '/setup', builder: (_, __) => const SizedBox()),
-          GoRoute(path: '/', builder: (_, __) => const SizedBox()),
-          GoRoute(path: '/map', builder: (_, __) => const SizedBox()),
-          GoRoute(path: '/favorites', builder: (_, __) => const SizedBox()),
-          GoRoute(path: '/profile', builder: (_, __) => const SizedBox()),
-          GoRoute(path: '/station/:id', builder: (_, __) => const SizedBox()),
-          GoRoute(path: '/alerts', builder: (_, __) => const SizedBox()),
-          GoRoute(path: '/calculator', builder: (_, __) => const SizedBox()),
+          GoRoute(path: '/setup', builder: (_, _) => const SizedBox()),
+          GoRoute(path: '/', builder: (_, _) => const SizedBox()),
+          GoRoute(path: '/map', builder: (_, _) => const SizedBox()),
+          GoRoute(path: '/favorites', builder: (_, _) => const SizedBox()),
+          GoRoute(path: '/profile', builder: (_, _) => const SizedBox()),
+          GoRoute(path: '/station/:id', builder: (_, _) => const SizedBox()),
+          GoRoute(path: '/alerts', builder: (_, _) => const SizedBox()),
+          GoRoute(path: '/calculator', builder: (_, _) => const SizedBox()),
         ],
       );
 

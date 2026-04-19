@@ -55,7 +55,7 @@ void main() {
     });
 
     test('key exceeding max length is detected', () {
-      final tooLong = '${validKey}extra_garbage_text_appended_from_copy_paste';
+      const tooLong = '${validKey}extra_garbage_text_appended_from_copy_paste';
       expect(tooLong.length, greaterThan(228));
       expect(tooLong.length > 512, isFalse,
           reason: 'Even with garbage, typical paste is under 512');

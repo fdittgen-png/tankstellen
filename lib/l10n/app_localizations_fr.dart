@@ -1807,6 +1807,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le carburant est dérivé de votre véhicule par défaut. Supprimez le véhicule pour choisir un carburant directement.';
 
   @override
+  String get consumptionNoVehicleTitle => 'Ajoutez d\'abord un véhicule';
+
+  @override
+  String get consumptionNoVehicleBody =>
+      'Les pleins sont attribués à un véhicule. Ajoutez votre voiture pour commencer à suivre la consommation.';
+
+  @override
   String get vehicleAdd => 'Add vehicle';
 
   @override

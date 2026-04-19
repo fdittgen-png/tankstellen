@@ -809,6 +809,8 @@
   "profileDefaultVehicleLabel": "Default vehicle (optional)",
   "profileDefaultVehicleNone": "No default",
   "profileFuelFromVehicleHint": "Fuel type is derived from your default vehicle. Clear the vehicle to pick a fuel directly.",
+  "consumptionNoVehicleTitle": "Add a vehicle first",
+  "consumptionNoVehicleBody": "Fill-ups are attributed to a vehicle. Add your car to start logging consumption.",
   "vehicleAdd": "Add vehicle",
   "vehicleAddTitle": "Add vehicle",
   "vehicleEditTitle": "Edit vehicle",

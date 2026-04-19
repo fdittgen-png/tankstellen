@@ -3,6 +3,7 @@
 /// Each interface covers a single data domain (3-5 methods).
 /// Providers should import only the interface they need.
 /// [StorageRepository] composes all interfaces for DI.
+library;
 
 /// Favorite station storage.
 abstract class FavoriteStorage {

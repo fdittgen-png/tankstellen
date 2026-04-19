@@ -49,7 +49,7 @@ void main() {
               continue;
             }
             // Exclude storage key constants (names, not values)
-            if (line.contains("static const String") &&
+            if (line.contains('static const String') &&
                 line.contains("= '") &&
                 RegExp(r"= '[a-z_]+'").hasMatch(line)) {
               continue;

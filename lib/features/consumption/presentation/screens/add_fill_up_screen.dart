@@ -213,6 +213,56 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       vehicles = const [];
     }
 
+    // #706 — consumption requires a vehicle. When none are configured,
+    // show an empty-state CTA instead of the full form.
+    if (vehicles.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(l?.addFillUp ?? 'Add fill-up'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            tooltip: l?.tooltipBack ?? 'Back',
+            onPressed: () => context.pop(),
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.directions_car_outlined,
+                  size: 80,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  l?.consumptionNoVehicleTitle ?? 'Add a vehicle first',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  l?.consumptionNoVehicleBody ??
+                      'Fill-ups are attributed to a vehicle. Add your car '
+                          'to start logging consumption.',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                FilledButton.icon(
+                  onPressed: () => context.push('/vehicles/edit'),
+                  icon: const Icon(Icons.add),
+                  label: Text(l?.vehicleAdd ?? 'Add vehicle'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l?.addFillUp ?? 'Add fill-up'),

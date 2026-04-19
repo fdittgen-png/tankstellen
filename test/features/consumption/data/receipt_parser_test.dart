@@ -109,7 +109,7 @@ void main() {
 
     group('full receipt', () {
       test('parses typical French receipt', () {
-        final receipt = '''
+        const receipt = '''
 TOTALENERGIES
 Station N°1234
 12/04/2026 14:32
@@ -129,7 +129,7 @@ CB **** 4321
       });
 
       test('parses typical German receipt', () {
-        final receipt = '''
+        const receipt = '''
 ARAL
 Tankstelle Hamburg
 12.04.2026

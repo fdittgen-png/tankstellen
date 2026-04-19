@@ -85,23 +85,30 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       }
     });
 
-    // #696 — every time the Map tab becomes the active branch, nudge
-    // the controller so the TileLayer recomputes its viewport. Needed
-    // because the shell's IndexedStack pre-mounts every branch with
-    // degenerate constraints and no lifecycle event retriggers when
-    // the user navigates back to the tab later.
+    // #696/#709 — every time the Map tab becomes the active branch,
+    // force the TileLayer to recompute its viewport. A same-center
+    // same-zoom `move` is a no-op that leaves the cached empty viewport
+    // in place, which was why v5021 still showed blank tiles. Jiggle
+    // the zoom by an imperceptible ε so the TileLayer's internal
+    // `_TileBoundsAtZoom` invalidates and refetches. Nested double
+    // post-frame so the first real layout pass completes first.
     ref.listen<int>(currentShellBranchProvider, (prev, next) {
       const mapBranchIndex = 1;
       if (next != mapBranchIndex || prev == next) return;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        try {
-          final camera = _mapController.camera;
-          _mapController.move(camera.center, camera.zoom);
-        } catch (_) {
-          // Controller not yet attached — the `onMapReady` fallback
-          // inside StationMapLayers will do the first load.
-        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          try {
+            final camera = _mapController.camera;
+            // Tiny zoom delta forces tile refetch; revert immediately.
+            _mapController.move(camera.center, camera.zoom + 0.0001);
+            _mapController.move(camera.center, camera.zoom);
+          } catch (_) {
+            // Controller not yet attached — the `onMapReady` fallback
+            // inside StationMapLayers will do the first load.
+          }
+        });
       });
     });
 

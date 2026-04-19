@@ -1810,6 +1810,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Kraftstoff wird aus dem Standardfahrzeug abgeleitet. Fahrzeug entfernen, um einen Kraftstoff direkt zu wählen.';
 
   @override
+  String get consumptionNoVehicleTitle => 'Fahrzeug zuerst hinzufügen';
+
+  @override
+  String get consumptionNoVehicleBody =>
+      'Tankvorgänge werden einem Fahrzeug zugeordnet. Fügen Sie Ihr Auto hinzu, um den Verbrauch zu erfassen.';
+
+  @override
   String get vehicleAdd => 'Fahrzeug hinzufügen';
 
   @override

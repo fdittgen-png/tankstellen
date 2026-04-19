@@ -43,7 +43,7 @@ class EVChargingService with StationServiceHelpers {
           'maxresults': maxResults,
           'compact': true,
           'verbose': false,
-          if (countryCode != null) 'countrycode': countryCode,
+          'countrycode': ?countryCode,
           'key': apiKey,
         },
         cancelToken: cancelToken,

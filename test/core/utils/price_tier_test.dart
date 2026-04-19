@@ -36,7 +36,7 @@ void main() {
 
     test('boundary at exactly 33% is still cheap (strict less-than)', () {
       // t = 0.33 * 0.30 / 0.30 = 0.33, which is NOT < 0.33
-      final price = 1.50 + 0.33 * (1.80 - 1.50);
+      const price = 1.50 + 0.33 * (1.80 - 1.50);
       // Due to < 0.33, exact 0.33 falls into average
       // but floating-point may land just below — verify it's cheap or average
       final tier = priceTierOf(price, 1.50, 1.80);
@@ -45,13 +45,13 @@ void main() {
 
     test('just above 33% threshold is average', () {
       // t slightly above 0.33
-      final price = 1.50 + 0.34 * (1.80 - 1.50);
+      const price = 1.50 + 0.34 * (1.80 - 1.50);
       expect(priceTierOf(price, 1.50, 1.80), PriceTier.average);
     });
 
     test('just above 66% threshold is expensive', () {
       // t slightly above 0.66
-      final price = 1.50 + 0.67 * (1.80 - 1.50);
+      const price = 1.50 + 0.67 * (1.80 - 1.50);
       expect(priceTierOf(price, 1.50, 1.80), PriceTier.expensive);
     });
 

@@ -782,6 +782,8 @@
   "profileDefaultVehicleLabel": "Standardfahrzeug (optional)",
   "profileDefaultVehicleNone": "Kein Standard",
   "profileFuelFromVehicleHint": "Kraftstoff wird aus dem Standardfahrzeug abgeleitet. Fahrzeug entfernen, um einen Kraftstoff direkt zu wählen.",
+  "consumptionNoVehicleTitle": "Fahrzeug zuerst hinzufügen",
+  "consumptionNoVehicleBody": "Tankvorgänge werden einem Fahrzeug zugeordnet. Fügen Sie Ihr Auto hinzu, um den Verbrauch zu erfassen.",
   "vehicleAdd": "Fahrzeug hinzufügen",
   "vehicleAddTitle": "Fahrzeug hinzufügen",
   "vehicleEditTitle": "Fahrzeug bearbeiten",

@@ -20,7 +20,7 @@ void main() {
 
       for (final match in RegExp(r'IconButton\s*\(').allMatches(src)) {
         final start = match.start;
-        int openParen = src.indexOf('(', start);
+        final int openParen = src.indexOf('(', start);
         int depth = 0;
         int? end;
         for (int i = openParen; i < src.length; i++) {

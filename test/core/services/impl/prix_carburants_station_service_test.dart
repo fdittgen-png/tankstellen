@@ -63,7 +63,7 @@ void main() {
         // This hits the real API (free, no key). If network is available,
         // we get stations; if not, the service catches DioException and
         // returns an empty list. Either way, the source should be correct.
-        final params = const SearchParams(
+        const params = SearchParams(
           lat: 43.3, lng: 3.5, radiusKm: 5.0,
         );
         final result = await service.searchStations(params);
@@ -73,7 +73,7 @@ void main() {
 
       test('returns empty list for coordinates far from France', () async {
         // Middle of Pacific — no stations even if API is reachable
-        final params = const SearchParams(lat: 0.0, lng: -170.0, radiusKm: 5.0);
+        const params = SearchParams(lat: 0.0, lng: -170.0, radiusKm: 5.0);
         final result = await service.searchStations(params);
         expect(result.data, isEmpty);
       });
@@ -192,7 +192,7 @@ void main() {
     });
 
     test('parseStation detects known brands from address', () {
-      final makeRecord = (String adresse) => {
+      Map<String, Object> makeRecord(String adresse) => {
         'id': '1',
         'adresse': adresse,
         'ville': '',
@@ -318,7 +318,7 @@ void main() {
 
   group('PrixCarburantsStationService searchStations integration', () {
     test('searchStations returns ServiceResult even on network failure', () async {
-      final params = const SearchParams(lat: 48.8, lng: 2.3, radiusKm: 5.0);
+      const params = SearchParams(lat: 48.8, lng: 2.3, radiusKm: 5.0);
       final result = await service.searchStations(params);
       // Whether network succeeds or fails, we get a valid ServiceResult
       expect(result.source, ServiceSource.prixCarburantsApi);
@@ -327,7 +327,7 @@ void main() {
     });
 
     test('searchStations with postalCode param returns valid result', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 48.8, lng: 2.3, radiusKm: 5.0, postalCode: '75001',
       );
       final result = await service.searchStations(params);
@@ -336,7 +336,7 @@ void main() {
     });
 
     test('searchStations sorts by distance by default', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 48.8, lng: 2.3, radiusKm: 5.0, sortBy: SortBy.distance,
       );
       final result = await service.searchStations(params);
@@ -348,7 +348,7 @@ void main() {
     });
 
     test('searchStations sorts by price when requested', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 48.8, lng: 2.3, radiusKm: 5.0, sortBy: SortBy.price,
       );
       final result = await service.searchStations(params);
@@ -357,14 +357,14 @@ void main() {
 
     test('searchStations with CancelToken does not throw', () async {
       final cancelToken = CancelToken();
-      final params = const SearchParams(lat: 48.8, lng: 2.3, radiusKm: 5.0);
+      const params = SearchParams(lat: 48.8, lng: 2.3, radiusKm: 5.0);
       final result = await service.searchStations(params, cancelToken: cancelToken);
       expect(result.source, ServiceSource.prixCarburantsApi);
     });
 
     test('searchStations with enricher null works fine', () async {
       final svc = PrixCarburantsStationService(enricher: null);
-      final params = const SearchParams(lat: 48.8, lng: 2.3, radiusKm: 5.0);
+      const params = SearchParams(lat: 48.8, lng: 2.3, radiusKm: 5.0);
       final result = await svc.searchStations(params);
       expect(result.source, ServiceSource.prixCarburantsApi);
     });
@@ -441,8 +441,8 @@ void main() {
       expect(results, hasLength(3));
 
       // Step 2: Parse each into Station
-      final searchLat = 48.85;
-      final searchLng = 2.35;
+      const searchLat = 48.85;
+      const searchLng = 2.35;
       final stations = <Station>[];
       for (final r in results) {
         final station = testableService.testParseStation(r, searchLat, searchLng);
@@ -588,7 +588,7 @@ void main() {
 
   group('PrixCarburantsStationService search strategy (#163)', () {
     /// Helper to build a mock API response with stations in a given postal code.
-    Map<String, dynamic> _makeApiResponse(String cp, int count) {
+    Map<String, dynamic> makeApiResponse(String cp, int count) {
       return {
         'results': List.generate(count, (i) => {
           'id': '${cp}00$i',
@@ -605,14 +605,14 @@ void main() {
     test('uses postal code query first when postalCode is provided', () async {
       final adapter = _TrackingMockAdapter();
       // First request (CP query) returns results
-      adapter.addResponse(_makeApiResponse('75012', 3));
+      adapter.addResponse(makeApiResponse('75012', 3));
       // Second request (geo follow-up for neighboring postal codes — #315)
       adapter.addResponse({'results': const []});
 
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
 
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 48.84, lng: 2.38, radiusKm: 5.0, postalCode: '75012',
       );
       final result = await svc.searchStations(params);
@@ -633,12 +633,12 @@ void main() {
       // First request (CP query) returns empty
       adapter.addResponse({'results': []});
       // Second request (geo query) returns results
-      adapter.addResponse(_makeApiResponse('75012', 2));
+      adapter.addResponse(makeApiResponse('75012', 2));
 
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
 
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 48.84, lng: 2.38, radiusKm: 5.0, postalCode: '75012',
       );
       final result = await svc.searchStations(params);
@@ -653,12 +653,12 @@ void main() {
     test('uses geo query directly when no postal code provided', () async {
       final adapter = _TrackingMockAdapter();
       // Only geo query
-      adapter.addResponse(_makeApiResponse('75012', 4));
+      adapter.addResponse(makeApiResponse('75012', 4));
 
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
 
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 48.84, lng: 2.38, radiusKm: 5.0,
       );
       final result = await svc.searchStations(params);
@@ -675,13 +675,13 @@ void main() {
       // requested radius. The fix is to ALWAYS run the geo query in addition
       // to the cp query when valid coordinates are present.
       final adapter = _TrackingMockAdapter();
-      adapter.addResponse(_makeApiResponse('34120', 5));
+      adapter.addResponse(makeApiResponse('34120', 5));
       adapter.addResponse({'results': const []}); // geo follow-up
 
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
 
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 43.45, lng: 3.42, radiusKm: 10.0, postalCode: '34120',
       );
       final result = await svc.searchStations(params);
@@ -694,12 +694,12 @@ void main() {
 
     test('empty postal code string is treated as no postal code', () async {
       final adapter = _TrackingMockAdapter();
-      adapter.addResponse(_makeApiResponse('75001', 2));
+      adapter.addResponse(makeApiResponse('75001', 2));
 
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
 
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 48.85, lng: 2.35, radiusKm: 5.0, postalCode: '',
       );
       final result = await svc.searchStations(params);

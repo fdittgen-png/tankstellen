@@ -31,14 +31,14 @@ void main() {
       routes: [
         GoRoute(
           path: '/',
-          builder: (_, __) => const Scaffold(
+          builder: (_, _) => const Scaffold(
             key: landingKey,
             body: VehiclesStep(),
           ),
         ),
         GoRoute(
           path: '/vehicles/edit',
-          builder: (_, __) => Scaffold(
+          builder: (_, _) => Scaffold(
             key: editKey,
             appBar: AppBar(title: const Text('Add vehicle')),
             body: const Center(child: Text('EDIT VEHICLE STUB')),

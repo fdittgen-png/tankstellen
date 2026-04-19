@@ -1,5 +1,5 @@
 @Tags(['network'])
-library italy_search_live_test;
+library;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/impl/mise_station_service.dart';

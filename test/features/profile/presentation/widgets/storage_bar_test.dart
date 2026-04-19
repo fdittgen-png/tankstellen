@@ -12,9 +12,9 @@ void main() {
       await pumpApp(
         tester,
         StorageBar(
-          segments: [
-            const StorageSegment('Settings', 500, Colors.blue),
-            const StorageSegment('Cache', 1500, Colors.red),
+          segments: const [
+            StorageSegment('Settings', 500, Colors.blue),
+            StorageSegment('Cache', 1500, Colors.red),
           ],
           totalBytes: 2000,
           theme: testTheme,
@@ -29,8 +29,8 @@ void main() {
       await pumpApp(
         tester,
         StorageBar(
-          segments: [
-            const StorageSegment('Settings', 0, Colors.blue),
+          segments: const [
+            StorageSegment('Settings', 0, Colors.blue),
           ],
           totalBytes: 0,
           theme: testTheme,

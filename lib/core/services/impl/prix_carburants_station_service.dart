@@ -187,7 +187,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     String stationId,
   ) async {
     final response = await _dio.get(_baseUrl, queryParameters: {
-      'where': "id=$stationId",
+      'where': 'id=$stationId',
       'limit': 1,
     });
 
@@ -215,7 +215,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     for (final id in ids.take(10)) {
       try {
         final response = await _dio.get(_baseUrl, queryParameters: {
-          'where': "id=$id",
+          'where': 'id=$id',
           'limit': 1,
         });
         final results = _extractResults(response.data);

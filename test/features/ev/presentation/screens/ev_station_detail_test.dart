@@ -22,7 +22,7 @@ void main() {
     });
 
     test('default EV API key has valid UUID format', () {
-      final key = SettingsHiveStore.defaultEvApiKey;
+      const key = SettingsHiveStore.defaultEvApiKey;
       final uuidRegex = RegExp(
         r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
         caseSensitive: false,

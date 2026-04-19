@@ -33,7 +33,7 @@ void main() {
       );
 
       // Simulate native→Dart call via the binary messenger
-      final codec = const StandardMethodCodec();
+      const codec = StandardMethodCodec();
       final message = codec.encodeMethodCall(const MethodCall('getAppVersion'));
       final responseBytes = await TestDefaultBinaryMessengerBinding
           .instance.defaultBinaryMessenger
@@ -50,7 +50,7 @@ void main() {
         appVersion: '5.0.0+100',
       );
 
-      final codec = const StandardMethodCodec();
+      const codec = StandardMethodCodec();
       final message = codec.encodeMethodCall(const MethodCall('getAppVersion'));
       final responseBytes = await TestDefaultBinaryMessengerBinding
           .instance.defaultBinaryMessenger

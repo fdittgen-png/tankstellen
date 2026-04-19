@@ -70,7 +70,7 @@ void main() {
       ];
     });
 
-    GoRouter _buildRouter() {
+    GoRouter buildRouter() {
       return GoRouter(
         initialLocation: '/',
         routes: [
@@ -121,7 +121,7 @@ void main() {
       );
     }
 
-    Future<void> _pumpShell(
+    Future<void> pumpShell(
       WidgetTester tester, {
       Size size = const Size(360, 640),
     }) async {
@@ -130,7 +130,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      final router = _buildRouter();
+      final router = buildRouter();
       await tester.pumpWidget(
         ProviderScope(
           overrides: overrides.cast(),
@@ -147,7 +147,7 @@ void main() {
 
     testWidgets('phone (360x640): shows bottom navigation bar',
         (tester) async {
-      await _pumpShell(tester, size: const Size(360, 640));
+      await pumpShell(tester, size: const Size(360, 640));
 
       // Bottom nav bar items should be present
       expect(find.text('Search'), findsOneWidget);
@@ -161,7 +161,7 @@ void main() {
 
     testWidgets('tablet portrait (768x1024): shows NavigationRail',
         (tester) async {
-      await _pumpShell(tester, size: const Size(768, 1024));
+      await pumpShell(tester, size: const Size(768, 1024));
 
       // NavigationRail should be present
       expect(find.byType(NavigationRail), findsOneWidget);
@@ -172,7 +172,7 @@ void main() {
 
     testWidgets('tablet landscape (1024x768): shows extended NavigationRail',
         (tester) async {
-      await _pumpShell(tester, size: const Size(1024, 768));
+      await pumpShell(tester, size: const Size(1024, 768));
 
       // NavigationRail should be present
       expect(find.byType(NavigationRail), findsOneWidget);
@@ -182,7 +182,7 @@ void main() {
     });
 
     testWidgets('foldable (884x1104): shows NavigationRail', (tester) async {
-      await _pumpShell(tester, size: const Size(884, 1104));
+      await pumpShell(tester, size: const Size(884, 1104));
 
       // NavigationRail should be present (884dp > 840dp threshold)
       expect(find.byType(NavigationRail), findsOneWidget);
@@ -193,7 +193,7 @@ void main() {
 
     testWidgets('NavigationRail tab navigation works on tablet',
         (tester) async {
-      await _pumpShell(tester, size: const Size(768, 1024));
+      await pumpShell(tester, size: const Size(768, 1024));
 
       expect(find.byType(NavigationRail), findsOneWidget);
       expect(find.text('SearchScreen'), findsOneWidget);
@@ -214,7 +214,7 @@ void main() {
 
     testWidgets('VerticalDivider separates rail from content on tablet',
         (tester) async {
-      await _pumpShell(tester, size: const Size(768, 1024));
+      await pumpShell(tester, size: const Size(768, 1024));
 
       // There should be a VerticalDivider between rail and content
       expect(find.byType(VerticalDivider), findsOneWidget);
@@ -222,7 +222,7 @@ void main() {
 
     testWidgets('phone screen does NOT show VerticalDivider for nav',
         (tester) async {
-      await _pumpShell(tester, size: const Size(360, 640));
+      await pumpShell(tester, size: const Size(360, 640));
 
       // No VerticalDivider between rail and content (no rail)
       expect(find.byType(VerticalDivider), findsNothing);

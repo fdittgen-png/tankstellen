@@ -52,8 +52,11 @@ class BatchQueryHelper {
       final batchResults = await Future.wait(futures);
 
       for (final stations in batchResults) {
-        if (stations.isNotEmpty) successCount++;
-        else failCount++;
+        if (stations.isNotEmpty) {
+          successCount++;
+        } else {
+          failCount++;
+        }
         for (final item in stations) {
           if (seen.add(item.id)) {
             results.add(item);

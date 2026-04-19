@@ -99,7 +99,7 @@ void main() {
     // SearchScreen
     // -----------------------------------------------------------------------
     group('SearchScreen', () {
-      List<Object> _overrides() {
+      List<Object> overrides() {
         final test = standardTestOverrides();
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
         return [
@@ -115,7 +115,7 @@ void main() {
           (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const SearchScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         // Known: ModeChip and GPS button are under 48px height.
         // Evaluate and report without failing — tracked for future fix.
@@ -132,7 +132,7 @@ void main() {
       testWidgets('meets labeled tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const SearchScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
         handle.dispose();
@@ -143,7 +143,7 @@ void main() {
     // FavoritesScreen
     // -----------------------------------------------------------------------
     group('FavoritesScreen', () {
-      List<Object> _overrides() {
+      List<Object> overrides() {
         final test = standardTestOverrides(favoriteIds: []);
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
         return [
@@ -156,7 +156,7 @@ void main() {
       testWidgets('meets Android tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const FavoritesScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
         handle.dispose();
@@ -165,7 +165,7 @@ void main() {
       testWidgets('meets labeled tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const FavoritesScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
         handle.dispose();
@@ -176,7 +176,7 @@ void main() {
     // ProfileScreen
     // -----------------------------------------------------------------------
     group('ProfileScreen', () {
-      List<Object> _overrides() {
+      List<Object> overrides() {
         final test = standardTestOverrides();
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
         when(() => test.mockStorage.getActiveProfileId()).thenReturn(null);
@@ -187,7 +187,7 @@ void main() {
       testWidgets('meets Android tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const ProfileScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
         handle.dispose();
@@ -196,7 +196,7 @@ void main() {
       testWidgets('meets labeled tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const ProfileScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
         handle.dispose();
@@ -207,7 +207,7 @@ void main() {
     // SetupScreen
     // -----------------------------------------------------------------------
     group('SetupScreen', () {
-      List<Object> _overrides() {
+      List<Object> overrides() {
         final test = standardTestOverrides();
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
         return [
@@ -222,7 +222,7 @@ void main() {
           (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const SetupScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         // Known: ChoiceChips are 40px tall (Material spec), under the 48px
         // Android guideline. Evaluate and report without failing.
@@ -238,7 +238,7 @@ void main() {
       testWidgets('meets labeled tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const SetupScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
         handle.dispose();
@@ -255,7 +255,7 @@ void main() {
     // SyncSetupScreen
     // -----------------------------------------------------------------------
     group('SyncSetupScreen', () {
-      List<Object> _overrides() {
+      List<Object> overrides() {
         final test = standardTestOverrides();
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
         return test.overrides;
@@ -264,7 +264,7 @@ void main() {
       testWidgets('meets Android tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const SyncSetupScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
         handle.dispose();
@@ -273,7 +273,7 @@ void main() {
       testWidgets('meets labeled tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const SyncSetupScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
         handle.dispose();
@@ -284,7 +284,7 @@ void main() {
     // CalculatorScreen
     // -----------------------------------------------------------------------
     group('CalculatorScreen', () {
-      List<Object> _overrides() {
+      List<Object> overrides() {
         final test = standardTestOverrides();
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
         return test.overrides;
@@ -293,7 +293,7 @@ void main() {
       testWidgets('meets Android tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const CalculatorScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
         handle.dispose();
@@ -302,7 +302,7 @@ void main() {
       testWidgets('meets labeled tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const CalculatorScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
         handle.dispose();
@@ -313,7 +313,7 @@ void main() {
     // ConsumptionScreen (empty state)
     // -----------------------------------------------------------------------
     group('ConsumptionScreen', () {
-      List<Object> _overrides() {
+      List<Object> overrides() {
         final test = standardTestOverrides();
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
         return [
@@ -325,7 +325,7 @@ void main() {
       testWidgets('meets Android tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const ConsumptionScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
         handle.dispose();
@@ -334,7 +334,7 @@ void main() {
       testWidgets('meets labeled tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const ConsumptionScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
         handle.dispose();
@@ -345,7 +345,7 @@ void main() {
     // PrivacyDashboardScreen
     // -----------------------------------------------------------------------
     group('PrivacyDashboardScreen', () {
-      List<Object> _overrides() {
+      List<Object> overrides() {
         final test = standardTestOverrides();
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
         when(() => test.mockStorage.hasCustomApiKey()).thenReturn(false);
@@ -377,7 +377,7 @@ void main() {
       testWidgets('meets Android tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const PrivacyDashboardScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
         handle.dispose();
@@ -386,7 +386,7 @@ void main() {
       testWidgets('meets labeled tap target guideline', (tester) async {
         final handle = tester.ensureSemantics();
         await _pumpScreen(tester, const PrivacyDashboardScreen(),
-            overrides: _overrides());
+            overrides: overrides());
 
         await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
         handle.dispose();

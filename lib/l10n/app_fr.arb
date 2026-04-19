@@ -700,5 +700,7 @@
   "fillUpVehicleNone": "Aucun véhicule",
   "profileDefaultVehicleLabel": "Véhicule par défaut (facultatif)",
   "profileDefaultVehicleNone": "Aucun par défaut",
-  "profileFuelFromVehicleHint": "Le carburant est dérivé de votre véhicule par défaut. Supprimez le véhicule pour choisir un carburant directement."
+  "profileFuelFromVehicleHint": "Le carburant est dérivé de votre véhicule par défaut. Supprimez le véhicule pour choisir un carburant directement.",
+  "consumptionNoVehicleTitle": "Ajoutez d'abord un véhicule",
+  "consumptionNoVehicleBody": "Les pleins sont attribués à un véhicule. Ajoutez votre voiture pour commencer à suivre la consommation."
 }

@@ -26,11 +26,11 @@ Future<void> _pumpScreen(
     routes: [
       GoRoute(
         path: '/consumption',
-        builder: (_, __) => const ConsumptionScreen(),
+        builder: (_, _) => const ConsumptionScreen(),
       ),
       // Minimal stubs so pushes in the screen don't crash.
-      GoRoute(path: '/consumption/add', builder: (_, __) => const SizedBox()),
-      GoRoute(path: '/carbon', builder: (_, __) => const SizedBox()),
+      GoRoute(path: '/consumption/add', builder: (_, _) => const SizedBox()),
+      GoRoute(path: '/carbon', builder: (_, _) => const SizedBox()),
     ],
   );
 

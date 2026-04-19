@@ -72,7 +72,7 @@ void main() {
 
     /// Build a GoRouter that includes the shell with 4 branches, similar
     /// to the real app router but without the redirect logic.
-    GoRouter _buildRouter() {
+    GoRouter buildRouter() {
       return GoRouter(
         initialLocation: '/',
         routes: [
@@ -124,8 +124,8 @@ void main() {
       );
     }
 
-    Future<void> _pumpShell(WidgetTester tester) async {
-      final router = _buildRouter();
+    Future<void> pumpShell(WidgetTester tester) async {
+      final router = buildRouter();
       await tester.pumpWidget(
         ProviderScope(
           overrides: overrides.cast(),
@@ -141,7 +141,7 @@ void main() {
     }
 
     testWidgets('renders all 4 bottom navigation tabs', (tester) async {
-      await _pumpShell(tester);
+      await pumpShell(tester);
 
       // All four tab labels should be present
       expect(find.text('Search'), findsOneWidget);
@@ -151,7 +151,7 @@ void main() {
     });
 
     testWidgets('tab labels match expected text', (tester) async {
-      await _pumpShell(tester);
+      await pumpShell(tester);
 
       // Verify the bottom nav bar contains exactly these labels
       final labels = <String>[];
@@ -165,13 +165,13 @@ void main() {
     });
 
     testWidgets('initial tab shows search content', (tester) async {
-      await _pumpShell(tester);
+      await pumpShell(tester);
 
       expect(find.text('SearchScreen'), findsOneWidget);
     });
 
     testWidgets('tapping Map tab switches content', (tester) async {
-      await _pumpShell(tester);
+      await pumpShell(tester);
 
       await tester.tap(find.text('Map'));
       await tester.pump(const Duration(seconds: 1));
@@ -180,7 +180,7 @@ void main() {
     });
 
     testWidgets('tapping Favorites tab switches content', (tester) async {
-      await _pumpShell(tester);
+      await pumpShell(tester);
 
       await tester.tap(find.text('Favorites'));
       await tester.pump(const Duration(seconds: 1));
@@ -189,7 +189,7 @@ void main() {
     });
 
     testWidgets('tapping Settings tab switches content', (tester) async {
-      await _pumpShell(tester);
+      await pumpShell(tester);
 
       await tester.tap(find.text('Settings'));
       await tester.pump(const Duration(seconds: 1));

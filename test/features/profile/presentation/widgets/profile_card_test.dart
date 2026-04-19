@@ -11,7 +11,7 @@ import '../../../../helpers/pump_app.dart';
 
 class MockProfileRepository extends Mock implements ProfileRepository {}
 
-final _testProfile = const UserProfile(
+const _testProfile = UserProfile(
   id: 'profile-1',
   name: 'Home',
   preferredFuelType: FuelType.e10,
@@ -20,7 +20,7 @@ final _testProfile = const UserProfile(
   countryCode: 'DE',
 );
 
-final _testProfile2 = const UserProfile(
+const _testProfile2 = UserProfile(
   id: 'profile-2',
   name: 'Work',
   preferredFuelType: FuelType.diesel,

@@ -3421,6 +3421,18 @@ abstract class AppLocalizations {
   /// **'Fuel type is derived from your default vehicle. Clear the vehicle to pick a fuel directly.'**
   String get profileFuelFromVehicleHint;
 
+  /// No description provided for @consumptionNoVehicleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a vehicle first'**
+  String get consumptionNoVehicleTitle;
+
+  /// No description provided for @consumptionNoVehicleBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill-ups are attributed to a vehicle. Add your car to start logging consumption.'**
+  String get consumptionNoVehicleBody;
+
   /// No description provided for @vehicleAdd.
   ///
   /// In en, this message translates to:

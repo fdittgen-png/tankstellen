@@ -321,7 +321,7 @@ final class FavoriteStationsProvider
   }
 }
 
-String _$favoriteStationsHash() => r'2423fe97b711c45913ec4fe49ed282faf32b8070';
+String _$favoriteStationsHash() => r'c0cbf6ca605257f0a93fb7c3dc019d19912531fe';
 
 /// Loads fuel station data for favorites and refreshes prices.
 ///

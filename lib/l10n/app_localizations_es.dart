@@ -1800,6 +1800,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Fuel type is derived from your default vehicle. Clear the vehicle to pick a fuel directly.';
 
   @override
+  String get consumptionNoVehicleTitle => 'Add a vehicle first';
+
+  @override
+  String get consumptionNoVehicleBody =>
+      'Fill-ups are attributed to a vehicle. Add your car to start logging consumption.';
+
+  @override
   String get vehicleAdd => 'Add vehicle';
 
   @override

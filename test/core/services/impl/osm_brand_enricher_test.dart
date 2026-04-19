@@ -17,7 +17,7 @@ void main() {
     when(() => mockStorage.putSetting(any(), any())).thenAnswer((_) async {});
   });
 
-  Station _makeStation({
+  Station makeStation({
     required String id,
     String brand = '',
     double lat = 48.8,
@@ -44,8 +44,8 @@ void main() {
 
     test('returns stations unchanged if all have brands', () async {
       final stations = [
-        _makeStation(id: '1', brand: 'TotalEnergies'),
-        _makeStation(id: '2', brand: 'Shell'),
+        makeStation(id: '1', brand: 'TotalEnergies'),
+        makeStation(id: '2', brand: 'Shell'),
       ];
 
       final result = await enricher.enrich(stations);
@@ -58,14 +58,14 @@ void main() {
     test('applies persisted brand from storage', () async {
       when(() => mockStorage.getSetting('brand_1')).thenReturn('Esso');
 
-      final stations = [_makeStation(id: '1', brand: '')];
+      final stations = [makeStation(id: '1', brand: '')];
       final result = await enricher.enrich(stations);
 
       expect(result[0].brand, 'Esso');
     });
 
     test('identifies stations needing brands (empty brand)', () async {
-      final stations = [_makeStation(id: '1', brand: '')];
+      final stations = [makeStation(id: '1', brand: '')];
       // Will try Nominatim (which will fail in test), but we test the logic
       final result = await enricher.enrich(stations);
 
@@ -74,14 +74,14 @@ void main() {
     });
 
     test('identifies stations needing brands ("Station")', () async {
-      final stations = [_makeStation(id: '1', brand: 'Station')];
+      final stations = [makeStation(id: '1', brand: 'Station')];
       final result = await enricher.enrich(stations);
 
       expect(result.length, 1);
     });
 
     test('identifies stations needing brands ("Autoroute")', () async {
-      final stations = [_makeStation(id: '1', brand: 'Autoroute')];
+      final stations = [makeStation(id: '1', brand: 'Autoroute')];
       final result = await enricher.enrich(stations);
 
       expect(result.length, 1);
@@ -91,7 +91,7 @@ void main() {
       // First call: brand from persisted storage
       when(() => mockStorage.getSetting('brand_1')).thenReturn('BP');
 
-      final stations = [_makeStation(id: '1', brand: '')];
+      final stations = [makeStation(id: '1', brand: '')];
       await enricher.enrich(stations);
 
       // Second call: should use session cache, not hit storage again
@@ -107,9 +107,9 @@ void main() {
       when(() => mockStorage.getSetting('brand_2')).thenReturn('Avia');
 
       final stations = [
-        _makeStation(id: '1', brand: 'Shell'),
-        _makeStation(id: '2', brand: ''),
-        _makeStation(id: '3', brand: 'TotalEnergies'),
+        makeStation(id: '1', brand: 'Shell'),
+        makeStation(id: '2', brand: ''),
+        makeStation(id: '3', brand: 'TotalEnergies'),
       ];
 
       final result = await enricher.enrich(stations);

@@ -293,7 +293,7 @@ class HomeWidgetService {
       'e10': data['e10'],
       'diesel': data['diesel'],
       'isOpen': data['isOpen'] ?? false,
-      if (currency != null) 'currency': currency,
+      'currency': ?currency,
       if (preferredFuelType != null)
         'preferred_fuel_code': preferredFuelType.apiValue,
       if (preferredFuelType != null) 'preferred_fuel_price': fuelPrice,
