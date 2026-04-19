@@ -90,8 +90,70 @@ class Obd2Service {
     }
   }
 
+  /// Read calculated engine load, 0–100 %. (#717)
+  Future<double?> readEngineLoad() => _readDouble(
+        Elm327Protocol.engineLoadCommand,
+        Elm327Protocol.parseEngineLoad,
+        label: 'engineLoad',
+      );
+
+  /// Read absolute throttle position, 0–100 %. (#717)
+  Future<double?> readThrottlePercent() => _readDouble(
+        Elm327Protocol.throttlePositionCommand,
+        Elm327Protocol.parseThrottlePercent,
+        label: 'throttle',
+      );
+
+  /// Read engine fuel rate in L/h (#717). Falls back to deriving from
+  /// MAF when PID 5E is unsupported — MAF's fuel-rate estimate is a
+  /// useful approximation on older cars.
+  Future<double?> readFuelRateLPerHour() async {
+    final direct = await _readDouble(
+      Elm327Protocol.engineFuelRateCommand,
+      Elm327Protocol.parseFuelRateLPerHour,
+      label: 'fuelRate',
+    );
+    if (direct != null) return direct;
+    final maf = await readMafGramsPerSecond();
+    if (maf == null) return null;
+    // Stoichiometric petrol: ~14.7 g air per g fuel; petrol density
+    // ~0.74 kg/L. Fuel rate (L/h) = MAF (g/s) * 3600 / (14.7 * 740).
+    // Returns an approximation; good enough for trip averages on
+    // vehicles that lack direct PID 5E.
+    return maf * 3600.0 / (14.7 * 740.0);
+  }
+
+  /// Read mass air flow in g/s. (#717)
+  Future<double?> readMafGramsPerSecond() => _readDouble(
+        Elm327Protocol.mafCommand,
+        Elm327Protocol.parseMafGramsPerSecond,
+        label: 'maf',
+      );
+
+  /// Read fuel tank level, 0–100 %. (#717)
+  Future<double?> readFuelLevelPercent() => _readDouble(
+        Elm327Protocol.fuelTankLevelCommand,
+        Elm327Protocol.parseFuelLevelPercent,
+        label: 'fuelLevel',
+      );
+
   /// Close the transport connection. Safe to call multiple times.
   Future<void> disconnect() async {
     await _transport.disconnect();
+  }
+
+  Future<double?> _readDouble(
+    String command,
+    double? Function(String raw) parser, {
+    required String label,
+  }) async {
+    if (!_transport.isConnected) return null;
+    try {
+      final response = await _transport.sendCommand(command);
+      return parser(response);
+    } catch (e) {
+      debugPrint('OBD2 read $label failed: $e');
+      return null;
+    }
   }
 }

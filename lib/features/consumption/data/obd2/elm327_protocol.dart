@@ -55,6 +55,25 @@ class Elm327Protocol {
   /// Note: Not supported by all vehicles.
   static const odometerCommand = '01A6\r';
 
+  /// Request calculated engine load (%). Mode 01, PID 04. (#717)
+  static const engineLoadCommand = '0104\r';
+
+  /// Request absolute throttle position (%). Mode 01, PID 11. (#717)
+  static const throttlePositionCommand = '0111\r';
+
+  /// Request engine fuel rate (L/h). Mode 01, PID 5E. Modern cars
+  /// (>= 2014-ish) answer directly; older cars return NO DATA and the
+  /// app falls back to deriving from MAF. (#717)
+  static const engineFuelRateCommand = '015E\r';
+
+  /// Request mass air flow rate (g/s). Mode 01, PID 10. Used as a
+  /// fallback to estimate fuel rate on cars that do not support PID 5E.
+  /// (#717)
+  static const mafCommand = '0110\r';
+
+  /// Request fuel tank level input (%). Mode 01, PID 2F. (#717)
+  static const fuelTankLevelCommand = '012F\r';
+
   // ---------------------------------------------------------------------------
   // Response parsing
   // ---------------------------------------------------------------------------
@@ -133,6 +152,61 @@ class Elm327Protocol {
 
     final value = (bytes[2] << 24) | (bytes[3] << 16) | (bytes[4] << 8) | bytes[5];
     return value / 10.0; // Odometer in km (1/10 km resolution)
+  }
+
+  /// Parse calculated engine load from Mode 01 PID 04 response (#717).
+  /// Formula: load% = value × 100 / 255. Response: "41 04 XX".
+  static double? parseEngineLoad(String raw) =>
+      _parse1BytePercent(raw, 0x04);
+
+  /// Parse absolute throttle position from Mode 01 PID 11 response
+  /// (#717). Formula: throttle% = value × 100 / 255. Response:
+  /// "41 11 XX".
+  static double? parseThrottlePercent(String raw) =>
+      _parse1BytePercent(raw, 0x11);
+
+  /// Parse fuel tank level from Mode 01 PID 2F response (#717).
+  /// Formula: level% = value × 100 / 255. Response: "41 2F XX".
+  static double? parseFuelLevelPercent(String raw) =>
+      _parse1BytePercent(raw, 0x2F);
+
+  /// Parse engine fuel rate from Mode 01 PID 5E response (#717).
+  /// Formula: L/h = ((A × 256) + B) × 0.05. Response: "41 5E XX YY".
+  static double? parseFuelRateLPerHour(String raw) {
+    final bytes = _parseModeOneBody(raw, 0x5E, minBytes: 4);
+    if (bytes == null) return null;
+    return ((bytes[2] * 256) + bytes[3]) * 0.05;
+  }
+
+  /// Parse mass air flow from Mode 01 PID 10 response (#717).
+  /// Formula: g/s = ((A × 256) + B) × 0.01. Response: "41 10 XX YY".
+  static double? parseMafGramsPerSecond(String raw) {
+    final bytes = _parseModeOneBody(raw, 0x10, minBytes: 4);
+    if (bytes == null) return null;
+    return ((bytes[2] * 256) + bytes[3]) * 0.01;
+  }
+
+  /// Helper for every "1 byte, scaled to percent" PID (04, 11, 2F).
+  static double? _parse1BytePercent(String raw, int expectedPid) {
+    final bytes = _parseModeOneBody(raw, expectedPid, minBytes: 3);
+    if (bytes == null) return null;
+    return bytes[2] * 100.0 / 255.0;
+  }
+
+  /// Shared plumbing: clean the response, verify the Mode 01 echo
+  /// + expected PID, and return the byte array — or null when the
+  /// response is missing / malformed.
+  static List<int>? _parseModeOneBody(
+    String raw,
+    int expectedPid, {
+    required int minBytes,
+  }) {
+    final clean = cleanResponse(raw);
+    if (clean == null) return null;
+    final bytes = _parseHexBytes(clean);
+    if (bytes.length < minBytes) return null;
+    if (bytes[0] != 0x41 || bytes[1] != expectedPid) return null;
+    return bytes;
   }
 
   /// Parse hex string "41 0D FF" into list of byte values [0x41, 0x0D, 0xFF].
