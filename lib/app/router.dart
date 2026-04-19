@@ -296,6 +296,32 @@ GoRouter router(Ref ref) {
           return EVStationDetailScreen(station: station);
         },
       ),
+      // Deep-link friendly EV detail: takes the station id in the
+      // path and hydrates the ChargingStation from storage (#713
+      // widget → station detail flow). Used when the caller has
+      // only the id — e.g. a home-screen widget tap or an external
+      // URL. Falls back to the invalid-id screen when the id is
+      // unknown or the cached JSON is missing.
+      GoRoute(
+        path: '/ev-station/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'];
+          if (!isValidStationId(id)) {
+            return _invalidIdScreen(context, state.matchedLocation);
+          }
+          final storage = ref.watch(storageRepositoryProvider);
+          final raw = storage.getEvFavoriteStationData(id!);
+          if (raw == null) {
+            return _invalidIdScreen(context, state.matchedLocation);
+          }
+          try {
+            final station = ChargingStation.fromJson(raw);
+            return EVStationDetailScreen(station: station);
+          } catch (e) {
+            return _invalidIdScreen(context, state.matchedLocation);
+          }
+        },
+      ),
       GoRoute(
         path: '/report/:id',
         builder: (context, state) {

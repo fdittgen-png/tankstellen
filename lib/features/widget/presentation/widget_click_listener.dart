@@ -60,7 +60,12 @@ class _WidgetClickListenerState extends State<WidgetClickListener> {
     if (id == null || id.isEmpty) return;
     if (!mounted) return;
     try {
-      GoRouter.of(context).push('/station/$id');
+      // EV station ids always start with `ocm-` (OpenChargeMap
+      // namespace). Route to the EV detail screen so the user sees
+      // connectors/power/etc. instead of the fuel-price UI. Fuel
+      // ids fall through to the regular station detail.
+      final path = id.startsWith('ocm-') ? '/ev-station/$id' : '/station/$id';
+      GoRouter.of(context).push(path);
     } catch (e) {
       debugPrint('WidgetClickListener: navigation failed for $uri: $e');
     }
