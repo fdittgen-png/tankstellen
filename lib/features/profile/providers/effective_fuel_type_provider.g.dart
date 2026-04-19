@@ -8,62 +8,71 @@ part of 'effective_fuel_type_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Resolves the **effective** fuel type the app should use, based on the
-/// vehicle-vs-direct contract described in #694/#705.
+/// Resolves the **effective** fuel type the app should use, based on
+/// the vehicle-vs-direct contract described in #694/#700/#706.
 ///
 /// Priority:
-///   1. If a default vehicle is configured and matches a stored vehicle:
+///   1. If a default vehicle is configured and matches a stored
+///      vehicle:
 ///      - EV vehicle → [FuelType.electric]
 ///      - Combustion vehicle → vehicle's preferredFuelType parsed via
-///        [FuelType.fromString]; fall back to profile's `preferredFuelType`
-///        if the vehicle has no fuel set
-///      - Hybrid vehicle → not handled here; #704 will add
-///        `hybridFuelChoice` and route through it.
+///        [FuelType.fromString]; fall back to profile's
+///        `preferredFuelType` if the vehicle has no fuel set
+///      - Hybrid vehicle → profile's `hybridFuelChoice` when set,
+///        otherwise the vehicle's own combustion fuel (pre-#706
+///        profiles keep the ICE side by default).
 ///   2. Otherwise the profile's own `preferredFuelType` wins.
 ///
-/// Every picker in the app (search chips, station filters, consumption
-/// log) should read from this provider so a change to the profile or
-/// the vehicle propagates in one place.
+/// Every picker in the app (search chips, station filters,
+/// consumption log) should read from this provider so a change to
+/// the profile, the vehicle, or the hybrid choice propagates in
+/// one place.
 
 @ProviderFor(effectiveFuelType)
 final effectiveFuelTypeProvider = EffectiveFuelTypeProvider._();
 
-/// Resolves the **effective** fuel type the app should use, based on the
-/// vehicle-vs-direct contract described in #694/#705.
+/// Resolves the **effective** fuel type the app should use, based on
+/// the vehicle-vs-direct contract described in #694/#700/#706.
 ///
 /// Priority:
-///   1. If a default vehicle is configured and matches a stored vehicle:
+///   1. If a default vehicle is configured and matches a stored
+///      vehicle:
 ///      - EV vehicle → [FuelType.electric]
 ///      - Combustion vehicle → vehicle's preferredFuelType parsed via
-///        [FuelType.fromString]; fall back to profile's `preferredFuelType`
-///        if the vehicle has no fuel set
-///      - Hybrid vehicle → not handled here; #704 will add
-///        `hybridFuelChoice` and route through it.
+///        [FuelType.fromString]; fall back to profile's
+///        `preferredFuelType` if the vehicle has no fuel set
+///      - Hybrid vehicle → profile's `hybridFuelChoice` when set,
+///        otherwise the vehicle's own combustion fuel (pre-#706
+///        profiles keep the ICE side by default).
 ///   2. Otherwise the profile's own `preferredFuelType` wins.
 ///
-/// Every picker in the app (search chips, station filters, consumption
-/// log) should read from this provider so a change to the profile or
-/// the vehicle propagates in one place.
+/// Every picker in the app (search chips, station filters,
+/// consumption log) should read from this provider so a change to
+/// the profile, the vehicle, or the hybrid choice propagates in
+/// one place.
 
 final class EffectiveFuelTypeProvider
     extends $FunctionalProvider<FuelType, FuelType, FuelType>
     with $Provider<FuelType> {
-  /// Resolves the **effective** fuel type the app should use, based on the
-  /// vehicle-vs-direct contract described in #694/#705.
+  /// Resolves the **effective** fuel type the app should use, based on
+  /// the vehicle-vs-direct contract described in #694/#700/#706.
   ///
   /// Priority:
-  ///   1. If a default vehicle is configured and matches a stored vehicle:
+  ///   1. If a default vehicle is configured and matches a stored
+  ///      vehicle:
   ///      - EV vehicle → [FuelType.electric]
   ///      - Combustion vehicle → vehicle's preferredFuelType parsed via
-  ///        [FuelType.fromString]; fall back to profile's `preferredFuelType`
-  ///        if the vehicle has no fuel set
-  ///      - Hybrid vehicle → not handled here; #704 will add
-  ///        `hybridFuelChoice` and route through it.
+  ///        [FuelType.fromString]; fall back to profile's
+  ///        `preferredFuelType` if the vehicle has no fuel set
+  ///      - Hybrid vehicle → profile's `hybridFuelChoice` when set,
+  ///        otherwise the vehicle's own combustion fuel (pre-#706
+  ///        profiles keep the ICE side by default).
   ///   2. Otherwise the profile's own `preferredFuelType` wins.
   ///
-  /// Every picker in the app (search chips, station filters, consumption
-  /// log) should read from this provider so a change to the profile or
-  /// the vehicle propagates in one place.
+  /// Every picker in the app (search chips, station filters,
+  /// consumption log) should read from this provider so a change to
+  /// the profile, the vehicle, or the hybrid choice propagates in
+  /// one place.
   EffectiveFuelTypeProvider._()
     : super(
         from: null,
@@ -97,4 +106,4 @@ final class EffectiveFuelTypeProvider
   }
 }
 
-String _$effectiveFuelTypeHash() => r'22d9da033039ea986f05a18c4a913483e144f373';
+String _$effectiveFuelTypeHash() => r'beb8f3b5ae400ac45f1130c9081f2105a48a59a4';

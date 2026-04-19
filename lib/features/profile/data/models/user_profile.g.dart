@@ -43,6 +43,7 @@ _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
     json['hybridFuelChoice'],
     const FuelTypeJsonConverter().fromJson,
   ),
+  showConsumptionTab: json['showConsumptionTab'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
@@ -72,6 +73,7 @@ Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
         instance.hybridFuelChoice,
         const FuelTypeJsonConverter().toJson,
       ),
+      'showConsumptionTab': instance.showConsumptionTab,
     };
 
 const _$LandingScreenEnumMap = {
