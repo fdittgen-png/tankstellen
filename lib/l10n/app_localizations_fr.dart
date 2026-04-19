@@ -1803,6 +1803,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reportScanError => 'Signaler une erreur de scan';
 
   @override
+  String get pickStationTitle => 'Choisir une station';
+
+  @override
+  String get pickStationHelper =>
+      'Démarrer le plein depuis une station connue — les prix, la marque et le carburant sont pré-remplis.';
+
+  @override
+  String get pickStationEmpty =>
+      'Aucune station favorite — ajoutez-en depuis Recherche ou Favoris, ou passez cette étape.';
+
+  @override
+  String get pickStationSkip => 'Passer — saisir sans station';
+
+  @override
   String get vehicleFuelNotSet => 'Non défini';
 
   @override

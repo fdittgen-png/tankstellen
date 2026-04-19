@@ -1794,6 +1794,20 @@ class AppLocalizationsSv extends AppLocalizations {
   String get reportScanError => 'Report scan error';
 
   @override
+  String get pickStationTitle => 'Pick a station';
+
+  @override
+  String get pickStationHelper =>
+      'Start the fill-up from a known station so prices, brand and fuel type fill themselves in.';
+
+  @override
+  String get pickStationEmpty =>
+      'No favorite stations yet — add some from Search or Favorites, or skip and fill in manually.';
+
+  @override
+  String get pickStationSkip => 'Skip — add without a station';
+
+  @override
   String get vehicleFuelNotSet => 'Not set';
 
   @override

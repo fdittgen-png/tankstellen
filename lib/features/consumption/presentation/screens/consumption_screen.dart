@@ -57,7 +57,7 @@ class ConsumptionScreen extends ConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/consumption/add'),
+        onPressed: () => context.push('/consumption/pick-station'),
         icon: const Icon(Icons.add),
         label: Text(l?.addFillUp ?? 'Add fill-up'),
       ),

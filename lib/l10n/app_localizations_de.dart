@@ -1806,6 +1806,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get reportScanError => 'Scan-Fehler melden';
 
   @override
+  String get pickStationTitle => 'Tankstelle wählen';
+
+  @override
+  String get pickStationHelper =>
+      'Tankvorgang von einer bekannten Tankstelle starten — Preise, Marke und Kraftstoff werden automatisch übernommen.';
+
+  @override
+  String get pickStationEmpty =>
+      'Noch keine Favoriten — fügen Sie welche aus Suche oder Favoriten hinzu, oder überspringen Sie diesen Schritt.';
+
+  @override
+  String get pickStationSkip => 'Überspringen — ohne Tankstelle eintragen';
+
+  @override
   String get vehicleFuelNotSet => 'Nicht gesetzt';
 
   @override

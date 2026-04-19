@@ -3415,6 +3415,30 @@ abstract class AppLocalizations {
   /// **'Report scan error'**
   String get reportScanError;
 
+  /// No description provided for @pickStationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a station'**
+  String get pickStationTitle;
+
+  /// No description provided for @pickStationHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Start the fill-up from a known station so prices, brand and fuel type fill themselves in.'**
+  String get pickStationHelper;
+
+  /// No description provided for @pickStationEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorite stations yet — add some from Search or Favorites, or skip and fill in manually.'**
+  String get pickStationEmpty;
+
+  /// No description provided for @pickStationSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip — add without a station'**
+  String get pickStationSkip;
+
   /// No description provided for @vehicleFuelNotSet.
   ///
   /// In en, this message translates to:
