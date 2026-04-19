@@ -180,6 +180,68 @@ Net           € 8.73
         expect(result.date, DateTime(2026, 4, 19));
         expect(result.stationName, 'SUPER U');
         expect(result.fuelType, FuelType.e10);
+        expect(result.brandLayout, 'super_u');
+      });
+
+      test(
+          'parses Carrefour Market France receipt with Quantite = / '
+          'Prix unit. = / MONTANT REEL', () {
+        // Real Carrefour Market Marseillan receipt (#713): labels are
+        // "Quantite = 5.27 L", "Prix unit. = 2,028 EUR", and
+        // "MONTANT REEL : 10.69 EUR", with the date in 2-digit-year
+        // form ("19/04/26").
+        const receipt = '''
+Carrefour market
+Station Carrefour Market
+SAS PLANE
+34340 MARSEILLAN
+Tel:04.67.77.29.10
+CREDIT AGRICOLE
+LANGUEDOC
+A00000000421010
+CB COMPTANT
+Le : 19/04/26 a : 11:03:35
+CARREFOUR MARKET
+MARSEILLAN
+34340
+No AUTO : 143525
+MONTANT REEL : 10.69 EUR
+Ticket No :
+008407 00019 00 06 0433 5409
+No pompe    = 6
+Carburant   = SP95
+Quantite    = 5.27 L
+Prix unit.  = 2,028 EUR
+TVA 20.00%  = 1.78 EUR
+''';
+        final result = parser.parse(receipt);
+        expect(result.liters, closeTo(5.27, 0.01));
+        expect(result.totalCost, closeTo(10.69, 0.01));
+        expect(result.pricePerLiter, closeTo(2.028, 0.001));
+        expect(result.date, DateTime(2026, 4, 19));
+        expect(result.stationName?.toLowerCase(), contains('carrefour'));
+        expect(result.fuelType, FuelType.e5,
+            reason: 'SP95 alone (not SP95-E10) is the E5 fuel in France');
+        expect(result.brandLayout, 'carrefour');
+      });
+    });
+
+    group('brand layout dispatch', () {
+      test('unknown brand falls through to generic extractor', () {
+        final result = parser.parse('RANDOM STATION\n42.35 L\nTOTAL 58.42');
+        expect(result.brandLayout, 'generic');
+      });
+
+      test('Super U text always dispatches to the super_u layout', () {
+        final result = parser.parse('SUPER U\nVolume 10 L\nTOT TTC € 19.99');
+        expect(result.brandLayout, 'super_u');
+      });
+
+      test('Carrefour text always dispatches to the carrefour layout', () {
+        final result = parser.parse(
+          'Carrefour market\nQuantite = 10 L\nMONTANT REEL : 19.99 EUR',
+        );
+        expect(result.brandLayout, 'carrefour');
       });
     });
 
