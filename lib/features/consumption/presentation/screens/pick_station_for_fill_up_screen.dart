@@ -116,7 +116,7 @@ class PickStationForFillUpScreen extends ConsumerWidget {
         'stationId': station.id,
         'stationName': station.brand.isNotEmpty ? station.brand : station.name,
         'fuelType': profileFuel,
-        if (price != null) 'pricePerLiter': price,
+        'pricePerLiter': ?price,
       },
     );
   }

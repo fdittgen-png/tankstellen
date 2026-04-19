@@ -104,7 +104,7 @@ void main() {
     test(
         'non-hybrid default vehicle ignores hybridFuelChoice (choice is '
         'meaningless here)', () {
-      final combustion = VehicleProfile(
+      const combustion = VehicleProfile(
         id: 'v-ice',
         name: 'Golf',
         type: VehicleType.combustion,
@@ -123,7 +123,7 @@ void main() {
 
     test('EV default vehicle is still electric regardless of hybrid choice',
         () {
-      final ev = VehicleProfile(id: 'v-ev', name: 'Model 3', type: VehicleType.ev);
+      const ev = VehicleProfile(id: 'v-ev', name: 'Model 3', type: VehicleType.ev);
       final c = _container(
         profile: _profileWith(
           defaultVehicleId: 'v-ev',

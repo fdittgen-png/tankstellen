@@ -16,7 +16,7 @@ class _CapturingAdapter implements HttpClientAdapter {
     capturedQueryParams = options.uri.queryParameters;
     const lat = 48.8566; // Paris — the only fixture these tests exercise.
     const lon = 2.3522;
-    final body = '[{"lat":"$lat","lon":"$lon","display_name":"Test"}]';
+    const body = '[{"lat":"$lat","lon":"$lon","display_name":"Test"}]';
     return ResponseBody.fromString(body, 200, headers: {
       'content-type': ['application/json'],
     });
