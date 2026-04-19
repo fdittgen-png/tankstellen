@@ -1806,6 +1806,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get pickStationSkip => 'Skip — add without a station';
 
   @override
+  String get scanPump => 'Scan pump';
+
+  @override
   String get vehicleFuelNotSet => 'Not set';
 
   @override

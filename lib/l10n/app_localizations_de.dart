@@ -1820,6 +1820,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get pickStationSkip => 'Überspringen — ohne Tankstelle eintragen';
 
   @override
+  String get scanPump => 'Zapfsäule scannen';
+
+  @override
   String get vehicleFuelNotSet => 'Nicht gesetzt';
 
   @override

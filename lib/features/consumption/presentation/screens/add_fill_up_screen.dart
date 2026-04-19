@@ -56,6 +56,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   DateTime _date = DateTime.now();
   late FuelType _fuelType = widget.preFilledFuelType ?? FuelType.e10;
   bool _scanning = false;
+  bool _scanningPump = false;
   bool _obdReading = false;
   ReceiptScanService? _scanService;
   String? _vehicleId;
@@ -340,8 +341,10 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
             // Scan receipt + OBD buttons
             FillUpInputButtons(
               scanning: _scanning,
+              scanningPump: _scanningPump,
               obdReading: _obdReading,
               onScanReceipt: _scanReceipt,
+              onScanPump: _scanPumpDisplay,
               onReadObd: _readObd,
             ),
             const SizedBox(height: 12),
@@ -459,6 +462,43 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
         ),
       ),
     );
+  }
+
+  /// #598 — scan the fuel-pump LCD (Betrag / Abgabe / Preis/Liter) and
+  /// pre-fill the form. Unlike the receipt path there is no brand
+  /// dispatch — every pump emits the same 3-number format — so we
+  /// only need the numeric values and one cross-validity check.
+  Future<void> _scanPumpDisplay() async {
+    setState(() => _scanningPump = true);
+    try {
+      _scanService ??= ReceiptScanService();
+      final result = await _scanService!.scanPumpDisplay();
+      if (result == null || !mounted) return;
+      if (!result.hasUsableData) {
+        SnackBarHelper.show(context, 'Pump display not readable — try again');
+        return;
+      }
+      setState(() {
+        if (result.liters != null) {
+          _litersCtrl.text = result.liters!.toStringAsFixed(2);
+        }
+        if (result.totalCost != null) {
+          _costCtrl.text = result.totalCost!.toStringAsFixed(2);
+        }
+      });
+      if (mounted) {
+        SnackBarHelper.show(
+          context,
+          'Pump display scanned — verify the values.',
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        SnackBarHelper.showError(context, 'Pump scan failed: $e');
+      }
+    } finally {
+      if (mounted) setState(() => _scanningPump = false);
+    }
   }
 
   Future<void> _reportBadScan() async {

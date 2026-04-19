@@ -3439,6 +3439,12 @@ abstract class AppLocalizations {
   /// **'Skip — add without a station'**
   String get pickStationSkip;
 
+  /// No description provided for @scanPump.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan pump'**
+  String get scanPump;
+
   /// No description provided for @vehicleFuelNotSet.
   ///
   /// In en, this message translates to:

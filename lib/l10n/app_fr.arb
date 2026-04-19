@@ -706,6 +706,7 @@
   "pickStationHelper": "Démarrer le plein depuis une station connue — les prix, la marque et le carburant sont pré-remplis.",
   "pickStationEmpty": "Aucune station favorite — ajoutez-en depuis Recherche ou Favoris, ou passez cette étape.",
   "pickStationSkip": "Passer — saisir sans station",
+  "scanPump": "Scanner la pompe",
   "vehicleFuelNotSet": "Non défini",
   "wizardVehicleTapToEdit": "Toucher pour modifier",
   "wizardVehicleDefaultBadge": "Par défaut",

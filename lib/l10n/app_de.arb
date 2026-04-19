@@ -785,6 +785,7 @@
   "pickStationHelper": "Tankvorgang von einer bekannten Tankstelle starten — Preise, Marke und Kraftstoff werden automatisch übernommen.",
   "pickStationEmpty": "Noch keine Favoriten — fügen Sie welche aus Suche oder Favoriten hinzu, oder überspringen Sie diesen Schritt.",
   "pickStationSkip": "Überspringen — ohne Tankstelle eintragen",
+  "scanPump": "Zapfsäule scannen",
   "vehicleFuelNotSet": "Nicht gesetzt",
   "wizardVehicleTapToEdit": "Zum Bearbeiten tippen",
   "wizardVehicleDefaultBadge": "Standard",

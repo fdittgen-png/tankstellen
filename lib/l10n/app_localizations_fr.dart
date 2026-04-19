@@ -1817,6 +1817,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pickStationSkip => 'Passer — saisir sans station';
 
   @override
+  String get scanPump => 'Scanner la pompe';
+
+  @override
   String get vehicleFuelNotSet => 'Non défini';
 
   @override
