@@ -125,6 +125,15 @@ class AppInitializer {
     // Opt in to edge-to-edge display (required for Android 15+).
     EdgeToEdge.enable();
 
+    // Enlarge Flutter's ImageCache so OSM map tiles aren't evicted
+    // mid-pan (#711). Default is 100 MB / 1 000 entries; at 15 KB per
+    // tile that's ~6 500 tiles of headroom — still eviction-prone
+    // when map + other images compete. Bump to 200 MB / 2 000 entries.
+    // Map tiles alone at zoom 13 for a 20 km radius ≈ 50 tiles; this
+    // leaves generous breathing room for zoom-in + pan-out browsing.
+    PaintingBinding.instance.imageCache.maximumSize = 2000;
+    PaintingBinding.instance.imageCache.maximumSizeBytes = 200 * 1024 * 1024;
+
     // Silence debugPrint in release — it is NOT stripped by the compiler.
     if (kReleaseMode) {
       debugPrint = (String? message, {int? wrapWidth}) {};
