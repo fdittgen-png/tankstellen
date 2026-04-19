@@ -84,12 +84,28 @@ class VehiclesStep extends ConsumerWidget {
                   style: theme.textTheme.titleSmall,
                 ),
                 const SizedBox(height: 8),
-                ...vehicles.map((v) => ListTile(
-                      dense: true,
-                      leading: const Icon(Icons.directions_car),
-                      title: Text(v.name),
-                      subtitle: Text(_typeLabel(l10n, v.isEv, v.isCombustion)),
-                    )),
+                // Tappable tiles so the user can re-open / edit any
+                // configured vehicle from within the wizard (#710).
+                // The first-defined vehicle is implicitly the default
+                // (see profile wiring) and displayed with a badge.
+                ...vehicles.map((v) {
+                  final isDefault = vehicles.first.id == v.id;
+                  return ListTile(
+                    dense: true,
+                    leading: const Icon(Icons.directions_car),
+                    title: Text(v.name),
+                    subtitle: Text(
+                      _typeLabel(l10n, v.isEv, v.isCombustion) +
+                          _fuelSuffix(v.preferredFuelType) +
+                          (isDefault
+                              ? '  •  ${l10n?.wizardVehicleDefaultBadge ?? 'Default'}'
+                              : ''),
+                    ),
+                    trailing: const Icon(Icons.edit_outlined),
+                    onTap: () =>
+                        context.push<void>('/vehicles/edit', extra: v.id),
+                  );
+                }),
               ],
             ),
           const SizedBox(height: 16),
@@ -128,5 +144,10 @@ class VehiclesStep extends ConsumerWidget {
     if (isEv && isCombustion) return l10n?.vehicleTypeHybrid ?? 'Hybrid';
     if (isEv) return l10n?.vehicleTypeEv ?? 'Electric';
     return l10n?.vehicleTypeCombustion ?? 'Combustion';
+  }
+
+  String _fuelSuffix(String? fuel) {
+    if (fuel == null || fuel.trim().isEmpty) return '';
+    return '  •  ${fuel.toUpperCase()}';
   }
 }

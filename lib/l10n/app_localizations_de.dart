@@ -1800,6 +1800,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fillUpVehicleNone => 'Kein Fahrzeug';
 
   @override
+  String get vehicleFuelNotSet => 'Nicht gesetzt';
+
+  @override
+  String get wizardVehicleTapToEdit => 'Zum Bearbeiten tippen';
+
+  @override
+  String get wizardVehicleDefaultBadge => 'Standard';
+
+  @override
   String get profileDefaultVehicleLabel => 'Standardfahrzeug (optional)';
 
   @override

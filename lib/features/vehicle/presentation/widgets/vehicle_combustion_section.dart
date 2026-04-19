@@ -66,15 +66,15 @@ class VehicleCombustionSection extends StatelessWidget {
             prefixIcon: const Icon(Icons.local_gas_station),
           ),
           items: [
-            DropdownMenuItem<FuelType?>(
-              value: null,
-              child: Text(l?.fillUpVehicleNone ?? 'Not set'),
-            ),
             ..._combustionFuels.map(
               (f) => DropdownMenuItem<FuelType?>(
                 value: f,
                 child: Text(f.apiValue.toUpperCase()),
               ),
+            ),
+            DropdownMenuItem<FuelType?>(
+              value: null,
+              child: Text(l?.vehicleFuelNotSet ?? 'Not set'),
             ),
           ],
           onChanged: (v) {

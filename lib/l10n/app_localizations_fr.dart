@@ -1797,6 +1797,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fillUpVehicleNone => 'Aucun véhicule';
 
   @override
+  String get vehicleFuelNotSet => 'Non défini';
+
+  @override
+  String get wizardVehicleTapToEdit => 'Toucher pour modifier';
+
+  @override
+  String get wizardVehicleDefaultBadge => 'Par défaut';
+
+  @override
   String get profileDefaultVehicleLabel => 'Véhicule par défaut (facultatif)';
 
   @override

@@ -1782,6 +1782,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fillUpVehicleNone => 'No vehicle';
 
   @override
+  String get vehicleFuelNotSet => 'Not set';
+
+  @override
+  String get wizardVehicleTapToEdit => 'Tap to edit';
+
+  @override
+  String get wizardVehicleDefaultBadge => 'Default';
+
+  @override
   String get profileDefaultVehicleLabel => 'Default vehicle (optional)';
 
   @override

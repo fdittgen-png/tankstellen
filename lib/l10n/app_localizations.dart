@@ -3403,6 +3403,24 @@ abstract class AppLocalizations {
   /// **'No vehicle'**
   String get fillUpVehicleNone;
 
+  /// No description provided for @vehicleFuelNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get vehicleFuelNotSet;
+
+  /// No description provided for @wizardVehicleTapToEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to edit'**
+  String get wizardVehicleTapToEdit;
+
+  /// No description provided for @wizardVehicleDefaultBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get wizardVehicleDefaultBadge;
+
   /// No description provided for @profileDefaultVehicleLabel.
   ///
   /// In en, this message translates to:
