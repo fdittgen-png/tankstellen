@@ -18,8 +18,12 @@ import '../utils/csv_parser.dart';
 /// Free, no API key. CSV with station-level prices + coordinates.
 /// Prices in ARS (Argentine Peso).
 class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin implements StationService {
+  // #728 — HTTPS only. The Secretaría de Energía CDN serves the same
+  // resource under TLS, so there's no reason to fetch the open-data
+  // CSV in clear text (MITM could inject malicious rows, and the
+  // integrity check downstream only catches the header schema).
   static const _csvUrl =
-      'http://datos.energia.gob.ar/dataset/'
+      'https://datos.energia.gob.ar/dataset/'
       '1c181390-5045-475e-94dc-410429be4b17/resource/'
       '80ac25de-a44a-4445-9215-090cf55cfda5/download/'
       'precios-en-surtidor-resolucin-3142016.csv';
