@@ -5,6 +5,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../data/obd2/obd2_service.dart';
 import '../data/obd2/trip_recording_controller.dart';
+import '../domain/cold_start_baselines.dart';
+import '../domain/situation_classifier.dart';
 import '../domain/trip_recorder.dart';
 
 part 'trip_recording_provider.g.dart';
@@ -17,19 +19,39 @@ enum TripRecordingPhase { idle, recording, paused, finished }
 class TripRecordingState {
   final TripRecordingPhase phase;
   final TripLiveReading? live;
+  final DrivingSituation situation;
+  final ConsumptionBand band;
+
+  /// How far live consumption deviates from the situation's baseline
+  /// as a signed fraction (e.g. -0.08 = 8 % below baseline). Null
+  /// when the car doesn't report fuel rate or a live L/100 km can't
+  /// be computed (idle uses L/h — caller formats it differently).
+  final double? liveDeltaFraction;
 
   const TripRecordingState({
     this.phase = TripRecordingPhase.idle,
     this.live,
+    this.situation = DrivingSituation.idle,
+    this.band = ConsumptionBand.normal,
+    this.liveDeltaFraction,
   });
 
   TripRecordingState copyWith({
     TripRecordingPhase? phase,
     TripLiveReading? live,
+    DrivingSituation? situation,
+    ConsumptionBand? band,
+    double? liveDeltaFraction,
+    bool clearDelta = false,
   }) =>
       TripRecordingState(
         phase: phase ?? this.phase,
         live: live ?? this.live,
+        situation: situation ?? this.situation,
+        band: band ?? this.band,
+        liveDeltaFraction: clearDelta
+            ? null
+            : (liveDeltaFraction ?? this.liveDeltaFraction),
       );
 
   bool get isActive =>
@@ -53,6 +75,12 @@ class TripRecording extends _$TripRecording {
   Obd2Service? _service;
   TripRecordingController? _controller;
   StreamSubscription<TripLiveReading>? _liveSub;
+  SituationClassifier? _classifier;
+
+  /// Fuel family used for cold-start baselines. Currently hardcoded
+  /// to gasoline — phase 2 (#769) reads it from the active vehicle
+  /// profile.
+  final ConsumptionFuelFamily _fuelFamily = ConsumptionFuelFamily.gasoline;
 
   @override
   TripRecordingState build() {
@@ -67,16 +95,76 @@ class TripRecording extends _$TripRecording {
     _service = service;
     final ctl = TripRecordingController(service: service);
     _controller = ctl;
+    _classifier = SituationClassifier();
     await ctl.start();
     _liveSub = ctl.live.listen((reading) {
+      final situation = _classifyFrom(reading);
+      final band = _classifyBandFrom(reading, situation);
+      final delta = _computeDelta(reading, situation);
       state = state.copyWith(
         phase: ctl.isPaused
             ? TripRecordingPhase.paused
             : TripRecordingPhase.recording,
         live: reading,
+        situation: situation,
+        band: band,
+        liveDeltaFraction: delta,
       );
     });
     state = state.copyWith(phase: TripRecordingPhase.recording);
+  }
+
+  DrivingSituation _classifyFrom(TripLiveReading r) {
+    final cls = _classifier;
+    if (cls == null) return DrivingSituation.idle;
+    return cls.onSample(DrivingSample(
+      timestamp: DateTime.now(),
+      speedKmh: r.speedKmh ?? 0,
+      rpm: r.rpm ?? 0,
+      throttlePercent: r.engineLoadPercent, // close-enough proxy
+      engineLoadPercent: r.engineLoadPercent,
+      fuelRateLPerHour: r.fuelRateLPerHour,
+    ));
+  }
+
+  ConsumptionBand _classifyBandFrom(
+    TripLiveReading r,
+    DrivingSituation situation,
+  ) {
+    final baseline = coldStartBaseline(_fuelFamily, situation);
+    final live = _liveConsumptionFor(r, baseline);
+    if (live == null) return ConsumptionBand.normal;
+    return classifyBand(
+      situation: situation,
+      live: live,
+      baseline: baseline,
+    );
+  }
+
+  double? _computeDelta(
+    TripLiveReading r,
+    DrivingSituation situation,
+  ) {
+    final baseline = coldStartBaseline(_fuelFamily, situation);
+    if (baseline.value <= 0) return null;
+    final live = _liveConsumptionFor(r, baseline);
+    if (live == null) return null;
+    return (live - baseline.value) / baseline.value;
+  }
+
+  /// Compute the live consumption value in the baseline's unit —
+  /// L/h for idle baselines, L/100 km otherwise. Returns null when
+  /// the car isn't reporting enough data to derive the metric.
+  double? _liveConsumptionFor(
+    TripLiveReading r,
+    SituationBaseline baseline,
+  ) {
+    final fuelRate = r.fuelRateLPerHour;
+    final speed = r.speedKmh;
+    if (fuelRate == null) return null;
+    if (baseline.unit == BaselineUnit.lPerHour) return fuelRate;
+    if (speed == null || speed <= 5) return null; // avoid /0
+    return fuelRate * 100.0 / speed;
   }
 
   void pause() {

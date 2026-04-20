@@ -3,16 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../domain/cold_start_baselines.dart';
+import '../../domain/situation_classifier.dart';
 import '../../providers/trip_recording_provider.dart';
 
-/// Persistent indicator of an active OBD2 trip (#726). Shown on
-/// every screen via `MaterialApp.router.builder` — when the user
-/// taps the banner, they're routed back to the trip screen where
-/// they can pause or stop.
+/// Persistent indicator of an active OBD2 trip (#726 + #768).
 ///
-/// The banner is zero-height when no trip is active (the parent's
-/// layout stays unaffected), so this widget can safely wrap every
-/// screen without regressing any pixel on idle states.
+/// Zero-height when idle, so wrapping every screen in it is safe.
+/// When a trip is active, the banner colour, icon, and label reflect
+/// the current driving situation + consumption band, and the right
+/// side shows the percentage delta vs the situation's baseline.
+/// Tapping routes back to /trip-recording.
 class TripRecordingBanner extends ConsumerWidget {
   final Widget child;
 
@@ -23,10 +24,11 @@ class TripRecordingBanner extends ConsumerWidget {
     final state = ref.watch(tripRecordingProvider);
     if (!state.isActive) return child;
 
+    final bandColor = _bandColor(context, state.band, state.phase);
     return Column(
       children: [
         Material(
-          color: Theme.of(context).colorScheme.primary,
+          color: bandColor.background,
           elevation: 2,
           child: SafeArea(
             bottom: false,
@@ -36,7 +38,7 @@ class TripRecordingBanner extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 12, vertical: 6),
-                child: _Content(state: state),
+                child: _Content(state: state, palette: bandColor),
               ),
             ),
           ),
@@ -45,45 +47,96 @@ class TripRecordingBanner extends ConsumerWidget {
       ],
     );
   }
+
+  _BannerPalette _bandColor(
+    BuildContext context,
+    ConsumptionBand band,
+    TripRecordingPhase phase,
+  ) {
+    // Paused always wins — UI should reflect "not recording" over
+    // any consumption signal from a stale reading.
+    if (phase == TripRecordingPhase.paused) {
+      return _BannerPalette(
+        background: Theme.of(context).colorScheme.surfaceContainerHighest,
+        foreground: Theme.of(context).colorScheme.onSurface,
+      );
+    }
+    switch (band) {
+      case ConsumptionBand.eco:
+        return _BannerPalette(
+            background: Colors.green.shade600, foreground: Colors.white);
+      case ConsumptionBand.normal:
+        return _BannerPalette(
+          background: Theme.of(context).colorScheme.primary,
+          foreground: Theme.of(context).colorScheme.onPrimary,
+        );
+      case ConsumptionBand.heavy:
+        return _BannerPalette(
+            background: Colors.amber.shade800, foreground: Colors.black);
+      case ConsumptionBand.veryHeavy:
+        return _BannerPalette(
+            background: Colors.red.shade700, foreground: Colors.white);
+      case ConsumptionBand.transient:
+        return _BannerPalette(
+            background: Colors.teal.shade400, foreground: Colors.white);
+    }
+  }
+}
+
+class _BannerPalette {
+  final Color background;
+  final Color foreground;
+  const _BannerPalette({required this.background, required this.foreground});
 }
 
 class _Content extends StatelessWidget {
   final TripRecordingState state;
+  final _BannerPalette palette;
 
-  const _Content({required this.state});
+  const _Content({required this.state, required this.palette});
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final onPrimary = Theme.of(context).colorScheme.onPrimary;
     final live = state.live;
     final distance = live?.distanceKmSoFar;
     final elapsed = live?.elapsed;
     final paused = state.phase == TripRecordingPhase.paused;
 
+    final fg = palette.foreground;
+    final situationLabel =
+        paused ? (l?.tripBannerPaused ?? 'Paused') : _label(state.situation, l);
+    final bandIcon = paused
+        ? Icons.pause_circle_filled
+        : _iconFor(state.situation, state.band);
+
     return Row(
       children: [
-        Icon(
-          paused ? Icons.pause_circle_filled : Icons.fiber_manual_record,
-          size: 18,
-          color: paused
-              ? onPrimary.withValues(alpha: 0.8)
-              : Colors.redAccent.shade200,
-        ),
+        Icon(bandIcon, size: 18, color: fg),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
-            paused
-                ? (l?.tripBannerPaused ?? 'Trip paused — tap to resume')
-                : (l?.tripBannerRecording ?? 'Recording trip'),
-            style: TextStyle(color: onPrimary, fontWeight: FontWeight.w600),
+            situationLabel,
+            style: TextStyle(color: fg, fontWeight: FontWeight.w600),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
+        if (state.liveDeltaFraction != null && !paused) ...[
+          Text(
+            _fmtDelta(state.liveDeltaFraction!),
+            style: TextStyle(
+              color: fg,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
         if (distance != null)
           Text(
             '${distance.toStringAsFixed(1)} km',
             style: TextStyle(
-              color: onPrimary,
+              color: fg,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
@@ -92,12 +145,55 @@ class _Content extends StatelessWidget {
           Text(
             _fmtElapsed(elapsed),
             style: TextStyle(
-              color: onPrimary,
+              color: fg,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
       ],
     );
+  }
+
+  String _label(DrivingSituation s, AppLocalizations? l) {
+    switch (s) {
+      case DrivingSituation.idle:
+        return l?.situationIdle ?? 'Idle';
+      case DrivingSituation.stopAndGo:
+        return l?.situationStopAndGo ?? 'Stop & go';
+      case DrivingSituation.urbanCruise:
+        return l?.situationUrban ?? 'Urban';
+      case DrivingSituation.highwayCruise:
+        return l?.situationHighway ?? 'Highway';
+      case DrivingSituation.deceleration:
+        return l?.situationDecel ?? 'Decelerating';
+      case DrivingSituation.climbingOrLoaded:
+        return l?.situationClimbing ?? 'Climbing / loaded';
+      case DrivingSituation.hardAccel:
+        return l?.situationHardAccel ?? 'Hard accel';
+      case DrivingSituation.fuelCutCoast:
+        return l?.situationFuelCut ?? 'Fuel cut — coast';
+    }
+  }
+
+  IconData _iconFor(DrivingSituation s, ConsumptionBand b) {
+    if (s == DrivingSituation.hardAccel) return Icons.local_fire_department;
+    if (s == DrivingSituation.fuelCutCoast) return Icons.eco;
+    if (s == DrivingSituation.idle) return Icons.hourglass_bottom;
+    switch (b) {
+      case ConsumptionBand.eco:
+        return Icons.eco;
+      case ConsumptionBand.heavy:
+      case ConsumptionBand.veryHeavy:
+        return Icons.local_fire_department;
+      case ConsumptionBand.transient:
+      case ConsumptionBand.normal:
+        return Icons.fiber_manual_record;
+    }
+  }
+
+  String _fmtDelta(double d) {
+    final pct = (d * 100).round();
+    final sign = pct > 0 ? '+' : (pct < 0 ? '' : '±');
+    return '$sign$pct%';
   }
 
   static String _fmtElapsed(Duration d) {

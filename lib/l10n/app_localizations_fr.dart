@@ -1941,6 +1941,30 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tripBannerPaused => 'Trajet en pause — toucher pour reprendre';
 
   @override
+  String get situationIdle => 'Ralenti';
+
+  @override
+  String get situationStopAndGo => 'Stop & go';
+
+  @override
+  String get situationUrban => 'Urbain';
+
+  @override
+  String get situationHighway => 'Autoroute';
+
+  @override
+  String get situationDecel => 'Décélération';
+
+  @override
+  String get situationClimbing => 'Côte / chargé';
+
+  @override
+  String get situationHardAccel => 'Accél. forte';
+
+  @override
+  String get situationFuelCut => 'Coupure — roue libre';
+
+  @override
   String get tripSaveAsFillUp => 'Enregistrer comme plein';
 
   @override
