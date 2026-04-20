@@ -138,6 +138,6 @@ Obd2ConnectionService obd2Connection(Ref ref) {
     registry: Obd2AdapterRegistry.defaults(),
     permissions: ref.watch(obd2PermissionsProvider),
     bluetooth: const PluginBluetoothFacade(),
-    classicBluetooth: const StubClassicBluetoothFacade(),
+    classicBluetooth: const PluginClassicBluetoothFacade(),
   );
 }

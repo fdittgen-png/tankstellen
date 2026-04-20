@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+
+import 'classic_method_channel.dart';
 import 'elm_byte_channel.dart';
 
 /// Standard Bluetooth Serial Port Profile UUID (#761). Every
@@ -7,55 +10,77 @@ import 'elm_byte_channel.dart';
 /// Amazon dongles) uses this same Bluetooth-SIG assigned base.
 const String sppServiceUuid = '00001101-0000-1000-8000-00805f9b34fb';
 
-/// Placeholder [ElmByteChannel] for the Bluetooth-Classic SPP path
-/// (#761).
+/// [ElmByteChannel] backed by the in-repo MethodChannel plugin
+/// [Obd2ClassicMethodChannel] (#763).
 ///
-/// The intended production impl wraps an RFCOMM socket opened via a
-/// platform plugin. The popular \`flutter_blue_classic\` package is
-/// GPL-3 licensed and incompatible with this MIT project (license
-/// audit would fail CI). A follow-up issue tracks the license-clean
-/// replacement — either a native MethodChannel wrapper in
-/// \`android/app/src/main/kotlin/\` or an MIT-licensed Classic BT
-/// plugin.
-///
-/// Until then, [open] throws so a user picking the Classic-only
-/// path gets a typed \`Obd2AdapterUnresponsive\` back from the
-/// connection service rather than a silent no-op. Tests inject a
-/// fake [ElmByteChannel] instead of this class, so nothing breaks.
+/// The plugin owns the native [android.bluetooth.BluetoothSocket];
+/// this Dart class just relays the two directions — `write` goes
+/// down via MethodChannel, `incoming` comes up via EventChannel.
+/// The existing [BluetoothObd2Transport] sits on top and handles
+/// the ELM327 `>`-prompt framing.
 class ClassicElmChannel implements ElmByteChannel {
-  final String _address;
-  final String _sppUuid;
+  final String address;
+  final String sppUuid;
+  final Obd2ClassicMethodChannel _plugin;
+
+  StreamSubscription<List<int>>? _subscription;
+  final StreamController<List<int>> _incoming =
+      StreamController<List<int>>.broadcast();
+  bool _open = false;
 
   ClassicElmChannel({
-    required String address,
-    String sppUuid = sppServiceUuid,
-  })  : _address = address,
-        _sppUuid = sppUuid;
+    required this.address,
+    Obd2ClassicMethodChannel? plugin,
+    this.sppUuid = sppServiceUuid,
+  }) : _plugin = plugin ?? const Obd2ClassicMethodChannel();
 
   @override
-  bool get isOpen => false;
+  bool get isOpen => _open;
 
   @override
-  Stream<List<int>> get incoming => const Stream.empty();
+  Stream<List<int>> get incoming => _incoming.stream;
 
   @override
   Future<void> open() async {
-    throw StateError(
-      'ClassicElmChannel: Bluetooth Classic SPP transport is not yet '
-      'wired on this build (target $_address via $_sppUuid). Follow '
-      '#761 for the license-clean native implementation. BLE '
-      'adapters (vLinker FD / MC, OBDLink MX+, Carista, Veepeak) '
-      'work today.',
+    if (_open) return;
+    final ok = await _plugin.connect(address: address, uuid: sppUuid);
+    if (!ok) {
+      throw StateError(
+        'ClassicElmChannel: failed to open RFCOMM socket to $address '
+        '(plugin returned false). Adapter may not be bonded or is out '
+        'of range.',
+      );
+    }
+    _subscription = _plugin.incoming.listen(
+      _incoming.add,
+      onError: (Object e, StackTrace st) {
+        debugPrint('ClassicElmChannel: incoming error: $e');
+      },
+      onDone: () {
+        _open = false;
+      },
     );
+    _open = true;
   }
 
   @override
   Future<void> write(List<int> bytes) async {
-    throw StateError('ClassicElmChannel: not open');
+    if (!_open) {
+      throw StateError('ClassicElmChannel: not open');
+    }
+    await _plugin.write(bytes);
   }
 
   @override
   Future<void> close() async {
-    // no-op — nothing was opened.
+    _open = false;
+    await _subscription?.cancel();
+    _subscription = null;
+    try {
+      await _plugin.disconnect();
+    } catch (e) {
+      debugPrint('ClassicElmChannel: disconnect error (ignored): $e');
+    }
+    await _incoming.close();
   }
 }
