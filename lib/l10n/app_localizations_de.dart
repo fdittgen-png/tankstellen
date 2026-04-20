@@ -1932,6 +1932,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripStop => 'Aufzeichnung beenden';
 
   @override
+  String get tripPause => 'Pause';
+
+  @override
+  String get tripResume => 'Fortsetzen';
+
+  @override
+  String get tripBannerRecording => 'Fahrt wird aufgezeichnet';
+
+  @override
+  String get tripBannerPaused => 'Fahrt pausiert — zum Fortsetzen tippen';
+
+  @override
   String get tripSaveAsFillUp => 'Als Tankfüllung speichern';
 
   @override

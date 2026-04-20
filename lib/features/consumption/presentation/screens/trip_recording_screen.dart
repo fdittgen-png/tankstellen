@@ -1,24 +1,16 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../data/obd2/obd2_service.dart';
-import '../../data/obd2/trip_recording_controller.dart';
 import '../../domain/trip_recorder.dart';
+import '../../providers/trip_recording_provider.dart';
 
 /// Result returned when the user saves a recorded trip as a fill-up
 /// (#726). Null means the user cancelled or discarded.
 class TripSaveResult {
-  /// Latest odometer reading, in km. Populates the fill-up form's
-  /// odometer field. Null when the car doesn't expose the odometer.
   final double? odometerKm;
-
-  /// Estimated litres consumed during the trip. Populates the
-  /// fill-up form's litres field. Null when the car doesn't expose
-  /// a fuel-rate PID.
   final double? litersConsumed;
-
   final TripSummary summary;
 
   const TripSaveResult({
@@ -28,109 +20,133 @@ class TripSaveResult {
   });
 }
 
-/// Full-screen trip recorder. Starts polling the already-connected
-/// [Obd2Service] in [initState], streams live metrics, and on Stop
-/// shows a summary with options to save as a fill-up or discard.
-class TripRecordingScreen extends StatefulWidget {
-  final Obd2Service service;
-
-  const TripRecordingScreen({super.key, required this.service});
+/// Live view of the app-wide trip recording. The trip itself lives
+/// in [tripRecordingProvider] (keepAlive), so this screen can come
+/// and go without losing state.
+///
+/// App bar exposes Pause/Resume and Stop; the user can also back
+/// out of the screen entirely while driving — the recording
+/// continues via the provider, surfaced by [TripRecordingBanner] on
+/// every subsequent screen.
+class TripRecordingScreen extends ConsumerStatefulWidget {
+  const TripRecordingScreen({super.key});
 
   @override
-  State<TripRecordingScreen> createState() => _TripRecordingScreenState();
+  ConsumerState<TripRecordingScreen> createState() =>
+      _TripRecordingScreenState();
 }
 
-class _TripRecordingScreenState extends State<TripRecordingScreen> {
-  late final TripRecordingController _controller;
-  StreamSubscription<TripLiveReading>? _sub;
-  TripLiveReading? _latest;
-  TripSummary? _summary;
+class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
+  StoppedTripResult? _stopped;
   bool _stopping = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TripRecordingController(service: widget.service);
-    _sub = _controller.live.listen((r) {
-      if (!mounted) return;
-      setState(() => _latest = r);
-    });
-    _controller.start();
-  }
-
-  @override
-  void dispose() {
-    _sub?.cancel();
-    // If the user backs out without saving, make sure the polling
-    // timer stops — the Obd2Service stays alive, owned by the caller.
-    if (_controller.isRecording) {
-      unawaited(_controller.stop());
-    }
-    super.dispose();
-  }
 
   Future<void> _onStop() async {
     if (_stopping) return;
     setState(() => _stopping = true);
-    await _controller.refreshOdometer();
-    final summary = await _controller.stop();
+    final result = await ref.read(tripRecordingProvider.notifier).stop();
     if (!mounted) return;
     setState(() {
-      _summary = summary;
+      _stopped = result;
       _stopping = false;
     });
   }
 
+  void _togglePause() {
+    final state = ref.read(tripRecordingProvider);
+    final notifier = ref.read(tripRecordingProvider.notifier);
+    if (state.phase == TripRecordingPhase.paused) {
+      notifier.resume();
+    } else {
+      notifier.pause();
+    }
+  }
+
   void _onSave() {
-    final s = _summary!;
-    final oStart = _controller.odometerStartKm;
-    final oNow = _controller.odometerLatestKm;
-    // End-of-trip km preference order:
-    //   1. Latest odometer read from the ECU — ground truth.
-    //   2. Start km + recorder-integrated distance — derived fallback
-    //      when the car never answered the odometer PID a second
-    //      time.
-    //   3. Null — neither number is meaningful; the form stays blank.
-    final endKm = oNow ??
-        (oStart != null ? oStart + s.distanceKm : null);
+    final r = _stopped!;
+    ref.read(tripRecordingProvider.notifier).reset();
     Navigator.of(context).pop(
       TripSaveResult(
-        odometerKm: endKm,
-        litersConsumed: s.fuelLitersConsumed,
-        summary: s,
+        odometerKm: r.endOdometerKm,
+        litersConsumed: r.summary.fuelLitersConsumed,
+        summary: r.summary,
       ),
     );
   }
 
   void _onDiscard() {
+    ref.read(tripRecordingProvider.notifier).reset();
     Navigator.of(context).pop(null);
   }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final summary = _summary;
+    final state = ref.watch(tripRecordingProvider);
+    final stopped = _stopped;
+
+    final title = stopped != null
+        ? (l?.tripSummaryTitle ?? 'Trip summary')
+        : state.phase == TripRecordingPhase.paused
+            ? (l?.tripBannerPaused ?? 'Trip paused')
+            : (l?.tripRecordingTitle ?? 'Recording trip');
+
+    // After stop: show the summary. Until then: live view.
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          summary == null
-              ? (l?.tripRecordingTitle ?? 'Recording trip')
-              : (l?.tripSummaryTitle ?? 'Trip summary'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: l?.tooltipBack ?? 'Back',
+          // Back from the recording screen DOES NOT stop the trip —
+          // it stays alive via the provider. The banner is the
+          // user's way back in.
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              GoRouter.of(context).go('/');
+            }
+          },
         ),
+        title: Text(title),
+        actions: stopped != null
+            ? null
+            : [
+                IconButton(
+                  key: const Key('tripPauseButton'),
+                  icon: Icon(state.phase == TripRecordingPhase.paused
+                      ? Icons.play_arrow
+                      : Icons.pause),
+                  tooltip: state.phase == TripRecordingPhase.paused
+                      ? (l?.tripResume ?? 'Resume')
+                      : (l?.tripPause ?? 'Pause'),
+                  onPressed: state.isActive ? _togglePause : null,
+                ),
+                IconButton(
+                  key: const Key('tripStopButton'),
+                  icon: const Icon(Icons.stop_circle_outlined),
+                  tooltip: l?.tripStop ?? 'Stop recording',
+                  onPressed:
+                      _stopping || !state.isActive ? null : _onStop,
+                ),
+              ],
       ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: summary == null
-              ? _buildRecording(context, l)
-              : _buildSummary(context, l, summary),
+          child: stopped == null
+              ? _buildRecording(context, l, state)
+              : _buildSummary(context, l, stopped),
         ),
       ),
     );
   }
 
-  Widget _buildRecording(BuildContext context, AppLocalizations? l) {
-    final r = _latest;
+  Widget _buildRecording(
+    BuildContext context,
+    AppLocalizations? l,
+    TripRecordingState state,
+  ) {
+    final r = state.live;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -169,20 +185,7 @@ class _TripRecordingScreenState extends State<TripRecordingScreen> {
         _MetricCard(
           icon: Icons.timer,
           label: l?.tripMetricElapsed ?? 'Elapsed',
-          value: r == null ? '—' : _formatElapsed(r.elapsed),
-        ),
-        const Spacer(),
-        FilledButton.icon(
-          key: const Key('tripStopButton'),
-          onPressed: _stopping ? null : _onStop,
-          icon: _stopping
-              ? const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.stop_circle_outlined),
-          label: Text(l?.tripStop ?? 'Stop recording'),
+          value: r == null ? '—' : _fmtElapsed(r.elapsed),
         ),
       ],
     );
@@ -191,11 +194,11 @@ class _TripRecordingScreenState extends State<TripRecordingScreen> {
   Widget _buildSummary(
     BuildContext context,
     AppLocalizations? l,
-    TripSummary s,
+    StoppedTripResult r,
   ) {
+    final s = r.summary;
     final liters = s.fuelLitersConsumed;
-    final endKm = _controller.odometerLatestKm ??
-        ((_controller.odometerStartKm ?? 0) + s.distanceKm);
+    final endKm = r.endOdometerKm;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -222,7 +225,7 @@ class _TripRecordingScreenState extends State<TripRecordingScreen> {
         _MetricCard(
           icon: Icons.speed,
           label: l?.tripMetricOdometer ?? 'Odometer',
-          value: '${endKm.toStringAsFixed(0)} km',
+          value: endKm == null ? '—' : '${endKm.toStringAsFixed(0)} km',
         ),
         const Spacer(),
         FilledButton.icon(
@@ -241,7 +244,7 @@ class _TripRecordingScreenState extends State<TripRecordingScreen> {
     );
   }
 
-  static String _formatElapsed(Duration d) {
+  static String _fmtElapsed(Duration d) {
     final m = d.inMinutes;
     final s = d.inSeconds % 60;
     return '${m.toString()}:${s.toString().padLeft(2, '0')}';
