@@ -3559,6 +3559,24 @@ abstract class AppLocalizations {
   /// **'Adapter didn\'t answer — turn the ignition on and retry'**
   String get obdAdapterUnresponsive;
 
+  /// No description provided for @obdPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick an OBD2 adapter'**
+  String get obdPickerTitle;
+
+  /// No description provided for @obdPickerScanning.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning for adapters…'**
+  String get obdPickerScanning;
+
+  /// No description provided for @obdPickerConnecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting…'**
+  String get obdPickerConnecting;
+
   /// No description provided for @obdOdometerRead.
   ///
   /// In en, this message translates to:

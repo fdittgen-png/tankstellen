@@ -832,6 +832,9 @@
   "obdOdometerUnavailable": "Could not read odometer",
   "obdPermissionDenied": "Grant Bluetooth permission in system settings",
   "obdAdapterUnresponsive": "Adapter didn't answer — turn the ignition on and retry",
+  "obdPickerTitle": "Pick an OBD2 adapter",
+  "obdPickerScanning": "Scanning for adapters…",
+  "obdPickerConnecting": "Connecting…",
   "obdOdometerRead": "Odometer read: {km} km",
   "@obdOdometerRead": {
     "placeholders": {

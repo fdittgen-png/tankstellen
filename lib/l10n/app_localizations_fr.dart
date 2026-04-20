@@ -1881,6 +1881,15 @@ class AppLocalizationsFr extends AppLocalizations {
       'Pas de réponse — mettez le contact et réessayez';
 
   @override
+  String get obdPickerTitle => 'Choisir un adaptateur OBD2';
+
+  @override
+  String get obdPickerScanning => 'Recherche d\'adaptateurs…';
+
+  @override
+  String get obdPickerConnecting => 'Connexion…';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Compteur lu : $km km';
   }

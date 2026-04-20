@@ -726,6 +726,9 @@
   "obdOdometerUnavailable": "Impossible de lire le compteur",
   "obdPermissionDenied": "Accorder la permission Bluetooth dans les paramètres",
   "obdAdapterUnresponsive": "Pas de réponse — mettez le contact et réessayez",
+  "obdPickerTitle": "Choisir un adaptateur OBD2",
+  "obdPickerScanning": "Recherche d'adaptateurs…",
+  "obdPickerConnecting": "Connexion…",
   "obdOdometerRead": "Compteur lu : {km} km",
   "@obdOdometerRead": {
     "placeholders": {

@@ -805,6 +805,9 @@
   "obdOdometerUnavailable": "Kilometerstand konnte nicht gelesen werden",
   "obdPermissionDenied": "Bluetooth-Berechtigung in den Einstellungen erteilen",
   "obdAdapterUnresponsive": "Keine Antwort — Zündung einschalten und neu versuchen",
+  "obdPickerTitle": "OBD2-Adapter wählen",
+  "obdPickerScanning": "Suche nach Adaptern…",
+  "obdPickerConnecting": "Verbinden…",
   "obdOdometerRead": "Kilometerstand gelesen: {km} km",
   "@obdOdometerRead": {
     "placeholders": {
