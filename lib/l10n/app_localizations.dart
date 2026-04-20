@@ -3601,6 +3601,72 @@ abstract class AppLocalizations {
   /// **'Follow system'**
   String get themeModeSystem;
 
+  /// No description provided for @tripRecordingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording trip'**
+  String get tripRecordingTitle;
+
+  /// No description provided for @tripSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip summary'**
+  String get tripSummaryTitle;
+
+  /// No description provided for @tripMetricDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get tripMetricDistance;
+
+  /// No description provided for @tripMetricSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get tripMetricSpeed;
+
+  /// No description provided for @tripMetricFuelUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel used'**
+  String get tripMetricFuelUsed;
+
+  /// No description provided for @tripMetricAvgConsumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg'**
+  String get tripMetricAvgConsumption;
+
+  /// No description provided for @tripMetricElapsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Elapsed'**
+  String get tripMetricElapsed;
+
+  /// No description provided for @tripMetricOdometer.
+  ///
+  /// In en, this message translates to:
+  /// **'Odometer'**
+  String get tripMetricOdometer;
+
+  /// No description provided for @tripStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop recording'**
+  String get tripStop;
+
+  /// No description provided for @tripSaveAsFillUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as fill-up'**
+  String get tripSaveAsFillUp;
+
+  /// No description provided for @tripDiscard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get tripDiscard;
+
   /// No description provided for @obdOdometerRead.
   ///
   /// In en, this message translates to:

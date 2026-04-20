@@ -12,6 +12,7 @@ import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/obd2/obd2_connection_errors.dart';
 import '../widgets/obd2_adapter_picker.dart';
+import 'trip_recording_screen.dart';
 import '../../data/receipt_scan_service.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
@@ -220,27 +221,44 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   }
 
   /// Tap handler for the OBD-II button. Opens the adapter picker
-  /// (#743); on successful connect it reads the odometer via the
-  /// returned [Obd2Service] and fills the form. A null return (user
-  /// cancelled) is a no-op — no snackbar noise.
+  /// (#743); on successful connect, pushes the trip-recording
+  /// screen (#726) which polls live PIDs, lets the user stop when
+  /// done, and returns a [TripSaveResult] that pre-fills the
+  /// odometer + litres fields. A null return (user cancelled or
+  /// discarded the trip) is a no-op.
   Future<void> _readObd() async {
     setState(() => _obdReading = true);
     final l = AppLocalizations.of(context);
     try {
       final service = await showObd2AdapterPicker(context);
       if (service == null || !mounted) return;
-      final km = await service.readOdometerKm();
+      final result = await Navigator.of(context).push<TripSaveResult?>(
+        MaterialPageRoute(
+          builder: (_) => TripRecordingScreen(service: service),
+        ),
+      );
+      // Screen owns the service lifecycle — disconnect once it pops.
       await service.disconnect();
-      if (!mounted) return;
-      if (km != null) {
-        setState(() => _odoCtrl.text = km.round().toString());
+      if (!mounted || result == null) return;
+      setState(() {
+        if (result.odometerKm != null) {
+          _odoCtrl.text = result.odometerKm!.round().toString();
+        }
+        if (result.litersConsumed != null) {
+          _litersCtrl.text = result.litersConsumed!.toStringAsFixed(2);
+        }
+      });
+      if (result.odometerKm != null) {
         SnackBarHelper.showSuccess(
           context,
-          l?.obdOdometerRead(km.round()) ?? 'Odometer read: ${km.round()} km',
+          l?.obdOdometerRead(result.odometerKm!.round()) ??
+              'Odometer read: ${result.odometerKm!.round()} km',
         );
       } else {
         SnackBarHelper.show(
-            context, l?.obdOdometerUnavailable ?? 'Could not read odometer');
+          context,
+          l?.obdOdometerUnavailable ?? 'Could not read odometer',
+        );
       }
     } on Obd2ConnectionError catch (e) {
       if (mounted) SnackBarHelper.showError(context, e.message);

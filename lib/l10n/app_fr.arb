@@ -733,6 +733,17 @@
   "themeModeLight": "Clair",
   "themeModeDark": "Sombre",
   "themeModeSystem": "Suivre le système",
+  "tripRecordingTitle": "Enregistrement du trajet",
+  "tripSummaryTitle": "Résumé du trajet",
+  "tripMetricDistance": "Distance",
+  "tripMetricSpeed": "Vitesse",
+  "tripMetricFuelUsed": "Carburant utilisé",
+  "tripMetricAvgConsumption": "Moyenne",
+  "tripMetricElapsed": "Durée",
+  "tripMetricOdometer": "Compteur",
+  "tripStop": "Arrêter l'enregistrement",
+  "tripSaveAsFillUp": "Enregistrer comme plein",
+  "tripDiscard": "Abandonner",
   "obdOdometerRead": "Compteur lu : {km} km",
   "@obdOdometerRead": {
     "placeholders": {

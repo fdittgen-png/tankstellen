@@ -812,6 +812,17 @@
   "themeModeLight": "Hell",
   "themeModeDark": "Dunkel",
   "themeModeSystem": "Systemeinstellung",
+  "tripRecordingTitle": "Fahrt wird aufgezeichnet",
+  "tripSummaryTitle": "Fahrtzusammenfassung",
+  "tripMetricDistance": "Strecke",
+  "tripMetricSpeed": "Geschwindigkeit",
+  "tripMetricFuelUsed": "Verbraucht",
+  "tripMetricAvgConsumption": "Ø",
+  "tripMetricElapsed": "Dauer",
+  "tripMetricOdometer": "Kilometerstand",
+  "tripStop": "Aufzeichnung beenden",
+  "tripSaveAsFillUp": "Als Tankfüllung speichern",
+  "tripDiscard": "Verwerfen",
   "obdOdometerRead": "Kilometerstand gelesen: {km} km",
   "@obdOdometerRead": {
     "placeholders": {

@@ -839,6 +839,17 @@
   "themeModeLight": "Light",
   "themeModeDark": "Dark",
   "themeModeSystem": "Follow system",
+  "tripRecordingTitle": "Recording trip",
+  "tripSummaryTitle": "Trip summary",
+  "tripMetricDistance": "Distance",
+  "tripMetricSpeed": "Speed",
+  "tripMetricFuelUsed": "Fuel used",
+  "tripMetricAvgConsumption": "Avg",
+  "tripMetricElapsed": "Elapsed",
+  "tripMetricOdometer": "Odometer",
+  "tripStop": "Stop recording",
+  "tripSaveAsFillUp": "Save as fill-up",
+  "tripDiscard": "Discard",
   "obdOdometerRead": "Odometer read: {km} km",
   "@obdOdometerRead": {
     "placeholders": {

@@ -1890,6 +1890,39 @@ class AppLocalizationsNb extends AppLocalizations {
   String get themeModeSystem => 'Follow system';
 
   @override
+  String get tripRecordingTitle => 'Recording trip';
+
+  @override
+  String get tripSummaryTitle => 'Trip summary';
+
+  @override
+  String get tripMetricDistance => 'Distance';
+
+  @override
+  String get tripMetricSpeed => 'Speed';
+
+  @override
+  String get tripMetricFuelUsed => 'Fuel used';
+
+  @override
+  String get tripMetricAvgConsumption => 'Avg';
+
+  @override
+  String get tripMetricElapsed => 'Elapsed';
+
+  @override
+  String get tripMetricOdometer => 'Odometer';
+
+  @override
+  String get tripStop => 'Stop recording';
+
+  @override
+  String get tripSaveAsFillUp => 'Save as fill-up';
+
+  @override
+  String get tripDiscard => 'Discard';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Odometer read: $km km';
   }
