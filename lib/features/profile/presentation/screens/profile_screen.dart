@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/theme/theme_mode_tile.dart';
 import '../../../consent/presentation/widgets/consent_settings_section.dart';
 import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
@@ -85,6 +86,10 @@ class ProfileScreen extends ConsumerWidget {
                 'Track fill-ups and calculate L/100km',
             onTap: () => context.push('/consumption'),
           ),
+          const SizedBox(height: 8),
+
+          // Theme mode — light / dark / follow system (#752).
+          const ThemeModeTile(),
           const SizedBox(height: 8),
 
           // Storage & Cache

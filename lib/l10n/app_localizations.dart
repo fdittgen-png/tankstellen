@@ -3577,6 +3577,30 @@ abstract class AppLocalizations {
   /// **'Connecting…'**
   String get obdPickerConnecting;
 
+  /// No description provided for @themeSettingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get themeSettingTitle;
+
+  /// No description provided for @themeModeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeModeLight;
+
+  /// No description provided for @themeModeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeModeDark;
+
+  /// No description provided for @themeModeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow system'**
+  String get themeModeSystem;
+
   /// No description provided for @obdOdometerRead.
   ///
   /// In en, this message translates to:

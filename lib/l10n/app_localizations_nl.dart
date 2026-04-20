@@ -1883,6 +1883,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get obdPickerConnecting => 'Connecting…';
 
   @override
+  String get themeSettingTitle => 'Theme';
+
+  @override
+  String get themeModeLight => 'Light';
+
+  @override
+  String get themeModeDark => 'Dark';
+
+  @override
+  String get themeModeSystem => 'Follow system';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Odometer read: $km km';
   }

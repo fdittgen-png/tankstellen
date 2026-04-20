@@ -1890,6 +1890,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get obdPickerConnecting => 'Connexion…';
 
   @override
+  String get themeSettingTitle => 'Thème';
+
+  @override
+  String get themeModeLight => 'Clair';
+
+  @override
+  String get themeModeDark => 'Sombre';
+
+  @override
+  String get themeModeSystem => 'Suivre le système';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Compteur lu : $km km';
   }

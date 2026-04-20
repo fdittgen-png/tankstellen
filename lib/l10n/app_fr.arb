@@ -729,6 +729,10 @@
   "obdPickerTitle": "Choisir un adaptateur OBD2",
   "obdPickerScanning": "Recherche d'adaptateurs…",
   "obdPickerConnecting": "Connexion…",
+  "themeSettingTitle": "Thème",
+  "themeModeLight": "Clair",
+  "themeModeDark": "Sombre",
+  "themeModeSystem": "Suivre le système",
   "obdOdometerRead": "Compteur lu : {km} km",
   "@obdOdometerRead": {
     "placeholders": {
