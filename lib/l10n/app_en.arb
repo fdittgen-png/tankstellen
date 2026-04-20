@@ -828,6 +828,16 @@
   "qrScannerGuidance": "Point the camera at a QR code",
   "torchOn": "Turn flash on",
   "torchOff": "Turn flash off",
+  "obdNoAdapter": "No OBD2 adapter in range",
+  "obdOdometerUnavailable": "Could not read odometer",
+  "obdPermissionDenied": "Grant Bluetooth permission in system settings",
+  "obdAdapterUnresponsive": "Adapter didn't answer — turn the ignition on and retry",
+  "obdOdometerRead": "Odometer read: {km} km",
+  "@obdOdometerRead": {
+    "placeholders": {
+      "km": { "type": "int" }
+    }
+  },
   "vehicleFuelNotSet": "Not set",
   "wizardVehicleTapToEdit": "Tap to edit",
   "wizardVehicleDefaultBadge": "Default",

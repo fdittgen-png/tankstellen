@@ -1867,6 +1867,25 @@ class AppLocalizationsFr extends AppLocalizations {
   String get torchOff => 'Éteindre le flash';
 
   @override
+  String get obdNoAdapter => 'Aucun adaptateur OBD2 à portée';
+
+  @override
+  String get obdOdometerUnavailable => 'Impossible de lire le compteur';
+
+  @override
+  String get obdPermissionDenied =>
+      'Accorder la permission Bluetooth dans les paramètres';
+
+  @override
+  String get obdAdapterUnresponsive =>
+      'Pas de réponse — mettez le contact et réessayez';
+
+  @override
+  String obdOdometerRead(int km) {
+    return 'Compteur lu : $km km';
+  }
+
+  @override
   String get vehicleFuelNotSet => 'Non défini';
 
   @override

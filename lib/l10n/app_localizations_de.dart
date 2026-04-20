@@ -1869,6 +1869,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String get torchOff => 'Blitz ausschalten';
 
   @override
+  String get obdNoAdapter => 'Kein OBD2-Adapter in Reichweite';
+
+  @override
+  String get obdOdometerUnavailable =>
+      'Kilometerstand konnte nicht gelesen werden';
+
+  @override
+  String get obdPermissionDenied =>
+      'Bluetooth-Berechtigung in den Einstellungen erteilen';
+
+  @override
+  String get obdAdapterUnresponsive =>
+      'Keine Antwort — Zündung einschalten und neu versuchen';
+
+  @override
+  String obdOdometerRead(int km) {
+    return 'Kilometerstand gelesen: $km km';
+  }
+
+  @override
   String get vehicleFuelNotSet => 'Nicht gesetzt';
 
   @override
