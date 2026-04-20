@@ -17,8 +17,10 @@ import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../payment/domain/qr_payment_decoder.dart';
 import '../../../payment/presentation/scan_payment_dispatcher.dart';
+import '../../../payment/presentation/widgets/unknown_qr_dialog.dart';
 import '../../../sync/presentation/widgets/qr_scanner_screen.dart';
 import '../../providers/station_detail_provider.dart';
 import '../widgets/price_history_section.dart';
@@ -325,23 +327,15 @@ class StationDetailScreen extends ConsumerWidget {
           }
         }
       case ScanPaymentOutcome.unknown:
+        final unknown = target as QrPaymentUnknown;
         await showDialog<void>(
           context: context,
-          builder: (ctx) {
-            final unknown = target as QrPaymentUnknown;
-            return AlertDialog(
-              title: Text(
-                l10n?.qrPaymentUnknownTitle ?? 'Unrecognised code',
-              ),
-              content: SelectableText(unknown.raw),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  child: Text(l10n?.cancel ?? 'Cancel'),
-                ),
-              ],
-            );
-          },
+          builder: (ctx) => UnknownQrDialog(
+            raw: unknown.raw,
+            onShare: (text, subject) => SharePlus.instance.share(
+              ShareParams(text: text, subject: subject),
+            ),
+          ),
         );
     }
   }

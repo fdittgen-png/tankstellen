@@ -1838,6 +1838,12 @@ class AppLocalizationsLt extends AppLocalizations {
   String get qrPaymentCopyRaw => 'Copy raw text';
 
   @override
+  String get qrPaymentCopiedRaw => 'Copied to clipboard';
+
+  @override
+  String get qrPaymentReport => 'Report this scan';
+
+  @override
   String get qrPaymentEpcCopied =>
       'Bank details copied — paste into your banking app';
 

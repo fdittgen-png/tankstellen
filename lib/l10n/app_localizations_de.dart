@@ -1850,6 +1850,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get qrPaymentCopyRaw => 'Rohtext kopieren';
 
   @override
+  String get qrPaymentCopiedRaw => 'In Zwischenablage kopiert';
+
+  @override
+  String get qrPaymentReport => 'Scan melden';
+
+  @override
   String get qrPaymentEpcCopied =>
       'Bankdaten kopiert — in Banking-App einfügen';
 

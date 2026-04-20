@@ -3499,6 +3499,18 @@ abstract class AppLocalizations {
   /// **'Copy raw text'**
   String get qrPaymentCopyRaw;
 
+  /// No description provided for @qrPaymentCopiedRaw.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get qrPaymentCopiedRaw;
+
+  /// No description provided for @qrPaymentReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Report this scan'**
+  String get qrPaymentReport;
+
   /// No description provided for @qrPaymentEpcCopied.
   ///
   /// In en, this message translates to:
