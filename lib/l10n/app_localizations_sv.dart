@@ -1871,6 +1871,15 @@ class AppLocalizationsSv extends AppLocalizations {
       'Adapter didn\'t answer — turn the ignition on and retry';
 
   @override
+  String get obdPickerTitle => 'Pick an OBD2 adapter';
+
+  @override
+  String get obdPickerScanning => 'Scanning for adapters…';
+
+  @override
+  String get obdPickerConnecting => 'Connecting…';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Odometer read: $km km';
   }

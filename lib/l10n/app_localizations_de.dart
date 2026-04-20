@@ -1884,6 +1884,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Keine Antwort — Zündung einschalten und neu versuchen';
 
   @override
+  String get obdPickerTitle => 'OBD2-Adapter wählen';
+
+  @override
+  String get obdPickerScanning => 'Suche nach Adaptern…';
+
+  @override
+  String get obdPickerConnecting => 'Verbinden…';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Kilometerstand gelesen: $km km';
   }
