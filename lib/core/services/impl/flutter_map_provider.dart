@@ -50,6 +50,9 @@ class FlutterMapProvider implements MapProvider {
     return TileLayer(
       urlTemplate: config.urlTemplate,
       userAgentPackageName: config.userAgent ?? '',
+      // #757 — evict failed tiles once off-screen, retry on next pan.
+      evictErrorTileStrategy:
+          EvictErrorTileStrategy.notVisibleRespectMargin,
     );
   }
 
