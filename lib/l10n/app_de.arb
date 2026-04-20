@@ -795,6 +795,8 @@
   "qrPaymentLaunchFailed": "Keine App kann diesen Code öffnen",
   "qrPaymentUnknownTitle": "Code nicht erkannt",
   "qrPaymentCopyRaw": "Rohtext kopieren",
+  "qrPaymentCopiedRaw": "In Zwischenablage kopiert",
+  "qrPaymentReport": "Scan melden",
   "qrPaymentEpcCopied": "Bankdaten kopiert — in Banking-App einfügen",
   "vehicleFuelNotSet": "Nicht gesetzt",
   "wizardVehicleTapToEdit": "Zum Bearbeiten tippen",
