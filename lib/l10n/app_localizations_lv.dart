@@ -1850,6 +1850,15 @@ class AppLocalizationsLv extends AppLocalizations {
       'Bank details copied — paste into your banking app';
 
   @override
+  String get qrScannerGuidance => 'Point the camera at a QR code';
+
+  @override
+  String get torchOn => 'Turn flash on';
+
+  @override
+  String get torchOff => 'Turn flash off';
+
+  @override
   String get vehicleFuelNotSet => 'Not set';
 
   @override

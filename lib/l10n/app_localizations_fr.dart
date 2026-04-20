@@ -1858,6 +1858,15 @@ class AppLocalizationsFr extends AppLocalizations {
       'Coordonnées copiées — collez dans votre app bancaire';
 
   @override
+  String get qrScannerGuidance => 'Pointez la caméra sur un QR code';
+
+  @override
+  String get torchOn => 'Allumer le flash';
+
+  @override
+  String get torchOff => 'Éteindre le flash';
+
+  @override
   String get vehicleFuelNotSet => 'Non défini';
 
   @override
