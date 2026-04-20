@@ -1932,6 +1932,30 @@ class AppLocalizationsPl extends AppLocalizations {
   String get tripBannerPaused => 'Trip paused — tap to resume';
 
   @override
+  String get situationIdle => 'Idle';
+
+  @override
+  String get situationStopAndGo => 'Stop & go';
+
+  @override
+  String get situationUrban => 'Urban';
+
+  @override
+  String get situationHighway => 'Highway';
+
+  @override
+  String get situationDecel => 'Decelerating';
+
+  @override
+  String get situationClimbing => 'Climbing / loaded';
+
+  @override
+  String get situationHardAccel => 'Hard accel';
+
+  @override
+  String get situationFuelCut => 'Fuel cut — coast';
+
+  @override
   String get tripSaveAsFillUp => 'Save as fill-up';
 
   @override

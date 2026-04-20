@@ -3679,6 +3679,54 @@ abstract class AppLocalizations {
   /// **'Trip paused — tap to resume'**
   String get tripBannerPaused;
 
+  /// No description provided for @situationIdle.
+  ///
+  /// In en, this message translates to:
+  /// **'Idle'**
+  String get situationIdle;
+
+  /// No description provided for @situationStopAndGo.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop & go'**
+  String get situationStopAndGo;
+
+  /// No description provided for @situationUrban.
+  ///
+  /// In en, this message translates to:
+  /// **'Urban'**
+  String get situationUrban;
+
+  /// No description provided for @situationHighway.
+  ///
+  /// In en, this message translates to:
+  /// **'Highway'**
+  String get situationHighway;
+
+  /// No description provided for @situationDecel.
+  ///
+  /// In en, this message translates to:
+  /// **'Decelerating'**
+  String get situationDecel;
+
+  /// No description provided for @situationClimbing.
+  ///
+  /// In en, this message translates to:
+  /// **'Climbing / loaded'**
+  String get situationClimbing;
+
+  /// No description provided for @situationHardAccel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard accel'**
+  String get situationHardAccel;
+
+  /// No description provided for @situationFuelCut.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel cut — coast'**
+  String get situationFuelCut;
+
   /// No description provided for @tripSaveAsFillUp.
   ///
   /// In en, this message translates to:

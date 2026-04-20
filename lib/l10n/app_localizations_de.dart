@@ -1944,6 +1944,30 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripBannerPaused => 'Fahrt pausiert — zum Fortsetzen tippen';
 
   @override
+  String get situationIdle => 'Leerlauf';
+
+  @override
+  String get situationStopAndGo => 'Stop & go';
+
+  @override
+  String get situationUrban => 'Stadtverkehr';
+
+  @override
+  String get situationHighway => 'Autobahn';
+
+  @override
+  String get situationDecel => 'Verzögerung';
+
+  @override
+  String get situationClimbing => 'Steigung / beladen';
+
+  @override
+  String get situationHardAccel => 'Harte Beschl.';
+
+  @override
+  String get situationFuelCut => 'Schubabschaltung';
+
+  @override
   String get tripSaveAsFillUp => 'Als Tankfüllung speichern';
 
   @override
