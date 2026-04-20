@@ -3,10 +3,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/error/exceptions.dart';
 import '../../../core/services/service_result.dart';
-import '../../../core/storage/storage_providers.dart';
 import '../../../core/country/country_provider.dart';
-import '../data/services/ev_charging_service.dart';
 import '../domain/entities/charging_station.dart';
+import 'ev_charging_service_provider.dart';
 
 part 'ev_search_provider.g.dart';
 
@@ -33,14 +32,12 @@ class EVSearchState extends _$EVSearchState {
   }) async {
     state = const AsyncValue.loading();
     try {
-      final storage = ref.read(storageRepositoryProvider);
-      final apiKey = storage.getEvApiKey();
-      if (apiKey == null || apiKey.isEmpty) {
+      final service = ref.read(evChargingServiceProvider);
+      if (service == null) {
         throw const NoEvApiKeyException();
       }
 
       final country = ref.read(activeCountryProvider);
-      final service = EVChargingService(apiKey: apiKey);
       final result = await service.searchStations(
         lat: lat,
         lng: lng,
