@@ -22,7 +22,7 @@ void main() {
         (tester) async {
       final svc = _buildService([
         [
-          _scanHit(name: 'vLinker FS', rssi: -55),
+          _scanHit(name: 'vLinker FD', rssi: -55),
           _scanHit(name: 'OBDLink MX+', rssi: -40),
         ],
       ]);
@@ -33,18 +33,18 @@ void main() {
       expect(find.byKey(const Key('obdPickerSelecting')), findsOneWidget);
       // OBDLink is stronger → ranks first by RSSI.
       expect(find.text('OBDLink MX+'), findsOneWidget);
-      expect(find.text('vLinker FS'), findsOneWidget);
+      expect(find.text('vLinker FD'), findsOneWidget);
     });
 
     testWidgets('tapping a candidate transitions to connecting state',
         (tester) async {
       final svc = _buildService([
-        [_scanHit(name: 'vLinker FS', rssi: -55)],
+        [_scanHit(name: 'vLinker FD', rssi: -55)],
       ]);
       await _pump(tester, svc);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 50));
-      await tester.tap(find.text('vLinker FS'));
+      await tester.tap(find.text('vLinker FD'));
       await tester.pump(); // state flip only — don't settle, the silent
       // channel intentionally leaves a pending 5 s timeout that
       // eventually surfaces as Obd2AdapterUnresponsive; we're only

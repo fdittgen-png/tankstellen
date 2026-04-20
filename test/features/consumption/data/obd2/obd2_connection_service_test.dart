@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
+import 'package:tankstellen/features/consumption/data/obd2/classic_bluetooth_facade.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
@@ -58,7 +59,8 @@ void main() {
       );
       final emitted = await svc.scan().toList();
       expect(emitted, hasLength(1));
-      expect(emitted.single.single.profile.id, 'vlinker');
+      // #761 — "vLinker FS" resolves to the Classic profile, not BLE.
+      expect(emitted.single.single.profile.id, 'vlinker-fs-classic');
     });
 
     test('accumulates across batches and preserves RSSI ranking', () async {
@@ -130,6 +132,84 @@ void main() {
     }, timeout: const Timeout(Duration(seconds: 30)));
   });
 
+  group('Obd2ConnectionService dual-transport (#761)', () {
+    test('connect dispatches to ClassicBluetoothFacade when the '
+        'resolved profile is Classic', () async {
+      // Covers the user's actual vLinker FS flow: scan sees a Classic
+      // adapter via the classic facade; connect must route through
+      // the same facade to build the RFCOMM-backed channel.
+      final classicFake = _FakeClassicFacade(
+        batches: const [[]],
+        channel: _FakeChannel(respondTo: _elmOkResponses()),
+      );
+      final svc = Obd2ConnectionService(
+        registry: Obd2AdapterRegistry.defaults(),
+        permissions: _FakePermissions(Obd2PermissionState.granted),
+        bluetooth: _FakeFacade(batches: const [[]]),
+        classicBluetooth: classicFake,
+      );
+      final candidate = ResolvedObd2Candidate(
+        candidate: Obd2AdapterCandidate(
+          deviceId: 'cc:dd',
+          deviceName: 'vLinker FS 14884',
+          advertisedServiceUuids: const [],
+          rssi: 0,
+        ),
+        profile: registry.profiles
+            .firstWhere((p) => p.id == 'vlinker-fs-classic'),
+      );
+      final ready = await svc.connect(candidate);
+      expect(ready.isConnected, isTrue);
+      expect(classicFake.channelForCalls, ['cc:dd']);
+      await ready.disconnect();
+    });
+
+    test('connect throws Obd2AdapterUnresponsive on Classic profile '
+        'when no Classic facade was wired', () async {
+      final svc = Obd2ConnectionService(
+        registry: Obd2AdapterRegistry.defaults(),
+        permissions: _FakePermissions(Obd2PermissionState.granted),
+        bluetooth: _FakeFacade(batches: const [[]]),
+        // classicBluetooth: null — misconfiguration safeguard.
+      );
+      final candidate = ResolvedObd2Candidate(
+        candidate: Obd2AdapterCandidate(
+          deviceId: 'cc:dd',
+          deviceName: 'vLinker FS',
+          advertisedServiceUuids: const [],
+          rssi: 0,
+        ),
+        profile: registry.profiles
+            .firstWhere((p) => p.id == 'vlinker-fs-classic'),
+      );
+      await expectLater(
+        svc.connect(candidate),
+        throwsA(isA<Obd2AdapterUnresponsive>()),
+      );
+    });
+
+    test('scan merges Classic-only candidates alongside BLE', () async {
+      final svc = Obd2ConnectionService(
+        registry: Obd2AdapterRegistry.defaults(),
+        permissions: _FakePermissions(Obd2PermissionState.granted),
+        bluetooth: _FakeFacade(batches: const [[]]),
+        classicBluetooth: _FakeClassicFacade(batches: [
+          [
+            Obd2AdapterCandidate(
+              deviceId: 'cc:dd',
+              deviceName: 'vLinker FS 14884',
+              advertisedServiceUuids: const [],
+              rssi: 0,
+            ),
+          ],
+        ]),
+      );
+      final emitted = await svc.scan().toList();
+      expect(emitted, isNotEmpty);
+      expect(emitted.last.single.profile.id, 'vlinker-fs-classic');
+    });
+  });
+
   group('Obd2ConnectionService.connectBest', () {
     test('returns null when no scan has happened yet', () async {
       final svc = _build(
@@ -154,15 +234,17 @@ Obd2ConnectionService _build({
     );
 
 ResolvedObd2Candidate _resolvedVlinker(Obd2AdapterRegistry r) {
+  // Use the FD (BLE) variant — FS is Classic (#761), and the BLE
+  // dispatch is what the unit tests below are validating.
   final candidate = Obd2AdapterCandidate(
     deviceId: 'aa:bb',
-    deviceName: 'vLinker FS',
+    deviceName: 'vLinker FD',
     advertisedServiceUuids: const [],
     rssi: -55,
   );
   return ResolvedObd2Candidate(
     candidate: candidate,
-    profile: r.profiles.firstWhere((p) => p.id == 'vlinker'),
+    profile: r.profiles.firstWhere((p) => p.id == 'vlinker-ble'),
   );
 }
 
@@ -173,6 +255,31 @@ class _FakePermissions implements Obd2Permissions {
   Future<Obd2PermissionState> current() async => state;
   @override
   Future<Obd2PermissionState> request() async => state;
+}
+
+class _FakeClassicFacade implements ClassicBluetoothFacade {
+  final List<List<Obd2AdapterCandidate>> batches;
+  final ElmByteChannel? channel;
+  final List<String> channelForCalls = [];
+  _FakeClassicFacade({required this.batches, this.channel});
+
+  @override
+  Stream<List<Obd2AdapterCandidate>> scan({
+    Duration timeout = const Duration(seconds: 8),
+  }) async* {
+    for (final batch in batches) {
+      yield batch;
+    }
+  }
+
+  @override
+  Future<void> stopScan() async {}
+
+  @override
+  ElmByteChannel channelFor(String deviceId) {
+    channelForCalls.add(deviceId);
+    return channel ?? _FakeChannel(silent: true);
+  }
 }
 
 class _FakeFacade implements BluetoothFacade {

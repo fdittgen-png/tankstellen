@@ -82,7 +82,7 @@ packages:
     source: hosted
     version: "2.7.0"
   async:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: async
       sha256: e2eb0491ba5ddb6177742d2da23904574082139b07c1e33b8503b9f46f3e1a37
@@ -406,6 +406,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_blue_classic:
+    dependency: "direct main"
+    description:
+      name: flutter_blue_classic
+      sha256: a3f6ad0bc1a6152c55ee67b37ea3849bd9edd668709351e8c5be5aa5298d6a62
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
   flutter_blue_plus:
     dependency: "direct main"
     description:
