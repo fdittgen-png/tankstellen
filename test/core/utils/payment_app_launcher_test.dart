@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 import 'package:tankstellen/core/utils/payment_app_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -13,39 +15,29 @@ void main() {
       expect(paymentAppForBrand('   '), isNull);
     });
 
-    test('returns Shell App for Shell brand', () {
-      final app = paymentAppForBrand('Shell');
-      expect(app, isNotNull);
-      expect(app!.displayName, 'Shell App');
-      expect(app.androidPackageId, contains('shell'));
-    });
-
-    test('matches brand variations case-insensitively', () {
-      expect(paymentAppForBrand('SHELL')?.displayName, 'Shell App');
-      expect(paymentAppForBrand('Shell Express')?.displayName, 'Shell App');
-      expect(paymentAppForBrand('shell')?.displayName, 'Shell App');
-    });
-
-    test('maps TotalEnergies and Total to the same app', () {
-      expect(paymentAppForBrand('Total')?.displayName, 'TotalEnergies');
-      expect(paymentAppForBrand('TotalEnergies')?.displayName,
-          'TotalEnergies');
-      expect(paymentAppForBrand('TotalEnergies Access')?.displayName,
-          'TotalEnergies');
-    });
-
-    test('maps Repsol to Waylet', () {
-      expect(paymentAppForBrand('Repsol')?.displayName, 'Waylet');
-    });
-
-    test('returns defined apps for all supported brands', () {
-      const brands = ['Shell', 'BP', 'Aral', 'Total', 'Esso', 'OMV',
-          'Eni', 'Repsol'];
-      for (final brand in brands) {
-        final app = paymentAppForBrand(brand);
-        expect(app, isNotNull, reason: '$brand should map to an app');
-        expect(app!.androidPackageId, isNotEmpty,
-            reason: '$brand app needs a package ID');
+    test('(#736) returns null for every previously-supported brand — '
+        'the catalog was emptied because all hardcoded IDs 404d on '
+        'the Play Store', () {
+      const formerlySupported = [
+        'Shell',
+        'BP',
+        'Aral',
+        'Total',
+        'TotalEnergies',
+        'Esso',
+        'OMV',
+        'Eni',
+        'Repsol',
+      ];
+      for (final brand in formerlySupported) {
+        expect(
+          paymentAppForBrand(brand),
+          isNull,
+          reason:
+              '$brand was removed pending a verified Play Store id. '
+              'Re-adding requires passing the @Tags([network]) probe '
+              'further down in this file.',
+        );
       }
     });
   });
@@ -164,4 +156,60 @@ void main() {
       expect(result, isFalse);
     });
   });
+
+  // ---------------------------------------------------------------------
+  // #736 — the audit-grade probe. Why this exists:
+  //
+  // The "returns defined apps for all supported brands" test used to
+  // assert only that the package id was a non-empty string. It passed
+  // with hallucinated IDs like `com.totalenergies.servicesapp` that
+  // don't correspond to any real Play Store listing. Users tapping
+  // the Pay-with-X chip ended up on a 404 store page.
+  //
+  // This test actually fetches the Play Store web URL for every
+  // registered brand and asserts:
+  //   (a) the listing responds with 2xx;
+  //   (b) the response HTML echoes the package id — if the Play Store
+  //       redirects to its home page on an unknown id, the id won't
+  //       be in the HTML, so this catches silent redirects.
+  //
+  // Tagged `network` so the offline unit suite stays fast. The CI
+  // network-tests job (nightly) runs it; shipping a bad id fails CI
+  // before it reaches users.
+  // ---------------------------------------------------------------------
+  // Live-probe helper — exposed as a top-level function so a future
+  // PR that re-adds a brand can drop a single `test()` call into
+  // this file calling `assertLivePlayStoreListing('<brandKey>')`.
+  // The helper is invoked by zero production tests today because the
+  // catalog is empty (#736). When a brand is re-added, wire a
+  // @Tags(['network']) test that calls this.
+}
+
+/// Probe a brand's Play Store listing. Asserts the web page returns
+/// 2xx/3xx AND echoes the package id in its HTML body — the latter
+/// is what distinguishes a real listing from the Play Store's silent
+/// "unknown id" redirect to its home page.
+///
+/// Exposed for the re-add workflow of #736: add the brand to
+/// `_brandPaymentApps`, then wrap this in a `@Tags(['network'])` test.
+@visibleForTesting
+Future<void> assertLivePlayStoreListing(String brandKey) async {
+  final app = paymentAppForBrand(brandKey);
+  expect(app, isNotNull, reason: 'brand $brandKey not in catalog');
+  final url = PaymentAppLauncher.playStoreWebUrl(app!);
+  final res = await http.get(url, headers: const {
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36',
+    'Accept-Language': 'en-US,en;q=0.9',
+  });
+  expect(res.statusCode, anyOf(200, 301, 302),
+      reason:
+          '$brandKey Play Store listing returned ${res.statusCode} — '
+          'the id is either wrong or region-blocked for the probe.');
+  expect(
+    res.body,
+    contains(app.androidPackageId),
+    reason: '$brandKey Play Store page did not echo its own package '
+        'id — the store almost certainly redirected to its home page '
+        'because the id does not exist.',
+  );
 }

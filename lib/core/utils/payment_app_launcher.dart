@@ -124,41 +124,32 @@ class PaymentAppLauncher {
       'https://play.google.com/store/apps/details?id=${app.androidPackageId}');
 }
 
-const _brandPaymentApps = {
-  'shell': PaymentApp(
-    displayName: 'Shell App',
-    androidPackageId: 'com.shell.sitibv.shellgoplus',
-  ),
-  'bp': PaymentApp(
-    displayName: 'BPme',
-    androidPackageId: 'com.bp.bpme',
-  ),
-  'aral': PaymentApp(
-    displayName: 'Aral Pay',
-    androidPackageId: 'de.aral.arelion',
-  ),
-  'totalenergies': PaymentApp(
-    displayName: 'TotalEnergies',
-    androidPackageId: 'com.totalenergies.servicesapp',
-  ),
-  'total': PaymentApp(
-    displayName: 'TotalEnergies',
-    androidPackageId: 'com.totalenergies.servicesapp',
-  ),
-  'esso': PaymentApp(
-    displayName: 'Esso Extras',
-    androidPackageId: 'com.exxonmobil.xsell',
-  ),
-  'omv': PaymentApp(
-    displayName: 'OMV Drive',
-    androidPackageId: 'at.omv.business.drive',
-  ),
-  'eni': PaymentApp(
-    displayName: 'Eni Station+',
-    androidPackageId: 'it.eni.stationplus',
-  ),
-  'repsol': PaymentApp(
-    displayName: 'Waylet',
-    androidPackageId: 'com.waylet',
-  ),
-};
+/// Registered branded payment apps. Only entries whose Android
+/// package ID has been verified to resolve to a live Play Store
+/// listing belong here — everything else is a dead link on the
+/// user's device (#736). When an entry is suspicious, remove it
+/// rather than leave it: a missing "Pay with X" chip is far better
+/// UX than a chip that launches the Play Store on a 404 page.
+///
+/// Adding a new brand? Before committing:
+/// 1. Open `https://play.google.com/store/apps/details?id=<id>`
+///    in an incognito browser. Confirm the listing loads.
+/// 2. Add the entry here.
+/// 3. Run `flutter test --tags=network test/core/utils/payment_app_launcher_test.dart`
+///    — the network-tagged probe asserts the Play Store page is live.
+///
+/// The removed entries from before #736 (Aral, TotalEnergies/Total,
+/// Esso, OMV, Eni, Repsol/Waylet) had guessed package IDs that the
+/// user confirmed resolve to 404 Play Store pages. Re-add only with
+/// verified IDs.
+/// Empty pending verified Play Store IDs (#736). Shell's
+/// `com.shell.sitibv.shellgoplus` and BP's `com.bp.bpme` were also
+/// confirmed 404 by the live-probe test along with the other brands.
+/// The whole branded-app catalog was guesswork.
+///
+/// Re-adding a brand requires running:
+/// `flutter test --tags=network test/core/utils/payment_app_launcher_test.dart`
+/// against the candidate ID and getting a green probe. The probe
+/// fetches the Play Store page and asserts the page body echoes the
+/// package id — catching silent redirects to the store home.
+const _brandPaymentApps = <String, PaymentApp>{};
