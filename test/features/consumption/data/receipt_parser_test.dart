@@ -294,6 +294,41 @@ Prix € 1.999/L
         final result = parser.parse('TVA 20.00 % 1.74 EUR\nVolume 5.24 L');
         expect(result.liters, closeTo(5.24, 0.01));
       });
+
+      // User report 2026-04-20: Super U Pomerols receipt came back with
+      // liters empty even though the paper clearly showed "Volume 5.24 ℓ".
+      // French receipts use the typography U+2113 (ℓ, "script small l")
+      // for the unit symbol, and ML Kit OCR passes it through verbatim.
+      // Our regex only accepted Latin l/L, so Volume extraction — and
+      // the price-per-liter-based reconcile fallback — both silently
+      // returned null.
+      test('accepts the typographic ℓ (U+2113) as the litre unit symbol',
+          () {
+        final result = parser.parse('SP95-E10 5.24 ℓ');
+        expect(result.liters, closeTo(5.24, 0.01));
+      });
+
+      test('Super U receipt with ℓ extracts liters, not null (regression)',
+          () {
+        const receipt = '''
+SUPER U
+CHEMIN DU PORTROU
+34810 POMEROLS
+QUITTANCE COPIE
+Date 19-04-2026 15:19:27
+* Pompe 3      SP95-E10
+  Volume         5.24 ℓ
+  Prix     € 1.999/ℓ
+  TOT TTC  € 10.47
+* TVA 20.00 %    € 1.74
+  Net            € 8.73
+''';
+        final result = parser.parse(receipt);
+        expect(result.liters, closeTo(5.24, 0.01));
+        expect(result.totalCost, closeTo(10.47, 0.01));
+        expect(result.pricePerLiter, closeTo(1.999, 0.001));
+        expect(result.brandLayout, 'super_u');
+      });
     });
 
     group('brand layout dispatch', () {
