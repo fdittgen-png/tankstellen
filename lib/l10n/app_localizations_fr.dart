@@ -1929,6 +1929,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tripStop => 'Arrêter l\'enregistrement';
 
   @override
+  String get tripPause => 'Pause';
+
+  @override
+  String get tripResume => 'Reprendre';
+
+  @override
+  String get tripBannerRecording => 'Enregistrement en cours';
+
+  @override
+  String get tripBannerPaused => 'Trajet en pause — toucher pour reprendre';
+
+  @override
   String get tripSaveAsFillUp => 'Enregistrer comme plein';
 
   @override

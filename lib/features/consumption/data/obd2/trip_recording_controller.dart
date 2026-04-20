@@ -73,6 +73,7 @@ class TripRecordingController {
   double _fuelLitersSoFar = 0;
   bool _fuelRateSeen = false;
   bool _polling = false;
+  bool _paused = false;
 
   TripRecordingController({
     required Obd2Service service,
@@ -87,7 +88,23 @@ class TripRecordingController {
   /// Live metrics stream — subscribe to update the recording UI.
   Stream<TripLiveReading> get live => _liveController.stream;
 
-  bool get isRecording => _timer != null;
+  bool get isRecording => _timer != null && !_paused;
+  bool get isPaused => _paused;
+  bool get isActive => _timer != null;
+
+  /// Pause the polling loop without tearing down the recorder. The
+  /// controller keeps its timer alive internally and ignores ticks
+  /// while paused; [resume] flips the flag back without resetting
+  /// state. Safe to call when not recording — no-op.
+  void pause() {
+    if (_timer == null) return;
+    _paused = true;
+  }
+
+  /// Resume a paused recording. Idempotent; no-op if not paused.
+  void resume() {
+    _paused = false;
+  }
 
   /// Start polling. Reads the odometer ONCE to pin the trip start;
   /// subsequent ticks read speed/RPM/fuel-rate/etc. Safe to call
@@ -132,6 +149,7 @@ class TripRecordingController {
   }
 
   Future<void> _pollOnce() async {
+    if (_paused) return; // paused — skip this tick but keep the timer
     if (_polling) return; // previous tick still in flight — skip
     _polling = true;
     try {

@@ -3655,6 +3655,30 @@ abstract class AppLocalizations {
   /// **'Stop recording'**
   String get tripStop;
 
+  /// No description provided for @tripPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get tripPause;
+
+  /// No description provided for @tripResume.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get tripResume;
+
+  /// No description provided for @tripBannerRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording trip'**
+  String get tripBannerRecording;
+
+  /// No description provided for @tripBannerPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip paused — tap to resume'**
+  String get tripBannerPaused;
+
   /// No description provided for @tripSaveAsFillUp.
   ///
   /// In en, this message translates to:

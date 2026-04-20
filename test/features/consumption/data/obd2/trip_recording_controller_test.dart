@@ -56,6 +56,40 @@ void main() {
       expect(ctl.odometerStartKm, isNull);
     });
 
+    test('pause() freezes polling; resume() re-arms it (#726)', () async {
+      final transport = FakeObd2Transport({
+        'ATZ': 'ELM327 v1.5>',
+        'ATE0': 'OK>',
+        'ATL0': 'OK>',
+        'ATH0': 'OK>',
+        'ATSP0': 'OK>',
+        '01A6': '41 A6 00 01 6A 2C>',
+      });
+      final service = Obd2Service(transport);
+      await service.connect();
+
+      final ctl = TripRecordingController(
+        service: service,
+        pollInterval: const Duration(minutes: 1),
+      );
+      await ctl.start();
+      expect(ctl.isRecording, isTrue);
+      expect(ctl.isPaused, isFalse);
+      expect(ctl.isActive, isTrue);
+
+      ctl.pause();
+      expect(ctl.isPaused, isTrue);
+      expect(ctl.isRecording, isFalse);
+      expect(ctl.isActive, isTrue,
+          reason: 'paused means "still owns the service", not "stopped"');
+
+      ctl.resume();
+      expect(ctl.isPaused, isFalse);
+      expect(ctl.isRecording, isTrue);
+
+      await ctl.stop();
+    });
+
     test('refreshOdometer() pulls a fresh reading before stop()',
         () async {
       // Transport returns two different values on successive 01A6 calls

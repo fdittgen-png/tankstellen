@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/country/country_switch_listener.dart';
 import '../core/language/language_provider.dart';
 import '../core/theme/theme_mode_provider.dart';
+import '../features/consumption/presentation/widgets/trip_recording_banner.dart';
 import '../features/widget/presentation/widget_click_listener.dart';
 import '../l10n/app_localizations.dart';
 import 'router.dart';
@@ -51,9 +52,14 @@ class TankstellenApp extends ConsumerWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       builder: (context, child) {
+        // #726 — TripRecordingBanner renders a thin "recording…"
+        // strip above every screen whenever the trip provider is
+        // active. Zero-height when idle.
         return WidgetClickListener(
           child: CountrySwitchListener(
-            child: child ?? const SizedBox.shrink(),
+            child: TripRecordingBanner(
+              child: child ?? const SizedBox.shrink(),
+            ),
           ),
         );
       },

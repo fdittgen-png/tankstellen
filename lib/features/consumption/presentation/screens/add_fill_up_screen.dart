@@ -11,6 +11,7 @@ import '../../../search/domain/entities/fuel_type.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/obd2/obd2_connection_errors.dart';
+import '../../providers/trip_recording_provider.dart';
 import '../widgets/obd2_adapter_picker.dart';
 import 'trip_recording_screen.dart';
 import '../../data/receipt_scan_service.dart';
@@ -232,13 +233,18 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     try {
       final service = await showObd2AdapterPicker(context);
       if (service == null || !mounted) return;
+      // #726 — hand the service off to the app-wide recording
+      // provider. It survives navigation, so the user can leave
+      // this screen (and the entire Consumption tab) and come back
+      // later via the banner. The provider disconnects the service
+      // for us inside stop().
+      await ref.read(tripRecordingProvider.notifier).start(service);
+      if (!mounted) return;
       final result = await Navigator.of(context).push<TripSaveResult?>(
         MaterialPageRoute(
-          builder: (_) => TripRecordingScreen(service: service),
+          builder: (_) => const TripRecordingScreen(),
         ),
       );
-      // Screen owns the service lifecycle — disconnect once it pops.
-      await service.disconnect();
       if (!mounted || result == null) return;
       setState(() {
         if (result.odometerKm != null) {

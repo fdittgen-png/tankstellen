@@ -1919,6 +1919,18 @@ class AppLocalizationsSv extends AppLocalizations {
   String get tripStop => 'Stop recording';
 
   @override
+  String get tripPause => 'Pause';
+
+  @override
+  String get tripResume => 'Resume';
+
+  @override
+  String get tripBannerRecording => 'Recording trip';
+
+  @override
+  String get tripBannerPaused => 'Trip paused — tap to resume';
+
+  @override
   String get tripSaveAsFillUp => 'Save as fill-up';
 
   @override

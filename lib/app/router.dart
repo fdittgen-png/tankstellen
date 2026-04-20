@@ -20,6 +20,7 @@ import '../features/report/presentation/screens/report_screen.dart';
 import '../features/consumption/presentation/screens/add_fill_up_screen.dart';
 import '../features/consumption/presentation/screens/consumption_screen.dart';
 import '../features/consumption/presentation/screens/pick_station_for_fill_up_screen.dart';
+import '../features/consumption/presentation/screens/trip_recording_screen.dart';
 import '../features/search/domain/entities/fuel_type.dart';
 import '../features/price_history/presentation/screens/price_history_screen.dart';
 import '../features/search/presentation/screens/ev_station_detail_screen.dart';
@@ -244,6 +245,16 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/consumption/pick-station',
         builder: (_, _) => const PickStationForFillUpScreen(),
+      ),
+      // #726 — global trip recording view. The recording session
+      // itself lives in `tripRecordingProvider` (keepAlive), so this
+      // screen is a thin viewer that can come and go without losing
+      // state. Opened from AddFillUpScreen after OBD2 connect, and
+      // re-entered by tapping the banner shown on every screen
+      // while a trip is active.
+      GoRoute(
+        path: '/trip-recording',
+        builder: (_, _) => const TripRecordingScreen(),
       ),
       GoRoute(
         path: '/consumption/add',
