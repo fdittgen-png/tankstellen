@@ -801,6 +801,16 @@
   "qrScannerGuidance": "Kamera auf einen QR-Code richten",
   "torchOn": "Blitz einschalten",
   "torchOff": "Blitz ausschalten",
+  "obdNoAdapter": "Kein OBD2-Adapter in Reichweite",
+  "obdOdometerUnavailable": "Kilometerstand konnte nicht gelesen werden",
+  "obdPermissionDenied": "Bluetooth-Berechtigung in den Einstellungen erteilen",
+  "obdAdapterUnresponsive": "Keine Antwort — Zündung einschalten und neu versuchen",
+  "obdOdometerRead": "Kilometerstand gelesen: {km} km",
+  "@obdOdometerRead": {
+    "placeholders": {
+      "km": { "type": "int" }
+    }
+  },
   "vehicleFuelNotSet": "Nicht gesetzt",
   "wizardVehicleTapToEdit": "Zum Bearbeiten tippen",
   "wizardVehicleDefaultBadge": "Standard",

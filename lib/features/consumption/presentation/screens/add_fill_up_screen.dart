@@ -10,8 +10,8 @@ import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
-import '../../data/obd2/obd2_service.dart';
-import '../../data/obd2/obd2_transport.dart';
+import '../../data/obd2/obd2_connection_errors.dart';
+import '../../data/obd2/obd2_connection_service.dart';
 import '../../data/receipt_scan_service.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
@@ -219,39 +219,63 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     }
   }
 
+  /// Tap handler for the OBD-II button. First in-car path (#742) —
+  /// no picker UI yet: consume the first scan batch, pick the
+  /// highest-RSSI known adapter, connect, read the odometer. Picker
+  /// UI will replace this in #743.
   Future<void> _readObd() async {
     setState(() => _obdReading = true);
+    final l = AppLocalizations.of(context);
+    final connection = ref.read(obd2ConnectionProvider);
     try {
-      // TODO: Replace FakeObd2Transport with BluetoothObd2Transport
-      // when flutter_blue_plus is integrated and tested on real hardware.
-      final transport = FakeObd2Transport({
-        'ATZ': 'ELM327 v1.5>',
-        'ATE0': 'OK>',
-        'ATL0': 'OK>',
-        'ATH0': 'OK>',
-        'ATSP0': 'OK>',
-        '01A6': 'NO DATA>',
-        '0131': '41 31 4E 20>',
-      });
-      final service = Obd2Service(transport);
-      final connected = await service.connect();
-      if (!connected || !mounted) return;
-
+      await connection.scan(timeout: const Duration(seconds: 8)).first;
+      if (!mounted) return;
+      final service = await connection.connectBest();
+      if (service == null) {
+        if (!mounted) return;
+        SnackBarHelper.show(
+            context, l?.obdNoAdapter ?? 'No OBD2 adapter in range');
+        return;
+      }
       final km = await service.readOdometerKm();
       await service.disconnect();
-
-      if (km != null && mounted) {
-        setState(() {
-          _odoCtrl.text = km.round().toString();
-        });
-        SnackBarHelper.showSuccess(context,
-            'Odometer read: ${km.round()} km');
-      } else if (mounted) {
-        SnackBarHelper.show(context, 'Could not read odometer');
+      if (!mounted) return;
+      if (km != null) {
+        setState(() => _odoCtrl.text = km.round().toString());
+        SnackBarHelper.showSuccess(
+          context,
+          l?.obdOdometerRead(km.round()) ?? 'Odometer read: ${km.round()} km',
+        );
+      } else {
+        SnackBarHelper.show(
+            context, l?.obdOdometerUnavailable ?? 'Could not read odometer');
       }
-    } catch (e) {
+    } on Obd2PermissionDenied {
       if (mounted) {
-        SnackBarHelper.showError(context, 'OBD-II error: $e');
+        SnackBarHelper.showError(
+          context,
+          l?.obdPermissionDenied ??
+              'Grant Bluetooth permission in system settings',
+        );
+      }
+    } on Obd2ScanTimeout {
+      if (mounted) {
+        SnackBarHelper.showError(
+          context,
+          l?.obdNoAdapter ?? 'No OBD2 adapter in range',
+        );
+      }
+    } on Obd2AdapterUnresponsive {
+      if (mounted) {
+        SnackBarHelper.showError(
+          context,
+          l?.obdAdapterUnresponsive ??
+              "Adapter didn't answer — turn the ignition on and retry",
+        );
+      }
+    } on Obd2ConnectionError catch (e) {
+      if (mounted) {
+        SnackBarHelper.showError(context, e.message);
       }
     } finally {
       if (mounted) setState(() => _obdReading = false);

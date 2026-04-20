@@ -1859,6 +1859,25 @@ class AppLocalizationsIt extends AppLocalizations {
   String get torchOff => 'Turn flash off';
 
   @override
+  String get obdNoAdapter => 'No OBD2 adapter in range';
+
+  @override
+  String get obdOdometerUnavailable => 'Could not read odometer';
+
+  @override
+  String get obdPermissionDenied =>
+      'Grant Bluetooth permission in system settings';
+
+  @override
+  String get obdAdapterUnresponsive =>
+      'Adapter didn\'t answer — turn the ignition on and retry';
+
+  @override
+  String obdOdometerRead(int km) {
+    return 'Odometer read: $km km';
+  }
+
+  @override
   String get vehicleFuelNotSet => 'Not set';
 
   @override

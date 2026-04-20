@@ -722,6 +722,16 @@
   "qrScannerGuidance": "Pointez la caméra sur un QR code",
   "torchOn": "Allumer le flash",
   "torchOff": "Éteindre le flash",
+  "obdNoAdapter": "Aucun adaptateur OBD2 à portée",
+  "obdOdometerUnavailable": "Impossible de lire le compteur",
+  "obdPermissionDenied": "Accorder la permission Bluetooth dans les paramètres",
+  "obdAdapterUnresponsive": "Pas de réponse — mettez le contact et réessayez",
+  "obdOdometerRead": "Compteur lu : {km} km",
+  "@obdOdometerRead": {
+    "placeholders": {
+      "km": { "type": "int" }
+    }
+  },
   "vehicleFuelNotSet": "Non défini",
   "wizardVehicleTapToEdit": "Toucher pour modifier",
   "wizardVehicleDefaultBadge": "Par défaut",

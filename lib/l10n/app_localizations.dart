@@ -3535,6 +3535,36 @@ abstract class AppLocalizations {
   /// **'Turn flash off'**
   String get torchOff;
 
+  /// No description provided for @obdNoAdapter.
+  ///
+  /// In en, this message translates to:
+  /// **'No OBD2 adapter in range'**
+  String get obdNoAdapter;
+
+  /// No description provided for @obdOdometerUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read odometer'**
+  String get obdOdometerUnavailable;
+
+  /// No description provided for @obdPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant Bluetooth permission in system settings'**
+  String get obdPermissionDenied;
+
+  /// No description provided for @obdAdapterUnresponsive.
+  ///
+  /// In en, this message translates to:
+  /// **'Adapter didn\'t answer — turn the ignition on and retry'**
+  String get obdAdapterUnresponsive;
+
+  /// No description provided for @obdOdometerRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Odometer read: {km} km'**
+  String obdOdometerRead(int km);
+
   /// No description provided for @vehicleFuelNotSet.
   ///
   /// In en, this message translates to:
