@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/country/country_switch_listener.dart';
 import '../core/language/language_provider.dart';
+import '../core/theme/theme_mode_provider.dart';
 import '../features/widget/presentation/widget_click_listener.dart';
 import '../l10n/app_localizations.dart';
 import 'router.dart';
@@ -34,6 +35,7 @@ class TankstellenApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     final language = ref.watch(activeLanguageProvider);
+    final themeMode = ref.watch(themeModeSettingProvider);
 
     return MaterialApp.router(
       // Keying on language.code forces a full rebuild whenever the user
@@ -43,7 +45,7 @@ class TankstellenApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       routerConfig: router,
       locale: language.locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

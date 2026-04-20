@@ -835,6 +835,10 @@
   "obdPickerTitle": "Pick an OBD2 adapter",
   "obdPickerScanning": "Scanning for adapters…",
   "obdPickerConnecting": "Connecting…",
+  "themeSettingTitle": "Theme",
+  "themeModeLight": "Light",
+  "themeModeDark": "Dark",
+  "themeModeSystem": "Follow system",
   "obdOdometerRead": "Odometer read: {km} km",
   "@obdOdometerRead": {
     "placeholders": {

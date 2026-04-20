@@ -808,6 +808,10 @@
   "obdPickerTitle": "OBD2-Adapter wählen",
   "obdPickerScanning": "Suche nach Adaptern…",
   "obdPickerConnecting": "Verbinden…",
+  "themeSettingTitle": "Design",
+  "themeModeLight": "Hell",
+  "themeModeDark": "Dunkel",
+  "themeModeSystem": "Systemeinstellung",
   "obdOdometerRead": "Kilometerstand gelesen: {km} km",
   "@obdOdometerRead": {
     "placeholders": {
