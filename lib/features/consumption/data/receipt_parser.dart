@@ -280,8 +280,14 @@ class ReceiptParser {
   /// "20.00" from "TVA 20.00 %" or year fragments from a date).
   double? _extractLiters(String text) {
     final patterns = [
-      // "42.35 L" / "42,35 l" / "5.24L" / "42.35 litres"
-      RegExp(r'(\d{1,3}[.,]\d{1,3})\s*(?:l(?:itres?)?|L)\b'),
+      // "42.35 L" / "42,35 l" / "5.24L" / "42.35 litres" / "5.24 ℓ".
+      // The U+2113 script `ℓ` symbol is what French thermal printers
+      // use for the litre unit — ML Kit OCR passes it through verbatim
+      // and Latin-only [lL] silently misses it (user report 2026-04-20
+      // on a Super U Pomerols receipt). The \b anchor is dropped for
+      // ℓ because Dart regex treats the character as non-word, so the
+      // original word boundary never held anyway.
+      RegExp(r'(\d{1,3}[.,]\d{1,3})\s*(?:l(?:itres?)?\b|L\b|\u2113)'),
       // "VOLUME : 42.35" / "Volume: 42,35" / "Quantité = 5.27"
       RegExp(
         r'(?:volume|quantit[eé])\s*[:=]?\s*(\d{1,3}[.,]\d{1,3})',
@@ -346,13 +352,14 @@ class ReceiptParser {
   /// "PRIX/L 1.899", "Prix unit. = 2,028 EUR", "Literpreis: 1.799".
   double? _extractPricePerLiter(String text) {
     return _matchFirst(text, [
-      // "1.899 €/L" or "1,899 EUR/L"
-      RegExp(r'(\d+[.,]\d{2,3})\s*(?:€|EUR)\s*/\s*[lL]'),
-      // "€ 1.999/L" or "EUR 1,999/L" — currency before number
-      RegExp(r'(?:€|EUR)\s*(\d+[.,]\d{2,3})\s*/\s*[lL]'),
-      // Labels: PRIX/L, PU, Preis/L, Literpreis, Prix unit(.), Preis je Liter
+      // "1.899 €/L" or "1,899 EUR/L" — also "1.999 €/ℓ" (U+2113).
+      RegExp(r'(\d+[.,]\d{2,3})\s*(?:€|EUR)\s*/\s*[lL\u2113]'),
+      // "€ 1.999/L" or "EUR 1,999/L" / "€ 1.999/ℓ" — currency before number.
+      RegExp(r'(?:€|EUR)\s*(\d+[.,]\d{2,3})\s*/\s*[lL\u2113]'),
+      // Labels: PRIX/L, PU, Preis/L, Literpreis, Prix unit(.), Preis je Liter.
+      // Also accepts `ℓ` in place of `l` in the slash-L forms.
       RegExp(
-        r'(?:prix\s*/\s*l|prix\s*unit\.?|pu|preis\s*/\s*l|'
+        r'(?:prix\s*/\s*[l\u2113]|prix\s*unit\.?|pu|preis\s*/\s*[l\u2113]|'
         r'preis\s*je\s*liter|literpreis)'
         r'\s*[:=]?\s*€?\s*(\d+[.,]\d{2,3})',
         caseSensitive: false,
