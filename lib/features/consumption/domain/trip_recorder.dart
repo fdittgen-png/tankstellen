@@ -27,6 +27,10 @@ class TripSummary {
   /// Average fuel consumption in L/100 km. Null when the trip carried
   /// no fuel-rate samples (cars without PID 5E / MAF).
   final double? avgLPer100Km;
+  /// Estimated fuel burned during the trip, in litres. Null when the
+  /// trip carried no fuel-rate samples. This is what the "save as
+  /// fill-up" flow pre-fills into the liters field (#726).
+  final double? fuelLitersConsumed;
   final DateTime? startedAt;
   final DateTime? endedAt;
 
@@ -38,6 +42,7 @@ class TripSummary {
     required this.harshBrakes,
     required this.harshAccelerations,
     this.avgLPer100Km,
+    this.fuelLitersConsumed,
     this.startedAt,
     this.endedAt,
   });
@@ -155,6 +160,7 @@ class TripRecorder {
       harshBrakes: _harshBrakes,
       harshAccelerations: _harshAccels,
       avgLPer100Km: avgLPer100Km,
+      fuelLitersConsumed: _hadFuelRate ? _fuelLiters : null,
       startedAt: _startedAt,
       endedAt: _endedAt,
     );

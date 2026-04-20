@@ -1905,6 +1905,39 @@ class AppLocalizationsDe extends AppLocalizations {
   String get themeModeSystem => 'Systemeinstellung';
 
   @override
+  String get tripRecordingTitle => 'Fahrt wird aufgezeichnet';
+
+  @override
+  String get tripSummaryTitle => 'Fahrtzusammenfassung';
+
+  @override
+  String get tripMetricDistance => 'Strecke';
+
+  @override
+  String get tripMetricSpeed => 'Geschwindigkeit';
+
+  @override
+  String get tripMetricFuelUsed => 'Verbraucht';
+
+  @override
+  String get tripMetricAvgConsumption => 'Ø';
+
+  @override
+  String get tripMetricElapsed => 'Dauer';
+
+  @override
+  String get tripMetricOdometer => 'Kilometerstand';
+
+  @override
+  String get tripStop => 'Aufzeichnung beenden';
+
+  @override
+  String get tripSaveAsFillUp => 'Als Tankfüllung speichern';
+
+  @override
+  String get tripDiscard => 'Verwerfen';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Kilometerstand gelesen: $km km';
   }
