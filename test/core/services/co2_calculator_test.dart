@@ -151,7 +151,7 @@ void main() {
         _f(liters: 40, fuelType: FuelType.e10),
         _f(liters: 30, fuelType: FuelType.e85),
       ];
-      final expected = 50 * Co2Calculator.kgCo2PerLiterDiesel +
+      const expected = 50 * Co2Calculator.kgCo2PerLiterDiesel +
           40 * Co2Calculator.kgCo2PerLiterE10 +
           30 * Co2Calculator.kgCo2PerLiterE85;
       expect(Co2Calculator.cumulativeCo2(fills), closeTo(expected, 0.0001));

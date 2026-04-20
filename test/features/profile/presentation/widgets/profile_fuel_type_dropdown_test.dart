@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/country/country_config.dart';
+import 'package:tankstellen/core/country/country_provider.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/profile_fuel_type_dropdown.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+
+/// Override the active country to France so the dropdown includes
+/// enough fuels to exercise the "not all" + "at least E5/diesel"
+/// assertions. #703 made the picker country-aware.
+class _FixedFrance extends ActiveCountry {
+  @override
+  CountryConfig build() => Countries.france;
+}
 
 void main() {
   group('ProfileFuelTypeDropdown', () {
@@ -13,18 +24,23 @@ void main() {
       ValueChanged<FuelType>? onChanged,
     }) {
       return tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
+        ProviderScope(
+          overrides: [
+            activeCountryProvider.overrideWith(() => _FixedFrance()),
           ],
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: Scaffold(
-            body: ProfileFuelTypeDropdown(
-              value: value,
-              onChanged: onChanged ?? (_) {},
+          child: MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: ProfileFuelTypeDropdown(
+                value: value,
+                onChanged: onChanged ?? (_) {},
+              ),
             ),
           ),
         ),

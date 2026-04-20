@@ -89,7 +89,7 @@ final class SearchStateProvider
   }
 }
 
-String _$searchStateHash() => r'86cc44d3d1916e93b1c7deeded7e981a7bc722b9';
+String _$searchStateHash() => r'ca6a2ba8f1cbdd3a1042d75f94149c820fc90cb0';
 
 /// Manages the station search lifecycle and exposes results as [AsyncValue].
 ///
@@ -222,7 +222,7 @@ final class SelectedFuelTypeProvider
   }
 }
 
-String _$selectedFuelTypeHash() => r'7ac6e8dcc8a0d81e2e9de3ac51ada679c0472556';
+String _$selectedFuelTypeHash() => r'71813a25d506b09ebe59bc4ed00192c9f714c60a';
 
 abstract class _$SelectedFuelType extends $Notifier<FuelType> {
   FuelType build();

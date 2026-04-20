@@ -18,7 +18,7 @@ class _FixedActiveLanguage extends ActiveLanguage {
 
 void main() {
   group('SetupScreen', () {
-    List<Object> _setupOverrides() {
+    List<Object> setupOverrides() {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
       return [
@@ -33,7 +33,7 @@ void main() {
       await pumpApp(
         tester,
         const SetupScreen(),
-        overrides: _setupOverrides(),
+        overrides: setupOverrides(),
       );
 
       // Should find ChoiceChip widgets for languages
@@ -47,7 +47,7 @@ void main() {
       await pumpApp(
         tester,
         const SetupScreen(),
-        overrides: _setupOverrides(),
+        overrides: setupOverrides(),
       );
 
       // Country chips contain flag + name, e.g. "🇩🇪 Germany"
@@ -62,7 +62,7 @@ void main() {
       await pumpApp(
         tester,
         const SetupScreen(),
-        overrides: _setupOverrides(),
+        overrides: setupOverrides(),
       );
 
       // Germany requires API key, so button text is 'Continue with demo data'
@@ -74,7 +74,7 @@ void main() {
       await pumpApp(
         tester,
         const SetupScreen(),
-        overrides: _setupOverrides(),
+        overrides: setupOverrides(),
       );
 
       expect(find.byIcon(Icons.local_gas_station), findsOneWidget);
@@ -87,7 +87,7 @@ void main() {
       await pumpApp(
         tester,
         const SetupScreen(),
-        overrides: _setupOverrides(),
+        overrides: setupOverrides(),
       );
 
       // No check or error icons when the field is empty
@@ -100,7 +100,7 @@ void main() {
       await pumpApp(
         tester,
         const SetupScreen(),
-        overrides: _setupOverrides(),
+        overrides: setupOverrides(),
       );
 
       // Enter invalid key
@@ -120,7 +120,7 @@ void main() {
       await pumpApp(
         tester,
         const SetupScreen(),
-        overrides: _setupOverrides(),
+        overrides: setupOverrides(),
       );
 
       // Enter valid UUID key
@@ -142,7 +142,7 @@ void main() {
       await pumpApp(
         tester,
         const SetupScreen(),
-        overrides: _setupOverrides(),
+        overrides: setupOverrides(),
       );
 
       final textField = find.byType(TextField);
@@ -163,7 +163,7 @@ void main() {
       await pumpApp(
         tester,
         const SetupScreen(),
-        overrides: _setupOverrides(),
+        overrides: setupOverrides(),
       );
 
       final textField = find.byType(TextField);

@@ -53,7 +53,7 @@ class ReportService {
         data: {
           'id': stationId,
           'type': reportType,
-          if (correction != null) 'correction': correction,
+          'correction': ?correction,
           'apikey': apiKey,
         },
       );

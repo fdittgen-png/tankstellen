@@ -19,6 +19,7 @@ import '../features/carbon/presentation/screens/carbon_dashboard_screen.dart';
 import '../features/report/presentation/screens/report_screen.dart';
 import '../features/consumption/presentation/screens/add_fill_up_screen.dart';
 import '../features/consumption/presentation/screens/consumption_screen.dart';
+import '../features/consumption/presentation/screens/pick_station_for_fill_up_screen.dart';
 import '../features/search/domain/entities/fuel_type.dart';
 import '../features/price_history/presentation/screens/price_history_screen.dart';
 import '../features/search/presentation/screens/ev_station_detail_screen.dart';
@@ -119,6 +120,12 @@ GoRouter router(Ref ref) {
       final isConsent = state.matchedLocation == '/consent';
       final isReady = storage.isSetupComplete;
       final isSetup = state.matchedLocation == '/setup';
+      // Routes the user can visit FROM inside /setup without the redirect
+      // kicking them back to the wizard (#695). Without this whitelist,
+      // pushing /vehicles/edit during the wizard's Vehicles step rounded
+      // straight back to /setup, making "Add vehicle" appear broken.
+      final isSetupAllowedChild = state.matchedLocation == '/vehicles' ||
+          state.matchedLocation == '/vehicles/edit';
 
       // Step 1: GDPR consent must be given before anything else
       if (!hasConsent && !isConsent) return '/consent';
@@ -127,7 +134,9 @@ GoRouter router(Ref ref) {
       }
 
       // Step 2: Setup (onboarding) must be complete before main app
-      if (!isReady && !isSetup && !isConsent) return '/setup';
+      if (!isReady && !isSetup && !isConsent && !isSetupAllowedChild) {
+        return '/setup';
+      }
       // Landing preference is only applied when leaving the setup flow — not
       // on every subsequent navigation back to '/', which would trap the
       // user on their landing tab.
@@ -179,6 +188,21 @@ GoRouter router(Ref ref) {
               ),
             ],
           ),
+          // 5th branch (#701) — always registered so the router keeps
+          // its state across flag toggles; the shell's nav UI hides
+          // or shows the destination based on the profile flag +
+          // vehicle presence. Path differs from the pre-existing
+          // /consumption route so deep links into the consumption
+          // log from elsewhere (station detail, etc.) keep pushing
+          // on top of the current branch rather than switching tabs.
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/consumption-tab',
+                builder: (_, _) => const ConsumptionScreen(),
+              ),
+            ],
+          ),
         ],
       ),
       GoRoute(
@@ -216,6 +240,10 @@ GoRouter router(Ref ref) {
           final vehicleId = extra is String ? extra : null;
           return EditVehicleScreen(vehicleId: vehicleId);
         },
+      ),
+      GoRoute(
+        path: '/consumption/pick-station',
+        builder: (_, _) => const PickStationForFillUpScreen(),
       ),
       GoRoute(
         path: '/consumption/add',
@@ -266,6 +294,32 @@ GoRouter router(Ref ref) {
         builder: (context, state) {
           final station = state.extra as ChargingStation;
           return EVStationDetailScreen(station: station);
+        },
+      ),
+      // Deep-link friendly EV detail: takes the station id in the
+      // path and hydrates the ChargingStation from storage (#713
+      // widget → station detail flow). Used when the caller has
+      // only the id — e.g. a home-screen widget tap or an external
+      // URL. Falls back to the invalid-id screen when the id is
+      // unknown or the cached JSON is missing.
+      GoRoute(
+        path: '/ev-station/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'];
+          if (!isValidStationId(id)) {
+            return _invalidIdScreen(context, state.matchedLocation);
+          }
+          final storage = ref.watch(storageRepositoryProvider);
+          final raw = storage.getEvFavoriteStationData(id!);
+          if (raw == null) {
+            return _invalidIdScreen(context, state.matchedLocation);
+          }
+          try {
+            final station = ChargingStation.fromJson(raw);
+            return EVStationDetailScreen(station: station);
+          } catch (e) {
+            return _invalidIdScreen(context, state.matchedLocation);
+          }
         },
       ),
       GoRoute(

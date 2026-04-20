@@ -22,7 +22,7 @@ void main() {
     });
 
     test('default EV API key has valid UUID format', () {
-      final key = SettingsHiveStore.defaultEvApiKey;
+      const key = SettingsHiveStore.defaultEvApiKey;
       final uuidRegex = RegExp(
         r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
         caseSensitive: false,
@@ -94,8 +94,18 @@ void main() {
       when(() => test.mockStorage.getRatings()).thenReturn(<String, int>{});
       when(() => test.mockStorage.addEvFavorite(any()))
           .thenAnswer((_) async {});
+      // Favorites.add verifies the JSON readback succeeded (#690 guard
+      // against Hive dropping payloads). The mock must mirror the write.
+      final savedJson = <String, Map<String, dynamic>>{};
       when(() => test.mockStorage.saveEvFavoriteStationData(any(), any()))
-          .thenAnswer((_) async {});
+          .thenAnswer((invocation) async {
+        final id = invocation.positionalArguments[0] as String;
+        final json = invocation.positionalArguments[1] as Map<String, dynamic>;
+        savedJson[id] = json;
+      });
+      when(() => test.mockStorage.getEvFavoriteStationData(any()))
+          .thenAnswer((invocation) =>
+              savedJson[invocation.positionalArguments[0] as String]);
 
       await pumpApp(
         tester,
@@ -125,8 +135,16 @@ void main() {
       when(() => test.mockStorage.getRatings()).thenReturn(<String, int>{});
       when(() => test.mockStorage.addEvFavorite(any()))
           .thenAnswer((_) async {});
+      final savedJson = <String, Map<String, dynamic>>{};
       when(() => test.mockStorage.saveEvFavoriteStationData(any(), any()))
-          .thenAnswer((_) async {});
+          .thenAnswer((invocation) async {
+        final id = invocation.positionalArguments[0] as String;
+        final json = invocation.positionalArguments[1] as Map<String, dynamic>;
+        savedJson[id] = json;
+      });
+      when(() => test.mockStorage.getEvFavoriteStationData(any()))
+          .thenAnswer((invocation) =>
+              savedJson[invocation.positionalArguments[0] as String]);
 
       await pumpApp(
         tester,

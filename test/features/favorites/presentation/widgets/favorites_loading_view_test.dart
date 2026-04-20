@@ -14,8 +14,8 @@ void main() {
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: const Scaffold(body: FavoritesLoadingView()),
+          locale: Locale('en'),
+          home: Scaffold(body: FavoritesLoadingView()),
         ),
       ),
     );

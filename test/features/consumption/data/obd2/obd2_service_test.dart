@@ -2,7 +2,83 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 
+// Shared AT-init boilerplate for the FakeObd2Transport.
+const _initResponses = {
+  'ATZ': 'ELM327 v1.5>',
+  'ATE0': 'OK>',
+  'ATL0': 'OK>',
+  'ATH0': 'OK>',
+  'ATSP0': 'OK>',
+};
+
+Future<Obd2Service> _connected(Map<String, String> extra) async {
+  final transport = FakeObd2Transport({..._initResponses, ...extra});
+  final service = Obd2Service(transport);
+  await service.connect();
+  return service;
+}
+
 void main() {
+  group('Obd2Service PID expansion (#717)', () {
+    test('readEngineLoad parses PID 04', () async {
+      final service = await _connected({'0104': '41 04 80>'});
+      expect(await service.readEngineLoad(), closeTo(50.2, 0.1));
+    });
+
+    test('readThrottlePercent parses PID 11', () async {
+      final service = await _connected({'0111': '41 11 40>'});
+      expect(await service.readThrottlePercent(), closeTo(25.1, 0.1));
+    });
+
+    test('readFuelRateLPerHour returns PID 5E when supported', () async {
+      final service = await _connected({'015E': '41 5E 08 00>'});
+      expect(await service.readFuelRateLPerHour(), closeTo(102.4, 0.1));
+    });
+
+    test(
+        'readFuelRateLPerHour falls back to MAF (PID 10) when 5E returns '
+        'NO DATA', () async {
+      final service = await _connected({
+        '015E': 'NO DATA>',
+        '0110': '41 10 04 00>', // MAF = 10.24 g/s
+      });
+      final rate = await service.readFuelRateLPerHour();
+      // 10.24 × 3600 / (14.7 × 740) ≈ 3.389 L/h
+      expect(rate, closeTo(3.389, 0.01));
+    });
+
+    test(
+        'readFuelRateLPerHour returns null when neither PID 5E nor MAF '
+        'are supported', () async {
+      final service = await _connected({
+        '015E': 'NO DATA>',
+        '0110': 'NO DATA>',
+      });
+      expect(await service.readFuelRateLPerHour(), isNull);
+    });
+
+    test('readMafGramsPerSecond parses PID 10', () async {
+      final service = await _connected({'0110': '41 10 04 00>'});
+      expect(await service.readMafGramsPerSecond(), closeTo(10.24, 0.01));
+    });
+
+    test('readFuelLevelPercent parses PID 2F', () async {
+      final service = await _connected({'012F': '41 2F 80>'});
+      expect(await service.readFuelLevelPercent(), closeTo(50.2, 0.1));
+    });
+
+    test('every new reader returns null when the transport is disconnected',
+        () async {
+      final service = await _connected({});
+      await service.disconnect();
+      expect(await service.readEngineLoad(), isNull);
+      expect(await service.readThrottlePercent(), isNull);
+      expect(await service.readFuelRateLPerHour(), isNull);
+      expect(await service.readMafGramsPerSecond(), isNull);
+      expect(await service.readFuelLevelPercent(), isNull);
+    });
+  });
+
   group('Obd2Service', () {
     test('connect initializes ELM327 adapter', () async {
       final transport = FakeObd2Transport({

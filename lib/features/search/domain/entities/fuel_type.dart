@@ -96,6 +96,63 @@ enum FuelCategory {
   meta,
 }
 
+/// Interchangeable family a typical vehicle can physically accept.
+///
+/// A petrol car can be filled with any of E5 / E10 / E98 / E85 at the
+/// pump (the mix changes the actual burn but the hardware accepts it),
+/// a diesel car takes diesel or diesel-premium, LPG / CNG / electric
+/// cars are one-fuel-only. Used by the fill-up form to offer "you
+/// normally run E10 but you filled with E85 today" flexibility
+/// without showing impossible options like EV on a diesel receipt
+/// (#713).
+enum FuelCompatibilityFamily { petrol, diesel, lpg, cng, electric, hydrogen }
+
+/// The compatibility family a single [FuelType] belongs to.
+FuelCompatibilityFamily fuelCompatibilityFamily(FuelType fuel) {
+  return switch (fuel) {
+    FuelTypeE5() ||
+    FuelTypeE10() ||
+    FuelTypeE98() ||
+    FuelTypeE85() =>
+      FuelCompatibilityFamily.petrol,
+    FuelTypeDiesel() ||
+    FuelTypeDieselPremium() =>
+      FuelCompatibilityFamily.diesel,
+    FuelTypeLpg() => FuelCompatibilityFamily.lpg,
+    FuelTypeCng() => FuelCompatibilityFamily.cng,
+    FuelTypeElectric() => FuelCompatibilityFamily.electric,
+    FuelTypeHydrogen() => FuelCompatibilityFamily.hydrogen,
+    // "All" is the search-time wildcard; treat as petrol for UI fallback.
+    FuelTypeAll() => FuelCompatibilityFamily.petrol,
+  };
+}
+
+/// Ordered list of fuels a vehicle whose primary fuel is [primary]
+/// can practically be filled with. The first entry is always [primary]
+/// so dropdowns show it on top.
+List<FuelType> compatibleFuelsFor(FuelType primary) {
+  final list = switch (fuelCompatibilityFamily(primary)) {
+    FuelCompatibilityFamily.petrol => const [
+        FuelType.e10,
+        FuelType.e5,
+        FuelType.e98,
+        FuelType.e85,
+      ],
+    FuelCompatibilityFamily.diesel => const [
+        FuelType.diesel,
+        FuelType.dieselPremium,
+      ],
+    FuelCompatibilityFamily.lpg => const [FuelType.lpg],
+    FuelCompatibilityFamily.cng => const [FuelType.cng],
+    FuelCompatibilityFamily.electric => const [FuelType.electric],
+    FuelCompatibilityFamily.hydrogen => const [FuelType.hydrogen],
+  };
+  // Pin [primary] first so the picker's default landing option is the
+  // vehicle's configured fuel.
+  final reordered = <FuelType>[primary, ...list.where((f) => f != primary)];
+  return reordered;
+}
+
 // ── Subclasses ──────────────────────────────────────────────────────────────
 
 final class FuelTypeE5 extends FuelType {

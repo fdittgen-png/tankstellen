@@ -76,10 +76,15 @@ StationService _resolveServiceForCountry(Ref ref, String countryCode) {
 GeocodingChain geocodingChain(Ref ref) {
   final cache = ref.watch(cacheManagerProvider);
   final country = ref.watch(activeCountryProvider);
+  // Nominatim first — it's deterministic, country-aware, and handles
+  // structured inputs (postal codes + French arrondissement hints)
+  // reliably. Native geocoding can silently return the device's last
+  // known GPS position on some Android builds when the query doesn't
+  // match cleanly, poisoning the search with local coords (#690).
   return GeocodingChain(
     [
-      NativeGeocodingProvider(countryName: country.name), // Android/iOS only
       NominatimGeocodingProvider(countryCode: country.code), // All platforms
+      NativeGeocodingProvider(countryName: country.name), // Android/iOS fallback
     ],
     cache,
     countryCode: country.code,
@@ -90,6 +95,9 @@ GeocodingChain geocodingChain(Ref ref) {
 // Interceptors (moved from dio_client.dart, now private to this file)
 // ---------------------------------------------------------------------------
 
+// Key für den Zugriff auf die freie Tankerkönig-Spritpreis-API
+// Für eigenen Key bitte hier https://creativecommons.tankerkoenig.de
+// registrieren.
 class _ApiKeyInterceptor extends Interceptor {
   final Ref _ref;
   _ApiKeyInterceptor(this._ref);

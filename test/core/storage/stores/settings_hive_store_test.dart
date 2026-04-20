@@ -98,39 +98,36 @@ void main() {
       expect(store.isSetupComplete, isFalse);
     });
 
-    test('#555 regression — isSetupComplete must NOT piggy-back on the '
-        'bundled Tankerkoenig key being available', () async {
-      // hasApiKey() is always true because of the #521 default key;
-      // isSetupComplete must depend on the explicit setup-skip flag
-      // instead. This was the regression that permanently bypassed
-      // the wizard on fresh installs.
-      expect(store.hasApiKey(), isTrue);
+    test('isSetupComplete reflects only the explicit setup-skip flag', () async {
+      // No bundled Tankerkönig key (#713) — wizard completion must depend
+      // on the explicit flag, not on key availability.
+      expect(store.hasApiKey(), isFalse);
       expect(store.isSetupComplete, isFalse);
     });
   });
 
   group('Tankerkoenig API key', () {
-    test('without a custom key, getApiKey returns the bundled community '
-        'default so German search works out of the box (#521)', () async {
-      // Reload into the in-memory cache. _mockSecureStorage is empty.
+    test('without a custom key, getApiKey returns null (#713 — Tankerkönig '
+        'TOS forbid bundling any key, including demo keys, in public source)',
+        () async {
       await SettingsHiveStore.loadApiKey();
-      expect(store.getApiKey(), SettingsHiveStore.defaultTankerkoenigKey);
-      expect(store.hasApiKey(), isTrue);
+      expect(store.getApiKey(), isNull);
+      expect(store.hasApiKey(), isFalse);
       expect(store.hasCustomApiKey(), isFalse);
     });
 
-    test('setApiKey overrides the default and flips hasCustomApiKey',
-        () async {
+    test('setApiKey persists the user key and flips hasApiKey', () async {
       await store.setApiKey('custom-key-123');
       expect(store.getApiKey(), 'custom-key-123');
+      expect(store.hasApiKey(), isTrue);
       expect(store.hasCustomApiKey(), isTrue);
     });
 
-    test('deleteApiKey clears the custom key and falls back to default',
-        () async {
+    test('deleteApiKey clears the user key and returns to null', () async {
       await store.setApiKey('custom-key-123');
       await store.deleteApiKey();
-      expect(store.getApiKey(), SettingsHiveStore.defaultTankerkoenigKey);
+      expect(store.getApiKey(), isNull);
+      expect(store.hasApiKey(), isFalse);
       expect(store.hasCustomApiKey(), isFalse);
     });
   });

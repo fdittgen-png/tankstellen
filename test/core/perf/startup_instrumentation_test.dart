@@ -20,7 +20,7 @@ void main() {
 
   group('Startup instrumentation', () {
     test('AppInitializer imports StartupTimer', () {
-      expect(startupSource, contains("startup_timer.dart"));
+      expect(startupSource, contains('startup_timer.dart'));
     });
 
     test('AppInitializer starts the timer before initialization', () {

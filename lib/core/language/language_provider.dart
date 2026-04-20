@@ -3,7 +3,6 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/profile/providers/profile_provider.dart';
-import '../../features/profile/data/repositories/profile_repository.dart';
 import '../storage/storage_providers.dart';
 
 part 'language_provider.g.dart';

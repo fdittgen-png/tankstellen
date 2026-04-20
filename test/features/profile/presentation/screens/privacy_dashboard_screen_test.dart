@@ -65,7 +65,7 @@ void main() {
       ));
     });
 
-    List<Object> _overrides() => [
+    List<Object> overrides() => [
           storageRepositoryProvider.overrideWithValue(mockStorage),
           syncStateProvider.overrideWith(() => _DisabledSyncState()),
           traceStorageProvider.overrideWithValue(_StubTraceStorage()),
@@ -76,7 +76,7 @@ void main() {
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
-        overrides: _overrides(),
+        overrides: overrides(),
       );
 
       expect(find.text('5'), findsOneWidget); // favorites
@@ -90,7 +90,7 @@ void main() {
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
-        overrides: _overrides(),
+        overrides: overrides(),
       );
 
       // API key stored should show Yes
@@ -104,7 +104,7 @@ void main() {
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
-        overrides: _overrides(),
+        overrides: overrides(),
       );
 
       expect(
@@ -137,7 +137,7 @@ void main() {
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
-        overrides: _overrides(),
+        overrides: overrides(),
       );
 
       // The button lives in the ListView below the fold — scroll it
@@ -164,7 +164,7 @@ void main() {
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
-        overrides: _overrides(),
+        overrides: overrides(),
       );
 
       await tester.scrollUntilVisible(
@@ -179,7 +179,7 @@ void main() {
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
-        overrides: _overrides(),
+        overrides: overrides(),
       );
 
       await tester.scrollUntilVisible(
@@ -194,7 +194,7 @@ void main() {
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
-        overrides: _overrides(),
+        overrides: overrides(),
       );
 
       await tester.scrollUntilVisible(
@@ -216,7 +216,7 @@ void main() {
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
-        overrides: _overrides(),
+        overrides: overrides(),
       );
 
       await tester.scrollUntilVisible(
@@ -238,7 +238,7 @@ void main() {
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
-        overrides: _overrides(),
+        overrides: overrides(),
       );
 
       expect(
@@ -252,7 +252,7 @@ void main() {
       await pumpApp(
         tester,
         const PrivacyDashboardScreen(),
-        overrides: _overrides(),
+        overrides: overrides(),
       );
 
       expect(find.text('Estimated storage'), findsOneWidget);

@@ -54,6 +54,23 @@ abstract class UserProfile with _$UserProfile {
     /// Amenities the user requires at stations by default (empty = no filter).
     /// Persisted per-profile and loaded into the search criteria screen.
     @Default([]) List<StationAmenity> preferredAmenities,
+    /// Optional reference to the user's default [VehicleProfile] (#694).
+    /// When set, AddFillUpScreen pre-selects this vehicle. Null keeps the
+    /// vehicle selector empty so the user can still log fill-ups without
+    /// attributing them to any vehicle.
+    String? defaultVehicleId,
+    /// Tie-breaker for hybrid default vehicles (#706). Null on
+    /// non-hybrid vehicles. When set to [FuelType.electric], search
+    /// + station filters treat a hybrid like an EV; when set to any
+    /// combustion fuel, they treat it like a petrol/diesel car.
+    /// Defaults to null so existing profiles don't need migration.
+    @FuelTypeJsonConverter() FuelType? hybridFuelChoice,
+    /// Opt-in visibility of the Consumption tab in the bottom nav
+    /// (#701). The tab stays hidden unless this is true AND at least
+    /// one vehicle is configured — the log is vehicle-centric and a
+    /// first-time user without a vehicle would only see the empty
+    /// state.
+    @Default(false) bool showConsumptionTab,
   }) = _UserProfile;
 
   factory UserProfile.fromJson(Map<String, dynamic> json) =>

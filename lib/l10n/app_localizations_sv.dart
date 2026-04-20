@@ -1757,6 +1757,117 @@ class AppLocalizationsSv extends AppLocalizations {
       'Add your car to filter by connector and estimate charging costs.';
 
   @override
+  String get vehiclesWizardTitle => 'My vehicles (optional)';
+
+  @override
+  String get vehiclesWizardSubtitle =>
+      'Add your car to pre-fill the consumption log and enable EV connector filters. You can skip this and add vehicles later.';
+
+  @override
+  String get vehiclesWizardNoneYet => 'No vehicle configured yet.';
+
+  @override
+  String vehiclesWizardYoursList(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vehicles',
+      one: '1 vehicle',
+    );
+    return 'You have $_temp0:';
+  }
+
+  @override
+  String get vehiclesWizardSkipHint =>
+      'Skip to finish setup — you can add vehicles anytime from Settings.';
+
+  @override
+  String get fillUpVehicleLabel => 'Vehicle';
+
+  @override
+  String get fillUpVehicleNone => 'No vehicle';
+
+  @override
+  String get fillUpVehicleRequired => 'Vehicle is required';
+
+  @override
+  String get reportScanError => 'Report scan error';
+
+  @override
+  String get pickStationTitle => 'Pick a station';
+
+  @override
+  String get pickStationHelper =>
+      'Start the fill-up from a known station so prices, brand and fuel type fill themselves in.';
+
+  @override
+  String get pickStationEmpty =>
+      'No favorite stations yet — add some from Search or Favorites, or skip and fill in manually.';
+
+  @override
+  String get pickStationSkip => 'Skip — add without a station';
+
+  @override
+  String get scanPump => 'Scan pump';
+
+  @override
+  String get scanPayment => 'Scan payment QR';
+
+  @override
+  String get qrPaymentBeneficiary => 'Beneficiary';
+
+  @override
+  String get qrPaymentAmount => 'Amount';
+
+  @override
+  String get qrPaymentEpcTitle => 'SEPA payment';
+
+  @override
+  String get qrPaymentEpcEmpty => 'No fields decoded';
+
+  @override
+  String get qrPaymentOpenInBank => 'Open in bank app';
+
+  @override
+  String get qrPaymentLaunchFailed => 'No app available to open this code';
+
+  @override
+  String get qrPaymentUnknownTitle => 'Unrecognised code';
+
+  @override
+  String get qrPaymentCopyRaw => 'Copy raw text';
+
+  @override
+  String get qrPaymentEpcCopied =>
+      'Bank details copied — paste into your banking app';
+
+  @override
+  String get vehicleFuelNotSet => 'Not set';
+
+  @override
+  String get wizardVehicleTapToEdit => 'Tap to edit';
+
+  @override
+  String get wizardVehicleDefaultBadge => 'Default';
+
+  @override
+  String get profileDefaultVehicleLabel => 'Default vehicle (optional)';
+
+  @override
+  String get profileDefaultVehicleNone => 'No default';
+
+  @override
+  String get profileFuelFromVehicleHint =>
+      'Fuel type is derived from your default vehicle. Clear the vehicle to pick a fuel directly.';
+
+  @override
+  String get consumptionNoVehicleTitle => 'Add a vehicle first';
+
+  @override
+  String get consumptionNoVehicleBody =>
+      'Fill-ups are attributed to a vehicle. Add your car to start logging consumption.';
+
+  @override
   String get vehicleAdd => 'Add vehicle';
 
   @override
@@ -2001,6 +2112,14 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get helpBannerAlerts =>
       'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.';
+
+  @override
+  String get helpBannerConsumption =>
+      'Log every fill-up to track your real-world consumption and CO₂ footprint. Swipe left to delete an entry.';
+
+  @override
+  String get helpBannerVehicles =>
+      'Add your vehicles so fill-ups and fuel preferences default correctly. The first vehicle becomes your default.';
 
   @override
   String get syncNow => 'Sync now';
@@ -2449,7 +2568,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get linkDeviceImportDescription =>
-      'Enter the device code from your other device to import its favorites and alerts.';
+      'Enter the device code from your other device to import its favorites, alerts, vehicles, and consumption log. Each device keeps its own profile and defaults.';
 
   @override
   String get linkDeviceCodeFieldLabel => 'Device code';
@@ -2465,7 +2584,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get linkDeviceHowItWorksBody =>
-      '1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites and alerts\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity. Data is merged, not moved.';
+      '1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites, alerts, vehicles, and consumption logs\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity and its own profile (preferred fuel, default vehicle, landing screen). Data is merged, not moved.';
 
   @override
   String get vehicleSetActive => 'Set active';

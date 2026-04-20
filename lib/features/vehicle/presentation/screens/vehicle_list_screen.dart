@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/storage/storage_keys.dart';
+import '../../../../core/widgets/help_banner.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/vehicle_providers.dart';
 import '../widgets/vehicle_card.dart';
@@ -21,9 +23,24 @@ class VehicleListScreen extends ConsumerWidget {
         title: Text(l?.vehiclesTitle ?? 'My vehicles'),
       ),
       body: vehicles.isEmpty
-          ? _EmptyState(
-              message: l?.vehiclesEmptyMessage ??
-                  'Add your car to filter by connector and estimate charging costs.',
+          ? Column(
+              children: [
+                HelpBanner(
+                  storageKey: StorageKeys.helpBannerVehicles,
+                  icon: Icons.tips_and_updates_outlined,
+                  message: l?.helpBannerVehicles ??
+                      'Add your vehicles so fill-ups and fuel preferences '
+                          'default correctly. The first vehicle becomes '
+                          'your default.',
+                ),
+                Expanded(
+                  child: _EmptyState(
+                    message: l?.vehiclesEmptyMessage ??
+                        'Add your car to filter by connector and estimate '
+                            'charging costs.',
+                  ),
+                ),
+              ],
             )
           : ListView.separated(
               padding: EdgeInsets.fromLTRB(
@@ -32,10 +49,20 @@ class VehicleListScreen extends ConsumerWidget {
                 16,
                 MediaQuery.of(context).viewPadding.bottom + 96,
               ),
-              itemCount: vehicles.length,
+              itemCount: vehicles.length + 1,
               separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
-                final v = vehicles[index];
+                if (index == 0) {
+                  return HelpBanner(
+                    storageKey: StorageKeys.helpBannerVehicles,
+                    icon: Icons.tips_and_updates_outlined,
+                    message: l?.helpBannerVehicles ??
+                        'Add your vehicles so fill-ups and fuel preferences '
+                            'default correctly. The first vehicle becomes '
+                            'your default.',
+                  );
+                }
+                final v = vehicles[index - 1];
                 return VehicleCard(
                   vehicle: v,
                   isActive: v.id == active?.id,

@@ -495,7 +495,7 @@ void main() {
     });
 
     group('per-station currency (#514)', () {
-      String _priceRichText(WidgetTester tester) {
+      String priceRichText(WidgetTester tester) {
         // Concatenate all RichText.toPlainText() so the fuel price
         // RichText (which embeds the superscript 9/10ths digit as a
         // WidgetSpan) is captured alongside plain fragments.
@@ -540,7 +540,7 @@ void main() {
           ),
         );
 
-        final rendered = _priceRichText(tester);
+        final rendered = priceRichText(tester);
         expect(rendered, contains('£'),
             reason: 'UK station must render its price in pounds');
         expect(rendered, isNot(contains('€')),
@@ -574,7 +574,7 @@ void main() {
           ),
         );
 
-        expect(_priceRichText(tester), contains('€'));
+        expect(priceRichText(tester), contains('€'));
       });
 
       testWidgets(
@@ -595,7 +595,7 @@ void main() {
           ),
         );
 
-        final rendered = _priceRichText(tester);
+        final rendered = priceRichText(tester);
         expect(rendered, contains('€'),
             reason: 'Berlin coordinates must resolve to DE → € even '
                 'under a GB profile (bbox fallback)');
@@ -638,7 +638,7 @@ void main() {
           ),
         );
 
-        final rendered = _priceRichText(tester);
+        final rendered = priceRichText(tester);
         expect(rendered, contains('€'),
             reason: 'French coordinates must resolve to FR → € even '
                 'with a bare numeric id and a GB profile');
@@ -677,7 +677,7 @@ void main() {
           ),
         );
 
-        final rendered = _priceRichText(tester);
+        final rendered = priceRichText(tester);
         expect(rendered, contains('£'));
         expect(rendered, isNot(contains('€')));
       });
@@ -711,7 +711,7 @@ void main() {
           ),
         );
 
-        final rendered = _priceRichText(tester);
+        final rendered = priceRichText(tester);
         expect(rendered, contains('\$'),
             reason: 'MX station must render the peso \$ symbol');
         expect(rendered, isNot(contains('€')));

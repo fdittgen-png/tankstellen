@@ -145,6 +145,7 @@ class CacheManager implements CacheStrategy {
   CacheManager(this._storage);
 
   /// Store data in cache with metadata envelope.
+  @override
   Future<void> put(
     String key,
     Map<String, dynamic> data, {
@@ -162,6 +163,7 @@ class CacheManager implements CacheStrategy {
   /// Retrieve cached data. Returns the entry even if expired —
   /// the caller (fallback chain) decides whether stale data is acceptable.
   /// Returns null only if the key was never cached.
+  @override
   CacheEntry? get(String key) {
     final raw = _storage.getCachedData(key);
     if (raw == null) return null;
@@ -183,6 +185,7 @@ class CacheManager implements CacheStrategy {
   }
 
   /// Get data only if the cache entry is still valid (not expired).
+  @override
   CacheEntry? getFresh(String key) {
     final entry = get(key);
     if (entry == null || entry.isExpired) return null;

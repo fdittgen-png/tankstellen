@@ -603,23 +603,20 @@ void main() {
   // ---------------------------------------------------------------------------
   group('API Key (in-memory)', () {
     test(
-        '#521: getApiKey returns the bundled community key when no '
-        'custom key is set', () {
+        '#713: getApiKey returns null when no user key is set — the app '
+        'ships with no bundled Tankerkönig key (TOS compliance)', () {
       final key = storage.getApiKey();
-      expect(key, isNotNull);
-      expect(key, isNotEmpty);
-      // Pin the exact community key — the value is part of the
-      // shipped behaviour and must not drift without review.
-      expect(key, 'ff6250b2-a85d-41e5-b483-c052caff0ca9');
+      expect(key, isNull,
+          reason: 'Tankerkönig TOS forbid publishing any API key, '
+              'including demo keys, in public source repositories.');
     });
 
-    test('#521: hasApiKey is always true (community default present)', () {
-      expect(storage.hasApiKey(), isTrue);
+    test('#713: hasApiKey is false until the user configures one', () {
+      expect(storage.hasApiKey(), isFalse);
     });
 
-    test(
-        '#521: hasCustomApiKey is false when only the community '
-        'default is available', () {
+    test('#713: hasCustomApiKey mirrors hasApiKey — any configured key is '
+        "the user's", () {
       expect(storage.hasCustomApiKey(), isFalse);
     });
 

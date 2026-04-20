@@ -92,7 +92,7 @@ void main() {
       // Should NOT contain unsafe 'as Map<String, dynamic>' casts
       // (safe patterns: 'is Map', 'as Map?' with null check, getMap())
       final unsafeCastPattern = RegExp(
-        r"as Map<String, dynamic>(?!\?)",
+        r'as Map<String, dynamic>(?!\?)',
       );
       expect(
         unsafeCastPattern.hasMatch(source),

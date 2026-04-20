@@ -25,7 +25,9 @@ void main() {
       if (entity is! File || !entity.path.endsWith('.dart')) continue;
       // Skip generated files — they don't follow handwritten conventions.
       if (entity.path.endsWith('.g.dart') ||
-          entity.path.endsWith('.freezed.dart')) continue;
+          entity.path.endsWith('.freezed.dart')) {
+        continue;
+      }
 
       final src = entity.readAsStringSync();
       for (final m in silent.allMatches(src)) {

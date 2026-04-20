@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../profile/providers/profile_provider.dart';
+import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/entities/vehicle_profile.dart';
 import '../../providers/vehicle_providers.dart';
 import '../widgets/vehicle_combustion_section.dart';
@@ -28,11 +30,16 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   final _batteryCtrl = TextEditingController();
   final _maxKwCtrl = TextEditingController();
   final _tankCtrl = TextEditingController();
-  final _fuelTypeCtrl = TextEditingController();
+  // Pre-fill a sensible default so the "Preferred fuel" dropdown shows
+  // E10 rather than the empty "Not set" option (#710). For EV the save
+  // flow ignores this value anyway.
+  final _fuelTypeCtrl = TextEditingController(text: 'e10');
   final _minSocCtrl = TextEditingController(text: '20');
   final _maxSocCtrl = TextEditingController(text: '80');
 
-  VehicleType _type = VehicleType.ev;
+  // Combustion is the dominant case; start there and let the user
+  // flip to Hybrid/Electric if needed (#710).
+  VehicleType _type = VehicleType.combustion;
   final Set<ConnectorType> _connectors = {};
   String? _existingId;
 
@@ -127,8 +134,47 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
     );
 
     await ref.read(vehicleProfileListProvider.notifier).save(profile);
+
+    // #710 — auto-set this vehicle as the profile's default and sync
+    // the profile's `preferredFuelType` to the vehicle's fuel when:
+    //   (a) no default is currently set, OR
+    //   (b) the user is editing the vehicle already flagged as default.
+    // This eliminates the bug where the preferences step's fuel chips
+    // ignored the just-configured vehicle.
+    try {
+      final profileRepo = ref.read(profileRepositoryProvider);
+      final activeProfile = ref.read(activeProfileProvider);
+      if (activeProfile != null) {
+        final shouldBecomeDefault =
+            activeProfile.defaultVehicleId == null ||
+                activeProfile.defaultVehicleId == profile.id;
+        if (shouldBecomeDefault) {
+          final derived = _deriveFuelTypeFromVehicle(profile);
+          final updated = activeProfile.copyWith(
+            defaultVehicleId: profile.id,
+            preferredFuelType: derived ?? activeProfile.preferredFuelType,
+          );
+          await profileRepo.updateProfile(updated);
+          ref.read(activeProfileProvider.notifier).refresh();
+        }
+      }
+    } catch (e) {
+      debugPrint('EditVehicleScreen: profile sync failed: $e');
+    }
     if (!mounted) return;
     Navigator.of(context).pop();
+  }
+
+  /// Translates a vehicle's type + stored `preferredFuelType` into the
+  /// canonical [FuelType] the rest of the app uses (#710). EV always
+  /// maps to electric; combustion parses via [FuelType.fromString].
+  /// Hybrid keeps the vehicle's combustion fuel as the default until
+  /// #704 ships `hybridFuelChoice`.
+  FuelType? _deriveFuelTypeFromVehicle(VehicleProfile v) {
+    if (v.type == VehicleType.ev) return FuelType.electric;
+    final raw = v.preferredFuelType;
+    if (raw == null || raw.trim().isEmpty) return null;
+    return FuelType.fromString(raw);
   }
 
   @override

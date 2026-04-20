@@ -23,7 +23,7 @@ void main() {
           required double radiusKm,
           required FuelType fuelType,
         }) async {
-          queriedPoints.add('${lat.toStringAsFixed(1)}');
+          queriedPoints.add(lat.toStringAsFixed(1));
           return [
             FuelStationResult(Station(
               id: 'st-${lat.toStringAsFixed(1)}',

@@ -240,6 +240,68 @@ class _LanguageSection extends StatelessWidget {
   }
 }
 
+/// Dropdown to pick the default [VehicleProfile] used when the user opens
+/// the Add fill-up form (#694). Null means "no vehicle pre-selected" —
+/// the feature remains fully optional.
+class _DefaultVehicleSection extends ConsumerWidget {
+  final ProfileEditState state;
+  final ProfileEditController ctrl;
+
+  const _DefaultVehicleSection({required this.state, required this.ctrl});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final vehicles = ref.watch(vehicleProfileListProvider);
+    if (vehicles.isEmpty) {
+      // Nothing to pick from — hide the section entirely.
+      return const SizedBox.shrink();
+    }
+    return DropdownButtonFormField<String?>(
+      initialValue:
+          vehicles.any((v) => v.id == state.defaultVehicleId)
+              ? state.defaultVehicleId
+              : null,
+      decoration: InputDecoration(
+        labelText:
+            l10n?.profileDefaultVehicleLabel ?? 'Default vehicle (optional)',
+        prefixIcon: const Icon(Icons.directions_car_outlined),
+      ),
+      items: [
+        DropdownMenuItem<String?>(
+          value: null,
+          child: Text(l10n?.profileDefaultVehicleNone ?? 'No default'),
+        ),
+        ...vehicles.map(
+          (v) => DropdownMenuItem<String?>(
+            value: v.id,
+            child: Text(v.name),
+          ),
+        ),
+      ],
+      onChanged: (v) {
+        ctrl.setDefaultVehicleId(v);
+        // When a vehicle is picked, sync the profile's fuel type to
+        // that vehicle's fuel so the search/consumption pickers have
+        // a single consistent source of truth (#695).
+        if (v != null) {
+          final vehicle = vehicles.firstWhere((x) => x.id == v);
+          final derived = _vehicleFuelType(vehicle);
+          if (derived != null) ctrl.setFuelType(derived);
+        }
+      },
+    );
+  }
+
+  /// EV → electric; combustion → parsed preferredFuelType; null if not set.
+  FuelType? _vehicleFuelType(VehicleProfile v) {
+    if (v.type == VehicleType.ev) return FuelType.electric;
+    final raw = v.preferredFuelType;
+    if (raw == null || raw.trim().isEmpty) return null;
+    return FuelType.fromString(raw);
+  }
+}
+
 /// Save button (always shown) plus optional Delete button side-by-side.
 class _SaveDeleteActions extends StatelessWidget {
   final ProfileEditState state;
@@ -283,6 +345,7 @@ class _SaveDeleteActions extends StatelessWidget {
                 showFuel: state.showFuel,
                 showElectric: state.showElectric,
                 ratingMode: state.ratingMode,
+                defaultVehicleId: state.defaultVehicleId,
               );
               await onSave(updated);
               if (context.mounted) Navigator.pop(context);

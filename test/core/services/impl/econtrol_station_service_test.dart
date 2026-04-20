@@ -478,7 +478,7 @@ void main() {
 
   group('EControlStationService searchStations', () {
     test('searchStations throws ApiException on network failure', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 48.2, lng: 16.37, radiusKm: 10.0,
       );
       try {
@@ -489,7 +489,7 @@ void main() {
     });
 
     test('searchStations returns valid result type', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 48.2, lng: 16.37, radiusKm: 10.0,
       );
       try {
@@ -502,7 +502,7 @@ void main() {
     });
 
     test('searchStations with sort by price', () async {
-      final params = const SearchParams(
+      const params = SearchParams(
         lat: 48.2, lng: 16.37, radiusKm: 10.0,
         sortBy: SortBy.price,
       );

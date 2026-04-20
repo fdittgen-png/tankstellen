@@ -417,7 +417,7 @@ void main() {
     });
 
     test('price history parsing handles non-list response', () {
-      final dynamic rows = null;
+      const dynamic rows = null;
 
       final result = rows is List
           ? rows.whereType<Map<String, dynamic>>().toList()
@@ -552,8 +552,8 @@ void main() {
     });
 
     test('fetchAllUserData length check handles non-list', () {
-      final dynamic favorites = 'unexpected';
-      final dynamic alerts = null;
+      const dynamic favorites = 'unexpected';
+      const dynamic alerts = null;
 
       final favList = favorites is List ? favorites : [];
       final alertList = alerts is List ? alerts : [];

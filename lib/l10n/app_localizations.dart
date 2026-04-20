@@ -3361,6 +3361,198 @@ abstract class AppLocalizations {
   /// **'Add your car to filter by connector and estimate charging costs.'**
   String get vehiclesEmptyMessage;
 
+  /// No description provided for @vehiclesWizardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My vehicles (optional)'**
+  String get vehiclesWizardTitle;
+
+  /// No description provided for @vehiclesWizardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your car to pre-fill the consumption log and enable EV connector filters. You can skip this and add vehicles later.'**
+  String get vehiclesWizardSubtitle;
+
+  /// No description provided for @vehiclesWizardNoneYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No vehicle configured yet.'**
+  String get vehiclesWizardNoneYet;
+
+  /// No description provided for @vehiclesWizardYoursList.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {count, plural, =1{1 vehicle} other{{count} vehicles}}:'**
+  String vehiclesWizardYoursList(int count);
+
+  /// No description provided for @vehiclesWizardSkipHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip to finish setup — you can add vehicles anytime from Settings.'**
+  String get vehiclesWizardSkipHint;
+
+  /// No description provided for @fillUpVehicleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle'**
+  String get fillUpVehicleLabel;
+
+  /// No description provided for @fillUpVehicleNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No vehicle'**
+  String get fillUpVehicleNone;
+
+  /// No description provided for @fillUpVehicleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle is required'**
+  String get fillUpVehicleRequired;
+
+  /// No description provided for @reportScanError.
+  ///
+  /// In en, this message translates to:
+  /// **'Report scan error'**
+  String get reportScanError;
+
+  /// No description provided for @pickStationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a station'**
+  String get pickStationTitle;
+
+  /// No description provided for @pickStationHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Start the fill-up from a known station so prices, brand and fuel type fill themselves in.'**
+  String get pickStationHelper;
+
+  /// No description provided for @pickStationEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorite stations yet — add some from Search or Favorites, or skip and fill in manually.'**
+  String get pickStationEmpty;
+
+  /// No description provided for @pickStationSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip — add without a station'**
+  String get pickStationSkip;
+
+  /// No description provided for @scanPump.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan pump'**
+  String get scanPump;
+
+  /// No description provided for @scanPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan payment QR'**
+  String get scanPayment;
+
+  /// No description provided for @qrPaymentBeneficiary.
+  ///
+  /// In en, this message translates to:
+  /// **'Beneficiary'**
+  String get qrPaymentBeneficiary;
+
+  /// No description provided for @qrPaymentAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get qrPaymentAmount;
+
+  /// No description provided for @qrPaymentEpcTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SEPA payment'**
+  String get qrPaymentEpcTitle;
+
+  /// No description provided for @qrPaymentEpcEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No fields decoded'**
+  String get qrPaymentEpcEmpty;
+
+  /// No description provided for @qrPaymentOpenInBank.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in bank app'**
+  String get qrPaymentOpenInBank;
+
+  /// No description provided for @qrPaymentLaunchFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'No app available to open this code'**
+  String get qrPaymentLaunchFailed;
+
+  /// No description provided for @qrPaymentUnknownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognised code'**
+  String get qrPaymentUnknownTitle;
+
+  /// No description provided for @qrPaymentCopyRaw.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy raw text'**
+  String get qrPaymentCopyRaw;
+
+  /// No description provided for @qrPaymentEpcCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank details copied — paste into your banking app'**
+  String get qrPaymentEpcCopied;
+
+  /// No description provided for @vehicleFuelNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get vehicleFuelNotSet;
+
+  /// No description provided for @wizardVehicleTapToEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to edit'**
+  String get wizardVehicleTapToEdit;
+
+  /// No description provided for @wizardVehicleDefaultBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get wizardVehicleDefaultBadge;
+
+  /// No description provided for @profileDefaultVehicleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Default vehicle (optional)'**
+  String get profileDefaultVehicleLabel;
+
+  /// No description provided for @profileDefaultVehicleNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No default'**
+  String get profileDefaultVehicleNone;
+
+  /// No description provided for @profileFuelFromVehicleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel type is derived from your default vehicle. Clear the vehicle to pick a fuel directly.'**
+  String get profileFuelFromVehicleHint;
+
+  /// No description provided for @consumptionNoVehicleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a vehicle first'**
+  String get consumptionNoVehicleTitle;
+
+  /// No description provided for @consumptionNoVehicleBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill-ups are attributed to a vehicle. Add your car to start logging consumption.'**
+  String get consumptionNoVehicleBody;
+
   /// No description provided for @vehicleAdd.
   ///
   /// In en, this message translates to:
@@ -3828,6 +4020,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.'**
   String get helpBannerAlerts;
+
+  /// No description provided for @helpBannerConsumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Log every fill-up to track your real-world consumption and CO₂ footprint. Swipe left to delete an entry.'**
+  String get helpBannerConsumption;
+
+  /// No description provided for @helpBannerVehicles.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your vehicles so fill-ups and fuel preferences default correctly. The first vehicle becomes your default.'**
+  String get helpBannerVehicles;
 
   /// No description provided for @syncNow.
   ///
@@ -4648,7 +4852,7 @@ abstract class AppLocalizations {
   /// No description provided for @linkDeviceImportDescription.
   ///
   /// In en, this message translates to:
-  /// **'Enter the device code from your other device to import its favorites and alerts.'**
+  /// **'Enter the device code from your other device to import its favorites, alerts, vehicles, and consumption log. Each device keeps its own profile and defaults.'**
   String get linkDeviceImportDescription;
 
   /// No description provided for @linkDeviceCodeFieldLabel.
@@ -4678,7 +4882,7 @@ abstract class AppLocalizations {
   /// No description provided for @linkDeviceHowItWorksBody.
   ///
   /// In en, this message translates to:
-  /// **'1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites and alerts\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity. Data is merged, not moved.'**
+  /// **'1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites, alerts, vehicles, and consumption logs\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity and its own profile (preferred fuel, default vehicle, landing screen). Data is merged, not moved.'**
   String get linkDeviceHowItWorksBody;
 
   /// No description provided for @vehicleSetActive.

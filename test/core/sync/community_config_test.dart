@@ -18,8 +18,11 @@ void main() {
   setUp(() {
     CommunityConfig.reset();
 
-    // Mock the asset bundle to serve our test config
-    ServicesBinding.instance.defaultBinaryMessenger
+    // Mock the asset bundle to serve our test config. The top-level
+    // ServicesBinding.setMockMessageHandler is deprecated (#711) —
+    // use TestDefaultBinaryMessengerBinding's helper which routes to
+    // the test messenger so handlers are isolated per test.
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMessageHandler('flutter/assets', (message) async {
       final key = utf8.decode(message!.buffer.asUint8List());
       if (key == 'assets/tanksync_config.json') {
@@ -31,7 +34,7 @@ void main() {
   });
 
   tearDown(() {
-    ServicesBinding.instance.defaultBinaryMessenger
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMessageHandler('flutter/assets', null);
   });
 
