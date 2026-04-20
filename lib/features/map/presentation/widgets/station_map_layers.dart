@@ -6,6 +6,7 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../data/osm_retry_client.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
@@ -98,6 +99,11 @@ class StationMapLayers extends StatelessWidget {
               userAgentPackageName: AppConstants.osmUserAgent,
               maxNativeZoom: 19,
               maxZoom: 19,
+              // #757 phase 2 — retry 429s and transient errors with
+              // Retry-After respect. Default RetryClient in flutter_map
+              // only handles 5xx; adding 429 + connection errors cuts
+              // down the gray-tile rate under load.
+              tileProvider: NetworkTileProvider(httpClient: OsmRetryClient()),
               // #757 — kill the persistent-gray-tile bug at its root.
               // Default NetworkTileProvider caches failed fetches in
               // TileImageManager and the same (z,x,y) is never
