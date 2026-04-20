@@ -8,9 +8,9 @@ import '../../../../core/widgets/star_rating.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/providers/favorites_provider.dart';
-import '../../data/services/ev_charging_service.dart';
 import '../../domain/entities/charging_station.dart';
 import '../../domain/entities/fuel_type.dart';
+import '../../providers/ev_charging_service_provider.dart';
 import '../../providers/station_rating_provider.dart';
 import '../widgets/ev_station_header_card.dart';
 import '../widgets/ev_station_info_cards.dart';
@@ -38,15 +38,13 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
   Future<void> _refreshStation() async {
     setState(() => _isRefreshing = true);
     try {
-      final apiKeys = ref.read(apiKeyStorageProvider);
-      final apiKey = apiKeys.getEvApiKey();
-      if (apiKey == null || apiKey.isEmpty) {
+      final service = ref.read(evChargingServiceProvider);
+      if (service == null) {
         if (mounted) {
           setState(() => _isRefreshing = false);
         }
         return;
       }
-      final service = EVChargingService(apiKey: apiKey);
       final result = await service.searchStations(
         lat: _station.lat,
         lng: _station.lng,
