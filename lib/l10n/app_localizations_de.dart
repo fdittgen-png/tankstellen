@@ -1860,6 +1860,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bankdaten kopiert — in Banking-App einfügen';
 
   @override
+  String get qrScannerGuidance => 'Kamera auf einen QR-Code richten';
+
+  @override
+  String get torchOn => 'Blitz einschalten';
+
+  @override
+  String get torchOff => 'Blitz ausschalten';
+
+  @override
   String get vehicleFuelNotSet => 'Nicht gesetzt';
 
   @override

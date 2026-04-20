@@ -3517,6 +3517,24 @@ abstract class AppLocalizations {
   /// **'Bank details copied — paste into your banking app'**
   String get qrPaymentEpcCopied;
 
+  /// No description provided for @qrScannerGuidance.
+  ///
+  /// In en, this message translates to:
+  /// **'Point the camera at a QR code'**
+  String get qrScannerGuidance;
+
+  /// No description provided for @torchOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn flash on'**
+  String get torchOn;
+
+  /// No description provided for @torchOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn flash off'**
+  String get torchOff;
+
   /// No description provided for @vehicleFuelNotSet.
   ///
   /// In en, this message translates to:
