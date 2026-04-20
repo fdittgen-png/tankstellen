@@ -43,6 +43,11 @@ class DrivingMapView extends StatelessWidget {
           TileLayer(
             urlTemplate: AppConstants.osmTileUrl,
             userAgentPackageName: AppConstants.osmUserAgent,
+            // #757 — evict failed tiles once off-screen so the next
+            // pan retries cleanly. See station_map_layers.dart for
+            // the full rationale.
+            evictErrorTileStrategy:
+                EvictErrorTileStrategy.notVisibleRespectMargin,
           ),
         ],
       );
@@ -80,6 +85,9 @@ class DrivingMapView extends StatelessWidget {
         TileLayer(
           urlTemplate: AppConstants.osmTileUrl,
           userAgentPackageName: AppConstants.osmUserAgent,
+          // #757 — evict failed tiles off-screen so the next pan retries.
+          evictErrorTileStrategy:
+              EvictErrorTileStrategy.notVisibleRespectMargin,
         ),
         MarkerLayer(markers: markers),
         const RichAttributionWidget(

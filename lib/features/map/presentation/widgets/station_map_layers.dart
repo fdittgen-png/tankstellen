@@ -98,6 +98,25 @@ class StationMapLayers extends StatelessWidget {
               userAgentPackageName: AppConstants.osmUserAgent,
               maxNativeZoom: 19,
               maxZoom: 19,
+              // #757 — kill the persistent-gray-tile bug at its root.
+              // Default NetworkTileProvider caches failed fetches in
+              // TileImageManager and the same (z,x,y) is never
+              // re-requested even on redraw, so a single transient
+              // 429/503 from the OSM tile server leaves a permanent
+              // gray square in the user's viewport. With
+              // `notVisibleRespectMargin`, the failed tile is
+              // evicted as soon as it scrolls out of the keepBuffer
+              // margin — the next pan retries cleanly. Every prior
+              // map-bug PR (#496, #532, #696, #707, #709, #711)
+              // attacked symptoms; this is the root cause.
+              evictErrorTileStrategy:
+                  EvictErrorTileStrategy.notVisibleRespectMargin,
+              errorTileCallback: (tile, error, stackTrace) {
+                debugPrint(
+                    'TileLayer error at (z:${tile.coordinates.z} '
+                    'x:${tile.coordinates.x} y:${tile.coordinates.y}): '
+                    '$error');
+              },
             ),
             // Route polyline (if in route search mode)
             if (routePolyline != null && routePolyline!.isNotEmpty)
