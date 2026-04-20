@@ -30,8 +30,18 @@ class Obd2AdapterCandidate {
             .toSet();
 }
 
-/// One supported ELM327-compatible BLE adapter. Selected by the
-/// registry based on name substring + advertised service UUIDs.
+/// Which Bluetooth transport an adapter uses (#761).
+///
+/// * [ble] — GATT / BLE peripheral. Discovered via `flutter_blue_plus`
+///   scan, communicates via write + notify characteristics.
+/// * [classic] — Bluetooth Classic (BR/EDR) with the Serial Port
+///   Profile (SPP). Not discoverable via BLE scan; enumerated from
+///   Android's bonded-device list and accessed via an RFCOMM socket.
+enum BluetoothTransport { ble, classic }
+
+/// One supported ELM327-compatible adapter. Selected by the registry
+/// based on name substring + advertised service UUIDs (BLE) or just
+/// device name (Classic, since Classic devices don't advertise).
 class Obd2AdapterProfile {
   /// Stable internal id, used when persisting the last-connected
   /// adapter to Hive (`vlinker-fs`, `obdlink-mx`, `generic-fff0`, …).
@@ -40,8 +50,14 @@ class Obd2AdapterProfile {
   /// Marketing name shown in the picker.
   final String displayName;
 
-  /// BLE service/characteristic UUIDs this adapter exposes. The
-  /// connection service feeds these to `FlutterBluePlusElmChannel`.
+  /// Transport this adapter uses — determines which facade
+  /// [Obd2ConnectionService] dispatches to.
+  final BluetoothTransport transport;
+
+  /// BLE service/characteristic UUIDs this adapter exposes. Only
+  /// meaningful when [transport] is [BluetoothTransport.ble]. For
+  /// [BluetoothTransport.classic] adapters these fields are ignored
+  /// (SPP uses a fixed UUID).
   final String serviceUuid;
   final String writeCharUuid;
   final String notifyCharUuid;
@@ -64,9 +80,10 @@ class Obd2AdapterProfile {
   const Obd2AdapterProfile({
     required this.id,
     required this.displayName,
-    required this.serviceUuid,
-    required this.writeCharUuid,
-    required this.notifyCharUuid,
+    this.transport = BluetoothTransport.ble,
+    this.serviceUuid = '',
+    this.writeCharUuid = '',
+    this.notifyCharUuid = '',
     this.nameMatchers = const [],
     this.initDelay = const Duration(milliseconds: 100),
     this.extraInitCommands = const [],
@@ -106,11 +123,16 @@ class Obd2AdapterRegistry {
   factory Obd2AdapterRegistry.defaults() =>
       const Obd2AdapterRegistry(profiles: _defaultProfiles);
 
-  /// All service UUIDs the registry knows about. Handed to
+  /// All BLE service UUIDs the registry knows about. Handed to
   /// `FlutterBluePlus.startScan(withServices: ...)` so the scan
   /// filters out consumer BLE noise (fitness trackers, headphones).
-  Set<String> get allServiceUuids =>
-      profiles.map((p) => p.serviceUuid.toLowerCase()).toSet();
+  /// Classic profiles are excluded — SPP uses a single universal
+  /// UUID and Classic discovery doesn't filter by service anyway.
+  Set<String> get allServiceUuids => profiles
+      .where((p) => p.transport == BluetoothTransport.ble)
+      .map((p) => p.serviceUuid.toLowerCase())
+      .where((u) => u.isNotEmpty)
+      .toSet();
 
   /// Pick the best profile for [candidate]. Returns null when the
   /// candidate is clearly not an OBD2 adapter.
@@ -121,12 +143,13 @@ class Obd2AdapterRegistry {
       if (p.matchesName(candidate.deviceName)) return p;
     }
     // Pass 2: service UUID match, but only against generic/nameless
-    // profiles. Named profiles (vLinker, OBDLink, Carista…) require
-    // their name to be seen — otherwise a random clone advertising the
-    // FFF0 service would be mis-labelled as "vLinker" just because
-    // it's the first FFF0 profile in the list.
+    // profiles. Named profiles require their name to be seen —
+    // otherwise a random clone advertising the FFF0 service would be
+    // mis-labelled. Classic profiles are skipped here: they have no
+    // advertised services and are reached only via pass 1 (name).
     for (final p in profiles) {
       if (p.nameMatchers.isNotEmpty) continue;
+      if (p.transport != BluetoothTransport.ble) continue;
       if (p.matchesAdvertisedServices(candidate.advertisedServiceUuids)) {
         return p;
       }
@@ -164,16 +187,25 @@ class ResolvedObd2Candidate {
 /// Default profile catalog. Kept as a const list so the registry is
 /// a cheap static-data lookup — no I/O to construct it.
 const List<Obd2AdapterProfile> _defaultProfiles = [
-  // vLinker FS / FD / MC — the target adapter for #733. Nordic UART
-  // variant: FFF0 service, FFF2 write, FFF1 notify. Name advertises
-  // as "vLinker FS" or similar; some firmware reports "VLink".
+  // vLinker FS / MS — Bluetooth CLASSIC variant (#761). The FS is the
+  // dominant Amazon-EU model; the user-reported adapter in the field
+  // advertises as "vLinker FS ####" over Classic SPP. Paired via the
+  // OS Bluetooth settings; our scan enumerates bonded devices.
   Obd2AdapterProfile(
-    id: 'vlinker',
-    displayName: 'vLinker FS / FD / MC',
+    id: 'vlinker-fs-classic',
+    displayName: 'vLinker FS (Classic)',
+    transport: BluetoothTransport.classic,
+    nameMatchers: ['vlinker fs', 'vlinker ms', 'vlink fs', 'vgate fs'],
+  ),
+  // vLinker FD / MC — the BLE variants. Nordic UART: FFF0 service,
+  // FFF2 write, FFF1 notify. Name advertises as "vLinker FD" / "MC".
+  Obd2AdapterProfile(
+    id: 'vlinker-ble',
+    displayName: 'vLinker FD / MC (BLE)',
     serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
     writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
     notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
-    nameMatchers: ['vlinker', 'vlink', 'vgate'],
+    nameMatchers: ['vlinker fd', 'vlinker mc', 'vlink fd', 'vlink mc'],
   ),
   // OBDLink MX+ — Scantool's premium adapter, uses a custom service
   // UUID pair. Name always starts with "OBDLink".
@@ -214,6 +246,18 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
     writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
     notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
+    initDelay: Duration(milliseconds: 300),
+  ),
+  // Generic ELM327 Classic SPP fallback (#761). Matches any bonded
+  // device whose name contains "obd" or "elm327" — the common ones
+  // on Amazon / AliExpress that predate BLE. Classic can't be
+  // discovered by service-UUID (SPP is 0x1101 universally); the
+  // name signature is all we have.
+  Obd2AdapterProfile(
+    id: 'generic-classic',
+    displayName: 'Generic ELM327 (Classic)',
+    transport: BluetoothTransport.classic,
+    nameMatchers: ['obdii', 'obd-ii', 'obd ii', 'obd2', 'elm327'],
     initDelay: Duration(milliseconds: 300),
   ),
 ];
