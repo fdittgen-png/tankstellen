@@ -240,20 +240,33 @@ class ReceiptParser {
   /// Detect the fuel product code on the receipt. Supports European labels
   /// like "SP95-E10", "Super E10", "E10", "Gazole", "Diesel", "E85",
   /// "GPL", "GNV/CNG", etc.
+  ///
+  /// French retailers (TotalEnergies, Intermarché) emit compound codes
+  /// with no separator — `SP95E5`, `SP95E10`, `SP98E5` — which the old
+  /// `sp95-e10` / `\be10\b` regexes missed because there was no word
+  /// boundary between the `5` and the `e10`. The compound forms now
+  /// have explicit patterns; order still matters (E10 before E5 before
+  /// E85 so longer codes win).
   FuelType? _extractFuelType(String text) {
     final lower = text.toLowerCase();
-    // Order matters: e10 before e5 so "e10" doesn't slip through as "e".
-    if (RegExp(r'\be10\b|sp95-e10|super\s*e10').hasMatch(lower)) {
+    // E85 first — "e85" contains "e5" as a substring-via-boundary edge
+    // case on some OCR outputs where the 8 reads as 3 or falls out.
+    if (RegExp(r'\be85\b|sp95\s*-?\s*e?\s*85|bio\s*[eé]thanol')
+        .hasMatch(lower)) {
+      return FuelType.e85;
+    }
+    // E10 — match compound (SP95E10, SP95-E10, SP95 E10) and standalone.
+    if (RegExp(r'sp95\s*-?\s*e\s*10|sp95e10|\be10\b|super\s*e10')
+        .hasMatch(lower)) {
       return FuelType.e10;
     }
-    if (RegExp(r'\be5\b|sp95(?!\s*-?e10)|super\s*e5').hasMatch(lower)) {
+    // E5 — SP95 without an E10 suffix, or compound SP95E5.
+    if (RegExp(r'sp95\s*-?\s*e\s*5\b|sp95e5\b|\be5\b|sp95(?!\s*-?\s*e\s*10)|super\s*e5')
+        .hasMatch(lower)) {
       return FuelType.e5;
     }
     if (RegExp(r'\be98\b|sp98|super\s*98').hasMatch(lower)) {
       return FuelType.e98;
-    }
-    if (RegExp(r'\be85\b|bio\s*[eé]thanol').hasMatch(lower)) {
-      return FuelType.e85;
     }
     if (RegExp(r'diesel\s*premium|premium\s*diesel|gazole\s*premium')
         .hasMatch(lower)) {
@@ -291,6 +304,16 @@ class ReceiptParser {
       // "VOLUME : 42.35" / "Volume: 42,35" / "Quantité = 5.27"
       RegExp(
         r'(?:volume|quantit[eé])\s*[:=]?\s*(\d{1,3}[.,]\d{1,3})',
+        caseSensitive: false,
+      ),
+      // "5,00 x SP95E5" / "42,50 X GAZOLE" / "10,00 × SP98" — French
+      // line-item format used by TotalEnergies, Intermarché and many
+      // independents (user report 2026-04-21, #801). Fuel codes after
+      // `x` are the French standard: SP95/SP98/E85/GAZOLE/GPL with
+      // compound E5/E10 suffixes.
+      RegExp(
+        r'(\d{1,3}[.,]\d{1,3})\s*[xX×]\s*'
+        r'(?:sp95e?5|sp95e10|sp98e?5|sp95|sp98|e85|gazole|gpl|gplc|b7|diesel|go)\b',
         caseSensitive: false,
       ),
     ];
@@ -343,15 +366,31 @@ class ReceiptParser {
       // Filter obvious non-totals: nobody's total is < 1 €, nobody's
       // total is > 10 000 €.
       if (value < 1 || value > 10000) continue;
+      // #801 — 3-decimal European amounts like `1,990 €` are fuel
+      // price-per-liter, never totals. Without this guard on the
+      // TotalEnergies receipt the parser grabbed `1,990 €` as the
+      // total and the user saw 1.99 € in the form instead of 9.95 €.
+      // Totals are always 2-decimal in EUR.
+      if (_decimalDigitCount(raw) >= 3 && value < 5) continue;
       if (best == null || value > best) best = value;
     }
     return best;
   }
 
+  /// Count decimal digits in a European-formatted decimal string
+  /// (accepts `.` or `,` as separator). Returns 0 when no separator
+  /// is found. Used to distinguish 3-decimal fuel prices from
+  /// 2-decimal totals without trusting `double` precision.
+  int _decimalDigitCount(String raw) {
+    final sepIndex = raw.lastIndexOf(RegExp(r'[.,]'));
+    if (sepIndex < 0) return 0;
+    return raw.length - sepIndex - 1;
+  }
+
   /// Matches price-per-liter: "1.899 €/L", "€ 1,999/L", "PU: 1,899",
   /// "PRIX/L 1.899", "Prix unit. = 2,028 EUR", "Literpreis: 1.799".
   double? _extractPricePerLiter(String text) {
-    return _matchFirst(text, [
+    final labelled = _matchFirst(text, [
       // "1.899 €/L" or "1,899 EUR/L" — also "1.999 €/ℓ" (U+2113).
       RegExp(r'(\d+[.,]\d{2,3})\s*(?:€|EUR)\s*/\s*[lL\u2113]'),
       // "€ 1.999/L" or "EUR 1,999/L" / "€ 1.999/ℓ" — currency before number.
@@ -365,6 +404,30 @@ class ReceiptParser {
         caseSensitive: false,
       ),
     ]);
+    if (labelled != null) return labelled;
+
+    // #801 — TotalEnergies / independent French receipts often emit
+    // the unit price as a bare `1,990 €` (3-decimal digits, no `/L`
+    // suffix) on the line below a `QTY x FUELCODE` item line. Without
+    // this heuristic the amount was either missed entirely or grabbed
+    // as the total. 3 decimal digits + euro suffix + plausible
+    // fuel-price range (0.5-3.0 €/L) is a strong enough signal to
+    // accept without the explicit `/L` marker.
+    // Note on the lookbehind-free check: `\b` after `€` doesn't hold
+    // (both `€` and a trailing space are non-word chars in Dart
+    // regex, so no boundary sits between them). The negative
+    // lookahead for `/L` is the only disambiguator we need — any
+    // 3-decimal euro amount NOT followed by `/L` is the unit price.
+    final bareFuelPrice =
+        RegExp(r'(\d+[.,]\d{3})\s*(?:€|EUR)(?!\s*/\s*[lLℓ])');
+    for (final match in bareFuelPrice.allMatches(text)) {
+      final raw = match.group(1);
+      if (raw == null) continue;
+      final value = _parseDecimal(raw);
+      if (value == null) continue;
+      if (value >= 0.5 && value <= 3.0) return value;
+    }
+    return null;
   }
 
   /// Matches common date formats: DD/MM/YYYY, DD.MM.YYYY, DD-MM-YYYY,

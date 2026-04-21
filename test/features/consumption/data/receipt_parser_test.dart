@@ -371,6 +371,89 @@ Date 19-04-2026 15:19:27
       test('returns null for an unrecognised product string', () {
         expect(parser.parse('Kerosene jet').fuelType, isNull);
       });
+
+      // #801 — French compound fuel codes have no separator between
+      // SP95 / SP98 and the E5 / E10 / E85 suffix on TotalEnergies and
+      // some Intermarché receipts. The original `sp95-e10` / `\be10\b`
+      // regexes relied on a word boundary between `5` and `e10` that
+      // doesn't exist in `sp95e10`.
+      test('recognises compound SP95E5 → FuelType.e5 (#801)', () {
+        expect(parser.parse('SP95E5 1,990 €').fuelType, FuelType.e5);
+      });
+
+      test('recognises compound SP95E10 → FuelType.e10 (#801)', () {
+        expect(parser.parse('SP95E10 1,899 €').fuelType, FuelType.e10);
+      });
+
+      test('recognises compound SP98E5 → FuelType.e98 (#801)', () {
+        // SP98E5 is the French label for SP98 with up to 5% ethanol;
+        // the app's fuel taxonomy groups this under e98.
+        expect(parser.parse('SP98E5 2,050 €').fuelType, FuelType.e98);
+      });
+    });
+
+    // -------------------------------------------------------------------
+    // #801 — TotalEnergies French receipt format
+    //
+    // Real receipt from a user report (21/04/26 Pézenas). The fuel line
+    // uses the `QTY x FUELCODE` format with no unit label on the price,
+    // no `/L` marker, and a three-column TTC / H.T. / TVA total block.
+    // Before the fix the parser grabbed `1,990 €` as the total and left
+    // liters empty.
+    // -------------------------------------------------------------------
+    group('TotalEnergies French receipt (#801)', () {
+      const receiptText = '''
+TotalEnergies
+SARL GAUTRAND PNEUS
+26 AVENUE DE PEZENAS 34120
+FRANCE
+Ticket de vente
+Pompe 04
+5,00 x SP95E5
+1,990 €
+9,95
+TVA inclusive TTC
+Taux M 20,00%   TTC     H.T.    TVA
+                9,95    8,29    1,66
+Total CB                        9,95
+Total H.T.                      8,29
+Date Heure  Num Ticket
+21/04/26 16:52:10 59533 11 0001 624
+''';
+
+      test('extracts liters from "5,00 x SP95E5" line-item', () {
+        final result = parser.parse(receiptText);
+        expect(result.liters, closeTo(5.00, 0.01));
+      });
+
+      test('extracts price-per-liter from bare "1,990 €" (no /L suffix)', () {
+        final result = parser.parse(receiptText);
+        expect(result.pricePerLiter, closeTo(1.990, 0.001));
+      });
+
+      test('extracts total cost as 9,95 (not the 1,990 unit price)', () {
+        final result = parser.parse(receiptText);
+        // Before the fix this was 1.99 — the parser grabbed the
+        // price-per-liter as the total because both have a € suffix
+        // and `1,990` normalises to 1.99 as a Dart double. The
+        // 3-decimal-excluded-from-heuristic fix closes that window.
+        expect(result.totalCost, closeTo(9.95, 0.01));
+      });
+
+      test('detects SP95E5 as FuelType.e5', () {
+        final result = parser.parse(receiptText);
+        expect(result.fuelType, FuelType.e5);
+      });
+
+      test('detects the 21/04/26 receipt date', () {
+        final result = parser.parse(receiptText);
+        expect(result.date, DateTime(2026, 4, 21));
+      });
+
+      test('extracts the TotalEnergies station brand', () {
+        final result = parser.parse(receiptText);
+        expect(result.stationName?.toLowerCase(), contains('total'));
+      });
     });
   });
 }
