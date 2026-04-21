@@ -75,6 +75,60 @@ void main() {
       });
     });
 
+    group('parseManifoldPressureKpa (PID 0B) — #800 speed-density input', () {
+      test('parses idle vacuum at 30 kPa', () {
+        expect(
+          Elm327Protocol.parseManifoldPressureKpa('41 0B 1E>'),
+          closeTo(30.0, 0.01),
+        );
+      });
+
+      test('parses wide-open throttle at ~100 kPa on an NA engine', () {
+        expect(
+          Elm327Protocol.parseManifoldPressureKpa('41 0B 64>'),
+          closeTo(100.0, 0.01),
+        );
+      });
+
+      test('parses turbocharged boost at 200 kPa', () {
+        expect(
+          Elm327Protocol.parseManifoldPressureKpa('41 0B C8>'),
+          closeTo(200.0, 0.01),
+        );
+      });
+
+      test('returns null on NO DATA', () {
+        expect(Elm327Protocol.parseManifoldPressureKpa('NO DATA>'), isNull);
+      });
+    });
+
+    group('parseIntakeAirTempCelsius (PID 0F) — #800 speed-density input', () {
+      test('parses -40 °C at raw 0x00 (sensor minimum)', () {
+        expect(
+          Elm327Protocol.parseIntakeAirTempCelsius('41 0F 00>'),
+          closeTo(-40.0, 0.01),
+        );
+      });
+
+      test('parses 20 °C at raw 0x3C (typical ambient)', () {
+        expect(
+          Elm327Protocol.parseIntakeAirTempCelsius('41 0F 3C>'),
+          closeTo(20.0, 0.01),
+        );
+      });
+
+      test('parses 215 °C at raw 0xFF (sensor maximum)', () {
+        expect(
+          Elm327Protocol.parseIntakeAirTempCelsius('41 0F FF>'),
+          closeTo(215.0, 0.01),
+        );
+      });
+
+      test('returns null on NO DATA', () {
+        expect(Elm327Protocol.parseIntakeAirTempCelsius('NO DATA>'), isNull);
+      });
+    });
+
     group('command constants', () {
       test('expose the new PIDs for the service layer', () {
         expect(Elm327Protocol.engineLoadCommand, '0104\r');
@@ -82,6 +136,9 @@ void main() {
         expect(Elm327Protocol.engineFuelRateCommand, '015E\r');
         expect(Elm327Protocol.mafCommand, '0110\r');
         expect(Elm327Protocol.fuelTankLevelCommand, '012F\r');
+        // #800 speed-density fallback PIDs:
+        expect(Elm327Protocol.intakeManifoldPressureCommand, '010B\r');
+        expect(Elm327Protocol.intakeAirTempCommand, '010F\r');
       });
     });
   });

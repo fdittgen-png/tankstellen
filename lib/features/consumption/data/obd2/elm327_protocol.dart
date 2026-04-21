@@ -150,6 +150,20 @@ class Elm327Protocol {
   /// (#717)
   static const mafCommand = '0110\r';
 
+  /// Request intake manifold absolute pressure (kPa). Mode 01, PID 0B.
+  /// Second-tier fallback for fuel-rate estimation (#800): when a car
+  /// has neither PID 5E nor a MAF sensor (e.g. Peugeot 107 1.0L 1KR-FE,
+  /// which is speed-density), combining MAP with IAT, RPM, engine
+  /// displacement and volumetric efficiency yields an approximate MAF
+  /// via the ideal gas law — which the existing MAF→fuel math can
+  /// then consume.
+  static const intakeManifoldPressureCommand = '010B\r';
+
+  /// Request intake air temperature (°C). Mode 01, PID 0F. Required
+  /// input to the speed-density fuel-rate estimation (#800). Formula:
+  /// °C = A − 40 (one-byte response).
+  static const intakeAirTempCommand = '010F\r';
+
   /// Request fuel tank level input (%). Mode 01, PID 2F. (#717)
   static const fuelTankLevelCommand = '012F\r';
 
@@ -319,6 +333,26 @@ class Elm327Protocol {
     final bytes = _parseModeOneBody(raw, 0x10, minBytes: 4);
     if (bytes == null) return null;
     return ((bytes[2] * 256) + bytes[3]) * 0.01;
+  }
+
+  /// Parse intake manifold absolute pressure from Mode 01 PID 0B
+  /// response (#800). Formula: kPa = A (single byte, raw value).
+  /// Response: "41 0B XX". Physical range 0–255 kPa — idle around
+  /// 30–40 kPa, wide-open throttle approaches atmospheric (~100 kPa)
+  /// on NA engines, and up to 200+ kPa on turbocharged engines.
+  static double? parseManifoldPressureKpa(String raw) {
+    final bytes = _parseModeOneBody(raw, 0x0B, minBytes: 3);
+    if (bytes == null) return null;
+    return bytes[2].toDouble();
+  }
+
+  /// Parse intake air temperature from Mode 01 PID 0F response (#800).
+  /// Formula: °C = A − 40 (single byte). Response: "41 0F XX". Range
+  /// −40 °C to 215 °C covers every drivable condition the sensor sees.
+  static double? parseIntakeAirTempCelsius(String raw) {
+    final bytes = _parseModeOneBody(raw, 0x0F, minBytes: 3);
+    if (bytes == null) return null;
+    return bytes[2].toDouble() - 40.0;
   }
 
   /// Helper for every "1 byte, scaled to percent" PID (04, 11, 2F).
