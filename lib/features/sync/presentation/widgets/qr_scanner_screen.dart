@@ -1,17 +1,24 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../../core/permissions/camera_permissions.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Full-screen QR code scanner for scanning TankSync credentials and
 /// payment QR codes from the station-detail screen.
 ///
-/// Adds the UX pieces called out in #721: a torch (flash) toggle in
-/// the app bar so the user can scan in low light, and a guidance
-/// caption at the bottom that explains what the camera is looking
-/// for. Permission prompt + timeout handling are separate follow-ups
-/// on the same issue.
+/// #721 hardens the scanner against the failure modes the bare
+/// `MobileScanner` has no opinion on:
+/// * Camera permission denied → a settings CTA instead of a silent
+///   black surface.
+/// * 30 s without a decode → a retry prompt so the user isn't stuck
+///   holding a dead camera over a blurry code.
+/// * Haptic nudge on decode so users know the scan landed before
+///   the navigation animation fires.
 class QrScannerScreen extends StatefulWidget {
   /// Optional caption shown as an overlay hint. Defaults to a generic
   /// "Point the camera at a QR code" message. Callers that reuse this
@@ -23,20 +30,39 @@ class QrScannerScreen extends StatefulWidget {
   /// this null and the screen owns its own controller.
   final MobileScannerController? controllerOverride;
 
+  /// Injectable permission facade — production uses the real plugin,
+  /// tests pass a fake returning the state they want to verify.
+  /// Null in production defaults to [PluginCameraPermissions] (can't
+  /// be a const default because `openAppSettings` isn't const).
+  final CameraPermissions? permissions;
+
+  /// How long to wait for a decode before showing the retry prompt.
+  /// Exposed so tests can use a short duration.
+  final Duration scanTimeout;
+
   const QrScannerScreen({
     super.key,
     this.guidance,
     this.controllerOverride,
+    this.permissions,
+    this.scanTimeout = const Duration(seconds: 30),
   });
+
+  CameraPermissions get _permissions =>
+      permissions ?? const PluginCameraPermissions();
 
   @override
   State<QrScannerScreen> createState() => _QrScannerScreenState();
 }
 
+enum _ScannerPhase { probing, scanning, denied, permanentlyDenied, timeout }
+
 class _QrScannerScreenState extends State<QrScannerScreen> {
   late final MobileScannerController _controller;
   bool _scanned = false;
   bool _ownsController = false;
+  _ScannerPhase _phase = _ScannerPhase.probing;
+  Timer? _timeoutTimer;
 
   @override
   void initState() {
@@ -47,10 +73,51 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       _controller = MobileScannerController();
       _ownsController = true;
     }
+    _probePermission();
+  }
+
+  Future<void> _probePermission() async {
+    final state = await widget._permissions.current();
+    if (!mounted) return;
+    switch (state) {
+      case CameraPermissionState.granted:
+        _enterScanning();
+      case CameraPermissionState.denied:
+        final requested = await widget._permissions.request();
+        if (!mounted) return;
+        if (requested == CameraPermissionState.granted) {
+          _enterScanning();
+        } else if (requested == CameraPermissionState.permanentlyDenied) {
+          setState(() => _phase = _ScannerPhase.permanentlyDenied);
+        } else {
+          setState(() => _phase = _ScannerPhase.denied);
+        }
+      case CameraPermissionState.permanentlyDenied:
+        setState(() => _phase = _ScannerPhase.permanentlyDenied);
+    }
+  }
+
+  void _enterScanning() {
+    setState(() => _phase = _ScannerPhase.scanning);
+    _startTimeout();
+  }
+
+  void _startTimeout() {
+    _timeoutTimer?.cancel();
+    _timeoutTimer = Timer(widget.scanTimeout, () {
+      if (!mounted) return;
+      setState(() => _phase = _ScannerPhase.timeout);
+    });
+  }
+
+  void _retry() {
+    _scanned = false;
+    _enterScanning();
   }
 
   @override
   void dispose() {
+    _timeoutTimer?.cancel();
     if (_ownsController) {
       _controller.dispose();
     }
@@ -63,40 +130,79 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n?.syncWizardScanQrCode ?? 'Scan QR Code'),
-        actions: [
-          QrScannerTorchButton(
-            state: _controller,
-            onToggle: _controller.toggleTorch,
-          ),
-        ],
+        actions: _phase == _ScannerPhase.scanning
+            ? [
+                QrScannerTorchButton(
+                  state: _controller,
+                  onToggle: _controller.toggleTorch,
+                ),
+              ]
+            : null,
       ),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          MobileScanner(
-            controller: _controller,
-            onDetect: (capture) {
-              if (_scanned) return;
-              final barcode = capture.barcodes.firstOrNull;
-              final value = barcode?.rawValue;
-              if (value != null) {
-                _scanned = true;
-                Navigator.pop(context, value);
-              }
-            },
-          ),
-          const _ScanFrameOverlay(),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: _GuidanceCaption(
-              text: widget.guidance ??
-                  l10n?.qrScannerGuidance ??
-                  'Point the camera at a QR code',
-            ),
-          ),
-        ],
-      ),
+      body: _buildBody(l10n),
     );
+  }
+
+  Widget _buildBody(AppLocalizations? l10n) {
+    switch (_phase) {
+      case _ScannerPhase.probing:
+        return const Center(child: CircularProgressIndicator());
+      case _ScannerPhase.denied:
+        return _PermissionDenied(
+          key: const Key('qrScannerDenied'),
+          message: l10n?.qrScannerPermissionDenied ??
+              'Camera access is needed to scan QR codes.',
+          buttonLabel: l10n?.qrScannerRetryPermission ?? 'Try again',
+          onPressed: _probePermission,
+        );
+      case _ScannerPhase.permanentlyDenied:
+        return _PermissionDenied(
+          key: const Key('qrScannerPermanentlyDenied'),
+          message: l10n?.qrScannerPermissionPermanentlyDenied ??
+              'Camera access was denied. Open settings to grant it.',
+          buttonLabel: l10n?.qrScannerOpenSettings ?? 'Open settings',
+          onPressed: widget._permissions.openSettings,
+        );
+      case _ScannerPhase.timeout:
+        return _ScanTimeoutPrompt(
+          message: l10n?.qrScannerTimeout ??
+              'No QR code detected. Move closer or try again.',
+          buttonLabel: l10n?.qrScannerRetry ?? 'Try again',
+          onPressed: _retry,
+        );
+      case _ScannerPhase.scanning:
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            MobileScanner(
+              controller: _controller,
+              onDetect: _onDetect,
+            ),
+            const _ScanFrameOverlay(),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: _GuidanceCaption(
+                text: widget.guidance ??
+                    l10n?.qrScannerGuidance ??
+                    'Point the camera at a QR code',
+              ),
+            ),
+          ],
+        );
+    }
+  }
+
+  void _onDetect(BarcodeCapture capture) {
+    if (_scanned) return;
+    final barcode = capture.barcodes.firstOrNull;
+    final value = barcode?.rawValue;
+    if (value == null) return;
+    _scanned = true;
+    _timeoutTimer?.cancel();
+    // Medium impact — noticeable but not startling. Gives the user
+    // a tactile "yes, we got it" before the navigation animation.
+    HapticFeedback.mediumImpact();
+    Navigator.pop(context, value);
   }
 }
 
@@ -132,6 +238,77 @@ class QrScannerTorchButton extends StatelessWidget {
           onPressed: onToggle,
         );
       },
+    );
+  }
+}
+
+class _PermissionDenied extends StatelessWidget {
+  final String message;
+  final String buttonLabel;
+  final Future<void> Function() onPressed;
+
+  const _PermissionDenied({
+    super.key,
+    required this.message,
+    required this.buttonLabel,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.no_photography_outlined, size: 64),
+            const SizedBox(height: 16),
+            Text(message, textAlign: TextAlign.center),
+            const SizedBox(height: 24),
+            FilledButton(
+              key: const Key('qrScannerDeniedAction'),
+              onPressed: onPressed,
+              child: Text(buttonLabel),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ScanTimeoutPrompt extends StatelessWidget {
+  final String message;
+  final String buttonLabel;
+  final VoidCallback onPressed;
+
+  const _ScanTimeoutPrompt({
+    required this.message,
+    required this.buttonLabel,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.timer_off_outlined, size: 64),
+            const SizedBox(height: 16),
+            Text(message, textAlign: TextAlign.center),
+            const SizedBox(height: 24),
+            FilledButton(
+              key: const Key('qrScannerTimeoutRetry'),
+              onPressed: onPressed,
+              child: Text(buttonLabel),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
