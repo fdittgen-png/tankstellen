@@ -1974,6 +1974,34 @@ class AppLocalizationsNb extends AppLocalizations {
       'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.';
 
   @override
+  String get achievementsTitle => 'Achievements';
+
+  @override
+  String get achievementFirstTrip => 'First trip';
+
+  @override
+  String get achievementFirstTripDesc => 'Record your first OBD2 trip.';
+
+  @override
+  String get achievementFirstFillUp => 'First fill-up';
+
+  @override
+  String get achievementFirstFillUpDesc => 'Log your first fill-up.';
+
+  @override
+  String get achievementTenTrips => '10 trips';
+
+  @override
+  String get achievementTenTripsDesc => 'Record 10 OBD2 trips.';
+
+  @override
+  String get achievementZeroHarsh => 'Smooth driver';
+
+  @override
+  String get achievementZeroHarshDesc =>
+      'Complete a trip of 10 km or more with no harsh braking or acceleration.';
+
+  @override
   String get tripHistoryTitle => 'Trip history';
 
   @override

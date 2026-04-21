@@ -8,6 +8,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../achievements/presentation/widgets/badge_shelf.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/csv_exporter.dart';
 import '../../providers/consumption_providers.dart';
@@ -109,6 +110,7 @@ class ConsumptionScreen extends ConsumerWidget {
                                 'consumption and CO₂ footprint. Swipe left '
                                 'to delete an entry.',
                       ),
+                      const BadgeShelf(),
                       ConsumptionStatsCard(stats: stats),
                     ],
                   );

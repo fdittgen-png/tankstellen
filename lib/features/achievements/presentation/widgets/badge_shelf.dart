@@ -1,0 +1,148 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../l10n/app_localizations.dart';
+import '../../domain/achievement.dart';
+import '../../providers/achievements_provider.dart';
+
+/// Row of earned + unearned badges (#781). Zero-height when nothing
+/// is earned yet so the consumption screen doesn't get cluttered for
+/// first-run users; a short prompt replaces the shelf in that case.
+class BadgeShelf extends ConsumerWidget {
+  const BadgeShelf({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final earned = ref.watch(achievementsProvider);
+    final l = AppLocalizations.of(context);
+    if (earned.isEmpty) return const SizedBox.shrink();
+    final earnedIds = {for (final e in earned) e.id};
+    final theme = Theme.of(context);
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.emoji_events_outlined, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  l?.achievementsTitle ?? 'Achievements',
+                  style: theme.textTheme.titleSmall,
+                ),
+                const Spacer(),
+                Text(
+                  '${earnedIds.length}/${AchievementId.values.length}',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 88,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  for (final id in AchievementId.values)
+                    _BadgeTile(
+                      id: id,
+                      isEarned: earnedIds.contains(id),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BadgeTile extends StatelessWidget {
+  final AchievementId id;
+  final bool isEarned;
+
+  const _BadgeTile({required this.id, required this.isEarned});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final (icon, label) = _iconAndLabel(id, l);
+    return Tooltip(
+      message: _description(id, l),
+      child: Container(
+        width: 88,
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: isEarned
+              ? theme.colorScheme.primaryContainer
+              : theme.colorScheme.surfaceContainerHighest,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 28,
+              color: isEarned
+                  ? theme.colorScheme.onPrimaryContainer
+                  : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: isEarned
+                    ? theme.colorScheme.onPrimaryContainer
+                    : theme.colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  (IconData, String) _iconAndLabel(AchievementId id, AppLocalizations? l) {
+    switch (id) {
+      case AchievementId.firstTrip:
+        return (Icons.route, l?.achievementFirstTrip ?? 'First trip');
+      case AchievementId.firstFillUp:
+        return (
+          Icons.local_gas_station,
+          l?.achievementFirstFillUp ?? 'First fill-up',
+        );
+      case AchievementId.tenTrips:
+        return (Icons.military_tech, l?.achievementTenTrips ?? '10 trips');
+      case AchievementId.zeroHarshTrip:
+        return (Icons.spa, l?.achievementZeroHarsh ?? 'Smooth driver');
+    }
+  }
+
+  String _description(AchievementId id, AppLocalizations? l) {
+    switch (id) {
+      case AchievementId.firstTrip:
+        return l?.achievementFirstTripDesc ??
+            'Record your first OBD2 trip.';
+      case AchievementId.firstFillUp:
+        return l?.achievementFirstFillUpDesc ??
+            'Log your first fill-up.';
+      case AchievementId.tenTrips:
+        return l?.achievementTenTripsDesc ??
+            'Record 10 OBD2 trips.';
+      case AchievementId.zeroHarshTrip:
+        return l?.achievementZeroHarshDesc ??
+            'Complete a trip of 10 km or more with no harsh braking or acceleration.';
+    }
+  }
+}

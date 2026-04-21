@@ -3757,6 +3757,60 @@ abstract class AppLocalizations {
   /// **'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.'**
   String get vehicleBaselineResetConfirmBody;
 
+  /// No description provided for @achievementsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements'**
+  String get achievementsTitle;
+
+  /// No description provided for @achievementFirstTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'First trip'**
+  String get achievementFirstTrip;
+
+  /// No description provided for @achievementFirstTripDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Record your first OBD2 trip.'**
+  String get achievementFirstTripDesc;
+
+  /// No description provided for @achievementFirstFillUp.
+  ///
+  /// In en, this message translates to:
+  /// **'First fill-up'**
+  String get achievementFirstFillUp;
+
+  /// No description provided for @achievementFirstFillUpDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Log your first fill-up.'**
+  String get achievementFirstFillUpDesc;
+
+  /// No description provided for @achievementTenTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'10 trips'**
+  String get achievementTenTrips;
+
+  /// No description provided for @achievementTenTripsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Record 10 OBD2 trips.'**
+  String get achievementTenTripsDesc;
+
+  /// No description provided for @achievementZeroHarsh.
+  ///
+  /// In en, this message translates to:
+  /// **'Smooth driver'**
+  String get achievementZeroHarsh;
+
+  /// No description provided for @achievementZeroHarshDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete a trip of 10 km or more with no harsh braking or acceleration.'**
+  String get achievementZeroHarshDesc;
+
   /// No description provided for @tripHistoryTitle.
   ///
   /// In en, this message translates to:
