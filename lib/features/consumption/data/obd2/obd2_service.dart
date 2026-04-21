@@ -164,11 +164,18 @@ class Obd2Service {
   /// NA petrol engine (matches the Peugeot 107 / Aygo / C1 class and
   /// covers many other sub-1.2 L city cars). A follow-up PR will plumb
   /// per-vehicle overrides from the vehicle profile.
+  ///
+  /// Fuel-trim correction (#813) is applied on the MAF and
+  /// speed-density branches — both compute air-mass at stoichiometric
+  /// AFR, but the ECU is often trimming the real mixture ±10 %. The
+  /// `(1 + (STFT + LTFT) / 100)` factor closes most of the gap with
+  /// pump-measured consumption. Skipped on the direct-5E path because
+  /// the ECU already returns a post-trim number there.
   Future<double?> readFuelRateLPerHour({
     int engineDisplacementCc = 1000,
     double volumetricEfficiency = 0.85,
   }) async {
-    // Step 1: direct fuel-rate PID.
+    // Step 1: direct fuel-rate PID. Already post-trim — no correction.
     final direct = await _readDouble(
       Elm327Protocol.engineFuelRateCommand,
       Elm327Protocol.parseFuelRateLPerHour,
@@ -181,7 +188,8 @@ class Obd2Service {
     if (maf != null) {
       // Stoichiometric petrol: AFR 14.7, density ~740 g/L.
       // L/h = MAF × 3600 / (14.7 × 740).
-      return maf * 3600.0 / (14.7 * 740.0);
+      final rate = maf * 3600.0 / (14.7 * 740.0);
+      return _applyFuelTrimCorrection(rate);
     }
 
     // Step 3: speed-density fallback. Requires MAP + IAT + RPM.
@@ -189,13 +197,44 @@ class Obd2Service {
     final iatCelsius = await readIntakeAirTempCelsius();
     final rpm = await readRpm();
     if (mapKpa == null || iatCelsius == null || rpm == null) return null;
-    return estimateFuelRateLPerHourFromMap(
+    final rate = estimateFuelRateLPerHourFromMap(
       mapKpa: mapKpa,
       iatCelsius: iatCelsius,
       rpm: rpm,
       engineDisplacementCc: engineDisplacementCc,
       volumetricEfficiency: volumetricEfficiency,
     );
+    if (rate == null) return null;
+    return _applyFuelTrimCorrection(rate);
+  }
+
+  /// Multiply a stoichiometric-assumption fuel rate by
+  /// `(1 + (STFT + LTFT) / 100)` when both trims are readable (#813).
+  /// If either trim is missing or un-parseable, returns [raw]
+  /// unchanged — better to ship the raw MAF/speed-density number
+  /// than one corrected by half the signal.
+  Future<double> _applyFuelTrimCorrection(double raw) async {
+    final stft = await readShortTermFuelTrimPercent();
+    final ltft = await readLongTermFuelTrimPercent();
+    if (stft == null || ltft == null) return raw;
+    return applyFuelTrimCorrection(raw, stft: stft, ltft: ltft);
+  }
+
+  /// Pure-math fuel-trim correction factor (#813). Exposed for unit
+  /// tests and for callers that already hold the trim values.
+  ///
+  /// Formula: `corrected = raw × (1 + (STFT + LTFT) / 100)`. Positive
+  /// trims mean the ECU is enriching the mixture — real fuel flow is
+  /// higher than what stoichiometric math predicts. Negative trims
+  /// mean the opposite. Summing STFT and LTFT is standard practice
+  /// (HEM Data's canonical formula); they capture fast and slow
+  /// corrections respectively.
+  static double applyFuelTrimCorrection(
+    double raw, {
+    required double stft,
+    required double ltft,
+  }) {
+    return raw * (1.0 + (stft + ltft) / 100.0);
   }
 
   /// Pure-math speed-density fuel-rate estimator (#800). Split out so
@@ -260,6 +299,23 @@ class Obd2Service {
         Elm327Protocol.intakeAirTempCommand,
         Elm327Protocol.parseIntakeAirTempCelsius,
         label: 'intakeAirTemp',
+      );
+
+  /// Read short-term fuel trim bank 1 (%) (#813). Fast-feedback loop
+  /// correction; the ECU adjusts this constantly to hit stoich.
+  Future<double?> readShortTermFuelTrimPercent() => _readDouble(
+        Elm327Protocol.shortTermFuelTrimCommand,
+        Elm327Protocol.parseShortTermFuelTrim,
+        label: 'shortTermFuelTrim',
+      );
+
+  /// Read long-term fuel trim bank 1 (%) (#813). Slow-drifting
+  /// correction that captures persistent offsets — altitude, air
+  /// filter state, injector wear.
+  Future<double?> readLongTermFuelTrimPercent() => _readDouble(
+        Elm327Protocol.longTermFuelTrimCommand,
+        Elm327Protocol.parseLongTermFuelTrim,
+        label: 'longTermFuelTrim',
       );
 
   /// Read fuel tank level, 0–100 %. (#717)

@@ -129,6 +129,46 @@ void main() {
       });
     });
 
+    group('parseShortTermFuelTrim / parseLongTermFuelTrim — #813', () {
+      test('STFT parses 0 % at midpoint raw 0x80', () {
+        expect(
+          Elm327Protocol.parseShortTermFuelTrim('41 06 80>'),
+          closeTo(0.0, 0.01),
+        );
+      });
+
+      test('STFT parses -100 % at raw 0x00 (extreme lean correction)', () {
+        expect(
+          Elm327Protocol.parseShortTermFuelTrim('41 06 00>'),
+          closeTo(-100.0, 0.01),
+        );
+      });
+
+      test('STFT parses +99.2 % at raw 0xFF (extreme rich correction)', () {
+        expect(
+          Elm327Protocol.parseShortTermFuelTrim('41 06 FF>'),
+          closeTo(99.22, 0.1),
+        );
+      });
+
+      test('LTFT uses the same formula as STFT, different PID', () {
+        // raw 0x90 = 144, (144-128)*100/128 = 12.5
+        expect(
+          Elm327Protocol.parseLongTermFuelTrim('41 07 90>'),
+          closeTo(12.5, 0.1),
+        );
+      });
+
+      test('STFT returns null on NO DATA', () {
+        expect(Elm327Protocol.parseShortTermFuelTrim('NO DATA>'), isNull);
+      });
+
+      test('STFT returns null when response is for a different PID', () {
+        // Guard against mixing up STFT and LTFT responses.
+        expect(Elm327Protocol.parseShortTermFuelTrim('41 07 80>'), isNull);
+      });
+    });
+
     group('command constants', () {
       test('expose the new PIDs for the service layer', () {
         expect(Elm327Protocol.engineLoadCommand, '0104\r');
@@ -139,6 +179,9 @@ void main() {
         // #800 speed-density fallback PIDs:
         expect(Elm327Protocol.intakeManifoldPressureCommand, '010B\r');
         expect(Elm327Protocol.intakeAirTempCommand, '010F\r');
+        // #813 fuel-trim PIDs:
+        expect(Elm327Protocol.shortTermFuelTrimCommand, '0106\r');
+        expect(Elm327Protocol.longTermFuelTrimCommand, '0107\r');
       });
     });
   });
