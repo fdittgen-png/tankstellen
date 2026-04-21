@@ -1932,6 +1932,19 @@ class AppLocalizationsRo extends AppLocalizations {
   String get tripBannerPaused => 'Trip paused — tap to resume';
 
   @override
+  String get tripHistoryTitle => 'Trip history';
+
+  @override
+  String get tripHistoryEmptyTitle => 'No trips yet';
+
+  @override
+  String get tripHistoryEmptySubtitle =>
+      'Connect an OBD2 adapter and record a trip to start building your driving history.';
+
+  @override
+  String get tripHistoryUnknownDate => 'Unknown date';
+
+  @override
   String get situationIdle => 'Idle';
 
   @override

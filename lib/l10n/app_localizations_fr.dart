@@ -1941,6 +1941,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tripBannerPaused => 'Trajet en pause — toucher pour reprendre';
 
   @override
+  String get tripHistoryTitle => 'Historique des trajets';
+
+  @override
+  String get tripHistoryEmptyTitle => 'Aucun trajet';
+
+  @override
+  String get tripHistoryEmptySubtitle =>
+      'Branchez un adaptateur OBD2 et enregistrez un trajet pour commencer à constituer votre historique.';
+
+  @override
+  String get tripHistoryUnknownDate => 'Date inconnue';
+
+  @override
   String get situationIdle => 'Ralenti';
 
   @override

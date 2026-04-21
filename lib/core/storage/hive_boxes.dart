@@ -24,6 +24,11 @@ class HiveBoxes {
   /// live outside the encrypted set to keep startup cheap.
   static const String obd2Baselines = 'obd2_baselines';
 
+  /// Rolling log of finalised OBD2 trips (#726). Aggregated driving
+  /// metrics (distance, avg L/100 km, harsh events). Treated like the
+  /// baselines box: unencrypted, opened once at startup.
+  static const String obd2TripHistory = 'obd2_trip_history';
+
   static const _encryptedBoxes = {
     settings,
     profiles,
@@ -100,6 +105,8 @@ class HiveBoxes {
     // #769 — OBD2 baselines are unencrypted JSON strings; low
     // sensitivity and opened once at startup like the other boxes.
     await Hive.openBox<String>(obd2Baselines);
+    // #726 — OBD2 trip history: rolling log of finalised trips.
+    await Hive.openBox<String>(obd2TripHistory);
   }
 
   /// Initialize Hive in a background isolate with proper encryption.

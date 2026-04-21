@@ -3679,6 +3679,30 @@ abstract class AppLocalizations {
   /// **'Trip paused — tap to resume'**
   String get tripBannerPaused;
 
+  /// No description provided for @tripHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip history'**
+  String get tripHistoryTitle;
+
+  /// No description provided for @tripHistoryEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No trips yet'**
+  String get tripHistoryEmptyTitle;
+
+  /// No description provided for @tripHistoryEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect an OBD2 adapter and record a trip to start building your driving history.'**
+  String get tripHistoryEmptySubtitle;
+
+  /// No description provided for @tripHistoryUnknownDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown date'**
+  String get tripHistoryUnknownDate;
+
   /// No description provided for @situationIdle.
   ///
   /// In en, this message translates to:
