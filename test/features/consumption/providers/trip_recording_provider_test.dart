@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
+import 'package:tankstellen/features/consumption/domain/cold_start_baselines.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 
 void main() {
@@ -107,6 +108,84 @@ void main() {
       await notifier.stop();
       // b was never wired in; clean it up manually.
       await b.disconnect();
+    });
+  });
+
+  group('hapticForBandTransition (#767)', () {
+    test('same band → none', () {
+      expect(
+        hapticForBandTransition(
+            ConsumptionBand.normal, ConsumptionBand.normal),
+        HapticIntensity.none,
+      );
+    });
+
+    test('normal → heavy fires light', () {
+      expect(
+        hapticForBandTransition(
+            ConsumptionBand.normal, ConsumptionBand.heavy),
+        HapticIntensity.light,
+      );
+    });
+
+    test('eco → heavy fires light', () {
+      expect(
+        hapticForBandTransition(
+            ConsumptionBand.eco, ConsumptionBand.heavy),
+        HapticIntensity.light,
+      );
+    });
+
+    test('transient → heavy fires light — a short WOT overtake that '
+        'settles into sustained heavy should still ping', () {
+      expect(
+        hapticForBandTransition(
+            ConsumptionBand.transient, ConsumptionBand.heavy),
+        HapticIntensity.light,
+      );
+    });
+
+    test('normal → veryHeavy fires medium', () {
+      expect(
+        hapticForBandTransition(
+            ConsumptionBand.normal, ConsumptionBand.veryHeavy),
+        HapticIntensity.medium,
+      );
+    });
+
+    test('heavy → veryHeavy fires medium — escalation is worth a '
+        'stronger pulse', () {
+      expect(
+        hapticForBandTransition(
+            ConsumptionBand.heavy, ConsumptionBand.veryHeavy),
+        HapticIntensity.medium,
+      );
+    });
+
+    test('veryHeavy → heavy stays silent — improvements never ping',
+        () {
+      expect(
+        hapticForBandTransition(
+            ConsumptionBand.veryHeavy, ConsumptionBand.heavy),
+        HapticIntensity.none,
+      );
+    });
+
+    test('heavy → eco stays silent', () {
+      expect(
+        hapticForBandTransition(
+            ConsumptionBand.heavy, ConsumptionBand.eco),
+        HapticIntensity.none,
+      );
+    });
+
+    test('normal → eco stays silent — positive transitions are '
+        'rewarded by the banner colour, not by vibration', () {
+      expect(
+        hapticForBandTransition(
+            ConsumptionBand.normal, ConsumptionBand.eco),
+        HapticIntensity.none,
+      );
     });
   });
 }

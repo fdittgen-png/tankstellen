@@ -25,20 +25,32 @@ class TripRecordingBanner extends ConsumerWidget {
     if (!state.isActive) return child;
 
     final bandColor = _bandColor(context, state.band, state.phase);
+    final l = AppLocalizations.of(context);
     return Column(
       children: [
-        Material(
-          color: bandColor.background,
-          elevation: 2,
-          child: SafeArea(
-            bottom: false,
-            child: InkWell(
-              key: const Key('tripRecordingBanner'),
-              onTap: () => GoRouter.of(context).push('/trip-recording'),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 6),
-                child: _Content(state: state, palette: bandColor),
+        Semantics(
+          container: true,
+          button: true,
+          // liveRegion makes TalkBack re-read the label when the
+          // band or situation changes — that's the whole point of
+          // the ambient consumption signal (#767).
+          liveRegion: true,
+          label: _semanticsLabel(state, l),
+          child: ExcludeSemantics(
+            child: Material(
+              color: bandColor.background,
+              elevation: 2,
+              child: SafeArea(
+                bottom: false,
+                child: InkWell(
+                  key: const Key('tripRecordingBanner'),
+                  onTap: () => GoRouter.of(context).push('/trip-recording'),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 6),
+                    child: _Content(state: state, palette: bandColor),
+                  ),
+                ),
               ),
             ),
           ),
@@ -46,6 +58,46 @@ class TripRecordingBanner extends ConsumerWidget {
         Expanded(child: child),
       ],
     );
+  }
+
+  String _semanticsLabel(TripRecordingState state, AppLocalizations? l) {
+    if (state.phase == TripRecordingPhase.paused) {
+      return l?.tripBannerPaused ?? 'Trip paused';
+    }
+    final prefix = l?.tripBannerRecording ?? 'Recording trip';
+    final situation = _situationLabel(state.situation, l);
+    final parts = <String>[prefix, situation];
+    final delta = state.liveDeltaFraction;
+    if (delta != null) {
+      final pct = (delta * 100).round();
+      parts.add('${pct >= 0 ? '+' : ''}$pct%');
+    }
+    final distance = state.live?.distanceKmSoFar;
+    if (distance != null) {
+      parts.add('${distance.toStringAsFixed(1)} km');
+    }
+    return parts.join(', ');
+  }
+
+  String _situationLabel(DrivingSituation s, AppLocalizations? l) {
+    switch (s) {
+      case DrivingSituation.idle:
+        return l?.situationIdle ?? 'Idle';
+      case DrivingSituation.stopAndGo:
+        return l?.situationStopAndGo ?? 'Stop & go';
+      case DrivingSituation.urbanCruise:
+        return l?.situationUrban ?? 'Urban';
+      case DrivingSituation.highwayCruise:
+        return l?.situationHighway ?? 'Highway';
+      case DrivingSituation.deceleration:
+        return l?.situationDecel ?? 'Decelerating';
+      case DrivingSituation.climbingOrLoaded:
+        return l?.situationClimbing ?? 'Climbing / loaded';
+      case DrivingSituation.hardAccel:
+        return l?.situationHardAccel ?? 'Hard accel';
+      case DrivingSituation.fuelCutCoast:
+        return l?.situationFuelCut ?? 'Fuel cut — coast';
+    }
   }
 
   _BannerPalette _bandColor(
