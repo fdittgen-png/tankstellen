@@ -3811,6 +3811,66 @@ abstract class AppLocalizations {
   /// **'Complete a trip of 10 km or more with no harsh braking or acceleration.'**
   String get achievementZeroHarshDesc;
 
+  /// No description provided for @obd2StatusConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 adapter: connected'**
+  String get obd2StatusConnected;
+
+  /// No description provided for @obd2StatusAttempting.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 adapter: connecting'**
+  String get obd2StatusAttempting;
+
+  /// No description provided for @obd2StatusUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 adapter: unreachable'**
+  String get obd2StatusUnreachable;
+
+  /// No description provided for @obd2StatusPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 adapter: Bluetooth permission needed'**
+  String get obd2StatusPermissionDenied;
+
+  /// No description provided for @obd2StatusConnectedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to record a trip.'**
+  String get obd2StatusConnectedBody;
+
+  /// No description provided for @obd2StatusAttemptingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting in the background…'**
+  String get obd2StatusAttemptingBody;
+
+  /// No description provided for @obd2StatusUnreachableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Adapter out of range or already in use by another app.'**
+  String get obd2StatusUnreachableBody;
+
+  /// No description provided for @obd2StatusPermissionDeniedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant Bluetooth permission in system settings to reconnect automatically.'**
+  String get obd2StatusPermissionDeniedBody;
+
+  /// No description provided for @obd2StatusNoAdapter.
+  ///
+  /// In en, this message translates to:
+  /// **'No adapter paired'**
+  String get obd2StatusNoAdapter;
+
+  /// No description provided for @obd2StatusForget.
+  ///
+  /// In en, this message translates to:
+  /// **'Forget adapter'**
+  String get obd2StatusForget;
+
   /// No description provided for @tripHistoryTitle.
   ///
   /// In en, this message translates to:

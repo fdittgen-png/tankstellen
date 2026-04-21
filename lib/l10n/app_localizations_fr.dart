@@ -2015,6 +2015,39 @@ class AppLocalizationsFr extends AppLocalizations {
       'Terminez un trajet d\'au moins 10 km sans freinage ni accélération brusques.';
 
   @override
+  String get obd2StatusConnected => 'Adaptateur OBD2 : connecté';
+
+  @override
+  String get obd2StatusAttempting => 'Adaptateur OBD2 : connexion en cours';
+
+  @override
+  String get obd2StatusUnreachable => 'Adaptateur OBD2 : injoignable';
+
+  @override
+  String get obd2StatusPermissionDenied =>
+      'Adaptateur OBD2 : autorisation Bluetooth requise';
+
+  @override
+  String get obd2StatusConnectedBody => 'Prêt à enregistrer un trajet.';
+
+  @override
+  String get obd2StatusAttemptingBody => 'Connexion en cours en arrière-plan…';
+
+  @override
+  String get obd2StatusUnreachableBody =>
+      'Adaptateur hors de portée ou déjà utilisé par une autre application.';
+
+  @override
+  String get obd2StatusPermissionDeniedBody =>
+      'Autorisez le Bluetooth dans les réglages système pour reconnecter automatiquement.';
+
+  @override
+  String get obd2StatusNoAdapter => 'Aucun adaptateur couplé';
+
+  @override
+  String get obd2StatusForget => 'Oublier l\'adaptateur';
+
+  @override
   String get tripHistoryTitle => 'Historique des trajets';
 
   @override

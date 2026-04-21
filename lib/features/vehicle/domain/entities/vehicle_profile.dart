@@ -92,6 +92,14 @@ abstract class VehicleProfile with _$VehicleProfile {
     // Combustion fields
     double? tankCapacityL,
     String? preferredFuelType,
+
+    // OBD2 adapter pairing (#784). Persisted so the app can
+    // transparently reconnect on launch without prompting the user
+    // again. Both fields are nullable — unpaired vehicles carry
+    // null. The MAC is the stable key; the name is the label shown
+    // to the user ("vLinker FS").
+    String? obd2AdapterMac,
+    String? obd2AdapterName,
   }) = _VehicleProfile;
 
   factory VehicleProfile.fromJson(Map<String, dynamic> json) =>
