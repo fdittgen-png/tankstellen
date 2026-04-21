@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/hive_boxes.dart';
+import '../../../core/sync/sync_service.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/baseline_store.dart';
@@ -339,6 +340,13 @@ class TripRecording extends _$TripRecording {
       } catch (e) {
         debugPrint('TripRecording.stop: baseline flush failed: $e');
       }
+      // #780 — fold in the server copy once the local flush lands.
+      // `syncVehicleBaseline` returns the merged JSON; if the merge
+      // changed anything, we rewrite Hive and reload so the next
+      // trip sees the higher-confidence per-situation accumulators.
+      // Entirely best-effort: offline, unauthenticated, or sync
+      // errors all return the local payload unchanged.
+      await _syncBaselineAfterFlush(vid);
     }
     _store = null;
     _vehicleId = null;
@@ -360,6 +368,35 @@ class TripRecording extends _$TripRecording {
   /// [StoppedTripResult] (saves as fill-up or discards).
   void reset() {
     state = const TripRecordingState();
+  }
+
+  /// #780 — merge local + server baselines for [vehicleId] via the
+  /// sync service. Called after the Hive flush so the payload on
+  /// disk is what actually gets sent, and the merged result (higher
+  /// per-situation sample counts) overwrites disk for the next
+  /// trip. No-op when the Hive box is closed or the sync client
+  /// is offline/unauthenticated — both paths return the input
+  /// payload unchanged.
+  Future<void> _syncBaselineAfterFlush(String vehicleId) async {
+    try {
+      if (!Hive.isBoxOpen(HiveBoxes.obd2Baselines)) return;
+      final box = Hive.box<String>(HiveBoxes.obd2Baselines);
+      final key = 'baseline:$vehicleId';
+      final localJson = box.get(key);
+      final merged = await SyncService.syncVehicleBaseline(
+        vehicleId: vehicleId,
+        localJson: localJson,
+      );
+      if (merged != null && merged != localJson) {
+        await box.put(key, merged);
+        // No in-memory cache refresh needed — _store is nulled out
+        // right after this call and the next trip creates a fresh
+        // BaselineStore whose loadVehicle reads the merged JSON
+        // from disk.
+      }
+    } catch (e) {
+      debugPrint('TripRecording.stop: baseline sync failed: $e');
+    }
   }
 
   Future<void> _saveToHistory(TripSummary summary) async {
