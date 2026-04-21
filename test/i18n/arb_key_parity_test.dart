@@ -115,9 +115,9 @@ String _localeFromPath(String p) {
 /// accidental removals. Locales left out of this map cause the test
 /// to fail, forcing an explicit decision on new locales.
 const Map<String, int> _baseline = {
-  'en': 799,
-  'de': 799,
-  'fr': 596,
+  'en': 800,
+  'de': 800,
+  'fr': 617,
   'bg': 300,
   'cs': 300,
   'da': 300,

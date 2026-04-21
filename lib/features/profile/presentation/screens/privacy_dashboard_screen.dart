@@ -68,8 +68,9 @@ class _PrivacyDashboardScreenState
             onPressed: _exportErrorLog,
             icon: const Icon(Icons.bug_report_outlined),
             label: Text(
-              'Copy error log to clipboard '
-              '(${ref.watch(traceStorageProvider).count})',
+              l?.privacyCopyErrorLog(ref.watch(traceStorageProvider).count) ??
+                  'Copy error log to clipboard '
+                      '(${ref.watch(traceStorageProvider).count})',
             ),
           ),
           const SizedBox(height: 12),

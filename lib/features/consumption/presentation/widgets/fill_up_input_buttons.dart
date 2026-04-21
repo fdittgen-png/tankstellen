@@ -44,7 +44,12 @@ class FillUpInputButtons extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.document_scanner),
-            label: Text(l?.scanReceipt ?? 'Scan receipt'),
+            label: Text(
+              l?.scanReceipt ?? 'Scan receipt',
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.visible,
+            ),
           ),
         ),
         if (onScanPump != null) ...[
@@ -60,7 +65,12 @@ class FillUpInputButtons extends StatelessWidget {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.local_gas_station),
-              label: Text(l?.scanPump ?? 'Scan pump'),
+              label: Text(
+                l?.scanPump ?? 'Scan pump',
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.visible,
+              ),
             ),
           ),
         ],
@@ -75,7 +85,12 @@ class FillUpInputButtons extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.bluetooth),
-            label: Text(l?.obdConnect ?? 'OBD-II'),
+            label: Text(
+              l?.obdConnect ?? 'OBD-II',
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.visible,
+            ),
           ),
         ),
       ],
