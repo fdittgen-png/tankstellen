@@ -18,6 +18,7 @@ import '../../data/receipt_scan_service.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
 import '../widgets/bad_scan_report_sheet.dart';
+import '../widgets/fill_up_date_row.dart';
 import '../widgets/fill_up_input_buttons.dart';
 import '../widgets/fill_up_numeric_field.dart';
 
@@ -373,13 +374,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
               ),
               const SizedBox(height: 12),
             ],
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const Icon(Icons.calendar_today),
-              title: Text(l?.fillUpDate ?? 'Date'),
-              subtitle: Text(dateStr),
-              onTap: _pickDate,
-            ),
+            FillUpDateRow(dateLabel: dateStr, onTap: _pickDate),
             const SizedBox(height: 8),
             // Vehicle picker (#713). Mandatory — the form is only reachable
             // when at least one vehicle exists (empty-state above). Fuel is
