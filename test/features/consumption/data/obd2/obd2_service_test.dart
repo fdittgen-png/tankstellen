@@ -113,6 +113,89 @@ void main() {
       );
     });
 
+    test(
+        'readFuelRateLPerHour applies fuel-trim correction on the MAF path '
+        'when both STFT and LTFT are readable (#813)', () async {
+      final service = await _connected({
+        '015E': 'NO DATA>',
+        '0110': '41 10 04 00>', // MAF = 10.24 g/s → raw rate ≈ 3.389 L/h
+        '0106': '41 06 8D>', // STFT raw 0x8D = 141 → +10.16 %
+        '0107': '41 07 86>', // LTFT raw 0x86 = 134 → +4.69 %
+      });
+      final rate = await service.readFuelRateLPerHour();
+      expect(rate, isNotNull);
+      // Correction factor 1 + (10.16 + 4.69)/100 ≈ 1.1485
+      // 3.389 × 1.1485 ≈ 3.893 L/h
+      expect(rate, closeTo(3.893, 0.05));
+    });
+
+    test(
+        'readFuelRateLPerHour skips trim correction on direct PID 5E path '
+        '— that value is already post-trim (#813)', () async {
+      final service = await _connected({
+        '015E': '41 5E 08 00>', // 102.4 L/h
+        '0106': '41 06 A0>', // +25% STFT — MUST NOT be applied
+        '0107': '41 07 A0>', // +25% LTFT — MUST NOT be applied
+      });
+      final rate = await service.readFuelRateLPerHour();
+      expect(rate, closeTo(102.4, 0.1));
+    });
+
+    test(
+        'readFuelRateLPerHour leaves the raw rate unchanged when only one '
+        'of STFT/LTFT is available (#813)', () async {
+      // MAF path + STFT missing: prefer the raw 3.389 over a
+      // half-applied correction.
+      final service = await _connected({
+        '015E': 'NO DATA>',
+        '0110': '41 10 04 00>',
+        '0106': 'NO DATA>',
+        '0107': '41 07 90>',
+      });
+      final rate = await service.readFuelRateLPerHour();
+      expect(rate, closeTo(3.389, 0.01));
+    });
+
+    test('readShortTermFuelTrimPercent parses PID 06 (#813)', () async {
+      final service = await _connected({'0106': '41 06 90>'});
+      expect(
+        await service.readShortTermFuelTrimPercent(),
+        closeTo(12.5, 0.1),
+      );
+    });
+
+    test('readLongTermFuelTrimPercent parses PID 07 (#813)', () async {
+      final service = await _connected({'0107': '41 07 70>'});
+      // raw 0x70 = 112, (112-128)*100/128 = -12.5 → lean-running engine
+      expect(
+        await service.readLongTermFuelTrimPercent(),
+        closeTo(-12.5, 0.1),
+      );
+    });
+
+    group('applyFuelTrimCorrection pure math — #813', () {
+      test('positive trims enrich (raw × (1 + sum/100))', () {
+        expect(
+          Obd2Service.applyFuelTrimCorrection(10.0, stft: 6.0, ltft: 4.0),
+          closeTo(11.0, 0.001),
+        );
+      });
+
+      test('negative trims lean (factor < 1)', () {
+        expect(
+          Obd2Service.applyFuelTrimCorrection(10.0, stft: -5.0, ltft: -5.0),
+          closeTo(9.0, 0.001),
+        );
+      });
+
+      test('zero trims pass through unchanged', () {
+        expect(
+          Obd2Service.applyFuelTrimCorrection(10.0, stft: 0, ltft: 0),
+          closeTo(10.0, 0.001),
+        );
+      });
+    });
+
     group('estimateFuelRateLPerHourFromMap — #800 speed-density math', () {
       test('typical Peugeot 107 cruise: 2500 RPM, 65 kPa, 30 °C → '
           '~3–5 L/h (plausible cruise consumption)', () {

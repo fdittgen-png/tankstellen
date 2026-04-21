@@ -164,6 +164,17 @@ class Elm327Protocol {
   /// °C = A − 40 (one-byte response).
   static const intakeAirTempCommand = '010F\r';
 
+  /// Request short-term fuel trim, bank 1 (%). Mode 01, PID 06. Used
+  /// to correct the MAF- and speed-density-based fuel-rate formulas
+  /// for the ECU's real-time mixture adjustment (#813). Formula:
+  /// trim% = (A − 128) × 100 / 128 (one-byte response, 128 = 0%).
+  static const shortTermFuelTrimCommand = '0106\r';
+
+  /// Request long-term fuel trim, bank 1 (%). Mode 01, PID 07. Same
+  /// formula as STFT. LTFT drifts slowly and captures persistent
+  /// mixture offsets (dirty air filter, wrong fuel grade, altitude).
+  static const longTermFuelTrimCommand = '0107\r';
+
   /// Request fuel tank level input (%). Mode 01, PID 2F. (#717)
   static const fuelTankLevelCommand = '012F\r';
 
@@ -353,6 +364,29 @@ class Elm327Protocol {
     final bytes = _parseModeOneBody(raw, 0x0F, minBytes: 3);
     if (bytes == null) return null;
     return bytes[2].toDouble() - 40.0;
+  }
+
+  /// Parse short-term fuel trim bank 1 from Mode 01 PID 06 response
+  /// (#813). Formula: `trim% = (A − 128) × 100 / 128`. Midpoint 128
+  /// = 0 % (stoichiometric); <128 means the ECU is leaning the
+  /// mixture (adding less fuel than stoich), >128 means it's
+  /// enriching. Response: "41 06 XX". Valid range roughly
+  /// −100 % … +99 %.
+  static double? parseShortTermFuelTrim(String raw) =>
+      _parseFuelTrim(raw, 0x06);
+
+  /// Parse long-term fuel trim bank 1 from Mode 01 PID 07 response
+  /// (#813). Same formula as STFT — captures persistent mixture
+  /// offsets rather than the fast-feedback loop.
+  static double? parseLongTermFuelTrim(String raw) =>
+      _parseFuelTrim(raw, 0x07);
+
+  /// Shared fuel-trim decoder used by PIDs 06 / 07 (and 08 / 09 when
+  /// we add bank-2 support). Returns null on NO DATA.
+  static double? _parseFuelTrim(String raw, int expectedPid) {
+    final bytes = _parseModeOneBody(raw, expectedPid, minBytes: 3);
+    if (bytes == null) return null;
+    return (bytes[2] - 128) * 100.0 / 128.0;
   }
 
   /// Helper for every "1 byte, scaled to percent" PID (04, 11, 2F).
