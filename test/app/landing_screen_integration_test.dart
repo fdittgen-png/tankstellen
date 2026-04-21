@@ -105,6 +105,14 @@ List<Object> _readyAppOverrides({
 
 Future<void> _pumpAppWithRouter(
     WidgetTester tester, List<Object> overrides) async {
+  // #778 widened the shell to 5 tabs, which shifts the search-screen
+  // bars by a few pixels at default test viewports. Give the test a
+  // taller viewport so the non-flex banners have enough room.
+  tester.view.physicalSize = const Size(800, 900);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
   await tester.pumpWidget(
     ProviderScope(
       overrides: overrides.cast(),

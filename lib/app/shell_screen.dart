@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/utils/frame_callbacks.dart';
-import '../features/profile/providers/profile_provider.dart';
-import '../features/vehicle/providers/vehicle_providers.dart';
 import '../l10n/app_localizations.dart';
 import 'current_shell_branch_provider.dart';
 import 'responsive_search_layout.dart';
@@ -156,36 +154,23 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
     final screenSize = screenSizeOf(context);
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
-    // Profile flag + vehicle presence decide whether the 5th tab
-    // (#701) renders. The tab ALWAYS exists as a router branch so
-    // deep links keep working; the UI just hides the nav entry when
-    // the user hasn't opted in or has no vehicle yet.
-    bool showConsumptionTab = false;
-    try {
-      final profile = ref.watch(activeProfileProvider);
-      final vehicles = ref.watch(vehicleProfileListProvider);
-      showConsumptionTab =
-          (profile?.showConsumptionTab ?? false) && vehicles.isNotEmpty;
-    } catch (e) {
-      // Widget tests without a real Hive storage — treat as hidden.
-      debugPrint('ShellScreen: consumption-tab visibility probe: $e');
-    }
-
+    // #778 — Consumption is a first-class destination now: always
+    // visible, sitting between Favorites and Settings. Order must
+    // match the StatefulShellRoute branches in router.dart.
     final destinations = <_NavItem>[
       _NavItem(Icons.search_outlined, Icons.search, l10n?.search ?? 'Search'),
       _NavItem(Icons.map_outlined, Icons.map, l10n?.map ?? 'Map'),
       _NavItem(Icons.star_outline, Icons.star, l10n?.favorites ?? 'Favorites'),
       _NavItem(
+        Icons.local_gas_station_outlined,
+        Icons.local_gas_station,
+        l10n?.navConsumption ?? 'Consumption',
+      ),
+      _NavItem(
         Icons.settings_outlined,
         Icons.settings,
         l10n?.settings ?? 'Settings',
       ),
-      if (showConsumptionTab)
-        _NavItem(
-          Icons.local_gas_station_outlined,
-          Icons.local_gas_station,
-          l10n?.consumptionLogTitle ?? 'Consumption',
-        ),
     ];
 
     final body = GestureDetector(

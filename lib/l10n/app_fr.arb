@@ -752,6 +752,7 @@
   "tripResume": "Reprendre",
   "tripBannerRecording": "Enregistrement en cours",
   "tripBannerPaused": "Trajet en pause — toucher pour reprendre",
+  "navConsumption": "Conso",
   "tripHistoryTitle": "Historique des trajets",
   "tripHistoryEmptyTitle": "Aucun trajet",
   "tripHistoryEmptySubtitle": "Branchez un adaptateur OBD2 et enregistrez un trajet pour commencer à constituer votre historique.",

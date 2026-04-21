@@ -3715,6 +3715,12 @@ abstract class AppLocalizations {
   /// **'Trip paused — tap to resume'**
   String get tripBannerPaused;
 
+  /// No description provided for @navConsumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption'**
+  String get navConsumption;
+
   /// No description provided for @tripHistoryTitle.
   ///
   /// In en, this message translates to:

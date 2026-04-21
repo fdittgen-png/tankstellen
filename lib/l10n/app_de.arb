@@ -831,6 +831,7 @@
   "tripResume": "Fortsetzen",
   "tripBannerRecording": "Fahrt wird aufgezeichnet",
   "tripBannerPaused": "Fahrt pausiert — zum Fortsetzen tippen",
+  "navConsumption": "Verbrauch",
   "tripHistoryTitle": "Fahrtenverlauf",
   "tripHistoryEmptyTitle": "Noch keine Fahrten",
   "tripHistoryEmptySubtitle": "OBD2-Adapter anschließen und eine Fahrt aufzeichnen, um deinen Fahrtenverlauf aufzubauen.",

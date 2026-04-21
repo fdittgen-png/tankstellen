@@ -1965,6 +1965,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripBannerPaused => 'Fahrt pausiert — zum Fortsetzen tippen';
 
   @override
+  String get navConsumption => 'Verbrauch';
+
+  @override
   String get tripHistoryTitle => 'Fahrtenverlauf';
 
   @override

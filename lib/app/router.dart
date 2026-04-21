@@ -182,26 +182,25 @@ GoRouter router(Ref ref) {
               ),
             ],
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/profile',
-                builder: (context, state) => const ProfileScreen(),
-              ),
-            ],
-          ),
-          // 5th branch (#701) — always registered so the router keeps
-          // its state across flag toggles; the shell's nav UI hides
-          // or shows the destination based on the profile flag +
-          // vehicle presence. Path differs from the pre-existing
-          // /consumption route so deep links into the consumption
-          // log from elsewhere (station detail, etc.) keep pushing
-          // on top of the current branch rather than switching tabs.
+          // Consumption is the 4th tab (#778) — sits between
+          // Favorites and Settings so the "behind-the-wheel savings"
+          // workflow has a first-class entry point. Path stays
+          // `/consumption-tab` to avoid colliding with the existing
+          // `/consumption` deep link (which still pushes on top of
+          // the current branch from station detail etc.).
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: '/consumption-tab',
                 builder: (_, _) => const ConsumptionScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => const ProfileScreen(),
               ),
             ],
           ),

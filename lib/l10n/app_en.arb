@@ -858,6 +858,7 @@
   "tripResume": "Resume",
   "tripBannerRecording": "Recording trip",
   "tripBannerPaused": "Trip paused — tap to resume",
+  "navConsumption": "Consumption",
   "tripHistoryTitle": "Trip history",
   "tripHistoryEmptyTitle": "No trips yet",
   "tripHistoryEmptySubtitle": "Connect an OBD2 adapter and record a trip to start building your driving history.",

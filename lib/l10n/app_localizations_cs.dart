@@ -1953,6 +1953,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tripBannerPaused => 'Trip paused — tap to resume';
 
   @override
+  String get navConsumption => 'Consumption';
+
+  @override
   String get tripHistoryTitle => 'Trip history';
 
   @override

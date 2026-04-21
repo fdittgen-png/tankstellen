@@ -126,6 +126,11 @@ void main() {
 
     testWidgets('/ renders shell with search when setup is complete',
         (tester) async {
+      tester.view.physicalSize = const Size(800, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       late GoRouter testRouter;
       await tester.pumpWidget(
         ProviderScope(
@@ -147,7 +152,12 @@ void main() {
       expect(find.text('Fuel Prices'), findsOneWidget);
     });
 
-    testWidgets('shell has 4 navigation branches', (tester) async {
+    testWidgets('shell has 5 navigation branches (#778)', (tester) async {
+      tester.view.physicalSize = const Size(800, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       late GoRouter testRouter;
       await tester.pumpWidget(
         ProviderScope(
@@ -165,14 +175,18 @@ void main() {
       );
       await tester.pump(const Duration(seconds: 1));
 
-      // The shell should render 4 tab items via InkWell or similar
-      // Check for all 4 tab icons
+      // Shell renders all 5 tab icons — Consumption now sits
+      // between Favorites and Settings (#778).
       expect(find.byIcon(Icons.search_outlined).evaluate().isNotEmpty ||
           find.byIcon(Icons.search).evaluate().isNotEmpty, isTrue);
       expect(find.byIcon(Icons.map_outlined).evaluate().isNotEmpty ||
           find.byIcon(Icons.map).evaluate().isNotEmpty, isTrue);
       expect(find.byIcon(Icons.star_outline).evaluate().isNotEmpty ||
           find.byIcon(Icons.star).evaluate().isNotEmpty, isTrue);
+      expect(
+          find.byIcon(Icons.local_gas_station_outlined).evaluate().isNotEmpty ||
+              find.byIcon(Icons.local_gas_station).evaluate().isNotEmpty,
+          isTrue);
       expect(find.byIcon(Icons.settings_outlined).evaluate().isNotEmpty ||
           find.byIcon(Icons.settings).evaluate().isNotEmpty, isTrue);
     });
