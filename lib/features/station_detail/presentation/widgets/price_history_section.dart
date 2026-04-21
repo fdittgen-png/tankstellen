@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/sync_provider.dart';
-import '../../../../core/sync/sync_service.dart';
+import '../../../../core/sync/price_history_sync.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../price_history/domain/entities/price_record.dart';
 import '../../../price_history/presentation/widgets/price_chart.dart';
@@ -71,7 +71,7 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
     }
 
     try {
-      final rows = await SyncService.fetchPriceHistory(widget.stationId);
+      final rows = await PriceHistorySync.fetch(widget.stationId);
       if (rows.isNotEmpty && mounted) {
         final storageMgmt = ref.read(storageManagementProvider);
         final records = rows.map((r) => {

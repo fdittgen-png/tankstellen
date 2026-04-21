@@ -1,3 +1,4 @@
+import '../../sync/price_history_sync.dart';
 import '../../sync/supabase_client.dart';
 import '../../sync/sync_service.dart';
 import '../sync_repository.dart';
@@ -61,7 +62,7 @@ class SupabaseSyncRepository implements SyncRepository {
   @override
   Future<List<Map<String, dynamic>>> fetchPriceHistory(String stationId,
           {int days = 30}) =>
-      SyncService.fetchPriceHistory(stationId, days: days);
+      PriceHistorySync.fetch(stationId, days: days);
 
   // ── Itineraries ──
 
