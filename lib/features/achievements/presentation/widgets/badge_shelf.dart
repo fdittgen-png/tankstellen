@@ -131,6 +131,11 @@ class _BadgeTile extends StatelessWidget {
           Icons.event_available,
           l?.achievementEcoWeek ?? 'Eco week',
         );
+      case AchievementId.priceWin:
+        return (
+          Icons.savings,
+          l?.achievementPriceWin ?? 'Price win',
+        );
     }
   }
 
@@ -151,6 +156,9 @@ class _BadgeTile extends StatelessWidget {
       case AchievementId.ecoWeek:
         return l?.achievementEcoWeekDesc ??
             'Drive 7 consecutive days with at least one smooth trip each day.';
+      case AchievementId.priceWin:
+        return l?.achievementPriceWinDesc ??
+            'Log a fill-up that beats the station\'s 30-day average by 5 % or more.';
     }
   }
 }

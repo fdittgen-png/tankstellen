@@ -14,11 +14,15 @@ class AchievementEngine {
   static const double _zeroHarshMinDistanceKm = 10.0;
 
   /// Evaluate every rule and return the set of badge ids currently
-  /// earned based on [trips] and [fillUps]. Order is deterministic
-  /// (iteration order of [AchievementId.values]).
+  /// earned based on [trips] and [fillUps]. [hasPriceWin] is a
+  /// pre-computed flag — the price-history lookup lives outside
+  /// the engine so it stays a pure function, trivially testable.
+  /// Order is deterministic (iteration order of
+  /// [AchievementId.values]).
   Set<AchievementId> evaluate({
     required List<TripHistoryEntry> trips,
     required List<FillUp> fillUps,
+    bool hasPriceWin = false,
   }) {
     final earned = <AchievementId>{};
     if (trips.isNotEmpty) {
@@ -35,6 +39,9 @@ class AchievementEngine {
     }
     if (_hasEcoWeekStreak(trips)) {
       earned.add(AchievementId.ecoWeek);
+    }
+    if (hasPriceWin) {
+      earned.add(AchievementId.priceWin);
     }
     return earned;
   }

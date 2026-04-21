@@ -3853,6 +3853,18 @@ abstract class AppLocalizations {
   /// **'Drive 7 consecutive days with at least one smooth trip each day.'**
   String get achievementEcoWeekDesc;
 
+  /// No description provided for @achievementPriceWin.
+  ///
+  /// In en, this message translates to:
+  /// **'Price win'**
+  String get achievementPriceWin;
+
+  /// No description provided for @achievementPriceWinDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Log a fill-up that beats the station\'s 30-day average by 5 % or more.'**
+  String get achievementPriceWinDesc;
+
   /// No description provided for @obd2StatusConnected.
   ///
   /// In en, this message translates to:

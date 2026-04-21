@@ -2040,6 +2040,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Fahre 7 Tage in Folge mit mindestens einer ruhigen Fahrt pro Tag.';
 
   @override
+  String get achievementPriceWin => 'Preis-Treffer';
+
+  @override
+  String get achievementPriceWinDesc =>
+      'Trage eine Tankung ein, die den 30-Tage-Durchschnitt der Station um mindestens 5 % schlägt.';
+
+  @override
   String get obd2StatusConnected => 'OBD2-Adapter: verbunden';
 
   @override

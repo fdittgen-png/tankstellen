@@ -2027,6 +2027,13 @@ class AppLocalizationsSv extends AppLocalizations {
       'Drive 7 consecutive days with at least one smooth trip each day.';
 
   @override
+  String get achievementPriceWin => 'Price win';
+
+  @override
+  String get achievementPriceWinDesc =>
+      'Log a fill-up that beats the station\'s 30-day average by 5 % or more.';
+
+  @override
   String get obd2StatusConnected => 'OBD2 adapter: connected';
 
   @override
