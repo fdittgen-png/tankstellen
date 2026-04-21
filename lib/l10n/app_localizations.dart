@@ -3757,6 +3757,36 @@ abstract class AppLocalizations {
   /// **'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.'**
   String get vehicleBaselineResetConfirmBody;
 
+  /// No description provided for @vehicleAdapterSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 adapter'**
+  String get vehicleAdapterSectionTitle;
+
+  /// No description provided for @vehicleAdapterEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No adapter paired. Pair one so the app can reconnect automatically next time.'**
+  String get vehicleAdapterEmpty;
+
+  /// No description provided for @vehicleAdapterUnnamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown adapter'**
+  String get vehicleAdapterUnnamed;
+
+  /// No description provided for @vehicleAdapterPair.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair adapter'**
+  String get vehicleAdapterPair;
+
+  /// No description provided for @vehicleAdapterForget.
+  ///
+  /// In en, this message translates to:
+  /// **'Forget adapter'**
+  String get vehicleAdapterForget;
+
   /// No description provided for @achievementsTitle.
   ///
   /// In en, this message translates to:

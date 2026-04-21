@@ -1989,6 +1989,22 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dadurch werden alle gelernten Werte für dieses Fahrzeug verworfen. Bis neue Fahrten die Daten wieder aufbauen, werden die Kaltstart-Standardwerte verwendet.';
 
   @override
+  String get vehicleAdapterSectionTitle => 'OBD2-Adapter';
+
+  @override
+  String get vehicleAdapterEmpty =>
+      'Kein Adapter gekoppelt. Koppeln, damit die App sich beim nächsten Mal automatisch verbindet.';
+
+  @override
+  String get vehicleAdapterUnnamed => 'Unbekannter Adapter';
+
+  @override
+  String get vehicleAdapterPair => 'Adapter koppeln';
+
+  @override
+  String get vehicleAdapterForget => 'Adapter vergessen';
+
+  @override
   String get achievementsTitle => 'Erfolge';
 
   @override
