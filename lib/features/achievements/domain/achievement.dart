@@ -25,6 +25,11 @@ enum AchievementId {
   /// is rolling: any 7-day stretch in the log qualifies, not just
   /// the most recent one.
   ecoWeek,
+
+  /// At least one logged fill-up beat the station's 30-day average
+  /// price for that fuel type by ≥5 %. Rewards the "save at the
+  /// pump" lens directly — the user timed their visit well.
+  priceWin,
 }
 
 /// An achievement the user has earned. `earnedAt` is the moment the

@@ -775,6 +775,8 @@
   "achievementZeroHarshDesc": "Terminez un trajet d'au moins 10 km sans freinage ni accélération brusques.",
   "achievementEcoWeek": "Semaine éco",
   "achievementEcoWeekDesc": "Conduisez 7 jours d'affilée avec au moins un trajet souple par jour.",
+  "achievementPriceWin": "Bon plan prix",
+  "achievementPriceWinDesc": "Enregistrez un plein qui bat la moyenne sur 30 jours de la station d'au moins 5 %.",
   "obd2StatusConnected": "Adaptateur OBD2 : connecté",
   "obd2StatusAttempting": "Adaptateur OBD2 : connexion en cours",
   "obd2StatusUnreachable": "Adaptateur OBD2 : injoignable",

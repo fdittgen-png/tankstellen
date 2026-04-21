@@ -2038,6 +2038,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Conduisez 7 jours d\'affilée avec au moins un trajet souple par jour.';
 
   @override
+  String get achievementPriceWin => 'Bon plan prix';
+
+  @override
+  String get achievementPriceWinDesc =>
+      'Enregistrez un plein qui bat la moyenne sur 30 jours de la station d\'au moins 5 %.';
+
+  @override
   String get obd2StatusConnected => 'Adaptateur OBD2 : connecté';
 
   @override
