@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/alerts/data/models/price_alert.dart';
+import '../../features/consumption/data/baseline_sync.dart';
 import '../../features/consumption/domain/entities/fill_up.dart';
 import '../../features/itinerary/domain/entities/saved_itinerary.dart';
 import '../../features/vehicle/domain/entities/vehicle_profile.dart';
@@ -621,6 +624,90 @@ class SyncService {
           .eq('id', fillUpId);
     } catch (e) {
       debugPrint('SyncService.deleteFillUp FAILED: $e');
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // OBD2 baselines (#780)
+  // ---------------------------------------------------------------------------
+
+  /// Two-way sync of the baseline payload for a single vehicle.
+  /// Merge rule is per-situation: for every driving situation, the
+  /// accumulator with the higher sample count wins. Returns the
+  /// merged JSON payload that callers should persist locally and
+  /// hand back to [BaselineStore]; returns the original [localJson]
+  /// unchanged when offline or unauthenticated.
+  ///
+  /// [totalSampleCountOverride] lets the caller supply a
+  /// pre-computed total — the Dart layer already counts samples for
+  /// the status UI, so we avoid decoding the JSON twice when it's
+  /// already available.
+  static Future<String?> syncVehicleBaseline({
+    required String vehicleId,
+    required String? localJson,
+    int? totalSampleCountOverride,
+  }) async {
+    final client = _client;
+    final userId = _authenticatedUserId;
+    if (client == null || userId == null) {
+      debugPrint('SyncService.syncVehicleBaseline: not authenticated');
+      return localJson;
+    }
+
+    try {
+      final serverRow = await client
+          .from('obd2_baselines')
+          .select('data')
+          .eq('user_id', userId)
+          .eq('vehicle_id', vehicleId)
+          .maybeSingle();
+
+      final serverData = serverRow == null
+          ? null
+          : (serverRow['data'] as Map?)?.cast<String, dynamic>();
+
+      final merged = mergeBaselineJson(
+        localJson,
+        serverData == null ? null : jsonEncode(serverData),
+      );
+      if (merged == null) return localJson;
+
+      final mergedDecoded =
+          (jsonDecode(merged) as Map).cast<String, dynamic>();
+      final total = totalSampleCountOverride ??
+          totalSampleCount(mergedDecoded);
+
+      await client.from('obd2_baselines').upsert(
+        {
+          'user_id': userId,
+          'vehicle_id': vehicleId,
+          'total_samples': total,
+          'data': mergedDecoded,
+          'updated_at': DateTime.now().toIso8601String(),
+        },
+        onConflict: 'user_id,vehicle_id',
+      );
+      return merged;
+    } catch (e) {
+      debugPrint('SyncService.syncVehicleBaseline FAILED: $e');
+      return localJson;
+    }
+  }
+
+  /// Remove a single vehicle's baseline from the server. Called on
+  /// explicit "Forget baseline" from the vehicle edit UI.
+  static Future<void> deleteVehicleBaseline(String vehicleId) async {
+    final client = _client;
+    final userId = _authenticatedUserId;
+    if (client == null || userId == null) return;
+    try {
+      await client
+          .from('obd2_baselines')
+          .delete()
+          .eq('user_id', userId)
+          .eq('vehicle_id', vehicleId);
+    } catch (e) {
+      debugPrint('SyncService.deleteVehicleBaseline FAILED: $e');
     }
   }
 }
