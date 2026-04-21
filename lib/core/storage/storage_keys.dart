@@ -36,4 +36,9 @@ class StorageKeys {
   /// Riverpod / Supabase handshake from inside WorkManager.
   static const String ntfyEnabled = 'ntfy_enabled';
   static const String ntfyTopic = 'ntfy_topic';
+
+  /// #780 — opt-in switch for per-vehicle baseline sync. Defaults to
+  /// false (off) so users who only want favourite sync aren't
+  /// silently uploading driving data.
+  static const String syncBaselinesEnabled = 'sync_baselines_enabled';
 }

@@ -777,6 +777,8 @@
   "achievementEcoWeekDesc": "Conduisez 7 jours d'affilée avec au moins un trajet souple par jour.",
   "achievementPriceWin": "Bon plan prix",
   "achievementPriceWinDesc": "Enregistrez un plein qui bat la moyenne sur 30 jours de la station d'au moins 5 %.",
+  "syncBaselinesToggleTitle": "Partager les profils de véhicules appris",
+  "syncBaselinesToggleSubtitle": "Téléverser les baselines de consommation par véhicule pour qu'un second appareil puisse les réutiliser.",
   "obd2StatusConnected": "Adaptateur OBD2 : connecté",
   "obd2StatusAttempting": "Adaptateur OBD2 : connexion en cours",
   "obd2StatusUnreachable": "Adaptateur OBD2 : injoignable",
