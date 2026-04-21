@@ -5,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/cold_start_baselines.dart';
 import '../../domain/situation_classifier.dart';
+import '../../providers/obd2_connection_state_provider.dart';
 import '../../providers/trip_recording_provider.dart';
+import 'obd2_status_dot.dart';
 
 /// Persistent indicator of an active OBD2 trip (#726 + #768).
 ///
@@ -22,7 +24,33 @@ class TripRecordingBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(tripRecordingProvider);
-    if (!state.isActive) return child;
+    final obd2 = ref.watch(obd2ConnectionStatusProvider);
+
+    // When no trip is active: show a thin strip carrying only the
+    // OBD2 status dot — and only when there's an adapter remembered
+    // (otherwise the dot itself collapses to zero size). First-run
+    // users with nothing configured see no chrome at all.
+    if (!state.isActive) {
+      if (!obd2.hasVisibleIndicator) return child;
+      return Column(
+        children: [
+          const SafeArea(
+            bottom: false,
+            child: SizedBox(
+              height: 24,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: EdgeInsets.only(right: 8),
+                  child: Obd2StatusDot(),
+                ),
+              ),
+            ),
+          ),
+          Expanded(child: child),
+        ],
+      );
+    }
 
     final bandColor = _bandColor(context, state.band, state.phase);
     final l = AppLocalizations.of(context);

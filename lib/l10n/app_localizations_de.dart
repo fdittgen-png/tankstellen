@@ -2017,6 +2017,40 @@ class AppLocalizationsDe extends AppLocalizations {
       'Schließe eine Fahrt von mindestens 10 km ohne starkes Bremsen oder Beschleunigen ab.';
 
   @override
+  String get obd2StatusConnected => 'OBD2-Adapter: verbunden';
+
+  @override
+  String get obd2StatusAttempting => 'OBD2-Adapter: verbindet';
+
+  @override
+  String get obd2StatusUnreachable => 'OBD2-Adapter: nicht erreichbar';
+
+  @override
+  String get obd2StatusPermissionDenied =>
+      'OBD2-Adapter: Bluetooth-Berechtigung erforderlich';
+
+  @override
+  String get obd2StatusConnectedBody => 'Bereit für eine Fahrtaufzeichnung.';
+
+  @override
+  String get obd2StatusAttemptingBody =>
+      'Verbindung wird im Hintergrund aufgebaut…';
+
+  @override
+  String get obd2StatusUnreachableBody =>
+      'Adapter ausser Reichweite oder wird von einer anderen App verwendet.';
+
+  @override
+  String get obd2StatusPermissionDeniedBody =>
+      'Bluetooth-Berechtigung in den Systemeinstellungen erteilen, um automatisch neu zu verbinden.';
+
+  @override
+  String get obd2StatusNoAdapter => 'Kein Adapter gekoppelt';
+
+  @override
+  String get obd2StatusForget => 'Adapter vergessen';
+
+  @override
   String get tripHistoryTitle => 'Fahrtenverlauf';
 
   @override

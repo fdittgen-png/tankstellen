@@ -2002,6 +2002,39 @@ class AppLocalizationsNb extends AppLocalizations {
       'Complete a trip of 10 km or more with no harsh braking or acceleration.';
 
   @override
+  String get obd2StatusConnected => 'OBD2 adapter: connected';
+
+  @override
+  String get obd2StatusAttempting => 'OBD2 adapter: connecting';
+
+  @override
+  String get obd2StatusUnreachable => 'OBD2 adapter: unreachable';
+
+  @override
+  String get obd2StatusPermissionDenied =>
+      'OBD2 adapter: Bluetooth permission needed';
+
+  @override
+  String get obd2StatusConnectedBody => 'Ready to record a trip.';
+
+  @override
+  String get obd2StatusAttemptingBody => 'Connecting in the background…';
+
+  @override
+  String get obd2StatusUnreachableBody =>
+      'Adapter out of range or already in use by another app.';
+
+  @override
+  String get obd2StatusPermissionDeniedBody =>
+      'Grant Bluetooth permission in system settings to reconnect automatically.';
+
+  @override
+  String get obd2StatusNoAdapter => 'No adapter paired';
+
+  @override
+  String get obd2StatusForget => 'Forget adapter';
+
+  @override
   String get tripHistoryTitle => 'Trip history';
 
   @override
