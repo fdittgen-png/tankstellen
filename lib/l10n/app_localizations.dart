@@ -3721,6 +3721,42 @@ abstract class AppLocalizations {
   /// **'Consumption'**
   String get navConsumption;
 
+  /// No description provided for @vehicleBaselineSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Baseline calibration'**
+  String get vehicleBaselineSectionTitle;
+
+  /// No description provided for @vehicleBaselineEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No samples yet — start an OBD2 trip to begin learning this vehicle\'s fuel profile.'**
+  String get vehicleBaselineEmpty;
+
+  /// No description provided for @vehicleBaselineProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Learned from samples across driving situations.'**
+  String get vehicleBaselineProgress;
+
+  /// No description provided for @vehicleBaselineReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset baseline'**
+  String get vehicleBaselineReset;
+
+  /// No description provided for @vehicleBaselineResetConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset baseline?'**
+  String get vehicleBaselineResetConfirmTitle;
+
+  /// No description provided for @vehicleBaselineResetConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.'**
+  String get vehicleBaselineResetConfirmBody;
+
   /// No description provided for @tripHistoryTitle.
   ///
   /// In en, this message translates to:

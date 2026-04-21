@@ -1968,6 +1968,27 @@ class AppLocalizationsDe extends AppLocalizations {
   String get navConsumption => 'Verbrauch';
 
   @override
+  String get vehicleBaselineSectionTitle => 'Baseline-Kalibrierung';
+
+  @override
+  String get vehicleBaselineEmpty =>
+      'Noch keine Messwerte — starte eine OBD2-Fahrt, um das Verbrauchsprofil dieses Fahrzeugs zu lernen.';
+
+  @override
+  String get vehicleBaselineProgress =>
+      'Anhand der Messwerte aus verschiedenen Fahrsituationen gelernt.';
+
+  @override
+  String get vehicleBaselineReset => 'Baseline zurücksetzen';
+
+  @override
+  String get vehicleBaselineResetConfirmTitle => 'Baseline zurücksetzen?';
+
+  @override
+  String get vehicleBaselineResetConfirmBody =>
+      'Dadurch werden alle gelernten Werte für dieses Fahrzeug verworfen. Bis neue Fahrten die Daten wieder aufbauen, werden die Kaltstart-Standardwerte verwendet.';
+
+  @override
   String get tripHistoryTitle => 'Fahrtenverlauf';
 
   @override
