@@ -20,6 +20,7 @@ import '../../providers/consumption_providers.dart';
 import '../widgets/bad_scan_report_sheet.dart';
 import '../widgets/fill_up_date_row.dart';
 import '../widgets/fill_up_input_buttons.dart';
+import '../widgets/fill_up_notes_field.dart';
 import '../widgets/fill_up_numeric_field.dart';
 
 /// Form to add a new [FillUp] entry.
@@ -439,20 +440,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
               validator: _positiveNumberValidator,
             ),
             const SizedBox(height: 12),
-            TextFormField(
-              controller: _notesCtrl,
-              decoration: InputDecoration(
-                labelText: l?.notesOptional ?? 'Notes (optional)',
-                prefixIcon: const Icon(Icons.edit_note),
-                alignLabelWithHint: true,
-                border: const OutlineInputBorder(),
-              ),
-              // Larger notes area — user requested more room (#695).
-              minLines: 4,
-              maxLines: 8,
-              keyboardType: TextInputType.multiline,
-              textInputAction: TextInputAction.newline,
-            ),
+            FillUpNotesField(controller: _notesCtrl),
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: _save,
