@@ -25,7 +25,7 @@ void main() {
     tmpDir.deleteSync(recursive: true);
   });
 
-  TripSummary _summary({required DateTime startedAt, double km = 10}) {
+  TripSummary mkSummary({required DateTime startedAt, double km = 10}) {
     return TripSummary(
       distanceKm: km,
       maxRpm: 2800,
@@ -47,7 +47,7 @@ void main() {
       await repo.save(TripHistoryEntry(
         id: start.toIso8601String(),
         vehicleId: 'car-a',
-        summary: _summary(startedAt: start),
+        summary: mkSummary(startedAt: start),
       ));
 
       final all = repo.loadAll();
@@ -68,12 +68,12 @@ void main() {
       await repo.save(TripHistoryEntry(
         id: earlier.toIso8601String(),
         vehicleId: null,
-        summary: _summary(startedAt: earlier, km: 5),
+        summary: mkSummary(startedAt: earlier, km: 5),
       ));
       await repo.save(TripHistoryEntry(
         id: later.toIso8601String(),
         vehicleId: null,
-        summary: _summary(startedAt: later, km: 20),
+        summary: mkSummary(startedAt: later, km: 20),
       ));
 
       final all = repo.loadAll();
@@ -89,7 +89,7 @@ void main() {
         await repo.save(TripHistoryEntry(
           id: start.toIso8601String(),
           vehicleId: null,
-          summary: _summary(startedAt: start),
+          summary: mkSummary(startedAt: start),
         ));
       }
       final all = repo.loadAll();
@@ -106,7 +106,7 @@ void main() {
       await repo.save(TripHistoryEntry(
         id: good.toIso8601String(),
         vehicleId: null,
-        summary: _summary(startedAt: good),
+        summary: mkSummary(startedAt: good),
       ));
       final all = repo.loadAll();
       expect(all, hasLength(1));
@@ -120,12 +120,12 @@ void main() {
       await repo.save(TripHistoryEntry(
         id: a.toIso8601String(),
         vehicleId: null,
-        summary: _summary(startedAt: a),
+        summary: mkSummary(startedAt: a),
       ));
       await repo.save(TripHistoryEntry(
         id: b.toIso8601String(),
         vehicleId: null,
-        summary: _summary(startedAt: b),
+        summary: mkSummary(startedAt: b),
       ));
       await repo.delete(a.toIso8601String());
       final all = repo.loadAll();

@@ -3523,6 +3523,42 @@ abstract class AppLocalizations {
   /// **'Point the camera at a QR code'**
   String get qrScannerGuidance;
 
+  /// No description provided for @qrScannerPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera access is needed to scan QR codes.'**
+  String get qrScannerPermissionDenied;
+
+  /// No description provided for @qrScannerPermissionPermanentlyDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera access was denied. Open settings to grant it.'**
+  String get qrScannerPermissionPermanentlyDenied;
+
+  /// No description provided for @qrScannerRetryPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get qrScannerRetryPermission;
+
+  /// No description provided for @qrScannerOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get qrScannerOpenSettings;
+
+  /// No description provided for @qrScannerTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'No QR code detected. Move closer or try again.'**
+  String get qrScannerTimeout;
+
+  /// No description provided for @qrScannerRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get qrScannerRetry;
+
   /// No description provided for @torchOn.
   ///
   /// In en, this message translates to:

@@ -1847,6 +1847,27 @@ class AppLocalizationsEt extends AppLocalizations {
   String get qrScannerGuidance => 'Point the camera at a QR code';
 
   @override
+  String get qrScannerPermissionDenied =>
+      'Camera access is needed to scan QR codes.';
+
+  @override
+  String get qrScannerPermissionPermanentlyDenied =>
+      'Camera access was denied. Open settings to grant it.';
+
+  @override
+  String get qrScannerRetryPermission => 'Try again';
+
+  @override
+  String get qrScannerOpenSettings => 'Open settings';
+
+  @override
+  String get qrScannerTimeout =>
+      'No QR code detected. Move closer or try again.';
+
+  @override
+  String get qrScannerRetry => 'Try again';
+
+  @override
   String get torchOn => 'Turn flash on';
 
   @override

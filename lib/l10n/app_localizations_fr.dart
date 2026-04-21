@@ -1861,6 +1861,27 @@ class AppLocalizationsFr extends AppLocalizations {
   String get qrScannerGuidance => 'Pointez la caméra sur un QR code';
 
   @override
+  String get qrScannerPermissionDenied =>
+      'L\'accès à la caméra est nécessaire pour scanner les QR codes.';
+
+  @override
+  String get qrScannerPermissionPermanentlyDenied =>
+      'L\'accès à la caméra a été refusé. Ouvrez les réglages pour l\'autoriser.';
+
+  @override
+  String get qrScannerRetryPermission => 'Réessayer';
+
+  @override
+  String get qrScannerOpenSettings => 'Ouvrir les réglages';
+
+  @override
+  String get qrScannerTimeout =>
+      'Aucun QR code détecté. Rapprochez-vous ou réessayez.';
+
+  @override
+  String get qrScannerRetry => 'Réessayer';
+
+  @override
   String get torchOn => 'Allumer le flash';
 
   @override
