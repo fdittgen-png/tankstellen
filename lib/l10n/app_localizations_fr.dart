@@ -1965,6 +1965,27 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navConsumption => 'Conso';
 
   @override
+  String get vehicleBaselineSectionTitle => 'Calibrage de la baseline';
+
+  @override
+  String get vehicleBaselineEmpty =>
+      'Aucun échantillon pour l\'instant — lancez un trajet OBD2 pour commencer à apprendre le profil de consommation de ce véhicule.';
+
+  @override
+  String get vehicleBaselineProgress =>
+      'Appris à partir d\'échantillons issus de différentes situations de conduite.';
+
+  @override
+  String get vehicleBaselineReset => 'Réinitialiser la baseline';
+
+  @override
+  String get vehicleBaselineResetConfirmTitle => 'Réinitialiser la baseline ?';
+
+  @override
+  String get vehicleBaselineResetConfirmBody =>
+      'Ceci efface tous les échantillons appris pour ce véhicule. Les valeurs par défaut au démarrage à froid seront utilisées jusqu\'à ce que de nouveaux trajets reconstruisent le profil.';
+
+  @override
   String get tripHistoryTitle => 'Historique des trajets';
 
   @override

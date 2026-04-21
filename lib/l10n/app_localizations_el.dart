@@ -1958,6 +1958,27 @@ class AppLocalizationsEl extends AppLocalizations {
   String get navConsumption => 'Consumption';
 
   @override
+  String get vehicleBaselineSectionTitle => 'Baseline calibration';
+
+  @override
+  String get vehicleBaselineEmpty =>
+      'No samples yet — start an OBD2 trip to begin learning this vehicle\'s fuel profile.';
+
+  @override
+  String get vehicleBaselineProgress =>
+      'Learned from samples across driving situations.';
+
+  @override
+  String get vehicleBaselineReset => 'Reset baseline';
+
+  @override
+  String get vehicleBaselineResetConfirmTitle => 'Reset baseline?';
+
+  @override
+  String get vehicleBaselineResetConfirmBody =>
+      'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.';
+
+  @override
   String get tripHistoryTitle => 'Trip history';
 
   @override

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../consumption/presentation/widgets/vehicle_baseline_section.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/entities/vehicle_profile.dart';
@@ -242,6 +243,14 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
                 fuelTypeController: _fuelTypeCtrl,
                 numberValidator: _validateOptionalNumber,
               ),
+            // Baseline calibration section (#779). Only meaningful
+            // for saved vehicles that might already have learned
+            // baselines from previous OBD2 trips — hide it during
+            // the Add flow to avoid confusing the first-run UX.
+            if (_existingId != null) ...[
+              const SizedBox(height: 24),
+              VehicleBaselineSection(vehicleId: _existingId!),
+            ],
             const SizedBox(height: 32),
             FilledButton.icon(
               onPressed: _save,
