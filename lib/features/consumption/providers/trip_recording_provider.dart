@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -18,6 +19,31 @@ part 'trip_recording_provider.g.dart';
 
 /// Lifecycle phase of the app-wide OBD2 trip recording (#726).
 enum TripRecordingPhase { idle, recording, paused, finished }
+
+/// Haptic strength emitted when the consumption band changes (#767).
+enum HapticIntensity { none, light, medium }
+
+/// Decide which haptic (if any) fires when [previous] transitions to
+/// [current]. Pure function: no platform calls, easily unit-tested.
+/// Only escalations vibrate — heavy or worse. Positive transitions
+/// (eco / normal) stay silent so the feedback is a corrective nudge,
+/// not constant noise.
+HapticIntensity hapticForBandTransition(
+  ConsumptionBand previous,
+  ConsumptionBand current,
+) {
+  if (previous == current) return HapticIntensity.none;
+  if (current == ConsumptionBand.veryHeavy &&
+      previous != ConsumptionBand.veryHeavy) {
+    return HapticIntensity.medium;
+  }
+  if (current == ConsumptionBand.heavy &&
+      previous != ConsumptionBand.heavy &&
+      previous != ConsumptionBand.veryHeavy) {
+    return HapticIntensity.light;
+  }
+  return HapticIntensity.none;
+}
 
 /// Immutable snapshot the UI observes.
 @immutable
@@ -85,6 +111,15 @@ class TripRecording extends _$TripRecording {
   String? _vehicleId;
   ConsumptionFuelFamily _fuelFamily = ConsumptionFuelFamily.gasoline;
 
+  /// Tests count haptic fires via these instead of hooking the
+  /// platform channel. The production path also still calls
+  /// [HapticFeedback], so counting here doesn't short-circuit the
+  /// real vibration on a device.
+  @visibleForTesting
+  int hapticLightCount = 0;
+  @visibleForTesting
+  int hapticMediumCount = 0;
+
   @override
   TripRecordingState build() {
     return const TripRecordingState();
@@ -127,6 +162,7 @@ class TripRecording extends _$TripRecording {
       _recordToStore(reading, situation);
       final band = _classifyBandFrom(reading, situation);
       final delta = _computeDelta(reading, situation);
+      _fireBandTransitionHaptic(state.band, band);
       state = state.copyWith(
         phase: ctl.isPaused
             ? TripRecordingPhase.paused
@@ -138,6 +174,25 @@ class TripRecording extends _$TripRecording {
       );
     });
     state = state.copyWith(phase: TripRecordingPhase.recording);
+  }
+
+  /// #767 — fire a short haptic when the band crosses *into* heavy
+  /// territory. Positive improvements (normal → eco) stay silent so
+  /// the vibration is a corrective nudge, not constant feedback.
+  void _fireBandTransitionHaptic(
+    ConsumptionBand previous,
+    ConsumptionBand current,
+  ) {
+    switch (hapticForBandTransition(previous, current)) {
+      case HapticIntensity.light:
+        hapticLightCount++;
+        HapticFeedback.lightImpact();
+      case HapticIntensity.medium:
+        hapticMediumCount++;
+        HapticFeedback.mediumImpact();
+      case HapticIntensity.none:
+        break;
+    }
   }
 
   /// Map a [FuelType] apiValue onto a [ConsumptionFuelFamily] for
