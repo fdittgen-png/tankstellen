@@ -109,6 +109,15 @@ void main() {
               StatefulShellBranch(
                 routes: [
                   GoRoute(
+                    path: '/consumption-tab',
+                    builder: (context, state) =>
+                        const Center(child: Text('ConsumptionScreen')),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
                     path: '/profile',
                     builder: (context, state) =>
                         const Center(child: Text('ProfileScreen')),
@@ -153,6 +162,7 @@ void main() {
       expect(find.text('Search'), findsOneWidget);
       expect(find.text('Map'), findsOneWidget);
       expect(find.text('Favorites'), findsOneWidget);
+      expect(find.text('Consumption'), findsOneWidget);
       expect(find.text('Settings'), findsOneWidget);
 
       // NavigationRail should NOT be present

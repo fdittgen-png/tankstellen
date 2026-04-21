@@ -3,45 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tankstellen/app/shell_screen.dart';
-import 'package:tankstellen/features/profile/data/models/user_profile.dart';
-import 'package:tankstellen/features/profile/providers/profile_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
-import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
-/// #701: bottom-nav renders the 5th "Consumption" tab only when the
-/// profile flag is on AND the user has at least one vehicle.
+/// #778: Consumption is a first-class destination — always visible,
+/// sitting between Favorites and Settings. Supersedes the #701
+/// flag-gated behaviour (which required a profile opt-in AND an
+/// existing vehicle to surface the tab).
 ///
-/// The router registers 5 branches unconditionally, so state survives
-/// flag toggles — we test the shell's NAV UI visibility only.
+/// The router registers 5 branches unconditionally, the shell always
+/// renders 5 nav items, and the order of the icons is fixed so the
+/// muscle-memory for Settings (now the rightmost) stays predictable.
 
-class _FixedProfile extends ActiveProfile {
-  _FixedProfile(this._profile);
-  final UserProfile? _profile;
-  @override
-  UserProfile? build() => _profile;
-}
-
-class _FixedVehicles extends VehicleProfileList {
-  _FixedVehicles(this._list);
-  final List<VehicleProfile> _list;
-  @override
-  List<VehicleProfile> build() => _list;
-}
-
-Future<int> _pumpShellNavCount(
-  WidgetTester tester, {
-  required UserProfile? profile,
-  required List<VehicleProfile> vehicles,
-}) async {
-  // Portrait mobile viewport — labels render under icons only in
-  // portrait (the shell hides them in landscape).
+Future<List<IconData>> _pumpShellIcons(WidgetTester tester) async {
   tester.view.physicalSize = const Size(400, 800);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
-  // Minimal router with 5 branches (matches production shape).
+
   final router = GoRouter(
     initialLocation: '/',
     routes: [
@@ -62,14 +40,14 @@ Future<int> _pumpShellNavCount(
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
-              path: '/profile',
-              builder: (_, _) => const Text('Settings'),
+              path: '/consumption-tab',
+              builder: (_, _) => const Text('Consumption'),
             ),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
-              path: '/consumption-tab',
-              builder: (_, _) => const Text('Consumption'),
+              path: '/profile',
+              builder: (_, _) => const Text('Settings'),
             ),
           ]),
         ],
@@ -79,10 +57,6 @@ Future<int> _pumpShellNavCount(
 
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [
-        activeProfileProvider.overrideWith(() => _FixedProfile(profile)),
-        vehicleProfileListProvider.overrideWith(() => _FixedVehicles(vehicles)),
-      ],
       child: MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
@@ -93,75 +67,58 @@ Future<int> _pumpShellNavCount(
   );
   await tester.pumpAndSettle();
 
-  // Count destinations via either the outlined OR filled icon per
-  // slot — the selected tab renders the filled variant so looking
-  // only at outlined would under-count.
-  final iconPairs = [
+  final expected = [
     [Icons.search_outlined, Icons.search],
     [Icons.map_outlined, Icons.map],
     [Icons.star_outline, Icons.star],
-    [Icons.settings_outlined, Icons.settings],
     [Icons.local_gas_station_outlined, Icons.local_gas_station],
+    [Icons.settings_outlined, Icons.settings],
   ];
-  return iconPairs.where((pair) {
-    return pair.any((i) => tester.widgetList(find.byIcon(i)).isNotEmpty);
-  }).length;
+  final seen = <IconData>[];
+  for (final pair in expected) {
+    for (final i in pair) {
+      if (tester.widgetList(find.byIcon(i)).isNotEmpty) {
+        seen.add(i);
+        break;
+      }
+    }
+  }
+  return seen;
 }
-
-UserProfile _profile({required bool flag}) => UserProfile(
-      id: 'p',
-      name: 'p',
-      preferredFuelType: FuelType.e10,
-      showConsumptionTab: flag,
-    );
-
-const _vehicle = VehicleProfile(
-  id: 'v1',
-  name: 'Golf',
-  type: VehicleType.combustion,
-);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('ShellScreen 5th Consumption tab (#701)', () {
-    testWidgets('default profile (flag off) → 4 nav items', (tester) async {
-      final count = await _pumpShellNavCount(
-        tester,
-        profile: _profile(flag: false),
-        vehicles: const [_vehicle],
-      );
-      expect(count, 4);
+  group('ShellScreen 5-tab layout (#778 — supersedes #701)', () {
+    testWidgets('always renders 5 destinations — Consumption is no '
+        'longer gated behind a profile flag', (tester) async {
+      final icons = await _pumpShellIcons(tester);
+      expect(icons, hasLength(5));
     });
 
-    testWidgets('flag on AND vehicle configured → 5 nav items',
+    testWidgets('Consumption sits between Favorites and Settings — '
+        'the muscle-memory position for Settings (rightmost) is '
+        'preserved', (tester) async {
+      final icons = await _pumpShellIcons(tester);
+      // Favorites index < Consumption index < Settings index
+      final favIdx = icons.indexWhere(
+          (i) => i == Icons.star || i == Icons.star_outline);
+      final consIdx = icons.indexWhere((i) =>
+          i == Icons.local_gas_station ||
+          i == Icons.local_gas_station_outlined);
+      final settingsIdx = icons.indexWhere(
+          (i) => i == Icons.settings || i == Icons.settings_outlined);
+      expect(favIdx, isNonNegative);
+      expect(consIdx, favIdx + 1);
+      expect(settingsIdx, consIdx + 1);
+    });
+
+    testWidgets('tapping Consumption shows the consumption-tab branch',
         (tester) async {
-      final count = await _pumpShellNavCount(
-        tester,
-        profile: _profile(flag: true),
-        vehicles: const [_vehicle],
-      );
-      expect(count, 5);
-    });
-
-    testWidgets('flag on but no vehicle configured → 4 nav items '
-        '(consumption is vehicle-centric)', (tester) async {
-      final count = await _pumpShellNavCount(
-        tester,
-        profile: _profile(flag: true),
-        vehicles: const [],
-      );
-      expect(count, 4);
-    });
-
-    testWidgets('no profile at all → 4 nav items (flag treated as false)',
-        (tester) async {
-      final count = await _pumpShellNavCount(
-        tester,
-        profile: null,
-        vehicles: const [_vehicle],
-      );
-      expect(count, 4);
+      await _pumpShellIcons(tester);
+      await tester.tap(find.text('Consumption'));
+      await tester.pumpAndSettle();
+      expect(find.text('Consumption'), findsWidgets);
     });
   });
 }

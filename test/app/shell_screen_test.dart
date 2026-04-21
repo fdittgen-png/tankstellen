@@ -112,6 +112,15 @@ void main() {
               StatefulShellBranch(
                 routes: [
                   GoRoute(
+                    path: '/consumption-tab',
+                    builder: (context, state) =>
+                        const Center(child: Text('ConsumptionScreen')),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
                     path: '/profile',
                     builder: (context, state) =>
                         const Center(child: Text('ProfileScreen')),
@@ -140,28 +149,35 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
     }
 
-    testWidgets('renders all 4 bottom navigation tabs', (tester) async {
+    testWidgets('renders all 5 bottom navigation tabs (#778)',
+        (tester) async {
       await pumpShell(tester);
 
-      // All four tab labels should be present
+      // All five labels should be present in the bottom nav —
+      // Consumption sits between Favorites and Settings as of #778.
       expect(find.text('Search'), findsOneWidget);
       expect(find.text('Map'), findsOneWidget);
       expect(find.text('Favorites'), findsOneWidget);
+      expect(find.text('Consumption'), findsOneWidget);
       expect(find.text('Settings'), findsOneWidget);
     });
 
     testWidgets('tab labels match expected text', (tester) async {
       await pumpShell(tester);
 
-      // Verify the bottom nav bar contains exactly these labels
       final labels = <String>[];
-      // Find all Text widgets that are nav bar labels (inside InkWell)
-      for (final label in ['Search', 'Map', 'Favorites', 'Settings']) {
+      for (final label in [
+        'Search',
+        'Map',
+        'Favorites',
+        'Consumption',
+        'Settings'
+      ]) {
         expect(find.text(label), findsOneWidget,
             reason: 'Expected tab label "$label" to be present');
         labels.add(label);
       }
-      expect(labels.length, 4);
+      expect(labels.length, 5);
     });
 
     testWidgets('initial tab shows search content', (tester) async {
@@ -190,8 +206,15 @@ void main() {
 
     testWidgets('tapping Settings tab switches content', (tester) async {
       await pumpShell(tester);
-
-      await tester.tap(find.text('Settings'));
+      // Dump present icons so diagnostics are easy if this regresses.
+      final settingsFinder = find.byWidgetPredicate(
+        (w) =>
+            w is Icon &&
+            (w.icon == Icons.settings_outlined ||
+                w.icon == Icons.settings),
+      );
+      expect(settingsFinder, findsAtLeast(1));
+      await tester.tap(settingsFinder.first);
       await tester.pump(const Duration(seconds: 1));
 
       expect(find.text('ProfileScreen'), findsOneWidget);
@@ -246,6 +269,15 @@ void main() {
               StatefulShellBranch(
                 routes: [
                   GoRoute(
+                    path: '/consumption-tab',
+                    builder: (context, state) =>
+                        const Center(child: Text('ConsumptionScreen')),
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                routes: [
+                  GoRoute(
                     path: '/profile',
                     builder: (context, state) =>
                         const Center(child: Text('ProfileScreen')),
@@ -274,6 +306,7 @@ void main() {
       expect(find.bySemanticsLabel('Search'), findsOneWidget);
       expect(find.bySemanticsLabel('Map'), findsOneWidget);
       expect(find.bySemanticsLabel('Favorites'), findsOneWidget);
+      expect(find.bySemanticsLabel('Consumption'), findsOneWidget);
       expect(find.bySemanticsLabel('Settings'), findsOneWidget);
 
       handle.dispose();
@@ -324,6 +357,10 @@ class _ShellScaffoldState extends State<_ShellScaffold> {
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'),
           BottomNavigationBarItem(icon: Icon(Icons.star), label: 'Favorites'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.local_gas_station_outlined),
+            label: 'Consumption',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
         ],
       ),

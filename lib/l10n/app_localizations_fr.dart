@@ -1962,6 +1962,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tripBannerPaused => 'Trajet en pause — toucher pour reprendre';
 
   @override
+  String get navConsumption => 'Conso';
+
+  @override
   String get tripHistoryTitle => 'Historique des trajets';
 
   @override
