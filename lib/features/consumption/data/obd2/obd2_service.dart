@@ -143,23 +143,102 @@ class Obd2Service {
         label: 'throttle',
       );
 
-  /// Read engine fuel rate in L/h (#717). Falls back to deriving from
-  /// MAF when PID 5E is unsupported — MAF's fuel-rate estimate is a
-  /// useful approximation on older cars.
-  Future<double?> readFuelRateLPerHour() async {
+  /// Read engine fuel rate in L/h. Three-step fallback chain (#717, #800):
+  ///
+  ///   1. **PID 5E** — direct `engine fuel rate` reading. Modern ECUs
+  ///      (~2014+) answer directly. Best accuracy, preferred when
+  ///      supported.
+  ///   2. **PID 10 MAF** — derive fuel rate from mass air flow:
+  ///      `L/h = MAF_g_per_s × 3600 / (AFR × density)`. Accepted ~5–10 %
+  ///      error, still very usable. Fails on cars without a MAF sensor.
+  ///   3. **MAP + IAT + RPM speed-density** — when neither direct fuel
+  ///      rate nor MAF is available (e.g. Peugeot 107 1.0L 1KR-FE), use
+  ///      the ideal gas law to estimate air mass flow from intake
+  ///      manifold pressure, intake air temperature, engine RPM, engine
+  ///      displacement, and volumetric efficiency. Accepted ~10–15 %
+  ///      error — still infinitely better than the `—` placeholder the
+  ///      trip summary would otherwise show.
+  ///
+  /// [engineDisplacementCc] and [volumetricEfficiency] are per-vehicle
+  /// constants for the step-3 fallback. Defaults are tuned for a 1.0 L
+  /// NA petrol engine (matches the Peugeot 107 / Aygo / C1 class and
+  /// covers many other sub-1.2 L city cars). A follow-up PR will plumb
+  /// per-vehicle overrides from the vehicle profile.
+  Future<double?> readFuelRateLPerHour({
+    int engineDisplacementCc = 1000,
+    double volumetricEfficiency = 0.85,
+  }) async {
+    // Step 1: direct fuel-rate PID.
     final direct = await _readDouble(
       Elm327Protocol.engineFuelRateCommand,
       Elm327Protocol.parseFuelRateLPerHour,
       label: 'fuelRate',
     );
     if (direct != null) return direct;
+
+    // Step 2: MAF-based estimate.
     final maf = await readMafGramsPerSecond();
-    if (maf == null) return null;
-    // Stoichiometric petrol: ~14.7 g air per g fuel; petrol density
-    // ~0.74 kg/L. Fuel rate (L/h) = MAF (g/s) * 3600 / (14.7 * 740).
-    // Returns an approximation; good enough for trip averages on
-    // vehicles that lack direct PID 5E.
-    return maf * 3600.0 / (14.7 * 740.0);
+    if (maf != null) {
+      // Stoichiometric petrol: AFR 14.7, density ~740 g/L.
+      // L/h = MAF × 3600 / (14.7 × 740).
+      return maf * 3600.0 / (14.7 * 740.0);
+    }
+
+    // Step 3: speed-density fallback. Requires MAP + IAT + RPM.
+    final mapKpa = await readManifoldPressureKpa();
+    final iatCelsius = await readIntakeAirTempCelsius();
+    final rpm = await readRpm();
+    if (mapKpa == null || iatCelsius == null || rpm == null) return null;
+    return estimateFuelRateLPerHourFromMap(
+      mapKpa: mapKpa,
+      iatCelsius: iatCelsius,
+      rpm: rpm,
+      engineDisplacementCc: engineDisplacementCc,
+      volumetricEfficiency: volumetricEfficiency,
+    );
+  }
+
+  /// Pure-math speed-density fuel-rate estimator (#800). Split out so
+  /// unit tests can verify the formula without mocking the transport.
+  ///
+  /// Formula:
+  ///   air_flow_g_per_s = (MAP_Pa × displacement_m³ × (RPM / 120) × η_v)
+  ///                      / (R × IAT_K)
+  ///   fuel_rate_L_per_h = air_flow_g_per_s × 3600 / (AFR × density)
+  ///
+  /// R = 287 J/(kg·K) is the specific gas constant for dry air.
+  /// `RPM / 120` converts crank revolutions to intake strokes per
+  /// second on a 4-stroke engine (one intake per 2 crank revs).
+  /// Returns null when any input is non-positive — the ideal gas law
+  /// breaks down at 0 K / 0 pressure and callers should surface "no
+  /// data" rather than a bogus number.
+  static double? estimateFuelRateLPerHourFromMap({
+    required double mapKpa,
+    required double iatCelsius,
+    required double rpm,
+    required int engineDisplacementCc,
+    required double volumetricEfficiency,
+    double afr = 14.7,
+    double fuelDensityGPerL = 740.0,
+  }) {
+    final iatKelvin = iatCelsius + 273.15;
+    if (mapKpa <= 0 ||
+        iatKelvin <= 0 ||
+        rpm <= 0 ||
+        engineDisplacementCc <= 0 ||
+        volumetricEfficiency <= 0) {
+      return null;
+    }
+    const gasConstant = 287.0; // J/(kg·K), dry air
+    final mapPa = mapKpa * 1000.0;
+    final displacementM3 = engineDisplacementCc / 1_000_000.0;
+    final intakesPerSecond = rpm / 120.0;
+    // Kilograms of air per second (ideal gas law × VE).
+    final airMassKgPerS =
+        (mapPa * displacementM3 * intakesPerSecond * volumetricEfficiency) /
+            (gasConstant * iatKelvin);
+    final airMassGPerS = airMassKgPerS * 1000.0;
+    return airMassGPerS * 3600.0 / (afr * fuelDensityGPerL);
   }
 
   /// Read mass air flow in g/s. (#717)
@@ -167,6 +246,20 @@ class Obd2Service {
         Elm327Protocol.mafCommand,
         Elm327Protocol.parseMafGramsPerSecond,
         label: 'maf',
+      );
+
+  /// Read intake manifold absolute pressure (kPa). (#800)
+  Future<double?> readManifoldPressureKpa() => _readDouble(
+        Elm327Protocol.intakeManifoldPressureCommand,
+        Elm327Protocol.parseManifoldPressureKpa,
+        label: 'manifoldPressure',
+      );
+
+  /// Read intake air temperature (°C). (#800)
+  Future<double?> readIntakeAirTempCelsius() => _readDouble(
+        Elm327Protocol.intakeAirTempCommand,
+        Elm327Protocol.parseIntakeAirTempCelsius,
+        label: 'intakeAirTemp',
       );
 
   /// Read fuel tank level, 0–100 %. (#717)
