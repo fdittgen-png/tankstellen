@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../core/storage/storage_keys.dart';
+import '../../../../../core/storage/storage_providers.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../providers/privacy_data_provider.dart';
 import 'privacy_data_row.dart';
@@ -78,7 +81,7 @@ class _SyncDisabledBanner extends StatelessWidget {
   }
 }
 
-class _SyncEnabledBody extends StatelessWidget {
+class _SyncEnabledBody extends ConsumerWidget {
   final ThemeData theme;
   final AppLocalizations? l;
   final PrivacyDataSnapshot snapshot;
@@ -90,8 +93,11 @@ class _SyncEnabledBody extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final userId = snapshot.syncUserId;
+    final settings = ref.watch(settingsStorageProvider);
+    final baselineSyncOn =
+        settings.getSetting(StorageKeys.syncBaselinesEnabled) == true;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -114,6 +120,29 @@ class _SyncEnabledBody extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
+        // #780 phase 3 — opt-in toggle for per-vehicle baseline sync.
+        // Default false; flips to true only when the user explicitly
+        // enables it here.
+        SwitchListTile(
+          key: const Key('syncBaselinesToggle'),
+          value: baselineSyncOn,
+          title: Text(
+            l?.syncBaselinesToggleTitle ?? 'Share learned vehicle profiles',
+          ),
+          subtitle: Text(
+            l?.syncBaselinesToggleSubtitle ??
+                'Upload per-vehicle consumption baselines so a second device can reuse them.',
+            style: theme.textTheme.bodySmall,
+          ),
+          onChanged: (v) async {
+            await settings.putSetting(
+              StorageKeys.syncBaselinesEnabled,
+              v,
+            );
+            ref.invalidate(settingsStorageProvider);
+          },
+          contentPadding: EdgeInsets.zero,
+        ),
         OutlinedButton.icon(
           onPressed: () => context.push('/data-transparency'),
           icon: const Icon(Icons.visibility, size: 18),

@@ -3865,6 +3865,18 @@ abstract class AppLocalizations {
   /// **'Log a fill-up that beats the station\'s 30-day average by 5 % or more.'**
   String get achievementPriceWinDesc;
 
+  /// No description provided for @syncBaselinesToggleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share learned vehicle profiles'**
+  String get syncBaselinesToggleTitle;
+
+  /// No description provided for @syncBaselinesToggleSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload per-vehicle consumption baselines so a second device can reuse them.'**
+  String get syncBaselinesToggleSubtitle;
+
   /// No description provided for @obd2StatusConnected.
   ///
   /// In en, this message translates to:

@@ -2047,6 +2047,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Trage eine Tankung ein, die den 30-Tage-Durchschnitt der Station um mindestens 5 % schlägt.';
 
   @override
+  String get syncBaselinesToggleTitle => 'Gelernte Fahrzeugprofile teilen';
+
+  @override
+  String get syncBaselinesToggleSubtitle =>
+      'Pro-Fahrzeug-Verbrauchsbaselines hochladen, damit ein zweites Gerät sie wiederverwenden kann.';
+
+  @override
   String get obd2StatusConnected => 'OBD2-Adapter: verbunden';
 
   @override

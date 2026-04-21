@@ -2045,6 +2045,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Enregistrez un plein qui bat la moyenne sur 30 jours de la station d\'au moins 5 %.';
 
   @override
+  String get syncBaselinesToggleTitle =>
+      'Partager les profils de véhicules appris';
+
+  @override
+  String get syncBaselinesToggleSubtitle =>
+      'Téléverser les baselines de consommation par véhicule pour qu\'un second appareil puisse les réutiliser.';
+
+  @override
   String get obd2StatusConnected => 'Adaptateur OBD2 : connecté';
 
   @override

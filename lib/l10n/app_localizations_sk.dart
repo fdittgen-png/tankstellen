@@ -2036,6 +2036,13 @@ class AppLocalizationsSk extends AppLocalizations {
       'Log a fill-up that beats the station\'s 30-day average by 5 % or more.';
 
   @override
+  String get syncBaselinesToggleTitle => 'Share learned vehicle profiles';
+
+  @override
+  String get syncBaselinesToggleSubtitle =>
+      'Upload per-vehicle consumption baselines so a second device can reuse them.';
+
+  @override
   String get obd2StatusConnected => 'OBD2 adapter: connected';
 
   @override

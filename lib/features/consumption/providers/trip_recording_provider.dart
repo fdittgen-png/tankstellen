@@ -6,6 +6,8 @@ import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/hive_boxes.dart';
+import '../../../core/storage/storage_keys.dart';
+import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_service.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
@@ -379,6 +381,16 @@ class TripRecording extends _$TripRecording {
   /// payload unchanged.
   Future<void> _syncBaselineAfterFlush(String vehicleId) async {
     try {
+      // #780 phase 3 — honour the opt-in setting. Default false so
+      // users who never toggled it in the sync setup screen don't
+      // silently upload driving data. Ungated favourite sync etc.
+      // are unaffected.
+      final settings = ref.read(settingsStorageProvider);
+      final enabled = settings.getSetting(
+            StorageKeys.syncBaselinesEnabled,
+          ) ==
+          true;
+      if (!enabled) return;
       if (!Hive.isBoxOpen(HiveBoxes.obd2Baselines)) return;
       final box = Hive.box<String>(HiveBoxes.obd2Baselines);
       final key = 'baseline:$vehicleId';
