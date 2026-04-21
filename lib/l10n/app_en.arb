@@ -874,6 +874,8 @@
   "achievementTenTripsDesc": "Record 10 OBD2 trips.",
   "achievementZeroHarsh": "Smooth driver",
   "achievementZeroHarshDesc": "Complete a trip of 10 km or more with no harsh braking or acceleration.",
+  "achievementEcoWeek": "Eco week",
+  "achievementEcoWeekDesc": "Drive 7 consecutive days with at least one smooth trip each day.",
   "obd2StatusConnected": "OBD2 adapter: connected",
   "obd2StatusAttempting": "OBD2 adapter: connecting",
   "obd2StatusUnreachable": "OBD2 adapter: unreachable",

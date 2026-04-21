@@ -33,6 +33,9 @@ class AchievementEngine {
     if (_anyZeroHarshTrip(trips)) {
       earned.add(AchievementId.zeroHarshTrip);
     }
+    if (_hasEcoWeekStreak(trips)) {
+      earned.add(AchievementId.ecoWeek);
+    }
     return earned;
   }
 
@@ -44,6 +47,38 @@ class AchievementEngine {
           s.harshAccelerations == 0) {
         return true;
       }
+    }
+    return false;
+  }
+
+  /// Check every 7-consecutive-day window in the log. For each
+  /// window, if each of the 7 calendar days has at least one trip
+  /// that qualifies as "eco" (≥10 km, zero harsh events), the
+  /// streak counts. The rolling window means once the user earns
+  /// the badge it stays earned, even if next week they skip a day.
+  bool _hasEcoWeekStreak(List<TripHistoryEntry> trips) {
+    final ecoDays = <DateTime>{};
+    for (final t in trips) {
+      final s = t.summary;
+      final startedAt = s.startedAt;
+      if (startedAt == null) continue;
+      if (s.distanceKm < _zeroHarshMinDistanceKm) continue;
+      if (s.harshBrakes != 0 || s.harshAccelerations != 0) continue;
+      ecoDays.add(DateTime(startedAt.year, startedAt.month, startedAt.day));
+    }
+    if (ecoDays.length < 7) return false;
+    final sorted = ecoDays.toList()..sort();
+    var streak = 1;
+    for (var i = 1; i < sorted.length; i++) {
+      final gap = sorted[i].difference(sorted[i - 1]).inDays;
+      if (gap == 1) {
+        streak++;
+        if (streak >= 7) return true;
+      } else if (gap > 1) {
+        streak = 1;
+      }
+      // gap == 0 would mean duplicate same-day; impossible since the
+      // set dedupes. Fall through.
     }
     return false;
   }
