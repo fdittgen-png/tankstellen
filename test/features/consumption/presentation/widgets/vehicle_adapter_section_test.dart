@@ -14,7 +14,7 @@ void main() {
         VehicleAdapterSection(
           adapterMac: null,
           adapterName: null,
-          onPaired: (_, __) => pairTaps++,
+          onPaired: (_, _) => pairTaps++,
           onForget: () {},
         ),
       );
@@ -37,7 +37,7 @@ void main() {
         VehicleAdapterSection(
           adapterMac: 'AA:BB:CC:DD:EE:FF',
           adapterName: 'vLinker FS 1234',
-          onPaired: (_, __) {},
+          onPaired: (_, _) {},
           onForget: () => forgetTaps++,
         ),
       );
@@ -61,7 +61,7 @@ void main() {
         VehicleAdapterSection(
           adapterMac: 'AA:BB',
           adapterName: '',
-          onPaired: (_, __) {},
+          onPaired: (_, _) {},
           onForget: () {},
         ),
       );
@@ -77,7 +77,7 @@ void main() {
         VehicleAdapterSection(
           adapterMac: '',
           adapterName: 'ghost',
-          onPaired: (_, __) {},
+          onPaired: (_, _) {},
           onForget: () {},
         ),
       );
