@@ -215,33 +215,6 @@ class SyncService {
   }
 
   // ---------------------------------------------------------------------------
-  // Price History (server-side)
-  // ---------------------------------------------------------------------------
-
-  /// Fetch price history from server for a station.
-  static Future<List<Map<String, dynamic>>> fetchPriceHistory(
-    String stationId, {
-    int days = 30,
-  }) async {
-    final client = _client;
-    if (client == null) return [];
-
-    try {
-      final cutoff = DateTime.now().subtract(Duration(days: days)).toIso8601String();
-      final rows = await client
-          .from('price_snapshots')
-          .select()
-          .eq('station_id', stationId)
-          .gte('recorded_at', cutoff)
-          .order('recorded_at', ascending: true);
-      return List<Map<String, dynamic>>.from(rows);
-    } catch (e) {
-      debugPrint('SyncService.fetchPriceHistory FAILED: $e');
-      return [];
-    }
-  }
-
-  // ---------------------------------------------------------------------------
   // Alerts
   // ---------------------------------------------------------------------------
 
