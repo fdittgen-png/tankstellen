@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../consumption/presentation/widgets/vehicle_adapter_section.dart';
 import '../../../consumption/presentation/widgets/vehicle_baseline_section.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
@@ -43,6 +44,8 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   VehicleType _type = VehicleType.combustion;
   final Set<ConnectorType> _connectors = {};
   String? _existingId;
+  String? _adapterMac;
+  String? _adapterName;
 
   @override
   void initState() {
@@ -70,6 +73,8 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
       _connectors
         ..clear()
         ..addAll(existing.supportedConnectors);
+      _adapterMac = existing.obd2AdapterMac;
+      _adapterName = existing.obd2AdapterName;
     });
   }
 
@@ -132,6 +137,8 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
         minSocPercent: _parseIntOr(_minSocCtrl.text, 20).clamp(0, 100),
         maxSocPercent: _parseIntOr(_maxSocCtrl.text, 80).clamp(0, 100),
       ),
+      obd2AdapterMac: _adapterMac,
+      obd2AdapterName: _adapterName,
     );
 
     await ref.read(vehicleProfileListProvider.notifier).save(profile);
@@ -243,6 +250,31 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
                 fuelTypeController: _fuelTypeCtrl,
                 numberValidator: _validateOptionalNumber,
               ),
+            // OBD2 adapter pairing section (#779). Shown for saved
+            // vehicles only — pairing needs a stable vehicle id so
+            // the adapter MAC attaches to something that already
+            // exists in storage.
+            if (_existingId != null) ...[
+              const SizedBox(height: 24),
+              VehicleAdapterSection(
+                adapterMac: _adapterMac,
+                adapterName: _adapterName,
+                onPaired: (name, mac) {
+                  setState(() {
+                    _adapterName = name;
+                    _adapterMac = mac;
+                  });
+                  _save();
+                },
+                onForget: () {
+                  setState(() {
+                    _adapterName = null;
+                    _adapterMac = null;
+                  });
+                  _save();
+                },
+              ),
+            ],
             // Baseline calibration section (#779). Only meaningful
             // for saved vehicles that might already have learned
             // baselines from previous OBD2 trips — hide it during

@@ -1986,6 +1986,22 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ceci efface tous les échantillons appris pour ce véhicule. Les valeurs par défaut au démarrage à froid seront utilisées jusqu\'à ce que de nouveaux trajets reconstruisent le profil.';
 
   @override
+  String get vehicleAdapterSectionTitle => 'Adaptateur OBD2';
+
+  @override
+  String get vehicleAdapterEmpty =>
+      'Aucun adaptateur couplé. Couplez-en un pour que l\'application se reconnecte automatiquement la prochaine fois.';
+
+  @override
+  String get vehicleAdapterUnnamed => 'Adaptateur inconnu';
+
+  @override
+  String get vehicleAdapterPair => 'Coupler un adaptateur';
+
+  @override
+  String get vehicleAdapterForget => 'Oublier l\'adaptateur';
+
+  @override
   String get achievementsTitle => 'Succès';
 
   @override

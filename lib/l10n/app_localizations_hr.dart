@@ -1974,6 +1974,22 @@ class AppLocalizationsHr extends AppLocalizations {
       'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.';
 
   @override
+  String get vehicleAdapterSectionTitle => 'OBD2 adapter';
+
+  @override
+  String get vehicleAdapterEmpty =>
+      'No adapter paired. Pair one so the app can reconnect automatically next time.';
+
+  @override
+  String get vehicleAdapterUnnamed => 'Unknown adapter';
+
+  @override
+  String get vehicleAdapterPair => 'Pair adapter';
+
+  @override
+  String get vehicleAdapterForget => 'Forget adapter';
+
+  @override
   String get achievementsTitle => 'Achievements';
 
   @override

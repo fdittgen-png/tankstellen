@@ -28,8 +28,28 @@ Future<Obd2Service?> showObd2AdapterPicker(BuildContext context) {
   );
 }
 
+/// Pair-only variant of [showObd2AdapterPicker] (#779). Opens the
+/// same scan sheet but pops with the user-picked
+/// [ResolvedObd2Candidate] instead of connecting. Used by the vehicle
+/// edit screen to persist the adapter's name+MAC on a vehicle without
+/// initiating a full trip-recording session.
+Future<ResolvedObd2Candidate?> showObd2AdapterPairer(BuildContext context) {
+  return showModalBottomSheet<ResolvedObd2Candidate>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (_) => const Obd2AdapterPickerSheet(pairOnly: true),
+  );
+}
+
 class Obd2AdapterPickerSheet extends ConsumerStatefulWidget {
-  const Obd2AdapterPickerSheet({super.key});
+  /// When true, tapping a candidate pops the sheet with the
+  /// [ResolvedObd2Candidate] instead of opening a connection. Used
+  /// by the vehicle-pairing flow (#779) where the user saves the
+  /// adapter on the vehicle profile without starting a trip.
+  final bool pairOnly;
+
+  const Obd2AdapterPickerSheet({super.key, this.pairOnly = false});
 
   @override
   ConsumerState<Obd2AdapterPickerSheet> createState() =>
@@ -84,6 +104,12 @@ class _Obd2AdapterPickerSheetState
   }
 
   Future<void> _connect(ResolvedObd2Candidate candidate) async {
+    // #779 — pair-only flow: pop the candidate instead of opening a
+    // connection. The caller persists it and closes.
+    if (widget.pairOnly) {
+      Navigator.of(context).pop(candidate);
+      return;
+    }
     setState(() => _phase = _Phase.connecting);
     try {
       final service = await ref
