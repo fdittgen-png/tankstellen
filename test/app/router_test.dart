@@ -126,6 +126,11 @@ void main() {
 
     testWidgets('/ renders shell with search when setup is complete',
         (tester) async {
+      tester.view.physicalSize = const Size(800, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       late GoRouter testRouter;
       await tester.pumpWidget(
         ProviderScope(
@@ -148,6 +153,11 @@ void main() {
     });
 
     testWidgets('shell has 5 navigation branches (#778)', (tester) async {
+      tester.view.physicalSize = const Size(800, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       late GoRouter testRouter;
       await tester.pumpWidget(
         ProviderScope(
