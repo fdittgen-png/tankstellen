@@ -29,6 +29,10 @@ class HiveBoxes {
   /// baselines box: unencrypted, opened once at startup.
   static const String obd2TripHistory = 'obd2_trip_history';
 
+  /// Earned gamification badges (#781). One JSON payload per earned
+  /// badge keyed by enum name; not PII.
+  static const String achievements = 'achievements';
+
   static const _encryptedBoxes = {
     settings,
     profiles,
@@ -107,6 +111,8 @@ class HiveBoxes {
     await Hive.openBox<String>(obd2Baselines);
     // #726 — OBD2 trip history: rolling log of finalised trips.
     await Hive.openBox<String>(obd2TripHistory);
+    // #781 — gamification badges: one entry per earned badge.
+    await Hive.openBox<String>(achievements);
   }
 
   /// Initialize Hive in a background isolate with proper encryption.

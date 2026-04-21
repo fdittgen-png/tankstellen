@@ -1986,6 +1986,35 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ceci efface tous les échantillons appris pour ce véhicule. Les valeurs par défaut au démarrage à froid seront utilisées jusqu\'à ce que de nouveaux trajets reconstruisent le profil.';
 
   @override
+  String get achievementsTitle => 'Succès';
+
+  @override
+  String get achievementFirstTrip => 'Premier trajet';
+
+  @override
+  String get achievementFirstTripDesc =>
+      'Enregistrez votre premier trajet OBD2.';
+
+  @override
+  String get achievementFirstFillUp => 'Premier plein';
+
+  @override
+  String get achievementFirstFillUpDesc => 'Enregistrez votre premier plein.';
+
+  @override
+  String get achievementTenTrips => '10 trajets';
+
+  @override
+  String get achievementTenTripsDesc => 'Enregistrez 10 trajets OBD2.';
+
+  @override
+  String get achievementZeroHarsh => 'Conduite souple';
+
+  @override
+  String get achievementZeroHarshDesc =>
+      'Terminez un trajet d\'au moins 10 km sans freinage ni accélération brusques.';
+
+  @override
   String get tripHistoryTitle => 'Historique des trajets';
 
   @override

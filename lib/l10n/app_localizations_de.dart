@@ -1989,6 +1989,34 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dadurch werden alle gelernten Werte für dieses Fahrzeug verworfen. Bis neue Fahrten die Daten wieder aufbauen, werden die Kaltstart-Standardwerte verwendet.';
 
   @override
+  String get achievementsTitle => 'Erfolge';
+
+  @override
+  String get achievementFirstTrip => 'Erste Fahrt';
+
+  @override
+  String get achievementFirstTripDesc => 'Zeichne deine erste OBD2-Fahrt auf.';
+
+  @override
+  String get achievementFirstFillUp => 'Erste Tankung';
+
+  @override
+  String get achievementFirstFillUpDesc => 'Trage deine erste Tankung ein.';
+
+  @override
+  String get achievementTenTrips => '10 Fahrten';
+
+  @override
+  String get achievementTenTripsDesc => 'Zeichne 10 OBD2-Fahrten auf.';
+
+  @override
+  String get achievementZeroHarsh => 'Ruhiger Fahrer';
+
+  @override
+  String get achievementZeroHarshDesc =>
+      'Schließe eine Fahrt von mindestens 10 km ohne starkes Bremsen oder Beschleunigen ab.';
+
+  @override
   String get tripHistoryTitle => 'Fahrtenverlauf';
 
   @override
