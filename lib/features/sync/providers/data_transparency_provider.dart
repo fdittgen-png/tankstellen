@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/sync/supabase_client.dart';
 import '../../../core/sync/sync_provider.dart';
+import '../../../core/sync/alerts_sync.dart';
 import '../../../core/sync/sync_service.dart';
 import '../../alerts/providers/alert_provider.dart';
 import '../../favorites/providers/favorites_provider.dart';
@@ -119,7 +120,7 @@ class DataTransparencyController extends _$DataTransparencyController {
 
       final alerts = ref.read(alertProvider);
       debugPrint('DataTransparency: syncing ${alerts.length} local alerts');
-      await SyncService.syncAlerts(alerts);
+      await AlertsSync.merge(alerts);
     } catch (e) {
       debugPrint('DataTransparency: force sync failed: $e');
     }

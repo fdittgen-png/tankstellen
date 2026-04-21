@@ -1,3 +1,4 @@
+import '../../sync/alerts_sync.dart';
 import '../../sync/price_history_sync.dart';
 import '../../sync/ratings_sync.dart';
 import '../../sync/supabase_client.dart';
@@ -56,7 +57,7 @@ class SupabaseSyncRepository implements SyncRepository {
 
   @override
   Future<List<PriceAlert>> syncAlerts(List<PriceAlert> localAlerts) =>
-      SyncService.syncAlerts(localAlerts);
+      AlertsSync.merge(localAlerts);
 
   // ── Price History ──
 
