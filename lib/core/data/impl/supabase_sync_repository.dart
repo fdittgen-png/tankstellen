@@ -1,4 +1,5 @@
 import '../../sync/price_history_sync.dart';
+import '../../sync/ratings_sync.dart';
 import '../../sync/supabase_client.dart';
 import '../../sync/sync_service.dart';
 import '../sync_repository.dart';
@@ -42,14 +43,14 @@ class SupabaseSyncRepository implements SyncRepository {
   @override
   Future<void> syncRating(String stationId, int rating,
           {bool shared = false}) =>
-      SyncService.syncRating(stationId, rating, shared: shared);
+      RatingsSync.upsert(stationId, rating, shared: shared);
 
   @override
   Future<void> deleteRating(String stationId) =>
-      SyncService.deleteRating(stationId);
+      RatingsSync.delete(stationId);
 
   @override
-  Future<Map<String, int>> fetchRatings() => SyncService.fetchRatings();
+  Future<Map<String, int>> fetchRatings() => RatingsSync.fetchAll();
 
   // ── Alerts ──
 

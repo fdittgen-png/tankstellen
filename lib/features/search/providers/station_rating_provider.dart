@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/storage_providers.dart';
+import '../../../core/sync/ratings_sync.dart';
 import '../../../core/sync/sync_helper.dart';
-import '../../../core/sync/sync_service.dart';
 import '../../profile/providers/profile_provider.dart';
 
 part 'station_rating_provider.g.dart';
@@ -35,7 +35,7 @@ class StationRatings extends _$StationRatings {
     if (mode != 'local') {
       final isShared = mode == 'shared';
       await SyncHelper.fireAndForget(ref, 'Ratings.rate',
-        () => SyncService.syncRating(stationId, clamped, shared: isShared),
+        () => RatingsSync.upsert(stationId, clamped, shared: isShared),
       );
     }
   }
@@ -48,7 +48,7 @@ class StationRatings extends _$StationRatings {
 
     // Always delete from server when removing (cleanup)
     await SyncHelper.fireAndForget(ref, 'Ratings.remove',
-      () => SyncService.deleteRating(stationId),
+      () => RatingsSync.delete(stationId),
     );
   }
 }

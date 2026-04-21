@@ -6,6 +6,7 @@ import '../storage/storage_providers.dart';
 import 'community_config.dart';
 import 'supabase_client.dart';
 import 'sync_config.dart';
+import 'ratings_sync.dart';
 import 'sync_service.dart';
 
 part 'sync_provider.g.dart';
@@ -206,7 +207,7 @@ class SyncState extends _$SyncState {
         if (ignoredIds.isNotEmpty) await SyncService.syncIgnoredStations(ignoredIds);
         final ratings = storage.getRatings();
         for (final entry in ratings.entries) {
-          await SyncService.syncRating(entry.key, entry.value);
+          await RatingsSync.upsert(entry.key, entry.value);
         }
         debugPrint('InitialSync: complete');
       } catch (e) {
