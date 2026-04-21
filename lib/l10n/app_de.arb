@@ -847,6 +847,8 @@
   "achievementTenTripsDesc": "Zeichne 10 OBD2-Fahrten auf.",
   "achievementZeroHarsh": "Ruhiger Fahrer",
   "achievementZeroHarshDesc": "Schließe eine Fahrt von mindestens 10 km ohne starkes Bremsen oder Beschleunigen ab.",
+  "achievementEcoWeek": "Öko-Woche",
+  "achievementEcoWeekDesc": "Fahre 7 Tage in Folge mit mindestens einer ruhigen Fahrt pro Tag.",
   "obd2StatusConnected": "OBD2-Adapter: verbunden",
   "obd2StatusAttempting": "OBD2-Adapter: verbindet",
   "obd2StatusUnreachable": "OBD2-Adapter: nicht erreichbar",

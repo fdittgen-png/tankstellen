@@ -2006,6 +2006,13 @@ class AppLocalizationsLv extends AppLocalizations {
       'Complete a trip of 10 km or more with no harsh braking or acceleration.';
 
   @override
+  String get achievementEcoWeek => 'Eco week';
+
+  @override
+  String get achievementEcoWeekDesc =>
+      'Drive 7 consecutive days with at least one smooth trip each day.';
+
+  @override
   String get obd2StatusConnected => 'OBD2 adapter: connected';
 
   @override

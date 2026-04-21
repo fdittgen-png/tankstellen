@@ -126,6 +126,11 @@ class _BadgeTile extends StatelessWidget {
         return (Icons.military_tech, l?.achievementTenTrips ?? '10 trips');
       case AchievementId.zeroHarshTrip:
         return (Icons.spa, l?.achievementZeroHarsh ?? 'Smooth driver');
+      case AchievementId.ecoWeek:
+        return (
+          Icons.event_available,
+          l?.achievementEcoWeek ?? 'Eco week',
+        );
     }
   }
 
@@ -143,6 +148,9 @@ class _BadgeTile extends StatelessWidget {
       case AchievementId.zeroHarshTrip:
         return l?.achievementZeroHarshDesc ??
             'Complete a trip of 10 km or more with no harsh braking or acceleration.';
+      case AchievementId.ecoWeek:
+        return l?.achievementEcoWeekDesc ??
+            'Drive 7 consecutive days with at least one smooth trip each day.';
     }
   }
 }

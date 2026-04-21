@@ -768,6 +768,8 @@
   "achievementTenTripsDesc": "Enregistrez 10 trajets OBD2.",
   "achievementZeroHarsh": "Conduite souple",
   "achievementZeroHarshDesc": "Terminez un trajet d'au moins 10 km sans freinage ni accélération brusques.",
+  "achievementEcoWeek": "Semaine éco",
+  "achievementEcoWeekDesc": "Conduisez 7 jours d'affilée avec au moins un trajet souple par jour.",
   "obd2StatusConnected": "Adaptateur OBD2 : connecté",
   "obd2StatusAttempting": "Adaptateur OBD2 : connexion en cours",
   "obd2StatusUnreachable": "Adaptateur OBD2 : injoignable",

@@ -3811,6 +3811,18 @@ abstract class AppLocalizations {
   /// **'Complete a trip of 10 km or more with no harsh braking or acceleration.'**
   String get achievementZeroHarshDesc;
 
+  /// No description provided for @achievementEcoWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Eco week'**
+  String get achievementEcoWeek;
+
+  /// No description provided for @achievementEcoWeekDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Drive 7 consecutive days with at least one smooth trip each day.'**
+  String get achievementEcoWeekDesc;
+
   /// No description provided for @obd2StatusConnected.
   ///
   /// In en, this message translates to:

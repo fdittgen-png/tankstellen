@@ -2017,6 +2017,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Schließe eine Fahrt von mindestens 10 km ohne starkes Bremsen oder Beschleunigen ab.';
 
   @override
+  String get achievementEcoWeek => 'Öko-Woche';
+
+  @override
+  String get achievementEcoWeekDesc =>
+      'Fahre 7 Tage in Folge mit mindestens einer ruhigen Fahrt pro Tag.';
+
+  @override
   String get obd2StatusConnected => 'OBD2-Adapter: verbunden';
 
   @override

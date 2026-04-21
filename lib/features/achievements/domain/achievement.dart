@@ -18,6 +18,13 @@ enum AchievementId {
   /// at least 10 km of distance. Rewards smooth driving, not just
   /// short drives that trivially have no events.
   zeroHarshTrip,
+
+  /// Seven consecutive calendar days, each with at least one trip
+  /// of ≥10 km and zero harsh events. Rewards sustained smooth
+  /// driving — a single good day isn't enough. The streak window
+  /// is rolling: any 7-day stretch in the log qualifies, not just
+  /// the most recent one.
+  ecoWeek,
 }
 
 /// An achievement the user has earned. `earnedAt` is the moment the

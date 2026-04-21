@@ -2015,6 +2015,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Terminez un trajet d\'au moins 10 km sans freinage ni accélération brusques.';
 
   @override
+  String get achievementEcoWeek => 'Semaine éco';
+
+  @override
+  String get achievementEcoWeekDesc =>
+      'Conduisez 7 jours d\'affilée avec au moins un trajet souple par jour.';
+
+  @override
   String get obd2StatusConnected => 'Adaptateur OBD2 : connecté';
 
   @override
