@@ -1,8 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/storage/hive_boxes.dart';
+import '../../search/domain/entities/fuel_type.dart';
+import '../../vehicle/providers/vehicle_providers.dart';
+import '../data/baseline_store.dart';
 import '../data/obd2/obd2_service.dart';
 import '../data/obd2/trip_recording_controller.dart';
 import '../domain/cold_start_baselines.dart';
@@ -76,11 +81,9 @@ class TripRecording extends _$TripRecording {
   TripRecordingController? _controller;
   StreamSubscription<TripLiveReading>? _liveSub;
   SituationClassifier? _classifier;
-
-  /// Fuel family used for cold-start baselines. Currently hardcoded
-  /// to gasoline — phase 2 (#769) reads it from the active vehicle
-  /// profile.
-  final ConsumptionFuelFamily _fuelFamily = ConsumptionFuelFamily.gasoline;
+  BaselineStore? _store;
+  String? _vehicleId;
+  ConsumptionFuelFamily _fuelFamily = ConsumptionFuelFamily.gasoline;
 
   @override
   TripRecordingState build() {
@@ -96,9 +99,32 @@ class TripRecording extends _$TripRecording {
     final ctl = TripRecordingController(service: service);
     _controller = ctl;
     _classifier = SituationClassifier();
+
+    // #769 — resolve the active vehicle + fuel family and load its
+    // learned baselines from Hive. Falls back silently to cold-start
+    // defaults when the box isn't open (widget tests) or the active
+    // vehicle is unavailable.
+    try {
+      final vehicle = ref.read(activeVehicleProfileProvider);
+      _vehicleId = vehicle?.id;
+      _fuelFamily = _resolveFuelFamily(vehicle?.preferredFuelType);
+      if (Hive.isBoxOpen(HiveBoxes.obd2Baselines)) {
+        _store = BaselineStore(
+          box: Hive.box<String>(HiveBoxes.obd2Baselines),
+        );
+        if (_vehicleId != null) {
+          await _store!.loadVehicle(_vehicleId!);
+        }
+      }
+    } catch (e) {
+      debugPrint('TripRecording.start: baseline setup failed: $e');
+      _store = null;
+    }
+
     await ctl.start();
     _liveSub = ctl.live.listen((reading) {
       final situation = _classifyFrom(reading);
+      _recordToStore(reading, situation);
       final band = _classifyBandFrom(reading, situation);
       final delta = _computeDelta(reading, situation);
       state = state.copyWith(
@@ -112,6 +138,43 @@ class TripRecording extends _$TripRecording {
       );
     });
     state = state.copyWith(phase: TripRecordingPhase.recording);
+  }
+
+  /// Map a [FuelType] apiValue onto a [ConsumptionFuelFamily] for
+  /// the cold-start tables. Everything that isn't diesel maps to
+  /// gasoline — LPG/CNG calorific values are close enough to petrol
+  /// that the cold-start number is within measurement noise.
+  ConsumptionFuelFamily _resolveFuelFamily(String? apiValue) {
+    if (apiValue == null) return ConsumptionFuelFamily.gasoline;
+    if (apiValue.startsWith('diesel')) return ConsumptionFuelFamily.diesel;
+    return ConsumptionFuelFamily.gasoline;
+  }
+
+  void _recordToStore(TripLiveReading r, DrivingSituation situation) {
+    final store = _store;
+    final vid = _vehicleId;
+    if (store == null || vid == null) return;
+    final baseline = coldStartBaseline(_fuelFamily, situation);
+    final live = _liveConsumptionFor(r, baseline);
+    if (live == null) return;
+    store.record(
+      vehicleId: vid,
+      situation: situation,
+      value: live,
+    );
+  }
+
+  SituationBaseline _baselineFor(DrivingSituation situation) {
+    final store = _store;
+    final vid = _vehicleId;
+    if (store == null || vid == null) {
+      return coldStartBaseline(_fuelFamily, situation);
+    }
+    return store.lookup(
+      vehicleId: vid,
+      situation: situation,
+      fuelFamily: _fuelFamily,
+    );
   }
 
   DrivingSituation _classifyFrom(TripLiveReading r) {
@@ -131,7 +194,7 @@ class TripRecording extends _$TripRecording {
     TripLiveReading r,
     DrivingSituation situation,
   ) {
-    final baseline = coldStartBaseline(_fuelFamily, situation);
+    final baseline = _baselineFor(situation);
     final live = _liveConsumptionFor(r, baseline);
     if (live == null) return ConsumptionBand.normal;
     return classifyBand(
@@ -145,7 +208,7 @@ class TripRecording extends _$TripRecording {
     TripLiveReading r,
     DrivingSituation situation,
   ) {
-    final baseline = coldStartBaseline(_fuelFamily, situation);
+    final baseline = _baselineFor(situation);
     if (baseline.value <= 0) return null;
     final live = _liveConsumptionFor(r, baseline);
     if (live == null) return null;
@@ -203,6 +266,20 @@ class TripRecording extends _$TripRecording {
     await _liveSub?.cancel();
     _liveSub = null;
     _controller = null;
+    // #769 — flush learned baselines before releasing the service so
+    // the next trip starts from the updated values. Best-effort: a
+    // Hive write failure here shouldn't block teardown.
+    final store = _store;
+    final vid = _vehicleId;
+    if (store != null && vid != null) {
+      try {
+        await store.flush(vid);
+      } catch (e) {
+        debugPrint('TripRecording.stop: baseline flush failed: $e');
+      }
+    }
+    _store = null;
+    _vehicleId = null;
     try {
       await svc.disconnect();
     } catch (e) {
