@@ -19,6 +19,11 @@ class HiveBoxes {
   static const String priceHistory = 'price_history';
   static const String alerts = 'alerts';
 
+  /// Per-vehicle per-situation consumption baselines (#769). Plain
+  /// averages like "7.2 L/100 km at highway cruise" are not PII and
+  /// live outside the encrypted set to keep startup cheap.
+  static const String obd2Baselines = 'obd2_baselines';
+
   static const _encryptedBoxes = {
     settings,
     profiles,
@@ -92,6 +97,9 @@ class HiveBoxes {
     await Hive.openBox(cache, encryptionCipher: cipher);
     await Hive.openBox(priceHistory, encryptionCipher: cipher);
     await Hive.openBox(alerts, encryptionCipher: cipher);
+    // #769 — OBD2 baselines are unencrypted JSON strings; low
+    // sensitivity and opened once at startup like the other boxes.
+    await Hive.openBox<String>(obd2Baselines);
   }
 
   /// Initialize Hive in a background isolate with proper encryption.
