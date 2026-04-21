@@ -11,9 +11,11 @@ import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/baseline_store.dart';
 import '../data/obd2/obd2_service.dart';
 import '../data/obd2/trip_recording_controller.dart';
+import '../data/trip_history_repository.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/situation_classifier.dart';
 import '../domain/trip_recorder.dart';
+import 'trip_history_provider.dart';
 
 part 'trip_recording_provider.g.dart';
 
@@ -321,6 +323,11 @@ class TripRecording extends _$TripRecording {
     await _liveSub?.cancel();
     _liveSub = null;
     _controller = null;
+    // #726 — persist to the trip history rolling log. Every trip
+    // (including discarded ones) is logged; the fill-up flow is a
+    // *separate* decision. Best-effort: a Hive write failure here
+    // shouldn't block service teardown.
+    await _saveToHistory(summary);
     // #769 — flush learned baselines before releasing the service so
     // the next trip starts from the updated values. Best-effort: a
     // Hive write failure here shouldn't block teardown.
@@ -353,6 +360,27 @@ class TripRecording extends _$TripRecording {
   /// [StoppedTripResult] (saves as fill-up or discards).
   void reset() {
     state = const TripRecordingState();
+  }
+
+  Future<void> _saveToHistory(TripSummary summary) async {
+    // Skip empty trips — the user tapped Stop without any usable
+    // sample, or the service disconnected immediately. No signal, no
+    // history clutter.
+    if (summary.distanceKm < 0.01 && summary.startedAt == null) return;
+    try {
+      final repo = ref.read(tripHistoryRepositoryProvider);
+      if (repo == null) return;
+      final id = summary.startedAt?.toIso8601String() ??
+          DateTime.now().toIso8601String();
+      await repo.save(TripHistoryEntry(
+        id: id,
+        vehicleId: _vehicleId,
+        summary: summary,
+      ));
+      ref.read(tripHistoryListProvider.notifier).refresh();
+    } catch (e) {
+      debugPrint('TripRecording._saveToHistory: $e');
+    }
   }
 }
 

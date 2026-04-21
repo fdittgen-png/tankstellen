@@ -1944,6 +1944,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripBannerPaused => 'Fahrt pausiert — zum Fortsetzen tippen';
 
   @override
+  String get tripHistoryTitle => 'Fahrtenverlauf';
+
+  @override
+  String get tripHistoryEmptyTitle => 'Noch keine Fahrten';
+
+  @override
+  String get tripHistoryEmptySubtitle =>
+      'OBD2-Adapter anschließen und eine Fahrt aufzeichnen, um deinen Fahrtenverlauf aufzubauen.';
+
+  @override
+  String get tripHistoryUnknownDate => 'Unbekanntes Datum';
+
+  @override
   String get situationIdle => 'Leerlauf';
 
   @override

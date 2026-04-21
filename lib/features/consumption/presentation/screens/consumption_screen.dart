@@ -56,6 +56,12 @@ class ConsumptionScreen extends ConsumerWidget {
             icon: const Icon(Icons.eco_outlined),
             onPressed: () => context.push('/carbon'),
           ),
+          IconButton(
+            key: const Key('open_trip_history'),
+            tooltip: l?.tripHistoryTitle ?? 'Trip history',
+            icon: const Icon(Icons.route_outlined),
+            onPressed: () => context.push('/trip-history'),
+          ),
           // Shortcut to edit the active vehicle — the primary
           // "subject" the consumption log belongs to (#702). Hidden
           // when no vehicle is configured; the fill-up FAB's empty
