@@ -2810,6 +2810,12 @@ abstract class AppLocalizations {
   /// **'Delete all data'**
   String get privacyDeleteButton;
 
+  /// Button that copies recorded error traces to the clipboard. count = number of traces buffered.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy error log to clipboard ({count})'**
+  String privacyCopyErrorLog(int count);
+
   /// No description provided for @privacyDeleteTitle.
   ///
   /// In en, this message translates to:

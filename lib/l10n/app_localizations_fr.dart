@@ -1389,7 +1389,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get alertStatsThisWeek => 'Cette semaine';
 
   @override
-  String get privacyDashboardTitle => 'Privacy Dashboard';
+  String get privacyDashboardTitle => 'Tableau de bord Confidentialité';
 
   @override
   String get privacyDashboardSubtitle => 'View, export, or delete your data';
@@ -1408,32 +1408,32 @@ class AppLocalizationsFr extends AppLocalizations {
   String get privacyRatings => 'Station ratings';
 
   @override
-  String get privacyPriceHistory => 'Price history stations';
+  String get privacyPriceHistory => 'Stations avec historique des prix';
 
   @override
-  String get privacyProfiles => 'Search profiles';
+  String get privacyProfiles => 'Profils de recherche';
 
   @override
-  String get privacyItineraries => 'Saved routes';
+  String get privacyItineraries => 'Itinéraires enregistrés';
 
   @override
-  String get privacyCacheEntries => 'Cache entries';
+  String get privacyCacheEntries => 'Entrées en cache';
 
   @override
-  String get privacyApiKey => 'API key stored';
+  String get privacyApiKey => 'Clé API enregistrée';
 
   @override
-  String get privacyEvApiKey => 'EV API key stored';
+  String get privacyEvApiKey => 'Clé API VE enregistrée';
 
   @override
-  String get privacyEstimatedSize => 'Estimated storage';
+  String get privacyEstimatedSize => 'Stockage estimé';
 
   @override
-  String get privacySyncedData => 'Cloud sync (TankSync)';
+  String get privacySyncedData => 'Synchronisation cloud (TankSync)';
 
   @override
   String get privacySyncDisabled =>
-      'Cloud sync is disabled. All data stays on this device only.';
+      'La synchronisation cloud est désactivée. Toutes les données restent uniquement sur cet appareil.';
 
   @override
   String get privacySyncMode => 'Sync mode';
@@ -1449,19 +1449,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get privacyViewServerData => 'View server data';
 
   @override
-  String get privacyExportButton => 'Export all data as JSON';
+  String get privacyExportButton => 'Exporter toutes les données en JSON';
 
   @override
   String get privacyExportSuccess => 'Data exported to clipboard';
 
   @override
-  String get privacyExportCsvButton => 'Export all data as CSV';
+  String get privacyExportCsvButton => 'Exporter toutes les données en CSV';
 
   @override
   String get privacyExportCsvSuccess => 'CSV data exported to clipboard';
 
   @override
-  String get privacyDeleteButton => 'Delete all data';
+  String get privacyDeleteButton => 'Tout supprimer';
+
+  @override
+  String privacyCopyErrorLog(int count) {
+    return 'Copier le journal d\'erreurs ($count)';
+  }
 
   @override
   String get privacyDeleteTitle => 'Delete all data?';
@@ -1474,10 +1479,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get privacyDeleteConfirm => 'Delete everything';
 
   @override
-  String get yes => 'Yes';
+  String get yes => 'Oui';
 
   @override
-  String get no => 'No';
+  String get no => 'Non';
 
   @override
   String get amenities => 'Équipements';
@@ -1618,7 +1623,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get consumptionStatsTitle => 'Consumption stats';
 
   @override
-  String get addFillUp => 'Add fill-up';
+  String get addFillUp => 'Ajouter un plein';
 
   @override
   String get noFillUpsTitle => 'No fill-ups yet';
@@ -1631,13 +1636,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fillUpDate => 'Date';
 
   @override
-  String get liters => 'Liters';
+  String get liters => 'Litres';
 
   @override
-  String get odometerKm => 'Odometer (km)';
+  String get odometerKm => 'Compteur (km)';
 
   @override
-  String get notesOptional => 'Notes (optional)';
+  String get notesOptional => 'Notes (facultatif)';
 
   @override
   String get stationPreFilled => 'Station pre-filled';

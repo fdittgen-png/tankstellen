@@ -1469,6 +1469,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get privacyDeleteButton => 'Alle Daten löschen';
 
   @override
+  String privacyCopyErrorLog(int count) {
+    return 'Fehlerprotokoll in Zwischenablage kopieren ($count)';
+  }
+
+  @override
   String get privacyDeleteTitle => 'Alle Daten löschen?';
 
   @override

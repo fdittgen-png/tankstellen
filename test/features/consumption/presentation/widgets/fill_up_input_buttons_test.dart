@@ -100,5 +100,37 @@ void main() {
       await tester.pump();
       expect(pressed, isTrue);
     });
+
+    testWidgets(
+      'scan button labels allow 2-line word-wrap so long locale strings '
+      '(e.g. French "Scanner le reçu") break at spaces, not mid-word (#799)',
+      (tester) async {
+        await pumpButtons(tester, scanning: false, obdReading: false);
+
+        // The three label-Text widgets: "Scan receipt" + "OBD-II"
+        // (the optional "Scan pump" button is off in pumpButtons' helper).
+        final labels = tester
+            .widgetList<Text>(find.descendant(
+              of: find.byType(OutlinedButton),
+              matching: find.byType(Text),
+            ))
+            .toList();
+
+        // Two buttons × 1 label each = 2 Text widgets. The maxLines:2 +
+        // textAlign:center + overflow:visible combo is what lets French
+        // labels (longer than their English equivalents) render on two
+        // clean word-broken lines instead of the mid-syllable break
+        // reported in the bug — "Scanner / le reçu" vs "Scann / er le / reçu".
+        expect(labels, hasLength(greaterThanOrEqualTo(2)));
+        for (final label in labels) {
+          expect(label.maxLines, 2,
+              reason: 'label "${label.data}" should allow 2-line wrap');
+          expect(label.textAlign, TextAlign.center,
+              reason: 'label "${label.data}" should center-align across wrap');
+          expect(label.overflow, TextOverflow.visible,
+              reason: 'label "${label.data}" should not ellipsise on wrap');
+        }
+      },
+    );
   });
 }

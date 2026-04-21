@@ -816,5 +816,30 @@
   "profileDefaultVehicleNone": "Aucun par défaut",
   "profileFuelFromVehicleHint": "Le carburant est dérivé de votre véhicule par défaut. Supprimez le véhicule pour choisir un carburant directement.",
   "consumptionNoVehicleTitle": "Ajoutez d'abord un véhicule",
-  "consumptionNoVehicleBody": "Les pleins sont attribués à un véhicule. Ajoutez votre voiture pour commencer à suivre la consommation."
+  "consumptionNoVehicleBody": "Les pleins sont attribués à un véhicule. Ajoutez votre voiture pour commencer à suivre la consommation.",
+  "addFillUp": "Ajouter un plein",
+  "fillUpDate": "Date",
+  "liters": "Litres",
+  "odometerKm": "Compteur (km)",
+  "notesOptional": "Notes (facultatif)",
+  "privacyDashboardTitle": "Tableau de bord Confidentialité",
+  "privacyPriceHistory": "Stations avec historique des prix",
+  "privacyProfiles": "Profils de recherche",
+  "privacyItineraries": "Itinéraires enregistrés",
+  "privacyCacheEntries": "Entrées en cache",
+  "privacyApiKey": "Clé API enregistrée",
+  "privacyEvApiKey": "Clé API VE enregistrée",
+  "privacyEstimatedSize": "Stockage estimé",
+  "privacySyncedData": "Synchronisation cloud (TankSync)",
+  "privacySyncDisabled": "La synchronisation cloud est désactivée. Toutes les données restent uniquement sur cet appareil.",
+  "privacyExportButton": "Exporter toutes les données en JSON",
+  "privacyExportCsvButton": "Exporter toutes les données en CSV",
+  "privacyDeleteButton": "Tout supprimer",
+  "privacyCopyErrorLog": "Copier le journal d'erreurs ({count})",
+  "@privacyCopyErrorLog": {
+    "description": "Button that copies recorded error traces to the clipboard. count = number of traces buffered.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "yes": "Oui",
+  "no": "Non"
 }

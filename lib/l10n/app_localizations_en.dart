@@ -1450,6 +1450,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacyDeleteButton => 'Delete all data';
 
   @override
+  String privacyCopyErrorLog(int count) {
+    return 'Copy error log to clipboard ($count)';
+  }
+
+  @override
   String get privacyDeleteTitle => 'Delete all data?';
 
   @override
