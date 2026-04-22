@@ -22,6 +22,7 @@ import '../widgets/fill_up_date_row.dart';
 import '../widgets/fill_up_input_buttons.dart';
 import '../widgets/fill_up_notes_field.dart';
 import '../widgets/fill_up_numeric_field.dart';
+import '../widgets/fill_up_vehicle_dropdown.dart';
 
 /// Form to add a new [FillUp] entry.
 class AddFillUpScreen extends ConsumerStatefulWidget {
@@ -381,27 +382,12 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
             // when at least one vehicle exists (empty-state above). Fuel is
             // ALWAYS derived from the selected vehicle, never picked
             // directly here.
-            DropdownButtonFormField<String>(
-              initialValue: _vehicleId,
-              decoration: InputDecoration(
-                labelText: l?.fillUpVehicleLabel ?? 'Vehicle',
-                prefixIcon: const Icon(Icons.directions_car_outlined),
-              ),
-              items: vehicles
-                  .map(
-                    (v) => DropdownMenuItem<String>(
-                      value: v.id,
-                      child: Text(v.name),
-                    ),
-                  )
-                  .toList(),
-              validator: (v) =>
-                  v == null ? (l?.fillUpVehicleRequired ?? 'Required') : null,
-              onChanged: (v) {
-                if (v == null) return;
+            FillUpVehicleDropdown(
+              vehicleId: _vehicleId,
+              vehicles: vehicles,
+              onChanged: (id, selected) {
                 setState(() {
-                  _vehicleId = v;
-                  final selected = vehicles.firstWhere((x) => x.id == v);
+                  _vehicleId = id;
                   final derived = _fuelForVehicle(selected);
                   if (derived != null) _fuelType = derived;
                 });
