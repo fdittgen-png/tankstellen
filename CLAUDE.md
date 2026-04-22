@@ -88,13 +88,15 @@ export ANDROID_HOME="$LOCALAPPDATA/Android/Sdk"
 
 ## Documents
 
-Development docs are in `docs/` (git-ignored, local reference only):
+Development docs are in `docs/` (most git-ignored for local reference only; tracked ones are called out below):
 
-- `docs/api/SPEC.md` — Auditable implementation spec (security, reliability, testing, CI/CD)
-- `docs/guides/CONCEPT.md` — Vision, features, architecture, i18n/globalization
-- `docs/guides/IMPLEMENTATION.md` — Technical details, API contracts, sprint plan
-- `docs/analysis/RISK_ANALYSIS.md` — 24 risks with mitigations
-- `docs/guides/DEPLOYMENT.md` — Per-platform build/ship instructions
+- `docs/api/SPEC.md` — Auditable implementation spec (security, reliability, testing, CI/CD) *(local)*
+- `docs/guides/CONCEPT.md` — Vision, features, architecture, i18n/globalization *(local)*
+- `docs/guides/IMPLEMENTATION.md` — Technical details, API contracts, sprint plan *(local)*
+- `docs/analysis/RISK_ANALYSIS.md` — 24 risks with mitigations *(local)*
+- `docs/guides/DEPLOYMENT.md` — Per-platform build/ship instructions *(local)*
+- **`docs/guides/NEW_COUNTRY.md`** — Step-by-step for adding a new country fuel API *(tracked)*
+- **`docs/guides/DEV-GIT-WORKTREES.md`** — Persistent `tankstellen-master` worktree setup + `Agent(isolation: "worktree")` pattern *(tracked)*
 
 ## Git Workflow (GitHub Flow)
 
