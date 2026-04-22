@@ -1233,5 +1233,7 @@
       "label": { "type": "String", "example": "Oil change" },
       "kmOver": { "type": "int", "example": "250" }
     }
-  }
+  },
+  "southKoreaApiKeyRequired": "Register at OPINET to get a free API key",
+  "southKoreaApiProvider": "OPINET (KNOC)"
 }

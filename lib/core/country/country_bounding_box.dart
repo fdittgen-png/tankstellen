@@ -76,6 +76,10 @@ const countryBoundingBoxes = <String, CountryBoundingBox>{
   // box — Slovenia is small and surrounded by IT / AT / HR so an
   // over-generous margin would shadow those neighbours. See #575.
   'SI': CountryBoundingBox(minLat: 45.3, maxLat: 47.0, minLng: 13.3, maxLng: 16.7),
+
+  // South Korea (mainland + Jeju): lat 33.10–38.61, lng 124.61–131.87
+  // (with margin). No overlap with any other registered country. See #597.
+  'KR': CountryBoundingBox(minLat: 33.0, maxLat: 39.0, minLng: 124.0, maxLng: 131.0),
 };
 
 /// Deterministic order used by [countryCodeFromLatLng] to walk
@@ -117,6 +121,7 @@ const List<String> _bboxLookupOrder = [
   'MX',
   'AR',
   'AU',
+  'KR',
 ];
 
 /// Returns the ISO country code whose bounding box contains the
