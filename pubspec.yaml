@@ -93,6 +93,7 @@ flutter:
 
   assets:
     - assets/
+    - assets/receipt_overrides/index.json
 
 flutter_launcher_icons:
   android: true
