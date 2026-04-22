@@ -15,6 +15,7 @@ enum ServiceSource {
   ukApi('CMA Fuel Finder'),
   australiaApi('FuelCheck NSW'),
   mexicoApi('CRE México'),
+  sloveniaApi('goriva.si'),
   osrmRouting('OSRM Routing'),
   openChargeMapApi('OpenChargeMap'),
   nominatimGeocoding('Nominatim (OSM)'),

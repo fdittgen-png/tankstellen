@@ -46,9 +46,9 @@ void main() {
   });
 
   group('countryBoundingBoxes', () {
-    test('has entries for all 11 supported countries', () {
+    test('has entries for all 12 supported countries', () {
       const expectedCountries = [
-        'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX',
+        'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'SI',
       ];
       for (final code in expectedCountries) {
         expect(countryBoundingBoxes.containsKey(code), isTrue,

@@ -316,6 +316,13 @@ List<FuelType> fuelTypesForCountry(String countryCode) {
       return [
         FuelType.e5, FuelType.diesel, FuelType.lpg, FuelType.cng, FuelType.electric, FuelType.all,
       ];
+    case 'SI':
+      // Slovenia sells NMB-95 (→ e5), NMB-100 (premium, → e98), Dizel
+      // (→ diesel), Dizel Premium, and LPG. #575
+      return [
+        FuelType.e5, FuelType.e98, FuelType.diesel,
+        FuelType.dieselPremium, FuelType.lpg, FuelType.electric, FuelType.all,
+      ];
     default:
       return [FuelType.e5, FuelType.e10, FuelType.diesel, FuelType.electric, FuelType.all];
   }
