@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import 'elm327_protocol.dart';
 import 'obd2_transport.dart';
+import 'supported_pids_cache.dart';
 
 /// High-level OBD-II service for reading vehicle data.
 ///
@@ -10,21 +11,45 @@ import 'obd2_transport.dart';
 class Obd2Service {
   final Obd2Transport _transport;
 
+  /// Optional persistent supported-PID cache (#811). When present and
+  /// a VIN (or [vehicleFallbackKey]) resolves to a cached entry,
+  /// [connect] skips the 8 × `01 XX` bitmap scan entirely.
+  final SupportedPidsCache? _pidsCache;
+
+  /// Fallback cache key for when the car doesn't return a VIN (old
+  /// ECUs / incompatible adapters). Typically `'${make}:${model}:${year}'`
+  /// — see [SupportedPidsCache.fallbackKey].
+  final String? _vehicleFallbackKey;
+
   /// Per-connection cache of the Mode 01 PIDs the car supports,
-  /// populated by [discoverSupportedPids]. Reset on every new
-  /// [connect] — each session must re-discover because the user may
-  /// have switched cars since last time. `null` means "we haven't
-  /// asked the car yet, so don't trust this cache to reject PIDs"
-  /// (see [isPidSupported] for the exact semantics).
+  /// populated by [discoverSupportedPids] or reloaded from [_pidsCache]
+  /// during [connect]. `null` means "we haven't asked the car yet,
+  /// so don't trust this cache to reject PIDs" (see [isPidSupported]
+  /// for the exact semantics).
   Set<int>? _supportedPids;
 
-  Obd2Service(this._transport);
+  Obd2Service(
+    this._transport, {
+    SupportedPidsCache? pidsCache,
+    String? vehicleFallbackKey,
+  })  : _pidsCache = pidsCache,
+        _vehicleFallbackKey = vehicleFallbackKey;
 
   /// `true` when the underlying [Obd2Transport] currently has an open
   /// connection to the vehicle's ELM327 adapter.
   bool get isConnected => _transport.isConnected;
 
   /// Connect and initialize the ELM327 adapter.
+  ///
+  /// After the init sequence, if a [SupportedPidsCache] was wired in
+  /// via the constructor (#811) this also:
+  ///   1. Reads the VIN from the car (Mode 09 PID 02). Falls back to
+  ///      the optional `vehicleFallbackKey` when no VIN comes back.
+  ///   2. Looks up the supported-PID set by that key. On cache hit,
+  ///      populates the in-memory set and skips the scan entirely —
+  ///      saves 8 × `01 XX` Bluetooth round-trips every session.
+  ///   3. On cache miss, runs [discoverSupportedPids] and persists
+  ///      the result under the chosen key for next time.
   Future<bool> connect() async {
     try {
       await _transport.connect();
@@ -40,11 +65,62 @@ class Obd2Service {
         await Future.delayed(const Duration(milliseconds: 100));
       }
 
+      await _primeSupportedPidsCache();
+
       return true;
     } catch (e) {
       debugPrint('OBD2 connect failed: $e');
       return false;
     }
+  }
+
+  /// Attempt to load the supported-PID set from the persistent cache
+  /// (#811). Silent no-op when no cache was injected. Always swallows
+  /// errors: a broken cache must not break the connect flow — worst
+  /// case we fall back to blind querying, which is exactly what the
+  /// adapter did before this feature landed.
+  Future<void> _primeSupportedPidsCache() async {
+    final cache = _pidsCache;
+    if (cache == null) return;
+    try {
+      final key = await _resolveVehicleCacheKey();
+      if (key == null) {
+        debugPrint(
+            'OBD2 supported-PID cache: no VIN and no fallback key — '
+            'scanning blindly this session');
+        return;
+      }
+      final cached = cache.get(key);
+      if (cached != null) {
+        _supportedPids = cached;
+        debugPrint(
+            'OBD2 supported-PID cache HIT for "$key" '
+            '(${cached.length} PIDs) — skipping scan');
+        return;
+      }
+      debugPrint('OBD2 supported-PID cache MISS for "$key" — scanning');
+      final discovered = await discoverSupportedPids();
+      if (discovered.isNotEmpty) {
+        await cache.put(key, discovered);
+      }
+    } catch (e) {
+      debugPrint('OBD2 supported-PID cache prime failed: $e');
+    }
+  }
+
+  /// Resolve the cache key for the currently-connected vehicle.
+  /// Prefers the VIN; falls back to the static [_vehicleFallbackKey]
+  /// provided at construction time. Returns null when neither is
+  /// available, at which point the cache is skipped this session.
+  Future<String?> _resolveVehicleCacheKey() async {
+    try {
+      final response = await _transport.sendCommand(Elm327Protocol.vinCommand);
+      final vin = Elm327Protocol.parseVin(response);
+      if (vin != null && vin.isNotEmpty) return vin;
+    } catch (e) {
+      debugPrint('OBD2 VIN read for cache key failed: $e');
+    }
+    return _vehicleFallbackKey;
   }
 
   /// Whether [pid] is known to be supported by the connected vehicle
@@ -60,6 +136,19 @@ class Obd2Service {
   ///     `false` — callers skip the query.
   bool isPidSupported(int pid) =>
       _supportedPids == null || _supportedPids!.contains(pid);
+
+  /// Alias for [isPidSupported] — matches the name used in the #811
+  /// issue. Same semantics: `true` when the cache is unpopulated or
+  /// [pid] is present, `false` only when we know the car doesn't
+  /// implement it.
+  bool supportsPid(int pid) => isPidSupported(pid);
+
+  /// Direct view of the supported-PID set for tests and diagnostics.
+  /// Returns an unmodifiable empty set when discovery hasn't run —
+  /// callers that want "is this supported?" should use [supportsPid]
+  /// instead to respect the "unknown ⇒ allow" semantics.
+  @visibleForTesting
+  Set<int> get debugSupportedPids => Set.unmodifiable(_supportedPids ?? {});
 
   /// Read the odometer value in km.
   ///
