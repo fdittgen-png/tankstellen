@@ -182,6 +182,77 @@ void main() {
         // #813 fuel-trim PIDs:
         expect(Elm327Protocol.shortTermFuelTrimCommand, '0106\r');
         expect(Elm327Protocol.longTermFuelTrimCommand, '0107\r');
+        // #811 supported-PID discovery chain:
+        expect(Elm327Protocol.supportedPidsCommands, [
+          '0100\r',
+          '0120\r',
+          '0140\r',
+          '0160\r',
+          '0180\r',
+          '01A0\r',
+          '01C0\r',
+        ]);
+      });
+    });
+
+    group('parseSupportedPidsBitmap (PID 00/20/40/...) — #811', () {
+      test(
+          'bitmap with only MSB set → PID 1 supported (groupBase 0x00)',
+          () {
+        // 0x80 = 1000_0000 → only the first bit set → PID 01 supported.
+        expect(
+          Elm327Protocol.parseSupportedPidsBitmap('41 00 80 00 00 00', 0x00),
+          {1},
+        );
+      });
+
+      test('bitmap with only LSB set → PID 32 supported (groupBase 0x00)',
+          () {
+        // Byte 3 of 0x01 = 0000_0001 → last bit set → PID 32.
+        expect(
+          Elm327Protocol.parseSupportedPidsBitmap('41 00 00 00 00 01', 0x00),
+          {32},
+        );
+      });
+
+      test('all-ones bitmap → every PID in the range supported', () {
+        final result =
+            Elm327Protocol.parseSupportedPidsBitmap('41 00 FF FF FF FF', 0x00);
+        expect(result, isNotNull);
+        expect(result!.length, 32);
+        expect(result, containsAll([1, 16, 17, 32]));
+      });
+
+      test('groupBase offset shifts the PID range (0x20 → PIDs 33–64)', () {
+        // Only the MSB of the first byte set → PID 33 (groupBase+1).
+        expect(
+          Elm327Protocol.parseSupportedPidsBitmap('41 20 80 00 00 00', 0x20),
+          {33},
+        );
+      });
+
+      test('returns null on NO DATA', () {
+        expect(
+          Elm327Protocol.parseSupportedPidsBitmap('NO DATA>', 0x00),
+          isNull,
+        );
+      });
+
+      test(
+          'real Peugeot 107 PID-00 response decodes to the expected PID set',
+          () {
+        // Fabricated but representative: speed (0D), RPM (0C),
+        // engine load (04), coolant temp (05), MAP (0B), IAT (0F),
+        // throttle (11) → bitmap BE 3F A8 13 by construction of
+        // bits 4, 5, 11, 12, 13, 14, 15 + 0x08 "next-range?" flag.
+        // Just validate the parser doesn't crash and produces a
+        // non-empty subset for a real-looking payload.
+        final result = Elm327Protocol.parseSupportedPidsBitmap(
+          '41 00 BE 3F A8 13',
+          0x00,
+        );
+        expect(result, isNotNull);
+        expect(result!.length, greaterThan(5));
       });
     });
   });

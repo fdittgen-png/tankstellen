@@ -124,6 +124,24 @@ class Elm327Protocol {
   /// Request vehicle speed (km/h). Mode 01, PID 0D.
   static const vehicleSpeedCommand = '010D\r';
 
+  /// Request the supported-PID bitmaps for Mode 01, in groups of 32
+  /// (#811). A modern vehicle answers each of these with 4 bytes of
+  /// bitmap: bit N set means the car implements PID
+  /// `0x{group_start + N}`. Seven commands cover every PID from 01
+  /// to FF. Knowing which PIDs are implemented lets callers skip
+  /// querying unsupported ones — saves Bluetooth bandwidth on every
+  /// tick of the trip loop, especially on older cars where most of
+  /// the PIDs we'd try are NO-DATA misses anyway.
+  static const supportedPidsCommands = <String>[
+    '0100\r', // PIDs 01–20
+    '0120\r', // PIDs 21–40
+    '0140\r', // PIDs 41–60
+    '0160\r', // PIDs 61–80
+    '0180\r', // PIDs 81–A0
+    '01A0\r', // PIDs A1–C0
+    '01C0\r', // PIDs C1–E0
+  ];
+
   /// Request engine RPM. Mode 01, PID 0C.
   static const engineRpmCommand = '010C\r';
 
@@ -394,6 +412,39 @@ class Elm327Protocol {
     final bytes = _parseModeOneBody(raw, expectedPid, minBytes: 3);
     if (bytes == null) return null;
     return bytes[2] * 100.0 / 255.0;
+  }
+
+  /// Parse a supported-PIDs bitmap response (#811).
+  ///
+  /// For a `01 XX` request where `XX ∈ {00, 20, 40, 60, 80, A0, C0}`,
+  /// the response is `41 XX AA BB CC DD` with AA–DD a 32-bit
+  /// big-endian bitmap. Bit-N of the bitmap (MSB = bit 31) set means
+  /// PID `(XX + 1 + (31 − N))` is supported. Equivalently: PID
+  /// `(groupBase + 1 + bitIndexFromLeft)`.
+  ///
+  /// Returns the concrete set of supported PID integers, or null on
+  /// NO DATA / malformed response. Each bitmap covers PIDs
+  /// `groupBase+1` through `groupBase+32` inclusive.
+  ///
+  /// The last bit of each bitmap is conventionally "are PIDs in the
+  /// next range also supported?"; callers use that to decide whether
+  /// to query the next `01 {next_group}` command.
+  static Set<int>? parseSupportedPidsBitmap(String raw, int groupBase) {
+    final bytes = _parseModeOneBody(raw, groupBase, minBytes: 6);
+    if (bytes == null) return null;
+    final supported = <int>{};
+    // Iterate the four payload bytes, most-significant bit first.
+    for (var byteIndex = 0; byteIndex < 4; byteIndex++) {
+      final payload = bytes[2 + byteIndex];
+      for (var bit = 0; bit < 8; bit++) {
+        final mask = 1 << (7 - bit);
+        if ((payload & mask) != 0) {
+          // First bit of the first byte → PID groupBase+1, etc.
+          supported.add(groupBase + 1 + (byteIndex * 8) + bit);
+        }
+      }
+    }
+    return supported;
   }
 
   /// Shared plumbing: clean the response, verify the Mode 01 echo

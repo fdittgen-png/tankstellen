@@ -115,6 +115,50 @@ class Obd2Service {
     }
   }
 
+  /// Ask the adapter which Mode 01 PIDs the vehicle supports (#811).
+  ///
+  /// Walks the standard supported-PIDs chain: `01 00` returns a
+  /// bitmap for PIDs 01–20, and bit-32 of that bitmap is set iff PIDs
+  /// 21–40 are also addressable — querying `01 20` in turn returns
+  /// that range, and so on up to `01 C0`. We stop as soon as a
+  /// bitmap's "next-range supported" flag is clear or the query
+  /// returns NO DATA.
+  ///
+  /// Returns the union of every PID the car implements. Callers can
+  /// consult it before issuing individual PID requests — on an older
+  /// car where most PIDs miss, this saves a full second of Bluetooth
+  /// round-trips per polling tick.
+  ///
+  /// Returns an empty set when the adapter isn't connected or the
+  /// first bitmap can't be read — the caller should fall back to
+  /// blind querying.
+  Future<Set<int>> discoverSupportedPids() async {
+    if (!_transport.isConnected) return const <int>{};
+    final supported = <int>{};
+    for (final command in Elm327Protocol.supportedPidsCommands) {
+      // Derive the 32-PID group base from the command (e.g. "0140\r"
+      // → 0x40). The commands list is in lockstep with the group
+      // bases, so we just hex-parse the middle two chars.
+      final groupBase = int.parse(command.substring(2, 4), radix: 16);
+      try {
+        final response = await _transport.sendCommand(command);
+        final bitmap =
+            Elm327Protocol.parseSupportedPidsBitmap(response, groupBase);
+        if (bitmap == null) break;
+        supported.addAll(bitmap);
+        // "Bit 32" of the bitmap — i.e. PID (groupBase + 32) — is
+        // conventionally the "are PIDs in the next range supported?"
+        // flag. If it's not in the set we just parsed, stop walking.
+        final nextRangeFlag = groupBase + 32;
+        if (!bitmap.contains(nextRangeFlag)) break;
+      } catch (e) {
+        debugPrint('OBD2 discoverSupportedPids failed on $command: $e');
+        break;
+      }
+    }
+    return supported;
+  }
+
   /// Read current engine RPM.
   Future<double?> readRpm() async {
     if (!_transport.isConnected) return null;
