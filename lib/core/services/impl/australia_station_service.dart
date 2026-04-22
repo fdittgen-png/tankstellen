@@ -23,8 +23,9 @@ import '../mixins/station_service_helpers.dart';
 /// introduced in #500 lets the user file a follow-up with the real
 /// context instead of a 404 blob.
 ///
-/// Tracking: #504 — restore real Australian fuel search, likely via a
-/// dedicated NSW API key onboarding flow.
+/// Tracking: #804 — restore real Australian fuel search, likely via a
+/// dedicated NSW API key onboarding flow. (Issue #504 was the older
+/// \"placeholder `apikey: 'empty'` header\" bug and is closed.)
 class AustraliaStationService
     with StationServiceHelpers
     implements StationService {
@@ -36,7 +37,7 @@ class AustraliaStationService
       'NSW FuelCheck is currently unavailable. The public '
       'FuelCheckApp/v2 endpoint has been retired and the replacement '
       'api.nsw.gov.au FuelCheck product requires OAuth2 client '
-      'credentials. Tracked in #504.';
+      'credentials. Tracked in #804.';
 
   @override
   Future<ServiceResult<List<Station>>> searchStations(
