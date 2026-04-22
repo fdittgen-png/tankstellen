@@ -33,6 +33,13 @@ class HiveBoxes {
   /// badge keyed by enum name; not PII.
   static const String achievements = 'achievements';
 
+  /// Supported-PID bitmap cache (#811). Keyed by VIN (preferred) or
+  /// `make:model:year` (fallback when the car doesn't return a VIN).
+  /// Values are sorted `List<int>` of PID indices the car implements
+  /// for Mode 01. Small, not PII, opened unencrypted like the other
+  /// OBD2 boxes.
+  static const String obd2SupportedPids = 'obd2_supported_pids';
+
   static const _encryptedBoxes = {
     settings,
     profiles,
@@ -113,6 +120,11 @@ class HiveBoxes {
     await Hive.openBox<String>(obd2TripHistory);
     // #781 — gamification badges: one entry per earned badge.
     await Hive.openBox<String>(achievements);
+    // #811 — supported-PID bitmap cache (per VIN, or make:model:year
+    // fallback). Values are JSON-encoded `List<int>` of PID indices,
+    // mirroring the storage idiom used by the other OBD2 boxes so
+    // we don't need a custom adapter.
+    await Hive.openBox<String>(obd2SupportedPids);
   }
 
   /// Initialize Hive in a background isolate with proper encryption.
