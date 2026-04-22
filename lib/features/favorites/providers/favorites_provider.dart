@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/data/storage_repository.dart';
+import '../../../core/services/service_providers.dart';
+import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../../../core/sync/favorites_sync.dart';
@@ -54,6 +56,12 @@ class Favorites extends _$Favorites {
 
   /// Fire-and-forget: tells [HomeWidgetService] to rebuild both the
   /// favorites and nearest widgets from the current Hive state.
+  ///
+  /// The nearest widget now queries the real station search (#609) —
+  /// reading the active country's [StationService] from Riverpod so it
+  /// works for users with zero favorites. When the station service
+  /// isn't configured yet (unit tests, pre-API-key cold start) the
+  /// nearest update degrades to the legacy favorites-distance path.
   void _refreshWidget(StorageRepository storage) {
     unawaited(() async {
       try {
@@ -62,10 +70,23 @@ class Favorites extends _$Favorites {
           profileStorage: storage,
           settingsStorage: storage,
         );
+        // Resolve the station service lazily + defensively — some test
+        // harnesses don't wire stationServiceProvider, and the nearest
+        // widget should still render (degraded) in that case.
+        StationService? stationService;
+        try {
+          stationService = ref.read(stationServiceProvider);
+        } catch (e) {
+          debugPrint(
+            'Favorites._refreshWidget: stationService unavailable, '
+            'falling back to legacy nearest update: $e',
+          );
+        }
         await HomeWidgetService.updateNearestWidget(
           storage,
           storage,
           profileStorage: storage,
+          stationService: stationService,
         );
       } catch (e) {
         debugPrint('Favorites._refreshWidget: $e');

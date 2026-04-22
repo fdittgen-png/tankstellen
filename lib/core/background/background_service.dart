@@ -9,6 +9,7 @@ import '../../features/widget/data/home_widget_service.dart';
 import '../constants/field_names.dart';
 import '../notifications/local_notification_service.dart';
 import '../services/impl/tankerkoenig_batch_price_fetcher.dart';
+import '../services/impl/tankerkoenig_station_service.dart';
 import '../storage/hive_storage.dart';
 import '../storage/storage_keys.dart';
 import '../sync/ntfy_service.dart';
@@ -154,7 +155,12 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     final allStationIds = {...favoriteIds, ...alertStationIds}.toList();
     debugPrint('BackgroundService: ${favoriteIds.length} favorites, ${alertStationIds.length} alert stations, ${allStationIds.length} total');
 
-    if (allStationIds.isEmpty) return;
+    if (allStationIds.isEmpty) {
+      // #609 — users without favorites still need a populated nearest
+      // widget. Run the real-search builder before bailing.
+      await _refreshNearestWidgetFromSearch(storage);
+      return;
+    }
 
     // 2. Fetch prices for all stations via the shared Tankerkoenig batch
     //    fetcher. The fetcher handles chunking + parsing + retry — see
@@ -325,11 +331,11 @@ Future<void> _refreshPricesAndCheckAlerts() async {
       profileStorage: storage,
       settingsStorage: storage,
     );
-    await HomeWidgetService.updateNearestWidget(
-      storage,
-      storage,
-      profileStorage: storage,
-    );
+    // #609 — nearest widget now queries a real search against the active
+    // country's API (when supported in the BG isolate) instead of just
+    // sorting favorites by distance. Shared helper so the early-return
+    // path above also runs it.
+    await _refreshNearestWidgetFromSearch(storage);
   } catch (e) {
     debugPrint('BackgroundService: task failed: $e');
   } finally {
@@ -341,5 +347,47 @@ Future<void> _refreshPricesAndCheckAlerts() async {
       debugPrint('BackgroundService: failed to close Hive boxes: $e');
     }
     lock?.release();
+  }
+}
+
+/// Run the new nearest-widget builder from the background isolate.
+///
+/// Instantiates a minimal [TankerkoenigStationService] because that's the
+/// only API for which we can assemble a working Dio here without pulling
+/// in the full Riverpod graph. Countries without a DE-style key-based API
+/// fall back to the legacy favorites-distance widget path by passing
+/// `stationService: null` to [HomeWidgetService.updateNearestWidget].
+///
+/// The key gate mirrors the existing background price refresh — which
+/// is also Tankerkoenig-only in the BG isolate today. Expanding this to
+/// other countries is tracked separately.
+Future<void> _refreshNearestWidgetFromSearch(HiveStorage storage) async {
+  try {
+    final apiKey = storage.getApiKey();
+    final hasKey = apiKey != null && apiKey.isNotEmpty;
+    if (hasKey) {
+      final dio = Dio(BaseOptions(
+        baseUrl: 'https://creativecommons.tankerkoenig.de/json',
+        connectTimeout: BackgroundService.bgConnectTimeout,
+        receiveTimeout: BackgroundService.bgReceiveTimeout,
+        queryParameters: {'apikey': apiKey},
+      ));
+      final service = TankerkoenigStationService(dio);
+      await HomeWidgetService.updateNearestWidget(
+        storage,
+        storage,
+        profileStorage: storage,
+        stationService: service,
+      );
+    } else {
+      // No API key → degrade to legacy favorites-distance path.
+      await HomeWidgetService.updateNearestWidget(
+        storage,
+        storage,
+        profileStorage: storage,
+      );
+    }
+  } catch (e) {
+    debugPrint('BackgroundService: nearest widget refresh failed: $e');
   }
 }

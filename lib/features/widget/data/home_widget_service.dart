@@ -6,8 +6,10 @@ import 'package:home_widget/home_widget.dart';
 
 import '../../../core/country/country_config.dart';
 import '../../../core/data/storage_repository.dart';
+import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../../search/domain/entities/fuel_type.dart';
+import 'nearest_widget_data_builder.dart';
 
 /// Manages data for the Android home screen widgets.
 ///
@@ -77,9 +79,12 @@ class HomeWidgetService {
 
   /// Update the nearest stations home screen widget.
   ///
-  /// Reads the user's last known GPS position from settings storage,
-  /// computes distances to all favorite stations, and writes the closest
-  /// ones to SharedPreferences for the native widget to display.
+  /// When [stationService] is provided, the widget is populated from a
+  /// real nearby-station search against the active country's API (#609) —
+  /// so the widget works for users with no favorites. When [stationService]
+  /// is null (e.g. background isolate where a fully wired service chain
+  /// is not available), falls back to the legacy favorites-distance mode
+  /// so existing users still see something.
   ///
   /// When [profileStorage] is non-null, the rendered price uses the active
   /// profile's preferred fuel type (falls back to e10 when profile absent).
@@ -87,11 +92,34 @@ class HomeWidgetService {
     FavoriteStorage favoriteStorage,
     SettingsStorage settingsStorage, {
     ProfileStorage? profileStorage,
+    StationService? stationService,
   }) async {
     try {
+      if (stationService != null && profileStorage != null) {
+        final builder = NearestWidgetDataBuilder(
+          stationService: stationService,
+          settingsStorage: settingsStorage,
+          profileStorage: profileStorage,
+        );
+        final payload = await builder.build();
+        await HomeWidget.updateWidget(androidName: _widgetAndroidName);
+        debugPrint(
+          'HomeWidget: nearest (real search) updated — '
+          'count=${payload.stations.length} '
+          'stale=${payload.isStale} reason=${payload.emptyReason}',
+        );
+        return;
+      }
+
+      // Legacy fallback: derive the list from favorites sorted by distance.
+      // Kept for the background isolate and any caller that can't construct
+      // a StationService. Will be removed once the background isolate is
+      // rewired (#609 follow-up).
       final favoriteIds = favoriteStorage.getFavoriteIds();
-      final lat = settingsStorage.getSetting(StorageKeys.userPositionLat) as double?;
-      final lng = settingsStorage.getSetting(StorageKeys.userPositionLng) as double?;
+      final lat = settingsStorage.getSetting(StorageKeys.userPositionLat)
+          as double?;
+      final lng = settingsStorage.getSetting(StorageKeys.userPositionLng)
+          as double?;
 
       if (favoriteIds.isEmpty || lat == null || lng == null) {
         await HomeWidget.saveWidgetData('nearest_count', 0);
@@ -100,6 +128,7 @@ class HomeWidgetService {
           'nearest_empty_reason',
           lat == null || lng == null ? 'no_gps' : 'no_favorites',
         );
+        await HomeWidget.saveWidgetData('nearest_is_stale', false);
         await HomeWidget.updateWidget(
           androidName: _widgetAndroidName,
         );
@@ -122,6 +151,8 @@ class HomeWidgetService {
         'nearest_updated_at',
         DateTime.now().toIso8601String(),
       );
+      await HomeWidget.saveWidgetData('nearest_empty_reason', '');
+      await HomeWidget.saveWidgetData('nearest_is_stale', false);
       await HomeWidget.saveWidgetData('nearest_lat', lat);
       await HomeWidget.saveWidgetData('nearest_lng', lng);
 
