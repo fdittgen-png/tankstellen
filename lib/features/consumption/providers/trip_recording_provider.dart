@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../../../core/storage/storage_providers.dart';
-import '../../../core/sync/sync_service.dart';
+import '../../../core/sync/baselines_sync.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/baseline_store.dart';
@@ -395,7 +395,7 @@ class TripRecording extends _$TripRecording {
       final box = Hive.box<String>(HiveBoxes.obd2Baselines);
       final key = 'baseline:$vehicleId';
       final localJson = box.get(key);
-      final merged = await SyncService.syncVehicleBaseline(
+      final merged = await BaselinesSync.merge(
         vehicleId: vehicleId,
         localJson: localJson,
       );
