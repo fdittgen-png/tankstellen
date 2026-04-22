@@ -10,6 +10,7 @@ import '../../../core/storage/storage_keys.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/baselines_sync.dart';
 import '../../search/domain/entities/fuel_type.dart';
+import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/baseline_store.dart';
 import '../data/obd2/obd2_service.dart';
@@ -136,7 +137,17 @@ class TripRecording extends _$TripRecording {
   Future<void> start(Obd2Service service) async {
     if (state.isActive) return;
     _service = service;
-    final ctl = TripRecordingController(service: service);
+    // #812 phase 2 — read the active vehicle's engine params once
+    // here so the controller can pass them to `readFuelRateLPerHour`
+    // on every tick (speed-density fallback uses them per car). We
+    // read the vehicle a second time below for the baseline-store
+    // bookkeeping; both reads are cheap Riverpod cache hits.
+    final activeVehicle = _tryReadActiveVehicle();
+    final ctl = TripRecordingController(
+      service: service,
+      engineDisplacementCc: activeVehicle?.engineDisplacementCc,
+      volumetricEfficiency: activeVehicle?.volumetricEfficiency,
+    );
     _controller = ctl;
     _classifier = SituationClassifier();
 
@@ -204,6 +215,22 @@ class TripRecording extends _$TripRecording {
   /// the cold-start tables. Everything that isn't diesel maps to
   /// gasoline — LPG/CNG calorific values are close enough to petrol
   /// that the cold-start number is within measurement noise.
+  /// Read the active vehicle profile, swallowing any provider-wiring
+  /// errors that show up in widget tests (where the Riverpod graph
+  /// for the vehicle-active-profile chain isn't always overridden).
+  /// Returns null — both a cold-start no-vehicle and an
+  /// unavailable-provider state — which the caller handles by
+  /// letting `readFuelRateLPerHour` fall back to its generic
+  /// defaults.
+  VehicleProfile? _tryReadActiveVehicle() {
+    try {
+      return ref.read(activeVehicleProfileProvider);
+    } catch (e) {
+      debugPrint('TripRecording: active vehicle unavailable: $e');
+      return null;
+    }
+  }
+
   ConsumptionFuelFamily _resolveFuelFamily(String? apiValue) {
     if (apiValue == null) return ConsumptionFuelFamily.gasoline;
     if (apiValue.startsWith('diesel')) return ConsumptionFuelFamily.diesel;
