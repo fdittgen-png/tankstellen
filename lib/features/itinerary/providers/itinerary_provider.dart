@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../core/data/storage_repository.dart';
 import '../../../core/storage/storage_providers.dart';
-import '../../../core/sync/sync_service.dart';
+import '../../../core/sync/itineraries_sync.dart';
 import '../../../core/sync/sync_provider.dart';
 import '../domain/entities/saved_itinerary.dart';
 import '../../route_search/domain/entities/route_info.dart';
@@ -56,7 +56,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
     if (!syncState.enabled) return;
 
     try {
-      final serverItineraries = await SyncService.fetchItineraries();
+      final serverItineraries = await ItinerariesSync.fetchAll();
       if (serverItineraries.isEmpty) return;
 
       final storage = ref.read(storageRepositoryProvider);
@@ -80,7 +80,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
       final serverIds = serverItineraries.map((i) => i.id).toSet();
       for (final localItem in state) {
         if (!serverIds.contains(localItem.id)) {
-          await SyncService.saveItinerary(localItem);
+          await ItinerariesSync.save(localItem);
         }
       }
 
@@ -127,7 +127,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
 
     // 2. Sync to server (non-blocking)
     try {
-      await SyncService.saveItinerary(itinerary);
+      await ItinerariesSync.save(itinerary);
     } catch (e) {
       debugPrint('ItineraryNotifier.saveRoute sync FAILED: $e');
     }
@@ -144,7 +144,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
 
     // 2. Delete from server
     try {
-      await SyncService.deleteItinerary(id);
+      await ItinerariesSync.delete(id);
     } catch (e) {
       debugPrint('ItineraryNotifier.delete sync FAILED: $e');
     }
