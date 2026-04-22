@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/storage_providers.dart';
+import '../../../core/sync/ignored_stations_sync.dart';
 import '../../../core/sync/sync_helper.dart';
-import '../../../core/sync/sync_service.dart';
 
 part 'ignored_stations_provider.g.dart';
 
@@ -28,7 +28,7 @@ class IgnoredStations extends _$IgnoredStations {
     state = storage.getIgnoredIds();
 
     await SyncHelper.syncIfEnabled(ref, 'IgnoredStations.add',
-      () => SyncService.syncIgnoredStations(state),
+      () => IgnoredStationsSync.merge(state),
     );
   }
 
@@ -39,7 +39,7 @@ class IgnoredStations extends _$IgnoredStations {
     state = storage.getIgnoredIds();
 
     await SyncHelper.syncIfEnabled(ref, 'IgnoredStations.remove',
-      () => SyncService.syncIgnoredStations(state),
+      () => IgnoredStationsSync.merge(state),
     );
   }
 

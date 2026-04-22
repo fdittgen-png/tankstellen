@@ -98,51 +98,6 @@ class SyncService {
   }
 
   // ---------------------------------------------------------------------------
-  // Ignored Stations
-  // ---------------------------------------------------------------------------
-
-  /// Sync ignored stations: merges local and server sets.
-  static Future<List<String>> syncIgnoredStations(
-    List<String> localIgnoredIds,
-  ) async {
-    final client = _client;
-    final userId = _authenticatedUserId;
-    if (client == null || userId == null) {
-      debugPrint('SyncService.syncIgnoredStations: not authenticated');
-      return localIgnoredIds;
-    }
-
-    try {
-      final serverRows = await client
-          .from('ignored_stations')
-          .select('station_id')
-          .eq('user_id', userId);
-      final serverIds = serverRows
-          .map((r) => r.getString('station_id'))
-          .whereType<String>()
-          .toSet();
-      final localIds = localIgnoredIds.toSet();
-
-      debugPrint('SyncService.syncIgnoredStations: local=${localIds.length}, server=${serverIds.length}');
-
-      // Upload local-only
-      final localOnly = localIds.difference(serverIds);
-      if (localOnly.isNotEmpty) {
-        final rows = localOnly
-            .map((id) => {'user_id': userId, 'station_id': id})
-            .toList();
-        await client.from('ignored_stations').upsert(rows, onConflict: 'user_id,station_id');
-        debugPrint('SyncService.syncIgnoredStations: uploaded ${localOnly.length}');
-      }
-
-      return localIds.union(serverIds).toList();
-    } catch (e) {
-      debugPrint('SyncService.syncIgnoredStations FAILED: $e');
-      return localIgnoredIds;
-    }
-  }
-
-  // ---------------------------------------------------------------------------
   // Data transparency
   // ---------------------------------------------------------------------------
 

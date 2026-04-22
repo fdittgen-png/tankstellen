@@ -1,4 +1,5 @@
 import '../../sync/alerts_sync.dart';
+import '../../sync/ignored_stations_sync.dart';
 import '../../sync/price_history_sync.dart';
 import '../../sync/ratings_sync.dart';
 import '../../sync/supabase_client.dart';
@@ -37,7 +38,7 @@ class SupabaseSyncRepository implements SyncRepository {
 
   @override
   Future<List<String>> syncIgnoredStations(List<String> localIds) =>
-      SyncService.syncIgnoredStations(localIds);
+      IgnoredStationsSync.merge(localIds);
 
   // ── Ratings ──
 

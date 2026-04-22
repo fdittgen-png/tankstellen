@@ -6,6 +6,7 @@ import '../storage/storage_providers.dart';
 import 'community_config.dart';
 import 'supabase_client.dart';
 import 'sync_config.dart';
+import 'ignored_stations_sync.dart';
 import 'ratings_sync.dart';
 import 'sync_service.dart';
 
@@ -204,7 +205,7 @@ class SyncState extends _$SyncState {
         final favIds = storage.getFavoriteIds();
         if (favIds.isNotEmpty) await SyncService.syncFavorites(favIds);
         final ignoredIds = storage.getIgnoredIds();
-        if (ignoredIds.isNotEmpty) await SyncService.syncIgnoredStations(ignoredIds);
+        if (ignoredIds.isNotEmpty) await IgnoredStationsSync.merge(ignoredIds);
         final ratings = storage.getRatings();
         for (final entry in ratings.entries) {
           await RatingsSync.upsert(entry.key, entry.value);
