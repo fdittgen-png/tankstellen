@@ -312,6 +312,32 @@ class Countries {
     pricePerUnitSuffix: 'c/L',
   );
 
+  static const slovenia = CountryConfig(
+    code: 'SI',
+    name: 'Slovenija',
+    flag: '\u{1F1F8}\u{1F1EE}',
+    locale: 'sl_SI',
+    postalCodeLength: 4,
+    postalCodeRegex: r'^\d{4}$',
+    postalCodeLabel: 'Poštna številka',
+    requiresApiKey: false,
+    apiProvider: 'goriva.si (gov.si)',
+    attribution: 'Podatki: goriva.si / Ministrstvo za gospodarstvo',
+    fuelTypes: ['NMB-95', 'NMB-100', 'Dizel', 'Dizel Premium', 'LPG'],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.e10,
+      FuelType.e98,
+      FuelType.diesel,
+      FuelType.dieselPremium,
+      FuelType.lpg,
+      FuelType.cng,
+      FuelType.electric,
+    },
+    examplePostalCode: '1000',
+    exampleCity: 'Ljubljana',
+  );
+
   static const mexico = CountryConfig(
     code: 'MX',
     name: 'México',
@@ -339,7 +365,7 @@ class Countries {
   /// All supported countries, ordered for display.
   static const all = [
     germany, france, austria, spain, italy, denmark, argentina,
-    portugal, unitedKingdom, australia, mexico,
+    portugal, unitedKingdom, australia, mexico, slovenia,
   ];
 
   /// Find country by ISO code.
@@ -377,6 +403,7 @@ class Countries {
   /// - \`mx-\` → MX (Mexico CRE)
   /// - \`ar-\` → AR (Argentina)
   /// - \`ok-\` / \`shell-\` → DK (Denmark — two retailer-specific feeds)
+  /// - \`si-\` → SI (Slovenia goriva.si, #575)
   /// - \`demo-\` → null (demo service, no real country)
   static const Map<String, String> _stationIdPrefixToCountry = {
     'pt-': 'PT',
@@ -386,6 +413,7 @@ class Countries {
     'ar-': 'AR',
     'ok-': 'DK',
     'shell-': 'DK',
+    'si-': 'SI',
   };
 
   /// Returns the ISO country code inferred from a station id's prefix,

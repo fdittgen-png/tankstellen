@@ -15,6 +15,7 @@ import 'impl/miteco_station_service.dart';
 import 'impl/osm_brand_enricher.dart';
 import 'impl/portugal_station_service.dart';
 import 'impl/prix_carburants_station_service.dart';
+import 'impl/slovenia_station_service.dart';
 import 'impl/tankerkoenig_station_service.dart';
 import 'impl/uk_station_service.dart';
 import 'service_providers.dart';
@@ -131,6 +132,11 @@ class CountryServiceRegistry {
       errorSource: ServiceSource.mexicoApi,
       createService: _createMexico,
     ),
+    CountryServiceEntry(
+      countryCode: 'SI',
+      errorSource: ServiceSource.sloveniaApi,
+      createService: _createSlovenia,
+    ),
   ];
 
   /// Lookup map built once from [entries] for O(1) access.
@@ -231,3 +237,4 @@ StationService _createPortugal(Ref ref) => PortugalStationService();
 StationService _createUk(Ref ref) => UkStationService();
 StationService _createAustralia(Ref ref) => const AustraliaStationService();
 StationService _createMexico(Ref ref) => MexicoStationService();
+StationService _createSlovenia(Ref ref) => SloveniaStationService();

@@ -66,6 +66,11 @@ const countryBoundingBoxes = <String, CountryBoundingBox>{
 
   // Mexico: lat 14.39–32.72, lng -118.37–-86.71 (with margin)
   'MX': CountryBoundingBox(minLat: 14.0, maxLat: 33.0, minLng: -119.0, maxLng: -86.0),
+
+  // Slovenia: lat 45.42–46.88, lng 13.38–16.61 (with margin). Tight
+  // box — Slovenia is small and surrounded by IT / AT / HR so an
+  // over-generous margin would shadow those neighbours. See #575.
+  'SI': CountryBoundingBox(minLat: 45.3, maxLat: 47.0, minLng: 13.3, maxLng: 16.7),
 };
 
 /// Deterministic order used by [countryCodeFromLatLng] to walk
@@ -92,6 +97,10 @@ const List<String> _bboxLookupOrder = [
   'PT',
   'GB',
   'DK',
+  // SI first among Alpine neighbours — its tight box is entirely inside
+  // both AT and IT's generous boxes (#575). A Ljubljana station (lat
+  // 46.05 / lng 14.50) would otherwise fall through to AT.
+  'SI',
   'AT',
   'FR',
   'IT',
