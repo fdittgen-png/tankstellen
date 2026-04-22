@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'argentina_fuel_classifier.dart';
 import '../../../features/search/data/models/search_params.dart';
 import '../../../features/search/domain/entities/station.dart';
+import '../../error/exceptions.dart';
 import '../../utils/geo_utils.dart';
 import '../dio_factory.dart';
 import '../mixins/cached_dataset_mixin.dart';
@@ -28,11 +29,21 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
       '80ac25de-a44a-4445-9215-090cf55cfda5/download/'
       'precios-en-surtidor-resolucin-3142016.csv';
 
-  final Dio _dio = DioFactory.create(
-    connectTimeout: const Duration(seconds: 20),
-    receiveTimeout: const Duration(seconds: 60),
-    responseType: ResponseType.plain,
-  );
+  /// Default production constructor.
+  ArgentinaStationService()
+      : _dio = DioFactory.create(
+          connectTimeout: const Duration(seconds: 20),
+          receiveTimeout: const Duration(seconds: 60),
+          responseType: ResponseType.plain,
+        );
+
+  /// Test-only constructor that accepts a preconfigured [Dio] (usually with
+  /// a [MockAdapter]) so the cert-error classification path (#837) can be
+  /// driven without hitting the network.
+  @visibleForTesting
+  ArgentinaStationService.withDio(this._dio);
+
+  final Dio _dio;
 
   // Cache parsed stations
   List<_RawStation>? _cachedStations;
@@ -129,8 +140,44 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
 
       return wrapStations(stations, ServiceSource.argentinaApi);
     } on DioException catch (e) {
+      _throwCertificateOrApiException(e); // #837 — classify cert errors first.
       throwApiException(e, defaultMessage: 'Error de red');
     }
+  }
+
+  /// #837 — if [e] is a TLS/certificate error, throw the specific
+  /// [UpstreamCertificateException] so the UI can blame the data provider
+  /// (not the app). Otherwise, return normally and let the caller fall back
+  /// to [throwApiException].
+  void _throwCertificateOrApiException(DioException e) {
+    if (_isCertificateError(e)) {
+      throw UpstreamCertificateException(
+        host: _csvHost,
+        countryCode: 'ar',
+        detail: e.message,
+      );
+    }
+  }
+
+  /// Hostname of the Argentina open-data CSV — kept in a constant so the
+  /// certificate error message names the exact provider the user should
+  /// contact (#837).
+  static const _csvHost = 'datos.energia.gob.ar';
+
+  /// Detect whether a [DioException] is a TLS/certificate validation
+  /// failure. Dio 5.x signals most cert errors via
+  /// [DioExceptionType.badCertificate], but on some platforms a bad cert
+  /// arrives under [DioExceptionType.unknown] with an `HandshakeException`
+  /// / `TlsException` wrapped in [DioException.error] — we match both.
+  static bool _isCertificateError(DioException e) {
+    if (e.type == DioExceptionType.badCertificate) return true;
+    if (e.type != DioExceptionType.unknown) return false;
+    final haystack = '${e.error ?? ''} ${e.message ?? ''}'.toUpperCase();
+    return haystack.contains('CERT') ||
+        haystack.contains('X509') ||
+        haystack.contains('SSL') ||
+        haystack.contains('TLS') ||
+        haystack.contains('HANDSHAKE');
   }
 
   Future<void> _ensureDataLoaded({CancelToken? cancelToken}) async {

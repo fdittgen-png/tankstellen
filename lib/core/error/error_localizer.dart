@@ -35,6 +35,15 @@ class ErrorLocalizer {
           'OpenChargeMap API key not configured. Add one in Settings to search EV charging stations.';
     }
 
+    if (error is UpstreamCertificateException) {
+      // ARB message carries a `{host}` placeholder so the user knows who to
+      // contact. Fallback mirrors the ARB wording in English (#837).
+      return l10n?.errorUpstreamCertExpired(error.host) ??
+          'Upstream data provider (${error.host}) is serving an expired or '
+              'invalid TLS certificate — the app cannot load data from this '
+              'provider until they fix it. Please contact ${error.host}.';
+    }
+
     if (error is ServiceChainExhaustedException) {
       return l10n?.errorAllServicesFailed ?? 'Could not load data. Check your connection and try again.';
     }

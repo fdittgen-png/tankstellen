@@ -60,6 +60,40 @@ class NoEvApiKeyException extends AppException {
   String toString() => message;
 }
 
+/// Thrown when an upstream provider serves an invalid, expired, or otherwise
+/// untrusted TLS certificate. We never bypass cert validation (MITM risk), so
+/// the only remedy is to surface a clear, actionable message telling the user
+/// that the data provider — not the app — is misconfigured, and (if known)
+/// which host is affected so the user can contact the data source (#837).
+class UpstreamCertificateException extends AppException {
+  /// Upstream hostname whose certificate failed validation (e.g.
+  /// `datos.energia.gob.ar`). Used in the localized message so the user
+  /// knows which provider to contact.
+  final String host;
+
+  /// Country code (ISO-3166-1 alpha-2, lowercase) of the affected provider,
+  /// e.g. `ar`. Lets the UI prefix the message with the country name.
+  final String? countryCode;
+
+  /// Underlying error detail (usually the Dio / X509 error text) for
+  /// diagnostics — NOT shown to the user as-is.
+  final String? detail;
+
+  const UpstreamCertificateException({
+    required this.host,
+    this.countryCode,
+    this.detail,
+  });
+
+  @override
+  String get message =>
+      'Upstream certificate invalid or expired for $host'
+      '${detail == null ? '' : ' ($detail)'}.';
+
+  @override
+  String toString() => 'UpstreamCertificateException: $message';
+}
+
 /// Thrown when every service in a fallback chain has failed,
 /// including the cache. Carries accumulated errors from each step
 /// so the UI can report exactly what went wrong.
