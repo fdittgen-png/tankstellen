@@ -2523,6 +2523,12 @@ class AppLocalizationsFr extends AppLocalizations {
       'Réessayez ou cherchez par code postal / ville.';
 
   @override
+  String get alertsLoadErrorTitle => 'Couldn\'t load your alerts';
+
+  @override
+  String get alertsBackgroundCheckErrorTitle => 'Alert background check failed';
+
+  @override
   String get detailsLabel => 'Détails';
 
   @override

@@ -1029,6 +1029,8 @@
   "errorHintConnection": "Prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
   "errorHintRouting": "Routenberechnung fehlgeschlagen. Prüfen Sie Ihre Internetverbindung.",
   "errorHintFallback": "Versuchen Sie es erneut oder suchen Sie nach Postleitzahl / Stadt.",
+  "alertsLoadErrorTitle": "Alarme konnten nicht geladen werden",
+  "alertsBackgroundCheckErrorTitle": "Hintergrundprüfung der Alarme fehlgeschlagen",
   "detailsLabel": "Details",
   "remove": "Entfernen",
   "showKey": "Schlüssel anzeigen",
