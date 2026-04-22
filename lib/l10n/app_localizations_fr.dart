@@ -2921,4 +2921,24 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get aboutSupportDescription =>
       'Cette application est gratuite, open source et sans publicité. Si vous la trouvez utile, soutenez le développeur.';
+
+  @override
+  String get luxembourgRegulatedPricesNotice =>
+      'Luxembourg fuel prices are government-regulated and uniform nationwide.';
+
+  @override
+  String get luxembourgFuelUnleaded95 => 'Unleaded 95';
+
+  @override
+  String get luxembourgFuelUnleaded98 => 'Unleaded 98';
+
+  @override
+  String get luxembourgFuelDiesel => 'Diesel';
+
+  @override
+  String get luxembourgFuelLpg => 'LPG';
+
+  @override
+  String get luxembourgPricesUnavailable =>
+      'Luxembourg regulated prices are unavailable.';
 }

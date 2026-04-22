@@ -2918,4 +2918,24 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get aboutSupportDescription =>
       'Diese App ist kostenlos, Open Source und werbefrei. Wenn sie Ihnen gefällt, unterstützen Sie bitte den Entwickler.';
+
+  @override
+  String get luxembourgRegulatedPricesNotice =>
+      'Die Kraftstoffpreise in Luxemburg sind staatlich reguliert und landesweit einheitlich.';
+
+  @override
+  String get luxembourgFuelUnleaded95 => 'Super bleifrei 95';
+
+  @override
+  String get luxembourgFuelUnleaded98 => 'Super bleifrei 98';
+
+  @override
+  String get luxembourgFuelDiesel => 'Diesel';
+
+  @override
+  String get luxembourgFuelLpg => 'Autogas';
+
+  @override
+  String get luxembourgPricesUnavailable =>
+      'Luxemburgs regulierte Preise sind nicht verfügbar.';
 }
