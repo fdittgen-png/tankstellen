@@ -6,7 +6,7 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../data/osm_retry_client.dart';
+import '../../data/retry_network_tile_provider.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
@@ -70,28 +70,6 @@ class StationMapLayers extends StatelessWidget {
             interactionOptions: const InteractionOptions(
               flags: InteractiveFlag.all,
             ),
-            // #496 — force the TileLayer to refetch tiles once the map
-            // has actually laid out. When the map screen sits inside
-            // StatefulShellRoute.indexedStack, the widget is pre-built
-            // offstage with degenerate constraints and the TileLayer's
-            // viewport is empty. The initState-based nudge in
-            // MapScreen fires before FlutterMap attaches the controller,
-            // so it gets swallowed. onMapReady fires exactly when the
-            // controller is attached AND the map has real constraints,
-            // which is the only reliable moment to nudge.
-            onMapReady: () {
-              // Zoom-jiggle: tiny delta then revert so the TileLayer's
-              // `_TileBoundsAtZoom` invalidates its cached-empty viewport
-              // and re-requests tiles (#709). A same-center/same-zoom
-              // move is a no-op and kept the blank viewport on first
-              // load.
-              try {
-                mapController.move(center, zoom + 0.0001);
-                mapController.move(center, zoom);
-              } catch (e) {
-                debugPrint('StationMapLayers onMapReady nudge: $e');
-              }
-            },
           ),
           children: [
             TileLayer(
@@ -99,22 +77,17 @@ class StationMapLayers extends StatelessWidget {
               userAgentPackageName: AppConstants.osmUserAgent,
               maxNativeZoom: 19,
               maxZoom: 19,
-              // #757 phase 2 — retry 429s and transient errors with
-              // Retry-After respect. Default RetryClient in flutter_map
-              // only handles 5xx; adding 429 + connection errors cuts
-              // down the gray-tile rate under load.
-              tileProvider: NetworkTileProvider(httpClient: OsmRetryClient()),
-              // #757 — kill the persistent-gray-tile bug at its root.
-              // Default NetworkTileProvider caches failed fetches in
-              // TileImageManager and the same (z,x,y) is never
-              // re-requested even on redraw, so a single transient
-              // 429/503 from the OSM tile server leaves a permanent
-              // gray square in the user's viewport. With
-              // `notVisibleRespectMargin`, the failed tile is
-              // evicted as soon as it scrolls out of the keepBuffer
-              // margin — the next pan retries cleanly. Every prior
-              // map-bug PR (#496, #532, #696, #707, #709, #711)
-              // attacked symptoms; this is the root cause.
+              // #757 — RetryNetworkTileProvider retries transient
+              // HTTP 429 / 5xx / connection errors with jittered
+              // backoff (200 ms, 800 ms). Combined with
+              // `evictErrorTileStrategy: notVisibleRespectMargin`
+              // below, a failed tile gets retried up to 3× and, if
+              // all attempts fail, is evicted as soon as it scrolls
+              // out of view so the next pan retries cleanly. This
+              // replaces the symptom-level workarounds from #496,
+              // #532, #696, #707, #709, and #711 (zoom-jiggle,
+              // subtree rebuild, ImageCache sizing).
+              tileProvider: RetryNetworkTileProvider(),
               evictErrorTileStrategy:
                   EvictErrorTileStrategy.notVisibleRespectMargin,
               errorTileCallback: (tile, error, stackTrace) {
