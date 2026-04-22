@@ -9,10 +9,13 @@ import '../../../consumption/providers/consumption_providers.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/entities/vehicle_profile.dart';
+import '../../domain/entities/vin_data.dart';
 import '../../providers/vehicle_providers.dart';
+import '../../providers/vin_decoder_provider.dart';
 import '../widgets/service_reminder_section.dart';
 import '../widgets/vehicle_combustion_section.dart';
 import '../widgets/vehicle_ev_section.dart';
+import '../widgets/vin_confirm_dialog.dart';
 
 /// Form for adding or editing a [VehicleProfile].
 ///
@@ -40,6 +43,10 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   final _fuelTypeCtrl = TextEditingController(text: 'e10');
   final _minSocCtrl = TextEditingController(text: '20');
   final _maxSocCtrl = TextEditingController(text: '80');
+  // VIN onboarding (#812 phase 2). The controller feeds the decode
+  // provider; the populated engine fields are stored separately and
+  // carried through _save.
+  final _vinCtrl = TextEditingController();
 
   // Combustion is the dominant case; start there and let the user
   // flip to Hybrid/Electric if needed (#710).
@@ -48,6 +55,17 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   String? _existingId;
   String? _adapterMac;
   String? _adapterName;
+
+  // Engine params populated by the VIN decoder (#812 phase 2).
+  // The form has no direct UI for these yet — they live alongside
+  // the VIN field and will feed the OBD2 fuel-rate math in phase 3.
+  int? _engineDisplacementCc;
+  int? _engineCylinders;
+  int? _curbWeightKg;
+
+  // Decode button state — flips to true while the vPIC request is in
+  // flight so the UI shows a spinner instead of the magnifying glass.
+  bool _decodingVin = false;
 
   @override
   void initState() {
@@ -77,6 +95,10 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
         ..addAll(existing.supportedConnectors);
       _adapterMac = existing.obd2AdapterMac;
       _adapterName = existing.obd2AdapterName;
+      _vinCtrl.text = existing.vin ?? '';
+      _engineDisplacementCc = existing.engineDisplacementCc;
+      _engineCylinders = existing.engineCylinders;
+      _curbWeightKg = existing.curbWeightKg;
     });
   }
 
@@ -89,6 +111,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
     _fuelTypeCtrl.dispose();
     _minSocCtrl.dispose();
     _maxSocCtrl.dispose();
+    _vinCtrl.dispose();
     super.dispose();
   }
 
@@ -141,6 +164,10 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
       ),
       obd2AdapterMac: _adapterMac,
       obd2AdapterName: _adapterName,
+      vin: _vinCtrl.text.trim().isEmpty ? null : _vinCtrl.text.trim(),
+      engineDisplacementCc: _engineDisplacementCc,
+      engineCylinders: _engineCylinders,
+      curbWeightKg: _curbWeightKg,
     );
 
     await ref.read(vehicleProfileListProvider.notifier).save(profile);
@@ -173,6 +200,76 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
     }
     if (!mounted) return;
     Navigator.of(context).pop();
+  }
+
+  /// Decode the value currently in [_vinCtrl] via the VIN decoder
+  /// provider (#812 phase 2). On a successful decode the user sees a
+  /// confirmation dialog summarising the decoded data; accepting it
+  /// auto-fills the engine-parameter fields on the profile. Invalid
+  /// input surfaces as a snackbar — the dialog is skipped entirely
+  /// so the user isn't prompted to "confirm" an empty summary.
+  Future<void> _decodeVin() async {
+    final l = AppLocalizations.of(context);
+    final vin = _vinCtrl.text.trim();
+    if (vin.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l?.vinInvalidFormat ?? 'Invalid VIN format')),
+      );
+      return;
+    }
+
+    setState(() => _decodingVin = true);
+    VinData? decoded;
+    try {
+      decoded = await ref.read(decodedVinProvider(vin).future);
+    } catch (e) {
+      debugPrint('EditVehicleScreen: VIN decode failed: $e');
+    }
+    if (!mounted) return;
+    setState(() => _decodingVin = false);
+
+    if (decoded == null || decoded.source == VinDataSource.invalid) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(decoded == null
+              ? (l?.vinDecodeError ?? "Couldn't decode this VIN")
+              : (l?.vinInvalidFormat ?? 'Invalid VIN format')),
+        ),
+      );
+      return;
+    }
+
+    final outcome = await VinConfirmDialog.show(context, decoded);
+    if (!mounted) return;
+    if (outcome == VinConfirmOutcome.confirm) {
+      _applyDecodedVin(decoded);
+    }
+  }
+
+  /// Copy non-null engine fields from [data] into the form state
+  /// (#812 phase 2). Displacement is in litres on [VinData] and must
+  /// be converted to cubic centimetres for [VehicleProfile].
+  ///
+  /// GVWR (pounds) is the vPIC stand-in for curb weight — a real
+  /// curb weight is GVWR minus payload, but vPIC doesn't expose
+  /// payload, so we approximate. The profile stores the value as an
+  /// integer kilogram, and the conversion factor is 1 lb = 0.4536 kg
+  /// (`lbs / 2.205`).
+  void _applyDecodedVin(VinData data) {
+    setState(() {
+      if (data.displacementL != null) {
+        _engineDisplacementCc = (data.displacementL! * 1000).round();
+      }
+      if (data.cylinderCount != null) {
+        _engineCylinders = data.cylinderCount;
+      }
+      if (data.gvwrLbs != null) {
+        // Approx — GVWR is gross weight, not curb weight. Phase 3
+        // will swap this for a real curb-weight lookup.
+        _curbWeightKg = (data.gvwrLbs! / 2.205).round();
+      }
+    });
   }
 
   /// Latest odometer reading logged for [vehicleId], picked from the
@@ -239,6 +336,27 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
               validator: (v) => (v == null || v.trim().isEmpty)
                   ? (l?.fieldRequired ?? 'Required')
                   : null,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _vinCtrl,
+              decoration: InputDecoration(
+                labelText: l?.vinLabel ?? 'VIN (optional)',
+                suffixIcon: _decodingVin
+                    ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    : IconButton(
+                        icon: const Icon(Icons.search),
+                        tooltip: l?.vinDecodeTooltip ?? 'Decode VIN',
+                        onPressed: _decodeVin,
+                      ),
+              ),
             ),
             const SizedBox(height: 16),
             _TypeSelector(

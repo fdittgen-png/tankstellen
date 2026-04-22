@@ -129,6 +129,14 @@ abstract class VehicleProfile with _$VehicleProfile {
     // to the user ("vLinker FS").
     String? obd2AdapterMac,
     String? obd2AdapterName,
+
+    // Vehicle Identification Number (#812 phase 2). Optional — the
+    // VIN decoder may pre-fill engine fields when present, and the
+    // value is persisted so a subsequent edit still shows what the
+    // user entered. No format validation at the model level — the
+    // UI rejects clearly-invalid input via the decoder, but users
+    // should be free to save a stub profile with a partial VIN.
+    String? vin,
   }) = _VehicleProfile;
 
   factory VehicleProfile.fromJson(Map<String, dynamic> json) =>

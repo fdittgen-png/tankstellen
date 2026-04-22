@@ -5700,6 +5700,67 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'CNE Bencina en Linea'**
   String get chileApiProvider;
+
+  /// No description provided for @vinLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'VIN (optional)'**
+  String get vinLabel;
+
+  /// No description provided for @vinDecodeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Decode VIN'**
+  String get vinDecodeTooltip;
+
+  /// No description provided for @vinConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Is this your car?'**
+  String get vinConfirmTitle;
+
+  /// No description provided for @vinConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{year} {make} {model} — {displacement}L, {cylinders}-cyl, {fuel}'**
+  String vinConfirmBody(
+    String year,
+    String make,
+    String model,
+    String displacement,
+    String cylinders,
+    String fuel,
+  );
+
+  /// No description provided for @vinConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, auto-fill'**
+  String get vinConfirmAction;
+
+  /// No description provided for @vinModifyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Modify manually'**
+  String get vinModifyAction;
+
+  /// No description provided for @vinPartialInfoNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Partial info (offline). You can edit below.'**
+  String get vinPartialInfoNote;
+
+  /// No description provided for @vinDecodeError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t decode this VIN'**
+  String get vinDecodeError;
+
+  /// No description provided for @vinInvalidFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid VIN format'**
+  String get vinInvalidFormat;
 }
 
 class _AppLocalizationsDelegate

@@ -1239,5 +1239,24 @@
   "southKoreaApiKeyRequired": "Register at OPINET to get a free API key",
   "southKoreaApiProvider": "OPINET (KNOC)",
   "chileApiKeyRequired": "Register at CNE to get a free API key",
-  "chileApiProvider": "CNE Bencina en Linea"
+  "chileApiProvider": "CNE Bencina en Linea",
+  "vinLabel": "VIN (optional)",
+  "vinDecodeTooltip": "Decode VIN",
+  "vinConfirmTitle": "Is this your car?",
+  "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders}-cyl, {fuel}",
+  "@vinConfirmBody": {
+    "placeholders": {
+      "year": { "type": "String", "example": "2008" },
+      "make": { "type": "String", "example": "PEUGEOT" },
+      "model": { "type": "String", "example": "107" },
+      "displacement": { "type": "String", "example": "1.0" },
+      "cylinders": { "type": "String", "example": "3" },
+      "fuel": { "type": "String", "example": "Gasoline" }
+    }
+  },
+  "vinConfirmAction": "Yes, auto-fill",
+  "vinModifyAction": "Modify manually",
+  "vinPartialInfoNote": "Partial info (offline). You can edit below.",
+  "vinDecodeError": "Couldn't decode this VIN",
+  "vinInvalidFormat": "Invalid VIN format"
 }
