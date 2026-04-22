@@ -5664,6 +5664,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{label} is due — {kmOver} km past the interval.'**
   String serviceReminderDueBody(String label, int kmOver);
+
+  /// No description provided for @southKoreaApiKeyRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Register at OPINET to get a free API key'**
+  String get southKoreaApiKeyRequired;
+
+  /// No description provided for @southKoreaApiProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'OPINET (KNOC)'**
+  String get southKoreaApiProvider;
 }
 
 class _AppLocalizationsDelegate

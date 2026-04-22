@@ -46,9 +46,9 @@ void main() {
   });
 
   group('countryBoundingBoxes', () {
-    test('has entries for all 12 supported countries', () {
+    test('has entries for all 13 supported countries', () {
       const expectedCountries = [
-        'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'SI',
+        'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'SI', 'KR',
       ];
       for (final code in expectedCountries) {
         expect(countryBoundingBoxes.containsKey(code), isTrue,
@@ -207,6 +207,19 @@ void main() {
 
     test('Buenos Aires → AR', () {
       expect(countryCodeFromLatLng(-34.60, -58.38), 'AR');
+    });
+
+    test('Seoul → KR (#597)', () {
+      expect(countryCodeFromLatLng(37.56, 126.98), 'KR');
+    });
+
+    test('Jeju → KR (island, #597)', () {
+      expect(countryCodeFromLatLng(33.50, 126.53), 'KR');
+    });
+
+    test('KR bounding box rejects German coordinates', () {
+      // Berlin sits at (52.52, 13.41) — must not be misattributed to KR.
+      expect(countryBoundingBoxes['KR']!.contains(52.52, 13.41), isFalse);
     });
 
     test('returns null for mid-Atlantic coordinates', () {

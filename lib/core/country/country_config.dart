@@ -388,10 +388,42 @@ class Countries {
     exampleCity: 'Luxembourg',
   );
 
+  /// South Korea — OPINET (Korea National Oil Corporation) REST API
+  /// (#597). ~14 000 stations nationwide; gasoline, premium gasoline,
+  /// diesel, LPG (kerosene published but unmapped until we add a
+  /// FuelType enum for it). Prices are in KRW per litre (integer).
+  static const southKorea = CountryConfig(
+    code: 'KR',
+    name: '대한민국',
+    flag: '\u{1F1F0}\u{1F1F7}',
+    currency: 'KRW',
+    currencySymbol: '₩',
+    locale: 'ko_KR',
+    postalCodeLength: 5,
+    postalCodeRegex: r'^\d{5}$',
+    postalCodeLabel: '우편번호',
+    requiresApiKey: true,
+    apiKeyRegistrationUrl: 'https://www.opinet.co.kr/',
+    apiProvider: 'OPINET (KNOC)',
+    attribution: 'Data: OPINET / Korea National Oil Corporation',
+    fuelTypes: ['휘발유', '고급휘발유', '경유', 'LPG'],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.e98,
+      FuelType.diesel,
+      FuelType.lpg,
+      FuelType.electric,
+    },
+    examplePostalCode: '04524',
+    exampleCity: '서울',
+    pricePerUnitSuffix: '₩/L',
+  );
+
   /// All supported countries, ordered for display.
   static const all = [
     germany, france, austria, spain, italy, denmark, argentina,
     portugal, unitedKingdom, australia, mexico, luxembourg, slovenia,
+    southKorea,
   ];
 
   /// Find country by ISO code.
@@ -431,6 +463,7 @@ class Countries {
   /// - \`ok-\` / \`shell-\` → DK (Denmark — two retailer-specific feeds)
   /// - \`lu-\` → LU (Luxembourg regulated prices, #574)
   /// - \`si-\` → SI (Slovenia goriva.si, #575)
+  /// - \`kr-\` → KR (South Korea OPINET / KNOC, #597)
   /// - \`demo-\` → null (demo service, no real country)
   static const Map<String, String> _stationIdPrefixToCountry = {
     'pt-': 'PT',
@@ -442,6 +475,7 @@ class Countries {
     'shell-': 'DK',
     'lu-': 'LU',
     'si-': 'SI',
+    'kr-': 'KR',
   };
 
   /// Returns the ISO country code inferred from a station id's prefix,

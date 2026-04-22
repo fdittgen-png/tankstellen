@@ -17,6 +17,7 @@ enum ServiceSource {
   mexicoApi('CRE México'),
   luxembourgApi('Luxembourg (regulated)'),
   sloveniaApi('goriva.si'),
+  openinetApi('OPINET (KNOC)'),
   osrmRouting('OSRM Routing'),
   openChargeMapApi('OpenChargeMap'),
   nominatimGeocoding('Nominatim (OSM)'),

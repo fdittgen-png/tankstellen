@@ -83,12 +83,12 @@ void main() {
     });
 
     group('requiresApiKey', () {
-      test('only DE requires API key', () {
+      test('DE and KR require API keys', () {
         final keyed = CountryServiceRegistry.entries
             .where((e) => e.requiresApiKey)
             .map((e) => e.countryCode)
-            .toList();
-        expect(keyed, equals(['DE']));
+            .toSet();
+        expect(keyed, equals({'DE', 'KR'}));
       });
 
       test('FR does not require API key', () {

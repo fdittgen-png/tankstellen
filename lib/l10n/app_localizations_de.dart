@@ -3025,4 +3025,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String serviceReminderDueBody(String label, int kmOver) {
     return '$label ist fällig — $kmOver km über dem Intervall.';
   }
+
+  @override
+  String get southKoreaApiKeyRequired =>
+      'Registrieren Sie sich bei OPINET, um einen kostenlosen API-Schlüssel zu erhalten';
+
+  @override
+  String get southKoreaApiProvider => 'OPINET (KNOC)';
 }

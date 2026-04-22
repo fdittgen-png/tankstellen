@@ -330,6 +330,14 @@ List<FuelType> fuelTypesForCountry(String countryCode) {
         FuelType.e5, FuelType.e98, FuelType.diesel,
         FuelType.dieselPremium, FuelType.lpg, FuelType.electric, FuelType.all,
       ];
+    case 'KR':
+      // South Korea (OPINET): Gasoline (→ e5), Premium Gasoline (→ e98),
+      // Diesel, LPG. Kerosene is published by OPINET but has no FuelType
+      // enum today — added in a follow-up. #597
+      return [
+        FuelType.e5, FuelType.e98, FuelType.diesel,
+        FuelType.lpg, FuelType.electric, FuelType.all,
+      ];
     default:
       return [FuelType.e5, FuelType.e10, FuelType.diesel, FuelType.electric, FuelType.all];
   }

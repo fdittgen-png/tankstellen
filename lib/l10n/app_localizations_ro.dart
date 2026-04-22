@@ -3005,4 +3005,11 @@ class AppLocalizationsRo extends AppLocalizations {
   String serviceReminderDueBody(String label, int kmOver) {
     return '$label is due — $kmOver km past the interval.';
   }
+
+  @override
+  String get southKoreaApiKeyRequired =>
+      'Register at OPINET to get a free API key';
+
+  @override
+  String get southKoreaApiProvider => 'OPINET (KNOC)';
 }

@@ -17,6 +17,7 @@ import 'impl/osm_brand_enricher.dart';
 import 'impl/portugal_station_service.dart';
 import 'impl/prix_carburants_station_service.dart';
 import 'impl/slovenia_station_service.dart';
+import 'impl/south_korea_station_service.dart';
 import 'impl/tankerkoenig_station_service.dart';
 import 'impl/uk_station_service.dart';
 import 'service_providers.dart';
@@ -143,6 +144,12 @@ class CountryServiceRegistry {
       errorSource: ServiceSource.sloveniaApi,
       createService: _createSlovenia,
     ),
+    CountryServiceEntry(
+      countryCode: 'KR',
+      errorSource: ServiceSource.openinetApi,
+      requiresApiKey: true,
+      createService: _createSouthKorea,
+    ),
   ];
 
   /// Lookup map built once from [entries] for O(1) access.
@@ -245,3 +252,17 @@ StationService _createAustralia(Ref ref) => const AustraliaStationService();
 StationService _createMexico(Ref ref) => MexicoStationService();
 StationService _createLuxembourg(Ref ref) => LuxembourgStationService();
 StationService _createSlovenia(Ref ref) => SloveniaStationService();
+
+/// South Korea factory (#597). Reads the OPINET developer API key from
+/// storage via [storageRepositoryProvider]. When no key is present we
+/// return [DemoStationService] so a Korean user still sees realistic
+/// data until they enter their free KNOC-issued key in Settings →
+/// API keys.
+StationService _createSouthKorea(Ref ref) {
+  final storage = ref.read(storageRepositoryProvider);
+  final apiKey = storage.getApiKey();
+  if (apiKey == null || apiKey.isEmpty) {
+    return DemoStationService(countryCode: 'KR');
+  }
+  return SouthKoreaStationService(apiKey: apiKey);
+}

@@ -1189,5 +1189,7 @@
   "serviceReminderLastService": "Letzter Service",
   "serviceReminderMarkDone": "Als erledigt markieren",
   "serviceReminderDueTitle": "Wartung fällig",
-  "serviceReminderDueBody": "{label} ist fällig — {kmOver} km über dem Intervall."
+  "serviceReminderDueBody": "{label} ist fällig — {kmOver} km über dem Intervall.",
+  "southKoreaApiKeyRequired": "Registrieren Sie sich bei OPINET, um einen kostenlosen API-Schlüssel zu erhalten",
+  "southKoreaApiProvider": "OPINET (KNOC)"
 }

@@ -2,9 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 
 void main() {
-  group('Countries.byCode for all 13 countries', () {
+  group('Countries.byCode for all 14 countries', () {
     final expectedCodes = [
-      'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'LU', 'SI',
+      'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'LU', 'SI', 'KR',
     ];
 
     for (final code in expectedCodes) {
@@ -104,6 +104,7 @@ void main() {
       expect(Countries.unitedKingdom.currency, 'GBP');
       expect(Countries.australia.currency, 'AUD');
       expect(Countries.mexico.currency, 'MXN');
+      expect(Countries.southKorea.currency, 'KRW');
     });
   });
 
@@ -186,12 +187,14 @@ void main() {
   });
 
   group('CountryConfig requiresApiKey', () {
-    test('only Germany requires an API key', () {
+    test('Germany and South Korea require an API key', () {
+      const keyedCodes = {'DE', 'KR'};
       for (final country in Countries.all) {
-        if (country.code == 'DE') {
+        if (keyedCodes.contains(country.code)) {
           expect(country.requiresApiKey, isTrue,
-              reason: 'DE requires API key');
-          expect(country.apiKeyRegistrationUrl, isNotNull);
+              reason: '${country.code} should require API key');
+          expect(country.apiKeyRegistrationUrl, isNotNull,
+              reason: '${country.code} should expose a registration URL');
         } else {
           expect(country.requiresApiKey, isFalse,
               reason: '${country.code} should not require API key');
