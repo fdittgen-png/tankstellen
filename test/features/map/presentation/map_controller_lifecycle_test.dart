@@ -12,16 +12,16 @@ void main() {
       expect(
         source.contains('_mapController.dispose()'),
         isTrue,
-        reason: 'MapScreen must dispose MapController to prevent stale references',
+        reason:
+            'MapScreen must dispose MapController to prevent stale references',
       );
-      // MapScreen REASSIGNS the controller on tab-flip (#709 rebuild
-      // fix), so the field is `late MapController` (non-final) and the
-      // assertion now checks for the non-final declaration.
+      // After #757 retired the `_mapIncarnation` subtree-rebuild hack,
+      // the controller is created once in initState and reused for the
+      // lifetime of the widget. The declaration is `late final` again.
       expect(
-        source.contains('late MapController _mapController'),
+        source.contains('late final MapController _mapController'),
         isTrue,
-        reason: 'MapController should be late (non-final), created in initState '
-            'and replaced on tab-flip rebuild',
+        reason: 'MapController should be late final, created in initState',
       );
     });
 
@@ -33,7 +33,8 @@ void main() {
       expect(
         source.contains('_mapController.dispose()'),
         isTrue,
-        reason: 'InlineMap must dispose MapController to prevent stale references',
+        reason:
+            'InlineMap must dispose MapController to prevent stale references',
       );
       expect(
         source.contains('late final MapController _mapController'),
@@ -42,7 +43,8 @@ void main() {
       );
     });
 
-    test('no MapController created as field initializer (must use initState)', () {
+    test('no MapController created as field initializer (must use initState)',
+        () {
       final mapScreen = File(
         'lib/features/map/presentation/screens/map_screen.dart',
       ).readAsStringSync();
@@ -50,49 +52,48 @@ void main() {
         'lib/features/map/presentation/widgets/inline_map.dart',
       ).readAsStringSync();
 
-      // Should NOT have `final _mapController = MapController()` as a field initializer
+      // Should NOT have `final _mapController = MapController()` as a field
+      // initializer — must be created in initState.
       expect(
         mapScreen.contains('final _mapController = MapController()'),
         isFalse,
-        reason: 'MapController should be created in initState, not as field initializer',
+        reason:
+            'MapController should be created in initState, not as field initializer',
       );
       expect(
         inlineMap.contains('final _mapController = MapController()'),
         isFalse,
-        reason: 'MapController should be created in initState, not as field initializer',
+        reason:
+            'MapController should be created in initState, not as field initializer',
       );
     });
 
     test(
-      'MapScreen rebuilds the FlutterMap subtree on every Carte tab-flip '
-      '(regression #709 — zoom-nudge alone left blank tiles on first visit)',
+      '#757: MapScreen no longer relies on `_mapIncarnation` subtree-rebuild '
+      'hack — retry+evict provider handles transient tile failures',
       () {
         final source = File(
           'lib/features/map/presentation/screens/map_screen.dart',
         ).readAsStringSync();
 
-        // The fix must (a) listen to currentShellBranchProvider, and
-        // (b) use a ValueKey on a KeyedSubtree wrapping the body so
-        // tab-flip destroys + rebuilds the TileLayer with fresh
-        // constraints, and (c) dispose + recreate the MapController
-        // so the old one isn't bound to the torn-down widget.
+        // The `_mapIncarnation` counter + `ValueKey` KeyedSubtree wrapper
+        // from #709 were symptom-level workarounds for `TileLayer`
+        // caching failed fetches. They cancelled in-flight HTTP
+        // requests on every tab-flip, which itself caused the gray
+        // viewport some users reported (see #709 rollback history).
+        // Root cause is addressed by `RetryNetworkTileProvider` +
+        // `evictErrorTileStrategy` (#757), so these workarounds must
+        // be gone.
         expect(
-          source.contains('currentShellBranchProvider'),
-          isTrue,
-          reason: 'MapScreen must observe tab flips via '
-              'currentShellBranchProvider to rebuild on Carte visits (#709)',
+          source.contains('_mapIncarnation'),
+          isFalse,
+          reason: '#757 — subtree-rebuild counter should have been '
+              'removed now that tile retries happen at the HTTP layer',
         );
         expect(
           source.contains('KeyedSubtree'),
-          isTrue,
-          reason: 'MapScreen must wrap the map body in a KeyedSubtree so '
-              'the tab-flip ValueKey forces a TileLayer rebuild (#709)',
-        );
-        expect(
-          source.contains('_mapIncarnation'),
-          isTrue,
-          reason: 'Rebuild counter must exist so each tab-flip produces a '
-              'distinct key (#709)',
+          isFalse,
+          reason: '#757 — KeyedSubtree wrapper no longer needed',
         );
       },
     );
