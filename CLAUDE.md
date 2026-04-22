@@ -97,6 +97,7 @@ Development docs are in `docs/` (most git-ignored for local reference only; trac
 - `docs/guides/DEPLOYMENT.md` — Per-platform build/ship instructions *(local)*
 - **`docs/guides/NEW_COUNTRY.md`** — Step-by-step for adding a new country fuel API *(tracked)*
 - **`docs/guides/DEV-GIT-WORKTREES.md`** — Persistent `tankstellen-master` worktree setup + `Agent(isolation: "worktree")` pattern *(tracked)*
+- **`docs/guides/AUTONOMOUS-LOOP-PROTOCOL.md`** — Parallel-worker-safe `/tankstellenfix` protocol (file-disjointness mutex, sequential merges, worker prompt template, must-not-parallelize list) *(tracked)*
 
 ## Git Workflow (GitHub Flow)
 
