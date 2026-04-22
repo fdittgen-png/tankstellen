@@ -2485,6 +2485,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'OpenChargeMap-API-Schlüssel nicht konfiguriert. Fügen Sie einen in den Einstellungen hinzu, um Ladestationen zu suchen.';
 
   @override
+  String errorUpstreamCertExpired(String host) {
+    return 'Der Datenanbieter ($host) verwendet ein abgelaufenes oder ungültiges TLS-Zertifikat. Die App kann von dieser Quelle keine Daten laden, bis der Anbieter das Problem behebt. Bitte wenden Sie sich an $host.';
+  }
+
+  @override
   String get offlineLabel => 'Offline';
 
   @override

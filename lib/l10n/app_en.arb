@@ -1041,6 +1041,12 @@
   "ratingDescPrivate": "Synced with your database (not visible to others)",
   "ratingDescShared": "Visible to all users of your database",
   "errorNoEvApiKey": "OpenChargeMap API key not configured. Add one in Settings to search EV charging stations.",
+  "errorUpstreamCertExpired": "The data provider ({host}) is serving an expired or invalid TLS certificate. The app cannot load data from this source until the provider fixes it. Please contact {host}.",
+  "@errorUpstreamCertExpired": {
+    "placeholders": {
+      "host": { "type": "String" }
+    }
+  },
   "offlineLabel": "Offline",
   "fallbackSummary": "{failed} unavailable. Using {current}.",
   "@fallbackSummary": {

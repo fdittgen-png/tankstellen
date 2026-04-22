@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/services/impl/argentina_station_service.dart';
@@ -311,12 +312,18 @@ col0,col1,col2,TestCo,Dir,Loc,Prov,col7,col8,Nafta premium,col10,col11,100.5,202
       const params = SearchParams(
         lat: -34.6, lng: -58.4, radiusKm: 10.0,
       );
-      // The service will try to download the CSV and fail (no network in test)
+      // The service will try to download the CSV and fail. Either a generic
+      // network error (ApiException) or the specific cert-expired path
+      // (#837 — UpstreamCertificateException) is acceptable here, since the
+      // real upstream cert is currently expired and the test harness has no
+      // network.
       try {
         await service.searchStations(params);
         // If it somehow succeeds (cached data), just verify the result
       } on ApiException catch (e) {
         expect(e.message, isNotEmpty);
+      } on UpstreamCertificateException catch (e) {
+        expect(e.host, 'datos.energia.gob.ar');
       }
     });
 
@@ -330,6 +337,8 @@ col0,col1,col2,TestCo,Dir,Loc,Prov,col7,col8,Nafta premium,col10,col11,100.5,202
         expect(result.data, isA<List<Station>>());
       } on ApiException catch (_) {
         // Expected if no network
+      } on UpstreamCertificateException catch (_) {
+        // Expected if the live cert is expired (#837)
       }
     });
   });
@@ -554,6 +563,121 @@ col0,col1,col2,YPF,Dir,Loc,Prov,col7,col8,Nafta premium,col10,col11,800.0,2026-0
       expect(stationMap.values.first.naftaPremium, closeTo(750.0, 0.01));
     });
   });
+
+  // #837 — datos.energia.gob.ar started serving an expired TLS cert. Assert
+  // that the service classifies this as a specific UpstreamCertificateException
+  // (so the UI can show a precise message) rather than a generic ApiException.
+  group('#837 Argentina TLS certificate error classification', () {
+    const params = SearchParams(
+      lat: -34.6, lng: -58.4, radiusKm: 10.0,
+    );
+
+    test('DioExceptionType.badCertificate surfaces UpstreamCertificateException', () async {
+      final dio = Dio()
+        ..httpClientAdapter = _ThrowingAdapter(
+          (opts) => DioException(
+            type: DioExceptionType.badCertificate,
+            requestOptions: opts,
+            message: 'CERTIFICATE_VERIFY_FAILED: certificate has expired',
+          ),
+        );
+      final service = ArgentinaStationService.withDio(dio);
+
+      try {
+        await service.searchStations(params);
+        fail('Expected UpstreamCertificateException');
+      } on UpstreamCertificateException catch (e) {
+        expect(e.host, 'datos.energia.gob.ar');
+        expect(e.countryCode, 'ar');
+        expect(e.message, contains('datos.energia.gob.ar'));
+      }
+    });
+
+    test('DioExceptionType.unknown with CERT in message is classified as cert error', () async {
+      // Some platforms (older Android, Windows) surface cert failures as
+      // `DioExceptionType.unknown` with a `HandshakeException` in `error`.
+      final dio = Dio()
+        ..httpClientAdapter = _ThrowingAdapter(
+          (opts) => DioException(
+            type: DioExceptionType.unknown,
+            requestOptions: opts,
+            error: 'HandshakeException: Handshake error in client '
+                '(CERTIFICATE_VERIFY_FAILED: certificate has expired)',
+            message: 'HandshakeException',
+          ),
+        );
+      final service = ArgentinaStationService.withDio(dio);
+
+      expect(
+        () => service.searchStations(params),
+        throwsA(isA<UpstreamCertificateException>()),
+      );
+    });
+
+    test('DioExceptionType.unknown without cert hints falls back to ApiException', () async {
+      // Non-cert unknown errors should NOT be mis-classified as cert errors —
+      // the user gets the regular network-error path.
+      final dio = Dio()
+        ..httpClientAdapter = _ThrowingAdapter(
+          (opts) => DioException(
+            type: DioExceptionType.unknown,
+            requestOptions: opts,
+            message: 'something else went wrong',
+          ),
+        );
+      final service = ArgentinaStationService.withDio(dio);
+
+      expect(
+        () => service.searchStations(params),
+        throwsA(
+          allOf(
+            isA<ApiException>(),
+            isNot(isA<UpstreamCertificateException>()),
+          ),
+        ),
+      );
+    });
+
+    test('DioExceptionType.connectionTimeout is NOT treated as cert error', () async {
+      final dio = Dio()
+        ..httpClientAdapter = _ThrowingAdapter(
+          (opts) => DioException(
+            type: DioExceptionType.connectionTimeout,
+            requestOptions: opts,
+          ),
+        );
+      final service = ArgentinaStationService.withDio(dio);
+
+      expect(
+        () => service.searchStations(params),
+        throwsA(
+          allOf(
+            isA<ApiException>(),
+            isNot(isA<UpstreamCertificateException>()),
+          ),
+        ),
+      );
+    });
+  });
+}
+
+/// Tiny HTTP adapter that always throws whatever the supplied builder returns.
+class _ThrowingAdapter implements HttpClientAdapter {
+  _ThrowingAdapter(this._build);
+
+  final DioException Function(RequestOptions) _build;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<List<int>>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    throw _build(options);
+  }
+
+  @override
+  void close({bool force = false}) {}
 }
 
 /// Expected CSV header columns (mirrors the service's validation).

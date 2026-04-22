@@ -1014,6 +1014,12 @@
   "ratingDescPrivate": "Mit Ihrer Datenbank synchronisiert (nicht für andere sichtbar)",
   "ratingDescShared": "Für alle Nutzer Ihrer Datenbank sichtbar",
   "errorNoEvApiKey": "OpenChargeMap-API-Schlüssel nicht konfiguriert. Fügen Sie einen in den Einstellungen hinzu, um Ladestationen zu suchen.",
+  "errorUpstreamCertExpired": "Der Datenanbieter ({host}) verwendet ein abgelaufenes oder ungültiges TLS-Zertifikat. Die App kann von dieser Quelle keine Daten laden, bis der Anbieter das Problem behebt. Bitte wenden Sie sich an {host}.",
+  "@errorUpstreamCertExpired": {
+    "placeholders": {
+      "host": { "type": "String" }
+    }
+  },
   "offlineLabel": "Offline",
   "fallbackSummary": "{failed} nicht verfügbar. Verwende {current}.",
   "errorTitleApiKey": "API-Schlüssel erforderlich",
