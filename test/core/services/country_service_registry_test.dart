@@ -83,12 +83,12 @@ void main() {
     });
 
     group('requiresApiKey', () {
-      test('DE and KR require API keys', () {
+      test('DE, KR, and CL require API keys', () {
         final keyed = CountryServiceRegistry.entries
             .where((e) => e.requiresApiKey)
             .map((e) => e.countryCode)
             .toSet();
-        expect(keyed, equals({'DE', 'KR'}));
+        expect(keyed, equals({'DE', 'KR', 'CL'}));
       });
 
       test('FR does not require API key', () {
@@ -172,6 +172,11 @@ void main() {
       test('MX maps to mexicoApi', () {
         final entry = CountryServiceRegistry.entryFor('MX');
         expect(entry!.errorSource, equals(ServiceSource.mexicoApi));
+      });
+
+      test('CL maps to chileApi', () {
+        final entry = CountryServiceRegistry.entryFor('CL');
+        expect(entry!.errorSource, equals(ServiceSource.chileApi));
       });
     });
   });

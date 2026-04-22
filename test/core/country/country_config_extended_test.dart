@@ -2,9 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 
 void main() {
-  group('Countries.byCode for all 14 countries', () {
+  group('Countries.byCode for all 15 countries', () {
     final expectedCodes = [
-      'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'LU', 'SI', 'KR',
+      'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'LU', 'SI', 'KR', 'CL',
     ];
 
     for (final code in expectedCodes) {
@@ -105,6 +105,7 @@ void main() {
       expect(Countries.australia.currency, 'AUD');
       expect(Countries.mexico.currency, 'MXN');
       expect(Countries.southKorea.currency, 'KRW');
+      expect(Countries.chile.currency, 'CLP');
     });
   });
 
@@ -187,8 +188,8 @@ void main() {
   });
 
   group('CountryConfig requiresApiKey', () {
-    test('Germany and South Korea require an API key', () {
-      const keyedCodes = {'DE', 'KR'};
+    test('Germany, South Korea, and Chile require an API key', () {
+      const keyedCodes = {'DE', 'KR', 'CL'};
       for (final country in Countries.all) {
         if (keyedCodes.contains(country.code)) {
           expect(country.requiresApiKey, isTrue,

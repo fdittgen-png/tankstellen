@@ -6,6 +6,7 @@ import '../country/country_config.dart';
 import '../storage/storage_providers.dart';
 import 'impl/argentina_station_service.dart';
 import 'impl/australia_station_service.dart';
+import 'impl/chile_station_service.dart';
 import 'impl/demo_station_service.dart';
 import 'impl/denmark_station_service.dart';
 import 'impl/econtrol_station_service.dart';
@@ -150,6 +151,12 @@ class CountryServiceRegistry {
       requiresApiKey: true,
       createService: _createSouthKorea,
     ),
+    CountryServiceEntry(
+      countryCode: 'CL',
+      errorSource: ServiceSource.chileApi,
+      requiresApiKey: true,
+      createService: _createChile,
+    ),
   ];
 
   /// Lookup map built once from [entries] for O(1) access.
@@ -265,4 +272,18 @@ StationService _createSouthKorea(Ref ref) {
     return DemoStationService(countryCode: 'KR');
   }
   return SouthKoreaStationService(apiKey: apiKey);
+}
+
+/// Chile factory (#596). Reads the CNE "Bencina en Línea" developer
+/// API key from storage via [storageRepositoryProvider]. When no key
+/// is present we return [DemoStationService] so a Chilean user still
+/// sees realistic data until they register a free CNE key in
+/// Settings → API keys.
+StationService _createChile(Ref ref) {
+  final storage = ref.read(storageRepositoryProvider);
+  final apiKey = storage.getApiKey();
+  if (apiKey == null || apiKey.isEmpty) {
+    return DemoStationService(countryCode: 'CL');
+  }
+  return ChileStationService(apiKey: apiKey);
 }

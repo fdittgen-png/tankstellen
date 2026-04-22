@@ -1235,5 +1235,7 @@
     }
   },
   "southKoreaApiKeyRequired": "Register at OPINET to get a free API key",
-  "southKoreaApiProvider": "OPINET (KNOC)"
+  "southKoreaApiProvider": "OPINET (KNOC)",
+  "chileApiKeyRequired": "Register at CNE to get a free API key",
+  "chileApiProvider": "CNE Bencina en Linea"
 }

@@ -3032,4 +3032,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get southKoreaApiProvider => 'OPINET (KNOC)';
+
+  @override
+  String get chileApiKeyRequired =>
+      'Registrieren Sie sich bei CNE, um einen kostenlosen API-Schlüssel zu erhalten';
+
+  @override
+  String get chileApiProvider => 'CNE Bencina en Linea';
 }

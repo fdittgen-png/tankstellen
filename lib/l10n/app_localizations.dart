@@ -5676,6 +5676,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OPINET (KNOC)'**
   String get southKoreaApiProvider;
+
+  /// No description provided for @chileApiKeyRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Register at CNE to get a free API key'**
+  String get chileApiKeyRequired;
+
+  /// No description provided for @chileApiProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'CNE Bencina en Linea'**
+  String get chileApiProvider;
 }
 
 class _AppLocalizationsDelegate

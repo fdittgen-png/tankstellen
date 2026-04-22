@@ -46,9 +46,9 @@ void main() {
   });
 
   group('countryBoundingBoxes', () {
-    test('has entries for all 13 supported countries', () {
+    test('has entries for all 14 supported countries', () {
       const expectedCountries = [
-        'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'SI', 'KR',
+        'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'SI', 'KR', 'CL',
       ];
       for (final code in expectedCountries) {
         expect(countryBoundingBoxes.containsKey(code), isTrue,
@@ -220,6 +220,33 @@ void main() {
     test('KR bounding box rejects German coordinates', () {
       // Berlin sits at (52.52, 13.41) — must not be misattributed to KR.
       expect(countryBoundingBoxes['KR']!.contains(52.52, 13.41), isFalse);
+    });
+
+    test('Santiago → CL (#596 — CL lookup order wins over AR)', () {
+      // AR's generous box incidentally covers the Chilean cordillera.
+      // The lookup order must test CL first so Santiago does not fall
+      // through to Argentina.
+      expect(countryCodeFromLatLng(-33.45, -70.67), 'CL');
+    });
+
+    test('Punta Arenas → CL (southern extreme, #596)', () {
+      expect(countryCodeFromLatLng(-53.16, -70.91), 'CL');
+    });
+
+    test('Valparaíso → CL (coastal, #596)', () {
+      expect(countryCodeFromLatLng(-33.05, -71.61), 'CL');
+    });
+
+    test('Buenos Aires → AR (east of the Chilean strip)', () {
+      expect(countryCodeFromLatLng(-34.60, -58.38), 'AR');
+    });
+
+    test('CL bounding box rejects Buenos Aires', () {
+      expect(countryBoundingBoxes['CL']!.contains(-34.60, -58.38), isFalse);
+    });
+
+    test('CL bounding box rejects Rio de Janeiro', () {
+      expect(countryBoundingBoxes['CL']!.contains(-22.90, -43.20), isFalse);
     });
 
     test('returns null for mid-Atlantic coordinates', () {

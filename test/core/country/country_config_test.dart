@@ -3,14 +3,14 @@ import 'package:tankstellen/core/country/country_config.dart';
 
 void main() {
   group('Countries.all', () {
-    test('contains exactly 14 countries', () {
-      expect(Countries.all.length, equals(14));
+    test('contains exactly 15 countries', () {
+      expect(Countries.all.length, equals(15));
     });
 
     test('contains all expected country codes', () {
       final codes = Countries.all.map((c) => c.code).toSet();
       expect(codes, containsAll(
-        ['DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'LU', 'SI', 'KR'],
+        ['DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'LU', 'SI', 'KR', 'CL'],
       ));
     });
 
