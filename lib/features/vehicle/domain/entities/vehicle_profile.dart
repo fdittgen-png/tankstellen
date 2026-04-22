@@ -93,6 +93,27 @@ abstract class VehicleProfile with _$VehicleProfile {
     double? tankCapacityL,
     String? preferredFuelType,
 
+    // Engine parameters for the speed-density fuel-rate fallback
+    // (#812). Only populated when the VIN decoder or the user's
+    // manual onboarding entry provides them. `readFuelRateLPerHour`
+    // on a vehicle without these falls back to its generic 1.0 L /
+    // η_v 0.85 defaults — still better than the NO DATA blanks the
+    // Peugeot 107 class was producing before #810.
+    //
+    //   engineDisplacementCc: total swept volume in cubic
+    //     centimetres (e.g. 998 for a 1.0 L 1KR-FE). Null when
+    //     unknown — the math falls back to 1000 cc.
+    //   engineCylinders: used by future features (firing-event-
+    //     based fuel estimation, engine-stress indicators). No
+    //     default — null is honest.
+    //   volumetricEfficiency: 0.60–0.95 range. Default 0.85 is
+    //     reasonable for a typical NA petrol engine at cruise.
+    //     Adaptive calibration (#815) will narrow this per vehicle
+    //     from tankful reconciliation.
+    int? engineDisplacementCc,
+    int? engineCylinders,
+    @Default(0.85) double volumetricEfficiency,
+
     // OBD2 adapter pairing (#784). Persisted so the app can
     // transparently reconnect on launch without prompting the user
     // again. Both fields are nullable — unpaired vehicles carry

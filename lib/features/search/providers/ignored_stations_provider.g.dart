@@ -65,7 +65,7 @@ final class IgnoredStationsProvider
   }
 }
 
-String _$ignoredStationsHash() => r'468acd69e52460f46f633be68a4092c01f19efa8';
+String _$ignoredStationsHash() => r'7f656b4ccdb9b582c0306f0441bf2a97acb67676';
 
 /// Manages the user's list of ignored (hidden) station IDs.
 ///
