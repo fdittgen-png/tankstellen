@@ -20,6 +20,7 @@ import '../core/sync/supabase_client.dart';
 import '../core/utils/edge_to_edge.dart';
 import '../features/profile/data/repositories/profile_repository.dart';
 import '../features/widget/data/home_widget_service.dart';
+import '../features/widget/providers/nearest_widget_refresh_provider.dart';
 
 /// Drives the cold-start sequence in well-defined phases instead of one
 /// monolithic `main()` body. Splitting the work makes failures observable
@@ -281,6 +282,15 @@ class AppInitializer {
       container.read(traceRecorderProvider).record(error, stack);
       return true;
     };
+
+    // #609 — kick the 2-minute nearest-widget heartbeat so the home-screen
+    // widget stays fresh while the app is running. The provider is
+    // keepAlive and owns its own Timer; disposal cancels it cleanly.
+    try {
+      container.read(nearestWidgetRefreshProvider);
+    } catch (e) {
+      debugPrint('AppInitializer: nearestWidgetRefresh start failed: $e');
+    }
 
     StartupTimer.instance.mark('first_frame');
     StartupTimer.instance.finish();

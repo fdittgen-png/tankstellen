@@ -80,6 +80,12 @@ object StationWidgetRenderer {
         val updatedAt: String?
         val emptyText: Int
         val nameRes: Int
+        // #609 — nearest-widget flags the data source: 'no_gps' when the
+        // app has never obtained a fix, 'no_network' when the search API
+        // is unreachable and no prior payload exists, 'isStale' when we
+        // are showing a previous successful payload as a fallback.
+        var emptyReason = ""
+        var isStale = false
         if (mode == MODE_FAVORITES) {
             stationsJson = prefs.getString("stations_json", "[]") ?: "[]"
             updatedAt = prefs.getString("updated_at", null)
@@ -90,6 +96,8 @@ object StationWidgetRenderer {
             updatedAt = prefs.getString("nearest_updated_at", null)
             emptyText = R.string.nearest_widget_empty
             nameRes = R.string.nearest_widget_name
+            emptyReason = prefs.getString("nearest_empty_reason", "") ?: ""
+            isStale = prefs.getBoolean("nearest_is_stale", false)
         }
 
         val views = RemoteViews(context.packageName, R.layout.station_widget_layout)
@@ -142,7 +150,15 @@ object StationWidgetRenderer {
         }
 
         if (stations.length() == 0) {
-            views.setTextViewText(R.id.widget_empty, context.getString(emptyText))
+            // #609 — surface a concrete hint when the list is empty because
+            // we don't know the user's location yet (no GPS fix). Falls
+            // back to the generic localised empty string otherwise.
+            val emptyString = when (emptyReason) {
+                "no_gps" -> "Turn on location in the app to see nearby stations"
+                "no_network" -> context.getString(emptyText)
+                else -> context.getString(emptyText)
+            }
+            views.setTextViewText(R.id.widget_empty, emptyString)
             views.setViewVisibility(R.id.widget_empty, View.VISIBLE)
             views.setViewVisibility(R.id.station_list, View.GONE)
         } else {
@@ -161,7 +177,14 @@ object StationWidgetRenderer {
         if (updatedAt != null) {
             try {
                 val fmt = SimpleDateFormat("HH:mm", Locale.getDefault())
-                views.setTextViewText(R.id.widget_updated_at, fmt.format(Date()))
+                // #609 — prefix a stale dot when we're showing a prior
+                // payload (network outage fallback). Mirrors the "cache"
+                // freshness hint the app shows in the search list.
+                val stamp = fmt.format(Date())
+                views.setTextViewText(
+                    R.id.widget_updated_at,
+                    if (isStale) "• $stamp" else stamp,
+                )
             } catch (e: Exception) {
                 views.setTextViewText(R.id.widget_updated_at, "")
             }
@@ -185,7 +208,13 @@ object StationWidgetRenderer {
             station.optString("brand", station.optString("name", "Station")),
         )
 
-        val distanceKm = station.optDouble("distance_km", Double.NaN)
+        // #609 — the real-search payload writes `distanceKm`; the legacy
+        // favorites payload still uses `distance_km`. Support both so the
+        // Kotlin widget survives either data producer.
+        val distanceKm = station.optDouble(
+            "distanceKm",
+            station.optDouble("distance_km", Double.NaN),
+        )
         if (!distanceKm.isNaN()) {
             row.setTextViewText(
                 R.id.station_distance,
@@ -211,19 +240,23 @@ object StationWidgetRenderer {
         val prefCode = station.optString("preferred_fuel_code", "")
         val prefPrice = station.optDouble("preferred_fuel_price", Double.NaN)
         val fallbackE10 = station.optDouble("e10", Double.NaN)
-        val (label, price) = when {
+        // #609 — when the Flutter builder sent a pre-formatted price
+        // (nearest real-search payload), prefer that over the raw double
+        // so decimals + currency match the search-results list exactly.
+        val formattedPrice = station.optString("priceFormatted", "")
+        val (label, priceText) = when {
+            prefCode.isNotBlank() && formattedPrice.isNotBlank() ->
+                prefCode.uppercase(Locale.getDefault()) to
+                    "$formattedPrice $currency".trim()
             prefCode.isNotBlank() && !prefPrice.isNaN() ->
-                prefCode.uppercase(Locale.getDefault()) to prefPrice
-            !fallbackE10.isNaN() -> "E10" to fallbackE10
-            else -> "" to Double.NaN
+                prefCode.uppercase(Locale.getDefault()) to
+                    String.format(Locale.getDefault(), "%.3f %s", prefPrice, currency).trim()
+            !fallbackE10.isNaN() -> "E10" to
+                String.format(Locale.getDefault(), "%.3f %s", fallbackE10, currency).trim()
+            else -> "" to "--"
         }
         row.setTextViewText(R.id.station_main_label, label)
-        row.setTextViewText(
-            R.id.station_main_price,
-            if (!price.isNaN())
-                String.format(Locale.getDefault(), "%.3f %s", price, currency).trim()
-            else "--",
-        )
+        row.setTextViewText(R.id.station_main_price, priceText)
 
         val isOpen = station.optBoolean("isOpen", false)
         row.setTextViewText(
