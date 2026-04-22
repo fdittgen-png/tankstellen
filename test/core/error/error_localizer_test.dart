@@ -72,6 +72,35 @@ void main() {
       expect(msg, contains('load data'));
     });
 
+    test('UpstreamCertificateException names the provider host (#837)', () {
+      final msg = ErrorLocalizer.localize(
+        const UpstreamCertificateException(
+          host: 'datos.energia.gob.ar',
+          countryCode: 'ar',
+          detail: 'HandshakeException: certificate has expired',
+        ),
+        null,
+      );
+      // The user has to know WHO to contact — the host must appear in the
+      // message, and we must mention the cert problem so the blame is on
+      // the provider, not the app.
+      expect(msg, contains('datos.energia.gob.ar'));
+      expect(msg.toLowerCase(), contains('certificate'));
+    });
+
+    test('UpstreamCertificateException does not leak raw Dart error text', () {
+      final msg = ErrorLocalizer.localize(
+        const UpstreamCertificateException(
+          host: 'example.com',
+          detail: 'HandshakeException: bad cert',
+        ),
+        null,
+      );
+      // The low-level `HandshakeException` string is for logs, not for users.
+      expect(msg.contains('HandshakeException'), isFalse,
+          reason: 'Raw Dart exception class should not reach the UI');
+    });
+
     test('CacheException returns cache error', () {
       final msg = ErrorLocalizer.localize(
         const CacheException(message: 'corrupt'),
@@ -127,6 +156,7 @@ void main() {
         const LocationException(message: 'test'),
         const NoApiKeyException(),
         const ServiceChainExhaustedException(errors: []),
+        const UpstreamCertificateException(host: 'example.com'),
         const CacheException(message: 'test'),
         DioException(
           requestOptions: RequestOptions(),

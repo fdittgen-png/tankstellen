@@ -4675,6 +4675,12 @@ abstract class AppLocalizations {
   /// **'OpenChargeMap API key not configured. Add one in Settings to search EV charging stations.'**
   String get errorNoEvApiKey;
 
+  /// No description provided for @errorUpstreamCertExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'The data provider ({host}) is serving an expired or invalid TLS certificate. The app cannot load data from this source until the provider fixes it. Please contact {host}.'**
+  String errorUpstreamCertExpired(String host);
+
   /// No description provided for @offlineLabel.
   ///
   /// In en, this message translates to:

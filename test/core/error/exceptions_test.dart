@@ -167,6 +167,7 @@ void main() {
         const NoApiKeyException(),
         const NoEvApiKeyException(),
         const ServiceChainExhaustedException(errors: []),
+        const UpstreamCertificateException(host: 'example.com'),
       ];
       for (final e in exceptions) {
         // This switch must compile - proves exhaustiveness of sealed class
@@ -177,6 +178,7 @@ void main() {
           NoApiKeyException() => 'nokey',
           NoEvApiKeyException() => 'noevkey',
           ServiceChainExhaustedException() => 'chain',
+          UpstreamCertificateException() => 'cert',
         };
         expect(result, isNotEmpty);
       }

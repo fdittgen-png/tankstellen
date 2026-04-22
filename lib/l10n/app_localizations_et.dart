@@ -2464,6 +2464,11 @@ class AppLocalizationsEt extends AppLocalizations {
       'OpenChargeMap API key not configured. Add one in Settings to search EV charging stations.';
 
   @override
+  String errorUpstreamCertExpired(String host) {
+    return 'The data provider ($host) is serving an expired or invalid TLS certificate. The app cannot load data from this source until the provider fixes it. Please contact $host.';
+  }
+
+  @override
   String get offlineLabel => 'Offline';
 
   @override
