@@ -15,7 +15,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ServiceReminder {
 
- String get id;/// Short label — "Oil change", "Tires", "Inspection". Stored
+ String get id;/// The vehicle this reminder belongs to. Fills-ups are checked
+/// only against reminders that match the fill-up's vehicleId.
+ String get vehicleId;/// Short label — "Oil change", "Tires", "Inspection". Stored
 /// verbatim; localisation happens in the UI if the label matches
 /// a known preset.
  String get label;/// Service interval in km between occurrences.
@@ -23,7 +25,14 @@ mixin _$ServiceReminder {
 /// added the reminder but hasn't yet recorded a completion — the
 /// first fill-up that brings the odometer above `intervalKm`
 /// will trip the alert.
- double? get lastServiceOdometerKm;
+ double? get lastServiceOdometerKm;/// Toggle for pausing a reminder without deleting it — the
+/// trigger skips inactive reminders. Defaults to `true` so a new
+/// reminder is armed immediately.
+ bool get isActive;/// Set to `true` after the trigger fires and the notification
+/// has been shown; reset by `markDone`. The vehicle edit row
+/// shows a badge when this is `true` so the user can confirm
+/// completion.
+ bool get pendingAcknowledgment;
 /// Create a copy of ServiceReminder
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -36,16 +45,16 @@ $ServiceReminderCopyWith<ServiceReminder> get copyWith => _$ServiceReminderCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServiceReminder&&(identical(other.id, id) || other.id == id)&&(identical(other.label, label) || other.label == label)&&(identical(other.intervalKm, intervalKm) || other.intervalKm == intervalKm)&&(identical(other.lastServiceOdometerKm, lastServiceOdometerKm) || other.lastServiceOdometerKm == lastServiceOdometerKm));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ServiceReminder&&(identical(other.id, id) || other.id == id)&&(identical(other.vehicleId, vehicleId) || other.vehicleId == vehicleId)&&(identical(other.label, label) || other.label == label)&&(identical(other.intervalKm, intervalKm) || other.intervalKm == intervalKm)&&(identical(other.lastServiceOdometerKm, lastServiceOdometerKm) || other.lastServiceOdometerKm == lastServiceOdometerKm)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.pendingAcknowledgment, pendingAcknowledgment) || other.pendingAcknowledgment == pendingAcknowledgment));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,label,intervalKm,lastServiceOdometerKm);
+int get hashCode => Object.hash(runtimeType,id,vehicleId,label,intervalKm,lastServiceOdometerKm,isActive,pendingAcknowledgment);
 
 @override
 String toString() {
-  return 'ServiceReminder(id: $id, label: $label, intervalKm: $intervalKm, lastServiceOdometerKm: $lastServiceOdometerKm)';
+  return 'ServiceReminder(id: $id, vehicleId: $vehicleId, label: $label, intervalKm: $intervalKm, lastServiceOdometerKm: $lastServiceOdometerKm, isActive: $isActive, pendingAcknowledgment: $pendingAcknowledgment)';
 }
 
 
@@ -56,7 +65,7 @@ abstract mixin class $ServiceReminderCopyWith<$Res>  {
   factory $ServiceReminderCopyWith(ServiceReminder value, $Res Function(ServiceReminder) _then) = _$ServiceReminderCopyWithImpl;
 @useResult
 $Res call({
- String id, String label, double intervalKm, double? lastServiceOdometerKm
+ String id, String vehicleId, String label, double intervalKm, double? lastServiceOdometerKm, bool isActive, bool pendingAcknowledgment
 });
 
 
@@ -73,13 +82,16 @@ class _$ServiceReminderCopyWithImpl<$Res>
 
 /// Create a copy of ServiceReminder
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? label = null,Object? intervalKm = null,Object? lastServiceOdometerKm = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? vehicleId = null,Object? label = null,Object? intervalKm = null,Object? lastServiceOdometerKm = freezed,Object? isActive = null,Object? pendingAcknowledgment = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,vehicleId: null == vehicleId ? _self.vehicleId : vehicleId // ignore: cast_nullable_to_non_nullable
 as String,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
 as String,intervalKm: null == intervalKm ? _self.intervalKm : intervalKm // ignore: cast_nullable_to_non_nullable
 as double,lastServiceOdometerKm: freezed == lastServiceOdometerKm ? _self.lastServiceOdometerKm : lastServiceOdometerKm // ignore: cast_nullable_to_non_nullable
-as double?,
+as double?,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,pendingAcknowledgment: null == pendingAcknowledgment ? _self.pendingAcknowledgment : pendingAcknowledgment // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -164,10 +176,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String label,  double intervalKm,  double? lastServiceOdometerKm)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String vehicleId,  String label,  double intervalKm,  double? lastServiceOdometerKm,  bool isActive,  bool pendingAcknowledgment)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ServiceReminder() when $default != null:
-return $default(_that.id,_that.label,_that.intervalKm,_that.lastServiceOdometerKm);case _:
+return $default(_that.id,_that.vehicleId,_that.label,_that.intervalKm,_that.lastServiceOdometerKm,_that.isActive,_that.pendingAcknowledgment);case _:
   return orElse();
 
 }
@@ -185,10 +197,10 @@ return $default(_that.id,_that.label,_that.intervalKm,_that.lastServiceOdometerK
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String label,  double intervalKm,  double? lastServiceOdometerKm)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String vehicleId,  String label,  double intervalKm,  double? lastServiceOdometerKm,  bool isActive,  bool pendingAcknowledgment)  $default,) {final _that = this;
 switch (_that) {
 case _ServiceReminder():
-return $default(_that.id,_that.label,_that.intervalKm,_that.lastServiceOdometerKm);case _:
+return $default(_that.id,_that.vehicleId,_that.label,_that.intervalKm,_that.lastServiceOdometerKm,_that.isActive,_that.pendingAcknowledgment);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -205,10 +217,10 @@ return $default(_that.id,_that.label,_that.intervalKm,_that.lastServiceOdometerK
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String label,  double intervalKm,  double? lastServiceOdometerKm)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String vehicleId,  String label,  double intervalKm,  double? lastServiceOdometerKm,  bool isActive,  bool pendingAcknowledgment)?  $default,) {final _that = this;
 switch (_that) {
 case _ServiceReminder() when $default != null:
-return $default(_that.id,_that.label,_that.intervalKm,_that.lastServiceOdometerKm);case _:
+return $default(_that.id,_that.vehicleId,_that.label,_that.intervalKm,_that.lastServiceOdometerKm,_that.isActive,_that.pendingAcknowledgment);case _:
   return null;
 
 }
@@ -220,10 +232,13 @@ return $default(_that.id,_that.label,_that.intervalKm,_that.lastServiceOdometerK
 @JsonSerializable()
 
 class _ServiceReminder extends ServiceReminder {
-  const _ServiceReminder({required this.id, required this.label, required this.intervalKm, this.lastServiceOdometerKm}): super._();
+  const _ServiceReminder({required this.id, required this.vehicleId, required this.label, required this.intervalKm, this.lastServiceOdometerKm, this.isActive = true, this.pendingAcknowledgment = false}): super._();
   factory _ServiceReminder.fromJson(Map<String, dynamic> json) => _$ServiceReminderFromJson(json);
 
 @override final  String id;
+/// The vehicle this reminder belongs to. Fills-ups are checked
+/// only against reminders that match the fill-up's vehicleId.
+@override final  String vehicleId;
 /// Short label — "Oil change", "Tires", "Inspection". Stored
 /// verbatim; localisation happens in the UI if the label matches
 /// a known preset.
@@ -235,6 +250,15 @@ class _ServiceReminder extends ServiceReminder {
 /// first fill-up that brings the odometer above `intervalKm`
 /// will trip the alert.
 @override final  double? lastServiceOdometerKm;
+/// Toggle for pausing a reminder without deleting it — the
+/// trigger skips inactive reminders. Defaults to `true` so a new
+/// reminder is armed immediately.
+@override@JsonKey() final  bool isActive;
+/// Set to `true` after the trigger fires and the notification
+/// has been shown; reset by `markDone`. The vehicle edit row
+/// shows a badge when this is `true` so the user can confirm
+/// completion.
+@override@JsonKey() final  bool pendingAcknowledgment;
 
 /// Create a copy of ServiceReminder
 /// with the given fields replaced by the non-null parameter values.
@@ -249,16 +273,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ServiceReminder&&(identical(other.id, id) || other.id == id)&&(identical(other.label, label) || other.label == label)&&(identical(other.intervalKm, intervalKm) || other.intervalKm == intervalKm)&&(identical(other.lastServiceOdometerKm, lastServiceOdometerKm) || other.lastServiceOdometerKm == lastServiceOdometerKm));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ServiceReminder&&(identical(other.id, id) || other.id == id)&&(identical(other.vehicleId, vehicleId) || other.vehicleId == vehicleId)&&(identical(other.label, label) || other.label == label)&&(identical(other.intervalKm, intervalKm) || other.intervalKm == intervalKm)&&(identical(other.lastServiceOdometerKm, lastServiceOdometerKm) || other.lastServiceOdometerKm == lastServiceOdometerKm)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.pendingAcknowledgment, pendingAcknowledgment) || other.pendingAcknowledgment == pendingAcknowledgment));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,label,intervalKm,lastServiceOdometerKm);
+int get hashCode => Object.hash(runtimeType,id,vehicleId,label,intervalKm,lastServiceOdometerKm,isActive,pendingAcknowledgment);
 
 @override
 String toString() {
-  return 'ServiceReminder(id: $id, label: $label, intervalKm: $intervalKm, lastServiceOdometerKm: $lastServiceOdometerKm)';
+  return 'ServiceReminder(id: $id, vehicleId: $vehicleId, label: $label, intervalKm: $intervalKm, lastServiceOdometerKm: $lastServiceOdometerKm, isActive: $isActive, pendingAcknowledgment: $pendingAcknowledgment)';
 }
 
 
@@ -269,7 +293,7 @@ abstract mixin class _$ServiceReminderCopyWith<$Res> implements $ServiceReminder
   factory _$ServiceReminderCopyWith(_ServiceReminder value, $Res Function(_ServiceReminder) _then) = __$ServiceReminderCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String label, double intervalKm, double? lastServiceOdometerKm
+ String id, String vehicleId, String label, double intervalKm, double? lastServiceOdometerKm, bool isActive, bool pendingAcknowledgment
 });
 
 
@@ -286,13 +310,16 @@ class __$ServiceReminderCopyWithImpl<$Res>
 
 /// Create a copy of ServiceReminder
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? label = null,Object? intervalKm = null,Object? lastServiceOdometerKm = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? vehicleId = null,Object? label = null,Object? intervalKm = null,Object? lastServiceOdometerKm = freezed,Object? isActive = null,Object? pendingAcknowledgment = null,}) {
   return _then(_ServiceReminder(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,vehicleId: null == vehicleId ? _self.vehicleId : vehicleId // ignore: cast_nullable_to_non_nullable
 as String,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
 as String,intervalKm: null == intervalKm ? _self.intervalKm : intervalKm // ignore: cast_nullable_to_non_nullable
 as double,lastServiceOdometerKm: freezed == lastServiceOdometerKm ? _self.lastServiceOdometerKm : lastServiceOdometerKm // ignore: cast_nullable_to_non_nullable
-as double?,
+as double?,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,pendingAcknowledgment: null == pendingAcknowledgment ? _self.pendingAcknowledgment : pendingAcknowledgment // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

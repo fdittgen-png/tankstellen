@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/storage_providers.dart';
+import '../../vehicle/providers/service_reminder_providers.dart';
 import '../data/repositories/fill_up_repository.dart';
 import '../domain/entities/consumption_stats.dart';
 import '../domain/entities/eco_score.dart';
@@ -26,10 +28,33 @@ class FillUpList extends _$FillUpList {
   }
 
   /// Insert a new fill-up entry and refresh the list.
+  ///
+  /// After saving, runs the odometer-based service-reminder check
+  /// (#584) for the fill-up's vehicle. Failures in the reminder
+  /// path are swallowed — logging a fill-up must never fail because
+  /// a downstream side-effect did.
   Future<void> add(FillUp fillUp) async {
     final repo = ref.read(fillUpRepositoryProvider);
     await repo.save(fillUp);
     state = repo.getAll();
+    await _evaluateReminders(fillUp);
+  }
+
+  Future<void> _evaluateReminders(FillUp fillUp) async {
+    final vehicleId = fillUp.vehicleId;
+    if (vehicleId == null || fillUp.odometerKm <= 0) return;
+    try {
+      final evaluator = ref.read(serviceReminderEvaluatorProvider);
+      await evaluator.evaluate(
+        vehicleId: vehicleId,
+        currentOdometerKm: fillUp.odometerKm,
+      );
+      // Invalidate the reminder list so the vehicle edit screen
+      // picks up the new `pendingAcknowledgment` flag immediately.
+      ref.invalidate(serviceReminderListProvider);
+    } catch (e) {
+      debugPrint('FillUpList: reminder evaluation failed: $e');
+    }
   }
 
   /// Persist edits to an existing fill-up (matched by id) and refresh.

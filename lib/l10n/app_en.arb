@@ -1212,5 +1212,26 @@
   "wrongLpgPrice": "Wrong LPG price",
   "wrongStationName": "Wrong station name",
   "wrongStationAddress": "Wrong address",
-  "independentStation": "Independent station"
+  "independentStation": "Independent station",
+  "serviceRemindersSection": "Service reminders",
+  "serviceRemindersEmpty": "No reminders yet — pick a preset above.",
+  "addServiceReminder": "Add reminder",
+  "serviceReminderPresetOil": "Oil (15,000 km)",
+  "serviceReminderPresetOilLabel": "Oil change",
+  "serviceReminderPresetTires": "Tires (20,000 km)",
+  "serviceReminderPresetTiresLabel": "Tires",
+  "serviceReminderPresetInspection": "Inspection (30,000 km)",
+  "serviceReminderPresetInspectionLabel": "Inspection",
+  "serviceReminderLabel": "Label",
+  "serviceReminderInterval": "Interval (km)",
+  "serviceReminderLastService": "Last service",
+  "serviceReminderMarkDone": "Mark as done",
+  "serviceReminderDueTitle": "Service due",
+  "serviceReminderDueBody": "{label} is due — {kmOver} km past the interval.",
+  "@serviceReminderDueBody": {
+    "placeholders": {
+      "label": { "type": "String", "example": "Oil change" },
+      "kmOver": { "type": "int", "example": "250" }
+    }
+  }
 }

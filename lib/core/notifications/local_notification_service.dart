@@ -20,6 +20,16 @@ class LocalNotificationService implements NotificationService {
   static const _channelDescription =
       'Notifications when fuel prices drop below your target';
 
+  /// #584 — separate channel for service reminders so the user can
+  /// independently mute maintenance reminders without muting price
+  /// drops (and vice versa). Default importance is lower than price
+  /// alerts — a missed oil change is less time-sensitive than a
+  /// short-lived price dip.
+  static const _serviceChannelId = 'service_reminders';
+  static const _serviceChannelName = 'Service reminders';
+  static const _serviceChannelDescription =
+      'Reminders when your odometer crosses a scheduled service interval';
+
   @override
   Future<void> initialize() async {
     const androidSettings =
@@ -41,6 +51,25 @@ class LocalNotificationService implements NotificationService {
         channelDescription: _channelDescription,
         importance: Importance.high,
         priority: Priority.high,
+      ),
+    );
+    await plugin.show(
+        id: id, title: title, body: body, notificationDetails: details);
+  }
+
+  @override
+  Future<void> showServiceReminder({
+    required int id,
+    required String title,
+    required String body,
+  }) async {
+    const details = NotificationDetails(
+      android: AndroidNotificationDetails(
+        _serviceChannelId,
+        _serviceChannelName,
+        channelDescription: _serviceChannelDescription,
+        importance: Importance.defaultImportance,
+        priority: Priority.defaultPriority,
       ),
     );
     await plugin.show(

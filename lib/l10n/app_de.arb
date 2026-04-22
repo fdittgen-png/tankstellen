@@ -1174,5 +1174,20 @@
   "wrongLpgPrice": "Falscher LPG Preis",
   "wrongStationName": "Falscher Tankstellenname",
   "wrongStationAddress": "Falsche Adresse",
-  "independentStation": "Unabhängige Tankstelle"
+  "independentStation": "Unabhängige Tankstelle",
+  "serviceRemindersSection": "Wartungserinnerungen",
+  "serviceRemindersEmpty": "Noch keine Erinnerungen — wähle oben eine Vorlage.",
+  "addServiceReminder": "Erinnerung hinzufügen",
+  "serviceReminderPresetOil": "Öl (15.000 km)",
+  "serviceReminderPresetOilLabel": "Ölwechsel",
+  "serviceReminderPresetTires": "Reifen (20.000 km)",
+  "serviceReminderPresetTiresLabel": "Reifen",
+  "serviceReminderPresetInspection": "Inspektion (30.000 km)",
+  "serviceReminderPresetInspectionLabel": "Inspektion",
+  "serviceReminderLabel": "Bezeichnung",
+  "serviceReminderInterval": "Intervall (km)",
+  "serviceReminderLastService": "Letzter Service",
+  "serviceReminderMarkDone": "Als erledigt markieren",
+  "serviceReminderDueTitle": "Wartung fällig",
+  "serviceReminderDueBody": "{label} ist fällig — {kmOver} km über dem Intervall."
 }

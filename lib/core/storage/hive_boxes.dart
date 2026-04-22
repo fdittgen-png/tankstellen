@@ -40,6 +40,12 @@ class HiveBoxes {
   /// OBD2 boxes.
   static const String obd2SupportedPids = 'obd2_supported_pids';
 
+  /// Odometer-based service reminders (#584). One JSON payload per
+  /// reminder keyed by reminder id. Not PII (label + interval +
+  /// odometer) — unencrypted to keep startup cheap, same as
+  /// [obd2Baselines] and [achievements].
+  static const String serviceReminders = 'service_reminders';
+
   static const _encryptedBoxes = {
     settings,
     profiles,
@@ -125,6 +131,8 @@ class HiveBoxes {
     // mirroring the storage idiom used by the other OBD2 boxes so
     // we don't need a custom adapter.
     await Hive.openBox<String>(obd2SupportedPids);
+    // #584 — odometer-based service reminders: one entry per reminder.
+    await Hive.openBox<String>(serviceReminders);
   }
 
   /// Initialize Hive in a background isolate with proper encryption.
@@ -163,6 +171,10 @@ class HiveBoxes {
     await Hive.openBox(profiles);
     await Hive.openBox(priceHistory);
     await Hive.openBox(alerts);
+    // #584 — service reminders live in their own box so tests that
+    // exercise the vehicle feature can open it without pulling in the
+    // rest of the app. String-typed to match runtime.
+    await Hive.openBox<String>(serviceReminders);
   }
 
   /// Safely converts any Hive map to a typed map.

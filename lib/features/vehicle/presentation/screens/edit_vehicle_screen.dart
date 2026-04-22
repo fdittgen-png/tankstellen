@@ -5,10 +5,12 @@ import 'package:uuid/uuid.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/presentation/widgets/vehicle_adapter_section.dart';
 import '../../../consumption/presentation/widgets/vehicle_baseline_section.dart';
+import '../../../consumption/providers/consumption_providers.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/entities/vehicle_profile.dart';
 import '../../providers/vehicle_providers.dart';
+import '../widgets/service_reminder_section.dart';
 import '../widgets/vehicle_combustion_section.dart';
 import '../widgets/vehicle_ev_section.dart';
 
@@ -173,6 +175,24 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
     Navigator.of(context).pop();
   }
 
+  /// Latest odometer reading logged for [vehicleId], picked from the
+  /// fill-up history (#584). Falls back to null so the reminder
+  /// section can prompt the user for a manual entry.
+  double? _latestOdometerKm(String vehicleId) {
+    try {
+      final fillUps = ref.watch(fillUpListProvider);
+      final forVehicle = fillUps.where((f) => f.vehicleId == vehicleId);
+      if (forVehicle.isEmpty) return null;
+      final latest = forVehicle.reduce(
+        (a, b) => a.odometerKm > b.odometerKm ? a : b,
+      );
+      return latest.odometerKm;
+    } catch (e) {
+      debugPrint('EditVehicleScreen: odometer lookup failed: $e');
+      return null;
+    }
+  }
+
   /// Translates a vehicle's type + stored `preferredFuelType` into the
   /// canonical [FuelType] the rest of the app uses (#710). EV always
   /// maps to electric; combustion parses via [FuelType.fromString].
@@ -282,6 +302,18 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
             if (_existingId != null) ...[
               const SizedBox(height: 24),
               VehicleBaselineSection(vehicleId: _existingId!),
+            ],
+            // Service reminders (#584). Needs a stable vehicle id —
+            // the id is the foreign key stored on each reminder — so
+            // the section only renders for saved vehicles. Users
+            // adding a new vehicle hit Save first, then return to
+            // edit and see this section.
+            if (_existingId != null) ...[
+              const SizedBox(height: 24),
+              ServiceReminderSection(
+                vehicleId: _existingId!,
+                currentOdometerKm: _latestOdometerKm(_existingId!),
+              ),
             ],
             const SizedBox(height: 32),
             FilledButton.icon(
