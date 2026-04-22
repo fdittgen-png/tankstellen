@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/widgets/animated_favorite_star.dart';
 import '../../../../core/widgets/brand_logo.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -61,11 +62,46 @@ class StationDetailScreen extends ConsumerWidget {
     final isFav = ref.watch(isFavoriteProvider(stationId));
     final l10n = AppLocalizations.of(context);
 
+    // #595 — derive a display title from the loaded station so the Hero
+    // flight from the search card lands on the matching brand/name.
+    // Falls back to the generic "Station" label until data loads.
+    final station = detailAsync.value?.data.station;
+    final String appBarTitle = station != null
+        ? (_hasRealBrand(station) ? station.brand : station.street)
+        : (AppLocalizations.of(context)?.search ?? 'Station');
+
     return Scaffold(
       appBar: AppBar(
         title: Semantics(
           header: true,
-          child: Text(AppLocalizations.of(context)?.search ?? 'Station'),
+          child: Hero(
+            tag: 'station-name-$stationId',
+            flightShuttleBuilder:
+                (ctx, animation, direction, fromCtx, toCtx) {
+              final theme = Theme.of(ctx);
+              return Material(
+                type: MaterialType.transparency,
+                child: DefaultTextStyle(
+                  style: theme.appBarTheme.titleTextStyle ??
+                      theme.textTheme.titleLarge ??
+                      const TextStyle(fontWeight: FontWeight.bold),
+                  child: Text(
+                    appBarTitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              );
+            },
+            child: Material(
+              type: MaterialType.transparency,
+              child: Text(
+                appBarTitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -76,7 +112,6 @@ class StationDetailScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.directions),
             onPressed: () {
-              final station = detailAsync.value?.data.station;
               if (station != null) {
                 NavigationUtils.openInMaps(station.lat, station.lng,
                     label: _hasRealBrand(station)
@@ -102,12 +137,8 @@ class StationDetailScreen extends ConsumerWidget {
             tooltip: l10n?.reportPrice ?? 'Report price',
           ),
           IconButton(
-            icon: Icon(
-              isFav ? Icons.star : Icons.star_border,
-              color: isFav ? Colors.amber : null,
-            ),
+            icon: AnimatedFavoriteStar(isFavorite: isFav),
             onPressed: () {
-              final station = detailAsync.value?.data.station;
               ref.read(favoritesProvider.notifier).toggle(stationId, stationData: station);
             },
             tooltip: isFav ? 'Remove from favorites' : 'Add to favorites',
