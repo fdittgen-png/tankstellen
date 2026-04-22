@@ -46,6 +46,10 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
             ),
       tankCapacityL: (json['tankCapacityL'] as num?)?.toDouble(),
       preferredFuelType: json['preferredFuelType'] as String?,
+      engineDisplacementCc: (json['engineDisplacementCc'] as num?)?.toInt(),
+      engineCylinders: (json['engineCylinders'] as num?)?.toInt(),
+      volumetricEfficiency:
+          (json['volumetricEfficiency'] as num?)?.toDouble() ?? 0.85,
       obd2AdapterMac: json['obd2AdapterMac'] as String?,
       obd2AdapterName: json['obd2AdapterName'] as String?,
     );
@@ -65,6 +69,9 @@ Map<String, dynamic> _$VehicleProfileToJson(_VehicleProfile instance) =>
       ),
       'tankCapacityL': instance.tankCapacityL,
       'preferredFuelType': instance.preferredFuelType,
+      'engineDisplacementCc': instance.engineDisplacementCc,
+      'engineCylinders': instance.engineCylinders,
+      'volumetricEfficiency': instance.volumetricEfficiency,
       'obd2AdapterMac': instance.obd2AdapterMac,
       'obd2AdapterName': instance.obd2AdapterName,
     };

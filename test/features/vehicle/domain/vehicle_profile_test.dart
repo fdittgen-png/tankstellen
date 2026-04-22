@@ -79,6 +79,60 @@ void main() {
           {ConnectorType.ccs, ConnectorType.type2});
     });
 
+    group('engine parameters for speed-density fallback (#812)', () {
+      test('defaults: no displacement/cylinders, η_v 0.85', () {
+        const v = VehicleProfile(id: 'abc', name: 'Car');
+        expect(v.engineDisplacementCc, isNull);
+        expect(v.engineCylinders, isNull);
+        expect(v.volumetricEfficiency, 0.85);
+      });
+
+      test('round-trips engine params through JSON — Peugeot 107 case', () {
+        const v = VehicleProfile(
+          id: 'peugeot-107',
+          name: 'Peugeot 107',
+          type: VehicleType.combustion,
+          engineDisplacementCc: 998,
+          engineCylinders: 3,
+          volumetricEfficiency: 0.80,
+        );
+        final restored = VehicleProfile.fromJson(v.toJson());
+        expect(restored.engineDisplacementCc, 998);
+        expect(restored.engineCylinders, 3);
+        expect(restored.volumetricEfficiency, closeTo(0.80, 0.001));
+      });
+
+      test('legacy JSON without engine fields still decodes — '
+          'backward compat on existing Hive profiles', () {
+        // Payload older than #812 — no engine keys at all. Must
+        // round-trip cleanly with the defaults filled in.
+        final json = {'id': 'old', 'name': 'Old'};
+        final v = VehicleProfile.fromJson(json);
+        expect(v.engineDisplacementCc, isNull);
+        expect(v.engineCylinders, isNull);
+        expect(v.volumetricEfficiency, 0.85);
+      });
+
+      test('copyWith lets callers update engine params without touching '
+          'unrelated fields', () {
+        const v = VehicleProfile(
+          id: 'x',
+          name: 'Corolla',
+          type: VehicleType.combustion,
+          tankCapacityL: 45,
+        );
+        final updated = v.copyWith(
+          engineDisplacementCc: 1600,
+          engineCylinders: 4,
+          volumetricEfficiency: 0.88,
+        );
+        expect(updated.tankCapacityL, 45);
+        expect(updated.engineDisplacementCc, 1600);
+        expect(updated.engineCylinders, 4);
+        expect(updated.volumetricEfficiency, 0.88);
+      });
+    });
+
     test('copyWith preserves unspecified fields', () {
       const v = VehicleProfile(
         id: 'a',
