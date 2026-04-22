@@ -4,7 +4,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/sync/supabase_client.dart';
 import '../../../core/sync/sync_provider.dart';
 import '../../../core/sync/alerts_sync.dart';
-import '../../../core/sync/sync_service.dart';
+import '../../../core/sync/favorites_sync.dart';
+import '../../../core/sync/user_data_sync.dart';
 import '../../alerts/providers/alert_provider.dart';
 import '../../favorites/providers/favorites_provider.dart';
 
@@ -69,7 +70,7 @@ class DataTransparencyController extends _$DataTransparencyController {
 
     state = state.copyWith(loading: true, clearError: true);
     try {
-      final data = await SyncService.fetchAllUserData();
+      final data = await UserDataSync.fetchAll();
       if (data.containsKey('error')) {
         state = state.copyWith(
           loading: false,
@@ -116,7 +117,7 @@ class DataTransparencyController extends _$DataTransparencyController {
         }
       }
 
-      await SyncService.syncFavorites(favoriteIds);
+      await FavoritesSync.merge(favoriteIds);
 
       final alerts = ref.read(alertProvider);
       debugPrint('DataTransparency: syncing ${alerts.length} local alerts');
@@ -134,7 +135,7 @@ class DataTransparencyController extends _$DataTransparencyController {
 
     state = state.copyWith(loading: true, clearError: true);
     try {
-      await SyncService.deleteAllUserData();
+      await UserDataSync.deleteAll();
       await load();
     } catch (e) {
       state = state.copyWith(loading: false, error: e.toString());

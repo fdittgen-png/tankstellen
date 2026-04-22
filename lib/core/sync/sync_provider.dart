@@ -6,9 +6,10 @@ import '../storage/storage_providers.dart';
 import 'community_config.dart';
 import 'supabase_client.dart';
 import 'sync_config.dart';
+import 'favorites_sync.dart';
 import 'ignored_stations_sync.dart';
 import 'ratings_sync.dart';
-import 'sync_service.dart';
+import 'user_data_sync.dart';
 
 part 'sync_provider.g.dart';
 
@@ -173,7 +174,7 @@ class SyncState extends _$SyncState {
       return;
     }
     try {
-      await SyncService.deleteAllUserData();
+      await UserDataSync.deleteAll();
       await TankSyncClient.signOut();
     } catch (e) {
       debugPrint('Delete account failed: $e');
@@ -203,7 +204,7 @@ class SyncState extends _$SyncState {
     Future.microtask(() async {
       try {
         final favIds = storage.getFavoriteIds();
-        if (favIds.isNotEmpty) await SyncService.syncFavorites(favIds);
+        if (favIds.isNotEmpty) await FavoritesSync.merge(favIds);
         final ignoredIds = storage.getIgnoredIds();
         if (ignoredIds.isNotEmpty) await IgnoredStationsSync.merge(ignoredIds);
         final ratings = storage.getRatings();

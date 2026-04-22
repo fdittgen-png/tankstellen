@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'alerts_sync.dart';
+import 'favorites_sync.dart';
 import 'sync_provider.dart';
-import 'sync_service.dart';
 
 /// Mixin for providers that need to sync changes to the server after local mutations.
 ///
@@ -13,7 +13,7 @@ mixin SyncAfterChangeMixin {
     try {
       final syncState = ref.read(syncStateProvider);
       if (syncState.enabled) {
-        await SyncService.syncFavorites(favoriteIds);
+        await FavoritesSync.merge(favoriteIds);
       }
     } catch (e) {
       debugPrint('SyncAfterChange: favorites sync failed: $e');
