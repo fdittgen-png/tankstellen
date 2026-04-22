@@ -3046,4 +3046,41 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get chileApiProvider => 'CNE Bencina en Linea';
+
+  @override
+  String get vinLabel => 'FIN (optional)';
+
+  @override
+  String get vinDecodeTooltip => 'FIN entschlüsseln';
+
+  @override
+  String get vinConfirmTitle => 'Ist das Ihr Auto?';
+
+  @override
+  String vinConfirmBody(
+    String year,
+    String make,
+    String model,
+    String displacement,
+    String cylinders,
+    String fuel,
+  ) {
+    return '$year $make $model — ${displacement}L, $cylinders-Zyl., $fuel';
+  }
+
+  @override
+  String get vinConfirmAction => 'Ja, automatisch ausfüllen';
+
+  @override
+  String get vinModifyAction => 'Manuell anpassen';
+
+  @override
+  String get vinPartialInfoNote =>
+      'Teilinfo (offline). Sie können die Felder unten bearbeiten.';
+
+  @override
+  String get vinDecodeError => 'Diese FIN konnte nicht entschlüsselt werden';
+
+  @override
+  String get vinInvalidFormat => 'Ungültiges FIN-Format';
 }

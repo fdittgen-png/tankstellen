@@ -1195,5 +1195,14 @@
   "southKoreaApiKeyRequired": "Registrieren Sie sich bei OPINET, um einen kostenlosen API-Schlüssel zu erhalten",
   "southKoreaApiProvider": "OPINET (KNOC)",
   "chileApiKeyRequired": "Registrieren Sie sich bei CNE, um einen kostenlosen API-Schlüssel zu erhalten",
-  "chileApiProvider": "CNE Bencina en Linea"
+  "chileApiProvider": "CNE Bencina en Linea",
+  "vinLabel": "FIN (optional)",
+  "vinDecodeTooltip": "FIN entschlüsseln",
+  "vinConfirmTitle": "Ist das Ihr Auto?",
+  "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders}-Zyl., {fuel}",
+  "vinConfirmAction": "Ja, automatisch ausfüllen",
+  "vinModifyAction": "Manuell anpassen",
+  "vinPartialInfoNote": "Teilinfo (offline). Sie können die Felder unten bearbeiten.",
+  "vinDecodeError": "Diese FIN konnte nicht entschlüsselt werden",
+  "vinInvalidFormat": "Ungültiges FIN-Format"
 }

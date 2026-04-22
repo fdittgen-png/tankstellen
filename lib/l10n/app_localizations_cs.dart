@@ -3024,4 +3024,41 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get chileApiProvider => 'CNE Bencina en Linea';
+
+  @override
+  String get vinLabel => 'VIN (optional)';
+
+  @override
+  String get vinDecodeTooltip => 'Decode VIN';
+
+  @override
+  String get vinConfirmTitle => 'Is this your car?';
+
+  @override
+  String vinConfirmBody(
+    String year,
+    String make,
+    String model,
+    String displacement,
+    String cylinders,
+    String fuel,
+  ) {
+    return '$year $make $model — ${displacement}L, $cylinders-cyl, $fuel';
+  }
+
+  @override
+  String get vinConfirmAction => 'Yes, auto-fill';
+
+  @override
+  String get vinModifyAction => 'Modify manually';
+
+  @override
+  String get vinPartialInfoNote =>
+      'Partial info (offline). You can edit below.';
+
+  @override
+  String get vinDecodeError => 'Couldn\'t decode this VIN';
+
+  @override
+  String get vinInvalidFormat => 'Invalid VIN format';
 }
