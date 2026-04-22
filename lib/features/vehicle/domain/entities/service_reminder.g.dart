@@ -9,16 +9,21 @@ part of 'service_reminder.dart';
 _ServiceReminder _$ServiceReminderFromJson(Map<String, dynamic> json) =>
     _ServiceReminder(
       id: json['id'] as String,
+      vehicleId: json['vehicleId'] as String,
       label: json['label'] as String,
-      intervalKm: (json['intervalKm'] as num).toDouble(),
-      lastServiceOdometerKm: (json['lastServiceOdometerKm'] as num?)
-          ?.toDouble(),
+      intervalKm: (json['intervalKm'] as num).toInt(),
+      lastServiceOdometerKm: (json['lastServiceOdometerKm'] as num).toInt(),
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      enabled: json['enabled'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$ServiceReminderToJson(_ServiceReminder instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'vehicleId': instance.vehicleId,
       'label': instance.label,
       'intervalKm': instance.intervalKm,
       'lastServiceOdometerKm': instance.lastServiceOdometerKm,
+      'createdAt': instance.createdAt.toIso8601String(),
+      'enabled': instance.enabled,
     };

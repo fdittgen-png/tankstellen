@@ -2,69 +2,82 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/service_reminder.dart';
 
 void main() {
-  group('ServiceReminder (#584)', () {
-    test('nextDueOdometerKm = lastServiceOdometerKm + intervalKm', () {
-      const r = ServiceReminder(
-        id: '1',
-        label: 'Oil change',
-        intervalKm: 15000,
-        lastServiceOdometerKm: 42000,
-      );
-      expect(r.nextDueOdometerKm, 57000);
-    });
+  ServiceReminder makeReminder({
+    String id = 'r-1',
+    String vehicleId = 'v-1',
+    String label = 'Oil change',
+    int intervalKm = 15000,
+    int lastServiceOdometerKm = 42000,
+    DateTime? createdAt,
+    bool enabled = true,
+  }) {
+    return ServiceReminder(
+      id: id,
+      vehicleId: vehicleId,
+      label: label,
+      intervalKm: intervalKm,
+      lastServiceOdometerKm: lastServiceOdometerKm,
+      createdAt: createdAt ?? DateTime(2026, 1, 1, 9, 0),
+      enabled: enabled,
+    );
+  }
 
-    test('nextDueOdometerKm = intervalKm when lastService is null', () {
-      const r = ServiceReminder(
-        id: '1',
-        label: 'Oil change',
-        intervalKm: 15000,
-      );
-      expect(r.nextDueOdometerKm, 15000);
-    });
-
-    test('isDue fires at the exact threshold', () {
-      const r = ServiceReminder(
-        id: '1',
-        label: 'Oil change',
-        intervalKm: 15000,
-        lastServiceOdometerKm: 42000,
-      );
-      expect(r.isDue(57000), isTrue);
-      expect(r.isDue(56999.99), isFalse);
-    });
-
-    test('isDue stays true past the threshold', () {
-      const r = ServiceReminder(
-        id: '1',
-        label: 'Oil change',
-        intervalKm: 15000,
-        lastServiceOdometerKm: 42000,
-      );
-      expect(r.isDue(60000), isTrue);
-    });
-
+  group('ServiceReminder (#584 phase 1)', () {
     test('JSON round-trip preserves every field', () {
-      const r = ServiceReminder(
-        id: 'r-1',
-        label: 'Tires',
-        intervalKm: 40000,
-        lastServiceOdometerKm: 18500,
-      );
-      final json = r.toJson();
-      final restored = ServiceReminder.fromJson(json);
+      final r = makeReminder();
+      final restored = ServiceReminder.fromJson(r.toJson());
       expect(restored, r);
     });
 
-    test('JSON round-trip with null lastService preserves null', () {
-      const r = ServiceReminder(
-        id: 'r-1',
+    test('JSON round-trip preserves disabled state', () {
+      final r = makeReminder(enabled: false);
+      final restored = ServiceReminder.fromJson(r.toJson());
+      expect(restored.enabled, isFalse);
+      expect(restored, r);
+    });
+
+    test('copyWith updates lastServiceOdometerKm without touching other fields',
+        () {
+      final r = makeReminder();
+      final updated = r.copyWith(lastServiceOdometerKm: 57000);
+
+      expect(updated.lastServiceOdometerKm, 57000);
+      // All other fields should be unchanged.
+      expect(updated.id, r.id);
+      expect(updated.vehicleId, r.vehicleId);
+      expect(updated.label, r.label);
+      expect(updated.intervalKm, r.intervalKm);
+      expect(updated.enabled, r.enabled);
+      expect(updated.createdAt, r.createdAt);
+    });
+
+    test('copyWith flips enabled without touching other fields', () {
+      final r = makeReminder(enabled: true);
+      final toggled = r.copyWith(enabled: false);
+
+      expect(toggled.enabled, isFalse);
+      expect(toggled.id, r.id);
+      expect(toggled.intervalKm, r.intervalKm);
+      expect(toggled.lastServiceOdometerKm, r.lastServiceOdometerKm);
+    });
+
+    test('defaults enabled to true when omitted', () {
+      final r = ServiceReminder(
+        id: 'r',
+        vehicleId: 'v',
         label: 'Inspection',
         intervalKm: 30000,
+        lastServiceOdometerKm: 0,
+        createdAt: DateTime(2026, 1, 1),
       );
-      final json = r.toJson();
-      final restored = ServiceReminder.fromJson(json);
-      expect(restored.lastServiceOdometerKm, isNull);
-      expect(restored, r);
+      expect(r.enabled, isTrue);
+    });
+
+    test('equality: two reminders with identical fields are equal', () {
+      final a = makeReminder();
+      final b = makeReminder();
+      expect(a, b);
+      expect(a.hashCode, b.hashCode);
     });
   });
 }

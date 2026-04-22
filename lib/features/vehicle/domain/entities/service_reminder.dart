@@ -3,41 +3,49 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'service_reminder.freezed.dart';
 part 'service_reminder.g.dart';
 
-/// Odometer-triggered maintenance reminder for a [VehicleProfile]
-/// (#584).
+/// Odometer-triggered maintenance reminder (#584 phase 1).
 ///
-/// Stored as a list field on VehicleProfile. Each reminder carries
-/// the last-service odometer value; the trigger fires when the
-/// current odometer crosses `lastServiceOdometerKm + intervalKm`.
-/// Marking the reminder done resets `lastServiceOdometerKm` to the
-/// current odometer so the next cycle starts from there.
+/// Each reminder belongs to a single [VehicleProfile] (by
+/// [vehicleId]) and carries the last-service odometer reading plus
+/// the km interval between services. The companion
+/// `ServiceReminderChecker` fires when
+/// `currentOdometerKm - lastServiceOdometerKm >= intervalKm`.
+///
+/// Values are stored as integers because every persisted odometer
+/// the app sees comes from the user's manual fill-up entry (a whole
+/// km on the dashboard) or OBD2's `distance since codes cleared`
+/// PID, both of which are already km-integers. Using `int` avoids
+/// the floating-point-equality pitfalls the phase-0 sketch ran into
+/// on its `isDue` boundary test.
+///
+/// Disabled reminders ([enabled] false) never fire — the user can
+/// pause a reminder without losing its history.
 @freezed
 abstract class ServiceReminder with _$ServiceReminder {
   const factory ServiceReminder({
     required String id,
-    /// Short label — "Oil change", "Tires", "Inspection". Stored
-    /// verbatim; localisation happens in the UI if the label matches
-    /// a known preset.
-    required String label,
-    /// Service interval in km between occurrences.
-    required double intervalKm,
-    /// Odometer reading at the last service. Null when the user
-    /// added the reminder but hasn't yet recorded a completion — the
-    /// first fill-up that brings the odometer above `intervalKm`
-    /// will trip the alert.
-    double? lastServiceOdometerKm,
-  }) = _ServiceReminder;
+    required String vehicleId,
 
-  const ServiceReminder._();
+    /// Short label — "Oil change", "Tires", "Inspection",
+    /// "Brake fluid". Stored verbatim in the user's chosen language;
+    /// the UI layer may map known preset strings to localised
+    /// display labels.
+    required String label,
+
+    /// Service interval in whole kilometres between occurrences.
+    required int intervalKm,
+
+    /// Odometer reading at the last completed service. Zero is a
+    /// legitimate value — it means "due at the next interval from
+    /// the odometer's zero" — so the field is non-nullable. Callers
+    /// creating a fresh reminder typically pass the vehicle's current
+    /// odometer so the first due threshold sits one [intervalKm]
+    /// ahead.
+    required int lastServiceOdometerKm,
+    required DateTime createdAt,
+    @Default(true) bool enabled,
+  }) = _ServiceReminder;
 
   factory ServiceReminder.fromJson(Map<String, dynamic> json) =>
       _$ServiceReminderFromJson(json);
-
-  /// Odometer value at which the next reminder should fire.
-  double get nextDueOdometerKm =>
-      (lastServiceOdometerKm ?? 0) + intervalKm;
-
-  /// True when [currentOdometerKm] has crossed the due threshold.
-  bool isDue(double currentOdometerKm) =>
-      currentOdometerKm >= nextDueOdometerKm;
 }
