@@ -2938,4 +2938,38 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get luxembourgPricesUnavailable =>
       'Luxemburgs regulierte Preise sind nicht verfügbar.';
+
+  @override
+  String get reportIssueTitle => 'Problem melden';
+
+  @override
+  String get enterCorrection => 'Bitte Korrektur eingeben';
+
+  @override
+  String get reportNoBackendAvailable =>
+      'Die Meldung konnte nicht gesendet werden: Für dieses Land ist kein Meldedienst konfiguriert. Aktivieren Sie TankSync in den Einstellungen, um Community-Meldungen zu senden.';
+
+  @override
+  String get correctName => 'Korrekter Tankstellenname';
+
+  @override
+  String get correctAddress => 'Korrekte Adresse';
+
+  @override
+  String get wrongE85Price => 'Falscher E85 Preis';
+
+  @override
+  String get wrongE98Price => 'Falscher Super 98 Preis';
+
+  @override
+  String get wrongLpgPrice => 'Falscher LPG Preis';
+
+  @override
+  String get wrongStationName => 'Falscher Tankstellenname';
+
+  @override
+  String get wrongStationAddress => 'Falsche Adresse';
+
+  @override
+  String get independentStation => 'Unabhängige Tankstelle';
 }

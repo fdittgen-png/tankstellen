@@ -2919,4 +2919,38 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get luxembourgPricesUnavailable =>
       'Luxembourg regulated prices are unavailable.';
+
+  @override
+  String get reportIssueTitle => 'Report a problem';
+
+  @override
+  String get enterCorrection => 'Please enter the correction';
+
+  @override
+  String get reportNoBackendAvailable =>
+      'The report could not be sent: no reporting service is configured for this country. Enable TankSync in Settings to send community reports.';
+
+  @override
+  String get correctName => 'Correct station name';
+
+  @override
+  String get correctAddress => 'Correct address';
+
+  @override
+  String get wrongE85Price => 'Wrong E85 price';
+
+  @override
+  String get wrongE98Price => 'Wrong Super 98 price';
+
+  @override
+  String get wrongLpgPrice => 'Wrong LPG price';
+
+  @override
+  String get wrongStationName => 'Wrong station name';
+
+  @override
+  String get wrongStationAddress => 'Wrong address';
+
+  @override
+  String get independentStation => 'Independent station';
 }
