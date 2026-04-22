@@ -114,6 +114,14 @@ abstract class VehicleProfile with _$VehicleProfile {
     int? engineCylinders,
     @Default(0.85) double volumetricEfficiency,
 
+    // Curb weight in kilograms (#812). Populated by the VIN decoder
+    // phase 2 onboarding flow (GVWR-minus-payload on the NHTSA side,
+    // or manufacturer spec sheets via a future secondary lookup).
+    // Null means "unknown" — consumers like the rolling-resistance
+    // estimator fall back to a 1500 kg reference, so the field being
+    // null is not fatal.
+    int? curbWeightKg,
+
     // OBD2 adapter pairing (#784). Persisted so the app can
     // transparently reconnect on launch without prompting the user
     // again. Both fields are nullable — unpaired vehicles carry
