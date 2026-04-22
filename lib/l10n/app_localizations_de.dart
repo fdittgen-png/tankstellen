@@ -2524,6 +2524,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Versuchen Sie es erneut oder suchen Sie nach Postleitzahl / Stadt.';
 
   @override
+  String get alertsLoadErrorTitle => 'Alarme konnten nicht geladen werden';
+
+  @override
+  String get alertsBackgroundCheckErrorTitle =>
+      'Hintergrundprüfung der Alarme fehlgeschlagen';
+
+  @override
   String get detailsLabel => 'Details';
 
   @override

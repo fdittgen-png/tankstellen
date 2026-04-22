@@ -4735,6 +4735,18 @@ abstract class AppLocalizations {
   /// **'Try again or search by postal code / city name.'**
   String get errorHintFallback;
 
+  /// No description provided for @alertsLoadErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your alerts'**
+  String get alertsLoadErrorTitle;
+
+  /// No description provided for @alertsBackgroundCheckErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert background check failed'**
+  String get alertsBackgroundCheckErrorTitle;
+
   /// No description provided for @detailsLabel.
   ///
   /// In en, this message translates to:

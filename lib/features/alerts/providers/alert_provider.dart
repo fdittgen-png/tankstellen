@@ -97,3 +97,22 @@ class AlertNotifier extends _$AlertNotifier {
         .toList();
   }
 }
+
+/// AsyncValue wrapper around [alertProvider] (#858).
+///
+/// The legacy [alertProvider] is a synchronous NotifierProvider, so if the
+/// underlying storage throws on read the error propagates to
+/// [ErrorWidget] with no retry affordance. This derived provider re-exposes
+/// the same list as an [AsyncValue] so screens can render a proper
+/// `ServiceChainErrorWidget` via `.when(..., error: ...)`.
+///
+/// Existing consumers of [alertProvider] keep working untouched; only
+/// screens that want a user-visible error branch need to switch.
+@riverpod
+AsyncValue<List<PriceAlert>> alertsAsync(Ref ref) {
+  try {
+    return AsyncValue.data(ref.watch(alertProvider));
+  } catch (e, st) {
+    return AsyncValue.error(e, st);
+  }
+}

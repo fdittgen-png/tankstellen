@@ -2500,6 +2500,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Try again or search by postal code / city name.';
 
   @override
+  String get alertsLoadErrorTitle => 'Couldn\'t load your alerts';
+
+  @override
+  String get alertsBackgroundCheckErrorTitle => 'Alert background check failed';
+
+  @override
   String get detailsLabel => 'Details';
 
   @override

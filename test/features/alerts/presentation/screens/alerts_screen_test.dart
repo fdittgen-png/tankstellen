@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/core/error/exceptions.dart';
+import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/alerts/presentation/screens/alerts_screen.dart';
 import 'package:tankstellen/features/alerts/providers/alert_provider.dart';
@@ -73,6 +76,59 @@ void main() {
 
       expect(find.text('Shell Berlin'), findsOneWidget);
       expect(find.byType(Switch), findsOneWidget);
+    });
+
+    // #858: the alerts screen now surfaces load failures via
+    // ServiceChainErrorWidget instead of letting the exception propagate
+    // to a blank ErrorWidget.
+    testWidgets('renders ServiceChainErrorWidget when provider throws',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getAlerts()).thenReturn([]);
+
+      await pumpApp(
+        tester,
+        const AlertsScreen(),
+        overrides: [
+          ...test.overrides,
+          alertsAsyncProvider.overrideWithValue(
+            AsyncValue<List<PriceAlert>>.error(
+              const ServiceChainExhaustedException(errors: []),
+              StackTrace.current,
+            ),
+          ),
+        ],
+      );
+
+      expect(find.byType(ServiceChainErrorWidget), findsOneWidget);
+      // The widget renders its standard "cloud off" icon + retry button.
+      expect(find.byIcon(Icons.cloud_off), findsOneWidget);
+      expect(find.text('Try again'), findsOneWidget);
+    });
+
+    testWidgets(
+        'renders ServiceChainErrorWidget on arbitrary alert load exception',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getAlerts()).thenReturn([]);
+
+      await pumpApp(
+        tester,
+        const AlertsScreen(),
+        overrides: [
+          ...test.overrides,
+          alertsAsyncProvider.overrideWithValue(
+            AsyncValue<List<PriceAlert>>.error(
+              Exception('alerts box corrupted'),
+              StackTrace.current,
+            ),
+          ),
+        ],
+      );
+
+      expect(find.byType(ServiceChainErrorWidget), findsOneWidget);
     });
   });
 }

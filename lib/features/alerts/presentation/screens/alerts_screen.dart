@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -14,7 +15,7 @@ class AlertsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final alerts = ref.watch(alertProvider);
+    final alertsAsync = ref.watch(alertsAsyncProvider);
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
@@ -26,24 +27,39 @@ class AlertsScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
       ),
-      body: alerts.isEmpty
-          ? EmptyState(
-              icon: Icons.notifications_off_outlined,
-              title: l10n?.noPriceAlerts ?? 'No price alerts',
-              subtitle: l10n?.noPriceAlertsHint ??
-                  'Create an alert from a station\'s detail page.',
-            )
-          : ListView.builder(
-              itemCount: alerts.length + 1,
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return const AlertStatisticsCard();
-                }
-                final alert = alerts[index - 1];
-                return _AlertListTile(key: ValueKey(alert.id), alert: alert);
-              },
-            ),
+      body: alertsAsync.when(
+        data: (alerts) => alerts.isEmpty
+            ? EmptyState(
+                icon: Icons.notifications_off_outlined,
+                title: l10n?.noPriceAlerts ?? 'No price alerts',
+                subtitle: l10n?.noPriceAlertsHint ??
+                    'Create an alert from a station\'s detail page.',
+              )
+            : ListView.builder(
+                itemCount: alerts.length + 1,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return const AlertStatisticsCard();
+                  }
+                  final alert = alerts[index - 1];
+                  return _AlertListTile(key: ValueKey(alert.id), alert: alert);
+                },
+              ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stackTrace) => ServiceChainErrorWidget(
+          error: error,
+          stackTrace: stackTrace,
+          searchContext:
+              l10n?.alertsLoadErrorTitle ?? "Couldn't load your alerts",
+          onRetry: () {
+            // Invalidate both the underlying notifier and the async
+            // wrapper so the read is retried from scratch.
+            ref.invalidate(alertProvider);
+            ref.invalidate(alertsAsyncProvider);
+          },
+        ),
+      ),
     );
   }
 }

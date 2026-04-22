@@ -1062,6 +1062,8 @@
   "errorHintConnection": "Check your internet connection and try again.",
   "errorHintRouting": "Route calculation failed. Check your internet connection and try again.",
   "errorHintFallback": "Try again or search by postal code / city name.",
+  "alertsLoadErrorTitle": "Couldn't load your alerts",
+  "alertsBackgroundCheckErrorTitle": "Alert background check failed",
   "detailsLabel": "Details",
   "remove": "Remove",
   "showKey": "Show key",
