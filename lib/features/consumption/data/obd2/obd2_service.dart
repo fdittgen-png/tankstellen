@@ -10,6 +10,14 @@ import 'obd2_transport.dart';
 class Obd2Service {
   final Obd2Transport _transport;
 
+  /// Per-connection cache of the Mode 01 PIDs the car supports,
+  /// populated by [discoverSupportedPids]. Reset on every new
+  /// [connect] — each session must re-discover because the user may
+  /// have switched cars since last time. `null` means "we haven't
+  /// asked the car yet, so don't trust this cache to reject PIDs"
+  /// (see [isPidSupported] for the exact semantics).
+  Set<int>? _supportedPids;
+
   Obd2Service(this._transport);
 
   /// `true` when the underlying [Obd2Transport] currently has an open
@@ -20,6 +28,10 @@ class Obd2Service {
   Future<bool> connect() async {
     try {
       await _transport.connect();
+
+      // Clear the per-connection supported-PIDs cache. A new session
+      // may be a different car / different adapter firmware.
+      _supportedPids = null;
 
       // Run initialization sequence
       for (final cmd in Elm327Protocol.initCommands) {
@@ -34,6 +46,20 @@ class Obd2Service {
       return false;
     }
   }
+
+  /// Whether [pid] is known to be supported by the connected vehicle
+  /// (#811). Key semantics:
+  ///
+  ///   - When [discoverSupportedPids] has NOT been called yet
+  ///     (cache is null), returns `true` — we don't know enough to
+  ///     reject the query, so let it go through and surface NO DATA
+  ///     naturally.
+  ///   - When the cache IS populated and [pid] is present, returns
+  ///     `true`.
+  ///   - When the cache IS populated and [pid] is absent, returns
+  ///     `false` — callers skip the query.
+  bool isPidSupported(int pid) =>
+      _supportedPids == null || _supportedPids!.contains(pid);
 
   /// Read the odometer value in km.
   ///
@@ -132,6 +158,11 @@ class Obd2Service {
   /// Returns an empty set when the adapter isn't connected or the
   /// first bitmap can't be read — the caller should fall back to
   /// blind querying.
+  ///
+  /// Also populates the internal per-connection cache, so subsequent
+  /// [isPidSupported] calls short-circuit queries for PIDs the car
+  /// doesn't implement. One walk per trip-recording session is
+  /// enough.
   Future<Set<int>> discoverSupportedPids() async {
     if (!_transport.isConnected) return const <int>{};
     final supported = <int>{};
@@ -156,6 +187,7 @@ class Obd2Service {
         break;
       }
     }
+    _supportedPids = supported;
     return supported;
   }
 
@@ -219,24 +251,38 @@ class Obd2Service {
     int engineDisplacementCc = 1000,
     double volumetricEfficiency = 0.85,
   }) async {
-    // Step 1: direct fuel-rate PID. Already post-trim — no correction.
-    final direct = await _readDouble(
-      Elm327Protocol.engineFuelRateCommand,
-      Elm327Protocol.parseFuelRateLPerHour,
-      label: 'fuelRate',
-    );
-    if (direct != null) return direct;
-
-    // Step 2: MAF-based estimate.
-    final maf = await readMafGramsPerSecond();
-    if (maf != null) {
-      // Stoichiometric petrol: AFR 14.7, density ~740 g/L.
-      // L/h = MAF × 3600 / (14.7 × 740).
-      final rate = maf * 3600.0 / (14.7 * 740.0);
-      return _applyFuelTrimCorrection(rate);
+    // Step 1: direct fuel-rate PID (already post-trim — no correction).
+    // Skipped when #811 discovery proved the car doesn't implement PID 5E.
+    if (isPidSupported(0x5E)) {
+      final direct = await _readDouble(
+        Elm327Protocol.engineFuelRateCommand,
+        Elm327Protocol.parseFuelRateLPerHour,
+        label: 'fuelRate',
+      );
+      if (direct != null) return direct;
     }
 
-    // Step 3: speed-density fallback. Requires MAP + IAT + RPM.
+    // Step 2: MAF-based estimate. Same short-circuit — a Peugeot 107
+    // without a MAF sensor returns empty set on PID 10, saves the
+    // Bluetooth round-trip on every tick.
+    if (isPidSupported(0x10)) {
+      final maf = await readMafGramsPerSecond();
+      if (maf != null) {
+        // Stoichiometric petrol: AFR 14.7, density ~740 g/L.
+        // L/h = MAF × 3600 / (14.7 × 740).
+        final rate = maf * 3600.0 / (14.7 * 740.0);
+        return _applyFuelTrimCorrection(rate);
+      }
+    }
+
+    // Step 3: speed-density fallback. Requires all three of MAP / IAT
+    // / RPM. If any one is known-unsupported, the step can't run and
+    // we surface null — there's no partial correction worth shipping.
+    if (!isPidSupported(0x0B) ||
+        !isPidSupported(0x0F) ||
+        !isPidSupported(0x0C)) {
+      return null;
+    }
     final mapKpa = await readManifoldPressureKpa();
     final iatCelsius = await readIntakeAirTempCelsius();
     final rpm = await readRpm();
