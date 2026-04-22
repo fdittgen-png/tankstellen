@@ -1,5 +1,6 @@
 import '../../sync/alerts_sync.dart';
 import '../../sync/ignored_stations_sync.dart';
+import '../../sync/itineraries_sync.dart';
 import '../../sync/price_history_sync.dart';
 import '../../sync/ratings_sync.dart';
 import '../../sync/supabase_client.dart';
@@ -71,14 +72,14 @@ class SupabaseSyncRepository implements SyncRepository {
 
   @override
   Future<bool> saveItinerary(SavedItinerary itinerary) =>
-      SyncService.saveItinerary(itinerary);
+      ItinerariesSync.save(itinerary);
 
   @override
   Future<List<SavedItinerary>> fetchItineraries() =>
-      SyncService.fetchItineraries();
+      ItinerariesSync.fetchAll();
 
   @override
-  Future<bool> deleteItinerary(String id) => SyncService.deleteItinerary(id);
+  Future<bool> deleteItinerary(String id) => ItinerariesSync.delete(id);
 
   // ── Data Management ──
 

@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../features/itinerary/domain/entities/saved_itinerary.dart';
 import '../utils/json_extensions.dart';
 import 'supabase_client.dart';
 
@@ -130,95 +129,6 @@ class SyncService {
     } catch (e) {
       debugPrint('SyncService.fetchAllUserData FAILED: $e');
       return {'error': e.toString()};
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Itineraries
-  // ---------------------------------------------------------------------------
-
-  /// Save or update an itinerary on the server.
-  static Future<bool> saveItinerary(SavedItinerary itinerary) async {
-    final client = _client;
-    final userId = _authenticatedUserId;
-    if (client == null || userId == null) return false;
-
-    try {
-      await client.from('itineraries').upsert({
-        'id': itinerary.id,
-        'user_id': userId,
-        'name': itinerary.name,
-        'waypoints': itinerary.waypoints,
-        'distance_km': itinerary.distanceKm,
-        'duration_minutes': itinerary.durationMinutes,
-        'avoid_highways': itinerary.avoidHighways,
-        'fuel_type': itinerary.fuelType,
-        'selected_station_ids': itinerary.selectedStationIds,
-        'updated_at': DateTime.now().toIso8601String(),
-      }, onConflict: 'id');
-      debugPrint('SyncService.saveItinerary: saved "${itinerary.name}"');
-      return true;
-    } catch (e) {
-      debugPrint('SyncService.saveItinerary FAILED: $e');
-      return false;
-    }
-  }
-
-  /// Fetch all itineraries for the current user.
-  static Future<List<SavedItinerary>> fetchItineraries() async {
-    final client = _client;
-    final userId = _authenticatedUserId;
-    if (client == null || userId == null) return [];
-
-    try {
-      final rows = await client
-          .from('itineraries')
-          .select()
-          .eq('user_id', userId)
-          .order('updated_at', ascending: false);
-
-      return rows.map((r) {
-        final createdAtStr = r.getString('created_at');
-        final updatedAtStr = r.getString('updated_at');
-        return SavedItinerary(
-          id: r.getString('id') ?? '',
-          name: r.getString('name') ?? '',
-          waypoints: r.getList<Map<String, dynamic>>('waypoints'),
-          distanceKm: r.getDouble('distance_km') ?? 0.0,
-          durationMinutes: r.getDouble('duration_minutes') ?? 0.0,
-          avoidHighways: r.getBool('avoid_highways') ?? false,
-          fuelType: r.getString('fuel_type') ?? 'e10',
-          selectedStationIds: r.getList<String>('selected_station_ids'),
-          createdAt: createdAtStr != null
-              ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
-              : DateTime.now(),
-          updatedAt: updatedAtStr != null
-              ? DateTime.tryParse(updatedAtStr) ?? DateTime.now()
-              : DateTime.now(),
-        );
-      }).toList();
-    } catch (e) {
-      debugPrint('SyncService.fetchItineraries FAILED: $e');
-      return [];
-    }
-  }
-
-  /// Delete an itinerary from the server.
-  static Future<bool> deleteItinerary(String itineraryId) async {
-    final client = _client;
-    final userId = _authenticatedUserId;
-    if (client == null || userId == null) return false;
-
-    try {
-      await client
-          .from('itineraries')
-          .delete()
-          .eq('id', itineraryId)
-          .eq('user_id', userId);
-      return true;
-    } catch (e) {
-      debugPrint('SyncService.deleteItinerary FAILED: $e');
-      return false;
     }
   }
 
