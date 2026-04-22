@@ -156,6 +156,98 @@ void main() {
       expect(rate, closeTo(3.389, 0.01));
     });
 
+    group('readFuelRateLPerHour + supported-PID cache — #811 phase 2', () {
+      test(
+          'after discoverSupportedPids, unsupported PIDs are skipped — '
+          'Peugeot 107 case: only MAP+IAT+RPM, no 5E, no MAF', () async {
+        // Peugeot 107 exposes speed/RPM/load/coolant/throttle
+        // /MAP/IAT but neither PID 5E nor MAF. Bitmap: 0x08 on PID
+        // 0B (MAP), 0x02 on 0C (RPM), 0x08 on 0F (IAT). Easier to
+        // hand-craft: a bitmap that supports 0B, 0C, 0F exactly.
+        // bits-from-left (groupBase 0x00):
+        //   PID 0B → byte 1 bit 2 = 0x20
+        //   PID 0C → byte 1 bit 3 = 0x10
+        //   PID 0F → byte 1 bit 6 = 0x02
+        // → byte 1 = 0x32. All other bytes zero + no continuation.
+        final service = await _connected({
+          '0100': '41 00 00 32 00 00>', // PIDs 0B, 0C, 0F supported
+          // Speed-density step responses:
+          '010B': '41 0B 28>', // MAP 40 kPa
+          '010F': '41 0F 41>', // IAT 25 °C
+          '010C': '41 0C 0C 80>', // RPM 800
+          // 5E and 10 intentionally UNMOCKED — if the service tries
+          // them the fake transport returns NO DATA and costs a
+          // round-trip. That's exactly the wasted work the cache
+          // should prevent.
+        });
+        await service.discoverSupportedPids();
+        expect(service.isPidSupported(0x5E), isFalse);
+        expect(service.isPidSupported(0x10), isFalse);
+        expect(service.isPidSupported(0x0B), isTrue);
+
+        final rate = await service.readFuelRateLPerHour();
+        // Speed-density produced a non-null rate → the chain reached
+        // step 3 even though steps 1 and 2 were never queried.
+        expect(rate, isNotNull);
+        expect(rate, greaterThan(0));
+      });
+
+      test(
+          'when cache is not populated, legacy blind-query behavior — '
+          'every step still attempted', () async {
+        // discoverSupportedPids never called → cache stays null →
+        // isPidSupported returns true for every PID → all three
+        // steps query blindly, honouring NO DATA as before.
+        final service = await _connected({
+          '015E': 'NO DATA>',
+          '0110': 'NO DATA>',
+          '010B': 'NO DATA>',
+          '010F': 'NO DATA>',
+          '010C': 'NO DATA>',
+        });
+        expect(service.isPidSupported(0x5E), isTrue);
+        expect(await service.readFuelRateLPerHour(), isNull);
+      });
+
+      test(
+          'cache-clear on reconnect — supported-PIDs forgotten between '
+          'sessions', () async {
+        final service = await _connected({
+          '0100': '41 00 80 00 00 00>', // only PID 01
+        });
+        await service.discoverSupportedPids();
+        expect(service.isPidSupported(0x5E), isFalse);
+
+        await service.disconnect();
+        await service.connect(); // fresh session
+        expect(service.isPidSupported(0x5E), isTrue,
+            reason: 'cache should clear on connect so a new car / '
+                'new adapter firmware gets discovered fresh');
+      });
+
+      test(
+          'MAF supported but 5E not → step 2 wins, step 3 never runs',
+          () async {
+        // Supported-PIDs bitmap sets PID 10 (MAF) but not 5E.
+        // byte 1 bit 0 (= PID 09) through byte 1 bit 7 (= PID 16) —
+        // MAF is PID 0x10 = 16 → byte 1 bit 7 = 0x01.
+        final service = await _connected({
+          '0100': '41 00 00 01 00 00>',
+          '0110': '41 10 04 00>', // MAF = 10.24 g/s
+          '0106': 'NO DATA>',
+          '0107': 'NO DATA>',
+        });
+        await service.discoverSupportedPids();
+        expect(service.isPidSupported(0x5E), isFalse);
+        expect(service.isPidSupported(0x10), isTrue);
+
+        final rate = await service.readFuelRateLPerHour();
+        // MAF path (10.24 × 3600 / (14.7 × 740)) ≈ 3.389 L/h,
+        // no trim correction because trims are NO DATA.
+        expect(rate, closeTo(3.389, 0.01));
+      });
+    });
+
     group('discoverSupportedPids — #811', () {
       test('returns an empty set when the transport is disconnected',
           () async {
