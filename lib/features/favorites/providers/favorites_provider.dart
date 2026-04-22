@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/data/storage_repository.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_helper.dart';
-import '../../../core/sync/sync_service.dart';
+import '../../../core/sync/favorites_sync.dart';
 import '../../search/domain/entities/charging_station.dart' as search_ev;
 import '../../search/domain/entities/station.dart';
 import '../../search/providers/station_rating_provider.dart';
@@ -131,7 +131,7 @@ class Favorites extends _$Favorites {
       await SyncHelper.syncIfEnabled(
         ref,
         'Favorites.add',
-        () => SyncService.syncFavorites(storage.getFavoriteIds()),
+        () => FavoritesSync.merge(storage.getFavoriteIds()),
       );
     }
 
@@ -175,7 +175,7 @@ class Favorites extends _$Favorites {
       await SyncHelper.fireAndForget(
         ref,
         'Favorites.remove',
-        () => SyncService.deleteFavorite(stationId),
+        () => FavoritesSync.delete(stationId),
       );
     }
 

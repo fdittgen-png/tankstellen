@@ -3,8 +3,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/sync/supabase_client.dart';
 import '../../../core/sync/alerts_sync.dart';
+import '../../../core/sync/favorites_sync.dart';
 import '../../../core/sync/fill_ups_sync.dart';
-import '../../../core/sync/sync_service.dart';
 import '../../../core/sync/vehicles_sync.dart';
 import '../../alerts/data/models/price_alert.dart';
 import '../../alerts/providers/alert_provider.dart';
@@ -167,7 +167,7 @@ class LinkDeviceController extends _$LinkDeviceController {
 
       // 7. Sync merged data back to our server account. Profile is NOT
       // synced — each device keeps its own local profile + defaulting.
-      await SyncService.syncFavorites(ref.read(favoritesProvider));
+      await FavoritesSync.merge(ref.read(favoritesProvider));
       await AlertsSync.merge(ref.read(alertProvider));
       await VehiclesSync.merge(ref.read(vehicleProfileListProvider));
       await FillUpsSync.merge(ref.read(fillUpListProvider));

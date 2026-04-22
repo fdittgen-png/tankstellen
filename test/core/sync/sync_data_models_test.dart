@@ -4,22 +4,23 @@ import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/itinerary/domain/entities/saved_itinerary.dart';
 
-/// SyncService depends heavily on Supabase (TankSyncClient.client).
-/// Since Supabase can't be easily mocked without real initialization,
-/// we test:
-/// 1. The data models used by sync (PriceAlert, SavedItinerary)
-/// 2. The "not authenticated" fallback paths (returns local data unchanged)
-/// 3. Parsing and data transformation logic
+/// Sync-data-model round-trip + parsing tests.
 ///
-/// Full integration tests require a running Supabase instance.
+/// Originally misnamed as "SyncService" tests (that class was retired
+/// in #727 — logic moved to per-concern `*_sync.dart` files). The
+/// cases here exercise:
+/// 1. Data models used by sync (PriceAlert, SavedItinerary) —
+///    toJson / fromJson / equality / hashCode parity.
+/// 2. Parsing/transformation logic (field coercion, null handling).
+///
+/// Auth-guard coverage lives in the per-class tests (`favorites_sync_test`,
+/// `alerts_sync_test`, etc.). Full Supabase integration tests require
+/// a running Supabase instance and live elsewhere.
 void main() {
-  group('SyncService - unauthenticated fallbacks', () {
-    // SyncService uses TankSyncClient.client which is null when not initialized.
-    // All sync methods should gracefully return local data when not authenticated.
-
-    // We can't call SyncService.syncFavorites directly because it accesses
-    // TankSyncClient.client which calls Supabase.instance (crashes without init).
-    // Instead, we test the data structures and transformations.
+  group('sync data-model round-trips', () {
+    // The cases below originally targeted SyncService before it was
+    // split. They retain their value because they lock the PriceAlert /
+    // SavedItinerary shapes that every per-concern sync class consumes.
 
     test('PriceAlert round-trips through JSON', () {
       final alert = PriceAlert(

@@ -1,10 +1,11 @@
 import '../../sync/alerts_sync.dart';
+import '../../sync/favorites_sync.dart';
 import '../../sync/ignored_stations_sync.dart';
 import '../../sync/itineraries_sync.dart';
 import '../../sync/price_history_sync.dart';
 import '../../sync/ratings_sync.dart';
 import '../../sync/supabase_client.dart';
-import '../../sync/sync_service.dart';
+import '../../sync/user_data_sync.dart';
 import '../sync_repository.dart';
 
 import '../../../features/alerts/data/models/price_alert.dart';
@@ -12,11 +13,13 @@ import '../../../features/itinerary/domain/entities/saved_itinerary.dart';
 
 /// Supabase implementation of [SyncRepository].
 ///
-/// Thin adapter that delegates every operation to [SyncService] static methods.
-/// This layer exists solely to satisfy the abstract [SyncRepository] interface
-/// so the backend can be swapped without changing provider or screen code.
-///
-/// All Supabase query logic lives in [SyncService] — the single source of truth.
+/// Thin adapter that delegates every operation to one of the
+/// per-concern sync classes in `core/sync/*_sync.dart`. This layer
+/// exists solely to satisfy the abstract [SyncRepository] interface
+/// so the backend can be swapped without changing provider or screen
+/// code — all Supabase query logic lives in the individual sync
+/// classes, each owning a single table / concern (#727 — retired
+/// the former `SyncService` god-class).
 class SupabaseSyncRepository implements SyncRepository {
   @override
   bool get isConnected => TankSyncClient.isConnected;
@@ -29,11 +32,11 @@ class SupabaseSyncRepository implements SyncRepository {
 
   @override
   Future<List<String>> syncFavorites(List<String> localIds) =>
-      SyncService.syncFavorites(localIds);
+      FavoritesSync.merge(localIds);
 
   @override
   Future<void> deleteFavorite(String stationId) =>
-      SyncService.deleteFavorite(stationId);
+      FavoritesSync.delete(stationId);
 
   // ── Ignored Stations ──
 
@@ -85,8 +88,8 @@ class SupabaseSyncRepository implements SyncRepository {
 
   @override
   Future<Map<String, dynamic>> fetchAllUserData() =>
-      SyncService.fetchAllUserData();
+      UserDataSync.fetchAll();
 
   @override
-  Future<void> deleteAllUserData() => SyncService.deleteAllUserData();
+  Future<void> deleteAllUserData() => UserDataSync.deleteAll();
 }
