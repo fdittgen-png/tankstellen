@@ -74,6 +74,7 @@ docs/*
 !docs/screenshots/
 docs/guides/*
 !docs/guides/NEW_COUNTRY.md
+!docs/guides/DEV-GIT-WORKTREES.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
