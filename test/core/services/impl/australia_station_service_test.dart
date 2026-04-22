@@ -33,7 +33,7 @@ void main() {
     });
   });
 
-  group('searchStations (#504 unavailable stop-gap)', () {
+  group('searchStations (#804 unavailable stop-gap)', () {
     const params = SearchParams(lat: -33.87, lng: 151.21, radiusKm: 5);
 
     test('throws ApiException on every call', () async {
@@ -53,7 +53,7 @@ void main() {
         // pin them explicitly.
         expect(e.message, contains('NSW FuelCheck'));
         expect(e.message, contains('OAuth2'));
-        expect(e.message, contains('#504'));
+        expect(e.message, contains('#804'));
       }
     });
 
