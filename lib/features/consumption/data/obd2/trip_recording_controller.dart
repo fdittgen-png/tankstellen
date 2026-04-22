@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../domain/trip_recorder.dart';
 import 'obd2_service.dart';
 
@@ -63,14 +64,13 @@ class TripRecordingController {
   final Duration _pollInterval;
   final DateTime Function() _now;
 
-  /// Engine constants for the speed-density fuel-rate fallback
-  /// (#810, #812). Captured once at construction — the user's
-  /// vehicle doesn't change mid-trip, and recomputing these per
-  /// tick would just burn CPU. When null, `readFuelRateLPerHour`
-  /// uses its generic 1.0 L / η_v 0.85 defaults — still honest,
-  /// just less precise.
-  final int? _engineDisplacementCc;
-  final double? _volumetricEfficiency;
+  /// Active [VehicleProfile] snapshot for the speed-density
+  /// fuel-rate fallback (#810, #812 phase 3). Captured once at
+  /// construction — the user's vehicle doesn't change mid-trip, and
+  /// re-reading the profile every tick would just burn CPU. When
+  /// null, `readFuelRateLPerHour` falls back to its generic 1.0 L /
+  /// η_v 0.85 defaults — still honest, just less precise.
+  final VehicleProfile? _vehicle;
 
   final StreamController<TripLiveReading> _liveController =
       StreamController<TripLiveReading>.broadcast();
@@ -89,14 +89,12 @@ class TripRecordingController {
     TripRecorder? recorder,
     Duration pollInterval = const Duration(seconds: 1),
     DateTime Function()? now,
-    int? engineDisplacementCc,
-    double? volumetricEfficiency,
+    VehicleProfile? vehicle,
   })  : _service = service,
         _recorder = recorder ?? TripRecorder(),
         _pollInterval = pollInterval,
         _now = now ?? DateTime.now,
-        _engineDisplacementCc = engineDisplacementCc,
-        _volumetricEfficiency = volumetricEfficiency;
+        _vehicle = vehicle;
 
   /// Live metrics stream — subscribe to update the recording UI.
   Stream<TripLiveReading> get live => _liveController.stream;
@@ -168,10 +166,7 @@ class TripRecordingController {
     try {
       final speed = await _service.readSpeedKmh();
       final rpm = await _service.readRpm();
-      final fuelRate = await _service.readFuelRateLPerHour(
-        engineDisplacementCc: _engineDisplacementCc ?? 1000,
-        volumetricEfficiency: _volumetricEfficiency ?? 0.85,
-      );
+      final fuelRate = await _service.readFuelRateLPerHour(vehicle: _vehicle);
       final engineLoad = await _service.readEngineLoad();
       final fuelLevel = await _service.readFuelLevelPercent();
       final sample = TripSample(

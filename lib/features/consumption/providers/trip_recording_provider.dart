@@ -137,16 +137,17 @@ class TripRecording extends _$TripRecording {
   Future<void> start(Obd2Service service) async {
     if (state.isActive) return;
     _service = service;
-    // #812 phase 2 — read the active vehicle's engine params once
-    // here so the controller can pass them to `readFuelRateLPerHour`
-    // on every tick (speed-density fallback uses them per car). We
-    // read the vehicle a second time below for the baseline-store
+    // #812 phase 3 — snapshot the active vehicle so the controller
+    // can hand it to `readFuelRateLPerHour` on every tick. The
+    // speed-density fallback reads engineDisplacementCc +
+    // volumetricEfficiency off the profile; a null vehicle or null
+    // fields fall back to the service-level defaults. We read the
+    // vehicle a second time below for the baseline-store
     // bookkeeping; both reads are cheap Riverpod cache hits.
     final activeVehicle = _tryReadActiveVehicle();
     final ctl = TripRecordingController(
       service: service,
-      engineDisplacementCc: activeVehicle?.engineDisplacementCc,
-      volumetricEfficiency: activeVehicle?.volumetricEfficiency,
+      vehicle: activeVehicle,
     );
     _controller = ctl;
     _classifier = SituationClassifier();
