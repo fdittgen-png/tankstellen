@@ -156,6 +156,53 @@ void main() {
       expect(rate, closeTo(3.389, 0.01));
     });
 
+    group('discoverSupportedPids — #811', () {
+      test('returns an empty set when the transport is disconnected',
+          () async {
+        final service = await _connected({});
+        await service.disconnect();
+        expect(await service.discoverSupportedPids(), isEmpty);
+      });
+
+      test(
+          'walks the PID chain and stops when the "next-range" bit is '
+          'clear', () async {
+        // First bitmap: PIDs 01, 03, 05, 08, and the group+32 bit
+        // (= PID 32) is clear → walk stops after this bitmap.
+        // 1010_1001 0000_0000 0000_0000 0000_0000 = 0xA9 0x00 0x00 0x00
+        final service = await _connected({
+          '0100': '41 00 A9 00 00 00>',
+        });
+        final pids = await service.discoverSupportedPids();
+        // 1010_1001 at MSB-first:
+        //   bit 0 → PID 1, bit 2 → PID 3, bit 4 → PID 5, bit 7 → PID 8.
+        expect(pids, {1, 3, 5, 8});
+      });
+
+      test(
+          'continues to the next range when the continuation bit is set',
+          () async {
+        // Range 0x00: continuation bit (PID 32) set → walk to 0x20.
+        // Byte 4 = 0x01 sets the LSB only = PID 32 supported.
+        // Range 0x20: one PID set, continuation clear.
+        final service = await _connected({
+          '0100': '41 00 80 00 00 01>', // PIDs 1 + 32
+          '0120': '41 20 40 00 00 00>', // PID 34, no continuation
+        });
+        final pids = await service.discoverSupportedPids();
+        expect(pids, containsAll([1, 32, 34]));
+      });
+
+      test('bails out on a NO DATA mid-walk', () async {
+        final service = await _connected({
+          '0100': '41 00 80 00 00 01>', // PIDs 1 + 32 + continuation
+          '0120': 'NO DATA>', // adapter gives up
+        });
+        final pids = await service.discoverSupportedPids();
+        expect(pids, {1, 32}); // only what the first range returned
+      });
+    });
+
     test('readShortTermFuelTrimPercent parses PID 06 (#813)', () async {
       final service = await _connected({'0106': '41 06 90>'});
       expect(
