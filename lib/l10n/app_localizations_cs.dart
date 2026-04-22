@@ -2958,4 +2958,51 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get independentStation => 'Independent station';
+
+  @override
+  String get serviceRemindersSection => 'Service reminders';
+
+  @override
+  String get serviceRemindersEmpty => 'No reminders yet — pick a preset above.';
+
+  @override
+  String get addServiceReminder => 'Add reminder';
+
+  @override
+  String get serviceReminderPresetOil => 'Oil (15,000 km)';
+
+  @override
+  String get serviceReminderPresetOilLabel => 'Oil change';
+
+  @override
+  String get serviceReminderPresetTires => 'Tires (20,000 km)';
+
+  @override
+  String get serviceReminderPresetTiresLabel => 'Tires';
+
+  @override
+  String get serviceReminderPresetInspection => 'Inspection (30,000 km)';
+
+  @override
+  String get serviceReminderPresetInspectionLabel => 'Inspection';
+
+  @override
+  String get serviceReminderLabel => 'Label';
+
+  @override
+  String get serviceReminderInterval => 'Interval (km)';
+
+  @override
+  String get serviceReminderLastService => 'Last service';
+
+  @override
+  String get serviceReminderMarkDone => 'Mark as done';
+
+  @override
+  String get serviceReminderDueTitle => 'Service due';
+
+  @override
+  String serviceReminderDueBody(String label, int kmOver) {
+    return '$label is due — $kmOver km past the interval.';
+  }
 }

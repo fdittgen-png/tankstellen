@@ -5574,6 +5574,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Independent station'**
   String get independentStation;
+
+  /// No description provided for @serviceRemindersSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Service reminders'**
+  String get serviceRemindersSection;
+
+  /// No description provided for @serviceRemindersEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminders yet — pick a preset above.'**
+  String get serviceRemindersEmpty;
+
+  /// No description provided for @addServiceReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Add reminder'**
+  String get addServiceReminder;
+
+  /// No description provided for @serviceReminderPresetOil.
+  ///
+  /// In en, this message translates to:
+  /// **'Oil (15,000 km)'**
+  String get serviceReminderPresetOil;
+
+  /// No description provided for @serviceReminderPresetOilLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Oil change'**
+  String get serviceReminderPresetOilLabel;
+
+  /// No description provided for @serviceReminderPresetTires.
+  ///
+  /// In en, this message translates to:
+  /// **'Tires (20,000 km)'**
+  String get serviceReminderPresetTires;
+
+  /// No description provided for @serviceReminderPresetTiresLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tires'**
+  String get serviceReminderPresetTiresLabel;
+
+  /// No description provided for @serviceReminderPresetInspection.
+  ///
+  /// In en, this message translates to:
+  /// **'Inspection (30,000 km)'**
+  String get serviceReminderPresetInspection;
+
+  /// No description provided for @serviceReminderPresetInspectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Inspection'**
+  String get serviceReminderPresetInspectionLabel;
+
+  /// No description provided for @serviceReminderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Label'**
+  String get serviceReminderLabel;
+
+  /// No description provided for @serviceReminderInterval.
+  ///
+  /// In en, this message translates to:
+  /// **'Interval (km)'**
+  String get serviceReminderInterval;
+
+  /// No description provided for @serviceReminderLastService.
+  ///
+  /// In en, this message translates to:
+  /// **'Last service'**
+  String get serviceReminderLastService;
+
+  /// No description provided for @serviceReminderMarkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as done'**
+  String get serviceReminderMarkDone;
+
+  /// No description provided for @serviceReminderDueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Service due'**
+  String get serviceReminderDueTitle;
+
+  /// No description provided for @serviceReminderDueBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} is due — {kmOver} km past the interval.'**
+  String serviceReminderDueBody(String label, int kmOver);
 }
 
 class _AppLocalizationsDelegate

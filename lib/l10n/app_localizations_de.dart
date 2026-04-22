@@ -2977,4 +2977,52 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get independentStation => 'Unabhängige Tankstelle';
+
+  @override
+  String get serviceRemindersSection => 'Wartungserinnerungen';
+
+  @override
+  String get serviceRemindersEmpty =>
+      'Noch keine Erinnerungen — wähle oben eine Vorlage.';
+
+  @override
+  String get addServiceReminder => 'Erinnerung hinzufügen';
+
+  @override
+  String get serviceReminderPresetOil => 'Öl (15.000 km)';
+
+  @override
+  String get serviceReminderPresetOilLabel => 'Ölwechsel';
+
+  @override
+  String get serviceReminderPresetTires => 'Reifen (20.000 km)';
+
+  @override
+  String get serviceReminderPresetTiresLabel => 'Reifen';
+
+  @override
+  String get serviceReminderPresetInspection => 'Inspektion (30.000 km)';
+
+  @override
+  String get serviceReminderPresetInspectionLabel => 'Inspektion';
+
+  @override
+  String get serviceReminderLabel => 'Bezeichnung';
+
+  @override
+  String get serviceReminderInterval => 'Intervall (km)';
+
+  @override
+  String get serviceReminderLastService => 'Letzter Service';
+
+  @override
+  String get serviceReminderMarkDone => 'Als erledigt markieren';
+
+  @override
+  String get serviceReminderDueTitle => 'Wartung fällig';
+
+  @override
+  String serviceReminderDueBody(String label, int kmOver) {
+    return '$label ist fällig — $kmOver km über dem Intervall.';
+  }
 }

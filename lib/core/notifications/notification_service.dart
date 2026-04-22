@@ -18,6 +18,19 @@ abstract class NotificationService {
     required String body,
   });
 
+  /// Display a service-reminder notification (#584). Uses a distinct
+  /// channel on Android so the user can mute price alerts without
+  /// silencing maintenance reminders.
+  ///
+  /// [id] should be stable per reminder so repeated triggers (e.g.
+  /// because the same fill-up is re-saved) update the existing
+  /// notification instead of stacking.
+  Future<void> showServiceReminder({
+    required int id,
+    required String title,
+    required String body,
+  });
+
   /// Cancel a specific notification by its [id].
   Future<void> cancelNotification(int id);
 

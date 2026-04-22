@@ -7,6 +7,7 @@ import 'package:tankstellen/core/notifications/notification_service.dart';
 class FakeNotificationService implements NotificationService {
   bool initialized = false;
   final List<({int id, String title, String body})> shownAlerts = [];
+  final List<({int id, String title, String body})> shownServiceReminders = [];
   final List<int> cancelledIds = [];
   bool allCancelled = false;
 
@@ -22,6 +23,15 @@ class FakeNotificationService implements NotificationService {
     required String body,
   }) async {
     shownAlerts.add((id: id, title: title, body: body));
+  }
+
+  @override
+  Future<void> showServiceReminder({
+    required int id,
+    required String title,
+    required String body,
+  }) async {
+    shownServiceReminders.add((id: id, title: title, body: body));
   }
 
   @override
