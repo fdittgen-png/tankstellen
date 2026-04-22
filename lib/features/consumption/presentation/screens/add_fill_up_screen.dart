@@ -22,6 +22,7 @@ import '../widgets/fill_up_date_row.dart';
 import '../widgets/fill_up_input_buttons.dart';
 import '../widgets/fill_up_notes_field.dart';
 import '../widgets/fill_up_numeric_field.dart';
+import '../widgets/fill_up_save_actions.dart';
 import '../widgets/fill_up_vehicle_dropdown.dart';
 
 /// Form to add a new [FillUp] entry.
@@ -428,19 +429,10 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
             const SizedBox(height: 12),
             FillUpNotesField(controller: _notesCtrl),
             const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: _save,
-              icon: const Icon(Icons.save),
-              label: Text(l?.save ?? 'Save'),
+            FillUpSaveActions(
+              onSave: _save,
+              onReportBadScan: _lastScan != null ? _reportBadScan : null,
             ),
-            if (_lastScan != null) ...[
-              const SizedBox(height: 8),
-              TextButton.icon(
-                onPressed: _reportBadScan,
-                icon: const Icon(Icons.flag_outlined, size: 18),
-                label: Text(l?.reportScanError ?? 'Report scan error'),
-              ),
-            ],
             SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 16),
           ],
         ),
