@@ -47,10 +47,9 @@ class ReportInputSection extends StatelessWidget {
           controller: textController,
           textCapitalization: TextCapitalization.sentences,
           decoration: InputDecoration(
-            // TODO: add ARB keys `correctName` / `correctAddress`.
             labelText: type == ReportType.wrongName
-                ? 'Nom correct de la station'
-                : 'Adresse correcte',
+                ? (l10n?.correctName ?? 'Correct station name')
+                : (l10n?.correctAddress ?? 'Correct address'),
             border: const OutlineInputBorder(),
           ),
         ),

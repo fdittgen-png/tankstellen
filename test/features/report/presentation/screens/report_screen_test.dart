@@ -11,7 +11,7 @@ import '../../../../helpers/pump_app.dart';
 
 void main() {
   group('ReportScreen', () {
-    testWidgets('renders Scaffold with the retitled "Signaler un problème"',
+    testWidgets('renders Scaffold with the retitled "Report a problem"',
         (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -25,9 +25,10 @@ void main() {
 
       expect(find.byType(Scaffold), findsAtLeast(1));
       // #484 — was "Report price" (misleading because status reports
-      // are not about prices). Retitled to the generic "Signaler un
-      // problème" that covers the whole scope.
-      expect(find.text('Signaler un problème'), findsOneWidget);
+      // are not about prices). Retitled to the generic "Report a
+      // problem" (via reportIssueTitle ARB key, #838) that covers the
+      // whole scope.
+      expect(find.text('Report a problem'), findsOneWidget);
     });
 
     testWidgets('renders all report type radio options', (tester) async {
@@ -226,7 +227,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Select wrongAddress
-      await tester.tap(find.text('Adresse incorrecte'));
+      await tester.tap(find.text('Wrong address'));
       await tester.pumpAndSettle();
 
       // Button still disabled without text.
@@ -306,8 +307,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await scrollToRadio(tester, 'Nom de la station incorrect');
-      await tester.tap(find.text('Nom de la station incorrect'));
+      await scrollToRadio(tester, 'Wrong station name');
+      await tester.tap(find.text('Wrong station name'));
       await tester.pumpAndSettle();
 
       expect(
@@ -334,8 +335,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await scrollToRadio(tester, 'Adresse incorrecte');
-      await tester.tap(find.text('Adresse incorrecte'));
+      await scrollToRadio(tester, 'Wrong address');
+      await tester.tap(find.text('Wrong address'));
       await tester.pumpAndSettle();
 
       expect(
@@ -359,8 +360,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await scrollToRadio(tester, 'Prix E85 incorrect');
-      await tester.tap(find.text('Prix E85 incorrect'));
+      await scrollToRadio(tester, 'Wrong E85 price');
+      await tester.tap(find.text('Wrong E85 price'));
       await tester.pumpAndSettle();
 
       expect(find.text('Correct price (e.g. 1.459)'), findsOneWidget);
@@ -385,8 +386,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await scrollToRadio(tester, 'Nom de la station incorrect');
-      await tester.tap(find.text('Nom de la station incorrect'));
+      await scrollToRadio(tester, 'Wrong station name');
+      await tester.tap(find.text('Wrong station name'));
       await tester.pumpAndSettle();
 
       // Scroll the button into view to assert its state.
@@ -511,7 +512,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Adresse incorrecte'));
+      await tester.tap(find.text('Wrong address'));
       await tester.pumpAndSettle();
 
       await tester.enterText(
@@ -556,11 +557,11 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.scrollUntilVisible(
-        find.text('Nom de la station incorrect'),
+        find.text('Wrong station name'),
         120,
         scrollable: find.byType(Scrollable).first,
       );
-      await tester.tap(find.text('Nom de la station incorrect'));
+      await tester.tap(find.text('Wrong station name'));
       await tester.pumpAndSettle();
 
       await tester.enterText(

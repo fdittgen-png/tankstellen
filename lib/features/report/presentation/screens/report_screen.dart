@@ -91,10 +91,9 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
       return;
     }
     if (selectedType.needsText && _textController.text.trim().isEmpty) {
-      // TODO: add ARB key for 'enterCorrection'.
       SnackBarHelper.showError(
         context,
-        'Veuillez saisir la correction',
+        l10n?.enterCorrection ?? 'Please enter the correction',
       );
       return;
     }
@@ -168,13 +167,12 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
 
       if (!canSubmitTankerkoenig && !canSubmitTankSync) {
         if (mounted) {
-          // TODO: localise via `reportNoBackendAvailable` ARB key when
-          // the next batch of l10n strings is added.
           SnackBarHelper.showError(
             context,
-            'Le signalement n\'a pas pu être envoyé : aucun service de '
-            'report n\'est configuré pour ce pays. Activez TankSync dans '
-            'les paramètres pour envoyer des signalements communautaires.',
+            l10n?.reportNoBackendAvailable ??
+                'The report could not be sent: no reporting service is '
+                    'configured for this country. Enable TankSync in Settings '
+                    'to send community reports.',
           );
         }
         return;
@@ -268,10 +266,9 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
       appBar: AppBar(
         // #484 — was "Signaler un prix" but two of the existing options
         // (open/closed status) are not about prices and the rework will
-        // add metadata-only report types. Generic "Signaler un problème"
+        // add metadata-only report types. Generic "Report a problem"
         // matches the actual scope.
-        // TODO: add `reportIssueTitle` ARB key for localisation.
-        title: const Text('Signaler un problème'),
+        title: Text(l10n?.reportIssueTitle ?? 'Report a problem'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           tooltip: l10n?.tooltipBack ?? 'Back',

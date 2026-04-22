@@ -5502,6 +5502,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Luxembourg regulated prices are unavailable.'**
   String get luxembourgPricesUnavailable;
+
+  /// No description provided for @reportIssueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a problem'**
+  String get reportIssueTitle;
+
+  /// No description provided for @enterCorrection.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the correction'**
+  String get enterCorrection;
+
+  /// No description provided for @reportNoBackendAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The report could not be sent: no reporting service is configured for this country. Enable TankSync in Settings to send community reports.'**
+  String get reportNoBackendAvailable;
+
+  /// No description provided for @correctName.
+  ///
+  /// In en, this message translates to:
+  /// **'Correct station name'**
+  String get correctName;
+
+  /// No description provided for @correctAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Correct address'**
+  String get correctAddress;
+
+  /// No description provided for @wrongE85Price.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong E85 price'**
+  String get wrongE85Price;
+
+  /// No description provided for @wrongE98Price.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong Super 98 price'**
+  String get wrongE98Price;
+
+  /// No description provided for @wrongLpgPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong LPG price'**
+  String get wrongLpgPrice;
+
+  /// No description provided for @wrongStationName.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong station name'**
+  String get wrongStationName;
+
+  /// No description provided for @wrongStationAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong address'**
+  String get wrongStationAddress;
+
+  /// No description provided for @independentStation.
+  ///
+  /// In en, this message translates to:
+  /// **'Independent station'**
+  String get independentStation;
 }
 
 class _AppLocalizationsDelegate

@@ -1195,5 +1195,16 @@
   "luxembourgFuelUnleaded98": "Unleaded 98",
   "luxembourgFuelDiesel": "Diesel",
   "luxembourgFuelLpg": "LPG",
-  "luxembourgPricesUnavailable": "Luxembourg regulated prices are unavailable."
+  "luxembourgPricesUnavailable": "Luxembourg regulated prices are unavailable.",
+  "reportIssueTitle": "Report a problem",
+  "enterCorrection": "Please enter the correction",
+  "reportNoBackendAvailable": "The report could not be sent: no reporting service is configured for this country. Enable TankSync in Settings to send community reports.",
+  "correctName": "Correct station name",
+  "correctAddress": "Correct address",
+  "wrongE85Price": "Wrong E85 price",
+  "wrongE98Price": "Wrong Super 98 price",
+  "wrongLpgPrice": "Wrong LPG price",
+  "wrongStationName": "Wrong station name",
+  "wrongStationAddress": "Wrong address",
+  "independentStation": "Independent station"
 }

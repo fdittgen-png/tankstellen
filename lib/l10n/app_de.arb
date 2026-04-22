@@ -1157,5 +1157,16 @@
   "luxembourgFuelUnleaded98": "Super bleifrei 98",
   "luxembourgFuelDiesel": "Diesel",
   "luxembourgFuelLpg": "Autogas",
-  "luxembourgPricesUnavailable": "Luxemburgs regulierte Preise sind nicht verfügbar."
+  "luxembourgPricesUnavailable": "Luxemburgs regulierte Preise sind nicht verfügbar.",
+  "reportIssueTitle": "Problem melden",
+  "enterCorrection": "Bitte Korrektur eingeben",
+  "reportNoBackendAvailable": "Die Meldung konnte nicht gesendet werden: Für dieses Land ist kein Meldedienst konfiguriert. Aktivieren Sie TankSync in den Einstellungen, um Community-Meldungen zu senden.",
+  "correctName": "Korrekter Tankstellenname",
+  "correctAddress": "Korrekte Adresse",
+  "wrongE85Price": "Falscher E85 Preis",
+  "wrongE98Price": "Falscher Super 98 Preis",
+  "wrongLpgPrice": "Falscher LPG Preis",
+  "wrongStationName": "Falscher Tankstellenname",
+  "wrongStationAddress": "Falsche Adresse",
+  "independentStation": "Unabhängige Tankstelle"
 }

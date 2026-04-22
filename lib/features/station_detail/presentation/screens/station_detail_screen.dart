@@ -191,15 +191,8 @@ class StationDetailScreen extends ConsumerWidget {
                       if (_isIndependentSentinel(station))
                         Padding(
                           padding: const EdgeInsets.only(top: 2),
-                          // TODO: localise via an `independentStation`
-                          // ARB key when the next batch of l10n keys
-                          // is added. Inline French fallback here
-                          // matches the primary user locale and the
-                          // inline fallback pattern used elsewhere on
-                          // this screen for strings not yet in the
-                          // ARB files.
                           child: Text(
-                            'Station indépendante',
+                            l10n?.independentStation ?? 'Independent station',
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                               fontStyle: FontStyle.italic,

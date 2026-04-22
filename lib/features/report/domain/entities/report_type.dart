@@ -130,22 +130,20 @@ enum ReportType {
         return l10n?.wrongE10Price ?? 'Prix Super E10 incorrect';
       case wrongDiesel:
         return l10n?.wrongDieselPrice ?? 'Prix Diesel incorrect';
-      // TODO: add ARB keys for the new types. Inline French fallback
-      // matches the primary user locale.
       case wrongE85:
-        return 'Prix E85 incorrect';
+        return l10n?.wrongE85Price ?? 'Wrong E85 price';
       case wrongE98:
-        return 'Prix Super 98 incorrect';
+        return l10n?.wrongE98Price ?? 'Wrong Super 98 price';
       case wrongLpg:
-        return 'Prix GPL incorrect';
+        return l10n?.wrongLpgPrice ?? 'Wrong LPG price';
       case wrongStatusOpen:
-        return l10n?.wrongStatusOpen ?? 'Affiché ouvert, mais fermé';
+        return l10n?.wrongStatusOpen ?? 'Shown as open, but closed';
       case wrongStatusClosed:
-        return l10n?.wrongStatusClosed ?? 'Affiché fermé, mais ouvert';
+        return l10n?.wrongStatusClosed ?? 'Shown as closed, but open';
       case wrongName:
-        return 'Nom de la station incorrect';
+        return l10n?.wrongStationName ?? 'Wrong station name';
       case wrongAddress:
-        return 'Adresse incorrecte';
+        return l10n?.wrongStationAddress ?? 'Wrong address';
     }
   }
 }
