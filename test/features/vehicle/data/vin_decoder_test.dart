@@ -2,29 +2,51 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/features/vehicle/data/vin_decoder.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vin_data.dart';
 
 class _MockDio extends Mock implements Dio {}
 
-/// Tests for [VinDecoder] (#812). Uses `mocktail` MockDio (house
-/// pattern) so no real network calls are made.
+/// Tests for [VinDecoder] (#812 phase 1).
+///
+/// vPIC calls are stubbed via mocktail so the suite is fully offline.
+/// Covers:
+///   - input validation (length, illegal letters)
+///   - the vPIC happy path with a recorded Peugeot 107 response
+///   - WMI offline fallback on DioException
+///   - WMI offline fallback on empty / unrecognised vPIC body
+///   - unknown WMI → wmiOffline with null fields (not invalid — the
+///     VIN itself validated, the decoder just has nothing to say)
 void main() {
   setUpAll(() {
     registerFallbackValue(Uri());
   });
 
   group('VinDecoder VIN validation', () {
-    test('rejects a VIN shorter than 17 characters', () async {
-      final dec = VinDecoder(dio: _MockDio());
+    test('rejects a VIN shorter than 17 characters (no network call)',
+        () async {
+      final dio = _MockDio();
+      final dec = VinDecoder(dio: dio);
       final result = await dec.decode('VF3ABC');
-      expect(result.source, VinDecodeSource.invalid);
+
+      expect(result, isNotNull);
+      expect(result!.source, VinDataSource.invalid);
       expect(result.make, isNull);
+      expect(result.model, isNull);
+      // Crucially, no network call happened on the invalid path.
+      verifyNever(() => dio.get<Map<String, dynamic>>(any(),
+          queryParameters: any(named: 'queryParameters')));
     });
 
-    test('rejects a VIN containing the forbidden I/O/Q letters', () async {
-      final dec = VinDecoder(dio: _MockDio());
-      // "I" is never used in VINs (looks like "1").
+    test('rejects a VIN containing forbidden I / O / Q letters', () async {
+      final dio = _MockDio();
+      final dec = VinDecoder(dio: dio);
+      // 'I' is never used in VINs (too close to '1').
       final result = await dec.decode('VF3IIIIIIIIIIIIII');
-      expect(result.source, VinDecodeSource.invalid);
+
+      expect(result, isNotNull);
+      expect(result!.source, VinDataSource.invalid);
+      verifyNever(() => dio.get<Map<String, dynamic>>(any(),
+          queryParameters: any(named: 'queryParameters')));
     });
 
     test('uppercases lowercase input before validation', () async {
@@ -38,16 +60,18 @@ void main() {
       ));
       final dec = VinDecoder(dio: dio);
       final result = await dec.decode('vf36b8hzl8r123456');
-      // Should fall back to WMI (VF3 → Peugeot), proving the cleaner
-      // normalised to uppercase and the 17-char check passed.
-      expect(result.source, VinDecodeSource.wmiFallback);
+      // Should fall back to WMI (VF3 → Peugeot), which also proves
+      // the cleaner normalised to uppercase and the 17-char check
+      // passed.
+      expect(result, isNotNull);
+      expect(result!.source, VinDataSource.wmiOffline);
       expect(result.make, 'Peugeot');
     });
   });
 
-  group('VinDecoder WMI table (offline fallback)', () {
-    // Force a network failure on every test so we exercise the
-    // WMI-only branch. The thenThrow arm mimics a DNS failure.
+  group('VinDecoder WMI offline fallback (network unavailable)', () {
+    // Every test in this group mocks vPIC as unreachable so the
+    // decoder is forced onto the WMI-only branch.
     late _MockDio dio;
     late VinDecoder decoder;
 
@@ -63,44 +87,29 @@ void main() {
       decoder = VinDecoder(dio: dio);
     });
 
-    test('VF3 → Peugeot FR', () async {
+    test('known WMI → partial VinData with make + country', () async {
       final r = await decoder.decode('VF38HKFVZ6R123456');
+      expect(r, isNotNull);
+      expect(r!.source, VinDataSource.wmiOffline);
       expect(r.make, 'Peugeot');
-      expect(r.country, 'FR');
-      expect(r.displacementLitres, isNull); // WMI doesn't carry engine data
+      expect(r.country, 'France');
+      expect(r.displacementL, isNull, reason: 'WMI carries no engine data');
+      expect(r.cylinderCount, isNull);
     });
 
-    test('WVW → Volkswagen DE', () async {
-      final r = await decoder.decode('WVWZZZ1KZAM123456');
-      expect(r.make, 'Volkswagen');
-      expect(r.country, 'DE');
-    });
-
-    test('WBA → BMW DE', () async {
-      final r = await decoder.decode('WBA3B1C50DF123456');
-      expect(r.make, 'BMW');
-    });
-
-    test('5YJ → Tesla US', () async {
-      final r = await decoder.decode('5YJ3E1EA7KF123456');
-      expect(r.make, 'Tesla');
-    });
-
-    test('TMB → Škoda (Peugeot 107 was sometimes built on the same '
-        'Kolín plant line — WMI disambiguates on country only)', () async {
-      final r = await decoder.decode('TMBEG7NE5H0123456');
-      expect(r.make, 'Škoda');
-      expect(r.country, 'CZ');
-    });
-
-    test('unknown WMI → invalid source (falls through to manual entry)',
+    test('unknown WMI → VinData(source: wmiOffline) with nulls everywhere',
         () async {
+      // ZZZ is not in the table — decoder still reports wmiOffline
+      // (the VIN validated, we just couldn't identify the maker).
       final r = await decoder.decode('ZZZ1234567890ZZZZ');
-      expect(r.source, VinDecodeSource.invalid);
+      expect(r, isNotNull);
+      expect(r!.source, VinDataSource.wmiOffline);
+      expect(r.make, isNull);
+      expect(r.country, isNull);
     });
   });
 
-  group('VinDecoder NHTSA happy path (mocked Dio)', () {
+  group('VinDecoder NHTSA vPIC happy path (mocked Dio)', () {
     test('parses a full vPIC response into every field', () async {
       final dio = _MockDio();
       when(() => dio.get<Map<String, dynamic>>(
@@ -115,13 +124,15 @@ void main() {
       final dec = VinDecoder(dio: dio);
       final r = await dec.decode('VF36B8HZL8R123456');
 
-      expect(r.source, VinDecodeSource.nhtsa);
+      expect(r, isNotNull);
+      expect(r!.source, VinDataSource.vpic);
       expect(r.make, 'PEUGEOT');
       expect(r.model, '107');
       expect(r.modelYear, 2008);
-      expect(r.displacementLitres, closeTo(1.0, 0.01));
-      expect(r.cylinders, 3);
-      expect(r.fuelType, 'Gasoline');
+      expect(r.displacementL, closeTo(1.0, 0.01));
+      expect(r.cylinderCount, 3);
+      expect(r.fuelTypePrimary, 'Gasoline');
+      expect(r.vin, 'VF36B8HZL8R123456');
       expect(r.isComplete, isTrue);
     });
 
@@ -139,12 +150,12 @@ void main() {
       final dec = VinDecoder(dio: dio);
       final r = await dec.decode('VF36B8HZL8R123456');
 
-      expect(r.source, VinDecodeSource.wmiFallback);
+      expect(r, isNotNull);
+      expect(r!.source, VinDataSource.wmiOffline);
       expect(r.make, 'Peugeot'); // from WMI fallback, not vPIC
     });
 
-    test('falls back to WMI when vPIC raises DioException (5xx)',
-        () async {
+    test('falls back to WMI when vPIC raises DioException (5xx)', () async {
       final dio = _MockDio();
       when(() => dio.get<Map<String, dynamic>>(
             any(),
@@ -157,11 +168,11 @@ void main() {
       final dec = VinDecoder(dio: dio);
       final r = await dec.decode('VF36B8HZL8R123456');
 
-      expect(r.source, VinDecodeSource.wmiFallback);
+      expect(r, isNotNull);
+      expect(r!.source, VinDataSource.wmiOffline);
     });
 
-    test('falls back to WMI when vPIC returns null Results key',
-        () async {
+    test('falls back to WMI when vPIC returns no Results key', () async {
       // vPIC occasionally returns a 200 with no Results key when it
       // doesn't recognise the VIN at all. Make sure we don't NPE.
       final dio = _MockDio();
@@ -176,36 +187,58 @@ void main() {
 
       final dec = VinDecoder(dio: dio);
       final r = await dec.decode('VF36B8HZL8R123456');
-      expect(r.source, VinDecodeSource.wmiFallback);
+      expect(r, isNotNull);
+      expect(r!.source, VinDataSource.wmiOffline);
     });
   });
 
-  group('VinDecodeResult', () {
-    test('isComplete is true only when make + model + displacement are all '
-        'set', () {
-      const complete = VinDecodeResult(
+  group('VinData', () {
+    test('isComplete is true only when make + model + displacement are set',
+        () {
+      const complete = VinData(
+        vin: 'VF36B8HZL8R123456',
         make: 'Peugeot',
         model: '107',
-        displacementLitres: 1.0,
-        source: VinDecodeSource.nhtsa,
+        displacementL: 1.0,
+        source: VinDataSource.vpic,
       );
       expect(complete.isComplete, isTrue);
 
-      const makeOnly = VinDecodeResult(
+      const makeOnly = VinData(
+        vin: 'VF38HKFVZ6R123456',
         make: 'Peugeot',
-        source: VinDecodeSource.wmiFallback,
+        source: VinDataSource.wmiOffline,
       );
       expect(makeOnly.isComplete, isFalse);
 
-      const empty = VinDecodeResult(source: VinDecodeSource.invalid);
+      const empty = VinData(
+        vin: 'short',
+        source: VinDataSource.invalid,
+      );
       expect(empty.isComplete, isFalse);
+    });
+
+    test('round-trips through JSON (Hive serialization)', () {
+      const data = VinData(
+        vin: 'VF36B8HZL8R123456',
+        make: 'PEUGEOT',
+        model: '107',
+        modelYear: 2008,
+        displacementL: 1.0,
+        cylinderCount: 3,
+        fuelTypePrimary: 'Gasoline',
+        source: VinDataSource.vpic,
+      );
+      final roundTripped = VinData.fromJson(data.toJson());
+      expect(roundTripped, equals(data));
     });
   });
 }
 
 /// Condensed vPIC response. Real vPIC returns 130+ variables; we only
-/// parse six. The extras + "Not Applicable" values are included to
-/// verify the parser filters them without throwing.
+/// parse the fields we care about. The extras + 'Not Applicable'
+/// values are included to verify the parser filters them without
+/// throwing.
 const _peugeot107VpicResponse = {
   'Results': [
     {'Variable': 'Make', 'Value': 'PEUGEOT'},

@@ -309,7 +309,13 @@ mixin _$VehicleProfile {
 //     reasonable for a typical NA petrol engine at cruise.
 //     Adaptive calibration (#815) will narrow this per vehicle
 //     from tankful reconciliation.
- int? get engineDisplacementCc; int? get engineCylinders; double get volumetricEfficiency;// OBD2 adapter pairing (#784). Persisted so the app can
+ int? get engineDisplacementCc; int? get engineCylinders; double get volumetricEfficiency;// Curb weight in kilograms (#812). Populated by the VIN decoder
+// phase 2 onboarding flow (GVWR-minus-payload on the NHTSA side,
+// or manufacturer spec sheets via a future secondary lookup).
+// Null means "unknown" — consumers like the rolling-resistance
+// estimator fall back to a 1500 kg reference, so the field being
+// null is not fatal.
+ int? get curbWeightKg;// OBD2 adapter pairing (#784). Persisted so the app can
 // transparently reconnect on launch without prompting the user
 // again. Both fields are nullable — unpaired vehicles carry
 // null. The MAC is the stable key; the name is the label shown
@@ -327,16 +333,16 @@ $VehicleProfileCopyWith<VehicleProfile> get copyWith => _$VehicleProfileCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VehicleProfile&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.type, type) || other.type == type)&&(identical(other.batteryKwh, batteryKwh) || other.batteryKwh == batteryKwh)&&(identical(other.maxChargingKw, maxChargingKw) || other.maxChargingKw == maxChargingKw)&&const DeepCollectionEquality().equals(other.supportedConnectors, supportedConnectors)&&(identical(other.chargingPreferences, chargingPreferences) || other.chargingPreferences == chargingPreferences)&&(identical(other.tankCapacityL, tankCapacityL) || other.tankCapacityL == tankCapacityL)&&(identical(other.preferredFuelType, preferredFuelType) || other.preferredFuelType == preferredFuelType)&&(identical(other.engineDisplacementCc, engineDisplacementCc) || other.engineDisplacementCc == engineDisplacementCc)&&(identical(other.engineCylinders, engineCylinders) || other.engineCylinders == engineCylinders)&&(identical(other.volumetricEfficiency, volumetricEfficiency) || other.volumetricEfficiency == volumetricEfficiency)&&(identical(other.obd2AdapterMac, obd2AdapterMac) || other.obd2AdapterMac == obd2AdapterMac)&&(identical(other.obd2AdapterName, obd2AdapterName) || other.obd2AdapterName == obd2AdapterName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VehicleProfile&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.type, type) || other.type == type)&&(identical(other.batteryKwh, batteryKwh) || other.batteryKwh == batteryKwh)&&(identical(other.maxChargingKw, maxChargingKw) || other.maxChargingKw == maxChargingKw)&&const DeepCollectionEquality().equals(other.supportedConnectors, supportedConnectors)&&(identical(other.chargingPreferences, chargingPreferences) || other.chargingPreferences == chargingPreferences)&&(identical(other.tankCapacityL, tankCapacityL) || other.tankCapacityL == tankCapacityL)&&(identical(other.preferredFuelType, preferredFuelType) || other.preferredFuelType == preferredFuelType)&&(identical(other.engineDisplacementCc, engineDisplacementCc) || other.engineDisplacementCc == engineDisplacementCc)&&(identical(other.engineCylinders, engineCylinders) || other.engineCylinders == engineCylinders)&&(identical(other.volumetricEfficiency, volumetricEfficiency) || other.volumetricEfficiency == volumetricEfficiency)&&(identical(other.curbWeightKg, curbWeightKg) || other.curbWeightKg == curbWeightKg)&&(identical(other.obd2AdapterMac, obd2AdapterMac) || other.obd2AdapterMac == obd2AdapterMac)&&(identical(other.obd2AdapterName, obd2AdapterName) || other.obd2AdapterName == obd2AdapterName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,type,batteryKwh,maxChargingKw,const DeepCollectionEquality().hash(supportedConnectors),chargingPreferences,tankCapacityL,preferredFuelType,engineDisplacementCc,engineCylinders,volumetricEfficiency,obd2AdapterMac,obd2AdapterName);
+int get hashCode => Object.hash(runtimeType,id,name,type,batteryKwh,maxChargingKw,const DeepCollectionEquality().hash(supportedConnectors),chargingPreferences,tankCapacityL,preferredFuelType,engineDisplacementCc,engineCylinders,volumetricEfficiency,curbWeightKg,obd2AdapterMac,obd2AdapterName);
 
 @override
 String toString() {
-  return 'VehicleProfile(id: $id, name: $name, type: $type, batteryKwh: $batteryKwh, maxChargingKw: $maxChargingKw, supportedConnectors: $supportedConnectors, chargingPreferences: $chargingPreferences, tankCapacityL: $tankCapacityL, preferredFuelType: $preferredFuelType, engineDisplacementCc: $engineDisplacementCc, engineCylinders: $engineCylinders, volumetricEfficiency: $volumetricEfficiency, obd2AdapterMac: $obd2AdapterMac, obd2AdapterName: $obd2AdapterName)';
+  return 'VehicleProfile(id: $id, name: $name, type: $type, batteryKwh: $batteryKwh, maxChargingKw: $maxChargingKw, supportedConnectors: $supportedConnectors, chargingPreferences: $chargingPreferences, tankCapacityL: $tankCapacityL, preferredFuelType: $preferredFuelType, engineDisplacementCc: $engineDisplacementCc, engineCylinders: $engineCylinders, volumetricEfficiency: $volumetricEfficiency, curbWeightKg: $curbWeightKg, obd2AdapterMac: $obd2AdapterMac, obd2AdapterName: $obd2AdapterName)';
 }
 
 
@@ -347,7 +353,7 @@ abstract mixin class $VehicleProfileCopyWith<$Res>  {
   factory $VehicleProfileCopyWith(VehicleProfile value, $Res Function(VehicleProfile) _then) = _$VehicleProfileCopyWithImpl;
 @useResult
 $Res call({
- String id, String name,@VehicleTypeJsonConverter() VehicleType type, double? batteryKwh, double? maxChargingKw,@ConnectorTypeSetConverter() Set<ConnectorType> supportedConnectors,@ChargingPreferencesJsonConverter() ChargingPreferences chargingPreferences, double? tankCapacityL, String? preferredFuelType, int? engineDisplacementCc, int? engineCylinders, double volumetricEfficiency, String? obd2AdapterMac, String? obd2AdapterName
+ String id, String name,@VehicleTypeJsonConverter() VehicleType type, double? batteryKwh, double? maxChargingKw,@ConnectorTypeSetConverter() Set<ConnectorType> supportedConnectors,@ChargingPreferencesJsonConverter() ChargingPreferences chargingPreferences, double? tankCapacityL, String? preferredFuelType, int? engineDisplacementCc, int? engineCylinders, double volumetricEfficiency, int? curbWeightKg, String? obd2AdapterMac, String? obd2AdapterName
 });
 
 
@@ -364,7 +370,7 @@ class _$VehicleProfileCopyWithImpl<$Res>
 
 /// Create a copy of VehicleProfile
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? type = null,Object? batteryKwh = freezed,Object? maxChargingKw = freezed,Object? supportedConnectors = null,Object? chargingPreferences = null,Object? tankCapacityL = freezed,Object? preferredFuelType = freezed,Object? engineDisplacementCc = freezed,Object? engineCylinders = freezed,Object? volumetricEfficiency = null,Object? obd2AdapterMac = freezed,Object? obd2AdapterName = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? type = null,Object? batteryKwh = freezed,Object? maxChargingKw = freezed,Object? supportedConnectors = null,Object? chargingPreferences = null,Object? tankCapacityL = freezed,Object? preferredFuelType = freezed,Object? engineDisplacementCc = freezed,Object? engineCylinders = freezed,Object? volumetricEfficiency = null,Object? curbWeightKg = freezed,Object? obd2AdapterMac = freezed,Object? obd2AdapterName = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -378,7 +384,8 @@ as double?,preferredFuelType: freezed == preferredFuelType ? _self.preferredFuel
 as String?,engineDisplacementCc: freezed == engineDisplacementCc ? _self.engineDisplacementCc : engineDisplacementCc // ignore: cast_nullable_to_non_nullable
 as int?,engineCylinders: freezed == engineCylinders ? _self.engineCylinders : engineCylinders // ignore: cast_nullable_to_non_nullable
 as int?,volumetricEfficiency: null == volumetricEfficiency ? _self.volumetricEfficiency : volumetricEfficiency // ignore: cast_nullable_to_non_nullable
-as double,obd2AdapterMac: freezed == obd2AdapterMac ? _self.obd2AdapterMac : obd2AdapterMac // ignore: cast_nullable_to_non_nullable
+as double,curbWeightKg: freezed == curbWeightKg ? _self.curbWeightKg : curbWeightKg // ignore: cast_nullable_to_non_nullable
+as int?,obd2AdapterMac: freezed == obd2AdapterMac ? _self.obd2AdapterMac : obd2AdapterMac // ignore: cast_nullable_to_non_nullable
 as String?,obd2AdapterName: freezed == obd2AdapterName ? _self.obd2AdapterName : obd2AdapterName // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -474,10 +481,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @VehicleTypeJsonConverter()  VehicleType type,  double? batteryKwh,  double? maxChargingKw, @ConnectorTypeSetConverter()  Set<ConnectorType> supportedConnectors, @ChargingPreferencesJsonConverter()  ChargingPreferences chargingPreferences,  double? tankCapacityL,  String? preferredFuelType,  int? engineDisplacementCc,  int? engineCylinders,  double volumetricEfficiency,  String? obd2AdapterMac,  String? obd2AdapterName)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @VehicleTypeJsonConverter()  VehicleType type,  double? batteryKwh,  double? maxChargingKw, @ConnectorTypeSetConverter()  Set<ConnectorType> supportedConnectors, @ChargingPreferencesJsonConverter()  ChargingPreferences chargingPreferences,  double? tankCapacityL,  String? preferredFuelType,  int? engineDisplacementCc,  int? engineCylinders,  double volumetricEfficiency,  int? curbWeightKg,  String? obd2AdapterMac,  String? obd2AdapterName)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _VehicleProfile() when $default != null:
-return $default(_that.id,_that.name,_that.type,_that.batteryKwh,_that.maxChargingKw,_that.supportedConnectors,_that.chargingPreferences,_that.tankCapacityL,_that.preferredFuelType,_that.engineDisplacementCc,_that.engineCylinders,_that.volumetricEfficiency,_that.obd2AdapterMac,_that.obd2AdapterName);case _:
+return $default(_that.id,_that.name,_that.type,_that.batteryKwh,_that.maxChargingKw,_that.supportedConnectors,_that.chargingPreferences,_that.tankCapacityL,_that.preferredFuelType,_that.engineDisplacementCc,_that.engineCylinders,_that.volumetricEfficiency,_that.curbWeightKg,_that.obd2AdapterMac,_that.obd2AdapterName);case _:
   return orElse();
 
 }
@@ -495,10 +502,10 @@ return $default(_that.id,_that.name,_that.type,_that.batteryKwh,_that.maxChargin
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @VehicleTypeJsonConverter()  VehicleType type,  double? batteryKwh,  double? maxChargingKw, @ConnectorTypeSetConverter()  Set<ConnectorType> supportedConnectors, @ChargingPreferencesJsonConverter()  ChargingPreferences chargingPreferences,  double? tankCapacityL,  String? preferredFuelType,  int? engineDisplacementCc,  int? engineCylinders,  double volumetricEfficiency,  String? obd2AdapterMac,  String? obd2AdapterName)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @VehicleTypeJsonConverter()  VehicleType type,  double? batteryKwh,  double? maxChargingKw, @ConnectorTypeSetConverter()  Set<ConnectorType> supportedConnectors, @ChargingPreferencesJsonConverter()  ChargingPreferences chargingPreferences,  double? tankCapacityL,  String? preferredFuelType,  int? engineDisplacementCc,  int? engineCylinders,  double volumetricEfficiency,  int? curbWeightKg,  String? obd2AdapterMac,  String? obd2AdapterName)  $default,) {final _that = this;
 switch (_that) {
 case _VehicleProfile():
-return $default(_that.id,_that.name,_that.type,_that.batteryKwh,_that.maxChargingKw,_that.supportedConnectors,_that.chargingPreferences,_that.tankCapacityL,_that.preferredFuelType,_that.engineDisplacementCc,_that.engineCylinders,_that.volumetricEfficiency,_that.obd2AdapterMac,_that.obd2AdapterName);case _:
+return $default(_that.id,_that.name,_that.type,_that.batteryKwh,_that.maxChargingKw,_that.supportedConnectors,_that.chargingPreferences,_that.tankCapacityL,_that.preferredFuelType,_that.engineDisplacementCc,_that.engineCylinders,_that.volumetricEfficiency,_that.curbWeightKg,_that.obd2AdapterMac,_that.obd2AdapterName);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -515,10 +522,10 @@ return $default(_that.id,_that.name,_that.type,_that.batteryKwh,_that.maxChargin
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @VehicleTypeJsonConverter()  VehicleType type,  double? batteryKwh,  double? maxChargingKw, @ConnectorTypeSetConverter()  Set<ConnectorType> supportedConnectors, @ChargingPreferencesJsonConverter()  ChargingPreferences chargingPreferences,  double? tankCapacityL,  String? preferredFuelType,  int? engineDisplacementCc,  int? engineCylinders,  double volumetricEfficiency,  String? obd2AdapterMac,  String? obd2AdapterName)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @VehicleTypeJsonConverter()  VehicleType type,  double? batteryKwh,  double? maxChargingKw, @ConnectorTypeSetConverter()  Set<ConnectorType> supportedConnectors, @ChargingPreferencesJsonConverter()  ChargingPreferences chargingPreferences,  double? tankCapacityL,  String? preferredFuelType,  int? engineDisplacementCc,  int? engineCylinders,  double volumetricEfficiency,  int? curbWeightKg,  String? obd2AdapterMac,  String? obd2AdapterName)?  $default,) {final _that = this;
 switch (_that) {
 case _VehicleProfile() when $default != null:
-return $default(_that.id,_that.name,_that.type,_that.batteryKwh,_that.maxChargingKw,_that.supportedConnectors,_that.chargingPreferences,_that.tankCapacityL,_that.preferredFuelType,_that.engineDisplacementCc,_that.engineCylinders,_that.volumetricEfficiency,_that.obd2AdapterMac,_that.obd2AdapterName);case _:
+return $default(_that.id,_that.name,_that.type,_that.batteryKwh,_that.maxChargingKw,_that.supportedConnectors,_that.chargingPreferences,_that.tankCapacityL,_that.preferredFuelType,_that.engineDisplacementCc,_that.engineCylinders,_that.volumetricEfficiency,_that.curbWeightKg,_that.obd2AdapterMac,_that.obd2AdapterName);case _:
   return null;
 
 }
@@ -530,7 +537,7 @@ return $default(_that.id,_that.name,_that.type,_that.batteryKwh,_that.maxChargin
 @JsonSerializable()
 
 class _VehicleProfile extends VehicleProfile {
-  const _VehicleProfile({required this.id, required this.name, @VehicleTypeJsonConverter() this.type = VehicleType.combustion, this.batteryKwh, this.maxChargingKw, @ConnectorTypeSetConverter() final  Set<ConnectorType> supportedConnectors = const <ConnectorType>{}, @ChargingPreferencesJsonConverter() this.chargingPreferences = const ChargingPreferences(), this.tankCapacityL, this.preferredFuelType, this.engineDisplacementCc, this.engineCylinders, this.volumetricEfficiency = 0.85, this.obd2AdapterMac, this.obd2AdapterName}): _supportedConnectors = supportedConnectors,super._();
+  const _VehicleProfile({required this.id, required this.name, @VehicleTypeJsonConverter() this.type = VehicleType.combustion, this.batteryKwh, this.maxChargingKw, @ConnectorTypeSetConverter() final  Set<ConnectorType> supportedConnectors = const <ConnectorType>{}, @ChargingPreferencesJsonConverter() this.chargingPreferences = const ChargingPreferences(), this.tankCapacityL, this.preferredFuelType, this.engineDisplacementCc, this.engineCylinders, this.volumetricEfficiency = 0.85, this.curbWeightKg, this.obd2AdapterMac, this.obd2AdapterName}): _supportedConnectors = supportedConnectors,super._();
   factory _VehicleProfile.fromJson(Map<String, dynamic> json) => _$VehicleProfileFromJson(json);
 
 @override final  String id;
@@ -570,6 +577,13 @@ class _VehicleProfile extends VehicleProfile {
 @override final  int? engineDisplacementCc;
 @override final  int? engineCylinders;
 @override@JsonKey() final  double volumetricEfficiency;
+// Curb weight in kilograms (#812). Populated by the VIN decoder
+// phase 2 onboarding flow (GVWR-minus-payload on the NHTSA side,
+// or manufacturer spec sheets via a future secondary lookup).
+// Null means "unknown" — consumers like the rolling-resistance
+// estimator fall back to a 1500 kg reference, so the field being
+// null is not fatal.
+@override final  int? curbWeightKg;
 // OBD2 adapter pairing (#784). Persisted so the app can
 // transparently reconnect on launch without prompting the user
 // again. Both fields are nullable — unpaired vehicles carry
@@ -591,16 +605,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VehicleProfile&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.type, type) || other.type == type)&&(identical(other.batteryKwh, batteryKwh) || other.batteryKwh == batteryKwh)&&(identical(other.maxChargingKw, maxChargingKw) || other.maxChargingKw == maxChargingKw)&&const DeepCollectionEquality().equals(other._supportedConnectors, _supportedConnectors)&&(identical(other.chargingPreferences, chargingPreferences) || other.chargingPreferences == chargingPreferences)&&(identical(other.tankCapacityL, tankCapacityL) || other.tankCapacityL == tankCapacityL)&&(identical(other.preferredFuelType, preferredFuelType) || other.preferredFuelType == preferredFuelType)&&(identical(other.engineDisplacementCc, engineDisplacementCc) || other.engineDisplacementCc == engineDisplacementCc)&&(identical(other.engineCylinders, engineCylinders) || other.engineCylinders == engineCylinders)&&(identical(other.volumetricEfficiency, volumetricEfficiency) || other.volumetricEfficiency == volumetricEfficiency)&&(identical(other.obd2AdapterMac, obd2AdapterMac) || other.obd2AdapterMac == obd2AdapterMac)&&(identical(other.obd2AdapterName, obd2AdapterName) || other.obd2AdapterName == obd2AdapterName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VehicleProfile&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.type, type) || other.type == type)&&(identical(other.batteryKwh, batteryKwh) || other.batteryKwh == batteryKwh)&&(identical(other.maxChargingKw, maxChargingKw) || other.maxChargingKw == maxChargingKw)&&const DeepCollectionEquality().equals(other._supportedConnectors, _supportedConnectors)&&(identical(other.chargingPreferences, chargingPreferences) || other.chargingPreferences == chargingPreferences)&&(identical(other.tankCapacityL, tankCapacityL) || other.tankCapacityL == tankCapacityL)&&(identical(other.preferredFuelType, preferredFuelType) || other.preferredFuelType == preferredFuelType)&&(identical(other.engineDisplacementCc, engineDisplacementCc) || other.engineDisplacementCc == engineDisplacementCc)&&(identical(other.engineCylinders, engineCylinders) || other.engineCylinders == engineCylinders)&&(identical(other.volumetricEfficiency, volumetricEfficiency) || other.volumetricEfficiency == volumetricEfficiency)&&(identical(other.curbWeightKg, curbWeightKg) || other.curbWeightKg == curbWeightKg)&&(identical(other.obd2AdapterMac, obd2AdapterMac) || other.obd2AdapterMac == obd2AdapterMac)&&(identical(other.obd2AdapterName, obd2AdapterName) || other.obd2AdapterName == obd2AdapterName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,type,batteryKwh,maxChargingKw,const DeepCollectionEquality().hash(_supportedConnectors),chargingPreferences,tankCapacityL,preferredFuelType,engineDisplacementCc,engineCylinders,volumetricEfficiency,obd2AdapterMac,obd2AdapterName);
+int get hashCode => Object.hash(runtimeType,id,name,type,batteryKwh,maxChargingKw,const DeepCollectionEquality().hash(_supportedConnectors),chargingPreferences,tankCapacityL,preferredFuelType,engineDisplacementCc,engineCylinders,volumetricEfficiency,curbWeightKg,obd2AdapterMac,obd2AdapterName);
 
 @override
 String toString() {
-  return 'VehicleProfile(id: $id, name: $name, type: $type, batteryKwh: $batteryKwh, maxChargingKw: $maxChargingKw, supportedConnectors: $supportedConnectors, chargingPreferences: $chargingPreferences, tankCapacityL: $tankCapacityL, preferredFuelType: $preferredFuelType, engineDisplacementCc: $engineDisplacementCc, engineCylinders: $engineCylinders, volumetricEfficiency: $volumetricEfficiency, obd2AdapterMac: $obd2AdapterMac, obd2AdapterName: $obd2AdapterName)';
+  return 'VehicleProfile(id: $id, name: $name, type: $type, batteryKwh: $batteryKwh, maxChargingKw: $maxChargingKw, supportedConnectors: $supportedConnectors, chargingPreferences: $chargingPreferences, tankCapacityL: $tankCapacityL, preferredFuelType: $preferredFuelType, engineDisplacementCc: $engineDisplacementCc, engineCylinders: $engineCylinders, volumetricEfficiency: $volumetricEfficiency, curbWeightKg: $curbWeightKg, obd2AdapterMac: $obd2AdapterMac, obd2AdapterName: $obd2AdapterName)';
 }
 
 
@@ -611,7 +625,7 @@ abstract mixin class _$VehicleProfileCopyWith<$Res> implements $VehicleProfileCo
   factory _$VehicleProfileCopyWith(_VehicleProfile value, $Res Function(_VehicleProfile) _then) = __$VehicleProfileCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name,@VehicleTypeJsonConverter() VehicleType type, double? batteryKwh, double? maxChargingKw,@ConnectorTypeSetConverter() Set<ConnectorType> supportedConnectors,@ChargingPreferencesJsonConverter() ChargingPreferences chargingPreferences, double? tankCapacityL, String? preferredFuelType, int? engineDisplacementCc, int? engineCylinders, double volumetricEfficiency, String? obd2AdapterMac, String? obd2AdapterName
+ String id, String name,@VehicleTypeJsonConverter() VehicleType type, double? batteryKwh, double? maxChargingKw,@ConnectorTypeSetConverter() Set<ConnectorType> supportedConnectors,@ChargingPreferencesJsonConverter() ChargingPreferences chargingPreferences, double? tankCapacityL, String? preferredFuelType, int? engineDisplacementCc, int? engineCylinders, double volumetricEfficiency, int? curbWeightKg, String? obd2AdapterMac, String? obd2AdapterName
 });
 
 
@@ -628,7 +642,7 @@ class __$VehicleProfileCopyWithImpl<$Res>
 
 /// Create a copy of VehicleProfile
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? type = null,Object? batteryKwh = freezed,Object? maxChargingKw = freezed,Object? supportedConnectors = null,Object? chargingPreferences = null,Object? tankCapacityL = freezed,Object? preferredFuelType = freezed,Object? engineDisplacementCc = freezed,Object? engineCylinders = freezed,Object? volumetricEfficiency = null,Object? obd2AdapterMac = freezed,Object? obd2AdapterName = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? type = null,Object? batteryKwh = freezed,Object? maxChargingKw = freezed,Object? supportedConnectors = null,Object? chargingPreferences = null,Object? tankCapacityL = freezed,Object? preferredFuelType = freezed,Object? engineDisplacementCc = freezed,Object? engineCylinders = freezed,Object? volumetricEfficiency = null,Object? curbWeightKg = freezed,Object? obd2AdapterMac = freezed,Object? obd2AdapterName = freezed,}) {
   return _then(_VehicleProfile(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -642,7 +656,8 @@ as double?,preferredFuelType: freezed == preferredFuelType ? _self.preferredFuel
 as String?,engineDisplacementCc: freezed == engineDisplacementCc ? _self.engineDisplacementCc : engineDisplacementCc // ignore: cast_nullable_to_non_nullable
 as int?,engineCylinders: freezed == engineCylinders ? _self.engineCylinders : engineCylinders // ignore: cast_nullable_to_non_nullable
 as int?,volumetricEfficiency: null == volumetricEfficiency ? _self.volumetricEfficiency : volumetricEfficiency // ignore: cast_nullable_to_non_nullable
-as double,obd2AdapterMac: freezed == obd2AdapterMac ? _self.obd2AdapterMac : obd2AdapterMac // ignore: cast_nullable_to_non_nullable
+as double,curbWeightKg: freezed == curbWeightKg ? _self.curbWeightKg : curbWeightKg // ignore: cast_nullable_to_non_nullable
+as int?,obd2AdapterMac: freezed == obd2AdapterMac ? _self.obd2AdapterMac : obd2AdapterMac // ignore: cast_nullable_to_non_nullable
 as String?,obd2AdapterName: freezed == obd2AdapterName ? _self.obd2AdapterName : obd2AdapterName // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
