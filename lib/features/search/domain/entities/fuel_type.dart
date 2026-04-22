@@ -338,6 +338,14 @@ List<FuelType> fuelTypesForCountry(String countryCode) {
         FuelType.e5, FuelType.e98, FuelType.diesel,
         FuelType.lpg, FuelType.electric, FuelType.all,
       ];
+    case 'CL':
+      // Chile (CNE Bencina en Línea): Gasolina 93/95 (→ e5),
+      // Gasolina 97 (→ e98), Diésel, Gas licuado / LPG. Kerosene is
+      // published by CNE but has no FuelType enum today. #596
+      return [
+        FuelType.e5, FuelType.e98, FuelType.diesel,
+        FuelType.lpg, FuelType.electric, FuelType.all,
+      ];
     default:
       return [FuelType.e5, FuelType.e10, FuelType.diesel, FuelType.electric, FuelType.all];
   }

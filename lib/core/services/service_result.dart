@@ -18,6 +18,7 @@ enum ServiceSource {
   luxembourgApi('Luxembourg (regulated)'),
   sloveniaApi('goriva.si'),
   openinetApi('OPINET (KNOC)'),
+  chileApi('CNE Bencina en Linea'),
   osrmRouting('OSRM Routing'),
   openChargeMapApi('OpenChargeMap'),
   nominatimGeocoding('Nominatim (OSM)'),

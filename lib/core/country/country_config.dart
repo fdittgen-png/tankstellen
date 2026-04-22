@@ -419,11 +419,45 @@ class Countries {
     pricePerUnitSuffix: '₩/L',
   );
 
+  /// Chile — CNE "Bencina en Línea" REST API (#596). ~6 000 service
+  /// stations nationwide. Gasolina 93/95 (→ e5), Gasolina 97 (→ e98),
+  /// Diésel, Gas licuado/LPG. Kerosene is published but unmapped until
+  /// we add a FuelType enum for it. Prices are in CLP per litre.
+  static const chile = CountryConfig(
+    code: 'CL',
+    name: 'Chile',
+    flag: '\u{1F1E8}\u{1F1F1}',
+    currency: 'CLP',
+    currencySymbol: '\$',
+    locale: 'es_CL',
+    postalCodeLength: 7,
+    // Chilean postal codes are 7 digits (RUT-style "1234567"). The
+    // regex is lenient enough to accept the common "123-4567" form as
+    // well — both variants appear on government records.
+    postalCodeRegex: r'^\d{7}$',
+    postalCodeLabel: 'Código postal',
+    requiresApiKey: true,
+    apiKeyRegistrationUrl: 'https://api.cne.cl/',
+    apiProvider: 'CNE Bencina en Linea',
+    attribution: 'Datos: Comisión Nacional de Energía (cne.cl)',
+    fuelTypes: ['Gasolina 93', 'Gasolina 95', 'Gasolina 97', 'Diésel', 'GLP'],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.e98,
+      FuelType.diesel,
+      FuelType.lpg,
+      FuelType.electric,
+    },
+    examplePostalCode: '8320000',
+    exampleCity: 'Santiago',
+    pricePerUnitSuffix: '\$/L',
+  );
+
   /// All supported countries, ordered for display.
   static const all = [
     germany, france, austria, spain, italy, denmark, argentina,
     portugal, unitedKingdom, australia, mexico, luxembourg, slovenia,
-    southKorea,
+    southKorea, chile,
   ];
 
   /// Find country by ISO code.
@@ -464,6 +498,7 @@ class Countries {
   /// - \`lu-\` → LU (Luxembourg regulated prices, #574)
   /// - \`si-\` → SI (Slovenia goriva.si, #575)
   /// - \`kr-\` → KR (South Korea OPINET / KNOC, #597)
+  /// - \`cl-\` → CL (Chile CNE Bencina en Línea, #596)
   /// - \`demo-\` → null (demo service, no real country)
   static const Map<String, String> _stationIdPrefixToCountry = {
     'pt-': 'PT',
@@ -476,6 +511,7 @@ class Countries {
     'lu-': 'LU',
     'si-': 'SI',
     'kr-': 'KR',
+    'cl-': 'CL',
   };
 
   /// Returns the ISO country code inferred from a station id's prefix,

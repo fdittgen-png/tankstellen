@@ -3011,4 +3011,10 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get southKoreaApiProvider => 'OPINET (KNOC)';
+
+  @override
+  String get chileApiKeyRequired => 'Register at CNE to get a free API key';
+
+  @override
+  String get chileApiProvider => 'CNE Bencina en Linea';
 }

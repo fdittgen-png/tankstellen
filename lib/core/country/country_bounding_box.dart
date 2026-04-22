@@ -80,6 +80,12 @@ const countryBoundingBoxes = <String, CountryBoundingBox>{
   // South Korea (mainland + Jeju): lat 33.10–38.61, lng 124.61–131.87
   // (with margin). No overlap with any other registered country. See #597.
   'KR': CountryBoundingBox(minLat: 33.0, maxLat: 39.0, minLng: 124.0, maxLng: 131.0),
+
+  // Chile: lat -56.00 (Tierra del Fuego) – -17.50 (Arica), lng -75.80 –
+  // -66.40 (mainland, with a margin large enough for Isla de Chiloé and
+  // the Atacama coast but kept narrow on the east so Chile's tight west-
+  // coast strip does not shadow Argentina's much larger box. See #596.
+  'CL': CountryBoundingBox(minLat: -56.5, maxLat: -17.0, minLng: -77.0, maxLng: -66.0),
 };
 
 /// Deterministic order used by [countryCodeFromLatLng] to walk
@@ -119,6 +125,11 @@ const List<String> _bboxLookupOrder = [
   'ES',
   'DE',
   'MX',
+  // CL before AR: Chile's narrow strip sits inside AR's generous
+  // longitude range along the cordillera. A Santiago station
+  // (-33.45 / -70.67) or a Punta Arenas station (-53.16 / -70.91)
+  // would otherwise fall through to AR. See #596.
+  'CL',
   'AR',
   'AU',
   'KR',
