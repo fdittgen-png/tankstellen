@@ -7,8 +7,12 @@ import 'package:tankstellen/app/app.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
+import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/consent/presentation/screens/gdpr_consent_screen.dart';
+import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
+import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
+import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/setup/presentation/screens/onboarding_wizard_screen.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/welcome_step.dart';
 
@@ -27,9 +31,10 @@ import 'package:tankstellen/features/setup/presentation/widgets/welcome_step.dar
 ///   4. Wizard completion creates a default profile.
 ///   5. After wizard with a non-default country selection, the active
 ///      profile records that country.
-///
-/// Test 6 from the issue body (EV favorite round-trip) is deferred to a
-/// follow-up PR — the EV-entity hardening on #691 is still in flux.
+///   6. After wizard completion on an EV-capable country, toggling an
+///      EV station favorite persists id + JSON, survives a provider-
+///      container restart, and the #691 JSON-before-id invariant holds
+///      (no orphan ids in EV storage).
 Future<void> _clearAllHiveBoxes() async {
   // Close any open boxes from a prior test so we can safely wipe their
   // underlying files. HiveStorage.init() will reopen them fresh.
@@ -344,6 +349,151 @@ void main() {
           reason:
               'Country selection during the wizard must propagate to '
               'UserProfile.countryCode on completion');
+    });
+
+    testWidgets(
+        'test 6: EV favorite toggled after a fresh-install wizard run '
+        'survives a provider-container restart (#846 regression for #691)',
+        (tester) async {
+      // This is the sixth scenario deferred from #569 and tracked in #846.
+      // It guards the #691 "JSON-before-id" EV favorite invariant in an
+      // integration context: a brand-new Hive install, the real onboarding
+      // wizard, then a favorite toggle on the same provider API the EV
+      // detail screen calls (`favoritesProvider.notifier.toggle(id,
+      // rawJson: ...)`), then a full container restart to prove the
+      // favorite rehydrates from Hive — not from in-memory provider state.
+      await _bootFreshStorage();
+      final firstContainer = await _pumpFreshApp(tester);
+      await _acceptConsentAll(tester);
+
+      // Pick France — an EV-capable country (OpenChargeMap is global, so
+      // any country works; FR keeps this test aligned with test 5 and
+      // the shorter no-API-key wizard shape).
+      expect(find.byType(WelcomeStep), findsOneWidget);
+      await _tapNext(tester);
+      await _selectCountry(tester, Countries.france);
+      expect(firstContainer.read(activeCountryProvider).code, 'FR');
+
+      // Walk the rest of the wizard to the Done step and finish.
+      const maxSteps = 10;
+      var stepsWalked = 0;
+      while (find.text('Get started').evaluate().isEmpty &&
+          stepsWalked < maxSteps) {
+        if (find.text('Skip').evaluate().isNotEmpty) {
+          await _tapSkip(tester);
+        } else {
+          await _tapNext(tester);
+        }
+        stepsWalked++;
+      }
+      await _tapGetStarted(tester);
+
+      // Pre-condition: shell reached, no EV favorites yet.
+      expect(firstContainer.read(favoritesProvider), isEmpty,
+          reason: 'Fresh install must start with zero favorites');
+      expect(firstContainer.read(evFavoriteStationsProvider), isEmpty);
+
+      // The EV station fixture MUST use the `ocm-` id prefix so that
+      // Favorites.add() routes the write to EV storage (the #691 code
+      // path). Shape mirrors what EVChargingService actually produces.
+      const evStation = ChargingStation(
+        id: 'ocm-846-test',
+        name: 'IONITY Pézenas',
+        operator: 'IONITY',
+        lat: 43.4672,
+        lng: 3.4242,
+        dist: 1.1,
+        address: 'A75 Aire de Pézenas',
+        postCode: '34120',
+        place: 'Pézenas',
+        connectors: [],
+        totalPoints: 6,
+        isOperational: true,
+      );
+
+      // Drive the EXACT call the EV detail screen makes (see
+      // lib/features/search/presentation/screens/ev_station_detail_screen.dart:103).
+      // Any deviation here lets the test pass while the app stays broken.
+      await tester.runAsync(() async {
+        await firstContainer.read(favoritesProvider.notifier).toggle(
+              evStation.id,
+              rawJson: evStation.toJson(),
+            );
+      });
+      await tester.pump();
+
+      // Assert the favorite landed in EV storage with BOTH id and JSON —
+      // if JSON is missing, the #691 "orphan id" regression has returned.
+      final storage1 = firstContainer.read(storageRepositoryProvider);
+      expect(storage1.getEvFavoriteIds(), contains(evStation.id),
+          reason:
+              'EV id must be in EV storage after toggle — fuel-storage '
+              'leak indicates the ocm- prefix routing regressed');
+      expect(storage1.getEvFavoriteStationData(evStation.id), isNotNull,
+          reason:
+              'Station JSON must be persisted alongside the id — the #691 '
+              'invariant forbids id-without-JSON orphans');
+      expect(firstContainer.read(favoritesProvider), contains(evStation.id),
+          reason:
+              'Unified favoritesProvider must reflect the EV toggle so the '
+              'star icon + Favorites tab rebuild');
+      expect(firstContainer.read(isFavoriteProvider(evStation.id)), isTrue);
+      expect(firstContainer.read(evFavoriteStationsProvider), hasLength(1),
+          reason:
+              'EvFavoriteStations must rehydrate the station from the '
+              'stored JSON — an empty list means fromJson failed');
+
+      // ---- RESTART SIMULATION ----
+      // Dispose the first ProviderContainer so every keepAlive provider
+      // (favorites, storage, EV favorites) is torn down. We do NOT clear
+      // Hive — the point is to prove the on-disk favorite survives a
+      // full cold boot. A new container re-reads the favorite IDs and
+      // JSON from the still-open Hive boxes on first `.read()`.
+      firstContainer.dispose();
+
+      final secondContainer = ProviderContainer();
+      addTearDown(secondContainer.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: secondContainer,
+          child: const TankstellenApp(),
+        ),
+      );
+      await tester.pumpAndSettle(const Duration(seconds: 3));
+
+      // Post-restart invariants: the EV favorite is still reachable on
+      // every surface the UI watches.
+      final storage2 = secondContainer.read(storageRepositoryProvider);
+      expect(storage2.getEvFavoriteIds(), contains(evStation.id),
+          reason:
+              'Post-restart: EV id must still be in EV storage — a missing '
+              'id here means the Hive write never hit disk before the '
+              'first container dispose');
+      expect(storage2.getEvFavoriteStationData(evStation.id), isNotNull,
+          reason:
+              'Post-restart: station JSON must rehydrate from Hive — the '
+              '#691 regression would surface here as a null readback');
+      expect(secondContainer.read(favoritesProvider), contains(evStation.id),
+          reason:
+              'Post-restart: fresh favoritesProvider must repopulate from '
+              'Hive on first build (merging fuel + EV ids)');
+      expect(secondContainer.read(isFavoriteProvider(evStation.id)), isTrue,
+          reason:
+              'Post-restart: isFavoriteProvider must keep reporting true so '
+              'the star icon renders filled on the EV detail screen');
+      final restoredStations =
+          secondContainer.read(evFavoriteStationsProvider);
+      expect(restoredStations, hasLength(1),
+          reason:
+              'Post-restart: EvFavoriteStations must return exactly the '
+              'one fixture station — zero means orphan (id without JSON), '
+              'more than one means the Hive state leaked from an earlier '
+              'test');
+      expect(restoredStations.first.id, evStation.id);
+      expect(restoredStations.first.name, evStation.name,
+          reason:
+              'Restored station must carry the original name, proving '
+              'fromJson round-tripped through Hive losslessly');
     });
   });
 }
