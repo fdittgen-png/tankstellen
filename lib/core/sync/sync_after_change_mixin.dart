@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'alerts_sync.dart';
 import 'sync_provider.dart';
 import 'sync_service.dart';
 
@@ -23,7 +24,7 @@ mixin SyncAfterChangeMixin {
     try {
       final syncState = ref.read(syncStateProvider);
       if (syncState.enabled) {
-        await SyncService.syncAlerts(alerts as dynamic);
+        await AlertsSync.merge(alerts as dynamic);
       }
     } catch (e) {
       debugPrint('SyncAfterChange: alerts sync failed: $e');

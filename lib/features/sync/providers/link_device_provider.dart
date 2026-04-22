@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/sync/supabase_client.dart';
+import '../../../core/sync/alerts_sync.dart';
 import '../../../core/sync/sync_service.dart';
 import '../../alerts/data/models/price_alert.dart';
 import '../../alerts/providers/alert_provider.dart';
@@ -165,7 +166,7 @@ class LinkDeviceController extends _$LinkDeviceController {
       // 7. Sync merged data back to our server account. Profile is NOT
       // synced — each device keeps its own local profile + defaulting.
       await SyncService.syncFavorites(ref.read(favoritesProvider));
-      await SyncService.syncAlerts(ref.read(alertProvider));
+      await AlertsSync.merge(ref.read(alertProvider));
       await SyncService.syncVehicles(ref.read(vehicleProfileListProvider));
       await SyncService.syncFillUps(ref.read(fillUpListProvider));
 

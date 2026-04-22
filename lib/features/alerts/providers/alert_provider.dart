@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/background/background_service.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_provider.dart';
-import '../../../core/sync/sync_service.dart';
+import '../../../core/sync/alerts_sync.dart';
 import '../data/models/price_alert.dart';
 import '../data/repositories/alert_repository.dart';
 
@@ -80,7 +80,7 @@ class AlertNotifier extends _$AlertNotifier {
     try {
       final syncState = ref.read(syncStateProvider);
       if (syncState.enabled) {
-        await SyncService.syncAlerts(state);
+        await AlertsSync.merge(state);
       }
     } catch (e) {
       debugPrint('AlertProvider: sync failed: $e');

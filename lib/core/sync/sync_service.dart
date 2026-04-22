@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../features/alerts/data/models/price_alert.dart';
 import '../../features/consumption/data/baseline_sync.dart';
 import '../../features/consumption/domain/entities/fill_up.dart';
 import '../../features/itinerary/domain/entities/saved_itinerary.dart';
@@ -140,74 +139,6 @@ class SyncService {
     } catch (e) {
       debugPrint('SyncService.syncIgnoredStations FAILED: $e');
       return localIgnoredIds;
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Alerts
-  // ---------------------------------------------------------------------------
-
-  /// Sync alerts: merges local and server sets.
-  static Future<List<PriceAlert>> syncAlerts(
-    List<PriceAlert> localAlerts,
-  ) async {
-    final client = _client;
-    final userId = _authenticatedUserId;
-    if (client == null || userId == null) {
-      debugPrint('SyncService.syncAlerts: not authenticated');
-      return localAlerts;
-    }
-
-    try {
-      final serverRows =
-          await client.from('alerts').select().eq('user_id', userId);
-      final serverAlertIds = serverRows
-          .map((r) => r.getString('id'))
-          .whereType<String>()
-          .toSet();
-      final localAlertIds = localAlerts.map((a) => a.id).toSet();
-
-      debugPrint('SyncService.syncAlerts: local=${localAlertIds.length}, server=${serverAlertIds.length}');
-
-      // Upload local-only alerts
-      final localOnly =
-          localAlerts.where((a) => !serverAlertIds.contains(a.id)).toList();
-      if (localOnly.isNotEmpty) {
-        final rows = localOnly
-            .map((a) => {
-                  'id': a.id,
-                  'user_id': userId,
-                  'station_id': a.stationId,
-                  'station_name': a.stationName,
-                  'fuel_type': a.fuelType.name,
-                  'target_price': a.targetPrice,
-                  'is_active': a.isActive,
-                  'created_at': a.createdAt.toIso8601String(),
-                })
-            .toList();
-        await client.from('alerts').upsert(rows, onConflict: 'id');
-        debugPrint('SyncService.syncAlerts: uploaded ${localOnly.length} alerts');
-      }
-
-      // Download server-only alerts
-      final serverOnly =
-          serverRows.where((r) => !localAlertIds.contains(r.getString('id')));
-      final downloaded = serverOnly.map((r) {
-        return PriceAlert.fromJson({
-          'id': r.getString('id') ?? '',
-          'stationId': r.getString('station_id') ?? '',
-          'stationName': r.getString('station_name') ?? '',
-          'fuelType': r.getString('fuel_type') ?? '',
-          'targetPrice': r.getDouble('target_price') ?? 0.0,
-          'isActive': r.getBool('is_active') ?? true,
-          'createdAt': r.getString('created_at') ?? '',
-        });
-      }).toList();
-
-      return [...localAlerts, ...downloaded];
-    } catch (e) {
-      debugPrint('SyncService.syncAlerts FAILED: $e');
-      return localAlerts;
     }
   }
 
