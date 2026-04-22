@@ -5,6 +5,8 @@ import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/station_extensions.dart';
+import '../../../../core/widgets/animated_favorite_star.dart';
+import '../../../../core/widgets/animated_price_text.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/station.dart';

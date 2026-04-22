@@ -10,6 +10,7 @@ import '../../../../core/services/widgets/freshness_badge.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/utils/price_utils.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../core/widgets/staggered_fade_in.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/presentation/widgets/swipe_tutorial_banner.dart';
 import '../../../favorites/providers/favorites_provider.dart';
@@ -161,7 +162,7 @@ class SearchResultsList extends ConsumerWidget {
                   final item = sorted[index];
                   final isFav = ref.watch(isFavoriteProvider(item.id));
 
-                  return switch (item) {
+                  final card = switch (item) {
                     FuelStationResult(:final station) => _buildFuelCard(
                       context: context,
                       ref: ref,
@@ -179,6 +180,15 @@ class SearchResultsList extends ConsumerWidget {
                       onTap: () => context.push('/ev-station', extra: item.station),
                     ),
                   };
+                  // #595 — cap stagger so a 50-result search finishes
+                  // fading in well under a second. Index key keeps the
+                  // animation bound to the slot, so rebuilds (refresh,
+                  // filter changes) don't re-trigger it.
+                  return StaggeredFadeIn(
+                    key: ValueKey('stagger-${item.id}'),
+                    index: index,
+                    child: card,
+                  );
                 },
               );
             }),

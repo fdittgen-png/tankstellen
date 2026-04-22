@@ -56,8 +56,9 @@ void main() {
         ],
       );
 
-      // The brand 'STAR' should be displayed
-      expect(find.text('STAR'), findsOneWidget);
+      // The brand 'STAR' should be displayed — once in the app bar hero
+      // target (#595) and once in the body content row.
+      expect(find.text('STAR'), findsNWidgets(2));
     });
 
     testWidgets('renders price tiles for fuel types', (tester) async {
@@ -233,6 +234,41 @@ void main() {
 
       // Should have filled star (favorited)
       expect(find.byIcon(Icons.star), findsWidgets);
+    });
+
+    testWidgets(
+        '#595: app bar title is wrapped in a Hero with the matching tag',
+        (tester) async {
+      final result = ServiceResult(
+        data: const StationDetail(station: testStation),
+        source: ServiceSource.cache,
+        fetchedAt: DateTime.now(),
+      );
+
+      await pumpApp(
+        tester,
+        const StationDetailScreen(
+          stationId: '51d4b477-a095-1aa0-e100-80009459e03a',
+        ),
+        overrides: [
+          ...commonOverrides,
+          stationDetailProvider('51d4b477-a095-1aa0-e100-80009459e03a')
+              .overrideWith((_) async => result),
+          favoritesOverride([]),
+          isFavoriteOverride(
+              '51d4b477-a095-1aa0-e100-80009459e03a', false),
+        ],
+      );
+
+      final heroes = find.byType(Hero);
+      final matching = heroes.evaluate().where((element) {
+        final widget = element.widget as Hero;
+        return widget.tag ==
+            'station-name-51d4b477-a095-1aa0-e100-80009459e03a';
+      });
+      expect(matching, isNotEmpty,
+          reason: 'Detail screen must expose a matching hero tag so the '
+              'station card title can fly to the app bar on push.');
     });
 
     testWidgets('renders address information', (tester) async {

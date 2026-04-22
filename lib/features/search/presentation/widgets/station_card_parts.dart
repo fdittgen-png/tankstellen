@@ -50,17 +50,43 @@ class _StationDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final titleText = hasBrand ? station.brand : station.street;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          hasBrand ? station.brand : station.street,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
+        // #595 — Hero flight from the card's brand/name to the detail app
+        // bar title. Text needs Material ancestry mid-flight so wrap in a
+        // transparent Material to avoid "Text requires Material" warnings.
+        Hero(
+          tag: 'station-name-${station.id}',
+          flightShuttleBuilder: (ctx, animation, direction, fromCtx, toCtx) {
+            return Material(
+              type: MaterialType.transparency,
+              child: DefaultTextStyle(
+                style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ) ??
+                    const TextStyle(fontWeight: FontWeight.bold),
+                child: Text(
+                  titleText,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            );
+          },
+          child: Material(
+            type: MaterialType.transparency,
+            child: Text(
+              titleText,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 2),
         Text(
@@ -170,16 +196,19 @@ class _StationPriceColumn extends StatelessWidget {
                       : theme.colorScheme.onSurfaceVariant,
                 ),
               ),
-            RichText(
-              overflow: TextOverflow.ellipsis,
-              text: PriceFormatter.priceTextSpan(
-                price,
-                currencyOverride: currencyOverride,
-                baseStyle: theme.textTheme.titleLarge!.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: station.isOpen
-                      ? fuelColor
-                      : theme.colorScheme.onSurfaceVariant,
+            AnimatedPriceText(
+              price: price,
+              child: RichText(
+                overflow: TextOverflow.ellipsis,
+                text: PriceFormatter.priceTextSpan(
+                  price,
+                  currencyOverride: currencyOverride,
+                  baseStyle: theme.textTheme.titleLarge!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: station.isOpen
+                        ? fuelColor
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
             ),
@@ -190,9 +219,8 @@ class _StationPriceColumn extends StatelessWidget {
               child: IconButton(
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                icon: Icon(
-                  isFavorite ? Icons.star : Icons.star_border,
-                  color: isFavorite ? Colors.amber : null,
+                icon: AnimatedFavoriteStar(
+                  isFavorite: isFavorite,
                   size: 22,
                 ),
                 onPressed: onFavoriteTap,

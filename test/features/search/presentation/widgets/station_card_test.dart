@@ -718,6 +718,69 @@ void main() {
       });
     });
 
+    group('micro-animations (#595)', () {
+      testWidgets('brand/name title is wrapped in a Hero with the station id',
+          (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.e10,
+          ),
+        );
+
+        final heroes = find.byType(Hero);
+        final matching = heroes.evaluate().where((element) {
+          final widget = element.widget as Hero;
+          return widget.tag ==
+              'station-name-51d4b477-a095-1aa0-e100-80009459e03a';
+        });
+        expect(matching, isNotEmpty,
+            reason: 'Station card title must be a Hero so the text flies '
+                'to the detail app bar on push.');
+      });
+
+      testWidgets('favorite star is rendered via AnimatedFavoriteStar',
+          (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.e10,
+            isFavorite: true,
+          ),
+        );
+
+        // The favorite icon should be hosted inside the animated wrapper
+        // so the toggle bounce fires in one place everywhere we render
+        // a favorite indicator.
+        expect(
+          find.byWidgetPredicate(
+            (w) => w.runtimeType.toString() == 'AnimatedFavoriteStar',
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets('price display is wrapped in AnimatedPriceText',
+          (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.e10,
+          ),
+        );
+
+        expect(
+          find.byWidgetPredicate(
+            (w) => w.runtimeType.toString() == 'AnimatedPriceText',
+          ),
+          findsOneWidget,
+        );
+      });
+    });
+
     group('card polish (#592)', () {
       testWidgets('card has 6dp vertical margin (breathing room)',
           (tester) async {
