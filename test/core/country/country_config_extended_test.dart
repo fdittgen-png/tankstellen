@@ -2,9 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 
 void main() {
-  group('Countries.byCode for all 12 countries', () {
+  group('Countries.byCode for all 13 countries', () {
     final expectedCodes = [
-      'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'SI',
+      'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'LU', 'SI',
     ];
 
     for (final code in expectedCodes) {

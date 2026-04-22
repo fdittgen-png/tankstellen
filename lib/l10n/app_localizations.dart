@@ -5466,6 +5466,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.'**
   String get aboutSupportDescription;
+
+  /// No description provided for @luxembourgRegulatedPricesNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Luxembourg fuel prices are government-regulated and uniform nationwide.'**
+  String get luxembourgRegulatedPricesNotice;
+
+  /// No description provided for @luxembourgFuelUnleaded95.
+  ///
+  /// In en, this message translates to:
+  /// **'Unleaded 95'**
+  String get luxembourgFuelUnleaded95;
+
+  /// No description provided for @luxembourgFuelUnleaded98.
+  ///
+  /// In en, this message translates to:
+  /// **'Unleaded 98'**
+  String get luxembourgFuelUnleaded98;
+
+  /// No description provided for @luxembourgFuelDiesel.
+  ///
+  /// In en, this message translates to:
+  /// **'Diesel'**
+  String get luxembourgFuelDiesel;
+
+  /// No description provided for @luxembourgFuelLpg.
+  ///
+  /// In en, this message translates to:
+  /// **'LPG'**
+  String get luxembourgFuelLpg;
+
+  /// No description provided for @luxembourgPricesUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Luxembourg regulated prices are unavailable.'**
+  String get luxembourgPricesUnavailable;
 }
 
 class _AppLocalizationsDelegate

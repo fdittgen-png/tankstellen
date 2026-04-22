@@ -362,10 +362,36 @@ class Countries {
     pricePerUnitSuffix: '\$/L',
   );
 
+  /// Luxembourg has government-regulated fuel prices — uniform nationally
+  /// by ministerial arrêté, with no station-level variance. See
+  /// `LuxembourgStationService` for the uniform-price model.
+  static const luxembourg = CountryConfig(
+    code: 'LU',
+    name: 'Luxembourg',
+    flag: '\u{1F1F1}\u{1F1FA}',
+    locale: 'fr_LU',
+    postalCodeLength: 4,
+    postalCodeRegex: r'^\d{4}$',
+    postalCodeLabel: 'Code postal',
+    apiProvider: 'Ministère de l\'Économie (LU)',
+    attribution: 'Prix réglementés — gouvernement.lu',
+    fuelTypes: ['Sans Plomb 95', 'Sans Plomb 98', 'Diesel', 'LPG'],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.e10,
+      FuelType.e98,
+      FuelType.diesel,
+      FuelType.lpg,
+      FuelType.electric,
+    },
+    examplePostalCode: '1009',
+    exampleCity: 'Luxembourg',
+  );
+
   /// All supported countries, ordered for display.
   static const all = [
     germany, france, austria, spain, italy, denmark, argentina,
-    portugal, unitedKingdom, australia, mexico, slovenia,
+    portugal, unitedKingdom, australia, mexico, luxembourg, slovenia,
   ];
 
   /// Find country by ISO code.
@@ -403,6 +429,7 @@ class Countries {
   /// - \`mx-\` → MX (Mexico CRE)
   /// - \`ar-\` → AR (Argentina)
   /// - \`ok-\` / \`shell-\` → DK (Denmark — two retailer-specific feeds)
+  /// - \`lu-\` → LU (Luxembourg regulated prices, #574)
   /// - \`si-\` → SI (Slovenia goriva.si, #575)
   /// - \`demo-\` → null (demo service, no real country)
   static const Map<String, String> _stationIdPrefixToCountry = {
@@ -413,6 +440,7 @@ class Countries {
     'ar-': 'AR',
     'ok-': 'DK',
     'shell-': 'DK',
+    'lu-': 'LU',
     'si-': 'SI',
   };
 

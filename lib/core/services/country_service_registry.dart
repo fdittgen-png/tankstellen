@@ -9,6 +9,7 @@ import 'impl/australia_station_service.dart';
 import 'impl/demo_station_service.dart';
 import 'impl/denmark_station_service.dart';
 import 'impl/econtrol_station_service.dart';
+import 'impl/luxembourg_station_service.dart';
 import 'impl/mexico_station_service.dart';
 import 'impl/mise_station_service.dart';
 import 'impl/miteco_station_service.dart';
@@ -133,6 +134,11 @@ class CountryServiceRegistry {
       createService: _createMexico,
     ),
     CountryServiceEntry(
+      countryCode: 'LU',
+      errorSource: ServiceSource.luxembourgApi,
+      createService: _createLuxembourg,
+    ),
+    CountryServiceEntry(
       countryCode: 'SI',
       errorSource: ServiceSource.sloveniaApi,
       createService: _createSlovenia,
@@ -237,4 +243,5 @@ StationService _createPortugal(Ref ref) => PortugalStationService();
 StationService _createUk(Ref ref) => UkStationService();
 StationService _createAustralia(Ref ref) => const AustraliaStationService();
 StationService _createMexico(Ref ref) => MexicoStationService();
+StationService _createLuxembourg(Ref ref) => LuxembourgStationService();
 StationService _createSlovenia(Ref ref) => SloveniaStationService();

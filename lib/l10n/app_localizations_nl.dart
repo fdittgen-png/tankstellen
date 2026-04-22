@@ -2901,4 +2901,24 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get aboutSupportDescription =>
       'This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.';
+
+  @override
+  String get luxembourgRegulatedPricesNotice =>
+      'Luxembourg fuel prices are government-regulated and uniform nationwide.';
+
+  @override
+  String get luxembourgFuelUnleaded95 => 'Unleaded 95';
+
+  @override
+  String get luxembourgFuelUnleaded98 => 'Unleaded 98';
+
+  @override
+  String get luxembourgFuelDiesel => 'Diesel';
+
+  @override
+  String get luxembourgFuelLpg => 'LPG';
+
+  @override
+  String get luxembourgPricesUnavailable =>
+      'Luxembourg regulated prices are unavailable.';
 }

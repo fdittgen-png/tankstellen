@@ -67,6 +67,11 @@ const countryBoundingBoxes = <String, CountryBoundingBox>{
   // Mexico: lat 14.39–32.72, lng -118.37–-86.71 (with margin)
   'MX': CountryBoundingBox(minLat: 14.0, maxLat: 33.0, minLng: -119.0, maxLng: -86.0),
 
+  // Luxembourg: lat 49.45–50.18, lng 5.74–6.53 (with margin).
+  // Very tight box — LU is ~82 km north-south, ~57 km east-west; keeping
+  // the margin modest so BE/FR/DE neighbours don't bleed into LU matches.
+  'LU': CountryBoundingBox(minLat: 49.4, maxLat: 50.25, minLng: 5.7, maxLng: 6.55),
+
   // Slovenia: lat 45.42–46.88, lng 13.38–16.61 (with margin). Tight
   // box — Slovenia is small and surrounded by IT / AT / HR so an
   // over-generous margin would shadow those neighbours. See #575.
@@ -97,6 +102,9 @@ const List<String> _bboxLookupOrder = [
   'PT',
   'GB',
   'DK',
+  // LU sits inside the generous FR and DE boxes (49.6/6.1) — must be
+  // tested first so Luxembourg-Ville doesn't fall through to France.
+  'LU',
   // SI first among Alpine neighbours — its tight box is entirely inside
   // both AT and IT's generous boxes (#575). A Ljubljana station (lat
   // 46.05 / lng 14.50) would otherwise fall through to AT.

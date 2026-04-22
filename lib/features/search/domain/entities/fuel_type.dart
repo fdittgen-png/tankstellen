@@ -316,6 +316,13 @@ List<FuelType> fuelTypesForCountry(String countryCode) {
       return [
         FuelType.e5, FuelType.diesel, FuelType.lpg, FuelType.cng, FuelType.electric, FuelType.all,
       ];
+    case 'LU':
+      // Luxembourg regulated prices (#574): Sans Plomb 95 (mapped to
+      // E5/E10), Sans Plomb 98 (E98), Diesel, LPG.
+      return [
+        FuelType.e5, FuelType.e10, FuelType.e98, FuelType.diesel,
+        FuelType.lpg, FuelType.electric, FuelType.all,
+      ];
     case 'SI':
       // Slovenia sells NMB-95 (→ e5), NMB-100 (premium, → e98), Dizel
       // (→ diesel), Dizel Premium, and LPG. #575
