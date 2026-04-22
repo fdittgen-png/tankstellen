@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/sync/supabase_client.dart';
 import '../../../core/sync/alerts_sync.dart';
+import '../../../core/sync/fill_ups_sync.dart';
 import '../../../core/sync/sync_service.dart';
 import '../../../core/sync/vehicles_sync.dart';
 import '../../alerts/data/models/price_alert.dart';
@@ -169,7 +170,7 @@ class LinkDeviceController extends _$LinkDeviceController {
       await SyncService.syncFavorites(ref.read(favoritesProvider));
       await AlertsSync.merge(ref.read(alertProvider));
       await VehiclesSync.merge(ref.read(vehicleProfileListProvider));
-      await SyncService.syncFillUps(ref.read(fillUpListProvider));
+      await FillUpsSync.merge(ref.read(fillUpListProvider));
 
       state = LinkDeviceState(
         result:
