@@ -54,6 +54,15 @@ class Obd2Service {
   /// connection to the vehicle's ELM327 adapter.
   bool get isConnected => _transport.isConnected;
 
+  /// Send a raw command to the ELM327 adapter and return the raw
+  /// response. Exposed for the [PidScheduler]-based trip recording
+  /// loop (#814) — the scheduler dispatches individual PID commands
+  /// directly and parses responses PID-by-PID, rather than going
+  /// through the typed `readRpm` / `readSpeed` helpers. Keeping the
+  /// escape hatch on the service lets the transport stay private.
+  Future<String> sendCommand(String command) =>
+      _transport.sendCommand(command);
+
   /// Connect and initialize the ELM327 adapter.
   ///
   /// After the init sequence, if a [SupportedPidsCache] was wired in
