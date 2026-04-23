@@ -3189,6 +3189,25 @@ class AppLocalizationsPl extends AppLocalizations {
   String get badScanReportHeaderYouTyped => 'You typed';
 
   @override
+  String get radiusAlertPickOnMap => 'Pick on map';
+
+  @override
+  String get radiusAlertMapPickerTitle => 'Pick alert center';
+
+  @override
+  String get radiusAlertMapPickerConfirm => 'Confirm';
+
+  @override
+  String get radiusAlertMapPickerCancel => 'Cancel';
+
+  @override
+  String get radiusAlertMapPickerHint =>
+      'Drag the map to position the alert center';
+
+  @override
+  String get radiusAlertCenterFromMap => 'Map location';
+
+  @override
   String get vinLabel => 'VIN (optional)';
 
   @override

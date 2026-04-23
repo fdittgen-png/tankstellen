@@ -3214,6 +3214,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get badScanReportHeaderYouTyped => 'Eingegeben';
 
   @override
+  String get radiusAlertPickOnMap => 'Auf Karte wählen';
+
+  @override
+  String get radiusAlertMapPickerTitle => 'Alarm-Zentrum wählen';
+
+  @override
+  String get radiusAlertMapPickerConfirm => 'Bestätigen';
+
+  @override
+  String get radiusAlertMapPickerCancel => 'Abbrechen';
+
+  @override
+  String get radiusAlertMapPickerHint =>
+      'Karte verschieben, um das Alarm-Zentrum zu platzieren';
+
+  @override
+  String get radiusAlertCenterFromMap => 'Kartenposition';
+
+  @override
   String get vinLabel => 'FIN (optional)';
 
   @override
