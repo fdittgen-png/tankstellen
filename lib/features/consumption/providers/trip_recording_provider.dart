@@ -137,9 +137,77 @@ class TripRecording extends _$TripRecording {
   @visibleForTesting
   int hapticMediumCount = 0;
 
+  /// Snapshot of the vehicle the last [startTrip] call was scoped to.
+  /// Exposed so the save-as-fill-up path can figure out which
+  /// trajets to auto-link (#888). Null before the first call, or
+  /// after a [reset] / fresh [build].
+  String? _lastTripVehicleId;
+  DateTime? _lastTripStartedAt;
+
+  /// Most recent vehicle id this provider kicked a trip for.
+  ///
+  /// Readable by the consumption providers so the fill-up auto-link
+  /// can filter trajets to the vehicle that was actually driven —
+  /// decoupling the trajets flow from the fill-up flow (#888).
+  String? get lastTripVehicleId => _lastTripVehicleId;
+
+  /// Timestamp captured on the most recent [startTrip] call. Used by
+  /// the auto-link window in the fill-up flow as a "latest-known
+  /// driving activity" lower bound when no prior fill-up exists.
+  DateTime? get lastTripStartedAt => _lastTripStartedAt;
+
   @override
   TripRecordingState build() {
     return const TripRecordingState();
+  }
+
+  /// Standalone entry point for starting a trajet (#888).
+  ///
+  /// Unlike [start] (which already expects a connected [Obd2Service]),
+  /// this call resolves the vehicle + adapter from the active profile
+  /// by default. Callers can override either by passing [vehicleId]
+  /// or [adapterMac] explicitly.
+  ///
+  /// Returns:
+  ///  - [StartTripOutcome.started] when [service] was supplied by
+  ///    the caller — the provider takes ownership and kicks off the
+  ///    recording immediately.
+  ///  - [StartTripOutcome.needsPicker] when no [service] is supplied
+  ///    and the resolved vehicle has no pinned adapter MAC. The UI
+  ///    layer is expected to fire `showObd2AdapterPicker`, then call
+  ///    back into [start] with the returned service.
+  ///  - [StartTripOutcome.alreadyActive] when a trip is already
+  ///    running — no double-start.
+  ///
+  /// Trajets are first-class: this method does NOT require a pending
+  /// fill-up, does NOT block on one, and does NOT read any fill-up
+  /// state. The fill-up save path (#888) derives the trip→tank link
+  /// from the rolling trip-history log independently.
+  Future<StartTripOutcome> startTrip({
+    String? vehicleId,
+    String? adapterMac,
+    Obd2Service? service,
+  }) async {
+    if (state.isActive) return StartTripOutcome.alreadyActive;
+    final activeVehicle = _tryReadActiveVehicle();
+    final resolvedVehicleId = vehicleId ?? activeVehicle?.id;
+    final resolvedMac = adapterMac ?? activeVehicle?.obd2AdapterMac;
+    _lastTripVehicleId = resolvedVehicleId;
+    _lastTripStartedAt = DateTime.now();
+    if (service != null) {
+      await start(service);
+      return StartTripOutcome.started;
+    }
+    if (resolvedMac == null || resolvedMac.isEmpty) {
+      return StartTripOutcome.needsPicker;
+    }
+    // Pinned adapter but no service handed in — the UI picker is
+    // still the right place to fire a connect: it reuses the exact
+    // same scan + connect flow (with retry/error surfacing) and
+    // short-circuits on the pinned MAC. Keeping the connect logic
+    // at the UI layer avoids pulling a Bluetooth stack into provider
+    // code and keeps #888's scope to the decoupling concern.
+    return StartTripOutcome.needsPicker;
   }
 
   /// Begin a recording session backed by [service]. The provider
@@ -147,6 +215,7 @@ class TripRecording extends _$TripRecording {
   /// caller; [stop] handles the full teardown.
   Future<void> start(Obd2Service service) async {
     if (state.isActive) return;
+    _lastTripStartedAt ??= DateTime.now();
     _service = service;
     // #812 phase 3 — snapshot the active vehicle so the controller
     // can hand it to `readFuelRateLPerHour` on every tick. The
@@ -185,6 +254,7 @@ class TripRecording extends _$TripRecording {
     try {
       final vehicle = ref.read(activeVehicleProfileProvider);
       _vehicleId = vehicle?.id;
+      _lastTripVehicleId ??= vehicle?.id;
       _fuelFamily = _resolveFuelFamily(vehicle?.preferredFuelType);
       if (Hive.isBoxOpen(HiveBoxes.obd2Baselines)) {
         _store = BaselineStore(
@@ -452,6 +522,10 @@ class TripRecording extends _$TripRecording {
 
   /// Return to idle — used after the caller consumes the
   /// [StoppedTripResult] (saves as fill-up or discards).
+  ///
+  /// Keeps [lastTripVehicleId] / [lastTripStartedAt] intact so the
+  /// subsequent fill-up save path can still resolve the link-window
+  /// (#888) after the user lands back on the fill-up screen.
   void reset() {
     state = const TripRecordingState();
   }
@@ -614,4 +688,19 @@ class StoppedTripResult {
       (odometerStartKm == null
           ? null
           : odometerStartKm! + summary.distanceKm);
+}
+
+/// Outcome surfaced by [TripRecording.startTrip] so the UI layer can
+/// decide whether to fire the adapter picker (#888).
+enum StartTripOutcome {
+  /// A service was supplied and the recording session started.
+  started,
+
+  /// No service was supplied and the resolved vehicle has no pinned
+  /// adapter — the caller should open `showObd2AdapterPicker`, then
+  /// hand the resulting service back into [TripRecording.start].
+  needsPicker,
+
+  /// A trip is already running; the call was a no-op.
+  alreadyActive,
 }

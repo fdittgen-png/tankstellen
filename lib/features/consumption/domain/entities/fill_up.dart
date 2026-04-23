@@ -27,6 +27,15 @@ abstract class FillUp with _$FillUp {
     /// it to a specific vehicle. Used to group per-vehicle stats and to
     /// pre-fill the next log entry.
     String? vehicleId,
+
+    /// OBD2 trip-history ids that were recorded for this vehicle since
+    /// the previous fill-up (#888). Populated automatically by the
+    /// `FillUpList.add` path: trajets are first-class, standalone
+    /// recordings, and the link from tank-to-tank is derived on save
+    /// rather than baked into the trip flow. Empty when no trajets
+    /// were recorded in the window or when the fill-up has no bound
+    /// vehicle.
+    @Default(<String>[]) List<String> linkedTripIds,
   }) = _FillUp;
 
   factory FillUp.fromJson(Map<String, dynamic> json) => _$FillUpFromJson(json);

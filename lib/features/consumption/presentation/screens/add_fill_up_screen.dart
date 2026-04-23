@@ -233,16 +233,42 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     }
   }
 
-  /// Tap handler for the OBD-II button. Opens the adapter picker
-  /// (#743); on successful connect, pushes the trip-recording
-  /// screen (#726) which polls live PIDs, lets the user stop when
-  /// done, and returns a [TripSaveResult] that pre-fills the
-  /// odometer + litres fields. A null return (user cancelled or
-  /// discarded the trip) is a no-op.
+  /// Tap handler for the OBD-II button. Asks the provider to start a
+  /// trajet (#888) — trajets are standalone, this path no longer
+  /// couples recording to the fill-up flow. The provider resolves
+  /// the active vehicle + pinned adapter by default; if no adapter
+  /// is pinned, we fall back to the picker sheet (#743). On success
+  /// we push the trip-recording screen (#726) which polls live PIDs,
+  /// lets the user stop when done, and returns a [TripSaveResult]
+  /// that pre-fills the odometer + litres fields. A null return
+  /// (user cancelled or discarded the trip) is a no-op.
   Future<void> _readObd() async {
     setState(() => _obdReading = true);
     final l = AppLocalizations.of(context);
     try {
+      // #888 — trajets are decoupled: ask the provider to start and
+      // let it figure out whether a picker is needed from the active
+      // vehicle's pinned adapter.
+      final outcome = await ref
+          .read(tripRecordingProvider.notifier)
+          .startTrip();
+      if (!mounted) return;
+      if (outcome == StartTripOutcome.alreadyActive) {
+        // A trajet is already running in the background — just jump
+        // into the recording screen without re-connecting.
+        final result = await Navigator.of(context).push<TripSaveResult?>(
+          MaterialPageRoute(
+            builder: (_) => const TripRecordingScreen(),
+          ),
+        );
+        if (!mounted || result == null) return;
+        _applyTripResult(result, l);
+        return;
+      }
+      // needsPicker or started-with-null-service: reuse the picker
+      // sheet and hand the resulting service back to the provider.
+      // Keeps the connect logic in one place and preserves the
+      // error-surfacing / retry path tested in #743.
       final service = await showObd2AdapterPicker(context);
       if (service == null || !mounted) return;
       // #726 — hand the service off to the app-wide recording
@@ -258,30 +284,36 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
         ),
       );
       if (!mounted || result == null) return;
-      setState(() {
-        if (result.odometerKm != null) {
-          _odoCtrl.text = result.odometerKm!.round().toString();
-        }
-        if (result.litersConsumed != null) {
-          _litersCtrl.text = result.litersConsumed!.toStringAsFixed(2);
-        }
-      });
-      if (result.odometerKm != null) {
-        SnackBarHelper.showSuccess(
-          context,
-          l?.obdOdometerRead(result.odometerKm!.round()) ??
-              'Odometer read: ${result.odometerKm!.round()} km',
-        );
-      } else {
-        SnackBarHelper.show(
-          context,
-          l?.obdOdometerUnavailable ?? 'Could not read odometer',
-        );
-      }
+      _applyTripResult(result, l);
     } on Obd2ConnectionError catch (e) {
       if (mounted) SnackBarHelper.showError(context, e.message);
     } finally {
       if (mounted) setState(() => _obdReading = false);
+    }
+  }
+
+  /// Hoist the "pre-fill the form from the recorded trajet" step so
+  /// both entry points (already-active and fresh-pick) share it.
+  void _applyTripResult(TripSaveResult result, AppLocalizations? l) {
+    setState(() {
+      if (result.odometerKm != null) {
+        _odoCtrl.text = result.odometerKm!.round().toString();
+      }
+      if (result.litersConsumed != null) {
+        _litersCtrl.text = result.litersConsumed!.toStringAsFixed(2);
+      }
+    });
+    if (result.odometerKm != null) {
+      SnackBarHelper.showSuccess(
+        context,
+        l?.obdOdometerRead(result.odometerKm!.round()) ??
+            'Odometer read: ${result.odometerKm!.round()} km',
+      );
+    } else {
+      SnackBarHelper.show(
+        context,
+        l?.obdOdometerUnavailable ?? 'Could not read odometer',
+      );
     }
   }
 

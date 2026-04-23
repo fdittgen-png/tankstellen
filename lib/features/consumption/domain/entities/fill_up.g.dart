@@ -17,6 +17,11 @@ _FillUp _$FillUpFromJson(Map<String, dynamic> json) => _FillUp(
   stationName: json['stationName'] as String?,
   notes: json['notes'] as String?,
   vehicleId: json['vehicleId'] as String?,
+  linkedTripIds:
+      (json['linkedTripIds'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const <String>[],
 );
 
 Map<String, dynamic> _$FillUpToJson(_FillUp instance) => <String, dynamic>{
@@ -30,4 +35,5 @@ Map<String, dynamic> _$FillUpToJson(_FillUp instance) => <String, dynamic>{
   'stationName': instance.stationName,
   'notes': instance.notes,
   'vehicleId': instance.vehicleId,
+  'linkedTripIds': instance.linkedTripIds,
 };
