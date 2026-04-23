@@ -5984,6 +5984,42 @@ abstract class AppLocalizations {
   /// **'You typed'**
   String get badScanReportHeaderYouTyped;
 
+  /// Button on the radius-alert create sheet that opens the full-screen map-picker for the alert center (#578 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Pick on map'**
+  String get radiusAlertPickOnMap;
+
+  /// AppBar title of the full-screen map-picker shown when choosing the center of a radius alert (#578 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Pick alert center'**
+  String get radiusAlertMapPickerTitle;
+
+  /// AppBar action that confirms the currently pinned location and returns it to the create sheet (#578 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get radiusAlertMapPickerConfirm;
+
+  /// AppBar action that dismisses the map-picker without returning a location (#578 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get radiusAlertMapPickerCancel;
+
+  /// Overlay hint on the map-picker explaining the center-crosshair interaction (#578 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Drag the map to position the alert center'**
+  String get radiusAlertMapPickerHint;
+
+  /// Label shown in the create sheet after a location has been picked on the map, distinguishing it from a GPS or postal-code center (#578 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Map location'**
+  String get radiusAlertCenterFromMap;
+
   /// No description provided for @vinLabel.
   ///
   /// In en, this message translates to:

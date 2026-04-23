@@ -1,0 +1,26 @@
+{
+  "radiusAlertPickOnMap": "Pick on map",
+  "@radiusAlertPickOnMap": {
+    "description": "Button on the radius-alert create sheet that opens the full-screen map-picker for the alert center (#578 phase 3)."
+  },
+  "radiusAlertMapPickerTitle": "Pick alert center",
+  "@radiusAlertMapPickerTitle": {
+    "description": "AppBar title of the full-screen map-picker shown when choosing the center of a radius alert (#578 phase 3)."
+  },
+  "radiusAlertMapPickerConfirm": "Confirm",
+  "@radiusAlertMapPickerConfirm": {
+    "description": "AppBar action that confirms the currently pinned location and returns it to the create sheet (#578 phase 3)."
+  },
+  "radiusAlertMapPickerCancel": "Cancel",
+  "@radiusAlertMapPickerCancel": {
+    "description": "AppBar action that dismisses the map-picker without returning a location (#578 phase 3)."
+  },
+  "radiusAlertMapPickerHint": "Drag the map to position the alert center",
+  "@radiusAlertMapPickerHint": {
+    "description": "Overlay hint on the map-picker explaining the center-crosshair interaction (#578 phase 3)."
+  },
+  "radiusAlertCenterFromMap": "Map location",
+  "@radiusAlertCenterFromMap": {
+    "description": "Label shown in the create sheet after a location has been picked on the map, distinguishing it from a GPS or postal-code center (#578 phase 3)."
+  }
+}

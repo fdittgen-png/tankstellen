@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/location/user_position_provider.dart';
@@ -8,21 +9,37 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/entities/radius_alert.dart';
 import '../../providers/radius_alerts_provider.dart';
+import 'radius_alert_map_picker.dart';
 
-/// Bottom sheet that creates a new [RadiusAlert] (#578 phase 2).
+/// Signature of the map-picker opener. Production code pushes
+/// [RadiusAlertMapPicker.push]; tests inject a stub that returns a
+/// pre-baked [LatLng] so the picker's own widget tree doesn't need to
+/// be built under `pumpApp` (#578 phase 3).
+typedef RadiusAlertMapPickerOpener = Future<LatLng?> Function(
+  BuildContext context,
+);
+
+/// Bottom sheet that creates a new [RadiusAlert] (#578 phase 2 + 3).
 ///
-/// Phase 2 intentionally keeps the center picker minimal: the user can
-/// tap "Use my location" to bind the alert to the cached GPS position
-/// or type a postal code as a textual fallback. A proper map-picker UI
-/// will land in a follow-up (no existing in-app widget could be reused
-/// without pulling the heavy map stack into the alerts feature — see
-/// PR body for the follow-up pointer).
+/// Phase 2 shipped the form shell (label, fuel, threshold, radius, GPS
+/// center). Phase 3 adds the "Pick on map" button that pushes
+/// [RadiusAlertMapPicker] and binds the returned [LatLng] as the alert
+/// center so the background evaluator has real coordinates.
 class RadiusAlertCreateSheet extends ConsumerStatefulWidget {
   /// Injection hook so widget tests can swap the id generator for a
   /// deterministic string. Production callers leave this unset.
   final String Function()? idGenerator;
 
-  const RadiusAlertCreateSheet({super.key, this.idGenerator});
+  /// Injection hook so widget tests can stub the map-picker push
+  /// without standing up the full map widget tree. Production callers
+  /// leave this unset; the sheet falls back to [RadiusAlertMapPicker.push].
+  final RadiusAlertMapPickerOpener? mapPickerOpener;
+
+  const RadiusAlertCreateSheet({
+    super.key,
+    this.idGenerator,
+    this.mapPickerOpener,
+  });
 
   /// Convenience opener used by both the alerts-screen CTA and the
   /// radius-section header button so the same entry point shows up
@@ -30,6 +47,7 @@ class RadiusAlertCreateSheet extends ConsumerStatefulWidget {
   static Future<void> show(
     BuildContext context, {
     String Function()? idGenerator,
+    RadiusAlertMapPickerOpener? mapPickerOpener,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -39,7 +57,10 @@ class RadiusAlertCreateSheet extends ConsumerStatefulWidget {
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(ctx).viewInsets.bottom,
         ),
-        child: RadiusAlertCreateSheet(idGenerator: idGenerator),
+        child: RadiusAlertCreateSheet(
+          idGenerator: idGenerator,
+          mapPickerOpener: mapPickerOpener,
+        ),
       ),
     );
   }
@@ -84,6 +105,25 @@ class _RadiusAlertCreateSheetState
       _centerLat = pos.lat;
       _centerLng = pos.lng;
       _centerSource = pos.source;
+    });
+  }
+
+  Future<void> _pickOnMap() async {
+    final opener = widget.mapPickerOpener ??
+        (ctx) => RadiusAlertMapPicker.push(
+              ctx,
+              initialCenter: _centerLat != null && _centerLng != null
+                  ? LatLng(_centerLat!, _centerLng!)
+                  : null,
+            );
+    final picked = await opener(context);
+    if (!mounted || picked == null) return;
+    final l10n = AppLocalizations.of(context);
+    setState(() {
+      _centerLat = picked.latitude;
+      _centerLng = picked.longitude;
+      _centerSource =
+          l10n?.radiusAlertCenterFromMap ?? 'Map location';
     });
   }
 
@@ -216,6 +256,16 @@ class _RadiusAlertCreateSheetState
                   onPressed: _useMyLocation,
                   label: Text(
                     l10n?.alertsRadiusCenterGps ?? 'Use my location',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.map_outlined),
+                  onPressed: _pickOnMap,
+                  label: Text(
+                    l10n?.radiusAlertPickOnMap ?? 'Pick on map',
                   ),
                 ),
               ),

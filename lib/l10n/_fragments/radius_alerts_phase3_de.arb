@@ -1,0 +1,8 @@
+{
+  "radiusAlertPickOnMap": "Auf Karte wählen",
+  "radiusAlertMapPickerTitle": "Alarm-Zentrum wählen",
+  "radiusAlertMapPickerConfirm": "Bestätigen",
+  "radiusAlertMapPickerCancel": "Abbrechen",
+  "radiusAlertMapPickerHint": "Karte verschieben, um das Alarm-Zentrum zu platzieren",
+  "radiusAlertCenterFromMap": "Kartenposition"
+}
