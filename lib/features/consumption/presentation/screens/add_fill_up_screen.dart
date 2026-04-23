@@ -179,6 +179,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
 
   Future<void> _scanReceipt() async {
     setState(() => _scanning = true);
+    final l = AppLocalizations.of(context);
     try {
       _scanService ??= ReceiptScanService();
       final outcome = await _scanService!.scanReceipt();
@@ -186,7 +187,10 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       final result = outcome.parse;
 
       if (!result.hasData) {
-        SnackBarHelper.show(context, 'No receipt data found — try again');
+        SnackBarHelper.show(
+          context,
+          l?.scanReceiptNoData ?? 'No receipt data found — try again',
+        );
         return;
       }
 
@@ -212,13 +216,17 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       if (mounted) {
         SnackBarHelper.show(
           context,
-          'Receipt scanned — verify values. Tap "Report scan error" '
-              'below if anything is off.',
+          l?.scanReceiptSuccess ??
+              'Receipt scanned — verify values. Tap "Report scan error" '
+                  'below if anything is off.',
         );
       }
     } catch (e) {
       if (mounted) {
-        SnackBarHelper.showError(context, 'Scan failed: $e');
+        SnackBarHelper.showError(
+          context,
+          l?.scanReceiptFailed(e.toString()) ?? 'Scan failed: $e',
+        );
       }
     } finally {
       if (mounted) setState(() => _scanning = false);
@@ -446,12 +454,16 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   /// only need the numeric values and one cross-validity check.
   Future<void> _scanPumpDisplay() async {
     setState(() => _scanningPump = true);
+    final l = AppLocalizations.of(context);
     try {
       _scanService ??= ReceiptScanService();
       final result = await _scanService!.scanPumpDisplay();
       if (result == null || !mounted) return;
       if (!result.hasUsableData) {
-        SnackBarHelper.show(context, 'Pump display not readable — try again');
+        SnackBarHelper.show(
+          context,
+          l?.scanPumpUnreadable ?? 'Pump display not readable — try again',
+        );
         return;
       }
       setState(() {
@@ -465,12 +477,15 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       if (mounted) {
         SnackBarHelper.show(
           context,
-          'Pump display scanned — verify the values.',
+          l?.scanPumpSuccess ?? 'Pump display scanned — verify the values.',
         );
       }
     } catch (e) {
       if (mounted) {
-        SnackBarHelper.showError(context, 'Pump scan failed: $e');
+        SnackBarHelper.showError(
+          context,
+          l?.scanPumpFailed(e.toString()) ?? 'Pump scan failed: $e',
+        );
       }
     } finally {
       if (mounted) setState(() => _scanningPump = false);

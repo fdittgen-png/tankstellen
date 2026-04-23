@@ -5876,6 +5876,114 @@ abstract class AppLocalizations {
   /// **'{stationCount} stations dropped by up to {maxDropCents}¢ in the last hour'**
   String velocityAlertBody(int stationCount, int maxDropCents);
 
+  /// Snackbar shown on the Add-Fill-Up screen when the receipt scan returns no usable fields (#751).
+  ///
+  /// In en, this message translates to:
+  /// **'No receipt data found — try again'**
+  String get scanReceiptNoData;
+
+  /// Snackbar shown after a successful receipt scan to prompt the user to verify the pre-filled values (#751).
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt scanned — verify values. Tap \"Report scan error\" below if anything is off.'**
+  String get scanReceiptSuccess;
+
+  /// Snackbar shown when the receipt scan throws (#751).
+  ///
+  /// In en, this message translates to:
+  /// **'Scan failed: {error}'**
+  String scanReceiptFailed(String error);
+
+  /// Snackbar shown on the Add-Fill-Up screen when the pump-display scan returns no usable fields (#751).
+  ///
+  /// In en, this message translates to:
+  /// **'Pump display not readable — try again'**
+  String get scanPumpUnreadable;
+
+  /// Snackbar shown after a successful pump-display scan (#751).
+  ///
+  /// In en, this message translates to:
+  /// **'Pump display scanned — verify the values.'**
+  String get scanPumpSuccess;
+
+  /// Snackbar shown when the pump-display scan throws (#751).
+  ///
+  /// In en, this message translates to:
+  /// **'Pump scan failed: {error}'**
+  String scanPumpFailed(String error);
+
+  /// Title of the bottom sheet that reports an incorrect receipt scan (#751).
+  ///
+  /// In en, this message translates to:
+  /// **'Report a scan error'**
+  String get badScanReportTitle;
+
+  /// Subtitle under the bad-scan-report sheet title (#751).
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll share the receipt photo and both sets of values so the next build can learn this layout.'**
+  String get badScanReportHint;
+
+  /// Button on the bad-scan-report sheet that triggers the system share intent (#751).
+  ///
+  /// In en, this message translates to:
+  /// **'Share report + photo'**
+  String get badScanReportShareAction;
+
+  /// No description provided for @badScanReportFieldBrandLayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Brand layout'**
+  String get badScanReportFieldBrandLayout;
+
+  /// No description provided for @badScanReportFieldTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get badScanReportFieldTotal;
+
+  /// No description provided for @badScanReportFieldPricePerLiter.
+  ///
+  /// In en, this message translates to:
+  /// **'Price/L'**
+  String get badScanReportFieldPricePerLiter;
+
+  /// No description provided for @badScanReportFieldStation.
+  ///
+  /// In en, this message translates to:
+  /// **'Station'**
+  String get badScanReportFieldStation;
+
+  /// No description provided for @badScanReportFieldFuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel'**
+  String get badScanReportFieldFuel;
+
+  /// No description provided for @badScanReportFieldDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get badScanReportFieldDate;
+
+  /// No description provided for @badScanReportHeaderField.
+  ///
+  /// In en, this message translates to:
+  /// **'Field'**
+  String get badScanReportHeaderField;
+
+  /// No description provided for @badScanReportHeaderScanned.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanned'**
+  String get badScanReportHeaderScanned;
+
+  /// No description provided for @badScanReportHeaderYouTyped.
+  ///
+  /// In en, this message translates to:
+  /// **'You typed'**
+  String get badScanReportHeaderYouTyped;
+
   /// No description provided for @vinLabel.
   ///
   /// In en, this message translates to:

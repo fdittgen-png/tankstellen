@@ -3131,6 +3131,66 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get scanReceiptNoData => 'No receipt data found — try again';
+
+  @override
+  String get scanReceiptSuccess =>
+      'Receipt scanned — verify values. Tap \"Report scan error\" below if anything is off.';
+
+  @override
+  String scanReceiptFailed(String error) {
+    return 'Scan failed: $error';
+  }
+
+  @override
+  String get scanPumpUnreadable => 'Pump display not readable — try again';
+
+  @override
+  String get scanPumpSuccess => 'Pump display scanned — verify the values.';
+
+  @override
+  String scanPumpFailed(String error) {
+    return 'Pump scan failed: $error';
+  }
+
+  @override
+  String get badScanReportTitle => 'Report a scan error';
+
+  @override
+  String get badScanReportHint =>
+      'We\'ll share the receipt photo and both sets of values so the next build can learn this layout.';
+
+  @override
+  String get badScanReportShareAction => 'Share report + photo';
+
+  @override
+  String get badScanReportFieldBrandLayout => 'Brand layout';
+
+  @override
+  String get badScanReportFieldTotal => 'Total';
+
+  @override
+  String get badScanReportFieldPricePerLiter => 'Price/L';
+
+  @override
+  String get badScanReportFieldStation => 'Station';
+
+  @override
+  String get badScanReportFieldFuel => 'Fuel';
+
+  @override
+  String get badScanReportFieldDate => 'Date';
+
+  @override
+  String get badScanReportHeaderField => 'Field';
+
+  @override
+  String get badScanReportHeaderScanned => 'Scanned';
+
+  @override
+  String get badScanReportHeaderYouTyped => 'You typed';
+
+  @override
   String get vinLabel => 'VIN (optional)';
 
   @override

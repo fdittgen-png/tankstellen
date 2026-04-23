@@ -3152,6 +3152,68 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get scanReceiptNoData =>
+      'Keine Belegdaten gefunden — bitte erneut versuchen';
+
+  @override
+  String get scanReceiptSuccess =>
+      'Beleg gescannt — Werte prüfen. Bei Fehlern unten auf \"Scan-Fehler melden\" tippen.';
+
+  @override
+  String scanReceiptFailed(String error) {
+    return 'Scan fehlgeschlagen: $error';
+  }
+
+  @override
+  String get scanPumpUnreadable =>
+      'Zapfsäule nicht lesbar — bitte erneut versuchen';
+
+  @override
+  String get scanPumpSuccess => 'Zapfsäule gescannt — Werte prüfen.';
+
+  @override
+  String scanPumpFailed(String error) {
+    return 'Zapfsäulen-Scan fehlgeschlagen: $error';
+  }
+
+  @override
+  String get badScanReportTitle => 'Scan-Fehler melden';
+
+  @override
+  String get badScanReportHint =>
+      'Wir teilen das Belegfoto und beide Wertesätze, damit die nächste Version dieses Layout lernen kann.';
+
+  @override
+  String get badScanReportShareAction => 'Bericht + Foto teilen';
+
+  @override
+  String get badScanReportFieldBrandLayout => 'Marken-Layout';
+
+  @override
+  String get badScanReportFieldTotal => 'Gesamt';
+
+  @override
+  String get badScanReportFieldPricePerLiter => 'Preis/L';
+
+  @override
+  String get badScanReportFieldStation => 'Tankstelle';
+
+  @override
+  String get badScanReportFieldFuel => 'Kraftstoff';
+
+  @override
+  String get badScanReportFieldDate => 'Datum';
+
+  @override
+  String get badScanReportHeaderField => 'Feld';
+
+  @override
+  String get badScanReportHeaderScanned => 'Gescannt';
+
+  @override
+  String get badScanReportHeaderYouTyped => 'Eingegeben';
+
+  @override
   String get vinLabel => 'FIN (optional)';
 
   @override
