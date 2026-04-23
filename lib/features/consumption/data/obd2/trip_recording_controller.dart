@@ -13,6 +13,24 @@ import 'obd2_connection_errors.dart';
 import 'obd2_service.dart';
 import 'paused_trip_repository.dart';
 import 'pid_scheduler.dart';
+import 'virtual_odometer.dart';
+
+/// Provenance of the final trip distance (#800). See
+/// [TripRecordingController.distanceSource] — persisted on the
+/// [TripSummary] so the fill-up flow and eco-analytics can decide
+/// whether the km figure is a ground truth (odometer delta) or an
+/// estimate (integrated speed samples).
+const String _distanceSourceReal = 'real';
+const String _distanceSourceVirtual = 'virtual';
+
+/// Upper bound on the speed-sample buffer used by the virtual
+/// odometer (#800). At 5 Hz a 10-hour trip produces ~180 k samples —
+/// the typical driving session is well under 2 hours, so 60 k (~3.3
+/// hours at 5 Hz) is a generous cap that still prevents a forgotten
+/// recording from eating unbounded memory. When the cap is hit we
+/// drop the oldest sample; the virtual-odometer error from losing
+/// the early stretch is bounded by the lost km.
+const int _virtualOdometerSampleCap = 60000;
 
 /// Live read-out from the currently-recording trip (#726).
 ///
@@ -263,6 +281,14 @@ class TripRecordingController {
   /// is the oldest. Reset on a successful transport read.
   final List<DateTime> _recentErrors = <DateTime>[];
 
+  /// Rolling buffer of `(timestamp, speedKmh)` samples used by the
+  /// virtual odometer (#800). Populated by the 5 Hz speed
+  /// subscription callback; capped at [_virtualOdometerSampleCap] so
+  /// a forgotten recording can't eat unbounded memory. Fed to
+  /// [VirtualOdometer] at finalisation when the car doesn't expose a
+  /// real odometer.
+  final List<VirtualOdometerSample> _speedSamples = <VirtualOdometerSample>[];
+
   /// Latest parsed values, keyed by PID command. Written by scheduler
   /// callbacks, read by [_emit] when assembling [TripLiveReading]. Not
   /// using a typed struct because most fields are optional doubles
@@ -416,6 +442,12 @@ class TripRecordingController {
 
   /// Stop the polling loop and return the accumulated summary.
   /// Idempotent — calling twice returns the same summary.
+  ///
+  /// The returned [TripSummary] carries the final [currentDistanceKm]
+  /// (#800) — which prefers the real odometer delta over the recorder's
+  /// integrated-speed number — and a [TripSummary.distanceSource] flag
+  /// distinguishing the two. This lets the fill-up flow and analytics
+  /// decide whether the km figure is ground truth or an estimate.
   Future<TripSummary> stop() async {
     _scheduler?.stop();
     _emitTimer?.cancel();
@@ -433,7 +465,39 @@ class TripRecordingController {
     if (!_liveController.isClosed) {
       await _liveController.close();
     }
-    return _recorder.buildSummary();
+    return _finaliseSummary();
+  }
+
+  /// Build the trip's final [TripSummary] from the recorder's
+  /// in-flight accumulator plus the controller-owned distance
+  /// provenance (#800). The recorder still owns distance integration
+  /// for live UI reads; the controller overrides at finalisation only
+  /// when a real odometer delta beats the virtual estimate.
+  TripSummary _finaliseSummary() {
+    final base = _recorder.buildSummary();
+    final distanceKm = currentDistanceKm;
+    final source = distanceSource;
+    // Recompute avgLPer100Km if we swapped the distance out — the
+    // recorder's value was keyed to its own integrated distance.
+    double? avg = base.avgLPer100Km;
+    if (base.fuelLitersConsumed != null && distanceKm > 0.001) {
+      avg = base.fuelLitersConsumed! / distanceKm * 100.0;
+    } else if (base.fuelLitersConsumed == null) {
+      avg = null;
+    }
+    return TripSummary(
+      distanceKm: distanceKm,
+      maxRpm: base.maxRpm,
+      highRpmSeconds: base.highRpmSeconds,
+      idleSeconds: base.idleSeconds,
+      harshBrakes: base.harshBrakes,
+      harshAccelerations: base.harshAccelerations,
+      avgLPer100Km: avg,
+      fuelLitersConsumed: base.fuelLitersConsumed,
+      startedAt: base.startedAt,
+      endedAt: base.endedAt,
+      distanceSource: source,
+    );
   }
 
   /// Odometer reading at trip start. Null when the adapter can't
@@ -468,6 +532,63 @@ class TripRecordingController {
   Future<void> refreshOdometer() async {
     final km = await _service.readOdometerKm();
     if (km != null) _odometerLatestKm = km;
+  }
+
+  /// Distance covered by the current trip so far (#800).
+  ///
+  /// Prefers the ground truth `odometerLatest - odometerStart` when
+  /// both readings are present AND moved forward by more than a
+  /// noise-floor epsilon (odometer PIDs are quantised to 0.1 km on
+  /// most cars — a 0.09-km delta on a 20-minute trip is a sensor
+  /// artefact, not real distance). When the odometer isn't readable
+  /// (Peugeot 107 class), falls back to the trapezoidal integral of
+  /// buffered speed samples via [VirtualOdometer].
+  double get currentDistanceKm {
+    final real = _realOdometerDeltaKm();
+    if (real != null) return real;
+    return VirtualOdometer(samples: _speedSamples).integrateKm();
+  }
+
+  /// `'real'` when [currentDistanceKm] came from the car's odometer,
+  /// `'virtual'` when it came from [VirtualOdometer] integration
+  /// (#800). Persisted on the finalised [TripSummary] so the fill-up
+  /// flow and eco-analytics know whether to treat the km as a ground
+  /// truth or as an estimate.
+  String get distanceSource =>
+      _realOdometerDeltaKm() != null
+          ? _distanceSourceReal
+          : _distanceSourceVirtual;
+
+  /// `odometerLatest - odometerStart` if both are present and the
+  /// delta is above a small noise-floor epsilon (0.05 km — half the
+  /// 0.1 km quantisation most cars apply to PID A6). Returns null
+  /// otherwise so callers can fall back to the virtual odometer.
+  double? _realOdometerDeltaKm() {
+    final start = _odometerStartKm;
+    final latest = _odometerLatestKm;
+    if (start == null || latest == null) return null;
+    final delta = latest - start;
+    if (delta < 0.05) return null;
+    return delta;
+  }
+
+  /// Append a speed sample to the virtual-odometer buffer, dropping
+  /// the oldest entry when the cap is hit. Called from the 5 Hz
+  /// vehicle-speed subscription.
+  void _recordSpeedSample(double speedKmh) {
+    _speedSamples.add(VirtualOdometerSample(
+      timestamp: _now(),
+      speedKmh: speedKmh,
+    ));
+    if (_speedSamples.length > _virtualOdometerSampleCap) {
+      // Drop the oldest slice to keep memory bounded. Losing the
+      // early stretch biases the virtual-odometer low by the km we
+      // dropped; on a typical trip the cap is never hit.
+      _speedSamples.removeRange(
+        0,
+        _speedSamples.length - _virtualOdometerSampleCap,
+      );
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -619,7 +740,7 @@ class TripRecordingController {
     final id = _sessionId;
     final repo = _resolvePausedRepo();
     final historyRepo = _resolveHistoryRepo();
-    final summary = _recorder.buildSummary();
+    final summary = _finaliseSummary();
     if (historyRepo != null && id != null) {
       try {
         await historyRepo.save(TripHistoryEntry(
@@ -692,7 +813,10 @@ class TripRecordingController {
       ScheduledPid(hz: 5.0, priority: PidPriority.high),
       (r) {
         final v = Elm327Protocol.parseVehicleSpeed(r);
-        if (v != null) _latestSpeedKmh = v.toDouble();
+        if (v != null) {
+          _latestSpeedKmh = v.toDouble();
+          _recordSpeedSample(v.toDouble());
+        }
       },
     );
     // MAF and MAP are the two alternate air-mass inputs to the fuel-
@@ -850,15 +974,28 @@ class TripRecordingController {
   /// instead of live I/O — the scheduler has already done the
   /// reads. Returns null when not enough inputs have arrived yet
   /// (e.g. first 200 ms of a trip before MAP/IAT both land).
+  ///
+  /// AFR + density are chosen from the active vehicle's preferred
+  /// fuel type (#800). Diesel profiles get AFR 14.5 / density 832 g/L;
+  /// anything else (including null / unknown) stays on the petrol
+  /// defaults the pre-#800 path used.
   double? _deriveFuelRateLPerHour() {
+    final preferredFuel =
+        _vehicle?.preferredFuelType?.trim().toLowerCase() ?? '';
+    final isDiesel = preferredFuel.contains('diesel');
+    final afr = isDiesel ? Obd2Service.dieselAfr : Obd2Service.petrolAfr;
+    final density = isDiesel
+        ? Obd2Service.dieselDensityGPerL
+        : Obd2Service.petrolDensityGPerL;
+
     // Step 1: direct PID 5E. Already post-trim, no correction.
     final direct = _latestDirectFuelRate;
     if (direct != null) return direct;
 
-    // Step 2: MAF-based. Stoich petrol: AFR 14.7, density 740 g/L.
+    // Step 2: MAF-based. L/h = MAF × 3600 / (AFR × density).
     final maf = _latestMaf;
     if (maf != null) {
-      final raw = maf * 3600.0 / (14.7 * 740.0);
+      final raw = maf * 3600.0 / (afr * density);
       return _applyTrim(raw);
     }
 
@@ -874,6 +1011,8 @@ class TripRecordingController {
       rpm: rpm,
       engineDisplacementCc: _vehicle?.engineDisplacementCc ?? 1000,
       volumetricEfficiency: _vehicle?.volumetricEfficiency ?? 0.85,
+      afr: afr,
+      fuelDensityGPerL: density,
     );
     if (raw == null) return null;
     return _applyTrim(raw);
@@ -946,4 +1085,33 @@ class TripRecordingController {
       fuelRateLPerHour: fuelRateLPerHour,
     ));
   }
+
+  /// Exposed for tests: append a speed sample to the virtual-odometer
+  /// buffer without going through the scheduler (#800). Tests use
+  /// this to pre-populate samples + call [currentDistanceKm] /
+  /// [distanceSource] deterministically.
+  @visibleForTesting
+  void debugRecordSpeedSample({
+    required double speedKmh,
+    required DateTime at,
+  }) {
+    _speedSamples.add(
+      VirtualOdometerSample(timestamp: at, speedKmh: speedKmh),
+    );
+  }
+
+  /// Exposed for tests: override the trip's start/latest odometer
+  /// readings without driving a fake transport through
+  /// [refreshOdometer] (#800). Useful when the test just needs to
+  /// assert that a `'real'` delta wins over the virtual path.
+  @visibleForTesting
+  void debugSetOdometerReadings({double? startKm, double? latestKm}) {
+    if (startKm != null) _odometerStartKm = startKm;
+    if (latestKm != null) _odometerLatestKm = latestKm;
+  }
+
+  /// Exposed for tests: read-only view of the captured speed samples.
+  @visibleForTesting
+  List<VirtualOdometerSample> get debugSpeedSamples =>
+      List.unmodifiable(_speedSamples);
 }
