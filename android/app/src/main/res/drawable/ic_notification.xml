@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Notification icon — white monochrome silhouette of the fuel-drop-in-shield
+  glyph at 24dp. Android tints this drawable system-side; any non-white
+  fill will be stripped, so every visible path is #FFFFFFFF.
+
+  Wired in from flutter_local_notifications init when a call site exists;
+  the drawable is committed standalone so the generator has an exact
+  target to replace.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Shield outline — stroke only so the fuel drop reads clearly inside. -->
+    <path
+        android:pathData="M12,2
+                          L19,5
+                          L19,13
+                          C19,17 15.5,20.5 12,22
+                          C8.5,20.5 5,17 5,13
+                          L5,5
+                          Z"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.4"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+
+    <!-- Fuel drop — filled, centered in the shield. -->
+    <path
+        android:pathData="M12,7
+                          C12,7 8.5,11 8.5,14
+                          C8.5,15.93 10.07,17.5 12,17.5
+                          C13.93,17.5 15.5,15.93 15.5,14
+                          C15.5,11 12,7 12,7
+                          Z"
+        android:fillColor="#FFFFFFFF" />
+</vector>

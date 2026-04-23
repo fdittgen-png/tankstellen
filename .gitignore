@@ -72,6 +72,7 @@ docs/*
 !docs/decisions/
 !docs/guides/
 !docs/screenshots/
+!docs/design/
 docs/guides/*
 !docs/guides/NEW_COUNTRY.md
 !docs/guides/DEV-GIT-WORKTREES.md

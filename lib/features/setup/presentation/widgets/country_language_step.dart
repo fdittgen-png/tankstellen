@@ -4,6 +4,7 @@ import '../../../../core/country/country_config.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/language/language_provider.dart';
 import '../../../../l10n/app_localizations.dart';
+import 'illustrations/globe_illustration.dart';
 
 /// Second onboarding step: language and country selection.
 class CountryLanguageStep extends ConsumerWidget {
@@ -21,6 +22,8 @@ class CountryLanguageStep extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const SizedBox(height: 8),
+          const Center(child: GlobeIllustration(size: 140)),
           const SizedBox(height: 16),
           // Language selector
           Text(

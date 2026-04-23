@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modify this file to customize your launch splash screen -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@android:color/white" />
+<!--
+  Branded splash (#590).
 
-    <!-- You can insert your own image assets here -->
-    <!-- <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@mipmap/launch_image" />
-    </item> -->
+  The layer-list gives us a color backdrop plus a centered brand glyph
+  without a dependency on flutter_native_splash — the project already
+  uses flutter_launcher_icons and adding a second platform-asset
+  generator is overkill for the current placeholder phase. ASSET_SPEC §
+  "Splash screen" has the migration-to-generator plan.
+
+  Colors match ic_launcher_background so the splash visually continues
+  the launcher icon press.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Color backdrop (same as launcher icon background). -->
+    <item android:drawable="@color/ic_launcher_background" />
+
+    <!-- Centered brand glyph (fuel drop inside shield). The vector
+         drawable renders directly — no bitmap wrapper needed. Width /
+         height constrain the glyph so it doesn't fill the whole screen
+         on small devices. -->
+    <item
+        android:gravity="center"
+        android:width="192dp"
+        android:height="192dp"
+        android:drawable="@drawable/ic_launcher_foreground" />
 </layer-list>
