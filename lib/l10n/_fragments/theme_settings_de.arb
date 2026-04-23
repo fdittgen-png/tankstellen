@@ -1,0 +1,13 @@
+{
+  "themeCardTitle": "Design",
+  "themeCardSubtitleSystem": "System",
+  "themeCardSubtitleLight": "Hell",
+  "themeCardSubtitleDark": "Dunkel",
+  "themeSettingsScreenTitle": "Design",
+  "themeSettingsSystemLabel": "Systemeinstellung folgen",
+  "themeSettingsLightLabel": "Hell",
+  "themeSettingsDarkLabel": "Dunkel",
+  "themeSettingsSystemDescription": "Verwendet die aktuelle Darstellung des Geräts.",
+  "themeSettingsLightDescription": "Helle Hintergründe — ideal tagsüber.",
+  "themeSettingsDarkDescription": "Dunkle Hintergründe — augenschonend bei Nacht und stromsparend auf OLED-Displays."
+}

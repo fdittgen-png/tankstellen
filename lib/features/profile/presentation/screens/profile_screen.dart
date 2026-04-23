@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../../core/theme/theme_mode_tile.dart';
+import '../../../../core/theme/theme_mode_provider.dart';
 import '../../../consent/presentation/widgets/consent_settings_section.dart';
 import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
@@ -85,8 +85,17 @@ class ProfileScreen extends ConsumerWidget {
           // `lib/app/router.dart` for direct navigation (station
           // detail CTA, deep links).
 
-          // Theme mode — light / dark / follow system (#752).
-          const ThemeModeTile(),
+          // Theme — light / dark / follow system (#752, #897).
+          // #897 — restyled as a `SettingsMenuTile` that navigates to
+          // the dedicated `/theme-settings` screen so the Theme entry
+          // matches the Privacy Dashboard and Storage card pattern
+          // instead of opening a modal bottom sheet inline.
+          SettingsMenuTile(
+            icon: Icons.palette_outlined,
+            title: l?.themeCardTitle ?? 'Theme',
+            subtitle: _themeSubtitle(ref, l),
+            onTap: () => context.push('/theme-settings'),
+          ),
           const SizedBox(height: 8),
 
           // Storage & Cache
@@ -164,6 +173,19 @@ class _FoldableSection extends StatelessWidget {
         children: [child],
       ),
     );
+  }
+}
+
+/// Active-mode subtitle on the Theme `SettingsMenuTile` (#897).
+String _themeSubtitle(WidgetRef ref, AppLocalizations? l) {
+  final mode = ref.watch(themeModeSettingProvider);
+  switch (mode) {
+    case ThemeMode.light:
+      return l?.themeCardSubtitleLight ?? 'Light';
+    case ThemeMode.dark:
+      return l?.themeCardSubtitleDark ?? 'Dark';
+    case ThemeMode.system:
+      return l?.themeCardSubtitleSystem ?? 'System';
   }
 }
 

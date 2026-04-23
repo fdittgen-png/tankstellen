@@ -208,8 +208,8 @@ void main() {
     });
 
     testWidgets(
-        '#896: renders exactly two SettingsMenuTile rows — the '
-        'Consumption log tile was the third and is removed',
+        '#896/#897: renders exactly three SettingsMenuTile rows — '
+        'My vehicles, Theme, Privacy Dashboard',
         (tester) async {
       await pumpApp(
         tester,
@@ -227,12 +227,12 @@ void main() {
         scrollable: find.byType(Scrollable).first,
       );
 
-      // Before #896 the Settings screen rendered three top-level
-      // destinations: My vehicles, Consumption log, Privacy Dashboard.
-      // After #896 only My vehicles and Privacy Dashboard remain — a
-      // decrease of exactly one. `SettingsMenuTile.title` survives the
-      // lazy-list dispose, so we collect titles from every match we
-      // see instead of trusting the instant count.
+      // #896 removed Consumption log. #897 restyled the Theme entry
+      // from a bespoke `ThemeModeTile` (Card + bottom sheet) into a
+      // third `SettingsMenuTile` that matches Privacy + Storage and
+      // pushes to a dedicated `/theme-settings` screen. The Settings
+      // screen now renders My vehicles, Theme, Privacy Dashboard as
+      // SettingsMenuTile rows.
       final observedTitles = <String>{};
       void collect() {
         for (final t in tester
@@ -258,16 +258,22 @@ void main() {
         reason: 'Privacy Dashboard tile should still render after #896',
       );
       expect(
+        observedTitles.contains('Theme'),
+        isTrue,
+        reason: '#897: Theme tile must render as a SettingsMenuTile '
+            '(card matching Privacy + Storage pattern)',
+      );
+      expect(
         observedTitles.contains('Consumption log'),
         isFalse,
         reason: '#896: Consumption log tile must not render any more',
       );
       expect(
         observedTitles.length,
-        2,
-        reason: '#896: expected exactly two distinct SettingsMenuTile '
-            'titles (My vehicles, Privacy Dashboard) after removing '
-            'Consumption log; found $observedTitles',
+        3,
+        reason: '#897: expected exactly three distinct SettingsMenuTile '
+            'titles (My vehicles, Theme, Privacy Dashboard); '
+            'found $observedTitles',
       );
     });
 

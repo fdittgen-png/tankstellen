@@ -1,0 +1,13 @@
+{
+  "themeCardTitle": "Thème",
+  "themeCardSubtitleSystem": "Système",
+  "themeCardSubtitleLight": "Clair",
+  "themeCardSubtitleDark": "Sombre",
+  "themeSettingsScreenTitle": "Thème",
+  "themeSettingsSystemLabel": "Suivre le système",
+  "themeSettingsLightLabel": "Clair",
+  "themeSettingsDarkLabel": "Sombre",
+  "themeSettingsSystemDescription": "Utilise l'apparence actuelle de l'appareil.",
+  "themeSettingsLightDescription": "Arrière-plans clairs — idéal en journée.",
+  "themeSettingsDarkDescription": "Arrière-plans sombres — plus doux pour les yeux la nuit et économe en batterie sur les écrans OLED."
+}
