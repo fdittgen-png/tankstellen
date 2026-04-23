@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
+import 'package:tankstellen/features/consumption/data/obd2/paused_trip_repository.dart';
 import 'package:tankstellen/features/consumption/data/obd2/pid_scheduler.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_recording_controller.dart';
+import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 
 void main() {
@@ -444,6 +450,278 @@ void main() {
       });
     });
   });
+
+  group('BT drop resilience — #797 phase 1', () {
+    late Directory tmpDir;
+    late Box<String> pausedBox;
+    late Box<String> historyBox;
+    late PausedTripRepository pausedRepo;
+    late TripHistoryRepository historyRepo;
+
+    setUp(() async {
+      tmpDir = Directory.systemTemp.createTempSync('bt_drop_test_');
+      Hive.init(tmpDir.path);
+      pausedBox = await Hive.openBox<String>(
+        'paused_${DateTime.now().microsecondsSinceEpoch}',
+      );
+      historyBox = await Hive.openBox<String>(
+        'history_${DateTime.now().microsecondsSinceEpoch}',
+      );
+      pausedRepo = PausedTripRepository(box: pausedBox);
+      historyRepo = TripHistoryRepository(box: historyBox);
+    });
+
+    tearDown(() async {
+      await pausedBox.deleteFromDisk();
+      await historyBox.deleteFromDisk();
+      await Hive.close();
+      tmpDir.deleteSync(recursive: true);
+    });
+
+    /// Common AT-init responses so `connect()` on the Obd2Service
+    /// happy-paths before the test starts simulating drops. Also
+    /// covers `01A6` (odometer) because [TripRecordingController.start]
+    /// reads it once and a NO DATA short-circuits the null-fallback
+    /// without throwing.
+    Map<String, String> initResponses() => {
+          'ATZ': 'ELM327 v1.5>',
+          'ATE0': 'OK>',
+          'ATL0': 'OK>',
+          'ATH0': 'OK>',
+          'ATSP0': 'OK>',
+          '01A6': 'NO DATA>',
+        };
+
+    test(
+        'three consecutive transport errors flip state to '
+        'pausedDueToDrop and stop the scheduler', () async {
+      final transport = _DroppingTransport(
+        initResponses: initResponses(),
+        firstGoodReads: 1, // one successful read before dropping
+      );
+      final service = Obd2Service(transport);
+      await service.connect();
+      // Drop the post-connect supported-PID scan noise.
+      transport.startCounting();
+
+      final ctl = TripRecordingController(
+        service: service,
+        pollInterval: const Duration(minutes: 1),
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+        pauseGraceWindow: const Duration(minutes: 5),
+        schedulerTickRate: const Duration(milliseconds: 20),
+      );
+      final states = <TripRecordingControllerState>[];
+      final sub = ctl.stateChanges.listen(states.add);
+
+      await ctl.start();
+      // Let the scheduler run long enough to accumulate well over 3
+      // transport errors — once the _DroppingTransport exhausts its
+      // good-read budget, every sendCommand throws.
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+
+      expect(
+        ctl.currentState,
+        TripRecordingControllerState.pausedDueToDrop,
+        reason: 'repeated transport errors must flip state to '
+            'pausedDueToDrop',
+      );
+      expect(
+        states,
+        contains(TripRecordingControllerState.pausedDueToDrop),
+        reason: 'state stream must surface the drop transition',
+      );
+
+      await sub.cancel();
+      // Scheduler has been stopped — but ctl.stop() would normally
+      // also close streams; skip here because we've already cancelled
+      // our listener and a second close would throw.
+    });
+
+    test(
+        'typed Obd2DisconnectedException triggers a drop immediately '
+        'without waiting for the 3-errors threshold', () async {
+      final transport = _ThrowingTransport(
+        initResponses: initResponses(),
+        error: const Obd2DisconnectedException(),
+      );
+      final service = Obd2Service(transport);
+      await service.connect();
+      transport.startCounting();
+
+      final ctl = TripRecordingController(
+        service: service,
+        pollInterval: const Duration(minutes: 1),
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+        pauseGraceWindow: const Duration(minutes: 5),
+        dropThreshold: 99, // huge threshold — only typed path can fire
+        schedulerTickRate: const Duration(milliseconds: 20),
+      );
+
+      await ctl.start();
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+
+      expect(
+        ctl.currentState,
+        TripRecordingControllerState.pausedDueToDrop,
+        reason: 'typed Obd2DisconnectedException is the strongest '
+            'signal; must not wait for the N-errors heuristic',
+      );
+    });
+
+    test(
+        'paused trip payload lands in the paused-trips box with the '
+        'captured distance preserved', () async {
+      final transport = FakeObd2Transport(initResponses());
+      await transport.connect();
+      final ctl = TripRecordingController(
+        service: Obd2Service(transport),
+        pollInterval: const Duration(minutes: 1),
+        vehicleId: 'car-under-test',
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+      );
+      await ctl.start();
+
+      // Inject 30 1 s-spaced samples with a constant 50 km/h speed
+      // so the recorder accumulates a tangible distance before the
+      // drop. 29 intervals × 1 s × 50 km/h / 3600 ≈ 0.403 km.
+      final startTs = DateTime(2026, 4, 22, 10);
+      for (var i = 0; i < 30; i++) {
+        ctl.debugInjectSample(
+          speedKmh: 50,
+          rpm: 1800,
+          at: startTs.add(Duration(seconds: i)),
+        );
+      }
+      ctl.debugTriggerDrop();
+
+      expect(
+        ctl.currentState,
+        TripRecordingControllerState.pausedDueToDrop,
+      );
+      final saved = pausedRepo.loadAll();
+      expect(saved, hasLength(1),
+          reason: 'exactly one paused entry should have been written');
+      final entry = saved.single;
+      expect(entry.vehicleId, 'car-under-test');
+      expect(entry.summary.distanceKm, greaterThan(0.3),
+          reason: '30 samples at 50 km/h × 100 ms steps produce '
+              '≈ 0.4 km, well above 0.3');
+    });
+
+    test(
+        'resume() flips state back to recording, cancels the grace '
+        'timer, and clears the paused-trips box row', () async {
+      final transport = FakeObd2Transport(initResponses());
+      await transport.connect();
+      final ctl = TripRecordingController(
+        service: Obd2Service(transport),
+        pollInterval: const Duration(minutes: 1),
+        vehicleId: 'car-resume',
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+        pauseGraceWindow: const Duration(milliseconds: 50),
+      );
+      await ctl.start();
+      ctl.debugTriggerDrop();
+      expect(pausedRepo.loadAll(), hasLength(1));
+      expect(ctl.currentState, TripRecordingControllerState.pausedDueToDrop);
+
+      ctl.resume();
+      // Resume should flip the state back to recording even though
+      // no new readings have arrived yet.
+      expect(ctl.currentState, TripRecordingControllerState.recording);
+
+      // Wait past the original grace deadline — nothing should be
+      // finalised because the grace timer was cancelled on resume.
+      await Future<void>.delayed(const Duration(milliseconds: 120));
+      expect(historyRepo.loadAll(), isEmpty,
+          reason: 'resume must cancel the grace timer');
+      // Paused row is cleared because the session is live again.
+      expect(pausedRepo.loadAll(), isEmpty,
+          reason: 'resume must delete the paused-trips row so a '
+              'subsequent pause writes a fresh snapshot');
+    });
+
+    test(
+        'grace window elapses → paused trip is finalised into history '
+        'and removed from the paused-trips box', () async {
+      final transport = FakeObd2Transport(initResponses());
+      await transport.connect();
+      final ctl = TripRecordingController(
+        service: Obd2Service(transport),
+        pollInterval: const Duration(minutes: 1),
+        vehicleId: 'car-grace',
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+        pauseGraceWindow: const Duration(milliseconds: 50),
+      );
+      await ctl.start();
+
+      // Feed one sample so the resulting TripHistoryEntry has a
+      // non-trivial summary — otherwise the finalise call would
+      // persist an empty row (valid but harder to assert).
+      ctl.debugInjectSample(
+        speedKmh: 40,
+        rpm: 1600,
+        at: DateTime(2026, 4, 22, 11),
+      );
+      ctl.debugInjectSample(
+        speedKmh: 42,
+        rpm: 1700,
+        at: DateTime(2026, 4, 22, 11, 0, 1),
+      );
+
+      ctl.debugTriggerDrop();
+      expect(pausedRepo.loadAll(), hasLength(1));
+
+      // Wait for the 50 ms grace window to elapse. Even on a busy
+      // CI box 200 ms is plenty of slack.
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+
+      expect(historyRepo.loadAll(), hasLength(1),
+          reason: 'grace-window expiry must finalise the paused '
+              'trip into the normal trip-history box');
+      expect(pausedRepo.loadAll(), isEmpty,
+          reason: 'paused-trips row must be removed once finalised');
+      expect(ctl.currentState, TripRecordingControllerState.stopped);
+    });
+
+    test(
+        'debugExpireGraceWindow promotes the paused trip even when '
+        'the real timer hasn\'t fired yet — used by fake-async tests',
+        () async {
+      final transport = FakeObd2Transport(initResponses());
+      await transport.connect();
+      final ctl = TripRecordingController(
+        service: Obd2Service(transport),
+        pollInterval: const Duration(minutes: 1),
+        vehicleId: 'car-debug',
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+        pauseGraceWindow: const Duration(hours: 1),
+      );
+      await ctl.start();
+      ctl.debugInjectSample(
+        speedKmh: 30,
+        rpm: 1500,
+        at: DateTime(2026, 4, 22, 12),
+      );
+      ctl.debugInjectSample(
+        speedKmh: 32,
+        rpm: 1550,
+        at: DateTime(2026, 4, 22, 12, 0, 1),
+      );
+      ctl.debugTriggerDrop();
+      await ctl.debugExpireGraceWindow();
+
+      expect(historyRepo.loadAll(), hasLength(1));
+      expect(pausedRepo.loadAll(), isEmpty);
+    });
+  });
 }
 
 /// Counts how many times each command is sent. Used to assert
@@ -492,5 +770,85 @@ class _SequencedTransport implements Obd2Transport {
     final key = command.trim();
     if (key == '01A6') return onOdometer();
     return init[key] ?? 'NO DATA>';
+  }
+}
+
+/// Transport that serves init responses, then yields a configurable
+/// number of healthy reads, then throws forever (#797 phase 1).
+///
+/// Used to exercise the controller's "3 consecutive errors → drop"
+/// heuristic. The `startCounting` call moves the transport past the
+/// post-connect supported-PID scan so the user-trip's read budget is
+/// honoured rather than burned on the bitmap scan.
+class _DroppingTransport implements Obd2Transport {
+  final Map<String, String> initResponses;
+  int firstGoodReads;
+  bool _connected = false;
+  bool _postConnect = false;
+
+  _DroppingTransport({
+    required this.initResponses,
+    required this.firstGoodReads,
+  });
+
+  /// Mark the end of the post-connect noise window — subsequent
+  /// sendCommand calls start consuming the `firstGoodReads` budget.
+  void startCounting() {
+    _postConnect = true;
+  }
+
+  @override
+  Future<void> connect() async => _connected = true;
+  @override
+  Future<void> disconnect() async => _connected = false;
+  @override
+  bool get isConnected => _connected;
+  @override
+  Future<String> sendCommand(String command) async {
+    final key = command.trim();
+    final canned = initResponses[key];
+    if (canned != null) return canned;
+    if (!_postConnect) return 'NO DATA>';
+    if (firstGoodReads > 0) {
+      firstGoodReads--;
+      // Valid RPM response — parses to a real number, resetting the
+      // error counter. 0E A6 → ((14×256)+166)/4 = 937.5 rpm.
+      return '41 0C 0E A6>';
+    }
+    throw StateError('Transport closed');
+  }
+}
+
+/// Transport that serves init responses, then throws a pinned error
+/// on every subsequent sendCommand. Used to verify the "typed
+/// [Obd2DisconnectedException] triggers an immediate drop" path.
+class _ThrowingTransport implements Obd2Transport {
+  final Map<String, String> initResponses;
+  final Object error;
+  bool _connected = false;
+  bool _postConnect = false;
+
+  _ThrowingTransport({
+    required this.initResponses,
+    required this.error,
+  });
+
+  void startCounting() {
+    _postConnect = true;
+  }
+
+  @override
+  Future<void> connect() async => _connected = true;
+  @override
+  Future<void> disconnect() async => _connected = false;
+  @override
+  bool get isConnected => _connected;
+  @override
+  Future<String> sendCommand(String command) async {
+    final key = command.trim();
+    final canned = initResponses[key];
+    if (canned != null) return canned;
+    if (!_postConnect) return 'NO DATA>';
+    throw error;
   }
 }

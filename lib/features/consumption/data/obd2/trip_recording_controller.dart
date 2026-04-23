@@ -1,11 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 
+import '../../../../core/storage/hive_boxes.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../domain/trip_recorder.dart';
+import '../trip_history_repository.dart';
 import 'elm327_protocol.dart';
+import 'obd2_connection_errors.dart';
 import 'obd2_service.dart';
+import 'paused_trip_repository.dart';
 import 'pid_scheduler.dart';
 
 /// Live read-out from the currently-recording trip (#726).
@@ -55,6 +60,33 @@ class TripLiveReading {
   }
 }
 
+/// Public recording state exposed by [TripRecordingController]
+/// (#797 phase 1).
+///
+/// Distinguishes the two "not currently polling" reasons so the UI can
+/// react differently:
+///   - [paused]: user tapped the pause button or navigated away; the
+///     polling loop is frozen but the Bluetooth link is still healthy.
+///     Resume returns immediately.
+///   - [pausedDueToDrop]: the scheduler observed repeated transport
+///     errors (or a typed disconnect); the partial trip was persisted
+///     to the `obd2_paused_trips` Hive box and a grace timer is
+///     ticking. A subsequent [TripRecordingController.resume] must
+///     succeed before the window elapses or the session will be
+///     auto-finalised into history.
+///
+/// phase 1 intentionally exposes the state but does NOT wire a UI
+/// banner — that lands in phase 2 alongside the auto-reconnect
+/// scanner. Phase 1's job is to make the state observable so the
+/// follow-up PR can react to it.
+enum TripRecordingControllerState {
+  idle,
+  recording,
+  paused,
+  pausedDueToDrop,
+  stopped,
+}
+
 /// Drives the priority-tiered PID polling loop that feeds an
 /// [Obd2Service]'s live PIDs into a [TripRecorder] (#726, #814).
 ///
@@ -93,6 +125,24 @@ class TripLiveReading {
 /// the situation/band classifier needs. The debounced approach keeps
 /// the event rate bounded at whatever cadence the caller wants
 /// (production: 250–500 ms; tests: 1 minute to pin the loop quiet).
+///
+/// ## #797 phase 1 — survive Bluetooth drops
+///
+/// Every scheduler-routed transport call is funnelled through
+/// [_runTransport] which counts consecutive failures and classifies
+/// them. Three consecutive errors within [_dropWindow], OR a typed
+/// [Obd2DisconnectedException] / `StateError('Transport closed')`,
+/// flip the controller into [TripRecordingControllerState.pausedDueToDrop]:
+///   - the scheduler is stopped,
+///   - the partial [TripSummary] (distance, fuel estimate so far,
+///     harsh counters, odometer reads, VIN) is serialised to the
+///     `obd2_paused_trips` Hive box,
+///   - a grace timer starts for [_pauseGraceWindow]; if [resume] isn't
+///     called before it fires, the paused entry is finalised into the
+///     normal trip history as if [stop] had run.
+///
+/// Phase 1 exposes the state machine without wiring a UI banner —
+/// phase 2 brings the auto-reconnect scanner + snackbar UX.
 class TripRecordingController {
   final Obd2Service _service;
   final TripRecorder _recorder;
@@ -107,18 +157,66 @@ class TripRecordingController {
   /// η_v 0.85 defaults — still honest, just less precise.
   final VehicleProfile? _vehicle;
 
+  /// Vehicle id tagged on paused snapshots + trip-history finalisations
+  /// (#797 phase 1). The controller itself doesn't know about the
+  /// Riverpod-backed active vehicle profile; the provider passes it
+  /// through at construction so the paused-trips box row carries it.
+  final String? _vehicleId;
+
   /// Optional override — tests inject a hand-built scheduler (usually
   /// with a tiny [PidScheduler.tickRate] + a fake transport) to
   /// exercise the scheduler ↔ controller wiring without touching the
   /// real [Obd2Service] chain. Production always passes null and
   /// [start] constructs a scheduler against [service.sendCommand].
+  ///
+  /// Note: an override bypasses the drop-detection transport wrapper
+  /// (#797 phase 1) because the caller pre-wired the transport. Tests
+  /// that want to exercise the drop heuristic should use
+  /// [schedulerTickRate] instead, which still routes through
+  /// [_runTransport].
   final PidScheduler? _schedulerOverride;
+
+  /// Tick rate for the default-constructed scheduler (#797 phase 1).
+  /// Lets tests drive the round-robin faster than the 100 ms
+  /// production default without having to construct their own
+  /// [PidScheduler] — which would bypass the drop-detection wrapper
+  /// in [_runTransport].
+  final Duration _schedulerTickRate;
+
+  /// Optional override — tests inject an in-memory box via a fake
+  /// repo so they don't have to spin up the real Hive box. Production
+  /// passes null and the controller resolves the box lazily from
+  /// [HiveBoxes.obd2PausedTrips] when a drop actually occurs.
+  final PausedTripRepository? _pausedRepoOverride;
+
+  /// Optional override — tests inject a lightweight fake that skips
+  /// the Hive round-trip when auto-finalising a paused trip after the
+  /// grace window elapses. Production uses [TripHistoryRepository]
+  /// against the `obd2_trip_history` Hive box.
+  final TripHistoryRepository? _historyRepoOverride;
+
+  /// Grace window before a paused-due-to-drop session auto-finalises
+  /// (#797 phase 1). Defaults to 15 minutes — long enough for a
+  /// toll-booth stop, short enough that a forgotten session can't
+  /// clog up the paused-trips box forever. Tests pass small values
+  /// (e.g. 100 ms) to exercise the auto-finalise path.
+  final Duration _pauseGraceWindow;
+
+  /// Sliding window used for the "3 consecutive transport errors"
+  /// heuristic (#797 phase 1). The counter resets on every successful
+  /// read. Override for tests that want to pin the exact threshold.
+  final Duration _dropWindow;
+  final int _dropThreshold;
 
   final StreamController<TripLiveReading> _liveController =
       StreamController<TripLiveReading>.broadcast();
 
+  final StreamController<TripRecordingControllerState> _stateController =
+      StreamController<TripRecordingControllerState>.broadcast();
+
   PidScheduler? _scheduler;
   Timer? _emitTimer;
+  Timer? _graceTimer;
   DateTime? _startedAt;
   DateTime? _lastSampleAt;
   double? _odometerStartKm;
@@ -126,7 +224,14 @@ class TripRecordingController {
   double _fuelLitersSoFar = 0;
   bool _fuelRateSeen = false;
   bool _paused = false;
+  bool _pausedDueToDrop = false;
   bool _started = false;
+  bool _stopped = false;
+  String? _sessionId; // ISO start-ts, stable across pause→resume cycles
+
+  /// Consecutive-error bookkeeping for the drop heuristic. First entry
+  /// is the oldest. Reset on a successful transport read.
+  final List<DateTime> _recentErrors = <DateTime>[];
 
   /// Latest parsed values, keyed by PID command. Written by scheduler
   /// callbacks, read by [_emit] when assembling [TripLiveReading]. Not
@@ -151,19 +256,54 @@ class TripRecordingController {
     Duration pollInterval = const Duration(milliseconds: 250),
     DateTime Function()? now,
     VehicleProfile? vehicle,
+    String? vehicleId,
     PidScheduler? scheduler,
+    PausedTripRepository? pausedRepo,
+    TripHistoryRepository? historyRepo,
+    Duration pauseGraceWindow = const Duration(minutes: 15),
+    Duration dropWindow = const Duration(seconds: 5),
+    int dropThreshold = 3,
+    Duration schedulerTickRate = const Duration(milliseconds: 100),
   })  : _service = service,
         _recorder = recorder ?? TripRecorder(),
         _pollInterval = pollInterval,
         _now = now ?? DateTime.now,
         _vehicle = vehicle,
-        _schedulerOverride = scheduler;
+        _vehicleId = vehicleId,
+        _schedulerOverride = scheduler,
+        _pausedRepoOverride = pausedRepo,
+        _historyRepoOverride = historyRepo,
+        _pauseGraceWindow = pauseGraceWindow,
+        _dropWindow = dropWindow,
+        _dropThreshold = dropThreshold,
+        _schedulerTickRate = schedulerTickRate;
 
   /// Live metrics stream — subscribe to update the recording UI.
   Stream<TripLiveReading> get live => _liveController.stream;
 
-  bool get isRecording => _started && !_paused;
-  bool get isPaused => _paused;
+  /// State-transition stream (#797 phase 1). Emits the new state on
+  /// every controller-driven transition (start → recording, pause →
+  /// paused, drop → pausedDueToDrop, resume → recording, grace →
+  /// stopped, manual stop → stopped). Phase 2 binds this to the UI
+  /// reaction; phase 1 just needs it observable.
+  Stream<TripRecordingControllerState> get stateChanges =>
+      _stateController.stream;
+
+  /// Current logical state. Mirrors [stateChanges] for callers that
+  /// want a pull-style read (widget tests, initial value).
+  TripRecordingControllerState get currentState {
+    // Check stopped first: an auto-finalised drop sets both
+    // `_stopped = true` AND `_started = false`, so the order matters.
+    if (_stopped) return TripRecordingControllerState.stopped;
+    if (!_started) return TripRecordingControllerState.idle;
+    if (_pausedDueToDrop) return TripRecordingControllerState.pausedDueToDrop;
+    if (_paused) return TripRecordingControllerState.paused;
+    return TripRecordingControllerState.recording;
+  }
+
+  bool get isRecording => _started && !_paused && !_pausedDueToDrop;
+  bool get isPaused => _paused || _pausedDueToDrop;
+  bool get isPausedDueToDrop => _pausedDueToDrop;
   bool get isActive => _started;
 
   /// Pause the polling loop without tearing down the recorder. The
@@ -174,16 +314,32 @@ class TripRecordingController {
   /// — no-op.
   void pause() {
     if (!_started) return;
-    if (_paused) return;
+    if (_paused || _pausedDueToDrop) return;
     _paused = true;
     _scheduler?.stop();
+    _emitState();
   }
 
-  /// Resume a paused recording. Idempotent; no-op if not paused.
+  /// Resume a paused recording. Works from both user-pause and
+  /// drop-pause states. Idempotent; no-op if not paused.
   void resume() {
-    if (!_paused) return;
+    if (!_paused && !_pausedDueToDrop) return;
+    if (_pausedDueToDrop) {
+      _graceTimer?.cancel();
+      _graceTimer = null;
+      _pausedDueToDrop = false;
+      // Clear the paused-trips box row — the session is live again,
+      // so leaving the partial behind would let a subsequent pause
+      // stomp over the in-memory state. Best-effort.
+      final id = _sessionId;
+      if (id != null) {
+        final repo = _resolvePausedRepo();
+        repo?.delete(id);
+      }
+    }
     _paused = false;
     _scheduler?.start();
+    _emitState();
   }
 
   /// Start polling. Reads the odometer and VIN ONCE to pin trip
@@ -193,7 +349,9 @@ class TripRecordingController {
   Future<void> start() async {
     if (_started) return;
     _started = true;
+    _stopped = false;
     _startedAt = _now();
+    _sessionId = _startedAt!.toIso8601String();
     _odometerStartKm = await _service.readOdometerKm();
     _odometerLatestKm = _odometerStartKm;
 
@@ -209,6 +367,7 @@ class TripRecordingController {
     _scheduler!.start();
 
     _emitTimer = Timer.periodic(_pollInterval, (_) => _emit());
+    _emitState();
   }
 
   /// Stop the polling loop and return the accumulated summary.
@@ -217,8 +376,18 @@ class TripRecordingController {
     _scheduler?.stop();
     _emitTimer?.cancel();
     _emitTimer = null;
+    _graceTimer?.cancel();
+    _graceTimer = null;
     _started = false;
-    await _liveController.close();
+    _stopped = true;
+    _pausedDueToDrop = false;
+    _emitState();
+    if (!_stateController.isClosed) {
+      await _stateController.close();
+    }
+    if (!_liveController.isClosed) {
+      await _liveController.close();
+    }
     return _recorder.buildSummary();
   }
 
@@ -242,6 +411,12 @@ class TripRecordingController {
   /// user's selected profile.
   String? get vin => _vin;
 
+  /// Stable session id (ISO start timestamp). Matches the primary
+  /// key used by [TripHistoryEntry] and [PausedTripEntry] so a
+  /// paused → finalised transition keeps the row together. Null
+  /// before [start] runs.
+  String? get sessionId => _sessionId;
+
   /// Refresh the odometer reading. Call this just before [stop] so
   /// the save-as-fill-up gets a ground-truth end km rather than a
   /// derived value.
@@ -256,9 +431,155 @@ class TripRecordingController {
 
   PidScheduler _buildScheduler() {
     return PidScheduler(
-      transport: _service.sendCommand,
+      transport: _runTransport,
+      tickRate: _schedulerTickRate,
       clock: _now,
     );
+  }
+
+  /// Wrap [Obd2Service.sendCommand] with drop-detection bookkeeping
+  /// (#797 phase 1). Successful reads reset the consecutive-error
+  /// counter; repeated failures in a short window flip the controller
+  /// into [TripRecordingControllerState.pausedDueToDrop].
+  ///
+  /// The scheduler itself still swallows the exception (it logs and
+  /// marks `lastReadAt` to keep other PIDs from starving) — we rethrow
+  /// because throwing keeps the scheduler's "something went wrong"
+  /// branch in play, but we *also* short-circuit by stopping the
+  /// scheduler the moment we cross the threshold.
+  Future<String> _runTransport(String command) async {
+    try {
+      final response = await _service.sendCommand(command);
+      // A clean read is the only signal strong enough to clear the
+      // error window; ELM327 NO DATA responses come back via the
+      // response string, not an exception.
+      _recentErrors.clear();
+      return response;
+    } catch (e) {
+      _registerTransportError(e);
+      rethrow;
+    }
+  }
+
+  void _registerTransportError(Object error) {
+    if (_pausedDueToDrop || _stopped) return;
+    final now = _now();
+    _recentErrors.add(now);
+    // Keep only errors inside the window so the heuristic doesn't
+    // count a ten-minute-old blip.
+    _recentErrors.removeWhere(
+      (ts) => now.difference(ts) > _dropWindow,
+    );
+    final typedDisconnect = _isTypedDisconnect(error);
+    if (typedDisconnect || _recentErrors.length >= _dropThreshold) {
+      _handleDrop();
+    }
+  }
+
+  bool _isTypedDisconnect(Object error) {
+    if (error is Obd2DisconnectedException) return true;
+    // The live Bluetooth transport throws `StateError('Transport
+    // closed')` once its channel is shut down by the OS / user.
+    // Match by message so the controller works against the real
+    // implementation without reaching into platform-specific
+    // exception types.
+    if (error is StateError) {
+      final msg = error.message.toLowerCase();
+      if (msg.contains('transport closed')) return true;
+      if (msg.contains('not connected')) return true;
+    }
+    return false;
+  }
+
+  void _handleDrop() {
+    if (_pausedDueToDrop) return;
+    _pausedDueToDrop = true;
+    _scheduler?.stop();
+    _recentErrors.clear();
+    _persistPausedSnapshot();
+    _graceTimer?.cancel();
+    _graceTimer = Timer(_pauseGraceWindow, _onGraceWindowElapsed);
+    _emitState();
+  }
+
+  void _persistPausedSnapshot() {
+    final repo = _resolvePausedRepo();
+    final id = _sessionId;
+    if (repo == null || id == null) return;
+    final summary = _recorder.buildSummary();
+    final entry = PausedTripEntry(
+      id: id,
+      vehicleId: _vehicleId,
+      vin: _vin,
+      summary: summary,
+      odometerStartKm: _odometerStartKm,
+      odometerLatestKm: _odometerLatestKm,
+      pausedAt: _now(),
+    );
+    // Fire-and-forget: the save is best-effort; Hive errors are
+    // logged by the repo and must not throw back into the scheduler
+    // callback.
+    repo.save(entry);
+  }
+
+  Future<void> _onGraceWindowElapsed() async {
+    if (!_pausedDueToDrop) return;
+    final id = _sessionId;
+    final repo = _resolvePausedRepo();
+    final historyRepo = _resolveHistoryRepo();
+    final summary = _recorder.buildSummary();
+    if (historyRepo != null && id != null) {
+      try {
+        await historyRepo.save(TripHistoryEntry(
+          id: id,
+          vehicleId: _vehicleId,
+          summary: summary,
+        ));
+      } catch (e) {
+        debugPrint('TripRecordingController grace finalise failed: $e');
+      }
+    }
+    if (repo != null && id != null) {
+      await repo.delete(id);
+    }
+    _pausedDueToDrop = false;
+    _stopped = true;
+    _started = false;
+    _graceTimer = null;
+    _emitState();
+  }
+
+  PausedTripRepository? _resolvePausedRepo() {
+    final override = _pausedRepoOverride;
+    if (override != null) return override;
+    if (!Hive.isBoxOpen(HiveBoxes.obd2PausedTrips)) return null;
+    try {
+      return PausedTripRepository(
+        box: Hive.box<String>(HiveBoxes.obd2PausedTrips),
+      );
+    } catch (e) {
+      debugPrint('TripRecordingController paused repo: $e');
+      return null;
+    }
+  }
+
+  TripHistoryRepository? _resolveHistoryRepo() {
+    final override = _historyRepoOverride;
+    if (override != null) return override;
+    if (!Hive.isBoxOpen(TripHistoryRepository.boxName)) return null;
+    try {
+      return TripHistoryRepository(
+        box: Hive.box<String>(TripHistoryRepository.boxName),
+      );
+    } catch (e) {
+      debugPrint('TripRecordingController history repo: $e');
+      return null;
+    }
+  }
+
+  void _emitState() {
+    if (_stateController.isClosed) return;
+    _stateController.add(currentState);
   }
 
   void _subscribeAllTiers(PidScheduler scheduler) {
@@ -391,7 +712,7 @@ class TripRecordingController {
   /// a [TripLiveReading], integrates any new fuel/distance since the
   /// last emit, and pushes to [live].
   void _emit() {
-    if (_paused) return; // frozen: don't flood the stream while paused
+    if (_paused || _pausedDueToDrop) return; // don't flood while paused
     if (_liveController.isClosed) return;
 
     final nowTs = _now();
@@ -489,4 +810,40 @@ class TripRecordingController {
   /// or RPM.
   @visibleForTesting
   DateTime? get debugLastSampleAt => _lastSampleAt;
+
+  /// Exposed for tests: trigger the drop-handling path directly, so
+  /// tests that can't easily convince a fake transport to throw three
+  /// times in a row still exercise the state transition.
+  @visibleForTesting
+  void debugTriggerDrop() {
+    _handleDrop();
+  }
+
+  /// Exposed for tests: synchronously drive the grace-window
+  /// finalisation path. Useful with fake-async patterns where
+  /// elapsing real wall-clock time is awkward.
+  @visibleForTesting
+  Future<void> debugExpireGraceWindow() async {
+    _graceTimer?.cancel();
+    await _onGraceWindowElapsed();
+  }
+
+  /// Exposed for tests: inject a hand-crafted [TripSample] directly
+  /// into the underlying [TripRecorder]. Used by the #797 phase 1
+  /// tests to accumulate captured data deterministically without
+  /// driving the scheduler + parsers end-to-end.
+  @visibleForTesting
+  void debugInjectSample({
+    required double speedKmh,
+    required double rpm,
+    required DateTime at,
+    double? fuelRateLPerHour,
+  }) {
+    _recorder.onSample(TripSample(
+      timestamp: at,
+      speedKmh: speedKmh,
+      rpm: rpm,
+      fuelRateLPerHour: fuelRateLPerHour,
+    ));
+  }
 }
