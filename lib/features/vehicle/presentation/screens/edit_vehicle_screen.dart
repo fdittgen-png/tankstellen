@@ -272,6 +272,53 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
     });
   }
 
+  /// Reset the learned η_v for this vehicle (#815). Shows a confirm
+  /// dialog first — destructive actions should always be explicit —
+  /// then writes the default (0.85) back through the repository and
+  /// clears the sample counter. Safe to call before _save because
+  /// the user hasn't necessarily pressed Save on their other
+  /// changes; the reset targets the stored profile independently.
+  Future<void> _resetVolumetricEfficiency() async {
+    final id = _existingId;
+    if (id == null) return;
+    final l = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l?.veResetConfirmTitle ?? 'Reset calibration?'),
+        content: Text(
+          l?.veResetConfirmBody ??
+              'This will discard the learned per-vehicle calibration '
+                  'and restore the default value (0.85).',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l?.cancel ?? 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l?.veResetAction ?? 'Reset calibration'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    if (!mounted) return;
+    try {
+      final list = ref.read(vehicleProfileListProvider);
+      final existing = list.where((v) => v.id == id).firstOrNull;
+      if (existing == null) return;
+      final cleared = existing.copyWith(
+        volumetricEfficiency: 0.85,
+        volumetricEfficiencySamples: 0,
+      );
+      await ref.read(vehicleProfileListProvider.notifier).save(cleared);
+    } catch (e) {
+      debugPrint('EditVehicleScreen: VE reset failed: $e');
+    }
+  }
+
   /// Latest odometer reading logged for [vehicleId], picked from the
   /// fill-up history (#584). Falls back to null so the reminder
   /// section can prompt the user for a manual entry.
@@ -420,6 +467,18 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
             if (_existingId != null) ...[
               const SizedBox(height: 24),
               VehicleBaselineSection(vehicleId: _existingId!),
+            ],
+            // η_v calibration reset (#815). Lives in the same
+            // "learned calibration" band as the baseline section
+            // above — a user who wants to wipe one will often want
+            // to wipe the other.
+            if (_existingId != null) ...[
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: _resetVolumetricEfficiency,
+                icon: const Icon(Icons.restart_alt_outlined),
+                label: Text(l?.veResetAction ?? 'Reset calibration'),
+              ),
             ],
             // Service reminders (#584). Needs a stable vehicle id —
             // the id is the foreign key stored on each reminder — so

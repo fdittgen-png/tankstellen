@@ -3093,4 +3093,19 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get obd2PauseBannerEnd => 'Aufzeichnung beenden';
+
+  @override
+  String veCalibratedTitle(String vehicleName, String percent) {
+    return 'Verbrauchsberechnung für $vehicleName kalibriert — Genauigkeit verbessert um $percent%';
+  }
+
+  @override
+  String get veResetAction => 'Kalibrierung zurücksetzen';
+
+  @override
+  String get veResetConfirmTitle => 'Kalibrierung zurücksetzen?';
+
+  @override
+  String get veResetConfirmBody =>
+      'Dies verwirft die gelernte fahrzeugspezifische Kalibrierung und stellt den Standardwert (0,85) wieder her.';
 }

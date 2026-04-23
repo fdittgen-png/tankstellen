@@ -59,6 +59,153 @@ final class FillUpRepositoryProvider
 
 String _$fillUpRepositoryHash() => r'cc5e51ddaa9f996875c6e5bace204386b25f55dd';
 
+/// Learner for per-vehicle volumetric efficiency (#815).
+///
+/// Returns null when the trip-history Hive box isn't open (widget
+/// tests that don't bother initialising Hive) — callers guard by
+/// skipping the reconciliation entirely when the instance is null,
+/// which also lets the fill-up save path stay a single-line change.
+
+@ProviderFor(veLearner)
+final veLearnerProvider = VeLearnerProvider._();
+
+/// Learner for per-vehicle volumetric efficiency (#815).
+///
+/// Returns null when the trip-history Hive box isn't open (widget
+/// tests that don't bother initialising Hive) — callers guard by
+/// skipping the reconciliation entirely when the instance is null,
+/// which also lets the fill-up save path stay a single-line change.
+
+final class VeLearnerProvider
+    extends $FunctionalProvider<VeLearner?, VeLearner?, VeLearner?>
+    with $Provider<VeLearner?> {
+  /// Learner for per-vehicle volumetric efficiency (#815).
+  ///
+  /// Returns null when the trip-history Hive box isn't open (widget
+  /// tests that don't bother initialising Hive) — callers guard by
+  /// skipping the reconciliation entirely when the instance is null,
+  /// which also lets the fill-up save path stay a single-line change.
+  VeLearnerProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'veLearnerProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$veLearnerHash();
+
+  @$internal
+  @override
+  $ProviderElement<VeLearner?> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  VeLearner? create(Ref ref) {
+    return veLearner(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(VeLearner? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<VeLearner?>(value),
+    );
+  }
+}
+
+String _$veLearnerHash() => r'3ee7af1d1504ef129c160480ac732df0494e036f';
+
+/// Holds the most recent [VeLearnResult] (#815) so the UI can show a
+/// one-shot calibration snackbar after the fill-up save flow closes.
+///
+/// The fill-up screen reads-and-clears this on its way out; unread
+/// results persist across widget rebuilds so the snackbar still fires
+/// when the user lands on the consumption tab. Only the most recent
+/// result is retained — if two tankfuls calibrate back-to-back (rare,
+/// but possible during data imports) the second one wins.
+
+@ProviderFor(LastVeLearnResult)
+final lastVeLearnResultProvider = LastVeLearnResultProvider._();
+
+/// Holds the most recent [VeLearnResult] (#815) so the UI can show a
+/// one-shot calibration snackbar after the fill-up save flow closes.
+///
+/// The fill-up screen reads-and-clears this on its way out; unread
+/// results persist across widget rebuilds so the snackbar still fires
+/// when the user lands on the consumption tab. Only the most recent
+/// result is retained — if two tankfuls calibrate back-to-back (rare,
+/// but possible during data imports) the second one wins.
+final class LastVeLearnResultProvider
+    extends $NotifierProvider<LastVeLearnResult, VeLearnResult?> {
+  /// Holds the most recent [VeLearnResult] (#815) so the UI can show a
+  /// one-shot calibration snackbar after the fill-up save flow closes.
+  ///
+  /// The fill-up screen reads-and-clears this on its way out; unread
+  /// results persist across widget rebuilds so the snackbar still fires
+  /// when the user lands on the consumption tab. Only the most recent
+  /// result is retained — if two tankfuls calibrate back-to-back (rare,
+  /// but possible during data imports) the second one wins.
+  LastVeLearnResultProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'lastVeLearnResultProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$lastVeLearnResultHash();
+
+  @$internal
+  @override
+  LastVeLearnResult create() => LastVeLearnResult();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(VeLearnResult? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<VeLearnResult?>(value),
+    );
+  }
+}
+
+String _$lastVeLearnResultHash() => r'71c27ad112b34edc9636c7ccd0694d1758ecd4d0';
+
+/// Holds the most recent [VeLearnResult] (#815) so the UI can show a
+/// one-shot calibration snackbar after the fill-up save flow closes.
+///
+/// The fill-up screen reads-and-clears this on its way out; unread
+/// results persist across widget rebuilds so the snackbar still fires
+/// when the user lands on the consumption tab. Only the most recent
+/// result is retained — if two tankfuls calibrate back-to-back (rare,
+/// but possible during data imports) the second one wins.
+
+abstract class _$LastVeLearnResult extends $Notifier<VeLearnResult?> {
+  VeLearnResult? build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<VeLearnResult?, VeLearnResult?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<VeLearnResult?, VeLearnResult?>,
+              VeLearnResult?,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
 /// Mutable list of all fill-ups, newest first.
 
 @ProviderFor(FillUpList)
@@ -95,7 +242,7 @@ final class FillUpListProvider
   }
 }
 
-String _$fillUpListHash() => r'9a14d041513e659f3ec8ff20e1ce51f2593bc800';
+String _$fillUpListHash() => r'0262985944ee0598189037bb600934c219993f7e';
 
 /// Mutable list of all fill-ups, newest first.
 

@@ -5779,6 +5779,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'End recording'**
   String get obd2PauseBannerEnd;
+
+  /// Snackbar shown after #815 reconciles OBD2 integrated fuel against the pump receipt and learns a new volumetric-efficiency scalar for the vehicle.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption calibration updated for {vehicleName} — accuracy improved by {percent}%'**
+  String veCalibratedTitle(String vehicleName, String percent);
+
+  /// Action on the vehicle edit screen that discards the learned volumetric-efficiency calibration (#815).
+  ///
+  /// In en, this message translates to:
+  /// **'Reset calibration'**
+  String get veResetAction;
+
+  /// Title of the confirm dialog shown before discarding the learned volumetric efficiency (#815).
+  ///
+  /// In en, this message translates to:
+  /// **'Reset calibration?'**
+  String get veResetConfirmTitle;
+
+  /// Body of the confirm dialog shown before discarding the learned volumetric efficiency (#815).
+  ///
+  /// In en, this message translates to:
+  /// **'This will discard the learned per-vehicle calibration and restore the default value (0.85).'**
+  String get veResetConfirmBody;
 }
 
 class _AppLocalizationsDelegate

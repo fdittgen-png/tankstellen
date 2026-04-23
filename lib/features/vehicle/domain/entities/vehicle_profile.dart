@@ -108,11 +108,19 @@ abstract class VehicleProfile with _$VehicleProfile {
     //     default — null is honest.
     //   volumetricEfficiency: 0.60–0.95 range. Default 0.85 is
     //     reasonable for a typical NA petrol engine at cruise.
-    //     Adaptive calibration (#815) will narrow this per vehicle
-    //     from tankful reconciliation.
+    //     Adaptive calibration (#815) narrows this per vehicle
+    //     from tankful reconciliation — see [VeLearner].
+    //   volumetricEfficiencySamples: EWMA sample counter for η_v
+    //     (#815). 0 at first fill-up; bumps by 1 every time the
+    //     reconciliation pipeline accepts a pumped/integrated pair.
+    //     Used for debugging and UX — e.g. "calibrated from 3
+    //     tankfuls" — and as a future ramp for the EWMA alpha if
+    //     the fixed 0.3 blend ever needs to soften during early
+    //     samples.
     int? engineDisplacementCc,
     int? engineCylinders,
     @Default(0.85) double volumetricEfficiency,
+    @Default(0) int volumetricEfficiencySamples,
 
     // Curb weight in kilograms (#812). Populated by the VIN decoder
     // phase 2 onboarding flow (GVWR-minus-payload on the NHTSA side,

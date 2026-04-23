@@ -1270,5 +1270,25 @@
   "obd2PauseBannerEnd": "End recording",
   "@obd2PauseBannerEnd": {
     "description": "Action on the OBD2 pause banner that stops the recording and saves what was captured before the drop."
+  },
+  "veCalibratedTitle": "Consumption calibration updated for {vehicleName} — accuracy improved by {percent}%",
+  "@veCalibratedTitle": {
+    "description": "Snackbar shown after #815 reconciles OBD2 integrated fuel against the pump receipt and learns a new volumetric-efficiency scalar for the vehicle.",
+    "placeholders": {
+      "vehicleName": { "type": "String", "example": "Peugeot 107" },
+      "percent": { "type": "String", "example": "42" }
+    }
+  },
+  "veResetAction": "Reset calibration",
+  "@veResetAction": {
+    "description": "Action on the vehicle edit screen that discards the learned volumetric-efficiency calibration (#815)."
+  },
+  "veResetConfirmTitle": "Reset calibration?",
+  "@veResetConfirmTitle": {
+    "description": "Title of the confirm dialog shown before discarding the learned volumetric efficiency (#815)."
+  },
+  "veResetConfirmBody": "This will discard the learned per-vehicle calibration and restore the default value (0.85).",
+  "@veResetConfirmBody": {
+    "description": "Body of the confirm dialog shown before discarding the learned volumetric efficiency (#815)."
   }
 }
