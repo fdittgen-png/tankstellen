@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/utils/frame_callbacks.dart';
+import '../features/vehicle/providers/vehicle_providers.dart';
 import '../l10n/app_localizations.dart';
 import 'current_shell_branch_provider.dart';
 import 'responsive_search_layout.dart';
@@ -38,6 +39,12 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
 
   int _currentIndex = 0;
   bool _isTransitioning = false;
+
+  /// Router-branch indices for the currently visible nav slots. Refreshed
+  /// on every `build()` so the swipe handler can walk to the adjacent
+  /// visible tab rather than blindly `_currentIndex ± 1` (which would
+  /// otherwise stop on the hidden Conso branch, #893).
+  List<int> _branchForSlot = const [0, 1, 2, 3, 4];
 
   /// Upper bound on destination count — the router always registers 5
   /// branches (see StatefulShellRoute in router.dart), the UI decides
@@ -130,10 +137,15 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
     final velocity = details.primaryVelocity ?? 0;
     if (velocity.abs() < 300) return;
 
-    if (velocity < 0 && _currentIndex < _pageCount - 1) {
-      _goToPage(_currentIndex + 1);
-    } else if (velocity > 0 && _currentIndex > 0) {
-      _goToPage(_currentIndex - 1);
+    // Walk through the visible slots, not the branch indices — when
+    // Conso is hidden (#893) the branch list has a gap between 2 and
+    // 4 that the user shouldn't be able to swipe through.
+    final slot = _branchForSlot.indexOf(_currentIndex);
+    if (slot < 0) return;
+    if (velocity < 0 && slot < _branchForSlot.length - 1) {
+      _goToPage(_branchForSlot[slot + 1]);
+    } else if (velocity > 0 && slot > 0) {
+      _goToPage(_branchForSlot[slot - 1]);
     }
   }
 
@@ -154,10 +166,22 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
     final screenSize = screenSizeOf(context);
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
 
-    // #778 — Consumption is a first-class destination now: always
-    // visible, sitting between Favorites and Settings. Order must
-    // match the StatefulShellRoute branches in router.dart.
-    final destinations = <_NavItem>[
+    // #893 — Conso tab is only visible once the user has configured at
+    // least one vehicle. A fresh install (no vehicles) shows the 4
+    // canonical destinations (Search, Map, Favorites, Settings); the
+    // Conso branch still exists in the router (deep links to
+    // `/consumption-tab` and `/consumption/...` remain functional),
+    // only the bottom-nav item is conditional. `ref.watch` makes this
+    // reactive — removing the last vehicle from Settings instantly
+    // collapses the tab to 4, and adding the first vehicle grows it
+    // back to 5.
+    final hasVehicle =
+        ref.watch(vehicleProfileListProvider).isNotEmpty;
+
+    // Kept in router-branch order so the index we hand to
+    // `navigationShell.goBranch()` still lines up: Search=0, Map=1,
+    // Favorites=2, Consumption=3, Settings=4.
+    final allDestinations = <_NavItem>[
       _NavItem(Icons.search_outlined, Icons.search, l10n?.search ?? 'Search'),
       _NavItem(Icons.map_outlined, Icons.map, l10n?.map ?? 'Map'),
       _NavItem(Icons.star_outline, Icons.star, l10n?.favorites ?? 'Favorites'),
@@ -172,6 +196,35 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
         l10n?.settings ?? 'Settings',
       ),
     ];
+
+    // Visible items + the router-branch index each one maps to. When
+    // Conso is hidden, Settings still routes to branch 4 even though
+    // it renders at display-slot 3.
+    final visibleDestinations = <_NavItem>[];
+    final branchForSlot = <int>[];
+    for (var i = 0; i < allDestinations.length; i++) {
+      if (i == _consumptionBranchIndex && !hasVehicle) continue;
+      visibleDestinations.add(allDestinations[i]);
+      branchForSlot.add(i);
+    }
+    _branchForSlot = branchForSlot;
+
+    // If the user was on the Conso tab and just deleted their last
+    // vehicle, snap the selection to Search (branch 0) — the Conso
+    // slot has disappeared from the nav bar and leaving
+    // `_currentIndex` pointing at it would leave no item highlighted.
+    if (!hasVehicle && _currentIndex == _consumptionBranchIndex) {
+      safePostFrame(() {
+        if (!mounted) return;
+        if (_currentIndex != _consumptionBranchIndex) return;
+        _goToPage(0);
+      });
+    }
+
+    // Display-slot the animated nav bar should highlight. `-1` when
+    // the active branch has no visible slot (transient, resolved by
+    // the snap above on the next frame).
+    final selectedSlot = branchForSlot.indexOf(_currentIndex);
 
     final body = GestureDetector(
       behavior: HitTestBehavior.translucent,
@@ -192,6 +245,15 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
       ),
     );
 
+    // Translate a tap on a visible slot into the underlying branch
+    // index before calling `_goToPage`. Keeps the animation + router
+    // state machine unchanged when Conso is hidden (Settings at
+    // display-slot 3 still targets branch 4).
+    void onSlotTap(int slot) {
+      if (slot < 0 || slot >= branchForSlot.length) return;
+      _goToPage(branchForSlot[slot]);
+    }
+
     // Wide screens: use NavigationRail instead of bottom nav
     if (screenSize != ScreenSize.compact) {
       return Scaffold(
@@ -207,11 +269,12 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
         body: Row(
           children: [
             _AdaptiveNavigationRail(
-              items: destinations,
-              currentIndex: _currentIndex,
+              items: visibleDestinations,
+              branchForSlot: branchForSlot,
+              currentIndex: selectedSlot < 0 ? 0 : selectedSlot,
               iconControllers: _iconControllers,
               extended: screenSize == ScreenSize.expanded,
-              onTap: _goToPage,
+              onTap: onSlotTap,
             ),
             const VerticalDivider(width: 1, thickness: 1),
             Expanded(child: body),
@@ -227,14 +290,20 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
       primary: false,
       body: body,
       bottomNavigationBar: _AnimatedNavBar(
-        items: destinations,
-        currentIndex: _currentIndex,
+        items: visibleDestinations,
+        branchForSlot: branchForSlot,
+        currentIndex: selectedSlot < 0 ? 0 : selectedSlot,
         iconControllers: _iconControllers,
         isLandscape: isLandscape,
-        onTap: _goToPage,
+        onTap: onSlotTap,
       ),
     );
   }
+
+  /// Index of the Consumption branch in the StatefulShellRoute (see
+  /// `router.dart`). Exposed as a constant so hiding/showing logic can
+  /// refer to it by name rather than a naked `3`.
+  static const int _consumptionBranchIndex = 3;
 }
 
 class _NavItem {
@@ -250,6 +319,9 @@ class _NavItem {
 /// Shows icons-only rail on medium screens (600-840dp).
 class _AdaptiveNavigationRail extends StatelessWidget {
   final List<_NavItem> items;
+  /// Router-branch index for each visible slot. Used to index into the
+  /// 5-wide `iconControllers` list when Conso is hidden (#893).
+  final List<int> branchForSlot;
   final int currentIndex;
   final List<AnimationController> iconControllers;
   final bool extended;
@@ -257,6 +329,7 @@ class _AdaptiveNavigationRail extends StatelessWidget {
 
   const _AdaptiveNavigationRail({
     required this.items,
+    required this.branchForSlot,
     required this.currentIndex,
     required this.iconControllers,
     required this.extended,
@@ -283,16 +356,17 @@ class _AdaptiveNavigationRail extends StatelessWidget {
       destinations: List.generate(items.length, (i) {
         final item = items[i];
         final selected = i == currentIndex;
+        final controller = iconControllers[branchForSlot[i]];
         return NavigationRailDestination(
           icon: _BounceIcon(
-            controller: iconControllers[i],
+            controller: controller,
             selected: false,
             icon: item.outlinedIcon,
             iconSize: 24,
             color: theme.colorScheme.onSurfaceVariant,
           ),
           selectedIcon: _BounceIcon(
-            controller: iconControllers[i],
+            controller: controller,
             selected: true,
             icon: item.filledIcon,
             iconSize: 24,
@@ -308,6 +382,8 @@ class _AdaptiveNavigationRail extends StatelessWidget {
 
 class _AnimatedNavBar extends StatelessWidget {
   final List<_NavItem> items;
+  /// Router-branch index for each visible slot (see rail comment, #893).
+  final List<int> branchForSlot;
   final int currentIndex;
   final List<AnimationController> iconControllers;
   final bool isLandscape;
@@ -315,6 +391,7 @@ class _AnimatedNavBar extends StatelessWidget {
 
   const _AnimatedNavBar({
     required this.items,
+    required this.branchForSlot,
     required this.currentIndex,
     required this.iconControllers,
     required this.isLandscape,
@@ -353,6 +430,7 @@ class _AnimatedNavBar extends StatelessWidget {
         children: List.generate(items.length, (i) {
           final selected = i == currentIndex;
           final item = items[i];
+          final controller = iconControllers[branchForSlot[i]];
 
           return Expanded(
             child: Semantics(
@@ -368,7 +446,7 @@ class _AnimatedNavBar extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _BounceIcon(
-                    controller: iconControllers[i],
+                    controller: controller,
                     selected: selected,
                     icon: selected ? item.filledIcon : item.outlinedIcon,
                     iconSize: iconSize,
