@@ -52,6 +52,11 @@ Map<String, dynamic> _summaryToJson(TripSummary s) => {
         'fuelLitersConsumed': s.fuelLitersConsumed,
       if (s.startedAt != null) 'startedAt': s.startedAt!.toIso8601String(),
       if (s.endedAt != null) 'endedAt': s.endedAt!.toIso8601String(),
+      // #800: provenance of distanceKm — `'real'` for odometer-backed
+      // trips, `'virtual'` for speed-integrated estimates. Older trips
+      // serialised before this field landed deserialise as `'virtual'`
+      // to match the recorder's historical behaviour.
+      'distanceSource': s.distanceSource,
     };
 
 TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
@@ -69,6 +74,10 @@ TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
       endedAt: j['endedAt'] == null
           ? null
           : DateTime.parse(j['endedAt'] as String),
+      // Default to 'virtual' for pre-#800 trips — that's the honest
+      // label for legacy recordings, which integrated speed samples
+      // regardless of whether an odometer was available.
+      distanceSource: (j['distanceSource'] as String?) ?? 'virtual',
     );
 
 /// Hive-backed list of finalised trips (#726).

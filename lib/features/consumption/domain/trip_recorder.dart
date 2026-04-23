@@ -34,6 +34,17 @@ class TripSummary {
   final DateTime? startedAt;
   final DateTime? endedAt;
 
+  /// Provenance flag for [distanceKm] (#800). Either `'real'` — the
+  /// value came from the car's odometer (`odometerLatest -
+  /// odometerStart`) — or `'virtual'` — the value is the trapezoidal
+  /// integration of speed samples from [VirtualOdometer]. UI /
+  /// analytics use this to decide whether to trust the km figure as a
+  /// ground truth (fuel-reconciliation denominator) or flag it as an
+  /// estimate. Defaults to `'virtual'` because the recorder
+  /// integrates speed even when an odometer is available — legacy
+  /// trips before this flag landed keep that honest label.
+  final String distanceSource;
+
   const TripSummary({
     required this.distanceKm,
     required this.maxRpm,
@@ -45,6 +56,7 @@ class TripSummary {
     this.fuelLitersConsumed,
     this.startedAt,
     this.endedAt,
+    this.distanceSource = 'virtual',
   });
 }
 

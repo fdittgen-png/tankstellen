@@ -364,6 +364,13 @@ class Obd2Service {
   /// `(1 + (STFT + LTFT) / 100)` factor closes most of the gap with
   /// pump-measured consumption. Skipped on the direct-5E path because
   /// the ECU already returns a post-trim number there.
+  ///
+  /// The MAF and speed-density branches honour the vehicle's
+  /// [VehicleProfile.preferredFuelType] (#800): diesel engines run
+  /// AFR ≈ 14.5 with a density of ~832 g/L, petrol AFR ≈ 14.7 with
+  /// density ~745 g/L. When the profile is absent or the fuel type is
+  /// unrecognised we default to petrol — that's the class of car
+  /// (Peugeot 107 / Aygo / C1) that motivated this fallback.
   Future<double?> readFuelRateLPerHour({VehicleProfile? vehicle}) async {
     final engineDisplacementCc =
         vehicle?.engineDisplacementCc ?? _defaultEngineDisplacementCc;
@@ -372,6 +379,9 @@ class Obd2Service {
     // service-level fallback for that field.
     final volumetricEfficiency =
         vehicle?.volumetricEfficiency ?? _defaultVolumetricEfficiency;
+    final isDiesel = _isDieselProfile(vehicle);
+    final afr = isDiesel ? dieselAfr : petrolAfr;
+    final fuelDensityGPerL = isDiesel ? dieselDensityGPerL : petrolDensityGPerL;
     // Step 1: direct fuel-rate PID (already post-trim — no correction).
     // Skipped when #811 discovery proved the car doesn't implement PID 5E.
     if (isPidSupported(0x5E)) {
@@ -389,9 +399,8 @@ class Obd2Service {
     if (isPidSupported(0x10)) {
       final maf = await readMafGramsPerSecond();
       if (maf != null) {
-        // Stoichiometric petrol: AFR 14.7, density ~740 g/L.
-        // L/h = MAF × 3600 / (14.7 × 740).
-        final rate = maf * 3600.0 / (14.7 * 740.0);
+        // Stoichiometric L/h = MAF × 3600 / (AFR × density).
+        final rate = maf * 3600.0 / (afr * fuelDensityGPerL);
         return _applyFuelTrimCorrection(rate);
       }
     }
@@ -414,9 +423,44 @@ class Obd2Service {
       rpm: rpm,
       engineDisplacementCc: engineDisplacementCc,
       volumetricEfficiency: volumetricEfficiency,
+      afr: afr,
+      fuelDensityGPerL: fuelDensityGPerL,
     );
     if (rate == null) return null;
     return _applyFuelTrimCorrection(rate);
+  }
+
+  /// Stoichiometric AFR for petrol / gasoline (#800). Approximately
+  /// 14.7 kg of air per kg of fuel at perfect combustion.
+  static const double petrolAfr = 14.7;
+
+  /// Stoichiometric AFR for diesel (#800). Slightly leaner burn than
+  /// petrol — ~14.5 kg of air per kg of diesel.
+  static const double dieselAfr = 14.5;
+
+  /// Petrol density in g/L at ~15 °C (#800). Published range
+  /// 720–775 g/L; 740 is the legacy Tankstellen constant, kept stable
+  /// so pre-#800 fuel-rate samples don't shift by ~0.7 % after the
+  /// diesel branch landed.
+  static const double petrolDensityGPerL = 740.0;
+
+  /// Diesel density in g/L at ~15 °C (#800). Denser than petrol at
+  /// ~820–845 g/L; 832 is the EN 590 reference point.
+  static const double dieselDensityGPerL = 832.0;
+
+  /// `true` when [vehicle]'s preferred fuel type reads like a diesel
+  /// variant (#800). Matching is done on the normalised string instead
+  /// of a typed enum because `preferredFuelType` is a free-text field
+  /// populated from several sources (user onboarding, VIN decoder,
+  /// home-widget mirror) — all of which use `"diesel"` /
+  /// `"dieselPremium"` as the key. Returns `false` for null, empty, or
+  /// any non-diesel value (which is the safe default — petrol AFR /
+  /// density produce slightly lower L/h numbers than diesel at the
+  /// same MAF, so under-counting is preferable to over-counting).
+  static bool _isDieselProfile(VehicleProfile? vehicle) {
+    final key = vehicle?.preferredFuelType?.trim().toLowerCase();
+    if (key == null || key.isEmpty) return false;
+    return key.contains('diesel');
   }
 
   /// Multiply a stoichiometric-assumption fuel rate by
