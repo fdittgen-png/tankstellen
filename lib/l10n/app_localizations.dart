@@ -6020,6 +6020,12 @@ abstract class AppLocalizations {
   /// **'Map location'**
   String get radiusAlertCenterFromMap;
 
+  /// Accessibility label announced by TalkBack/VoiceOver while the animated splash screen is visible. Not rendered visually; keep it concise and speakable.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading Tankstellen'**
+  String get splashLoadingLabel;
+
   /// No description provided for @vinLabel.
   ///
   /// In en, this message translates to:

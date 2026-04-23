@@ -1262,6 +1262,10 @@
   "radiusAlertMapPickerCancel": "Abbrechen",
   "radiusAlertMapPickerHint": "Karte verschieben, um das Alarm-Zentrum zu platzieren",
   "radiusAlertCenterFromMap": "Kartenposition",
+  "splashLoadingLabel": "Tankstellen wird geladen",
+  "@splashLoadingLabel": {
+    "description": "Barrierefreiheits-Label, das TalkBack/VoiceOver während des animierten Splash-Screens ansagt. Wird nicht sichtbar gerendert; kurz und sprechbar halten."
+  },
   "vinLabel": "FIN (optional)",
   "vinDecodeTooltip": "FIN entschlüsseln",
   "vinConfirmAction": "Ja, automatisch ausfüllen",

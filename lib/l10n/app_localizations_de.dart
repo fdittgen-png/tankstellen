@@ -3233,6 +3233,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get radiusAlertCenterFromMap => 'Kartenposition';
 
   @override
+  String get splashLoadingLabel => 'Tankstellen wird geladen';
+
+  @override
   String get vinLabel => 'FIN (optional)';
 
   @override
