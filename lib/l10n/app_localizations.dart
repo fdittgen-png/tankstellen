@@ -6355,6 +6355,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset calibration'**
   String get veResetAction;
+
+  /// Tooltip + Semantics label for the info icon next to the VIN field on EditVehicleScreen (#895).
+  ///
+  /// In en, this message translates to:
+  /// **'What is a VIN?'**
+  String get vinInfoTooltip;
+
+  /// Heading for the 'What VIN is' section of the VIN info sheet (#895).
+  ///
+  /// In en, this message translates to:
+  /// **'What is a VIN?'**
+  String get vinInfoSectionWhatTitle;
+
+  /// Body of the 'What VIN is' section of the VIN info sheet (#895).
+  ///
+  /// In en, this message translates to:
+  /// **'The Vehicle Identification Number is a 17-character code unique to your car. It\'s stamped on the chassis and printed on your vehicle registration document.'**
+  String get vinInfoSectionWhatBody;
+
+  /// Heading for the 'Why we ask' section of the VIN info sheet (#895).
+  ///
+  /// In en, this message translates to:
+  /// **'Why we ask'**
+  String get vinInfoSectionWhyTitle;
+
+  /// Body of the 'Why we ask' section of the VIN info sheet (#895).
+  ///
+  /// In en, this message translates to:
+  /// **'Decoding the VIN auto-fills engine displacement, cylinder count, model year, primary fuel type, and gross weight — saving you from looking up technical specs manually. The OBD2 fuel-rate calculation uses these values to give you accurate consumption numbers.'**
+  String get vinInfoSectionWhyBody;
+
+  /// Heading for the 'Privacy' section of the VIN info sheet (#895).
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get vinInfoSectionPrivacyTitle;
+
+  /// Body of the 'Privacy' section of the VIN info sheet (#895).
+  ///
+  /// In en, this message translates to:
+  /// **'Your VIN is stored only locally in the app\'s encrypted storage — it\'s never uploaded to Tankstellen servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.'**
+  String get vinInfoSectionPrivacyBody;
+
+  /// Heading for the 'Where to find it' section of the VIN info sheet (#895).
+  ///
+  /// In en, this message translates to:
+  /// **'Where to find it'**
+  String get vinInfoSectionWhereTitle;
+
+  /// Body of the 'Where to find it' section of the VIN info sheet (#895).
+  ///
+  /// In en, this message translates to:
+  /// **'Look through the windshield at the lower-left corner on the driver\'s side, check the driver-side door-frame sticker when the door is open, or read it off your vehicle registration document (card / Carte Grise).'**
+  String get vinInfoSectionWhereBody;
+
+  /// Dismiss button label on the VIN info sheet (#895).
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get vinInfoDismiss;
+
+  /// One-line privacy reassurance shown near the top of the VIN confirm dialog (#895).
+  ///
+  /// In en, this message translates to:
+  /// **'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Tankstellen servers.'**
+  String get vinConfirmPrivacyNote;
 }
 
 class _AppLocalizationsDelegate

@@ -68,5 +68,28 @@ void main() {
       expect(find.text('Yes, auto-fill'), findsOneWidget);
       expect(find.text('Modify manually'), findsOneWidget);
     });
+
+    testWidgets(
+      'renders the NHTSA privacy note at the top of the dialog (#895)',
+      (tester) async {
+        await pumpApp(tester, const VinConfirmDialog(data: fullVpic));
+
+        // The privacy note sits above the technical summary so the
+        // user sees the reassurance before committing to the
+        // auto-fill.
+        expect(
+          find.textContaining("NHTSA's free vehicle database"),
+          findsOneWidget,
+          reason:
+              'The dialog must reassure the user that the VIN was '
+              'looked up on a public NHTSA database, not a '
+              'Tankstellen server (#895).',
+        );
+        expect(
+          find.textContaining('Tankstellen servers'),
+          findsOneWidget,
+        );
+      },
+    );
   });
 }
