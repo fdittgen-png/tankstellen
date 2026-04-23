@@ -3212,6 +3212,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Monat';
 
   @override
+  String get greeceApiProvider => 'Paratiritirio Timon (Greece)';
+
+  @override
+  String get greeceCommunityApiNotice =>
+      'Betrieben von der von der Community gepflegten fuelpricesgr-API';
+
+  @override
   String get scanReceiptNoData =>
       'Keine Belegdaten gefunden — bitte erneut versuchen';
 

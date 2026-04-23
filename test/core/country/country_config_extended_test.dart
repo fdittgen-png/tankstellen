@@ -2,9 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 
 void main() {
-  group('Countries.byCode for all 15 countries', () {
+  group('Countries.byCode for all 16 countries', () {
     final expectedCodes = [
-      'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'LU', 'SI', 'KR', 'CL',
+      'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'LU', 'SI', 'KR', 'CL', 'GR',
     ];
 
     for (final code in expectedCodes) {
@@ -78,6 +78,10 @@ void main() {
 
     test('Slovenia uses goriva.si', () {
       expect(Countries.slovenia.apiProvider, contains('goriva.si'));
+    });
+
+    test('Greece uses Paratiritirio Timon', () {
+      expect(Countries.greece.apiProvider, contains('Paratiritirio'));
     });
   });
 

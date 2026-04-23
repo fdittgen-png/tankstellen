@@ -1531,6 +1531,8 @@
   "@chargingChartsMonthAxis": {
     "description": "Axis label for the X axis (month) on the charging charts (#582 phase 3)."
   },
+  "greeceApiProvider": "Paratiritirio Timon (Greece)",
+  "greeceCommunityApiNotice": "Powered by the community-maintained fuelpricesgr API",
   "scanReceiptNoData": "No receipt data found — try again",
   "@scanReceiptNoData": {
     "description": "Snackbar shown on the Add-Fill-Up screen when the receipt scan returns no usable fields (#751)."

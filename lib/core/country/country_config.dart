@@ -453,11 +453,43 @@ class Countries {
     pricePerUnitSuffix: '\$/L',
   );
 
+  /// Greece — Paratiritirio Timon (Fuel Price Observatory) via the
+  /// community [fuelpricesgr](https://github.com/mavroprovato/fuelpricesgr)
+  /// API (#576). The community feed is free and open — no key required.
+  /// Coverage is prefecture-level (not station-level): we synthesize one
+  /// virtual station per major prefecture, each showing that region's
+  /// daily mean price. Fuels: Αμόλυβδη 95 (→ e5), Αμόλυβδη 100 (→ e98),
+  /// Diesel (→ diesel), Υγραέριο / LPG (→ lpg). Diesel heating is
+  /// published but dropped — not a motoring fuel.
+  static const greece = CountryConfig(
+    code: 'GR',
+    name: 'Ελλάδα',
+    flag: '\u{1F1EC}\u{1F1F7}',
+    locale: 'el_GR',
+    postalCodeLength: 5,
+    postalCodeRegex: r'^\d{5}$',
+    postalCodeLabel: 'Ταχυδρομικός κώδικας',
+    requiresApiKey: false,
+    apiProvider: 'Paratiritirio Timon',
+    attribution:
+        'Data: fuelprices.gr (Paratiritirio Timon) via fuelpricesgr community API',
+    fuelTypes: ['Αμόλυβδη 95', 'Αμόλυβδη 100', 'Diesel', 'LPG'],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.e98,
+      FuelType.diesel,
+      FuelType.lpg,
+      FuelType.electric,
+    },
+    examplePostalCode: '10431',
+    exampleCity: 'Αθήνα',
+  );
+
   /// All supported countries, ordered for display.
   static const all = [
     germany, france, austria, spain, italy, denmark, argentina,
     portugal, unitedKingdom, australia, mexico, luxembourg, slovenia,
-    southKorea, chile,
+    southKorea, chile, greece,
   ];
 
   /// Find country by ISO code.
@@ -499,6 +531,7 @@ class Countries {
   /// - \`si-\` → SI (Slovenia goriva.si, #575)
   /// - \`kr-\` → KR (South Korea OPINET / KNOC, #597)
   /// - \`cl-\` → CL (Chile CNE Bencina en Línea, #596)
+  /// - \`gr-\` → GR (Greece Paratiritirio Timon, #576)
   /// - \`demo-\` → null (demo service, no real country)
   static const Map<String, String> _stationIdPrefixToCountry = {
     'pt-': 'PT',
@@ -512,6 +545,7 @@ class Countries {
     'si-': 'SI',
     'kr-': 'KR',
     'cl-': 'CL',
+    'gr-': 'GR',
   };
 
   /// Returns the ISO country code inferred from a station id's prefix,

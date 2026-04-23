@@ -19,6 +19,7 @@ enum ServiceSource {
   sloveniaApi('goriva.si'),
   openinetApi('OPINET (KNOC)'),
   chileApi('CNE Bencina en Linea'),
+  greeceApi('Paratiritirio Timon (Greece)'),
   osrmRouting('OSRM Routing'),
   openChargeMapApi('OpenChargeMap'),
   nominatimGeocoding('Nominatim (OSM)'),

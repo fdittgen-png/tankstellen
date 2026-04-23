@@ -10,6 +10,7 @@ import 'impl/chile_station_service.dart';
 import 'impl/demo_station_service.dart';
 import 'impl/denmark_station_service.dart';
 import 'impl/econtrol_station_service.dart';
+import 'impl/greece_station_service.dart';
 import 'impl/luxembourg_station_service.dart';
 import 'impl/mexico_station_service.dart';
 import 'impl/mise_station_service.dart';
@@ -157,6 +158,11 @@ class CountryServiceRegistry {
       requiresApiKey: true,
       createService: _createChile,
     ),
+    CountryServiceEntry(
+      countryCode: 'GR',
+      errorSource: ServiceSource.greeceApi,
+      createService: _createGreece,
+    ),
   ];
 
   /// Lookup map built once from [entries] for O(1) access.
@@ -287,3 +293,9 @@ StationService _createChile(Ref ref) {
   }
   return ChileStationService(apiKey: apiKey);
 }
+
+/// Greece factory (#576). The Paratiritirio Timon feed is wrapped by
+/// the community [fuelpricesgr](https://github.com/mavroprovato/fuelpricesgr)
+/// FastAPI; it is free and open, so no API key is required. Users get
+/// real prefecture-level data out-of-the-box.
+StationService _createGreece(Ref ref) => GreeceStationService();

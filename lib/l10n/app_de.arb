@@ -1256,6 +1256,8 @@
   "chargingEfficiencyTitle": "Effizienz (kWh/100 km)",
   "chargingChartsEmpty": "Noch nicht genügend Daten",
   "chargingChartsMonthAxis": "Monat",
+  "greeceApiProvider": "Paratiritirio Timon (Greece)",
+  "greeceCommunityApiNotice": "Betrieben von der von der Community gepflegten fuelpricesgr-API",
   "scanReceiptNoData": "Keine Belegdaten gefunden — bitte erneut versuchen",
   "scanReceiptSuccess": "Beleg gescannt — Werte prüfen. Bei Fehlern unten auf \"Scan-Fehler melden\" tippen.",
   "scanReceiptFailed": "Scan fehlgeschlagen: {error}",

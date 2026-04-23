@@ -86,6 +86,19 @@ const countryBoundingBoxes = <String, CountryBoundingBox>{
   // the Atacama coast but kept narrow on the east so Chile's tight west-
   // coast strip does not shadow Argentina's much larger box. See #596.
   'CL': CountryBoundingBox(minLat: -56.5, maxLat: -17.0, minLng: -77.0, maxLng: -66.0),
+
+  // Greece: lat 34.50 (southern Crete) – 41.80 (north Macedonia border),
+  // lng 19.00 (Corfu / Ionian) – 28.50 (eastern Dodecanese / Rhodes).
+  // The eastern edge is deliberately pulled in from the geographic
+  // limit (~29.6 for Kastellorizo) so Istanbul (41.01, 28.98) is
+  // NOT falsely attributed to GR. Kastellorizo (~500 residents) is
+  // the only Greek territory lost; every populated island including
+  // Rhodes (36.43, 28.22) and Kos stays inside the box. Turkey is
+  // not currently in the registry, so a point that falls between the
+  // bbox and the Turkish border simply returns `null` — the caller
+  // uses that as the signal to fall back to the active profile.
+  // See #576.
+  'GR': CountryBoundingBox(minLat: 34.5, maxLat: 41.8, minLng: 19.0, maxLng: 28.5),
 };
 
 /// Deterministic order used by [countryCodeFromLatLng] to walk
@@ -133,6 +146,9 @@ const List<String> _bboxLookupOrder = [
   'AR',
   'AU',
   'KR',
+  // GR last — no overlap with any currently-registered country's box,
+  // so placement in the lookup order is inconsequential. #576
+  'GR',
 ];
 
 /// Returns the ISO country code whose bounding box contains the
