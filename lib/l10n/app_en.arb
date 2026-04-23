@@ -1353,5 +1353,20 @@
     "placeholders": {
       "adapterName": { "type": "String", "example": "vLinker FS" }
     }
+  },
+  "velocityAlertTitle": "{fuelLabel} dropped at nearby stations",
+  "@velocityAlertTitle": {
+    "description": "Title of the price-drop velocity notification (#579). Fired when multiple nearby stations drop within the lookback window.",
+    "placeholders": {
+      "fuelLabel": { "type": "String", "example": "E10" }
+    }
+  },
+  "velocityAlertBody": "{stationCount} stations dropped by up to {maxDropCents}¢ in the last hour",
+  "@velocityAlertBody": {
+    "description": "Body of the price-drop velocity notification (#579). Lists the number of affected stations and the largest observed drop in cents.",
+    "placeholders": {
+      "stationCount": { "type": "int", "example": "3" },
+      "maxDropCents": { "type": "int", "example": "5" }
+    }
   }
 }

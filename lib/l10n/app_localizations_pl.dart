@@ -3132,4 +3132,14 @@ class AppLocalizationsPl extends AppLocalizations {
   String obd2ConnectedTooltip(String adapterName) {
     return 'OBD2 connected: $adapterName';
   }
+
+  @override
+  String velocityAlertTitle(String fuelLabel) {
+    return '$fuelLabel dropped at nearby stations';
+  }
+
+  @override
+  String velocityAlertBody(int stationCount, int maxDropCents) {
+    return '$stationCount stations dropped by up to $maxDropCents¢ in the last hour';
+  }
 }

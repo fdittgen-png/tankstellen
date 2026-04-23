@@ -3155,4 +3155,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String obd2ConnectedTooltip(String adapterName) {
     return 'OBD2 verbunden: $adapterName';
   }
+
+  @override
+  String velocityAlertTitle(String fuelLabel) {
+    return '$fuelLabel an Tankstellen in der Nähe gefallen';
+  }
+
+  @override
+  String velocityAlertBody(int stationCount, int maxDropCents) {
+    return '$stationCount Tankstellen um bis zu $maxDropCents¢ in der letzten Stunde gefallen';
+  }
 }

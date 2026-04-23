@@ -55,6 +55,15 @@ class HiveBoxes {
   /// startup.
   static const String obd2PausedTrips = 'obd2_paused_trips';
 
+  /// Rolling price snapshots used by the price-drop velocity detector
+  /// (#579). One JSON payload per (station, fuel, timestamp) with a
+  /// synthetic key. Coords are captured per-snapshot so the detector
+  /// can filter by radius without re-joining against station data.
+  /// Pruned to the last 6 h on every write to keep the box small.
+  /// Unencrypted like the other OBD2 boxes — contains no PII beyond
+  /// public station coordinates.
+  static const String priceSnapshots = 'price_snapshots';
+
   static const _encryptedBoxes = {
     settings,
     profiles,
@@ -145,6 +154,8 @@ class HiveBoxes {
     // #797 — partial OBD2 trips paused by a BT drop. Same string-typed
     // JSON pattern as [obd2TripHistory] so one box adapter covers both.
     await Hive.openBox<String>(obd2PausedTrips);
+    // #579 — rolling price snapshots for the velocity detector.
+    await Hive.openBox<String>(priceSnapshots);
   }
 
   /// Initialize Hive in a background isolate with proper encryption.
@@ -156,6 +167,9 @@ class HiveBoxes {
     await Hive.openBox(alerts, encryptionCipher: cipher);
     await Hive.openBox(cache, encryptionCipher: cipher);
     await Hive.openBox(priceHistory, encryptionCipher: cipher);
+    // #579 — velocity detector reads/writes snapshots from the BG
+    // isolate, mirroring the main-isolate open above.
+    await Hive.openBox<String>(priceSnapshots);
   }
 
   /// Close all Hive boxes opened by [initInIsolate].
@@ -163,7 +177,7 @@ class HiveBoxes {
   /// Must be called at the end of every background task to release file
   /// handles and prevent race conditions with the main isolate.
   static Future<void> closeIsolateBoxes() async {
-    final boxNames = [settings, favorites, alerts, cache, priceHistory];
+    final boxNames = [settings, favorites, alerts, cache, priceHistory, priceSnapshots];
     for (final name in boxNames) {
       try {
         if (Hive.isBoxOpen(name)) {
@@ -189,6 +203,9 @@ class HiveBoxes {
     await Hive.openBox<String>(serviceReminders);
     // #797 — paused trips box, string-typed JSON, matches runtime.
     await Hive.openBox<String>(obd2PausedTrips);
+    // #579 — velocity detector snapshots. String-typed JSON so the
+    // same one-adapter pattern covers unit tests + runtime.
+    await Hive.openBox<String>(priceSnapshots);
   }
 
   /// Safely converts any Hive map to a typed map.
