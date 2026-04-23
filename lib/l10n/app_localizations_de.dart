@@ -3419,4 +3419,42 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get veResetAction => 'Kalibrierung zurücksetzen';
+
+  @override
+  String get vinInfoTooltip => 'Was ist eine FIN?';
+
+  @override
+  String get vinInfoSectionWhatTitle => 'Was ist eine FIN?';
+
+  @override
+  String get vinInfoSectionWhatBody =>
+      'Die Fahrzeug-Identifizierungsnummer ist ein 17-stelliger Code, der Ihr Fahrzeug eindeutig kennzeichnet. Sie ist im Chassis eingeprägt und steht in Ihrem Fahrzeugschein.';
+
+  @override
+  String get vinInfoSectionWhyTitle => 'Warum wir danach fragen';
+
+  @override
+  String get vinInfoSectionWhyBody =>
+      'Das Entschlüsseln der FIN füllt automatisch Hubraum, Zylinderzahl, Modelljahr, Hauptkraftstoff und zulässiges Gesamtgewicht aus — so müssen Sie die technischen Daten nicht mühsam heraussuchen. Die OBD2-Verbrauchsberechnung nutzt diese Werte für genaue Zahlen.';
+
+  @override
+  String get vinInfoSectionPrivacyTitle => 'Datenschutz';
+
+  @override
+  String get vinInfoSectionPrivacyBody =>
+      'Ihre FIN wird nur lokal in der verschlüsselten App-Datenbank gespeichert — sie wird niemals an Tankstellen-Server gesendet. Die NHTSA vPIC-Datenbank wird mit der FIN abgefragt, liefert jedoch ausschließlich anonyme Fahrzeugdaten zurück; NHTSA verknüpft die FIN mit keinerlei persönlichen Daten. Ohne Netzwerk liefert eine Offline-Suche nur Hersteller und Land.';
+
+  @override
+  String get vinInfoSectionWhereTitle => 'Wo Sie sie finden';
+
+  @override
+  String get vinInfoSectionWhereBody =>
+      'Schauen Sie unten links in der Windschutzscheibe (Fahrerseite) durch das Glas, prüfen Sie den Aufkleber am Türrahmen der Fahrertür bei geöffneter Tür, oder lesen Sie sie in Ihrem Fahrzeugschein ab.';
+
+  @override
+  String get vinInfoDismiss => 'Verstanden';
+
+  @override
+  String get vinConfirmPrivacyNote =>
+      'Wir haben Ihre FIN in NHTSA\'s kostenloser Fahrzeugdatenbank nachgeschlagen — nichts wurde an Tankstellen-Server gesendet.';
 }

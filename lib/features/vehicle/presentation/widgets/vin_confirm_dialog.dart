@@ -64,6 +64,19 @@ class VinConfirmDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Privacy reassurance (#895). Shown at the top so the user
+          // sees it before committing to the auto-fill — NHTSA is a
+          // free, public database, the VIN never leaves their device
+          // for Tankstellen purposes.
+          Text(
+            l?.vinConfirmPrivacyNote ??
+                "We looked up your VIN on NHTSA's free vehicle "
+                    'database — nothing sent to Tankstellen servers.',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+          ),
+          const SizedBox(height: 12),
           Text(body),
           if (isPartial) ...[
             const SizedBox(height: 12),

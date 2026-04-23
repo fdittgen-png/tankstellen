@@ -18,6 +18,7 @@ import '../widgets/service_reminder_section.dart';
 import '../widgets/vehicle_combustion_section.dart';
 import '../widgets/vehicle_ev_section.dart';
 import '../widgets/vin_confirm_dialog.dart';
+import '../widgets/vin_info_sheet.dart';
 
 /// Form for adding or editing a [VehicleProfile].
 ///
@@ -49,6 +50,10 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   // provider; the populated engine fields are stored separately and
   // carried through _save.
   final _vinCtrl = TextEditingController();
+  // Focus node for the VIN field — we grab focus back after the
+  // in-place explanation sheet (#895) dismisses, so TalkBack users
+  // don't lose their place on the form.
+  final _vinFocus = FocusNode();
 
   // Combustion is the dominant case; start there and let the user
   // flip to Hybrid/Electric if needed (#710).
@@ -123,7 +128,17 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
     _minSocCtrl.dispose();
     _maxSocCtrl.dispose();
     _vinCtrl.dispose();
+    _vinFocus.dispose();
     super.dispose();
+  }
+
+  /// Open the in-place VIN explanation (#895). After the sheet is
+  /// dismissed focus returns to the VIN text field so the user can
+  /// resume typing without hunting for the input.
+  Future<void> _showVinInfo() async {
+    await VinInfoSheet.show(context);
+    if (!mounted) return;
+    _vinFocus.requestFocus();
   }
 
   double? _parseDouble(String text) {
@@ -420,31 +435,54 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
                         : null,
                   ),
                 ),
-                FormFieldTile(
-                  icon: Icons.qr_code_2_outlined,
-                  color: accent,
-                  content: TextFormField(
-                    controller: _vinCtrl,
-                    decoration: InputDecoration(
-                      labelText: l?.vinLabel ?? 'VIN (optional)',
-                      border: const OutlineInputBorder(),
-                      suffixIcon: _decodingVin
-                          ? const Padding(
-                              padding: EdgeInsets.all(12),
-                              child: SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 2),
-                              ),
-                            )
-                          : IconButton(
-                              icon: const Icon(Icons.search),
-                              tooltip: l?.vinDecodeTooltip ?? 'Decode VIN',
-                              onPressed: _decodeVin,
-                            ),
+                // VIN row — the FormFieldTile keeps the existing
+                // input layout, and a trailing info icon button
+                // (#895) opens the in-place explanation sheet.
+                // Tooltip + Semantics satisfy
+                // androidTapTargetGuideline and TalkBack
+                // announcement requirements.
+                Row(
+                  children: [
+                    Expanded(
+                      child: FormFieldTile(
+                        icon: Icons.qr_code_2_outlined,
+                        color: accent,
+                        content: TextFormField(
+                          controller: _vinCtrl,
+                          focusNode: _vinFocus,
+                          decoration: InputDecoration(
+                            labelText: l?.vinLabel ?? 'VIN (optional)',
+                            border: const OutlineInputBorder(),
+                            suffixIcon: _decodingVin
+                                ? const Padding(
+                                    padding: EdgeInsets.all(12),
+                                    child: SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
+                                    ),
+                                  )
+                                : IconButton(
+                                    icon: const Icon(Icons.search),
+                                    tooltip:
+                                        l?.vinDecodeTooltip ?? 'Decode VIN',
+                                    onPressed: _decodeVin,
+                                  ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    Semantics(
+                      label: l?.vinInfoTooltip ?? 'What is a VIN?',
+                      button: true,
+                      child: IconButton(
+                        icon: const Icon(Icons.info_outline),
+                        tooltip: l?.vinInfoTooltip ?? 'What is a VIN?',
+                        onPressed: _showVinInfo,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

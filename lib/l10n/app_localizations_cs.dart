@@ -3391,4 +3391,42 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get veResetAction => 'Reset calibration';
+
+  @override
+  String get vinInfoTooltip => 'What is a VIN?';
+
+  @override
+  String get vinInfoSectionWhatTitle => 'What is a VIN?';
+
+  @override
+  String get vinInfoSectionWhatBody =>
+      'The Vehicle Identification Number is a 17-character code unique to your car. It\'s stamped on the chassis and printed on your vehicle registration document.';
+
+  @override
+  String get vinInfoSectionWhyTitle => 'Why we ask';
+
+  @override
+  String get vinInfoSectionWhyBody =>
+      'Decoding the VIN auto-fills engine displacement, cylinder count, model year, primary fuel type, and gross weight — saving you from looking up technical specs manually. The OBD2 fuel-rate calculation uses these values to give you accurate consumption numbers.';
+
+  @override
+  String get vinInfoSectionPrivacyTitle => 'Privacy';
+
+  @override
+  String get vinInfoSectionPrivacyBody =>
+      'Your VIN is stored only locally in the app\'s encrypted storage — it\'s never uploaded to Tankstellen servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.';
+
+  @override
+  String get vinInfoSectionWhereTitle => 'Where to find it';
+
+  @override
+  String get vinInfoSectionWhereBody =>
+      'Look through the windshield at the lower-left corner on the driver\'s side, check the driver-side door-frame sticker when the door is open, or read it off your vehicle registration document (card / Carte Grise).';
+
+  @override
+  String get vinInfoDismiss => 'Got it';
+
+  @override
+  String get vinConfirmPrivacyNote =>
+      'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Tankstellen servers.';
 }
