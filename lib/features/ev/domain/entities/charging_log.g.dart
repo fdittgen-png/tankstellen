@@ -8,29 +8,25 @@ part of 'charging_log.dart';
 
 _ChargingLog _$ChargingLogFromJson(Map<String, dynamic> json) => _ChargingLog(
   id: json['id'] as String,
+  vehicleId: json['vehicleId'] as String,
   date: DateTime.parse(json['date'] as String),
-  kwh: (json['kwh'] as num).toDouble(),
-  totalCost: (json['totalCost'] as num).toDouble(),
-  odometerKm: (json['odometerKm'] as num).toDouble(),
-  chargeTimeMin: (json['chargeTimeMin'] as num?)?.toInt(),
-  stationId: json['stationId'] as String?,
+  kWh: (json['kWh'] as num).toDouble(),
+  costEur: (json['costEur'] as num).toDouble(),
+  chargeTimeMin: (json['chargeTimeMin'] as num).toInt(),
+  odometerKm: (json['odometerKm'] as num).toInt(),
   stationName: json['stationName'] as String?,
-  operator: json['operator'] as String?,
-  notes: json['notes'] as String?,
-  vehicleId: json['vehicleId'] as String?,
+  chargingStationId: json['chargingStationId'] as String?,
 );
 
 Map<String, dynamic> _$ChargingLogToJson(_ChargingLog instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'date': instance.date.toIso8601String(),
-      'kwh': instance.kwh,
-      'totalCost': instance.totalCost,
-      'odometerKm': instance.odometerKm,
-      'chargeTimeMin': instance.chargeTimeMin,
-      'stationId': instance.stationId,
-      'stationName': instance.stationName,
-      'operator': instance.operator,
-      'notes': instance.notes,
       'vehicleId': instance.vehicleId,
+      'date': instance.date.toIso8601String(),
+      'kWh': instance.kWh,
+      'costEur': instance.costEur,
+      'chargeTimeMin': instance.chargeTimeMin,
+      'odometerKm': instance.odometerKm,
+      'stationName': instance.stationName,
+      'chargingStationId': instance.chargingStationId,
     };
