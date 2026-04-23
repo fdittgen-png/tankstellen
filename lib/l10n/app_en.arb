@@ -1504,6 +1504,31 @@
   "badScanReportHeaderField": "Field",
   "badScanReportHeaderScanned": "Scanned",
   "badScanReportHeaderYouTyped": "You typed",
+  "onboardingObd2StepTitle": "Connect your OBD2 adapter",
+  "@onboardingObd2StepTitle": {
+    "description": "Title of the optional onboarding step (#816) that offers to connect an OBD2 adapter, read the VIN, and auto-fill the vehicle profile."
+  },
+  "onboardingObd2StepBody": "Plug your OBD2 adapter into the car's port and turn the ignition on. We'll read the VIN and fill in engine details for you.",
+  "@onboardingObd2StepBody": {
+    "description": "Body copy for the OBD2 onboarding step (#816) explaining what the user needs to do."
+  },
+  "onboardingObd2ConnectButton": "Connect adapter",
+  "@onboardingObd2ConnectButton": {
+    "description": "Label of the primary button on the OBD2 onboarding step (#816) that opens the adapter picker."
+  },
+  "onboardingObd2SkipButton": "Maybe later",
+  "@onboardingObd2SkipButton": {
+    "description": "Label of the skip button on the OBD2 onboarding step (#816) — users without an adapter can skip without connecting."
+  },
+  "onboardingObd2ReadingVin": "Reading VIN…",
+  "@onboardingObd2ReadingVin": {
+    "description": "Spinner label shown while the app reads the VIN from the connected OBD2 adapter (#816)."
+  },
+  "onboardingObd2VinReadFailed": "Couldn't read VIN — enter manually",
+  "@onboardingObd2VinReadFailed": {
+    "description": "Banner shown on the next manual vehicle step when the OBD2 adapter connected but the VIN could not be read (#816)."
+  },
+  "onboardingObd2ConnectFailed": "Couldn't connect to the adapter. You can retry or skip.",
   "radiusAlertPickOnMap": "Pick on map",
   "@radiusAlertPickOnMap": {
     "description": "Button on the radius-alert create sheet that opens the full-screen map-picker for the alert center (#578 phase 3)."

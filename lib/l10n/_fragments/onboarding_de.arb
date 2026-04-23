@@ -1,0 +1,9 @@
+{
+  "onboardingObd2StepTitle": "OBD2-Adapter verbinden",
+  "onboardingObd2StepBody": "Stecke deinen OBD2-Adapter in den Anschluss des Fahrzeugs und schalte die Zündung ein. Wir lesen die VIN aus und füllen die Motordaten automatisch.",
+  "onboardingObd2ConnectButton": "Adapter verbinden",
+  "onboardingObd2SkipButton": "Später",
+  "onboardingObd2ReadingVin": "VIN wird ausgelesen…",
+  "onboardingObd2VinReadFailed": "VIN konnte nicht ausgelesen werden — bitte manuell eingeben",
+  "onboardingObd2ConnectFailed": "Adapter konnte nicht verbunden werden. Du kannst es erneut versuchen oder überspringen."
+}

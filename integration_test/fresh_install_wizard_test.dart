@@ -26,8 +26,11 @@ import 'package:tankstellen/features/setup/presentation/widgets/welcome_step.dar
 /// Scope (from #569):
 ///   1. Empty Hive -> `isSetupComplete` is false.
 ///   2. Router redirects unsetup user to /consent then /setup.
-///   3. Wizard advances through its full step set (6 for no-API-key
-///      countries, 7 for API-key countries — Germany is the default).
+///   3. Wizard advances through its full step set (7 for no-API-key
+///      countries, 8 for API-key countries — Germany is the default).
+///      The OBD2 adapter-first step (#816) adds one optional skip step
+///      between Country and Vehicles; every flow remains walkable via
+///      the Skip button when no adapter is attached.
 ///   4. Wizard completion creates a default profile.
 ///   5. After wizard with a non-default country selection, the active
 ///      profile records that country.
@@ -228,16 +231,16 @@ void main() {
       await _acceptConsentAll(tester);
 
       // Germany is the default country in the DE/locale-derived startup
-      // path and requires an API key, so the wizard exposes 7 steps:
-      // Welcome, Country, Vehicles, Preferences, Landing, API Key, Done.
-      // Countries without an API key trim Landing/API-Key merge and run
-      // 6 steps. We accept either shape; what matters for #569 is that
+      // path and requires an API key, so the wizard exposes 8 steps:
+      // Welcome, Country, OBD2, Vehicles, Preferences, Landing, API Key, Done.
+      // Countries without an API key trim the API-Key step and run 7
+      // steps. We accept either shape; what matters for #569 is that
       // the wizard RUNS every step and lands on "All set!".
       expect(find.byType(WelcomeStep), findsOneWidget);
       expect(
-          find.textContaining(RegExp(r'^1 / [67]$')), findsOneWidget,
+          find.textContaining(RegExp(r'^1 / [78]$')), findsOneWidget,
           reason:
-              'Progress indicator should read "1 / 6" or "1 / 7" on the '
+              'Progress indicator should read "1 / 7" or "1 / 8" on the '
               'welcome step');
 
       // Walk steps forward until we see the completion button. Each
@@ -320,7 +323,7 @@ void main() {
       await _tapNext(tester);
 
       // Country step: pick France. France does NOT require an API key
-      // so the wizard shape drops from 7 steps to 6 for the remaining
+      // so the wizard shape drops from 8 steps to 7 for the remaining
       // traversal. Our loop below doesn't depend on the number.
       await _selectCountry(tester, Countries.france);
 

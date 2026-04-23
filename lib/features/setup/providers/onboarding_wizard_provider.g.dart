@@ -22,7 +22,7 @@ final class OnboardingWizardControllerProvider
         argument: null,
         retry: null,
         name: r'onboardingWizardControllerProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -44,7 +44,7 @@ final class OnboardingWizardControllerProvider
 }
 
 String _$onboardingWizardControllerHash() =>
-    r'9f4c3023353e3358b6e022ddeab946605f2ca6d4';
+    r'4fc8defaee287f3bdd83c1a0e8126590809c79a1';
 
 abstract class _$OnboardingWizardController
     extends $Notifier<OnboardingWizardState> {

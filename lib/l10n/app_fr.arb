@@ -841,5 +841,12 @@
     "placeholders": { "count": { "type": "int" } }
   },
   "yes": "Oui",
-  "no": "Non"
+  "no": "Non",
+  "onboardingObd2StepTitle": "Connecter votre adaptateur OBD2",
+  "onboardingObd2StepBody": "Branchez votre adaptateur OBD2 pour lire automatiquement les informations de votre véhicule — marque, modèle, motorisation — via le numéro de série (VIN). Vous pouvez aussi passer cette étape et saisir manuellement.",
+  "onboardingObd2ConnectButton": "Connecter l'adaptateur",
+  "onboardingObd2SkipButton": "Plus tard",
+  "onboardingObd2ReadingVin": "Lecture du VIN en cours...",
+  "onboardingObd2VinReadFailed": "Impossible de lire le VIN — saisie manuelle",
+  "onboardingObd2ConnectFailed": "Connexion impossible — vérifiez l'adaptateur ou passez l'étape"
 }

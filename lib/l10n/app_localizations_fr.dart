@@ -3211,6 +3211,30 @@ class AppLocalizationsFr extends AppLocalizations {
   String get badScanReportHeaderYouTyped => 'You typed';
 
   @override
+  String get onboardingObd2StepTitle => 'Connecter votre adaptateur OBD2';
+
+  @override
+  String get onboardingObd2StepBody =>
+      'Branchez votre adaptateur OBD2 pour lire automatiquement les informations de votre véhicule — marque, modèle, motorisation — via le numéro de série (VIN). Vous pouvez aussi passer cette étape et saisir manuellement.';
+
+  @override
+  String get onboardingObd2ConnectButton => 'Connecter l\'adaptateur';
+
+  @override
+  String get onboardingObd2SkipButton => 'Plus tard';
+
+  @override
+  String get onboardingObd2ReadingVin => 'Lecture du VIN en cours...';
+
+  @override
+  String get onboardingObd2VinReadFailed =>
+      'Impossible de lire le VIN — saisie manuelle';
+
+  @override
+  String get onboardingObd2ConnectFailed =>
+      'Connexion impossible — vérifiez l\'adaptateur ou passez l\'étape';
+
+  @override
   String get radiusAlertPickOnMap => 'Pick on map';
 
   @override
