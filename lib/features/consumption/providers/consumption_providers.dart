@@ -6,6 +6,7 @@ import '../../vehicle/data/ve_learner.dart';
 import '../../vehicle/providers/service_reminder_providers.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/repositories/fill_up_repository.dart';
+import '../data/trip_history_repository.dart';
 import '../domain/entities/consumption_stats.dart';
 import '../domain/entities/eco_score.dart';
 import '../domain/entities/fill_up.dart';
@@ -75,13 +76,52 @@ class FillUpList extends _$FillUpList {
   /// η_v reconciliation (#815). Failures in either side-effect path
   /// are swallowed: logging a fill-up must never fail because a
   /// downstream calibration did.
+  ///
+  /// #888 — auto-links OBD2 trajets recorded since the previous
+  /// fill-up for the same vehicle. Populates [FillUp.linkedTripIds]
+  /// before persisting so the derived relationship is durable and
+  /// queryable (per-tank eco-score, trajets list filtering).
   Future<void> add(FillUp fillUp) async {
     final repo = ref.read(fillUpRepositoryProvider);
     final previous = _previousFillUpFor(fillUp, repo.getAll());
-    await repo.save(fillUp);
+    final linkedIds = _linkedTripIdsFor(fillUp, previous);
+    final linked = fillUp.linkedTripIds.isEmpty
+        ? fillUp.copyWith(linkedTripIds: linkedIds)
+        : fillUp;
+    await repo.save(linked);
     state = repo.getAll();
-    await _evaluateReminders(fillUp);
-    await _reconcileVolumetricEfficiency(fillUp, previous);
+    await _evaluateReminders(linked);
+    await _reconcileVolumetricEfficiency(linked, previous);
+  }
+
+  /// Compute the trip-history ids recorded for [fillUp.vehicleId]
+  /// between [previous] and [fillUp] (inclusive lower, inclusive
+  /// upper). Returns an empty list when the fill-up has no vehicle
+  /// bound, the history repository isn't available, or no trips fall
+  /// in the window.
+  List<String> _linkedTripIdsFor(FillUp fillUp, FillUp? previous) {
+    final vehicleId = fillUp.vehicleId;
+    if (vehicleId == null) return const <String>[];
+    final repo = ref.read(tripHistoryRepositoryProvider);
+    if (repo == null) return const <String>[];
+    final history = repo.loadAll();
+    final lowerBound = previous?.date;
+    final upperBound = fillUp.date;
+    final matches = <TripHistoryEntry>[];
+    for (final entry in history) {
+      if (entry.vehicleId != vehicleId) continue;
+      final when = entry.summary.startedAt;
+      if (when == null) continue;
+      // Strictly after the previous fill-up (or everything older
+      // than this one if there's no prior tank) and at-or-before
+      // the new fill-up timestamp. Dates equal to the previous
+      // fill-up are excluded so the trip that completed the prior
+      // tank isn't double-counted.
+      if (lowerBound != null && !when.isAfter(lowerBound)) continue;
+      if (when.isAfter(upperBound)) continue;
+      matches.add(entry);
+    }
+    return matches.map((e) => e.id).toList(growable: false);
   }
 
   /// Pick the fill-up with the largest `date` that is strictly older
