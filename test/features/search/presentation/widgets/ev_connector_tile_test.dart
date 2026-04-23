@@ -1,21 +1,27 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/ev_connector_tile.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
+    show ConnectorType;
 
 import '../../../../helpers/pump_app.dart';
 
 void main() {
   group('EVConnectorTile', () {
-    testWidgets('renders connector type and power', (tester) async {
+    testWidgets('renders connector type, power, current type, qty and status',
+        (tester) async {
       await pumpApp(
         tester,
         const EVConnectorTile(
-          connector: Connector(
-            type: 'CCS2',
-            powerKW: 150.0,
+          connector: EvConnector(
+            id: 'c1',
+            type: ConnectorType.ccs,
+            rawType: 'CCS2',
+            maxPowerKw: 150,
             currentType: 'DC',
             quantity: 2,
-            status: 'Operational',
+            status: ConnectorStatus.available,
+            statusLabel: 'Operational',
           ),
         ),
       );
@@ -27,13 +33,17 @@ void main() {
       expect(find.text('Operational'), findsOneWidget);
     });
 
-    testWidgets('renders without status when null', (tester) async {
+    testWidgets(
+        'renders without status when the connector has no statusLabel',
+        (tester) async {
       await pumpApp(
         tester,
         const EVConnectorTile(
-          connector: Connector(
-            type: 'Type 2',
-            powerKW: 22.0,
+          connector: EvConnector(
+            id: 'c2',
+            type: ConnectorType.type2,
+            rawType: 'Type 2',
+            maxPowerKw: 22,
             quantity: 1,
           ),
         ),

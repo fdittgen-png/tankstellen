@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/charging_station.dart';
+import '../../../ev/domain/entities/charging_station.dart';
 import 'ev_connector_tile.dart';
 
 /// Address card for an EV charging station.
@@ -14,6 +14,8 @@ class EVAddressCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final postCode = station.postCode ?? '';
+    final place = station.place ?? '';
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -24,14 +26,14 @@ class EVAddressCard extends StatelessWidget {
               children: [
                 const Icon(Icons.place, size: 20),
                 const SizedBox(width: 8),
-                Expanded(child: Text(station.address, style: theme.textTheme.bodyLarge)),
+                Expanded(child: Text(station.address ?? '', style: theme.textTheme.bodyLarge)),
               ],
             ),
-            if (station.postCode.isNotEmpty || station.place.isNotEmpty)
+            if (postCode.isNotEmpty || place.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(left: 28),
                 child: Text(
-                  '${station.postCode} ${station.place}'.trim(),
+                  '$postCode $place'.trim(),
                   style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                 ),
               ),

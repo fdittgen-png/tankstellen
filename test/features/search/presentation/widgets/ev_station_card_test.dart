@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/presentation/widgets/ev_station_card.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
+    show ConnectorType;
 
 import '../../../../helpers/pump_app.dart';
 
@@ -11,15 +13,27 @@ void main() {
     id: 'ocm-123',
     name: 'Test Charger',
     operator: 'Ionity',
-    lat: 52.5,
-    lng: 13.4,
+    latitude: 52.5,
+    longitude: 13.4,
     dist: 3.5,
     address: 'Hauptstr. 10',
     postCode: '10115',
     place: 'Berlin',
     connectors: [
-      Connector(type: 'CCS Type 2', powerKW: 350, quantity: 4, currentType: 'DC'),
-      Connector(type: 'Type 2', powerKW: 22, quantity: 2, currentType: 'AC'),
+      EvConnector(
+          id: 'c1',
+          type: ConnectorType.ccs,
+          rawType: 'CCS Type 2',
+          maxPowerKw: 350,
+          quantity: 4,
+          currentType: 'DC'),
+      EvConnector(
+          id: 'c2',
+          type: ConnectorType.type2,
+          rawType: 'Type 2',
+          maxPowerKw: 22,
+          quantity: 2,
+          currentType: 'AC'),
     ],
     totalPoints: 6,
     isOperational: true,

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/storage_providers.dart';
-import '../../search/domain/entities/charging_station.dart';
+import '../../ev/domain/entities/charging_station.dart';
 import 'favorites_provider.dart';
 
 part 'ev_favorites_provider.g.dart';
@@ -53,6 +53,10 @@ bool isEvFavorite(Ref ref, String stationId) {
 }
 
 /// Loads persisted EV station data for favorites.
+///
+/// Post-#560 the canonical [ChargingStation.fromJson] handles both the
+/// legacy `lat`/`lng` and the current `latitude`/`longitude` key
+/// shapes, so there is no longer a second fallback parser path.
 @riverpod
 class EvFavoriteStations extends _$EvFavoriteStations {
   @override
@@ -72,40 +76,28 @@ class EvFavoriteStations extends _$EvFavoriteStations {
 
     for (final id in favoriteIds) {
       final data = storage.getEvFavoriteStationData(id);
-      debugPrint('[EvFavoriteStations.build] id=$id dataKeys=${data?.keys.toList()}');
-      if (data != null) {
-        try {
-          stations.add(ChargingStation.fromJson(data));
-          continue;
-        } catch (e) {
-          debugPrint('[EvFavoriteStations.build] fromJson failed for $id: $e — falling back');
-        }
-        // Fallback: manually construct from JSON fields that may use either
-        // lat/lng (search/ format) or latitude/longitude (ev/ format).
-        try {
-          stations.add(ChargingStation(
-            id: data['id']?.toString() ?? id,
-            name: data['name']?.toString() ?? '',
-            operator: data['operator']?.toString() ?? '',
-            lat: (data['lat'] ?? data['latitude'] as num?)?.toDouble() ?? 0,
-            lng: (data['lng'] ?? data['longitude'] as num?)?.toDouble() ?? 0,
-            address: data['address']?.toString() ?? '',
-            connectors: const [],
-          ));
-        } catch (e) {
-          debugPrint('[EvFavoriteStations.build] fallback parse failed for $id: $e');
-          orphaned.add(id);
-        }
-      } else {
+      debugPrint(
+          '[EvFavoriteStations.build] id=$id dataKeys=${data?.keys.toList()}');
+      if (data == null) {
         debugPrint('[EvFavoriteStations.build] MISSING DATA for id=$id');
+        orphaned.add(id);
+        continue;
+      }
+      try {
+        stations.add(ChargingStation.fromJson(data));
+      } catch (e) {
+        debugPrint(
+            '[EvFavoriteStations.build] fromJson failed for $id: $e');
         orphaned.add(id);
       }
     }
 
     if (orphaned.isNotEmpty) {
-      debugPrint('[EvFavoriteStations.build] ${orphaned.length} orphan id(s) skipped: $orphaned');
+      debugPrint(
+          '[EvFavoriteStations.build] ${orphaned.length} orphan id(s) skipped: $orphaned');
     }
-    debugPrint('[EvFavoriteStations.build] returning ${stations.length} stations');
+    debugPrint(
+        '[EvFavoriteStations.build] returning ${stations.length} stations');
     return stations;
   }
 }

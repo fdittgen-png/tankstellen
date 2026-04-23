@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
-import '../../domain/entities/charging_station.dart';
+import '../../../ev/domain/entities/charging_station.dart';
 
 /// A single connector row showing type, power, current type, quantity, and status.
 class EVConnectorTile extends StatelessWidget {
-  final Connector connector;
+  final EvConnector connector;
   const EVConnectorTile({super.key, required this.connector});
+
+  String get _typeLabel => connector.rawType ?? connector.type.label;
+  String? get _statusLabel => connector.statusLabel;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final connColor = _connectorColor(connector.type);
+    final label = _typeLabel;
+    final status = _statusLabel;
+    final connColor = _connectorColor(label);
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -23,22 +28,22 @@ class EVConnectorTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              connector.type,
+              label,
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: connColor),
             ),
           ),
           const SizedBox(width: 12),
-          Text('${connector.powerKW.round()} kW', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text('${connector.maxPowerKw.round()} kW', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(width: 8),
           if (connector.currentType != null)
             Text(connector.currentType!, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
           const Spacer(),
           if (connector.quantity > 0)
             Text('x${connector.quantity}', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-          if (connector.status != null) ...[
+          if (status != null) ...[
             const SizedBox(width: 8),
             Builder(builder: (context) {
-              final statusCol = _statusColor(context, connector.status);
+              final statusCol = _statusColor(context, status);
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -48,9 +53,9 @@ class EVConnectorTile extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(_statusIcon(connector.status), size: 12, color: statusCol),
+                    Icon(_statusIcon(status), size: 12, color: statusCol),
                     const SizedBox(width: 3),
-                    Text(connector.status!, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: statusCol)),
+                    Text(status, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: statusCol)),
                   ],
                 ),
               );

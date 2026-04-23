@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/country/country_provider.dart';
-import '../domain/entities/charging_station.dart';
+import '../../ev/domain/entities/charging_station.dart';
 import 'ev_charging_service_provider.dart';
 
 part 'ev_search_provider.g.dart';

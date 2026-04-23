@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
-import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/search/presentation/screens/ev_station_detail_screen.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
+    show ConnectorType;
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
@@ -14,23 +16,28 @@ const _testEvStation = ChargingStation(
   id: 'ocm-12345',
   name: 'Supercharger Berlin',
   operator: 'Tesla',
-  lat: 52.52,
-  lng: 13.405,
+  latitude: 52.52,
+  longitude: 13.405,
   dist: 2.3,
   address: 'Alexanderplatz 1',
   postCode: '10178',
   place: 'Berlin',
   connectors: [
-    Connector(
-      type: 'CCS',
-      powerKW: 250,
+    EvConnector(
+      id: 'ocm-12345-c1',
+      type: ConnectorType.ccs,
+      rawType: 'CCS',
+      maxPowerKw: 250,
       quantity: 8,
       currentType: 'DC',
-      status: 'Available',
+      status: ConnectorStatus.available,
+      statusLabel: 'Available',
     ),
-    Connector(
-      type: 'Type 2',
-      powerKW: 22,
+    EvConnector(
+      id: 'ocm-12345-c2',
+      type: ConnectorType.type2,
+      rawType: 'Type 2',
+      maxPowerKw: 22,
       quantity: 4,
       currentType: 'AC',
     ),

@@ -160,14 +160,26 @@ final class IsEvFavoriteFamily extends $Family
 }
 
 /// Loads persisted EV station data for favorites.
+///
+/// Post-#560 the canonical [ChargingStation.fromJson] handles both the
+/// legacy `lat`/`lng` and the current `latitude`/`longitude` key
+/// shapes, so there is no longer a second fallback parser path.
 
 @ProviderFor(EvFavoriteStations)
 final evFavoriteStationsProvider = EvFavoriteStationsProvider._();
 
 /// Loads persisted EV station data for favorites.
+///
+/// Post-#560 the canonical [ChargingStation.fromJson] handles both the
+/// legacy `lat`/`lng` and the current `latitude`/`longitude` key
+/// shapes, so there is no longer a second fallback parser path.
 final class EvFavoriteStationsProvider
     extends $NotifierProvider<EvFavoriteStations, List<ChargingStation>> {
   /// Loads persisted EV station data for favorites.
+  ///
+  /// Post-#560 the canonical [ChargingStation.fromJson] handles both the
+  /// legacy `lat`/`lng` and the current `latitude`/`longitude` key
+  /// shapes, so there is no longer a second fallback parser path.
   EvFavoriteStationsProvider._()
     : super(
         from: null,
@@ -196,9 +208,13 @@ final class EvFavoriteStationsProvider
 }
 
 String _$evFavoriteStationsHash() =>
-    r'1cef3e12d136fe593170adbddd30dd820e2a0056';
+    r'2ab1fda0f4c7a060a5a63062e42b7e867e1fc4d1';
 
 /// Loads persisted EV station data for favorites.
+///
+/// Post-#560 the canonical [ChargingStation.fromJson] handles both the
+/// legacy `lat`/`lng` and the current `latitude`/`longitude` key
+/// shapes, so there is no longer a second fallback parser path.
 
 abstract class _$EvFavoriteStations extends $Notifier<List<ChargingStation>> {
   List<ChargingStation> build();

@@ -11,8 +11,8 @@ import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/consent/presentation/screens/gdpr_consent_screen.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
+import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/setup/presentation/screens/onboarding_wizard_screen.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/welcome_step.dart';
 
@@ -403,8 +403,8 @@ void main() {
         id: 'ocm-846-test',
         name: 'IONITY Pézenas',
         operator: 'IONITY',
-        lat: 43.4672,
-        lng: 3.4242,
+        latitude: 43.4672,
+        longitude: 3.4242,
         dist: 1.1,
         address: 'A75 Aire de Pézenas',
         postCode: '34120',

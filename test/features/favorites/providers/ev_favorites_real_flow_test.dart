@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
-import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 
@@ -10,12 +10,11 @@ import '../../../mocks/mocks.dart';
 
 /// Tests that exercise the REAL code path on the device:
 ///
-/// 1. EVChargingService returns search/ ChargingStation
+/// 1. EVChargingService returns canonical [ChargingStation] (post-#560)
 /// 2. EVStationResult wraps it
-/// 3. Router passes it to EVStationDetailScreen (search/ version)
-/// 4. User taps star → calls favoritesProvider.notifier.toggle(id)
-///    (BUG: should call toggleEv with stationData)
-/// 5. Favorites tab reads evFavoriteStationsProvider → should show the station
+/// 3. Router passes it to EVStationDetailScreen
+/// 4. User taps star → calls favoritesProvider.notifier.toggle(id, rawJson: …)
+/// 5. Favorites tab reads evFavoriteStationsProvider → station must appear
 void main() {
   late MockHiveStorage mockStorage;
   late List<String> fuelIds;
@@ -23,15 +22,14 @@ void main() {
   late Map<String, Map<String, dynamic>> fuelStationData;
   late Map<String, Map<String, dynamic>> evStationData;
 
-  // This is the type returned by EVChargingService and wrapped in EVStationResult
+  // Canonical unified type after #560 — same entity everywhere.
   const searchStation = ChargingStation(
     id: 'ocm-12345',
     name: 'Charger Pézenas',
     operator: 'Ionity',
-    lat: 43.46,
-    lng: 3.42,
+    latitude: 43.46,
+    longitude: 3.42,
     address: '1 Avenue du Test',
-    connectors: [],
   );
 
   setUp(() {
@@ -111,13 +109,14 @@ void main() {
 
   group('Real device flow: EV favorite from search results', () {
     test(
-      'EXACT DEVICE PATH: toggle(stationId) without stationData — '
+      'EXACT DEVICE PATH: toggle(stationId) with rawJson — '
       'station MUST appear in evFavoriteStationsProvider',
       () async {
         final container = createContainer();
 
-        // This is exactly what EVStationDetailScreen (search/ version) does:
-        // ref.read(favoritesProvider.notifier).toggle(station.id, rawJson: station.toJson());
+        // This is exactly what EVStationDetailScreen does:
+        // ref.read(favoritesProvider.notifier).toggle(
+        //   station.id, rawJson: station.toJson());
         await container
             .read(favoritesProvider.notifier)
             .toggle(searchStation.id, rawJson: searchStation.toJson());
@@ -126,13 +125,9 @@ void main() {
         expect(container.read(favoritesProvider), contains('ocm-12345'),
             reason: 'toggle adds the ID');
 
-        // But is it in evFavoriteStationsProvider? On the device: NO,
-        // because toggle() adds to FUEL storage, not EV storage.
-        // EvFavoriteStations reads from EV storage → station is missing.
+        // With the unified entity, fromJson handles the serialised form
+        // natively so EvFavoriteStations rehydrates the station.
         final evStations = container.read(evFavoriteStationsProvider);
-
-        // THIS IS THE ASSERTION THAT MUST PASS FOR THE FIX TO WORK:
-        // The EV station should appear in the favorites list.
         expect(evStations, hasLength(1),
             reason:
                 'EV station favorited via toggle() must appear in EV favorites');
@@ -146,20 +141,17 @@ void main() {
       () async {
         final container = createContainer();
 
-        // The search/ detail screen passes rawJson from station.toJson().
         await container
             .read(favoritesProvider.notifier)
             .toggle(searchStation.id, rawJson: searchStation.toJson());
 
-        // Even without explicit stationData, the favorites tab should
-        // show SOMETHING for this station (at minimum the ID).
         expect(container.read(favoritesProvider), contains('ocm-12345'));
 
-        // Check that station data was persisted in SOME storage
         final hasEvData = evStationData.containsKey('ocm-12345');
         final hasFuelData = fuelStationData.containsKey('ocm-12345');
         expect(hasEvData || hasFuelData, isTrue,
-            reason: 'Station data must be persisted for favorites to display it');
+            reason:
+                'Station data must be persisted for favorites to display it');
       },
     );
   });

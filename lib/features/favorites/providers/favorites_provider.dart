@@ -9,7 +9,7 @@ import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../../../core/sync/favorites_sync.dart';
-import '../../search/domain/entities/charging_station.dart' as search_ev;
+import '../../ev/domain/entities/charging_station.dart' as search_ev;
 import '../../search/domain/entities/station.dart';
 import '../../search/providers/station_rating_provider.dart';
 import '../../widget/data/home_widget_service.dart';

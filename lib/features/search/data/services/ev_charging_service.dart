@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import '../../../../core/services/dio_factory.dart';
 import '../../../../core/services/mixins/station_service_helpers.dart';
 import '../../../../core/services/service_result.dart';
-import '../../domain/entities/charging_station.dart';
+import '../../../ev/domain/entities/charging_station.dart';
 
 /// OpenChargeMap API client for EV charging station search.
 ///
@@ -103,18 +103,28 @@ class EVChargingService with StationServiceHelpers {
 
       final dist = roundedDistance(searchLat, searchLng, lat, lng);
 
+      final stationId = 'ocm-${item['ID']}';
+
       // Parse connectors
       final connections = item['Connections'] as List<dynamic>? ?? [];
-      final connectors = connections.map((c) {
-        final conn = c as Map<String, dynamic>;
-        return Connector(
-          type: _mapConnectionType(conn['ConnectionTypeID'] as int?),
-          powerKW: (conn['PowerKW'] as num?)?.toDouble() ?? 0,
+      final connectors = <EvConnector>[];
+      for (var i = 0; i < connections.length; i++) {
+        final conn = connections[i] as Map<String, dynamic>;
+        final rawLabel = _mapConnectionType(conn['ConnectionTypeID'] as int?);
+        final statusLabel = _mapStatusType(conn['StatusTypeID'] as int?);
+        connectors.add(EvConnector(
+          id: '$stationId-c$i',
+          type: connectorTypeFromLabel(rawLabel),
+          rawType: rawLabel,
+          maxPowerKw: (conn['PowerKW'] as num?)?.toDouble() ?? 0,
           quantity: (conn['Quantity'] as int?) ?? 1,
           currentType: _mapCurrentType(conn['CurrentTypeID'] as int?),
-          status: _mapStatusType(conn['StatusTypeID'] as int?),
-        );
-      }).toList();
+          status: statusLabel == null
+              ? ConnectorStatus.unknown
+              : ConnectorStatus.fromLabel(statusLabel),
+          statusLabel: statusLabel,
+        ));
+      }
 
       // Parse operator
       final operatorInfo = item['OperatorInfo'] as Map<String, dynamic>?;
@@ -125,11 +135,11 @@ class EVChargingService with StationServiceHelpers {
       final isOperational = statusType?['IsOperational'] as bool? ?? true;
 
       return ChargingStation(
-        id: 'ocm-${item['ID']}',
+        id: stationId,
         name: addr['Title']?.toString() ?? operatorName,
         operator: operatorName,
-        lat: lat,
-        lng: lng,
+        latitude: lat,
+        longitude: lng,
         dist: dist,
         address: addr['AddressLine1']?.toString() ?? '',
         postCode: addr['Postcode']?.toString() ?? '',

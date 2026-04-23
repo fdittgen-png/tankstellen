@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
-import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/presentation/widgets/favorites_fuel_tab.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
@@ -22,8 +22,8 @@ ChargingStation _evStation({String id = 'ev-1', String name = 'Test Charger'}) {
     id: id,
     name: name,
     operator: 'Test Operator',
-    lat: 48.8,
-    lng: 2.3,
+    latitude: 48.8,
+    longitude: 2.3,
     address: '1 Rue de Test',
     connectors: const [],
   );
