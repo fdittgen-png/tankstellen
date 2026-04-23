@@ -3406,6 +3406,42 @@ class AppLocalizationsDe extends AppLocalizations {
   String get splashLoadingLabel => 'Tankstellen wird geladen';
 
   @override
+  String get themeCardTitle => 'Design';
+
+  @override
+  String get themeCardSubtitleSystem => 'System';
+
+  @override
+  String get themeCardSubtitleLight => 'Hell';
+
+  @override
+  String get themeCardSubtitleDark => 'Dunkel';
+
+  @override
+  String get themeSettingsScreenTitle => 'Design';
+
+  @override
+  String get themeSettingsSystemLabel => 'Systemeinstellung folgen';
+
+  @override
+  String get themeSettingsLightLabel => 'Hell';
+
+  @override
+  String get themeSettingsDarkLabel => 'Dunkel';
+
+  @override
+  String get themeSettingsSystemDescription =>
+      'Verwendet die aktuelle Darstellung des Geräts.';
+
+  @override
+  String get themeSettingsLightDescription =>
+      'Helle Hintergründe — ideal tagsüber.';
+
+  @override
+  String get themeSettingsDarkDescription =>
+      'Dunkle Hintergründe — augenschonend bei Nacht und stromsparend auf OLED-Displays.';
+
+  @override
   String get vinLabel => 'FIN (optional)';
 
   @override

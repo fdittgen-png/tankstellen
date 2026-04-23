@@ -848,5 +848,16 @@
   "onboardingObd2SkipButton": "Plus tard",
   "onboardingObd2ReadingVin": "Lecture du VIN en cours...",
   "onboardingObd2VinReadFailed": "Impossible de lire le VIN — saisie manuelle",
-  "onboardingObd2ConnectFailed": "Connexion impossible — vérifiez l'adaptateur ou passez l'étape"
+  "onboardingObd2ConnectFailed": "Connexion impossible — vérifiez l'adaptateur ou passez l'étape",
+  "themeCardTitle": "Thème",
+  "themeCardSubtitleSystem": "Système",
+  "themeCardSubtitleLight": "Clair",
+  "themeCardSubtitleDark": "Sombre",
+  "themeSettingsScreenTitle": "Thème",
+  "themeSettingsSystemLabel": "Suivre le système",
+  "themeSettingsLightLabel": "Clair",
+  "themeSettingsDarkLabel": "Sombre",
+  "themeSettingsSystemDescription": "Utilise l'apparence actuelle de l'appareil.",
+  "themeSettingsLightDescription": "Arrière-plans clairs — idéal en journée.",
+  "themeSettingsDarkDescription": "Arrière-plans sombres — plus doux pour les yeux la nuit et économe en batterie sur les écrans OLED."
 }

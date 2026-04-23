@@ -3400,6 +3400,42 @@ class AppLocalizationsFr extends AppLocalizations {
   String get splashLoadingLabel => 'Loading Tankstellen';
 
   @override
+  String get themeCardTitle => 'Thème';
+
+  @override
+  String get themeCardSubtitleSystem => 'Système';
+
+  @override
+  String get themeCardSubtitleLight => 'Clair';
+
+  @override
+  String get themeCardSubtitleDark => 'Sombre';
+
+  @override
+  String get themeSettingsScreenTitle => 'Thème';
+
+  @override
+  String get themeSettingsSystemLabel => 'Suivre le système';
+
+  @override
+  String get themeSettingsLightLabel => 'Clair';
+
+  @override
+  String get themeSettingsDarkLabel => 'Sombre';
+
+  @override
+  String get themeSettingsSystemDescription =>
+      'Utilise l\'apparence actuelle de l\'appareil.';
+
+  @override
+  String get themeSettingsLightDescription =>
+      'Arrière-plans clairs — idéal en journée.';
+
+  @override
+  String get themeSettingsDarkDescription =>
+      'Arrière-plans sombres — plus doux pour les yeux la nuit et économe en batterie sur les écrans OLED.';
+
+  @override
   String get vinLabel => 'VIN (optional)';
 
   @override

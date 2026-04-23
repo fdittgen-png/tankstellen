@@ -10,6 +10,7 @@ import '../features/favorites/presentation/screens/favorites_screen.dart';
 import '../features/map/presentation/screens/map_screen.dart';
 import '../features/profile/presentation/screens/privacy_dashboard_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
+import '../features/profile/presentation/screens/theme_settings_screen.dart';
 import '../features/search/presentation/screens/search_criteria_screen.dart';
 import '../features/search/presentation/screens/search_screen.dart';
 import '../features/setup/presentation/screens/onboarding_wizard_screen.dart';
@@ -370,6 +371,14 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/privacy-dashboard',
         builder: (context, state) => const PrivacyDashboardScreen(),
+      ),
+      // #897 — dedicated Theme settings screen, pushed from the
+      // Theme card on the profile/settings screen. Extracted from
+      // the inline bottom sheet so the Theme entry matches the
+      // Privacy + Storage card pattern.
+      GoRoute(
+        path: '/theme-settings',
+        builder: (context, state) => const ThemeSettingsScreen(),
       ),
     ],
   );

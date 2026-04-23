@@ -1,0 +1,46 @@
+{
+  "themeCardTitle": "Theme",
+  "@themeCardTitle": {
+    "description": "Title of the Theme card on the Settings screen (#897). The card matches the Privacy + Storage card pattern and navigates to a dedicated theme picker screen."
+  },
+  "themeCardSubtitleSystem": "System",
+  "@themeCardSubtitleSystem": {
+    "description": "Subtitle on the Theme card when the active theme mode is System (follow device setting) (#897)."
+  },
+  "themeCardSubtitleLight": "Light",
+  "@themeCardSubtitleLight": {
+    "description": "Subtitle on the Theme card when the active theme mode is Light (#897)."
+  },
+  "themeCardSubtitleDark": "Dark",
+  "@themeCardSubtitleDark": {
+    "description": "Subtitle on the Theme card when the active theme mode is Dark (#897)."
+  },
+  "themeSettingsScreenTitle": "Theme",
+  "@themeSettingsScreenTitle": {
+    "description": "AppBar title of the dedicated Theme settings screen (#897)."
+  },
+  "themeSettingsSystemLabel": "Follow system",
+  "@themeSettingsSystemLabel": {
+    "description": "Radio option label for the System theme mode on the Theme settings screen (#897)."
+  },
+  "themeSettingsLightLabel": "Light",
+  "@themeSettingsLightLabel": {
+    "description": "Radio option label for the Light theme mode on the Theme settings screen (#897)."
+  },
+  "themeSettingsDarkLabel": "Dark",
+  "@themeSettingsDarkLabel": {
+    "description": "Radio option label for the Dark theme mode on the Theme settings screen (#897)."
+  },
+  "themeSettingsSystemDescription": "Match the current device appearance.",
+  "@themeSettingsSystemDescription": {
+    "description": "Description text under the System option on the Theme settings screen (#897)."
+  },
+  "themeSettingsLightDescription": "Bright backgrounds — best for daytime use.",
+  "@themeSettingsLightDescription": {
+    "description": "Description text under the Light option on the Theme settings screen (#897)."
+  },
+  "themeSettingsDarkDescription": "Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.",
+  "@themeSettingsDarkDescription": {
+    "description": "Description text under the Dark option on the Theme settings screen (#897)."
+  }
+}

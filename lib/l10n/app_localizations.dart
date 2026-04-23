@@ -6326,6 +6326,72 @@ abstract class AppLocalizations {
   /// **'Loading Tankstellen'**
   String get splashLoadingLabel;
 
+  /// Title of the Theme card on the Settings screen (#897). The card matches the Privacy + Storage card pattern and navigates to a dedicated theme picker screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get themeCardTitle;
+
+  /// Subtitle on the Theme card when the active theme mode is System (follow device setting) (#897).
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get themeCardSubtitleSystem;
+
+  /// Subtitle on the Theme card when the active theme mode is Light (#897).
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeCardSubtitleLight;
+
+  /// Subtitle on the Theme card when the active theme mode is Dark (#897).
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeCardSubtitleDark;
+
+  /// AppBar title of the dedicated Theme settings screen (#897).
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get themeSettingsScreenTitle;
+
+  /// Radio option label for the System theme mode on the Theme settings screen (#897).
+  ///
+  /// In en, this message translates to:
+  /// **'Follow system'**
+  String get themeSettingsSystemLabel;
+
+  /// Radio option label for the Light theme mode on the Theme settings screen (#897).
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeSettingsLightLabel;
+
+  /// Radio option label for the Dark theme mode on the Theme settings screen (#897).
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeSettingsDarkLabel;
+
+  /// Description text under the System option on the Theme settings screen (#897).
+  ///
+  /// In en, this message translates to:
+  /// **'Match the current device appearance.'**
+  String get themeSettingsSystemDescription;
+
+  /// Description text under the Light option on the Theme settings screen (#897).
+  ///
+  /// In en, this message translates to:
+  /// **'Bright backgrounds — best for daytime use.'**
+  String get themeSettingsLightDescription;
+
+  /// Description text under the Dark option on the Theme settings screen (#897).
+  ///
+  /// In en, this message translates to:
+  /// **'Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.'**
+  String get themeSettingsDarkDescription;
+
   /// No description provided for @vinLabel.
   ///
   /// In en, this message translates to:

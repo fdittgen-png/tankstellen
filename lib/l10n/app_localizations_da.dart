@@ -3376,6 +3376,42 @@ class AppLocalizationsDa extends AppLocalizations {
   String get splashLoadingLabel => 'Loading Tankstellen';
 
   @override
+  String get themeCardTitle => 'Theme';
+
+  @override
+  String get themeCardSubtitleSystem => 'System';
+
+  @override
+  String get themeCardSubtitleLight => 'Light';
+
+  @override
+  String get themeCardSubtitleDark => 'Dark';
+
+  @override
+  String get themeSettingsScreenTitle => 'Theme';
+
+  @override
+  String get themeSettingsSystemLabel => 'Follow system';
+
+  @override
+  String get themeSettingsLightLabel => 'Light';
+
+  @override
+  String get themeSettingsDarkLabel => 'Dark';
+
+  @override
+  String get themeSettingsSystemDescription =>
+      'Match the current device appearance.';
+
+  @override
+  String get themeSettingsLightDescription =>
+      'Bright backgrounds — best for daytime use.';
+
+  @override
+  String get themeSettingsDarkDescription =>
+      'Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.';
+
+  @override
   String get vinLabel => 'VIN (optional)';
 
   @override
