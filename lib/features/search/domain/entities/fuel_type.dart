@@ -355,6 +355,15 @@ List<FuelType> fuelTypesForCountry(String countryCode) {
         FuelType.e5, FuelType.e98, FuelType.diesel,
         FuelType.lpg, FuelType.electric, FuelType.all,
       ];
+    case 'RO':
+      // Romania (Monitorul Prețurilor — pretcarburant.ro): Benzină
+      // Standard (→ e5), Benzină Premium (→ e98), Motorină Standard
+      // (→ diesel), Motorină Premium (→ diesel premium), GPL
+      // (→ lpg). 15-minute government-mandated updates. #577
+      return [
+        FuelType.e5, FuelType.e98, FuelType.diesel,
+        FuelType.dieselPremium, FuelType.lpg, FuelType.electric, FuelType.all,
+      ];
     default:
       return [FuelType.e5, FuelType.e10, FuelType.diesel, FuelType.electric, FuelType.all];
   }

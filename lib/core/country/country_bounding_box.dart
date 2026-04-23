@@ -99,6 +99,13 @@ const countryBoundingBoxes = <String, CountryBoundingBox>{
   // uses that as the signal to fall back to the active profile.
   // See #576.
   'GR': CountryBoundingBox(minLat: 34.5, maxLat: 41.8, minLng: 19.0, maxLng: 28.5),
+
+  // Romania: lat 43.50 (southern Danube border) – 48.50 (northern
+  // Maramureș), lng 20.00 (western Banat) – 29.80 (Dobrogea / Black
+  // Sea coast). No neighbour conflicts — HU, BG, UA, RS, and MD are
+  // not currently in the registry, so misattribution risk is zero at
+  // the bbox layer. See #577.
+  'RO': CountryBoundingBox(minLat: 43.5, maxLat: 48.5, minLng: 20.0, maxLng: 29.8),
 };
 
 /// Deterministic order used by [countryCodeFromLatLng] to walk
@@ -149,6 +156,9 @@ const List<String> _bboxLookupOrder = [
   // GR last — no overlap with any currently-registered country's box,
   // so placement in the lookup order is inconsequential. #576
   'GR',
+  // RO last — no overlap with any currently-registered country's box
+  // (HU / BG / UA / RS / MD are not registered). #577
+  'RO',
 ];
 
 /// Returns the ISO country code whose bounding box contains the

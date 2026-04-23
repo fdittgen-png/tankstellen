@@ -1258,6 +1258,8 @@
   "chargingChartsMonthAxis": "Monat",
   "greeceApiProvider": "Paratiritirio Timon (Greece)",
   "greeceCommunityApiNotice": "Betrieben von der von der Community gepflegten fuelpricesgr-API",
+  "romaniaApiProvider": "Monitorul Prețurilor (Romania)",
+  "romaniaScrapingNotice": "Betrieben von pretcarburant.ro (Wettbewerbsrat + ANPC)",
   "scanReceiptNoData": "Keine Belegdaten gefunden — bitte erneut versuchen",
   "scanReceiptSuccess": "Beleg gescannt — Werte prüfen. Bei Fehlern unten auf \"Scan-Fehler melden\" tippen.",
   "scanReceiptFailed": "Scan fehlgeschlagen: {error}",

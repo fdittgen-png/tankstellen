@@ -103,6 +103,14 @@ void main() {
         expect(entry, isNotNull);
         expect(entry!.requiresApiKey, isFalse);
       });
+
+      test('RO does not require API key (public observatory feed)', () {
+        // Monitorul Prețurilor is a government-mandated public feed —
+        // no auth required. #577
+        final entry = CountryServiceRegistry.entryFor('RO');
+        expect(entry, isNotNull);
+        expect(entry!.requiresApiKey, isFalse);
+      });
     });
 
     group('assertAllCountriesRegistered', () {
@@ -191,6 +199,12 @@ void main() {
         final entry = CountryServiceRegistry.entryFor('GR');
         expect(entry, isNotNull);
         expect(entry!.errorSource, equals(ServiceSource.greeceApi));
+      });
+
+      test('RO maps to romaniaApi (#577)', () {
+        final entry = CountryServiceRegistry.entryFor('RO');
+        expect(entry, isNotNull);
+        expect(entry!.errorSource, equals(ServiceSource.romaniaApi));
       });
     });
   });

@@ -20,6 +20,7 @@ enum ServiceSource {
   openinetApi('OPINET (KNOC)'),
   chileApi('CNE Bencina en Linea'),
   greeceApi('Paratiritirio Timon (Greece)'),
+  romaniaApi('Monitorul Prețurilor (Romania)'),
   osrmRouting('OSRM Routing'),
   openChargeMapApi('OpenChargeMap'),
   nominatimGeocoding('Nominatim (OSM)'),
