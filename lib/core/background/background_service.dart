@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../../features/alerts/data/price_snapshot_store.dart';
 import '../../features/alerts/data/repositories/alert_repository.dart';
+import '../../features/alerts/data/velocity_alert_cooldown.dart';
+import '../../features/alerts/data/velocity_alert_runner.dart';
+import '../../features/alerts/domain/velocity_alert_detector.dart';
 import '../../features/price_history/data/models/price_record.dart';
 import '../../features/search/domain/entities/fuel_type.dart';
 import '../../features/widget/data/home_widget_service.dart';
@@ -323,6 +329,25 @@ Future<void> _refreshPricesAndCheckAlerts() async {
       debugPrint('BackgroundService: ${activeAlerts.length} active alerts, ${prices.length} prices available');
     }
 
+    // 5b. #579 — Velocity detector: rapid drops across multiple nearby
+    //     stations. Runs even when no per-station alert exists so the
+    //     user gets notified about a wider price slide. Snapshots are
+    //     pruned by the store itself; cooldown is per fuel type.
+    if (prices.isNotEmpty) {
+      try {
+        final notifier = LocalNotificationService();
+        await notifier.initialize();
+        await _runVelocityDetector(
+          storage: storage,
+          prices: prices,
+          now: now,
+          notifier: notifier,
+        );
+      } catch (e) {
+        debugPrint('BackgroundService: velocity detector failed: $e');
+      }
+    }
+
     // 6. Update home screen widgets with latest favorite prices.
     //    Pass profile + settings storage so the widget can resolve the
     //    active profile's preferred fuel type and last-known GPS.
@@ -348,6 +373,112 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     }
     lock?.release();
   }
+}
+
+/// #579 — orchestrate the velocity detector from the BG isolate.
+///
+/// Builds per-station [VelocityStationObservation]s by joining the
+/// freshly fetched prices with the `station:<id>` cache (for
+/// coordinates), then hands off to [VelocityAlertRunner] which owns
+/// snapshot recording, detection, cooldown, and notification firing.
+///
+/// Extracted so a future test can drive the same code path with a
+/// fake notifier + seeded snapshots.
+Future<void> _runVelocityDetector({
+  required HiveStorage storage,
+  required Map<String, Map<String, dynamic>> prices,
+  required DateTime now,
+  required LocalNotificationService notifier,
+}) async {
+  final runner = VelocityAlertRunner(
+    snapshotStore: PriceSnapshotStore(),
+    cooldown: VelocityAlertCooldown(),
+    notifier: notifier,
+    copyBuilder: _buildVelocityCopy,
+  );
+  final config = await runner.loadConfig();
+  final fuelKey = _tankerkoenigKeyFor(config.fuelType);
+  if (fuelKey == null) {
+    debugPrint('BackgroundService: velocity skipped — ${config.fuelType.apiValue} not in Tankerkoenig response');
+    return;
+  }
+
+  final observations = <VelocityStationObservation>[];
+  for (final entry in prices.entries) {
+    final stationId = entry.key;
+    final p = entry.value;
+    if (p[TankerkoenigFields.status] == TankerkoenigFields.statusNoPrices) {
+      continue;
+    }
+    final price = p.getDouble(fuelKey);
+    if (price == null) continue;
+    final cached = storage.getCachedData('station:$stationId');
+    final data = cached?.getMap('data');
+    final lat = data?.getDouble('lat');
+    final lng = data?.getDouble('lng');
+    if (lat == null || lng == null) continue;
+    observations.add(VelocityStationObservation(
+      stationId: stationId,
+      price: price,
+      lat: lat,
+      lng: lng,
+    ));
+  }
+  if (observations.isEmpty) {
+    debugPrint('BackgroundService: velocity detector has no usable observations');
+    return;
+  }
+
+  final userLat = storage.getSetting(StorageKeys.userPositionLat) as num?;
+  final userLng = storage.getSetting(StorageKeys.userPositionLng) as num?;
+
+  final event = await runner.run(
+    observations: observations,
+    now: now,
+    userLat: userLat?.toDouble(),
+    userLng: userLng?.toDouble(),
+  );
+  if (event != null) {
+    debugPrint(
+        'BackgroundService: velocity alert ${event.fuelType.apiValue}, '
+        'count=${event.stationCount}, max=${event.maxDropCents.toStringAsFixed(1)}ct');
+  }
+}
+
+/// Map [FuelType] → Tankerkoenig JSON key. The BG isolate only
+/// fetches E5/E10/diesel today (see [_refreshPricesAndCheckAlerts])
+/// so other fuels return `null` and skip velocity detection until
+/// we broaden the batch fetcher.
+String? _tankerkoenigKeyFor(FuelType fuelType) {
+  return switch (fuelType) {
+    FuelTypeE5() => TankerkoenigFields.e5,
+    FuelTypeE10() => TankerkoenigFields.e10,
+    FuelTypeDiesel() => TankerkoenigFields.diesel,
+    _ => null,
+  };
+}
+
+/// Build notification copy for a velocity event. The BG isolate
+/// can't resolve the full ARB bundle (no BuildContext) so we pick
+/// German vs English from [Platform.localeName] and format with
+/// the same placeholders the ARB keys use.
+VelocityAlertCopy _buildVelocityCopy(VelocityAlertEvent event) {
+  final fuelLabel = event.fuelType.displayName.toUpperCase();
+  final stationCount = event.stationCount;
+  final maxCents = event.maxDropCents.round();
+  final isGerman = Platform.localeName.toLowerCase().startsWith('de');
+  if (isGerman) {
+    return VelocityAlertCopy(
+      title: '$fuelLabel an Tankstellen in der Nähe gefallen',
+      body:
+          '$stationCount Tankstellen um bis zu $maxCents¢ in der letzten Stunde gefallen',
+    );
+  }
+  return VelocityAlertCopy(
+    title: '$fuelLabel dropped at nearby stations',
+    body:
+        '$stationCount stations dropped by up to $maxCents¢ in the last hour',
+  );
 }
 
 /// Run the new nearest-widget builder from the background isolate.

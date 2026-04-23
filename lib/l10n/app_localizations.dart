@@ -5893,6 +5893,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OBD2 connected: {adapterName}'**
   String obd2ConnectedTooltip(String adapterName);
+
+  /// Title of the price-drop velocity notification (#579). Fired when multiple nearby stations drop within the lookback window.
+  ///
+  /// In en, this message translates to:
+  /// **'{fuelLabel} dropped at nearby stations'**
+  String velocityAlertTitle(String fuelLabel);
+
+  /// Body of the price-drop velocity notification (#579). Lists the number of affected stations and the largest observed drop in cents.
+  ///
+  /// In en, this message translates to:
+  /// **'{stationCount} stations dropped by up to {maxDropCents}¢ in the last hour'**
+  String velocityAlertBody(int stationCount, int maxDropCents);
 }
 
 class _AppLocalizationsDelegate
