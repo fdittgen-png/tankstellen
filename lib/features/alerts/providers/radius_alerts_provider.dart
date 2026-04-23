@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../data/radius_alert_dedup.dart';
 import '../data/radius_alert_store.dart';
 import '../domain/entities/radius_alert.dart';
 
@@ -11,6 +12,14 @@ part 'radius_alerts_provider.g.dart';
 /// re-instantiating a store per operation.
 @Riverpod(keepAlive: true)
 RadiusAlertStore radiusAlertStore(Ref ref) => RadiusAlertStore();
+
+/// Shared [RadiusAlertDedup] instance. Owns the per-(alert, station)
+/// "last notified" state consumed by the BG runner (#578 phase 3).
+/// Exposed here so the provider layer can purge dedup rows when a
+/// radius alert is deleted — otherwise stale rows would leak in the
+/// shared alerts box forever.
+@Riverpod(keepAlive: true)
+RadiusAlertDedup radiusAlertDedup(Ref ref) => RadiusAlertDedup();
 
 /// Radius-watchlist state (#578 phase 1).
 ///
@@ -41,8 +50,13 @@ class RadiusAlerts extends _$RadiusAlerts {
   /// Remove the alert with [id] and refresh state. No-op if unknown.
   Future<void> remove(String id) async {
     final store = ref.read(radiusAlertStoreProvider);
+    final dedup = ref.read(radiusAlertDedupProvider);
     try {
       await store.remove(id);
+      // #578 phase 3 — purge dedup rows so the shared alerts box
+      // doesn't accumulate stale (alertId, stationId) entries after
+      // the user deletes the alert.
+      await dedup.clearForAlert(id);
     } catch (e) {
       debugPrint('RadiusAlerts.remove: $e');
     }

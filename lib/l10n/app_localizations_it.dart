@@ -3233,6 +3233,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get radiusAlertCenterFromMap => 'Map location';
 
   @override
+  String radiusAlertNotificationTitle(String fuelLabel, String label) {
+    return '$fuelLabel near $label';
+  }
+
+  @override
+  String radiusAlertNotificationBody(String price, String threshold) {
+    return 'A station is at $price € (target: $threshold €)';
+  }
+
+  @override
   String get splashLoadingLabel => 'Loading Tankstellen';
 
   @override

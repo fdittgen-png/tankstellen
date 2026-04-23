@@ -1,0 +1,30 @@
+{
+  "radiusAlertNotificationTitle": "{fuelLabel} near {label}",
+  "@radiusAlertNotificationTitle": {
+    "description": "Background notification title when a station in the radius drops to the alert threshold (#578 phase 3).",
+    "placeholders": {
+      "fuelLabel": {
+        "type": "String",
+        "example": "DIESEL"
+      },
+      "label": {
+        "type": "String",
+        "example": "Home"
+      }
+    }
+  },
+  "radiusAlertNotificationBody": "A station is at {price} € (target: {threshold} €)",
+  "@radiusAlertNotificationBody": {
+    "description": "Background notification body with the observed price and the user's threshold (#578 phase 3).",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "1.559"
+      },
+      "threshold": {
+        "type": "String",
+        "example": "1.600"
+      }
+    }
+  }
+}
