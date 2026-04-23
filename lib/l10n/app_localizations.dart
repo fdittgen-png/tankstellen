@@ -5803,6 +5803,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This will discard the learned per-vehicle calibration and restore the default value (0.85).'**
   String get veResetConfirmBody;
+
+  /// Header of the radius-based watchlist section on the alerts screen (#578).
+  ///
+  /// In en, this message translates to:
+  /// **'Radius alerts'**
+  String get alertsRadiusSectionTitle;
+
+  /// Tooltip/label of the button that opens the radius-alert create sheet (#578).
+  ///
+  /// In en, this message translates to:
+  /// **'Add radius alert'**
+  String get alertsRadiusAdd;
+
+  /// Empty state title shown when no radius alerts are configured (#578).
+  ///
+  /// In en, this message translates to:
+  /// **'No radius alerts yet'**
+  String get alertsRadiusEmptyTitle;
+
+  /// Call-to-action button that opens the create sheet from the empty state (#578).
+  ///
+  /// In en, this message translates to:
+  /// **'Create a radius alert'**
+  String get alertsRadiusEmptyCta;
+
+  /// Title of the bottom sheet used to create a new radius alert (#578).
+  ///
+  /// In en, this message translates to:
+  /// **'Create radius alert'**
+  String get alertsRadiusCreateTitle;
+
+  /// Hint text for the label field in the radius-alert create sheet (#578).
+  ///
+  /// In en, this message translates to:
+  /// **'Label (e.g. Home diesel)'**
+  String get alertsRadiusLabelHint;
+
+  /// Fuel-type picker label in the radius-alert create sheet (#578).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel type'**
+  String get alertsRadiusFuelType;
+
+  /// Price-threshold field label in the radius-alert create sheet (#578).
+  ///
+  /// In en, this message translates to:
+  /// **'Threshold (€/L)'**
+  String get alertsRadiusThreshold;
+
+  /// Radius slider label in the radius-alert create sheet (#578).
+  ///
+  /// In en, this message translates to:
+  /// **'Radius (km)'**
+  String get alertsRadiusKm;
+
+  /// Button that sets the alert center to the user's current GPS position (#578).
+  ///
+  /// In en, this message translates to:
+  /// **'Use my location'**
+  String get alertsRadiusCenterGps;
+
+  /// Fallback input for entering a postal code as the alert center when no map picker is available (#578).
+  ///
+  /// In en, this message translates to:
+  /// **'Postal code'**
+  String get alertsRadiusCenterPostalCode;
+
+  /// Save button label in the radius-alert create sheet (#578).
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get alertsRadiusSave;
+
+  /// Cancel button label in the radius-alert create sheet (#578).
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get alertsRadiusCancel;
+
+  /// Snackbar/confirm text shown when a radius alert is dismissed for deletion (#578).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete radius alert?'**
+  String get alertsRadiusDeleteConfirm;
 }
 
 class _AppLocalizationsDelegate

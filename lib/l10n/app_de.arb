@@ -1211,5 +1211,19 @@
   "veCalibratedTitle": "Verbrauchsberechnung für {vehicleName} kalibriert — Genauigkeit verbessert um {percent}%",
   "veResetAction": "Kalibrierung zurücksetzen",
   "veResetConfirmTitle": "Kalibrierung zurücksetzen?",
-  "veResetConfirmBody": "Dies verwirft die gelernte fahrzeugspezifische Kalibrierung und stellt den Standardwert (0,85) wieder her."
+  "veResetConfirmBody": "Dies verwirft die gelernte fahrzeugspezifische Kalibrierung und stellt den Standardwert (0,85) wieder her.",
+  "alertsRadiusSectionTitle": "Umkreis-Alarme",
+  "alertsRadiusAdd": "Umkreis-Alarm hinzufügen",
+  "alertsRadiusEmptyTitle": "Noch keine Umkreis-Alarme",
+  "alertsRadiusEmptyCta": "Umkreis-Alarm anlegen",
+  "alertsRadiusCreateTitle": "Umkreis-Alarm anlegen",
+  "alertsRadiusLabelHint": "Bezeichnung (z. B. Zuhause Diesel)",
+  "alertsRadiusFuelType": "Kraftstoffart",
+  "alertsRadiusThreshold": "Schwelle (€/L)",
+  "alertsRadiusKm": "Radius (km)",
+  "alertsRadiusCenterGps": "Meinen Standort verwenden",
+  "alertsRadiusCenterPostalCode": "Postleitzahl",
+  "alertsRadiusSave": "Speichern",
+  "alertsRadiusCancel": "Abbrechen",
+  "alertsRadiusDeleteConfirm": "Umkreis-Alarm löschen?"
 }
