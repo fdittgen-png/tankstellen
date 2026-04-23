@@ -2,12 +2,15 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/storage_providers.dart';
+import '../../vehicle/data/ve_learner.dart';
 import '../../vehicle/providers/service_reminder_providers.dart';
+import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/repositories/fill_up_repository.dart';
 import '../domain/entities/consumption_stats.dart';
 import '../domain/entities/eco_score.dart';
 import '../domain/entities/fill_up.dart';
 import '../domain/services/eco_score_calculator.dart';
+import 'trip_history_provider.dart';
 
 part 'consumption_providers.g.dart';
 
@@ -16,6 +19,43 @@ part 'consumption_providers.g.dart';
 FillUpRepository fillUpRepository(Ref ref) {
   final storage = ref.watch(settingsStorageProvider);
   return FillUpRepository(storage);
+}
+
+/// Learner for per-vehicle volumetric efficiency (#815).
+///
+/// Returns null when the trip-history Hive box isn't open (widget
+/// tests that don't bother initialising Hive) — callers guard by
+/// skipping the reconciliation entirely when the instance is null,
+/// which also lets the fill-up save path stay a single-line change.
+@Riverpod(keepAlive: true)
+VeLearner? veLearner(Ref ref) {
+  final history = ref.watch(tripHistoryRepositoryProvider);
+  if (history == null) return null;
+  final profileRepo = ref.watch(vehicleProfileRepositoryProvider);
+  return VeLearner.fromRepos(
+    profileRepository: profileRepo,
+    tripHistoryRepository: history,
+  );
+}
+
+/// Holds the most recent [VeLearnResult] (#815) so the UI can show a
+/// one-shot calibration snackbar after the fill-up save flow closes.
+///
+/// The fill-up screen reads-and-clears this on its way out; unread
+/// results persist across widget rebuilds so the snackbar still fires
+/// when the user lands on the consumption tab. Only the most recent
+/// result is retained — if two tankfuls calibrate back-to-back (rare,
+/// but possible during data imports) the second one wins.
+@Riverpod(keepAlive: true)
+class LastVeLearnResult extends _$LastVeLearnResult {
+  @override
+  VeLearnResult? build() => null;
+
+  /// Stash [result]. Pass `null` from the consumer to clear after
+  /// rendering the snackbar.
+  void set(VeLearnResult? result) {
+    state = result;
+  }
 }
 
 /// Mutable list of all fill-ups, newest first.
@@ -30,14 +70,33 @@ class FillUpList extends _$FillUpList {
   /// Insert a new fill-up entry and refresh the list.
   ///
   /// After saving, runs the odometer-based service-reminder check
-  /// (#584) for the fill-up's vehicle. Failures in the reminder
-  /// path are swallowed — logging a fill-up must never fail because
-  /// a downstream side-effect did.
+  /// (#584) for the fill-up's vehicle and — when the vehicle has an
+  /// OBD2 trip history since the previous fill-up — kicks off the
+  /// η_v reconciliation (#815). Failures in either side-effect path
+  /// are swallowed: logging a fill-up must never fail because a
+  /// downstream calibration did.
   Future<void> add(FillUp fillUp) async {
     final repo = ref.read(fillUpRepositoryProvider);
+    final previous = _previousFillUpFor(fillUp, repo.getAll());
     await repo.save(fillUp);
     state = repo.getAll();
     await _evaluateReminders(fillUp);
+    await _reconcileVolumetricEfficiency(fillUp, previous);
+  }
+
+  /// Pick the fill-up with the largest `date` that is strictly older
+  /// than [current] for the same vehicle. Ignores fill-ups without a
+  /// vehicle id — reconciliation only applies to vehicle-bound fills.
+  FillUp? _previousFillUpFor(FillUp current, List<FillUp> all) {
+    if (current.vehicleId == null) return null;
+    FillUp? best;
+    for (final f in all) {
+      if (f.id == current.id) continue;
+      if (f.vehicleId != current.vehicleId) continue;
+      if (!f.date.isBefore(current.date)) continue;
+      if (best == null || f.date.isAfter(best.date)) best = f;
+    }
+    return best;
   }
 
   Future<void> _evaluateReminders(FillUp fillUp) async {
@@ -54,6 +113,35 @@ class FillUpList extends _$FillUpList {
       ref.invalidate(serviceReminderListProvider);
     } catch (e) {
       debugPrint('FillUpList: reminder evaluation failed: $e');
+    }
+  }
+
+  Future<void> _reconcileVolumetricEfficiency(
+    FillUp fillUp,
+    FillUp? previous,
+  ) async {
+    final vehicleId = fillUp.vehicleId;
+    if (vehicleId == null) return;
+    if (fillUp.liters <= 0) return;
+    try {
+      final learner = ref.read(veLearnerProvider);
+      if (learner == null) return;
+      final result = await learner.reconcileAfterFillUp(
+        vehicleId: vehicleId,
+        pumpedLiters: fillUp.liters,
+        fillUpTimestamp: fillUp.date,
+        previousFillUpTimestamp: previous?.date,
+      );
+      if (result != null) {
+        ref
+            .read(lastVeLearnResultProvider.notifier)
+            .set(result);
+        // Refresh the vehicle list so the edit screen reflects the
+        // bumped η_v sample count immediately.
+        ref.invalidate(vehicleProfileListProvider);
+      }
+    } catch (e) {
+      debugPrint('FillUpList: VE reconciliation failed: $e');
     }
   }
 

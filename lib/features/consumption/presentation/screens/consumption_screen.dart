@@ -26,6 +26,28 @@ class ConsumptionScreen extends ConsumerWidget {
     final activeVehicle = ref.watch(activeVehicleProfileProvider);
     final l = AppLocalizations.of(context);
 
+    // #815 — surface the η_v calibration outcome as a one-shot
+    // snackbar when the fill-up save path learns a new value for the
+    // active vehicle. Listening here (rather than in the fill-up
+    // screen) keeps the snackbar visible after the fill-up form
+    // pops, which is the screen the user actually sees.
+    ref.listen(lastVeLearnResultProvider, (previous, next) {
+      if (next == null) return;
+      final vehicles = ref.read(vehicleProfileListProvider);
+      final vehicle = vehicles
+          .where((v) => v.id == next.vehicleId)
+          .firstOrNull;
+      final name = vehicle?.name ?? '';
+      final percent = next.accuracyImprovementPct.round().toString();
+      final msg = l?.veCalibratedTitle(name, percent) ??
+          'Consumption calibration updated for $name — '
+              'accuracy improved by $percent%';
+      SnackBarHelper.showSuccess(context, msg);
+      // Clear so a rebuild doesn't re-fire the snackbar on the next
+      // unrelated rebuild (e.g. the user deleting a fill-up).
+      ref.read(lastVeLearnResultProvider.notifier).set(null);
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l?.consumptionLogTitle ?? 'Fuel consumption'),

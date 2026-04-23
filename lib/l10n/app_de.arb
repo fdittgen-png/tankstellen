@@ -1207,5 +1207,9 @@
   "vinInvalidFormat": "Ungültiges FIN-Format",
   "obd2PauseBannerTitle": "OBD2-Verbindung verloren — Aufzeichnung pausiert",
   "obd2PauseBannerResume": "Weiter aufzeichnen",
-  "obd2PauseBannerEnd": "Aufzeichnung beenden"
+  "obd2PauseBannerEnd": "Aufzeichnung beenden",
+  "veCalibratedTitle": "Verbrauchsberechnung für {vehicleName} kalibriert — Genauigkeit verbessert um {percent}%",
+  "veResetAction": "Kalibrierung zurücksetzen",
+  "veResetConfirmTitle": "Kalibrierung zurücksetzen?",
+  "veResetConfirmBody": "Dies verwirft die gelernte fahrzeugspezifische Kalibrierung und stellt den Standardwert (0,85) wieder her."
 }

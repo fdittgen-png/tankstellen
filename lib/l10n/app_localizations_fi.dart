@@ -3068,4 +3068,19 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get obd2PauseBannerEnd => 'End recording';
+
+  @override
+  String veCalibratedTitle(String vehicleName, String percent) {
+    return 'Consumption calibration updated for $vehicleName — accuracy improved by $percent%';
+  }
+
+  @override
+  String get veResetAction => 'Reset calibration';
+
+  @override
+  String get veResetConfirmTitle => 'Reset calibration?';
+
+  @override
+  String get veResetConfirmBody =>
+      'This will discard the learned per-vehicle calibration and restore the default value (0.85).';
 }
