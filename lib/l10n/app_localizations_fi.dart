@@ -3193,6 +3193,13 @@ class AppLocalizationsFi extends AppLocalizations {
       'Powered by the community-maintained fuelpricesgr API';
 
   @override
+  String get romaniaApiProvider => 'Monitorul Prețurilor (Romania)';
+
+  @override
+  String get romaniaScrapingNotice =>
+      'Powered by pretcarburant.ro (Competition Council + ANPC)';
+
+  @override
   String get scanReceiptNoData => 'No receipt data found — try again';
 
   @override

@@ -46,9 +46,9 @@ void main() {
   });
 
   group('countryBoundingBoxes', () {
-    test('has entries for all 15 supported countries', () {
+    test('has entries for all 16 supported countries', () {
       const expectedCountries = [
-        'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'SI', 'KR', 'CL', 'GR',
+        'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'SI', 'KR', 'CL', 'GR', 'RO',
       ];
       for (final code in expectedCountries) {
         expect(countryBoundingBoxes.containsKey(code), isTrue,
@@ -282,6 +282,36 @@ void main() {
 
     test('CL bounding box rejects Rio de Janeiro', () {
       expect(countryBoundingBoxes['CL']!.contains(-22.90, -43.20), isFalse);
+    });
+
+    test('Bucharest → RO (#577)', () {
+      expect(countryCodeFromLatLng(44.43, 26.10), 'RO');
+    });
+
+    test('Cluj-Napoca → RO (Transylvania, #577)', () {
+      expect(countryCodeFromLatLng(46.77, 23.60), 'RO');
+    });
+
+    test('Constanța → RO (Black Sea coast, #577)', () {
+      expect(countryCodeFromLatLng(44.18, 28.63), 'RO');
+    });
+
+    test('Thessaloniki → GR (not RO — bboxes do not overlap)', () {
+      expect(countryCodeFromLatLng(40.64, 22.94), 'GR');
+    });
+
+    test('Kiev (UA) is not misattributed to RO', () {
+      // Kiev at (50.45, 30.52) sits north and east of Romania.
+      // Ukraine is not in the registry — must resolve to null.
+      expect(countryCodeFromLatLng(50.45, 30.52), isNull);
+    });
+
+    test('RO bounding box rejects Kiev', () {
+      expect(countryBoundingBoxes['RO']!.contains(50.45, 30.52), isFalse);
+    });
+
+    test('RO bounding box rejects Thessaloniki', () {
+      expect(countryBoundingBoxes['RO']!.contains(40.64, 22.94), isFalse);
     });
 
     test('returns null for mid-Atlantic coordinates', () {

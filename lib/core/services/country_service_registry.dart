@@ -18,6 +18,7 @@ import 'impl/miteco_station_service.dart';
 import 'impl/osm_brand_enricher.dart';
 import 'impl/portugal_station_service.dart';
 import 'impl/prix_carburants_station_service.dart';
+import 'impl/romania_station_service.dart';
 import 'impl/slovenia_station_service.dart';
 import 'impl/south_korea_station_service.dart';
 import 'impl/tankerkoenig_station_service.dart';
@@ -163,6 +164,11 @@ class CountryServiceRegistry {
       errorSource: ServiceSource.greeceApi,
       createService: _createGreece,
     ),
+    CountryServiceEntry(
+      countryCode: 'RO',
+      errorSource: ServiceSource.romaniaApi,
+      createService: _createRomania,
+    ),
   ];
 
   /// Lookup map built once from [entries] for O(1) access.
@@ -299,3 +305,10 @@ StationService _createChile(Ref ref) {
 /// FastAPI; it is free and open, so no API key is required. Users get
 /// real prefecture-level data out-of-the-box.
 StationService _createGreece(Ref ref) => GreeceStationService();
+
+/// Romania factory (#577). *Monitorul Prețurilor la Carburanți*
+/// (pretcarburant.ro) is the Competition Council + ANPC observatory,
+/// government-mandated with 15-minute price updates. There is no
+/// documented public API — the parser is fixture-driven so a URL
+/// drift is a one-line fix. No key required.
+StationService _createRomania(Ref ref) => RomaniaStationService();

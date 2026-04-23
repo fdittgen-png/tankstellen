@@ -485,11 +485,52 @@ class Countries {
     exampleCity: 'Αθήνα',
   );
 
+  /// Romania — *Monitorul Prețurilor la Carburanți* (pretcarburant.ro),
+  /// the Competition Council + ANPC joint observatory (#577). Romanian
+  /// law mandates 15-minute price updates from every retailer and ~1 500
+  /// stations are covered (Petrom / OMV / Rompetrol / MOL / Lukoil /
+  /// Socar). The feed is public — no key required. Fuels: Benzină
+  /// Standard (→ e5), Benzină Premium (→ e98), Motorină Standard
+  /// (→ diesel), Motorină Premium (→ diesel premium), GPL (→ lpg).
+  static const romania = CountryConfig(
+    code: 'RO',
+    name: 'România',
+    flag: '\u{1F1F7}\u{1F1F4}',
+    currency: 'RON',
+    currencySymbol: 'lei',
+    locale: 'ro_RO',
+    postalCodeLength: 6,
+    postalCodeRegex: r'^\d{6}$',
+    postalCodeLabel: 'Cod poștal',
+    requiresApiKey: false,
+    apiProvider: 'Monitorul Prețurilor',
+    attribution:
+        'Date: Consiliul Concurenței + ANPC — pretcarburant.ro',
+    fuelTypes: [
+      'Benzină Standard',
+      'Benzină Premium',
+      'Motorină Standard',
+      'Motorină Premium',
+      'GPL',
+    ],
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.e98,
+      FuelType.diesel,
+      FuelType.dieselPremium,
+      FuelType.lpg,
+      FuelType.electric,
+    },
+    examplePostalCode: '010101',
+    exampleCity: 'București',
+    pricePerUnitSuffix: 'lei/L',
+  );
+
   /// All supported countries, ordered for display.
   static const all = [
     germany, france, austria, spain, italy, denmark, argentina,
     portugal, unitedKingdom, australia, mexico, luxembourg, slovenia,
-    southKorea, chile, greece,
+    southKorea, chile, greece, romania,
   ];
 
   /// Find country by ISO code.
@@ -532,6 +573,7 @@ class Countries {
   /// - \`kr-\` → KR (South Korea OPINET / KNOC, #597)
   /// - \`cl-\` → CL (Chile CNE Bencina en Línea, #596)
   /// - \`gr-\` → GR (Greece Paratiritirio Timon, #576)
+  /// - \`ro-\` → RO (Romania Monitorul Prețurilor, #577)
   /// - \`demo-\` → null (demo service, no real country)
   static const Map<String, String> _stationIdPrefixToCountry = {
     'pt-': 'PT',
@@ -546,6 +588,7 @@ class Countries {
     'kr-': 'KR',
     'cl-': 'CL',
     'gr-': 'GR',
+    'ro-': 'RO',
   };
 
   /// Returns the ISO country code inferred from a station id's prefix,

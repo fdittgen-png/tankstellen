@@ -5996,6 +5996,18 @@ abstract class AppLocalizations {
   /// **'Powered by the community-maintained fuelpricesgr API'**
   String get greeceCommunityApiNotice;
 
+  /// No description provided for @romaniaApiProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitorul Prețurilor (Romania)'**
+  String get romaniaApiProvider;
+
+  /// No description provided for @romaniaScrapingNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Powered by pretcarburant.ro (Competition Council + ANPC)'**
+  String get romaniaScrapingNotice;
+
   /// Snackbar shown on the Add-Fill-Up screen when the receipt scan returns no usable fields (#751).
   ///
   /// In en, this message translates to:

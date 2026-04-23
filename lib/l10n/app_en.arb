@@ -1533,6 +1533,8 @@
   },
   "greeceApiProvider": "Paratiritirio Timon (Greece)",
   "greeceCommunityApiNotice": "Powered by the community-maintained fuelpricesgr API",
+  "romaniaApiProvider": "Monitorul Prețurilor (Romania)",
+  "romaniaScrapingNotice": "Powered by pretcarburant.ro (Competition Council + ANPC)",
   "scanReceiptNoData": "No receipt data found — try again",
   "@scanReceiptNoData": {
     "description": "Snackbar shown on the Add-Fill-Up screen when the receipt scan returns no usable fields (#751)."

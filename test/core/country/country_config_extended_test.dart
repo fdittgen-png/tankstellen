@@ -2,9 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 
 void main() {
-  group('Countries.byCode for all 16 countries', () {
+  group('Countries.byCode for all 17 countries', () {
     final expectedCodes = [
-      'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'LU', 'SI', 'KR', 'CL', 'GR',
+      'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'LU', 'SI', 'KR', 'CL', 'GR', 'RO',
     ];
 
     for (final code in expectedCodes) {
@@ -83,6 +83,10 @@ void main() {
     test('Greece uses Paratiritirio Timon', () {
       expect(Countries.greece.apiProvider, contains('Paratiritirio'));
     });
+
+    test('Romania uses Monitorul Prețurilor', () {
+      expect(Countries.romania.apiProvider, contains('Monitorul'));
+    });
   });
 
   group('Country configs currency correctness', () {
@@ -110,6 +114,8 @@ void main() {
       expect(Countries.mexico.currency, 'MXN');
       expect(Countries.southKorea.currency, 'KRW');
       expect(Countries.chile.currency, 'CLP');
+      expect(Countries.romania.currency, 'RON');
+      expect(Countries.romania.currencySymbol, 'lei');
     });
   });
 
