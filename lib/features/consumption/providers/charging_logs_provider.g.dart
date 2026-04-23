@@ -80,9 +80,11 @@ String _$chargingLogStoreHash() => r'9921ba627549e835218a3975c56a6c6996f8d327';
 /// refreshes state from a fresh `store.list()` call so the list
 /// stays canonical (including sort order).
 ///
-/// [update] preserves the incoming [ChargingLog.id] and overwrites
+/// [edit] preserves the incoming [ChargingLog.id] and overwrites
 /// every other field — the caller is expected to `copyWith` their
-/// edits onto the existing entry before calling.
+/// edits onto the existing entry before calling. Named `edit`
+/// instead of `update` to avoid shadowing [AsyncNotifier.update],
+/// whose signature rebuilds state from a reducer callback.
 
 @ProviderFor(ChargingLogs)
 final chargingLogsProvider = ChargingLogsProvider._();
@@ -96,9 +98,11 @@ final chargingLogsProvider = ChargingLogsProvider._();
 /// refreshes state from a fresh `store.list()` call so the list
 /// stays canonical (including sort order).
 ///
-/// [update] preserves the incoming [ChargingLog.id] and overwrites
+/// [edit] preserves the incoming [ChargingLog.id] and overwrites
 /// every other field — the caller is expected to `copyWith` their
-/// edits onto the existing entry before calling.
+/// edits onto the existing entry before calling. Named `edit`
+/// instead of `update` to avoid shadowing [AsyncNotifier.update],
+/// whose signature rebuilds state from a reducer callback.
 final class ChargingLogsProvider
     extends $AsyncNotifierProvider<ChargingLogs, List<ChargingLog>> {
   /// Charging-log list state (#582 phase 1).
@@ -110,9 +114,11 @@ final class ChargingLogsProvider
   /// refreshes state from a fresh `store.list()` call so the list
   /// stays canonical (including sort order).
   ///
-  /// [update] preserves the incoming [ChargingLog.id] and overwrites
+  /// [edit] preserves the incoming [ChargingLog.id] and overwrites
   /// every other field — the caller is expected to `copyWith` their
-  /// edits onto the existing entry before calling.
+  /// edits onto the existing entry before calling. Named `edit`
+  /// instead of `update` to avoid shadowing [AsyncNotifier.update],
+  /// whose signature rebuilds state from a reducer callback.
   ChargingLogsProvider._()
     : super(
         from: null,
@@ -132,7 +138,7 @@ final class ChargingLogsProvider
   ChargingLogs create() => ChargingLogs();
 }
 
-String _$chargingLogsHash() => r'4341211da6a46381ff0a370982ed159d64bc5acf';
+String _$chargingLogsHash() => r'1c58203d45fa592b745b097bcf4d225d7a471f9e';
 
 /// Charging-log list state (#582 phase 1).
 ///
@@ -143,9 +149,11 @@ String _$chargingLogsHash() => r'4341211da6a46381ff0a370982ed159d64bc5acf';
 /// refreshes state from a fresh `store.list()` call so the list
 /// stays canonical (including sort order).
 ///
-/// [update] preserves the incoming [ChargingLog.id] and overwrites
+/// [edit] preserves the incoming [ChargingLog.id] and overwrites
 /// every other field — the caller is expected to `copyWith` their
-/// edits onto the existing entry before calling.
+/// edits onto the existing entry before calling. Named `edit`
+/// instead of `update` to avoid shadowing [AsyncNotifier.update],
+/// whose signature rebuilds state from a reducer callback.
 
 abstract class _$ChargingLogs extends $AsyncNotifier<List<ChargingLog>> {
   FutureOr<List<ChargingLog>> build();

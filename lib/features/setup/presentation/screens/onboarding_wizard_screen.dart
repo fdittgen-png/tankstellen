@@ -14,6 +14,7 @@ import '../widgets/completion_step.dart';
 import '../widgets/country_language_step.dart';
 import '../widgets/landing_screen_step.dart';
 import '../widgets/onboarding_navigation_buttons.dart';
+import '../widgets/onboarding_obd2_step.dart';
 import '../widgets/onboarding_progress_indicator.dart';
 import '../widgets/preferences_step.dart';
 import '../widgets/vehicles_step.dart';
@@ -50,19 +51,24 @@ class _OnboardingWizardScreenState
   /// requires an API key.
   int get _stepCount {
     final country = ref.read(activeCountryProvider);
-    // Welcome, Country, Vehicles, Preferences, Landing, [API Key], Done
-    return country.requiresApiKey ? 7 : 6;
+    // Welcome, Country, OBD2, Vehicles, Preferences, Landing, [API Key], Done
+    return country.requiresApiKey ? 8 : 7;
   }
+
+  /// Zero-based index of the optional OBD2 adapter step (#816). Placed
+  /// BEFORE the Vehicles step so a successful VIN read can skip the
+  /// manual vehicle entry entirely.
+  static const int _obd2StepIndex = 2;
 
   /// Zero-based index of the Vehicles step. Placed BEFORE Preferences so
   /// the user can pick a vehicle first — the fuel preference can then
   /// derive from the vehicle's fuel (#695).
-  static const int _vehiclesStepIndex = 2;
+  static const int _vehiclesStepIndex = 3;
 
   /// Zero-based index of the optional API key step.
   int get _apiKeyStepIndex {
     final country = ref.read(activeCountryProvider);
-    return country.requiresApiKey ? 5 : -1;
+    return country.requiresApiKey ? 6 : -1;
   }
 
   bool _isLastStep(int currentStep) => currentStep == _stepCount - 1;
@@ -173,9 +179,29 @@ class _OnboardingWizardScreenState
 
   /// Returns whether the current step is an optional one that can be skipped.
   bool _isCurrentStepSkippable(int currentStep) {
-    // Vehicles is always skippable; API key is skippable when it shows.
+    // OBD2 + Vehicles are always skippable; API key is skippable when
+    // it shows. The OBD2 step owns its own skip button, but surfacing
+    // the wizard's "Skip" too keeps the UX consistent with the rest
+    // of the optional steps.
+    if (currentStep == _obd2StepIndex) return true;
     if (currentStep == _vehiclesStepIndex) return true;
     return currentStep == _apiKeyStepIndex && _apiKeyStepIndex != -1;
+  }
+
+  /// Advance past the manual VehiclesStep in response to a successful
+  /// OBD2-driven auto-fill (#816). Jumps to the step AFTER Vehicles so
+  /// the user isn't prompted to re-enter what we just decoded.
+  void _advanceAfterObd2AutoFill() {
+    // _vehiclesStepIndex + 1 — the OBD2 step saves the profile itself,
+    // then we skip straight to Preferences.
+    _goToStep(_vehiclesStepIndex + 1);
+  }
+
+  /// Continue from the OBD2 step in response to a skip / partial
+  /// decode / VIN read failure — hand control to the manual Vehicles
+  /// step.
+  void _advanceFromObd2() {
+    _goToStep(_obd2StepIndex + 1);
   }
 
   List<Widget> _buildSteps() {
@@ -183,6 +209,10 @@ class _OnboardingWizardScreenState
     return [
       const WelcomeStep(),
       const CountryLanguageStep(),
+      OnboardingObd2Step(
+        onProceed: _advanceFromObd2,
+        onAutoFillSuccess: _advanceAfterObd2AutoFill,
+      ),
       const VehiclesStep(),
       const PreferencesStep(),
       const LandingScreenStep(),

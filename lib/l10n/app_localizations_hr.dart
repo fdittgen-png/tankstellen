@@ -3186,6 +3186,30 @@ class AppLocalizationsHr extends AppLocalizations {
   String get badScanReportHeaderYouTyped => 'You typed';
 
   @override
+  String get onboardingObd2StepTitle => 'Connect your OBD2 adapter';
+
+  @override
+  String get onboardingObd2StepBody =>
+      'Plug your OBD2 adapter into the car\'s port and turn the ignition on. We\'ll read the VIN and fill in engine details for you.';
+
+  @override
+  String get onboardingObd2ConnectButton => 'Connect adapter';
+
+  @override
+  String get onboardingObd2SkipButton => 'Maybe later';
+
+  @override
+  String get onboardingObd2ReadingVin => 'Reading VIN…';
+
+  @override
+  String get onboardingObd2VinReadFailed =>
+      'Couldn\'t read VIN — enter manually';
+
+  @override
+  String get onboardingObd2ConnectFailed =>
+      'Couldn\'t connect to the adapter. You can retry or skip.';
+
+  @override
   String get radiusAlertPickOnMap => 'Pick on map';
 
   @override

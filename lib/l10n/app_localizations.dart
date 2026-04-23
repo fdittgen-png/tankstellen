@@ -5984,6 +5984,48 @@ abstract class AppLocalizations {
   /// **'You typed'**
   String get badScanReportHeaderYouTyped;
 
+  /// Title of the optional onboarding step (#816) that offers to connect an OBD2 adapter, read the VIN, and auto-fill the vehicle profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect your OBD2 adapter'**
+  String get onboardingObd2StepTitle;
+
+  /// Body copy for the OBD2 onboarding step (#816) explaining what the user needs to do.
+  ///
+  /// In en, this message translates to:
+  /// **'Plug your OBD2 adapter into the car\'s port and turn the ignition on. We\'ll read the VIN and fill in engine details for you.'**
+  String get onboardingObd2StepBody;
+
+  /// Label of the primary button on the OBD2 onboarding step (#816) that opens the adapter picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect adapter'**
+  String get onboardingObd2ConnectButton;
+
+  /// Label of the skip button on the OBD2 onboarding step (#816) — users without an adapter can skip without connecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Maybe later'**
+  String get onboardingObd2SkipButton;
+
+  /// Spinner label shown while the app reads the VIN from the connected OBD2 adapter (#816).
+  ///
+  /// In en, this message translates to:
+  /// **'Reading VIN…'**
+  String get onboardingObd2ReadingVin;
+
+  /// Banner shown on the next manual vehicle step when the OBD2 adapter connected but the VIN could not be read (#816).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t read VIN — enter manually'**
+  String get onboardingObd2VinReadFailed;
+
+  /// No description provided for @onboardingObd2ConnectFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t connect to the adapter. You can retry or skip.'**
+  String get onboardingObd2ConnectFailed;
+
   /// Button on the radius-alert create sheet that opens the full-screen map-picker for the alert center (#578 phase 3).
   ///
   /// In en, this message translates to:
