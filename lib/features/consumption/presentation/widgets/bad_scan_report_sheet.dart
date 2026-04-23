@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../data/receipt_scan_service.dart';
 
 /// Bottom sheet the user opens when the scanned receipt values are
@@ -30,6 +31,7 @@ class BadScanReportSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
     final p = scan.parse;
     return SafeArea(
       child: Padding(
@@ -44,14 +46,15 @@ class BadScanReportSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Report a scan error',
+              l?.badScanReportTitle ?? 'Report a scan error',
               style: theme.textTheme.titleMedium
                   ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
-              "We'll share the receipt photo and both sets of values so "
-              'the next build can learn this layout.',
+              l?.badScanReportHint ??
+                  "We'll share the receipt photo and both sets of values so "
+                      'the next build can learn this layout.',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -59,19 +62,41 @@ class BadScanReportSheet extends StatelessWidget {
             const SizedBox(height: 16),
             _DiffTable(
               rows: [
-                _DiffRow('Brand layout', p.brandLayout, p.brandLayout),
-                _DiffRow('Liters',
-                    p.liters?.toStringAsFixed(2) ?? '—',
-                    enteredLiters?.toStringAsFixed(2) ?? '—'),
-                _DiffRow('Total',
-                    p.totalCost?.toStringAsFixed(2) ?? '—',
-                    enteredTotalCost?.toStringAsFixed(2) ?? '—'),
-                _DiffRow('Price/L',
-                    p.pricePerLiter?.toStringAsFixed(3) ?? '—', '—'),
-                _DiffRow('Station', p.stationName ?? '—', '—'),
-                _DiffRow('Fuel', p.fuelType?.displayName ?? '—', '—'),
-                _DiffRow('Date',
-                    p.date?.toIso8601String().split('T').first ?? '—', '—'),
+                _DiffRow(
+                  l?.badScanReportFieldBrandLayout ?? 'Brand layout',
+                  p.brandLayout,
+                  p.brandLayout,
+                ),
+                _DiffRow(
+                  l?.liters ?? 'Liters',
+                  p.liters?.toStringAsFixed(2) ?? '—',
+                  enteredLiters?.toStringAsFixed(2) ?? '—',
+                ),
+                _DiffRow(
+                  l?.badScanReportFieldTotal ?? 'Total',
+                  p.totalCost?.toStringAsFixed(2) ?? '—',
+                  enteredTotalCost?.toStringAsFixed(2) ?? '—',
+                ),
+                _DiffRow(
+                  l?.badScanReportFieldPricePerLiter ?? 'Price/L',
+                  p.pricePerLiter?.toStringAsFixed(3) ?? '—',
+                  '—',
+                ),
+                _DiffRow(
+                  l?.badScanReportFieldStation ?? 'Station',
+                  p.stationName ?? '—',
+                  '—',
+                ),
+                _DiffRow(
+                  l?.badScanReportFieldFuel ?? 'Fuel',
+                  p.fuelType?.displayName ?? '—',
+                  '—',
+                ),
+                _DiffRow(
+                  l?.badScanReportFieldDate ?? 'Date',
+                  p.date?.toIso8601String().split('T').first ?? '—',
+                  '—',
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -81,12 +106,14 @@ class BadScanReportSheet extends StatelessWidget {
                 await _share();
               },
               icon: const Icon(Icons.send),
-              label: const Text('Share report + photo'),
+              label: Text(
+                l?.badScanReportShareAction ?? 'Share report + photo',
+              ),
             ),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text(l?.cancel ?? 'Cancel'),
             ),
           ],
         ),
@@ -141,6 +168,7 @@ class _DiffTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
     return Table(
       columnWidths: const {
         0: IntrinsicColumnWidth(),
@@ -153,9 +181,12 @@ class _DiffTable extends StatelessWidget {
           decoration:
               BoxDecoration(color: theme.colorScheme.surfaceContainerHighest),
           children: [
-            _cell('Field', bold: true, theme: theme),
-            _cell('Scanned', bold: true, theme: theme),
-            _cell('You typed', bold: true, theme: theme),
+            _cell(l?.badScanReportHeaderField ?? 'Field',
+                bold: true, theme: theme),
+            _cell(l?.badScanReportHeaderScanned ?? 'Scanned',
+                bold: true, theme: theme),
+            _cell(l?.badScanReportHeaderYouTyped ?? 'You typed',
+                bold: true, theme: theme),
           ],
         ),
         for (final row in rows)

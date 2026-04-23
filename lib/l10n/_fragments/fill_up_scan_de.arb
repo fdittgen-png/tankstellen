@@ -1,0 +1,20 @@
+{
+  "scanReceiptNoData": "Keine Belegdaten gefunden — bitte erneut versuchen",
+  "scanReceiptSuccess": "Beleg gescannt — Werte prüfen. Bei Fehlern unten auf \"Scan-Fehler melden\" tippen.",
+  "scanReceiptFailed": "Scan fehlgeschlagen: {error}",
+  "scanPumpUnreadable": "Zapfsäule nicht lesbar — bitte erneut versuchen",
+  "scanPumpSuccess": "Zapfsäule gescannt — Werte prüfen.",
+  "scanPumpFailed": "Zapfsäulen-Scan fehlgeschlagen: {error}",
+  "badScanReportTitle": "Scan-Fehler melden",
+  "badScanReportHint": "Wir teilen das Belegfoto und beide Wertesätze, damit die nächste Version dieses Layout lernen kann.",
+  "badScanReportShareAction": "Bericht + Foto teilen",
+  "badScanReportFieldBrandLayout": "Marken-Layout",
+  "badScanReportFieldTotal": "Gesamt",
+  "badScanReportFieldPricePerLiter": "Preis/L",
+  "badScanReportFieldStation": "Tankstelle",
+  "badScanReportFieldFuel": "Kraftstoff",
+  "badScanReportFieldDate": "Datum",
+  "badScanReportHeaderField": "Feld",
+  "badScanReportHeaderScanned": "Gescannt",
+  "badScanReportHeaderYouTyped": "Eingegeben"
+}

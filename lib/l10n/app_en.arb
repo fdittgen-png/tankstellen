@@ -1449,6 +1449,61 @@
       }
     }
   },
+  "scanReceiptNoData": "No receipt data found — try again",
+  "@scanReceiptNoData": {
+    "description": "Snackbar shown on the Add-Fill-Up screen when the receipt scan returns no usable fields (#751)."
+  },
+  "scanReceiptSuccess": "Receipt scanned — verify values. Tap \"Report scan error\" below if anything is off.",
+  "@scanReceiptSuccess": {
+    "description": "Snackbar shown after a successful receipt scan to prompt the user to verify the pre-filled values (#751)."
+  },
+  "scanReceiptFailed": "Scan failed: {error}",
+  "@scanReceiptFailed": {
+    "description": "Snackbar shown when the receipt scan throws (#751).",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scanPumpUnreadable": "Pump display not readable — try again",
+  "@scanPumpUnreadable": {
+    "description": "Snackbar shown on the Add-Fill-Up screen when the pump-display scan returns no usable fields (#751)."
+  },
+  "scanPumpSuccess": "Pump display scanned — verify the values.",
+  "@scanPumpSuccess": {
+    "description": "Snackbar shown after a successful pump-display scan (#751)."
+  },
+  "scanPumpFailed": "Pump scan failed: {error}",
+  "@scanPumpFailed": {
+    "description": "Snackbar shown when the pump-display scan throws (#751).",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "badScanReportTitle": "Report a scan error",
+  "@badScanReportTitle": {
+    "description": "Title of the bottom sheet that reports an incorrect receipt scan (#751)."
+  },
+  "badScanReportHint": "We'll share the receipt photo and both sets of values so the next build can learn this layout.",
+  "@badScanReportHint": {
+    "description": "Subtitle under the bad-scan-report sheet title (#751)."
+  },
+  "badScanReportShareAction": "Share report + photo",
+  "@badScanReportShareAction": {
+    "description": "Button on the bad-scan-report sheet that triggers the system share intent (#751)."
+  },
+  "badScanReportFieldBrandLayout": "Brand layout",
+  "badScanReportFieldTotal": "Total",
+  "badScanReportFieldPricePerLiter": "Price/L",
+  "badScanReportFieldStation": "Station",
+  "badScanReportFieldFuel": "Fuel",
+  "badScanReportFieldDate": "Date",
+  "badScanReportHeaderField": "Field",
+  "badScanReportHeaderScanned": "Scanned",
+  "badScanReportHeaderYouTyped": "You typed",
   "vinLabel": "VIN (optional)",
   "vinDecodeTooltip": "Decode VIN",
   "vinConfirmAction": "Yes, auto-fill",
