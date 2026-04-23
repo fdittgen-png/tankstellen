@@ -1290,5 +1290,12 @@
   "veResetConfirmBody": "This will discard the learned per-vehicle calibration and restore the default value (0.85).",
   "@veResetConfirmBody": {
     "description": "Body of the confirm dialog shown before discarding the learned volumetric efficiency (#815)."
+  },
+  "obd2ConnectedTooltip": "OBD2 connected: {adapterName}",
+  "@obd2ConnectedTooltip": {
+    "description": "Tooltip on the title-bar OBD2 status chip (#797 phase 3) shown only when the pinned adapter is currently connected.",
+    "placeholders": {
+      "adapterName": { "type": "String", "example": "vLinker FS" }
+    }
   }
 }

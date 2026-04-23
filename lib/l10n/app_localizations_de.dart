@@ -3108,4 +3108,9 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get veResetConfirmBody =>
       'Dies verwirft die gelernte fahrzeugspezifische Kalibrierung und stellt den Standardwert (0,85) wieder her.';
+
+  @override
+  String obd2ConnectedTooltip(String adapterName) {
+    return 'OBD2 verbunden: $adapterName';
+  }
 }

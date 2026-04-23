@@ -5803,6 +5803,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This will discard the learned per-vehicle calibration and restore the default value (0.85).'**
   String get veResetConfirmBody;
+
+  /// Tooltip on the title-bar OBD2 status chip (#797 phase 3) shown only when the pinned adapter is currently connected.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 connected: {adapterName}'**
+  String obd2ConnectedTooltip(String adapterName);
 }
 
 class _AppLocalizationsDelegate

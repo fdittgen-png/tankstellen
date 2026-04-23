@@ -3107,4 +3107,9 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get veResetConfirmBody =>
       'This will discard the learned per-vehicle calibration and restore the default value (0.85).';
+
+  @override
+  String obd2ConnectedTooltip(String adapterName) {
+    return 'OBD2 connected: $adapterName';
+  }
 }
