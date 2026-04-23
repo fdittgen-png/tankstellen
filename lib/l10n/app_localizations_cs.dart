@@ -3087,6 +3087,48 @@ class AppLocalizationsCs extends AppLocalizations {
       'This will discard the learned per-vehicle calibration and restore the default value (0.85).';
 
   @override
+  String get alertsRadiusSectionTitle => 'Radius alerts';
+
+  @override
+  String get alertsRadiusAdd => 'Add radius alert';
+
+  @override
+  String get alertsRadiusEmptyTitle => 'No radius alerts yet';
+
+  @override
+  String get alertsRadiusEmptyCta => 'Create a radius alert';
+
+  @override
+  String get alertsRadiusCreateTitle => 'Create radius alert';
+
+  @override
+  String get alertsRadiusLabelHint => 'Label (e.g. Home diesel)';
+
+  @override
+  String get alertsRadiusFuelType => 'Fuel type';
+
+  @override
+  String get alertsRadiusThreshold => 'Threshold (€/L)';
+
+  @override
+  String get alertsRadiusKm => 'Radius (km)';
+
+  @override
+  String get alertsRadiusCenterGps => 'Use my location';
+
+  @override
+  String get alertsRadiusCenterPostalCode => 'Postal code';
+
+  @override
+  String get alertsRadiusSave => 'Save';
+
+  @override
+  String get alertsRadiusCancel => 'Cancel';
+
+  @override
+  String get alertsRadiusDeleteConfirm => 'Delete radius alert?';
+
+  @override
   String obd2ConnectedTooltip(String adapterName) {
     return 'OBD2 connected: $adapterName';
   }

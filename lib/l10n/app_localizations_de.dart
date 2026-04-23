@@ -3110,6 +3110,48 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dies verwirft die gelernte fahrzeugspezifische Kalibrierung und stellt den Standardwert (0,85) wieder her.';
 
   @override
+  String get alertsRadiusSectionTitle => 'Umkreis-Alarme';
+
+  @override
+  String get alertsRadiusAdd => 'Umkreis-Alarm hinzufügen';
+
+  @override
+  String get alertsRadiusEmptyTitle => 'Noch keine Umkreis-Alarme';
+
+  @override
+  String get alertsRadiusEmptyCta => 'Umkreis-Alarm anlegen';
+
+  @override
+  String get alertsRadiusCreateTitle => 'Umkreis-Alarm anlegen';
+
+  @override
+  String get alertsRadiusLabelHint => 'Bezeichnung (z. B. Zuhause Diesel)';
+
+  @override
+  String get alertsRadiusFuelType => 'Kraftstoffart';
+
+  @override
+  String get alertsRadiusThreshold => 'Schwelle (€/L)';
+
+  @override
+  String get alertsRadiusKm => 'Radius (km)';
+
+  @override
+  String get alertsRadiusCenterGps => 'Meinen Standort verwenden';
+
+  @override
+  String get alertsRadiusCenterPostalCode => 'Postleitzahl';
+
+  @override
+  String get alertsRadiusSave => 'Speichern';
+
+  @override
+  String get alertsRadiusCancel => 'Abbrechen';
+
+  @override
+  String get alertsRadiusDeleteConfirm => 'Umkreis-Alarm löschen?';
+
+  @override
   String obd2ConnectedTooltip(String adapterName) {
     return 'OBD2 verbunden: $adapterName';
   }
