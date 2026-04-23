@@ -1,0 +1,7 @@
+{
+  "vinLabel": "FIN (optional)",
+  "vinDecodeTooltip": "FIN entschlüsseln",
+  "vinConfirmAction": "Ja, automatisch ausfüllen",
+  "vinModifyAction": "Manuell anpassen",
+  "veResetAction": "Kalibrierung zurücksetzen"
+}

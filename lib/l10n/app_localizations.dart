@@ -5701,18 +5701,6 @@ abstract class AppLocalizations {
   /// **'CNE Bencina en Linea'**
   String get chileApiProvider;
 
-  /// No description provided for @vinLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'VIN (optional)'**
-  String get vinLabel;
-
-  /// No description provided for @vinDecodeTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Decode VIN'**
-  String get vinDecodeTooltip;
-
   /// No description provided for @vinConfirmTitle.
   ///
   /// In en, this message translates to:
@@ -5731,18 +5719,6 @@ abstract class AppLocalizations {
     String cylinders,
     String fuel,
   );
-
-  /// No description provided for @vinConfirmAction.
-  ///
-  /// In en, this message translates to:
-  /// **'Yes, auto-fill'**
-  String get vinConfirmAction;
-
-  /// No description provided for @vinModifyAction.
-  ///
-  /// In en, this message translates to:
-  /// **'Modify manually'**
-  String get vinModifyAction;
 
   /// No description provided for @vinPartialInfoNote.
   ///
@@ -5785,12 +5761,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Consumption calibration updated for {vehicleName} — accuracy improved by {percent}%'**
   String veCalibratedTitle(String vehicleName, String percent);
-
-  /// Action on the vehicle edit screen that discards the learned volumetric-efficiency calibration (#815).
-  ///
-  /// In en, this message translates to:
-  /// **'Reset calibration'**
-  String get veResetAction;
 
   /// Title of the confirm dialog shown before discarding the learned volumetric efficiency (#815).
   ///
@@ -5905,6 +5875,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{stationCount} stations dropped by up to {maxDropCents}¢ in the last hour'**
   String velocityAlertBody(int stationCount, int maxDropCents);
+
+  /// No description provided for @vinLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'VIN (optional)'**
+  String get vinLabel;
+
+  /// No description provided for @vinDecodeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Decode VIN'**
+  String get vinDecodeTooltip;
+
+  /// No description provided for @vinConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, auto-fill'**
+  String get vinConfirmAction;
+
+  /// No description provided for @vinModifyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Modify manually'**
+  String get vinModifyAction;
+
+  /// Action on the vehicle edit screen that discards the learned volumetric-efficiency calibration (#815).
+  ///
+  /// In en, this message translates to:
+  /// **'Reset calibration'**
+  String get veResetAction;
 }
 
 class _AppLocalizationsDelegate

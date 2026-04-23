@@ -3023,12 +3023,6 @@ class AppLocalizationsHr extends AppLocalizations {
   String get chileApiProvider => 'CNE Bencina en Linea';
 
   @override
-  String get vinLabel => 'VIN (optional)';
-
-  @override
-  String get vinDecodeTooltip => 'Decode VIN';
-
-  @override
   String get vinConfirmTitle => 'Is this your car?';
 
   @override
@@ -3042,12 +3036,6 @@ class AppLocalizationsHr extends AppLocalizations {
   ) {
     return '$year $make $model — ${displacement}L, $cylinders-cyl, $fuel';
   }
-
-  @override
-  String get vinConfirmAction => 'Yes, auto-fill';
-
-  @override
-  String get vinModifyAction => 'Modify manually';
 
   @override
   String get vinPartialInfoNote =>
@@ -3072,9 +3060,6 @@ class AppLocalizationsHr extends AppLocalizations {
   String veCalibratedTitle(String vehicleName, String percent) {
     return 'Consumption calibration updated for $vehicleName — accuracy improved by $percent%';
   }
-
-  @override
-  String get veResetAction => 'Reset calibration';
 
   @override
   String get veResetConfirmTitle => 'Reset calibration?';
@@ -3139,4 +3124,19 @@ class AppLocalizationsHr extends AppLocalizations {
   String velocityAlertBody(int stationCount, int maxDropCents) {
     return '$stationCount stations dropped by up to $maxDropCents¢ in the last hour';
   }
+
+  @override
+  String get vinLabel => 'VIN (optional)';
+
+  @override
+  String get vinDecodeTooltip => 'Decode VIN';
+
+  @override
+  String get vinConfirmAction => 'Yes, auto-fill';
+
+  @override
+  String get vinModifyAction => 'Modify manually';
+
+  @override
+  String get veResetAction => 'Reset calibration';
 }

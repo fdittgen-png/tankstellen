@@ -83,9 +83,9 @@ Non-negotiable, inlined here so workers don't need to chase down `feedback_agent
 
 - `flutter analyze` (STRICT — NO `--no-fatal-infos`; CI fails on `prefer_const_constructors` per `feedback_analyze_stricter_in_ci.md`).
 - `dart run build_runner build --delete-conflicting-outputs` if any freezed/riverpod model changed.
-- `flutter gen-l10n` if any ARB file changed.
+- **New ARB keys → feature fragments**: add your keys to `lib/l10n/_fragments/<feature>_en.arb` + `lib/l10n/_fragments/<feature>_de.arb` (NOT directly to `app_en.arb` / `app_de.arb` — those are generated). Then `dart run tool/build_arb.dart` and `flutter gen-l10n`. See `docs/guides/ARB_FRAGMENTS.md`.
 - `flutter test` — full suite, not just the new test file.
-- Every new ARB key: present in `app_en.arb` AND `app_de.arb` (the `test/l10n/localization_completeness_test.dart` gate fails CI on a missing German translation).
+- Every new ARB key: present in BOTH the `_en` and the `_de` fragment (the `test/lint/arb_fragments_consistency_test.dart` + `test/l10n/localization_completeness_test.dart` gates fail CI on a missing German translation).
 - `flutter analyze` again after generation — generated code occasionally reintroduces lints.
 
 ## Coordinator-workers model
@@ -220,7 +220,7 @@ A COMPLETED check can be SUCCESS, FAILURE, or SKIPPED. A filter that only reads 
 - **#575** Slovenia country API (new file under `lib/core/services/impl/`)
 - **#573** UK upgrade to GOV.UK (modifies existing `uk_station_service.dart` only)
 
-All three touch country-service files plus ARB keys. Coordinator handles ARB merge centrally: each worker appends its keys to a dedicated block in `app_en.arb` + `app_de.arb`, coordinator resolves on merge.
+All three touch country-service files plus ARB keys. Since the ARB-fragment pattern landed, each worker writes keys to its own `lib/l10n/_fragments/<feature>_<locale>.arb` pair — no coordinator-side merge conflict on the ARB files. See `docs/guides/ARB_FRAGMENTS.md`.
 
 ## When to stop
 

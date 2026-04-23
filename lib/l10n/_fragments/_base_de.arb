@@ -1237,10 +1237,5 @@
   "alertsRadiusDeleteConfirm": "Umkreis-Alarm löschen?",
   "obd2ConnectedTooltip": "OBD2 verbunden: {adapterName}",
   "velocityAlertTitle": "{fuelLabel} an Tankstellen in der Nähe gefallen",
-  "velocityAlertBody": "{stationCount} Tankstellen um bis zu {maxDropCents}¢ in der letzten Stunde gefallen",
-  "vinLabel": "FIN (optional)",
-  "vinDecodeTooltip": "FIN entschlüsseln",
-  "vinConfirmAction": "Ja, automatisch ausfüllen",
-  "vinModifyAction": "Manuell anpassen",
-  "veResetAction": "Kalibrierung zurücksetzen"
+  "velocityAlertBody": "{stationCount} Tankstellen um bis zu {maxDropCents}¢ in der letzten Stunde gefallen"
 }
