@@ -46,6 +46,15 @@ class HiveBoxes {
   /// [obd2Baselines] and [achievements].
   static const String serviceReminders = 'service_reminders';
 
+  /// In-flight OBD2 trips that were paused by a transient Bluetooth
+  /// drop (#797 phase 1). One JSON payload per paused session keyed by
+  /// the session id (ISO start timestamp). Entries are consumed by
+  /// [TripRecordingController.resume] or auto-finalised into
+  /// [obd2TripHistory] when the grace window expires. Same privacy
+  /// treatment as the other OBD2 boxes — unencrypted, opened once at
+  /// startup.
+  static const String obd2PausedTrips = 'obd2_paused_trips';
+
   static const _encryptedBoxes = {
     settings,
     profiles,
@@ -133,6 +142,9 @@ class HiveBoxes {
     await Hive.openBox<String>(obd2SupportedPids);
     // #584 — odometer-based service reminders: one entry per reminder.
     await Hive.openBox<String>(serviceReminders);
+    // #797 — partial OBD2 trips paused by a BT drop. Same string-typed
+    // JSON pattern as [obd2TripHistory] so one box adapter covers both.
+    await Hive.openBox<String>(obd2PausedTrips);
   }
 
   /// Initialize Hive in a background isolate with proper encryption.
@@ -175,6 +187,8 @@ class HiveBoxes {
     // exercise the vehicle feature can open it without pulling in the
     // rest of the app. String-typed to match runtime.
     await Hive.openBox<String>(serviceReminders);
+    // #797 — paused trips box, string-typed JSON, matches runtime.
+    await Hive.openBox<String>(obd2PausedTrips);
   }
 
   /// Safely converts any Hive map to a typed map.

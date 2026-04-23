@@ -46,3 +46,16 @@ class Obd2ProtocolInitFailed extends Obd2ConnectionError {
   const Obd2ProtocolInitFailed(String rawResponse)
       : super('Adapter returned unexpected init string: $rawResponse');
 }
+
+/// The Bluetooth transport dropped mid-session (#797). Raised by
+/// higher-level code (e.g. [TripRecordingController]) when the
+/// scheduler observes a burst of transport errors that indicates the
+/// adapter is no longer reachable — the underlying channel itself
+/// throws `StateError('Transport closed')` or `TimeoutException`, and
+/// the controller classifies those into this typed error so UI code
+/// can render the "connection lost" banner without parsing strings.
+class Obd2DisconnectedException extends Obd2ConnectionError {
+  const Obd2DisconnectedException([
+    super.message = 'OBD2 adapter disconnected mid-session',
+  ]);
+}

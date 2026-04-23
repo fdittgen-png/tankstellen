@@ -24,7 +24,13 @@ import 'trip_history_provider.dart';
 part 'trip_recording_provider.g.dart';
 
 /// Lifecycle phase of the app-wide OBD2 trip recording (#726).
-enum TripRecordingPhase { idle, recording, paused, finished }
+///
+/// #797 phase 1 adds [pausedDueToDrop] for the "Bluetooth link lost
+/// mid-recording" case. Distinct from [paused] because the user did
+/// not pause; the partial trip is auto-persisted to the paused-trips
+/// Hive box and a grace timer ticks in the controller. Phase 2 wires
+/// this into a banner + auto-reconnect scanner.
+enum TripRecordingPhase { idle, recording, paused, pausedDueToDrop, finished }
 
 /// Haptic strength emitted when the consumption band changes (#767).
 enum HapticIntensity { none, light, medium }
@@ -93,7 +99,8 @@ class TripRecordingState {
 
   bool get isActive =>
       phase == TripRecordingPhase.recording ||
-      phase == TripRecordingPhase.paused;
+      phase == TripRecordingPhase.paused ||
+      phase == TripRecordingPhase.pausedDueToDrop;
 }
 
 /// App-wide owner of the trip recording (#726).
@@ -112,6 +119,7 @@ class TripRecording extends _$TripRecording {
   Obd2Service? _service;
   TripRecordingController? _controller;
   StreamSubscription<TripLiveReading>? _liveSub;
+  StreamSubscription<TripRecordingControllerState>? _stateSub;
   SituationClassifier? _classifier;
   BaselineStore? _store;
   String? _vehicleId;
@@ -145,9 +153,15 @@ class TripRecording extends _$TripRecording {
     // vehicle a second time below for the baseline-store
     // bookkeeping; both reads are cheap Riverpod cache hits.
     final activeVehicle = _tryReadActiveVehicle();
+    // Resolve the vehicle id up-front so the controller can tag any
+    // pause-on-drop snapshot it writes to the `obd2_paused_trips`
+    // Hive box (#797 phase 1). Cheap Riverpod cache hit — same
+    // provider call used again below for the baseline store.
+    final eagerVehicleId = _tryReadActiveVehicle()?.id;
     final ctl = TripRecordingController(
       service: service,
       vehicle: activeVehicle,
+      vehicleId: eagerVehicleId,
     );
     _controller = ctl;
     _classifier = SituationClassifier();
@@ -181,16 +195,40 @@ class TripRecording extends _$TripRecording {
       final delta = _computeDelta(reading, situation);
       _fireBandTransitionHaptic(state.band, band);
       state = state.copyWith(
-        phase: ctl.isPaused
-            ? TripRecordingPhase.paused
-            : TripRecordingPhase.recording,
+        phase: _phaseFor(ctl),
         live: reading,
         situation: situation,
         band: band,
         liveDeltaFraction: delta,
       );
     });
+    // #797 phase 1 — listen to explicit state changes so the UI
+    // surfaces "pausedDueToDrop" even when no TripLiveReading lands
+    // (the drop kills the per-PID callbacks that would have woken the
+    // live listener). Pure state transitions don't reshape band/delta,
+    // so we only copyWith the phase here.
+    _stateSub = ctl.stateChanges.listen((_) {
+      state = state.copyWith(phase: _phaseFor(ctl));
+    });
     state = state.copyWith(phase: TripRecordingPhase.recording);
+  }
+
+  /// Map the controller's enum onto the provider's phase. Stays a
+  /// private helper so the provider's state model doesn't leak the
+  /// raw enum to widgets that should keep consuming `TripRecordingPhase`.
+  TripRecordingPhase _phaseFor(TripRecordingController ctl) {
+    switch (ctl.currentState) {
+      case TripRecordingControllerState.idle:
+        return TripRecordingPhase.idle;
+      case TripRecordingControllerState.recording:
+        return TripRecordingPhase.recording;
+      case TripRecordingControllerState.paused:
+        return TripRecordingPhase.paused;
+      case TripRecordingControllerState.pausedDueToDrop:
+        return TripRecordingPhase.pausedDueToDrop;
+      case TripRecordingControllerState.stopped:
+        return TripRecordingPhase.finished;
+    }
   }
 
   /// #767 — fire a short haptic when the band crosses *into* heavy
@@ -327,7 +365,11 @@ class TripRecording extends _$TripRecording {
 
   void resume() {
     final ctl = _controller;
-    if (ctl == null || state.phase != TripRecordingPhase.paused) return;
+    if (ctl == null) return;
+    if (state.phase != TripRecordingPhase.paused &&
+        state.phase != TripRecordingPhase.pausedDueToDrop) {
+      return;
+    }
     ctl.resume();
     state = state.copyWith(phase: TripRecordingPhase.recording);
   }
@@ -353,6 +395,8 @@ class TripRecording extends _$TripRecording {
     final odometerLatestKm = ctl.odometerLatestKm;
     await _liveSub?.cancel();
     _liveSub = null;
+    await _stateSub?.cancel();
+    _stateSub = null;
     _controller = null;
     // #726 — persist to the trip history rolling log. Every trip
     // (including discarded ones) is logged; the fill-up flow is a
