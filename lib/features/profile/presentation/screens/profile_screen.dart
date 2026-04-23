@@ -78,15 +78,12 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
 
-          // Fuel consumption log
-          SettingsMenuTile(
-            icon: Icons.local_gas_station,
-            title: l?.consumptionLogMenuTitle ?? 'Consumption log',
-            subtitle: l?.consumptionLogMenuSubtitle ??
-                'Track fill-ups and calculate L/100km',
-            onTap: () => context.push('/consumption'),
-          ),
-          const SizedBox(height: 8),
+          // #896 — Consumption log menu tile removed. The consumption
+          // screen is already a top-level destination on the bottom
+          // navigation bar, so a duplicate menu entry here was
+          // redundant. Route `/consumption` remains registered in
+          // `lib/app/router.dart` for direct navigation (station
+          // detail CTA, deep links).
 
           // Theme mode — light / dark / follow system (#752).
           const ThemeModeTile(),
