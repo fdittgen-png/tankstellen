@@ -10,6 +10,8 @@ import 'package:tankstellen/features/favorites/providers/favorites_provider.dart
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../helpers/mock_providers.dart';
@@ -33,6 +35,19 @@ class _EmptySearchState extends SearchState {
       fetchedAt: DateTime.now(),
     ));
   }
+}
+
+/// Stubs one configured vehicle so the shell renders all 5 tabs —
+/// #893 hides the Conso tab when the vehicle list is empty.
+class _OneVehicleList extends VehicleProfileList {
+  @override
+  List<VehicleProfile> build() => const [
+        VehicleProfile(
+          id: 'car-1',
+          name: 'Daily Driver',
+          type: VehicleType.combustion,
+        ),
+      ];
 }
 
 /// Fixed FavoriteStations returning empty data.
@@ -67,6 +82,9 @@ void main() {
         userPositionNullOverride(),
         searchStateProvider.overrideWith(() => _EmptySearchState()),
         favoriteStationsProvider.overrideWith(() => _EmptyFavoriteStations()),
+        // #893 — seed a vehicle so the Conso tab shows up and the
+        // existing 5-tab / 5-label assertions below still hold.
+        vehicleProfileListProvider.overrideWith(() => _OneVehicleList()),
       ];
     });
 

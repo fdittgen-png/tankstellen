@@ -3,7 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tankstellen/app/shell_screen.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
+
+/// #893 — seeds one vehicle so the Conso tab is visible in the
+/// existing #778 layout tests (Conso is otherwise hidden on fresh
+/// installs).
+class _OneVehicleList extends VehicleProfileList {
+  @override
+  List<VehicleProfile> build() => const [
+        VehicleProfile(
+          id: 'car-1',
+          name: 'Daily Driver',
+          type: VehicleType.combustion,
+        ),
+      ];
+}
 
 /// #778: Consumption is a first-class destination — always visible,
 /// sitting between Favorites and Settings. Supersedes the #701
@@ -57,6 +73,9 @@ Future<List<IconData>> _pumpShellIcons(WidgetTester tester) async {
 
   await tester.pumpWidget(
     ProviderScope(
+      overrides: [
+        vehicleProfileListProvider.overrideWith(() => _OneVehicleList()),
+      ],
       child: MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,

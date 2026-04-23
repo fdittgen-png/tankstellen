@@ -11,6 +11,8 @@ import 'package:tankstellen/features/favorites/providers/favorites_provider.dart
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../helpers/mock_providers.dart';
@@ -35,6 +37,19 @@ class _EmptySearchState extends SearchState {
       fetchedAt: DateTime.now(),
     ));
   }
+}
+
+/// Stubs one configured vehicle so the #893 Conso-tab gating keeps
+/// the 5-tab shell visible in tests that assert all five icons.
+class _OneVehicleList extends VehicleProfileList {
+  @override
+  List<VehicleProfile> build() => const [
+        VehicleProfile(
+          id: 'car-1',
+          name: 'Daily Driver',
+          type: VehicleType.combustion,
+        ),
+      ];
 }
 
 /// Fixed FavoriteStations returning empty data.
@@ -80,6 +95,10 @@ void main() {
         userPositionNullOverride(),
         searchStateProvider.overrideWith(() => _EmptySearchState()),
         favoriteStationsProvider.overrideWith(() => _EmptyFavoriteStations()),
+        // #893 — the Conso tab is hidden when no vehicle is configured,
+        // so tests that assert the 5-tab layout must seed at least one
+        // vehicle.
+        vehicleProfileListProvider.overrideWith(() => _OneVehicleList()),
       ].cast();
     });
 
