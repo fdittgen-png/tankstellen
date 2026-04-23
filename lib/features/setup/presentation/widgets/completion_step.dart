@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
+import 'illustrations/shield_illustration.dart';
 
 /// Final onboarding step: confirmation that setup is complete.
 class CompletionStep extends StatelessWidget {
@@ -15,11 +16,7 @@ class CompletionStep extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.check_circle_outline,
-            size: 96,
-            color: theme.colorScheme.primary,
-          ),
+          const ShieldIllustration(size: 160),
           const SizedBox(height: 24),
           Text(
             l10n?.onboardingComplete ?? 'All set!',

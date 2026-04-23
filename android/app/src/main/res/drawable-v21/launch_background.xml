@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modify this file to customize your launch splash screen -->
+<!--
+  Branded splash for API 21+ — mirror of drawable/launch_background.xml.
+  See that file for the rationale; this variant exists because Flutter's
+  default project layout shipped both and some launchers pick one over
+  the other (#590).
+-->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="?android:colorBackground" />
+    <item android:drawable="@color/ic_launcher_background" />
 
-    <!-- You can insert your own image assets here -->
-    <!-- <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@mipmap/launch_image" />
-    </item> -->
+    <item
+        android:gravity="center"
+        android:width="192dp"
+        android:height="192dp"
+        android:drawable="@drawable/ic_launcher_foreground" />
 </layer-list>

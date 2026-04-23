@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
+import 'illustrations/fuel_pump_illustration.dart';
 
 /// First onboarding step: welcome message with app branding.
 class WelcomeStep extends StatelessWidget {
@@ -15,11 +16,7 @@ class WelcomeStep extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.local_gas_station,
-            size: 96,
-            color: theme.colorScheme.primary,
-          ),
+          const FuelPumpIllustration(size: 160),
           const SizedBox(height: 24),
           Text(
             l10n?.welcome ?? 'Fuel Prices',

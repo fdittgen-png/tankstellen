@@ -5,10 +5,13 @@ import '../../../../helpers/pump_app.dart';
 
 void main() {
   group('CompletionStep', () {
-    testWidgets('renders completion icon and text', (tester) async {
+    testWidgets('renders shield illustration and text', (tester) async {
       await pumpApp(tester, const CompletionStep());
 
-      expect(find.byIcon(Icons.check_circle_outline), findsOneWidget);
+      // #593: completion step renders the branded ShieldIllustration
+      // (privacy shield + fuel drop) instead of the generic check-mark.
+      expect(find.byIcon(Icons.verified_user), findsOneWidget);
+      expect(find.byIcon(Icons.water_drop), findsOneWidget);
       expect(find.text('All set!'), findsOneWidget);
       expect(
         find.text('You can change these settings anytime in your profile.'),
