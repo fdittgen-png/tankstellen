@@ -3083,4 +3083,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get vinInvalidFormat => 'Ungültiges FIN-Format';
+
+  @override
+  String get obd2PauseBannerTitle =>
+      'OBD2-Verbindung verloren — Aufzeichnung pausiert';
+
+  @override
+  String get obd2PauseBannerResume => 'Weiter aufzeichnen';
+
+  @override
+  String get obd2PauseBannerEnd => 'Aufzeichnung beenden';
 }

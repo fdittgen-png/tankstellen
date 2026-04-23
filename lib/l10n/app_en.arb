@@ -1258,5 +1258,17 @@
   "vinModifyAction": "Modify manually",
   "vinPartialInfoNote": "Partial info (offline). You can edit below.",
   "vinDecodeError": "Couldn't decode this VIN",
-  "vinInvalidFormat": "Invalid VIN format"
+  "vinInvalidFormat": "Invalid VIN format",
+  "obd2PauseBannerTitle": "OBD2 connection lost — recording paused",
+  "@obd2PauseBannerTitle": {
+    "description": "Banner shown (#797 phase 2) when the OBD2 Bluetooth link drops mid-recording. The trip is auto-paused on the device and the partial data is preserved. User can resume (if the link comes back) or end the recording entirely."
+  },
+  "obd2PauseBannerResume": "Resume recording",
+  "@obd2PauseBannerResume": {
+    "description": "Action on the OBD2 pause banner that resumes the recording once the Bluetooth link is back."
+  },
+  "obd2PauseBannerEnd": "End recording",
+  "@obd2PauseBannerEnd": {
+    "description": "Action on the OBD2 pause banner that stops the recording and saves what was captured before the drop."
+  }
 }

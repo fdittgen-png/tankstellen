@@ -5761,6 +5761,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid VIN format'**
   String get vinInvalidFormat;
+
+  /// Banner shown (#797 phase 2) when the OBD2 Bluetooth link drops mid-recording. The trip is auto-paused on the device and the partial data is preserved. User can resume (if the link comes back) or end the recording entirely.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 connection lost — recording paused'**
+  String get obd2PauseBannerTitle;
+
+  /// Action on the OBD2 pause banner that resumes the recording once the Bluetooth link is back.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume recording'**
+  String get obd2PauseBannerResume;
+
+  /// Action on the OBD2 pause banner that stops the recording and saves what was captured before the drop.
+  ///
+  /// In en, this message translates to:
+  /// **'End recording'**
+  String get obd2PauseBannerEnd;
 }
 
 class _AppLocalizationsDelegate
