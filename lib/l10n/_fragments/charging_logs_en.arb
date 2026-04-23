@@ -1,0 +1,64 @@
+{
+  "consumptionTabFuel": "Fuel",
+  "@consumptionTabFuel": {
+    "description": "Label for the fuel fill-ups tab on the ConsumptionScreen (#582 phase 2)."
+  },
+  "consumptionTabCharging": "Charging",
+  "@consumptionTabCharging": {
+    "description": "Label for the EV charging logs tab on the ConsumptionScreen (#582 phase 2)."
+  },
+  "noChargingLogsTitle": "No charging logs yet",
+  "@noChargingLogsTitle": {
+    "description": "Empty-state title on the Charging tab when no sessions have been logged (#582 phase 2)."
+  },
+  "noChargingLogsSubtitle": "Log your first charging session to start tracking EUR/100 km and kWh/100 km.",
+  "@noChargingLogsSubtitle": {
+    "description": "Empty-state subtitle on the Charging tab (#582 phase 2)."
+  },
+  "addChargingLog": "Log charging",
+  "@addChargingLog": {
+    "description": "Floating-action-button label on the Charging tab for adding a new session (#582 phase 2)."
+  },
+  "addChargingLogTitle": "Log charging session",
+  "@addChargingLogTitle": {
+    "description": "AppBar title for the Add-Charging-Log screen (#582 phase 2)."
+  },
+  "chargingKwh": "Energy (kWh)",
+  "@chargingKwh": {
+    "description": "Label for the kWh numeric input on the Add-Charging-Log form (#582 phase 2)."
+  },
+  "chargingCost": "Total cost",
+  "@chargingCost": {
+    "description": "Label for the cost numeric input on the Add-Charging-Log form (#582 phase 2)."
+  },
+  "chargingTimeMin": "Charge time (min)",
+  "@chargingTimeMin": {
+    "description": "Label for the charge-time numeric input on the Add-Charging-Log form (#582 phase 2)."
+  },
+  "chargingStationName": "Station (optional)",
+  "@chargingStationName": {
+    "description": "Label for the free-form station-name input on the Add-Charging-Log form (#582 phase 2)."
+  },
+  "chargingEurPer100km": "{value} EUR / 100 km",
+  "@chargingEurPer100km": {
+    "description": "Derived EUR/100km readout on the Add-Charging-Log form (#582 phase 2). Shown when odometer + cost are both entered and a previous log exists.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "chargingKwhPer100km": "{value} kWh / 100 km",
+  "@chargingKwhPer100km": {
+    "description": "Derived kWh/100km readout on the Add-Charging-Log form (#582 phase 2).",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "chargingDerivedHelper": "Need a previous log to compare",
+  "@chargingDerivedHelper": {
+    "description": "Helper text under the cost field when there is no prior charging log for the selected vehicle, so the EUR/100 km cannot be computed yet (#582 phase 2)."
+  }
+}

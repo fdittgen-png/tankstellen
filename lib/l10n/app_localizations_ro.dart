@@ -3129,6 +3129,50 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String get consumptionTabFuel => 'Fuel';
+
+  @override
+  String get consumptionTabCharging => 'Charging';
+
+  @override
+  String get noChargingLogsTitle => 'No charging logs yet';
+
+  @override
+  String get noChargingLogsSubtitle =>
+      'Log your first charging session to start tracking EUR/100 km and kWh/100 km.';
+
+  @override
+  String get addChargingLog => 'Log charging';
+
+  @override
+  String get addChargingLogTitle => 'Log charging session';
+
+  @override
+  String get chargingKwh => 'Energy (kWh)';
+
+  @override
+  String get chargingCost => 'Total cost';
+
+  @override
+  String get chargingTimeMin => 'Charge time (min)';
+
+  @override
+  String get chargingStationName => 'Station (optional)';
+
+  @override
+  String chargingEurPer100km(String value) {
+    return '$value EUR / 100 km';
+  }
+
+  @override
+  String chargingKwhPer100km(String value) {
+    return '$value kWh / 100 km';
+  }
+
+  @override
+  String get chargingDerivedHelper => 'Need a previous log to compare';
+
+  @override
   String get scanReceiptNoData => 'No receipt data found — try again';
 
   @override

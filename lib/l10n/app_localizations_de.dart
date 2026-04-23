@@ -3152,6 +3152,51 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get consumptionTabFuel => 'Kraftstoff';
+
+  @override
+  String get consumptionTabCharging => 'Laden';
+
+  @override
+  String get noChargingLogsTitle => 'Noch keine Ladeeinträge';
+
+  @override
+  String get noChargingLogsSubtitle =>
+      'Protokolliere deine erste Ladesitzung, um EUR/100 km und kWh/100 km zu verfolgen.';
+
+  @override
+  String get addChargingLog => 'Ladung erfassen';
+
+  @override
+  String get addChargingLogTitle => 'Ladesitzung erfassen';
+
+  @override
+  String get chargingKwh => 'Energie (kWh)';
+
+  @override
+  String get chargingCost => 'Gesamtkosten';
+
+  @override
+  String get chargingTimeMin => 'Ladezeit (Min.)';
+
+  @override
+  String get chargingStationName => 'Station (optional)';
+
+  @override
+  String chargingEurPer100km(String value) {
+    return '$value EUR / 100 km';
+  }
+
+  @override
+  String chargingKwhPer100km(String value) {
+    return '$value kWh / 100 km';
+  }
+
+  @override
+  String get chargingDerivedHelper =>
+      'Vorheriger Eintrag benötigt für Vergleich';
+
+  @override
   String get scanReceiptNoData =>
       'Keine Belegdaten gefunden — bitte erneut versuchen';
 
