@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/utils/brand_logo_mapper.dart';
+import '../../../../core/widgets/form_section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/presentation/widgets/vehicle_adapter_section.dart';
 import '../../../consumption/presentation/widgets/vehicle_baseline_section.dart';
@@ -70,10 +72,18 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   @override
   void initState() {
     super.initState();
+    // Rebuild the header on every name keystroke so the big title
+    // tracks what the user is typing. The controller itself is the
+    // source of truth, we just need `setState` to flush the view.
+    _nameCtrl.addListener(_refresh);
     if (widget.vehicleId != null) {
       // Load after first frame so we have access to ref.
       WidgetsBinding.instance.addPostFrameCallback((_) => _loadExisting());
     }
+  }
+
+  void _refresh() {
+    if (mounted) setState(() {});
   }
 
   void _loadExisting() {
@@ -104,6 +114,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
 
   @override
   void dispose() {
+    _nameCtrl.removeListener(_refresh);
     _nameCtrl.dispose();
     _batteryCtrl.dispose();
     _maxKwCtrl.dispose();
@@ -355,6 +366,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
     final isEdit = _existingId != null || widget.vehicleId != null;
     final showEv = _type != VehicleType.combustion;
     final showCombustion = _type != VehicleType.ev;
+    final accent = _brandAccent(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -372,75 +384,116 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.fromLTRB(
+            16,
+            16,
+            16,
+            MediaQuery.of(context).viewPadding.bottom + 96,
+          ),
           children: [
-            TextFormField(
-              controller: _nameCtrl,
-              decoration: InputDecoration(
-                labelText: l?.vehicleNameLabel ?? 'Name',
-                hintText: l?.vehicleNameHint ?? 'e.g. My Tesla Model 3',
-              ),
-              validator: (v) => (v == null || v.trim().isEmpty)
-                  ? (l?.fieldRequired ?? 'Required')
-                  : null,
+            // Big brand-tinted header — #751 §3 bullet 2.
+            _VehicleHeader(
+              name: _nameCtrl.text,
+              accent: accent,
+              type: _type,
             ),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: _vinCtrl,
-              decoration: InputDecoration(
-                labelText: l?.vinLabel ?? 'VIN (optional)',
-                suffixIcon: _decodingVin
-                    ? const Padding(
-                        padding: EdgeInsets.all(12),
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      )
-                    : IconButton(
-                        icon: const Icon(Icons.search),
-                        tooltip: l?.vinDecodeTooltip ?? 'Decode VIN',
-                        onPressed: _decodeVin,
-                      ),
-              ),
+            // Card 1: Identity (name + VIN).
+            FormSectionCard(
+              title: l?.vehicleSectionIdentityTitle ?? 'Identity',
+              subtitle: l?.vehicleSectionIdentitySubtitle ?? 'Name & VIN',
+              icon: Icons.badge_outlined,
+              accent: accent,
+              children: [
+                FormFieldTile(
+                  icon: Icons.directions_car_outlined,
+                  color: accent,
+                  content: TextFormField(
+                    controller: _nameCtrl,
+                    decoration: InputDecoration(
+                      labelText: l?.vehicleNameLabel ?? 'Name',
+                      hintText: l?.vehicleNameHint ?? 'e.g. My Tesla Model 3',
+                      border: const OutlineInputBorder(),
+                    ),
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? (l?.fieldRequired ?? 'Required')
+                        : null,
+                  ),
+                ),
+                FormFieldTile(
+                  icon: Icons.qr_code_2_outlined,
+                  color: accent,
+                  content: TextFormField(
+                    controller: _vinCtrl,
+                    decoration: InputDecoration(
+                      labelText: l?.vinLabel ?? 'VIN (optional)',
+                      border: const OutlineInputBorder(),
+                      suffixIcon: _decodingVin
+                          ? const Padding(
+                              padding: EdgeInsets.all(12),
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2),
+                              ),
+                            )
+                          : IconButton(
+                              icon: const Icon(Icons.search),
+                              tooltip: l?.vinDecodeTooltip ?? 'Decode VIN',
+                              onPressed: _decodeVin,
+                            ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
-            _TypeSelector(
-              selected: _type,
-              onChanged: (t) => setState(() => _type = t),
+            // Card 2: Drivetrain (type + type-specific fields).
+            FormSectionCard(
+              title: l?.vehicleSectionDrivetrainTitle ?? 'Drivetrain',
+              subtitle: l?.vehicleSectionDrivetrainSubtitle ??
+                  'How this vehicle moves',
+              icon: Icons.settings_outlined,
+              accent: accent,
+              children: [
+                _TypeSelector(
+                  selected: _type,
+                  onChanged: (t) => setState(() => _type = t),
+                ),
+                const SizedBox(height: 8),
+                if (showEv) ...[
+                  VehicleEvSection(
+                    batteryController: _batteryCtrl,
+                    maxChargingKwController: _maxKwCtrl,
+                    minSocController: _minSocCtrl,
+                    maxSocController: _maxSocCtrl,
+                    connectors: _connectors,
+                    onToggleConnector: (c) => setState(() {
+                      if (_connectors.contains(c)) {
+                        _connectors.remove(c);
+                      } else {
+                        _connectors.add(c);
+                      }
+                    }),
+                    numberValidator: _validateOptionalNumber,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                if (showCombustion)
+                  VehicleCombustionSection(
+                    tankController: _tankCtrl,
+                    fuelTypeController: _fuelTypeCtrl,
+                    numberValidator: _validateOptionalNumber,
+                  ),
+              ],
             ),
-            const SizedBox(height: 24),
-            if (showEv) ...[
-              VehicleEvSection(
-                batteryController: _batteryCtrl,
-                maxChargingKwController: _maxKwCtrl,
-                minSocController: _minSocCtrl,
-                maxSocController: _maxSocCtrl,
-                connectors: _connectors,
-                onToggleConnector: (c) => setState(() {
-                  if (_connectors.contains(c)) {
-                    _connectors.remove(c);
-                  } else {
-                    _connectors.add(c);
-                  }
-                }),
-                numberValidator: _validateOptionalNumber,
-              ),
-              const SizedBox(height: 24),
-            ],
-            if (showCombustion)
-              VehicleCombustionSection(
-                tankController: _tankCtrl,
-                fuelTypeController: _fuelTypeCtrl,
-                numberValidator: _validateOptionalNumber,
-              ),
-            // OBD2 adapter pairing section (#779). Shown for saved
+            // Card 3: OBD2 adapter pairing (#779). Shown for saved
             // vehicles only — pairing needs a stable vehicle id so
             // the adapter MAC attaches to something that already
             // exists in storage.
             if (_existingId != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               VehicleAdapterSection(
                 adapterMac: _adapterMac,
                 adapterName: _adapterName,
@@ -465,7 +518,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
             // baselines from previous OBD2 trips — hide it during
             // the Add flow to avoid confusing the first-run UX.
             if (_existingId != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               VehicleBaselineSection(vehicleId: _existingId!),
             ],
             // η_v calibration reset (#815). Lives in the same
@@ -486,19 +539,176 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
             // adding a new vehicle hit Save first, then return to
             // edit and see this section.
             if (_existingId != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               ServiceReminderSection(
                 vehicleId: _existingId!,
                 currentOdometerKm: _latestOdometerKm(_existingId!),
               ),
             ],
-            const SizedBox(height: 32),
-            FilledButton.icon(
-              onPressed: _save,
-              icon: const Icon(Icons.save),
-              label: Text(l?.save ?? 'Save'),
+          ],
+        ),
+      ),
+      // Big primary Save pinned at the bottom (#751 §3). Using
+      // `bottomNavigationBar` guarantees the widget is always in
+      // the element tree even when the form scrolls off screen —
+      // which tests (and TalkBack) depend on for `ensureVisible`.
+      bottomNavigationBar: _VehicleSaveBar(onSave: _save),
+    );
+  }
+
+  /// Resolve a brand-accent color from the vehicle name when we can
+  /// recognise a known brand. Falls back to the theme primary when
+  /// no brand can be matched — which keeps first-run vehicles from
+  /// looking under-styled.
+  Color _brandAccent(BuildContext context) {
+    final theme = Theme.of(context);
+    final name = _nameCtrl.text;
+    if (name.isEmpty) return theme.colorScheme.primary;
+    // Brand mapper works on fuel-station brands; we share it because
+    // a lot of vehicle nameplates overlap (Shell, Esso obviously not;
+    // Aral no; but users type names like "Shell car" rarely). The
+    // hasLogo check proves the brand is mapped.
+    final lower = name.toLowerCase();
+    for (final token in lower.split(RegExp(r'\s+'))) {
+      if (BrandLogoMapper.hasLogo(token)) {
+        return theme.colorScheme.primary;
+      }
+    }
+    return theme.colorScheme.primary;
+  }
+}
+
+/// Pinned bottom Save bar on the restyled edit-vehicle form
+/// (#751 §3). Uses `bottomNavigationBar` so the CTA is always one
+/// tap away regardless of scroll position, and respects the system
+/// nav-bar inset (see `feedback_scaffold_inset_doubling.md`).
+class _VehicleSaveBar extends StatelessWidget {
+  final VoidCallback onSave;
+  const _VehicleSaveBar({required this.onSave});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Material(
+      elevation: 8,
+      color: theme.colorScheme.surface,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: FilledButton.icon(
+            onPressed: onSave,
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(52),
+            ),
+            icon: const Icon(Icons.save),
+            label: Text(l?.save ?? 'Save'),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Card-free big header rendered at the top of the restyled form
+/// (#751 §3). Shows the vehicle's name as a large title plus a tiny
+/// "plate" chip with the drivetrain icon — a visual anchor that
+/// turns the edit screen into "this vehicle's page" instead of "a
+/// long list of fields".
+class _VehicleHeader extends StatelessWidget {
+  final String name;
+  final Color accent;
+  final VehicleType type;
+
+  const _VehicleHeader({
+    required this.name,
+    required this.accent,
+    required this.type,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
+    final displayName = name.trim().isEmpty
+        ? (l?.vehicleHeaderUntitled ?? 'New vehicle')
+        : name.trim();
+    final typeLabel = switch (type) {
+      VehicleType.ev => l?.vehicleTypeEv ?? 'Electric',
+      VehicleType.hybrid => l?.vehicleTypeHybrid ?? 'Hybrid',
+      VehicleType.combustion => l?.vehicleTypeCombustion ?? 'Combustion',
+    };
+    final typeIcon = switch (type) {
+      VehicleType.ev => Icons.electric_car,
+      VehicleType.hybrid => Icons.directions_car_filled,
+      VehicleType.combustion => Icons.local_gas_station,
+    };
+
+    return Semantics(
+      container: true,
+      label: '$displayName · $typeLabel',
+      child: ExcludeSemantics(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: accent.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(typeIcon, size: 36, color: accent),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    displayName,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  _PlateChip(label: typeLabel, accent: accent),
+                ],
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PlateChip extends StatelessWidget {
+  final String label;
+  final Color accent;
+
+  const _PlateChip({required this.label, required this.accent});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.10),
+        border: Border.all(color: accent.withValues(alpha: 0.4)),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: accent,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 1.2,
         ),
       ),
     );

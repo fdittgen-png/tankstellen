@@ -5984,6 +5984,120 @@ abstract class AppLocalizations {
   /// **'You typed'**
   String get badScanReportHeaderYouTyped;
 
+  /// Card title grouping date, fuel and quantity inputs on the Add-Fill-up form (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'What you filled'**
+  String get fillUpSectionWhatTitle;
+
+  /// Sub-title for the 'What you filled' card (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel, amount, price'**
+  String get fillUpSectionWhatSubtitle;
+
+  /// Card title grouping station, odometer and notes on the Add-Fill-up form (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Where you were'**
+  String get fillUpSectionWhereTitle;
+
+  /// Sub-title for the 'Where you were' card (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Station, odometer, notes'**
+  String get fillUpSectionWhereSubtitle;
+
+  /// Chip label that opens the import bottom sheet with receipt / pump / OBD-II options (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Import from…'**
+  String get fillUpImportFromLabel;
+
+  /// Bottom-sheet title for the import-from chooser (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Import fill-up data'**
+  String get fillUpImportSheetTitle;
+
+  /// Import option: OCR-scan a paper receipt (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt'**
+  String get fillUpImportReceiptLabel;
+
+  /// Subtitle for the receipt-scan import option (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Scan a paper receipt with the camera'**
+  String get fillUpImportReceiptDescription;
+
+  /// Import option: OCR-scan the fuel-pump LCD (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Pump display'**
+  String get fillUpImportPumpLabel;
+
+  /// Subtitle for the pump-display import option (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Read Betrag / Preis from the pump LCD'**
+  String get fillUpImportPumpDescription;
+
+  /// Import option: pull the odometer reading via OBD-II Bluetooth (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'OBD-II adapter'**
+  String get fillUpImportObdLabel;
+
+  /// Subtitle for the OBD-II import option (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Read odometer from the OBD-II port over Bluetooth'**
+  String get fillUpImportObdDescription;
+
+  /// Read-only derived value shown below the cost field when liters + cost are both entered (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Price per liter'**
+  String get fillUpPricePerLiterLabel;
+
+  /// Tiny chip label shown next to the big vehicle title on the edit screen header (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Plate'**
+  String get vehicleHeaderPlateLabel;
+
+  /// Placeholder shown in the vehicle header when no name has been typed yet (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'New vehicle'**
+  String get vehicleHeaderUntitled;
+
+  /// Card title grouping name + VIN on the edit-vehicle form (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Identity'**
+  String get vehicleSectionIdentityTitle;
+
+  /// Sub-title for the identity card (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Name & VIN'**
+  String get vehicleSectionIdentitySubtitle;
+
+  /// Card title grouping vehicle type (combustion/hybrid/EV) and the type-specific inputs (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Drivetrain'**
+  String get vehicleSectionDrivetrainTitle;
+
+  /// Sub-title for the drivetrain card (#751 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'How this vehicle moves'**
+  String get vehicleSectionDrivetrainSubtitle;
+
   /// Title of the optional onboarding step (#816) that offers to connect an OBD2 adapter, read the VIN, and auto-fill the vehicle profile.
   ///
   /// In en, this message translates to:

@@ -1,0 +1,21 @@
+{
+  "fillUpSectionWhatTitle": "Was du getankt hast",
+  "fillUpSectionWhatSubtitle": "Kraftstoff, Menge, Preis",
+  "fillUpSectionWhereTitle": "Wo du warst",
+  "fillUpSectionWhereSubtitle": "Tankstelle, Kilometerstand, Notizen",
+  "fillUpImportFromLabel": "Importieren aus…",
+  "fillUpImportSheetTitle": "Tankvorgang importieren",
+  "fillUpImportReceiptLabel": "Beleg",
+  "fillUpImportReceiptDescription": "Papierbeleg mit der Kamera scannen",
+  "fillUpImportPumpLabel": "Zapfsäulen-Display",
+  "fillUpImportPumpDescription": "Betrag / Preis vom Zapfsäulen-Display lesen",
+  "fillUpImportObdLabel": "OBD-II-Adapter",
+  "fillUpImportObdDescription": "Kilometerstand über OBD-II per Bluetooth abrufen",
+  "fillUpPricePerLiterLabel": "Preis pro Liter",
+  "vehicleHeaderPlateLabel": "Kennzeichen",
+  "vehicleHeaderUntitled": "Neues Fahrzeug",
+  "vehicleSectionIdentityTitle": "Identität",
+  "vehicleSectionIdentitySubtitle": "Name & FIN",
+  "vehicleSectionDrivetrainTitle": "Antrieb",
+  "vehicleSectionDrivetrainSubtitle": "Wie sich dieses Fahrzeug bewegt"
+}
