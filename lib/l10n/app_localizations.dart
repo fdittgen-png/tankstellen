@@ -5876,6 +5876,84 @@ abstract class AppLocalizations {
   /// **'{stationCount} stations dropped by up to {maxDropCents}¢ in the last hour'**
   String velocityAlertBody(int stationCount, int maxDropCents);
 
+  /// Label for the fuel fill-ups tab on the ConsumptionScreen (#582 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel'**
+  String get consumptionTabFuel;
+
+  /// Label for the EV charging logs tab on the ConsumptionScreen (#582 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Charging'**
+  String get consumptionTabCharging;
+
+  /// Empty-state title on the Charging tab when no sessions have been logged (#582 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'No charging logs yet'**
+  String get noChargingLogsTitle;
+
+  /// Empty-state subtitle on the Charging tab (#582 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Log your first charging session to start tracking EUR/100 km and kWh/100 km.'**
+  String get noChargingLogsSubtitle;
+
+  /// Floating-action-button label on the Charging tab for adding a new session (#582 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Log charging'**
+  String get addChargingLog;
+
+  /// AppBar title for the Add-Charging-Log screen (#582 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Log charging session'**
+  String get addChargingLogTitle;
+
+  /// Label for the kWh numeric input on the Add-Charging-Log form (#582 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Energy (kWh)'**
+  String get chargingKwh;
+
+  /// Label for the cost numeric input on the Add-Charging-Log form (#582 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Total cost'**
+  String get chargingCost;
+
+  /// Label for the charge-time numeric input on the Add-Charging-Log form (#582 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Charge time (min)'**
+  String get chargingTimeMin;
+
+  /// Label for the free-form station-name input on the Add-Charging-Log form (#582 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Station (optional)'**
+  String get chargingStationName;
+
+  /// Derived EUR/100km readout on the Add-Charging-Log form (#582 phase 2). Shown when odometer + cost are both entered and a previous log exists.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} EUR / 100 km'**
+  String chargingEurPer100km(String value);
+
+  /// Derived kWh/100km readout on the Add-Charging-Log form (#582 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'{value} kWh / 100 km'**
+  String chargingKwhPer100km(String value);
+
+  /// Helper text under the cost field when there is no prior charging log for the selected vehicle, so the EUR/100 km cannot be computed yet (#582 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Need a previous log to compare'**
+  String get chargingDerivedHelper;
+
   /// Snackbar shown on the Add-Fill-Up screen when the receipt scan returns no usable fields (#751).
   ///
   /// In en, this message translates to:
