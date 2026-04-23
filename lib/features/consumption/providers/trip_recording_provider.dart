@@ -13,6 +13,9 @@ import '../../search/domain/entities/fuel_type.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/baseline_store.dart';
+import '../data/obd2/adapter_registry.dart';
+import '../data/obd2/adapter_reconnect_scanner.dart';
+import '../data/obd2/obd2_connection_service.dart';
 import '../data/obd2/obd2_service.dart';
 import '../data/obd2/trip_recording_controller.dart';
 import '../data/trip_history_repository.dart';
@@ -158,10 +161,19 @@ class TripRecording extends _$TripRecording {
     // Hive box (#797 phase 1). Cheap Riverpod cache hit — same
     // provider call used again below for the baseline store.
     final eagerVehicleId = _tryReadActiveVehicle()?.id;
+    // #797 phase 3 — pass the pinned MAC + a factory for the auto-
+    // reconnect scanner. Null MAC (unpaired vehicle) skips the
+    // scanner entirely and leaves the grace-window path as the sole
+    // recovery mechanism. The factory uses the already-wired
+    // [Obd2ConnectionService] to drive the BT scan + reconnect,
+    // keeping the controller free of plugin imports.
+    final pinnedMac = activeVehicle?.obd2AdapterMac;
     final ctl = TripRecordingController(
       service: service,
       vehicle: activeVehicle,
       vehicleId: eagerVehicleId,
+      pinnedAdapterMac: pinnedMac,
+      reconnectScannerFactory: _buildReconnectScannerFactory(),
     );
     _controller = ctl;
     _classifier = SituationClassifier();
@@ -481,6 +493,69 @@ class TripRecording extends _$TripRecording {
     } catch (e) {
       debugPrint('TripRecording.stop: baseline sync failed: $e');
     }
+  }
+
+  /// Build the reconnect-scanner factory handed to
+  /// [TripRecordingController] (#797 phase 3). The returned closure
+  /// is called once per drop with the pinned MAC + an onReconnect
+  /// hook; it wires the scanner's probe and connect callbacks to
+  /// the already-provided [Obd2ConnectionService].
+  ///
+  /// Returns null in tests / environments where [obd2ConnectionProvider]
+  /// can't be resolved — in that case the controller falls back to
+  /// the grace-window-only recovery.
+  AdapterReconnectScanner? Function(
+    String pinnedMac,
+    VoidCallback onReconnect,
+  )? _buildReconnectScannerFactory() {
+    final Obd2ConnectionService connection;
+    try {
+      connection = ref.read(obd2ConnectionProvider);
+    } catch (e) {
+      debugPrint('TripRecording: connection provider unavailable: $e');
+      return null;
+    }
+    return (pinnedMac, onReconnect) {
+      ResolvedObd2Candidate? lastCandidate;
+      return AdapterReconnectScanner(
+        pinnedMac: pinnedMac,
+        probe: (mac) async {
+          try {
+            // One scan window per probe — the service closes it at
+            // its built-in timeout. We take the first batch that
+            // contains the pinned MAC and short-circuit.
+            await for (final batch in connection.scan()) {
+              for (final c in batch) {
+                if (c.candidate.deviceId == mac) {
+                  lastCandidate = c;
+                  return true;
+                }
+              }
+            }
+          } catch (e) {
+            debugPrint('TripRecording reconnect probe failed: $e');
+          }
+          return false;
+        },
+        connect: (mac) async {
+          final candidate = lastCandidate;
+          if (candidate == null) return false;
+          try {
+            final svc = await connection.connect(candidate);
+            // Swap the controller's owned service pointer and
+            // hand ownership of the old (dead) service over to
+            // GC. The controller's scheduler will re-prime
+            // against the new transport on the next tick.
+            _service = svc;
+            return true;
+          } catch (e) {
+            debugPrint('TripRecording reconnect connect failed: $e');
+            return false;
+          }
+        },
+        onReconnect: onReconnect,
+      );
+    };
   }
 
   Future<void> _saveToHistory(TripSummary summary) async {

@@ -1346,5 +1346,12 @@
   "alertsRadiusDeleteConfirm": "Delete radius alert?",
   "@alertsRadiusDeleteConfirm": {
     "description": "Snackbar/confirm text shown when a radius alert is dismissed for deletion (#578)."
+  },
+  "obd2ConnectedTooltip": "OBD2 connected: {adapterName}",
+  "@obd2ConnectedTooltip": {
+    "description": "Tooltip on the title-bar OBD2 status chip (#797 phase 3) shown only when the pinned adapter is currently connected.",
+    "placeholders": {
+      "adapterName": { "type": "String", "example": "vLinker FS" }
+    }
   }
 }

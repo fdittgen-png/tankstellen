@@ -3150,4 +3150,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get alertsRadiusDeleteConfirm => 'Umkreis-Alarm löschen?';
+
+  @override
+  String obd2ConnectedTooltip(String adapterName) {
+    return 'OBD2 verbunden: $adapterName';
+  }
 }

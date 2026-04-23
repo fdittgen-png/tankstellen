@@ -7,6 +7,7 @@ import '../../../../core/storage/hive_boxes.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../domain/trip_recorder.dart';
 import '../trip_history_repository.dart';
+import 'adapter_reconnect_scanner.dart';
 import 'elm327_protocol.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_service.dart';
@@ -79,6 +80,13 @@ class TripLiveReading {
 /// banner — that lands in phase 2 alongside the auto-reconnect
 /// scanner. Phase 1's job is to make the state observable so the
 /// follow-up PR can react to it.
+///
+/// phase 3 (#797) wires an [AdapterReconnectScanner] into
+/// [_handleDrop]: while the controller is in
+/// [TripRecordingControllerState.pausedDueToDrop] the scanner
+/// periodically probes for the pinned adapter's MAC. On a
+/// reconnect the scanner fires [TripRecordingController.resume]
+/// and the grace timer is cancelled before the window elapses.
 enum TripRecordingControllerState {
   idle,
   recording,
@@ -208,6 +216,28 @@ class TripRecordingController {
   final Duration _dropWindow;
   final int _dropThreshold;
 
+  /// Pinned adapter MAC that the auto-reconnect scanner (#797 phase 3)
+  /// will search for when a drop flips us into
+  /// [TripRecordingControllerState.pausedDueToDrop]. Null-able
+  /// because the vehicle profile may not carry an adapter pairing
+  /// yet (fresh profiles, or users who never ran the picker). When
+  /// null the scanner is not started and the grace-window path
+  /// remains the only recovery mechanism.
+  final String? _pinnedAdapterMac;
+
+  /// Factory used by [_handleDrop] to construct the reconnect
+  /// scanner (#797 phase 3). Takes the pinned MAC + the callback to
+  /// fire on reconnect and returns a fresh scanner. Tests inject a
+  /// fake factory that returns an in-memory scanner with a clock
+  /// they control; production passes null and the controller builds
+  /// nothing — wiring the real BT scan layer is the provider's job.
+  final AdapterReconnectScanner? Function(
+    String pinnedMac,
+    VoidCallback onReconnect,
+  )? _reconnectScannerFactory;
+
+  AdapterReconnectScanner? _reconnectScanner;
+
   final StreamController<TripLiveReading> _liveController =
       StreamController<TripLiveReading>.broadcast();
 
@@ -264,6 +294,11 @@ class TripRecordingController {
     Duration dropWindow = const Duration(seconds: 5),
     int dropThreshold = 3,
     Duration schedulerTickRate = const Duration(milliseconds: 100),
+    String? pinnedAdapterMac,
+    AdapterReconnectScanner? Function(
+      String pinnedMac,
+      VoidCallback onReconnect,
+    )? reconnectScannerFactory,
   })  : _service = service,
         _recorder = recorder ?? TripRecorder(),
         _pollInterval = pollInterval,
@@ -276,7 +311,9 @@ class TripRecordingController {
         _pauseGraceWindow = pauseGraceWindow,
         _dropWindow = dropWindow,
         _dropThreshold = dropThreshold,
-        _schedulerTickRate = schedulerTickRate;
+        _schedulerTickRate = schedulerTickRate,
+        _pinnedAdapterMac = pinnedAdapterMac,
+        _reconnectScannerFactory = reconnectScannerFactory;
 
   /// Live metrics stream — subscribe to update the recording UI.
   Stream<TripLiveReading> get live => _liveController.stream;
@@ -328,6 +365,13 @@ class TripRecordingController {
       _graceTimer?.cancel();
       _graceTimer = null;
       _pausedDueToDrop = false;
+      // Also tear down the auto-reconnect scanner (#797 phase 3) —
+      // either we got here because the scanner fired its callback
+      // (in which case it already stopped itself), or the user
+      // tapped "Resume" manually on the pause banner before the
+      // scanner reconnected. Either way, no scanner should survive
+      // the resume transition.
+      unawaited(_stopReconnectScanner());
       // Clear the paused-trips box row — the session is live again,
       // so leaving the partial behind would let a subsequent pause
       // stomp over the in-memory state. Best-effort.
@@ -378,6 +422,7 @@ class TripRecordingController {
     _emitTimer = null;
     _graceTimer?.cancel();
     _graceTimer = null;
+    await _stopReconnectScanner();
     _started = false;
     _stopped = true;
     _pausedDueToDrop = false;
@@ -499,7 +544,51 @@ class TripRecordingController {
     _persistPausedSnapshot();
     _graceTimer?.cancel();
     _graceTimer = Timer(_pauseGraceWindow, _onGraceWindowElapsed);
+    _startReconnectScanner();
     _emitState();
+  }
+
+  /// Kick off the auto-reconnect scanner (#797 phase 3) if both the
+  /// vehicle profile has a pinned adapter MAC AND the provider wired
+  /// in a scanner factory. No-op in either's absence — the grace
+  /// timer remains the sole recovery path in that case.
+  ///
+  /// The [AdapterReconnectScanner]'s `onReconnect` callback is set
+  /// to call [resume] here — which cancels the grace timer, clears
+  /// the paused-trips row, and resumes the scheduler. Tests that
+  /// want to observe the reconnect path can watch [stateChanges]
+  /// for the recording → pausedDueToDrop → recording sequence.
+  void _startReconnectScanner() {
+    final mac = _pinnedAdapterMac;
+    final factory = _reconnectScannerFactory;
+    if (mac == null || factory == null) return;
+    final scanner = factory(mac, _onScannerReconnect);
+    if (scanner == null) return;
+    _reconnectScanner = scanner;
+    // Fire-and-forget — start() is an async scheduler boot that
+    // shouldn't block the drop handler. Errors inside the scanner
+    // are already caught internally.
+    unawaited(scanner.start());
+  }
+
+  void _onScannerReconnect() {
+    // The scanner self-stops before firing this callback, so we
+    // don't need to call stop() here. Just resume the trip — the
+    // ordinary resume() path cancels the grace timer and clears
+    // the paused-trips row.
+    _reconnectScanner = null;
+    if (_pausedDueToDrop) resume();
+  }
+
+  Future<void> _stopReconnectScanner() async {
+    final scanner = _reconnectScanner;
+    if (scanner == null) return;
+    _reconnectScanner = null;
+    try {
+      await scanner.stop();
+    } catch (e) {
+      debugPrint('TripRecordingController stop reconnect scanner: $e');
+    }
   }
 
   void _persistPausedSnapshot() {
@@ -524,6 +613,9 @@ class TripRecordingController {
 
   Future<void> _onGraceWindowElapsed() async {
     if (!_pausedDueToDrop) return;
+    // Stop the scanner before finalising — otherwise a late
+    // reconnect would race against an already-finalised trip.
+    await _stopReconnectScanner();
     final id = _sessionId;
     final repo = _resolvePausedRepo();
     final historyRepo = _resolveHistoryRepo();
@@ -827,6 +919,14 @@ class TripRecordingController {
     _graceTimer?.cancel();
     await _onGraceWindowElapsed();
   }
+
+  /// Exposed for tests: the auto-reconnect scanner instance created
+  /// by [_handleDrop] (#797 phase 3). Null when no scanner factory
+  /// is wired in or no pinned MAC is known — also null again after
+  /// a successful reconnect or a stop(), because the controller
+  /// releases the reference as soon as it's no longer needed.
+  @visibleForTesting
+  AdapterReconnectScanner? get debugReconnectScanner => _reconnectScanner;
 
   /// Exposed for tests: inject a hand-crafted [TripSample] directly
   /// into the underlying [TripRecorder]. Used by the #797 phase 1

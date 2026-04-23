@@ -1225,5 +1225,6 @@
   "alertsRadiusCenterPostalCode": "Postleitzahl",
   "alertsRadiusSave": "Speichern",
   "alertsRadiusCancel": "Abbrechen",
-  "alertsRadiusDeleteConfirm": "Umkreis-Alarm löschen?"
+  "alertsRadiusDeleteConfirm": "Umkreis-Alarm löschen?",
+  "obd2ConnectedTooltip": "OBD2 verbunden: {adapterName}"
 }

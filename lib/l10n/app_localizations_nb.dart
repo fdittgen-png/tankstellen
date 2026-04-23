@@ -3124,4 +3124,9 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get alertsRadiusDeleteConfirm => 'Delete radius alert?';
+
+  @override
+  String obd2ConnectedTooltip(String adapterName) {
+    return 'OBD2 connected: $adapterName';
+  }
 }

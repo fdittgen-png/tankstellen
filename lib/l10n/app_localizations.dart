@@ -5887,6 +5887,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete radius alert?'**
   String get alertsRadiusDeleteConfirm;
+
+  /// Tooltip on the title-bar OBD2 status chip (#797 phase 3) shown only when the pinned adapter is currently connected.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 connected: {adapterName}'**
+  String obd2ConnectedTooltip(String adapterName);
 }
 
 class _AppLocalizationsDelegate
