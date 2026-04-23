@@ -5,10 +5,15 @@ import 'package:flutter/foundation.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../../features/alerts/data/price_snapshot_store.dart';
+import '../../features/alerts/data/radius_alert_dedup.dart';
+import '../../features/alerts/data/radius_alert_runner.dart';
+import '../../features/alerts/data/radius_alert_store.dart';
 import '../../features/alerts/data/repositories/alert_repository.dart';
 import '../../features/alerts/data/velocity_alert_cooldown.dart';
 import '../../features/alerts/data/velocity_alert_runner.dart';
+import '../../features/alerts/domain/radius_alert_evaluator.dart';
 import '../../features/alerts/domain/velocity_alert_detector.dart';
+import '../../features/search/data/models/search_params.dart';
 import '../../features/price_history/data/models/price_record.dart';
 import '../../features/search/domain/entities/fuel_type.dart';
 import '../../features/widget/data/home_widget_service.dart';
@@ -348,6 +353,25 @@ Future<void> _refreshPricesAndCheckAlerts() async {
       }
     }
 
+    // 5c. #578 phase 3 — Radius alerts: iterate every enabled
+    //     RadiusAlert, query stations within its radius, and fire a
+    //     notification when any station is at or below the
+    //     threshold. Dedup remembers (alert, station) → (price, ts)
+    //     so we don't re-notify on every 1 h cycle while the station
+    //     stays cheap.
+    try {
+      final notifier = LocalNotificationService();
+      await notifier.initialize();
+      await _runRadiusAlerts(
+        storage: storage,
+        now: now,
+        notifier: notifier,
+        apiKey: apiKey,
+      );
+    } catch (e) {
+      debugPrint('BackgroundService: radius alert runner failed: $e');
+    }
+
     // 6. Update home screen widgets with latest favorite prices.
     //    Pass profile + settings storage so the widget can resolve the
     //    active profile's preferred fuel type and last-known GPS.
@@ -478,6 +502,105 @@ VelocityAlertCopy _buildVelocityCopy(VelocityAlertEvent event) {
     title: '$fuelLabel dropped at nearby stations',
     body:
         '$stationCount stations dropped by up to $maxCents¢ in the last hour',
+  );
+}
+
+/// #578 phase 3 — orchestrate radius-alert evaluation from the BG
+/// isolate.
+///
+/// Builds a per-alert sample list by searching the country's
+/// StationService for stations within the alert's radius, then hands
+/// off to [RadiusAlertRunner] which owns evaluator + dedup +
+/// notification firing.
+///
+/// Today the BG isolate only has a working [TankerkoenigStationService]
+/// (matches the per-station alert + velocity detector scope). Alerts
+/// centred on non-DE coordinates are skipped with a log line rather
+/// than dropped silently, so the user can tell why nothing arrived.
+/// Expanding BG coverage to every country API is tracked separately.
+Future<void> _runRadiusAlerts({
+  required HiveStorage storage,
+  required DateTime now,
+  required LocalNotificationService notifier,
+  required String? apiKey,
+}) async {
+  final store = RadiusAlertStore();
+  final alerts = await store.list();
+  final active = alerts.where((a) => a.enabled).toList();
+  if (active.isEmpty) {
+    debugPrint('BackgroundService: no active radius alerts');
+    return;
+  }
+
+  // Without a Tankerkoenig key the only useful source is the shared
+  // cache; skip rather than pretend we can search.
+  if (apiKey == null || apiKey.isEmpty) {
+    debugPrint(
+        'BackgroundService: radius alerts skipped — no Tankerkoenig API key');
+    return;
+  }
+
+  final dio = Dio(BaseOptions(
+    baseUrl: 'https://creativecommons.tankerkoenig.de/json',
+    connectTimeout: BackgroundService.bgConnectTimeout,
+    receiveTimeout: BackgroundService.bgReceiveTimeout,
+    queryParameters: {'apikey': apiKey},
+  ));
+  final service = TankerkoenigStationService(dio);
+
+  final runner = RadiusAlertRunner(
+    store: store,
+    dedup: RadiusAlertDedup(),
+    notifier: notifier,
+    copyBuilder: _buildRadiusAlertCopy,
+  );
+
+  final fired = await runner.run(
+    now: now,
+    samplesFor: (alert) async {
+      try {
+        final result = await service.searchStations(
+          SearchParams(
+            lat: alert.centerLat,
+            lng: alert.centerLng,
+            radiusKm: alert.radiusKm,
+          ),
+        );
+        final samples = <StationPriceSample>[];
+        for (final station in result.data) {
+          samples.addAll(StationPriceSample.fromStation(station));
+        }
+        return samples;
+      } catch (e) {
+        debugPrint(
+            'BackgroundService: radius alert samples for ${alert.id} failed: $e');
+        return const <StationPriceSample>[];
+      }
+    },
+  );
+  debugPrint('BackgroundService: ${fired.length} radius alerts fired');
+}
+
+/// Build notification copy for a radius alert. The BG isolate can't
+/// resolve the full ARB bundle (no BuildContext), so we pick German
+/// vs English from [Platform.localeName] and interpolate placeholders
+/// the same way the main-isolate preview does.
+RadiusAlertCopy _buildRadiusAlertCopy(RadiusAlertNotification event) {
+  final threshold = event.alert.threshold.toStringAsFixed(3);
+  final price = event.price.toStringAsFixed(3);
+  final fuelLabel = event.alert.fuelType.toUpperCase();
+  final label = event.alert.label;
+  final isGerman = Platform.localeName.toLowerCase().startsWith('de');
+  if (isGerman) {
+    return RadiusAlertCopy(
+      title: '$fuelLabel in der Nähe von $label',
+      body:
+          'Eine Tankstelle bietet $price € (Grenze: $threshold €)',
+    );
+  }
+  return RadiusAlertCopy(
+    title: '$fuelLabel near $label',
+    body: 'A station is at $price € (target: $threshold €)',
   );
 }
 

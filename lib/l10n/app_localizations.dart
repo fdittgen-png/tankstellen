@@ -6062,6 +6062,18 @@ abstract class AppLocalizations {
   /// **'Map location'**
   String get radiusAlertCenterFromMap;
 
+  /// Background notification title when a station in the radius drops to the alert threshold (#578 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuelLabel} near {label}'**
+  String radiusAlertNotificationTitle(String fuelLabel, String label);
+
+  /// Background notification body with the observed price and the user's threshold (#578 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'A station is at {price} € (target: {threshold} €)'**
+  String radiusAlertNotificationBody(String price, String threshold);
+
   /// Accessibility label announced by TalkBack/VoiceOver while the animated splash screen is visible. Not rendered visually; keep it concise and speakable.
   ///
   /// In en, this message translates to:

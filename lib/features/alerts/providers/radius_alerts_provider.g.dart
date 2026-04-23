@@ -65,6 +65,69 @@ final class RadiusAlertStoreProvider
 
 String _$radiusAlertStoreHash() => r'379932ffed7a9f10c6a9a32f77e0195d9f167316';
 
+/// Shared [RadiusAlertDedup] instance. Owns the per-(alert, station)
+/// "last notified" state consumed by the BG runner (#578 phase 3).
+/// Exposed here so the provider layer can purge dedup rows when a
+/// radius alert is deleted — otherwise stale rows would leak in the
+/// shared alerts box forever.
+
+@ProviderFor(radiusAlertDedup)
+final radiusAlertDedupProvider = RadiusAlertDedupProvider._();
+
+/// Shared [RadiusAlertDedup] instance. Owns the per-(alert, station)
+/// "last notified" state consumed by the BG runner (#578 phase 3).
+/// Exposed here so the provider layer can purge dedup rows when a
+/// radius alert is deleted — otherwise stale rows would leak in the
+/// shared alerts box forever.
+
+final class RadiusAlertDedupProvider
+    extends
+        $FunctionalProvider<
+          RadiusAlertDedup,
+          RadiusAlertDedup,
+          RadiusAlertDedup
+        >
+    with $Provider<RadiusAlertDedup> {
+  /// Shared [RadiusAlertDedup] instance. Owns the per-(alert, station)
+  /// "last notified" state consumed by the BG runner (#578 phase 3).
+  /// Exposed here so the provider layer can purge dedup rows when a
+  /// radius alert is deleted — otherwise stale rows would leak in the
+  /// shared alerts box forever.
+  RadiusAlertDedupProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'radiusAlertDedupProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$radiusAlertDedupHash();
+
+  @$internal
+  @override
+  $ProviderElement<RadiusAlertDedup> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  RadiusAlertDedup create(Ref ref) {
+    return radiusAlertDedup(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(RadiusAlertDedup value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<RadiusAlertDedup>(value),
+    );
+  }
+}
+
+String _$radiusAlertDedupHash() => r'4cbd5efc80bc437e286942ea63495d907ac35068';
+
 /// Radius-watchlist state (#578 phase 1).
 ///
 /// Loads the persisted list from the store on first read and exposes
@@ -108,7 +171,7 @@ final class RadiusAlertsProvider
   RadiusAlerts create() => RadiusAlerts();
 }
 
-String _$radiusAlertsHash() => r'635ffc03242162c975914d077f27c16748c32564';
+String _$radiusAlertsHash() => r'f061e4846f0e417feb7f40ebe3e52057c8a1f227';
 
 /// Radius-watchlist state (#578 phase 1).
 ///

@@ -1269,6 +1269,8 @@
   "radiusAlertMapPickerCancel": "Abbrechen",
   "radiusAlertMapPickerHint": "Karte verschieben, um das Alarm-Zentrum zu platzieren",
   "radiusAlertCenterFromMap": "Kartenposition",
+  "radiusAlertNotificationTitle": "{fuelLabel} in der Nähe von {label}",
+  "radiusAlertNotificationBody": "Eine Tankstelle bietet {price} € (Grenze: {threshold} €)",
   "splashLoadingLabel": "Tankstellen wird geladen",
   "@splashLoadingLabel": {
     "description": "Barrierefreiheits-Label, das TalkBack/VoiceOver während des animierten Splash-Screens ansagt. Wird nicht sichtbar gerendert; kurz und sprechbar halten."
