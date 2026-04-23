@@ -1211,5 +1211,6 @@
   "veCalibratedTitle": "Verbrauchsberechnung für {vehicleName} kalibriert — Genauigkeit verbessert um {percent}%",
   "veResetAction": "Kalibrierung zurücksetzen",
   "veResetConfirmTitle": "Kalibrierung zurücksetzen?",
-  "veResetConfirmBody": "Dies verwirft die gelernte fahrzeugspezifische Kalibrierung und stellt den Standardwert (0,85) wieder her."
+  "veResetConfirmBody": "Dies verwirft die gelernte fahrzeugspezifische Kalibrierung und stellt den Standardwert (0,85) wieder her.",
+  "obd2ConnectedTooltip": "OBD2 verbunden: {adapterName}"
 }

@@ -14,6 +14,7 @@ import '../../data/csv_exporter.dart';
 import '../../providers/consumption_providers.dart';
 import '../widgets/consumption_stats_card.dart';
 import '../widgets/fill_up_card.dart';
+import '../widgets/obd2_status_chip.dart';
 
 /// Lists all logged fill-ups with a summary stats card at the top.
 class ConsumptionScreen extends ConsumerWidget {
@@ -57,6 +58,10 @@ class ConsumptionScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         actions: [
+          // #797 phase 3 — title-bar chip announcing "OBD2 connected"
+          // when the pinned adapter is currently linked. Hides
+          // itself otherwise so unpaired users see no chrome.
+          const Obd2StatusChip(),
           IconButton(
             key: const Key('export_csv'),
             tooltip: 'Export CSV',
