@@ -3406,6 +3406,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get splashLoadingLabel => 'Tankstellen wird geladen';
 
   @override
+  String get themeSettingsSubtitlePrefix => 'Aktuell: ';
+
+  @override
+  String get themeSettingsDescription =>
+      'Wähle, wie die App aussehen soll. „Systemeinstellung“ übernimmt die Hell-/Dunkel-Einstellung deines Geräts.';
+
+  @override
+  String get themeSettingsPickerHeader => 'Darstellung';
+
+  @override
   String get vinLabel => 'FIN (optional)';
 
   @override

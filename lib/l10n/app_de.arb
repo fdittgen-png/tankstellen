@@ -1316,6 +1316,9 @@
   "@splashLoadingLabel": {
     "description": "Barrierefreiheits-Label, das TalkBack/VoiceOver während des animierten Splash-Screens ansagt. Wird nicht sichtbar gerendert; kurz und sprechbar halten."
   },
+  "themeSettingsSubtitlePrefix": "Aktuell: ",
+  "themeSettingsDescription": "Wähle, wie die App aussehen soll. „Systemeinstellung“ übernimmt die Hell-/Dunkel-Einstellung deines Geräts.",
+  "themeSettingsPickerHeader": "Darstellung",
   "vinLabel": "FIN (optional)",
   "vinDecodeTooltip": "FIN entschlüsseln",
   "vinConfirmAction": "Ja, automatisch ausfüllen",

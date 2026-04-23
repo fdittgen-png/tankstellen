@@ -3375,6 +3375,16 @@ class AppLocalizationsHr extends AppLocalizations {
   String get splashLoadingLabel => 'Loading Tankstellen';
 
   @override
+  String get themeSettingsSubtitlePrefix => 'Current: ';
+
+  @override
+  String get themeSettingsDescription =>
+      'Choose how the app looks. \"Follow system\" matches your device\'s light/dark preference.';
+
+  @override
+  String get themeSettingsPickerHeader => 'Appearance';
+
+  @override
   String get vinLabel => 'VIN (optional)';
 
   @override

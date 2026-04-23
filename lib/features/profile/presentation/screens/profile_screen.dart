@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/theme/theme_mode_provider.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../../core/theme/theme_mode_tile.dart';
 import '../../../consent/presentation/widgets/consent_settings_section.dart';
 import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
@@ -11,6 +11,7 @@ import '../widgets/profile_list_section.dart';
 import '../widgets/settings_menu_tile.dart';
 import '../widgets/storage_section.dart';
 import '../widgets/tank_sync_section.dart';
+import 'theme_settings_screen.dart';
 
 /// Settings / profile screen that composes extracted section widgets.
 ///
@@ -85,8 +86,29 @@ class ProfileScreen extends ConsumerWidget {
           // `lib/app/router.dart` for direct navigation (station
           // detail CTA, deep links).
 
-          // Theme mode — light / dark / follow system (#752).
-          const ThemeModeTile(),
+          // Theme — light / dark / follow system (#752, #897).
+          // Same widget class as the Privacy Dashboard and My vehicles
+          // menu tiles so the Settings screen reads as a consistent
+          // list of top-level destinations. Subtitle shows the active
+          // mode ("Current: Follow system") and rebuilds live when the
+          // user changes it on the `ThemeSettingsScreen`.
+          Consumer(
+            builder: (context, ref, _) {
+              final mode = ref.watch(themeModeSettingProvider);
+              final subtitlePrefix =
+                  l?.themeSettingsSubtitlePrefix ?? 'Current: ';
+              return SettingsMenuTile(
+                icon: Icons.palette_outlined,
+                title: l?.themeSettingTitle ?? 'Theme',
+                subtitle: '$subtitlePrefix${themeModeLabel(mode, l)}',
+                onTap: () => Navigator.of(context).push<void>(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const ThemeSettingsScreen(),
+                  ),
+                ),
+              );
+            },
+          ),
           const SizedBox(height: 8),
 
           // Storage & Cache

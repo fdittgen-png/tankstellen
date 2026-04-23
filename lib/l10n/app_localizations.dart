@@ -6326,6 +6326,24 @@ abstract class AppLocalizations {
   /// **'Loading Tankstellen'**
   String get splashLoadingLabel;
 
+  /// Prefix for the Theme settings card subtitle on the Settings screen. Followed by the localized current theme mode label (Light / Dark / Follow system).
+  ///
+  /// In en, this message translates to:
+  /// **'Current: '**
+  String get themeSettingsSubtitlePrefix;
+
+  /// Body copy on the Theme settings screen explaining what the three theme modes do. Matches the banner/body style of the Privacy Dashboard and Storage Dashboard screens.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how the app looks. \"Follow system\" matches your device\'s light/dark preference.'**
+  String get themeSettingsDescription;
+
+  /// Section header above the three-radio theme picker on the Theme settings screen (Light / Dark / Follow system).
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get themeSettingsPickerHeader;
+
   /// No description provided for @vinLabel.
   ///
   /// In en, this message translates to:

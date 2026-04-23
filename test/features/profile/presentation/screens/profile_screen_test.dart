@@ -208,8 +208,8 @@ void main() {
     });
 
     testWidgets(
-        '#896: renders exactly two SettingsMenuTile rows — the '
-        'Consumption log tile was the third and is removed',
+        '#896/#897: renders exactly three SettingsMenuTile rows — '
+        'My vehicles, Theme, Privacy Dashboard',
         (tester) async {
       await pumpApp(
         tester,
@@ -229,10 +229,12 @@ void main() {
 
       // Before #896 the Settings screen rendered three top-level
       // destinations: My vehicles, Consumption log, Privacy Dashboard.
-      // After #896 only My vehicles and Privacy Dashboard remain — a
-      // decrease of exactly one. `SettingsMenuTile.title` survives the
-      // lazy-list dispose, so we collect titles from every match we
-      // see instead of trusting the instant count.
+      // After #896 the Consumption log tile was removed. #897 then
+      // restyled the Theme section to use the same SettingsMenuTile,
+      // bringing the count back to three (My vehicles, Theme, Privacy
+      // Dashboard). `SettingsMenuTile.title` survives the lazy-list
+      // dispose, so we collect titles from every match we see instead
+      // of trusting the instant count.
       final observedTitles = <String>{};
       void collect() {
         for (final t in tester
@@ -253,6 +255,11 @@ void main() {
         reason: 'My vehicles tile should still render after #896',
       );
       expect(
+        observedTitles.contains('Theme'),
+        isTrue,
+        reason: '#897: Theme tile must render as a SettingsMenuTile',
+      );
+      expect(
         observedTitles.contains('Privacy Dashboard'),
         isTrue,
         reason: 'Privacy Dashboard tile should still render after #896',
@@ -264,10 +271,10 @@ void main() {
       );
       expect(
         observedTitles.length,
-        2,
-        reason: '#896: expected exactly two distinct SettingsMenuTile '
-            'titles (My vehicles, Privacy Dashboard) after removing '
-            'Consumption log; found $observedTitles',
+        3,
+        reason: '#897: expected exactly three distinct SettingsMenuTile '
+            'titles (My vehicles, Theme, Privacy Dashboard); '
+            'found $observedTitles',
       );
     });
 
