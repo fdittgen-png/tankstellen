@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/search/domain/entities/brand_registry.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';

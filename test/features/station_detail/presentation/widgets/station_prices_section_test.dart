@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/profile/domain/entities/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
