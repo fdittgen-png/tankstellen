@@ -71,8 +71,8 @@ class EVStationCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      station.operator.isNotEmpty
-                          ? station.operator
+                      (station.operator?.isNotEmpty ?? false)
+                          ? station.operator!
                           : station.name,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
@@ -81,9 +81,9 @@ class EVStationCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
-                    if (station.address.isNotEmpty)
+                    if ((station.address ?? '').isNotEmpty)
                       Text(
-                        station.address,
+                        station.address!,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -91,7 +91,7 @@ class EVStationCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     Text(
-                      '${station.postCode} ${station.place}'.trim(),
+                      '${station.postCode ?? ''} ${station.place ?? ''}'.trim(),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),

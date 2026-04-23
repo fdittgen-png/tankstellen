@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
-import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 
 import '../../../mocks/mocks.dart';
@@ -58,10 +58,9 @@ void main() {
         id: 'ev-1',
         name: 'Test Charger',
         operator: '',
-        lat: 48.0,
-        lng: 2.0,
+        latitude: 48.0,
+        longitude: 2.0,
         address: '',
-        connectors: [],
       );
 
       await container
@@ -121,13 +120,15 @@ void main() {
       expect(stations, isEmpty);
     });
 
-    test('loads persisted station data', () {
+    test('loads persisted station data (canonical key shape)', () {
       when(() => mockStorage.getEvFavoriteIds()).thenReturn(['ev-1']);
       when(() => mockStorage.getEvFavoriteStationData('ev-1')).thenReturn({
         'id': 'ev-1',
         'name': 'Test Charger',
-        'lat': 48.0, 'operator': '', 'address': '',
-        'lng': 2.0,
+        'latitude': 48.0,
+        'longitude': 2.0,
+        'operator': '',
+        'address': '',
         'connectors': <dynamic>[],
         'amenities': <dynamic>[],
       });
@@ -135,6 +136,28 @@ void main() {
       final stations = container.read(evFavoriteStationsProvider);
       expect(stations, hasLength(1));
       expect(stations.first.name, 'Test Charger');
+      expect(stations.first.latitude, 48.0);
+    });
+
+    test('loads persisted station data (legacy lat/lng key shape)', () {
+      // Pre-#560 the search-side entity persisted `lat`/`lng`. The
+      // unified entity must still parse this shape.
+      when(() => mockStorage.getEvFavoriteIds()).thenReturn(['ev-1']);
+      when(() => mockStorage.getEvFavoriteStationData('ev-1')).thenReturn({
+        'id': 'ev-1',
+        'name': 'Test Charger',
+        'lat': 48.0,
+        'lng': 2.0,
+        'operator': '',
+        'address': '',
+        'connectors': <dynamic>[],
+      });
+
+      final stations = container.read(evFavoriteStationsProvider);
+      expect(stations, hasLength(1));
+      expect(stations.first.name, 'Test Charger');
+      expect(stations.first.latitude, 48.0);
+      expect(stations.first.longitude, 2.0);
     });
 
     test('skips stations with no persisted data', () {
@@ -142,10 +165,11 @@ void main() {
       when(() => mockStorage.getEvFavoriteStationData('ev-1')).thenReturn({
         'id': 'ev-1',
         'name': 'Test Charger',
-        'lat': 48.0, 'operator': '', 'address': '',
-        'lng': 2.0,
+        'latitude': 48.0,
+        'longitude': 2.0,
+        'operator': '',
+        'address': '',
         'connectors': <dynamic>[],
-        'amenities': <dynamic>[],
       });
       when(() => mockStorage.getEvFavoriteStationData('ev-2'))
           .thenReturn(null);

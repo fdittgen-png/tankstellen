@@ -1,4 +1,4 @@
-import 'charging_station.dart';
+import '../../../ev/domain/entities/charging_station.dart';
 import 'station.dart';
 
 /// Unified result type for search results that can contain
@@ -34,17 +34,21 @@ class EVStationResult implements SearchResultItem {
   @override double get lat => station.lat;
   @override double get lng => station.lng;
   @override double get dist => station.dist;
-  @override String get displayName => station.operator.isNotEmpty
-      ? station.operator : station.name;
-  @override String get displayAddress => station.address;
+  @override String get displayName => (station.operator?.isNotEmpty ?? false)
+      ? station.operator! : station.name;
+  @override String get displayAddress => station.address ?? '';
   @override String get id => station.id;
 
   /// Maximum power across all connectors.
   double get maxPowerKW => station.connectors.isEmpty
       ? 0
-      : station.connectors.map((c) => c.powerKW).reduce((a, b) => a > b ? a : b);
+      : station.connectors.map((c) => c.maxPowerKw).reduce((a, b) => a > b ? a : b);
 
-  /// Unique connector type names.
-  List<String> get connectorTypes =>
-      station.connectors.map((c) => c.type).toSet().toList();
+  /// Unique connector type labels. Prefers the free-form [rawType]
+  /// when present (e.g. "CCS Type 2") so the UI can show the specific
+  /// OpenChargeMap label; falls back to the enum's localized label.
+  List<String> get connectorTypes => station.connectors
+      .map((c) => c.rawType ?? c.type.label)
+      .toSet()
+      .toList();
 }

@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
-import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 
@@ -12,6 +12,12 @@ import '../../../mocks/mocks.dart';
 /// favoritesProvider.toggleEv(), then verify it appears in
 /// evFavoriteStationsProvider. This is the exact chain the user
 /// exercises: EV detail screen → star tap → Favorites tab.
+///
+/// Post-#560, [ChargingStation.fromJson] handles BOTH `lat`/`lng` and
+/// `latitude`/`longitude` natively, so the old EvFavoriteStations
+/// fallback parser is gone and the test that used to exercise it now
+/// simply verifies the canonical fromJson handles the legacy key
+/// naming directly.
 void main() {
   late MockHiveStorage mockStorage;
 
@@ -20,19 +26,15 @@ void main() {
   late List<String> evIds;
   late Map<String, Map<String, dynamic>> evStationData;
 
-  // Canonical search/ ChargingStation — the single type used everywhere now.
+  // Canonical ChargingStation — the single unified type after #560.
   const testEvStation = ChargingStation(
     id: 'ev-42',
     name: 'Test Charger Paris',
     operator: 'Test Operator',
-    lat: 48.85,
-    lng: 2.35,
+    latitude: 48.85,
+    longitude: 2.35,
     address: '1 Rue de Test',
-    connectors: [],
   );
-
-  // Alias for tests that reference the "search" variant (same type now).
-  const testSearchEvStation = testEvStation;
 
   setUp(() {
     mockStorage = MockHiveStorage();
@@ -135,42 +137,55 @@ void main() {
     });
 
     test(
-      'search/ ChargingStation JSON stored by toggleEv is recovered by '
-      'EvFavoriteStations fallback parser',
+      'legacy-shape JSON (lat/lng keys) persisted by the pre-#560 '
+      'search/ ChargingStation round-trips natively through '
+      'ChargingStation.fromJson — no fallback parser needed',
       () async {
-        // Simulate what happens when the search results store a station
-        // using the search/ ChargingStation format (lat/lng keys instead
-        // of latitude/longitude):
-        final searchJson = testSearchEvStation.toJson();
-        evStationData['ev-42'] = searchJson;
+        // Simulate stored data from the pre-#560 search-side entity.
+        // The unified entity's fromJson handles the legacy shape
+        // directly, so EvFavoriteStations no longer needs a fallback
+        // parser hack.
+        final legacyJson = {
+          'id': 'ev-42',
+          'name': 'Test Charger Paris',
+          'operator': 'Test Operator',
+          'lat': 48.85,
+          'lng': 2.35,
+          'address': '1 Rue de Test',
+          'connectors': <dynamic>[],
+        };
+        evStationData['ev-42'] = legacyJson;
         evIds.add('ev-42');
 
         final container = createContainer();
         final stations = container.read(evFavoriteStationsProvider);
 
-        // The fallback parser should recover the station
+        // Canonical fromJson handles the legacy shape directly.
         expect(stations, hasLength(1));
         expect(stations.first.id, 'ev-42');
         expect(stations.first.lat, 48.85,
-            reason: 'fallback parser reads lat field as latitude');
+            reason: 'lat getter aliases latitude after #560');
+        expect(stations.first.latitude, 48.85);
+        expect(stations.first.longitude, 2.35);
         expect(stations.first.name, 'Test Charger Paris');
       },
     );
 
     test(
-      'CORRECT: ev/ ChargingStation round-trips correctly through storage',
+      'canonical ChargingStation round-trips through storage',
       () async {
         final container = createContainer();
 
-        // Use the ev/ entity directly (correct path)
         await container
             .read(favoritesProvider.notifier)
             .toggleEv('ev-42', stationData: testEvStation);
 
         final stations = container.read(evFavoriteStationsProvider);
         expect(stations, hasLength(1));
+        expect(stations.first.latitude, 48.85,
+            reason: 'canonical latitude preserved through storage');
         expect(stations.first.lat, 48.85,
-            reason: 'ev/ ChargingStation preserves coordinates through storage');
+            reason: 'lat getter still works on canonical entity');
       },
     );
   });

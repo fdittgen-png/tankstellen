@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/presentation/widgets/ev_favorite_card.dart';
-import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
+    show ConnectorType;
 
 import '../../../../helpers/pump_app.dart';
 
 ChargingStation _station({
   String name = 'IONITY Tournefeuille',
   String operator = 'IONITY',
-  List<Connector> connectors = const [],
+  List<EvConnector> connectors = const [],
 }) =>
     ChargingStation(
       id: 'ev-1',
       name: name,
       operator: operator,
-      lat: 43.5,
-      lng: 1.4,
+      latitude: 43.5,
+      longitude: 1.4,
       address: 'A64',
       connectors: connectors,
     );
@@ -50,9 +52,11 @@ void main() {
         tester,
         EvFavoriteCard(
           station: _station(connectors: const [
-            Connector(type: 'Type 2', powerKW: 22),
-            Connector(type: 'CCS', powerKW: 350),
-            Connector(type: 'CHAdeMO', powerKW: 50),
+            EvConnector(
+                id: '1', type: ConnectorType.type2, maxPowerKw: 22),
+            EvConnector(id: '2', type: ConnectorType.ccs, maxPowerKw: 350),
+            EvConnector(
+                id: '3', type: ConnectorType.chademo, maxPowerKw: 50),
           ]),
         ),
       );
@@ -74,9 +78,21 @@ void main() {
         tester,
         EvFavoriteCard(
           station: _station(connectors: const [
-            Connector(type: 'CCS', powerKW: 150, status: 'Available'),
-            Connector(type: 'Type 2', powerKW: 22, status: 'In Use'),
-            Connector(type: 'CCS', powerKW: 150, status: 'Unknown'),
+            EvConnector(
+                id: '1',
+                type: ConnectorType.ccs,
+                maxPowerKw: 150,
+                status: ConnectorStatus.available),
+            EvConnector(
+                id: '2',
+                type: ConnectorType.type2,
+                maxPowerKw: 22,
+                status: ConnectorStatus.occupied),
+            EvConnector(
+                id: '3',
+                type: ConnectorType.ccs,
+                maxPowerKw: 150,
+                status: ConnectorStatus.unknown),
           ]),
         ),
       );
@@ -90,7 +106,11 @@ void main() {
         tester,
         EvFavoriteCard(
           station: _station(connectors: const [
-            Connector(type: 'CCS', powerKW: 150, status: 'Available'),
+            EvConnector(
+                id: '1',
+                type: ConnectorType.ccs,
+                maxPowerKw: 150,
+                status: ConnectorStatus.available),
           ]),
         ),
       );
@@ -104,7 +124,11 @@ void main() {
         tester,
         EvFavoriteCard(
           station: _station(connectors: const [
-            Connector(type: 'CCS', powerKW: 150, status: 'In Use'),
+            EvConnector(
+                id: '1',
+                type: ConnectorType.ccs,
+                maxPowerKw: 150,
+                status: ConnectorStatus.occupied),
           ]),
         ),
       );
@@ -112,15 +136,28 @@ void main() {
       expect(icon.color, Colors.grey);
     });
 
-    testWidgets('deduplicates connector-type chips (shows each type once)',
+    testWidgets(
+        'deduplicates connector-type chips using rawType when present',
         (tester) async {
       await pumpApp(
         tester,
         EvFavoriteCard(
           station: _station(connectors: const [
-            Connector(type: 'CCS', powerKW: 150),
-            Connector(type: 'CCS', powerKW: 150),
-            Connector(type: 'Type 2', powerKW: 22),
+            EvConnector(
+                id: '1',
+                type: ConnectorType.ccs,
+                rawType: 'CCS',
+                maxPowerKw: 150),
+            EvConnector(
+                id: '2',
+                type: ConnectorType.ccs,
+                rawType: 'CCS',
+                maxPowerKw: 150),
+            EvConnector(
+                id: '3',
+                type: ConnectorType.type2,
+                rawType: 'Type 2',
+                maxPowerKw: 22),
           ]),
         ),
       );
@@ -135,8 +172,6 @@ void main() {
         tester,
         EvFavoriteCard(station: _station(), onTap: () => tapped++),
       );
-      // The outer Card→InkWell is our target; star-button has its
-      // own InkResponse so we need to tap the explicit station name.
       await tester.tap(find.text('IONITY Tournefeuille'));
       expect(tapped, 1);
     });

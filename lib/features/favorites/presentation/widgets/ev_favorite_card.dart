@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/charging_station.dart';
+import '../../../ev/domain/entities/charging_station.dart';
 
 /// Compact card for an EV charging station in the favorites list.
 ///
-/// Uses the canonical `search/` [ChargingStation] type with [Connector]
-/// (simple String fields) rather than the richer `ev/` type.
+/// Uses the canonical [ChargingStation] type (unified in #560) with
+/// the typed [EvConnector] instead of the previous free-form search
+/// side [Connector].
 class EvFavoriteCard extends StatelessWidget {
   final ChargingStation station;
   final VoidCallback? onTap;
@@ -23,14 +24,15 @@ class EvFavoriteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+    final operatorName = station.operator ?? '';
     final connectors = station.connectors;
     final available = connectors
-        .where((c) => c.status?.toLowerCase().contains('available') == true)
+        .where((c) => c.status == ConnectorStatus.available)
         .length;
     final total = connectors.length;
     final maxPower = connectors.isEmpty
         ? 0.0
-        : connectors.map((c) => c.powerKW).reduce((a, b) => a > b ? a : b);
+        : connectors.map((c) => c.maxPowerKw).reduce((a, b) => a > b ? a : b);
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -53,9 +55,9 @@ class EvFavoriteCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (station.operator.isNotEmpty)
+                    if (operatorName.isNotEmpty)
                       Text(
-                        station.operator,
+                        operatorName,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -95,7 +97,7 @@ class EvFavoriteCard extends StatelessWidget {
                         child: Wrap(
                           spacing: 4,
                           children: connectors
-                              .map((c) => c.type)
+                              .map((c) => c.rawType ?? c.type.label)
                               .toSet()
                               .map((type) => Chip(
                                     label: Text(type,

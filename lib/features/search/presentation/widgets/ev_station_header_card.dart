@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/charging_station.dart';
+import '../../../ev/domain/entities/charging_station.dart';
 
 /// Header card showing status, name, and operator for an EV station.
 class EVStationHeaderCard extends StatelessWidget {
@@ -19,6 +19,7 @@ class EVStationHeaderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+    final operatorName = station.operator ?? '';
 
     return Card(
       child: Padding(
@@ -59,8 +60,8 @@ class EVStationHeaderCard extends StatelessWidget {
               station.name,
               style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
-            if (station.operator.isNotEmpty && station.operator != station.name)
-              Text(station.operator, style: theme.textTheme.titleMedium?.copyWith(color: evColor)),
+            if (operatorName.isNotEmpty && operatorName != station.name)
+              Text(operatorName, style: theme.textTheme.titleMedium?.copyWith(color: evColor)),
           ],
         ),
       ),

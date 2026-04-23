@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/ev_station_header_card.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -13,11 +13,10 @@ void main() {
     address: '123 Test St',
     postCode: '12345',
     place: 'Test City',
-    lat: 48.5,
-    lng: 2.3,
+    latitude: 48.5,
+    longitude: 2.3,
     dist: 1.5,
     totalPoints: 4,
-    connectors: [],
   );
 
   group('EVStationHeaderCard', () {
@@ -54,11 +53,10 @@ void main() {
         address: '456 St',
         postCode: '00000',
         place: 'Place',
-        lat: 48.0,
-        lng: 2.0,
+        latitude: 48.0,
+        longitude: 2.0,
         dist: 1.0,
         totalPoints: 1,
-        connectors: [],
         isOperational: true,
       );
 

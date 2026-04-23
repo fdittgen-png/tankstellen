@@ -8,8 +8,8 @@ import '../../../../core/widgets/star_rating.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/presentation/screens/add_charging_log_screen.dart';
+import '../../../ev/domain/entities/charging_station.dart';
 import '../../../favorites/providers/favorites_provider.dart';
-import '../../domain/entities/charging_station.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../providers/ev_charging_service_provider.dart';
 import '../../providers/station_rating_provider.dart';
@@ -83,7 +83,7 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
   Future<void> _logCharging() async {
     final displayName = _station.name.trim().isNotEmpty
         ? _station.name
-        : _station.operator;
+        : (_station.operator ?? '');
     await Navigator.of(context).push<bool?>(
       MaterialPageRoute(
         builder: (_) => AddChargingLogScreen(
@@ -101,9 +101,10 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
     final evColor = FuelColors.forType(FuelType.electric);
     final station = _station;
 
+    final operatorName = station.operator ?? '';
     return Scaffold(
       appBar: AppBar(
-        title: Text(station.operator.isNotEmpty ? station.operator : station.name),
+        title: Text(operatorName.isNotEmpty ? operatorName : station.name),
         actions: [
           Consumer(builder: (context, ref, _) {
             final isFav = ref.watch(isFavoriteProvider(station.id));

@@ -5,7 +5,7 @@ import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
 import 'package:tankstellen/core/widgets/empty_state.dart';
 import 'package:tankstellen/core/widgets/shimmer_placeholder.dart';
-import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/ev_search_results_view.dart';
 import 'package:tankstellen/features/search/presentation/widgets/ev_station_card.dart';
 import 'package:tankstellen/features/search/providers/ev_search_provider.dart';
@@ -27,10 +27,9 @@ const _station = ChargingStation(
   id: 'ev-1',
   name: 'IONITY Tournefeuille',
   operator: 'IONITY',
-  lat: 43.5,
-  lng: 1.4,
+  latitude: 43.5,
+  longitude: 1.4,
   address: 'A64, Tournefeuille',
-  connectors: [],
 );
 
 ServiceResult<List<ChargingStation>> _data(List<ChargingStation> s) =>
@@ -77,7 +76,6 @@ void main() {
         (tester) async {
       await pump(tester, AsyncValue.data(_data(const [])));
       expect(find.byType(EmptyState), findsOneWidget);
-      // The icon pinned by the widget — keeps it recognisable.
       expect(find.byIcon(Icons.ev_station), findsOneWidget);
     });
 
@@ -112,9 +110,6 @@ void main() {
         ],
       );
 
-      // ServiceChainErrorWidget surfaces a retry affordance; if it
-      // doesn't, the error path is unusable. Find any tappable widget
-      // with a non-null onPressed and trigger it to simulate retry.
       final retryCandidates = [
         find.widgetWithText(FilledButton, 'Retry'),
         find.widgetWithText(TextButton, 'Retry'),
@@ -129,10 +124,6 @@ void main() {
           return;
         }
       }
-      // If no explicit Retry button is found, at minimum the error
-      // widget must be mounted so the user sees *something* — which
-      // is asserted by the other test. We don't hard-fail this test
-      // because the retry UX is owned by ServiceChainErrorWidget.
     });
   });
 }

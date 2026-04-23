@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
+    show ConnectorType;
 
 void main() {
   group('FuelStationResult', () {
@@ -70,14 +72,32 @@ void main() {
       id: 'ocm-789',
       name: 'Charger Name',
       operator: 'Ionity',
-      lat: 48.8566,
-      lng: 2.3522,
+      latitude: 48.8566,
+      longitude: 2.3522,
       dist: 1.5,
       address: '10 Rue de Rivoli',
       connectors: [
-        Connector(type: 'CCS Type 2', powerKW: 350, quantity: 4, currentType: 'DC'),
-        Connector(type: 'Type 2', powerKW: 22, quantity: 2, currentType: 'AC'),
-        Connector(type: 'CCS Type 2', powerKW: 150, quantity: 2, currentType: 'DC'),
+        EvConnector(
+            id: 'c1',
+            type: ConnectorType.ccs,
+            rawType: 'CCS Type 2',
+            maxPowerKw: 350,
+            quantity: 4,
+            currentType: 'DC'),
+        EvConnector(
+            id: 'c2',
+            type: ConnectorType.type2,
+            rawType: 'Type 2',
+            maxPowerKw: 22,
+            quantity: 2,
+            currentType: 'AC'),
+        EvConnector(
+            id: 'c3',
+            type: ConnectorType.ccs,
+            rawType: 'CCS Type 2',
+            maxPowerKw: 150,
+            quantity: 2,
+            currentType: 'DC'),
       ],
     );
 
@@ -106,10 +126,9 @@ void main() {
         id: 'ocm-1',
         name: 'Fallback Name',
         operator: '',
-        lat: 50.0,
-        lng: 8.0,
+        latitude: 50.0,
+        longitude: 8.0,
         address: 'Addr',
-        connectors: [],
       );
       const result = EVStationResult(stationNoOp);
 
@@ -133,21 +152,20 @@ void main() {
         id: 'ocm-empty',
         name: 'Empty',
         operator: 'Op',
-        lat: 50.0,
-        lng: 8.0,
+        latitude: 50.0,
+        longitude: 8.0,
         address: 'Addr',
-        connectors: [],
       );
       const result = EVStationResult(emptyStation);
 
       expect(result.maxPowerKW, 0);
     });
 
-    test('connectorTypes deduplicates types', () {
+    test('connectorTypes deduplicates labels (uses rawType when set)', () {
       const result = EVStationResult(chargingStation);
       final types = result.connectorTypes;
 
-      // 3 connectors but only 2 unique types: 'CCS Type 2' and 'Type 2'
+      // 3 connectors but only 2 unique labels: 'CCS Type 2' and 'Type 2'
       expect(types.length, 2);
       expect(types, containsAll(['CCS Type 2', 'Type 2']));
     });
@@ -176,10 +194,9 @@ void main() {
         id: 'ocm-1',
         name: 'E',
         operator: 'Op',
-        lat: 50,
-        lng: 8,
+        latitude: 50,
+        longitude: 8,
         address: 'A',
-        connectors: [],
       );
 
       final items = <SearchResultItem>[
