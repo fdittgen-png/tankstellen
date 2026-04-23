@@ -3230,6 +3230,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get radiusAlertCenterFromMap => 'Map location';
 
   @override
+  String get splashLoadingLabel => 'Loading Tankstellen';
+
+  @override
   String get vinLabel => 'VIN (optional)';
 
   @override

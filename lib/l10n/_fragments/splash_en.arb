@@ -1,0 +1,6 @@
+{
+  "splashLoadingLabel": "Loading Tankstellen",
+  "@splashLoadingLabel": {
+    "description": "Accessibility label announced by TalkBack/VoiceOver while the animated splash screen is visible. Not rendered visually; keep it concise and speakable."
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "splashLoadingLabel": "Tankstellen wird geladen",
+  "@splashLoadingLabel": {
+    "description": "Barrierefreiheits-Label, das TalkBack/VoiceOver während des animierten Splash-Screens ansagt. Wird nicht sichtbar gerendert; kurz und sprechbar halten."
+  }
+}
