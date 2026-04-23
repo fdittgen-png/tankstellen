@@ -5954,6 +5954,36 @@ abstract class AppLocalizations {
   /// **'Need a previous log to compare'**
   String get chargingDerivedHelper;
 
+  /// Primary action button on the EV station detail screen that opens the Add-Charging-Log form pre-filled with this station (#582 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Log charging'**
+  String get chargingLogButtonLabel;
+
+  /// Section title above the monthly charging-cost bar chart on the Charging tab (#582 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Charging cost trend'**
+  String get chargingCostTrendTitle;
+
+  /// Section title above the monthly kWh/100 km line chart on the Charging tab (#582 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Efficiency (kWh/100 km)'**
+  String get chargingEfficiencyTitle;
+
+  /// Empty-state caption shown inside the charging charts when no data is available for the last 6 months (#582 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough data yet'**
+  String get chargingChartsEmpty;
+
+  /// Axis label for the X axis (month) on the charging charts (#582 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get chargingChartsMonthAxis;
+
   /// Snackbar shown on the Add-Fill-Up screen when the receipt scan returns no usable fields (#751).
   ///
   /// In en, this message translates to:

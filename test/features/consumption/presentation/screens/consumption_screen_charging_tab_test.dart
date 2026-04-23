@@ -116,6 +116,15 @@ void main() {
 
     testWidgets('Charging tab renders a card per logged session',
         (tester) async {
+      // Phase-3 added a charts header above the log list. On the
+      // default 800px test surface the cards end up below the fold,
+      // so we enlarge the viewport for this assertion only —
+      // `ListView.builder` only mounts items in the visible range.
+      tester.view.physicalSize = const Size(900, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       final logs = [
         ChargingLog(
           id: 'c1',

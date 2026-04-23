@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../consumption/presentation/screens/add_charging_log_screen.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../../search/providers/station_rating_provider.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart'
@@ -87,6 +88,26 @@ class EvStationDetailScreen extends ConsumerWidget {
           if (station.connectors.isEmpty)
             Text(l10n?.evNoConnectors ?? 'No connector details available'),
           ...station.connectors.map((c) => _ConnectorTile(connector: c)),
+          const SizedBox(height: 16),
+          // Log-charging CTA — primary wheel-lens action (#582 phase 3).
+          FilledButton.icon(
+            key: const Key('ev_log_charging_button'),
+            onPressed: () => Navigator.of(context).push<bool?>(
+              MaterialPageRoute(
+                builder: (_) => AddChargingLogScreen(
+                  chargingStationId: station.id,
+                  stationName: station.name,
+                ),
+              ),
+            ),
+            icon: const Icon(Icons.ev_station),
+            label: Text(
+              l10n?.chargingLogButtonLabel ?? 'Log charging',
+            ),
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+            ),
+          ),
           const SizedBox(height: 16),
           // Rating stars
           _RatingRow(stationId: station.id),
