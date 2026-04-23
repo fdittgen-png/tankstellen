@@ -3126,6 +3126,70 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String get consumptionTabFuel => 'Fuel';
+
+  @override
+  String get consumptionTabCharging => 'Charging';
+
+  @override
+  String get chargingLogAddTitle => 'Log charging';
+
+  @override
+  String get chargingLogAddSubtitle => 'Record this charging session';
+
+  @override
+  String get chargingLogKwhLabel => 'Energy (kWh)';
+
+  @override
+  String get chargingLogCostLabel => 'Cost (EUR)';
+
+  @override
+  String get chargingLogTimeLabel => 'Charge time (minutes)';
+
+  @override
+  String get chargingLogOdometerLabel => 'Odometer (km)';
+
+  @override
+  String get chargingLogNotesLabel => 'Notes (optional)';
+
+  @override
+  String get chargingLogStationLabel => 'Station';
+
+  @override
+  String get chargingLogSave => 'Save';
+
+  @override
+  String get chargingLogCancel => 'Cancel';
+
+  @override
+  String get chargingLogStatsEurPer100Km => 'EUR / 100 km';
+
+  @override
+  String get chargingLogStatsTotalKwh => 'Total kWh';
+
+  @override
+  String get chargingLogStatsTotalCost => 'Total cost';
+
+  @override
+  String get chargingLogStatsCount => 'Sessions';
+
+  @override
+  String get chargingLogEmpty =>
+      'No charging sessions yet. Log one from the EV station detail screen.';
+
+  @override
+  String get chargingLogDeleteConfirm => 'Delete this charging session?';
+
+  @override
+  String get chargingLogValidationKwh => 'Enter the kWh delivered';
+
+  @override
+  String get chargingLogValidationCost => 'Enter the amount paid';
+
+  @override
+  String get chargingLogValidationNumber => 'Enter a valid number';
+
+  @override
   String get scanReceiptNoData => 'No receipt data found — try again';
 
   @override

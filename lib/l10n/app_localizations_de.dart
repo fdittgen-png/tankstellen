@@ -3152,6 +3152,70 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get consumptionTabFuel => 'Kraftstoff';
+
+  @override
+  String get consumptionTabCharging => 'Laden';
+
+  @override
+  String get chargingLogAddTitle => 'Ladevorgang protokollieren';
+
+  @override
+  String get chargingLogAddSubtitle => 'Diesen Ladevorgang aufzeichnen';
+
+  @override
+  String get chargingLogKwhLabel => 'Energie (kWh)';
+
+  @override
+  String get chargingLogCostLabel => 'Kosten (EUR)';
+
+  @override
+  String get chargingLogTimeLabel => 'Ladezeit (Minuten)';
+
+  @override
+  String get chargingLogOdometerLabel => 'Kilometerstand (km)';
+
+  @override
+  String get chargingLogNotesLabel => 'Notizen (optional)';
+
+  @override
+  String get chargingLogStationLabel => 'Ladestation';
+
+  @override
+  String get chargingLogSave => 'Speichern';
+
+  @override
+  String get chargingLogCancel => 'Abbrechen';
+
+  @override
+  String get chargingLogStatsEurPer100Km => 'EUR / 100 km';
+
+  @override
+  String get chargingLogStatsTotalKwh => 'Gesamt kWh';
+
+  @override
+  String get chargingLogStatsTotalCost => 'Gesamtkosten';
+
+  @override
+  String get chargingLogStatsCount => 'Ladungen';
+
+  @override
+  String get chargingLogEmpty =>
+      'Noch keine Ladevorgänge. Logge einen vom EV-Stationsdetail aus.';
+
+  @override
+  String get chargingLogDeleteConfirm => 'Diesen Ladevorgang löschen?';
+
+  @override
+  String get chargingLogValidationKwh => 'Bitte die gelieferten kWh eingeben';
+
+  @override
+  String get chargingLogValidationCost => 'Bitte den Betrag eingeben';
+
+  @override
+  String get chargingLogValidationNumber => 'Bitte eine gültige Zahl eingeben';
+
+  @override
   String get scanReceiptNoData =>
       'Keine Belegdaten gefunden — bitte erneut versuchen';
 

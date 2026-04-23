@@ -5876,6 +5876,132 @@ abstract class AppLocalizations {
   /// **'{stationCount} stations dropped by up to {maxDropCents}¢ in the last hour'**
   String velocityAlertBody(int stationCount, int maxDropCents);
 
+  /// Label for the fuel segment of the fuel/charging toggle on the consumption screen (#582 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel'**
+  String get consumptionTabFuel;
+
+  /// Label for the charging segment of the fuel/charging toggle on the consumption screen (#582 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Charging'**
+  String get consumptionTabCharging;
+
+  /// No description provided for @chargingLogAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log charging'**
+  String get chargingLogAddTitle;
+
+  /// No description provided for @chargingLogAddSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Record this charging session'**
+  String get chargingLogAddSubtitle;
+
+  /// No description provided for @chargingLogKwhLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy (kWh)'**
+  String get chargingLogKwhLabel;
+
+  /// No description provided for @chargingLogCostLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost (EUR)'**
+  String get chargingLogCostLabel;
+
+  /// No description provided for @chargingLogTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Charge time (minutes)'**
+  String get chargingLogTimeLabel;
+
+  /// No description provided for @chargingLogOdometerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Odometer (km)'**
+  String get chargingLogOdometerLabel;
+
+  /// No description provided for @chargingLogNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes (optional)'**
+  String get chargingLogNotesLabel;
+
+  /// No description provided for @chargingLogStationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Station'**
+  String get chargingLogStationLabel;
+
+  /// No description provided for @chargingLogSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get chargingLogSave;
+
+  /// No description provided for @chargingLogCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get chargingLogCancel;
+
+  /// No description provided for @chargingLogStatsEurPer100Km.
+  ///
+  /// In en, this message translates to:
+  /// **'EUR / 100 km'**
+  String get chargingLogStatsEurPer100Km;
+
+  /// No description provided for @chargingLogStatsTotalKwh.
+  ///
+  /// In en, this message translates to:
+  /// **'Total kWh'**
+  String get chargingLogStatsTotalKwh;
+
+  /// No description provided for @chargingLogStatsTotalCost.
+  ///
+  /// In en, this message translates to:
+  /// **'Total cost'**
+  String get chargingLogStatsTotalCost;
+
+  /// No description provided for @chargingLogStatsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sessions'**
+  String get chargingLogStatsCount;
+
+  /// No description provided for @chargingLogEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No charging sessions yet. Log one from the EV station detail screen.'**
+  String get chargingLogEmpty;
+
+  /// No description provided for @chargingLogDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this charging session?'**
+  String get chargingLogDeleteConfirm;
+
+  /// No description provided for @chargingLogValidationKwh.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the kWh delivered'**
+  String get chargingLogValidationKwh;
+
+  /// No description provided for @chargingLogValidationCost.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the amount paid'**
+  String get chargingLogValidationCost;
+
+  /// No description provided for @chargingLogValidationNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid number'**
+  String get chargingLogValidationNumber;
+
   /// Snackbar shown on the Add-Fill-Up screen when the receipt scan returns no usable fields (#751).
   ///
   /// In en, this message translates to:

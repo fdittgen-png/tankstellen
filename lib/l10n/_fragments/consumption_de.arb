@@ -1,0 +1,29 @@
+{
+  "consumptionTabFuel": "Kraftstoff",
+  "@consumptionTabFuel": {
+    "description": "Label für das Kraftstoff-Segment des Kraftstoff-/Lade-Schalters auf dem Verbrauchsbildschirm (#582 Phase 2)."
+  },
+  "consumptionTabCharging": "Laden",
+  "@consumptionTabCharging": {
+    "description": "Label für das Lade-Segment des Kraftstoff-/Lade-Schalters auf dem Verbrauchsbildschirm (#582 Phase 2)."
+  },
+  "chargingLogAddTitle": "Ladevorgang protokollieren",
+  "chargingLogAddSubtitle": "Diesen Ladevorgang aufzeichnen",
+  "chargingLogKwhLabel": "Energie (kWh)",
+  "chargingLogCostLabel": "Kosten (EUR)",
+  "chargingLogTimeLabel": "Ladezeit (Minuten)",
+  "chargingLogOdometerLabel": "Kilometerstand (km)",
+  "chargingLogNotesLabel": "Notizen (optional)",
+  "chargingLogStationLabel": "Ladestation",
+  "chargingLogSave": "Speichern",
+  "chargingLogCancel": "Abbrechen",
+  "chargingLogStatsEurPer100Km": "EUR / 100 km",
+  "chargingLogStatsTotalKwh": "Gesamt kWh",
+  "chargingLogStatsTotalCost": "Gesamtkosten",
+  "chargingLogStatsCount": "Ladungen",
+  "chargingLogEmpty": "Noch keine Ladevorgänge. Logge einen vom EV-Stationsdetail aus.",
+  "chargingLogDeleteConfirm": "Diesen Ladevorgang löschen?",
+  "chargingLogValidationKwh": "Bitte die gelieferten kWh eingeben",
+  "chargingLogValidationCost": "Bitte den Betrag eingeben",
+  "chargingLogValidationNumber": "Bitte eine gültige Zahl eingeben"
+}

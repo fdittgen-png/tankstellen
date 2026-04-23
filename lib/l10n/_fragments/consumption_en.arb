@@ -1,0 +1,29 @@
+{
+  "consumptionTabFuel": "Fuel",
+  "@consumptionTabFuel": {
+    "description": "Label for the fuel segment of the fuel/charging toggle on the consumption screen (#582 phase 2)."
+  },
+  "consumptionTabCharging": "Charging",
+  "@consumptionTabCharging": {
+    "description": "Label for the charging segment of the fuel/charging toggle on the consumption screen (#582 phase 2)."
+  },
+  "chargingLogAddTitle": "Log charging",
+  "chargingLogAddSubtitle": "Record this charging session",
+  "chargingLogKwhLabel": "Energy (kWh)",
+  "chargingLogCostLabel": "Cost (EUR)",
+  "chargingLogTimeLabel": "Charge time (minutes)",
+  "chargingLogOdometerLabel": "Odometer (km)",
+  "chargingLogNotesLabel": "Notes (optional)",
+  "chargingLogStationLabel": "Station",
+  "chargingLogSave": "Save",
+  "chargingLogCancel": "Cancel",
+  "chargingLogStatsEurPer100Km": "EUR / 100 km",
+  "chargingLogStatsTotalKwh": "Total kWh",
+  "chargingLogStatsTotalCost": "Total cost",
+  "chargingLogStatsCount": "Sessions",
+  "chargingLogEmpty": "No charging sessions yet. Log one from the EV station detail screen.",
+  "chargingLogDeleteConfirm": "Delete this charging session?",
+  "chargingLogValidationKwh": "Enter the kWh delivered",
+  "chargingLogValidationCost": "Enter the amount paid",
+  "chargingLogValidationNumber": "Enter a valid number"
+}

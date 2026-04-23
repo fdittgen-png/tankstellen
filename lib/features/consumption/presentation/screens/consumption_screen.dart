@@ -9,21 +9,43 @@ import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../achievements/presentation/widgets/badge_shelf.dart';
+import '../../../station_detail/presentation/widgets/log_charging_bottom_sheet.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/csv_exporter.dart';
+import '../../providers/charging_logs_provider.dart';
 import '../../providers/consumption_providers.dart';
+import '../widgets/charging_log_card.dart';
+import '../widgets/charging_stats_card.dart';
 import '../widgets/consumption_stats_card.dart';
 import '../widgets/fill_up_card.dart';
 import '../widgets/obd2_status_chip.dart';
 
+/// Which segment of the consumption screen is currently active —
+/// fuel fill-ups (default) or EV charging sessions (#582 phase 2).
+enum ConsumptionTab { fuel, charging }
+
 /// Lists all logged fill-ups with a summary stats card at the top.
-class ConsumptionScreen extends ConsumerWidget {
+///
+/// #582 phase 2 adds a Fuel ↔ Charging segmented toggle at the top of
+/// the body so EV owners can inspect their charging history alongside
+/// the fuel list without losing the existing fuel-only flow. The
+/// toggle is purely screen-scoped state (StatefulWidget) — we never
+/// need to persist the user's last-viewed tab because the fuel side
+/// is the canonical default: a returning hybrid driver most commonly
+/// wants to see fuel first.
+class ConsumptionScreen extends ConsumerStatefulWidget {
   const ConsumptionScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumptionScreen> createState() => _ConsumptionScreenState();
+}
+
+class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen> {
+  ConsumptionTab _tab = ConsumptionTab.fuel;
+
+  @override
+  Widget build(BuildContext context) {
     final fillUps = ref.watch(fillUpListProvider);
-    final stats = ref.watch(consumptionStatsProvider);
     final activeVehicle = ref.watch(activeVehicleProfileProvider);
     final l = AppLocalizations.of(context);
 
@@ -106,64 +128,192 @@ class ConsumptionScreen extends ConsumerWidget {
             ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/consumption/pick-station'),
-        icon: const Icon(Icons.add),
-        label: Text(l?.addFillUp ?? 'Add fill-up'),
-      ),
-      body: fillUps.isEmpty
-          ? EmptyState(
-              icon: Icons.local_gas_station_outlined,
-              title: l?.noFillUpsTitle ?? 'No fill-ups yet',
-              subtitle: l?.noFillUpsSubtitle ??
-                  'Log your first fill-up to start tracking consumption.',
+      floatingActionButton: _tab == ConsumptionTab.fuel
+          ? FloatingActionButton.extended(
+              onPressed: () => context.push('/consumption/pick-station'),
+              icon: const Icon(Icons.add),
+              label: Text(l?.addFillUp ?? 'Add fill-up'),
             )
-          : ListView.builder(
-              padding: EdgeInsets.only(
-                top: 8,
-                bottom: 96 + MediaQuery.of(context).viewPadding.bottom,
-              ),
-              itemCount: fillUps.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      HelpBanner(
-                        storageKey: StorageKeys.helpBannerConsumption,
-                        icon: Icons.tips_and_updates_outlined,
-                        message: l?.helpBannerConsumption ??
-                            'Log every fill-up to track your real-world '
-                                'consumption and CO₂ footprint. Swipe left '
-                                'to delete an entry.',
-                      ),
-                      const BadgeShelf(),
-                      ConsumptionStatsCard(stats: stats),
-                    ],
-                  );
-                }
-                final fillUp = fillUps[index - 1];
-                return Dismissible(
-                  key: ValueKey(fillUp.id),
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 24),
-                    color: Colors.red,
-                    child: const Icon(Icons.delete, color: Colors.white),
-                  ),
-                  onDismissed: (_) {
-                    ref
-                        .read(fillUpListProvider.notifier)
-                        .remove(fillUp.id);
-                  },
-                  child: FillUpCard(
-                    fillUp: fillUp,
-                    ecoScore: ref.watch(ecoScoreForFillUpProvider(fillUp.id)),
-                  ),
-                );
-              },
+          : FloatingActionButton.extended(
+              key: const Key('add_charging_log'),
+              onPressed: () =>
+                  LogChargingBottomSheet.show(context),
+              icon: const Icon(Icons.add),
+              label: Text(l?.chargingLogAddTitle ?? 'Log charging'),
             ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: SegmentedButton<ConsumptionTab>(
+              key: const Key('consumption_tab_toggle'),
+              segments: [
+                ButtonSegment(
+                  value: ConsumptionTab.fuel,
+                  icon: const Icon(Icons.local_gas_station_outlined),
+                  label: Text(l?.consumptionTabFuel ?? 'Fuel'),
+                ),
+                ButtonSegment(
+                  value: ConsumptionTab.charging,
+                  icon: const Icon(Icons.ev_station_outlined),
+                  label: Text(l?.consumptionTabCharging ?? 'Charging'),
+                ),
+              ],
+              selected: {_tab},
+              onSelectionChanged: (sel) =>
+                  setState(() => _tab = sel.first),
+            ),
+          ),
+          Expanded(
+            child: _tab == ConsumptionTab.fuel
+                ? _FuelTabBody()
+                : const _ChargingTabBody(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Fuel-side body extracted so the screen's `build` stays focused on
+/// routing the segmented toggle. Contains the help banner, badge
+/// shelf, stats card, and the fill-up list — identical to the pre-#582
+/// layout.
+class _FuelTabBody extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final fillUps = ref.watch(fillUpListProvider);
+    final stats = ref.watch(consumptionStatsProvider);
+    final l = AppLocalizations.of(context);
+
+    if (fillUps.isEmpty) {
+      return EmptyState(
+        icon: Icons.local_gas_station_outlined,
+        title: l?.noFillUpsTitle ?? 'No fill-ups yet',
+        subtitle: l?.noFillUpsSubtitle ??
+            'Log your first fill-up to start tracking consumption.',
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.only(
+        top: 8,
+        bottom: 96 + MediaQuery.of(context).viewPadding.bottom,
+      ),
+      itemCount: fillUps.length + 1,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              HelpBanner(
+                storageKey: StorageKeys.helpBannerConsumption,
+                icon: Icons.tips_and_updates_outlined,
+                message: l?.helpBannerConsumption ??
+                    'Log every fill-up to track your real-world '
+                        'consumption and CO₂ footprint. Swipe left '
+                        'to delete an entry.',
+              ),
+              const BadgeShelf(),
+              ConsumptionStatsCard(stats: stats),
+            ],
+          );
+        }
+        final fillUp = fillUps[index - 1];
+        return Dismissible(
+          key: ValueKey(fillUp.id),
+          direction: DismissDirection.endToStart,
+          background: Container(
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 24),
+            color: Colors.red,
+            child: const Icon(Icons.delete, color: Colors.white),
+          ),
+          onDismissed: (_) {
+            ref
+                .read(fillUpListProvider.notifier)
+                .remove(fillUp.id);
+          },
+          child: FillUpCard(
+            fillUp: fillUp,
+            ecoScore: ref.watch(ecoScoreForFillUpProvider(fillUp.id)),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Charging-side body for the active vehicle — mirrors [_FuelTabBody]
+/// shape so the two feel like the same product. Empty state + stats
+/// card + list-of-cards, newest-first. Unlike the fuel side, there is
+/// no in-screen "Add" FAB — charging sessions are logged from the EV
+/// station detail screen (#582 phase 2 scope).
+class _ChargingTabBody extends ConsumerWidget {
+  const _ChargingTabBody();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final active = ref.watch(activeVehicleProfileProvider);
+    // Show the logs belonging to the active vehicle when one is set;
+    // fall back to "every log in the box" for users who haven't yet
+    // configured a vehicle profile. Matches the read-side of the
+    // bottom sheet's save path, which falls back to `vehicleId = ''`
+    // when no vehicle is active.
+    final logsAsync = active != null
+        ? ref.watch(chargingLogsForVehicleProvider(active.id))
+        : ref.watch(chargingLogsProvider);
+
+    return logsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Center(child: Text('$e')),
+      data: (logs) {
+        if (logs.isEmpty) {
+          return EmptyState(
+            icon: Icons.ev_station_outlined,
+            title: l?.chargingLogEmpty ??
+                'No charging sessions yet. '
+                    'Log one from the EV station detail screen.',
+          );
+        }
+        // Display newest-first to match the fuel side's "recent at the
+        // top" feel. The store returns oldest-first.
+        final sorted = [...logs]..sort((a, b) => b.date.compareTo(a.date));
+        return ListView.builder(
+          padding: EdgeInsets.only(
+            top: 8,
+            bottom: 96 + MediaQuery.of(context).viewPadding.bottom,
+          ),
+          itemCount: sorted.length + 1,
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return const ChargingStatsCard();
+            }
+            final log = sorted[index - 1];
+            return Dismissible(
+              key: ValueKey('charging_log_${log.id}'),
+              direction: DismissDirection.endToStart,
+              background: Container(
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.only(right: 24),
+                color: Colors.red,
+                child: const Icon(Icons.delete, color: Colors.white),
+              ),
+              onDismissed: (_) {
+                ref.read(chargingLogsProvider.notifier).remove(log.id);
+              },
+              child: ChargingLogCard(
+                key: ValueKey('charging_log_card_${log.id}'),
+                log: log,
+                // Tap-to-edit is reserved for a phase-2 follow-up; no
+                // navigation target exists yet so the card is
+                // intentionally non-tappable.
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
