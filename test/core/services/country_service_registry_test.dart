@@ -95,6 +95,14 @@ void main() {
         final entry = CountryServiceRegistry.entryFor('FR');
         expect(entry!.requiresApiKey, isFalse);
       });
+
+      test('GR does not require API key (community API is free)', () {
+        // Unlike KR / CL, the Greek Paratiritirio Timon feed is
+        // exposed via a community FastAPI wrapper with no auth. #576
+        final entry = CountryServiceRegistry.entryFor('GR');
+        expect(entry, isNotNull);
+        expect(entry!.requiresApiKey, isFalse);
+      });
     });
 
     group('assertAllCountriesRegistered', () {
@@ -177,6 +185,12 @@ void main() {
       test('CL maps to chileApi', () {
         final entry = CountryServiceRegistry.entryFor('CL');
         expect(entry!.errorSource, equals(ServiceSource.chileApi));
+      });
+
+      test('GR maps to greeceApi (#576)', () {
+        final entry = CountryServiceRegistry.entryFor('GR');
+        expect(entry, isNotNull);
+        expect(entry!.errorSource, equals(ServiceSource.greeceApi));
       });
     });
   });

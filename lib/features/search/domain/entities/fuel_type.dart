@@ -346,6 +346,15 @@ List<FuelType> fuelTypesForCountry(String countryCode) {
         FuelType.e5, FuelType.e98, FuelType.diesel,
         FuelType.lpg, FuelType.electric, FuelType.all,
       ];
+    case 'GR':
+      // Greece (Paratiritirio Timon via fuelpricesgr community API):
+      // Αμόλυβδη 95 (→ e5), Αμόλυβδη 100 (→ e98), Diesel, Υγραέριο /
+      // LPG. Diesel heating is published but intentionally dropped
+      // (not a motoring fuel). #576
+      return [
+        FuelType.e5, FuelType.e98, FuelType.diesel,
+        FuelType.lpg, FuelType.electric, FuelType.all,
+      ];
     default:
       return [FuelType.e5, FuelType.e10, FuelType.diesel, FuelType.electric, FuelType.all];
   }

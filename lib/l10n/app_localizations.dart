@@ -5984,6 +5984,18 @@ abstract class AppLocalizations {
   /// **'Month'**
   String get chargingChartsMonthAxis;
 
+  /// No description provided for @greeceApiProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Paratiritirio Timon (Greece)'**
+  String get greeceApiProvider;
+
+  /// No description provided for @greeceCommunityApiNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Powered by the community-maintained fuelpricesgr API'**
+  String get greeceCommunityApiNotice;
+
   /// Snackbar shown on the Add-Fill-Up screen when the receipt scan returns no usable fields (#751).
   ///
   /// In en, this message translates to:

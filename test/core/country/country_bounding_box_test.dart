@@ -46,9 +46,9 @@ void main() {
   });
 
   group('countryBoundingBoxes', () {
-    test('has entries for all 14 supported countries', () {
+    test('has entries for all 15 supported countries', () {
       const expectedCountries = [
-        'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'SI', 'KR', 'CL',
+        'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR', 'PT', 'GB', 'AU', 'MX', 'SI', 'KR', 'CL', 'GR',
       ];
       for (final code in expectedCountries) {
         expect(countryBoundingBoxes.containsKey(code), isTrue,
@@ -220,6 +220,41 @@ void main() {
     test('KR bounding box rejects German coordinates', () {
       // Berlin sits at (52.52, 13.41) — must not be misattributed to KR.
       expect(countryBoundingBoxes['KR']!.contains(52.52, 13.41), isFalse);
+    });
+
+    test('Athens → GR (#576)', () {
+      expect(countryCodeFromLatLng(37.98, 23.72), 'GR');
+    });
+
+    test('Thessaloniki → GR (#576)', () {
+      expect(countryCodeFromLatLng(40.64, 22.94), 'GR');
+    });
+
+    test('Heraklion (Crete) → GR (#576)', () {
+      expect(countryCodeFromLatLng(35.34, 25.14), 'GR');
+    });
+
+    test('Rhodes → GR (eastern Aegean, #576)', () {
+      expect(countryCodeFromLatLng(36.43, 28.22), 'GR');
+    });
+
+    test('Rome → IT (not GR — Italy does not overlap the Greek box)', () {
+      expect(countryCodeFromLatLng(41.90, 12.50), 'IT');
+    });
+
+    test('Istanbul (TR) is not misattributed to GR', () {
+      // Istanbul at (41.01, 28.98) sits just east of the Greek box.
+      // Turkey is not in the registry — the point must resolve to null,
+      // not to GR.
+      expect(countryCodeFromLatLng(41.01, 28.98), isNull);
+    });
+
+    test('GR bounding box rejects Berlin', () {
+      expect(countryBoundingBoxes['GR']!.contains(52.52, 13.41), isFalse);
+    });
+
+    test('GR bounding box rejects Rome', () {
+      expect(countryBoundingBoxes['GR']!.contains(41.90, 12.50), isFalse);
     });
 
     test('Santiago → CL (#596 — CL lookup order wins over AR)', () {
