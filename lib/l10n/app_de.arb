@@ -1204,5 +1204,8 @@
   "vinModifyAction": "Manuell anpassen",
   "vinPartialInfoNote": "Teilinfo (offline). Sie können die Felder unten bearbeiten.",
   "vinDecodeError": "Diese FIN konnte nicht entschlüsselt werden",
-  "vinInvalidFormat": "Ungültiges FIN-Format"
+  "vinInvalidFormat": "Ungültiges FIN-Format",
+  "obd2PauseBannerTitle": "OBD2-Verbindung verloren — Aufzeichnung pausiert",
+  "obd2PauseBannerResume": "Weiter aufzeichnen",
+  "obd2PauseBannerEnd": "Aufzeichnung beenden"
 }

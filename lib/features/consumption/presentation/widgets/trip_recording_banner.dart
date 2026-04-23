@@ -7,6 +7,7 @@ import '../../domain/cold_start_baselines.dart';
 import '../../domain/situation_classifier.dart';
 import '../../providers/obd2_connection_state_provider.dart';
 import '../../providers/trip_recording_provider.dart';
+import 'obd2_pause_banner.dart';
 import 'obd2_status_dot.dart';
 
 /// Persistent indicator of an active OBD2 trip (#726 + #768).
@@ -83,6 +84,11 @@ class TripRecordingBanner extends ConsumerWidget {
             ),
           ),
         ),
+        // #797 phase 2 — BT-drop pause banner. Zero-height unless the
+        // provider is in pausedDueToDrop; self-watches its slice of
+        // the state so the main banner above doesn't rebuild on
+        // drop/resume transitions.
+        const Obd2PauseBanner(),
         Expanded(child: child),
       ],
     );

@@ -3059,4 +3059,13 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get vinInvalidFormat => 'Invalid VIN format';
+
+  @override
+  String get obd2PauseBannerTitle => 'OBD2 connection lost — recording paused';
+
+  @override
+  String get obd2PauseBannerResume => 'Resume recording';
+
+  @override
+  String get obd2PauseBannerEnd => 'End recording';
 }
