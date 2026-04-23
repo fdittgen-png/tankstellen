@@ -1,8 +1,23 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import 'elm327_protocol.dart';
 import 'obd2_transport.dart';
 import 'supported_pids_cache.dart';
+
+/// Fallback engine displacement used by the speed-density fuel-rate
+/// estimator when the active vehicle profile doesn't expose one
+/// (#810, #812). 1000 cc = 1.0 L NA petrol — matches the Peugeot 107
+/// / Aygo / C1 class that originally motivated the fallback. Kept as
+/// a named constant so the no-profile case is obvious at a glance
+/// and easy to update if the default assumption ever changes.
+const int _defaultEngineDisplacementCc = 1000;
+
+/// Fallback volumetric efficiency for the speed-density estimator
+/// (#810, #812). 0.85 is a sensible midpoint for a NA petrol engine
+/// at cruise; adaptive calibration (#815) will later narrow this per
+/// vehicle from tankful reconciliation.
+const double _defaultVolumetricEfficiency = 0.85;
 
 /// High-level OBD-II service for reading vehicle data.
 ///
@@ -324,11 +339,15 @@ class Obd2Service {
   ///      error — still infinitely better than the `—` placeholder the
   ///      trip summary would otherwise show.
   ///
-  /// [engineDisplacementCc] and [volumetricEfficiency] are per-vehicle
-  /// constants for the step-3 fallback. Defaults are tuned for a 1.0 L
-  /// NA petrol engine (matches the Peugeot 107 / Aygo / C1 class and
-  /// covers many other sub-1.2 L city cars). A follow-up PR will plumb
-  /// per-vehicle overrides from the vehicle profile.
+  /// Pass the active [VehicleProfile] via [vehicle] to feed the
+  /// step-3 speed-density fallback the car's real engine displacement
+  /// and volumetric efficiency (#812 phase 3). When [vehicle] is null
+  /// or its engine fields are null, the method falls back to
+  /// [_defaultEngineDisplacementCc] / [_defaultVolumetricEfficiency]
+  /// — still honest, just tuned for the 1.0 L NA petrol class (Peugeot
+  /// 107 / Aygo / C1) that originally motivated the fallback.
+  /// Partial profiles (e.g. displacement known, VE unknown) use the
+  /// known field and fall back for the missing one.
   ///
   /// Fuel-trim correction (#813) is applied on the MAF and
   /// speed-density branches — both compute air-mass at stoichiometric
@@ -336,10 +355,14 @@ class Obd2Service {
   /// `(1 + (STFT + LTFT) / 100)` factor closes most of the gap with
   /// pump-measured consumption. Skipped on the direct-5E path because
   /// the ECU already returns a post-trim number there.
-  Future<double?> readFuelRateLPerHour({
-    int engineDisplacementCc = 1000,
-    double volumetricEfficiency = 0.85,
-  }) async {
+  Future<double?> readFuelRateLPerHour({VehicleProfile? vehicle}) async {
+    final engineDisplacementCc =
+        vehicle?.engineDisplacementCc ?? _defaultEngineDisplacementCc;
+    // VE on VehicleProfile is a non-nullable double with its own
+    // default (0.85). Using it directly here is equivalent to the
+    // service-level fallback for that field.
+    final volumetricEfficiency =
+        vehicle?.volumetricEfficiency ?? _defaultVolumetricEfficiency;
     // Step 1: direct fuel-rate PID (already post-trim — no correction).
     // Skipped when #811 discovery proved the car doesn't implement PID 5E.
     if (isPidSupported(0x5E)) {

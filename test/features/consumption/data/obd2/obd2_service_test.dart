@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 
 // Shared AT-init boilerplate for the FakeObd2Transport.
 const _initResponses = {
@@ -245,6 +246,149 @@ void main() {
         // MAF path (10.24 × 3600 / (14.7 × 740)) ≈ 3.389 L/h,
         // no trim correction because trims are NO DATA.
         expect(rate, closeTo(3.389, 0.01));
+      });
+    });
+
+    group('readFuelRateLPerHour + VehicleProfile plumbing — #812 phase 3',
+        () {
+      // Shared Peugeot 107-style speed-density fixture: no 5E, no
+      // MAF; only MAP+IAT+RPM. Same operating point across all the
+      // tests below so expected values are comparable.
+      const mapKpa = 65.0;
+      const iatCelsius = 30.0;
+      const rpm = 2500.0;
+      Future<Obd2Service> speedDensityOnly() async {
+        return _connected({
+          '015E': 'NO DATA>',
+          '0110': 'NO DATA>',
+          '010B': '41 0B 41>', // MAP raw 0x41 = 65 kPa
+          '010F': '41 0F 46>', // IAT raw 0x46 = 70; 70 − 40 = 30 °C
+          '010C': '41 0C 27 10>', // RPM ((0x27×256)+0x10)/4 = 2500
+          '0106': 'NO DATA>', // no fuel-trim correction in these tests
+          '0107': 'NO DATA>',
+        });
+      }
+
+      test(
+          'null vehicle falls back to the same 1000 cc / 0.85 VE output '
+          'as pre-phase-3 — characterization test', () async {
+        final service = await speedDensityOnly();
+        final rate = await service.readFuelRateLPerHour();
+        final expected = Obd2Service.estimateFuelRateLPerHourFromMap(
+          mapKpa: mapKpa,
+          iatCelsius: iatCelsius,
+          rpm: rpm,
+          engineDisplacementCc: 1000,
+          volumetricEfficiency: 0.85,
+        );
+        expect(rate, isNotNull);
+        expect(expected, isNotNull);
+        expect(rate, closeTo(expected!, 1e-3));
+      });
+
+      test(
+          'VehicleProfile overrides both displacement and VE in the '
+          'speed-density branch', () async {
+        final service = await speedDensityOnly();
+        const profile = VehicleProfile(
+          id: 'v1',
+          name: '1.6L override',
+          engineDisplacementCc: 1600,
+          volumetricEfficiency: 0.88,
+        );
+        final rate =
+            await service.readFuelRateLPerHour(vehicle: profile);
+        final expected = Obd2Service.estimateFuelRateLPerHourFromMap(
+          mapKpa: mapKpa,
+          iatCelsius: iatCelsius,
+          rpm: rpm,
+          engineDisplacementCc: 1600,
+          volumetricEfficiency: 0.88,
+        );
+        expect(rate, isNotNull);
+        expect(expected, isNotNull);
+        expect(rate, closeTo(expected!, 1e-3));
+
+        // And the override must actually change the answer vs. the
+        // defaults — otherwise the plumbing could be silently
+        // dropping the profile and the test would still pass.
+        final defaultRate = await (await speedDensityOnly())
+            .readFuelRateLPerHour();
+        expect(
+          (rate! - defaultRate!).abs(),
+          greaterThan(1e-2),
+          reason: '1600 cc × 0.88 VE should yield a clearly different '
+              'rate from 1000 cc × 0.85 VE',
+        );
+      });
+
+      test(
+          'partial profile (displacement known, VE left at model default) '
+          'uses the profile displacement and the VehicleProfile default VE',
+          () async {
+        final service = await speedDensityOnly();
+        // VehicleProfile's volumetricEfficiency field defaults to
+        // 0.85 at the model level — NOT null — so "unknown" here
+        // means "user hasn't overridden the VehicleProfile default".
+        // The behaviour should match passing a profile with
+        // displacement 1600 + VE 0.85 explicitly.
+        const profile = VehicleProfile(
+          id: 'v2',
+          name: '1.6L, default VE',
+          engineDisplacementCc: 1600,
+        );
+        final rate =
+            await service.readFuelRateLPerHour(vehicle: profile);
+        final expected = Obd2Service.estimateFuelRateLPerHourFromMap(
+          mapKpa: mapKpa,
+          iatCelsius: iatCelsius,
+          rpm: rpm,
+          engineDisplacementCc: 1600,
+          volumetricEfficiency: 0.85,
+        );
+        expect(rate, isNotNull);
+        expect(expected, isNotNull);
+        expect(rate, closeTo(expected!, 1e-3));
+      });
+
+      test(
+          'profile with null engineDisplacementCc falls back to the '
+          '1000 cc default — VE from profile still wins', () async {
+        final service = await speedDensityOnly();
+        const profile = VehicleProfile(
+          id: 'v3',
+          name: 'no displacement, custom VE',
+          volumetricEfficiency: 0.72,
+        );
+        final rate =
+            await service.readFuelRateLPerHour(vehicle: profile);
+        final expected = Obd2Service.estimateFuelRateLPerHourFromMap(
+          mapKpa: mapKpa,
+          iatCelsius: iatCelsius,
+          rpm: rpm,
+          engineDisplacementCc: 1000,
+          volumetricEfficiency: 0.72,
+        );
+        expect(rate, isNotNull);
+        expect(expected, isNotNull);
+        expect(rate, closeTo(expected!, 1e-3));
+      });
+
+      test(
+          'profile is not used on the direct PID 5E path — that value '
+          'is already per-vehicle from the ECU', () async {
+        final service = await _connected({'015E': '41 5E 08 00>'});
+        const profile = VehicleProfile(
+          id: 'v4',
+          name: 'irrelevant',
+          engineDisplacementCc: 9999,
+          volumetricEfficiency: 0.50,
+        );
+        final rate =
+            await service.readFuelRateLPerHour(vehicle: profile);
+        // Same 102.4 L/h as the no-profile 5E test above — the
+        // profile is just ignored when PID 5E wins.
+        expect(rate, closeTo(102.4, 0.1));
       });
     });
 

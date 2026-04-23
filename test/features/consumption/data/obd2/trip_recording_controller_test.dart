@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_recording_controller.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 
 void main() {
   group('TripRecordingController (#726)', () {
@@ -124,10 +125,10 @@ void main() {
       await ctl.stop();
     });
 
-    group('engine-param plumbing — #812 phase 2', () {
+    group('engine-param plumbing — #812 phase 3', () {
       test(
-          'accepts engineDisplacementCc + volumetricEfficiency and passes '
-          'them to readFuelRateLPerHour on every poll', () async {
+          'accepts a VehicleProfile and feeds its engine fields into '
+          'readFuelRateLPerHour on every poll', () async {
         // On a Peugeot 107-class setup (no PID 5E, no MAF; only
         // MAP+IAT+RPM), the resulting fuel rate is directly
         // proportional to displacement × η_v. Doubling displacement
@@ -153,30 +154,41 @@ void main() {
         }
 
         // Service-level sanity: 2.0 L yields twice the fuel rate of
-        // 1.0 L at the same VE and operating point.
+        // 1.0 L at the same VE and operating point — passing two
+        // profiles that differ only in displacement.
         final svc1 = await peugeot107();
         final rate1L = await svc1.readFuelRateLPerHour(
-          engineDisplacementCc: 1000,
-          volumetricEfficiency: 0.85,
+          vehicle: const VehicleProfile(
+            id: 'a',
+            name: '1.0L',
+            engineDisplacementCc: 1000,
+          ),
         );
         final svc2 = await peugeot107();
         final rate2L = await svc2.readFuelRateLPerHour(
-          engineDisplacementCc: 2000,
-          volumetricEfficiency: 0.85,
+          vehicle: const VehicleProfile(
+            id: 'b',
+            name: '2.0L',
+            engineDisplacementCc: 2000,
+          ),
         );
         expect(rate1L, isNotNull);
         expect(rate2L, isNotNull);
         expect(rate2L! / rate1L!, closeTo(2.0, 0.01));
 
-        // Controller wire-up: the constructor params are plumbed
+        // Controller wire-up: the constructor param is plumbed
         // through. Not validated by running the poll loop (that
-        // requires a timer + streaming), but the parameters are
+        // requires a timer + streaming), but the parameter is
         // captured and non-null when supplied.
         final ctl = TripRecordingController(
           service: svc1,
           pollInterval: const Duration(minutes: 1),
-          engineDisplacementCc: 998, // Peugeot 107
-          volumetricEfficiency: 0.80,
+          vehicle: const VehicleProfile(
+            id: 'peugeot107',
+            name: 'Peugeot 107',
+            engineDisplacementCc: 998,
+            volumetricEfficiency: 0.80,
+          ),
         );
         await ctl.start();
         await ctl.stop();
@@ -186,7 +198,7 @@ void main() {
       });
 
       test(
-          'null engine params fall back to generic 1.0 L / 0.85 defaults — '
+          'null vehicle falls back to the generic 1.0 L / 0.85 defaults — '
           'matches the pre-#812 hardcoded behavior', () async {
         final transport = FakeObd2Transport({
           'ATZ': 'ELM327 v1.5>',
@@ -199,7 +211,7 @@ void main() {
         final service = Obd2Service(transport);
         await service.connect();
 
-        // Omitting the engine params should not throw and should
+        // Omitting the vehicle param should not throw and should
         // behave identically to the pre-#812 constructor.
         final ctl = TripRecordingController(
           service: service,
