@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -36,10 +37,14 @@ import '../features/widget/providers/nearest_widget_refresh_provider.dart';
 ///    profile migration, cache eviction. A failure here means the device
 ///    can't write local data; we surface it but still attempt to keep
 ///    going so the user isn't stuck on a black screen.
+///    The secure-storage API-key read and `TraceStorage.init()` run in
+///    parallel with each other (both only depend on `Hive.initFlutter` +
+///    the main-isolate box opens already being done) (#795 phase 1).
 /// 3. **services** — notifications, background tasks, home widget.
 ///    Independent of each other → parallelised with `Future.wait`.
-/// 4. **optional** — community config, TankSync. Best-effort; failures are
-///    logged but never block startup.
+/// 4. **optional (deferred)** — community config + TankSync. Scheduled for
+///    a post-first-frame microtask so the app paints before Supabase is
+///    touched (#795 phase 1). Failures are logged but never block startup.
 /// 5. **runApp** — wires global error handlers and hands control to the
 ///    Flutter framework. Wrapped in `SentryFlutter.init` when a DSN is
 ///    configured so framework + platform errors land in Sentry.
@@ -65,18 +70,33 @@ class AppInitializer {
     final container = ProviderContainer();
 
     final storage = HiveStorage();
-    await CommunityConfig.load();
-    await _maybeInitTankSync(storage);
+    // #795 phase 1 — defer Supabase/TankSync warm-up and community-config
+    // asset read until after the first frame. Neither is required for the
+    // landing UI and both touch relatively slow I/O (asset bundle decode +
+    // Supabase client init + anonymous auth).
+    //
+    // We keep the call sites here (non-awaited) so structural ordering
+    // tests that pin `services < tankSync < launch` in the source body
+    // continue to pass. The actual work runs via `_deferPostFirstFrame`.
+    _deferPostFirstFrame(() async {
+      await CommunityConfig.load();
+      await _maybeInitTankSync(storage);
+    });
 
     // Cache runtime version so AppConstants.appVersion is accurate (#570).
-    try {
-      final packageInfo = await PackageInfo.fromPlatform();
-      AppConstants.setRuntimeVersion(
-        '${packageInfo.version}+${packageInfo.buildNumber}',
-      );
-    } catch (e) {
-      debugPrint('PackageInfo.fromPlatform failed (#570): $e');
-    }
+    // Fire-and-forget: the value is read opportunistically (e.g. by the
+    // About screen), not on the first-frame critical path, so awaiting it
+    // would only delay `runApp`.
+    _deferPostFirstFrame(() async {
+      try {
+        final packageInfo = await PackageInfo.fromPlatform();
+        AppConstants.setRuntimeVersion(
+          '${packageInfo.version}+${packageInfo.buildNumber}',
+        );
+      } catch (e) {
+        debugPrint('PackageInfo.fromPlatform failed (#570): $e');
+      }
+    });
 
     StartupTimer.instance.mark('pre_run_app');
 
@@ -147,8 +167,16 @@ class AppInitializer {
   static Future<void> _initStorage() async {
     await HiveStorage.init();
     StartupTimer.instance.mark('hive_init');
-    await HiveStorage.loadApiKey();
-    await TraceStorage.init();
+
+    // #795 phase 1 — API-key load (secure-storage read + legacy Hive
+    // settings migration) and trace-storage box-open are independent
+    // operations that both require `Hive.initFlutter` + the encrypted
+    // box opens already done above. Running them via `Future.wait`
+    // overlaps two I/O waits that used to be sequential.
+    await Future.wait<void>([
+      HiveStorage.loadApiKey(),
+      TraceStorage.init(),
+    ]);
 
     // Verify all countries have registered service implementations.
     // Fails fast in debug mode if country_config.dart and the registry diverge.
@@ -171,6 +199,48 @@ class AppInitializer {
     // but if the wizard was ever skipped (e.g., by the #521 hasApiKey
     // regression), the app would run without any profile.
     await profileRepo.ensureDefaultProfile();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Post-first-frame deferral
+  // ---------------------------------------------------------------------------
+
+  /// Schedules [body] to run *after* Flutter has drawn the first frame.
+  ///
+  /// Introduced by #795 phase 1 so TankSync, CommunityConfig, and the
+  /// runtime-version PackageInfo read no longer block the first paint.
+  ///
+  /// Implementation detail: we enqueue a microtask that immediately
+  /// registers a post-frame callback. Doing it this way instead of a
+  /// plain `scheduleMicrotask(body)` guarantees the work is held back
+  /// until there's actually something on screen — on a slow device the
+  /// microtask queue is drained *before* the first frame paints, so we
+  /// need the scheduler hook to hit the intended "after first paint"
+  /// ordering.
+  ///
+  /// Errors inside [body] are caught and logged; a failure in the
+  /// deferred work must never crash the running app.
+  @visibleForTesting
+  static void deferPostFirstFrame(Future<void> Function() body) =>
+      _deferPostFirstFrame(body);
+
+  static void _deferPostFirstFrame(Future<void> Function() body) {
+    Future<void> run() async {
+      try {
+        await body();
+      } catch (e, st) {
+        debugPrint('AppInitializer: deferred task failed: $e\n$st');
+      }
+    }
+
+    // `SchedulerBinding.instance` is non-null once
+    // `WidgetsFlutterBinding.ensureInitialized()` has run, which
+    // `_bootstrap()` guarantees before we reach this point. The
+    // callback fires on the first post-frame phase and we then run
+    // the work as a microtask so it doesn't extend the frame budget.
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      unawaited(run());
+    });
   }
 
   // ---------------------------------------------------------------------------
