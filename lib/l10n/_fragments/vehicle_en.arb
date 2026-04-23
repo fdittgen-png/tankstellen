@@ -1,0 +1,10 @@
+{
+  "vinLabel": "VIN (optional)",
+  "vinDecodeTooltip": "Decode VIN",
+  "vinConfirmAction": "Yes, auto-fill",
+  "vinModifyAction": "Modify manually",
+  "veResetAction": "Reset calibration",
+  "@veResetAction": {
+    "description": "Action on the vehicle edit screen that discards the learned volumetric-efficiency calibration (#815)."
+  }
+}
