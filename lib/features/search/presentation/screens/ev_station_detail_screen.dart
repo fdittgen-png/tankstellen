@@ -7,6 +7,7 @@ import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/widgets/star_rating.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../consumption/presentation/screens/add_charging_log_screen.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../domain/entities/charging_station.dart';
 import '../../domain/entities/fuel_type.dart';
@@ -73,6 +74,24 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
   void _navigateToStation() {
     NavigationUtils.openInMaps(_station.lat, _station.lng,
         label: _station.name);
+  }
+
+  /// Open the add-charging-log form pre-filled with this station
+  /// (#582 phase 3). The form itself auto-selects the active vehicle;
+  /// we supply the station id + display name so the log attributes
+  /// back to the charger the user is standing at.
+  Future<void> _logCharging() async {
+    final displayName = _station.name.trim().isNotEmpty
+        ? _station.name
+        : _station.operator;
+    await Navigator.of(context).push<bool?>(
+      MaterialPageRoute(
+        builder: (_) => AddChargingLogScreen(
+          chargingStationId: _station.id,
+          stationName: displayName,
+        ),
+      ),
+    );
   }
 
   @override
@@ -185,6 +204,19 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
           ),
           const SizedBox(height: 8),
 
+          // Log-charging button — primary wheel-lens action (#582 phase 3).
+          FilledButton.icon(
+            key: const Key('ev_log_charging_button'),
+            onPressed: _logCharging,
+            icon: const Icon(Icons.ev_station),
+            label: Text(l10n?.chargingLogButtonLabel ?? 'Log charging'),
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+              backgroundColor: evColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+
           // Navigate button
           FilledButton.icon(
             onPressed: _navigateToStation,
@@ -192,7 +224,7 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
             label: Text(l10n?.evNavigateToStation ?? 'Navigate to station'),
             style: FilledButton.styleFrom(
               minimumSize: const Size.fromHeight(48),
-              backgroundColor: evColor,
+              backgroundColor: evColor.withValues(alpha: 0.85),
             ),
           ),
         ],

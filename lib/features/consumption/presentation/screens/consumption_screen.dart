@@ -12,8 +12,11 @@ import '../../../achievements/presentation/widgets/badge_shelf.dart';
 import '../../../ev/domain/entities/charging_log.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/csv_exporter.dart';
+import '../../providers/charging_charts_provider.dart';
 import '../../providers/charging_logs_provider.dart';
 import '../../providers/consumption_providers.dart';
+import '../widgets/charging_cost_trend_chart.dart';
+import '../widgets/charging_efficiency_chart.dart';
 import '../widgets/charging_log_card.dart';
 import '../widgets/consumption_stats_card.dart';
 import '../widgets/fill_up_card.dart';
@@ -305,9 +308,15 @@ class _ChargingTab extends ConsumerWidget {
             top: 8,
             bottom: 96 + MediaQuery.of(context).viewPadding.bottom,
           ),
-          itemCount: ordered.length,
+          itemCount: ordered.length + 1,
           itemBuilder: (context, index) {
-            final log = ordered[index];
+            if (index == 0) {
+              // Charts header — read the derived rollup providers so
+              // they react to the same chargingLogsProvider we already
+              // watched upstream.
+              return const _ChargingChartsSection();
+            }
+            final log = ordered[index - 1];
             return Dismissible(
               key: ValueKey('charging-${log.id}'),
               direction: DismissDirection.endToStart,
@@ -325,6 +334,72 @@ class _ChargingTab extends ConsumerWidget {
           },
         );
       },
+    );
+  }
+}
+
+/// Charts header rendered above the charging-log list (#582 phase 3).
+///
+/// Collapses nicely in landscape: both charts are fixed-height boxes
+/// and sit inside the list's vertical scroll, so narrow widths just
+/// squeeze the bars/points — they never clip.
+class _ChargingChartsSection extends ConsumerWidget {
+  const _ChargingChartsSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final cost = ref.watch(chargingMonthlyCostProvider);
+    final efficiency = ref.watch(chargingMonthlyEfficiencyProvider);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+      child: Column(
+        key: const Key('charging_charts_section'),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l?.chargingCostTrendTitle ?? 'Charging cost trend',
+                    style: theme.textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: 6),
+                  ChargingCostTrendChart(
+                    key: const Key('charging_cost_trend_chart'),
+                    monthlyCost: cost,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l?.chargingEfficiencyTitle ??
+                        'Efficiency (kWh/100 km)',
+                    style: theme.textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: 6),
+                  ChargingEfficiencyChart(
+                    key: const Key('charging_efficiency_chart'),
+                    monthlyEfficiency: efficiency,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

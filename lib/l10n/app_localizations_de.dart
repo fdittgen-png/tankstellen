@@ -3197,6 +3197,21 @@ class AppLocalizationsDe extends AppLocalizations {
       'Vorheriger Eintrag benötigt für Vergleich';
 
   @override
+  String get chargingLogButtonLabel => 'Ladung protokollieren';
+
+  @override
+  String get chargingCostTrendTitle => 'Ladekosten-Trend';
+
+  @override
+  String get chargingEfficiencyTitle => 'Effizienz (kWh/100 km)';
+
+  @override
+  String get chargingChartsEmpty => 'Noch nicht genügend Daten';
+
+  @override
+  String get chargingChartsMonthAxis => 'Monat';
+
+  @override
   String get scanReceiptNoData =>
       'Keine Belegdaten gefunden — bitte erneut versuchen';
 

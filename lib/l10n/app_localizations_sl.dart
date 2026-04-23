@@ -3168,6 +3168,21 @@ class AppLocalizationsSl extends AppLocalizations {
   String get chargingDerivedHelper => 'Need a previous log to compare';
 
   @override
+  String get chargingLogButtonLabel => 'Log charging';
+
+  @override
+  String get chargingCostTrendTitle => 'Charging cost trend';
+
+  @override
+  String get chargingEfficiencyTitle => 'Efficiency (kWh/100 km)';
+
+  @override
+  String get chargingChartsEmpty => 'Not enough data yet';
+
+  @override
+  String get chargingChartsMonthAxis => 'Month';
+
+  @override
   String get scanReceiptNoData => 'No receipt data found — try again';
 
   @override

@@ -11,5 +11,10 @@
   "chargingStationName": "Station (optional)",
   "chargingEurPer100km": "{value} EUR / 100 km",
   "chargingKwhPer100km": "{value} kWh / 100 km",
-  "chargingDerivedHelper": "Vorheriger Eintrag benötigt für Vergleich"
+  "chargingDerivedHelper": "Vorheriger Eintrag benötigt für Vergleich",
+  "chargingLogButtonLabel": "Ladung protokollieren",
+  "chargingCostTrendTitle": "Ladekosten-Trend",
+  "chargingEfficiencyTitle": "Effizienz (kWh/100 km)",
+  "chargingChartsEmpty": "Noch nicht genügend Daten",
+  "chargingChartsMonthAxis": "Monat"
 }

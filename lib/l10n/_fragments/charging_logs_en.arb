@@ -60,5 +60,25 @@
   "chargingDerivedHelper": "Need a previous log to compare",
   "@chargingDerivedHelper": {
     "description": "Helper text under the cost field when there is no prior charging log for the selected vehicle, so the EUR/100 km cannot be computed yet (#582 phase 2)."
+  },
+  "chargingLogButtonLabel": "Log charging",
+  "@chargingLogButtonLabel": {
+    "description": "Primary action button on the EV station detail screen that opens the Add-Charging-Log form pre-filled with this station (#582 phase 3)."
+  },
+  "chargingCostTrendTitle": "Charging cost trend",
+  "@chargingCostTrendTitle": {
+    "description": "Section title above the monthly charging-cost bar chart on the Charging tab (#582 phase 3)."
+  },
+  "chargingEfficiencyTitle": "Efficiency (kWh/100 km)",
+  "@chargingEfficiencyTitle": {
+    "description": "Section title above the monthly kWh/100 km line chart on the Charging tab (#582 phase 3)."
+  },
+  "chargingChartsEmpty": "Not enough data yet",
+  "@chargingChartsEmpty": {
+    "description": "Empty-state caption shown inside the charging charts when no data is available for the last 6 months (#582 phase 3)."
+  },
+  "chargingChartsMonthAxis": "Month",
+  "@chargingChartsMonthAxis": {
+    "description": "Axis label for the X axis (month) on the charging charts (#582 phase 3)."
   }
 }
