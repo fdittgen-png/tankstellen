@@ -6392,6 +6392,48 @@ abstract class AppLocalizations {
   /// **'Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.'**
   String get themeSettingsDarkDescription;
 
+  /// Label for the Trips tab on the ConsumptionScreen (#889). Sits between Fuel and Charging.
+  ///
+  /// In en, this message translates to:
+  /// **'Trips'**
+  String get trajetsTabLabel;
+
+  /// Primary CTA on the Trips tab that kicks off a new trip recording (#889).
+  ///
+  /// In en, this message translates to:
+  /// **'Start recording'**
+  String get trajetsStartRecordingButton;
+
+  /// Empty-state title on the Trips tab when no trips have been recorded (#889).
+  ///
+  /// In en, this message translates to:
+  /// **'No trips yet'**
+  String get trajetsEmptyStateTitle;
+
+  /// Empty-state body text on the Trips tab inviting the user to start recording (#889).
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Start recording to begin logging your drives.'**
+  String get trajetsEmptyStateBody;
+
+  /// Distance chip on a trip history row (#889).
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km'**
+  String trajetsRowDistance(String km);
+
+  /// Duration chip on a trip history row (#889).
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String trajetsRowDuration(String minutes);
+
+  /// Average consumption chip on a trip history row (#889). Unit is L/100 km for combustion trips and kWh/100 km for EV trips.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} {unit}'**
+  String trajetsRowAvgConsumption(String value, String unit);
+
   /// No description provided for @vinLabel.
   ///
   /// In en, this message translates to:

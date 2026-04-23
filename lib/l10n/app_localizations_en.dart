@@ -3407,6 +3407,34 @@ class AppLocalizationsEn extends AppLocalizations {
       'Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.';
 
   @override
+  String get trajetsTabLabel => 'Trips';
+
+  @override
+  String get trajetsStartRecordingButton => 'Start recording';
+
+  @override
+  String get trajetsEmptyStateTitle => 'No trips yet';
+
+  @override
+  String get trajetsEmptyStateBody =>
+      'Tap Start recording to begin logging your drives.';
+
+  @override
+  String trajetsRowDistance(String km) {
+    return '$km km';
+  }
+
+  @override
+  String trajetsRowDuration(String minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String trajetsRowAvgConsumption(String value, String unit) {
+    return '$value $unit';
+  }
+
+  @override
   String get vinLabel => 'VIN (optional)';
 
   @override
