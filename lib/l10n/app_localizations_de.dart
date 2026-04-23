@@ -3442,6 +3442,34 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dunkle Hintergründe — augenschonend bei Nacht und stromsparend auf OLED-Displays.';
 
   @override
+  String get trajetsTabLabel => 'Fahrten';
+
+  @override
+  String get trajetsStartRecordingButton => 'Aufzeichnung starten';
+
+  @override
+  String get trajetsEmptyStateTitle => 'Noch keine Fahrten';
+
+  @override
+  String get trajetsEmptyStateBody =>
+      'Tippe auf „Aufzeichnung starten“, um deine Fahrten zu protokollieren.';
+
+  @override
+  String trajetsRowDistance(String km) {
+    return '$km km';
+  }
+
+  @override
+  String trajetsRowDuration(String minutes) {
+    return '$minutes Min.';
+  }
+
+  @override
+  String trajetsRowAvgConsumption(String value, String unit) {
+    return '$value $unit';
+  }
+
+  @override
   String get vinLabel => 'FIN (optional)';
 
   @override

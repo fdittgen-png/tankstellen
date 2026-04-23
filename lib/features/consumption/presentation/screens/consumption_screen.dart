@@ -21,6 +21,7 @@ import '../widgets/charging_log_card.dart';
 import '../widgets/consumption_stats_card.dart';
 import '../widgets/fill_up_card.dart';
 import '../widgets/obd2_status_chip.dart';
+import '../widgets/trajets_tab.dart';
 import 'add_charging_log_screen.dart';
 
 /// Lists all logged fill-ups and charging sessions.
@@ -49,7 +50,11 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    // #889 — three tabs now: Fuel, Trajets, Charging. Trajets is
+    // always visible once the Consumption screen is visible (gated on
+    // an active vehicle per #893); Charging stays present — #892 will
+    // tailor visibility per vehicle type in a follow-up.
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
       // The FAB label changes when the tab changes, so trigger a
       // rebuild on every tab transition (indexIsChanging covers the
@@ -95,7 +100,14 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
       ref.read(lastVeLearnResultProvider.notifier).set(null);
     });
 
-    final isFuelTab = _tabController.index == 0;
+    // #889 — three tabs: 0 Fuel, 1 Trajets, 2 Charging. The FAB
+    // rebinds per-tab: Fuel -> pick-station sheet, Trajets hides the
+    // FAB (the "Start recording" CTA lives inside the tab header),
+    // Charging -> Add charging log sheet.
+    final tabIndex = _tabController.index;
+    final isFuelTab = tabIndex == 0;
+    final isTrajetsTab = tabIndex == 1;
+    final isChargingTab = tabIndex == 2;
 
     return Scaffold(
       appBar: AppBar(
@@ -112,6 +124,11 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
               key: const Key('consumption_tab_fuel'),
               icon: const Icon(Icons.local_gas_station_outlined),
               text: l?.consumptionTabFuel ?? 'Fuel',
+            ),
+            Tab(
+              key: const Key('consumption_tab_trajets'),
+              icon: const Icon(Icons.route_outlined),
+              text: l?.trajetsTabLabel ?? 'Trips',
             ),
             Tab(
               key: const Key('consumption_tab_charging'),
@@ -169,30 +186,37 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
             ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        key: Key(isFuelTab ? 'fab_add_fillup' : 'fab_add_charging'),
-        onPressed: () async {
-          if (isFuelTab) {
-            await context.push('/consumption/pick-station');
-          } else {
-            await Navigator.of(context).push<bool?>(
-              MaterialPageRoute(
-                builder: (_) => const AddChargingLogScreen(),
+      floatingActionButton: isTrajetsTab
+          // Trajets tab hides the global FAB — the "Start recording"
+          // CTA lives inside the tab header, mirroring the fuel-tab
+          // add-fill-up and charging-tab log-charging patterns but
+          // scoped to the list the user is looking at.
+          ? null
+          : FloatingActionButton.extended(
+              key: Key(isFuelTab ? 'fab_add_fillup' : 'fab_add_charging'),
+              onPressed: () async {
+                if (isFuelTab) {
+                  await context.push('/consumption/pick-station');
+                } else if (isChargingTab) {
+                  await Navigator.of(context).push<bool?>(
+                    MaterialPageRoute(
+                      builder: (_) => const AddChargingLogScreen(),
+                    ),
+                  );
+                }
+              },
+              icon: const Icon(Icons.add),
+              label: Text(
+                isFuelTab
+                    ? (l?.addFillUp ?? 'Add fill-up')
+                    : (l?.addChargingLog ?? 'Log charging'),
               ),
-            );
-          }
-        },
-        icon: const Icon(Icons.add),
-        label: Text(
-          isFuelTab
-              ? (l?.addFillUp ?? 'Add fill-up')
-              : (l?.addChargingLog ?? 'Log charging'),
-        ),
-      ),
+            ),
       body: TabBarView(
         controller: _tabController,
         children: [
           _FuelTab(fillUps: fillUps, stats: stats, l: l),
+          TrajetsTab(vehicleId: activeVehicle?.id),
           _ChargingTab(async: chargingLogsAsync, l: l),
         ],
       ),

@@ -21,6 +21,7 @@ import '../features/report/presentation/screens/report_screen.dart';
 import '../features/consumption/presentation/screens/add_fill_up_screen.dart';
 import '../features/consumption/presentation/screens/consumption_screen.dart';
 import '../features/consumption/presentation/screens/pick_station_for_fill_up_screen.dart';
+import '../features/consumption/presentation/screens/trip_detail_screen.dart';
 import '../features/consumption/presentation/screens/trip_history_screen.dart';
 import '../features/consumption/presentation/screens/trip_recording_screen.dart';
 import '../features/search/domain/entities/fuel_type.dart';
@@ -260,6 +261,19 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/trip-history',
         builder: (_, _) => const TripHistoryScreen(),
+      ),
+      // #889 — placeholder trip-detail route wired up alongside the
+      // new Trajets tab on the Consumption screen. Full detail UI
+      // (timeline / per-minute consumption / map) lands in #890.
+      GoRoute(
+        path: '/trip/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'];
+          if (id == null || id.isEmpty) {
+            return _invalidIdScreen(context, state.matchedLocation);
+          }
+          return TripDetailScreen(tripId: id);
+        },
       ),
       GoRoute(
         path: '/consumption/add',

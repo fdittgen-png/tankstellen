@@ -1791,6 +1791,52 @@
   "@themeSettingsDarkDescription": {
     "description": "Description text under the Dark option on the Theme settings screen (#897)."
   },
+  "trajetsTabLabel": "Trips",
+  "@trajetsTabLabel": {
+    "description": "Label for the Trips tab on the ConsumptionScreen (#889). Sits between Fuel and Charging."
+  },
+  "trajetsStartRecordingButton": "Start recording",
+  "@trajetsStartRecordingButton": {
+    "description": "Primary CTA on the Trips tab that kicks off a new trip recording (#889)."
+  },
+  "trajetsEmptyStateTitle": "No trips yet",
+  "@trajetsEmptyStateTitle": {
+    "description": "Empty-state title on the Trips tab when no trips have been recorded (#889)."
+  },
+  "trajetsEmptyStateBody": "Tap Start recording to begin logging your drives.",
+  "@trajetsEmptyStateBody": {
+    "description": "Empty-state body text on the Trips tab inviting the user to start recording (#889)."
+  },
+  "trajetsRowDistance": "{km} km",
+  "@trajetsRowDistance": {
+    "description": "Distance chip on a trip history row (#889).",
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "trajetsRowDuration": "{minutes} min",
+  "@trajetsRowDuration": {
+    "description": "Duration chip on a trip history row (#889).",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "trajetsRowAvgConsumption": "{value} {unit}",
+  "@trajetsRowAvgConsumption": {
+    "description": "Average consumption chip on a trip history row (#889). Unit is L/100 km for combustion trips and kWh/100 km for EV trips.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
   "vinLabel": "VIN (optional)",
   "vinDecodeTooltip": "Decode VIN",
   "vinConfirmAction": "Yes, auto-fill",

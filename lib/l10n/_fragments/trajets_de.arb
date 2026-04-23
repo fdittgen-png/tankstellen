@@ -1,0 +1,9 @@
+{
+  "trajetsTabLabel": "Fahrten",
+  "trajetsStartRecordingButton": "Aufzeichnung starten",
+  "trajetsEmptyStateTitle": "Noch keine Fahrten",
+  "trajetsEmptyStateBody": "Tippe auf „Aufzeichnung starten“, um deine Fahrten zu protokollieren.",
+  "trajetsRowDistance": "{km} km",
+  "trajetsRowDuration": "{minutes} Min.",
+  "trajetsRowAvgConsumption": "{value} {unit}"
+}
