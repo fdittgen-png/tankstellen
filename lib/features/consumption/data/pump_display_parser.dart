@@ -1,66 +1,10 @@
-import 'package:flutter/foundation.dart';
+import '_pump_display_helpers.dart';
+import '_pump_display_patterns.dart';
+import 'pump_display_parse_result.dart';
 
-/// Fields extracted from a fuel pump display (the 7-segment / LCD
-/// panel on the pump itself, NOT the paper receipt).
-///
-/// All fields are nullable because OCR is best-effort: bright
-/// sunlight, glare, a partially-visible display, or an unfamiliar
-/// layout can all blank a field. Use [hasUsableData] to decide
-/// whether the result is worth prefilling a form with.
-class PumpDisplayParseResult {
-  /// Volume dispensed in litres (the "Abgabe" / "Volume" line).
-  final double? liters;
-
-  /// Total amount charged on the pump (the "Betrag" / "€" line).
-  final double? totalCost;
-
-  /// Unit price per litre as shown on the pump (the "Preis/Liter" /
-  /// "€/L" line). This is typically 3-decimal precision (e.g. 1.849).
-  final double? pricePerLiter;
-
-  /// Pump number printed or displayed on the housing (e.g. "3" in a
-  /// large standalone digit on the cabinet). Optional — helps the
-  /// user confirm which pump they scanned.
-  final int? pumpNumber;
-
-  /// Confidence ∈ [0, 1] based on how many of the three primary
-  /// fields were extracted AND whether they are internally consistent
-  /// (totalCost ≈ liters * pricePerLiter within tolerance).
-  final double confidence;
-
-  const PumpDisplayParseResult({
-    this.liters,
-    this.totalCost,
-    this.pricePerLiter,
-    this.pumpNumber,
-    this.confidence = 0,
-  });
-
-  /// `true` when the parser extracted at least two of the three
-  /// primary numeric fields. One alone (e.g. just a total) is rarely
-  /// enough to auto-fill a fill-up log.
-  bool get hasUsableData {
-    final count = [liters, totalCost, pricePerLiter]
-        .where((v) => v != null)
-        .length;
-    return count >= 2;
-  }
-
-  /// `true` when totalCost, liters and pricePerLiter are all present
-  /// AND they satisfy `totalCost ≈ liters * pricePerLiter` within a
-  /// small rounding tolerance. The three-way agreement is the
-  /// strongest signal that OCR actually read the right numbers.
-  bool get isConsistent {
-    if (liters == null || totalCost == null || pricePerLiter == null) {
-      return false;
-    }
-    final predicted = liters! * pricePerLiter!;
-    final delta = (predicted - totalCost!).abs();
-    // Pump displays round to the cent. A 2 cent tolerance covers
-    // the rounding plus small OCR jitter on the last digit.
-    return delta <= 0.02;
-  }
-}
+// Re-export so existing callers that `import 'pump_display_parser.dart'`
+// keep resolving [PumpDisplayParseResult] without changes.
+export 'pump_display_parse_result.dart';
 
 /// Parses raw OCR text from a fuel pump 7-segment / LCD display.
 ///
@@ -88,7 +32,7 @@ class PumpDisplayParser {
       return const PumpDisplayParseResult();
     }
 
-    final normalised = _normaliseDigits(rawText);
+    final normalised = normaliseDigits(rawText);
     final lines = normalised
         .split(RegExp(r'[\r\n]+'))
         .map((l) => l.trim())
@@ -118,7 +62,7 @@ class PumpDisplayParser {
     }
 
     final pump = _extractPumpNumber(rawText, lines);
-    final confidence = _scoreConfidence(
+    final confidence = scorePumpDisplayConfidence(
       total: total,
       liters: liters,
       price: price,
@@ -137,46 +81,19 @@ class PumpDisplayParser {
   // Labelled extraction
   // ---------------------------------------------------------------------
 
-  /// Matches "Betrag 58,42", "Betrag € 58,42", "€ 58.42",
-  /// "EUR 58,42", and the common OCR misread "Betraq" where the
-  /// 'g' hook is thin.
   double? _extractBetrag(String text) {
-    final patterns = <RegExp>[
-      // "Betrag 58,42", "Betrag € 58,42", "Betrag: 58,42".
-      RegExp(
-          r'betra[gq]\s*(?:€|EUR)?\s*[:=]?\s*(\d+[.,]\d{2})',
-          caseSensitive: false),
-      RegExp(r'(?:€|EUR)\s*[:=]?\s*(\d+[.,]\d{2})\b'),
-      RegExp(r'\b(\d+[.,]\d{2})\s*€\b'),
-    ];
-    for (final p in patterns) {
+    for (final p in kBetragPatterns) {
       final m = p.firstMatch(text);
       if (m != null) {
-        final value = _parseDecimal(m.group(1)!);
+        final value = parseDecimalFromOcr(m.group(1)!);
         if (value != null && value >= 0 && value < 10000) return value;
       }
     }
     return null;
   }
 
-  /// Matches "Abgabe 31,12", "Abgabe L 31,12", "Volume 31.12 L",
-  /// "Liter 31,12", and the "Ab9abe" / "Abqabe" misreads where a
-  /// small glyph is mistaken for 9 or q.
   double? _extractAbgabe(String text) {
-    final patterns = <RegExp>[
-      // Allow an optional "L" or "Liter" unit between the label and
-      // the number — some pumps render "Abgabe L 31,12" across two
-      // visual rows and ML Kit flattens that into a single line.
-      RegExp(
-          r'ab[g9q]abe\s*(?:L|l|Liter)?\s*[:=]?\s*(\d+[.,]\d{1,3})',
-          caseSensitive: false),
-      RegExp(r'(?:volume|menge|quantit[eé])\s*[:=]?\s*(\d+[.,]\d{1,3})',
-          caseSensitive: false),
-      // "31,12 L" or "31.12 Liter" — only when the line has no €
-      // nearby (so we don't grab the Betrag by accident).
-      RegExp(r'\b(\d+[.,]\d{1,3})\s*(?:L|l|Liter|Litres?)\b'),
-    ];
-    for (final p in patterns) {
+    for (final p in kAbgabePatterns) {
       final m = p.firstMatch(text);
       if (m != null) {
         // Skip if this looks like a price/litre (has "€" right after).
@@ -185,37 +102,24 @@ class PumpDisplayParser {
             tail.trimLeft().toLowerCase().startsWith('eur')) {
           continue;
         }
-        final value = _parseDecimal(m.group(1)!);
+        final value = parseDecimalFromOcr(m.group(1)!);
         if (value != null && value >= 0 && value < 2000) return value;
       }
     }
     return null;
   }
 
-  /// Matches "Preis/Liter 1,849", "PREIS/L 1.849",
-  /// "CT / Preis/Liter 184,9" (cents-per-litre layout),
-  /// "1,849 €/L", "EUR/L 1.849".
   double? _extractPricePerLiter(String text) {
-    final patterns = <RegExp>[
-      RegExp(
-          r'preis\s*/?\s*(?:liter|l)\s*[:=]?\s*(\d+[.,]\d{2,3})',
-          caseSensitive: false),
-      RegExp(r'(?:€|EUR)\s*/\s*(?:L|l|Liter)\s*[:=]?\s*(\d+[.,]\d{2,3})'),
-      RegExp(r'(\d+[.,]\d{2,3})\s*(?:€|EUR)\s*/\s*(?:L|l|Liter)'),
-    ];
-    for (final p in patterns) {
+    for (final p in kPricePerLiterPatterns) {
       final m = p.firstMatch(text);
       if (m != null) {
-        final value = _parseDecimal(m.group(1)!);
+        final value = parseDecimalFromOcr(m.group(1)!);
         if (value != null && value > 0 && value < 10) return value;
       }
     }
-    // Cents-per-litre layout: "CT 184,9" means 184,9 ct = 1.849 €/L.
-    final ctMatch =
-        RegExp(r'\bCT\b\s*[:=]?\s*(\d{2,3}[.,]?\d?)', caseSensitive: false)
-            .firstMatch(text);
+    final ctMatch = kCentsPerLiterPattern.firstMatch(text);
     if (ctMatch != null) {
-      final ct = _parseDecimal(ctMatch.group(1)!);
+      final ct = parseDecimalFromOcr(ctMatch.group(1)!);
       if (ct != null && ct >= 80 && ct <= 400) {
         return ct / 100.0;
       }
@@ -231,7 +135,7 @@ class PumpDisplayParser {
   int? _extractPumpNumber(String rawText, List<String> lines) {
     for (final line in lines) {
       final trimmed = line.trim();
-      if (RegExp(r'^[1-9]$').hasMatch(trimmed)) {
+      if (kLonePumpDigitPattern.hasMatch(trimmed)) {
         return int.parse(trimmed);
       }
     }
@@ -252,26 +156,27 @@ class PumpDisplayParser {
   /// This is deliberately conservative — when buckets overlap (e.g.
   /// a small fill-up of €1.80 could look like a price-per-litre),
   /// we leave the field null rather than guessing wrong.
-  _InferredTriple _inferFromNumericOrder(
+  PumpDisplayInferredTriple _inferFromNumericOrder(
     List<String> lines, {
     List<double> exclude = const [],
   }) {
-    final rawNumbers = <_Candidate>[];
+    final rawNumbers = <PumpDisplayCandidate>[];
     for (final line in lines) {
-      for (final m in RegExp(r'(\d+[.,]\d{1,3})').allMatches(line)) {
-        final v = _parseDecimal(m.group(1)!);
+      for (final m in kDecimalNumberPattern.allMatches(line)) {
+        final v = parseDecimalFromOcr(m.group(1)!);
         if (v == null) continue;
         final decimals = m.group(1)!.contains(',') || m.group(1)!.contains('.')
             ? m.group(1)!.split(RegExp(r'[.,]')).last.length
             : 0;
-        rawNumbers.add(_Candidate(value: v, decimals: decimals, line: line));
+        rawNumbers.add(
+            PumpDisplayCandidate(value: v, decimals: decimals, line: line));
       }
     }
     // Consume `exclude` once per occurrence so duplicate values
     // (e.g. the pump reading 0.00 on every line at idle) are not
     // all wiped out by the first match.
     final toSkip = List<double>.from(exclude);
-    final numbers = <_Candidate>[];
+    final numbers = <PumpDisplayCandidate>[];
     for (final c in rawNumbers) {
       final idx = toSkip.indexWhere((e) => (e - c.value).abs() < 1e-6);
       if (idx >= 0) {
@@ -280,11 +185,11 @@ class PumpDisplayParser {
         numbers.add(c);
       }
     }
-    if (numbers.isEmpty) return const _InferredTriple();
+    if (numbers.isEmpty) return PumpDisplayInferredTriple.empty;
 
-    _Candidate? price;
-    _Candidate? liters;
-    _Candidate? total;
+    PumpDisplayCandidate? price;
+    PumpDisplayCandidate? liters;
+    PumpDisplayCandidate? total;
 
     // Price-per-litre: smallest value in (0.5, 5) with 3 decimals.
     final priceCandidates = numbers
@@ -307,8 +212,8 @@ class PumpDisplayParser {
         .toList();
 
     if (price != null && twoDecimals.length >= 2) {
-      _Candidate? bestL;
-      _Candidate? bestT;
+      PumpDisplayCandidate? bestL;
+      PumpDisplayCandidate? bestT;
       var bestDelta = double.infinity;
       for (var i = 0; i < twoDecimals.length; i++) {
         for (var j = 0; j < twoDecimals.length; j++) {
@@ -340,127 +245,10 @@ class PumpDisplayParser {
       }
     }
 
-    return _InferredTriple(
+    return PumpDisplayInferredTriple(
       totalCost: total?.value,
       liters: liters?.value,
       pricePerLiter: price?.value,
     );
   }
-
-  // ---------------------------------------------------------------------
-  // Digit normalisation — fixes common 7-segment OCR confusions on
-  // digit-context characters only. We only rewrite characters that
-  // appear inside a numeric token so we don't destroy German words
-  // like "Diesel" or "Super".
-  // ---------------------------------------------------------------------
-
-  String _normaliseDigits(String text) {
-    // Find tokens that look like numeric values (digits with optional
-    // . , separators, possibly contaminated by lookalike letters such
-    // as 'B' for 8) and rewrite just those. Non-numeric tokens like
-    // 'Diesel' are left untouched by construction because they are
-    // never inside a match of the numeric-token regex below.
-    final tokenRe = RegExp(r'[0-9OoIlBSDZsdzbg]+(?:[.,][0-9OoIlBSDZsdzbg]+)*');
-    return text.replaceAllMapped(tokenRe, (m) {
-      final tok = m.group(0)!;
-      if (!_isLikelyNumeric(tok)) return tok;
-      return _rewriteDigitLookalikes(tok);
-    });
-  }
-
-  /// A token is "likely numeric" if either
-  /// - it contains a decimal separator AND every non-separator char
-  ///   is a digit or a known 7-segment lookalike letter
-  ///   (so `58,42`, `B.OO`, `1O.SO` all qualify); or
-  /// - it is a pure digit sequence (catches the bare pump number
-  ///   like "8" on its own line).
-  ///
-  /// This deliberately excludes single lookalike letters ("D") and
-  /// multi-letter tokens without a separator ("Diesel") so the
-  /// rewriter never corrupts German words.
-  bool _isLikelyNumeric(String token) {
-    if (token.isEmpty) return false;
-    if (!token.contains(RegExp(r'[.,]'))) {
-      return RegExp(r'^\d+$').hasMatch(token);
-    }
-    final core = token.replaceAll(RegExp(r'[.,]'), '');
-    if (core.isEmpty) return false;
-    for (final ch in core.split('')) {
-      if (!_looksLikeDigit(ch)) return false;
-    }
-    return true;
-  }
-
-  bool _looksLikeDigit(String ch) =>
-      RegExp(r'^[0-9OoIlBSDZsdzbg]$').hasMatch(ch);
-
-  String _rewriteDigitLookalikes(String token) {
-    final sb = StringBuffer();
-    for (final ch in token.split('')) {
-      sb.write(_digitMap[ch] ?? ch);
-    }
-    return sb.toString();
-  }
-
-  static const _digitMap = <String, String>{
-    'O': '0', 'o': '0', 'D': '0',
-    'I': '1', 'l': '1',
-    'B': '8', 'b': '8',
-    'S': '5', 's': '5',
-    'Z': '2', 'z': '2',
-    'g': '9',
-  };
-
-  // ---------------------------------------------------------------------
-  // Confidence scoring
-  // ---------------------------------------------------------------------
-
-  double _scoreConfidence({
-    required double? total,
-    required double? liters,
-    required double? price,
-  }) {
-    var score = 0.0;
-    if (total != null) score += 0.3;
-    if (liters != null) score += 0.3;
-    if (price != null) score += 0.3;
-    if (total != null && liters != null && price != null) {
-      final predicted = liters * price;
-      final delta = (predicted - total).abs();
-      if (delta <= 0.02) {
-        score += 0.1;
-      } else if (delta <= 0.10) {
-        score += 0.05;
-      }
-    }
-    return score.clamp(0.0, 1.0);
-  }
-
-  double? _parseDecimal(String value) {
-    final n = double.tryParse(value.replaceAll(',', '.'));
-    if (n == null) debugPrint('PumpDisplayParser: bad decimal "$value"');
-    return n;
-  }
-}
-
-class _Candidate {
-  final double value;
-  final int decimals;
-  final String line;
-  const _Candidate({
-    required this.value,
-    required this.decimals,
-    required this.line,
-  });
-}
-
-class _InferredTriple {
-  final double? totalCost;
-  final double? liters;
-  final double? pricePerLiter;
-  const _InferredTriple({
-    this.totalCost,
-    this.liters,
-    this.pricePerLiter,
-  });
 }
