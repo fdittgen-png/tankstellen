@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/app/router.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
+import 'package:tankstellen/core/storage/storage_keys.dart';
+import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/profile/presentation/screens/profile_screen.dart';
+import 'package:tankstellen/features/profile/presentation/widgets/settings_menu_tile.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
@@ -168,6 +174,150 @@ void main() {
 
       expect(find.text('Privacy Dashboard'), findsOneWidget);
       expect(find.text('View, export, or delete your data'), findsOneWidget);
+    });
+
+    testWidgets(
+        '#896: does not render the Consumption log menu entry '
+        '(duplicate of bottom-nav Consumption tab)', (tester) async {
+      await pumpApp(
+        tester,
+        const ProfileScreen(),
+        overrides: overrides,
+      );
+
+      // English (default ARB) — the menu title string must be gone.
+      expect(find.text('Consumption log'), findsNothing);
+      // The English subtitle copy must also be gone.
+      expect(
+        find.text('Track fill-ups and calculate L/100km'),
+        findsNothing,
+      );
+      // Sanity check against the icon that was paired with the old row
+      // — `Icons.local_gas_station` used to identify the consumption
+      // tile and is not used by any other `SettingsMenuTile` on the
+      // Settings screen.
+      final gasStationIcons = tester
+          .widgetList<Icon>(find.byIcon(Icons.local_gas_station))
+          .toList();
+      expect(
+        gasStationIcons,
+        isEmpty,
+        reason: '#896: the local_gas_station icon for the Consumption '
+            'log row should no longer appear on the Settings screen',
+      );
+    });
+
+    testWidgets(
+        '#896: renders exactly two SettingsMenuTile rows — the '
+        'Consumption log tile was the third and is removed',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const ProfileScreen(),
+        overrides: overrides,
+      );
+
+      // The Settings screen body is a lazily-built `ListView`; tiles
+      // below the viewport are not yet realized. Scroll through the
+      // list so every `SettingsMenuTile` is materialised before we
+      // count them.
+      await tester.scrollUntilVisible(
+        find.text('Privacy Dashboard'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      // Before #896 the Settings screen rendered three top-level
+      // destinations: My vehicles, Consumption log, Privacy Dashboard.
+      // After #896 only My vehicles and Privacy Dashboard remain — a
+      // decrease of exactly one. `SettingsMenuTile.title` survives the
+      // lazy-list dispose, so we collect titles from every match we
+      // see instead of trusting the instant count.
+      final observedTitles = <String>{};
+      void collect() {
+        for (final t in tester
+            .widgetList<SettingsMenuTile>(find.byType(SettingsMenuTile))) {
+          observedTitles.add(t.title);
+        }
+      }
+
+      collect();
+      // Scroll back to the top so the first tile is realized again.
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, 2000));
+      await tester.pumpAndSettle();
+      collect();
+
+      expect(
+        observedTitles.contains('My vehicles'),
+        isTrue,
+        reason: 'My vehicles tile should still render after #896',
+      );
+      expect(
+        observedTitles.contains('Privacy Dashboard'),
+        isTrue,
+        reason: 'Privacy Dashboard tile should still render after #896',
+      );
+      expect(
+        observedTitles.contains('Consumption log'),
+        isFalse,
+        reason: '#896: Consumption log tile must not render any more',
+      );
+      expect(
+        observedTitles.length,
+        2,
+        reason: '#896: expected exactly two distinct SettingsMenuTile '
+            'titles (My vehicles, Privacy Dashboard) after removing '
+            'Consumption log; found $observedTitles',
+      );
+    });
+
+    test(
+        '#896: /consumption route stays registered even after the '
+        'Settings menu entry is removed', () {
+      // The Settings menu entry to /consumption was removed, but the
+      // route itself is still used by the bottom-nav Consumption tab
+      // (#778), the station detail add-fill-up CTA, and potential
+      // deep links. This test builds the real router via
+      // `routerProvider` and asserts `/consumption` is still declared
+      // on the route tree.
+
+      final mock = MockStorageRepository();
+      when(() => mock.getFavoriteIds()).thenReturn([]);
+      when(() => mock.getFavoriteStationData(any())).thenReturn(null);
+      when(() => mock.getEvFavoriteIds()).thenReturn([]);
+      when(() => mock.getEvFavoriteStationData(any())).thenReturn(null);
+      when(() => mock.isFavorite(any())).thenReturn(false);
+      when(() => mock.isEvFavorite(any())).thenReturn(false);
+      when(() => mock.isSetupComplete).thenReturn(true);
+      when(() => mock.getSetting(StorageKeys.gdprConsentGiven))
+          .thenReturn(true);
+
+      final container = ProviderContainer(overrides: [
+        storageRepositoryProvider.overrideWithValue(mock),
+      ]);
+      addTearDown(container.dispose);
+
+      final GoRouter testRouter = container.read(routerProvider);
+
+      // Walk the top-level route tree looking for a GoRoute at
+      // `/consumption`. Using `router.configuration.findMatch` would
+      // execute the redirect pipeline (which needs more provider
+      // setup); inspecting the route list is enough to prove the
+      // route remains registered.
+      bool pathRegistered(List<RouteBase> routes, String target) {
+        for (final r in routes) {
+          if (r is GoRoute && r.path == target) return true;
+          if (pathRegistered(r.routes, target)) return true;
+        }
+        return false;
+      }
+
+      expect(
+        pathRegistered(testRouter.configuration.routes, '/consumption'),
+        isTrue,
+        reason: '#896 scope: route /consumption must remain registered '
+            '— only the duplicate Settings menu entry was removed',
+      );
     });
 
     testWidgets('renders body as a scrollable ListView', (tester) async {

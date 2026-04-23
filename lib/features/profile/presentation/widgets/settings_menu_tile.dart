@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
-/// Reusable menu row used by `ProfileScreen` for the three top-level
-/// destinations (My vehicles, Consumption log, Privacy Dashboard). Each
-/// instance is a `Card`-wrapped `ListTile` with a small leading icon,
-/// a bold title, a body-small subtitle, a trailing chevron, and an
-/// `onTap` callback.
+/// Reusable menu row used by `ProfileScreen` for the top-level
+/// destinations (My vehicles, Privacy Dashboard). Each instance is a
+/// `Card`-wrapped `ListTile` with a small leading icon, a bold title,
+/// a body-small subtitle, a trailing chevron, and an `onTap` callback.
 ///
-/// Pulled out of `profile_screen.dart` so the screen drops three nearly
+/// Pulled out of `profile_screen.dart` so the screen drops nearly
 /// identical 20-line `Card` blocks and so the tile shape can be exercised
 /// by widget tests in isolation.
+///
+/// #896 — the Consumption log entry was removed in favour of the
+/// dedicated bottom-nav tab to avoid duplicate navigation.
 class SettingsMenuTile extends StatelessWidget {
   final IconData icon;
   final String title;
