@@ -3184,6 +3184,66 @@ class AppLocalizationsSl extends AppLocalizations {
   String get badScanReportHeaderYouTyped => 'You typed';
 
   @override
+  String get fillUpSectionWhatTitle => 'What you filled';
+
+  @override
+  String get fillUpSectionWhatSubtitle => 'Fuel, amount, price';
+
+  @override
+  String get fillUpSectionWhereTitle => 'Where you were';
+
+  @override
+  String get fillUpSectionWhereSubtitle => 'Station, odometer, notes';
+
+  @override
+  String get fillUpImportFromLabel => 'Import from…';
+
+  @override
+  String get fillUpImportSheetTitle => 'Import fill-up data';
+
+  @override
+  String get fillUpImportReceiptLabel => 'Receipt';
+
+  @override
+  String get fillUpImportReceiptDescription =>
+      'Scan a paper receipt with the camera';
+
+  @override
+  String get fillUpImportPumpLabel => 'Pump display';
+
+  @override
+  String get fillUpImportPumpDescription =>
+      'Read Betrag / Preis from the pump LCD';
+
+  @override
+  String get fillUpImportObdLabel => 'OBD-II adapter';
+
+  @override
+  String get fillUpImportObdDescription =>
+      'Read odometer from the OBD-II port over Bluetooth';
+
+  @override
+  String get fillUpPricePerLiterLabel => 'Price per liter';
+
+  @override
+  String get vehicleHeaderPlateLabel => 'Plate';
+
+  @override
+  String get vehicleHeaderUntitled => 'New vehicle';
+
+  @override
+  String get vehicleSectionIdentityTitle => 'Identity';
+
+  @override
+  String get vehicleSectionIdentitySubtitle => 'Name & VIN';
+
+  @override
+  String get vehicleSectionDrivetrainTitle => 'Drivetrain';
+
+  @override
+  String get vehicleSectionDrivetrainSubtitle => 'How this vehicle moves';
+
+  @override
   String get onboardingObd2StepTitle => 'Connect your OBD2 adapter';
 
   @override

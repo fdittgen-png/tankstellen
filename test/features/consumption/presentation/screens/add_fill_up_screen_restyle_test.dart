@@ -1,0 +1,207 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/widgets/form_section_card.dart';
+import 'package:tankstellen/features/consumption/presentation/screens/add_fill_up_screen.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_import_from_chip.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_numeric_field.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_price_per_liter_readout.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
+
+import '../../../../helpers/pump_app.dart';
+
+/// Widget tests for the restyled Add-Fill-up screen (#751 phase 2).
+///
+/// The phase 2 visual refresh groups fields into two cards
+/// ("What you filled" / "Where you were"), replaces the three
+/// top buttons with a single Import-from chip, and pins the Save
+/// action at the bottom of the Scaffold. These tests lock in the
+/// new structural contract so a future styling tweak can't silently
+/// drop one of the pieces.
+class _StubVehicleList extends VehicleProfileList {
+  @override
+  List<VehicleProfile> build() => const [
+        VehicleProfile(
+          id: 'stub-vehicle',
+          name: 'Stub Car',
+          type: VehicleType.combustion,
+        ),
+      ];
+}
+
+final _withVehicle = <Object>[
+  vehicleProfileListProvider.overrideWith(() => _StubVehicleList()),
+];
+
+/// Larger test surface so the two grouped cards and the pinned
+/// Save button all fit without ListView virtualization hiding the
+/// lower one (the default 800x600 crops the second card on phones —
+/// real devices only do that behind a scrollable).
+Future<void> _pumpWithTallView(
+  WidgetTester tester,
+  Widget child, {
+  List<Object>? overrides,
+}) async {
+  tester.view.physicalSize = const Size(900, 2400);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  await pumpApp(tester, child, overrides: overrides);
+}
+
+Finder _fieldByLabel(String label) => find.ancestor(
+      of: find.text(label),
+      matching: find.byType(FillUpNumericField),
+    );
+
+TextField _textFieldFor(WidgetTester tester, String label) {
+  final fillUpField = tester.widget<FillUpNumericField>(_fieldByLabel(label));
+  return tester.widget<TextField>(
+    find.descendant(
+      of: find.byWidget(fillUpField),
+      matching: find.byType(TextField),
+    ),
+  );
+}
+
+void main() {
+  group('AddFillUpScreen restyle (#751 phase 2)', () {
+    testWidgets('renders the two grouped cards with their titles',
+        (tester) async {
+      await _pumpWithTallView(
+        tester,
+        const AddFillUpScreen(),
+        overrides: _withVehicle,
+      );
+
+      expect(find.byType(FormSectionCard), findsNWidgets(2));
+      expect(find.text('What you filled'), findsOneWidget);
+      expect(find.text('Where you were'), findsOneWidget);
+    });
+
+    testWidgets('renders the Import-from chip once (replacing the '
+        'three top buttons)', (tester) async {
+      await _pumpWithTallView(
+        tester,
+        const AddFillUpScreen(),
+        overrides: _withVehicle,
+      );
+
+      expect(find.byType(FillUpImportFromChip), findsOneWidget);
+      expect(find.text('Import from…'), findsOneWidget);
+
+      // The pre-restyle Scan-receipt / Scan-pump / OBD-II labels must
+      // not appear at the top of the form — they have moved into the
+      // bottom sheet behind the chip.
+      expect(find.text('Scan receipt'), findsNothing);
+      expect(find.text('Scan pump'), findsNothing);
+      expect(find.text('OBD-II'), findsNothing);
+    });
+
+    testWidgets('tapping the chip opens the bottom sheet with all three '
+        'import options', (tester) async {
+      await _pumpWithTallView(
+        tester,
+        const AddFillUpScreen(),
+        overrides: _withVehicle,
+      );
+
+      await tester.tap(find.byType(ActionChip));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Import fill-up data'), findsOneWidget);
+      expect(find.text('Receipt'), findsOneWidget);
+      expect(find.text('Pump display'), findsOneWidget);
+      expect(find.text('OBD-II adapter'), findsOneWidget);
+    });
+
+    testWidgets('price-per-liter derivation renders under the cost field '
+        'when both liters and cost are set', (tester) async {
+      await _pumpWithTallView(
+        tester,
+        const AddFillUpScreen(),
+        overrides: _withVehicle,
+      );
+
+      expect(find.byType(FillUpPricePerLiterReadout), findsOneWidget,
+          reason: 'Readout widget is always mounted; it self-hides.');
+      expect(find.textContaining('Price per liter'), findsNothing,
+          reason: 'Initially no liters/cost → hidden.');
+
+      final liters = _textFieldFor(tester, 'Liters');
+      liters.controller!.text = '30';
+      await tester.pump();
+
+      final cost = _textFieldFor(tester, 'Total cost');
+      cost.controller!.text = '60';
+      await tester.pump();
+
+      // 60 / 30 = 2.000
+      expect(find.textContaining('Price per liter'), findsOneWidget);
+      expect(find.textContaining('2.000'), findsOneWidget);
+    });
+
+    testWidgets('pins the Save action at the bottom of the Scaffold',
+        (tester) async {
+      await _pumpWithTallView(
+        tester,
+        const AddFillUpScreen(),
+        overrides: _withVehicle,
+      );
+
+      // The FilledButton containing "Save" must always be in the tree —
+      // it's pinned via `bottomNavigationBar`, not at the end of a
+      // scroll view that could virtualize it.
+      expect(find.widgetWithText(FilledButton, 'Save'), findsOneWidget);
+    });
+
+    testWidgets('every ARB label referenced in the form still renders',
+        (tester) async {
+      await _pumpWithTallView(
+        tester,
+        const AddFillUpScreen(),
+        overrides: _withVehicle,
+      );
+
+      // Field labels.
+      expect(find.text('Date'), findsOneWidget);
+      expect(find.text('Liters'), findsOneWidget);
+      expect(find.text('Total cost'), findsOneWidget);
+      expect(find.text('Odometer (km)'), findsOneWidget);
+      expect(find.text('Notes (optional)'), findsOneWidget);
+      // Card headers + import chip.
+      expect(find.text('What you filled'), findsOneWidget);
+      expect(find.text('Where you were'), findsOneWidget);
+      expect(find.text('Import from…'), findsOneWidget);
+    });
+
+    testWidgets('meets the Android tap-target guideline (48dp, #566)',
+        (tester) async {
+      await _pumpWithTallView(
+        tester,
+        const AddFillUpScreen(),
+        overrides: _withVehicle,
+      );
+
+      final handle = tester.ensureSemantics();
+      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+      handle.dispose();
+    });
+
+    testWidgets(
+        'station pre-fill banner renders when a stationName is passed',
+        (tester) async {
+      await _pumpWithTallView(
+        tester,
+        const AddFillUpScreen(
+          stationId: 's-1',
+          stationName: 'Totale Castelnau',
+        ),
+        overrides: _withVehicle,
+      );
+
+      expect(find.text('Totale Castelnau'), findsOneWidget);
+      expect(find.text('Station pre-filled'), findsOneWidget);
+    });
+  });
+}

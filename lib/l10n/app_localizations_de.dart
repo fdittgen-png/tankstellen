@@ -3214,6 +3214,68 @@ class AppLocalizationsDe extends AppLocalizations {
   String get badScanReportHeaderYouTyped => 'Eingegeben';
 
   @override
+  String get fillUpSectionWhatTitle => 'Was du getankt hast';
+
+  @override
+  String get fillUpSectionWhatSubtitle => 'Kraftstoff, Menge, Preis';
+
+  @override
+  String get fillUpSectionWhereTitle => 'Wo du warst';
+
+  @override
+  String get fillUpSectionWhereSubtitle =>
+      'Tankstelle, Kilometerstand, Notizen';
+
+  @override
+  String get fillUpImportFromLabel => 'Importieren aus…';
+
+  @override
+  String get fillUpImportSheetTitle => 'Tankvorgang importieren';
+
+  @override
+  String get fillUpImportReceiptLabel => 'Beleg';
+
+  @override
+  String get fillUpImportReceiptDescription =>
+      'Papierbeleg mit der Kamera scannen';
+
+  @override
+  String get fillUpImportPumpLabel => 'Zapfsäulen-Display';
+
+  @override
+  String get fillUpImportPumpDescription =>
+      'Betrag / Preis vom Zapfsäulen-Display lesen';
+
+  @override
+  String get fillUpImportObdLabel => 'OBD-II-Adapter';
+
+  @override
+  String get fillUpImportObdDescription =>
+      'Kilometerstand über OBD-II per Bluetooth abrufen';
+
+  @override
+  String get fillUpPricePerLiterLabel => 'Preis pro Liter';
+
+  @override
+  String get vehicleHeaderPlateLabel => 'Kennzeichen';
+
+  @override
+  String get vehicleHeaderUntitled => 'Neues Fahrzeug';
+
+  @override
+  String get vehicleSectionIdentityTitle => 'Identität';
+
+  @override
+  String get vehicleSectionIdentitySubtitle => 'Name & FIN';
+
+  @override
+  String get vehicleSectionDrivetrainTitle => 'Antrieb';
+
+  @override
+  String get vehicleSectionDrivetrainSubtitle =>
+      'Wie sich dieses Fahrzeug bewegt';
+
+  @override
   String get onboardingObd2StepTitle => 'OBD2-Adapter verbinden';
 
   @override

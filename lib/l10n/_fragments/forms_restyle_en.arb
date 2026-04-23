@@ -1,0 +1,78 @@
+{
+  "fillUpSectionWhatTitle": "What you filled",
+  "@fillUpSectionWhatTitle": {
+    "description": "Card title grouping date, fuel and quantity inputs on the Add-Fill-up form (#751 phase 2)."
+  },
+  "fillUpSectionWhatSubtitle": "Fuel, amount, price",
+  "@fillUpSectionWhatSubtitle": {
+    "description": "Sub-title for the 'What you filled' card (#751 phase 2)."
+  },
+  "fillUpSectionWhereTitle": "Where you were",
+  "@fillUpSectionWhereTitle": {
+    "description": "Card title grouping station, odometer and notes on the Add-Fill-up form (#751 phase 2)."
+  },
+  "fillUpSectionWhereSubtitle": "Station, odometer, notes",
+  "@fillUpSectionWhereSubtitle": {
+    "description": "Sub-title for the 'Where you were' card (#751 phase 2)."
+  },
+  "fillUpImportFromLabel": "Import from…",
+  "@fillUpImportFromLabel": {
+    "description": "Chip label that opens the import bottom sheet with receipt / pump / OBD-II options (#751 phase 2)."
+  },
+  "fillUpImportSheetTitle": "Import fill-up data",
+  "@fillUpImportSheetTitle": {
+    "description": "Bottom-sheet title for the import-from chooser (#751 phase 2)."
+  },
+  "fillUpImportReceiptLabel": "Receipt",
+  "@fillUpImportReceiptLabel": {
+    "description": "Import option: OCR-scan a paper receipt (#751 phase 2)."
+  },
+  "fillUpImportReceiptDescription": "Scan a paper receipt with the camera",
+  "@fillUpImportReceiptDescription": {
+    "description": "Subtitle for the receipt-scan import option (#751 phase 2)."
+  },
+  "fillUpImportPumpLabel": "Pump display",
+  "@fillUpImportPumpLabel": {
+    "description": "Import option: OCR-scan the fuel-pump LCD (#751 phase 2)."
+  },
+  "fillUpImportPumpDescription": "Read Betrag / Preis from the pump LCD",
+  "@fillUpImportPumpDescription": {
+    "description": "Subtitle for the pump-display import option (#751 phase 2)."
+  },
+  "fillUpImportObdLabel": "OBD-II adapter",
+  "@fillUpImportObdLabel": {
+    "description": "Import option: pull the odometer reading via OBD-II Bluetooth (#751 phase 2)."
+  },
+  "fillUpImportObdDescription": "Read odometer from the OBD-II port over Bluetooth",
+  "@fillUpImportObdDescription": {
+    "description": "Subtitle for the OBD-II import option (#751 phase 2)."
+  },
+  "fillUpPricePerLiterLabel": "Price per liter",
+  "@fillUpPricePerLiterLabel": {
+    "description": "Read-only derived value shown below the cost field when liters + cost are both entered (#751 phase 2)."
+  },
+  "vehicleHeaderPlateLabel": "Plate",
+  "@vehicleHeaderPlateLabel": {
+    "description": "Tiny chip label shown next to the big vehicle title on the edit screen header (#751 phase 2)."
+  },
+  "vehicleHeaderUntitled": "New vehicle",
+  "@vehicleHeaderUntitled": {
+    "description": "Placeholder shown in the vehicle header when no name has been typed yet (#751 phase 2)."
+  },
+  "vehicleSectionIdentityTitle": "Identity",
+  "@vehicleSectionIdentityTitle": {
+    "description": "Card title grouping name + VIN on the edit-vehicle form (#751 phase 2)."
+  },
+  "vehicleSectionIdentitySubtitle": "Name & VIN",
+  "@vehicleSectionIdentitySubtitle": {
+    "description": "Sub-title for the identity card (#751 phase 2)."
+  },
+  "vehicleSectionDrivetrainTitle": "Drivetrain",
+  "@vehicleSectionDrivetrainTitle": {
+    "description": "Card title grouping vehicle type (combustion/hybrid/EV) and the type-specific inputs (#751 phase 2)."
+  },
+  "vehicleSectionDrivetrainSubtitle": "How this vehicle moves",
+  "@vehicleSectionDrivetrainSubtitle": {
+    "description": "Sub-title for the drivetrain card (#751 phase 2)."
+  }
+}

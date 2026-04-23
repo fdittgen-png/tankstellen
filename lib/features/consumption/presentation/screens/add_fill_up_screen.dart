@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/widgets/form_section_card.dart';
 import '../../../../core/widgets/fuel_type_dropdown.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -18,11 +19,10 @@ import '../../data/receipt_scan_service.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
 import '../widgets/bad_scan_report_sheet.dart';
-import '../widgets/fill_up_date_row.dart';
-import '../widgets/fill_up_input_buttons.dart';
+import '../widgets/fill_up_import_from_chip.dart';
 import '../widgets/fill_up_notes_field.dart';
 import '../widgets/fill_up_numeric_field.dart';
-import '../widgets/fill_up_save_actions.dart';
+import '../widgets/fill_up_price_per_liter_readout.dart';
 import '../widgets/fill_up_vehicle_dropdown.dart';
 
 /// Form to add a new [FillUp] entry.
@@ -288,6 +288,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     final dateStr =
         '${_date.year}-${_pad(_date.month)}-${_pad(_date.day)}';
     // Tolerate providers in error state during widget tests without
@@ -322,12 +323,12 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
                 Icon(
                   Icons.directions_car_outlined,
                   size: 80,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: theme.colorScheme.primary,
                 ),
                 const SizedBox(height: 24),
                 Text(
                   l?.consumptionNoVehicleTitle ?? 'Add a vehicle first',
-                  style: Theme.of(context).textTheme.headlineSmall,
+                  style: theme.textTheme.headlineSmall,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
@@ -335,7 +336,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
                   l?.consumptionNoVehicleBody ??
                       'Fill-ups are attributed to a vehicle. Add your car '
                           'to start logging consumption.',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: theme.textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
@@ -351,6 +352,8 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       );
     }
 
+    final importBusy = _scanning || _scanningPump || _obdReading;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l?.addFillUp ?? 'Add fill-up'),
@@ -363,88 +366,153 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.fromLTRB(
+            16,
+            16,
+            16,
+            // Extra breathing room before the pinned Save button —
+            // keeps the last field clear of the bottom action.
+            MediaQuery.of(context).viewPadding.bottom + 96,
+          ),
           children: [
-            // Scan receipt + OBD buttons
-            FillUpInputButtons(
-              scanning: _scanning,
-              scanningPump: _scanningPump,
-              obdReading: _obdReading,
+            // Quiet "Import from…" chip replacing the three buttons
+            // (#751 phase 2). A busy flag on the chip prevents tapping
+            // while any import path is already in flight.
+            FillUpImportFromChip(
+              busy: importBusy,
               onScanReceipt: _scanReceipt,
               onScanPump: _scanPumpDisplay,
               onReadObd: _readObd,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
+            // Station pre-fill callout — rendered above the cards so
+            // it's unmissable when the user opened the form from a
+            // station detail screen (#751 phase 2 keeps the original
+            // #581 affordance; it simply graduated from a ListTile
+            // card to the restyled header band).
             if (widget.stationName != null) ...[
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.place_outlined),
-                  title: Text(widget.stationName!),
-                  subtitle: Text(l?.stationPreFilled ?? 'Station pre-filled'),
+              _StationPreFillBanner(
+                stationName: widget.stationName!,
+                label: l?.stationPreFilled ?? 'Station pre-filled',
+              ),
+              const SizedBox(height: 16),
+            ],
+            // Card 1: "What you filled" — date, fuel, liters, cost.
+            FormSectionCard(
+              title: l?.fillUpSectionWhatTitle ?? 'What you filled',
+              subtitle: l?.fillUpSectionWhatSubtitle ?? 'Fuel, amount, price',
+              icon: Icons.local_gas_station_outlined,
+              children: [
+                FormFieldTile(
+                  icon: Icons.calendar_today_outlined,
+                  content: InkWell(
+                    onTap: _pickDate,
+                    borderRadius: BorderRadius.circular(8),
+                    child: InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: l?.fillUpDate ?? 'Date',
+                        border: const OutlineInputBorder(),
+                      ),
+                      child: Text(dateStr),
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-            ],
-            FillUpDateRow(dateLabel: dateStr, onTap: _pickDate),
-            const SizedBox(height: 8),
-            // Vehicle picker (#713). Mandatory — the form is only reachable
-            // when at least one vehicle exists (empty-state above). Fuel is
-            // ALWAYS derived from the selected vehicle, never picked
-            // directly here.
-            FillUpVehicleDropdown(
-              vehicleId: _vehicleId,
-              vehicles: vehicles,
-              onChanged: (id, selected) {
-                setState(() {
-                  _vehicleId = id;
-                  final derived = _fuelForVehicle(selected);
-                  if (derived != null) _fuelType = derived;
-                });
-              },
+                FormFieldTile(
+                  icon: Icons.directions_car_outlined,
+                  content: FillUpVehicleDropdown(
+                    vehicleId: _vehicleId,
+                    vehicles: vehicles,
+                    onChanged: (id, selected) {
+                      setState(() {
+                        _vehicleId = id;
+                        final derived = _fuelForVehicle(selected);
+                        if (derived != null) _fuelType = derived;
+                      });
+                    },
+                  ),
+                ),
+                if (_vehicleId != null)
+                  FormFieldTile(
+                    icon: Icons.water_drop_outlined,
+                    content: _VehicleFuelPicker(
+                      vehicles: vehicles,
+                      vehicleId: _vehicleId!,
+                      fuelType: _fuelType,
+                      onChanged: (next) => setState(() => _fuelType = next),
+                      onOpenVehicle: () =>
+                          context.push('/vehicles/edit', extra: _vehicleId!),
+                    ),
+                  ),
+                FormFieldTile(
+                  icon: Icons.opacity_outlined,
+                  content: FillUpNumericField(
+                    controller: _litersCtrl,
+                    label: l?.liters ?? 'Liters',
+                    icon: Icons.water_drop_outlined,
+                    validator: _positiveNumberValidator,
+                  ),
+                ),
+                FormFieldTile(
+                  icon: Icons.euro,
+                  content: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      FillUpNumericField(
+                        controller: _costCtrl,
+                        label: l?.totalCost ?? 'Total cost',
+                        icon: Icons.euro,
+                        validator: _positiveNumberValidator,
+                      ),
+                      // Live-derived price/L — #751 §2 bullet 4.
+                      FillUpPricePerLiterReadout(
+                        litersController: _litersCtrl,
+                        costController: _costCtrl,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            if (_vehicleId != null) ...[
-              _VehicleFuelPicker(
-                vehicles: vehicles,
-                vehicleId: _vehicleId!,
-                fuelType: _fuelType,
-                onChanged: (next) => setState(() => _fuelType = next),
-                onOpenVehicle: () =>
-                    context.push('/vehicles/edit', extra: _vehicleId!),
-              ),
-              const SizedBox(height: 12),
-            ],
-            FillUpNumericField(
-              controller: _litersCtrl,
-              label: l?.liters ?? 'Liters',
-              icon: Icons.water_drop_outlined,
-              validator: _positiveNumberValidator,
+            const SizedBox(height: 16),
+            // Card 2: "Where you were" — station, odometer, notes.
+            FormSectionCard(
+              title: l?.fillUpSectionWhereTitle ?? 'Where you were',
+              subtitle:
+                  l?.fillUpSectionWhereSubtitle ?? 'Station, odometer, notes',
+              icon: Icons.place_outlined,
+              children: [
+                FormFieldTile(
+                  icon: Icons.speed_outlined,
+                  content: FillUpNumericField(
+                    controller: _odoCtrl,
+                    label: l?.odometerKm ?? 'Odometer (km)',
+                    icon: Icons.speed,
+                    validator: _positiveNumberValidator,
+                  ),
+                ),
+                FormFieldTile(
+                  icon: Icons.edit_note_outlined,
+                  content: FillUpNotesField(controller: _notesCtrl),
+                ),
+                if (_lastScan != null) ...[
+                  const SizedBox(height: 4),
+                  Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: TextButton.icon(
+                      onPressed: _reportBadScan,
+                      icon: const Icon(Icons.flag_outlined, size: 18),
+                      label: Text(
+                        l?.reportScanError ?? 'Report scan error',
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
-            const SizedBox(height: 12),
-            FillUpNumericField(
-              controller: _costCtrl,
-              label: l?.totalCost ?? 'Total cost',
-              icon: Icons.euro,
-              validator: _positiveNumberValidator,
-            ),
-            const SizedBox(height: 12),
-            FillUpNumericField(
-              controller: _odoCtrl,
-              label: l?.odometerKm ?? 'Odometer (km)',
-              icon: Icons.speed,
-              validator: _positiveNumberValidator,
-            ),
-            const SizedBox(height: 12),
-            FillUpNotesField(controller: _notesCtrl),
-            const SizedBox(height: 24),
-            FillUpSaveActions(
-              onSave: _save,
-              onReportBadScan: _lastScan != null ? _reportBadScan : null,
-            ),
-            SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 16),
           ],
         ),
       ),
+      bottomNavigationBar: _PinnedSaveBar(onSave: _save),
     );
   }
 
@@ -567,6 +635,104 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     final raw = v.preferredFuelType;
     if (raw == null || raw.trim().isEmpty) return null;
     return FuelType.fromString(raw);
+  }
+}
+
+/// Small banner above the form cards announcing the pre-filled
+/// station (#581 affordance restyled for #751 phase 2). Replaces the
+/// old ListTile card so the callout is visible above the fold without
+/// stealing visual weight from the "What you filled" card.
+class _StationPreFillBanner extends StatelessWidget {
+  final String stationName;
+  final String label;
+
+  const _StationPreFillBanner({
+    required this.stationName,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withValues(alpha: 0.08),
+        border: Border.all(
+          color: theme.colorScheme.primary.withValues(alpha: 0.2),
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          ExcludeSemantics(
+            child: Icon(
+              Icons.place_outlined,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Semantics(
+              container: true,
+              label: '$label: $stationName',
+              child: ExcludeSemantics(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      label,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    Text(
+                      stationName,
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Pinned bottom Save bar (#751 phase 2). Sits below the scroll view
+/// so the CTA is always one tap away regardless of how many cards
+/// the user has scrolled past. Respects the system nav-bar inset so
+/// it never clips under gesture pills (see
+/// `feedback_scaffold_inset_doubling.md`).
+class _PinnedSaveBar extends StatelessWidget {
+  final VoidCallback onSave;
+  const _PinnedSaveBar({required this.onSave});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Material(
+      elevation: 8,
+      color: theme.colorScheme.surface,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: FilledButton.icon(
+            onPressed: onSave,
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(52),
+            ),
+            icon: const Icon(Icons.save_outlined),
+            label: Text(l?.save ?? 'Save'),
+          ),
+        ),
+      ),
+    );
   }
 }
 
