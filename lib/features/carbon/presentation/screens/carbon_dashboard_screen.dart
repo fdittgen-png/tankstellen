@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/page_scaffold.dart';
+import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/providers/consumption_providers.dart';
 import '../../domain/milestone.dart';
@@ -15,6 +17,13 @@ import '../widgets/monthly_bar_chart.dart';
 /// Carbon dashboard: tabbed view of monthly charts (#180) and
 /// gamified achievements (#181). Data is derived entirely from the
 /// existing [fillUpListProvider] — no new storage or providers.
+///
+/// #923 phase 3c — outer chrome migrated to [PageScaffold] and the
+/// charts-tab cards to [SectionCard]. The in-tab `TabBar` primitive is
+/// intentionally preserved as-is: the two tabs switch between Charts
+/// and Achievements views, but swapping to [TabSwitcher] is a separate
+/// presentation-layer PR to keep this diff focused on the
+/// scaffold/card migration.
 class CarbonDashboardScreen extends ConsumerWidget {
   const CarbonDashboardScreen({super.key});
 
@@ -33,22 +42,15 @@ class CarbonDashboardScreen extends ConsumerWidget {
 
     return DefaultTabController(
       length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(l?.carbonDashboardTitle ?? 'Carbon dashboard'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            tooltip: l?.tooltipBack ?? 'Back',
-            onPressed: () => context.pop(),
-          ),
-          bottomOpacity: 1,
-          bottom: TabBar(
-            tabs: [
-              Tab(text: l?.carbonTabCharts ?? 'Charts'),
-              Tab(text: l?.carbonTabAchievements ?? 'Achievements'),
-            ],
-          ),
+      child: PageScaffold(
+        title: l?.carbonDashboardTitle ?? 'Carbon dashboard',
+        bannerIcon: Icons.eco_outlined,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: l?.tooltipBack ?? 'Back',
+          onPressed: () => context.pop(),
         ),
+        bodyPadding: EdgeInsets.zero,
         body: fillUps.isEmpty
             ? EmptyState(
                 icon: Icons.eco_outlined,
@@ -56,18 +58,33 @@ class CarbonDashboardScreen extends ConsumerWidget {
                 subtitle: l?.carbonEmptySubtitle ??
                     'Log fill-ups to see your carbon dashboard.',
               )
-            : TabBarView(
+            : Column(
                 children: [
-                  _ChartsTab(
-                    summaries: last12,
-                    totalCost: totalCost,
-                    totalCo2: totalCo2,
+                  Material(
+                    color: Colors.transparent,
+                    child: TabBar(
+                      tabs: [
+                        Tab(text: l?.carbonTabCharts ?? 'Charts'),
+                        Tab(text: l?.carbonTabAchievements ?? 'Achievements'),
+                      ],
+                    ),
                   ),
-                  _AchievementsTab(
-                    milestones: milestones,
-                    fuelCo2Kg: totalCo2,
-                    distanceKm: distanceKm,
-                    theme: theme,
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        _ChartsTab(
+                          summaries: last12,
+                          totalCost: totalCost,
+                          totalCo2: totalCo2,
+                        ),
+                        _AchievementsTab(
+                          milestones: milestones,
+                          fuelCo2Kg: totalCo2,
+                          distanceKm: distanceKm,
+                          theme: theme,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -99,49 +116,29 @@ class _ChartsTab extends StatelessWidget {
       children: [
         _SummaryRow(totalCost: totalCost, totalCo2: totalCo2),
         const SizedBox(height: 8),
-        Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l?.monthlyCostsTitle ?? 'Monthly costs',
-                  style: theme.textTheme.titleMedium,
-                ),
-                const SizedBox(height: 12),
-                MonthlyBarChart(
-                  key: const Key('monthly_cost_chart'),
-                  summaries: summaries,
-                  valueOf: (s) => s.totalCost,
-                  color: theme.colorScheme.primary,
-                  unitLabel: PriceFormatter.currency,
-                ),
-              ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: SectionCard(
+            title: l?.monthlyCostsTitle ?? 'Monthly costs',
+            child: MonthlyBarChart(
+              key: const Key('monthly_cost_chart'),
+              summaries: summaries,
+              valueOf: (s) => s.totalCost,
+              color: theme.colorScheme.primary,
+              unitLabel: PriceFormatter.currency,
             ),
           ),
         ),
-        Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l?.monthlyEmissionsTitle ?? 'Monthly CO2 emissions',
-                  style: theme.textTheme.titleMedium,
-                ),
-                const SizedBox(height: 12),
-                MonthlyBarChart(
-                  key: const Key('monthly_emissions_chart'),
-                  summaries: summaries,
-                  valueOf: (s) => s.totalCo2Kg,
-                  color: theme.colorScheme.tertiary,
-                  unitLabel: 'kg',
-                ),
-              ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: SectionCard(
+            title: l?.monthlyEmissionsTitle ?? 'Monthly CO2 emissions',
+            child: MonthlyBarChart(
+              key: const Key('monthly_emissions_chart'),
+              summaries: summaries,
+              valueOf: (s) => s.totalCo2Kg,
+              color: theme.colorScheme.tertiary,
+              unitLabel: 'kg',
             ),
           ),
         ),
@@ -191,10 +188,9 @@ class _SummaryRow extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Card(
-            margin: const EdgeInsets.only(left: 16, right: 8),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16, right: 8),
+            child: SectionCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -213,10 +209,9 @@ class _SummaryRow extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: Card(
-            margin: const EdgeInsets.only(left: 8, right: 16),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8, right: 16),
+            child: SectionCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
