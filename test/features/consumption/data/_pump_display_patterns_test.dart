@@ -265,6 +265,109 @@ void main() {
     });
   });
 
+  // -------------------------------------------------------------------
+  // Multi-locale label coverage — issue #948.
+  //
+  // French Tokheim / Dresser Wayne pumps label the three fields as
+  // PRIX, VOLUME / LITRES, and PRIX DU LITRE. Italian and Spanish
+  // variants are folded into the same lists so a pump in Milan or
+  // Valencia also parses. Labels are UPPERCASE on Tokheim glass;
+  // the patterns use caseSensitive:false throughout.
+  // -------------------------------------------------------------------
+
+  group('kBetragPatterns — French / Italian / Spanish / English labels', () {
+    test('French "PRIX 79,91 €" yields the total amount', () {
+      expect(_firstMatch(kBetragPatterns, 'PRIX 79,91 €'), '79,91');
+    });
+
+    test('French "Prix: 30,02" (lowercase + colon) yields the amount', () {
+      expect(_firstMatch(kBetragPatterns, 'Prix: 30,02'), '30,02');
+    });
+
+    test('Italian "Importo 58,42" yields the amount', () {
+      expect(_firstMatch(kBetragPatterns, 'Importo 58,42'), '58,42');
+    });
+
+    test('Spanish "Importe 58,42" yields the amount', () {
+      expect(_firstMatch(kBetragPatterns, 'Importe 58,42'), '58,42');
+    });
+
+    test('English "Amount 58.42" yields the amount', () {
+      expect(_firstMatch(kBetragPatterns, 'Amount 58.42'), '58.42');
+    });
+
+    test(r'English "Amount $ 58.42" (USD) still matches', () {
+      expect(_firstMatch(kBetragPatterns, r'Amount $ 58.42'), '58.42');
+    });
+  });
+
+  group('kAbgabePatterns — French / Italian / Spanish / English labels', () {
+    test('French "VOLUME 36,06" yields the volume', () {
+      expect(_firstMatch(kAbgabePatterns, 'VOLUME 36,06'), '36,06');
+    });
+
+    test('French "36,06 LITRES" (trailing unit) yields the volume', () {
+      expect(_firstMatch(kAbgabePatterns, '36,06 LITRES'), '36,06');
+    });
+
+    test('French "20,03 L" (short unit) yields the volume', () {
+      expect(_firstMatch(kAbgabePatterns, '20,03 L'), '20,03');
+    });
+
+    test('Italian "Litri 31,65" yields the volume', () {
+      expect(_firstMatch(kAbgabePatterns, 'Litri 31,65'), '31,65');
+    });
+
+    test('Spanish "Litros 31,65" yields the volume', () {
+      expect(_firstMatch(kAbgabePatterns, 'Litros 31,65'), '31,65');
+    });
+
+    test('English "Liters 10.50" yields the volume', () {
+      expect(_firstMatch(kAbgabePatterns, 'Liters 10.50'), '10.50');
+    });
+  });
+
+  group('kPricePerLiterPatterns — French / Italian / Spanish labels', () {
+    test('French "PRIX DU LITRE 2,216" yields the unit price', () {
+      expect(
+        _firstMatch(kPricePerLiterPatterns, 'PRIX DU LITRE 2,216'),
+        '2,216',
+      );
+    });
+
+    test('French "prix du litre: 2,216" (lowercase + colon) matches', () {
+      expect(
+        _firstMatch(kPricePerLiterPatterns, 'prix du litre: 2,216'),
+        '2,216',
+      );
+    });
+
+    test('French "2,216 €/L" (trailing EUR/L) matches', () {
+      expect(_firstMatch(kPricePerLiterPatterns, '2,216 €/L'), '2,216');
+    });
+
+    test('French "2,216 €/litre" (full word) matches', () {
+      expect(
+        _firstMatch(kPricePerLiterPatterns, '2,216 €/litre'),
+        '2,216',
+      );
+    });
+
+    test('Italian "Prezzo al litro 1,846" yields the unit price', () {
+      expect(
+        _firstMatch(kPricePerLiterPatterns, 'Prezzo al litro 1,846'),
+        '1,846',
+      );
+    });
+
+    test('Spanish "Precio por litro 1,846" yields the unit price', () {
+      expect(
+        _firstMatch(kPricePerLiterPatterns, 'Precio por litro 1,846'),
+        '1,846',
+      );
+    });
+  });
+
   group('kDigitLookalikeMap — rewrite table', () {
     test('maps each known lookalike to the intended digit', () {
       expect(kDigitLookalikeMap['O'], '0');
