@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/widgets/form_section_card.dart';
 import '../../../../core/widgets/fuel_type_dropdown.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
@@ -337,48 +338,44 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     // #706 — consumption requires a vehicle. When none are configured,
     // show an empty-state CTA instead of the full form.
     if (vehicles.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(l?.addFillUp ?? 'Add fill-up'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            tooltip: l?.tooltipBack ?? 'Back',
-            onPressed: () => context.pop(),
-          ),
+      return PageScaffold(
+        title: l?.addFillUp ?? 'Add fill-up',
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: l?.tooltipBack ?? 'Back',
+          onPressed: () => context.pop(),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.directions_car_outlined,
-                  size: 80,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  l?.consumptionNoVehicleTitle ?? 'Add a vehicle first',
-                  style: theme.textTheme.headlineSmall,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  l?.consumptionNoVehicleBody ??
-                      'Fill-ups are attributed to a vehicle. Add your car '
-                          'to start logging consumption.',
-                  style: theme.textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                FilledButton.icon(
-                  onPressed: () => context.push('/vehicles/edit'),
-                  icon: const Icon(Icons.add),
-                  label: Text(l?.vehicleAdd ?? 'Add vehicle'),
-                ),
-              ],
-            ),
+        bodyPadding: const EdgeInsets.all(32),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.directions_car_outlined,
+                size: 80,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(height: 24),
+              Text(
+                l?.consumptionNoVehicleTitle ?? 'Add a vehicle first',
+                style: theme.textTheme.headlineSmall,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                l?.consumptionNoVehicleBody ??
+                    'Fill-ups are attributed to a vehicle. Add your car '
+                        'to start logging consumption.',
+                style: theme.textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: () => context.push('/vehicles/edit'),
+                icon: const Icon(Icons.add),
+                label: Text(l?.vehicleAdd ?? 'Add vehicle'),
+              ),
+            ],
           ),
         ),
       );
@@ -386,15 +383,14 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
 
     final importBusy = _scanning || _scanningPump || _obdReading;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l?.addFillUp ?? 'Add fill-up'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: l?.tooltipBack ?? 'Back',
-          onPressed: () => context.pop(),
-        ),
+    return PageScaffold(
+      title: l?.addFillUp ?? 'Add fill-up',
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: l?.tooltipBack ?? 'Back',
+        onPressed: () => context.pop(),
       ),
+      bodyPadding: EdgeInsets.zero,
       body: Form(
         key: _formKey,
         child: ListView(
