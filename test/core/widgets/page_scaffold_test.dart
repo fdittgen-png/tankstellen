@@ -193,6 +193,28 @@ void main() {
       expect(find.byKey(const Key('pinned_save_bar')), findsOneWidget);
     });
 
+    testWidgets('passes bottom through to AppBar', (tester) async {
+      const bottomHeight = 48.0;
+      await pump(
+        tester,
+        PageScaffold(
+          title: 'Favorites',
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(bottomHeight),
+            child: Container(
+              key: const Key('tab_bar_stub'),
+              height: bottomHeight,
+            ),
+          ),
+          body: const SizedBox.shrink(),
+        ),
+      );
+      final appBar = tester.widget<AppBar>(find.byType(AppBar));
+      expect(appBar.bottom, isNotNull);
+      expect(appBar.bottom!.preferredSize.height, bottomHeight);
+      expect(find.byKey(const Key('tab_bar_stub')), findsOneWidget);
+    });
+
     testWidgets('forwards leading to the app bar', (tester) async {
       var tapped = false;
       await pump(
