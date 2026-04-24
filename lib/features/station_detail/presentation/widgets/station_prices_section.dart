@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/brand_registry.dart';
@@ -15,6 +16,12 @@ import 'price_tile.dart';
 /// Extracted from [StationDetailScreen] so the screen stays under the
 /// 300-LOC cap (#563). Public behaviour is unchanged — same fuel
 /// ordering, same optional-tile gating, same localisation lookups.
+///
+/// #923 phase 3f — the raw `Text(…, titleMedium)` + plain Column
+/// wrapper is replaced by the canonical [SectionCard] so the Prices
+/// block shares the design-system surface tint, radius, padding, and
+/// header role (`SectionHeader`) with every other section on the
+/// station-detail screen.
 class StationPricesSection extends StatelessWidget {
   final Station station;
 
@@ -22,32 +29,28 @@ class StationPricesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Semantics(
-          header: true,
-          child: Text(l10n?.prices ?? 'Prices',
-              style: theme.textTheme.titleMedium),
-        ),
-        const SizedBox(height: 6),
-        PriceTile(label: 'Super E5', price: station.e5, fuelType: FuelType.e5),
-        PriceTile(label: 'Super E10', price: station.e10, fuelType: FuelType.e10),
-        PriceTile(label: 'Diesel', price: station.diesel, fuelType: FuelType.diesel),
-        if (station.e98 != null)
-          PriceTile(label: 'Super 98', price: station.e98, fuelType: FuelType.e98),
-        if (station.e85 != null)
-          PriceTile(label: 'E85', price: station.e85, fuelType: FuelType.e85),
-        if (station.lpg != null)
-          PriceTile(label: 'LPG', price: station.lpg, fuelType: FuelType.lpg),
-        if (station.cng != null)
-          PriceTile(label: 'CNG', price: station.cng, fuelType: FuelType.cng),
-        const SizedBox(height: 12),
-        LogFillUpButton(station: station),
-      ],
+    return SectionCard(
+      title: l10n?.prices ?? 'Prices',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          PriceTile(label: 'Super E5', price: station.e5, fuelType: FuelType.e5),
+          PriceTile(label: 'Super E10', price: station.e10, fuelType: FuelType.e10),
+          PriceTile(label: 'Diesel', price: station.diesel, fuelType: FuelType.diesel),
+          if (station.e98 != null)
+            PriceTile(label: 'Super 98', price: station.e98, fuelType: FuelType.e98),
+          if (station.e85 != null)
+            PriceTile(label: 'E85', price: station.e85, fuelType: FuelType.e85),
+          if (station.lpg != null)
+            PriceTile(label: 'LPG', price: station.lpg, fuelType: FuelType.lpg),
+          if (station.cng != null)
+            PriceTile(label: 'CNG', price: station.cng, fuelType: FuelType.cng),
+          const SizedBox(height: 12),
+          LogFillUpButton(station: station),
+        ],
+      ),
     );
   }
 }
