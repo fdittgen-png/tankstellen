@@ -2,22 +2,27 @@ import 'package:flutter/foundation.dart';
 
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import 'elm327_protocol.dart';
+import 'fuel_rate_estimator.dart' as estimator;
 import 'obd2_transport.dart';
 import 'supported_pids_cache.dart';
 
-/// Fallback engine displacement used by the speed-density fuel-rate
-/// estimator when the active vehicle profile doesn't expose one
-/// (#810, #812). 1000 cc = 1.0 L NA petrol — matches the Peugeot 107
-/// / Aygo / C1 class that originally motivated the fallback. Kept as
-/// a named constant so the no-profile case is obvious at a glance
-/// and easy to update if the default assumption ever changes.
-const int _defaultEngineDisplacementCc = 1000;
-
-/// Fallback volumetric efficiency for the speed-density estimator
-/// (#810, #812). 0.85 is a sensible midpoint for a NA petrol engine
-/// at cruise; adaptive calibration (#815) will later narrow this per
-/// vehicle from tankful reconciliation.
-const double _defaultVolumetricEfficiency = 0.85;
+// Re-export the pure-math estimator + stoichiometric constants so
+// callers that only need the math (e.g. [TripRecordingController]'s
+// cached live sampler) can import one file instead of chasing statics
+// on [Obd2Service]. New callers should import `fuel_rate_estimator.dart`
+// directly; the static forwarders on [Obd2Service] stay for backwards
+// compatibility with pre-#563 call sites.
+export 'fuel_rate_estimator.dart'
+    show
+        kPetrolAfr,
+        kDieselAfr,
+        kPetrolDensityGPerL,
+        kDieselDensityGPerL,
+        kDefaultEngineDisplacementCc,
+        kDefaultVolumetricEfficiency,
+        isDieselProfile,
+        applyFuelTrimCorrection,
+        estimateFuelRateLPerHourFromMap;
 
 /// High-level OBD-II service for reading vehicle data.
 ///
@@ -352,7 +357,7 @@ class Obd2Service {
   /// step-3 speed-density fallback the car's real engine displacement
   /// and volumetric efficiency (#812 phase 3). When [vehicle] is null
   /// or its engine fields are null, the method falls back to
-  /// [_defaultEngineDisplacementCc] / [_defaultVolumetricEfficiency]
+  /// [kDefaultEngineDisplacementCc] / [kDefaultVolumetricEfficiency]
   /// — still honest, just tuned for the 1.0 L NA petrol class (Peugeot
   /// 107 / Aygo / C1) that originally motivated the fallback.
   /// Partial profiles (e.g. displacement known, VE unknown) use the
@@ -372,16 +377,17 @@ class Obd2Service {
   /// unrecognised we default to petrol — that's the class of car
   /// (Peugeot 107 / Aygo / C1) that motivated this fallback.
   Future<double?> readFuelRateLPerHour({VehicleProfile? vehicle}) async {
-    final engineDisplacementCc =
-        vehicle?.engineDisplacementCc ?? _defaultEngineDisplacementCc;
+    final engineDisplacementCc = vehicle?.engineDisplacementCc ??
+        estimator.kDefaultEngineDisplacementCc;
     // VE on VehicleProfile is a non-nullable double with its own
     // default (0.85). Using it directly here is equivalent to the
     // service-level fallback for that field.
     final volumetricEfficiency =
-        vehicle?.volumetricEfficiency ?? _defaultVolumetricEfficiency;
-    final isDiesel = _isDieselProfile(vehicle);
-    final afr = isDiesel ? dieselAfr : petrolAfr;
-    final fuelDensityGPerL = isDiesel ? dieselDensityGPerL : petrolDensityGPerL;
+        vehicle?.volumetricEfficiency ?? estimator.kDefaultVolumetricEfficiency;
+    final isDiesel = estimator.isDieselProfile(vehicle);
+    final afr = isDiesel ? estimator.kDieselAfr : estimator.kPetrolAfr;
+    final fuelDensityGPerL =
+        isDiesel ? estimator.kDieselDensityGPerL : estimator.kPetrolDensityGPerL;
     // Step 1: direct fuel-rate PID (already post-trim — no correction).
     // Skipped when #811 discovery proved the car doesn't implement PID 5E.
     if (isPidSupported(0x5E)) {
@@ -417,7 +423,7 @@ class Obd2Service {
     final iatCelsius = await readIntakeAirTempCelsius();
     final rpm = await readRpm();
     if (mapKpa == null || iatCelsius == null || rpm == null) return null;
-    final rate = estimateFuelRateLPerHourFromMap(
+    final rate = estimator.estimateFuelRateLPerHourFromMap(
       mapKpa: mapKpa,
       iatCelsius: iatCelsius,
       rpm: rpm,
@@ -432,36 +438,29 @@ class Obd2Service {
 
   /// Stoichiometric AFR for petrol / gasoline (#800). Approximately
   /// 14.7 kg of air per kg of fuel at perfect combustion.
-  static const double petrolAfr = 14.7;
+  ///
+  /// Backwards-compat forwarder for [kPetrolAfr] from
+  /// `fuel_rate_estimator.dart` — kept so pre-#563 call sites
+  /// (`Obd2Service.petrolAfr`) compile unchanged.
+  static const double petrolAfr = estimator.kPetrolAfr;
 
   /// Stoichiometric AFR for diesel (#800). Slightly leaner burn than
   /// petrol — ~14.5 kg of air per kg of diesel.
-  static const double dieselAfr = 14.5;
+  ///
+  /// Backwards-compat forwarder for [kDieselAfr].
+  static const double dieselAfr = estimator.kDieselAfr;
 
   /// Petrol density in g/L at ~15 °C (#800). Published range
-  /// 720–775 g/L; 740 is the legacy Tankstellen constant, kept stable
-  /// so pre-#800 fuel-rate samples don't shift by ~0.7 % after the
-  /// diesel branch landed.
-  static const double petrolDensityGPerL = 740.0;
+  /// 720–775 g/L; 740 is the legacy Tankstellen constant.
+  ///
+  /// Backwards-compat forwarder for [kPetrolDensityGPerL].
+  static const double petrolDensityGPerL = estimator.kPetrolDensityGPerL;
 
   /// Diesel density in g/L at ~15 °C (#800). Denser than petrol at
   /// ~820–845 g/L; 832 is the EN 590 reference point.
-  static const double dieselDensityGPerL = 832.0;
-
-  /// `true` when [vehicle]'s preferred fuel type reads like a diesel
-  /// variant (#800). Matching is done on the normalised string instead
-  /// of a typed enum because `preferredFuelType` is a free-text field
-  /// populated from several sources (user onboarding, VIN decoder,
-  /// home-widget mirror) — all of which use `"diesel"` /
-  /// `"dieselPremium"` as the key. Returns `false` for null, empty, or
-  /// any non-diesel value (which is the safe default — petrol AFR /
-  /// density produce slightly lower L/h numbers than diesel at the
-  /// same MAF, so under-counting is preferable to over-counting).
-  static bool _isDieselProfile(VehicleProfile? vehicle) {
-    final key = vehicle?.preferredFuelType?.trim().toLowerCase();
-    if (key == null || key.isEmpty) return false;
-    return key.contains('diesel');
-  }
+  ///
+  /// Backwards-compat forwarder for [kDieselDensityGPerL].
+  static const double dieselDensityGPerL = estimator.kDieselDensityGPerL;
 
   /// Multiply a stoichiometric-assumption fuel rate by
   /// `(1 + (STFT + LTFT) / 100)` when both trims are readable (#813).
@@ -472,68 +471,45 @@ class Obd2Service {
     final stft = await readShortTermFuelTrimPercent();
     final ltft = await readLongTermFuelTrimPercent();
     if (stft == null || ltft == null) return raw;
-    return applyFuelTrimCorrection(raw, stft: stft, ltft: ltft);
+    return estimator.applyFuelTrimCorrection(raw, stft: stft, ltft: ltft);
   }
 
-  /// Pure-math fuel-trim correction factor (#813). Exposed for unit
-  /// tests and for callers that already hold the trim values.
+  /// Pure-math fuel-trim correction factor (#813).
   ///
-  /// Formula: `corrected = raw × (1 + (STFT + LTFT) / 100)`. Positive
-  /// trims mean the ECU is enriching the mixture — real fuel flow is
-  /// higher than what stoichiometric math predicts. Negative trims
-  /// mean the opposite. Summing STFT and LTFT is standard practice
-  /// (HEM Data's canonical formula); they capture fast and slow
-  /// corrections respectively.
+  /// Backwards-compat forwarder for
+  /// [estimator.applyFuelTrimCorrection] from `fuel_rate_estimator.dart`.
+  /// New call sites should import the top-level function directly.
   static double applyFuelTrimCorrection(
     double raw, {
     required double stft,
     required double ltft,
-  }) {
-    return raw * (1.0 + (stft + ltft) / 100.0);
-  }
+  }) =>
+      estimator.applyFuelTrimCorrection(raw, stft: stft, ltft: ltft);
 
-  /// Pure-math speed-density fuel-rate estimator (#800). Split out so
-  /// unit tests can verify the formula without mocking the transport.
+  /// Pure-math speed-density fuel-rate estimator (#800).
   ///
-  /// Formula:
-  ///   air_flow_g_per_s = (MAP_Pa × displacement_m³ × (RPM / 120) × η_v)
-  ///                      / (R × IAT_K)
-  ///   fuel_rate_L_per_h = air_flow_g_per_s × 3600 / (AFR × density)
-  ///
-  /// R = 287 J/(kg·K) is the specific gas constant for dry air.
-  /// `RPM / 120` converts crank revolutions to intake strokes per
-  /// second on a 4-stroke engine (one intake per 2 crank revs).
-  /// Returns null when any input is non-positive — the ideal gas law
-  /// breaks down at 0 K / 0 pressure and callers should surface "no
-  /// data" rather than a bogus number.
+  /// Backwards-compat forwarder for
+  /// [estimator.estimateFuelRateLPerHourFromMap] from
+  /// `fuel_rate_estimator.dart`. New call sites should import the
+  /// top-level function directly.
   static double? estimateFuelRateLPerHourFromMap({
     required double mapKpa,
     required double iatCelsius,
     required double rpm,
     required int engineDisplacementCc,
     required double volumetricEfficiency,
-    double afr = 14.7,
-    double fuelDensityGPerL = 740.0,
-  }) {
-    final iatKelvin = iatCelsius + 273.15;
-    if (mapKpa <= 0 ||
-        iatKelvin <= 0 ||
-        rpm <= 0 ||
-        engineDisplacementCc <= 0 ||
-        volumetricEfficiency <= 0) {
-      return null;
-    }
-    const gasConstant = 287.0; // J/(kg·K), dry air
-    final mapPa = mapKpa * 1000.0;
-    final displacementM3 = engineDisplacementCc / 1_000_000.0;
-    final intakesPerSecond = rpm / 120.0;
-    // Kilograms of air per second (ideal gas law × VE).
-    final airMassKgPerS =
-        (mapPa * displacementM3 * intakesPerSecond * volumetricEfficiency) /
-            (gasConstant * iatKelvin);
-    final airMassGPerS = airMassKgPerS * 1000.0;
-    return airMassGPerS * 3600.0 / (afr * fuelDensityGPerL);
-  }
+    double afr = estimator.kPetrolAfr,
+    double fuelDensityGPerL = estimator.kPetrolDensityGPerL,
+  }) =>
+      estimator.estimateFuelRateLPerHourFromMap(
+        mapKpa: mapKpa,
+        iatCelsius: iatCelsius,
+        rpm: rpm,
+        engineDisplacementCc: engineDisplacementCc,
+        volumetricEfficiency: volumetricEfficiency,
+        afr: afr,
+        fuelDensityGPerL: fuelDensityGPerL,
+      );
 
   /// Read mass air flow in g/s. (#717)
   Future<double?> readMafGramsPerSecond() => _readDouble(
