@@ -12,15 +12,15 @@ part of 'search_provider.dart';
 ///
 /// Wraps every result in [ServiceResult] so the UI can display data source,
 /// freshness age, and fallback information (e.g., "cache, 12 min ago").
+/// Supports three search modes: [searchByGps], [searchByZipCode],
+/// [searchByCoordinates]. All modes delegate to the country-appropriate
+/// [StationService] via [stationServiceProvider] (fresh cache → API →
+/// stale cache → error).
 ///
-/// Supports three search modes:
-/// - [searchByGps] -- uses device GPS to determine coordinates
-/// - [searchByZipCode] -- geocodes a postal code, then searches
-/// - [searchByCoordinates] -- uses explicit lat/lng (from city search)
-///
-/// All modes delegate to the country-appropriate [StationService] via
-/// the [stationServiceProvider], which applies the full fallback chain
-/// (fresh cache -> API -> stale cache -> error).
+/// Pure helpers (result wrapping, distance recalc, postal-code
+/// extraction, geocoding-error merging) live in
+/// `search_result_helpers.dart`; this file keeps the stateful
+/// orchestration (cancel tokens, profile lookups, state mutation).
 
 @ProviderFor(SearchState)
 final searchStateProvider = SearchStateProvider._();
@@ -29,15 +29,15 @@ final searchStateProvider = SearchStateProvider._();
 ///
 /// Wraps every result in [ServiceResult] so the UI can display data source,
 /// freshness age, and fallback information (e.g., "cache, 12 min ago").
+/// Supports three search modes: [searchByGps], [searchByZipCode],
+/// [searchByCoordinates]. All modes delegate to the country-appropriate
+/// [StationService] via [stationServiceProvider] (fresh cache → API →
+/// stale cache → error).
 ///
-/// Supports three search modes:
-/// - [searchByGps] -- uses device GPS to determine coordinates
-/// - [searchByZipCode] -- geocodes a postal code, then searches
-/// - [searchByCoordinates] -- uses explicit lat/lng (from city search)
-///
-/// All modes delegate to the country-appropriate [StationService] via
-/// the [stationServiceProvider], which applies the full fallback chain
-/// (fresh cache -> API -> stale cache -> error).
+/// Pure helpers (result wrapping, distance recalc, postal-code
+/// extraction, geocoding-error merging) live in
+/// `search_result_helpers.dart`; this file keeps the stateful
+/// orchestration (cancel tokens, profile lookups, state mutation).
 final class SearchStateProvider
     extends
         $NotifierProvider<
@@ -48,15 +48,15 @@ final class SearchStateProvider
   ///
   /// Wraps every result in [ServiceResult] so the UI can display data source,
   /// freshness age, and fallback information (e.g., "cache, 12 min ago").
+  /// Supports three search modes: [searchByGps], [searchByZipCode],
+  /// [searchByCoordinates]. All modes delegate to the country-appropriate
+  /// [StationService] via [stationServiceProvider] (fresh cache → API →
+  /// stale cache → error).
   ///
-  /// Supports three search modes:
-  /// - [searchByGps] -- uses device GPS to determine coordinates
-  /// - [searchByZipCode] -- geocodes a postal code, then searches
-  /// - [searchByCoordinates] -- uses explicit lat/lng (from city search)
-  ///
-  /// All modes delegate to the country-appropriate [StationService] via
-  /// the [stationServiceProvider], which applies the full fallback chain
-  /// (fresh cache -> API -> stale cache -> error).
+  /// Pure helpers (result wrapping, distance recalc, postal-code
+  /// extraction, geocoding-error merging) live in
+  /// `search_result_helpers.dart`; this file keeps the stateful
+  /// orchestration (cancel tokens, profile lookups, state mutation).
   SearchStateProvider._()
     : super(
         from: null,
@@ -89,21 +89,21 @@ final class SearchStateProvider
   }
 }
 
-String _$searchStateHash() => r'ca6a2ba8f1cbdd3a1042d75f94149c820fc90cb0';
+String _$searchStateHash() => r'794dccf84672b1c30c6f326acefbd78157ef659a';
 
 /// Manages the station search lifecycle and exposes results as [AsyncValue].
 ///
 /// Wraps every result in [ServiceResult] so the UI can display data source,
 /// freshness age, and fallback information (e.g., "cache, 12 min ago").
+/// Supports three search modes: [searchByGps], [searchByZipCode],
+/// [searchByCoordinates]. All modes delegate to the country-appropriate
+/// [StationService] via [stationServiceProvider] (fresh cache → API →
+/// stale cache → error).
 ///
-/// Supports three search modes:
-/// - [searchByGps] -- uses device GPS to determine coordinates
-/// - [searchByZipCode] -- geocodes a postal code, then searches
-/// - [searchByCoordinates] -- uses explicit lat/lng (from city search)
-///
-/// All modes delegate to the country-appropriate [StationService] via
-/// the [stationServiceProvider], which applies the full fallback chain
-/// (fresh cache -> API -> stale cache -> error).
+/// Pure helpers (result wrapping, distance recalc, postal-code
+/// extraction, geocoding-error merging) live in
+/// `search_result_helpers.dart`; this file keeps the stateful
+/// orchestration (cancel tokens, profile lookups, state mutation).
 
 abstract class _$SearchState
     extends $Notifier<AsyncValue<ServiceResult<List<SearchResultItem>>>> {
