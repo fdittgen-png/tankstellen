@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/station.dart';
@@ -40,15 +41,14 @@ class PickStationForFillUpScreen extends ConsumerWidget {
     final profileFuel =
         ref.watch(activeProfileProvider)?.preferredFuelType;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l?.pickStationTitle ?? 'Pick a station'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: l?.tooltipBack ?? 'Back',
-          onPressed: () => context.pop(),
-        ),
+    return PageScaffold(
+      title: l?.pickStationTitle ?? 'Pick a station',
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: l?.tooltipBack ?? 'Back',
+        onPressed: () => context.pop(),
       ),
+      bodyPadding: EdgeInsets.zero,
       body: Column(
         children: [
           Padding(

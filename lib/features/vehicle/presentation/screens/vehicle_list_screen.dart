@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/widgets/help_banner.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/vehicle_providers.dart';
 import '../widgets/vehicle_card.dart';
@@ -18,10 +19,9 @@ class VehicleListScreen extends ConsumerWidget {
     final vehicles = ref.watch(vehicleProfileListProvider);
     final active = ref.watch(activeVehicleProfileProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l?.vehiclesTitle ?? 'My vehicles'),
-      ),
+    return PageScaffold(
+      title: l?.vehiclesTitle ?? 'My vehicles',
+      bodyPadding: EdgeInsets.zero,
       body: vehicles.isEmpty
           ? Column(
               children: [
