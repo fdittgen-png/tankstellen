@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
+import '../../../../core/widgets/section_header.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../search/presentation/widgets/amenity_chips.dart';
@@ -10,6 +11,18 @@ import '../../../search/presentation/widgets/pay_with_app_button.dart';
 import '../../../search/presentation/widgets/payment_method_chips.dart';
 
 /// Address, opening hours, fuels, services, and location info for a station.
+///
+/// #923 phase 3f — the five plain-text `titleMedium` sub-headings
+/// (Address / Opening hours / Zone / Amenities / Payment methods)
+/// are rendered through the canonical [SectionHeader] so the headings
+/// share the design-system role, weight, and color with every other
+/// section on the screen. The body stays in a single Column — the
+/// screen already owns outer card-vs-card spacing via its parent
+/// [SizedBox]s and the section layout was not wrapped in a Card before
+/// this migration, so no visual regressions are introduced here. The
+/// bottom `ExpansionTile` for "Services (N)" keeps its own
+/// `titleMedium` label because that slot is an ExpansionTile title,
+/// not a stand-alone section heading.
 class StationInfoSection extends StatelessWidget {
   final Station station;
   final StationDetail detail;
@@ -29,7 +42,10 @@ class StationInfoSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Address
-        Text(l10n?.address ?? 'Address', style: theme.textTheme.titleMedium),
+        SectionHeader(
+          title: l10n?.address ?? 'Address',
+          padding: EdgeInsets.zero,
+        ),
         const SizedBox(height: 8),
         ListTile(
           leading: const Icon(Icons.location_on),
@@ -49,7 +65,10 @@ class StationInfoSection extends StatelessWidget {
         const SizedBox(height: 24),
 
         // Opening times
-        Text(l10n?.openingHours ?? 'Opening hours', style: theme.textTheme.titleMedium),
+        SectionHeader(
+          title: l10n?.openingHours ?? 'Opening hours',
+          padding: EdgeInsets.zero,
+        ),
         const SizedBox(height: 8),
         if (station.is24h)
           ListTile(
@@ -79,7 +98,10 @@ class StationInfoSection extends StatelessWidget {
 
         // Location info
         if (station.department != null || station.region != null) ...[
-          Text(l10n?.zone ?? 'Zone', style: theme.textTheme.titleMedium),
+          SectionHeader(
+            title: l10n?.zone ?? 'Zone',
+            padding: EdgeInsets.zero,
+          ),
           const SizedBox(height: 8),
           ListTile(
             dense: true,
@@ -96,7 +118,10 @@ class StationInfoSection extends StatelessWidget {
 
         // Amenities (icon chips) — at the bottom
         if (station.amenities.isNotEmpty) ...[
-          Text(l10n?.amenities ?? 'Amenities', style: theme.textTheme.titleMedium),
+          SectionHeader(
+            title: l10n?.amenities ?? 'Amenities',
+            padding: EdgeInsets.zero,
+          ),
           const SizedBox(height: 8),
           AmenityChips(amenities: station.amenities, maxVisible: 8),
           const SizedBox(height: 24),
@@ -104,9 +129,9 @@ class StationInfoSection extends StatelessWidget {
 
         // Payment methods (inferred from brand — no API data available)
         if (station.brand.trim().isNotEmpty) ...[
-          Text(
-            l10n?.paymentMethods ?? 'Payment methods',
-            style: theme.textTheme.titleMedium,
+          SectionHeader(
+            title: l10n?.paymentMethods ?? 'Payment methods',
+            padding: EdgeInsets.zero,
           ),
           const SizedBox(height: 8),
           PaymentMethodChips(brand: station.brand, maxVisible: 8),
