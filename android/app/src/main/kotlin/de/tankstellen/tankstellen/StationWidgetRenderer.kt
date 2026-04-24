@@ -107,6 +107,11 @@ object StationWidgetRenderer {
     ): RemoteViews {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val mode = getMode(context, appWidgetId, defaultMode)
+        // #610 — per-widget profile id, when the configure activity has
+        // persisted one. Read here (not inside buildRow) so one render pass
+        // resolves it once; the value is purely diagnostic for Kotlin —
+        // the Dart side has already filtered the JSON to the right profile.
+        val profileId = prefs.getString("profile_$appWidgetId", null)
 
         val stationsJson: String
         val updatedAt: String?
@@ -212,7 +217,7 @@ object StationWidgetRenderer {
             val count = minOf(stations.length(), 3)
             for (i in 0 until count) {
                 val station = stations.getJSONObject(i)
-                val row = buildRow(context, station, appWidgetId, i)
+                val row = buildRow(context, station, appWidgetId, i, profileId)
                 views.addView(R.id.station_list, row)
             }
         }
@@ -243,6 +248,7 @@ object StationWidgetRenderer {
         station: JSONObject,
         appWidgetId: Int,
         index: Int,
+        profileId: String? = null,
     ): RemoteViews {
         val row = RemoteViews(context.packageName, R.layout.widget_station_row)
 
@@ -315,7 +321,7 @@ object StationWidgetRenderer {
         // wired to which visual row. No control-flow change.
         android.util.Log.d(
             "TankstellenWidget",
-            "buildRow widgetId=$appWidgetId index=$index id=$stationId brand=${station.optString("brand", "")}",
+            "buildRow widgetId=$appWidgetId index=$index id=$stationId brand=${station.optString("brand", "")} profile=${profileId ?: "active"}",
         )
         if (stationId.isNotBlank()) {
             val uri = Uri.parse("tankstellenwidget://station?id=$stationId")

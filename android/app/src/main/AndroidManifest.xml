@@ -64,6 +64,18 @@
                 android:resource="@xml/fuel_widget_info" />
         </receiver>
 
+        <!-- Per-widget configure activity (#610). Declared on the provider
+             via android:configure so the framework launches it on drop and
+             on the Android 12+ reconfigure gesture. -->
+        <activity
+            android:name=".WidgetConfigActivity"
+            android:theme="@android:style/Theme.DeviceDefault.Light.DialogWhenLarge"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
         <!-- Android Auto car app service -->
         <!-- exported=true required: Android Auto host binds via this intent-filter.
              Permission restricts binding to holders of FOREGROUND_SERVICE permission. -->

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -7,6 +8,7 @@ import '../../../core/country/country_config.dart';
 import '../../../core/data/storage_repository.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_keys.dart';
+import '../../profile/data/models/user_profile.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import 'home_widget_json.dart';
 import 'nearest_widget_data_builder.dart';
@@ -48,7 +50,17 @@ class HomeWidgetService {
   }) async {
     try {
       final favoriteIds = storage.getFavoriteIds();
-      final context = _resolveDisplayContext(profileStorage, settingsStorage);
+      // #610 — if the user picked a specific profile for this widget via
+      // the configure activity, prefer it over the active profile. Shared
+      // JSON payload means we resolve to one profile per render; the
+      // per-widget key read here picks the first installed widget's choice,
+      // which is the only one that could ever differ from the active profile.
+      final perWidgetProfileId = await _readFirstPerWidgetProfileId();
+      final context = _resolveDisplayContext(
+        profileStorage,
+        settingsStorage,
+        perWidgetProfileId: perWidgetProfileId,
+      );
 
       if (favoriteIds.isEmpty) {
         await HomeWidget.saveWidgetData('station_count', 0);
@@ -138,7 +150,13 @@ class HomeWidgetService {
         return;
       }
 
-      final context = _resolveDisplayContext(profileStorage, settingsStorage);
+      // #610 — same per-widget profile override as the favorites path.
+      final perWidgetProfileId = await _readFirstPerWidgetProfileId();
+      final context = _resolveDisplayContext(
+        profileStorage,
+        settingsStorage,
+        perWidgetProfileId: perWidgetProfileId,
+      );
 
       final stations = _buildNearestStationList(
         favoriteStorage,
@@ -199,13 +217,20 @@ class HomeWidgetService {
   /// piece is missing (no profile set, no GPS ever obtained, etc.).
   static _WidgetDisplayContext _resolveDisplayContext(
     ProfileStorage? profileStorage,
-    SettingsStorage? settingsStorage,
-  ) {
+    SettingsStorage? settingsStorage, {
+    String? perWidgetProfileId,
+  }) {
     FuelType? fuel;
     if (profileStorage != null) {
-      final id = profileStorage.getActiveProfileId();
-      if (id != null) {
-        final raw = profileStorage.getProfile(id);
+      // #610 — prefer the per-widget profile when set. If the id doesn't
+      // resolve (profile deleted since widget was placed), silently fall
+      // back to the active profile so the widget keeps working.
+      final resolvedId = _resolvePerWidgetProfileId(
+        profileStorage,
+        perWidgetProfileId,
+      );
+      if (resolvedId != null) {
+        final raw = profileStorage.getProfile(resolvedId);
         final key = raw?['preferredFuelType']?.toString();
         if (key != null) {
           try {
@@ -418,6 +443,102 @@ class HomeWidgetService {
   /// Initialize home_widget group ID. Call once from main.
   static Future<void> init() async {
     await HomeWidget.setAppGroupId(_widgetGroupId);
+  }
+
+  /// Publish the user's profile list to SharedPreferences so the Android
+  /// widget configure activity (#610) can offer them as choices when the
+  /// user places a new widget.
+  ///
+  /// Writes a JSON array to `widget_profiles_json` with only the fields the
+  /// activity needs (id, name, preferredFuel, currency). Non-fatal on
+  /// failure — the configure activity gracefully falls back to a single
+  /// "Default" option when the key is missing or malformed.
+  static Future<void> publishProfiles(List<UserProfile> profiles) async {
+    try {
+      final list = profiles.map((p) {
+        final currency = p.countryCode == null
+            ? ''
+            : (Countries.byCode(p.countryCode!)?.currencySymbol ?? '');
+        return <String, dynamic>{
+          'id': p.id,
+          'name': p.name,
+          'preferredFuel': p.preferredFuelType.name,
+          'currency': currency,
+        };
+      }).toList(growable: false);
+      await HomeWidget.saveWidgetData(
+        'widget_profiles_json',
+        jsonEncode(list),
+      );
+    } catch (e) {
+      debugPrint('HomeWidget: publishProfiles failed: $e');
+    }
+  }
+
+  /// Read the first installed widget's `profile_<id>` key, or null when no
+  /// widget has a per-widget profile override. Private so callers go
+  /// through [updateWidget] / [updateNearestWidget]. Not exported to tests
+  /// directly — the per-widget test exercises the write path via
+  /// [HomeWidget.saveWidgetData] and reads back the resolved fuel on the
+  /// compact station data.
+  static Future<String?> _readFirstPerWidgetProfileId() async {
+    try {
+      final widgets = await HomeWidget.getInstalledWidgets();
+      for (final w in widgets) {
+        final id = await HomeWidget.getWidgetData<String>(
+          'profile_${w.androidWidgetId}',
+        );
+        if (id != null && id.isNotEmpty) return id;
+      }
+      return null;
+    } catch (e) {
+      debugPrint('HomeWidget: readFirstPerWidgetProfileId failed: $e');
+      return null;
+    }
+  }
+
+  /// Resolve the effective profile id: prefer [perWidgetProfileId] when it
+  /// exists in [profileStorage], otherwise fall back to the active profile.
+  /// Returns null when neither is set. Visible for testing so the
+  /// per-widget profile behaviour can be asserted without widget channel
+  /// round-trips.
+  @visibleForTesting
+  static String? resolvePerWidgetProfileIdForTest(
+    ProfileStorage profileStorage,
+    String? perWidgetProfileId,
+  ) =>
+      _resolvePerWidgetProfileId(profileStorage, perWidgetProfileId);
+
+  static String? _resolvePerWidgetProfileId(
+    ProfileStorage profileStorage,
+    String? perWidgetProfileId,
+  ) {
+    if (perWidgetProfileId != null &&
+        profileStorage.getProfile(perWidgetProfileId) != null) {
+      return perWidgetProfileId;
+    }
+    return profileStorage.getActiveProfileId();
+  }
+
+  /// Public test-only entry point for [_resolveDisplayContext], so the
+  /// per-widget profile override can be asserted without tapping the
+  /// `home_widget` platform channel. Mirrors the internal signature.
+  @visibleForTesting
+  static Map<String, dynamic> resolveDisplayContextForTest({
+    ProfileStorage? profileStorage,
+    SettingsStorage? settingsStorage,
+    String? perWidgetProfileId,
+  }) {
+    final ctx = _resolveDisplayContext(
+      profileStorage,
+      settingsStorage,
+      perWidgetProfileId: perWidgetProfileId,
+    );
+    return <String, dynamic>{
+      'preferredFuelType': ctx.preferredFuelType?.apiValue,
+      'userLat': ctx.userLat,
+      'userLng': ctx.userLng,
+    };
   }
 }
 
