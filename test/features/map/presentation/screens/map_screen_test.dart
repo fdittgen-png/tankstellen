@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/core/widgets/page_scaffold.dart';
 import 'package:tankstellen/features/map/presentation/screens/map_screen.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -40,6 +41,23 @@ void main() {
 
       // App bar should be present with preferredSize height of 36
       expect(find.byType(AppBar), findsAtLeast(1));
+    });
+
+    testWidgets('uses canonical PageScaffold chrome (Refs #923 phase 3g)',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const MapScreen(),
+        overrides: [
+          ...test.overrides,
+          userPositionNullOverride(),
+        ],
+      );
+
+      expect(find.byType(PageScaffold), findsOneWidget);
     });
 
     // #529 / #709 regression tests retired by #757. Previously
