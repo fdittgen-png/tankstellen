@@ -76,11 +76,11 @@ void main() {
   group('ConsumptionScreen tab toggle (#582 phase 2)', () {
     testWidgets('renders both Fuel and Charging tab headers', (tester) async {
       await _pumpScreen(tester);
-      expect(find.byKey(const Key('consumption_tab_fuel')), findsOneWidget);
-      expect(
-        find.byKey(const Key('consumption_tab_charging')),
-        findsOneWidget,
-      );
+      // #923 phase 3a — tabs now come from the canonical `TabSwitcher`
+      // widget whose `TabSwitcherEntry` contract has no `key:` field,
+      // so we assert on the localised label text instead.
+      expect(find.text('Fuel'), findsOneWidget);
+      expect(find.text('Charging'), findsOneWidget);
     });
 
     testWidgets('Fuel tab shows its empty state with 0 fill-ups',
@@ -93,7 +93,7 @@ void main() {
         'Charging tab shows its empty state with 0 charging logs',
         (tester) async {
       await _pumpScreen(tester);
-      await tester.tap(find.byKey(const Key('consumption_tab_charging')));
+      await tester.tap(find.text('Charging'));
       await tester.pumpAndSettle();
       expect(
         find.byKey(const Key('charging_empty_state')),
@@ -107,7 +107,7 @@ void main() {
       expect(find.byKey(const Key('fab_add_fillup')), findsOneWidget);
       expect(find.byKey(const Key('fab_add_charging')), findsNothing);
 
-      await tester.tap(find.byKey(const Key('consumption_tab_charging')));
+      await tester.tap(find.text('Charging'));
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('fab_add_charging')), findsOneWidget);
@@ -148,7 +148,7 @@ void main() {
         ),
       ];
       await _pumpScreen(tester, chargingLogs: logs);
-      await tester.tap(find.byKey(const Key('consumption_tab_charging')));
+      await tester.tap(find.text('Charging'));
       await tester.pumpAndSettle();
 
       expect(find.text('Ionity Castelnau'), findsOneWidget);

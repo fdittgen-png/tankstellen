@@ -134,18 +134,21 @@ void main() {
           vehicles: const [_iceVehicle],
         );
 
+        // #923 phase 3a — tabs now come from the canonical
+        // `TabSwitcher` widget whose entries carry no per-tab `key:`.
+        // Assert on the localised label instead.
         expect(
-          find.byKey(const Key('consumption_tab_fuel')),
+          find.text('Fuel'),
           findsOneWidget,
           reason: 'Fuel tab must always render',
         );
         expect(
-          find.byKey(const Key('consumption_tab_trajets')),
+          find.text('Trips'),
           findsOneWidget,
           reason: 'Trajets tab must render for ICE vehicles',
         );
         expect(
-          find.byKey(const Key('consumption_tab_charging')),
+          find.text('Charging'),
           findsNothing,
           reason: 'Charging tab must be hidden for combustion vehicles',
         );
@@ -170,23 +173,14 @@ void main() {
           vehicles: const [_evVehicle],
         );
 
+        expect(find.text('Fuel'), findsOneWidget);
+        expect(find.text('Trips'), findsOneWidget);
         expect(
-          find.byKey(const Key('consumption_tab_fuel')),
-          findsOneWidget,
-        );
-        expect(
-          find.byKey(const Key('consumption_tab_trajets')),
-          findsOneWidget,
-        );
-        expect(
-          find.byKey(const Key('consumption_tab_charging')),
+          find.text('Charging'),
           findsOneWidget,
           reason: 'Charging tab must render for EV vehicles',
         );
         expect(find.byType(Tab), findsNWidgets(3));
-
-        // Default English ARB value for `consumptionTabCharging`.
-        expect(find.text('Charging'), findsOneWidget);
       },
     );
 
@@ -200,7 +194,7 @@ void main() {
         );
 
         expect(
-          find.byKey(const Key('consumption_tab_charging')),
+          find.text('Charging'),
           findsOneWidget,
           reason: 'Charging tab must render for hybrid vehicles',
         );
@@ -234,13 +228,10 @@ void main() {
         );
 
         // Sanity: Charging tab is there.
-        expect(
-          find.byKey(const Key('consumption_tab_charging')),
-          findsOneWidget,
-        );
+        expect(find.text('Charging'), findsOneWidget);
 
         // Tap onto Charging so we're ON the tab that will vanish.
-        await tester.tap(find.byKey(const Key('consumption_tab_charging')));
+        await tester.tap(find.text('Charging'));
         await tester.pumpAndSettle();
 
         // Flip the active vehicle to ICE — the tab set should shrink.
@@ -252,10 +243,6 @@ void main() {
         expect(tester.takeException(), isNull);
 
         // Charging tab is gone.
-        expect(
-          find.byKey(const Key('consumption_tab_charging')),
-          findsNothing,
-        );
         expect(find.text('Charging'), findsNothing);
 
         // We now have exactly 2 tabs.
@@ -280,7 +267,7 @@ void main() {
         activeNotifier.setVehicle(_evVehicle);
         await tester.pumpAndSettle();
         expect(
-          find.byKey(const Key('consumption_tab_charging')),
+          find.text('Charging'),
           findsOneWidget,
           reason: 'Charging tab must come back when vehicle is EV again',
         );
