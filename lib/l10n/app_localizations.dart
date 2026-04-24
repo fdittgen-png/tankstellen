@@ -6230,6 +6230,30 @@ abstract class AppLocalizations {
   /// **'How this vehicle moves'**
   String get vehicleSectionDrivetrainSubtitle;
 
+  /// Label above the rule/fuzzy segmented button on the vehicle edit screen (#894).
+  ///
+  /// In en, this message translates to:
+  /// **'Calibration mode'**
+  String get calibrationModeLabel;
+
+  /// Rule-based calibration option (#894) — the default winner-take-all classifier from #779.
+  ///
+  /// In en, this message translates to:
+  /// **'Rule-based'**
+  String get calibrationModeRule;
+
+  /// Fuzzy calibration option (#894) — each sample contributes to all situations weighted by membership.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuzzy'**
+  String get calibrationModeFuzzy;
+
+  /// No description provided for @calibrationModeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.'**
+  String get calibrationModeTooltip;
+
   /// Title of the optional onboarding step (#816) that offers to connect an OBD2 adapter, read the VIN, and auto-fill the vehicle profile.
   ///
   /// In en, this message translates to:

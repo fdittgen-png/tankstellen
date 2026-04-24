@@ -3350,6 +3350,19 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wie sich dieses Fahrzeug bewegt';
 
   @override
+  String get calibrationModeLabel => 'Kalibrierungsmodus';
+
+  @override
+  String get calibrationModeRule => 'Regelbasiert';
+
+  @override
+  String get calibrationModeFuzzy => 'Fuzzy';
+
+  @override
+  String get calibrationModeTooltip =>
+      'Regelbasiert ordnet jede Fahrprobe genau einer Situation zu. Fuzzy verteilt sie auf alle, je nachdem wie gut sie passen — ruhiger rund um 60 km/h oder bei wechselnden Steigungen, aber langsamer beim Befüllen aller Kategorien.';
+
+  @override
   String get onboardingObd2StepTitle => 'OBD2-Adapter verbinden';
 
   @override

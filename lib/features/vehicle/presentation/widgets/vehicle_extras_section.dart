@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/presentation/widgets/vehicle_adapter_section.dart';
 import '../../../consumption/presentation/widgets/vehicle_baseline_section.dart';
 import 'service_reminder_section.dart';
+import 'vehicle_calibration_mode_selector.dart';
 
 /// "Extras for a saved vehicle" band on the edit screen — OBD2
 /// adapter pairing, learned baselines, volumetric-efficiency reset
@@ -41,6 +42,11 @@ class VehicleExtrasSection {
       // vehicle is saved — hidden during the Add flow.
       const SizedBox(height: 16),
       VehicleBaselineSection(vehicleId: vehicleId),
+      // Calibration mode toggle (#894) — rule vs fuzzy. Lives directly
+      // under the baseline progress so users see what they're opting
+      // into without jumping sections.
+      const SizedBox(height: 12),
+      VehicleCalibrationModeSelector(vehicleId: vehicleId),
       // η_v calibration reset (#815). Pairs visually with baseline
       // above — users who reset one often reset the other.
       const SizedBox(height: 12),
