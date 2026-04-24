@@ -1,23 +1,32 @@
-Tankstellen ist eine kostenlose Open-Source-App zum Vergleich von Kraftstoffpreisen, die Ihnen hilft, das guenstigste Benzin und Diesel in Ihrer Naehe zu finden. Datenschutz steht im Mittelpunkt: keine Werbung, kein Tracking, keine Telemetrie. Ihre Standortdaten verlassen niemals Ihr Geraet, es sei denn, Sie aktivieren die optionale Cloud-Synchronisation.
+Tankstellen ist eine kostenlose Open-Source-App zum Vergleich von Kraftstoff- und EV-Ladepreisen, die Ihnen hilft, an der Zapfsaeule weniger zu zahlen und am Steuer weniger zu verbrauchen. Datenschutz steht im Mittelpunkt: keine Werbung, kein Tracking, keine Telemetrie. Ihre Standortdaten verlassen niemals Ihr Geraet, es sei denn, Sie aktivieren die optionale Cloud-Synchronisation.
 
 FUNKTIONEN
 
-- Echtzeit-Kraftstoffpreise von offiziellen Regierungs-APIs in 7 europaeischen Laendern: Deutschland (Tankerkoenig/MTS-K), Frankreich (Prix Carburants), Italien (MASE/MiSE), Spanien (Geoportal), Polen (UOKiK), Oesterreich (Spritpreisrechner) und Kroatien (MINGOR)
-- Interaktive Karte mit OpenStreetMap-Kacheln und Marker-Clustering fuer schnelles Navigieren auch in dichten Stadtgebieten
-- Suche nach Stadtname, Postleitzahl oder GPS-Position mit einstellbarem Radius
-- Favoritenliste fuer schnellen Zugriff auf Ihre Stammtankstellen
-- Preisverlauf-Diagramme zur Ermittlung des besten Tankzeitpunkts
-- Hintergrund-Preisalarme mit lokalen Benachrichtigungen, wenn Preise unter Ihren Zielwert fallen
-- Material 3 Design mit hellem und dunklem Thema
-- Vollstaendige Lokalisierung in 10 Sprachen: Deutsch, Englisch, Franzoesisch, Italienisch, Spanisch, Polnisch, Kroatisch, Niederlaendisch, Portugiesisch und Tuerkisch
+Preisvergleich in 15 Laendern
+- Echtzeit-Kraftstoffpreise von offiziellen Regierungs-APIs in Deutschland (Tankerkoenig/MTS-K), Frankreich (Prix Carburants), Oesterreich (Spritpreisrechner), Spanien (Geoportal), Italien (MASE/MiSE), Daenemark, Portugal (DGEG), Grossbritannien (GOV.UK), Australien (FuelWatch), Slowenien, Luxemburg, Suedkorea (Opinet), Chile (CNE), Argentinien und Mexiko.
+- Interaktive Karte mit OpenStreetMap-Kacheln und Marker-Clustering fuer schnelles Navigieren auch in dichten Stadtgebieten.
+- Suche nach Stadt, Postleitzahl oder GPS-Position mit einstellbarem Radius.
+- EV-Ladestationen von OpenChargeMap mit Stecker- und Leistungsdetails neben den Kraftstoffpreisen.
+
+Klueger fahren, doppelt sparen
+- Fahrtaufzeichnung ueber den OBD2-Adapter Ihres Fahrzeugs (Bluetooth ELM327) fuer echte Verbrauchsdaten.
+- Trajets-Tab mit Statistiken pro Fahrt, VIN-Dekodierung und Fuzzy-Trainingskalibrierung.
+- Tank-Historie mit Beleg-OCR fuer Super U, Carrefour und generische Layouts.
+- Fahrzeugprofile und CO2-Berechnung pro Fahrt.
+
+Informiert bleiben
+- Radius- und Geschwindigkeits-Preisalarme mit lokalen Push-Benachrichtigungen bei fallenden Preisen.
+- Favoriten, Preisverlaufs-Diagramme und statistisch optimaler Tankzeitpunkt.
+- Android-Startbildschirm-Widgets fuer Favoriten und naechstgelegene Tankstellen.
+- Grenzueberschreitender Preisvergleich fuer Routen, die eine Landesgrenze queren.
 
 DATENSCHUTZ
 
-Tankstellen benoetigt die Standortberechtigung nur bei der aktiven Suche nach Tankstellen in der Naehe. Kein Konto erforderlich. Es werden keine Daten an Dritte uebermittelt. Die App funktioniert vollstaendig offline fuer zwischengespeicherte Ergebnisse.
+Tankstellen benoetigt die Standortberechtigung nur bei der aktiven Suche. Kein Konto erforderlich. Standardmaessig werden keine Daten an Dritte uebermittelt. Die App funktioniert vollstaendig offline fuer zwischengespeicherte Ergebnisse. Vollstaendige Lokalisierung in 23 Sprachen.
 
 OPTIONALE CLOUD-SYNCHRONISATION (TankSync)
 
-Fuer Benutzer, die Favoriten und Preisalarme geraeteuebergreifend synchronisieren moechten, unterstuetzt Tankstellen ein optionales selbst gehostetes Supabase-Backend namens TankSync. Sie betreiben Ihre eigene Instanz, geben URL und anonymen Schluessel ein, und die App synchronisiert Ihre Daten auf Ihren eigenen Server. Volle Datentransparenz: Sie koennen jederzeit alles, was auf dem Server gespeichert ist, einsehen, exportieren oder loeschen.
+Fuer Benutzer, die Favoriten, Fahrzeuge, Tankungen und Alarme geraeteuebergreifend synchronisieren moechten, unterstuetzt Tankstellen ein optionales selbst gehostetes Supabase-Backend namens TankSync. Sie betreiben Ihre eigene Instanz, geben URL und anonymen Schluessel ein, und die App synchronisiert Ihre Daten auf Ihren eigenen Server. Volle Datentransparenz: Sie koennen jederzeit alles einsehen, exportieren oder loeschen.
 
 Push-Benachrichtigungen fuer Preisalarme werden ueber ntfy.sh geliefert, einen Open-Source-Push-Benachrichtigungsdienst, sodass keine Google Play Services oder Firebase erforderlich sind.
 
@@ -27,8 +36,9 @@ Tankstellen ist unter MIT lizenziert. Der vollstaendige Quellcode, Supabase-Migr
 
 UNTERSTUETZTE PLATTFORMEN
 
-- Android (primaere Zielplattform, einschliesslich Android Auto)
-- Chromebook (ueber Android-APK)
+- Android (primaere Zielplattform, einschliesslich Android Auto).
+- Chromebook (ueber Android-APK).
+- iOS — in Entwicklung.
 
 TECHNISCHE DETAILS
 

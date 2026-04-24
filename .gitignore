@@ -78,6 +78,9 @@ docs/guides/*
 !docs/guides/DEV-GIT-WORKTREES.md
 !docs/guides/AUTONOMOUS-LOOP-PROTOCOL.md
 !docs/guides/ARB_FRAGMENTS.md
+!docs/guides/BLOCKER-IOS-PROVISIONING.md
+!docs/guides/BLOCKER-SUPABASE-MIGRATION.md
+!docs/guides/PLAY-STORE-LISTING-REFRESH.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
