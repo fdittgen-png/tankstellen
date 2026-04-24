@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/trip_history_provider.dart';
 import '../widgets/trip_history_card.dart';
@@ -17,15 +18,14 @@ class TripHistoryScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final trips = ref.watch(tripHistoryListProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: l?.tooltipBack ?? 'Back',
-          onPressed: () => context.pop(),
-        ),
-        title: Text(l?.tripHistoryTitle ?? 'Trip history'),
+    return PageScaffold(
+      title: l?.tripHistoryTitle ?? 'Trip history',
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: l?.tooltipBack ?? 'Back',
+        onPressed: () => context.pop(),
       ),
+      bodyPadding: EdgeInsets.zero,
       body: trips.isEmpty
           ? EmptyState(
               icon: Icons.route_outlined,
