@@ -84,7 +84,7 @@ void main() {
         overrides: test.overrides,
       );
 
-      // TabBar should have both tabs
+      // TabSwitcher should have both tabs
       expect(find.text('Favorites'), findsAtLeast(2)); // Tab + AppBar
       expect(find.text('Price Alerts'), findsOneWidget);
     });

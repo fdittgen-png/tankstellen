@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/widgets/tab_switcher.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/favorites_provider.dart';
 import '../widgets/alerts_tab.dart';
@@ -58,10 +59,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                 tooltip: l10n?.refreshPrices ?? 'Refresh prices',
               ),
           ],
-          bottom: TabBar(
+          bottom: TabSwitcher(
             tabs: [
-              Tab(text: l10n?.favorites ?? 'Favorites'),
-              Tab(text: l10n?.priceAlerts ?? 'Price Alerts'),
+              TabSwitcherEntry(label: l10n?.favorites ?? 'Favorites'),
+              TabSwitcherEntry(label: l10n?.priceAlerts ?? 'Price Alerts'),
             ],
           ),
         ),
