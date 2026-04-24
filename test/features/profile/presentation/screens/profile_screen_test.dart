@@ -8,7 +8,7 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/profile/presentation/screens/profile_screen.dart';
-import 'package:tankstellen/features/profile/presentation/widgets/settings_menu_tile.dart';
+import 'package:tankstellen/core/widgets/settings_menu_tile.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';

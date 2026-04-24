@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 
-/// Reusable menu row used by `ProfileScreen` for the top-level
-/// destinations (My vehicles, Privacy Dashboard). Each instance is a
-/// `Card`-wrapped `ListTile` with a small leading icon, a bold title,
-/// a body-small subtitle, a trailing chevron, and an `onTap` callback.
+/// Reusable "tap to drill in" menu row for settings-style screens.
 ///
-/// Pulled out of `profile_screen.dart` so the screen drops nearly
-/// identical 20-line `Card` blocks and so the tile shape can be exercised
-/// by widget tests in isolation.
+/// Originally lived under `lib/features/profile/presentation/widgets/`
+/// and was used only by the Profile screen; promoted to
+/// `lib/core/widgets/` in #923 phase 2 so Privacy / Sync / onboarding
+/// settings can share the exact same tile shape.
+///
+/// Visual contract (see `docs/design/DESIGN_SYSTEM.md`
+/// §"SettingsMenuTile"): a `Card`-wrapped `ListTile` with a small
+/// leading icon, a bold `titleSmall` title, a `bodySmall` subtitle,
+/// a trailing chevron, and a `VoidCallback onTap`.
 ///
 /// #896 — the Consumption log entry was removed in favour of the
 /// dedicated bottom-nav tab to avoid duplicate navigation.

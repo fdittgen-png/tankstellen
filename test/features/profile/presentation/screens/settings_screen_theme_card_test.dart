@@ -4,7 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/theme/theme_mode_provider.dart';
 import 'package:tankstellen/features/profile/presentation/screens/profile_screen.dart';
-import 'package:tankstellen/features/profile/presentation/widgets/settings_menu_tile.dart';
+import 'package:tankstellen/core/widgets/settings_menu_tile.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';

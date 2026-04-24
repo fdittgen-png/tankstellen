@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/profile/presentation/widgets/settings_menu_tile.dart';
+import 'package:tankstellen/core/widgets/settings_menu_tile.dart';
 
 void main() {
   group('SettingsMenuTile', () {
