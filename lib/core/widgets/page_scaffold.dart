@@ -75,6 +75,12 @@ class PageScaffold extends StatelessWidget {
   /// ([NavigationToolbar.kMiddleSpacing] = 16).
   final double? titleSpacing;
 
+  /// Optional bottom bar — a pinned action bar below the body. Forwards
+  /// to [Scaffold.bottomNavigationBar]. Used by form screens
+  /// (e.g. `AddFillUpScreen`, `EditVehicleScreen`) to pin a Save button
+  /// above the system nav inset without stealing scrollable real estate.
+  final Widget? bottomNavigationBar;
+
   const PageScaffold({
     super.key,
     required this.title,
@@ -90,6 +96,7 @@ class PageScaffold extends StatelessWidget {
     this.toolbarHeight,
     this.titleTextStyle,
     this.titleSpacing,
+    this.bottomNavigationBar,
   });
 
   @override
@@ -123,6 +130,7 @@ class PageScaffold extends StatelessWidget {
       ),
       floatingActionButton: floatingActionButton,
       floatingActionButtonLocation: floatingActionButtonLocation,
+      bottomNavigationBar: bottomNavigationBar,
     );
   }
 }

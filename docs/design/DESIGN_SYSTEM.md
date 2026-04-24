@@ -236,8 +236,16 @@ screen is about" identified in the #923 audit.
   `null` uses `Scaffold`'s default (end-float); pass
   `FloatingActionButtonLocation.centerDocked` when pairing with a
   bottom bar.
-- `bottomNavigationBar: Widget?` — reserved for the shell; leaf
-  screens do not set this.
+- `bottomNavigationBar: Widget?` — pass-through to
+  [Scaffold.bottomNavigationBar]. Used by form screens
+  (e.g. `AddFillUpScreen`, `EditVehicleScreen`) to pin a Save button
+  above the system nav inset without stealing scrollable real estate.
+- `leading: Widget?` — optional leading app-bar widget. Normally the
+  back button — pass a custom drawer icon when needed. Works with
+  `automaticallyImplyLeading: false` when the caller wants full
+  control.
+- `automaticallyImplyLeading: bool` — whether the app bar shows its
+  automatic leading. Default: `true`.
 - `toolbarHeight: double?` — optional override for the app-bar toolbar
   height (pass-through to `AppBar.toolbarHeight`). Default `null` uses
   Material's default; compact layouts (e.g. `SearchScreen` in

@@ -175,6 +175,43 @@ void main() {
       expect(appBar.titleSpacing, 12);
     });
 
+    testWidgets('forwards bottomNavigationBar to the scaffold',
+        (tester) async {
+      await pump(
+        tester,
+        const PageScaffold(
+          title: 'Add fill-up',
+          body: SizedBox.shrink(),
+          bottomNavigationBar: SizedBox(
+            key: Key('pinned_save_bar'),
+            height: 56,
+          ),
+        ),
+      );
+      final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+      expect(scaffold.bottomNavigationBar, isNotNull);
+      expect(find.byKey(const Key('pinned_save_bar')), findsOneWidget);
+    });
+
+    testWidgets('forwards leading to the app bar', (tester) async {
+      var tapped = false;
+      await pump(
+        tester,
+        PageScaffold(
+          title: 'Add fill-up',
+          leading: IconButton(
+            tooltip: 'Back',
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => tapped = true,
+          ),
+          body: const SizedBox.shrink(),
+        ),
+      );
+      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      expect(tapped, isTrue);
+    });
+
     testWidgets('title has header semantics', (tester) async {
       final handle = tester.ensureSemantics();
       await pump(
