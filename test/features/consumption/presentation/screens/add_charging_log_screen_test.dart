@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/widgets/page_scaffold.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/add_charging_log_screen.dart';
 import 'package:tankstellen/features/consumption/providers/charging_logs_provider.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
@@ -56,6 +57,25 @@ void main() {
       );
       expect(find.textContaining('Add a vehicle'), findsWidgets);
       expect(find.byKey(const Key('charging_save_button')), findsNothing);
+      // #923 phase 3j — empty branch renders via PageScaffold.
+      expect(find.byType(PageScaffold), findsOneWidget);
+    });
+
+    testWidgets('with vehicles, main form renders via PageScaffold (#923 3j)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const AddChargingLogScreen(),
+        overrides: [
+          vehicleProfileListProvider.overrideWith(() => _EvVehicleList()),
+          chargingLogsProvider
+              .overrideWith(() => _PreloadedChargingLogs(const [])),
+        ],
+      );
+      expect(find.byType(PageScaffold), findsOneWidget);
+      // Sanity: the save button still renders inside the PageScaffold
+      // body (proves we didn't lose the Form tree in the migration).
+      expect(find.byKey(const Key('charging_save_button')), findsOneWidget);
     });
 
     testWidgets(
