@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/calculator_provider.dart';
 import '../widgets/calculator_empty_hint.dart';
@@ -59,15 +60,14 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
     final notifier = ref.read(calculatorProvider.notifier);
     final l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n?.fuelCostCalculator ?? 'Fuel Cost Calculator'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: l10n?.tooltipBack ?? 'Back',
-          onPressed: () => context.go('/'),
-        ),
+    return PageScaffold(
+      title: l10n?.fuelCostCalculator ?? 'Fuel Cost Calculator',
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: l10n?.tooltipBack ?? 'Back',
+        onPressed: () => context.go('/'),
       ),
+      bodyPadding: EdgeInsets.zero,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
