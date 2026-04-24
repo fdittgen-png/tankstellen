@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/theme_mode_provider.dart';
+import '../../../../core/widgets/page_scaffold.dart';
+import '../../../../core/widgets/section_header.dart';
+import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../consent/presentation/widgets/consent_settings_section.dart';
 import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
 import '../widgets/location_section_widget.dart';
 import '../widgets/profile_list_section.dart';
-import '../../../../core/widgets/settings_menu_tile.dart';
 import '../widgets/storage_section.dart';
 import '../widgets/tank_sync_section.dart';
 
@@ -23,21 +25,24 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l?.settings ?? 'Settings'),
-      ),
+    return PageScaffold(
+      title: l?.settings ?? 'Settings',
+      // #530 — compact vertical spacing. Was `EdgeInsets.all(16)` plus
+      // `SizedBox(height: 32)` between every major section, which ate
+      // ~180 dp of whitespace on a single screen. Tightened to 8 dp
+      // top / 16 dp sides + 16 dp section gaps + 4 dp header-to-body.
+      bodyPadding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       body: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        // #530 — compact vertical spacing. Was `EdgeInsets.all(16)` plus
-        // `SizedBox(height: 32)` between every major section, which ate
-        // ~180 dp of whitespace on a single screen. Tightened to 8 dp
-        // top / 16 dp sides + 16 dp section gaps + 4 dp header-to-body.
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        padding: EdgeInsets.zero,
         children: [
           // Profiles — always visible, the primary interaction on the
           // Settings screen.
-          _SectionHeader(icon: Icons.person, title: l?.sectionProfile ?? 'Profile'),
+          SectionHeader(
+            leadingIcon: Icons.person,
+            title: l?.sectionProfile ?? 'Profile',
+            padding: EdgeInsets.zero,
+          ),
           const SizedBox(height: 4),
           const ProfileListSection(),
           const SizedBox(height: 16),
@@ -125,8 +130,11 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 16),
 
           // #534 — About moved to the very end, below Privacy.
-          _SectionHeader(
-              icon: Icons.info_outline, title: l?.about ?? 'About'),
+          SectionHeader(
+            leadingIcon: Icons.info_outline,
+            title: l?.about ?? 'About',
+            padding: EdgeInsets.zero,
+          ),
           const SizedBox(height: 4),
           const AboutSection(),
           SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 16),
@@ -189,23 +197,3 @@ String _themeSubtitle(WidgetRef ref, AppLocalizations? l) {
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  final IconData icon;
-  final String title;
-
-  const _SectionHeader({required this.icon, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      header: true,
-      child: Row(
-        children: [
-          ExcludeSemantics(child: Icon(icon, size: 20)),
-          const SizedBox(width: 8),
-          Text(title, style: Theme.of(context).textTheme.titleMedium),
-        ],
-      ),
-    );
-  }
-}
