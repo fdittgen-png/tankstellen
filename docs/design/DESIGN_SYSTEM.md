@@ -242,6 +242,14 @@ screen is about" identified in the #923 audit.
   height (pass-through to `AppBar.toolbarHeight`). Default `null` uses
   Material's default; compact layouts (e.g. `SearchScreen` in
   landscape) pass `40`.
+- `titleTextStyle: TextStyle?` — optional override for the app-bar
+  title text style (pass-through to `AppBar.titleTextStyle`). Default
+  `null` uses Material's default; compact layouts (e.g. `MapScreen`
+  in landscape) pass `TextStyle(fontSize: 16)`.
+- `titleSpacing: double?` — optional override for the horizontal
+  space between the leading widget and the title (pass-through to
+  `AppBar.titleSpacing`). Default `null` uses `NavigationToolbar.kMiddleSpacing`
+  (16); compact layouts (e.g. `MapScreen` in landscape) pass `12`.
 
 **Accessibility:** the app-bar title is wrapped in
 `Semantics(header: true, …)` so TalkBack/VoiceOver announce the

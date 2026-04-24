@@ -149,6 +149,32 @@ void main() {
       expect(appBar.toolbarHeight, 40);
     });
 
+    testWidgets('passes titleTextStyle through to AppBar', (tester) async {
+      await pump(
+        tester,
+        const PageScaffold(
+          title: 'Map',
+          titleTextStyle: TextStyle(fontSize: 16),
+          body: SizedBox.shrink(),
+        ),
+      );
+      final appBar = tester.widget<AppBar>(find.byType(AppBar));
+      expect(appBar.titleTextStyle?.fontSize, 16);
+    });
+
+    testWidgets('passes titleSpacing through to AppBar', (tester) async {
+      await pump(
+        tester,
+        const PageScaffold(
+          title: 'Map',
+          titleSpacing: 12,
+          body: SizedBox.shrink(),
+        ),
+      );
+      final appBar = tester.widget<AppBar>(find.byType(AppBar));
+      expect(appBar.titleSpacing, 12);
+    });
+
     testWidgets('title has header semantics', (tester) async {
       final handle = tester.ensureSemantics();
       await pump(
