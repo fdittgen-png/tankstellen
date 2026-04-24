@@ -155,12 +155,12 @@ void main() {
         activeVehicle: vehicle,
         vehicles: [vehicle],
       );
-      expect(find.byKey(const Key('consumption_tab_fuel')), findsOneWidget);
-      expect(find.byKey(const Key('consumption_tab_trajets')), findsOneWidget);
-      expect(
-        find.byKey(const Key('consumption_tab_charging')),
-        findsOneWidget,
-      );
+      // #923 phase 3a — the canonical `TabSwitcher` has no key-per-tab
+      // contract, so we assert on the localised label text for each
+      // tab entry instead.
+      expect(find.text('Fuel'), findsOneWidget);
+      expect(find.text('Trips'), findsOneWidget);
+      expect(find.text('Charging'), findsOneWidget);
     });
 
     testWidgets('Trajets empty state renders CTA + "Start recording" button',
@@ -170,7 +170,7 @@ void main() {
         activeVehicle: vehicle,
         vehicles: [vehicle],
       );
-      await tester.tap(find.byKey(const Key('consumption_tab_trajets')));
+      await tester.tap(find.text('Trips'));
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('trajets_empty_state')), findsOneWidget);
@@ -220,7 +220,7 @@ void main() {
         activeVehicle: vehicle,
         vehicles: [vehicle],
       );
-      await tester.tap(find.byKey(const Key('consumption_tab_trajets')));
+      await tester.tap(find.text('Trips'));
       await tester.pumpAndSettle();
 
       // Every trip should render a row.
@@ -262,7 +262,7 @@ void main() {
         activeVehicle: vehicle,
         vehicles: [vehicle],
       );
-      await tester.tap(find.byKey(const Key('consumption_tab_trajets')));
+      await tester.tap(find.text('Trips'));
       await tester.pumpAndSettle();
 
       // Sanity — before tap, the detail stub hasn't been visited.

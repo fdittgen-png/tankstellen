@@ -7,6 +7,7 @@ import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../core/widgets/tab_switcher.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../achievements/presentation/widgets/badge_shelf.dart';
 import '../../../ev/domain/entities/charging_log.dart';
@@ -166,28 +167,25 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
           tooltip: l?.tooltipBack ?? 'Back',
           onPressed: () => context.pop(),
         ),
-        bottom: TabBar(
+        bottom: TabSwitcher(
           controller: tabController,
           tabs: [
-            Tab(
-              key: const Key('consumption_tab_fuel'),
-              icon: const Icon(Icons.local_gas_station_outlined),
-              text: l?.consumptionTabFuel ?? 'Fuel',
+            TabSwitcherEntry(
+              label: l?.consumptionTabFuel ?? 'Fuel',
+              icon: Icons.local_gas_station_outlined,
             ),
-            Tab(
-              key: const Key('consumption_tab_trajets'),
-              icon: const Icon(Icons.route_outlined),
-              text: l?.trajetsTabLabel ?? 'Trips',
+            TabSwitcherEntry(
+              label: l?.trajetsTabLabel ?? 'Trips',
+              icon: Icons.route_outlined,
             ),
             // #892 — Charging tab is hidden when the active vehicle
             // is a pure combustion engine. Hybrid and EV profiles
             // still see it; the no-vehicle case keeps the tab (a
             // dedicated onboarding story covers that path).
             if (showCharging)
-              Tab(
-                key: const Key('consumption_tab_charging'),
-                icon: const Icon(Icons.ev_station_outlined),
-                text: l?.consumptionTabCharging ?? 'Charging',
+              TabSwitcherEntry(
+                label: l?.consumptionTabCharging ?? 'Charging',
+                icon: Icons.ev_station_outlined,
               ),
           ],
         ),
