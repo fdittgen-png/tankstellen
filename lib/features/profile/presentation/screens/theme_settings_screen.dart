@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/theme_mode_provider.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Dedicated Theme settings screen (#897).
@@ -24,10 +25,9 @@ class ThemeSettingsScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final mode = ref.watch(themeModeSettingProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l?.themeSettingsScreenTitle ?? 'Theme'),
-      ),
+    return PageScaffold(
+      title: l?.themeSettingsScreenTitle ?? 'Theme',
+      bodyPadding: EdgeInsets.zero,
       body: RadioGroup<ThemeMode>(
         groupValue: mode,
         onChanged: (picked) => _select(ref, picked),
