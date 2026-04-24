@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../driving/presentation/widgets/driving_mode_fab.dart';
 import '../../../ev/presentation/widgets/ev_filter_chips.dart';
@@ -68,16 +69,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             mapController: _mapController,
           );
 
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(36),
-        child: AppBar(
-          title:
-              Text(l10n?.map ?? 'Map', style: const TextStyle(fontSize: 16)),
-          toolbarHeight: 36,
-          titleSpacing: 12,
-        ),
-      ),
+    return PageScaffold(
+      title: l10n?.map ?? 'Map',
+      toolbarHeight: 36,
+      titleSpacing: 12,
+      titleTextStyle: const TextStyle(fontSize: 16),
+      bodyPadding: EdgeInsets.zero,
       floatingActionButton: const DrivingModeFab(),
       body: Column(
         children: [
