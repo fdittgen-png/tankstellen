@@ -44,6 +44,13 @@ class WidgetLaunchHandler {
 
   void handle(Uri? uri) {
     final path = widgetUriToPath(uri);
+    // #753 diagnostic — prints every widget launch so the user can
+    // diff what Kotlin bound to the row (see StationWidgetRenderer
+    // `TankstellenWidget` logcat tag) against what Flutter received.
+    debugPrint(
+      'WidgetLaunchHandler.handle uri=$uri path=$path '
+      'outcome=${path == null ? "rejected" : "pushed"}',
+    );
     if (path == null) return;
     try {
       _router.push(path);
