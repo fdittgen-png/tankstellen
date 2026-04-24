@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TEMPORARY widget background — green accent scheme, DARK variant
+  (Phase 1 of #607). Hex values here are placeholder night-mode tints;
+  designer will replace them in the follow-up palette PR.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#1B3A2C" />
+    <corners android:radius="16dp" />
+    <stroke
+        android:width="1dp"
+        android:color="#2E5D45" />
+</shape>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TEMPORARY widget color palette (Phase 1 of #607 — widget redesign epic).
+
+  Designer will swap these hex values in a follow-up PR; they are
+  intentionally simple placeholders so the plumbing (Kotlin mapping +
+  drawable set + Dart scheme identifiers) can ship first.
+
+  The six valid scheme identifiers are:
+    system, light, dark, blue, green, orange
+
+  `system` / `light` / `dark` reuse the existing
+  drawable/widget_background.xml + drawable-night/widget_background.xml
+  pair and have no entries here. The three accent schemes below share
+  token names across values/ and values-night/ via the drawable files.
+-->
+<resources>
+    <!-- Blue accent (placeholder — designer to replace). -->
+    <color name="widget_bg_blue">#E3F2FD</color>
+    <color name="widget_stroke_blue">#BBDEFB</color>
+
+    <!-- Green accent (placeholder — designer to replace). -->
+    <color name="widget_bg_green">#E8F5E9</color>
+    <color name="widget_stroke_green">#C8E6C9</color>
+
+    <!-- Orange accent (placeholder — designer to replace). -->
+    <color name="widget_bg_orange">#FFF3E0</color>
+    <color name="widget_stroke_orange">#FFE0B2</color>
+</resources>

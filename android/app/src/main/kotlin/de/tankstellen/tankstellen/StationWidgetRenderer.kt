@@ -30,6 +30,8 @@ object StationWidgetRenderer {
 
     const val PREFS_NAME = "HomeWidgetPreferences"
     private const val MODE_KEY_PREFIX = "widget_mode_"
+    private const val COLOR_KEY_PREFIX = "color_"
+    private const val DEFAULT_COLOR_SCHEME = "system"
 
     const val MODE_FAVORITES = "favorites"
     const val MODE_NEAREST = "nearest"
@@ -48,6 +50,36 @@ object StationWidgetRenderer {
     fun getMode(context: Context, appWidgetId: Int, defaultMode: String): String {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return prefs.getString("$MODE_KEY_PREFIX$appWidgetId", defaultMode) ?: defaultMode
+    }
+
+    /**
+     * Read the persisted color scheme for [appWidgetId]. Phase 1 of #607
+     * — the configure activity that writes this key lands in #610; for
+     * now the key is simply absent and we fall back to "system", which
+     * maps to the existing drawable/widget_background.xml pair.
+     *
+     * Valid identifiers (kept in sync with
+     * lib/features/widget/data/widget_color_schemes.dart and
+     * android/app/src/main/res/values/widget_color_schemes.xml):
+     * `system`, `light`, `dark`, `blue`, `green`, `orange`.
+     */
+    fun getColorScheme(context: Context, appWidgetId: Int): String {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getString("$COLOR_KEY_PREFIX$appWidgetId", DEFAULT_COLOR_SCHEME)
+            ?: DEFAULT_COLOR_SCHEME
+    }
+
+    /**
+     * Map a color-scheme identifier to its drawable resource. `system`,
+     * `light`, `dark`, and any unknown value fall back to the default
+     * widget_background drawable (which already provides light/dark
+     * variants via the drawable-night/ folder).
+     */
+    fun drawableForScheme(scheme: String): Int = when (scheme) {
+        "blue" -> R.drawable.widget_background_blue
+        "green" -> R.drawable.widget_background_green
+        "orange" -> R.drawable.widget_background_orange
+        else -> R.drawable.widget_background
     }
 
     /** Flip the persisted mode for [appWidgetId] and return the new value. */
@@ -141,6 +173,17 @@ object StationWidgetRenderer {
         views.setOnClickPendingIntent(
             R.id.widget_root,
             buildActivity(context, uri = null, requestCode = appWidgetId * 10 + 3),
+        )
+
+        // #607 phase 1 — apply the per-widget color scheme on top of
+        // the layout-XML default background. The configure activity
+        // that persists `color_<appWidgetId>` ships in #610; until then
+        // getColorScheme() returns "system", which maps back to the
+        // existing widget_background drawable.
+        views.setInt(
+            R.id.widget_root,
+            "setBackgroundResource",
+            drawableForScheme(getColorScheme(context, appWidgetId)),
         )
 
         val stations = try {

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TEMPORARY widget background — blue accent scheme (Phase 1 of #607).
+  Colour tokens live in values/widget_color_schemes.xml; designer may
+  replace the hex values there without touching this file.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/widget_bg_blue" />
+    <corners android:radius="16dp" />
+    <stroke
+        android:width="1dp"
+        android:color="@color/widget_stroke_blue" />
+</shape>
