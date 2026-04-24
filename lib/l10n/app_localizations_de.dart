@@ -3548,7 +3548,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tripRecordingPinTooltip =>
-      'Epinglen hält den Bildschirm an — verbraucht mehr Akku';
+      'Anpinnen hält den Bildschirm an — verbraucht mehr Akku';
 
   @override
   String get tripRecordingPinSemanticOn => 'Aufnahmeformular lösen';
