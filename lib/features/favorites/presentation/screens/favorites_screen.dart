@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/tab_switcher.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/favorites_provider.dart';
@@ -43,29 +44,25 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 
     return DefaultTabController(
       length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Semantics(
-            header: true,
-            child: Text(l10n?.favorites ?? 'Favorites'),
-          ),
-          actions: [
-            if (favoriteIds.isNotEmpty)
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: () {
-                  ref.read(favoriteStationsProvider.notifier).loadAndRefresh();
-                },
-                tooltip: l10n?.refreshPrices ?? 'Refresh prices',
-              ),
+      child: PageScaffold(
+        title: l10n?.favorites ?? 'Favorites',
+        actions: [
+          if (favoriteIds.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () {
+                ref.read(favoriteStationsProvider.notifier).loadAndRefresh();
+              },
+              tooltip: l10n?.refreshPrices ?? 'Refresh prices',
+            ),
+        ],
+        bottom: TabSwitcher(
+          tabs: [
+            TabSwitcherEntry(label: l10n?.favorites ?? 'Favorites'),
+            TabSwitcherEntry(label: l10n?.priceAlerts ?? 'Price Alerts'),
           ],
-          bottom: TabSwitcher(
-            tabs: [
-              TabSwitcherEntry(label: l10n?.favorites ?? 'Favorites'),
-              TabSwitcherEntry(label: l10n?.priceAlerts ?? 'Price Alerts'),
-            ],
-          ),
         ),
+        bodyPadding: EdgeInsets.zero,
         body: const TabBarView(
           children: [
             FavoritesFuelTab(),
