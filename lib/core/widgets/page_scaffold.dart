@@ -63,6 +63,18 @@ class PageScaffold extends StatelessWidget {
   /// Compact screens (e.g. `SearchScreen` in landscape) shrink to ~40.
   final double? toolbarHeight;
 
+  /// Optional override for the app-bar title text style. Pass-through to
+  /// [AppBar.titleTextStyle]. Leave `null` to use the Material default.
+  /// Compact screens (e.g. `MapScreen` in landscape) pass
+  /// `TextStyle(fontSize: 16)`.
+  final TextStyle? titleTextStyle;
+
+  /// Optional override for the app-bar title spacing (horizontal space
+  /// between the leading widget and the title). Pass-through to
+  /// [AppBar.titleSpacing]. Leave `null` to use the Material default
+  /// ([NavigationToolbar.kMiddleSpacing] = 16).
+  final double? titleSpacing;
+
   const PageScaffold({
     super.key,
     required this.title,
@@ -76,6 +88,8 @@ class PageScaffold extends StatelessWidget {
     this.leading,
     this.automaticallyImplyLeading = true,
     this.toolbarHeight,
+    this.titleTextStyle,
+    this.titleSpacing,
   });
 
   @override
@@ -88,6 +102,8 @@ class PageScaffold extends StatelessWidget {
         leading: leading,
         automaticallyImplyLeading: automaticallyImplyLeading,
         toolbarHeight: toolbarHeight,
+        titleTextStyle: titleTextStyle,
+        titleSpacing: titleSpacing,
       ),
       body: Column(
         children: [
