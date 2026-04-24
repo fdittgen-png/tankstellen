@@ -231,6 +231,15 @@ screen is about" identified in the #923 audit.
 - `floatingActionButton: Widget?`
 - `bottomNavigationBar: Widget?` — reserved for the shell; leaf
   screens do not set this.
+- `toolbarHeight: double?` — optional override for the app-bar toolbar
+  height (pass-through to `AppBar.toolbarHeight`). Default `null` uses
+  Material's default; compact layouts (e.g. `SearchScreen` in
+  landscape) pass `40`.
+
+**Accessibility:** the app-bar title is wrapped in
+`Semantics(header: true, …)` so TalkBack/VoiceOver announce the
+`pageTitle` with the heading role. Callers get this for free — no
+action required.
 
 **Visual contract:**
 

@@ -99,5 +99,42 @@ void main() {
       );
       expect(find.byType(FloatingActionButton), findsOneWidget);
     });
+
+    testWidgets('passes toolbarHeight through to AppBar', (tester) async {
+      await pump(
+        tester,
+        const PageScaffold(
+          title: 'Search',
+          toolbarHeight: 40,
+          body: SizedBox.shrink(),
+        ),
+      );
+      final appBar = tester.widget<AppBar>(find.byType(AppBar));
+      expect(appBar.toolbarHeight, 40);
+    });
+
+    testWidgets('title has header semantics', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pump(
+        tester,
+        const PageScaffold(
+          title: 'Privacy',
+          body: SizedBox.shrink(),
+        ),
+      );
+      // The title Text is wrapped in Semantics(header: true, ...).
+      // Locate the Semantics node that carries both the header flag
+      // and the "Privacy" label — asserting the flag is the whole
+      // point of the test, so we don't fall back to find.text.
+      final semantics = tester
+          .getSemantics(find.text('Privacy'))
+          .getSemanticsData();
+      expect(
+        semantics.flagsCollection.isHeader,
+        isTrue,
+        reason: 'PageScaffold title must expose the TalkBack heading role',
+      );
+      handle.dispose();
+    });
   });
 }
