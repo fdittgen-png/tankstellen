@@ -56,6 +56,11 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
       obd2AdapterMac: json['obd2AdapterMac'] as String?,
       obd2AdapterName: json['obd2AdapterName'] as String?,
       vin: json['vin'] as String?,
+      calibrationMode: json['calibrationMode'] == null
+          ? VehicleCalibrationMode.rule
+          : const VehicleCalibrationModeJsonConverter().fromJson(
+              json['calibrationMode'] as String?,
+            ),
     );
 
 Map<String, dynamic> _$VehicleProfileToJson(_VehicleProfile instance) =>
@@ -81,4 +86,7 @@ Map<String, dynamic> _$VehicleProfileToJson(_VehicleProfile instance) =>
       'obd2AdapterMac': instance.obd2AdapterMac,
       'obd2AdapterName': instance.obd2AdapterName,
       'vin': instance.vin,
+      'calibrationMode': const VehicleCalibrationModeJsonConverter().toJson(
+        instance.calibrationMode,
+      ),
     };

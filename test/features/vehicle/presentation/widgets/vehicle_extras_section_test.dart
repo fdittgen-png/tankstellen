@@ -26,7 +26,7 @@ void main() {
   group('VehicleExtrasSection (extracted from #563 edit_vehicle_screen)', () {
     testWidgets('build() returns the reset calibration action in the list',
         (tester) async {
-      // Tall canvas so all four rows fit without virtualization —
+      // Tall canvas so all rows fit without virtualization —
       // scrollUntilVisible would work too, but a simpler viewport
       // keeps the test focused on the widget's contract.
       tester.view.physicalSize = const Size(900, 2400);

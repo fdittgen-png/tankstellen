@@ -3320,6 +3320,19 @@ class AppLocalizationsFi extends AppLocalizations {
   String get vehicleSectionDrivetrainSubtitle => 'How this vehicle moves';
 
   @override
+  String get calibrationModeLabel => 'Calibration mode';
+
+  @override
+  String get calibrationModeRule => 'Rule-based';
+
+  @override
+  String get calibrationModeFuzzy => 'Fuzzy';
+
+  @override
+  String get calibrationModeTooltip =>
+      'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.';
+
+  @override
   String get onboardingObd2StepTitle => 'Connect your OBD2 adapter';
 
   @override

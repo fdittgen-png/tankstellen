@@ -1,0 +1,15 @@
+{
+  "calibrationModeLabel": "Calibration mode",
+  "@calibrationModeLabel": {
+    "description": "Label above the rule/fuzzy segmented button on the vehicle edit screen (#894)."
+  },
+  "calibrationModeRule": "Rule-based",
+  "@calibrationModeRule": {
+    "description": "Rule-based calibration option (#894) — the default winner-take-all classifier from #779."
+  },
+  "calibrationModeFuzzy": "Fuzzy",
+  "@calibrationModeFuzzy": {
+    "description": "Fuzzy calibration option (#894) — each sample contributes to all situations weighted by membership."
+  },
+  "calibrationModeTooltip": "Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets."
+}

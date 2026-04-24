@@ -21,6 +21,36 @@ enum VehicleType {
   }
 }
 
+/// How the per-vehicle baseline calibration (#779) should classify
+/// driving samples (#894).
+///
+/// * [rule] — the original winner-take-all classifier from #768:
+///   every sample is assigned to exactly one [DrivingSituation] and
+///   the Welford accumulator for that situation is bumped by one.
+/// * [fuzzy] — phase 2 from the #773 investigation: every sample
+///   contributes to ALL accumulators proportional to its membership
+///   in each situation. Smoother at borderline speeds (around
+///   60 km/h urban/highway) and at mode transitions, at the cost of
+///   a slightly longer cold-start (each bucket grows more slowly).
+///
+/// Default is [rule] so existing profiles keep their behaviour
+/// without migration.
+enum VehicleCalibrationMode {
+  rule('rule'),
+  fuzzy('fuzzy');
+
+  final String key;
+  const VehicleCalibrationMode(this.key);
+
+  static VehicleCalibrationMode fromKey(String? value) {
+    if (value == null) return VehicleCalibrationMode.rule;
+    for (final m in VehicleCalibrationMode.values) {
+      if (m.key == value) return m;
+    }
+    return VehicleCalibrationMode.rule;
+  }
+}
+
 /// Common EV connector standards used in Europe.
 ///
 /// Stored as part of [VehicleProfile.supportedConnectors] so the app can
@@ -145,6 +175,15 @@ abstract class VehicleProfile with _$VehicleProfile {
     // UI rejects clearly-invalid input via the decoder, but users
     // should be free to save a stub profile with a partial VIN.
     String? vin,
+
+    // Baseline calibration mode (#894). `rule` keeps the original
+    // winner-take-all classifier from #779; `fuzzy` re-weights each
+    // sample across all situations via [FuzzyClassifier]. Default
+    // stays on `rule` so existing profiles deserialize without a
+    // migration — users opt in from the vehicle edit screen.
+    @Default(VehicleCalibrationMode.rule)
+    @VehicleCalibrationModeJsonConverter()
+    VehicleCalibrationMode calibrationMode,
   }) = _VehicleProfile;
 
   factory VehicleProfile.fromJson(Map<String, dynamic> json) =>
@@ -165,6 +204,22 @@ class VehicleTypeJsonConverter
 
   @override
   String toJson(VehicleType object) => object.key;
+}
+
+/// Serializes [VehicleCalibrationMode] as its string key. Accepts
+/// `null` / unknown values as [VehicleCalibrationMode.rule] so
+/// pre-#894 profiles (which simply omit the field) deserialize with
+/// the existing rule-based behaviour.
+class VehicleCalibrationModeJsonConverter
+    implements JsonConverter<VehicleCalibrationMode, String?> {
+  const VehicleCalibrationModeJsonConverter();
+
+  @override
+  VehicleCalibrationMode fromJson(String? json) =>
+      VehicleCalibrationMode.fromKey(json);
+
+  @override
+  String toJson(VehicleCalibrationMode object) => object.key;
 }
 
 /// Serializes [ChargingPreferences] as a plain map so json_serializable

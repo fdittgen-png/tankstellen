@@ -1,0 +1,6 @@
+{
+  "calibrationModeLabel": "Kalibrierungsmodus",
+  "calibrationModeRule": "Regelbasiert",
+  "calibrationModeFuzzy": "Fuzzy",
+  "calibrationModeTooltip": "Regelbasiert ordnet jede Fahrprobe genau einer Situation zu. Fuzzy verteilt sie auf alle, je nachdem wie gut sie passen — ruhiger rund um 60 km/h oder bei wechselnden Steigungen, aber langsamer beim Befüllen aller Kategorien."
+}
