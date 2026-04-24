@@ -146,6 +146,19 @@ class RetryingTileHttpClient extends http.BaseClient {
         lastStack = s;
         _logAttempt(request.url, attempt, 'TimeoutException: $e');
       } on http.ClientException catch (e, s) {
+        // #930 — flutter_map 8.x aborts in-flight tile HTTP requests
+        // when the viewport moves and the tile becomes obsolete. The
+        // underlying http client surfaces that abort as a
+        // ClientException with a message containing "canceled",
+        // "cancelled", or "aborted". Retrying it is pointless (the
+        // caller has moved on) and actively harmful: burning our 3
+        // attempts on a cancelled request produces an error tile,
+        // which `evictErrorTileStrategy.notVisibleRespectMargin`
+        // keeps on screen as gray when the user stops panning.
+        // Rethrow immediately — no retry, no sleep.
+        if (_isCancellation(e)) {
+          Error.throwWithStackTrace(e, s);
+        }
         lastError = e;
         lastStack = s;
         _logAttempt(request.url, attempt, 'ClientException: $e');
@@ -162,6 +175,22 @@ class RetryingTileHttpClient extends http.BaseClient {
     throw http.ClientException(
         'RetryNetworkTileProvider: retries exhausted without response');
   }
+
+  /// Detects the cancellation/abort signal produced when
+  /// flutter_map aborts an in-flight tile fetch because the tile
+  /// became obsolete (viewport moved before the fetch completed).
+  /// The underlying `http` package surfaces these aborts as
+  /// `http.ClientException` with a message containing "canceled",
+  /// "cancelled", or "aborted" (case varies by platform + package
+  /// version). See #930 for the gray-tile regression this prevents.
+  @visibleForTesting
+  static bool isCancellationException(http.ClientException e) {
+    final msg = e.message.toLowerCase();
+    return msg.contains('cancel') || msg.contains('abort');
+  }
+
+  static bool _isCancellation(http.ClientException e) =>
+      isCancellationException(e);
 
   /// Which HTTP status codes should trigger a retry.
   ///

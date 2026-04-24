@@ -215,6 +215,161 @@ void main() {
       expect(d2.inMilliseconds, greaterThan(d1.inMilliseconds));
     });
 
+    group('cancellation handling (#930)', () {
+      // flutter_map 8.x aborts in-flight tile HTTP requests when
+      // the viewport moves and the tile becomes obsolete. The
+      // retry client must treat those cancellations as a hard
+      // rethrow (not a transient failure) so it does not burn its
+      // retries producing an error tile that
+      // `evictErrorTileStrategy.notVisibleRespectMargin` then
+      // strands on-screen as gray. See #930 for the full trace.
+
+      test('ClientException("Request canceled") rethrows immediately — '
+          'zero retries, zero sleeps', () async {
+        final inner = _FakeClient(errors: [
+          http.ClientException('Request canceled'),
+          // Unreachable — if the retry loop keeps going, it would
+          // hit this and produce a misleading success.
+          http.ClientException('Request canceled'),
+          http.ClientException('Request canceled'),
+        ]);
+        final slept = <Duration>[];
+        final client = RetryingTileHttpClient(
+          inner: inner,
+          sleep: (d) async => slept.add(d),
+        );
+
+        await expectLater(
+          client.get(Uri.parse('https://tile/cancel.png')),
+          throwsA(isA<http.ClientException>()),
+        );
+        expect(inner.sentCount, 1,
+            reason: 'cancellation must NOT retry — the caller '
+                '(flutter_map) has moved on, retrying wastes '
+                'bandwidth and produces a bogus error tile.');
+        expect(slept, isEmpty,
+            reason: 'zero sleeps — the rethrow is immediate.');
+      });
+
+      test('ClientException with "aborted" rethrows immediately', () async {
+        final inner = _FakeClient(errors: [
+          http.ClientException('Connection aborted by client'),
+          http.ClientException('still aborted'),
+        ]);
+        final slept = <Duration>[];
+        final client = RetryingTileHttpClient(
+          inner: inner,
+          sleep: (d) async => slept.add(d),
+        );
+
+        await expectLater(
+          client.get(Uri.parse('https://tile/abort.png')),
+          throwsA(isA<http.ClientException>()),
+        );
+        expect(inner.sentCount, 1);
+        expect(slept, isEmpty);
+      });
+
+      test('ClientException with "Cancelled" (capital C) rethrows — '
+          'match is case-insensitive', () async {
+        final inner = _FakeClient(errors: [
+          http.ClientException('Request Cancelled'),
+          http.ClientException('still cancelled'),
+        ]);
+        final slept = <Duration>[];
+        final client = RetryingTileHttpClient(
+          inner: inner,
+          sleep: (d) async => slept.add(d),
+        );
+
+        await expectLater(
+          client.get(Uri.parse('https://tile/Cancelled.png')),
+          throwsA(isA<http.ClientException>()),
+        );
+        expect(inner.sentCount, 1);
+        expect(slept, isEmpty);
+      });
+
+      test('SocketException still retries — cancellation branch did not '
+          'overshoot into transient connection errors', () async {
+        // Regression guard: if the #930 fix accidentally short-
+        // circuits SocketException too, we lose retries on legitimate
+        // transient network blips.
+        final inner = _FakeClient(errors: [
+          const SocketException('connection blip 1'),
+          const SocketException('connection blip 2'),
+          const SocketException('connection blip 3'),
+        ]);
+        final slept = <Duration>[];
+        final client = RetryingTileHttpClient(
+          inner: inner,
+          sleep: (d) async => slept.add(d),
+        );
+
+        await expectLater(
+          client.get(Uri.parse('https://tile/socket.png')),
+          throwsA(isA<SocketException>()),
+        );
+        expect(inner.sentCount, 3,
+            reason: 'SocketException is transient — must still hit the '
+                'full maxAttempts retry path.');
+        expect(slept, hasLength(2),
+            reason: 'two backoff sleeps between three attempts.');
+      });
+
+      test('ClientException without cancel/abort keyword still retries',
+          () async {
+        // Another regression guard: generic http.ClientException
+        // (e.g. "Connection closed before full header was received")
+        // is transient and must keep its 3-attempt retry.
+        final inner = _FakeClient(errors: [
+          http.ClientException('Connection closed before full '
+              'header was received'),
+          http.ClientException('Connection closed'),
+          http.ClientException('Connection closed'),
+        ]);
+        final client = RetryingTileHttpClient(
+          inner: inner,
+          sleep: (_) async {},
+        );
+
+        await expectLater(
+          client.get(Uri.parse('https://tile/closed.png')),
+          throwsA(isA<http.ClientException>()),
+        );
+        expect(inner.sentCount, 3,
+            reason: 'non-cancellation ClientException remains retryable.');
+      });
+
+      test('isCancellationException matches the expected keyword set', () {
+        expect(
+            RetryingTileHttpClient.isCancellationException(
+                http.ClientException('Request canceled')),
+            isTrue);
+        expect(
+            RetryingTileHttpClient.isCancellationException(
+                http.ClientException('request Cancelled')),
+            isTrue);
+        expect(
+            RetryingTileHttpClient.isCancellationException(
+                http.ClientException('aborted by client')),
+            isTrue);
+        expect(
+            RetryingTileHttpClient.isCancellationException(
+                http.ClientException('Aborted')),
+            isTrue);
+        // Does NOT match generic transient errors.
+        expect(
+            RetryingTileHttpClient.isCancellationException(
+                http.ClientException('Connection closed')),
+            isFalse);
+        expect(
+            RetryingTileHttpClient.isCancellationException(
+                http.ClientException('Timed out')),
+            isFalse);
+      });
+    });
+
     test('RetryingTileHttpClient.isRetryableStatusCode matches policy', () {
       // Permanent 4xx — no retry.
       expect(RetryingTileHttpClient.isRetryableStatusCode(400), isFalse);
