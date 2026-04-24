@@ -8,7 +8,7 @@ import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
 import '../widgets/location_section_widget.dart';
 import '../widgets/profile_list_section.dart';
-import '../widgets/settings_menu_tile.dart';
+import '../../../../core/widgets/settings_menu_tile.dart';
 import '../widgets/storage_section.dart';
 import '../widgets/tank_sync_section.dart';
 
