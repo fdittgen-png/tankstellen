@@ -1,35 +1,47 @@
-Tankstellen is a free, open-source fuel price comparison app that helps you find the cheapest petrol and diesel near you. Built with privacy as a core principle, it contains no ads, no tracking, and no telemetry. Your location data never leaves your device unless you explicitly opt into cloud sync.
+Tankstellen is a free, open-source fuel and EV charging price comparison app that helps you spend less at the pump and burn less fuel behind the wheel. Built with privacy as a core principle, it contains no ads, no tracking, and no telemetry. Your location never leaves your device unless you explicitly opt into cloud sync.
 
 FEATURES
 
-- Real-time fuel prices from official government APIs in 7 European countries: Germany (Tankerkoenig/MTS-K), France (Prix Carburants), Italy (MASE/MiSE), Spain (Geoportal), Poland (UOKiK), Austria (Spritpreisrechner), and Croatia (MINGOR)
-- Interactive map with OpenStreetMap tiles and marker clustering for fast browsing even in dense urban areas
-- Search by city name, postal code, or GPS position with configurable radius
-- Favorites list for quick access to your regular stations
-- Price history charts to identify the best time to fill up
-- Background price alerts with local notifications when prices drop below your target
-- Material 3 design with light and dark themes
-- Full localization in 10 languages: German, English, French, Italian, Spanish, Polish, Croatian, Dutch, Portuguese, and Turkish
+Price comparison across 15 countries
+- Real-time fuel prices from official government APIs in Germany (Tankerkoenig/MTS-K), France (Prix Carburants), Austria (Spritpreisrechner), Spain (Geoportal), Italy (MASE/MiSE), Denmark, Portugal (DGEG), United Kingdom (GOV.UK), Australia (FuelWatch), Slovenia, Luxembourg, South Korea (Opinet), Chile (CNE), Argentina, and Mexico.
+- Interactive map with OpenStreetMap tiles and marker clustering for fast browsing even in dense urban areas.
+- Search by city, postal code, or GPS position with a configurable radius.
+- EV charging stations from OpenChargeMap with connector and power details alongside fuel prices.
 
-PRIVACY FIRST
+Drive smarter, save twice
+- Trip recording with your car's OBD2 adapter (Bluetooth ELM327) for real consumption data.
+- Trajets tab with per-trip statistics, VIN decoding, and fuzzy-training calibration.
+- Fill-up history with receipt OCR for Super U, Carrefour, and generic layouts.
+- Vehicle profiles and per-trip carbon tracking.
 
-Tankstellen requires location permission only when actively searching for nearby stations. No account is needed. No data is collected or transmitted to any third party. The app works entirely offline for cached results.
+Stay in the know
+- Radius and velocity price alerts with local push notifications when prices drop.
+- Station favorites, price history charts, and best-time-to-fill statistics.
+- Android home-screen widgets for favorites and nearest stations.
+- Cross-border price comparison for routes that cross a national boundary.
+
+Privacy-first
+- Location is requested only when actively searching.
+- No account required. No data sent to third parties by default.
+- Works offline for cached results.
+- Full localisation in 23 languages.
 
 OPTIONAL CLOUD SYNC (TankSync)
 
-For users who want to sync favorites and price alerts across multiple devices, Tankstellen supports an optional self-hosted Supabase backend called TankSync. You deploy your own instance, enter the URL and anonymous key, and the app syncs your data to your own server. Full data transparency: you can view, export, or delete everything stored on the server at any time from within the app.
+For users who want to sync favorites, vehicles, fill-ups, and alerts across multiple devices, Tankstellen supports an optional self-hosted Supabase backend called TankSync. You deploy your own instance, enter the URL and anonymous key, and the app syncs to your own server. Full data transparency: view, export, or delete everything at any time from within the app.
 
-Push notifications for price alerts are delivered through ntfy.sh, an open-source push notification service, so no Google Play Services or Firebase is required.
+Push notifications for price alerts are delivered via ntfy.sh, an open-source push notification service, so no Google Play Services or Firebase are required.
 
 OPEN SOURCE
 
-Tankstellen is licensed under MIT. The full source code, Supabase migration scripts, and deployment documentation are available on GitHub. Contributions and translations are welcome.
+Tankstellen is licensed under MIT. Full source code, Supabase migration scripts, and deployment documentation are available on GitHub. Contributions and translations are welcome.
 
 SUPPORTED PLATFORMS
 
-- Android (primary target, including Android Auto)
-- Chromebook (via Android APK)
+- Android (primary target, including Android Auto).
+- Chromebook (via the Android APK).
+- iOS — in development.
 
 TECHNICAL DETAILS
 
-Built with Flutter and Riverpod for state management. All data is stored locally using Hive. Network requests go through a service abstraction layer with automatic fallback chains and caching. The app respects API rate limits and caches responses to minimize network usage.
+Built with Flutter and Riverpod for state management. All data is stored locally with Hive. Network requests go through a service abstraction layer with automatic fallback chains and caching. The app respects API rate limits and caches responses to minimise network usage.
