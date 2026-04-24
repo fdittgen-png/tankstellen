@@ -6,6 +6,7 @@ import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/password_validator.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/auth_form_provider.dart';
@@ -169,8 +170,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final form = ref.watch(authFormControllerProvider);
     final isEmailUser = syncConfig.hasEmail;
 
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n?.account ?? 'Account')),
+    return PageScaffold(
+      title: l10n?.account ?? 'Account',
+      bodyPadding: EdgeInsets.zero,
       body: ListView(
         padding: EdgeInsets.fromLTRB(
             16, 16, 16, 16 + MediaQuery.of(context).viewPadding.bottom),

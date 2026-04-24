@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/password_validator.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/sync/schema_verifier.dart';
@@ -100,23 +101,22 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
   @override
   Widget build(BuildContext context) {
     final wizard = ref.watch(syncWizardControllerProvider);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Connect TankSync'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: AppLocalizations.of(context)?.tooltipBack ?? 'Back',
-          onPressed: () {
-            if (wizard.mode == SyncWizardMode.choose) {
-              Navigator.pop(context);
-            } else if (wizard.mode == SyncWizardMode.schema) {
-              _notifier.setMode(SyncWizardMode.auth);
-            } else {
-              _notifier.setMode(SyncWizardMode.choose);
-            }
-          },
-        ),
+    return PageScaffold(
+      title: 'Connect TankSync',
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: AppLocalizations.of(context)?.tooltipBack ?? 'Back',
+        onPressed: () {
+          if (wizard.mode == SyncWizardMode.choose) {
+            Navigator.pop(context);
+          } else if (wizard.mode == SyncWizardMode.schema) {
+            _notifier.setMode(SyncWizardMode.auth);
+          } else {
+            _notifier.setMode(SyncWizardMode.choose);
+          }
+        },
       ),
+      bodyPadding: EdgeInsets.zero,
       body: ListView(
         padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.of(context).viewPadding.bottom),
         children: [
