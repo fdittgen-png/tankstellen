@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/brand_logo_mapper.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/vehicle_profile.dart';
 import '../../domain/entities/vin_data.dart';
@@ -214,19 +215,18 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
     final isEdit = _existingId != null || widget.vehicleId != null;
     final accent = _brandAccent(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEdit
-            ? (l?.vehicleEditTitle ?? 'Edit vehicle')
-            : (l?.vehicleAddTitle ?? 'Add vehicle')),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.check),
-            tooltip: l?.save ?? 'Save',
-            onPressed: _save,
-          ),
-        ],
-      ),
+    return PageScaffold(
+      title: isEdit
+          ? (l?.vehicleEditTitle ?? 'Edit vehicle')
+          : (l?.vehicleAddTitle ?? 'Add vehicle'),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.check),
+          tooltip: l?.save ?? 'Save',
+          onPressed: _save,
+        ),
+      ],
+      bodyPadding: EdgeInsets.zero,
       body: Form(
         key: _formKey,
         child: ListView(
