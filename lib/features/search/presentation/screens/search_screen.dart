@@ -8,6 +8,7 @@ import '../../../../core/location/location_consent.dart';
 import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/frame_callbacks.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../map/presentation/widgets/inline_map.dart';
@@ -122,14 +123,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Semantics(
-          header: true,
-          child: Text(l10n?.appTitle ?? 'Fuel Prices'),
-        ),
-        toolbarHeight: isLandscape ? 40 : null,
-      ),
+    return PageScaffold(
+      title: l10n?.appTitle ?? 'Fuel Prices',
+      toolbarHeight: isLandscape ? 40 : null,
+      bodyPadding: EdgeInsets.zero,
       body: isWide
           ? _buildWideLayout(context)
           : _buildSearchContent(context),
