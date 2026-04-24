@@ -6434,6 +6434,24 @@ abstract class AppLocalizations {
   /// **'{value} {unit}'**
   String trajetsRowAvgConsumption(String value, String unit);
 
+  /// Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinning keeps the screen on — uses more battery'**
+  String get tripRecordingPinTooltip;
+
+  /// Accessibility label when the pin toggle is currently ON. Tapping will unpin (disable wake lock + restore system UI).
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin recording form'**
+  String get tripRecordingPinSemanticOn;
+
+  /// Accessibility label when the pin toggle is currently OFF. Tapping will pin (enable wake lock + immersive mode).
+  ///
+  /// In en, this message translates to:
+  /// **'Pin recording form'**
+  String get tripRecordingPinSemanticOff;
+
   /// No description provided for @vinLabel.
   ///
   /// In en, this message translates to:

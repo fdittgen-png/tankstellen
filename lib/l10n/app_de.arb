@@ -1334,6 +1334,18 @@
   "trajetsRowDistance": "{km} km",
   "trajetsRowDuration": "{minutes} Min.",
   "trajetsRowAvgConsumption": "{value} {unit}",
+  "tripRecordingPinTooltip": "Epinglen hält den Bildschirm an — verbraucht mehr Akku",
+  "@tripRecordingPinTooltip": {
+    "description": "Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost."
+  },
+  "tripRecordingPinSemanticOn": "Aufnahmeformular lösen",
+  "@tripRecordingPinSemanticOn": {
+    "description": "Accessibility label when the pin toggle is currently ON. Tapping will unpin (disable wake lock + restore system UI)."
+  },
+  "tripRecordingPinSemanticOff": "Aufnahmeformular anpinnen",
+  "@tripRecordingPinSemanticOff": {
+    "description": "Accessibility label when the pin toggle is currently OFF. Tapping will pin (enable wake lock + immersive mode)."
+  },
   "vinLabel": "FIN (optional)",
   "vinDecodeTooltip": "FIN entschlüsseln",
   "vinConfirmAction": "Ja, automatisch ausfüllen",
