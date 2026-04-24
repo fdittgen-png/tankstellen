@@ -237,6 +237,87 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
     nameMatchers: ['veepeak'],
   ),
+  // SmartOBD — generic ELM327 v1.5 clone, widely shipped on Amazon
+  // (#949). BLE variant rides on FFF0 like the rest of the Nordic-UART
+  // family; a Classic-BT sibling also exists under the same name, so a
+  // separate Classic entry follows this one.
+  Obd2AdapterProfile(
+    id: 'smartobd-ble',
+    displayName: 'SmartOBD (BLE)',
+    serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
+    writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
+    notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
+    nameMatchers: ['smartobd'],
+  ),
+  Obd2AdapterProfile(
+    id: 'smartobd-classic',
+    displayName: 'SmartOBD (Classic)',
+    transport: BluetoothTransport.classic,
+    nameMatchers: ['smartobd'],
+  ),
+  // ieGeek Scanner — ELM327 v2.1 BLE clone, advertises as "ieGeek…"
+  // (#949). Nordic UART FFF0 family.
+  Obd2AdapterProfile(
+    id: 'iegeek',
+    displayName: 'ieGeek Scanner',
+    serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
+    writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
+    notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
+    nameMatchers: ['iegeek'],
+  ),
+  // vLinker BM+ — BLE-only sibling of the vLinker BM. The "+" is the
+  // distinguishing glyph, so the matchers require it to win over a
+  // future plain-"bm" entry; listed as 'vlinker bm+' / 'vlink bm+'
+  // (#949). Same Nordic UART FFF0 family.
+  Obd2AdapterProfile(
+    id: 'vlinker-bm-plus',
+    displayName: 'vLinker BM+ (BLE)',
+    serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
+    writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
+    notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
+    nameMatchers: ['vlinker bm+', 'vlink bm+'],
+  ),
+  // Konnwei KW902 — Classic Bluetooth ELM327 v1.5 clone, extremely
+  // common on Amazon / AliExpress. Advertises as "KONNWEI" or "KW902"
+  // in bonded-device lists (#949).
+  Obd2AdapterProfile(
+    id: 'konnwei-kw902',
+    displayName: 'Konnwei KW902',
+    transport: BluetoothTransport.classic,
+    nameMatchers: ['konnwei', 'kw902'],
+  ),
+  // Vgate iCar Pro — Chinese-brand ELM327, ships in BLE and WiFi
+  // variants (#949). The BLE model lands on the FFF0 Nordic-UART
+  // family; the WiFi model is handled by a TCP adapter outside this
+  // registry. Name advertises as "Vgate iCar Pro" / "iCar Pro".
+  Obd2AdapterProfile(
+    id: 'vgate-icar-pro',
+    displayName: 'Vgate iCar Pro',
+    serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
+    writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
+    notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
+    nameMatchers: ['vgate', 'icar pro'],
+  ),
+  // Panlong WiFi — entry-level WiFi adapter (#949). Not reachable via
+  // BLE scan, but a Classic-bonded-device list may still carry the
+  // name if the user mis-paired it; keep the matcher available so the
+  // UI labels the device correctly before the connection attempt
+  // fails. Transport set to classic as the nearest no-op (WiFi
+  // adapters connect through a TCP facade).
+  Obd2AdapterProfile(
+    id: 'panlong-wifi',
+    displayName: 'Panlong WiFi',
+    transport: BluetoothTransport.classic,
+    nameMatchers: ['panlong'],
+  ),
+  // BAFX 34t5 — legacy ELM327 v1.5 Classic-BT adapter, still widely
+  // sold in the US (#949). Advertises simply as "BAFX".
+  Obd2AdapterProfile(
+    id: 'bafx',
+    displayName: 'BAFX 34t5',
+    transport: BluetoothTransport.classic,
+    nameMatchers: ['bafx'],
+  ),
   // Generic ELM327 BLE fallback. Matches any clone that advertises
   // the FFF0 service but has an unfamiliar name (plenty on Amazon).
   // No nameMatchers — reached only via service-UUID pass.

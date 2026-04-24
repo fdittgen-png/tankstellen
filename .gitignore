@@ -81,6 +81,7 @@ docs/guides/*
 !docs/guides/BLOCKER-IOS-PROVISIONING.md
 !docs/guides/BLOCKER-SUPABASE-MIGRATION.md
 !docs/guides/PLAY-STORE-LISTING-REFRESH.md
+!docs/guides/obd2-adapters.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/

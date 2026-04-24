@@ -84,6 +84,135 @@ void main() {
     });
   });
 
+  group('Obd2AdapterRegistry.resolve — expanded catalog (#949)', () {
+    // Each assertion below mirrors the "resolve by advertised name"
+    // path used by the BLE scan flow. The picker feeds the registry
+    // via Obd2AdapterCandidate; these tests ensure each new #949
+    // entry is reachable without relying on a service-UUID hit.
+
+    test('SmartOBD BLE advert is labelled as SmartOBD (not generic)', () {
+      final hit = _candidate(
+        name: 'SmartOBD-BT',
+        services: const ['0000fff0-0000-1000-8000-00805f9b34fb'],
+      );
+      final profile = registry.resolve(hit);
+      expect(profile, isNotNull);
+      expect(profile!.id, 'smartobd-ble');
+      expect(profile.transport, BluetoothTransport.ble);
+    });
+
+    test('SmartOBD Classic bonded-device name lands on a SmartOBD profile',
+        () {
+      // Classic devices have no advertised services — the name is
+      // all we get. BLE and Classic SmartOBD entries share the
+      // matcher; the BLE entry is listed first, so the assertion
+      // below accepts either SmartOBD id — the guard is against the
+      // generic fallback winning.
+      final hit = _candidate(name: 'SmartOBD', services: []);
+      final profile = registry.resolve(hit);
+      expect(profile, isNotNull);
+      expect(profile!.id, startsWith('smartobd'));
+    });
+
+    test('ieGeek Scanner matched by name (#949)', () {
+      final hit = _candidate(
+        name: 'ieGeek 123',
+        services: const ['0000fff0-0000-1000-8000-00805f9b34fb'],
+      );
+      expect(registry.resolve(hit)?.id, 'iegeek');
+    });
+
+    test('vLinker BM+ matches the new BM+ profile, not a generic', () {
+      final hit = _candidate(
+        name: 'vLinker BM+ BLE',
+        services: const ['0000fff0-0000-1000-8000-00805f9b34fb'],
+      );
+      final profile = registry.resolve(hit);
+      expect(profile, isNotNull);
+      expect(profile!.id, 'vlinker-bm-plus');
+    });
+
+    test('vLinker BM (no plus) does NOT collide with the BM+ entry', () {
+      // Regression guard: a plain "vLinker BM" advert must not be
+      // hijacked by the BM+ matcher — the "+" is the distinguishing
+      // glyph. With the current catalog there is no named BM-only
+      // profile, so the advert falls through to the generic FFF0
+      // BLE fallback (via the advertised Nordic-UART service).
+      final hit = _candidate(
+        name: 'vLinker BM',
+        services: const ['0000fff0-0000-1000-8000-00805f9b34fb'],
+      );
+      final profile = registry.resolve(hit);
+      expect(profile, isNotNull);
+      expect(profile!.id, isNot('vlinker-bm-plus'));
+      expect(profile.id, 'generic-fff0');
+    });
+
+    test('Konnwei / KW902 → konnwei-kw902 (#949)', () {
+      expect(
+        registry.resolve(_candidate(name: 'KONNWEI KW902', services: []))?.id,
+        'konnwei-kw902',
+      );
+      expect(
+        registry.resolve(_candidate(name: 'KW902-OBD', services: []))?.id,
+        'konnwei-kw902',
+      );
+    });
+
+    test('Vgate iCar Pro matched by "Vgate" and by "iCar Pro" (#949)', () {
+      expect(
+        registry
+            .resolve(_candidate(name: 'Vgate iCar Pro BLE', services: []))
+            ?.id,
+        'vgate-icar-pro',
+      );
+      expect(
+        registry.resolve(_candidate(name: 'iCar Pro 2', services: []))?.id,
+        'vgate-icar-pro',
+      );
+    });
+
+    test('Panlong WiFi matched by name (#949)', () {
+      expect(
+        registry
+            .resolve(_candidate(name: 'Panlong WiFi OBD', services: []))
+            ?.id,
+        'panlong-wifi',
+      );
+    });
+
+    test('BAFX matched by name (#949)', () {
+      expect(
+        registry
+            .resolve(_candidate(name: 'BAFX Products 34t5', services: []))
+            ?.id,
+        'bafx',
+      );
+    });
+
+    test('"random device" name with no OBD signature is rejected', () {
+      // Regression guard on the generic fallback: a noisy advert
+      // with no OBD signature and no relevant service UUID must not
+      // be matched by any of the new #949 entries. The generic-
+      // classic profile only fires when the name contains "obd" /
+      // "elm327" etc., so "random device" lands on null and the UI
+      // hides it.
+      final hit = _candidate(name: 'random device', services: []);
+      expect(registry.resolve(hit), isNull);
+    });
+
+    test('generic Classic ELM327 clone still reaches generic-classic after '
+        '#949 additions', () {
+      // Guard on the "last entry is the catch-all" contract. A
+      // name that carries an OBD signature but matches none of the
+      // named profiles must land on the generic-classic fallback.
+      final hit = _candidate(name: 'OBD-II Random Clone', services: []);
+      final profile = registry.resolve(hit);
+      expect(profile, isNotNull);
+      expect(profile!.id, 'generic-classic');
+    });
+  });
+
   group('Obd2AdapterRegistry.allServiceUuids', () {
     test('only BLE profiles contribute service UUIDs (#761)', () {
       // Classic profiles have no advertised service UUID — including
