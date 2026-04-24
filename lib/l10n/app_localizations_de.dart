@@ -3470,6 +3470,70 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get trajetDetailSummaryTitle => 'Zusammenfassung';
+
+  @override
+  String get trajetDetailFieldDate => 'Datum';
+
+  @override
+  String get trajetDetailFieldVehicle => 'Fahrzeug';
+
+  @override
+  String get trajetDetailFieldDistance => 'Strecke';
+
+  @override
+  String get trajetDetailFieldDuration => 'Dauer';
+
+  @override
+  String get trajetDetailFieldAvgConsumption => 'Ø Verbrauch';
+
+  @override
+  String get trajetDetailFieldFuelUsed => 'Kraftstoff';
+
+  @override
+  String get trajetDetailFieldAvgSpeed => 'Ø Geschwindigkeit';
+
+  @override
+  String get trajetDetailFieldMaxSpeed => 'Höchstgeschwindigkeit';
+
+  @override
+  String get trajetDetailFieldValueUnknown => '—';
+
+  @override
+  String get trajetDetailChartSpeed => 'Geschwindigkeit (km/h)';
+
+  @override
+  String get trajetDetailChartFuelRate => 'Kraftstoffrate (L/h)';
+
+  @override
+  String get trajetDetailChartRpm => 'Drehzahl';
+
+  @override
+  String get trajetDetailChartEmpty => 'Keine Messwerte';
+
+  @override
+  String get trajetDetailShareAction => 'Teilen';
+
+  @override
+  String get trajetDetailShareCopied => 'In Zwischenablage kopiert';
+
+  @override
+  String get trajetDetailDeleteAction => 'Löschen';
+
+  @override
+  String get trajetDetailDeleteConfirmTitle => 'Diese Fahrt löschen?';
+
+  @override
+  String get trajetDetailDeleteConfirmBody =>
+      'Diese Fahrt wird dauerhaft aus deinem Verlauf entfernt.';
+
+  @override
+  String get trajetDetailDeleteConfirmCancel => 'Abbrechen';
+
+  @override
+  String get trajetDetailDeleteConfirmConfirm => 'Löschen';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Epinglen hält den Bildschirm an — verbraucht mehr Akku';
 

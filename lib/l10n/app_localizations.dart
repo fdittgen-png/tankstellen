@@ -6434,6 +6434,132 @@ abstract class AppLocalizations {
   /// **'{value} {unit}'**
   String trajetsRowAvgConsumption(String value, String unit);
 
+  /// Title of the summary card at the top of the Trip detail screen (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get trajetDetailSummaryTitle;
+
+  /// Label for the trip date row in the Trip detail summary card (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get trajetDetailFieldDate;
+
+  /// Label for the vehicle-name row in the Trip detail summary card (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle'**
+  String get trajetDetailFieldVehicle;
+
+  /// Label for the distance row in the Trip detail summary card (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get trajetDetailFieldDistance;
+
+  /// Label for the duration row in the Trip detail summary card (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get trajetDetailFieldDuration;
+
+  /// Label for the average consumption row in the Trip detail summary card (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Avg consumption'**
+  String get trajetDetailFieldAvgConsumption;
+
+  /// Label for the total fuel litres row in the Trip detail summary card (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel used'**
+  String get trajetDetailFieldFuelUsed;
+
+  /// Label for the average speed row in the Trip detail summary card (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Avg speed'**
+  String get trajetDetailFieldAvgSpeed;
+
+  /// Label for the max speed row in the Trip detail summary card (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Max speed'**
+  String get trajetDetailFieldMaxSpeed;
+
+  /// Placeholder shown in the Trip detail summary card when a value is unknown (no samples, missing timestamp, etc.) (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get trajetDetailFieldValueUnknown;
+
+  /// Section title above the speed-over-time chart on the Trip detail screen (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Speed (km/h)'**
+  String get trajetDetailChartSpeed;
+
+  /// Section title above the fuel-rate-over-time chart on the Trip detail screen (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel rate (L/h)'**
+  String get trajetDetailChartFuelRate;
+
+  /// Section title above the RPM-over-time chart on the Trip detail screen (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'RPM'**
+  String get trajetDetailChartRpm;
+
+  /// Empty-state caption shown inside a Trip detail chart when no matching samples were recorded (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'No samples recorded'**
+  String get trajetDetailChartEmpty;
+
+  /// AppBar action tooltip / snackbar label for copying the trip summary + sample CSV to the clipboard (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get trajetDetailShareAction;
+
+  /// Snackbar shown after the Share action has written the trip payload to the clipboard (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get trajetDetailShareCopied;
+
+  /// AppBar action tooltip for the delete-trip button on the Trip detail screen (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get trajetDetailDeleteAction;
+
+  /// Title of the confirmation dialog before deleting a trip on the Trip detail screen (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this trip?'**
+  String get trajetDetailDeleteConfirmTitle;
+
+  /// Body of the confirmation dialog before deleting a trip on the Trip detail screen (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'This trip will be permanently removed from your history.'**
+  String get trajetDetailDeleteConfirmBody;
+
+  /// Cancel button label on the delete-trip confirmation dialog (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get trajetDetailDeleteConfirmCancel;
+
+  /// Confirm button label on the delete-trip confirmation dialog (#890).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get trajetDetailDeleteConfirmConfirm;
+
   /// Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost.
   ///
   /// In en, this message translates to:

@@ -44,5 +44,89 @@
         "type": "String"
       }
     }
+  },
+  "trajetDetailSummaryTitle": "Summary",
+  "@trajetDetailSummaryTitle": {
+    "description": "Title of the summary card at the top of the Trip detail screen (#890)."
+  },
+  "trajetDetailFieldDate": "Date",
+  "@trajetDetailFieldDate": {
+    "description": "Label for the trip date row in the Trip detail summary card (#890)."
+  },
+  "trajetDetailFieldVehicle": "Vehicle",
+  "@trajetDetailFieldVehicle": {
+    "description": "Label for the vehicle-name row in the Trip detail summary card (#890)."
+  },
+  "trajetDetailFieldDistance": "Distance",
+  "@trajetDetailFieldDistance": {
+    "description": "Label for the distance row in the Trip detail summary card (#890)."
+  },
+  "trajetDetailFieldDuration": "Duration",
+  "@trajetDetailFieldDuration": {
+    "description": "Label for the duration row in the Trip detail summary card (#890)."
+  },
+  "trajetDetailFieldAvgConsumption": "Avg consumption",
+  "@trajetDetailFieldAvgConsumption": {
+    "description": "Label for the average consumption row in the Trip detail summary card (#890)."
+  },
+  "trajetDetailFieldFuelUsed": "Fuel used",
+  "@trajetDetailFieldFuelUsed": {
+    "description": "Label for the total fuel litres row in the Trip detail summary card (#890)."
+  },
+  "trajetDetailFieldAvgSpeed": "Avg speed",
+  "@trajetDetailFieldAvgSpeed": {
+    "description": "Label for the average speed row in the Trip detail summary card (#890)."
+  },
+  "trajetDetailFieldMaxSpeed": "Max speed",
+  "@trajetDetailFieldMaxSpeed": {
+    "description": "Label for the max speed row in the Trip detail summary card (#890)."
+  },
+  "trajetDetailFieldValueUnknown": "—",
+  "@trajetDetailFieldValueUnknown": {
+    "description": "Placeholder shown in the Trip detail summary card when a value is unknown (no samples, missing timestamp, etc.) (#890)."
+  },
+  "trajetDetailChartSpeed": "Speed (km/h)",
+  "@trajetDetailChartSpeed": {
+    "description": "Section title above the speed-over-time chart on the Trip detail screen (#890)."
+  },
+  "trajetDetailChartFuelRate": "Fuel rate (L/h)",
+  "@trajetDetailChartFuelRate": {
+    "description": "Section title above the fuel-rate-over-time chart on the Trip detail screen (#890)."
+  },
+  "trajetDetailChartRpm": "RPM",
+  "@trajetDetailChartRpm": {
+    "description": "Section title above the RPM-over-time chart on the Trip detail screen (#890)."
+  },
+  "trajetDetailChartEmpty": "No samples recorded",
+  "@trajetDetailChartEmpty": {
+    "description": "Empty-state caption shown inside a Trip detail chart when no matching samples were recorded (#890)."
+  },
+  "trajetDetailShareAction": "Share",
+  "@trajetDetailShareAction": {
+    "description": "AppBar action tooltip / snackbar label for copying the trip summary + sample CSV to the clipboard (#890)."
+  },
+  "trajetDetailShareCopied": "Copied to clipboard",
+  "@trajetDetailShareCopied": {
+    "description": "Snackbar shown after the Share action has written the trip payload to the clipboard (#890)."
+  },
+  "trajetDetailDeleteAction": "Delete",
+  "@trajetDetailDeleteAction": {
+    "description": "AppBar action tooltip for the delete-trip button on the Trip detail screen (#890)."
+  },
+  "trajetDetailDeleteConfirmTitle": "Delete this trip?",
+  "@trajetDetailDeleteConfirmTitle": {
+    "description": "Title of the confirmation dialog before deleting a trip on the Trip detail screen (#890)."
+  },
+  "trajetDetailDeleteConfirmBody": "This trip will be permanently removed from your history.",
+  "@trajetDetailDeleteConfirmBody": {
+    "description": "Body of the confirmation dialog before deleting a trip on the Trip detail screen (#890)."
+  },
+  "trajetDetailDeleteConfirmCancel": "Cancel",
+  "@trajetDetailDeleteConfirmCancel": {
+    "description": "Cancel button label on the delete-trip confirmation dialog (#890)."
+  },
+  "trajetDetailDeleteConfirmConfirm": "Delete",
+  "@trajetDetailDeleteConfirmConfirm": {
+    "description": "Confirm button label on the delete-trip confirmation dialog (#890)."
   }
 }
