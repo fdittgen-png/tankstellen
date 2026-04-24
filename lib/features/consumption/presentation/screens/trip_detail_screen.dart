@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
@@ -73,31 +74,30 @@ class TripDetailScreen extends ConsumerWidget {
             activeVehicle;
     final isEv = vehicle?.type == VehicleType.ev;
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: l?.tooltipBack ?? 'Back',
-          onPressed: () => context.pop(),
-        ),
-        title: Text(l?.tripHistoryTitle ?? 'Trip history'),
-        actions: entry == null
-            ? null
-            : [
-                IconButton(
-                  key: const Key('trip_detail_share_button'),
-                  icon: const Icon(Icons.share),
-                  tooltip: l?.trajetDetailShareAction ?? 'Share',
-                  onPressed: () => _onShare(context, l, entry, vehicle),
-                ),
-                IconButton(
-                  key: const Key('trip_detail_delete_button'),
-                  icon: const Icon(Icons.delete_outline),
-                  tooltip: l?.trajetDetailDeleteAction ?? 'Delete',
-                  onPressed: () => _onDelete(context, ref, l),
-                ),
-              ],
+    return PageScaffold(
+      title: l?.tripHistoryTitle ?? 'Trip history',
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: l?.tooltipBack ?? 'Back',
+        onPressed: () => context.pop(),
       ),
+      actions: entry == null
+          ? null
+          : [
+              IconButton(
+                key: const Key('trip_detail_share_button'),
+                icon: const Icon(Icons.share),
+                tooltip: l?.trajetDetailShareAction ?? 'Share',
+                onPressed: () => _onShare(context, l, entry, vehicle),
+              ),
+              IconButton(
+                key: const Key('trip_detail_delete_button'),
+                icon: const Icon(Icons.delete_outline),
+                tooltip: l?.trajetDetailDeleteAction ?? 'Delete',
+                onPressed: () => _onDelete(context, ref, l),
+              ),
+            ],
+      bodyPadding: EdgeInsets.zero,
       body: entry == null
           ? Center(
               child: Padding(
