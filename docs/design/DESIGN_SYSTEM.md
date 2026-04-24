@@ -228,7 +228,14 @@ screen is about" identified in the #923 audit.
 - **required** `body: Widget` — scrollable content. `PageScaffold`
   applies `Spacing.screenPadding` to the body by default; opt out via
   `bodyPadding: EdgeInsets.zero` for full-bleed content (map screen).
-- `floatingActionButton: Widget?`
+- `floatingActionButton: Widget?` — pass-through to
+  [Scaffold.floatingActionButton]. Enables MapScreen's
+  `DrivingModeFab` to live inside `PageScaffold`.
+- `floatingActionButtonLocation: FloatingActionButtonLocation?` —
+  pass-through to [Scaffold.floatingActionButtonLocation]. Default
+  `null` uses `Scaffold`'s default (end-float); pass
+  `FloatingActionButtonLocation.centerDocked` when pairing with a
+  bottom bar.
 - `bottomNavigationBar: Widget?` — reserved for the shell; leaf
   screens do not set this.
 - `toolbarHeight: double?` — optional override for the app-bar toolbar
