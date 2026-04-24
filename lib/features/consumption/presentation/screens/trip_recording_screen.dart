@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/trip_recorder.dart';
 import '../../providers/trip_recording_provider.dart';
+import '../../providers/wakelock_facade.dart';
 
 /// Result returned when the user saves a recorded trip as a fill-up
 /// (#726). Null means the user cancelled or discarded.
@@ -40,15 +44,81 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
   StoppedTripResult? _stopped;
   bool _stopping = false;
 
+  /// #891 — ephemeral pin state. Enabling keeps the screen on + hides
+  /// system bars so the live recording form stays readable at the
+  /// pump / on a dashboard mount. Intentionally NOT persisted: the
+  /// user opts back in each drive so battery-drain never lingers.
+  bool _pinned = false;
+
+  /// Cached facade handle so [dispose] can release the wake lock
+  /// without touching `ref` (Riverpod forbids `ref.read` after the
+  /// widget is deactivated). Populated the first time the user pins.
+  WakelockFacade? _cachedFacade;
+
+  @override
+  void dispose() {
+    // Auto-release the wake lock + restore system UI if the user
+    // exits the screen without unpinning. Best-effort; the facade
+    // swallows plugin errors on unsupported platforms. Fire-and-
+    // forget — `dispose` must stay synchronous.
+    if (_pinned) {
+      final facade = _cachedFacade;
+      if (facade != null) {
+        unawaited(facade.disable());
+      }
+      unawaited(
+        SystemChrome.setEnabledSystemUIMode(
+          SystemUiMode.manual,
+          overlays: SystemUiOverlay.values,
+        ),
+      );
+    }
+    super.dispose();
+  }
+
   Future<void> _onStop() async {
     if (_stopping) return;
     setState(() => _stopping = true);
     final result = await ref.read(tripRecordingProvider.notifier).stop();
     if (!mounted) return;
+    // #891 — when the recording ends, auto-release the wake lock
+    // even if the user forgot to unpin. The form will still be
+    // visible (summary screen) but there's no longer any reason
+    // to keep the device awake at the user's expense.
+    if (_pinned) {
+      await ref.read(wakelockFacadeProvider).disable();
+      await SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: SystemUiOverlay.values,
+      );
+      if (!mounted) return;
+    }
     setState(() {
       _stopped = result;
       _stopping = false;
+      _pinned = false;
     });
+  }
+
+  Future<void> _togglePin() async {
+    final facade = ref.read(wakelockFacadeProvider);
+    // Cache so [dispose] can call `disable()` without reading `ref`
+    // after the widget has been deactivated.
+    _cachedFacade = facade;
+    final nextPinned = !_pinned;
+    // Flip UI state first so the icon reflects intent even if the
+    // plugin call is slow — the facade swallows its own errors.
+    setState(() => _pinned = nextPinned);
+    if (nextPinned) {
+      await facade.enable();
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    } else {
+      await facade.disable();
+      await SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: SystemUiOverlay.values,
+      );
+    }
   }
 
   void _togglePause() {
@@ -111,6 +181,33 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         actions: stopped != null
             ? null
             : [
+                // #891 — wrap in Semantics so TalkBack announces the
+                // *next* action (Pin / Unpin) in addition to the
+                // tooltip's battery-cost hint. `container: true`
+                // merges the IconButton's tap semantics into the label.
+                Semantics(
+                  container: true,
+                  button: true,
+                  toggled: _pinned,
+                  label: _pinned
+                      ? (l?.tripRecordingPinSemanticOn ??
+                          'Unpin recording form')
+                      : (l?.tripRecordingPinSemanticOff ??
+                          'Pin recording form'),
+                  child: IconButton(
+                    key: const Key('tripPinButton'),
+                    icon: Icon(
+                      _pinned ? Icons.push_pin : Icons.push_pin_outlined,
+                      color: _pinned
+                          ? Theme.of(context).colorScheme.primary
+                          : null,
+                    ),
+                    tooltip: l?.tripRecordingPinTooltip ??
+                        'Pinning keeps the screen on — uses more battery',
+                    isSelected: _pinned,
+                    onPressed: _togglePin,
+                  ),
+                ),
                 IconButton(
                   key: const Key('tripPauseButton'),
                   icon: Icon(state.phase == TripRecordingPhase.paused

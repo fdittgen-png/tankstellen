@@ -1,0 +1,14 @@
+{
+  "tripRecordingPinTooltip": "Pinning keeps the screen on — uses more battery",
+  "@tripRecordingPinTooltip": {
+    "description": "Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost."
+  },
+  "tripRecordingPinSemanticOn": "Unpin recording form",
+  "@tripRecordingPinSemanticOn": {
+    "description": "Accessibility label when the pin toggle is currently ON. Tapping will unpin (disable wake lock + restore system UI)."
+  },
+  "tripRecordingPinSemanticOff": "Pin recording form",
+  "@tripRecordingPinSemanticOff": {
+    "description": "Accessibility label when the pin toggle is currently OFF. Tapping will pin (enable wake lock + immersive mode)."
+  }
+}

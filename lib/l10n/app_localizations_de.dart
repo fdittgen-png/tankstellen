@@ -3470,6 +3470,16 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get tripRecordingPinTooltip =>
+      'Epinglen hält den Bildschirm an — verbraucht mehr Akku';
+
+  @override
+  String get tripRecordingPinSemanticOn => 'Aufnahmeformular lösen';
+
+  @override
+  String get tripRecordingPinSemanticOff => 'Aufnahmeformular anpinnen';
+
+  @override
   String get vinLabel => 'FIN (optional)';
 
   @override

@@ -3441,6 +3441,16 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String get tripRecordingPinTooltip =>
+      'Pinning keeps the screen on — uses more battery';
+
+  @override
+  String get tripRecordingPinSemanticOn => 'Unpin recording form';
+
+  @override
+  String get tripRecordingPinSemanticOff => 'Pin recording form';
+
+  @override
   String get vinLabel => 'VIN (optional)';
 
   @override
