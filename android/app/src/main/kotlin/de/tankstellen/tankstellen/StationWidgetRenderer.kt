@@ -267,6 +267,13 @@ object StationWidgetRenderer {
         // Tap the row → open the station detail screen. The id comes from
         // the JSON produced by HomeWidgetService.
         val stationId = station.optString("id", "")
+        // #753 diagnostic — one log per bound row so `adb logcat -s
+        // TankstellenWidget` during repro shows exactly which id was
+        // wired to which visual row. No control-flow change.
+        android.util.Log.d(
+            "TankstellenWidget",
+            "buildRow widgetId=$appWidgetId index=$index id=$stationId brand=${station.optString("brand", "")}",
+        )
         if (stationId.isNotBlank()) {
             val uri = Uri.parse("tankstellenwidget://station?id=$stationId")
             row.setOnClickPendingIntent(

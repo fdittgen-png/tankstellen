@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -9,6 +8,7 @@ import '../../../core/data/storage_repository.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../../search/domain/entities/fuel_type.dart';
+import 'home_widget_json.dart';
 import 'nearest_widget_data_builder.dart';
 
 /// Manages data for the Android home screen widgets.
@@ -62,7 +62,10 @@ class HomeWidgetService {
       final stations = _buildStationList(storage, favoriteIds, context);
 
       await HomeWidget.saveWidgetData('station_count', stations.length);
-      await HomeWidget.saveWidgetData('stations_json', jsonEncode(stations));
+      await HomeWidget.saveWidgetData(
+        'stations_json',
+        encodeStationsForWidget(stations),
+      );
       await HomeWidget.saveWidgetData(
         'updated_at',
         DateTime.now().toIso8601String(),
@@ -146,7 +149,10 @@ class HomeWidgetService {
       );
 
       await HomeWidget.saveWidgetData('nearest_count', stations.length);
-      await HomeWidget.saveWidgetData('nearest_json', jsonEncode(stations));
+      await HomeWidget.saveWidgetData(
+        'nearest_json',
+        encodeStationsForWidget(stations),
+      );
       await HomeWidget.saveWidgetData(
         'nearest_updated_at',
         DateTime.now().toIso8601String(),
