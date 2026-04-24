@@ -87,7 +87,18 @@ class StationMapLayers extends StatelessWidget {
               // replaces the symptom-level workarounds from #496,
               // #532, #696, #707, #709, and #711 (zoom-jiggle,
               // subtree rebuild, ImageCache sizing).
-              tileProvider: RetryNetworkTileProvider(),
+              //
+              // #930 — flutter_map's default aborts in-flight tile
+              // fetches on pan. Our retry layer must not see those
+              // cancellations as errors, and we prefer the tiny
+              // bandwidth cost of finishing the fetch over
+              // race-induced gray tiles when the user stops panning
+              // with a mid-flight tile still in view. Hence explicit
+              // `abortObsoleteRequests: false` here (belt) plus
+              // cancellation-aware retry logic in the provider
+              // itself (suspenders).
+              tileProvider:
+                  RetryNetworkTileProvider(abortObsoleteRequests: false),
               evictErrorTileStrategy:
                   EvictErrorTileStrategy.notVisibleRespectMargin,
               errorTileCallback: (tile, error, stackTrace) {
