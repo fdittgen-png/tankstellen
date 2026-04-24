@@ -10,6 +10,7 @@ import '../../../../core/services/report_service.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/community_report_service.dart';
@@ -262,18 +263,17 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
     final selectedIsGitHubRouted =
         selectedType != null && selectedType.routesToGitHub;
 
-    return Scaffold(
-      appBar: AppBar(
-        // #484 — was "Signaler un prix" but two of the existing options
-        // (open/closed status) are not about prices and the rework will
-        // add metadata-only report types. Generic "Report a problem"
-        // matches the actual scope.
-        title: Text(l10n?.reportIssueTitle ?? 'Report a problem'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: l10n?.tooltipBack ?? 'Back',
-          onPressed: () => context.pop(),
-        ),
+    // #484 — was "Signaler un prix" but two of the existing options
+    // (open/closed status) are not about prices and the rework will
+    // add metadata-only report types. Generic "Report a problem"
+    // matches the actual scope.
+    return PageScaffold(
+      title: l10n?.reportIssueTitle ?? 'Report a problem',
+      bodyPadding: EdgeInsets.zero,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: l10n?.tooltipBack ?? 'Back',
+        onPressed: () => context.pop(),
       ),
       // RadioGroup sits OUTSIDE the ListView so every lazy-built
       // RadioListTile can look up the ancestor at any scroll position
