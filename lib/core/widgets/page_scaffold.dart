@@ -44,6 +44,13 @@ class PageScaffold extends StatelessWidget {
   /// Optional FAB. Passed through to [Scaffold.floatingActionButton].
   final Widget? floatingActionButton;
 
+  /// Optional FAB position. Passed through to
+  /// [Scaffold.floatingActionButtonLocation]. Default `null` lets
+  /// `Scaffold` pick its default (end-float). Use e.g.
+  /// [FloatingActionButtonLocation.centerDocked] when pairing with a
+  /// bottom bar.
+  final FloatingActionButtonLocation? floatingActionButtonLocation;
+
   /// Optional leading app-bar widget. Normally the back button — pass
   /// a custom drawer icon when needed.
   final Widget? leading;
@@ -65,6 +72,7 @@ class PageScaffold extends StatelessWidget {
     this.actions,
     this.bodyPadding,
     this.floatingActionButton,
+    this.floatingActionButtonLocation,
     this.leading,
     this.automaticallyImplyLeading = true,
     this.toolbarHeight,
@@ -98,6 +106,7 @@ class PageScaffold extends StatelessWidget {
         ],
       ),
       floatingActionButton: floatingActionButton,
+      floatingActionButtonLocation: floatingActionButtonLocation,
     );
   }
 }

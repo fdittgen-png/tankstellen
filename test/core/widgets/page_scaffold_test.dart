@@ -100,6 +100,42 @@ void main() {
       expect(find.byType(FloatingActionButton), findsOneWidget);
     });
 
+    testWidgets('renders floatingActionButton when provided', (tester) async {
+      await pump(
+        tester,
+        PageScaffold(
+          title: 'Map',
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {},
+            child: const Icon(Icons.drive_eta),
+          ),
+          body: const SizedBox.shrink(),
+        ),
+      );
+      expect(find.byType(FloatingActionButton), findsOneWidget);
+    });
+
+    testWidgets('passes floatingActionButtonLocation through to Scaffold',
+        (tester) async {
+      await pump(
+        tester,
+        PageScaffold(
+          title: 'Map',
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {},
+            child: const Icon(Icons.add),
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          body: const SizedBox.shrink(),
+        ),
+      );
+      final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+      expect(
+        scaffold.floatingActionButtonLocation,
+        FloatingActionButtonLocation.centerDocked,
+      );
+    });
+
     testWidgets('passes toolbarHeight through to AppBar', (tester) async {
       await pump(
         tester,
