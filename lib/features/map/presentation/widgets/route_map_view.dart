@@ -204,7 +204,12 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
         ],
       ),
     );
-    controller.dispose();
+    // Defer dispose to the next frame so the AlertDialog's exit animation
+    // can finish rebuilding the still-mounted TextField before its
+    // controller vanishes. Disposing synchronously here races the animation
+    // and throws "TextEditingController used after being disposed" in
+    // debug/test builds.
+    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
     if (name != null && name.isNotEmpty && mounted) {
       final start = result.route.geometry.first;
       final end = result.route.geometry.last;
