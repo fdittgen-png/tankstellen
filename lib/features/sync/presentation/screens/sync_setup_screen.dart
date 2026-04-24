@@ -9,6 +9,7 @@ import '../../providers/sync_setup_provider.dart';
 import '../widgets/auth_form_widget.dart';
 import '../widgets/qr_scanner_screen.dart';
 import '../widgets/sync_credentials_step.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../widgets/sync_done_step.dart';
@@ -131,18 +132,14 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
   @override
   Widget build(BuildContext context) {
     final setup = ref.watch(syncSetupControllerProvider);
-    return Scaffold(
-      appBar: AppBar(
-        title: Semantics(
-          header: true,
-          child: Text(_titleFor(setup.step, setup.selectedMode)),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: _onBack,
-          tooltip: 'Back',
-        ),
+    return PageScaffold(
+      title: _titleFor(setup.step, setup.selectedMode),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: _onBack,
+        tooltip: 'Back',
       ),
+      bodyPadding: EdgeInsets.zero,
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
         child: _buildStep(setup),

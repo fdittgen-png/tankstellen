@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/data_transparency_provider.dart';
@@ -134,8 +135,9 @@ class DataTransparencyScreen extends ConsumerWidget {
     final uiState = ref.watch(dataTransparencyControllerProvider);
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)?.myServerData ?? 'My server data')),
+    return PageScaffold(
+      title: AppLocalizations.of(context)?.myServerData ?? 'My server data',
+      bodyPadding: EdgeInsets.zero,
       body: uiState.loading
           ? const Center(child: CircularProgressIndicator())
           : uiState.error != null

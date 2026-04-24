@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/sync/supabase_client.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../widgets/link_device_how_it_works_card.dart';
 import '../widgets/link_device_import_card.dart';
@@ -31,10 +32,9 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n?.linkDeviceScreenTitle ?? 'Link Device'),
-      ),
+    return PageScaffold(
+      title: l10n?.linkDeviceScreenTitle ?? 'Link Device',
+      bodyPadding: EdgeInsets.zero,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
