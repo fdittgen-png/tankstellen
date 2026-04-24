@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/swipe_to_delete.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -35,10 +36,9 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n?.savedRoutes ?? 'Saved Routes'),
-      ),
+    return PageScaffold(
+      title: l10n?.savedRoutes ?? 'Saved Routes',
+      bodyPadding: EdgeInsets.zero,
       body: itineraries.isEmpty
           ? EmptyState(
               icon: Icons.route,

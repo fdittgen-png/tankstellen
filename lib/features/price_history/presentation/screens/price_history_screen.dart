@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../providers/price_history_provider.dart';
@@ -22,15 +23,14 @@ class PriceHistoryScreen extends ConsumerWidget {
 
     final l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n?.priceHistory ?? 'Price History'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: l10n?.tooltipBack ?? 'Back',
-          onPressed: () => context.pop(),
-        ),
+    return PageScaffold(
+      title: l10n?.priceHistory ?? 'Price History',
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: l10n?.tooltipBack ?? 'Back',
+        onPressed: () => context.pop(),
       ),
+      bodyPadding: EdgeInsets.zero,
       body: history.isEmpty
           ? Center(child: Text(l10n?.noPriceHistory ?? 'No price history yet'))
           : ListView(
