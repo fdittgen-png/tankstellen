@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/trip_recorder.dart';
 import '../../providers/trip_recording_provider.dart';
@@ -161,72 +162,70 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
             : (l?.tripRecordingTitle ?? 'Recording trip');
 
     // After stop: show the summary. Until then: live view.
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: l?.tooltipBack ?? 'Back',
-          // Back from the recording screen DOES NOT stop the trip —
-          // it stays alive via the provider. The banner is the
-          // user's way back in.
-          onPressed: () {
-            if (Navigator.canPop(context)) {
-              Navigator.pop(context);
-            } else {
-              GoRouter.of(context).go('/');
-            }
-          },
-        ),
-        title: Text(title),
-        actions: stopped != null
-            ? null
-            : [
-                // #891 — wrap in Semantics so TalkBack announces the
-                // *next* action (Pin / Unpin) in addition to the
-                // tooltip's battery-cost hint. `container: true`
-                // merges the IconButton's tap semantics into the label.
-                Semantics(
-                  container: true,
-                  button: true,
-                  toggled: _pinned,
-                  label: _pinned
-                      ? (l?.tripRecordingPinSemanticOn ??
-                          'Unpin recording form')
-                      : (l?.tripRecordingPinSemanticOff ??
-                          'Pin recording form'),
-                  child: IconButton(
-                    key: const Key('tripPinButton'),
-                    icon: Icon(
-                      _pinned ? Icons.push_pin : Icons.push_pin_outlined,
-                      color: _pinned
-                          ? Theme.of(context).colorScheme.primary
-                          : null,
-                    ),
-                    tooltip: l?.tripRecordingPinTooltip ??
-                        'Pinning keeps the screen on — uses more battery',
-                    isSelected: _pinned,
-                    onPressed: _togglePin,
-                  ),
-                ),
-                IconButton(
-                  key: const Key('tripPauseButton'),
-                  icon: Icon(state.phase == TripRecordingPhase.paused
-                      ? Icons.play_arrow
-                      : Icons.pause),
-                  tooltip: state.phase == TripRecordingPhase.paused
-                      ? (l?.tripResume ?? 'Resume')
-                      : (l?.tripPause ?? 'Pause'),
-                  onPressed: state.isActive ? _togglePause : null,
-                ),
-                IconButton(
-                  key: const Key('tripStopButton'),
-                  icon: const Icon(Icons.stop_circle_outlined),
-                  tooltip: l?.tripStop ?? 'Stop recording',
-                  onPressed:
-                      _stopping || !state.isActive ? null : _onStop,
-                ),
-              ],
+    return PageScaffold(
+      title: title,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: l?.tooltipBack ?? 'Back',
+        // Back from the recording screen DOES NOT stop the trip —
+        // it stays alive via the provider. The banner is the
+        // user's way back in.
+        onPressed: () {
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          } else {
+            GoRouter.of(context).go('/');
+          }
+        },
       ),
+      actions: stopped != null
+          ? null
+          : [
+              // #891 — wrap in Semantics so TalkBack announces the
+              // *next* action (Pin / Unpin) in addition to the
+              // tooltip's battery-cost hint. `container: true`
+              // merges the IconButton's tap semantics into the label.
+              Semantics(
+                container: true,
+                button: true,
+                toggled: _pinned,
+                label: _pinned
+                    ? (l?.tripRecordingPinSemanticOn ??
+                        'Unpin recording form')
+                    : (l?.tripRecordingPinSemanticOff ??
+                        'Pin recording form'),
+                child: IconButton(
+                  key: const Key('tripPinButton'),
+                  icon: Icon(
+                    _pinned ? Icons.push_pin : Icons.push_pin_outlined,
+                    color: _pinned
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                  ),
+                  tooltip: l?.tripRecordingPinTooltip ??
+                      'Pinning keeps the screen on — uses more battery',
+                  isSelected: _pinned,
+                  onPressed: _togglePin,
+                ),
+              ),
+              IconButton(
+                key: const Key('tripPauseButton'),
+                icon: Icon(state.phase == TripRecordingPhase.paused
+                    ? Icons.play_arrow
+                    : Icons.pause),
+                tooltip: state.phase == TripRecordingPhase.paused
+                    ? (l?.tripResume ?? 'Resume')
+                    : (l?.tripPause ?? 'Pause'),
+                onPressed: state.isActive ? _togglePause : null,
+              ),
+              IconButton(
+                key: const Key('tripStopButton'),
+                icon: const Icon(Icons.stop_circle_outlined),
+                tooltip: l?.tripStop ?? 'Stop recording',
+                onPressed: _stopping || !state.isActive ? null : _onStop,
+              ),
+            ],
+      bodyPadding: EdgeInsets.zero,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
