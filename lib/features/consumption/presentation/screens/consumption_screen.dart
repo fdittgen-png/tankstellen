@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/help_banner.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/tab_switcher.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -159,85 +160,84 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     final isTrajetsTab = tabIndex == 1;
     final isChargingTab = showCharging && tabIndex == 2;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l?.consumptionLogTitle ?? 'Fuel consumption'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: l?.tooltipBack ?? 'Back',
-          onPressed: () => context.pop(),
-        ),
-        bottom: TabSwitcher(
-          controller: tabController,
-          tabs: [
+    return PageScaffold(
+      title: l?.consumptionLogTitle ?? 'Fuel consumption',
+      bodyPadding: EdgeInsets.zero,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: l?.tooltipBack ?? 'Back',
+        onPressed: () => context.pop(),
+      ),
+      bottom: TabSwitcher(
+        controller: tabController,
+        tabs: [
+          TabSwitcherEntry(
+            label: l?.consumptionTabFuel ?? 'Fuel',
+            icon: Icons.local_gas_station_outlined,
+          ),
+          TabSwitcherEntry(
+            label: l?.trajetsTabLabel ?? 'Trips',
+            icon: Icons.route_outlined,
+          ),
+          // #892 — Charging tab is hidden when the active vehicle
+          // is a pure combustion engine. Hybrid and EV profiles
+          // still see it; the no-vehicle case keeps the tab (a
+          // dedicated onboarding story covers that path).
+          if (showCharging)
             TabSwitcherEntry(
-              label: l?.consumptionTabFuel ?? 'Fuel',
-              icon: Icons.local_gas_station_outlined,
-            ),
-            TabSwitcherEntry(
-              label: l?.trajetsTabLabel ?? 'Trips',
-              icon: Icons.route_outlined,
-            ),
-            // #892 — Charging tab is hidden when the active vehicle
-            // is a pure combustion engine. Hybrid and EV profiles
-            // still see it; the no-vehicle case keeps the tab (a
-            // dedicated onboarding story covers that path).
-            if (showCharging)
-              TabSwitcherEntry(
-                label: l?.consumptionTabCharging ?? 'Charging',
-                icon: Icons.ev_station_outlined,
-              ),
-          ],
-        ),
-        actions: [
-          // #797 phase 3 — title-bar chip announcing "OBD2 connected"
-          // when the pinned adapter is currently linked. Hides
-          // itself otherwise so unpaired users see no chrome.
-          const Obd2StatusChip(),
-          IconButton(
-            key: const Key('export_csv'),
-            tooltip: 'Export CSV',
-            icon: const Icon(Icons.download_outlined),
-            onPressed: fillUps.isEmpty
-                ? null
-                : () async {
-                    final csv = ConsumptionCsvExporter.toCsv(fillUps);
-                    await Clipboard.setData(ClipboardData(text: csv));
-                    if (!context.mounted) return;
-                    SnackBarHelper.show(
-                      context,
-                      'CSV copied to clipboard — paste into a spreadsheet',
-                    );
-                  },
-          ),
-          IconButton(
-            key: const Key('open_carbon_dashboard'),
-            tooltip: l?.carbonDashboardTitle ?? 'Carbon dashboard',
-            icon: const Icon(Icons.eco_outlined),
-            onPressed: () => context.push('/carbon'),
-          ),
-          IconButton(
-            key: const Key('open_trip_history'),
-            tooltip: l?.tripHistoryTitle ?? 'Trip history',
-            icon: const Icon(Icons.route_outlined),
-            onPressed: () => context.push('/trip-history'),
-          ),
-          // Shortcut to edit the active vehicle — the primary
-          // "subject" the consumption log belongs to (#702). Hidden
-          // when no vehicle is configured; the fill-up FAB's empty
-          // state already surfaces the Add-vehicle CTA in that case.
-          if (activeVehicle != null)
-            IconButton(
-              key: const Key('open_active_vehicle'),
-              tooltip: l?.vehicleEditTitle ?? 'Edit vehicle',
-              icon: const Icon(Icons.directions_car_outlined),
-              onPressed: () => context.push(
-                '/vehicles/edit',
-                extra: activeVehicle.id,
-              ),
+              label: l?.consumptionTabCharging ?? 'Charging',
+              icon: Icons.ev_station_outlined,
             ),
         ],
       ),
+      actions: [
+        // #797 phase 3 — title-bar chip announcing "OBD2 connected"
+        // when the pinned adapter is currently linked. Hides
+        // itself otherwise so unpaired users see no chrome.
+        const Obd2StatusChip(),
+        IconButton(
+          key: const Key('export_csv'),
+          tooltip: 'Export CSV',
+          icon: const Icon(Icons.download_outlined),
+          onPressed: fillUps.isEmpty
+              ? null
+              : () async {
+                  final csv = ConsumptionCsvExporter.toCsv(fillUps);
+                  await Clipboard.setData(ClipboardData(text: csv));
+                  if (!context.mounted) return;
+                  SnackBarHelper.show(
+                    context,
+                    'CSV copied to clipboard — paste into a spreadsheet',
+                  );
+                },
+        ),
+        IconButton(
+          key: const Key('open_carbon_dashboard'),
+          tooltip: l?.carbonDashboardTitle ?? 'Carbon dashboard',
+          icon: const Icon(Icons.eco_outlined),
+          onPressed: () => context.push('/carbon'),
+        ),
+        IconButton(
+          key: const Key('open_trip_history'),
+          tooltip: l?.tripHistoryTitle ?? 'Trip history',
+          icon: const Icon(Icons.route_outlined),
+          onPressed: () => context.push('/trip-history'),
+        ),
+        // Shortcut to edit the active vehicle — the primary
+        // "subject" the consumption log belongs to (#702). Hidden
+        // when no vehicle is configured; the fill-up FAB's empty
+        // state already surfaces the Add-vehicle CTA in that case.
+        if (activeVehicle != null)
+          IconButton(
+            key: const Key('open_active_vehicle'),
+            tooltip: l?.vehicleEditTitle ?? 'Edit vehicle',
+            icon: const Icon(Icons.directions_car_outlined),
+            onPressed: () => context.push(
+              '/vehicles/edit',
+              extra: activeVehicle.id,
+            ),
+          ),
+      ],
       floatingActionButton: isTrajetsTab
           // Trajets tab hides the global FAB — the "Start recording"
           // CTA lives inside the tab header, mirroring the fuel-tab
