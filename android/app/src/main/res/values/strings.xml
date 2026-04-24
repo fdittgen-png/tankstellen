@@ -7,4 +7,19 @@
     <string name="nearest_widget_empty">Add favorites and enable GPS to see nearby stations</string>
     <string name="widget_refresh">Refresh</string>
     <string name="widget_mode_toggle">Switch between favorites and nearest</string>
+
+    <!-- Widget configure activity (#610). TEMP placeholder copy; designer
+         polish (final wording + localisation via values-<locale>/ overlays)
+         lands in a follow-up PR of epic #607. -->
+    <string name="widget_config_title">Configure widget</string>
+    <string name="widget_config_profile_label">Profile</string>
+    <string name="widget_config_color_label">Color scheme</string>
+    <string name="widget_config_save">Save</string>
+    <string name="widget_config_cancel">Cancel</string>
+    <string name="widget_color_scheme_system">System</string>
+    <string name="widget_color_scheme_light">Light</string>
+    <string name="widget_color_scheme_dark">Dark</string>
+    <string name="widget_color_scheme_blue">Blue</string>
+    <string name="widget_color_scheme_green">Green</string>
+    <string name="widget_color_scheme_orange">Orange</string>
 </resources>

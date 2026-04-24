@@ -11,4 +11,5 @@
     android:initialLayout="@layout/station_widget_layout"
     android:widgetCategory="home_screen"
     android:description="@string/widget_description"
-    android:previewLayout="@layout/station_widget_layout" />
+    android:previewLayout="@layout/station_widget_layout"
+    android:configure="de.tankstellen.tankstellen.WidgetConfigActivity" />
