@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/price_alert.dart';
@@ -21,14 +22,13 @@ class AlertsScreen extends ConsumerWidget {
     final alertsAsync = ref.watch(alertsAsyncProvider);
     final l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n?.priceAlerts ?? 'Price Alerts'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: l10n?.tooltipBack ?? 'Back',
-          onPressed: () => context.pop(),
-        ),
+    return PageScaffold(
+      title: l10n?.priceAlerts ?? 'Price Alerts',
+      bodyPadding: EdgeInsets.zero,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: l10n?.tooltipBack ?? 'Back',
+        onPressed: () => context.pop(),
       ),
       body: alertsAsync.when(
         data: (alerts) => _AlertsBody(alerts: alerts),
