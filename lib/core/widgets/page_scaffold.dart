@@ -51,6 +51,11 @@ class PageScaffold extends StatelessWidget {
   /// Whether the app bar shows its automatic leading. Default: true.
   final bool automaticallyImplyLeading;
 
+  /// Optional override for the app-bar toolbar height. Pass-through to
+  /// [AppBar.toolbarHeight]. Leave `null` to use the Material default.
+  /// Compact screens (e.g. `SearchScreen` in landscape) shrink to ~40.
+  final double? toolbarHeight;
+
   const PageScaffold({
     super.key,
     required this.title,
@@ -62,6 +67,7 @@ class PageScaffold extends StatelessWidget {
     this.floatingActionButton,
     this.leading,
     this.automaticallyImplyLeading = true,
+    this.toolbarHeight,
   });
 
   @override
@@ -69,10 +75,11 @@ class PageScaffold extends StatelessWidget {
     final effectivePadding = bodyPadding ?? Spacing.screenPadding;
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Semantics(header: true, child: Text(title)),
         actions: actions,
         leading: leading,
         automaticallyImplyLeading: automaticallyImplyLeading,
+        toolbarHeight: toolbarHeight,
       ),
       body: Column(
         children: [
