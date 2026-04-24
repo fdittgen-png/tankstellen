@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/domain/charging_cost_calculator.dart';
 import '../../../ev/domain/entities/charging_log.dart';
@@ -255,42 +256,33 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
     _initVehicleIfNeeded(vehicles);
 
     if (vehicles.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(l?.addChargingLogTitle ?? 'Log charging session'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            tooltip: l?.tooltipBack ?? 'Back',
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.directions_car_outlined,
-                  size: 80,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  l?.consumptionNoVehicleTitle ?? 'Add a vehicle first',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  l?.consumptionNoVehicleBody ??
-                      'Charging sessions are attributed to a vehicle. '
-                          'Add your car to start logging.',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
+      return PageScaffold(
+        title: l?.addChargingLogTitle ?? 'Log charging session',
+        bodyPadding: const EdgeInsets.all(32),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.directions_car_outlined,
+                size: 80,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(height: 24),
+              Text(
+                l?.consumptionNoVehicleTitle ?? 'Add a vehicle first',
+                style: Theme.of(context).textTheme.headlineSmall,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                l?.consumptionNoVehicleBody ??
+                    'Charging sessions are attributed to a vehicle. '
+                        'Add your car to start logging.',
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       );
@@ -300,15 +292,9 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
         '${_date.year}-${_pad(_date.month)}-${_pad(_date.day)}';
     final derived = _deriveReadout();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l?.addChargingLogTitle ?? 'Log charging session'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: l?.tooltipBack ?? 'Back',
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
+    return PageScaffold(
+      title: l?.addChargingLogTitle ?? 'Log charging session',
+      bodyPadding: EdgeInsets.zero,
       body: Form(
         key: _formKey,
         child: ListView(
