@@ -13,71 +13,17 @@ import 'obd2_connection_errors.dart';
 import 'obd2_service.dart';
 import 'paused_trip_repository.dart';
 import 'pid_scheduler.dart';
+import 'trip_distance_source.dart';
+import 'trip_live_reading.dart';
 import 'virtual_odometer.dart';
 
-/// Provenance of the final trip distance (#800). See
-/// [TripRecordingController.distanceSource] — persisted on the
-/// [TripSummary] so the fill-up flow and eco-analytics can decide
-/// whether the km figure is a ground truth (odometer delta) or an
-/// estimate (integrated speed samples).
-const String _distanceSourceReal = 'real';
-const String _distanceSourceVirtual = 'virtual';
-
-/// Upper bound on the speed-sample buffer used by the virtual
-/// odometer (#800). At 5 Hz a 10-hour trip produces ~180 k samples —
-/// the typical driving session is well under 2 hours, so 60 k (~3.3
-/// hours at 5 Hz) is a generous cap that still prevents a forgotten
-/// recording from eating unbounded memory. When the cap is hit we
-/// drop the oldest sample; the virtual-odometer error from losing
-/// the early stretch is bounded by the lost km.
-const int _virtualOdometerSampleCap = 60000;
-
-/// Live read-out from the currently-recording trip (#726).
-///
-/// Emitted on every debounced tick so the recording screen can show the
-/// user speed / RPM / distance / estimated fuel without having to
-/// ask the recorder for a full summary each time.
-@immutable
-class TripLiveReading {
-  final double? speedKmh;
-  final double? rpm;
-  final double? fuelRateLPerHour;
-  final double? fuelLevelPercent;
-  final double? engineLoadPercent;
-  /// Absolute throttle position, 0–100 %. Subscribed to the 5 Hz tier
-  /// of the [PidScheduler] (#814) so the eco-feedback UI and the
-  /// future coasting-detection logic have a direct signal instead of
-  /// the engine-load proxy. Null when the adapter hasn't surfaced PID
-  /// 11 or the first tick hasn't landed yet.
-  final double? throttlePercent;
-  final double distanceKmSoFar;
-  final double? fuelLitersSoFar;
-  final Duration elapsed;
-  final double? odometerStartKm;
-  final double? odometerNowKm;
-
-  const TripLiveReading({
-    this.speedKmh,
-    this.rpm,
-    this.fuelRateLPerHour,
-    this.fuelLevelPercent,
-    this.engineLoadPercent,
-    this.throttlePercent,
-    required this.distanceKmSoFar,
-    this.fuelLitersSoFar,
-    required this.elapsed,
-    this.odometerStartKm,
-    this.odometerNowKm,
-  });
-
-  /// Live L/100 km estimate — uses trip-so-far totals, so early
-  /// samples are noisy and converge as the trip progresses. Returns
-  /// null when the car doesn't surface a fuel-rate PID.
-  double? get liveAvgLPer100Km {
-    if (fuelLitersSoFar == null || distanceKmSoFar < 0.01) return null;
-    return fuelLitersSoFar! / distanceKmSoFar * 100.0;
-  }
-}
+// Re-export the DTO + distance-source constants so existing callers
+// (providers, widget tests) that import this file keep working after
+// the #563 controller-split refactor. New callers should import the
+// individual files directly.
+export 'trip_distance_source.dart'
+    show kDistanceSourceReal, kDistanceSourceVirtual;
+export 'trip_live_reading.dart' show TripLiveReading;
 
 /// Public recording state exposed by [TripRecordingController]
 /// (#797 phase 1).
@@ -556,8 +502,8 @@ class TripRecordingController {
   /// truth or as an estimate.
   String get distanceSource =>
       _realOdometerDeltaKm() != null
-          ? _distanceSourceReal
-          : _distanceSourceVirtual;
+          ? kDistanceSourceReal
+          : kDistanceSourceVirtual;
 
   /// `odometerLatest - odometerStart` if both are present and the
   /// delta is above a small noise-floor epsilon (0.05 km — half the
@@ -580,13 +526,13 @@ class TripRecordingController {
       timestamp: _now(),
       speedKmh: speedKmh,
     ));
-    if (_speedSamples.length > _virtualOdometerSampleCap) {
+    if (_speedSamples.length > kVirtualOdometerSampleCap) {
       // Drop the oldest slice to keep memory bounded. Losing the
       // early stretch biases the virtual-odometer low by the km we
       // dropped; on a typical trip the cap is never hit.
       _speedSamples.removeRange(
         0,
-        _speedSamples.length - _virtualOdometerSampleCap,
+        _speedSamples.length - kVirtualOdometerSampleCap,
       );
     }
   }
