@@ -10,6 +10,7 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../achievements/presentation/widgets/badge_shelf.dart';
 import '../../../ev/domain/entities/charging_log.dart';
+import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/csv_exporter.dart';
 import '../../providers/charging_charts_provider.dart';
@@ -26,11 +27,18 @@ import 'add_charging_log_screen.dart';
 
 /// Lists all logged fill-ups and charging sessions.
 ///
-/// Two-tab scaffold (#582 phase 2):
-///   * **Fuel** — existing fill-up list with its CSV export + stats card.
-///   * **Charging** — new EV charging logs backed by
-///     [chargingLogsProvider]. Phase-3 will add per-vehicle charts
-///     and the deep-link from the EV station detail screen.
+/// Tab shape depends on the active vehicle's powertrain (#892):
+///   * **Fuel** — always visible; existing fill-up list with its CSV
+///     export and stats card.
+///   * **Trajets** — always visible (#889); trip history for the
+///     active vehicle.
+///   * **Charging** — visible only when the active vehicle is hybrid
+///     or electric. Hidden for ICE so the UI doesn't advertise a
+///     feature the user can't use.
+///
+/// When the active vehicle is unknown (null), we keep all three tabs
+/// because #892 explicitly defers the "no vehicle" case to a separate
+/// issue and existing callers rely on the full tab row.
 ///
 /// The FAB rebinds to the active tab so the user always sees the
 /// most obvious "log what I just did" action for the list they're
@@ -44,30 +52,56 @@ class ConsumptionScreen extends ConsumerStatefulWidget {
 }
 
 class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    // #889 — three tabs now: Fuel, Trajets, Charging. Trajets is
-    // always visible once the Consumption screen is visible (gated on
-    // an active vehicle per #893); Charging stays present — #892 will
-    // tailor visibility per vehicle type in a follow-up.
-    _tabController = TabController(length: 3, vsync: this);
-    _tabController.addListener(() {
-      // The FAB label changes when the tab changes, so trigger a
-      // rebuild on every tab transition (indexIsChanging covers the
-      // animated swipe case too).
-      if (!mounted) return;
-      setState(() {});
-    });
-  }
+    with TickerProviderStateMixin {
+  /// Tracks the current controller length so we can detect when the
+  /// visible-tab count changes (vehicle type switched) and rebuild
+  /// the [TabController] — its length is immutable.
+  TabController? _tabController;
+  int _controllerLength = 0;
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _tabController?.dispose();
     super.dispose();
+  }
+
+  /// Re-create the [TabController] for [length] tabs while preserving
+  /// the selected index when possible.
+  ///
+  /// When the Charging tab disappears (length 3 -> 2) and the user was
+  /// on it (index 2), snap to Trajets (index 1) so the view doesn't
+  /// land out of range.
+  void _ensureController(int length) {
+    final previous = _tabController;
+    if (previous != null && _controllerLength == length) return;
+
+    int initialIndex = 0;
+    if (previous != null) {
+      final oldIndex = previous.index;
+      if (oldIndex < length) {
+        initialIndex = oldIndex;
+      } else {
+        // Old index exceeds the new length — for a 3 -> 2 shrink this
+        // means the user was on the Charging tab, so snap to Trajets
+        // rather than Fuel to stay on the adjacent list.
+        initialIndex = length - 1;
+      }
+    }
+
+    final next = TabController(
+      length: length,
+      vsync: this,
+      initialIndex: initialIndex,
+    );
+    next.addListener(() {
+      // The FAB label changes when the tab changes, so trigger a
+      // rebuild on every tab transition.
+      if (!mounted) return;
+      setState(() {});
+    });
+    previous?.dispose();
+    _tabController = next;
+    _controllerLength = length;
   }
 
   @override
@@ -77,6 +111,17 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     final stats = ref.watch(consumptionStatsProvider);
     final activeVehicle = ref.watch(activeVehicleProfileProvider);
     final l = AppLocalizations.of(context);
+
+    // #892 — Charging tab is only relevant for vehicles that can
+    // actually charge. ICE vehicles hide it. When no vehicle is
+    // configured we preserve the full tab row (the issue scopes the
+    // "no vehicle" hide to a separate future change).
+    final showCharging = activeVehicle == null ||
+        activeVehicle.type == VehicleType.ev ||
+        activeVehicle.type == VehicleType.hybrid;
+
+    _ensureController(showCharging ? 3 : 2);
+    final tabController = _tabController!;
 
     // #815 — surface the η_v calibration outcome as a one-shot
     // snackbar when the fill-up save path learns a new value for the
@@ -100,14 +145,12 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
       ref.read(lastVeLearnResultProvider.notifier).set(null);
     });
 
-    // #889 — three tabs: 0 Fuel, 1 Trajets, 2 Charging. The FAB
-    // rebinds per-tab: Fuel -> pick-station sheet, Trajets hides the
-    // FAB (the "Start recording" CTA lives inside the tab header),
-    // Charging -> Add charging log sheet.
-    final tabIndex = _tabController.index;
+    // Tab indices depend on whether Charging is present. Fuel/Trajets
+    // are always 0/1; Charging is 2 when visible.
+    final tabIndex = tabController.index;
     final isFuelTab = tabIndex == 0;
     final isTrajetsTab = tabIndex == 1;
-    final isChargingTab = tabIndex == 2;
+    final isChargingTab = showCharging && tabIndex == 2;
 
     return Scaffold(
       appBar: AppBar(
@@ -118,7 +161,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
           onPressed: () => context.pop(),
         ),
         bottom: TabBar(
-          controller: _tabController,
+          controller: tabController,
           tabs: [
             Tab(
               key: const Key('consumption_tab_fuel'),
@@ -130,11 +173,12 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
               icon: const Icon(Icons.route_outlined),
               text: l?.trajetsTabLabel ?? 'Trips',
             ),
-            Tab(
-              key: const Key('consumption_tab_charging'),
-              icon: const Icon(Icons.ev_station_outlined),
-              text: l?.consumptionTabCharging ?? 'Charging',
-            ),
+            if (showCharging)
+              Tab(
+                key: const Key('consumption_tab_charging'),
+                icon: const Icon(Icons.ev_station_outlined),
+                text: l?.consumptionTabCharging ?? 'Charging',
+              ),
           ],
         ),
         actions: [
@@ -213,11 +257,11 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
               ),
             ),
       body: TabBarView(
-        controller: _tabController,
+        controller: tabController,
         children: [
           _FuelTab(fillUps: fillUps, stats: stats, l: l),
           TrajetsTab(vehicleId: activeVehicle?.id),
-          _ChargingTab(async: chargingLogsAsync, l: l),
+          if (showCharging) _ChargingTab(async: chargingLogsAsync, l: l),
         ],
       ),
     );
