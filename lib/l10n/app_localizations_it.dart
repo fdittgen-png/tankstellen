@@ -3443,6 +3443,70 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get trajetDetailSummaryTitle => 'Summary';
+
+  @override
+  String get trajetDetailFieldDate => 'Date';
+
+  @override
+  String get trajetDetailFieldVehicle => 'Vehicle';
+
+  @override
+  String get trajetDetailFieldDistance => 'Distance';
+
+  @override
+  String get trajetDetailFieldDuration => 'Duration';
+
+  @override
+  String get trajetDetailFieldAvgConsumption => 'Avg consumption';
+
+  @override
+  String get trajetDetailFieldFuelUsed => 'Fuel used';
+
+  @override
+  String get trajetDetailFieldAvgSpeed => 'Avg speed';
+
+  @override
+  String get trajetDetailFieldMaxSpeed => 'Max speed';
+
+  @override
+  String get trajetDetailFieldValueUnknown => '—';
+
+  @override
+  String get trajetDetailChartSpeed => 'Speed (km/h)';
+
+  @override
+  String get trajetDetailChartFuelRate => 'Fuel rate (L/h)';
+
+  @override
+  String get trajetDetailChartRpm => 'RPM';
+
+  @override
+  String get trajetDetailChartEmpty => 'No samples recorded';
+
+  @override
+  String get trajetDetailShareAction => 'Share';
+
+  @override
+  String get trajetDetailShareCopied => 'Copied to clipboard';
+
+  @override
+  String get trajetDetailDeleteAction => 'Delete';
+
+  @override
+  String get trajetDetailDeleteConfirmTitle => 'Delete this trip?';
+
+  @override
+  String get trajetDetailDeleteConfirmBody =>
+      'This trip will be permanently removed from your history.';
+
+  @override
+  String get trajetDetailDeleteConfirmCancel => 'Cancel';
+
+  @override
+  String get trajetDetailDeleteConfirmConfirm => 'Delete';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Pinning keeps the screen on — uses more battery';
 
