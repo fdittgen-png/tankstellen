@@ -244,6 +244,11 @@ screen is about" identified in the #923 audit.
   back button — pass a custom drawer icon when needed. Works with
   `automaticallyImplyLeading: false` when the caller wants full
   control.
+- `bottom: PreferredSizeWidget?` — optional widget rendered below the
+  app-bar title (pass-through to `AppBar.bottom`). Used by tabbed
+  screens (e.g. `FavoritesScreen`, `ConsumptionScreen`) to host a
+  `TabBar` / `TabSwitcher` under the title while keeping the rest of
+  the scaffold contract intact.
 - `automaticallyImplyLeading: bool` — whether the app bar shows its
   automatic leading. Default: `true`.
 - `toolbarHeight: double?` — optional override for the app-bar toolbar

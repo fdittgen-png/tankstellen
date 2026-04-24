@@ -81,6 +81,13 @@ class PageScaffold extends StatelessWidget {
   /// above the system nav inset without stealing scrollable real estate.
   final Widget? bottomNavigationBar;
 
+  /// Optional [PreferredSizeWidget] below the app-bar title — e.g. a
+  /// `TabBar` or `TabSwitcher`. Pass-through to [AppBar.bottom]. Used
+  /// by tabbed screens (e.g. `FavoritesScreen`, `ConsumptionScreen`)
+  /// that swap content via a [DefaultTabController] sibling to this
+  /// scaffold.
+  final PreferredSizeWidget? bottom;
+
   const PageScaffold({
     super.key,
     required this.title,
@@ -97,6 +104,7 @@ class PageScaffold extends StatelessWidget {
     this.titleTextStyle,
     this.titleSpacing,
     this.bottomNavigationBar,
+    this.bottom,
   });
 
   @override
@@ -111,6 +119,7 @@ class PageScaffold extends StatelessWidget {
         toolbarHeight: toolbarHeight,
         titleTextStyle: titleTextStyle,
         titleSpacing: titleSpacing,
+        bottom: bottom,
       ),
       body: Column(
         children: [
