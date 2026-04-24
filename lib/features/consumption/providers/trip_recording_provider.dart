@@ -22,89 +22,22 @@ import '../data/trip_history_repository.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/situation_classifier.dart';
 import '../domain/trip_recorder.dart';
+import 'haptic_feedback_policy.dart';
 import 'trip_history_provider.dart';
+import 'trip_recording_phase.dart';
+import 'trip_recording_state.dart';
+
+// Re-export the phase, state, and haptic-policy types so existing
+// callers (widgets, screens, tests) that import this file keep
+// resolving without touching every import site after the #563
+// provider-split refactor. New callers should import the individual
+// files directly.
+export 'haptic_feedback_policy.dart'
+    show HapticIntensity, hapticForBandTransition;
+export 'trip_recording_phase.dart' show TripRecordingPhase;
+export 'trip_recording_state.dart' show TripRecordingState;
 
 part 'trip_recording_provider.g.dart';
-
-/// Lifecycle phase of the app-wide OBD2 trip recording (#726).
-///
-/// #797 phase 1 adds [pausedDueToDrop] for the "Bluetooth link lost
-/// mid-recording" case. Distinct from [paused] because the user did
-/// not pause; the partial trip is auto-persisted to the paused-trips
-/// Hive box and a grace timer ticks in the controller. Phase 2 wires
-/// this into a banner + auto-reconnect scanner.
-enum TripRecordingPhase { idle, recording, paused, pausedDueToDrop, finished }
-
-/// Haptic strength emitted when the consumption band changes (#767).
-enum HapticIntensity { none, light, medium }
-
-/// Decide which haptic (if any) fires when [previous] transitions to
-/// [current]. Pure function: no platform calls, easily unit-tested.
-/// Only escalations vibrate — heavy or worse. Positive transitions
-/// (eco / normal) stay silent so the feedback is a corrective nudge,
-/// not constant noise.
-HapticIntensity hapticForBandTransition(
-  ConsumptionBand previous,
-  ConsumptionBand current,
-) {
-  if (previous == current) return HapticIntensity.none;
-  if (current == ConsumptionBand.veryHeavy &&
-      previous != ConsumptionBand.veryHeavy) {
-    return HapticIntensity.medium;
-  }
-  if (current == ConsumptionBand.heavy &&
-      previous != ConsumptionBand.heavy &&
-      previous != ConsumptionBand.veryHeavy) {
-    return HapticIntensity.light;
-  }
-  return HapticIntensity.none;
-}
-
-/// Immutable snapshot the UI observes.
-@immutable
-class TripRecordingState {
-  final TripRecordingPhase phase;
-  final TripLiveReading? live;
-  final DrivingSituation situation;
-  final ConsumptionBand band;
-
-  /// How far live consumption deviates from the situation's baseline
-  /// as a signed fraction (e.g. -0.08 = 8 % below baseline). Null
-  /// when the car doesn't report fuel rate or a live L/100 km can't
-  /// be computed (idle uses L/h — caller formats it differently).
-  final double? liveDeltaFraction;
-
-  const TripRecordingState({
-    this.phase = TripRecordingPhase.idle,
-    this.live,
-    this.situation = DrivingSituation.idle,
-    this.band = ConsumptionBand.normal,
-    this.liveDeltaFraction,
-  });
-
-  TripRecordingState copyWith({
-    TripRecordingPhase? phase,
-    TripLiveReading? live,
-    DrivingSituation? situation,
-    ConsumptionBand? band,
-    double? liveDeltaFraction,
-    bool clearDelta = false,
-  }) =>
-      TripRecordingState(
-        phase: phase ?? this.phase,
-        live: live ?? this.live,
-        situation: situation ?? this.situation,
-        band: band ?? this.band,
-        liveDeltaFraction: clearDelta
-            ? null
-            : (liveDeltaFraction ?? this.liveDeltaFraction),
-      );
-
-  bool get isActive =>
-      phase == TripRecordingPhase.recording ||
-      phase == TripRecordingPhase.paused ||
-      phase == TripRecordingPhase.pausedDueToDrop;
-}
 
 /// App-wide owner of the trip recording (#726).
 ///
