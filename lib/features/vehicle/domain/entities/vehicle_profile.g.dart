@@ -61,6 +61,14 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
           : const VehicleCalibrationModeJsonConverter().fromJson(
               json['calibrationMode'] as String?,
             ),
+      autoRecord: json['autoRecord'] as bool? ?? false,
+      pairedAdapterMac: json['pairedAdapterMac'] as String?,
+      movementStartThresholdKmh:
+          (json['movementStartThresholdKmh'] as num?)?.toDouble() ?? 5.0,
+      disconnectSaveDelaySec:
+          (json['disconnectSaveDelaySec'] as num?)?.toInt() ?? 60,
+      backgroundLocationConsent:
+          json['backgroundLocationConsent'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$VehicleProfileToJson(_VehicleProfile instance) =>
@@ -89,4 +97,9 @@ Map<String, dynamic> _$VehicleProfileToJson(_VehicleProfile instance) =>
       'calibrationMode': const VehicleCalibrationModeJsonConverter().toJson(
         instance.calibrationMode,
       ),
+      'autoRecord': instance.autoRecord,
+      'pairedAdapterMac': instance.pairedAdapterMac,
+      'movementStartThresholdKmh': instance.movementStartThresholdKmh,
+      'disconnectSaveDelaySec': instance.disconnectSaveDelaySec,
+      'backgroundLocationConsent': instance.backgroundLocationConsent,
     };
