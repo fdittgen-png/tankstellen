@@ -83,6 +83,7 @@ docs/guides/*
 !docs/guides/PLAY-STORE-LISTING-REFRESH.md
 !docs/guides/obd2-adapters.md
 !docs/guides/vehicle-catalog.md
+!docs/guides/driving-insights.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
