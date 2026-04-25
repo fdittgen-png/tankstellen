@@ -6068,6 +6068,48 @@ abstract class AppLocalizations {
   /// **'Powered by pretcarburant.ro (Competition Council + ANPC)'**
   String get romaniaScrapingNotice;
 
+  /// Title of the driving-insights card on the Trip detail screen — surfaces the top-3 fuel-wasting behaviours from the analyzer (#1041 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Top wasteful behaviours'**
+  String get insightCardTitle;
+
+  /// Empty-state message inside the driving-insights card when the analyzer found no cost lines above the noise floor (#1041 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'No notable inefficiencies — keep it up!'**
+  String get insightEmptyState;
+
+  /// Cost-line copy for the high-RPM insight on the Trip detail screen (#1041 phase 2). Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'Engine over 3000 RPM ({pctTime}% of trip): wasted {liters} L'**
+  String insightHighRpm(String pctTime, String liters);
+
+  /// Cost-line copy for the hard-acceleration insight on the Trip detail screen (#1041 phase 2). Count is the integer event count; liters is a pre-formatted string.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} hard accelerations: wasted {liters} L'**
+  String insightHardAccel(String count, String liters);
+
+  /// Cost-line copy for the idling insight on the Trip detail screen (#1041 phase 2). Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'Idling ({pctTime}% of trip): wasted {liters} L'**
+  String insightIdling(String pctTime, String liters);
+
+  /// Secondary subtitle line under each insight ListTile showing the percent of the trip spent in this state (#1041 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'{pctTime}% of trip'**
+  String insightSubtitlePctOfTrip(String pctTime);
+
+  /// Trailing badge on each insight ListTile showing the litres wasted (#1041 phase 2). Liters is a pre-formatted one-decimal string.
+  ///
+  /// In en, this message translates to:
+  /// **'+{liters} L'**
+  String insightTrailingLitersWasted(String liters);
+
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
   /// In en, this message translates to:

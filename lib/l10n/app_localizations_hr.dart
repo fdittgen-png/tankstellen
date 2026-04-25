@@ -3232,6 +3232,37 @@ class AppLocalizationsHr extends AppLocalizations {
       'Powered by pretcarburant.ro (Competition Council + ANPC)';
 
   @override
+  String get insightCardTitle => 'Top wasteful behaviours';
+
+  @override
+  String get insightEmptyState => 'No notable inefficiencies — keep it up!';
+
+  @override
+  String insightHighRpm(String pctTime, String liters) {
+    return 'Engine over 3000 RPM ($pctTime% of trip): wasted $liters L';
+  }
+
+  @override
+  String insightHardAccel(String count, String liters) {
+    return '$count hard accelerations: wasted $liters L';
+  }
+
+  @override
+  String insightIdling(String pctTime, String liters) {
+    return 'Idling ($pctTime% of trip): wasted $liters L';
+  }
+
+  @override
+  String insightSubtitlePctOfTrip(String pctTime) {
+    return '$pctTime% of trip';
+  }
+
+  @override
+  String insightTrailingLitersWasted(String liters) {
+    return '+$liters L';
+  }
+
+  @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
 
   @override

@@ -1,0 +1,64 @@
+{
+  "insightCardTitle": "Top wasteful behaviours",
+  "@insightCardTitle": {
+    "description": "Title of the driving-insights card on the Trip detail screen — surfaces the top-3 fuel-wasting behaviours from the analyzer (#1041 phase 2)."
+  },
+  "insightEmptyState": "No notable inefficiencies — keep it up!",
+  "@insightEmptyState": {
+    "description": "Empty-state message inside the driving-insights card when the analyzer found no cost lines above the noise floor (#1041 phase 2)."
+  },
+  "insightHighRpm": "Engine over 3000 RPM ({pctTime}% of trip): wasted {liters} L",
+  "@insightHighRpm": {
+    "description": "Cost-line copy for the high-RPM insight on the Trip detail screen (#1041 phase 2). Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "insightHardAccel": "{count} hard accelerations: wasted {liters} L",
+  "@insightHardAccel": {
+    "description": "Cost-line copy for the hard-acceleration insight on the Trip detail screen (#1041 phase 2). Count is the integer event count; liters is a pre-formatted string.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "insightIdling": "Idling ({pctTime}% of trip): wasted {liters} L",
+  "@insightIdling": {
+    "description": "Cost-line copy for the idling insight on the Trip detail screen (#1041 phase 2). Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "insightSubtitlePctOfTrip": "{pctTime}% of trip",
+  "@insightSubtitlePctOfTrip": {
+    "description": "Secondary subtitle line under each insight ListTile showing the percent of the trip spent in this state (#1041 phase 2).",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      }
+    }
+  },
+  "insightTrailingLitersWasted": "+{liters} L",
+  "@insightTrailingLitersWasted": {
+    "description": "Trailing badge on each insight ListTile showing the litres wasted (#1041 phase 2). Liters is a pre-formatted one-decimal string.",
+    "placeholders": {
+      "liters": {
+        "type": "String"
+      }
+    }
+  }
+}
