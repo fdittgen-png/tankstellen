@@ -1,0 +1,122 @@
+name: Daily Open-Testing Build
+
+# Builds master at 18:00 Europe/Paris (CEST) and uploads to the open-testing track.
+# Cron is UTC: 16:00 UTC = 18:00 CEST (summer) / 17:00 CET (winter).
+# Adjust to '0 17 * * *' if you want 18:00 Paris during winter instead.
+#
+# Build numbers are date-based (YYYYMMDD) computed at build time, so there's no
+# commit pushed back to master. pubspec.yaml's +N keeps tracking manual releases.
+on:
+  schedule:
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Play track'
+        required: true
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+        default: beta
+      release_notes:
+        description: 'Release notes (overrides per-version changelog files)'
+        required: false
+        type: string
+
+concurrency:
+  group: daily-open-testing
+  cancel-in-progress: false
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: master
+
+      - name: Compute date-based build number
+        id: bn
+        run: |
+          BN=$(TZ=Europe/Paris date +%Y%m%d)
+          echo "build_number=$BN" >> "$GITHUB_OUTPUT"
+          echo "Daily build number: $BN"
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v3
+        with:
+          channel: stable
+          cache: true
+
+      - name: Decode signing keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ] || [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_ALIAS" ]; then
+            echo "::error::Missing keystore secrets. Configure ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS." >&2
+            exit 1
+          fi
+          KEYSTORE_PATH="$RUNNER_TEMP/upload-keystore.jks"
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
+          echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH" >> "$GITHUB_ENV"
+          echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS" >> "$GITHUB_ENV"
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Build AAB (play flavor, date-based build number)
+        run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }}
+
+      - name: Clean up decoded keystore
+        if: always()
+        run: rm -f "$ANDROID_KEYSTORE_PATH"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install Python deps
+        run: pip install --quiet google-api-python-client google-auth
+
+      - name: Decode service-account key
+        env:
+          SA_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -z "$SA_JSON" ]; then
+            echo "::error::PLAY_STORE_SERVICE_ACCOUNT_JSON secret is not set." >&2
+            exit 1
+          fi
+          echo "$SA_JSON" > "$RUNNER_TEMP/play-key.json"
+          echo "PLAY_KEY_PATH=$RUNNER_TEMP/play-key.json" >> "$GITHUB_ENV"
+
+      - name: Upload to Play Store
+        run: |
+          python tools/upload_to_play.py \
+            --aab build/app/outputs/bundle/playRelease/app-play-release.aab \
+            --key "$PLAY_KEY_PATH" \
+            --track "${{ github.event.inputs.track || 'beta' }}" \
+            ${{ github.event.inputs.release_notes && format('--release-notes "{0}"', github.event.inputs.release_notes) || '' }}
+
+      - name: Clean up service-account key
+        if: always()
+        run: rm -f "$PLAY_KEY_PATH"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Daily Open-Testing Release" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Build number:** ${{ steps.bn.outputs.build_number }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Track:** ${{ github.event.inputs.track || 'beta' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Trigger:** ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
