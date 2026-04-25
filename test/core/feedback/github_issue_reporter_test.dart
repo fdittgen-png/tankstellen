@@ -273,6 +273,39 @@ void main() {
       expect(body, isNot(contains('\x1B')));
       expect(body, isNot(contains('\x00')));
     });
+
+    test(
+        'EXIF strip failure on garbage bytes adds a marker but still uploads',
+        () async {
+      // Random bytes that the `image` package cannot decode. The
+      // reporter must not throw — it falls back to raw bytes and
+      // surfaces the marker in the body so triage knows.
+      client.responses.add(
+        _ok(
+          statusCode: 201,
+          body: {
+            'html_url':
+                'https://github.com/fdittgen-png/tankstellen/issues/77',
+          },
+        ),
+      );
+
+      final url = await reporter.reportBadScan(
+        kind: ScanKind.receipt,
+        rawOcrText: 'x',
+        parsedFields: const {},
+        userCorrections: const {},
+        imageBytes: Uint8List.fromList(const [0xFF, 0x00, 0xAB, 0xCD]),
+      );
+
+      expect(url.toString(), endsWith('/77'));
+      final payload =
+          jsonDecode(client.requests.single.body) as Map<String, dynamic>;
+      final body = payload['body'] as String;
+      expect(body, contains('EXIF strip failed, raw bytes uploaded'));
+      // Body should still embed the image — not silently dropped.
+      expect(body, contains('data:image/jpeg;base64,'));
+    });
   });
 }
 

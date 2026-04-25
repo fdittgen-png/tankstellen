@@ -3224,6 +3224,47 @@ class AppLocalizationsFr extends AppLocalizations {
       'Powered by pretcarburant.ro (Competition Council + ANPC)';
 
   @override
+  String get feedbackConsentTitle => 'Envoyer le rapport à GitHub ?';
+
+  @override
+  String get feedbackConsentBody =>
+      'Cela crée un ticket public sur notre dépôt GitHub avec votre photo et le texte OCR. Aucune donnée personnelle (localisation, identifiant) n\'est envoyée. Continuer ?';
+
+  @override
+  String get feedbackConsentContinue => 'Continuer';
+
+  @override
+  String get feedbackConsentCancel => 'Annuler';
+
+  @override
+  String get feedbackConsentLater => 'Plus tard';
+
+  @override
+  String get feedbackTokenSectionTitle => 'Retour scan raté (GitHub)';
+
+  @override
+  String get feedbackTokenDescription =>
+      'Pour créer automatiquement un ticket GitHub à partir d\'un scan raté, collez un token PAT GitHub (scope `public_repo` sur le dépôt tankstellen). Sinon, le partage manuel reste disponible.';
+
+  @override
+  String get feedbackTokenStatusSet => 'Token configuré';
+
+  @override
+  String get feedbackTokenStatusUnset => 'Pas de token';
+
+  @override
+  String get feedbackTokenSet => 'Définir';
+
+  @override
+  String get feedbackTokenClear => 'Effacer';
+
+  @override
+  String get feedbackTokenDialogTitle => 'Token GitHub (PAT)';
+
+  @override
+  String get feedbackTokenFieldLabel => 'Personal Access Token';
+
+  @override
   String get scanReceiptNoData => 'No receipt data found — try again';
 
   @override

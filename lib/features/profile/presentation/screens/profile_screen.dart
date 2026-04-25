@@ -9,6 +9,7 @@ import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../consent/presentation/widgets/consent_settings_section.dart';
 import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
+import '../widgets/feedback_token_section.dart';
 import '../widgets/location_section_widget.dart';
 import '../widgets/profile_list_section.dart';
 import '../widgets/storage_section.dart';
@@ -62,6 +63,16 @@ class ProfileScreen extends ConsumerWidget {
             icon: Icons.cloud_outlined,
             title: 'TankSync',
             child: TankSyncSection(),
+          ),
+          const SizedBox(height: 8),
+
+          // #952 phase 3 — bad-scan reporter PAT entry. Closed by
+          // default; users without a token continue to use the
+          // SharePlus fallback.
+          _FoldableSection(
+            icon: Icons.bug_report_outlined,
+            title: l?.feedbackTokenSectionTitle ?? 'Bad-scan feedback (GitHub)',
+            child: const FeedbackTokenSection(),
           ),
           const SizedBox(height: 8),
 
