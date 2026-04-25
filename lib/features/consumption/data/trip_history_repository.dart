@@ -25,11 +25,27 @@ class TripHistoryEntry {
   /// pre-#1004 entries deserialise as manual.
   final bool automatic;
 
+  /// Per-tick recording profile used by the trip-detail charts (#1040).
+  ///
+  /// Captured by [TripRecordingController] at ~1 Hz throughout the
+  /// recording — the speed / RPM / fuel-rate fields render the
+  /// speed / fuel-rate / RPM line charts in the trip-detail screen.
+  /// Empty for legacy trips written before #1040 landed: the charts
+  /// fall back to the shared "No samples recorded" caption in that
+  /// case, which is the honest answer for trips whose buffer was
+  /// never persisted.
+  ///
+  /// Storage budget: ~1 Hz × 8 fields, so a 39-min trip is roughly
+  /// 19 KB compressed. A year of daily commutes is around 7 MB —
+  /// well below the rolling-log cap.
+  final List<TripSample> samples;
+
   const TripHistoryEntry({
     required this.id,
     required this.vehicleId,
     required this.summary,
     this.automatic = false,
+    this.samples = const [],
   });
 
   Map<String, dynamic> toJson() => {
@@ -37,6 +53,8 @@ class TripHistoryEntry {
         'vehicleId': vehicleId,
         'summary': _summaryToJson(summary),
         if (automatic) 'automatic': true,
+        if (samples.isNotEmpty)
+          'samples': samples.map(_sampleToJson).toList(growable: false),
       };
 
   static TripHistoryEntry fromJson(Map<String, dynamic> json) =>
@@ -47,8 +65,33 @@ class TripHistoryEntry {
           (json['summary'] as Map).cast<String, dynamic>(),
         ),
         automatic: (json['automatic'] as bool?) ?? false,
+        samples: (json['samples'] as List?)
+                ?.map(
+                    (e) => _sampleFromJson((e as Map).cast<String, dynamic>()))
+                .toList(growable: false) ??
+            const [],
       );
 }
+
+/// Serialise a single [TripSample]. Compact key names ('t','s','r','f')
+/// keep per-trip JSON small — a 39-min trip × 1 Hz lands around 19 KB
+/// compressed at this density. Use millisecondsSinceEpoch for the
+/// timestamp so the JSON parses fast and round-trips precisely.
+Map<String, dynamic> _sampleToJson(TripSample s) => {
+      't': s.timestamp.millisecondsSinceEpoch,
+      's': s.speedKmh,
+      'r': s.rpm,
+      if (s.fuelRateLPerHour != null) 'f': s.fuelRateLPerHour,
+    };
+
+TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
+      timestamp: DateTime.fromMillisecondsSinceEpoch(
+        (j['t'] as num).toInt(),
+      ),
+      speedKmh: (j['s'] as num).toDouble(),
+      rpm: (j['r'] as num).toDouble(),
+      fuelRateLPerHour: (j['f'] as num?)?.toDouble(),
+    );
 
 Map<String, dynamic> _summaryToJson(TripSummary s) => {
       'distanceKm': s.distanceKm,
