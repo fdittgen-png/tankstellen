@@ -13,23 +13,18 @@ import 'package:flutter_test/flutter_test.dart';
 /// onto `PageScaffold` (which already centralises title/leading/actions
 /// styling, system-nav padding, and bottom-sheet helpers).
 ///
-/// Allowlist: `lib/features/station_detail/presentation/screens/
-/// station_detail_screen.dart` is the one screen still on raw `AppBar`.
-/// It uses a `Hero`-flighted custom title widget, which `PageScaffold`
-/// cannot express until the `title: Widget` variant lands (deferred,
-/// tracked separately under #923-deferred). When that variant ships,
-/// remove the entry below.
+/// Allowlist: empty. The deferred `station_detail_screen.dart` migration
+/// landed once `PageScaffold` gained the `titleWidget:` variant — every
+/// feature presentation file now flows through `PageScaffold`.
 void main() {
   test(
     'no raw `appBar: AppBar(...)` in lib/features/**/presentation '
     '(#923 final)',
     () {
-      // Posix paths so the allowlist matches on every host OS.
-      // Deferred — needs PageScaffold `title: Widget` variant for the
-      // Hero-flighted station-name title. See #923-deferred.
-      const allowlist = <String>{
-        'lib/features/station_detail/presentation/screens/station_detail_screen.dart',
-      };
+      // Posix paths so the allowlist matches on every host OS. Empty
+      // since the station_detail migration landed alongside the
+      // PageScaffold `titleWidget:` variant.
+      const allowlist = <String>{};
 
       // Match `appBar: AppBar(` with optional whitespace. Paired
       // constructor-name boundary: an identifier char before `AppBar`

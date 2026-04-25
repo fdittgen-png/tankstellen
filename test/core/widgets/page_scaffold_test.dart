@@ -234,6 +234,62 @@ void main() {
       expect(tapped, isTrue);
     });
 
+    testWidgets('renders titleWidget when provided', (tester) async {
+      await pump(
+        tester,
+        const PageScaffold(
+          titleWidget: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.local_gas_station, key: Key('brand_icon')),
+              SizedBox(width: 8),
+              Text('Custom Brand Title'),
+            ],
+          ),
+          body: SizedBox.shrink(),
+        ),
+      );
+      // The custom title widget renders inside the AppBar.
+      final appBarFinder = find.byType(AppBar);
+      expect(appBarFinder, findsOneWidget);
+      expect(
+        find.descendant(
+          of: appBarFinder,
+          matching: find.byKey(const Key('brand_icon')),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: appBarFinder,
+          matching: find.text('Custom Brand Title'),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('titleWidget wins when both title and titleWidget are passed',
+        (tester) async {
+      await pump(
+        tester,
+        const PageScaffold(
+          title: 'Plain title',
+          titleWidget: Text('Widget title', key: Key('title_widget')),
+          body: SizedBox.shrink(),
+        ),
+      );
+      // titleWidget takes precedence; the plain `title` is not rendered.
+      expect(find.byKey(const Key('title_widget')), findsOneWidget);
+      expect(find.text('Plain title'), findsNothing);
+    });
+
+    test('assertion fires when both title and titleWidget are null', () {
+      expect(
+        () => PageScaffold(body: const SizedBox.shrink()),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
     testWidgets('title has header semantics', (tester) async {
       final handle = tester.ensureSemantics();
       await pump(

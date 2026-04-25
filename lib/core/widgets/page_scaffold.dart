@@ -10,9 +10,19 @@ import '../theme/spacing.dart';
 /// strip à la `ThemeSettingsScreen`, ad-hoc hero row). See
 /// `docs/design/DESIGN_SYSTEM.md` §"PageScaffold" for the contract.
 class PageScaffold extends StatelessWidget {
-  /// App-bar title. Required — every page has a title in the
-  /// `pageTitle` role.
-  final String title;
+  /// App-bar title. Used unless [titleWidget] is provided. Mutually
+  /// exclusive with [titleWidget] — exactly one of the two must be
+  /// non-null. Renders in the `pageTitle` role wrapped in
+  /// `Semantics(header: true, …)`.
+  final String? title;
+
+  /// Custom title widget — escape hatch for screens whose title cannot
+  /// be expressed as plain text (e.g. `StationDetailScreen`'s
+  /// Hero-flighted brand-header composition). Mutually exclusive with
+  /// [title]: pass exactly one. The caller is responsible for the
+  /// title's semantics (header role, ellipsis, etc.) when this slot is
+  /// used.
+  final Widget? titleWidget;
 
   /// Optional subtitle — rendered inside the banner (if [bannerIcon]
   /// is set). When [bannerIcon] is null the subtitle is ignored
@@ -90,7 +100,8 @@ class PageScaffold extends StatelessWidget {
 
   const PageScaffold({
     super.key,
-    required this.title,
+    this.title,
+    this.titleWidget,
     required this.body,
     this.subtitle,
     this.bannerIcon,
@@ -105,14 +116,23 @@ class PageScaffold extends StatelessWidget {
     this.titleSpacing,
     this.bottomNavigationBar,
     this.bottom,
-  });
+  })  : assert(
+          title != null || titleWidget != null,
+          'PageScaffold requires either `title` or `titleWidget` to be '
+          'non-null.',
+        ),
+        assert(
+          bannerIcon == null || title != null,
+          'PageScaffold(bannerIcon: …) requires `title` (the banner '
+          'shows the title text). Drop the banner or pass `title`.',
+        );
 
   @override
   Widget build(BuildContext context) {
     final effectivePadding = bodyPadding ?? Spacing.screenPadding;
     return Scaffold(
       appBar: AppBar(
-        title: Semantics(header: true, child: Text(title)),
+        title: titleWidget ?? Semantics(header: true, child: Text(title!)),
         actions: actions,
         leading: leading,
         automaticallyImplyLeading: automaticallyImplyLeading,
@@ -126,7 +146,7 @@ class PageScaffold extends StatelessWidget {
           if (bannerIcon != null)
             _PageBanner(
               icon: bannerIcon!,
-              title: title,
+              title: title!,
               subtitle: subtitle,
             ),
           Expanded(

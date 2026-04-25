@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/station.dart';
@@ -33,51 +34,49 @@ class StationDetailScreen extends ConsumerWidget {
         ? (hasRealBrand(station) ? station.brand : station.street)
         : (AppLocalizations.of(context)?.search ?? 'Station');
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Semantics(
-          header: true,
-          child: Hero(
-            tag: 'station-name-$stationId',
-            flightShuttleBuilder:
-                (ctx, animation, direction, fromCtx, toCtx) {
-              final theme = Theme.of(ctx);
-              return Material(
-                type: MaterialType.transparency,
-                child: DefaultTextStyle(
-                  style: theme.appBarTheme.titleTextStyle ??
-                      theme.textTheme.titleLarge ??
-                      const TextStyle(fontWeight: FontWeight.bold),
-                  child: Text(
-                    appBarTitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              );
-            },
-            child: Material(
+    return PageScaffold(
+      titleWidget: Semantics(
+        header: true,
+        child: Hero(
+          tag: 'station-name-$stationId',
+          flightShuttleBuilder: (ctx, animation, direction, fromCtx, toCtx) {
+            final theme = Theme.of(ctx);
+            return Material(
               type: MaterialType.transparency,
-              child: Text(
-                appBarTitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              child: DefaultTextStyle(
+                style: theme.appBarTheme.titleTextStyle ??
+                    theme.textTheme.titleLarge ??
+                    const TextStyle(fontWeight: FontWeight.bold),
+                child: Text(
+                  appBarTitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
+            );
+          },
+          child: Material(
+            type: MaterialType.transparency,
+            child: Text(
+              appBarTitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-          tooltip: AppLocalizations.of(context)?.tooltipBack ?? 'Back',
-        ),
-        actions: [
-          StationDetailAppBarActions(
-            stationId: stationId,
-            station: station,
-          ),
-        ],
       ),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () => context.pop(),
+        tooltip: AppLocalizations.of(context)?.tooltipBack ?? 'Back',
+      ),
+      actions: [
+        StationDetailAppBarActions(
+          stationId: stationId,
+          station: station,
+        ),
+      ],
+      bodyPadding: EdgeInsets.zero,
       body: detailAsync.when(
         data: (result) => Column(
           children: [
