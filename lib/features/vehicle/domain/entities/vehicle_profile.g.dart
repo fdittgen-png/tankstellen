@@ -69,6 +69,10 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
           (json['disconnectSaveDelaySec'] as num?)?.toInt() ?? 60,
       backgroundLocationConsent:
           json['backgroundLocationConsent'] as bool? ?? false,
+      make: json['make'] as String?,
+      model: json['model'] as String?,
+      year: (json['year'] as num?)?.toInt(),
+      referenceVehicleId: json['referenceVehicleId'] as String?,
     );
 
 Map<String, dynamic> _$VehicleProfileToJson(_VehicleProfile instance) =>
@@ -102,4 +106,8 @@ Map<String, dynamic> _$VehicleProfileToJson(_VehicleProfile instance) =>
       'movementStartThresholdKmh': instance.movementStartThresholdKmh,
       'disconnectSaveDelaySec': instance.disconnectSaveDelaySec,
       'backgroundLocationConsent': instance.backgroundLocationConsent,
+      'make': instance.make,
+      'model': instance.model,
+      'year': instance.year,
+      'referenceVehicleId': instance.referenceVehicleId,
     };
