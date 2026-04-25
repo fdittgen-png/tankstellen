@@ -6,6 +6,7 @@ import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/widgets/star_rating.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/presentation/screens/add_charging_log_screen.dart';
 import '../../../ev/domain/entities/charging_station.dart';
@@ -102,62 +103,61 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
     final station = _station;
 
     final operatorName = station.operator ?? '';
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(operatorName.isNotEmpty ? operatorName : station.name),
-        actions: [
-          Consumer(builder: (context, ref, _) {
-            final isFav = ref.watch(isFavoriteProvider(station.id));
-            return IconButton(
-              icon: Icon(
-                isFav ? Icons.star : Icons.star_outline,
-                color: isFav ? Colors.amber : Colors.white70,
-                size: 26,
-              ),
-              tooltip: isFav ? (l10n?.removeFavorite ?? 'Remove from favorites') : (l10n?.addFavorite ?? 'Add to favorites'),
-              onPressed: () async {
-                // Await the toggle so the snackbar fires AFTER persistence
-                // and the isFavoriteProvider has flipped. Otherwise a quick
-                // back-navigation can cancel the in-flight Hive write and
-                // leave the favorite half-persisted (#566).
-                await ref.read(favoritesProvider.notifier).toggle(
-                      station.id,
-                      rawJson: station.toJson(),
-                    );
-                if (!context.mounted) return;
-                // Temporary diagnostic: surface live storage counts in the
-                // snackbar so a user on an APK without logcat can verify
-                // the favorite actually persisted.
-                final storage = ref.read(storageRepositoryProvider);
-                final evIds = storage.getEvFavoriteIds();
-                final savedCount = evIds
-                    .where((id) => storage.getEvFavoriteStationData(id) != null)
-                    .length;
-                final base = isFav
-                    ? (l10n?.removedFromFavorites ?? 'Removed from favorites')
-                    : (l10n?.addedToFavorites ?? 'Added to favorites');
-                SnackBarHelper.show(
-                  context,
-                  '$base (EV: ${evIds.length} ids / $savedCount saved)',
-                  duration: const Duration(seconds: 3),
-                );
-              },
-            );
-          }),
-          IconButton(
-            icon: _isRefreshing
-                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70))
-                : const Icon(Icons.refresh),
-            tooltip: l10n?.evRefreshStatus ?? 'Refresh status',
-            onPressed: _isRefreshing ? null : _refreshStation,
-          ),
-          IconButton(
-            icon: const Icon(Icons.navigation),
-            tooltip: l10n?.navigate ?? 'Navigate',
-            onPressed: _navigateToStation,
-          ),
-        ],
-      ),
+    return PageScaffold(
+      title: operatorName.isNotEmpty ? operatorName : station.name,
+      bodyPadding: EdgeInsets.zero,
+      actions: [
+        Consumer(builder: (context, ref, _) {
+          final isFav = ref.watch(isFavoriteProvider(station.id));
+          return IconButton(
+            icon: Icon(
+              isFav ? Icons.star : Icons.star_outline,
+              color: isFav ? Colors.amber : Colors.white70,
+              size: 26,
+            ),
+            tooltip: isFav ? (l10n?.removeFavorite ?? 'Remove from favorites') : (l10n?.addFavorite ?? 'Add to favorites'),
+            onPressed: () async {
+              // Await the toggle so the snackbar fires AFTER persistence
+              // and the isFavoriteProvider has flipped. Otherwise a quick
+              // back-navigation can cancel the in-flight Hive write and
+              // leave the favorite half-persisted (#566).
+              await ref.read(favoritesProvider.notifier).toggle(
+                    station.id,
+                    rawJson: station.toJson(),
+                  );
+              if (!context.mounted) return;
+              // Temporary diagnostic: surface live storage counts in the
+              // snackbar so a user on an APK without logcat can verify
+              // the favorite actually persisted.
+              final storage = ref.read(storageRepositoryProvider);
+              final evIds = storage.getEvFavoriteIds();
+              final savedCount = evIds
+                  .where((id) => storage.getEvFavoriteStationData(id) != null)
+                  .length;
+              final base = isFav
+                  ? (l10n?.removedFromFavorites ?? 'Removed from favorites')
+                  : (l10n?.addedToFavorites ?? 'Added to favorites');
+              SnackBarHelper.show(
+                context,
+                '$base (EV: ${evIds.length} ids / $savedCount saved)',
+                duration: const Duration(seconds: 3),
+              );
+            },
+          );
+        }),
+        IconButton(
+          icon: _isRefreshing
+              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70))
+              : const Icon(Icons.refresh),
+          tooltip: l10n?.evRefreshStatus ?? 'Refresh status',
+          onPressed: _isRefreshing ? null : _refreshStation,
+        ),
+        IconButton(
+          icon: const Icon(Icons.navigation),
+          tooltip: l10n?.navigate ?? 'Navigate',
+          onPressed: _navigateToStation,
+        ),
+      ],
       body: ListView(
         padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.of(context).viewPadding.bottom + 24),
         children: [

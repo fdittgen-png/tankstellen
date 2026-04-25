@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/location/user_position_provider.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Full-screen map-picker for choosing the center of a [RadiusAlert]
@@ -145,27 +146,23 @@ class _RadiusAlertMapPickerState extends ConsumerState<RadiusAlertMapPicker> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          l10n?.radiusAlertMapPickerTitle ?? 'Pick alert center',
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          tooltip:
-              l10n?.radiusAlertMapPickerCancel ?? 'Cancel',
-          onPressed: _cancel,
-        ),
-        actions: [
-          TextButton(
-            onPressed: _confirm,
-            child: Text(
-              l10n?.radiusAlertMapPickerConfirm ?? 'Confirm',
-              style: TextStyle(color: theme.colorScheme.onPrimary),
-            ),
-          ),
-        ],
+    return PageScaffold(
+      title: l10n?.radiusAlertMapPickerTitle ?? 'Pick alert center',
+      bodyPadding: EdgeInsets.zero,
+      leading: IconButton(
+        icon: const Icon(Icons.close),
+        tooltip: l10n?.radiusAlertMapPickerCancel ?? 'Cancel',
+        onPressed: _cancel,
       ),
+      actions: [
+        TextButton(
+          onPressed: _confirm,
+          child: Text(
+            l10n?.radiusAlertMapPickerConfirm ?? 'Confirm',
+            style: TextStyle(color: theme.colorScheme.onPrimary),
+          ),
+        ),
+      ],
       body: Stack(
         alignment: Alignment.center,
         children: [
