@@ -11,31 +11,18 @@ import '../../../../core/feedback/github_issue_reporter.dart';
 import '../../../../core/feedback/github_issue_reporter_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/receipt_scan_service.dart';
+import 'bad_scan_form_view.dart';
+import 'bad_scan_issue_created_surface.dart';
+import 'bad_scan_report_formatters.dart';
 
-/// Test seam for the consent prompt. Production code uses
-/// [FeedbackConsentDialog.show]; widget tests can replace it with a
-/// stub that returns a pre-canned [FeedbackConsentChoice].
+/// Test seams: widget tests substitute these for the real
+/// platform-channel / secure-storage backed implementations.
 typedef ConsentPrompter = Future<FeedbackConsentChoice> Function(
     BuildContext context);
-
-/// Test seam for the persisted consent state. Production code reads
-/// from `shared_preferences` via [FeedbackConsent.read].
 typedef ConsentReader = Future<FeedbackConsentState> Function();
-
-/// Test seam for persisting a consent choice. Production code writes
-/// to `shared_preferences` via [FeedbackConsent.write].
 typedef ConsentWriter = Future<void> Function(FeedbackConsentState state);
-
-/// Share callback signature so widget tests can substitute the
-/// [SharePlus] platform channel with a Dart-only fake. Production
-/// code passes [_defaultShareFallback].
 typedef ShareFallback = Future<void> Function(ShareParams params);
-
-/// URL-launcher callback signature, same rationale as [ShareFallback].
 typedef UrlLauncher = Future<bool> Function(Uri uri);
-
-/// Reads the raw bytes of the scanned image. Defaults to
-/// `File(path).readAsBytes()`; widget tests inject a Dart-only fake.
 typedef ImageBytesReader = Future<Uint8List> Function(String path);
 
 /// Bottom sheet the user opens when a scanned value is wrong. Two
@@ -72,33 +59,18 @@ class BadScanReportSheet extends ConsumerStatefulWidget {
   final double? enteredTotalCost;
   final String appVersion;
 
-  /// Injected for widget tests. In production the default implementation
-  /// forwards to `SharePlus.instance.share(...)`.
+  // Test seams — see typedefs above. Null in production; the
+  // ?? operators in the state class fall back to platform defaults.
   @visibleForTesting
   final ShareFallback? shareFallback;
-
-  /// Injected for widget tests. In production the default implementation
-  /// forwards to `launchUrl(...)`.
   @visibleForTesting
   final UrlLauncher? urlLauncher;
-
-  /// Injected for widget tests. In production the default implementation
-  /// reads the scan image off the local filesystem.
   @visibleForTesting
   final ImageBytesReader? imageBytesReader;
-
-  /// Injected for widget tests. In production this calls
-  /// [FeedbackConsentDialog.show].
   @visibleForTesting
   final ConsentPrompter? consentPrompter;
-
-  /// Injected for widget tests. In production this calls
-  /// [FeedbackConsent.read].
   @visibleForTesting
   final ConsentReader? consentReader;
-
-  /// Injected for widget tests. In production this calls
-  /// [FeedbackConsent.write].
   @visibleForTesting
   final ConsentWriter? consentWriter;
 
@@ -152,8 +124,6 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l = AppLocalizations.of(context);
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -162,55 +132,22 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
           top: 16,
           bottom: MediaQuery.of(context).viewInsets.bottom + 16,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              _resolveTitle(l),
-              style: theme.textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              l?.badScanReportHint ??
-                  "We'll share the receipt photo and both sets of values so "
-                      'the next build can learn this layout.',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 16),
-            if (_createdIssueUrl == null) ...[
-              _DiffTable(rows: _buildDiffRows(l)),
-              const SizedBox(height: 16),
-              FilledButton.icon(
-                onPressed: _submitting ? null : _handleCreateTicket,
-                icon: _submitting
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.bug_report_outlined),
-                label: Text(
-                  l?.badScanReportCreateTicket ?? 'Create issue',
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed:
-                    _submitting ? null : () => Navigator.of(context).pop(),
-                child: Text(l?.cancel ?? 'Cancel'),
-              ),
-            ] else
-              _IssueCreatedSurface(
+        child: _createdIssueUrl == null
+            ? BadScanFormView(
+                kind: widget.kind,
+                receiptScan: widget.scan,
+                pumpScan: widget.pumpScan,
+                enteredLiters: widget.enteredLiters,
+                enteredTotalCost: widget.enteredTotalCost,
+                submitting: _submitting,
+                onSubmit: _handleCreateTicket,
+                onCancel: () => Navigator.of(context).pop(),
+              )
+            : BadScanIssueCreatedSurface(
                 issueUrl: _createdIssueUrl!,
                 onOpenInBrowser: _handleOpenInBrowser,
                 onClose: () => Navigator.of(context).pop(),
               ),
-          ],
-        ),
       ),
     );
   }
@@ -262,8 +199,15 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
       final url = await reporter.reportBadScan(
         kind: widget.kind,
         rawOcrText: widget._ocrText,
-        parsedFields: _parsedFields(),
-        userCorrections: _userCorrections(),
+        parsedFields: buildBadScanParsedFields(
+          kind: widget.kind,
+          receiptScan: widget.scan,
+          pumpScan: widget.pumpScan,
+        ),
+        userCorrections: buildBadScanUserCorrections(
+          enteredLiters: widget.enteredLiters,
+          enteredTotalCost: widget.enteredTotalCost,
+        ),
         imageBytes: await _readImageBytes(),
       );
 
@@ -289,7 +233,15 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
 
     final params = ShareParams(
       files: [XFile(widget._imagePath)],
-      text: _buildShareBody(),
+      text: buildBadScanShareBody(
+        kind: widget.kind,
+        receiptScan: widget.scan,
+        pumpScan: widget.pumpScan,
+        enteredLiters: widget.enteredLiters,
+        enteredTotalCost: widget.enteredTotalCost,
+        appVersion: widget.appVersion,
+        ocrText: widget._ocrText,
+      ),
       subject: widget.kind == ScanKind.receipt
           ? 'Tankstellen receipt scan issue'
           : 'Tankstellen pump-display scan issue',
@@ -328,36 +280,6 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
     }
   }
 
-  Map<String, String?> _parsedFields() {
-    if (widget.kind == ScanKind.receipt) {
-      final p = widget.scan!.parse;
-      return <String, String?>{
-        'brandLayout': p.brandLayout,
-        'liters': p.liters?.toStringAsFixed(2),
-        'totalCost': p.totalCost?.toStringAsFixed(2),
-        'pricePerLiter': p.pricePerLiter?.toStringAsFixed(3),
-        'stationName': p.stationName,
-        'fuelType': p.fuelType?.apiValue,
-        'date': p.date?.toIso8601String(),
-      };
-    }
-    final p = widget.pumpScan!.parse;
-    return <String, String?>{
-      'liters': p.liters?.toStringAsFixed(2),
-      'totalCost': p.totalCost?.toStringAsFixed(2),
-      'pricePerLiter': p.pricePerLiter?.toStringAsFixed(3),
-      'pumpNumber': p.pumpNumber?.toString(),
-      'confidence': p.confidence.toStringAsFixed(2),
-    };
-  }
-
-  Map<String, String?> _userCorrections() {
-    return <String, String?>{
-      'liters': widget.enteredLiters?.toStringAsFixed(2),
-      'totalCost': widget.enteredTotalCost?.toStringAsFixed(2),
-    };
-  }
-
   Future<Uint8List> _defaultImageBytesReader(String path) async {
     try {
       return await File(path).readAsBytes();
@@ -370,242 +292,5 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
   Future<Uint8List> _readImageBytes() {
     final reader = widget.imageBytesReader ?? _defaultImageBytesReader;
     return reader(widget._imagePath);
-  }
-
-  String _buildShareBody() {
-    final buffer = StringBuffer();
-    if (widget.kind == ScanKind.receipt) {
-      final p = widget.scan!.parse;
-      buffer
-        ..writeln('Tankstellen receipt scan report')
-        ..writeln('================================')
-        ..writeln('App version: ${widget.appVersion}')
-        ..writeln('Brand layout: ${p.brandLayout}')
-        ..writeln()
-        ..writeln('Scanned → Corrected')
-        ..writeln('-------------------')
-        ..writeln('Liters:   ${p.liters?.toStringAsFixed(2) ?? '—'}'
-            '   →   ${widget.enteredLiters?.toStringAsFixed(2) ?? '(please fill)'}')
-        ..writeln('Total:    ${p.totalCost?.toStringAsFixed(2) ?? '—'}'
-            '   →   ${widget.enteredTotalCost?.toStringAsFixed(2) ?? '(please fill)'}')
-        ..writeln('Price/L:  ${p.pricePerLiter?.toStringAsFixed(3) ?? '—'}')
-        ..writeln('Station:  ${p.stationName ?? '—'}')
-        ..writeln('Fuel:     ${p.fuelType?.apiValue ?? '—'}')
-        ..writeln('Date:     ${p.date?.toIso8601String() ?? '—'}');
-    } else {
-      final p = widget.pumpScan!.parse;
-      buffer
-        ..writeln('Tankstellen pump-display scan report')
-        ..writeln('=====================================')
-        ..writeln('App version: ${widget.appVersion}')
-        ..writeln()
-        ..writeln('Scanned → Corrected')
-        ..writeln('-------------------')
-        ..writeln('Liters:   ${p.liters?.toStringAsFixed(2) ?? '—'}'
-            '   →   ${widget.enteredLiters?.toStringAsFixed(2) ?? '(please fill)'}')
-        ..writeln('Total:    ${p.totalCost?.toStringAsFixed(2) ?? '—'}'
-            '   →   ${widget.enteredTotalCost?.toStringAsFixed(2) ?? '(please fill)'}')
-        ..writeln('Price/L:  ${p.pricePerLiter?.toStringAsFixed(3) ?? '—'}')
-        ..writeln('Pump #:   ${p.pumpNumber?.toString() ?? '—'}')
-        ..writeln('Confidence: ${p.confidence.toStringAsFixed(2)}');
-    }
-    buffer
-      ..writeln()
-      ..writeln('Raw OCR text')
-      ..writeln('------------')
-      ..writeln(widget._ocrText);
-    return buffer.toString();
-  }
-
-  /// Resolves the kind-aware sheet title. Falls back to the original
-  /// "Report a scan error" string for both kinds when localization is
-  /// not available, then layers per-kind suffixes on top via the
-  /// kind-specific keys (#953).
-  String _resolveTitle(AppLocalizations? l) {
-    switch (widget.kind) {
-      case ScanKind.receipt:
-        return l?.badScanReportTitleReceipt ??
-            l?.badScanReportTitle ??
-            'Report a scan error — Receipt';
-      case ScanKind.pumpDisplay:
-        return l?.badScanReportTitlePumpDisplay ??
-            'Report a scan error — Pump display';
-    }
-  }
-
-  /// Builds the field-by-field diff table rendered above the action
-  /// buttons. Receipt shows the rich layout (brand, station, fuel,
-  /// date); pump-display shows only the three transaction numbers
-  /// plus the pump number when available (#953).
-  List<_DiffRow> _buildDiffRows(AppLocalizations? l) {
-    if (widget.kind == ScanKind.receipt) {
-      final p = widget.scan!.parse;
-      return [
-        _DiffRow(
-          l?.badScanReportFieldBrandLayout ?? 'Brand layout',
-          p.brandLayout,
-          p.brandLayout,
-        ),
-        _DiffRow(
-          l?.liters ?? 'Liters',
-          p.liters?.toStringAsFixed(2) ?? '—',
-          widget.enteredLiters?.toStringAsFixed(2) ?? '—',
-        ),
-        _DiffRow(
-          l?.badScanReportFieldTotal ?? 'Total',
-          p.totalCost?.toStringAsFixed(2) ?? '—',
-          widget.enteredTotalCost?.toStringAsFixed(2) ?? '—',
-        ),
-        _DiffRow(
-          l?.badScanReportFieldPricePerLiter ?? 'Price/L',
-          p.pricePerLiter?.toStringAsFixed(3) ?? '—',
-          '—',
-        ),
-        _DiffRow(
-          l?.badScanReportFieldStation ?? 'Station',
-          p.stationName ?? '—',
-          '—',
-        ),
-        _DiffRow(
-          l?.badScanReportFieldFuel ?? 'Fuel',
-          p.fuelType?.displayName ?? '—',
-          '—',
-        ),
-        _DiffRow(
-          l?.badScanReportFieldDate ?? 'Date',
-          p.date?.toIso8601String().split('T').first ?? '—',
-          '—',
-        ),
-      ];
-    }
-    final p = widget.pumpScan!.parse;
-    return [
-      _DiffRow(
-        l?.liters ?? 'Liters',
-        p.liters?.toStringAsFixed(2) ?? '—',
-        widget.enteredLiters?.toStringAsFixed(2) ?? '—',
-      ),
-      _DiffRow(
-        l?.badScanReportFieldTotal ?? 'Total',
-        p.totalCost?.toStringAsFixed(2) ?? '—',
-        widget.enteredTotalCost?.toStringAsFixed(2) ?? '—',
-      ),
-      _DiffRow(
-        l?.badScanReportFieldPricePerLiter ?? 'Price/L',
-        p.pricePerLiter?.toStringAsFixed(3) ?? '—',
-        '—',
-      ),
-    ];
-  }
-}
-
-class _IssueCreatedSurface extends StatelessWidget {
-  final Uri issueUrl;
-  final Future<void> Function() onOpenInBrowser;
-  final VoidCallback onClose;
-
-  const _IssueCreatedSurface({
-    required this.issueUrl,
-    required this.onOpenInBrowser,
-    required this.onClose,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l = AppLocalizations.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          children: [
-            Icon(Icons.check_circle, color: theme.colorScheme.primary),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                issueUrl.toString(),
-                style: theme.textTheme.bodySmall,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        FilledButton.icon(
-          onPressed: onOpenInBrowser,
-          icon: const Icon(Icons.open_in_new),
-          label: Text(
-            l?.badScanReportOpenInBrowser ?? 'Open in browser',
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextButton(
-          onPressed: onClose,
-          child: Text(l?.close ?? 'Close'),
-        ),
-      ],
-    );
-  }
-}
-
-class _DiffRow {
-  final String label;
-  final String scanned;
-  final String real;
-  const _DiffRow(this.label, this.scanned, this.real);
-}
-
-class _DiffTable extends StatelessWidget {
-  final List<_DiffRow> rows;
-  const _DiffTable({required this.rows});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l = AppLocalizations.of(context);
-    return Table(
-      columnWidths: const {
-        0: IntrinsicColumnWidth(),
-        1: FlexColumnWidth(),
-        2: FlexColumnWidth(),
-      },
-      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-      children: [
-        TableRow(
-          decoration:
-              BoxDecoration(color: theme.colorScheme.surfaceContainerHighest),
-          children: [
-            _cell(l?.badScanReportHeaderField ?? 'Field',
-                bold: true, theme: theme),
-            _cell(l?.badScanReportHeaderScanned ?? 'Scanned',
-                bold: true, theme: theme),
-            _cell(l?.badScanReportHeaderYouTyped ?? 'You typed',
-                bold: true, theme: theme),
-          ],
-        ),
-        for (final row in rows)
-          TableRow(
-            children: [
-              _cell(row.label, theme: theme),
-              _cell(row.scanned, theme: theme),
-              _cell(row.real, theme: theme),
-            ],
-          ),
-      ],
-    );
-  }
-
-  Widget _cell(String text, {bool bold = false, required ThemeData theme}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-      child: Text(
-        text,
-        style: theme.textTheme.bodySmall?.copyWith(
-          fontWeight: bold ? FontWeight.bold : null,
-        ),
-      ),
-    );
   }
 }
