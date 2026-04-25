@@ -6128,6 +6128,48 @@ abstract class AppLocalizations {
   /// **'Report a scan error'**
   String get badScanReportTitle;
 
+  /// Receipt-specific title for the bad-scan report sheet (#953). Used when ScanKind == receipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a scan error — Receipt'**
+  String get badScanReportTitleReceipt;
+
+  /// Pump-display-specific title for the bad-scan report sheet (#953). Used when ScanKind == pumpDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a scan error — Pump display'**
+  String get badScanReportTitlePumpDisplay;
+
+  /// Title of the bottom sheet shown when a pump-display scan returns no usable data (#953).
+  ///
+  /// In en, this message translates to:
+  /// **'Display unreadable'**
+  String get pumpScanFailureTitle;
+
+  /// Body text of the pump-scan failure sheet, prompting the user to choose between correcting manually, reporting, or removing the photo (#953).
+  ///
+  /// In en, this message translates to:
+  /// **'The scan couldn\'t read the pump display. What would you like to do?'**
+  String get pumpScanFailureBody;
+
+  /// Action: close the failure sheet and leave the form untouched so the user types values (#953).
+  ///
+  /// In en, this message translates to:
+  /// **'Correct manually'**
+  String get pumpScanFailureCorrectManually;
+
+  /// Action: open the bad-scan report flow so the unreadable photo is shipped to GitHub for triage (#953).
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get pumpScanFailureReport;
+
+  /// Action: delete the captured photo and forget the scan (#953).
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get pumpScanFailureRemove;
+
   /// Subtitle under the bad-scan-report sheet title (#751).
   ///
   /// In en, this message translates to:

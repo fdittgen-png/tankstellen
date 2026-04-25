@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/feedback/github_issue_reporter.dart';
 import '../../../../core/widgets/form_section_card.dart';
 import '../../../../core/widgets/fuel_type_dropdown.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -20,6 +21,7 @@ import '../../data/receipt_scan_service.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
 import '../widgets/bad_scan_report_sheet.dart';
+import '../widgets/pump_scan_failure_sheet.dart';
 import '../widgets/fill_up_import_from_chip.dart';
 import '../widgets/fill_up_notes_field.dart';
 import '../widgets/fill_up_numeric_field.dart';
@@ -42,12 +44,21 @@ class AddFillUpScreen extends ConsumerStatefulWidget {
   /// into a two-tap flow (liters + odometer).
   final double? preFilledPricePerLiter;
 
+  /// Test seam (#953) — widget tests can swap in a fake
+  /// [ReceiptScanService] that returns a pre-canned failing
+  /// pump-display outcome without launching the camera. Production
+  /// callers leave this null and the screen instantiates a real
+  /// service on first use.
+  @visibleForTesting
+  final ReceiptScanService? scanService;
+
   const AddFillUpScreen({
     super.key,
     this.stationId,
     this.stationName,
     this.preFilledFuelType,
     this.preFilledPricePerLiter,
+    this.scanService,
   });
 
   @override
@@ -77,6 +88,9 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     if (price != null) {
       _litersCtrl.addListener(_recomputeCost);
     }
+    // #953 — accept an injected scan service so widget tests can drive
+    // the failure flow without touching the platform camera channel.
+    _scanService = widget.scanService;
   }
 
   /// Resolve the initial vehicle selection: prefer the profile's
@@ -174,7 +188,12 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     _costCtrl.dispose();
     _odoCtrl.dispose();
     _notesCtrl.dispose();
-    _scanService?.dispose();
+    // Only dispose the service when WE created it (#953). When the
+    // test passes one in via `widget.scanService` the fake's lifecycle
+    // is owned by the test, not the screen.
+    if (widget.scanService == null) {
+      _scanService?.dispose();
+    }
     super.dispose();
   }
 
@@ -548,18 +567,26 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   /// pre-fill the form. Unlike the receipt path there is no brand
   /// dispatch — every pump emits the same 3-number format — so we
   /// only need the numeric values and one cross-validity check.
+  ///
+  /// #953 — when parsing fails (`!hasUsableData`) we no longer drop the
+  /// photo silently; we open the [_PumpScanFailureSheet] which lets the
+  /// user pick "Corriger manuellement" (close, leave the form untouched
+  /// so they type values), "Signaler" (open [BadScanReportSheet] with
+  /// [ScanKind.pumpDisplay] so the photo is shipped to GitHub), or
+  /// "Retirer la photo" (delete + close).
   Future<void> _scanPumpDisplay() async {
     setState(() => _scanningPump = true);
     final l = AppLocalizations.of(context);
     try {
       _scanService ??= ReceiptScanService();
-      final result = await _scanService!.scanPumpDisplay();
-      if (result == null || !mounted) return;
+      final outcome = await _scanService!.scanPumpDisplay();
+      if (outcome == null || !mounted) return;
+      final result = outcome.parse;
       if (!result.hasUsableData) {
-        SnackBarHelper.show(
-          context,
-          l?.scanPumpUnreadable ?? 'Pump display not readable — try again',
-        );
+        // Pass the outcome straight into the failure sheet so the
+        // bad-scan reporter can ship the photo + raw OCR text without
+        // re-running OCR on a re-captured image.
+        await _showPumpScanFailureSheet(outcome);
         return;
       }
       setState(() {
@@ -586,6 +613,55 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     } finally {
       if (mounted) setState(() => _scanningPump = false);
     }
+  }
+
+  /// Opens the failure-flow bottom sheet for an unreadable pump-display
+  /// scan (#953). The sheet is dismissable; the action the user picks
+  /// determines the next step:
+  ///   - correctManually: close, leave the form untouched.
+  ///   - report: open [BadScanReportSheet] with [ScanKind.pumpDisplay].
+  ///   - removePhoto: delete the temp file and forget the scan.
+  Future<void> _showPumpScanFailureSheet(
+    PumpDisplayScanOutcome outcome,
+  ) async {
+    final action = await showModalBottomSheet<PumpScanFailureAction>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => const PumpScanFailureSheet(),
+    );
+    if (!mounted) return;
+    switch (action) {
+      case PumpScanFailureAction.report:
+        await _reportBadPumpScan(outcome);
+        break;
+      case PumpScanFailureAction.removePhoto:
+        await _scanService?.deleteCapturedImage(outcome.imagePath);
+        break;
+      case PumpScanFailureAction.correctManually:
+      case null:
+        // Sheet dismissed or "Correct manually" — keep the photo on
+        // disk so the user can still hit "Report scan error" via the
+        // existing affordance below the form. (The button currently
+        // surfaces only for receipt scans; pump-display reports are
+        // accessible via the failure sheet itself.)
+        break;
+    }
+  }
+
+  Future<void> _reportBadPumpScan(PumpDisplayScanOutcome outcome) async {
+    final liters = double.tryParse(_litersCtrl.text.replaceAll(',', '.'));
+    final cost = double.tryParse(_costCtrl.text.replaceAll(',', '.'));
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => BadScanReportSheet(
+        kind: ScanKind.pumpDisplay,
+        pumpScan: outcome,
+        enteredLiters: liters,
+        enteredTotalCost: cost,
+        appVersion: AppConstants.appVersion,
+      ),
+    );
   }
 
   Future<void> _reportBadScan() async {
@@ -832,3 +908,4 @@ class _VehicleFuelPicker extends StatelessWidget {
     return FuelType.fromString(raw);
   }
 }
+
