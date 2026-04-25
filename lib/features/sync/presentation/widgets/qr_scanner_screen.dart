@@ -8,6 +8,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../../core/permissions/camera_permissions.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
+import 'qr_scanner_helpers.dart';
 
 /// Full-screen QR code scanner for scanning TankSync credentials and
 /// payment QR codes from the station-detail screen.
@@ -148,7 +149,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       case _ScannerPhase.probing:
         return const Center(child: CircularProgressIndicator());
       case _ScannerPhase.denied:
-        return _PermissionDenied(
+        return QrPermissionDenied(
           key: const Key('qrScannerDenied'),
           message: l10n?.qrScannerPermissionDenied ??
               'Camera access is needed to scan QR codes.',
@@ -156,7 +157,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
           onPressed: _probePermission,
         );
       case _ScannerPhase.permanentlyDenied:
-        return _PermissionDenied(
+        return QrPermissionDenied(
           key: const Key('qrScannerPermanentlyDenied'),
           message: l10n?.qrScannerPermissionPermanentlyDenied ??
               'Camera access was denied. Open settings to grant it.',
@@ -164,7 +165,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
           onPressed: widget._permissions.openSettings,
         );
       case _ScannerPhase.timeout:
-        return _ScanTimeoutPrompt(
+        return QrScanTimeoutPrompt(
           message: l10n?.qrScannerTimeout ??
               'No QR code detected. Move closer or try again.',
           buttonLabel: l10n?.qrScannerRetry ?? 'Try again',
@@ -178,7 +179,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
               controller: _controller,
               onDetect: _onDetect,
             ),
-            const _ScanFrameOverlay(),
+            const QrScanFrameOverlay(),
             Align(
               alignment: Alignment.bottomCenter,
               child: _GuidanceCaption(
@@ -240,128 +241,6 @@ class QrScannerTorchButton extends StatelessWidget {
       },
     );
   }
-}
-
-class _PermissionDenied extends StatelessWidget {
-  final String message;
-  final String buttonLabel;
-  final Future<void> Function() onPressed;
-
-  const _PermissionDenied({
-    super.key,
-    required this.message,
-    required this.buttonLabel,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.no_photography_outlined, size: 64),
-            const SizedBox(height: 16),
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: 24),
-            FilledButton(
-              key: const Key('qrScannerDeniedAction'),
-              onPressed: onPressed,
-              child: Text(buttonLabel),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ScanTimeoutPrompt extends StatelessWidget {
-  final String message;
-  final String buttonLabel;
-  final VoidCallback onPressed;
-
-  const _ScanTimeoutPrompt({
-    required this.message,
-    required this.buttonLabel,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.timer_off_outlined, size: 64),
-            const SizedBox(height: 16),
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: 24),
-            FilledButton(
-              key: const Key('qrScannerTimeoutRetry'),
-              onPressed: onPressed,
-              child: Text(buttonLabel),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Dimmed backdrop with a square cut-out in the middle. Gives the
-/// user a clear target so they stop holding the camera 2 cm from the
-/// code.
-class _ScanFrameOverlay extends StatelessWidget {
-  const _ScanFrameOverlay();
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: CustomPaint(
-        painter: _FramePainter(color: Theme.of(context).colorScheme.primary),
-      ),
-    );
-  }
-}
-
-class _FramePainter extends CustomPainter {
-  final Color color;
-  _FramePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    const frameRatio = 0.65;
-    final side = size.shortestSide * frameRatio;
-    final rect = Rect.fromCenter(
-      center: size.center(Offset.zero),
-      width: side,
-      height: side,
-    );
-    final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(16));
-
-    // Dimmed backdrop — scrim everywhere except the scan window.
-    final scrim = Paint()..color = Colors.black54;
-    final path = Path()
-      ..addRect(Offset.zero & size)
-      ..addRRect(rrect)
-      ..fillType = PathFillType.evenOdd;
-    canvas.drawPath(path, scrim);
-
-    // Accent border around the window.
-    final border = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
-    canvas.drawRRect(rrect, border);
-  }
-
-  @override
-  bool shouldRepaint(covariant _FramePainter old) => old.color != color;
 }
 
 class _GuidanceCaption extends StatelessWidget {
