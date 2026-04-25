@@ -172,4 +172,183 @@ void main() {
       );
     });
   });
+
+  // #1012 phase 2 — the runner now fires one notification per alert
+  // per cycle, so the dedup *decision* moved from per-(alert, station)
+  // to per-alert. The per-station ledger still exists (phase 3 deep-
+  // links use it), but `shouldNotifyAlert` is the gate.
+  group('RadiusAlertDedup alert-level (#1012 phase 2)', () {
+    test('first alert-level notification is always allowed', () async {
+      final dedup = RadiusAlertDedup();
+      final allowed = await dedup.shouldNotifyAlert(
+        alertId: 'a1',
+        cheapestPrice: 1.550,
+        now: DateTime.utc(2026, 4, 22, 12),
+      );
+      expect(allowed, isTrue);
+    });
+
+    test(
+        'within 12 h with the cheapest unchanged → suppressed (per-alert window)',
+        () async {
+      final dedup = RadiusAlertDedup();
+      final t0 = DateTime.utc(2026, 4, 22, 12);
+      await dedup.recordAlertFire(
+          alertId: 'a1', cheapestPrice: 1.550, now: t0);
+
+      final allowed = await dedup.shouldNotifyAlert(
+        alertId: 'a1',
+        cheapestPrice: 1.550,
+        now: t0.add(const Duration(hours: 11, minutes: 59)),
+      );
+      expect(allowed, isFalse);
+    });
+
+    test(
+        'within 12 h but cheapest dropped further → fires (further-drop override preserved)',
+        () async {
+      final dedup = RadiusAlertDedup();
+      final t0 = DateTime.utc(2026, 4, 22, 12);
+      await dedup.recordAlertFire(
+          alertId: 'a1', cheapestPrice: 1.550, now: t0);
+
+      // 4 h later the cheapest match dropped another cent — the user
+      // wants to know the new floor even though the dedup window is
+      // still active.
+      final allowed = await dedup.shouldNotifyAlert(
+        alertId: 'a1',
+        cheapestPrice: 1.540,
+        now: t0.add(const Duration(hours: 4)),
+      );
+      expect(allowed, isTrue);
+    });
+
+    test('sub-epsilon wiggle on the cheapest is still suppressed',
+        () async {
+      final dedup = RadiusAlertDedup();
+      final t0 = DateTime.utc(2026, 4, 22, 12);
+      await dedup.recordAlertFire(
+          alertId: 'a1', cheapestPrice: 1.550, now: t0);
+
+      final allowed = await dedup.shouldNotifyAlert(
+        alertId: 'a1',
+        cheapestPrice: 1.5495,
+        now: t0.add(const Duration(hours: 1)),
+      );
+      expect(allowed, isFalse);
+    });
+
+    test('alert-level notification re-fires once 12 h elapsed', () async {
+      final dedup = RadiusAlertDedup();
+      final t0 = DateTime.utc(2026, 4, 22, 12);
+      await dedup.recordAlertFire(
+          alertId: 'a1', cheapestPrice: 1.550, now: t0);
+
+      final allowed = await dedup.shouldNotifyAlert(
+        alertId: 'a1',
+        cheapestPrice: 1.550,
+        now: t0.add(const Duration(hours: 12, minutes: 1)),
+      );
+      expect(allowed, isTrue);
+    });
+
+    test('alert-level dedup is scoped per alertId', () async {
+      final dedup = RadiusAlertDedup();
+      final t0 = DateTime.utc(2026, 4, 22, 12);
+      await dedup.recordAlertFire(
+          alertId: 'a1', cheapestPrice: 1.550, now: t0);
+
+      // a2 hasn't been recorded — must fire.
+      expect(
+        await dedup.shouldNotifyAlert(
+          alertId: 'a2',
+          cheapestPrice: 1.550,
+          now: t0.add(const Duration(minutes: 5)),
+        ),
+        isTrue,
+      );
+    });
+
+    test(
+        'per-station fire records remain readable after alert-level fire (phase 3 deep-link prereq)',
+        () async {
+      // Phase 3 will deep-link to the cheapest station shown in a
+      // grouped notification. Its tap handler reads the per-station
+      // ledger to know "what price did we tell the user about this
+      // station?". The runner stamps both ledgers in one cycle, so we
+      // pin here that they coexist and the per-station read still
+      // works after the alert-level row is written.
+      final dedup = RadiusAlertDedup();
+      final t0 = DateTime.utc(2026, 4, 22, 12);
+      await dedup.recordAlertFire(
+          alertId: 'a1', cheapestPrice: 1.500, now: t0);
+      await dedup.recordFire(
+          alertId: 'a1', stationId: 's1', price: 1.500, now: t0);
+      await dedup.recordFire(
+          alertId: 'a1', stationId: 's2', price: 1.520, now: t0);
+
+      // Per-station gate still suppresses repeats within the window.
+      expect(
+        await dedup.shouldNotify(
+          alertId: 'a1',
+          stationId: 's1',
+          currentPrice: 1.500,
+          now: t0.add(const Duration(hours: 1)),
+        ),
+        isFalse,
+      );
+      expect(
+        await dedup.shouldNotify(
+          alertId: 'a1',
+          stationId: 's2',
+          currentPrice: 1.520,
+          now: t0.add(const Duration(hours: 1)),
+        ),
+        isFalse,
+      );
+      // And the per-station further-drop override still works.
+      expect(
+        await dedup.shouldNotify(
+          alertId: 'a1',
+          stationId: 's2',
+          currentPrice: 1.500,
+          now: t0.add(const Duration(hours: 1)),
+        ),
+        isTrue,
+      );
+    });
+
+    test('clearForAlert wipes both alert-level and per-station rows',
+        () async {
+      final dedup = RadiusAlertDedup();
+      final t0 = DateTime.utc(2026, 4, 22, 12);
+      await dedup.recordAlertFire(
+          alertId: 'a1', cheapestPrice: 1.550, now: t0);
+      await dedup.recordFire(
+          alertId: 'a1', stationId: 's1', price: 1.550, now: t0);
+      await dedup.recordAlertFire(
+          alertId: 'a2', cheapestPrice: 1.560, now: t0);
+
+      await dedup.clearForAlert('a1');
+
+      // a1 alert-level row gone — shouldNotifyAlert returns true.
+      expect(
+        await dedup.shouldNotifyAlert(
+          alertId: 'a1',
+          cheapestPrice: 1.550,
+          now: t0.add(const Duration(minutes: 1)),
+        ),
+        isTrue,
+      );
+      // a2 alert-level row preserved.
+      expect(
+        await dedup.shouldNotifyAlert(
+          alertId: 'a2',
+          cheapestPrice: 1.560,
+          now: t0.add(const Duration(minutes: 1)),
+        ),
+        isFalse,
+      );
+    });
+  });
 }

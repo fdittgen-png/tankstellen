@@ -45,10 +45,19 @@ class _FakeNotifier implements NotificationService {
   Future<void> cancelAll() async {}
 }
 
-RadiusAlertCopy _copy(RadiusAlertNotification event) => RadiusAlertCopy(
-      title: '${event.alert.fuelType.toUpperCase()} near ${event.alert.label}',
-      body: 'A station is at ${event.price.toStringAsFixed(3)}',
-    );
+RadiusAlertCopy _copy(RadiusAlertGroupedEvent event) {
+  final lines = event.matches
+      .map((m) => '${m.stationId} ${m.pricePerLiter.toStringAsFixed(3)}')
+      .toList();
+  if (event.truncatedMoreCount > 0) {
+    lines.add('+ ${event.truncatedMoreCount} more');
+  }
+  return RadiusAlertCopy(
+    title:
+        '${event.alert.fuelType.toUpperCase()} near ${event.alert.label}',
+    body: lines.join('\n'),
+  );
+}
 
 void main() {
   late Directory tempDir;

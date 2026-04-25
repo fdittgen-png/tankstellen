@@ -15,23 +15,38 @@ typedef SamplesForAlert = Future<List<StationPriceSample>> Function(
     RadiusAlert alert);
 
 /// Glue between the background price refresh cycle and the radius
-/// alert evaluator (#578 phase 3).
+/// alert evaluator (#578 phase 3 + #1012 phases 1–2).
 ///
 /// The background isolate calls [run] once per cycle. The runner:
 ///   1. loads every active [RadiusAlert] from [RadiusAlertStore],
-///   2. asks the [samplesFor] callback for stations currently in
+///   2. honours the per-alert frequencyPerDay throttle (#1012 phase 1)
+///      so a 1×/day alert only re-evaluates once per 24 h,
+///   3. asks the [samplesFor] callback for stations currently in
 ///      range of each alert (per-country StationService in the real
 ///      path, fake fixtures in tests),
-///   3. uses [RadiusAlertEvaluator] to pick the matching samples,
-///   4. runs each (alert, station) match past [RadiusAlertDedup]
-///      (12 h default window + further-drop override), and
-///   5. fires one local notification per surviving match through the
-///      injected [NotificationService].
+///   4. uses [RadiusAlertEvaluator] to pick every matching sample,
+///   5. sorts the matches by price ascending, caps at top-5,
+///   6. runs the *alert as a whole* past [RadiusAlertDedup] (12 h
+///      window, with a "cheaper than last fire" override), and
+///   7. fires **one** grouped local notification per alert per cycle
+///      with the top-N stations rolled up into one body.
+///
+/// The dedup record also stamps every per-station match in this cycle
+/// so phase 3's per-station deep-link payload can read the last-fired
+/// price for any station that appeared in a notification — even though
+/// the dedup *decision* is now made at the alert level.
 ///
 /// All collaborators are injected so the service-level integration
 /// test can seed an alert + a fake samples provider and assert that
 /// the notifier was called exactly once.
 class RadiusAlertRunner {
+  /// Maximum number of stations rendered in the grouped notification
+  /// body. Keeping this small (5) means the notification stays
+  /// glanceable on the Android lock screen — anything past five lines
+  /// gets truncated by the system anyway, and the "+ X more" suffix
+  /// tells the user to open the app for the full list.
+  static const int maxStationsInBody = 5;
+
   final RadiusAlertStore store;
   final RadiusAlertDedup dedup;
   final NotificationService notifier;
@@ -42,7 +57,7 @@ class RadiusAlertRunner {
   /// function that formats against the event payload. Keep the
   /// signature stable so the main-isolate preview and the BG runner
   /// emit identical strings.
-  final RadiusAlertCopy Function(RadiusAlertNotification event)
+  final RadiusAlertCopy Function(RadiusAlertGroupedEvent event)
       copyBuilder;
 
   RadiusAlertRunner({
@@ -53,13 +68,13 @@ class RadiusAlertRunner {
     RadiusAlertEvaluator? evaluator,
   }) : evaluator = evaluator ?? const RadiusAlertEvaluator();
 
-  /// Execute the whole pipeline. Returns the list of fired events
-  /// (may be empty) so callers can log / assert / update a widget
-  /// status line without re-walking state.
+  /// Execute the whole pipeline. Returns the list of fired grouped
+  /// events (may be empty) so callers can log / assert / update a
+  /// widget status line without re-walking state.
   ///
   /// Safe to call with no active alerts: the runner returns an empty
   /// list and never touches the notifier.
-  Future<List<RadiusAlertNotification>> run({
+  Future<List<RadiusAlertGroupedEvent>> run({
     required DateTime now,
     required SamplesForAlert samplesFor,
   }) async {
@@ -67,7 +82,7 @@ class RadiusAlertRunner {
     final active = alerts.where((a) => a.enabled).toList();
     if (active.isEmpty) return const [];
 
-    final fired = <RadiusAlertNotification>[];
+    final fired = <RadiusAlertGroupedEvent>[];
     for (final alert in active) {
       try {
         // #1012 phase 1 — per-alert frequency throttling. Skip the
@@ -92,34 +107,62 @@ class RadiusAlertRunner {
         if (samples.isEmpty) continue;
         final matches = evaluator.matches(alert, samples).toList();
         if (matches.isEmpty) continue;
-        for (final match in matches) {
-          final allow = await dedup.shouldNotify(
-            alertId: alert.id,
-            stationId: match.stationId,
-            currentPrice: match.pricePerLiter,
-            now: now,
-          );
-          if (!allow) continue;
 
-          final event = RadiusAlertNotification(
-            alert: alert,
-            stationId: match.stationId,
-            price: match.pricePerLiter,
-          );
-          final copy = copyBuilder(event);
-          await notifier.showPriceAlert(
-            id: _notificationId(alert.id, match.stationId),
-            title: copy.title,
-            body: copy.body,
-          );
+        // #1012 phase 2 — sort cheap-first and cap the rendered list
+        // at top-5. The full list still drives the dedup record so
+        // phase 3 can deep-link any station the user saw.
+        matches.sort(
+            (a, b) => a.pricePerLiter.compareTo(b.pricePerLiter));
+        final cheapest = matches.first.pricePerLiter;
+        final topMatches = matches.length > maxStationsInBody
+            ? matches.sublist(0, maxStationsInBody)
+            : List<StationPriceSample>.from(matches);
+        final truncatedMore = matches.length - topMatches.length;
+
+        // #1012 phase 2 — alert-level dedup. We notify once per alert
+        // per cycle, so the dedup decision is now per-alert, keyed off
+        // the cheapest current match. The "further drop" override
+        // still applies: if the cheapest price has dropped below the
+        // last-fired cheapest, surface again even inside the window.
+        final allow = await dedup.shouldNotifyAlert(
+          alertId: alert.id,
+          cheapestPrice: cheapest,
+          now: now,
+        );
+        if (!allow) continue;
+
+        final event = RadiusAlertGroupedEvent(
+          alert: alert,
+          matches: topMatches,
+          truncatedMoreCount: truncatedMore,
+        );
+        final copy = copyBuilder(event);
+        await notifier.showPriceAlert(
+          id: _notificationId(alert.id),
+          title: copy.title,
+          body: copy.body,
+        );
+        // Stamp the per-alert dedup row first — that's the source of
+        // truth for the next cycle's gating decision.
+        await dedup.recordAlertFire(
+          alertId: alert.id,
+          cheapestPrice: cheapest,
+          now: now,
+        );
+        // Also keep the per-(alert, station) fire records refreshed
+        // for every station in this cycle's match set. Phase 3's
+        // deep-link payload needs to know "what was the price when we
+        // told the user about this station last?" and that lookup
+        // would be impossible if we only stamped the cheapest one.
+        for (final match in matches) {
           await dedup.recordFire(
             alertId: alert.id,
             stationId: match.stationId,
             price: match.pricePerLiter,
             now: now,
           );
-          fired.add(event);
         }
+        fired.add(event);
       } catch (e) {
         // One bad alert (e.g. country API down) must not block the
         // rest — log and keep going.
@@ -129,26 +172,46 @@ class RadiusAlertRunner {
     return fired;
   }
 
-  /// Stable notification id per (alert, station) pair. Re-fires
-  /// overwrite the existing notification in place rather than
-  /// stacking a fresh banner for every periodic check.
-  static int _notificationId(String alertId, String stationId) =>
-      'radius:$alertId:$stationId'.hashCode;
+  /// Stable notification id per alert. Re-fires overwrite the
+  /// existing grouped notification in place rather than stacking a
+  /// fresh banner for every periodic check.
+  ///
+  /// Phase 1 / #578 keyed this by (alertId, stationId) because every
+  /// match produced its own banner; phase 2 collapses the whole alert
+  /// into one banner so the id is keyed on alertId alone.
+  static int _notificationId(String alertId) =>
+      'radius:$alertId'.hashCode;
 }
 
-/// Everything the notification-copy builder needs to format a single
-/// fired radius alert. Kept as a plain value object so the main-
-/// isolate preview and the BG runner produce identical strings.
-class RadiusAlertNotification {
+/// Everything the notification-copy builder needs to format one fired
+/// radius alert (#1012 phase 2). Carries the full top-N station list
+/// plus a `truncatedMoreCount` so the body renderer can append the
+/// "+ X more" suffix when matches got capped.
+///
+/// Kept as a plain value object so the main-isolate preview and the
+/// BG runner produce identical strings.
+class RadiusAlertGroupedEvent {
   final RadiusAlert alert;
-  final String stationId;
-  final double price;
 
-  const RadiusAlertNotification({
+  /// Matching stations, sorted cheapest first and capped to the
+  /// runner's [RadiusAlertRunner.maxStationsInBody] limit.
+  final List<StationPriceSample> matches;
+
+  /// Number of additional matching stations that were dropped from
+  /// [matches] because of the top-N cap. Zero when nothing was
+  /// truncated. Body renderers use this to print "+ X more".
+  final int truncatedMoreCount;
+
+  const RadiusAlertGroupedEvent({
     required this.alert,
-    required this.stationId,
-    required this.price,
+    required this.matches,
+    this.truncatedMoreCount = 0,
   });
+
+  /// Convenience accessor — first (cheapest) match. Body renderers
+  /// often need the headline price for the title before iterating
+  /// the rest for the body lines.
+  StationPriceSample get cheapest => matches.first;
 }
 
 /// User-facing copy for a radius alert notification.

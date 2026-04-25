@@ -581,26 +581,40 @@ Future<void> _runRadiusAlerts({
   debugPrint('BackgroundService: ${fired.length} radius alerts fired');
 }
 
-/// Build notification copy for a radius alert. The BG isolate can't
-/// resolve the full ARB bundle (no BuildContext), so we pick German
-/// vs English from [Platform.localeName] and interpolate placeholders
-/// the same way the main-isolate preview does.
-RadiusAlertCopy _buildRadiusAlertCopy(RadiusAlertNotification event) {
+/// Build notification copy for a radius alert (#1012 phase 2 grouped
+/// fire). The BG isolate can't resolve the full ARB bundle (no
+/// BuildContext), so we pick German vs English from
+/// [Platform.localeName] and interpolate placeholders the same way
+/// the main-isolate preview does.
+///
+/// Title summarises the alert as `<label>: N stations ≤ €X`. Body
+/// renders one line per top-N matching station (cheapest first) and
+/// appends `+ X more` when matches got truncated.
+RadiusAlertCopy _buildRadiusAlertCopy(RadiusAlertGroupedEvent event) {
   final threshold = event.alert.threshold.toStringAsFixed(3);
-  final price = event.price.toStringAsFixed(3);
-  final fuelLabel = event.alert.fuelType.toUpperCase();
   final label = event.alert.label;
   final isGerman = Platform.localeName.toLowerCase().startsWith('de');
+  // Total visible matches *plus* the truncated tail — the title number
+  // should reflect everything the user could see if they tapped in.
+  final total = event.matches.length + event.truncatedMoreCount;
+  final lines = event.matches
+      .map((m) => '${m.stationId} ${m.pricePerLiter.toStringAsFixed(3)} €')
+      .toList();
+  if (event.truncatedMoreCount > 0) {
+    lines.add(isGerman
+        ? '+ ${event.truncatedMoreCount} weitere'
+        : '+ ${event.truncatedMoreCount} more');
+  }
+  final body = lines.join('\n');
   if (isGerman) {
     return RadiusAlertCopy(
-      title: '$fuelLabel in der Nähe von $label',
-      body:
-          'Eine Tankstelle bietet $price € (Grenze: $threshold €)',
+      title: '$label: $total Tankstellen ≤ $threshold €',
+      body: body,
     );
   }
   return RadiusAlertCopy(
-    title: '$fuelLabel near $label',
-    body: 'A station is at $price € (target: $threshold €)',
+    title: '$label: $total stations ≤ $threshold €',
+    body: body,
   );
 }
 
