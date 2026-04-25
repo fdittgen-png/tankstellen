@@ -216,8 +216,15 @@ screen is about" identified in the #923 audit.
 
 **Props:**
 
-- **required** `title: String` — `pageTitle` role. Renders in the
-  `AppBar`.
+- `title: String?` — `pageTitle` role. Renders in the `AppBar` wrapped
+  in `Semantics(header: true, …)`. Mutually exclusive with
+  `titleWidget`: pass exactly one. The `bannerIcon` slot also requires
+  this string variant since the banner shows the title text.
+- `titleWidget: Widget?` — escape hatch for screens whose title cannot
+  be expressed as plain text (e.g. `StationDetailScreen`'s
+  Hero-flighted brand-header composition). Mutually exclusive with
+  `title`. The caller owns the title's semantics (header role,
+  ellipsis, etc.) when this slot is used.
 - `subtitle: String?` — optional second line under the app-bar title.
 - `bannerIcon: IconData?` — when non-null, renders a primary-tinted
   banner strip below the app bar carrying the icon + `title` +
