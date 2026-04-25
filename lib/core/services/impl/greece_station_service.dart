@@ -9,6 +9,7 @@ import '../dio_factory.dart';
 import '../mixins/station_service_helpers.dart';
 import '../service_result.dart';
 import '../station_service.dart';
+import 'greece_prefectures.dart';
 
 /// Greece fuel prices — Paratiritirio Timon (Fuel Price Observatory) via the
 /// community [fuelpricesgr](https://github.com/mavroprovato/fuelpricesgr)
@@ -60,7 +61,8 @@ import '../station_service.dart';
 /// ]
 /// ```
 ///
-/// Fuel-type mapping used by [_fuelForObservatoryKey]:
+/// Fuel-type mapping lives on [GreeceObservatoryKeys] in
+/// `greece_prefectures.dart`:
 ///
 /// ```
 /// UNLEADED_95      → FuelType.e5
@@ -88,98 +90,6 @@ class GreeceStationService
   /// changing the parser.
   static const String defaultBaseUrl = 'https://fuelpricesgr.com/api';
 
-  /// Observatory fuel_type enum → canonical [FuelType].
-  ///
-  /// `DIESEL_HEATING` and `SUPER` are intentionally absent from the
-  /// map. [droppedObservatoryKeys] pins the policy for tests.
-  static const Map<String, FuelType> _fuelForObservatoryKey = {
-    'unleaded_95': FuelType.e5,
-    'unleaded_100': FuelType.e98,
-    'diesel': FuelType.diesel,
-    'gas': FuelType.lpg,
-  };
-
-  /// Keys the parser deliberately drops because no [FuelType] exists
-  /// (DIESEL_HEATING is not a motoring fuel; SUPER is phased-out
-  /// leaded).
-  static const Set<String> droppedObservatoryKeys = {
-    'diesel_heating',
-    'super',
-  };
-
-  /// Representative prefectures used as virtual stations. Coordinates
-  /// are each prefecture's capital (OpenStreetMap). The set is
-  /// deliberately small and geographically spread so a user searching
-  /// from anywhere in Greece hits at least one entry within a
-  /// sensible radius, without flooding the map with 50+ synthetic
-  /// pins.
-  static const List<_GreekPrefecture> _prefectures = [
-    _GreekPrefecture(
-      apiName: 'ATTICA',
-      id: 'gr-attica',
-      displayName: 'Αττική / Attica',
-      place: 'Αθήνα',
-      lat: 37.9838,
-      lng: 23.7275,
-    ),
-    _GreekPrefecture(
-      apiName: 'THESSALONIKI',
-      id: 'gr-thessaloniki',
-      displayName: 'Θεσσαλονίκη / Thessaloniki',
-      place: 'Θεσσαλονίκη',
-      lat: 40.6401,
-      lng: 22.9444,
-    ),
-    _GreekPrefecture(
-      apiName: 'ACHAEA',
-      id: 'gr-achaea',
-      displayName: 'Αχαΐα / Achaea',
-      place: 'Πάτρα',
-      lat: 38.2466,
-      lng: 21.7346,
-    ),
-    _GreekPrefecture(
-      apiName: 'LARISSA',
-      id: 'gr-larissa',
-      displayName: 'Λάρισα / Larissa',
-      place: 'Λάρισα',
-      lat: 39.6390,
-      lng: 22.4191,
-    ),
-    _GreekPrefecture(
-      apiName: 'HERAKLION',
-      id: 'gr-heraklion',
-      displayName: 'Ηράκλειο / Heraklion',
-      place: 'Ηράκλειο',
-      lat: 35.3387,
-      lng: 25.1442,
-    ),
-    _GreekPrefecture(
-      apiName: 'IOANNINA',
-      id: 'gr-ioannina',
-      displayName: 'Ιωάννινα / Ioannina',
-      place: 'Ιωάννινα',
-      lat: 39.6650,
-      lng: 20.8537,
-    ),
-    _GreekPrefecture(
-      apiName: 'DODECANESE',
-      id: 'gr-dodecanese',
-      displayName: 'Δωδεκάνησα / Dodecanese',
-      place: 'Ρόδος',
-      lat: 36.4349,
-      lng: 28.2176,
-    ),
-    _GreekPrefecture(
-      apiName: 'CHANIA',
-      id: 'gr-chania',
-      displayName: 'Χανιά / Chania',
-      place: 'Χανιά',
-      lat: 35.5138,
-      lng: 24.0180,
-    ),
-  ];
-
   final Dio _dio;
   final String _baseUrl;
 
@@ -193,6 +103,17 @@ class GreeceStationService
             ),
         _baseUrl = baseUrl ?? defaultBaseUrl;
 
+  /// Public delegator: case-insensitive lookup for the Observatory
+  /// `fuel_type` enum. Kept on the class so existing tests keep
+  /// working without rewrites.
+  @visibleForTesting
+  static FuelType? fuelForObservatoryKey(String key) =>
+      GreeceObservatoryKeys.lookup(key);
+
+  /// Public delegator: keys the parser intentionally drops.
+  static Set<String> get droppedObservatoryKeys =>
+      GreeceObservatoryKeys.droppedObservatoryKeys;
+
   @override
   Future<ServiceResult<List<Station>>> searchStations(
     SearchParams params, {
@@ -201,7 +122,7 @@ class GreeceStationService
     // Pull the user's nearest prefectures first — a radius-based
     // pre-filter so we don't slam the upstream with 8 serial requests
     // when the user is standing in Athens and the answer is `ATTICA`.
-    final candidates = _prefecturesForQuery(params);
+    final candidates = prefecturesForQuery(params, kGreekPrefectures);
 
     final stations = <Station>[];
     final errors = <ServiceError>[];
@@ -284,7 +205,7 @@ class GreeceStationService
   /// fuel prices onto the virtual station.
   ///
   /// The prefecture is addressed by its stable `stationId` so tests do
-  /// not need access to the private `_GreekPrefecture` class.
+  /// not need access to the [GreekPrefecture] type.
   @visibleForTesting
   Station? parsePrefectureResponse(
     dynamic data, {
@@ -296,8 +217,7 @@ class GreeceStationService
     required double fromLat,
     required double fromLng,
   }) {
-    final list = _coerceList(data);
-    if (list == null) {
+    if (data is! List) {
       throw const ApiException(
         message: 'Paratiritirio returned unparseable body',
       );
@@ -306,14 +226,14 @@ class GreeceStationService
     // Empty list is valid — just means no recent data for this
     // prefecture. Drop the station (a synthetic entry with no prices
     // would clutter the list).
-    if (list.isEmpty) return null;
+    if (data.isEmpty) return null;
 
     // Prefer the newest entry. The community API documents "most recent
     // first" but we defend against order drift by picking the entry with
     // the greatest `date` string (ISO-8601 lexicographic order works).
     Map? newest;
     String newestDate = '';
-    for (final item in list) {
+    for (final item in data) {
       if (item is! Map) continue;
       final date = item['date']?.toString() ?? '';
       if (date.compareTo(newestDate) > 0) {
@@ -323,7 +243,7 @@ class GreeceStationService
     }
     if (newest == null) return null;
 
-    final prices = _parsePrices(newest['data']);
+    final prices = GreeceObservatoryKeys.parsePrices(newest['data']);
     // A prefecture with zero recognised fuel rows is dropped — no
     // synthetic pin for "nothing to show".
     if (prices.isEmpty) return null;
@@ -347,12 +267,6 @@ class GreeceStationService
     );
   }
 
-  /// Exposed for tests — single source of truth for the observatory
-  /// fuel-key → [FuelType] mapping.
-  @visibleForTesting
-  static FuelType? fuelForObservatoryKey(String key) =>
-      _fuelForObservatoryKey[key.toLowerCase()];
-
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(
     String stationId,
@@ -366,84 +280,4 @@ class GreeceStationService
   ) async {
     return emptyPricesResult(ServiceSource.greeceApi);
   }
-
-  // ──────────────────────────────────────────────────────────────────────
-  // Helpers
-  // ──────────────────────────────────────────────────────────────────────
-
-  /// Order the prefectures so the nearest ones come first. Keeps us
-  /// from fanning out to the entire country when the user is standing
-  /// in one prefecture.
-  List<_GreekPrefecture> _prefecturesForQuery(SearchParams params) {
-    final ordered = List<_GreekPrefecture>.from(_prefectures)
-      ..sort((a, b) {
-        final da = roundedDistance(params.lat, params.lng, a.lat, a.lng);
-        final db = roundedDistance(params.lat, params.lng, b.lat, b.lng);
-        return da.compareTo(db);
-      });
-    // Fetch the four closest prefectures. Covers the mainland /
-    // island cases without making 8 serial HTTP calls per search.
-    return ordered.take(4).toList();
-  }
-
-  Map<FuelType, double> _parsePrices(dynamic rawData) {
-    final out = <FuelType, double>{};
-    if (rawData is! List) return out;
-    for (final row in rawData) {
-      if (row is! Map) continue;
-      final key = row['fuel_type']?.toString() ?? '';
-      if (key.isEmpty) continue;
-      final fuel = _fuelForObservatoryKey[key.toLowerCase()];
-      if (fuel == null) continue; // unknown / intentionally dropped
-      final price = _parseEuroPerLitre(row['price']);
-      if (price == null) continue;
-      out[fuel] = price;
-    }
-    return out;
-  }
-
-  /// Observatory prices are EUR per litre with up to three decimals
-  /// (e.g. `1.721`). Accepts `num` and numeric strings. Rejects zero
-  /// and negative values.
-  double? _parseEuroPerLitre(dynamic raw) {
-    if (raw == null) return null;
-    if (raw is num) {
-      if (raw <= 0) return null;
-      return raw.toDouble();
-    }
-    if (raw is String) {
-      final t = raw.trim();
-      if (t.isEmpty) return null;
-      final v = double.tryParse(t);
-      if (v == null || v <= 0) return null;
-      return v;
-    }
-    return null;
-  }
-
-  List? _coerceList(dynamic data) {
-    if (data is List) return data;
-    return null;
-  }
-}
-
-/// Internal representation of a Greek prefecture used as a virtual
-/// station. Kept private — callers only ever see fully-built
-/// [Station] objects.
-class _GreekPrefecture {
-  final String apiName;
-  final String id;
-  final String displayName;
-  final String place;
-  final double lat;
-  final double lng;
-
-  const _GreekPrefecture({
-    required this.apiName,
-    required this.id,
-    required this.displayName,
-    required this.place,
-    required this.lat,
-    required this.lng,
-  });
 }
