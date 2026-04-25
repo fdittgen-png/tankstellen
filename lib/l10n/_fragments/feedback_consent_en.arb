@@ -1,0 +1,54 @@
+{
+  "feedbackConsentTitle": "Send report to GitHub?",
+  "@feedbackConsentTitle": {
+    "description": "Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3)."
+  },
+  "feedbackConsentBody": "This creates a public ticket on our GitHub repository with your photo and the OCR text. No personal data (location, account id) is sent. Continue?",
+  "@feedbackConsentBody": {
+    "description": "Body of the bad-scan-report consent dialog (#952 phase 3)."
+  },
+  "feedbackConsentContinue": "Continue",
+  "@feedbackConsentContinue": {
+    "description": "Primary action of the bad-scan-report consent dialog — opts the user in (#952 phase 3)."
+  },
+  "feedbackConsentCancel": "Cancel",
+  "@feedbackConsentCancel": {
+    "description": "Negative action of the bad-scan-report consent dialog — persists the user's denial (#952 phase 3)."
+  },
+  "feedbackConsentLater": "Later",
+  "@feedbackConsentLater": {
+    "description": "Tertiary action of the bad-scan-report consent dialog — does not persist anything; we re-ask on next attempt (#952 phase 3)."
+  },
+  "feedbackTokenSectionTitle": "Bad-scan feedback (GitHub)",
+  "@feedbackTokenSectionTitle": {
+    "description": "Title of the foldable settings section that lets the user paste a GitHub PAT for the bad-scan reporter (#952 phase 3)."
+  },
+  "feedbackTokenDescription": "To automatically open a GitHub ticket from a failed scan, paste a GitHub PAT (`public_repo` scope on the tankstellen repository). Otherwise manual sharing remains available.",
+  "@feedbackTokenDescription": {
+    "description": "Helper text explaining the PAT requirement on the bad-scan-feedback settings section (#952 phase 3)."
+  },
+  "feedbackTokenStatusSet": "Token configured",
+  "@feedbackTokenStatusSet": {
+    "description": "Status line in the bad-scan-feedback section when a PAT is stored (#952 phase 3)."
+  },
+  "feedbackTokenStatusUnset": "No token",
+  "@feedbackTokenStatusUnset": {
+    "description": "Status line in the bad-scan-feedback section when no PAT is stored (#952 phase 3)."
+  },
+  "feedbackTokenSet": "Set",
+  "@feedbackTokenSet": {
+    "description": "Button in the bad-scan-feedback section that opens the PAT-entry dialog (#952 phase 3)."
+  },
+  "feedbackTokenClear": "Clear",
+  "@feedbackTokenClear": {
+    "description": "Button in the bad-scan-feedback section that wipes the stored PAT (#952 phase 3)."
+  },
+  "feedbackTokenDialogTitle": "GitHub PAT",
+  "@feedbackTokenDialogTitle": {
+    "description": "Title of the dialog that prompts for a GitHub PAT (#952 phase 3)."
+  },
+  "feedbackTokenFieldLabel": "Personal Access Token",
+  "@feedbackTokenFieldLabel": {
+    "description": "Label of the obscured-text field that captures the GitHub PAT (#952 phase 3)."
+  }
+}

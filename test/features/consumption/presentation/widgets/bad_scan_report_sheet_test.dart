@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:share_plus/share_plus.dart';
+import 'package:tankstellen/core/feedback/feedback_consent.dart';
 import 'package:tankstellen/core/feedback/github_issue_reporter.dart';
 import 'package:tankstellen/core/feedback/github_issue_reporter_provider.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
@@ -37,6 +38,9 @@ void main() {
     ShareFallback? shareFallback,
     UrlLauncher? urlLauncher,
     ImageBytesReader? imageBytesReader,
+    ConsentPrompter? consentPrompter,
+    ConsentReader? consentReader,
+    ConsentWriter? consentWriter,
   }) {
     return tester.pumpWidget(
       ProviderScope(
@@ -54,6 +58,9 @@ void main() {
               shareFallback: shareFallback,
               urlLauncher: urlLauncher,
               imageBytesReader: imageBytesReader,
+              consentPrompter: consentPrompter,
+              consentReader: consentReader,
+              consentWriter: consentWriter,
             ),
           ),
         ),
@@ -130,6 +137,8 @@ void main() {
           return true;
         },
         imageBytesReader: stubImageReader,
+        consentReader: () async => FeedbackConsentState.granted,
+        consentWriter: (_) async {},
       );
       await tester.pumpAndSettle();
 
@@ -178,6 +187,8 @@ void main() {
           sharedParams.add(params);
         },
         imageBytesReader: stubImageReader,
+        consentReader: () async => FeedbackConsentState.granted,
+        consentWriter: (_) async {},
       );
       await tester.pumpAndSettle();
 
@@ -226,6 +237,210 @@ void main() {
         find.text('Submission failed — manual share'),
         findsNothing,
       );
+    });
+  });
+
+  group('consent gate (#952 phase 3)', () {
+    testWidgets(
+        'consent unset → user grants → reporter is called and persisted',
+        (tester) async {
+      final reporter = _FakeReporter(
+        onCall: () async =>
+            Uri.parse('https://github.com/fdittgen-png/tankstellen/issues/77'),
+      );
+      final writes = <FeedbackConsentState>[];
+      var promptCount = 0;
+
+      await pumpSheet(
+        tester,
+        overrides: [
+          githubIssueReporterProvider.overrideWith(
+            (ref) async => reporter,
+          ),
+        ],
+        imageBytesReader: stubImageReader,
+        consentReader: () async => FeedbackConsentState.unset,
+        consentWriter: (state) async {
+          writes.add(state);
+        },
+        consentPrompter: (_) async {
+          promptCount++;
+          return FeedbackConsentChoice.granted;
+        },
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Create issue'));
+      for (var i = 0; i < 30; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+
+      expect(promptCount, 1);
+      expect(writes, [FeedbackConsentState.granted]);
+      expect(reporter.callCount, 1);
+      expect(find.text('Open in browser'), findsOneWidget);
+    });
+
+    testWidgets(
+        'consent unset → user denies → no reporter call, falls back to share',
+        (tester) async {
+      final reporter = _FakeReporter(
+        onCall: () async =>
+            throw StateError('reporter must NOT be called when denied'),
+      );
+      final sharedParams = <ShareParams>[];
+      final writes = <FeedbackConsentState>[];
+
+      await pumpSheet(
+        tester,
+        overrides: [
+          githubIssueReporterProvider.overrideWith(
+            (ref) async => reporter,
+          ),
+        ],
+        shareFallback: (params) async {
+          sharedParams.add(params);
+        },
+        imageBytesReader: stubImageReader,
+        consentReader: () async => FeedbackConsentState.unset,
+        consentWriter: (state) async {
+          writes.add(state);
+        },
+        consentPrompter: (_) async => FeedbackConsentChoice.denied,
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Create issue'));
+      for (var i = 0; i < 30; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+
+      expect(reporter.callCount, 0);
+      expect(writes, [FeedbackConsentState.denied]);
+      expect(sharedParams, hasLength(1));
+    });
+
+    testWidgets(
+        'consent already granted → no prompt, reporter is called',
+        (tester) async {
+      final reporter = _FakeReporter(
+        onCall: () async =>
+            Uri.parse('https://github.com/fdittgen-png/tankstellen/issues/88'),
+      );
+      var promptCount = 0;
+      final writes = <FeedbackConsentState>[];
+
+      await pumpSheet(
+        tester,
+        overrides: [
+          githubIssueReporterProvider.overrideWith(
+            (ref) async => reporter,
+          ),
+        ],
+        imageBytesReader: stubImageReader,
+        consentReader: () async => FeedbackConsentState.granted,
+        consentWriter: (state) async {
+          writes.add(state);
+        },
+        consentPrompter: (_) async {
+          promptCount++;
+          return FeedbackConsentChoice.granted;
+        },
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Create issue'));
+      for (var i = 0; i < 30; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+
+      expect(promptCount, 0);
+      expect(writes, isEmpty);
+      expect(reporter.callCount, 1);
+    });
+
+    testWidgets(
+        'consent already denied → no prompt, no reporter call, falls back',
+        (tester) async {
+      final reporter = _FakeReporter(
+        onCall: () async =>
+            throw StateError('reporter must NOT be called when denied'),
+      );
+      final sharedParams = <ShareParams>[];
+      var promptCount = 0;
+
+      await pumpSheet(
+        tester,
+        overrides: [
+          githubIssueReporterProvider.overrideWith(
+            (ref) async => reporter,
+          ),
+        ],
+        shareFallback: (params) async {
+          sharedParams.add(params);
+        },
+        imageBytesReader: stubImageReader,
+        consentReader: () async => FeedbackConsentState.denied,
+        consentWriter: (_) async {},
+        consentPrompter: (_) async {
+          promptCount++;
+          return FeedbackConsentChoice.granted;
+        },
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Create issue'));
+      for (var i = 0; i < 30; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+
+      expect(promptCount, 0);
+      expect(reporter.callCount, 0);
+      expect(sharedParams, hasLength(1));
+    });
+
+    testWidgets(
+        'Later → no persistence, falls back, next attempt re-asks',
+        (tester) async {
+      final reporter = _FakeReporter(
+        onCall: () async =>
+            throw StateError('reporter must NOT be called on later'),
+      );
+      final sharedParams = <ShareParams>[];
+      final writes = <FeedbackConsentState>[];
+      var promptCount = 0;
+
+      await pumpSheet(
+        tester,
+        overrides: [
+          githubIssueReporterProvider.overrideWith(
+            (ref) async => reporter,
+          ),
+        ],
+        shareFallback: (params) async {
+          sharedParams.add(params);
+        },
+        imageBytesReader: stubImageReader,
+        consentReader: () async => FeedbackConsentState.unset,
+        consentWriter: (state) async {
+          writes.add(state);
+        },
+        consentPrompter: (_) async {
+          promptCount++;
+          return FeedbackConsentChoice.later;
+        },
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Create issue'));
+      for (var i = 0; i < 30; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+
+      expect(promptCount, 1);
+      expect(writes, isEmpty); // "Later" must NOT persist.
+      expect(reporter.callCount, 0);
+      expect(sharedParams, hasLength(1));
     });
   });
 }

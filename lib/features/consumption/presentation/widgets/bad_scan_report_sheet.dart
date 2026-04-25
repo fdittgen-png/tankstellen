@@ -6,10 +6,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/feedback/feedback_consent.dart';
 import '../../../../core/feedback/github_issue_reporter.dart';
 import '../../../../core/feedback/github_issue_reporter_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/receipt_scan_service.dart';
+
+/// Test seam for the consent prompt. Production code uses
+/// [FeedbackConsentDialog.show]; widget tests can replace it with a
+/// stub that returns a pre-canned [FeedbackConsentChoice].
+typedef ConsentPrompter = Future<FeedbackConsentChoice> Function(
+    BuildContext context);
+
+/// Test seam for the persisted consent state. Production code reads
+/// from `shared_preferences` via [FeedbackConsent.read].
+typedef ConsentReader = Future<FeedbackConsentState> Function();
+
+/// Test seam for persisting a consent choice. Production code writes
+/// to `shared_preferences` via [FeedbackConsent.write].
+typedef ConsentWriter = Future<void> Function(FeedbackConsentState state);
 
 /// Share callback signature so widget tests can substitute the
 /// [SharePlus] platform channel with a Dart-only fake. Production
@@ -58,6 +73,21 @@ class BadScanReportSheet extends ConsumerStatefulWidget {
   @visibleForTesting
   final ImageBytesReader? imageBytesReader;
 
+  /// Injected for widget tests. In production this calls
+  /// [FeedbackConsentDialog.show].
+  @visibleForTesting
+  final ConsentPrompter? consentPrompter;
+
+  /// Injected for widget tests. In production this calls
+  /// [FeedbackConsent.read].
+  @visibleForTesting
+  final ConsentReader? consentReader;
+
+  /// Injected for widget tests. In production this calls
+  /// [FeedbackConsent.write].
+  @visibleForTesting
+  final ConsentWriter? consentWriter;
+
   const BadScanReportSheet({
     super.key,
     required this.scan,
@@ -67,6 +97,9 @@ class BadScanReportSheet extends ConsumerStatefulWidget {
     this.shareFallback,
     this.urlLauncher,
     this.imageBytesReader,
+    this.consentPrompter,
+    this.consentReader,
+    this.consentWriter,
   });
 
   @override
@@ -197,7 +230,39 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
           await ref.read(githubIssueReporterProvider.future);
       if (reporter == null) {
         // No token configured — fall back silently to the system share
-        // sheet (phase 2 behaviour). Phase 3 adds a token-entry UI.
+        // sheet. The settings screen exposes a token-entry UI
+        // ([FeedbackTokenSection]); the user has chosen to skip it.
+        await _runShareFallback(showSnackbar: false);
+        return;
+      }
+
+      // #952 phase 3 — consent gate. Token-holders still need to opt
+      // in once before we POST anything to GitHub.
+      final reader = widget.consentReader ?? FeedbackConsent.read;
+      final writer = widget.consentWriter ?? FeedbackConsent.write;
+      var consent = await reader();
+      if (consent == FeedbackConsentState.unset) {
+        if (!mounted) return;
+        final prompter =
+            widget.consentPrompter ?? FeedbackConsentDialog.show;
+        final choice = await prompter(context);
+        switch (choice) {
+          case FeedbackConsentChoice.granted:
+            await writer(FeedbackConsentState.granted);
+            consent = FeedbackConsentState.granted;
+            break;
+          case FeedbackConsentChoice.denied:
+            await writer(FeedbackConsentState.denied);
+            consent = FeedbackConsentState.denied;
+            break;
+          case FeedbackConsentChoice.later:
+            // Don't persist — re-ask next attempt. Fall back silently
+            // for this submission.
+            break;
+        }
+      }
+
+      if (consent != FeedbackConsentState.granted) {
         await _runShareFallback(showSnackbar: false);
         return;
       }

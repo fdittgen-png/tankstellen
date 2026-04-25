@@ -6008,6 +6008,84 @@ abstract class AppLocalizations {
   /// **'Powered by pretcarburant.ro (Competition Council + ANPC)'**
   String get romaniaScrapingNotice;
 
+  /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Send report to GitHub?'**
+  String get feedbackConsentTitle;
+
+  /// Body of the bad-scan-report consent dialog (#952 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'This creates a public ticket on our GitHub repository with your photo and the OCR text. No personal data (location, account id) is sent. Continue?'**
+  String get feedbackConsentBody;
+
+  /// Primary action of the bad-scan-report consent dialog — opts the user in (#952 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get feedbackConsentContinue;
+
+  /// Negative action of the bad-scan-report consent dialog — persists the user's denial (#952 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get feedbackConsentCancel;
+
+  /// Tertiary action of the bad-scan-report consent dialog — does not persist anything; we re-ask on next attempt (#952 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get feedbackConsentLater;
+
+  /// Title of the foldable settings section that lets the user paste a GitHub PAT for the bad-scan reporter (#952 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Bad-scan feedback (GitHub)'**
+  String get feedbackTokenSectionTitle;
+
+  /// Helper text explaining the PAT requirement on the bad-scan-feedback settings section (#952 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'To automatically open a GitHub ticket from a failed scan, paste a GitHub PAT (`public_repo` scope on the tankstellen repository). Otherwise manual sharing remains available.'**
+  String get feedbackTokenDescription;
+
+  /// Status line in the bad-scan-feedback section when a PAT is stored (#952 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Token configured'**
+  String get feedbackTokenStatusSet;
+
+  /// Status line in the bad-scan-feedback section when no PAT is stored (#952 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'No token'**
+  String get feedbackTokenStatusUnset;
+
+  /// Button in the bad-scan-feedback section that opens the PAT-entry dialog (#952 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Set'**
+  String get feedbackTokenSet;
+
+  /// Button in the bad-scan-feedback section that wipes the stored PAT (#952 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get feedbackTokenClear;
+
+  /// Title of the dialog that prompts for a GitHub PAT (#952 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub PAT'**
+  String get feedbackTokenDialogTitle;
+
+  /// Label of the obscured-text field that captures the GitHub PAT (#952 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Access Token'**
+  String get feedbackTokenFieldLabel;
+
   /// Snackbar shown on the Add-Fill-Up screen when the receipt scan returns no usable fields (#751).
   ///
   /// In en, this message translates to:

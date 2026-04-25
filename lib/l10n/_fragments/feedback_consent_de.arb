@@ -1,0 +1,15 @@
+{
+  "feedbackConsentTitle": "Bericht an GitHub senden?",
+  "feedbackConsentBody": "Damit wird ein öffentliches Ticket in unserem GitHub-Repository mit deinem Foto und dem OCR-Text erstellt. Es werden keine personenbezogenen Daten (Standort, Konto-ID) gesendet. Fortfahren?",
+  "feedbackConsentContinue": "Fortfahren",
+  "feedbackConsentCancel": "Abbrechen",
+  "feedbackConsentLater": "Später",
+  "feedbackTokenSectionTitle": "Scan-Feedback (GitHub)",
+  "feedbackTokenDescription": "Um aus einem fehlgeschlagenen Scan automatisch ein GitHub-Ticket zu erstellen, füge einen GitHub-PAT ein (`public_repo`-Scope auf dem Tankstellen-Repository). Andernfalls bleibt das manuelle Teilen verfügbar.",
+  "feedbackTokenStatusSet": "Token gespeichert",
+  "feedbackTokenStatusUnset": "Kein Token",
+  "feedbackTokenSet": "Setzen",
+  "feedbackTokenClear": "Löschen",
+  "feedbackTokenDialogTitle": "GitHub-PAT",
+  "feedbackTokenFieldLabel": "Personal Access Token"
+}
