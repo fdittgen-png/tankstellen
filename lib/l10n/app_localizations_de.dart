@@ -3460,6 +3460,21 @@ class AppLocalizationsDe extends AppLocalizations {
       'Adapter konnte nicht verbunden werden. Du kannst es erneut versuchen oder überspringen.';
 
   @override
+  String get alertsRadiusFrequencyLabel => 'Prüfintervall';
+
+  @override
+  String get alertsRadiusFrequencyDaily => 'Einmal täglich';
+
+  @override
+  String get alertsRadiusFrequencyTwiceDaily => 'Zweimal täglich';
+
+  @override
+  String get alertsRadiusFrequencyThriceDaily => 'Dreimal täglich';
+
+  @override
+  String get alertsRadiusFrequencyFourTimesDaily => 'Viermal täglich';
+
+  @override
   String get radiusAlertPickOnMap => 'Auf Karte wählen';
 
   @override

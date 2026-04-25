@@ -882,5 +882,10 @@
   "themeSettingsDarkLabel": "Sombre",
   "themeSettingsSystemDescription": "Utilise l'apparence actuelle de l'appareil.",
   "themeSettingsLightDescription": "Arrière-plans clairs — idéal en journée.",
-  "themeSettingsDarkDescription": "Arrière-plans sombres — plus doux pour les yeux la nuit et économe en batterie sur les écrans OLED."
+  "themeSettingsDarkDescription": "Arrière-plans sombres — plus doux pour les yeux la nuit et économe en batterie sur les écrans OLED.",
+  "alertsRadiusFrequencyLabel": "Fréquence de vérification",
+  "alertsRadiusFrequencyDaily": "Une fois par jour",
+  "alertsRadiusFrequencyTwiceDaily": "Deux fois par jour",
+  "alertsRadiusFrequencyThriceDaily": "Trois fois par jour",
+  "alertsRadiusFrequencyFourTimesDaily": "Quatre fois par jour"
 }

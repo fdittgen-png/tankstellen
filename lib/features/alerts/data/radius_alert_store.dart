@@ -24,6 +24,13 @@ class RadiusAlertStore {
   /// iterate alerts from an isolate without re-importing this class.
   static const String keyPrefix = 'radius_alert:';
 
+  /// Side-table prefix for the per-alert "last evaluated by the
+  /// runner" timestamp (#1012 phase 1). Stored separately from the
+  /// entity payload so the [RadiusAlert] config stays a pure value
+  /// object that the user controls; the runner-only state lives
+  /// here.
+  static const String lastEvalKeyPrefix = 'radius_alert_last_eval:';
+
   Box? _boxOrNull() {
     try {
       if (!Hive.isBoxOpen(HiveBoxes.alerts)) return null;
@@ -71,10 +78,56 @@ class RadiusAlertStore {
   }
 
   /// Remove a radius alert by id. No-op when the key isn't present.
+  /// Also drops the matching last-evaluated record so re-creating an
+  /// alert with the same id starts with a clean throttler.
   Future<void> remove(String id) async {
     final box = _boxOrNull();
     if (box == null) return;
     await box.delete('$keyPrefix$id');
+    await box.delete('$lastEvalKeyPrefix$id');
+  }
+
+  /// Read the last-evaluated timestamp the runner recorded for
+  /// [alertId], or `null` when this alert has never been touched
+  /// (e.g. brand-new alert, or app upgraded from a pre-#1012 build
+  /// where this side-table did not yet exist). The runner treats
+  /// `null` as "evaluate" — see
+  /// `RadiusAlertRunner.run` for the throttling rule.
+  Future<DateTime?> getLastEvaluatedAt(String alertId) async {
+    final box = _boxOrNull();
+    if (box == null) return null;
+    final raw = box.get('$lastEvalKeyPrefix$alertId');
+    if (raw == null) return null;
+    if (raw is String) {
+      try {
+        return DateTime.parse(raw);
+      } catch (e) {
+        debugPrint(
+            'RadiusAlertStore.getLastEvaluatedAt: bad ISO timestamp '
+            'for $alertId: $e');
+        return null;
+      }
+    }
+    if (raw is int) {
+      // Belt-and-braces: accept epoch-millis writes from older
+      // experimental builds.
+      return DateTime.fromMillisecondsSinceEpoch(raw, isUtc: true);
+    }
+    return null;
+  }
+
+  /// Record that the runner has just evaluated [alertId] at [now].
+  /// Stored as ISO-8601 so a Hive box dump stays human-readable in
+  /// support diagnostics.
+  Future<void> recordEvaluatedAt(String alertId, DateTime now) async {
+    final box = _boxOrNull();
+    if (box == null) {
+      debugPrint(
+          'RadiusAlertStore.recordEvaluatedAt: alerts box closed, '
+          'dropping $alertId @ $now');
+      return;
+    }
+    await box.put('$lastEvalKeyPrefix$alertId', now.toIso8601String());
   }
 
   /// Accept either a `Map` (the default Hive round-trip for our

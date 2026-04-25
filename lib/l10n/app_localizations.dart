@@ -6434,6 +6434,36 @@ abstract class AppLocalizations {
   /// **'Couldn\'t connect to the adapter. You can retry or skip.'**
   String get onboardingObd2ConnectFailed;
 
+  /// Label of the per-alert frequency dropdown (#1012 phase 1) — chooses how often the background runner re-evaluates this radius alert.
+  ///
+  /// In en, this message translates to:
+  /// **'Check frequency'**
+  String get alertsRadiusFrequencyLabel;
+
+  /// Per-alert frequency option: evaluate at most once every 24 h (#1012 phase 1).
+  ///
+  /// In en, this message translates to:
+  /// **'Once a day'**
+  String get alertsRadiusFrequencyDaily;
+
+  /// Per-alert frequency option: evaluate at most once every 12 h (#1012 phase 1).
+  ///
+  /// In en, this message translates to:
+  /// **'Twice a day'**
+  String get alertsRadiusFrequencyTwiceDaily;
+
+  /// Per-alert frequency option: evaluate at most once every 8 h (#1012 phase 1).
+  ///
+  /// In en, this message translates to:
+  /// **'Three times a day'**
+  String get alertsRadiusFrequencyThriceDaily;
+
+  /// Per-alert frequency option: evaluate at most once every 6 h (#1012 phase 1).
+  ///
+  /// In en, this message translates to:
+  /// **'Four times a day'**
+  String get alertsRadiusFrequencyFourTimesDaily;
+
   /// Button on the radius-alert create sheet that opens the full-screen map-picker for the alert center (#578 phase 3).
   ///
   /// In en, this message translates to:

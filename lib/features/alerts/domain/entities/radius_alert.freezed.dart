@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RadiusAlert {
 
- String get id; String get fuelType; double get threshold; double get centerLat; double get centerLng; double get radiusKm; String get label; DateTime get createdAt; bool get enabled;
+ String get id; String get fuelType; double get threshold; double get centerLat; double get centerLng; double get radiusKm; String get label; DateTime get createdAt; bool get enabled; int get frequencyPerDay;
 /// Create a copy of RadiusAlert
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $RadiusAlertCopyWith<RadiusAlert> get copyWith => _$RadiusAlertCopyWithImpl<Radi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RadiusAlert&&(identical(other.id, id) || other.id == id)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.threshold, threshold) || other.threshold == threshold)&&(identical(other.centerLat, centerLat) || other.centerLat == centerLat)&&(identical(other.centerLng, centerLng) || other.centerLng == centerLng)&&(identical(other.radiusKm, radiusKm) || other.radiusKm == radiusKm)&&(identical(other.label, label) || other.label == label)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.enabled, enabled) || other.enabled == enabled));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RadiusAlert&&(identical(other.id, id) || other.id == id)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.threshold, threshold) || other.threshold == threshold)&&(identical(other.centerLat, centerLat) || other.centerLat == centerLat)&&(identical(other.centerLng, centerLng) || other.centerLng == centerLng)&&(identical(other.radiusKm, radiusKm) || other.radiusKm == radiusKm)&&(identical(other.label, label) || other.label == label)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.enabled, enabled) || other.enabled == enabled)&&(identical(other.frequencyPerDay, frequencyPerDay) || other.frequencyPerDay == frequencyPerDay));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,fuelType,threshold,centerLat,centerLng,radiusKm,label,createdAt,enabled);
+int get hashCode => Object.hash(runtimeType,id,fuelType,threshold,centerLat,centerLng,radiusKm,label,createdAt,enabled,frequencyPerDay);
 
 @override
 String toString() {
-  return 'RadiusAlert(id: $id, fuelType: $fuelType, threshold: $threshold, centerLat: $centerLat, centerLng: $centerLng, radiusKm: $radiusKm, label: $label, createdAt: $createdAt, enabled: $enabled)';
+  return 'RadiusAlert(id: $id, fuelType: $fuelType, threshold: $threshold, centerLat: $centerLat, centerLng: $centerLng, radiusKm: $radiusKm, label: $label, createdAt: $createdAt, enabled: $enabled, frequencyPerDay: $frequencyPerDay)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $RadiusAlertCopyWith<$Res>  {
   factory $RadiusAlertCopyWith(RadiusAlert value, $Res Function(RadiusAlert) _then) = _$RadiusAlertCopyWithImpl;
 @useResult
 $Res call({
- String id, String fuelType, double threshold, double centerLat, double centerLng, double radiusKm, String label, DateTime createdAt, bool enabled
+ String id, String fuelType, double threshold, double centerLat, double centerLng, double radiusKm, String label, DateTime createdAt, bool enabled, int frequencyPerDay
 });
 
 
@@ -65,7 +65,7 @@ class _$RadiusAlertCopyWithImpl<$Res>
 
 /// Create a copy of RadiusAlert
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fuelType = null,Object? threshold = null,Object? centerLat = null,Object? centerLng = null,Object? radiusKm = null,Object? label = null,Object? createdAt = null,Object? enabled = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fuelType = null,Object? threshold = null,Object? centerLat = null,Object? centerLng = null,Object? radiusKm = null,Object? label = null,Object? createdAt = null,Object? enabled = null,Object? frequencyPerDay = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fuelType: null == fuelType ? _self.fuelType : fuelType // ignore: cast_nullable_to_non_nullable
@@ -76,7 +76,8 @@ as double,radiusKm: null == radiusKm ? _self.radiusKm : radiusKm // ignore: cast
 as double,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,enabled: null == enabled ? _self.enabled : enabled // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,frequencyPerDay: null == frequencyPerDay ? _self.frequencyPerDay : frequencyPerDay // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -161,10 +162,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fuelType,  double threshold,  double centerLat,  double centerLng,  double radiusKm,  String label,  DateTime createdAt,  bool enabled)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fuelType,  double threshold,  double centerLat,  double centerLng,  double radiusKm,  String label,  DateTime createdAt,  bool enabled,  int frequencyPerDay)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RadiusAlert() when $default != null:
-return $default(_that.id,_that.fuelType,_that.threshold,_that.centerLat,_that.centerLng,_that.radiusKm,_that.label,_that.createdAt,_that.enabled);case _:
+return $default(_that.id,_that.fuelType,_that.threshold,_that.centerLat,_that.centerLng,_that.radiusKm,_that.label,_that.createdAt,_that.enabled,_that.frequencyPerDay);case _:
   return orElse();
 
 }
@@ -182,10 +183,10 @@ return $default(_that.id,_that.fuelType,_that.threshold,_that.centerLat,_that.ce
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fuelType,  double threshold,  double centerLat,  double centerLng,  double radiusKm,  String label,  DateTime createdAt,  bool enabled)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fuelType,  double threshold,  double centerLat,  double centerLng,  double radiusKm,  String label,  DateTime createdAt,  bool enabled,  int frequencyPerDay)  $default,) {final _that = this;
 switch (_that) {
 case _RadiusAlert():
-return $default(_that.id,_that.fuelType,_that.threshold,_that.centerLat,_that.centerLng,_that.radiusKm,_that.label,_that.createdAt,_that.enabled);case _:
+return $default(_that.id,_that.fuelType,_that.threshold,_that.centerLat,_that.centerLng,_that.radiusKm,_that.label,_that.createdAt,_that.enabled,_that.frequencyPerDay);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +203,10 @@ return $default(_that.id,_that.fuelType,_that.threshold,_that.centerLat,_that.ce
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fuelType,  double threshold,  double centerLat,  double centerLng,  double radiusKm,  String label,  DateTime createdAt,  bool enabled)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fuelType,  double threshold,  double centerLat,  double centerLng,  double radiusKm,  String label,  DateTime createdAt,  bool enabled,  int frequencyPerDay)?  $default,) {final _that = this;
 switch (_that) {
 case _RadiusAlert() when $default != null:
-return $default(_that.id,_that.fuelType,_that.threshold,_that.centerLat,_that.centerLng,_that.radiusKm,_that.label,_that.createdAt,_that.enabled);case _:
+return $default(_that.id,_that.fuelType,_that.threshold,_that.centerLat,_that.centerLng,_that.radiusKm,_that.label,_that.createdAt,_that.enabled,_that.frequencyPerDay);case _:
   return null;
 
 }
@@ -217,7 +218,7 @@ return $default(_that.id,_that.fuelType,_that.threshold,_that.centerLat,_that.ce
 @JsonSerializable()
 
 class _RadiusAlert implements RadiusAlert {
-  const _RadiusAlert({required this.id, required this.fuelType, required this.threshold, required this.centerLat, required this.centerLng, required this.radiusKm, required this.label, required this.createdAt, this.enabled = true});
+  const _RadiusAlert({required this.id, required this.fuelType, required this.threshold, required this.centerLat, required this.centerLng, required this.radiusKm, required this.label, required this.createdAt, this.enabled = true, this.frequencyPerDay = 1});
   factory _RadiusAlert.fromJson(Map<String, dynamic> json) => _$RadiusAlertFromJson(json);
 
 @override final  String id;
@@ -229,6 +230,7 @@ class _RadiusAlert implements RadiusAlert {
 @override final  String label;
 @override final  DateTime createdAt;
 @override@JsonKey() final  bool enabled;
+@override@JsonKey() final  int frequencyPerDay;
 
 /// Create a copy of RadiusAlert
 /// with the given fields replaced by the non-null parameter values.
@@ -243,16 +245,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RadiusAlert&&(identical(other.id, id) || other.id == id)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.threshold, threshold) || other.threshold == threshold)&&(identical(other.centerLat, centerLat) || other.centerLat == centerLat)&&(identical(other.centerLng, centerLng) || other.centerLng == centerLng)&&(identical(other.radiusKm, radiusKm) || other.radiusKm == radiusKm)&&(identical(other.label, label) || other.label == label)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.enabled, enabled) || other.enabled == enabled));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RadiusAlert&&(identical(other.id, id) || other.id == id)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.threshold, threshold) || other.threshold == threshold)&&(identical(other.centerLat, centerLat) || other.centerLat == centerLat)&&(identical(other.centerLng, centerLng) || other.centerLng == centerLng)&&(identical(other.radiusKm, radiusKm) || other.radiusKm == radiusKm)&&(identical(other.label, label) || other.label == label)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.enabled, enabled) || other.enabled == enabled)&&(identical(other.frequencyPerDay, frequencyPerDay) || other.frequencyPerDay == frequencyPerDay));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,fuelType,threshold,centerLat,centerLng,radiusKm,label,createdAt,enabled);
+int get hashCode => Object.hash(runtimeType,id,fuelType,threshold,centerLat,centerLng,radiusKm,label,createdAt,enabled,frequencyPerDay);
 
 @override
 String toString() {
-  return 'RadiusAlert(id: $id, fuelType: $fuelType, threshold: $threshold, centerLat: $centerLat, centerLng: $centerLng, radiusKm: $radiusKm, label: $label, createdAt: $createdAt, enabled: $enabled)';
+  return 'RadiusAlert(id: $id, fuelType: $fuelType, threshold: $threshold, centerLat: $centerLat, centerLng: $centerLng, radiusKm: $radiusKm, label: $label, createdAt: $createdAt, enabled: $enabled, frequencyPerDay: $frequencyPerDay)';
 }
 
 
@@ -263,7 +265,7 @@ abstract mixin class _$RadiusAlertCopyWith<$Res> implements $RadiusAlertCopyWith
   factory _$RadiusAlertCopyWith(_RadiusAlert value, $Res Function(_RadiusAlert) _then) = __$RadiusAlertCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String fuelType, double threshold, double centerLat, double centerLng, double radiusKm, String label, DateTime createdAt, bool enabled
+ String id, String fuelType, double threshold, double centerLat, double centerLng, double radiusKm, String label, DateTime createdAt, bool enabled, int frequencyPerDay
 });
 
 
@@ -280,7 +282,7 @@ class __$RadiusAlertCopyWithImpl<$Res>
 
 /// Create a copy of RadiusAlert
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fuelType = null,Object? threshold = null,Object? centerLat = null,Object? centerLng = null,Object? radiusKm = null,Object? label = null,Object? createdAt = null,Object? enabled = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fuelType = null,Object? threshold = null,Object? centerLat = null,Object? centerLng = null,Object? radiusKm = null,Object? label = null,Object? createdAt = null,Object? enabled = null,Object? frequencyPerDay = null,}) {
   return _then(_RadiusAlert(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fuelType: null == fuelType ? _self.fuelType : fuelType // ignore: cast_nullable_to_non_nullable
@@ -291,7 +293,8 @@ as double,radiusKm: null == radiusKm ? _self.radiusKm : radiusKm // ignore: cast
 as double,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
 as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,enabled: null == enabled ? _self.enabled : enabled // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,frequencyPerDay: null == frequencyPerDay ? _self.frequencyPerDay : frequencyPerDay // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

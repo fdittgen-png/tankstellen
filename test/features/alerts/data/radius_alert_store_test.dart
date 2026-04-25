@@ -153,4 +153,90 @@ void main() {
       await Hive.openBox(HiveBoxes.alerts);
     });
   });
+
+  group('RadiusAlertStore lastEvaluatedAt (#1012 phase 1)', () {
+    test('getLastEvaluatedAt returns null for an unknown id', () async {
+      final store = RadiusAlertStore();
+      expect(await store.getLastEvaluatedAt('does-not-exist'), isNull);
+    });
+
+    test('recordEvaluatedAt persists a timestamp readable by getLastEvaluatedAt',
+        () async {
+      final store = RadiusAlertStore();
+      final t = DateTime.utc(2026, 4, 22, 9, 30);
+
+      await store.recordEvaluatedAt('a1', t);
+
+      expect(await store.getLastEvaluatedAt('a1'), equals(t));
+    });
+
+    test('recordEvaluatedAt overwrites the previous timestamp for the same id',
+        () async {
+      final store = RadiusAlertStore();
+      final t0 = DateTime.utc(2026, 4, 22, 9);
+      final t1 = DateTime.utc(2026, 4, 23, 9);
+
+      await store.recordEvaluatedAt('a1', t0);
+      await store.recordEvaluatedAt('a1', t1);
+
+      expect(await store.getLastEvaluatedAt('a1'), equals(t1));
+    });
+
+    test('recordEvaluatedAt is namespaced per alert id', () async {
+      final store = RadiusAlertStore();
+      final t0 = DateTime.utc(2026, 4, 22, 9);
+      final t1 = DateTime.utc(2026, 4, 23, 9);
+
+      await store.recordEvaluatedAt('a1', t0);
+      await store.recordEvaluatedAt('a2', t1);
+
+      expect(await store.getLastEvaluatedAt('a1'), equals(t0));
+      expect(await store.getLastEvaluatedAt('a2'), equals(t1));
+      expect(await store.getLastEvaluatedAt('a3'), isNull);
+    });
+
+    test('lastEvaluatedAt records do not pollute list()', () async {
+      // The side-table uses a different key prefix; list() must not
+      // pick those entries up and try to deserialize them as
+      // RadiusAlert payloads.
+      final store = RadiusAlertStore();
+      await store.recordEvaluatedAt('a1', DateTime.utc(2026, 4, 22));
+
+      expect(await store.list(), isEmpty);
+    });
+
+    test('remove drops the matching lastEvaluatedAt record', () async {
+      final store = RadiusAlertStore();
+      await store.upsert(makeAlert(id: 'a1'));
+      await store.recordEvaluatedAt('a1', DateTime.utc(2026, 4, 22));
+
+      await store.remove('a1');
+
+      expect(await store.getLastEvaluatedAt('a1'), isNull);
+    });
+
+    test(
+        'a freshly-loaded RadiusAlert defaults frequencyPerDay to 1 '
+        '(pre-#1012 hive payload backwards compat)', () async {
+      // Simulate a Hive payload written before #1012 — no
+      // frequencyPerDay key.
+      final box = Hive.box(HiveBoxes.alerts);
+      await box.put('${RadiusAlertStore.keyPrefix}legacy', {
+        'id': 'legacy',
+        'fuelType': 'diesel',
+        'threshold': 1.5,
+        'centerLat': 48.1,
+        'centerLng': 2.2,
+        'radiusKm': 10.0,
+        'label': 'Old',
+        'createdAt': DateTime(2025, 12, 1).toIso8601String(),
+        'enabled': true,
+      });
+
+      final store = RadiusAlertStore();
+      final all = await store.list();
+      expect(all, hasLength(1));
+      expect(all.single.frequencyPerDay, 1);
+    });
+  });
 }

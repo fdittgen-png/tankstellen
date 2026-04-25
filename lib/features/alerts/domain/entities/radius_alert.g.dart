@@ -16,6 +16,7 @@ _RadiusAlert _$RadiusAlertFromJson(Map<String, dynamic> json) => _RadiusAlert(
   label: json['label'] as String,
   createdAt: DateTime.parse(json['createdAt'] as String),
   enabled: json['enabled'] as bool? ?? true,
+  frequencyPerDay: (json['frequencyPerDay'] as num?)?.toInt() ?? 1,
 );
 
 Map<String, dynamic> _$RadiusAlertToJson(_RadiusAlert instance) =>
@@ -29,4 +30,5 @@ Map<String, dynamic> _$RadiusAlertToJson(_RadiusAlert instance) =>
       'label': instance.label,
       'createdAt': instance.createdAt.toIso8601String(),
       'enabled': instance.enabled,
+      'frequencyPerDay': instance.frequencyPerDay,
     };

@@ -1796,6 +1796,26 @@
     "description": "Banner shown on the next manual vehicle step when the OBD2 adapter connected but the VIN could not be read (#816)."
   },
   "onboardingObd2ConnectFailed": "Couldn't connect to the adapter. You can retry or skip.",
+  "alertsRadiusFrequencyLabel": "Check frequency",
+  "@alertsRadiusFrequencyLabel": {
+    "description": "Label of the per-alert frequency dropdown (#1012 phase 1) — chooses how often the background runner re-evaluates this radius alert."
+  },
+  "alertsRadiusFrequencyDaily": "Once a day",
+  "@alertsRadiusFrequencyDaily": {
+    "description": "Per-alert frequency option: evaluate at most once every 24 h (#1012 phase 1)."
+  },
+  "alertsRadiusFrequencyTwiceDaily": "Twice a day",
+  "@alertsRadiusFrequencyTwiceDaily": {
+    "description": "Per-alert frequency option: evaluate at most once every 12 h (#1012 phase 1)."
+  },
+  "alertsRadiusFrequencyThriceDaily": "Three times a day",
+  "@alertsRadiusFrequencyThriceDaily": {
+    "description": "Per-alert frequency option: evaluate at most once every 8 h (#1012 phase 1)."
+  },
+  "alertsRadiusFrequencyFourTimesDaily": "Four times a day",
+  "@alertsRadiusFrequencyFourTimesDaily": {
+    "description": "Per-alert frequency option: evaluate at most once every 6 h (#1012 phase 1)."
+  },
   "radiusAlertPickOnMap": "Pick on map",
   "@radiusAlertPickOnMap": {
     "description": "Button on the radius-alert create sheet that opens the full-screen map-picker for the alert center (#578 phase 3)."

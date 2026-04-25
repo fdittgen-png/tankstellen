@@ -1,0 +1,7 @@
+{
+  "alertsRadiusFrequencyLabel": "Prüfintervall",
+  "alertsRadiusFrequencyDaily": "Einmal täglich",
+  "alertsRadiusFrequencyTwiceDaily": "Zweimal täglich",
+  "alertsRadiusFrequencyThriceDaily": "Dreimal täglich",
+  "alertsRadiusFrequencyFourTimesDaily": "Viermal täglich"
+}

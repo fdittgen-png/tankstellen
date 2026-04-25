@@ -49,8 +49,16 @@ void main() {
       await tester.tap(find.text('Use my location'));
       await tester.pumpAndSettle();
 
-      // Save.
-      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      // Save. The sheet has grown past the 600 px test viewport
+      // since #1012 phase 1 added the frequency dropdown, so we
+      // scroll the Save button into view first.
+      final saveBtn = find.widgetWithText(FilledButton, 'Save');
+      await tester.scrollUntilVisible(
+        saveBtn,
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(saveBtn);
       await tester.pumpAndSettle();
 
       expect(fake.addedAlerts, hasLength(1));
@@ -142,7 +150,14 @@ void main() {
       // source is currently bound to the alert.
       expect(find.text('Map location'), findsOneWidget);
 
-      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      // Scroll Save into view (the sheet grew with #1012 phase 1).
+      final saveBtn = find.widgetWithText(FilledButton, 'Save');
+      await tester.scrollUntilVisible(
+        saveBtn,
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(saveBtn);
       await tester.pumpAndSettle();
 
       expect(fake.addedAlerts, hasLength(1));
@@ -185,6 +200,103 @@ void main() {
           .widget<FilledButton>(find.widgetWithText(FilledButton, 'Save'));
       expect(save.onPressed, isNull);
       expect(find.text('Map location'), findsNothing);
+    });
+
+    testWidgets(
+        'frequency dropdown writes selected value into the saved alert '
+        '(#1012 phase 1)', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      final fake = _CapturingRadiusAlerts();
+
+      await pumpApp(
+        tester,
+        RadiusAlertCreateSheet(idGenerator: () => 'freq-id-1'),
+        overrides: [
+          ...test.overrides,
+          radiusAlertsProvider.overrideWith(() => fake),
+          userPositionOverride(lat: 48.85, lng: 2.35, source: 'GPS'),
+        ],
+      );
+
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Label (e.g. Home diesel)'),
+        'Home diesel',
+      );
+      await tester.pump();
+
+      // Bind a center so Save is enabled.
+      await tester.tap(find.text('Use my location'));
+      await tester.pumpAndSettle();
+
+      // Open the frequency dropdown and pick the 4×/day option.
+      // Scroll it into view first — the sheet can overflow the
+      // 600 px test viewport.
+      final dropdown = find.byType(DropdownButtonFormField<int>);
+      await tester.scrollUntilVisible(
+        dropdown,
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(dropdown);
+      await tester.pumpAndSettle();
+      // The menu shows duplicates of every label (one in the field,
+      // one in the dropdown menu) — `last` reliably picks the menu
+      // entry.
+      await tester.tap(find.text('Four times a day').last);
+      await tester.pumpAndSettle();
+
+      final saveButton = find.widgetWithText(FilledButton, 'Save');
+      await tester.scrollUntilVisible(
+        saveButton,
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(saveButton);
+      await tester.pumpAndSettle();
+
+      expect(fake.addedAlerts, hasLength(1));
+      expect(fake.addedAlerts.single.frequencyPerDay, 4);
+    });
+
+    testWidgets(
+        'frequency dropdown defaults to once-a-day when left untouched '
+        '(#1012 phase 1)', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      final fake = _CapturingRadiusAlerts();
+
+      await pumpApp(
+        tester,
+        RadiusAlertCreateSheet(idGenerator: () => 'freq-default'),
+        overrides: [
+          ...test.overrides,
+          radiusAlertsProvider.overrideWith(() => fake),
+          userPositionOverride(lat: 48.85, lng: 2.35, source: 'GPS'),
+        ],
+      );
+
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Label (e.g. Home diesel)'),
+        'Default freq',
+      );
+      await tester.pump();
+
+      await tester.tap(find.text('Use my location'));
+      await tester.pumpAndSettle();
+
+      final saveButton = find.widgetWithText(FilledButton, 'Save');
+      await tester.scrollUntilVisible(
+        saveButton,
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(saveButton);
+      await tester.pumpAndSettle();
+
+      expect(fake.addedAlerts.single.frequencyPerDay, 1);
     });
 
     testWidgets('cancel button dismisses without calling add()',
