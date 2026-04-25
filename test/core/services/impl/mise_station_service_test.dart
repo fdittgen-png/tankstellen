@@ -3,7 +3,6 @@ import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/services/impl/mise_station_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
 void main() {
@@ -357,31 +356,11 @@ columns
     });
   });
 
-  group('MiseStationService searchStations', () {
-    test('searchStations throws ApiException on network failure', () async {
-      const params = SearchParams(
-        lat: 41.9, lng: 12.5, radiusKm: 10.0,
-      );
-      try {
-        await service.searchStations(params);
-      } on ApiException catch (e) {
-        expect(e.message, isNotEmpty);
-      }
-    });
-
-    test('searchStations returns valid type when data available', () async {
-      const params = SearchParams(
-        lat: 41.9, lng: 12.5, radiusKm: 10.0,
-      );
-      try {
-        final result = await service.searchStations(params);
-        expect(result.source, ServiceSource.miseApi);
-        expect(result.data, isA<List<Station>>());
-      } on ApiException catch (_) {
-        // Expected in test environment
-      }
-    });
-  });
+  // Live searchStations() coverage moved to test/core/services/italy_search_live_test.dart
+  // (file-level @Tags(['network'])). The two tests previously here wrapped the
+  // live call in try/catch that swallowed any non-ApiException, so they passed
+  // silently when the runner could reach mimit.gov.it and FAILed only on
+  // unrelated DioException timeouts — high noise, zero signal.
 
   group('MISE full station-building pipeline', () {
     late _TestableMiseCsvParser parser;
