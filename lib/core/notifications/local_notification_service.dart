@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'notification_service.dart';
+import 'notification_tap_dispatcher.dart';
 
 /// Default [NotificationService] implementation backed by
 /// `flutter_local_notifications`.
@@ -35,7 +37,25 @@ class LocalNotificationService implements NotificationService {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const initSettings = InitializationSettings(android: androidSettings);
-    await plugin.initialize(settings: initSettings);
+    // #1012 phase 3 — register the tap callback so the launch listener
+    // (wired in lib/app/app.dart) can resolve payloads to deep-link
+    // targets. The static dispatcher fans out so any number of warm
+    // listeners can subscribe; cold-launch reads `getNotificationApp
+    // LaunchDetails()` separately and doesn't depend on this hook
+    // having been wired in time.
+    await plugin.initialize(
+      settings: initSettings,
+      onDidReceiveNotificationResponse: _onDidReceiveNotificationResponse,
+    );
+  }
+
+  /// Static entry point so flutter_local_notifications keeps a stable
+  /// reference even when the [LocalNotificationService] instance is
+  /// rebuilt (Riverpod overrides, hot reload, etc.). Pumps every
+  /// notification tap into the global dispatcher.
+  static void _onDidReceiveNotificationResponse(
+      NotificationResponse response) {
+    NotificationTapDispatcher.instance.dispatch(response.payload);
   }
 
   @override
@@ -43,6 +63,7 @@ class LocalNotificationService implements NotificationService {
     required int id,
     required String title,
     required String body,
+    String? payload,
   }) async {
     const details = NotificationDetails(
       android: AndroidNotificationDetails(
@@ -54,7 +75,12 @@ class LocalNotificationService implements NotificationService {
       ),
     );
     await plugin.show(
-        id: id, title: title, body: body, notificationDetails: details);
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: details,
+      payload: payload,
+    );
   }
 
   @override
@@ -84,5 +110,22 @@ class LocalNotificationService implements NotificationService {
   @override
   Future<void> cancelAll() async {
     await plugin.cancelAll();
+  }
+
+  /// Probes whether a notification tap launched the app from a cold
+  /// start and, if so, returns the payload it carried. Returns `null`
+  /// when the launch was not from a notification (or the plugin
+  /// reported no payload). Surfaces errors as `null` rather than
+  /// throwing so the launch listener can degrade gracefully.
+  Future<String?> getColdLaunchPayload() async {
+    try {
+      final details = await plugin.getNotificationAppLaunchDetails();
+      if (details == null) return null;
+      if (!details.didNotificationLaunchApp) return null;
+      return details.notificationResponse?.payload;
+    } catch (e) {
+      debugPrint('LocalNotificationService.getColdLaunchPayload failed: $e');
+      return null;
+    }
   }
 }

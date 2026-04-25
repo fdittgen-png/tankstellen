@@ -6,7 +6,8 @@ import 'package:tankstellen/core/notifications/notification_service.dart';
 /// the abstract interface without touching platform channels.
 class FakeNotificationService implements NotificationService {
   bool initialized = false;
-  final List<({int id, String title, String body})> shownAlerts = [];
+  final List<({int id, String title, String body, String? payload})>
+      shownAlerts = [];
   final List<({int id, String title, String body})> shownServiceReminders = [];
   final List<int> cancelledIds = [];
   bool allCancelled = false;
@@ -21,8 +22,9 @@ class FakeNotificationService implements NotificationService {
     required int id,
     required String title,
     required String body,
+    String? payload,
   }) async {
-    shownAlerts.add((id: id, title: title, body: body));
+    shownAlerts.add((id: id, title: title, body: body, payload: payload));
   }
 
   @override

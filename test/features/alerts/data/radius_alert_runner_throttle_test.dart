@@ -17,7 +17,8 @@ import 'package:tankstellen/features/alerts/domain/radius_alert_evaluator.dart';
 /// throttler so a future refactor can't silently regress to the old
 /// "evaluate on every cycle" cadence.
 class _FakeNotifier implements NotificationService {
-  final List<({int id, String title, String body})> priceAlerts = [];
+  final List<({int id, String title, String body, String? payload})>
+      priceAlerts = [];
 
   @override
   Future<void> initialize() async {}
@@ -27,8 +28,9 @@ class _FakeNotifier implements NotificationService {
     required int id,
     required String title,
     required String body,
+    String? payload,
   }) async {
-    priceAlerts.add((id: id, title: title, body: body));
+    priceAlerts.add((id: id, title: title, body: body, payload: payload));
   }
 
   @override
