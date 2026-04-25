@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import 'elm327_protocol.dart';
 import 'fuel_rate_estimator.dart' as estimator;
@@ -181,14 +182,26 @@ class Obd2Service {
 
   /// Read the odometer value in km.
   ///
-  /// Fallback chain (#719):
+  /// Fallback chain (#719, refactored in #950 phase 2):
   ///   1. PID A6 (standard, only on cars from ~2018+)
   ///   2. PID 31 (distance since DTC cleared) — proxy, resets on DTC
-  ///   3. Manufacturer Mode 22 PID resolved from the car's VIN
+  ///   3. Manufacturer Mode 22 PID — resolution depends on
+  ///      [referenceVehicle]:
+  ///        * When [referenceVehicle] is non-null (#950 path), dispatch
+  ///          on its `odometerPidStrategy` (`stdA6` / `psaUds` /
+  ///          `bmwCan` / `vwUds` / `unknown`). `stdA6` and `unknown`
+  ///          short-circuit to null after the standard PIDs fail; the
+  ///          others walk only the matching catalog entry.
+  ///        * When [referenceVehicle] is null (legacy path), identify
+  ///          brand from the VIN and iterate every catalog entry for
+  ///          that brand. Preserves pre-#950 behaviour for callers that
+  ///          haven't been migrated yet.
   ///
   /// Returns null when every layer fails, so callers can surface
   /// "odometer not readable for your car" instead of a zero.
-  Future<double?> readOdometerKm() async {
+  Future<double?> readOdometerKm({
+    ReferenceVehicle? referenceVehicle,
+  }) async {
     if (!_transport.isConnected) return null;
 
     try {
@@ -204,45 +217,81 @@ class Obd2Service {
       final distance = Elm327Protocol.parseDistanceSinceDtcCleared(pid31);
       if (distance != null) return distance.toDouble();
 
-      // 3. Manufacturer Mode 22 fallback. Identify brand from VIN and
-      //    iterate every catalog entry for that brand. Silent failure
-      //    on unknown-brand is intentional — we'd rather return null
-      //    than spam the car with commands it rejects.
+      // 3. Manufacturer Mode 22 fallback.
+      if (referenceVehicle != null) {
+        return _readOdometerByStrategy(referenceVehicle.odometerPidStrategy);
+      }
+
+      // Legacy path: identify brand from VIN and iterate catalog.
+      // Silent failure on unknown-brand is intentional — we'd rather
+      // return null than spam the car with commands it rejects.
       final vinResponse =
           await _transport.sendCommand(Elm327Protocol.vinCommand);
       final vin = Elm327Protocol.parseVin(vinResponse);
       final brand = vehicleBrandFromVin(vin);
       if (brand == VehicleBrand.unknown) return null;
-
-      for (final entry in Elm327Protocol.mfgOdometerCatalog) {
-        if (entry.brand != brand) continue;
-        final response = await _transport.sendCommand(entry.command);
-        final value = switch (entry.kind) {
-          MfgOdometerKind.threeBytesKm =>
-            Elm327Protocol.parseMfgOdometer3Byte(
-              response,
-              expectedPidHi: entry.pidHi,
-              expectedPidLo: entry.pidLo,
-            ),
-          MfgOdometerKind.twoBytesKm => Elm327Protocol.parseMfgOdometer2Byte(
-              response,
-              expectedPidHi: entry.pidHi,
-              expectedPidLo: entry.pidLo,
-            ),
-          MfgOdometerKind.twoBytesMilesTimes10 =>
-            Elm327Protocol.parseMfgOdometerMilesTimes10(
-              response,
-              expectedPidHi: entry.pidHi,
-              expectedPidLo: entry.pidLo,
-            ),
-        };
-        if (value != null) return value;
-      }
-      return null;
+      return _readOdometerFromCatalogByBrand(brand);
     } catch (e) {
       debugPrint('OBD2 readOdometer failed: $e');
       return null;
     }
+  }
+
+  /// Resolve a [ReferenceVehicle.odometerPidStrategy] code to the
+  /// corresponding manufacturer-catalog brand and walk that brand's
+  /// entries. `stdA6` / `unknown` return null without sending any
+  /// further commands — the standard PIDs already exhausted that path.
+  /// `bmwCan` / `vwUds` route to the existing catalog rows; raw-CAN
+  /// support beyond Mode 22 is a separate issue.
+  Future<double?> _readOdometerByStrategy(String strategy) async {
+    switch (strategy) {
+      case 'psaUds':
+        return _readOdometerFromCatalogByBrand(VehicleBrand.psa);
+      case 'vwUds':
+        return _readOdometerFromCatalogByBrand(VehicleBrand.vwGroup);
+      case 'bmwCan':
+        // Catalog ships a Mode 22 fallback for BMW; raw-CAN broadcast
+        // (the literal "bmwCan" name) is a separate issue. Walk the
+        // catalog entry — better than returning null for cars that
+        // would otherwise answer 22 30 16.
+        return _readOdometerFromCatalogByBrand(VehicleBrand.bmw);
+      case 'stdA6':
+      case 'unknown':
+        return null;
+      default:
+        debugPrint(
+            'OBD2 readOdometer: unrecognised strategy "$strategy" — '
+            'falling back to null');
+        return null;
+    }
+  }
+
+  Future<double?> _readOdometerFromCatalogByBrand(VehicleBrand brand) async {
+    for (final entry in Elm327Protocol.mfgOdometerCatalog) {
+      if (entry.brand != brand) continue;
+      final response = await _transport.sendCommand(entry.command);
+      final value = switch (entry.kind) {
+        MfgOdometerKind.threeBytesKm =>
+          Elm327Protocol.parseMfgOdometer3Byte(
+            response,
+            expectedPidHi: entry.pidHi,
+            expectedPidLo: entry.pidLo,
+          ),
+        MfgOdometerKind.twoBytesKm => Elm327Protocol.parseMfgOdometer2Byte(
+            response,
+            expectedPidHi: entry.pidHi,
+            expectedPidLo: entry.pidLo,
+          ),
+        MfgOdometerKind.twoBytesMilesTimes10 =>
+          Elm327Protocol.parseMfgOdometerMilesTimes10(
+            response,
+            expectedPidHi: entry.pidHi,
+            expectedPidLo: entry.pidLo,
+          ),
+      };
+      if (value != null) return value;
+    }
+    return null;
   }
 
   /// Read current vehicle speed in km/h.
@@ -376,15 +425,31 @@ class Obd2Service {
   /// density ~745 g/L. When the profile is absent or the fuel type is
   /// unrecognised we default to petrol — that's the class of car
   /// (Peugeot 107 / Aygo / C1) that motivated this fallback.
-  Future<double?> readFuelRateLPerHour({VehicleProfile? vehicle}) async {
+  Future<double?> readFuelRateLPerHour({
+    VehicleProfile? vehicle,
+    ReferenceVehicle? referenceVehicle,
+  }) async {
+    // Precedence (#950 phase 2):
+    //   1. VehicleProfile field (user-set, may be tuned to override
+    //      the catalog defaults).
+    //   2. ReferenceVehicle catalog entry (data-driven defaults).
+    //   3. Generic estimator constants (last-resort 1500 cc / 0.85
+    //      VE — bumped from the legacy 1000 cc when a catalog entry
+    //      is missing AND the user hasn't filled in the engine spec).
     final engineDisplacementCc = vehicle?.engineDisplacementCc ??
+        referenceVehicle?.displacementCc ??
         estimator.kDefaultEngineDisplacementCc;
     // VE on VehicleProfile is a non-nullable double with its own
     // default (0.85). Using it directly here is equivalent to the
-    // service-level fallback for that field.
-    final volumetricEfficiency =
-        vehicle?.volumetricEfficiency ?? estimator.kDefaultVolumetricEfficiency;
-    final isDiesel = estimator.isDieselProfile(vehicle);
+    // service-level fallback for that field. When vehicle is null the
+    // ReferenceVehicle catalog VE wins; absent both, the estimator's
+    // 0.85 default is the final fallback.
+    final volumetricEfficiency = vehicle?.volumetricEfficiency ??
+        referenceVehicle?.volumetricEfficiency ??
+        estimator.kDefaultVolumetricEfficiency;
+    final isDiesel = vehicle != null
+        ? estimator.isDieselProfile(vehicle)
+        : referenceVehicle?.fuelType.toLowerCase() == 'diesel';
     final afr = isDiesel ? estimator.kDieselAfr : estimator.kPetrolAfr;
     final fuelDensityGPerL =
         isDiesel ? estimator.kDieselDensityGPerL : estimator.kPetrolDensityGPerL;

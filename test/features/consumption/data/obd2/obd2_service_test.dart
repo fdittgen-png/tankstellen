@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 
 // Shared AT-init boilerplate for the FakeObd2Transport.
@@ -706,6 +707,271 @@ void main() {
 
       await service.disconnect();
       expect(service.isConnected, isFalse);
+    });
+  });
+
+  group('Obd2Service ReferenceVehicle catalog consumer (#950 phase 2)', () {
+    // PSA UDS-style fixture: PID A6 missing, PID 31 missing, but the
+    // PSA mfg odometer command 22D101 returns a 2-byte km value. This
+    // is the in-catalog Peugeot 208 path the user runs today.
+    const peugeot208 = ReferenceVehicle(
+      make: 'Peugeot',
+      model: '208',
+      generation: 'II (2019-)',
+      yearStart: 2019,
+      displacementCc: 1199,
+      fuelType: 'petrol',
+      transmission: 'manual',
+      odometerPidStrategy: 'psaUds',
+    );
+
+    // VW Golf VIII — 1498 cc, vwUds. The VW odometer command is
+    // 222203 returning a 3-byte km value.
+    const vwGolf = ReferenceVehicle(
+      make: 'Volkswagen',
+      model: 'Golf',
+      generation: 'VIII (2019-)',
+      yearStart: 2019,
+      displacementCc: 1498,
+      fuelType: 'petrol',
+      transmission: 'automatic',
+      volumetricEfficiency: 0.87,
+      odometerPidStrategy: 'vwUds',
+    );
+
+    // Fictional vehicle the catalog does not cover. Phase 2 callers
+    // are expected to pass `null` when the lookup misses; the service
+    // then falls back to the pre-#950 generic behaviour.
+    const unknownStrategy = ReferenceVehicle(
+      make: 'Acme',
+      model: 'XYZ',
+      generation: 'I',
+      yearStart: 2020,
+      displacementCc: 1500,
+      fuelType: 'petrol',
+      transmission: 'manual',
+      odometerPidStrategy: 'unknown',
+    );
+
+    test(
+        'readOdometerKm with Peugeot 208 ReferenceVehicle (psaUds) reads '
+        'the PSA mfg odometer command — preserves pre-#950 behaviour',
+        () async {
+      // VIN-free fixture: only the PSA-specific 22D101 command answers,
+      // proving the service dispatched on `odometerPidStrategy` rather
+      // than walking the brand catalog blindly.
+      final transport = FakeObd2Transport({
+        ..._initResponses,
+        '01A6': 'NO DATA>',
+        '0131': 'NO DATA>',
+        // 0xD1 0x01 prefix + 2 bytes (0x4E 0x20) → 20000 km.
+        '22D101': '62 D1 01 4E 20>',
+      });
+      final service = Obd2Service(transport);
+      await service.connect();
+
+      final km = await service.readOdometerKm(referenceVehicle: peugeot208);
+      expect(km, 20000.0);
+    });
+
+    test(
+        'readFuelRateLPerHour without VehicleProfile uses ReferenceVehicle '
+        'displacement + VE in the speed-density branch (Peugeot 208: 1199 cc, '
+        '0.85 VE)', () async {
+      // Speed-density-only fixture (no 5E, no MAF, no trims).
+      final transport = FakeObd2Transport({
+        ..._initResponses,
+        '015E': 'NO DATA>',
+        '0110': 'NO DATA>',
+        '010B': '41 0B 41>', // MAP raw 0x41 = 65 kPa
+        '010F': '41 0F 46>', // IAT raw 0x46 → 30 °C
+        '010C': '41 0C 27 10>', // RPM 2500
+        '0106': 'NO DATA>',
+        '0107': 'NO DATA>',
+      });
+      final service = Obd2Service(transport);
+      await service.connect();
+
+      final rate = await service.readFuelRateLPerHour(
+        referenceVehicle: peugeot208,
+      );
+      final expected = Obd2Service.estimateFuelRateLPerHourFromMap(
+        mapKpa: 65,
+        iatCelsius: 30,
+        rpm: 2500,
+        engineDisplacementCc: 1199,
+        volumetricEfficiency: 0.85,
+      );
+      expect(rate, isNotNull);
+      expect(expected, isNotNull);
+      expect(rate, closeTo(expected!, 1e-3));
+    });
+
+    test(
+        'readOdometerKm with VW Golf ReferenceVehicle (vwUds) reads the VW '
+        'mfg odometer command (222203 → 3-byte km)', () async {
+      final transport = FakeObd2Transport({
+        ..._initResponses,
+        '01A6': 'NO DATA>',
+        '0131': 'NO DATA>',
+        // 0x22 0x03 prefix + 3 bytes → 0x01 0xE2 0x40 = 123456 km.
+        '222203': '62 22 03 01 E2 40>',
+      });
+      final service = Obd2Service(transport);
+      await service.connect();
+
+      final km = await service.readOdometerKm(referenceVehicle: vwGolf);
+      expect(km, 123456.0);
+    });
+
+    test(
+        'readFuelRateLPerHour with VW Golf ReferenceVehicle uses 1498 cc + '
+        '0.87 VE (catalog values, not 1000 cc / 0.85 default)', () async {
+      final transport = FakeObd2Transport({
+        ..._initResponses,
+        '015E': 'NO DATA>',
+        '0110': 'NO DATA>',
+        '010B': '41 0B 41>',
+        '010F': '41 0F 46>',
+        '010C': '41 0C 27 10>',
+        '0106': 'NO DATA>',
+        '0107': 'NO DATA>',
+      });
+      final service = Obd2Service(transport);
+      await service.connect();
+
+      final rate = await service.readFuelRateLPerHour(
+        referenceVehicle: vwGolf,
+      );
+      final expected = Obd2Service.estimateFuelRateLPerHourFromMap(
+        mapKpa: 65,
+        iatCelsius: 30,
+        rpm: 2500,
+        engineDisplacementCc: 1498,
+        volumetricEfficiency: 0.87,
+      );
+      expect(rate, isNotNull);
+      expect(expected, isNotNull);
+      expect(rate, closeTo(expected!, 1e-3));
+
+      // Sanity: 1498 cc / 0.87 VE must produce a clearly different
+      // rate from the 1000 cc / 0.85 generic default.
+      final defaultRate = Obd2Service.estimateFuelRateLPerHourFromMap(
+        mapKpa: 65,
+        iatCelsius: 30,
+        rpm: 2500,
+        engineDisplacementCc: 1000,
+        volumetricEfficiency: 0.85,
+      )!;
+      expect((rate! - defaultRate).abs(), greaterThan(1e-2));
+    });
+
+    test(
+        'readOdometerKm with unknown-strategy ReferenceVehicle returns null '
+        'gracefully when standard PIDs miss — no mfg fallback attempted',
+        () async {
+      // No PSA / VW / BMW / Renault commands are mocked. If the
+      // service tried any of them, FakeObd2Transport throws. The
+      // strategy switch must short-circuit to null after PID 31.
+      final transport = FakeObd2Transport({
+        ..._initResponses,
+        '01A6': 'NO DATA>',
+        '0131': 'NO DATA>',
+      });
+      final service = Obd2Service(transport);
+      await service.connect();
+
+      final km = await service.readOdometerKm(
+        referenceVehicle: unknownStrategy,
+      );
+      expect(km, isNull);
+    });
+
+    test(
+        'readFuelRateLPerHour with unknown-make ReferenceVehicle still uses '
+        'its 1500 cc displacement (data-driven default beats the legacy '
+        '1000 cc constant)', () async {
+      final transport = FakeObd2Transport({
+        ..._initResponses,
+        '015E': 'NO DATA>',
+        '0110': 'NO DATA>',
+        '010B': '41 0B 41>',
+        '010F': '41 0F 46>',
+        '010C': '41 0C 27 10>',
+        '0106': 'NO DATA>',
+        '0107': 'NO DATA>',
+      });
+      final service = Obd2Service(transport);
+      await service.connect();
+
+      final rate = await service.readFuelRateLPerHour(
+        referenceVehicle: unknownStrategy,
+      );
+      final expected = Obd2Service.estimateFuelRateLPerHourFromMap(
+        mapKpa: 65,
+        iatCelsius: 30,
+        rpm: 2500,
+        engineDisplacementCc: 1500,
+        volumetricEfficiency: 0.85,
+      );
+      expect(rate, isNotNull);
+      expect(expected, isNotNull);
+      expect(rate, closeTo(expected!, 1e-3));
+    });
+
+    test(
+        'VehicleProfile still wins over ReferenceVehicle when both supplied '
+        '— the user can override catalog defaults', () async {
+      final transport = FakeObd2Transport({
+        ..._initResponses,
+        '015E': 'NO DATA>',
+        '0110': 'NO DATA>',
+        '010B': '41 0B 41>',
+        '010F': '41 0F 46>',
+        '010C': '41 0C 27 10>',
+        '0106': 'NO DATA>',
+        '0107': 'NO DATA>',
+      });
+      final service = Obd2Service(transport);
+      await service.connect();
+
+      const profile = VehicleProfile(
+        id: 'override',
+        name: 'tuned',
+        engineDisplacementCc: 1800,
+        volumetricEfficiency: 0.92,
+      );
+      final rate = await service.readFuelRateLPerHour(
+        vehicle: profile,
+        referenceVehicle: vwGolf,
+      );
+      final expected = Obd2Service.estimateFuelRateLPerHourFromMap(
+        mapKpa: 65,
+        iatCelsius: 30,
+        rpm: 2500,
+        engineDisplacementCc: 1800,
+        volumetricEfficiency: 0.92,
+      );
+      expect(rate, isNotNull);
+      expect(expected, isNotNull);
+      expect(rate, closeTo(expected!, 1e-3));
+    });
+
+    test(
+        'readOdometerKm with no ReferenceVehicle still walks the VIN→brand '
+        'fallback (pre-#950 behaviour preserved when callers do not opt in)',
+        () async {
+      // Same fixture as the existing "PID A6 returns odometer" test —
+      // proves we did not break call sites that pass nothing.
+      final transport = FakeObd2Transport({
+        ..._initResponses,
+        '01A6': '41 A6 00 12 D6 87>',
+      });
+      final service = Obd2Service(transport);
+      await service.connect();
+
+      final km = await service.readOdometerKm();
+      expect(km, closeTo(123456.7, 0.1));
     });
   });
 }
