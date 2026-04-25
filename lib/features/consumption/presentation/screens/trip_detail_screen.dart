@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
@@ -43,7 +44,7 @@ export '../widgets/trip_detail_share_payload.dart'
 ///   tool without needing any backend.
 /// * **Delete** confirms and then calls
 ///   [TripHistoryList.delete] before popping back to the Trajets tab.
-class TripDetailScreen extends ConsumerWidget {
+class TripDetailScreen extends ConsumerStatefulWidget {
   final String tripId;
 
   /// Optional per-sample profile used to populate the charts (#890).
@@ -62,10 +63,21 @@ class TripDetailScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TripDetailScreen> createState() => _TripDetailScreenState();
+}
+
+class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
+  /// Latches the badge-decrement to the first frame after the trip
+  /// detail mounts, so a `setState` rebuild can't trigger a second
+  /// decrement and over-clear the launcher counter.
+  bool _badgeDecremented = false;
+
+  @override
+  Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final trips = ref.watch(tripHistoryListProvider);
-    final entry = trips.where((t) => t.id == tripId).firstOrNull;
+    final entry = trips.where((t) => t.id == widget.tripId).firstOrNull;
+    _maybeDecrementBadge(entry);
     final activeVehicle = ref.watch(activeVehicleProfileProvider);
     final vehicles = ref.watch(vehicleProfileListProvider);
 
@@ -115,10 +127,28 @@ class TripDetailScreen extends ConsumerWidget {
           : TripDetailBody(
               entry: entry,
               vehicle: vehicle,
-              samples: samples,
+              samples: widget.samples,
               isEv: isEv,
             ),
     );
+  }
+
+  /// Decrement the launcher-icon badge once on the first build that
+  /// resolves an auto-recorded entry (#1004 phase 5). Scheduled
+  /// post-frame so we don't mutate provider state during a build.
+  void _maybeDecrementBadge(TripHistoryEntry? entry) {
+    if (_badgeDecremented) return;
+    if (entry == null || !entry.automatic) return;
+    _badgeDecremented = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final badge =
+            await ref.read(autoRecordBadgeServiceProvider.future);
+        await badge.decrement();
+      } catch (e) {
+        debugPrint('TripDetailScreen badge decrement: $e');
+      }
+    });
   }
 
   Future<void> _onShare(
@@ -130,7 +160,7 @@ class TripDetailScreen extends ConsumerWidget {
     final payload = tripDetailSharePayload(
       entry: entry,
       vehicle: vehicle,
-      samples: samples,
+      samples: widget.samples,
     );
     await Clipboard.setData(ClipboardData(text: payload));
     if (!context.mounted) return;
@@ -171,7 +201,7 @@ class TripDetailScreen extends ConsumerWidget {
       ),
     );
     if (confirmed != true || !context.mounted) return;
-    await ref.read(tripHistoryListProvider.notifier).delete(tripId);
+    await ref.read(tripHistoryListProvider.notifier).delete(widget.tripId);
     if (!context.mounted) return;
     context.pop();
   }

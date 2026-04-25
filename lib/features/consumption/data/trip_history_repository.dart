@@ -18,16 +18,25 @@ class TripHistoryEntry {
   final String? vehicleId;
   final TripSummary summary;
 
+  /// Whether this trip was captured by the auto-record path
+  /// (#1004 phase 4). Drives the badge-decrement call when the user
+  /// opens the detail screen — manual trips don't decrement because
+  /// they were never counted as "unseen". Defaults to false so all
+  /// pre-#1004 entries deserialise as manual.
+  final bool automatic;
+
   const TripHistoryEntry({
     required this.id,
     required this.vehicleId,
     required this.summary,
+    this.automatic = false,
   });
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'vehicleId': vehicleId,
         'summary': _summaryToJson(summary),
+        if (automatic) 'automatic': true,
       };
 
   static TripHistoryEntry fromJson(Map<String, dynamic> json) =>
@@ -37,6 +46,7 @@ class TripHistoryEntry {
         summary: _summaryFromJson(
           (json['summary'] as Map).cast<String, dynamic>(),
         ),
+        automatic: (json['automatic'] as bool?) ?? false,
       );
 }
 

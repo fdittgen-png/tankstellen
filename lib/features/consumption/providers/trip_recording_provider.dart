@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../../../core/storage/storage_providers.dart';
@@ -565,7 +566,10 @@ class TripRecording extends _$TripRecording {
     };
   }
 
-  Future<void> _saveToHistory(TripSummary summary) async {
+  Future<void> _saveToHistory(
+    TripSummary summary, {
+    bool automatic = false,
+  }) async {
     // Skip empty trips — the user tapped Stop without any usable
     // sample, or the service disconnected immediately. No signal, no
     // history clutter.
@@ -579,8 +583,21 @@ class TripRecording extends _$TripRecording {
         id: id,
         vehicleId: _vehicleId,
         summary: summary,
+        automatic: automatic,
       ));
       ref.read(tripHistoryListProvider.notifier).refresh();
+      // Phase 5 (#1004): bump the launcher-icon badge so the user sees
+      // "something happened while I was driving" without opening the
+      // app. The decrement fires when the user lands on the trip
+      // detail screen for this auto-recorded trip.
+      if (automatic) {
+        try {
+          final badge = await ref.read(autoRecordBadgeServiceProvider.future);
+          await badge.increment();
+        } catch (e) {
+          debugPrint('TripRecording auto-record badge increment: $e');
+        }
+      }
     } catch (e) {
       debugPrint('TripRecording._saveToHistory: $e');
     }
