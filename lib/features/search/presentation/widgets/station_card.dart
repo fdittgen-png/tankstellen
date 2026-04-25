@@ -12,7 +12,9 @@ import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/station.dart';
 import 'amenity_chips.dart';
 
-part 'station_card_parts.dart';
+part 'station_card_price_column.dart';
+part 'station_card_price_row.dart';
+part 'station_card_status.dart';
 
 class StationCard extends StatelessWidget {
   final Station station;
