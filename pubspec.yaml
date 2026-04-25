@@ -93,6 +93,13 @@ dev_dependencies:
   # `FlutterSecureStoragePlatform.instance` to inject a fake store
   # without going through the platform method channel (#952 phase 3).
   flutter_secure_storage_platform_interface: ^2.0.1
+  # Required only by the DrivingStationSheet widget test, which swaps
+  # `UrlLauncherPlatform.instance` with a fake to assert the geo: URI
+  # the Navigate button emits without going through a real intent.
+  # Mixing in MockPlatformInterfaceMixin (from plugin_platform_interface)
+  # bypasses the verify-token guard for tests only.
+  url_launcher_platform_interface: ^2.3.2
+  plugin_platform_interface: ^2.1.8
 
 flutter:
   uses-material-design: true
