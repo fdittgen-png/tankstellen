@@ -3288,6 +3288,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get badScanReportHeaderYouTyped => 'Eingegeben';
 
   @override
+  String get badScanReportCreateTicket => 'Ticket erstellen';
+
+  @override
+  String get badScanReportOpenInBrowser => 'Im Browser öffnen';
+
+  @override
+  String get badScanReportFallbackToShare =>
+      'Senden fehlgeschlagen — manuell teilen';
+
+  @override
   String get fillUpSectionWhatTitle => 'Was du getankt hast';
 
   @override

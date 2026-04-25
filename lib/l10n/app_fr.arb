@@ -1,5 +1,8 @@
 {
   "@@locale": "fr",
+  "badScanReportCreateTicket": "Créer un ticket",
+  "badScanReportOpenInBrowser": "Ouvrir dans le navigateur",
+  "badScanReportFallbackToShare": "Échec de création — partage manuel",
   "appTitle": "Prix Carburants",
   "search": "Recherche",
   "favorites": "Favoris",
