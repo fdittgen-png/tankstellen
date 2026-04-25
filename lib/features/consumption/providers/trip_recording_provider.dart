@@ -71,6 +71,13 @@ class TripRecording extends _$TripRecording {
   @visibleForTesting
   int hapticMediumCount = 0;
 
+  /// Exposed for tests: the underlying [TripRecordingController] while
+  /// a trip is active. Lets the #1040 sample-persistence test inject a
+  /// deterministic buffer through [TripRecordingController.debugCaptureSample]
+  /// without spinning up a real polling clock. Null between trips.
+  @visibleForTesting
+  TripRecordingController? get debugController => _controller;
+
   /// Snapshot of the vehicle the last [startTrip] call was scoped to.
   /// Exposed so the save-as-fill-up path can figure out which
   /// trajets to auto-link (#888). Null before the first call, or
@@ -406,6 +413,10 @@ class TripRecording extends _$TripRecording {
     } catch (e) {
       debugPrint('TripRecording.stop: refreshOdometer failed: $e');
     }
+    // Snapshot the captured-samples buffer BEFORE stop() tears down
+    // the controller — without this the trip-detail charts render the
+    // "No samples recorded" empty state on every saved trip (#1040).
+    final capturedSamples = List<TripSample>.unmodifiable(ctl.capturedSamples);
     final summary = await ctl.stop();
     final odometerStartKm = ctl.odometerStartKm;
     final odometerLatestKm = ctl.odometerLatestKm;
@@ -418,7 +429,7 @@ class TripRecording extends _$TripRecording {
     // (including discarded ones) is logged; the fill-up flow is a
     // *separate* decision. Best-effort: a Hive write failure here
     // shouldn't block service teardown.
-    await _saveToHistory(summary);
+    await _saveToHistory(summary, samples: capturedSamples);
     // #769 — flush learned baselines before releasing the service so
     // the next trip starts from the updated values. Best-effort: a
     // Hive write failure here shouldn't block teardown.
@@ -569,6 +580,7 @@ class TripRecording extends _$TripRecording {
   Future<void> _saveToHistory(
     TripSummary summary, {
     bool automatic = false,
+    List<TripSample> samples = const [],
   }) async {
     // Skip empty trips — the user tapped Stop without any usable
     // sample, or the service disconnected immediately. No signal, no
@@ -584,6 +596,7 @@ class TripRecording extends _$TripRecording {
         vehicleId: _vehicleId,
         summary: summary,
         automatic: automatic,
+        samples: samples,
       ));
       ref.read(tripHistoryListProvider.notifier).refresh();
       // Phase 5 (#1004): bump the launcher-icon badge so the user sees

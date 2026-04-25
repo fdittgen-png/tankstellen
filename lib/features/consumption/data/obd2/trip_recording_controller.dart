@@ -235,6 +235,31 @@ class TripRecordingController {
   /// real odometer.
   final List<VirtualOdometerSample> _speedSamples = <VirtualOdometerSample>[];
 
+  /// Per-tick sample buffer used by the trip-detail charts (#1040).
+  /// Decimated to ~1 Hz inside [_emit] — the user-facing charts don't
+  /// need the 4 Hz emit cadence, and 1 Hz × 8 fields keeps a 39-min
+  /// trip's payload well under 20 KB compressed. Capped at
+  /// [_capturedSampleCap] so a forgotten recording can't eat unbounded
+  /// memory; the cap covers a 33-hour drive at 1 Hz which is more
+  /// than enough headroom.
+  final List<TripSample> _capturedSamples = <TripSample>[];
+
+  /// Timestamp of the most recently *captured* (decimated) sample.
+  /// Distinct from [_lastSampleAt] which tracks the recorder feed at
+  /// the full 4 Hz emit cadence.
+  DateTime? _lastCapturedAt;
+
+  /// Cap on the captured-sample buffer (#1040). 120000 samples = 33 h
+  /// at 1 Hz — comfortably above any plausible single trip — so this
+  /// only kicks in if the user forgets to stop a recording overnight.
+  static const int _capturedSampleCap = 120000;
+
+  /// Read-only snapshot of the captured sample buffer (#1040). The
+  /// list is unmodifiable so callers can't accidentally mutate the
+  /// controller's state — the provider clones it into the persisted
+  /// [TripHistoryEntry] at stop time.
+  List<TripSample> get capturedSamples => List.unmodifiable(_capturedSamples);
+
   /// Latest parsed values, keyed by PID command. Written by scheduler
   /// callbacks, read by [_emit] when assembling [TripLiveReading]. Not
   /// using a typed struct because most fields are optional doubles
@@ -885,13 +910,15 @@ class TripRecordingController {
     // the pre-#814 1 Hz loop's behavior closely enough that the
     // distance/fuelLitersConsumed integration is unchanged.
     if (_latestSpeedKmh != null || _latestRpm != null) {
-      _recorder.onSample(TripSample(
+      final sample = TripSample(
         timestamp: nowTs,
         speedKmh: _latestSpeedKmh ?? 0,
         rpm: _latestRpm ?? 0,
         fuelRateLPerHour: fuelRate,
-      ));
+      );
+      _recorder.onSample(sample);
       _lastSampleAt = nowTs;
+      _maybeCaptureSample(sample);
     }
     if (fuelRate != null) {
       _fuelRateSeen = true;
@@ -973,6 +1000,42 @@ class TripRecordingController {
     final ltft = _latestLtft;
     if (stft == null || ltft == null) return raw;
     return Obd2Service.applyFuelTrimCorrection(raw, stft: stft, ltft: ltft);
+  }
+
+  /// Append [sample] to the captured-samples buffer when at least
+  /// 1 second has elapsed since the previous capture. The 4 Hz emit
+  /// loop drops 3 of every 4 candidate samples — the chart layer
+  /// renders at 1 Hz and the storage budget is sized for that
+  /// cadence (#1040).
+  void _maybeCaptureSample(TripSample sample) {
+    final last = _lastCapturedAt;
+    if (last != null) {
+      // Use 950 ms as the gate so a 1 Hz scheduler that's slightly
+      // jittered (998 ms / 1003 ms) still captures every tick. Without
+      // the slack a 998 ms gap would slip through the >=1000 check
+      // and we'd silently halve the captured rate.
+      if (sample.timestamp.difference(last).inMilliseconds < 950) return;
+    }
+    _capturedSamples.add(sample);
+    _lastCapturedAt = sample.timestamp;
+    if (_capturedSamples.length > _capturedSampleCap) {
+      // Drop the oldest slice — losing the early stretch is preferable
+      // to letting a forgotten overnight recording eat unbounded memory.
+      _capturedSamples.removeRange(
+        0,
+        _capturedSamples.length - _capturedSampleCap,
+      );
+    }
+  }
+
+  /// Exposed for tests: append a sample to the captured-samples buffer
+  /// without going through the scheduler / debounced emit timer
+  /// (#1040). Tests use this to populate a deterministic buffer + then
+  /// drive [TripRecording.stop] end-to-end.
+  @visibleForTesting
+  void debugCaptureSample(TripSample sample) {
+    _capturedSamples.add(sample);
+    _lastCapturedAt = sample.timestamp;
   }
 
   /// Exposed for tests: force an emit immediately instead of waiting

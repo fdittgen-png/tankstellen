@@ -9,6 +9,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/trip_history_repository.dart';
+import '../../domain/trip_recorder.dart';
 import '../../providers/trip_history_provider.dart';
 import '../widgets/trip_detail_body.dart';
 import '../widgets/trip_detail_charts.dart';
@@ -31,12 +32,15 @@ export '../widgets/trip_detail_share_payload.dart'
 /// * [TripHistoryEntry] is read from [tripHistoryListProvider] keyed
 ///   by the path id. A missing entry (stale deep link) falls back to
 ///   a friendly empty-state instead of crashing the route.
-/// * The per-sample time series is supplied via [samples]. The Hive
-///   schema today stores only the aggregated [TripSummary], so the
-///   production route passes an empty list and the charts render the
-///   shared empty-state caption. Future PRs will persist samples
-///   alongside the summary — tests inject them directly today so the
-///   detail screen's contract ships now.
+/// * The per-sample time series ships in two ways:
+///   1. The constructor's [samples] arg lets tests / future callers
+///      inject a hand-built profile directly.
+///   2. When [samples] is empty, the screen derives the chart input
+///      from [TripHistoryEntry.samples] (#1040) — so any trip recorded
+///      with the OBD2 buffer renders its full speed / fuel-rate / RPM
+///      profile. Legacy entries written before #1040 carry an empty
+///      list; the charts then fall back to the shared
+///      "No samples recorded" empty-state caption.
 ///
 /// ## AppBar actions
 /// * **Share** copies a JSON summary + CSV sample block to the
@@ -49,11 +53,10 @@ class TripDetailScreen extends ConsumerStatefulWidget {
 
   /// Optional per-sample profile used to populate the charts (#890).
   ///
-  /// Defaults to an empty list because the Hive schema doesn't yet
-  /// persist samples — every chart then renders its empty-state
-  /// caption, keeping the section layout honest. Tests and future
-  /// persisted-samples PRs pass a non-empty list to drive the
-  /// CustomPaint path.
+  /// Defaults to an empty list — the production route relies on the
+  /// per-trip samples persisted on [TripHistoryEntry.samples] (#1040)
+  /// instead. Tests inject a non-empty list here to drive the chart
+  /// CustomPaint path without needing Hive.
   final List<TripDetailSample> samples;
 
   const TripDetailScreen({
@@ -89,6 +92,16 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         : vehicles.where((v) => v.id == entry!.vehicleId).firstOrNull ??
             activeVehicle;
     final isEv = vehicle?.type == VehicleType.ev;
+
+    // Production callers pass widget.samples = const [] so the screen
+    // pulls the per-trip profile straight off the persisted entry
+    // (#1040). Tests pre-populate widget.samples; honour that input
+    // instead of overriding it. Legacy entries with no samples render
+    // the shared empty-state caption — same UX as a fresh install.
+    final List<TripDetailSample> samples = widget.samples.isNotEmpty
+        ? widget.samples
+        : (entry?.samples.map(_toDetailSample).toList(growable: false) ??
+            const []);
 
     return PageScaffold(
       title: l?.tripHistoryTitle ?? 'Trip history',
@@ -127,7 +140,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
           : TripDetailBody(
               entry: entry,
               vehicle: vehicle,
-              samples: widget.samples,
+              samples: samples,
               isEv: isEv,
             ),
     );
@@ -157,10 +170,13 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     TripHistoryEntry entry,
     VehicleProfile? vehicle,
   ) async {
+    final shareSamples = widget.samples.isNotEmpty
+        ? widget.samples
+        : entry.samples.map(_toDetailSample).toList(growable: false);
     final payload = tripDetailSharePayload(
       entry: entry,
       vehicle: vehicle,
-      samples: widget.samples,
+      samples: shareSamples,
     );
     await Clipboard.setData(ClipboardData(text: payload));
     if (!context.mounted) return;
@@ -206,3 +222,16 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     context.pop();
   }
 }
+
+/// Convert a domain-layer [TripSample] (persisted on
+/// [TripHistoryEntry]) into the presentation-layer [TripDetailSample]
+/// the trip-detail charts consume (#1040). The two types carry the
+/// same fields but live in different layers — keeping the converter
+/// at the screen boundary stops the chart widgets from depending on
+/// the consumption-domain package.
+TripDetailSample _toDetailSample(TripSample s) => TripDetailSample(
+      timestamp: s.timestamp,
+      speedKmh: s.speedKmh,
+      rpm: s.rpm,
+      fuelRateLPerHour: s.fuelRateLPerHour,
+    );
