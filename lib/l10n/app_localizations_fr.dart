@@ -3284,6 +3284,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get badScanReportHeaderYouTyped => 'You typed';
 
   @override
+  String get badScanReportCreateTicket => 'Créer un ticket';
+
+  @override
+  String get badScanReportOpenInBrowser => 'Ouvrir dans le navigateur';
+
+  @override
+  String get badScanReportFallbackToShare =>
+      'Échec de création — partage manuel';
+
+  @override
   String get fillUpSectionWhatTitle => 'What you filled';
 
   @override

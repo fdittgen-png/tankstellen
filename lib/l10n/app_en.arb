@@ -1590,6 +1590,18 @@
   "badScanReportHeaderField": "Field",
   "badScanReportHeaderScanned": "Scanned",
   "badScanReportHeaderYouTyped": "You typed",
+  "badScanReportCreateTicket": "Create issue",
+  "@badScanReportCreateTicket": {
+    "description": "Primary action on the bad-scan-report sheet that files a GitHub issue (#952 phase 2)."
+  },
+  "badScanReportOpenInBrowser": "Open in browser",
+  "@badScanReportOpenInBrowser": {
+    "description": "Action shown after a GitHub issue is filed; opens the issue URL in the system browser (#952 phase 2)."
+  },
+  "badScanReportFallbackToShare": "Submission failed — manual share",
+  "@badScanReportFallbackToShare": {
+    "description": "Snackbar shown when the GitHub submission fails and we fall back to the system share sheet (#952 phase 2)."
+  },
   "fillUpSectionWhatTitle": "What you filled",
   "@fillUpSectionWhatTitle": {
     "description": "Card title grouping date, fuel and quantity inputs on the Add-Fill-up form (#751 phase 2)."

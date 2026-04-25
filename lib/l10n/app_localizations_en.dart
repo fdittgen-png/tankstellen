@@ -3255,6 +3255,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get badScanReportHeaderYouTyped => 'You typed';
 
   @override
+  String get badScanReportCreateTicket => 'Create issue';
+
+  @override
+  String get badScanReportOpenInBrowser => 'Open in browser';
+
+  @override
+  String get badScanReportFallbackToShare => 'Submission failed — manual share';
+
+  @override
   String get fillUpSectionWhatTitle => 'What you filled';
 
   @override

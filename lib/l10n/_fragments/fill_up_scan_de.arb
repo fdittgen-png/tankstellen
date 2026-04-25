@@ -16,5 +16,8 @@
   "badScanReportFieldDate": "Datum",
   "badScanReportHeaderField": "Feld",
   "badScanReportHeaderScanned": "Gescannt",
-  "badScanReportHeaderYouTyped": "Eingegeben"
+  "badScanReportHeaderYouTyped": "Eingegeben",
+  "badScanReportCreateTicket": "Ticket erstellen",
+  "badScanReportOpenInBrowser": "Im Browser öffnen",
+  "badScanReportFallbackToShare": "Senden fehlgeschlagen — manuell teilen"
 }

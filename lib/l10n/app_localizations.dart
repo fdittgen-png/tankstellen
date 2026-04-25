@@ -6116,6 +6116,24 @@ abstract class AppLocalizations {
   /// **'You typed'**
   String get badScanReportHeaderYouTyped;
 
+  /// Primary action on the bad-scan-report sheet that files a GitHub issue (#952 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Create issue'**
+  String get badScanReportCreateTicket;
+
+  /// Action shown after a GitHub issue is filed; opens the issue URL in the system browser (#952 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Open in browser'**
+  String get badScanReportOpenInBrowser;
+
+  /// Snackbar shown when the GitHub submission fails and we fall back to the system share sheet (#952 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Submission failed — manual share'**
+  String get badScanReportFallbackToShare;
+
   /// Card title grouping date, fuel and quantity inputs on the Add-Fill-up form (#751 phase 2).
   ///
   /// In en, this message translates to:
