@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/presentation/screens/add_charging_log_screen.dart';
 import '../../../favorites/providers/favorites_provider.dart';
@@ -25,34 +26,33 @@ class EvStationDetailScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final isFav = ref.watch(isFavoriteProvider(station.id));
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(station.name),
-        actions: [
-          IconButton(
-            icon: Icon(
-              isFav ? Icons.star : Icons.star_border,
-              color: isFav ? Colors.amber : null,
-            ),
-            tooltip: isFav
-                ? (l10n?.removeFavorite ?? 'Remove from favorites')
-                : (l10n?.addFavorite ?? 'Add to favorites'),
-            onPressed: () async {
-              // Await the toggle so the snackbar lies become impossible
-              // and the isFavoriteProvider has flipped before we show
-              // any feedback (#566).
-              await ref
-                  .read(favoritesProvider.notifier)
-                  .toggle(station.id, rawJson: station.toJson());
-              if (!context.mounted) return;
-              final msg = isFav
-                  ? (l10n?.removedFromFavorites ?? 'Removed from favorites')
-                  : (l10n?.addedToFavorites ?? 'Added to favorites');
-              SnackBarHelper.show(context, msg);
-            },
+    return PageScaffold(
+      title: station.name,
+      bodyPadding: EdgeInsets.zero,
+      actions: [
+        IconButton(
+          icon: Icon(
+            isFav ? Icons.star : Icons.star_border,
+            color: isFav ? Colors.amber : null,
           ),
-        ],
-      ),
+          tooltip: isFav
+              ? (l10n?.removeFavorite ?? 'Remove from favorites')
+              : (l10n?.addFavorite ?? 'Add to favorites'),
+          onPressed: () async {
+            // Await the toggle so the snackbar lies become impossible
+            // and the isFavoriteProvider has flipped before we show
+            // any feedback (#566).
+            await ref
+                .read(favoritesProvider.notifier)
+                .toggle(station.id, rawJson: station.toJson());
+            if (!context.mounted) return;
+            final msg = isFav
+                ? (l10n?.removedFromFavorites ?? 'Removed from favorites')
+                : (l10n?.addedToFavorites ?? 'Added to favorites');
+            SnackBarHelper.show(context, msg);
+          },
+        ),
+      ],
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

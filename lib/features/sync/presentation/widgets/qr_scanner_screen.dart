@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../../core/permissions/camera_permissions.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Full-screen QR code scanner for scanning TankSync credentials and
@@ -127,18 +128,17 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n?.syncWizardScanQrCode ?? 'Scan QR Code'),
-        actions: _phase == _ScannerPhase.scanning
-            ? [
-                QrScannerTorchButton(
-                  state: _controller,
-                  onToggle: _controller.toggleTorch,
-                ),
-              ]
-            : null,
-      ),
+    return PageScaffold(
+      title: l10n?.syncWizardScanQrCode ?? 'Scan QR Code',
+      bodyPadding: EdgeInsets.zero,
+      actions: _phase == _ScannerPhase.scanning
+          ? [
+              QrScannerTorchButton(
+                state: _controller,
+                onToggle: _controller.toggleTorch,
+              ),
+            ]
+          : null,
       body: _buildBody(l10n),
     );
   }
