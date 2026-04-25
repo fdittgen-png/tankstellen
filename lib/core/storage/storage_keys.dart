@@ -41,4 +41,12 @@ class StorageKeys {
   /// false (off) so users who only want favourite sync aren't
   /// silently uploading driving data.
   static const String syncBaselinesEnabled = 'sync_baselines_enabled';
+
+  /// #950 phase 4 — flag set once the
+  /// [VehicleProfileCatalogMigrator] has run, so subsequent app
+  /// launches skip the migration. Stored in the settings box rather
+  /// than in shared_preferences to keep all app-state in one place
+  /// (matches how onboarding completion is tracked).
+  static const String vehicleCatalogMigrationDone =
+      'vehicle_catalog_migration_done';
 }

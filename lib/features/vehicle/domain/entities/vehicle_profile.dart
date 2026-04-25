@@ -220,6 +220,26 @@ abstract class VehicleProfile with _$VehicleProfile {
     @Default(5.0) double movementStartThresholdKmh,
     @Default(60) int disconnectSaveDelaySec,
     @Default(false) bool backgroundLocationConsent,
+
+    // Reference catalog identification (#950 phase 4). Optional fields
+    // populated during onboarding (VIN decoder pre-fill or manual user
+    // entry) so the migrator and the OBD-II layer can resolve the
+    // vehicle to a [ReferenceVehicle]. All three default to null so
+    // pre-#950 profiles deserialize without losing data — the migrator
+    // fills them in on first launch.
+    //
+    //   make: marketing brand name, e.g. "Peugeot", "Renault".
+    //   model: model name as marketed in Europe, e.g. "208", "Clio".
+    //   year: model year (4-digit), used to disambiguate generations.
+    //   referenceVehicleId: slug of the matching catalog entry, e.g.
+    //     "peugeot-208-ii-2019-". Format is `<make>-<model>-<generation>`
+    //     lowercased with non-alphanumerics collapsed to dashes. The
+    //     consumer side (obd2_service) resolves the slug back to a
+    //     [ReferenceVehicle] via the catalog provider.
+    String? make,
+    String? model,
+    int? year,
+    String? referenceVehicleId,
   }) = _VehicleProfile;
 
   factory VehicleProfile.fromJson(Map<String, dynamic> json) =>

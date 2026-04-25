@@ -20,6 +20,9 @@ import '../core/sync/community_config.dart';
 import '../core/sync/supabase_client.dart';
 import '../core/utils/edge_to_edge.dart';
 import '../features/profile/data/repositories/profile_repository.dart';
+import '../features/vehicle/data/reference_vehicle_catalog_provider.dart';
+import '../features/vehicle/data/repositories/vehicle_profile_repository.dart';
+import '../features/vehicle/data/vehicle_profile_migrator.dart';
 import '../features/widget/data/home_widget_service.dart';
 import '../features/widget/providers/nearest_widget_refresh_provider.dart';
 
@@ -95,6 +98,28 @@ class AppInitializer {
         );
       } catch (e) {
         debugPrint('PackageInfo.fromPlatform failed (#570): $e');
+      }
+    });
+
+    // #950 phase 4 — backfill `referenceVehicleId` on existing
+    // VehicleProfile entries from the reference catalog. One-shot:
+    // gated on `vehicleCatalogMigrationDone` so subsequent launches
+    // skip the work. Runs after the first frame because reading the
+    // bundled JSON asset shouldn't block the landing UI.
+    _deferPostFirstFrame(() async {
+      try {
+        final migrator = VehicleProfileCatalogMigrator(
+          repository: VehicleProfileRepository(storage),
+          settings: storage,
+        );
+        if (migrator.hasRun) return;
+        final catalog =
+            await container.read(referenceVehicleCatalogProvider.future);
+        final matched = await migrator.run(catalog: catalog);
+        debugPrint(
+            'VehicleProfileCatalogMigrator: matched $matched profile(s)');
+      } catch (e) {
+        debugPrint('VehicleProfileCatalogMigrator: deferred run failed: $e');
       }
     });
 
