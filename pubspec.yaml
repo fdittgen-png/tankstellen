@@ -100,6 +100,7 @@ flutter:
   assets:
     - assets/
     - assets/receipt_overrides/index.json
+    - assets/reference_vehicles/vehicles.json
 
 flutter_launcher_icons:
   android: true
