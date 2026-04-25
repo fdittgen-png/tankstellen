@@ -24,6 +24,27 @@ class ReceiptScanOutcome {
   });
 }
 
+/// Outcome of a single pump-display capture: parsed fields plus the
+/// source OCR text and the path to the captured JPEG on disk. Mirrors
+/// [ReceiptScanOutcome] so the bad-scan reporting flow (#953) can ship
+/// the photo and OCR text alongside the user's corrected values when a
+/// pump-display read fails.
+///
+/// The caller is responsible for deleting [imagePath] once it no longer
+/// needs it (form saved, user dismissed the failure flow, or report
+/// submitted).
+class PumpDisplayScanOutcome {
+  final PumpDisplayParseResult parse;
+  final String ocrText;
+  final String imagePath;
+
+  const PumpDisplayScanOutcome({
+    required this.parse,
+    required this.ocrText,
+    required this.imagePath,
+  });
+}
+
 /// Service that captures a photo and runs on-device OCR.
 ///
 /// Uses [ImagePicker] for camera access and [TextRecognizer] from
@@ -73,18 +94,26 @@ class ReceiptScanService {
   /// Opens the camera, captures a pump-display photo, runs OCR, and
   /// parses the three primary values (Betrag / Abgabe / Preis/Liter)
   /// into a [PumpDisplayParseResult]. Returns null if the user
-  /// cancels the camera. The photo is deleted before return — the
-  /// pump-display flow does not feed the bad-scan reporting path.
-  Future<PumpDisplayParseResult?> scanPumpDisplay() async {
+  /// cancels the camera or OCR itself fails (no text recognised).
+  ///
+  /// Unlike earlier revisions of this method, the photo is NOT deleted
+  /// on success or on parse failure — callers hold the path from
+  /// [PumpDisplayScanOutcome.imagePath] and decide when to clean up
+  /// (#953 added the bad-scan reporting flow for pump displays, which
+  /// needs the image bytes long after parse returned).
+  Future<PumpDisplayScanOutcome?> scanPumpDisplay() async {
     final capture = await _capture();
     if (capture == null) return null;
-    try {
-      final text = await _recognise(capture);
-      if (text == null) return null;
-      return _pumpParser.parse(text);
-    } finally {
+    final text = await _recognise(capture);
+    if (text == null) {
       await _tryDelete(capture);
+      return null;
     }
+    return PumpDisplayScanOutcome(
+      parse: _pumpParser.parse(text),
+      ocrText: text,
+      imagePath: capture,
+    );
   }
 
   Future<String?> _capture() async {
@@ -117,6 +146,12 @@ class ReceiptScanService {
       debugPrint('OCR temp-file cleanup failed at $path: $e');
     }
   }
+
+  /// Deletes a captured photo file. Public so the failure-flow handlers
+  /// (#953) can drop the temp file when the user picks "Remove photo"
+  /// after a parse fail. Wraps [_tryDelete] so cleanup errors are
+  /// logged but never bubble up.
+  Future<void> deleteCapturedImage(String path) => _tryDelete(path);
 
   void dispose() {
     _recognizer.close();

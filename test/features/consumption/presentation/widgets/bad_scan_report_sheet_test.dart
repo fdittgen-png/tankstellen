@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:tankstellen/core/feedback/feedback_consent.dart';
 import 'package:tankstellen/core/feedback/github_issue_reporter.dart';
 import 'package:tankstellen/core/feedback/github_issue_reporter_provider.dart';
+import 'package:tankstellen/features/consumption/data/pump_display_parse_result.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_scan_service.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/bad_scan_report_sheet.dart';
@@ -31,6 +32,18 @@ void main() {
     imagePath: '/tmp/fake.jpg',
   );
 
+  const pumpOutcome = PumpDisplayScanOutcome(
+    parse: PumpDisplayParseResult(
+      liters: 40.0,
+      totalCost: 70.0,
+      pricePerLiter: 1.75,
+      pumpNumber: 3,
+      confidence: 0.9,
+    ),
+    ocrText: 'Betrag 70.00\nAbgabe 40.00\nPreis/L 1.75',
+    imagePath: '/tmp/fake-pump.jpg',
+  );
+
   Future<void> pumpSheet(
     WidgetTester tester, {
     Locale locale = const Locale('en'),
@@ -41,6 +54,7 @@ void main() {
     ConsentPrompter? consentPrompter,
     ConsentReader? consentReader,
     ConsentWriter? consentWriter,
+    ScanKind kind = ScanKind.receipt,
   }) {
     return tester.pumpWidget(
       ProviderScope(
@@ -51,7 +65,9 @@ void main() {
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: BadScanReportSheet(
-              scan: outcome,
+              kind: kind,
+              scan: kind == ScanKind.receipt ? outcome : null,
+              pumpScan: kind == ScanKind.pumpDisplay ? pumpOutcome : null,
               enteredLiters: 32.5,
               enteredTotalCost: 55.12,
               appVersion: '4.3.0+1',
@@ -77,7 +93,11 @@ void main() {
       await pumpSheet(tester);
       await tester.pumpAndSettle();
 
-      expect(find.text('Report a scan error'), findsOneWidget);
+      expect(
+        find.text('Report a scan error — Receipt'),
+        findsOneWidget,
+        reason: '#953 — receipt kind must use the kind-specific title.',
+      );
       expect(
         find.textContaining('share the receipt photo'),
         findsOneWidget,
@@ -103,7 +123,11 @@ void main() {
       await pumpSheet(tester, locale: const Locale('de'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Scan-Fehler melden'), findsOneWidget);
+      expect(
+        find.text('Scan-Fehler melden — Beleg'),
+        findsOneWidget,
+        reason: '#953 — German receipt kind also uses kind-specific title.',
+      );
       expect(find.text('Ticket erstellen'), findsOneWidget);
       expect(find.text('Feld'), findsOneWidget);
       expect(find.text('Gescannt'), findsOneWidget);
@@ -113,6 +137,80 @@ void main() {
       expect(find.text('Tankstelle'), findsOneWidget);
       expect(find.text('Kraftstoff'), findsOneWidget);
       expect(find.text('Datum'), findsOneWidget);
+    });
+  });
+
+  group('pump-display kind (#953)', () {
+    testWidgets('renders pump-display title on en locale', (tester) async {
+      await pumpSheet(tester, kind: ScanKind.pumpDisplay);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Report a scan error — Pump display'),
+        findsOneWidget,
+        reason: 'Pump-display kind must use the kind-specific title — '
+            'separates pump issues from receipt issues at first glance.',
+      );
+      // Pump-display kind hides receipt-only diff rows (brand layout,
+      // station, fuel, date) — only the three transaction numbers
+      // make it onto the diff table.
+      expect(find.text('Brand layout'), findsNothing);
+      expect(find.text('Station'), findsNothing);
+      expect(find.text('Fuel'), findsNothing);
+      expect(find.text('Date'), findsNothing);
+      // Common rows survive.
+      expect(find.text('Liters'), findsOneWidget);
+      expect(find.text('Total'), findsOneWidget);
+      expect(find.text('Price/L'), findsOneWidget);
+    });
+
+    testWidgets('renders pump-display title on de locale', (tester) async {
+      await pumpSheet(
+        tester,
+        locale: const Locale('de'),
+        kind: ScanKind.pumpDisplay,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Scan-Fehler melden — Zapfsäule'), findsOneWidget);
+    });
+
+    testWidgets(
+        'submitting forwards ScanKind.pumpDisplay to the reporter (#953)',
+        (tester) async {
+      ScanKind? capturedKind;
+      final reporter = _FakeReporter(
+        onCall: () async =>
+            Uri.parse('https://github.com/fdittgen-png/tankstellen/issues/953'),
+      );
+      reporter.onKindCaptured = (k) => capturedKind = k;
+
+      await pumpSheet(
+        tester,
+        kind: ScanKind.pumpDisplay,
+        overrides: [
+          githubIssueReporterProvider.overrideWith(
+            (ref) async => reporter,
+          ),
+        ],
+        imageBytesReader: stubImageReader,
+        consentReader: () async => FeedbackConsentState.granted,
+        consentWriter: (_) async {},
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Create issue'));
+      for (var i = 0; i < 30; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+
+      expect(
+        capturedKind,
+        ScanKind.pumpDisplay,
+        reason: 'GithubIssueReporter must receive ScanKind.pumpDisplay so '
+            'the issue title reads "[Scan] Pump display OCR failure".',
+      );
+      expect(reporter.callCount, 1);
     });
   });
 
@@ -463,6 +561,11 @@ class _FakeReporter extends GithubIssueReporter {
   final Future<Uri> Function() onCall;
   int callCount = 0;
 
+  /// Optional sink for the [ScanKind] received by [reportBadScan]. The
+  /// pump-display test (#953) uses this to assert the kind crosses the
+  /// widget boundary verbatim.
+  void Function(ScanKind kind)? onKindCaptured;
+
   @override
   Future<Uri> reportBadScan({
     required ScanKind kind,
@@ -473,6 +576,7 @@ class _FakeReporter extends GithubIssueReporter {
     String? userNote,
   }) async {
     callCount++;
+    onKindCaptured?.call(kind);
     return await onCall();
   }
 }

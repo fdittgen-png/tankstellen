@@ -3291,6 +3291,29 @@ class AppLocalizationsFr extends AppLocalizations {
   String get badScanReportTitle => 'Report a scan error';
 
   @override
+  String get badScanReportTitleReceipt => 'Signaler une erreur de scan — Reçu';
+
+  @override
+  String get badScanReportTitlePumpDisplay =>
+      'Signaler une erreur de scan — Display de pompe';
+
+  @override
+  String get pumpScanFailureTitle => 'Display illisible';
+
+  @override
+  String get pumpScanFailureBody =>
+      'Le scan n\'a pas pu lire le display. Que voulez-vous faire ?';
+
+  @override
+  String get pumpScanFailureCorrectManually => 'Corriger manuellement';
+
+  @override
+  String get pumpScanFailureReport => 'Signaler';
+
+  @override
+  String get pumpScanFailureRemove => 'Retirer la photo';
+
+  @override
   String get badScanReportHint =>
       'We\'ll share the receipt photo and both sets of values so the next build can learn this layout.';
 

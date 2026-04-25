@@ -237,25 +237,30 @@ void main() {
       expect(recognizer.processCalls, 0);
     });
 
-    test('returns parsed pump display and deletes the capture', () async {
+    test('returns parsed pump display and KEEPS the capture for #953',
+        () async {
       final capture = await _createTempCapture();
       picker.pathToReturn = capture.path;
       recognizer.textToReturn = 'Betrag 70.00\nAbgabe 40.00\nPreis/L 1.75';
 
-      final result = await service.scanPumpDisplay();
+      final outcome = await service.scanPumpDisplay();
 
-      expect(result, isNotNull);
-      expect(result!.liters, 40.0);
-      expect(result.totalCost, 70.0);
-      expect(result.pricePerLiter, 1.75);
-      expect(File(capture.path).existsSync(), isFalse,
-          reason: 'Pump-display flow does not feed bad-scan reports, '
-              'so the capture must be deleted to avoid leaking temp files.');
+      expect(outcome, isNotNull);
+      expect(outcome!.parse.liters, 40.0);
+      expect(outcome.parse.totalCost, 70.0);
+      expect(outcome.parse.pricePerLiter, 1.75);
+      expect(outcome.imagePath, capture.path);
+      expect(outcome.ocrText, contains('Betrag'));
+      expect(File(capture.path).existsSync(), isTrue,
+          reason: '#953 — pump-display photo must survive scan so the '
+              'failure-flow / bad-scan report can ship the image.');
 
+      await File(capture.path).delete();
       await capture.dir.delete(recursive: true);
     });
 
-    test('returns null and still deletes when OCR fails', () async {
+    test('returns null and deletes the capture when OCR itself fails',
+        () async {
       final capture = await _createTempCapture();
       picker.pathToReturn = capture.path;
       recognizer.errorToThrow = Exception('OCR exploded');
@@ -263,11 +268,13 @@ void main() {
       final result = await service.scanPumpDisplay();
 
       expect(result, isNull);
-      // _tryDelete is inside the `finally` of scanPumpDisplay — even
-      // when recognition throws, the file must not leak.
+      // OCR-recognition failure means we have no usable text to ship —
+      // there is nothing for the bad-scan flow to act on, so we still
+      // clean up the temp file. (Parse failure with usable text is a
+      // different path: the outcome is returned and the caller decides.)
       expect(File(capture.path).existsSync(), isFalse,
-          reason: 'OCR error on pump-display path must still clean up '
-              'the capture via the finally block.');
+          reason: 'OCR-recognition error on pump-display path must clean '
+              'up the capture — there is no outcome for the failure flow.');
 
       await capture.dir.delete(recursive: true);
     });

@@ -3295,6 +3295,28 @@ class AppLocalizationsDe extends AppLocalizations {
   String get badScanReportTitle => 'Scan-Fehler melden';
 
   @override
+  String get badScanReportTitleReceipt => 'Scan-Fehler melden — Beleg';
+
+  @override
+  String get badScanReportTitlePumpDisplay => 'Scan-Fehler melden — Zapfsäule';
+
+  @override
+  String get pumpScanFailureTitle => 'Anzeige nicht lesbar';
+
+  @override
+  String get pumpScanFailureBody =>
+      'Die Zapfsäulen-Anzeige konnte nicht gelesen werden. Wie möchtest du fortfahren?';
+
+  @override
+  String get pumpScanFailureCorrectManually => 'Manuell eingeben';
+
+  @override
+  String get pumpScanFailureReport => 'Melden';
+
+  @override
+  String get pumpScanFailureRemove => 'Foto entfernen';
+
+  @override
   String get badScanReportHint =>
       'Wir teilen das Belegfoto und beide Wertesätze, damit die nächste Version dieses Layout lernen kann.';
 

@@ -37,6 +37,34 @@
   "@badScanReportTitle": {
     "description": "Title of the bottom sheet that reports an incorrect receipt scan (#751)."
   },
+  "badScanReportTitleReceipt": "Report a scan error — Receipt",
+  "@badScanReportTitleReceipt": {
+    "description": "Receipt-specific title for the bad-scan report sheet (#953). Used when ScanKind == receipt."
+  },
+  "badScanReportTitlePumpDisplay": "Report a scan error — Pump display",
+  "@badScanReportTitlePumpDisplay": {
+    "description": "Pump-display-specific title for the bad-scan report sheet (#953). Used when ScanKind == pumpDisplay."
+  },
+  "pumpScanFailureTitle": "Display unreadable",
+  "@pumpScanFailureTitle": {
+    "description": "Title of the bottom sheet shown when a pump-display scan returns no usable data (#953)."
+  },
+  "pumpScanFailureBody": "The scan couldn't read the pump display. What would you like to do?",
+  "@pumpScanFailureBody": {
+    "description": "Body text of the pump-scan failure sheet, prompting the user to choose between correcting manually, reporting, or removing the photo (#953)."
+  },
+  "pumpScanFailureCorrectManually": "Correct manually",
+  "@pumpScanFailureCorrectManually": {
+    "description": "Action: close the failure sheet and leave the form untouched so the user types values (#953)."
+  },
+  "pumpScanFailureReport": "Report",
+  "@pumpScanFailureReport": {
+    "description": "Action: open the bad-scan report flow so the unreadable photo is shipped to GitHub for triage (#953)."
+  },
+  "pumpScanFailureRemove": "Remove photo",
+  "@pumpScanFailureRemove": {
+    "description": "Action: delete the captured photo and forget the scan (#953)."
+  },
   "badScanReportHint": "We'll share the receipt photo and both sets of values so the next build can learn this layout.",
   "@badScanReportHint": {
     "description": "Subtitle under the bad-scan-report sheet title (#751)."

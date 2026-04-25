@@ -3266,6 +3266,29 @@ class AppLocalizationsNb extends AppLocalizations {
   String get badScanReportTitle => 'Report a scan error';
 
   @override
+  String get badScanReportTitleReceipt => 'Report a scan error — Receipt';
+
+  @override
+  String get badScanReportTitlePumpDisplay =>
+      'Report a scan error — Pump display';
+
+  @override
+  String get pumpScanFailureTitle => 'Display unreadable';
+
+  @override
+  String get pumpScanFailureBody =>
+      'The scan couldn\'t read the pump display. What would you like to do?';
+
+  @override
+  String get pumpScanFailureCorrectManually => 'Correct manually';
+
+  @override
+  String get pumpScanFailureReport => 'Report';
+
+  @override
+  String get pumpScanFailureRemove => 'Remove photo';
+
+  @override
   String get badScanReportHint =>
       'We\'ll share the receipt photo and both sets of values so the next build can learn this layout.';
 

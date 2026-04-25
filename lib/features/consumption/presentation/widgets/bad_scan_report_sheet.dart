@@ -38,8 +38,8 @@ typedef UrlLauncher = Future<bool> Function(Uri uri);
 /// `File(path).readAsBytes()`; widget tests inject a Dart-only fake.
 typedef ImageBytesReader = Future<Uint8List> Function(String path);
 
-/// Bottom sheet the user opens when the scanned receipt values are
-/// wrong. Two submit paths:
+/// Bottom sheet the user opens when a scanned value is wrong. Two
+/// submit paths:
 ///
 /// 1. **GitHub ticket** (#952 phase 2) — when a PAT is configured via
 ///    secure storage under [kGithubFeedbackTokenKey] the sheet files an
@@ -50,10 +50,24 @@ typedef ImageBytesReader = Future<Uint8List> Function(String path);
 ///    system-share intent so the user can still deliver the report via
 ///    email / GitHub Mobile / any share target.
 ///
-/// Phase 2 does NOT introduce the token-entry UI or the consent dialog
-/// — both ship in #952 phase 3 alongside EXIF stripping.
+/// #953 generalised the sheet to also handle failed pump-display scans.
+/// Pass [scan] for the receipt path, or [pumpScan] for the pump-display
+/// path; exactly one must be non-null and [kind] selects which.
 class BadScanReportSheet extends ConsumerStatefulWidget {
-  final ReceiptScanOutcome scan;
+  /// Selects the rendering + GitHub issue title. Defaults to
+  /// [ScanKind.receipt] for backward compatibility with the original
+  /// (#751 / #952) callers — existing code that passes only [scan]
+  /// continues to render the receipt diff table unchanged.
+  final ScanKind kind;
+
+  /// Receipt-side scan outcome. Required when [kind] is
+  /// [ScanKind.receipt]; ignored when [kind] is [ScanKind.pumpDisplay].
+  final ReceiptScanOutcome? scan;
+
+  /// Pump-display scan outcome (#953). Required when [kind] is
+  /// [ScanKind.pumpDisplay]; ignored when [kind] is [ScanKind.receipt].
+  final PumpDisplayScanOutcome? pumpScan;
+
   final double? enteredLiters;
   final double? enteredTotalCost;
   final String appVersion;
@@ -90,7 +104,9 @@ class BadScanReportSheet extends ConsumerStatefulWidget {
 
   const BadScanReportSheet({
     super.key,
-    required this.scan,
+    this.kind = ScanKind.receipt,
+    this.scan,
+    this.pumpScan,
     required this.enteredLiters,
     required this.enteredTotalCost,
     required this.appVersion,
@@ -100,7 +116,22 @@ class BadScanReportSheet extends ConsumerStatefulWidget {
     this.consentPrompter,
     this.consentReader,
     this.consentWriter,
-  });
+  })  : assert(
+          kind == ScanKind.receipt
+              ? scan != null
+              : pumpScan != null,
+          'BadScanReportSheet: scan must be set for ScanKind.receipt, '
+          'pumpScan must be set for ScanKind.pumpDisplay.',
+        );
+
+  /// Path of the scanned image on disk. Resolves to either the receipt
+  /// or the pump-display capture depending on [kind].
+  String get _imagePath =>
+      kind == ScanKind.receipt ? scan!.imagePath : pumpScan!.imagePath;
+
+  /// Raw OCR text. Same kind dispatch as [_imagePath].
+  String get _ocrText =>
+      kind == ScanKind.receipt ? scan!.ocrText : pumpScan!.ocrText;
 
   @override
   ConsumerState<BadScanReportSheet> createState() =>
@@ -123,7 +154,6 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
-    final p = widget.scan.parse;
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -137,7 +167,7 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              l?.badScanReportTitle ?? 'Report a scan error',
+              _resolveTitle(l),
               style: theme.textTheme.titleMedium
                   ?.copyWith(fontWeight: FontWeight.bold),
             ),
@@ -152,45 +182,7 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
             ),
             const SizedBox(height: 16),
             if (_createdIssueUrl == null) ...[
-              _DiffTable(
-                rows: [
-                  _DiffRow(
-                    l?.badScanReportFieldBrandLayout ?? 'Brand layout',
-                    p.brandLayout,
-                    p.brandLayout,
-                  ),
-                  _DiffRow(
-                    l?.liters ?? 'Liters',
-                    p.liters?.toStringAsFixed(2) ?? '—',
-                    widget.enteredLiters?.toStringAsFixed(2) ?? '—',
-                  ),
-                  _DiffRow(
-                    l?.badScanReportFieldTotal ?? 'Total',
-                    p.totalCost?.toStringAsFixed(2) ?? '—',
-                    widget.enteredTotalCost?.toStringAsFixed(2) ?? '—',
-                  ),
-                  _DiffRow(
-                    l?.badScanReportFieldPricePerLiter ?? 'Price/L',
-                    p.pricePerLiter?.toStringAsFixed(3) ?? '—',
-                    '—',
-                  ),
-                  _DiffRow(
-                    l?.badScanReportFieldStation ?? 'Station',
-                    p.stationName ?? '—',
-                    '—',
-                  ),
-                  _DiffRow(
-                    l?.badScanReportFieldFuel ?? 'Fuel',
-                    p.fuelType?.displayName ?? '—',
-                    '—',
-                  ),
-                  _DiffRow(
-                    l?.badScanReportFieldDate ?? 'Date',
-                    p.date?.toIso8601String().split('T').first ?? '—',
-                    '—',
-                  ),
-                ],
-              ),
+              _DiffTable(rows: _buildDiffRows(l)),
               const SizedBox(height: 16),
               FilledButton.icon(
                 onPressed: _submitting ? null : _handleCreateTicket,
@@ -268,8 +260,8 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
       }
 
       final url = await reporter.reportBadScan(
-        kind: ScanKind.receipt,
-        rawOcrText: widget.scan.ocrText,
+        kind: widget.kind,
+        rawOcrText: widget._ocrText,
         parsedFields: _parsedFields(),
         userCorrections: _userCorrections(),
         imageBytes: await _readImageBytes(),
@@ -296,9 +288,11 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
     final share = widget.shareFallback ?? _defaultShareFallback;
 
     final params = ShareParams(
-      files: [XFile(widget.scan.imagePath)],
+      files: [XFile(widget._imagePath)],
       text: _buildShareBody(),
-      subject: 'Tankstellen receipt scan issue',
+      subject: widget.kind == ScanKind.receipt
+          ? 'Tankstellen receipt scan issue'
+          : 'Tankstellen pump-display scan issue',
     );
 
     // Show the snackbar before awaiting share() so the message is
@@ -335,15 +329,25 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
   }
 
   Map<String, String?> _parsedFields() {
-    final p = widget.scan.parse;
+    if (widget.kind == ScanKind.receipt) {
+      final p = widget.scan!.parse;
+      return <String, String?>{
+        'brandLayout': p.brandLayout,
+        'liters': p.liters?.toStringAsFixed(2),
+        'totalCost': p.totalCost?.toStringAsFixed(2),
+        'pricePerLiter': p.pricePerLiter?.toStringAsFixed(3),
+        'stationName': p.stationName,
+        'fuelType': p.fuelType?.apiValue,
+        'date': p.date?.toIso8601String(),
+      };
+    }
+    final p = widget.pumpScan!.parse;
     return <String, String?>{
-      'brandLayout': p.brandLayout,
       'liters': p.liters?.toStringAsFixed(2),
       'totalCost': p.totalCost?.toStringAsFixed(2),
       'pricePerLiter': p.pricePerLiter?.toStringAsFixed(3),
-      'stationName': p.stationName,
-      'fuelType': p.fuelType?.apiValue,
-      'date': p.date?.toIso8601String(),
+      'pumpNumber': p.pumpNumber?.toString(),
+      'confidence': p.confidence.toStringAsFixed(2),
     };
   }
 
@@ -365,32 +369,133 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
 
   Future<Uint8List> _readImageBytes() {
     final reader = widget.imageBytesReader ?? _defaultImageBytesReader;
-    return reader(widget.scan.imagePath);
+    return reader(widget._imagePath);
   }
 
   String _buildShareBody() {
-    final p = widget.scan.parse;
-    final buffer = StringBuffer()
-      ..writeln('Tankstellen receipt scan report')
-      ..writeln('================================')
-      ..writeln('App version: ${widget.appVersion}')
-      ..writeln('Brand layout: ${p.brandLayout}')
-      ..writeln()
-      ..writeln('Scanned → Corrected')
-      ..writeln('-------------------')
-      ..writeln('Liters:   ${p.liters?.toStringAsFixed(2) ?? '—'}'
-          '   →   ${widget.enteredLiters?.toStringAsFixed(2) ?? '(please fill)'}')
-      ..writeln('Total:    ${p.totalCost?.toStringAsFixed(2) ?? '—'}'
-          '   →   ${widget.enteredTotalCost?.toStringAsFixed(2) ?? '(please fill)'}')
-      ..writeln('Price/L:  ${p.pricePerLiter?.toStringAsFixed(3) ?? '—'}')
-      ..writeln('Station:  ${p.stationName ?? '—'}')
-      ..writeln('Fuel:     ${p.fuelType?.apiValue ?? '—'}')
-      ..writeln('Date:     ${p.date?.toIso8601String() ?? '—'}')
+    final buffer = StringBuffer();
+    if (widget.kind == ScanKind.receipt) {
+      final p = widget.scan!.parse;
+      buffer
+        ..writeln('Tankstellen receipt scan report')
+        ..writeln('================================')
+        ..writeln('App version: ${widget.appVersion}')
+        ..writeln('Brand layout: ${p.brandLayout}')
+        ..writeln()
+        ..writeln('Scanned → Corrected')
+        ..writeln('-------------------')
+        ..writeln('Liters:   ${p.liters?.toStringAsFixed(2) ?? '—'}'
+            '   →   ${widget.enteredLiters?.toStringAsFixed(2) ?? '(please fill)'}')
+        ..writeln('Total:    ${p.totalCost?.toStringAsFixed(2) ?? '—'}'
+            '   →   ${widget.enteredTotalCost?.toStringAsFixed(2) ?? '(please fill)'}')
+        ..writeln('Price/L:  ${p.pricePerLiter?.toStringAsFixed(3) ?? '—'}')
+        ..writeln('Station:  ${p.stationName ?? '—'}')
+        ..writeln('Fuel:     ${p.fuelType?.apiValue ?? '—'}')
+        ..writeln('Date:     ${p.date?.toIso8601String() ?? '—'}');
+    } else {
+      final p = widget.pumpScan!.parse;
+      buffer
+        ..writeln('Tankstellen pump-display scan report')
+        ..writeln('=====================================')
+        ..writeln('App version: ${widget.appVersion}')
+        ..writeln()
+        ..writeln('Scanned → Corrected')
+        ..writeln('-------------------')
+        ..writeln('Liters:   ${p.liters?.toStringAsFixed(2) ?? '—'}'
+            '   →   ${widget.enteredLiters?.toStringAsFixed(2) ?? '(please fill)'}')
+        ..writeln('Total:    ${p.totalCost?.toStringAsFixed(2) ?? '—'}'
+            '   →   ${widget.enteredTotalCost?.toStringAsFixed(2) ?? '(please fill)'}')
+        ..writeln('Price/L:  ${p.pricePerLiter?.toStringAsFixed(3) ?? '—'}')
+        ..writeln('Pump #:   ${p.pumpNumber?.toString() ?? '—'}')
+        ..writeln('Confidence: ${p.confidence.toStringAsFixed(2)}');
+    }
+    buffer
       ..writeln()
       ..writeln('Raw OCR text')
       ..writeln('------------')
-      ..writeln(widget.scan.ocrText);
+      ..writeln(widget._ocrText);
     return buffer.toString();
+  }
+
+  /// Resolves the kind-aware sheet title. Falls back to the original
+  /// "Report a scan error" string for both kinds when localization is
+  /// not available, then layers per-kind suffixes on top via the
+  /// kind-specific keys (#953).
+  String _resolveTitle(AppLocalizations? l) {
+    switch (widget.kind) {
+      case ScanKind.receipt:
+        return l?.badScanReportTitleReceipt ??
+            l?.badScanReportTitle ??
+            'Report a scan error — Receipt';
+      case ScanKind.pumpDisplay:
+        return l?.badScanReportTitlePumpDisplay ??
+            'Report a scan error — Pump display';
+    }
+  }
+
+  /// Builds the field-by-field diff table rendered above the action
+  /// buttons. Receipt shows the rich layout (brand, station, fuel,
+  /// date); pump-display shows only the three transaction numbers
+  /// plus the pump number when available (#953).
+  List<_DiffRow> _buildDiffRows(AppLocalizations? l) {
+    if (widget.kind == ScanKind.receipt) {
+      final p = widget.scan!.parse;
+      return [
+        _DiffRow(
+          l?.badScanReportFieldBrandLayout ?? 'Brand layout',
+          p.brandLayout,
+          p.brandLayout,
+        ),
+        _DiffRow(
+          l?.liters ?? 'Liters',
+          p.liters?.toStringAsFixed(2) ?? '—',
+          widget.enteredLiters?.toStringAsFixed(2) ?? '—',
+        ),
+        _DiffRow(
+          l?.badScanReportFieldTotal ?? 'Total',
+          p.totalCost?.toStringAsFixed(2) ?? '—',
+          widget.enteredTotalCost?.toStringAsFixed(2) ?? '—',
+        ),
+        _DiffRow(
+          l?.badScanReportFieldPricePerLiter ?? 'Price/L',
+          p.pricePerLiter?.toStringAsFixed(3) ?? '—',
+          '—',
+        ),
+        _DiffRow(
+          l?.badScanReportFieldStation ?? 'Station',
+          p.stationName ?? '—',
+          '—',
+        ),
+        _DiffRow(
+          l?.badScanReportFieldFuel ?? 'Fuel',
+          p.fuelType?.displayName ?? '—',
+          '—',
+        ),
+        _DiffRow(
+          l?.badScanReportFieldDate ?? 'Date',
+          p.date?.toIso8601String().split('T').first ?? '—',
+          '—',
+        ),
+      ];
+    }
+    final p = widget.pumpScan!.parse;
+    return [
+      _DiffRow(
+        l?.liters ?? 'Liters',
+        p.liters?.toStringAsFixed(2) ?? '—',
+        widget.enteredLiters?.toStringAsFixed(2) ?? '—',
+      ),
+      _DiffRow(
+        l?.badScanReportFieldTotal ?? 'Total',
+        p.totalCost?.toStringAsFixed(2) ?? '—',
+        widget.enteredTotalCost?.toStringAsFixed(2) ?? '—',
+      ),
+      _DiffRow(
+        l?.badScanReportFieldPricePerLiter ?? 'Price/L',
+        p.pricePerLiter?.toStringAsFixed(3) ?? '—',
+        '—',
+      ),
+    ];
   }
 }
 
