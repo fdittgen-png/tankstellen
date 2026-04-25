@@ -158,6 +158,10 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         final badge =
             await ref.read(autoRecordBadgeServiceProvider.future);
         await badge.decrement();
+        // Phase 6: also refresh the reactive count so the
+        // trip-history "Mark all as read" badge updates without
+        // waiting for a route change.
+        await ref.read(autoRecordBadgeCountProvider.notifier).refresh();
       } catch (e) {
         debugPrint('TripDetailScreen badge decrement: $e');
       }

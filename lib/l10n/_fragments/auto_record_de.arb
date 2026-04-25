@@ -1,0 +1,12 @@
+{
+  "autoRecordSectionTitle": "Automatische Aufzeichnung",
+  "autoRecordToggleLabel": "Fahrten automatisch aufzeichnen",
+  "autoRecordPhaseStatusBanner": "Die automatische Aufzeichnung wird schrittweise eingeführt. Das Aktivieren speichert deine Einstellung, aber der Hintergrundablauf ist noch in Entwicklung — Fahrten werden noch nicht automatisch erfasst.",
+  "autoRecordSpeedThresholdLabel": "Startgeschwindigkeit (km/h)",
+  "autoRecordSaveDelayLabel": "Speicherverzögerung nach Trennung (Sekunden)",
+  "autoRecordPairedAdapterLabel": "Verbundener Adapter",
+  "autoRecordPairedAdapterNone": "Kein Adapter verbunden. Verbinde zuerst einen über das OBD2-Onboarding.",
+  "autoRecordBackgroundLocationLabel": "Standort im Hintergrund erlaubt",
+  "autoRecordBackgroundLocationRequest": "Berechtigung anfordern",
+  "autoRecordBadgeClearTooltip": "Zähler zurücksetzen"
+}

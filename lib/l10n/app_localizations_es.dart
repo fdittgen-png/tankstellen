@@ -3130,6 +3130,39 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get autoRecordSectionTitle => 'Auto-record';
+
+  @override
+  String get autoRecordToggleLabel => 'Auto-record trips';
+
+  @override
+  String get autoRecordPhaseStatusBanner =>
+      'Auto-record is being rolled out in phases. Turning this on saves your preference, but the background recording flow is still in development — your trips are not yet auto-captured.';
+
+  @override
+  String get autoRecordSpeedThresholdLabel => 'Start speed (km/h)';
+
+  @override
+  String get autoRecordSaveDelayLabel =>
+      'Save delay after disconnect (seconds)';
+
+  @override
+  String get autoRecordPairedAdapterLabel => 'Paired adapter';
+
+  @override
+  String get autoRecordPairedAdapterNone =>
+      'No adapter paired. Pair one via the OBD2 onboarding first.';
+
+  @override
+  String get autoRecordBackgroundLocationLabel => 'Background location allowed';
+
+  @override
+  String get autoRecordBackgroundLocationRequest => 'Request permission';
+
+  @override
+  String get autoRecordBadgeClearTooltip => 'Clear counter';
+
+  @override
   String get consumptionTabFuel => 'Fuel';
 
   @override

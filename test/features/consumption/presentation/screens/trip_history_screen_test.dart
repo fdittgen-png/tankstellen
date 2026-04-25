@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tankstellen/core/feedback/auto_record_badge_provider.dart';
 import 'package:tankstellen/core/widgets/empty_state.dart';
 import 'package:tankstellen/core/widgets/page_scaffold.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
@@ -10,16 +12,18 @@ import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/trip_history_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_history_card.dart';
 import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../helpers/pump_app.dart';
 
-/// Widget tests for `TripHistoryScreen` (#561 zero-coverage backlog).
+/// Widget tests for `TripHistoryScreen` (#561 zero-coverage backlog +
+/// #1004 phase 6).
 ///
 /// The screen is a thin shell around `tripHistoryListProvider`: empty
 /// list → `EmptyState`, non-empty → a `ListView.builder` of
 /// `Dismissible`-wrapped `TripHistoryCard`s. Swipes call
-/// `notifier.delete(tripId)`. The back button uses `context.pop()` so
-/// the tests wrap the screen in a `GoRouter` with a stub initial route.
+/// `notifier.delete(tripId)`. The AppBar exposes a "Mark all as read"
+/// affordance backed by `autoRecordBadgeCountProvider` (#1004 phase 6).
 
 class _FakeTripHistoryList extends TripHistoryList {
   _FakeTripHistoryList(this._initial);
@@ -36,6 +40,34 @@ class _FakeTripHistoryList extends TripHistoryList {
     deleteCallCount++;
     lastDeletedId = id;
     state = state.where((e) => e.id != id).toList();
+  }
+}
+
+class _FixedTripHistoryList extends TripHistoryList {
+  _FixedTripHistoryList(this._value);
+  final List<TripHistoryEntry> _value;
+
+  @override
+  List<TripHistoryEntry> build() => _value;
+}
+
+class _FakeBadgeCount extends AutoRecordBadgeCount {
+  _FakeBadgeCount(this._initial);
+  final int _initial;
+  int markAllCallCount = 0;
+
+  @override
+  int build() => _initial;
+
+  @override
+  Future<void> markAllAsRead() async {
+    markAllCallCount++;
+    state = 0;
+  }
+
+  @override
+  Future<void> refresh() async {
+    // No-op — tests drive state via constructor seeds.
   }
 }
 
@@ -70,9 +102,6 @@ Future<_FakeTripHistoryList> _pumpHistory(
 }) async {
   final notifier = _FakeTripHistoryList(trips);
   final router = GoRouter(
-    // Stub initial route gives `context.pop()` a parent to pop back to,
-    // mirroring the real flow where the user lands on the consumption
-    // screen and pushes the trip history on top.
     initialLocation: '/consumption-stub',
     routes: [
       GoRoute(
@@ -100,6 +129,40 @@ Future<_FakeTripHistoryList> _pumpHistory(
   return notifier;
 }
 
+Future<_FakeBadgeCount> _pumpScreen(
+  WidgetTester tester, {
+  required int badgeCount,
+  List<TripHistoryEntry> trips = const [],
+}) async {
+  final fakeBadge = _FakeBadgeCount(badgeCount);
+  final router = GoRouter(
+    initialLocation: '/',
+    routes: [
+      GoRoute(
+        path: '/',
+        builder: (_, _) => const TripHistoryScreen(),
+      ),
+    ],
+  );
+
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        tripHistoryListProvider
+            .overrideWith(() => _FixedTripHistoryList(trips)),
+        autoRecordBadgeCountProvider.overrideWith(() => fakeBadge),
+      ],
+      child: MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: router,
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+  return fakeBadge;
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -115,7 +178,6 @@ void main() {
         find.textContaining('Connect an OBD2 adapter'),
         findsOneWidget,
       );
-      // No ListView rendered when the list is empty.
       expect(find.byType(ListView), findsNothing);
       expect(find.byType(TripHistoryCard), findsNothing);
     });
@@ -148,9 +210,6 @@ void main() {
         ],
       );
 
-      // Two `Dismissible`s — one per row. The screen keys them on
-      // `ValueKey(trip.id)` so swipe-to-delete attaches to the right
-      // entry across rebuilds.
       final dismissibles =
           tester.widgetList<Dismissible>(find.byType(Dismissible));
       expect(dismissibles.length, 2);
@@ -170,9 +229,6 @@ void main() {
         ],
       );
 
-      // Swipe the first card (trip-a) right-to-left → endToStart
-      // direction. `fling` triggers the dismiss animation; we settle
-      // afterwards so `onDismissed` runs.
       await tester.fling(
         find.byKey(const ValueKey('trip-a')),
         const Offset(-500, 0),
@@ -182,7 +238,6 @@ void main() {
 
       expect(notifier.deleteCallCount, 1);
       expect(notifier.lastDeletedId, 'trip-a');
-      // After the optimistic state update only one row remains.
       expect(find.byType(TripHistoryCard), findsOneWidget);
     });
   });
@@ -200,7 +255,6 @@ void main() {
         (tester) async {
       await _pumpHistory(tester, trips: const []);
 
-      // One IconButton in the leading slot — the back arrow.
       final back = find.widgetWithIcon(IconButton, Icons.arrow_back);
       expect(back, findsOneWidget);
       final button = tester.widget<IconButton>(back);
@@ -213,16 +267,66 @@ void main() {
         trips: [_entry(id: 'trip-a')],
       );
 
-      // We are on /trips with /consumption-stub underneath.
       expect(find.byType(TripHistoryScreen), findsOneWidget);
       expect(find.text('ConsumptionStub'), findsNothing);
 
       await tester.tap(find.widgetWithIcon(IconButton, Icons.arrow_back));
       await tester.pumpAndSettle();
 
-      // Pop returned us to the stub; the history screen is gone.
       expect(find.byType(TripHistoryScreen), findsNothing);
       expect(find.text('ConsumptionStub'), findsOneWidget);
+    });
+  });
+
+  group('TripHistoryScreen badge clear (#1004 phase 6)', () {
+    testWidgets('badge action is hidden when counter is 0', (tester) async {
+      await _pumpScreen(tester, badgeCount: 0);
+      expect(
+        find.byKey(const Key('tripHistoryBadgeClear')),
+        findsNothing,
+      );
+    });
+
+    testWidgets('badge action is visible when counter is > 0',
+        (tester) async {
+      await _pumpScreen(tester, badgeCount: 3);
+      expect(
+        find.byKey(const Key('tripHistoryBadgeClear')),
+        findsOneWidget,
+      );
+      expect(find.text('3'), findsOneWidget);
+    });
+
+    testWidgets('counter > 99 renders as 99+ to prevent overflow',
+        (tester) async {
+      await _pumpScreen(tester, badgeCount: 250);
+      expect(find.text('99+'), findsOneWidget);
+      expect(find.text('250'), findsNothing);
+    });
+
+    testWidgets('tapping the badge action runs markAllAsRead and hides it',
+        (tester) async {
+      final badge = await _pumpScreen(tester, badgeCount: 2);
+      expect(badge.markAllCallCount, 0);
+
+      await tester.tap(find.byKey(const Key('tripHistoryBadgeClear')));
+      await tester.pumpAndSettle();
+
+      expect(badge.markAllCallCount, 1);
+      expect(
+        find.byKey(const Key('tripHistoryBadgeClear')),
+        findsNothing,
+      );
+    });
+
+    testWidgets('badge action carries a tooltip for accessibility',
+        (tester) async {
+      await _pumpScreen(tester, badgeCount: 5);
+      final btn = tester.widget<IconButton>(
+        find.byKey(const Key('tripHistoryBadgeClear')),
+      );
+      expect(btn.tooltip, isNotNull);
+      expect(btn.tooltip, isNotEmpty);
     });
   });
 }

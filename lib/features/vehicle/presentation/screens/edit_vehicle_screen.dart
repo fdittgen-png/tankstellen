@@ -8,6 +8,7 @@ import '../../domain/entities/vehicle_profile.dart';
 import '../../domain/entities/vin_data.dart';
 import '../../providers/vehicle_providers.dart';
 import '../../providers/vin_decoder_provider.dart';
+import '../widgets/auto_record_section.dart';
 import '../widgets/ve_reset_confirm_dialog.dart';
 import '../widgets/vehicle_drivetrain_section.dart';
 import '../widgets/vehicle_extras_section.dart';
@@ -277,7 +278,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
             // Spread a List<Widget> instead of wrapping in a Column
             // so tester.scrollUntilVisible still works on the rows
             // below the fold (see feedback_ci_column_in_listview.md).
-            if (_existingId != null)
+            if (_existingId != null) ...[
               ...VehicleExtrasSection.build(
                 context: context,
                 vehicleId: _existingId!,
@@ -288,6 +289,12 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
                 onResetVolumetricEfficiency: _resetVolumetricEfficiency,
                 currentOdometerKm: ref.latestOdometerKm(_existingId!),
               ),
+              // Card: hands-free auto-record settings (#1004 phase 6).
+              // Spread alongside the extras list so the host ListView
+              // owns scroll virtualisation for the row.
+              const SizedBox(height: 16),
+              AutoRecordSection(vehicleId: _existingId!),
+            ],
           ],
         ),
       ),

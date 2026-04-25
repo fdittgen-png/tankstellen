@@ -3152,6 +3152,40 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get autoRecordSectionTitle => 'Automatische Aufzeichnung';
+
+  @override
+  String get autoRecordToggleLabel => 'Fahrten automatisch aufzeichnen';
+
+  @override
+  String get autoRecordPhaseStatusBanner =>
+      'Die automatische Aufzeichnung wird schrittweise eingeführt. Das Aktivieren speichert deine Einstellung, aber der Hintergrundablauf ist noch in Entwicklung — Fahrten werden noch nicht automatisch erfasst.';
+
+  @override
+  String get autoRecordSpeedThresholdLabel => 'Startgeschwindigkeit (km/h)';
+
+  @override
+  String get autoRecordSaveDelayLabel =>
+      'Speicherverzögerung nach Trennung (Sekunden)';
+
+  @override
+  String get autoRecordPairedAdapterLabel => 'Verbundener Adapter';
+
+  @override
+  String get autoRecordPairedAdapterNone =>
+      'Kein Adapter verbunden. Verbinde zuerst einen über das OBD2-Onboarding.';
+
+  @override
+  String get autoRecordBackgroundLocationLabel =>
+      'Standort im Hintergrund erlaubt';
+
+  @override
+  String get autoRecordBackgroundLocationRequest => 'Berechtigung anfordern';
+
+  @override
+  String get autoRecordBadgeClearTooltip => 'Zähler zurücksetzen';
+
+  @override
   String get consumptionTabFuel => 'Kraftstoff';
 
   @override

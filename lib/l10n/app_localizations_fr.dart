@@ -3151,6 +3151,40 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get autoRecordSectionTitle => 'Enregistrement automatique';
+
+  @override
+  String get autoRecordToggleLabel => 'Enregistrer les trajets automatiquement';
+
+  @override
+  String get autoRecordPhaseStatusBanner =>
+      'L\'enregistrement automatique est déployé par étapes. L\'activer enregistre votre préférence, mais le flux d\'arrière-plan est encore en développement — vos trajets ne sont pas encore capturés automatiquement.';
+
+  @override
+  String get autoRecordSpeedThresholdLabel => 'Vitesse de démarrage (km/h)';
+
+  @override
+  String get autoRecordSaveDelayLabel =>
+      'Délai de sauvegarde après déconnexion (secondes)';
+
+  @override
+  String get autoRecordPairedAdapterLabel => 'Adaptateur appairé';
+
+  @override
+  String get autoRecordPairedAdapterNone =>
+      'Aucun adaptateur appairé. Pairez via l\'onboarding OBD2 d\'abord.';
+
+  @override
+  String get autoRecordBackgroundLocationLabel =>
+      'Localisation en arrière-plan autorisée';
+
+  @override
+  String get autoRecordBackgroundLocationRequest => 'Demander la permission';
+
+  @override
+  String get autoRecordBadgeClearTooltip => 'Effacer le compteur';
+
+  @override
   String get consumptionTabFuel => 'Fuel';
 
   @override

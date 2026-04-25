@@ -87,3 +87,82 @@ final class AutoRecordBadgeServiceProvider
 
 String _$autoRecordBadgeServiceHash() =>
     r'3b635790f0a15f6020ccbc4dfe696ed021b76bf3';
+
+/// Reactive counter mirroring [AutoRecordBadgeService.count] for UI
+/// consumers (#1004 phase 6). The service writes to
+/// `SharedPreferences` synchronously but does not notify; this
+/// provider re-reads the value on demand and on `markAllAsRead`
+/// invocations so the trip-history AppBar badge stays in step with
+/// the launcher icon.
+
+@ProviderFor(AutoRecordBadgeCount)
+final autoRecordBadgeCountProvider = AutoRecordBadgeCountProvider._();
+
+/// Reactive counter mirroring [AutoRecordBadgeService.count] for UI
+/// consumers (#1004 phase 6). The service writes to
+/// `SharedPreferences` synchronously but does not notify; this
+/// provider re-reads the value on demand and on `markAllAsRead`
+/// invocations so the trip-history AppBar badge stays in step with
+/// the launcher icon.
+final class AutoRecordBadgeCountProvider
+    extends $NotifierProvider<AutoRecordBadgeCount, int> {
+  /// Reactive counter mirroring [AutoRecordBadgeService.count] for UI
+  /// consumers (#1004 phase 6). The service writes to
+  /// `SharedPreferences` synchronously but does not notify; this
+  /// provider re-reads the value on demand and on `markAllAsRead`
+  /// invocations so the trip-history AppBar badge stays in step with
+  /// the launcher icon.
+  AutoRecordBadgeCountProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'autoRecordBadgeCountProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$autoRecordBadgeCountHash();
+
+  @$internal
+  @override
+  AutoRecordBadgeCount create() => AutoRecordBadgeCount();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(int value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<int>(value),
+    );
+  }
+}
+
+String _$autoRecordBadgeCountHash() =>
+    r'c5a24468db696e7f608480933646d490dcb5e09f';
+
+/// Reactive counter mirroring [AutoRecordBadgeService.count] for UI
+/// consumers (#1004 phase 6). The service writes to
+/// `SharedPreferences` synchronously but does not notify; this
+/// provider re-reads the value on demand and on `markAllAsRead`
+/// invocations so the trip-history AppBar badge stays in step with
+/// the launcher icon.
+
+abstract class _$AutoRecordBadgeCount extends $Notifier<int> {
+  int build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<int, int>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<int, int>,
+              int,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

@@ -887,5 +887,15 @@
   "alertsRadiusFrequencyDaily": "Une fois par jour",
   "alertsRadiusFrequencyTwiceDaily": "Deux fois par jour",
   "alertsRadiusFrequencyThriceDaily": "Trois fois par jour",
-  "alertsRadiusFrequencyFourTimesDaily": "Quatre fois par jour"
+  "alertsRadiusFrequencyFourTimesDaily": "Quatre fois par jour",
+  "autoRecordSectionTitle": "Enregistrement automatique",
+  "autoRecordToggleLabel": "Enregistrer les trajets automatiquement",
+  "autoRecordPhaseStatusBanner": "L'enregistrement automatique est déployé par étapes. L'activer enregistre votre préférence, mais le flux d'arrière-plan est encore en développement — vos trajets ne sont pas encore capturés automatiquement.",
+  "autoRecordSpeedThresholdLabel": "Vitesse de démarrage (km/h)",
+  "autoRecordSaveDelayLabel": "Délai de sauvegarde après déconnexion (secondes)",
+  "autoRecordPairedAdapterLabel": "Adaptateur appairé",
+  "autoRecordPairedAdapterNone": "Aucun adaptateur appairé. Pairez via l'onboarding OBD2 d'abord.",
+  "autoRecordBackgroundLocationLabel": "Localisation en arrière-plan autorisée",
+  "autoRecordBackgroundLocationRequest": "Demander la permission",
+  "autoRecordBadgeClearTooltip": "Effacer le compteur"
 }

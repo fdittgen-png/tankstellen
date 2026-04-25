@@ -5876,6 +5876,66 @@ abstract class AppLocalizations {
   /// **'{stationCount} stations dropped by up to {maxDropCents}¢ in the last hour'**
   String velocityAlertBody(int stationCount, int maxDropCents);
 
+  /// Title of the per-vehicle auto-record configuration section on the edit-vehicle screen (#1004 phase 6).
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-record'**
+  String get autoRecordSectionTitle;
+
+  /// Label for the master ON/OFF switch that opts a vehicle into hands-free trip recording.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-record trips'**
+  String get autoRecordToggleLabel;
+
+  /// Soft warning banner shown when auto-record is enabled but the background phases (2-4) are not yet shipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-record is being rolled out in phases. Turning this on saves your preference, but the background recording flow is still in development — your trips are not yet auto-captured.'**
+  String get autoRecordPhaseStatusBanner;
+
+  /// Label for the slider that controls the movement-start threshold above which an auto-record trip begins.
+  ///
+  /// In en, this message translates to:
+  /// **'Start speed (km/h)'**
+  String get autoRecordSpeedThresholdLabel;
+
+  /// Label for the slider that controls how long after a Bluetooth disconnect the auto-record path waits before saving the trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Save delay after disconnect (seconds)'**
+  String get autoRecordSaveDelayLabel;
+
+  /// Label for the read-only field showing the MAC address of the OBD2 adapter paired to this vehicle.
+  ///
+  /// In en, this message translates to:
+  /// **'Paired adapter'**
+  String get autoRecordPairedAdapterLabel;
+
+  /// Empty-state text shown when no OBD2 adapter has been paired to this vehicle yet.
+  ///
+  /// In en, this message translates to:
+  /// **'No adapter paired. Pair one via the OBD2 onboarding first.'**
+  String get autoRecordPairedAdapterNone;
+
+  /// Label for the read-only field showing whether the user has granted always-on location permission for auto-record.
+  ///
+  /// In en, this message translates to:
+  /// **'Background location allowed'**
+  String get autoRecordBackgroundLocationLabel;
+
+  /// Button that prompts the OS for the always-on location permission required by auto-record's GPS-based metadata.
+  ///
+  /// In en, this message translates to:
+  /// **'Request permission'**
+  String get autoRecordBackgroundLocationRequest;
+
+  /// Tooltip on the AppBar action that resets the auto-record unseen-trip badge to zero.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear counter'**
+  String get autoRecordBadgeClearTooltip;
+
   /// Label for the fuel fill-ups tab on the ConsumptionScreen (#582 phase 2).
   ///
   /// In en, this message translates to:
