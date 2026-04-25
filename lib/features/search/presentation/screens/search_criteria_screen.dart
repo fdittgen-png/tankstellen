@@ -7,6 +7,7 @@ import '../../../../core/services/location_search_service.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/help_banner.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
@@ -134,15 +135,14 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     final openOnly = ref.watch(openOnlyFilterProvider);
     final amenities = ref.watch(selectedAmenitiesProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n?.searchCriteriaTitle ?? 'Search criteria'),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          tooltip: AppLocalizations.of(context)?.tooltipClose ?? 'Close',
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+    return PageScaffold(
+      title: l10n?.searchCriteriaTitle ?? 'Search criteria',
+      leading: IconButton(
+        icon: const Icon(Icons.close),
+        tooltip: AppLocalizations.of(context)?.tooltipClose ?? 'Close',
+        onPressed: () => Navigator.of(context).pop(),
       ),
+      bodyPadding: EdgeInsets.zero,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),

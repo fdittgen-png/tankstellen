@@ -7,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../core/error_tracing/storage/trace_storage.dart';
 import '../../../../core/export/data_exporter.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/privacy_data_provider.dart';
@@ -37,10 +38,9 @@ class _PrivacyDashboardScreenState
     final snapshot = ref.watch(privacyDataProvider);
     final l = AppLocalizations.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l?.privacyDashboardTitle ?? 'Privacy Dashboard'),
-      ),
+    return PageScaffold(
+      title: l?.privacyDashboardTitle ?? 'Privacy Dashboard',
+      bodyPadding: EdgeInsets.zero,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
