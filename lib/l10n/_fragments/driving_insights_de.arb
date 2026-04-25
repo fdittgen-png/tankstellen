@@ -1,0 +1,9 @@
+{
+  "insightCardTitle": "Größte Spritfresser",
+  "insightEmptyState": "Keine auffälligen Ineffizienzen – weiter so!",
+  "insightHighRpm": "Motor über 3000 U/min ({pctTime}% der Fahrt): {liters} L verschwendet",
+  "insightHardAccel": "{count} starke Beschleunigungen: {liters} L verschwendet",
+  "insightIdling": "Leerlauf ({pctTime}% der Fahrt): {liters} L verschwendet",
+  "insightSubtitlePctOfTrip": "{pctTime}% der Fahrt",
+  "insightTrailingLitersWasted": "+{liters} L"
+}

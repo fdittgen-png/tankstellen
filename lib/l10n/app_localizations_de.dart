@@ -3260,6 +3260,38 @@ class AppLocalizationsDe extends AppLocalizations {
       'Betrieben von pretcarburant.ro (Wettbewerbsrat + ANPC)';
 
   @override
+  String get insightCardTitle => 'Größte Spritfresser';
+
+  @override
+  String get insightEmptyState =>
+      'Keine auffälligen Ineffizienzen – weiter so!';
+
+  @override
+  String insightHighRpm(String pctTime, String liters) {
+    return 'Motor über 3000 U/min ($pctTime% der Fahrt): $liters L verschwendet';
+  }
+
+  @override
+  String insightHardAccel(String count, String liters) {
+    return '$count starke Beschleunigungen: $liters L verschwendet';
+  }
+
+  @override
+  String insightIdling(String pctTime, String liters) {
+    return 'Leerlauf ($pctTime% der Fahrt): $liters L verschwendet';
+  }
+
+  @override
+  String insightSubtitlePctOfTrip(String pctTime) {
+    return '$pctTime% der Fahrt';
+  }
+
+  @override
+  String insightTrailingLitersWasted(String liters) {
+    return '+$liters L';
+  }
+
+  @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';
 
   @override
