@@ -148,30 +148,42 @@ void main() {
     });
 
     group('source-level regression', () {
-      test('report_screen does not instantiate Dio directly', () {
-        final source = File(
-          'lib/features/report/presentation/screens/report_screen.dart',
-        ).readAsStringSync();
+      // #563 — submit-flow extracted to sibling report_submit_handler.dart so
+      // report_screen.dart stays under the 300-LOC budget. The screen file
+      // and the handler file together must keep the original invariants
+      // (no direct Dio, ReportService.submitComplaint is the entry point).
+      const reportScreenPath =
+          'lib/features/report/presentation/screens/report_screen.dart';
+      const submitHandlerPath =
+          'lib/features/report/presentation/screens/report_submit_handler.dart';
 
-        expect(
-          source.contains('Dio('),
-          isFalse,
-          reason: 'ReportScreen should use ReportService, not create Dio directly',
-        );
-        expect(
-          source.contains("import 'package:dio/dio.dart'"),
-          isFalse,
-          reason: 'ReportScreen should not import Dio',
-        );
+      test('report_screen does not instantiate Dio directly', () {
+        final screenSource = File(reportScreenPath).readAsStringSync();
+        final handlerSource = File(submitHandlerPath).readAsStringSync();
+
+        for (final entry in {
+          reportScreenPath: screenSource,
+          submitHandlerPath: handlerSource,
+        }.entries) {
+          expect(
+            entry.value.contains('Dio('),
+            isFalse,
+            reason:
+                '${entry.key} should use ReportService, not create Dio directly',
+          );
+          expect(
+            entry.value.contains("import 'package:dio/dio.dart'"),
+            isFalse,
+            reason: '${entry.key} should not import Dio',
+          );
+        }
       });
 
       test('report_screen uses ReportService', () {
-        final source = File(
-          'lib/features/report/presentation/screens/report_screen.dart',
-        ).readAsStringSync();
+        final handlerSource = File(submitHandlerPath).readAsStringSync();
 
-        expect(source, contains('ReportService'));
-        expect(source, contains('submitComplaint'));
+        expect(handlerSource, contains('ReportService'));
+        expect(handlerSource, contains('submitComplaint'));
       });
     });
   });
