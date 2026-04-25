@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:tankstellen/core/notifications/notification_payload.dart';
 import 'package:tankstellen/core/notifications/notification_service.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/alerts/data/radius_alert_dedup.dart';
@@ -14,7 +15,8 @@ import 'package:tankstellen/features/alerts/domain/radius_alert_evaluator.dart';
 /// [LocalNotificationService] — the service layer only needs
 /// `showPriceAlert` to reach it.
 class _FakeNotifier implements NotificationService {
-  final List<({int id, String title, String body})> priceAlerts = [];
+  final List<({int id, String title, String body, String? payload})>
+      priceAlerts = [];
 
   @override
   Future<void> initialize() async {}
@@ -24,8 +26,9 @@ class _FakeNotifier implements NotificationService {
     required int id,
     required String title,
     required String body,
+    String? payload,
   }) async {
-    priceAlerts.add((id: id, title: title, body: body));
+    priceAlerts.add((id: id, title: title, body: body, payload: payload));
   }
 
   @override
@@ -524,6 +527,84 @@ void main() {
       );
       expect(firedRepeat, isEmpty);
       expect(notifier.priceAlerts, hasLength(1));
+    });
+
+    // #1012 phase 3 — notification → station-detail deep link. The
+    // runner stamps a {k,s,c} payload onto every fired notification
+    // so the launch listener can route the user straight to the
+    // cheapest matching station's detail screen.
+    test('embeds a NotificationPayload pointing at the cheapest match',
+        () async {
+      final store = RadiusAlertStore();
+      final dedup = RadiusAlertDedup();
+      final notifier = _FakeNotifier();
+      final runner = RadiusAlertRunner(
+        store: store,
+        dedup: dedup,
+        notifier: notifier,
+        copyBuilder: _copy,
+        country: 'de',
+      );
+
+      await store.upsert(makeAlert(id: 'r1'));
+
+      // Cheapest match is s2 at 1.500 — the payload must point at
+      // that station, not the first one in the input order.
+      await runner.run(
+        now: DateTime.utc(2026, 4, 22, 12),
+        samplesFor: (a) async => [
+          sample(stationId: 's1', price: 1.540, lat: 43.50, lng: 3.50),
+          sample(stationId: 's2', price: 1.500, lat: 43.51, lng: 3.51),
+          sample(stationId: 's3', price: 1.520, lat: 43.49, lng: 3.49),
+        ],
+      );
+
+      expect(notifier.priceAlerts, hasLength(1));
+      final raw = notifier.priceAlerts.single.payload;
+      expect(raw, isNotNull,
+          reason: 'Phase 3 must embed a non-null payload so the tap '
+              'handler has something to deep-link with.');
+
+      final decoded = NotificationPayload.tryDecode(raw);
+      expect(decoded, isNotNull,
+          reason: 'Payload must round-trip through NotificationPayload — '
+              'otherwise the launch listener cannot resolve it.');
+      expect(decoded!.kind, NotificationPayload.kindRadius,
+          reason: 'Kind must be the radius-alert discriminator.');
+      expect(decoded.stationId, 's2',
+          reason: 'Station id must point at the cheapest match (s2 @ '
+              '1.500), not s1 (1.540) or s3 (1.520).');
+      expect(decoded.country, 'de');
+      expect(decoded.toRouterPath(), '/station/s2');
+    });
+
+    test('payload threads the runner-supplied country code through', () async {
+      final store = RadiusAlertStore();
+      final dedup = RadiusAlertDedup();
+      final notifier = _FakeNotifier();
+      // The BG isolate today is Tankerkönig-only ('de'); the runner
+      // takes country as a constructor arg so a future Italy/Austria
+      // wiring can stamp the right code without touching the runner.
+      final runner = RadiusAlertRunner(
+        store: store,
+        dedup: dedup,
+        notifier: notifier,
+        copyBuilder: _copy,
+        country: 'it',
+      );
+
+      await store.upsert(makeAlert(id: 'r1'));
+
+      await runner.run(
+        now: DateTime.utc(2026, 4, 22, 12),
+        samplesFor: (a) async => [sample(stationId: 'it-001', price: 1.540)],
+      );
+
+      final decoded = NotificationPayload.tryDecode(
+          notifier.priceAlerts.single.payload);
+      expect(decoded, isNotNull);
+      expect(decoded!.country, 'it');
+      expect(decoded.stationId, 'it-001');
     });
   });
 }

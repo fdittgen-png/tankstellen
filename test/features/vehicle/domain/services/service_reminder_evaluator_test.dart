@@ -22,6 +22,7 @@ class _FakeNotificationService implements NotificationService {
     required int id,
     required String title,
     required String body,
+    String? payload,
   }) async {}
 
   @override

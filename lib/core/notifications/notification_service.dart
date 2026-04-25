@@ -12,10 +12,17 @@ abstract class NotificationService {
   ///
   /// [id] should be stable per station so that re-triggers update
   /// the existing notification instead of creating duplicates.
+  ///
+  /// [payload] is forwarded to the underlying plugin so the tap
+  /// listener can deep-link the user back into the app on the right
+  /// screen (#1012 phase 3). Pure-string format — see
+  /// [NotificationPayload.encode] for the JSON shape the radius
+  /// alert runner emits.
   Future<void> showPriceAlert({
     required int id,
     required String title,
     required String body,
+    String? payload,
   });
 
   /// Display a service-reminder notification (#584). Uses a distinct

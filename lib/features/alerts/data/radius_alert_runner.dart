@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../core/notifications/notification_payload.dart';
 import '../../../core/notifications/notification_service.dart';
 import '../domain/entities/radius_alert.dart';
 import '../domain/radius_alert_evaluator.dart';
@@ -60,11 +61,18 @@ class RadiusAlertRunner {
   final RadiusAlertCopy Function(RadiusAlertGroupedEvent event)
       copyBuilder;
 
+  /// 2-letter country code stamped into the deep-link payload so the
+  /// tap resolver can disambiguate id collisions across countries
+  /// (#1012 phase 3). Today the BG isolate only wires Tankerkönig, so
+  /// this is `'de'` in production. Tests inject whatever they need.
+  final String country;
+
   RadiusAlertRunner({
     required this.store,
     required this.dedup,
     required this.notifier,
     required this.copyBuilder,
+    this.country = 'de',
     RadiusAlertEvaluator? evaluator,
   }) : evaluator = evaluator ?? const RadiusAlertEvaluator();
 
@@ -137,10 +145,22 @@ class RadiusAlertRunner {
           truncatedMoreCount: truncatedMore,
         );
         final copy = copyBuilder(event);
+        // #1012 phase 3 — embed the cheapest match's id + country
+        // into the notification payload so tapping the body deep-
+        // links straight to the cheapest station's detail screen
+        // (instead of just opening the launcher route). topMatches is
+        // already sorted ascending by price, so `.first` is the
+        // cheapest by definition.
+        final payload = NotificationPayload(
+          kind: NotificationPayload.kindRadius,
+          stationId: topMatches.first.stationId,
+          country: country,
+        ).encode();
         await notifier.showPriceAlert(
           id: _notificationId(alert.id),
           title: copy.title,
           body: copy.body,
+          payload: payload,
         );
         // Stamp the per-alert dedup row first — that's the source of
         // truth for the next cycle's gating decision.
