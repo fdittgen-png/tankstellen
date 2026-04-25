@@ -42,10 +42,24 @@ class _FakeNotifier implements NotificationService {
   Future<void> cancelAll() async {}
 }
 
-RadiusAlertCopy _copy(RadiusAlertNotification event) => RadiusAlertCopy(
-      title: '${event.alert.fuelType.toUpperCase()} near ${event.alert.label}',
-      body: 'A station is at ${event.price.toStringAsFixed(3)}',
-    );
+/// Render the grouped event the same way the BG copy builder does:
+/// one line per top-N station, cheapest first, with a "+ X more"
+/// suffix when truncated. Matches the production format closely
+/// enough that body assertions test the real shape.
+RadiusAlertCopy _copy(RadiusAlertGroupedEvent event) {
+  final lines = event.matches
+      .map((m) => '${m.stationId} ${m.pricePerLiter.toStringAsFixed(3)}')
+      .toList();
+  if (event.truncatedMoreCount > 0) {
+    lines.add('+ ${event.truncatedMoreCount} more');
+  }
+  final total = event.matches.length + event.truncatedMoreCount;
+  return RadiusAlertCopy(
+    title:
+        '${event.alert.label}: $total stations <= ${event.alert.threshold.toStringAsFixed(3)}',
+    body: lines.join('\n'),
+  );
+}
 
 void main() {
   late Directory tempDir;
@@ -134,7 +148,6 @@ void main() {
 
       expect(fired, hasLength(1));
       expect(notifier.priceAlerts, hasLength(1));
-      expect(notifier.priceAlerts.single.title, contains('DIESEL'));
       expect(notifier.priceAlerts.single.title, contains('Home'));
       expect(notifier.priceAlerts.single.body, contains('1.540'));
     });
@@ -329,8 +342,11 @@ void main() {
       expect(notifier.priceAlerts, hasLength(2));
     });
 
-    test('multiple in-range stations each get their own notification',
+    test(
+        'multiple in-range stations roll up into a single grouped notification',
         () async {
+      // #1012 phase 2: one notification per alert per cycle (was: one
+      // notification per (alert, station) match).
       final store = RadiusAlertStore();
       final dedup = RadiusAlertDedup();
       final notifier = _FakeNotifier();
@@ -348,17 +364,78 @@ void main() {
         samplesFor: (a) async => [
           sample(stationId: 's1', price: 1.540),
           sample(stationId: 's2', price: 1.545, lat: 43.51, lng: 3.51),
+          sample(stationId: 's3', price: 1.520, lat: 43.49, lng: 3.49),
         ],
       );
 
-      expect(fired, hasLength(2));
-      expect(notifier.priceAlerts, hasLength(2));
-      expect(
-        notifier.priceAlerts.map((n) => n.id).toSet().length,
-        2,
-        reason:
-            'Each (alert, station) pair must resolve to a distinct notification id',
+      expect(fired, hasLength(1),
+          reason: 'Three matches must collapse into a single fired event');
+      expect(notifier.priceAlerts, hasLength(1));
+
+      final event = fired.single;
+      expect(event.matches.map((m) => m.stationId).toList(),
+          equals(['s3', 's1', 's2']),
+          reason: 'Matches must be sorted ascending by price');
+      expect(event.truncatedMoreCount, 0);
+      expect(notifier.priceAlerts.single.title, contains('3 stations'));
+    });
+
+    test(
+        'top-5 truncation: 7 matches render 5 sorted lines plus "+ 2 more"',
+        () async {
+      final store = RadiusAlertStore();
+      final dedup = RadiusAlertDedup();
+      final notifier = _FakeNotifier();
+      final runner = RadiusAlertRunner(
+        store: store,
+        dedup: dedup,
+        notifier: notifier,
+        copyBuilder: _copy,
       );
+
+      await store.upsert(makeAlert(id: 'r1'));
+
+      // Seven distinct in-range matches at increasing prices. Note
+      // they're inserted out of price order on purpose so the test
+      // pins the runner's sort behaviour, not the input ordering.
+      final samples = <StationPriceSample>[
+        sample(stationId: 's5', price: 1.530, lat: 43.51, lng: 3.51),
+        sample(stationId: 's2', price: 1.500, lat: 43.50, lng: 3.51),
+        sample(stationId: 's7', price: 1.540, lat: 43.49, lng: 3.50),
+        sample(stationId: 's1', price: 1.490, lat: 43.50, lng: 3.50),
+        sample(stationId: 's4', price: 1.520, lat: 43.50, lng: 3.49),
+        sample(stationId: 's3', price: 1.510, lat: 43.49, lng: 3.49),
+        sample(stationId: 's6', price: 1.535, lat: 43.51, lng: 3.49),
+      ];
+
+      final fired = await runner.run(
+        now: DateTime.utc(2026, 4, 22, 12),
+        samplesFor: (a) async => samples,
+      );
+
+      expect(fired, hasLength(1));
+      final event = fired.single;
+      expect(event.matches, hasLength(RadiusAlertRunner.maxStationsInBody),
+          reason:
+              'matches list must be capped to RadiusAlertRunner.maxStationsInBody');
+      expect(event.matches.map((m) => m.stationId).toList(),
+          equals(['s1', 's2', 's3', 's4', 's5']),
+          reason:
+              'Top-5 list must be the 5 cheapest matches, sorted ascending');
+      expect(event.truncatedMoreCount, 2,
+          reason:
+              '7 matches with a top-5 cap leaves 2 in the truncated tail');
+
+      final body = notifier.priceAlerts.single.body;
+      // Each top-5 line in cheap-first order plus the + 2 more suffix.
+      expect(body.split('\n'), hasLength(6));
+      expect(body, contains('s1 1.490'));
+      expect(body, contains('s5 1.530'));
+      expect(body, isNot(contains('s6')),
+          reason:
+              'Stations 6 and 7 are in the truncated tail, not the body');
+      expect(body, isNot(contains('s7')));
+      expect(body, contains('+ 2 more'));
     });
 
     test('one alert failing does not block the rest', () async {
