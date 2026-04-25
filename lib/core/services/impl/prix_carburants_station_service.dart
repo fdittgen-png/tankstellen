@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../../../features/search/data/models/search_params.dart';
 import '../../../features/search/domain/entities/station.dart';
-import '../../../features/search/domain/entities/station_amenity.dart';
 import 'osm_brand_enricher.dart';
+import 'prix_carburants_parsers.dart' as parser;
 import '../dio_factory.dart';
 import '../mixins/station_service_helpers.dart';
 import '../service_result.dart';
@@ -15,6 +15,13 @@ import '../station_service.dart';
 /// Strategy: when a postal code is provided, query the native CP filter
 /// first (100% accurate), then fall back to geo. For GPS searches without
 /// a postal code, query by geo (within_distance) directly.
+///
+/// **Split (#563)**: the JSON parsing + record → [Station] mapping,
+/// brand detection, and small string-shape coercions all live in
+/// `prix_carburants_parsers.dart` so they can be tested as pure
+/// functions without Dio. This shell keeps only the [StationService]
+/// implementation: HTTP via Dio, [ServiceResult] plumbing, dedupe, and
+/// post-fetch radius filtering.
 class PrixCarburantsStationService with StationServiceHelpers implements StationService {
   final OsmBrandEnricher? _enricher;
   final Dio _dio;
@@ -74,7 +81,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     // Parse all results into Station objects
     final parsed = <Station>[];
     for (final r in allResults) {
-      final station = _parseStation(r, params.lat, params.lng);
+      final station = parser.parsePrixCarburantsStation(r, params.lat, params.lng);
       if (station != null) parsed.add(station);
     }
 
@@ -116,7 +123,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
         'where': "cp='$cp'",
         'limit': 50,
       }, cancelToken: cancelToken);
-      return _extractResults(response.data);
+      return parser.extractPrixCarburantsResults(response.data);
     } on DioException catch (e) {
       debugPrint('Prix-Carburants ZIP fetch failed: $e');
       return [];
@@ -138,7 +145,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
             "within_distance(geom,geom'POINT($lng $lat)',${radiusStr}km)",
         'limit': 50,
       }, cancelToken: cancelToken);
-      return _extractResults(response.data);
+      return parser.extractPrixCarburantsResults(response.data);
     } on DioException catch (e) {
       debugPrint('Prix-Carburants geo fetch failed: $e');
       return [];
@@ -172,16 +179,6 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     return merged;
   }
 
-  List<Map<String, dynamic>> _extractResults(dynamic data) {
-    if (data is Map<String, dynamic>) {
-      final results = data['results'] as List<dynamic>? ?? [];
-      return results
-          .map((r) => r as Map<String, dynamic>)
-          .toList();
-    }
-    return [];
-  }
-
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(
     String stationId,
@@ -191,11 +188,11 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
       'limit': 1,
     });
 
-    final results = _extractResults(response.data);
+    final results = parser.extractPrixCarburantsResults(response.data);
     if (results.isEmpty) throw Exception('Station $stationId not found');
 
     final r = results[0];
-    final station = _parseStation(r, 0, 0);
+    final station = parser.parsePrixCarburantsStation(r, 0, 0);
     if (station == null) throw Exception('Failed to parse station');
 
     final is24h = r['horaires_automate_24_24'] == 'Oui';
@@ -218,7 +215,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
           'where': 'id=$id',
           'limit': 1,
         });
-        final results = _extractResults(response.data);
+        final results = parser.extractPrixCarburantsResults(response.data);
         if (results.isNotEmpty) {
           final r = results[0];
           prices[id] = StationPrices(
@@ -237,163 +234,14 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     );
   }
 
-  Station? _parseStation(Map<String, dynamic> r, double searchLat, double searchLng) {
-    try {
-      final geom = r['geom'] as Map<String, dynamic>?;
-      double lat = (geom?['lat'] as num?)?.toDouble() ?? 0;
-      double lng = (geom?['lon'] as num?)?.toDouble() ?? 0;
-
-      // Some stations have lat/lng in old format (multiplied by 100000)
-      if (lat == 0 || lng == 0) {
-        final latStr = r['latitude']?.toString() ?? '0';
-        final lngStr = r['longitude']?.toString() ?? '0';
-        lat = (double.tryParse(latStr) ?? 0) / 100000;
-        lng = (double.tryParse(lngStr) ?? 0) / 100000;
-      }
-
-      // Use flat price fields (already in EUR, e.g., 2.129)
-      final adresse = r['adresse'] as String? ?? '';
-      final ville = r['ville'] as String? ?? '';
-      final cp = r['cp'] as String? ?? '';
-
-      return Station(
-        id: r['id']?.toString() ?? '',
-        name: adresse,
-        brand: _detectBrand(adresse, r['services_service'], r),
-        street: adresse,
-        postCode: cp,
-        place: ville,
-        lat: lat,
-        lng: lng,
-        dist: roundedDistance(searchLat, searchLng, lat, lng),
-        e5: _toDouble(r['sp95_prix']),
-        e10: _toDouble(r['e10_prix']),
-        e98: _toDouble(r['sp98_prix']),
-        diesel: _toDouble(r['gazole_prix']),
-        e85: _toDouble(r['e85_prix']),
-        lpg: _toDouble(r['gplc_prix']),
-        isOpen: true,
-        updatedAt: _mostRecentUpdate(r),
-        is24h: r['horaires_automate_24_24'] == 'Oui',
-        openingHoursText: _parseOpeningHours(r['horaires_jour']),
-        services: _parseServices(r['services_service']),
-        amenities: parseAmenitiesFromServices(_parseServices(r['services_service'])),
-        availableFuels: _parseStringList(r['carburants_disponibles']),
-        unavailableFuels: _parseStringList(r['carburants_indisponibles']),
-        stationType: r['pop']?.toString(),
-        department: r['departement']?.toString(),
-        region: r['region']?.toString(),
-      );
-    } on FormatException catch (e) {
-      debugPrint('Prix-Carburants station parse failed: $e');
-      return null;
-    }
-  }
-
-  String? _mostRecentUpdate(Map<String, dynamic> r) {
-    final dates = <String>[
-      r['gazole_maj']?.toString() ?? '',
-      r['sp95_maj']?.toString() ?? '',
-      r['e10_maj']?.toString() ?? '',
-      r['sp98_maj']?.toString() ?? '',
-      r['e85_maj']?.toString() ?? '',
-      r['gplc_maj']?.toString() ?? '',
-    ].where((d) => d.isNotEmpty).toList();
-    if (dates.isEmpty) return null;
-    dates.sort((a, b) => b.compareTo(a)); // Most recent first
-    // Format: "2026-03-23T00:01:00+00:00" → "23/03 00:01"
-    try {
-      final dt = DateTime.parse(dates.first);
-      return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-    } on FormatException catch (e) {
-      debugPrint('Prix-Carburants date parse failed: $e');
-      return dates.first.substring(0, 16).replaceAll('T', ' ');
-    }
-  }
-
-  String? _parseOpeningHours(dynamic hoursStr) {
-    if (hoursStr == null) return null;
-    final s = hoursStr.toString();
-    if (s.isEmpty) return null;
-    // Format: "Automate-24-24, Lundi07.00-18.30, Mardi07.00-18.30..."
-    // Clean up: add spaces around times
-    return s
-        .replaceAll('Automate-24-24, ', '')
-        .replaceAllMapped(RegExp(r'(\d{2})\.(\d{2})-(\d{2})\.(\d{2})'),
-            (m) => '${m[1]}:${m[2]}-${m[3]}:${m[4]}')
-        .replaceAllMapped(RegExp(r'(\d{2})\.(\d{2})'),
-            (m) => '${m[1]}:${m[2]}')
-        .replaceAll(', ', '\n');
-  }
-
-  List<String> _parseServices(dynamic services) {
-    if (services is List) return services.map((e) => e.toString()).toList();
-    return [];
-  }
-
-  List<String> _parseStringList(dynamic list) {
-    if (list is List) return list.map((e) => e.toString()).toList();
-    return [];
-  }
-
+  /// Local copy of the `_toDouble` coercion. Used only by [getPrices]
+  /// where we map raw record fields directly into [StationPrices]
+  /// without going through the full [parser.parsePrixCarburantsStation]
+  /// path. Kept here to avoid widening the parser module's surface for
+  /// a one-line helper.
   double? _toDouble(dynamic v) {
     if (v == null) return null;
     if (v is num) return v.toDouble();
     return double.tryParse(v.toString());
-  }
-
-  String _detectBrand(String adresse, dynamic services, Map<String, dynamic> r) {
-    // Check address, ville, and services for known brand names
-    final ville = r['ville']?.toString() ?? '';
-    final allServices = services is List ? services.join(' ') : (services?.toString() ?? '');
-    final text = '$adresse $ville $allServices'.toUpperCase();
-
-    const brandMap = {
-      'TOTALENERGIES': 'TotalEnergies',
-      'TOTAL ACCESS': 'TotalEnergies',
-      'TOTAL ': 'Total',
-      'LECLERC': 'E.Leclerc',
-      'CARREFOUR': 'Carrefour',
-      'INTERMARCHE': 'Intermarché',
-      'INTERMARCHÉ': 'Intermarché',
-      'AUCHAN': 'Auchan',
-      'SUPER U': 'Super U',
-      'SYSTEME U': 'Système U',
-      'SYSTÈME U': 'Système U',
-      'U EXPRESS': 'Système U',
-      'HYPER U': 'Système U',
-      'CASINO': 'Casino',
-      'GEANT CASINO': 'Casino',
-      'BP ': 'BP',
-      'SHELL': 'Shell',
-      'ESSO': 'Esso',
-      'AVIA': 'AVIA',
-      'VITO': 'Vito',
-      'NETTO': 'Netto',
-      'DYNEFF': 'Dyneff',
-      'ENI': 'ENI',
-      'AGIP': 'ENI',
-      'Q8 ': 'Q8',
-      'TAMOIL': 'Tamoil',
-      'JET ': 'JET',
-      'LUKOIL': 'Lukoil',
-      'REPSOL': 'Repsol',
-      'CEPSA': 'Cepsa',
-      'GALP': 'Galp',
-    };
-
-    for (final entry in brandMap.entries) {
-      if (text.contains(entry.key)) return entry.value;
-    }
-
-    // Fallback: use station type
-    final pop = r['pop']?.toString() ?? '';
-    if (pop == 'A') return 'Autoroute';
-    // #482 — explicit "genuinely brandless" sentinel instead of the
-    // previous magic string `'Station'`. Detail views can now render a
-    // localised "Station indépendante" row so the user can distinguish
-    // an unbranded independent station from a brand-detection bug.
-    // The sentinel is also observable via `BrandRegistry.independentLabel`.
-    return 'Independent';
   }
 }
