@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/app/current_shell_branch_provider.dart';
 import 'package:tankstellen/core/widgets/page_scaffold.dart';
 import 'package:tankstellen/features/map/presentation/screens/map_screen.dart';
 
@@ -60,16 +62,81 @@ void main() {
       expect(find.byType(PageScaffold), findsOneWidget);
     });
 
-    // #529 / #709 regression tests retired by #757. Previously
-    // MapScreen listened to `searchStateProvider` and
-    // `currentShellBranchProvider` to nudge the map controller and
-    // rebuild the FlutterMap subtree on every tab-flip — both were
-    // symptom-level workarounds for `TileLayer` caching failed
-    // fetches. They cancelled in-flight HTTP requests and caused
-    // regressions of their own. The root cause is addressed at the
-    // tile-provider layer by `RetryNetworkTileProvider` +
-    // `evictErrorTileStrategy` (see
-    // `lib/features/map/data/retry_network_tile_provider.dart` and
-    // `test/features/map/tile_layer_eviction_strategy_test.dart`).
+    testWidgets(
+      'rebuilds FlutterMap subtree when shell branch flips TO Map tab '
+      '(#473 / #498 / #709 — IndexedStack offstage-mount workaround)',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        await pumpApp(
+          tester,
+          const MapScreen(),
+          overrides: [
+            ...test.overrides,
+            userPositionNullOverride(),
+          ],
+        );
+
+        // The outermost KeyedSubtree under MapScreen carries the
+        // ValueKey<int>(_mapIncarnation). Pre-order traversal returns
+        // the highest match first, so .first is ours; flutter_map
+        // internal KeyedSubtrees sit deeper in the tree.
+        int currentIncarnation() {
+          final subtree = tester
+              .widgetList<KeyedSubtree>(
+                find.descendant(
+                  of: find.byType(MapScreen),
+                  matching: find.byType(KeyedSubtree),
+                ),
+              )
+              .firstWhere((w) => w.key is ValueKey<int>);
+          return (subtree.key as ValueKey<int>).value;
+        }
+
+        final initial = currentIncarnation();
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(MapScreen)),
+        );
+
+        // Simulate ShellScreen publishing "Map tab is now visible" (branch 1).
+        // _mapIncarnation increments via a post-frame callback then setState,
+        // so two pumps are needed to settle.
+        container.read(currentShellBranchProvider.notifier).set(1);
+        await tester.pump();
+        await tester.pump();
+
+        expect(
+          currentIncarnation(),
+          greaterThan(initial),
+          reason:
+              'MapScreen must rebuild the FlutterMap subtree when the Map '
+              'branch becomes visible. Without the rebuild, TileLayer keeps '
+              'the offstage zero-sized viewport it captured at app start '
+              'and the map stays gray until manual pan/zoom (#709). The '
+              'RetryNetworkTileProvider added in #757 cannot fix this — it '
+              'retries failed HTTP fetches, but here the fetch is never '
+              'issued.',
+        );
+
+        final afterMapEntry = currentIncarnation();
+
+        // Flipping AWAY from the Map tab must NOT bump the incarnation —
+        // only entering the Map tab does. Otherwise we'd cancel in-flight
+        // tile fetches whenever the user navigates away (the #709
+        // regression that originally killed the search-state listener).
+        container.read(currentShellBranchProvider.notifier).set(0);
+        await tester.pump();
+        await tester.pump();
+
+        expect(
+          currentIncarnation(),
+          equals(afterMapEntry),
+          reason:
+              'Branch changes that leave the Map tab must not rebuild — '
+              'rebuilding cancels in-flight tile HTTP requests (#709).',
+        );
+      },
+    );
   });
 }

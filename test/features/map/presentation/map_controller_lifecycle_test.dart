@@ -15,13 +15,16 @@ void main() {
         reason:
             'MapScreen must dispose MapController to prevent stale references',
       );
-      // After #757 retired the `_mapIncarnation` subtree-rebuild hack,
-      // the controller is created once in initState and reused for the
-      // lifetime of the widget. The declaration is `late final` again.
+      // The controller is reassigned on every Carte tab-flip rebuild
+      // (see _mapIncarnation in the screen), so it cannot be `late
+      // final` — it's `late MapController _mapController` and the
+      // previous instance is disposed in the post-frame callback that
+      // bumps the incarnation.
       expect(
-        source.contains('late final MapController _mapController'),
+        source.contains('late MapController _mapController'),
         isTrue,
-        reason: 'MapController should be late final, created in initState',
+        reason: 'MapController should be `late MapController` (mutable), '
+            'created in initState and reassigned on tab-flip rebuild',
       );
     });
 
@@ -69,31 +72,47 @@ void main() {
     });
 
     test(
-      '#757: MapScreen no longer relies on `_mapIncarnation` subtree-rebuild '
-      'hack — retry+evict provider handles transient tile failures',
+      '#473 / #498 / #709: MapScreen keeps the `_mapIncarnation` + '
+      '`KeyedSubtree` tab-flip teardown — RetryNetworkTileProvider does '
+      'NOT subsume it',
       () {
         final source = File(
           'lib/features/map/presentation/screens/map_screen.dart',
         ).readAsStringSync();
 
-        // The `_mapIncarnation` counter + `ValueKey` KeyedSubtree wrapper
-        // from #709 were symptom-level workarounds for `TileLayer`
-        // caching failed fetches. They cancelled in-flight HTTP
-        // requests on every tab-flip, which itself caused the gray
-        // viewport some users reported (see #709 rollback history).
-        // Root cause is addressed by `RetryNetworkTileProvider` +
-        // `evictErrorTileStrategy` (#757), so these workarounds must
-        // be gone.
+        // Earlier reasoning (in the ddeace4 commit message) was that
+        // RetryNetworkTileProvider + evictErrorTileStrategy at the HTTP
+        // layer would make this workaround redundant. They don't:
+        //
+        //   * Retry handles failed HTTP fetches.
+        //   * The IndexedStack offstage-mount bug is a fetch that's
+        //     never *issued* — TileLayer captures a zero-sized
+        //     viewport on its first layout pass and settles into a
+        //     "no tiles to fetch" state.
+        //
+        // The only reliable fix is to tear down + rebuild the
+        // FlutterMap subtree when the Carte tab becomes visible so it
+        // lays out against real constraints. Removing this guard
+        // ships a gray map on first open (#473, #498, #709).
         expect(
           source.contains('_mapIncarnation'),
-          isFalse,
-          reason: '#757 — subtree-rebuild counter should have been '
-              'removed now that tile retries happen at the HTTP layer',
+          isTrue,
+          reason: 'subtree-rebuild counter is required to defeat the '
+              'IndexedStack offstage zero-viewport bug — see screen '
+              'docstring',
         );
         expect(
           source.contains('KeyedSubtree'),
-          isFalse,
-          reason: '#757 — KeyedSubtree wrapper no longer needed',
+          isTrue,
+          reason: 'KeyedSubtree(ValueKey<int>(_mapIncarnation)) is what '
+              'forces flutter_map teardown on tab-flip',
+        );
+        expect(
+          source.contains('currentShellBranchProvider'),
+          isTrue,
+          reason: 'tab-flip rebuild is driven by listening to '
+              'currentShellBranchProvider — the producer is in '
+              'ShellScreen and must have a consumer here',
         );
       },
     );

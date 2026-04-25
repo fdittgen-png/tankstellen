@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../app/current_shell_branch_provider.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../driving/presentation/widgets/driving_mode_fab.dart';
@@ -15,14 +16,28 @@ import '../widgets/route_map_view.dart';
 /// Top-level map screen that delegates to [RouteMapView] when route search
 /// results are available, or [NearbyMapView] for nearby station results.
 ///
-/// Previously this screen hosted a complex subtree-rebuild counter plus
-/// a `searchStateProvider` listener that nudged the controller on fresh
-/// search results (#529, #709). Both were symptom-level workarounds for
-/// `TileLayer` caching failed fetches — now addressed at the root by
-/// [RetryNetworkTileProvider] and `evictErrorTileStrategy:
-/// notVisibleRespectMargin` on every `TileLayer` in the app (#757).
-/// Keeping the workarounds after the root-cause fix added complexity
-/// and cancelled in-flight tile requests when price-refreshes landed.
+/// ## Tab-flip teardown ([_mapIncarnation])
+///
+/// `StatefulShellRoute.indexedStack` pre-mounts every tab with degenerate
+/// (zero-sized) constraints. `flutter_map`'s [TileLayer] captures its
+/// tile viewport on the first layout pass; when that pass happens
+/// offstage, the layer settles into a "no tiles to fetch" state and
+/// never re-issues requests when real constraints arrive. Result: gray
+/// background until the user manually pans or zooms (#473, #498, #709).
+///
+/// [RetryNetworkTileProvider] + `evictErrorTileStrategy` (#757) handle
+/// transient HTTP failures but cannot recover this state — the bug
+/// isn't a failed fetch, it's a fetch that's never issued. The only
+/// reliable cure is to tear down and rebuild the entire FlutterMap
+/// subtree when the Carte tab becomes visible, so it lays out against
+/// real post-mount constraints. That's what the [currentShellBranchProvider]
+/// listener + [_mapIncarnation] [ValueKey] do below.
+///
+/// We deliberately do NOT also listen to `searchStateProvider` —
+/// rebuilding on search-result change cancelled in-flight tile fetches
+/// when price-refreshes landed (#709 regression). Camera moves on
+/// search results are nudged inside [NearbyMapView] / [RouteMapView]
+/// instead.
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
 
@@ -31,7 +46,12 @@ class MapScreen extends ConsumerStatefulWidget {
 }
 
 class _MapScreenState extends ConsumerState<MapScreen> {
-  late final MapController _mapController;
+  late MapController _mapController;
+
+  /// Bumped every time the Carte tab becomes visible. Used as a
+  /// [ValueKey] on the map subtree so the FlutterMap + TileLayer is
+  /// destroyed and rebuilt with real post-layout constraints (#709).
+  int _mapIncarnation = 0;
 
   @override
   void initState() {
@@ -47,6 +67,32 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<int>(currentShellBranchProvider, (_, next) {
+      const mapBranchIndex = 1;
+      if (next != mapBranchIndex) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final old = _mapController;
+        try {
+          setState(() {
+            _mapController = MapController();
+            _mapIncarnation++;
+          });
+        } catch (e) {
+          debugPrint('MapScreen rebuild on tab-flip: $e');
+        }
+        // Dispose the previous controller after the next frame so the
+        // old FlutterMap has fully detached from it.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          try {
+            old.dispose();
+          } catch (e) {
+            debugPrint('MapScreen old controller dispose: $e');
+          }
+        });
+      });
+    });
+
     final searchState = ref.watch(searchStateProvider);
     final selectedFuel = ref.watch(selectedFuelTypeProvider);
     final searchRadius = ref.watch(searchRadiusProvider);
@@ -56,18 +102,21 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     final hasRouteResults = routeState.hasValue && routeState.value != null;
 
-    final body = hasRouteResults
-        ? RouteMapView(
-            routeResult: routeState.value!,
-            selectedFuel: selectedFuel,
-            mapController: _mapController,
-          )
-        : NearbyMapView(
-            searchState: searchState,
-            selectedFuel: selectedFuel,
-            searchRadiusKm: searchRadius,
-            mapController: _mapController,
-          );
+    final body = KeyedSubtree(
+      key: ValueKey<int>(_mapIncarnation),
+      child: hasRouteResults
+          ? RouteMapView(
+              routeResult: routeState.value!,
+              selectedFuel: selectedFuel,
+              mapController: _mapController,
+            )
+          : NearbyMapView(
+              searchState: searchState,
+              selectedFuel: selectedFuel,
+              searchRadiusKm: searchRadius,
+              mapController: _mapController,
+            ),
+    );
 
     return PageScaffold(
       title: l10n?.map ?? 'Map',
