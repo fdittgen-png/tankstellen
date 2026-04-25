@@ -270,6 +270,15 @@ void main() {
         samplesFor: (a) async => [sample(stationId: 's1', price: 1.540)],
       );
 
+      // The #1012 phase 1 throttler would normally short-circuit a
+      // cycle 2 h after the first because the default frequency is
+      // 1×/day (24 h gap). We're testing the *dedup* layer here, so
+      // age the per-alert evaluation timestamp out of the gap.
+      await store.recordEvaluatedAt(
+        'r1',
+        t0.subtract(const Duration(days: 2)),
+      );
+
       // 2 h later the station dropped by another cent — user wants it.
       final fired = await runner.run(
         now: t0.add(const Duration(hours: 2)),
@@ -300,6 +309,14 @@ void main() {
       await runner.run(
         now: t0,
         samplesFor: (a) async => [sample(stationId: 's1', price: 1.540)],
+      );
+
+      // The #1012 phase 1 throttler caps default-frequency alerts at
+      // 1×/day. Reset the per-alert evaluation timestamp so the
+      // dedup-window assertion below is the only thing in play.
+      await store.recordEvaluatedAt(
+        'r1',
+        t0.subtract(const Duration(days: 2)),
       );
 
       // 13 h later — same price, but the reminder has aged out.
@@ -400,6 +417,16 @@ void main() {
       expect(firedAbove, isEmpty);
       expect(notifier.priceAlerts, isEmpty);
 
+      // The #1012 phase 1 throttler would skip the next cycles
+      // because frequency defaults to 1×/day. Pre-#1012 those cycles
+      // ran every WorkManager tick — keep that behaviour for this
+      // dedup-focused integration scenario by ageing out the
+      // last-evaluated record.
+      await store.recordEvaluatedAt(
+        'r1',
+        DateTime.utc(2026, 4, 21, 12),
+      );
+
       // 3. Next BG cycle: price dropped below threshold — fire.
       final firedDrop = await runner.run(
         now: DateTime.utc(2026, 4, 22, 13),
@@ -407,6 +434,11 @@ void main() {
       );
       expect(firedDrop, hasLength(1));
       expect(notifier.priceAlerts, hasLength(1));
+
+      await store.recordEvaluatedAt(
+        'r1',
+        DateTime.utc(2026, 4, 21, 12),
+      );
 
       // 4. Dedup persisted — immediate re-run is silent.
       final firedRepeat = await runner.run(

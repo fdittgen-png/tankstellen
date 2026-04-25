@@ -3455,6 +3455,21 @@ class AppLocalizationsFr extends AppLocalizations {
       'Connexion impossible — vérifiez l\'adaptateur ou passez l\'étape';
 
   @override
+  String get alertsRadiusFrequencyLabel => 'Fréquence de vérification';
+
+  @override
+  String get alertsRadiusFrequencyDaily => 'Une fois par jour';
+
+  @override
+  String get alertsRadiusFrequencyTwiceDaily => 'Deux fois par jour';
+
+  @override
+  String get alertsRadiusFrequencyThriceDaily => 'Trois fois par jour';
+
+  @override
+  String get alertsRadiusFrequencyFourTimesDaily => 'Quatre fois par jour';
+
+  @override
   String get radiusAlertPickOnMap => 'Pick on map';
 
   @override

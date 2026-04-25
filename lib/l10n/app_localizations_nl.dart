@@ -3434,6 +3434,21 @@ class AppLocalizationsNl extends AppLocalizations {
       'Couldn\'t connect to the adapter. You can retry or skip.';
 
   @override
+  String get alertsRadiusFrequencyLabel => 'Check frequency';
+
+  @override
+  String get alertsRadiusFrequencyDaily => 'Once a day';
+
+  @override
+  String get alertsRadiusFrequencyTwiceDaily => 'Twice a day';
+
+  @override
+  String get alertsRadiusFrequencyThriceDaily => 'Three times a day';
+
+  @override
+  String get alertsRadiusFrequencyFourTimesDaily => 'Four times a day';
+
+  @override
   String get radiusAlertPickOnMap => 'Pick on map';
 
   @override

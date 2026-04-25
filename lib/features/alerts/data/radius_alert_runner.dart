@@ -70,7 +70,25 @@ class RadiusAlertRunner {
     final fired = <RadiusAlertNotification>[];
     for (final alert in active) {
       try {
+        // #1012 phase 1 — per-alert frequency throttling. Skip the
+        // alert when it was evaluated more recently than the user-
+        // configured cadence allows. A null lastEvaluatedAt means
+        // "never evaluated" (brand-new alert, or pre-#1012 upgrade)
+        // and falls through to evaluation regardless of frequency.
+        final lastEval = await store.getLastEvaluatedAt(alert.id);
+        if (lastEval != null) {
+          final gap = frequencyToGap(alert.frequencyPerDay);
+          if (now.difference(lastEval) < gap) {
+            continue;
+          }
+        }
+
         final samples = await samplesFor(alert);
+        // Record the evaluation timestamp regardless of match
+        // outcome so the throttler applies to "no match" cycles too
+        // — otherwise an alert with no in-range stations would be
+        // re-queried every cycle and burn the StationService budget.
+        await store.recordEvaluatedAt(alert.id, now);
         if (samples.isEmpty) continue;
         final matches = evaluator.matches(alert, samples).toList();
         if (matches.isEmpty) continue;

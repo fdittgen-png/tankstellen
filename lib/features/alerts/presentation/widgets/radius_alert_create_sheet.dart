@@ -78,6 +78,7 @@ class _RadiusAlertCreateSheetState
 
   FuelType _fuelType = FuelType.diesel;
   double _radiusKm = 10;
+  int _frequencyPerDay = 1;
 
   double? _centerLat;
   double? _centerLng;
@@ -164,6 +165,7 @@ class _RadiusAlertCreateSheetState
       radiusKm: _radiusKm,
       label: _labelController.text.trim(),
       createdAt: DateTime.now(),
+      frequencyPerDay: _frequencyPerDay,
     );
 
     await ref.read(radiusAlertsProvider.notifier).add(alert);
@@ -246,6 +248,43 @@ class _RadiusAlertCreateSheetState
             divisions: 49,
             label: '${_radiusKm.round()} km',
             onChanged: (v) => setState(() => _radiusKm = v),
+          ),
+          const SizedBox(height: 16),
+          DropdownButtonFormField<int>(
+            initialValue: _frequencyPerDay,
+            decoration: InputDecoration(
+              labelText: l10n?.alertsRadiusFrequencyLabel ??
+                  'Check frequency',
+              border: const OutlineInputBorder(),
+            ),
+            items: <DropdownMenuItem<int>>[
+              DropdownMenuItem(
+                value: 1,
+                child: Text(l10n?.alertsRadiusFrequencyDaily ??
+                    'Once a day'),
+              ),
+              DropdownMenuItem(
+                value: 2,
+                child: Text(
+                    l10n?.alertsRadiusFrequencyTwiceDaily ??
+                        'Twice a day'),
+              ),
+              DropdownMenuItem(
+                value: 3,
+                child: Text(
+                    l10n?.alertsRadiusFrequencyThriceDaily ??
+                        'Three times a day'),
+              ),
+              DropdownMenuItem(
+                value: 4,
+                child: Text(
+                    l10n?.alertsRadiusFrequencyFourTimesDaily ??
+                        'Four times a day'),
+              ),
+            ],
+            onChanged: (v) {
+              if (v != null) setState(() => _frequencyPerDay = v);
+            },
           ),
           const SizedBox(height: 8),
           Row(
