@@ -82,10 +82,13 @@ void main() {
         find.byType(ListView),
         const Offset(0, -200),
       );
-      // Extra scroll to make sure the segments themselves (not just
-      // the card header) are fully inside the viewport so the tap
-      // doesn't fall on an off-screen pixel.
-      await tester.drag(find.byType(ListView), const Offset(0, -120));
+      // Ensure the Fuzzy segment is fully inside the viewport so the
+      // tap doesn't fall on an off-screen pixel. `ensureVisible` is
+      // resilient to layout shifts when sibling sections appear above
+      // or below — important because the edit screen accretes content
+      // (e.g. #1004 phase 6 auto-record card) without each PR being
+      // expected to retune fixed-pixel scrolls.
+      await tester.ensureVisible(find.text('Fuzzy'));
       await tester.pumpAndSettle();
 
       // Precondition: repo still on rule mode.
