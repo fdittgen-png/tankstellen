@@ -163,11 +163,6 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     return PageScaffold(
       title: l?.consumptionLogTitle ?? 'Fuel consumption',
       bodyPadding: EdgeInsets.zero,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        tooltip: l?.tooltipBack ?? 'Back',
-        onPressed: () => context.pop(),
-      ),
       bottom: TabSwitcher(
         controller: tabController,
         tabs: [
