@@ -133,6 +133,91 @@ void main() {
       });
     });
 
+    group('hands-free auto-record config (#1004 phase 1)', () {
+      test('defaults: auto-record off, no paired adapter, 5 km/h / 60 s, '
+          'no background-location consent', () {
+        const v = VehicleProfile(id: 'abc', name: 'Car');
+        expect(v.autoRecord, isFalse);
+        expect(v.pairedAdapterMac, isNull);
+        expect(v.movementStartThresholdKmh, 5.0);
+        expect(v.disconnectSaveDelaySec, 60);
+        expect(v.backgroundLocationConsent, isFalse);
+      });
+
+      test('round-trips opted-in values through JSON', () {
+        const v = VehicleProfile(
+          id: 'auto-1',
+          name: 'Daily Driver',
+          type: VehicleType.combustion,
+          autoRecord: true,
+          pairedAdapterMac: 'AA:BB:CC:DD:EE:FF',
+          movementStartThresholdKmh: 7.5,
+          disconnectSaveDelaySec: 90,
+          backgroundLocationConsent: true,
+        );
+
+        final restored = VehicleProfile.fromJson(v.toJson());
+
+        expect(restored.autoRecord, isTrue);
+        expect(restored.pairedAdapterMac, 'AA:BB:CC:DD:EE:FF');
+        expect(restored.movementStartThresholdKmh, closeTo(7.5, 0.001));
+        expect(restored.disconnectSaveDelaySec, 90);
+        expect(restored.backgroundLocationConsent, isTrue);
+        expect(v, equals(restored));
+      });
+
+      test('legacy JSON without auto-record keys still decodes — '
+          'existing Hive profiles take safe defaults', () {
+        // Payload shape that pre-#1004 profiles wrote to Hive: no
+        // autoRecord / pairedAdapterMac / movementStartThresholdKmh
+        // / disconnectSaveDelaySec / backgroundLocationConsent
+        // keys at all. Must round-trip cleanly with defaults.
+        final json = <String, dynamic>{
+          'id': 'legacy',
+          'name': 'Legacy Car',
+          'type': 'combustion',
+          'tankCapacityL': 50.0,
+          'preferredFuelType': 'Diesel',
+        };
+
+        final v = VehicleProfile.fromJson(json);
+
+        expect(v.autoRecord, isFalse);
+        expect(v.pairedAdapterMac, isNull);
+        expect(v.movementStartThresholdKmh, 5.0);
+        expect(v.disconnectSaveDelaySec, 60);
+        expect(v.backgroundLocationConsent, isFalse);
+        // Pre-existing fields should still come through.
+        expect(v.tankCapacityL, 50.0);
+        expect(v.preferredFuelType, 'Diesel');
+      });
+
+      test('copyWith updates auto-record fields without disturbing '
+          'unrelated state', () {
+        const v = VehicleProfile(
+          id: 'cw',
+          name: 'CopyWith Car',
+          type: VehicleType.combustion,
+          tankCapacityL: 45,
+        );
+
+        final updated = v.copyWith(
+          autoRecord: true,
+          pairedAdapterMac: '11:22:33:44:55:66',
+          movementStartThresholdKmh: 3.0,
+          disconnectSaveDelaySec: 120,
+          backgroundLocationConsent: true,
+        );
+
+        expect(updated.tankCapacityL, 45);
+        expect(updated.autoRecord, isTrue);
+        expect(updated.pairedAdapterMac, '11:22:33:44:55:66');
+        expect(updated.movementStartThresholdKmh, 3.0);
+        expect(updated.disconnectSaveDelaySec, 120);
+        expect(updated.backgroundLocationConsent, isTrue);
+      });
+    });
+
     test('copyWith preserves unspecified fields', () {
       const v = VehicleProfile(
         id: 'a',

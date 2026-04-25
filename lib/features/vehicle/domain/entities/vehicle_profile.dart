@@ -184,6 +184,42 @@ abstract class VehicleProfile with _$VehicleProfile {
     @Default(VehicleCalibrationMode.rule)
     @VehicleCalibrationModeJsonConverter()
     VehicleCalibrationMode calibrationMode,
+
+    // Hands-free auto-record configuration (#1004 phase 1). All
+    // fields default to "off" or to safe values so pre-#1004 Hive
+    // profiles deserialize cleanly via freezed's `@Default`. Phases
+    // 2-6 layer the background service, movement-detection,
+    // disconnect-save, badge counter and UI on top of these fields
+    // — phase 1 ships the data layer only.
+    //
+    //   autoRecord: master toggle. Off by default — every user must
+    //     opt in explicitly from the vehicle edit screen.
+    //   pairedAdapterMac: MAC address of the ELM327 adapter that
+    //     belongs to this vehicle. Distinct from
+    //     [obd2AdapterMac] (the "currently connected" adapter from
+    //     #784 / #816); pairedAdapterMac is the long-lived "this
+    //     adapter belongs to this car" marker that the BLE auto-
+    //     connect listener watches for. Null when the user hasn't
+    //     paired one yet.
+    //   movementStartThresholdKmh: speed (OBD2 PID 0x0D OR phone
+    //     GPS, whichever fires first) above which auto-record fires
+    //     `startTrip()`. Default 5 km/h — low enough to catch
+    //     pulling out of a parking spot, high enough to ignore the
+    //     adapter waking up while the car is stationary.
+    //   disconnectSaveDelaySec: debounce window in seconds before a
+    //     BT disconnect triggers `stopAndSave`. Default 60 s — long
+    //     enough to absorb a tunnel or a parking-garage lift, short
+    //     enough that the user sees a saved trip when they walk
+    //     into the kitchen.
+    //   backgroundLocationConsent: separate from runtime location
+    //     permission — this is the user's stored answer to "may we
+    //     record GPS while the screen is off?" Without it, the
+    //     auto-flow runs BT-only and skips GPS-based trip metadata.
+    @Default(false) bool autoRecord,
+    String? pairedAdapterMac,
+    @Default(5.0) double movementStartThresholdKmh,
+    @Default(60) int disconnectSaveDelaySec,
+    @Default(false) bool backgroundLocationConsent,
   }) = _VehicleProfile;
 
   factory VehicleProfile.fromJson(Map<String, dynamic> json) =>
