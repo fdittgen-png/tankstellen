@@ -1,12 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 
-import '../../../mocks/mocks.dart';
+import '../../../fakes/fake_hive_storage.dart';
 
 /// Tests that exercise the REAL code path on the device:
 ///
@@ -16,11 +15,7 @@ import '../../../mocks/mocks.dart';
 /// 4. User taps star → calls favoritesProvider.notifier.toggle(id, rawJson: …)
 /// 5. Favorites tab reads evFavoriteStationsProvider → station must appear
 void main() {
-  late MockHiveStorage mockStorage;
-  late List<String> fuelIds;
-  late List<String> evIds;
-  late Map<String, Map<String, dynamic>> fuelStationData;
-  late Map<String, Map<String, dynamic>> evStationData;
+  late FakeHiveStorage fakeStorage;
 
   // Canonical unified type after #560 — same entity everywhere.
   const searchStation = ChargingStation(
@@ -33,75 +28,12 @@ void main() {
   );
 
   setUp(() {
-    mockStorage = MockHiveStorage();
-    fuelIds = [];
-    evIds = [];
-    fuelStationData = {};
-    evStationData = {};
-
-    // Fuel storage
-    when(() => mockStorage.getFavoriteIds())
-        .thenAnswer((_) => List.of(fuelIds));
-    when(() => mockStorage.addFavorite(any())).thenAnswer((inv) async {
-      final id = inv.positionalArguments.first as String;
-      if (!fuelIds.contains(id)) fuelIds.add(id);
-    });
-    when(() => mockStorage.removeFavorite(any())).thenAnswer((inv) async {
-      fuelIds.remove(inv.positionalArguments.first);
-    });
-    when(() => mockStorage.isFavorite(any()))
-        .thenAnswer((inv) => fuelIds.contains(inv.positionalArguments.first));
-    when(() => mockStorage.saveFavoriteStationData(any(), any()))
-        .thenAnswer((inv) async {
-      fuelStationData[inv.positionalArguments.first as String] =
-          inv.positionalArguments[1] as Map<String, dynamic>;
-    });
-    when(() => mockStorage.getFavoriteStationData(any())).thenAnswer((inv) {
-      return fuelStationData[inv.positionalArguments.first];
-    });
-    when(() => mockStorage.removeFavoriteStationData(any()))
-        .thenAnswer((inv) async {
-      fuelStationData.remove(inv.positionalArguments.first);
-    });
-
-    // EV storage
-    when(() => mockStorage.getEvFavoriteIds())
-        .thenAnswer((_) => List.of(evIds));
-    when(() => mockStorage.addEvFavorite(any())).thenAnswer((inv) async {
-      final id = inv.positionalArguments.first as String;
-      if (!evIds.contains(id)) evIds.add(id);
-    });
-    when(() => mockStorage.removeEvFavorite(any())).thenAnswer((inv) async {
-      evIds.remove(inv.positionalArguments.first);
-    });
-    when(() => mockStorage.isEvFavorite(any()))
-        .thenAnswer((inv) => evIds.contains(inv.positionalArguments.first));
-    when(() => mockStorage.saveEvFavoriteStationData(any(), any()))
-        .thenAnswer((inv) async {
-      evStationData[inv.positionalArguments.first as String] =
-          inv.positionalArguments[1] as Map<String, dynamic>;
-    });
-    when(() => mockStorage.getEvFavoriteStationData(any())).thenAnswer((inv) {
-      return evStationData[inv.positionalArguments.first];
-    });
-    when(() => mockStorage.removeEvFavoriteStationData(any()))
-        .thenAnswer((inv) async {
-      evStationData.remove(inv.positionalArguments.first);
-    });
-
-    // Misc
-    when(() => mockStorage.getSetting(any())).thenReturn(null);
-    when(() => mockStorage.getRatings()).thenReturn({});
-    when(() => mockStorage.removeRating(any())).thenAnswer((_) async {});
-    when(() => mockStorage.clearPriceHistoryForStation(any()))
-        .thenAnswer((_) async {});
-
-    registerFallbackValue(<String, dynamic>{});
+    fakeStorage = FakeHiveStorage();
   });
 
   ProviderContainer createContainer() {
     final c = ProviderContainer(overrides: [
-      hiveStorageProvider.overrideWithValue(mockStorage),
+      hiveStorageProvider.overrideWithValue(fakeStorage),
     ]);
     addTearDown(c.dispose);
     return c;
@@ -147,8 +79,10 @@ void main() {
 
         expect(container.read(favoritesProvider), contains('ocm-12345'));
 
-        final hasEvData = evStationData.containsKey('ocm-12345');
-        final hasFuelData = fuelStationData.containsKey('ocm-12345');
+        final hasEvData =
+            fakeStorage.getEvFavoriteStationData('ocm-12345') != null;
+        final hasFuelData =
+            fakeStorage.getFavoriteStationData('ocm-12345') != null;
         expect(hasEvData || hasFuelData, isTrue,
             reason:
                 'Station data must be persisted for favorites to display it');

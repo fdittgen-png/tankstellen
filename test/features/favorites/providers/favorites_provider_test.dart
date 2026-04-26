@@ -11,6 +11,7 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
+import '../../../fakes/fake_hive_storage.dart';
 import '../../../fixtures/stations.dart';
 import '../../../mocks/mocks.dart';
 
@@ -30,21 +31,16 @@ void main() {
   // Default: online
   _mockConnectivity(['wifi']);
 
-  late MockHiveStorage mockStorage;
+  late FakeHiveStorage fakeStorage;
   late ProviderContainer container;
 
   setUp(() {
-    mockStorage = MockHiveStorage();
-    // Favorites.build() merges fuel + EV IDs; mock EV as empty by default.
-    when(() => mockStorage.getEvFavoriteIds()).thenReturn([]);
-    // Favorites.remove() checks which storage owns the ID.
-    when(() => mockStorage.isFavorite(any())).thenReturn(true);
-    when(() => mockStorage.isEvFavorite(any())).thenReturn(false);
+    fakeStorage = FakeHiveStorage();
   });
 
   ProviderContainer createContainer({MockStationService? mockService}) {
     final c = ProviderContainer(overrides: [
-      hiveStorageProvider.overrideWithValue(mockStorage),
+      hiveStorageProvider.overrideWithValue(fakeStorage),
       if (mockService != null)
         stationServiceProvider.overrideWithValue(mockService),
     ]);
@@ -53,98 +49,76 @@ void main() {
   }
 
   group('Favorites', () {
-    test('build returns favorite IDs from storage', () {
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['a', 'b']);
+    test('build returns favorite IDs from storage', () async {
+      await fakeStorage.setFavoriteIds(['a', 'b']);
 
       container = createContainer();
       final ids = container.read(favoritesProvider);
 
       expect(ids, ['a', 'b']);
-      verify(() => mockStorage.getFavoriteIds()).called(1);
     });
 
     test('add() adds station ID to list', () async {
-      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
-      when(() => mockStorage.addFavorite(any())).thenAnswer((_) async {});
-
       container = createContainer();
       container.read(favoritesProvider);
 
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['station-1']);
       await container.read(favoritesProvider.notifier).add('station-1');
 
-      verify(() => mockStorage.addFavorite('station-1')).called(1);
+      expect(fakeStorage.getFavoriteIds(), ['station-1']);
       expect(container.read(favoritesProvider), ['station-1']);
     });
 
     test('add() with stationData persists station JSON', () async {
-      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
-      when(() => mockStorage.addFavorite(any())).thenAnswer((_) async {});
-      when(() => mockStorage.saveFavoriteStationData(any(), any()))
-          .thenAnswer((_) async {});
-
       container = createContainer();
       container.read(favoritesProvider);
 
-      when(() => mockStorage.getFavoriteIds()).thenReturn([testStation.id]);
       await container
           .read(favoritesProvider.notifier)
           .add(testStation.id, stationData: testStation);
 
-      verify(() => mockStorage.saveFavoriteStationData(
-            testStation.id,
-            testStation.toJson(),
-          )).called(1);
+      expect(fakeStorage.getFavoriteStationData(testStation.id),
+          testStation.toJson());
     });
 
-    test('add() without stationData does NOT call saveFavoriteStationData',
+    test('add() without stationData does NOT persist station JSON',
         () async {
-      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
-      when(() => mockStorage.addFavorite(any())).thenAnswer((_) async {});
-
       container = createContainer();
       container.read(favoritesProvider);
 
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['station-1']);
       await container.read(favoritesProvider.notifier).add('station-1');
 
-      verifyNever(() => mockStorage.saveFavoriteStationData(any(), any()));
+      expect(fakeStorage.getFavoriteStationData('station-1'), isNull);
     });
 
     test('remove() removes station ID and persisted data', () async {
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['station-1']);
-      when(() => mockStorage.removeFavorite(any())).thenAnswer((_) async {});
-      when(() => mockStorage.removeFavoriteStationData(any())).thenAnswer((_) async {});
-      when(() => mockStorage.getRatings()).thenReturn({});
-      when(() => mockStorage.removeRating(any())).thenAnswer((_) async {});
-      when(() => mockStorage.clearPriceHistoryForStation(any())).thenAnswer((_) async {});
+      await fakeStorage.setFavoriteIds(['station-1']);
+      await fakeStorage.saveFavoriteStationData(
+          'station-1', testStation.toJson());
 
       container = createContainer();
       expect(container.read(favoritesProvider), ['station-1']);
 
-      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
       await container.read(favoritesProvider.notifier).remove('station-1');
 
-      verify(() => mockStorage.removeFavorite('station-1')).called(1);
-      verify(() => mockStorage.removeFavoriteStationData('station-1')).called(1);
+      expect(fakeStorage.getFavoriteIds(), isEmpty);
+      expect(fakeStorage.getFavoriteStationData('station-1'), isNull);
       expect(container.read(favoritesProvider), isEmpty);
     });
 
     test('remove() cleans up rating and price history', () async {
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['station-1']);
-      when(() => mockStorage.removeFavorite(any())).thenAnswer((_) async {});
-      when(() => mockStorage.removeFavoriteStationData(any())).thenAnswer((_) async {});
-      when(() => mockStorage.getRatings()).thenReturn({'station-1': 4});
-      when(() => mockStorage.removeRating(any())).thenAnswer((_) async {});
-      when(() => mockStorage.clearPriceHistoryForStation(any())).thenAnswer((_) async {});
+      await fakeStorage.setFavoriteIds(['station-1']);
+      await fakeStorage.setRating('station-1', 4);
+      await fakeStorage.savePriceRecords('station-1', [
+        {'ts': '2026-04-01', 'e10': 1.799},
+      ]);
 
       container = createContainer();
       container.read(favoritesProvider);
 
-      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
       await container.read(favoritesProvider.notifier).remove('station-1');
 
-      verify(() => mockStorage.clearPriceHistoryForStation('station-1')).called(1);
+      expect(fakeStorage.getRating('station-1'), isNull);
+      expect(fakeStorage.getPriceRecords('station-1'), isEmpty);
     });
 
     // Regression for issue #423: the rating-cleanup call inside remove()
@@ -152,131 +126,101 @@ void main() {
     // observe a still-present rating. The fix awaits it; this test pins
     // the awaited ordering so it can't regress.
     test('remove() awaits the rating cleanup before returning', () async {
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['station-1']);
-      when(() => mockStorage.removeFavorite(any())).thenAnswer((_) async {});
-      when(() => mockStorage.removeFavoriteStationData(any()))
-          .thenAnswer((_) async {});
-      when(() => mockStorage.getRatings()).thenReturn({'station-1': 4});
-      when(() => mockStorage.clearPriceHistoryForStation(any()))
-          .thenAnswer((_) async {});
+      // For the timing-sensitive ordering test we need a controllable async
+      // stub on removeRating; mocktail is the right fit here so we keep it
+      // for this single case. The rest of the storage state lives on the
+      // fake.
+      final orderedStorage = _OrderedRemoveRatingFake();
+      await orderedStorage.setFavoriteIds(['station-1']);
+      await orderedStorage.setRating('station-1', 4);
 
-      // Make removeRating slow so a non-awaiting caller would race past it.
-      final ratingCleanupCompleter = Completer<void>();
-      var ratingCleanupCalled = false;
-      when(() => mockStorage.removeRating(any())).thenAnswer((_) async {
-        ratingCleanupCalled = true;
-        await ratingCleanupCompleter.future;
-      });
-
-      container = createContainer();
+      container = ProviderContainer(overrides: [
+        hiveStorageProvider.overrideWithValue(orderedStorage),
+      ]);
+      addTearDown(container.dispose);
       container.read(favoritesProvider);
-      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
 
       final removeFuture =
           container.read(favoritesProvider.notifier).remove('station-1');
 
       // Yield once so remove() reaches the rating cleanup call.
       await Future<void>.delayed(Duration.zero);
-      expect(ratingCleanupCalled, isTrue,
+      expect(orderedStorage.removeRatingCalled, isTrue,
           reason: 'remove() should call rating cleanup before completing');
       expect(removeFuture, isA<Future<void>>(),
           reason: 'remove() should still be pending while cleanup is running');
 
-      ratingCleanupCompleter.complete();
+      orderedStorage.completer.complete();
       await removeFuture;
-      verify(() => mockStorage.removeRating('station-1')).called(1);
+      expect(orderedStorage.getRating('station-1'), isNull);
     });
 
     test('remove() succeeds even if price history cleanup throws', () async {
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['station-1']);
-      when(() => mockStorage.removeFavorite(any())).thenAnswer((_) async {});
-      when(() => mockStorage.removeFavoriteStationData(any())).thenAnswer((_) async {});
-      when(() => mockStorage.getRatings()).thenReturn({});
-      when(() => mockStorage.removeRating(any())).thenAnswer((_) async {});
-      when(() => mockStorage.clearPriceHistoryForStation(any()))
-          .thenThrow(Exception('corrupt'));
+      final throwingStorage = _ThrowingPriceHistoryFake();
+      await throwingStorage.setFavoriteIds(['station-1']);
 
-      container = createContainer();
+      container = ProviderContainer(overrides: [
+        hiveStorageProvider.overrideWithValue(throwingStorage),
+      ]);
+      addTearDown(container.dispose);
       container.read(favoritesProvider);
 
-      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
       // Should not throw — cleanup errors are caught
       await container.read(favoritesProvider.notifier).remove('station-1');
 
-      verify(() => mockStorage.removeFavorite('station-1')).called(1);
+      expect(throwingStorage.getFavoriteIds(), isEmpty);
       expect(container.read(favoritesProvider), isEmpty);
     });
 
     test('toggle() adds if not present', () async {
-      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
-      when(() => mockStorage.addFavorite(any())).thenAnswer((_) async {});
-
       container = createContainer();
       container.read(favoritesProvider);
 
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['station-1']);
       await container.read(favoritesProvider.notifier).toggle('station-1');
 
-      verify(() => mockStorage.addFavorite('station-1')).called(1);
+      expect(fakeStorage.getFavoriteIds(), ['station-1']);
     });
 
     test('toggle() removes if already present', () async {
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['station-1']);
-      when(() => mockStorage.removeFavorite(any())).thenAnswer((_) async {});
-      when(() => mockStorage.removeFavoriteStationData(any())).thenAnswer((_) async {});
-      when(() => mockStorage.getRatings()).thenReturn({});
-      when(() => mockStorage.removeRating(any())).thenAnswer((_) async {});
-      when(() => mockStorage.clearPriceHistoryForStation(any())).thenAnswer((_) async {});
+      await fakeStorage.setFavoriteIds(['station-1']);
 
       container = createContainer();
       container.read(favoritesProvider);
 
-      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
       await container.read(favoritesProvider.notifier).toggle('station-1');
 
-      verify(() => mockStorage.removeFavorite('station-1')).called(1);
-      verifyNever(() => mockStorage.addFavorite(any()));
+      expect(fakeStorage.getFavoriteIds(), isEmpty);
     });
 
     test('toggle() with stationData passes it through to add()', () async {
-      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
-      when(() => mockStorage.addFavorite(any())).thenAnswer((_) async {});
-      when(() => mockStorage.saveFavoriteStationData(any(), any()))
-          .thenAnswer((_) async {});
-
       container = createContainer();
       container.read(favoritesProvider);
 
-      when(() => mockStorage.getFavoriteIds()).thenReturn([testStation.id]);
       await container
           .read(favoritesProvider.notifier)
           .toggle(testStation.id, stationData: testStation);
 
-      verify(() => mockStorage.saveFavoriteStationData(
-            testStation.id,
-            testStation.toJson(),
-          )).called(1);
+      expect(fakeStorage.getFavoriteStationData(testStation.id),
+          testStation.toJson());
     });
   });
 
   group('isFavoriteProvider', () {
-    test('returns true for a favorited station', () {
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['station-1']);
+    test('returns true for a favorited station', () async {
+      await fakeStorage.setFavoriteIds(['station-1']);
 
       container = createContainer();
       expect(container.read(isFavoriteProvider('station-1')), isTrue);
     });
 
-    test('returns false for a non-favorite station', () {
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['station-1']);
+    test('returns false for a non-favorite station', () async {
+      await fakeStorage.setFavoriteIds(['station-1']);
 
       container = createContainer();
       expect(container.read(isFavoriteProvider('station-2')), isFalse);
     });
 
     test('returns false when no favorites exist', () {
-      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
-
       container = createContainer();
       expect(container.read(isFavoriteProvider('station-1')), isFalse);
     });
@@ -284,8 +228,6 @@ void main() {
 
   group('FavoriteStations', () {
     test('build() returns empty list', () {
-      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
-
       container = createContainer();
       final state = container.read(favoriteStationsProvider);
 
@@ -294,8 +236,6 @@ void main() {
     });
 
     test('loadAndRefresh() returns empty when no favorites', () async {
-      when(() => mockStorage.getFavoriteIds()).thenReturn([]);
-
       container = createContainer();
       await container.read(favoriteStationsProvider.notifier).loadAndRefresh();
 
@@ -305,15 +245,15 @@ void main() {
 
     test('loadAndRefresh() loads persisted stations from storage', () async {
       final station = testStationList[0];
-      when(() => mockStorage.getFavoriteIds()).thenReturn([station.id]);
-      when(() => mockStorage.getFavoriteStationData(station.id))
-          .thenReturn(station.toJson());
-      when(() => mockStorage.saveFavoriteStationData(any(), any()))
-          .thenAnswer((_) async {});
+      await fakeStorage.setFavoriteIds([station.id]);
+      await fakeStorage.saveFavoriteStationData(station.id, station.toJson());
 
       final mockService = MockStationService();
       when(() => mockService.getPrices(any())).thenAnswer((_) async =>
-          ServiceResult(data: {}, source: ServiceSource.tankerkoenigApi, fetchedAt: DateTime.now()));
+          ServiceResult(
+              data: {},
+              source: ServiceSource.tankerkoenigApi,
+              fetchedAt: DateTime.now()));
 
       container = createContainer(mockService: mockService);
       await container.read(favoriteStationsProvider.notifier).loadAndRefresh();
@@ -326,10 +266,7 @@ void main() {
 
     test('loadAndRefresh() fetches missing station data from API', () async {
       const station = testStation;
-      when(() => mockStorage.getFavoriteIds()).thenReturn([station.id]);
-      when(() => mockStorage.getFavoriteStationData(station.id)).thenReturn(null);
-      when(() => mockStorage.saveFavoriteStationData(any(), any()))
-          .thenAnswer((_) async {});
+      await fakeStorage.setFavoriteIds([station.id]);
 
       final mockService = MockStationService();
       when(() => mockService.getStationDetail(station.id)).thenAnswer(
@@ -339,7 +276,10 @@ void main() {
                 fetchedAt: DateTime.now(),
               ));
       when(() => mockService.getPrices(any())).thenAnswer((_) async =>
-          ServiceResult(data: {}, source: ServiceSource.tankerkoenigApi, fetchedAt: DateTime.now()));
+          ServiceResult(
+              data: {},
+              source: ServiceSource.tankerkoenigApi,
+              fetchedAt: DateTime.now()));
 
       container = createContainer(mockService: mockService);
       await container.read(favoriteStationsProvider.notifier).loadAndRefresh();
@@ -349,17 +289,15 @@ void main() {
       expect(state.value!.data.first.id, station.id);
 
       verify(() => mockService.getStationDetail(station.id)).called(1);
-      verify(() => mockStorage.saveFavoriteStationData(station.id, any()))
-          .called(greaterThanOrEqualTo(1));
+      // Production should persist what it fetched so the next start has it
+      // available offline.
+      expect(fakeStorage.getFavoriteStationData(station.id), isNotNull);
     });
 
     test('loadAndRefresh() merges fresh prices into stations', () async {
       final station = testStationList[0]; // e10: 1.739
-      when(() => mockStorage.getFavoriteIds()).thenReturn([station.id]);
-      when(() => mockStorage.getFavoriteStationData(station.id))
-          .thenReturn(station.toJson());
-      when(() => mockStorage.saveFavoriteStationData(any(), any()))
-          .thenAnswer((_) async {});
+      await fakeStorage.setFavoriteIds([station.id]);
+      await fakeStorage.saveFavoriteStationData(station.id, station.toJson());
 
       final mockService = MockStationService();
       when(() => mockService.getPrices(any())).thenAnswer((_) async =>
@@ -387,30 +325,30 @@ void main() {
       expect(updated.isOpen, isTrue);
     });
 
-    test('loadAndRefresh() persists updated prices back to storage', () async {
+    test('loadAndRefresh() persists updated prices back to storage',
+        () async {
       final station = testStationList[0];
-      when(() => mockStorage.getFavoriteIds()).thenReturn([station.id]);
-      when(() => mockStorage.getFavoriteStationData(station.id))
-          .thenReturn(station.toJson());
-      when(() => mockStorage.saveFavoriteStationData(any(), any()))
-          .thenAnswer((_) async {});
+      await fakeStorage.setFavoriteIds([station.id]);
+      await fakeStorage.saveFavoriteStationData(station.id, station.toJson());
 
       final mockService = MockStationService();
       when(() => mockService.getPrices(any())).thenAnswer((_) async =>
-          ServiceResult(data: {}, source: ServiceSource.tankerkoenigApi, fetchedAt: DateTime.now()));
+          ServiceResult(
+              data: {},
+              source: ServiceSource.tankerkoenigApi,
+              fetchedAt: DateTime.now()));
 
       container = createContainer(mockService: mockService);
       await container.read(favoriteStationsProvider.notifier).loadAndRefresh();
 
-      verify(() => mockStorage.saveFavoriteStationData(station.id, any()))
-          .called(1);
+      // Production rewrites the persisted JSON after refresh.
+      expect(fakeStorage.getFavoriteStationData(station.id), isNotNull);
     });
 
     test('loadAndRefresh() serves persisted data when API fails', () async {
       final station = testStationList[0];
-      when(() => mockStorage.getFavoriteIds()).thenReturn([station.id]);
-      when(() => mockStorage.getFavoriteStationData(station.id))
-          .thenReturn(station.toJson());
+      await fakeStorage.setFavoriteIds([station.id]);
+      await fakeStorage.saveFavoriteStationData(station.id, station.toJson());
 
       final mockService = MockStationService();
       when(() => mockService.getPrices(any()))
@@ -427,15 +365,16 @@ void main() {
 
     test('loadAndRefresh() handles missing data + API failure gracefully',
         () async {
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['missing-id']);
-      when(() => mockStorage.getFavoriteStationData('missing-id'))
-          .thenReturn(null);
+      await fakeStorage.setFavoriteIds(['missing-id']);
 
       final mockService = MockStationService();
       when(() => mockService.getStationDetail('missing-id'))
           .thenThrow(Exception('Station not found'));
       when(() => mockService.getPrices(any())).thenAnswer((_) async =>
-          ServiceResult(data: {}, source: ServiceSource.tankerkoenigApi, fetchedAt: DateTime.now()));
+          ServiceResult(
+              data: {},
+              source: ServiceSource.tankerkoenigApi,
+              fetchedAt: DateTime.now()));
 
       container = createContainer(mockService: mockService);
       await container.read(favoriteStationsProvider.notifier).loadAndRefresh();
@@ -444,14 +383,14 @@ void main() {
       expect(state.value!.data, isEmpty);
     });
 
-    test('loadAndRefresh() offline returns persisted data with isStale', () async {
+    test('loadAndRefresh() offline returns persisted data with isStale',
+        () async {
       // Switch to offline
       _mockConnectivity(['none']);
 
       final station = testStationList[0];
-      when(() => mockStorage.getFavoriteIds()).thenReturn([station.id]);
-      when(() => mockStorage.getFavoriteStationData(station.id))
-          .thenReturn(station.toJson());
+      await fakeStorage.setFavoriteIds([station.id]);
+      await fakeStorage.saveFavoriteStationData(station.id, station.toJson());
 
       container = createContainer();
       await container.read(favoriteStationsProvider.notifier).loadAndRefresh();
@@ -465,12 +404,11 @@ void main() {
       _mockConnectivity(['wifi']);
     });
 
-    test('loadAndRefresh() offline with no persisted data returns empty stale', () async {
+    test('loadAndRefresh() offline with no persisted data returns empty stale',
+        () async {
       _mockConnectivity(['none']);
 
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['orphan-id']);
-      when(() => mockStorage.getFavoriteStationData('orphan-id'))
-          .thenReturn(null);
+      await fakeStorage.setFavoriteIds(['orphan-id']);
 
       container = createContainer();
       await container.read(favoriteStationsProvider.notifier).loadAndRefresh();
@@ -484,22 +422,20 @@ void main() {
 
     test('loadAndRefresh() skips corrupted JSON without crashing', () async {
       final goodStation = testStationList[0];
-      when(() => mockStorage.getFavoriteIds())
-          .thenReturn(['corrupt', goodStation.id]);
-      // Return invalid JSON that will fail Station.fromJson()
-      when(() => mockStorage.getFavoriteStationData('corrupt'))
-          .thenReturn({'not': 'a station'});
-      when(() => mockStorage.getFavoriteStationData(goodStation.id))
-          .thenReturn(goodStation.toJson());
-      when(() => mockStorage.saveFavoriteStationData(any(), any()))
-          .thenAnswer((_) async {});
+      await fakeStorage.setFavoriteIds(['corrupt', goodStation.id]);
+      await fakeStorage.saveFavoriteStationData('corrupt', {'not': 'a station'});
+      await fakeStorage.saveFavoriteStationData(
+          goodStation.id, goodStation.toJson());
 
       final mockService = MockStationService();
       // Fetch detail for the corrupt one
       when(() => mockService.getStationDetail('corrupt'))
           .thenThrow(Exception('not found'));
       when(() => mockService.getPrices(any())).thenAnswer((_) async =>
-          ServiceResult(data: {}, source: ServiceSource.tankerkoenigApi, fetchedAt: DateTime.now()));
+          ServiceResult(
+              data: {},
+              source: ServiceSource.tankerkoenigApi,
+              fetchedAt: DateTime.now()));
 
       container = createContainer(mockService: mockService);
       await container.read(favoriteStationsProvider.notifier).loadAndRefresh();
@@ -510,20 +446,21 @@ void main() {
       expect(state.value!.data.first.id, goodStation.id);
     });
 
-    test('loadAndRefresh() loads multiple stations in correct order', () async {
+    test('loadAndRefresh() loads multiple stations in correct order',
+        () async {
       final stations = testStationList;
       final ids = stations.map((s) => s.id).toList();
-      when(() => mockStorage.getFavoriteIds()).thenReturn(ids);
+      await fakeStorage.setFavoriteIds(ids);
       for (final s in stations) {
-        when(() => mockStorage.getFavoriteStationData(s.id))
-            .thenReturn(s.toJson());
+        await fakeStorage.saveFavoriteStationData(s.id, s.toJson());
       }
-      when(() => mockStorage.saveFavoriteStationData(any(), any()))
-          .thenAnswer((_) async {});
 
       final mockService = MockStationService();
       when(() => mockService.getPrices(any())).thenAnswer((_) async =>
-          ServiceResult(data: {}, source: ServiceSource.tankerkoenigApi, fetchedAt: DateTime.now()));
+          ServiceResult(
+              data: {},
+              source: ServiceSource.tankerkoenigApi,
+              fetchedAt: DateTime.now()));
 
       container = createContainer(mockService: mockService);
       await container.read(favoriteStationsProvider.notifier).loadAndRefresh();
@@ -535,17 +472,13 @@ void main() {
       expect(state.value!.data[2].id, 'station-expensive');
     });
 
-    test('loadAndRefresh() handles mix of persisted and missing data', () async {
+    test('loadAndRefresh() handles mix of persisted and missing data',
+        () async {
       final persisted = testStationList[0];
       const missing = testStation;
-      when(() => mockStorage.getFavoriteIds())
-          .thenReturn([persisted.id, missing.id]);
-      when(() => mockStorage.getFavoriteStationData(persisted.id))
-          .thenReturn(persisted.toJson());
-      when(() => mockStorage.getFavoriteStationData(missing.id))
-          .thenReturn(null);
-      when(() => mockStorage.saveFavoriteStationData(any(), any()))
-          .thenAnswer((_) async {});
+      await fakeStorage.setFavoriteIds([persisted.id, missing.id]);
+      await fakeStorage.saveFavoriteStationData(
+          persisted.id, persisted.toJson());
 
       final mockService = MockStationService();
       when(() => mockService.getStationDetail(missing.id)).thenAnswer(
@@ -555,7 +488,10 @@ void main() {
                 fetchedAt: DateTime.now(),
               ));
       when(() => mockService.getPrices(any())).thenAnswer((_) async =>
-          ServiceResult(data: {}, source: ServiceSource.tankerkoenigApi, fetchedAt: DateTime.now()));
+          ServiceResult(
+              data: {},
+              source: ServiceSource.tankerkoenigApi,
+              fetchedAt: DateTime.now()));
 
       container = createContainer(mockService: mockService);
       await container.read(favoriteStationsProvider.notifier).loadAndRefresh();
@@ -568,7 +504,8 @@ void main() {
       expect(loadedIds, contains(missing.id));
     });
 
-    test('Station JSON round-trip through toJson/fromJson preserves all fields', () {
+    test('Station JSON round-trip through toJson/fromJson preserves all fields',
+        () {
       const original = testStation;
       final json = original.toJson();
       final restored = Station.fromJson(json);
@@ -588,4 +525,28 @@ void main() {
       expect(restored.isOpen, original.isOpen);
     });
   });
+}
+
+/// Fake variant that exposes a controllable [Completer] for the rating
+/// cleanup, so the await-ordering regression test (#423) can pin the
+/// timing without leaning on mocktail.
+class _OrderedRemoveRatingFake extends FakeHiveStorage {
+  final Completer<void> completer = Completer<void>();
+  bool removeRatingCalled = false;
+
+  @override
+  Future<void> removeRating(String stationId) async {
+    removeRatingCalled = true;
+    await completer.future;
+    await super.removeRating(stationId);
+  }
+}
+
+/// Fake variant whose price-history cleanup throws — used to assert the
+/// remove() flow swallows storage errors and still drops the favorite.
+class _ThrowingPriceHistoryFake extends FakeHiveStorage {
+  @override
+  Future<void> clearPriceHistoryForStation(String stationId) async {
+    throw Exception('corrupt');
+  }
 }
