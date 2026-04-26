@@ -5,6 +5,14 @@ import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
+/// Pure-parser + interface-contract tests for [MiseStationService]. Runs
+/// fully offline against checked-in CSV fixtures — no upstream call.
+///
+/// Live `searchStations()` coverage lives in
+/// `test/core/services/italy_search_live_test.dart` under
+/// `@Tags(['network'])`; rerun that file (not this one) when the MISE
+/// CSV schema or the `mimit.gov.it` host changes. See
+/// `docs/guides/NETWORK_TESTS.md`.
 void main() {
   late MiseStationService service;
 

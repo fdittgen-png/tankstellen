@@ -7,7 +7,11 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 
-/// #1110 — RLS policy verification test.
+/// #1110 — Supabase RLS policy verification. Rerun after any migration
+/// under `supabase/migrations/` that touches `CREATE POLICY` or
+/// `ENABLE/DISABLE ROW LEVEL SECURITY`, and whenever
+/// `docs/security/SUPABASE_RLS_MATRIX.md` is edited (matrix and test
+/// move together). See `docs/guides/NETWORK_TESTS.md`.
 ///
 /// Calls the `public.audit_rls_policies()` SQL function (added by
 /// migration `20260426000001_rls_audit_function.sql`) against a live

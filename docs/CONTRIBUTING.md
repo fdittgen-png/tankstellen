@@ -76,6 +76,10 @@ dart run build_runner build --delete-conflicting-outputs
 - Target the testing pyramid: 70% unit, 20% widget, 10% integration.
 - Prefer fakes over mocks for service layer tests.
 - Use `pumpApp` from `test/helpers/pump_app.dart` for widget tests.
+- Tests that hit real third-party endpoints are isolated under
+  `@Tags(['network'])` and excluded from CI — see
+  [docs/guides/NETWORK_TESTS.md](guides/NETWORK_TESTS.md) for the
+  full inventory and re-run triggers.
 
 ```bash
 flutter test                # all tests

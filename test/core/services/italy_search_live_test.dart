@@ -6,13 +6,13 @@ import 'package:tankstellen/core/services/impl/mise_station_service.dart';
 import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
-/// #695 — live reachability + end-to-end search test for the Italian
-/// MISE provider. Guards against the bug the user reported ("search
-/// for Italy returns no results") by hitting the real upstream and
-/// asserting >0 stations for a known-busy location (Rome).
+/// #695 — live end-to-end search against the Italian MISE provider.
+/// Hits `mimit.gov.it/images/exportCSV/anagrafica_impianti_attivi.csv`
+/// + the price CSV, asserts >0 stations for Rome and Milan.
 ///
-/// Run with `flutter test --tags network` on demand; skipped by the
-/// default test runner (CI `flutter test` excludes tagged suites).
+/// Rerun after touching `mise_station_service.dart`, `mise_csv_parser.dart`,
+/// or the Italian bounding box — also when a user reports "Italy returns
+/// no results". CI excludes the tag; see `docs/guides/NETWORK_TESTS.md`.
 void main() {
   test(
     'MISE returns stations within 10km of Rome (Roma Centro)',

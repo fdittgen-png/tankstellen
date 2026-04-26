@@ -5,15 +5,15 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Integration tests that verify each country's fuel price API is reachable
-/// and returns valid data. These tests hit real endpoints.
+/// and returns valid data. Probes Tankerkoenig (DE), Prix-Carburants (FR),
+/// E-Control (AT), MITECO (ES), MIMIT (IT), OK + Shell (DK), Argentina
+/// Energía, and Nominatim — real endpoints, hence the `network` tag.
 ///
-/// Tagged `network` so the main CI run excludes them — the upstream APIs
-/// (Argentina, Italy MIMIT, Spain MITECO) intermittently time out and
-/// must not block PRs. Run on demand with:
+/// Rerun after any change under `lib/core/services/impl/*_station_service.dart`
+/// or before tagging a release. CI excludes the tag (intermittent upstream
+/// timeouts cannot block PRs); see `docs/guides/NETWORK_TESTS.md`.
 ///
 ///   flutter test test/core/services/api_connectivity_test.dart --tags=network
-///
-/// or from a workstation via `flutter test --tags=network`.
 void main() {
   late Dio dio;
 
