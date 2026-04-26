@@ -1444,5 +1444,8 @@
   "vinInfoSectionWhereTitle": "Wo Sie sie finden",
   "vinInfoSectionWhereBody": "Schauen Sie unten links in der Windschutzscheibe (Fahrerseite) durch das Glas, prüfen Sie den Aufkleber am Türrahmen der Fahrertür bei geöffneter Tür, oder lesen Sie sie in Ihrem Fahrzeugschein ab.",
   "vinInfoDismiss": "Verstanden",
-  "vinConfirmPrivacyNote": "Wir haben Ihre FIN in NHTSA's kostenloser Fahrzeugdatenbank nachgeschlagen — nichts wurde an Tankstellen-Server gesendet."
+  "vinConfirmPrivacyNote": "Wir haben Ihre FIN in NHTSA's kostenloser Fahrzeugdatenbank nachgeschlagen — nichts wurde an Tankstellen-Server gesendet.",
+  "widgetVariantDefault": "Nur aktueller Preis",
+  "widgetVariantPredictive": "Prognose: bester Tankzeitpunkt",
+  "widgetPredictiveNowPrefix": "jetzt"
 }

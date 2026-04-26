@@ -31,10 +31,23 @@ object StationWidgetRenderer {
     const val PREFS_NAME = "HomeWidgetPreferences"
     private const val MODE_KEY_PREFIX = "widget_mode_"
     private const val COLOR_KEY_PREFIX = "color_"
+    private const val VARIANT_KEY_PREFIX = "variant_"
     private const val DEFAULT_COLOR_SCHEME = "system"
+    private const val DEFAULT_VARIANT = "default"
 
     const val MODE_FAVORITES = "favorites"
     const val MODE_NEAREST = "nearest"
+
+    /** Default content variant: only the current price line. */
+    const val VARIANT_DEFAULT = "default"
+
+    /**
+     * Predictive content variant (#1121). Adds a compact "best time" line
+     * under each row when the Dart side wrote `predictive_*` fields into
+     * the station JSON. Renderer falls back to [VARIANT_DEFAULT] for any
+     * row that lacks those fields.
+     */
+    const val VARIANT_PREDICTIVE = "predictive"
 
     const val ACTION_TOGGLE_MODE = "de.tankstellen.fuelprices.TOGGLE_MODE"
     const val ACTION_OPEN_APP = "de.tankstellen.fuelprices.OPEN_APP"
@@ -67,6 +80,22 @@ object StationWidgetRenderer {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return prefs.getString("$COLOR_KEY_PREFIX$appWidgetId", DEFAULT_COLOR_SCHEME)
             ?: DEFAULT_COLOR_SCHEME
+    }
+
+    /**
+     * Read the persisted content variant for [appWidgetId] (#1121). Defaults
+     * to [VARIANT_DEFAULT] on first render so existing widgets keep their
+     * original look until the user opts into predictive nudges via the
+     * configure activity.
+     *
+     * Valid identifiers (kept in sync with
+     * `lib/features/widget/data/widget_variants.dart`): `default`,
+     * `predictive`.
+     */
+    fun getVariant(context: Context, appWidgetId: Int): String {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getString("$VARIANT_KEY_PREFIX$appWidgetId", DEFAULT_VARIANT)
+            ?: DEFAULT_VARIANT
     }
 
     /**
@@ -112,6 +141,10 @@ object StationWidgetRenderer {
         // resolves it once; the value is purely diagnostic for Kotlin —
         // the Dart side has already filtered the JSON to the right profile.
         val profileId = prefs.getString("profile_$appWidgetId", null)
+        // #1121 — content variant (default vs predictive). Resolved once
+        // per render and forwarded to `buildRow`; rows without predictive
+        // fields automatically fall back to the default appearance.
+        val variant = getVariant(context, appWidgetId)
 
         val stationsJson: String
         val updatedAt: String?
@@ -217,7 +250,7 @@ object StationWidgetRenderer {
             val count = minOf(stations.length(), 3)
             for (i in 0 until count) {
                 val station = stations.getJSONObject(i)
-                val row = buildRow(context, station, appWidgetId, i, profileId)
+                val row = buildRow(context, station, appWidgetId, i, profileId, variant)
                 views.addView(R.id.station_list, row)
             }
         }
@@ -249,6 +282,7 @@ object StationWidgetRenderer {
         appWidgetId: Int,
         index: Int,
         profileId: String? = null,
+        variant: String = VARIANT_DEFAULT,
     ): RemoteViews {
         val row = RemoteViews(context.packageName, R.layout.widget_station_row)
 
@@ -312,6 +346,41 @@ object StationWidgetRenderer {
             R.id.station_status,
             if (isOpen) "● Open" else "○ Closed",
         )
+
+        // #1121 — predictive nudge line. Render only when the user selected
+        // the predictive variant AND the Dart side attached `predictive_*`
+        // fields. Either condition false → fall back to the default
+        // appearance (the layout's default visibility is GONE).
+        val predictiveLabel = station.optString("predictive_best_label", "")
+        val predictiveBestPrice =
+            station.optDouble("predictive_best_price", Double.NaN)
+        if (
+            variant == VARIANT_PREDICTIVE &&
+            predictiveLabel.isNotBlank() &&
+            !predictiveBestPrice.isNaN()
+        ) {
+            val nowText = if (!prefPrice.isNaN()) {
+                String.format(Locale.getDefault(), "%.3f %s", prefPrice, currency).trim()
+            } else if (!fallbackE10.isNaN()) {
+                String.format(Locale.getDefault(), "%.3f %s", fallbackE10, currency).trim()
+            } else {
+                ""
+            }
+            val bestText =
+                String.format(Locale.getDefault(), "%.3f %s", predictiveBestPrice, currency).trim()
+            // Format: "now €1.84/L · best Tue 6-8 PM ~€1.79/L".
+            // The predictor's `recommendation` already contains the day +
+            // hour-range phrasing.
+            val composed = if (nowText.isNotBlank()) {
+                "now $nowText · $predictiveLabel ~$bestText"
+            } else {
+                "$predictiveLabel ~$bestText"
+            }
+            row.setTextViewText(R.id.station_predictive, composed)
+            row.setViewVisibility(R.id.station_predictive, View.VISIBLE)
+        } else {
+            row.setViewVisibility(R.id.station_predictive, View.GONE)
+        }
 
         // Tap the row → open the station detail screen. The id comes from
         // the JSON produced by HomeWidgetService.

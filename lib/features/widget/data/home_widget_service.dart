@@ -12,6 +12,7 @@ import '../../profile/data/models/user_profile.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import 'home_widget_json.dart';
 import 'nearest_widget_data_builder.dart';
+import 'predictive_payload.dart';
 
 /// Manages data for the Android home screen widgets.
 ///
@@ -47,6 +48,7 @@ class HomeWidgetService {
     FavoriteStorage storage, {
     ProfileStorage? profileStorage,
     SettingsStorage? settingsStorage,
+    PricePredictor? pricePredictor,
   }) async {
     try {
       final favoriteIds = storage.getFavoriteIds();
@@ -71,7 +73,12 @@ class HomeWidgetService {
         return;
       }
 
-      final stations = _buildStationList(storage, favoriteIds, context);
+      final stations = _buildStationList(
+        storage,
+        favoriteIds,
+        context,
+        pricePredictor: pricePredictor,
+      );
 
       await HomeWidget.saveWidgetData('station_count', stations.length);
       await HomeWidget.saveWidgetData(
@@ -108,6 +115,7 @@ class HomeWidgetService {
     SettingsStorage settingsStorage, {
     ProfileStorage? profileStorage,
     StationService? stationService,
+    PricePredictor? pricePredictor,
   }) async {
     try {
       if (stationService != null && profileStorage != null) {
@@ -115,6 +123,7 @@ class HomeWidgetService {
           stationService: stationService,
           settingsStorage: settingsStorage,
           profileStorage: profileStorage,
+          pricePredictor: pricePredictor,
         );
         final payload = await builder.build();
         await HomeWidget.updateWidget(androidName: _widgetAndroidName);
@@ -164,6 +173,7 @@ class HomeWidgetService {
         lat,
         lng,
         context,
+        pricePredictor: pricePredictor,
       );
 
       await HomeWidget.saveWidgetData('nearest_count', stations.length);
@@ -193,8 +203,9 @@ class HomeWidgetService {
   static List<Map<String, dynamic>> _buildStationList(
     FavoriteStorage storage,
     List<String> favoriteIds,
-    _WidgetDisplayContext context,
-  ) {
+    _WidgetDisplayContext context, {
+    PricePredictor? pricePredictor,
+  }) {
     final stations = <Map<String, dynamic>>[];
     for (final id in favoriteIds.take(_maxWidgetStations)) {
       final data = storage.getFavoriteStationData(id);
@@ -205,6 +216,7 @@ class HomeWidgetService {
           preferredFuelType: context.preferredFuelType,
           userLat: context.userLat,
           userLng: context.userLng,
+          pricePredictor: pricePredictor,
         ));
       }
     }
@@ -270,8 +282,9 @@ class HomeWidgetService {
     List<String> favoriteIds,
     double lat,
     double lng,
-    _WidgetDisplayContext context,
-  ) {
+    _WidgetDisplayContext context, {
+    PricePredictor? pricePredictor,
+  }) {
     final stationsWithDistance = <(Map<String, dynamic>, double)>[];
 
     for (final id in favoriteIds) {
@@ -289,6 +302,7 @@ class HomeWidgetService {
         preferredFuelType: context.preferredFuelType,
         userLat: lat,
         userLng: lng,
+        pricePredictor: pricePredictor,
       );
       stationsWithDistance.add((compact, distanceKm));
     }
@@ -317,6 +331,7 @@ class HomeWidgetService {
     FuelType? preferredFuelType,
     double? userLat,
     double? userLng,
+    PricePredictor? pricePredictor,
   }) {
     final brand = (data['brand'] as String?)?.trim();
     final name = (data['name'] as String?)?.trim();
@@ -347,6 +362,19 @@ class HomeWidgetService {
         ? _priceForFuel(data, preferredFuelType)
         : null;
 
+    // Predictive variant payload — only attached when the caller supplied a
+    // predictor AND the predictor returned an actionable forecast for the
+    // station's preferred fuel. When absent, the row falls back to the
+    // default (price-only) line on the renderer side. See
+    // [buildPredictivePayload] for the null-fallback rules.
+    Map<String, dynamic>? predictive;
+    if (pricePredictor != null && preferredFuelType != null) {
+      predictive = buildPredictivePayload(
+        currentPrice: fuelPrice,
+        prediction: pricePredictor(id, preferredFuelType),
+      );
+    }
+
     return {
       'id': id,
       'brand': displayBrand,
@@ -363,6 +391,7 @@ class HomeWidgetService {
         'preferred_fuel_code': preferredFuelType.apiValue,
       if (preferredFuelType != null) 'preferred_fuel_price': fuelPrice,
       'distance_km': distanceKm,
+      if (predictive != null) ...predictive,
     };
   }
 
@@ -398,6 +427,7 @@ class HomeWidgetService {
     FuelType? preferredFuelType,
     double? userLat,
     double? userLng,
+    PricePredictor? pricePredictor,
   }) =>
       _compactStationData(
         id,
@@ -405,6 +435,7 @@ class HomeWidgetService {
         preferredFuelType: preferredFuelType,
         userLat: userLat,
         userLng: userLng,
+        pricePredictor: pricePredictor,
       );
 
   /// Haversine formula to calculate distance in km between two GPS points.

@@ -10,6 +10,8 @@ import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../../../core/sync/favorites_sync.dart';
 import '../../ev/domain/entities/charging_station.dart' as search_ev;
+import '../../price_history/providers/price_prediction_provider.dart';
+import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/station.dart';
 import '../../search/providers/station_rating_provider.dart';
 import '../../widget/data/home_widget_service.dart';
@@ -65,10 +67,17 @@ class Favorites extends _$Favorites {
   void _refreshWidget(StorageRepository storage) {
     unawaited(() async {
       try {
+        // Wire the price predictor for the predictive variant (#1121).
+        // The widget config decides whether to render predictive nudges;
+        // we always attach the data so the user's choice doesn't need a
+        // second refresh round-trip.
+        predictor(String stationId, FuelType fuel) =>
+            ref.read(pricePredictionProvider(stationId, fuel));
         await HomeWidgetService.updateWidget(
           storage,
           profileStorage: storage,
           settingsStorage: storage,
+          pricePredictor: predictor,
         );
         // Resolve the station service lazily + defensively — some test
         // harnesses don't wire stationServiceProvider, and the nearest
@@ -87,6 +96,7 @@ class Favorites extends _$Favorites {
           storage,
           profileStorage: storage,
           stationService: stationService,
+          pricePredictor: predictor,
         );
       } catch (e, st) {
         debugPrint('Favorites._refreshWidget: $e\n$st');

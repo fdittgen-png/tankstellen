@@ -10,6 +10,7 @@ import '../../../core/storage/storage_keys.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/station.dart';
+import 'predictive_payload.dart';
 
 /// Storage boundary for the nearest-widget JSON payload.
 ///
@@ -136,12 +137,19 @@ class NearestWidgetDataBuilder {
     required this.settingsStorage,
     required this.profileStorage,
     NearestWidgetPayloadStore? payloadStore,
+    this.pricePredictor,
   }) : payloadStore = payloadStore ?? const HomeWidgetPayloadStore();
 
   final StationService stationService;
   final SettingsStorage settingsStorage;
   final ProfileStorage profileStorage;
   final NearestWidgetPayloadStore payloadStore;
+
+  /// Optional predictor that drives the predictive widget variant (#1121).
+  /// When `null`, station rows omit the predictive fields and the renderer
+  /// falls back to the default price-only line — matching the behaviour
+  /// before #1121 shipped.
+  final PricePredictor? pricePredictor;
 
   /// Maximum rows the widget renders.
   static const int maxStations = 5;
@@ -275,6 +283,18 @@ class NearestWidgetDataBuilder {
     final priceFormatted =
         price != null ? price.toStringAsFixed(3) : '';
 
+    // Predictive variant (#1121): same null-fallback rules as the favorites
+    // path. Predictor is null in the background isolate (and any caller
+    // wiring up the default variant) — that's the cue the renderer needs
+    // to draw only the standard price line.
+    Map<String, dynamic>? predictive;
+    if (pricePredictor != null) {
+      predictive = buildPredictivePayload(
+        currentPrice: price,
+        prediction: pricePredictor!(station.id, fuel),
+      );
+    }
+
     return <String, dynamic>{
       'id': station.id,
       'brand': brand,
@@ -293,6 +313,7 @@ class NearestWidgetDataBuilder {
       'e5': station.e5,
       'e10': station.e10,
       'diesel': station.diesel,
+      if (predictive != null) ...predictive,
     };
   }
 

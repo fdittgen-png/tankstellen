@@ -3804,4 +3804,13 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get vinConfirmPrivacyNote =>
       'Wir haben Ihre FIN in NHTSA\'s kostenloser Fahrzeugdatenbank nachgeschlagen — nichts wurde an Tankstellen-Server gesendet.';
+
+  @override
+  String get widgetVariantDefault => 'Nur aktueller Preis';
+
+  @override
+  String get widgetVariantPredictive => 'Prognose: bester Tankzeitpunkt';
+
+  @override
+  String get widgetPredictiveNowPrefix => 'jetzt';
 }
