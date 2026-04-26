@@ -31,6 +31,7 @@ import '../features/search/presentation/screens/ev_station_detail_screen.dart';
 import '../features/station_detail/presentation/screens/station_detail_screen.dart';
 import '../features/driving/presentation/screens/driving_mode_screen.dart';
 import '../features/itinerary/presentation/screens/itineraries_screen.dart';
+import '../features/loyalty/presentation/loyalty_settings_screen.dart';
 import '../features/sync/presentation/screens/auth_screen.dart';
 import '../features/sync/presentation/screens/data_transparency_screen.dart';
 import '../features/sync/presentation/screens/link_device_screen.dart';
@@ -393,6 +394,13 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/theme-settings',
         builder: (context, state) => const ThemeSettingsScreen(),
+      ),
+      // #1120 — fuel-club / loyalty discount settings. Pilot ships
+      // with one brand (Total Energies); the screen lists, adds,
+      // toggles, and deletes user-entered cards.
+      GoRoute(
+        path: '/loyalty-settings',
+        builder: (context, state) => const LoyaltySettingsScreen(),
       ),
     ],
   );

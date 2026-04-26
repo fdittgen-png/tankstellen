@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../loyalty/providers/loyalty_provider.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/station.dart';
 import '../../providers/search_provider.dart';
@@ -91,6 +92,15 @@ class SwipeableStationCard extends ConsumerWidget {
         priceTier: priceTier,
         rating: rating,
         profileFuelType: profileFuelType,
+        // #1120 — collapse the loyalty-card map to canonical-brand
+        // strings so the StationCard widget stays decoupled from the
+        // [LoyaltyBrand] enum.
+        activeDiscountsByBrand: {
+          for (final entry in ref
+              .watch(activeDiscountByBrandProvider)
+              .entries)
+            entry.key.canonicalBrand: entry.value,
+        },
       ),
     );
   }
