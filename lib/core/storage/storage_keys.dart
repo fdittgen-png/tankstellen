@@ -49,4 +49,9 @@ class StorageKeys {
   /// (matches how onboarding completion is tracked).
   static const String vehicleCatalogMigrationDone =
       'vehicle_catalog_migration_done';
+
+  /// #1122 — opt-in toggle for the real-time eco-coaching haptic that
+  /// fires on sustained-high-throttle / low-Δspeed cruise. Defaults to
+  /// off so we never buzz a user who hasn't asked for live feedback.
+  static const String hapticEcoCoachEnabled = 'haptic_eco_coach_enabled';
 }

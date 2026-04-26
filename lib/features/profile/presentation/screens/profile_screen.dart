@@ -7,6 +7,7 @@ import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../consent/presentation/widgets/consent_settings_section.dart';
+import '../../../driving/presentation/widgets/driving_settings_section.dart';
 import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
 import '../widgets/feedback_token_section.dart';
@@ -123,6 +124,16 @@ class ProfileScreen extends ConsumerWidget {
             subtitle: l?.loyaltyMenuSubtitle ??
                 'Apply per-litre discounts from Total, Aral, Shell, …',
             onTap: () => context.push('/loyalty-settings'),
+          ),
+          const SizedBox(height: 8),
+
+          // #1122 — driving (wheel-lens) settings. Foldable so the
+          // section stays out of the way for users who don't want to
+          // toggle the real-time eco-coaching haptic.
+          _FoldableSection(
+            icon: Icons.directions_car_filled,
+            title: l?.hapticEcoCoachSectionTitle ?? 'Driving',
+            child: const DrivingSettingsSection(),
           ),
           const SizedBox(height: 8),
 
