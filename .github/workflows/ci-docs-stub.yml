@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '**/*.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.gitignore'
+  pull_request:
+    branches: [master]
+    paths:
+      - '**/*.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.gitignore'
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "docs-only change — analyze skipped (stub passes for branch protection)"
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "docs-only change — test skipped (stub passes for branch protection)"
