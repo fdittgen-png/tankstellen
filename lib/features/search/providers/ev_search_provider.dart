@@ -45,9 +45,9 @@ class EVSearchState extends _$EVSearchState {
         countryCode: country.code,
       );
       state = AsyncValue.data(result);
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
       if (e.type == DioExceptionType.cancel) return;
-      state = AsyncValue.error(e, StackTrace.current);
+      state = AsyncValue.error(e, st);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
