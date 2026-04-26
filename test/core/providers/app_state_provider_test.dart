@@ -1,70 +1,77 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/providers/app_state_provider.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 
-import '../../mocks/mocks.dart';
+import '../../fakes/fake_hive_storage.dart';
 
 void main() {
-  late MockHiveStorage mockStorage;
+  late FakeHiveStorage fakeStorage;
 
   setUp(() {
-    mockStorage = MockHiveStorage();
-    when(() => mockStorage.getSetting(any())).thenReturn(null);
+    fakeStorage = FakeHiveStorage()..hasBundledDefaultKey = false;
   });
 
   ProviderContainer createContainer() {
     final c = ProviderContainer(overrides: [
-      hiveStorageProvider.overrideWithValue(mockStorage),
+      hiveStorageProvider.overrideWithValue(fakeStorage),
     ]);
     addTearDown(c.dispose);
     return c;
   }
 
   group('hasApiKeyProvider', () {
-    test('returns true when API key exists', () {
-      when(() => mockStorage.hasApiKey()).thenReturn(true);
+    test('returns true when API key exists', () async {
+      await fakeStorage.setApiKey('user-key');
       final c = createContainer();
       expect(c.read(hasApiKeyProvider), isTrue);
     });
 
     test('returns false when no API key', () {
-      when(() => mockStorage.hasApiKey()).thenReturn(false);
       final c = createContainer();
       expect(c.read(hasApiKeyProvider), isFalse);
     });
   });
 
   group('isDemoModeProvider', () {
-    test('returns true when setup skipped and no key', () {
-      when(() => mockStorage.isSetupSkipped).thenReturn(true);
-      when(() => mockStorage.hasApiKey()).thenReturn(false);
+    test('returns true when setup skipped and no key', () async {
+      await fakeStorage.skipSetup();
       final c = createContainer();
       expect(c.read(isDemoModeProvider), isTrue);
     });
 
-    test('returns false when API key exists', () {
-      when(() => mockStorage.isSetupSkipped).thenReturn(true);
-      when(() => mockStorage.hasApiKey()).thenReturn(true);
+    test('returns false when API key exists', () async {
+      await fakeStorage.skipSetup();
+      await fakeStorage.setApiKey('user-key');
       final c = createContainer();
       expect(c.read(isDemoModeProvider), isFalse);
     });
   });
 
   group('storageStatsProvider', () {
-    test('aggregates all counts correctly', () {
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['a', 'b']);
-      when(() => mockStorage.alertCount).thenReturn(3);
-      when(() => mockStorage.getIgnoredIds()).thenReturn(['c']);
-      when(() => mockStorage.getRatings()).thenReturn({'d': 4});
-      when(() => mockStorage.cacheEntryCount).thenReturn(10);
-      when(() => mockStorage.priceHistoryEntryCount).thenReturn(5);
-      when(() => mockStorage.profileCount).thenReturn(1);
-      when(() => mockStorage.hasApiKey()).thenReturn(true);
-      when(() => mockStorage.hasCustomEvApiKey()).thenReturn(false);
-      when(() => mockStorage.getSetting('user_position_lat')).thenReturn(48.0);
+    test('aggregates all counts correctly', () async {
+      await fakeStorage.setFavoriteIds(['a', 'b']);
+      await fakeStorage.saveAlerts([
+        {'id': 'a1'},
+        {'id': 'a2'},
+        {'id': 'a3'},
+      ]);
+      await fakeStorage.setIgnoredIds(['c']);
+      await fakeStorage.setRating('d', 4);
+      for (var i = 0; i < 10; i++) {
+        await fakeStorage.cacheData('k$i', {});
+      }
+      await fakeStorage.savePriceRecords('s1', [
+        {'a': 1},
+        {'a': 2},
+        {'a': 3},
+        {'a': 4},
+        {'a': 5},
+      ]);
+      await fakeStorage.saveProfile('p1', {});
+      await fakeStorage.setApiKey('user-key');
+      await fakeStorage.putSetting('user_position_lat', 48.0);
 
       final c = createContainer();
       final stats = c.read(storageStatsProvider);
@@ -84,40 +91,33 @@ void main() {
 
   group('LocationConsent', () {
     test('build returns false when no consent', () {
-      when(() => mockStorage.getSetting('location_consent')).thenReturn(null);
       final c = createContainer();
       expect(c.read(locationConsentProvider), isFalse);
     });
 
-    test('build returns true when consent given', () {
-      when(() => mockStorage.getSetting('location_consent')).thenReturn(true);
+    test('build returns true when consent given', () async {
+      await fakeStorage.putSetting('location_consent', true);
       final c = createContainer();
       expect(c.read(locationConsentProvider), isTrue);
     });
 
     test('grant saves consent to storage', () async {
-      when(() => mockStorage.getSetting('location_consent')).thenReturn(false);
-      when(() => mockStorage.putSetting(any(), any())).thenAnswer((_) async {});
-
       final c = createContainer();
       await c.read(locationConsentProvider.notifier).grant();
 
-      verify(() => mockStorage.putSetting('location_consent', true)).called(1);
+      expect(fakeStorage.getSetting('location_consent'), true);
       expect(c.read(locationConsentProvider), isTrue);
     });
   });
 
   group('hasGdprConsent', () {
     test('returns false when no consent given', () {
-      when(() => mockStorage.getSetting(StorageKeys.gdprConsentGiven))
-          .thenReturn(null);
       final c = createContainer();
       expect(c.read(hasGdprConsentProvider), isFalse);
     });
 
-    test('returns true when consent given', () {
-      when(() => mockStorage.getSetting(StorageKeys.gdprConsentGiven))
-          .thenReturn(true);
+    test('returns true when consent given', () async {
+      await fakeStorage.putSetting(StorageKeys.gdprConsentGiven, true);
       final c = createContainer();
       expect(c.read(hasGdprConsentProvider), isTrue);
     });
@@ -132,13 +132,10 @@ void main() {
       expect(state.cloudSync, isFalse);
     });
 
-    test('build reflects stored values', () {
-      when(() => mockStorage.getSetting(StorageKeys.consentLocation))
-          .thenReturn(true);
-      when(() => mockStorage.getSetting(StorageKeys.consentErrorReporting))
-          .thenReturn(false);
-      when(() => mockStorage.getSetting(StorageKeys.consentCloudSync))
-          .thenReturn(true);
+    test('build reflects stored values', () async {
+      await fakeStorage.putSetting(StorageKeys.consentLocation, true);
+      await fakeStorage.putSetting(StorageKeys.consentErrorReporting, false);
+      await fakeStorage.putSetting(StorageKeys.consentCloudSync, true);
 
       final c = createContainer();
       final state = c.read(gdprConsentProvider);
@@ -149,9 +146,6 @@ void main() {
 
     test('save persists all consent values and sets gdprConsentGiven',
         () async {
-      when(() => mockStorage.putSetting(any(), any()))
-          .thenAnswer((_) async {});
-
       final c = createContainer();
       await c.read(gdprConsentProvider.notifier).save(
             location: true,
@@ -159,21 +153,12 @@ void main() {
             cloudSync: true,
           );
 
-      verify(() =>
-              mockStorage.putSetting(StorageKeys.gdprConsentGiven, true))
-          .called(1);
-      verify(() =>
-              mockStorage.putSetting(StorageKeys.consentLocation, true))
-          .called(1);
-      verify(() => mockStorage.putSetting(
-              StorageKeys.consentErrorReporting, false))
-          .called(1);
-      verify(() =>
-              mockStorage.putSetting(StorageKeys.consentCloudSync, true))
-          .called(1);
+      expect(fakeStorage.getSetting(StorageKeys.gdprConsentGiven), true);
+      expect(fakeStorage.getSetting(StorageKeys.consentLocation), true);
+      expect(fakeStorage.getSetting(StorageKeys.consentErrorReporting), false);
+      expect(fakeStorage.getSetting(StorageKeys.consentCloudSync), true);
       // Also updates legacy location_consent key
-      verify(() => mockStorage.putSetting('location_consent', true))
-          .called(1);
+      expect(fakeStorage.getSetting('location_consent'), true);
 
       final state = c.read(gdprConsentProvider);
       expect(state.location, isTrue);

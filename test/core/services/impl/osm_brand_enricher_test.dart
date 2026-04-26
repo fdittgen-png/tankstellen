@@ -1,20 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/impl/osm_brand_enricher.dart';
-import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
-class MockHiveStorage extends Mock implements HiveStorage {}
+import '../../../fakes/fake_hive_storage.dart';
 
 void main() {
-  late MockHiveStorage mockStorage;
+  late FakeHiveStorage fakeStorage;
   late OsmBrandEnricher enricher;
 
   setUp(() {
-    mockStorage = MockHiveStorage();
-    enricher = OsmBrandEnricher(mockStorage);
-    when(() => mockStorage.getSetting(any())).thenReturn(null);
-    when(() => mockStorage.putSetting(any(), any())).thenAnswer((_) async {});
+    fakeStorage = FakeHiveStorage();
+    enricher = OsmBrandEnricher(fakeStorage);
   });
 
   Station makeStation({
@@ -56,7 +52,7 @@ void main() {
     });
 
     test('applies persisted brand from storage', () async {
-      when(() => mockStorage.getSetting('brand_1')).thenReturn('Esso');
+      await fakeStorage.putSetting('brand_1', 'Esso');
 
       final stations = [makeStation(id: '1', brand: '')];
       final result = await enricher.enrich(stations);
@@ -89,22 +85,21 @@ void main() {
 
     test('uses session cache on second call', () async {
       // First call: brand from persisted storage
-      when(() => mockStorage.getSetting('brand_1')).thenReturn('BP');
+      await fakeStorage.putSetting('brand_1', 'BP');
 
       final stations = [makeStation(id: '1', brand: '')];
       await enricher.enrich(stations);
 
-      // Second call: should use session cache, not hit storage again
-      reset(mockStorage);
-      when(() => mockStorage.getSetting(any())).thenReturn(null);
-      when(() => mockStorage.putSetting(any(), any())).thenAnswer((_) async {});
+      // Second call: clear persisted storage, but session cache should still
+      // hold 'BP'.
+      await fakeStorage.putSetting('brand_1', null);
 
       final result2 = await enricher.enrich(stations);
       expect(result2[0].brand, 'BP');
     });
 
     test('mixed stations: branded and unbranded', () async {
-      when(() => mockStorage.getSetting('brand_2')).thenReturn('Avia');
+      await fakeStorage.putSetting('brand_2', 'Avia');
 
       final stations = [
         makeStation(id: '1', brand: 'Shell'),
