@@ -401,7 +401,14 @@ class TripRecording extends _$TripRecording {
   /// release the service, and return the accumulated [TripSummary].
   /// Safe to call when no trip is active — returns a default empty
   /// summary so callers don't have to null-check.
-  Future<StoppedTripResult> stop() async {
+  ///
+  /// [automatic] flags the saved [TripHistoryEntry] as auto-recorded
+  /// (#1004 phase 2a). Defaults to `false` so existing manual call
+  /// sites keep their behaviour unchanged. The hands-free
+  /// [AutoTripCoordinator] calls [stopAndSaveAutomatic] (the typed
+  /// wrapper below) so the launcher-icon badge increments only when
+  /// the coordinator was the one that decided to save.
+  Future<StoppedTripResult> stop({bool automatic = false}) async {
     final ctl = _controller;
     final svc = _service;
     if (ctl == null || svc == null) {
@@ -429,7 +436,11 @@ class TripRecording extends _$TripRecording {
     // (including discarded ones) is logged; the fill-up flow is a
     // *separate* decision. Best-effort: a Hive write failure here
     // shouldn't block service teardown.
-    await _saveToHistory(summary, samples: capturedSamples);
+    await _saveToHistory(
+      summary,
+      samples: capturedSamples,
+      automatic: automatic,
+    );
     // #769 — flush learned baselines before releasing the service so
     // the next trip starts from the updated values. Best-effort: a
     // Hive write failure here shouldn't block teardown.
@@ -463,6 +474,17 @@ class TripRecording extends _$TripRecording {
       odometerStartKm: odometerStartKm,
       odometerLatestKm: odometerLatestKm,
     );
+  }
+
+  /// Typed entry point for the hands-free [AutoTripCoordinator]
+  /// (#1004 phase 2a). Forwards to [stop] with `automatic: true` so
+  /// the saved [TripHistoryEntry] is tagged as auto-recorded and the
+  /// launcher-icon badge increments. Kept as a thin wrapper so the
+  /// coordinator binds to a stable, no-arg `Future<void>` seam — the
+  /// internal stop signature can grow more flags later without
+  /// breaking the coordinator's call site.
+  Future<void> stopAndSaveAutomatic() async {
+    await stop(automatic: true);
   }
 
   /// Return to idle — used after the caller consumes the

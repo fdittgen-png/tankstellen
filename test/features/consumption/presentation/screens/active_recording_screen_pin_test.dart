@@ -42,7 +42,7 @@ class _FakeTripRecording extends TripRecording {
   TripRecordingState build() => _initial;
 
   @override
-  Future<StoppedTripResult> stop() async {
+  Future<StoppedTripResult> stop({bool automatic = false}) async {
     state = state.copyWith(phase: TripRecordingPhase.finished);
     return const StoppedTripResult(
       summary: TripSummary(
