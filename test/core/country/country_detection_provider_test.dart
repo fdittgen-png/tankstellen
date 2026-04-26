@@ -102,10 +102,10 @@ void main() {
         'when a position is persisted at build time the geocoder is '
         'called once and the state updates with the returned code',
         () async {
-      fakeStorage.putSetting(StorageKeys.userPositionLat, 48.85);
-      fakeStorage.putSetting(StorageKeys.userPositionLng, 2.35);
-      fakeStorage.putSetting(StorageKeys.userPositionTimestamp, 0);
-      fakeStorage.putSetting(StorageKeys.userPositionSource, 'GPS');
+      await fakeStorage.putSetting(StorageKeys.userPositionLat, 48.85);
+      await fakeStorage.putSetting(StorageKeys.userPositionLng, 2.35);
+      await fakeStorage.putSetting(StorageKeys.userPositionTimestamp, 0);
+      await fakeStorage.putSetting(StorageKeys.userPositionSource, 'GPS');
 
       final geocoding = _FakeGeocoding(codeScript: const ['FR']);
       final c = makeContainer(geocoding);
@@ -136,9 +136,9 @@ void main() {
     test(
         'geocoder returning null leaves state null even though it was '
         'called', () async {
-      fakeStorage.putSetting(StorageKeys.userPositionLat, 1.0);
-      fakeStorage.putSetting(StorageKeys.userPositionLng, 2.0);
-      fakeStorage.putSetting(StorageKeys.userPositionTimestamp, 0);
+      await fakeStorage.putSetting(StorageKeys.userPositionLat, 1.0);
+      await fakeStorage.putSetting(StorageKeys.userPositionLng, 2.0);
+      await fakeStorage.putSetting(StorageKeys.userPositionTimestamp, 0);
 
       final geocoding = _FakeGeocoding(codeScript: const [null]);
       final c = makeContainer(geocoding);
@@ -160,9 +160,9 @@ void main() {
         'when the geocoder returns the same code as the current state, '
         '_detectCountry takes the no-op branch (no double-set on state)',
         () async {
-      fakeStorage.putSetting(StorageKeys.userPositionLat, 1.0);
-      fakeStorage.putSetting(StorageKeys.userPositionLng, 2.0);
-      fakeStorage.putSetting(StorageKeys.userPositionTimestamp, 0);
+      await fakeStorage.putSetting(StorageKeys.userPositionLat, 1.0);
+      await fakeStorage.putSetting(StorageKeys.userPositionLng, 2.0);
+      await fakeStorage.putSetting(StorageKeys.userPositionTimestamp, 0);
 
       // First call yields 'DE'. Second position emission yields 'DE'
       // again — covers the `code != state` false-branch in
@@ -206,9 +206,9 @@ void main() {
     test(
         'a position change re-runs detection with the new coordinates and '
         'updates state to the new code', () async {
-      fakeStorage.putSetting(StorageKeys.userPositionLat, 10.0);
-      fakeStorage.putSetting(StorageKeys.userPositionLng, 20.0);
-      fakeStorage.putSetting(StorageKeys.userPositionTimestamp, 0);
+      await fakeStorage.putSetting(StorageKeys.userPositionLat, 10.0);
+      await fakeStorage.putSetting(StorageKeys.userPositionLng, 20.0);
+      await fakeStorage.putSetting(StorageKeys.userPositionTimestamp, 0);
 
       final geocoding = _FakeGeocoding(codeScript: const ['DE', 'FR']);
       final c = makeContainer(geocoding);
@@ -239,9 +239,9 @@ void main() {
     test(
         'a second position emission while the first geocode is still in '
         'flight does NOT fire a second concurrent geocode call', () async {
-      fakeStorage.putSetting(StorageKeys.userPositionLat, 1.0);
-      fakeStorage.putSetting(StorageKeys.userPositionLng, 2.0);
-      fakeStorage.putSetting(StorageKeys.userPositionTimestamp, 0);
+      await fakeStorage.putSetting(StorageKeys.userPositionLat, 1.0);
+      await fakeStorage.putSetting(StorageKeys.userPositionLng, 2.0);
+      await fakeStorage.putSetting(StorageKeys.userPositionTimestamp, 0);
 
       // Hold the first call open with a Completer; the second should
       // be blocked by the _detecting flag and never even reach the
@@ -286,9 +286,9 @@ void main() {
     test(
         'after a held-open call resolves, the guard releases and a '
         'subsequent position change triggers a fresh geocode', () async {
-      fakeStorage.putSetting(StorageKeys.userPositionLat, 1.0);
-      fakeStorage.putSetting(StorageKeys.userPositionLng, 2.0);
-      fakeStorage.putSetting(StorageKeys.userPositionTimestamp, 0);
+      await fakeStorage.putSetting(StorageKeys.userPositionLat, 1.0);
+      await fakeStorage.putSetting(StorageKeys.userPositionLng, 2.0);
+      await fakeStorage.putSetting(StorageKeys.userPositionTimestamp, 0);
 
       final firstCallGate = Completer<String?>();
       final geocoding = _FakeGeocoding(
