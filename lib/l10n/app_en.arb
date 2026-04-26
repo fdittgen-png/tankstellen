@@ -526,29 +526,6 @@
       }
     }
   },
-  "crossBorderCheaper": "{country} stations {km} km away — €{price}/L cheaper",
-  "@crossBorderCheaper": {
-    "description": "Banner shown when stations across the border are cheaper than local prices.",
-    "placeholders": {
-      "country": {
-        "type": "String"
-      },
-      "km": {
-        "type": "String"
-      },
-      "price": {
-        "type": "String"
-      }
-    }
-  },
-  "crossBorderTapToSwitch": "Tap to switch country",
-  "@crossBorderTapToSwitch": {
-    "description": "Hint shown beneath the cross-border banner — tapping switches the active country and re-runs the search."
-  },
-  "crossBorderDismissTooltip": "Dismiss",
-  "@crossBorderDismissTooltip": {
-    "description": "Tooltip on the cross-border banner's dismiss icon."
-  },
   "allPricesView": "All prices",
   "compactView": "Compact",
   "switchToAllPricesView": "Switch to all-prices view",
@@ -1598,6 +1575,29 @@
   "greeceCommunityApiNotice": "Powered by the community-maintained fuelpricesgr API",
   "romaniaApiProvider": "Monitorul Prețurilor (Romania)",
   "romaniaScrapingNotice": "Powered by pretcarburant.ro (Competition Council + ANPC)",
+  "crossBorderCheaper": "{country} stations {km} km away — €{price}/L cheaper",
+  "@crossBorderCheaper": {
+    "description": "Banner shown when stations across the border are cheaper than local prices.",
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "km": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "crossBorderTapToSwitch": "Tap to switch country",
+  "@crossBorderTapToSwitch": {
+    "description": "Hint shown beneath the cross-border banner — tapping switches the active country and re-runs the search."
+  },
+  "crossBorderDismissTooltip": "Dismiss",
+  "@crossBorderDismissTooltip": {
+    "description": "Tooltip on the cross-border banner's dismiss icon."
+  },
   "insightCardTitle": "Top wasteful behaviours",
   "@insightCardTitle": {
     "description": "Title of the driving-insights card on the Trip detail screen — surfaces the top-3 fuel-wasting behaviours from the analyzer (#1041 phase 2)."
