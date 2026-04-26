@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
@@ -88,10 +89,10 @@ class _FakeFailingScanService extends ReceiptScanService {
 void main() {
   group('AddFillUpScreen — pump-display failure flow (#953)', () {
     /// Pumps enough frames to drive the async chain through:
-    ///   open import sheet → tap pump → fake returns failing outcome
-    ///   → screen calls showModalBottomSheet → failure sheet appears.
+    ///   tap pump-display button → fake returns failing outcome →
+    ///   screen calls showModalBottomSheet → failure sheet appears.
     /// Cannot use pumpAndSettle past the failure-sheet open because
-    /// the import-chip's busy spinner keeps animating until the host
+    /// the pump-button's busy spinner keeps animating until the host
     /// finally-block flips _scanningPump back to false (which only
     /// happens AFTER the failure sheet returns).
     Future<void> openFailureSheet(
@@ -103,11 +104,12 @@ void main() {
         AddFillUpScreen(scanService: scanService),
         overrides: _withVehicle,
       );
-      await tester.tap(find.text('Import from…'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Pump display'));
+      // #951 — the import affordance is now two visible buttons; the
+      // pump-display flow is reachable directly without an intermediate
+      // bottom sheet.
+      await tester.tap(find.byKey(const Key('import_pump_button')));
       // Drive the async chain manually — pumpAndSettle would deadlock
-      // on the import-chip's busy spinner.
+      // on the pump-button's busy spinner.
       for (var i = 0; i < 30; i++) {
         await tester.pump(const Duration(milliseconds: 50));
       }
@@ -161,8 +163,8 @@ void main() {
       await openFailureSheet(tester, fake);
       await tester.tap(find.text('Remove photo'));
       // After Remove photo the host returns from the failure sheet,
-      // flips _scanningPump back to false — chip spinner stops, so
-      // pumpAndSettle can settle frames cleanly.
+      // flips _scanningPump back to false — pump-button spinner stops,
+      // so pumpAndSettle can settle frames cleanly.
       await tester.pumpAndSettle();
 
       expect(

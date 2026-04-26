@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/widgets/form_section_card.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/add_fill_up_screen.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_import_from_chip.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_numeric_field.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_price_per_liter_readout.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
@@ -10,14 +9,15 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
 
-/// Widget tests for the restyled Add-Fill-up screen (#751 phase 2).
+/// Widget tests for the restyled Add-Fill-up screen.
 ///
-/// The phase 2 visual refresh groups fields into two cards
-/// ("What you filled" / "Where you were"), replaces the three
-/// top buttons with a single Import-from chip, and pins the Save
-/// action at the bottom of the Scaffold. These tests lock in the
-/// new structural contract so a future styling tweak can't silently
-/// drop one of the pieces.
+/// The form groups fields into two cards ("What you filled" /
+/// "Where you were") and pins the Save action at the bottom of the
+/// Scaffold. The import affordance is a pair of side-by-side buttons
+/// (Receipt + Pump display) — restored from the single "Import from…"
+/// chip via #951 because OBD-II odometer reading is unreliable on
+/// real hardware. These tests lock in the structural contract so a
+/// future styling tweak can't silently drop one of the pieces.
 class _StubVehicleList extends VehicleProfileList {
   @override
   List<VehicleProfile> build() => const [
@@ -79,40 +79,30 @@ void main() {
       expect(find.text('Where you were'), findsOneWidget);
     });
 
-    testWidgets('renders the Import-from chip once (replacing the '
-        'three top buttons)', (tester) async {
+    testWidgets(
+        'renders two visible import buttons (Receipt + Pump display) '
+        'and hides the OBD-II import path (#951)', (tester) async {
       await _pumpWithTallView(
         tester,
         const AddFillUpScreen(),
         overrides: _withVehicle,
       );
 
-      expect(find.byType(FillUpImportFromChip), findsOneWidget);
-      expect(find.text('Import from…'), findsOneWidget);
-
-      // The pre-restyle Scan-receipt / Scan-pump / OBD-II labels must
-      // not appear at the top of the form — they have moved into the
-      // bottom sheet behind the chip.
-      expect(find.text('Scan receipt'), findsNothing);
-      expect(find.text('Scan pump'), findsNothing);
-      expect(find.text('OBD-II'), findsNothing);
-    });
-
-    testWidgets('tapping the chip opens the bottom sheet with all three '
-        'import options', (tester) async {
-      await _pumpWithTallView(
-        tester,
-        const AddFillUpScreen(),
-        overrides: _withVehicle,
-      );
-
-      await tester.tap(find.byType(ActionChip));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Import fill-up data'), findsOneWidget);
+      // Two side-by-side OutlinedButtons — keyed for stable lookup.
+      expect(find.byKey(const Key('import_receipt_button')), findsOneWidget);
+      expect(find.byKey(const Key('import_pump_button')), findsOneWidget);
       expect(find.text('Receipt'), findsOneWidget);
       expect(find.text('Pump display'), findsOneWidget);
-      expect(find.text('OBD-II adapter'), findsOneWidget);
+
+      // The single "Import from…" chip and the OBD-II import tile
+      // must NOT appear on this screen — they were rolled back in
+      // #951 because PID 0xA6 odometer is unreliable on real
+      // hardware. The full OBD-II trip flow lives on the
+      // Consumption screen and is unaffected.
+      expect(find.text('Import from…'), findsNothing);
+      expect(find.byType(ActionChip), findsNothing);
+      expect(find.text('OBD-II adapter'), findsNothing);
+      expect(find.text('OBD-II'), findsNothing);
     });
 
     testWidgets('price-per-liter derivation renders under the cost field '
@@ -169,10 +159,11 @@ void main() {
       expect(find.text('Total cost'), findsOneWidget);
       expect(find.text('Odometer (km)'), findsOneWidget);
       expect(find.text('Notes (optional)'), findsOneWidget);
-      // Card headers + import chip.
+      // Card headers + import button labels.
       expect(find.text('What you filled'), findsOneWidget);
       expect(find.text('Where you were'), findsOneWidget);
-      expect(find.text('Import from…'), findsOneWidget);
+      expect(find.text('Receipt'), findsOneWidget);
+      expect(find.text('Pump display'), findsOneWidget);
     });
 
     testWidgets('meets the Android tap-target guideline (48dp, #566)',
