@@ -3,41 +3,187 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consent/providers/gdpr_consent_form_provider.dart';
 
 void main() {
-  group('GdprConsentFormController', () {
-    test('initial state is all consents off', () {
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
-      final state = container.read(gdprConsentFormControllerProvider);
+  group('GdprConsentFormState', () {
+    test('default constructor leaves all three flags false', () {
+      const state = GdprConsentFormState();
       expect(state.locationConsent, isFalse);
       expect(state.errorReportingConsent, isFalse);
       expect(state.cloudSyncConsent, isFalse);
     });
 
-    test('toggles update only the targeted field', () {
+    group('copyWith', () {
+      test('returns identical-value state when no params are passed', () {
+        const original = GdprConsentFormState(
+          locationConsent: true,
+          errorReportingConsent: true,
+          cloudSyncConsent: true,
+        );
+        final copy = original.copyWith();
+        expect(copy.locationConsent, isTrue);
+        expect(copy.errorReportingConsent, isTrue);
+        expect(copy.cloudSyncConsent, isTrue);
+      });
+
+      test('overrides only locationConsent when that param is supplied', () {
+        const original = GdprConsentFormState();
+        final copy = original.copyWith(locationConsent: true);
+        expect(copy.locationConsent, isTrue);
+        expect(copy.errorReportingConsent, isFalse);
+        expect(copy.cloudSyncConsent, isFalse);
+      });
+
+      test('overrides only errorReportingConsent when that param is supplied',
+          () {
+        const original = GdprConsentFormState();
+        final copy = original.copyWith(errorReportingConsent: true);
+        expect(copy.locationConsent, isFalse);
+        expect(copy.errorReportingConsent, isTrue);
+        expect(copy.cloudSyncConsent, isFalse);
+      });
+
+      test('overrides only cloudSyncConsent when that param is supplied', () {
+        const original = GdprConsentFormState();
+        final copy = original.copyWith(cloudSyncConsent: true);
+        expect(copy.locationConsent, isFalse);
+        expect(copy.errorReportingConsent, isFalse);
+        expect(copy.cloudSyncConsent, isTrue);
+      });
+
+      test('omitted params keep the existing value (true stays true)', () {
+        const original = GdprConsentFormState(
+          locationConsent: true,
+          errorReportingConsent: true,
+          cloudSyncConsent: true,
+        );
+        final copy = original.copyWith(locationConsent: false);
+        expect(copy.locationConsent, isFalse);
+        expect(copy.errorReportingConsent, isTrue);
+        expect(copy.cloudSyncConsent, isTrue);
+      });
+    });
+  });
+
+  group('GdprConsentFormController', () {
+    test('build() returns the default state with all flags false', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final state = container.read(gdprConsentFormControllerProvider);
+
+      expect(state.locationConsent, isFalse);
+      expect(state.errorReportingConsent, isFalse);
+      expect(state.cloudSyncConsent, isFalse);
+    });
+
+    test('setLocation(true) flips locationConsent only', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final notifier =
           container.read(gdprConsentFormControllerProvider.notifier);
 
       notifier.setLocation(true);
-      var state = container.read(gdprConsentFormControllerProvider);
+
+      final state = container.read(gdprConsentFormControllerProvider);
       expect(state.locationConsent, isTrue);
       expect(state.errorReportingConsent, isFalse);
       expect(state.cloudSyncConsent, isFalse);
+    });
+
+    test('setLocation(false) leaves errorReporting + cloudSync intact', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier =
+          container.read(gdprConsentFormControllerProvider.notifier);
+
+      // Pre-arm the other two flags so we can verify setLocation does not
+      // disturb them.
+      notifier.setErrorReporting(true);
+      notifier.setCloudSync(true);
+
+      notifier.setLocation(false);
+
+      final state = container.read(gdprConsentFormControllerProvider);
+      expect(state.locationConsent, isFalse);
+      expect(state.errorReportingConsent, isTrue);
+      expect(state.cloudSyncConsent, isTrue);
+    });
+
+    test('setErrorReporting(true) flips errorReportingConsent only', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier =
+          container.read(gdprConsentFormControllerProvider.notifier);
 
       notifier.setErrorReporting(true);
-      state = container.read(gdprConsentFormControllerProvider);
+
+      final state = container.read(gdprConsentFormControllerProvider);
+      expect(state.locationConsent, isFalse);
+      expect(state.errorReportingConsent, isTrue);
+      expect(state.cloudSyncConsent, isFalse);
+    });
+
+    test('setErrorReporting(false) leaves location + cloudSync intact', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier =
+          container.read(gdprConsentFormControllerProvider.notifier);
+
+      notifier.setLocation(true);
+      notifier.setCloudSync(true);
+      notifier.setErrorReporting(true);
+
+      notifier.setErrorReporting(false);
+
+      final state = container.read(gdprConsentFormControllerProvider);
+      expect(state.locationConsent, isTrue);
+      expect(state.errorReportingConsent, isFalse);
+      expect(state.cloudSyncConsent, isTrue);
+    });
+
+    test('setCloudSync(true) flips cloudSyncConsent only', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier =
+          container.read(gdprConsentFormControllerProvider.notifier);
+
+      notifier.setCloudSync(true);
+
+      final state = container.read(gdprConsentFormControllerProvider);
+      expect(state.locationConsent, isFalse);
+      expect(state.errorReportingConsent, isFalse);
+      expect(state.cloudSyncConsent, isTrue);
+    });
+
+    test('setCloudSync(false) leaves location + errorReporting intact', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier =
+          container.read(gdprConsentFormControllerProvider.notifier);
+
+      notifier.setLocation(true);
+      notifier.setErrorReporting(true);
+      notifier.setCloudSync(true);
+
+      notifier.setCloudSync(false);
+
+      final state = container.read(gdprConsentFormControllerProvider);
       expect(state.locationConsent, isTrue);
       expect(state.errorReportingConsent, isTrue);
       expect(state.cloudSyncConsent, isFalse);
+    });
 
+    test('calling all three setters with true yields all flags true', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final notifier =
+          container.read(gdprConsentFormControllerProvider.notifier);
+
+      notifier.setLocation(true);
+      notifier.setErrorReporting(true);
       notifier.setCloudSync(true);
-      state = container.read(gdprConsentFormControllerProvider);
-      expect(state.cloudSyncConsent, isTrue);
 
-      notifier.setLocation(false);
-      state = container.read(gdprConsentFormControllerProvider);
-      expect(state.locationConsent, isFalse);
+      final state = container.read(gdprConsentFormControllerProvider);
+      expect(state.locationConsent, isTrue);
       expect(state.errorReportingConsent, isTrue);
       expect(state.cloudSyncConsent, isTrue);
     });
