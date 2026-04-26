@@ -4,6 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 /// Verifies that the new-country documentation references all required
 /// touchpoints for adding a country. If a developer adds a new required
 /// file but forgets to update the guide, this test will fail.
+///
+/// Updated post-#1111: the per-country touchpoints are now consolidated
+/// onto a single `CountryServiceEntry` in `country_service_registry.dart`.
+/// Bounding boxes and per-country fuel-type lists no longer have their
+/// own dedicated edit files — they live on the registry entry.
 void main() {
   group('New-country guide completeness', () {
     late String guideContent;
@@ -24,12 +29,10 @@ void main() {
     group('NEW_COUNTRY.md references all required files', () {
       final requiredPaths = <String, String>{
         'lib/core/services/impl/': 'station service implementation directory',
-        'lib/core/services/service_providers.dart': 'service registry',
+        'lib/core/services/country_service_registry.dart':
+            'country service registry (entries for bounding box / fuel types / factory)',
         'lib/core/services/service_result.dart': 'ServiceSource enum',
         'lib/core/country/country_config.dart': 'country configuration',
-        'lib/core/country/country_bounding_box.dart': 'bounding box',
-        'lib/features/search/domain/entities/fuel_type.dart':
-            'fuel type mapping',
       };
 
       for (final entry in requiredPaths.entries) {
@@ -46,10 +49,11 @@ void main() {
         'StationService': 'the abstract service interface',
         'StationServiceHelpers': 'the helpers mixin',
         'ServiceSource': 'the service source enum',
+        'CountryServiceEntry': 'the registry entry class (#1111)',
+        'CountryServiceRegistry': 'the registry singleton (#1111)',
         'CountryConfig': 'the country config class',
-        'CountryBoundingBox': 'the bounding box class',
-        'fuelTypesForCountry': 'the fuel type mapping function',
-        'StationServiceChain': 'the service chain wrapper',
+        'CountryBoundingBox': 'the bounding box value class',
+        'availableFuelTypes': 'the per-entry fuel type list (#1111)',
         'DioFactory': 'the Dio factory',
         'Countries.all': 'the all-countries list',
       };
@@ -87,14 +91,12 @@ void main() {
       });
 
       test('contains new-country checklist', () {
-        // Every required file must appear in the checklist
+        // Every required file must appear in the checklist.
         final requiredChecklist = [
           'station_service.dart',
-          'service_providers.dart',
           'service_result.dart',
+          'country_service_registry.dart',
           'country_config.dart',
-          'country_bounding_box.dart',
-          'fuel_type.dart',
         ];
 
         for (final item in requiredChecklist) {
@@ -139,7 +141,7 @@ void main() {
         for (final file in serviceFiles) {
           final fileName = file.uri.pathSegments.last;
 
-          // Check that the file is imported in service_providers.dart or registry
+          // The file must be imported in service_providers.dart or registry.
           expect(
             serviceProviders.contains(fileName) ||
                 registryContent.contains(fileName),

@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/country/country_bounding_box.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/services/country_service_registry.dart';
 import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
 void main() {
   group('CountryServiceRegistry', () {
@@ -205,6 +207,97 @@ void main() {
         final entry = CountryServiceRegistry.entryFor('RO');
         expect(entry, isNotNull);
         expect(entry!.errorSource, equals(ServiceSource.romaniaApi));
+      });
+    });
+
+    // ── Bounding box and fuel-type fields (#1111) ──────────────────────
+    group('boundingBox (#1111)', () {
+      test('every entry has a bounding box that is a CountryBoundingBox', () {
+        for (final entry in CountryServiceRegistry.entries) {
+          expect(entry.boundingBox, isA<CountryBoundingBox>(),
+              reason: '${entry.countryCode} entry must have a bounding box');
+        }
+      });
+
+      test('every bounding box has minLat < maxLat and minLng < maxLng', () {
+        for (final entry in CountryServiceRegistry.entries) {
+          final bbox = entry.boundingBox;
+          expect(bbox.minLat, lessThan(bbox.maxLat),
+              reason: '${entry.countryCode}: minLat must be < maxLat');
+          expect(bbox.minLng, lessThan(bbox.maxLng),
+              reason: '${entry.countryCode}: minLng must be < maxLng');
+        }
+      });
+
+      test('boundingBoxFor returns the entry box for a registered code', () {
+        final box = CountryServiceRegistry.boundingBoxFor('DE');
+        expect(box, isNotNull);
+        expect(box!.contains(52.52, 13.41), isTrue, // Berlin
+            reason: 'DE box must contain Berlin');
+      });
+
+      test('boundingBoxFor returns null for an unregistered code', () {
+        expect(CountryServiceRegistry.boundingBoxFor('ZZ'), isNull);
+      });
+
+      test('entryByLatLng resolves a Berlin point to DE', () {
+        final entry = CountryServiceRegistry.entryByLatLng(52.52, 13.41);
+        expect(entry, isNotNull);
+        expect(entry!.countryCode, equals('DE'));
+      });
+
+      test('entryByLatLng resolves a Lisbon point to PT (not ES)', () {
+        // Tight-box ordering invariant: PT must be tested before ES.
+        final entry = CountryServiceRegistry.entryByLatLng(38.72, -9.14);
+        expect(entry, isNotNull);
+        expect(entry!.countryCode, equals('PT'));
+      });
+
+      test('entryByLatLng returns null for the Atlantic', () {
+        expect(CountryServiceRegistry.entryByLatLng(0.0, -30.0), isNull);
+      });
+    });
+
+    group('availableFuelTypes (#1111)', () {
+      test('every entry exposes a non-empty fuel-type list', () {
+        for (final entry in CountryServiceRegistry.entries) {
+          expect(entry.availableFuelTypes, isNotEmpty,
+              reason:
+                  '${entry.countryCode} must publish at least one fuel type');
+        }
+      });
+
+      test('every fuel-type list ends with electric, all', () {
+        for (final entry in CountryServiceRegistry.entries) {
+          final list = entry.availableFuelTypes;
+          expect(list.length, greaterThanOrEqualTo(2),
+              reason: '${entry.countryCode}: list should be non-trivial');
+          expect(list[list.length - 2], FuelType.electric,
+              reason: '${entry.countryCode} must end with electric, all');
+          expect(list.last, FuelType.all,
+              reason: '${entry.countryCode} must end with electric, all');
+        }
+      });
+
+      test('fuelTypesFor returns the entry list for a registered code', () {
+        final list = CountryServiceRegistry.fuelTypesFor('FR');
+        // FR's first fuel is E10 (most common at French pumps).
+        expect(list.first, equals(FuelType.e10));
+      });
+
+      test('fuelTypesFor returns the default minimal set for unknown codes',
+          () {
+        final list = CountryServiceRegistry.fuelTypesFor('XX');
+        expect(
+          list,
+          equals(<FuelType>[
+            FuelType.e5,
+            FuelType.e10,
+            FuelType.diesel,
+            FuelType.electric,
+            FuelType.all,
+          ]),
+        );
       });
     });
   });
