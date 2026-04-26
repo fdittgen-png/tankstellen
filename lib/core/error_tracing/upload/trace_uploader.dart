@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/storage_repository.dart';
 import '../../services/dio_factory.dart';
 import '../../storage/storage_providers.dart';
+import '../../telemetry/pii_scrubber.dart';
 import '../models/error_trace.dart';
 import 'trace_upload_config.dart';
 
@@ -52,9 +53,14 @@ class TraceUploader {
         // immediately — opting out of the default rate limiter.
         rateLimit: null,
       );
+      // #1109 — same PII redaction policy as Sentry's `beforeSend`.
+      // Strips emails, lat/lng pairs, token-like strings, and caps long
+      // breadcrumb payloads so the user-configured trace endpoint sees
+      // the same scrubbed surface Sentry does.
+      final scrubbed = PiiScrubber.scrubErrorTrace(trace);
       await dio.post(
         config.serverUrl!,
-        data: trace.toJson(),
+        data: scrubbed.toJson(),
         options: Options(headers: {
           'Content-Type': 'application/json',
           if (config.authToken != null && config.authToken!.isNotEmpty)
