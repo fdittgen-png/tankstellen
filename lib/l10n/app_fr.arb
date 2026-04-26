@@ -897,5 +897,9 @@
   "autoRecordPairedAdapterNone": "Aucun adaptateur appairé. Pairez via l'onboarding OBD2 d'abord.",
   "autoRecordBackgroundLocationLabel": "Localisation en arrière-plan autorisée",
   "autoRecordBackgroundLocationRequest": "Demander la permission",
-  "autoRecordBadgeClearTooltip": "Effacer le compteur"
+  "autoRecordBadgeClearTooltip": "Effacer le compteur",
+  "consumptionLogTitle": "Consommation",
+  "consumptionTabFuel": "Carburant",
+  "trajetsTabLabel": "Trajets",
+  "consumptionTabCharging": "Recharge"
 }

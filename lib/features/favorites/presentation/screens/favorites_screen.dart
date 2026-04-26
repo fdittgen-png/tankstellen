@@ -58,8 +58,14 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         ],
         bottom: TabSwitcher(
           tabs: [
-            TabSwitcherEntry(label: l10n?.favorites ?? 'Favorites'),
-            TabSwitcherEntry(label: l10n?.priceAlerts ?? 'Price Alerts'),
+            TabSwitcherEntry(
+              label: l10n?.favorites ?? 'Favorites',
+              icon: Icons.star_outline,
+            ),
+            TabSwitcherEntry(
+              label: l10n?.priceAlerts ?? 'Price Alerts',
+              icon: Icons.notifications_outlined,
+            ),
           ],
         ),
         bodyPadding: EdgeInsets.zero,
