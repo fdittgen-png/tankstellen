@@ -94,15 +94,21 @@ This is the most common type of contribution. See the full step-by-step guide:
 
 ### Quick Checklist
 
-When adding a new country, you must touch **all** of these files:
+Since #1111 the per-country touchpoints are consolidated onto a single
+`CountryServiceEntry` in the registry. When adding a new country you only
+touch these files:
 
 - [ ] `lib/core/services/impl/<country>_station_service.dart` -- new service
-- [ ] `lib/core/services/service_providers.dart` -- register in factory map
 - [ ] `lib/core/services/service_result.dart` -- add `ServiceSource` enum value
-- [ ] `lib/core/country/country_config.dart` -- add `CountryConfig` + add to `Countries.all`
-- [ ] `lib/core/country/country_bounding_box.dart` -- add bounding box
-- [ ] `lib/features/search/domain/entities/fuel_type.dart` -- add case in `fuelTypesForCountry`
+- [ ] `lib/core/services/country_service_registry.dart` -- append `CountryServiceEntry` (carries bounding box, fuel types, error source, factory)
+- [ ] `lib/core/country/country_config.dart` -- append `CountryConfig` + add to `Countries.all`
 - [ ] `test/` -- unit tests for the new service
+
+Pre-#1111 you also had to edit `lib/core/country/country_bounding_box.dart`,
+`lib/core/services/service_providers.dart`, and the per-country switch in
+`lib/features/search/domain/entities/fuel_type.dart` (`fuelTypesForCountry`).
+Those files now read from `CountryServiceRegistry.entries`, so they no
+longer require per-country edits.
 
 Optional but recommended:
 

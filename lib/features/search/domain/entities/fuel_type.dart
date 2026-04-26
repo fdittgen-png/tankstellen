@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../../core/services/country_service_registry.dart';
+
 /// Canonical fuel types across all countries.
 ///
 /// Sealed class hierarchy enables exhaustive pattern matching while allowing
@@ -295,96 +297,12 @@ class FuelTypeJsonConverter implements JsonConverter<FuelType, String> {
 
 // ── Country mappings ────────────────────────────────────────────────────────
 
-/// Default fuel types for any country not present in [_countryFuels].
-///
-/// Mirrors the historical `default:` branch of `fuelTypesForCountry`: the
-/// minimal set every petrol/diesel station can be assumed to carry, plus
-/// the EV and "all" wildcard.
-const List<FuelType> _defaultCountryFuels = [
-  FuelType.e5,
-  FuelType.e10,
-  FuelType.diesel,
-  FuelType.electric,
-  FuelType.all,
-];
-
-/// Declarative per-country fuel-type catalogue.
-///
-/// Each entry is the exact ordered list returned for that ISO 3166-1
-/// alpha-2 country code. Order matters: the UI fuel-type selector renders
-/// the list in this order, so the most common fuel for each country sits
-/// first. Every list ends with [FuelType.electric] followed by
-/// [FuelType.all] (the search-time wildcard) — keep that tail when adding
-/// a new country.
-const Map<String, List<FuelType>> _countryFuels = {
-  // DE: Tankerkönig publishes E5, E10, Diesel.
-  'DE': [FuelType.e5, FuelType.e10, FuelType.diesel, FuelType.electric, FuelType.all],
-  // FR: Prix Carburants — SP95-E10 first (most common at French pumps),
-  // then SP95 / SP98, Gazole, E85 (Bioéthanol), GPL.
-  'FR': [
-    FuelType.e10, FuelType.e5, FuelType.e98, FuelType.diesel,
-    FuelType.e85, FuelType.lpg, FuelType.electric, FuelType.all,
-  ],
-  // AT: Spritpreisrechner — Super 95 (E5/E10), Diesel.
-  'AT': [FuelType.e5, FuelType.e10, FuelType.diesel, FuelType.electric, FuelType.all],
-  // ES: Geoportal Gasolineras — Gasolina 95/98, Diésel A/A+, GLP.
-  'ES': [
-    FuelType.e5, FuelType.e10, FuelType.e98, FuelType.diesel,
-    FuelType.dieselPremium, FuelType.lpg, FuelType.electric, FuelType.all,
-  ],
-  // IT: MIMIT (osservaprezzi) — Benzina, Gasolio, GPL, Metano (CNG).
-  'IT': [
-    FuelType.e5, FuelType.diesel, FuelType.lpg, FuelType.cng, FuelType.electric, FuelType.all,
-  ],
-  // LU: Luxembourg regulated prices (#574): Sans Plomb 95 (mapped to
-  // E5/E10), Sans Plomb 98 (E98), Diesel, LPG.
-  'LU': [
-    FuelType.e5, FuelType.e10, FuelType.e98, FuelType.diesel,
-    FuelType.lpg, FuelType.electric, FuelType.all,
-  ],
-  // SI: Slovenia sells NMB-95 (→ e5), NMB-100 (premium, → e98), Dizel
-  // (→ diesel), Dizel Premium, and LPG. #575
-  'SI': [
-    FuelType.e5, FuelType.e98, FuelType.diesel,
-    FuelType.dieselPremium, FuelType.lpg, FuelType.electric, FuelType.all,
-  ],
-  // KR: South Korea (OPINET): Gasoline (→ e5), Premium Gasoline (→ e98),
-  // Diesel, LPG. Kerosene is published by OPINET but has no FuelType
-  // enum today — added in a follow-up. #597
-  'KR': [
-    FuelType.e5, FuelType.e98, FuelType.diesel,
-    FuelType.lpg, FuelType.electric, FuelType.all,
-  ],
-  // CL: Chile (CNE Bencina en Línea): Gasolina 93/95 (→ e5),
-  // Gasolina 97 (→ e98), Diésel, Gas licuado / LPG. Kerosene is
-  // published by CNE but has no FuelType enum today. #596
-  'CL': [
-    FuelType.e5, FuelType.e98, FuelType.diesel,
-    FuelType.lpg, FuelType.electric, FuelType.all,
-  ],
-  // GR: Greece (Paratiritirio Timon via fuelpricesgr community API):
-  // Αμόλυβδη 95 (→ e5), Αμόλυβδη 100 (→ e98), Diesel, Υγραέριο /
-  // LPG. Diesel heating is published but intentionally dropped
-  // (not a motoring fuel). #576
-  'GR': [
-    FuelType.e5, FuelType.e98, FuelType.diesel,
-    FuelType.lpg, FuelType.electric, FuelType.all,
-  ],
-  // RO: Romania (Monitorul Prețurilor — pretcarburant.ro): Benzină
-  // Standard (→ e5), Benzină Premium (→ e98), Motorină Standard
-  // (→ diesel), Motorină Premium (→ diesel premium), GPL
-  // (→ lpg). 15-minute government-mandated updates. #577
-  'RO': [
-    FuelType.e5, FuelType.e98, FuelType.diesel,
-    FuelType.dieselPremium, FuelType.lpg, FuelType.electric, FuelType.all,
-  ],
-};
-
 /// Returns fuel types available for a given country code.
 ///
-/// Looks up [countryCode] in [_countryFuels]; falls back to
-/// [_defaultCountryFuels] for unknown countries (the same minimal set the
-/// previous `switch` returned via its `default:` branch).
-List<FuelType> fuelTypesForCountry(String countryCode) {
-  return _countryFuels[countryCode] ?? _defaultCountryFuels;
-}
+/// Per-country fuel lists now live on [CountryServiceEntry.availableFuelTypes]
+/// in [CountryServiceRegistry.entries] (#1111) — adding a new country only
+/// requires appending one entry to the registry, never editing this file.
+/// Falls back to a default minimal set (E5, E10, Diesel, Electric, All) for
+/// unregistered countries.
+List<FuelType> fuelTypesForCountry(String countryCode) =>
+    CountryServiceRegistry.fuelTypesFor(countryCode);
