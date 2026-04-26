@@ -13,20 +13,15 @@ import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
-import '../../data/obd2/obd2_connection_errors.dart';
-import '../../providers/trip_recording_provider.dart';
-import '../widgets/obd2_adapter_picker.dart';
-import 'trip_recording_screen.dart';
 import '../../data/receipt_scan_service.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
 import '../widgets/bad_scan_report_sheet.dart';
-import '../widgets/pump_scan_failure_sheet.dart';
-import '../widgets/fill_up_import_from_chip.dart';
 import '../widgets/fill_up_notes_field.dart';
 import '../widgets/fill_up_numeric_field.dart';
 import '../widgets/fill_up_price_per_liter_readout.dart';
 import '../widgets/fill_up_vehicle_dropdown.dart';
+import '../widgets/pump_scan_failure_sheet.dart';
 
 /// Form to add a new [FillUp] entry.
 class AddFillUpScreen extends ConsumerStatefulWidget {
@@ -75,7 +70,6 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   late FuelType _fuelType = widget.preFilledFuelType ?? FuelType.e10;
   bool _scanning = false;
   bool _scanningPump = false;
-  bool _obdReading = false;
   ReceiptScanService? _scanService;
   String? _vehicleId;
   bool _vehicleInitialized = false;
@@ -253,90 +247,6 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     }
   }
 
-  /// Tap handler for the OBD-II button. Asks the provider to start a
-  /// trajet (#888) — trajets are standalone, this path no longer
-  /// couples recording to the fill-up flow. The provider resolves
-  /// the active vehicle + pinned adapter by default; if no adapter
-  /// is pinned, we fall back to the picker sheet (#743). On success
-  /// we push the trip-recording screen (#726) which polls live PIDs,
-  /// lets the user stop when done, and returns a [TripSaveResult]
-  /// that pre-fills the odometer + litres fields. A null return
-  /// (user cancelled or discarded the trip) is a no-op.
-  Future<void> _readObd() async {
-    setState(() => _obdReading = true);
-    final l = AppLocalizations.of(context);
-    try {
-      // #888 — trajets are decoupled: ask the provider to start and
-      // let it figure out whether a picker is needed from the active
-      // vehicle's pinned adapter.
-      final outcome = await ref
-          .read(tripRecordingProvider.notifier)
-          .startTrip();
-      if (!mounted) return;
-      if (outcome == StartTripOutcome.alreadyActive) {
-        // A trajet is already running in the background — just jump
-        // into the recording screen without re-connecting.
-        final result = await Navigator.of(context).push<TripSaveResult?>(
-          MaterialPageRoute(
-            builder: (_) => const TripRecordingScreen(),
-          ),
-        );
-        if (!mounted || result == null) return;
-        _applyTripResult(result, l);
-        return;
-      }
-      // needsPicker or started-with-null-service: reuse the picker
-      // sheet and hand the resulting service back to the provider.
-      // Keeps the connect logic in one place and preserves the
-      // error-surfacing / retry path tested in #743.
-      final service = await showObd2AdapterPicker(context);
-      if (service == null || !mounted) return;
-      // #726 — hand the service off to the app-wide recording
-      // provider. It survives navigation, so the user can leave
-      // this screen (and the entire Consumption tab) and come back
-      // later via the banner. The provider disconnects the service
-      // for us inside stop().
-      await ref.read(tripRecordingProvider.notifier).start(service);
-      if (!mounted) return;
-      final result = await Navigator.of(context).push<TripSaveResult?>(
-        MaterialPageRoute(
-          builder: (_) => const TripRecordingScreen(),
-        ),
-      );
-      if (!mounted || result == null) return;
-      _applyTripResult(result, l);
-    } on Obd2ConnectionError catch (e) {
-      if (mounted) SnackBarHelper.showError(context, e.message);
-    } finally {
-      if (mounted) setState(() => _obdReading = false);
-    }
-  }
-
-  /// Hoist the "pre-fill the form from the recorded trajet" step so
-  /// both entry points (already-active and fresh-pick) share it.
-  void _applyTripResult(TripSaveResult result, AppLocalizations? l) {
-    setState(() {
-      if (result.odometerKm != null) {
-        _odoCtrl.text = result.odometerKm!.round().toString();
-      }
-      if (result.litersConsumed != null) {
-        _litersCtrl.text = result.litersConsumed!.toStringAsFixed(2);
-      }
-    });
-    if (result.odometerKm != null) {
-      SnackBarHelper.showSuccess(
-        context,
-        l?.obdOdometerRead(result.odometerKm!.round()) ??
-            'Odometer read: ${result.odometerKm!.round()} km',
-      );
-    } else {
-      SnackBarHelper.show(
-        context,
-        l?.obdOdometerUnavailable ?? 'Could not read odometer',
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -400,8 +310,6 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       );
     }
 
-    final importBusy = _scanning || _scanningPump || _obdReading;
-
     return PageScaffold(
       title: l?.addFillUp ?? 'Add fill-up',
       leading: IconButton(
@@ -422,14 +330,17 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
             MediaQuery.of(context).viewPadding.bottom + 96,
           ),
           children: [
-            // Quiet "Import from…" chip replacing the three buttons
-            // (#751 phase 2). A busy flag on the chip prevents tapping
-            // while any import path is already in flight.
-            FillUpImportFromChip(
-              busy: importBusy,
+            // #951 — restored to two visible buttons after the
+            // single "Import from…" chip was rolled back. The OBD-II
+            // adapter import path was removed from this screen because
+            // odometer reading via PID 0xA6 is unreliable on real
+            // hardware (Peugeot 107 / generic ELM327). The full OBD-II
+            // trip flow remains accessible from the Consumption screen.
+            _FillUpImportButtons(
+              scanningReceipt: _scanning,
+              scanningPump: _scanningPump,
               onScanReceipt: _scanReceipt,
-              onScanPump: _scanPumpDisplay,
-              onReadObd: _readObd,
+              onScanPumpDisplay: _scanPumpDisplay,
             ),
             const SizedBox(height: 16),
             // Station pre-fill callout — rendered above the cards so
@@ -739,6 +650,78 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     final raw = v.preferredFuelType;
     if (raw == null || raw.trim().isEmpty) return null;
     return FuelType.fromString(raw);
+  }
+}
+
+/// Two side-by-side import buttons restored on the Add-Fill-up form
+/// (#951). The previous single "Import from…" chip + bottom-sheet was
+/// rolled back because the OBD-II tile inside the sheet returned null
+/// for the odometer on the user's real hardware (Peugeot 107 + generic
+/// ELM327 BLE). Until odometer reading via PID 0xA6 is proven reliable
+/// across the supported adapter registry, the OBD-II import path is
+/// hidden from the fill-up screen — see `docs/guides/obd2-adapters.md`.
+///
+/// The full OBD-II trajet flow remains available from the Consumption
+/// screen (#888); only this fill-up entry-point is reduced.
+class _FillUpImportButtons extends StatelessWidget {
+  final bool scanningReceipt;
+  final bool scanningPump;
+  final VoidCallback onScanReceipt;
+  final VoidCallback onScanPumpDisplay;
+
+  const _FillUpImportButtons({
+    required this.scanningReceipt,
+    required this.scanningPump,
+    required this.onScanReceipt,
+    required this.onScanPumpDisplay,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            key: const Key('import_receipt_button'),
+            onPressed: scanningReceipt ? null : onScanReceipt,
+            icon: scanningReceipt
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.document_scanner_outlined),
+            label: Text(
+              l?.fillUpImportReceiptLabel ?? 'Receipt',
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.visible,
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: OutlinedButton.icon(
+            key: const Key('import_pump_button'),
+            onPressed: scanningPump ? null : onScanPumpDisplay,
+            icon: scanningPump
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.local_gas_station_outlined),
+            label: Text(
+              l?.fillUpImportPumpLabel ?? 'Pump display',
+              maxLines: 2,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.visible,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 
