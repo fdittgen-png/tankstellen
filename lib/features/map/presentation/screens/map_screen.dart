@@ -163,11 +163,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     // app-bar theme (FlexColorScheme) and preserve it explicitly.
     final foregroundColor = appBarTheme.foregroundColor ??
         theme.colorScheme.onSurface;
-    // Don't fall back to `theme.textTheme.titleLarge` — the
-    // `no_inline_title_theme_test` lint (#923) bans inline title
-    // textTheme refs in feature screens. The explicit `copyWith` below
-    // sets fontSize/color directly, and any unset family/weight is
-    // inherited from the AppBar's defaults via DefaultTextStyle.
+    // Inline title text-theme refs are banned in feature screens by
+    // the `no_inline_title_theme_test` lint (#923) — including in
+    // comments, since the static scan greps for the literal string.
+    // The explicit `copyWith` below sets fontSize/color directly, and
+    // any unset family/weight is inherited from the AppBar default
+    // via DefaultTextStyle when `appBarTheme.titleTextStyle` is null.
     final baseTitleStyle = appBarTheme.titleTextStyle ?? const TextStyle();
     final compactTitleStyle = baseTitleStyle.copyWith(
       fontSize: 16,
