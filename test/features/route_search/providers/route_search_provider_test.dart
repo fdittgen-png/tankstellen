@@ -4,6 +4,7 @@ import 'package:tankstellen/features/route_search/domain/route_search_strategy.d
 import 'package:tankstellen/features/route_search/data/strategies/uniform_search_strategy.dart';
 import 'package:tankstellen/features/route_search/data/strategies/cheapest_search_strategy.dart';
 import 'package:tankstellen/features/route_search/data/strategies/balanced_search_strategy.dart';
+import 'package:tankstellen/features/route_search/data/strategies/eco_route_search_strategy.dart';
 import 'package:tankstellen/features/route_search/domain/entities/route_info.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
@@ -26,6 +27,11 @@ void main() {
       final strategy = strategyFor(RouteSearchStrategyType.balanced);
       expect(strategy, isA<BalancedSearchStrategy>());
     });
+
+    test('returns EcoRouteSearchStrategy for eco type', () {
+      final strategy = strategyFor(RouteSearchStrategyType.eco);
+      expect(strategy, isA<EcoRouteSearchStrategy>());
+    });
   });
 
   group('RouteSearchStrategyType', () {
@@ -33,16 +39,18 @@ void main() {
       expect(RouteSearchStrategyType.uniform.key, 'uniform');
       expect(RouteSearchStrategyType.cheapest.key, 'cheapest');
       expect(RouteSearchStrategyType.balanced.key, 'balanced');
+      expect(RouteSearchStrategyType.eco.key, 'eco');
     });
 
     test('has correct l10nKey values', () {
       expect(RouteSearchStrategyType.uniform.l10nKey, 'uniformSearch');
       expect(RouteSearchStrategyType.cheapest.l10nKey, 'cheapestSearch');
       expect(RouteSearchStrategyType.balanced.l10nKey, 'balancedSearch');
+      expect(RouteSearchStrategyType.eco.l10nKey, 'ecoSearch');
     });
 
     test('all values are present', () {
-      expect(RouteSearchStrategyType.values.length, 3);
+      expect(RouteSearchStrategyType.values.length, 4);
     });
   });
 

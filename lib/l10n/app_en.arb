@@ -1660,6 +1660,23 @@
       }
     }
   },
+  "ecoRouteOption": "Eco",
+  "@ecoRouteOption": {
+    "description": "Label for the eco-routing strategy chip on the route search controls (#1123). Picks routes that minimise fuel rather than time."
+  },
+  "ecoRouteSavings": "≈ {liters} L saved",
+  "@ecoRouteSavings": {
+    "description": "Predicted savings preview shown when the eco-routing strategy is active on the route search controls (#1123). {liters} is the estimated litres saved compared to the fastest route, formatted with one decimal.",
+    "placeholders": {
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "ecoRouteHint": "Smarter drive — favours steady highway over zigzag shortcuts.",
+  "@ecoRouteHint": {
+    "description": "Helper caption shown beneath the eco-routing chip explaining why the user might pick it (#1123). Keep concise; the leitmotiv 'Smarter pump. Smarter drive.' should remain recognisable."
+  },
   "feedbackConsentTitle": "Send report to GitHub?",
   "@feedbackConsentTitle": {
     "description": "Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3)."

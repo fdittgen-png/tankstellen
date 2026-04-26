@@ -17,6 +17,7 @@ import '../data/services/routing_service.dart';
 import '../data/strategies/uniform_search_strategy.dart';
 import '../data/strategies/cheapest_search_strategy.dart';
 import '../data/strategies/balanced_search_strategy.dart';
+import '../data/strategies/eco_route_search_strategy.dart';
 import '../domain/entities/route_info.dart';
 import '../domain/route_search_strategy.dart';
 
@@ -53,6 +54,8 @@ RouteSearchStrategy strategyFor(RouteSearchStrategyType type) {
       return CheapestSearchStrategy();
     case RouteSearchStrategyType.balanced:
       return BalancedSearchStrategy();
+    case RouteSearchStrategyType.eco:
+      return EcoRouteSearchStrategy();
   }
 }
 

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/utils/geo_utils.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../route_search/data/strategies/eco_route_search_strategy.dart';
 import '../../../route_search/presentation/widgets/route_input.dart';
 import '../../../route_search/domain/entities/route_info.dart';
 import '../../../route_search/domain/route_search_strategy.dart';
+import '../../../route_search/providers/route_input_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
 import 'fuel_type_selector.dart';
 
@@ -46,7 +49,9 @@ class RouteSearchControls extends ConsumerWidget {
                     style: const TextStyle(fontSize: 11),
                   ),
                   selected: selectedStrategy == strategy,
-                  onSelected: (_) => ref.read(selectedRouteStrategyProvider.notifier).set(strategy),
+                  onSelected: (_) => ref
+                      .read(selectedRouteStrategyProvider.notifier)
+                      .set(strategy),
                   visualDensity: VisualDensity.compact,
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -54,6 +59,11 @@ class RouteSearchControls extends ConsumerWidget {
               ),
           ],
         ),
+        // Eco strategy savings preview + hint (#1123). Wheel-lens
+        // 10/10: when the user picks Eco, surface what they're
+        // about to save *before* they commit to the search.
+        if (selectedStrategy == RouteSearchStrategyType.eco)
+          const _EcoSavingsPreview(),
         // Saved routes link
         Align(
           alignment: Alignment.centerLeft,
@@ -82,6 +92,94 @@ class RouteSearchControls extends ConsumerWidget {
         return l10n?.cheapest ?? 'Cheapest';
       case RouteSearchStrategyType.balanced:
         return 'Balanced';
+      case RouteSearchStrategyType.eco:
+        return l10n?.ecoRouteOption ?? 'Eco';
     }
+  }
+}
+
+/// Predicted-savings preview shown beneath the strategy chips when
+/// Eco is selected (#1123). Watches the resolved start/end coords
+/// from [routeInputControllerProvider] and computes a rough
+/// litres-saved estimate based on straight-line distance × a typical
+/// road-factor × the eco efficiency uplift.
+///
+/// Before the user has both endpoints resolved we render only the
+/// hint caption — without coords there is nothing honest to estimate.
+class _EcoSavingsPreview extends ConsumerWidget {
+  const _EcoSavingsPreview();
+
+  /// Multiplier from straight-line Haversine to expected driving
+  /// distance. 1.3 is a defensible average for European motorway +
+  /// B-road mixes; OSRM-resolved distances on common test routes
+  /// (Berlin↔Hamburg, Lyon↔Marseille) sit between 1.20 and 1.35.
+  static const double _roadFactor = 1.3;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final input = ref.watch(routeInputControllerProvider);
+
+    final start = input.startCoords;
+    final end = input.endCoords;
+
+    String? savingsLine;
+    if (start != null && end != null) {
+      final straight = distanceKm(
+        start.latitude,
+        start.longitude,
+        end.latitude,
+        end.longitude,
+      );
+      final est = straight * _roadFactor;
+      final litersSaved = EcoSavingsEstimator.estimateLitersSaved(
+        fastestDistanceKm: est,
+        ecoDistanceKm: est,
+        consumptionLPer100km:
+            EcoSavingsEstimator.defaultConsumptionLPer100km,
+      );
+      if (litersSaved > 0) {
+        final formatted = litersSaved.toStringAsFixed(1);
+        savingsLine = (l10n?.ecoRouteSavings(formatted)) ??
+            '≈ $formatted L saved';
+      }
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, left: 4, right: 4, bottom: 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (savingsLine != null)
+            Row(
+              key: const ValueKey('ecoSavingsLine'),
+              children: [
+                Icon(
+                  Icons.eco,
+                  size: 14,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  savingsLine,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          Text(
+            l10n?.ecoRouteHint ??
+                'Smarter drive — favours steady highway over zigzag shortcuts.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

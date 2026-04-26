@@ -6128,6 +6128,24 @@ abstract class AppLocalizations {
   /// **'+{liters} L'**
   String insightTrailingLitersWasted(String liters);
 
+  /// Label for the eco-routing strategy chip on the route search controls (#1123). Picks routes that minimise fuel rather than time.
+  ///
+  /// In en, this message translates to:
+  /// **'Eco'**
+  String get ecoRouteOption;
+
+  /// Predicted savings preview shown when the eco-routing strategy is active on the route search controls (#1123). {liters} is the estimated litres saved compared to the fastest route, formatted with one decimal.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {liters} L saved'**
+  String ecoRouteSavings(String liters);
+
+  /// Helper caption shown beneath the eco-routing chip explaining why the user might pick it (#1123). Keep concise; the leitmotiv 'Smarter pump. Smarter drive.' should remain recognisable.
+  ///
+  /// In en, this message translates to:
+  /// **'Smarter drive — favours steady highway over zigzag shortcuts.'**
+  String get ecoRouteHint;
+
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
   /// In en, this message translates to:

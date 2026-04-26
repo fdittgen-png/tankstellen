@@ -3,12 +3,12 @@ import 'package:tankstellen/features/route_search/domain/route_search_strategy.d
 
 void main() {
   group('RouteSearchStrategyType', () {
-    test('three strategies are defined: uniform, cheapest, balanced', () {
+    test('four strategies are defined: uniform, cheapest, balanced, eco', () {
       // Guards against a silent new strategy being added without
       // updating the strategy-factory + l10n keys elsewhere.
       expect(
         RouteSearchStrategyType.values.map((s) => s.key).toSet(),
-        {'uniform', 'cheapest', 'balanced'},
+        {'uniform', 'cheapest', 'balanced', 'eco'},
       );
     });
 
@@ -18,6 +18,7 @@ void main() {
       expect(RouteSearchStrategyType.uniform.key, 'uniform');
       expect(RouteSearchStrategyType.cheapest.key, 'cheapest');
       expect(RouteSearchStrategyType.balanced.key, 'balanced');
+      expect(RouteSearchStrategyType.eco.key, 'eco');
     });
 
     test('every strategy has a non-empty distinct l10nKey', () {

@@ -6,8 +6,10 @@ import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/location/geolocator_wrapper.dart';
 import 'package:tankstellen/core/location/location_service.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/features/route_search/domain/route_search_strategy.dart';
 import 'package:tankstellen/features/route_search/presentation/widgets/route_input.dart';
+import 'package:tankstellen/features/route_search/providers/route_input_provider.dart';
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
 import 'package:tankstellen/features/search/presentation/widgets/route_search_controls.dart';
 import 'package:tankstellen/features/search/providers/search_screen_ui_provider.dart';
@@ -84,7 +86,7 @@ void main() {
     }
 
     testWidgets(
-        'renders RouteInput, FuelTypeSelector, and 3 strategy ChoiceChips',
+        'renders RouteInput, FuelTypeSelector, and 4 strategy ChoiceChips',
         (tester) async {
       await pumpApp(
         tester,
@@ -95,11 +97,13 @@ void main() {
       expect(find.byType(RouteInput), findsOneWidget);
       expect(find.byType(FuelTypeSelector), findsOneWidget);
 
-      // 3 strategy chips: Uniform / Cheapest / Balanced. (FuelTypeSelector
-      // also renders ChoiceChips, so we check by label, not by count.)
+      // 4 strategy chips: Uniform / Cheapest / Balanced / Eco (#1123).
+      // FuelTypeSelector also renders ChoiceChips, so we check by label,
+      // not by count.
       expect(find.widgetWithText(ChoiceChip, 'Uniform'), findsOneWidget);
       expect(find.widgetWithText(ChoiceChip, 'Cheapest'), findsOneWidget);
       expect(find.widgetWithText(ChoiceChip, 'Balanced'), findsOneWidget);
+      expect(find.widgetWithText(ChoiceChip, 'Eco'), findsOneWidget);
     });
 
     testWidgets('"Uniform" chip is selected when state == uniform',
@@ -252,6 +256,54 @@ void main() {
 
       expect(landedOn, '/itineraries');
       expect(find.text('itineraries page'), findsOneWidget);
+    });
+
+    testWidgets(
+        'tapping "Eco" chip selects eco strategy and shows the hint caption',
+        (tester) async {
+      // Coords trigger the savings line via routeInputControllerProvider;
+      // Strasbourg → Lyon is ~400 km straight-line, well above the
+      // EcoSavingsEstimator zero-clamp.
+      final recording = _RecordingSelectedRouteStrategy(
+        RouteSearchStrategyType.uniform,
+      );
+      await pumpApp(
+        tester,
+        RouteSearchControls(onSearch: (_) {}),
+        overrides: baseOverrides(recording: recording),
+      );
+
+      // Seed start + end coords on the input controller so the savings
+      // preview has something honest to compute.
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(RouteSearchControls)),
+      );
+      container.read(routeInputControllerProvider.notifier)
+        ..setStartCoords(const LatLng(48.5734, 7.7521)) // Strasbourg
+        ..setEndCoords(const LatLng(45.7640, 4.8357)); // Lyon
+
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Eco'));
+      await tester.pumpAndSettle();
+
+      // The notifier was driven.
+      expect(recording.setCalls, [RouteSearchStrategyType.eco]);
+
+      // Eco hint caption is now visible.
+      expect(
+        find.textContaining('Smarter drive', findRichText: false),
+        findsOneWidget,
+      );
+
+      // Predicted-savings line renders with the litres-saved estimate.
+      // Format: "≈ X.X L saved" (English ARB).
+      expect(
+        find.byKey(const ValueKey('ecoSavingsLine')),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('L saved', findRichText: false),
+        findsOneWidget,
+      );
     });
 
     testWidgets('renders the "Strategy:" label', (tester) async {
