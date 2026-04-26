@@ -38,6 +38,29 @@ import '../widgets/route_map_view.dart';
 /// when price-refreshes landed (#709 regression). Camera moves on
 /// search results are nudged inside [NearbyMapView] / [RouteMapView]
 /// instead.
+///
+/// ## First-open zero-size guard ([LayoutBuilder])
+///
+/// The [_mapIncarnation] listener handles repeat visits but cannot
+/// fully cover the cold-start case (#1164): when the user taps Carte
+/// for the first time, the listener fires AFTER the IndexedStack has
+/// already promoted the offstage-mounted MapScreen to onstage, leaving
+/// a one-frame window in which TileLayer has already captured its
+/// zero-sized viewport. Wrapping the body in a [LayoutBuilder] that
+/// suppresses the FlutterMap subtree until constraints are non-zero
+/// guarantees the TileLayer NEVER sees degenerate constraints — its
+/// first layout pass always uses the real post-mount size.
+///
+/// ## App-bar title color (#1164 bug 2)
+///
+/// `PageScaffold(titleTextStyle: const TextStyle(fontSize: 16))` would
+/// strip the inherited foreground color: AppBar's title text-style
+/// resolution does NOT merge with `defaults.titleTextStyle` when the
+/// caller supplies a non-null `titleTextStyle`, so the title would
+/// render in the DefaultTextStyle fallback (near-invisible against the
+/// FlexColorScheme app bar surface). We resolve the theme's
+/// foreground color explicitly so the compact 16pt size still inherits
+/// the proper on-surface contrast.
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
 
@@ -99,30 +122,64 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final routeState = ref.watch(routeSearchStateProvider);
     final showEv = ref.watch(evShowOnMapProvider);
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final appBarTheme = theme.appBarTheme;
 
     final hasRouteResults = routeState.hasValue && routeState.value != null;
 
-    final body = KeyedSubtree(
-      key: ValueKey<int>(_mapIncarnation),
-      child: hasRouteResults
-          ? RouteMapView(
-              routeResult: routeState.value!,
-              selectedFuel: selectedFuel,
-              mapController: _mapController,
-            )
-          : NearbyMapView(
-              searchState: searchState,
-              selectedFuel: selectedFuel,
-              searchRadiusKm: searchRadius,
-              mapController: _mapController,
-            ),
+    // #1164 — gate the FlutterMap subtree on real (non-zero) constraints
+    // so its TileLayer never captures the offstage IndexedStack's
+    // degenerate viewport. Combined with the [_mapIncarnation] rebuild
+    // on tab-flip, this fully covers cold-start (first tap) and repeat
+    // visits.
+    final body = LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth <= 0 || constraints.maxHeight <= 0) {
+          return const SizedBox.shrink();
+        }
+        return KeyedSubtree(
+          key: ValueKey<int>(_mapIncarnation),
+          child: hasRouteResults
+              ? RouteMapView(
+                  routeResult: routeState.value!,
+                  selectedFuel: selectedFuel,
+                  mapController: _mapController,
+                )
+              : NearbyMapView(
+                  searchState: searchState,
+                  selectedFuel: selectedFuel,
+                  searchRadiusKm: searchRadius,
+                  mapController: _mapController,
+                ),
+        );
+      },
+    );
+
+    // #1164 — restore the inherited foreground color when overriding
+    // `titleTextStyle`. AppBar does NOT merge with the default title
+    // style when the caller supplies a non-null `titleTextStyle`, so a
+    // bare `TextStyle(fontSize: 16)` strips the color and the title
+    // renders near-invisible. Resolve the foreground color from the
+    // app-bar theme (FlexColorScheme) and preserve it explicitly.
+    final foregroundColor = appBarTheme.foregroundColor ??
+        theme.colorScheme.onSurface;
+    // Inline title text-theme refs are banned in feature screens by
+    // the `no_inline_title_theme_test` lint (#923) — including in
+    // comments, since the static scan greps for the literal string.
+    // The explicit `copyWith` below sets fontSize/color directly, and
+    // any unset family/weight is inherited from the AppBar default
+    // via DefaultTextStyle when `appBarTheme.titleTextStyle` is null.
+    final baseTitleStyle = appBarTheme.titleTextStyle ?? const TextStyle();
+    final compactTitleStyle = baseTitleStyle.copyWith(
+      fontSize: 16,
+      color: foregroundColor,
     );
 
     return PageScaffold(
       title: l10n?.map ?? 'Map',
       toolbarHeight: 36,
       titleSpacing: 12,
-      titleTextStyle: const TextStyle(fontSize: 16),
+      titleTextStyle: compactTitleStyle,
       bodyPadding: EdgeInsets.zero,
       floatingActionButton: const DrivingModeFab(),
       body: Column(
