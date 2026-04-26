@@ -6,25 +6,25 @@ import '../country/country_bounding_box.dart';
 import '../country/country_config.dart';
 import '../storage/storage_providers.dart';
 import '../../features/search/domain/entities/fuel_type.dart';
-import 'impl/argentina_station_service.dart';
-import 'impl/australia_station_service.dart';
-import 'impl/chile_station_service.dart';
+import '../../features/station_services/argentina/argentina_station_service.dart';
+import '../../features/station_services/australia/australia_station_service.dart';
+import '../../features/station_services/austria/econtrol_station_service.dart';
+import '../../features/station_services/chile/chile_station_service.dart';
+import '../../features/station_services/denmark/denmark_station_service.dart';
+import '../../features/station_services/france/prix_carburants_station_service.dart';
+import '../../features/station_services/germany/tankerkoenig_station_service.dart';
+import '../../features/station_services/greece/greece_station_service.dart';
+import '../../features/station_services/italy/mise_station_service.dart';
+import '../../features/station_services/luxembourg/luxembourg_station_service.dart';
+import '../../features/station_services/mexico/mexico_station_service.dart';
+import '../../features/station_services/portugal/portugal_station_service.dart';
+import '../../features/station_services/romania/romania_station_service.dart';
+import '../../features/station_services/slovenia/slovenia_station_service.dart';
+import '../../features/station_services/south_korea/south_korea_station_service.dart';
+import '../../features/station_services/spain/miteco_station_service.dart';
+import '../../features/station_services/uk/uk_station_service.dart';
 import 'impl/demo_station_service.dart';
-import 'impl/denmark_station_service.dart';
-import 'impl/econtrol_station_service.dart';
-import 'impl/greece_station_service.dart';
-import 'impl/luxembourg_station_service.dart';
-import 'impl/mexico_station_service.dart';
-import 'impl/mise_station_service.dart';
-import 'impl/miteco_station_service.dart';
 import 'impl/osm_brand_enricher.dart';
-import 'impl/portugal_station_service.dart';
-import 'impl/prix_carburants_station_service.dart';
-import 'impl/romania_station_service.dart';
-import 'impl/slovenia_station_service.dart';
-import 'impl/south_korea_station_service.dart';
-import 'impl/tankerkoenig_station_service.dart';
-import 'impl/uk_station_service.dart';
 import 'service_providers.dart';
 import 'service_result.dart';
 import 'station_service.dart';
@@ -43,7 +43,8 @@ import 'station_service_chain.dart';
 ///
 /// Adding a 12th country now requires:
 ///
-/// 1. One new file: `lib/core/services/impl/<country>_station_service.dart`
+/// 1. A new file under
+///    `lib/features/station_services/<country>/<country>_station_service.dart`
 /// 2. One [ServiceSource] enum value in `service_result.dart` (mechanical;
 ///    enums naturally cluster on append)
 /// 3. One new entry appended to [CountryServiceRegistry.entries]
@@ -110,9 +111,9 @@ const List<FuelType> _defaultFuelTypes = [
 /// Central registry of all country-specific station services.
 ///
 /// This is the **single source of truth** for which countries have API
-/// implementations. Adding a new country requires exactly one new file in
-/// `lib/core/services/impl/` plus one [CountryServiceEntry] appended to
-/// [entries].
+/// implementations. Adding a new country requires exactly one new file
+/// under `lib/features/station_services/<country>/` plus one
+/// [CountryServiceEntry] appended to [entries].
 ///
 /// The registry provides compile-time safety through [assertAllCountriesRegistered],
 /// which is called at app startup in debug mode to verify every country in

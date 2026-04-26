@@ -8,15 +8,15 @@ import 'package:flutter_test/flutter_test.dart';
 /// bogus coordinates, XML with redirects, etc.); the integrity check
 /// on our side only validates header schemas, not content (#728).
 ///
-/// This scans the lib/core/services/impl/ directory, reading each
+/// This scans the lib/features/station_services/ tree, reading each
 /// file and failing if any URL-shaped string literal uses the `http:`
 /// scheme. Tolerated: `http://schemas.*`, `http://www.w3.org/*`, and
 /// similar XML/schema namespace URIs that aren't fetched at runtime.
 void main() {
   test('every StationService uses HTTPS for its upstream feed (#728)', () {
-    final dir = Directory('lib/core/services/impl');
+    final dir = Directory('lib/features/station_services');
     final files = dir
-        .listSync()
+        .listSync(recursive: true)
         .whereType<File>()
         .where((f) => f.path.endsWith('_station_service.dart'))
         .toList();

@@ -107,9 +107,9 @@ Nominatim city search for every supported country.
 - **Expected runtime**: 30 – 90 s end-to-end. The Argentina CSV step
   has a 90-second timeout; everything else is 15 – 30 s.
 - **Re-run trigger**: after touching any
-  `lib/core/services/impl/*_station_service.dart`, after a
-  Nominatim user-agent or rate-limit change, or as a sanity check
-  before tagging a release.
+  `lib/features/station_services/<country>/*_station_service.dart`,
+  after a Nominatim user-agent or rate-limit change, or as a sanity
+  check before tagging a release.
 
 #### `test/core/services/italy_search_live_test.dart`
 
@@ -169,7 +169,7 @@ These files don't carry the directive themselves — they document
 the live counterpart or reserve a follow-up slot for a future test.
 Listed here so the cross-reference doesn't bit-rot.
 
-#### `test/core/services/impl/mise_station_service_test.dart`
+#### `test/features/station_services/italy/mise_station_service_test.dart`
 
 Pure-parser tests for `MiseStationService`. The block comment near
 line 360 explicitly directs live `searchStations()` coverage to

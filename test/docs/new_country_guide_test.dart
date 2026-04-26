@@ -28,7 +28,8 @@ void main() {
 
     group('NEW_COUNTRY.md references all required files', () {
       final requiredPaths = <String, String>{
-        'lib/core/services/impl/': 'station service implementation directory',
+        'lib/features/station_services/':
+            'station service implementation directory',
         'lib/core/services/country_service_registry.dart':
             'country service registry (entries for bounding box / fuel types / factory)',
         'lib/core/services/service_result.dart': 'ServiceSource enum',
@@ -117,9 +118,11 @@ void main() {
     });
 
     group('All existing country services have registry entries', () {
-      test('every service in impl/ has a factory entry or DE special case', () {
-        final implDir = Directory('lib/core/services/impl');
-        if (!implDir.existsSync()) return;
+      test(
+          'every service under features/station_services/ has a factory entry '
+          '(or DE special case)', () {
+        final featuresDir = Directory('lib/features/station_services');
+        if (!featuresDir.existsSync()) return;
 
         final serviceProviders =
             File('lib/core/services/service_providers.dart')
@@ -130,8 +133,8 @@ void main() {
             ? registryFile.readAsStringSync()
             : '';
 
-        final serviceFiles = implDir
-            .listSync()
+        final serviceFiles = featuresDir
+            .listSync(recursive: true)
             .whereType<File>()
             .where((f) =>
                 f.path.endsWith('_station_service.dart') &&
