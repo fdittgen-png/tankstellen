@@ -238,7 +238,7 @@ ConsumptionStats consumptionStats(Ref ref) {
 ///
 /// Keyed by fill-up id so the Riverpod graph invalidates just the
 /// affected card when a single fill-up is edited, not the whole list.
-/// See #676 and the project leitmotiv in CLAUDE.md.
+/// See #676 ("Smarter pump. Smarter drive. Save twice.").
 @riverpod
 EcoScore? ecoScoreForFillUp(Ref ref, String fillUpId) {
   final fillUps = ref.watch(fillUpListProvider);

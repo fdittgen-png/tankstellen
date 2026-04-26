@@ -15,9 +15,9 @@ void main() {
           reason: 'docs/guides/NEW_COUNTRY.md must exist');
       guideContent = guideFile.readAsStringSync();
 
-      final contributingFile = File('CONTRIBUTING.md');
+      final contributingFile = File('docs/CONTRIBUTING.md');
       expect(contributingFile.existsSync(), isTrue,
-          reason: 'CONTRIBUTING.md must exist');
+          reason: 'docs/CONTRIBUTING.md must exist');
       contributingContent = contributingFile.readAsStringSync();
     });
 
@@ -80,10 +80,10 @@ void main() {
       });
     });
 
-    group('CONTRIBUTING.md completeness', () {
+    group('docs/CONTRIBUTING.md completeness', () {
       test('references NEW_COUNTRY.md', () {
         expect(contributingContent, contains('NEW_COUNTRY.md'),
-            reason: 'CONTRIBUTING.md must link to the new-country guide');
+            reason: 'docs/CONTRIBUTING.md must link to the new-country guide');
       });
 
       test('contains new-country checklist', () {
@@ -99,18 +99,18 @@ void main() {
 
         for (final item in requiredChecklist) {
           expect(contributingContent, contains(item),
-              reason: 'CONTRIBUTING.md checklist must mention $item');
+              reason: 'docs/CONTRIBUTING.md checklist must mention $item');
         }
       });
 
       test('mentions conventional commits', () {
         expect(contributingContent, contains('conventional commit'),
-            reason: 'CONTRIBUTING.md must mention conventional commits');
+            reason: 'docs/CONTRIBUTING.md must mention conventional commits');
       });
 
       test('mentions flutter analyze', () {
         expect(contributingContent, contains('flutter analyze'),
-            reason: 'CONTRIBUTING.md must mention running flutter analyze');
+            reason: 'docs/CONTRIBUTING.md must mention running flutter analyze');
       });
     });
 

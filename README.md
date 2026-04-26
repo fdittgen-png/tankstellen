@@ -170,7 +170,7 @@ The app is designed to be easily extensible. Each country has its own service im
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+Contributions are welcome! See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for detailed guidelines.
 
 **Quick summary:**
 
