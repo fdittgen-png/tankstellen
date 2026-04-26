@@ -1,10 +1,10 @@
-import 'dart:io' show Platform;
+﻿import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/constants/app_constants.dart';
-import 'package:tankstellen/core/error_reporting/error_reporter_context.dart';
+import 'package:tankstellen/core/feedback/github_issue_reporter/error_reporter_context.dart';
 
 /// Helper that hands [ErrorReporterContext.currentLocale] a real
 /// BuildContext seeded with the given locale via `Localizations`.

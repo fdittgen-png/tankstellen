@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../core/data/storage_repository.dart';
-import '../core/error_tracing/integrations/navigation_trace_observer.dart';
+import '../core/telemetry/integrations/navigation_trace_observer.dart';
 import '../core/storage/storage_keys.dart';
 import '../core/storage/storage_providers.dart';
 import '../features/consent/presentation/screens/gdpr_consent_screen.dart';

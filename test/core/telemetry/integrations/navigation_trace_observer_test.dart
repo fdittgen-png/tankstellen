@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
-import 'package:tankstellen/core/error_tracing/collectors/app_state_collector.dart';
-import 'package:tankstellen/core/error_tracing/collectors/breadcrumb_collector.dart';
-import 'package:tankstellen/core/error_tracing/integrations/navigation_trace_observer.dart';
+import 'package:tankstellen/core/telemetry/collectors/app_state_collector.dart';
+import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
+import 'package:tankstellen/core/telemetry/integrations/navigation_trace_observer.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 
 /// Minimal storage repo so AppStateCollector.collect doesn't fail when reading

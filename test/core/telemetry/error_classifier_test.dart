@@ -1,8 +1,8 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
-import 'package:tankstellen/core/error_tracing/error_classifier.dart';
-import 'package:tankstellen/core/error_tracing/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/error_classifier.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 
 void main() {
   group('ErrorClassifier', () {

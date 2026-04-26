@@ -1,11 +1,11 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/core/error_tracing/models/error_trace.dart';
-import 'package:tankstellen/core/error_tracing/trace_recorder.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 
 /// Captures every `record` call without standing up a real
 /// TraceStorage / TraceUploader / Riverpod stack. Mirrors the fake
-/// used by `test/core/error_tracing/storage/isolate_error_spool_test.dart`.
+/// used by `test/core/telemetry/storage/isolate_error_spool_test.dart`.
 class _FakeTraceRecorder implements TraceRecorder {
   final calls = <_RecordedCall>[];
 

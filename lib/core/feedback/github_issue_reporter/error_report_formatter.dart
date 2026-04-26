@@ -1,4 +1,4 @@
-import '../constants/app_constants.dart';
+import '../../constants/app_constants.dart';
 import 'error_report_payload.dart';
 
 /// Pure functions that turn an [ErrorReportPayload] into the title,

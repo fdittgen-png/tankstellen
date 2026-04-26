@@ -1,8 +1,8 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../cache/cache_manager.dart';
 import '../country/country_provider.dart';
-import '../error_tracing/integrations/dio_trace_interceptor.dart';
+import '../telemetry/integrations/dio_trace_interceptor.dart';
 import '../storage/storage_providers.dart';
 import 'country_service_registry.dart';
 import 'dio_factory.dart';

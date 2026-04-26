@@ -1,9 +1,9 @@
-import 'dart:io' show Platform;
+﻿import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/constants/app_constants.dart';
-import 'package:tankstellen/core/error_tracing/collectors/device_info_collector.dart';
+import 'package:tankstellen/core/telemetry/collectors/device_info_collector.dart';
 
 void main() {
   group('DeviceInfoCollector.collect', () {

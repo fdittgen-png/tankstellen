@@ -1,6 +1,6 @@
-import 'package:sentry_flutter/sentry_flutter.dart';
+﻿import 'package:sentry_flutter/sentry_flutter.dart';
 
-import '../error_tracing/models/error_trace.dart' as et;
+import 'models/error_trace.dart' as et;
 
 /// Pure, side-effect-free PII redaction primitives shared between the
 /// Sentry `beforeSend` hook (#1109) and the local `TraceUploader` payload

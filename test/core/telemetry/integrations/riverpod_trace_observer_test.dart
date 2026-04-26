@@ -1,8 +1,8 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/core/error_tracing/integrations/riverpod_trace_observer.dart';
-import 'package:tankstellen/core/error_tracing/models/error_trace.dart';
-import 'package:tankstellen/core/error_tracing/trace_recorder.dart';
+import 'package:tankstellen/core/telemetry/integrations/riverpod_trace_observer.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 
 class _FakeTraceRecorder implements TraceRecorder {

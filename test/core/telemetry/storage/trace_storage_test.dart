@@ -1,10 +1,10 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:tankstellen/core/error_tracing/models/error_trace.dart';
-import 'package:tankstellen/core/error_tracing/storage/trace_storage.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
 
 /// Create a plain JSON map that Hive can serialize (no freezed objects).
 /// This mirrors what TraceStorage.store does: trace.toJson(), but we ensure

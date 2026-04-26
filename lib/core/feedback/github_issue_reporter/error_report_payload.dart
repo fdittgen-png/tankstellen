@@ -1,5 +1,5 @@
-import '../error/exceptions.dart';
-import '../services/service_result.dart';
+import '../../error/exceptions.dart';
+import '../../services/service_result.dart';
 
 /// Immutable snapshot of an error suitable for serialization into a
 /// GitHub issue prefill.

@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/core/error_tracing/upload/trace_upload_config.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/telemetry/upload/trace_upload_config.dart';
 
 void main() {
   group('TraceUploadConfig', () {

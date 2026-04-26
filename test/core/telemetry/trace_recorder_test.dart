@@ -1,11 +1,11 @@
-import 'package:flutter/services.dart';
+﻿import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:tankstellen/core/error_tracing/models/error_trace.dart';
-import 'package:tankstellen/core/error_tracing/storage/trace_storage.dart';
-import 'package:tankstellen/core/error_tracing/upload/trace_uploader.dart';
-import 'package:tankstellen/core/error_tracing/trace_recorder.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
+import 'package:tankstellen/core/telemetry/upload/trace_uploader.dart';
+import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';

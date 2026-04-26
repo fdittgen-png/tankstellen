@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/error/exceptions.dart';
-import '../../../../core/error_reporting/error_report_payload.dart';
-import '../../../../core/error_reporting/error_reporter.dart';
-import '../../../../core/error_reporting/error_reporter_context.dart';
+import '../../../../core/feedback/github_issue_reporter/error_report_payload.dart';
+import '../../../../core/feedback/github_issue_reporter/error_reporter.dart';
+import '../../../../core/feedback/github_issue_reporter/error_reporter_context.dart';
 import '../../../../core/services/report_service.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/supabase_client.dart';

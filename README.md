@@ -1,4 +1,4 @@
-# Tankstellen
+﻿# Tankstellen
 
 > **Smarter pump. Smarter drive. Save twice.**
 >
@@ -110,7 +110,7 @@ lib/
     services/       # Abstract interfaces + country implementations
     storage/        # Hive local storage
     sync/           # TankSync cloud backend (optional)
-    error_tracing/  # Structured error capture
+    telemetry/  # Structured error capture
   features/
     search/         # City/postal code search
     map/            # Interactive map with clustering

@@ -2,7 +2,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/widgets.dart';
 
-import '../constants/app_constants.dart';
+import '../../constants/app_constants.dart';
 
 /// Small synchronous helper that resolves the fields needed to build
 /// an `ErrorReportPayload` without awaiting any plugin calls.

@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../error_tracing/storage/isolate_error_spool.dart';
-import '../error_tracing/trace_recorder.dart';
+import '../telemetry/storage/isolate_error_spool.dart';
+import '../telemetry/trace_recorder.dart';
 
 /// Layer / area of the codebase where an error originated. Used as a
 /// single grep target for cross-cutting analytics ("how many service
