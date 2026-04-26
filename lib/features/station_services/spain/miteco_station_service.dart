@@ -195,8 +195,13 @@ class MitecoStationService with StationServiceHelpers, CachedDatasetMixin implem
       // Determine if open based on schedule (simplistic: assume open if horario is not empty)
       final isOpen = horario.isNotEmpty && horario != 'Cerrado';
 
+      // #753 — `es-` prefix so a MITECO `IDEESS` (bare numeric) cannot
+      // collide with another country's numeric id space.
+      final rawId = r['IDEESS']?.toString() ?? '';
       return Station(
-        id: r['IDEESS']?.toString() ?? '',
+        id: rawId.isEmpty
+            ? ''
+            : (rawId.startsWith('es-') ? rawId : 'es-$rawId'),
         name: brand.isNotEmpty ? brand : address,
         brand: brand,
         street: address,

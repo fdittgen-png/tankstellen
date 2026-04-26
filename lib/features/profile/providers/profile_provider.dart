@@ -38,9 +38,20 @@ class ActiveProfile extends _$ActiveProfile {
 
   Future<void> updateProfile(UserProfile profile) async {
     final repo = ref.read(profileRepositoryProvider);
+    final previousCountryCode = state?.countryCode;
     await repo.updateProfile(profile);
     if (state?.id == profile.id) {
       state = profile;
+      // #753 — Same invalidation guard as `switchProfile`: changing the
+      // active profile's country (via Settings → edit profile, or the
+      // suggest-dialog confirm) leaves the previous country's search
+      // results in cache. Without this, a numeric-id collision between
+      // the two countries opens the wrong station on the next widget
+      // tap.
+      if (previousCountryCode != null &&
+          previousCountryCode != profile.countryCode) {
+        ref.invalidate(searchStateProvider);
+      }
     }
   }
 

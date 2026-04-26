@@ -555,13 +555,19 @@ class Countries {
   /// country's currency (see #514) — otherwise a UK station in a
   /// French profile would display \`£1.559\` as \`1,559 €\`.
   ///
-  /// Only country-specific prefixes produce a hit. Services that use
-  /// raw upstream ids (Tankerkoenig UUIDs for DE, Prix-Carburants
-  /// numeric ids for FR, E-Control ids for AT, MITECO \`IDEESS\` for
-  /// ES, MISE registry ids for IT) return \`null\` — the caller falls
-  /// back to the active profile country.
+  /// As of #753 every supported country emits prefixed ids — the
+  /// previous "raw upstream id" exemptions for DE / FR / AT / ES / IT
+  /// are gone. The widget tap path now derives the origin country from
+  /// the prefix and routes [stationDetailProvider] to the matching
+  /// [StationService], even when the user has switched the active
+  /// profile to a different country.
   ///
   /// Known prefixes:
+  /// - \`de-\` → DE (Germany Tankerkönig, #753)
+  /// - \`fr-\` → FR (France Prix-Carburants, #753)
+  /// - \`at-\` → AT (Austria E-Control, #753)
+  /// - \`es-\` → ES (Spain MITECO Geoportal, #753)
+  /// - \`it-\` → IT (Italy MIMIT/MISE, #753)
   /// - \`pt-\` → PT (Portugal DGEG, #503)
   /// - \`uk-\` → GB (UK CMA Fuel Finder, #499)
   /// - \`au-\` → AU (Australia FuelCheck)
@@ -576,6 +582,11 @@ class Countries {
   /// - \`ro-\` → RO (Romania Monitorul Prețurilor, #577)
   /// - \`demo-\` → null (demo service, no real country)
   static const Map<String, String> _stationIdPrefixToCountry = {
+    'de-': 'DE',
+    'fr-': 'FR',
+    'at-': 'AT',
+    'es-': 'ES',
+    'it-': 'IT',
     'pt-': 'PT',
     'uk-': 'GB',
     'au-': 'AU',

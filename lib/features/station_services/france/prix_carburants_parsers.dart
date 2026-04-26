@@ -83,8 +83,15 @@ Station? parsePrixCarburantsStation(
     final ville = r['ville'] as String? ?? '';
     final cp = r['cp'] as String? ?? '';
 
+    // #753 — scope the id with the `fr-` country prefix so a French
+    // numeric id (e.g. `12345`) cannot collide with another country's
+    // numeric id space. Stripped before any call back out to the
+    // Prix-Carburants API by `prix_carburants_station_service.dart`.
+    final rawId = r['id']?.toString() ?? '';
     return Station(
-      id: r['id']?.toString() ?? '',
+      id: rawId.isEmpty
+          ? ''
+          : (rawId.startsWith('fr-') ? rawId : 'fr-$rawId'),
       name: adresse,
       brand: detectPrixCarburantsBrand(adresse, r['services_service'], r),
       street: adresse,
