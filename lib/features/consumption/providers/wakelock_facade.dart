@@ -32,8 +32,8 @@ class RealWakelockFacade implements WakelockFacade {
   Future<void> enable() async {
     try {
       await WakelockPlus.enable();
-    } catch (e) {
-      debugPrint('WakelockFacade.enable failed: $e');
+    } catch (e, st) {
+      debugPrint('WakelockFacade.enable failed: $e\n$st');
     }
   }
 
@@ -41,8 +41,8 @@ class RealWakelockFacade implements WakelockFacade {
   Future<void> disable() async {
     try {
       await WakelockPlus.disable();
-    } catch (e) {
-      debugPrint('WakelockFacade.disable failed: $e');
+    } catch (e, st) {
+      debugPrint('WakelockFacade.disable failed: $e\n$st');
     }
   }
 }

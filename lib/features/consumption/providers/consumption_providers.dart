@@ -151,8 +151,8 @@ class FillUpList extends _$FillUpList {
       // Invalidate the reminder list so the vehicle edit screen
       // picks up the new `pendingAcknowledgment` flag immediately.
       ref.invalidate(serviceReminderListProvider);
-    } catch (e) {
-      debugPrint('FillUpList: reminder evaluation failed: $e');
+    } catch (e, st) {
+      debugPrint('FillUpList: reminder evaluation failed: $e\n$st');
     }
   }
 
@@ -180,8 +180,8 @@ class FillUpList extends _$FillUpList {
         // bumped η_v sample count immediately.
         ref.invalidate(vehicleProfileListProvider);
       }
-    } catch (e) {
-      debugPrint('FillUpList: VE reconciliation failed: $e');
+    } catch (e, st) {
+      debugPrint('FillUpList: VE reconciliation failed: $e\n$st');
     }
   }
 

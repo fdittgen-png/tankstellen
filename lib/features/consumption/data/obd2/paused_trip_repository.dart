@@ -119,8 +119,8 @@ class PausedTripRepository {
   Future<void> save(PausedTripEntry entry) async {
     try {
       await _box.put(entry.id, jsonEncode(entry.toJson()));
-    } catch (e) {
-      debugPrint('PausedTripRepository.save: $e');
+    } catch (e, st) {
+      debugPrint('PausedTripRepository.save: $e\n$st');
     }
   }
 
@@ -133,8 +133,8 @@ class PausedTripRepository {
     try {
       final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
       return PausedTripEntry.fromJson(json);
-    } catch (e) {
-      debugPrint('PausedTripRepository.load: $e');
+    } catch (e, st) {
+      debugPrint('PausedTripRepository.load: $e\n$st');
       return null;
     }
   }
@@ -157,8 +157,8 @@ class PausedTripRepository {
   Future<void> delete(String id) async {
     try {
       await _box.delete(id);
-    } catch (e) {
-      debugPrint('PausedTripRepository.delete: $e');
+    } catch (e, st) {
+      debugPrint('PausedTripRepository.delete: $e\n$st');
     }
   }
 }

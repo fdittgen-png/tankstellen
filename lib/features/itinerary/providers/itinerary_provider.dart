@@ -44,8 +44,8 @@ class ItineraryNotifier extends _$ItineraryNotifier {
           updatedAt: DateTime.tryParse(r['updatedAt']?.toString() ?? r['updated_at']?.toString() ?? '') ?? DateTime.now(),
         );
       }).toList();
-    } catch (e) {
-      debugPrint('ItineraryNotifier._fromStorage FAILED: $e');
+    } catch (e, st) {
+      debugPrint('ItineraryNotifier._fromStorage FAILED: $e\n$st');
       return [];
     }
   }
@@ -85,8 +85,8 @@ class ItineraryNotifier extends _$ItineraryNotifier {
       }
 
       debugPrint('ItineraryNotifier: merged ${state.length} itineraries (${serverItineraries.length} from server)');
-    } catch (e) {
-      debugPrint('ItineraryNotifier._loadAndMerge FAILED: $e');
+    } catch (e, st) {
+      debugPrint('ItineraryNotifier._loadAndMerge FAILED: $e\n$st');
     }
   }
 
@@ -128,8 +128,8 @@ class ItineraryNotifier extends _$ItineraryNotifier {
     // 2. Sync to server (non-blocking)
     try {
       await ItinerariesSync.save(itinerary);
-    } catch (e) {
-      debugPrint('ItineraryNotifier.saveRoute sync FAILED: $e');
+    } catch (e, st) {
+      debugPrint('ItineraryNotifier.saveRoute sync FAILED: $e\n$st');
     }
 
     return true;
@@ -145,8 +145,8 @@ class ItineraryNotifier extends _$ItineraryNotifier {
     // 2. Delete from server
     try {
       await ItinerariesSync.delete(id);
-    } catch (e) {
-      debugPrint('ItineraryNotifier.delete sync FAILED: $e');
+    } catch (e, st) {
+      debugPrint('ItineraryNotifier.delete sync FAILED: $e\n$st');
     }
   }
 

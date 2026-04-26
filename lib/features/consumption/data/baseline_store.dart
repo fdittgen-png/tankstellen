@@ -67,7 +67,7 @@ class BaselineStore {
         }
       });
       _cache[vehicleId] = m;
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       debugPrint('BaselineStore.loadVehicle: corrupt payload '
           'for $vehicleId — starting fresh: $e');
       _cache[vehicleId] = {};

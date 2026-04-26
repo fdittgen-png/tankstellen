@@ -148,8 +148,8 @@ class AdapterReconnectScanner {
   Future<bool> _probeSafely() async {
     try {
       return await _probe(_pinnedMac);
-    } catch (e) {
-      debugPrint('AdapterReconnectScanner probe failed: $e');
+    } catch (e, st) {
+      debugPrint('AdapterReconnectScanner probe failed: $e\n$st');
       return false;
     }
   }
@@ -157,8 +157,8 @@ class AdapterReconnectScanner {
   Future<bool> _connectSafely() async {
     try {
       return await _connect(_pinnedMac);
-    } catch (e) {
-      debugPrint('AdapterReconnectScanner connect failed: $e');
+    } catch (e, st) {
+      debugPrint('AdapterReconnectScanner connect failed: $e\n$st');
       return false;
     }
   }

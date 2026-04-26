@@ -67,10 +67,10 @@ class VinDecoder {
         final parsed = _parseVpic(cleaned, data);
         if (parsed != null) return parsed;
       }
-    } on DioException catch (e) {
+    } on DioException catch (e, st) { // ignore: unused_catch_stack
       debugPrint('VinDecoder: vPIC failed (${e.type}): falling back to WMI');
-    } on Object catch (e) {
-      debugPrint('VinDecoder: unexpected error $e — falling back to WMI');
+    } on Object catch (e, st) {
+      debugPrint('VinDecoder: unexpected error $e — falling back to WMI\n$st');
     }
 
     return _fallbackFromWmi(cleaned);

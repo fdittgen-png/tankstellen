@@ -29,8 +29,8 @@ class FillUpRepository {
       if (map == null) continue;
       try {
         result.add(FillUp.fromJson(map));
-      } catch (e) {
-        debugPrint('FillUpRepository: skipping malformed entry: $e');
+      } catch (e, st) {
+        debugPrint('FillUpRepository: skipping malformed entry: $e\n$st');
       }
     }
     result.sort((a, b) => b.date.compareTo(a.date));

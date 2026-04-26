@@ -29,8 +29,8 @@ class EvStationRepository {
       if (map == null) continue;
       try {
         result.add(ChargingStation.fromJson(map));
-      } catch (e) {
-        debugPrint('EvStationRepository: skipping malformed entry: $e');
+      } catch (e, st) {
+        debugPrint('EvStationRepository: skipping malformed entry: $e\n$st');
       }
     }
     return result;

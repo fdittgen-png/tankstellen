@@ -34,8 +34,8 @@ Map<DrivingSituation, int> vehicleBaselineSummary(Ref ref, String vehicleId) {
   Map<String, dynamic> decoded;
   try {
     decoded = json.decode(raw) as Map<String, dynamic>;
-  } catch (e) {
-    debugPrint('vehicleBaselineSummary: corrupt payload for $vehicleId: $e');
+  } catch (e, st) {
+    debugPrint('vehicleBaselineSummary: corrupt payload for $vehicleId: $e\n$st');
     return const {};
   }
 

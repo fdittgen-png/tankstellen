@@ -41,7 +41,7 @@ class ApiKeyValidator {
         );
       }
       return const ApiKeyValidationResult(isValid: true);
-    } on DioException catch (e) {
+    } on DioException catch (e, st) { // ignore: unused_catch_stack
       return ApiKeyValidationResult(
         isValid: false,
         errorMessage: e.message ?? 'Network error',

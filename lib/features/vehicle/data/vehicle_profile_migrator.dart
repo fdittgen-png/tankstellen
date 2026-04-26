@@ -78,9 +78,8 @@ class VehicleProfileCatalogMigrator {
         StorageKeys.vehicleCatalogMigrationDone,
         true,
       );
-    } catch (e) {
-      debugPrint(
-          'VehicleProfileCatalogMigrator: failed to set done flag: $e');
+    } catch (e, st) {
+      debugPrint('VehicleProfileCatalogMigrator: failed to set done flag: $e\n$st');
     }
 
     return matched;

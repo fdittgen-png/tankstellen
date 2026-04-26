@@ -102,8 +102,8 @@ class LinkDeviceController extends _$LinkDeviceController {
             });
             await ref.read(alertProvider.notifier).addAlert(alert);
             addedAlerts++;
-          } catch (e) {
-            debugPrint('Alert import failed: $e');
+          } catch (e, st) {
+            debugPrint('Alert import failed: $e\n$st');
           }
         }
       }
@@ -121,8 +121,8 @@ class LinkDeviceController extends _$LinkDeviceController {
               if (data is Map<String, dynamic>) {
                 try {
                   return VehicleProfile.fromJson(data);
-                } catch (e) {
-                  debugPrint('Vehicle import decode failed: $e');
+                } catch (e, st) {
+                  debugPrint('Vehicle import decode failed: $e\n$st');
                   return null;
                 }
               }
@@ -133,8 +133,8 @@ class LinkDeviceController extends _$LinkDeviceController {
         addedVehicles = await ref
             .read(vehicleProfileListProvider.notifier)
             .mergeFrom(parsed);
-      } catch (e) {
-        debugPrint('Vehicle import failed: $e');
+      } catch (e, st) {
+        debugPrint('Vehicle import failed: $e\n$st');
       }
 
       // 6. Fetch + merge the other device's fill-ups (#713)
@@ -150,8 +150,8 @@ class LinkDeviceController extends _$LinkDeviceController {
               if (data is Map<String, dynamic>) {
                 try {
                   return FillUp.fromJson(data);
-                } catch (e) {
-                  debugPrint('FillUp import decode failed: $e');
+                } catch (e, st) {
+                  debugPrint('FillUp import decode failed: $e\n$st');
                   return null;
                 }
               }
@@ -161,8 +161,8 @@ class LinkDeviceController extends _$LinkDeviceController {
             .toList();
         addedFillUps =
             await ref.read(fillUpListProvider.notifier).mergeFrom(parsed);
-      } catch (e) {
-        debugPrint('FillUp import failed: $e');
+      } catch (e, st) {
+        debugPrint('FillUp import failed: $e\n$st');
       }
 
       // 7. Sync merged data back to our server account. Profile is NOT
@@ -177,7 +177,7 @@ class LinkDeviceController extends _$LinkDeviceController {
             'Linked! Imported $addedFavorites favorites, $addedAlerts alerts, '
             '$addedVehicles vehicles, $addedFillUps fill-ups.',
       );
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       state = LinkDeviceState(result: 'Link failed: $e');
     }
   }

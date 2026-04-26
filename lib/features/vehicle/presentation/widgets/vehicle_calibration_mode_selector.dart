@@ -37,8 +37,8 @@ class VehicleCalibrationModeSelector extends ConsumerWidget {
             (v) => v.id == vehicleId,
             orElse: () => const VehicleProfile(id: '', name: ''),
           );
-    } catch (e) {
-      debugPrint('VehicleCalibrationModeSelector: profile lookup failed: $e');
+    } catch (e, st) {
+      debugPrint('VehicleCalibrationModeSelector: profile lookup failed: $e\n$st');
       return const SizedBox.shrink();
     }
 

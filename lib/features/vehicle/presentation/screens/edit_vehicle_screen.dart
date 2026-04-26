@@ -142,8 +142,8 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
     VinData? decoded;
     try {
       decoded = await ref.read(decodedVinProvider(vin).future);
-    } catch (e) {
-      debugPrint('EditVehicleScreen: VIN decode failed: $e');
+    } catch (e, st) {
+      debugPrint('EditVehicleScreen: VIN decode failed: $e\n$st');
     }
     if (!mounted) return;
     setState(() => _decodingVin = false);

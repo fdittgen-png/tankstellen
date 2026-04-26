@@ -183,10 +183,10 @@ class RadiusAlertRunner {
           );
         }
         fired.add(event);
-      } catch (e) {
+      } catch (e, st) {
         // One bad alert (e.g. country API down) must not block the
         // rest — log and keep going.
-        debugPrint('RadiusAlertRunner: alert ${alert.id} failed: $e');
+        debugPrint('RadiusAlertRunner: alert ${alert.id} failed: $e\n$st');
       }
     }
     return fired;

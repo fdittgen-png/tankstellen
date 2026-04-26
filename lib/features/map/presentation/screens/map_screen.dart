@@ -78,16 +78,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             _mapController = MapController();
             _mapIncarnation++;
           });
-        } catch (e) {
-          debugPrint('MapScreen rebuild on tab-flip: $e');
+        } catch (e, st) {
+          debugPrint('MapScreen rebuild on tab-flip: $e\n$st');
         }
         // Dispose the previous controller after the next frame so the
         // old FlutterMap has fully detached from it.
         WidgetsBinding.instance.addPostFrameCallback((_) {
           try {
             old.dispose();
-          } catch (e) {
-            debugPrint('MapScreen old controller dispose: $e');
+          } catch (e, st) {
+            debugPrint('MapScreen old controller dispose: $e\n$st');
           }
         });
       });

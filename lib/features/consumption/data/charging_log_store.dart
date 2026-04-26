@@ -34,8 +34,8 @@ class ChargingLogStore {
     try {
       if (!Hive.isBoxOpen(HiveBoxes.settings)) return null;
       return Hive.box(HiveBoxes.settings);
-    } catch (e) {
-      debugPrint('ChargingLogStore: settings box unavailable: $e');
+    } catch (e, st) {
+      debugPrint('ChargingLogStore: settings box unavailable: $e\n$st');
       return null;
     }
   }
@@ -56,8 +56,8 @@ class ChargingLogStore {
         final json = _decode(raw);
         if (json == null) continue;
         out.add(ChargingLog.fromJson(json));
-      } catch (e) {
-        debugPrint('ChargingLogStore.list: skipping $key: $e');
+      } catch (e, st) {
+        debugPrint('ChargingLogStore.list: skipping $key: $e\n$st');
       }
     }
     out.sort((a, b) => a.date.compareTo(b.date));

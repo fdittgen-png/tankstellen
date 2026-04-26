@@ -87,8 +87,8 @@ class ServiceReminderEvaluator {
       final updated = reminder.copyWith(pendingAcknowledgment: true);
       try {
         await repository.save(updated);
-      } catch (e) {
-        debugPrint('ServiceReminderEvaluator: failed to persist flag: $e');
+      } catch (e, st) {
+        debugPrint('ServiceReminderEvaluator: failed to persist flag: $e\n$st');
         continue;
       }
       try {
@@ -100,8 +100,8 @@ class ServiceReminderEvaluator {
             kmOver: reminder.kmOverdue(currentOdometerKm).round(),
           ),
         );
-      } catch (e) {
-        debugPrint('ServiceReminderEvaluator: notification failed: $e');
+      } catch (e, st) {
+        debugPrint('ServiceReminderEvaluator: notification failed: $e\n$st');
       }
       fired.add(updated);
     }

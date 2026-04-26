@@ -141,8 +141,8 @@ class VelocityAlertRunner {
           }
         }
       }
-    } catch (e) {
-      debugPrint('VelocityAlertRunner.loadConfig: falling back to defaults: $e');
+    } catch (e, st) {
+      debugPrint('VelocityAlertRunner.loadConfig: falling back to defaults: $e\n$st');
     }
     return VelocityAlertConfig.defaults();
   }

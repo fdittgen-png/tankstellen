@@ -97,8 +97,8 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
     String? activeId;
     try {
       activeId = ref.read(activeVehicleProfileProvider)?.id;
-    } catch (e) {
-      debugPrint('AddChargingLog: active vehicle unavailable: $e');
+    } catch (e, st) {
+      debugPrint('AddChargingLog: active vehicle unavailable: $e\n$st');
     }
     final evVehicles =
         vehicles.where((v) => v.isEv).toList(growable: false);
@@ -236,8 +236,8 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
       await ref.read(chargingLogsProvider.notifier).add(log);
       if (!mounted) return;
       Navigator.of(context).pop(true);
-    } catch (e) {
-      debugPrint('AddChargingLog._save: $e');
+    } catch (e, st) {
+      debugPrint('AddChargingLog._save: $e\n$st');
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -249,8 +249,8 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
     List<VehicleProfile> vehicles;
     try {
       vehicles = ref.watch(vehicleProfileListProvider);
-    } catch (e) {
-      debugPrint('AddChargingLog build: vehicle list unavailable: $e');
+    } catch (e, st) {
+      debugPrint('AddChargingLog build: vehicle list unavailable: $e\n$st');
       vehicles = const [];
     }
     _initVehicleIfNeeded(vehicles);

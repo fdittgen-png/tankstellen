@@ -63,8 +63,8 @@ class RadiusAlertDedup {
     try {
       if (!Hive.isBoxOpen(HiveBoxes.alerts)) return null;
       return Hive.box(HiveBoxes.alerts);
-    } catch (e) {
-      debugPrint('RadiusAlertDedup: alerts box unavailable: $e');
+    } catch (e, st) {
+      debugPrint('RadiusAlertDedup: alerts box unavailable: $e\n$st');
       return null;
     }
   }
@@ -220,8 +220,8 @@ class RadiusAlertDedup {
         if (decoded is Map) return _LastFire.fromJson(decoded);
       }
       if (raw is Map) return _LastFire.fromJson(raw);
-    } catch (e) {
-      debugPrint('RadiusAlertDedup: corrupt dedup row for $context: $e');
+    } catch (e, st) {
+      debugPrint('RadiusAlertDedup: corrupt dedup row for $context: $e\n$st');
     }
     return null;
   }

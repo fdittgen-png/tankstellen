@@ -195,8 +195,8 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
         _urlController.text = json['url']?.toString() ?? '';
         _keyController.text = json['key']?.toString() ?? '';
         _notifier.setMode(SyncWizardMode.auth);
-      } catch (e) {
-        debugPrint('QR code parse failed: $e');
+      } catch (e, st) {
+        debugPrint('QR code parse failed: $e\n$st');
         SnackBarHelper.showError(context, AppLocalizations.of(context)?.invalidQrCodeTankSync ?? 'Invalid QR code — expected TankSync format');
       }
     }
@@ -209,7 +209,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
       final key = _sanitizeKey(_keyController.text);
       await TankSyncClient.init(url: url, anonKey: key);
       _notifier.testSucceeded('Connection successful!');
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       _notifier.testFailed('Connection failed:\n$e');
     }
   }
@@ -254,7 +254,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
           );
         }
       }
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) {
         _notifier.connectFailed('Connection failed: $e');
       }

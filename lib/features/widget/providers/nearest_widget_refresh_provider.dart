@@ -49,8 +49,8 @@ class NearestWidgetRefresh extends _$NearestWidgetRefresh {
         profileStorage: storage,
         stationService: stationService,
       );
-    } catch (e) {
-      debugPrint('NearestWidgetRefresh: tick failed: $e');
+    } catch (e, st) {
+      debugPrint('NearestWidgetRefresh: tick failed: $e\n$st');
     }
   }
 }

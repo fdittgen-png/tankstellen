@@ -54,8 +54,8 @@ class WidgetLaunchHandler {
     if (path == null) return;
     try {
       _router.push(path);
-    } catch (e) {
-      debugPrint('WidgetLaunchHandler: push failed for $uri → $path: $e');
+    } catch (e, st) {
+      debugPrint('WidgetLaunchHandler: push failed for $uri → $path: $e\n$st');
     }
   }
 }
@@ -108,8 +108,8 @@ class _WidgetClickListenerState extends ConsumerState<WidgetClickListener> {
       // start. Defer until after the first frame so `push` lands on a
       // live navigator rather than an empty stack.
       WidgetsBinding.instance.addPostFrameCallback((_) => _dispatch(uri));
-    } catch (e) {
-      debugPrint('WidgetClickListener: initial launch probe failed: $e');
+    } catch (e, st) {
+      debugPrint('WidgetClickListener: initial launch probe failed: $e\n$st');
     }
   }
 

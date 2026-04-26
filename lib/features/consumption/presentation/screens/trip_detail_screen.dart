@@ -162,8 +162,8 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         // trip-history "Mark all as read" badge updates without
         // waiting for a route change.
         await ref.read(autoRecordBadgeCountProvider.notifier).refresh();
-      } catch (e) {
-        debugPrint('TripDetailScreen badge decrement: $e');
+      } catch (e, st) {
+        debugPrint('TripDetailScreen badge decrement: $e\n$st');
       }
     });
   }

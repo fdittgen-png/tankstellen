@@ -50,8 +50,8 @@ class HomeWidgetPayloadStore implements NearestWidgetPayloadStore {
     try {
       final value = await HomeWidget.getWidgetData<String>('nearest_json');
       return (value != null && value.isNotEmpty && value != '[]') ? value : null;
-    } catch (e) {
-      debugPrint('HomeWidgetPayloadStore.readLastJson failed: $e');
+    } catch (e, st) {
+      debugPrint('HomeWidgetPayloadStore.readLastJson failed: $e\n$st');
       return null;
     }
   }
@@ -62,8 +62,8 @@ class HomeWidgetPayloadStore implements NearestWidgetPayloadStore {
       final iso =
           await HomeWidget.getWidgetData<String>('nearest_updated_at');
       return iso == null ? null : DateTime.tryParse(iso);
-    } catch (e) {
-      debugPrint('HomeWidgetPayloadStore.readLastFetchedAt failed: $e');
+    } catch (e, st) {
+      debugPrint('HomeWidgetPayloadStore.readLastFetchedAt failed: $e\n$st');
       return null;
     }
   }
@@ -195,8 +195,8 @@ class NearestWidgetDataBuilder {
       );
       await _persist(payload, userLat: lat, userLng: lng);
       return payload;
-    } catch (e) {
-      debugPrint('NearestWidgetDataBuilder.build search failed: $e');
+    } catch (e, st) {
+      debugPrint('NearestWidgetDataBuilder.build search failed: $e\n$st');
       // Attempt stale-fallback: reuse the previous successful payload.
       final previousJson = await payloadStore.readLastJson();
       if (previousJson != null) {
@@ -213,7 +213,7 @@ class NearestWidgetDataBuilder {
             await _persist(payload, userLat: lat, userLng: lng);
             return payload;
           }
-        } catch (decodeErr) {
+        } catch (decodeErr, st) { // ignore: unused_catch_stack
           debugPrint(
             'NearestWidgetDataBuilder: previous JSON decode failed: '
             '$decodeErr',
@@ -245,7 +245,7 @@ class NearestWidgetDataBuilder {
     if (key != null) {
       try {
         fuel = FuelType.fromString(key);
-      } catch (e) {
+      } catch (e, st) { // ignore: unused_catch_stack
         debugPrint(
           'NearestWidgetDataBuilder: unknown preferred fuel "$key": $e',
         );

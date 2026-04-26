@@ -152,7 +152,7 @@ class ReportSubmitHandler {
         );
         context.pop();
       }
-    } on ApiException catch (e) {
+    } on ApiException catch (e, st) { // ignore: unused_catch_stack
       if (context.mounted) {
         SnackBarHelper.showError(
           context,

@@ -125,8 +125,8 @@ class Obd2ConnectionService {
     if (_lastRanked.isEmpty) return null;
     try {
       return await connect(_lastRanked.first);
-    } on Obd2ConnectionError catch (e) {
-      debugPrint('Obd2ConnectionService.connectBest failed: $e');
+    } on Obd2ConnectionError catch (e, st) {
+      debugPrint('Obd2ConnectionService.connectBest failed: $e\n$st');
       rethrow;
     }
   }

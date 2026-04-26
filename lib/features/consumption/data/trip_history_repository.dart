@@ -158,8 +158,8 @@ class TripHistoryRepository {
   Future<void> save(TripHistoryEntry entry) async {
     try {
       await _box.put(entry.id, jsonEncode(entry.toJson()));
-    } catch (e) {
-      debugPrint('TripHistoryRepository.save: $e');
+    } catch (e, st) {
+      debugPrint('TripHistoryRepository.save: $e\n$st');
       return;
     }
     await _trim();
@@ -176,8 +176,8 @@ class TripHistoryRepository {
       try {
         final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
         result.add(TripHistoryEntry.fromJson(json));
-      } catch (e) {
-        debugPrint('TripHistoryRepository.loadAll: skipping $key: $e');
+      } catch (e, st) {
+        debugPrint('TripHistoryRepository.loadAll: skipping $key: $e\n$st');
       }
     }
     result.sort((a, b) {

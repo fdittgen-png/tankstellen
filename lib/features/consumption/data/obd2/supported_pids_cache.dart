@@ -62,8 +62,8 @@ class SupportedPidsCache {
         }
       }
       return pids;
-    } catch (e) {
-      debugPrint('SupportedPidsCache: corrupt JSON at "$key": $e');
+    } catch (e, st) {
+      debugPrint('SupportedPidsCache: corrupt JSON at "$key": $e\n$st');
       return null;
     }
   }

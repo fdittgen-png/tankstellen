@@ -95,8 +95,8 @@ class _CityAutocompleteFieldState extends State<CityAutocompleteField> {
             _removeOverlay();
           }
         }
-      } catch (e) {
-        debugPrint('Route autocomplete failed: $e');
+      } catch (e, st) {
+        debugPrint('Route autocomplete failed: $e\n$st');
         if (mounted) setState(() => _isLoading = false);
       }
     });

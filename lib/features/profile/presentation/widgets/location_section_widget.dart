@@ -180,7 +180,7 @@ class LocationSectionWidget extends ConsumerWidget {
   Future<void> _updateGps(BuildContext context, WidgetRef ref) async {
     try {
       await ref.read(userPositionProvider.notifier).updateFromGps();
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       if (context.mounted) {
         final l10n = AppLocalizations.of(context);
         SnackBarHelper.showError(

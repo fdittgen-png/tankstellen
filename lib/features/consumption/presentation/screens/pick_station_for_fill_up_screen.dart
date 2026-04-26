@@ -34,8 +34,8 @@ class PickStationForFillUpScreen extends ConsumerWidget {
       if (raw == null) continue;
       try {
         stations.add(Station.fromJson(raw));
-      } catch (e) {
-        debugPrint('PickStationForFillUp: skipping malformed favorite $id: $e');
+      } catch (e, st) {
+        debugPrint('PickStationForFillUp: skipping malformed favorite $id: $e\n$st');
       }
     }
     final profileFuel =

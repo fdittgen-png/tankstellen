@@ -35,8 +35,8 @@ class RadiusAlertStore {
     try {
       if (!Hive.isBoxOpen(HiveBoxes.alerts)) return null;
       return Hive.box(HiveBoxes.alerts);
-    } catch (e) {
-      debugPrint('RadiusAlertStore: alerts box unavailable: $e');
+    } catch (e, st) {
+      debugPrint('RadiusAlertStore: alerts box unavailable: $e\n$st');
       return null;
     }
   }
@@ -55,8 +55,8 @@ class RadiusAlertStore {
         final json = _decode(raw);
         if (json == null) continue;
         out.add(RadiusAlert.fromJson(json));
-      } catch (e) {
-        debugPrint('RadiusAlertStore.list: skipping $key: $e');
+      } catch (e, st) {
+        debugPrint('RadiusAlertStore.list: skipping $key: $e\n$st');
       }
     }
     // Stable order — oldest-first keeps the UI deterministic across
@@ -101,7 +101,7 @@ class RadiusAlertStore {
     if (raw is String) {
       try {
         return DateTime.parse(raw);
-      } catch (e) {
+      } catch (e, st) { // ignore: unused_catch_stack
         debugPrint(
             'RadiusAlertStore.getLastEvaluatedAt: bad ISO timestamp '
             'for $alertId: $e');

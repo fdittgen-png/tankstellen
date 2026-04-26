@@ -31,8 +31,8 @@ class AchievementsRepository {
         final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
         final earned = EarnedAchievement.fromJson(json);
         if (earned != null) result.add(earned);
-      } catch (e) {
-        debugPrint('AchievementsRepository.loadAll: skipping $key: $e');
+      } catch (e, st) {
+        debugPrint('AchievementsRepository.loadAll: skipping $key: $e\n$st');
       }
     }
     result.sort((a, b) => b.earnedAt.compareTo(a.earnedAt));

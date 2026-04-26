@@ -592,7 +592,7 @@ class TripRecordingController {
       // response string, not an exception.
       _recentErrors.clear();
       return response;
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       _registerTransportError(e);
       rethrow;
     }
@@ -678,8 +678,8 @@ class TripRecordingController {
     _reconnectScanner = null;
     try {
       await scanner.stop();
-    } catch (e) {
-      debugPrint('TripRecordingController stop reconnect scanner: $e');
+    } catch (e, st) {
+      debugPrint('TripRecordingController stop reconnect scanner: $e\n$st');
     }
   }
 
@@ -719,8 +719,8 @@ class TripRecordingController {
           vehicleId: _vehicleId,
           summary: summary,
         ));
-      } catch (e) {
-        debugPrint('TripRecordingController grace finalise failed: $e');
+      } catch (e, st) {
+        debugPrint('TripRecordingController grace finalise failed: $e\n$st');
       }
     }
     if (repo != null && id != null) {
@@ -741,8 +741,8 @@ class TripRecordingController {
       return PausedTripRepository(
         box: Hive.box<String>(HiveBoxes.obd2PausedTrips),
       );
-    } catch (e) {
-      debugPrint('TripRecordingController paused repo: $e');
+    } catch (e, st) {
+      debugPrint('TripRecordingController paused repo: $e\n$st');
       return null;
     }
   }
@@ -755,8 +755,8 @@ class TripRecordingController {
       return TripHistoryRepository(
         box: Hive.box<String>(TripHistoryRepository.boxName),
       );
-    } catch (e) {
-      debugPrint('TripRecordingController history repo: $e');
+    } catch (e, st) {
+      debugPrint('TripRecordingController history repo: $e\n$st');
       return null;
     }
   }
@@ -889,8 +889,8 @@ class TripRecordingController {
     try {
       final raw = await _service.sendCommand(Elm327Protocol.vinCommand);
       return Elm327Protocol.parseVin(raw);
-    } catch (e) {
-      debugPrint('TripRecordingController VIN read failed: $e');
+    } catch (e, st) {
+      debugPrint('TripRecordingController VIN read failed: $e\n$st');
       return null;
     }
   }

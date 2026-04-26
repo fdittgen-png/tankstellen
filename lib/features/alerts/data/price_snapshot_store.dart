@@ -39,8 +39,8 @@ class PriceSnapshotStore {
     try {
       if (!Hive.isBoxOpen(HiveBoxes.priceSnapshots)) return null;
       return Hive.box<String>(HiveBoxes.priceSnapshots);
-    } catch (e) {
-      debugPrint('PriceSnapshotStore: box unavailable: $e');
+    } catch (e, st) {
+      debugPrint('PriceSnapshotStore: box unavailable: $e\n$st');
       return null;
     }
   }
@@ -80,8 +80,8 @@ class PriceSnapshotStore {
           if (map == null) continue;
           out.add(PriceSnapshot.fromJson(map));
         }
-      } catch (e) {
-        debugPrint('PriceSnapshotStore.all: skipping $key: $e');
+      } catch (e, st) {
+        debugPrint('PriceSnapshotStore.all: skipping $key: $e\n$st');
       }
     }
     out.sort((a, b) => a.timestamp.compareTo(b.timestamp));
@@ -123,8 +123,8 @@ class PriceSnapshotStore {
         if (ts == null || ts.isBefore(cutoff)) {
           toDelete.add(key);
         }
-      } catch (e) {
-        debugPrint('PriceSnapshotStore._prune: removing corrupt $key: $e');
+      } catch (e, st) {
+        debugPrint('PriceSnapshotStore._prune: removing corrupt $key: $e\n$st');
         toDelete.add(key);
       }
     }

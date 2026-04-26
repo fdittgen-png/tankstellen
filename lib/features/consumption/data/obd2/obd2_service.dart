@@ -98,8 +98,8 @@ class Obd2Service {
       await _primeSupportedPidsCache();
 
       return true;
-    } catch (e) {
-      debugPrint('OBD2 connect failed: $e');
+    } catch (e, st) {
+      debugPrint('OBD2 connect failed: $e\n$st');
       return false;
     }
   }
@@ -133,8 +133,8 @@ class Obd2Service {
       if (discovered.isNotEmpty) {
         await cache.put(key, discovered);
       }
-    } catch (e) {
-      debugPrint('OBD2 supported-PID cache prime failed: $e');
+    } catch (e, st) {
+      debugPrint('OBD2 supported-PID cache prime failed: $e\n$st');
     }
   }
 
@@ -147,8 +147,8 @@ class Obd2Service {
       final response = await _transport.sendCommand(Elm327Protocol.vinCommand);
       final vin = Elm327Protocol.parseVin(response);
       if (vin != null && vin.isNotEmpty) return vin;
-    } catch (e) {
-      debugPrint('OBD2 VIN read for cache key failed: $e');
+    } catch (e, st) {
+      debugPrint('OBD2 VIN read for cache key failed: $e\n$st');
     }
     return _vehicleFallbackKey;
   }
@@ -231,8 +231,8 @@ class Obd2Service {
       final brand = vehicleBrandFromVin(vin);
       if (brand == VehicleBrand.unknown) return null;
       return _readOdometerFromCatalogByBrand(brand);
-    } catch (e) {
-      debugPrint('OBD2 readOdometer failed: $e');
+    } catch (e, st) {
+      debugPrint('OBD2 readOdometer failed: $e\n$st');
       return null;
     }
   }
@@ -302,8 +302,8 @@ class Obd2Service {
       final response =
           await _transport.sendCommand(Elm327Protocol.vehicleSpeedCommand);
       return Elm327Protocol.parseVehicleSpeed(response);
-    } catch (e) {
-      debugPrint('OBD2 readSpeed failed: $e');
+    } catch (e, st) {
+      debugPrint('OBD2 readSpeed failed: $e\n$st');
       return null;
     }
   }
@@ -349,8 +349,8 @@ class Obd2Service {
         // flag. If it's not in the set we just parsed, stop walking.
         final nextRangeFlag = groupBase + 32;
         if (!bitmap.contains(nextRangeFlag)) break;
-      } catch (e) {
-        debugPrint('OBD2 discoverSupportedPids failed on $command: $e');
+      } catch (e, st) {
+        debugPrint('OBD2 discoverSupportedPids failed on $command: $e\n$st');
         break;
       }
     }
@@ -366,8 +366,8 @@ class Obd2Service {
       final response =
           await _transport.sendCommand(Elm327Protocol.engineRpmCommand);
       return Elm327Protocol.parseEngineRpm(response);
-    } catch (e) {
-      debugPrint('OBD2 readRpm failed: $e');
+    } catch (e, st) {
+      debugPrint('OBD2 readRpm failed: $e\n$st');
       return null;
     }
   }
@@ -635,8 +635,8 @@ class Obd2Service {
     try {
       final response = await _transport.sendCommand(command);
       return parser(response);
-    } catch (e) {
-      debugPrint('OBD2 read $label failed: $e');
+    } catch (e, st) {
+      debugPrint('OBD2 read $label failed: $e\n$st');
       return null;
     }
   }

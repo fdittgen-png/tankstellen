@@ -42,8 +42,8 @@ class ChargingLogs extends _$ChargingLogs {
     final store = ref.read(chargingLogStoreProvider);
     try {
       await store.upsert(log);
-    } catch (e) {
-      debugPrint('ChargingLogs.add: $e');
+    } catch (e, st) {
+      debugPrint('ChargingLogs.add: $e\n$st');
     }
     state = AsyncValue.data(await store.list());
   }
@@ -57,8 +57,8 @@ class ChargingLogs extends _$ChargingLogs {
     final store = ref.read(chargingLogStoreProvider);
     try {
       await store.upsert(log);
-    } catch (e) {
-      debugPrint('ChargingLogs.edit: $e');
+    } catch (e, st) {
+      debugPrint('ChargingLogs.edit: $e\n$st');
     }
     state = AsyncValue.data(await store.list());
   }
@@ -70,8 +70,8 @@ class ChargingLogs extends _$ChargingLogs {
     final store = ref.read(chargingLogStoreProvider);
     try {
       await store.remove(id);
-    } catch (e) {
-      debugPrint('ChargingLogs.remove: $e');
+    } catch (e, st) {
+      debugPrint('ChargingLogs.remove: $e\n$st');
     }
     state = AsyncValue.data(await store.list());
   }

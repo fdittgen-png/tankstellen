@@ -106,8 +106,8 @@ class PriceHistoryRepository {
         .map((map) {
           try {
             return PriceRecord.fromJson(Map<String, dynamic>.from(map));
-          } catch (e) {
-            debugPrint('PriceRecord parse failed: $e');
+          } catch (e, st) {
+            debugPrint('PriceRecord parse failed: $e\n$st');
             return null;
           }
         })

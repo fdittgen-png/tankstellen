@@ -30,8 +30,8 @@ class VehicleProfileRepository {
       if (map == null) continue;
       try {
         result.add(VehicleProfile.fromJson(map));
-      } catch (e) {
-        debugPrint('VehicleProfileRepository: skipping malformed entry: $e');
+      } catch (e, st) {
+        debugPrint('VehicleProfileRepository: skipping malformed entry: $e\n$st');
       }
     }
     return result;

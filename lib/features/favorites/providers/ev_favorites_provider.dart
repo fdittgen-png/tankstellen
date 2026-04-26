@@ -85,9 +85,8 @@ class EvFavoriteStations extends _$EvFavoriteStations {
       }
       try {
         stations.add(ChargingStation.fromJson(data));
-      } catch (e) {
-        debugPrint(
-            '[EvFavoriteStations.build] fromJson failed for $id: $e');
+      } catch (e, st) {
+        debugPrint('[EvFavoriteStations.build] fromJson failed for $id: $e\n$st');
         orphaned.add(id);
       }
     }

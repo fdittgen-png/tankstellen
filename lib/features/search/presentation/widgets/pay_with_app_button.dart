@@ -45,8 +45,8 @@ class PayWithAppButton extends StatelessWidget {
     final launcher = onLaunch ?? PaymentAppLauncher.open;
     try {
       await launcher(app);
-    } on Exception catch (e) {
-      debugPrint('PayWithAppButton launch failed: $e');
+    } on Exception catch (e, st) {
+      debugPrint('PayWithAppButton launch failed: $e\n$st');
     }
   }
 }

@@ -98,8 +98,8 @@ class NearbyMapView extends ConsumerWidget {
                 padding: const EdgeInsets.all(32),
               ),
             );
-          } catch (e) {
-            debugPrint('Map fitCamera failed: $e');
+          } catch (e, st) {
+            debugPrint('Map fitCamera failed: $e\n$st');
           }
         });
 

@@ -70,10 +70,10 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
           builder: (_) => const TripRecordingScreen(),
         ),
       );
-    } on Obd2ConnectionError catch (e) {
+    } on Obd2ConnectionError catch (e, st) { // ignore: unused_catch_stack
       if (mounted) SnackBarHelper.showError(context, e.message);
-    } catch (e) {
-      debugPrint('TrajetsTab._onStartRecording: $e');
+    } catch (e, st) {
+      debugPrint('TrajetsTab._onStartRecording: $e\n$st');
     } finally {
       if (mounted) setState(() => _starting = false);
     }

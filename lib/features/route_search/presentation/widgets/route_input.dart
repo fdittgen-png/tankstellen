@@ -71,7 +71,7 @@ class _RouteInputState extends ConsumerState<RouteInput> {
       ref.read(routeInputControllerProvider.notifier).setStartCoords(coords);
       final l10n = AppLocalizations.of(context);
       _startController.text = l10n?.currentLocation ?? 'Current location';
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) {
         final l10n = AppLocalizations.of(context);
         SnackBarHelper.showError(
@@ -189,7 +189,7 @@ class _RouteInputState extends ConsumerState<RouteInput> {
       ];
 
       widget.onSearch(waypoints);
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) {
         SnackBarHelper.showError(context,
             '${AppLocalizations.of(context)?.errorUnknown ?? "Error"}: $e');

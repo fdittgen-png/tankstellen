@@ -105,14 +105,14 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       final profile = ref.read(activeProfileProvider);
       defaultId = profile?.defaultVehicleId;
       profilePreferred = profile?.preferredFuelType;
-    } catch (e) {
-      debugPrint('AddFillUp: active profile unavailable: $e');
+    } catch (e, st) {
+      debugPrint('AddFillUp: active profile unavailable: $e\n$st');
     }
     String? activeId;
     try {
       activeId = ref.read(activeVehicleProfileProvider)?.id;
-    } catch (e) {
-      debugPrint('AddFillUp: active vehicle unavailable: $e');
+    } catch (e, st) {
+      debugPrint('AddFillUp: active vehicle unavailable: $e\n$st');
     }
     if (defaultId != null && vehicles.any((v) => v.id == defaultId)) {
       _vehicleId = defaultId;
@@ -235,7 +235,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
                   'below if anything is off.',
         );
       }
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) {
         SnackBarHelper.showError(
           context,
@@ -258,8 +258,8 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     List<VehicleProfile> vehicles;
     try {
       vehicles = ref.watch(vehicleProfileListProvider);
-    } catch (e) {
-      debugPrint('AddFillUp build: vehicle list unavailable: $e');
+    } catch (e, st) {
+      debugPrint('AddFillUp build: vehicle list unavailable: $e\n$st');
       vehicles = const [];
     }
     _initVehicleIfNeeded(vehicles);
@@ -514,7 +514,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
           l?.scanPumpSuccess ?? 'Pump display scanned — verify the values.',
         );
       }
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) {
         SnackBarHelper.showError(
           context,

@@ -43,8 +43,8 @@ class BatchQueryHelper {
             radiusKm: searchRadiusKm,
             fuelType: fuelType,
           );
-        } catch (e) {
-          debugPrint('BatchQuery: point ${point.latitude},${point.longitude} failed: $e');
+        } catch (e, st) {
+          debugPrint('BatchQuery: point ${point.latitude},${point.longitude} failed: $e\n$st');
           return <SearchResultItem>[];
         }
       });

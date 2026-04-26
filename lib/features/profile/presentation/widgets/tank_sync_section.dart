@@ -213,7 +213,7 @@ class TankSyncSection extends ConsumerWidget {
         if (context.mounted) {
           SnackBarHelper.show(context, AppLocalizations.of(context)?.switchedToAnonymous ?? 'Switched to anonymous session');
         }
-      } catch (e) {
+      } catch (e, st) { // ignore: unused_catch_stack
         if (context.mounted) {
           SnackBarHelper.showError(context, AppLocalizations.of(context)?.failedToSwitch(e.toString()) ?? 'Failed to switch: $e');
         }

@@ -238,8 +238,8 @@ DateTime? buildDate(String dayStr, String monthStr, String yearStr) {
     if (month < 1 || month > 12) return null;
     if (day < 1 || day > 31) return null;
     return DateTime(year, month, day);
-  } on FormatException catch (e) {
-    debugPrint('Receipt date parse failed for "$dayStr/$monthStr/$yearStr": $e');
+  } on FormatException catch (e, st) {
+    debugPrint('Receipt date parse failed for "$dayStr/$monthStr/$yearStr": $e\n$st');
     return null;
   }
 }
