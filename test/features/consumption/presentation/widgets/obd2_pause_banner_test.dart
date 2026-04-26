@@ -35,7 +35,7 @@ class _FakeTripRecording extends TripRecording {
   }
 
   @override
-  Future<StoppedTripResult> stop() async {
+  Future<StoppedTripResult> stop({bool automatic = false}) async {
     stopCalls++;
     return const StoppedTripResult.empty();
   }
