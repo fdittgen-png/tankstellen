@@ -8,7 +8,9 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../domain/entities/radius_alert.dart';
+import '../../domain/radius_alert_validators.dart';
 import '../../providers/radius_alerts_provider.dart';
+import 'radius_alert_form_fields.dart';
 import 'radius_alert_map_picker.dart';
 
 /// Signature of the map-picker opener. Production code pushes
@@ -19,12 +21,18 @@ typedef RadiusAlertMapPickerOpener = Future<LatLng?> Function(
   BuildContext context,
 );
 
-/// Bottom sheet that creates a new [RadiusAlert] (#578 phase 2 + 3).
+/// Bottom sheet that creates a new [RadiusAlert] (#578 phase 2 + 3,
+/// refactored in #563 phase: radius_alert_create_sheet).
 ///
 /// Phase 2 shipped the form shell (label, fuel, threshold, radius, GPS
-/// center). Phase 3 adds the "Pick on map" button that pushes
+/// center). Phase 3 added the "Pick on map" button that pushes
 /// [RadiusAlertMapPicker] and binds the returned [LatLng] as the alert
 /// center so the background evaluator has real coordinates.
+///
+/// The form sections live in `radius_alert_form_fields.dart` and the
+/// pure validators / parsers live in
+/// `domain/radius_alert_validators.dart`; this file owns the state,
+/// lifecycle, and side-effects (GPS read, map picker, save).
 class RadiusAlertCreateSheet extends ConsumerStatefulWidget {
   /// Injection hook so widget tests can swap the id generator for a
   /// deterministic string. Production callers leave this unset.
@@ -123,30 +131,21 @@ class _RadiusAlertCreateSheetState
     setState(() {
       _centerLat = picked.latitude;
       _centerLng = picked.longitude;
-      _centerSource =
-          l10n?.radiusAlertCenterFromMap ?? 'Map location';
+      _centerSource = l10n?.radiusAlertCenterFromMap ?? 'Map location';
     });
   }
 
-  bool get _canSave {
-    if (_labelController.text.trim().isEmpty) return false;
-    final threshold = _parseThreshold();
-    if (threshold == null || threshold <= 0) return false;
-    // A center is required. GPS wins; otherwise postal code must be
-    // non-empty so the phase-3 worker has something to geocode.
-    final hasGps = _centerLat != null && _centerLng != null;
-    final hasPostal = _postalCodeController.text.trim().isNotEmpty;
-    return hasGps || hasPostal;
-  }
-
-  double? _parseThreshold() {
-    final raw = _thresholdController.text.trim().replaceAll(',', '.');
-    if (raw.isEmpty) return null;
-    return double.tryParse(raw);
-  }
+  bool get _canSave => RadiusAlertValidators.canSave(
+        label: _labelController.text,
+        thresholdRaw: _thresholdController.text,
+        centerLat: _centerLat,
+        centerLng: _centerLng,
+        postalCode: _postalCodeController.text,
+      );
 
   Future<void> _save() async {
-    final threshold = _parseThreshold();
+    final threshold =
+        RadiusAlertValidators.parseThreshold(_thresholdController.text);
     if (threshold == null) return;
 
     // Postal-code-only entries are parked at (0,0) until the phase-3
@@ -175,6 +174,11 @@ class _RadiusAlertCreateSheetState
 
   static String _defaultId() => const Uuid().v4();
 
+  /// Re-run `build` so the Save button picks up the new can-save state
+  /// after a text field changes. Wired into every controller-driven
+  /// child via [VoidCallback].
+  void _rebuild() => setState(() {});
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -191,124 +195,34 @@ class _RadiusAlertCreateSheetState
             style: theme.textTheme.titleLarge,
           ),
           const SizedBox(height: 16),
-          TextField(
+          RadiusAlertLabelField(
             controller: _labelController,
-            decoration: InputDecoration(
-              hintText: l10n?.alertsRadiusLabelHint ?? 'Label',
-              border: const OutlineInputBorder(),
-            ),
-            onChanged: (_) => setState(() {}),
+            onChanged: _rebuild,
           ),
           const SizedBox(height: 16),
-          DropdownButtonFormField<FuelType>(
-            initialValue: _fuelType,
-            decoration: InputDecoration(
-              labelText: l10n?.alertsRadiusFuelType ?? 'Fuel type',
-              border: const OutlineInputBorder(),
-            ),
-            items: FuelType.values
-                .where((t) => t != FuelType.all)
-                .map((t) => DropdownMenuItem(
-                      value: t,
-                      child: Text(t.displayName),
-                    ))
-                .toList(),
-            onChanged: (v) {
-              if (v != null) setState(() => _fuelType = v);
-            },
+          RadiusAlertFuelTypeField(
+            value: _fuelType,
+            onChanged: (v) => setState(() => _fuelType = v),
           ),
           const SizedBox(height: 16),
-          TextField(
+          RadiusAlertThresholdField(
             controller: _thresholdController,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(
-              labelText: l10n?.alertsRadiusThreshold ?? 'Threshold (€/L)',
-              border: const OutlineInputBorder(),
-            ),
-            onChanged: (_) => setState(() {}),
+            onChanged: _rebuild,
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Text(
-                l10n?.alertsRadiusKm ?? 'Radius (km)',
-                style: theme.textTheme.titleSmall,
-              ),
-              const Spacer(),
-              Text(
-                '${_radiusKm.round()} km',
-                style: theme.textTheme.titleSmall,
-              ),
-            ],
-          ),
-          Slider(
-            value: _radiusKm.clamp(1, 50),
-            min: 1,
-            max: 50,
-            divisions: 49,
-            label: '${_radiusKm.round()} km',
+          RadiusAlertRadiusSlider(
+            value: _radiusKm,
             onChanged: (v) => setState(() => _radiusKm = v),
           ),
           const SizedBox(height: 16),
-          DropdownButtonFormField<int>(
-            initialValue: _frequencyPerDay,
-            decoration: InputDecoration(
-              labelText: l10n?.alertsRadiusFrequencyLabel ??
-                  'Check frequency',
-              border: const OutlineInputBorder(),
-            ),
-            items: <DropdownMenuItem<int>>[
-              DropdownMenuItem(
-                value: 1,
-                child: Text(l10n?.alertsRadiusFrequencyDaily ??
-                    'Once a day'),
-              ),
-              DropdownMenuItem(
-                value: 2,
-                child: Text(
-                    l10n?.alertsRadiusFrequencyTwiceDaily ??
-                        'Twice a day'),
-              ),
-              DropdownMenuItem(
-                value: 3,
-                child: Text(
-                    l10n?.alertsRadiusFrequencyThriceDaily ??
-                        'Three times a day'),
-              ),
-              DropdownMenuItem(
-                value: 4,
-                child: Text(
-                    l10n?.alertsRadiusFrequencyFourTimesDaily ??
-                        'Four times a day'),
-              ),
-            ],
-            onChanged: (v) {
-              if (v != null) setState(() => _frequencyPerDay = v);
-            },
+          RadiusAlertFrequencyField(
+            value: _frequencyPerDay,
+            onChanged: (v) => setState(() => _frequencyPerDay = v),
           ),
           const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.my_location),
-                  onPressed: _useMyLocation,
-                  label: Text(
-                    l10n?.alertsRadiusCenterGps ?? 'Use my location',
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.map_outlined),
-                  onPressed: _pickOnMap,
-                  label: Text(
-                    l10n?.radiusAlertPickOnMap ?? 'Pick on map',
-                  ),
-                ),
-              ),
-            ],
+          RadiusAlertCenterButtons(
+            onUseMyLocation: _useMyLocation,
+            onPickOnMap: _pickOnMap,
           ),
           if (_centerSource != null) ...[
             const SizedBox(height: 8),
@@ -318,32 +232,14 @@ class _RadiusAlertCreateSheetState
             ),
           ],
           const SizedBox(height: 16),
-          TextField(
+          RadiusAlertPostalCodeField(
             controller: _postalCodeController,
-            decoration: InputDecoration(
-              labelText:
-                  l10n?.alertsRadiusCenterPostalCode ?? 'Postal code',
-              border: const OutlineInputBorder(),
-            ),
-            onChanged: (_) => setState(() {}),
+            onChanged: _rebuild,
           ),
           const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(l10n?.alertsRadiusCancel ?? 'Cancel'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton(
-                  onPressed: _canSave ? _save : null,
-                  child: Text(l10n?.alertsRadiusSave ?? 'Save'),
-                ),
-              ),
-            ],
+          RadiusAlertActionButtons(
+            onCancel: () => Navigator.of(context).pop(),
+            onSave: _canSave ? _save : null,
           ),
           const SizedBox(height: 8),
         ],
