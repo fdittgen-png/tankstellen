@@ -50,8 +50,13 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
 
         final prices = _cachedPrices![entry.key];
 
+        // #753 — `it-` prefix so a MISE registry id (bare numeric)
+        // cannot collide with another country's numeric id space.
+        final rawId = entry.key;
         stations.add(Station(
-          id: entry.key,
+          id: rawId.isEmpty
+              ? ''
+              : (rawId.startsWith('it-') ? rawId : 'it-$rawId'),
           name: s.name.isNotEmpty ? s.name : s.brand,
           brand: s.brand,
           street: s.address,

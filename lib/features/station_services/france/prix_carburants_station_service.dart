@@ -183,8 +183,13 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
   Future<ServiceResult<StationDetail>> getStationDetail(
     String stationId,
   ) async {
+    // #753 — strip the `fr-` prefix before sending it to Prix-Carburants
+    // (the upstream only knows the bare numeric id). Tolerant of legacy
+    // unprefixed favorites.
+    final upstreamId =
+        stationId.startsWith('fr-') ? stationId.substring(3) : stationId;
     final response = await _dio.get(_baseUrl, queryParameters: {
-      'where': 'id=$stationId',
+      'where': 'id=$upstreamId',
       'limit': 1,
     });
 
@@ -210,9 +215,14 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
   ) async {
     final prices = <String, StationPrices>{};
     for (final id in ids.take(10)) {
+      // #753 — same strip-and-restore pattern as `getStationDetail`: the
+      // upstream id is bare numeric, but the result map is keyed by the
+      // caller's original id shape so favorites/alerts that store the
+      // canonical `fr-<id>` form get matching keys back.
+      final upstreamId = id.startsWith('fr-') ? id.substring(3) : id;
       try {
         final response = await _dio.get(_baseUrl, queryParameters: {
-          'where': 'id=$id',
+          'where': 'id=$upstreamId',
           'limit': 1,
         });
         final results = parser.extractPrixCarburantsResults(response.data);

@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/profile/providers/profile_provider.dart';
+import '../../features/search/providers/search_provider.dart';
 import '../storage/storage_providers.dart';
 import '../utils/price_formatter.dart';
 import 'country_config.dart';
@@ -45,6 +46,8 @@ class ActiveCountry extends _$ActiveCountry {
 
   /// User explicitly selects a country.
   Future<void> select(CountryConfig country) async {
+    final previousCode = state.code;
+
     // Update legacy storage
     final storage = ref.read(storageRepositoryProvider);
     await storage.putSetting(_storageKey, country.code);
@@ -60,5 +63,15 @@ class ActiveCountry extends _$ActiveCountry {
     }
 
     state = country;
+
+    // #753 — invalidate search results so the next render fetches fresh
+    // ones from the new country's API. Without this, a stale country-A
+    // search cache shadows country-B widget taps that share a numeric
+    // id (the original bug). Mirrors the guard in
+    // `ActiveProfile.switchProfile` so every country-change path is
+    // covered (manual selector, profile edit, auto-switch).
+    if (previousCode != country.code) {
+      ref.invalidate(searchStateProvider);
+    }
   }
 }

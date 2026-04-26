@@ -60,7 +60,11 @@ void main() {
       }, 43.4, 3.5);
 
       expect(station, isNotNull);
-      expect(station!.id, '34200002');
+      // #753 — parser now prefixes the upstream numeric id with `fr-`
+      // for global uniqueness across countries. The bare `34200002`
+      // form would have collided with AT/ES/IT services that emit raw
+      // numeric ids in the same range.
+      expect(station!.id, 'fr-34200002');
       expect(station.name, '120 RUE LECLERC');
       expect(station.brand, 'E.Leclerc');
       expect(station.postCode, '34290');

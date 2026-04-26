@@ -57,11 +57,29 @@ StationService stationService(Ref ref) {
   return _resolveServiceForCountry(ref, country.code);
 }
 
-/// Get a station service for a specific country code.
-/// Used by route search to query the correct API for each country
-/// the route passes through (instead of using the profile's active country).
+/// Cross-country station service lookup (#753 widget tap path, #514
+/// favorites currency, #515 route search). Resolves the
+/// [StationService] for an arbitrary [countryCode] without changing
+/// the active country.
+///
+/// Exposed as a `Provider.family` so tests can override per-country
+/// services without standing up the full `CountryServiceRegistry`.
+/// Production paths use the [stationServiceForCountry] sync helper.
+@riverpod
+StationService perCountryStationService(
+  Ref ref,
+  String countryCode,
+) {
+  return _resolveServiceForCountry(ref, countryCode);
+}
+
+/// Sync helper preserved for the legacy call sites that haven't moved
+/// to the provider family yet. Goes through
+/// [perCountryStationServiceProvider] so a test override on the
+/// family applies here too — that's the seam the #753 widget-tap
+/// regression test relies on.
 StationService stationServiceForCountry(Ref ref, String countryCode) =>
-    _resolveServiceForCountry(ref, countryCode);
+    ref.read(perCountryStationServiceProvider(countryCode));
 
 StationService _resolveServiceForCountry(Ref ref, String countryCode) {
   final cache = ref.read(cacheManagerProvider);

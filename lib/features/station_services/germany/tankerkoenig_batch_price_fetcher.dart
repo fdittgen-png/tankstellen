@@ -38,6 +38,14 @@ class TankerkoenigBatchPriceFetcher {
   /// Backoff policy passed to [fetchWithRetry] for transient errors.
   final BackgroundRetryConfig retryConfig;
 
+  /// Country prefix used in #753's globally-unique station id scheme
+  /// (`de-<uuid>`). Tankerkönig itself only knows the bare UUID, so the
+  /// fetcher strips the prefix before sending and re-applies it on the
+  /// returned keys so the caller's id space stays consistent — including
+  /// the WorkManager background isolate that records price history
+  /// against the favorites' canonical (prefixed) ids.
+  static const _countryPrefix = 'de-';
+
   /// Fetches prices for [ids] in batches of [batchSize] and merges the
   /// results into a single map keyed by station ID. Returns an empty map
   /// when [ids] is empty.
@@ -51,6 +59,11 @@ class TankerkoenigBatchPriceFetcher {
   /// useful (e.g. one batch of 10 fails but the other 20 stations still
   /// get fresh prices). Per-batch errors are retried via
   /// [BackgroundRetryConfig] before being given up on.
+  ///
+  /// #753 — accepts ids in either the new prefixed (`de-<uuid>`) or
+  /// legacy bare-UUID form. The returned map is keyed in the SAME shape
+  /// the caller passed in, so favorites/alerts that store prefixed ids
+  /// see prefixed keys back.
   Future<Map<String, Map<String, dynamic>>> fetchBatch({
     required List<String> ids,
     String? apiKey,
@@ -59,12 +72,24 @@ class TankerkoenigBatchPriceFetcher {
       return const <String, Map<String, dynamic>>{};
     }
 
+    // Build a bare-id list for the upstream call and remember the
+    // original shape each one came in as so we can re-key the response.
+    final bareToOriginal = <String, String>{};
+    final bareIds = <String>[];
+    for (final id in ids) {
+      final bare = id.startsWith(_countryPrefix)
+          ? id.substring(_countryPrefix.length)
+          : id;
+      bareIds.add(bare);
+      bareToOriginal[bare] = id;
+    }
+
     final result = <String, Map<String, dynamic>>{};
 
-    for (var i = 0; i < ids.length; i += batchSize) {
-      final batch = ids.sublist(
+    for (var i = 0; i < bareIds.length; i += batchSize) {
+      final batch = bareIds.sublist(
         i,
-        i + batchSize > ids.length ? ids.length : i + batchSize,
+        i + batchSize > bareIds.length ? bareIds.length : i + batchSize,
       );
       final joined = batch.join(',');
 
@@ -77,7 +102,7 @@ class TankerkoenigBatchPriceFetcher {
         },
         config: retryConfig,
       );
-      _mergeBatch(data, into: result);
+      _mergeBatch(data, into: result, bareToOriginal: bareToOriginal);
     }
     return result;
   }
@@ -85,6 +110,7 @@ class TankerkoenigBatchPriceFetcher {
   void _mergeBatch(
     Map<String, dynamic>? data, {
     required Map<String, Map<String, dynamic>> into,
+    required Map<String, String> bareToOriginal,
   }) {
     if (data == null) return;
     if (data[TankerkoenigFields.ok] != true) return;
@@ -93,10 +119,14 @@ class TankerkoenigBatchPriceFetcher {
     if (raw == null) return;
     for (final entry in raw.entries) {
       final value = entry.value;
+      // Re-key the upstream's bare UUID back to whatever shape the
+      // caller asked for (prefixed or bare). Falls back to bare when
+      // the response carries an unexpected key.
+      final outKey = bareToOriginal[entry.key] ?? entry.key;
       if (value is Map<String, dynamic>) {
-        into[entry.key] = value;
+        into[outKey] = value;
       } else if (value is Map) {
-        into[entry.key] = Map<String, dynamic>.from(value);
+        into[outKey] = Map<String, dynamic>.from(value);
       }
     }
   }

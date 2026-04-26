@@ -35,16 +35,20 @@ class EControlStationService with StationServiceHelpers implements StationServic
       final dieselStations = results[0];
       final superStations = results[1];
 
-      // Merge: combine prices from both queries by station ID
+      // Merge: combine prices from both queries by station ID.
+      // The merge key parses the (possibly-prefixed) id back to its
+      // numeric upstream form so the diesel-query and super-query
+      // results merge cleanly regardless of where the `at-` prefix
+      // lands in the chain (added by `_parseStation`).
       final merged = <int, Station>{};
 
       for (final s in dieselStations) {
-        final id = int.tryParse(s.id) ?? 0;
+        final id = int.tryParse(_stripCountryPrefix(s.id)) ?? 0;
         merged[id] = s;
       }
 
       for (final s in superStations) {
-        final id = int.tryParse(s.id) ?? 0;
+        final id = int.tryParse(_stripCountryPrefix(s.id)) ?? 0;
         final existing = merged[id];
         if (existing != null) {
           // Merge e5 from super query into existing diesel station
@@ -128,8 +132,14 @@ class EControlStationService with StationServiceHelpers implements StationServic
       final name = r['name']?.toString() ?? '';
       final isOpen = r['open'] as bool? ?? true;
 
+      // #753 — `at-` prefix so a numeric E-Control id can never collide
+      // with another country's numeric id space when widget JSON or
+      // search-state cache crosses a country switch.
+      final rawId = r['id']?.toString() ?? '';
       return Station(
-        id: r['id']?.toString() ?? '',
+        id: rawId.isEmpty
+            ? ''
+            : (rawId.startsWith('at-') ? rawId : 'at-$rawId'),
         name: name,
         brand: _extractBrand(name),
         street: location['address']?.toString() ?? '',
@@ -166,6 +176,12 @@ class EControlStationService with StationServiceHelpers implements StationServic
     final firstWord = name.split(RegExp(r'[\s\-]')).first;
     return firstWord.isNotEmpty ? firstWord : name;
   }
+
+  /// Strip the `at-` prefix when round-tripping ids back into integer
+  /// form (E-Control upstream ids are bare integers). Tolerant of legacy
+  /// unprefixed favorites.
+  static String _stripCountryPrefix(String id) =>
+      id.startsWith('at-') ? id.substring(3) : id;
 
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(

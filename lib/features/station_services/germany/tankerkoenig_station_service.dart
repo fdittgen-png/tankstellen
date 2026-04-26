@@ -70,6 +70,12 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
       final stationsJson = response.data['stations'] as List<dynamic>? ?? [];
       final stations = stationsJson
           .map((j) => Station.fromJson(Map<String, dynamic>.from(j as Map)))
+          // #753 — scope ids with the `de-` country prefix so a German
+          // UUID can never collide with another country's numeric id
+          // (FR `12345`, AT `12345`, ES `IDEESS`, IT registry id).
+          // [_stripCountryPrefix] strips the prefix before any call back
+          // out to Tankerkönig.
+          .map((s) => s.copyWith(id: _withCountryPrefix(s.id)))
           .toList();
 
       return ServiceResult(
@@ -89,12 +95,21 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
     try {
       final response = await _dio.get(
         ApiConstants.detailEndpoint,
-        queryParameters: {'id': stationId},
+        // #753 — accept either `de-<uuid>` (new prefix) or a bare UUID
+        // (legacy favorite from before the prefix scheme); the upstream
+        // server only knows the bare UUID so we always strip.
+        queryParameters: {'id': _stripCountryPrefix(stationId)},
       );
       _checkOk(response.data);
 
       final stationJson = response.data['station'] as Map<String, dynamic>;
-      final station = Station.fromJson(stationJson);
+      final parsed = Station.fromJson(stationJson);
+      // Re-apply the `de-` prefix so the Station emitted from detail
+      // matches the prefixed shape used everywhere else (search results,
+      // favorites, widget rows). Without this, legacy favorites would
+      // round-trip back to bare UUIDs and the next save would re-poison
+      // the storage with two ids for the same station.
+      final station = parsed.copyWith(id: _withCountryPrefix(parsed.id));
 
       // Parse opening times
       final openingTimesRaw = stationJson['openingTimes'];
@@ -149,6 +164,10 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
     // stations) get prices for *every* requested station instead of just
     // the first 10. The API key is added by the Dio interceptor in
     // service_providers.dart, so we don't pass it here.
+    //
+    // #753 — the fetcher transparently strips the `de-` prefix before
+    // calling Tankerkönig and re-keys the response with the caller's
+    // original id shape, so prefixed/bare ids round-trip cleanly.
     try {
       final raw = await _priceFetcher.fetchBatch(ids: ids);
       final prices = raw.map(
@@ -164,6 +183,16 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
       throwApiException(e, stackTrace: st);
     }
   }
+
+  /// `de-<id>` if [id] is unprefixed, otherwise [id] unchanged. Idempotent so
+  /// detail re-parses don't double-prefix.
+  static String _withCountryPrefix(String id) =>
+      id.startsWith('de-') ? id : 'de-$id';
+
+  /// Strip the `de-` prefix when passing an id back to Tankerkönig. Tolerant
+  /// of legacy bare-UUID favorites (returns the id unchanged in that case).
+  static String _stripCountryPrefix(String id) =>
+      id.startsWith('de-') ? id.substring(3) : id;
 
   void _checkOk(dynamic data) {
     if (data is Map<String, dynamic> && data['ok'] != true) {

@@ -41,7 +41,7 @@ final class ActiveCountryProvider
   }
 }
 
-String _$activeCountryHash() => r'f892c75e5c0adf31c923f5de143f33e9192fb99d';
+String _$activeCountryHash() => r'687ba3085ccf486e1daa9fdfdbfc1eb156abd70b';
 
 abstract class _$ActiveCountry extends $Notifier<CountryConfig> {
   CountryConfig build();

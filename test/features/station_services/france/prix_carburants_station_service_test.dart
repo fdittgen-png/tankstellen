@@ -776,7 +776,8 @@ void main() {
       // First request must be the postal-code query
       expect(adapter.requestUris.first, contains('cp%3D%2734120%27'),
           reason: 'should have taken the postal-code path');
-      expect(result.data.map((s) => s.id).toList(), ['3412001', '3412002'],
+      // #753 — parser now emits `fr-` prefixed ids for global uniqueness.
+      expect(result.data.map((s) => s.id).toList(), ['fr-3412001', 'fr-3412002'],
           reason: 'only stations within 2 km should remain');
       for (final s in result.data) {
         expect(s.dist, lessThanOrEqualTo(2.0));
@@ -840,7 +841,8 @@ void main() {
       ));
 
       expect(adapter.lastRequestUri, contains('within_distance'));
-      expect(result.data.map((s) => s.id).toList(), ['3412001', '3412002']);
+      // #753 — `fr-` prefix on the parser output.
+      expect(result.data.map((s) => s.id).toList(), ['fr-3412001', 'fr-3412002']);
     });
 
     // -------- #315: postal-code search must include neighboring postal codes --------
@@ -926,8 +928,9 @@ void main() {
       // Should return 5 unique stations (2 local + 3 neighbors), deduped
       expect(result.data.length, 5,
           reason: 'merged set should include local + neighboring stations');
+      // #753 — `fr-` prefix on the parser output.
       expect(result.data.map((s) => s.id).toSet(), {
-        '3412001', '3412002', '3412003', '3414001', '3430001',
+        'fr-3412001', 'fr-3412002', 'fr-3412003', 'fr-3414001', 'fr-3430001',
       });
     });
 
