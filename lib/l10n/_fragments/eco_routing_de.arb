@@ -1,0 +1,19 @@
+{
+  "ecoRouteOption": "Sparsam",
+  "@ecoRouteOption": {
+    "description": "Label für den Eco-Routing-Chip in den Routensuche-Bedienelementen (#1123). Wählt Routen aus, die Kraftstoff statt Zeit minimieren."
+  },
+  "ecoRouteSavings": "≈ {liters} L gespart",
+  "@ecoRouteSavings": {
+    "description": "Vorhergesagte Ersparnis-Vorschau, die angezeigt wird, wenn die Eco-Routing-Strategie in den Routensuche-Bedienelementen aktiv ist (#1123). {liters} ist die geschätzte Litereinsparung gegenüber der schnellsten Route, formatiert mit einer Nachkommastelle.",
+    "placeholders": {
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "ecoRouteHint": "Smarter fahren — bevorzugt ruhige Autobahn statt Zickzack-Abkürzungen.",
+  "@ecoRouteHint": {
+    "description": "Hilfetext unterhalb des Eco-Chips, der erklärt, wann der Nutzer ihn wählen sollte (#1123). Kurz halten; das Leitmotiv 'Smarter pump. Smarter drive.' soll erkennbar bleiben."
+  }
+}

@@ -3303,6 +3303,18 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get ecoRouteOption => 'Sparsam';
+
+  @override
+  String ecoRouteSavings(String liters) {
+    return '≈ $liters L gespart';
+  }
+
+  @override
+  String get ecoRouteHint =>
+      'Smarter fahren — bevorzugt ruhige Autobahn statt Zickzack-Abkürzungen.';
+
+  @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';
 
   @override

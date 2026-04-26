@@ -3274,6 +3274,18 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String get ecoRouteOption => 'Eco';
+
+  @override
+  String ecoRouteSavings(String liters) {
+    return '≈ $liters L saved';
+  }
+
+  @override
+  String get ecoRouteHint =>
+      'Smarter drive — favours steady highway over zigzag shortcuts.';
+
+  @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
 
   @override

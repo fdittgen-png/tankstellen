@@ -56,7 +56,12 @@ enum RouteSearchStrategyType {
   cheapest('cheapest', 'cheapestSearch'),
 
   /// Balanced: find stations near highway exits / major intersections.
-  balanced('balanced', 'balancedSearch');
+  balanced('balanced', 'balancedSearch'),
+
+  /// Eco: pick a route + station set that minimise *fuel*, not *time*
+  /// (#1123). Favours steady highway cruise over zigzag shortcuts;
+  /// surfaces a predicted-litres-saved hint to the user.
+  eco('eco', 'ecoSearch');
 
   final String key;
   final String l10nKey;
