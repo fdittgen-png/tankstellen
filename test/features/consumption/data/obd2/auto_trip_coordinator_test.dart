@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/data/obd2/auto_record_trace_log.dart';
 import 'package:tankstellen/features/consumption/data/obd2/auto_trip_coordinator.dart';
 import 'package:tankstellen/features/consumption/data/obd2/fake_background_adapter_listener.dart';
 
@@ -47,6 +48,7 @@ void main() {
   }
 
   setUp(() {
+    AutoRecordTraceLog.clear();
     listener = FakeBackgroundAdapterListener();
     speed = StreamController<double>.broadcast();
     startTripCalls = 0;
@@ -88,6 +90,25 @@ void main() {
     expect(startTripCalls, 1,
         reason: 'startTrip is idempotent within a single connect '
             'cycle — extra samples should not double-fire');
+
+    // Trace assertions: the ring should have recorded coordinatorStarted,
+    // adapterConnected, three supra-threshold samples, thresholdCrossed,
+    // and finally tripStarted in that order.
+    final List<AutoRecordEventKind> kinds =
+        AutoRecordTraceLog.snapshot().map((e) => e.kind).toList();
+    expect(kinds.first, AutoRecordEventKind.coordinatorStarted);
+    expect(kinds.contains(AutoRecordEventKind.adapterConnected), isTrue);
+    expect(
+      kinds.where((k) => k == AutoRecordEventKind.speedSampleSupraThreshold)
+          .length,
+      3,
+      reason: 'three supra-threshold samples must each emit a trace entry',
+    );
+    final int crossedAt = kinds.indexOf(AutoRecordEventKind.thresholdCrossed);
+    final int startedAt = kinds.indexOf(AutoRecordEventKind.tripStarted);
+    expect(crossedAt, greaterThan(0));
+    expect(startedAt, greaterThan(crossedAt),
+        reason: 'thresholdCrossed must be emitted before tripStarted');
   });
 
   test('sub-threshold samples never reach the consecutive window', () async {
@@ -104,6 +125,17 @@ void main() {
 
     expect(startTripCalls, 0,
         reason: 'sub-threshold samples must never trigger startTrip');
+
+    final List<AutoRecordEventKind> kinds =
+        AutoRecordTraceLog.snapshot().map((e) => e.kind).toList();
+    expect(
+      kinds.where((k) => k == AutoRecordEventKind.speedSampleSubThreshold)
+          .length,
+      5,
+      reason: 'each sub-threshold sample must emit a trace entry',
+    );
+    expect(kinds.contains(AutoRecordEventKind.thresholdCrossed), isFalse);
+    expect(kinds.contains(AutoRecordEventKind.tripStarted), isFalse);
   });
 
   test('fluctuating samples do not satisfy the consecutive window', () async {
@@ -156,6 +188,25 @@ void main() {
     await Future<void>.delayed(shortDelay * 2);
     expect(stopAndSaveCalls, 0,
         reason: 'a cancelled timer must not still call stopAndSave');
+
+    final List<AutoRecordEventKind> kinds =
+        AutoRecordTraceLog.snapshot().map((e) => e.kind).toList();
+    final int timerStartedAt =
+        kinds.indexOf(AutoRecordEventKind.disconnectTimerStarted);
+    final int reconnectedAt =
+        kinds.lastIndexOf(AutoRecordEventKind.adapterConnected);
+    final int cancelledAt =
+        kinds.indexOf(AutoRecordEventKind.disconnectTimerCancelled);
+    expect(timerStartedAt, greaterThan(-1),
+        reason: 'disconnect must record disconnectTimerStarted');
+    expect(reconnectedAt, greaterThan(timerStartedAt),
+        reason: 'reconnect must record adapterConnected after the timer '
+            'started');
+    expect(cancelledAt, greaterThan(reconnectedAt),
+        reason: 'reconnect must trigger disconnectTimerCancelled');
+    expect(kinds.contains(AutoRecordEventKind.disconnectTimerFired), isFalse,
+        reason: 'a cancelled timer must not record a fired entry');
+    expect(kinds.contains(AutoRecordEventKind.tripSavedAuto), isFalse);
   });
 
   test('disconnect timer fires → stopAndSaveAutomatic called once', () async {
@@ -174,6 +225,15 @@ void main() {
 
     expect(stopAndSaveCalls, 1,
         reason: 'timer fire must call stopAndSaveAutomatic exactly once');
+
+    final List<AutoRecordEventKind> kinds =
+        AutoRecordTraceLog.snapshot().map((e) => e.kind).toList();
+    final int firedAt = kinds.indexOf(AutoRecordEventKind.disconnectTimerFired);
+    final int savedAt = kinds.indexOf(AutoRecordEventKind.tripSavedAuto);
+    expect(firedAt, greaterThan(-1),
+        reason: 'timer fire must record disconnectTimerFired');
+    expect(savedAt, greaterThan(firedAt),
+        reason: 'tripSavedAuto must follow disconnectTimerFired');
   });
 
   test('disconnect with no active trip → timer fires but no save', () async {
@@ -205,6 +265,22 @@ void main() {
         reason: 'disconnect for the wrong MAC must not arm the timer');
     await Future<void>.delayed(shortDelay * 3);
     expect(stopAndSaveCalls, 0);
+
+    // Trace must record the foreign MAC as ignored (so the user can
+    // see "an event arrived but it wasn't ours") rather than silently
+    // dropping it.
+    final List<AutoRecordEvent> events = AutoRecordTraceLog.snapshot();
+    final AutoRecordEvent ignoredConnect = events.firstWhere(
+      (e) => e.kind == AutoRecordEventKind.adapterConnectIgnoredOtherMac,
+    );
+    expect(ignoredConnect.mac, otherMac);
+    final AutoRecordEvent ignoredDisconnect = events.firstWhere(
+      (e) => e.kind == AutoRecordEventKind.adapterDisconnectIgnoredOtherMac,
+    );
+    expect(ignoredDisconnect.mac, otherMac);
+    expect(events.any((e) => e.kind == AutoRecordEventKind.adapterConnected),
+        isFalse,
+        reason: 'no AdapterConnected for the configured mac should appear');
   });
 
   test('start() is idempotent — second call does not double-subscribe',
@@ -266,6 +342,16 @@ void main() {
     expect(coordinator.isStarted, isFalse);
     expect(listener.stopCalls, 2,
         reason: 'each stop() call forwards once to the listener');
+
+    // Both stop() calls record a coordinatorStopped entry — the trace
+    // is "what happened from the coordinator's POV", not "what changed
+    // state".
+    final List<AutoRecordEventKind> kinds =
+        AutoRecordTraceLog.snapshot().map((e) => e.kind).toList();
+    expect(
+      kinds.where((k) => k == AutoRecordEventKind.coordinatorStopped).length,
+      2,
+    );
   });
 
   test('connect → disconnect → reconnect → 3 supra samples → only one save',
