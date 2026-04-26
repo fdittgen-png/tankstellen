@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import 'auto_record_trace_log.dart';
 import 'background_adapter_listener.dart';
 
 /// Immutable snapshot of the auto-record fields off [VehicleProfile]
@@ -173,6 +174,13 @@ class AutoTripCoordinator {
   Future<void> start() async {
     if (_started) return;
     _started = true;
+    AutoRecordTraceLog.add(
+      AutoRecordEventKind.coordinatorStarted,
+      mac: config.mac,
+      detail: 'thresholdKmh=${config.movementStartThresholdKmh} '
+          'delaySec=${config.disconnectSaveDelay.inSeconds} '
+          'window=$consecutiveSamplesWindow',
+    );
     try {
       await listener.start(mac: config.mac);
     } catch (e, st) {
@@ -181,6 +189,11 @@ class AutoTripCoordinator {
       // and bail so the coordinator stays in a clean idle state and
       // the next start attempt can re-arm.
       _started = false;
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.error,
+        mac: config.mac,
+        detail: 'start failed: $e',
+      );
       await errorLogger.log(
         ErrorLayer.background,
         e,
@@ -207,6 +220,10 @@ class AutoTripCoordinator {
       // in directly. The flags below all start in the "nothing to do"
       // state on a fresh instance.
     }
+    AutoRecordTraceLog.add(
+      AutoRecordEventKind.coordinatorStopped,
+      mac: config.mac,
+    );
     _started = false;
     _disconnectTimer?.cancel();
     _disconnectTimer = null;
@@ -220,6 +237,11 @@ class AutoTripCoordinator {
     } catch (e, st) {
       // Native bridge teardown failure shouldn't propagate — the
       // coordinator is already idle from the Dart side's perspective.
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.error,
+        mac: config.mac,
+        detail: 'stop failed: $e',
+      );
       await errorLogger.log(
         ErrorLayer.background,
         e,
@@ -237,12 +259,31 @@ class AutoTripCoordinator {
     // the same listener (phase 2b may centralise the bridge) would
     // emit events for an unrelated MAC; we drop them silently rather
     // than risk auto-recording the wrong car's drive.
-    if (event.mac != config.mac) return;
+    if (event.mac != config.mac) {
+      AutoRecordTraceLog.add(
+        switch (event) {
+          AdapterConnected() =>
+            AutoRecordEventKind.adapterConnectIgnoredOtherMac,
+          AdapterDisconnected() =>
+            AutoRecordEventKind.adapterDisconnectIgnoredOtherMac,
+        },
+        mac: event.mac,
+      );
+      return;
+    }
 
     switch (event) {
       case AdapterConnected():
+        AutoRecordTraceLog.add(
+          AutoRecordEventKind.adapterConnected,
+          mac: event.mac,
+        );
         _onConnected();
       case AdapterDisconnected():
+        AutoRecordTraceLog.add(
+          AutoRecordEventKind.adapterDisconnected,
+          mac: event.mac,
+        );
         _onDisconnected();
     }
   }
@@ -257,6 +298,10 @@ class AutoTripCoordinator {
     if (_disconnectTimer?.isActive ?? false) {
       _disconnectTimer!.cancel();
       _disconnectTimer = null;
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.disconnectTimerCancelled,
+        mac: config.mac,
+      );
     }
     _consecutiveSupraThreshold = 0;
     _speedSub?.cancel();
@@ -274,16 +319,39 @@ class AutoTripCoordinator {
     // and we save.
     _disconnectTimer?.cancel();
     _disconnectTimer = Timer(config.disconnectSaveDelay, _onSaveTimerFired);
+    AutoRecordTraceLog.add(
+      AutoRecordEventKind.disconnectTimerStarted,
+      mac: config.mac,
+      detail: 'delaySec=${config.disconnectSaveDelay.inSeconds} '
+          'delayMs=${config.disconnectSaveDelay.inMilliseconds}',
+    );
   }
 
   void _onSpeedSample(double kmh) {
     if (_tripActive) return;
     if (kmh > config.movementStartThresholdKmh) {
       _consecutiveSupraThreshold++;
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.speedSampleSupraThreshold,
+        mac: config.mac,
+        detail:
+            'speed=${kmh.toStringAsFixed(1)} kmh, '
+            'count=$_consecutiveSupraThreshold/$consecutiveSamplesWindow',
+      );
     } else {
       _consecutiveSupraThreshold = 0;
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.speedSampleSubThreshold,
+        mac: config.mac,
+        detail: 'speed=${kmh.toStringAsFixed(1)} kmh',
+      );
     }
     if (_consecutiveSupraThreshold >= consecutiveSamplesWindow) {
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.thresholdCrossed,
+        mac: config.mac,
+        detail: 'speed=${kmh.toStringAsFixed(1)} kmh',
+      );
       _tripActive = true;
       _consecutiveSupraThreshold = 0;
       // Fire-and-forget — the coordinator's contract is "we observed
@@ -297,6 +365,11 @@ class AutoTripCoordinator {
   void _onSaveTimerFired() {
     final firedAt = _now();
     _disconnectTimer = null;
+    AutoRecordTraceLog.add(
+      AutoRecordEventKind.disconnectTimerFired,
+      mac: config.mac,
+      detail: 'tripActive=$_tripActive',
+    );
     if (!_tripActive) {
       // Edge case: connect, no movement detected, disconnect, timer
       // fires. Nothing to save. Stay idle and let the next connect
@@ -309,8 +382,33 @@ class AutoTripCoordinator {
 
   Future<void> _invokeStartTrip(double observedSpeedKmh) async {
     try {
-      await startTrip();
+      final Object? outcome = await startTrip();
+      // The coordinator is decoupled from `StartTripOutcome` (it lives
+      // in the providers layer). We classify outcomes by their string
+      // form: enum `toString()` is `EnumName.value`, so the trailing
+      // segment after the dot is the value name. `null` is the test
+      // stub's signal for "no outcome to report" and is treated as
+      // success — production wiring always returns a typed outcome.
+      final String? outcomeName = outcome?.toString().split('.').last;
+      if (outcome == null || outcomeName == 'started') {
+        AutoRecordTraceLog.add(
+          AutoRecordEventKind.tripStarted,
+          mac: config.mac,
+          detail: 'observedSpeedKmh=${observedSpeedKmh.toStringAsFixed(1)}',
+        );
+      } else {
+        AutoRecordTraceLog.add(
+          AutoRecordEventKind.tripStartFailed,
+          mac: config.mac,
+          detail: 'outcome=$outcomeName',
+        );
+      }
     } catch (e, st) {
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.tripStartFailed,
+        mac: config.mac,
+        detail: 'exception=$e',
+      );
       await errorLogger.log(
         ErrorLayer.background,
         e,
@@ -327,7 +425,17 @@ class AutoTripCoordinator {
   Future<void> _invokeStopAndSave(DateTime firedAt) async {
     try {
       await stopAndSaveAutomatic();
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.tripSavedAuto,
+        mac: config.mac,
+        detail: 'firedAt=${firedAt.toIso8601String()}',
+      );
     } catch (e, st) {
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.tripSaveFailed,
+        mac: config.mac,
+        detail: 'exception=$e',
+      );
       await errorLogger.log(
         ErrorLayer.background,
         e,
