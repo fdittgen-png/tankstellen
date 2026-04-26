@@ -1,0 +1,25 @@
+{
+  "crossBorderCheaper": "{country} stations {km} km away — €{price}/L cheaper",
+  "@crossBorderCheaper": {
+    "description": "Banner shown when stations across the border are cheaper than local prices.",
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "km": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "crossBorderTapToSwitch": "Tap to switch country",
+  "@crossBorderTapToSwitch": {
+    "description": "Hint shown beneath the cross-border banner — tapping switches the active country and re-runs the search."
+  },
+  "crossBorderDismissTooltip": "Dismiss",
+  "@crossBorderDismissTooltip": {
+    "description": "Tooltip on the cross-border banner's dismiss icon."
+  }
+}

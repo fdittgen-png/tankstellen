@@ -3233,6 +3233,17 @@ class AppLocalizationsDa extends AppLocalizations {
       'Powered by pretcarburant.ro (Competition Council + ANPC)';
 
   @override
+  String crossBorderCheaper(String country, String km, String price) {
+    return '$country stations $km km away — €$price/L cheaper';
+  }
+
+  @override
+  String get crossBorderTapToSwitch => 'Tap to switch country';
+
+  @override
+  String get crossBorderDismissTooltip => 'Dismiss';
+
+  @override
   String get insightCardTitle => 'Top wasteful behaviours';
 
   @override

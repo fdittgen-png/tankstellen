@@ -1270,6 +1270,29 @@
   "greeceCommunityApiNotice": "Betrieben von der von der Community gepflegten fuelpricesgr-API",
   "romaniaApiProvider": "Monitorul Prețurilor (Romania)",
   "romaniaScrapingNotice": "Betrieben von pretcarburant.ro (Wettbewerbsrat + ANPC)",
+  "crossBorderCheaper": "Tankstellen in {country} {km} km entfernt — {price} €/L günstiger",
+  "@crossBorderCheaper": {
+    "description": "Banner shown when stations across the border are cheaper than local prices.",
+    "placeholders": {
+      "country": {
+        "type": "String"
+      },
+      "km": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "crossBorderTapToSwitch": "Tippen, um das Land zu wechseln",
+  "@crossBorderTapToSwitch": {
+    "description": "Hint shown beneath the cross-border banner — tapping switches the active country and re-runs the search."
+  },
+  "crossBorderDismissTooltip": "Schließen",
+  "@crossBorderDismissTooltip": {
+    "description": "Tooltip on the cross-border banner's dismiss icon."
+  },
   "insightCardTitle": "Größte Spritfresser",
   "insightEmptyState": "Keine auffälligen Ineffizienzen – weiter so!",
   "insightHighRpm": "Motor über 3000 U/min ({pctTime}% der Fahrt): {liters} L verschwendet",

@@ -3260,6 +3260,17 @@ class AppLocalizationsDe extends AppLocalizations {
       'Betrieben von pretcarburant.ro (Wettbewerbsrat + ANPC)';
 
   @override
+  String crossBorderCheaper(String country, String km, String price) {
+    return 'Tankstellen in $country $km km entfernt — $price €/L günstiger';
+  }
+
+  @override
+  String get crossBorderTapToSwitch => 'Tippen, um das Land zu wechseln';
+
+  @override
+  String get crossBorderDismissTooltip => 'Schließen';
+
+  @override
   String get insightCardTitle => 'Größte Spritfresser';
 
   @override

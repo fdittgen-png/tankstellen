@@ -6068,6 +6068,24 @@ abstract class AppLocalizations {
   /// **'Powered by pretcarburant.ro (Competition Council + ANPC)'**
   String get romaniaScrapingNotice;
 
+  /// Banner shown when stations across the border are cheaper than local prices.
+  ///
+  /// In en, this message translates to:
+  /// **'{country} stations {km} km away — €{price}/L cheaper'**
+  String crossBorderCheaper(String country, String km, String price);
+
+  /// Hint shown beneath the cross-border banner — tapping switches the active country and re-runs the search.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to switch country'**
+  String get crossBorderTapToSwitch;
+
+  /// Tooltip on the cross-border banner's dismiss icon.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get crossBorderDismissTooltip;
+
   /// Title of the driving-insights card on the Trip detail screen — surfaces the top-3 fuel-wasting behaviours from the analyzer (#1041 phase 2).
   ///
   /// In en, this message translates to:

@@ -1,125 +1,197 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/domain/entities/cross_border_comparison.dart';
+import 'package:tankstellen/core/country/country_config.dart';
+import 'package:tankstellen/core/country/country_provider.dart';
+import 'package:tankstellen/core/location/user_position_provider.dart';
+import 'package:tankstellen/features/search/domain/entities/cross_border_suggestion.dart';
 import 'package:tankstellen/features/search/presentation/widgets/cross_border_banner.dart';
-import 'package:tankstellen/features/search/providers/cross_border_provider.dart';
+import 'package:tankstellen/features/search/providers/cross_border_suggestion_provider.dart';
 
 import '../../../../helpers/pump_app.dart';
 
 void main() {
   group('CrossBorderBanner', () {
-    testWidgets('shows nothing when no comparisons', (tester) async {
+    testWidgets('shows nothing when suggestion is null', (tester) async {
       await pumpApp(
         tester,
         const CrossBorderBanner(),
         overrides: [
-          crossBorderComparisonsProvider.overrideWith((ref) => const []),
+          crossBorderSuggestionProvider
+              .overrideWith((ref) async => null),
         ],
       );
 
       expect(find.byType(Card), findsNothing);
     });
 
-    testWidgets('shows banner with neighbor info', (tester) async {
-      final comparisons = [
-        const CrossBorderComparison(
-          neighborCode: 'FR',
-          neighborName: 'France',
-          neighborFlag: '\u{1F1EB}\u{1F1F7}',
-          neighborCurrency: '\u20ac',
-          currentAvgPrice: 1.850,
-          borderDistanceKm: 12.5,
-          stationCount: 5,
-        ),
-      ];
-
+    testWidgets('shows nothing while suggestion is loading', (tester) async {
       await pumpApp(
         tester,
         const CrossBorderBanner(),
         overrides: [
-          crossBorderComparisonsProvider.overrideWith((ref) => comparisons),
+          crossBorderSuggestionProvider.overrideWith((ref) {
+            // Never-completing future keeps the AsyncValue in `loading`.
+            return Completer<CrossBorderSuggestion?>().future;
+          }),
+        ],
+      );
+
+      expect(find.byType(Card), findsNothing);
+    });
+
+    testWidgets('renders headline + flag when suggestion exists',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const CrossBorderBanner(),
+        overrides: [
+          crossBorderSuggestionProvider.overrideWith(
+            (ref) async => const CrossBorderSuggestion(
+              neighborCountryCode: 'FR',
+              neighborName: 'France',
+              neighborFlag: '\u{1F1EB}\u{1F1F7}',
+              distanceKm: 4.0,
+              priceDeltaPerLiter: 0.12,
+              sampleCount: 6,
+            ),
+          ),
         ],
       );
 
       expect(find.byType(Card), findsOneWidget);
-      expect(find.text('France is nearby'), findsOneWidget);
-      expect(find.text('~13 km to border'), findsOneWidget);
+      expect(find.text('\u{1F1EB}\u{1F1F7}'), findsOneWidget);
       expect(
-        find.text('Avg here: 1.850 EUR (5 stations)'),
+        find.textContaining('France'),
         findsOneWidget,
       );
-      expect(find.byIcon(Icons.compare_arrows), findsOneWidget);
+      expect(find.textContaining('0.12'), findsOneWidget);
+      expect(find.byIcon(Icons.close), findsOneWidget);
     });
 
-    testWidgets('shows multiple banners for multiple neighbors', (tester) async {
-      final comparisons = [
-        const CrossBorderComparison(
-          neighborCode: 'FR',
-          neighborName: 'France',
-          neighborFlag: '\u{1F1EB}\u{1F1F7}',
-          neighborCurrency: '\u20ac',
-          currentAvgPrice: 1.800,
-          borderDistanceKm: 10.0,
-          stationCount: 3,
-        ),
-        const CrossBorderComparison(
-          neighborCode: 'AT',
-          neighborName: '\u00d6sterreich',
-          neighborFlag: '\u{1F1E6}\u{1F1F9}',
-          neighborCurrency: '\u20ac',
-          currentAvgPrice: 1.800,
-          borderDistanceKm: 25.0,
-          stationCount: 3,
-        ),
-      ];
-
+    testWidgets('dismiss button hides banner for that neighbor',
+        (tester) async {
       await pumpApp(
         tester,
         const CrossBorderBanner(),
         overrides: [
-          crossBorderComparisonsProvider.overrideWith((ref) => comparisons),
+          crossBorderSuggestionProvider.overrideWith(
+            (ref) async => const CrossBorderSuggestion(
+              neighborCountryCode: 'FR',
+              neighborName: 'France',
+              neighborFlag: '\u{1F1EB}\u{1F1F7}',
+              distanceKm: 4.0,
+              priceDeltaPerLiter: 0.12,
+              sampleCount: 6,
+            ),
+          ),
         ],
       );
 
-      expect(find.byType(Card), findsNWidgets(2));
-      expect(find.text('France is nearby'), findsOneWidget);
-      expect(find.text('\u00d6sterreich is nearby'), findsOneWidget);
+      expect(find.byType(Card), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Card), findsNothing);
     });
 
-    testWidgets('rounds distance correctly', (tester) async {
-      final comparisons = [
-        const CrossBorderComparison(
-          neighborCode: 'DK',
-          neighborName: 'Danmark',
-          neighborFlag: '\u{1F1E9}\u{1F1F0}',
-          neighborCurrency: 'kr',
-          currentAvgPrice: 1.650,
-          borderDistanceKm: 7.3,
-          stationCount: 2,
-        ),
-      ];
-
+    testWidgets('hidden when suggestion neighbor is already dismissed',
+        (tester) async {
       await pumpApp(
         tester,
         const CrossBorderBanner(),
         overrides: [
-          crossBorderComparisonsProvider.overrideWith((ref) => comparisons),
+          crossBorderSuggestionProvider.overrideWith(
+            (ref) async => const CrossBorderSuggestion(
+              neighborCountryCode: 'FR',
+              neighborName: 'France',
+              neighborFlag: '\u{1F1EB}\u{1F1F7}',
+              distanceKm: 4.0,
+              priceDeltaPerLiter: 0.12,
+              sampleCount: 6,
+            ),
+          ),
+          crossBorderBannerDismissedProvider
+              .overrideWith(() => _PreDismissed({'FR'})),
         ],
       );
 
-      expect(find.text('~7 km to border'), findsOneWidget);
+      expect(find.byType(Card), findsNothing);
     });
 
-    testWidgets('meets tap target guidelines', (tester) async {
+    testWidgets('tap invokes country switch via ActiveCountry.select()',
+        (tester) async {
+      final spy = _SpyActiveCountry(Countries.germany);
       await pumpApp(
         tester,
         const CrossBorderBanner(),
         overrides: [
-          crossBorderComparisonsProvider.overrideWith((ref) => const []),
+          activeCountryProvider.overrideWith(() => spy),
+          // The banner's tap handler reads the user position to feed
+          // searchByCoordinates; without one it returns early.
+          userPositionProvider.overrideWith(
+            () => _FixedUserPosition(49.23, 7.0),
+          ),
+          crossBorderSuggestionProvider.overrideWith(
+            (ref) async => const CrossBorderSuggestion(
+              neighborCountryCode: 'FR',
+              neighborName: 'France',
+              neighborFlag: '\u{1F1EB}\u{1F1F7}',
+              distanceKm: 4.0,
+              priceDeltaPerLiter: 0.12,
+              sampleCount: 6,
+            ),
+          ),
         ],
       );
 
-      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+      // Tap the body of the card (not the dismiss icon).
+      await tester.tap(find.text('\u{1F1EB}\u{1F1F7}'));
+      // Don't pumpAndSettle — searchByCoordinates dispatches further
+      // async work we don't care about here.
+      await tester.pump();
+
+      expect(spy.selectedCodes, contains('FR'));
     });
   });
+}
+
+class _PreDismissed extends CrossBorderBannerDismissed {
+  final Set<String> _initial;
+  _PreDismissed(this._initial);
+
+  @override
+  Set<String> build() => Set<String>.from(_initial);
+}
+
+class _FixedUserPosition extends UserPosition {
+  final double _lat;
+  final double _lng;
+  _FixedUserPosition(this._lat, this._lng);
+
+  @override
+  UserPositionData? build() => UserPositionData(
+        lat: _lat,
+        lng: _lng,
+        updatedAt: DateTime.now(),
+        source: 'test',
+      );
+}
+
+class _SpyActiveCountry extends ActiveCountry {
+  final CountryConfig _initial;
+  final List<String> selectedCodes = [];
+
+  _SpyActiveCountry(this._initial);
+
+  @override
+  CountryConfig build() => _initial;
+
+  @override
+  Future<void> select(CountryConfig country) async {
+    selectedCodes.add(country.code);
+    state = country;
+  }
 }
