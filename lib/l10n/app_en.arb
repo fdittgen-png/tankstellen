@@ -2291,5 +2291,17 @@
   "vinConfirmPrivacyNote": "We looked up your VIN on NHTSA's free vehicle database — nothing sent to Tankstellen servers.",
   "@vinConfirmPrivacyNote": {
     "description": "One-line privacy reassurance shown near the top of the VIN confirm dialog (#895)."
+  },
+  "widgetVariantDefault": "Current price only",
+  "@widgetVariantDefault": {
+    "description": "Label for the default home-widget content variant — shows just the current pump price (#1121)."
+  },
+  "widgetVariantPredictive": "Predictive: best time to fill",
+  "@widgetVariantPredictive": {
+    "description": "Label for the predictive home-widget content variant — adds a best-time-to-fill nudge under each row (#1121)."
+  },
+  "widgetPredictiveNowPrefix": "now",
+  "@widgetPredictiveNowPrefix": {
+    "description": "One-word prefix shown before the current price on the predictive widget line, e.g. 'now €1.84/L' (#1121)."
   }
 }

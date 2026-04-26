@@ -91,6 +91,36 @@
                 android:text="@string/widget_color_scheme_orange" />
         </RadioGroup>
 
+        <!-- #1121 — content variant. Default = price-only line. Predictive
+             adds a "best time to fill" hint per row. -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/widget_config_variant_label"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:paddingTop="16dp"
+            android:paddingBottom="4dp" />
+
+        <RadioGroup
+            android:id="@+id/widget_config_variant_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/widget_config_variant_default"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/widget_variant_default" />
+
+            <RadioButton
+                android:id="@+id/widget_config_variant_predictive"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/widget_variant_predictive" />
+        </RadioGroup>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

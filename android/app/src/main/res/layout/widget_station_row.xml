@@ -80,4 +80,19 @@
             android:textSize="10sp"
             android:paddingStart="6dp" />
     </LinearLayout>
+
+    <!-- Row 4 (#1121): predictive nudge — "now €1.84/L · best Tue eve ~€1.79/L".
+         Visibility is GONE by default; the renderer flips it to VISIBLE only
+         when the station JSON carries `predictive_*` fields AND the user
+         picked the predictive variant in the configure activity. -->
+    <TextView
+        android:id="@+id/station_predictive"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:textColor="@color/widget_text_secondary"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:paddingTop="2dp"
+        android:visibility="gone" />
 </LinearLayout>

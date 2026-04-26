@@ -22,4 +22,9 @@
     <string name="widget_color_scheme_blue">Blue</string>
     <string name="widget_color_scheme_green">Green</string>
     <string name="widget_color_scheme_orange">Orange</string>
+
+    <!-- Predictive widget variant (#1121). -->
+    <string name="widget_config_variant_label">Content</string>
+    <string name="widget_variant_default">Current price only</string>
+    <string name="widget_variant_predictive">Predictive: best time to fill</string>
 </resources>

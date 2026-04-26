@@ -1,0 +1,5 @@
+{
+  "widgetVariantDefault": "Nur aktueller Preis",
+  "widgetVariantPredictive": "Prognose: bester Tankzeitpunkt",
+  "widgetPredictiveNowPrefix": "jetzt"
+}

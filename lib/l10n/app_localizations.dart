@@ -7063,6 +7063,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Tankstellen servers.'**
   String get vinConfirmPrivacyNote;
+
+  /// Label for the default home-widget content variant — shows just the current pump price (#1121).
+  ///
+  /// In en, this message translates to:
+  /// **'Current price only'**
+  String get widgetVariantDefault;
+
+  /// Label for the predictive home-widget content variant — adds a best-time-to-fill nudge under each row (#1121).
+  ///
+  /// In en, this message translates to:
+  /// **'Predictive: best time to fill'**
+  String get widgetVariantPredictive;
+
+  /// One-word prefix shown before the current price on the predictive widget line, e.g. 'now €1.84/L' (#1121).
+  ///
+  /// In en, this message translates to:
+  /// **'now'**
+  String get widgetPredictiveNowPrefix;
 }
 
 class _AppLocalizationsDelegate

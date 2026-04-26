@@ -32,6 +32,7 @@ class WidgetConfigActivity : Activity() {
 
     private lateinit var profileGroup: RadioGroup
     private lateinit var colorGroup: RadioGroup
+    private lateinit var variantGroup: RadioGroup
 
     // profile-id indexed by the RadioButton view id we assigned.
     private val profileIdByViewId = mutableMapOf<Int, String>()
@@ -57,6 +58,7 @@ class WidgetConfigActivity : Activity() {
 
         profileGroup = findViewById(R.id.widget_config_profile_group)
         colorGroup = findViewById(R.id.widget_config_color_group)
+        variantGroup = findViewById(R.id.widget_config_variant_group)
 
         val prefs = getSharedPreferences(
             StationWidgetRenderer.PREFS_NAME,
@@ -64,9 +66,11 @@ class WidgetConfigActivity : Activity() {
         )
         val currentProfile = prefs.getString("profile_$appWidgetId", null)
         val currentColor = StationWidgetRenderer.getColorScheme(this, appWidgetId)
+        val currentVariant = StationWidgetRenderer.getVariant(this, appWidgetId)
 
         populateProfiles(prefs, currentProfile)
         selectColorScheme(currentColor)
+        selectVariant(currentVariant)
 
         findViewById<Button>(R.id.widget_config_save).setOnClickListener {
             onSavePressed()
@@ -141,6 +145,21 @@ class WidgetConfigActivity : Activity() {
         else -> "system"
     }
 
+    private fun selectVariant(variant: String) {
+        val viewId = when (variant) {
+            StationWidgetRenderer.VARIANT_PREDICTIVE ->
+                R.id.widget_config_variant_predictive
+            else -> R.id.widget_config_variant_default
+        }
+        variantGroup.check(viewId)
+    }
+
+    private fun selectedVariant(): String = when (variantGroup.checkedRadioButtonId) {
+        R.id.widget_config_variant_predictive ->
+            StationWidgetRenderer.VARIANT_PREDICTIVE
+        else -> StationWidgetRenderer.VARIANT_DEFAULT
+    }
+
     private fun selectedProfileId(): String? {
         val id = profileGroup.checkedRadioButtonId
         if (id == View.NO_ID) return null
@@ -150,6 +169,7 @@ class WidgetConfigActivity : Activity() {
     private fun onSavePressed() {
         val profileId = selectedProfileId()
         val colorScheme = selectedColorScheme()
+        val variant = selectedVariant()
 
         val editor = getSharedPreferences(
             StationWidgetRenderer.PREFS_NAME,
@@ -159,6 +179,7 @@ class WidgetConfigActivity : Activity() {
             editor.putString("profile_$appWidgetId", profileId)
         }
         editor.putString("color_$appWidgetId", colorScheme)
+        editor.putString("variant_$appWidgetId", variant)
         editor.apply()
 
         // Render immediately so the user sees the new colors / profile.

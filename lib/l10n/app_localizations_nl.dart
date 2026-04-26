@@ -3787,4 +3787,13 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get vinConfirmPrivacyNote =>
       'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Tankstellen servers.';
+
+  @override
+  String get widgetVariantDefault => 'Current price only';
+
+  @override
+  String get widgetVariantPredictive => 'Predictive: best time to fill';
+
+  @override
+  String get widgetPredictiveNowPrefix => 'now';
 }

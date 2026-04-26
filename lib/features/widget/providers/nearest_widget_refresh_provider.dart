@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/services/service_providers.dart';
 import '../../../core/storage/storage_providers.dart';
+import '../../price_history/providers/price_prediction_provider.dart';
 import '../data/home_widget_service.dart';
 
 part 'nearest_widget_refresh_provider.g.dart';
@@ -48,6 +49,13 @@ class NearestWidgetRefresh extends _$NearestWidgetRefresh {
         storage,
         profileStorage: storage,
         stationService: stationService,
+        // Wire the on-device predictor (#1121). Reads through the same
+        // Riverpod provider the in-app `BestTimeBanner` uses, so the
+        // widget shows the same recommendation without any new background
+        // work — it just runs while the foreground tick is alive.
+        pricePredictor: (stationId, fuelType) => ref.read(
+          pricePredictionProvider(stationId, fuelType),
+        ),
       );
     } catch (e, st) {
       debugPrint('NearestWidgetRefresh: tick failed: $e\n$st');
