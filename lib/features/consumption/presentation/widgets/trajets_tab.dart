@@ -12,6 +12,7 @@ import '../../data/trip_history_repository.dart';
 import '../../providers/trip_history_provider.dart';
 import '../../providers/trip_recording_provider.dart';
 import '../screens/trip_recording_screen.dart';
+import 'maintenance_suggestion_card.dart';
 import 'obd2_adapter_picker.dart';
 
 /// Trajets tab body on the Consumption screen (#889).
@@ -142,6 +143,11 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         header,
+        // Predictive-maintenance suggestion list (#1124). Renders zero
+        // or more cards above the trip list — empty by default, only
+        // appears when one of the trend heuristics fires AND the
+        // signal is not currently snoozed.
+        const MaintenanceSuggestionList(),
         Expanded(
           child: ListView.builder(
             key: const Key('trajets_list'),

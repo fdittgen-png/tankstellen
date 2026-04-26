@@ -3574,6 +3574,29 @@ class AppLocalizationsDe extends AppLocalizations {
   String get loyaltyBadgePrefix => '−';
 
   @override
+  String get maintenanceSignalIdleRpmCreepTitle => 'Leerlaufdrehzahl steigt';
+
+  @override
+  String maintenanceSignalIdleRpmCreepBody(String percent, int tripCount) {
+    return 'Die Leerlaufdrehzahl ist über deine letzten $tripCount Fahrten um $percent % gestiegen. Möglicher Hinweis auf einen verschmutzten Luftfilter oder eine driftende Sensorik.';
+  }
+
+  @override
+  String get maintenanceSignalMafDeviationTitle =>
+      'Möglicher Lufteinlass-Engpass';
+
+  @override
+  String maintenanceSignalMafDeviationBody(String percent, int tripCount) {
+    return 'Der Kraftstoffverbrauch bei konstanter Fahrt ist über deine letzten $tripCount Fahrten um $percent % gefallen. Möglicher Hinweis auf einen verstopften Luftfilter — eine Prüfung lohnt sich.';
+  }
+
+  @override
+  String get maintenanceActionDismiss => 'Verwerfen';
+
+  @override
+  String get maintenanceActionSnooze => '30 Tage stumm';
+
+  @override
   String get onboardingObd2StepTitle => 'OBD2-Adapter verbinden';
 
   @override

@@ -3545,6 +3545,29 @@ class AppLocalizationsEs extends AppLocalizations {
   String get loyaltyBadgePrefix => '−';
 
   @override
+  String get maintenanceSignalIdleRpmCreepTitle => 'Idle RPM creep detected';
+
+  @override
+  String maintenanceSignalIdleRpmCreepBody(String percent, int tripCount) {
+    return 'Idle RPM has crept up by $percent% over your last $tripCount trips. Possible early sign of a clogged air filter or sensor drift.';
+  }
+
+  @override
+  String get maintenanceSignalMafDeviationTitle =>
+      'Possible intake restriction';
+
+  @override
+  String maintenanceSignalMafDeviationBody(String percent, int tripCount) {
+    return 'Cruise fuel rate has dropped by $percent% over your last $tripCount trips. Possible sign of a clogged air filter or restricted intake — worth a check-up.';
+  }
+
+  @override
+  String get maintenanceActionDismiss => 'Dismiss';
+
+  @override
+  String get maintenanceActionSnooze => 'Snooze 30 days';
+
+  @override
   String get onboardingObd2StepTitle => 'Connect your OBD2 adapter';
 
   @override
