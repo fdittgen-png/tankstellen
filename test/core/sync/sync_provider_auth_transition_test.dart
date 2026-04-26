@@ -1,11 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
 
-import '../../mocks/mocks.dart';
+import '../../fakes/fake_hive_storage.dart';
 
 /// These tests verify that favorites, ignored stations, and ratings
 /// are correctly synced when the user transitions between auth states:
@@ -15,47 +14,33 @@ import '../../mocks/mocks.dart';
 /// - Connected → Disconnect → Reconnect
 /// - Community mode → Delete account (blocked)
 ///
-/// The tests use a MockHiveStorage to simulate local state and verify
-/// that the sync provider triggers sync operations at the right time.
+/// The tests use a [FakeHiveStorage] to simulate local state and verify
+/// state changes via fake-state inspection (no mocktail needed for
+/// stateful storage assertions).
 void main() {
-  late MockHiveStorage mockStorage;
+  late FakeHiveStorage fakeStorage;
 
   setUp(() {
-    mockStorage = MockHiveStorage();
+    fakeStorage = FakeHiveStorage();
   });
 
   ProviderContainer createContainer({
     SyncConfig initialConfig = const SyncConfig(),
   }) {
     final c = ProviderContainer(overrides: [
-      hiveStorageProvider.overrideWithValue(mockStorage),
+      hiveStorageProvider.overrideWithValue(fakeStorage),
       syncStateProvider.overrideWith(() => _FakeSyncState(initialConfig)),
     ]);
     addTearDown(c.dispose);
     return c;
   }
 
-  void stubStorageDefaults() {
-    when(() => mockStorage.getSetting(any())).thenReturn(null);
-    when(() => mockStorage.putSetting(any(), any())).thenAnswer((_) async {});
-    when(() => mockStorage.getSupabaseAnonKey()).thenReturn(null);
-    when(() => mockStorage.setSupabaseAnonKey(any()))
-        .thenAnswer((_) async {});
-    when(() => mockStorage.deleteSupabaseAnonKey())
-        .thenAnswer((_) async {});
-    when(() => mockStorage.getFavoriteIds()).thenReturn([]);
-    when(() => mockStorage.getIgnoredIds()).thenReturn([]);
-    when(() => mockStorage.getRatings()).thenReturn({});
-  }
-
   group('SyncState auth transitions', () {
     test('signInWithEmail triggers initial sync of local favorites', () async {
       // Setup: user has local favorites from anonymous session
-      stubStorageDefaults();
-      when(() => mockStorage.getFavoriteIds())
-          .thenReturn(['station-1', 'station-2', 'station-3']);
-      when(() => mockStorage.getIgnoredIds()).thenReturn(['station-x']);
-      when(() => mockStorage.getRatings()).thenReturn({'station-1': 5});
+      await fakeStorage.setFavoriteIds(['station-1', 'station-2', 'station-3']);
+      await fakeStorage.setIgnoredIds(['station-x']);
+      await fakeStorage.setRating('station-1', 5);
 
       final container = createContainer(
         initialConfig: const SyncConfig(
@@ -73,13 +58,16 @@ void main() {
       expect(state.userId, 'anon-uuid');
 
       // Verify storage has favorites that would need syncing
-      expect(mockStorage.getFavoriteIds(), hasLength(3));
-      expect(mockStorage.getIgnoredIds(), hasLength(1));
-      expect(mockStorage.getRatings(), hasLength(1));
+      expect(fakeStorage.getFavoriteIds(), hasLength(3));
+      expect(fakeStorage.getIgnoredIds(), hasLength(1));
+      expect(fakeStorage.getRatings(), hasLength(1));
     });
 
     test('disconnect clears sync config but preserves local data', () async {
-      stubStorageDefaults();
+      // Pre-seed local data — disconnect must NOT touch any of this.
+      await fakeStorage.setFavoriteIds(['s1', 's2']);
+      await fakeStorage.setIgnoredIds(['ignored-1']);
+      await fakeStorage.setRating('s1', 4);
 
       final container = createContainer(
         initialConfig: const SyncConfig(
@@ -94,17 +82,17 @@ void main() {
       container.read(syncStateProvider);
       await container.read(syncStateProvider.notifier).disconnect();
 
-      // Verify sync settings are cleared
-      verify(() => mockStorage.putSetting('sync_enabled', false)).called(1);
-      verify(() => mockStorage.putSetting('supabase_url', null)).called(1);
-      verify(() => mockStorage.deleteSupabaseAnonKey()).called(1);
-      verify(() => mockStorage.putSetting('sync_user_id', null)).called(1);
-      verify(() => mockStorage.putSetting('sync_mode', null)).called(1);
+      // Verify sync settings are cleared in storage.
+      expect(fakeStorage.getSetting('sync_enabled'), false);
+      expect(fakeStorage.getSetting('supabase_url'), isNull);
+      expect(fakeStorage.getSupabaseAnonKey(), isNull);
+      expect(fakeStorage.getSetting('sync_user_id'), isNull);
+      expect(fakeStorage.getSetting('sync_mode'), isNull);
 
-      // Verify local data is NOT touched
-      verifyNever(() => mockStorage.removeFavorite(any()));
-      verifyNever(() => mockStorage.removeIgnored(any()));
-      verifyNever(() => mockStorage.removeRating(any()));
+      // Verify local data is preserved.
+      expect(fakeStorage.getFavoriteIds(), ['s1', 's2']);
+      expect(fakeStorage.getIgnoredIds(), ['ignored-1']);
+      expect(fakeStorage.getRatings(), {'s1': 4});
 
       // Verify state is reset
       final state = container.read(syncStateProvider);
@@ -113,8 +101,6 @@ void main() {
     });
 
     test('deleteAccount is blocked in community mode', () async {
-      stubStorageDefaults();
-
       final container = createContainer(
         initialConfig: const SyncConfig(
           enabled: true,
@@ -137,8 +123,6 @@ void main() {
     });
 
     test('deleteAccount works in private mode', () async {
-      stubStorageDefaults();
-
       final container = createContainer(
         initialConfig: const SyncConfig(
           enabled: true,
@@ -153,14 +137,12 @@ void main() {
       await container.read(syncStateProvider.notifier).deleteAccount();
 
       // Private mode should proceed with disconnect
-      verify(() => mockStorage.putSetting('sync_enabled', false)).called(1);
+      expect(fakeStorage.getSetting('sync_enabled'), false);
       final state = container.read(syncStateProvider);
       expect(state.enabled, isFalse);
     });
 
     test('deleteAccount works in joinExisting mode', () async {
-      stubStorageDefaults();
-
       final container = createContainer(
         initialConfig: const SyncConfig(
           enabled: true,
@@ -174,7 +156,7 @@ void main() {
       container.read(syncStateProvider);
       await container.read(syncStateProvider.notifier).deleteAccount();
 
-      verify(() => mockStorage.putSetting('sync_enabled', false)).called(1);
+      expect(fakeStorage.getSetting('sync_enabled'), false);
     });
   });
 
@@ -252,13 +234,10 @@ void main() {
 
   group('switchToAnonymous', () {
     test('clears email and updates state', () async {
-      stubStorageDefaults();
-      when(() => mockStorage.getFavoriteIds()).thenReturn(['s1', 's2']);
-      when(() => mockStorage.getIgnoredIds()).thenReturn([]);
-      when(() => mockStorage.getRatings()).thenReturn({});
+      await fakeStorage.setFavoriteIds(['s1', 's2']);
 
       final container = ProviderContainer(overrides: [
-        hiveStorageProvider.overrideWithValue(mockStorage),
+        hiveStorageProvider.overrideWithValue(fakeStorage),
         syncStateProvider.overrideWith(
           () => _FakeSwitchableSyncState(const SyncConfig(
             enabled: true,
@@ -286,14 +265,13 @@ void main() {
       expect(state.enabled, isTrue);
       expect(state.mode, SyncMode.community);
       // Should persist the new userId
-      verify(() => mockStorage.putSetting('sync_user_id', any())).called(1);
+      expect(fakeStorage.getSetting('sync_user_id'), isNotNull);
+      expect(fakeStorage.getSetting('sync_user_id'), state.userId);
     });
 
     test('preserves sync mode and connection after switch', () async {
-      stubStorageDefaults();
-
       final container = ProviderContainer(overrides: [
-        hiveStorageProvider.overrideWithValue(mockStorage),
+        hiveStorageProvider.overrideWithValue(fakeStorage),
         syncStateProvider.overrideWith(
           () => _FakeSwitchableSyncState(const SyncConfig(
             enabled: true,
@@ -321,8 +299,6 @@ void main() {
 
   group('SyncMode transitions', () {
     test('community → disconnect preserves mode none', () async {
-      stubStorageDefaults();
-
       final container = createContainer(
         initialConfig: const SyncConfig(
           enabled: true,
@@ -341,8 +317,6 @@ void main() {
     });
 
     test('private → disconnect preserves mode none', () async {
-      stubStorageDefaults();
-
       final container = createContainer(
         initialConfig: const SyncConfig(
           enabled: true,

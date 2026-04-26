@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/consent/presentation/widgets/consent_settings_section.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
-import '../../../../mocks/mocks.dart';
+import '../../../../fakes/fake_hive_storage.dart';
 
 void main() {
-  late MockHiveStorage mockStorage;
+  late FakeHiveStorage fakeStorage;
 
   setUp(() {
-    mockStorage = MockHiveStorage();
-    when(() => mockStorage.getSetting(any())).thenReturn(null);
-    when(() => mockStorage.putSetting(any(), any())).thenAnswer((_) async {});
+    fakeStorage = FakeHiveStorage();
   });
 
   Widget buildWidget({
@@ -23,16 +20,13 @@ void main() {
     bool errorReporting = false,
     bool cloudSync = false,
   }) {
-    when(() => mockStorage.getSetting(StorageKeys.consentLocation))
-        .thenReturn(location);
-    when(() => mockStorage.getSetting(StorageKeys.consentErrorReporting))
-        .thenReturn(errorReporting);
-    when(() => mockStorage.getSetting(StorageKeys.consentCloudSync))
-        .thenReturn(cloudSync);
+    fakeStorage.putSetting(StorageKeys.consentLocation, location);
+    fakeStorage.putSetting(StorageKeys.consentErrorReporting, errorReporting);
+    fakeStorage.putSetting(StorageKeys.consentCloudSync, cloudSync);
 
     return ProviderScope(
       overrides: [
-        hiveStorageProvider.overrideWithValue(mockStorage),
+        hiveStorageProvider.overrideWithValue(fakeStorage),
       ],
       child: const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -83,8 +77,7 @@ void main() {
       await tester.tap(find.byType(Switch).first);
       await tester.pumpAndSettle();
 
-      verify(() => mockStorage.putSetting(StorageKeys.consentLocation, true))
-          .called(1);
+      expect(fakeStorage.getSetting(StorageKeys.consentLocation), true);
     });
 
     testWidgets('shows settings hint text', (tester) async {
