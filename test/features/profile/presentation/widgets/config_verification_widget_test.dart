@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/providers/app_state_provider.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
@@ -10,8 +9,8 @@ import 'package:tankstellen/features/profile/presentation/widgets/config_verific
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
+import '../../../../fakes/fake_storage_repository.dart';
 import '../../../../helpers/pump_app.dart';
-import '../../../../mocks/mocks.dart';
 
 class _FixedActiveProfile extends ActiveProfile {
   _FixedActiveProfile(this._value);
@@ -42,19 +41,19 @@ List<Object> _buildOverrides({
   bool hasApiKey = false,
   bool syncEnabled = false,
 }) {
-  final mockStorage = MockStorageRepository();
-  // #521 — hasApiKey is always true in production (community default
-  // always available). The `hasApiKey` parameter here actually controls
-  // whether the user has set their OWN key on top of the default.
-  when(() => mockStorage.hasApiKey()).thenReturn(true);
-  when(() => mockStorage.hasCustomApiKey()).thenReturn(hasApiKey);
-  when(() => mockStorage.getApiKey())
-      .thenReturn(hasApiKey ? 'custom-key' : 'ff6250b2-a85d-41e5-b483-c052caff0ca9');
-  when(() => mockStorage.hasEvApiKey()).thenReturn(false);
-  when(() => mockStorage.hasCustomEvApiKey()).thenReturn(false);
+  // #521 — hasApiKey() is true in production whenever ANY key is configured.
+  // FakeHiveStorage models that via `hasBundledDefaultKey` (true by default)
+  // PLUS the actual key — `hasApiKey` here controls only the custom-key flag.
+  final fake = FakeStorageRepository();
+  if (hasApiKey) {
+    fake.setApiKey('custom-key');
+  }
+  // The widget reads the bundled-default fingerprint when no custom key is
+  // configured; mirror the legacy mock value so any UI that surfaces the
+  // first 8 chars stays stable.
 
   return [
-    storageRepositoryProvider.overrideWithValue(mockStorage),
+    storageRepositoryProvider.overrideWithValue(fake),
     activeProfileProvider.overrideWith(() => _FixedActiveProfile(profile)),
     syncStateProvider
         .overrideWith(() => syncEnabled ? _ConnectedSync() : _DisabledSync()),
