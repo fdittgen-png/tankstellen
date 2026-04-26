@@ -17,11 +17,12 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_providers.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/widget/providers/nearest_widget_refresh_provider.dart';
 
+import '../../../fakes/fake_hive_storage.dart';
+import '../../../fakes/fake_storage_repository.dart';
 import '../../../mocks/mocks.dart';
 
 void main() {
@@ -60,29 +61,20 @@ void main() {
   });
 
   group('NearestWidgetRefresh provider', () {
-    late MockStorageRepository storage;
+    late _SettingsCountingFake countingStorage;
+    late FakeStorageRepository storage;
     late MockStationService stationService;
     late ProviderContainer container;
 
     setUp(() {
-      storage = MockStorageRepository();
+      countingStorage = _SettingsCountingFake();
+      storage = FakeStorageRepository(inner: countingStorage);
       stationService = MockStationService();
 
-      // Default stubs that keep the tick on the fast empty path:
-      //   - no GPS → builder writes an empty `no_gps` payload and returns.
-      // This is enough to observe the tick without spinning up a full
-      // search service — and it exercises the production NearestWidgetDataBuilder
-      // call path, not a stand-in.
-      when(() => storage.getSetting(any())).thenReturn(null);
-      when(() => storage.getActiveProfileId()).thenReturn(null);
-      when(() => storage.getProfile(any())).thenReturn(null);
-      when(() => storage.getAllProfiles()).thenReturn(const []);
-      when(() => storage.getFavoriteIds()).thenReturn(const []);
-      when(() => storage.getFavoriteStationData(any())).thenReturn(null);
-
-      // searchStations is only invoked when GPS is known; with the
-      // default null user-position settings the builder short-circuits
-      // before reaching the station service, so no stub is needed here.
+      // The default empty fake state already short-circuits the
+      // NearestWidgetDataBuilder on the no-GPS path (no profile, no
+      // favourites, no user-position settings) so the tick path is
+      // exercised end-to-end without needing the station service.
 
       container = ProviderContainer(
         overrides: [
@@ -101,13 +93,14 @@ void main() {
       // Reading the provider runs build() which schedules the periodic
       // timer and unawaited-fires _tick() once. The latter is async, so
       // give the microtask queue a chance to drain.
-      expect(() => container.read(nearestWidgetRefreshProvider), returnsNormally);
+      expect(() => container.read(nearestWidgetRefreshProvider),
+          returnsNormally);
 
       // The immediate tick reads the user-position settings as its first
       // step; counting that call confirms the tick actually ran rather
       // than only being scheduled.
       await Future<void>.delayed(const Duration(milliseconds: 50));
-      verify(() => storage.getSetting(any())).called(greaterThanOrEqualTo(1));
+      expect(countingStorage.getSettingCalls, greaterThanOrEqualTo(1));
     });
 
     test('container.dispose cancels the timer cleanly (no exceptions)',
@@ -122,15 +115,22 @@ void main() {
     });
 
     test('a tick whose storage layer throws does not bubble up', () async {
-      // Make the very first read inside the tick throw. The provider's
+      // Wire a fake whose getSetting throws on every call. The provider's
       // try/catch must swallow it — `unawaited(_tick())` means an
       // un-caught error here would surface as an unhandled async error
       // and fail the test (zone-error).
-      when(() => storage.getSetting(any()))
-          .thenThrow(StateError('storage exploded'));
+      final throwingStorage = FakeStorageRepository(inner: _ThrowingFake());
+
+      final localContainer = ProviderContainer(
+        overrides: [
+          storageRepositoryProvider.overrideWithValue(throwingStorage),
+          stationServiceProvider.overrideWithValue(stationService),
+        ],
+      );
+      addTearDown(localContainer.dispose);
 
       expect(
-        () => container.read(nearestWidgetRefreshProvider),
+        () => localContainer.read(nearestWidgetRefreshProvider),
         returnsNormally,
       );
 
@@ -139,4 +139,25 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 50));
     });
   });
+}
+
+/// Fake variant that counts how many times `getSetting` is called — the
+/// proxy used here for "did the tick fire?".
+class _SettingsCountingFake extends FakeHiveStorage {
+  int getSettingCalls = 0;
+
+  @override
+  dynamic getSetting(String key) {
+    getSettingCalls++;
+    return super.getSetting(key);
+  }
+}
+
+/// Fake variant whose getSetting throws — used to exercise the tick's
+/// outer catch.
+class _ThrowingFake extends FakeHiveStorage {
+  @override
+  dynamic getSetting(String key) {
+    throw StateError('storage exploded');
+  }
 }

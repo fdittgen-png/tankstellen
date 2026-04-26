@@ -1,20 +1,19 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
 import 'package:tankstellen/features/itinerary/providers/itinerary_provider.dart';
 
-import '../../../mocks/mocks.dart';
+import '../../../fakes/fake_hive_storage.dart';
 
 void main() {
   group('ItineraryNotifier', () {
-    late MockHiveStorage mockStorage;
+    late FakeHiveStorage fakeStorage;
     late ProviderContainer container;
 
     setUp(() {
-      mockStorage = MockHiveStorage();
+      fakeStorage = FakeHiveStorage();
     });
 
     tearDown(() {
@@ -22,10 +21,8 @@ void main() {
     });
 
     test('build returns empty list when storage has no itineraries', () {
-      when(() => mockStorage.getItineraries()).thenReturn([]);
-
       container = ProviderContainer(overrides: [
-        hiveStorageProvider.overrideWithValue(mockStorage),
+        hiveStorageProvider.overrideWithValue(fakeStorage),
         syncStateProvider.overrideWith(() => _DisabledSync()),
       ]);
 
@@ -33,8 +30,8 @@ void main() {
       expect(itineraries, isEmpty);
     });
 
-    test('build returns itineraries from storage', () {
-      when(() => mockStorage.getItineraries()).thenReturn([
+    test('build returns itineraries from storage', () async {
+      await fakeStorage.saveItineraries([
         {
           'id': 'route-1',
           'name': 'Test Route',
@@ -52,7 +49,7 @@ void main() {
       ]);
 
       container = ProviderContainer(overrides: [
-        hiveStorageProvider.overrideWithValue(mockStorage),
+        hiveStorageProvider.overrideWithValue(fakeStorage),
         syncStateProvider.overrideWith(() => _DisabledSync()),
       ]);
 
@@ -63,10 +60,13 @@ void main() {
     });
 
     test('build handles malformed storage data gracefully', () {
-      when(() => mockStorage.getItineraries()).thenThrow(Exception('corrupt'));
+      // Use a fake variant whose getItineraries throws to exercise the
+      // catch-and-fall-back path. The previous mocktail spec used
+      // thenThrow; here we extend the fake to model the same condition.
+      final throwingStorage = _ThrowingItineraryFake();
 
       container = ProviderContainer(overrides: [
-        hiveStorageProvider.overrideWithValue(mockStorage),
+        hiveStorageProvider.overrideWithValue(throwingStorage),
         syncStateProvider.overrideWith(() => _DisabledSync()),
       ]);
 
@@ -79,4 +79,11 @@ void main() {
 class _DisabledSync extends SyncState {
   @override
   SyncConfig build() => const SyncConfig();
+}
+
+class _ThrowingItineraryFake extends FakeHiveStorage {
+  @override
+  List<Map<String, dynamic>> getItineraries() {
+    throw Exception('corrupt');
+  }
 }

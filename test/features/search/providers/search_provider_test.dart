@@ -15,6 +15,7 @@ import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/ev_search_provider.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 
+import '../../../fakes/fake_hive_storage.dart';
 import '../../../mocks/mocks.dart';
 
 class MockGeocodingChain extends Mock implements GeocodingChain {}
@@ -68,15 +69,14 @@ class _FakeEVSearchState extends EVSearchState {
 }
 
 void main() {
-  late MockHiveStorage mockStorage;
+  late FakeHiveStorage fakeStorage;
   late MockStationService mockStationService;
   late MockGeocodingChain mockGeocoding;
 
   setUp(() {
-    mockStorage = MockHiveStorage();
+    fakeStorage = FakeHiveStorage();
     mockStationService = MockStationService();
     mockGeocoding = MockGeocodingChain();
-    when(() => mockStorage.getSetting(any())).thenReturn(null);
 
     registerFallbackValue(const SearchParams(
       lat: 0,
@@ -89,7 +89,7 @@ void main() {
 
   ProviderContainer createContainer() {
     final c = ProviderContainer(overrides: [
-      hiveStorageProvider.overrideWithValue(mockStorage),
+      hiveStorageProvider.overrideWithValue(fakeStorage),
       stationServiceProvider.overrideWithValue(mockStationService),
       geocodingChainProvider.overrideWithValue(mockGeocoding),
       userPositionProvider.overrideWith(() => _NullUserPosition()),
@@ -102,7 +102,7 @@ void main() {
   (ProviderContainer, _FakeEVSearchState) createContainerWithEv() {
     final fakeEv = _FakeEVSearchState();
     final c = ProviderContainer(overrides: [
-      hiveStorageProvider.overrideWithValue(mockStorage),
+      hiveStorageProvider.overrideWithValue(fakeStorage),
       stationServiceProvider.overrideWithValue(mockStationService),
       geocodingChainProvider.overrideWithValue(mockGeocoding),
       userPositionProvider.overrideWith(() => _NullUserPosition()),
@@ -456,7 +456,7 @@ void main() {
               ));
 
       final container = ProviderContainer(overrides: [
-        hiveStorageProvider.overrideWithValue(mockStorage),
+        hiveStorageProvider.overrideWithValue(fakeStorage),
         stationServiceProvider.overrideWithValue(mockStationService),
         geocodingChainProvider.overrideWithValue(mockGeocoding),
         userPositionProvider.overrideWith(() => _FixedUserPosition(
@@ -579,7 +579,7 @@ void main() {
 
       // Create container with user position set
       final container = ProviderContainer(overrides: [
-        hiveStorageProvider.overrideWithValue(mockStorage),
+        hiveStorageProvider.overrideWithValue(fakeStorage),
         stationServiceProvider.overrideWithValue(mockStationService),
         geocodingChainProvider.overrideWithValue(mockGeocoding),
         userPositionProvider.overrideWith(() => _FixedUserPosition(

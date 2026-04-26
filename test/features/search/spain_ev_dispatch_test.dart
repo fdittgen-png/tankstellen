@@ -1,12 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/search/providers/ev_search_provider.dart';
 
-import '../../mocks/mocks.dart';
+import '../../fakes/fake_hive_storage.dart';
 
 /// #697 — Spain EV search dispatch regression guard.
 ///
@@ -23,15 +22,11 @@ void main() {
   test(
     'ES active country dispatches EV search with an API key set',
     () async {
-      final mock = MockHiveStorage();
-      when(() => mock.getEvApiKey()).thenReturn('test-key-abc');
-      when(() => mock.getSetting(any())).thenReturn(null);
-      when(() => mock.getActiveProfileId()).thenReturn(null);
-      when(() => mock.getProfile(any())).thenReturn(null);
-      when(() => mock.hasApiKey()).thenReturn(false);
+      final fake = FakeHiveStorage()..hasBundledDefaultKey = false;
+      await fake.setEvApiKey('test-key-abc');
 
       final container = ProviderContainer(overrides: [
-        hiveStorageProvider.overrideWithValue(mock),
+        hiveStorageProvider.overrideWithValue(fake),
         // Force the active country to Spain so the dispatcher uses ES.
         activeCountryProvider.overrideWith(() => _FixedActiveCountry()),
       ]);
