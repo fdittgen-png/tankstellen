@@ -9,7 +9,8 @@ import 'package:flutter_test/flutter_test.dart';
 /// E-Control (AT), MITECO (ES), MIMIT (IT), OK + Shell (DK), Argentina
 /// Energía, and Nominatim — real endpoints, hence the `network` tag.
 ///
-/// Rerun after any change under `lib/core/services/impl/*_station_service.dart`
+/// Rerun after any change under
+/// `lib/features/station_services/<country>/*_station_service.dart`
 /// or before tagging a release. CI excludes the tag (intermittent upstream
 /// timeouts cannot block PRs); see `docs/guides/NETWORK_TESTS.md`.
 ///

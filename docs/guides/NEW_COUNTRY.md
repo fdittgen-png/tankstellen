@@ -17,7 +17,7 @@ Since #1111 the per-country touchpoints are consolidated onto a single
 
 ### 1. Create the Station Service
 
-**File (NEW):** `lib/core/services/impl/<country>_station_service.dart`
+**File (NEW):** `lib/features/station_services/<country>/<country>_station_service.dart`
 
 This is the core implementation. It must implement `StationService` and handle
 fetching + parsing station data from the country's API.
@@ -211,7 +211,7 @@ top-level lookup helpers; they delegate to `CountryServiceRegistry`.
 
 ### 6. Write tests
 
-**Required:** `test/core/services/impl/<country>_station_service_test.dart`
+**Required:** `test/features/station_services/<country>/<country>_station_service_test.dart`
 
 Test at minimum:
 
@@ -222,7 +222,7 @@ Test at minimum:
 - Station ID prefixing
 
 Use fakes, not mocks. Follow patterns in existing tests under
-`test/core/services/impl/`.
+`test/features/station_services/`.
 
 ### 7. Run checks
 
@@ -235,11 +235,11 @@ flutter test       # full suite must pass
 
 | File | Action | Required |
 |------|--------|----------|
-| `lib/core/services/impl/<country>_station_service.dart` | Create | Yes |
+| `lib/features/station_services/<country>/<country>_station_service.dart` | Create | Yes |
 | `lib/core/services/service_result.dart` | Add `ServiceSource` enum value | Yes |
 | `lib/core/services/country_service_registry.dart` | Append `CountryServiceEntry` + factory fn | Yes |
 | `lib/core/country/country_config.dart` | Append `CountryConfig` + update `Countries.all` list | Yes |
-| `test/core/services/impl/<country>_station_service_test.dart` | Create | Yes |
+| `test/features/station_services/<country>/<country>_station_service_test.dart` | Create | Yes |
 | `lib/l10n/app_*.arb` | Localized strings | Optional |
 
 Compared to the pre-#1111 layout you no longer touch

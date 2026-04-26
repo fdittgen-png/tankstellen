@@ -153,7 +153,7 @@ flutter build apk --release
 
 ### Adding a New Country
 
-The app is designed to be easily extensible. Each country has its own service implementation behind the `StationService` interface. See `lib/core/services/impl/` for examples.
+The app is designed to be easily extensible. Each country has its own service implementation behind the `StationService` interface. See `lib/features/station_services/` for examples.
 
 ## Tech Stack
 

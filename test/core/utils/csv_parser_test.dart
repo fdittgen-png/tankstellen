@@ -145,7 +145,7 @@ void main() {
   group('CsvParser adoption regression', () {
     test('Argentina service uses CsvParser instead of inline parser', () {
       final source = File(
-        'lib/core/services/impl/argentina_station_service.dart',
+        'lib/features/station_services/argentina/argentina_station_service.dart',
       ).readAsStringSync();
 
       expect(
@@ -162,7 +162,7 @@ void main() {
 
     test('Argentina CSV parsing runs in compute() isolate', () {
       final source = File(
-        'lib/core/services/impl/argentina_station_service.dart',
+        'lib/features/station_services/argentina/argentina_station_service.dart',
       ).readAsStringSync();
 
       expect(
@@ -174,7 +174,7 @@ void main() {
 
     test('MISE service uses CsvParser instead of inline parser', () {
       final source = File(
-        'lib/core/services/impl/mise_station_service.dart',
+        'lib/features/station_services/italy/mise_station_service.dart',
       ).readAsStringSync();
 
       expect(
@@ -191,10 +191,10 @@ void main() {
 
     test('both services import csv_parser.dart', () {
       final argSource = File(
-        'lib/core/services/impl/argentina_station_service.dart',
+        'lib/features/station_services/argentina/argentina_station_service.dart',
       ).readAsStringSync();
       final miseSource = File(
-        'lib/core/services/impl/mise_station_service.dart',
+        'lib/features/station_services/italy/mise_station_service.dart',
       ).readAsStringSync();
 
       expect(argSource, contains('csv_parser.dart'));

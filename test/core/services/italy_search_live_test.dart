@@ -2,7 +2,7 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/core/services/impl/mise_station_service.dart';
+import 'package:tankstellen/features/station_services/italy/mise_station_service.dart';
 import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 

@@ -8,18 +8,18 @@ void main() {
     /// call throwApiException in their searchStations catch blocks instead
     /// of manually constructing and throwing ApiException.
     final serviceFiles = [
-      'lib/core/services/impl/tankerkoenig_station_service.dart',
-      'lib/core/services/impl/argentina_station_service.dart',
-      'lib/core/services/impl/mise_station_service.dart',
-      'lib/core/services/impl/econtrol_station_service.dart',
-      'lib/core/services/impl/miteco_station_service.dart',
-      'lib/core/services/impl/denmark_station_service.dart',
+      'lib/features/station_services/germany/tankerkoenig_station_service.dart',
+      'lib/features/station_services/argentina/argentina_station_service.dart',
+      'lib/features/station_services/italy/mise_station_service.dart',
+      'lib/features/station_services/austria/econtrol_station_service.dart',
+      'lib/features/station_services/spain/miteco_station_service.dart',
+      'lib/features/station_services/denmark/denmark_station_service.dart',
       // UK service intentionally omitted: it fans out to many retailer
       // feeds and isolates DioException per-feed instead of bubbling
       // through a single `throwApiException` at the top level.
-      'lib/core/services/impl/australia_station_service.dart',
-      'lib/core/services/impl/mexico_station_service.dart',
-      'lib/core/services/impl/portugal_station_service.dart',
+      'lib/features/station_services/australia/australia_station_service.dart',
+      'lib/features/station_services/mexico/mexico_station_service.dart',
+      'lib/features/station_services/portugal/portugal_station_service.dart',
     ];
 
     for (final path in serviceFiles) {
