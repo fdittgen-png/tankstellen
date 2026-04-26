@@ -3609,6 +3609,48 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dunkle Hintergründe — augenschonend bei Nacht und stromsparend auf OLED-Displays.';
 
   @override
+  String get throttleRpmHistogramTitle => 'So hast du den Motor genutzt';
+
+  @override
+  String get throttleRpmHistogramThrottleSection => 'Gaspedalstellung';
+
+  @override
+  String get throttleRpmHistogramRpmSection => 'Motordrehzahl';
+
+  @override
+  String get throttleRpmHistogramThrottleCoast => 'Rollen (0–25 %)';
+
+  @override
+  String get throttleRpmHistogramThrottleLight => 'Leicht (25–50 %)';
+
+  @override
+  String get throttleRpmHistogramThrottleFirm => 'Fest (50–75 %)';
+
+  @override
+  String get throttleRpmHistogramThrottleWide => 'Vollgas (75–100 %)';
+
+  @override
+  String get throttleRpmHistogramRpmIdle => 'Leerlauf (≤900)';
+
+  @override
+  String get throttleRpmHistogramRpmCruise => 'Konstant (901–2000)';
+
+  @override
+  String get throttleRpmHistogramRpmSpirited => 'Sportlich (2001–3000)';
+
+  @override
+  String get throttleRpmHistogramRpmHard => 'Hart (>3000)';
+
+  @override
+  String get throttleRpmHistogramEmpty =>
+      'Keine Drehzahl- oder Gaspedaldaten in dieser Fahrt.';
+
+  @override
+  String throttleRpmHistogramBarShare(String pct) {
+    return '$pct %';
+  }
+
+  @override
   String get trajetsTabLabel => 'Fahrten';
 
   @override

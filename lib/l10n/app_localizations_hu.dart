@@ -3581,6 +3581,48 @@ class AppLocalizationsHu extends AppLocalizations {
       'Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.';
 
   @override
+  String get throttleRpmHistogramTitle => 'How you used the engine';
+
+  @override
+  String get throttleRpmHistogramThrottleSection => 'Throttle position';
+
+  @override
+  String get throttleRpmHistogramRpmSection => 'Engine RPM';
+
+  @override
+  String get throttleRpmHistogramThrottleCoast => 'Coast (0–25%)';
+
+  @override
+  String get throttleRpmHistogramThrottleLight => 'Light (25–50%)';
+
+  @override
+  String get throttleRpmHistogramThrottleFirm => 'Firm (50–75%)';
+
+  @override
+  String get throttleRpmHistogramThrottleWide => 'Wide-open (75–100%)';
+
+  @override
+  String get throttleRpmHistogramRpmIdle => 'Idle (≤900)';
+
+  @override
+  String get throttleRpmHistogramRpmCruise => 'Cruise (901–2000)';
+
+  @override
+  String get throttleRpmHistogramRpmSpirited => 'Spirited (2001–3000)';
+
+  @override
+  String get throttleRpmHistogramRpmHard => 'Hard (>3000)';
+
+  @override
+  String get throttleRpmHistogramEmpty =>
+      'No throttle or RPM samples in this trip.';
+
+  @override
+  String throttleRpmHistogramBarShare(String pct) {
+    return '$pct%';
+  }
+
+  @override
   String get trajetsTabLabel => 'Trips';
 
   @override

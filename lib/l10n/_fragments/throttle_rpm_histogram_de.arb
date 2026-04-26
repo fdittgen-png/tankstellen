@@ -1,0 +1,15 @@
+{
+  "throttleRpmHistogramTitle": "So hast du den Motor genutzt",
+  "throttleRpmHistogramThrottleSection": "Gaspedalstellung",
+  "throttleRpmHistogramRpmSection": "Motordrehzahl",
+  "throttleRpmHistogramThrottleCoast": "Rollen (0–25 %)",
+  "throttleRpmHistogramThrottleLight": "Leicht (25–50 %)",
+  "throttleRpmHistogramThrottleFirm": "Fest (50–75 %)",
+  "throttleRpmHistogramThrottleWide": "Vollgas (75–100 %)",
+  "throttleRpmHistogramRpmIdle": "Leerlauf (≤900)",
+  "throttleRpmHistogramRpmCruise": "Konstant (901–2000)",
+  "throttleRpmHistogramRpmSpirited": "Sportlich (2001–3000)",
+  "throttleRpmHistogramRpmHard": "Hart (>3000)",
+  "throttleRpmHistogramEmpty": "Keine Drehzahl- oder Gaspedaldaten in dieser Fahrt.",
+  "throttleRpmHistogramBarShare": "{pct} %"
+}

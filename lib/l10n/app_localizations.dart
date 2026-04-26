@@ -6686,6 +6686,84 @@ abstract class AppLocalizations {
   /// **'Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.'**
   String get themeSettingsDarkDescription;
 
+  /// Title of the throttle / RPM histogram card on the Trip detail screen — surfaces the share of time the driver spent at each throttle quartile and RPM band (#1041 phase 3a).
+  ///
+  /// In en, this message translates to:
+  /// **'How you used the engine'**
+  String get throttleRpmHistogramTitle;
+
+  /// Section label above the throttle-quartile bar group on the throttle/RPM histogram card (#1041 phase 3a).
+  ///
+  /// In en, this message translates to:
+  /// **'Throttle position'**
+  String get throttleRpmHistogramThrottleSection;
+
+  /// Section label above the RPM-band bar group on the throttle/RPM histogram card (#1041 phase 3a).
+  ///
+  /// In en, this message translates to:
+  /// **'Engine RPM'**
+  String get throttleRpmHistogramRpmSection;
+
+  /// Bottom-quartile throttle label (closed throttle / coasting) on the throttle/RPM histogram card (#1041 phase 3a).
+  ///
+  /// In en, this message translates to:
+  /// **'Coast (0–25%)'**
+  String get throttleRpmHistogramThrottleCoast;
+
+  /// Second-quartile throttle label (light cruise) on the throttle/RPM histogram card (#1041 phase 3a).
+  ///
+  /// In en, this message translates to:
+  /// **'Light (25–50%)'**
+  String get throttleRpmHistogramThrottleLight;
+
+  /// Third-quartile throttle label (firm pedal) on the throttle/RPM histogram card (#1041 phase 3a).
+  ///
+  /// In en, this message translates to:
+  /// **'Firm (50–75%)'**
+  String get throttleRpmHistogramThrottleFirm;
+
+  /// Top-quartile throttle label (wide-open / kick-down) on the throttle/RPM histogram card (#1041 phase 3a).
+  ///
+  /// In en, this message translates to:
+  /// **'Wide-open (75–100%)'**
+  String get throttleRpmHistogramThrottleWide;
+
+  /// Idle RPM band label (≤900 RPM) on the throttle/RPM histogram card (#1041 phase 3a).
+  ///
+  /// In en, this message translates to:
+  /// **'Idle (≤900)'**
+  String get throttleRpmHistogramRpmIdle;
+
+  /// Cruise RPM band label (901–2000 RPM) on the throttle/RPM histogram card (#1041 phase 3a).
+  ///
+  /// In en, this message translates to:
+  /// **'Cruise (901–2000)'**
+  String get throttleRpmHistogramRpmCruise;
+
+  /// Spirited RPM band label (2001–3000 RPM) on the throttle/RPM histogram card (#1041 phase 3a).
+  ///
+  /// In en, this message translates to:
+  /// **'Spirited (2001–3000)'**
+  String get throttleRpmHistogramRpmSpirited;
+
+  /// Hard RPM band label (>3000 RPM) on the throttle/RPM histogram card (#1041 phase 3a). Cutoff aligns with the 'Engine over 3000 RPM' driving-insight on the same screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard (>3000)'**
+  String get throttleRpmHistogramRpmHard;
+
+  /// Empty-state caption inside the throttle/RPM histogram card when neither axis has any time-share to show — typically a legacy trip recorded before the throttle PID was added to the polling rotation (#1041 phase 3a).
+  ///
+  /// In en, this message translates to:
+  /// **'No throttle or RPM samples in this trip.'**
+  String get throttleRpmHistogramEmpty;
+
+  /// Trailing time-share label on each histogram bar — whole-number percent (e.g. '12%') on the throttle/RPM histogram card (#1041 phase 3a).
+  ///
+  /// In en, this message translates to:
+  /// **'{pct}%'**
+  String throttleRpmHistogramBarShare(String pct);
+
   /// Label for the Trips tab on the ConsumptionScreen (#889). Sits between Fuel and Charging.
   ///
   /// In en, this message translates to:
