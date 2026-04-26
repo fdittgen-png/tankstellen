@@ -213,7 +213,7 @@ Future<List<ChargingStation>> evStations(
       radiusKm: viewport.radiusKm,
     );
     await repo.saveAll(stations);
-  } catch (e) {
+  } catch (e, st) { // ignore: unused_catch_stack
     // Fall back to whatever we have cached if the service fails.
     stations = repo.getAll();
   }

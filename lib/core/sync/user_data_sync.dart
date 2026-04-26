@@ -54,8 +54,8 @@ class UserDataSync {
         'reports': reports,
         'itineraries': itineraries,
       };
-    } catch (e) {
-      debugPrint('UserDataSync.fetchAll FAILED: $e');
+    } catch (e, st) {
+      debugPrint('UserDataSync.fetchAll FAILED: $e\n$st');
       return {'error': e.toString()};
     }
   }

@@ -76,7 +76,7 @@ class Favorites extends _$Favorites {
         StationService? stationService;
         try {
           stationService = ref.read(stationServiceProvider);
-        } catch (e) {
+        } catch (e, st) { // ignore: unused_catch_stack
           debugPrint(
             'Favorites._refreshWidget: stationService unavailable, '
             'falling back to legacy nearest update: $e',
@@ -88,8 +88,8 @@ class Favorites extends _$Favorites {
           profileStorage: storage,
           stationService: stationService,
         );
-      } catch (e) {
-        debugPrint('Favorites._refreshWidget: $e');
+      } catch (e, st) {
+        debugPrint('Favorites._refreshWidget: $e\n$st');
       }
     }());
   }
@@ -184,13 +184,13 @@ class Favorites extends _$Favorites {
 
       try {
         await ref.read(stationRatingsProvider.notifier).remove(stationId);
-      } catch (e) {
-        debugPrint('Cleanup: $e');
+      } catch (e, st) {
+        debugPrint('Cleanup: $e\n$st');
       }
       try {
         await storage.clearPriceHistoryForStation(stationId);
-      } catch (e) {
-        debugPrint('Cleanup: $e');
+      } catch (e, st) {
+        debugPrint('Cleanup: $e\n$st');
       }
 
       await SyncHelper.fireAndForget(

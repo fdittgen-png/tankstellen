@@ -70,8 +70,8 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
     Obd2Service? service;
     try {
       service = await connector.connect(context);
-    } catch (e) {
-      debugPrint('OnboardingObd2Step: connect threw $e');
+    } catch (e, st) {
+      debugPrint('OnboardingObd2Step: connect threw $e\n$st');
       service = null;
     }
 
@@ -99,8 +99,8 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
     String? vin;
     try {
       vin = await connector.readVin(service);
-    } catch (e) {
-      debugPrint('OnboardingObd2Step: readVin threw $e');
+    } catch (e, st) {
+      debugPrint('OnboardingObd2Step: readVin threw $e\n$st');
       vin = null;
     }
 
@@ -125,8 +125,8 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
     VinData? decoded;
     try {
       decoded = await ref.read(decodedVinProvider(vin).future);
-    } catch (e) {
-      debugPrint('OnboardingObd2Step: VIN decode failed: $e');
+    } catch (e, st) {
+      debugPrint('OnboardingObd2Step: VIN decode failed: $e\n$st');
       decoded = null;
     }
 
@@ -168,8 +168,8 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
     // entirely.
     try {
       await _saveDecodedProfile(decoded);
-    } catch (e) {
-      debugPrint('OnboardingObd2Step: save decoded profile failed: $e');
+    } catch (e, st) {
+      debugPrint('OnboardingObd2Step: save decoded profile failed: $e\n$st');
     }
     if (!mounted) return;
     widget.onAutoFillSuccess();

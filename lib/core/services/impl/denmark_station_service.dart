@@ -48,8 +48,8 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
       sortStations(stations, params);
 
       return wrapStations(stations, ServiceSource.denmarkApi);
-    } on DioException catch (e) {
-      throwApiException(e, defaultMessage: 'Netværksfejl');
+    } on DioException catch (e, st) {
+      throwApiException(e, defaultMessage: 'Netværksfejl', stackTrace: st);
     }
   }
 
@@ -118,8 +118,8 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           updatedAt: _formatIsoTime(r['last_updated_time']?.toString()),
         );
       }).whereType<Station>().toList();
-    } on DioException catch (e) {
-      debugPrint('DK OK fetch failed: $e');
+    } on DioException catch (e, st) {
+      debugPrint('DK OK fetch failed: $e\n$st');
       return [];
     }
   }
@@ -170,8 +170,8 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           ),
         );
       }).whereType<Station>().toList();
-    } on DioException catch (e) {
-      debugPrint('DK Shell fetch failed: $e');
+    } on DioException catch (e, st) {
+      debugPrint('DK Shell fetch failed: $e\n$st');
       return [];
     }
   }
@@ -191,8 +191,8 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           '${dt.month.toString().padLeft(2, '0')} '
           '${dt.hour.toString().padLeft(2, '0')}:'
           '${dt.minute.toString().padLeft(2, '0')}';
-    } on FormatException catch (e) {
-      debugPrint('DK date parse failed: $e');
+    } on FormatException catch (e, st) {
+      debugPrint('DK date parse failed: $e\n$st');
       return null;
     }
   }

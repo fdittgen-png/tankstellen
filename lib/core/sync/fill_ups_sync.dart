@@ -71,8 +71,8 @@ class FillUpsSync {
         if (data is Map<String, dynamic>) {
           try {
             return FillUp.fromJson(data);
-          } catch (e) {
-            debugPrint('FillUpsSync.merge decode failed: $e');
+          } catch (e, st) {
+            debugPrint('FillUpsSync.merge decode failed: $e\n$st');
             return null;
           }
         }
@@ -80,8 +80,8 @@ class FillUpsSync {
       }).whereType<FillUp>().toList();
 
       return [...localFillUps, ...downloaded];
-    } catch (e) {
-      debugPrint('FillUpsSync.merge FAILED: $e');
+    } catch (e, st) {
+      debugPrint('FillUpsSync.merge FAILED: $e\n$st');
       return localFillUps;
     }
   }
@@ -98,8 +98,8 @@ class FillUpsSync {
           .delete()
           .eq('user_id', userId)
           .eq('id', fillUpId);
-    } catch (e) {
-      debugPrint('FillUpsSync.delete FAILED: $e');
+    } catch (e, st) {
+      debugPrint('FillUpsSync.delete FAILED: $e\n$st');
     }
   }
 }

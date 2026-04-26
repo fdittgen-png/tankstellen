@@ -144,8 +144,8 @@ class GreeceStationService
           fromLng: params.lng,
         );
         if (s != null) stations.add(s);
-      } on DioException catch (e) {
-        debugPrint('GR daily fetch failed for ${pref.apiName}: $e');
+      } on DioException catch (e, st) {
+        debugPrint('GR daily fetch failed for ${pref.apiName}: $e\n$st');
         final status = e.response?.statusCode;
         if (status == 401 || status == 403) {
           // The community API is free and anonymous — a 401/403 means
@@ -162,8 +162,8 @@ class GreeceStationService
           statusCode: status,
           occurredAt: DateTime.now(),
         ));
-      } catch (e) {
-        debugPrint('GR daily fetch unexpected error for ${pref.apiName}: $e');
+      } catch (e, st) {
+        debugPrint('GR daily fetch unexpected error for ${pref.apiName}: $e\n$st');
         errors.add(ServiceError(
           source: ServiceSource.greeceApi,
           message: 'parse ${pref.apiName}: $e',

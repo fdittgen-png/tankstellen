@@ -105,7 +105,7 @@ class HiveBoxes {
       await oldBox.close();
       await Hive.deleteBoxFromDisk('${boxName}_migration_check');
       oldBox = await Hive.openBox(boxName);
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       debugPrint('Hive migration: $boxName already encrypted or empty');
       return;
     }
@@ -134,7 +134,7 @@ class HiveBoxes {
       try {
         final box = await Hive.openBox(boxName, encryptionCipher: cipher);
         await box.close();
-      } catch (e) {
+      } catch (e, st) { // ignore: unused_catch_stack
         debugPrint('Hive: migrating $boxName to encrypted storage');
         await _migrateToEncrypted(boxName, cipher);
       }
@@ -200,8 +200,8 @@ class HiveBoxes {
         if (Hive.isBoxOpen(name)) {
           await Hive.box(name).close();
         }
-      } catch (e) {
-        debugPrint('HiveBoxes: failed to close box "$name": $e');
+      } catch (e, st) {
+        debugPrint('HiveBoxes: failed to close box "$name": $e\n$st');
       }
     }
   }

@@ -39,8 +39,8 @@ class PriceHistorySync {
           .gte('recorded_at', cutoff)
           .order('recorded_at', ascending: true);
       return List<Map<String, dynamic>>.from(rows);
-    } catch (e) {
-      debugPrint('PriceHistorySync.fetch FAILED: $e');
+    } catch (e, st) {
+      debugPrint('PriceHistorySync.fetch FAILED: $e\n$st');
       return [];
     }
   }

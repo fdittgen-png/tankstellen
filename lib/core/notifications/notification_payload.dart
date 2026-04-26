@@ -75,8 +75,8 @@ class NotificationPayload {
         stationId: stationId,
         country: country,
       );
-    } catch (e) {
-      debugPrint('NotificationPayload.tryDecode failed: $e');
+    } catch (e, st) {
+      debugPrint('NotificationPayload.tryDecode failed: $e\n$st');
       return null;
     }
   }

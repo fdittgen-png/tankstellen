@@ -175,7 +175,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               if (state.hasValue && state.value!.data.isNotEmpty) {
                 unawaited(_performGpsSearch());
               }
-            } catch (e) {
+            } catch (e, st) { // ignore: unused_catch_stack
               if (!context.mounted) return;
               SnackBarHelper.showError(context, e.toString());
             }

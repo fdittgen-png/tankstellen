@@ -32,8 +32,8 @@ class ServiceReminderRepository {
       try {
         final map = jsonDecode(raw) as Map<String, dynamic>;
         result.add(ServiceReminder.fromJson(map));
-      } catch (e) {
-        debugPrint('ServiceReminderRepository: skipping "$key": $e');
+      } catch (e, st) {
+        debugPrint('ServiceReminderRepository: skipping "$key": $e\n$st');
       }
     }
     return result;
@@ -50,8 +50,8 @@ class ServiceReminderRepository {
     try {
       final map = jsonDecode(raw) as Map<String, dynamic>;
       return ServiceReminder.fromJson(map);
-    } catch (e) {
-      debugPrint('ServiceReminderRepository: failed to decode "$id": $e');
+    } catch (e, st) {
+      debugPrint('ServiceReminderRepository: failed to decode "$id": $e\n$st');
       return null;
     }
   }

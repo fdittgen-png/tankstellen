@@ -45,10 +45,10 @@ class _HelpBannerState extends ConsumerState<HelpBanner> {
       if (shown != true && mounted) {
         setState(() => _visible = true);
       }
-    } catch (e) {
+    } catch (e, st) {
       // Widget tests without an initialized settings box — keep the
       // banner hidden rather than crashing.
-      debugPrint('HelpBanner: cannot read shown flag: $e');
+      debugPrint('HelpBanner: cannot read shown flag: $e\n$st');
     }
   }
 
@@ -56,8 +56,8 @@ class _HelpBannerState extends ConsumerState<HelpBanner> {
     try {
       final settings = ref.read(settingsStorageProvider);
       await settings.putSetting(widget.storageKey, true);
-    } catch (e) {
-      debugPrint('HelpBanner: cannot persist dismiss: $e');
+    } catch (e, st) {
+      debugPrint('HelpBanner: cannot persist dismiss: $e\n$st');
     }
     if (mounted) {
       setState(() => _visible = false);

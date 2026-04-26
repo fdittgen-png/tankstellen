@@ -41,7 +41,7 @@ class NativeGeocodingProvider implements GeocodingProvider {
       }
       final location = locations.first;
       return (lat: location.latitude, lng: location.longitude);
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       if (e is LocationException) rethrow;
       throw LocationException(
         message: 'Geräte-Geocodierung fehlgeschlagen: $e',
@@ -59,8 +59,8 @@ class NativeGeocodingProvider implements GeocodingProvider {
       final placemarks = await geo.placemarkFromCoordinates(lat, lng);
       if (placemarks.isEmpty) return null;
       return placemarks.first.isoCountryCode;
-    } on Exception catch (e) {
-      debugPrint('Native country detection failed: $e');
+    } on Exception catch (e, st) {
+      debugPrint('Native country detection failed: $e\n$st');
       return null;
     }
   }
@@ -77,8 +77,8 @@ class NativeGeocodingProvider implements GeocodingProvider {
       return [place.postalCode, place.locality]
           .where((s) => s != null && s.isNotEmpty)
           .join(' ');
-    } on Exception catch (e) {
-      debugPrint('Native reverse geocoding failed: $e');
+    } on Exception catch (e, st) {
+      debugPrint('Native reverse geocoding failed: $e\n$st');
       return '$lat, $lng';
     }
   }

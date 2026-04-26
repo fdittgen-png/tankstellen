@@ -78,8 +78,8 @@ class ClassicElmChannel implements ElmByteChannel {
     _subscription = null;
     try {
       await _plugin.disconnect();
-    } catch (e) {
-      debugPrint('ClassicElmChannel: disconnect error (ignored): $e');
+    } catch (e, st) {
+      debugPrint('ClassicElmChannel: disconnect error (ignored): $e\n$st');
     }
     await _incoming.close();
   }

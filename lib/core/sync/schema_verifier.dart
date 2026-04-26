@@ -41,7 +41,7 @@ class SchemaVerifier {
       try {
         await client.from(table).select('*').limit(0);
         result[table] = true;
-      } catch (e) { debugPrint('SchemaVerifier: table check failed: $e');
+      } catch (e, st) { debugPrint('SchemaVerifier: table check failed: $e\n$st');
         result[table] = false;
       }
     }

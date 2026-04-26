@@ -51,8 +51,8 @@ class PluginClassicBluetoothFacade implements ClassicBluetoothFacade {
                 rssi: 0,
               ))
           .toList();
-    } on Exception catch (e) {
-      debugPrint('PluginClassicBluetoothFacade: bondedDevices failed: $e');
+    } on Exception catch (e, st) {
+      debugPrint('PluginClassicBluetoothFacade: bondedDevices failed: $e\n$st');
     }
   }
 

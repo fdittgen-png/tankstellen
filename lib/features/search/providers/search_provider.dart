@@ -63,8 +63,8 @@ class SearchState extends _$SearchState {
     if (ref.read(activeProfileProvider)?.autoUpdatePosition != true) return;
     try {
       await ref.read(userPositionProvider.notifier).updateFromGps();
-    } on Exception catch (e) {
-      debugPrint('GPS auto-update failed: $e');
+    } on Exception catch (e, st) {
+      debugPrint('GPS auto-update failed: $e\n$st');
     }
   }
 
@@ -74,11 +74,11 @@ class SearchState extends _$SearchState {
     final cancelToken = _newCancelToken();
     try {
       await search(cancelToken);
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
       if (e.type == DioExceptionType.cancel) return;
-      state = AsyncValue.error(e, StackTrace.current);
-    } on ServiceChainExhaustedException catch (e) {
-      state = AsyncValue.error(e, StackTrace.current);
+      state = AsyncValue.error(e, st);
+    } on ServiceChainExhaustedException catch (e, st) {
+      state = AsyncValue.error(e, st);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -150,8 +150,8 @@ class SearchState extends _$SearchState {
                 );
         resolvedPostalCode = extractPostalCode(addrResult.data);
         ref.read(searchLocationProvider.notifier).set(addrResult.data);
-      } on Exception catch (e) {
-        debugPrint('Reverse geocoding failed: $e');
+      } on Exception catch (e, st) {
+        debugPrint('Reverse geocoding failed: $e\n$st');
       }
 
       final params = SearchParams(
@@ -204,8 +204,8 @@ class SearchState extends _$SearchState {
           cancelToken: cancelToken,
         );
         cityName = addrResult.data;
-      } on Exception catch (e) {
-        debugPrint('ZIP reverse geocoding failed: $e');
+      } on Exception catch (e, st) {
+        debugPrint('ZIP reverse geocoding failed: $e\n$st');
       }
 
       final locationLabel = '$zipCode ${cityName ?? ''}'.trim();

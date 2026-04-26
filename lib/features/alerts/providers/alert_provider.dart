@@ -68,8 +68,8 @@ class AlertNotifier extends _$AlertNotifier {
       } else {
         await BackgroundService.cancelAll();
       }
-    } catch (e) {
-      debugPrint('AlertNotifier: background task reconcile failed: $e');
+    } catch (e, st) {
+      debugPrint('AlertNotifier: background task reconcile failed: $e\n$st');
     }
   }
 
@@ -82,8 +82,8 @@ class AlertNotifier extends _$AlertNotifier {
       if (syncState.enabled) {
         await AlertsSync.merge(state);
       }
-    } catch (e) {
-      debugPrint('AlertProvider: sync failed: $e');
+    } catch (e, st) {
+      debugPrint('AlertProvider: sync failed: $e\n$st');
     }
   }
 

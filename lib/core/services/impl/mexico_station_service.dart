@@ -89,8 +89,8 @@ class MexicoStationService
         source: ServiceSource.mexicoApi,
         fetchedAt: DateTime.now(),
       );
-    } on DioException catch (e) {
-      throwApiException(e, defaultMessage: 'CRE API error');
+    } on DioException catch (e, st) {
+      throwApiException(e, defaultMessage: 'CRE API error', stackTrace: st);
     }
   }
 
@@ -183,8 +183,8 @@ class MexicoStationService
         );
         if (x == null || y == null) continue;
         out[id] = _CrePlace(name: name, lat: y, lng: x);
-      } catch (e) {
-        debugPrint('CRE place parse failed: $e');
+      } catch (e, st) {
+        debugPrint('CRE place parse failed: $e\n$st');
         continue;
       }
     }
@@ -220,8 +220,8 @@ class MexicoStationService
           premium: premium,
           diesel: diesel,
         );
-      } catch (e) {
-        debugPrint('CRE price parse failed: $e');
+      } catch (e, st) {
+        debugPrint('CRE price parse failed: $e\n$st');
         continue;
       }
     }

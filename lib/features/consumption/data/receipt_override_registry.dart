@@ -33,7 +33,7 @@ class OverrideFieldSpec {
     // Validate the regex compiles so the parser doesn't throw later.
     try {
       RegExp(pattern);
-    } on FormatException catch (e) {
+    } on FormatException catch (e, st) { // ignore: unused_catch_stack
       debugPrint(
         'ReceiptOverrideRegistry: invalid regex "$pattern" skipped: $e',
       );
@@ -154,13 +154,13 @@ class ReceiptOverrideRegistry {
     try {
       final bundle = _bundle ?? rootBundle;
       raw = await bundle.loadString(_assetPath);
-    } catch (e) {
+    } catch (e, st) {
       // rootBundle throws `FlutterError` (an Error subclass) on a missing
       // asset. We deliberately use a wide catch so the app keeps running
       // with no overrides rather than crashing when the catalogue has
       // not been shipped in a given build — the same pattern
       // `CommunityConfig.load()` uses for `tanksync_config.json`.
-      debugPrint('ReceiptOverrideRegistry: asset load failed: $e');
+      debugPrint('ReceiptOverrideRegistry: asset load failed: $e\n$st');
       return;
     }
 
@@ -192,7 +192,7 @@ class ReceiptOverrideRegistry {
     dynamic decoded;
     try {
       decoded = json.decode(raw);
-    } on FormatException catch (e) {
+    } on FormatException catch (e, st) { // ignore: unused_catch_stack
       debugPrint(
         'ReceiptOverrideRegistry: malformed JSON in $_assetPath: $e',
       );

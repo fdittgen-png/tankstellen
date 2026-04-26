@@ -87,8 +87,8 @@ class EVChargingService with StationServiceHelpers {
         source: ServiceSource.openChargeMapApi,
         fetchedAt: DateTime.now(),
       );
-    } on DioException catch (e) {
-      throwApiException(e, defaultMessage: 'EV charging search failed');
+    } on DioException catch (e, st) {
+      throwApiException(e, defaultMessage: 'EV charging search failed', stackTrace: st);
     }
   }
 
@@ -151,8 +151,8 @@ class EVChargingService with StationServiceHelpers {
         updatedAt: _formatDate(item['DateLastStatusUpdate']?.toString()),
         countryCode: addr['Country']?['ISOCode']?.toString(),
       );
-    } catch (e) {
-      debugPrint('EV station parse failed: $e');
+    } catch (e, st) {
+      debugPrint('EV station parse failed: $e\n$st');
       return null;
     }
   }
@@ -196,8 +196,8 @@ class EVChargingService with StationServiceHelpers {
     try {
       final dt = DateTime.parse(iso);
       return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
-    } catch (e) {
-      debugPrint('EV date parse failed: $e');
+    } catch (e, st) {
+      debugPrint('EV date parse failed: $e\n$st');
       return null;
     }
   }

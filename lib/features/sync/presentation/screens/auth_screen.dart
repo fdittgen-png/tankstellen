@@ -77,7 +77,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           context.pop();
         }
       }
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       _formNotifier.setError(e.toString());
     } finally {
       _formNotifier.setLoading(false);
@@ -124,7 +124,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 : (l10n?.signedIn ?? 'Signed in!'));
         context.pop();
       }
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) {
         String errorMsg = e.toString();
         if (errorMsg.contains('invalid_credentials')) {
@@ -155,7 +155,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 'Switched to anonymous session');
         context.pop();
       }
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       _formNotifier.setError(e.toString());
     } finally {
       _formNotifier.setLoading(false);

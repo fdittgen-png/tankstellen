@@ -73,8 +73,8 @@ class BaselinesSync {
         onConflict: 'user_id,vehicle_id',
       );
       return merged;
-    } catch (e) {
-      debugPrint('BaselinesSync.merge FAILED: $e');
+    } catch (e, st) {
+      debugPrint('BaselinesSync.merge FAILED: $e\n$st');
       return localJson;
     }
   }
@@ -93,8 +93,8 @@ class BaselinesSync {
           .delete()
           .eq('user_id', userId)
           .eq('vehicle_id', vehicleId);
-    } catch (e) {
-      debugPrint('BaselinesSync.delete FAILED: $e');
+    } catch (e, st) {
+      debugPrint('BaselinesSync.delete FAILED: $e\n$st');
     }
   }
 }

@@ -131,8 +131,8 @@ class PortugalStationService
         source: ServiceSource.portugalApi,
         fetchedAt: DateTime.now(),
       );
-    } on DioException catch (e) {
-      throwApiException(e, defaultMessage: 'DGEG API error');
+    } on DioException catch (e, st) {
+      throwApiException(e, defaultMessage: 'DGEG API error', stackTrace: st);
     }
   }
 
@@ -181,8 +181,8 @@ class PortugalStationService
         merged.assignPrice(fuel, price);
 
         byId[id] = merged;
-      } catch (e) {
-        debugPrint('PT station row parse failed: $e');
+      } catch (e, st) {
+        debugPrint('PT station row parse failed: $e\n$st');
         continue;
       }
     }

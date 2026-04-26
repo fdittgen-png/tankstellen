@@ -79,7 +79,7 @@ class DataTransparencyController extends _$DataTransparencyController {
       } else {
         state = DataTransparencyState(data: data, loading: false);
       }
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       state = state.copyWith(loading: false, error: e.toString());
     }
   }
@@ -111,8 +111,8 @@ class DataTransparencyController extends _$DataTransparencyController {
             await TankSyncClient.client!
                 .from('users')
                 .upsert({'id': uid}, onConflict: 'id');
-          } catch (e) {
-            debugPrint('DataTransparency: users upsert failed: $e');
+          } catch (e, st) {
+            debugPrint('DataTransparency: users upsert failed: $e\n$st');
           }
         }
       }
@@ -122,8 +122,8 @@ class DataTransparencyController extends _$DataTransparencyController {
       final alerts = ref.read(alertProvider);
       debugPrint('DataTransparency: syncing ${alerts.length} local alerts');
       await AlertsSync.merge(alerts);
-    } catch (e) {
-      debugPrint('DataTransparency: force sync failed: $e');
+    } catch (e, st) {
+      debugPrint('DataTransparency: force sync failed: $e\n$st');
     }
 
     await load();
@@ -137,7 +137,7 @@ class DataTransparencyController extends _$DataTransparencyController {
     try {
       await UserDataSync.deleteAll();
       await load();
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       state = state.copyWith(loading: false, error: e.toString());
     }
   }

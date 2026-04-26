@@ -60,8 +60,8 @@ class AutoRecordSection extends ConsumerWidget {
             (v) => v.id == vehicleId,
             orElse: () => const VehicleProfile(id: '', name: ''),
           );
-    } catch (e) {
-      debugPrint('AutoRecordSection: profile lookup failed: $e');
+    } catch (e, st) {
+      debugPrint('AutoRecordSection: profile lookup failed: $e\n$st');
       return const SizedBox.shrink();
     }
 
@@ -143,8 +143,8 @@ class AutoRecordSection extends ConsumerWidget {
                       profile.copyWith(backgroundLocationConsent: true),
                     );
                   }
-                } catch (e) {
-                  debugPrint('AutoRecordSection: bg-location prompt: $e');
+                } catch (e, st) {
+                  debugPrint('AutoRecordSection: bg-location prompt: $e\n$st');
                 }
               },
             ),

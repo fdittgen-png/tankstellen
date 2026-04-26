@@ -67,8 +67,8 @@ class HiveIsolateLock {
           debugPrint('HiveIsolateLock: removing stale lock (age: ${age.inSeconds}s)');
           try {
             _lockFile.deleteSync();
-          } catch (e) {
-            debugPrint('HiveIsolateLock: failed to remove stale lock: $e');
+          } catch (e, st) {
+            debugPrint('HiveIsolateLock: failed to remove stale lock: $e\n$st');
           }
         }
       }
@@ -85,8 +85,8 @@ class HiveIsolateLock {
             debugPrint('HiveIsolateLock: acquired');
             return true;
           }
-        } catch (e) {
-          debugPrint('HiveIsolateLock: create failed, retrying: $e');
+        } catch (e, st) {
+          debugPrint('HiveIsolateLock: create failed, retrying: $e\n$st');
         }
       }
 
@@ -104,8 +104,8 @@ class HiveIsolateLock {
         _lockFile.deleteSync();
         debugPrint('HiveIsolateLock: released');
       }
-    } catch (e) {
-      debugPrint('HiveIsolateLock: release failed: $e');
+    } catch (e, st) {
+      debugPrint('HiveIsolateLock: release failed: $e\n$st');
     }
   }
 

@@ -123,8 +123,8 @@ class LocalNotificationService implements NotificationService {
       if (details == null) return null;
       if (!details.didNotificationLaunchApp) return null;
       return details.notificationResponse?.payload;
-    } catch (e) {
-      debugPrint('LocalNotificationService.getColdLaunchPayload failed: $e');
+    } catch (e, st) {
+      debugPrint('LocalNotificationService.getColdLaunchPayload failed: $e\n$st');
       return null;
     }
   }

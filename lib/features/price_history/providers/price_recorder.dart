@@ -24,8 +24,9 @@ void recordSearchResults(
         cng: station.cng,
       );
       repo.recordPrice(record);
-    } catch (e) { debugPrint('Silent catch: ');
-      // Skip individual failures; don't abort remaining records
+    } catch (e, st) {
+      // Skip individual failures; don't abort remaining records.
+      debugPrint('price_recorder: recordPrice failed for ${station.id}: $e\n$st');
     }
   }
 }

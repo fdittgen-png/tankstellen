@@ -136,11 +136,11 @@ class RouteSearchState extends _$RouteSearchState {
         cheapestPerSegment: segmentCheapest,
         strategyType: strategyType,
       ));
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
       if (e.type == DioExceptionType.cancel) return;
-      state = AsyncValue.error(e, StackTrace.current);
-    } on AppException catch (e) {
-      state = AsyncValue.error(e, StackTrace.current);
+      state = AsyncValue.error(e, st);
+    } on AppException catch (e, st) {
+      state = AsyncValue.error(e, st);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
@@ -172,8 +172,8 @@ class RouteSearchState extends _$RouteSearchState {
       String? country;
       try {
         country = await geocoding.coordinatesToCountryCode(lat, lng);
-      } catch (e) {
-        debugPrint('RouteSearch: country detection failed at $lat,$lng: $e');
+      } catch (e, st) {
+        debugPrint('RouteSearch: country detection failed at $lat,$lng: $e\n$st');
       }
 
       // Reuse cached service if country unchanged
@@ -224,8 +224,8 @@ class RouteSearchState extends _$RouteSearchState {
             point.latitude, point.longitude,
           );
           if (detected != null) countryCode = detected;
-        } catch (e) {
-          debugPrint('RouteSearch EV: country detection failed: $e');
+        } catch (e, st) {
+          debugPrint('RouteSearch EV: country detection failed: $e\n$st');
         }
 
         final result = await service.searchStations(
@@ -240,8 +240,8 @@ class RouteSearchState extends _$RouteSearchState {
             results.add(EVStationResult(station));
           }
         }
-      } catch (e) {
-        debugPrint('RouteSearch EV: sample point query failed: $e');
+      } catch (e, st) {
+        debugPrint('RouteSearch EV: sample point query failed: $e\n$st');
       }
     }
 

@@ -88,7 +88,7 @@ class NominatimGeocodingProvider implements GeocodingProvider {
       }
 
       return (lat: lat, lng: lng);
-    } on DioException catch (e) {
+    } on DioException catch (e, st) { // ignore: unused_catch_stack
       throw LocationException(
         message: 'Nominatim geocoding failed: ${e.message}',
       );
@@ -126,8 +126,8 @@ class NominatimGeocodingProvider implements GeocodingProvider {
       return [address['postcode'], address['city'] ?? address['town'] ?? address['village']]
           .where((s) => s != null && s.toString().isNotEmpty)
           .join(' ');
-    } on DioException catch (e) {
-      debugPrint('Nominatim reverse geocoding failed: $e');
+    } on DioException catch (e, st) {
+      debugPrint('Nominatim reverse geocoding failed: $e\n$st');
       return '$lat, $lng';
     }
   }
@@ -153,8 +153,8 @@ class NominatimGeocodingProvider implements GeocodingProvider {
       final address = response.data?['address'] as Map<String, dynamic>?;
       final code = address?['country_code'] as String?;
       return code?.toUpperCase();
-    } on DioException catch (e) {
-      debugPrint('Nominatim country detection failed: $e');
+    } on DioException catch (e, st) {
+      debugPrint('Nominatim country detection failed: $e\n$st');
       return null;
     }
   }

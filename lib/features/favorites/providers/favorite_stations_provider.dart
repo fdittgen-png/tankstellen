@@ -44,8 +44,8 @@ class FavoriteStations extends _$FavoriteStations {
       if (data != null) {
         try {
           stations.add(Station.fromJson(data));
-        } catch (e) {
-          debugPrint('Skipping corrupt favorite $id: $e');
+        } catch (e, st) {
+          debugPrint('Skipping corrupt favorite $id: $e\n$st');
         }
       }
     }
@@ -82,8 +82,8 @@ class FavoriteStations extends _$FavoriteStations {
         if (data != null) {
           try {
             stations.add(Station.fromJson(data));
-          } catch (e) {
-            debugPrint('FavoriteStations: parse error for $id: $e');
+          } catch (e, st) {
+            debugPrint('FavoriteStations: parse error for $id: $e\n$st');
           }
         }
       }
@@ -157,8 +157,8 @@ class FavoriteStations extends _$FavoriteStations {
               final s = detail.data.station;
               stations.add(s);
               await storage.saveFavoriteStationData(id, s.toJson());
-            } catch (e) {
-              debugPrint('FavoriteStations: fetch detail $id ($code): $e');
+            } catch (e, st) {
+              debugPrint('FavoriteStations: fetch detail $id ($code): $e\n$st');
             }
           }
         }
@@ -178,9 +178,8 @@ class FavoriteStations extends _$FavoriteStations {
             freshPrices.addAll(result.data);
             lastResult = result;
             successCountries++;
-          } on Exception catch (e) {
-            debugPrint(
-                'FavoriteStations: prices for ${entry.key} failed: $e');
+          } on Exception catch (e, st) {
+            debugPrint('FavoriteStations: prices for ${entry.key} failed: $e\n$st');
           }
         }
 
@@ -198,8 +197,8 @@ class FavoriteStations extends _$FavoriteStations {
         for (final s in updated) {
           try {
             await storage.saveFavoriteStationData(s.id, s.toJson());
-          } catch (e) {
-            debugPrint('FavoriteStations: re-persist ${s.id} failed: $e');
+          } catch (e, st) {
+            debugPrint('FavoriteStations: re-persist ${s.id} failed: $e\n$st');
           }
         }
 
@@ -215,8 +214,8 @@ class FavoriteStations extends _$FavoriteStations {
           isStale: allFailed ? true : (lastResult?.isStale ?? false),
           errors: lastResult?.errors ?? const [],
         ));
-      } on Exception catch (e) {
-        debugPrint('Favorites price refresh failed: $e');
+      } on Exception catch (e, st) {
+        debugPrint('Favorites price refresh failed: $e\n$st');
         state = AsyncValue.data(ServiceResult(
           data: stations,
           source: ServiceSource.cache,

@@ -119,8 +119,8 @@ class AnnouncementEngine {
         await _ttsService.announce(best);
         _announcedStations[best.station.id] = _clock();
         return [best];
-      } catch (e) {
-        debugPrint('VoiceAnnouncement: TTS error: $e');
+      } catch (e, st) {
+        debugPrint('VoiceAnnouncement: TTS error: $e\n$st');
       }
     }
 

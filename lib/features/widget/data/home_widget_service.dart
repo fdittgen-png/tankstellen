@@ -87,8 +87,8 @@ class HomeWidgetService {
         androidName: _widgetAndroidName,
       );
       debugPrint('HomeWidget: favorites updated with ${stations.length} stations');
-    } catch (e) {
-      debugPrint('HomeWidget: favorites update failed: $e');
+    } catch (e, st) {
+      debugPrint('HomeWidget: favorites update failed: $e\n$st');
     }
   }
 
@@ -184,8 +184,8 @@ class HomeWidgetService {
         androidName: _widgetAndroidName,
       );
       debugPrint('HomeWidget: nearest updated with ${stations.length} stations');
-    } catch (e) {
-      debugPrint('HomeWidget: nearest update failed: $e');
+    } catch (e, st) {
+      debugPrint('HomeWidget: nearest update failed: $e\n$st');
     }
   }
 
@@ -235,8 +235,8 @@ class HomeWidgetService {
         if (key != null) {
           try {
             fuel = FuelType.fromString(key);
-          } catch (e) {
-            debugPrint('HomeWidgetService: unknown fuel "$key": $e');
+          } catch (e, st) {
+            debugPrint('HomeWidgetService: unknown fuel "$key": $e\n$st');
             fuel = null;
           }
         }
@@ -470,8 +470,8 @@ class HomeWidgetService {
         'widget_profiles_json',
         jsonEncode(list),
       );
-    } catch (e) {
-      debugPrint('HomeWidget: publishProfiles failed: $e');
+    } catch (e, st) {
+      debugPrint('HomeWidget: publishProfiles failed: $e\n$st');
     }
   }
 
@@ -491,8 +491,8 @@ class HomeWidgetService {
         if (id != null && id.isNotEmpty) return id;
       }
       return null;
-    } catch (e) {
-      debugPrint('HomeWidget: readFirstPerWidgetProfileId failed: $e');
+    } catch (e, st) {
+      debugPrint('HomeWidget: readFirstPerWidgetProfileId failed: $e\n$st');
       return null;
     }
   }

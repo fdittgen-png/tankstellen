@@ -112,8 +112,8 @@ class FlutterBluePlusElmChannel implements ElmByteChannel {
     _subscription = null;
     try {
       await _device.disconnect();
-    } catch (e) {
-      debugPrint('FlutterBluePlusElmChannel: disconnect failed: $e');
+    } catch (e, st) {
+      debugPrint('FlutterBluePlusElmChannel: disconnect failed: $e\n$st');
     }
     _writeChar = null;
     _notifyChar = null;

@@ -81,8 +81,8 @@ class SyncState extends _$SyncState {
 
       // Initial sync: upload local data to server (non-blocking)
       _performInitialSync(storage);
-    } catch (e) {
-      debugPrint('TankSync connect failed: $e');
+    } catch (e, st) {
+      debugPrint('TankSync connect failed: $e\n$st');
       rethrow;
     }
   }
@@ -158,8 +158,8 @@ class SyncState extends _$SyncState {
 
       // Sync local data to the new anonymous account
       _performInitialSync(storage);
-    } catch (e) {
-      debugPrint('switchToAnonymous failed: $e');
+    } catch (e, st) {
+      debugPrint('switchToAnonymous failed: $e\n$st');
       rethrow;
     }
   }
@@ -176,8 +176,8 @@ class SyncState extends _$SyncState {
     try {
       await UserDataSync.deleteAll();
       await TankSyncClient.signOut();
-    } catch (e) {
-      debugPrint('Delete account failed: $e');
+    } catch (e, st) {
+      debugPrint('Delete account failed: $e\n$st');
     }
     await disconnect();
   }
@@ -187,8 +187,8 @@ class SyncState extends _$SyncState {
     final storage = ref.read(storageRepositoryProvider);
     try {
       await TankSyncClient.signOut();
-    } catch (e) {
-      debugPrint('TankSync signOut failed: $e');
+    } catch (e, st) {
+      debugPrint('TankSync signOut failed: $e\n$st');
     }
 
     await storage.putSetting('sync_enabled', false);
@@ -212,8 +212,8 @@ class SyncState extends _$SyncState {
           await RatingsSync.upsert(entry.key, entry.value);
         }
         debugPrint('InitialSync: complete');
-      } catch (e) {
-        debugPrint('InitialSync failed (non-fatal): $e');
+      } catch (e, st) {
+        debugPrint('InitialSync failed (non-fatal): $e\n$st');
       }
     });
   }

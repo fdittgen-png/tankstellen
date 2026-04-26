@@ -98,8 +98,8 @@ class AppInitializer {
         AppConstants.setRuntimeVersion(
           '${packageInfo.version}+${packageInfo.buildNumber}',
         );
-      } catch (e) {
-        debugPrint('PackageInfo.fromPlatform failed (#570): $e');
+      } catch (e, st) {
+        debugPrint('PackageInfo.fromPlatform failed (#570): $e\n$st');
       }
     });
 
@@ -120,8 +120,8 @@ class AppInitializer {
         final matched = await migrator.run(catalog: catalog);
         debugPrint(
             'VehicleProfileCatalogMigrator: matched $matched profile(s)');
-      } catch (e) {
-        debugPrint('VehicleProfileCatalogMigrator: deferred run failed: $e');
+      } catch (e, st) {
+        debugPrint('VehicleProfileCatalogMigrator: deferred run failed: $e\n$st');
       }
     });
 
@@ -148,8 +148,8 @@ class AppInitializer {
           options.beforeSend = (event, hint) {
             try {
               return PiiScrubber.scrubSentryEvent(event);
-            } catch (e) {
-              debugPrint('Sentry beforeSend scrub failed: $e');
+            } catch (e, st) {
+              debugPrint('Sentry beforeSend scrub failed: $e\n$st');
               return event;
             }
           };
@@ -357,16 +357,16 @@ class AppInitializer {
               {'id': sessionId},
               onConflict: 'id',
             );
-          } catch (e) {
-            debugPrint('TankSync: users upsert failed: $e');
+          } catch (e, st) {
+            debugPrint('TankSync: users upsert failed: $e\n$st');
           }
         }
         debugPrint('TankSync: ready');
       }).timeout(const Duration(seconds: 8));
     } on TimeoutException {
       debugPrint('TankSync: init timed out after 8s, proceeding without sync');
-    } catch (e) {
-      debugPrint('TankSync init failed: $e');
+    } catch (e, st) {
+      debugPrint('TankSync init failed: $e\n$st');
     }
   }
 
@@ -397,8 +397,8 @@ class AppInitializer {
     // keepAlive and owns its own Timer; disposal cancels it cleanly.
     try {
       container.read(nearestWidgetRefreshProvider);
-    } catch (e) {
-      debugPrint('AppInitializer: nearestWidgetRefresh start failed: $e');
+    } catch (e, st) {
+      debugPrint('AppInitializer: nearestWidgetRefresh start failed: $e\n$st');
     }
 
     // #1105 — drain the background-isolate error spool through the
@@ -417,8 +417,8 @@ class AppInitializer {
           debugPrint(
               'AppInitializer: drained $replayed isolate error(s) into TraceRecorder');
         }
-      } catch (e) {
-        debugPrint('AppInitializer: isolate spool drain failed: $e');
+      } catch (e, st) {
+        debugPrint('AppInitializer: isolate spool drain failed: $e\n$st');
       }
     });
 

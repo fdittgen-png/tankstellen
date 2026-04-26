@@ -105,7 +105,7 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
 
       await Future<void>.delayed(const Duration(milliseconds: 1500));
       if (mounted) Navigator.pop(context);
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) ctrl.setError(e.toString());
     }
   }
@@ -120,8 +120,8 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
         final json = jsonDecode(result) as Map<String, dynamic>;
         _urlController.text = json['url']?.toString() ?? '';
         _keyController.text = json['key']?.toString() ?? '';
-      } catch (e) {
-        debugPrint('QR code parse failed: $e');
+      } catch (e, st) {
+        debugPrint('QR code parse failed: $e\n$st');
         if (mounted) {
           SnackBarHelper.showError(context, AppLocalizations.of(context)?.invalidQrCode ?? 'Invalid QR code format');
         }

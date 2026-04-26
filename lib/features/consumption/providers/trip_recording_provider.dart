@@ -205,8 +205,8 @@ class TripRecording extends _$TripRecording {
           await _store!.loadVehicle(_vehicleId!);
         }
       }
-    } catch (e) {
-      debugPrint('TripRecording.start: baseline setup failed: $e');
+    } catch (e, st) {
+      debugPrint('TripRecording.start: baseline setup failed: $e\n$st');
       _store = null;
     }
 
@@ -287,8 +287,8 @@ class TripRecording extends _$TripRecording {
   VehicleProfile? _tryReadActiveVehicle() {
     try {
       return ref.read(activeVehicleProfileProvider);
-    } catch (e) {
-      debugPrint('TripRecording: active vehicle unavailable: $e');
+    } catch (e, st) {
+      debugPrint('TripRecording: active vehicle unavailable: $e\n$st');
       return null;
     }
   }
@@ -410,8 +410,8 @@ class TripRecording extends _$TripRecording {
     }
     try {
       await ctl.refreshOdometer();
-    } catch (e) {
-      debugPrint('TripRecording.stop: refreshOdometer failed: $e');
+    } catch (e, st) {
+      debugPrint('TripRecording.stop: refreshOdometer failed: $e\n$st');
     }
     // Snapshot the captured-samples buffer BEFORE stop() tears down
     // the controller — without this the trip-detail charts render the
@@ -438,8 +438,8 @@ class TripRecording extends _$TripRecording {
     if (store != null && vid != null) {
       try {
         await store.flush(vid);
-      } catch (e) {
-        debugPrint('TripRecording.stop: baseline flush failed: $e');
+      } catch (e, st) {
+        debugPrint('TripRecording.stop: baseline flush failed: $e\n$st');
       }
       // #780 — fold in the server copy once the local flush lands.
       // `syncVehicleBaseline` returns the merged JSON; if the merge
@@ -453,8 +453,8 @@ class TripRecording extends _$TripRecording {
     _vehicleId = null;
     try {
       await svc.disconnect();
-    } catch (e) {
-      debugPrint('TripRecording.stop: service disconnect failed: $e');
+    } catch (e, st) {
+      debugPrint('TripRecording.stop: service disconnect failed: $e\n$st');
     }
     _service = null;
     state = state.copyWith(phase: TripRecordingPhase.finished);
@@ -509,8 +509,8 @@ class TripRecording extends _$TripRecording {
         // BaselineStore whose loadVehicle reads the merged JSON
         // from disk.
       }
-    } catch (e) {
-      debugPrint('TripRecording.stop: baseline sync failed: $e');
+    } catch (e, st) {
+      debugPrint('TripRecording.stop: baseline sync failed: $e\n$st');
     }
   }
 
@@ -530,8 +530,8 @@ class TripRecording extends _$TripRecording {
     final Obd2ConnectionService connection;
     try {
       connection = ref.read(obd2ConnectionProvider);
-    } catch (e) {
-      debugPrint('TripRecording: connection provider unavailable: $e');
+    } catch (e, st) {
+      debugPrint('TripRecording: connection provider unavailable: $e\n$st');
       return null;
     }
     return (pinnedMac, onReconnect) {
@@ -551,8 +551,8 @@ class TripRecording extends _$TripRecording {
                 }
               }
             }
-          } catch (e) {
-            debugPrint('TripRecording reconnect probe failed: $e');
+          } catch (e, st) {
+            debugPrint('TripRecording reconnect probe failed: $e\n$st');
           }
           return false;
         },
@@ -567,8 +567,8 @@ class TripRecording extends _$TripRecording {
             // against the new transport on the next tick.
             _service = svc;
             return true;
-          } catch (e) {
-            debugPrint('TripRecording reconnect connect failed: $e');
+          } catch (e, st) {
+            debugPrint('TripRecording reconnect connect failed: $e\n$st');
             return false;
           }
         },
@@ -607,12 +607,12 @@ class TripRecording extends _$TripRecording {
         try {
           final badge = await ref.read(autoRecordBadgeServiceProvider.future);
           await badge.increment();
-        } catch (e) {
-          debugPrint('TripRecording auto-record badge increment: $e');
+        } catch (e, st) {
+          debugPrint('TripRecording auto-record badge increment: $e\n$st');
         }
       }
-    } catch (e) {
-      debugPrint('TripRecording._saveToHistory: $e');
+    } catch (e, st) {
+      debugPrint('TripRecording._saveToHistory: $e\n$st');
     }
   }
 }

@@ -26,8 +26,8 @@ class TraceUploader {
     if (raw == null) return TraceUploadConfig.disabled;
     try {
       return TraceUploadConfig.fromJson(Map<String, dynamic>.from(raw as Map));
-    } on FormatException catch (e) {
-      debugPrint('TraceUploader: config parse failed: $e');
+    } on FormatException catch (e, st) {
+      debugPrint('TraceUploader: config parse failed: $e\n$st');
       return TraceUploadConfig.disabled;
     }
   }
@@ -67,8 +67,8 @@ class TraceUploader {
             'Authorization': 'Bearer ${config.authToken}',
         }),
       );
-    } on DioException catch (e) {
-      debugPrint('TraceUploader: upload failed: $e');
+    } on DioException catch (e, st) {
+      debugPrint('TraceUploader: upload failed: $e\n$st');
     }
   }
 }

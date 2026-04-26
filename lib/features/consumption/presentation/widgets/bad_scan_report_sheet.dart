@@ -213,13 +213,13 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
 
       if (!mounted) return;
       setState(() => _createdIssueUrl = url);
-    } on GithubReporterException catch (e) {
-      debugPrint('BadScanReportSheet: GitHub submission failed: $e');
+    } on GithubReporterException catch (e, st) {
+      debugPrint('BadScanReportSheet: GitHub submission failed: $e\n$st');
       await _runShareFallback(showSnackbar: true);
-    } catch (e) {
+    } catch (e, st) {
       // Secure-storage / image-read / unexpected errors — still fall
       // back so the user can always ship a report.
-      debugPrint('BadScanReportSheet: unexpected failure: $e');
+      debugPrint('BadScanReportSheet: unexpected failure: $e\n$st');
       await _runShareFallback(showSnackbar: true);
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -264,8 +264,8 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
 
     try {
       await share(params);
-    } catch (e) {
-      debugPrint('BadScanReportSheet: share fallback itself failed: $e');
+    } catch (e, st) {
+      debugPrint('BadScanReportSheet: share fallback itself failed: $e\n$st');
     }
   }
 
@@ -275,16 +275,16 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
     final launcher = widget.urlLauncher ?? _defaultUrlLauncher;
     try {
       await launcher(url);
-    } catch (e) {
-      debugPrint('BadScanReportSheet: launchUrl failed: $e');
+    } catch (e, st) {
+      debugPrint('BadScanReportSheet: launchUrl failed: $e\n$st');
     }
   }
 
   Future<Uint8List> _defaultImageBytesReader(String path) async {
     try {
       return await File(path).readAsBytes();
-    } catch (e) {
-      debugPrint('BadScanReportSheet: could not read scan image: $e');
+    } catch (e, st) {
+      debugPrint('BadScanReportSheet: could not read scan image: $e\n$st');
       return Uint8List(0);
     }
   }

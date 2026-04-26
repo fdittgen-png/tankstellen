@@ -51,8 +51,8 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
         _hasToken = value != null && value.isNotEmpty;
         _loading = false;
       });
-    } catch (e) {
-      debugPrint('FeedbackTokenSection: secure-storage read failed: $e');
+    } catch (e, st) {
+      debugPrint('FeedbackTokenSection: secure-storage read failed: $e\n$st');
       if (!mounted) return;
       setState(() {
         _hasToken = false;
@@ -128,8 +128,8 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
         key: kGithubFeedbackTokenKey,
         value: scrubbed,
       );
-    } catch (e) {
-      debugPrint('FeedbackTokenSection: secure-storage write failed: $e');
+    } catch (e, st) {
+      debugPrint('FeedbackTokenSection: secure-storage write failed: $e\n$st');
       return;
     }
 
@@ -142,8 +142,8 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
   Future<void> _clearToken() async {
     try {
       await _storage.delete(key: kGithubFeedbackTokenKey);
-    } catch (e) {
-      debugPrint('FeedbackTokenSection: secure-storage delete failed: $e');
+    } catch (e, st) {
+      debugPrint('FeedbackTokenSection: secure-storage delete failed: $e\n$st');
     }
     ref.invalidate(githubIssueReporterProvider);
     await _refresh();

@@ -121,8 +121,8 @@ class UkFuelFinderService
           validateStatus: (status) => status != null && status < 400,
         ),
       );
-    } on DioException catch (e) {
-      throwApiException(e, defaultMessage: 'Fuel Finder request failed');
+    } on DioException catch (e, st) {
+      throwApiException(e, defaultMessage: 'Fuel Finder request failed', stackTrace: st);
     }
 
     final items = UkFuelFinderResponseParser.extractStationList(response.data);

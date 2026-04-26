@@ -121,8 +121,8 @@ class SloveniaStationService with StationServiceHelpers implements StationServic
       sortStations(filtered, params);
 
       return wrapStations(filtered, ServiceSource.sloveniaApi);
-    } on DioException catch (e) {
-      throwApiException(e, defaultMessage: 'Network error (Slovenia goriva.si)');
+    } on DioException catch (e, st) {
+      throwApiException(e, defaultMessage: 'Network error (Slovenia goriva.si)', stackTrace: st);
     }
   }
 

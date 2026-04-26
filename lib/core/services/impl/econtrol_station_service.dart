@@ -67,8 +67,8 @@ class EControlStationService with StationServiceHelpers implements StationServic
       sortStations(stations, params);
 
       return wrapStations(stations, ServiceSource.eControlApi);
-    } on DioException catch (e) {
-      throwApiException(e);
+    } on DioException catch (e, st) {
+      throwApiException(e, stackTrace: st);
     }
   }
 
@@ -145,8 +145,8 @@ class EControlStationService with StationServiceHelpers implements StationServic
         isOpen: isOpen,
         openingHoursText: hoursText.isNotEmpty ? hoursText : null,
       );
-    } on FormatException catch (e) {
-      debugPrint('E-Control station parse failed: $e');
+    } on FormatException catch (e, st) {
+      debugPrint('E-Control station parse failed: $e\n$st');
       return null;
     }
   }

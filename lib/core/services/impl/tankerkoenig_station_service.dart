@@ -77,8 +77,8 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
         source: ServiceSource.tankerkoenigApi,
         fetchedAt: DateTime.now(),
       );
-    } on DioException catch (e) {
-      throwApiException(e);
+    } on DioException catch (e, st) {
+      throwApiException(e, stackTrace: st);
     }
   }
 
@@ -127,8 +127,8 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
         source: ServiceSource.tankerkoenigApi,
         fetchedAt: DateTime.now(),
       );
-    } on DioException catch (e) {
-      throwApiException(e);
+    } on DioException catch (e, st) {
+      throwApiException(e, stackTrace: st);
     }
   }
 
@@ -160,8 +160,8 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
         source: ServiceSource.tankerkoenigApi,
         fetchedAt: DateTime.now(),
       );
-    } on DioException catch (e) {
-      throwApiException(e);
+    } on DioException catch (e, st) {
+      throwApiException(e, stackTrace: st);
     }
   }
 

@@ -128,7 +128,7 @@ class StationServiceChain implements StationService {
         source: result.source,
       );
       return result;
-    } on Exception catch (e) {
+    } on Exception catch (e, st) { // ignore: unused_catch_stack
       errors.add(ServiceError(
         source: _errorSource,
         message: e.toString(),
@@ -226,8 +226,8 @@ class StationServiceChain implements StationService {
       return list
           .map((j) => Station.fromJson(Map<String, dynamic>.from(j as Map)))
           .toList();
-    } on FormatException catch (e) {
-      debugPrint('Cache: station list parse failed: $e');
+    } on FormatException catch (e, st) {
+      debugPrint('Cache: station list parse failed: $e\n$st');
       return null;
     }
   }
@@ -255,8 +255,8 @@ class StationServiceChain implements StationService {
         wholeDay: data['wholeDay'] as bool? ?? false,
         state: data['state'] as String?,
       );
-    } on FormatException catch (e) {
-      debugPrint('Cache: station detail parse failed: $e');
+    } on FormatException catch (e, st) {
+      debugPrint('Cache: station detail parse failed: $e\n$st');
       return null;
     }
   }
@@ -272,8 +272,8 @@ class StationServiceChain implements StationService {
       return raw.map(
         (k, v) => MapEntry(k, StationPrices.fromJson(Map<String, dynamic>.from(v as Map))),
       );
-    } on FormatException catch (e) {
-      debugPrint('Cache: prices parse failed: $e');
+    } on FormatException catch (e, st) {
+      debugPrint('Cache: prices parse failed: $e\n$st');
       return null;
     }
   }

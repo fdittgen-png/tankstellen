@@ -75,19 +75,19 @@ class AutoRecordBadgeService {
   Future<void> _writeCount(int value) async {
     try {
       await _prefs.setInt(storageKey, value);
-    } catch (e) {
-      debugPrint('AutoRecordBadgeService write failed: $e');
+    } catch (e, st) {
+      debugPrint('AutoRecordBadgeService write failed: $e\n$st');
     }
   }
 
   Future<void> _safeSetBadge(int value) async {
     try {
       await _setBadge(value);
-    } catch (e) {
+    } catch (e, st) {
       // Launcher does not support badges, or the platform plugin
       // raised. Don't propagate — the Dart-level counter is the
       // source of truth and survives the next launch attempt.
-      debugPrint('AutoRecordBadgeService setBadge($value) failed: $e');
+      debugPrint('AutoRecordBadgeService setBadge($value) failed: $e\n$st');
     }
   }
 

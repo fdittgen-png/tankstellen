@@ -15,8 +15,8 @@ mixin SyncAfterChangeMixin {
       if (syncState.enabled) {
         await FavoritesSync.merge(favoriteIds);
       }
-    } catch (e) {
-      debugPrint('SyncAfterChange: favorites sync failed: $e');
+    } catch (e, st) {
+      debugPrint('SyncAfterChange: favorites sync failed: $e\n$st');
     }
   }
 
@@ -26,8 +26,8 @@ mixin SyncAfterChangeMixin {
       if (syncState.enabled) {
         await AlertsSync.merge(alerts as dynamic);
       }
-    } catch (e) {
-      debugPrint('SyncAfterChange: alerts sync failed: $e');
+    } catch (e, st) {
+      debugPrint('SyncAfterChange: alerts sync failed: $e\n$st');
     }
   }
 }

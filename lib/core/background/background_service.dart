@@ -322,7 +322,7 @@ Future<void> _refreshPricesAndCheckAlerts() async {
                 targetPrice: alert.targetPrice,
               );
             } catch (e, st) {
-              debugPrint('BackgroundService: ntfy push failed: $e');
+              debugPrint('BackgroundService: ntfy push failed: $e\n$st');
               // #1105 — spool the error so the foreground TraceRecorder
               // can replay it. ntfy push failures are best-effort but
               // they're a real signal that something is wrong with the
@@ -364,7 +364,7 @@ Future<void> _refreshPricesAndCheckAlerts() async {
           notifier: notifier,
         );
       } catch (e, st) {
-        debugPrint('BackgroundService: velocity detector failed: $e');
+        debugPrint('BackgroundService: velocity detector failed: $e\n$st');
         // #1105 — spool the failure so the foreground TraceRecorder can
         // surface it through the same pipeline as foreground errors.
         await IsolateErrorSpool.enqueue(
@@ -394,7 +394,7 @@ Future<void> _refreshPricesAndCheckAlerts() async {
         apiKey: apiKey,
       );
     } catch (e, st) {
-      debugPrint('BackgroundService: radius alert runner failed: $e');
+      debugPrint('BackgroundService: radius alert runner failed: $e\n$st');
       // #1105 — spool the failure so the foreground TraceRecorder can
       // surface radius-alert outages through the same pipeline as
       // foreground errors.
@@ -419,7 +419,7 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     // path above also runs it.
     await _refreshNearestWidgetFromSearch(storage);
   } catch (e, st) {
-    debugPrint('BackgroundService: task failed: $e');
+    debugPrint('BackgroundService: task failed: $e\n$st');
     // #1105 — top-level isolate failure: spool through the ring buffer
     // so the foreground TraceRecorder can replay it. This catches any
     // exception not handled by the inner runners (Hive open failures,
@@ -434,8 +434,8 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     // This prevents file handle leaks and stale locks.
     try {
       await HiveStorage.closeIsolateBoxes();
-    } catch (e) {
-      debugPrint('BackgroundService: failed to close Hive boxes: $e');
+    } catch (e, st) {
+      debugPrint('BackgroundService: failed to close Hive boxes: $e\n$st');
     }
     lock?.release();
   }
@@ -613,9 +613,8 @@ Future<void> _runRadiusAlerts({
           samples.addAll(StationPriceSample.fromStation(station));
         }
         return samples;
-      } catch (e) {
-        debugPrint(
-            'BackgroundService: radius alert samples for ${alert.id} failed: $e');
+      } catch (e, st) {
+        debugPrint('BackgroundService: radius alert samples for ${alert.id} failed: $e\n$st');
         return const <StationPriceSample>[];
       }
     },
@@ -697,7 +696,7 @@ Future<void> _refreshNearestWidgetFromSearch(HiveStorage storage) async {
         profileStorage: storage,
       );
     }
-  } catch (e) {
-    debugPrint('BackgroundService: nearest widget refresh failed: $e');
+  } catch (e, st) {
+    debugPrint('BackgroundService: nearest widget refresh failed: $e\n$st');
   }
 }

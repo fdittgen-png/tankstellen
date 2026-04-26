@@ -117,7 +117,7 @@ class _Obd2AdapterPickerSheetState
           .connect(candidate);
       if (!mounted) return;
       Navigator.of(context).pop(service);
-    } on Obd2ConnectionError catch (e) {
+    } on Obd2ConnectionError catch (e, st) { // ignore: unused_catch_stack
       if (!mounted) return;
       setState(() {
         _error = e;

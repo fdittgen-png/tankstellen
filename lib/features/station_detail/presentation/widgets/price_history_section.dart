@@ -88,8 +88,8 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
         await storageMgmt.savePriceRecords(widget.stationId, records);
         ref.invalidate(priceHistoryProvider(widget.stationId));
       }
-    } catch (e) {
-      debugPrint('PriceHistory DB fetch failed: $e');
+    } catch (e, st) {
+      debugPrint('PriceHistory DB fetch failed: $e\n$st');
     }
     if (mounted) setState(() => _fetchedFromDb = true);
   }

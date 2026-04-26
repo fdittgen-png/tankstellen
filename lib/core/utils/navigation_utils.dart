@@ -27,8 +27,8 @@ class NavigationUtils {
     try {
       final launched = await launchUrl(geoUri, mode: LaunchMode.externalApplication);
       if (launched) return;
-    } on Exception catch (e) {
-      debugPrint('Navigation geo: URI failed: $e');
+    } on Exception catch (e, st) {
+      debugPrint('Navigation geo: URI failed: $e\n$st');
     }
 
     // Fallback: Google Maps web URL — works universally via browser.

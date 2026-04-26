@@ -207,12 +207,12 @@ class PidScheduler {
       if (_subs.containsKey(command)) {
         try {
           sub.onResult(response);
-        } catch (e) {
+        } catch (e, st) {
           // Callback errors must not stall the scheduler. Log and move on.
-          debugPrint('PidScheduler: onResult for $command threw: $e');
+          debugPrint('PidScheduler: onResult for $command threw: $e\n$st');
         }
       }
-    } catch (e) {
+    } catch (e, st) {
       // Transport failures (timeout, NO DATA, adapter dropped) must not
       // deadlock the loop OR starve healthy PIDs. We stamp lastReadAt
       // anyway so the failing PID stops winning every tick — otherwise
@@ -220,7 +220,7 @@ class PidScheduler {
       // the healthy one starved by the FIFO tiebreaker. On the next
       // round the failing PID still gets retried when its weight wins,
       // just no more often than the cadence it was subscribed at.
-      debugPrint('PidScheduler: transport for $command threw: $e');
+      debugPrint('PidScheduler: transport for $command threw: $e\n$st');
       sub.config.lastReadAt = _clock();
     } finally {
       _inFlight = null;

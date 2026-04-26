@@ -77,8 +77,8 @@ class NtfySetupController extends _$NtfySetupController {
           enabled: rows.first['enabled'] as bool? ?? false,
         );
       }
-    } catch (e) {
-      debugPrint('NtfySetupController: failed to load push_tokens state: $e');
+    } catch (e, st) {
+      debugPrint('NtfySetupController: failed to load push_tokens state: $e\n$st');
     }
   }
 
@@ -112,14 +112,14 @@ class NtfySetupController extends _$NtfySetupController {
         final storage = ref.read(settingsStorageProvider);
         await storage.putSetting(StorageKeys.ntfyEnabled, value);
         await storage.putSetting(StorageKeys.ntfyTopic, topic);
-      } catch (e) {
-        debugPrint('NtfySetupController: failed to mirror to Hive: $e');
+      } catch (e, st) {
+        debugPrint('NtfySetupController: failed to mirror to Hive: $e\n$st');
       }
 
       state = state.copyWith(enabled: value, isToggling: false);
       return true;
-    } catch (e) {
-      debugPrint('NtfySetupController: failed to update push_tokens: $e');
+    } catch (e, st) {
+      debugPrint('NtfySetupController: failed to update push_tokens: $e\n$st');
       state = state.copyWith(isToggling: false);
       return false;
     }

@@ -347,7 +347,7 @@ GoRouter router(Ref ref) {
           try {
             final station = ChargingStation.fromJson(raw);
             return EVStationDetailScreen(station: station);
-          } catch (e) {
+          } catch (e, st) { // ignore: unused_catch_stack
             return _invalidIdScreen(context, state.matchedLocation);
           }
         },

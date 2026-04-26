@@ -41,8 +41,8 @@ class RadiusAlerts extends _$RadiusAlerts {
     final store = ref.read(radiusAlertStoreProvider);
     try {
       await store.upsert(alert);
-    } catch (e) {
-      debugPrint('RadiusAlerts.add: $e');
+    } catch (e, st) {
+      debugPrint('RadiusAlerts.add: $e\n$st');
     }
     state = AsyncValue.data(await store.list());
   }
@@ -57,8 +57,8 @@ class RadiusAlerts extends _$RadiusAlerts {
       // doesn't accumulate stale (alertId, stationId) entries after
       // the user deletes the alert.
       await dedup.clearForAlert(id);
-    } catch (e) {
-      debugPrint('RadiusAlerts.remove: $e');
+    } catch (e, st) {
+      debugPrint('RadiusAlerts.remove: $e\n$st');
     }
     state = AsyncValue.data(await store.list());
   }
@@ -79,8 +79,8 @@ class RadiusAlerts extends _$RadiusAlerts {
     final updated = match.first.copyWith(enabled: !match.first.enabled);
     try {
       await store.upsert(updated);
-    } catch (e) {
-      debugPrint('RadiusAlerts.toggle: $e');
+    } catch (e, st) {
+      debugPrint('RadiusAlerts.toggle: $e\n$st');
     }
     state = AsyncValue.data(await store.list());
   }

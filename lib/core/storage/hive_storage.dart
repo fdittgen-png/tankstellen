@@ -323,8 +323,8 @@ class HiveStorage implements StorageRepository {
       final file = File(path);
       if (!file.existsSync()) return box.length * fallbackPerEntry;
       return file.lengthSync();
-    } catch (e) {
-      debugPrint('storageStats: lengthSync failed for $boxName: $e');
+    } catch (e, st) {
+      debugPrint('storageStats: lengthSync failed for $boxName: $e\n$st');
       return box.length * fallbackPerEntry;
     }
   }

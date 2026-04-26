@@ -23,8 +23,8 @@ class VelocityAlertCooldown {
     try {
       if (!Hive.isBoxOpen(HiveBoxes.settings)) return null;
       return Hive.box(HiveBoxes.settings);
-    } catch (e) {
-      debugPrint('VelocityAlertCooldown: settings box unavailable: $e');
+    } catch (e, st) {
+      debugPrint('VelocityAlertCooldown: settings box unavailable: $e\n$st');
       return null;
     }
   }
@@ -68,8 +68,8 @@ class VelocityAlertCooldown {
     try {
       final parsed = DateTime.tryParse(raw.toString());
       return parsed;
-    } catch (e) {
-      debugPrint('VelocityAlertCooldown: corrupt timestamp for ${fuelType.apiValue}: $e');
+    } catch (e, st) {
+      debugPrint('VelocityAlertCooldown: corrupt timestamp for ${fuelType.apiValue}: $e\n$st');
       return null;
     }
   }

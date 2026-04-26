@@ -42,8 +42,8 @@ class DefaultOnboardingObd2Connector implements OnboardingObd2Connector {
     try {
       final raw = await service.sendCommand(Elm327Protocol.vinCommand);
       return Elm327Protocol.parseVin(raw);
-    } catch (e) {
-      debugPrint('OnboardingObd2Connector.readVin failed: $e');
+    } catch (e, st) {
+      debugPrint('OnboardingObd2Connector.readVin failed: $e\n$st');
       return null;
     }
   }

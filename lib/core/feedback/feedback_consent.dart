@@ -50,8 +50,8 @@ class FeedbackConsent {
         default:
           return FeedbackConsentState.unset;
       }
-    } catch (e) {
-      debugPrint('FeedbackConsent.read failed: $e');
+    } catch (e, st) {
+      debugPrint('FeedbackConsent.read failed: $e\n$st');
       return FeedbackConsentState.unset;
     }
   }
@@ -72,8 +72,8 @@ class FeedbackConsent {
           await prefs.remove(storageKey);
           return;
       }
-    } catch (e) {
-      debugPrint('FeedbackConsent.write failed: $e');
+    } catch (e, st) {
+      debugPrint('FeedbackConsent.write failed: $e\n$st');
     }
   }
 }

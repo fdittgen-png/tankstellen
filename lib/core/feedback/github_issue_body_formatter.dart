@@ -105,8 +105,8 @@ class GithubIssueBodyFormatter {
       decoded.exif = img.ExifData();
       final encoded = img.encodeJpg(decoded, quality: 85);
       return _ExifStripResult(bytes: encoded, stripped: true);
-    } catch (e) {
-      debugPrint('GithubIssueReporter EXIF strip failed: $e');
+    } catch (e, st) {
+      debugPrint('GithubIssueReporter EXIF strip failed: $e\n$st');
       return _ExifStripResult(bytes: bytes, stripped: false);
     }
   }

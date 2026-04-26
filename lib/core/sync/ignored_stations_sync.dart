@@ -51,8 +51,8 @@ class IgnoredStationsSync {
       }
 
       return localIds.union(serverIds).toList();
-    } catch (e) {
-      debugPrint('IgnoredStationsSync.merge FAILED: $e');
+    } catch (e, st) {
+      debugPrint('IgnoredStationsSync.merge FAILED: $e\n$st');
       return localIgnoredIds;
     }
   }

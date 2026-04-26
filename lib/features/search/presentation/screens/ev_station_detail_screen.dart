@@ -63,7 +63,7 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
         final l10n = AppLocalizations.of(context);
         SnackBarHelper.showError(context, l10n?.evStationNotFound ?? 'Could not refresh — station not found nearby');
       }
-    } catch (e) {
+    } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) {
         SnackBarHelper.showError(context, AppLocalizations.of(context)?.refreshFailed ?? 'Refresh failed. Please try again.');
       }

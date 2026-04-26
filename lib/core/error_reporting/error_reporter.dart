@@ -47,8 +47,8 @@ class ErrorReporter {
     final url = ErrorReportFormatter.buildIssueUrl(payload);
     try {
       return await _launcher(url);
-    } catch (e) {
-      debugPrint('ErrorReporter launch failed: $e');
+    } catch (e, st) {
+      debugPrint('ErrorReporter launch failed: $e\n$st');
       return false;
     }
   }

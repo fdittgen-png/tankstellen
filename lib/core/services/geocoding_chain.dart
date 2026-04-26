@@ -97,7 +97,7 @@ class GeocodingChain {
         );
 
         return result;
-      } catch (e) {
+      } catch (e, st) { // ignore: unused_catch_stack
         errors.add(ServiceError(
           source: provider.source,
           message: e.toString(),
@@ -160,7 +160,7 @@ class GeocodingChain {
           fetchedAt: DateTime.now(),
           errors: errors,
         );
-      } catch (e) {
+      } catch (e, st) { // ignore: unused_catch_stack
         errors.add(ServiceError(
           source: provider.source,
           message: e.toString(),

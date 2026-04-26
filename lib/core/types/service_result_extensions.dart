@@ -28,7 +28,7 @@ Future<Result<ServiceResult<T>, ServiceFailure>> captureServiceResult<T>(
 ) async {
   try {
     return Success(await call());
-  } on ServiceChainExhaustedException catch (e) {
+  } on ServiceChainExhaustedException catch (e, st) { // ignore: unused_catch_stack
     return Failure(ServiceFailure(
       message: e.message,
       errors: e.errors.cast<ServiceError>(),

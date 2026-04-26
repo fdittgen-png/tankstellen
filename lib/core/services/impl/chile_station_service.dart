@@ -162,8 +162,8 @@ class ChileStationService
       sortStations(filtered, params);
 
       return wrapStations(filtered, ServiceSource.chileApi);
-    } on DioException catch (e) {
-      debugPrint('CL search failed: $e');
+    } on DioException catch (e, st) {
+      debugPrint('CL search failed: $e\n$st');
       final status = e.response?.statusCode;
       if (status == 401 || status == 403) {
         throw ApiException(
@@ -171,7 +171,7 @@ class ChileStationService
           statusCode: status,
         );
       }
-      throwApiException(e, defaultMessage: 'Network error (CNE)');
+      throwApiException(e, defaultMessage: 'Network error (CNE)', stackTrace: st);
     }
   }
 

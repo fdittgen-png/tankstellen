@@ -29,7 +29,7 @@ class DeviceInfoCollector {
       final size = view.physicalSize / view.devicePixelRatio;
       screenWidth = size.width;
       screenHeight = size.height;
-    } catch (e) { debugPrint('DeviceInfoCollector.screenSize: $e'); }
+    } catch (e, st) { debugPrint('DeviceInfoCollector.screenSize: $e\n$st'); }
 
     return DeviceInfo(
       os: os,

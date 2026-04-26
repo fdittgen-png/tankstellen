@@ -68,11 +68,11 @@ class OsmRetryClient extends http.BaseClient {
           return response;
         }
         lastResponse = response;
-      } on SocketException catch (e) {
+      } on SocketException catch (e, st) { // ignore: unused_catch_stack
         lastError = e;
-      } on TimeoutException catch (e) {
+      } on TimeoutException catch (e, st) { // ignore: unused_catch_stack
         lastError = e;
-      } on http.ClientException catch (e) {
+      } on http.ClientException catch (e, st) { // ignore: unused_catch_stack
         lastError = e;
       }
 

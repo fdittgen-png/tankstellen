@@ -32,8 +32,8 @@ extension VehicleSaveActions on WidgetRef {
       );
       await profileRepo.updateProfile(updated);
       read(activeProfileProvider.notifier).refresh();
-    } catch (e) {
-      debugPrint('EditVehicleScreen: profile sync failed: $e');
+    } catch (e, st) {
+      debugPrint('EditVehicleScreen: profile sync failed: $e\n$st');
     }
   }
 
@@ -49,8 +49,8 @@ extension VehicleSaveActions on WidgetRef {
         volumetricEfficiencySamples: 0,
       );
       await read(vehicleProfileListProvider.notifier).save(cleared);
-    } catch (e) {
-      debugPrint('EditVehicleScreen: VE reset failed: $e');
+    } catch (e, st) {
+      debugPrint('EditVehicleScreen: VE reset failed: $e\n$st');
     }
   }
 
@@ -65,8 +65,8 @@ extension VehicleSaveActions on WidgetRef {
       final latest =
           forVehicle.reduce((a, b) => a.odometerKm > b.odometerKm ? a : b);
       return latest.odometerKm;
-    } catch (e) {
-      debugPrint('EditVehicleScreen: odometer lookup failed: $e');
+    } catch (e, st) {
+      debugPrint('EditVehicleScreen: odometer lookup failed: $e\n$st');
       return null;
     }
   }

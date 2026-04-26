@@ -141,11 +141,11 @@ class UkStationService with StationServiceHelpers implements StationService {
       }
       if (data is List) return List<dynamic>.from(data);
       return null;
-    } on DioException catch (e) {
+    } on DioException catch (e, st) { // ignore: unused_catch_stack
       debugPrint('UK feed $url failed: ${e.type.name}');
       return null;
-    } catch (e) {
-      debugPrint('UK feed $url parse error: $e');
+    } catch (e, st) {
+      debugPrint('UK feed $url parse error: $e\n$st');
       return null;
     }
   }
@@ -208,8 +208,8 @@ class UkStationService with StationServiceHelpers implements StationService {
           diesel: _parsePence(prices['B7'] ?? prices['diesel']),
           isOpen: true,
         ));
-      } catch (e) {
-        debugPrint('UK station parse failed: $e');
+      } catch (e, st) {
+        debugPrint('UK station parse failed: $e\n$st');
         continue;
       }
     }

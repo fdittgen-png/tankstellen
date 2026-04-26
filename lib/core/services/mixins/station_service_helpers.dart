@@ -25,16 +25,29 @@ mixin StationServiceHelpers {
   /// Convert a [DioException] to an [ApiException] and throw it.
   ///
   /// Includes the Dio exception type and request path so error reports
-  /// carry enough context to diagnose without a repro (#524).
+  /// carry enough context to diagnose without a repro (#524). Pass the
+  /// caught stack trace as [stackTrace] (#1103) so the rethrown
+  /// [ApiException] keeps the original Dio call site instead of being
+  /// re-stamped at the throw point — required for usable Sentry /
+  /// `TraceRecorder` triage.
   ///
-  /// Use in catch blocks: `on DioException catch (e) { throwApiException(e); }`
-  Never throwApiException(DioException e, {String defaultMessage = 'Network error'}) {
+  /// Use in catch blocks:
+  /// `on DioException catch (e, st) { throwApiException(e, stackTrace: st); }`
+  Never throwApiException(
+    DioException e, {
+    String defaultMessage = 'Network error',
+    StackTrace? stackTrace,
+  }) {
     final path = e.requestOptions.uri.replace(queryParameters: {}).path;
     final detail = e.message ?? defaultMessage;
-    throw ApiException(
+    final apiException = ApiException(
       message: '${e.type.name}: $detail (path: $path)',
       statusCode: e.response?.statusCode,
     );
+    if (stackTrace != null) {
+      Error.throwWithStackTrace(apiException, stackTrace);
+    }
+    throw apiException;
   }
 
   // ---------------------------------------------------------------------------

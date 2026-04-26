@@ -133,8 +133,8 @@ class ReceiptScanService {
       final text = recognized.text;
       debugPrint('OCR text (${text.length} chars):\n$text');
       return text;
-    } catch (e) {
-      debugPrint('OCR scan failed: $e');
+    } catch (e, st) {
+      debugPrint('OCR scan failed: $e\n$st');
       return null;
     }
   }
@@ -142,8 +142,8 @@ class ReceiptScanService {
   Future<void> _tryDelete(String path) async {
     try {
       await File(path).delete();
-    } catch (e) {
-      debugPrint('OCR temp-file cleanup failed at $path: $e');
+    } catch (e, st) {
+      debugPrint('OCR temp-file cleanup failed at $path: $e\n$st');
     }
   }
 

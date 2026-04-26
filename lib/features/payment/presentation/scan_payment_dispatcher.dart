@@ -106,8 +106,8 @@ class ScanPaymentDispatcher {
       return ok
           ? ScanPaymentOutcome.launched
           : ScanPaymentOutcome.launchFailed;
-    } on Exception catch (e) {
-      debugPrint('ScanPaymentDispatcher launch failed: $e');
+    } on Exception catch (e, st) {
+      debugPrint('ScanPaymentDispatcher launch failed: $e\n$st');
       return ScanPaymentOutcome.launchFailed;
     }
   }
@@ -143,8 +143,8 @@ class ScanPaymentDispatcher {
               mode: LaunchMode.externalApplication);
           if (launched) return EpcLaunchOutcome.launched;
         }
-      } on Exception catch (e) {
-        debugPrint('tryLaunchEpc $scheme failed: $e');
+      } on Exception catch (e, st) {
+        debugPrint('tryLaunchEpc $scheme failed: $e\n$st');
       }
     }
 
@@ -157,8 +157,8 @@ class ScanPaymentDispatcher {
     try {
       await clipboardWriter(clipboard);
       return EpcLaunchOutcome.copiedToClipboard;
-    } on Exception catch (e) {
-      debugPrint('tryLaunchEpc clipboard failed: $e');
+    } on Exception catch (e, st) {
+      debugPrint('tryLaunchEpc clipboard failed: $e\n$st');
       return EpcLaunchOutcome.failed;
     }
   }
