@@ -2282,6 +2282,24 @@ abstract class AppLocalizations {
   /// **'Avg here: {price} EUR ({count} stations)'**
   String crossBorderAvgPrice(String price, int count);
 
+  /// Banner shown when stations across the border are cheaper than local prices.
+  ///
+  /// In en, this message translates to:
+  /// **'{country} stations {km} km away — €{price}/L cheaper'**
+  String crossBorderCheaper(String country, String km, String price);
+
+  /// Hint shown beneath the cross-border banner — tapping switches the active country and re-runs the search.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to switch country'**
+  String get crossBorderTapToSwitch;
+
+  /// Tooltip on the cross-border banner's dismiss icon.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get crossBorderDismissTooltip;
+
   /// No description provided for @allPricesView.
   ///
   /// In en, this message translates to:

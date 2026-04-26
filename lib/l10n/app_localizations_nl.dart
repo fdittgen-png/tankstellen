@@ -1170,6 +1170,17 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String crossBorderCheaper(String country, String km, String price) {
+    return '$country stations $km km away — €$price/L cheaper';
+  }
+
+  @override
+  String get crossBorderTapToSwitch => 'Tap to switch country';
+
+  @override
+  String get crossBorderDismissTooltip => 'Dismiss';
+
+  @override
   String get allPricesView => 'All prices';
 
   @override
