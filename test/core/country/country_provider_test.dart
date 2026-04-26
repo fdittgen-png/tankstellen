@@ -1,13 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 
-import '../../mocks/mocks.dart';
+import '../../fakes/fake_hive_storage.dart';
 
 class _FixedActiveProfile extends ActiveProfile {
   final UserProfile? _value;
@@ -18,22 +17,23 @@ class _FixedActiveProfile extends ActiveProfile {
 }
 
 void main() {
-  late MockHiveStorage mockStorage;
+  late FakeHiveStorage fakeStorage;
 
   setUp(() {
-    mockStorage = MockHiveStorage();
-    when(() => mockStorage.getSetting(any())).thenReturn(null);
+    fakeStorage = FakeHiveStorage();
   });
 
   ProviderContainer createContainer({
     UserProfile? profile,
     String? savedCountryCode,
   }) {
-    when(() => mockStorage.getSetting('active_country_code'))
-        .thenReturn(savedCountryCode);
+    if (savedCountryCode != null) {
+      // Seed the persisted country setting so the provider can read it.
+      fakeStorage.putSetting('active_country_code', savedCountryCode);
+    }
 
     final c = ProviderContainer(overrides: [
-      hiveStorageProvider.overrideWithValue(mockStorage),
+      hiveStorageProvider.overrideWithValue(fakeStorage),
       activeProfileProvider.overrideWith(() => _FixedActiveProfile(profile)),
     ]);
     addTearDown(c.dispose);
@@ -54,8 +54,7 @@ void main() {
       expect(container.read(activeCountryProvider).code, 'DE');
     });
 
-    test('priority 2: persisted setting when no profile country',
-        () {
+    test('priority 2: persisted setting when no profile country', () {
       final container = createContainer(
         profile: const UserProfile(id: 'p', name: 'none'),
         savedCountryCode: 'AT',
@@ -77,8 +76,7 @@ void main() {
       expect(Countries.byCode(resolved.code), isNotNull);
     });
 
-    test('profile with null countryCode is ignored, falls to storage',
-        () {
+    test('profile with null countryCode is ignored, falls to storage', () {
       final container = createContainer(
         profile: const UserProfile(id: 'p', name: 'none'),
         savedCountryCode: 'IT',

@@ -11,12 +11,19 @@ import 'package:tankstellen/features/favorites/providers/favorites_provider.dart
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 
+import '../fakes/fake_hive_storage.dart';
+import '../fakes/fake_storage_repository.dart';
 import '../mocks/mocks.dart';
 
 /// Creates an override for [storageRepositoryProvider] using a [MockStorageRepository].
 ///
 /// Returns both the override and the mock so callers can configure stubs.
+@Deprecated(
+  'Prefer fakeStorageRepositoryOverride for stateful tests. The mocktail mock '
+  'does not track state changes; see test/fakes/fake_storage_repository.dart.',
+)
 ({Object override, MockStorageRepository mock}) mockStorageRepositoryOverride() {
+  // ignore: deprecated_member_use_from_same_package
   final mock = MockStorageRepository();
   // Default stubs to avoid null returns from Mock
   when(() => mock.getFavoriteIds()).thenReturn([]);
@@ -33,12 +40,40 @@ import '../mocks/mocks.dart';
 
 /// Legacy alias — creates an override for [hiveStorageProvider] using a [MockHiveStorage].
 ///
-/// Prefer [mockStorageRepositoryOverride] for new tests.
+/// Prefer [fakeHiveStorageOverride] for stateful tests.
+@Deprecated(
+  'Prefer fakeHiveStorageOverride for stateful tests. See '
+  'test/fakes/fake_hive_storage.dart.',
+)
 ({Object override, MockHiveStorage mock}) mockHiveStorageOverride() {
+  // ignore: deprecated_member_use_from_same_package
   final mock = MockHiveStorage();
   return (
     override: hiveStorageProvider.overrideWithValue(mock),
     mock: mock,
+  );
+}
+
+/// Creates an override for [storageRepositoryProvider] using a stateful
+/// [FakeStorageRepository]. Prefer this over [mockStorageRepositoryOverride]
+/// for any test that needs read-after-write storage semantics — see
+/// `feedback_test_doubles_must_mirror_real_service_outputs.md`.
+({Object override, FakeStorageRepository fake}) fakeStorageRepositoryOverride() {
+  final fake = FakeStorageRepository();
+  return (
+    override: storageRepositoryProvider.overrideWithValue(fake),
+    fake: fake,
+  );
+}
+
+/// Creates an override for [hiveStorageProvider] using a stateful
+/// [FakeHiveStorage]. Prefer this over [mockHiveStorageOverride] for any
+/// test that needs read-after-write semantics.
+({Object override, FakeHiveStorage fake}) fakeHiveStorageOverride() {
+  final fake = FakeHiveStorage();
+  return (
+    override: hiveStorageProvider.overrideWithValue(fake),
+    fake: fake,
   );
 }
 
@@ -163,6 +198,27 @@ class _FixedUserPosition extends UserPosition {
       syncStateProvider.overrideWith(() => _DisabledSyncState()),
     ],
     mockStorage: storage.mock,
+  );
+}
+
+/// Same as [standardTestOverrides] but backed by a [FakeStorageRepository]
+/// for tests that exercise real storage state transitions. Returns the
+/// fake so callers can pre-seed storage (e.g. `fake.setApiKey('x')`).
+({List<Object> overrides, FakeStorageRepository fakeStorage})
+    standardFakeTestOverrides({
+  CountryConfig country = Countries.germany,
+  List<String> favoriteIds = const [],
+}) {
+  final storage = fakeStorageRepositoryOverride();
+  return (
+    overrides: [
+      storage.override,
+      activeCountryOverride(country),
+      favoritesOverride(favoriteIds),
+      evFavoritesProvider.overrideWith(() => _EmptyEvFavorites()),
+      syncStateProvider.overrideWith(() => _DisabledSyncState()),
+    ],
+    fakeStorage: storage.fake,
   );
 }
 

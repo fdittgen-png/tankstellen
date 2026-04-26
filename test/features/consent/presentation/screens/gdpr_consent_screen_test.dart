@@ -2,24 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/consent/presentation/screens/gdpr_consent_screen.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
-import '../../../../mocks/mocks.dart';
+import '../../../../fakes/fake_hive_storage.dart';
 
 void main() {
-  late MockHiveStorage mockStorage;
+  late FakeHiveStorage fakeStorage;
 
   setUp(() {
-    mockStorage = MockHiveStorage();
-    when(() => mockStorage.getSetting(any())).thenReturn(null);
-    when(() => mockStorage.putSetting(any(), any())).thenAnswer((_) async {});
-    when(() => mockStorage.hasApiKey()).thenReturn(false);
-    when(() => mockStorage.isSetupComplete).thenReturn(false);
-    when(() => mockStorage.isSetupSkipped).thenReturn(false);
+    fakeStorage = FakeHiveStorage()..hasBundledDefaultKey = false;
   });
 
   Widget buildScreen() {
@@ -41,7 +35,7 @@ void main() {
 
     return ProviderScope(
       overrides: [
-        hiveStorageProvider.overrideWithValue(mockStorage),
+        hiveStorageProvider.overrideWithValue(fakeStorage),
       ],
       child: MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -126,16 +120,10 @@ void main() {
       await tester.tap(find.text('Accept Selected'));
       await tester.pumpAndSettle();
 
-      verify(() => mockStorage.putSetting(StorageKeys.gdprConsentGiven, true))
-          .called(1);
-      verify(() => mockStorage.putSetting(StorageKeys.consentLocation, true))
-          .called(1);
-      verify(() =>
-              mockStorage.putSetting(StorageKeys.consentErrorReporting, false))
-          .called(1);
-      verify(() =>
-              mockStorage.putSetting(StorageKeys.consentCloudSync, false))
-          .called(1);
+      expect(fakeStorage.getSetting(StorageKeys.gdprConsentGiven), true);
+      expect(fakeStorage.getSetting(StorageKeys.consentLocation), true);
+      expect(fakeStorage.getSetting(StorageKeys.consentErrorReporting), false);
+      expect(fakeStorage.getSetting(StorageKeys.consentCloudSync), false);
     });
 
     testWidgets('Accept All saves all consents as true', (tester) async {
@@ -146,15 +134,10 @@ void main() {
       await tester.tap(find.text('Accept All'));
       await tester.pumpAndSettle();
 
-      verify(() => mockStorage.putSetting(StorageKeys.gdprConsentGiven, true))
-          .called(1);
-      verify(() => mockStorage.putSetting(StorageKeys.consentLocation, true))
-          .called(1);
-      verify(() =>
-              mockStorage.putSetting(StorageKeys.consentErrorReporting, true))
-          .called(1);
-      verify(() => mockStorage.putSetting(StorageKeys.consentCloudSync, true))
-          .called(1);
+      expect(fakeStorage.getSetting(StorageKeys.gdprConsentGiven), true);
+      expect(fakeStorage.getSetting(StorageKeys.consentLocation), true);
+      expect(fakeStorage.getSetting(StorageKeys.consentErrorReporting), true);
+      expect(fakeStorage.getSetting(StorageKeys.consentCloudSync), true);
     });
 
     testWidgets('shows privacy icon', (tester) async {

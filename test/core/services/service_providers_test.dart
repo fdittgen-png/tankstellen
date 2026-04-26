@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/cache/cache_manager.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
@@ -9,6 +8,7 @@ import 'package:tankstellen/core/services/service_providers.dart';
 import 'package:tankstellen/core/services/station_service_chain.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 
+import '../../fakes/fake_hive_storage.dart';
 import '../../mocks/mocks.dart';
 
 class _FixedActiveCountry extends ActiveCountry {
@@ -20,20 +20,19 @@ class _FixedActiveCountry extends ActiveCountry {
 }
 
 void main() {
-  late MockHiveStorage mockStorage;
+  late FakeHiveStorage fakeStorage;
   late MockCacheManager mockCache;
 
   setUp(() {
-    mockStorage = MockHiveStorage();
+    fakeStorage = FakeHiveStorage()..hasBundledDefaultKey = false;
     mockCache = MockCacheManager();
-    when(() => mockStorage.getSetting(any())).thenReturn(null);
   });
 
   ProviderContainer createContainer({
     CountryConfig country = Countries.germany,
   }) {
     final container = ProviderContainer(overrides: [
-      hiveStorageProvider.overrideWithValue(mockStorage),
+      hiveStorageProvider.overrideWithValue(fakeStorage),
       cacheManagerProvider.overrideWithValue(mockCache),
       activeCountryProvider.overrideWith(() => _FixedActiveCountry(country)),
     ]);
@@ -48,7 +47,7 @@ void main() {
       // fallback) in a StationServiceChain. The behaviour is preserved:
       // demo data still backs the chain, the chain is just the consistent
       // outer type so callers don't have to special-case Germany either.
-      when(() => mockStorage.hasApiKey()).thenReturn(false);
+      // Default fake state: no key configured, hasApiKey() == false.
 
       final container = createContainer(country: Countries.germany);
       final service = container.read(stationServiceProvider);
@@ -56,9 +55,9 @@ void main() {
       expect(service, isA<StationServiceChain>());
     });
 
-    test('returns StationServiceChain when DE and API key present', () {
-      when(() => mockStorage.hasApiKey()).thenReturn(true);
-      when(() => mockStorage.getApiKey()).thenReturn('test-key');
+    test('returns StationServiceChain when DE and API key present',
+        () async {
+      await fakeStorage.setApiKey('test-key');
 
       final container = createContainer(country: Countries.germany);
       final service = container.read(stationServiceProvider);

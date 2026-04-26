@@ -1,16 +1,16 @@
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/cache/cache_manager.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/core/services/station_service_chain.dart';
-import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+
+import '../../fakes/fake_hive_storage.dart';
 
 // ---------------------------------------------------------------------------
 // Test doubles
@@ -57,17 +57,14 @@ class _FakeStationService implements StationService {
   }
 }
 
-/// In-memory HiveStorage mock that provides cache operations.
-class _MockHiveStorage extends Mock implements HiveStorage {}
-
 /// In-memory CacheManager wrapper that bypasses Hive for testing.
 ///
-/// Since CacheManager is a concrete class requiring HiveStorage, we wrap
-/// it with an in-memory store that implements the same interface.
+/// Since CacheManager is a concrete class requiring HiveStorage, we hand
+/// it a [FakeHiveStorage] (in-memory) and override every method anyway.
 class _FakeCacheManager extends CacheManager {
   final Map<String, Map<String, dynamic>> _store = {};
 
-  _FakeCacheManager() : super(_MockHiveStorage());
+  _FakeCacheManager() : super(FakeHiveStorage());
 
   @override
   Future<void> put(

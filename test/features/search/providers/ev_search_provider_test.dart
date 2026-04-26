@@ -1,12 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/search/providers/ev_search_provider.dart';
 
-import '../../../mocks/mocks.dart';
+import '../../../fakes/fake_hive_storage.dart';
 
 /// Tests cover the branches of EVSearchState that do **not** hit the
 /// real OpenChargeMap API — notably the initial state and the
@@ -16,15 +15,15 @@ import '../../../mocks/mocks.dart';
 /// here too would require a dependency-injection seam for
 /// EVChargingService that does not exist today.
 void main() {
-  late MockHiveStorage mockStorage;
+  late FakeHiveStorage fakeStorage;
 
   setUp(() {
-    mockStorage = MockHiveStorage();
+    fakeStorage = FakeHiveStorage();
   });
 
   ProviderContainer createContainer() {
     final c = ProviderContainer(overrides: [
-      hiveStorageProvider.overrideWithValue(mockStorage),
+      hiveStorageProvider.overrideWithValue(fakeStorage),
     ]);
     addTearDown(c.dispose);
     return c;
@@ -55,8 +54,7 @@ void main() {
 
   group('EVSearchState.searchNearby — no API key guard', () {
     test('sets AsyncError(NoEvApiKeyException) when key is null', () async {
-      when(() => mockStorage.getEvApiKey()).thenReturn(null);
-
+      // FakeHiveStorage returns null for getEvApiKey by default.
       final container = createContainer();
       await container
           .read(eVSearchStateProvider.notifier)
@@ -69,7 +67,7 @@ void main() {
 
     test('sets AsyncError(NoEvApiKeyException) when key is empty',
         () async {
-      when(() => mockStorage.getEvApiKey()).thenReturn('');
+      await fakeStorage.setEvApiKey('');
 
       final container = createContainer();
       await container
@@ -82,8 +80,6 @@ void main() {
     });
 
     test('error state carries the stack trace', () async {
-      when(() => mockStorage.getEvApiKey()).thenReturn(null);
-
       final container = createContainer();
       await container
           .read(eVSearchStateProvider.notifier)
@@ -98,8 +94,6 @@ void main() {
       // Regression guard for #550 — if keepAlive ever gets dropped,
       // the notifier would be disposed mid-error-surface and a retry
       // would throw UnmountedRefException.
-      when(() => mockStorage.getEvApiKey()).thenReturn(null);
-
       final container = createContainer();
       final notifier = container.read(eVSearchStateProvider.notifier);
       await notifier.searchNearby(lat: 0, lng: 0, radiusKm: 5);

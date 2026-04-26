@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/sync/presentation/screens/data_transparency_screen.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
-import '../../../../mocks/mocks.dart';
+import '../../../../fakes/fake_hive_storage.dart';
 
 void main() {
   group('DataTransparencyScreen', () {
@@ -15,15 +14,15 @@ void main() {
     // Supabase backend, we test the initial/error state which shows
     // "No user ID found." when userId is null.
 
-    late MockHiveStorage mockStorage;
+    late FakeHiveStorage fakeStorage;
     late List<Object> overrides;
 
     setUp(() {
-      mockStorage = MockHiveStorage();
-      // Return null for all settings so SyncConfig has no userId
-      when(() => mockStorage.getSetting(any())).thenReturn(null);
+      // Default fake state: every getSetting returns null, so SyncConfig
+      // has no userId and the screen falls through to its error path.
+      fakeStorage = FakeHiveStorage();
       overrides = [
-        hiveStorageProvider.overrideWithValue(mockStorage),
+        hiveStorageProvider.overrideWithValue(fakeStorage),
       ];
     });
 

@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_detection_provider.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
@@ -10,7 +9,7 @@ import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 
-import '../../mocks/mocks.dart';
+import '../../fakes/fake_hive_storage.dart';
 
 class _FixedDetectedCountry extends DetectedCountry {
   final String? _value;
@@ -41,12 +40,11 @@ const _germanProfile = UserProfile(
 );
 
 void main() {
-  late MockHiveStorage mockStorage;
+  late FakeHiveStorage fakeStorage;
 
   setUp(() {
-    mockStorage = MockHiveStorage();
-    when(() => mockStorage.getSetting(StorageKeys.autoSwitchProfile))
-        .thenReturn(false);
+    fakeStorage = FakeHiveStorage();
+    fakeStorage.putSetting(StorageKeys.autoSwitchProfile, false);
   });
 
   ProviderContainer createContainer({
@@ -55,8 +53,9 @@ void main() {
     List<UserProfile> profiles = const [],
   }) {
     final c = ProviderContainer(overrides: [
-      hiveStorageProvider.overrideWithValue(mockStorage),
-      detectedCountryProvider.overrideWith(() => _FixedDetectedCountry(detected)),
+      hiveStorageProvider.overrideWithValue(fakeStorage),
+      detectedCountryProvider
+          .overrideWith(() => _FixedDetectedCountry(detected)),
       activeCountryProvider.overrideWith(() => _FixedActiveCountry(active)),
       allProfilesProvider.overrideWith((ref) => profiles),
     ]);
@@ -95,9 +94,8 @@ void main() {
     });
 
     test('returns "suggest" when profile matches but auto-switch is off',
-        () {
-      when(() => mockStorage.getSetting(StorageKeys.autoSwitchProfile))
-          .thenReturn(false);
+        () async {
+      await fakeStorage.putSetting(StorageKeys.autoSwitchProfile, false);
 
       final c = createContainer(
         detected: 'DE',
@@ -112,9 +110,8 @@ void main() {
     });
 
     test('returns "autoSwitch" when profile matches AND autoSwitch is on',
-        () {
-      when(() => mockStorage.getSetting(StorageKeys.autoSwitchProfile))
-          .thenReturn(true);
+        () async {
+      await fakeStorage.putSetting(StorageKeys.autoSwitchProfile, true);
 
       final c = createContainer(
         detected: 'DE',
@@ -129,9 +126,8 @@ void main() {
     });
 
     test('autoSwitch only fires when a matching profile EXISTS — no profile '
-        'still returns "noProfile" even with the flag on', () {
-      when(() => mockStorage.getSetting(StorageKeys.autoSwitchProfile))
-          .thenReturn(true);
+        'still returns "noProfile" even with the flag on', () async {
+      await fakeStorage.putSetting(StorageKeys.autoSwitchProfile, true);
 
       final c = createContainer(
         detected: 'IT',

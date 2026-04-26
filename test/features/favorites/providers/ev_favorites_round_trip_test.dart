@@ -1,12 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 
-import '../../../mocks/mocks.dart';
+import '../../../fakes/fake_hive_storage.dart';
 
 /// End-to-end round-trip test: add an EV favorite via the unified
 /// favoritesProvider.toggleEv(), then verify it appears in
@@ -19,12 +18,7 @@ import '../../../mocks/mocks.dart';
 /// simply verifies the canonical fromJson handles the legacy key
 /// naming directly.
 void main() {
-  late MockHiveStorage mockStorage;
-
-  // In-memory stores that behave like real Hive.
-  late List<String> fuelIds;
-  late List<String> evIds;
-  late Map<String, Map<String, dynamic>> evStationData;
+  late FakeHiveStorage fakeStorage;
 
   // Canonical ChargingStation — the single unified type after #560.
   const testEvStation = ChargingStation(
@@ -37,51 +31,12 @@ void main() {
   );
 
   setUp(() {
-    mockStorage = MockHiveStorage();
-    fuelIds = [];
-    evIds = [];
-    evStationData = {};
-
-    // Fuel stubs
-    when(() => mockStorage.getFavoriteIds()).thenAnswer((_) => List.of(fuelIds));
-    when(() => mockStorage.isFavorite(any()))
-        .thenAnswer((inv) => fuelIds.contains(inv.positionalArguments.first));
-    when(() => mockStorage.getFavoriteStationData(any())).thenReturn(null);
-
-    // EV stubs — in-memory round-trip
-    when(() => mockStorage.getEvFavoriteIds()).thenAnswer((_) => List.of(evIds));
-    when(() => mockStorage.isEvFavorite(any()))
-        .thenAnswer((inv) => evIds.contains(inv.positionalArguments.first));
-    when(() => mockStorage.addEvFavorite(any())).thenAnswer((inv) async {
-      final id = inv.positionalArguments.first as String;
-      if (!evIds.contains(id)) evIds.add(id);
-    });
-    when(() => mockStorage.removeEvFavorite(any())).thenAnswer((inv) async {
-      evIds.remove(inv.positionalArguments.first);
-    });
-    when(() => mockStorage.saveEvFavoriteStationData(any(), any()))
-        .thenAnswer((inv) async {
-      evStationData[inv.positionalArguments.first as String] =
-          inv.positionalArguments[1] as Map<String, dynamic>;
-    });
-    when(() => mockStorage.getEvFavoriteStationData(any())).thenAnswer((inv) {
-      return evStationData[inv.positionalArguments.first];
-    });
-    when(() => mockStorage.removeEvFavoriteStationData(any()))
-        .thenAnswer((inv) async {
-      evStationData.remove(inv.positionalArguments.first);
-    });
-
-    // Misc stubs
-    when(() => mockStorage.getSetting(any())).thenReturn(null);
-    when(() => mockStorage.getRatings()).thenReturn({});
-
-    registerFallbackValue(<String, dynamic>{});
+    fakeStorage = FakeHiveStorage();
   });
 
   ProviderContainer createContainer() {
     final c = ProviderContainer(overrides: [
-      hiveStorageProvider.overrideWithValue(mockStorage),
+      hiveStorageProvider.overrideWithValue(fakeStorage),
     ]);
     addTearDown(c.dispose);
     return c;
@@ -154,8 +109,8 @@ void main() {
           'address': '1 Rue de Test',
           'connectors': <dynamic>[],
         };
-        evStationData['ev-42'] = legacyJson;
-        evIds.add('ev-42');
+        await fakeStorage.addEvFavorite('ev-42');
+        await fakeStorage.saveEvFavoriteStationData('ev-42', legacyJson);
 
         final container = createContainer();
         final stations = container.read(evFavoriteStationsProvider);

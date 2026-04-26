@@ -1,27 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/price_history/data/repositories/price_history_repository.dart';
 import 'package:tankstellen/features/price_history/presentation/screens/price_history_screen.dart';
 import 'package:tankstellen/features/price_history/providers/price_history_provider.dart';
 
+import '../../../../fakes/fake_hive_storage.dart';
 import '../../../../helpers/pump_app.dart';
-import '../../../../mocks/mocks.dart';
 
 void main() {
   group('PriceHistoryScreen', () {
-    late MockHiveStorage mockStorage;
+    late FakeHiveStorage fakeStorage;
     late List<Object> commonOverrides;
 
     setUp(() {
-      mockStorage = MockHiveStorage();
-      when(() => mockStorage.getPriceRecords(any())).thenReturn([]);
-      when(() => mockStorage.getPriceHistoryKeys()).thenReturn([]);
+      fakeStorage = FakeHiveStorage();
       commonOverrides = [
-        hiveStorageProvider.overrideWithValue(mockStorage),
+        hiveStorageProvider.overrideWithValue(fakeStorage),
         priceHistoryRepositoryProvider.overrideWithValue(
-          PriceHistoryRepository(mockStorage),
+          PriceHistoryRepository(fakeStorage),
         ),
       ];
     });

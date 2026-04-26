@@ -1,31 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 
-import '../../mocks/mocks.dart';
+import '../../fakes/fake_hive_storage.dart';
 
 void main() {
-  late MockHiveStorage mockStorage;
-  final persisted = <String, dynamic>{};
+  late FakeHiveStorage fakeStorage;
 
   setUp(() {
-    persisted.clear();
-    mockStorage = MockHiveStorage();
-    when(() => mockStorage.getSetting(any()))
-        .thenAnswer((inv) => persisted[inv.positionalArguments.first]);
-    when(() => mockStorage.putSetting(any(), any()))
-        .thenAnswer((inv) async {
-      final key = inv.positionalArguments.first as String;
-      persisted[key] = inv.positionalArguments.last;
-    });
+    fakeStorage = FakeHiveStorage();
   });
 
   ProviderContainer makeContainer() {
     final c = ProviderContainer(overrides: [
-      hiveStorageProvider.overrideWithValue(mockStorage),
+      hiveStorageProvider.overrideWithValue(fakeStorage),
     ]);
     addTearDown(c.dispose);
     return c;
@@ -36,12 +26,12 @@ void main() {
       expect(makeContainer().read(userPositionProvider), isNull);
     });
 
-    test('reconstructs UserPositionData from persisted settings', () {
-      persisted[StorageKeys.userPositionLat] = 48.85;
-      persisted[StorageKeys.userPositionLng] = 2.35;
-      persisted[StorageKeys.userPositionTimestamp] =
-          DateTime(2026, 4, 10, 9, 30).millisecondsSinceEpoch;
-      persisted[StorageKeys.userPositionSource] = 'GPS';
+    test('reconstructs UserPositionData from persisted settings', () async {
+      await fakeStorage.putSetting(StorageKeys.userPositionLat, 48.85);
+      await fakeStorage.putSetting(StorageKeys.userPositionLng, 2.35);
+      await fakeStorage.putSetting(StorageKeys.userPositionTimestamp,
+          DateTime(2026, 4, 10, 9, 30).millisecondsSinceEpoch);
+      await fakeStorage.putSetting(StorageKeys.userPositionSource, 'GPS');
 
       final pos = makeContainer().read(userPositionProvider);
       expect(pos, isNotNull);
@@ -51,16 +41,16 @@ void main() {
       expect(pos.updatedAt, DateTime(2026, 4, 10, 9, 30));
     });
 
-    test('missing source defaults to "GPS"', () {
-      persisted[StorageKeys.userPositionLat] = 1.0;
-      persisted[StorageKeys.userPositionLng] = 2.0;
-      persisted[StorageKeys.userPositionTimestamp] = 0;
+    test('missing source defaults to "GPS"', () async {
+      await fakeStorage.putSetting(StorageKeys.userPositionLat, 1.0);
+      await fakeStorage.putSetting(StorageKeys.userPositionLng, 2.0);
+      await fakeStorage.putSetting(StorageKeys.userPositionTimestamp, 0);
       final pos = makeContainer().read(userPositionProvider)!;
       expect(pos.source, 'GPS');
     });
 
-    test('partial persistence (missing lat) yields null', () {
-      persisted[StorageKeys.userPositionLng] = 2.35;
+    test('partial persistence (missing lat) yields null', () async {
+      await fakeStorage.putSetting(StorageKeys.userPositionLng, 2.35);
       expect(makeContainer().read(userPositionProvider), isNull);
     });
   });
@@ -77,8 +67,8 @@ void main() {
       expect(pos.lng, 1.4);
       expect(pos.source, 'GPS');
       expect(pos.updatedAt.isAfter(DateTime(2024)), isTrue);
-      expect(persisted[StorageKeys.userPositionLat], 43.6);
-      expect(persisted[StorageKeys.userPositionSource], 'GPS');
+      expect(fakeStorage.getSetting(StorageKeys.userPositionLat), 43.6);
+      expect(fakeStorage.getSetting(StorageKeys.userPositionSource), 'GPS');
     });
 
     test('setWithSource uses the supplied label', () {
@@ -89,7 +79,8 @@ void main() {
 
       final pos = container.read(userPositionProvider)!;
       expect(pos.source, 'Frankfurt Hbf');
-      expect(persisted[StorageKeys.userPositionSource], 'Frankfurt Hbf');
+      expect(fakeStorage.getSetting(StorageKeys.userPositionSource),
+          'Frankfurt Hbf');
     });
 
     test('subsequent setFromGps overwrites the earlier position', () {
@@ -111,10 +102,11 @@ void main() {
       notifier.clear();
 
       expect(container.read(userPositionProvider), isNull);
-      expect(persisted[StorageKeys.userPositionLat], isNull);
-      expect(persisted[StorageKeys.userPositionLng], isNull);
-      expect(persisted[StorageKeys.userPositionTimestamp], isNull);
-      expect(persisted[StorageKeys.userPositionSource], isNull);
+      expect(fakeStorage.getSetting(StorageKeys.userPositionLat), isNull);
+      expect(fakeStorage.getSetting(StorageKeys.userPositionLng), isNull);
+      expect(
+          fakeStorage.getSetting(StorageKeys.userPositionTimestamp), isNull);
+      expect(fakeStorage.getSetting(StorageKeys.userPositionSource), isNull);
     });
   });
 }
