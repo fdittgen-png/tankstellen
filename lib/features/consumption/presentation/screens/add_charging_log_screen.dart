@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../ev/domain/charging_cost_calculator.dart';
 import '../../../ev/domain/entities/charging_log.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
+import '../../domain/charging_log_readout.dart';
+import '../../domain/charging_log_validators.dart';
 import '../../providers/charging_logs_provider.dart';
-import '../widgets/fill_up_date_row.dart';
-import '../widgets/fill_up_numeric_field.dart';
-import '../widgets/fill_up_vehicle_dropdown.dart';
+import '../widgets/charging_log_form_fields.dart';
 
 /// Form to add a new [ChargingLog] entry (#582 phase 2).
 ///
@@ -28,6 +26,11 @@ import '../widgets/fill_up_vehicle_dropdown.dart';
 /// When there is no prior log, the readout hides and a small helper
 /// line explains why. Phase-3 will upgrade this to the vehicle's
 /// consumption baseline when odometer-only anchoring isn't enough.
+///
+/// **#563 refactor** — form layout, validators, and the derived
+/// readout were extracted to siblings under `presentation/widgets/`
+/// and `domain/`. The screen now owns lifecycle (controllers, state
+/// flags, vehicle init, submit) and delegates rendering.
 class AddChargingLogScreen extends ConsumerStatefulWidget {
   /// Optional pre-fill from a selected EV station. Phase 3 wires
   /// this up from the EV-station-detail screen (#691) — this phase
@@ -115,37 +118,6 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
     _vehicleInitialized = true;
   }
 
-  String? _positiveNumberValidator(String? value) {
-    final l = AppLocalizations.of(context);
-    if (value == null || value.trim().isEmpty) {
-      return l?.fieldRequired ?? 'Required';
-    }
-    final parsed = double.tryParse(value.replaceAll(',', '.'));
-    if (parsed == null || parsed <= 0) {
-      return l?.fieldInvalidNumber ?? 'Invalid number';
-    }
-    return null;
-  }
-
-  String? _nonNegativeIntValidator(String? value) {
-    final l = AppLocalizations.of(context);
-    if (value == null || value.trim().isEmpty) {
-      return l?.fieldRequired ?? 'Required';
-    }
-    final parsed = int.tryParse(value.replaceAll(',', '.').split('.').first);
-    if (parsed == null || parsed < 0) {
-      return l?.fieldInvalidNumber ?? 'Invalid number';
-    }
-    return null;
-  }
-
-  double _parseDouble(TextEditingController ctrl) =>
-      double.parse(ctrl.text.replaceAll(',', '.'));
-
-  int _parseInt(TextEditingController ctrl) => int.parse(
-        ctrl.text.replaceAll(',', '.').split('.').first,
-      );
-
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -158,62 +130,12 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
     }
   }
 
-  /// Compute EUR/100 km for a hypothetical log carrying the form's
-  /// current inputs, comparing against the most-recent prior log for
-  /// the selected vehicle. Returns null when inputs are incomplete,
-  /// unparseable, or there's no prior log to anchor the distance.
-  _DerivedReadout? _deriveReadout() {
-    if (_vehicleId == null) return null;
-    final kWh = double.tryParse(_kwhCtrl.text.replaceAll(',', '.'));
-    final cost = double.tryParse(_costCtrl.text.replaceAll(',', '.'));
-    final parsedOdo = int.tryParse(
-      _odoCtrl.text.replaceAll(',', '.').split('.').first,
-    );
-    if (kWh == null || kWh <= 0) return null;
-    if (cost == null || cost <= 0) return null;
-    if (parsedOdo == null || parsedOdo <= 0) return null;
-    // Local non-nullable copy — Dart's flow analysis does not promote
-    // captured nullable locals inside closures like [firstWhere].
-    final int odo = parsedOdo;
-
+  /// Resolve the prior-logs list for the readout. Returns null while
+  /// the provider is still loading so the panel hides until data
+  /// arrives.
+  List<ChargingLog>? _allLogsOrNull() {
     final logsAsync = ref.watch(chargingLogsProvider);
-    final all = logsAsync.hasValue ? logsAsync.value : null;
-    if (all == null) return null;
-    final prior = all
-        .where((log) => log.vehicleId == _vehicleId)
-        .toList(growable: false);
-    if (prior.isEmpty) return const _DerivedReadout.empty();
-
-    // Prior logs are oldest-first; the anchor is the most recent one
-    // with odometer < odo (i.e. driven since then).
-    final candidate = prior.reversed.firstWhere(
-      (log) => log.odometerKm < odo,
-      orElse: () => prior.last,
-    );
-    final int kmDriven = odo - candidate.odometerKm;
-    if (kmDriven <= 0) return const _DerivedReadout.empty();
-
-    final preview = ChargingLog(
-      id: 'preview',
-      vehicleId: _vehicleId!,
-      date: _date,
-      kWh: kWh,
-      costEur: cost,
-      chargeTimeMin: 0,
-      odometerKm: odo,
-    );
-    final eurPer100 = ChargingCostCalculator.eurPer100km(
-      preview,
-      kmDriven: kmDriven,
-    );
-    final kwhPer100 = ChargingCostCalculator.kWhPer100km(
-      preview,
-      kmDriven: kmDriven,
-    );
-    return _DerivedReadout(
-      eurPer100km: eurPer100,
-      kwhPer100km: kwhPer100,
-    );
+    return logsAsync.hasValue ? logsAsync.value : null;
   }
 
   Future<void> _save() async {
@@ -225,10 +147,10 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
         id: DateTime.now().microsecondsSinceEpoch.toString(),
         vehicleId: _vehicleId!,
         date: _date,
-        kWh: _parseDouble(_kwhCtrl),
-        costEur: _parseDouble(_costCtrl),
-        chargeTimeMin: _parseInt(_timeMinCtrl),
-        odometerKm: _parseInt(_odoCtrl),
+        kWh: ChargingLogValidators.parseDouble(_kwhCtrl.text),
+        costEur: ChargingLogValidators.parseDouble(_costCtrl.text),
+        chargeTimeMin: ChargingLogValidators.parseInt(_timeMinCtrl.text),
+        odometerKm: ChargingLogValidators.parseInt(_odoCtrl.text),
         stationName:
             _stationCtrl.text.trim().isEmpty ? null : _stationCtrl.text.trim(),
         chargingStationId: widget.chargingStationId,
@@ -290,163 +212,40 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
 
     final dateStr =
         '${_date.year}-${_pad(_date.month)}-${_pad(_date.day)}';
-    final derived = _deriveReadout();
+    final derived = computeChargingLogReadout(
+      vehicleId: _vehicleId,
+      kWhText: _kwhCtrl.text,
+      costText: _costCtrl.text,
+      odometerText: _odoCtrl.text,
+      date: _date,
+      allLogs: _allLogsOrNull(),
+    );
 
     return PageScaffold(
       title: l?.addChargingLogTitle ?? 'Log charging session',
       bodyPadding: EdgeInsets.zero,
       body: Form(
         key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            FillUpDateRow(dateLabel: dateStr, onTap: _pickDate),
-            const SizedBox(height: 8),
-            FillUpVehicleDropdown(
-              vehicleId: _vehicleId,
-              vehicles: vehicles,
-              onChanged: (id, _) {
-                setState(() => _vehicleId = id);
-              },
-            ),
-            const SizedBox(height: 12),
-            FillUpNumericField(
-              key: const Key('charging_kwh_field'),
-              controller: _kwhCtrl,
-              label: l?.chargingKwh ?? 'Energy (kWh)',
-              icon: Icons.bolt_outlined,
-              validator: _positiveNumberValidator,
-            ),
-            const SizedBox(height: 12),
-            FillUpNumericField(
-              key: const Key('charging_cost_field'),
-              controller: _costCtrl,
-              label: l?.chargingCost ?? 'Total cost',
-              icon: Icons.euro,
-              validator: _positiveNumberValidator,
-            ),
-            _DerivedReadoutPanel(readout: derived),
-            const SizedBox(height: 12),
-            FillUpNumericField(
-              key: const Key('charging_time_field'),
-              controller: _timeMinCtrl,
-              label: l?.chargingTimeMin ?? 'Charge time (min)',
-              icon: Icons.timer_outlined,
-              validator: _nonNegativeIntValidator,
-            ),
-            const SizedBox(height: 12),
-            FillUpNumericField(
-              key: const Key('charging_odo_field'),
-              controller: _odoCtrl,
-              label: l?.odometerKm ?? 'Odometer (km)',
-              icon: Icons.speed,
-              validator: _positiveNumberValidator,
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              key: const Key('charging_station_field'),
-              controller: _stationCtrl,
-              textCapitalization: TextCapitalization.words,
-              inputFormatters: [
-                LengthLimitingTextInputFormatter(80),
-              ],
-              decoration: InputDecoration(
-                labelText: l?.chargingStationName ?? 'Station (optional)',
-                prefixIcon: const Icon(Icons.place_outlined),
-              ),
-            ),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              key: const Key('charging_save_button'),
-              onPressed: _saving ? null : _save,
-              icon: _saving
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.save),
-              label: Text(l?.save ?? 'Save'),
-            ),
-            SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 16),
-          ],
+        child: ChargingLogFormFields(
+          dateLabel: dateStr,
+          onPickDate: _pickDate,
+          vehicleId: _vehicleId,
+          vehicles: vehicles,
+          onVehicleChanged: (id, _) {
+            setState(() => _vehicleId = id);
+          },
+          kwhCtrl: _kwhCtrl,
+          costCtrl: _costCtrl,
+          timeMinCtrl: _timeMinCtrl,
+          odoCtrl: _odoCtrl,
+          stationCtrl: _stationCtrl,
+          derived: derived,
+          saving: _saving,
+          onSave: _save,
         ),
       ),
     );
   }
 
   String _pad(int n) => n.toString().padLeft(2, '0');
-}
-
-/// Shape returned by [_AddChargingLogScreenState._deriveReadout].
-///
-/// A null instance means "inputs incomplete" — hide the panel
-/// entirely. A [_DerivedReadout.empty] instance means "inputs
-/// complete but no prior log to anchor the distance" — render the
-/// helper text instead of numbers so the user knows why the
-/// readout is blank.
-class _DerivedReadout {
-  final double? eurPer100km;
-  final double? kwhPer100km;
-
-  const _DerivedReadout({
-    required this.eurPer100km,
-    required this.kwhPer100km,
-  });
-
-  const _DerivedReadout.empty()
-      : eurPer100km = null,
-        kwhPer100km = null;
-
-  bool get hasValues => eurPer100km != null && kwhPer100km != null;
-}
-
-class _DerivedReadoutPanel extends StatelessWidget {
-  final _DerivedReadout? readout;
-
-  const _DerivedReadoutPanel({required this.readout});
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final r = readout;
-    if (r == null) return const SizedBox.shrink();
-    final theme = Theme.of(context);
-    final style = theme.textTheme.bodySmall?.copyWith(
-      color: theme.colorScheme.primary,
-    );
-    if (!r.hasValues) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 6, left: 12),
-        child: Text(
-          l?.chargingDerivedHelper ?? 'Need a previous log to compare',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-          key: const Key('charging_derived_helper'),
-        ),
-      );
-    }
-    final eurStr = r.eurPer100km!.toStringAsFixed(2);
-    final kwhStr = r.kwhPer100km!.toStringAsFixed(1);
-    return Padding(
-      padding: const EdgeInsets.only(top: 6, left: 12),
-      child: Row(
-        key: const Key('charging_derived_readout'),
-        children: [
-          Icon(Icons.insights_outlined,
-              size: 16, color: theme.colorScheme.primary),
-          const SizedBox(width: 6),
-          Flexible(
-            child: Text(
-              '${l?.chargingEurPer100km(eurStr) ?? '$eurStr EUR / 100 km'}'
-              '  •  '
-              '${l?.chargingKwhPer100km(kwhStr) ?? '$kwhStr kWh / 100 km'}',
-              style: style,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
