@@ -1,0 +1,8 @@
+{
+  "maintenanceSignalIdleRpmCreepTitle": "Leerlaufdrehzahl steigt",
+  "maintenanceSignalIdleRpmCreepBody": "Die Leerlaufdrehzahl ist über deine letzten {tripCount} Fahrten um {percent} % gestiegen. Möglicher Hinweis auf einen verschmutzten Luftfilter oder eine driftende Sensorik.",
+  "maintenanceSignalMafDeviationTitle": "Möglicher Lufteinlass-Engpass",
+  "maintenanceSignalMafDeviationBody": "Der Kraftstoffverbrauch bei konstanter Fahrt ist über deine letzten {tripCount} Fahrten um {percent} % gefallen. Möglicher Hinweis auf einen verstopften Luftfilter — eine Prüfung lohnt sich.",
+  "maintenanceActionDismiss": "Verwerfen",
+  "maintenanceActionSnooze": "30 Tage stumm"
+}

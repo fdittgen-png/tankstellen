@@ -6620,6 +6620,42 @@ abstract class AppLocalizations {
   /// **'−'**
   String get loyaltyBadgePrefix;
 
+  /// Title of the predictive-maintenance card on the Trips tab when the idle-RPM creep heuristic fires (#1124).
+  ///
+  /// In en, this message translates to:
+  /// **'Idle RPM creep detected'**
+  String get maintenanceSignalIdleRpmCreepTitle;
+
+  /// Body copy of the predictive-maintenance card when the idle-RPM creep heuristic fires (#1124). {percent} is the observed delta as a whole-number percent (e.g. '9'); {tripCount} is the number of trips analysed.
+  ///
+  /// In en, this message translates to:
+  /// **'Idle RPM has crept up by {percent}% over your last {tripCount} trips. Possible early sign of a clogged air filter or sensor drift.'**
+  String maintenanceSignalIdleRpmCreepBody(String percent, int tripCount);
+
+  /// Title of the predictive-maintenance card when the MAF-deviation heuristic fires — proxied via cruise fuel-rate drop (#1124).
+  ///
+  /// In en, this message translates to:
+  /// **'Possible intake restriction'**
+  String get maintenanceSignalMafDeviationTitle;
+
+  /// Body copy of the predictive-maintenance card when the MAF-deviation heuristic fires (#1124). {percent} is the observed drop as a whole-number percent; {tripCount} is the number of trips analysed.
+  ///
+  /// In en, this message translates to:
+  /// **'Cruise fuel rate has dropped by {percent}% over your last {tripCount} trips. Possible sign of a clogged air filter or restricted intake — worth a check-up.'**
+  String maintenanceSignalMafDeviationBody(String percent, int tripCount);
+
+  /// Label on the 'Dismiss' button of the predictive-maintenance card — silences the card for 24 hours (#1124).
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get maintenanceActionDismiss;
+
+  /// Label on the 'Snooze 30 days' button of the predictive-maintenance card — silences the card for the standard 30-day snooze window (#1124).
+  ///
+  /// In en, this message translates to:
+  /// **'Snooze 30 days'**
+  String get maintenanceActionSnooze;
+
   /// Title of the optional onboarding step (#816) that offers to connect an OBD2 adapter, read the VIN, and auto-fill the vehicle profile.
   ///
   /// In en, this message translates to:

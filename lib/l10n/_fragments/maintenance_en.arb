@@ -1,0 +1,42 @@
+{
+  "maintenanceSignalIdleRpmCreepTitle": "Idle RPM creep detected",
+  "@maintenanceSignalIdleRpmCreepTitle": {
+    "description": "Title of the predictive-maintenance card on the Trips tab when the idle-RPM creep heuristic fires (#1124)."
+  },
+  "maintenanceSignalIdleRpmCreepBody": "Idle RPM has crept up by {percent}% over your last {tripCount} trips. Possible early sign of a clogged air filter or sensor drift.",
+  "@maintenanceSignalIdleRpmCreepBody": {
+    "description": "Body copy of the predictive-maintenance card when the idle-RPM creep heuristic fires (#1124). {percent} is the observed delta as a whole-number percent (e.g. '9'); {tripCount} is the number of trips analysed.",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "tripCount": {
+        "type": "int"
+      }
+    }
+  },
+  "maintenanceSignalMafDeviationTitle": "Possible intake restriction",
+  "@maintenanceSignalMafDeviationTitle": {
+    "description": "Title of the predictive-maintenance card when the MAF-deviation heuristic fires — proxied via cruise fuel-rate drop (#1124)."
+  },
+  "maintenanceSignalMafDeviationBody": "Cruise fuel rate has dropped by {percent}% over your last {tripCount} trips. Possible sign of a clogged air filter or restricted intake — worth a check-up.",
+  "@maintenanceSignalMafDeviationBody": {
+    "description": "Body copy of the predictive-maintenance card when the MAF-deviation heuristic fires (#1124). {percent} is the observed drop as a whole-number percent; {tripCount} is the number of trips analysed.",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "tripCount": {
+        "type": "int"
+      }
+    }
+  },
+  "maintenanceActionDismiss": "Dismiss",
+  "@maintenanceActionDismiss": {
+    "description": "Label on the 'Dismiss' button of the predictive-maintenance card — silences the card for 24 hours (#1124)."
+  },
+  "maintenanceActionSnooze": "Snooze 30 days",
+  "@maintenanceActionSnooze": {
+    "description": "Label on the 'Snooze 30 days' button of the predictive-maintenance card — silences the card for the standard 30-day snooze window (#1124)."
+  }
+}
