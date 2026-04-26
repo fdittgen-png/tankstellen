@@ -13,6 +13,7 @@ import '../core/cache/cache_manager.dart';
 import '../core/error_tracing/storage/isolate_error_spool.dart';
 import '../core/error_tracing/storage/trace_storage.dart';
 import '../core/error_tracing/trace_recorder.dart';
+import '../core/logging/error_logger.dart';
 import '../core/notifications/local_notification_service.dart';
 import '../core/perf/startup_timer.dart';
 import '../core/services/country_service_registry.dart';
@@ -378,17 +379,29 @@ class AppInitializer {
     ProviderContainer container,
     Widget Function(ProviderContainer container) appBuilder,
   ) {
+    // #1104 — bind the unified errorLogger to this container so every
+    // call to `errorLogger.log(layer, e, st)` from the foreground
+    // isolate routes through TraceRecorder + Sentry. Background-isolate
+    // callsites never reach this path; they fall through to the Hive
+    // ring buffer (IsolateErrorSpool) and are replayed below.
+    errorLogger.bind(container);
+
     // Capture Flutter framework errors (build, layout, paint).
     FlutterError.onError = (details) {
       FlutterError.presentError(details);
-      container.read(traceRecorderProvider).record(
-            details.exception,
-            details.stack ?? StackTrace.current,
-          );
+      errorLogger.log(
+        ErrorLayer.ui,
+        details.exception,
+        details.stack ?? StackTrace.current,
+        context: <String, Object?>{
+          'library': details.library,
+          'context': details.context?.toString(),
+        },
+      );
     };
     // Capture async / platform errors that escape the framework.
     PlatformDispatcher.instance.onError = (error, stack) {
-      container.read(traceRecorderProvider).record(error, stack);
+      errorLogger.log(ErrorLayer.other, error, stack);
       return true;
     };
 

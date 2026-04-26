@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error_tracing/integrations/riverpod_trace_observer.dart';
 import 'package:tankstellen/core/error_tracing/models/error_trace.dart';
 import 'package:tankstellen/core/error_tracing/trace_recorder.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
 
 class _FakeTraceRecorder implements TraceRecorder {
   Object? capturedError;
@@ -34,23 +35,22 @@ final _exploding = Provider<int>((ref) {
 
 void main() {
   group('RiverpodTraceObserver', () {
-    test(
-      'providerDidFail forwards (error, stackTrace) to traceRecorderProvider',
-      () {
-        final fakeRecorder = _FakeTraceRecorder();
+    setUp(() => errorLogger.resetForTest());
+    tearDown(() => errorLogger.resetForTest());
 
-        // Build the container *first*, then attach the observer using the
-        // explicit constructor argument — RiverpodTraceObserver(_container)
-        // breaks the chicken-and-egg by storing the container reference.
+    test(
+      'providerDidFail forwards (error, stackTrace) to errorLogger',
+      () async {
+        final fakeRecorder = _FakeTraceRecorder();
+        // After #1104 the observer routes through `errorLogger.log`,
+        // which is bound here directly via the test seam so we skip
+        // standing up a full Riverpod TraceRecorder.
+        errorLogger.testRecorderOverride = fakeRecorder;
+
         late ProviderContainer container;
         final observer =
             _DeferredObserver((c) => RiverpodTraceObserver(c));
-        container = ProviderContainer(
-          observers: [observer],
-          overrides: [
-            traceRecorderProvider.overrideWithValue(fakeRecorder),
-          ],
-        );
+        container = ProviderContainer(observers: [observer]);
         observer.attach(container);
         addTearDown(container.dispose);
 
@@ -60,26 +60,27 @@ void main() {
         // receives the original StateError.)
         expect(() => container.read(_exploding), throwsA(isA<Object>()));
 
+        // The observer fires-and-forgets the future; pump microtasks so
+        // the async `record` call lands before assertions run.
+        await Future<void>.delayed(Duration.zero);
+
         expect(fakeRecorder.recordCount, 1);
-        expect(fakeRecorder.capturedError, isA<StateError>());
-        expect(
-          (fakeRecorder.capturedError as StateError).message,
-          'boom',
-        );
+        // Wrapped error preserves the original StateError in its
+        // toString() so log triage can still see the message.
+        expect(fakeRecorder.capturedError, isNotNull);
+        expect(fakeRecorder.capturedError.toString(), contains('boom'));
+        expect(fakeRecorder.capturedError.toString(), contains('providers'));
         expect(fakeRecorder.capturedStack, isNotNull);
       },
     );
 
-    test('multiple failing reads each forward to the recorder', () {
+    test('multiple failing reads each forward to the logger', () async {
       final fakeRecorder = _FakeTraceRecorder();
+      errorLogger.testRecorderOverride = fakeRecorder;
+
       late ProviderContainer container;
       final observer = _DeferredObserver((c) => RiverpodTraceObserver(c));
-      container = ProviderContainer(
-        observers: [observer],
-        overrides: [
-          traceRecorderProvider.overrideWithValue(fakeRecorder),
-        ],
-      );
+      container = ProviderContainer(observers: [observer]);
       observer.attach(container);
       addTearDown(container.dispose);
 
@@ -88,6 +89,7 @@ void main() {
       container.invalidate(_exploding);
       expect(() => container.read(_exploding), throwsA(isA<Object>()));
 
+      await Future<void>.delayed(Duration.zero);
       expect(fakeRecorder.recordCount, 2);
     });
   });

@@ -6,6 +6,7 @@ import 'package:tankstellen/core/error_tracing/collectors/breadcrumb_collector.d
 import 'package:tankstellen/core/error_tracing/integrations/dio_trace_interceptor.dart';
 import 'package:tankstellen/core/error_tracing/models/error_trace.dart';
 import 'package:tankstellen/core/error_tracing/trace_recorder.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 
@@ -120,11 +121,16 @@ void main() {
       },
     );
 
-    test('onError forwards (error, stackTrace) to TraceRecorder + handler', () {
+    test('onError forwards (error, stackTrace) to errorLogger + handler',
+        () async {
+      // After #1104, DioTraceInterceptor routes errors through
+      // `errorLogger.log` instead of reading `traceRecorderProvider`
+      // directly. The test recorder seam captures the wrapped error.
       final fakeRecorder = _FakeTraceRecorder();
-      final container = ProviderContainer(overrides: [
-        traceRecorderProvider.overrideWithValue(fakeRecorder),
-      ]);
+      errorLogger.testRecorderOverride = fakeRecorder;
+      addTearDown(errorLogger.resetForTest);
+
+      final container = ProviderContainer();
       addTearDown(container.dispose);
 
       late Ref capturedRef;
@@ -138,7 +144,7 @@ void main() {
       final handler = _CapturingErrorHandler();
       final stack = StackTrace.current;
       final dioErr = DioException(
-        requestOptions: RequestOptions(path: '/boom'),
+        requestOptions: RequestOptions(method: 'GET', path: '/boom'),
         type: DioExceptionType.connectionError,
         error: 'connection refused',
         stackTrace: stack,
@@ -146,8 +152,16 @@ void main() {
 
       interceptor.onError(dioErr, handler);
 
+      // The interceptor fires-and-forgets; pump microtasks so the
+      // async log lands.
+      await Future<void>.delayed(Duration.zero);
+
       expect(fakeRecorder.recordCount, 1);
-      expect(fakeRecorder.capturedError, same(dioErr));
+      // Wrapped error renders the original DioException via toString();
+      // the layer prefix lets log triage filter by ErrorLayer.services.
+      expect(fakeRecorder.capturedError.toString(), contains('services'));
+      expect(fakeRecorder.capturedError.toString(),
+          contains('DioException'));
       expect(fakeRecorder.capturedStack, same(stack));
 
       expect(handler.nextCount, 1);
