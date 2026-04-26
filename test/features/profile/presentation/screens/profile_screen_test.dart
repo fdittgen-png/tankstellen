@@ -208,8 +208,8 @@ void main() {
     });
 
     testWidgets(
-        '#896/#897: renders exactly three SettingsMenuTile rows — '
-        'My vehicles, Theme, Privacy Dashboard',
+        '#896/#897/#1120: renders exactly four SettingsMenuTile rows — '
+        'My vehicles, Theme, Fuel club cards, Privacy Dashboard',
         (tester) async {
       await pumpApp(
         tester,
@@ -230,8 +230,9 @@ void main() {
       // #896 removed Consumption log. #897 restyled the Theme entry
       // from a bespoke `ThemeModeTile` (Card + bottom sheet) into a
       // third `SettingsMenuTile` that matches Privacy + Storage and
-      // pushes to a dedicated `/theme-settings` screen. The Settings
-      // screen now renders My vehicles, Theme, Privacy Dashboard as
+      // pushes to a dedicated `/theme-settings` screen. #1120 adds a
+      // Fuel club cards entry point. The Settings screen now renders
+      // My vehicles, Theme, Fuel club cards, Privacy Dashboard as
       // SettingsMenuTile rows.
       final observedTitles = <String>{};
       void collect() {
@@ -264,16 +265,22 @@ void main() {
             '(card matching Privacy + Storage pattern)',
       );
       expect(
+        observedTitles.contains('Fuel club cards'),
+        isTrue,
+        reason: '#1120: Fuel club cards tile must render as a '
+            'SettingsMenuTile entry to /loyalty-settings',
+      );
+      expect(
         observedTitles.contains('Consumption log'),
         isFalse,
         reason: '#896: Consumption log tile must not render any more',
       );
       expect(
         observedTitles.length,
-        3,
-        reason: '#897: expected exactly three distinct SettingsMenuTile '
-            'titles (My vehicles, Theme, Privacy Dashboard); '
-            'found $observedTitles',
+        4,
+        reason: '#1120: expected exactly four distinct SettingsMenuTile '
+            'titles (My vehicles, Theme, Fuel club cards, Privacy '
+            'Dashboard); found $observedTitles',
       );
     });
 

@@ -6530,6 +6530,96 @@ abstract class AppLocalizations {
   /// **'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.'**
   String get calibrationModeTooltip;
 
+  /// Title of the loyalty settings sub-screen where the user manages fuel-club cards (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel club cards'**
+  String get loyaltySettingsTitle;
+
+  /// Banner subtitle on the loyalty settings sub-screen explaining what cards do (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'Apply your loyalty discount to displayed prices'**
+  String get loyaltySettingsSubtitle;
+
+  /// Settings menu tile title that routes to the loyalty settings screen (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel club cards'**
+  String get loyaltyMenuTitle;
+
+  /// Settings menu tile subtitle on the loyalty settings entry (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'Apply per-litre discounts from Total, Aral, Shell, …'**
+  String get loyaltyMenuSubtitle;
+
+  /// Floating-action-button label for adding a new loyalty card (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'Add card'**
+  String get loyaltyAddCard;
+
+  /// Title shown at the top of the add-loyalty-card bottom sheet (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'Add fuel club card'**
+  String get loyaltyAddCardSheetTitle;
+
+  /// Label for the loyalty brand picker on the add-card sheet (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'Brand'**
+  String get loyaltyBrandLabel;
+
+  /// Label for the optional free-form label input on the add-card sheet (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'Label (optional)'**
+  String get loyaltyCardLabelLabel;
+
+  /// Label for the per-litre discount numeric input on the add-card sheet (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'Discount (per litre)'**
+  String get loyaltyDiscountLabel;
+
+  /// Validation error shown when the per-litre discount is missing, zero, or negative (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a positive number'**
+  String get loyaltyDiscountInvalid;
+
+  /// Title of the confirmation dialog shown before deleting a loyalty card (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete card?'**
+  String get loyaltyDeleteConfirmTitle;
+
+  /// Body of the confirmation dialog shown before deleting a loyalty card (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'This card will stop applying its discount.'**
+  String get loyaltyDeleteConfirmBody;
+
+  /// Empty-state title shown on the loyalty settings screen when no card is registered (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'No fuel club cards yet'**
+  String get loyaltyEmptyTitle;
+
+  /// Empty-state body explaining what loyalty cards do (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'Add a card to apply your per-litre discount to matching stations automatically.'**
+  String get loyaltyEmptyBody;
+
+  /// Prefix character (minus sign) used on the discounted-price badge shown on station cards (#1120).
+  ///
+  /// In en, this message translates to:
+  /// **'−'**
+  String get loyaltyBadgePrefix;
+
   /// Title of the optional onboarding step (#816) that offers to connect an OBD2 adapter, read the VIN, and auto-fill the vehicle profile.
   ///
   /// In en, this message translates to:

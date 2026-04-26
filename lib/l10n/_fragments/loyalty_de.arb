@@ -1,0 +1,17 @@
+{
+  "loyaltySettingsTitle": "Tankstellen-Kundenkarten",
+  "loyaltySettingsSubtitle": "Treuerabatt automatisch auf den angezeigten Preis anwenden",
+  "loyaltyMenuTitle": "Tankstellen-Kundenkarten",
+  "loyaltyMenuSubtitle": "Rabatte pro Liter für Total, Aral, Shell …",
+  "loyaltyAddCard": "Karte hinzufügen",
+  "loyaltyAddCardSheetTitle": "Kundenkarte hinzufügen",
+  "loyaltyBrandLabel": "Marke",
+  "loyaltyCardLabelLabel": "Bezeichnung (optional)",
+  "loyaltyDiscountLabel": "Rabatt (pro Liter)",
+  "loyaltyDiscountInvalid": "Bitte eine positive Zahl eingeben",
+  "loyaltyDeleteConfirmTitle": "Karte löschen?",
+  "loyaltyDeleteConfirmBody": "Der Rabatt dieser Karte wird nicht mehr angewendet.",
+  "loyaltyEmptyTitle": "Noch keine Kundenkarte",
+  "loyaltyEmptyBody": "Karte hinzufügen, um den Rabatt pro Liter automatisch auf passende Stationen anzuwenden.",
+  "loyaltyBadgePrefix": "−"
+}

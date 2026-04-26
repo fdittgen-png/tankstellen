@@ -3490,6 +3490,55 @@ class AppLocalizationsSl extends AppLocalizations {
       'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.';
 
   @override
+  String get loyaltySettingsTitle => 'Fuel club cards';
+
+  @override
+  String get loyaltySettingsSubtitle =>
+      'Apply your loyalty discount to displayed prices';
+
+  @override
+  String get loyaltyMenuTitle => 'Fuel club cards';
+
+  @override
+  String get loyaltyMenuSubtitle =>
+      'Apply per-litre discounts from Total, Aral, Shell, …';
+
+  @override
+  String get loyaltyAddCard => 'Add card';
+
+  @override
+  String get loyaltyAddCardSheetTitle => 'Add fuel club card';
+
+  @override
+  String get loyaltyBrandLabel => 'Brand';
+
+  @override
+  String get loyaltyCardLabelLabel => 'Label (optional)';
+
+  @override
+  String get loyaltyDiscountLabel => 'Discount (per litre)';
+
+  @override
+  String get loyaltyDiscountInvalid => 'Enter a positive number';
+
+  @override
+  String get loyaltyDeleteConfirmTitle => 'Delete card?';
+
+  @override
+  String get loyaltyDeleteConfirmBody =>
+      'This card will stop applying its discount.';
+
+  @override
+  String get loyaltyEmptyTitle => 'No fuel club cards yet';
+
+  @override
+  String get loyaltyEmptyBody =>
+      'Add a card to apply your per-litre discount to matching stations automatically.';
+
+  @override
+  String get loyaltyBadgePrefix => '−';
+
+  @override
   String get onboardingObd2StepTitle => 'Connect your OBD2 adapter';
 
   @override

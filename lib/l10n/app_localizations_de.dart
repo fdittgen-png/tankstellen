@@ -3525,6 +3525,55 @@ class AppLocalizationsDe extends AppLocalizations {
       'Regelbasiert ordnet jede Fahrprobe genau einer Situation zu. Fuzzy verteilt sie auf alle, je nachdem wie gut sie passen — ruhiger rund um 60 km/h oder bei wechselnden Steigungen, aber langsamer beim Befüllen aller Kategorien.';
 
   @override
+  String get loyaltySettingsTitle => 'Tankstellen-Kundenkarten';
+
+  @override
+  String get loyaltySettingsSubtitle =>
+      'Treuerabatt automatisch auf den angezeigten Preis anwenden';
+
+  @override
+  String get loyaltyMenuTitle => 'Tankstellen-Kundenkarten';
+
+  @override
+  String get loyaltyMenuSubtitle =>
+      'Rabatte pro Liter für Total, Aral, Shell …';
+
+  @override
+  String get loyaltyAddCard => 'Karte hinzufügen';
+
+  @override
+  String get loyaltyAddCardSheetTitle => 'Kundenkarte hinzufügen';
+
+  @override
+  String get loyaltyBrandLabel => 'Marke';
+
+  @override
+  String get loyaltyCardLabelLabel => 'Bezeichnung (optional)';
+
+  @override
+  String get loyaltyDiscountLabel => 'Rabatt (pro Liter)';
+
+  @override
+  String get loyaltyDiscountInvalid => 'Bitte eine positive Zahl eingeben';
+
+  @override
+  String get loyaltyDeleteConfirmTitle => 'Karte löschen?';
+
+  @override
+  String get loyaltyDeleteConfirmBody =>
+      'Der Rabatt dieser Karte wird nicht mehr angewendet.';
+
+  @override
+  String get loyaltyEmptyTitle => 'Noch keine Kundenkarte';
+
+  @override
+  String get loyaltyEmptyBody =>
+      'Karte hinzufügen, um den Rabatt pro Liter automatisch auf passende Stationen anzuwenden.';
+
+  @override
+  String get loyaltyBadgePrefix => '−';
+
+  @override
   String get onboardingObd2StepTitle => 'OBD2-Adapter verbinden';
 
   @override

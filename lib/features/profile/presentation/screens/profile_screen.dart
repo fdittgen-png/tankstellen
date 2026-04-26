@@ -114,6 +114,18 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
 
+          // #1120 — loyalty / fuel-club cards entry point. Pilot
+          // ships with Total Energies; cards apply a per-litre
+          // discount to displayed prices on matching stations.
+          SettingsMenuTile(
+            icon: Icons.card_membership,
+            title: l?.loyaltyMenuTitle ?? 'Fuel club cards',
+            subtitle: l?.loyaltyMenuSubtitle ??
+                'Apply per-litre discounts from Total, Aral, Shell, …',
+            onTap: () => context.push('/loyalty-settings'),
+          ),
+          const SizedBox(height: 8),
+
           // Storage & Cache
           _FoldableSection(
             icon: Icons.storage,

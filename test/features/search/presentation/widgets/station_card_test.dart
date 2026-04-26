@@ -781,6 +781,156 @@ void main() {
       });
     });
 
+    group('loyalty discount (#1120)', () {
+      testWidgets(
+          'matching brand renders an effective price + badge',
+          (tester) async {
+        // testStation.brand == 'STAR' which is in BrandRegistry as
+        // an alias of Orlen. Use a Total station instead.
+        const totalStation = Station(
+          id: 'fr-totalenergies-1',
+          name: 'TotalEnergies Pézenas',
+          brand: 'TotalEnergies',
+          street: 'Avenue Jean Jaurès',
+          postCode: '34120',
+          place: 'Pézenas',
+          lat: 43.46,
+          lng: 3.42,
+          dist: 1.0,
+          e10: 1.799,
+          isOpen: true,
+        );
+
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: totalStation,
+            selectedFuelType: FuelType.e10,
+            activeDiscountsByBrand: {'TotalEnergies': 0.05},
+          ),
+        );
+
+        // Effective price = 1.799 - 0.05 = 1.749 → "1,74⁹"
+        final richTexts = find.byType(RichText);
+        final hasEffective = richTexts.evaluate().any((element) {
+          final richText = element.widget as RichText;
+          return richText.text.toPlainText().contains('1,74');
+        });
+        expect(hasEffective, isTrue,
+            reason: 'effective price (raw - discount) must be the headline');
+
+        // Raw price stays accessible — appears struck through in the badge.
+        final hasRaw = find.textContaining('1,799');
+        expect(hasRaw, findsOneWidget,
+            reason: 'raw price must remain visible to the user');
+      });
+
+      testWidgets('non-matching brand leaves the price unchanged',
+          (tester) async {
+        // testStation brand "STAR" canonicalises to Orlen — no
+        // Total card applies. Headline price must stay 1,79⁹.
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.e10,
+            activeDiscountsByBrand: {'TotalEnergies': 0.05},
+          ),
+        );
+
+        final richTexts = find.byType(RichText);
+        final hasOriginal = richTexts.evaluate().any((element) {
+          final richText = element.widget as RichText;
+          return richText.text.toPlainText().contains('1,79');
+        });
+        expect(hasOriginal, isTrue);
+
+        // No struck-through raw-price text from the badge — there is
+        // no badge for unmatched stations.
+        final hasStrike = find.byWidgetPredicate((w) {
+          if (w is Text && w.style?.decoration == TextDecoration.lineThrough) {
+            return true;
+          }
+          return false;
+        });
+        expect(hasStrike, findsNothing);
+      });
+
+      testWidgets(
+          'empty discount map leaves matching-brand stations unchanged',
+          (tester) async {
+        const totalStation = Station(
+          id: 'fr-totalenergies-2',
+          name: 'TotalEnergies Béziers',
+          brand: 'Total',
+          street: 'Boulevard Pasteur',
+          postCode: '34500',
+          place: 'Béziers',
+          lat: 43.34,
+          lng: 3.21,
+          dist: 1.0,
+          e10: 1.799,
+          isOpen: true,
+        );
+
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: totalStation,
+            selectedFuelType: FuelType.e10,
+            activeDiscountsByBrand: {},
+          ),
+        );
+
+        // Strike-through text is what the badge renders. Empty map
+        // → no badge → no strike-through.
+        final hasStrike = find.byWidgetPredicate((w) {
+          if (w is Text && w.style?.decoration == TextDecoration.lineThrough) {
+            return true;
+          }
+          return false;
+        });
+        expect(hasStrike, findsNothing);
+      });
+
+      testWidgets(
+          'zero discount is rejected (defensive — never floor below raw)',
+          (tester) async {
+        const totalStation = Station(
+          id: 'fr-totalenergies-3',
+          name: 'TotalEnergies Sète',
+          brand: 'TotalEnergies',
+          street: 'Quai',
+          postCode: '34200',
+          place: 'Sète',
+          lat: 43.40,
+          lng: 3.69,
+          dist: 1.0,
+          e10: 1.799,
+          isOpen: true,
+        );
+
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: totalStation,
+            selectedFuelType: FuelType.e10,
+            activeDiscountsByBrand: {'TotalEnergies': 0},
+          ),
+        );
+
+        // Strike-through text would only appear if a real discount
+        // applied. 0 → no badge → no strike-through.
+        final hasStrike = find.byWidgetPredicate((w) {
+          if (w is Text && w.style?.decoration == TextDecoration.lineThrough) {
+            return true;
+          }
+          return false;
+        });
+        expect(hasStrike, findsNothing);
+      });
+    });
+
     group('card polish (#592)', () {
       testWidgets('card has 6dp vertical margin (breathing room)',
           (tester) async {

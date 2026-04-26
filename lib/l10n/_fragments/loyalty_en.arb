@@ -1,0 +1,62 @@
+{
+  "loyaltySettingsTitle": "Fuel club cards",
+  "@loyaltySettingsTitle": {
+    "description": "Title of the loyalty settings sub-screen where the user manages fuel-club cards (#1120)."
+  },
+  "loyaltySettingsSubtitle": "Apply your loyalty discount to displayed prices",
+  "@loyaltySettingsSubtitle": {
+    "description": "Banner subtitle on the loyalty settings sub-screen explaining what cards do (#1120)."
+  },
+  "loyaltyMenuTitle": "Fuel club cards",
+  "@loyaltyMenuTitle": {
+    "description": "Settings menu tile title that routes to the loyalty settings screen (#1120)."
+  },
+  "loyaltyMenuSubtitle": "Apply per-litre discounts from Total, Aral, Shell, …",
+  "@loyaltyMenuSubtitle": {
+    "description": "Settings menu tile subtitle on the loyalty settings entry (#1120)."
+  },
+  "loyaltyAddCard": "Add card",
+  "@loyaltyAddCard": {
+    "description": "Floating-action-button label for adding a new loyalty card (#1120)."
+  },
+  "loyaltyAddCardSheetTitle": "Add fuel club card",
+  "@loyaltyAddCardSheetTitle": {
+    "description": "Title shown at the top of the add-loyalty-card bottom sheet (#1120)."
+  },
+  "loyaltyBrandLabel": "Brand",
+  "@loyaltyBrandLabel": {
+    "description": "Label for the loyalty brand picker on the add-card sheet (#1120)."
+  },
+  "loyaltyCardLabelLabel": "Label (optional)",
+  "@loyaltyCardLabelLabel": {
+    "description": "Label for the optional free-form label input on the add-card sheet (#1120)."
+  },
+  "loyaltyDiscountLabel": "Discount (per litre)",
+  "@loyaltyDiscountLabel": {
+    "description": "Label for the per-litre discount numeric input on the add-card sheet (#1120)."
+  },
+  "loyaltyDiscountInvalid": "Enter a positive number",
+  "@loyaltyDiscountInvalid": {
+    "description": "Validation error shown when the per-litre discount is missing, zero, or negative (#1120)."
+  },
+  "loyaltyDeleteConfirmTitle": "Delete card?",
+  "@loyaltyDeleteConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before deleting a loyalty card (#1120)."
+  },
+  "loyaltyDeleteConfirmBody": "This card will stop applying its discount.",
+  "@loyaltyDeleteConfirmBody": {
+    "description": "Body of the confirmation dialog shown before deleting a loyalty card (#1120)."
+  },
+  "loyaltyEmptyTitle": "No fuel club cards yet",
+  "@loyaltyEmptyTitle": {
+    "description": "Empty-state title shown on the loyalty settings screen when no card is registered (#1120)."
+  },
+  "loyaltyEmptyBody": "Add a card to apply your per-litre discount to matching stations automatically.",
+  "@loyaltyEmptyBody": {
+    "description": "Empty-state body explaining what loyalty cards do (#1120)."
+  },
+  "loyaltyBadgePrefix": "−",
+  "@loyaltyBadgePrefix": {
+    "description": "Prefix character (minus sign) used on the discounted-price badge shown on station cards (#1120)."
+  }
+}

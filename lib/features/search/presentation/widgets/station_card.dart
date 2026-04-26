@@ -8,6 +8,7 @@ import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/animated_favorite_star.dart';
 import '../../../../core/widgets/animated_price_text.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../domain/entities/brand_registry.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/station.dart';
 import 'amenity_chips.dart';
@@ -39,6 +40,16 @@ class StationCard extends StatelessWidget {
   /// dominant.
   final FuelType? profileFuelType;
 
+  /// Active loyalty/fuel-club discounts keyed by canonical brand
+  /// string (#1120 pilot). When this station's brand canonicalizes to
+  /// a key in the map and the per-litre discount is positive, the
+  /// price column renders an effective price (raw − discount) plus a
+  /// `−€0.05` badge. Stations whose brand isn't in the map render
+  /// unchanged. Callers typically pass
+  /// `ref.watch(activeDiscountByBrandProvider)` after collapsing to
+  /// the canonical-brand string keys.
+  final Map<String, double>? activeDiscountsByBrand;
+
   const StationCard({
     super.key,
     required this.station,
@@ -50,6 +61,7 @@ class StationCard extends StatelessWidget {
     this.priceTier,
     this.rating,
     this.profileFuelType,
+    this.activeDiscountsByBrand,
   });
 
   /// True if the station has a real brand name (not empty, not generic "Station")
@@ -59,6 +71,20 @@ class StationCard extends StatelessWidget {
       station.brand != 'Autoroute';
 
   double? get _displayPrice => station.priceFor(selectedFuelType);
+
+  /// Resolve the per-litre loyalty discount that applies to this
+  /// station, or `null` if no card matches (#1120 pilot). The lookup
+  /// is canonical-brand → discount, so the caller doesn't have to
+  /// know about the raw API brand strings.
+  double? get _loyaltyDiscount {
+    final discounts = activeDiscountsByBrand;
+    if (discounts == null || discounts.isEmpty) return null;
+    final canonical = BrandRegistry.canonicalize(station.brand);
+    if (canonical == null) return null;
+    final discount = discounts[canonical];
+    if (discount == null || discount <= 0) return null;
+    return discount;
+  }
 
   /// Per-station currency symbol derived from the station's origin
   /// country (#514 / #516). The resolution order is:
@@ -142,6 +168,7 @@ class StationCard extends StatelessWidget {
                   priceTier: priceTier,
                   rating: rating,
                   profileFuelType: profileFuelType,
+                  loyaltyDiscount: _loyaltyDiscount,
                   onFavoriteTap: onFavoriteTap,
                 ),
               ],
