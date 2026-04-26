@@ -161,8 +161,8 @@ class SouthKoreaStationService
       sortStations(filtered, params);
 
       return wrapStations(filtered, ServiceSource.openinetApi);
-    } on DioException catch (e) {
-      debugPrint('KR search failed: $e');
+    } on DioException catch (e, st) {
+      debugPrint('KR search failed: $e\n$st');
       final status = e.response?.statusCode;
       if (status == 401 || status == 403) {
         throw ApiException(
@@ -170,7 +170,7 @@ class SouthKoreaStationService
           statusCode: status,
         );
       }
-      throwApiException(e, defaultMessage: 'Network error (OPINET)');
+      throwApiException(e, defaultMessage: 'Network error (OPINET)', stackTrace: st);
     }
   }
 

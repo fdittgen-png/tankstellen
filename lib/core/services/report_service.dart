@@ -70,7 +70,7 @@ class ReportService {
         success: true,
         message: data is Map ? data['message']?.toString() : null,
       );
-    } on DioException catch (e) {
+    } on DioException catch (e, st) { // ignore: unused_catch_stack
       throw ApiException(
         message: e.message ?? 'Network error submitting report',
         statusCode: e.response?.statusCode,

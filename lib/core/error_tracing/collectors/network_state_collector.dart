@@ -17,8 +17,8 @@ class NetworkStateCollector {
         type = 'ethernet';
       }
       return NetworkSnapshot(isOnline: isOnline, connectivityType: type);
-    } on Exception catch (e) {
-      debugPrint('NetworkStateCollector: connectivity check failed: $e');
+    } on Exception catch (e, st) {
+      debugPrint('NetworkStateCollector: connectivity check failed: $e\n$st');
       return const NetworkSnapshot(isOnline: false, connectivityType: 'unknown');
     }
   }

@@ -31,8 +31,8 @@ class TraceStorage {
         .map((raw) {
           try {
             return ErrorTrace.fromJson(Map<String, dynamic>.from(raw as Map));
-          } on FormatException catch (e) {
-            debugPrint('TraceStorage: trace parse failed: $e');
+          } on FormatException catch (e, st) {
+            debugPrint('TraceStorage: trace parse failed: $e\n$st');
             return null;
           }
         })
@@ -46,8 +46,8 @@ class TraceStorage {
     if (raw == null) return null;
     try {
       return ErrorTrace.fromJson(Map<String, dynamic>.from(raw as Map));
-    } on FormatException catch (e) {
-      debugPrint('TraceStorage: trace parse failed: $e');
+    } on FormatException catch (e, st) {
+      debugPrint('TraceStorage: trace parse failed: $e\n$st');
       return null;
     }
   }

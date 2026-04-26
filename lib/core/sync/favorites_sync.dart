@@ -53,8 +53,8 @@ class FavoritesSync {
       }
 
       return localIds.union(serverIds).toList();
-    } catch (e) {
-      debugPrint('FavoritesSync.merge FAILED: $e');
+    } catch (e, st) {
+      debugPrint('FavoritesSync.merge FAILED: $e\n$st');
       return localFavoriteIds;
     }
   }
@@ -74,8 +74,8 @@ class FavoritesSync {
           .eq('user_id', userId)
           .eq('station_id', stationId);
       debugPrint('FavoritesSync.delete: $stationId removed from server');
-    } catch (e) {
-      debugPrint('FavoritesSync.delete FAILED: $e');
+    } catch (e, st) {
+      debugPrint('FavoritesSync.delete FAILED: $e\n$st');
     }
   }
 }

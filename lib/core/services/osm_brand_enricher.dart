@@ -78,8 +78,8 @@ class OsmBrandEnricher {
 
       _cache[cacheKey] = null;
       return null;
-    } catch (e) {
-      debugPrint('OSM brand enrichment failed: $e');
+    } catch (e, st) {
+      debugPrint('OSM brand enrichment failed: $e\n$st');
       _cache[cacheKey] = null;
       return null;
     }

@@ -119,8 +119,8 @@ class GithubIssueReporter {
       return _parseResponse(response);
     } on GithubReporterException {
       rethrow;
-    } catch (e) {
-      debugPrint('GithubIssueReporter network failure: $e');
+    } catch (e, st) {
+      debugPrint('GithubIssueReporter network failure: $e\n$st');
       throw GithubReporterException('network error: $e');
     }
   }

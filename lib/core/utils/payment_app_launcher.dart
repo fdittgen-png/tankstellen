@@ -92,8 +92,8 @@ class PaymentAppLauncher {
           );
           if (launched) return true;
         }
-      } on Exception catch (e) {
-        debugPrint('PaymentAppLauncher scheme failed: $e');
+      } on Exception catch (e, st) {
+        debugPrint('PaymentAppLauncher scheme failed: $e\n$st');
       }
     }
 
@@ -105,15 +105,15 @@ class PaymentAppLauncher {
         mode: LaunchMode.externalApplication,
       );
       if (launched) return true;
-    } on Exception catch (e) {
-      debugPrint('PaymentAppLauncher market failed: $e');
+    } on Exception catch (e, st) {
+      debugPrint('PaymentAppLauncher market failed: $e\n$st');
     }
 
     final webUri = playStoreWebUrl(app);
     try {
       return await launcher(webUri, mode: LaunchMode.externalApplication);
-    } on Exception catch (e) {
-      debugPrint('PaymentAppLauncher web fallback failed: $e');
+    } on Exception catch (e, st) {
+      debugPrint('PaymentAppLauncher web fallback failed: $e\n$st');
       return false;
     }
   }

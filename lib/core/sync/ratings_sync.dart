@@ -43,8 +43,8 @@ class RatingsSync {
       }, onConflict: 'user_id,station_id');
       debugPrint(
           'RatingsSync.upsert: $stationId = $rating stars (shared=$shared)');
-    } catch (e) {
-      debugPrint('RatingsSync.upsert FAILED: $e');
+    } catch (e, st) {
+      debugPrint('RatingsSync.upsert FAILED: $e\n$st');
     }
   }
 
@@ -62,8 +62,8 @@ class RatingsSync {
           .eq('user_id', userId)
           .eq('station_id', stationId);
       debugPrint('RatingsSync.delete: $stationId removed');
-    } catch (e) {
-      debugPrint('RatingsSync.delete FAILED: $e');
+    } catch (e, st) {
+      debugPrint('RatingsSync.delete FAILED: $e\n$st');
     }
   }
 
@@ -89,8 +89,8 @@ class RatingsSync {
         }
       }
       return result;
-    } catch (e) {
-      debugPrint('RatingsSync.fetchAll FAILED: $e');
+    } catch (e, st) {
+      debugPrint('RatingsSync.fetchAll FAILED: $e\n$st');
       return {};
     }
   }

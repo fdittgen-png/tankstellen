@@ -124,8 +124,8 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
         'limit': 50,
       }, cancelToken: cancelToken);
       return parser.extractPrixCarburantsResults(response.data);
-    } on DioException catch (e) {
-      debugPrint('Prix-Carburants ZIP fetch failed: $e');
+    } on DioException catch (e, st) {
+      debugPrint('Prix-Carburants ZIP fetch failed: $e\n$st');
       return [];
     }
   }
@@ -146,8 +146,8 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
         'limit': 50,
       }, cancelToken: cancelToken);
       return parser.extractPrixCarburantsResults(response.data);
-    } on DioException catch (e) {
-      debugPrint('Prix-Carburants geo fetch failed: $e');
+    } on DioException catch (e, st) {
+      debugPrint('Prix-Carburants geo fetch failed: $e\n$st');
       return [];
     }
   }
@@ -225,7 +225,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
             status: 'open',
           );
         }
-      } on DioException catch (e) { debugPrint('Prix-Carburants detail fetch failed: $e'); }
+      } on DioException catch (e, st) { debugPrint('Prix-Carburants detail fetch failed: $e\n$st'); }
     }
     return ServiceResult(
       data: prices,

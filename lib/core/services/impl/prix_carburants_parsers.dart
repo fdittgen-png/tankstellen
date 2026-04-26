@@ -113,8 +113,8 @@ Station? parsePrixCarburantsStation(
       department: r['departement']?.toString(),
       region: r['region']?.toString(),
     );
-  } on FormatException catch (e) {
-    debugPrint('Prix-Carburants station parse failed: $e');
+  } on FormatException catch (e, st) {
+    debugPrint('Prix-Carburants station parse failed: $e\n$st');
     return null;
   }
 }
@@ -137,8 +137,8 @@ String? parsePrixCarburantsMostRecentUpdate(Map<String, dynamic> r) {
   try {
     final dt = DateTime.parse(dates.first);
     return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')} ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-  } on FormatException catch (e) {
-    debugPrint('Prix-Carburants date parse failed: $e');
+  } on FormatException catch (e, st) {
+    debugPrint('Prix-Carburants date parse failed: $e\n$st');
     final raw = dates.first;
     final cut = raw.length >= 16 ? raw.substring(0, 16) : raw;
     return cut.replaceAll('T', ' ');

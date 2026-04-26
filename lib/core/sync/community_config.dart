@@ -40,8 +40,8 @@ class CommunityConfig {
       final config = json.decode(jsonStr) as Map<String, dynamic>;
       _cachedUrl = config['supabase_url'] as String?;
       _cachedKey = config['supabase_anon_key'] as String?;
-    } catch (e) {
-      debugPrint('CommunityConfig: failed to load asset: $e');
+    } catch (e, st) {
+      debugPrint('CommunityConfig: failed to load asset: $e\n$st');
     }
   }
 

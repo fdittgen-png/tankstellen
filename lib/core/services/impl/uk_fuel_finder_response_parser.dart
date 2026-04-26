@@ -111,8 +111,8 @@ class UkFuelFinderResponseParser {
           ),
           isOpen: true,
         ));
-      } catch (e) {
-        debugPrint('UK Fuel Finder parse failed: $e');
+      } catch (e, st) {
+        debugPrint('UK Fuel Finder parse failed: $e\n$st');
         continue;
       }
     }

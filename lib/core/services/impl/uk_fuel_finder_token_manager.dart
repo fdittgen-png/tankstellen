@@ -121,7 +121,7 @@ class UkFuelFinderTokenManager {
 
       store(accessToken, Duration(seconds: expiresIn));
       return accessToken;
-    } on DioException catch (e) {
+    } on DioException catch (e, st) { // ignore: unused_catch_stack
       final status = e.response?.statusCode;
       if (status == 401 || status == 403) {
         throw ApiException(

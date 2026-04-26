@@ -75,8 +75,8 @@ class AlertsSync {
       }).toList();
 
       return [...localAlerts, ...downloaded];
-    } catch (e) {
-      debugPrint('AlertsSync.merge FAILED: $e');
+    } catch (e, st) {
+      debugPrint('AlertsSync.merge FAILED: $e\n$st');
       return localAlerts;
     }
   }

@@ -115,11 +115,10 @@ class IsolateErrorSpool {
           await box.delete(keys[i]);
         }
       }
-    } catch (e) {
+    } catch (e, st) {
       // Never re-throw from the spool. The whole point of #1105 is
       // that observability must not break the BG task.
-      debugPrint(
-          'IsolateErrorSpool: enqueue failed ($isolateTaskName): $e');
+      debugPrint('IsolateErrorSpool: enqueue failed ($isolateTaskName): $e\n$st');
     }
   }
 
@@ -128,8 +127,8 @@ class IsolateErrorSpool {
     try {
       final box = await boxFactory();
       return box.length;
-    } catch (e) {
-      debugPrint('IsolateErrorSpool: length read failed: $e');
+    } catch (e, st) {
+      debugPrint('IsolateErrorSpool: length read failed: $e\n$st');
       return 0;
     }
   }
@@ -146,14 +145,13 @@ class IsolateErrorSpool {
         try {
           final json = jsonDecode(raw) as Map<String, dynamic>;
           entries.add(IsolateErrorSpoolEntry.fromJson(json));
-        } catch (e) {
-          debugPrint(
-              'IsolateErrorSpool: skipping unreadable entry ($key): $e');
+        } catch (e, st) {
+          debugPrint('IsolateErrorSpool: skipping unreadable entry ($key): $e\n$st');
         }
       }
       return entries;
-    } catch (e) {
-      debugPrint('IsolateErrorSpool: peek failed: $e');
+    } catch (e, st) {
+      debugPrint('IsolateErrorSpool: peek failed: $e\n$st');
       return const <IsolateErrorSpoolEntry>[];
     }
   }
@@ -180,16 +178,15 @@ class IsolateErrorSpool {
           StackTrace.fromString(entry.stack),
         );
         replayed++;
-      } catch (e) {
-        debugPrint(
-            'IsolateErrorSpool: replay failed for ${entry.isolateTaskName}: $e');
+      } catch (e, st) {
+        debugPrint('IsolateErrorSpool: replay failed for ${entry.isolateTaskName}: $e\n$st');
       }
     }
     try {
       final box = await boxFactory();
       await box.clear();
-    } catch (e) {
-      debugPrint('IsolateErrorSpool: clear after drain failed: $e');
+    } catch (e, st) {
+      debugPrint('IsolateErrorSpool: clear after drain failed: $e\n$st');
     }
     return replayed;
   }
@@ -200,8 +197,8 @@ class IsolateErrorSpool {
     try {
       final box = await boxFactory();
       await box.clear();
-    } catch (e) {
-      debugPrint('IsolateErrorSpool: clearForTest failed: $e');
+    } catch (e, st) {
+      debugPrint('IsolateErrorSpool: clearForTest failed: $e\n$st');
     }
   }
 

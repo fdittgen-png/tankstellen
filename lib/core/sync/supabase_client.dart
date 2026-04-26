@@ -105,7 +105,7 @@ class TankSyncClient {
       try {
         await c.from('users').upsert({'id': userId}, onConflict: 'id');
         return; // success
-      } catch (e) {
+      } catch (e, st) { // ignore: unused_catch_stack
         lastError = e;
         debugPrint(
           'TankSync: users upsert attempt ${attempt + 1}/$maxUpsertRetries failed: $e',
@@ -123,8 +123,8 @@ class TankSyncClient {
     debugPrint('TankSync: users upsert failed after $maxUpsertRetries attempts, signing out');
     try {
       await c.auth.signOut();
-    } catch (e) {
-      debugPrint('TankSync: sign-out after upsert failure also failed: $e');
+    } catch (e, st) {
+      debugPrint('TankSync: sign-out after upsert failure also failed: $e\n$st');
     }
     _initialized = false;
     throw StateError(

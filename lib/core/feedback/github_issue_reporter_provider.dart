@@ -46,11 +46,11 @@ Future<GithubIssueReporter?> githubIssueReporter(Ref ref) async {
   try {
     const storage = FlutterSecureStorage();
     token = await storage.read(key: kGithubFeedbackTokenKey);
-  } catch (e) {
+  } catch (e, st) {
     // Secure storage can fail on some Android devices (keystore corruption,
     // biometric reset). Treat any failure as "no token" so the UI falls
     // back to SharePlus instead of bubbling up a platform error.
-    debugPrint('githubIssueReporterProvider: secure-storage read failed: $e');
+    debugPrint('githubIssueReporterProvider: secure-storage read failed: $e\n$st');
     return null;
   }
 

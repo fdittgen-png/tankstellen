@@ -38,9 +38,8 @@ class NotificationLaunchHandler {
     if (path == null) return;
     try {
       _router.push(path);
-    } catch (e) {
-      debugPrint(
-          'NotificationLaunchHandler: push failed for $rawPayload → $path: $e');
+    } catch (e, st) {
+      debugPrint('NotificationLaunchHandler: push failed for $rawPayload → $path: $e\n$st');
     }
   }
 }
@@ -111,8 +110,8 @@ class _NotificationLaunchListenerState
       // start. Defer to after the first frame so `push` lands on a
       // live navigator rather than an empty stack.
       WidgetsBinding.instance.addPostFrameCallback((_) => _dispatch(payload));
-    } catch (e) {
-      debugPrint('NotificationLaunchListener: cold-launch probe failed: $e');
+    } catch (e, st) {
+      debugPrint('NotificationLaunchListener: cold-launch probe failed: $e\n$st');
     }
   }
 

@@ -139,9 +139,9 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
       sortStations(stations, params);
 
       return wrapStations(stations, ServiceSource.argentinaApi);
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
       _throwCertificateOrApiException(e); // #837 — classify cert errors first.
-      throwApiException(e, defaultMessage: 'Error de red');
+      throwApiException(e, defaultMessage: 'Error de red', stackTrace: st);
     }
   }
 

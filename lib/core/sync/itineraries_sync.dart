@@ -40,8 +40,8 @@ class ItinerariesSync {
       }, onConflict: 'id');
       debugPrint('ItinerariesSync.save: saved "${itinerary.name}"');
       return true;
-    } catch (e) {
-      debugPrint('ItinerariesSync.save FAILED: $e');
+    } catch (e, st) {
+      debugPrint('ItinerariesSync.save FAILED: $e\n$st');
       return false;
     }
   }
@@ -81,8 +81,8 @@ class ItinerariesSync {
               : DateTime.now(),
         );
       }).toList();
-    } catch (e) {
-      debugPrint('ItinerariesSync.fetchAll FAILED: $e');
+    } catch (e, st) {
+      debugPrint('ItinerariesSync.fetchAll FAILED: $e\n$st');
       return [];
     }
   }
@@ -101,8 +101,8 @@ class ItinerariesSync {
           .eq('id', itineraryId)
           .eq('user_id', userId);
       return true;
-    } catch (e) {
-      debugPrint('ItinerariesSync.delete FAILED: $e');
+    } catch (e, st) {
+      debugPrint('ItinerariesSync.delete FAILED: $e\n$st');
       return false;
     }
   }

@@ -56,8 +56,8 @@ class MitecoStationService with StationServiceHelpers, CachedDatasetMixin implem
       sortStations(stations, params);
 
       return wrapStations(stations, ServiceSource.mitecoApi, limit: 50);
-    } on DioException catch (e) {
-      throwApiException(e, defaultMessage: 'Error de red');
+    } on DioException catch (e, st) {
+      throwApiException(e, defaultMessage: 'Error de red', stackTrace: st);
     }
   }
 
@@ -217,8 +217,8 @@ class MitecoStationService with StationServiceHelpers, CachedDatasetMixin implem
         openingHoursText: horario.isNotEmpty ? horario : null,
         stationType: r['Margen']?.toString(),
       );
-    } on FormatException catch (e) {
-      debugPrint('MITECO station parse failed: $e');
+    } on FormatException catch (e, st) {
+      debugPrint('MITECO station parse failed: $e\n$st');
       return null;
     }
   }

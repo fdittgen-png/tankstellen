@@ -53,8 +53,8 @@ class AutoRecordBadgeCount extends _$AutoRecordBadgeCount {
     try {
       final service = await ref.read(autoRecordBadgeServiceProvider.future);
       state = service.count;
-    } catch (e) {
-      debugPrint('AutoRecordBadgeCount refresh: $e');
+    } catch (e, st) {
+      debugPrint('AutoRecordBadgeCount refresh: $e\n$st');
     }
   }
 
@@ -65,8 +65,8 @@ class AutoRecordBadgeCount extends _$AutoRecordBadgeCount {
       final service = await ref.read(autoRecordBadgeServiceProvider.future);
       await service.markAllAsRead();
       state = service.count;
-    } catch (e) {
-      debugPrint('AutoRecordBadgeCount markAllAsRead: $e');
+    } catch (e, st) {
+      debugPrint('AutoRecordBadgeCount markAllAsRead: $e\n$st');
     }
   }
 }

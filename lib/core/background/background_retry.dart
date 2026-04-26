@@ -30,7 +30,7 @@ Future<Map<String, dynamic>?> fetchWithRetry({
         return response.data as Map<String, dynamic>;
       }
       return null;
-    } on DioException catch (e) {
+    } on DioException catch (e, st) { // ignore: unused_catch_stack
       final isLastAttempt = attempt == config.maxAttempts - 1;
       if (isLastAttempt || !isRetryable(e)) {
         debugPrint(

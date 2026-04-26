@@ -74,8 +74,8 @@ class VehiclesSync {
         if (data is Map<String, dynamic>) {
           try {
             return VehicleProfile.fromJson(data);
-          } catch (e) {
-            debugPrint('VehiclesSync.merge decode failed: $e');
+          } catch (e, st) {
+            debugPrint('VehiclesSync.merge decode failed: $e\n$st');
             return null;
           }
         }
@@ -83,8 +83,8 @@ class VehiclesSync {
       }).whereType<VehicleProfile>().toList();
 
       return [...localVehicles, ...downloaded];
-    } catch (e) {
-      debugPrint('VehiclesSync.merge FAILED: $e');
+    } catch (e, st) {
+      debugPrint('VehiclesSync.merge FAILED: $e\n$st');
       return localVehicles;
     }
   }
@@ -103,8 +103,8 @@ class VehiclesSync {
           .delete()
           .eq('user_id', userId)
           .eq('id', vehicleId);
-    } catch (e) {
-      debugPrint('VehiclesSync.delete FAILED: $e');
+    } catch (e, st) {
+      debugPrint('VehiclesSync.delete FAILED: $e\n$st');
     }
   }
 }

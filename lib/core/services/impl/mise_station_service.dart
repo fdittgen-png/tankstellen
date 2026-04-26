@@ -75,8 +75,8 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
       sortStations(stations, params);
 
       return wrapStations(stations, ServiceSource.miseApi);
-    } on DioException catch (e) {
-      throwApiException(e, defaultMessage: 'Errore di rete');
+    } on DioException catch (e, st) {
+      throwApiException(e, defaultMessage: 'Errore di rete', stackTrace: st);
     }
   }
 

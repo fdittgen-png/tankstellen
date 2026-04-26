@@ -153,8 +153,8 @@ class RomaniaStationService
         source: ServiceSource.romaniaApi,
         fetchedAt: DateTime.now(),
       );
-    } on DioException catch (e) {
-      debugPrint('RO Monitorul fetch failed: $e');
+    } on DioException catch (e, st) {
+      debugPrint('RO Monitorul fetch failed: $e\n$st');
       final status = e.response?.statusCode;
       throw ApiException(
         message:
@@ -164,8 +164,8 @@ class RomaniaStationService
       );
     } on ApiException {
       rethrow;
-    } catch (e) {
-      debugPrint('RO Monitorul unexpected error: $e');
+    } catch (e, st) {
+      debugPrint('RO Monitorul unexpected error: $e\n$st');
       throw ApiException(message: 'Monitorul Prețurilor parse error: $e');
     }
   }

@@ -46,8 +46,8 @@ class SyncHelper {
       if (syncState.enabled) {
         await syncFn();
       }
-    } catch (e) {
-      debugPrint('SyncHelper[$context]: sync failed: $e');
+    } catch (e, st) {
+      debugPrint('SyncHelper[$context]: sync failed: $e\n$st');
     }
   }
 

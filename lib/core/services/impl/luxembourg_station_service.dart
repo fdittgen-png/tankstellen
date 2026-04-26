@@ -185,11 +185,11 @@ class LuxembourgStationService
       sortStations(filtered, params);
 
       return wrapStations(filtered, ServiceSource.luxembourgApi);
-    } on DioException catch (e) {
+    } on DioException catch (e, st) {
       // No HTTP call is made today, but the catch keeps the signature
       // stable if a future scrape is added.
-      debugPrint('LU search failed: $e');
-      throwApiException(e, defaultMessage: 'Network error');
+      debugPrint('LU search failed: $e\n$st');
+      throwApiException(e, defaultMessage: 'Network error', stackTrace: st);
     }
   }
 

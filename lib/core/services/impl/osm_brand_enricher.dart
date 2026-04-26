@@ -124,7 +124,7 @@ class OsmBrandEnricher {
           }
         }
       }
-    } on DioException catch (e) { debugPrint('OSM brand enrichment failed: $e'); }
+    } on DioException catch (e, st) { debugPrint('OSM brand enrichment failed: $e\n$st'); }
   }
 
   List<Station> _applyCachedBrands(List<Station> stations) {
