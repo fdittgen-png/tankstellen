@@ -410,7 +410,9 @@ void main() {
           overrides: overrides(),
         );
 
-        expect(find.byIcon(Icons.star_outline), findsOneWidget);
+        // #1163 — Icons.star_outline now appears in BOTH the
+        // Favoris sub-tab and the empty-state body, so allow ≥1.
+        expect(find.byIcon(Icons.star_outline), findsAtLeast(1));
       });
     });
 

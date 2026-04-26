@@ -1610,7 +1610,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Trouver les stations les plus proches avec votre position actuelle';
 
   @override
-  String get consumptionLogTitle => 'Fuel consumption';
+  String get consumptionLogTitle => 'Consommation';
 
   @override
   String get consumptionLogMenuTitle => 'Consumption log';
@@ -3185,10 +3185,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get autoRecordBadgeClearTooltip => 'Effacer le compteur';
 
   @override
-  String get consumptionTabFuel => 'Fuel';
+  String get consumptionTabFuel => 'Carburant';
 
   @override
-  String get consumptionTabCharging => 'Charging';
+  String get consumptionTabCharging => 'Recharge';
 
   @override
   String get noChargingLogsTitle => 'No charging logs yet';
@@ -3750,7 +3750,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get trajetsTabLabel => 'Trips';
+  String get trajetsTabLabel => 'Trajets';
 
   @override
   String get trajetsStartRecordingButton => 'Start recording';

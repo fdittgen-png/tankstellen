@@ -52,8 +52,11 @@ void main() {
         overrides: test.overrides,
       );
 
-      // Empty state shows star_border icon and "No favorites yet" text
-      expect(find.byIcon(Icons.star_outline), findsOneWidget);
+      // Empty state shows star_outline icon and "No favorites yet" text.
+      // #1163 — the Favoris sub-tab now also renders Icons.star_outline,
+      // so we expect at least 2 occurrences (one in the tab row, one in
+      // the empty-state body) instead of exactly one.
+      expect(find.byIcon(Icons.star_outline), findsAtLeast(2));
       expect(find.text('No favorites yet'), findsOneWidget);
     });
 
