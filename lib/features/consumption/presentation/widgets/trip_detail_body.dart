@@ -5,8 +5,10 @@ import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../data/driving_insights_analyzer.dart';
 import '../../data/trip_history_repository.dart';
 import '../../domain/driving_insight.dart';
+import '../../domain/services/throttle_rpm_histogram_calculator.dart';
 import '../../domain/trip_recorder.dart';
 import 'driving_insights_card.dart';
+import 'throttle_rpm_histogram_card.dart';
 import 'trip_detail_charts.dart';
 import 'trip_summary_card.dart';
 
@@ -51,6 +53,19 @@ class _TripDetailBodyState extends State<TripDetailBody> {
   /// invalidation boundary, no manual cache key needed.
   late final List<DrivingInsight> _insights = _computeInsights();
 
+  /// Lazily-computed throttle / RPM time-share histogram (#1041 phase
+  /// 3a). Cached alongside [_insights] for the same reason — the
+  /// calculator is O(n), pure, and cheap, but a long trip ticks at
+  /// ~1 Hz so re-running on every rebuild adds up.
+  ///
+  /// Persisted [TripSample]s currently carry RPM but not throttle %
+  /// (the throttle PID was added to the polling rotation later). We
+  /// still feed every sample through the calculator — the throttle
+  /// axis falls back to its own empty-state caption while the RPM
+  /// bars render normally. Once a future phase persists throttle on
+  /// disk, the card lights up automatically.
+  late final ThrottleRpmHistogram _histogram = _computeHistogram();
+
   List<DrivingInsight> _computeInsights() {
     if (widget.samples.isEmpty) return const [];
     // Insights are only meaningful for combustion trips — EV trips
@@ -64,6 +79,28 @@ class _TripDetailBodyState extends State<TripDetailBody> {
           growable: false,
         );
     return analyzeTrip(tripSamples);
+  }
+
+  ThrottleRpmHistogram _computeHistogram() {
+    if (widget.samples.isEmpty) return ThrottleRpmHistogram.empty;
+    // EV trips skip the histogram for the same reason they skip
+    // [DrivingInsightsCard] — RPM doesn't model EV motor behaviour
+    // and "throttle %" maps differently. Phase 4 will revisit.
+    if (widget.isEv) return ThrottleRpmHistogram.empty;
+    final histogramSamples = widget.samples
+        .map(
+          (s) => ThrottleRpmSample(
+            timestamp: s.timestamp,
+            // TripDetailSample has no throttle field — legacy
+            // persistence didn't carry PID 11. The calculator
+            // treats nulls as "skip on the throttle axis" so the
+            // RPM bars still render.
+            throttlePercent: null,
+            rpm: s.rpm,
+          ),
+        )
+        .toList(growable: false);
+    return calculateThrottleRpmHistogram(histogramSamples);
   }
 
   @override
@@ -96,6 +133,13 @@ class _TripDetailBodyState extends State<TripDetailBody> {
           // this card; phase 4 will land an EV-aware version.
           if (!widget.isEv && widget.samples.isNotEmpty)
             DrivingInsightsCard(insights: _insights),
+          // Throttle / RPM histogram (#1041 phase 3a — Card C). Slotted
+          // right below the insights card so the user reads "what was
+          // wasteful" then immediately sees "here's the engine
+          // distribution that produced that". Mirrors the EV-skip and
+          // empty-samples-skip rules.
+          if (!widget.isEv && widget.samples.isNotEmpty)
+            ThrottleRpmHistogramCard(histogram: _histogram),
           _ChartSection(
             title: l?.trajetDetailChartSpeed ?? 'Speed (km/h)',
             chart: TripDetailSpeedChart(samples: widget.samples),

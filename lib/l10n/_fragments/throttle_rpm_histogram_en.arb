@@ -1,0 +1,59 @@
+{
+  "throttleRpmHistogramTitle": "How you used the engine",
+  "@throttleRpmHistogramTitle": {
+    "description": "Title of the throttle / RPM histogram card on the Trip detail screen — surfaces the share of time the driver spent at each throttle quartile and RPM band (#1041 phase 3a)."
+  },
+  "throttleRpmHistogramThrottleSection": "Throttle position",
+  "@throttleRpmHistogramThrottleSection": {
+    "description": "Section label above the throttle-quartile bar group on the throttle/RPM histogram card (#1041 phase 3a)."
+  },
+  "throttleRpmHistogramRpmSection": "Engine RPM",
+  "@throttleRpmHistogramRpmSection": {
+    "description": "Section label above the RPM-band bar group on the throttle/RPM histogram card (#1041 phase 3a)."
+  },
+  "throttleRpmHistogramThrottleCoast": "Coast (0–25%)",
+  "@throttleRpmHistogramThrottleCoast": {
+    "description": "Bottom-quartile throttle label (closed throttle / coasting) on the throttle/RPM histogram card (#1041 phase 3a)."
+  },
+  "throttleRpmHistogramThrottleLight": "Light (25–50%)",
+  "@throttleRpmHistogramThrottleLight": {
+    "description": "Second-quartile throttle label (light cruise) on the throttle/RPM histogram card (#1041 phase 3a)."
+  },
+  "throttleRpmHistogramThrottleFirm": "Firm (50–75%)",
+  "@throttleRpmHistogramThrottleFirm": {
+    "description": "Third-quartile throttle label (firm pedal) on the throttle/RPM histogram card (#1041 phase 3a)."
+  },
+  "throttleRpmHistogramThrottleWide": "Wide-open (75–100%)",
+  "@throttleRpmHistogramThrottleWide": {
+    "description": "Top-quartile throttle label (wide-open / kick-down) on the throttle/RPM histogram card (#1041 phase 3a)."
+  },
+  "throttleRpmHistogramRpmIdle": "Idle (≤900)",
+  "@throttleRpmHistogramRpmIdle": {
+    "description": "Idle RPM band label (≤900 RPM) on the throttle/RPM histogram card (#1041 phase 3a)."
+  },
+  "throttleRpmHistogramRpmCruise": "Cruise (901–2000)",
+  "@throttleRpmHistogramRpmCruise": {
+    "description": "Cruise RPM band label (901–2000 RPM) on the throttle/RPM histogram card (#1041 phase 3a)."
+  },
+  "throttleRpmHistogramRpmSpirited": "Spirited (2001–3000)",
+  "@throttleRpmHistogramRpmSpirited": {
+    "description": "Spirited RPM band label (2001–3000 RPM) on the throttle/RPM histogram card (#1041 phase 3a)."
+  },
+  "throttleRpmHistogramRpmHard": "Hard (>3000)",
+  "@throttleRpmHistogramRpmHard": {
+    "description": "Hard RPM band label (>3000 RPM) on the throttle/RPM histogram card (#1041 phase 3a). Cutoff aligns with the 'Engine over 3000 RPM' driving-insight on the same screen."
+  },
+  "throttleRpmHistogramEmpty": "No throttle or RPM samples in this trip.",
+  "@throttleRpmHistogramEmpty": {
+    "description": "Empty-state caption inside the throttle/RPM histogram card when neither axis has any time-share to show — typically a legacy trip recorded before the throttle PID was added to the polling rotation (#1041 phase 3a)."
+  },
+  "throttleRpmHistogramBarShare": "{pct}%",
+  "@throttleRpmHistogramBarShare": {
+    "description": "Trailing time-share label on each histogram bar — whole-number percent (e.g. '12%') on the throttle/RPM histogram card (#1041 phase 3a).",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  }
+}
