@@ -73,6 +73,7 @@ docs/*
 !docs/guides/
 !docs/screenshots/
 !docs/design/
+!docs/security/
 docs/guides/*
 !docs/guides/NEW_COUNTRY.md
 !docs/guides/DEV-GIT-WORKTREES.md
