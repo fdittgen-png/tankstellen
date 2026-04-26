@@ -9,79 +9,15 @@ import '../../../search/domain/entities/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
 import '../../domain/route_search_strategy.dart';
 import '../helpers/batch_query_helper.dart';
+import 'eco_route_candidate.dart';
+import 'eco_route_scoring.dart';
 
-/// A single OSRM alternative (or any candidate route) scored by the
-/// eco strategy. Bundles the raw OSRM-derived metrics we need to
-/// compute `time + α × elevation + β × speed_variance_penalty`.
-///
-/// `elevationGainMeters` is null when OSRM did not return an
-/// elevation profile (the public demo server typically doesn't).
-/// In that case `EcoRouteSearchStrategy.scoreCandidate` falls back
-/// to time + speed-variance only — see the strategy's class docs.
-@immutable
-class EcoRouteCandidate {
-  const EcoRouteCandidate({
-    required this.geometry,
-    required this.distanceKm,
-    required this.durationMinutes,
-    this.elevationGainMeters,
-    this.legSpeedsKmh = const <double>[],
-  });
-
-  final List<LatLng> geometry;
-  final double distanceKm;
-  final double durationMinutes;
-
-  /// Total positive elevation gain along the candidate, in metres.
-  /// Null when the OSRM response carries no elevation data.
-  final double? elevationGainMeters;
-
-  /// Per-leg average speed in km/h. Used to compute a speed-variance
-  /// penalty: routes that mix highway + slow stretches burn more
-  /// fuel than a flat-cruise highway-only route. Empty list means
-  /// "we couldn't sample legs" and the variance penalty is 0.
-  final List<double> legSpeedsKmh;
-
-  /// Convert to the public `RouteInfo` shape, sampling every ~15 km
-  /// for downstream station-along-route queries (mirrors
-  /// `RoutingService._sampleAlongPolyline`).
-  RouteInfo toRouteInfo() {
-    final samples = _sampleAlongPolyline(geometry, 15.0);
-    return RouteInfo(
-      geometry: geometry,
-      distanceKm: distanceKm,
-      durationMinutes: durationMinutes,
-      samplePoints: samples,
-    );
-  }
-
-  static List<LatLng> _sampleAlongPolyline(
-    List<LatLng> polyline,
-    double intervalKm,
-  ) {
-    if (polyline.isEmpty) return const <LatLng>[];
-    final samples = <LatLng>[polyline.first];
-    double accumulated = 0;
-    for (var i = 1; i < polyline.length; i++) {
-      final prev = polyline[i - 1];
-      final curr = polyline[i];
-      accumulated += geo.distanceKm(
-        prev.latitude,
-        prev.longitude,
-        curr.latitude,
-        curr.longitude,
-      );
-      if (accumulated >= intervalKm) {
-        samples.add(curr);
-        accumulated = 0;
-      }
-    }
-    if (samples.last != polyline.last) {
-      samples.add(polyline.last);
-    }
-    return samples;
-  }
-}
+// Re-export the value types so existing imports of
+// `eco_route_search_strategy.dart` continue to resolve
+// `EcoRouteCandidate` and `EcoSavingsEstimator` symbols without
+// touching every callsite.
+export 'eco_route_candidate.dart' show EcoRouteCandidate;
+export 'eco_savings_estimator.dart' show EcoSavingsEstimator;
 
 /// Eco routing strategy (#1123).
 ///
@@ -92,11 +28,13 @@ class EcoRouteCandidate {
 ///            + α × elevationGainMeters
 ///            + β × speedVariancePenalty
 ///
-/// and returns the candidate with the lowest weight. The constants
-/// [alpha] and [beta] are tuned so that a route up to ~15 % slower
-/// than the fastest option but with markedly less elevation gain
-/// or steadier speeds wins. They are documented in-source so a
-/// future maintainer can re-tune from one place.
+/// and returns the candidate with the lowest weight. The tuning
+/// constants ([EcoRouteScoring.alpha], [EcoRouteScoring.beta],
+/// [EcoRouteScoring.maxSlowdownRatio]) are calibrated so that a
+/// route up to ~15 % slower than the fastest option but with
+/// markedly less elevation gain or steadier speeds wins. They live
+/// on [EcoRouteScoring] so a future maintainer can re-tune from
+/// one place.
 ///
 /// ### Fallback
 /// When OSRM returns no elevation profile (the public demo server
@@ -105,84 +43,29 @@ class EcoRouteCandidate {
 /// highway over zigzag-shortcut alternatives.
 ///
 /// ### Scope
-/// This file owns the *route-selection* logic. The station-search
-/// portion of the strategy (sampling along the chosen polyline,
-/// filtering by detour, ordering by itinerary) mirrors
-/// [`UniformSearchStrategy`] — once the eco route is picked, the
-/// stations-along-route problem is the same one.
+/// This file owns the *route-selection orchestration*. The pure
+/// scoring math lives in `eco_route_scoring.dart`; the candidate
+/// value type lives in `eco_route_candidate.dart`. The
+/// station-search portion of the strategy (sampling along the
+/// chosen polyline, filtering by detour, ordering by itinerary)
+/// mirrors [`UniformSearchStrategy`] — once the eco route is
+/// picked, the stations-along-route problem is the same one.
 class EcoRouteSearchStrategy implements RouteSearchStrategy {
-  /// Cost in `score units` per metre of cumulative elevation gain.
-  ///
-  /// Tuning rationale: a typical 100 km highway leg with 200 m of
-  /// gain represents ~+0.3 L of fuel for a 7 L/100 km vehicle.
-  /// We want that to *outweigh* a +5 minute detour penalty around
-  /// the gain — so 1 m ≈ 0.05 minutes of equivalent "cost" puts
-  /// 200 m of climb on par with a 10 minute detour. That feels
-  /// right for "ship the flatter route unless it's wildly slower".
-  static const double alpha = 0.05;
-
-  /// Cost in `score units` per (km/h)² of speed variance across
-  /// route legs. Highway-only candidates have variance ≈ 0;
-  /// city + highway mixes can hit 600–900 km²/h². The constant
-  /// 0.02 makes a variance of 500 worth ~10 minutes of equivalent
-  /// detour, which discourages stop-and-go shortcuts.
-  static const double beta = 0.02;
-
-  /// Cap on how much slower the eco choice may be vs the fastest
-  /// candidate. Above this ratio the eco strategy gives up on the
-  /// alternative and re-selects the fastest, on the theory that
-  /// the user came to drive, not to crawl. Matches the issue's
-  /// "≤ 15 % slower" acceptance bullet.
-  static const double maxSlowdownRatio = 1.15;
-
   @override
   String get name => 'Eco';
 
   @override
   String get l10nKey => 'ecoSearch';
 
-  /// Score a single candidate. Public so tests can pin the
-  /// weighting math without going through OSRM.
-  static double scoreCandidate(EcoRouteCandidate c) {
-    final elevTerm =
-        c.elevationGainMeters == null ? 0.0 : alpha * c.elevationGainMeters!;
-    final variance = _speedVariance(c.legSpeedsKmh);
-    final varianceTerm = beta * variance;
-    return c.durationMinutes + elevTerm + varianceTerm;
-  }
+  /// Score a single candidate. Delegates to [EcoRouteScoring.scoreCandidate]
+  /// — the implementation lives there so the math is testable in isolation.
+  static double scoreCandidate(EcoRouteCandidate c) =>
+      EcoRouteScoring.scoreCandidate(c);
 
-  /// Select the eco-best candidate from a list. Returns the
-  /// fastest candidate when:
-  ///   * the list is empty (caller-side error — never hits here
-  ///     in practice),
-  ///   * only one candidate exists,
-  ///   * every alternative is more than [maxSlowdownRatio] slower
-  ///     than the fastest.
-  ///
-  /// Otherwise returns the lowest-weight candidate within the
-  /// slowdown cap.
-  static EcoRouteCandidate selectEcoRoute(List<EcoRouteCandidate> candidates) {
-    if (candidates.isEmpty) {
-      throw ArgumentError('selectEcoRoute requires at least one candidate');
-    }
-    if (candidates.length == 1) return candidates.first;
-
-    final fastest = candidates
-        .reduce((a, b) => a.durationMinutes <= b.durationMinutes ? a : b);
-    final cap = fastest.durationMinutes * maxSlowdownRatio;
-
-    EcoRouteCandidate best = fastest;
-    double bestScore = scoreCandidate(fastest);
-    for (final c in candidates) {
-      if (c.durationMinutes > cap) continue;
-      final s = scoreCandidate(c);
-      if (s < bestScore) {
-        bestScore = s;
-        best = c;
-      }
-    }
-    return best;
-  }
+  /// Select the eco-best candidate from a list. Delegates to
+  /// [EcoRouteScoring.selectEcoRoute].
+  static EcoRouteCandidate selectEcoRoute(List<EcoRouteCandidate> candidates) =>
+      EcoRouteScoring.selectEcoRoute(candidates);
 
   /// Parse an OSRM `/route/v1/driving/...?alternatives=true` JSON
   /// response into a list of [EcoRouteCandidate]s. Tolerates the
@@ -400,64 +283,5 @@ class EcoRouteSearchStrategy implements RouteSearchStrategy {
       final db = geo.distanceAlongPolyline(b.lat, b.lng, geometry);
       return da.compareTo(db);
     });
-  }
-
-  /// Population variance of the per-leg speeds. Returns 0 for
-  /// empty/single-element lists (no penalty when we have no signal).
-  static double _speedVariance(List<double> speeds) {
-    if (speeds.length < 2) return 0;
-    final mean = speeds.reduce((a, b) => a + b) / speeds.length;
-    double sumSq = 0;
-    for (final s in speeds) {
-      final d = s - mean;
-      sumSq += d * d;
-    }
-    return sumSq / speeds.length;
-  }
-}
-
-/// Estimated litres saved by picking the eco route over the fastest.
-///
-/// Simple model: distance × consumption_baseline_lPer100km / 100,
-/// adjusted by the eco route's expected efficiency uplift relative
-/// to the fastest. We assume the eco route burns
-/// `1 / (1 + ecoEfficiencyLift)` as much per km as the fastest —
-/// `0.07` (7 % less) is a defensible default for a steady-cruise
-/// vs zigzag delta on a typical European motorway+B-road mix.
-///
-/// Returns 0.0 when either route is empty or the math underflows.
-class EcoSavingsEstimator {
-  /// Default consumption (L / 100 km) when the user hasn't set a
-  /// vehicle baseline. 7 L is roughly the EU fleet average for
-  /// petrol passenger cars (EEA 2023). Diesel users will see a
-  /// slight over-estimate — fine for a UI hint.
-  static const double defaultConsumptionLPer100km = 7.0;
-
-  /// Eco route burns `1 / (1 + lift)` × the fastest route's per-km
-  /// consumption. 7 % is a conservative midpoint of the
-  /// 5–10 % range reported by EU eco-driving studies for steady
-  /// cruise vs aggressive variable-speed driving.
-  static const double ecoEfficiencyLift = 0.07;
-
-  /// Compute estimated litres saved by switching from [fastest] to
-  /// [eco]. Both arguments are total-route distances in km +
-  /// total-route durations in minutes; consumption is L/100 km.
-  ///
-  /// Returns a non-negative value (clamped at 0) — if the model
-  /// somehow predicts the eco route burns *more*, we hide the
-  /// preview rather than scare the user.
-  static double estimateLitersSaved({
-    required double fastestDistanceKm,
-    required double ecoDistanceKm,
-    required double consumptionLPer100km,
-  }) {
-    if (fastestDistanceKm <= 0 || ecoDistanceKm <= 0) return 0.0;
-    if (consumptionLPer100km <= 0) return 0.0;
-    final fastestL = fastestDistanceKm * consumptionLPer100km / 100.0;
-    final ecoConsumption =
-        consumptionLPer100km / (1.0 + ecoEfficiencyLift);
-    final ecoL = ecoDistanceKm * ecoConsumption / 100.0;
-    final delta = fastestL - ecoL;
-    return delta > 0 ? delta : 0.0;
   }
 }
