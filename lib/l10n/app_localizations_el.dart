@@ -3497,6 +3497,16 @@ class AppLocalizationsEl extends AppLocalizations {
       'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.';
 
   @override
+  String get hapticEcoCoachSectionTitle => 'Driving';
+
+  @override
+  String get hapticEcoCoachSettingTitle => 'Real-time eco coaching';
+
+  @override
+  String get hapticEcoCoachSettingSubtitle =>
+      'Gentle haptic when you floor it during cruise';
+
+  @override
   String get loyaltySettingsTitle => 'Fuel club cards';
 
   @override

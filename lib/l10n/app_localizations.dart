@@ -6530,6 +6530,24 @@ abstract class AppLocalizations {
   /// **'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.'**
   String get calibrationModeTooltip;
 
+  /// Section header on the Settings screen grouping wheel-lens (driving-behaviour) settings (#1122).
+  ///
+  /// In en, this message translates to:
+  /// **'Driving'**
+  String get hapticEcoCoachSectionTitle;
+
+  /// Title of the haptic-eco-coach toggle on the Settings screen (#1122).
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time eco coaching'**
+  String get hapticEcoCoachSettingTitle;
+
+  /// Subtitle/explanation of the haptic-eco-coach toggle on the Settings screen (#1122). Describes the heuristic in user-facing terms.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle haptic when you floor it during cruise'**
+  String get hapticEcoCoachSettingSubtitle;
+
   /// Title of the loyalty settings sub-screen where the user manages fuel-club cards (#1120).
   ///
   /// In en, this message translates to:

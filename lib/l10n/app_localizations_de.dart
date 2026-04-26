@@ -3525,6 +3525,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'Regelbasiert ordnet jede Fahrprobe genau einer Situation zu. Fuzzy verteilt sie auf alle, je nachdem wie gut sie passen — ruhiger rund um 60 km/h oder bei wechselnden Steigungen, aber langsamer beim Befüllen aller Kategorien.';
 
   @override
+  String get hapticEcoCoachSectionTitle => 'Fahrweise';
+
+  @override
+  String get hapticEcoCoachSettingTitle => 'Echtzeit-Eco-Coaching';
+
+  @override
+  String get hapticEcoCoachSettingSubtitle =>
+      'Sanfte Vibration bei zu starker Beschleunigung im Reisemodus';
+
+  @override
   String get loyaltySettingsTitle => 'Tankstellen-Kundenkarten';
 
   @override
