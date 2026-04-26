@@ -64,6 +64,14 @@ class HiveBoxes {
   /// public station coordinates.
   static const String priceSnapshots = 'price_snapshots';
 
+  /// Ring buffer of background-isolate errors awaiting foreground
+  /// replay through `TraceRecorder` (#1105). Up to 50 JSON-encoded
+  /// `IsolateErrorSpoolEntry` payloads keyed by a synthetic
+  /// timestamp+index string. Lives outside the encrypted set so the
+  /// WorkManager isolate can write to it before consent / encryption
+  /// keys are available.
+  static const String isolateErrorSpool = 'isolate_error_spool';
+
   static const _encryptedBoxes = {
     settings,
     profiles,
@@ -156,6 +164,11 @@ class HiveBoxes {
     await Hive.openBox<String>(obd2PausedTrips);
     // #579 — rolling price snapshots for the velocity detector.
     await Hive.openBox<String>(priceSnapshots);
+    // #1105 — isolate error spool: background-isolate errors written
+    // here while Riverpod is unavailable, drained by the foreground
+    // initialiser into TraceRecorder. Unencrypted so the BG isolate
+    // can write before consent / keychain unlock.
+    await Hive.openBox<String>(isolateErrorSpool);
   }
 
   /// Initialize Hive in a background isolate with proper encryption.
@@ -170,6 +183,10 @@ class HiveBoxes {
     // #579 — velocity detector reads/writes snapshots from the BG
     // isolate, mirroring the main-isolate open above.
     await Hive.openBox<String>(priceSnapshots);
+    // #1105 — isolate error spool: background-isolate errors written
+    // here while Riverpod is unavailable, drained by the foreground
+    // initialiser into TraceRecorder.
+    await Hive.openBox<String>(isolateErrorSpool);
   }
 
   /// Close all Hive boxes opened by [initInIsolate].
@@ -177,7 +194,7 @@ class HiveBoxes {
   /// Must be called at the end of every background task to release file
   /// handles and prevent race conditions with the main isolate.
   static Future<void> closeIsolateBoxes() async {
-    final boxNames = [settings, favorites, alerts, cache, priceHistory, priceSnapshots];
+    final boxNames = [settings, favorites, alerts, cache, priceHistory, priceSnapshots, isolateErrorSpool];
     for (final name in boxNames) {
       try {
         if (Hive.isBoxOpen(name)) {

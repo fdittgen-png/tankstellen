@@ -10,6 +10,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import '../core/background/background_service.dart';
 import '../core/constants/app_constants.dart';
 import '../core/cache/cache_manager.dart';
+import '../core/error_tracing/storage/isolate_error_spool.dart';
 import '../core/error_tracing/storage/trace_storage.dart';
 import '../core/error_tracing/trace_recorder.dart';
 import '../core/notifications/local_notification_service.dart';
@@ -399,6 +400,27 @@ class AppInitializer {
     } catch (e) {
       debugPrint('AppInitializer: nearestWidgetRefresh start failed: $e');
     }
+
+    // #1105 — drain the background-isolate error spool through the
+    // foreground TraceRecorder. WorkManager runs without Riverpod, so
+    // every BG failure is parked in a Hive ring buffer until the app
+    // is in the foreground; replaying here puts those errors in the
+    // same observability pipeline as foreground exceptions (and into
+    // Sentry when the user has consented). Deferred to the post-frame
+    // microtask so the first paint isn't delayed by Hive reads /
+    // recorder writes.
+    _deferPostFirstFrame(() async {
+      try {
+        final recorder = container.read(traceRecorderProvider);
+        final replayed = await IsolateErrorSpool.drain(recorder);
+        if (replayed > 0) {
+          debugPrint(
+              'AppInitializer: drained $replayed isolate error(s) into TraceRecorder');
+        }
+      } catch (e) {
+        debugPrint('AppInitializer: isolate spool drain failed: $e');
+      }
+    });
 
     StartupTimer.instance.mark('first_frame');
     StartupTimer.instance.finish();
