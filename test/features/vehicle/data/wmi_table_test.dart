@@ -58,6 +58,78 @@ void main() {
       expect(entry, isNotNull);
       expect(entry!.brand, 'Peugeot');
     });
+
+    test('mixed-case input still resolves (toUpperCase normalisation)', () {
+      final entry = lookup('Wba3B1c50dF123456');
+      expect(entry, isNotNull);
+      expect(entry!.brand, 'BMW');
+      expect(entry.country, 'Germany');
+    });
+
+    test('exactly 3-character input resolves to the matching entry', () {
+      // The lookup only consults the first 3 chars, so a bare prefix
+      // must succeed even though it isn't a real 17-char VIN.
+      final entry = lookup('WVW');
+      expect(entry, isNotNull);
+      expect(entry!.brand, 'Volkswagen');
+      expect(entry.country, 'Germany');
+    });
+
+    test('WF0 → Ford, Germany (European Ford plant)', () {
+      final entry = lookup('WF0AXXGCDAEU12345');
+      expect(entry, isNotNull);
+      expect(entry!.brand, 'Ford');
+      expect(entry.country, 'Germany');
+    });
+
+    test('1FA → Ford, United States (US Ford plant)', () {
+      final entry = lookup('1FAFP404X4F123456');
+      expect(entry, isNotNull);
+      expect(entry!.brand, 'Ford');
+      expect(entry.country, 'United States');
+    });
+
+    test('WVW → Volkswagen, Germany', () {
+      final entry = lookup('WVWZZZ1JZ3W123456');
+      expect(entry, isNotNull);
+      expect(entry!.brand, 'Volkswagen');
+      expect(entry.country, 'Germany');
+    });
+
+    test('17-char real-world VIN — only 3-char prefix is consulted', () {
+      // Two distinct full VINs that share the WAU prefix must resolve
+      // to the same WmiEntry, proving characters 4-17 are ignored.
+      final a = lookup('WAUZZZ8K9BA123456');
+      final b = lookup('WAUFFAFL0BN999999');
+      expect(a, isNotNull);
+      expect(b, isNotNull);
+      expect(a!.brand, 'Audi');
+      expect(b!.brand, 'Audi');
+      expect(a.country, 'Germany');
+      expect(b.country, 'Germany');
+    });
+
+    test('single-char and two-char inputs return null', () {
+      expect(lookup('W'), isNull);
+      expect(lookup('WB'), isNull);
+    });
+  });
+
+  group('WmiEntry', () {
+    test('constructor exposes country and brand verbatim', () {
+      const entry = WmiEntry(country: 'France', brand: 'Peugeot');
+      expect(entry.country, 'France');
+      expect(entry.brand, 'Peugeot');
+    });
+
+    test('lookup hit returns a WmiEntry whose fields are accessible', () {
+      final entry = lookup('VF3');
+      expect(entry, isA<WmiEntry>());
+      expect(entry!.country, isA<String>());
+      expect(entry.brand, isA<String>());
+      expect(entry.country, 'France');
+      expect(entry.brand, 'Peugeot');
+    });
   });
 
   group('wmiTable integrity', () {
