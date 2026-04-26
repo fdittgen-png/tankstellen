@@ -4,6 +4,13 @@ import 'package:http/http.dart' as http;
 import 'package:tankstellen/core/utils/payment_app_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// Offline tests for [paymentAppForBrand] and [PaymentAppLauncher]. The
+/// brand catalog is empty today (#736 — every hard-coded Play Store id
+/// 404'd), so no live probe runs.
+///
+/// When a brand is re-added, wrap [assertLivePlayStoreListing] (below) in
+/// a `@Tags(['network'])` test so CI catches silent Play Store redirects
+/// before users tap the chip. See `docs/guides/NETWORK_TESTS.md`.
 void main() {
   group('paymentAppForBrand', () {
     test('returns null for unknown brand', () {

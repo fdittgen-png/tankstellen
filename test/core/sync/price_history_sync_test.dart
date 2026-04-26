@@ -1,18 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/price_history_sync.dart';
 
-/// Shape-only smoke tests for [PriceHistorySync] (#727 extract).
+/// Shape-only smoke tests for [PriceHistorySync] (#727 extract). Runs
+/// fully offline — exercises the "TankSync client is null → return empty
+/// list" guard without touching Supabase.
 ///
-/// The method wraps a Supabase query; the ONLY behaviour this test
-/// can exercise without a live Supabase stack is the "client is
-/// null → return empty list" guard. That guard is the contract the
-/// rest of the codebase depends on (see
-/// `supabase_sync_repository_test.dart` for the same test at the
-/// repository layer) — any refactor that loses it is a regression.
-///
-/// Tests that require a real Supabase client live under
-/// `test/core/data/sync_repository_test.dart` with a `@Tags(['network'])`
-/// guard; we don't duplicate those here.
+/// Live counterpart sits at `test/core/data/sync_repository_test.dart`
+/// under `@Tags(['network'])`; rerun that file (not this one) when the
+/// `price_snapshots` table schema or the TankSync RPC contract changes.
+/// See `docs/guides/NETWORK_TESTS.md`.
 void main() {
   group('PriceHistorySync', () {
     test('returns empty list when TankSync client is not configured',

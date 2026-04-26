@@ -5,14 +5,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:tankstellen/core/constants/app_constants.dart';
 
-/// Verifies that every user-facing URL constant in [AppConstants] is
-/// reachable (returns HTTP 2xx or 3xx). Tagged `network` so it only
-/// runs in CI jobs / manual invocations with network access:
+/// #539 — `HEAD`-probes every user-facing URL constant in [AppConstants]
+/// (privacy policy, GitHub repo + issues, Tankerkoenig registration,
+/// PayPal, Revolut). Catches the broken-link case after a domain change.
 ///
-///   flutter test --tags=network
-///
-/// The default CI step runs `--exclude-tags=network`, so this test
-/// does NOT block offline PR checks.
+/// Rerun after editing `lib/core/constants/app_constants.dart` or after
+/// reconfiguring GitHub Pages for the privacy policy. CI excludes the
+/// tag; see `docs/guides/NETWORK_TESTS.md`.
 void main() {
   group('External URLs reachable (#539)', () {
     /// URLs the app opens in the user's browser. A 404 on any of

@@ -79,6 +79,7 @@ docs/*
 !docs/design/
 !docs/security/
 docs/guides/*
+!docs/guides/NETWORK_TESTS.md
 !docs/guides/NEW_COUNTRY.md
 !docs/guides/ARB_FRAGMENTS.md
 !docs/guides/BLOCKER-IOS-PROVISIONING.md
