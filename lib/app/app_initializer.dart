@@ -19,6 +19,7 @@ import '../core/services/country_service_registry.dart';
 import '../core/storage/hive_storage.dart';
 import '../core/sync/community_config.dart';
 import '../core/sync/supabase_client.dart';
+import '../core/telemetry/pii_scrubber.dart';
 import '../core/utils/edge_to_edge.dart';
 import '../features/profile/data/repositories/profile_repository.dart';
 import '../features/vehicle/data/reference_vehicle_catalog_provider.dart';
@@ -140,6 +141,18 @@ class AppInitializer {
           options.tracesSampleRate = 0.2;
           options.environment = 'production';
           options.release = release;
+          // #1109 — strip PII (emails, lat/lng, tokens, user/request blocks,
+          // long breadcrumb payloads) from every event before it leaves the
+          // device. The scrubber is a pure function so it stays unit-tested
+          // and shared with `TraceUploader`.
+          options.beforeSend = (event, hint) {
+            try {
+              return PiiScrubber.scrubSentryEvent(event);
+            } catch (e) {
+              debugPrint('Sentry beforeSend scrub failed: $e');
+              return event;
+            }
+          };
         },
         appRunner: () => _launch(container, appBuilder),
       );

@@ -49,7 +49,7 @@ class StationPrices {
 /// caching, fallback, and request deduplication on top.
 ///
 /// To add a new country, implement this interface and register it in
-/// `service_providers.dart`. See CONTRIBUTING.md for the full guide.
+/// `service_providers.dart`. See docs/CONTRIBUTING.md for the full guide.
 abstract class StationService {
   /// Search for stations near a geographic location.
   ///
