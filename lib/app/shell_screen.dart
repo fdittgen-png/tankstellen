@@ -6,6 +6,9 @@ import '../features/vehicle/providers/vehicle_providers.dart';
 import '../l10n/app_localizations.dart';
 import 'current_shell_branch_provider.dart';
 import 'responsive_search_layout.dart';
+import 'shell/shell_bottom_bar.dart';
+import 'shell/shell_destinations.dart';
+import 'shell/shell_nav_rail.dart';
 
 /// The main app shell with adaptive navigation.
 ///
@@ -31,7 +34,8 @@ class ShellScreen extends ConsumerStatefulWidget {
   ConsumerState<ShellScreen> createState() => _ShellScreenState();
 }
 
-class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderStateMixin {
+class _ShellScreenState extends ConsumerState<ShellScreen>
+    with TickerProviderStateMixin {
   late final List<AnimationController> _iconControllers;
   late AnimationController _transitionController;
   late Animation<Offset> _slideInAnim;
@@ -87,7 +91,8 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
     _slideInAnim = Tween<Offset>(
       begin: Offset(0.3 * direction, 0),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _transitionController, curve: Curves.easeOutCubic));
+    ).animate(CurvedAnimation(
+        parent: _transitionController, curve: Curves.easeOutCubic));
     _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _transitionController, curve: Curves.easeOut),
     );
@@ -164,7 +169,8 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
 
     final l10n = AppLocalizations.of(context);
     final screenSize = screenSizeOf(context);
-    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
 
     // #893 — Conso tab is only visible once the user has configured at
     // least one vehicle. A fresh install (no vehicles) shows the 4
@@ -175,48 +181,22 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
     // reactive — removing the last vehicle from Settings instantly
     // collapses the tab to 4, and adding the first vehicle grows it
     // back to 5.
-    final hasVehicle =
-        ref.watch(vehicleProfileListProvider).isNotEmpty;
+    final hasVehicle = ref.watch(vehicleProfileListProvider).isNotEmpty;
 
-    // Kept in router-branch order so the index we hand to
-    // `navigationShell.goBranch()` still lines up: Search=0, Map=1,
-    // Favorites=2, Consumption=3, Settings=4.
-    final allDestinations = <_NavItem>[
-      _NavItem(Icons.search_outlined, Icons.search, l10n?.search ?? 'Search'),
-      _NavItem(Icons.map_outlined, Icons.map, l10n?.map ?? 'Map'),
-      _NavItem(Icons.star_outline, Icons.star, l10n?.favorites ?? 'Favorites'),
-      _NavItem(
-        Icons.local_gas_station_outlined,
-        Icons.local_gas_station,
-        l10n?.navConsumption ?? 'Consumption',
-      ),
-      _NavItem(
-        Icons.settings_outlined,
-        Icons.settings,
-        l10n?.settings ?? 'Settings',
-      ),
-    ];
-
-    // Visible items + the router-branch index each one maps to. When
-    // Conso is hidden, Settings still routes to branch 4 even though
-    // it renders at display-slot 3.
-    final visibleDestinations = <_NavItem>[];
-    final branchForSlot = <int>[];
-    for (var i = 0; i < allDestinations.length; i++) {
-      if (i == _consumptionBranchIndex && !hasVehicle) continue;
-      visibleDestinations.add(allDestinations[i]);
-      branchForSlot.add(i);
-    }
+    final destinations =
+        resolveShellDestinations(l10n: l10n, hasVehicle: hasVehicle);
+    final visibleDestinations = destinations.items;
+    final branchForSlot = destinations.branchForSlot;
     _branchForSlot = branchForSlot;
 
     // If the user was on the Conso tab and just deleted their last
     // vehicle, snap the selection to Search (branch 0) — the Conso
     // slot has disappeared from the nav bar and leaving
     // `_currentIndex` pointing at it would leave no item highlighted.
-    if (!hasVehicle && _currentIndex == _consumptionBranchIndex) {
+    if (!hasVehicle && _currentIndex == kConsumptionBranchIndex) {
       safePostFrame(() {
         if (!mounted) return;
-        if (_currentIndex != _consumptionBranchIndex) return;
+        if (_currentIndex != kConsumptionBranchIndex) return;
         _goToPage(0);
       });
     }
@@ -228,9 +208,8 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
 
     final body = GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onHorizontalDragEnd: screenSize == ScreenSize.compact
-          ? _onHorizontalDragEnd
-          : null,
+      onHorizontalDragEnd:
+          screenSize == ScreenSize.compact ? _onHorizontalDragEnd : null,
       child: AnimatedBuilder(
         animation: _transitionController,
         builder: (context, _) {
@@ -268,7 +247,7 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
         primary: false,
         body: Row(
           children: [
-            _AdaptiveNavigationRail(
+            ShellNavRail(
               items: visibleDestinations,
               branchForSlot: branchForSlot,
               currentIndex: selectedSlot < 0 ? 0 : selectedSlot,
@@ -289,7 +268,7 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
       // applied to the compact Scaffold that hosts the bottom nav.
       primary: false,
       body: body,
-      bottomNavigationBar: _AnimatedNavBar(
+      bottomNavigationBar: ShellBottomBar(
         items: visibleDestinations,
         branchForSlot: branchForSlot,
         currentIndex: selectedSlot < 0 ? 0 : selectedSlot,
@@ -297,230 +276,6 @@ class _ShellScreenState extends ConsumerState<ShellScreen> with TickerProviderSt
         isLandscape: isLandscape,
         onTap: onSlotTap,
       ),
-    );
-  }
-
-  /// Index of the Consumption branch in the StatefulShellRoute (see
-  /// `router.dart`). Exposed as a constant so hiding/showing logic can
-  /// refer to it by name rather than a naked `3`.
-  static const int _consumptionBranchIndex = 3;
-}
-
-class _NavItem {
-  final IconData outlinedIcon;
-  final IconData filledIcon;
-  final String label;
-  const _NavItem(this.outlinedIcon, this.filledIcon, this.label);
-}
-
-/// NavigationRail for medium and expanded screen sizes.
-///
-/// Shows labels and wider rail on expanded screens (> 840dp).
-/// Shows icons-only rail on medium screens (600-840dp).
-class _AdaptiveNavigationRail extends StatelessWidget {
-  final List<_NavItem> items;
-  /// Router-branch index for each visible slot. Used to index into the
-  /// 5-wide `iconControllers` list when Conso is hidden (#893).
-  final List<int> branchForSlot;
-  final int currentIndex;
-  final List<AnimationController> iconControllers;
-  final bool extended;
-  final ValueChanged<int> onTap;
-
-  const _AdaptiveNavigationRail({
-    required this.items,
-    required this.branchForSlot,
-    required this.currentIndex,
-    required this.iconControllers,
-    required this.extended,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return NavigationRail(
-      selectedIndex: currentIndex,
-      onDestinationSelected: onTap,
-      extended: extended,
-      minWidth: 56,
-      minExtendedWidth: 180,
-      labelType: extended
-          ? NavigationRailLabelType.none
-          : NavigationRailLabelType.selected,
-      selectedIconTheme: IconThemeData(color: theme.colorScheme.primary),
-      unselectedIconTheme: IconThemeData(
-        color: theme.colorScheme.onSurfaceVariant,
-      ),
-      destinations: List.generate(items.length, (i) {
-        final item = items[i];
-        final selected = i == currentIndex;
-        final controller = iconControllers[branchForSlot[i]];
-        return NavigationRailDestination(
-          icon: _BounceIcon(
-            controller: controller,
-            selected: false,
-            icon: item.outlinedIcon,
-            iconSize: 24,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-          selectedIcon: _BounceIcon(
-            controller: controller,
-            selected: true,
-            icon: item.filledIcon,
-            iconSize: 24,
-            color: theme.colorScheme.primary,
-          ),
-          label: Text(item.label),
-          padding: EdgeInsets.symmetric(vertical: selected ? 4 : 0),
-        );
-      }),
-    );
-  }
-}
-
-class _AnimatedNavBar extends StatelessWidget {
-  final List<_NavItem> items;
-  /// Router-branch index for each visible slot (see rail comment, #893).
-  final List<int> branchForSlot;
-  final int currentIndex;
-  final List<AnimationController> iconControllers;
-  final bool isLandscape;
-  final ValueChanged<int> onTap;
-
-  const _AnimatedNavBar({
-    required this.items,
-    required this.branchForSlot,
-    required this.currentIndex,
-    required this.iconControllers,
-    required this.isLandscape,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final iconSize = isLandscape ? 20.0 : 24.0;
-    // #528 — wrap the bar in `SafeArea(top: false)` rather than
-    // reading `MediaQuery.viewPadding.bottom` manually. SafeArea
-    // *consumes* the inset, so no ancestor or descendant can
-    // accidentally apply it a second time. Fixes the visible band
-    // of empty space between the bottom nav and the Android gesture
-    // bar on edge-to-edge devices (same class of bug as #520).
-    final barHeight = isLandscape ? 48.0 : 64.0;
-
-    return SafeArea(
-      top: false,
-      child: Container(
-      height: barHeight,
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.black.withValues(alpha: 0.3)
-                : Colors.black.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: List.generate(items.length, (i) {
-          final selected = i == currentIndex;
-          final item = items[i];
-          final controller = iconControllers[branchForSlot[i]];
-
-          return Expanded(
-            child: Semantics(
-              label: item.label,
-              button: true,
-              selected: selected,
-              excludeSemantics: true,
-              child: InkWell(
-              onTap: () => onTap(i),
-              splashColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-              highlightColor: Colors.transparent,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _BounceIcon(
-                    controller: controller,
-                    selected: selected,
-                    icon: selected ? item.filledIcon : item.outlinedIcon,
-                    iconSize: iconSize,
-                    color: selected
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurfaceVariant,
-                  ),
-                  if (!isLandscape) ...[
-                    const SizedBox(height: 2),
-                    AnimatedDefaultTextStyle(
-                      duration: const Duration(milliseconds: 200),
-                      style: TextStyle(
-                        fontSize: selected ? 11 : 10,
-                        fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                        color: selected
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurfaceVariant,
-                      ),
-                      child: Text(item.label, maxLines: 1, overflow: TextOverflow.ellipsis),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            ),
-          );
-        }),
-      ),
-      ),
-    );
-  }
-}
-
-class _BounceIcon extends StatelessWidget {
-  final AnimationController controller;
-  final bool selected;
-  final IconData icon;
-  final double iconSize;
-  final Color color;
-
-  const _BounceIcon({
-    required this.controller,
-    required this.selected,
-    required this.icon,
-    required this.iconSize,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scaleAnim = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 1.25).chain(CurveTween(curve: Curves.easeOut)),
-        weight: 40,
-      ),
-      TweenSequenceItem(
-        tween: Tween(begin: 1.25, end: 0.95).chain(CurveTween(curve: Curves.easeInOut)),
-        weight: 30,
-      ),
-      TweenSequenceItem(
-        tween: Tween(begin: 0.95, end: 1.0).chain(CurveTween(curve: Curves.easeOut)),
-        weight: 30,
-      ),
-    ]).animate(controller);
-
-    return AnimatedBuilder(
-      animation: scaleAnim,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: scaleAnim.value,
-          child: child,
-        );
-      },
-      child: Icon(icon, size: iconSize, color: color),
     );
   }
 }
