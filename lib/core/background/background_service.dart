@@ -18,6 +18,7 @@ import '../../features/price_history/data/models/price_record.dart';
 import '../../features/search/domain/entities/fuel_type.dart';
 import '../../features/widget/data/home_widget_service.dart';
 import '../constants/field_names.dart';
+import '../error_tracing/storage/isolate_error_spool.dart';
 import '../notifications/local_notification_service.dart';
 import '../services/impl/tankerkoenig_batch_price_fetcher.dart';
 import '../services/impl/tankerkoenig_station_service.dart';
@@ -320,8 +321,22 @@ Future<void> _refreshPricesAndCheckAlerts() async {
                 currentPrice: currentPrice,
                 targetPrice: alert.targetPrice,
               );
-            } catch (e) {
+            } catch (e, st) {
               debugPrint('BackgroundService: ntfy push failed: $e');
+              // #1105 — spool the error so the foreground TraceRecorder
+              // can replay it. ntfy push failures are best-effort but
+              // they're a real signal that something is wrong with the
+              // user's relay configuration, so they belong in the
+              // observability pipeline.
+              await IsolateErrorSpool.enqueue(
+                isolateTaskName: 'ntfy_push',
+                error: e,
+                stack: st,
+                contextMap: <String, dynamic>{
+                  'alertId': alert.stationId,
+                  'fuelType': alert.fuelType.displayName,
+                },
+              );
             }
           }
 
@@ -348,8 +363,18 @@ Future<void> _refreshPricesAndCheckAlerts() async {
           now: now,
           notifier: notifier,
         );
-      } catch (e) {
+      } catch (e, st) {
         debugPrint('BackgroundService: velocity detector failed: $e');
+        // #1105 — spool the failure so the foreground TraceRecorder can
+        // surface it through the same pipeline as foreground errors.
+        await IsolateErrorSpool.enqueue(
+          isolateTaskName: 'velocity_detector',
+          error: e,
+          stack: st,
+          contextMap: <String, dynamic>{
+            'priceCount': prices.length,
+          },
+        );
       }
     }
 
@@ -368,8 +393,16 @@ Future<void> _refreshPricesAndCheckAlerts() async {
         notifier: notifier,
         apiKey: apiKey,
       );
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('BackgroundService: radius alert runner failed: $e');
+      // #1105 — spool the failure so the foreground TraceRecorder can
+      // surface radius-alert outages through the same pipeline as
+      // foreground errors.
+      await IsolateErrorSpool.enqueue(
+        isolateTaskName: 'radius_alerts',
+        error: e,
+        stack: st,
+      );
     }
 
     // 6. Update home screen widgets with latest favorite prices.
@@ -385,8 +418,17 @@ Future<void> _refreshPricesAndCheckAlerts() async {
     // sorting favorites by distance. Shared helper so the early-return
     // path above also runs it.
     await _refreshNearestWidgetFromSearch(storage);
-  } catch (e) {
+  } catch (e, st) {
     debugPrint('BackgroundService: task failed: $e');
+    // #1105 — top-level isolate failure: spool through the ring buffer
+    // so the foreground TraceRecorder can replay it. This catches any
+    // exception not handled by the inner runners (Hive open failures,
+    // batch fetcher exhaustion, unexpected runtime errors).
+    await IsolateErrorSpool.enqueue(
+      isolateTaskName: 'price_refresh',
+      error: e,
+      stack: st,
+    );
   } finally {
     // Always close Hive boxes and release lock, even on failure.
     // This prevents file handle leaks and stale locks.
