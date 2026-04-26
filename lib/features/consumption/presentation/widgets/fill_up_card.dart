@@ -12,7 +12,7 @@ import 'eco_score_badge.dart';
 /// When an [ecoScore] is supplied (computed against the user's recent
 /// fill-up history), an eco-score badge appears under the cost line —
 /// turning the card from a passive record into a driving-behaviour
-/// nudge. See issue #676 and the project leitmotiv in CLAUDE.md.
+/// nudge. See issue #676 ("Smarter pump. Smarter drive. Save twice.").
 class FillUpCard extends StatelessWidget {
   final FillUp fillUp;
   final EcoScore? ecoScore;
