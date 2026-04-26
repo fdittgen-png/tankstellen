@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
@@ -10,9 +10,9 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import '../core/background/background_service.dart';
 import '../core/constants/app_constants.dart';
 import '../core/cache/cache_manager.dart';
-import '../core/error_tracing/storage/isolate_error_spool.dart';
-import '../core/error_tracing/storage/trace_storage.dart';
-import '../core/error_tracing/trace_recorder.dart';
+import '../core/telemetry/storage/isolate_error_spool.dart';
+import '../core/telemetry/storage/trace_storage.dart';
+import '../core/telemetry/trace_recorder.dart';
 import '../core/logging/error_logger.dart';
 import '../core/notifications/local_notification_service.dart';
 import '../core/perf/startup_timer.dart';

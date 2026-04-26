@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../error/error_localizer.dart';
 import '../../error/exceptions.dart';
-import '../../error_reporting/error_report_payload.dart';
-import '../../error_reporting/error_reporter.dart';
-import '../../error_reporting/error_reporter_context.dart';
+import '../../feedback/github_issue_reporter/error_report_payload.dart';
+import '../../feedback/github_issue_reporter/error_reporter.dart';
+import '../../feedback/github_issue_reporter/error_reporter_context.dart';
 import '../service_result.dart';
 
 /// Displays a banner when data comes from cache or fallback services.

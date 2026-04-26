@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -18,7 +18,7 @@ import '../../features/price_history/data/models/price_record.dart';
 import '../../features/search/domain/entities/fuel_type.dart';
 import '../../features/widget/data/home_widget_service.dart';
 import '../constants/field_names.dart';
-import '../error_tracing/storage/isolate_error_spool.dart';
+import '../telemetry/storage/isolate_error_spool.dart';
 import '../notifications/local_notification_service.dart';
 import '../services/impl/tankerkoenig_batch_price_fetcher.dart';
 import '../services/impl/tankerkoenig_station_service.dart';

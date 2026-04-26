@@ -1,7 +1,7 @@
-import 'package:flutter/services.dart';
+﻿import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/core/error_tracing/collectors/network_state_collector.dart';
-import 'package:tankstellen/core/error_tracing/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/collectors/network_state_collector.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

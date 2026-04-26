@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
@@ -41,7 +41,7 @@ void main() {
         'lib/core/services/location_search_service.dart',
         'lib/core/services/impl/osm_brand_enricher.dart',
         'lib/core/services/impl/nominatim_geocoding_provider.dart',
-        'lib/core/error_tracing/upload/trace_uploader.dart',
+        'lib/core/telemetry/upload/trace_uploader.dart',
         'lib/features/setup/data/api_key_validator.dart',
         'lib/core/sync/ntfy_service.dart',
       ];

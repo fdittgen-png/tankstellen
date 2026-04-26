@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
-import 'package:tankstellen/core/error_reporting/error_reporter.dart';
+import 'package:tankstellen/core/feedback/github_issue_reporter/error_reporter.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';

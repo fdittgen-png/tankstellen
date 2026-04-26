@@ -1,6 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
-import 'package:tankstellen/core/error_reporting/error_report_payload.dart';
+import 'package:tankstellen/core/feedback/github_issue_reporter/error_report_payload.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 
 void main() {

@@ -1,11 +1,11 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:tankstellen/core/error_tracing/models/error_trace.dart';
-import 'package:tankstellen/core/error_tracing/storage/isolate_error_spool.dart';
-import 'package:tankstellen/core/error_tracing/storage/isolate_error_spool_entry.dart';
-import 'package:tankstellen/core/error_tracing/trace_recorder.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/storage/isolate_error_spool.dart';
+import 'package:tankstellen/core/telemetry/storage/isolate_error_spool_entry.dart';
+import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 
 /// Minimal fake [TraceRecorder] that captures every call to `record`.
 ///

@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/storage_repository.dart';
 import '../../services/dio_factory.dart';
 import '../../storage/storage_providers.dart';
-import '../../telemetry/pii_scrubber.dart';
+import '../pii_scrubber.dart';
 import '../models/error_trace.dart';
 import 'trace_upload_config.dart';
 

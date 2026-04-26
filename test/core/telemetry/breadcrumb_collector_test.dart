@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/core/error_tracing/collectors/breadcrumb_collector.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
 
 void main() {
   setUp(() => BreadcrumbCollector.clear());
