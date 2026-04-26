@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/storage_section.dart';
 
+import '../../../../fakes/fake_hive_storage.dart';
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
-import '../../../../mocks/mocks.dart';
 
 void main() {
   group('StorageSection', () {
     testWidgets('renders storage title', (tester) async {
-      final storage = mockHiveStorageOverride();
-      _stubStorageStats(storage.mock);
+      final storage = fakeHiveStorageOverride();
+      _seedStorageStats(storage.fake);
 
       await pumpApp(
         tester,
@@ -24,8 +23,8 @@ void main() {
 
     testWidgets('renders storage detail rows for each category',
         (tester) async {
-      final storage = mockHiveStorageOverride();
-      _stubStorageStats(storage.mock, cacheEntries: 15, favorites: 3);
+      final storage = fakeHiveStorageOverride();
+      _seedStorageStats(storage.fake, cacheEntries: 15, favorites: 3);
 
       await pumpApp(
         tester,
@@ -41,8 +40,8 @@ void main() {
     });
 
     testWidgets('shows profile, favorite, and cache counts', (tester) async {
-      final storage = mockHiveStorageOverride();
-      _stubStorageStats(storage.mock,
+      final storage = fakeHiveStorageOverride();
+      _seedStorageStats(storage.fake,
           profiles: 2, favorites: 5, cacheEntries: 42);
 
       await pumpApp(
@@ -58,8 +57,8 @@ void main() {
 
     testWidgets('shows clear cache button when cache has entries',
         (tester) async {
-      final storage = mockHiveStorageOverride();
-      _stubStorageStats(storage.mock, cacheEntries: 10);
+      final storage = fakeHiveStorageOverride();
+      _seedStorageStats(storage.fake, cacheEntries: 10);
 
       await pumpApp(
         tester,
@@ -73,8 +72,8 @@ void main() {
 
     testWidgets('shows "Cache is empty" when no cache entries',
         (tester) async {
-      final storage = mockHiveStorageOverride();
-      _stubStorageStats(storage.mock, cacheEntries: 0);
+      final storage = fakeHiveStorageOverride();
+      _seedStorageStats(storage.fake, cacheEntries: 0);
 
       await pumpApp(
         tester,
@@ -86,8 +85,8 @@ void main() {
     });
 
     testWidgets('shows delete all button', (tester) async {
-      final storage = mockHiveStorageOverride();
-      _stubStorageStats(storage.mock);
+      final storage = fakeHiveStorageOverride();
+      _seedStorageStats(storage.fake);
 
       await pumpApp(
         tester,
@@ -100,8 +99,8 @@ void main() {
     });
 
     testWidgets('shows total storage size', (tester) async {
-      final storage = mockHiveStorageOverride();
-      _stubStorageStats(storage.mock);
+      final storage = fakeHiveStorageOverride();
+      _seedStorageStats(storage.fake);
 
       await pumpApp(
         tester,
@@ -113,8 +112,8 @@ void main() {
     });
 
     testWidgets('shows cache TTL information', (tester) async {
-      final storage = mockHiveStorageOverride();
-      _stubStorageStats(storage.mock);
+      final storage = fakeHiveStorageOverride();
+      _seedStorageStats(storage.fake);
 
       await pumpApp(
         tester,
@@ -129,31 +128,51 @@ void main() {
   });
 }
 
-/// Stubs all HiveStorage methods needed by StorageSection.
-void _stubStorageStats(
-  MockHiveStorage mock, {
+/// Seeds the fake with the storage state needed by [StorageSection].
+void _seedStorageStats(
+  FakeHiveStorage fake, {
   int profiles = 1,
   int favorites = 0,
   int cacheEntries = 5,
   int priceHistory = 0,
   int alerts = 0,
 }) {
-  when(() => mock.getActiveProfileId()).thenReturn(null);
-  when(() => mock.getSetting(any())).thenReturn(null);
-  when(() => mock.profileCount).thenReturn(profiles);
-  when(() => mock.favoriteCount).thenReturn(favorites);
-  when(() => mock.cacheEntryCount).thenReturn(cacheEntries);
-  when(() => mock.priceHistoryEntryCount).thenReturn(priceHistory);
-  when(() => mock.alertCount).thenReturn(alerts);
-  when(() => mock.getIgnoredIds()).thenReturn([]);
-  when(() => mock.getRatings()).thenReturn({});
-  when(() => mock.storageStats).thenReturn((
-    settings: 256,
-    profiles: profiles * 512,
-    favorites: favorites * 128,
-    cache: cacheEntries * 1024,
-    priceHistory: priceHistory * 256,
-    alerts: alerts * 128,
-    total: 256 + profiles * 512 + favorites * 128 + cacheEntries * 1024,
-  ));
+  for (var i = 0; i < profiles; i++) {
+    fake.saveProfile('p$i', {'name': 'p$i'});
+  }
+  fake.setFavoriteIds(List.generate(favorites, (i) => 'f$i'));
+  for (var i = 0; i < cacheEntries; i++) {
+    fake.cacheData('k$i', {'v': i});
+  }
+  if (priceHistory > 0) {
+    fake.savePriceRecords(
+      's-history',
+      List.generate(priceHistory, (i) => {'ts': '$i'}),
+    );
+  }
+  if (alerts > 0) {
+    fake.saveAlerts(List.generate(alerts, (i) => {'id': 'a$i'}));
+  }
+
+  // Override the byte-stats so the widget gets stable totals matching
+  // the previous mock-based assertions (256 + profiles*512 +
+  // favorites*128 + cacheEntries*1024 + priceHistory*256 + alerts*128).
+  fake.statsOverride = (box) {
+    switch (box) {
+      case 'settings':
+        return 256;
+      case 'profiles':
+        return profiles * 512;
+      case 'favorites':
+        return favorites * 128;
+      case 'cache':
+        return cacheEntries * 1024;
+      case 'priceHistory':
+        return priceHistory * 256;
+      case 'alerts':
+        return alerts * 128;
+      default:
+        return 0;
+    }
+  };
 }

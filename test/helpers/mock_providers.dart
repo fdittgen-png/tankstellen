@@ -18,7 +18,12 @@ import '../mocks/mocks.dart';
 /// Creates an override for [storageRepositoryProvider] using a [MockStorageRepository].
 ///
 /// Returns both the override and the mock so callers can configure stubs.
+@Deprecated(
+  'Prefer fakeStorageRepositoryOverride for stateful tests. The mocktail mock '
+  'does not track state changes; see test/fakes/fake_storage_repository.dart.',
+)
 ({Object override, MockStorageRepository mock}) mockStorageRepositoryOverride() {
+  // ignore: deprecated_member_use_from_same_package
   final mock = MockStorageRepository();
   // Default stubs to avoid null returns from Mock
   when(() => mock.getFavoriteIds()).thenReturn([]);
@@ -35,8 +40,13 @@ import '../mocks/mocks.dart';
 
 /// Legacy alias — creates an override for [hiveStorageProvider] using a [MockHiveStorage].
 ///
-/// Prefer [mockStorageRepositoryOverride] for new tests.
+/// Prefer [fakeHiveStorageOverride] for stateful tests.
+@Deprecated(
+  'Prefer fakeHiveStorageOverride for stateful tests. See '
+  'test/fakes/fake_hive_storage.dart.',
+)
 ({Object override, MockHiveStorage mock}) mockHiveStorageOverride() {
+  // ignore: deprecated_member_use_from_same_package
   final mock = MockHiveStorage();
   return (
     override: hiveStorageProvider.overrideWithValue(mock),
