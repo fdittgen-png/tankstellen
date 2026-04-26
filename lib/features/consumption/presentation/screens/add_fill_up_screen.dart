@@ -2,26 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/feedback/github_issue_reporter.dart';
-import '../../../../core/widgets/form_section_card.dart';
-import '../../../../core/widgets/fuel_type_dropdown.dart';
 import '../../../../core/widgets/page_scaffold.dart';
-import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/receipt_scan_service.dart';
+import '../../domain/add_fill_up_fuel_resolver.dart';
+import '../../domain/add_fill_up_validators.dart';
 import '../../domain/entities/fill_up.dart';
+import '../../domain/fill_up_auto_cost_calculator.dart';
 import '../../providers/consumption_providers.dart';
-import '../widgets/bad_scan_report_sheet.dart';
-import '../widgets/fill_up_notes_field.dart';
-import '../widgets/fill_up_numeric_field.dart';
-import '../widgets/fill_up_price_per_liter_readout.dart';
-import '../widgets/fill_up_vehicle_dropdown.dart';
-import '../widgets/pump_scan_failure_sheet.dart';
+import '../widgets/add_fill_up_form_fields.dart';
+import '../widgets/fill_up_no_vehicle_cta.dart';
+import '../widgets/fill_up_pinned_save_bar.dart';
+import '../widgets/fill_up_scan_handlers.dart';
 
 /// Form to add a new [FillUp] entry.
 class AddFillUpScreen extends ConsumerStatefulWidget {
@@ -74,12 +70,14 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   String? _vehicleId;
   bool _vehicleInitialized = false;
   ReceiptScanOutcome? _lastScan;
+  FillUpAutoCostCalculator? _autoCostCalc;
 
   @override
   void initState() {
     super.initState();
     final price = widget.preFilledPricePerLiter;
     if (price != null) {
+      _autoCostCalc = FillUpAutoCostCalculator(pricePerLiter: price);
       _litersCtrl.addListener(_recomputeCost);
     }
     // #953 — accept an injected scan service so widget tests can drive
@@ -114,18 +112,16 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     } catch (e, st) {
       debugPrint('AddFillUp: active vehicle unavailable: $e\n$st');
     }
-    if (defaultId != null && vehicles.any((v) => v.id == defaultId)) {
-      _vehicleId = defaultId;
-    } else if (activeId != null && vehicles.any((v) => v.id == activeId)) {
-      _vehicleId = activeId;
-    } else {
-      _vehicleId = vehicles.first.id;
-    }
+    _vehicleId = AddFillUpFuelResolver.pickInitialVehicleId(
+      vehicles: vehicles,
+      profileDefaultId: defaultId,
+      activeVehicleId: activeId,
+    );
     final selected = vehicles.firstWhere(
       (v) => v.id == _vehicleId,
       orElse: () => vehicles.first,
     );
-    _fuelType = _resolveDefaultFuel(
+    _fuelType = AddFillUpFuelResolver.resolveDefaultFuel(
       vehicle: selected,
       profilePreferred: profilePreferred,
       preFill: widget.preFilledFuelType,
@@ -133,48 +129,15 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     _vehicleInitialized = true;
   }
 
-  /// Default-fuel policy (#713):
-  /// 1. preFilledFuelType (from receipt scan / station context) if it
-  ///    is compatible with the vehicle
-  /// 2. profile's preferredFuelType if compatible — honours "suggest
-  ///    by default the one in the profile" for flex-fuel vehicles
-  /// 3. vehicle's own preferred fuel as the fallback
-  /// 4. FuelType.e10 as the global last-resort default
-  FuelType _resolveDefaultFuel({
-    required VehicleProfile vehicle,
-    FuelType? profilePreferred,
-    FuelType? preFill,
-  }) {
-    final vehicleFuel = _fuelForVehicle(vehicle) ?? FuelType.e10;
-    final compatible = compatibleFuelsFor(vehicleFuel);
-    if (preFill != null && compatible.contains(preFill)) return preFill;
-    if (profilePreferred != null && compatible.contains(profilePreferred)) {
-      return profilePreferred;
-    }
-    return vehicleFuel;
-  }
-
-  /// Auto-fills the total cost based on the pre-filled price per liter
-  /// and the current liters input. Only runs when the user has not manually
-  /// typed a cost (empty field) — so we don't clobber a scanned receipt.
+  /// Listener bridging the liters controller to the auto-cost
+  /// calculator (extracted to `fill_up_auto_cost_calculator.dart`).
   void _recomputeCost() {
-    final price = widget.preFilledPricePerLiter;
-    if (price == null) return;
-    final liters = double.tryParse(_litersCtrl.text.replaceAll(',', '.'));
-    if (liters == null || liters <= 0) return;
-    final current = double.tryParse(_costCtrl.text.replaceAll(',', '.'));
-    // Only overwrite if the user hasn't typed a custom cost. We detect
-    // "user-typed" by checking whether the current value matches a prior
-    // auto-fill: if the field is empty OR exactly matches the previous
-    // auto-computed value, we overwrite.
-    final autoCost = (liters * price).toStringAsFixed(2);
-    if (_costCtrl.text.isEmpty || current == _lastAutoCost) {
-      _costCtrl.text = autoCost;
-      _lastAutoCost = double.tryParse(autoCost);
-    }
+    final next = _autoCostCalc?.recompute(
+      litersText: _litersCtrl.text,
+      costText: _costCtrl.text,
+    );
+    if (next != null) _costCtrl.text = next;
   }
-
-  double? _lastAutoCost;
 
   @override
   void dispose() {
@@ -191,66 +154,72 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     super.dispose();
   }
 
-  Future<void> _scanReceipt() async {
-    setState(() => _scanning = true);
-    final l = AppLocalizations.of(context);
-    try {
-      _scanService ??= ReceiptScanService();
-      final outcome = await _scanService!.scanReceipt();
-      if (outcome == null || !mounted) return;
-      final result = outcome.parse;
+  /// Bridge to the scan helpers in `fill_up_scan_handlers.dart`.
+  /// Bundles the controllers + per-field setters the helpers need so
+  /// the long async sequences live outside the screen file.
+  FillUpScanHostState _buildScanHostState() => FillUpScanHostState(
+        litersCtrl: _litersCtrl,
+        costCtrl: _costCtrl,
+        vehicleId: _vehicleId,
+        readService: () => _scanService,
+        writeService: (s) => _scanService = s,
+        setScanning: (v) => setState(() => _scanning = v),
+        setScanningPump: (v) => setState(() => _scanningPump = v),
+        setDate: (d) => setState(() => _date = d),
+        setFuelType: (f) => setState(() => _fuelType = f),
+        setLastScan: (o) => setState(() => _lastScan = o),
+        isMounted: () => mounted,
+      );
 
-      if (!result.hasData) {
-        SnackBarHelper.show(
-          context,
-          l?.scanReceiptNoData ?? 'No receipt data found — try again',
-        );
-        return;
-      }
+  Future<void> _scanReceipt() => runReceiptScan(context, _buildScanHostState());
 
-      setState(() {
-        if (result.liters != null) {
-          _litersCtrl.text = result.liters!.toStringAsFixed(2);
-        }
-        if (result.totalCost != null) {
-          _costCtrl.text = result.totalCost!.toStringAsFixed(2);
-        }
-        if (result.date != null) {
-          _date = result.date!;
-        }
-        // Only pre-select the fuel when there is no vehicle bound — the
-        // vehicle's configured fuel always wins (#698 single source of
-        // truth for fuel).
-        if (result.fuelType != null && _vehicleId == null) {
-          _fuelType = result.fuelType!;
-        }
-        _lastScan = outcome;
-      });
+  Future<void> _scanPumpDisplay() =>
+      runPumpDisplayScan(context, _buildScanHostState());
 
-      if (mounted) {
-        SnackBarHelper.show(
-          context,
-          l?.scanReceiptSuccess ??
-              'Receipt scanned — verify values. Tap "Report scan error" '
-                  'below if anything is off.',
-        );
-      }
-    } catch (e, st) { // ignore: unused_catch_stack
-      if (mounted) {
-        SnackBarHelper.showError(
-          context,
-          l?.scanReceiptFailed(e.toString()) ?? 'Scan failed: $e',
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _scanning = false);
+  Future<void> _reportBadScan() async {
+    final scan = _lastScan;
+    if (scan == null) return;
+    return reportBadReceiptScan(context, _buildScanHostState(), scan);
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _date,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now().add(const Duration(days: 1)),
+    );
+    if (picked != null) {
+      setState(() => _date = picked);
     }
   }
+
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final fillUp = FillUp(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      date: _date,
+      liters: AddFillUpValidators.parseDouble(_litersCtrl.text),
+      totalCost: AddFillUpValidators.parseDouble(_costCtrl.text),
+      odometerKm: AddFillUpValidators.parseDouble(_odoCtrl.text),
+      fuelType: _fuelType,
+      stationId: widget.stationId,
+      stationName: widget.stationName,
+      notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+      vehicleId: _vehicleId,
+    );
+
+    await ref.read(fillUpListProvider.notifier).add(fillUp);
+    if (!mounted) return;
+    context.pop();
+  }
+
+  String _pad(int n) => n.toString().padLeft(2, '0');
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final dateStr =
         '${_date.year}-${_pad(_date.month)}-${_pad(_date.day)}';
     // Tolerate providers in error state during widget tests without
@@ -267,47 +236,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     // #706 — consumption requires a vehicle. When none are configured,
     // show an empty-state CTA instead of the full form.
     if (vehicles.isEmpty) {
-      return PageScaffold(
-        title: l?.addFillUp ?? 'Add fill-up',
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: l?.tooltipBack ?? 'Back',
-          onPressed: () => context.pop(),
-        ),
-        bodyPadding: const EdgeInsets.all(32),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.directions_car_outlined,
-                size: 80,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(height: 24),
-              Text(
-                l?.consumptionNoVehicleTitle ?? 'Add a vehicle first',
-                style: theme.textTheme.headlineSmall,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                l?.consumptionNoVehicleBody ??
-                    'Fill-ups are attributed to a vehicle. Add your car '
-                        'to start logging consumption.',
-                style: theme.textTheme.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              FilledButton.icon(
-                onPressed: () => context.push('/vehicles/edit'),
-                icon: const Icon(Icons.add),
-                label: Text(l?.vehicleAdd ?? 'Add vehicle'),
-              ),
-            ],
-          ),
-        ),
-      );
+      return const FillUpNoVehicleCta();
     }
 
     return PageScaffold(
@@ -330,565 +259,38 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
             MediaQuery.of(context).viewPadding.bottom + 96,
           ),
           children: [
-            // #951 — restored to two visible buttons after the
-            // single "Import from…" chip was rolled back. The OBD-II
-            // adapter import path was removed from this screen because
-            // odometer reading via PID 0xA6 is unreliable on real
-            // hardware (Peugeot 107 / generic ELM327). The full OBD-II
-            // trip flow remains accessible from the Consumption screen.
-            _FillUpImportButtons(
+            AddFillUpFormFields(
               scanningReceipt: _scanning,
               scanningPump: _scanningPump,
               onScanReceipt: _scanReceipt,
               onScanPumpDisplay: _scanPumpDisplay,
-            ),
-            const SizedBox(height: 16),
-            // Station pre-fill callout — rendered above the cards so
-            // it's unmissable when the user opened the form from a
-            // station detail screen (#751 phase 2 keeps the original
-            // #581 affordance; it simply graduated from a ListTile
-            // card to the restyled header band).
-            if (widget.stationName != null) ...[
-              _StationPreFillBanner(
-                stationName: widget.stationName!,
-                label: l?.stationPreFilled ?? 'Station pre-filled',
-              ),
-              const SizedBox(height: 16),
-            ],
-            // Card 1: "What you filled" — date, fuel, liters, cost.
-            FormSectionCard(
-              title: l?.fillUpSectionWhatTitle ?? 'What you filled',
-              subtitle: l?.fillUpSectionWhatSubtitle ?? 'Fuel, amount, price',
-              icon: Icons.local_gas_station_outlined,
-              children: [
-                FormFieldTile(
-                  icon: Icons.calendar_today_outlined,
-                  content: InkWell(
-                    onTap: _pickDate,
-                    borderRadius: BorderRadius.circular(8),
-                    child: InputDecorator(
-                      decoration: InputDecoration(
-                        labelText: l?.fillUpDate ?? 'Date',
-                        border: const OutlineInputBorder(),
-                      ),
-                      child: Text(dateStr),
-                    ),
-                  ),
-                ),
-                FormFieldTile(
-                  icon: Icons.directions_car_outlined,
-                  content: FillUpVehicleDropdown(
-                    vehicleId: _vehicleId,
-                    vehicles: vehicles,
-                    onChanged: (id, selected) {
-                      setState(() {
-                        _vehicleId = id;
-                        final derived = _fuelForVehicle(selected);
-                        if (derived != null) _fuelType = derived;
-                      });
-                    },
-                  ),
-                ),
-                if (_vehicleId != null)
-                  FormFieldTile(
-                    icon: Icons.water_drop_outlined,
-                    content: _VehicleFuelPicker(
-                      vehicles: vehicles,
-                      vehicleId: _vehicleId!,
-                      fuelType: _fuelType,
-                      onChanged: (next) => setState(() => _fuelType = next),
-                      onOpenVehicle: () =>
-                          context.push('/vehicles/edit', extra: _vehicleId!),
-                    ),
-                  ),
-                FormFieldTile(
-                  icon: Icons.opacity_outlined,
-                  content: FillUpNumericField(
-                    controller: _litersCtrl,
-                    label: l?.liters ?? 'Liters',
-                    icon: Icons.water_drop_outlined,
-                    validator: _positiveNumberValidator,
-                  ),
-                ),
-                FormFieldTile(
-                  icon: Icons.euro,
-                  content: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      FillUpNumericField(
-                        controller: _costCtrl,
-                        label: l?.totalCost ?? 'Total cost',
-                        icon: Icons.euro,
-                        validator: _positiveNumberValidator,
-                      ),
-                      // Live-derived price/L — #751 §2 bullet 4.
-                      FillUpPricePerLiterReadout(
-                        litersController: _litersCtrl,
-                        costController: _costCtrl,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Card 2: "Where you were" — station, odometer, notes.
-            FormSectionCard(
-              title: l?.fillUpSectionWhereTitle ?? 'Where you were',
-              subtitle:
-                  l?.fillUpSectionWhereSubtitle ?? 'Station, odometer, notes',
-              icon: Icons.place_outlined,
-              children: [
-                FormFieldTile(
-                  icon: Icons.speed_outlined,
-                  content: FillUpNumericField(
-                    controller: _odoCtrl,
-                    label: l?.odometerKm ?? 'Odometer (km)',
-                    icon: Icons.speed,
-                    validator: _positiveNumberValidator,
-                  ),
-                ),
-                FormFieldTile(
-                  icon: Icons.edit_note_outlined,
-                  content: FillUpNotesField(controller: _notesCtrl),
-                ),
-                if (_lastScan != null) ...[
-                  const SizedBox(height: 4),
-                  Align(
-                    alignment: AlignmentDirectional.centerEnd,
-                    child: TextButton.icon(
-                      onPressed: _reportBadScan,
-                      icon: const Icon(Icons.flag_outlined, size: 18),
-                      label: Text(
-                        l?.reportScanError ?? 'Report scan error',
-                      ),
-                    ),
-                  ),
-                ],
-              ],
+              stationName: widget.stationName,
+              dateLabel: dateStr,
+              onPickDate: _pickDate,
+              vehicleId: _vehicleId,
+              vehicles: vehicles,
+              onVehicleChanged: (id, selected) {
+                setState(() {
+                  _vehicleId = id;
+                  final derived =
+                      AddFillUpFuelResolver.fuelForVehicle(selected);
+                  if (derived != null) _fuelType = derived;
+                });
+              },
+              fuelType: _fuelType,
+              onFuelChanged: (next) => setState(() => _fuelType = next),
+              onOpenVehicle: () =>
+                  context.push('/vehicles/edit', extra: _vehicleId!),
+              litersCtrl: _litersCtrl,
+              costCtrl: _costCtrl,
+              odoCtrl: _odoCtrl,
+              notesCtrl: _notesCtrl,
+              onReportBadScan: _lastScan != null ? _reportBadScan : null,
             ),
           ],
         ),
       ),
-      bottomNavigationBar: _PinnedSaveBar(onSave: _save),
-    );
-  }
-
-  /// #598 — scan the fuel-pump LCD (Betrag / Abgabe / Preis/Liter) and
-  /// pre-fill the form. Unlike the receipt path there is no brand
-  /// dispatch — every pump emits the same 3-number format — so we
-  /// only need the numeric values and one cross-validity check.
-  ///
-  /// #953 — when parsing fails (`!hasUsableData`) we no longer drop the
-  /// photo silently; we open the [_PumpScanFailureSheet] which lets the
-  /// user pick "Corriger manuellement" (close, leave the form untouched
-  /// so they type values), "Signaler" (open [BadScanReportSheet] with
-  /// [ScanKind.pumpDisplay] so the photo is shipped to GitHub), or
-  /// "Retirer la photo" (delete + close).
-  Future<void> _scanPumpDisplay() async {
-    setState(() => _scanningPump = true);
-    final l = AppLocalizations.of(context);
-    try {
-      _scanService ??= ReceiptScanService();
-      final outcome = await _scanService!.scanPumpDisplay();
-      if (outcome == null || !mounted) return;
-      final result = outcome.parse;
-      if (!result.hasUsableData) {
-        // Pass the outcome straight into the failure sheet so the
-        // bad-scan reporter can ship the photo + raw OCR text without
-        // re-running OCR on a re-captured image.
-        await _showPumpScanFailureSheet(outcome);
-        return;
-      }
-      setState(() {
-        if (result.liters != null) {
-          _litersCtrl.text = result.liters!.toStringAsFixed(2);
-        }
-        if (result.totalCost != null) {
-          _costCtrl.text = result.totalCost!.toStringAsFixed(2);
-        }
-      });
-      if (mounted) {
-        SnackBarHelper.show(
-          context,
-          l?.scanPumpSuccess ?? 'Pump display scanned — verify the values.',
-        );
-      }
-    } catch (e, st) { // ignore: unused_catch_stack
-      if (mounted) {
-        SnackBarHelper.showError(
-          context,
-          l?.scanPumpFailed(e.toString()) ?? 'Pump scan failed: $e',
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _scanningPump = false);
-    }
-  }
-
-  /// Opens the failure-flow bottom sheet for an unreadable pump-display
-  /// scan (#953). The sheet is dismissable; the action the user picks
-  /// determines the next step:
-  ///   - correctManually: close, leave the form untouched.
-  ///   - report: open [BadScanReportSheet] with [ScanKind.pumpDisplay].
-  ///   - removePhoto: delete the temp file and forget the scan.
-  Future<void> _showPumpScanFailureSheet(
-    PumpDisplayScanOutcome outcome,
-  ) async {
-    final action = await showModalBottomSheet<PumpScanFailureAction>(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => const PumpScanFailureSheet(),
-    );
-    if (!mounted) return;
-    switch (action) {
-      case PumpScanFailureAction.report:
-        await _reportBadPumpScan(outcome);
-        break;
-      case PumpScanFailureAction.removePhoto:
-        await _scanService?.deleteCapturedImage(outcome.imagePath);
-        break;
-      case PumpScanFailureAction.correctManually:
-      case null:
-        // Sheet dismissed or "Correct manually" — keep the photo on
-        // disk so the user can still hit "Report scan error" via the
-        // existing affordance below the form. (The button currently
-        // surfaces only for receipt scans; pump-display reports are
-        // accessible via the failure sheet itself.)
-        break;
-    }
-  }
-
-  Future<void> _reportBadPumpScan(PumpDisplayScanOutcome outcome) async {
-    final liters = double.tryParse(_litersCtrl.text.replaceAll(',', '.'));
-    final cost = double.tryParse(_costCtrl.text.replaceAll(',', '.'));
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => BadScanReportSheet(
-        kind: ScanKind.pumpDisplay,
-        pumpScan: outcome,
-        enteredLiters: liters,
-        enteredTotalCost: cost,
-        appVersion: AppConstants.appVersion,
-      ),
-    );
-  }
-
-  Future<void> _reportBadScan() async {
-    final scan = _lastScan;
-    if (scan == null) return;
-    final liters = double.tryParse(_litersCtrl.text.replaceAll(',', '.'));
-    final cost = double.tryParse(_costCtrl.text.replaceAll(',', '.'));
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => BadScanReportSheet(
-        scan: scan,
-        enteredLiters: liters,
-        enteredTotalCost: cost,
-        appVersion: AppConstants.appVersion,
-      ),
-    );
-  }
-
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now().add(const Duration(days: 1)),
-    );
-    if (picked != null) {
-      setState(() => _date = picked);
-    }
-  }
-
-  String? _positiveNumberValidator(String? value) {
-    final l = AppLocalizations.of(context);
-    if (value == null || value.trim().isEmpty) {
-      return l?.fieldRequired ?? 'Required';
-    }
-    final parsed = double.tryParse(value.replaceAll(',', '.'));
-    if (parsed == null || parsed <= 0) {
-      return l?.fieldInvalidNumber ?? 'Invalid number';
-    }
-    return null;
-  }
-
-  double _parse(TextEditingController ctrl) =>
-      double.parse(ctrl.text.replaceAll(',', '.'));
-
-  Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    final fillUp = FillUp(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
-      date: _date,
-      liters: _parse(_litersCtrl),
-      totalCost: _parse(_costCtrl),
-      odometerKm: _parse(_odoCtrl),
-      fuelType: _fuelType,
-      stationId: widget.stationId,
-      stationName: widget.stationName,
-      notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
-      vehicleId: _vehicleId,
-    );
-
-    await ref.read(fillUpListProvider.notifier).add(fillUp);
-    if (!mounted) return;
-    context.pop();
-  }
-
-  String _pad(int n) => n.toString().padLeft(2, '0');
-
-  /// Resolve the vehicle's fuel type (#698). EV → electric; combustion →
-  /// the stored preferredFuelType parsed back to the typed enum.
-  /// Returns null when the vehicle has no fuel configured.
-  FuelType? _fuelForVehicle(VehicleProfile v) {
-    if (v.type == VehicleType.ev) return FuelType.electric;
-    final raw = v.preferredFuelType;
-    if (raw == null || raw.trim().isEmpty) return null;
-    return FuelType.fromString(raw);
-  }
-}
-
-/// Two side-by-side import buttons restored on the Add-Fill-up form
-/// (#951). The previous single "Import from…" chip + bottom-sheet was
-/// rolled back because the OBD-II tile inside the sheet returned null
-/// for the odometer on the user's real hardware (Peugeot 107 + generic
-/// ELM327 BLE). Until odometer reading via PID 0xA6 is proven reliable
-/// across the supported adapter registry, the OBD-II import path is
-/// hidden from the fill-up screen — see `docs/guides/obd2-adapters.md`.
-///
-/// The full OBD-II trajet flow remains available from the Consumption
-/// screen (#888); only this fill-up entry-point is reduced.
-class _FillUpImportButtons extends StatelessWidget {
-  final bool scanningReceipt;
-  final bool scanningPump;
-  final VoidCallback onScanReceipt;
-  final VoidCallback onScanPumpDisplay;
-
-  const _FillUpImportButtons({
-    required this.scanningReceipt,
-    required this.scanningPump,
-    required this.onScanReceipt,
-    required this.onScanPumpDisplay,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    return Row(
-      children: [
-        Expanded(
-          child: OutlinedButton.icon(
-            key: const Key('import_receipt_button'),
-            onPressed: scanningReceipt ? null : onScanReceipt,
-            icon: scanningReceipt
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.document_scanner_outlined),
-            label: Text(
-              l?.fillUpImportReceiptLabel ?? 'Receipt',
-              maxLines: 2,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.visible,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: OutlinedButton.icon(
-            key: const Key('import_pump_button'),
-            onPressed: scanningPump ? null : onScanPumpDisplay,
-            icon: scanningPump
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.local_gas_station_outlined),
-            label: Text(
-              l?.fillUpImportPumpLabel ?? 'Pump display',
-              maxLines: 2,
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.visible,
-            ),
-          ),
-        ),
-      ],
+      bottomNavigationBar: FillUpPinnedSaveBar(onSave: _save),
     );
   }
 }
-
-/// Small banner above the form cards announcing the pre-filled
-/// station (#581 affordance restyled for #751 phase 2). Replaces the
-/// old ListTile card so the callout is visible above the fold without
-/// stealing visual weight from the "What you filled" card.
-class _StationPreFillBanner extends StatelessWidget {
-  final String stationName;
-  final String label;
-
-  const _StationPreFillBanner({
-    required this.stationName,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withValues(alpha: 0.08),
-        border: Border.all(
-          color: theme.colorScheme.primary.withValues(alpha: 0.2),
-        ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          ExcludeSemantics(
-            child: Icon(
-              Icons.place_outlined,
-              color: theme.colorScheme.primary,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Semantics(
-              container: true,
-              label: '$label: $stationName',
-              child: ExcludeSemantics(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      label,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    Text(
-                      stationName,
-                      style: theme.textTheme.titleMedium,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Pinned bottom Save bar (#751 phase 2). Sits below the scroll view
-/// so the CTA is always one tap away regardless of how many cards
-/// the user has scrolled past. Respects the system nav-bar inset so
-/// it never clips under gesture pills (see
-/// `feedback_scaffold_inset_doubling.md`).
-class _PinnedSaveBar extends StatelessWidget {
-  final VoidCallback onSave;
-  const _PinnedSaveBar({required this.onSave});
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Material(
-      elevation: 8,
-      color: theme.colorScheme.surface,
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: FilledButton.icon(
-            onPressed: onSave,
-            style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(52),
-            ),
-            icon: const Icon(Icons.save_outlined),
-            label: Text(l?.save ?? 'Save'),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Fuel picker constrained to the vehicle's compatible fuels (#713).
-///
-/// A petrol car gets [e10, e5, e98, e85]; a diesel car gets
-/// [diesel, dieselPremium]; EV / LPG / CNG / H₂ vehicles pick from
-/// their single applicable fuel only. The initial value is the one
-/// resolved by [_AddFillUpScreenState._resolveDefaultFuel] — profile
-/// preference when compatible, else the vehicle's own fuel — so the
-/// form always loads with the most likely choice but still lets the
-/// user override it for this specific fill-up (e.g. a flex-fuel
-/// E85 car tanking regular SP95 this week).
-class _VehicleFuelPicker extends StatelessWidget {
-  final List<VehicleProfile> vehicles;
-  final String vehicleId;
-  final FuelType fuelType;
-  final ValueChanged<FuelType> onChanged;
-  final VoidCallback onOpenVehicle;
-
-  const _VehicleFuelPicker({
-    required this.vehicles,
-    required this.vehicleId,
-    required this.fuelType,
-    required this.onChanged,
-    required this.onOpenVehicle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final vehicle = vehicles.firstWhere((v) => v.id == vehicleId);
-    final vehicleFuel = _fuelForVehicleStatic(vehicle) ?? FuelType.e10;
-    final compatible = compatibleFuelsFor(vehicleFuel);
-    final value =
-        compatible.contains(fuelType) ? fuelType : compatible.first;
-
-    return Row(
-      children: [
-        Expanded(
-          child: FuelTypeDropdown(
-            value: value,
-            options: compatible,
-            prefixIcon: const Icon(Icons.local_gas_station),
-            labelText: '${l?.fuelType ?? 'Fuel type'} • ${vehicle.name}',
-            onChanged: onChanged,
-          ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.open_in_new),
-          tooltip: l?.vehicleEditTitle ?? 'Edit vehicle',
-          onPressed: onOpenVehicle,
-          style: IconButton.styleFrom(
-            foregroundColor: theme.colorScheme.primary,
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Mirror of [_AddFillUpScreenState._fuelForVehicle] — kept static
-  /// here so the picker can resolve the vehicle's family without
-  /// pulling in a dependency on the parent state.
-  static FuelType? _fuelForVehicleStatic(VehicleProfile v) {
-    if (v.type == VehicleType.ev) return FuelType.electric;
-    final raw = v.preferredFuelType;
-    if (raw == null || raw.trim().isEmpty) return null;
-    return FuelType.fromString(raw);
-  }
-}
-
