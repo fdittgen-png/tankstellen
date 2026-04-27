@@ -19,6 +19,21 @@
     <uses-feature android:name="android.hardware.bluetooth_le"
         android:required="false"/>
 
+    <!-- Hands-free trip auto-record (#1004 phase 2b-1).
+         The AutoRecordForegroundService observes BLE auto-connect for
+         the paired adapter while the app is not in the foreground. It
+         requires:
+           * FOREGROUND_SERVICE              base permission since API 28
+           * FOREGROUND_SERVICE_CONNECTED_DEVICE  required by Android 14
+             (API 34+) for `connectedDevice` foreground service type
+           * POST_NOTIFICATIONS              Android 13+ runtime perm so
+             the persistent low-importance auto-record notification can
+             render. Without it the service still runs but the channel
+             is silenced. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
     <application
         android:label="Fuel Prices"
         android:name="${applicationName}"
@@ -75,6 +90,16 @@
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
+
+        <!-- Hands-free trip auto-record foreground service (#1004
+             phase 2b-1). Internal-only — exported=false so no other
+             app can bind. foregroundServiceType="connectedDevice"
+             matches the BLE listener's role: observe transitions on
+             the paired OBD2 adapter only. -->
+        <service
+            android:name=".autorecord.AutoRecordForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice"/>
 
         <!-- Android Auto car app service -->
         <!-- exported=true required: Android Auto host binds via this intent-filter.
