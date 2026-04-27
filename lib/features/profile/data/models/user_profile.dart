@@ -71,6 +71,13 @@ abstract class UserProfile with _$UserProfile {
     /// first-time user without a vehicle would only see the empty
     /// state.
     @Default(false) bool showConsumptionTab,
+    /// Master toggle for gamification surfaces (#1194). Defaults to
+    /// true so existing users see no behaviour change. When flipped
+    /// off, badges, scores, achievement tabs, and trophy iconography
+    /// are hidden across the app — the underlying achievement
+    /// evaluation continues to run so toggling back on instantly
+    /// restores any earned badges.
+    @Default(true) bool gamificationEnabled,
   }) = _UserProfile;
 
   factory UserProfile.fromJson(Map<String, dynamic> json) =>

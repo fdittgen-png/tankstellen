@@ -2005,6 +2005,14 @@
     "description": "Fuzzy calibration option (#894) — each sample contributes to all situations weighted by membership."
   },
   "calibrationModeTooltip": "Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.",
+  "profileGamificationToggleTitle": "Show achievements & scores",
+  "@profileGamificationToggleTitle": {
+    "description": "Title of the master gamification opt-out switch on the profile / settings screen (#1194)."
+  },
+  "profileGamificationToggleSubtitle": "When off, badges, scores and trophy icons are hidden across the app.",
+  "@profileGamificationToggleSubtitle": {
+    "description": "Subtitle explaining what the gamification opt-out toggle hides (#1194)."
+  },
   "hapticEcoCoachSectionTitle": "Driving",
   "@hapticEcoCoachSectionTitle": {
     "description": "Section header on the Settings screen grouping wheel-lens (driving-behaviour) settings (#1122)."

@@ -44,6 +44,7 @@ _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
     const FuelTypeJsonConverter().fromJson,
   ),
   showConsumptionTab: json['showConsumptionTab'] as bool? ?? false,
+  gamificationEnabled: json['gamificationEnabled'] as bool? ?? true,
 );
 
 Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
@@ -74,6 +75,7 @@ Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
         const FuelTypeJsonConverter().toJson,
       ),
       'showConsumptionTab': instance.showConsumptionTab,
+      'gamificationEnabled': instance.gamificationEnabled,
     };
 
 const _$LandingScreenEnumMap = {

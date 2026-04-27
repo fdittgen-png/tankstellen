@@ -3564,6 +3564,13 @@ class AppLocalizationsNb extends AppLocalizations {
       'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.';
 
   @override
+  String get profileGamificationToggleTitle => 'Show achievements & scores';
+
+  @override
+  String get profileGamificationToggleSubtitle =>
+      'When off, badges, scores and trophy icons are hidden across the app.';
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Driving';
 
   @override

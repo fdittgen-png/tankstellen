@@ -3599,6 +3599,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Regelbasiert ordnet jede Fahrprobe genau einer Situation zu. Fuzzy verteilt sie auf alle, je nachdem wie gut sie passen — ruhiger rund um 60 km/h oder bei wechselnden Steigungen, aber langsamer beim Befüllen aller Kategorien.';
 
   @override
+  String get profileGamificationToggleTitle => 'Erfolge & Punkte anzeigen';
+
+  @override
+  String get profileGamificationToggleSubtitle =>
+      'Wenn aus, sind Abzeichen, Punkte und Pokal-Symbole überall ausgeblendet.';
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Fahrweise';
 
   @override

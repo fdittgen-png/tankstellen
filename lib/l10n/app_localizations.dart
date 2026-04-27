@@ -6656,6 +6656,18 @@ abstract class AppLocalizations {
   /// **'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.'**
   String get calibrationModeTooltip;
 
+  /// Title of the master gamification opt-out switch on the profile / settings screen (#1194).
+  ///
+  /// In en, this message translates to:
+  /// **'Show achievements & scores'**
+  String get profileGamificationToggleTitle;
+
+  /// Subtitle explaining what the gamification opt-out toggle hides (#1194).
+  ///
+  /// In en, this message translates to:
+  /// **'When off, badges, scores and trophy icons are hidden across the app.'**
+  String get profileGamificationToggleSubtitle;
+
   /// Section header on the Settings screen grouping wheel-lens (driving-behaviour) settings (#1122).
   ///
   /// In en, this message translates to:

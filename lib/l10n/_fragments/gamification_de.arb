@@ -1,0 +1,10 @@
+{
+  "profileGamificationToggleTitle": "Erfolge & Punkte anzeigen",
+  "@profileGamificationToggleTitle": {
+    "description": "Title of the master gamification opt-out switch on the profile / settings screen (#1194)."
+  },
+  "profileGamificationToggleSubtitle": "Wenn aus, sind Abzeichen, Punkte und Pokal-Symbole überall ausgeblendet.",
+  "@profileGamificationToggleSubtitle": {
+    "description": "Subtitle explaining what the gamification opt-out toggle hides (#1194)."
+  }
+}
