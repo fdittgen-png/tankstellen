@@ -49,12 +49,6 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   // connected OBD2 picker selection.
   String? _pairedAdapterMac;
 
-  // #1217 — baseline calibration mode (#894) is initialised from the
-  // loaded profile and threaded back through buildProfile on Save so
-  // the screen-level Save button doesn't clobber whatever the
-  // segmented-button selector just persisted.
-  VehicleCalibrationMode _calibrationMode = VehicleCalibrationMode.rule;
-
   // #812 phase 2 — engine params populated by the VIN decoder;
   // carried through _save for phase-3 OBD2 math.
   int? _engineDisplacementCc;
@@ -98,7 +92,6 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
       _engineDisplacementCc = snap.engineDisplacementCc;
       _engineCylinders = snap.engineCylinders;
       _curbWeightKg = snap.curbWeightKg;
-      _calibrationMode = snap.calibrationMode;
     });
   }
 
@@ -129,20 +122,22 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   Future<void> _save() async {
     final form = _formKey.currentState;
     if (form == null || !form.validate()) return;
-    // #1217 — read the freshest calibrationMode from the provider so
-    // a value the segmented-button selector just persisted survives
-    // this Save. Falls back to the loaded snapshot value when the
-    // profile isn't (yet) in the list (new-vehicle flow).
+    // #1226 — read the freshest persisted profile from the provider
+    // and pass it as `existing:` so `buildProfile` can `copyWith` over
+    // it. This preserves every non-form field (calibrationMode,
+    // pairedAdapterMac, autoRecord & friends, runtime-calibrated η_v,
+    // driving-stats aggregates, VIN-decode metadata, ...) verbatim and
+    // closes the bug class behind #1217 / #1221 (which was a minimum-
+    // scope thread-through for `calibrationMode` only).
     final id = _existingId;
-    final persisted = id == null
+    final existing = id == null
         ? null
         : ref
             .read(vehicleProfileListProvider)
             .where((v) => v.id == id)
             .firstOrNull;
-    final calibrationMode = persisted?.calibrationMode ?? _calibrationMode;
     final profile = _ctrl.buildProfile(
-      existingId: _existingId,
+      existing: existing,
       type: _type,
       connectors: _connectors,
       adapterMac: _adapterMac,
@@ -150,7 +145,6 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
       engineDisplacementCc: _engineDisplacementCc,
       engineCylinders: _engineCylinders,
       curbWeightKg: _curbWeightKg,
-      calibrationMode: calibrationMode,
     );
     await ref.read(vehicleProfileListProvider.notifier).save(profile);
     await ref.syncActiveProfile(profile);

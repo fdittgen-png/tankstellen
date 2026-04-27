@@ -239,16 +239,20 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 50));
 
-      // Fresh controllers loading the persisted profile see Fuzzy —
-      // i.e. the next time the user opens this vehicle's edit screen,
-      // the segmented button will render Fuzzy as selected.
+      // The persisted profile holds Fuzzy — i.e. the next time the
+      // user opens this vehicle's edit screen, the segmented button
+      // will render Fuzzy as selected (the selector reads it directly
+      // from `profile.calibrationMode`, no longer threaded through
+      // VehicleFormSnapshot since #1226).
       final reloaded = repo.getById('v1')!;
       expect(reloaded.calibrationMode, VehicleCalibrationMode.fuzzy);
 
+      // Loading the controllers off the persisted profile must not
+      // crash; the segmented button reads the mode straight off the
+      // profile via the selector widget.
       final freshControllers = VehicleFormControllers();
       addTearDown(freshControllers.dispose);
-      final snap = freshControllers.load(reloaded);
-      expect(snap.calibrationMode, VehicleCalibrationMode.fuzzy);
+      freshControllers.load(reloaded);
     });
   });
 }

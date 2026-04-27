@@ -131,31 +131,6 @@ void main() {
       expect(snap.curbWeightKg, isNull);
     });
 
-    test('captures calibrationMode from the loaded profile (#1217)', () {
-      final c = VehicleFormControllers();
-      addTearDown(c.dispose);
-
-      const profile = VehicleProfile(
-        id: 'fuzzy-1',
-        name: 'Polo',
-        calibrationMode: VehicleCalibrationMode.fuzzy,
-      );
-
-      final snap = c.load(profile);
-      expect(snap.calibrationMode, VehicleCalibrationMode.fuzzy);
-    });
-
-    test('defaults snapshot calibrationMode to rule for pre-#894 profiles',
-        () {
-      final c = VehicleFormControllers();
-      addTearDown(c.dispose);
-
-      const profile = VehicleProfile(id: 'rule-1', name: 'Polo');
-
-      final snap = c.load(profile);
-      expect(snap.calibrationMode, VehicleCalibrationMode.rule);
-    });
-
     test('connectors snapshot is a defensive copy', () {
       final c = VehicleFormControllers();
       addTearDown(c.dispose);
@@ -187,8 +162,9 @@ void main() {
       c.maxSocController.text = '80';
       c.vinController.text = 'WVWZZZ9NZ7Y000001';
 
+      const existing = VehicleProfile(id: 'ice-7', name: 'old name');
       final profile = c.buildProfile(
-        existingId: 'ice-7',
+        existing: existing,
         type: VehicleType.combustion,
         connectors: const {ConnectorType.ccs}, // ignored for combustion
         adapterMac: '11:22:33:44:55:66',
@@ -231,8 +207,9 @@ void main() {
       c.minSocController.text = '10';
       c.maxSocController.text = '90';
 
+      const existing = VehicleProfile(id: 'ev-7', name: 'old');
       final profile = c.buildProfile(
-        existingId: 'ev-7',
+        existing: existing,
         type: VehicleType.ev,
         connectors: const {ConnectorType.ccs, ConnectorType.type2},
         adapterMac: null,
@@ -268,8 +245,9 @@ void main() {
       c.minSocController.text = '20';
       c.maxSocController.text = '80';
 
+      const existing = VehicleProfile(id: 'hyb-1', name: 'old');
       final profile = c.buildProfile(
-        existingId: 'hyb-1',
+        existing: existing,
         type: VehicleType.hybrid,
         connectors: const {ConnectorType.type2},
         adapterMac: null,
@@ -289,14 +267,14 @@ void main() {
       expect(profile.engineCylinders, 4);
     });
 
-    test('mints a new uuid when existingId is null', () {
+    test('mints a new uuid when existing is null', () {
       final c = VehicleFormControllers();
       addTearDown(c.dispose);
 
       c.nameController.text = 'New Car';
 
       final p1 = c.buildProfile(
-        existingId: null,
+        existing: null,
         type: VehicleType.combustion,
         connectors: const {},
         adapterMac: null,
@@ -306,7 +284,7 @@ void main() {
         curbWeightKg: null,
       );
       final p2 = c.buildProfile(
-        existingId: null,
+        existing: null,
         type: VehicleType.combustion,
         connectors: const {},
         adapterMac: null,
@@ -334,8 +312,9 @@ void main() {
       c.maxSocController.text = ''; // -> fallback 80
       c.vinController.text = '   ';
 
+      const existing = VehicleProfile(id: 'edge-1', name: 'old');
       final profile = c.buildProfile(
-        existingId: 'edge-1',
+        existing: existing,
         type: VehicleType.hybrid,
         connectors: const {},
         adapterMac: null,
@@ -365,8 +344,9 @@ void main() {
       c.minSocController.text = 'low'; // -> fallback 20
       c.maxSocController.text = 'high'; // -> fallback 80
 
+      const existing = VehicleProfile(id: 'edge-2', name: 'old');
       final profile = c.buildProfile(
-        existingId: 'edge-2',
+        existing: existing,
         type: VehicleType.hybrid,
         connectors: const {},
         adapterMac: null,
@@ -391,8 +371,9 @@ void main() {
       c.maxChargingKwController.text = '150,25';
       c.tankController.text = '45,5';
 
+      const existing = VehicleProfile(id: 'edge-3', name: 'old');
       final profile = c.buildProfile(
-        existingId: 'edge-3',
+        existing: existing,
         type: VehicleType.hybrid,
         connectors: const {},
         adapterMac: null,
@@ -407,14 +388,20 @@ void main() {
       expect(profile.tankCapacityL, 45.5);
     });
 
-    test('threads calibrationMode through to the built profile (#1217)', () {
+    test('preserves calibrationMode from existing via copyWith (#1217/#1226)',
+        () {
       final c = VehicleFormControllers();
       addTearDown(c.dispose);
 
       c.nameController.text = 'Polo';
 
+      const existing = VehicleProfile(
+        id: 'fuzzy-2',
+        name: 'old',
+        calibrationMode: VehicleCalibrationMode.fuzzy,
+      );
       final profile = c.buildProfile(
-        existingId: 'fuzzy-2',
+        existing: existing,
         type: VehicleType.combustion,
         connectors: const {},
         adapterMac: null,
@@ -422,20 +409,19 @@ void main() {
         engineDisplacementCc: null,
         engineCylinders: null,
         curbWeightKg: null,
-        calibrationMode: VehicleCalibrationMode.fuzzy,
       );
 
       expect(profile.calibrationMode, VehicleCalibrationMode.fuzzy);
     });
 
-    test('omitted calibrationMode falls back to rule (#1217 default)', () {
+    test('new-vehicle path defaults calibrationMode to rule', () {
       final c = VehicleFormControllers();
       addTearDown(c.dispose);
 
       c.nameController.text = 'Polo';
 
       final profile = c.buildProfile(
-        existingId: 'rule-2',
+        existing: null,
         type: VehicleType.combustion,
         connectors: const {},
         adapterMac: null,
@@ -448,6 +434,61 @@ void main() {
       expect(profile.calibrationMode, VehicleCalibrationMode.rule);
     });
 
+    test(
+        'preserves all non-form fields verbatim via copyWith (#1226 root-cause '
+        'class)', () {
+      // Single fixture covering every non-form field on VehicleProfile that
+      // the form does NOT manage. The earlier `buildProfile(...)` constructed
+      // a fresh `VehicleProfile(...)` and silently fell back to the freezed
+      // `@Default` for each — wiping these on every Save.
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+
+      c.nameController.text = 'Polo'; // changing only name via the form.
+
+      final existing = VehicleProfile(
+        id: 'v1',
+        name: 'old',
+        calibrationMode: VehicleCalibrationMode.fuzzy,
+        pairedAdapterMac: 'AA:BB:CC:DD:EE:FF',
+        autoRecord: true,
+        movementStartThresholdKmh: 7.5,
+        disconnectSaveDelaySec: 90,
+        backgroundLocationConsent: true,
+        volumetricEfficiency: 0.92,
+        volumetricEfficiencySamples: 120,
+        referenceVehicleId: 'ref-vw-polo-2018',
+        aggregatesTripCount: 17,
+        aggregatesUpdatedAt: DateTime.utc(2026, 4, 1, 12),
+      );
+
+      final profile = c.buildProfile(
+        existing: existing,
+        type: VehicleType.combustion,
+        connectors: const {},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+      );
+
+      expect(profile.id, 'v1');
+      expect(profile.name, 'Polo');
+      // All non-form fields survive the round-trip.
+      expect(profile.calibrationMode, VehicleCalibrationMode.fuzzy);
+      expect(profile.pairedAdapterMac, 'AA:BB:CC:DD:EE:FF');
+      expect(profile.autoRecord, isTrue);
+      expect(profile.movementStartThresholdKmh, 7.5);
+      expect(profile.disconnectSaveDelaySec, 90);
+      expect(profile.backgroundLocationConsent, isTrue);
+      expect(profile.volumetricEfficiency, 0.92);
+      expect(profile.volumetricEfficiencySamples, 120);
+      expect(profile.referenceVehicleId, 'ref-vw-polo-2018');
+      expect(profile.aggregatesTripCount, 17);
+      expect(profile.aggregatesUpdatedAt, DateTime.utc(2026, 4, 1, 12));
+    });
+
     test('SoC values are clamped to 0..100', () {
       final c = VehicleFormControllers();
       addTearDown(c.dispose);
@@ -455,8 +496,9 @@ void main() {
       c.minSocController.text = '-50';
       c.maxSocController.text = '250';
 
+      const existing = VehicleProfile(id: 'edge-4', name: 'old');
       final profile = c.buildProfile(
-        existingId: 'edge-4',
+        existing: existing,
         type: VehicleType.ev,
         connectors: const {ConnectorType.type2},
         adapterMac: null,
@@ -476,8 +518,9 @@ void main() {
 
       final inputConnectors = <ConnectorType>{ConnectorType.type2};
 
+      const existing = VehicleProfile(id: 'ev-3', name: 'old');
       final profile = c.buildProfile(
-        existingId: 'ev-3',
+        existing: existing,
         type: VehicleType.ev,
         connectors: inputConnectors,
         adapterMac: null,

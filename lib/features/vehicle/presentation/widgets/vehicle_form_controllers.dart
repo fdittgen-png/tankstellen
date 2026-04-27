@@ -53,18 +53,28 @@ class VehicleFormControllers {
       engineDisplacementCc: profile.engineDisplacementCc,
       engineCylinders: profile.engineCylinders,
       curbWeightKg: profile.curbWeightKg,
-      calibrationMode: profile.calibrationMode,
     );
   }
 
   /// Construct a [VehicleProfile] from the current controller values
   /// combined with the non-controller state passed in by the caller.
   ///
-  /// [calibrationMode] is threaded through verbatim from the loaded
-  /// snapshot so the screen-level Save doesn't clobber a value the
-  /// segmented-button selector (#894) just persisted (#1217).
+  /// When [existing] is non-null, the result is `existing.copyWith(...)` —
+  /// every field NOT managed by this form (calibration mode, paired
+  /// adapter MAC, autoRecord and friends, runtime-calibrated η_v,
+  /// driving-stats aggregates, VIN-decode metadata, ...) is preserved
+  /// verbatim. This closes the architectural bug class behind #1226 /
+  /// #1217: the previous `buildProfile` returned a fresh
+  /// `VehicleProfile(...)` and silently overwrote any field that wasn't
+  /// in its parameter list with the freezed `@Default`. Threading every
+  /// new field through the form (the #1221 minimum-scope fix for
+  /// `calibrationMode`) doesn't scale; copyWith is silently-correct for
+  /// every existing AND future field.
+  ///
+  /// When [existing] is null, the new-vehicle path mints a fresh uuid
+  /// and constructs from defaults — no `VehicleProfile` to preserve.
   VehicleProfile buildProfile({
-    required String? existingId,
+    required VehicleProfile? existing,
     required VehicleType type,
     required Set<ConnectorType> connectors,
     required String? adapterMac,
@@ -72,40 +82,69 @@ class VehicleFormControllers {
     required int? engineDisplacementCc,
     required int? engineCylinders,
     required int? curbWeightKg,
-    VehicleCalibrationMode calibrationMode = VehicleCalibrationMode.rule,
   }) {
-    return VehicleProfile(
-      id: existingId ?? _uuid.v4(),
+    final batteryKwh = type == VehicleType.combustion
+        ? null
+        : _parseDouble(batteryController.text);
+    final maxChargingKw = type == VehicleType.combustion
+        ? null
+        : _parseDouble(maxChargingKwController.text);
+    final supportedConnectors =
+        type == VehicleType.combustion ? <ConnectorType>{} : {...connectors};
+    final tankCapacityL =
+        type == VehicleType.ev ? null : _parseDouble(tankController.text);
+    final preferredFuelType = type == VehicleType.ev
+        ? null
+        : (fuelTypeController.text.trim().isEmpty
+            ? null
+            : fuelTypeController.text.trim());
+    final chargingPreferences = ChargingPreferences(
+      minSocPercent: _parseIntOr(minSocController.text, 20).clamp(0, 100),
+      maxSocPercent: _parseIntOr(maxSocController.text, 80).clamp(0, 100),
+    );
+    final vin = vinController.text.trim().isEmpty
+        ? null
+        : vinController.text.trim();
+
+    if (existing == null) {
+      return VehicleProfile(
+        id: _uuid.v4(),
+        name: nameController.text.trim(),
+        type: type,
+        batteryKwh: batteryKwh,
+        maxChargingKw: maxChargingKw,
+        supportedConnectors: supportedConnectors,
+        tankCapacityL: tankCapacityL,
+        preferredFuelType: preferredFuelType,
+        chargingPreferences: chargingPreferences,
+        obd2AdapterMac: adapterMac,
+        obd2AdapterName: adapterName,
+        vin: vin,
+        engineDisplacementCc: engineDisplacementCc,
+        engineCylinders: engineCylinders,
+        curbWeightKg: curbWeightKg,
+      );
+    }
+
+    // Edit path — copyWith preserves every non-form field on the
+    // loaded profile: calibrationMode, pairedAdapterMac,
+    // volumetricEfficiency / volumetricEfficiencySamples, autoRecord
+    // and friends, the *_aggregates pack, referenceVehicleId, etc.
+    return existing.copyWith(
       name: nameController.text.trim(),
       type: type,
-      batteryKwh: type == VehicleType.combustion
-          ? null
-          : _parseDouble(batteryController.text),
-      maxChargingKw: type == VehicleType.combustion
-          ? null
-          : _parseDouble(maxChargingKwController.text),
-      supportedConnectors:
-          type == VehicleType.combustion ? <ConnectorType>{} : {...connectors},
-      tankCapacityL:
-          type == VehicleType.ev ? null : _parseDouble(tankController.text),
-      preferredFuelType: type == VehicleType.ev
-          ? null
-          : (fuelTypeController.text.trim().isEmpty
-              ? null
-              : fuelTypeController.text.trim()),
-      chargingPreferences: ChargingPreferences(
-        minSocPercent: _parseIntOr(minSocController.text, 20).clamp(0, 100),
-        maxSocPercent: _parseIntOr(maxSocController.text, 80).clamp(0, 100),
-      ),
+      batteryKwh: batteryKwh,
+      maxChargingKw: maxChargingKw,
+      supportedConnectors: supportedConnectors,
+      tankCapacityL: tankCapacityL,
+      preferredFuelType: preferredFuelType,
+      chargingPreferences: chargingPreferences,
       obd2AdapterMac: adapterMac,
       obd2AdapterName: adapterName,
-      vin: vinController.text.trim().isEmpty
-          ? null
-          : vinController.text.trim(),
+      vin: vin,
       engineDisplacementCc: engineDisplacementCc,
       engineCylinders: engineCylinders,
       curbWeightKg: curbWeightKg,
-      calibrationMode: calibrationMode,
     );
   }
 
@@ -150,12 +189,6 @@ class VehicleFormSnapshot {
   final int? engineCylinders;
   final int? curbWeightKg;
 
-  /// Baseline calibration mode (#894) captured from the loaded
-  /// profile so the screen can thread it back into [buildProfile]
-  /// on Save instead of falling through to the constructor default
-  /// (#1217).
-  final VehicleCalibrationMode calibrationMode;
-
   VehicleFormSnapshot({
     required this.id,
     required this.type,
@@ -166,6 +199,5 @@ class VehicleFormSnapshot {
     required this.engineDisplacementCc,
     required this.engineCylinders,
     required this.curbWeightKg,
-    this.calibrationMode = VehicleCalibrationMode.rule,
   });
 }
