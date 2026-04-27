@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../core/error/exceptions.dart';
 import '../../../core/location/location_service.dart';
 import '../../../core/location/user_position_provider.dart';
 import '../../../core/services/service_providers.dart';
@@ -9,12 +7,10 @@ import '../../../core/services/service_result.dart';
 import '../data/models/search_params.dart';
 import '../domain/entities/fuel_type.dart';
 import '../domain/entities/search_result_item.dart';
-import '../../profile/providers/effective_fuel_type_provider.dart';
-import '../../profile/providers/profile_provider.dart';
-import 'ev_search_provider.dart';
 // #727 — SearchState reads `searchLocationProvider` so we import
 // filters_provider directly (re-exports don't surface symbols here).
 import 'search_filters_provider.dart';
+import 'search_provider_orchestration.dart';
 import 'search_result_helpers.dart';
 
 // #727 — re-export so `import 'search_provider.dart'` keeps resolving
@@ -34,8 +30,10 @@ part 'search_provider.g.dart';
 ///
 /// Pure helpers (result wrapping, distance recalc, postal-code
 /// extraction, geocoding-error merging) live in
-/// `search_result_helpers.dart`; this file keeps the stateful
-/// orchestration (cancel tokens, profile lookups, state mutation).
+/// `search_result_helpers.dart`; orchestration helpers (EV dispatch,
+/// fuel/radius resolution, error classification, GPS auto-update)
+/// live in `search_provider_orchestration.dart`. This file keeps only
+/// the public search entry points + state mutation.
 @riverpod
 class SearchState extends _$SearchState {
   CancelToken? _activeCancelToken;
@@ -58,59 +56,21 @@ class SearchState extends _$SearchState {
     ));
   }
 
-  /// Auto-update user position from GPS if the setting is enabled.
-  Future<void> _autoUpdatePositionIfEnabled() async {
-    if (ref.read(activeProfileProvider)?.autoUpdatePosition != true) return;
-    try {
-      await ref.read(userPositionProvider.notifier).updateFromGps();
-    } on Exception catch (e, st) {
-      debugPrint('GPS auto-update failed: $e\n$st');
-    }
-  }
-
-  /// Wraps a search operation with standard loading state + error handling.
-  Future<void> _runSearch(Future<void> Function(CancelToken cancelToken) search) async {
+  /// Wraps a search closure with standard loading state + error
+  /// handling. Cancellations are silently dropped; every other
+  /// exception flows into [AsyncValue.error] via [classifySearchError]
+  /// so the UI can surface a fallback summary.
+  Future<void> _runSearch(
+    Future<void> Function(CancelToken cancelToken) search,
+  ) async {
     state = const AsyncValue.loading();
     final cancelToken = _newCancelToken();
     try {
       await search(cancelToken);
-    } on DioException catch (e, st) {
-      if (e.type == DioExceptionType.cancel) return;
-      state = AsyncValue.error(e, st);
-    } on ServiceChainExhaustedException catch (e, st) {
-      state = AsyncValue.error(e, st);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      final classified = classifySearchError(e, st);
+      if (classified != null) state = classified;
     }
-  }
-
-  /// Resolves the effective fuel + radius: honour explicit overrides,
-  /// otherwise fall back to the active profile's effective fuel (#704)
-  /// and default radius.
-  ({FuelType fuelType, double radiusKm}) _resolveFuelAndRadius(
-      FuelType? fuelType, double? radiusKm) {
-    final profile = ref.read(activeProfileProvider);
-    return (
-      fuelType: fuelType ?? ref.read(effectiveFuelTypeProvider),
-      radiusKm: radiusKm ?? profile?.defaultSearchRadius ?? 10.0,
-    );
-  }
-
-  /// If [fuelType] is EV, delegate to [EVSearchState] and copy the
-  /// wrapped result into this provider's state. Returns `true` when
-  /// dispatched so callers can early-return before the fuel path.
-  Future<bool> _maybeDispatchEv({
-    required FuelType fuelType,
-    required double lat,
-    required double lng,
-    required double radiusKm,
-  }) async {
-    if (fuelType != FuelType.electric) return false;
-    await ref
-        .read(eVSearchStateProvider.notifier)
-        .searchNearby(lat: lat, lng: lng, radiusKm: radiusKm);
-    _copyEvResults();
-    return true;
   }
 
   /// Search for nearby stations using the device's current GPS position.
@@ -130,28 +90,26 @@ class SearchState extends _$SearchState {
             position.latitude, position.longitude,
           );
 
-      final resolved = _resolveFuelAndRadius(fuelType, radiusKm);
-      if (await _maybeDispatchEv(
+      final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
+      final ev = await dispatchEvIfNeeded(
+        ref: ref,
         fuelType: resolved.fuelType,
         lat: position.latitude,
         lng: position.longitude,
         radiusKm: resolved.radiusKm,
-      )) {
-        return;
-      }
+      );
+      if (ev != null) { state = ev; return; }
 
       // Reverse-geocode for a postal code (Prix-Carburants + co).
+      final addr = await tryReverseGeocode(
+        ref.read(geocodingChainProvider),
+        position.latitude, position.longitude,
+        cancelToken: cancelToken,
+      );
       String? resolvedPostalCode;
-      try {
-        final addrResult =
-            await ref.read(geocodingChainProvider).coordinatesToAddress(
-                  position.latitude, position.longitude,
-                  cancelToken: cancelToken,
-                );
-        resolvedPostalCode = extractPostalCode(addrResult.data);
-        ref.read(searchLocationProvider.notifier).set(addrResult.data);
-      } on Exception catch (e, st) {
-        debugPrint('Reverse geocoding failed: $e\n$st');
+      if (addr != null) {
+        resolvedPostalCode = extractPostalCode(addr);
+        ref.read(searchLocationProvider.notifier).set(addr);
       }
 
       final params = SearchParams(
@@ -181,32 +139,26 @@ class SearchState extends _$SearchState {
     SortBy? sortBy,
   }) async {
     await _runSearch((cancelToken) async {
-      await _autoUpdatePositionIfEnabled();
+      await autoUpdatePositionIfEnabled(ref);
       final geocoding = ref.read(geocodingChainProvider);
       final coordsResult = await geocoding.zipCodeToCoordinates(
         zipCode, cancelToken: cancelToken,
       );
 
-      final resolved = _resolveFuelAndRadius(fuelType, radiusKm);
-      if (await _maybeDispatchEv(
+      final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
+      final ev = await dispatchEvIfNeeded(
+        ref: ref,
         fuelType: resolved.fuelType,
         lat: coordsResult.data.lat,
         lng: coordsResult.data.lng,
         radiusKm: resolved.radiusKm,
-      )) {
-        return;
-      }
+      );
+      if (ev != null) { state = ev; return; }
 
-      String? cityName;
-      try {
-        final addrResult = await geocoding.coordinatesToAddress(
-          coordsResult.data.lat, coordsResult.data.lng,
-          cancelToken: cancelToken,
-        );
-        cityName = addrResult.data;
-      } on Exception catch (e, st) {
-        debugPrint('ZIP reverse geocoding failed: $e\n$st');
-      }
+      final cityName = await tryReverseGeocode(
+        geocoding, coordsResult.data.lat, coordsResult.data.lng,
+        cancelToken: cancelToken,
+      );
 
       final locationLabel = '$zipCode ${cityName ?? ''}'.trim();
       ref.read(searchLocationProvider.notifier).set(locationLabel);
@@ -251,20 +203,20 @@ class SearchState extends _$SearchState {
     double? radiusKm,
   }) async {
     await _runSearch((cancelToken) async {
-      await _autoUpdatePositionIfEnabled();
+      await autoUpdatePositionIfEnabled(ref);
       if (locationName != null) {
         ref.read(searchLocationProvider.notifier).set(locationName);
       }
 
-      final resolved = _resolveFuelAndRadius(fuelType, radiusKm);
-      if (await _maybeDispatchEv(
+      final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
+      final ev = await dispatchEvIfNeeded(
+        ref: ref,
         fuelType: resolved.fuelType,
         lat: lat,
         lng: lng,
         radiusKm: resolved.radiusKm,
-      )) {
-        return;
-      }
+      );
+      if (ev != null) { state = ev; return; }
 
       final params = SearchParams(
         lat: lat,
@@ -284,16 +236,5 @@ class SearchState extends _$SearchState {
         wrapFuelResultAsSearchItems(withStations(result, adjustedStations)),
       );
     });
-  }
-
-  /// Copies EVSearchState results into this provider's state, wrapped
-  /// as [EVStationResult]. Called after [EVSearchState.searchNearby].
-  void _copyEvResults() {
-    ref.read(eVSearchStateProvider).when(
-          data: (r) =>
-              state = AsyncValue.data(wrapEvResultAsSearchItems(r)),
-          loading: () {},
-          error: (e, st) => state = AsyncValue.error(e, st),
-        );
   }
 }
