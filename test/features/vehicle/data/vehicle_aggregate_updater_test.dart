@@ -7,6 +7,8 @@ import 'package:tankstellen/features/consumption/data/trip_history_repository.da
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/vehicle/data/repositories/vehicle_profile_repository.dart';
 import 'package:tankstellen/features/vehicle/data/vehicle_aggregate_updater.dart';
+import 'package:tankstellen/features/vehicle/data/vehicle_speed_consumption_aggregator.dart';
+import 'package:tankstellen/features/vehicle/data/vehicle_trip_length_aggregator.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/speed_consumption_histogram.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/trip_length_breakdown.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
