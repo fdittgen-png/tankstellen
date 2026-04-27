@@ -15,6 +15,7 @@ import 'profile_landing_screen_dropdown.dart';
 import 'profile_radius_slider.dart';
 
 part 'profile_edit_sheet_parts.dart';
+part 'profile_edit_sheet_parts2.dart';
 
 /// Profile edit bottom sheet. Form state (fuel, radius, rating mode, etc.)
 /// lives in [profileEditControllerProvider] so changes trigger selective
