@@ -3943,6 +3943,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trajetsStartRecordingButton => 'Aufzeichnung starten';
 
   @override
+  String get trajetsResumeRecordingButton => 'Aufzeichnung fortsetzen';
+
+  @override
   String get trajetsEmptyStateTitle => 'Noch keine Fahrten';
 
   @override

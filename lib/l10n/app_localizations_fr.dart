@@ -3936,7 +3936,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trajetsTabLabel => 'Trajets';
 
   @override
-  String get trajetsStartRecordingButton => 'Start recording';
+  String get trajetsStartRecordingButton => 'Démarrer l\'enregistrement';
+
+  @override
+  String get trajetsResumeRecordingButton => 'Reprendre l\'enregistrement';
 
   @override
   String get trajetsEmptyStateTitle => 'No trips yet';

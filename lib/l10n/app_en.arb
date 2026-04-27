@@ -2475,6 +2475,10 @@
   "@trajetsStartRecordingButton": {
     "description": "Primary CTA on the Trips tab that kicks off a new trip recording (#889)."
   },
+  "trajetsResumeRecordingButton": "Resume recording",
+  "@trajetsResumeRecordingButton": {
+    "description": "Primary CTA on the Trips tab when a trip is already being recorded in the background; tapping it brings focus back to the recording screen (#1237)."
+  },
   "trajetsEmptyStateTitle": "No trips yet",
   "@trajetsEmptyStateTitle": {
     "description": "Empty-state title on the Trips tab when no trips have been recorded (#889)."

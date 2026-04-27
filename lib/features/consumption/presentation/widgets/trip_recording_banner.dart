@@ -235,6 +235,11 @@ class _Content extends StatelessWidget {
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
+        // #1237 — chevron makes the banner look tappable. The InkWell
+        // already routes to /trip-recording, but without an affordance
+        // users read the row as decorative AppBar chrome.
+        const SizedBox(width: 6),
+        Icon(Icons.chevron_right, size: 18, color: fg),
       ],
     );
   }

@@ -3908,6 +3908,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get trajetsStartRecordingButton => 'Start recording';
 
   @override
+  String get trajetsResumeRecordingButton => 'Resume recording';
+
+  @override
   String get trajetsEmptyStateTitle => 'No trips yet';
 
   @override
