@@ -3646,6 +3646,11 @@ class AppLocalizationsSv extends AppLocalizations {
       'Need at least 3 trips per month for comparison';
 
   @override
+  String obd2PickerPinnedFallback(String adapterName) {
+    return 'Couldn\'t reach \'$adapterName\' — pick another adapter';
+  }
+
+  @override
   String get onboardingObd2StepTitle => 'Connect your OBD2 adapter';
 
   @override

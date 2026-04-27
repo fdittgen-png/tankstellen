@@ -8,7 +8,9 @@ import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart
 import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/obd2_adapter_picker.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('Obd2AdapterPickerSheet (#743)', () {
@@ -70,6 +72,187 @@ void main() {
           findsOneWidget);
     });
   });
+
+  // #1188 — pinned-MAC fast path. `showObd2AdapterPicker` accepts a
+  // [pinnedMac] for the active vehicle's adapter. When set, it tries
+  // a silent direct connect via [Obd2ConnectionService.connectByMac]
+  // and only falls back to the modal sheet when that fails.
+  group('showObd2AdapterPicker pinned-MAC fast path (#1188)', () {
+    testWidgets('pinnedMac=null shows the sheet (regression check)',
+        (tester) async {
+      final svc = _RecordingFakeConnection.success();
+      final completer = Completer<Obd2Service?>();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [obd2ConnectionProvider.overrideWith((_) => svc)],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (ctx) => ElevatedButton(
+                  onPressed: () {
+                    completer.complete(showObd2AdapterPicker(ctx));
+                  },
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pump();
+      // Sheet rendered → its title is on screen.
+      expect(find.text('Pick an OBD2 adapter'), findsOneWidget);
+      expect(svc.connectByMacCalls, isEmpty);
+      // Tear down the open future cleanly.
+      Navigator.of(tester.element(find.text('Pick an OBD2 adapter')))
+          .pop();
+      await tester.pumpAndSettle();
+      await completer.future;
+    });
+
+    testWidgets(
+        'pinnedMac with successful connect resolves silently (no sheet)',
+        (tester) async {
+      final fakeService = _NoopObd2Service();
+      final svc = _RecordingFakeConnection(
+        connectByMacResult: fakeService,
+      );
+      final completer = Completer<Obd2Service?>();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [obd2ConnectionProvider.overrideWith((_) => svc)],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (ctx) => ElevatedButton(
+                  onPressed: () {
+                    completer.complete(showObd2AdapterPicker(
+                      ctx,
+                      pinnedMac: 'AA:BB:CC:DD:EE:FF',
+                      pinnedAdapterName: 'vLinker FS',
+                    ));
+                  },
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      expect(svc.connectByMacCalls, ['AA:BB:CC:DD:EE:FF']);
+      // No sheet rendered.
+      expect(find.text('Pick an OBD2 adapter'), findsNothing);
+      // Future resolved with the service.
+      final resolved = await completer.future;
+      expect(resolved, same(fakeService));
+    });
+
+    testWidgets(
+        'pinnedMac with failed connect (returns null) opens sheet + snackbar',
+        (tester) async {
+      final svc = _RecordingFakeConnection(
+        connectByMacResult: null, // simulate timeout / out-of-range
+      );
+      final completer = Completer<Obd2Service?>();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [obd2ConnectionProvider.overrideWith((_) => svc)],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (ctx) => ElevatedButton(
+                  onPressed: () {
+                    completer.complete(showObd2AdapterPicker(
+                      ctx,
+                      pinnedMac: 'AA:BB:CC:DD:EE:FF',
+                      pinnedAdapterName: 'vLinker FS',
+                    ));
+                  },
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      expect(svc.connectByMacCalls, ['AA:BB:CC:DD:EE:FF']);
+      // Sheet IS rendered now (fallback) — its title shows.
+      expect(find.text('Pick an OBD2 adapter'), findsOneWidget);
+      // Snackbar with the pinned name carries the localized message.
+      expect(
+        find.textContaining("Couldn't reach 'vLinker FS'"),
+        findsOneWidget,
+      );
+
+      // Drain the picker — the underlying scan stream is empty so it
+      // sits in `scanning`. Pop the sheet to resolve the future.
+      Navigator.of(tester.element(find.text('Pick an OBD2 adapter')))
+          .pop();
+      await tester.pumpAndSettle();
+      await completer.future;
+    });
+  });
+}
+
+/// Recording fake for [Obd2ConnectionService] that lets the pinned-MAC
+/// tests drive `connectByMac` without spinning up a real BLE stack.
+/// Sheet-fallback paths still need a working `scan` because the
+/// underlying [Obd2AdapterPickerSheet] subscribes to it on init —
+/// returning an empty stream sits the sheet in its scanning state
+/// indefinitely, which is exactly what the tests need to assert
+/// "the sheet IS rendered" without chasing further state transitions.
+class _RecordingFakeConnection extends Obd2ConnectionService {
+  _RecordingFakeConnection({this.connectByMacResult})
+      : super(
+          registry: Obd2AdapterRegistry.defaults(),
+          permissions: _FakePermissions(Obd2PermissionState.granted),
+          bluetooth: _StreamingFacade(const []),
+        );
+  factory _RecordingFakeConnection.success() =>
+      _RecordingFakeConnection(connectByMacResult: _NoopObd2Service());
+
+  final Obd2Service? connectByMacResult;
+  final List<String> connectByMacCalls = [];
+
+  @override
+  Future<Obd2Service?> connectByMac(
+    String mac, {
+    Duration timeout = const Duration(seconds: 5),
+  }) async {
+    connectByMacCalls.add(mac);
+    return connectByMacResult;
+  }
+
+  @override
+  Stream<List<ResolvedObd2Candidate>> scan({
+    Duration timeout = const Duration(seconds: 8),
+  }) async* {
+    // Empty stream — the picker sheet sits in its scanning state.
+  }
+}
+
+/// Minimal [Obd2Service] stand-in. The pinned-MAC tests only need
+/// identity comparison (`same(fakeService)`); no transport calls fire.
+class _NoopObd2Service implements Obd2Service {
+  @override
+  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 // --- helpers ---------------------------------------------------------

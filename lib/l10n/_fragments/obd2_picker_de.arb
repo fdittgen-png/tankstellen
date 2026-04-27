@@ -1,0 +1,11 @@
+{
+  "obd2PickerPinnedFallback": "Konnte '{adapterName}' nicht erreichen — wähle einen anderen Adapter",
+  "@obd2PickerPinnedFallback": {
+    "description": "Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.",
+    "placeholders": {
+      "adapterName": {
+        "type": "String"
+      }
+    }
+  }
+}

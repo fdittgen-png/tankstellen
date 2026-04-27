@@ -130,6 +130,39 @@ class Obd2ConnectionService {
       rethrow;
     }
   }
+
+  /// Pinned-adapter fast path (#1188). Runs a short scan and, as soon
+  /// as a candidate matching [mac] appears, opens a connection without
+  /// involving the picker UI. Returns null when [timeout] elapses
+  /// without a match (the adapter is off, out of range, or the user
+  /// has changed adapters since the MAC was persisted) so the caller
+  /// can fall back to the manual picker. [Obd2ConnectionError]
+  /// thrown by the underlying scan/connect flow propagates to the
+  /// caller — those are real failures (permission denied, init
+  /// timeout) that the caller should surface, not silently swallow.
+  Future<Obd2Service?> connectByMac(
+    String mac, {
+    Duration timeout = const Duration(seconds: 5),
+  }) async {
+    final stream = scan(timeout: timeout);
+    ResolvedObd2Candidate? match;
+    try {
+      await for (final batch in stream) {
+        for (final c in batch) {
+          if (c.candidate.deviceId == mac) {
+            match = c;
+            break;
+          }
+        }
+        if (match != null) break;
+      }
+    } on Obd2ScanTimeout {
+      // No adapters at all in range — fall through to picker.
+      return null;
+    }
+    if (match == null) return null;
+    return connect(match);
+  }
 }
 
 @Riverpod(keepAlive: true)

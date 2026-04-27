@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/obd2/adapter_registry.dart';
 import '../../data/obd2/obd2_connection_errors.dart';
 import '../../data/obd2/obd2_connection_service.dart';
@@ -19,7 +20,74 @@ import '../../data/obd2/obd2_service.dart';
 /// injected [Obd2ConnectionService], so widget tests swap it via a
 /// Riverpod override of `obd2ConnectionProvider` and drive the full
 /// flow without a BLE stack.
-Future<Obd2Service?> showObd2AdapterPicker(BuildContext context) {
+///
+/// When [pinnedMac] is non-null (#1188), the picker first tries a
+/// silent direct connect via [Obd2ConnectionService.connectByMac].
+/// On success the future resolves with the connected service and the
+/// modal sheet is never shown — eliminating the 2-tap friction for
+/// returning users with a paired adapter. On failure (adapter off,
+/// out of range, init error) the sheet is shown with a snackbar built
+/// from [pinnedAdapterName] so the user understands why the picker
+/// reappeared.
+Future<Obd2Service?> showObd2AdapterPicker(
+  BuildContext context, {
+  String? pinnedMac,
+  String? pinnedAdapterName,
+}) async {
+  // Pinned-MAC fast path (#1188). When the active vehicle has an
+  // adapter paired we want zero UI — connect silently and resolve
+  // immediately, falling back to the sheet on any failure.
+  if (pinnedMac != null && pinnedMac.isNotEmpty) {
+    final container = ProviderScope.containerOf(context, listen: false);
+    Obd2Service? service;
+    try {
+      service = await container.read(obd2ConnectionProvider).connectByMac(
+            pinnedMac,
+          );
+    } on Obd2ConnectionError catch (e, st) {
+      // Real connect failure (permission denied, init timeout). Drop
+      // through to the sheet so the user can pick another adapter;
+      // the snackbar surfaces the mishap.
+      debugPrint('showObd2AdapterPicker pinned connect failed: $e\n$st');
+    }
+    if (service != null) {
+      return service;
+    }
+    // Fall-through: open the sheet with a fallback snackbar. Schedule
+    // the snackbar after the first frame so it lands on the surrounding
+    // Scaffold and not on the modal route.
+    if (!context.mounted) return null;
+    return _showPickerSheet(
+      context,
+      fallbackAdapterName: pinnedAdapterName,
+    );
+  }
+  return _showPickerSheet(context);
+}
+
+Future<Obd2Service?> _showPickerSheet(
+  BuildContext context, {
+  String? fallbackAdapterName,
+}) {
+  if (fallbackAdapterName != null && fallbackAdapterName.isNotEmpty) {
+    // Surface the snackbar against the surrounding Scaffold (not the
+    // modal route). Schedules after the current frame so the modal
+    // is mounted by the time the snackbar slides in.
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final l = AppLocalizations.of(context);
+    if (messenger != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              l?.obd2PickerPinnedFallback(fallbackAdapterName) ??
+                  "Couldn't reach '$fallbackAdapterName' — pick another adapter",
+            ),
+          ),
+        );
+      });
+    }
+  }
   return showModalBottomSheet<Obd2Service>(
     context: context,
     isScrollControlled: true,
@@ -115,6 +183,12 @@ class _Obd2AdapterPickerSheetState
       final service = await ref
           .read(obd2ConnectionProvider)
           .connect(candidate);
+      // #1188 — persist MAC + display name back onto the active
+      // vehicle profile so the next session takes the pinned-MAC fast
+      // path and skips the picker entirely. Best-effort: a missing
+      // active vehicle, or a failed save, must not block the connect
+      // path the user just completed.
+      await _persistPickedAdapterToActiveVehicle(candidate);
       if (!mounted) return;
       Navigator.of(context).pop(service);
     } on Obd2ConnectionError catch (e, st) { // ignore: unused_catch_stack
@@ -123,6 +197,36 @@ class _Obd2AdapterPickerSheetState
         _error = e;
         _phase = _Phase.error;
       });
+    }
+  }
+
+  /// Write the user's picked adapter MAC + display name onto the
+  /// active vehicle profile when missing or different (#1188). Runs
+  /// only when an active profile exists; no-op otherwise. Errors are
+  /// swallowed (debug-printed) — the connect path the user is
+  /// completing is the priority.
+  Future<void> _persistPickedAdapterToActiveVehicle(
+    ResolvedObd2Candidate candidate,
+  ) async {
+    try {
+      final active = ref.read(activeVehicleProfileProvider);
+      if (active == null) return;
+      final mac = candidate.candidate.deviceId;
+      final name = candidate.candidate.deviceName.isEmpty
+          ? candidate.profile.displayName
+          : candidate.candidate.deviceName;
+      if (active.obd2AdapterMac == mac && active.obd2AdapterName == name) {
+        return; // already persisted — skip the redundant write.
+      }
+      final updated = active.copyWith(
+        obd2AdapterMac: mac,
+        obd2AdapterName: name,
+      );
+      await ref.read(vehicleProfileListProvider.notifier).save(updated);
+    } catch (e, st) {
+      debugPrint(
+        'Obd2AdapterPickerSheet._persistPickedAdapterToActiveVehicle: $e\n$st',
+      );
     }
   }
 

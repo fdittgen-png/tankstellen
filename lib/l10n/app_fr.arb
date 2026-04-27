@@ -758,6 +758,7 @@
   "obdPickerTitle": "Choisir un adaptateur OBD2",
   "obdPickerScanning": "Recherche d'adaptateurs…",
   "obdPickerConnecting": "Connexion…",
+  "obd2PickerPinnedFallback": "Impossible de joindre '{adapterName}' — choisissez un autre adaptateur",
   "themeSettingTitle": "Thème",
   "themeModeLight": "Clair",
   "themeModeDark": "Sombre",

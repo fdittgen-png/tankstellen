@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tankstellen/core/widgets/empty_state.dart';
+import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
+import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
+import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
@@ -90,6 +95,93 @@ class _IdleTripRecording extends TripRecording {
   }
 }
 
+/// Fake that returns [StartTripOutcome.needsPicker] — drives the
+/// picker code path in `_onStartRecording` (#1188).
+class _NeedsPickerTripRecording extends TripRecording {
+  int startTripCallCount = 0;
+  int startServiceCallCount = 0;
+
+  @override
+  TripRecordingState build() => const TripRecordingState();
+
+  @override
+  Future<StartTripOutcome> startTrip({
+    String? vehicleId,
+    String? adapterMac,
+    Obd2Service? service,
+  }) async {
+    startTripCallCount++;
+    return StartTripOutcome.needsPicker;
+  }
+
+  @override
+  Future<void> start(Obd2Service service) async {
+    startServiceCallCount++;
+  }
+}
+
+/// Fake [Obd2ConnectionService] that records `connectByMac` calls and
+/// returns a synthetic [Obd2Service] (or null to force the sheet
+/// fallback) so the trajets_tab pinned-MAC tests don't spin up any
+/// Bluetooth stack. The constructor uses the existing fake permissions
+/// + bluetooth facades so the underlying scan path also stays inert.
+class _RecordingFakeConnection extends Obd2ConnectionService {
+  _RecordingFakeConnection({this.connectByMacResult})
+      : super(
+          registry: Obd2AdapterRegistry.defaults(),
+          permissions: _AlwaysGrantedPermissions(),
+          bluetooth: _EmptyBluetoothFacade(),
+        );
+
+  final Obd2Service? connectByMacResult;
+  final List<String> connectByMacCalls = [];
+
+  @override
+  Future<Obd2Service?> connectByMac(
+    String mac, {
+    Duration timeout = const Duration(seconds: 5),
+  }) async {
+    connectByMacCalls.add(mac);
+    return connectByMacResult;
+  }
+
+  @override
+  Stream<List<ResolvedObd2Candidate>> scan({
+    Duration timeout = const Duration(seconds: 8),
+  }) async* {
+    // Empty stream — the picker sheet (when shown) sits in scanning.
+  }
+}
+
+class _AlwaysGrantedPermissions implements Obd2Permissions {
+  @override
+  Future<Obd2PermissionState> current() async => Obd2PermissionState.granted;
+
+  @override
+  Future<Obd2PermissionState> request() async => Obd2PermissionState.granted;
+}
+
+class _EmptyBluetoothFacade implements BluetoothFacade {
+  @override
+  Stream<List<Obd2AdapterCandidate>> scan({
+    required Set<String> serviceUuids,
+    Duration timeout = const Duration(seconds: 8),
+  }) async* {}
+
+  @override
+  Future<void> stopScan() async {}
+
+  @override
+  ElmByteChannel channelFor(String deviceId, Obd2AdapterProfile profile) {
+    throw UnimplementedError('not used in trajets_tab tests');
+  }
+}
+
+class _NoopObd2Service implements Obd2Service {
+  @override
+  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 /// Builds a [TripHistoryEntry] with sensible defaults so each test
 /// only spells out the fields it cares about.
 TripHistoryEntry _entry({
@@ -127,6 +219,7 @@ Future<void> _pumpTab(
   List<VehicleProfile> vehicles = const [],
   VehicleProfile? activeVehicle,
   TripRecording Function()? recordingFactory,
+  Obd2ConnectionService? obd2Connection,
 }) async {
   _lastTripIdVisited = null;
   final router = GoRouter(
@@ -157,6 +250,8 @@ Future<void> _pumpTab(
           .overrideWith(() => _FixedActiveVehicle(activeVehicle)),
       tripRecordingProvider
           .overrideWith(recordingFactory ?? () => _IdleTripRecording()),
+      if (obd2Connection != null)
+        obd2ConnectionProvider.overrideWith((_) => obd2Connection),
     ],
   );
 }
@@ -494,6 +589,92 @@ void main() {
 
       expect(find.text('18.5 kWh/100 km'), findsOneWidget);
       expect(find.textContaining('L/100 km'), findsNothing);
+    });
+  });
+
+  // #1188 — pinned-MAC fast path. When the active vehicle has an
+  // adapter paired (`obd2AdapterMac` non-null), tapping Start
+  // recording must NOT show the picker sheet. The picker calls
+  // `connectByMac` silently and pushes straight into the recording
+  // screen.
+  group('TrajetsTab — pinned-MAC fast path (#1188)', () {
+    const pairedVehicle = VehicleProfile(
+      id: 'v1',
+      name: 'Daily Driver',
+      type: VehicleType.combustion,
+      obd2AdapterMac: 'AA:BB:CC:DD:EE:FF',
+      obd2AdapterName: 'vLinker FS',
+    );
+    const unpairedVehicle = VehicleProfile(
+      id: 'v2',
+      name: 'Daily Driver',
+      type: VehicleType.combustion,
+    );
+
+    testWidgets(
+        'paired vehicle skips the picker sheet on Start recording',
+        (tester) async {
+      final fakeService = _NoopObd2Service();
+      final connection = _RecordingFakeConnection(
+        connectByMacResult: fakeService,
+      );
+      final notifier = _NeedsPickerTripRecording();
+
+      await _pumpTab(
+        tester,
+        vehicleId: null,
+        trips: const [],
+        activeVehicle: pairedVehicle,
+        recordingFactory: () => notifier,
+        obd2Connection: connection,
+      );
+
+      await tester.tap(
+        find.byKey(const Key('trajets_start_recording_button')),
+      );
+      // Need to pump enough for the futures to chain through. Don't
+      // pumpAndSettle — the recording screen push would attempt to
+      // build the full TripRecordingScreen.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      // startTrip fired and returned needsPicker.
+      expect(notifier.startTripCallCount, 1);
+      // Picker called connectByMac with the pinned MAC.
+      expect(connection.connectByMacCalls, ['AA:BB:CC:DD:EE:FF']);
+      // Sheet title NEVER appears — the picker short-circuited.
+      expect(find.text('Pick an OBD2 adapter'), findsNothing);
+      // The notifier received the connected service from the silent
+      // pinned-MAC fast path.
+      expect(notifier.startServiceCallCount, 1);
+    });
+
+    testWidgets(
+        'unpaired vehicle still opens the picker sheet on Start recording',
+        (tester) async {
+      final connection = _RecordingFakeConnection();
+      final notifier = _NeedsPickerTripRecording();
+
+      await _pumpTab(
+        tester,
+        vehicleId: null,
+        trips: const [],
+        activeVehicle: unpairedVehicle,
+        recordingFactory: () => notifier,
+        obd2Connection: connection,
+      );
+
+      await tester.tap(
+        find.byKey(const Key('trajets_start_recording_button')),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      expect(notifier.startTripCallCount, 1);
+      // No pinned MAC → picker did not attempt the silent connect.
+      expect(connection.connectByMacCalls, isEmpty);
+      // Sheet IS shown — the title text on the modal is rendered.
+      expect(find.text('Pick an OBD2 adapter'), findsOneWidget);
     });
   });
 }

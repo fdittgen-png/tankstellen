@@ -3678,6 +3678,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Mindestens 3 Fahrten pro Monat für den Vergleich nötig';
 
   @override
+  String obd2PickerPinnedFallback(String adapterName) {
+    return 'Konnte \'$adapterName\' nicht erreichen — wähle einen anderen Adapter';
+  }
+
+  @override
   String get onboardingObd2StepTitle => 'OBD2-Adapter verbinden';
 
   @override
