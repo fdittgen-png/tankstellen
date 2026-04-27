@@ -7268,6 +7268,24 @@ abstract class AppLocalizations {
   /// **'Resume recording'**
   String get trajetsResumeRecordingButton;
 
+  /// Status label shown on the Trips tab while the pinned OBD2 adapter is being reached over Bluetooth, before the recording screen opens. Replaces the silent disabled-button wait.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting to OBD2 adapter…'**
+  String get tripStartProgressConnectingAdapter;
+
+  /// Status label shown on the Trips tab while the trip recorder is reading the odometer / VIN and warming up the polling loop, before the recording screen opens.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading vehicle data…'**
+  String get tripStartProgressReadingVehicleData;
+
+  /// Status label shown on the Trips tab in the final moment before pushing to the live recording screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting recording…'**
+  String get tripStartProgressStartingRecording;
+
   /// Empty-state title on the Trips tab when no trips have been recorded (#889).
   ///
   /// In en, this message translates to:

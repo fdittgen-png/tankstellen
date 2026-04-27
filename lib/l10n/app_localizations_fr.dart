@@ -3942,6 +3942,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trajetsResumeRecordingButton => 'Reprendre l\'enregistrement';
 
   @override
+  String get tripStartProgressConnectingAdapter =>
+      'Connexion à l\'adaptateur OBD2…';
+
+  @override
+  String get tripStartProgressReadingVehicleData =>
+      'Lecture des données du véhicule…';
+
+  @override
+  String get tripStartProgressStartingRecording =>
+      'Démarrage de l\'enregistrement…';
+
+  @override
   String get trajetsEmptyStateTitle => 'No trips yet';
 
   @override

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -76,6 +78,26 @@ class _RecordingThrowsTripRecording extends TripRecording {
     // Surfacing an Obd2ScanTimeout exercises the `on Obd2ConnectionError`
     // catch arm — TrajetsTab should swallow it into a SnackBar.
     throw const Obd2ScanTimeout('No OBD2 adapter found in range');
+  }
+}
+
+/// Fake whose `startTrip()` resolves on a [Completer] the test
+/// controls. Lets a test pump while the start flow is mid-flight so
+/// it can assert that the inline [TripStartProgress] card replaces
+/// the disabled button (#1230) instead of the screen looking frozen.
+class _PendingTripRecording extends TripRecording {
+  final Completer<StartTripOutcome> gate = Completer<StartTripOutcome>();
+
+  @override
+  TripRecordingState build() => const TripRecordingState();
+
+  @override
+  Future<StartTripOutcome> startTrip({
+    String? vehicleId,
+    String? adapterMac,
+    Obd2Service? service,
+  }) {
+    return gate.future;
   }
 }
 
@@ -722,6 +744,52 @@ void main() {
         );
       },
     );
+  });
+
+  // Inline progress feedback during the start flow (#1232). Without
+  // this the user taps Start recording and the screen looks frozen for
+  // several seconds while the BLE connect + odometer/VIN reads happen
+  // — the disabled button gives no visual signal at all.
+  group('TrajetsTab — start-flow progress feedback', () {
+    testWidgets(
+        'tapping Start recording swaps the button for the progress card',
+        (tester) async {
+      final notifier = _PendingTripRecording();
+      await _pumpTab(
+        tester,
+        vehicleId: null,
+        trips: const [],
+        recordingFactory: () => notifier,
+      );
+
+      // Baseline: button visible, progress card not.
+      expect(
+        find.byKey(const Key('trajets_start_recording_button')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('trajets_start_progress')), findsNothing);
+
+      await tester.tap(
+        find.byKey(const Key('trajets_start_recording_button')),
+      );
+      // Pump twice so the `setState` lands and the AnimatedSwitcher
+      // commits the new child without waiting for the swap animation.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 250));
+
+      // Progress card replaces the button while startTrip() is pending.
+      expect(find.byKey(const Key('trajets_start_progress')), findsOneWidget);
+      expect(
+        find.text('Connecting to OBD2 adapter…'),
+        findsOneWidget,
+      );
+
+      // Resolve the gate so the start flow can finish — keeps the
+      // widget tree clean for tearDown.
+      notifier.gate.complete(StartTripOutcome.alreadyActive);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 250));
+    });
   });
 }
 

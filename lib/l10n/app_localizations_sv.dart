@@ -3910,6 +3910,16 @@ class AppLocalizationsSv extends AppLocalizations {
   String get trajetsResumeRecordingButton => 'Resume recording';
 
   @override
+  String get tripStartProgressConnectingAdapter =>
+      'Connecting to OBD2 adapter…';
+
+  @override
+  String get tripStartProgressReadingVehicleData => 'Reading vehicle data…';
+
+  @override
+  String get tripStartProgressStartingRecording => 'Starting recording…';
+
+  @override
   String get trajetsEmptyStateTitle => 'No trips yet';
 
   @override

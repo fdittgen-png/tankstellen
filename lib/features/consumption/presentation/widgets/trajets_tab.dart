@@ -16,6 +16,7 @@ import '../screens/trip_recording_screen.dart';
 import 'maintenance_suggestion_card.dart';
 import 'monthly_insights_card.dart';
 import 'obd2_adapter_picker.dart';
+import 'trip_start_progress.dart';
 
 /// Trajets tab body on the Consumption screen (#889).
 ///
@@ -41,11 +42,17 @@ class TrajetsTab extends ConsumerStatefulWidget {
 }
 
 class _TrajetsTabState extends ConsumerState<TrajetsTab> {
-  bool _starting = false;
+  /// Non-null while the start flow is running. Drives the inline
+  /// [TripStartProgress] card that replaces the disabled button so
+  /// the user gets visible feedback during the silent BLE-connect /
+  /// odometer-read window instead of staring at a frozen screen.
+  TripStartStage? _startStage;
+
+  bool get _starting => _startStage != null;
 
   Future<void> _onStartRecording() async {
     if (_starting) return;
-    setState(() => _starting = true);
+    setState(() => _startStage = TripStartStage.connectingAdapter);
     try {
       final notifier = ref.read(tripRecordingProvider.notifier);
       final outcome = await notifier.startTrip();
@@ -78,8 +85,10 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
         pinnedAdapterName: activeVehicle?.obd2AdapterName,
       );
       if (service == null || !mounted) return;
+      setState(() => _startStage = TripStartStage.readingVehicleData);
       await notifier.start(service);
       if (!mounted) return;
+      setState(() => _startStage = TripStartStage.startingRecording);
       await Navigator.of(context).push<TripSaveResult?>(
         MaterialPageRoute(
           builder: (_) => const TripRecordingScreen(),
@@ -90,7 +99,7 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
     } catch (e, st) {
       debugPrint('TrajetsTab._onStartRecording: $e\n$st');
     } finally {
-      if (mounted) setState(() => _starting = false);
+      if (mounted) setState(() => _startStage = null);
     }
   }
 
@@ -123,27 +132,37 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
         return bx.compareTo(ax);
       });
 
+    final stage = _startStage;
     // When a trip is already recording in the background (#1237), the
     // CTA changes shape: same `_onStartRecording` handler — which
     // routes through `StartTripOutcome.alreadyActive` and pushes the
     // existing recording screen — but a different label + icon so the
     // user understands tapping returns them to the live trip rather
-    // than starting a new one. Without this the recording is hidden
-    // behind a button that looks destructive.
+    // than starting a new one.
     final isRecordingActive = ref.watch(tripRecordingProvider).isActive;
     final header = Padding(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-      child: FilledButton.icon(
-        key: const Key('trajets_start_recording_button'),
-        onPressed: _starting ? null : _onStartRecording,
-        icon: Icon(
-          isRecordingActive ? Icons.visibility : Icons.fiber_manual_record,
-        ),
-        label: Text(
-          isRecordingActive
-              ? (l?.trajetsResumeRecordingButton ?? 'Resume recording')
-              : (l?.trajetsStartRecordingButton ?? 'Start recording'),
-        ),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 220),
+        child: stage == null
+            ? FilledButton.icon(
+                key: const Key('trajets_start_recording_button'),
+                onPressed: _onStartRecording,
+                icon: Icon(
+                  isRecordingActive
+                      ? Icons.visibility
+                      : Icons.fiber_manual_record,
+                ),
+                label: Text(
+                  isRecordingActive
+                      ? (l?.trajetsResumeRecordingButton ?? 'Resume recording')
+                      : (l?.trajetsStartRecordingButton ?? 'Start recording'),
+                ),
+              )
+            : TripStartProgress(
+                key: const Key('trajets_start_progress'),
+                stage: stage,
+              ),
       ),
     );
 

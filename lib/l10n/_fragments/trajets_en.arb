@@ -11,6 +11,18 @@
   "@trajetsResumeRecordingButton": {
     "description": "Primary CTA on the Trips tab when a trip is already being recorded in the background; tapping it brings focus back to the recording screen (#1237)."
   },
+  "tripStartProgressConnectingAdapter": "Connecting to OBD2 adapter…",
+  "@tripStartProgressConnectingAdapter": {
+    "description": "Status label shown on the Trips tab while the pinned OBD2 adapter is being reached over Bluetooth, before the recording screen opens. Replaces the silent disabled-button wait."
+  },
+  "tripStartProgressReadingVehicleData": "Reading vehicle data…",
+  "@tripStartProgressReadingVehicleData": {
+    "description": "Status label shown on the Trips tab while the trip recorder is reading the odometer / VIN and warming up the polling loop, before the recording screen opens."
+  },
+  "tripStartProgressStartingRecording": "Starting recording…",
+  "@tripStartProgressStartingRecording": {
+    "description": "Status label shown on the Trips tab in the final moment before pushing to the live recording screen."
+  },
   "trajetsEmptyStateTitle": "No trips yet",
   "@trajetsEmptyStateTitle": {
     "description": "Empty-state title on the Trips tab when no trips have been recorded (#889)."
