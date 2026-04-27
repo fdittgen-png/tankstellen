@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
@@ -304,56 +303,125 @@ void main() {
     );
   });
 
-  group('TripDetailScreen Share action (#890)', () {
-    testWidgets('Share copies JSON+CSV payload to clipboard', (tester) async {
-      String? captured;
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        SystemChannels.platform,
-        (call) async {
-          if (call.method == 'Clipboard.setData') {
-            captured =
-                (call.arguments as Map)['text'] as String?;
-          }
-          return null;
-        },
-      );
-      addTearDown(() {
-        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-          SystemChannels.platform,
-          null,
-        );
-      });
-
-      final samples = _seedSamples();
-      await _pumpDetail(
-        tester,
-        entry: _seedEntry(),
-        activeVehicle: vehicle,
-        vehicles: const [vehicle],
-        samples: samples,
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(const Key('trip_detail_share_button')));
-      await tester.pumpAndSettle();
-
-      expect(captured, isNotNull);
-      // JSON summary + CSV block with one row per sample (+1 header).
-      expect(captured, contains('"id": "trip-1"'));
-      expect(captured, contains('timestamp,speedKmh,rpm,fuelRateLPerHour'));
-      // CSV block starts at the header line and contains one row per
-      // sample; split on the header to isolate the sample block so
-      // the JSON-summary commas don't inflate the count.
-      final csvBlock =
-          captured!.split('timestamp,speedKmh,rpm,fuelRateLPerHour\n').last;
-      final csvDataRows = csvBlock
-          .split('\n')
-          .where((line) => line.trim().isNotEmpty)
-          .length;
-      expect(csvDataRows, 100);
-      // Snackbar confirmation.
-      expect(find.text('Copied to clipboard'), findsOneWidget);
+  group('TripDetailScreen Share action (#1189)', () {
+    tearDown(() {
+      debugTripDetailShareOverride = null;
     });
+
+    testWidgets(
+      'Share invokes the renderer with the boundary key + localised subject',
+      (tester) async {
+        GlobalKey? capturedKey;
+        String? capturedSubject;
+        String? capturedFileNameStem;
+        debugTripDetailShareOverride = ({
+          required GlobalKey boundaryKey,
+          required String subject,
+          required String fileNameStem,
+        }) async {
+          capturedKey = boundaryKey;
+          capturedSubject = subject;
+          capturedFileNameStem = fileNameStem;
+        };
+
+        final samples = _seedSamples();
+        await _pumpDetail(
+          tester,
+          entry: _seedEntry(),
+          activeVehicle: vehicle,
+          vehicles: const [vehicle],
+          samples: samples,
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(const Key('trip_detail_share_button')));
+        await tester.pumpAndSettle();
+
+        expect(capturedKey, isNotNull,
+            reason: 'share renderer was not invoked');
+        expect(capturedKey!.currentContext, isNotNull,
+            reason: 'boundary key must point at a mounted widget so the '
+                'real renderer can rasterise it');
+        // The subject template is "Tankstellen — trip on {date}" in
+        // English (the trip's startedAt is 2026-04-22). Verify the
+        // brand + the year ended up in the share subject.
+        expect(capturedSubject, isNotNull);
+        expect(capturedSubject, contains('Tankstellen'));
+        expect(capturedSubject, contains('2026'));
+        expect(capturedFileNameStem, 'tankstellen_trip_trip-1');
+        // Should NOT be a clipboard snackbar — make sure no legacy
+        // path leaked through.
+        expect(find.text('Copied to clipboard'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'Share works with empty samples (no chart crash, still hands off PNG)',
+      (tester) async {
+        var rendererCalled = false;
+        debugTripDetailShareOverride = ({
+          required GlobalKey boundaryKey,
+          required String subject,
+          required String fileNameStem,
+        }) async {
+          rendererCalled = true;
+          // The empty-samples body must still produce a render-target
+          // boundary, otherwise the production renderer would throw.
+          expect(boundaryKey.currentContext, isNotNull,
+              reason: 'empty-samples body must mount the share boundary');
+        };
+
+        await _pumpDetail(
+          tester,
+          entry: _seedEntry(),
+          activeVehicle: vehicle,
+          vehicles: const [vehicle],
+          samples: const [],
+        );
+        await tester.pumpAndSettle();
+
+        // No exception during build with the empty-samples placeholder.
+        expect(tester.takeException(), isNull);
+
+        await tester.tap(find.byKey(const Key('trip_detail_share_button')));
+        await tester.pumpAndSettle();
+
+        expect(rendererCalled, isTrue,
+            reason: 'share renderer must run even when samples are empty');
+      },
+    );
+
+    testWidgets(
+      'Share surfaces a snackbar when the renderer throws',
+      (tester) async {
+        debugTripDetailShareOverride = ({
+          required GlobalKey boundaryKey,
+          required String subject,
+          required String fileNameStem,
+        }) async {
+          throw StateError('boom');
+        };
+
+        await _pumpDetail(
+          tester,
+          entry: _seedEntry(),
+          activeVehicle: vehicle,
+          vehicles: const [vehicle],
+          samples: _seedSamples(),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(const Key('trip_detail_share_button')));
+        await tester.pumpAndSettle();
+
+        // The error snackbar surfaces — exact message is the EN
+        // fallback because the test pumps the default locale.
+        expect(
+          find.text("Couldn't generate share image"),
+          findsOneWidget,
+        );
+      },
+    );
   });
 
   group('TripDetailScreen Delete action (#890)', () {

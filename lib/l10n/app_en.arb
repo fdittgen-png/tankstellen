@@ -2522,11 +2522,20 @@
   },
   "trajetDetailShareAction": "Share",
   "@trajetDetailShareAction": {
-    "description": "AppBar action tooltip / snackbar label for copying the trip summary + sample CSV to the clipboard (#890)."
+    "description": "AppBar action tooltip for the share-trip button on the Trip detail screen (#890, #1189)."
   },
-  "trajetDetailShareCopied": "Copied to clipboard",
-  "@trajetDetailShareCopied": {
-    "description": "Snackbar shown after the Share action has written the trip payload to the clipboard (#890)."
+  "trajetDetailShareSubject": "Tankstellen — trip on {date}",
+  "@trajetDetailShareSubject": {
+    "description": "Subject / preview text passed to the OS share sheet when the user shares a trip detail report as an image (#1189). The {date} placeholder is replaced with a localised short date.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trajetDetailShareError": "Couldn't generate share image",
+  "@trajetDetailShareError": {
+    "description": "Snackbar shown when the trip-detail Share action fails to render or hand off the report PNG (#1189)."
   },
   "trajetDetailDeleteAction": "Delete",
   "@trajetDetailDeleteAction": {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../data/storage_repository.dart';
+import '_csv_encoder.dart';
 
 /// Categories of user data that can be exported individually.
 ///
@@ -122,7 +123,7 @@ class DataExporter {
         m['lng'] ?? m['lon'],
       ]);
     }
-    return _encodeCsv(rows);
+    return encodeCsv(rows);
   }
 
   String _priceHistoryCsv() {
@@ -146,7 +147,7 @@ class DataExporter {
         }
       }
     }
-    return _encodeCsv(rows);
+    return encodeCsv(rows);
   }
 
   String _alertsCsv() {
@@ -171,7 +172,7 @@ class DataExporter {
         a['createdAt'] ?? a['created_at'],
       ]);
     }
-    return _encodeCsv(rows);
+    return encodeCsv(rows);
   }
 
   String _fillUpsCsv() {
@@ -202,14 +203,14 @@ class DataExporter {
         f['notes'],
       ]);
     }
-    return _encodeCsv(rows);
+    return encodeCsv(rows);
   }
 
   String _ratingsCsv() {
     const header = ['station_id', 'rating'];
     final rows = <List<Object?>>[header];
     _storage.getRatings().forEach((k, v) => rows.add([k, v]));
-    return _encodeCsv(rows);
+    return encodeCsv(rows);
   }
 
   String _ignoredCsv() {
@@ -218,7 +219,7 @@ class DataExporter {
     for (final id in _storage.getIgnoredIds()) {
       rows.add([id]);
     }
-    return _encodeCsv(rows);
+    return encodeCsv(rows);
   }
 
   String _profilesCsv() {
@@ -233,7 +234,7 @@ class DataExporter {
         p['sortBy'] ?? p['sort_by'],
       ]);
     }
-    return _encodeCsv(rows);
+    return encodeCsv(rows);
   }
 
   String _itinerariesCsv() {
@@ -248,7 +249,7 @@ class DataExporter {
         it['createdAt'] ?? it['created_at'],
       ]);
     }
-    return _encodeCsv(rows);
+    return encodeCsv(rows);
   }
 
   // --------------------------------------------------------------------------
@@ -275,34 +276,5 @@ class DataExporter {
       result[key] = _storage.getPriceRecords(key);
     }
     return result;
-  }
-
-  /// RFC 4180 CSV encoder — no dependency on the `csv` package.
-  ///
-  /// - Uses `,` separator and `\r\n` line ending (Excel-friendly).
-  /// - Wraps fields in `"` when they contain `,`, `"`, `\r`, or `\n`.
-  /// - Doubles embedded `"` characters inside quoted fields.
-  /// - `null` renders as an empty cell.
-  String _encodeCsv(List<List<Object?>> rows) {
-    final buf = StringBuffer();
-    for (final row in rows) {
-      for (var i = 0; i < row.length; i++) {
-        if (i > 0) buf.write(',');
-        buf.write(_encodeCell(row[i]));
-      }
-      buf.write('\r\n');
-    }
-    return buf.toString();
-  }
-
-  String _encodeCell(Object? value) {
-    if (value == null) return '';
-    final s = value.toString();
-    final needsQuoting = s.contains(',') ||
-        s.contains('"') ||
-        s.contains('\n') ||
-        s.contains('\r');
-    if (!needsQuoting) return s;
-    return '"${s.replaceAll('"', '""')}"';
   }
 }

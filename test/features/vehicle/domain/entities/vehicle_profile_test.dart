@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/speed_consumption_histogram.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/trip_length_breakdown.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 
 /// Unit tests for the pure freezed [VehicleProfile] entity (Refs #561).
@@ -210,6 +212,105 @@ void main() {
         containsAll(<String>['ccs', 'three_pin']),
       );
       expect(connectors.length, 2);
+    });
+  });
+
+  group('VehicleProfile aggregate fields (#1193 phase 1)', () {
+    test('round-trip with all four new fields populated preserves equality',
+        () {
+      final updatedAt = DateTime.utc(2026, 4, 27, 9, 30);
+      final original = VehicleProfile(
+        id: 'agg-profile',
+        name: 'AggProfile',
+        type: VehicleType.combustion,
+        tripLengthAggregates: const TripLengthBreakdown(
+          short: TripLengthBucket(
+            tripCount: 8,
+            meanLPer100km: 9.4,
+            totalDistanceKm: 64,
+            totalLitres: 6.02,
+          ),
+          medium: TripLengthBucket(
+            tripCount: 4,
+            meanLPer100km: 6.8,
+            totalDistanceKm: 132,
+            totalLitres: 8.98,
+          ),
+          long: TripLengthBucket(
+            tripCount: 2,
+            meanLPer100km: 5.4,
+            totalDistanceKm: 240,
+            totalLitres: 12.96,
+          ),
+        ),
+        speedConsumptionAggregates: const SpeedConsumptionHistogram(
+          bands: <SpeedBand>[
+            SpeedBand(
+              minKmh: 0,
+              maxKmh: 30,
+              sampleCount: 200,
+              meanLPer100km: 12.1,
+              timeShareFraction: 0.18,
+            ),
+            SpeedBand(
+              minKmh: 110,
+              maxKmh: null,
+              sampleCount: 50,
+              meanLPer100km: 7.6,
+              timeShareFraction: 0.12,
+            ),
+          ],
+        ),
+        aggregatesUpdatedAt: updatedAt,
+        aggregatesTripCount: 14,
+      );
+
+      final json = original.toJson();
+      final restored = VehicleProfile.fromJson(json);
+
+      expect(restored, equals(original));
+      expect(restored.tripLengthAggregates, equals(original.tripLengthAggregates));
+      expect(
+        restored.speedConsumptionAggregates,
+        equals(original.speedConsumptionAggregates),
+      );
+      expect(restored.aggregatesUpdatedAt, equals(updatedAt));
+      expect(restored.aggregatesTripCount, 14);
+    });
+
+    test('round-trip with all four new fields null preserves equality '
+        '(backwards compat)', () {
+      const original = VehicleProfile(id: 'no-agg', name: 'NoAgg');
+      // Explicit null for clarity even though they default to null.
+      expect(original.tripLengthAggregates, isNull);
+      expect(original.speedConsumptionAggregates, isNull);
+      expect(original.aggregatesUpdatedAt, isNull);
+      expect(original.aggregatesTripCount, isNull);
+
+      final json = original.toJson();
+      final restored = VehicleProfile.fromJson(json);
+
+      expect(restored, equals(original));
+      expect(restored.tripLengthAggregates, isNull);
+      expect(restored.speedConsumptionAggregates, isNull);
+      expect(restored.aggregatesUpdatedAt, isNull);
+      expect(restored.aggregatesTripCount, isNull);
+    });
+
+    test('legacy JSON without aggregate keys deserializes with nulls', () {
+      // Pre-#1193 Hive payloads simply omit the new keys. freezed's
+      // nullable factory parameters must surface them as null rather
+      // than throwing during fromJson.
+      final json = <String, dynamic>{
+        'id': 'legacy',
+        'name': 'Legacy',
+        'type': 'combustion',
+      };
+      final restored = VehicleProfile.fromJson(json);
+      expect(restored.tripLengthAggregates, isNull);
+      expect(restored.speedConsumptionAggregates, isNull);
+      expect(restored.aggregatesUpdatedAt, isNull);
+      expect(restored.aggregatesTripCount, isNull);
     });
   });
 

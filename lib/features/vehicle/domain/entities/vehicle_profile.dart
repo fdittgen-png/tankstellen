@@ -1,5 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'speed_consumption_histogram.dart';
+import 'trip_length_breakdown.dart';
+
 part 'vehicle_profile.freezed.dart';
 part 'vehicle_profile.g.dart';
 
@@ -240,6 +243,30 @@ abstract class VehicleProfile with _$VehicleProfile {
     String? model,
     int? year,
     String? referenceVehicleId,
+
+    // Rolling per-vehicle driving aggregates (#1193 phase 1). All four
+    // fields are nullable; they remain null until the first trip
+    // aggregator pass writes them, and a null bucket entry inside the
+    // populated [TripLengthBreakdown] / [SpeedConsumptionHistogram]
+    // means the vehicle has trips overall but not yet enough in that
+    // specific bucket to clear the per-bucket min-sample threshold.
+    //
+    // The phase-1 PR ships these storage fields and the value-object
+    // schemas only — the aggregator service that fills them lives in
+    // `lib/features/vehicle/data/vehicle_aggregate_updater.dart`
+    // (#1193 phase 2), and the vehicle-profile UI section that reads
+    // them lives in the edit/view screens (#1193 phase 3).
+    //
+    //   tripLengthAggregates:    short / medium / long bucket stats.
+    //   speedConsumptionAggregates: per-speed-band L/100 km histogram.
+    //   aggregatesUpdatedAt:     wall-clock time of the last refresh.
+    //   aggregatesTripCount:     # trips folded into the current pass
+    //                            (used by the UI to gate the section
+    //                            below a min-trips threshold).
+    TripLengthBreakdown? tripLengthAggregates,
+    SpeedConsumptionHistogram? speedConsumptionAggregates,
+    DateTime? aggregatesUpdatedAt,
+    int? aggregatesTripCount,
   }) = _VehicleProfile;
 
   factory VehicleProfile.fromJson(Map<String, dynamic> json) =>

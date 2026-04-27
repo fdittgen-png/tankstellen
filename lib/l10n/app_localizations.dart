@@ -7310,17 +7310,23 @@ abstract class AppLocalizations {
   /// **'No samples recorded'**
   String get trajetDetailChartEmpty;
 
-  /// AppBar action tooltip / snackbar label for copying the trip summary + sample CSV to the clipboard (#890).
+  /// AppBar action tooltip for the share-trip button on the Trip detail screen (#890, #1189).
   ///
   /// In en, this message translates to:
   /// **'Share'**
   String get trajetDetailShareAction;
 
-  /// Snackbar shown after the Share action has written the trip payload to the clipboard (#890).
+  /// Subject / preview text passed to the OS share sheet when the user shares a trip detail report as an image (#1189). The {date} placeholder is replaced with a localised short date.
   ///
   /// In en, this message translates to:
-  /// **'Copied to clipboard'**
-  String get trajetDetailShareCopied;
+  /// **'Tankstellen — trip on {date}'**
+  String trajetDetailShareSubject(String date);
+
+  /// Snackbar shown when the trip-detail Share action fails to render or hand off the report PNG (#1189).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t generate share image'**
+  String get trajetDetailShareError;
 
   /// AppBar action tooltip for the delete-trip button on the Trip detail screen (#890).
   ///

@@ -3933,7 +3933,12 @@ class AppLocalizationsEt extends AppLocalizations {
   String get trajetDetailShareAction => 'Share';
 
   @override
-  String get trajetDetailShareCopied => 'Copied to clipboard';
+  String trajetDetailShareSubject(String date) {
+    return 'Tankstellen — trip on $date';
+  }
+
+  @override
+  String get trajetDetailShareError => 'Couldn\'t generate share image';
 
   @override
   String get trajetDetailDeleteAction => 'Delete';

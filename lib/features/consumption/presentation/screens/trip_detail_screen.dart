@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -9,17 +9,24 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/trip_history_repository.dart';
+import '../../data/trip_share_renderer.dart';
 import '../../domain/trip_recorder.dart';
 import '../../providers/trip_history_provider.dart';
 import '../widgets/trip_detail_body.dart';
 import '../widgets/trip_detail_charts.dart';
-import '../widgets/trip_detail_share_payload.dart';
 
-// Re-export the visible-for-testing share payload builder so existing
-// importers (and tests) can keep using the screen file as the entry
-// point even though the implementation now lives in a sibling widget.
-export '../widgets/trip_detail_share_payload.dart'
-    show buildTripDetailSharePayload;
+/// Test-only override for the trip-detail Share renderer (#1189).
+///
+/// When set, the trip detail screen routes its Share action through
+/// this function instead of [shareTripAsImage]. Lets widget tests
+/// assert on the share invocation without driving the offscreen
+/// rasterisation pipeline (which the fake-async clock can't resolve).
+@visibleForTesting
+Future<void> Function({
+  required GlobalKey boundaryKey,
+  required String subject,
+  required String fileNameStem,
+})? debugTripDetailShareOverride;
 
 /// Trip detail screen (#890).
 ///
@@ -43,9 +50,11 @@ export '../widgets/trip_detail_share_payload.dart'
 ///      "No samples recorded" empty-state caption.
 ///
 /// ## AppBar actions
-/// * **Share** copies a JSON summary + CSV sample block to the
-///   clipboard so the user can paste it into a support ticket / diff
-///   tool without needing any backend.
+/// * **Share** rasterises the visible report (Summary card + Insights
+///   cards + charts) into a PNG via a [RepaintBoundary] and hands it
+///   to the OS share sheet through `share_plus` (#1189). The share
+///   intent carries a localised subject ("Tankstellen — trip on
+///   {date}") so messaging apps render a clean preview.
 /// * **Delete** confirms and then calls
 ///   [TripHistoryList.delete] before popping back to the Trajets tab.
 class TripDetailScreen extends ConsumerStatefulWidget {
@@ -74,6 +83,13 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   /// detail mounts, so a `setState` rebuild can't trigger a second
   /// decrement and over-clear the launcher counter.
   bool _badgeDecremented = false;
+
+  /// [GlobalKey] for the [RepaintBoundary] wrapping the report content
+  /// — passed down to [TripDetailBody] so the Share action (#1189) can
+  /// rasterise the report into a PNG.
+  final GlobalKey _shareBoundaryKey = GlobalKey(
+    debugLabel: 'trip_detail_share_boundary',
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -142,6 +158,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               vehicle: vehicle,
               samples: samples,
               isEv: isEv,
+              shareBoundaryKey: _shareBoundaryKey,
             ),
     );
   }
@@ -174,18 +191,33 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     TripHistoryEntry entry,
     VehicleProfile? vehicle,
   ) async {
-    final shareSamples = widget.samples.isNotEmpty
-        ? widget.samples
-        : entry.samples.map(_toDetailSample).toList(growable: false);
-    final payload = tripDetailSharePayload(
-      entry: entry,
-      vehicle: vehicle,
-      samples: shareSamples,
-    );
-    await Clipboard.setData(ClipboardData(text: payload));
-    if (!context.mounted) return;
-    final msg = l?.trajetDetailShareCopied ?? 'Copied to clipboard';
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    // Compose a friendly subject line so the OS share sheet (and the
+    // receiving app's preview) shows "Tankstellen — trip on <date>"
+    // instead of a bare filename.
+    final locale = Localizations.localeOf(context);
+    final shareDate = entry.summary.startedAt ?? DateTime.now();
+    final formattedDate =
+        DateFormat.yMMMd(locale.toString()).format(shareDate);
+    final subject = l?.trajetDetailShareSubject(formattedDate) ??
+        'Tankstellen — trip on $formattedDate';
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final renderer = debugTripDetailShareOverride ?? shareTripAsImage;
+    try {
+      await renderer(
+        boundaryKey: _shareBoundaryKey,
+        subject: subject,
+        fileNameStem: 'tankstellen_trip_${entry.id}',
+      );
+    } catch (e, st) {
+      // Surface the failure to the user instead of silently swallowing
+      // it — the snackbar tells them the share didn't go through, and
+      // the debugPrint keeps the cause in `flutter logs` for support.
+      debugPrint('TripDetailScreen share image: $e\n$st');
+      if (messenger == null) return;
+      final errorMsg = l?.trajetDetailShareError ??
+          "Couldn't generate share image";
+      messenger.showSnackBar(SnackBar(content: Text(errorMsg)));
+    }
   }
 
   Future<void> _onDelete(
