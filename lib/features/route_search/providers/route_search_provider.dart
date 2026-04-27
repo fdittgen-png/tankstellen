@@ -14,50 +14,16 @@ import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/search_result_item.dart';
 import '../../profile/providers/profile_provider.dart';
 import '../data/services/routing_service.dart';
-import '../data/strategies/uniform_search_strategy.dart';
-import '../data/strategies/cheapest_search_strategy.dart';
-import '../data/strategies/balanced_search_strategy.dart';
-import '../data/strategies/eco_route_search_strategy.dart';
 import '../domain/entities/route_info.dart';
+import '../domain/route_search_result.dart';
 import '../domain/route_search_strategy.dart';
+import '../domain/route_search_strategy_factory.dart';
+
+// Re-export so existing imports of route_search_provider.dart keep working.
+export '../domain/route_search_result.dart';
+export '../domain/route_search_strategy_factory.dart';
 
 part 'route_search_provider.g.dart';
-
-/// State for route-based search: the route itself + stations found along it.
-class RouteSearchResult {
-  final RouteInfo route;
-  final List<SearchResultItem> stations;
-  final String? cheapestId;
-
-  /// Maps segment index to the cheapest station ID within that segment.
-  /// Segments are computed based on [segmentKm] intervals along the route.
-  final Map<int, String>? cheapestPerSegment;
-
-  /// Which strategy was used for this search.
-  final RouteSearchStrategyType strategyType;
-
-  const RouteSearchResult({
-    required this.route,
-    required this.stations,
-    this.cheapestId,
-    this.cheapestPerSegment,
-    this.strategyType = RouteSearchStrategyType.uniform,
-  });
-}
-
-/// Factory to get the right strategy implementation.
-RouteSearchStrategy strategyFor(RouteSearchStrategyType type) {
-  switch (type) {
-    case RouteSearchStrategyType.uniform:
-      return UniformSearchStrategy();
-    case RouteSearchStrategyType.cheapest:
-      return CheapestSearchStrategy();
-    case RouteSearchStrategyType.balanced:
-      return BalancedSearchStrategy();
-    case RouteSearchStrategyType.eco:
-      return EcoRouteSearchStrategy();
-  }
-}
 
 /// Orchestrates "cheapest stations along my route" feature.
 ///
