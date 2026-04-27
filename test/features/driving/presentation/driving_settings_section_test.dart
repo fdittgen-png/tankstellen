@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
+import 'package:tankstellen/core/widgets/settings_menu_tile.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_settings_section.dart';
 
 import '../../../helpers/pump_app.dart';
@@ -82,6 +83,47 @@ void main() {
             'A persisted-true value must hydrate the toggle on first '
             'paint — otherwise the user would have to flip it twice on '
             'every cold start.',
+      );
+    },
+  );
+
+  testWidgets(
+    'composes vehicles + fuel-club tiles above the eco-coach toggle '
+    '(#1242 — Console grouping)',
+    (tester) async {
+      await pumpApp(
+        tester,
+        const DrivingSettingsSection(),
+        overrides: [
+          settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
+        ],
+      );
+
+      // Both moved-in tiles must render with their canonical keys.
+      expect(
+        find.byKey(const Key('consoleVehiclesTile')),
+        findsOneWidget,
+        reason: 'My vehicles tile is part of the Consumption group.',
+      );
+      expect(
+        find.byKey(const Key('consoleFuelClubCardsTile')),
+        findsOneWidget,
+        reason: 'Fuel club cards tile is part of the Consumption group.',
+      );
+
+      // The eco-coach toggle is the third element, after the two
+      // menu tiles.
+      final children = <Widget>[
+        for (final t in tester
+            .widgetList<SettingsMenuTile>(find.byType(SettingsMenuTile)))
+          t,
+      ];
+      expect(
+        children.length,
+        2,
+        reason: 'Exactly two SettingsMenuTile children: vehicles + fuel '
+            'club. Adding more would risk drift between this section '
+            'and the Conso-tab landing screen.',
       );
     },
   );

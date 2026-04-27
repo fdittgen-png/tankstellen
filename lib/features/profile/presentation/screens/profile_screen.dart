@@ -86,16 +86,6 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
 
-          // My vehicles
-          SettingsMenuTile(
-            icon: Icons.directions_car,
-            title: l?.vehiclesMenuTitle ?? 'My vehicles',
-            subtitle: l?.vehiclesMenuSubtitle ??
-                'Battery, connectors, charging preferences',
-            onTap: () => context.push('/vehicles'),
-          ),
-          const SizedBox(height: 8),
-
           // #896 — Consumption log menu tile removed. The consumption
           // screen is already a top-level destination on the bottom
           // navigation bar, so a duplicate menu entry here was
@@ -116,24 +106,15 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
 
-          // #1120 — loyalty / fuel-club cards entry point. Pilot
-          // ships with Total Energies; cards apply a per-litre
-          // discount to displayed prices on matching stations.
-          SettingsMenuTile(
-            icon: Icons.card_membership,
-            title: l?.loyaltyMenuTitle ?? 'Fuel club cards',
-            subtitle: l?.loyaltyMenuSubtitle ??
-                'Apply per-litre discounts from Total, Aral, Shell, …',
-            onTap: () => context.push('/loyalty-settings'),
-          ),
-          const SizedBox(height: 8),
-
-          // #1122 — driving (wheel-lens) settings. Foldable so the
-          // section stays out of the way for users who don't want to
-          // toggle the real-time eco-coaching haptic.
+          // Consumption-tab settings group: vehicles, fuel club cards,
+          // and the real-time eco-coaching toggle. Section title matches
+          // the bottom-nav "Conso" tab so users can correlate the two
+          // entry points (#1122 follow-up). The standalone "My vehicles"
+          // and "Fuel club cards" tiles were folded INTO this section
+          // so per-vehicle controls cluster under one heading.
           _FoldableSection(
-            icon: Icons.directions_car_filled,
-            title: l?.hapticEcoCoachSectionTitle ?? 'Driving',
+            icon: Icons.local_gas_station_outlined,
+            title: l?.navConsumption ?? 'Consumption',
             child: const DrivingSettingsSection(),
           ),
           const SizedBox(height: 8),
