@@ -1024,5 +1024,16 @@
   "serviceReminderDueTitle": "Entretien à effectuer",
   "serviceReminderDueBody": "{label} à effectuer — {kmOver} km au-delà de l'intervalle.",
   "vehiclesMenuTitle": "Mes véhicules",
-  "vehiclesMenuSubtitle": "Batterie, connecteurs, préférences de recharge"
+  "vehiclesMenuSubtitle": "Batterie, connecteurs, préférences de recharge",
+  "tripLengthCardTitle": "Consommation par longueur de trajet",
+  "tripLengthCardSubtitle": "Petits trajets à froid vs. longs voyages",
+  "tripLengthBucketShort": "Court",
+  "tripLengthBucketMedium": "Moyen",
+  "tripLengthBucketLong": "Long",
+  "tripLengthBucketRange": "{range}",
+  "tripLengthBucketSubtitle": "{count} trajets · {km} km",
+  "tripLengthNeedMoreData": "Au moins 5 trajets requis dans cette catégorie",
+  "tripLengthAvgUnit": "{value} L/100 km",
+  "tripLengthBelowAverageA11y": "{value} L pour 100 km, sous la moyenne",
+  "tripLengthAboveAverageA11y": "{value} L pour 100 km, au-dessus de la moyenne"
 }

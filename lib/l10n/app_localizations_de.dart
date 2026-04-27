@@ -3230,6 +3230,51 @@ class AppLocalizationsDe extends AppLocalizations {
   String get autoRecordBadgeClearTooltip => 'Zähler zurücksetzen';
 
   @override
+  String get tripLengthCardTitle => 'Verbrauch nach Streckenlänge';
+
+  @override
+  String get tripLengthCardSubtitle =>
+      'Kaltstart-Kurzstrecken vs. lange Fahrten';
+
+  @override
+  String get tripLengthBucketShort => 'Kurz';
+
+  @override
+  String get tripLengthBucketMedium => 'Mittel';
+
+  @override
+  String get tripLengthBucketLong => 'Lang';
+
+  @override
+  String tripLengthBucketRange(String range) {
+    return '$range';
+  }
+
+  @override
+  String tripLengthBucketSubtitle(String count, String km) {
+    return '$count Fahrten · $km km';
+  }
+
+  @override
+  String get tripLengthNeedMoreData =>
+      'Mindestens 5 Fahrten in dieser Klasse erforderlich';
+
+  @override
+  String tripLengthAvgUnit(String value) {
+    return '$value L/100 km';
+  }
+
+  @override
+  String tripLengthBelowAverageA11y(String value) {
+    return '$value L pro 100 km, unter dem Durchschnitt';
+  }
+
+  @override
+  String tripLengthAboveAverageA11y(String value) {
+    return '$value L pro 100 km, über dem Durchschnitt';
+  }
+
+  @override
   String get consumptionTabFuel => 'Kraftstoff';
 
   @override

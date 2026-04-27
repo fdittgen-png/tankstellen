@@ -6008,6 +6008,72 @@ abstract class AppLocalizations {
   /// **'Clear counter'**
   String get autoRecordBadgeClearTooltip;
 
+  /// Title of the trip-length consumption breakdown card on the Carbon dashboard's Charts tab (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption by trip length'**
+  String get tripLengthCardTitle;
+
+  /// Subtitle clarifying the cold-start lens of the trip-length consumption card (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'Cold-engine short hops vs. long voyages'**
+  String get tripLengthCardSubtitle;
+
+  /// Label for the < 5 km bucket on the trip-length consumption card (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'Short'**
+  String get tripLengthBucketShort;
+
+  /// Label for the 5–25 km bucket on the trip-length consumption card (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get tripLengthBucketMedium;
+
+  /// Label for the >= 25 km bucket on the trip-length consumption card (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'Long'**
+  String get tripLengthBucketLong;
+
+  /// Bucket distance-range hint, e.g. '< 5 km' or '5–25 km' or '>= 25 km' (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'{range}'**
+  String tripLengthBucketRange(String range);
+
+  /// Per-tile subtitle on the trip-length card showing trip count and total km in this bucket (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'{count} trips · {km} km'**
+  String tripLengthBucketSubtitle(String count, String km);
+
+  /// Placeholder shown for a single bucket that has fewer than 5 trips — statistically too thin to surface an average (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'Need at least 5 trips in this bucket'**
+  String get tripLengthNeedMoreData;
+
+  /// Avg consumption value formatted with the L/100 km unit on the trip-length card (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'{value} L/100 km'**
+  String tripLengthAvgUnit(String value);
+
+  /// Accessibility / semantic label for a bucket whose avg L/100 km is below the vehicle overall (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'{value} L per 100 km, below average'**
+  String tripLengthBelowAverageA11y(String value);
+
+  /// Accessibility / semantic label for a bucket whose avg L/100 km is above the vehicle overall (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'{value} L per 100 km, above average'**
+  String tripLengthAboveAverageA11y(String value);
+
   /// Label for the fuel fill-ups tab on the ConsumptionScreen (#582 phase 2).
   ///
   /// In en, this message translates to:

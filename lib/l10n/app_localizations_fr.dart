@@ -3230,6 +3230,51 @@ class AppLocalizationsFr extends AppLocalizations {
   String get autoRecordBadgeClearTooltip => 'Effacer le compteur';
 
   @override
+  String get tripLengthCardTitle => 'Consommation par longueur de trajet';
+
+  @override
+  String get tripLengthCardSubtitle =>
+      'Petits trajets à froid vs. longs voyages';
+
+  @override
+  String get tripLengthBucketShort => 'Court';
+
+  @override
+  String get tripLengthBucketMedium => 'Moyen';
+
+  @override
+  String get tripLengthBucketLong => 'Long';
+
+  @override
+  String tripLengthBucketRange(String range) {
+    return '$range';
+  }
+
+  @override
+  String tripLengthBucketSubtitle(String count, String km) {
+    return '$count trajets · $km km';
+  }
+
+  @override
+  String get tripLengthNeedMoreData =>
+      'Au moins 5 trajets requis dans cette catégorie';
+
+  @override
+  String tripLengthAvgUnit(String value) {
+    return '$value L/100 km';
+  }
+
+  @override
+  String tripLengthBelowAverageA11y(String value) {
+    return '$value L pour 100 km, sous la moyenne';
+  }
+
+  @override
+  String tripLengthAboveAverageA11y(String value) {
+    return '$value L pour 100 km, au-dessus de la moyenne';
+  }
+
+  @override
   String get consumptionTabFuel => 'Carburant';
 
   @override

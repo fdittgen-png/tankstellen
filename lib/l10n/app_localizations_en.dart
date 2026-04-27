@@ -3197,6 +3197,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String get autoRecordBadgeClearTooltip => 'Clear counter';
 
   @override
+  String get tripLengthCardTitle => 'Consumption by trip length';
+
+  @override
+  String get tripLengthCardSubtitle =>
+      'Cold-engine short hops vs. long voyages';
+
+  @override
+  String get tripLengthBucketShort => 'Short';
+
+  @override
+  String get tripLengthBucketMedium => 'Medium';
+
+  @override
+  String get tripLengthBucketLong => 'Long';
+
+  @override
+  String tripLengthBucketRange(String range) {
+    return '$range';
+  }
+
+  @override
+  String tripLengthBucketSubtitle(String count, String km) {
+    return '$count trips · $km km';
+  }
+
+  @override
+  String get tripLengthNeedMoreData => 'Need at least 5 trips in this bucket';
+
+  @override
+  String tripLengthAvgUnit(String value) {
+    return '$value L/100 km';
+  }
+
+  @override
+  String tripLengthBelowAverageA11y(String value) {
+    return '$value L per 100 km, below average';
+  }
+
+  @override
+  String tripLengthAboveAverageA11y(String value) {
+    return '$value L per 100 km, above average';
+  }
+
+  @override
   String get consumptionTabFuel => 'Fuel';
 
   @override

@@ -7,13 +7,17 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../consumption/domain/services/consumption_trip_length_aggregator.dart';
 import '../../../consumption/providers/consumption_providers.dart';
+import '../../../consumption/providers/trip_history_provider.dart';
 import '../../../profile/providers/gamification_enabled_provider.dart';
+import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../domain/milestone.dart';
 import '../../domain/monthly_summary.dart';
 import '../widgets/fuel_vs_ev_card.dart';
 import '../widgets/milestones_card.dart';
 import '../widgets/monthly_bar_chart.dart';
+import '../widgets/trip_length_breakdown_card.dart';
 
 /// Carbon dashboard: tabbed view of monthly charts (#180) and
 /// gamified achievements (#181). Data is derived entirely from the
@@ -116,7 +120,7 @@ class CarbonDashboardScreen extends ConsumerWidget {
   }
 }
 
-class _ChartsTab extends StatelessWidget {
+class _ChartsTab extends ConsumerWidget {
   final List<MonthlySummary> summaries;
   final double totalCost;
   final double totalCo2;
@@ -128,9 +132,22 @@ class _ChartsTab extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    // #1191 — trip-length consumption breakdown. The card is fed from
+    // [tripHistoryListProvider] (per-trip OBD2 recordings) filtered to
+    // the active vehicle so the cold-start lens reflects one car at a
+    // time. When no profile is active we pass null and the aggregator
+    // considers every trip — same fallback the rest of the dashboard
+    // uses for vehicle-agnostic rollups.
+    final trips = ref.watch(tripHistoryListProvider);
+    final activeVehicle = ref.watch(activeVehicleProfileProvider);
+    final breakdown = aggregateConsumptionByTripLength(
+      trips,
+      vehicleId: activeVehicle?.id,
+    );
+
     return ListView(
       padding: EdgeInsets.only(
         top: 16,
@@ -139,6 +156,11 @@ class _ChartsTab extends StatelessWidget {
       children: [
         _SummaryRow(totalCost: totalCost, totalCo2: totalCo2),
         const SizedBox(height: 8),
+        // #1191 — only render when at least one bucket has data; the
+        // card itself also defends but skipping construction here saves
+        // the parent from emitting a hidden ListView entry.
+        if (!breakdown.isEmpty)
+          TripLengthBreakdownCard(breakdown: breakdown),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: SectionCard(
