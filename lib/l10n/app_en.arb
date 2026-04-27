@@ -2377,6 +2377,14 @@
   "@veResetAction": {
     "description": "Action on the vehicle edit screen that discards the learned volumetric-efficiency calibration (#815)."
   },
+  "vehicleReadVinFromCarButton": "Read VIN from car",
+  "@vehicleReadVinFromCarButton": {
+    "description": "Outlined button on the vehicle edit screen that reads the VIN over OBD2 Mode 09 PID 02 from the paired adapter (#1162). Shown only when an adapter is paired."
+  },
+  "vehicleReadVinFailedSnackbar": "VIN not available — Mode 09 PID 02 unsupported on pre-2005 vehicles",
+  "@vehicleReadVinFailedSnackbar": {
+    "description": "Fallback snackbar shown when the OBD2 VIN read returns no VIN — typically because the car is too old to implement Mode 09 PID 02 (#1162)."
+  },
   "vinInfoTooltip": "What is a VIN?",
   "@vinInfoTooltip": {
     "description": "Tooltip + Semantics label for the info icon next to the VIN field on EditVehicleScreen (#895)."

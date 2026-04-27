@@ -1498,6 +1498,8 @@
   "vinConfirmAction": "Ja, automatisch ausfüllen",
   "vinModifyAction": "Manuell anpassen",
   "veResetAction": "Kalibrierung zurücksetzen",
+  "vehicleReadVinFromCarButton": "FIN aus Auto auslesen",
+  "vehicleReadVinFailedSnackbar": "FIN nicht verfügbar — Modus 09 PID 02 wird auf Fahrzeugen vor 2005 nicht unterstützt",
   "vinInfoTooltip": "Was ist eine FIN?",
   "vinInfoSectionWhatTitle": "Was ist eine FIN?",
   "vinInfoSectionWhatBody": "Die Fahrzeug-Identifizierungsnummer ist ein 17-stelliger Code, der Ihr Fahrzeug eindeutig kennzeichnet. Sie ist im Chassis eingeprägt und steht in Ihrem Fahrzeugschein.",

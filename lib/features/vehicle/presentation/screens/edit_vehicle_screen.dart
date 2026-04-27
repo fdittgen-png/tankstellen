@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/brand_logo_mapper.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../consumption/data/obd2/obd2_service.dart';
+import '../../../setup/providers/onboarding_obd2_connector.dart';
+import '../../data/obd2_vin_reader.dart';
 import '../../domain/entities/vehicle_profile.dart';
 import '../../domain/entities/vin_data.dart';
 import '../../providers/vehicle_providers.dart';
@@ -51,6 +54,12 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
 
   // True while the vPIC request is in flight → VIN field spinner.
   bool _decodingVin = false;
+
+  // True while the OBD2 Mode 09 PID 02 read is in flight (#1162) →
+  // disables the "Read VIN from car" button + shows a small spinner
+  // in its leading slot. Distinct from [_decodingVin] so a user
+  // mid-tap doesn't trigger both spinners at once.
+  bool _readingVinFromCar = false;
 
   @override
   void initState() {
@@ -165,6 +174,71 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
     if (outcome == VinConfirmOutcome.confirm) _applyDecodedVin(decoded);
   }
 
+  /// Auto-read the VIN from the paired OBD2 adapter (#1162). Opens
+  /// the existing adapter picker via [OnboardingObd2Connector.connect]
+  /// (the same scan→pick→connect sheet used by the onboarding step),
+  /// then issues Mode 09 PID 02 through [Obd2VinReader]. On success
+  /// the VIN is populated and the existing vPIC decoder is invoked
+  /// to pre-fill make/model/year/engine; on failure a localized
+  /// fallback snackbar tells the user to enter the VIN manually
+  /// (typical cause: pre-2005 ECUs that don't implement Mode 09).
+  ///
+  /// Hidden behind the `_adapterMac != null` check at the call site —
+  /// the button never appears unhooked.
+  Future<void> _readVinFromCar() async {
+    final l = AppLocalizations.of(context);
+    final connector = ref.read(onboardingObd2ConnectorProvider);
+    final readerFactory = ref.read(obd2VinReaderFactoryProvider);
+
+    setState(() => _readingVinFromCar = true);
+    Obd2Service? service;
+    String? vin;
+    try {
+      service = await connector.connect(context);
+      if (service != null) {
+        final reader = readerFactory(service);
+        vin = await reader.readVin();
+      }
+    } catch (e, st) {
+      debugPrint('EditVehicleScreen: read VIN from car failed: $e\n$st');
+      vin = null;
+    } finally {
+      // Disconnect the adapter so the picker can be re-opened later
+      // and so background polling isn't pinned to this screen. Best-
+      // effort — if the adapter is already gone we don't care.
+      if (service != null) {
+        try {
+          await service.disconnect();
+        } catch (e, st) {
+          debugPrint('EditVehicleScreen: VIN-read disconnect failed: $e\n$st');
+        }
+      }
+    }
+
+    if (!mounted) return;
+    setState(() => _readingVinFromCar = false);
+
+    if (vin == null || vin.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            l?.vehicleReadVinFailedSnackbar ??
+                'VIN not available — Mode 09 PID 02 unsupported on '
+                    'pre-2005 vehicles',
+          ),
+        ),
+      );
+      return;
+    }
+
+    // Populate the VIN field, then run the existing decoder to pre-
+    // fill engine fields. Reuse [_decodeVin] so the success path
+    // matches a manual paste-and-decode exactly — confirm dialog,
+    // outcome handling, and engine pre-fill are all already in place.
+    _ctrl.vinController.text = vin;
+    await _decodeVin();
+  }
+
   /// Copy non-null engine fields from [data] (#812 phase 2).
   /// Displacement: L → cc. Curb weight ≈ GVWR / 2.205 (vPIC has no
   /// payload field, so GVWR is the best proxy for now).
@@ -250,6 +324,13 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
               decodingVin: _decodingVin,
               onDecodeVin: _decodeVin,
               onShowVinInfo: _showVinInfo,
+              // Show the "Read VIN from car" button only when an
+              // adapter is paired to this profile (#1162). Hidden
+              // (callback null) prevents users without an adapter
+              // from seeing an affordance that wouldn't work.
+              onReadVinFromCar:
+                  _adapterMac != null ? _readVinFromCar : null,
+              readingVinFromCar: _readingVinFromCar,
             ),
             const SizedBox(height: 16),
             // Card 2: Drivetrain (type + type-specific fields).

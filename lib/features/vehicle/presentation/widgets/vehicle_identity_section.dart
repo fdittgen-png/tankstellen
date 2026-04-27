@@ -10,6 +10,13 @@ import '../../../../l10n/app_localizations.dart';
 /// controllers, focus node, and the callbacks for decode / info —
 /// this widget is intentionally dumb so all VIN-decoder state stays
 /// at the screen level where the provider already lives.
+///
+/// When the parent passes [onReadVinFromCar] (the profile has a paired
+/// OBD2 adapter), an outlined "Read VIN from car" button is rendered
+/// below the VIN field — tapping it triggers the Mode 09 PID 02 read
+/// in the parent (#1162). When the callback is null, the button is
+/// not rendered at all so users without an adapter never see an
+/// affordance that wouldn't work.
 class VehicleIdentitySection extends StatelessWidget {
   final TextEditingController nameController;
   final TextEditingController vinController;
@@ -18,6 +25,17 @@ class VehicleIdentitySection extends StatelessWidget {
   final bool decodingVin;
   final VoidCallback onDecodeVin;
   final VoidCallback onShowVinInfo;
+
+  /// Tap handler for the "Read VIN from car" button (#1162). When null,
+  /// the button is hidden — the parent gates this on
+  /// `obd2AdapterMac != null`, so the button only appears when there's
+  /// an adapter to read from.
+  final VoidCallback? onReadVinFromCar;
+
+  /// True while a VIN read is in flight (#1162). Disables the button
+  /// and shows a progress indicator in its place to prevent
+  /// double-taps while the adapter is responding.
+  final bool readingVinFromCar;
 
   const VehicleIdentitySection({
     super.key,
@@ -28,6 +46,8 @@ class VehicleIdentitySection extends StatelessWidget {
     required this.decodingVin,
     required this.onDecodeVin,
     required this.onShowVinInfo,
+    this.onReadVinFromCar,
+    this.readingVinFromCar = false,
   });
 
   @override
@@ -101,6 +121,35 @@ class VehicleIdentitySection extends StatelessWidget {
             ),
           ],
         ),
+        // "Read VIN from car" — outlined button rendered only when a
+        // paired adapter is available (#1162). Hidden entirely when
+        // [onReadVinFromCar] is null so users without an adapter
+        // never see an affordance that wouldn't work.
+        if (onReadVinFromCar != null) ...[
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.only(left: 56, right: 8),
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Tooltip(
+                message: l?.vehicleReadVinFromCarButton ?? 'Read VIN from car',
+                child: OutlinedButton.icon(
+                  onPressed: readingVinFromCar ? null : onReadVinFromCar,
+                  icon: readingVinFromCar
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.bluetooth_searching),
+                  label: Text(
+                    l?.vehicleReadVinFromCarButton ?? 'Read VIN from car',
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }

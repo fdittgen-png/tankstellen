@@ -3867,6 +3867,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get veResetAction => 'Reset calibration';
 
   @override
+  String get vehicleReadVinFromCarButton => 'Lire le VIN depuis la voiture';
+
+  @override
+  String get vehicleReadVinFailedSnackbar =>
+      'VIN non disponible — Mode 09 PID 02 non pris en charge sur les véhicules antérieurs à 2005';
+
+  @override
   String get vinInfoTooltip => 'What is a VIN?';
 
   @override

@@ -901,5 +901,7 @@
   "consumptionLogTitle": "Consommation",
   "consumptionTabFuel": "Carburant",
   "trajetsTabLabel": "Trajets",
-  "consumptionTabCharging": "Recharge"
+  "consumptionTabCharging": "Recharge",
+  "vehicleReadVinFromCarButton": "Lire le VIN depuis la voiture",
+  "vehicleReadVinFailedSnackbar": "VIN non disponible — Mode 09 PID 02 non pris en charge sur les véhicules antérieurs à 2005"
 }

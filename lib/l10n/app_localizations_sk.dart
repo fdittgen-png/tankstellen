@@ -3844,6 +3844,13 @@ class AppLocalizationsSk extends AppLocalizations {
   String get veResetAction => 'Reset calibration';
 
   @override
+  String get vehicleReadVinFromCarButton => 'Read VIN from car';
+
+  @override
+  String get vehicleReadVinFailedSnackbar =>
+      'VIN not available — Mode 09 PID 02 unsupported on pre-2005 vehicles';
+
+  @override
   String get vinInfoTooltip => 'What is a VIN?';
 
   @override

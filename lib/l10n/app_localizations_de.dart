@@ -3873,6 +3873,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get veResetAction => 'Kalibrierung zurücksetzen';
 
   @override
+  String get vehicleReadVinFromCarButton => 'FIN aus Auto auslesen';
+
+  @override
+  String get vehicleReadVinFailedSnackbar =>
+      'FIN nicht verfügbar — Modus 09 PID 02 wird auf Fahrzeugen vor 2005 nicht unterstützt';
+
+  @override
   String get vinInfoTooltip => 'Was ist eine FIN?';
 
   @override
