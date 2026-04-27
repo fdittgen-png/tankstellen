@@ -144,9 +144,24 @@ class TripHistoryRepository {
   final Box<String> _box;
   final int cap;
 
+  /// Optional hook fired after a successful [save] when the saved
+  /// entry's `vehicleId` is non-null (#1193 phase 2). Production wires
+  /// this from `app_initializer.dart` to dispatch a vehicle-aggregate
+  /// recompute via [VehicleAggregateUpdater]; tests inject a fake to
+  /// observe the call.
+  ///
+  /// IMPORTANT — the hook MUST NOT throw. It's invoked synchronously
+  /// from inside [save] and any throw is caught and logged via
+  /// `errorLogger.log(ErrorLayer.background, ...)` so the save flow is
+  /// never derailed by an aggregator failure. The hook itself should
+  /// fire-and-forget any async work it kicks off (use `unawaited(...)`
+  /// at the call site).
+  void Function(String vehicleId)? onSavedHook;
+
   TripHistoryRepository({
     required Box<String> box,
     this.cap = 100,
+    this.onSavedHook,
   }) : _box = box;
 
   /// Box name used by the production wiring.
@@ -163,6 +178,21 @@ class TripHistoryRepository {
       return;
     }
     await _trim();
+
+    // Fire the post-save hook for vehicle-attributed trips. Wrapped in
+    // a try/catch because the hook is user code (production: an
+    // aggregator dispatch) and a failure there must not propagate up
+    // into the trip-save flow — the trip already persisted. The hook
+    // is responsible for fire-and-forget on its own async work.
+    final vehicleId = entry.vehicleId;
+    final hook = onSavedHook;
+    if (vehicleId != null && hook != null) {
+      try {
+        hook(vehicleId);
+      } catch (e, st) {
+        debugPrint('TripHistoryRepository.save onSavedHook: $e\n$st');
+      }
+    }
   }
 
   /// Return every persisted trip, sorted newest-first. Corrupt
