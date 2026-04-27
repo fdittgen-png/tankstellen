@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/sync/sync_config.dart';
 import '../../../../core/sync/sync_provider.dart';
+import '../../data/auth_error_mapper.dart';
 import '../../providers/sync_setup_provider.dart';
 import '../widgets/auth_form_widget.dart';
 import '../widgets/qr_scanner_screen.dart';
@@ -106,7 +107,9 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
       await Future<void>.delayed(const Duration(milliseconds: 1500));
       if (mounted) Navigator.pop(context);
     } catch (e, st) { // ignore: unused_catch_stack
-      if (mounted) ctrl.setError(e.toString());
+      if (mounted) {
+        ctrl.setError(friendlyAuthError(e, AppLocalizations.of(context)));
+      }
     }
   }
 
