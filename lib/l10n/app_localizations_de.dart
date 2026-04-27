@@ -3946,6 +3946,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trajetsResumeRecordingButton => 'Aufzeichnung fortsetzen';
 
   @override
+  String get tripStartProgressConnectingAdapter => 'Verbinde mit OBD2-Adapter…';
+
+  @override
+  String get tripStartProgressReadingVehicleData =>
+      'Fahrzeugdaten werden gelesen…';
+
+  @override
+  String get tripStartProgressStartingRecording =>
+      'Aufzeichnung wird gestartet…';
+
+  @override
   String get trajetsEmptyStateTitle => 'Noch keine Fahrten';
 
   @override
