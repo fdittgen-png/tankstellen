@@ -1,0 +1,8 @@
+{
+  "consumptionMonthlyInsightsTitle": "Dieser Monat vs. letzter Monat",
+  "consumptionMonthlyTripsLabel": "Fahrten",
+  "consumptionMonthlyDriveTimeLabel": "Fahrzeit",
+  "consumptionMonthlyDistanceLabel": "Strecke",
+  "consumptionMonthlyAvgConsumptionLabel": "Ø Verbrauch",
+  "consumptionMonthlyComparisonNotReliable": "Mindestens 3 Fahrten pro Monat für den Vergleich nötig"
+}

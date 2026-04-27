@@ -3576,6 +3576,25 @@ class AppLocalizationsSv extends AppLocalizations {
   String get maintenanceActionSnooze => 'Snooze 30 days';
 
   @override
+  String get consumptionMonthlyInsightsTitle => 'This month vs last month';
+
+  @override
+  String get consumptionMonthlyTripsLabel => 'Trips';
+
+  @override
+  String get consumptionMonthlyDriveTimeLabel => 'Drive time';
+
+  @override
+  String get consumptionMonthlyDistanceLabel => 'Distance';
+
+  @override
+  String get consumptionMonthlyAvgConsumptionLabel => 'Avg consumption';
+
+  @override
+  String get consumptionMonthlyComparisonNotReliable =>
+      'Need at least 3 trips per month for comparison';
+
+  @override
   String get onboardingObd2StepTitle => 'Connect your OBD2 adapter';
 
   @override

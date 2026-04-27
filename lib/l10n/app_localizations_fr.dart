@@ -3601,6 +3601,26 @@ class AppLocalizationsFr extends AppLocalizations {
   String get maintenanceActionSnooze => 'Snooze 30 days';
 
   @override
+  String get consumptionMonthlyInsightsTitle =>
+      'Ce mois-ci vs. le mois dernier';
+
+  @override
+  String get consumptionMonthlyTripsLabel => 'Trajets';
+
+  @override
+  String get consumptionMonthlyDriveTimeLabel => 'Temps de conduite';
+
+  @override
+  String get consumptionMonthlyDistanceLabel => 'Distance';
+
+  @override
+  String get consumptionMonthlyAvgConsumptionLabel => 'Conso. moyenne';
+
+  @override
+  String get consumptionMonthlyComparisonNotReliable =>
+      'Au moins 3 trajets par mois sont nécessaires pour la comparaison';
+
+  @override
   String get onboardingObd2StepTitle => 'Connecter votre adaptateur OBD2';
 
   @override
@@ -3867,19 +3887,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get veResetAction => 'Reset calibration';
 
   @override
-  String get vehicleReadVinFromCarButton => 'Lire le VIN depuis la voiture';
+  String get vehicleReadVinFromCarButton => 'Read VIN from car';
 
   @override
   String get vehicleReadVinFromCarTooltip =>
-      'Lire le VIN depuis l\'adaptateur OBD2 couplé';
+      'Read VIN from the paired OBD2 adapter';
 
   @override
   String get vehicleReadVinFailedUnsupportedSnackbar =>
-      'VIN indisponible (Mode 09 PID 02 non pris en charge sur les véhicules d\'avant 2005)';
+      'VIN not available (Mode 09 PID 02 unsupported on pre-2005 vehicles)';
 
   @override
   String get vehicleReadVinFailedGenericSnackbar =>
-      'Lecture du VIN échouée — veuillez saisir manuellement';
+      'VIN read failed — please enter manually';
 
   @override
   String get vinInfoTooltip => 'What is a VIN?';
