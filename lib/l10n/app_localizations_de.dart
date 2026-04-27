@@ -3152,6 +3152,27 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get achievementSmoothDriver => 'Ruhige Serie';
+
+  @override
+  String get achievementSmoothDriverDesc =>
+      'Fahre 5 Fahrten in Folge mit einem Fahrstil-Score von 80 oder höher.';
+
+  @override
+  String get achievementColdStartAware => 'Kaltstart-Profi';
+
+  @override
+  String get achievementColdStartAwareDesc =>
+      'Halte den Kaltstart-Mehrverbrauch eines ganzen Monats unter 2 % des Gesamtverbrauchs – fasse kurze Fahrten zusammen.';
+
+  @override
+  String get achievementHighwayMaster => 'Autobahn-Meister';
+
+  @override
+  String get achievementHighwayMasterDesc =>
+      'Fahre eine Tour von mindestens 30 km mit gleichmäßigem Tempo und einem Fahrstil-Score von 90 oder höher.';
+
+  @override
   String get autoRecordSectionTitle => 'Automatische Aufzeichnung';
 
   @override

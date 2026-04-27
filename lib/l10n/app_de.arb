@@ -1238,6 +1238,30 @@
   "obd2ConnectedTooltip": "OBD2 verbunden: {adapterName}",
   "velocityAlertTitle": "{fuelLabel} an Tankstellen in der Nähe gefallen",
   "velocityAlertBody": "{stationCount} Tankstellen um bis zu {maxDropCents}¢ in der letzten Stunde gefallen",
+  "achievementSmoothDriver": "Ruhige Serie",
+  "@achievementSmoothDriver": {
+    "description": "Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5)."
+  },
+  "achievementSmoothDriverDesc": "Fahre 5 Fahrten in Folge mit einem Fahrstil-Score von 80 oder höher.",
+  "@achievementSmoothDriverDesc": {
+    "description": "Tooltip for the smoothDriver badge (#1041 phase 5)."
+  },
+  "achievementColdStartAware": "Kaltstart-Profi",
+  "@achievementColdStartAware": {
+    "description": "Title of the coldStartAware badge — whole month with cold-start excess <2% of total fuel (#1041 phase 5)."
+  },
+  "achievementColdStartAwareDesc": "Halte den Kaltstart-Mehrverbrauch eines ganzen Monats unter 2 % des Gesamtverbrauchs – fasse kurze Fahrten zusammen.",
+  "@achievementColdStartAwareDesc": {
+    "description": "Tooltip for the coldStartAware badge (#1041 phase 5)."
+  },
+  "achievementHighwayMaster": "Autobahn-Meister",
+  "@achievementHighwayMaster": {
+    "description": "Title of the highwayMaster badge — single 30km+ trip at consistent speed with driving-score >= 90 (#1041 phase 5)."
+  },
+  "achievementHighwayMasterDesc": "Fahre eine Tour von mindestens 30 km mit gleichmäßigem Tempo und einem Fahrstil-Score von 90 oder höher.",
+  "@achievementHighwayMasterDesc": {
+    "description": "Tooltip for the highwayMaster badge (#1041 phase 5)."
+  },
   "autoRecordSectionTitle": "Automatische Aufzeichnung",
   "autoRecordToggleLabel": "Fahrten automatisch aufzeichnen",
   "autoRecordPhaseStatusBanner": "Die automatische Aufzeichnung wird schrittweise eingeführt. Das Aktivieren speichert deine Einstellung, aber der Hintergrundablauf ist noch in Entwicklung — Fahrten werden noch nicht automatisch erfasst.",

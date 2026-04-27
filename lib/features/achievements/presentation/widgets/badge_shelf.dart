@@ -136,6 +136,21 @@ class _BadgeTile extends StatelessWidget {
           Icons.savings,
           l?.achievementPriceWin ?? 'Price win',
         );
+      case AchievementId.smoothDriver:
+        return (
+          Icons.timeline,
+          l?.achievementSmoothDriver ?? 'Smooth streak',
+        );
+      case AchievementId.coldStartAware:
+        return (
+          Icons.ac_unit,
+          l?.achievementColdStartAware ?? 'Cold-start aware',
+        );
+      case AchievementId.highwayMaster:
+        return (
+          Icons.straight,
+          l?.achievementHighwayMaster ?? 'Highway master',
+        );
     }
   }
 
@@ -159,6 +174,15 @@ class _BadgeTile extends StatelessWidget {
       case AchievementId.priceWin:
         return l?.achievementPriceWinDesc ??
             'Log a fill-up that beats the station\'s 30-day average by 5 % or more.';
+      case AchievementId.smoothDriver:
+        return l?.achievementSmoothDriverDesc ??
+            'Drive 5 trips in a row with a smooth-driving score of 80 or higher.';
+      case AchievementId.coldStartAware:
+        return l?.achievementColdStartAwareDesc ??
+            'Keep a whole month\'s cold-start fuel cost under 2 % of total fuel — combine short trips.';
+      case AchievementId.highwayMaster:
+        return l?.achievementHighwayMasterDesc ??
+            'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.';
     }
   }
 }

@@ -1,0 +1,26 @@
+{
+  "achievementSmoothDriver": "Smooth streak",
+  "@achievementSmoothDriver": {
+    "description": "Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5)."
+  },
+  "achievementSmoothDriverDesc": "Drive 5 trips in a row with a smooth-driving score of 80 or higher.",
+  "@achievementSmoothDriverDesc": {
+    "description": "Tooltip for the smoothDriver badge (#1041 phase 5)."
+  },
+  "achievementColdStartAware": "Cold-start aware",
+  "@achievementColdStartAware": {
+    "description": "Title of the coldStartAware badge — whole month with cold-start excess <2% of total fuel (#1041 phase 5)."
+  },
+  "achievementColdStartAwareDesc": "Keep a whole month's cold-start fuel cost under 2 % of total fuel — combine short trips.",
+  "@achievementColdStartAwareDesc": {
+    "description": "Tooltip for the coldStartAware badge (#1041 phase 5)."
+  },
+  "achievementHighwayMaster": "Highway master",
+  "@achievementHighwayMaster": {
+    "description": "Title of the highwayMaster badge — single 30km+ trip at consistent speed with driving-score >= 90 (#1041 phase 5)."
+  },
+  "achievementHighwayMasterDesc": "Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.",
+  "@achievementHighwayMasterDesc": {
+    "description": "Tooltip for the highwayMaster badge (#1041 phase 5)."
+  }
+}

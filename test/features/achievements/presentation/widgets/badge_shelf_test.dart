@@ -47,7 +47,7 @@ void main() {
 
   group('BadgeShelf — non-empty state', () {
     testWidgets(
-      'renders Card + 6 tiles + count "1/6" when one badge earned',
+      'renders Card + 9 tiles + count "1/9" when one badge earned',
       (tester) async {
         await pumpApp(
           tester,
@@ -62,18 +62,32 @@ void main() {
         expect(find.byType(Card), findsOneWidget);
         // Title + count.
         expect(find.text('Achievements'), findsOneWidget);
-        expect(find.text('1/6'), findsOneWidget);
-        // All six labels are rendered (one per AchievementId).
+        expect(find.text('1/9'), findsOneWidget);
+        // The first tiles are rendered eagerly. Tiles toward the
+        // right of the horizontal ListView may sit just past the
+        // 800 px test viewport; scroll to materialise them before
+        // asserting.
         expect(find.text('First trip'), findsOneWidget);
         expect(find.text('First fill-up'), findsOneWidget);
         expect(find.text('10 trips'), findsOneWidget);
         expect(find.text('Smooth driver'), findsOneWidget);
         expect(find.text('Eco week'), findsOneWidget);
         expect(find.text('Price win'), findsOneWidget);
+        // #1041 phase 5 — three additional badges. Highway master
+        // renders past the 800 px viewport, so scroll the shelf to
+        // bring it on-screen before asserting.
+        await tester.scrollUntilVisible(
+          find.text('Highway master'),
+          80,
+          scrollable: find.byType(Scrollable).first,
+        );
+        expect(find.text('Smooth streak'), findsOneWidget);
+        expect(find.text('Cold-start aware'), findsOneWidget);
+        expect(find.text('Highway master'), findsOneWidget);
       },
     );
 
-    testWidgets('count text reads "3/6" when three badges earned',
+    testWidgets('count text reads "3/9" when three badges earned',
         (tester) async {
       await pumpApp(
         tester,
@@ -87,10 +101,10 @@ void main() {
         ],
       );
 
-      expect(find.text('3/6'), findsOneWidget);
+      expect(find.text('3/9'), findsOneWidget);
     });
 
-    testWidgets('count text reads "6/6" when all badges earned',
+    testWidgets('count text reads "9/9" when all badges earned',
         (tester) async {
       await pumpApp(
         tester,
@@ -102,7 +116,7 @@ void main() {
         ],
       );
 
-      expect(find.text('6/6'), findsOneWidget);
+      expect(find.text('9/9'), findsOneWidget);
     });
   });
 
@@ -183,8 +197,16 @@ void main() {
         ],
       );
 
-      // One Tooltip per `_BadgeTile` — six in total.
-      expect(find.byType(Tooltip), findsNWidgets(6));
+      // One Tooltip per `_BadgeTile` — nine in total (#1041 phase 5
+      // bumped the badge count from 6 to 9). The horizontal
+      // ListView lazily builds tiles past the viewport, so scroll
+      // to the rightmost tile to materialise every tooltip first.
+      await tester.scrollUntilVisible(
+        find.text('Highway master'),
+        80,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.byType(Tooltip), findsNWidgets(9));
 
       // Sample one description string to confirm tooltip messages are
       // wired through the l10n fallback.

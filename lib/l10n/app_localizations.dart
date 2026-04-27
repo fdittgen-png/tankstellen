@@ -5876,6 +5876,42 @@ abstract class AppLocalizations {
   /// **'{stationCount} stations dropped by up to {maxDropCents}¢ in the last hour'**
   String velocityAlertBody(int stationCount, int maxDropCents);
 
+  /// Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5).
+  ///
+  /// In en, this message translates to:
+  /// **'Smooth streak'**
+  String get achievementSmoothDriver;
+
+  /// Tooltip for the smoothDriver badge (#1041 phase 5).
+  ///
+  /// In en, this message translates to:
+  /// **'Drive 5 trips in a row with a smooth-driving score of 80 or higher.'**
+  String get achievementSmoothDriverDesc;
+
+  /// Title of the coldStartAware badge — whole month with cold-start excess <2% of total fuel (#1041 phase 5).
+  ///
+  /// In en, this message translates to:
+  /// **'Cold-start aware'**
+  String get achievementColdStartAware;
+
+  /// Tooltip for the coldStartAware badge (#1041 phase 5).
+  ///
+  /// In en, this message translates to:
+  /// **'Keep a whole month\'s cold-start fuel cost under 2 % of total fuel — combine short trips.'**
+  String get achievementColdStartAwareDesc;
+
+  /// Title of the highwayMaster badge — single 30km+ trip at consistent speed with driving-score >= 90 (#1041 phase 5).
+  ///
+  /// In en, this message translates to:
+  /// **'Highway master'**
+  String get achievementHighwayMaster;
+
+  /// Tooltip for the highwayMaster badge (#1041 phase 5).
+  ///
+  /// In en, this message translates to:
+  /// **'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.'**
+  String get achievementHighwayMasterDesc;
+
   /// Title of the per-vehicle auto-record configuration section on the edit-vehicle screen (#1004 phase 6).
   ///
   /// In en, this message translates to:

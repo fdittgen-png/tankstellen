@@ -3129,6 +3129,27 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String get achievementSmoothDriver => 'Smooth streak';
+
+  @override
+  String get achievementSmoothDriverDesc =>
+      'Drive 5 trips in a row with a smooth-driving score of 80 or higher.';
+
+  @override
+  String get achievementColdStartAware => 'Cold-start aware';
+
+  @override
+  String get achievementColdStartAwareDesc =>
+      'Keep a whole month\'s cold-start fuel cost under 2 % of total fuel — combine short trips.';
+
+  @override
+  String get achievementHighwayMaster => 'Highway master';
+
+  @override
+  String get achievementHighwayMasterDesc =>
+      'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.';
+
+  @override
   String get autoRecordSectionTitle => 'Auto-record';
 
   @override
