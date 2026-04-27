@@ -945,6 +945,13 @@
   "situationHardAccel": "Hard accel",
   "situationFuelCut": "Fuel cut — coast",
   "tripSaveAsFillUp": "Save as fill-up",
+  "@tripSaveAsFillUp": {
+    "description": "DEPRECATED (#1185): replaced by tripSaveRecording. Retained for parity with non-EN locales until the orphan-key sweep lands."
+  },
+  "tripSaveRecording": "Save trip",
+  "@tripSaveRecording": {
+    "description": "Trip-summary CTA: persists a TripHistoryEntry only — no fill-up created. (#1185)"
+  },
   "tripDiscard": "Discard",
   "obdOdometerRead": "Odometer read: {km} km",
   "@obdOdometerRead": {

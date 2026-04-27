@@ -2133,6 +2133,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripSaveAsFillUp => 'Als Tankfüllung speichern';
 
   @override
+  String get tripSaveRecording => 'Fahrt speichern';
+
+  @override
   String get tripDiscard => 'Verwerfen';
 
   @override

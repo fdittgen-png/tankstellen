@@ -2131,6 +2131,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tripSaveAsFillUp => 'Enregistrer comme plein';
 
   @override
+  String get tripSaveRecording => 'Enregistrer le trajet';
+
+  @override
   String get tripDiscard => 'Abandonner';
 
   @override

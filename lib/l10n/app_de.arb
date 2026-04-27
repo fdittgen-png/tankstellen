@@ -892,6 +892,7 @@
   "situationHardAccel": "Harte Beschl.",
   "situationFuelCut": "Schubabschaltung",
   "tripSaveAsFillUp": "Als Tankfüllung speichern",
+  "tripSaveRecording": "Fahrt speichern",
   "tripDiscard": "Verwerfen",
   "obdOdometerRead": "Kilometerstand gelesen: {km} km",
   "@obdOdometerRead": {

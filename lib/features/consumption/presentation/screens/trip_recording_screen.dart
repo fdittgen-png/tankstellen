@@ -11,16 +11,24 @@ import '../../domain/trip_recorder.dart';
 import '../../providers/trip_recording_provider.dart';
 import '../../providers/wakelock_facade.dart';
 
-/// Result returned when the user saves a recorded trip as a fill-up
-/// (#726). Null means the user cancelled or discarded.
+/// Result returned when the user confirms saving a recorded trip
+/// from the summary screen (#726, #1185).
+///
+/// The trip itself is already persisted to [TripHistoryRepository] by
+/// the time the summary screen renders — `TripRecording.stop()` writes
+/// the [TripHistoryEntry] before this screen flips to the summary
+/// view. The id is exposed here so the caller can refresh its trip
+/// list / scroll to the new row, but the save action itself NEVER
+/// creates a fill-up. Null means the user cancelled or discarded.
 class TripSaveResult {
-  final double? odometerKm;
-  final double? litersConsumed;
+  /// Id of the persisted [TripHistoryEntry] for this trip. Matches
+  /// the id used by [TripHistoryRepository.save] (ISO start timestamp
+  /// when available, otherwise the save-time fallback).
+  final String entryId;
   final TripSummary summary;
 
   const TripSaveResult({
-    required this.odometerKm,
-    required this.litersConsumed,
+    required this.entryId,
     required this.summary,
   });
 }
@@ -133,12 +141,22 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
   }
 
   void _onSave() {
+    // #1185 — the trip is ALREADY persisted to the rolling
+    // [TripHistoryRepository] by `TripRecording.stop()` before this
+    // summary screen renders, so this handler is a confirm-and-pop
+    // affordance, not a write site. We DELIBERATELY do not push
+    // `AddFillUpScreen` from here: a trip is a consumption record,
+    // a fill-up is a refuel event at a pump — the two must not be
+    // conflated (see issue #1185 for the wrong-semantics report).
     final r = _stopped!;
+    // Match the id derivation in `TripRecording._saveToHistory` so
+    // the popped id resolves to the entry that was just written.
+    final entryId = r.summary.startedAt?.toIso8601String() ??
+        DateTime.now().toIso8601String();
     ref.read(tripRecordingProvider.notifier).reset();
     Navigator.of(context).pop(
       TripSaveResult(
-        odometerKm: r.endOdometerKm,
-        litersConsumed: r.summary.fuelLitersConsumed,
+        entryId: entryId,
         summary: r.summary,
       ),
     );
@@ -328,7 +346,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
           key: const Key('tripSaveButton'),
           onPressed: _onSave,
           icon: const Icon(Icons.save),
-          label: Text(l?.tripSaveAsFillUp ?? 'Save as fill-up'),
+          label: Text(l?.tripSaveRecording ?? 'Save trip'),
         ),
         const SizedBox(height: 8),
         TextButton(

@@ -2119,6 +2119,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get tripSaveAsFillUp => 'Save as fill-up';
 
   @override
+  String get tripSaveRecording => 'Save trip';
+
+  @override
   String get tripDiscard => 'Discard';
 
   @override
