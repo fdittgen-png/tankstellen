@@ -133,8 +133,10 @@ class AutoRecordForegroundService : Service() {
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                // Android 10+ accepts the foregroundServiceType variant.
-                @Suppress("DEPRECATION")
+                // Android 10+ accepts the foregroundServiceType variant
+                // — required on Android 14+ so the OS knows we are the
+                // connectedDevice flavour and can size the timeout
+                // window accordingly.
                 startForeground(
                     NOTIFICATION_ID,
                     notification,
