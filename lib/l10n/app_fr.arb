@@ -902,8 +902,10 @@
   "consumptionTabFuel": "Carburant",
   "trajetsTabLabel": "Trajets",
   "consumptionTabCharging": "Recharge",
-  "vehicleReadVinFromCarButton": "Lire le VIN depuis la voiture",
-  "vehicleReadVinFromCarTooltip": "Lire le VIN depuis l'adaptateur OBD2 couplé",
-  "vehicleReadVinFailedUnsupportedSnackbar": "VIN indisponible (Mode 09 PID 02 non pris en charge sur les véhicules d'avant 2005)",
-  "vehicleReadVinFailedGenericSnackbar": "Lecture du VIN échouée — veuillez saisir manuellement"
+  "consumptionMonthlyInsightsTitle": "Ce mois-ci vs. le mois dernier",
+  "consumptionMonthlyTripsLabel": "Trajets",
+  "consumptionMonthlyDriveTimeLabel": "Temps de conduite",
+  "consumptionMonthlyDistanceLabel": "Distance",
+  "consumptionMonthlyAvgConsumptionLabel": "Conso. moyenne",
+  "consumptionMonthlyComparisonNotReliable": "Au moins 3 trajets par mois sont nécessaires pour la comparaison"
 }

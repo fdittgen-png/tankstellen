@@ -3607,6 +3607,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String get maintenanceActionSnooze => '30 Tage stumm';
 
   @override
+  String get consumptionMonthlyInsightsTitle =>
+      'Dieser Monat vs. letzter Monat';
+
+  @override
+  String get consumptionMonthlyTripsLabel => 'Fahrten';
+
+  @override
+  String get consumptionMonthlyDriveTimeLabel => 'Fahrzeit';
+
+  @override
+  String get consumptionMonthlyDistanceLabel => 'Strecke';
+
+  @override
+  String get consumptionMonthlyAvgConsumptionLabel => 'Ø Verbrauch';
+
+  @override
+  String get consumptionMonthlyComparisonNotReliable =>
+      'Mindestens 3 Fahrten pro Monat für den Vergleich nötig';
+
+  @override
   String get onboardingObd2StepTitle => 'OBD2-Adapter verbinden';
 
   @override

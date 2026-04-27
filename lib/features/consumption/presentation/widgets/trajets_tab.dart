@@ -9,10 +9,12 @@ import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/obd2/obd2_connection_errors.dart';
 import '../../data/trip_history_repository.dart';
+import '../../domain/services/monthly_insights_aggregator.dart';
 import '../../providers/trip_history_provider.dart';
 import '../../providers/trip_recording_provider.dart';
 import '../screens/trip_recording_screen.dart';
 import 'maintenance_suggestion_card.dart';
+import 'monthly_insights_card.dart';
 import 'obd2_adapter_picker.dart';
 
 /// Trajets tab body on the Consumption screen (#889).
@@ -139,10 +141,21 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
       );
     }
 
+    // Aggregate the (already vehicle-filtered) trips into the
+    // monthly-insights summary. Aggregator is pure + cheap; running it
+    // on every rebuild keeps the card in lock-step with the visible
+    // trip list (vehicle filter changes flow through automatically).
+    final monthlySummary = aggregateMonthlyInsights(filtered, DateTime.now());
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         header,
+        // "This month vs last month" aggregates (#1041 phase 4).
+        // Hidden in the zero-trip branch above — by the time we reach
+        // here `filtered` is non-empty, so the card always carries at
+        // least one current/previous month bucket.
+        MonthlyInsightsCard(summary: monthlySummary),
         // Predictive-maintenance suggestion list (#1124). Renders zero
         // or more cards above the trip list — empty by default, only
         // appears when one of the trend heuristics fires AND the

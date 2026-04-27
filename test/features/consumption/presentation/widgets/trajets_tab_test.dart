@@ -193,6 +193,49 @@ void main() {
       );
       // ListView is the populated branch — must not render here.
       expect(find.byKey(const Key('trajets_list')), findsNothing);
+      // Phase-4 monthly card is gated behind "trips exist" — empty
+      // state shows the CTA only, not the card.
+      expect(
+        find.byKey(const ValueKey('monthly_insights_card')),
+        findsNothing,
+      );
+    });
+  });
+
+  group('TrajetsTab — monthly insights card slot (#1041 phase 4)', () {
+    testWidgets('renders the card above the trip list when trips exist',
+        (tester) async {
+      tester.view.physicalSize = const Size(900, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final trips = [
+        _entry(
+          id: 'trip-x',
+          vehicleId: 'v1',
+          startedAt: DateTime(2026, 4, 22, 9),
+          endedAt: DateTime(2026, 4, 22, 9, 30),
+          distanceKm: 12.0,
+        ),
+      ];
+
+      await _pumpTab(
+        tester,
+        vehicleId: null,
+        trips: trips,
+        vehicles: [combustionVehicle],
+        activeVehicle: combustionVehicle,
+      );
+
+      expect(
+        find.byKey(const ValueKey('monthly_insights_card')),
+        findsOneWidget,
+      );
+      // The card carries the localized title — confirms wiring
+      // through `aggregateMonthlyInsights` produced a renderable
+      // summary, not a crashed widget that bailed before the title.
+      expect(find.text('This month vs last month'), findsOneWidget);
     });
   });
 

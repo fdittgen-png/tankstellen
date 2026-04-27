@@ -6674,6 +6674,42 @@ abstract class AppLocalizations {
   /// **'Snooze 30 days'**
   String get maintenanceActionSnooze;
 
+  /// Title of the monthly-insights card on the Trajets tab landing screen — aggregates all trips into a current-vs-previous-month comparison (#1041 phase 4).
+  ///
+  /// In en, this message translates to:
+  /// **'This month vs last month'**
+  String get consumptionMonthlyInsightsTitle;
+
+  /// Row label on the monthly-insights card for trip count (#1041 phase 4).
+  ///
+  /// In en, this message translates to:
+  /// **'Trips'**
+  String get consumptionMonthlyTripsLabel;
+
+  /// Row label on the monthly-insights card for total drive time across the month (#1041 phase 4).
+  ///
+  /// In en, this message translates to:
+  /// **'Drive time'**
+  String get consumptionMonthlyDriveTimeLabel;
+
+  /// Row label on the monthly-insights card for total distance across the month (#1041 phase 4).
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get consumptionMonthlyDistanceLabel;
+
+  /// Row label on the monthly-insights card for average L/100 km across the month (#1041 phase 4). Only rendered when both months recorded fuel-rate samples.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg consumption'**
+  String get consumptionMonthlyAvgConsumptionLabel;
+
+  /// Caption shown on the monthly-insights card when one or both months has fewer than 3 trips. The card still shows the current-month numbers but skips the previous-month column and the delta arrows (#1041 phase 4).
+  ///
+  /// In en, this message translates to:
+  /// **'Need at least 3 trips per month for comparison'**
+  String get consumptionMonthlyComparisonNotReliable;
+
   /// Title of the optional onboarding step (#816) that offers to connect an OBD2 adapter, read the VIN, and auto-fill the vehicle profile.
   ///
   /// In en, this message translates to:
