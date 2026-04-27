@@ -16,7 +16,7 @@ import '../../../search/providers/search_provider.dart';
 import '../../../profile/providers/profile_provider.dart';
 import 'route_best_stops_list.dart';
 import 'route_info_bar.dart';
-import 'route_view_mode_chip.dart';
+import 'route_view_mode_bar.dart';
 import 'station_map_layers.dart';
 
 /// View modes for the route map.
@@ -72,11 +72,26 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
         ? result.route.geometry[midIdx]
         : const LatLng(48.8566, 2.3522);
     final zoom = _zoomForRoute(result.route.distanceKm);
-    final theme = Theme.of(context);
 
     return Column(
       children: [
-        _buildViewModeToggle(theme, l10n, allFuelStations, result),
+        RouteViewModeBar(
+          allStationsSelected: _viewMode == RouteViewMode.allStations,
+          bestStopsSelected: _viewMode == RouteViewMode.bestStops,
+          selectedCount: _selectedStationIds.length,
+          onTapAllStations: () => setState(() {
+            _viewMode = RouteViewMode.allStations;
+            _selectedStationIds.clear();
+          }),
+          onTapBestStops: () => setState(() {
+            _viewMode = RouteViewMode.bestStops;
+            _selectedStationIds.clear();
+            for (final s in _getBestStopStations(allFuelStations, result)) {
+              _selectedStationIds.add(s.id);
+            }
+          }),
+          onOpenSelectedInMaps: () => _openSelectedInMaps(result),
+        ),
         Expanded(
           child: StationMapLayers(
             mapController: widget.mapController,
@@ -118,62 +133,6 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
           onOpenInMaps: () => _openSelectedInMaps(result),
         ),
       ],
-    );
-  }
-  Widget _buildViewModeToggle(
-    ThemeData theme,
-    AppLocalizations? l10n,
-    List<Station> allFuelStations,
-    RouteSearchResult result,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      color: theme.colorScheme.surfaceContainerHighest,
-      child: Row(
-        children: [
-          RouteViewModeChip(
-            label: l10n?.allStations ?? 'All stations',
-            icon: Icons.local_gas_station,
-            selected: _viewMode == RouteViewMode.allStations,
-            onTap: () => setState(() {
-              _viewMode = RouteViewMode.allStations;
-              _selectedStationIds.clear();
-            }),
-          ),
-          const SizedBox(width: 8),
-          RouteViewModeChip(
-            label: l10n?.bestStops ?? 'Best stops',
-            icon: Icons.star,
-            selected: _viewMode == RouteViewMode.bestStops,
-            onTap: () => setState(() {
-              _viewMode = RouteViewMode.bestStops;
-              _selectedStationIds.clear();
-              for (final s in _getBestStopStations(allFuelStations, result)) {
-                _selectedStationIds.add(s.id);
-              }
-            }),
-          ),
-          const Spacer(),
-          if (_selectedStationIds.isNotEmpty) ...[
-            Text(
-              '${_selectedStationIds.length}',
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.primary,
-              ),
-            ),
-            const SizedBox(width: 4),
-            IconButton(
-              icon: Icon(Icons.navigation,
-                  size: 18, color: theme.colorScheme.primary),
-              tooltip: l10n?.openInMaps ?? 'Open in Maps',
-              onPressed: () => _openSelectedInMaps(result),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            ),
-          ],
-        ],
-      ),
     );
   }
   Future<void> _showSaveRouteDialog(
