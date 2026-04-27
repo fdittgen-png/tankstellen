@@ -3963,6 +3963,33 @@ class AppLocalizationsFi extends AppLocalizations {
   String get trajetDetailDeleteConfirmConfirm => 'Delete';
 
   @override
+  String get tripLengthCardTitle => 'Consumption by trip length';
+
+  @override
+  String get tripLengthBucketShort => 'Short (<5 km)';
+
+  @override
+  String get tripLengthBucketMedium => 'Medium (5–25 km)';
+
+  @override
+  String get tripLengthBucketLong => 'Long (>25 km)';
+
+  @override
+  String get tripLengthBucketNeedMoreData => 'Need more data';
+
+  @override
+  String tripLengthBucketTripCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count trips',
+      one: '1 trip',
+      zero: 'no trips',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tripRecordingPinTooltip =>
       'Pinning keeps the screen on — uses more battery';
 

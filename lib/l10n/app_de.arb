@@ -1570,6 +1570,12 @@
   "trajetDetailDeleteConfirmBody": "Diese Fahrt wird dauerhaft aus deinem Verlauf entfernt.",
   "trajetDetailDeleteConfirmCancel": "Abbrechen",
   "trajetDetailDeleteConfirmConfirm": "Löschen",
+  "tripLengthCardTitle": "Verbrauch nach Fahrtlänge",
+  "tripLengthBucketShort": "Kurz (<5 km)",
+  "tripLengthBucketMedium": "Mittel (5–25 km)",
+  "tripLengthBucketLong": "Lang (>25 km)",
+  "tripLengthBucketNeedMoreData": "Mehr Daten nötig",
+  "tripLengthBucketTripCount": "{count, plural, =0{keine Fahrten} one{1 Fahrt} other{{count} Fahrten}}",
   "tripRecordingPinTooltip": "Anpinnen hält den Bildschirm an — verbraucht mehr Akku",
   "@tripRecordingPinTooltip": {
     "description": "Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost."

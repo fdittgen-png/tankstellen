@@ -1,0 +1,31 @@
+{
+  "tripLengthCardTitle": "Consumption by trip length",
+  "@tripLengthCardTitle": {
+    "description": "Title of the trip-length consumption card on the Carbon dashboard Charts tab — splits trips into short/medium/long buckets so the user can see cold-start fuel waste vs. cruising efficiency (#1191)."
+  },
+  "tripLengthBucketShort": "Short (<5 km)",
+  "@tripLengthBucketShort": {
+    "description": "Label of the short-trip tile on the trip-length breakdown card — trips under 5 km, where cold-engine warmup dominates (#1191)."
+  },
+  "tripLengthBucketMedium": "Medium (5–25 km)",
+  "@tripLengthBucketMedium": {
+    "description": "Label of the medium-trip tile on the trip-length breakdown card — trips between 5 and 25 km, mostly urban / mixed driving (#1191)."
+  },
+  "tripLengthBucketLong": "Long (>25 km)",
+  "@tripLengthBucketLong": {
+    "description": "Label of the long-trip tile on the trip-length breakdown card — trips over 25 km, stable-temperature cruising (#1191)."
+  },
+  "tripLengthBucketNeedMoreData": "Need more data",
+  "@tripLengthBucketNeedMoreData": {
+    "description": "Placeholder shown on a trip-length breakdown tile when the bucket has fewer than 5 trips — statistically meaningless to show an average that thin (#1191)."
+  },
+  "tripLengthBucketTripCount": "{count, plural, =0{no trips} one{1 trip} other{{count} trips}}",
+  "@tripLengthBucketTripCount": {
+    "description": "Trip-count subtitle on each trip-length breakdown tile (#1191).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}
