@@ -105,6 +105,25 @@ void main() {
           reason: 'French (fr) must have every onboarding* key — the '
               'wizard is the user\'s first impression of the app and '
               'must not fall back to English for French users');
+
+      // #1218 — Edit vehicle was shipping mixed-locale on French because
+      // calibration / service-reminder / VIN / vehicle-edit keys lacked
+      // translations. Same rule as onboarding: these flows are core
+      // surfaces and must not fall back to English for French users.
+      final frenchMissingVehicleEdit = frenchMissing
+          .where((k) =>
+              k.startsWith('vehicle') ||
+              k.startsWith('calibrationMode') ||
+              k.startsWith('veReset') ||
+              k.startsWith('serviceReminder') ||
+              k == 'addServiceReminder' ||
+              k.startsWith('vin'))
+          .toList()
+        ..sort();
+      expect(frenchMissingVehicleEdit, isEmpty,
+          reason: 'French (fr) must have every vehicle-edit, calibration, '
+              'service-reminder and VIN key — the Edit vehicle screen '
+              'must not fall back to English for French users (#1218)');
     });
 
     test('no locale has extra keys not in app_en.arb', () {
