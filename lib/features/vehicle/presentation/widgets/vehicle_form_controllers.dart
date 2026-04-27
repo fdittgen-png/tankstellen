@@ -58,8 +58,21 @@ class VehicleFormControllers {
 
   /// Construct a [VehicleProfile] from the current controller values
   /// combined with the non-controller state passed in by the caller.
+  ///
+  /// When [existing] is non-null, the result starts from
+  /// `existing.copyWith(...)` and only overwrites the fields the form
+  /// actually edits — everything else (e.g. the long-lived
+  /// `pairedAdapterMac`, the auto-record toggle, learned volumetric
+  /// efficiency, the driving aggregates, the reference-catalog ids)
+  /// is preserved automatically. This is the architectural fix for
+  /// #1217: previously, every Save constructed a brand-new profile
+  /// from a fixed parameter list, silently wiping any field that
+  /// wasn't on that list back to its `@Default(...)`.
+  ///
+  /// When [existing] is null (the "Add vehicle" path), the new profile
+  /// is built from defaults with a freshly minted uuid.
   VehicleProfile buildProfile({
-    required String? existingId,
+    required VehicleProfile? existing,
     required VehicleType type,
     required Set<ConnectorType> connectors,
     required String? adapterMac,
@@ -68,34 +81,69 @@ class VehicleFormControllers {
     required int? engineCylinders,
     required int? curbWeightKg,
   }) {
+    // Compute the form-derived values once — they're the same whether
+    // we're creating a new profile or copying an existing one.
+    final name = nameController.text.trim();
+    final isCombustion = type == VehicleType.combustion;
+    final isEv = type == VehicleType.ev;
+    final batteryKwh =
+        isCombustion ? null : _parseDouble(batteryController.text);
+    final maxChargingKw =
+        isCombustion ? null : _parseDouble(maxChargingKwController.text);
+    final supportedConnectors =
+        isCombustion ? <ConnectorType>{} : {...connectors};
+    final tankCapacityL =
+        isEv ? null : _parseDouble(tankController.text);
+    final preferredFuelType = isEv
+        ? null
+        : (fuelTypeController.text.trim().isEmpty
+            ? null
+            : fuelTypeController.text.trim());
+    final chargingPreferences = ChargingPreferences(
+      minSocPercent: _parseIntOr(minSocController.text, 20).clamp(0, 100),
+      maxSocPercent: _parseIntOr(maxSocController.text, 80).clamp(0, 100),
+    );
+    final vin = vinController.text.trim().isEmpty
+        ? null
+        : vinController.text.trim();
+
+    if (existing != null) {
+      // Preserve every non-form field by starting from the saved
+      // profile and only overwriting what the form actually edits.
+      // The EV/combustion type-flip rules (null out battery/tank/etc.
+      // when switching across types) are still applied above and
+      // flow through copyWith here.
+      return existing.copyWith(
+        name: name,
+        type: type,
+        batteryKwh: batteryKwh,
+        maxChargingKw: maxChargingKw,
+        supportedConnectors: supportedConnectors,
+        chargingPreferences: chargingPreferences,
+        tankCapacityL: tankCapacityL,
+        preferredFuelType: preferredFuelType,
+        obd2AdapterMac: adapterMac,
+        obd2AdapterName: adapterName,
+        vin: vin,
+        engineDisplacementCc: engineDisplacementCc,
+        engineCylinders: engineCylinders,
+        curbWeightKg: curbWeightKg,
+      );
+    }
+
     return VehicleProfile(
-      id: existingId ?? _uuid.v4(),
-      name: nameController.text.trim(),
+      id: _uuid.v4(),
+      name: name,
       type: type,
-      batteryKwh: type == VehicleType.combustion
-          ? null
-          : _parseDouble(batteryController.text),
-      maxChargingKw: type == VehicleType.combustion
-          ? null
-          : _parseDouble(maxChargingKwController.text),
-      supportedConnectors:
-          type == VehicleType.combustion ? <ConnectorType>{} : {...connectors},
-      tankCapacityL:
-          type == VehicleType.ev ? null : _parseDouble(tankController.text),
-      preferredFuelType: type == VehicleType.ev
-          ? null
-          : (fuelTypeController.text.trim().isEmpty
-              ? null
-              : fuelTypeController.text.trim()),
-      chargingPreferences: ChargingPreferences(
-        minSocPercent: _parseIntOr(minSocController.text, 20).clamp(0, 100),
-        maxSocPercent: _parseIntOr(maxSocController.text, 80).clamp(0, 100),
-      ),
+      batteryKwh: batteryKwh,
+      maxChargingKw: maxChargingKw,
+      supportedConnectors: supportedConnectors,
+      tankCapacityL: tankCapacityL,
+      preferredFuelType: preferredFuelType,
+      chargingPreferences: chargingPreferences,
       obd2AdapterMac: adapterMac,
       obd2AdapterName: adapterName,
-      vin: vinController.text.trim().isEmpty
-          ? null
-          : vinController.text.trim(),
+      vin: vin,
       engineDisplacementCc: engineDisplacementCc,
       engineCylinders: engineCylinders,
       curbWeightKg: curbWeightKg,

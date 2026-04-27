@@ -163,7 +163,7 @@ void main() {
       c.vinController.text = 'WVWZZZ9NZ7Y000001';
 
       final profile = c.buildProfile(
-        existingId: 'ice-7',
+        existing: const VehicleProfile(id: 'ice-7', name: ''),
         type: VehicleType.combustion,
         connectors: const {ConnectorType.ccs}, // ignored for combustion
         adapterMac: '11:22:33:44:55:66',
@@ -207,7 +207,7 @@ void main() {
       c.maxSocController.text = '90';
 
       final profile = c.buildProfile(
-        existingId: 'ev-7',
+        existing: const VehicleProfile(id: 'ev-7', name: ''),
         type: VehicleType.ev,
         connectors: const {ConnectorType.ccs, ConnectorType.type2},
         adapterMac: null,
@@ -244,7 +244,7 @@ void main() {
       c.maxSocController.text = '80';
 
       final profile = c.buildProfile(
-        existingId: 'hyb-1',
+        existing: const VehicleProfile(id: 'hyb-1', name: ''),
         type: VehicleType.hybrid,
         connectors: const {ConnectorType.type2},
         adapterMac: null,
@@ -264,14 +264,14 @@ void main() {
       expect(profile.engineCylinders, 4);
     });
 
-    test('mints a new uuid when existingId is null', () {
+    test('mints a new uuid when existing is null', () {
       final c = VehicleFormControllers();
       addTearDown(c.dispose);
 
       c.nameController.text = 'New Car';
 
       final p1 = c.buildProfile(
-        existingId: null,
+        existing: null,
         type: VehicleType.combustion,
         connectors: const {},
         adapterMac: null,
@@ -281,7 +281,7 @@ void main() {
         curbWeightKg: null,
       );
       final p2 = c.buildProfile(
-        existingId: null,
+        existing: null,
         type: VehicleType.combustion,
         connectors: const {},
         adapterMac: null,
@@ -310,7 +310,7 @@ void main() {
       c.vinController.text = '   ';
 
       final profile = c.buildProfile(
-        existingId: 'edge-1',
+        existing: const VehicleProfile(id: 'edge-1', name: ''),
         type: VehicleType.hybrid,
         connectors: const {},
         adapterMac: null,
@@ -341,7 +341,7 @@ void main() {
       c.maxSocController.text = 'high'; // -> fallback 80
 
       final profile = c.buildProfile(
-        existingId: 'edge-2',
+        existing: const VehicleProfile(id: 'edge-2', name: ''),
         type: VehicleType.hybrid,
         connectors: const {},
         adapterMac: null,
@@ -367,7 +367,7 @@ void main() {
       c.tankController.text = '45,5';
 
       final profile = c.buildProfile(
-        existingId: 'edge-3',
+        existing: const VehicleProfile(id: 'edge-3', name: ''),
         type: VehicleType.hybrid,
         connectors: const {},
         adapterMac: null,
@@ -390,7 +390,7 @@ void main() {
       c.maxSocController.text = '250';
 
       final profile = c.buildProfile(
-        existingId: 'edge-4',
+        existing: const VehicleProfile(id: 'edge-4', name: ''),
         type: VehicleType.ev,
         connectors: const {ConnectorType.type2},
         adapterMac: null,
@@ -411,7 +411,7 @@ void main() {
       final inputConnectors = <ConnectorType>{ConnectorType.type2};
 
       final profile = c.buildProfile(
-        existingId: 'ev-3',
+        existing: const VehicleProfile(id: 'ev-3', name: ''),
         type: VehicleType.ev,
         connectors: inputConnectors,
         adapterMac: null,

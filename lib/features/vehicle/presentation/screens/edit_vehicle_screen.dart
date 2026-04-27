@@ -122,8 +122,19 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   Future<void> _save() async {
     final form = _formKey.currentState;
     if (form == null || !form.validate()) return;
+    // #1217 — pass the saved profile through so [buildProfile] can
+    // copyWith on top of it. Otherwise every Save reset every field
+    // not on the form's parameter list (autoRecord, pairedAdapterMac,
+    // learned VE, driving aggregates, reference-catalog ids, ...) to
+    // its freezed `@Default`.
+    final existing = _existingId == null
+        ? null
+        : ref
+            .read(vehicleProfileListProvider)
+            .where((v) => v.id == _existingId)
+            .firstOrNull;
     final profile = _ctrl.buildProfile(
-      existingId: _existingId,
+      existing: existing,
       type: _type,
       connectors: _connectors,
       adapterMac: _adapterMac,
