@@ -901,5 +901,9 @@
   "consumptionLogTitle": "Consommation",
   "consumptionTabFuel": "Carburant",
   "trajetsTabLabel": "Trajets",
-  "consumptionTabCharging": "Recharge"
+  "consumptionTabCharging": "Recharge",
+  "vehicleReadVinFromCarButton": "Lire le VIN depuis la voiture",
+  "vehicleReadVinFromCarTooltip": "Lire le VIN depuis l'adaptateur OBD2 couplé",
+  "vehicleReadVinFailedUnsupportedSnackbar": "VIN indisponible (Mode 09 PID 02 non pris en charge sur les véhicules d'avant 2005)",
+  "vehicleReadVinFailedGenericSnackbar": "Lecture du VIN échouée — veuillez saisir manuellement"
 }

@@ -442,6 +442,7 @@ void main() {
         connectors: {ConnectorType.ccs},
         adapterMac: 'mac',
         adapterName: 'name',
+        pairedAdapterMac: 'paired-mac',
         engineDisplacementCc: 1500,
         engineCylinders: 4,
         curbWeightKg: 1300,
@@ -452,6 +453,7 @@ void main() {
       expect(snapshot.connectors, {ConnectorType.ccs});
       expect(snapshot.adapterMac, 'mac');
       expect(snapshot.adapterName, 'name');
+      expect(snapshot.pairedAdapterMac, 'paired-mac');
       expect(snapshot.engineDisplacementCc, 1500);
       expect(snapshot.engineCylinders, 4);
       expect(snapshot.curbWeightKg, 1300);

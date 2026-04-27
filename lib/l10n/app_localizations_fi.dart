@@ -3841,6 +3841,21 @@ class AppLocalizationsFi extends AppLocalizations {
   String get veResetAction => 'Reset calibration';
 
   @override
+  String get vehicleReadVinFromCarButton => 'Read VIN from car';
+
+  @override
+  String get vehicleReadVinFromCarTooltip =>
+      'Read VIN from the paired OBD2 adapter';
+
+  @override
+  String get vehicleReadVinFailedUnsupportedSnackbar =>
+      'VIN not available (Mode 09 PID 02 unsupported on pre-2005 vehicles)';
+
+  @override
+  String get vehicleReadVinFailedGenericSnackbar =>
+      'VIN read failed — please enter manually';
+
+  @override
   String get vinInfoTooltip => 'What is a VIN?';
 
   @override
