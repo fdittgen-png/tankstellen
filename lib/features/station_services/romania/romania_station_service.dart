@@ -9,6 +9,7 @@ import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import 'romania_observatory_keys.dart';
 
 /// Romania fuel prices — *Monitorul Prețurilor la Carburanți*
 /// (pretcarburant.ro), the Competition Council + ANPC joint
@@ -63,7 +64,8 @@ import '../../../core/services/station_service.dart';
 /// ]
 /// ```
 ///
-/// Fuel-type mapping used by [_fuelForObservatoryKey]:
+/// Fuel-type mapping lives on [RomaniaObservatoryKeys] in
+/// `romania_observatory_keys.dart`:
 ///
 /// ```
 /// benzina_standard   → FuelType.e5
@@ -98,16 +100,6 @@ class RomaniaStationService
   /// problematic.
   static const String userAgent =
       'Tankstellen/5.0 (fuel price comparison) contact: github.com/fdittgen/tankstellen';
-
-  /// Observatory fuel-key → canonical [FuelType]. Kept lowercase so
-  /// the lookup is case-insensitive against upstream drift.
-  static const Map<String, FuelType> _fuelForObservatoryKey = {
-    'benzina_standard': FuelType.e5,
-    'benzina_premium': FuelType.e98,
-    'motorina_standard': FuelType.diesel,
-    'motorina_premium': FuelType.dieselPremium,
-    'gpl': FuelType.lpg,
-  };
 
   final Dio _dio;
   final String _baseUrl;
@@ -200,10 +192,12 @@ class RomaniaStationService
   }
 
   /// Exposed for tests — single source of truth for the observatory
-  /// fuel-key → [FuelType] mapping.
+  /// fuel-key → [FuelType] mapping. Delegates to
+  /// [RomaniaObservatoryKeys.lookup] so existing tests keep passing
+  /// without rewrites.
   @visibleForTesting
   static FuelType? fuelForObservatoryKey(String key) =>
-      _fuelForObservatoryKey[key.toLowerCase()];
+      RomaniaObservatoryKeys.lookup(key);
 
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(
@@ -235,7 +229,7 @@ class RomaniaStationService
     final lng = _parseDouble(raw['lng']);
     if (lat == null || lng == null) return null;
 
-    final prices = _parsePrices(raw['prices']);
+    final prices = RomaniaObservatoryKeys.parsePrices(raw['prices']);
     // Drop stations that advertise no recognised motoring fuel —
     // nothing actionable to show the user.
     if (prices.isEmpty) return null;
@@ -260,39 +254,6 @@ class RomaniaStationService
       isOpen: raw['is_open'] is bool ? raw['is_open'] as bool : true,
       updatedAt: raw['updated_at']?.toString(),
     );
-  }
-
-  Map<FuelType, double> _parsePrices(dynamic rawPrices) {
-    final out = <FuelType, double>{};
-    if (rawPrices is! Map) return out;
-    for (final entry in rawPrices.entries) {
-      final key = entry.key.toString();
-      final fuel = _fuelForObservatoryKey[key.toLowerCase()];
-      if (fuel == null) continue; // unknown / intentionally dropped
-      final price = _parseLeiPerLitre(entry.value);
-      if (price == null) continue;
-      out[fuel] = price;
-    }
-    return out;
-  }
-
-  /// Romanian pump prices are RON (lei) per litre with up to three
-  /// decimals (e.g. `7.259`). Accepts `num` and numeric strings.
-  /// Rejects zero and negative values.
-  double? _parseLeiPerLitre(dynamic raw) {
-    if (raw == null) return null;
-    if (raw is num) {
-      if (raw <= 0) return null;
-      return raw.toDouble();
-    }
-    if (raw is String) {
-      final t = raw.trim();
-      if (t.isEmpty) return null;
-      final v = double.tryParse(t);
-      if (v == null || v <= 0) return null;
-      return v;
-    }
-    return null;
   }
 
   double? _parseDouble(dynamic raw) {
