@@ -55,6 +55,15 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   int? _engineCylinders;
   int? _curbWeightKg;
 
+  // #1217 — Live calibration mode for the screen-level Save path.
+  // Initialized from the loaded profile in [_loadExisting] and read at
+  // [_save] time so the rebuilt profile keeps whatever value the
+  // [VehicleCalibrationModeSelector] segmented button persisted to the
+  // provider moments earlier. Without this, [_ctrl.buildProfile]
+  // would emit the freezed-default `rule` and overwrite a Fuzzy
+  // selection that the segmented-button widget already saved.
+  VehicleCalibrationMode _calibrationMode = VehicleCalibrationMode.rule;
+
   // True while the vPIC request is in flight → VIN field spinner.
   bool _decodingVin = false;
 
@@ -92,6 +101,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
       _engineDisplacementCc = snap.engineDisplacementCc;
       _engineCylinders = snap.engineCylinders;
       _curbWeightKg = snap.curbWeightKg;
+      _calibrationMode = snap.calibrationMode;
     });
   }
 
@@ -122,6 +132,20 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   Future<void> _save() async {
     final form = _formKey.currentState;
     if (form == null || !form.validate()) return;
+    // #1217 — pull the latest persisted calibrationMode from the
+    // provider before rebuilding the profile, so any value the
+    // [VehicleCalibrationModeSelector] saved while this screen was
+    // open is preserved. Falls back to whatever was loaded from the
+    // initial profile (or the freezed default) when no live entry is
+    // found (new vehicle / first save).
+    final liveMode = _existingId == null
+        ? _calibrationMode
+        : ref
+                .read(vehicleProfileListProvider)
+                .where((v) => v.id == _existingId)
+                .firstOrNull
+                ?.calibrationMode ??
+            _calibrationMode;
     final profile = _ctrl.buildProfile(
       existingId: _existingId,
       type: _type,
@@ -131,6 +155,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
       engineDisplacementCc: _engineDisplacementCc,
       engineCylinders: _engineCylinders,
       curbWeightKg: _curbWeightKg,
+      calibrationMode: liveMode,
     );
     await ref.read(vehicleProfileListProvider.notifier).save(profile);
     await ref.syncActiveProfile(profile);

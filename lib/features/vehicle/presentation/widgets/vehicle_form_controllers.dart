@@ -53,11 +53,19 @@ class VehicleFormControllers {
       engineDisplacementCc: profile.engineDisplacementCc,
       engineCylinders: profile.engineCylinders,
       curbWeightKg: profile.curbWeightKg,
+      calibrationMode: profile.calibrationMode,
     );
   }
 
   /// Construct a [VehicleProfile] from the current controller values
   /// combined with the non-controller state passed in by the caller.
+  ///
+  /// [calibrationMode] is threaded through verbatim so the screen-
+  /// level Save path doesn't clobber a value the
+  /// [VehicleCalibrationModeSelector] persisted moments earlier
+  /// (#1217). Defaults to [VehicleCalibrationMode.rule] to match the
+  /// freezed default for new profiles where the caller has no live
+  /// value to pass in.
   VehicleProfile buildProfile({
     required String? existingId,
     required VehicleType type,
@@ -67,6 +75,7 @@ class VehicleFormControllers {
     required int? engineDisplacementCc,
     required int? engineCylinders,
     required int? curbWeightKg,
+    VehicleCalibrationMode calibrationMode = VehicleCalibrationMode.rule,
   }) {
     return VehicleProfile(
       id: existingId ?? _uuid.v4(),
@@ -99,6 +108,7 @@ class VehicleFormControllers {
       engineDisplacementCc: engineDisplacementCc,
       engineCylinders: engineCylinders,
       curbWeightKg: curbWeightKg,
+      calibrationMode: calibrationMode,
     );
   }
 
@@ -143,6 +153,11 @@ class VehicleFormSnapshot {
   final int? engineCylinders;
   final int? curbWeightKg;
 
+  /// Calibration mode (#894) carried out of [VehicleFormControllers.load]
+  /// so the screen can seed its live state and pass the value back
+  /// through [VehicleFormControllers.buildProfile] on save (#1217).
+  final VehicleCalibrationMode calibrationMode;
+
   VehicleFormSnapshot({
     required this.id,
     required this.type,
@@ -153,5 +168,6 @@ class VehicleFormSnapshot {
     required this.engineDisplacementCc,
     required this.engineCylinders,
     required this.curbWeightKg,
+    this.calibrationMode = VehicleCalibrationMode.rule,
   });
 }
