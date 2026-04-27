@@ -4015,11 +4015,17 @@ abstract class AppLocalizations {
   /// **'Fuel cut — coast'**
   String get situationFuelCut;
 
-  /// No description provided for @tripSaveAsFillUp.
+  /// DEPRECATED (#1185): replaced by tripSaveRecording. Retained for parity with non-EN locales until the orphan-key sweep lands.
   ///
   /// In en, this message translates to:
   /// **'Save as fill-up'**
   String get tripSaveAsFillUp;
+
+  /// Trip-summary CTA: persists a TripHistoryEntry only — no fill-up created. (#1185)
+  ///
+  /// In en, this message translates to:
+  /// **'Save trip'**
+  String get tripSaveRecording;
 
   /// No description provided for @tripDiscard.
   ///

@@ -832,6 +832,7 @@
   "situationHardAccel": "Accél. forte",
   "situationFuelCut": "Coupure — roue libre",
   "tripSaveAsFillUp": "Enregistrer comme plein",
+  "tripSaveRecording": "Enregistrer le trajet",
   "tripDiscard": "Abandonner",
   "obdOdometerRead": "Compteur lu : {km} km",
   "@obdOdometerRead": {
