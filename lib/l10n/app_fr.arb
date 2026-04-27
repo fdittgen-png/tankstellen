@@ -933,5 +933,7 @@
   "tankLevelMethodMixed": "mesure mixte",
   "tankLevelEmptyNoFillUp": "Enregistrez un plein pour voir le niveau du réservoir",
   "tankLevelDetailSheetTitle": "Trajets depuis le dernier plein",
-  "addFillUpIsFullTankLabel": "Plein complet"
+  "addFillUpIsFullTankLabel": "Plein complet",
+  "profileGamificationToggleTitle": "Afficher les succès et scores",
+  "profileGamificationToggleSubtitle": "Désactivé, les badges, scores et trophées sont masqués dans toute l'app."
 }

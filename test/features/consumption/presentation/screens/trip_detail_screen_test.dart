@@ -8,6 +8,7 @@ import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/trip_detail_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_detail_charts.dart';
 import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
+import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
@@ -137,6 +138,10 @@ Future<({_FixedTripHistoryList tripsNotifier})> _pumpDetail(
           .overrideWith(() => _FixedActiveVehicle(activeVehicle)),
       vehicleProfileListProvider
           .overrideWith(() => _FixedVehicleProfileList(vehicles)),
+      // #1194 — TripDetailBody now reads gamificationEnabledProvider;
+      // override here so it doesn't fall through to the (Hive-backed)
+      // active profile lookup that these tests don't seed.
+      gamificationEnabledProvider.overrideWith((ref) => true),
     ],
   );
   // Push the detail route on top of the stub so `context.pop()` in

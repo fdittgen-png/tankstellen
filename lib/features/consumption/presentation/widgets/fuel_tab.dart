@@ -6,6 +6,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/help_banner.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../achievements/presentation/widgets/badge_shelf.dart';
+import '../../../profile/providers/gamification_enabled_provider.dart';
 import '../../domain/entities/consumption_stats.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
@@ -40,6 +41,10 @@ class FuelTab extends ConsumerWidget {
             'Log your first fill-up to start tracking consumption.',
       );
     }
+    // #1194 — opt-out gate for gamification surfaces. Watching here
+    // (above the ListView) so the BadgeShelf is omitted from the
+    // header column without churning the itemCount.
+    final showGamification = ref.watch(gamificationEnabledProvider);
     return ListView.builder(
       padding: EdgeInsets.only(
         top: 8,
@@ -59,7 +64,7 @@ class FuelTab extends ConsumerWidget {
                         'consumption and CO₂ footprint. Swipe left '
                         'to delete an entry.',
               ),
-              const BadgeShelf(),
+              if (showGamification) const BadgeShelf(),
               // #1195 — tank-level indicator sits above the consumption
               // stats card. Renders nothing when no active vehicle is
               // configured (FuelTab itself shows the no-fill-ups empty

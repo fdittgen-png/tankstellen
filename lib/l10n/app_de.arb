@@ -1435,6 +1435,14 @@
   "calibrationModeRule": "Regelbasiert",
   "calibrationModeFuzzy": "Fuzzy",
   "calibrationModeTooltip": "Regelbasiert ordnet jede Fahrprobe genau einer Situation zu. Fuzzy verteilt sie auf alle, je nachdem wie gut sie passen — ruhiger rund um 60 km/h oder bei wechselnden Steigungen, aber langsamer beim Befüllen aller Kategorien.",
+  "profileGamificationToggleTitle": "Erfolge & Punkte anzeigen",
+  "@profileGamificationToggleTitle": {
+    "description": "Title of the master gamification opt-out switch on the profile / settings screen (#1194)."
+  },
+  "profileGamificationToggleSubtitle": "Wenn aus, sind Abzeichen, Punkte und Pokal-Symbole überall ausgeblendet.",
+  "@profileGamificationToggleSubtitle": {
+    "description": "Subtitle explaining what the gamification opt-out toggle hides (#1194)."
+  },
   "hapticEcoCoachSectionTitle": "Fahrweise",
   "hapticEcoCoachSettingTitle": "Echtzeit-Eco-Coaching",
   "hapticEcoCoachSettingSubtitle": "Sanfte Vibration bei zu starker Beschleunigung im Reisemodus",

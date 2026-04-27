@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../profile/providers/gamification_enabled_provider.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../data/driving_insights_analyzer.dart';
 import '../../data/driving_score_calculator.dart';
@@ -30,7 +32,7 @@ import 'trip_summary_card.dart';
 /// history list / vehicle providers). The analyzer is O(n) and
 /// pure, but for a 60-min trip that's still ~3 600 samples — re-running
 /// it on every theme switch / locale switch is wasteful.
-class TripDetailBody extends StatefulWidget {
+class TripDetailBody extends ConsumerStatefulWidget {
   final TripHistoryEntry entry;
   final VehicleProfile? vehicle;
   final List<TripDetailSample> samples;
@@ -53,10 +55,10 @@ class TripDetailBody extends StatefulWidget {
   });
 
   @override
-  State<TripDetailBody> createState() => _TripDetailBodyState();
+  ConsumerState<TripDetailBody> createState() => _TripDetailBodyState();
 }
 
-class _TripDetailBodyState extends State<TripDetailBody> {
+class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
   /// Lazily-computed driving insights for the trip. Cached for the
   /// lifetime of this State so locale / theme rebuilds don't re-run
   /// the analyzer. The widget tree is rebuilt from scratch (new State)
@@ -136,6 +138,10 @@ class _TripDetailBodyState extends State<TripDetailBody> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    // #1194 — gamification opt-out gates the composite driving score
+    // card. The underlying calculator still runs (cheap, pure) so
+    // toggling back on instantly restores the score without a re-render.
+    final showGamification = ref.watch(gamificationEnabledProvider);
 
     // RPM section is hidden when every sample reports null (the car's
     // PID cache flagged RPM as unsupported). The summary card still
@@ -162,8 +168,9 @@ class _TripDetailBodyState extends State<TripDetailBody> {
         // the top of the Insights group: a single big 0..100 number
         // with a brief breakdown chip row beneath it. EV trips and
         // empty trips are skipped on the same gating rule as the
-        // cost-line card below.
-        if (!widget.isEv && widget.samples.isNotEmpty)
+        // cost-line card below. #1194: also gated by gamification
+        // toggle (the score is the most game-like trip element).
+        if (showGamification && !widget.isEv && widget.samples.isNotEmpty)
           DrivingScoreCard(score: _score),
         // Driving insights — combustion trips only. EV trips skip
         // this card; phase 4 will land an EV-aware version.

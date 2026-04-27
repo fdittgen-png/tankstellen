@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
@@ -7,6 +8,7 @@ import 'package:tankstellen/features/carbon/presentation/widgets/milestones_card
 import 'package:tankstellen/features/carbon/presentation/widgets/monthly_bar_chart.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
+import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
 import '../../helpers/pump_app.dart';
@@ -55,6 +57,7 @@ void main() {
       const CarbonDashboardScreen(),
       overrides: [
         settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
+        gamificationEnabledProvider.overrideWith((ref) => true),
       ],
     );
     expect(find.text('No data yet'), findsOneWidget);
@@ -69,6 +72,7 @@ void main() {
       overrides: [
         settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
         fillUpListProvider.overrideWith(_FakeFillUpList.new),
+        gamificationEnabledProvider.overrideWith((ref) => true),
       ],
     );
     // Two bar charts on the Charts tab
@@ -85,6 +89,7 @@ void main() {
       overrides: [
         settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
         fillUpListProvider.overrideWith(_FakeFillUpList.new),
+        gamificationEnabledProvider.overrideWith((ref) => true),
       ],
     );
     await tester.tap(find.text('Achievements'));
@@ -99,6 +104,51 @@ void main() {
     );
     expect(find.text('Milestones'), findsOneWidget);
   });
+
+  // -------------------------------------------------------------------------
+  // #1194 — gamification opt-out gating
+  // -------------------------------------------------------------------------
+  testWidgets(
+    'shows both Charts and Achievements tabs when gamification is enabled',
+    (tester) async {
+      await pumpApp(
+        tester,
+        const CarbonDashboardScreen(),
+        overrides: [
+          settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
+          fillUpListProvider.overrideWith(_FakeFillUpList.new),
+          gamificationEnabledProvider.overrideWith((ref) => true),
+        ],
+      );
+      // Both tabs are present (one TabBar with two Tab children).
+      expect(find.byType(TabBar), findsOneWidget);
+      expect(find.byType(Tab), findsNWidgets(2));
+      expect(find.text('Charts'), findsOneWidget);
+      expect(find.text('Achievements'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'collapses to a single Charts pane when gamification is disabled',
+    (tester) async {
+      await pumpApp(
+        tester,
+        const CarbonDashboardScreen(),
+        overrides: [
+          settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
+          fillUpListProvider.overrideWith(_FakeFillUpList.new),
+          gamificationEnabledProvider.overrideWith((ref) => false),
+        ],
+      );
+      // No TabBar, no Achievements tab — just the Charts pane.
+      expect(find.byType(TabBar), findsNothing);
+      expect(find.text('Achievements'), findsNothing);
+      // Charts content is still rendered.
+      expect(find.byType(MonthlyBarChart), findsNWidgets(2));
+      expect(find.text('Monthly costs'), findsOneWidget);
+      expect(find.text('Monthly CO2 emissions'), findsOneWidget);
+    },
+  );
 }
 
 class _FakeFillUpList extends FillUpList {

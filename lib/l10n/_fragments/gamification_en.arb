@@ -1,0 +1,10 @@
+{
+  "profileGamificationToggleTitle": "Show achievements & scores",
+  "@profileGamificationToggleTitle": {
+    "description": "Title of the master gamification opt-out switch on the profile / settings screen (#1194)."
+  },
+  "profileGamificationToggleSubtitle": "When off, badges, scores and trophy icons are hidden across the app.",
+  "@profileGamificationToggleSubtitle": {
+    "description": "Subtitle explaining what the gamification opt-out toggle hides (#1194)."
+  }
+}

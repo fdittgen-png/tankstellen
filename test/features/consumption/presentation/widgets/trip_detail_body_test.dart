@@ -5,6 +5,7 @@ import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_detail_body.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_detail_charts.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_summary_card.dart';
+import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -59,13 +60,24 @@ TripDetailSample _sampleWithRpm(int sec, double speed, double rpm) =>
       rpm: rpm,
     );
 
+/// Default overrides for [TripDetailBody] tests. Now that the body
+/// reads [gamificationEnabledProvider] (#1194), every test must seed a
+/// value so the underlying active-profile chain isn't traversed (those
+/// tests don't set up Hive).
+final List<Object> _defaultOverrides = [
+  gamificationEnabledProvider.overrideWith((ref) => true),
+];
+
+Future<void> _pump(WidgetTester tester, Widget body) =>
+    pumpApp(tester, body, overrides: _defaultOverrides);
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('TripDetailBody — scroll container', () {
     testWidgets('exposes the trip_detail_scroll key on the SingleChildScrollView',
         (tester) async {
-      await pumpApp(
+      await _pump(
         tester,
         TripDetailBody(
           entry: _entry(),
@@ -87,7 +99,7 @@ void main() {
   group('TripDetailBody — always-mounted sections', () {
     testWidgets('mounts the summary card and the speed + fuel-rate charts',
         (tester) async {
-      await pumpApp(
+      await _pump(
         tester,
         TripDetailBody(
           entry: _entry(),
@@ -104,7 +116,7 @@ void main() {
 
     testWidgets('renders the localized speed and fuel-rate section titles',
         (tester) async {
-      await pumpApp(
+      await _pump(
         tester,
         TripDetailBody(
           entry: _entry(),
@@ -123,7 +135,7 @@ void main() {
   group('TripDetailBody — RPM section visibility', () {
     testWidgets('mounts the RPM chart when at least one sample has rpm',
         (tester) async {
-      await pumpApp(
+      await _pump(
         tester,
         TripDetailBody(
           entry: _entry(),
@@ -143,7 +155,7 @@ void main() {
 
     testWidgets('hides the RPM chart when every sample has null rpm',
         (tester) async {
-      await pumpApp(
+      await _pump(
         tester,
         TripDetailBody(
           entry: _entry(),
@@ -162,7 +174,7 @@ void main() {
     });
 
     testWidgets('hides the RPM chart when samples is empty', (tester) async {
-      await pumpApp(
+      await _pump(
         tester,
         TripDetailBody(
           entry: _entry(),
@@ -181,7 +193,7 @@ void main() {
     testWidgets(
         'renders summary, speed, fuel rate, then RPM in that vertical order',
         (tester) async {
-      await pumpApp(
+      await _pump(
         tester,
         TripDetailBody(
           entry: _entry(),
@@ -215,7 +227,7 @@ void main() {
       // The body itself doesn't gate sections on isEv — it only forwards
       // the flag to the summary card. This guards against a future change
       // accidentally hiding charts on EV trips.
-      await pumpApp(
+      await _pump(
         tester,
         TripDetailBody(
           entry: _entry(),

@@ -8,6 +8,7 @@ import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/providers/consumption_providers.dart';
+import '../../../profile/providers/gamification_enabled_provider.dart';
 import '../../domain/milestone.dart';
 import '../../domain/monthly_summary.dart';
 import '../widgets/fuel_vs_ev_card.dart';
@@ -32,6 +33,12 @@ class CarbonDashboardScreen extends ConsumerWidget {
     final fillUps = ref.watch(fillUpListProvider);
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    // #1194 — gamification opt-out. When off, the dashboard collapses
+    // to a single Charts pane (no TabBar, no Achievements tab) so the
+    // user only sees pure data visualisation. The DefaultTabController
+    // length must match the tab list exactly to avoid an index-range
+    // error on rebuild.
+    final showGamification = ref.watch(gamificationEnabledProvider);
 
     final summaries = MonthlyAggregator.byMonth(fillUps);
     final last12 = MonthlyAggregator.lastN(summaries, 12);
@@ -40,56 +47,72 @@ class CarbonDashboardScreen extends ConsumerWidget {
     final totalCo2 = MonthlyAggregator.totalCo2(summaries);
     final totalCost = MonthlyAggregator.totalCost(summaries);
 
-    return DefaultTabController(
-      length: 2,
-      child: PageScaffold(
-        title: l?.carbonDashboardTitle ?? 'Carbon dashboard',
-        bannerIcon: Icons.eco_outlined,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: l?.tooltipBack ?? 'Back',
-          onPressed: () => context.pop(),
-        ),
-        bodyPadding: EdgeInsets.zero,
-        body: fillUps.isEmpty
-            ? EmptyState(
-                icon: Icons.eco_outlined,
-                title: l?.carbonEmptyTitle ?? 'No data yet',
-                subtitle: l?.carbonEmptySubtitle ??
-                    'Log fill-ups to see your carbon dashboard.',
-              )
-            : Column(
-                children: [
-                  Material(
-                    color: Colors.transparent,
-                    child: TabBar(
-                      tabs: [
-                        Tab(text: l?.carbonTabCharts ?? 'Charts'),
-                        Tab(text: l?.carbonTabAchievements ?? 'Achievements'),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: TabBarView(
-                      children: [
-                        _ChartsTab(
-                          summaries: last12,
-                          totalCost: totalCost,
-                          totalCo2: totalCo2,
-                        ),
-                        _AchievementsTab(
-                          milestones: milestones,
-                          fuelCo2Kg: totalCo2,
-                          distanceKm: distanceKm,
-                          theme: theme,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-      ),
+    final chartsTab = _ChartsTab(
+      summaries: last12,
+      totalCost: totalCost,
+      totalCo2: totalCo2,
     );
+
+    Widget body;
+    if (fillUps.isEmpty) {
+      body = EmptyState(
+        icon: Icons.eco_outlined,
+        title: l?.carbonEmptyTitle ?? 'No data yet',
+        subtitle: l?.carbonEmptySubtitle ??
+            'Log fill-ups to see your carbon dashboard.',
+      );
+    } else if (!showGamification) {
+      // Single-pane mode — render the Charts tab directly without any
+      // TabBar/TabBarView chrome.
+      body = chartsTab;
+    } else {
+      body = Column(
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: TabBar(
+              tabs: [
+                Tab(text: l?.carbonTabCharts ?? 'Charts'),
+                Tab(text: l?.carbonTabAchievements ?? 'Achievements'),
+              ],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                chartsTab,
+                _AchievementsTab(
+                  milestones: milestones,
+                  fuelCo2Kg: totalCo2,
+                  distanceKm: distanceKm,
+                  theme: theme,
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    final scaffold = PageScaffold(
+      title: l?.carbonDashboardTitle ?? 'Carbon dashboard',
+      bannerIcon: Icons.eco_outlined,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: l?.tooltipBack ?? 'Back',
+        onPressed: () => context.pop(),
+      ),
+      bodyPadding: EdgeInsets.zero,
+      body: body,
+    );
+
+    // The TabController is only required when the TabBar/TabBarView
+    // are mounted — wrapping the single-pane variant in a controller
+    // would log a "controller has length 2 but only 1 tab" warning.
+    if (!showGamification || fillUps.isEmpty) {
+      return scaffold;
+    }
+    return DefaultTabController(length: 2, child: scaffold);
   }
 }
 

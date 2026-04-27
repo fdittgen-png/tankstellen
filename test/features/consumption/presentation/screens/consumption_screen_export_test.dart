@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/consumption_screen.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
+import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
@@ -50,6 +51,10 @@ Future<void> _pumpScreen(
     overrides: [
       fillUpListProvider.overrideWith(() => _FixedFillUpList(fillUps)),
       activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
+      // #1194 — FuelTab now reads gamificationEnabledProvider; default
+      // to true here so the BadgeShelf gating doesn't depend on a
+      // (Hive-backed) profile lookup that these tests don't seed.
+      gamificationEnabledProvider.overrideWith((ref) => true),
     ],
   );
 }

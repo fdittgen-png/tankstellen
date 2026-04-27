@@ -224,6 +224,49 @@ void main() {
       expect(profile.showFuel, isTrue);
       expect(profile.showElectric, isTrue);
       expect(profile.ratingMode, 'local');
+      // #1194 — gamification toggle defaults to ON so existing users
+      // see no behaviour change.
+      expect(profile.gamificationEnabled, isTrue);
+    });
+
+    test('gamificationEnabled defaults to true on legacy JSON missing the key',
+        () {
+      // Mirrors the migration path for users upgrading from a build
+      // that didn't persist this field — fromJson must not throw and
+      // must default to true.
+      final json = <String, dynamic>{
+        'id': 'legacy',
+        'name': 'Legacy',
+      };
+      final profile = UserProfile.fromJson(json);
+      expect(profile.gamificationEnabled, isTrue);
+    });
+
+    test('copyWith preserves and overrides gamificationEnabled', () {
+      const profile = UserProfile(id: 'abc', name: 'Test');
+      // Default flips through copyWith.
+      final disabled = profile.copyWith(gamificationEnabled: false);
+      expect(disabled.gamificationEnabled, isFalse);
+      expect(disabled.id, 'abc');
+      // copyWith without the field preserves the previous value.
+      final preserved = disabled.copyWith(name: 'Renamed');
+      expect(preserved.gamificationEnabled, isFalse);
+      expect(preserved.name, 'Renamed');
+    });
+
+    test('JSON roundtrip preserves gamificationEnabled', () {
+      const enabled = UserProfile(id: 'a', name: 'A');
+      const disabled = UserProfile(
+        id: 'b',
+        name: 'B',
+        gamificationEnabled: false,
+      );
+
+      final restoredEnabled = UserProfile.fromJson(enabled.toJson());
+      final restoredDisabled = UserProfile.fromJson(disabled.toJson());
+
+      expect(restoredEnabled.gamificationEnabled, isTrue);
+      expect(restoredDisabled.gamificationEnabled, isFalse);
     });
 
     test('toJson and fromJson roundtrip', () {
