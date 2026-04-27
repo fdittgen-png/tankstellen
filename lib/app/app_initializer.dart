@@ -22,6 +22,7 @@ import '../core/sync/community_config.dart';
 import '../core/sync/supabase_client.dart';
 import '../core/telemetry/pii_scrubber.dart';
 import '../core/utils/edge_to_edge.dart';
+import '../features/consumption/providers/auto_record_orchestrator.dart';
 import '../features/profile/data/repositories/profile_repository.dart';
 import '../features/vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../features/vehicle/data/repositories/vehicle_profile_repository.dart';
@@ -413,6 +414,24 @@ class AppInitializer {
     } catch (e, st) {
       debugPrint('AppInitializer: nearestWidgetRefresh start failed: $e\n$st');
     }
+
+    // #1004 phase 2b-2 — instantiate the auto-record orchestrator. The
+    // provider is `keepAlive: true` and watches the vehicle list
+    // internally; reading it once is enough to spin up coordinators
+    // for any vehicle that already has `autoRecord: true`. Deferred to
+    // a post-frame microtask so a slow listener factory (Android
+    // platform channel handshake) cannot delay the first paint. The
+    // try/catch belongs here, not just inside the provider, because a
+    // bug in `defaultTargetPlatform` resolution or in the listener
+    // factory would otherwise crash the whole launch path.
+    _deferPostFirstFrame(() async {
+      try {
+        container.read(autoRecordOrchestratorProvider);
+      } catch (e, st) {
+        debugPrint(
+            'AppInitializer: autoRecordOrchestrator init failed: $e\n$st');
+      }
+    });
 
     // #1105 — drain the background-isolate error spool through the
     // foreground TraceRecorder. WorkManager runs without Riverpod, so
