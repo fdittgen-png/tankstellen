@@ -6,6 +6,8 @@ import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/service_reminder.dart';
 import '../../providers/service_reminder_providers.dart';
 
+part 'service_reminder_section_parts.dart';
+
 /// Service-reminders section of the vehicle edit screen (#584).
 ///
 /// Renders a preset chip row ("Oil 15000 km", "Tires 20000 km",
@@ -207,44 +209,6 @@ class ServiceReminderSection extends ConsumerWidget {
       labelCtrl.dispose();
       intervalCtrl.dispose();
     }
-  }
-}
-
-class _PresetChipRow extends StatelessWidget {
-  final void Function(String label, double intervalKm) onAdd;
-
-  const _PresetChipRow({required this.onAdd});
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        ActionChip(
-          avatar: const Icon(Icons.oil_barrel_outlined, size: 18),
-          label:
-              Text(l?.serviceReminderPresetOil ?? 'Oil (15,000 km)'),
-          onPressed: () =>
-              onAdd(l?.serviceReminderPresetOilLabel ?? 'Oil change', 15000),
-        ),
-        ActionChip(
-          avatar: const Icon(Icons.tire_repair_outlined, size: 18),
-          label:
-              Text(l?.serviceReminderPresetTires ?? 'Tires (20,000 km)'),
-          onPressed: () =>
-              onAdd(l?.serviceReminderPresetTiresLabel ?? 'Tires', 20000),
-        ),
-        ActionChip(
-          avatar: const Icon(Icons.build_outlined, size: 18),
-          label: Text(
-              l?.serviceReminderPresetInspection ?? 'Inspection (30,000 km)'),
-          onPressed: () => onAdd(
-              l?.serviceReminderPresetInspectionLabel ?? 'Inspection', 30000),
-        ),
-      ],
-    );
   }
 }
 
