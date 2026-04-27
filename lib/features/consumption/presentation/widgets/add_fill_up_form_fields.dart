@@ -50,6 +50,12 @@ class AddFillUpFormFields extends StatelessWidget {
   final ValueChanged<FuelType> onFuelChanged;
   final VoidCallback onOpenVehicle;
 
+  /// Whether this fill-up topped the tank up to capacity (#1195).
+  /// Drives the tank-level estimator's reset behaviour — see
+  /// [FillUp.isFullTank].
+  final bool isFullTank;
+  final ValueChanged<bool> onIsFullTankChanged;
+
   final TextEditingController litersCtrl;
   final TextEditingController costCtrl;
   final TextEditingController odoCtrl;
@@ -75,6 +81,8 @@ class AddFillUpFormFields extends StatelessWidget {
     required this.fuelType,
     required this.onFuelChanged,
     required this.onOpenVehicle,
+    required this.isFullTank,
+    required this.onIsFullTankChanged,
     required this.litersCtrl,
     required this.costCtrl,
     required this.odoCtrl,
@@ -177,6 +185,21 @@ class AddFillUpFormFields extends StatelessWidget {
                     costController: costCtrl,
                   ),
                 ],
+              ),
+            ),
+            // #1195 — Full-tank toggle. Defaults ON because the typical
+            // pattern is a "plein". Off = partial top-up so the tank-
+            // level estimator can branch on previous_level + liters_added
+            // once that path is wired (today the data is captured but
+            // the v1 estimator still assumes capacity reset).
+            FormFieldTile(
+              icon: Icons.local_gas_station_outlined,
+              content: SwitchListTile(
+                key: const Key('add_fill_up_is_full_tank_toggle'),
+                contentPadding: EdgeInsets.zero,
+                title: Text(l?.addFillUpIsFullTankLabel ?? 'Full tank'),
+                value: isFullTank,
+                onChanged: onIsFullTankChanged,
               ),
             ),
           ],

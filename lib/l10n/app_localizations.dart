@@ -6968,6 +6968,66 @@ abstract class AppLocalizations {
   /// **'Loading Tankstellen'**
   String get splashLoadingLabel;
 
+  /// Title of the tank-level card on the Fuel tab — shows the current estimated litres in the tank above the consumption stats card (#1195).
+  ///
+  /// In en, this message translates to:
+  /// **'Tank level'**
+  String get tankLevelTitle;
+
+  /// Big-number rendering of the current tank level on the Fuel tab — value is pre-formatted with one decimal (e.g. '32.4 L') (#1195).
+  ///
+  /// In en, this message translates to:
+  /// **'{litres} L'**
+  String tankLevelLitersFormat(String litres);
+
+  /// Sub-text under the tank-level big number — distance the user can still drive at the vehicle's average L/100 km (#1195).
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {kilometres} km of range'**
+  String tankLevelRangeFormat(String kilometres);
+
+  /// Caption beneath the tank-level card — when the last fill-up was logged and how many trips have been recorded since (#1195).
+  ///
+  /// In en, this message translates to:
+  /// **'Last fill-up: {date} · {count} trip(s) since'**
+  String tankLevelLastFillUpFormat(String date, String count);
+
+  /// Method label appended to the tank-level caption when every trip since the last fill-up carried a measured OBD2 fuel-rate value (#1195).
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 measured'**
+  String get tankLevelMethodObd2;
+
+  /// Method label appended to the tank-level caption when no OBD2 fuel measurement was available and consumption was estimated from distance × avg L/100 km (#1195).
+  ///
+  /// In en, this message translates to:
+  /// **'distance-based estimate'**
+  String get tankLevelMethodDistanceFallback;
+
+  /// Method label appended to the tank-level caption when some trips used OBD2 and some used the distance-based fallback (#1195).
+  ///
+  /// In en, this message translates to:
+  /// **'mixed measurement'**
+  String get tankLevelMethodMixed;
+
+  /// Empty-state message inside the tank-level card when the active vehicle has no fill-ups logged yet (#1195).
+  ///
+  /// In en, this message translates to:
+  /// **'Log a fill-up to see your tank level'**
+  String get tankLevelEmptyNoFillUp;
+
+  /// Title of the bottom sheet shown when the user taps the tank-level card — lists the trips folded into the level calculation (#1195).
+  ///
+  /// In en, this message translates to:
+  /// **'Trips since last fill-up'**
+  String get tankLevelDetailSheetTitle;
+
+  /// Label of the Full-tank toggle on the Add fill-up screen — defaults on, captures whether the fill-up topped the tank up to capacity (#1195).
+  ///
+  /// In en, this message translates to:
+  /// **'Full tank'**
+  String get addFillUpIsFullTankLabel;
+
   /// Title of the Theme card on the Settings screen (#897). The card matches the Privacy + Storage card pattern and navigates to a dedicated theme picker screen.
   ///
   /// In en, this message translates to:

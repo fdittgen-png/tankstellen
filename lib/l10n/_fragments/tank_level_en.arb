@@ -1,0 +1,60 @@
+{
+  "tankLevelTitle": "Tank level",
+  "@tankLevelTitle": {
+    "description": "Title of the tank-level card on the Fuel tab — shows the current estimated litres in the tank above the consumption stats card (#1195)."
+  },
+  "tankLevelLitersFormat": "{litres} L",
+  "@tankLevelLitersFormat": {
+    "description": "Big-number rendering of the current tank level on the Fuel tab — value is pre-formatted with one decimal (e.g. '32.4 L') (#1195).",
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelRangeFormat": "≈ {kilometres} km of range",
+  "@tankLevelRangeFormat": {
+    "description": "Sub-text under the tank-level big number — distance the user can still drive at the vehicle's average L/100 km (#1195).",
+    "placeholders": {
+      "kilometres": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelLastFillUpFormat": "Last fill-up: {date} · {count} trip(s) since",
+  "@tankLevelLastFillUpFormat": {
+    "description": "Caption beneath the tank-level card — when the last fill-up was logged and how many trips have been recorded since (#1195).",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelMethodObd2": "OBD2 measured",
+  "@tankLevelMethodObd2": {
+    "description": "Method label appended to the tank-level caption when every trip since the last fill-up carried a measured OBD2 fuel-rate value (#1195)."
+  },
+  "tankLevelMethodDistanceFallback": "distance-based estimate",
+  "@tankLevelMethodDistanceFallback": {
+    "description": "Method label appended to the tank-level caption when no OBD2 fuel measurement was available and consumption was estimated from distance × avg L/100 km (#1195)."
+  },
+  "tankLevelMethodMixed": "mixed measurement",
+  "@tankLevelMethodMixed": {
+    "description": "Method label appended to the tank-level caption when some trips used OBD2 and some used the distance-based fallback (#1195)."
+  },
+  "tankLevelEmptyNoFillUp": "Log a fill-up to see your tank level",
+  "@tankLevelEmptyNoFillUp": {
+    "description": "Empty-state message inside the tank-level card when the active vehicle has no fill-ups logged yet (#1195)."
+  },
+  "tankLevelDetailSheetTitle": "Trips since last fill-up",
+  "@tankLevelDetailSheetTitle": {
+    "description": "Title of the bottom sheet shown when the user taps the tank-level card — lists the trips folded into the level calculation (#1195)."
+  },
+  "addFillUpIsFullTankLabel": "Full tank",
+  "@addFillUpIsFullTankLabel": {
+    "description": "Label of the Full-tank toggle on the Add fill-up screen — defaults on, captures whether the fill-up topped the tank up to capacity (#1195)."
+  }
+}

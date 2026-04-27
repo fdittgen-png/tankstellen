@@ -1,0 +1,12 @@
+{
+  "tankLevelTitle": "Tankfüllstand",
+  "tankLevelLitersFormat": "{litres} L",
+  "tankLevelRangeFormat": "≈ {kilometres} km Reichweite",
+  "tankLevelLastFillUpFormat": "Letzter Tankvorgang: {date} · {count} Fahrt(en) seit",
+  "tankLevelMethodObd2": "OBD2-Messung",
+  "tankLevelMethodDistanceFallback": "distanzbasierte Schätzung",
+  "tankLevelMethodMixed": "gemischte Messung",
+  "tankLevelEmptyNoFillUp": "Tankvorgang erfassen, um den Tankfüllstand zu sehen",
+  "tankLevelDetailSheetTitle": "Fahrten seit dem letzten Tankvorgang",
+  "addFillUpIsFullTankLabel": "Voller Tank"
+}

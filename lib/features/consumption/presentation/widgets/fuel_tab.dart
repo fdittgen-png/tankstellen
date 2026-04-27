@@ -11,6 +11,7 @@ import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
 import 'consumption_stats_card.dart';
 import 'fill_up_card.dart';
+import 'tank_level_card.dart';
 
 /// Body of the Fuel tab on the Consumption screen.
 ///
@@ -59,6 +60,11 @@ class FuelTab extends ConsumerWidget {
                         'to delete an entry.',
               ),
               const BadgeShelf(),
+              // #1195 — tank-level indicator sits above the consumption
+              // stats card. Renders nothing when no active vehicle is
+              // configured (FuelTab itself shows the no-fill-ups empty
+              // state above this point).
+              const TankLevelCard(),
               ConsumptionStatsCard(stats: stats),
             ],
           );

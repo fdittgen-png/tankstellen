@@ -3739,6 +3739,42 @@ class AppLocalizationsEt extends AppLocalizations {
   String get splashLoadingLabel => 'Loading Tankstellen';
 
   @override
+  String get tankLevelTitle => 'Tank level';
+
+  @override
+  String tankLevelLitersFormat(String litres) {
+    return '$litres L';
+  }
+
+  @override
+  String tankLevelRangeFormat(String kilometres) {
+    return '≈ $kilometres km of range';
+  }
+
+  @override
+  String tankLevelLastFillUpFormat(String date, String count) {
+    return 'Last fill-up: $date · $count trip(s) since';
+  }
+
+  @override
+  String get tankLevelMethodObd2 => 'OBD2 measured';
+
+  @override
+  String get tankLevelMethodDistanceFallback => 'distance-based estimate';
+
+  @override
+  String get tankLevelMethodMixed => 'mixed measurement';
+
+  @override
+  String get tankLevelEmptyNoFillUp => 'Log a fill-up to see your tank level';
+
+  @override
+  String get tankLevelDetailSheetTitle => 'Trips since last fill-up';
+
+  @override
+  String get addFillUpIsFullTankLabel => 'Full tank';
+
+  @override
   String get themeCardTitle => 'Theme';
 
   @override

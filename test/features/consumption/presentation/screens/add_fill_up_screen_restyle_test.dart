@@ -195,4 +195,41 @@ void main() {
       expect(find.text('Station pre-filled'), findsOneWidget);
     });
   });
+
+  group('AddFillUpScreen isFullTank toggle (#1195)', () {
+    testWidgets('toggle defaults to ON', (tester) async {
+      await _pumpWithTallView(
+        tester,
+        const AddFillUpScreen(),
+        overrides: _withVehicle,
+      );
+
+      // The full-tank label is rendered in the form.
+      expect(find.text('Full tank'), findsOneWidget);
+
+      // The Switch starts in the "on" position (default true).
+      final toggle = tester.widget<SwitchListTile>(
+        find.byKey(const Key('add_fill_up_is_full_tank_toggle')),
+      );
+      expect(toggle.value, isTrue);
+    });
+
+    testWidgets('toggle flips to OFF when tapped', (tester) async {
+      await _pumpWithTallView(
+        tester,
+        const AddFillUpScreen(),
+        overrides: _withVehicle,
+      );
+
+      await tester.tap(
+        find.byKey(const Key('add_fill_up_is_full_tank_toggle')),
+      );
+      await tester.pumpAndSettle();
+
+      final toggle = tester.widget<SwitchListTile>(
+        find.byKey(const Key('add_fill_up_is_full_tank_toggle')),
+      );
+      expect(toggle.value, isFalse);
+    });
+  });
 }

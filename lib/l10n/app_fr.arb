@@ -920,5 +920,15 @@
   "authErrorInvalidCredentials": "E-mail ou mot de passe incorrect. Veuillez vérifier vos identifiants.",
   "authErrorUserAlreadyExists": "Cette adresse e-mail est déjà enregistrée. Essayez de vous connecter.",
   "authErrorEmailNotConfirmed": "Veuillez ouvrir l'e-mail de confirmation pour activer votre compte.",
-  "authErrorGeneric": "Échec de la connexion. Veuillez réessayer."
+  "authErrorGeneric": "Échec de la connexion. Veuillez réessayer.",
+  "tankLevelTitle": "Niveau du réservoir",
+  "tankLevelLitersFormat": "{litres} L",
+  "tankLevelRangeFormat": "≈ {kilometres} km d'autonomie",
+  "tankLevelLastFillUpFormat": "Dernier plein : {date} · {count} trajet(s) depuis",
+  "tankLevelMethodObd2": "mesuré par OBD2",
+  "tankLevelMethodDistanceFallback": "estimation basée sur la distance",
+  "tankLevelMethodMixed": "mesure mixte",
+  "tankLevelEmptyNoFillUp": "Enregistrez un plein pour voir le niveau du réservoir",
+  "tankLevelDetailSheetTitle": "Trajets depuis le dernier plein",
+  "addFillUpIsFullTankLabel": "Plein complet"
 }
