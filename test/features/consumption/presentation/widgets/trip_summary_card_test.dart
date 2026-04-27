@@ -1,8 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_detail_charts.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_summary_card.dart';
+import 'package:tankstellen/features/consumption/providers/trip_fuel_cost_provider.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -336,6 +338,91 @@ void main() {
       );
       expect(find.text('60.0 km/h'), findsOneWidget);
       expect(find.text('80.0 km/h'), findsOneWidget);
+    });
+  });
+
+  group('TripSummaryCard — fuel cost row (#1209)', () {
+    setUp(() {
+      // Pin the active currency so the formatted-price assertions
+      // below are deterministic regardless of test ordering.
+      PriceFormatter.setCountry('FR');
+    });
+
+    testWidgets('renders the formatted cost when the provider has data',
+        (tester) async {
+      await pumpApp(
+        tester,
+        TripSummaryCard(
+          entry: _entry(
+            id: 't-cost',
+            fuelLitersConsumed: 0.27,
+            startedAt: DateTime(2026, 4, 25, 14),
+          ),
+          vehicle: _vehicle,
+          samples: const [],
+          isEv: false,
+        ),
+        overrides: [
+          tripFuelCostProvider('t-cost').overrideWithValue(0.4455),
+        ],
+      );
+
+      expect(find.text('Fuel cost'), findsOneWidget);
+      // PriceFormatter.formatPrice with FR locale prints the value
+      // with three decimals and a non-breaking space + €.
+      expect(
+        find.text(PriceFormatter.formatPrice(0.4455)),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('hides the cost row when the provider returns null',
+        (tester) async {
+      await pumpApp(
+        tester,
+        TripSummaryCard(
+          entry: _entry(
+            id: 't-no-cost',
+            fuelLitersConsumed: 0.27,
+            startedAt: DateTime(2026, 4, 25, 14),
+          ),
+          vehicle: _vehicle,
+          samples: const [],
+          isEv: false,
+        ),
+        overrides: [
+          tripFuelCostProvider('t-no-cost').overrideWithValue(null),
+        ],
+      );
+
+      expect(find.text('Fuel cost'), findsNothing);
+    });
+
+    testWidgets('hides the cost row for EV trips even when a value is set',
+        (tester) async {
+      // EV trips never show fuel cost — fuel-litres-consumed semantics
+      // don't apply, and the row should be skipped before the
+      // provider read fires.
+      await pumpApp(
+        tester,
+        TripSummaryCard(
+          entry: _entry(
+            id: 't-ev',
+            fuelLitersConsumed: null,
+            startedAt: DateTime(2026, 4, 25, 14),
+          ),
+          vehicle: _vehicle,
+          samples: const [],
+          isEv: true,
+        ),
+        overrides: [
+          // Even with a non-null override the row must stay hidden
+          // because the EV branch short-circuits before the watch.
+          tripFuelCostProvider('t-ev').overrideWithValue(1.23),
+        ],
+      );
+
+      expect(find.text('Fuel cost'), findsNothing);
     });
   });
 }

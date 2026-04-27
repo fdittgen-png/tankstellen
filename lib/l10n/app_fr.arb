@@ -909,6 +909,7 @@
   "consumptionLogTitle": "Consommation",
   "consumptionTabFuel": "Carburant",
   "trajetsTabLabel": "Trajets",
+  "trajetDetailFieldFuelCost": "Coût du carburant",
   "trajetDetailShareAction": "Partager",
   "trajetDetailShareSubject": "Tankstellen — trajet du {date}",
   "trajetDetailShareError": "Impossible de générer l'image à partager",

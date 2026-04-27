@@ -7,6 +7,7 @@ import 'package:tankstellen/features/consumption/data/trip_history_repository.da
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/trip_detail_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_detail_charts.dart';
+import 'package:tankstellen/features/consumption/providers/trip_fuel_cost_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
 import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
@@ -142,6 +143,10 @@ Future<({_FixedTripHistoryList tripsNotifier})> _pumpDetail(
       // override here so it doesn't fall through to the (Hive-backed)
       // active profile lookup that these tests don't seed.
       gamificationEnabledProvider.overrideWith((ref) => true),
+      // #1209 — TripSummaryCard now watches tripFuelCostProvider, which
+      // composes fillUpListProvider (Hive-backed). These tests don't
+      // seed Hive; return null so the cost row hides cleanly.
+      tripFuelCostProvider(entry.id).overrideWith((ref) => null),
     ],
   );
   // Push the detail route on top of the stub so `context.pop()` in
