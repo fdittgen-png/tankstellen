@@ -3777,6 +3777,44 @@ class AppLocalizationsDe extends AppLocalizations {
   String get splashLoadingLabel => 'Tankstellen wird geladen';
 
   @override
+  String get tankLevelTitle => 'Tankfüllstand';
+
+  @override
+  String tankLevelLitersFormat(String litres) {
+    return '$litres L';
+  }
+
+  @override
+  String tankLevelRangeFormat(String kilometres) {
+    return '≈ $kilometres km Reichweite';
+  }
+
+  @override
+  String tankLevelLastFillUpFormat(String date, String count) {
+    return 'Letzter Tankvorgang: $date · $count Fahrt(en) seit';
+  }
+
+  @override
+  String get tankLevelMethodObd2 => 'OBD2-Messung';
+
+  @override
+  String get tankLevelMethodDistanceFallback => 'distanzbasierte Schätzung';
+
+  @override
+  String get tankLevelMethodMixed => 'gemischte Messung';
+
+  @override
+  String get tankLevelEmptyNoFillUp =>
+      'Tankvorgang erfassen, um den Tankfüllstand zu sehen';
+
+  @override
+  String get tankLevelDetailSheetTitle =>
+      'Fahrten seit dem letzten Tankvorgang';
+
+  @override
+  String get addFillUpIsFullTankLabel => 'Voller Tank';
+
+  @override
   String get themeCardTitle => 'Design';
 
   @override

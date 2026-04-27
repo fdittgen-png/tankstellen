@@ -64,6 +64,10 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   final _notesCtrl = TextEditingController();
   DateTime _date = DateTime.now();
   late FuelType _fuelType = widget.preFilledFuelType ?? FuelType.e10;
+  // #1195 — defaults to ON because the typical European pattern is a
+  // full "plein". The toggle exposes the partial-top-up case so the
+  // tank-level estimator can branch correctly on subsequent reads.
+  bool _isFullTank = true;
   bool _scanning = false;
   bool _scanningPump = false;
   ReceiptScanService? _scanService;
@@ -208,6 +212,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       stationName: widget.stationName,
       notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
       vehicleId: _vehicleId,
+      isFullTank: _isFullTank,
     );
 
     await ref.read(fillUpListProvider.notifier).add(fillUp);
@@ -281,6 +286,8 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
               onFuelChanged: (next) => setState(() => _fuelType = next),
               onOpenVehicle: () =>
                   context.push('/vehicles/edit', extra: _vehicleId!),
+              isFullTank: _isFullTank,
+              onIsFullTankChanged: (v) => setState(() => _isFullTank = v),
               litersCtrl: _litersCtrl,
               costCtrl: _costCtrl,
               odoCtrl: _odoCtrl,

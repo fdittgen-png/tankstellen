@@ -3770,6 +3770,44 @@ class AppLocalizationsFr extends AppLocalizations {
   String get splashLoadingLabel => 'Loading Tankstellen';
 
   @override
+  String get tankLevelTitle => 'Niveau du réservoir';
+
+  @override
+  String tankLevelLitersFormat(String litres) {
+    return '$litres L';
+  }
+
+  @override
+  String tankLevelRangeFormat(String kilometres) {
+    return '≈ $kilometres km d\'autonomie';
+  }
+
+  @override
+  String tankLevelLastFillUpFormat(String date, String count) {
+    return 'Dernier plein : $date · $count trajet(s) depuis';
+  }
+
+  @override
+  String get tankLevelMethodObd2 => 'mesuré par OBD2';
+
+  @override
+  String get tankLevelMethodDistanceFallback =>
+      'estimation basée sur la distance';
+
+  @override
+  String get tankLevelMethodMixed => 'mesure mixte';
+
+  @override
+  String get tankLevelEmptyNoFillUp =>
+      'Enregistrez un plein pour voir le niveau du réservoir';
+
+  @override
+  String get tankLevelDetailSheetTitle => 'Trajets depuis le dernier plein';
+
+  @override
+  String get addFillUpIsFullTankLabel => 'Plein complet';
+
+  @override
   String get themeCardTitle => 'Thème';
 
   @override

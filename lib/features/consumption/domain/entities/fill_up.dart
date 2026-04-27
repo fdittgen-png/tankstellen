@@ -36,6 +36,17 @@ abstract class FillUp with _$FillUp {
     /// were recorded in the window or when the fill-up has no bound
     /// vehicle.
     @Default(<String>[]) List<String> linkedTripIds,
+
+    /// Whether this fill-up topped the tank up to capacity (#1195).
+    ///
+    /// Default `true` matches the typical European "plein" pattern —
+    /// most users fill all the way up. The flag governs how the tank-
+    /// level estimator initialises after this fill-up: when `true`, the
+    /// estimator resets to the vehicle's `tankCapacityL`; when `false`,
+    /// it uses `previous_level + liters_added` (partial top-up).
+    /// Existing fill-ups deserialise with the default so historical
+    /// data keeps working as full-tank fills.
+    @Default(true) bool isFullTank,
   }) = _FillUp;
 
   factory FillUp.fromJson(Map<String, dynamic> json) => _$FillUpFromJson(json);
