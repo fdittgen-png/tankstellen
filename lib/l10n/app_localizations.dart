@@ -7268,6 +7268,12 @@ abstract class AppLocalizations {
   /// **'Fuel used'**
   String get trajetDetailFieldFuelUsed;
 
+  /// Label for the estimated fuel cost row in the Trip detail summary card. Shown only when a recent fill-up's price-per-litre is available so we can multiply by fuel-litres-consumed (#1209).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel cost'**
+  String get trajetDetailFieldFuelCost;
+
   /// Label for the average speed row in the Trip detail summary card (#890).
   ///
   /// In en, this message translates to:

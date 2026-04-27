@@ -3915,6 +3915,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trajetDetailFieldFuelUsed => 'Fuel used';
 
   @override
+  String get trajetDetailFieldFuelCost => 'Fuel cost';
+
+  @override
   String get trajetDetailFieldAvgSpeed => 'Avg speed';
 
   @override

@@ -3942,6 +3942,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trajetDetailFieldFuelUsed => 'Fuel used';
 
   @override
+  String get trajetDetailFieldFuelCost => 'Coût du carburant';
+
+  @override
   String get trajetDetailFieldAvgSpeed => 'Avg speed';
 
   @override

@@ -13,6 +13,7 @@
   "trajetDetailFieldDuration": "Dauer",
   "trajetDetailFieldAvgConsumption": "Ø Verbrauch",
   "trajetDetailFieldFuelUsed": "Kraftstoff",
+  "trajetDetailFieldFuelCost": "Kraftstoffkosten",
   "trajetDetailFieldAvgSpeed": "Ø Geschwindigkeit",
   "trajetDetailFieldMaxSpeed": "Höchstgeschwindigkeit",
   "trajetDetailFieldValueUnknown": "—",
