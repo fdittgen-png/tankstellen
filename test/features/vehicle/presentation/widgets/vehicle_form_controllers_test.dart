@@ -131,6 +131,31 @@ void main() {
       expect(snap.curbWeightKg, isNull);
     });
 
+    test('captures calibrationMode from the loaded profile (#1217)', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+
+      const profile = VehicleProfile(
+        id: 'fuzzy-1',
+        name: 'Polo',
+        calibrationMode: VehicleCalibrationMode.fuzzy,
+      );
+
+      final snap = c.load(profile);
+      expect(snap.calibrationMode, VehicleCalibrationMode.fuzzy);
+    });
+
+    test('defaults snapshot calibrationMode to rule for pre-#894 profiles',
+        () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+
+      const profile = VehicleProfile(id: 'rule-1', name: 'Polo');
+
+      final snap = c.load(profile);
+      expect(snap.calibrationMode, VehicleCalibrationMode.rule);
+    });
+
     test('connectors snapshot is a defensive copy', () {
       final c = VehicleFormControllers();
       addTearDown(c.dispose);
@@ -380,6 +405,47 @@ void main() {
       expect(profile.batteryKwh, 60.5);
       expect(profile.maxChargingKw, 150.25);
       expect(profile.tankCapacityL, 45.5);
+    });
+
+    test('threads calibrationMode through to the built profile (#1217)', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+
+      c.nameController.text = 'Polo';
+
+      final profile = c.buildProfile(
+        existingId: 'fuzzy-2',
+        type: VehicleType.combustion,
+        connectors: const {},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+        calibrationMode: VehicleCalibrationMode.fuzzy,
+      );
+
+      expect(profile.calibrationMode, VehicleCalibrationMode.fuzzy);
+    });
+
+    test('omitted calibrationMode falls back to rule (#1217 default)', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+
+      c.nameController.text = 'Polo';
+
+      final profile = c.buildProfile(
+        existingId: 'rule-2',
+        type: VehicleType.combustion,
+        connectors: const {},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+      );
+
+      expect(profile.calibrationMode, VehicleCalibrationMode.rule);
     });
 
     test('SoC values are clamped to 0..100', () {
