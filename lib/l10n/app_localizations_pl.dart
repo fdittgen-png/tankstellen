@@ -3748,6 +3748,42 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String get speedConsumptionCardTitle => 'Consumption by speed';
+
+  @override
+  String get speedBandIdleJam => 'Idle / jam';
+
+  @override
+  String get speedBandUrban => 'Urban (10–50)';
+
+  @override
+  String get speedBandSuburban => 'Suburban (50–80)';
+
+  @override
+  String get speedBandRural => 'Rural (80–100)';
+
+  @override
+  String get speedBandMotorwaySlow => 'Eco-cruise (100–115)';
+
+  @override
+  String get speedBandMotorway => 'Motorway (115–130)';
+
+  @override
+  String get speedBandMotorwayFast => 'Motorway fast (130+)';
+
+  @override
+  String get speedConsumptionInsufficientData =>
+      'Record 30+ minutes of trips with the OBD2 adapter to unlock the speed/consumption analysis.';
+
+  @override
+  String speedConsumptionTimeShare(int percent) {
+    return '$percent % of driving';
+  }
+
+  @override
+  String get speedConsumptionNeedMoreData => 'Need more data';
+
+  @override
   String get splashLoadingLabel => 'Loading Tankstellen';
 
   @override

@@ -8,6 +8,7 @@ import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/data/trip_history_repository.dart';
+import '../../../consumption/domain/services/speed_consumption_histogram.dart';
 import '../../../consumption/domain/services/trip_length_aggregator.dart';
 import '../../../consumption/providers/consumption_providers.dart';
 import '../../../consumption/providers/trip_history_provider.dart';
@@ -18,6 +19,7 @@ import '../../domain/monthly_summary.dart';
 import '../widgets/fuel_vs_ev_card.dart';
 import '../widgets/milestones_card.dart';
 import '../widgets/monthly_bar_chart.dart';
+import '../widgets/speed_consumption_card.dart';
 import '../widgets/trip_length_breakdown_card.dart';
 
 /// Carbon dashboard: tabbed view of monthly charts (#180) and
@@ -150,6 +152,16 @@ class _ChartsTab extends ConsumerWidget {
     );
     final overallAvg = _overallAvgLPer100Km(trips, activeVehicle?.id);
 
+    // #1192 — speed-vs-consumption histogram, fed by per-second OBD2
+    // samples on each TripHistoryEntry. Same vehicle-id filter as the
+    // trip-length card so the two histograms describe the same data
+    // slice — and so the reference line on the speed card matches the
+    // overall avg already computed above.
+    final filteredTrips = _filterTrips(trips, activeVehicle?.id);
+    final speedBins = aggregateSpeedConsumption(
+      filteredTrips.expand((entry) => entry.samples),
+    );
+
     return ListView(
       padding: EdgeInsets.only(
         top: 16,
@@ -161,6 +173,13 @@ class _ChartsTab extends ConsumerWidget {
         if (l != null && !breakdown.isEmpty)
           TripLengthBreakdownCard(
             breakdown: breakdown,
+            overallAvgLPer100Km: overallAvg,
+            l: l,
+            theme: theme,
+          ),
+        if (l != null)
+          SpeedConsumptionCard(
+            bins: speedBins,
             overallAvgLPer100Km: overallAvg,
             l: l,
             theme: theme,
@@ -222,6 +241,23 @@ double? _overallAvgLPer100Km(
   }
   if (totalDistanceKm <= 0) return null;
   return (totalLitres / totalDistanceKm) * 100.0;
+}
+
+/// Filter [trips] to those that match [vehicleId] (or carry a legacy
+/// null vehicleId — same convention used by the trajets tab and
+/// [aggregateByTripLength]). Returns the filtered list eagerly so the
+/// caller can `.expand` over it twice without re-running the predicate
+/// per pass — a small but noticeable saving on long trip lists where
+/// each entry carries hundreds of samples.
+List<TripHistoryEntry> _filterTrips(
+  Iterable<TripHistoryEntry> trips,
+  String? vehicleId,
+) {
+  if (vehicleId == null) return trips.toList(growable: false);
+  return trips
+      .where((entry) =>
+          entry.vehicleId == null || entry.vehicleId == vehicleId)
+      .toList(growable: false);
 }
 
 class _AchievementsTab extends StatelessWidget {

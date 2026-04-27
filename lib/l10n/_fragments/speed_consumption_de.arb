@@ -1,0 +1,13 @@
+{
+  "speedConsumptionCardTitle": "Verbrauch nach Geschwindigkeit",
+  "speedBandIdleJam": "Leerlauf / Stau",
+  "speedBandUrban": "Stadt (10–50)",
+  "speedBandSuburban": "Vorort (50–80)",
+  "speedBandRural": "Landstraße (80–100)",
+  "speedBandMotorwaySlow": "Eco-Tempo (100–115)",
+  "speedBandMotorway": "Autobahn (115–130)",
+  "speedBandMotorwayFast": "Autobahn schnell (130+)",
+  "speedConsumptionInsufficientData": "Zeichnen Sie 30+ Minuten Fahrten mit dem OBD2-Adapter auf, um die Geschwindigkeits-/Verbrauchsanalyse freizuschalten.",
+  "speedConsumptionTimeShare": "{percent} % der Fahrt",
+  "speedConsumptionNeedMoreData": "Mehr Daten nötig"
+}
