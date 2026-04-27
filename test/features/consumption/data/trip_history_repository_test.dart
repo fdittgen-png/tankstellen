@@ -158,4 +158,77 @@ void main() {
       expect(all.first.summary.endedAt, isNull);
     });
   });
+
+  group('TripHistoryRepository.onSavedHook (#1193 phase 2)', () {
+    test(
+        'save() invokes onSavedHook with the saved entry vehicleId', () async {
+      final hookCalls = <String>[];
+      final repo = TripHistoryRepository(
+        box: box,
+        onSavedHook: hookCalls.add,
+      );
+      final start = DateTime(2026, 4, 21);
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: 'car-a',
+        summary: mkSummary(startedAt: start),
+      ));
+      expect(hookCalls, ['car-a']);
+    });
+
+    test(
+        'save() does NOT invoke onSavedHook when vehicleId is null '
+        '— orphan trips are out of scope for the aggregator', () async {
+      final hookCalls = <String>[];
+      final repo = TripHistoryRepository(
+        box: box,
+        onSavedHook: hookCalls.add,
+      );
+      final start = DateTime(2026, 4, 21);
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: start),
+      ));
+      expect(hookCalls, isEmpty);
+    });
+
+    test(
+        'a throwing onSavedHook does NOT make save() rethrow — the trip '
+        'has already persisted, the aggregator failure must not derail '
+        'the trip-stop flow', () async {
+      final repo = TripHistoryRepository(
+        box: box,
+        onSavedHook: (_) => throw StateError('aggregator boom'),
+      );
+      final start = DateTime(2026, 4, 21);
+      // Must complete without throwing.
+      await expectLater(
+        repo.save(TripHistoryEntry(
+          id: start.toIso8601String(),
+          vehicleId: 'car-a',
+          summary: mkSummary(startedAt: start),
+        )),
+        completes,
+      );
+      // And the trip must still be persisted — the hook fires AFTER
+      // the put, so a hook throw doesn't roll back the storage write.
+      expect(repo.loadAll(), hasLength(1));
+    });
+
+    test('onSavedHook is mutable post-construction (production wiring path)',
+        () async {
+      final repo = TripHistoryRepository(box: box);
+      final hookCalls = <String>[];
+      repo.onSavedHook = hookCalls.add;
+
+      final start = DateTime(2026, 4, 21);
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: 'car-b',
+        summary: mkSummary(startedAt: start),
+      ));
+      expect(hookCalls, ['car-b']);
+    });
+  });
 }

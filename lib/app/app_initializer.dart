@@ -27,6 +27,7 @@ import '../features/profile/data/repositories/profile_repository.dart';
 import '../features/vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../features/vehicle/data/repositories/vehicle_profile_repository.dart';
 import '../features/vehicle/data/vehicle_profile_migrator.dart';
+import '../features/vehicle/providers/vehicle_aggregate_updater_provider.dart';
 import '../features/widget/data/home_widget_service.dart';
 import '../features/widget/providers/nearest_widget_refresh_provider.dart';
 
@@ -430,6 +431,29 @@ class AppInitializer {
       } catch (e, st) {
         debugPrint(
             'AppInitializer: autoRecordOrchestrator init failed: $e\n$st');
+      }
+    });
+
+    // #1193 phase 2 — wire the vehicle aggregator's `runForVehicle`
+    // hook onto `TripHistoryRepository.onSavedHook` so every saved
+    // trip with a non-null vehicleId triggers a background recompute
+    // of the rolling driving aggregates. Deferred to the post-frame
+    // microtask because the trip-history Hive box is opened during
+    // the storage phase but the Riverpod provider may not have read
+    // it yet — by post-frame the provider graph has settled. Errors
+    // are logged but never block launch (the aggregator is purely an
+    // optimisation; trips still save without it).
+    _deferPostFirstFrame(() async {
+      try {
+        final wired = wireAggregatorIntoTripHistory(container);
+        if (!wired) {
+          debugPrint(
+              'AppInitializer: vehicle aggregator hook deferred — '
+              'trip-history box not open yet');
+        }
+      } catch (e, st) {
+        debugPrint(
+            'AppInitializer: vehicle aggregator wiring failed: $e\n$st');
       }
     });
 
