@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/brand_logo_mapper.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../data/obd2_vin_reader.dart';
 import '../../domain/entities/vehicle_profile.dart';
 import '../../domain/entities/vin_data.dart';
+import '../../providers/obd2_vin_reader_provider.dart';
 import '../../providers/vehicle_providers.dart';
 import '../../providers/vin_decoder_provider.dart';
 import '../widgets/auto_record_section.dart';
@@ -42,6 +44,10 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   String? _existingId;
   String? _adapterMac;
   String? _adapterName;
+  // #1162 — pairedAdapterMac (#1004) gates the "Read VIN from car"
+  // button. Distinct from [_adapterMac] which is the currently-
+  // connected OBD2 picker selection.
+  String? _pairedAdapterMac;
 
   // #812 phase 2 — engine params populated by the VIN decoder;
   // carried through _save for phase-3 OBD2 math.
@@ -51,6 +57,11 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
 
   // True while the vPIC request is in flight → VIN field spinner.
   bool _decodingVin = false;
+
+  // True while an OBD2 Mode 09 PID 02 read is in flight (#1162).
+  // Disables the "Read VIN from car" button and shows a spinner so
+  // the user has visible feedback during the bounded ~3 s window.
+  bool _readingVinFromCar = false;
 
   @override
   void initState() {
@@ -77,6 +88,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
         ..addAll(snap.connectors);
       _adapterMac = snap.adapterMac;
       _adapterName = snap.adapterName;
+      _pairedAdapterMac = snap.pairedAdapterMac;
       _engineDisplacementCc = snap.engineDisplacementCc;
       _engineCylinders = snap.engineCylinders;
       _curbWeightKg = snap.curbWeightKg;
@@ -180,6 +192,38 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
     });
   }
 
+  /// Read the VIN from the paired OBD2 adapter (#1162). On success,
+  /// sets the VIN text field; the existing decoder hook (#812 phase 2)
+  /// can then be triggered manually by the user — we don't auto-fire
+  /// it because the user may want to verify the value first. On any
+  /// failure, surfaces a localized snackbar and leaves the field
+  /// editable.
+  Future<void> _readVinFromCar() async {
+    final l = AppLocalizations.of(context);
+    final mac = _pairedAdapterMac;
+    if (mac == null || mac.isEmpty) return;
+
+    setState(() => _readingVinFromCar = true);
+    final result = await ref
+        .read(vinReaderServiceProvider)
+        .readVin(pairedAdapterMac: mac);
+    if (!mounted) return;
+    setState(() => _readingVinFromCar = false);
+
+    if (result.isSuccess) {
+      _ctrl.vinController.text = result.vin!;
+      return;
+    }
+
+    final messenger = ScaffoldMessenger.of(context);
+    final message = result.failure == ObdVinFailureReason.unsupported
+        ? (l?.vehicleReadVinFailedUnsupportedSnackbar ??
+            'VIN not available (Mode 09 PID 02 unsupported on pre-2005 vehicles)')
+        : (l?.vehicleReadVinFailedGenericSnackbar ??
+            'VIN read failed — please enter manually');
+    messenger.showSnackBar(SnackBar(content: Text(message)));
+  }
+
   void _onAdapterChanged(String? name, String? mac) {
     setState(() {
       _adapterName = name;
@@ -250,6 +294,10 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
               decodingVin: _decodingVin,
               onDecodeVin: _decodeVin,
               onShowVinInfo: _showVinInfo,
+              pairedAdapterMac: _pairedAdapterMac,
+              onReadVinFromCar:
+                  _pairedAdapterMac != null ? _readVinFromCar : null,
+              readingVinFromCar: _readingVinFromCar,
             ),
             const SizedBox(height: 16),
             // Card 2: Drivetrain (type + type-specific fields).

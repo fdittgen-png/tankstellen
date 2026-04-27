@@ -6,5 +6,21 @@
   "veResetAction": "Reset calibration",
   "@veResetAction": {
     "description": "Action on the vehicle edit screen that discards the learned volumetric-efficiency calibration (#815)."
+  },
+  "vehicleReadVinFromCarButton": "Read VIN from car",
+  "@vehicleReadVinFromCarButton": {
+    "description": "Button label on the vehicle edit screen that triggers an OBD2 Mode 09 PID 02 read of the VIN from the paired adapter (#1162)."
+  },
+  "vehicleReadVinFromCarTooltip": "Read VIN from the paired OBD2 adapter",
+  "@vehicleReadVinFromCarTooltip": {
+    "description": "Tooltip for the read-VIN-from-car button on the vehicle edit screen (#1162)."
+  },
+  "vehicleReadVinFailedUnsupportedSnackbar": "VIN not available (Mode 09 PID 02 unsupported on pre-2005 vehicles)",
+  "@vehicleReadVinFailedUnsupportedSnackbar": {
+    "description": "Snackbar shown when the OBD2 adapter does not support Mode 09 PID 02 (#1162)."
+  },
+  "vehicleReadVinFailedGenericSnackbar": "VIN read failed — please enter manually",
+  "@vehicleReadVinFailedGenericSnackbar": {
+    "description": "Snackbar shown when reading the VIN failed for a non-unsupported reason (timeout, malformed, IO) (#1162)."
   }
 }

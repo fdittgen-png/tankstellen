@@ -7160,6 +7160,30 @@ abstract class AppLocalizations {
   /// **'Reset calibration'**
   String get veResetAction;
 
+  /// Button label on the vehicle edit screen that triggers an OBD2 Mode 09 PID 02 read of the VIN from the paired adapter (#1162).
+  ///
+  /// In en, this message translates to:
+  /// **'Read VIN from car'**
+  String get vehicleReadVinFromCarButton;
+
+  /// Tooltip for the read-VIN-from-car button on the vehicle edit screen (#1162).
+  ///
+  /// In en, this message translates to:
+  /// **'Read VIN from the paired OBD2 adapter'**
+  String get vehicleReadVinFromCarTooltip;
+
+  /// Snackbar shown when the OBD2 adapter does not support Mode 09 PID 02 (#1162).
+  ///
+  /// In en, this message translates to:
+  /// **'VIN not available (Mode 09 PID 02 unsupported on pre-2005 vehicles)'**
+  String get vehicleReadVinFailedUnsupportedSnackbar;
+
+  /// Snackbar shown when reading the VIN failed for a non-unsupported reason (timeout, malformed, IO) (#1162).
+  ///
+  /// In en, this message translates to:
+  /// **'VIN read failed — please enter manually'**
+  String get vehicleReadVinFailedGenericSnackbar;
+
   /// Tooltip + Semantics label for the info icon next to the VIN field on EditVehicleScreen (#895).
   ///
   /// In en, this message translates to:

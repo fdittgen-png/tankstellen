@@ -3867,6 +3867,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String get veResetAction => 'Reset calibration';
 
   @override
+  String get vehicleReadVinFromCarButton => 'Lire le VIN depuis la voiture';
+
+  @override
+  String get vehicleReadVinFromCarTooltip =>
+      'Lire le VIN depuis l\'adaptateur OBD2 couplé';
+
+  @override
+  String get vehicleReadVinFailedUnsupportedSnackbar =>
+      'VIN indisponible (Mode 09 PID 02 non pris en charge sur les véhicules d\'avant 2005)';
+
+  @override
+  String get vehicleReadVinFailedGenericSnackbar =>
+      'Lecture du VIN échouée — veuillez saisir manuellement';
+
+  @override
   String get vinInfoTooltip => 'What is a VIN?';
 
   @override
