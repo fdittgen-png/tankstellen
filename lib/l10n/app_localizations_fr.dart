@@ -1666,7 +1666,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fieldRequired => 'Required';
 
   @override
-  String get fieldInvalidNumber => 'Invalid number';
+  String get fieldInvalidNumber => 'Nombre invalide';
 
   @override
   String get carbonDashboardTitle => 'Carbon dashboard';
@@ -1756,18 +1756,18 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get vehiclesTitle => 'My vehicles';
+  String get vehiclesTitle => 'Mes véhicules';
 
   @override
-  String get vehiclesMenuTitle => 'My vehicles';
+  String get vehiclesMenuTitle => 'Mes véhicules';
 
   @override
   String get vehiclesMenuSubtitle =>
-      'Battery, connectors, charging preferences';
+      'Batterie, connecteurs, préférences de recharge';
 
   @override
   String get vehiclesEmptyMessage =>
-      'Add your car to filter by connector and estimate charging costs.';
+      'Ajoutez votre voiture pour filtrer par connecteur et estimer les coûts de recharge.';
 
   @override
   String get vehiclesWizardTitle => 'Mes véhicules (facultatif)';
@@ -2168,63 +2168,63 @@ class AppLocalizationsFr extends AppLocalizations {
       'Les pleins sont attribués à un véhicule. Ajoutez votre voiture pour commencer à suivre la consommation.';
 
   @override
-  String get vehicleAdd => 'Add vehicle';
+  String get vehicleAdd => 'Ajouter un véhicule';
 
   @override
-  String get vehicleAddTitle => 'Add vehicle';
+  String get vehicleAddTitle => 'Ajouter un véhicule';
 
   @override
-  String get vehicleEditTitle => 'Edit vehicle';
+  String get vehicleEditTitle => 'Modifier le véhicule';
 
   @override
-  String get vehicleDeleteTitle => 'Delete vehicle?';
+  String get vehicleDeleteTitle => 'Supprimer le véhicule ?';
 
   @override
   String vehicleDeleteMessage(String name) {
-    return 'Remove \"$name\" from your profiles?';
+    return 'Retirer « $name » de vos profils ?';
   }
 
   @override
-  String get vehicleNameLabel => 'Name';
+  String get vehicleNameLabel => 'Nom';
 
   @override
-  String get vehicleNameHint => 'e.g. My Tesla Model 3';
+  String get vehicleNameHint => 'ex. Ma Tesla Model 3';
 
   @override
-  String get vehicleTypeCombustion => 'Combustion';
+  String get vehicleTypeCombustion => 'Thermique';
 
   @override
-  String get vehicleTypeHybrid => 'Hybrid';
+  String get vehicleTypeHybrid => 'Hybride';
 
   @override
-  String get vehicleTypeEv => 'Electric';
+  String get vehicleTypeEv => 'Électrique';
 
   @override
-  String get vehicleEvSectionTitle => 'Electric';
+  String get vehicleEvSectionTitle => 'Électrique';
 
   @override
-  String get vehicleCombustionSectionTitle => 'Combustion';
+  String get vehicleCombustionSectionTitle => 'Thermique';
 
   @override
-  String get vehicleBatteryLabel => 'Battery capacity (kWh)';
+  String get vehicleBatteryLabel => 'Capacité de la batterie (kWh)';
 
   @override
-  String get vehicleMaxChargeLabel => 'Max charging power (kW)';
+  String get vehicleMaxChargeLabel => 'Puissance de recharge maximale (kW)';
 
   @override
-  String get vehicleConnectorsLabel => 'Supported connectors';
+  String get vehicleConnectorsLabel => 'Connecteurs pris en charge';
 
   @override
-  String get vehicleMinSocLabel => 'Min SoC %';
+  String get vehicleMinSocLabel => 'SoC min. %';
 
   @override
-  String get vehicleMaxSocLabel => 'Max SoC %';
+  String get vehicleMaxSocLabel => 'SoC max. %';
 
   @override
-  String get vehicleTankLabel => 'Tank capacity (L)';
+  String get vehicleTankLabel => 'Capacité du réservoir (L)';
 
   @override
-  String get vehiclePreferredFuelLabel => 'Preferred fuel';
+  String get vehiclePreferredFuelLabel => 'Carburant préféré';
 
   @override
   String get connectorType2 => 'Type 2';
@@ -2991,50 +2991,52 @@ class AppLocalizationsFr extends AppLocalizations {
   String get independentStation => 'Independent station';
 
   @override
-  String get serviceRemindersSection => 'Service reminders';
+  String get serviceRemindersSection => 'Rappels d\'entretien';
 
   @override
-  String get serviceRemindersEmpty => 'No reminders yet — pick a preset above.';
+  String get serviceRemindersEmpty =>
+      'Aucun rappel — choisissez un préréglage ci-dessus.';
 
   @override
-  String get addServiceReminder => 'Add reminder';
+  String get addServiceReminder => 'Ajouter un rappel';
 
   @override
-  String get serviceReminderPresetOil => 'Oil (15,000 km)';
+  String get serviceReminderPresetOil => 'Vidange (15 000 km)';
 
   @override
-  String get serviceReminderPresetOilLabel => 'Oil change';
+  String get serviceReminderPresetOilLabel => 'Vidange';
 
   @override
-  String get serviceReminderPresetTires => 'Tires (20,000 km)';
+  String get serviceReminderPresetTires => 'Pneus (20 000 km)';
 
   @override
-  String get serviceReminderPresetTiresLabel => 'Tires';
+  String get serviceReminderPresetTiresLabel => 'Pneus';
 
   @override
-  String get serviceReminderPresetInspection => 'Inspection (30,000 km)';
+  String get serviceReminderPresetInspection =>
+      'Contrôle technique (30 000 km)';
 
   @override
-  String get serviceReminderPresetInspectionLabel => 'Inspection';
+  String get serviceReminderPresetInspectionLabel => 'Contrôle technique';
 
   @override
-  String get serviceReminderLabel => 'Label';
+  String get serviceReminderLabel => 'Libellé';
 
   @override
-  String get serviceReminderInterval => 'Interval (km)';
+  String get serviceReminderInterval => 'Intervalle (km)';
 
   @override
-  String get serviceReminderLastService => 'Last service';
+  String get serviceReminderLastService => 'Dernier entretien';
 
   @override
-  String get serviceReminderMarkDone => 'Mark as done';
+  String get serviceReminderMarkDone => 'Marquer comme effectué';
 
   @override
-  String get serviceReminderDueTitle => 'Service due';
+  String get serviceReminderDueTitle => 'Entretien à effectuer';
 
   @override
   String serviceReminderDueBody(String label, int kmOver) {
-    return '$label is due — $kmOver km past the interval.';
+    return '$label à effectuer — $kmOver km au-delà de l\'intervalle.';
   }
 
   @override
@@ -3051,7 +3053,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chileApiProvider => 'CNE Bencina en Linea';
 
   @override
-  String get vinConfirmTitle => 'Is this your car?';
+  String get vinConfirmTitle => 'Est-ce votre voiture ?';
 
   @override
   String vinConfirmBody(
@@ -3062,18 +3064,18 @@ class AppLocalizationsFr extends AppLocalizations {
     String cylinders,
     String fuel,
   ) {
-    return '$year $make $model — ${displacement}L, $cylinders-cyl, $fuel';
+    return '$year $make $model — ${displacement}L, $cylinders cyl., $fuel';
   }
 
   @override
   String get vinPartialInfoNote =>
-      'Partial info (offline). You can edit below.';
+      'Informations partielles (hors ligne). Vous pouvez modifier ci-dessous.';
 
   @override
-  String get vinDecodeError => 'Couldn\'t decode this VIN';
+  String get vinDecodeError => 'Impossible de décoder ce VIN';
 
   @override
-  String get vinInvalidFormat => 'Invalid VIN format';
+  String get vinInvalidFormat => 'Format VIN invalide';
 
   @override
   String get obd2PauseBannerTitle => 'OBD2 connection lost — recording paused';
@@ -3090,11 +3092,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get veResetConfirmTitle => 'Reset calibration?';
+  String get veResetConfirmTitle => 'Réinitialiser la calibration ?';
 
   @override
   String get veResetConfirmBody =>
-      'This will discard the learned per-vehicle calibration and restore the default value (0.85).';
+      'Cela supprimera la calibration apprise pour ce véhicule et restaurera la valeur par défaut (0,85).';
 
   @override
   String get alertsRadiusSectionTitle => 'Radius alerts';
@@ -3561,35 +3563,36 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fillUpPricePerLiterLabel => 'Price per liter';
 
   @override
-  String get vehicleHeaderPlateLabel => 'Plate';
+  String get vehicleHeaderPlateLabel => 'Plaque';
 
   @override
-  String get vehicleHeaderUntitled => 'New vehicle';
+  String get vehicleHeaderUntitled => 'Nouveau véhicule';
 
   @override
-  String get vehicleSectionIdentityTitle => 'Identity';
+  String get vehicleSectionIdentityTitle => 'Identité';
 
   @override
-  String get vehicleSectionIdentitySubtitle => 'Name & VIN';
+  String get vehicleSectionIdentitySubtitle => 'Nom et VIN';
 
   @override
-  String get vehicleSectionDrivetrainTitle => 'Drivetrain';
+  String get vehicleSectionDrivetrainTitle => 'Motorisation';
 
   @override
-  String get vehicleSectionDrivetrainSubtitle => 'How this vehicle moves';
+  String get vehicleSectionDrivetrainSubtitle =>
+      'Comment ce véhicule se déplace';
 
   @override
-  String get calibrationModeLabel => 'Calibration mode';
+  String get calibrationModeLabel => 'Mode de calibration';
 
   @override
-  String get calibrationModeRule => 'Rule-based';
+  String get calibrationModeRule => 'Basé sur les règles';
 
   @override
-  String get calibrationModeFuzzy => 'Fuzzy';
+  String get calibrationModeFuzzy => 'Flou';
 
   @override
   String get calibrationModeTooltip =>
-      'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.';
+      'Le mode basé sur les règles attribue chaque échantillon de conduite à une seule situation. Le mode flou le répartit entre toutes en fonction de la pertinence de chacune — plus stable autour de 60 km/h ou en cas de variations de pente, mais plus lent à remplir toutes les catégories.';
 
   @override
   String get profileGamificationToggleTitle => 'Afficher les succès et scores';
@@ -4004,72 +4007,72 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tripRecordingPinSemanticOff => 'Pin recording form';
 
   @override
-  String get vinLabel => 'VIN (optional)';
+  String get vinLabel => 'VIN (optionnel)';
 
   @override
-  String get vinDecodeTooltip => 'Decode VIN';
+  String get vinDecodeTooltip => 'Décoder le VIN';
 
   @override
-  String get vinConfirmAction => 'Yes, auto-fill';
+  String get vinConfirmAction => 'Oui, remplir automatiquement';
 
   @override
-  String get vinModifyAction => 'Modify manually';
+  String get vinModifyAction => 'Modifier manuellement';
 
   @override
-  String get veResetAction => 'Reset calibration';
+  String get veResetAction => 'Réinitialiser la calibration';
 
   @override
-  String get vehicleReadVinFromCarButton => 'Read VIN from car';
+  String get vehicleReadVinFromCarButton => 'Lire le VIN depuis la voiture';
 
   @override
   String get vehicleReadVinFromCarTooltip =>
-      'Read VIN from the paired OBD2 adapter';
+      'Lire le VIN depuis l\'adaptateur OBD2 jumelé';
 
   @override
   String get vehicleReadVinFailedUnsupportedSnackbar =>
-      'VIN not available (Mode 09 PID 02 unsupported on pre-2005 vehicles)';
+      'VIN indisponible (Mode 09 PID 02 non pris en charge avant 2005)';
 
   @override
   String get vehicleReadVinFailedGenericSnackbar =>
-      'VIN read failed — please enter manually';
+      'Échec de la lecture du VIN — veuillez le saisir manuellement';
 
   @override
-  String get vinInfoTooltip => 'What is a VIN?';
+  String get vinInfoTooltip => 'Qu\'est-ce qu\'un VIN ?';
 
   @override
-  String get vinInfoSectionWhatTitle => 'What is a VIN?';
+  String get vinInfoSectionWhatTitle => 'Qu\'est-ce qu\'un VIN ?';
 
   @override
   String get vinInfoSectionWhatBody =>
-      'The Vehicle Identification Number is a 17-character code unique to your car. It\'s stamped on the chassis and printed on your vehicle registration document.';
+      'Le numéro d\'identification du véhicule (VIN) est un code unique de 17 caractères propre à votre voiture. Il est gravé sur le châssis et figure sur votre carte grise.';
 
   @override
-  String get vinInfoSectionWhyTitle => 'Why we ask';
+  String get vinInfoSectionWhyTitle => 'Pourquoi nous le demandons';
 
   @override
   String get vinInfoSectionWhyBody =>
-      'Decoding the VIN auto-fills engine displacement, cylinder count, model year, primary fuel type, and gross weight — saving you from looking up technical specs manually. The OBD2 fuel-rate calculation uses these values to give you accurate consumption numbers.';
+      'Décoder le VIN remplit automatiquement la cylindrée, le nombre de cylindres, l\'année du modèle, le carburant principal et le poids total — vous évitant de chercher les fiches techniques. Le calcul de débit carburant OBD2 utilise ces valeurs pour fournir des chiffres de consommation précis.';
 
   @override
-  String get vinInfoSectionPrivacyTitle => 'Privacy';
+  String get vinInfoSectionPrivacyTitle => 'Confidentialité';
 
   @override
   String get vinInfoSectionPrivacyBody =>
-      'Your VIN is stored only locally in the app\'s encrypted storage — it\'s never uploaded to Tankstellen servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.';
+      'Votre VIN est stocké uniquement en local dans le stockage chiffré de l\'application — il n\'est jamais envoyé aux serveurs Tankstellen. La base de données NHTSA vPIC est interrogée avec le VIN mais ne renvoie que des spécifications techniques anonymes ; NHTSA n\'associe le VIN à aucune donnée personnelle. Sans réseau, une recherche hors ligne ne renvoie que le constructeur et le pays.';
 
   @override
-  String get vinInfoSectionWhereTitle => 'Where to find it';
+  String get vinInfoSectionWhereTitle => 'Où le trouver';
 
   @override
   String get vinInfoSectionWhereBody =>
-      'Look through the windshield at the lower-left corner on the driver\'s side, check the driver-side door-frame sticker when the door is open, or read it off your vehicle registration document (card / Carte Grise).';
+      'Regardez à travers le pare-brise dans le coin inférieur gauche côté conducteur, vérifiez l\'autocollant sur le montant de portière côté conducteur (porte ouverte), ou lisez-le sur votre carte grise.';
 
   @override
-  String get vinInfoDismiss => 'Got it';
+  String get vinInfoDismiss => 'Compris';
 
   @override
   String get vinConfirmPrivacyNote =>
-      'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Tankstellen servers.';
+      'Nous avons interrogé votre VIN dans la base de données gratuite NHTSA — rien n\'a été envoyé aux serveurs Tankstellen.';
 
   @override
   String get widgetVariantDefault => 'Current price only';

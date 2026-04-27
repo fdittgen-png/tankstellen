@@ -641,8 +641,12 @@
   "syncWizardStepOfSteps": "Étape {current} sur {total}",
   "@syncWizardStepOfSteps": {
     "placeholders": {
-      "current": { "type": "int" },
-      "total": { "type": "int" }
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "syncWizardCreateSupabaseTitle": "Créer un projet Supabase",
@@ -717,7 +721,9 @@
   "vehiclesWizardYoursList": "Vous avez {count, plural, =1{1 véhicule} other{{count} véhicules}} :",
   "@vehiclesWizardYoursList": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "vehiclesWizardSkipHint": "Ignorer pour terminer la configuration — vous pouvez ajouter des véhicules à tout moment depuis les Paramètres.",
@@ -837,7 +843,9 @@
   "obdOdometerRead": "Compteur lu : {km} km",
   "@obdOdometerRead": {
     "placeholders": {
-      "km": { "type": "int" }
+      "km": {
+        "type": "int"
+      }
     }
   },
   "vehicleFuelNotSet": "Non défini",
@@ -869,7 +877,11 @@
   "privacyCopyErrorLog": "Copier le journal d'erreurs ({count})",
   "@privacyCopyErrorLog": {
     "description": "Button that copies recorded error traces to the clipboard. count = number of traces buffered.",
-    "placeholders": { "count": { "type": "int" } }
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "yes": "Oui",
   "no": "Non",
@@ -936,5 +948,81 @@
   "tankLevelDetailSheetTitle": "Trajets depuis le dernier plein",
   "addFillUpIsFullTankLabel": "Plein complet",
   "profileGamificationToggleTitle": "Afficher les succès et scores",
-  "profileGamificationToggleSubtitle": "Désactivé, les badges, scores et trophées sont masqués dans toute l'app."
+  "profileGamificationToggleSubtitle": "Désactivé, les badges, scores et trophées sont masqués dans toute l'app.",
+  "vehicleEditTitle": "Modifier le véhicule",
+  "vehicleAddTitle": "Ajouter un véhicule",
+  "vehicleAdd": "Ajouter un véhicule",
+  "vehicleHeaderUntitled": "Nouveau véhicule",
+  "vehicleHeaderPlateLabel": "Plaque",
+  "vehicleSectionIdentityTitle": "Identité",
+  "vehicleSectionIdentitySubtitle": "Nom et VIN",
+  "vehicleSectionDrivetrainTitle": "Motorisation",
+  "vehicleSectionDrivetrainSubtitle": "Comment ce véhicule se déplace",
+  "vehicleNameLabel": "Nom",
+  "vehicleNameHint": "ex. Ma Tesla Model 3",
+  "vehiclesTitle": "Mes véhicules",
+  "vehiclesEmptyMessage": "Ajoutez votre voiture pour filtrer par connecteur et estimer les coûts de recharge.",
+  "vehicleDeleteTitle": "Supprimer le véhicule ?",
+  "vehicleDeleteMessage": "Retirer « {name} » de vos profils ?",
+  "vehicleTypeCombustion": "Thermique",
+  "vehicleTypeEv": "Électrique",
+  "vehicleTypeHybrid": "Hybride",
+  "vehicleCombustionSectionTitle": "Thermique",
+  "vehicleEvSectionTitle": "Électrique",
+  "vehicleTankLabel": "Capacité du réservoir (L)",
+  "vehiclePreferredFuelLabel": "Carburant préféré",
+  "vehicleBatteryLabel": "Capacité de la batterie (kWh)",
+  "vehicleMaxChargeLabel": "Puissance de recharge maximale (kW)",
+  "vehicleMinSocLabel": "SoC min. %",
+  "vehicleMaxSocLabel": "SoC max. %",
+  "vehicleConnectorsLabel": "Connecteurs pris en charge",
+  "vehicleReadVinFromCarButton": "Lire le VIN depuis la voiture",
+  "vehicleReadVinFromCarTooltip": "Lire le VIN depuis l'adaptateur OBD2 jumelé",
+  "vehicleReadVinFailedGenericSnackbar": "Échec de la lecture du VIN — veuillez le saisir manuellement",
+  "vehicleReadVinFailedUnsupportedSnackbar": "VIN indisponible (Mode 09 PID 02 non pris en charge avant 2005)",
+  "vinLabel": "VIN (optionnel)",
+  "vinDecodeTooltip": "Décoder le VIN",
+  "vinDecodeError": "Impossible de décoder ce VIN",
+  "vinInvalidFormat": "Format VIN invalide",
+  "vinConfirmTitle": "Est-ce votre voiture ?",
+  "vinConfirmBody": "{year} {make} {model} — {displacement}L, {cylinders} cyl., {fuel}",
+  "vinConfirmAction": "Oui, remplir automatiquement",
+  "vinConfirmPrivacyNote": "Nous avons interrogé votre VIN dans la base de données gratuite NHTSA — rien n'a été envoyé aux serveurs Tankstellen.",
+  "vinModifyAction": "Modifier manuellement",
+  "vinPartialInfoNote": "Informations partielles (hors ligne). Vous pouvez modifier ci-dessous.",
+  "vinInfoTooltip": "Qu'est-ce qu'un VIN ?",
+  "vinInfoDismiss": "Compris",
+  "vinInfoSectionWhatTitle": "Qu'est-ce qu'un VIN ?",
+  "vinInfoSectionWhatBody": "Le numéro d'identification du véhicule (VIN) est un code unique de 17 caractères propre à votre voiture. Il est gravé sur le châssis et figure sur votre carte grise.",
+  "vinInfoSectionWhereTitle": "Où le trouver",
+  "vinInfoSectionWhereBody": "Regardez à travers le pare-brise dans le coin inférieur gauche côté conducteur, vérifiez l'autocollant sur le montant de portière côté conducteur (porte ouverte), ou lisez-le sur votre carte grise.",
+  "vinInfoSectionWhyTitle": "Pourquoi nous le demandons",
+  "vinInfoSectionWhyBody": "Décoder le VIN remplit automatiquement la cylindrée, le nombre de cylindres, l'année du modèle, le carburant principal et le poids total — vous évitant de chercher les fiches techniques. Le calcul de débit carburant OBD2 utilise ces valeurs pour fournir des chiffres de consommation précis.",
+  "vinInfoSectionPrivacyTitle": "Confidentialité",
+  "vinInfoSectionPrivacyBody": "Votre VIN est stocké uniquement en local dans le stockage chiffré de l'application — il n'est jamais envoyé aux serveurs Tankstellen. La base de données NHTSA vPIC est interrogée avec le VIN mais ne renvoie que des spécifications techniques anonymes ; NHTSA n'associe le VIN à aucune donnée personnelle. Sans réseau, une recherche hors ligne ne renvoie que le constructeur et le pays.",
+  "calibrationModeLabel": "Mode de calibration",
+  "calibrationModeRule": "Basé sur les règles",
+  "calibrationModeFuzzy": "Flou",
+  "calibrationModeTooltip": "Le mode basé sur les règles attribue chaque échantillon de conduite à une seule situation. Le mode flou le répartit entre toutes en fonction de la pertinence de chacune — plus stable autour de 60 km/h ou en cas de variations de pente, mais plus lent à remplir toutes les catégories.",
+  "veResetAction": "Réinitialiser la calibration",
+  "veResetConfirmTitle": "Réinitialiser la calibration ?",
+  "veResetConfirmBody": "Cela supprimera la calibration apprise pour ce véhicule et restaurera la valeur par défaut (0,85).",
+  "serviceRemindersSection": "Rappels d'entretien",
+  "serviceRemindersEmpty": "Aucun rappel — choisissez un préréglage ci-dessus.",
+  "addServiceReminder": "Ajouter un rappel",
+  "serviceReminderLabel": "Libellé",
+  "serviceReminderInterval": "Intervalle (km)",
+  "serviceReminderLastService": "Dernier entretien",
+  "serviceReminderMarkDone": "Marquer comme effectué",
+  "serviceReminderPresetOil": "Vidange (15 000 km)",
+  "serviceReminderPresetOilLabel": "Vidange",
+  "serviceReminderPresetTires": "Pneus (20 000 km)",
+  "serviceReminderPresetTiresLabel": "Pneus",
+  "serviceReminderPresetInspection": "Contrôle technique (30 000 km)",
+  "serviceReminderPresetInspectionLabel": "Contrôle technique",
+  "fieldInvalidNumber": "Nombre invalide",
+  "serviceReminderDueTitle": "Entretien à effectuer",
+  "serviceReminderDueBody": "{label} à effectuer — {kmOver} km au-delà de l'intervalle.",
+  "vehiclesMenuTitle": "Mes véhicules",
+  "vehiclesMenuSubtitle": "Batterie, connecteurs, préférences de recharge"
 }

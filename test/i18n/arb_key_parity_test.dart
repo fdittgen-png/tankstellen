@@ -117,7 +117,7 @@ String _localeFromPath(String p) {
 const Map<String, int> _baseline = {
   'en': 800,
   'de': 800,
-  'fr': 617,
+  'fr': 693,
   'bg': 300,
   'cs': 300,
   'da': 300,
