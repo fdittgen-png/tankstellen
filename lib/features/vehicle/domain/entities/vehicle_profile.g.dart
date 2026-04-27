@@ -73,41 +73,60 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
       model: json['model'] as String?,
       year: (json['year'] as num?)?.toInt(),
       referenceVehicleId: json['referenceVehicleId'] as String?,
+      tripLengthAggregates: json['tripLengthAggregates'] == null
+          ? null
+          : TripLengthBreakdown.fromJson(
+              json['tripLengthAggregates'] as Map<String, dynamic>,
+            ),
+      speedConsumptionAggregates: json['speedConsumptionAggregates'] == null
+          ? null
+          : SpeedConsumptionHistogram.fromJson(
+              json['speedConsumptionAggregates'] as Map<String, dynamic>,
+            ),
+      aggregatesUpdatedAt: json['aggregatesUpdatedAt'] == null
+          ? null
+          : DateTime.parse(json['aggregatesUpdatedAt'] as String),
+      aggregatesTripCount: (json['aggregatesTripCount'] as num?)?.toInt(),
     );
 
-Map<String, dynamic> _$VehicleProfileToJson(_VehicleProfile instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'type': const VehicleTypeJsonConverter().toJson(instance.type),
-      'batteryKwh': instance.batteryKwh,
-      'maxChargingKw': instance.maxChargingKw,
-      'supportedConnectors': const ConnectorTypeSetConverter().toJson(
-        instance.supportedConnectors,
-      ),
-      'chargingPreferences': const ChargingPreferencesJsonConverter().toJson(
-        instance.chargingPreferences,
-      ),
-      'tankCapacityL': instance.tankCapacityL,
-      'preferredFuelType': instance.preferredFuelType,
-      'engineDisplacementCc': instance.engineDisplacementCc,
-      'engineCylinders': instance.engineCylinders,
-      'volumetricEfficiency': instance.volumetricEfficiency,
-      'volumetricEfficiencySamples': instance.volumetricEfficiencySamples,
-      'curbWeightKg': instance.curbWeightKg,
-      'obd2AdapterMac': instance.obd2AdapterMac,
-      'obd2AdapterName': instance.obd2AdapterName,
-      'vin': instance.vin,
-      'calibrationMode': const VehicleCalibrationModeJsonConverter().toJson(
-        instance.calibrationMode,
-      ),
-      'autoRecord': instance.autoRecord,
-      'pairedAdapterMac': instance.pairedAdapterMac,
-      'movementStartThresholdKmh': instance.movementStartThresholdKmh,
-      'disconnectSaveDelaySec': instance.disconnectSaveDelaySec,
-      'backgroundLocationConsent': instance.backgroundLocationConsent,
-      'make': instance.make,
-      'model': instance.model,
-      'year': instance.year,
-      'referenceVehicleId': instance.referenceVehicleId,
-    };
+Map<String, dynamic> _$VehicleProfileToJson(
+  _VehicleProfile instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'name': instance.name,
+  'type': const VehicleTypeJsonConverter().toJson(instance.type),
+  'batteryKwh': instance.batteryKwh,
+  'maxChargingKw': instance.maxChargingKw,
+  'supportedConnectors': const ConnectorTypeSetConverter().toJson(
+    instance.supportedConnectors,
+  ),
+  'chargingPreferences': const ChargingPreferencesJsonConverter().toJson(
+    instance.chargingPreferences,
+  ),
+  'tankCapacityL': instance.tankCapacityL,
+  'preferredFuelType': instance.preferredFuelType,
+  'engineDisplacementCc': instance.engineDisplacementCc,
+  'engineCylinders': instance.engineCylinders,
+  'volumetricEfficiency': instance.volumetricEfficiency,
+  'volumetricEfficiencySamples': instance.volumetricEfficiencySamples,
+  'curbWeightKg': instance.curbWeightKg,
+  'obd2AdapterMac': instance.obd2AdapterMac,
+  'obd2AdapterName': instance.obd2AdapterName,
+  'vin': instance.vin,
+  'calibrationMode': const VehicleCalibrationModeJsonConverter().toJson(
+    instance.calibrationMode,
+  ),
+  'autoRecord': instance.autoRecord,
+  'pairedAdapterMac': instance.pairedAdapterMac,
+  'movementStartThresholdKmh': instance.movementStartThresholdKmh,
+  'disconnectSaveDelaySec': instance.disconnectSaveDelaySec,
+  'backgroundLocationConsent': instance.backgroundLocationConsent,
+  'make': instance.make,
+  'model': instance.model,
+  'year': instance.year,
+  'referenceVehicleId': instance.referenceVehicleId,
+  'tripLengthAggregates': instance.tripLengthAggregates?.toJson(),
+  'speedConsumptionAggregates': instance.speedConsumptionAggregates?.toJson(),
+  'aggregatesUpdatedAt': instance.aggregatesUpdatedAt?.toIso8601String(),
+  'aggregatesTripCount': instance.aggregatesTripCount,
+};
