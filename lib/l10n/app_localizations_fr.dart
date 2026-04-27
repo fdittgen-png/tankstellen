@@ -3172,6 +3172,25 @@ class AppLocalizationsFr extends AppLocalizations {
       'Réalisez un trajet de 30 km ou plus à vitesse constante avec un score de conduite souple supérieur ou égal à 90.';
 
   @override
+  String get authErrorNoNetwork =>
+      'Pas de connexion réseau. Veuillez réessayer plus tard.';
+
+  @override
+  String get authErrorInvalidCredentials =>
+      'E-mail ou mot de passe incorrect. Veuillez vérifier vos identifiants.';
+
+  @override
+  String get authErrorUserAlreadyExists =>
+      'Cette adresse e-mail est déjà enregistrée. Essayez de vous connecter.';
+
+  @override
+  String get authErrorEmailNotConfirmed =>
+      'Veuillez ouvrir l\'e-mail de confirmation pour activer votre compte.';
+
+  @override
+  String get authErrorGeneric => 'Échec de la connexion. Veuillez réessayer.';
+
+  @override
   String get autoRecordSectionTitle => 'Enregistrement automatique';
 
   @override
