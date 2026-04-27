@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
 import 'package:tankstellen/core/widgets/page_scaffold.dart';
@@ -74,7 +76,45 @@ class _FakeSyncState extends SyncState {
   SyncConfig build() => _config;
 }
 
+/// Fake [SyncState] whose [signInWithEmail] always throws the supplied
+/// error. Used to verify the catch-block goes through the friendly-error
+/// mapper rather than dumping `e.toString()` onto the screen (#1186).
+class _ThrowingSyncState extends SyncState {
+  _ThrowingSyncState(this._error);
+  final Object _error;
+
+  @override
+  SyncConfig build() => const SyncConfig();
+
+  @override
+  Future<void> signInWithEmail(
+    String email,
+    String password, {
+    bool isSignUp = true,
+  }) async {
+    throw _error;
+  }
+}
+
 void main() {
+  setUp(() {
+    // The friendly-error mapper used by AuthScreen logs through
+    // errorLogger, which falls through to the Hive-backed spool when
+    // no foreground container is bound. Hive is not initialised in
+    // pure widget tests, so override the enqueue to a no-op.
+    errorLogger.spoolEnqueueOverride = ({
+      required String isolateTaskName,
+      required Object error,
+      StackTrace? stack,
+      Map<String, dynamic>? contextMap,
+      DateTime? timestamp,
+    }) async {};
+  });
+
+  tearDown(() {
+    errorLogger.resetForTest();
+  });
+
   group('AuthScreen', () {
     Future<_FakeAuthFormController> pumpAuthScreen(
       WidgetTester tester, {
@@ -237,6 +277,78 @@ void main() {
       final fake = await pumpAuthScreen(tester);
       // pumpApp ends with pumpAndSettle so the post-frame callback has run.
       expect(fake.resetCalls, 1);
+    });
+
+    testWidgets(
+        'submitting email when sign-in throws a retryable fetch error '
+        'renders the localized "no network" string and never leaks the '
+        'project URL or exception type name (#1186)',
+        (tester) async {
+      // Drive _submitEmail by tapping the submit button — the throwing
+      // SyncState fakes the worst-case scenario from the bug: the user
+      // enters credentials, the server is unreachable, and the catch
+      // block previously rendered something like
+      // `AuthRetryableFetchException: ...
+      // uri=https://klelxnkzrxlpzuddhpfg.supabase.co/...`.
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            authFormControllerProvider
+                .overrideWith(() => _FakeAuthFormController(
+                      const AuthFormState(isSignUp: false),
+                    )),
+            syncStateProvider.overrideWith(
+              () => _ThrowingSyncState(
+                AuthRetryableFetchException(
+                  message:
+                      'AuthRetryableFetchException: ClientException with '
+                      'SocketException: Failed host lookup '
+                      'klelxnkzrxlpzuddhpfg.supabase.co',
+                ),
+              ),
+            ),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
+            home: AuthScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Type credentials so the early-return validators don't short-circuit.
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Email'), 'someone@example.com');
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Password'), 'Hunter22!');
+      await tester.pump();
+
+      // Tap the submit button (FilledButton inside the EmailAuthCard).
+      await tester.tap(find.byType(FilledButton).first);
+      // The throwing future resolves on the next microtask; pumpAndSettle
+      // would loop on the spinner while it's flipped on.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      // The friendly localized string is what the user sees.
+      expect(find.text('No network connection. Try again later.'),
+          findsOneWidget);
+
+      // None of these forbidden strings appear anywhere on the rendered
+      // tree. This is the core regression test for #1186.
+      final allText = find
+          .byType(Text)
+          .evaluate()
+          .map((e) => (e.widget as Text).data ?? '')
+          .join(' \n ');
+      expect(allText, isNot(contains('AuthRetryableFetchException')),
+          reason: 'exception type name must not leak into the UI');
+      expect(allText, isNot(contains('klelxnkzrxlpzuddhpfg')),
+          reason: 'project URL must not leak into the UI');
+      expect(allText, isNot(contains('supabase.co')),
+          reason: 'project host must not leak into the UI');
     });
   });
 }

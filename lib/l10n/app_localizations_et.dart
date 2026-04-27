@@ -3713,6 +3713,24 @@ class AppLocalizationsEt extends AppLocalizations {
   String get splashLoadingLabel => 'Loading Tankstellen';
 
   @override
+  String get authErrorNoNetwork => 'No network connection. Try again later.';
+
+  @override
+  String get authErrorInvalidCredentials =>
+      'Invalid email or password. Check your credentials.';
+
+  @override
+  String get authErrorUserAlreadyExists =>
+      'An account with this email already exists.';
+
+  @override
+  String get authErrorEmailNotConfirmed =>
+      'Please confirm your email before signing in.';
+
+  @override
+  String get authErrorGeneric => 'Something went wrong. Please try again.';
+
+  @override
   String get themeCardTitle => 'Theme';
 
   @override

@@ -6926,6 +6926,36 @@ abstract class AppLocalizations {
   /// **'Loading Tankstellen'**
   String get splashLoadingLabel;
 
+  /// Friendly error pill on the auth screen when sign-in / sign-up fails because the device is offline or the Supabase host cannot be resolved (#1186). Replaces raw exception text like 'AuthRetryableFetchException' that previously leaked the project URL.
+  ///
+  /// In en, this message translates to:
+  /// **'No network connection. Try again later.'**
+  String get authErrorNoNetwork;
+
+  /// Friendly error pill when Supabase returns invalid_credentials on email sign-in (#1186).
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email or password. Check your credentials.'**
+  String get authErrorInvalidCredentials;
+
+  /// Friendly error pill when Supabase rejects a sign-up because the email is already registered (#1186).
+  ///
+  /// In en, this message translates to:
+  /// **'An account with this email already exists.'**
+  String get authErrorUserAlreadyExists;
+
+  /// Friendly error pill when Supabase blocks a sign-in because the user has not confirmed their email yet (#1186).
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your email before signing in.'**
+  String get authErrorEmailNotConfirmed;
+
+  /// Default friendly error pill on the auth screen when no specific cause is detected. Used as the fallback after the friendly-error mapper exhausts all known cases (#1186).
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get authErrorGeneric;
+
   /// Title of the Theme card on the Settings screen (#897). The card matches the Privacy + Storage card pattern and navigates to a dedicated theme picker screen.
   ///
   /// In en, this message translates to:

@@ -3743,6 +3743,25 @@ class AppLocalizationsFr extends AppLocalizations {
   String get splashLoadingLabel => 'Loading Tankstellen';
 
   @override
+  String get authErrorNoNetwork =>
+      'Pas de connexion réseau. Réessayez plus tard.';
+
+  @override
+  String get authErrorInvalidCredentials =>
+      'E-mail ou mot de passe invalide. Vérifiez vos identifiants.';
+
+  @override
+  String get authErrorUserAlreadyExists =>
+      'Un compte avec cet e-mail existe déjà.';
+
+  @override
+  String get authErrorEmailNotConfirmed =>
+      'Veuillez confirmer votre e-mail avant de vous connecter.';
+
+  @override
+  String get authErrorGeneric => 'Une erreur est survenue. Veuillez réessayer.';
+
+  @override
   String get themeCardTitle => 'Thème';
 
   @override

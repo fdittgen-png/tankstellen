@@ -1,0 +1,7 @@
+{
+  "authErrorNoNetwork": "Keine Netzwerkverbindung. Bitte später erneut versuchen.",
+  "authErrorInvalidCredentials": "Ungültige E-Mail oder Passwort. Bitte überprüfen.",
+  "authErrorUserAlreadyExists": "Ein Konto mit dieser E-Mail existiert bereits.",
+  "authErrorEmailNotConfirmed": "Bitte bestätige deine E-Mail vor der Anmeldung.",
+  "authErrorGeneric": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+}

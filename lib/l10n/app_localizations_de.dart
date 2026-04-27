@@ -3749,6 +3749,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String get splashLoadingLabel => 'Tankstellen wird geladen';
 
   @override
+  String get authErrorNoNetwork =>
+      'Keine Netzwerkverbindung. Bitte später erneut versuchen.';
+
+  @override
+  String get authErrorInvalidCredentials =>
+      'Ungültige E-Mail oder Passwort. Bitte überprüfen.';
+
+  @override
+  String get authErrorUserAlreadyExists =>
+      'Ein Konto mit dieser E-Mail existiert bereits.';
+
+  @override
+  String get authErrorEmailNotConfirmed =>
+      'Bitte bestätige deine E-Mail vor der Anmeldung.';
+
+  @override
+  String get authErrorGeneric =>
+      'Etwas ist schiefgelaufen. Bitte erneut versuchen.';
+
+  @override
   String get themeCardTitle => 'Design';
 
   @override

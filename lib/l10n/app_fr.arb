@@ -913,5 +913,10 @@
   "consumptionMonthlyDriveTimeLabel": "Temps de conduite",
   "consumptionMonthlyDistanceLabel": "Distance",
   "consumptionMonthlyAvgConsumptionLabel": "Conso. moyenne",
-  "consumptionMonthlyComparisonNotReliable": "Au moins 3 trajets par mois sont nécessaires pour la comparaison"
+  "consumptionMonthlyComparisonNotReliable": "Au moins 3 trajets par mois sont nécessaires pour la comparaison",
+  "authErrorNoNetwork": "Pas de connexion réseau. Réessayez plus tard.",
+  "authErrorInvalidCredentials": "E-mail ou mot de passe invalide. Vérifiez vos identifiants.",
+  "authErrorUserAlreadyExists": "Un compte avec cet e-mail existe déjà.",
+  "authErrorEmailNotConfirmed": "Veuillez confirmer votre e-mail avant de vous connecter.",
+  "authErrorGeneric": "Une erreur est survenue. Veuillez réessayer."
 }
