@@ -1,45 +1,18 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../core/data/storage_repository.dart';
 import '../core/telemetry/integrations/navigation_trace_observer.dart';
 import '../core/storage/storage_keys.dart';
 import '../core/storage/storage_providers.dart';
-import '../features/consent/presentation/screens/gdpr_consent_screen.dart';
-import '../features/favorites/presentation/screens/favorites_screen.dart';
-import '../features/map/presentation/screens/map_screen.dart';
-import '../features/profile/presentation/screens/privacy_dashboard_screen.dart';
-import '../features/profile/presentation/screens/profile_screen.dart';
-import '../features/profile/presentation/screens/theme_settings_screen.dart';
-import '../features/search/presentation/screens/search_criteria_screen.dart';
-import '../features/search/presentation/screens/search_screen.dart';
-import '../features/setup/presentation/screens/onboarding_wizard_screen.dart';
-import '../features/alerts/presentation/screens/alerts_screen.dart';
-import '../features/calculator/presentation/screens/calculator_screen.dart';
-import '../features/carbon/presentation/screens/carbon_dashboard_screen.dart';
-import '../features/report/presentation/screens/report_screen.dart';
-import '../features/consumption/presentation/screens/add_fill_up_screen.dart';
-import '../features/consumption/presentation/screens/consumption_screen.dart';
-import '../features/consumption/presentation/screens/pick_station_for_fill_up_screen.dart';
-import '../features/consumption/presentation/screens/trip_detail_screen.dart';
-import '../features/consumption/presentation/screens/trip_history_screen.dart';
-import '../features/consumption/presentation/screens/trip_recording_screen.dart';
-import '../features/search/domain/entities/fuel_type.dart';
-import '../features/price_history/presentation/screens/price_history_screen.dart';
-import '../features/ev/domain/entities/charging_station.dart';
-import '../features/search/presentation/screens/ev_station_detail_screen.dart';
-import '../features/station_detail/presentation/screens/station_detail_screen.dart';
-import '../features/driving/presentation/screens/driving_mode_screen.dart';
-import '../features/itinerary/presentation/screens/itineraries_screen.dart';
-import '../features/loyalty/presentation/loyalty_settings_screen.dart';
-import '../features/sync/presentation/screens/auth_screen.dart';
-import '../features/sync/presentation/screens/data_transparency_screen.dart';
-import '../features/sync/presentation/screens/link_device_screen.dart';
-import '../features/sync/presentation/screens/sync_setup_screen.dart';
-import '../features/vehicle/presentation/screens/edit_vehicle_screen.dart';
-import '../features/vehicle/presentation/screens/vehicle_list_screen.dart';
+import 'routes/consumption_routes.dart';
+import 'routes/onboarding_routes.dart';
+import 'routes/profile_routes.dart';
+import 'routes/search_routes.dart';
+import 'routes/shell_branches.dart';
+import 'routes/station_routes.dart';
+import 'routes/sync_routes.dart';
 import 'shell_screen.dart';
-import 'station_id_validator.dart';
 
 part 'router.g.dart';
 
@@ -65,30 +38,6 @@ String resolveLandingLocation(StorageRepository storage) {
     default:
       return '/';
   }
-}
-
-Widget _invalidIdScreen(BuildContext context, String path) {
-  return Scaffold(
-    appBar: AppBar(title: const Text('Invalid link')),
-    body: Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.link_off, size: 64, color: Colors.grey),
-          const SizedBox(height: 16),
-          Text(
-            'The link "$path" is not valid.',
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          FilledButton(
-            onPressed: () => context.go('/'),
-            child: const Text('Home'),
-          ),
-        ],
-      ),
-    ),
-  );
 }
 
 @riverpod
@@ -149,259 +98,17 @@ GoRouter router(Ref ref) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/consent',
-        builder: (context, state) => const GdprConsentScreen(),
-      ),
-      GoRoute(
-        path: '/setup',
-        builder: (context, state) => const OnboardingWizardScreen(),
-      ),
+      ...onboardingRoutes,
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             ShellScreen(navigationShell: navigationShell),
-        branches: [
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/',
-                builder: (context, state) => const SearchScreen(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/map',
-                builder: (context, state) => const MapScreen(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/favorites',
-                builder: (context, state) => const FavoritesScreen(),
-              ),
-            ],
-          ),
-          // Consumption is the 4th tab (#778) — sits between
-          // Favorites and Settings so the "behind-the-wheel savings"
-          // workflow has a first-class entry point. Path stays
-          // `/consumption-tab` to avoid colliding with the existing
-          // `/consumption` deep link (which still pushes on top of
-          // the current branch from station detail etc.).
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/consumption-tab',
-                builder: (_, _) => const ConsumptionScreen(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/profile',
-                builder: (context, state) => const ProfileScreen(),
-              ),
-            ],
-          ),
-        ],
+        branches: shellBranches,
       ),
-      GoRoute(
-        path: '/search/criteria',
-        builder: (context, state) => const SearchCriteriaScreen(),
-      ),
-      GoRoute(
-        path: '/driving',
-        builder: (context, state) => const DrivingModeScreen(),
-      ),
-      GoRoute(
-        path: '/alerts',
-        builder: (context, state) => const AlertsScreen(),
-      ),
-      GoRoute(
-        path: '/calculator',
-        builder: (context, state) => const CalculatorScreen(),
-      ),
-      GoRoute(
-        path: '/consumption',
-        builder: (context, state) => const ConsumptionScreen(),
-      ),
-      GoRoute(
-        path: '/carbon',
-        builder: (context, state) => const CarbonDashboardScreen(),
-      ),
-      GoRoute(
-        path: '/vehicles',
-        builder: (context, state) => const VehicleListScreen(),
-      ),
-      GoRoute(
-        path: '/vehicles/edit',
-        builder: (context, state) {
-          final extra = state.extra;
-          final vehicleId = extra is String ? extra : null;
-          return EditVehicleScreen(vehicleId: vehicleId);
-        },
-      ),
-      GoRoute(
-        path: '/consumption/pick-station',
-        builder: (_, _) => const PickStationForFillUpScreen(),
-      ),
-      // #726 — global trip recording view. The recording session
-      // itself lives in `tripRecordingProvider` (keepAlive), so this
-      // screen is a thin viewer that can come and go without losing
-      // state. Opened from AddFillUpScreen after OBD2 connect, and
-      // re-entered by tapping the banner shown on every screen
-      // while a trip is active.
-      GoRoute(
-        path: '/trip-recording',
-        builder: (_, _) => const TripRecordingScreen(),
-      ),
-      GoRoute(
-        path: '/trip-history',
-        builder: (_, _) => const TripHistoryScreen(),
-      ),
-      // #889 — placeholder trip-detail route wired up alongside the
-      // new Trajets tab on the Consumption screen. Full detail UI
-      // (timeline / per-minute consumption / map) lands in #890.
-      GoRoute(
-        path: '/trip/:id',
-        builder: (context, state) {
-          final id = state.pathParameters['id'];
-          if (id == null || id.isEmpty) {
-            return _invalidIdScreen(context, state.matchedLocation);
-          }
-          return TripDetailScreen(tripId: id);
-        },
-      ),
-      GoRoute(
-        path: '/consumption/add',
-        builder: (context, state) {
-          final extra = state.extra;
-          String? stationId;
-          String? stationName;
-          FuelType? fuelType;
-          double? pricePerLiter;
-          if (extra is Map) {
-            stationId = extra['stationId']?.toString();
-            stationName = extra['stationName']?.toString();
-            final ft = extra['fuelType'];
-            if (ft is FuelType) fuelType = ft;
-            final price = extra['pricePerLiter'];
-            if (price is num) pricePerLiter = price.toDouble();
-          }
-          return AddFillUpScreen(
-            stationId: stationId,
-            stationName: stationName,
-            preFilledFuelType: fuelType,
-            preFilledPricePerLiter: pricePerLiter,
-          );
-        },
-      ),
-      GoRoute(
-        path: '/station/:id/history',
-        builder: (context, state) {
-          final id = state.pathParameters['id'];
-          if (!isValidStationId(id)) {
-            return _invalidIdScreen(context, state.matchedLocation);
-          }
-          return PriceHistoryScreen(stationId: id!);
-        },
-      ),
-      GoRoute(
-        path: '/station/:id',
-        builder: (context, state) {
-          final id = state.pathParameters['id'];
-          if (!isValidStationId(id)) {
-            return _invalidIdScreen(context, state.matchedLocation);
-          }
-          return StationDetailScreen(stationId: id!);
-        },
-      ),
-      GoRoute(
-        path: '/ev-station',
-        builder: (context, state) {
-          final station = state.extra as ChargingStation;
-          return EVStationDetailScreen(station: station);
-        },
-      ),
-      // Deep-link friendly EV detail: takes the station id in the
-      // path and hydrates the ChargingStation from storage (#713
-      // widget → station detail flow). Used when the caller has
-      // only the id — e.g. a home-screen widget tap or an external
-      // URL. Falls back to the invalid-id screen when the id is
-      // unknown or the cached JSON is missing.
-      GoRoute(
-        path: '/ev-station/:id',
-        builder: (context, state) {
-          final id = state.pathParameters['id'];
-          if (!isValidStationId(id)) {
-            return _invalidIdScreen(context, state.matchedLocation);
-          }
-          final storage = ref.watch(storageRepositoryProvider);
-          final raw = storage.getEvFavoriteStationData(id!);
-          if (raw == null) {
-            return _invalidIdScreen(context, state.matchedLocation);
-          }
-          try {
-            final station = ChargingStation.fromJson(raw);
-            return EVStationDetailScreen(station: station);
-          } catch (e, st) { // ignore: unused_catch_stack
-            return _invalidIdScreen(context, state.matchedLocation);
-          }
-        },
-      ),
-      GoRoute(
-        path: '/report/:id',
-        builder: (context, state) {
-          final id = state.pathParameters['id'];
-          if (!isValidStationId(id)) {
-            return _invalidIdScreen(context, state.matchedLocation);
-          }
-          return ReportScreen(stationId: id!);
-        },
-      ),
-      GoRoute(
-        path: '/sync-setup',
-        builder: (context, state) => const SyncSetupScreen(),
-      ),
-      GoRoute(
-        path: '/link-device',
-        builder: (context, state) => const LinkDeviceScreen(),
-      ),
-      GoRoute(
-        path: '/data-transparency',
-        builder: (context, state) => const DataTransparencyScreen(),
-      ),
-      GoRoute(
-        path: '/auth',
-        builder: (context, state) => const AuthScreen(),
-      ),
-      GoRoute(
-        path: '/itineraries',
-        builder: (context, state) => const ItinerariesScreen(),
-      ),
-      GoRoute(
-        path: '/privacy-dashboard',
-        builder: (context, state) => const PrivacyDashboardScreen(),
-      ),
-      // #897 — dedicated Theme settings screen, pushed from the
-      // Theme card on the profile/settings screen. Extracted from
-      // the inline bottom sheet so the Theme entry matches the
-      // Privacy + Storage card pattern.
-      GoRoute(
-        path: '/theme-settings',
-        builder: (context, state) => const ThemeSettingsScreen(),
-      ),
-      // #1120 — fuel-club / loyalty discount settings. Pilot ships
-      // with one brand (Total Energies); the screen lists, adds,
-      // toggles, and deletes user-entered cards.
-      GoRoute(
-        path: '/loyalty-settings',
-        builder: (context, state) => const LoyaltySettingsScreen(),
-      ),
+      ...searchRoutes,
+      ...profileRoutes,
+      ...consumptionRoutes,
+      ...stationRoutes(ref),
+      ...syncRoutes,
     ],
   );
 }
