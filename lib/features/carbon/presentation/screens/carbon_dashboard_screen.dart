@@ -7,13 +7,18 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../consumption/data/trip_history_repository.dart';
+import '../../../consumption/domain/services/trip_length_aggregator.dart';
 import '../../../consumption/providers/consumption_providers.dart';
+import '../../../consumption/providers/trip_history_provider.dart';
 import '../../../profile/providers/gamification_enabled_provider.dart';
+import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../domain/milestone.dart';
 import '../../domain/monthly_summary.dart';
 import '../widgets/fuel_vs_ev_card.dart';
 import '../widgets/milestones_card.dart';
 import '../widgets/monthly_bar_chart.dart';
+import '../widgets/trip_length_breakdown_card.dart';
 
 /// Carbon dashboard: tabbed view of monthly charts (#180) and
 /// gamified achievements (#181). Data is derived entirely from the
@@ -116,7 +121,7 @@ class CarbonDashboardScreen extends ConsumerWidget {
   }
 }
 
-class _ChartsTab extends StatelessWidget {
+class _ChartsTab extends ConsumerWidget {
   final List<MonthlySummary> summaries;
   final double totalCost;
   final double totalCo2;
@@ -128,9 +133,23 @@ class _ChartsTab extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+
+    // #1191 — fold trip-history into the three length buckets, filtered
+    // to the active vehicle (legacy null-vehicleId trips are included
+    // per the trajets-tab convention). Computing the overall avg from
+    // the SAME filtered list keeps the per-tile arrows consistent with
+    // the headline figure on the dashboard.
+    final trips = ref.watch(tripHistoryListProvider);
+    final activeVehicle = ref.watch(activeVehicleProfileProvider);
+    final breakdown = aggregateByTripLength(
+      trips,
+      vehicleId: activeVehicle?.id,
+    );
+    final overallAvg = _overallAvgLPer100Km(trips, activeVehicle?.id);
+
     return ListView(
       padding: EdgeInsets.only(
         top: 16,
@@ -139,6 +158,13 @@ class _ChartsTab extends StatelessWidget {
       children: [
         _SummaryRow(totalCost: totalCost, totalCo2: totalCo2),
         const SizedBox(height: 8),
+        if (l != null && !breakdown.isEmpty)
+          TripLengthBreakdownCard(
+            breakdown: breakdown,
+            overallAvgLPer100Km: overallAvg,
+            l: l,
+            theme: theme,
+          ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: SectionCard(
@@ -168,6 +194,34 @@ class _ChartsTab extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Compute the overall average L/100 km across the same filtered trip
+/// list the [TripLengthBreakdown] was built from. Returns null when no
+/// trip in the filtered set has both a non-null `fuelLitersConsumed`
+/// and a positive distance — the per-tile arrows are suppressed in
+/// that case. Mirrors the same vehicle-id filter as
+/// [aggregateByTripLength] so the figure stays consistent with the
+/// breakdown the user sees right next to it.
+double? _overallAvgLPer100Km(
+  Iterable<TripHistoryEntry> trips,
+  String? vehicleId,
+) {
+  double totalDistanceKm = 0;
+  double totalLitres = 0;
+  for (final entry in trips) {
+    if (vehicleId != null &&
+        entry.vehicleId != null &&
+        entry.vehicleId != vehicleId) {
+      continue;
+    }
+    final litres = entry.summary.fuelLitersConsumed;
+    if (litres == null) continue;
+    totalDistanceKm += entry.summary.distanceKm;
+    totalLitres += litres;
+  }
+  if (totalDistanceKm <= 0) return null;
+  return (totalLitres / totalDistanceKm) * 100.0;
 }
 
 class _AchievementsTab extends StatelessWidget {

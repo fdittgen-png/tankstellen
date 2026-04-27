@@ -7364,6 +7364,42 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get trajetDetailDeleteConfirmConfirm;
 
+  /// Title of the trip-length consumption card on the Carbon dashboard Charts tab — splits trips into short/medium/long buckets so the user can see cold-start fuel waste vs. cruising efficiency (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption by trip length'**
+  String get tripLengthCardTitle;
+
+  /// Label of the short-trip tile on the trip-length breakdown card — trips under 5 km, where cold-engine warmup dominates (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'Short (<5 km)'**
+  String get tripLengthBucketShort;
+
+  /// Label of the medium-trip tile on the trip-length breakdown card — trips between 5 and 25 km, mostly urban / mixed driving (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'Medium (5–25 km)'**
+  String get tripLengthBucketMedium;
+
+  /// Label of the long-trip tile on the trip-length breakdown card — trips over 25 km, stable-temperature cruising (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'Long (>25 km)'**
+  String get tripLengthBucketLong;
+
+  /// Placeholder shown on a trip-length breakdown tile when the bucket has fewer than 5 trips — statistically meaningless to show an average that thin (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'Need more data'**
+  String get tripLengthBucketNeedMoreData;
+
+  /// Trip-count subtitle on each trip-length breakdown tile (#1191).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{no trips} one{1 trip} other{{count} trips}}'**
+  String tripLengthBucketTripCount(int count);
+
   /// Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost.
   ///
   /// In en, this message translates to:

@@ -1,0 +1,8 @@
+{
+  "tripLengthCardTitle": "Verbrauch nach Fahrtlänge",
+  "tripLengthBucketShort": "Kurz (<5 km)",
+  "tripLengthBucketMedium": "Mittel (5–25 km)",
+  "tripLengthBucketLong": "Lang (>25 km)",
+  "tripLengthBucketNeedMoreData": "Mehr Daten nötig",
+  "tripLengthBucketTripCount": "{count, plural, =0{keine Fahrten} one{1 Fahrt} other{{count} Fahrten}}"
+}
