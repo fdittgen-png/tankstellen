@@ -3303,6 +3303,36 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get drivingScoreCardTitle => 'Fahrnote';
+
+  @override
+  String get drivingScoreCardOutOf => '/100';
+
+  @override
+  String get drivingScoreCardSubtitle =>
+      'Gesamtnote aus Leerlauf, starken Beschleunigungen, hartem Bremsen und Zeit über 3000 U/min. Ein Vergleich „besser als X% deiner bisherigen Fahrten“ folgt in einem späteren Release.';
+
+  @override
+  String drivingScoreCardSemanticsLabel(String score) {
+    return 'Fahrnote $score von 100';
+  }
+
+  @override
+  String get drivingScorePenaltyIdling => 'Leerlauf';
+
+  @override
+  String get drivingScorePenaltyHardAccel => 'Starke Beschleunigung';
+
+  @override
+  String get drivingScorePenaltyHardBrake => 'Hartes Bremsen';
+
+  @override
+  String get drivingScorePenaltyHighRpm => 'Hohe Drehzahl';
+
+  @override
+  String get drivingScorePenaltyFullThrottle => 'Vollgas';
+
+  @override
   String get ecoRouteOption => 'Sparsam';
 
   @override
