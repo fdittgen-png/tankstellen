@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../data/driving_insights_analyzer.dart';
+import '../../data/driving_score_calculator.dart';
 import '../../data/trip_history_repository.dart';
 import '../../domain/driving_insight.dart';
+import '../../domain/driving_score.dart';
 import '../../domain/services/throttle_rpm_histogram_calculator.dart';
 import '../../domain/trip_recorder.dart';
 import 'driving_insights_card.dart';
+import 'driving_score_card.dart';
 import 'throttle_rpm_histogram_card.dart';
 import 'trip_detail_charts.dart';
 import 'trip_summary_card.dart';
@@ -66,6 +69,16 @@ class _TripDetailBodyState extends State<TripDetailBody> {
   /// disk, the card lights up automatically.
   late final ThrottleRpmHistogram _histogram = _computeHistogram();
 
+  /// Lazily-computed composite driving score (#1041 phase 5a — Card A).
+  /// Cached alongside [_insights] and [_histogram] for the same
+  /// reason — the calculator is O(n), pure, and cheap, but a long trip
+  /// ticks at ~1 Hz so re-running on every locale / theme rebuild adds
+  /// up. EV trips and empty trips return [DrivingScore.perfect] from
+  /// the calculator; the parent gates rendering on the same conditions
+  /// it uses for [DrivingInsightsCard] so the card is hidden in those
+  /// cases.
+  late final DrivingScore _score = _computeScore();
+
   List<DrivingInsight> _computeInsights() {
     if (widget.samples.isEmpty) return const [];
     // Insights are only meaningful for combustion trips — EV trips
@@ -79,6 +92,15 @@ class _TripDetailBodyState extends State<TripDetailBody> {
           growable: false,
         );
     return analyzeTrip(tripSamples);
+  }
+
+  DrivingScore _computeScore() {
+    if (widget.samples.isEmpty) return DrivingScore.perfect;
+    if (widget.isEv) return DrivingScore.perfect;
+    final tripSamples = widget.samples.map(_toTripSample).toList(
+          growable: false,
+        );
+    return computeDrivingScore(tripSamples);
   }
 
   ThrottleRpmHistogram _computeHistogram() {
@@ -129,6 +151,13 @@ class _TripDetailBodyState extends State<TripDetailBody> {
             isEv: widget.isEv,
           ),
           const SizedBox(height: 8),
+          // Composite driving score (#1041 phase 5a — Card A). Sits at
+          // the top of the Insights group: a single big 0..100 number
+          // with a brief breakdown chip row beneath it. EV trips and
+          // empty trips are skipped on the same gating rule as the
+          // cost-line card below.
+          if (!widget.isEv && widget.samples.isNotEmpty)
+            DrivingScoreCard(score: _score),
           // Driving insights — combustion trips only. EV trips skip
           // this card; phase 4 will land an EV-aware version.
           if (!widget.isEv && widget.samples.isNotEmpty)

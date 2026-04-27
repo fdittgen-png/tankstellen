@@ -1,0 +1,43 @@
+{
+  "drivingScoreCardTitle": "Driving score",
+  "@drivingScoreCardTitle": {
+    "description": "Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A)."
+  },
+  "drivingScoreCardOutOf": "/100",
+  "@drivingScoreCardOutOf": {
+    "description": "Suffix shown next to the big driving-score number on the Trip detail screen — clarifies the 0..100 scale (#1041 phase 5a Card A)."
+  },
+  "drivingScoreCardSubtitle": "Composite score from idling, hard accelerations, hard braking, and high-RPM time. A 'better than X% of past trips' comparison will land in a follow-up release.",
+  "@drivingScoreCardSubtitle": {
+    "description": "Caption beneath the big driving-score number explaining what feeds the composite. Doubles as a placeholder for the future per-trip percentile sub-text (#1041 phase 5a Card A)."
+  },
+  "drivingScoreCardSemanticsLabel": "Driving score {score} out of 100",
+  "@drivingScoreCardSemanticsLabel": {
+    "description": "TalkBack / VoiceOver label for the big driving-score number — bundles the value and the scale into a single accessible utterance (#1041 phase 5a Card A).",
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "drivingScorePenaltyIdling": "Idling",
+  "@drivingScorePenaltyIdling": {
+    "description": "Breakdown chip surfaced beneath the driving-score big number when the idling penalty was the largest contributor (#1041 phase 5a Card A)."
+  },
+  "drivingScorePenaltyHardAccel": "Hard accelerations",
+  "@drivingScorePenaltyHardAccel": {
+    "description": "Breakdown chip surfaced beneath the driving-score big number when the hard-acceleration penalty was a top contributor (#1041 phase 5a Card A)."
+  },
+  "drivingScorePenaltyHardBrake": "Hard braking",
+  "@drivingScorePenaltyHardBrake": {
+    "description": "Breakdown chip surfaced beneath the driving-score big number when the hard-braking penalty was a top contributor (#1041 phase 5a Card A)."
+  },
+  "drivingScorePenaltyHighRpm": "High RPM",
+  "@drivingScorePenaltyHighRpm": {
+    "description": "Breakdown chip surfaced beneath the driving-score big number when the high-RPM penalty was a top contributor (#1041 phase 5a Card A)."
+  },
+  "drivingScorePenaltyFullThrottle": "Full throttle",
+  "@drivingScorePenaltyFullThrottle": {
+    "description": "Breakdown chip surfaced beneath the driving-score big number when the full-throttle penalty was a top contributor — currently unused while throttle is not persisted (#1041 phase 5a Card A)."
+  }
+}

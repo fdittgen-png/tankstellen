@@ -6128,6 +6128,60 @@ abstract class AppLocalizations {
   /// **'+{liters} L'**
   String insightTrailingLitersWasted(String liters);
 
+  /// Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A).
+  ///
+  /// In en, this message translates to:
+  /// **'Driving score'**
+  String get drivingScoreCardTitle;
+
+  /// Suffix shown next to the big driving-score number on the Trip detail screen — clarifies the 0..100 scale (#1041 phase 5a Card A).
+  ///
+  /// In en, this message translates to:
+  /// **'/100'**
+  String get drivingScoreCardOutOf;
+
+  /// Caption beneath the big driving-score number explaining what feeds the composite. Doubles as a placeholder for the future per-trip percentile sub-text (#1041 phase 5a Card A).
+  ///
+  /// In en, this message translates to:
+  /// **'Composite score from idling, hard accelerations, hard braking, and high-RPM time. A \'better than X% of past trips\' comparison will land in a follow-up release.'**
+  String get drivingScoreCardSubtitle;
+
+  /// TalkBack / VoiceOver label for the big driving-score number — bundles the value and the scale into a single accessible utterance (#1041 phase 5a Card A).
+  ///
+  /// In en, this message translates to:
+  /// **'Driving score {score} out of 100'**
+  String drivingScoreCardSemanticsLabel(String score);
+
+  /// Breakdown chip surfaced beneath the driving-score big number when the idling penalty was the largest contributor (#1041 phase 5a Card A).
+  ///
+  /// In en, this message translates to:
+  /// **'Idling'**
+  String get drivingScorePenaltyIdling;
+
+  /// Breakdown chip surfaced beneath the driving-score big number when the hard-acceleration penalty was a top contributor (#1041 phase 5a Card A).
+  ///
+  /// In en, this message translates to:
+  /// **'Hard accelerations'**
+  String get drivingScorePenaltyHardAccel;
+
+  /// Breakdown chip surfaced beneath the driving-score big number when the hard-braking penalty was a top contributor (#1041 phase 5a Card A).
+  ///
+  /// In en, this message translates to:
+  /// **'Hard braking'**
+  String get drivingScorePenaltyHardBrake;
+
+  /// Breakdown chip surfaced beneath the driving-score big number when the high-RPM penalty was a top contributor (#1041 phase 5a Card A).
+  ///
+  /// In en, this message translates to:
+  /// **'High RPM'**
+  String get drivingScorePenaltyHighRpm;
+
+  /// Breakdown chip surfaced beneath the driving-score big number when the full-throttle penalty was a top contributor — currently unused while throttle is not persisted (#1041 phase 5a Card A).
+  ///
+  /// In en, this message translates to:
+  /// **'Full throttle'**
+  String get drivingScorePenaltyFullThrottle;
+
   /// Label for the eco-routing strategy chip on the route search controls (#1123). Picks routes that minimise fuel rather than time.
   ///
   /// In en, this message translates to:

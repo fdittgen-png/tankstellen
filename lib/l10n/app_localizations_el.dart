@@ -3279,6 +3279,36 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String get drivingScoreCardTitle => 'Driving score';
+
+  @override
+  String get drivingScoreCardOutOf => '/100';
+
+  @override
+  String get drivingScoreCardSubtitle =>
+      'Composite score from idling, hard accelerations, hard braking, and high-RPM time. A \'better than X% of past trips\' comparison will land in a follow-up release.';
+
+  @override
+  String drivingScoreCardSemanticsLabel(String score) {
+    return 'Driving score $score out of 100';
+  }
+
+  @override
+  String get drivingScorePenaltyIdling => 'Idling';
+
+  @override
+  String get drivingScorePenaltyHardAccel => 'Hard accelerations';
+
+  @override
+  String get drivingScorePenaltyHardBrake => 'Hard braking';
+
+  @override
+  String get drivingScorePenaltyHighRpm => 'High RPM';
+
+  @override
+  String get drivingScorePenaltyFullThrottle => 'Full throttle';
+
+  @override
   String get ecoRouteOption => 'Eco';
 
   @override

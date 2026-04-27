@@ -1300,6 +1300,15 @@
   "insightIdling": "Leerlauf ({pctTime}% der Fahrt): {liters} L verschwendet",
   "insightSubtitlePctOfTrip": "{pctTime}% der Fahrt",
   "insightTrailingLitersWasted": "+{liters} L",
+  "drivingScoreCardTitle": "Fahrnote",
+  "drivingScoreCardOutOf": "/100",
+  "drivingScoreCardSubtitle": "Gesamtnote aus Leerlauf, starken Beschleunigungen, hartem Bremsen und Zeit über 3000 U/min. Ein Vergleich „besser als X% deiner bisherigen Fahrten“ folgt in einem späteren Release.",
+  "drivingScoreCardSemanticsLabel": "Fahrnote {score} von 100",
+  "drivingScorePenaltyIdling": "Leerlauf",
+  "drivingScorePenaltyHardAccel": "Starke Beschleunigung",
+  "drivingScorePenaltyHardBrake": "Hartes Bremsen",
+  "drivingScorePenaltyHighRpm": "Hohe Drehzahl",
+  "drivingScorePenaltyFullThrottle": "Vollgas",
   "ecoRouteOption": "Sparsam",
   "@ecoRouteOption": {
     "description": "Label für den Eco-Routing-Chip in den Routensuche-Bedienelementen (#1123). Wählt Routen aus, die Kraftstoff statt Zeit minimieren."
