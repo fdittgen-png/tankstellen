@@ -1,7 +1,7 @@
 # Hands-free trip auto-record (Android)
 
-Status: phase 2b-1 — native bridge shipped, production wiring of
-`AutoTripCoordinator` is phase 2b-2.
+Status: phase 2b-2 — native bridge shipped, `AutoTripCoordinator` wired
+to the active vehicle list via `AutoRecordOrchestrator`.
 
 This document explains the Android-side foreground service that drives
 hands-free trip auto-record (issue #1004) and how to verify a build.
@@ -106,6 +106,36 @@ translates those maps into the sealed `AdapterConnected` /
    * After the configured `disconnectSaveDelay` (default 60 s) the
      trip is saved to history.
 
+## Production wiring (phase 2b-2)
+
+`AutoRecordOrchestrator` (`lib/features/consumption/providers/auto_record_orchestrator.dart`)
+is the single Riverpod-keepAlive provider that turns the foreground
+service on. Boot sequence:
+
+1. `AppInitializer._launch` reads `autoRecordOrchestratorProvider` from
+   a post-first-frame microtask. Failures are logged but never block
+   the launch path — a bug in the listener factory cannot crash boot.
+2. The orchestrator subscribes to `vehicleProfileListProvider` and
+   diffs every change. Any vehicle with both `autoRecord: true` and a
+   non-null `pairedAdapterMac` gets a fresh `AutoTripCoordinator`.
+3. The coordinator constructs its own `BackgroundAdapterListener`. On
+   Android (`defaultTargetPlatform == TargetPlatform.android`) this is
+   `AndroidBackgroundAdapterListener` — calling `start(mac)` triggers
+   the Kotlin foreground service. On other platforms the orchestrator
+   falls back to `UnimplementedBackgroundAdapterListener` so iOS /
+   desktop builds still compile.
+4. A vehicle that flips `autoRecord` off, drops its paired MAC, or
+   gets deleted has its coordinator stopped. A `pairedAdapterMac`
+   change is treated as drop + recreate: the foreground service
+   watches a single MAC, so re-arming is the only way to switch.
+5. Speed is sourced from `Geolocator.getPositionStream`
+   (m/s → km/h) for phase 2b-2. Phase 2b-3 will switch to OBD2 PID
+   0x0D once the on-connect session-handoff design is decided.
+6. On orchestrator dispose (Riverpod container teardown / app exit)
+   every coordinator is stopped, which in turn calls
+   `AndroidBackgroundAdapterListener.stop()` and the foreground
+   service is dismissed.
+
 ## Files
 
 | Layer | Path |
@@ -115,4 +145,7 @@ translates those maps into the sealed `AdapterConnected` /
 | Activity wiring | `android/app/src/main/kotlin/de/tankstellen/tankstellen/MainActivity.kt` |
 | Manifest | `android/app/src/main/AndroidManifest.xml` |
 | Dart bridge | `lib/features/consumption/data/obd2/android_background_adapter_listener.dart` |
-| Tests | `test/features/consumption/data/obd2/android_background_adapter_listener_test.dart` |
+| Coordinator | `lib/features/consumption/data/obd2/auto_trip_coordinator.dart` |
+| Orchestrator | `lib/features/consumption/providers/auto_record_orchestrator.dart` |
+| App boot | `lib/app/app_initializer.dart` |
+| Tests | `test/features/consumption/data/obd2/android_background_adapter_listener_test.dart`, `test/features/consumption/providers/auto_record_orchestrator_test.dart` |
