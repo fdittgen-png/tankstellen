@@ -20,7 +20,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(AlertDialog), findsOneWidget);
-      expect(find.text('Reset calibration?'), findsOneWidget);
+      expect(find.text('Reset volumetric efficiency?'), findsOneWidget);
     });
 
     testWidgets('renders the explanatory body copy', (tester) async {
@@ -59,7 +59,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(AlertDialog),
-          matching: find.text('Reset calibration'),
+          matching: find.text('Reset volumetric efficiency'),
         ),
         findsOneWidget,
       );
@@ -84,7 +84,7 @@ void main() {
       expect(await result, false);
     });
 
-    testWidgets('tapping Reset calibration resolves the future with `true`',
+    testWidgets('tapping Reset volumetric efficiency resolves the future with `true`',
         (tester) async {
       late Future<bool?> result;
       await _pumpHost(tester, onShow: (future) => result = future);
@@ -94,7 +94,7 @@ void main() {
       await tester.tap(
         find.descendant(
           of: find.byType(AlertDialog),
-          matching: find.text('Reset calibration'),
+          matching: find.text('Reset volumetric efficiency'),
         ),
       );
       await tester.pumpAndSettle();

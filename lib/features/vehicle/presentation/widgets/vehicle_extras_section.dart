@@ -48,12 +48,15 @@ class VehicleExtrasSection {
       const SizedBox(height: 12),
       VehicleCalibrationModeSelector(vehicleId: vehicleId),
       // η_v calibration reset (#815). Pairs visually with baseline
-      // above — users who reset one often reset the other.
+      // above — users who reset one often reset the other. Distinct
+      // icon + label per #1219 so users can tell at a glance which
+      // side of the calibration pipeline they're nuking — fuel-pump
+      // glyph for the volumetric-efficiency constant.
       const SizedBox(height: 12),
       OutlinedButton.icon(
         onPressed: onResetVolumetricEfficiency,
-        icon: const Icon(Icons.restart_alt_outlined),
-        label: Text(l?.veResetAction ?? 'Reset calibration'),
+        icon: const Icon(Icons.local_gas_station_outlined),
+        label: Text(l?.veResetAction ?? 'Reset volumetric efficiency'),
       ),
       // Service reminders (#584). Keyed by vehicle id; hidden on Add.
       const SizedBox(height: 16),

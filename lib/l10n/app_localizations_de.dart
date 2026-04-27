@@ -1984,10 +1984,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Anhand der Messwerte aus verschiedenen Fahrsituationen gelernt.';
 
   @override
-  String get vehicleBaselineReset => 'Baseline zurücksetzen';
+  String get vehicleBaselineReset => 'Fahrsituation-Baseline zurücksetzen';
 
   @override
-  String get vehicleBaselineResetConfirmTitle => 'Baseline zurücksetzen?';
+  String get vehicleBaselineResetConfirmTitle =>
+      'Fahrsituation-Baseline zurücksetzen?';
 
   @override
   String get vehicleBaselineResetConfirmBody =>
@@ -3091,11 +3092,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get veResetConfirmTitle => 'Kalibrierung zurücksetzen?';
+  String get veResetConfirmTitle => 'Volumetrischen Wirkungsgrad zurücksetzen?';
 
   @override
   String get veResetConfirmBody =>
-      'Dies verwirft die gelernte fahrzeugspezifische Kalibrierung und stellt den Standardwert (0,85) wieder her.';
+      'Dies verwirft den gelernten volumetrischen Wirkungsgrad (η_v) und stellt den Standardwert (0,85) wieder her. Fahrt-bezogene Verbrauchsschätzungen fallen auf die Herstellerkonstante zurück, bis der Kalibrator aus kommenden Fahrten neue Messwerte sammelt.';
 
   @override
   String get alertsRadiusSectionTitle => 'Umkreis-Alarme';
@@ -4049,7 +4050,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get vinModifyAction => 'Manuell anpassen';
 
   @override
-  String get veResetAction => 'Kalibrierung zurücksetzen';
+  String get veResetAction => 'Volumetrischen Wirkungsgrad zurücksetzen';
 
   @override
   String get vehicleReadVinFromCarButton => 'FIN aus dem Auto auslesen';

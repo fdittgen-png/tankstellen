@@ -3748,13 +3748,13 @@ abstract class AppLocalizations {
   /// No description provided for @vehicleBaselineReset.
   ///
   /// In en, this message translates to:
-  /// **'Reset baseline'**
+  /// **'Reset driving-situation baseline'**
   String get vehicleBaselineReset;
 
   /// No description provided for @vehicleBaselineResetConfirmTitle.
   ///
   /// In en, this message translates to:
-  /// **'Reset baseline?'**
+  /// **'Reset driving-situation baseline?'**
   String get vehicleBaselineResetConfirmTitle;
 
   /// No description provided for @vehicleBaselineResetConfirmBody.
@@ -5771,13 +5771,13 @@ abstract class AppLocalizations {
   /// Title of the confirm dialog shown before discarding the learned volumetric efficiency (#815).
   ///
   /// In en, this message translates to:
-  /// **'Reset calibration?'**
+  /// **'Reset volumetric efficiency?'**
   String get veResetConfirmTitle;
 
   /// Body of the confirm dialog shown before discarding the learned volumetric efficiency (#815).
   ///
   /// In en, this message translates to:
-  /// **'This will discard the learned per-vehicle calibration and restore the default value (0.85).'**
+  /// **'This will discard the learned volumetric efficiency (η_v) and restore the default value (0.85). Trip-level fuel-flow estimates will fall back to the manufacturer constant until the calibrator collects new samples from upcoming trips.'**
   String get veResetConfirmBody;
 
   /// Header of the radius-based watchlist section on the alerts screen (#578).
@@ -7445,7 +7445,7 @@ abstract class AppLocalizations {
   /// Action on the vehicle edit screen that discards the learned volumetric-efficiency calibration (#815).
   ///
   /// In en, this message translates to:
-  /// **'Reset calibration'**
+  /// **'Reset volumetric efficiency'**
   String get veResetAction;
 
   /// Button label on the vehicle edit screen that triggers an OBD2 Mode 09 PID 02 read of the VIN from the paired adapter (#1162).

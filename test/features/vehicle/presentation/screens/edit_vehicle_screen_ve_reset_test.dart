@@ -54,11 +54,11 @@ void main() {
       // Scroll until the reset action is visible — it lives below
       // the service-reminder and baseline sections.
       await tester.dragUntilVisible(
-        find.text('Reset calibration'),
+        find.text('Reset volumetric efficiency'),
         find.byType(ListView),
         const Offset(0, -200),
       );
-      expect(find.text('Reset calibration'), findsOneWidget);
+      expect(find.text('Reset volumetric efficiency'), findsOneWidget);
     });
 
     testWidgets('Cancel leaves the profile untouched', (tester) async {
@@ -72,14 +72,14 @@ void main() {
 
       await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
       await tester.dragUntilVisible(
-        find.text('Reset calibration'),
+        find.text('Reset volumetric efficiency'),
         find.byType(ListView),
         const Offset(0, -200),
       );
-      await tester.tap(find.text('Reset calibration'));
+      await tester.tap(find.text('Reset volumetric efficiency'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Reset calibration?'), findsOneWidget);
+      expect(find.text('Reset volumetric efficiency?'), findsOneWidget);
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
 
@@ -102,18 +102,18 @@ void main() {
 
         await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
         await tester.dragUntilVisible(
-          find.text('Reset calibration'),
+          find.text('Reset volumetric efficiency'),
           find.byType(ListView),
           const Offset(0, -200),
         );
-        await tester.tap(find.text('Reset calibration'));
+        await tester.tap(find.text('Reset volumetric efficiency'));
         await tester.pumpAndSettle();
 
         // The dialog's confirm action and the outer page button share
         // the same label — find the one inside the AlertDialog.
         final confirm = find.descendant(
           of: find.byType(AlertDialog),
-          matching: find.text('Reset calibration'),
+          matching: find.text('Reset volumetric efficiency'),
         );
         expect(confirm, findsOneWidget);
         await tester.tap(confirm);
