@@ -90,9 +90,13 @@ class VehicleBaselineSection extends ConsumerWidget {
                 onPressed: totalSamples == 0
                     ? null
                     : () => _confirmReset(context, ref, l),
-                icon: const Icon(Icons.restart_alt),
+                // tune_outlined picks up the "tuning learned per-situation
+                // behaviour" connotation — distinct from the η_v reset's
+                // local_gas_station_outlined icon (#1219).
+                icon: const Icon(Icons.tune_outlined),
                 label: Text(
-                  l?.vehicleBaselineReset ?? 'Reset baseline',
+                  l?.vehicleBaselineReset ??
+                      'Reset driving-situation baseline',
                 ),
               ),
             ),
@@ -111,7 +115,8 @@ class VehicleBaselineSection extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(
-          l?.vehicleBaselineResetConfirmTitle ?? 'Reset baseline?',
+          l?.vehicleBaselineResetConfirmTitle ??
+              'Reset driving-situation baseline?',
         ),
         content: Text(
           l?.vehicleBaselineResetConfirmBody ??
@@ -126,7 +131,9 @@ class VehicleBaselineSection extends ConsumerWidget {
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l?.vehicleBaselineReset ?? 'Reset baseline'),
+            child: Text(
+              l?.vehicleBaselineReset ?? 'Reset driving-situation baseline',
+            ),
           ),
         ],
       ),

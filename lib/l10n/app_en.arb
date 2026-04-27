@@ -899,8 +899,8 @@
   "vehicleBaselineSectionTitle": "Baseline calibration",
   "vehicleBaselineEmpty": "No samples yet — start an OBD2 trip to begin learning this vehicle's fuel profile.",
   "vehicleBaselineProgress": "Learned from samples across driving situations.",
-  "vehicleBaselineReset": "Reset baseline",
-  "vehicleBaselineResetConfirmTitle": "Reset baseline?",
+  "vehicleBaselineReset": "Reset driving-situation baseline",
+  "vehicleBaselineResetConfirmTitle": "Reset driving-situation baseline?",
   "vehicleBaselineResetConfirmBody": "This wipes every learned sample for this vehicle. You'll drift back to the cold-start defaults until new trips refill the profile.",
   "vehicleAdapterSectionTitle": "OBD2 adapter",
   "vehicleAdapterEmpty": "No adapter paired. Pair one so the app can reconnect automatically next time.",
@@ -1358,11 +1358,11 @@
       }
     }
   },
-  "veResetConfirmTitle": "Reset calibration?",
+  "veResetConfirmTitle": "Reset volumetric efficiency?",
   "@veResetConfirmTitle": {
     "description": "Title of the confirm dialog shown before discarding the learned volumetric efficiency (#815)."
   },
-  "veResetConfirmBody": "This will discard the learned per-vehicle calibration and restore the default value (0.85).",
+  "veResetConfirmBody": "This will discard the learned volumetric efficiency (η_v) and restore the default value (0.85). Trip-level fuel-flow estimates will fall back to the manufacturer constant until the calibrator collects new samples from upcoming trips.",
   "@veResetConfirmBody": {
     "description": "Body of the confirm dialog shown before discarding the learned volumetric efficiency (#815)."
   },
@@ -2606,7 +2606,7 @@
   "vinDecodeTooltip": "Decode VIN",
   "vinConfirmAction": "Yes, auto-fill",
   "vinModifyAction": "Modify manually",
-  "veResetAction": "Reset calibration",
+  "veResetAction": "Reset volumetric efficiency",
   "@veResetAction": {
     "description": "Action on the vehicle edit screen that discards the learned volumetric-efficiency calibration (#815)."
   },

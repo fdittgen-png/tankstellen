@@ -192,8 +192,13 @@ void main() {
       await tester.tap(reset);
       await tester.pumpAndSettle();
 
-      // Confirm dialog title + body are visible.
-      expect(find.text('Reset baseline?'), findsOneWidget);
+      // Confirm dialog title + body are visible. #1219 — title now
+      // explicitly names "driving-situation baseline" so users can
+      // distinguish it from the volumetric-efficiency reset.
+      expect(
+        find.text('Reset driving-situation baseline?'),
+        findsOneWidget,
+      );
       expect(find.textContaining('wipes every learned sample'), findsOneWidget);
     });
 
@@ -223,7 +228,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Dialog gone, provider untouched.
-      expect(find.text('Reset baseline?'), findsNothing);
+      expect(
+        find.text('Reset driving-situation baseline?'),
+        findsNothing,
+      );
       expect(resetCalls, 0);
     });
 
@@ -249,13 +257,13 @@ void main() {
       await tester.tap(find.byKey(const Key('resetBaselinesButton')));
       await tester.pumpAndSettle();
 
-      // The dialog has TWO "Reset baseline" texts: the original button
-      // (still on screen behind the dialog) and the FilledButton in the
-      // dialog. Tap the FilledButton specifically.
+      // The dialog has TWO "Reset driving-situation baseline" texts:
+      // the original button (still on screen behind the dialog) and
+      // the FilledButton in the dialog. Tap the FilledButton.
       await tester.tap(
         find.descendant(
           of: find.byType(FilledButton),
-          matching: find.text('Reset baseline'),
+          matching: find.text('Reset driving-situation baseline'),
         ),
       );
       await tester.pumpAndSettle();
@@ -274,6 +282,36 @@ void main() {
       );
 
       expect(find.text('Baseline calibration'), findsOneWidget);
+    });
+
+    testWidgets(
+        'reset button uses the tune_outlined icon and the explicit '
+        '"driving-situation baseline" label so users can tell it apart '
+        'from the η_v reset on the same screen (#1219)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        _host(),
+        overrides: [
+          _summaryOverride(const {
+            DrivingSituation.idle: 4,
+          }),
+        ],
+      );
+
+      // Distinct icon — tune_outlined, not the generic restart_alt.
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('resetBaselinesButton')),
+          matching: find.byIcon(Icons.tune_outlined),
+        ),
+        findsOneWidget,
+      );
+      // Explicit label — names the cleared data, not just "reset".
+      expect(
+        find.text('Reset driving-situation baseline'),
+        findsOneWidget,
+      );
     });
   });
 }

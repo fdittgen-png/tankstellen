@@ -1969,10 +1969,11 @@ class AppLocalizationsNb extends AppLocalizations {
       'Learned from samples across driving situations.';
 
   @override
-  String get vehicleBaselineReset => 'Reset baseline';
+  String get vehicleBaselineReset => 'Reset driving-situation baseline';
 
   @override
-  String get vehicleBaselineResetConfirmTitle => 'Reset baseline?';
+  String get vehicleBaselineResetConfirmTitle =>
+      'Reset driving-situation baseline?';
 
   @override
   String get vehicleBaselineResetConfirmBody =>
@@ -3065,11 +3066,11 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
-  String get veResetConfirmTitle => 'Reset calibration?';
+  String get veResetConfirmTitle => 'Reset volumetric efficiency?';
 
   @override
   String get veResetConfirmBody =>
-      'This will discard the learned per-vehicle calibration and restore the default value (0.85).';
+      'This will discard the learned volumetric efficiency (η_v) and restore the default value (0.85). Trip-level fuel-flow estimates will fall back to the manufacturer constant until the calibrator collects new samples from upcoming trips.';
 
   @override
   String get alertsRadiusSectionTitle => 'Radius alerts';
@@ -4011,7 +4012,7 @@ class AppLocalizationsNb extends AppLocalizations {
   String get vinModifyAction => 'Modify manually';
 
   @override
-  String get veResetAction => 'Reset calibration';
+  String get veResetAction => 'Reset volumetric efficiency';
 
   @override
   String get vehicleReadVinFromCarButton => 'Read VIN from car';

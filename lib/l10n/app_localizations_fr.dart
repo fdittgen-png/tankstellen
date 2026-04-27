@@ -1981,10 +1981,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Appris à partir d\'échantillons issus de différentes situations de conduite.';
 
   @override
-  String get vehicleBaselineReset => 'Réinitialiser la baseline';
+  String get vehicleBaselineReset => 'Réinitialiser la baseline par situation';
 
   @override
-  String get vehicleBaselineResetConfirmTitle => 'Réinitialiser la baseline ?';
+  String get vehicleBaselineResetConfirmTitle =>
+      'Réinitialiser la baseline par situation ?';
 
   @override
   String get vehicleBaselineResetConfirmBody =>
@@ -3092,11 +3093,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get veResetConfirmTitle => 'Réinitialiser la calibration ?';
+  String get veResetConfirmTitle => 'Réinitialiser le rendement volumétrique ?';
 
   @override
   String get veResetConfirmBody =>
-      'Cela supprimera la calibration apprise pour ce véhicule et restaurera la valeur par défaut (0,85).';
+      'Cela supprimera le rendement volumétrique appris (η_v) et restaurera la valeur par défaut (0,85). Les estimations de débit de carburant par trajet retomberont sur la constante du constructeur jusqu\'à ce que le calibrateur collecte de nouveaux échantillons lors des prochains trajets.';
 
   @override
   String get alertsRadiusSectionTitle => 'Radius alerts';
@@ -4046,7 +4047,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get vinModifyAction => 'Modifier manuellement';
 
   @override
-  String get veResetAction => 'Réinitialiser la calibration';
+  String get veResetAction => 'Réinitialiser le rendement volumétrique';
 
   @override
   String get vehicleReadVinFromCarButton => 'Lire le VIN depuis la voiture';
