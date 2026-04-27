@@ -3151,6 +3151,27 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get achievementSmoothDriver => 'Série souple';
+
+  @override
+  String get achievementSmoothDriverDesc =>
+      'Enchaînez 5 trajets avec un score de conduite souple supérieur ou égal à 80.';
+
+  @override
+  String get achievementColdStartAware => 'Démarrage à froid maîtrisé';
+
+  @override
+  String get achievementColdStartAwareDesc =>
+      'Maintenez le surcoût de démarrage à froid sous 2 % de la consommation totale du mois — regroupez les trajets courts.';
+
+  @override
+  String get achievementHighwayMaster => 'Maître de l\'autoroute';
+
+  @override
+  String get achievementHighwayMasterDesc =>
+      'Réalisez un trajet de 30 km ou plus à vitesse constante avec un score de conduite souple supérieur ou égal à 90.';
+
+  @override
   String get autoRecordSectionTitle => 'Enregistrement automatique';
 
   @override

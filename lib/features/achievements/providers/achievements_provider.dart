@@ -9,6 +9,7 @@ import '../data/achievements_repository.dart';
 import '../domain/achievement.dart';
 import '../domain/achievement_engine.dart';
 import '../domain/price_win_detector.dart';
+import '../domain/trip_metrics.dart';
 
 part 'achievements_provider.g.dart';
 
@@ -48,10 +49,29 @@ class Achievements extends _$Achievements {
     // cheap: Hive-backed, already loaded per station.
     final priceRepo = ref.watch(priceHistoryRepositoryProvider);
     final hasPriceWin = anyPriceWin(fillUps, priceRepo);
+    // #1041 phase 5 — driving-score, cold-start excess, and speed
+    // std-dev are pre-computed here so the engine stays pure (no
+    // sample-scanning in rule code). The maps are keyed by trip id;
+    // missing entries fall back to safe defaults inside the engine.
+    final scores = <String, int>{};
+    final coldStarts = <String, double>{};
+    final stdDevs = <String, double>{};
+    for (final t in trips) {
+      scores[t.id] = TripMetrics.drivingScore(t.summary);
+      // Sample-based metrics only land for trips persisted with
+      // their tick buffer (#1040+). Legacy trips with empty
+      // [TripHistoryEntry.samples] yield 0 / +inf which the engine
+      // treats as "skip this trip for the rule".
+      coldStarts[t.id] = TripMetrics.coldStartExcessLiters(t.samples);
+      stdDevs[t.id] = TripMetrics.speedStdDev(t.samples);
+    }
     final earnedIds = engine.evaluate(
       trips: trips,
       fillUps: fillUps,
       hasPriceWin: hasPriceWin,
+      scoresByTripId: scores,
+      coldStartExcessLByTripId: coldStarts,
+      speedStdDevByTripId: stdDevs,
     );
     // Fire-and-forget persistence so the build is synchronous.
     // The repository merges idempotently — re-runs are cheap.

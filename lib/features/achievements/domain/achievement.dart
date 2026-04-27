@@ -30,6 +30,27 @@ enum AchievementId {
   /// price for that fuel type by ≥5 %. Rewards the "save at the
   /// pump" lens directly — the user timed their visit well.
   priceWin,
+
+  /// Five consecutive trips, ordered by `summary.startedAt`, each
+  /// with a driving-score (#1041 phase 5 derived metric) of ≥ 80
+  /// and no gap of more than 14 days between adjacent trips. Trips
+  /// without a `startedAt` are skipped (cannot be ordered).
+  /// Rewards a sustained smooth-driving streak — one good trip is
+  /// already covered by [zeroHarshTrip].
+  smoothDriver,
+
+  /// At least one calendar month where the total cold-start excess
+  /// fuel sums to less than 2 % of that month's total fuel
+  /// consumed. Months with fewer than 3 trips are skipped because
+  /// the aggregate isn't representative. Rewards the "combine
+  /// short trips" lens of the leitmotiv.
+  coldStartAware,
+
+  /// One single trip with distance ≥ 30 km, driving-score ≥ 90
+  /// and tight speed std-dev (≤ 8 km/h across non-idle samples).
+  /// Rewards a long, consistent highway run — the situation where
+  /// driving smoothness has the biggest fuel-saving payoff.
+  highwayMaster,
 }
 
 /// An achievement the user has earned. `earnedAt` is the moment the
