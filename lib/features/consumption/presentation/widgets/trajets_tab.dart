@@ -64,7 +64,19 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
       // didn't. `needsPicker` is the expected path here: surface the
       // picker, then hand the resulting service back to the provider
       // (same pattern as AddFillUpScreen).
-      final service = await showObd2AdapterPicker(context);
+      //
+      // #1188 — when the active vehicle has an adapter paired, the
+      // picker takes a silent fast path: it tries `connectByMac` and
+      // only opens the modal sheet when the connect fails. Plumbing
+      // both the MAC and the display name lets the picker surface a
+      // concrete fallback snackbar ("Couldn't reach 'X' …") rather
+      // than a generic message.
+      final activeVehicle = ref.read(activeVehicleProfileProvider);
+      final service = await showObd2AdapterPicker(
+        context,
+        pinnedMac: activeVehicle?.obd2AdapterMac,
+        pinnedAdapterName: activeVehicle?.obd2AdapterName,
+      );
       if (service == null || !mounted) return;
       await notifier.start(service);
       if (!mounted) return;

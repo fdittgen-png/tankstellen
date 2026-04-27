@@ -6800,6 +6800,12 @@ abstract class AppLocalizations {
   /// **'Need at least 3 trips per month for comparison'**
   String get consumptionMonthlyComparisonNotReliable;
 
+  /// Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t reach \'{adapterName}\' — pick another adapter'**
+  String obd2PickerPinnedFallback(String adapterName);
+
   /// Title of the optional onboarding step (#816) that offers to connect an OBD2 adapter, read the VIN, and auto-fill the vehicle profile.
   ///
   /// In en, this message translates to:

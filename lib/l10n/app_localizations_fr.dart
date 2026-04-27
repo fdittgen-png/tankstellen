@@ -3672,6 +3672,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Au moins 3 trajets par mois sont nécessaires pour la comparaison';
 
   @override
+  String obd2PickerPinnedFallback(String adapterName) {
+    return 'Impossible de joindre \'$adapterName\' — choisissez un autre adaptateur';
+  }
+
+  @override
   String get onboardingObd2StepTitle => 'Connecter votre adaptateur OBD2';
 
   @override

@@ -2114,6 +2114,15 @@
   "@consumptionMonthlyComparisonNotReliable": {
     "description": "Caption shown on the monthly-insights card when one or both months has fewer than 3 trips. The card still shows the current-month numbers but skips the previous-month column and the delta arrows (#1041 phase 4)."
   },
+  "obd2PickerPinnedFallback": "Couldn't reach '{adapterName}' — pick another adapter",
+  "@obd2PickerPinnedFallback": {
+    "description": "Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.",
+    "placeholders": {
+      "adapterName": {
+        "type": "String"
+      }
+    }
+  },
   "onboardingObd2StepTitle": "Connect your OBD2 adapter",
   "@onboardingObd2StepTitle": {
     "description": "Title of the optional onboarding step (#816) that offers to connect an OBD2 adapter, read the VIN, and auto-fill the vehicle profile."
