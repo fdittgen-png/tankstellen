@@ -13,6 +13,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/route_info.dart';
 import '../../providers/route_input_provider.dart';
 import 'city_autocomplete_field.dart';
+import 'route_search_button.dart';
 
 /// Input widget for route-based search: start, optional stops, destination.
 ///
@@ -280,25 +281,11 @@ class _RouteInputState extends ConsumerState<RouteInput> {
 
         // Search button — listens to controllers so it enables as the user
         // types, without needing setState.
-        ListenableBuilder(
-          listenable: Listenable.merge([_startController, _endController]),
-          builder: (context, _) {
-            final canSearch = _startController.text.isNotEmpty &&
-                _endController.text.isNotEmpty &&
-                !routeState.isSearching;
-            return FilledButton.icon(
-              onPressed: canSearch ? _resolveAndSearch : null,
-              icon: routeState.isSearching
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
-                    )
-                  : const Icon(Icons.route),
-              label: Text(l10n?.searchAlongRoute ?? 'Search along route'),
-            );
-          },
+        RouteSearchButton(
+          startController: _startController,
+          endController: _endController,
+          isSearching: routeState.isSearching,
+          onSearch: _resolveAndSearch,
         ),
       ],
     );
