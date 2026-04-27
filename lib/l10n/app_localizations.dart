@@ -3745,11 +3745,17 @@ abstract class AppLocalizations {
   /// **'Learned from samples across driving situations.'**
   String get vehicleBaselineProgress;
 
-  /// No description provided for @vehicleBaselineReset.
+  /// Action that wipes the learned per-driving-situation Welford samples for the current vehicle (#779).
   ///
   /// In en, this message translates to:
-  /// **'Reset baseline'**
+  /// **'Reset driving-situation baseline'**
   String get vehicleBaselineReset;
+
+  /// One-line caption shown under the driving-situation baseline reset button so users know what the action clears (#1219).
+  ///
+  /// In en, this message translates to:
+  /// **'Clears the per-situation Welford samples (deceleration / climb / cruise).'**
+  String get vehicleBaselineResetCaption;
 
   /// No description provided for @vehicleBaselineResetConfirmTitle.
   ///
@@ -3762,6 +3768,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.'**
   String get vehicleBaselineResetConfirmBody;
+
+  /// Title of the calibration card on the vehicle edit screen that groups the driving-situation baseline reset and the volumetric-efficiency reset (#1219).
+  ///
+  /// In en, this message translates to:
+  /// **'Calibration'**
+  String get calibrationGroupTitle;
 
   /// No description provided for @vehicleAdapterSectionTitle.
   ///
@@ -5771,7 +5783,7 @@ abstract class AppLocalizations {
   /// Title of the confirm dialog shown before discarding the learned volumetric efficiency (#815).
   ///
   /// In en, this message translates to:
-  /// **'Reset calibration?'**
+  /// **'Reset volumetric efficiency?'**
   String get veResetConfirmTitle;
 
   /// Body of the confirm dialog shown before discarding the learned volumetric efficiency (#815).
@@ -7445,8 +7457,14 @@ abstract class AppLocalizations {
   /// Action on the vehicle edit screen that discards the learned volumetric-efficiency calibration (#815).
   ///
   /// In en, this message translates to:
-  /// **'Reset calibration'**
+  /// **'Reset volumetric efficiency'**
   String get veResetAction;
+
+  /// One-line caption shown under the volumetric-efficiency reset button so users know what the action clears (#1219).
+  ///
+  /// In en, this message translates to:
+  /// **'Drops the learned η_v constant back to default 0.85 — needs new OBD2 trips to re-converge.'**
+  String get veResetCaption;
 
   /// Button label on the vehicle edit screen that triggers an OBD2 Mode 09 PID 02 read of the VIN from the paired adapter (#1162).
   ///

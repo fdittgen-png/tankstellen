@@ -899,9 +899,20 @@
   "vehicleBaselineSectionTitle": "Baseline calibration",
   "vehicleBaselineEmpty": "No samples yet — start an OBD2 trip to begin learning this vehicle's fuel profile.",
   "vehicleBaselineProgress": "Learned from samples across driving situations.",
-  "vehicleBaselineReset": "Reset baseline",
+  "vehicleBaselineReset": "Reset driving-situation baseline",
+  "@vehicleBaselineReset": {
+    "description": "Action that wipes the learned per-driving-situation Welford samples for the current vehicle (#779)."
+  },
+  "vehicleBaselineResetCaption": "Clears the per-situation Welford samples (deceleration / climb / cruise).",
+  "@vehicleBaselineResetCaption": {
+    "description": "One-line caption shown under the driving-situation baseline reset button so users know what the action clears (#1219)."
+  },
   "vehicleBaselineResetConfirmTitle": "Reset baseline?",
   "vehicleBaselineResetConfirmBody": "This wipes every learned sample for this vehicle. You'll drift back to the cold-start defaults until new trips refill the profile.",
+  "calibrationGroupTitle": "Calibration",
+  "@calibrationGroupTitle": {
+    "description": "Title of the calibration card on the vehicle edit screen that groups the driving-situation baseline reset and the volumetric-efficiency reset (#1219)."
+  },
   "vehicleAdapterSectionTitle": "OBD2 adapter",
   "vehicleAdapterEmpty": "No adapter paired. Pair one so the app can reconnect automatically next time.",
   "vehicleAdapterUnnamed": "Unknown adapter",
@@ -1358,7 +1369,7 @@
       }
     }
   },
-  "veResetConfirmTitle": "Reset calibration?",
+  "veResetConfirmTitle": "Reset volumetric efficiency?",
   "@veResetConfirmTitle": {
     "description": "Title of the confirm dialog shown before discarding the learned volumetric efficiency (#815)."
   },

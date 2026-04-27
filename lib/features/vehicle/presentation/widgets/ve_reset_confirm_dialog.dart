@@ -16,7 +16,9 @@ class VeResetConfirmDialog {
     return showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(l?.veResetConfirmTitle ?? 'Reset calibration?'),
+        title: Text(
+          l?.veResetConfirmTitle ?? 'Reset volumetric efficiency?',
+        ),
         content: Text(
           l?.veResetConfirmBody ??
               'This will discard the learned per-vehicle calibration '
@@ -29,7 +31,9 @@ class VeResetConfirmDialog {
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l?.veResetAction ?? 'Reset calibration'),
+            child: Text(
+              l?.veResetAction ?? 'Reset volumetric efficiency',
+            ),
           ),
         ],
       ),

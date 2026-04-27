@@ -29,6 +29,7 @@ class VehicleExtrasSection {
     required double? currentOdometerKm,
   }) {
     final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return [
       // Card 3: OBD2 adapter pairing (#779). Stable vehicle id only.
       const SizedBox(height: 16),
@@ -38,23 +39,62 @@ class VehicleExtrasSection {
         onPaired: onAdapterPaired,
         onForget: onAdapterForget,
       ),
-      // Baseline calibration section (#779). Only renders once a
-      // vehicle is saved — hidden during the Add flow.
+      // Calibration group (#1219) — wraps both reset actions in a single
+      // visually-grouped card with one-line captions. The two resets
+      // clear different state (Welford samples vs η_v constant) so they
+      // need distinct labels and icons; the grouping makes the relation
+      // obvious without putting them on the same row.
       const SizedBox(height: 16),
-      VehicleBaselineSection(vehicleId: vehicleId),
+      Card(
+        margin: EdgeInsets.zero,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Text(
+                l?.calibrationGroupTitle ?? 'Calibration',
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            // Driving-situation baseline (#779) — its own progress bars
+            // and reset button + caption live inside this section.
+            VehicleBaselineSection(vehicleId: vehicleId),
+            const Divider(height: 1),
+            // η_v calibration reset (#815). Distinct label + caption +
+            // icon disambiguate it from the baseline reset above.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: onResetVolumetricEfficiency,
+                    icon: const Icon(Icons.tune),
+                    label: Text(
+                      l?.veResetAction ?? 'Reset volumetric efficiency',
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    l?.veResetCaption ??
+                        'Drops the learned η_v constant back to default '
+                            '0.85 — needs new OBD2 trips to re-converge.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
       // Calibration mode toggle (#894) — rule vs fuzzy. Lives directly
-      // under the baseline progress so users see what they're opting
+      // under the calibration card so users see what they're opting
       // into without jumping sections.
       const SizedBox(height: 12),
       VehicleCalibrationModeSelector(vehicleId: vehicleId),
-      // η_v calibration reset (#815). Pairs visually with baseline
-      // above — users who reset one often reset the other.
-      const SizedBox(height: 12),
-      OutlinedButton.icon(
-        onPressed: onResetVolumetricEfficiency,
-        icon: const Icon(Icons.restart_alt_outlined),
-        label: Text(l?.veResetAction ?? 'Reset calibration'),
-      ),
       // Service reminders (#584). Keyed by vehicle id; hidden on Add.
       const SizedBox(height: 16),
       ServiceReminderSection(

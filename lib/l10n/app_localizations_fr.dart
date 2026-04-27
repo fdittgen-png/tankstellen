@@ -1981,7 +1981,12 @@ class AppLocalizationsFr extends AppLocalizations {
       'Appris à partir d\'échantillons issus de différentes situations de conduite.';
 
   @override
-  String get vehicleBaselineReset => 'Réinitialiser la baseline';
+  String get vehicleBaselineReset =>
+      'Réinitialiser la base des situations de conduite';
+
+  @override
+  String get vehicleBaselineResetCaption =>
+      'Efface les échantillons Welford par situation (décélération / montée / route).';
 
   @override
   String get vehicleBaselineResetConfirmTitle => 'Réinitialiser la baseline ?';
@@ -1989,6 +1994,9 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get vehicleBaselineResetConfirmBody =>
       'Ceci efface tous les échantillons appris pour ce véhicule. Les valeurs par défaut au démarrage à froid seront utilisées jusqu\'à ce que de nouveaux trajets reconstruisent le profil.';
+
+  @override
+  String get calibrationGroupTitle => 'Calibration';
 
   @override
   String get vehicleAdapterSectionTitle => 'Adaptateur OBD2';
@@ -3092,7 +3100,8 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get veResetConfirmTitle => 'Réinitialiser la calibration ?';
+  String get veResetConfirmTitle =>
+      'Réinitialiser l\'efficacité volumétrique ?';
 
   @override
   String get veResetConfirmBody =>
@@ -4046,7 +4055,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get vinModifyAction => 'Modifier manuellement';
 
   @override
-  String get veResetAction => 'Réinitialiser la calibration';
+  String get veResetAction => 'Réinitialiser l\'efficacité volumétrique';
+
+  @override
+  String get veResetCaption =>
+      'Remet la constante η_v apprise à la valeur par défaut 0,85 — nécessite de nouveaux trajets OBD2 pour reconverger.';
 
   @override
   String get vehicleReadVinFromCarButton => 'Lire le VIN depuis la voiture';

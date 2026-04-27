@@ -50,6 +50,45 @@ void main() {
     });
 
     testWidgets(
+        'caption text is rendered under the reset button so users can '
+        'tell this baseline reset apart from the η_v reset directly '
+        'beneath in the calibration card (#1219)', (tester) async {
+      await pumpApp(
+        tester,
+        _host(),
+        overrides: [_summaryOverride(const {})],
+      );
+
+      expect(
+        find.textContaining('Welford samples'),
+        findsOneWidget,
+        reason:
+            'Caption must appear under the reset button so the user '
+            'knows what gets cleared.',
+      );
+    });
+
+    testWidgets(
+        'reset button uses Icons.restart_alt — distinct from the η_v '
+        'reset (Icons.tune) right beneath it in the calibration card '
+        '(#1219)', (tester) async {
+      await pumpApp(
+        tester,
+        _host(),
+        overrides: [_summaryOverride(const {})],
+      );
+
+      // The button itself has a `restart_alt` icon. Other widgets in
+      // the section can carry icons too (the title row uses `tune`),
+      // so we scope the search to the keyed reset button.
+      final resetIcon = find.descendant(
+        of: find.byKey(const Key('resetBaselinesButton')),
+        matching: find.byIcon(Icons.restart_alt),
+      );
+      expect(resetIcon, findsOneWidget);
+    });
+
+    testWidgets(
         'partial confidence: a situation with 15 samples and a 30 cap '
         'renders its bar at 50% so the user can eyeball calibration '
         'progress', (tester) async {
@@ -249,13 +288,13 @@ void main() {
       await tester.tap(find.byKey(const Key('resetBaselinesButton')));
       await tester.pumpAndSettle();
 
-      // The dialog has TWO "Reset baseline" texts: the original button
-      // (still on screen behind the dialog) and the FilledButton in the
-      // dialog. Tap the FilledButton specifically.
+      // The dialog has TWO "Reset driving-situation baseline" texts:
+      // the original button (still on screen behind the dialog) and the
+      // FilledButton in the dialog. Tap the FilledButton specifically.
       await tester.tap(
         find.descendant(
           of: find.byType(FilledButton),
-          matching: find.text('Reset baseline'),
+          matching: find.text('Reset driving-situation baseline'),
         ),
       );
       await tester.pumpAndSettle();

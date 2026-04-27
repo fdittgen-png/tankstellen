@@ -1984,7 +1984,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Anhand der Messwerte aus verschiedenen Fahrsituationen gelernt.';
 
   @override
-  String get vehicleBaselineReset => 'Baseline zurücksetzen';
+  String get vehicleBaselineReset => 'Fahrsituationsbasis zurücksetzen';
+
+  @override
+  String get vehicleBaselineResetCaption =>
+      'Löscht die situationsbezogenen Welford-Samples (Verzögerung / Steigung / Fahrt).';
 
   @override
   String get vehicleBaselineResetConfirmTitle => 'Baseline zurücksetzen?';
@@ -1992,6 +1996,9 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get vehicleBaselineResetConfirmBody =>
       'Dadurch werden alle gelernten Werte für dieses Fahrzeug verworfen. Bis neue Fahrten die Daten wieder aufbauen, werden die Kaltstart-Standardwerte verwendet.';
+
+  @override
+  String get calibrationGroupTitle => 'Kalibrierung';
 
   @override
   String get vehicleAdapterSectionTitle => 'OBD2-Adapter';
@@ -3091,7 +3098,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get veResetConfirmTitle => 'Kalibrierung zurücksetzen?';
+  String get veResetConfirmTitle => 'Volumetrische Effizienz zurücksetzen?';
 
   @override
   String get veResetConfirmBody =>
@@ -4049,7 +4056,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get vinModifyAction => 'Manuell anpassen';
 
   @override
-  String get veResetAction => 'Kalibrierung zurücksetzen';
+  String get veResetAction => 'Volumetrische Effizienz zurücksetzen';
+
+  @override
+  String get veResetCaption =>
+      'Setzt die gelernte η_v-Konstante auf den Standardwert 0,85 zurück — neue OBD2-Fahrten nötig zur Neukonvergenz.';
 
   @override
   String get vehicleReadVinFromCarButton => 'FIN aus dem Auto auslesen';

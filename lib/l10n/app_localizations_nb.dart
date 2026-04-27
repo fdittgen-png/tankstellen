@@ -1969,7 +1969,11 @@ class AppLocalizationsNb extends AppLocalizations {
       'Learned from samples across driving situations.';
 
   @override
-  String get vehicleBaselineReset => 'Reset baseline';
+  String get vehicleBaselineReset => 'Reset driving-situation baseline';
+
+  @override
+  String get vehicleBaselineResetCaption =>
+      'Clears the per-situation Welford samples (deceleration / climb / cruise).';
 
   @override
   String get vehicleBaselineResetConfirmTitle => 'Reset baseline?';
@@ -1977,6 +1981,9 @@ class AppLocalizationsNb extends AppLocalizations {
   @override
   String get vehicleBaselineResetConfirmBody =>
       'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.';
+
+  @override
+  String get calibrationGroupTitle => 'Calibration';
 
   @override
   String get vehicleAdapterSectionTitle => 'OBD2 adapter';
@@ -3065,7 +3072,7 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
-  String get veResetConfirmTitle => 'Reset calibration?';
+  String get veResetConfirmTitle => 'Reset volumetric efficiency?';
 
   @override
   String get veResetConfirmBody =>
@@ -4011,7 +4018,11 @@ class AppLocalizationsNb extends AppLocalizations {
   String get vinModifyAction => 'Modify manually';
 
   @override
-  String get veResetAction => 'Reset calibration';
+  String get veResetAction => 'Reset volumetric efficiency';
+
+  @override
+  String get veResetCaption =>
+      'Drops the learned η_v constant back to default 0.85 — needs new OBD2 trips to re-converge.';
 
   @override
   String get vehicleReadVinFromCarButton => 'Read VIN from car';

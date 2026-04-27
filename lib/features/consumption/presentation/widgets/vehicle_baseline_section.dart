@@ -46,58 +46,66 @@ class VehicleBaselineSection extends ConsumerWidget {
     final totalSamples =
         situations.fold<int>(0, (acc, s) => acc + (counts[s] ?? 0));
 
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.tune),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    l?.vehicleBaselineSectionTitle ??
-                        'Baseline calibration',
-                    style: theme.textTheme.titleMedium,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              totalSamples == 0
-                  ? (l?.vehicleBaselineEmpty ??
-                      'No samples yet — start an OBD2 trip to begin learning this vehicle\'s fuel profile.')
-                  : (l?.vehicleBaselineProgress ??
-                      'Learned from $totalSamples sample(s) across driving situations.'),
-              style: theme.textTheme.bodySmall,
-            ),
-            const SizedBox(height: 12),
-            for (final s in situations)
-              _BaselineRow(
-                label: _label(s, l),
-                count: counts[s] ?? 0,
-                fullConfidenceSamples: fullConfidenceSamples,
-              ),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                key: const Key('resetBaselinesButton'),
-                onPressed: totalSamples == 0
-                    ? null
-                    : () => _confirmReset(context, ref, l),
-                icon: const Icon(Icons.restart_alt),
-                label: Text(
-                  l?.vehicleBaselineReset ?? 'Reset baseline',
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.tune),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l?.vehicleBaselineSectionTitle ??
+                      'Baseline calibration',
+                  style: theme.textTheme.titleMedium,
                 ),
               ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            totalSamples == 0
+                ? (l?.vehicleBaselineEmpty ??
+                    'No samples yet — start an OBD2 trip to begin learning this vehicle\'s fuel profile.')
+                : (l?.vehicleBaselineProgress ??
+                    'Learned from $totalSamples sample(s) across driving situations.'),
+            style: theme.textTheme.bodySmall,
+          ),
+          const SizedBox(height: 12),
+          for (final s in situations)
+            _BaselineRow(
+              label: _label(s, l),
+              count: counts[s] ?? 0,
+              fullConfidenceSamples: fullConfidenceSamples,
             ),
-          ],
-        ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              key: const Key('resetBaselinesButton'),
+              onPressed: totalSamples == 0
+                  ? null
+                  : () => _confirmReset(context, ref, l),
+              icon: const Icon(Icons.restart_alt),
+              label: Text(
+                l?.vehicleBaselineReset ?? 'Reset driving-situation baseline',
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          // Caption disambiguates this reset from the η_v reset directly
+          // beneath. The two actions clear different state — see #1219.
+          Text(
+            l?.vehicleBaselineResetCaption ??
+                'Clears the per-situation Welford samples '
+                    '(deceleration / climb / cruise).',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -126,7 +134,9 @@ class VehicleBaselineSection extends ConsumerWidget {
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l?.vehicleBaselineReset ?? 'Reset baseline'),
+            child: Text(
+              l?.vehicleBaselineReset ?? 'Reset driving-situation baseline',
+            ),
           ),
         ],
       ),

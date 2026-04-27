@@ -52,13 +52,19 @@ void main() {
       await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
 
       // Scroll until the reset action is visible — it lives below
-      // the service-reminder and baseline sections.
-      await tester.dragUntilVisible(
-        find.text('Reset calibration'),
-        find.byType(ListView),
-        const Offset(0, -200),
+      // the service-reminder and baseline sections. We scroll to the
+      // OutlinedButton (not the Text) so the hit-rect, not just the
+      // glyph, comes into view.
+      final resetButton = find.ancestor(
+        of: find.text('Reset volumetric efficiency'),
+        matching: find.byType(OutlinedButton),
       );
-      expect(find.text('Reset calibration'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        resetButton,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(resetButton, findsOneWidget);
     });
 
     testWidgets('Cancel leaves the profile untouched', (tester) async {
@@ -71,15 +77,24 @@ void main() {
       ));
 
       await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
-      await tester.dragUntilVisible(
-        find.text('Reset calibration'),
-        find.byType(ListView),
-        const Offset(0, -200),
+      final resetButton = find.ancestor(
+        of: find.text('Reset volumetric efficiency'),
+        matching: find.byType(OutlinedButton),
       );
-      await tester.tap(find.text('Reset calibration'));
+      await tester.scrollUntilVisible(
+        resetButton,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      // ensureVisible re-anchors the widget so its hit-rect is fully
+      // on-screen — fixes the "hit test missed" race that surfaced
+      // after the calibration-card grouping (#1219).
+      await tester.ensureVisible(resetButton);
+      await tester.pumpAndSettle();
+      await tester.tap(resetButton);
       await tester.pumpAndSettle();
 
-      expect(find.text('Reset calibration?'), findsOneWidget);
+      expect(find.text('Reset volumetric efficiency?'), findsOneWidget);
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
 
@@ -101,19 +116,25 @@ void main() {
         ));
 
         await _pumpEditScreen(tester, repo: repo, vehicleId: 'v1');
-        await tester.dragUntilVisible(
-          find.text('Reset calibration'),
-          find.byType(ListView),
-          const Offset(0, -200),
+        final resetButton = find.ancestor(
+          of: find.text('Reset volumetric efficiency'),
+          matching: find.byType(OutlinedButton),
         );
-        await tester.tap(find.text('Reset calibration'));
+        await tester.scrollUntilVisible(
+          resetButton,
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.ensureVisible(resetButton);
+        await tester.pumpAndSettle();
+        await tester.tap(resetButton);
         await tester.pumpAndSettle();
 
         // The dialog's confirm action and the outer page button share
         // the same label — find the one inside the AlertDialog.
         final confirm = find.descendant(
           of: find.byType(AlertDialog),
-          matching: find.text('Reset calibration'),
+          matching: find.text('Reset volumetric efficiency'),
         );
         expect(confirm, findsOneWidget);
         await tester.tap(confirm);

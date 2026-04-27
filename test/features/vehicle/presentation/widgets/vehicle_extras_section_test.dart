@@ -24,8 +24,7 @@ void main() {
   });
 
   group('VehicleExtrasSection (extracted from #563 edit_vehicle_screen)', () {
-    testWidgets('build() returns the reset calibration action in the list',
-        (tester) async {
+    Future<void> pump(WidgetTester tester) async {
       // Tall canvas so all rows fit without virtualization —
       // scrollUntilVisible would work too, but a simpler viewport
       // keeps the test focused on the widget's contract.
@@ -59,10 +58,57 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+    }
 
-      // The reset-calibration OutlinedButton must be present — the
-      // VE reset test depends on this label being scroll-reachable.
-      expect(find.text('Reset calibration'), findsOneWidget);
+    testWidgets(
+        'build() renders the renamed η_v reset action — the screen-level '
+        'tests scroll until this label is visible, so a regression '
+        'silently breaks the η_v reset flow', (tester) async {
+      await pump(tester);
+
+      // The reset-volumetric-efficiency OutlinedButton must be present.
+      expect(find.text('Reset volumetric efficiency'), findsOneWidget);
+    });
+
+    testWidgets(
+        'build() groups both resets under a "Calibration" card with '
+        'distinct icons and captions so users can tell them apart '
+        '(#1219 — the whole point of this issue)', (tester) async {
+      await pump(tester);
+
+      // 1. The card has a "Calibration" header.
+      expect(find.text('Calibration'), findsOneWidget);
+
+      // 2. Both reset buttons are rendered with their renamed labels.
+      expect(
+        find.text('Reset driving-situation baseline'),
+        findsOneWidget,
+        reason: 'Baseline reset label must be the renamed value.',
+      );
+      expect(
+        find.text('Reset volumetric efficiency'),
+        findsOneWidget,
+        reason: 'η_v reset label must be the renamed value.',
+      );
+
+      // 3. Each reset has its caption directly beneath.
+      expect(
+        find.textContaining('Welford samples'),
+        findsOneWidget,
+        reason: 'Baseline-reset caption must be present.',
+      );
+      expect(
+        find.textContaining('η_v constant'),
+        findsOneWidget,
+        reason: 'η_v-reset caption must be present.',
+      );
+
+      // 4. Distinct icons on the two buttons. The baseline reset uses
+      // restart_alt; the η_v reset uses tune. Asserting both appear at
+      // least once is enough — duplicate visual cues defeat the whole
+      // disambiguation effort.
+      expect(find.byIcon(Icons.restart_alt), findsWidgets);
+      expect(find.byIcon(Icons.tune), findsWidgets);
     });
   });
 }
