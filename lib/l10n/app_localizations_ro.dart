@@ -3150,6 +3150,24 @@ class AppLocalizationsRo extends AppLocalizations {
       'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.';
 
   @override
+  String get authErrorNoNetwork => 'No network connection. Try again later.';
+
+  @override
+  String get authErrorInvalidCredentials =>
+      'Invalid email or password. Check your credentials.';
+
+  @override
+  String get authErrorUserAlreadyExists =>
+      'This email is already registered. Try signing in instead.';
+
+  @override
+  String get authErrorEmailNotConfirmed =>
+      'Please check your email and confirm your account first.';
+
+  @override
+  String get authErrorGeneric => 'Sign-in failed. Please try again.';
+
+  @override
   String get autoRecordSectionTitle => 'Auto-record';
 
   @override

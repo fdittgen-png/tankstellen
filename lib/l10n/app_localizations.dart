@@ -5912,6 +5912,36 @@ abstract class AppLocalizations {
   /// **'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.'**
   String get achievementHighwayMasterDesc;
 
+  /// Auth error pill — shown when the device has no network connectivity (DNS failure, dropped socket, AuthRetryableFetchException). Replaces the raw exception text leaked by #1186.
+  ///
+  /// In en, this message translates to:
+  /// **'No network connection. Try again later.'**
+  String get authErrorNoNetwork;
+
+  /// Auth error pill — shown when Supabase rejects the email/password pair (#1186).
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email or password. Check your credentials.'**
+  String get authErrorInvalidCredentials;
+
+  /// Auth error pill — shown on sign-up when the email is already in use (#1186).
+  ///
+  /// In en, this message translates to:
+  /// **'This email is already registered. Try signing in instead.'**
+  String get authErrorUserAlreadyExists;
+
+  /// Auth error pill — shown when sign-in fails because the user has not yet clicked the confirmation link (#1186).
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your email and confirm your account first.'**
+  String get authErrorEmailNotConfirmed;
+
+  /// Auth error pill — generic fallback when no specific mapping matches the raw exception (#1186).
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in failed. Please try again.'**
+  String get authErrorGeneric;
+
   /// Title of the per-vehicle auto-record configuration section on the edit-vehicle screen (#1004 phase 6).
   ///
   /// In en, this message translates to:

@@ -9,6 +9,7 @@ import '../../../../core/utils/password_validator.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../data/auth_error_mapper.dart';
 import '../../providers/auth_form_provider.dart';
 import '../widgets/auth_info_card.dart';
 import '../widgets/auth_status_cards.dart';
@@ -78,7 +79,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         }
       }
     } catch (e, st) { // ignore: unused_catch_stack
-      _formNotifier.setError(e.toString());
+      if (mounted) {
+        _formNotifier.setError(
+            friendlyAuthError(e, AppLocalizations.of(context)));
+      }
     } finally {
       _formNotifier.setLoading(false);
     }
@@ -126,18 +130,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       }
     } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) {
-        String errorMsg = e.toString();
-        if (errorMsg.contains('invalid_credentials')) {
-          errorMsg = 'Invalid email or password. Check your credentials.';
-        } else if (errorMsg.contains('user_already_exists') ||
-            errorMsg.contains('already registered')) {
-          errorMsg =
-              'This email is already registered. Try signing in instead.';
-        } else if (errorMsg.contains('email_not_confirmed')) {
-          errorMsg =
-              'Please check your email and confirm your account first.';
-        }
-        _formNotifier.setError(errorMsg);
+        _formNotifier.setError(
+            friendlyAuthError(e, AppLocalizations.of(context)));
       }
     } finally {
       _formNotifier.setLoading(false);
@@ -156,7 +150,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         context.pop();
       }
     } catch (e, st) { // ignore: unused_catch_stack
-      _formNotifier.setError(e.toString());
+      if (mounted) {
+        _formNotifier.setError(
+            friendlyAuthError(e, AppLocalizations.of(context)));
+      }
     } finally {
       _formNotifier.setLoading(false);
     }

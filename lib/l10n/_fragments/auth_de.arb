@@ -1,0 +1,22 @@
+{
+  "authErrorNoNetwork": "Keine Netzwerkverbindung. Bitte später erneut versuchen.",
+  "@authErrorNoNetwork": {
+    "description": "Auth error pill — shown when the device has no network connectivity (DNS failure, dropped socket, AuthRetryableFetchException). Replaces the raw exception text leaked by #1186."
+  },
+  "authErrorInvalidCredentials": "E-Mail oder Passwort ungültig. Bitte Eingabe prüfen.",
+  "@authErrorInvalidCredentials": {
+    "description": "Auth error pill — shown when Supabase rejects the email/password pair (#1186)."
+  },
+  "authErrorUserAlreadyExists": "Diese E-Mail-Adresse ist bereits registriert. Bitte stattdessen anmelden.",
+  "@authErrorUserAlreadyExists": {
+    "description": "Auth error pill — shown on sign-up when the email is already in use (#1186)."
+  },
+  "authErrorEmailNotConfirmed": "Bitte zuerst die Bestätigungs-E-Mail öffnen und das Konto aktivieren.",
+  "@authErrorEmailNotConfirmed": {
+    "description": "Auth error pill — shown when sign-in fails because the user has not yet clicked the confirmation link (#1186)."
+  },
+  "authErrorGeneric": "Anmeldung fehlgeschlagen. Bitte erneut versuchen.",
+  "@authErrorGeneric": {
+    "description": "Auth error pill — generic fallback when no specific mapping matches the raw exception (#1186)."
+  }
+}

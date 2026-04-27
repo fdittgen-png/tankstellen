@@ -3173,6 +3173,26 @@ class AppLocalizationsDe extends AppLocalizations {
       'Fahre eine Tour von mindestens 30 km mit gleichmäßigem Tempo und einem Fahrstil-Score von 90 oder höher.';
 
   @override
+  String get authErrorNoNetwork =>
+      'Keine Netzwerkverbindung. Bitte später erneut versuchen.';
+
+  @override
+  String get authErrorInvalidCredentials =>
+      'E-Mail oder Passwort ungültig. Bitte Eingabe prüfen.';
+
+  @override
+  String get authErrorUserAlreadyExists =>
+      'Diese E-Mail-Adresse ist bereits registriert. Bitte stattdessen anmelden.';
+
+  @override
+  String get authErrorEmailNotConfirmed =>
+      'Bitte zuerst die Bestätigungs-E-Mail öffnen und das Konto aktivieren.';
+
+  @override
+  String get authErrorGeneric =>
+      'Anmeldung fehlgeschlagen. Bitte erneut versuchen.';
+
+  @override
   String get autoRecordSectionTitle => 'Automatische Aufzeichnung';
 
   @override
