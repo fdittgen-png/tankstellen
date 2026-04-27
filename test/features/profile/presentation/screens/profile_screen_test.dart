@@ -208,8 +208,9 @@ void main() {
     });
 
     testWidgets(
-        '#896/#897/#1120: renders exactly four SettingsMenuTile rows — '
-        'My vehicles, Theme, Fuel club cards, Privacy Dashboard',
+        'Settings screen renders Theme + Privacy Dashboard tiles at top '
+        'level; My vehicles + Fuel club cards live INSIDE the Consumption '
+        'foldable (#1242 — Console grouping)',
         (tester) async {
       await pumpApp(
         tester,
@@ -217,23 +218,13 @@ void main() {
         overrides: overrides,
       );
 
-      // The Settings screen body is a lazily-built `ListView`; tiles
-      // below the viewport are not yet realized. Scroll through the
-      // list so every `SettingsMenuTile` is materialised before we
-      // count them.
+      // Scroll through so every realized tile gets a chance to mount.
       await tester.scrollUntilVisible(
         find.text('Privacy Dashboard'),
         200,
         scrollable: find.byType(Scrollable).first,
       );
 
-      // #896 removed Consumption log. #897 restyled the Theme entry
-      // from a bespoke `ThemeModeTile` (Card + bottom sheet) into a
-      // third `SettingsMenuTile` that matches Privacy + Storage and
-      // pushes to a dedicated `/theme-settings` screen. #1120 adds a
-      // Fuel club cards entry point. The Settings screen now renders
-      // My vehicles, Theme, Fuel club cards, Privacy Dashboard as
-      // SettingsMenuTile rows.
       final observedTitles = <String>{};
       void collect() {
         for (final t in tester
@@ -243,21 +234,13 @@ void main() {
       }
 
       collect();
-      // Scroll back to the top so the first tile is realized again.
       await tester.drag(find.byType(Scrollable).first, const Offset(0, 2000));
       await tester.pumpAndSettle();
       collect();
 
-      expect(
-        observedTitles.contains('My vehicles'),
-        isTrue,
-        reason: 'My vehicles tile should still render after #896',
-      );
-      expect(
-        observedTitles.contains('Privacy Dashboard'),
-        isTrue,
-        reason: 'Privacy Dashboard tile should still render after #896',
-      );
+      // Theme + Privacy Dashboard remain at the screen's top level;
+      // they are not vehicle-specific so they don't belong inside
+      // the Consumption foldable.
       expect(
         observedTitles.contains('Theme'),
         isTrue,
@@ -265,22 +248,96 @@ void main() {
             '(card matching Privacy + Storage pattern)',
       );
       expect(
-        observedTitles.contains('Fuel club cards'),
+        observedTitles.contains('Privacy Dashboard'),
         isTrue,
-        reason: '#1120: Fuel club cards tile must render as a '
-            'SettingsMenuTile entry to /loyalty-settings',
+        reason: 'Privacy Dashboard tile should still render at the '
+            'top level of the Settings screen',
       );
+
+      // My vehicles + Fuel club cards must NOT appear at the top
+      // level — they were folded into the Consumption section.
+      expect(
+        observedTitles.contains('My vehicles'),
+        isFalse,
+        reason: 'My vehicles tile moved INSIDE the Consumption '
+            'foldable; it must not render as a top-level entry too '
+            '(would be a duplicate).',
+      );
+      expect(
+        observedTitles.contains('Fuel club cards'),
+        isFalse,
+        reason: 'Fuel club cards tile moved INSIDE the Consumption '
+            'foldable; it must not render as a top-level entry too.',
+      );
+
       expect(
         observedTitles.contains('Consumption log'),
         isFalse,
         reason: '#896: Consumption log tile must not render any more',
       );
+    });
+
+    testWidgets(
+        'Consumption foldable header uses the same label as the bottom-nav '
+        '"Conso" tab and contains vehicles + fuel-club cards entries '
+        '(#1242)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const ProfileScreen(),
+        overrides: overrides,
+      );
+
+      // The new section header replaces the old "Driving" copy. We
+      // must find the `navConsumption` label ("Consumption" in
+      // English) on the screen, and tapping it must reveal the
+      // vehicles + fuel-club tiles that were moved inside.
+      final consumptionHeader = find.text('Consumption');
+      await tester.scrollUntilVisible(
+        consumptionHeader,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(
-        observedTitles.length,
-        4,
-        reason: '#1120: expected exactly four distinct SettingsMenuTile '
-            'titles (My vehicles, Theme, Fuel club cards, Privacy '
-            'Dashboard); found $observedTitles',
+        consumptionHeader,
+        findsOneWidget,
+        reason:
+            'Foldable section title must match navConsumption ("Consumption") '
+            'so users correlate the Settings group with the bottom-nav tab.',
+      );
+
+      // Foldable starts collapsed — child tiles should not be in the
+      // tree yet.
+      expect(
+        find.byKey(const Key('consoleVehiclesTile')),
+        findsNothing,
+        reason: 'Consumption foldable must start collapsed; vehicle '
+            'tile should only mount after the user expands it.',
+      );
+
+      // Expand the foldable.
+      await tester.tap(consumptionHeader);
+      await tester.pumpAndSettle();
+
+      // Now both moved tiles should be present, plus the existing
+      // eco-coaching toggle.
+      expect(
+        find.byKey(const Key('consoleVehiclesTile')),
+        findsOneWidget,
+        reason: 'My vehicles tile must live inside the expanded '
+            'Consumption foldable (was at top level before #1242).',
+      );
+      expect(
+        find.byKey(const Key('consoleFuelClubCardsTile')),
+        findsOneWidget,
+        reason: 'Fuel club cards tile must live inside the expanded '
+            'Consumption foldable (was at top level before #1242).',
+      );
+      expect(
+        find.byKey(const Key('hapticEcoCoachToggle')),
+        findsOneWidget,
+        reason: 'The eco-coach haptic toggle remains in the same '
+            'group, now grouped with vehicles + fuel club cards.',
       );
     });
 
