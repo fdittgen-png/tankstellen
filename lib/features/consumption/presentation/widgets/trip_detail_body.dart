@@ -36,12 +36,20 @@ class TripDetailBody extends StatefulWidget {
   final List<TripDetailSample> samples;
   final bool isEv;
 
+  /// Optional [RepaintBoundary] key supplied by the parent screen so
+  /// the Share action (#1189) can rasterise the report into a PNG. The
+  /// key is hooked into the [RepaintBoundary] that wraps the report
+  /// content (Summary card + Insights cards + charts) — i.e. the
+  /// widget subtree the user expects to share.
+  final GlobalKey? shareBoundaryKey;
+
   const TripDetailBody({
     super.key,
     required this.entry,
     required this.vehicle,
     required this.samples,
     required this.isEv,
+    this.shareBoundaryKey,
   });
 
   @override
@@ -135,54 +143,72 @@ class _TripDetailBodyState extends State<TripDetailBody> {
     // summary regardless of per-sample availability.
     final hasRpmSamples = widget.samples.any((s) => s.rpm != null);
 
+    // Wrap the report content in a [RepaintBoundary] so the Share
+    // action (#1189) can call `boundary.toImage(...)` to produce a PNG
+    // for the OS share sheet. The boundary covers Summary + Insights
+    // cards + charts — i.e. everything visible above the share button
+    // (which lives on the AppBar, outside the scroll view).
+    final reportContent = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TripSummaryCard(
+          entry: widget.entry,
+          vehicle: widget.vehicle,
+          samples: widget.samples,
+          isEv: widget.isEv,
+        ),
+        const SizedBox(height: 8),
+        // Composite driving score (#1041 phase 5a — Card A). Sits at
+        // the top of the Insights group: a single big 0..100 number
+        // with a brief breakdown chip row beneath it. EV trips and
+        // empty trips are skipped on the same gating rule as the
+        // cost-line card below.
+        if (!widget.isEv && widget.samples.isNotEmpty)
+          DrivingScoreCard(score: _score),
+        // Driving insights — combustion trips only. EV trips skip
+        // this card; phase 4 will land an EV-aware version.
+        if (!widget.isEv && widget.samples.isNotEmpty)
+          DrivingInsightsCard(insights: _insights),
+        // Throttle / RPM histogram (#1041 phase 3a — Card C). Slotted
+        // right below the insights card so the user reads "what was
+        // wasteful" then immediately sees "here's the engine
+        // distribution that produced that". Mirrors the EV-skip and
+        // empty-samples-skip rules.
+        if (!widget.isEv && widget.samples.isNotEmpty)
+          ThrottleRpmHistogramCard(histogram: _histogram),
+        _ChartSection(
+          title: l?.trajetDetailChartSpeed ?? 'Speed (km/h)',
+          chart: TripDetailSpeedChart(samples: widget.samples),
+        ),
+        _ChartSection(
+          title: l?.trajetDetailChartFuelRate ?? 'Fuel rate (L/h)',
+          chart: TripDetailFuelRateChart(samples: widget.samples),
+        ),
+        if (hasRpmSamples)
+          _ChartSection(
+            title: l?.trajetDetailChartRpm ?? 'RPM',
+            chart: TripDetailRpmChart(samples: widget.samples),
+          ),
+      ],
+    );
+
     return SingleChildScrollView(
       key: const Key('trip_detail_scroll'),
       padding: EdgeInsets.only(
         top: 8,
         bottom: 16 + MediaQuery.of(context).viewPadding.bottom,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TripSummaryCard(
-            entry: widget.entry,
-            vehicle: widget.vehicle,
-            samples: widget.samples,
-            isEv: widget.isEv,
-          ),
-          const SizedBox(height: 8),
-          // Composite driving score (#1041 phase 5a — Card A). Sits at
-          // the top of the Insights group: a single big 0..100 number
-          // with a brief breakdown chip row beneath it. EV trips and
-          // empty trips are skipped on the same gating rule as the
-          // cost-line card below.
-          if (!widget.isEv && widget.samples.isNotEmpty)
-            DrivingScoreCard(score: _score),
-          // Driving insights — combustion trips only. EV trips skip
-          // this card; phase 4 will land an EV-aware version.
-          if (!widget.isEv && widget.samples.isNotEmpty)
-            DrivingInsightsCard(insights: _insights),
-          // Throttle / RPM histogram (#1041 phase 3a — Card C). Slotted
-          // right below the insights card so the user reads "what was
-          // wasteful" then immediately sees "here's the engine
-          // distribution that produced that". Mirrors the EV-skip and
-          // empty-samples-skip rules.
-          if (!widget.isEv && widget.samples.isNotEmpty)
-            ThrottleRpmHistogramCard(histogram: _histogram),
-          _ChartSection(
-            title: l?.trajetDetailChartSpeed ?? 'Speed (km/h)',
-            chart: TripDetailSpeedChart(samples: widget.samples),
-          ),
-          _ChartSection(
-            title: l?.trajetDetailChartFuelRate ?? 'Fuel rate (L/h)',
-            chart: TripDetailFuelRateChart(samples: widget.samples),
-          ),
-          if (hasRpmSamples)
-            _ChartSection(
-              title: l?.trajetDetailChartRpm ?? 'RPM',
-              chart: TripDetailRpmChart(samples: widget.samples),
-            ),
-        ],
+      child: RepaintBoundary(
+        key: widget.shareBoundaryKey,
+        child: Material(
+          // Painting the report into a PNG outside the screen's surface
+          // strips the [Scaffold] background, so wrap the boundary in
+          // a [Material] with the theme's surface colour. This keeps
+          // the captured image readable when shared into a chat where
+          // the receiver has a dark background.
+          color: Theme.of(context).colorScheme.surface,
+          child: reportContent,
+        ),
       ),
     );
   }

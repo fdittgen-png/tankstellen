@@ -3956,10 +3956,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trajetDetailChartEmpty => 'No samples recorded';
 
   @override
-  String get trajetDetailShareAction => 'Share';
+  String get trajetDetailShareAction => 'Partager';
 
   @override
-  String get trajetDetailShareCopied => 'Copied to clipboard';
+  String trajetDetailShareSubject(String date) {
+    return 'Tankstellen — trajet du $date';
+  }
+
+  @override
+  String get trajetDetailShareError =>
+      'Impossible de générer l\'image à partager';
 
   @override
   String get trajetDetailDeleteAction => 'Delete';

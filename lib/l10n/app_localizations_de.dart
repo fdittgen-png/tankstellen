@@ -3966,7 +3966,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trajetDetailShareAction => 'Teilen';
 
   @override
-  String get trajetDetailShareCopied => 'In Zwischenablage kopiert';
+  String trajetDetailShareSubject(String date) {
+    return 'Tankstellen — Fahrt vom $date';
+  }
+
+  @override
+  String get trajetDetailShareError => 'Bild konnte nicht erstellt werden';
 
   @override
   String get trajetDetailDeleteAction => 'Löschen';
