@@ -921,6 +921,8 @@
   "consumptionLogTitle": "Consommation",
   "consumptionTabFuel": "Carburant",
   "trajetsTabLabel": "Trajets",
+  "trajetsStartRecordingButton": "Démarrer l'enregistrement",
+  "trajetsResumeRecordingButton": "Reprendre l'enregistrement",
   "trajetDetailFieldFuelCost": "Coût du carburant",
   "trajetDetailShareAction": "Partager",
   "trajetDetailShareSubject": "Tankstellen — trajet du {date}",

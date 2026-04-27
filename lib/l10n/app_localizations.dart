@@ -7262,6 +7262,12 @@ abstract class AppLocalizations {
   /// **'Start recording'**
   String get trajetsStartRecordingButton;
 
+  /// Primary CTA on the Trips tab when a trip is already being recorded in the background; tapping it brings focus back to the recording screen (#1237).
+  ///
+  /// In en, this message translates to:
+  /// **'Resume recording'**
+  String get trajetsResumeRecordingButton;
+
   /// Empty-state title on the Trips tab when no trips have been recorded (#889).
   ///
   /// In en, this message translates to:

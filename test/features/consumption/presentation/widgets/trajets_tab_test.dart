@@ -677,4 +677,68 @@ void main() {
       expect(find.text('Pick an OBD2 adapter'), findsOneWidget);
     });
   });
+
+  group('TrajetsTab — active recording CTA discoverability (#1237)', () {
+    testWidgets(
+      'idle state shows "Start recording" with the record-dot icon',
+      (tester) async {
+        await _pumpTab(tester, vehicleId: null, trips: const []);
+
+        expect(find.text('Start recording'), findsOneWidget);
+        expect(find.text('Resume recording'), findsNothing);
+        // FilledButton.icon renders the dot when no trip is active.
+        final button = tester.widget<FilledButton>(
+          find.byKey(const Key('trajets_start_recording_button')),
+        );
+        expect(button.onPressed, isNotNull);
+      },
+    );
+
+    testWidgets(
+      'active recording switches CTA to "Resume recording" + visibility icon',
+      (tester) async {
+        await _pumpTab(
+          tester,
+          vehicleId: null,
+          trips: const [],
+          recordingFactory: () => _ActiveRecordingTrip(),
+        );
+
+        expect(find.text('Resume recording'), findsOneWidget);
+        expect(find.text('Start recording'), findsNothing);
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('trajets_start_recording_button')),
+            matching: find.byIcon(Icons.visibility),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('trajets_start_recording_button')),
+            matching: find.byIcon(Icons.fiber_manual_record),
+          ),
+          findsNothing,
+        );
+      },
+    );
+  });
+}
+
+/// Returns an [TripRecordingState] whose [TripRecordingState.isActive] is
+/// `true` so the Trajets CTA flips to its "Resume recording" shape
+/// without having to spin up the OBD2 service stack.
+class _ActiveRecordingTrip extends TripRecording {
+  @override
+  TripRecordingState build() => const TripRecordingState(
+        phase: TripRecordingPhase.recording,
+      );
+
+  @override
+  Future<StartTripOutcome> startTrip({
+    String? vehicleId,
+    String? adapterMac,
+    Obd2Service? service,
+  }) async =>
+      StartTripOutcome.alreadyActive;
 }

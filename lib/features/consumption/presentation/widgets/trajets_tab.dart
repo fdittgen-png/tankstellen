@@ -123,14 +123,26 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
         return bx.compareTo(ax);
       });
 
+    // When a trip is already recording in the background (#1237), the
+    // CTA changes shape: same `_onStartRecording` handler — which
+    // routes through `StartTripOutcome.alreadyActive` and pushes the
+    // existing recording screen — but a different label + icon so the
+    // user understands tapping returns them to the live trip rather
+    // than starting a new one. Without this the recording is hidden
+    // behind a button that looks destructive.
+    final isRecordingActive = ref.watch(tripRecordingProvider).isActive;
     final header = Padding(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
       child: FilledButton.icon(
         key: const Key('trajets_start_recording_button'),
         onPressed: _starting ? null : _onStartRecording,
-        icon: const Icon(Icons.fiber_manual_record),
+        icon: Icon(
+          isRecordingActive ? Icons.visibility : Icons.fiber_manual_record,
+        ),
         label: Text(
-          l?.trajetsStartRecordingButton ?? 'Start recording',
+          isRecordingActive
+              ? (l?.trajetsResumeRecordingButton ?? 'Resume recording')
+              : (l?.trajetsStartRecordingButton ?? 'Start recording'),
         ),
       ),
     );
