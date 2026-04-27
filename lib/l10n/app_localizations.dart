@@ -6974,6 +6974,72 @@ abstract class AppLocalizations {
   /// **'A station is at {price} € (target: {threshold} €)'**
   String radiusAlertNotificationBody(String price, String threshold);
 
+  /// Title of the consumption-by-speed card on the Carbon dashboard Charts tab — bins per-second OBD2 samples by speed band so the user can see what motorway speed is costing them per 100 km (#1192).
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption by speed'**
+  String get speedConsumptionCardTitle;
+
+  /// Label of the 0-10 km/h speed band on the consumption-by-speed card — stop-and-go and traffic-jam time. Has a time-share figure but no L/100 km average (denominator approaches zero) (#1192).
+  ///
+  /// In en, this message translates to:
+  /// **'Idle / jam'**
+  String get speedBandIdleJam;
+
+  /// Label of the 10-50 km/h speed band on the consumption-by-speed card — city driving (#1192).
+  ///
+  /// In en, this message translates to:
+  /// **'Urban (10–50)'**
+  String get speedBandUrban;
+
+  /// Label of the 50-80 km/h speed band on the consumption-by-speed card — boulevards and mixed roads (#1192).
+  ///
+  /// In en, this message translates to:
+  /// **'Suburban (50–80)'**
+  String get speedBandSuburban;
+
+  /// Label of the 80-100 km/h speed band on the consumption-by-speed card — country roads and secondary highways (#1192).
+  ///
+  /// In en, this message translates to:
+  /// **'Rural (80–100)'**
+  String get speedBandRural;
+
+  /// Label of the 100-115 km/h speed band on the consumption-by-speed card — eco-cruise sweet spot on most modern engines (#1192).
+  ///
+  /// In en, this message translates to:
+  /// **'Eco-cruise (100–115)'**
+  String get speedBandMotorwaySlow;
+
+  /// Label of the 115-130 km/h speed band on the consumption-by-speed card — standard motorway / French highway speed limit (#1192).
+  ///
+  /// In en, this message translates to:
+  /// **'Motorway (115–130)'**
+  String get speedBandMotorway;
+
+  /// Label of the 130+ km/h speed band on the consumption-by-speed card — above the French limit; German Autobahn fast lane (#1192).
+  ///
+  /// In en, this message translates to:
+  /// **'Motorway fast (130+)'**
+  String get speedBandMotorwayFast;
+
+  /// Empty-state copy on the consumption-by-speed card when the user has logged less than 30 min of OBD2 telemetry — explains what's needed to populate the chart (#1192).
+  ///
+  /// In en, this message translates to:
+  /// **'Record 30+ minutes of trips with the OBD2 adapter to unlock the speed/consumption analysis.'**
+  String get speedConsumptionInsufficientData;
+
+  /// Per-bar sub-label on the consumption-by-speed card — share of total driving time spent in this band (#1192).
+  ///
+  /// In en, this message translates to:
+  /// **'{percent} % of driving'**
+  String speedConsumptionTimeShare(int percent);
+
+  /// Placeholder shown on a speed-band bar when the bin's sample count is under the statistical floor — averaging a thin sliver of seconds isn't meaningful (#1192).
+  ///
+  /// In en, this message translates to:
+  /// **'Need more data'**
+  String get speedConsumptionNeedMoreData;
+
   /// Accessibility label announced by TalkBack/VoiceOver while the animated splash screen is visible. Not rendered visually; keep it concise and speakable.
   ///
   /// In en, this message translates to:

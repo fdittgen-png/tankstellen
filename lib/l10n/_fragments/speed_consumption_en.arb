@@ -1,0 +1,51 @@
+{
+  "speedConsumptionCardTitle": "Consumption by speed",
+  "@speedConsumptionCardTitle": {
+    "description": "Title of the consumption-by-speed card on the Carbon dashboard Charts tab — bins per-second OBD2 samples by speed band so the user can see what motorway speed is costing them per 100 km (#1192)."
+  },
+  "speedBandIdleJam": "Idle / jam",
+  "@speedBandIdleJam": {
+    "description": "Label of the 0-10 km/h speed band on the consumption-by-speed card — stop-and-go and traffic-jam time. Has a time-share figure but no L/100 km average (denominator approaches zero) (#1192)."
+  },
+  "speedBandUrban": "Urban (10–50)",
+  "@speedBandUrban": {
+    "description": "Label of the 10-50 km/h speed band on the consumption-by-speed card — city driving (#1192)."
+  },
+  "speedBandSuburban": "Suburban (50–80)",
+  "@speedBandSuburban": {
+    "description": "Label of the 50-80 km/h speed band on the consumption-by-speed card — boulevards and mixed roads (#1192)."
+  },
+  "speedBandRural": "Rural (80–100)",
+  "@speedBandRural": {
+    "description": "Label of the 80-100 km/h speed band on the consumption-by-speed card — country roads and secondary highways (#1192)."
+  },
+  "speedBandMotorwaySlow": "Eco-cruise (100–115)",
+  "@speedBandMotorwaySlow": {
+    "description": "Label of the 100-115 km/h speed band on the consumption-by-speed card — eco-cruise sweet spot on most modern engines (#1192)."
+  },
+  "speedBandMotorway": "Motorway (115–130)",
+  "@speedBandMotorway": {
+    "description": "Label of the 115-130 km/h speed band on the consumption-by-speed card — standard motorway / French highway speed limit (#1192)."
+  },
+  "speedBandMotorwayFast": "Motorway fast (130+)",
+  "@speedBandMotorwayFast": {
+    "description": "Label of the 130+ km/h speed band on the consumption-by-speed card — above the French limit; German Autobahn fast lane (#1192)."
+  },
+  "speedConsumptionInsufficientData": "Record 30+ minutes of trips with the OBD2 adapter to unlock the speed/consumption analysis.",
+  "@speedConsumptionInsufficientData": {
+    "description": "Empty-state copy on the consumption-by-speed card when the user has logged less than 30 min of OBD2 telemetry — explains what's needed to populate the chart (#1192)."
+  },
+  "speedConsumptionTimeShare": "{percent} % of driving",
+  "@speedConsumptionTimeShare": {
+    "description": "Per-bar sub-label on the consumption-by-speed card — share of total driving time spent in this band (#1192).",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "speedConsumptionNeedMoreData": "Need more data",
+  "@speedConsumptionNeedMoreData": {
+    "description": "Placeholder shown on a speed-band bar when the bin's sample count is under the statistical floor — averaging a thin sliver of seconds isn't meaningful (#1192)."
+  }
+}

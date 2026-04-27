@@ -1030,5 +1030,16 @@
   "tripLengthBucketMedium": "Moyen (5–25 km)",
   "tripLengthBucketLong": "Long (>25 km)",
   "tripLengthBucketNeedMoreData": "Plus de données nécessaires",
-  "tripLengthBucketTripCount": "{count, plural, =0{aucun trajet} one{1 trajet} other{{count} trajets}}"
+  "tripLengthBucketTripCount": "{count, plural, =0{aucun trajet} one{1 trajet} other{{count} trajets}}",
+  "speedConsumptionCardTitle": "Consommation par vitesse",
+  "speedBandIdleJam": "Ralenti / embouteillage",
+  "speedBandUrban": "Urbain (10–50)",
+  "speedBandSuburban": "Périurbain (50–80)",
+  "speedBandRural": "Route (80–100)",
+  "speedBandMotorwaySlow": "Eco-vitesse (100–115)",
+  "speedBandMotorway": "Autoroute (115–130)",
+  "speedBandMotorwayFast": "Autoroute rapide (130+)",
+  "speedConsumptionInsufficientData": "Enregistrez plus de 30 minutes de trajets avec l'adaptateur OBD2 pour débloquer l'analyse vitesse/consommation.",
+  "speedConsumptionTimeShare": "{percent} % de conduite",
+  "speedConsumptionNeedMoreData": "Plus de données nécessaires"
 }

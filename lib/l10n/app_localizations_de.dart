@@ -3782,6 +3782,42 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get speedConsumptionCardTitle => 'Verbrauch nach Geschwindigkeit';
+
+  @override
+  String get speedBandIdleJam => 'Leerlauf / Stau';
+
+  @override
+  String get speedBandUrban => 'Stadt (10–50)';
+
+  @override
+  String get speedBandSuburban => 'Vorort (50–80)';
+
+  @override
+  String get speedBandRural => 'Landstraße (80–100)';
+
+  @override
+  String get speedBandMotorwaySlow => 'Eco-Tempo (100–115)';
+
+  @override
+  String get speedBandMotorway => 'Autobahn (115–130)';
+
+  @override
+  String get speedBandMotorwayFast => 'Autobahn schnell (130+)';
+
+  @override
+  String get speedConsumptionInsufficientData =>
+      'Zeichnen Sie 30+ Minuten Fahrten mit dem OBD2-Adapter auf, um die Geschwindigkeits-/Verbrauchsanalyse freizuschalten.';
+
+  @override
+  String speedConsumptionTimeShare(int percent) {
+    return '$percent % der Fahrt';
+  }
+
+  @override
+  String get speedConsumptionNeedMoreData => 'Mehr Daten nötig';
+
+  @override
   String get splashLoadingLabel => 'Tankstellen wird geladen';
 
   @override

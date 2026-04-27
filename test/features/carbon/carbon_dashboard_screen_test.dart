@@ -75,10 +75,22 @@ void main() {
         gamificationEnabledProvider.overrideWith((ref) => true),
       ],
     );
-    // Two bar charts on the Charts tab
-    expect(find.byType(MonthlyBarChart), findsNWidgets(2));
-    expect(find.text('Monthly costs'), findsOneWidget);
-    expect(find.text('Monthly CO2 emissions'), findsOneWidget);
+    // Two bar charts on the Charts tab. skipOffstage: false because the
+    // tab is now tall enough that the second chart sits below the 800x600
+    // test viewport — the assertion is "the chart is in the tree", not
+    // "the chart is in the initial scroll window".
+    expect(
+      find.byType(MonthlyBarChart, skipOffstage: false),
+      findsNWidgets(2),
+    );
+    expect(
+      find.text('Monthly costs', skipOffstage: false),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Monthly CO2 emissions', skipOffstage: false),
+      findsOneWidget,
+    );
   });
 
   testWidgets('switches to achievements tab showing milestones + EV card',
@@ -143,10 +155,21 @@ void main() {
       // No TabBar, no Achievements tab — just the Charts pane.
       expect(find.byType(TabBar), findsNothing);
       expect(find.text('Achievements'), findsNothing);
-      // Charts content is still rendered.
-      expect(find.byType(MonthlyBarChart), findsNWidgets(2));
-      expect(find.text('Monthly costs'), findsOneWidget);
-      expect(find.text('Monthly CO2 emissions'), findsOneWidget);
+      // Charts content is still rendered. skipOffstage: false — the
+      // pane is taller than 600 px since the trip-length and
+      // speed-consumption cards landed.
+      expect(
+        find.byType(MonthlyBarChart, skipOffstage: false),
+        findsNWidgets(2),
+      );
+      expect(
+        find.text('Monthly costs', skipOffstage: false),
+        findsOneWidget,
+      );
+      expect(
+        find.text('Monthly CO2 emissions', skipOffstage: false),
+        findsOneWidget,
+      );
     },
   );
 }
