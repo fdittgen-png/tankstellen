@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../profile/presentation/widgets/gamification_settings_tile.dart';
 import '../../providers/haptic_eco_coach_provider.dart';
 
 /// Consumption / driving settings group on the profile screen.
@@ -14,6 +15,8 @@ import '../../providers/haptic_eco_coach_provider.dart';
 ///   1. **My vehicles** (battery, connectors, charging prefs).
 ///   2. **Fuel club cards** (per-litre discounts).
 ///   3. **Real-time eco coaching** (haptic when over-driving on cruise).
+///   4. **Show achievements & scores** (master gamification opt-out —
+///      badges, scores, achievement tab).
 ///
 /// The first two were standalone `SettingsMenuTile`s on the Settings
 /// page; pulling them inside one foldable that matches the "Conso" tab
@@ -67,6 +70,7 @@ class DrivingSettingsSection extends ConsumerWidget {
               ref.read(hapticEcoCoachEnabledProvider.notifier).set(v),
           contentPadding: EdgeInsets.zero,
         ),
+        const GamificationSettingsTile(),
       ],
     );
   }
