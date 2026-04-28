@@ -1,46 +1,79 @@
 ﻿# Tankstellen
 
-> **Smarter pump. Smarter drive. Save twice.**
+> **The cost of driving, attacked from three sides.**
 >
-> Every litre saved at the pump is a litre not burned on the road — and a kilogram of CO₂ you kept out of the air. Tankstellen is built to help you save both ways: cheaper fuel _and_ leaner driving.
+> A car loses you money in three places: at the pump, on the road, and in everything you forgot to track. Tankstellen tackles all three — pay less per litre, burn fewer of them per kilometre, and see exactly where the money actually went.
 
 [![CI](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml/badge.svg)](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Flutter-3.41-blue.svg)](https://flutter.dev)
 
-**Free fuel-price comparison for Europe and beyond** — 11 countries, 23 languages, privacy-first.
+**A free, open-source companion app for cutting the running cost of your car.** 11 countries, 23 languages, privacy-first, no ads, no tracking.
 
-Tankstellen helps drivers find the cheapest fuel nearby, along a route, or in a specific city, _and_ track their real consumption so they can drive it down over time. It aggregates real-time prices from official government APIs — no scraping, no tracking, no ads.
+Tankstellen aggregates real-time fuel prices from official government APIs, plugs into your car's OBD-II port to see how it actually drives, and keeps a tidy log of every fill-up and trip so the savings stop being theoretical.
 
-### The two savings lenses
+## The objective: a cheaper kilometre
 
-1. **At the pump.** Live price comparison across countries, along your route, with alerts when prices drop.
-2. **Behind the wheel.** Fill-up log, consumption stats, CO₂ dashboard, and the signals you need to drive more economically over time.
+Every feature ladders up to one goal — **reduce what your car costs you, per kilometre driven** — through three layers, in priority order:
 
-Every feature in the app serves at least one of these two lenses. Features that serve neither don't belong.
+### 1. Buy fuel for less money
+
+Live cross-country price comparison, route-aware "cheapest stop" planning, drop alerts, and 30-day price history with a "best time to fill" model. Cheap fuel is the easiest win — and the one drivers leave on the table the most.
+
+### 2. Burn less of it per kilometre
+
+Plug in any ELM327-compatible OBD-II adapter and the app starts coaching: live haptic eco-feedback, hard-acceleration and idling insights, gear-coaching for the wrong-gear moments, a per-trip driving score, and a throttle/RPM histogram showing where your engine actually lives. Behaviour change is harder than picking a station, but it pays out on every drive instead of every fill-up.
+
+### 3. See what you're really spending
+
+A fill-up log (manual, receipt-OCR, or OBD-II auto-record on disconnect), per-trip cost detail, fuel-cost projections, a CO₂ dashboard, and a maintenance-suggestion engine that watches consumption drift over time. You can't reduce what you don't measure — and most drivers measure nothing.
+
+Features that don't serve at least one of those three layers don't belong.
 
 ## Features
 
-- **Real-time prices** from official government data sources
+### Layer 1 — buying cheaper
+
+- **Real-time prices** from each country's official government data source — no scraping
 - **11 countries** — Germany, France, Austria, Spain, Italy, Denmark, Portugal, UK, Argentina, Australia, Mexico
 - **23 languages** — from Bulgarian to Swedish
-- **Route search** — find the cheapest station along your planned route, with saved itineraries
+- **Route-aware search** — uniform / cheapest / balanced strategies, "best stops" along a planned trip
+- **Cross-border suggestions** — when the next country over is meaningfully cheaper, the app says so
+- **Price alerts** — threshold-based notifications, evaluated by a background job
+- **Price history & predictions** — 30-day charts plus a "best time to fill" model from your local history
+- **Brand filter** — Total / Esso / Shell / Aral, country-aware brand registry
+- **Favorites** — quick access with swipe-to-navigate / swipe-to-remove
+- **Home-screen widget** — current prices and a "predictive" variant without opening the app
 - **EV charging** — OpenChargeMap integration with connector type, max power, and pricing
+
+### Layer 2 — burning less
+
+- **OBD-II support** — any ELM327-compatible adapter (BLE classic + dual-mode, see the adapter registry)
+- **Auto-record** — pair adapter to vehicle, auto-connect on Bluetooth, auto-start on movement, auto-save on disconnect
+- **Trip recorder** — speed, fuel rate, RPM, throttle %, engine load (when supported), GPS path
+- **Trip detail view** — per-trip charts (speed, fuel rate, RPM, engine load) plus shareable PNG report
+- **Driving insights** — hard-accel waste, idling fuel, cold-start surcharge, low-gear coaching
+- **Driving score** — composite 0-100 score per trip with breakdown chips, opt-in
+- **Throttle / RPM histogram** — see the engine zone you actually drive in
+- **Visual eco-coach** — live haptic + on-screen feedback when behaviour costs fuel
 - **Driving mode** — full-screen, in-car friendly map with large markers and voice announcements
-- **Vehicle profiles** — combustion, hybrid, or EV; battery, connectors, tank capacity
-- **Fuel consumption tracking** — log fill-ups manually, by **receipt scan** (OCR), or via **OBD-II** (ELM327)
-- **Calculator** — tank fill cost, cross-station savings, fuel budget projections
-- **Carbon dashboard** — CO₂ emissions per vehicle with 30-day rolling chart
-- **Price alerts** — get notified when prices drop below your threshold
-- **Price history & predictions** — 30-day charts and "best time to fill" analysis
-- **Brand registry & filter** — country-specific brand recognition, filter by Total / Esso / Shell / etc.
-- **Landing screen selection** — open the app to nearest, cheapest, favorites, or map
-- **Favorites** — quick access to your regular stations with swipe actions
-- **Home screen widget** — see prices without opening the app
-- **Offline-capable** — local-first architecture with smart caching
+- **Maintenance analyzer** — watches consumption drift over time, flags MAF deviation, idle creep, sluggish warm-up
+
+### Layer 3 — seeing what you actually spend
+
+- **Fill-up log** — manual entry, receipt OCR scan, pump-display OCR, or OBD-II auto-import on disconnect
+- **Trip history** — every recorded trip with distance, duration, avg consumption, fuel used, fuel cost
+- **Vehicle profiles** — combustion, hybrid, or EV; tank capacity, battery, connectors, multi-vehicle households
+- **Cost calculator** — tank fill cost, cross-station savings, fuel-budget projections
+- **CO₂ dashboard** — emissions per vehicle with 30-day rolling chart
+- **Service reminders** — interval + mileage-driven, configurable per vehicle
+
+### Cross-cutting
+
+- **Local-first** — Hive storage, smart caching, offline-capable
 - **Cross-device sync** — optional TankSync cloud backend (self-hostable via Supabase)
-- **Privacy-first** — no Firebase, no Google Play Services, no tracking, GDPR-compliant
-- **Accessibility** — meets Android tap target guidelines, semantic labels throughout
+- **Privacy** — no Firebase, no Google Play Services, no tracking, no ads, GDPR-compliant
+- **Accessibility** — meets Android tap-target guidelines, semantic labels throughout
 
 ## Screenshots
 
@@ -170,23 +203,16 @@ The app is designed to be easily extensible. Each country has its own service im
 
 ## Contributing
 
-Contributions are welcome! See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for detailed guidelines.
-
-**Quick summary:**
-
-1. Open an issue first — describe the bug or feature before writing code
-2. Branch from `master` — use conventional branch names (`feat/`, `fix/`, `refactor/`)
-3. Write tests — every change needs tests
-4. Run checks — `flutter analyze` and `flutter test` must pass
-5. Keep PRs small — under 400 lines changed (excluding generated files)
-Contributions are welcome! Please follow these guidelines:
+Contributions are welcome — see [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for the full version. Quick summary:
 
 1. **Open an issue first** — describe the bug or feature before writing code
-2. **Branch from `master`** — use conventional branch names (`feat/`, `fix/`, `refactor/`)
+2. **Branch from `master`** — conventional branch names (`feat/`, `fix/`, `refactor/`, `test/`)
 3. **Write tests** — every change needs tests (unit, widget, or integration)
-4. **Run checks** — `flutter analyze` and `flutter test` must pass
+4. **Run checks** — `flutter analyze` and `flutter test` must pass with zero warnings
 5. **Keep PRs small** — under 400 lines changed (excluding generated files)
 6. **Conventional commits** — `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
+
+A feature that doesn't ladder up to one of the three savings layers above is unlikely to be merged.
 
 ### Commit Messages
 
