@@ -4021,6 +4021,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trajetDetailChartRpm => 'Drehzahl';
 
   @override
+  String get trajetDetailChartEngineLoad => 'Motorlast (%)';
+
+  @override
+  String get trajetsRowColdStartChip => 'Kaltstart';
+
+  @override
+  String get trajetsRowColdStartTooltip =>
+      'Der Motor erreichte während dieser Fahrt nicht die Betriebstemperatur — der Verbrauch war höher als üblich.';
+
+  @override
   String get trajetDetailChartEmpty => 'Keine Messwerte';
 
   @override

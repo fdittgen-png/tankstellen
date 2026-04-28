@@ -213,6 +213,7 @@ TripHistoryEntry _entry({
   DateTime? endedAt,
   double distanceKm = 5.0,
   double? avgLPer100Km,
+  bool coldStartSurcharge = false,
 }) {
   return TripHistoryEntry(
     id: id,
@@ -227,6 +228,7 @@ TripHistoryEntry _entry({
       avgLPer100Km: avgLPer100Km,
       startedAt: startedAt,
       endedAt: endedAt,
+      coldStartSurcharge: coldStartSurcharge,
     ),
   );
 }
@@ -611,6 +613,83 @@ void main() {
 
       expect(find.text('18.5 kWh/100 km'), findsOneWidget);
       expect(find.textContaining('L/100 km'), findsNothing);
+    });
+  });
+
+  // #1262 phase 3 — cold-start chip on the trip-history row. The chip
+  // is rendered alongside distance / duration / avg-consumption when
+  // the trip's `summary.coldStartSurcharge` is true (the recorder
+  // flagged the coolant trace as never-warm / late-warm in phase 2).
+  // Trips that warmed up normally — and trips on cars without PID
+  // 0x05 — keep the flag false and the chip stays hidden.
+  group('TrajetsTab — cold-start chip (#1262 phase 3)', () {
+    testWidgets(
+        'renders the chip with localized label and tooltip when the flag is true',
+        (tester) async {
+      final trips = [
+        _entry(
+          id: 'trip-cold',
+          vehicleId: 'v1',
+          startedAt: DateTime(2026, 4, 22, 9),
+          endedAt: DateTime(2026, 4, 22, 9, 5),
+          distanceKm: 1.8,
+          coldStartSurcharge: true,
+        ),
+      ];
+
+      await _pumpTab(
+        tester,
+        vehicleId: null,
+        trips: trips,
+        vehicles: [combustionVehicle],
+        activeVehicle: combustionVehicle,
+      );
+
+      // Chip label is the localized "Cold start" string.
+      expect(find.text('Cold start'), findsOneWidget);
+      // Tooltip widget wraps the chip with the localized explanation
+      // (find.byTooltip matches the message string against the
+      // surrounding Tooltip / RawTooltip — this asserts the tooltip
+      // is wired up regardless of which concrete class Flutter
+      // instantiates internally).
+      expect(
+        find.byTooltip(
+          "Engine didn't reach operating temperature during this trip — "
+          'fuel consumption was higher than usual.',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets(
+        "does NOT render the chip when the trip's flag is false",
+        (tester) async {
+      final trips = [
+        _entry(
+          id: 'trip-warm',
+          vehicleId: 'v1',
+          startedAt: DateTime(2026, 4, 22, 9),
+          endedAt: DateTime(2026, 4, 22, 9, 30),
+          distanceKm: 25.0,
+          // coldStartSurcharge: false (default) — the chip must stay
+          // hidden for trips that warmed up normally and for trips
+          // recorded on cars without PID 0x05 (recorder leaves the
+          // flag false in both cases — see #1262 phase 2 comments).
+        ),
+      ];
+
+      await _pumpTab(
+        tester,
+        vehicleId: null,
+        trips: trips,
+        vehicles: [combustionVehicle],
+        activeVehicle: combustionVehicle,
+      );
+
+      expect(find.text('Cold start'), findsNothing);
+      // Distance chip is still rendered — sanity check that the row
+      // built correctly.
+      expect(find.text('25.0 km'), findsOneWidget);
     });
   });
 

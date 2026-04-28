@@ -133,6 +133,53 @@ void main() {
     });
   });
 
+  // #1262 phase 3 — engine-load sparkline. Mirrors the RPM chart
+  // gating: cars without PID 0x04 carry null engineLoadPercent on
+  // every sample, and the chart falls back to the shared empty-state
+  // caption (the parent screen actually skips the section header for
+  // that case; tested in trip_detail_body_test.dart).
+  group('TripDetailEngineLoadChart', () {
+    List<TripDetailSample> withEngineLoad(int n) => [
+          for (var i = 0; i < n; i++)
+            TripDetailSample(
+              timestamp:
+                  DateTime.utc(2026, 4, 22, 10).add(Duration(seconds: i)),
+              speedKmh: 25 + i.toDouble(),
+              engineLoadPercent: 30 + (i % 60).toDouble(),
+            ),
+        ];
+
+    testWidgets('renders CustomPaint when engine-load samples exist',
+        (tester) async {
+      await pumpApp(
+        tester,
+        TripDetailEngineLoadChart(samples: withEngineLoad(10)),
+      );
+      _expectCustomPaintPresent(tester, TripDetailEngineLoadChart);
+      expect(find.text('No samples recorded'), findsNothing);
+    });
+
+    testWidgets(
+      'renders empty-state caption when every sample has null engineLoad',
+      (tester) async {
+        await pumpApp(
+          tester,
+          TripDetailEngineLoadChart(samples: _withSpeedOnly(10)),
+        );
+        expect(find.text('No samples recorded'), findsOneWidget);
+      },
+    );
+
+    testWidgets('renders empty-state caption for an empty list',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TripDetailEngineLoadChart(samples: []),
+      );
+      expect(find.text('No samples recorded'), findsOneWidget);
+    });
+  });
+
   group('TripDetailSample accepts partial data without throwing', () {
     testWidgets('every chart survives mixed null/non-null samples',
         (tester) async {

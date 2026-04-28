@@ -321,6 +321,21 @@ class _TrajetRow extends StatelessWidget {
                                 ) ??
                                 '${s.avgLPer100Km!.toStringAsFixed(1)} $avgUnit',
                           ),
+                        // #1262 phase 3 — cold-start chip surfaced when
+                        // the recorder flagged the trip's coolant trace
+                        // as never-warm / late-warm. Tooltip explains
+                        // the surcharge; flag stays false on cars
+                        // without PID 0x05 so this chip never appears
+                        // for the no-data case.
+                        if (s.coldStartSurcharge)
+                          _Chip(
+                            icon: Icons.ac_unit,
+                            text: l?.trajetsRowColdStartChip ?? 'Cold start',
+                            tooltip: l?.trajetsRowColdStartTooltip ??
+                                "Engine didn't reach operating temperature "
+                                    'during this trip — fuel consumption '
+                                    'was higher than usual.',
+                          ),
                       ],
                     ),
                   ],
@@ -348,12 +363,18 @@ class _Chip extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const _Chip({required this.icon, required this.text});
+  /// Optional tooltip wrapped around the chip — surfaced for the
+  /// cold-start chip on a trip-history row (#1262 phase 3) so the user
+  /// can long-press to read the explanation. `null` keeps the existing
+  /// distance / duration / avg-consumption chips bare.
+  final String? tooltip;
+
+  const _Chip({required this.icon, required this.text, this.tooltip});
 
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme.onSurfaceVariant;
-    return Row(
+    final row = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 14, color: color),
@@ -361,5 +382,8 @@ class _Chip extends StatelessWidget {
         Text(text, style: TextStyle(color: color, fontSize: 12)),
       ],
     );
+    final t = tooltip;
+    if (t == null) return row;
+    return Tooltip(message: t, child: row);
   }
 }

@@ -60,6 +60,13 @@ TripDetailSample _sampleWithRpm(int sec, double speed, double rpm) =>
       rpm: rpm,
     );
 
+TripDetailSample _sampleWithEngineLoad(int sec, double speed, double load) =>
+    TripDetailSample(
+      timestamp: DateTime.utc(2026, 4, 22, 10, 0, sec),
+      speedKmh: speed,
+      engineLoadPercent: load,
+    );
+
 /// Default overrides for [TripDetailBody] tests. Now that the body
 /// reads [gamificationEnabledProvider] (#1194), every test must seed a
 /// value so the underlying active-profile chain isn't traversed (those
@@ -186,6 +193,70 @@ void main() {
 
       expect(find.byType(TripDetailRpmChart), findsNothing);
       expect(find.text('RPM'), findsNothing);
+    });
+  });
+
+  // #1262 phase 3 — engine-load sparkline. Mirrors the RPM-section
+  // gating: cars without PID 0x04 emit null engineLoadPercent on every
+  // sample, and the body silently drops the section header rather than
+  // rendering an empty card. The section title comes from the new
+  // `trajetDetailChartEngineLoad` ARB key.
+  group('TripDetailBody — engine-load section visibility', () {
+    testWidgets('mounts the engine-load chart when at least one sample has it',
+        (tester) async {
+      await _pump(
+        tester,
+        TripDetailBody(
+          entry: _entry(),
+          vehicle: _vehicle,
+          samples: [
+            _sampleNoRpm(0, 30),
+            _sampleWithEngineLoad(1, 35, 42),
+            _sampleNoRpm(2, 40),
+          ],
+          isEv: false,
+        ),
+      );
+
+      expect(find.byType(TripDetailEngineLoadChart), findsOneWidget);
+      expect(find.text('Engine load (%)'), findsOneWidget);
+    });
+
+    testWidgets(
+        'hides the engine-load chart when every sample has null engineLoad',
+        (tester) async {
+      await _pump(
+        tester,
+        TripDetailBody(
+          entry: _entry(),
+          vehicle: _vehicle,
+          samples: [
+            _sampleNoRpm(0, 30),
+            _sampleNoRpm(1, 35),
+            _sampleNoRpm(2, 40),
+          ],
+          isEv: false,
+        ),
+      );
+
+      expect(find.byType(TripDetailEngineLoadChart), findsNothing);
+      expect(find.text('Engine load (%)'), findsNothing);
+    });
+
+    testWidgets('hides the engine-load chart when samples is empty',
+        (tester) async {
+      await _pump(
+        tester,
+        TripDetailBody(
+          entry: _entry(),
+          vehicle: _vehicle,
+          samples: const [],
+          isEv: false,
+        ),
+      );
+
+      expect(find.byType(TripDetailEngineLoadChart), findsNothing);
+      expect(find.text('Engine load (%)'), findsNothing);
     });
   });
 
