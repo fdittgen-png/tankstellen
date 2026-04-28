@@ -19,8 +19,10 @@ part of 'search_provider.dart';
 ///
 /// Pure helpers (result wrapping, distance recalc, postal-code
 /// extraction, geocoding-error merging) live in
-/// `search_result_helpers.dart`; this file keeps the stateful
-/// orchestration (cancel tokens, profile lookups, state mutation).
+/// `search_result_helpers.dart`; orchestration helpers (EV dispatch,
+/// fuel/radius resolution, error classification, GPS auto-update)
+/// live in `search_provider_orchestration.dart`. This file keeps only
+/// the public search entry points + state mutation.
 
 @ProviderFor(SearchState)
 final searchStateProvider = SearchStateProvider._();
@@ -36,8 +38,10 @@ final searchStateProvider = SearchStateProvider._();
 ///
 /// Pure helpers (result wrapping, distance recalc, postal-code
 /// extraction, geocoding-error merging) live in
-/// `search_result_helpers.dart`; this file keeps the stateful
-/// orchestration (cancel tokens, profile lookups, state mutation).
+/// `search_result_helpers.dart`; orchestration helpers (EV dispatch,
+/// fuel/radius resolution, error classification, GPS auto-update)
+/// live in `search_provider_orchestration.dart`. This file keeps only
+/// the public search entry points + state mutation.
 final class SearchStateProvider
     extends
         $NotifierProvider<
@@ -55,8 +59,10 @@ final class SearchStateProvider
   ///
   /// Pure helpers (result wrapping, distance recalc, postal-code
   /// extraction, geocoding-error merging) live in
-  /// `search_result_helpers.dart`; this file keeps the stateful
-  /// orchestration (cancel tokens, profile lookups, state mutation).
+  /// `search_result_helpers.dart`; orchestration helpers (EV dispatch,
+  /// fuel/radius resolution, error classification, GPS auto-update)
+  /// live in `search_provider_orchestration.dart`. This file keeps only
+  /// the public search entry points + state mutation.
   SearchStateProvider._()
     : super(
         from: null,
@@ -89,7 +95,7 @@ final class SearchStateProvider
   }
 }
 
-String _$searchStateHash() => r'a272f93101baa656572034b8f6d56c113693140d';
+String _$searchStateHash() => r'18b410ecf78dd8b652cac24a5f1e7c235658c0a1';
 
 /// Manages the station search lifecycle and exposes results as [AsyncValue].
 ///
@@ -102,8 +108,10 @@ String _$searchStateHash() => r'a272f93101baa656572034b8f6d56c113693140d';
 ///
 /// Pure helpers (result wrapping, distance recalc, postal-code
 /// extraction, geocoding-error merging) live in
-/// `search_result_helpers.dart`; this file keeps the stateful
-/// orchestration (cancel tokens, profile lookups, state mutation).
+/// `search_result_helpers.dart`; orchestration helpers (EV dispatch,
+/// fuel/radius resolution, error classification, GPS auto-update)
+/// live in `search_provider_orchestration.dart`. This file keeps only
+/// the public search entry points + state mutation.
 
 abstract class _$SearchState
     extends $Notifier<AsyncValue<ServiceResult<List<SearchResultItem>>>> {

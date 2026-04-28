@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,6 +53,27 @@ import '../widgets/route_map_view.dart';
 /// guarantees the TileLayer NEVER sees degenerate constraints — its
 /// first layout pass always uses the real post-mount size.
 ///
+/// ## App-resume refresh (#1268)
+///
+/// Backgrounding the app and returning after >10 s leaves both tiles
+/// and price chips frozen in their pre-pause state — none of the
+/// existing defenses ([_mapIncarnation] tab-flip listener,
+/// [LayoutBuilder] gate, first-paint reset stream) fire on lifecycle
+/// resume because no tab-flip happens. The user reports the visible
+/// viewport never recovers and price chips stay on `--` indefinitely.
+///
+/// We hook [WidgetsBindingObserver.didChangeAppLifecycleState] to:
+///   1. Bump [_mapIncarnation] when the app resumes AND Carte is
+///      currently visible — this rebuilds the FlutterMap subtree the
+///      same way a tab-flip does, restoring the tile-fetch loop.
+///   2. Call `searchStateProvider.notifier.repeatLastSearch()` so the
+///      station data (and any prices that the API now reports) is
+///      refreshed. Stations whose previous fetch returned no price for
+///      the selected fuel get a second chance to populate; chips that
+///      legitimately have no upstream data continue to render `--` (the
+///      `priceColor(null,…)` grey signals "no data" — already distinct
+///      from the loading state).
+///
 /// ## App-bar title color (#1164 bug 2)
 ///
 /// `PageScaffold(titleTextStyle: const TextStyle(fontSize: 16))` would
@@ -62,13 +85,21 @@ import '../widgets/route_map_view.dart';
 /// foreground color explicitly so the compact 16pt size still inherits
 /// the proper on-surface contrast.
 class MapScreen extends ConsumerStatefulWidget {
-  const MapScreen({super.key});
+  const MapScreen({super.key, this.clockOverride});
+
+  /// When non-null, overrides `DateTime.now()` for the resume-threshold
+  /// comparison. Tests use this so they can simulate "paused 30 s ago"
+  /// without sleeping wall-clock seconds. Production callers leave it
+  /// `null`.
+  @visibleForTesting
+  final DateTime Function()? clockOverride;
 
   @override
   ConsumerState<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends ConsumerState<MapScreen> {
+class _MapScreenState extends ConsumerState<MapScreen>
+    with WidgetsBindingObserver {
   late MapController _mapController;
 
   /// Bumped every time the Carte tab becomes visible. Used as a
@@ -76,16 +107,94 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   /// destroyed and rebuilt with real post-layout constraints (#709).
   int _mapIncarnation = 0;
 
+  /// Index of the Map branch in the bottom-nav stack. Kept as a named
+  /// constant so the lifecycle handler stays readable.
+  static const int _mapBranchIndex = 1;
+
+  /// Minimum pause-to-resume gap that triggers a refresh on resume
+  /// (#1268). A short blip (notification shade swipe, lock-screen
+  /// peek) does not need to pay the rebuild + search-refresh cost, so
+  /// brief lifecycle bounces are ignored. Ten seconds matches the
+  /// acceptance criterion in the issue.
+  static const Duration _resumeRefreshThreshold = Duration(seconds: 10);
+
+  /// When the app last entered a non-resumed state. Compared against
+  /// the resume timestamp to decide whether to refresh — see
+  /// [_resumeRefreshThreshold].
+  DateTime? _pausedAt;
+
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _mapController.dispose();
     super.dispose();
+  }
+
+  DateTime _now() => widget.clockOverride?.call() ?? DateTime.now();
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      _onAppResumed();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
+      // Track the first transition into a non-resumed state. Don't
+      // reset on every flip — repeated `inactive`+`paused` callbacks
+      // during a single backgrounding would otherwise overwrite the
+      // genuine pause moment.
+      _pausedAt ??= _now();
+    }
+  }
+
+  /// Refresh the map when the user returns to the app after >10 s
+  /// AND the Carte tab is currently visible (#1268). Bumping the
+  /// incarnation rebuilds the FlutterMap subtree (the same fix as the
+  /// tab-flip listener); calling `repeatLastSearch` re-fetches station
+  /// data so price chips pick up any newly-available prices.
+  void _onAppResumed() {
+    final pausedAt = _pausedAt;
+    _pausedAt = null;
+    if (!mounted) return;
+    if (pausedAt == null) return;
+    if (_now().difference(pausedAt) < _resumeRefreshThreshold) {
+      return;
+    }
+    final currentBranch = ref.read(currentShellBranchProvider);
+    if (currentBranch != _mapBranchIndex) return;
+
+    final old = _mapController;
+    try {
+      setState(() {
+        _mapController = MapController();
+        _mapIncarnation++;
+      });
+    } catch (e, st) {
+      debugPrint('MapScreen rebuild on app-resume: $e\n$st');
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        old.dispose();
+      } catch (e, st) {
+        debugPrint('MapScreen old controller dispose on resume: $e\n$st');
+      }
+    });
+
+    // Fire-and-forget: re-issue the most recent search so the station
+    // data underlying the price chips is refreshed. Failures (no last
+    // search, network error) are surfaced via `searchStateProvider`'s
+    // existing error path.
+    unawaited(
+      ref.read(searchStateProvider.notifier).repeatLastSearch(),
+    );
   }
 
   @override

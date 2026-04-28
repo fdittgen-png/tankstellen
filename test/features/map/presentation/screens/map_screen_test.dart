@@ -298,6 +298,183 @@ void main() {
     );
 
     testWidgets(
+      'app-resume after >10s on Carte tab rebuilds FlutterMap subtree '
+      '(#1268 — tile + chip refresh on resume)',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        // Inject a controllable clock so the test can simulate
+        // "paused 30 s ago" without wall-clock sleeps.
+        var fakeNow = DateTime(2026, 4, 28, 12);
+        await pumpApp(
+          tester,
+          MapScreen(clockOverride: () => fakeNow),
+          overrides: [
+            ...test.overrides,
+            userPositionNullOverride(),
+          ],
+        );
+
+        int currentIncarnation() {
+          final subtree = tester
+              .widgetList<KeyedSubtree>(
+                find.descendant(
+                  of: find.byType(MapScreen),
+                  matching: find.byType(KeyedSubtree),
+                ),
+              )
+              .firstWhere((w) => w.key is ValueKey<int>);
+          return (subtree.key as ValueKey<int>).value;
+        }
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(MapScreen)),
+        );
+        // Carte tab is the active branch.
+        container.read(currentShellBranchProvider.notifier).set(1);
+        await tester.pump();
+        await tester.pump();
+        final initial = currentIncarnation();
+
+        // Background → simulate 30 s passing → resume.
+        final binding = tester.binding;
+        binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        await tester.pump();
+        fakeNow = fakeNow.add(const Duration(seconds: 30));
+        binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+        await tester.pump();
+        await tester.pump();
+
+        expect(
+          currentIncarnation(),
+          greaterThan(initial),
+          reason:
+              'Resuming the app after >10s with the Carte tab visible '
+              'must rebuild the FlutterMap subtree (same fix as the '
+              'tab-flip listener) so tile fetching restarts and the '
+              'station data underlying the price chips refreshes (#1268).',
+        );
+      },
+    );
+
+    testWidgets(
+      'app-resume after <10s does NOT rebuild FlutterMap subtree '
+      '(#1268 — short blip ignored)',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        var fakeNow = DateTime(2026, 4, 28, 12);
+        await pumpApp(
+          tester,
+          MapScreen(clockOverride: () => fakeNow),
+          overrides: [
+            ...test.overrides,
+            userPositionNullOverride(),
+          ],
+        );
+
+        int currentIncarnation() {
+          final subtree = tester
+              .widgetList<KeyedSubtree>(
+                find.descendant(
+                  of: find.byType(MapScreen),
+                  matching: find.byType(KeyedSubtree),
+                ),
+              )
+              .firstWhere((w) => w.key is ValueKey<int>);
+          return (subtree.key as ValueKey<int>).value;
+        }
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(MapScreen)),
+        );
+        container.read(currentShellBranchProvider.notifier).set(1);
+        await tester.pump();
+        await tester.pump();
+        final initial = currentIncarnation();
+
+        // Brief blip — notification shade swipe, lock-screen peek, etc.
+        final binding = tester.binding;
+        binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+        await tester.pump();
+        fakeNow = fakeNow.add(const Duration(seconds: 2));
+        binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+        await tester.pump();
+        await tester.pump();
+
+        expect(
+          currentIncarnation(),
+          equals(initial),
+          reason:
+              'Brief lifecycle bounces (<10s) must not pay the rebuild + '
+              'search-refresh cost — only sustained backgrounding does '
+              '(#1268 acceptance criterion).',
+        );
+      },
+    );
+
+    testWidgets(
+      'app-resume on a non-Carte tab does NOT rebuild FlutterMap '
+      '(#1268 — only refresh when Carte is visible)',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        var fakeNow = DateTime(2026, 4, 28, 12);
+        await pumpApp(
+          tester,
+          MapScreen(clockOverride: () => fakeNow),
+          overrides: [
+            ...test.overrides,
+            userPositionNullOverride(),
+          ],
+        );
+
+        int currentIncarnation() {
+          final subtree = tester
+              .widgetList<KeyedSubtree>(
+                find.descendant(
+                  of: find.byType(MapScreen),
+                  matching: find.byType(KeyedSubtree),
+                ),
+              )
+              .firstWhere((w) => w.key is ValueKey<int>);
+          return (subtree.key as ValueKey<int>).value;
+        }
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(MapScreen)),
+        );
+        // User is on Search (branch 0), not Carte.
+        container.read(currentShellBranchProvider.notifier).set(0);
+        await tester.pump();
+        await tester.pump();
+        final initial = currentIncarnation();
+
+        final binding = tester.binding;
+        binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+        await tester.pump();
+        fakeNow = fakeNow.add(const Duration(seconds: 30));
+        binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+        await tester.pump();
+        await tester.pump();
+
+        expect(
+          currentIncarnation(),
+          equals(initial),
+          reason:
+              'Resume-driven refresh must only fire when Carte is the '
+              'visible branch — pre-emptively rebuilding offstage maps '
+              'would cancel any tile fetches that would otherwise be '
+              'covered by the standard tab-flip listener when the user '
+              'returns to Carte (#1268).',
+        );
+      },
+    );
+
+    testWidgets(
       'AppBar title color survives a tab round-trip '
       '(#1164 bug 2 regression guard)',
       (tester) async {

@@ -596,6 +596,171 @@ void main() {
       // Distance from Paris to Berlin should be recalculated
       expect(state.value!.data.first.dist, greaterThan(0));
     });
+
+    test(
+        'repeatLastSearch is a no-op before any search has been issued '
+        '(#1268 — guard against fresh-install resume crash)', () async {
+      final container = createContainer();
+      final notifier = container.read(searchStateProvider.notifier);
+
+      // Must not throw and must leave state untouched.
+      await notifier.repeatLastSearch();
+
+      final state = container.read(searchStateProvider);
+      expect(state, isA<AsyncData>());
+      expect(state.value!.data, isEmpty);
+      verifyNever(() => mockStationService.searchStations(any(),
+          cancelToken: any(named: 'cancelToken')));
+    });
+
+    test(
+        'repeatLastSearch replays the most recent searchByZipCode '
+        'with the same parameters (#1268)', () async {
+      when(() => mockGeocoding.zipCodeToCoordinates('10115',
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) async => ServiceResult(
+                data: (lat: 52.52, lng: 13.41),
+                source: ServiceSource.nominatimGeocoding,
+                fetchedAt: DateTime.now(),
+              ));
+      when(() => mockGeocoding.coordinatesToAddress(any(), any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) async => ServiceResult(
+                data: 'Berlin',
+                source: ServiceSource.nominatimGeocoding,
+                fetchedAt: DateTime.now(),
+              ));
+      var stationCalls = 0;
+      when(() => mockStationService.searchStations(any(),
+          cancelToken: any(named: 'cancelToken'))).thenAnswer((inv) async {
+        stationCalls++;
+        return ServiceResult(
+          data: [testStation],
+          source: ServiceSource.tankerkoenigApi,
+          fetchedAt: DateTime.now(),
+        );
+      });
+
+      final container = createContainer();
+      final notifier = container.read(searchStateProvider.notifier);
+
+      await notifier.searchByZipCode(zipCode: '10115', radiusKm: 7.0);
+      expect(stationCalls, 1);
+
+      await notifier.repeatLastSearch();
+      expect(stationCalls, 2,
+          reason:
+              'repeatLastSearch must re-run the most recently issued '
+              'search so the map can refresh stale data on app resume.');
+
+      // The second SearchParams must carry the same radius — i.e. the
+      // replay used the original parameters, not a default.
+      final captured = verify(() => mockStationService.searchStations(
+              captureAny(),
+              cancelToken: any(named: 'cancelToken')))
+          .captured
+          .whereType<SearchParams>()
+          .toList();
+      expect(captured.length, 2);
+      expect(captured.last.radiusKm, 7.0);
+      expect(captured.last.postalCode, '10115');
+    });
+
+    test(
+        'repeatLastSearch replays searchByCoordinates with original '
+        'lat/lng/postalCode (#1268)', () async {
+      var stationCalls = 0;
+      when(() => mockStationService.searchStations(any(),
+          cancelToken: any(named: 'cancelToken'))).thenAnswer((inv) async {
+        stationCalls++;
+        return ServiceResult(
+          data: [testStation],
+          source: ServiceSource.tankerkoenigApi,
+          fetchedAt: DateTime.now(),
+        );
+      });
+
+      final container = createContainer();
+      final notifier = container.read(searchStateProvider.notifier);
+
+      await notifier.searchByCoordinates(
+        lat: 43.45,
+        lng: 3.45,
+        postalCode: '34120',
+        locationName: 'Castelnau-de-Guers',
+        radiusKm: 12.5,
+      );
+      expect(stationCalls, 1);
+
+      await notifier.repeatLastSearch();
+      expect(stationCalls, 2);
+
+      final captured = verify(() => mockStationService.searchStations(
+              captureAny(),
+              cancelToken: any(named: 'cancelToken')))
+          .captured
+          .whereType<SearchParams>()
+          .toList();
+      expect(captured.length, 2);
+      expect(captured.last.lat, 43.45);
+      expect(captured.last.lng, 3.45);
+      expect(captured.last.postalCode, '34120');
+      expect(captured.last.radiusKm, 12.5);
+    });
+
+    test(
+        'repeatLastSearch tracks the LATEST search type, not just the '
+        'first (#1268 — sequential tab-switch + zip-edit scenario)',
+        () async {
+      // First search: by zip code.
+      when(() => mockGeocoding.zipCodeToCoordinates(any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) async => ServiceResult(
+                data: (lat: 52.52, lng: 13.41),
+                source: ServiceSource.nominatimGeocoding,
+                fetchedAt: DateTime.now(),
+              ));
+      when(() => mockGeocoding.coordinatesToAddress(any(), any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) async => ServiceResult(
+                data: 'Berlin',
+                source: ServiceSource.nominatimGeocoding,
+                fetchedAt: DateTime.now(),
+              ));
+      when(() => mockStationService.searchStations(any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) async => ServiceResult(
+                data: [testStation],
+                source: ServiceSource.tankerkoenigApi,
+                fetchedAt: DateTime.now(),
+              ));
+
+      final container = createContainer();
+      final notifier = container.read(searchStateProvider.notifier);
+
+      await notifier.searchByZipCode(zipCode: '10115');
+      // Then a second, different search by coordinates.
+      await notifier.searchByCoordinates(
+        lat: 43.45,
+        lng: 3.45,
+        radiusKm: 5.0,
+      );
+
+      // Replay must replay the SECOND (coordinates) search.
+      await notifier.repeatLastSearch();
+
+      final captured = verify(() => mockStationService.searchStations(
+              captureAny(),
+              cancelToken: any(named: 'cancelToken')))
+          .captured
+          .whereType<SearchParams>()
+          .toList();
+      // 3 calls: zip, coordinates, replay-coordinates.
+      expect(captured.length, 3);
+      expect(captured.last.lat, 43.45);
+      expect(captured.last.lng, 3.45);
+      expect(captured.last.radiusKm, 5.0);
+    });
   });
 
   group('EV dispatch (unified search trigger)', () {
