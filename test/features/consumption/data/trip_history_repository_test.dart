@@ -422,6 +422,94 @@ void main() {
     });
   });
 
+  group('TripSummary.secondsBelowOptimalGear persistence (#1263 phase 2)', () {
+    test(
+        'summary with secondsBelowOptimalGear populated round-trips through '
+        'save / loadAll', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 4, 21, 12);
+      final geared = TripSummary(
+        distanceKm: 25,
+        maxRpm: 3200,
+        highRpmSeconds: 18,
+        idleSeconds: 12,
+        harshBrakes: 0,
+        harshAccelerations: 0,
+        startedAt: start,
+        endedAt: start.add(const Duration(minutes: 25)),
+        secondsBelowOptimalGear: 120.5,
+      );
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: geared,
+      ));
+
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.summary.secondsBelowOptimalGear, 120.5);
+    });
+
+    test(
+        'summary with secondsBelowOptimalGear null does NOT include the '
+        '"sblog" key in stored JSON — matches the parsimony rule the '
+        '"f" / "th" / "el" / "ct" keys already follow', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 4, 21, 12);
+      final noGear = TripSummary(
+        distanceKm: 12,
+        maxRpm: 2400,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 0,
+        startedAt: start,
+        endedAt: start.add(const Duration(minutes: 14)),
+        // secondsBelowOptimalGear defaults null
+      );
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: noGear,
+      ));
+
+      final raw = box.get(start.toIso8601String())!;
+      final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
+      final summaryJson = (decoded['summary'] as Map).cast<String, dynamic>();
+      expect(summaryJson.containsKey('sblog'), isFalse);
+
+      final loaded = repo.loadAll();
+      expect(loaded.first.summary.secondsBelowOptimalGear, isNull);
+    });
+
+    test(
+        'legacy JSON (pre-#1263 phase 2) without the "sblog" key '
+        'deserialises with secondsBelowOptimalGear: null — older trips '
+        'were written before the gear-inference metric landed', () async {
+      final start = DateTime(2026, 4, 21, 12);
+      final legacyJson = jsonEncode({
+        'id': start.toIso8601String(),
+        'vehicleId': null,
+        'summary': {
+          'distanceKm': 18.0,
+          'maxRpm': 3000.0,
+          'highRpmSeconds': 0.0,
+          'idleSeconds': 0.0,
+          'harshBrakes': 0,
+          'harshAccelerations': 0,
+          'startedAt': start.toIso8601String(),
+          // 'sblog' deliberately absent
+        },
+      });
+      await box.put(start.toIso8601String(), legacyJson);
+
+      final repo = TripHistoryRepository(box: box);
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.summary.secondsBelowOptimalGear, isNull);
+    });
+  });
+
   group('TripSample engineLoad + coolantTemp persistence (#1262 phase 1)', () {
     test(
         'sample with engineLoadPercent and coolantTempC round-trips through '

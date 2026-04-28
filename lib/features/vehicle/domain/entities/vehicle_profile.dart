@@ -267,6 +267,27 @@ abstract class VehicleProfile with _$VehicleProfile {
     SpeedConsumptionHistogram? speedConsumptionAggregates,
     DateTime? aggregatesUpdatedAt,
     int? aggregatesTripCount,
+
+    // Gear-inference per-vehicle calibration (#1263 phase 2). The
+    // pure-logic clusterer in [gear_inference.dart] needs the driven-
+    // wheel circumference to derive the engine-RPM / wheel-RPM ratio
+    // it clusters on; persisted centroids let the next trip seed
+    // k-means with the previous trip's converged values instead of
+    // cold-starting from this trip's percentiles.
+    //
+    //   tireCircumferenceMeters: circumference in metres of the driven
+    //     wheel — used by gear-inference (#1263). 1.95 m is the default
+    //     for a typical 195/65R15, the most common factory size on the
+    //     European compact-car class this app targets. Users can
+    //     override from the vehicle edit screen (phase 3) if their car
+    //     runs a different tyre.
+    //   gearCentroids: persisted cluster centroids from the most
+    //     recent trip (sorted ascending). Null when no trip has run
+    //     yet — the clusterer cold-starts in that case. Phase 3 wires
+    //     the centroid-write side of this field; this phase ships the
+    //     storage so the read path is ready when it lands.
+    @Default(1.95) double tireCircumferenceMeters,
+    List<double>? gearCentroids,
   }) = _VehicleProfile;
 
   factory VehicleProfile.fromJson(Map<String, dynamic> json) =>

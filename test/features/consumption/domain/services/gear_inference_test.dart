@@ -429,4 +429,223 @@ void main() {
       expect(r, closeTo(5.85, 0.02));
     });
   });
+
+  group('computeSecondsBelowOptimalGear (#1263 phase 2)', () {
+    /// Drive the 5-speed fixture through [inferGears] so the assertions
+    /// below see realistic centroid spacing — hand-rolled centroids
+    /// would let a math error in the helper drift between fixture and
+    /// production.
+    GearInferenceResult inferFromFixture(List<TripSample> samples) {
+      return inferGears(
+        samples: samples,
+        tireCircumferenceMeters: _tireC,
+      );
+    }
+
+    test('returns 0.0 when every sample is in the top gear', () {
+      // 110 km/h @ 2500 RPM is fixture-5th. We need at least one OTHER
+      // regime fed in so [inferGears] returns 5 distinct centroids;
+      // otherwise the centroids list collapses and the helper returns
+      // null. Build a fixture where the gear-5 regime dominates and
+      // restrict the assertions to that slice.
+      final fixture = _fiveSpeedFixture();
+      final result = inferFromFixture(fixture);
+      expect(result.centroids.length, equals(5));
+
+      // The fixture's 5th-gear regime is samples 480..600. Slice the
+      // gear assignments + samples to just that window — the helper
+      // should report 0.0 because there's no "next gear up".
+      final sliceAssignments = result.samples
+          .sublist(480, 600)
+          .map((s) => (timestamp: s.timestamp, gear: s.gear))
+          .toList(growable: false);
+      final sliceSamples = fixture.sublist(480, 600);
+
+      final seconds = computeSecondsBelowOptimalGear(
+        gearAssignments: sliceAssignments,
+        optimalRpmCeiling: 2200.0,
+        samples: sliceSamples,
+        centroids: result.centroids,
+      );
+      expect(seconds, equals(0.0));
+    });
+
+    test('returns ~trip-duration when stuck in 1st gear at high RPM', () {
+      // Build a five-speed fixture (so [inferGears] has enough data to
+      // resolve 5 gears) then evaluate the helper on a slice that's
+      // pinned in 1st gear at high RPM. The predicted next-gear RPM
+      // (`currentRpm × centroids[gear-2-idx] / centroids[gear-1-idx]`)
+      // must sit above the 2200 RPM ceiling — at 5000 RPM the ratio
+      // multiplier 9.36/17.5 produces ~2674, comfortably above.
+      //
+      // Plumbing: the fixture's 1st-gear regime is 10 km/h @ 1500 RPM,
+      // ratio ~17.5; 2nd-gear is 25 km/h @ 2000 RPM, ratio ~9.36. We
+      // re-use that fixture to anchor the centroids, then build a
+      // separate "stuck in 1st" subsequence and pre-label its gear
+      // field as 1 to bypass re-clustering — the helper's contract
+      // takes assignments + centroids, not raw samples.
+      final fixture = _fiveSpeedFixture();
+      final result = inferFromFixture(fixture);
+      expect(result.centroids.length, equals(5));
+
+      // Build the stuck-in-1st run: 30 samples at 1 s spacing, all
+      // labelled gear=1 explicitly. Speed 30 km/h × 5000 RPM puts
+      // the predicted gear-2 RPM (≈ 2670) cleanly above the 2200
+      // ceiling, so every Δt should count.
+      final t0 = DateTime(2026, 4, 28, 9, 0, 0);
+      final stuckSamples = _steady(
+        start: t0,
+        count: 30,
+        speedKmh: 30,
+        rpm: 5000,
+      );
+      final stuckAssignments = List.generate(
+        stuckSamples.length,
+        (i) => (timestamp: stuckSamples[i].timestamp, gear: 1),
+        growable: false,
+      );
+
+      final seconds = computeSecondsBelowOptimalGear(
+        gearAssignments: stuckAssignments,
+        optimalRpmCeiling: 2200.0,
+        samples: stuckSamples,
+        centroids: result.centroids,
+      );
+
+      // 30 samples × 1 s spacing → 29 inter-sample intervals → 29 s
+      // counted. The helper integrates on consecutive PAIRS, not
+      // points.
+      expect(seconds, isNotNull);
+      expect(seconds, closeTo(29.0, 0.01));
+    });
+
+    test('mixed gear-1 + gear-5 segments only count gear-1 seconds', () {
+      // Build a fixture, run inferGears so we have valid 5-cluster
+      // centroids, then construct a synthetic assignment list that
+      // alternates gear=1 (10 s of intervals) and gear=5 (10 s of
+      // intervals). Only the gear-1 stretch should count toward the
+      // sum; the gear-5 stretch is the top gear and contributes zero.
+      final fixture = _fiveSpeedFixture();
+      final result = inferFromFixture(fixture);
+      expect(result.centroids.length, equals(5));
+
+      final t0 = DateTime(2026, 4, 28, 9, 0, 0);
+
+      // 11 samples × 1 s @ gear-1: 10 intervals × 1 s = 10 s counted.
+      // 30 km/h × 5000 RPM keeps the predicted gear-2 RPM
+      // (≈ 5000 × 9.36/17.5 ≈ 2670) above the 2200 ceiling.
+      final firstHalfSamples = _steady(
+        start: t0,
+        count: 11,
+        speedKmh: 30,
+        rpm: 5000,
+      );
+      final firstHalfAssignments = firstHalfSamples
+          .map((s) => (timestamp: s.timestamp, gear: 1))
+          .toList(growable: false);
+
+      // 11 samples × 1 s @ gear-5: 10 intervals × 1 s = 0 s counted
+      // (already top gear).
+      final secondHalfSamples = _steady(
+        start: t0.add(const Duration(seconds: 12)),
+        count: 11,
+        speedKmh: 110,
+        rpm: 2500,
+      );
+      final secondHalfAssignments = secondHalfSamples
+          .map((s) => (timestamp: s.timestamp, gear: 5))
+          .toList(growable: false);
+
+      final assignments = <({DateTime timestamp, int? gear})>[
+        ...firstHalfAssignments,
+        ...secondHalfAssignments,
+      ];
+      final samples = <TripSample>[
+        ...firstHalfSamples,
+        ...secondHalfSamples,
+      ];
+
+      final seconds = computeSecondsBelowOptimalGear(
+        gearAssignments: assignments,
+        optimalRpmCeiling: 2200.0,
+        samples: samples,
+        centroids: result.centroids,
+      );
+
+      // 10 s from the gear-1 internal pairs (samples 0..10 → 10
+      // intervals × 1 s) + 2 s from the boundary pair: sample[10] at
+      // t0+10s has gear=1 (so the helper still asks "would gear 2 hold
+      // RPM ≥ 2200 at 4000 RPM?" — yes), and sample[11] is t0+12s, so
+      // Δt is 2 s. Then samples 11..21 are gear-5 (already top, no
+      // counting). Total 12 s.
+      expect(seconds, isNotNull);
+      expect(seconds, closeTo(12.0, 0.01));
+    });
+
+    test('returns null when fewer than two centroids were inferred', () {
+      // Single-gear (degenerate) fixture: only one cluster will be
+      // robust. The helper can't compare to "next gear up" with a
+      // single centroid — it returns null.
+      final t0 = DateTime(2026, 4, 28, 9, 0, 0);
+      final samples = _steady(start: t0, count: 30, speedKmh: 50, rpm: 2500);
+      final assignments = samples
+          .map((s) => (timestamp: s.timestamp, gear: 1))
+          .toList(growable: false);
+
+      // Force the centroids list to a single element.
+      final seconds = computeSecondsBelowOptimalGear(
+        gearAssignments: assignments,
+        optimalRpmCeiling: 2200.0,
+        samples: samples,
+        centroids: const [5.85],
+      );
+      expect(seconds, isNull);
+    });
+
+    test('returns 0.0 on empty assignments', () {
+      final seconds = computeSecondsBelowOptimalGear(
+        gearAssignments: const [],
+        optimalRpmCeiling: 2200.0,
+        samples: const [],
+        // ≥ 2 centroids — empty assignments still trip the early
+        // return (length 0 → no pairs to integrate).
+        centroids: const [4.0, 5.0],
+      );
+      expect(seconds, equals(0.0));
+    });
+
+    test('returns 0.0 when every gear is null (idle-only fixture)', () {
+      final t0 = DateTime(2026, 4, 28, 9, 0, 0);
+      final samples = _steady(start: t0, count: 10, speedKmh: 0, rpm: 800);
+      final assignments = samples
+          .map((s) => (timestamp: s.timestamp, gear: null))
+          .toList(growable: false);
+
+      final seconds = computeSecondsBelowOptimalGear(
+        gearAssignments: assignments,
+        optimalRpmCeiling: 2200.0,
+        samples: samples,
+        centroids: const [4.0, 5.0],
+      );
+      expect(seconds, equals(0.0));
+    });
+
+    test('returns null when assignments / samples lengths mismatch', () {
+      final t0 = DateTime(2026, 4, 28, 9, 0, 0);
+      final samples = _steady(start: t0, count: 5, speedKmh: 30, rpm: 3000);
+      // One fewer assignment than sample — defensive guard kicks in.
+      final assignments = samples
+          .take(4)
+          .map((s) => (timestamp: s.timestamp, gear: 1))
+          .toList(growable: false);
+
+      final seconds = computeSecondsBelowOptimalGear(
+        gearAssignments: assignments,
+        optimalRpmCeiling: 2200.0,
+        samples: samples,
+        centroids: const [4.0, 5.0, 6.0],
+      );
+      expect(seconds, isNull);
+    });
+  });
 }

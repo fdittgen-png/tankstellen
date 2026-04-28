@@ -87,6 +87,11 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
           ? null
           : DateTime.parse(json['aggregatesUpdatedAt'] as String),
       aggregatesTripCount: (json['aggregatesTripCount'] as num?)?.toInt(),
+      tireCircumferenceMeters:
+          (json['tireCircumferenceMeters'] as num?)?.toDouble() ?? 1.95,
+      gearCentroids: (json['gearCentroids'] as List<dynamic>?)
+          ?.map((e) => (e as num).toDouble())
+          .toList(),
     );
 
 Map<String, dynamic> _$VehicleProfileToJson(
@@ -129,4 +134,6 @@ Map<String, dynamic> _$VehicleProfileToJson(
   'speedConsumptionAggregates': instance.speedConsumptionAggregates?.toJson(),
   'aggregatesUpdatedAt': instance.aggregatesUpdatedAt?.toIso8601String(),
   'aggregatesTripCount': instance.aggregatesTripCount,
+  'tireCircumferenceMeters': instance.tireCircumferenceMeters,
+  'gearCentroids': instance.gearCentroids,
 };
