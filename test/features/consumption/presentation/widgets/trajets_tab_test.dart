@@ -137,7 +137,7 @@ class _NeedsPickerTripRecording extends TripRecording {
   }
 
   @override
-  Future<void> start(Obd2Service service) async {
+  Future<void> start(Obd2Service service, {bool automatic = false}) async {
     startServiceCallCount++;
   }
 }

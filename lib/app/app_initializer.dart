@@ -7,9 +7,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
+import 'package:hive/hive.dart';
+
 import '../core/background/background_service.dart';
 import '../core/constants/app_constants.dart';
 import '../core/cache/cache_manager.dart';
+import '../core/feedback/auto_record_badge_provider.dart';
 import '../core/telemetry/storage/isolate_error_spool.dart';
 import '../core/telemetry/storage/trace_storage.dart';
 import '../core/telemetry/trace_recorder.dart';
@@ -17,11 +20,15 @@ import '../core/logging/error_logger.dart';
 import '../core/notifications/local_notification_service.dart';
 import '../core/perf/startup_timer.dart';
 import '../core/services/country_service_registry.dart';
+import '../core/storage/hive_boxes.dart';
 import '../core/storage/hive_storage.dart';
 import '../core/sync/community_config.dart';
 import '../core/sync/supabase_client.dart';
 import '../core/telemetry/pii_scrubber.dart';
 import '../core/utils/edge_to_edge.dart';
+import '../features/consumption/data/obd2/paused_trip_recovery_service.dart';
+import '../features/consumption/data/obd2/paused_trip_repository.dart';
+import '../features/consumption/data/trip_history_repository.dart';
 import '../features/consumption/providers/auto_record_orchestrator.dart';
 import '../features/profile/data/repositories/profile_repository.dart';
 import '../features/vehicle/data/reference_vehicle_catalog_provider.dart';
@@ -373,6 +380,47 @@ class AppInitializer {
     }
   }
 
+  /// #1004 phase 4-WAL — finalise paused trips that survived an app
+  /// kill mid-grace-window into the trip-history rolling log.
+  ///
+  /// Resolves the paused-trips + history Hive boxes (no-op when either
+  /// is closed — widget tests, fresh installs), wires the badge bump
+  /// from [autoRecordBadgeServiceProvider] only for entries flagged as
+  /// auto-record, and calls [PausedTripRecoveryService.recoverStale]
+  /// with the default 5-minute threshold. The recovered count is
+  /// debug-printed; production builds drop the message.
+  static Future<void> _runPausedTripRecovery(
+    ProviderContainer container,
+  ) async {
+    if (!Hive.isBoxOpen(HiveBoxes.obd2PausedTrips)) return;
+    if (!Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) return;
+    final pausedRepo = PausedTripRepository(
+      box: Hive.box<String>(HiveBoxes.obd2PausedTrips),
+    );
+    final historyRepo = TripHistoryRepository(
+      box: Hive.box<String>(HiveBoxes.obd2TripHistory),
+    );
+    final service = PausedTripRecoveryService(
+      pausedRepo: pausedRepo,
+      historyRepo: historyRepo,
+      onAutomaticRecovered: () async {
+        try {
+          final badge =
+              await container.read(autoRecordBadgeServiceProvider.future);
+          await badge.increment();
+        } catch (e, st) {
+          debugPrint(
+              'AppInitializer: pausedTripRecovery badge bump failed: $e\n$st');
+        }
+      },
+    );
+    final recovered = await service.recoverStale();
+    if (recovered > 0) {
+      debugPrint(
+          'AppInitializer: recovered $recovered paused trip(s) into history');
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Phase 5 — runApp
   // ---------------------------------------------------------------------------
@@ -415,6 +463,25 @@ class AppInitializer {
     } catch (e, st) {
       debugPrint('AppInitializer: nearestWidgetRefresh start failed: $e\n$st');
     }
+
+    // #1004 phase 4-WAL — recover paused trips that were never
+    // finalised because the app was killed mid-grace-window. Walks
+    // the `obd2_paused_trips` box, finalises any entry older than 5
+    // minutes into the trip-history rolling log, and bumps the
+    // launcher-icon badge for entries that came from the auto-record
+    // path. Deferred to the post-frame microtask so the first paint
+    // isn't blocked by what is at most a 100 ms Hive walk on devices
+    // with a single stale entry. Sequenced BEFORE the orchestrator
+    // start below so the user lands on a history list with the
+    // recovered trip already populated.
+    _deferPostFirstFrame(() async {
+      try {
+        await _runPausedTripRecovery(container);
+      } catch (e, st) {
+        debugPrint(
+            'AppInitializer: pausedTripRecovery failed: $e\n$st');
+      }
+    });
 
     // #1004 phase 2b-2 — instantiate the auto-record orchestrator. The
     // provider is `keepAlive: true` and watches the vehicle list

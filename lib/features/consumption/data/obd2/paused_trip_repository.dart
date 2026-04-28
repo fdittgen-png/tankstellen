@@ -33,6 +33,20 @@ class PausedTripEntry {
   final double? odometerLatestKm;
   final DateTime pausedAt;
 
+  /// Whether the recording that produced this paused snapshot was
+  /// kicked off by the hands-free auto-record path (#1004 phase 4-WAL).
+  ///
+  /// Carried so the [PausedTripRecoveryService] knows whether to bump
+  /// the launcher-icon badge when a stale entry is finalised on next
+  /// app launch — manual trips never counted toward the unseen-badge
+  /// counter and must not retroactively start counting just because
+  /// the app was killed before the disconnect-save timer fired.
+  ///
+  /// Defaults to `false` so legacy serialised rows (written before
+  /// this field landed) round-trip cleanly via the `?? false` read in
+  /// [fromJson].
+  final bool automatic;
+
   const PausedTripEntry({
     required this.id,
     required this.vehicleId,
@@ -41,6 +55,7 @@ class PausedTripEntry {
     required this.odometerStartKm,
     required this.odometerLatestKm,
     required this.pausedAt,
+    this.automatic = false,
   });
 
   Map<String, dynamic> toJson() => {
@@ -51,6 +66,7 @@ class PausedTripEntry {
         if (odometerStartKm != null) 'odometerStartKm': odometerStartKm,
         if (odometerLatestKm != null) 'odometerLatestKm': odometerLatestKm,
         'pausedAt': pausedAt.toIso8601String(),
+        if (automatic) 'automatic': true,
       };
 
   static PausedTripEntry fromJson(Map<String, dynamic> json) =>
@@ -64,6 +80,7 @@ class PausedTripEntry {
         odometerStartKm: (json['odometerStartKm'] as num?)?.toDouble(),
         odometerLatestKm: (json['odometerLatestKm'] as num?)?.toDouble(),
         pausedAt: DateTime.parse(json['pausedAt'] as String),
+        automatic: (json['automatic'] as bool?) ?? false,
       );
 }
 

@@ -139,6 +139,13 @@ class TripRecording extends _$TripRecording {
       await start(service);
       return StartTripOutcome.started;
     }
+    // TODO(#1004 phase 2b-3) — when the orchestrator's no-picker
+    // start lands, plumb `automatic: true` into the resulting [start]
+    // call here so the [PausedTripEntry] written on a mid-trip BLE
+    // drop carries the automatic flag at WAL recovery time. For now
+    // the picker fork below is the only orchestrator-driven path and
+    // it goes through UI before re-entering [start], which provides
+    // the [automatic] argument explicitly.
     if (resolvedMac == null || resolvedMac.isEmpty) {
       return StartTripOutcome.needsPicker;
     }
@@ -154,7 +161,13 @@ class TripRecording extends _$TripRecording {
   /// Begin a recording session backed by [service]. The provider
   /// takes ownership of the service — don't disconnect it from the
   /// caller; [stop] handles the full teardown.
-  Future<void> start(Obd2Service service) async {
+  ///
+  /// [automatic] flags the controller so any [PausedTripEntry] it
+  /// writes on a mid-trip BLE drop (#1004 phase 4-WAL) carries the
+  /// auto-record provenance. Defaults to false so existing manual
+  /// call sites are unchanged. The hands-free [AutoTripCoordinator]
+  /// path passes `automatic: true`.
+  Future<void> start(Obd2Service service, {bool automatic = false}) async {
     if (state.isActive) return;
     _lastTripStartedAt ??= DateTime.now();
     _service = service;
@@ -183,6 +196,7 @@ class TripRecording extends _$TripRecording {
       vehicle: activeVehicle,
       vehicleId: eagerVehicleId,
       pinnedAdapterMac: pinnedMac,
+      automatic: automatic,
       reconnectScannerFactory: _buildReconnectScannerFactory(),
     );
     _controller = ctl;
