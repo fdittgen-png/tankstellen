@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -34,12 +36,37 @@ class DrivingInsightsCard extends StatelessWidget {
   /// `litersWasted` desc and capped at 3. Empty list → empty-state.
   final List<DrivingInsight> insights;
 
-  const DrivingInsightsCard({super.key, required this.insights});
+  /// Optional time-below-optimal-gear metric from `gear_inference.dart`
+  /// (#1263 phase 1) summed at trip end into
+  /// `TripSummary.secondsBelowOptimalGear` (phase 2). Surfaced here as
+  /// the gear-coaching row when non-null AND > 60s. Null on EV trips
+  /// or when the inference had insufficient samples / no centroids;
+  /// the parent screen also gates the entire card on EV / empty-trip.
+  ///
+  /// Rendered ABOVE the regular insight tiles. When the regular
+  /// `insights` list is empty and this metric fires, the gear row
+  /// renders ALONE — no empty-state — so the user always sees the
+  /// most actionable line.
+  final double? secondsBelowOptimalGear;
+
+  const DrivingInsightsCard({
+    super.key,
+    required this.insights,
+    this.secondsBelowOptimalGear,
+  });
+
+  /// True when the gear-coaching row should render — non-null metric
+  /// strictly greater than 60s (the issue-#1263 acceptance threshold).
+  bool get _showLowGearRow {
+    final s = secondsBelowOptimalGear;
+    return s != null && s > 60;
+  }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final showLowGear = _showLowGearRow;
 
     return Card(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -53,7 +80,9 @@ class DrivingInsightsCard extends StatelessWidget {
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
-            if (insights.isEmpty)
+            if (showLowGear)
+              _LowGearTile(seconds: secondsBelowOptimalGear!),
+            if (insights.isEmpty && !showLowGear)
               _EmptyState(
                 message: l?.insightEmptyState ??
                     'No notable inefficiencies — keep it up!',
@@ -64,6 +93,41 @@ class DrivingInsightsCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Gear-coaching row (#1263 phase 3). Visual style mirrors
+/// [_InsightTile] — leading icon, headline title, no trailing badge
+/// (the metric is a duration, not a litres figure).
+class _LowGearTile extends StatelessWidget {
+  /// Total seconds the trip spent below the optimal-gear ceiling.
+  /// Only ever rendered when caller has confirmed `> 60`.
+  final double seconds;
+
+  const _LowGearTile({required this.seconds});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    // `Math.max(1, round(seconds / 60))` so we never display "0
+    // minutes". The `> 60` guard already ensures `round()` returns
+    // at least 1 (round(60/60) = 1), but clamping defensively keeps
+    // the formatter honest for future callers.
+    final minutes = math.max(1, (seconds / 60).round()).toString();
+    final headline = l?.insightLowGear(minutes) ??
+        'Labouring in low gear ($minutes min)';
+
+    return ListTile(
+      key: const ValueKey('insight_tile_insightLowGear'),
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(
+        Icons.swap_vert,
+        color: theme.colorScheme.error,
+      ),
+      title: Text(headline),
     );
   }
 }
@@ -151,6 +215,13 @@ class _InsightTile extends StatelessWidget {
         return Icons.flash_on;
       case 'insightIdling':
         return Icons.hourglass_empty;
+      case 'insightLowGear':
+        // Gear-coaching row (#1263 phase 3) doesn't go through this
+        // tile builder (it's rendered by [_LowGearTile] directly), but
+        // keep the icon mapping here so future analyzer-emitted
+        // 'insightLowGear' insights would render with the same gear-
+        // shift glyph.
+        return Icons.swap_vert;
       default:
         return Icons.info_outline;
     }

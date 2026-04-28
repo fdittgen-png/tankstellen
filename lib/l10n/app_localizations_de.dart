@@ -3348,6 +3348,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String insightLowGear(String minutes) {
+    return 'Im niedrigen Gang gefahren ($minutes Min.)';
+  }
+
+  @override
   String get drivingScoreCardTitle => 'Fahrnote';
 
   @override
