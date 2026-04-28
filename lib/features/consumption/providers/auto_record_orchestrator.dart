@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../vehicle/domain/entities/vehicle_profile.dart';
@@ -9,19 +8,23 @@ import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/android_background_adapter_listener.dart';
 import '../data/obd2/auto_trip_coordinator.dart';
 import '../data/obd2/background_adapter_listener.dart';
+import '../data/obd2/obd2_connection_service.dart';
+import '../data/obd2/obd2_service.dart';
 import 'trip_recording_provider.dart';
 
 part 'auto_record_orchestrator.g.dart';
 
-/// Production wiring for the hands-free auto-record flow (#1004 phase 2b-2).
+/// Production wiring for the hands-free auto-record flow (#1004 phase 2b-3).
 ///
 /// Sits between [vehicleProfileListProvider] and the per-vehicle
 /// [AutoTripCoordinator]: watches the vehicle list for changes and
 /// keeps a long-lived coordinator alive for every profile that has
 /// `autoRecord: true` AND a non-null `pairedAdapterMac`. The
 /// coordinator(s) in turn observe the native Android foreground service
-/// (phase 2b-1) and bridge into [TripRecording] when movement is
-/// detected.
+/// (phase 2b-1), open an OBD2 session on `AdapterConnected` (phase
+/// 2b-3), poll PID 0x0D for speed, and hand the live session to
+/// [TripRecording.start] when movement is detected — closing the loop
+/// the phase 2b-2 GPS source had left as a `needsPicker` outcome.
 ///
 /// ## Lifecycle invariants
 ///
@@ -53,17 +56,15 @@ part 'auto_record_orchestrator.g.dart';
 /// [FakeBackgroundAdapterListener]; the same hook lets a future
 /// platform implementation slot in without touching this file.
 ///
-/// ## Speed-stream source
+/// ## Speed-stream source (#1004 phase 2b-3)
 ///
-/// Phase 2b-2 ships GPS-only: each coordinator wraps
-/// [Geolocator.getPositionStream] and converts m/s → km/h. This is
-/// intentional — opening an OBD2 session inline (PID 0x0D) on every
-/// `AdapterConnected` event would conflict with the manual flow's
-/// existing `Obd2ConnectionService.takeover` semantics. Phase 2b-3 will
-/// switch to OBD2 PID 0x0D once the on-connect session-handoff design
-/// is settled. The GPS source is good enough to detect "the car
-/// started moving"; we are not measuring instantaneous speed for
-/// telemetry here.
+/// Each coordinator opens an [Obd2Service] on `AdapterConnected` via
+/// [autoRecordSessionOpenerFactoryProvider], wraps it in an
+/// `Obd2SpeedStream` that polls PID 0x0D at 1 Hz, and hands ownership
+/// of the live session to [TripRecording.start] on threshold-cross.
+/// Tests override the factory provider to inject a fake opener that
+/// returns a stub service whose `readSpeedKmh()` is wired to a
+/// pre-defined queue.
 @Riverpod(keepAlive: true)
 class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
   /// Active coordinators keyed by vehicle id. Read by tests through
@@ -154,25 +155,30 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
     if (mac == null || mac.isEmpty) return null;
 
     final listenerFactory = ref.read(autoRecordListenerFactoryProvider);
-    final speedStreamFactory = ref.read(autoRecordSpeedStreamFactoryProvider);
+    final sessionOpener = ref.read(autoRecordSessionOpenerFactoryProvider);
 
     final listener = listenerFactory();
     final coordinator = AutoTripCoordinator(
       listener: listener,
-      startTrip: () async {
-        // The coordinator is decoupled from `StartTripOutcome` (it
-        // lives in the providers layer). Forwarding the typed enum
-        // back lets the coordinator distinguish "actually started"
-        // from "alreadyActive" / "needsPicker" via its existing
-        // string-form classifier.
-        return ref
+      startTrip: (Obd2Service service) async {
+        // Phase 2b-3 — hand the live OBD2 session to the trip recorder
+        // and tag the trip as automatic so [PausedTripEntry] /
+        // launcher-icon badge bookkeeping picks it up. The recorder
+        // takes ownership of the session; the coordinator's pointer
+        // has already been nulled out before this callback fires.
+        await ref
             .read(tripRecordingProvider.notifier)
-            .startTrip(vehicleId: profile.id, adapterMac: mac);
+            .start(service, automatic: true);
+        // The coordinator's outcome classifier looks for the trailing
+        // segment 'started' on a `Type.value` toString to tag a
+        // `tripStarted` trace entry. The provider's `start()` returns
+        // void, so we synthesise the marker here.
+        return 'StartTripOutcome.started';
       },
       stopAndSaveAutomatic: () async {
         await ref.read(tripRecordingProvider.notifier).stopAndSaveAutomatic();
       },
-      speedStream: speedStreamFactory(),
+      sessionOpener: sessionOpener,
       config: _configFor(profile, mac),
     );
     return _OrchestratorEntry(
@@ -258,22 +264,15 @@ BackgroundAdapterListenerFactory autoRecordListenerFactory(Ref ref) {
   };
 }
 
-/// Factory that returns a fresh GPS speed stream (km/h) per coordinator.
-///
-/// Phase 2b-2 starter — wraps [Geolocator.getPositionStream] and maps
-/// `position.speed` (m/s) to km/h. Tests override this provider with a
-/// controlled stream so the coordinator's threshold logic is exercised
-/// without touching the platform's location stack.
-typedef SpeedStreamFactory = Stream<double> Function();
-
+/// Default opener: opens a fresh [Obd2Service] for the configured MAC
+/// via [Obd2ConnectionService.connectByMac] (#1004 phase 2b-3).
+/// Returns null when the adapter is out of range or the scan times
+/// out — the coordinator stays idle for that connect cycle and waits
+/// for the next `AdapterConnected`. Tests override this provider to
+/// inject a fake opener that returns a stub service.
 @Riverpod(keepAlive: true)
-SpeedStreamFactory autoRecordSpeedStreamFactory(Ref ref) {
-  return () {
-    return Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 0,
-      ),
-    ).map((position) => position.speed * 3.6);
+Obd2SessionOpener autoRecordSessionOpenerFactory(Ref ref) {
+  return (String mac) async {
+    return ref.read(obd2ConnectionProvider).connectByMac(mac);
   };
 }
