@@ -334,6 +334,94 @@ void main() {
     });
   });
 
+  group('TripSummary.coldStartSurcharge persistence (#1262 phase 2)', () {
+    test(
+        'summary with coldStartSurcharge true round-trips through save / '
+        'loadAll', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 4, 21, 12);
+      final cold = TripSummary(
+        distanceKm: 4,
+        maxRpm: 1800,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 0,
+        startedAt: start,
+        endedAt: start.add(const Duration(minutes: 5)),
+        coldStartSurcharge: true,
+      );
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: cold,
+      ));
+
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.summary.coldStartSurcharge, isTrue);
+    });
+
+    test(
+        'summary with coldStartSurcharge false round-trips and the stored '
+        'JSON carries an explicit "cs": false (no parsimony rule for '
+        'this key — every trip persists it)', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 4, 21, 12);
+      final warm = TripSummary(
+        distanceKm: 30,
+        maxRpm: 2800,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 0,
+        startedAt: start,
+        endedAt: start.add(const Duration(minutes: 30)),
+        // coldStartSurcharge defaults false
+      );
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: warm,
+      ));
+
+      final raw = box.get(start.toIso8601String())!;
+      final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
+      final summaryJson = (decoded['summary'] as Map).cast<String, dynamic>();
+      expect(summaryJson['cs'], isFalse);
+
+      final loaded = repo.loadAll();
+      expect(loaded.first.summary.coldStartSurcharge, isFalse);
+    });
+
+    test(
+        'legacy JSON (pre-#1262 phase 2) without the "cs" key '
+        'deserialises with coldStartSurcharge: false — older trips '
+        'were written before the heuristic landed', () async {
+      final start = DateTime(2026, 4, 21, 12);
+      final legacyJson = jsonEncode({
+        'id': start.toIso8601String(),
+        'vehicleId': null,
+        'summary': {
+          'distanceKm': 10.0,
+          'maxRpm': 2800.0,
+          'highRpmSeconds': 0.0,
+          'idleSeconds': 0.0,
+          'harshBrakes': 0,
+          'harshAccelerations': 0,
+          'startedAt': start.toIso8601String(),
+          // 'cs' deliberately absent
+        },
+      });
+      await box.put(start.toIso8601String(), legacyJson);
+
+      final repo = TripHistoryRepository(box: box);
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.summary.coldStartSurcharge, isFalse);
+    });
+  });
+
   group('TripSample engineLoad + coolantTemp persistence (#1262 phase 1)', () {
     test(
         'sample with engineLoadPercent and coolantTempC round-trips through '

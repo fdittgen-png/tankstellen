@@ -175,6 +175,147 @@ void main() {
       expect(sample.throttlePercent, isNull);
     });
 
+    group('cold-start surcharge heuristic (#1262 phase 2)', () {
+      test(
+          'short cold trip — 5 min @ 25 °C coolant flips coldStartSurcharge '
+          'true (rule A: < 10 min AND coolant min < 70 °C)', () {
+        final start = DateTime.utc(2026);
+        // Five samples across 5 minutes, coolant pegged at 25 °C —
+        // a typical winter short hop where the engine never warms up.
+        for (var i = 0; i <= 5; i++) {
+          recorder.onSample(TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 30,
+            rpm: 1500,
+            coolantTempC: 25,
+          ));
+        }
+        expect(recorder.buildSummary().coldStartSurcharge, isTrue);
+      });
+
+      test(
+          'warm trip — climbs to 90 °C in first 2 min of a 30-min trip '
+          'stays false (engine reached operating temp early)', () {
+        final start = DateTime.utc(2026);
+        // Minute 0: cold. Minute 2: warm. Stays warm for the rest.
+        recorder.onSample(TripSample(
+          timestamp: start,
+          speedKmh: 50,
+          rpm: 2000,
+          coolantTempC: 25,
+        ));
+        recorder.onSample(TripSample(
+          timestamp: start.add(const Duration(minutes: 2)),
+          speedKmh: 70,
+          rpm: 2200,
+          coolantTempC: 90,
+        ));
+        recorder.onSample(TripSample(
+          timestamp: start.add(const Duration(minutes: 30)),
+          speedKmh: 70,
+          rpm: 2200,
+          coolantTempC: 92,
+        ));
+        expect(recorder.buildSummary().coldStartSurcharge, isFalse);
+      });
+
+      test(
+          'never-warmed long trip — 20 min stuck at 60 °C flips true '
+          '(rule B: max coolant < 70 °C across the whole trip)', () {
+        final start = DateTime.utc(2026);
+        // 20-minute trip, coolant never crosses the 70 °C line — the
+        // engine ran rich the whole time. Rule A doesn't fire (the
+        // trip is > 10 min) but rule B catches this case.
+        for (var i = 0; i <= 20; i++) {
+          recorder.onSample(TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 25,
+            rpm: 1400,
+            coolantTempC: 60,
+          ));
+        }
+        expect(recorder.buildSummary().coldStartSurcharge, isTrue);
+      });
+
+      test(
+          'late-warm trip — coolant only crosses 70 °C at minute 15 of a '
+          '20-min trip flips true (rule C: warmed in second half)', () {
+        final start = DateTime.utc(2026);
+        // 0..14: cold. 15..20: warm. Crossover at minute 15 (75 % of
+        // the trip elapsed) → second half → rule C fires.
+        for (var i = 0; i < 15; i++) {
+          recorder.onSample(TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 40,
+            rpm: 1700,
+            coolantTempC: 50,
+          ));
+        }
+        for (var i = 15; i <= 20; i++) {
+          recorder.onSample(TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 40,
+            rpm: 1700,
+            coolantTempC: 80,
+          ));
+        }
+        expect(recorder.buildSummary().coldStartSurcharge, isTrue);
+      });
+
+      test(
+          'no coolant data — every sample carries coolantTempC: null '
+          'leaves coldStartSurcharge false (no false positives on cars '
+          'without PID 0x05)', () {
+        final start = DateTime.utc(2026);
+        // Short trip — would hit rule A if we had any coolant sample.
+        for (var i = 0; i <= 5; i++) {
+          recorder.onSample(TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 30,
+            rpm: 1500,
+            // coolantTempC omitted → null
+          ));
+        }
+        expect(recorder.buildSummary().coldStartSurcharge, isFalse);
+      });
+
+      test(
+          'reset clears cold-start state — a warm trip after a cold trip '
+          'must NOT inherit the cold flag', () {
+        final start = DateTime.utc(2026);
+        // First trip: short and cold → would flip true.
+        for (var i = 0; i <= 5; i++) {
+          recorder.onSample(TripSample(
+            timestamp: start.add(Duration(minutes: i)),
+            speedKmh: 30,
+            rpm: 1500,
+            coolantTempC: 25,
+          ));
+        }
+        expect(recorder.buildSummary().coldStartSurcharge, isTrue);
+
+        recorder.reset();
+
+        // Second trip: warm from the start, long enough to not be a
+        // short cold trip. Min coolant ≥ 70 means rule A (which keys
+        // off min, not start) won't fire either.
+        final t2 = DateTime.utc(2026, 1, 2);
+        recorder.onSample(TripSample(
+          timestamp: t2,
+          speedKmh: 70,
+          rpm: 2200,
+          coolantTempC: 85,
+        ));
+        recorder.onSample(TripSample(
+          timestamp: t2.add(const Duration(minutes: 30)),
+          speedKmh: 70,
+          rpm: 2200,
+          coolantTempC: 90,
+        ));
+        expect(recorder.buildSummary().coldStartSurcharge, isFalse);
+      });
+    });
+
     test('configurable thresholds override the defaults', () {
       final strict = TripRecorder(
         highRpmThreshold: 2500,
