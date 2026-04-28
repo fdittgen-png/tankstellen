@@ -3,6 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
+import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
+import 'package:tankstellen/features/consumption/domain/cold_start_baselines.dart';
+import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
+import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import 'package:tankstellen/features/driving/haptic_eco_coach.dart';
 import 'package:tankstellen/features/driving/providers/haptic_eco_coach_provider.dart';
 
 /// Provider-layer coverage for the [hapticEcoCoachEnabledProvider]
@@ -98,6 +103,100 @@ void main() {
       expect(container.read(hapticEcoCoachEnabledProvider), isFalse);
     });
   });
+
+  group('hapticEcoCoachLifecycleProvider.coachEvents (#1273)', () {
+    test('emits no events when the toggle is OFF — even with an active trip',
+        () async {
+      final fake = _FakeSettingsStorage();
+      final tripRecording = _ManualTripRecording();
+
+      final container = ProviderContainer(overrides: [
+        settingsStorageProvider.overrideWithValue(fake),
+        tripRecordingProvider.overrideWith(() => tripRecording),
+      ]);
+      addTearDown(container.dispose);
+
+      // Materialize the lifecycle provider so its `build` runs and the
+      // (empty, gated) bridge is created.
+      container.read(hapticEcoCoachLifecycleProvider);
+      final lifecycle =
+          container.read(hapticEcoCoachLifecycleProvider.notifier);
+      final received = <CoachEvent>[];
+      final sub = lifecycle.coachEvents.listen(received.add);
+      addTearDown(sub.cancel);
+
+      // Activate the trip — emission still gated by the toggle.
+      tripRecording.setActive(_recordingState());
+      // Yield so any pending stream events propagate before we assert.
+      await Future<void>.delayed(Duration.zero);
+
+      expect(
+        received,
+        isEmpty,
+        reason:
+            'Toggle OFF must gate the emission path even when a trip is '
+            'active — the visual surface only fires when the user opted '
+            'in via the haptic-eco-coach toggle.',
+      );
+    });
+
+    test('exposes a non-null broadcast stream so multiple subscribers can '
+        'attach', () async {
+      // The contract: `coachEvents` is a broadcast stream — the
+      // recording screen subscribes once, but a multi-subscriber
+      // shape future-proofs us for an additional surface (e.g.
+      // an in-app diagnostics overlay) without redesign.
+      final fake = _FakeSettingsStorage();
+      final tripRecording = _ManualTripRecording();
+      final container = ProviderContainer(overrides: [
+        settingsStorageProvider.overrideWithValue(fake),
+        tripRecordingProvider.overrideWith(() => tripRecording),
+      ]);
+      addTearDown(container.dispose);
+
+      container.read(hapticEcoCoachLifecycleProvider);
+      final lifecycle =
+          container.read(hapticEcoCoachLifecycleProvider.notifier);
+      final stream = lifecycle.coachEvents;
+      expect(stream.isBroadcast, isTrue,
+          reason:
+              'coachEvents must be a broadcast stream — single-subscription '
+              'streams would break multi-surface fan-out.');
+
+      // Verify two listeners can attach without throwing.
+      final a = stream.listen((_) {});
+      final b = stream.listen((_) {});
+      addTearDown(a.cancel);
+      addTearDown(b.cancel);
+    });
+  });
+}
+
+/// Manual `TripRecording` fake that lets the test flip phases without
+/// any OBD2 / Hive dependency. Only what the lifecycle provider's
+/// `build` reads (`isActive`, `live`) is exercised; the rest of the
+/// surface is deliberately untouched.
+class _ManualTripRecording extends TripRecording {
+  @override
+  TripRecordingState build() => const TripRecordingState();
+
+  void setActive(TripRecordingState s) {
+    state = s;
+  }
+}
+
+TripRecordingState _recordingState() {
+  return const TripRecordingState(
+    phase: TripRecordingPhase.recording,
+    situation: DrivingSituation.highwayCruise,
+    band: ConsumptionBand.normal,
+    live: TripLiveReading(
+      throttlePercent: 80,
+      speedKmh: 110,
+      distanceKmSoFar: 0,
+      elapsed: Duration(seconds: 1),
+    ),
+  );
 }
 
 class _FakeSettingsStorage implements SettingsStorage {

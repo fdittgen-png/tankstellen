@@ -60,6 +60,26 @@ class HapticEcoCoachLifecycle extends _$HapticEcoCoachLifecycle {
   StreamSubscription<TripLiveReading>? _coachSub;
   TripLiveReading? _lastForwardedReading;
 
+  /// Long-lived broadcast controller for [CoachEvent]s (#1273). Stays
+  /// open for the app's lifetime — cleaning it up on `_teardown`
+  /// would race the recording screen, which subscribes once in
+  /// `initState` and unsubscribes in `dispose`. Multiple subscribers
+  /// (haptic isn't one — that path is direct in [HapticEcoCoach]) can
+  /// attach safely; today there's exactly one (the trip-recording
+  /// screen).
+  // ignore: close_sinks — broadcast lives for the app's lifetime; see
+  //   the comment on [coachEvents] for why we don't close it on each
+  //   trip teardown.
+  final StreamController<CoachEvent> _coachEventsController =
+      StreamController<CoachEvent>.broadcast();
+
+  /// Public broadcast stream of fire decisions (#1273). The trip
+  /// recording screen subscribes in `initState`, shows a SnackBar per
+  /// event, and cancels in `dispose`. Other routes (summary, history,
+  /// home) DO NOT subscribe — that's how we guarantee the visual
+  /// surface only fires while the user is on the recording screen.
+  Stream<CoachEvent> get coachEvents => _coachEventsController.stream;
+
   @override
   void build() {
     final enabled = ref.watch(hapticEcoCoachEnabledProvider);
@@ -79,7 +99,10 @@ class HapticEcoCoachLifecycle extends _$HapticEcoCoachLifecycle {
     // ignore: close_sinks
     final bridge = StreamController<TripLiveReading>.broadcast();
     _bridge = bridge;
-    final coach = HapticEcoCoach(readings: bridge.stream);
+    final coach = HapticEcoCoach(
+      readings: bridge.stream,
+      onFire: _emitCoachEvent,
+    );
     _coachSub = coach.start();
 
     // Forward state updates into the bridge. `ref.listen` fires once
@@ -94,7 +117,22 @@ class HapticEcoCoachLifecycle extends _$HapticEcoCoachLifecycle {
       bridge.add(reading);
     });
 
-    ref.onDispose(_teardown);
+    ref.onDispose(() {
+      _teardown();
+      // The broadcast controller for coach events stays open across
+      // trip-teardown / re-arm cycles — its lifecycle matches the
+      // provider's `keepAlive: true`. We only close it if the
+      // provider itself is being disposed permanently (e.g. test
+      // ProviderContainer.dispose).
+      if (!_coachEventsController.isClosed) {
+        _coachEventsController.close();
+      }
+    });
+  }
+
+  void _emitCoachEvent(CoachEvent event) {
+    if (_coachEventsController.isClosed) return;
+    _coachEventsController.add(event);
   }
 
   void _teardown() {

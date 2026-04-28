@@ -3585,7 +3585,11 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get hapticEcoCoachSettingSubtitle =>
-      'Gentle haptic when you floor it during cruise';
+      'Gentle haptic + on-screen tip when you floor it during cruise';
+
+  @override
+  String get hapticEcoCoachSnackBarMessage =>
+      'Easy on the throttle — coasting saves more';
 
   @override
   String get loyaltySettingsTitle => 'Fuel club cards';
@@ -4063,6 +4067,20 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get tripRecordingPinSemanticOff => 'Pin recording form';
+
+  @override
+  String get tripRecordingPinHelpTooltip => 'What does pin do?';
+
+  @override
+  String get tripRecordingPinHelpTitle => 'About pin';
+
+  @override
+  String get tripRecordingPinHelpBody =>
+      'Pin keeps the screen on and hides system bars so the form stays readable on a dashboard mount. Tap again to release. Auto-releases when the trip stops.';
+
+  @override
+  String get tripRecordingResumeHintMessage =>
+      'Recording continues in the background. Tap the red banner at the top of any screen to return.';
 
   @override
   String get vinLabel => 'VIN (optional)';

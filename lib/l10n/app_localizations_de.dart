@@ -3619,7 +3619,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get hapticEcoCoachSettingSubtitle =>
-      'Sanfte Vibration bei zu starker Beschleunigung im Reisemodus';
+      'Sanftes Vibrieren + Hinweis am Bildschirm, wenn du beim Cruisen aufs Pedal trittst';
+
+  @override
+  String get hapticEcoCoachSnackBarMessage =>
+      'Locker vom Pedal — Ausrollen spart mehr';
 
   @override
   String get loyaltySettingsTitle => 'Tankstellen-Kundenkarten';
@@ -4101,6 +4105,20 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tripRecordingPinSemanticOff => 'Aufnahmeformular anpinnen';
+
+  @override
+  String get tripRecordingPinHelpTooltip => 'Was macht das Anpinnen?';
+
+  @override
+  String get tripRecordingPinHelpTitle => 'Über das Anpinnen';
+
+  @override
+  String get tripRecordingPinHelpBody =>
+      'Anpinnen hält den Bildschirm an und blendet die Systemleisten aus, damit das Formular auf einer Armaturenhalterung lesbar bleibt. Erneut tippen, um zu lösen. Wird automatisch beendet, wenn die Fahrt stoppt.';
+
+  @override
+  String get tripRecordingResumeHintMessage =>
+      'Die Aufnahme läuft im Hintergrund weiter. Tippe oben auf das rote Banner, um zurückzukehren.';
 
   @override
   String get vinLabel => 'FIN (optional)';

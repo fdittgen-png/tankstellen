@@ -63,7 +63,8 @@ class DrivingSettingsSection extends ConsumerWidget {
           ),
           subtitle: Text(
             l?.hapticEcoCoachSettingSubtitle ??
-                'Gentle haptic when you floor it during cruise',
+                'Gentle haptic + on-screen tip when you floor it '
+                    'during cruise',
             style: theme.textTheme.bodySmall,
           ),
           onChanged: (v) =>

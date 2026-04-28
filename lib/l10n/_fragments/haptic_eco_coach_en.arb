@@ -7,8 +7,12 @@
   "@hapticEcoCoachSettingTitle": {
     "description": "Title of the haptic-eco-coach toggle on the Settings screen (#1122)."
   },
-  "hapticEcoCoachSettingSubtitle": "Gentle haptic when you floor it during cruise",
+  "hapticEcoCoachSettingSubtitle": "Gentle haptic + on-screen tip when you floor it during cruise",
   "@hapticEcoCoachSettingSubtitle": {
-    "description": "Subtitle/explanation of the haptic-eco-coach toggle on the Settings screen (#1122). Describes the heuristic in user-facing terms."
+    "description": "Subtitle/explanation of the haptic-eco-coach toggle on the Settings screen (#1122). Describes both the haptic and visual surfaces in user-facing terms (#1273)."
+  },
+  "hapticEcoCoachSnackBarMessage": "Easy on the throttle — coasting saves more",
+  "@hapticEcoCoachSnackBarMessage": {
+    "description": "SnackBar copy shown on the trip-recording screen when the eco-coach heuristic fires (#1273). Co-located with the haptic; same toggle gates both surfaces."
   }
 }

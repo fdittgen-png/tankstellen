@@ -6686,11 +6686,17 @@ abstract class AppLocalizations {
   /// **'Real-time eco coaching'**
   String get hapticEcoCoachSettingTitle;
 
-  /// Subtitle/explanation of the haptic-eco-coach toggle on the Settings screen (#1122). Describes the heuristic in user-facing terms.
+  /// Subtitle/explanation of the haptic-eco-coach toggle on the Settings screen (#1122). Describes both the haptic and visual surfaces in user-facing terms (#1273).
   ///
   /// In en, this message translates to:
-  /// **'Gentle haptic when you floor it during cruise'**
+  /// **'Gentle haptic + on-screen tip when you floor it during cruise'**
   String get hapticEcoCoachSettingSubtitle;
+
+  /// SnackBar copy shown on the trip-recording screen when the eco-coach heuristic fires (#1273). Co-located with the haptic; same toggle gates both surfaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Easy on the throttle — coasting saves more'**
+  String get hapticEcoCoachSnackBarMessage;
 
   /// Title of the loyalty settings sub-screen where the user manages fuel-club cards (#1120).
   ///
@@ -7531,6 +7537,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pin recording form'**
   String get tripRecordingPinSemanticOff;
+
+  /// Tooltip on the help (?) icon adjacent to the pin button (#1273). Tapping opens a bottom sheet explaining what pin does.
+  ///
+  /// In en, this message translates to:
+  /// **'What does pin do?'**
+  String get tripRecordingPinHelpTooltip;
+
+  /// Title of the bottom sheet explaining the pin button (#1273).
+  ///
+  /// In en, this message translates to:
+  /// **'About pin'**
+  String get tripRecordingPinHelpTitle;
+
+  /// Body text in the bottom sheet explaining the pin button (#1273).
+  ///
+  /// In en, this message translates to:
+  /// **'Pin keeps the screen on and hides system bars so the form stays readable on a dashboard mount. Tap again to release. Auto-releases when the trip stops.'**
+  String get tripRecordingPinHelpBody;
+
+  /// One-time tooltip shown the first time the user backs out of the recording screen while a trip is still recording (#1273). Tells them they can tap the persistent banner to return. Persisted dismissal — never fires twice.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording continues in the background. Tap the red banner at the top of any screen to return.'**
+  String get tripRecordingResumeHintMessage;
 
   /// No description provided for @vinLabel.
   ///
