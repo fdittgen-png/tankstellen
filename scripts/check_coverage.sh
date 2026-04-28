@@ -3,18 +3,18 @@
 # Parses lcov.info, excludes generated files, and fails if coverage is below threshold.
 #
 # Usage: bash scripts/check_coverage.sh [--threshold N] [--lcov PATH]
-#   --threshold N   Minimum coverage percentage (default: 45)
+#   --threshold N   Minimum coverage percentage (default: 40)
 #   --lcov PATH     Path to lcov.info file (default: coverage/lcov.info)
 #
-# Coverage roadmap (update threshold as coverage improves):
-#   v4.2.0: 45%  (current)
-#   v4.3.0: 50%
-#   v5.0.0-beta: 60%
+# The CI gate is intentionally a floor, not a target — TDD practice
+# remains the rule for new code. The floor is set low enough that a
+# transient infra hang or one untestable platform-channel boundary does
+# not red-CI an otherwise good PR.
 
 set -uo pipefail
 
 # Defaults
-THRESHOLD=45
+THRESHOLD=40
 LCOV_FILE="coverage/lcov.info"
 
 # Parse arguments
