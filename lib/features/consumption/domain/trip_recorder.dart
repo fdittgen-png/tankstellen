@@ -77,6 +77,13 @@ class TripSummary {
   /// render a chip on the trip card based on this bit.
   final bool coldStartSurcharge;
 
+  /// Seconds during the trip the engine was in a lower gear than
+  /// optimal — heuristic: in-gear-N when N+1 would let RPM drop below
+  /// `optimalRpmCeiling` (≈ 2200 RPM). Computed from
+  /// `gear_inference.dart` outputs at trip end. Null = no inference
+  /// (no centroids, EV, insufficient samples).
+  final double? secondsBelowOptimalGear;
+
   const TripSummary({
     required this.distanceKm,
     required this.maxRpm,
@@ -90,6 +97,7 @@ class TripSummary {
     this.endedAt,
     this.distanceSource = 'virtual',
     this.coldStartSurcharge = false,
+    this.secondsBelowOptimalGear,
   });
 }
 

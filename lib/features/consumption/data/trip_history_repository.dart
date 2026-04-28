@@ -124,6 +124,13 @@ Map<String, dynamic> _summaryToJson(TripSummary s) => {
       // because every trip carries this and we'd rather not pay six
       // bytes per record. Legacy trips without the key default false.
       'cs': s.coldStartSurcharge,
+      // #1263 phase 2: seconds spent below the optimal gear (gear-
+      // inference coaching metric). Compact key 'sblog' (Seconds
+      // Below Low-Optimal Gear). Omitted when null — most trips on
+      // pre-#1263 builds, EVs, and combustion trips with insufficient
+      // gear-inference data carry no value, so parsimony saves bytes.
+      if (s.secondsBelowOptimalGear != null)
+        'sblog': s.secondsBelowOptimalGear,
     };
 
 TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
@@ -149,6 +156,9 @@ TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
       // cold-start surcharge heuristic landed; default false rather
       // than retroactively flag them.
       coldStartSurcharge: (j['cs'] as bool?) ?? false,
+      // #1263 phase 2: gear-inference coaching metric. Legacy trips
+      // (and EV / no-inference trips) carry no key → null.
+      secondsBelowOptimalGear: (j['sblog'] as num?)?.toDouble(),
     );
 
 /// Hive-backed list of finalised trips (#726).

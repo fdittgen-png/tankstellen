@@ -314,6 +314,61 @@ void main() {
     });
   });
 
+  group('VehicleProfile gear-inference fields (#1263 phase 2)', () {
+    test('default profile carries tireCircumferenceMeters = 1.95 and '
+        'gearCentroids null', () {
+      const v = VehicleProfile(id: 'fresh', name: 'Fresh');
+      expect(v.tireCircumferenceMeters, 1.95);
+      expect(v.gearCentroids, isNull);
+    });
+
+    test('round-trip with custom tireCircumferenceMeters preserves value', () {
+      const original = VehicleProfile(
+        id: 'tyre',
+        name: 'Custom Tyre',
+        tireCircumferenceMeters: 2.05,
+      );
+      final json = original.toJson();
+      final restored = VehicleProfile.fromJson(json);
+      expect(restored.tireCircumferenceMeters, 2.05);
+      expect(restored, equals(original));
+    });
+
+    test('round-trip with populated gearCentroids preserves the list', () {
+      const original = VehicleProfile(
+        id: 'centroids',
+        name: 'WithCentroids',
+        gearCentroids: <double>[12.5, 8.4, 6.1, 4.8, 3.7],
+      );
+      final json = original.toJson();
+      final restored = VehicleProfile.fromJson(json);
+      expect(restored.gearCentroids, [12.5, 8.4, 6.1, 4.8, 3.7]);
+      expect(restored, equals(original));
+    });
+
+    test('round-trip with gearCentroids null preserves null', () {
+      const original = VehicleProfile(id: 'nullc', name: 'NullCentroids');
+      final json = original.toJson();
+      final restored = VehicleProfile.fromJson(json);
+      expect(restored.gearCentroids, isNull);
+    });
+
+    test('legacy JSON without tireCircumferenceMeters / gearCentroids '
+        'deserializes with documented defaults', () {
+      // Pre-#1263 Hive payloads simply omit the new keys. freezed's
+      // `@Default` and nullable factory parameters must surface them
+      // safely rather than throwing during fromJson.
+      final json = <String, dynamic>{
+        'id': 'legacy-1263',
+        'name': 'LegacyProfile',
+        'type': 'combustion',
+      };
+      final restored = VehicleProfile.fromJson(json);
+      expect(restored.tireCircumferenceMeters, 1.95);
+      expect(restored.gearCentroids, isNull);
+    });
+  });
+
   group('ChargingPreferences', () {
     test('defaults match documented values', () {
       const prefs = ChargingPreferences();

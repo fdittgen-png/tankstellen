@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 
 import '../../../../core/storage/hive_boxes.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../domain/services/gear_inference.dart';
 import '../../domain/trip_recorder.dart';
 import '../trip_history_repository.dart';
 import 'adapter_reconnect_scanner.dart';
@@ -440,11 +441,31 @@ class TripRecordingController {
     return _finaliseSummary();
   }
 
+  /// RPM ceiling used by the gear-inference coaching metric (#1263
+  /// phase 2). The "seconds below optimal gear" heuristic counts an
+  /// interval when the next gear up would still keep the engine at or
+  /// above this value — i.e. the current selection is unnecessarily
+  /// low. 2200 RPM matches the issue body's reference point: well
+  /// above the 1500-1800 RPM lugging band on most petrol engines but
+  /// still within the cruise sweet-spot the coaching line targets.
+  /// Hardcoded for phase 2; phase 3+ may promote this to a per-
+  /// vehicle field if the spread between engine families warrants it.
+  static const double _optimalRpmCeiling = 2200.0;
+
   /// Build the trip's final [TripSummary] from the recorder's
   /// in-flight accumulator plus the controller-owned distance
   /// provenance (#800). The recorder still owns distance integration
   /// for live UI reads; the controller overrides at finalisation only
   /// when a real odometer delta beats the virtual estimate.
+  ///
+  /// #1263 phase 2 — when the active vehicle is combustion / hybrid
+  /// AND there are enough captured samples to drive [inferGears], the
+  /// gear-inference metric `secondsBelowOptimalGear` is computed and
+  /// stamped onto the returned summary. EVs (and any vehicle whose
+  /// type resolves to [VehicleType.ev]) bypass the inference entirely
+  /// — no gears, no coaching. Failures inside the pure-logic helpers
+  /// fall back to a null metric rather than throw, so a degenerate
+  /// fixture never derails the trip-stop flow.
   TripSummary _finaliseSummary() {
     final base = _recorder.buildSummary();
     final distanceKm = currentDistanceKm;
@@ -469,6 +490,46 @@ class TripRecordingController {
       startedAt: base.startedAt,
       endedAt: base.endedAt,
       distanceSource: source,
+      secondsBelowOptimalGear: _computeGearCoachingMetric(),
+    );
+  }
+
+  /// Compute the gear-inference coaching metric (#1263 phase 2).
+  ///
+  /// Returns null when:
+  ///  - no vehicle profile is wired (we don't know the tyre size);
+  ///  - the vehicle type is [VehicleType.ev] (no gears to coach);
+  ///  - the captured-samples buffer is empty (no data to cluster);
+  ///  - [inferGears] returns fewer than two centroids (degenerate);
+  ///  - [computeSecondsBelowOptimalGear] reports the heuristic as
+  ///    not computable.
+  ///
+  /// Returns a non-negative double otherwise — seconds during the
+  /// trip where a higher gear would have kept RPM above
+  /// [_optimalRpmCeiling].
+  double? _computeGearCoachingMetric() {
+    final vehicle = _vehicle;
+    if (vehicle == null) return null;
+    // EV bypass — pure-electric drivetrains have no manual / discrete
+    // gears. Hybrids DO have a step-ratio transmission on the
+    // combustion side, so they fall through to the inference path.
+    if (vehicle.type == VehicleType.ev) return null;
+    if (_capturedSamples.isEmpty) return null;
+    final tireC = vehicle.tireCircumferenceMeters;
+    if (tireC <= 0) return null;
+    final result = inferGears(
+      samples: _capturedSamples,
+      tireCircumferenceMeters: tireC,
+      priorCentroids: vehicle.gearCentroids,
+    );
+    if (result.centroids.length < 2) return null;
+    return computeSecondsBelowOptimalGear(
+      gearAssignments: result.samples
+          .map((s) => (timestamp: s.timestamp, gear: s.gear))
+          .toList(growable: false),
+      optimalRpmCeiling: _optimalRpmCeiling,
+      samples: _capturedSamples,
+      centroids: result.centroids,
     );
   }
 
