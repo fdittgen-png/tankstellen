@@ -34,11 +34,18 @@ class TripDetailSample {
   /// null.
   final double? fuelRateLPerHour;
 
+  /// Throttle position % (PID 0x11). Null when the car's PID cache
+  /// flagged 0x11 as unsupported, or when persisted by a build before
+  /// #1261 (legacy trips). Drives the throttle axis of the throttle /
+  /// RPM histogram on the trip-detail screen.
+  final double? throttlePercent;
+
   const TripDetailSample({
     required this.timestamp,
     required this.speedKmh,
     this.rpm,
     this.fuelRateLPerHour,
+    this.throttlePercent,
   });
 }
 

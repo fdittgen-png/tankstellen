@@ -151,6 +151,30 @@ void main() {
       expect(summary.avgLPer100Km, closeTo(10.0, 0.1));
     });
 
+    test('throttlePercent on TripSample is preserved (#1261)', () {
+      // The recorder doesn't aggregate throttle today — but the field
+      // must round-trip through TripSample so the persisted samples
+      // can drive the trip-detail throttle / RPM histogram.
+      final ts = DateTime.utc(2026);
+      final sample = TripSample(
+        timestamp: ts,
+        speedKmh: 60,
+        rpm: 2000,
+        throttlePercent: 42.0,
+      );
+      expect(sample.throttlePercent, 42.0);
+      // And the existing fields still pass through unchanged.
+      expect(sample.speedKmh, 60);
+      expect(sample.rpm, 2000);
+      expect(sample.fuelRateLPerHour, isNull);
+    });
+
+    test('throttlePercent defaults to null when omitted (#1261)', () {
+      final ts = DateTime.utc(2026);
+      final sample = TripSample(timestamp: ts, speedKmh: 50, rpm: 1500);
+      expect(sample.throttlePercent, isNull);
+    });
+
     test('configurable thresholds override the defaults', () {
       final strict = TripRecorder(
         highRpmThreshold: 2500,
