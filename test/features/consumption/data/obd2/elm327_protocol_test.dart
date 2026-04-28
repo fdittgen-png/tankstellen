@@ -102,6 +102,30 @@ void main() {
       });
     });
 
+    group('parseCoolantTempCelsius (PID 05) — #1262', () {
+      test('parses 80 °C (operating temperature) at raw 0x78', () {
+        expect(
+          Elm327Protocol.parseCoolantTempCelsius('41 05 78>'),
+          closeTo(80.0, 0.01),
+        );
+      });
+
+      test('parses -40 °C at raw 0x00 (sensor minimum / cold start)', () {
+        expect(
+          Elm327Protocol.parseCoolantTempCelsius('41 05 00>'),
+          closeTo(-40.0, 0.01),
+        );
+      });
+
+      test('returns null on NO DATA', () {
+        expect(Elm327Protocol.parseCoolantTempCelsius('NO DATA>'), isNull);
+      });
+
+      test('coolantTempCommand asks for PID 05', () {
+        expect(Elm327Protocol.coolantTempCommand, '0105\r');
+      });
+    });
+
     group('parseIntakeAirTempCelsius (PID 0F) — #800 speed-density input', () {
       test('parses -40 °C at raw 0x00 (sensor minimum)', () {
         expect(

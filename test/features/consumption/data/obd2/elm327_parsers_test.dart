@@ -367,6 +367,58 @@ void main() {
     });
   });
 
+  group('parseCoolantTempCelsius (PID 05) — #1262', () {
+    test('41 05 28 -> 0 °C (40 - 40)', () {
+      // Same °C = A − 40 encoding as IAT (PID 0F).
+      expect(
+        Elm327Parsers.parseCoolantTempCelsius('41 05 28'),
+        0.0,
+      );
+    });
+
+    test('41 05 00 -> -40 °C (sensor minimum)', () {
+      expect(
+        Elm327Parsers.parseCoolantTempCelsius('41 05 00'),
+        -40.0,
+      );
+    });
+
+    test('41 05 78 -> 80 °C (typical operating temperature)', () {
+      // 0x78 = 120 → 120 − 40 = 80 °C — the cold-start surcharge
+      // heuristic uses ~80 °C as the "warm" threshold.
+      expect(
+        Elm327Parsers.parseCoolantTempCelsius('41 05 78'),
+        80.0,
+      );
+    });
+
+    test('41 05 FF -> 215 °C (sensor maximum)', () {
+      expect(
+        Elm327Parsers.parseCoolantTempCelsius('41 05 FF'),
+        215.0,
+      );
+    });
+
+    test('wrong PID echo (0F) returns null — PID isolation from IAT', () {
+      // Important: parseCoolantTempCelsius must NOT decode PID 0F (IAT)
+      // even though the formula is identical — otherwise a missing
+      // coolant PID would silently masquerade as IAT data.
+      expect(Elm327Parsers.parseCoolantTempCelsius('41 0F 28'), isNull);
+    });
+
+    test('wrong PID echo (04) returns null', () {
+      expect(Elm327Parsers.parseCoolantTempCelsius('41 04 28'), isNull);
+    });
+
+    test('short response returns null', () {
+      expect(Elm327Parsers.parseCoolantTempCelsius('41 05'), isNull);
+    });
+
+    test('NO DATA returns null', () {
+      expect(Elm327Parsers.parseCoolantTempCelsius('NO DATA'), isNull);
+    });
+  });
+
   group('parseFuelRateLPerHour (PID 5E)', () {
     test('41 5E 00 64 -> 5.0 L/h', () {
       // (0*256 + 100) * 0.05 = 5.0

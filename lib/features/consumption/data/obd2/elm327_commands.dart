@@ -151,6 +151,13 @@ class Elm327Commands {
   /// Request calculated engine load (%). Mode 01, PID 04. (#717)
   static const engineLoadCommand = '0104\r';
 
+  /// Request engine coolant temperature (°C). Mode 01, PID 05.
+  /// Formula: °C = A − 40 (one-byte response). Used by the cold-start
+  /// surcharge heuristic (#1262) to flag short trips where the engine
+  /// never reached operating temperature and consumed proportionally
+  /// more fuel for warm-up than for forward motion.
+  static const coolantTempCommand = '0105\r';
+
   /// Request absolute throttle position (%). Mode 01, PID 11. (#717)
   static const throttlePositionCommand = '0111\r';
 
