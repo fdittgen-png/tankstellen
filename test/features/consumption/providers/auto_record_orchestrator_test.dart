@@ -1,16 +1,19 @@
-import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/auto_record_trace_log.dart';
+import 'package:tankstellen/features/consumption/data/obd2/auto_trip_coordinator.dart';
+import 'package:tankstellen/features/consumption/data/obd2/elm327_protocol.dart';
 import 'package:tankstellen/features/consumption/data/obd2/fake_background_adapter_listener.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/providers/auto_record_orchestrator.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
-/// Tests for the auto-record orchestrator (#1004 phase 2b-2).
+/// Tests for the auto-record orchestrator (#1004 phase 2b-3).
 ///
 /// Drives the orchestrator with:
 ///  - a fake [VehicleProfileList] notifier so the test can imperatively
@@ -19,9 +22,9 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 ///    instances so each coordinator gets its own listener (the orchestrator
 ///    constructs one listener per coordinator on purpose — see the
 ///    "MAC change" test);
-///  - a controllable speed stream factory so threshold logic stays
-///    deterministic without touching Geolocator;
-///  - a fake [TripRecording] notifier counting `startTrip` / `stopAndSaveAutomatic`
+///  - a controllable session-opener factory so threshold logic stays
+///    deterministic without touching real Bluetooth;
+///  - a fake [TripRecording] notifier counting `start` / `stopAndSaveAutomatic`
 ///    calls.
 ///
 /// Each test owns its own [ProviderContainer] and disposes it in the
@@ -46,24 +49,19 @@ class _FakeVehicleProfileList extends VehicleProfileList {
 /// notifier via `ref.read(...notifier)` — a state override would not
 /// intercept those method calls.
 class _FakeTripRecording extends TripRecording {
-  int startTripCalls = 0;
+  int startCalls = 0;
   int stopAndSaveCalls = 0;
-  final List<String?> startTripVehicleIds = <String?>[];
-  final List<String?> startTripAdapterMacs = <String?>[];
+  final List<bool> startAutomaticFlags = <bool>[];
+  final List<Obd2Service> startServices = <Obd2Service>[];
 
   @override
   TripRecordingState build() => const TripRecordingState();
 
   @override
-  Future<StartTripOutcome> startTrip({
-    String? vehicleId,
-    String? adapterMac,
-    Obd2Service? service,
-  }) async {
-    startTripCalls++;
-    startTripVehicleIds.add(vehicleId);
-    startTripAdapterMacs.add(adapterMac);
-    return StartTripOutcome.started;
+  Future<void> start(Obd2Service service, {bool automatic = false}) async {
+    startCalls++;
+    startAutomaticFlags.add(automatic);
+    startServices.add(service);
   }
 
   @override
@@ -112,6 +110,41 @@ class _ListenerHarness {
   }
 }
 
+/// Test-only [Obd2Transport] that returns canned `41 0D <hex>` speed
+/// responses. Mirrors the helper in `auto_trip_coordinator_test` so
+/// the orchestrator-level test can exercise the full provider override
+/// chain without depending on that file.
+class _FakeTransport implements Obd2Transport {
+  final Queue<int?> speedQueue;
+  bool _connected = true;
+
+  _FakeTransport(this.speedQueue);
+
+  @override
+  bool get isConnected => _connected;
+
+  @override
+  Future<void> connect() async {
+    _connected = true;
+  }
+
+  @override
+  Future<void> disconnect() async {
+    _connected = false;
+  }
+
+  @override
+  Future<String> sendCommand(String command) async {
+    if (command == Elm327Protocol.vehicleSpeedCommand) {
+      if (speedQueue.isEmpty) return 'NO DATA';
+      final value = speedQueue.removeFirst();
+      if (value == null) return 'NO DATA';
+      return '41 0D ${value.toRadixString(16).padLeft(2, '0').toUpperCase()}';
+    }
+    return '';
+  }
+}
+
 VehicleProfile _profile({
   required String id,
   bool autoRecord = true,
@@ -132,20 +165,36 @@ VehicleProfile _profile({
 
 void main() {
   late _ListenerHarness harness;
-  late StreamController<double> speed;
   late _FakeTripRecording fakeTripRecording;
+  // Speed-queue per opened MAC. Tests that exercise threshold-cross
+  // pre-populate this with samples; the default empty queue means
+  // `readSpeedKmh` returns null forever (no movement detected).
+  late Map<String, Queue<int?>> speedByMac;
+  // Services the harness handed out, keyed by MAC. Lets tests assert
+  // identity between the opened service and the one passed to
+  // [TripRecording.start].
+  late Map<String, Obd2Service> servicesByMac;
 
   setUp(() {
     AutoRecordTraceLog.clear();
     harness = _ListenerHarness();
-    speed = StreamController<double>.broadcast();
     fakeTripRecording = _FakeTripRecording();
+    speedByMac = <String, Queue<int?>>{};
+    servicesByMac = <String, Obd2Service>{};
   });
 
   tearDown(() async {
-    await speed.close();
     await harness.disposeAll();
   });
+
+  Obd2SessionOpener fakeOpener() {
+    return (String mac) async {
+      final queue = speedByMac.putIfAbsent(mac, () => Queue<int?>());
+      final service = Obd2Service(_FakeTransport(queue));
+      servicesByMac[mac] = service;
+      return service;
+    };
+  }
 
   ProviderContainer makeContainer({
     required _FakeVehicleProfileList vehicleList,
@@ -155,9 +204,7 @@ void main() {
         vehicleProfileListProvider.overrideWith(() => vehicleList),
         tripRecordingProvider.overrideWith(() => fakeTripRecording),
         autoRecordListenerFactoryProvider.overrideWithValue(harness.factory()),
-        autoRecordSpeedStreamFactoryProvider.overrideWithValue(
-          () => speed.stream,
-        ),
+        autoRecordSessionOpenerFactoryProvider.overrideWithValue(fakeOpener()),
       ],
     );
   }
@@ -351,13 +398,16 @@ void main() {
   });
 
   test(
-      'connect + supra-threshold speed stream forwards startTrip with vehicleId and adapterMac',
+      'connect + supra-threshold OBD2 speed → start(service, automatic: true)',
       () async {
+    const targetMac = 'AA:BB:CC:DD:EE:FF';
+    speedByMac[targetMac] = Queue<int?>.of(<int?>[20, 25, 30, 40, 50, 60]);
+
     final list = _FakeVehicleProfileList(
       [
         _profile(
           id: 'v1',
-          mac: 'AA:BB:CC:DD:EE:FF',
+          mac: targetMac,
           thresholdKmh: 5.0,
         ),
       ],
@@ -368,19 +418,28 @@ void main() {
     container.read(autoRecordOrchestratorProvider);
     await Future<void>.delayed(Duration.zero);
 
-    final listener = harness.listenerArmedFor('AA:BB:CC:DD:EE:FF')!;
-    listener.emitConnected('AA:BB:CC:DD:EE:FF');
-    await Future<void>.delayed(Duration.zero);
+    final listener = harness.listenerArmedFor(targetMac)!;
+    listener.emitConnected(targetMac);
+    // The opener resolves async; speed stream polls at 1 s by default
+    // in production, but the orchestrator-level test uses the
+    // production cadence — so this test waits a generous interval to
+    // allow at least three reads. Trade-off: keeps the orchestrator
+    // wiring honest at the cost of ~3 s wall-clock per assertion. The
+    // poll period is the only knob we don't override, so this is the
+    // shortest deterministic wait that still exercises the real code
+    // path.
+    await Future<void>.delayed(const Duration(milliseconds: 3500));
 
-    speed.add(20);
-    speed.add(25);
-    speed.add(30);
-    await Future<void>.delayed(Duration.zero);
-    // Allow the unawaited startTrip call to land.
-    await Future<void>.delayed(Duration.zero);
-
-    expect(fakeTripRecording.startTripCalls, 1);
-    expect(fakeTripRecording.startTripVehicleIds, ['v1']);
-    expect(fakeTripRecording.startTripAdapterMacs, ['AA:BB:CC:DD:EE:FF']);
-  });
+    expect(fakeTripRecording.startCalls, 1,
+        reason: '3 supra-threshold OBD2 reads must trigger one start()');
+    expect(fakeTripRecording.startAutomaticFlags, [true],
+        reason: 'auto-record start must tag the trip as automatic');
+    expect(fakeTripRecording.startServices, hasLength(1));
+    expect(
+      identical(fakeTripRecording.startServices.first, servicesByMac[targetMac]),
+      isTrue,
+      reason: 'the orchestrator must hand the SAME service the opener '
+          'returned — ownership transfer, not copy',
+    );
+  }, timeout: const Timeout(Duration(seconds: 15)));
 }

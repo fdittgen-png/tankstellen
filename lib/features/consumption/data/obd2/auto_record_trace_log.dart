@@ -69,6 +69,24 @@ enum AutoRecordEventKind {
   /// message.
   tripSaveFailed,
 
+  /// `Obd2SessionOpener` returned null or threw on `AdapterConnected`
+  /// (#1004 phase 2b-3). The coordinator stays idle for this connect
+  /// cycle and waits for the next event.
+  sessionOpenFailed,
+
+  /// On threshold-cross, the coordinator passed ownership of its open
+  /// [Obd2Service] to `TripRecording.start(service)` (#1004 phase
+  /// 2b-3). After this entry the recorder owns the OBD2 session and
+  /// the coordinator no longer polls speed for the active trip.
+  sessionHandedOff,
+
+  /// `Obd2Service.readSpeedKmh()` returned null repeatedly while the
+  /// OBD2 speed stream was polling (#1004 phase 2b-3). Logged once per
+  /// N consecutive failures so the user can tell a flaky link from
+  /// "engine off" silence. Detail carries the consecutive-failure
+  /// count.
+  obd2SpeedReadFailed,
+
   /// Generic catch — detail carries a free-form message. Used
   /// sparingly so the enum stays the contract.
   error,

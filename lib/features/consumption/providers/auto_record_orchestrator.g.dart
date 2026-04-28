@@ -8,15 +8,17 @@ part of 'auto_record_orchestrator.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Production wiring for the hands-free auto-record flow (#1004 phase 2b-2).
+/// Production wiring for the hands-free auto-record flow (#1004 phase 2b-3).
 ///
 /// Sits between [vehicleProfileListProvider] and the per-vehicle
 /// [AutoTripCoordinator]: watches the vehicle list for changes and
 /// keeps a long-lived coordinator alive for every profile that has
 /// `autoRecord: true` AND a non-null `pairedAdapterMac`. The
 /// coordinator(s) in turn observe the native Android foreground service
-/// (phase 2b-1) and bridge into [TripRecording] when movement is
-/// detected.
+/// (phase 2b-1), open an OBD2 session on `AdapterConnected` (phase
+/// 2b-3), poll PID 0x0D for speed, and hand the live session to
+/// [TripRecording.start] when movement is detected — closing the loop
+/// the phase 2b-2 GPS source had left as a `needsPicker` outcome.
 ///
 /// ## Lifecycle invariants
 ///
@@ -48,30 +50,30 @@ part of 'auto_record_orchestrator.dart';
 /// [FakeBackgroundAdapterListener]; the same hook lets a future
 /// platform implementation slot in without touching this file.
 ///
-/// ## Speed-stream source
+/// ## Speed-stream source (#1004 phase 2b-3)
 ///
-/// Phase 2b-2 ships GPS-only: each coordinator wraps
-/// [Geolocator.getPositionStream] and converts m/s → km/h. This is
-/// intentional — opening an OBD2 session inline (PID 0x0D) on every
-/// `AdapterConnected` event would conflict with the manual flow's
-/// existing `Obd2ConnectionService.takeover` semantics. Phase 2b-3 will
-/// switch to OBD2 PID 0x0D once the on-connect session-handoff design
-/// is settled. The GPS source is good enough to detect "the car
-/// started moving"; we are not measuring instantaneous speed for
-/// telemetry here.
+/// Each coordinator opens an [Obd2Service] on `AdapterConnected` via
+/// [autoRecordSessionOpenerFactoryProvider], wraps it in an
+/// `Obd2SpeedStream` that polls PID 0x0D at 1 Hz, and hands ownership
+/// of the live session to [TripRecording.start] on threshold-cross.
+/// Tests override the factory provider to inject a fake opener that
+/// returns a stub service whose `readSpeedKmh()` is wired to a
+/// pre-defined queue.
 
 @ProviderFor(AutoRecordOrchestrator)
 final autoRecordOrchestratorProvider = AutoRecordOrchestratorProvider._();
 
-/// Production wiring for the hands-free auto-record flow (#1004 phase 2b-2).
+/// Production wiring for the hands-free auto-record flow (#1004 phase 2b-3).
 ///
 /// Sits between [vehicleProfileListProvider] and the per-vehicle
 /// [AutoTripCoordinator]: watches the vehicle list for changes and
 /// keeps a long-lived coordinator alive for every profile that has
 /// `autoRecord: true` AND a non-null `pairedAdapterMac`. The
 /// coordinator(s) in turn observe the native Android foreground service
-/// (phase 2b-1) and bridge into [TripRecording] when movement is
-/// detected.
+/// (phase 2b-1), open an OBD2 session on `AdapterConnected` (phase
+/// 2b-3), poll PID 0x0D for speed, and hand the live session to
+/// [TripRecording.start] when movement is detected — closing the loop
+/// the phase 2b-2 GPS source had left as a `needsPicker` outcome.
 ///
 /// ## Lifecycle invariants
 ///
@@ -103,28 +105,28 @@ final autoRecordOrchestratorProvider = AutoRecordOrchestratorProvider._();
 /// [FakeBackgroundAdapterListener]; the same hook lets a future
 /// platform implementation slot in without touching this file.
 ///
-/// ## Speed-stream source
+/// ## Speed-stream source (#1004 phase 2b-3)
 ///
-/// Phase 2b-2 ships GPS-only: each coordinator wraps
-/// [Geolocator.getPositionStream] and converts m/s → km/h. This is
-/// intentional — opening an OBD2 session inline (PID 0x0D) on every
-/// `AdapterConnected` event would conflict with the manual flow's
-/// existing `Obd2ConnectionService.takeover` semantics. Phase 2b-3 will
-/// switch to OBD2 PID 0x0D once the on-connect session-handoff design
-/// is settled. The GPS source is good enough to detect "the car
-/// started moving"; we are not measuring instantaneous speed for
-/// telemetry here.
+/// Each coordinator opens an [Obd2Service] on `AdapterConnected` via
+/// [autoRecordSessionOpenerFactoryProvider], wraps it in an
+/// `Obd2SpeedStream` that polls PID 0x0D at 1 Hz, and hands ownership
+/// of the live session to [TripRecording.start] on threshold-cross.
+/// Tests override the factory provider to inject a fake opener that
+/// returns a stub service whose `readSpeedKmh()` is wired to a
+/// pre-defined queue.
 final class AutoRecordOrchestratorProvider
     extends $NotifierProvider<AutoRecordOrchestrator, void> {
-  /// Production wiring for the hands-free auto-record flow (#1004 phase 2b-2).
+  /// Production wiring for the hands-free auto-record flow (#1004 phase 2b-3).
   ///
   /// Sits between [vehicleProfileListProvider] and the per-vehicle
   /// [AutoTripCoordinator]: watches the vehicle list for changes and
   /// keeps a long-lived coordinator alive for every profile that has
   /// `autoRecord: true` AND a non-null `pairedAdapterMac`. The
   /// coordinator(s) in turn observe the native Android foreground service
-  /// (phase 2b-1) and bridge into [TripRecording] when movement is
-  /// detected.
+  /// (phase 2b-1), open an OBD2 session on `AdapterConnected` (phase
+  /// 2b-3), poll PID 0x0D for speed, and hand the live session to
+  /// [TripRecording.start] when movement is detected — closing the loop
+  /// the phase 2b-2 GPS source had left as a `needsPicker` outcome.
   ///
   /// ## Lifecycle invariants
   ///
@@ -156,17 +158,15 @@ final class AutoRecordOrchestratorProvider
   /// [FakeBackgroundAdapterListener]; the same hook lets a future
   /// platform implementation slot in without touching this file.
   ///
-  /// ## Speed-stream source
+  /// ## Speed-stream source (#1004 phase 2b-3)
   ///
-  /// Phase 2b-2 ships GPS-only: each coordinator wraps
-  /// [Geolocator.getPositionStream] and converts m/s → km/h. This is
-  /// intentional — opening an OBD2 session inline (PID 0x0D) on every
-  /// `AdapterConnected` event would conflict with the manual flow's
-  /// existing `Obd2ConnectionService.takeover` semantics. Phase 2b-3 will
-  /// switch to OBD2 PID 0x0D once the on-connect session-handoff design
-  /// is settled. The GPS source is good enough to detect "the car
-  /// started moving"; we are not measuring instantaneous speed for
-  /// telemetry here.
+  /// Each coordinator opens an [Obd2Service] on `AdapterConnected` via
+  /// [autoRecordSessionOpenerFactoryProvider], wraps it in an
+  /// `Obd2SpeedStream` that polls PID 0x0D at 1 Hz, and hands ownership
+  /// of the live session to [TripRecording.start] on threshold-cross.
+  /// Tests override the factory provider to inject a fake opener that
+  /// returns a stub service whose `readSpeedKmh()` is wired to a
+  /// pre-defined queue.
   AutoRecordOrchestratorProvider._()
     : super(
         from: null,
@@ -195,17 +195,19 @@ final class AutoRecordOrchestratorProvider
 }
 
 String _$autoRecordOrchestratorHash() =>
-    r'9d2c1df4b54a3c7f408be77fe74891266f82f18e';
+    r'f296b5a2fd060757a8da3149a5464553afadb2ca';
 
-/// Production wiring for the hands-free auto-record flow (#1004 phase 2b-2).
+/// Production wiring for the hands-free auto-record flow (#1004 phase 2b-3).
 ///
 /// Sits between [vehicleProfileListProvider] and the per-vehicle
 /// [AutoTripCoordinator]: watches the vehicle list for changes and
 /// keeps a long-lived coordinator alive for every profile that has
 /// `autoRecord: true` AND a non-null `pairedAdapterMac`. The
 /// coordinator(s) in turn observe the native Android foreground service
-/// (phase 2b-1) and bridge into [TripRecording] when movement is
-/// detected.
+/// (phase 2b-1), open an OBD2 session on `AdapterConnected` (phase
+/// 2b-3), poll PID 0x0D for speed, and hand the live session to
+/// [TripRecording.start] when movement is detected — closing the loop
+/// the phase 2b-2 GPS source had left as a `needsPicker` outcome.
 ///
 /// ## Lifecycle invariants
 ///
@@ -237,17 +239,15 @@ String _$autoRecordOrchestratorHash() =>
 /// [FakeBackgroundAdapterListener]; the same hook lets a future
 /// platform implementation slot in without touching this file.
 ///
-/// ## Speed-stream source
+/// ## Speed-stream source (#1004 phase 2b-3)
 ///
-/// Phase 2b-2 ships GPS-only: each coordinator wraps
-/// [Geolocator.getPositionStream] and converts m/s → km/h. This is
-/// intentional — opening an OBD2 session inline (PID 0x0D) on every
-/// `AdapterConnected` event would conflict with the manual flow's
-/// existing `Obd2ConnectionService.takeover` semantics. Phase 2b-3 will
-/// switch to OBD2 PID 0x0D once the on-connect session-handoff design
-/// is settled. The GPS source is good enough to detect "the car
-/// started moving"; we are not measuring instantaneous speed for
-/// telemetry here.
+/// Each coordinator opens an [Obd2Service] on `AdapterConnected` via
+/// [autoRecordSessionOpenerFactoryProvider], wraps it in an
+/// `Obd2SpeedStream` that polls PID 0x0D at 1 Hz, and hands ownership
+/// of the live session to [TripRecording.start] on threshold-cross.
+/// Tests override the factory provider to inject a fake opener that
+/// returns a stub service whose `readSpeedKmh()` is wired to a
+/// pre-defined queue.
 
 abstract class _$AutoRecordOrchestrator extends $Notifier<void> {
   void build();
@@ -331,51 +331,71 @@ final class AutoRecordListenerFactoryProvider
 String _$autoRecordListenerFactoryHash() =>
     r'3ac9db8a2ce1a0919d0fb75fc9b9906b736d40af';
 
-@ProviderFor(autoRecordSpeedStreamFactory)
-final autoRecordSpeedStreamFactoryProvider =
-    AutoRecordSpeedStreamFactoryProvider._();
+/// Default opener: opens a fresh [Obd2Service] for the configured MAC
+/// via [Obd2ConnectionService.connectByMac] (#1004 phase 2b-3).
+/// Returns null when the adapter is out of range or the scan times
+/// out — the coordinator stays idle for that connect cycle and waits
+/// for the next `AdapterConnected`. Tests override this provider to
+/// inject a fake opener that returns a stub service.
 
-final class AutoRecordSpeedStreamFactoryProvider
+@ProviderFor(autoRecordSessionOpenerFactory)
+final autoRecordSessionOpenerFactoryProvider =
+    AutoRecordSessionOpenerFactoryProvider._();
+
+/// Default opener: opens a fresh [Obd2Service] for the configured MAC
+/// via [Obd2ConnectionService.connectByMac] (#1004 phase 2b-3).
+/// Returns null when the adapter is out of range or the scan times
+/// out — the coordinator stays idle for that connect cycle and waits
+/// for the next `AdapterConnected`. Tests override this provider to
+/// inject a fake opener that returns a stub service.
+
+final class AutoRecordSessionOpenerFactoryProvider
     extends
         $FunctionalProvider<
-          SpeedStreamFactory,
-          SpeedStreamFactory,
-          SpeedStreamFactory
+          Obd2SessionOpener,
+          Obd2SessionOpener,
+          Obd2SessionOpener
         >
-    with $Provider<SpeedStreamFactory> {
-  AutoRecordSpeedStreamFactoryProvider._()
+    with $Provider<Obd2SessionOpener> {
+  /// Default opener: opens a fresh [Obd2Service] for the configured MAC
+  /// via [Obd2ConnectionService.connectByMac] (#1004 phase 2b-3).
+  /// Returns null when the adapter is out of range or the scan times
+  /// out — the coordinator stays idle for that connect cycle and waits
+  /// for the next `AdapterConnected`. Tests override this provider to
+  /// inject a fake opener that returns a stub service.
+  AutoRecordSessionOpenerFactoryProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'autoRecordSpeedStreamFactoryProvider',
+        name: r'autoRecordSessionOpenerFactoryProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$autoRecordSpeedStreamFactoryHash();
+  String debugGetCreateSourceHash() => _$autoRecordSessionOpenerFactoryHash();
 
   @$internal
   @override
-  $ProviderElement<SpeedStreamFactory> $createElement(
+  $ProviderElement<Obd2SessionOpener> $createElement(
     $ProviderPointer pointer,
   ) => $ProviderElement(pointer);
 
   @override
-  SpeedStreamFactory create(Ref ref) {
-    return autoRecordSpeedStreamFactory(ref);
+  Obd2SessionOpener create(Ref ref) {
+    return autoRecordSessionOpenerFactory(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(SpeedStreamFactory value) {
+  Override overrideWithValue(Obd2SessionOpener value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<SpeedStreamFactory>(value),
+      providerOverride: $SyncValueProvider<Obd2SessionOpener>(value),
     );
   }
 }
 
-String _$autoRecordSpeedStreamFactoryHash() =>
-    r'b829693bb5405b843f8cff4d2fc2b81ee065d24e';
+String _$autoRecordSessionOpenerFactoryHash() =>
+    r'bb6af1c2c633c61722cb5329e5ea038cb7c0e33f';

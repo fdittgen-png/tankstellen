@@ -1,14 +1,111 @@
-import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/consumption/data/obd2/auto_record_trace_log.dart';
 import 'package:tankstellen/features/consumption/data/obd2/auto_trip_coordinator.dart';
+import 'package:tankstellen/features/consumption/data/obd2/elm327_protocol.dart';
 import 'package:tankstellen/features/consumption/data/obd2/fake_background_adapter_listener.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_speed_stream.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 
-/// Coordinator state-machine tests for #1004 phase 2a. Drives the
-/// scaffolding from synthetic adapter events + a stream-controlled
-/// speed source so the assertions stay deterministic without a real
-/// BLE stack or OBD2 transport.
+/// Coordinator state-machine tests for #1004 phase 2b-3. Drives the
+/// coordinator with synthetic adapter events, an injected fake OBD2
+/// session, and a queue-backed speed stream so the assertions stay
+/// deterministic without a real BLE stack or OBD2 transport.
+///
+/// The phase 2b-3 swap moved the speed source from a constructor-
+/// injected `Stream<double>` to an `Obd2SessionOpener` callback that
+/// hands back an `Obd2Service` on `AdapterConnected`. The tests below
+/// inject a fake opener that returns a fake service whose
+/// `readSpeedKmh()` is wired to a queue.
+
+/// Test-only [Obd2Transport] that returns canned speed values from a
+/// queue. The coordinator's [Obd2SpeedStream] only calls
+/// `readSpeedKmh`, which itself only sends `Elm327Protocol.vehicleSpeedCommand`
+/// — so we map that command to the next item in the queue and
+/// otherwise return an empty string.
+class _FakeTransport implements Obd2Transport {
+  final Queue<int?> speedQueue;
+  bool _connected = true;
+  int disconnectCalls = 0;
+
+  _FakeTransport(this.speedQueue);
+
+  @override
+  bool get isConnected => _connected;
+
+  @override
+  Future<void> connect() async {
+    _connected = true;
+  }
+
+  @override
+  Future<void> disconnect() async {
+    _connected = false;
+    disconnectCalls++;
+  }
+
+  @override
+  Future<String> sendCommand(String command) async {
+    if (command == Elm327Protocol.vehicleSpeedCommand) {
+      if (speedQueue.isEmpty) return 'NO DATA';
+      final value = speedQueue.removeFirst();
+      if (value == null) return 'NO DATA';
+      // Encode as a Mode 01 PID 0D response: "41 0D <hex>".
+      return '41 0D ${value.toRadixString(16).padLeft(2, '0').toUpperCase()}';
+    }
+    return '';
+  }
+}
+
+/// Bookkeeping for the injected session opener — captures the MAC each
+/// `AdapterConnected` opens against, the services returned, and lets a
+/// test fail or queue different responses per call.
+class _SessionOpenerHarness {
+  /// One queued response per planned `_open` call. Each entry is
+  /// either the service to return, `null` to simulate "scan timed
+  /// out, no usable adapter," or `_OpenerError` to simulate a throw.
+  final Queue<Object?> queue = Queue<Object?>();
+  final List<String> openedFor = <String>[];
+  int callCount = 0;
+
+  Obd2SessionOpener opener() {
+    return (String mac) async {
+      callCount++;
+      openedFor.add(mac);
+      if (queue.isEmpty) return null;
+      final next = queue.removeFirst();
+      if (next is _OpenerError) throw next.cause;
+      return next as Obd2Service?;
+    };
+  }
+}
+
+class _OpenerError {
+  final Object cause;
+  _OpenerError(this.cause);
+}
+
+/// In-memory [TraceRecorder] used to drain `errorLogger.log` calls
+/// during failure-path tests. We don't assert on the captured records
+/// — we just stop the global logger from reaching Hive.
+class _FakeTraceRecorder implements TraceRecorder {
+  @override
+  Future<void> record(
+    Object error,
+    StackTrace stackTrace, {
+    ServiceChainSnapshot? serviceChainState,
+  }) async {}
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      super.noSuchMethod(invocation);
+}
+
 void main() {
   // The default disconnect-save delay in production is 60 s; tests
   // shrink it to 50 ms so the timer fires inside `pumpEventQueue`
@@ -16,28 +113,50 @@ void main() {
   const String mac = 'AA:BB:CC:DD:EE:FF';
   const String otherMac = 'FF:EE:DD:CC:BB:AA';
   const Duration shortDelay = Duration(milliseconds: 50);
+  const Duration shortPoll = Duration(milliseconds: 5);
 
   late FakeBackgroundAdapterListener listener;
-  late StreamController<double> speed;
+  late _SessionOpenerHarness opener;
   late int startTripCalls;
   late int stopAndSaveCalls;
+  late List<Obd2Service> handedOffServices;
   late AutoTripCoordinator coordinator;
+
+  /// Build a fake [Obd2Service] whose `readSpeedKmh` reads from
+  /// [speeds]. Each entry is either an int (returned as-is) or null
+  /// (treated as a missed read by the speed stream).
+  ({Obd2Service service, _FakeTransport transport}) buildFakeService(
+    List<int?> speeds,
+  ) {
+    final transport = _FakeTransport(Queue<int?>.of(speeds));
+    final service = Obd2Service(transport);
+    return (service: service, transport: transport);
+  }
 
   AutoTripCoordinator buildCoordinator({
     int consecutive = 3,
     Duration delay = shortDelay,
     double threshold = 5.0,
+    Obd2SessionOpener? customOpener,
   }) {
     return AutoTripCoordinator(
       listener: listener,
-      startTrip: () async {
+      startTrip: (Obd2Service service) async {
         startTripCalls++;
+        handedOffServices.add(service);
         return null;
       },
       stopAndSaveAutomatic: () async {
         stopAndSaveCalls++;
       },
-      speedStream: speed.stream,
+      sessionOpener: customOpener ?? opener.opener(),
+      speedStreamFactory: (Obd2Service service, {String? mac}) {
+        return Obd2SpeedStream(
+          service,
+          mac: mac,
+          pollPeriod: shortPoll,
+        );
+      },
       config: AutoRecordConfig(
         mac: mac,
         movementStartThresholdKmh: threshold,
@@ -49,79 +168,85 @@ void main() {
 
   setUp(() {
     AutoRecordTraceLog.clear();
+    // Wire the global errorLogger to an in-memory recorder so failure
+    // paths don't try to spool through Hive (which is not initialized
+    // in plain unit-test mode). Same pattern used by
+    // `obd2_vin_reader_test.dart` for error-throwing assertions.
+    errorLogger.resetForTest();
+    errorLogger.testRecorderOverride = _FakeTraceRecorder();
     listener = FakeBackgroundAdapterListener();
-    speed = StreamController<double>.broadcast();
+    opener = _SessionOpenerHarness();
     startTripCalls = 0;
     stopAndSaveCalls = 0;
-    coordinator = buildCoordinator();
+    handedOffServices = <Obd2Service>[];
   });
 
   tearDown(() async {
     await coordinator.stop();
-    await speed.close();
     await listener.dispose();
+    errorLogger.resetForTest();
   });
+
+  /// Pumps the microtask queue until the speed stream has had a
+  /// chance to emit at least [count] samples. The polling timer fires
+  /// at [shortPoll]; we sleep [shortPoll] × [count] × 2 to add
+  /// headroom for the awaits inside `_tick`.
+  Future<void> pumpSpeedTicks(int count) async {
+    await Future<void>.delayed(shortPoll * (count * 2 + 1));
+  }
 
   test('3 consecutive supra-threshold samples trigger startTrip exactly once',
       () async {
+    final fake = buildFakeService([20, 25, 30, 40, 45, 50]);
+    opener.queue.add(fake.service);
+    coordinator = buildCoordinator();
+
     await coordinator.start();
     listener.emitConnected(mac);
-    // Allow the coordinator's listener subscription to wire through
-    // the broadcast queue before we push speed samples.
-    await Future<void>.delayed(Duration.zero);
-
-    // Push 3 samples > threshold; coordinator should fire startTrip.
-    speed.add(20);
-    speed.add(25);
-    speed.add(30);
-    await Future<void>.delayed(Duration.zero);
+    // Wait long enough for the opener to resolve and the speed stream
+    // to deliver three reads.
+    await pumpSpeedTicks(4);
 
     expect(startTripCalls, 1,
         reason: '3 consecutive supra-threshold samples must trigger '
             'startTrip exactly once');
-
-    // Pushing more samples while the trip is active does not fire
-    // again — the coordinator gates on `_tripActive`.
-    speed.add(40);
-    speed.add(45);
-    speed.add(50);
-    await Future<void>.delayed(Duration.zero);
-
-    expect(startTripCalls, 1,
-        reason: 'startTrip is idempotent within a single connect '
-            'cycle — extra samples should not double-fire');
+    expect(handedOffServices, hasLength(1),
+        reason: 'startTrip must receive the live OBD2 service');
+    expect(identical(handedOffServices.first, fake.service), isTrue,
+        reason: 'the coordinator must hand off the SAME service it opened');
 
     // Trace assertions: the ring should have recorded coordinatorStarted,
     // adapterConnected, three supra-threshold samples, thresholdCrossed,
-    // and finally tripStarted in that order.
+    // sessionHandedOff, and finally tripStarted in that order.
     final List<AutoRecordEventKind> kinds =
         AutoRecordTraceLog.snapshot().map((e) => e.kind).toList();
     expect(kinds.first, AutoRecordEventKind.coordinatorStarted);
     expect(kinds.contains(AutoRecordEventKind.adapterConnected), isTrue);
     expect(
-      kinds.where((k) => k == AutoRecordEventKind.speedSampleSupraThreshold)
+      kinds
+          .where((k) => k == AutoRecordEventKind.speedSampleSupraThreshold)
           .length,
-      3,
+      greaterThanOrEqualTo(3),
       reason: 'three supra-threshold samples must each emit a trace entry',
     );
     final int crossedAt = kinds.indexOf(AutoRecordEventKind.thresholdCrossed);
+    final int handedAt = kinds.indexOf(AutoRecordEventKind.sessionHandedOff);
     final int startedAt = kinds.indexOf(AutoRecordEventKind.tripStarted);
     expect(crossedAt, greaterThan(0));
-    expect(startedAt, greaterThan(crossedAt),
-        reason: 'thresholdCrossed must be emitted before tripStarted');
+    expect(handedAt, greaterThan(crossedAt),
+        reason: 'sessionHandedOff must be emitted after thresholdCrossed');
+    expect(startedAt, greaterThan(handedAt),
+        reason: 'tripStarted must be emitted after sessionHandedOff');
   });
 
   test('sub-threshold samples never reach the consecutive window', () async {
+    final fake = buildFakeService([2, 1, 3, 0, 1]);
+    opener.queue.add(fake.service);
+    coordinator = buildCoordinator();
+
     await coordinator.start();
     listener.emitConnected(mac);
-    await Future<void>.delayed(Duration.zero);
-
-    // Five sub-threshold samples — well past the consecutive window
-    // count, but each one resets the counter.
-    for (int i = 0; i < 5; i++) {
-      speed.add(2.0);
-    }
-    await Future<void>.delayed(Duration.zero);
+    await pumpSpeedTicks(6);
 
     expect(startTripCalls, 0,
         reason: 'sub-threshold samples must never trigger startTrip');
@@ -129,9 +254,10 @@ void main() {
     final List<AutoRecordEventKind> kinds =
         AutoRecordTraceLog.snapshot().map((e) => e.kind).toList();
     expect(
-      kinds.where((k) => k == AutoRecordEventKind.speedSampleSubThreshold)
+      kinds
+          .where((k) => k == AutoRecordEventKind.speedSampleSubThreshold)
           .length,
-      5,
+      greaterThanOrEqualTo(5),
       reason: 'each sub-threshold sample must emit a trace entry',
     );
     expect(kinds.contains(AutoRecordEventKind.thresholdCrossed), isFalse);
@@ -139,19 +265,13 @@ void main() {
   });
 
   test('fluctuating samples do not satisfy the consecutive window', () async {
+    final fake = buildFakeService([10, 15, 0, 20, 2, 25]);
+    opener.queue.add(fake.service);
+    coordinator = buildCoordinator();
+
     await coordinator.start();
     listener.emitConnected(mac);
-    await Future<void>.delayed(Duration.zero);
-
-    // Pattern: above, above, below — counter must reset on the third
-    // sample so the window is never satisfied.
-    speed.add(10);
-    speed.add(15);
-    speed.add(0);
-    speed.add(20);
-    speed.add(2);
-    speed.add(25);
-    await Future<void>.delayed(Duration.zero);
+    await pumpSpeedTicks(7);
 
     expect(startTripCalls, 0,
         reason: 'A sub-threshold sample in the middle of a run must '
@@ -160,24 +280,25 @@ void main() {
 
   test('disconnect arms timer; reconnect within window cancels save',
       () async {
+    final fakeOne = buildFakeService([20, 25, 30]);
+    final fakeTwo = buildFakeService(<int?>[]);
+    opener.queue.addAll(<Object?>[fakeOne.service, fakeTwo.service]);
+    coordinator = buildCoordinator();
+
     await coordinator.start();
     listener.emitConnected(mac);
-    await Future<void>.delayed(Duration.zero);
-    speed.add(20);
-    speed.add(25);
-    speed.add(30);
-    await Future<void>.delayed(Duration.zero);
+    await pumpSpeedTicks(4);
     expect(startTripCalls, 1);
 
     listener.emitDisconnected(mac);
-    // Broadcast streams deliver asynchronously — flush the microtask
-    // queue so the coordinator's _onAdapterEvent has run before we
-    // peek at the timer state.
+    // Allow the disconnect handler to run.
     await Future<void>.delayed(Duration.zero);
     expect(coordinator.hasPendingDisconnectTimer, isTrue,
         reason: 'disconnect must arm the debounce timer');
 
-    // Reconnect well within the window.
+    // Reconnect well within the window. Trip is active so the
+    // coordinator should NOT re-open a session — it leaves session
+    // ownership with the recorder.
     listener.emitConnected(mac);
     await Future<void>.delayed(Duration.zero);
     expect(coordinator.hasPendingDisconnectTimer, isFalse,
@@ -210,13 +331,13 @@ void main() {
   });
 
   test('disconnect timer fires → stopAndSaveAutomatic called once', () async {
+    final fake = buildFakeService([20, 25, 30]);
+    opener.queue.add(fake.service);
+    coordinator = buildCoordinator();
+
     await coordinator.start();
     listener.emitConnected(mac);
-    await Future<void>.delayed(Duration.zero);
-    speed.add(20);
-    speed.add(25);
-    speed.add(30);
-    await Future<void>.delayed(Duration.zero);
+    await pumpSpeedTicks(4);
     expect(startTripCalls, 1);
 
     listener.emitDisconnected(mac);
@@ -228,7 +349,8 @@ void main() {
 
     final List<AutoRecordEventKind> kinds =
         AutoRecordTraceLog.snapshot().map((e) => e.kind).toList();
-    final int firedAt = kinds.indexOf(AutoRecordEventKind.disconnectTimerFired);
+    final int firedAt =
+        kinds.indexOf(AutoRecordEventKind.disconnectTimerFired);
     final int savedAt = kinds.indexOf(AutoRecordEventKind.tripSavedAuto);
     expect(firedAt, greaterThan(-1),
         reason: 'timer fire must record disconnectTimerFired');
@@ -236,27 +358,44 @@ void main() {
         reason: 'tripSavedAuto must follow disconnectTimerFired');
   });
 
-  test('disconnect with no active trip → timer fires but no save', () async {
+  test('disconnect with no active trip → orphan session is closed', () async {
+    final fake = buildFakeService(<int?>[]);
+    opener.queue.add(fake.service);
+    coordinator = buildCoordinator();
+
     await coordinator.start();
     listener.emitConnected(mac);
-    await Future<void>.delayed(Duration.zero);
-    // No speed samples — startTrip never fires.
-    listener.emitDisconnected(mac);
-    await Future<void>.delayed(shortDelay * 3);
+    // Allow the opener to resolve so the coordinator holds a session.
+    await pumpSpeedTicks(2);
+    expect(coordinator.hasOpenSession, isTrue,
+        reason: 'opener returns a service — the coordinator must hold it');
 
+    // Disconnect with no trip active → orphan session must be closed,
+    // not handed off.
+    listener.emitDisconnected(mac);
+    await Future<void>.delayed(Duration.zero);
+    expect(coordinator.hasOpenSession, isFalse,
+        reason: 'disconnect with no trip active must close the orphan '
+            'session');
+    expect(fake.transport.disconnectCalls, greaterThanOrEqualTo(1),
+        reason: 'the coordinator must call service.disconnect() to close '
+            'the orphan session');
+
+    await Future<void>.delayed(shortDelay * 3);
     expect(startTripCalls, 0);
     expect(stopAndSaveCalls, 0,
         reason: 'no trip was active — nothing to save');
   });
 
   test('events for a different MAC are ignored', () async {
+    coordinator = buildCoordinator();
     await coordinator.start();
     listener.emitConnected(otherMac);
-    await Future<void>.delayed(Duration.zero);
-    speed.add(20);
-    speed.add(25);
-    speed.add(30);
-    await Future<void>.delayed(Duration.zero);
+    // Wait for any spurious opener calls — there should be none.
+    await pumpSpeedTicks(3);
+
+    expect(opener.callCount, 0,
+        reason: 'connect for the wrong MAC must not open a session');
     expect(startTripCalls, 0,
         reason: 'connect for the wrong MAC must not subscribe to speed');
 
@@ -285,6 +424,10 @@ void main() {
 
   test('start() is idempotent — second call does not double-subscribe',
       () async {
+    final fake = buildFakeService([20, 25, 30, 40, 45, 50]);
+    opener.queue.add(fake.service);
+    coordinator = buildCoordinator();
+
     await coordinator.start();
     await coordinator.start();
     expect(coordinator.isStarted, isTrue);
@@ -292,35 +435,26 @@ void main() {
         reason: 'second start() must not re-arm the native bridge');
 
     listener.emitConnected(mac);
-    await Future<void>.delayed(Duration.zero);
-    speed.add(20);
-    speed.add(25);
-    speed.add(30);
-    await Future<void>.delayed(Duration.zero);
+    await pumpSpeedTicks(4);
 
     // If the second start had double-subscribed, the speed handler
-    // would run twice and startTrip would fire twice (since
-    // `_tripActive` is set inside the callback path that fires).
-    // Even though `_tripActive` gates the callback, the underlying
-    // adapter-event subscription would also be doubled, leading to
-    // doubled `_onConnected` runs which would re-subscribe speed
-    // doubly. Either way the count must stay at 1.
+    // would run twice and startTrip would fire twice. Even though
+    // `_tripActive` gates the callback, the underlying adapter-event
+    // subscription would also be doubled.
     expect(startTripCalls, 1,
         reason: 'idempotent start must not duplicate subscriptions');
   });
 
   test('stop() cancels a pending disconnect timer', () async {
+    final fake = buildFakeService([20, 25, 30]);
+    opener.queue.add(fake.service);
+    coordinator = buildCoordinator();
+
     await coordinator.start();
     listener.emitConnected(mac);
-    await Future<void>.delayed(Duration.zero);
-    speed.add(20);
-    speed.add(25);
-    speed.add(30);
-    await Future<void>.delayed(Duration.zero);
+    await pumpSpeedTicks(4);
 
     listener.emitDisconnected(mac);
-    // Flush microtasks so the coordinator's adapter-event handler has
-    // armed the timer before we inspect it.
     await Future<void>.delayed(Duration.zero);
     expect(coordinator.hasPendingDisconnectTimer, isTrue);
 
@@ -336,6 +470,7 @@ void main() {
   });
 
   test('stop() called twice is safe', () async {
+    coordinator = buildCoordinator();
     await coordinator.start();
     await coordinator.stop();
     await coordinator.stop(); // No throw, no double tear-down side effects.
@@ -354,33 +489,111 @@ void main() {
     );
   });
 
-  test('connect → disconnect → reconnect → 3 supra samples → only one save',
+  test('connect → disconnect → reconnect → trip stays active, no second start',
       () async {
-    // The reconnect-within-window path needs to leave the trip
-    // running; a second supra-threshold burst must NOT re-fire
-    // startTrip (the trip is still active from the first burst).
+    final fake = buildFakeService([20, 25, 30]);
+    opener.queue.add(fake.service);
+    coordinator = buildCoordinator();
+
     await coordinator.start();
     listener.emitConnected(mac);
-    await Future<void>.delayed(Duration.zero);
-    speed.add(20);
-    speed.add(25);
-    speed.add(30);
-    await Future<void>.delayed(Duration.zero);
+    await pumpSpeedTicks(4);
     expect(startTripCalls, 1);
 
     listener.emitDisconnected(mac);
+    await Future<void>.delayed(Duration.zero);
     listener.emitConnected(mac);
     await Future<void>.delayed(Duration.zero);
-    // Push another supra burst — trip is still active, must not
-    // re-fire.
-    speed.add(40);
-    speed.add(45);
-    speed.add(50);
-    await Future<void>.delayed(Duration.zero);
 
+    // Trip is still active — no opener call expected on the reconnect
+    // (the recorder owns the session). And no second startTrip.
+    expect(opener.callCount, 1,
+        reason: 'reconnect with active trip must NOT open a second '
+            'OBD2 session — the recorder still owns the original');
     expect(startTripCalls, 1,
         reason: 'reconnect must NOT clear `_tripActive`; the trip '
             'survives the brief drop and a new supra burst is just '
             'continued movement, not a new trip');
+  });
+
+  test('opener returning null leaves coordinator idle for that connect cycle',
+      () async {
+    // First connect: opener returns null (scan timeout). Coordinator
+    // stays idle; no speed stream wired; no startTrip fires even if
+    // the listener emits more events.
+    opener.queue.add(null);
+    coordinator = buildCoordinator();
+
+    await coordinator.start();
+    listener.emitConnected(mac);
+    await pumpSpeedTicks(3);
+
+    expect(coordinator.hasOpenSession, isFalse,
+        reason: 'opener returned null — no session held');
+    expect(startTripCalls, 0,
+        reason: 'no speed source means no threshold-cross');
+
+    // Trace records the failure so the user can see "we tried but
+    // couldn't open a session."
+    final List<AutoRecordEventKind> kinds =
+        AutoRecordTraceLog.snapshot().map((e) => e.kind).toList();
+    expect(kinds.contains(AutoRecordEventKind.sessionOpenFailed), isTrue,
+        reason: 'a null opener result must record sessionOpenFailed');
+  });
+
+  test('opener throwing is logged; coordinator stays idle', () async {
+    opener.queue.add(_OpenerError(StateError('boom')));
+    coordinator = buildCoordinator();
+
+    await coordinator.start();
+    listener.emitConnected(mac);
+    await pumpSpeedTicks(3);
+
+    expect(coordinator.hasOpenSession, isFalse,
+        reason: 'opener throw must leave the coordinator session-less');
+    expect(startTripCalls, 0);
+
+    final List<AutoRecordEvent> events = AutoRecordTraceLog.snapshot();
+    expect(
+      events.where((e) => e.kind == AutoRecordEventKind.sessionOpenFailed),
+      isNotEmpty,
+      reason: 'opener throw must record sessionOpenFailed',
+    );
+  });
+
+  test('threshold-cross hands the live service into startTrip', () async {
+    final fake = buildFakeService([20, 25, 30]);
+    opener.queue.add(fake.service);
+    coordinator = buildCoordinator();
+
+    await coordinator.start();
+    listener.emitConnected(mac);
+    await pumpSpeedTicks(4);
+
+    expect(handedOffServices, hasLength(1));
+    expect(identical(handedOffServices.first, fake.service), isTrue,
+        reason: 'the service handed to startTrip must be the SAME instance '
+            'opened on AdapterConnected — ownership transfer, not copy');
+    expect(coordinator.hasOpenSession, isFalse,
+        reason: 'after hand-off the coordinator must release its '
+            'session pointer so a follow-up disconnect does not close '
+            'the recorder\'s service');
+  });
+
+  test('stop() closes a held orphan session', () async {
+    final fake = buildFakeService([0, 0, 0]);
+    opener.queue.add(fake.service);
+    coordinator = buildCoordinator();
+
+    await coordinator.start();
+    listener.emitConnected(mac);
+    await pumpSpeedTicks(2);
+    expect(coordinator.hasOpenSession, isTrue);
+
+    await coordinator.stop();
+    expect(coordinator.hasOpenSession, isFalse,
+        reason: 'stop() must close any held session');
+    expect(fake.transport.disconnectCalls, greaterThanOrEqualTo(1),
+        reason: 'stop() must call service.disconnect() on the held session');
   });
 }
