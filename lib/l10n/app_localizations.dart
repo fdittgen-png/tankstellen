@@ -6200,6 +6200,12 @@ abstract class AppLocalizations {
   /// **'+{liters} L'**
   String insightTrailingLitersWasted(String liters);
 
+  /// Coaching line on the driving-insights card when secondsBelowOptimalGear > 60 (#1263 phase 3). Tells the driver they spent significant time in too-low a gear, raising fuel consumption. Placeholder is the integer minute count.
+  ///
+  /// In en, this message translates to:
+  /// **'Labouring in low gear ({minutes} min)'**
+  String insightLowGear(String minutes);
+
   /// Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A).
   ///
   /// In en, this message translates to:

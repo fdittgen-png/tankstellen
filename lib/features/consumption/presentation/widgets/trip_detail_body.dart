@@ -180,8 +180,20 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
           DrivingScoreCard(score: _score),
         // Driving insights — combustion trips only. EV trips skip
         // this card; phase 4 will land an EV-aware version.
+        //
+        // #1263 phase 3: also pass the gear-coaching metric
+        // (`secondsBelowOptimalGear`) so the card can render a
+        // "Labouring in low gear (X min)" row when the metric > 60s.
+        // Force null on EV trips defensively — the parent gate above
+        // already hides the card for EVs, but null-passing keeps the
+        // contract clean if that gate ever moves.
         if (!widget.isEv && widget.samples.isNotEmpty)
-          DrivingInsightsCard(insights: _insights),
+          DrivingInsightsCard(
+            insights: _insights,
+            secondsBelowOptimalGear: widget.isEv
+                ? null
+                : widget.entry.summary.secondsBelowOptimalGear,
+          ),
         // Throttle / RPM histogram (#1041 phase 3a — Card C). Slotted
         // right below the insights card so the user reads "what was
         // wasteful" then immediately sees "here's the engine

@@ -3322,6 +3322,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String insightLowGear(String minutes) {
+    return 'Labouring in low gear ($minutes min)';
+  }
+
+  @override
   String get drivingScoreCardTitle => 'Driving score';
 
   @override

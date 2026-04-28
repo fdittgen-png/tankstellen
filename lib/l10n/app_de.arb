@@ -1345,6 +1345,7 @@
   "insightIdling": "Leerlauf ({pctTime}% der Fahrt): {liters} L verschwendet",
   "insightSubtitlePctOfTrip": "{pctTime}% der Fahrt",
   "insightTrailingLitersWasted": "+{liters} L",
+  "insightLowGear": "Im niedrigen Gang gefahren ({minutes} Min.)",
   "drivingScoreCardTitle": "Fahrnote",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Gesamtnote aus Leerlauf, starken Beschleunigungen, hartem Bremsen und Zeit über 3000 U/min. Ein Vergleich „besser als X% deiner bisherigen Fahrten“ folgt in einem späteren Release.",

@@ -5,5 +5,6 @@
   "insightHardAccel": "{count} starke Beschleunigungen: {liters} L verschwendet",
   "insightIdling": "Leerlauf ({pctTime}% der Fahrt): {liters} L verschwendet",
   "insightSubtitlePctOfTrip": "{pctTime}% der Fahrt",
-  "insightTrailingLitersWasted": "+{liters} L"
+  "insightTrailingLitersWasted": "+{liters} L",
+  "insightLowGear": "Im niedrigen Gang gefahren ({minutes} Min.)"
 }

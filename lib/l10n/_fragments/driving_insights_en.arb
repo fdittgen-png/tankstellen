@@ -60,5 +60,14 @@
         "type": "String"
       }
     }
+  },
+  "insightLowGear": "Labouring in low gear ({minutes} min)",
+  "@insightLowGear": {
+    "description": "Coaching line on the driving-insights card when secondsBelowOptimalGear > 60 (#1263 phase 3). Tells the driver they spent significant time in too-low a gear, raising fuel consumption. Placeholder is the integer minute count.",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -1711,6 +1711,15 @@
       }
     }
   },
+  "insightLowGear": "Labouring in low gear ({minutes} min)",
+  "@insightLowGear": {
+    "description": "Coaching line on the driving-insights card when secondsBelowOptimalGear > 60 (#1263 phase 3). Tells the driver they spent significant time in too-low a gear, raising fuel consumption. Placeholder is the integer minute count.",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
   "drivingScoreCardTitle": "Driving score",
   "@drivingScoreCardTitle": {
     "description": "Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A)."
