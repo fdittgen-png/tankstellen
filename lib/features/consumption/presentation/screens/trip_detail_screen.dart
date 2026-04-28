@@ -270,4 +270,5 @@ TripDetailSample _toDetailSample(TripSample s) => TripDetailSample(
       speedKmh: s.speedKmh,
       rpm: s.rpm,
       fuelRateLPerHour: s.fuelRateLPerHour,
+      throttlePercent: s.throttlePercent,
     );

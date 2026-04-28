@@ -915,6 +915,7 @@ class TripRecordingController {
         speedKmh: _latestSpeedKmh ?? 0,
         rpm: _latestRpm ?? 0,
         fuelRateLPerHour: fuelRate,
+        throttlePercent: _latestThrottlePercent,
       );
       _recorder.onSample(sample);
       _lastSampleAt = nowTs;

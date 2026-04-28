@@ -71,12 +71,10 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
   /// calculator is O(n), pure, and cheap, but a long trip ticks at
   /// ~1 Hz so re-running on every rebuild adds up.
   ///
-  /// Persisted [TripSample]s currently carry RPM but not throttle %
-  /// (the throttle PID was added to the polling rotation later). We
-  /// still feed every sample through the calculator — the throttle
-  /// axis falls back to its own empty-state caption while the RPM
-  /// bars render normally. Once a future phase persists throttle on
-  /// disk, the card lights up automatically.
+  /// Persisted [TripSample]s carry both RPM and throttle % (#1261).
+  /// Cars without PID 0x11 still emit null throttle on every sample —
+  /// the calculator treats those nulls as "skip on the throttle axis"
+  /// so the RPM bars render alone in that case.
   late final ThrottleRpmHistogram _histogram = _computeHistogram();
 
   /// Lazily-computed composite driving score (#1041 phase 5a — Card A).
@@ -123,11 +121,11 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         .map(
           (s) => ThrottleRpmSample(
             timestamp: s.timestamp,
-            // TripDetailSample has no throttle field — legacy
-            // persistence didn't carry PID 11. The calculator
+            // #1261: persisted samples now carry throttle %. Cars
+            // without PID 0x11 still emit null and the calculator
             // treats nulls as "skip on the throttle axis" so the
-            // RPM bars still render.
-            throttlePercent: null,
+            // RPM bars render alone for those trips.
+            throttlePercent: s.throttlePercent,
             rpm: s.rpm,
           ),
         )

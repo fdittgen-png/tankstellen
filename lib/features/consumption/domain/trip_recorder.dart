@@ -8,11 +8,17 @@ class TripSample {
   final double rpm;
   final double? fuelRateLPerHour;
 
+  /// Throttle position in percent (PID 0x11), if available. Cars
+  /// without PID 11 report null — the trip-detail throttle / RPM
+  /// histogram falls back to the RPM axis only in that case (#1261).
+  final double? throttlePercent;
+
   const TripSample({
     required this.timestamp,
     required this.speedKmh,
     required this.rpm,
     this.fuelRateLPerHour,
+    this.throttlePercent,
   });
 }
 
