@@ -73,15 +73,22 @@ class TripHistoryEntry {
       );
 }
 
-/// Serialise a single [TripSample]. Compact key names ('t','s','r','f')
-/// keep per-trip JSON small — a 39-min trip × 1 Hz lands around 19 KB
-/// compressed at this density. Use millisecondsSinceEpoch for the
-/// timestamp so the JSON parses fast and round-trips precisely.
+/// Serialise a single [TripSample]. Compact key names
+/// ('t','s','r','f','th','el','ct') keep per-trip JSON small — a
+/// 39-min trip × 1 Hz lands around 19 KB compressed at this density.
+/// Use millisecondsSinceEpoch for the timestamp so the JSON parses
+/// fast and round-trips precisely. The optional `'th'` (#1261),
+/// `'el'` and `'ct'` (#1262) keys are only emitted when the
+/// corresponding PID was actually read — legacy trips written before
+/// each key landed deserialise with the field null.
 Map<String, dynamic> _sampleToJson(TripSample s) => {
       't': s.timestamp.millisecondsSinceEpoch,
       's': s.speedKmh,
       'r': s.rpm,
       if (s.fuelRateLPerHour != null) 'f': s.fuelRateLPerHour,
+      if (s.throttlePercent != null) 'th': s.throttlePercent,
+      if (s.engineLoadPercent != null) 'el': s.engineLoadPercent,
+      if (s.coolantTempC != null) 'ct': s.coolantTempC,
     };
 
 TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
@@ -91,6 +98,9 @@ TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
       speedKmh: (j['s'] as num).toDouble(),
       rpm: (j['r'] as num).toDouble(),
       fuelRateLPerHour: (j['f'] as num?)?.toDouble(),
+      throttlePercent: (j['th'] as num?)?.toDouble(),
+      engineLoadPercent: (j['el'] as num?)?.toDouble(),
+      coolantTempC: (j['ct'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _summaryToJson(TripSummary s) => {
@@ -110,6 +120,10 @@ Map<String, dynamic> _summaryToJson(TripSummary s) => {
       // serialised before this field landed deserialise as `'virtual'`
       // to match the recorder's historical behaviour.
       'distanceSource': s.distanceSource,
+      // #1262 phase 2: cold-start surcharge bit. Compact key 'cs'
+      // because every trip carries this and we'd rather not pay six
+      // bytes per record. Legacy trips without the key default false.
+      'cs': s.coldStartSurcharge,
     };
 
 TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
@@ -131,6 +145,10 @@ TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
       // label for legacy recordings, which integrated speed samples
       // regardless of whether an odometer was available.
       distanceSource: (j['distanceSource'] as String?) ?? 'virtual',
+      // #1262 phase 2: pre-existing trips were persisted before the
+      // cold-start surcharge heuristic landed; default false rather
+      // than retroactively flag them.
+      coldStartSurcharge: (j['cs'] as bool?) ?? false,
     );
 
 /// Hive-backed list of finalised trips (#726).

@@ -57,6 +57,7 @@ class Elm327Protocol {
       Elm327Commands.distanceSinceDtcClearedCommand;
   static const odometerCommand = Elm327Commands.odometerCommand;
   static const engineLoadCommand = Elm327Commands.engineLoadCommand;
+  static const coolantTempCommand = Elm327Commands.coolantTempCommand;
   static const throttlePositionCommand = Elm327Commands.throttlePositionCommand;
   static const engineFuelRateCommand = Elm327Commands.engineFuelRateCommand;
   static const mafCommand = Elm327Commands.mafCommand;
@@ -107,6 +108,9 @@ class Elm327Protocol {
 
   static double? parseIntakeAirTempCelsius(String raw) =>
       Elm327Parsers.parseIntakeAirTempCelsius(raw);
+
+  static double? parseCoolantTempCelsius(String raw) =>
+      Elm327Parsers.parseCoolantTempCelsius(raw);
 
   static double? parseShortTermFuelTrim(String raw) =>
       Elm327Parsers.parseShortTermFuelTrim(raw);

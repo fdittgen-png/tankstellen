@@ -34,11 +34,33 @@ class TripDetailSample {
   /// null.
   final double? fuelRateLPerHour;
 
+  /// Throttle position % (PID 0x11). Null when the car's PID cache
+  /// flagged 0x11 as unsupported, or when persisted by a build before
+  /// #1261 (legacy trips). Drives the throttle axis of the throttle /
+  /// RPM histogram on the trip-detail screen.
+  final double? throttlePercent;
+
+  /// Calculated engine load % (PID 0x04). Null when the car's PID
+  /// cache flagged 0x04 as unsupported, or when persisted by a build
+  /// before #1262 (legacy trips). Surfaced by the load-aware coaching
+  /// chart in phase 3 of #1262 — distinguishes "uphill at 60 km/h"
+  /// (high load) from "flat at 60 km/h" (low load).
+  final double? engineLoadPercent;
+
+  /// Engine coolant temperature in °C (PID 0x05). Null when the car
+  /// doesn't surface the PID, or when persisted by a build before
+  /// #1262 (legacy trips). Drives the cold-start surcharge chip in
+  /// phase 3 of #1262.
+  final double? coolantTempC;
+
   const TripDetailSample({
     required this.timestamp,
     required this.speedKmh,
     this.rpm,
     this.fuelRateLPerHour,
+    this.throttlePercent,
+    this.engineLoadPercent,
+    this.coolantTempC,
   });
 }
 

@@ -235,6 +235,7 @@ void main() {
         Elm327Commands.distanceSinceDtcClearedCommand,
         Elm327Commands.odometerCommand,
         Elm327Commands.engineLoadCommand,
+        Elm327Commands.coolantTempCommand,
         Elm327Commands.throttlePositionCommand,
         Elm327Commands.engineFuelRateCommand,
         Elm327Commands.mafCommand,
@@ -266,6 +267,10 @@ void main() {
       expect(Elm327Commands.odometerCommand, '01A6\r');
     });
 
+    test('coolantTempCommand asks for PID 05 (#1262)', () {
+      expect(Elm327Commands.coolantTempCommand, '0105\r');
+    });
+
     test('vinCommand asks for Mode 09 PID 02', () {
       expect(Elm327Commands.vinCommand, '0902\r');
     });
@@ -277,6 +282,7 @@ void main() {
         Elm327Commands.distanceSinceDtcClearedCommand,
         Elm327Commands.odometerCommand,
         Elm327Commands.engineLoadCommand,
+        Elm327Commands.coolantTempCommand,
         Elm327Commands.throttlePositionCommand,
         Elm327Commands.engineFuelRateCommand,
         Elm327Commands.mafCommand,
@@ -286,8 +292,8 @@ void main() {
         Elm327Commands.longTermFuelTrimCommand,
         Elm327Commands.fuelTankLevelCommand,
       };
-      // Set length must equal number of unique commands above (13).
-      expect(pids.length, 13);
+      // Set length must equal number of unique commands above (14).
+      expect(pids.length, 14);
     });
   });
 

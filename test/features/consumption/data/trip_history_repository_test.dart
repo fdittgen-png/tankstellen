@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -229,6 +230,303 @@ void main() {
         summary: mkSummary(startedAt: start),
       ));
       expect(hookCalls, ['car-b']);
+    });
+  });
+
+  group('TripSample throttle persistence (#1261)', () {
+    test('sample with throttle round-trips through save / loadAll', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 4, 21);
+      final ts = start.add(const Duration(seconds: 5));
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: start),
+        samples: [
+          TripSample(
+            timestamp: ts,
+            speedKmh: 55,
+            rpm: 1800,
+            fuelRateLPerHour: 4.2,
+            throttlePercent: 37.5,
+          ),
+        ],
+      ));
+
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.samples, hasLength(1));
+      expect(loaded.first.samples.first.throttlePercent, 37.5);
+      // And the other compact-key fields still round-trip cleanly.
+      expect(loaded.first.samples.first.speedKmh, 55);
+      expect(loaded.first.samples.first.rpm, 1800);
+      expect(loaded.first.samples.first.fuelRateLPerHour, 4.2);
+    });
+
+    test(
+        'sample with null throttle does NOT include the "th" key in stored '
+        'JSON — matches the parsimony rule the "f" key already follows',
+        () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 4, 21);
+      final ts = start.add(const Duration(seconds: 5));
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: start),
+        samples: [
+          TripSample(
+            timestamp: ts,
+            speedKmh: 55,
+            rpm: 1800,
+            // throttlePercent and fuelRateLPerHour both null
+          ),
+        ],
+      ));
+
+      // Read the raw stored JSON and inspect the sample's keys.
+      final raw = box.get(start.toIso8601String())!;
+      final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
+      final samples = (decoded['samples'] as List).cast<Map>();
+      expect(samples.first.containsKey('th'), isFalse);
+      expect(samples.first.containsKey('f'), isFalse);
+    });
+
+    test(
+        'legacy JSON (pre-#1261) without the "th" key deserialises with '
+        'throttlePercent: null — backward compat for trips on disk',
+        () async {
+      final start = DateTime(2026, 4, 21);
+      final ts = start.add(const Duration(seconds: 5));
+      // Hand-craft a JSON payload as a pre-#1261 build would have
+      // written it: every compact key EXCEPT 'th' is present.
+      final legacyJson = jsonEncode({
+        'id': start.toIso8601String(),
+        'vehicleId': null,
+        'summary': {
+          'distanceKm': 10.0,
+          'maxRpm': 2800.0,
+          'highRpmSeconds': 0.0,
+          'idleSeconds': 0.0,
+          'harshBrakes': 0,
+          'harshAccelerations': 0,
+          'startedAt': start.toIso8601String(),
+        },
+        'samples': [
+          {
+            't': ts.millisecondsSinceEpoch,
+            's': 55.0,
+            'r': 1800.0,
+            'f': 4.2,
+          },
+        ],
+      });
+      await box.put(start.toIso8601String(), legacyJson);
+
+      final repo = TripHistoryRepository(box: box);
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.samples, hasLength(1));
+      expect(loaded.first.samples.first.throttlePercent, isNull);
+      // Other fields still parse normally.
+      expect(loaded.first.samples.first.speedKmh, 55);
+      expect(loaded.first.samples.first.fuelRateLPerHour, 4.2);
+    });
+  });
+
+  group('TripSummary.coldStartSurcharge persistence (#1262 phase 2)', () {
+    test(
+        'summary with coldStartSurcharge true round-trips through save / '
+        'loadAll', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 4, 21, 12);
+      final cold = TripSummary(
+        distanceKm: 4,
+        maxRpm: 1800,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 0,
+        startedAt: start,
+        endedAt: start.add(const Duration(minutes: 5)),
+        coldStartSurcharge: true,
+      );
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: cold,
+      ));
+
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.summary.coldStartSurcharge, isTrue);
+    });
+
+    test(
+        'summary with coldStartSurcharge false round-trips and the stored '
+        'JSON carries an explicit "cs": false (no parsimony rule for '
+        'this key — every trip persists it)', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 4, 21, 12);
+      final warm = TripSummary(
+        distanceKm: 30,
+        maxRpm: 2800,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 0,
+        startedAt: start,
+        endedAt: start.add(const Duration(minutes: 30)),
+        // coldStartSurcharge defaults false
+      );
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: warm,
+      ));
+
+      final raw = box.get(start.toIso8601String())!;
+      final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
+      final summaryJson = (decoded['summary'] as Map).cast<String, dynamic>();
+      expect(summaryJson['cs'], isFalse);
+
+      final loaded = repo.loadAll();
+      expect(loaded.first.summary.coldStartSurcharge, isFalse);
+    });
+
+    test(
+        'legacy JSON (pre-#1262 phase 2) without the "cs" key '
+        'deserialises with coldStartSurcharge: false — older trips '
+        'were written before the heuristic landed', () async {
+      final start = DateTime(2026, 4, 21, 12);
+      final legacyJson = jsonEncode({
+        'id': start.toIso8601String(),
+        'vehicleId': null,
+        'summary': {
+          'distanceKm': 10.0,
+          'maxRpm': 2800.0,
+          'highRpmSeconds': 0.0,
+          'idleSeconds': 0.0,
+          'harshBrakes': 0,
+          'harshAccelerations': 0,
+          'startedAt': start.toIso8601String(),
+          // 'cs' deliberately absent
+        },
+      });
+      await box.put(start.toIso8601String(), legacyJson);
+
+      final repo = TripHistoryRepository(box: box);
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.summary.coldStartSurcharge, isFalse);
+    });
+  });
+
+  group('TripSample engineLoad + coolantTemp persistence (#1262 phase 1)', () {
+    test(
+        'sample with engineLoadPercent and coolantTempC round-trips through '
+        'save / loadAll', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 4, 21);
+      final ts = start.add(const Duration(seconds: 5));
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: start),
+        samples: [
+          TripSample(
+            timestamp: ts,
+            speedKmh: 55,
+            rpm: 1800,
+            fuelRateLPerHour: 4.2,
+            throttlePercent: 37.5,
+            engineLoadPercent: 42.5,
+            coolantTempC: 82.0,
+          ),
+        ],
+      ));
+
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.samples, hasLength(1));
+      final s = loaded.first.samples.first;
+      expect(s.engineLoadPercent, 42.5);
+      expect(s.coolantTempC, 82.0);
+      // Throttle still survives — the new keys don't displace the old.
+      expect(s.throttlePercent, 37.5);
+    });
+
+    test(
+        'sample with null engineLoadPercent / coolantTempC does NOT include '
+        '"el" / "ct" keys in stored JSON — matches the parsimony rule the '
+        '"f" / "th" keys already follow', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 4, 21);
+      final ts = start.add(const Duration(seconds: 5));
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: start),
+        samples: [
+          TripSample(
+            timestamp: ts,
+            speedKmh: 55,
+            rpm: 1800,
+            // engineLoadPercent / coolantTempC both null
+          ),
+        ],
+      ));
+
+      final raw = box.get(start.toIso8601String())!;
+      final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
+      final samples = (decoded['samples'] as List).cast<Map>();
+      expect(samples.first.containsKey('el'), isFalse);
+      expect(samples.first.containsKey('ct'), isFalse);
+    });
+
+    test(
+        'legacy JSON (pre-#1262) without "el" / "ct" keys deserialises with '
+        'engineLoadPercent: null AND coolantTempC: null — backward compat',
+        () async {
+      final start = DateTime(2026, 4, 21);
+      final ts = start.add(const Duration(seconds: 5));
+      // Legacy sample JSON: 't','s','r','f','th' present, but no
+      // 'el' / 'ct' (the trip was recorded before #1262 phase 1).
+      final legacyJson = jsonEncode({
+        'id': start.toIso8601String(),
+        'vehicleId': null,
+        'summary': {
+          'distanceKm': 10.0,
+          'maxRpm': 2800.0,
+          'highRpmSeconds': 0.0,
+          'idleSeconds': 0.0,
+          'harshBrakes': 0,
+          'harshAccelerations': 0,
+          'startedAt': start.toIso8601String(),
+        },
+        'samples': [
+          {
+            't': ts.millisecondsSinceEpoch,
+            's': 55.0,
+            'r': 1800.0,
+            'f': 4.2,
+            'th': 30.0,
+          },
+        ],
+      });
+      await box.put(start.toIso8601String(), legacyJson);
+
+      final repo = TripHistoryRepository(box: box);
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.samples, hasLength(1));
+      final s = loaded.first.samples.first;
+      expect(s.engineLoadPercent, isNull);
+      expect(s.coolantTempC, isNull);
+      // Existing fields still parse — backward compat means "we add to
+      // the schema, we don't break what the old schema persisted."
+      expect(s.throttlePercent, 30.0);
+      expect(s.fuelRateLPerHour, 4.2);
     });
   });
 }

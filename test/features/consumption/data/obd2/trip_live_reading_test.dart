@@ -17,9 +17,20 @@ void main() {
       expect(reading.fuelLevelPercent, isNull);
       expect(reading.engineLoadPercent, isNull);
       expect(reading.throttlePercent, isNull);
+      expect(reading.coolantTempC, isNull);
       expect(reading.fuelLitersSoFar, isNull);
       expect(reading.odometerStartKm, isNull);
       expect(reading.odometerNowKm, isNull);
+    });
+
+    test('coolantTempC stores the value supplied by the controller (#1262)',
+        () {
+      const reading = TripLiveReading(
+        coolantTempC: 78.5,
+        distanceKmSoFar: 0,
+        elapsed: Duration.zero,
+      );
+      expect(reading.coolantTempC, 78.5);
     });
   });
 
