@@ -120,6 +120,10 @@ Map<String, dynamic> _summaryToJson(TripSummary s) => {
       // serialised before this field landed deserialise as `'virtual'`
       // to match the recorder's historical behaviour.
       'distanceSource': s.distanceSource,
+      // #1262 phase 2: cold-start surcharge bit. Compact key 'cs'
+      // because every trip carries this and we'd rather not pay six
+      // bytes per record. Legacy trips without the key default false.
+      'cs': s.coldStartSurcharge,
     };
 
 TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
@@ -141,6 +145,10 @@ TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
       // label for legacy recordings, which integrated speed samples
       // regardless of whether an odometer was available.
       distanceSource: (j['distanceSource'] as String?) ?? 'virtual',
+      // #1262 phase 2: pre-existing trips were persisted before the
+      // cold-start surcharge heuristic landed; default false rather
+      // than retroactively flag them.
+      coldStartSurcharge: (j['cs'] as bool?) ?? false,
     );
 
 /// Hive-backed list of finalised trips (#726).

@@ -66,6 +66,17 @@ class TripSummary {
   /// trips before this flag landed keep that honest label.
   final String distanceSource;
 
+  /// Whether this trip likely paid a cold-start fuel surcharge
+  /// (#1262 phase 2). Flipped true when the coolant temperature
+  /// telemetry suggests the engine was warming up for a meaningful
+  /// portion of the trip — short trips that never reached operating
+  /// temperature, trips where the coolant max stayed below 70 °C, or
+  /// trips that only crossed 70 °C in the second half. Cars without
+  /// PID 0x05 produce no coolant samples, so the flag stays false to
+  /// avoid false positives on absent data. UI surfaces (Phase 3)
+  /// render a chip on the trip card based on this bit.
+  final bool coldStartSurcharge;
+
   const TripSummary({
     required this.distanceKm,
     required this.maxRpm,
@@ -78,6 +89,7 @@ class TripSummary {
     this.startedAt,
     this.endedAt,
     this.distanceSource = 'virtual',
+    this.coldStartSurcharge = false,
   });
 }
 
@@ -113,6 +125,21 @@ class TripRecorder {
   DateTime? _startedAt;
   DateTime? _endedAt;
 
+  // Cold-start surcharge accumulators (#1262 phase 2). Coolant temp
+  // is per-sample (PID 0x05); the recorder tracks the lifetime
+  // min / max plus the first warm-up timestamp so [buildSummary] can
+  // evaluate three cold-start patterns in one pass.
+  double? _minCoolantTempC;
+  double? _maxCoolantTempC;
+  int _coolantSampleCount = 0;
+  DateTime? _firstCoolantWarmAt;
+
+  /// Coolant temperature (°C) at which the engine is considered to
+  /// have reached operating range. 70 °C matches the canonical
+  /// thermostat-open threshold for typical petrol engines and is the
+  /// value the issue body cites for the cold-start heuristic.
+  static const double _coolantWarmThresholdC = 70.0;
+
   TripRecorder({
     this.highRpmThreshold = 3500,
     this.harshBrakeThresholdMps2 = 3.5,
@@ -125,6 +152,24 @@ class TripRecorder {
     _startedAt ??= sample.timestamp;
     _endedAt = sample.timestamp;
     _maxRpm = math.max(_maxRpm, sample.rpm);
+
+    // Track coolant samples for the cold-start surcharge heuristic
+    // (#1262 phase 2). Cars without PID 0x05 carry coolantTempC ==
+    // null on every sample; the heuristic falls back to "false" in
+    // that case so we never accuse a sensor-less car of a cold start.
+    final coolant = sample.coolantTempC;
+    if (coolant != null) {
+      _coolantSampleCount++;
+      final currentMin = _minCoolantTempC;
+      _minCoolantTempC =
+          currentMin == null ? coolant : math.min(currentMin, coolant);
+      final currentMax = _maxCoolantTempC;
+      _maxCoolantTempC =
+          currentMax == null ? coolant : math.max(currentMax, coolant);
+      if (_firstCoolantWarmAt == null && coolant >= _coolantWarmThresholdC) {
+        _firstCoolantWarmAt = sample.timestamp;
+      }
+    }
 
     final previous = _previous;
     if (previous == null) {
@@ -185,6 +230,43 @@ class TripRecorder {
     if (_hadFuelRate && _distanceKm > 0.001) {
       avgLPer100Km = _fuelLiters / _distanceKm * 100.0;
     }
+
+    // Cold-start surcharge heuristic (#1262 phase 2). Three rules
+    // flip the same bit; we OR them so any pattern triggers the
+    // chip. Skipped entirely when no coolant sample was ever read —
+    // a car without PID 0x05 must NOT be flagged as "cold-started"
+    // every trip; the false-positive rate would make the chip
+    // useless.
+    var coldStartSurcharge = false;
+    if (_coolantSampleCount > 0 && _startedAt != null && _endedAt != null) {
+      final durationSec =
+          _endedAt!.difference(_startedAt!).inMicroseconds / 1e6;
+      final minC = _minCoolantTempC ?? 0.0;
+      final maxC = _maxCoolantTempC ?? 0.0;
+      // Rule A: trip < 10 min AND coolant minimum below operating
+      // temp (the canonical "short cold trip"). Even if it warmed
+      // up by the end, a sub-10-minute trip that started cold paid
+      // the surcharge.
+      final shortColdTrip =
+          durationSec < 600 && minC < _coolantWarmThresholdC;
+      // Rule B: any duration, but engine never reached operating
+      // temp at all. Realistic on very cold ambient + low-load
+      // cruising — the engine burns enrichment fuel for the entire
+      // trip. The issue body's "(< 10 min) OR (didn't cross in 2nd
+      // half)" misses this case.
+      final neverWarmed = maxC < _coolantWarmThresholdC;
+      // Rule C: coolant didn't cross 70 °C until the second half of
+      // the trip. The first half ran rich — the surcharge applies.
+      var warmedLate = false;
+      final warmAt = _firstCoolantWarmAt;
+      if (warmAt != null) {
+        final warmOffsetSec =
+            warmAt.difference(_startedAt!).inMicroseconds / 1e6;
+        warmedLate = durationSec > 0 && warmOffsetSec > durationSec / 2;
+      }
+      coldStartSurcharge = shortColdTrip || neverWarmed || warmedLate;
+    }
+
     return TripSummary(
       distanceKm: _distanceKm,
       maxRpm: _maxRpm,
@@ -196,6 +278,7 @@ class TripRecorder {
       fuelLitersConsumed: _hadFuelRate ? _fuelLiters : null,
       startedAt: _startedAt,
       endedAt: _endedAt,
+      coldStartSurcharge: coldStartSurcharge,
     );
   }
 
@@ -213,5 +296,9 @@ class TripRecorder {
     _hadFuelRate = false;
     _startedAt = null;
     _endedAt = null;
+    _minCoolantTempC = null;
+    _maxCoolantTempC = null;
+    _coolantSampleCount = 0;
+    _firstCoolantWarmAt = null;
   }
 }
