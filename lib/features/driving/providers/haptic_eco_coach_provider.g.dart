@@ -179,7 +179,7 @@ final class HapticEcoCoachLifecycleProvider
 }
 
 String _$hapticEcoCoachLifecycleHash() =>
-    r'0865ff3eaea0b7b6755bed041cbac5fb965a4ec1';
+    r'8d90355ebc18056cb4fda2ec743cb769d4578a56';
 
 /// Active subscription that bridges the trip-recording state stream
 /// to a [HapticEcoCoach]. Held by Riverpod for the duration of an
@@ -217,3 +217,61 @@ abstract class _$HapticEcoCoachLifecycle extends $Notifier<void> {
     element.handleCreate(ref, build);
   }
 }
+
+/// UI-facing broadcast stream of [CoachEvent]s from the lifecycle
+/// provider (#1273). Subscribers (the visual SnackBar on
+/// [TripRecordingScreen]) read this rather than poking at the
+/// [HapticEcoCoachLifecycle] notifier directly — it stays a stream
+/// even while the coach is down, so the subscription site doesn't
+/// branch on enabled/active.
+
+@ProviderFor(coachEvents)
+final coachEventsProvider = CoachEventsProvider._();
+
+/// UI-facing broadcast stream of [CoachEvent]s from the lifecycle
+/// provider (#1273). Subscribers (the visual SnackBar on
+/// [TripRecordingScreen]) read this rather than poking at the
+/// [HapticEcoCoachLifecycle] notifier directly — it stays a stream
+/// even while the coach is down, so the subscription site doesn't
+/// branch on enabled/active.
+
+final class CoachEventsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<CoachEvent>,
+          CoachEvent,
+          Stream<CoachEvent>
+        >
+    with $FutureModifier<CoachEvent>, $StreamProvider<CoachEvent> {
+  /// UI-facing broadcast stream of [CoachEvent]s from the lifecycle
+  /// provider (#1273). Subscribers (the visual SnackBar on
+  /// [TripRecordingScreen]) read this rather than poking at the
+  /// [HapticEcoCoachLifecycle] notifier directly — it stays a stream
+  /// even while the coach is down, so the subscription site doesn't
+  /// branch on enabled/active.
+  CoachEventsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'coachEventsProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$coachEventsHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<CoachEvent> $createElement($ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
+
+  @override
+  Stream<CoachEvent> create(Ref ref) {
+    return coachEvents(ref);
+  }
+}
+
+String _$coachEventsHash() => r'6891cb19436a01d7bb96cd6fd25aee75fe748ece';

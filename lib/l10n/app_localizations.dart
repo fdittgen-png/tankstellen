@@ -6680,10 +6680,10 @@ abstract class AppLocalizations {
   /// **'Real-time eco coaching'**
   String get hapticEcoCoachSettingTitle;
 
-  /// Subtitle/explanation of the haptic-eco-coach toggle on the Settings screen (#1122). Describes the heuristic in user-facing terms.
+  /// Subtitle/explanation of the haptic-eco-coach toggle on the Settings screen (#1122, updated #1273 — now mentions the on-screen tip alongside the haptic). Describes the heuristic in user-facing terms.
   ///
   /// In en, this message translates to:
-  /// **'Gentle haptic when you floor it during cruise'**
+  /// **'Gentle haptic + on-screen tip when you floor it during cruise'**
   String get hapticEcoCoachSettingSubtitle;
 
   /// Title of the loyalty settings sub-screen where the user manages fuel-club cards (#1120).
@@ -6973,6 +6973,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A station is at {price} € (target: {threshold} €)'**
   String radiusAlertNotificationBody(String price, String threshold);
+
+  /// SnackBar copy fired on the trip-recording screen when the real-time eco coach heuristic matches sustained-high-throttle / low-Δspeed cruise (#1273). Paired with the existing haptic vibration.
+  ///
+  /// In en, this message translates to:
+  /// **'Easy on the throttle — coasting saves more'**
+  String get coachSnackBarMessage;
+
+  /// Title of the modal bottom sheet that explains what the pin toggle on the trip-recording screen does (#1273).
+  ///
+  /// In en, this message translates to:
+  /// **'About the pin button'**
+  String get tripRecordingPinHelpTitle;
+
+  /// Body copy of the pin-button help bottom sheet on the trip-recording screen (#1273).
+  ///
+  /// In en, this message translates to:
+  /// **'Pin keeps the screen on and hides system bars so the form stays readable on a dashboard mount. Tap again to release. Auto-releases when the trip stops.'**
+  String get tripRecordingPinHelpBody;
+
+  /// Dismiss button label on the pin-button help bottom sheet (#1273).
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get tripRecordingPinHelpDismiss;
+
+  /// Tooltip on the small help (?) icon next to the pin button on the trip-recording screen (#1273).
+  ///
+  /// In en, this message translates to:
+  /// **'About the pin button'**
+  String get tripRecordingPinHelpTooltip;
+
+  /// One-time SnackBar shown the first time a user backs out of the trip-recording screen mid-trip, pointing them at the persistent TripRecordingBanner as the way back in (#1273). Persists dismissal in Hive so it never re-shows on this install.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording continues in the background. Tap the red banner at the top of any screen to return.'**
+  String get tripRecordingResumeTip;
 
   /// Title of the consumption-by-speed card on the Carbon dashboard Charts tab — bins per-second OBD2 samples by speed band so the user can see what motorway speed is costing them per 100 km (#1192).
   ///

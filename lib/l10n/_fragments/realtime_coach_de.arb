@@ -1,0 +1,8 @@
+{
+  "coachSnackBarMessage": "Sanfter aufs Gas — Ausrollen spart mehr",
+  "tripRecordingPinHelpTitle": "Über die Pin-Taste",
+  "tripRecordingPinHelpBody": "Pin hält den Bildschirm an und blendet die System-Leisten aus, damit das Formular auf einer Dashboard-Halterung gut lesbar bleibt. Erneut tippen, um zu lösen. Wird automatisch gelöst, wenn die Fahrt endet.",
+  "tripRecordingPinHelpDismiss": "Verstanden",
+  "tripRecordingPinHelpTooltip": "Über die Pin-Taste",
+  "tripRecordingResumeTip": "Die Aufzeichnung läuft im Hintergrund weiter. Tippe oben auf den roten Banner, um zurückzukehren."
+}

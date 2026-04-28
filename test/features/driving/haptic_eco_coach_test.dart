@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
+import 'package:tankstellen/features/driving/coach_event.dart';
 import 'package:tankstellen/features/driving/haptic_eco_coach.dart';
 
 /// Heuristic + cooldown coverage for [HapticEcoCoach] (#1122).
@@ -174,6 +175,152 @@ void main() {
         hapticCount,
         equals(2),
         reason: 'Past the cooldown, the next matching window fires again.',
+      );
+    });
+
+    test('onCoach callback fires alongside the haptic on the same window',
+        () async {
+      // #1273 — the visual SnackBar surface is wired by the lifecycle
+      // provider as an `onCoach: (event) => ...` callback. It MUST
+      // fire on the same fire decision (and only that decision) as
+      // the haptic — same heuristic, same cooldown, no parallel path.
+      final clock = _Clock(DateTime(2026, 1, 1, 12, 0, 0));
+      var hapticCount = 0;
+      final coachEvents = <CoachEvent>[];
+      final coach = HapticEcoCoach(
+        readings: const Stream<TripLiveReading>.empty(),
+        haptic: () async => hapticCount++,
+        onCoach: coachEvents.add,
+        clock: clock.now,
+      );
+
+      // Same 6 s sustained-stab burst the haptic test uses. Both
+      // surfaces must observe exactly one fire.
+      _feedConstant(
+        coach,
+        clock,
+        durationSeconds: 6,
+        intervalMs: 200,
+        throttle: 80.0,
+        speed: 110.0,
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(
+        hapticCount,
+        equals(1),
+        reason:
+            'Sustained-stab window must still fire the haptic once — '
+            '`onCoach` must not displace the haptic, only mirror it.',
+      );
+      expect(
+        coachEvents,
+        hasLength(1),
+        reason:
+            'The same fire decision must invoke `onCoach` exactly once '
+            '— if it fires more or fewer times, the visual + haptic '
+            'surfaces are out of sync, defeating the shared-cooldown '
+            'design (#1273).',
+      );
+      // Sanity: the event carries the diagnostic context the
+      // heuristic computed, not zeros.
+      expect(coachEvents.single.avgThrottlePercent, greaterThan(75.0));
+      expect(coachEvents.single.speedDeltaKmh, lessThan(10.0));
+    });
+
+    test('onCoach respects the same 30 s cooldown as the haptic',
+        () async {
+      // The shared cooldown is the whole point of the wiring — visual
+      // surface must NOT fire a second SnackBar 10 s after the first
+      // even though the heuristic still matches.
+      final clock = _Clock(DateTime(2026, 1, 1, 12, 0, 0));
+      var hapticCount = 0;
+      final coachEvents = <CoachEvent>[];
+      final coach = HapticEcoCoach(
+        readings: const Stream<TripLiveReading>.empty(),
+        haptic: () async => hapticCount++,
+        onCoach: coachEvents.add,
+        clock: clock.now,
+      );
+
+      _feedConstant(
+        coach,
+        clock,
+        durationSeconds: 6,
+        intervalMs: 200,
+        throttle: 85.0,
+        speed: 120.0,
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(coachEvents, hasLength(1));
+      expect(hapticCount, equals(1));
+
+      // 10 s later — still inside the 30 s cooldown.
+      clock.advance(const Duration(seconds: 10));
+      _feedConstant(
+        coach,
+        clock,
+        durationSeconds: 6,
+        intervalMs: 200,
+        throttle: 85.0,
+        speed: 120.0,
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        coachEvents,
+        hasLength(1),
+        reason:
+            'A second matching window inside the haptic cooldown must '
+            'NOT fire the visual surface — both share the cooldown.',
+      );
+      expect(hapticCount, equals(1));
+
+      // Past the cooldown: both fire again together.
+      clock.advance(const Duration(seconds: 35));
+      _feedConstant(
+        coach,
+        clock,
+        durationSeconds: 6,
+        intervalMs: 200,
+        throttle: 85.0,
+        speed: 120.0,
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(coachEvents, hasLength(2));
+      expect(hapticCount, equals(2));
+    });
+
+    test('onCoach errors are swallowed — live-readings stream stays alive',
+        () async {
+      // A bad UI subscriber (e.g. accessing a disposed BuildContext)
+      // MUST NOT bubble up and cancel the trip's live-readings
+      // subscription — that would silently kill the recording.
+      final clock = _Clock(DateTime(2026, 1, 1, 12, 0, 0));
+      var hapticCount = 0;
+      final coach = HapticEcoCoach(
+        readings: const Stream<TripLiveReading>.empty(),
+        haptic: () async => hapticCount++,
+        onCoach: (_) => throw StateError('bad subscriber'),
+        clock: clock.now,
+      );
+
+      _feedConstant(
+        coach,
+        clock,
+        durationSeconds: 6,
+        intervalMs: 200,
+        throttle: 80.0,
+        speed: 110.0,
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(
+        hapticCount,
+        equals(1),
+        reason:
+            'A throwing onCoach MUST NOT short-circuit the haptic '
+            'fire — both surfaces are independent on the failure path '
+            'even though they share the cooldown.',
       );
     });
 

@@ -1046,5 +1046,12 @@
   "speedBandMotorwayFast": "Autoroute rapide (130+)",
   "speedConsumptionInsufficientData": "Enregistrez plus de 30 minutes de trajets avec l'adaptateur OBD2 pour débloquer l'analyse vitesse/consommation.",
   "speedConsumptionTimeShare": "{percent} % de conduite",
-  "speedConsumptionNeedMoreData": "Plus de données nécessaires"
+  "speedConsumptionNeedMoreData": "Plus de données nécessaires",
+  "hapticEcoCoachSettingSubtitle": "Vibration douce + indication à l'écran lorsque vous accélérez fort en mode croisière",
+  "coachSnackBarMessage": "Doucement sur l'accélérateur — la roue libre économise plus",
+  "tripRecordingPinHelpTitle": "À propos du bouton d'épinglage",
+  "tripRecordingPinHelpBody": "L'épinglage garde l'écran allumé et masque les barres système pour que le formulaire reste lisible sur un support de tableau de bord. Touchez à nouveau pour libérer. Se libère automatiquement à l'arrêt du trajet.",
+  "tripRecordingPinHelpDismiss": "Compris",
+  "tripRecordingPinHelpTooltip": "À propos du bouton d'épinglage",
+  "tripRecordingResumeTip": "L'enregistrement continue en arrière-plan. Touchez la bannière rouge en haut de n'importe quel écran pour revenir."
 }

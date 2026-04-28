@@ -3610,7 +3610,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get hapticEcoCoachSettingSubtitle =>
-      'Gentle haptic when you floor it during cruise';
+      'Vibration douce + indication à l\'écran lorsque vous accélérez fort en mode croisière';
 
   @override
   String get loyaltySettingsTitle => 'Fuel club cards';
@@ -3776,6 +3776,27 @@ class AppLocalizationsFr extends AppLocalizations {
   String radiusAlertNotificationBody(String price, String threshold) {
     return 'A station is at $price € (target: $threshold €)';
   }
+
+  @override
+  String get coachSnackBarMessage =>
+      'Doucement sur l\'accélérateur — la roue libre économise plus';
+
+  @override
+  String get tripRecordingPinHelpTitle => 'À propos du bouton d\'épinglage';
+
+  @override
+  String get tripRecordingPinHelpBody =>
+      'L\'épinglage garde l\'écran allumé et masque les barres système pour que le formulaire reste lisible sur un support de tableau de bord. Touchez à nouveau pour libérer. Se libère automatiquement à l\'arrêt du trajet.';
+
+  @override
+  String get tripRecordingPinHelpDismiss => 'Compris';
+
+  @override
+  String get tripRecordingPinHelpTooltip => 'À propos du bouton d\'épinglage';
+
+  @override
+  String get tripRecordingResumeTip =>
+      'L\'enregistrement continue en arrière-plan. Touchez la bannière rouge en haut de n\'importe quel écran pour revenir.';
 
   @override
   String get speedConsumptionCardTitle => 'Consommation par vitesse';

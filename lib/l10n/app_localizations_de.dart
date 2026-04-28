@@ -3614,7 +3614,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get hapticEcoCoachSettingSubtitle =>
-      'Sanfte Vibration bei zu starker Beschleunigung im Reisemodus';
+      'Sanftes Vibrieren + Hinweis am Bildschirm, wenn du beim Cruisen aufs Pedal trittst';
 
   @override
   String get loyaltySettingsTitle => 'Tankstellen-Kundenkarten';
@@ -3780,6 +3780,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String radiusAlertNotificationBody(String price, String threshold) {
     return 'Eine Tankstelle bietet $price € (Grenze: $threshold €)';
   }
+
+  @override
+  String get coachSnackBarMessage => 'Sanfter aufs Gas — Ausrollen spart mehr';
+
+  @override
+  String get tripRecordingPinHelpTitle => 'Über die Pin-Taste';
+
+  @override
+  String get tripRecordingPinHelpBody =>
+      'Pin hält den Bildschirm an und blendet die System-Leisten aus, damit das Formular auf einer Dashboard-Halterung gut lesbar bleibt. Erneut tippen, um zu lösen. Wird automatisch gelöst, wenn die Fahrt endet.';
+
+  @override
+  String get tripRecordingPinHelpDismiss => 'Verstanden';
+
+  @override
+  String get tripRecordingPinHelpTooltip => 'Über die Pin-Taste';
+
+  @override
+  String get tripRecordingResumeTip =>
+      'Die Aufzeichnung läuft im Hintergrund weiter. Tippe oben auf den roten Banner, um zurückzukehren.';
 
   @override
   String get speedConsumptionCardTitle => 'Verbrauch nach Geschwindigkeit';

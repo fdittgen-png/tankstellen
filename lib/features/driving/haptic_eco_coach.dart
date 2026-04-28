@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../../core/logging/error_logger.dart';
 import '../consumption/data/obd2/trip_live_reading.dart';
+import 'coach_event.dart';
 
 /// Real-time eco-coaching haptic (#1122).
 ///
@@ -44,6 +45,7 @@ class HapticEcoCoach {
   HapticEcoCoach({
     required this.readings,
     Future<void> Function()? haptic,
+    this.onCoach,
     this.windowSize = const Duration(seconds: 5),
     this.throttleThresholdPercent = 75.0,
     this.maxSpeedDeltaKmh = 10.0,
@@ -62,6 +64,22 @@ class HapticEcoCoach {
   /// Defaults to [HapticFeedback.mediumImpact]. Tests inject a captor
   /// so they can count fires deterministically.
   final Future<void> Function() haptic;
+
+  /// Optional visual / analytics hook — invoked synchronously alongside
+  /// [haptic] on the same fire decision so a UI surface (#1273 visual
+  /// SnackBar) can subscribe via the lifecycle provider's broadcast
+  /// stream WITHOUT duplicating the cooldown logic. Receives a
+  /// [CoachEvent] describing the fire context (timestamp + averaged
+  /// throttle + speed delta from the window).
+  ///
+  /// Errors raised by the callback are caught and surfaced via
+  /// [debugPrint] (the unified [errorLogger] cannot be reached from
+  /// this callback site without breaking the unit-test harness — see
+  /// `_fireCoachCallback`). The live-readings subscription keeps
+  /// flowing in all cases; the haptic that fires before this hook
+  /// is independent of failures here. Null in tests that only care
+  /// about the haptic path.
+  final void Function(CoachEvent event)? onCoach;
 
   /// Rolling-window length the heuristic averages over. Bigger windows
   /// smooth out short stabs but lag the user's actual behaviour;
@@ -126,10 +144,12 @@ class HapticEcoCoach {
     final now = _clock();
     _appendAndPrune(reading, now);
     if (!_windowIsFull(now)) return;
-    if (!_inCooldown(now) && _heuristicMatches()) {
-      _lastFireAt = now;
-      _fireHaptic();
-    }
+    if (_inCooldown(now)) return;
+    final match = _heuristicMatch();
+    if (match == null) return;
+    _lastFireAt = now;
+    _fireHaptic();
+    _fireCoachCallback(now, match);
   }
 
   /// Push the new reading into the buffer and drop anything older than
@@ -169,8 +189,13 @@ class HapticEcoCoach {
   }
 
   /// The actual heuristic — applied only after the buffer is full and
-  /// we're past cooldown. Returns true when:
+  /// we're past cooldown. Returns a [_HeuristicMatch] (carrying the
+  /// averaged throttle + speed delta the fire decision was based on)
+  /// when both checks pass; null otherwise. The diagnostic numbers
+  /// flow into [CoachEvent] for the visual surface (#1273) without
+  /// requiring a second pass over the window.
   ///
+  /// Match conditions:
   ///   * The mean throttle across all non-null entries in the window
   ///     is greater than [throttleThresholdPercent].
   ///   * The speed change between the first and last non-null speed
@@ -178,26 +203,29 @@ class HapticEcoCoach {
   ///     value — both sustained-flat and slight-deceleration cases
   ///     count as "not accelerating").
   ///
-  /// Both checks must pass. Either failing → no fire.
-  bool _heuristicMatches() {
+  /// Both checks must pass. Either failing → null (no fire).
+  _HeuristicMatch? _heuristicMatch() {
     final throttleSamples = _window
         .map((e) => e.throttlePercent)
         .whereType<double>()
         .toList(growable: false);
-    if (throttleSamples.isEmpty) return false;
+    if (throttleSamples.isEmpty) return null;
     final avgThrottle =
         throttleSamples.reduce((a, b) => a + b) / throttleSamples.length;
-    if (avgThrottle <= throttleThresholdPercent) return false;
+    if (avgThrottle <= throttleThresholdPercent) return null;
 
     final speedSamples = _window
         .map((e) => e.speedKmh)
         .whereType<double>()
         .toList(growable: false);
-    if (speedSamples.length < 2) return false;
+    if (speedSamples.length < 2) return null;
     final delta = (speedSamples.last - speedSamples.first).abs();
-    if (delta >= maxSpeedDeltaKmh) return false;
+    if (delta >= maxSpeedDeltaKmh) return null;
 
-    return true;
+    return _HeuristicMatch(
+      avgThrottlePercent: avgThrottle,
+      speedDeltaKmh: delta,
+    );
   }
 
   /// Fire the platform haptic. Errors are routed through [errorLogger]
@@ -217,6 +245,49 @@ class HapticEcoCoach {
       );
     });
   }
+
+  /// Invoke [onCoach] with a fresh [CoachEvent] for the visual surface
+  /// (#1273). Errors are caught and surfaced via [debugPrint] with
+  /// surrounding context so they remain debuggable, while the trip's
+  /// live-readings stream — and the haptic that already fired before
+  /// us — keep going. The trip recording MUST keep flowing even when
+  /// a UI subscriber throws (e.g. accessing a disposed BuildContext
+  /// from a SnackBar handler). No-op when [onCoach] is null.
+  void _fireCoachCallback(DateTime now, _HeuristicMatch match) {
+    final cb = onCoach;
+    if (cb == null) return;
+    final event = CoachEvent(
+      firedAt: now,
+      avgThrottlePercent: match.avgThrottlePercent,
+      speedDeltaKmh: match.speedDeltaKmh,
+    );
+    try {
+      cb(event);
+    } catch (subscriberError, subscriberStack) {
+      // ignore: avoid_print — debugPrint with full context, NOT a
+      // raw exception variable. The lint scanner allows this form
+      // (#1104) because the surrounding string is informative on
+      // its own.
+      debugPrint(
+        'HapticEcoCoach.onCoach threw — visual surface skipped '
+        'this fire (haptic still vibrated): $subscriberError\n'
+        '$subscriberStack',
+      );
+    }
+  }
+}
+
+/// Bundled fire-decision payload returned by [HapticEcoCoach._heuristicMatch].
+/// Pure data — flows into [CoachEvent] for the visual subscriber.
+@immutable
+class _HeuristicMatch {
+  const _HeuristicMatch({
+    required this.avgThrottlePercent,
+    required this.speedDeltaKmh,
+  });
+
+  final double avgThrottlePercent;
+  final double speedDeltaKmh;
 }
 
 /// One entry in the rolling window. Internal helper — pure data.

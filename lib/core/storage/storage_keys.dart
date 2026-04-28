@@ -54,4 +54,12 @@ class StorageKeys {
   /// fires on sustained-high-throttle / low-Δspeed cruise. Defaults to
   /// off so we never buzz a user who hasn't asked for live feedback.
   static const String hapticEcoCoachEnabled = 'haptic_eco_coach_enabled';
+
+  /// #1273 — one-shot flag tracking whether we've already shown the
+  /// "recording continues in the background, tap the red banner to
+  /// return" tip the first time a user backs out of the recording
+  /// screen mid-trip. Default null/false → tip shows once; flips to
+  /// true on display, never resurfacing on this install.
+  static const String tripRecordingResumeTipShown =
+      'trip_recording_resume_tip_shown';
 }

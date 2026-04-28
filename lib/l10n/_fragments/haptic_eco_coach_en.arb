@@ -7,8 +7,8 @@
   "@hapticEcoCoachSettingTitle": {
     "description": "Title of the haptic-eco-coach toggle on the Settings screen (#1122)."
   },
-  "hapticEcoCoachSettingSubtitle": "Gentle haptic when you floor it during cruise",
+  "hapticEcoCoachSettingSubtitle": "Gentle haptic + on-screen tip when you floor it during cruise",
   "@hapticEcoCoachSettingSubtitle": {
-    "description": "Subtitle/explanation of the haptic-eco-coach toggle on the Settings screen (#1122). Describes the heuristic in user-facing terms."
+    "description": "Subtitle/explanation of the haptic-eco-coach toggle on the Settings screen (#1122, updated #1273 — now mentions the on-screen tip alongside the haptic). Describes the heuristic in user-facing terms."
   }
 }
