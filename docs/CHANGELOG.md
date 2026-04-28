@@ -3,6 +3,56 @@
 All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [5.0.0] - 2026-04-28 (Build 5112)
+
+The "cheaper kilometre" release. Where 4.x found you a cheaper litre, 5.x helps you burn fewer of them and shows you exactly what each one cost.
+
+### Added — Layer 2 (drive less consumption)
+
+- **OBD-II auto-record (#1004)** — pair adapter to vehicle, auto-connect on Bluetooth, auto-start on movement, auto-save on disconnect, badge counter on the trips tab. Stale-paused-trip recovery on launch (phase 4-WAL).
+- **Visual eco-coach on recording screen (#1273)** — live haptic + on-screen feedback when behaviour costs fuel. Pin-toggle help sheet and resume-recording hint.
+- **Driving insights card (#1041 phases 1-5)** — hard-accel waste, idling fuel, cold-start surcharge, low-gear coaching (#1263) on the per-trip detail screen.
+- **Composite driving score (#1041 phase 5a, opt-in via gamification toggle)** — single 0-100 number per trip with breakdown chips. Hidden on EV trips.
+- **Throttle / RPM histogram (#1041 phase 3a)** — visualises the engine zone you actually drive in.
+- **Engine-load chart (#1262 phase 3)** — per-sample engine load over the trip, when the car exposes PID 0x04.
+- **Cold-start chip + tooltip (#1262 phase 3)** — surfaces trips where the engine never reached operating temperature.
+- **Gear inference + coaching (#1263)** — 1-D k-means clustering on speed/RPM ratios, with a "labouring in low gear" insight when the metric exceeds 60 s per trip.
+- **Maintenance analyzer (#1124)** — watches consumption drift over time. Pilot heuristics: MAF deviation (cruise fuel-rate drop), idle creep (warm idle drift), sluggish warm-up.
+- **Trip-detail share (#1189)** — render Summary + Insights + charts to a PNG and hand off to the OS share sheet.
+- **Fuel-cost field on trip summary (#1209)** — multiplies trip litres by the most-recent fill-up's price-per-litre when available.
+
+### Added — Layer 3 (transparency)
+
+- **Trips tab on Consumption screen (#889)** — full trip history with distance, duration, avg consumption chips. Resume-recording when a trip is already in progress (#1237).
+- **Pump-display OCR scan handler** — scan the display at the pump as an alternative to receipt OCR.
+- **Driving-insights card on Trip Detail (#1041 phase 2)** — phase 2 wires the insights surface above the charts.
+
+### Added — Layer 1 (cheaper fuel)
+
+- **Daily 18:00 Paris open-testing release (#1066)** — automated AAB → Play Store open-testing track at 18:00 Europe/Paris each day.
+
+### Infrastructure
+
+- **ARB fragment pattern** — `lib/l10n/_fragments/<feature>_<locale>.arb` plus `dart run tool/build_arb.dart` aggregator. Eliminates the multi-coordinator merge conflicts that used to plague `app_en.arb` / `app_de.arb`.
+- **Shell branches refactor** — bottom-nav routes extracted to `lib/app/routes/shell_branches.dart` and `*_routes.dart` files. Drove the file-extraction phase work for #563.
+- **Test coverage drive (#561)** — 7 phase PRs in the 4.3.x → 5.0.0 window covering route configs, route widgets, shell surfaces, loyalty providers, maintenance analyzer heuristics, and the trip-detail body. 100+ new test cases.
+- **Coverage gate lowered to 40 %** (from 45 %, #1292) — temporary while the harder OBD-II / sync paths catch up; will be raised again in 5.1.x.
+- **CI parallelism** — daily-beta job pinned to existing action versions (#1066 follow-up).
+
+### Fixed
+
+- Multi-coordinator race detection on parallel autonomous-loop sessions — first-PR-wins with CI-alive verification before closing the duplicate.
+- Numerous unused-import / `unnecessary_underscores` info-level lint failures that CI started failing on after the analyse-stricter switch (#1168 cycle).
+- Worker compute leaks where isolation worktrees could escape via `cd` — workers now verify `git rev-parse --show-toplevel` before every commit.
+
+### Known limitations / not in this release
+
+- iOS support (#9) is still deferred — code signing, notifications, and background tasks need a paid Apple Developer programme.
+- Auto-import the OBD-II odometer reading into the fill-up form is hidden behind a gate until PID 0xA6 is proven reliable across the supported adapter registry (see [docs/guides/obd2-adapters.md](guides/obd2-adapters.md)).
+- The price-prediction TFLite model (#1117) is on the backlog but not yet shipped.
+
+---
+
 ## [4.3.0] - 2026-03-31 (Build 4001)
 
 ### Bug Fixes
