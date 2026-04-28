@@ -3987,6 +3987,16 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trajetDetailChartRpm => 'RPM';
 
   @override
+  String get trajetDetailChartEngineLoad => 'Engine load (%)';
+
+  @override
+  String get trajetsRowColdStartChip => 'Cold start';
+
+  @override
+  String get trajetsRowColdStartTooltip =>
+      'Engine didn\'t reach operating temperature during this trip — fuel consumption was higher than usual.';
+
+  @override
   String get trajetDetailChartEmpty => 'No samples recorded';
 
   @override

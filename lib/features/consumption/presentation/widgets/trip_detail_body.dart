@@ -147,6 +147,14 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     // summary regardless of per-sample availability.
     final hasRpmSamples = widget.samples.any((s) => s.rpm != null);
 
+    // Engine-load section (#1262 phase 3) follows the same gating
+    // rule as RPM: cars without PID 0x04 emit null on every sample
+    // (legacy trips persisted before #1262 phase 1 also do), and we
+    // silently skip the section header in that case rather than
+    // rendering an empty card.
+    final hasEngineLoadSamples =
+        widget.samples.any((s) => s.engineLoadPercent != null);
+
     // Wrap the report content in a [RepaintBoundary] so the Share
     // action (#1189) can call `boundary.toImage(...)` to produce a PNG
     // for the OS share sheet. The boundary covers Summary + Insights
@@ -193,6 +201,11 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
           _ChartSection(
             title: l?.trajetDetailChartRpm ?? 'RPM',
             chart: TripDetailRpmChart(samples: widget.samples),
+          ),
+        if (hasEngineLoadSamples)
+          _ChartSection(
+            title: l?.trajetDetailChartEngineLoad ?? 'Engine load (%)',
+            chart: TripDetailEngineLoadChart(samples: widget.samples),
           ),
       ],
     );

@@ -7400,6 +7400,24 @@ abstract class AppLocalizations {
   /// **'RPM'**
   String get trajetDetailChartRpm;
 
+  /// Section title above the engine-load-over-time chart on the Trip detail screen (#1262 phase 3). Hidden when no sample carries an engineLoadPercent value (cars without OBD2 PID 0x04).
+  ///
+  /// In en, this message translates to:
+  /// **'Engine load (%)'**
+  String get trajetDetailChartEngineLoad;
+
+  /// Compact chip label rendered on the trip-history row when the trip's coldStartSurcharge flag is true (#1262 phase 3). Tells the user the engine never reached operating temperature, which raised fuel consumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Cold start'**
+  String get trajetsRowColdStartChip;
+
+  /// Tooltip shown when the user long-presses the cold-start chip on a trip-history row (#1262 phase 3). Explains the surcharge in plain language.
+  ///
+  /// In en, this message translates to:
+  /// **'Engine didn\'t reach operating temperature during this trip — fuel consumption was higher than usual.'**
+  String get trajetsRowColdStartTooltip;
+
   /// Empty-state caption shown inside a Trip detail chart when no matching samples were recorded (#890).
   ///
   /// In en, this message translates to:

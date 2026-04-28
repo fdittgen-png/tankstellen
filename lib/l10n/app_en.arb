@@ -2585,6 +2585,18 @@
   "@trajetDetailChartRpm": {
     "description": "Section title above the RPM-over-time chart on the Trip detail screen (#890)."
   },
+  "trajetDetailChartEngineLoad": "Engine load (%)",
+  "@trajetDetailChartEngineLoad": {
+    "description": "Section title above the engine-load-over-time chart on the Trip detail screen (#1262 phase 3). Hidden when no sample carries an engineLoadPercent value (cars without OBD2 PID 0x04)."
+  },
+  "trajetsRowColdStartChip": "Cold start",
+  "@trajetsRowColdStartChip": {
+    "description": "Compact chip label rendered on the trip-history row when the trip's coldStartSurcharge flag is true (#1262 phase 3). Tells the user the engine never reached operating temperature, which raised fuel consumption."
+  },
+  "trajetsRowColdStartTooltip": "Engine didn't reach operating temperature during this trip — fuel consumption was higher than usual.",
+  "@trajetsRowColdStartTooltip": {
+    "description": "Tooltip shown when the user long-presses the cold-start chip on a trip-history row (#1262 phase 3). Explains the surcharge in plain language."
+  },
   "trajetDetailChartEmpty": "No samples recorded",
   "@trajetDetailChartEmpty": {
     "description": "Empty-state caption shown inside a Trip detail chart when no matching samples were recorded (#890)."

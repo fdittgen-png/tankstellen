@@ -148,6 +148,38 @@ class TripDetailRpmChart extends StatelessWidget {
   }
 }
 
+/// Engine-load-over-time sparkline on the Trip detail screen
+/// (#1262 phase 3).
+///
+/// Plots `sample.engineLoadPercent` (PID 0x04) on a 0..100 axis. The
+/// PARENT screen gates rendering on "any non-null engineLoad sample"
+/// — cars without PID 0x04 carry null on every sample, and the screen
+/// silently skips the section header rather than rendering an empty
+/// card. This widget itself still falls back to the shared empty-state
+/// caption when every sample is null, so direct tests of the chart
+/// stay symmetrical with the RPM / fuel-rate variants.
+class TripDetailEngineLoadChart extends StatelessWidget {
+  final List<TripDetailSample> samples;
+  final Color? color;
+
+  const TripDetailEngineLoadChart({
+    super.key,
+    required this.samples,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _TripDetailLineChart(
+      samples: samples,
+      color: color,
+      valueOf: (s) => s.engineLoadPercent,
+      unit: '%',
+      emptyWhenAllNull: true,
+    );
+  }
+}
+
 /// Shared implementation — every Trip-detail chart is the same
 /// rolling-window line plot over [timestamp], differing only in which
 /// sample field they extract. Keeping the painter private avoids
