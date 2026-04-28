@@ -5,7 +5,9 @@ import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/widgets/settings_menu_tile.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_settings_section.dart';
+import 'package:tankstellen/features/profile/presentation/widgets/gamification_settings_tile.dart';
 
+import '../../../fakes/fake_storage_repository.dart';
 import '../../../helpers/pump_app.dart';
 
 /// Widget coverage for [DrivingSettingsSection] (#1122).
@@ -30,6 +32,7 @@ void main() {
         const DrivingSettingsSection(),
         overrides: [
           settingsStorageProvider.overrideWithValue(fake),
+          storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
         ],
       );
 
@@ -71,6 +74,7 @@ void main() {
         const DrivingSettingsSection(),
         overrides: [
           settingsStorageProvider.overrideWithValue(fake),
+          storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
         ],
       );
 
@@ -96,6 +100,7 @@ void main() {
         const DrivingSettingsSection(),
         overrides: [
           settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
+          storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
         ],
       );
 
@@ -124,6 +129,34 @@ void main() {
         reason: 'Exactly two SettingsMenuTile children: vehicles + fuel '
             'club. Adding more would risk drift between this section '
             'and the Conso-tab landing screen.',
+      );
+    },
+  );
+
+  testWidgets(
+    'nests the gamification opt-out tile inside the Conso section '
+    '(#1249 — moved out of the standalone settings card)',
+    (tester) async {
+      await pumpApp(
+        tester,
+        const DrivingSettingsSection(),
+        overrides: [
+          settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
+          storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
+        ],
+      );
+
+      // The gamification toggle now lives as the last child of the
+      // Consumption foldable instead of as a sibling Card on the
+      // Settings page. Asserting it is present here pins that
+      // placement so a future rewrite can't silently move it back.
+      expect(
+        find.byType(GamificationSettingsTile),
+        findsOneWidget,
+        reason:
+            'Exactly one GamificationSettingsTile must render inside '
+            'DrivingSettingsSection — duplication or absence indicates '
+            'the #1249 placement regressed.',
       );
     },
   );
