@@ -408,6 +408,7 @@ void main() {
           '010D': '41 0D 32>', // 50 km/h
           '0111': '41 11 40>',
           '0104': '41 04 33>', // 0x33 = 51 → ~20 %
+          '0105': '41 05 78>', // 0x78 = 120 → 80 °C
           '010F': '41 0F 41>',
           '0106': '41 06 80>',
           '0107': '41 07 80>',
@@ -447,6 +448,8 @@ void main() {
         expect(latest.engineLoadPercent, closeTo(20, 1));
         // Fuel level landed via 012F → ~50 %.
         expect(latest.fuelLevelPercent, closeTo(50, 1));
+        // Coolant temp landed via 0105 → 80 °C (0x78 - 40). #1262.
+        expect(latest.coolantTempC, closeTo(80, 0.1));
       });
     });
   });

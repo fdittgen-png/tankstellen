@@ -23,6 +23,13 @@ class TripLiveReading {
   /// the engine-load proxy. Null when the adapter hasn't surfaced PID
   /// 11 or the first tick hasn't landed yet.
   final double? throttlePercent;
+
+  /// Engine coolant temperature in °C (PID 0x05). Null when the car
+  /// doesn't surface the PID or the first tick hasn't landed. Persists
+  /// onto [TripSample] so the cold-start surcharge heuristic (#1262
+  /// phase 2) can read it post-trip — engines that never reach
+  /// operating temperature burn proportionally more fuel for warm-up.
+  final double? coolantTempC;
   final double distanceKmSoFar;
   final double? fuelLitersSoFar;
   final Duration elapsed;
@@ -36,6 +43,7 @@ class TripLiveReading {
     this.fuelLevelPercent,
     this.engineLoadPercent,
     this.throttlePercent,
+    this.coolantTempC,
     required this.distanceKmSoFar,
     this.fuelLitersSoFar,
     required this.elapsed,

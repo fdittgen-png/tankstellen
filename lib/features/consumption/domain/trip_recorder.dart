@@ -13,12 +13,27 @@ class TripSample {
   /// histogram falls back to the RPM axis only in that case (#1261).
   final double? throttlePercent;
 
+  /// Calculated engine load in percent (PID 0x04). Null when the car
+  /// doesn't surface the PID. Persisted so post-trip insights can
+  /// distinguish "uphill at 60 km/h" (high load) from "flat at 60 km/h"
+  /// (low load) instead of inferring from RPM alone (#1262).
+  final double? engineLoadPercent;
+
+  /// Engine coolant temperature in °C (PID 0x05). Null when the car
+  /// doesn't surface the PID. Persisted so the cold-start surcharge
+  /// heuristic (#1262 phase 2) can flag trips whose ECT never reached
+  /// operating temperature — those burn proportionally more fuel for
+  /// warm-up.
+  final double? coolantTempC;
+
   const TripSample({
     required this.timestamp,
     required this.speedKmh,
     required this.rpm,
     this.fuelRateLPerHour,
     this.throttlePercent,
+    this.engineLoadPercent,
+    this.coolantTempC,
   });
 }
 

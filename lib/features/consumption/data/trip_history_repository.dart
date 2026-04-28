@@ -74,18 +74,21 @@ class TripHistoryEntry {
 }
 
 /// Serialise a single [TripSample]. Compact key names
-/// ('t','s','r','f','th') keep per-trip JSON small — a 39-min trip ×
-/// 1 Hz lands around 19 KB compressed at this density. Use
-/// millisecondsSinceEpoch for the timestamp so the JSON parses fast
-/// and round-trips precisely. The `'th'` key (#1261) is only emitted
-/// when throttle % was actually read (cars without PID 0x11 omit it
-/// — legacy trips without `'th'` deserialise with throttle null).
+/// ('t','s','r','f','th','el','ct') keep per-trip JSON small — a
+/// 39-min trip × 1 Hz lands around 19 KB compressed at this density.
+/// Use millisecondsSinceEpoch for the timestamp so the JSON parses
+/// fast and round-trips precisely. The optional `'th'` (#1261),
+/// `'el'` and `'ct'` (#1262) keys are only emitted when the
+/// corresponding PID was actually read — legacy trips written before
+/// each key landed deserialise with the field null.
 Map<String, dynamic> _sampleToJson(TripSample s) => {
       't': s.timestamp.millisecondsSinceEpoch,
       's': s.speedKmh,
       'r': s.rpm,
       if (s.fuelRateLPerHour != null) 'f': s.fuelRateLPerHour,
       if (s.throttlePercent != null) 'th': s.throttlePercent,
+      if (s.engineLoadPercent != null) 'el': s.engineLoadPercent,
+      if (s.coolantTempC != null) 'ct': s.coolantTempC,
     };
 
 TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
@@ -96,6 +99,8 @@ TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
       rpm: (j['r'] as num).toDouble(),
       fuelRateLPerHour: (j['f'] as num?)?.toDouble(),
       throttlePercent: (j['th'] as num?)?.toDouble(),
+      engineLoadPercent: (j['el'] as num?)?.toDouble(),
+      coolantTempC: (j['ct'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _summaryToJson(TripSummary s) => {

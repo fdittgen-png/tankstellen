@@ -271,6 +271,7 @@ class TripRecordingController {
   double? _latestIatCelsius;
   double? _latestThrottlePercent;
   double? _latestEngineLoadPercent;
+  double? _latestCoolantTempC;
   double? _latestFuelLevelPercent;
   double? _latestStft;
   double? _latestLtft;
@@ -853,6 +854,17 @@ class TripRecordingController {
         if (v != null) _latestIatCelsius = v;
       },
     );
+    // Coolant temp drifts slowly — 1 Hz is more than enough resolution
+    // for the cold-start surcharge heuristic (#1262 phase 2) to detect
+    // whether the trip ever crossed operating temperature.
+    scheduler.subscribe(
+      Elm327Protocol.coolantTempCommand,
+      ScheduledPid(hz: 1.0),
+      (r) {
+        final v = Elm327Protocol.parseCoolantTempCelsius(r);
+        if (v != null) _latestCoolantTempC = v;
+      },
+    );
     scheduler.subscribe(
       Elm327Protocol.shortTermFuelTrimCommand,
       ScheduledPid(hz: 1.0),
@@ -916,6 +928,8 @@ class TripRecordingController {
         rpm: _latestRpm ?? 0,
         fuelRateLPerHour: fuelRate,
         throttlePercent: _latestThrottlePercent,
+        engineLoadPercent: _latestEngineLoadPercent,
+        coolantTempC: _latestCoolantTempC,
       );
       _recorder.onSample(sample);
       _lastSampleAt = nowTs;
@@ -933,6 +947,7 @@ class TripRecordingController {
       fuelLevelPercent: _latestFuelLevelPercent,
       engineLoadPercent: _latestEngineLoadPercent,
       throttlePercent: _latestThrottlePercent,
+      coolantTempC: _latestCoolantTempC,
       distanceKmSoFar: _recorder.buildSummary().distanceKm,
       fuelLitersSoFar: _fuelRateSeen ? _fuelLitersSoFar : null,
       elapsed: nowTs.difference(_startedAt ?? nowTs),

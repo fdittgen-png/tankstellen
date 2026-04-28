@@ -134,6 +134,17 @@ class Elm327Parsers {
     return bytes[2].toDouble() - 40.0;
   }
 
+  /// Parse engine coolant temperature from Mode 01 PID 05 response
+  /// (#1262). Formula: °C = A − 40 (single byte) — same encoding as
+  /// PID 0F (intake air). Response: "41 05 XX". Range −40 °C to
+  /// 215 °C. Used by the cold-start surcharge heuristic to flag trips
+  /// whose ECT never reached operating temperature.
+  static double? parseCoolantTempCelsius(String raw) {
+    final bytes = _parseModeOneBody(raw, 0x05, minBytes: 3);
+    if (bytes == null) return null;
+    return bytes[2].toDouble() - 40.0;
+  }
+
   /// Parse short-term fuel trim bank 1 from Mode 01 PID 06 response
   /// (#813). Formula: `trim% = (A − 128) × 100 / 128`. Midpoint 128
   /// = 0 % (stoichiometric); <128 means the ECU is leaning the
