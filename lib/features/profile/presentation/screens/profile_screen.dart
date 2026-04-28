@@ -11,7 +11,6 @@ import '../../../driving/presentation/widgets/driving_settings_section.dart';
 import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
 import '../widgets/feedback_token_section.dart';
-import '../widgets/gamification_settings_tile.dart';
 import '../widgets/location_section_widget.dart';
 import '../widgets/profile_list_section.dart';
 import '../widgets/storage_section.dart';
@@ -116,20 +115,6 @@ class ProfileScreen extends ConsumerWidget {
             icon: Icons.local_gas_station_outlined,
             title: l?.navConsumption ?? 'Consumption',
             child: const DrivingSettingsSection(),
-          ),
-          const SizedBox(height: 8),
-
-          // #1194 — master gamification opt-out. A flat card next to
-          // the existing toggle-style entries. Default on; flipping it
-          // off hides badges, scores, the achievements tab, and the
-          // driving-score card across the app while keeping the
-          // underlying achievement engine running.
-          const Card(
-            margin: EdgeInsets.zero,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: GamificationSettingsTile(),
-            ),
           ),
           const SizedBox(height: 8),
 
