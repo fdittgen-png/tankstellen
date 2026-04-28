@@ -38,6 +38,12 @@ part 'search_provider.g.dart';
 class SearchState extends _$SearchState {
   CancelToken? _activeCancelToken;
 
+  /// Replays the most recently issued search. `null` until the user has
+  /// run at least one search. Used by [repeatLastSearch], which lets
+  /// observers (e.g. MapScreen's app-resume handler, #1268) refresh
+  /// stale data without knowing which search-by-X variant was invoked.
+  Future<void> Function()? _lastSearchReplay;
+
   /// Cancel any in-flight search and create a fresh [CancelToken].
   CancelToken _newCancelToken() {
     final old = _activeCancelToken;
@@ -54,6 +60,21 @@ class SearchState extends _$SearchState {
       source: ServiceSource.cache,
       fetchedAt: DateTime.now(),
     ));
+  }
+
+  /// Re-runs the most recent search (whichever entry point — GPS, ZIP,
+  /// coordinates) with the same parameters. No-op if no search has run
+  /// yet or one is already in flight.
+  ///
+  /// Used by [MapScreen] to refresh stale tile + price data when the
+  /// app returns from background after >10 s (#1268). Returns the same
+  /// future the underlying search returns, or a completed future when
+  /// no replay is available.
+  Future<void> repeatLastSearch() async {
+    final replay = _lastSearchReplay;
+    if (replay == null) return;
+    if (state.isLoading) return;
+    await replay();
   }
 
   /// Wraps a search closure with standard loading state + error
@@ -83,6 +104,11 @@ class SearchState extends _$SearchState {
     double? radiusKm,
     SortBy? sortBy,
   }) async {
+    _lastSearchReplay = () => searchByGps(
+          fuelType: fuelType,
+          radiusKm: radiusKm,
+          sortBy: sortBy,
+        );
     await _runSearch((cancelToken) async {
       final position =
           await ref.read(locationServiceProvider).getCurrentPosition();
@@ -138,6 +164,12 @@ class SearchState extends _$SearchState {
     double? radiusKm,
     SortBy? sortBy,
   }) async {
+    _lastSearchReplay = () => searchByZipCode(
+          zipCode: zipCode,
+          fuelType: fuelType,
+          radiusKm: radiusKm,
+          sortBy: sortBy,
+        );
     await _runSearch((cancelToken) async {
       await autoUpdatePositionIfEnabled(ref);
       final geocoding = ref.read(geocodingChainProvider);
@@ -202,6 +234,14 @@ class SearchState extends _$SearchState {
     FuelType? fuelType,
     double? radiusKm,
   }) async {
+    _lastSearchReplay = () => searchByCoordinates(
+          lat: lat,
+          lng: lng,
+          postalCode: postalCode,
+          locationName: locationName,
+          fuelType: fuelType,
+          radiusKm: radiusKm,
+        );
     await _runSearch((cancelToken) async {
       await autoUpdatePositionIfEnabled(ref);
       if (locationName != null) {
