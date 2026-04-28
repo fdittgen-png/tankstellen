@@ -10,5 +10,21 @@
   "tripRecordingPinSemanticOff": "Pin recording form",
   "@tripRecordingPinSemanticOff": {
     "description": "Accessibility label when the pin toggle is currently OFF. Tapping will pin (enable wake lock + immersive mode)."
+  },
+  "tripRecordingPinHelpTooltip": "What does pin do?",
+  "@tripRecordingPinHelpTooltip": {
+    "description": "Tooltip on the help (?) icon adjacent to the pin button (#1273). Tapping opens a bottom sheet explaining what pin does."
+  },
+  "tripRecordingPinHelpTitle": "About pin",
+  "@tripRecordingPinHelpTitle": {
+    "description": "Title of the bottom sheet explaining the pin button (#1273)."
+  },
+  "tripRecordingPinHelpBody": "Pin keeps the screen on and hides system bars so the form stays readable on a dashboard mount. Tap again to release. Auto-releases when the trip stops.",
+  "@tripRecordingPinHelpBody": {
+    "description": "Body text in the bottom sheet explaining the pin button (#1273)."
+  },
+  "tripRecordingResumeHintMessage": "Recording continues in the background. Tap the red banner at the top of any screen to return.",
+  "@tripRecordingResumeHintMessage": {
+    "description": "One-time tooltip shown the first time the user backs out of the recording screen while a trip is still recording (#1273). Tells them they can tap the persistent banner to return. Persisted dismissal — never fires twice."
   }
 }

@@ -5,8 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/storage/storage_keys.dart';
+import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../driving/haptic_eco_coach.dart';
+import '../../../driving/providers/haptic_eco_coach_provider.dart';
 import '../../domain/trip_recorder.dart';
 import '../../providers/trip_recording_provider.dart';
 import '../../providers/wakelock_facade.dart';
@@ -64,6 +68,24 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
   /// widget is deactivated). Populated the first time the user pins.
   WakelockFacade? _cachedFacade;
 
+  /// #1273 — subscription to [HapticEcoCoachLifecycle.coachEvents]. We
+  /// open this in [initState] and cancel in [dispose] so the visual
+  /// SnackBar surface is bound to THIS screen's lifecycle: navigating
+  /// to the summary, history, or any other route silently stops the
+  /// SnackBar even if the coach keeps firing in the background.
+  StreamSubscription<CoachEvent>? _coachEventsSub;
+
+  @override
+  void initState() {
+    super.initState();
+    // Subscribe to the long-lived coach-events broadcast. The
+    // lifecycle provider's stream is filter-empty when the toggle is
+    // off — no event will be emitted until the user has opted in,
+    // so a `setState`-light listener is fine here.
+    final lifecycle = ref.read(hapticEcoCoachLifecycleProvider.notifier);
+    _coachEventsSub = lifecycle.coachEvents.listen(_onCoachEvent);
+  }
+
   @override
   void dispose() {
     // Auto-release the wake lock + restore system UI if the user
@@ -82,7 +104,41 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         ),
       );
     }
+    _coachEventsSub?.cancel();
+    _coachEventsSub = null;
     super.dispose();
+  }
+
+  /// Show the visual eco-coach SnackBar. Lifecycle-gated: this is
+  /// only called while the recording screen is mounted because the
+  /// stream subscription only exists between initState and dispose.
+  /// The provider gates EMISSION on the haptic-eco-coach toggle, so
+  /// no event reaches us when the toggle is off — no need to
+  /// double-gate here.
+  void _onCoachEvent(CoachEvent _) {
+    if (!mounted) return;
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    if (messenger == null) return;
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        key: const Key('hapticEcoCoachSnackBar'),
+        duration: const Duration(seconds: 4),
+        content: Row(
+          children: [
+            const Icon(Icons.eco, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                l?.hapticEcoCoachSnackBarMessage ??
+                    'Easy on the throttle — coasting saves more',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _onStop() async {
@@ -167,6 +223,99 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     Navigator.of(context).pop(null);
   }
 
+  /// #1273 — show a bottom sheet explaining what the pin button does.
+  /// Always visible (NOT gated by any toggle); first-launch users
+  /// need this regardless of opt-ins.
+  void _showPinHelp() {
+    final l = AppLocalizations.of(context);
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.push_pin, size: 24),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l?.tripRecordingPinHelpTitle ?? 'About pin',
+                        style: Theme.of(ctx).textTheme.titleLarge,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  l?.tripRecordingPinHelpBody ??
+                      'Pin keeps the screen on and hides system bars '
+                          'so the form stays readable on a dashboard '
+                          'mount. Tap again to release. Auto-releases '
+                          'when the trip stops.',
+                ),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    child: Text(l?.tooltipBack ?? 'Close'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// #1273 — handle the back-press. If the trip is still recording
+  /// AND the user has never seen the resume hint, show a SnackBar
+  /// with the resume copy, persist the dismissal, then pop. Once the
+  /// flag is set (in Hive) future back-outs pop immediately.
+  Future<void> _onBackPressed() async {
+    final state = ref.read(tripRecordingProvider);
+    final settings = ref.read(settingsStorageProvider);
+    final shown =
+        settings.getSetting(StorageKeys.tripRecordingResumeHintShown) == true;
+    if (state.isActive && !shown) {
+      final l = AppLocalizations.of(context);
+      final messenger = ScaffoldMessenger.maybeOf(context);
+      if (messenger != null) {
+        messenger.hideCurrentSnackBar();
+        messenger.showSnackBar(
+          SnackBar(
+            key: const Key('tripRecordingResumeHintSnackBar'),
+            duration: const Duration(seconds: 5),
+            content: Text(
+              l?.tripRecordingResumeHintMessage ??
+                  'Recording continues in the background. Tap the red '
+                      'banner at the top of any screen to return.',
+            ),
+          ),
+        );
+      }
+      // Persist the dismissal so the hint never fires twice. Awaited
+      // so the test that asserts post-state can read it back without
+      // racing the pop.
+      await settings.putSetting(
+        StorageKeys.tripRecordingResumeHintShown,
+        true,
+      );
+    }
+    if (!mounted) return;
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    } else {
+      GoRouter.of(context).go('/');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -187,14 +336,9 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         tooltip: l?.tooltipBack ?? 'Back',
         // Back from the recording screen DOES NOT stop the trip —
         // it stays alive via the provider. The banner is the
-        // user's way back in.
-        onPressed: () {
-          if (Navigator.canPop(context)) {
-            Navigator.pop(context);
-          } else {
-            GoRouter.of(context).go('/');
-          }
-        },
+        // user's way back in. #1273 — first back-out while
+        // recording fires a one-time tooltip pointing at the banner.
+        onPressed: _onBackPressed,
       ),
       actions: stopped != null
           ? null
@@ -225,6 +369,17 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
                   isSelected: _pinned,
                   onPressed: _togglePin,
                 ),
+              ),
+              // #1273 — `?` icon adjacent to the pin button. Always
+              // visible (no toggle gating); first-launch users need
+              // a path to "what does this button do" without leaving
+              // the recording screen.
+              IconButton(
+                key: const Key('tripPinHelpButton'),
+                icon: const Icon(Icons.help_outline),
+                tooltip: l?.tripRecordingPinHelpTooltip ??
+                    'What does pin do?',
+                onPressed: _showPinHelp,
               ),
               IconButton(
                 key: const Key('tripPauseButton'),

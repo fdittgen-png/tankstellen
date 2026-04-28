@@ -54,4 +54,11 @@ class StorageKeys {
   /// fires on sustained-high-throttle / low-Δspeed cruise. Defaults to
   /// off so we never buzz a user who hasn't asked for live feedback.
   static const String hapticEcoCoachEnabled = 'haptic_eco_coach_enabled';
+
+  /// #1273 — flag set the first time the user backs out of the trip
+  /// recording screen WHILE recording, after they've seen the "tap the
+  /// red banner to return" tooltip. Persisted so the tooltip never
+  /// fires twice for the same user.
+  static const String tripRecordingResumeHintShown =
+      'trip_recording_resume_hint_shown';
 }

@@ -6,6 +6,23 @@ import 'package:flutter/services.dart';
 import '../../core/logging/error_logger.dart';
 import '../consumption/data/obd2/trip_live_reading.dart';
 
+/// One coach fire decision (#1273).
+///
+/// Emitted on the lifecycle provider's `coachEvents` stream every time
+/// the heuristic in [HapticEcoCoach] decides to nudge the driver. The
+/// haptic surface and the visual SnackBar both subscribe to the same
+/// stream so they share the 30 s cooldown — there is exactly one
+/// decision per fire window, never one per surface.
+@immutable
+class CoachEvent {
+  /// Wall-clock instant of the fire decision (matches the value the
+  /// coach used to update its internal cooldown gate). Tests assert on
+  /// this to verify cooldown sequencing without `Future.delayed`.
+  final DateTime triggeredAt;
+
+  const CoachEvent({required this.triggeredAt});
+}
+
 /// Real-time eco-coaching haptic (#1122).
 ///
 /// Pure wheel-lens feature: fires a gentle haptic when the driver is
@@ -44,6 +61,7 @@ class HapticEcoCoach {
   HapticEcoCoach({
     required this.readings,
     Future<void> Function()? haptic,
+    this.onFire,
     this.windowSize = const Duration(seconds: 5),
     this.throttleThresholdPercent = 75.0,
     this.maxSpeedDeltaKmh = 10.0,
@@ -62,6 +80,14 @@ class HapticEcoCoach {
   /// Defaults to [HapticFeedback.mediumImpact]. Tests inject a captor
   /// so they can count fires deterministically.
   final Future<void> Function() haptic;
+
+  /// Fan-out callback fired alongside [haptic] on every fire decision
+  /// (#1273). The lifecycle provider plumbs this into a broadcast
+  /// `Stream<CoachEvent>` that the visual SnackBar subscribes to, so
+  /// the haptic and visual surfaces share the SAME 30 s cooldown — one
+  /// decision per match, never one per surface. Optional: tests that
+  /// only care about the haptic count leave it null.
+  final void Function(CoachEvent event)? onFire;
 
   /// Rolling-window length the heuristic averages over. Bigger windows
   /// smooth out short stabs but lag the user's actual behaviour;
@@ -129,6 +155,12 @@ class HapticEcoCoach {
     if (!_inCooldown(now) && _heuristicMatches()) {
       _lastFireAt = now;
       _fireHaptic();
+      // Fire the visual / event-stream surface AFTER the haptic so a
+      // synchronous subscriber can rely on the cooldown gate having
+      // already advanced. Errors here are swallowed via the same
+      // logger path as the haptic — a SnackBar push must never kill
+      // the live-readings subscription (#1273).
+      _fireEvent(now);
     }
   }
 
@@ -216,6 +248,29 @@ class HapticEcoCoach {
         },
       );
     });
+  }
+
+  /// Fire the visual / event-stream subscriber (#1273). The callback
+  /// is optional — code paths that don't need a visual surface (the
+  /// existing pure-haptic test suite) construct a coach without
+  /// `onFire` and pay nothing. Errors are routed through the same
+  /// logger so a SnackBar push that throws can't kill the readings
+  /// subscription.
+  void _fireEvent(DateTime triggeredAt) {
+    final cb = onFire;
+    if (cb == null) return;
+    try {
+      cb(CoachEvent(triggeredAt: triggeredAt));
+    } catch (e, st) {
+      errorLogger.log(
+        ErrorLayer.ui,
+        e,
+        st,
+        context: <String, Object?>{
+          'where': 'HapticEcoCoach.onFire',
+        },
+      );
+    }
   }
 }
 

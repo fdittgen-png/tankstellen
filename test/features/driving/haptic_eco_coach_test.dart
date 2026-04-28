@@ -177,6 +177,83 @@ void main() {
       );
     });
 
+    test('onFire fires alongside the haptic on every fire decision (#1273)',
+        () async {
+      // Both surfaces (haptic + visual SnackBar) share the SAME 30 s
+      // cooldown via a single fire decision per match. Two fire
+      // windows < 30 s apart must fire neither callback the second
+      // time.
+      final clock = _Clock(DateTime(2026, 1, 1, 12, 0, 0));
+      var hapticCount = 0;
+      final events = <CoachEvent>[];
+      final coach = HapticEcoCoach(
+        readings: const Stream<TripLiveReading>.empty(),
+        haptic: () async => hapticCount++,
+        onFire: events.add,
+        clock: clock.now,
+      );
+
+      _feedConstant(
+        coach,
+        clock,
+        durationSeconds: 6,
+        intervalMs: 200,
+        throttle: 85.0,
+        speed: 120.0,
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        hapticCount,
+        equals(1),
+        reason: 'Haptic fires once on the matching window.',
+      );
+      expect(
+        events.length,
+        equals(1),
+        reason:
+            'Visual surface event fires alongside the haptic — one '
+            'decision per match, never one per surface.',
+      );
+
+      // Second window inside the cooldown — neither surface fires.
+      clock.advance(const Duration(seconds: 10));
+      _feedConstant(
+        coach,
+        clock,
+        durationSeconds: 6,
+        intervalMs: 200,
+        throttle: 85.0,
+        speed: 120.0,
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        hapticCount,
+        equals(1),
+        reason: 'Cooldown still applies to haptic.',
+      );
+      expect(
+        events.length,
+        equals(1),
+        reason:
+            'Cooldown applies to BOTH surfaces — they share one fire '
+            'decision so neither can race the other.',
+      );
+
+      // Past the cooldown — both fire again.
+      clock.advance(const Duration(seconds: 35));
+      _feedConstant(
+        coach,
+        clock,
+        durationSeconds: 6,
+        intervalMs: 200,
+        throttle: 85.0,
+        speed: 120.0,
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(hapticCount, equals(2));
+      expect(events.length, equals(2));
+    });
+
     test('start() subscribes to the readings stream and forwards to heuristic',
         () async {
       final clock = _Clock(DateTime(2026, 1, 1, 12, 0, 0));
