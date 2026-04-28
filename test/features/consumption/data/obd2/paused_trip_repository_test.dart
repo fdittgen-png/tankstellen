@@ -110,6 +110,7 @@ void main() {
       expect(actual.odometerStartKm, expected.odometerStartKm);
       expect(actual.odometerLatestKm, expected.odometerLatestKm);
       expect(actual.pausedAt, expected.pausedAt);
+      expect(actual.automatic, expected.automatic);
       expectSummaryEquals(actual.summary, expected.summary);
     }
 
@@ -248,6 +249,43 @@ void main() {
       final minimal = minimalEntry();
       final minimalRound = PausedTripEntry.fromJson(minimal.toJson());
       expectEntryEquals(minimalRound, minimal);
+    });
+
+    test('automatic flag round-trips through save → load (#1004 phase '
+        '4-WAL)', () async {
+      final auto = PausedTripEntry(
+        id: '2026-04-27T12:00:00.000Z',
+        vehicleId: 'veh-auto',
+        vin: null,
+        summary: minimalSummary(),
+        odometerStartKm: null,
+        odometerLatestKm: null,
+        pausedAt: DateTime.utc(2026, 4, 27, 12, 5),
+        automatic: true,
+      );
+      await repo.save(auto);
+      final loaded = repo.load(auto.id);
+      expect(loaded, isNotNull);
+      expect(loaded!.automatic, isTrue);
+      expectEntryEquals(loaded, auto);
+
+      // toJson emits the key only when true (parsimony) and fromJson
+      // tolerates the missing key by defaulting to false. This keeps
+      // pre-#1004 paused rows deserialising cleanly into a manual
+      // entry.
+      final autoJson = auto.toJson();
+      expect(autoJson['automatic'], isTrue);
+
+      final manualJson = Map<String, dynamic>.from(autoJson)..remove('automatic');
+      final manualParsed = PausedTripEntry.fromJson(manualJson);
+      expect(manualParsed.automatic, isFalse);
+    });
+
+    test('omits automatic key when false to keep payload parsimonious',
+        () {
+      final manual = minimalEntry(); // automatic defaults to false
+      final json = manual.toJson();
+      expect(json.containsKey('automatic'), isFalse);
     });
   });
 }

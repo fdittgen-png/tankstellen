@@ -136,6 +136,15 @@ class TripRecordingController {
   /// through at construction so the paused-trips box row carries it.
   final String? _vehicleId;
 
+  /// Whether this recording was kicked off by the hands-free
+  /// [AutoTripCoordinator] (#1004 phase 4-WAL). Plumbed through to the
+  /// persisted [PausedTripEntry] so the launch-time recovery service
+  /// can decide whether to bump the launcher-icon badge when it
+  /// finalises a stale entry — manual trips never counted toward
+  /// "unseen" and must not retroactively start counting just because
+  /// the app was killed before the disconnect-save timer fired.
+  final bool _automatic;
+
   /// Optional override — tests inject a hand-built scheduler (usually
   /// with a tiny [PidScheduler.tickRate] + a fake transport) to
   /// exercise the scheduler ↔ controller wiring without touching the
@@ -294,6 +303,7 @@ class TripRecordingController {
     int dropThreshold = 3,
     Duration schedulerTickRate = const Duration(milliseconds: 100),
     String? pinnedAdapterMac,
+    bool automatic = false,
     AdapterReconnectScanner? Function(
       String pinnedMac,
       VoidCallback onReconnect,
@@ -312,6 +322,7 @@ class TripRecordingController {
         _dropThreshold = dropThreshold,
         _schedulerTickRate = schedulerTickRate,
         _pinnedAdapterMac = pinnedAdapterMac,
+        _automatic = automatic,
         _reconnectScannerFactory = reconnectScannerFactory;
 
   /// Live metrics stream — subscribe to update the recording UI.
@@ -758,6 +769,10 @@ class TripRecordingController {
       odometerStartKm: _odometerStartKm,
       odometerLatestKm: _odometerLatestKm,
       pausedAt: _now(),
+      // #1004 phase 4-WAL — flag persists so the launch-time recovery
+      // service knows whether to bump the launcher-icon badge if the
+      // app is killed before the grace timer fires.
+      automatic: _automatic,
     );
     // Fire-and-forget: the save is best-effort; Hive errors are
     // logged by the repo and must not throw back into the scheduler
