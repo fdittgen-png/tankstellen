@@ -8,5 +8,10 @@
   "autoRecordPairedAdapterNone": "Kein Adapter verbunden. Verbinde zuerst einen über das OBD2-Onboarding.",
   "autoRecordBackgroundLocationLabel": "Standort im Hintergrund erlaubt",
   "autoRecordBackgroundLocationRequest": "Berechtigung anfordern",
+  "autoRecordBackgroundLocationRationaleTitle": "Warum \"Immer erlauben\"?",
+  "autoRecordBackgroundLocationRationaleBody": "Die automatische Aufzeichnung erfasst GPS-Koordinaten über den OBD-II-Vordergrunddienst, auch wenn der Bildschirm aus ist, damit deine Streckenführung korrekt bleibt. Android verlangt dafür die Option \"Immer erlauben\" — sonst stoppt die Standortabfrage, sobald das Gerät gesperrt wird.",
+  "autoRecordBackgroundLocationOpenSettings": "Einstellungen öffnen",
+  "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Standortberechtigung erforderlich",
+  "autoRecordBackgroundLocationRequestFailedSnackbar": "Hintergrundstandort konnte nicht angefordert werden",
   "autoRecordBadgeClearTooltip": "Zähler zurücksetzen"
 }

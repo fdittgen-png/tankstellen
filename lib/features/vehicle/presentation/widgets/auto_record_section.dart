@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/vehicle_profile.dart';
@@ -35,14 +36,39 @@ class AutoRecordSection extends ConsumerWidget {
   /// construction so the constructor stays const-eligible.
   final Future<PermissionStatus> Function()? requestBackgroundLocation;
 
+  /// Hook for prompting `Permission.location` (foreground). Same
+  /// shape and rationale as [requestBackgroundLocation] — Android
+  /// requires foreground location to be granted before the OS will
+  /// even consider an `ACCESS_BACKGROUND_LOCATION` prompt (#1302),
+  /// so the widget runs a two-step flow and tests inject both hooks.
+  final Future<PermissionStatus> Function()? requestForegroundLocation;
+
+  /// Hook for opening the OS app-settings page. Used as the fallback
+  /// for the permanently-denied path on Android 11+, where the runtime
+  /// dialog no longer appears and the user has to flip
+  /// "Allow all the time" manually. Tests inject a counter so the
+  /// rationale-dialog assertion can be made without launching the
+  /// real Android intent.
+  final Future<void> Function()? openSettings;
+
   const AutoRecordSection({
     super.key,
     required this.vehicleId,
     this.requestBackgroundLocation,
+    this.requestForegroundLocation,
+    this.openSettings,
   });
 
   static Future<PermissionStatus> _defaultRequestBackgroundLocation() {
     return Permission.locationAlways.request();
+  }
+
+  static Future<PermissionStatus> _defaultRequestForegroundLocation() {
+    return Permission.location.request();
+  }
+
+  static Future<void> _defaultOpenSettings() async {
+    await openAppSettings();
   }
 
   @override
@@ -132,21 +158,12 @@ class AutoRecordSection extends ConsumerWidget {
               requestLabel: l?.autoRecordBackgroundLocationRequest ??
                   'Request permission',
               theme: theme,
-              onRequest: () async {
-                try {
-                  final prompt = requestBackgroundLocation ??
-                      _defaultRequestBackgroundLocation;
-                  final status = await prompt();
-                  if (status.isGranted) {
-                    await _persist(
-                      ref,
-                      profile.copyWith(backgroundLocationConsent: true),
-                    );
-                  }
-                } catch (e, st) {
-                  debugPrint('AutoRecordSection: bg-location prompt: $e\n$st');
-                }
-              },
+              onRequest: () => _handleBackgroundLocationRequest(
+                context: context,
+                ref: ref,
+                profile: profile,
+                l: l,
+              ),
             ),
           ],
         ],
@@ -156,6 +173,149 @@ class AutoRecordSection extends ConsumerWidget {
 
   Future<void> _persist(WidgetRef ref, VehicleProfile next) {
     return ref.read(vehicleProfileListProvider.notifier).save(next);
+  }
+
+  /// Two-step background-location grant flow (#1302).
+  ///
+  /// 1. Foreground first. Android refuses to even surface the
+  ///    "Allow all the time" choice unless ACCESS_FINE_LOCATION (or
+  ///    coarse) is already granted, so we prompt that first if the
+  ///    status is not yet `granted`. A denial aborts with a snackbar.
+  /// 2. Then the background permission. On API <30 the runtime dialog
+  ///    handles it; on API 30+ a `permanentlyDenied` status (which
+  ///    Android returns after the first denial) sends the user to the
+  ///    OS settings page via [openAppSettings] after a rationale
+  ///    dialog explains *why* the app needs it.
+  ///
+  /// Replaces the old silent `try/catch` (#1302) — every failure path
+  /// now produces user-visible feedback (snackbar) AND a structured
+  /// log entry through [errorLogger].
+  Future<void> _handleBackgroundLocationRequest({
+    required BuildContext context,
+    required WidgetRef ref,
+    required VehicleProfile profile,
+    required AppLocalizations? l,
+  }) async {
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final navigator = Navigator.maybeOf(context);
+    final foregroundPrompt =
+        requestForegroundLocation ?? _defaultRequestForegroundLocation;
+    final backgroundPrompt =
+        requestBackgroundLocation ?? _defaultRequestBackgroundLocation;
+    final openSettingsFn = openSettings ?? _defaultOpenSettings;
+
+    try {
+      // Step 1 — foreground location must be granted first.
+      final fgStatus = await foregroundPrompt();
+      if (!fgStatus.isGranted) {
+        if (!context.mounted) return;
+        messenger?.showSnackBar(
+          SnackBar(
+            content: Text(
+              l?.autoRecordBackgroundLocationForegroundDeniedSnackbar ??
+                  'Location permission required',
+            ),
+          ),
+        );
+        return;
+      }
+
+      // Step 2 — background location. Permanent denial on API 30+
+      // can never recover via runtime dialog, so we route through the
+      // rationale dialog → Settings fallback instead of re-prompting.
+      final bgStatus = await backgroundPrompt();
+      if (bgStatus.isGranted) {
+        await _persist(
+          ref,
+          profile.copyWith(backgroundLocationConsent: true),
+        );
+        return;
+      }
+
+      if (bgStatus.isPermanentlyDenied || bgStatus.isRestricted) {
+        if (!context.mounted) return;
+        await _showRationaleDialog(
+          context: context,
+          navigator: navigator,
+          openSettingsFn: openSettingsFn,
+          l: l,
+        );
+        return;
+      }
+
+      // Plain denial — Android <30 will have already shown its dialog
+      // and we cannot re-prompt. Surface a rationale so the user can
+      // open Settings if they meant to grant.
+      if (!context.mounted) return;
+      await _showRationaleDialog(
+        context: context,
+        navigator: navigator,
+        openSettingsFn: openSettingsFn,
+        l: l,
+      );
+    } catch (e, st) {
+      // Replace the old silent debugPrint with structured logging plus
+      // user-visible feedback. Without this the user saw nothing on
+      // failure (#1302).
+      await errorLogger.log(
+        ErrorLayer.ui,
+        e,
+        st,
+        context: const {
+          'op': 'autoRecordSection.requestBackgroundLocation',
+        },
+      );
+      if (!context.mounted) return;
+      messenger?.showSnackBar(
+        SnackBar(
+          content: Text(
+            l?.autoRecordBackgroundLocationRequestFailedSnackbar ??
+                'Could not request background location',
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _showRationaleDialog({
+    required BuildContext context,
+    required NavigatorState? navigator,
+    required Future<void> Function() openSettingsFn,
+    required AppLocalizations? l,
+  }) {
+    return showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          key: const Key('autoRecordBackgroundLocationRationaleDialog'),
+          title: Text(
+            l?.autoRecordBackgroundLocationRationaleTitle ??
+                'Why "Allow all the time"?',
+          ),
+          content: Text(
+            l?.autoRecordBackgroundLocationRationaleBody ??
+                'Auto-record streams GPS coordinates from the OBD-II '
+                    'foreground service while the screen is off so your '
+                    'trip route stays accurate. Android requires the '
+                    '"Allow all the time" option for that to keep '
+                    'working after the device locks.',
+          ),
+          actions: [
+            TextButton(
+              key: const Key('autoRecordBackgroundLocationOpenSettings'),
+              onPressed: () async {
+                Navigator.of(dialogContext).pop();
+                await openSettingsFn();
+              },
+              child: Text(
+                l?.autoRecordBackgroundLocationOpenSettings ??
+                    'Open settings',
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 

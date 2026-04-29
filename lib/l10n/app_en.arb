@@ -1536,6 +1536,26 @@
   "@autoRecordBackgroundLocationRequest": {
     "description": "Button that prompts the OS for the always-on location permission required by auto-record's GPS-based metadata."
   },
+  "autoRecordBackgroundLocationRationaleTitle": "Why \"Allow all the time\"?",
+  "@autoRecordBackgroundLocationRationaleTitle": {
+    "description": "Title of the rationale dialog shown before the OS prompt for ACCESS_BACKGROUND_LOCATION (#1302)."
+  },
+  "autoRecordBackgroundLocationRationaleBody": "Auto-record streams GPS coordinates from the OBD-II foreground service while the screen is off so your trip route stays accurate. Android requires the \"Allow all the time\" option for that to keep working after the device locks.",
+  "@autoRecordBackgroundLocationRationaleBody": {
+    "description": "Body copy of the rationale dialog explaining why the app needs ACCESS_BACKGROUND_LOCATION; shown before the OS prompt and on the permanently-denied path (#1302)."
+  },
+  "autoRecordBackgroundLocationOpenSettings": "Open settings",
+  "@autoRecordBackgroundLocationOpenSettings": {
+    "description": "CTA on the rationale dialog that opens the OS app-settings page so the user can pick \"Allow all the time\" manually (#1302)."
+  },
+  "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Location permission required",
+  "@autoRecordBackgroundLocationForegroundDeniedSnackbar": {
+    "description": "Snackbar shown when the user denied the foreground-location prompt; without it the background-location step cannot proceed (#1302)."
+  },
+  "autoRecordBackgroundLocationRequestFailedSnackbar": "Could not request background location",
+  "@autoRecordBackgroundLocationRequestFailedSnackbar": {
+    "description": "Snackbar shown when the permission request itself threw an exception. Replaces the previous silent debugPrint catch (#1302)."
+  },
   "autoRecordBadgeClearTooltip": "Clear counter",
   "@autoRecordBadgeClearTooltip": {
     "description": "Tooltip on the AppBar action that resets the auto-record unseen-trip badge to zero."
