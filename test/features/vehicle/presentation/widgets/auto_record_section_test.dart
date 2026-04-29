@@ -36,6 +36,8 @@ Future<_FakeVehicleProfileList> _pumpSection(
   required String vehicleId,
   required _FakeVehicleProfileList list,
   Future<PermissionStatus> Function()? requestBackgroundLocation,
+  Future<PermissionStatus> Function()? requestForegroundLocation,
+  Future<void> Function()? openSettings,
 }) async {
   // Tall canvas so the slider/banner stack does not overflow when the
   // master toggle is on. Mirror the size used by the extras section
@@ -51,6 +53,8 @@ Future<_FakeVehicleProfileList> _pumpSection(
       child: AutoRecordSection(
         vehicleId: vehicleId,
         requestBackgroundLocation: requestBackgroundLocation,
+        requestForegroundLocation: requestForegroundLocation,
+        openSettings: openSettings,
       ),
     ),
     overrides: [
@@ -200,6 +204,7 @@ void main() {
           tester,
           vehicleId: 'v1',
           list: list,
+          requestForegroundLocation: () async => PermissionStatus.granted,
           requestBackgroundLocation: () async => PermissionStatus.granted,
         );
 
@@ -214,7 +219,8 @@ void main() {
     );
 
     testWidgets(
-      'denied permission does not persist consent',
+      'denied background permission does not persist consent and '
+      'shows the rationale dialog',
       (tester) async {
         final list = _FakeVehicleProfileList([
           const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
@@ -223,7 +229,79 @@ void main() {
           tester,
           vehicleId: 'v1',
           list: list,
+          requestForegroundLocation: () async => PermissionStatus.granted,
           requestBackgroundLocation: () async => PermissionStatus.denied,
+        );
+
+        await tester.tap(
+          find.byKey(const Key('autoRecordBackgroundLocationRequest')),
+        );
+        // Use pump() — the AlertDialog scrim animates indefinitely under
+        // pumpAndSettle in some Flutter versions. pump twice with a
+        // bounded duration is enough for the route + content to settle.
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
+
+        expect(list.savedProfiles, isEmpty);
+        expect(
+          find.byKey(
+            const Key('autoRecordBackgroundLocationRationaleDialog'),
+          ),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'foreground-denied shows snackbar and does NOT call '
+      'requestBackgroundLocation (#1302)',
+      (tester) async {
+        final list = _FakeVehicleProfileList([
+          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
+        ]);
+        var bgPromptCalls = 0;
+        await _pumpSection(
+          tester,
+          vehicleId: 'v1',
+          list: list,
+          requestForegroundLocation: () async => PermissionStatus.denied,
+          requestBackgroundLocation: () async {
+            bgPromptCalls++;
+            return PermissionStatus.granted;
+          },
+        );
+
+        await tester.tap(
+          find.byKey(const Key('autoRecordBackgroundLocationRequest')),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
+
+        expect(bgPromptCalls, 0,
+            reason:
+                'Background prompt must not run before foreground is granted');
+        expect(list.savedProfiles, isEmpty);
+        // SnackBar copy from the en ARB fragment is rendered.
+        expect(
+          find.text('Location permission required'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'foreground+background granted flips backgroundLocationConsent to true '
+      '(#1302)',
+      (tester) async {
+        final list = _FakeVehicleProfileList([
+          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
+        ]);
+        await _pumpSection(
+          tester,
+          vehicleId: 'v1',
+          list: list,
+          requestForegroundLocation: () async => PermissionStatus.granted,
+          requestBackgroundLocation: () async => PermissionStatus.granted,
         );
 
         await tester.tap(
@@ -231,7 +309,64 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(list.savedProfiles, isEmpty);
+        expect(list.savedProfiles, hasLength(1));
+        expect(list.savedProfiles.single.backgroundLocationConsent, isTrue);
+      },
+    );
+
+    testWidgets(
+      'permanently-denied background shows the rationale dialog with '
+      'an Open settings button that calls openSettings (#1302)',
+      (tester) async {
+        final list = _FakeVehicleProfileList([
+          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
+        ]);
+        var openSettingsCalls = 0;
+        await _pumpSection(
+          tester,
+          vehicleId: 'v1',
+          list: list,
+          requestForegroundLocation: () async => PermissionStatus.granted,
+          requestBackgroundLocation: () async =>
+              PermissionStatus.permanentlyDenied,
+          openSettings: () async {
+            openSettingsCalls++;
+          },
+        );
+
+        await tester.tap(
+          find.byKey(const Key('autoRecordBackgroundLocationRequest')),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
+
+        // Rationale dialog rendered with title + Open Settings CTA.
+        expect(
+          find.byKey(
+            const Key('autoRecordBackgroundLocationRationaleDialog'),
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Why "Allow all the time"?'), findsOneWidget);
+        expect(
+          find.byKey(
+            const Key('autoRecordBackgroundLocationOpenSettings'),
+          ),
+          findsOneWidget,
+        );
+
+        // Tapping the CTA pops the dialog and invokes openSettings.
+        await tester.tap(
+          find.byKey(
+            const Key('autoRecordBackgroundLocationOpenSettings'),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
+
+        expect(openSettingsCalls, 1);
+        expect(list.savedProfiles, isEmpty,
+            reason: 'Permanent-denied path must not flip consent silently');
       },
     );
   });

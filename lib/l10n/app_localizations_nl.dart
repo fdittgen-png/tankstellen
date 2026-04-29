@@ -3204,6 +3204,25 @@ class AppLocalizationsNl extends AppLocalizations {
   String get autoRecordBackgroundLocationRequest => 'Request permission';
 
   @override
+  String get autoRecordBackgroundLocationRationaleTitle =>
+      'Why \"Allow all the time\"?';
+
+  @override
+  String get autoRecordBackgroundLocationRationaleBody =>
+      'Auto-record streams GPS coordinates from the OBD-II foreground service while the screen is off so your trip route stays accurate. Android requires the \"Allow all the time\" option for that to keep working after the device locks.';
+
+  @override
+  String get autoRecordBackgroundLocationOpenSettings => 'Open settings';
+
+  @override
+  String get autoRecordBackgroundLocationForegroundDeniedSnackbar =>
+      'Location permission required';
+
+  @override
+  String get autoRecordBackgroundLocationRequestFailedSnackbar =>
+      'Could not request background location';
+
+  @override
   String get autoRecordBadgeClearTooltip => 'Clear counter';
 
   @override

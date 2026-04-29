@@ -3,6 +3,14 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!-- Hands-free trip auto-record (#1004 / #1302).
+         Required so the OS shows the "Allow all the time" option for
+         location when the user opts into auto-record. Without this
+         declaration, `Permission.locationAlways.request()` returns
+         `denied` immediately with no UI. On Android 11+ the OS does
+         NOT grant this via runtime dialog after the first prompt —
+         the app must send the user to Settings via openAppSettings(). -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
 
     <!-- Bluetooth — used by the OBD2 adapter transport (#716). -->
     <!-- Android <= 11 (API 30) BT permissions. -->

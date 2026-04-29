@@ -3228,6 +3228,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get autoRecordBackgroundLocationRequest => 'Berechtigung anfordern';
 
   @override
+  String get autoRecordBackgroundLocationRationaleTitle =>
+      'Warum \"Immer erlauben\"?';
+
+  @override
+  String get autoRecordBackgroundLocationRationaleBody =>
+      'Die automatische Aufzeichnung erfasst GPS-Koordinaten über den OBD-II-Vordergrunddienst, auch wenn der Bildschirm aus ist, damit deine Streckenführung korrekt bleibt. Android verlangt dafür die Option \"Immer erlauben\" — sonst stoppt die Standortabfrage, sobald das Gerät gesperrt wird.';
+
+  @override
+  String get autoRecordBackgroundLocationOpenSettings => 'Einstellungen öffnen';
+
+  @override
+  String get autoRecordBackgroundLocationForegroundDeniedSnackbar =>
+      'Standortberechtigung erforderlich';
+
+  @override
+  String get autoRecordBackgroundLocationRequestFailedSnackbar =>
+      'Hintergrundstandort konnte nicht angefordert werden';
+
+  @override
   String get autoRecordBadgeClearTooltip => 'Zähler zurücksetzen';
 
   @override

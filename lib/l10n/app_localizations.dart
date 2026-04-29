@@ -6002,6 +6002,36 @@ abstract class AppLocalizations {
   /// **'Request permission'**
   String get autoRecordBackgroundLocationRequest;
 
+  /// Title of the rationale dialog shown before the OS prompt for ACCESS_BACKGROUND_LOCATION (#1302).
+  ///
+  /// In en, this message translates to:
+  /// **'Why \"Allow all the time\"?'**
+  String get autoRecordBackgroundLocationRationaleTitle;
+
+  /// Body copy of the rationale dialog explaining why the app needs ACCESS_BACKGROUND_LOCATION; shown before the OS prompt and on the permanently-denied path (#1302).
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-record streams GPS coordinates from the OBD-II foreground service while the screen is off so your trip route stays accurate. Android requires the \"Allow all the time\" option for that to keep working after the device locks.'**
+  String get autoRecordBackgroundLocationRationaleBody;
+
+  /// CTA on the rationale dialog that opens the OS app-settings page so the user can pick "Allow all the time" manually (#1302).
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get autoRecordBackgroundLocationOpenSettings;
+
+  /// Snackbar shown when the user denied the foreground-location prompt; without it the background-location step cannot proceed (#1302).
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission required'**
+  String get autoRecordBackgroundLocationForegroundDeniedSnackbar;
+
+  /// Snackbar shown when the permission request itself threw an exception. Replaces the previous silent debugPrint catch (#1302).
+  ///
+  /// In en, this message translates to:
+  /// **'Could not request background location'**
+  String get autoRecordBackgroundLocationRequestFailedSnackbar;
+
   /// Tooltip on the AppBar action that resets the auto-record unseen-trip badge to zero.
   ///
   /// In en, this message translates to:
