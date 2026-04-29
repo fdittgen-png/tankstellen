@@ -231,6 +231,101 @@ void main() {
     });
   });
 
+  group('extractLiters — French POS unit-char OCR variants (#1308)', () {
+    // The italic lowercase `l` (litre) glyph after the volume number on
+    // French thermal-print receipts is so faintly printed that ML Kit
+    // OCR transcribes it as `?`, `|`, `i`, `t`, `j`, `P`, or `1`.
+    // Reported across Super U Pomerols + enilive Pezenas; the regex
+    // broadening lives in the GENERIC extractor so every brand benefits.
+
+    test('"5.24 ?" parses as 5.24 (Super U glyph)', () {
+      expect(extractLiters('5.24 ?'), closeTo(5.24, 0.001));
+    });
+
+    test('"5.24 |" parses as 5.24 (pipe-as-l misread)', () {
+      expect(extractLiters('5.24 |'), closeTo(5.24, 0.001));
+    });
+
+    test('"5.24 i" parses as 5.24 (dot-i misread)', () {
+      expect(extractLiters('5.24 i'), closeTo(5.24, 0.001));
+    });
+
+    test('"5.24 t" parses as 5.24 (narrow-glyph t misread)', () {
+      expect(extractLiters('5.24 t'), closeTo(5.24, 0.001));
+    });
+
+    test('"5.24 j" parses as 5.24', () {
+      expect(extractLiters('5.24 j'), closeTo(5.24, 0.001));
+    });
+
+    test('"5.24 P" parses as 5.24 (poor scan)', () {
+      expect(extractLiters('5.24 P'), closeTo(5.24, 0.001));
+    });
+
+    test('"8.93 ?" parses as 8.93 (enilive Pezenas case)', () {
+      expect(extractLiters('8.93 ?'), closeTo(8.93, 0.001));
+    });
+
+    test('"5.24 1" parses as 5.24 (digit-1 misread, with whitespace)', () {
+      // Whitespace before the `1` is the disambiguator: with a space
+      // the `1` is the unit char. Without space (`5.241`) the negative
+      // lookahead `(?!\d)` after the decimals prevents the partial
+      // capture, so `5.241` does NOT yield 5.24 — see boundary test.
+      expect(extractLiters('5.24 1'), closeTo(5.24, 0.001));
+    });
+
+    test('"5.241" does NOT match (no whitespace boundary)', () {
+      // Without whitespace between the decimals and the trailing digit,
+      // the lookahead pins the decimals to the full `5.241` token —
+      // which then has no `[?|itjP1]` unit char after it. No match.
+      // (No other regex picks this up because there's no `volume` /
+      // `quantité` label and no `x FUELCODE` line item either.)
+      expect(extractLiters('5.241'), isNull);
+    });
+
+    test('OCR-eaten char inside larger receipt text parses correctly', () {
+      // Whole-text match, not just the line.
+      const text = 'QUITTANCE COPIE\n* Pompe 3 SP95-E10\n'
+          'Volume                                 5.24 ?\n'
+          'Prix                                 € 1.999/?\n'
+          'TOT TTC                              € 10.47\n';
+      expect(extractLiters(text), closeTo(5.24, 0.001));
+    });
+
+    test('does not match when the unit char would form a longer word', () {
+      // "5,24 thanks" — `t` is in the OCR-eaten class, but it's
+      // followed by `h`, a word char, so the negative lookahead
+      // `(?![A-Za-z0-9])` rejects the partial match.
+      expect(extractLiters('5,24 thanks for your business'), isNull);
+    });
+  });
+
+  group('extractLiters — false-positive guards (#1308)', () {
+    test('"TVA 20.00 %" does NOT match (no OCR-eaten unit char)', () {
+      // The new pattern requires a `[?|itjP1]` after the number, and
+      // `%` is not in the class. Range guard would also reject 20.00.
+      expect(extractLiters('TVA 20.00 %'), isNull);
+    });
+
+    test('"2026-04-29" does NOT match (year fragment, no decimal point)', () {
+      // The `[.,]` separator in the captured group needs a literal
+      // `.` or `,`; the date hyphens defeat this.
+      expect(extractLiters('2026-04-29'), isNull);
+    });
+
+    test('"12.99 €" does NOT match (price, not volume)', () {
+      // The new pattern requires a `[?|itjP1]` unit char, not `€`.
+      expect(extractLiters('12.99 €'), isNull);
+    });
+
+    test('"€ 1.999/?" does NOT match as volume (slash blocks unit char)', () {
+      // The `?` after `1.999` is on the price-per-liter denominator,
+      // not the volume. The `/` between `1.999` and `?` is not
+      // whitespace, so `\s*[?|itjP1]` cannot bridge them.
+      expect(extractLiters('€ 1.999/?'), isNull);
+    });
+  });
+
   group('extractTotalCost', () {
     test('labelled "TOTAL 58.42"', () {
       expect(extractTotalCost('TOTAL 58.42'), closeTo(58.42, 0.001));
