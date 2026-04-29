@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
@@ -454,6 +456,69 @@ Date Heure  Num Ticket
         final result = parser.parse(receiptText);
         expect(result.stationName?.toLowerCase(), contains('total'));
       });
+    });
+
+    // -------------------------------------------------------------------
+    // #1308 — French thermal-print POS receipts where ML Kit OCR
+    // misreads the italic lowercase `l` (litre) glyph as `?`, `|`, `i`,
+    // `t`, `j`, `P`, or `1`. Observed across multiple brands (Super U
+    // Pomerols, enilive Pezenas) so the regex broadening lives in the
+    // generic `extractLiters` and rescues every brand using this POS
+    // template.
+    // -------------------------------------------------------------------
+    group('French thermal-print OCR-eaten unit char (#1308)', () {
+      test(
+        'Super U Pomerols 2026-04-19 fixture: 5.24 L SP95-E10 with `5.24 ?` glyph',
+        () {
+          final receipt = File(
+            'test/features/consumption/data/receipt_parser/'
+            'fixtures/super_u_pomerols_2026-04-19.txt',
+          ).readAsStringSync();
+          final result = parser.parse(receipt);
+          expect(
+            result.liters,
+            closeTo(5.24, 0.01),
+            reason: 'volume should be rescued from the `5.24 ?` line',
+          );
+          expect(result.totalCost, closeTo(10.47, 0.01));
+          // Price-per-liter regex still requires `/L` / `/ℓ`; with the
+          // OCR-eaten `/?` denominator the labelled regex misses, and
+          // reconcile() derives ppl = total / liters = 10.47 / 5.24 ≈
+          // 1.998. Tolerance covers both 1.998 (derived) and 1.999
+          // (OCR-original) outcomes — the load-bearing assertion is
+          // that liters is no longer null.
+          expect(result.pricePerLiter, closeTo(1.999, 0.005));
+          expect(result.date, DateTime(2026, 4, 19));
+          expect(result.stationName, 'SUPER U');
+          expect(result.fuelType, FuelType.e10);
+          expect(result.brandLayout, 'super_u');
+        },
+      );
+
+      test(
+        'enilive Pezenas 2026-04-23 fixture: 8.93 L ETHANOL 85 with `8.93 ?` glyph',
+        () {
+          final receipt = File(
+            'test/features/consumption/data/receipt_parser/'
+            'fixtures/enilive_pezenas_2026-04-23.txt',
+          ).readAsStringSync();
+          final result = parser.parse(receipt);
+          expect(
+            result.liters,
+            closeTo(8.93, 0.01),
+            reason: 'volume should be rescued from the `8.93 ?` line',
+          );
+          expect(result.totalCost, closeTo(8.03, 0.01));
+          // 8.03 / 8.93 = 0.8990 → reconcile rounds to 0.899.
+          expect(result.pricePerLiter, closeTo(0.899, 0.005));
+          expect(result.date, DateTime(2026, 4, 23));
+          // enilive isn't in the brand-detection list, so this falls
+          // through to the generic layout and `ETHANOL 85` doesn't
+          // match the existing fuel-type patterns (no `bio` prefix,
+          // no compound `e85` token). Future work — out of scope here.
+          expect(result.brandLayout, 'generic');
+        },
+      );
     });
   });
 }

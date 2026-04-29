@@ -73,6 +73,27 @@ double? extractLiters(String text) {
     // ℓ because Dart regex treats the character as non-word, so the
     // original word boundary never held anyway.
     RegExp(r'(\d{1,3}[.,]\d{1,3})\s*(?:l(?:itres?)?\b|L\b|ℓ)'),
+    // French thermal-print POS receipts (#1308): the italic lowercase
+    // `l` (litre) glyph after the volume number is so faintly printed
+    // that ML Kit OCR transcribes it as `?`, `|`, `i`, `t`, `j`, `P`,
+    // or `1` — sometimes drops it entirely. Observed across multiple
+    // brands (Super U Pomerols 2026-04-19, enilive Pezenas 2026-04-23)
+    // so this is the French POS template, not brand-specific. The new
+    // pattern fires AFTER the strict l/L/ℓ pattern so anything we can
+    // read confidently is still preferred.
+    //
+    // Constraint: the number must have 2-3 decimals (fuel quantities
+    // aren't printed with 0 or 1 decimal on these receipts). The
+    // `(?!\d)` lookahead pins the decimals so `5.241` doesn't backtrack
+    // to capture `5.24` and consume the trailing `1` as the unit char.
+    // The `(?![A-Za-z0-9.,])` lookahead after the unit char ensures
+    // we didn't grab the `t` from `thanks`, the `i` from `inclus`, or
+    // the leading `1` of an adjacent decimal like `8,29  1,66` from
+    // a Total H.T./TVA column block (real false-positive observed on
+    // the TotalEnergies #801 fixture). The 0.1-300 L range guard at
+    // the bottom of this function prunes the remaining false positives
+    // (TVA percentages stay outside range).
+    RegExp(r'(\d{1,3}[.,]\d{2,3})(?!\d)\s*[?|itjP1](?![A-Za-z0-9.,])'),
     // "VOLUME : 42.35" / "Volume: 42,35" / "Quantité = 5.27"
     RegExp(
       r'(?:volume|quantit[eé])\s*[:=]?\s*(\d{1,3}[.,]\d{1,3})',
