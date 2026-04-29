@@ -26,10 +26,13 @@ import '../core/sync/community_config.dart';
 import '../core/sync/supabase_client.dart';
 import '../core/telemetry/pii_scrubber.dart';
 import '../core/utils/edge_to_edge.dart';
+import '../features/consumption/data/obd2/active_trip_recovery_service.dart';
+import '../features/consumption/data/obd2/active_trip_repository.dart';
 import '../features/consumption/data/obd2/paused_trip_recovery_service.dart';
 import '../features/consumption/data/obd2/paused_trip_repository.dart';
 import '../features/consumption/data/trip_history_repository.dart';
 import '../features/consumption/providers/auto_record_orchestrator.dart';
+import '../features/consumption/providers/trip_recording_provider.dart';
 import '../features/profile/data/repositories/profile_repository.dart';
 import '../features/vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../features/vehicle/data/repositories/vehicle_profile_repository.dart';
@@ -37,6 +40,7 @@ import '../features/vehicle/data/vehicle_profile_migrator.dart';
 import '../features/vehicle/providers/vehicle_aggregate_updater_provider.dart';
 import '../features/widget/data/home_widget_service.dart';
 import '../features/widget/providers/nearest_widget_refresh_provider.dart';
+import 'router.dart';
 
 /// Drives the cold-start sequence in well-defined phases instead of one
 /// monolithic `main()` body. Splitting the work makes failures observable
@@ -380,6 +384,96 @@ class AppInitializer {
     }
   }
 
+  /// #1303 — recover an in-progress trip snapshot that survived a
+  /// process death. Walks the active-trip Hive box; if a fresh
+  /// snapshot is on disk (within the 24 h staleness window) the
+  /// `TripRecording` provider is rehydrated into a
+  /// `pausedDueToDrop`-shaped state with the captured samples
+  /// preserved, the launcher-icon badge is bumped (auto-record
+  /// trips only), and the user is navigated to `/trip-recording`.
+  ///
+  /// Stale snapshots are dropped quietly — the user gave up; we
+  /// don't surface a stale recovery prompt that would confuse them
+  /// on a fresh launch.
+  ///
+  /// No-ops cleanly when the active-trip box isn't open.
+  static Future<void> _runActiveTripRecovery(
+    ProviderContainer container,
+  ) async {
+    if (!Hive.isBoxOpen(HiveBoxes.obd2ActiveTrip)) return;
+    final activeRepo = ActiveTripRepository(
+      box: Hive.box<String>(HiveBoxes.obd2ActiveTrip),
+    );
+    TripHistoryRepository? historyRepo;
+    if (Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) {
+      historyRepo = TripHistoryRepository(
+        box: Hive.box<String>(HiveBoxes.obd2TripHistory),
+      );
+    }
+    final service = ActiveTripRecoveryService(
+      activeRepo: activeRepo,
+      historyRepo: historyRepo,
+      onAutomaticRecovered: () async {
+        try {
+          final badge =
+              await container.read(autoRecordBadgeServiceProvider.future);
+          await badge.increment();
+        } catch (e, st) {
+          debugPrint(
+              'AppInitializer: activeTripRecovery badge bump failed: $e\n$st');
+        }
+      },
+    );
+    final outcome = await service.recover();
+    switch (outcome) {
+      case ActiveTripRecoveryOutcome.none:
+      case ActiveTripRecoveryOutcome.failed:
+      case ActiveTripRecoveryOutcome.discarded:
+        return;
+      case ActiveTripRecoveryOutcome.recovered:
+        final snapshot = service.recoveredSnapshot;
+        if (snapshot == null) return;
+        try {
+          final notifier = container.read(tripRecordingProvider.notifier);
+          final applied = notifier.restoreFromSnapshot(snapshot);
+          if (!applied) return;
+          // Bump the unseen-trip badge for auto-record sessions —
+          // the user should see "your auto-trip didn't fully save"
+          // in the launcher even if they don't tap the recording
+          // banner. Mirrors the paused-trip recovery semantics.
+          if (snapshot.automatic) {
+            try {
+              final badge = await container
+                  .read(autoRecordBadgeServiceProvider.future);
+              await badge.increment();
+            } catch (e, st) {
+              debugPrint(
+                  'AppInitializer: activeTripRecovery recovered badge bump failed: $e\n$st');
+            }
+          }
+          // Auto-navigate to /trip-recording on the next frame so
+          // the user lands directly on the live recording UI. We
+          // re-enter post-frame because the GoRouter redirect chain
+          // (consent → setup → landing) has to settle before we
+          // can push a new route — a synchronous push from inside
+          // the recovery callback would race against the redirect
+          // logic and lose.
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            try {
+              final goRouter = container.read(routerProvider);
+              goRouter.go('/trip-recording');
+            } catch (e, st) {
+              debugPrint(
+                  'AppInitializer: activeTripRecovery go(/trip-recording) failed: $e\n$st');
+            }
+          });
+        } catch (e, st) {
+          debugPrint(
+              'AppInitializer: activeTripRecovery restoreFromSnapshot failed: $e\n$st');
+        }
+    }
+  }
+
   /// #1004 phase 4-WAL — finalise paused trips that survived an app
   /// kill mid-grace-window into the trip-history rolling log.
   ///
@@ -480,6 +574,23 @@ class AppInitializer {
       } catch (e, st) {
         debugPrint(
             'AppInitializer: pausedTripRecovery failed: $e\n$st');
+      }
+    });
+
+    // #1303 — recover an in-progress trip whose process was killed
+    // before it could finalise. Walks the active-trip Hive box,
+    // hands a non-stale snapshot back to the [TripRecording]
+    // provider, bumps the unseen-trip badge for auto-record
+    // sessions, and navigates to `/trip-recording`. Sequenced
+    // AFTER the paused-trip recovery so a stale paused row from
+    // the same drive lands in history before the active recovery
+    // re-enters the recording UI.
+    _deferPostFirstFrame(() async {
+      try {
+        await _runActiveTripRecovery(container);
+      } catch (e, st) {
+        debugPrint(
+            'AppInitializer: activeTripRecovery failed: $e\n$st');
       }
     });
 

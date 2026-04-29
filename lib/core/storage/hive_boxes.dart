@@ -55,6 +55,15 @@ class HiveBoxes {
   /// startup.
   static const String obd2PausedTrips = 'obd2_paused_trips';
 
+  /// Write-through snapshot of the currently-recording OBD2 trip
+  /// (#1303). At most ONE entry — keyed on a fixed sentinel — that
+  /// the [TripRecording] provider rewrites every few seconds while a
+  /// trip is live. Survives a process death so the recovery service
+  /// can put the user back on the recording screen with their
+  /// captured samples on next launch. Same privacy treatment as the
+  /// other OBD2 boxes — unencrypted, opened once at startup.
+  static const String obd2ActiveTrip = 'obd2_active_trip';
+
   /// Rolling price snapshots used by the price-drop velocity detector
   /// (#579). One JSON payload per (station, fuel, timestamp) with a
   /// synthetic key. Coords are captured per-snapshot so the detector
@@ -162,6 +171,10 @@ class HiveBoxes {
     // #797 — partial OBD2 trips paused by a BT drop. Same string-typed
     // JSON pattern as [obd2TripHistory] so one box adapter covers both.
     await Hive.openBox<String>(obd2PausedTrips);
+    // #1303 — write-through snapshot of the currently-recording trip.
+    // Single-entry box; the provider rewrites on a 5-second debounce
+    // and the recovery service reads it on next cold start.
+    await Hive.openBox<String>(obd2ActiveTrip);
     // #579 — rolling price snapshots for the velocity detector.
     await Hive.openBox<String>(priceSnapshots);
     // #1105 — isolate error spool: background-isolate errors written
@@ -220,6 +233,8 @@ class HiveBoxes {
     await Hive.openBox<String>(serviceReminders);
     // #797 — paused trips box, string-typed JSON, matches runtime.
     await Hive.openBox<String>(obd2PausedTrips);
+    // #1303 — active-trip snapshot box, string-typed JSON.
+    await Hive.openBox<String>(obd2ActiveTrip);
     // #579 — velocity detector snapshots. String-typed JSON so the
     // same one-adapter pattern covers unit tests + runtime.
     await Hive.openBox<String>(priceSnapshots);
