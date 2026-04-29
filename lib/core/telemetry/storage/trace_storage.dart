@@ -103,8 +103,8 @@ class TraceStorage {
       final asMap = Map<String, dynamic>.from(raw);
       try {
         ErrorTrace.fromJson(asMap);
-      } on Object catch (e) {
-        debugPrint('TraceStorage: capturing unparsed entry: $e');
+      } on Object catch (e, st) {
+        debugPrint('TraceStorage: capturing unparsed entry: $e\n$st');
         unparsed.add(asMap);
       }
     }
