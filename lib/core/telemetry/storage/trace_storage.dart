@@ -29,9 +29,16 @@ class TraceStorage {
   List<ErrorTrace> getAll() {
     return _box.values
         .map((raw) {
+          if (raw is! Map) return null;
           try {
-            return ErrorTrace.fromJson(Map<String, dynamic>.from(raw as Map));
-          } on FormatException catch (e, st) {
+            return ErrorTrace.fromJson(Map<String, dynamic>.from(raw));
+          } on Object catch (e, st) {
+            // #1301 — schema migrations can leave entries that throw
+            // TypeError (missing required field) rather than the
+            // narrower FormatException the original code expected.
+            // Catch broadly so a single drift entry doesn't poison
+            // export — `unparsedRaw` in `exportAsJson` ships the raw
+            // payload for offline debugging.
             debugPrint('TraceStorage: trace parse failed: $e\n$st');
             return null;
           }
@@ -43,10 +50,11 @@ class TraceStorage {
 
   ErrorTrace? getById(String id) {
     final raw = _box.get(id);
-    if (raw == null) return null;
+    if (raw is! Map) return null;
     try {
-      return ErrorTrace.fromJson(Map<String, dynamic>.from(raw as Map));
-    } on FormatException catch (e, st) {
+      return ErrorTrace.fromJson(Map<String, dynamic>.from(raw));
+    } on Object catch (e, st) {
+      // See [getAll] for the rationale behind the broad catch (#1301).
       debugPrint('TraceStorage: trace parse failed: $e\n$st');
       return null;
     }
@@ -60,26 +68,79 @@ class TraceStorage {
   /// their first build in environments (tests, headless builds) where
   /// `TraceStorage.init()` hasn't been called — production goes through
   /// AppInitializer which always calls `init()`.
+  ///
+  /// NOTE: This is the RAW box length and includes entries that fail to
+  /// parse via [ErrorTrace.fromJson] after a schema migration. Use
+  /// [parsedCount] to get the count of successfully decoded entries and
+  /// [unparsedCount] to surface drift to the user (see #1301).
   int get count => Hive.isBoxOpen(_boxName) ? _box.length : 0;
+
+  /// Number of stored entries that successfully parse via
+  /// [ErrorTrace.fromJson]. Equals [count] when the schema is current,
+  /// drops to 0 after a breaking schema change. (#1301)
+  int get parsedCount => getAll().length;
+
+  /// Number of stored entries that FAIL to parse — the gap between
+  /// [count] and [parsedCount]. When non-zero the privacy-dashboard
+  /// "copy error log" action surfaces this so users know why the
+  /// payload looks empty after a migration. (#1301)
+  int get unparsedCount {
+    final raw = count;
+    final parsed = parsedCount;
+    return raw > parsed ? raw - parsed : 0;
+  }
+
+  /// Returns the raw Hive maps for entries that fail [ErrorTrace.fromJson].
+  /// Used by [exportAsJson] so a maintainer can debug schema drift even
+  /// when every stored trace is unreadable. Each entry is converted to a
+  /// plain `Map<String, dynamic>` so it round-trips cleanly through
+  /// [JsonEncoder]. (#1301)
+  List<Map<String, dynamic>> getUnparsedRaw() {
+    if (!Hive.isBoxOpen(_boxName)) return const [];
+    final unparsed = <Map<String, dynamic>>[];
+    for (final raw in _box.values) {
+      if (raw is! Map) continue;
+      final asMap = Map<String, dynamic>.from(raw);
+      try {
+        ErrorTrace.fromJson(asMap);
+      } on Object catch (e) {
+        debugPrint('TraceStorage: capturing unparsed entry: $e');
+        unparsed.add(asMap);
+      }
+    }
+    return unparsed;
+  }
 
   /// Serialises every persisted trace into a single JSON document the
   /// user can email or attach to a GitHub issue. Used by the privacy
-  /// dashboard's "Export error log" action (#476).
+  /// dashboard's "Export error log" action (#476, #1301).
   ///
   /// Format:
   /// ```json
   /// {
   ///   "exportedAt": "<iso8601>",
   ///   "traceCount": 12,
-  ///   "traces": [ <ErrorTrace.toJson()>, ... ]
+  ///   "parsedCount": 11,
+  ///   "unparsedCount": 1,
+  ///   "traces": [ <ErrorTrace.toJson()>, ... ],
+  ///   "unparsedRaw": [ <raw Hive map>, ... ]
   /// }
   /// ```
+  ///
+  /// `traceCount` mirrors the raw [count] so the legacy field stays
+  /// stable; `parsedCount` and `unparsedCount` were added in #1301 to
+  /// surface schema-drift to the user (and to keep the unreadable
+  /// payload available under `unparsedRaw` for offline debugging).
   String exportAsJson() {
     final traces = getAll();
+    final unparsed = getUnparsedRaw();
     return const JsonEncoder.withIndent('  ').convert({
       'exportedAt': DateTime.now().toUtc().toIso8601String(),
-      'traceCount': traces.length,
+      'traceCount': traces.length + unparsed.length,
+      'parsedCount': traces.length,
+      'unparsedCount': unparsed.length,
       'traces': traces.map((t) => t.toJson()).toList(),
+      'unparsedRaw': unparsed,
     });
   }
 

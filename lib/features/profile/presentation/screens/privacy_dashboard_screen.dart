@@ -1,8 +1,13 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/telemetry/storage/trace_storage.dart';
 import '../../../../core/export/data_exporter.dart';
@@ -16,6 +21,31 @@ import '../widgets/privacy_dashboard/local_data_card.dart';
 import '../widgets/privacy_dashboard/privacy_action_buttons.dart';
 import '../widgets/privacy_dashboard/privacy_banner.dart';
 import '../widgets/privacy_dashboard/synced_data_card.dart';
+
+/// Threshold above which the error-log export switches from clipboard
+/// to the OS share sheet. Some Samsung clipboard managers silently drop
+/// large payloads — see #1301.
+const int _errorLogClipboardThresholdBytes = 64 * 1024;
+
+/// Test-only override for the share-sheet handoff used by
+/// [_PrivacyDashboardScreenState._exportErrorLog]. Production sends
+/// [ShareParams] straight to [SharePlus.instance.share]; widget tests
+/// substitute a fake to assert the outgoing payload without launching
+/// the real OS share sheet. (#1301)
+typedef PrivacyShareSink = Future<void> Function(ShareParams params);
+
+/// See [PrivacyShareSink].
+@visibleForTesting
+PrivacyShareSink? debugPrivacyShareSinkOverride;
+
+/// Test-only override for the temporary-directory lookup used by the
+/// large-log share path. Returns a [Directory] the dashboard is allowed
+/// to write into. (#1301)
+typedef PrivacyTempDirectoryProvider = Future<Directory> Function();
+
+/// See [PrivacyTempDirectoryProvider].
+@visibleForTesting
+PrivacyTempDirectoryProvider? debugPrivacyTempDirectoryOverride;
 
 /// GDPR-compliant privacy dashboard showing all locally stored data
 /// with options to export as JSON or delete everything.
@@ -95,13 +125,85 @@ class _PrivacyDashboardScreenState
   Future<void> _exportErrorLog() async {
     final traces = ref.read(traceStorageProvider);
     final json = traces.exportAsJson();
+    final byteSize = utf8.encode(json).length;
+    final kb = (byteSize / 1024).toStringAsFixed(1);
+    final parsed = traces.parsedCount;
+    final unparsed = traces.unparsedCount;
+    final totalEntries = parsed + unparsed;
+
+    // Large payloads exceed Samsung One UI's clipboard preview budget
+    // (#1301); hand off to the OS share sheet instead so the user can
+    // route the JSON to email / files / a chat reliably.
+    if (byteSize > _errorLogClipboardThresholdBytes) {
+      try {
+        await _shareErrorLogAsFile(json);
+      } on Object catch (e, st) {
+        // If share sheet wiring fails we still want to give the user
+        // something — fall back to clipboard so the bug report doesn't
+        // get blocked on a platform-channel hiccup.
+        debugPrint('privacy: error-log share fallback to clipboard: $e\n$st');
+        await Clipboard.setData(ClipboardData(text: json));
+        if (!mounted) return;
+        SnackBarHelper.showSuccess(
+          context,
+          _formatCopySnackbar(
+            parsed: parsed,
+            unparsed: unparsed,
+            kb: kb,
+          ),
+        );
+        return;
+      }
+      if (!mounted) return;
+      SnackBarHelper.showSuccess(
+        context,
+        'Error log shared ($kb KB, $totalEntries entries)',
+      );
+      return;
+    }
+
     await Clipboard.setData(ClipboardData(text: json));
     if (!mounted) return;
     SnackBarHelper.showSuccess(
       context,
-      'Error log copied to clipboard (${traces.count} entries)',
+      _formatCopySnackbar(
+        parsed: parsed,
+        unparsed: unparsed,
+        kb: kb,
+      ),
     );
   }
+
+  String _formatCopySnackbar({
+    required int parsed,
+    required int unparsed,
+    required String kb,
+  }) {
+    if (unparsed > 0) {
+      return 'Error log copied ($parsed parsed + $unparsed raw entries, '
+          '$kb KB) — some entries failed to parse';
+    }
+    return 'Error log copied to clipboard — $kb KB, $parsed entries';
+  }
+
+  Future<void> _shareErrorLogAsFile(String json) async {
+    final tempDirProvider =
+        debugPrivacyTempDirectoryOverride ?? getTemporaryDirectory;
+    final tempDir = await tempDirProvider();
+    final filePath = '${tempDir.path}/tankstellen-error-log.json';
+    final file = File(filePath);
+    await file.writeAsString(json, flush: true);
+
+    final params = ShareParams(
+      files: [XFile(filePath, mimeType: 'application/json')],
+      subject: 'tankstellen-error-log.json',
+    );
+    final sink = debugPrivacyShareSinkOverride ?? _defaultShareSink;
+    await sink(params);
+  }
+
+  static Future<void> _defaultShareSink(ShareParams params) =>
+      SharePlus.instance.share(params);
 
   Future<void> _exportDataCsv() async {
     final storage = ref.read(storageRepositoryProvider);

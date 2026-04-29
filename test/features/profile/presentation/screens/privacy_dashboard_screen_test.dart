@@ -1,6 +1,10 @@
-﻿import 'package:flutter/widgets.dart';
+﻿import 'dart:io';
+
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
@@ -15,11 +19,29 @@ import '../../../../mocks/mocks.dart';
 /// implementation calls `Hive.box('error_traces')` which fails in
 /// widget tests where Hive isn't initialised.
 class _StubTraceStorage extends TraceStorage {
-  @override
-  int get count => 0;
+  _StubTraceStorage({
+    this.stubCount = 0,
+    this.stubParsedCount = 0,
+    this.stubUnparsedCount = 0,
+    this.stubExport = '{"traceCount":0,"traces":[]}',
+  });
+
+  final int stubCount;
+  final int stubParsedCount;
+  final int stubUnparsedCount;
+  final String stubExport;
 
   @override
-  String exportAsJson() => '{"traceCount":0,"traces":[]}';
+  int get count => stubCount;
+
+  @override
+  int get parsedCount => stubParsedCount;
+
+  @override
+  int get unparsedCount => stubUnparsedCount;
+
+  @override
+  String exportAsJson() => stubExport;
 }
 
 /// #519 — the Privacy Dashboard body grew with the
@@ -258,6 +280,185 @@ void main() {
       expect(find.text('Estimated storage'), findsOneWidget);
       // 35136 bytes = 34.3 KB
       expect(find.text('34.3 KB'), findsOneWidget);
+    });
+
+    /// #1301 — `_exportErrorLog` must (a) write the JSON to the system
+    /// clipboard when the payload is small, (b) hand off via
+    /// share_plus when it's large, and (c) surface unparsed entries in
+    /// the snackbar so users know why a 21-entry log looks empty.
+    group('_exportErrorLog (#1301)', () {
+      Map<String, dynamic>? capturedClipboard;
+      ShareParams? capturedShareParams;
+
+      setUp(() {
+        capturedClipboard = null;
+        capturedShareParams = null;
+      });
+
+      void wireClipboardCapture(WidgetTester tester) {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(SystemChannels.platform,
+                (MethodCall call) async {
+          if (call.method == 'Clipboard.setData') {
+            capturedClipboard = Map<String, dynamic>.from(call.arguments as Map);
+          }
+          return null;
+        });
+        addTearDown(() {
+          TestDefaultBinaryMessengerBinding
+              .instance.defaultBinaryMessenger
+              .setMockMethodCallHandler(SystemChannels.platform, null);
+        });
+      }
+
+      void wireShareCapture() {
+        debugPrivacyShareSinkOverride = (params) async {
+          capturedShareParams = params;
+        };
+        debugPrivacyTempDirectoryOverride = () async =>
+            Directory.systemTemp.createTempSync('privacy_dashboard_test_');
+        addTearDown(() {
+          debugPrivacyShareSinkOverride = null;
+          debugPrivacyTempDirectoryOverride = null;
+        });
+      }
+
+      Future<void> tapExportButton(WidgetTester tester) async {
+        await tester.scrollUntilVisible(
+          find.byKey(const ValueKey('privacy-export-error-log-button')),
+          50.0,
+        );
+        // Tap inside runAsync so the export's real-time Futures
+        // (writeAsString + share sink) actually resolve. tester.tap
+        // itself is sync, but the onPressed callback kicks off an
+        // async chain that the fake clock can't pump.
+        await tester.runAsync(() async {
+          await tester.tap(
+            find.byKey(const ValueKey('privacy-export-error-log-button')),
+          );
+          // Give the disk IO + share sink real wall-clock time.
+          await Future<void>.delayed(const Duration(milliseconds: 500));
+        });
+        // Surface the resulting snackbar in the widget tree.
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+
+      testWidgets(
+          'small JSON path writes to Clipboard.setData and skips share_plus',
+          (tester) async {
+        wireClipboardCapture(tester);
+        wireShareCapture();
+        await _setTallSurface(tester);
+
+        const smallJson = '{"traceCount":1,"traces":[{"id":"a"}]}';
+        final stub = _StubTraceStorage(
+          stubCount: 1,
+          stubParsedCount: 1,
+          stubExport: smallJson,
+        );
+        await pumpApp(
+          tester,
+          const PrivacyDashboardScreen(),
+          overrides: [
+            storageRepositoryProvider.overrideWithValue(mockStorage),
+            syncStateProvider.overrideWith(() => _DisabledSyncState()),
+            traceStorageProvider.overrideWithValue(stub),
+          ],
+        );
+
+        await tapExportButton(tester);
+
+        expect(capturedClipboard, isNotNull,
+            reason: 'small payload should reach the clipboard channel');
+        expect(capturedClipboard!['text'], smallJson);
+        expect(capturedShareParams, isNull,
+            reason: 'small payload should NOT trigger share_plus');
+        // Snackbar reports byte size + entry count.
+        expect(find.textContaining('Error log copied to clipboard'),
+            findsOneWidget);
+        expect(find.textContaining('1 entries'), findsOneWidget);
+      });
+
+      testWidgets(
+          'large JSON path hands off to share_plus with a JSON file attachment',
+          (tester) async {
+        wireClipboardCapture(tester);
+        wireShareCapture();
+        await _setTallSurface(tester);
+
+        // 80 KB > 64 KB threshold.
+        final bigPayload = '{"traceCount":1,"big":"${'x' * (80 * 1024)}"}';
+        final stub = _StubTraceStorage(
+          stubCount: 1,
+          stubParsedCount: 1,
+          stubExport: bigPayload,
+        );
+        await pumpApp(
+          tester,
+          const PrivacyDashboardScreen(),
+          overrides: [
+            storageRepositoryProvider.overrideWithValue(mockStorage),
+            syncStateProvider.overrideWith(() => _DisabledSyncState()),
+            traceStorageProvider.overrideWithValue(stub),
+          ],
+        );
+
+        await tapExportButton(tester);
+
+        expect(capturedShareParams, isNotNull,
+            reason: 'payload above 64 KB threshold must use share sheet');
+        expect(capturedShareParams!.files, isNotNull);
+        expect(capturedShareParams!.files!, hasLength(1));
+        expect(
+          capturedShareParams!.files!.first.path,
+          endsWith('tankstellen-error-log.json'),
+        );
+        expect(capturedClipboard, isNull,
+            reason: 'large payload skips clipboard');
+        // Snackbar mentions "shared".
+        expect(find.textContaining('Error log shared'), findsOneWidget);
+      });
+
+      testWidgets(
+          'snackbar surfaces parsed-vs-unparsed split when Hive has '
+          'schema drift', (tester) async {
+        wireClipboardCapture(tester);
+        wireShareCapture();
+        await _setTallSurface(tester);
+
+        const mixedJson = '{"traceCount":3,"parsedCount":1,'
+            '"unparsedCount":2,"traces":[],"unparsedRaw":[{"id":"x"}]}';
+        final stub = _StubTraceStorage(
+          stubCount: 3,
+          stubParsedCount: 1,
+          stubUnparsedCount: 2,
+          stubExport: mixedJson,
+        );
+        await pumpApp(
+          tester,
+          const PrivacyDashboardScreen(),
+          overrides: [
+            storageRepositoryProvider.overrideWithValue(mockStorage),
+            syncStateProvider.overrideWith(() => _DisabledSyncState()),
+            traceStorageProvider.overrideWithValue(stub),
+          ],
+        );
+
+        await tapExportButton(tester);
+
+        expect(capturedClipboard, isNotNull);
+        // Snackbar tells the user the breakdown explicitly.
+        expect(
+          find.textContaining(
+              'Error log copied (1 parsed + 2 raw entries'),
+          findsOneWidget,
+        );
+        expect(
+          find.textContaining('some entries failed to parse'),
+          findsOneWidget,
+        );
+      });
     });
   });
 }
