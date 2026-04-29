@@ -199,5 +199,93 @@ void main() {
         expect(lines[1], startsWith('  '));
       });
     });
+
+    /// #1301 — surface parse-vs-raw mismatch so the privacy dashboard
+    /// can warn the user (and ship the unreadable payload for offline
+    /// debugging) when a Hive schema migration leaves stale entries the
+    /// current `ErrorTrace.fromJson` can no longer decode.
+    group('parse-vs-raw (#1301)', () {
+      Map<String, dynamic> malformedEntry(String id) => <String, dynamic>{
+            'id': id,
+            // Missing every required field except id — this triggers
+            // FormatException inside ErrorTrace.fromJson.
+            'schemaVersion': 'unknown',
+          };
+
+      test(
+          'count returns the raw box length while parsedCount filters out '
+          'failures', () async {
+        final box = Hive.box('error_traces');
+        await box.put('valid', _makePlainJson(id: 'valid'));
+        await box.put('broken-1', malformedEntry('broken-1'));
+        await box.put('broken-2', malformedEntry('broken-2'));
+
+        expect(storage.count, 3);
+        expect(storage.parsedCount, 1);
+        expect(storage.unparsedCount, 2);
+      });
+
+      test(
+          'when every entry fails to parse, exportAsJson surfaces the raw '
+          'payload under unparsedRaw and traces is empty', () async {
+        final box = Hive.box('error_traces');
+        await box.put('broken-1', malformedEntry('broken-1'));
+        await box.put('broken-2', malformedEntry('broken-2'));
+
+        expect(storage.parsedCount, 0);
+        expect(storage.unparsedCount, storage.count);
+
+        final decoded =
+            jsonDecode(storage.exportAsJson()) as Map<String, dynamic>;
+        expect(decoded['traceCount'], 2);
+        expect(decoded['parsedCount'], 0);
+        expect(decoded['unparsedCount'], 2);
+        expect(decoded['traces'], isEmpty);
+        final unparsed = decoded['unparsedRaw'] as List;
+        expect(unparsed, hasLength(2));
+        // Each raw entry is round-tripped as a plain Map preserving the
+        // original id so a maintainer can correlate it back to the device.
+        final ids = unparsed
+            .map((e) => (e as Map<String, dynamic>)['id'] as String)
+            .toSet();
+        expect(ids, {'broken-1', 'broken-2'});
+      });
+
+      test(
+          'with mixed valid/invalid entries both arrays populate and counts '
+          'add up to the raw box length', () async {
+        final box = Hive.box('error_traces');
+        await box.put('valid-1', _makePlainJson(id: 'valid-1'));
+        await box.put('valid-2', _makePlainJson(id: 'valid-2'));
+        await box.put('broken', malformedEntry('broken'));
+
+        expect(storage.count, 3);
+        expect(storage.parsedCount, 2);
+        expect(storage.unparsedCount, 1);
+
+        final decoded =
+            jsonDecode(storage.exportAsJson()) as Map<String, dynamic>;
+        expect(decoded['traceCount'], 3);
+        expect(decoded['parsedCount'], 2);
+        expect(decoded['unparsedCount'], 1);
+        expect(decoded['traces'], hasLength(2));
+        expect(decoded['unparsedRaw'], hasLength(1));
+        final raw = (decoded['unparsedRaw'] as List).first as Map;
+        expect(raw['id'], 'broken');
+      });
+
+      test('unparsedCount is 0 (never negative) when every entry parses',
+          () async {
+        final box = Hive.box('error_traces');
+        await box.put('a', _makePlainJson(id: 'a'));
+        await box.put('b', _makePlainJson(id: 'b'));
+
+        expect(storage.unparsedCount, 0);
+        final decoded =
+            jsonDecode(storage.exportAsJson()) as Map<String, dynamic>;
+        expect(decoded['unparsedCount'], 0);
+        expect(decoded['unparsedRaw'], isEmpty);
+      });
+    });
   });
 }
