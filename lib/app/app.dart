@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/country/country_switch_listener.dart';
@@ -5,6 +7,7 @@ import '../core/language/language_provider.dart';
 import '../core/notifications/notification_launch_listener.dart';
 import '../core/theme/theme_mode_provider.dart';
 import '../features/consumption/presentation/widgets/trip_recording_banner.dart';
+import '../features/consumption/providers/trip_recording_provider.dart';
 import '../features/widget/presentation/widget_click_listener.dart';
 import '../l10n/app_localizations.dart';
 import 'router.dart';
@@ -30,11 +33,51 @@ import 'theme.dart';
 /// Theme/dark mode follow the system. Light/dark themes live in
 /// `lib/app/theme.dart`. Localization delegates come from the generated
 /// `AppLocalizations`.
-class TankstellenApp extends ConsumerWidget {
+class TankstellenApp extends ConsumerStatefulWidget {
   const TankstellenApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TankstellenApp> createState() => _TankstellenAppState();
+}
+
+class _TankstellenAppState extends ConsumerState<TankstellenApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    // #1303 phase C — observe app lifecycle so the in-progress
+    // trip can force-flush its snapshot before the OS kills us.
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state != AppLifecycleState.paused &&
+        state != AppLifecycleState.inactive) {
+      return;
+    }
+    // Force-flush ONLY on `paused` — `inactive` fires on every
+    // brief interruption (notifications, picker dialogs) and would
+    // be wasteful. We still listen so a `paused` arriving via the
+    // `inactive → paused` path routes through this observer.
+    if (state != AppLifecycleState.paused) return;
+    try {
+      final notifier = ref.read(tripRecordingProvider.notifier);
+      unawaited(notifier.onAppBackgrounded());
+    } catch (e, st) {
+      debugPrint('TankstellenApp: onAppBackgrounded failed: $e\n$st');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
     final language = ref.watch(activeLanguageProvider);
     final themeMode = ref.watch(themeModeSettingProvider);

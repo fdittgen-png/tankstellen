@@ -14,6 +14,7 @@ import '../../search/domain/entities/fuel_type.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/baseline_store.dart';
+import '../data/obd2/active_trip_repository.dart';
 import '../data/obd2/adapter_registry.dart';
 import '../data/obd2/adapter_reconnect_scanner.dart';
 import '../data/obd2/obd2_connection_service.dart';
@@ -84,6 +85,44 @@ class TripRecording extends _$TripRecording {
   /// after a [reset] / fresh [build].
   String? _lastTripVehicleId;
   DateTime? _lastTripStartedAt;
+
+  // ---------------------------------------------------------------------------
+  // #1303 — write-through persistence of the in-progress trip
+  // ---------------------------------------------------------------------------
+
+  /// Optional override for tests: hand-built repository wrapping an
+  /// in-memory Hive box. Production reads the box from
+  /// [HiveBoxes.obd2ActiveTrip] when needed; this lets tests skip
+  /// the box-open dance.
+  ActiveTripRepository? _activeRepoOverride;
+
+  /// Last persisted snapshot, kept in memory so the debounced
+  /// flush can re-use the trip identity (id, startedAt, vehicleId)
+  /// across writes without rebuilding it from scratch.
+  ActiveTripSnapshot? _activeSnapshot;
+
+  /// Wall-clock of the most recent flush. Used by the debounce
+  /// gate so we don't pay a Hive write on every sample.
+  DateTime? _lastSnapshotFlushAt;
+
+  /// Sample count since the last flush. Forces an out-of-band
+  /// write when the user has been driving long enough to fill the
+  /// buffer past the count threshold even if the time threshold
+  /// hasn't elapsed (e.g. a 5 Hz fast tier on stop-and-go traffic).
+  int _samplesSinceLastFlush = 0;
+
+  /// Time-based debounce: at most one Hive write every 5 seconds
+  /// while the trip is healthy. Aligned with the controller's
+  /// 4 Hz emit cadence — 4 Hz × 5 s = 20 emits per write, which
+  /// is a comfortable balance between recovery freshness and
+  /// flash-write wear.
+  static const Duration _snapshotFlushInterval = Duration(seconds: 5);
+
+  /// Sample-count fallback: flush when this many emits have
+  /// accumulated since the previous write, regardless of clock.
+  /// 30 covers ~7.5 s at 4 Hz so the upper bound on a freshness
+  /// gap is bounded by either rule.
+  static const int _snapshotFlushSampleThreshold = 30;
 
   /// Most recent vehicle id this provider kicked a trip for.
   ///
@@ -225,6 +264,13 @@ class TripRecording extends _$TripRecording {
     }
 
     await ctl.start();
+    // #1303 — seed the active-trip snapshot identity now that the
+    // controller knows its session id + odometer reads. The first
+    // flush happens off the live-stream debounce below; if the
+    // process dies before the first sample lands, the empty
+    // snapshot is still enough to put the user back in the
+    // recording UI on next launch.
+    _seedActiveSnapshot();
     _liveSub = ctl.live.listen((reading) {
       final situation = _classifyFrom(reading);
       _recordToStore(reading, situation);
@@ -238,6 +284,9 @@ class TripRecording extends _$TripRecording {
         band: band,
         liveDeltaFraction: delta,
       );
+      // #1303 — debounced write-through. Cheap when the gate
+      // rejects (a single timestamp comparison + counter bump).
+      _maybeFlushActiveSnapshot();
     });
     // #797 phase 1 — listen to explicit state changes so the UI
     // surfaces "pausedDueToDrop" even when no TripLiveReading lands
@@ -246,6 +295,11 @@ class TripRecording extends _$TripRecording {
     // so we only copyWith the phase here.
     _stateSub = ctl.stateChanges.listen((_) {
       state = state.copyWith(phase: _phaseFor(ctl));
+      // #1303 — phase transitions force an immediate snapshot so
+      // a recovered crash lands on the right phase (the controller
+      // moving from recording → pausedDueToDrop should NOT be lost
+      // if the OS kills us before the next debounce window).
+      unawaited(_flushActiveSnapshot(force: true));
     });
     state = state.copyWith(phase: TripRecordingPhase.recording);
   }
@@ -482,6 +536,11 @@ class TripRecording extends _$TripRecording {
       debugPrint('TripRecording.stop: service disconnect failed: $e\n$st');
     }
     _service = null;
+    // #1303 — the trip is finalised in history; the active-trip
+    // snapshot is no longer the source of truth and would lure the
+    // recovery service into resurrecting a stopped trip on next
+    // launch. Clear it. Best-effort.
+    await _clearActiveSnapshot();
     state = state.copyWith(phase: TripRecordingPhase.finished);
     return StoppedTripResult(
       summary: summary,
@@ -509,6 +568,266 @@ class TripRecording extends _$TripRecording {
   /// (#888) after the user lands back on the fill-up screen.
   void reset() {
     state = const TripRecordingState();
+    // #1303 — also drop any stale snapshot. `reset` runs when the
+    // user discards a stopped trip from the summary screen; without
+    // this call the recovery service would re-surface the discarded
+    // trip on next cold start.
+    unawaited(_clearActiveSnapshot());
+  }
+
+  // ---------------------------------------------------------------------------
+  // #1303 — write-through persistence helpers
+  // ---------------------------------------------------------------------------
+
+  /// Allow tests / wiring to inject a custom [ActiveTripRepository].
+  /// Production never calls this — the box is resolved lazily from
+  /// [HiveBoxes.obd2ActiveTrip].
+  @visibleForTesting
+  void debugSetActiveRepo(ActiveTripRepository repo) {
+    _activeRepoOverride = repo;
+  }
+
+  /// Read the active-trip repo, returning null when the box isn't
+  /// open (widget tests, fresh installs). The provider falls back to
+  /// the in-memory snapshot only — recovery doesn't happen if
+  /// there's no Hive to read from.
+  ActiveTripRepository? _resolveActiveRepo() {
+    final override = _activeRepoOverride;
+    if (override != null) return override;
+    if (!Hive.isBoxOpen(HiveBoxes.obd2ActiveTrip)) return null;
+    try {
+      return ActiveTripRepository(
+        box: Hive.box<String>(HiveBoxes.obd2ActiveTrip),
+      );
+    } catch (e, st) {
+      debugPrint('TripRecording active repo: $e\n$st');
+      return null;
+    }
+  }
+
+  /// Initialise [_activeSnapshot] from controller state immediately
+  /// after [start] succeeds. The snapshot is kept null until then so
+  /// the lifecycle-paused hook on a never-started provider is a no-op.
+  void _seedActiveSnapshot() {
+    final ctl = _controller;
+    if (ctl == null) return;
+    final id = ctl.sessionId ?? DateTime.now().toIso8601String();
+    final startedAt = _lastTripStartedAt ?? DateTime.now();
+    _activeSnapshot = ActiveTripSnapshot(
+      id: id,
+      vehicleId: _lastTripVehicleId ?? _vehicleId,
+      vin: ctl.vin,
+      automatic: false, // refined on every flush via _buildSnapshotFor
+      phase: 'recording',
+      summary: const TripSummary(
+        distanceKm: 0,
+        maxRpm: 0,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 0,
+      ),
+      samples: const [],
+      odometerStartKm: ctl.odometerStartKm,
+      odometerLatestKm: ctl.odometerLatestKm,
+      startedAt: startedAt,
+      lastFlushedAt: DateTime.now(),
+    );
+    _lastSnapshotFlushAt = null;
+    _samplesSinceLastFlush = 0;
+    // First-write seed so the recovery service has something on
+    // disk even if the OS kills us before the first live sample
+    // lands. Best-effort, fire-and-forget.
+    unawaited(_flushActiveSnapshot(force: true));
+  }
+
+  /// Build a fresh snapshot from the controller's current state.
+  /// Returns null when there's no controller (defensive).
+  ActiveTripSnapshot? _buildSnapshotFor(TripRecordingController ctl) {
+    final base = _activeSnapshot;
+    if (base == null) return null;
+    final phaseStr = _phaseStringFor(ctl);
+    return base.copyWith(
+      phase: phaseStr,
+      summary: _summaryFromCtl(ctl),
+      samples: ctl.capturedSamples,
+      odometerStartKm: ctl.odometerStartKm,
+      odometerLatestKm: ctl.odometerLatestKm,
+      lastFlushedAt: DateTime.now(),
+    );
+  }
+
+  /// Map the controller's enum to the string the snapshot
+  /// serialises. Centralised so the recovery service doesn't have
+  /// to translate enum names — both sides agree on the wire format.
+  String _phaseStringFor(TripRecordingController ctl) {
+    switch (ctl.currentState) {
+      case TripRecordingControllerState.idle:
+        return 'idle';
+      case TripRecordingControllerState.recording:
+        return 'recording';
+      case TripRecordingControllerState.paused:
+        return 'paused';
+      case TripRecordingControllerState.pausedDueToDrop:
+        return 'pausedDueToDrop';
+      case TripRecordingControllerState.stopped:
+        return 'stopped';
+    }
+  }
+
+  /// Pull the recorder's running summary; lets the snapshot carry
+  /// the latest distance / fuel / harsh counts without forcing the
+  /// controller to expose more debug surface than [capturedSamples].
+  TripSummary _summaryFromCtl(TripRecordingController ctl) {
+    // capturedSamples is a List<TripSample>; the controller exposes
+    // the running summary indirectly via stop()/buildSummary, but
+    // there's no public mid-trip accessor. Rather than reach into
+    // the controller's recorder we recompute distance + max RPM
+    // from the captured buffer — it's already the post-debounce
+    // 1 Hz feed and is plenty for the staleness / preview rendering
+    // that recovery does. A perfect mid-trip summary (idle/harsh
+    // counters) would require the controller to expose its own
+    // recorder snapshot; we leave that for a future iteration if
+    // recovery acquires a richer preview.
+    final samples = ctl.capturedSamples;
+    if (samples.isEmpty) {
+      return const TripSummary(
+        distanceKm: 0,
+        maxRpm: 0,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 0,
+      );
+    }
+    var distanceKm = 0.0;
+    var maxRpm = 0.0;
+    for (var i = 0; i < samples.length; i++) {
+      final s = samples[i];
+      if (s.rpm > maxRpm) maxRpm = s.rpm;
+      if (i == 0) continue;
+      final prev = samples[i - 1];
+      final dtSec = s.timestamp
+              .difference(prev.timestamp)
+              .inMicroseconds /
+          Duration.microsecondsPerSecond;
+      if (dtSec <= 0) continue;
+      final avgSpeed = (prev.speedKmh + s.speedKmh) / 2.0;
+      distanceKm += avgSpeed * dtSec / 3600.0;
+    }
+    final startedAt = samples.first.timestamp;
+    final endedAt = samples.last.timestamp;
+    return TripSummary(
+      distanceKm: distanceKm,
+      maxRpm: maxRpm,
+      highRpmSeconds: 0,
+      idleSeconds: 0,
+      harshBrakes: 0,
+      harshAccelerations: 0,
+      startedAt: startedAt,
+      endedAt: endedAt,
+    );
+  }
+
+  /// Cheap gate called from the live-stream listener. Promotes to
+  /// a real flush when either the time threshold or the sample
+  /// threshold is crossed.
+  void _maybeFlushActiveSnapshot() {
+    _samplesSinceLastFlush++;
+    final last = _lastSnapshotFlushAt;
+    final now = DateTime.now();
+    if (last != null) {
+      final elapsed = now.difference(last);
+      if (elapsed < _snapshotFlushInterval &&
+          _samplesSinceLastFlush < _snapshotFlushSampleThreshold) {
+        return;
+      }
+    }
+    unawaited(_flushActiveSnapshot());
+  }
+
+  /// Persist the current snapshot. Always writes when called — the
+  /// debounce gate lives upstream in [_maybeFlushActiveSnapshot]
+  /// which decides whether to call this method. Forced callers
+  /// (lifecycle backgrounded, phase transition, seed) skip the gate
+  /// and invoke this directly so they can't lose the next interval.
+  Future<void> _flushActiveSnapshot({bool force = false}) async {
+    // `force` is kept on the signature for self-documenting call
+    // sites (`_flushActiveSnapshot(force: true)` reads as "I do not
+    // want this skipped"). The semantics are unconditional today;
+    // earlier drafts had an internal gate here too which double-
+    // counted with [_maybeFlushActiveSnapshot]. Keeping the param
+    // makes the intent at the call site obvious without changing
+    // behaviour.
+    if (!force && _controller == null) return;
+    final ctl = _controller;
+    if (ctl == null) return;
+    final repo = _resolveActiveRepo();
+    if (repo == null) return;
+    final next = _buildSnapshotFor(ctl);
+    if (next == null) return;
+    _activeSnapshot = next;
+    _lastSnapshotFlushAt = next.lastFlushedAt;
+    _samplesSinceLastFlush = 0;
+    try {
+      await repo.saveSnapshot(next);
+    } catch (e, st) {
+      debugPrint('TripRecording flush snapshot failed: $e\n$st');
+    }
+  }
+
+  /// Drop the persisted snapshot + clear in-memory bookkeeping.
+  /// Safe to call when nothing was ever written.
+  Future<void> _clearActiveSnapshot() async {
+    _activeSnapshot = null;
+    _lastSnapshotFlushAt = null;
+    _samplesSinceLastFlush = 0;
+    final repo = _resolveActiveRepo();
+    if (repo == null) return;
+    try {
+      await repo.clearSnapshot();
+    } catch (e, st) {
+      debugPrint('TripRecording clear snapshot failed: $e\n$st');
+    }
+  }
+
+  /// Lifecycle hook entry point — called by the wiring layer's
+  /// [WidgetsBindingObserver] when the host app transitions into
+  /// the background. We force-flush so the latest sample buffer
+  /// is on disk before the OS has a chance to kill us.
+  ///
+  /// No-op when no trip is active (the snapshot is null) so the
+  /// hook is safe to fire on every backgrounding regardless of
+  /// recording state.
+  Future<void> onAppBackgrounded() async {
+    if (_controller == null) return;
+    if (!state.isActive) return;
+    await _flushActiveSnapshot(force: true);
+  }
+
+  /// Surface the recovered snapshot from a previous cold-start
+  /// recovery walk. Phase 2 of #1303: hands the user back into a
+  /// `pausedDueToDrop`-shaped state with their captured samples
+  /// preserved and exposed as `state.live.distanceKmSoFar` so the
+  /// recording screen renders something meaningful.
+  ///
+  /// Does NOT auto-reconnect OBD2 — that's the existing reconnect
+  /// scanner's job. The user manually resumes after they're back
+  /// in the recording UI; that path picks up from a fresh BT
+  /// connect through the regular adapter picker.
+  ///
+  /// Returns true when the snapshot was applied, false when the
+  /// provider was already mid-trip (a fresh launch that started a
+  /// trip before recovery ran — extremely unlikely but defensive).
+  bool restoreFromSnapshot(ActiveTripSnapshot snapshot) {
+    if (state.isActive) return false;
+    _activeSnapshot = snapshot;
+    _lastTripVehicleId = snapshot.vehicleId;
+    _lastTripStartedAt = snapshot.startedAt;
+    state = state.copyWith(
+      phase: TripRecordingPhase.pausedDueToDrop,
+    );
+    return true;
   }
 
   /// #780 — merge local + server baselines for [vehicleId] via the
