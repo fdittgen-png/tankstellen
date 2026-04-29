@@ -3203,8 +3203,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get autoRecordToggleLabel => 'Enregistrer les trajets automatiquement';
 
   @override
-  String get autoRecordPhaseStatusBanner =>
-      'L\'enregistrement automatique est déployé par étapes. L\'activer enregistre votre préférence, mais le flux d\'arrière-plan est encore en développement — vos trajets ne sont pas encore capturés automatiquement.';
+  String get autoRecordStatusActiveLabel =>
+      'L\'enregistrement automatique démarrera la prochaine fois que vous monterez en voiture.';
+
+  @override
+  String get autoRecordStatusNeedsPairingLabel =>
+      'Associez un adaptateur OBD2 pour activer l\'enregistrement automatique.';
+
+  @override
+  String get autoRecordStatusNeedsBackgroundLocationLabel =>
+      'Autorisez la localisation en arrière-plan pour que l\'enregistrement automatique continue lorsque l\'écran est éteint.';
+
+  @override
+  String get autoRecordStatusPairAdapterCta => 'Associer un adaptateur';
 
   @override
   String get autoRecordSpeedThresholdLabel => 'Vitesse de démarrage (km/h)';

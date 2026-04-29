@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/logging/error_logger.dart';
@@ -13,10 +14,22 @@ import '../../providers/vehicle_providers.dart';
 ///
 /// Exposes a master toggle plus the advanced fields (start speed,
 /// disconnect-save delay, paired adapter, background-location
-/// consent). Phases 2-4 (foreground service, movement detection,
-/// disconnect-save) are not yet shipped, so the card renders a
-/// soft warning banner explaining that the toggle persists the
-/// preference but does not yet activate any background flow.
+/// consent). #1310 — when the master toggle is on the card renders a
+/// state-aware status banner that mirrors the actual orchestrator
+/// gate (`pairedAdapterMac` non-empty + `backgroundLocationConsent`
+/// true). The banner shows one of three states:
+///
+///   * Active — both prerequisites satisfied; auto-record arms next
+///     drive.
+///   * Needs pairing — no `pairedAdapterMac` set; CTA pushes the
+///     OBD2 onboarding wizard.
+///   * Needs background location — adapter paired but consent
+///     missing; the existing background-location row below already
+///     surfaces the OS prompt.
+///
+/// Replaces the pre-#1310 stale phase-status copy that misled users
+/// into thinking the feature wasn't shipped — every phase is on
+/// master.
 ///
 /// Stateless against the vehicle list — every change is funnelled
 /// through `vehicleProfileListProvider.save` so the rest of the
@@ -51,12 +64,20 @@ class AutoRecordSection extends ConsumerWidget {
   /// real Android intent.
   final Future<void> Function()? openSettings;
 
+  /// Hook invoked when the user taps the "Pair an adapter" CTA on the
+  /// state-aware status banner (#1310). Null defers to the production
+  /// behaviour — push `/setup` (the OBD2 onboarding wizard) via
+  /// [GoRouter]. Tests inject a counter to assert the navigation
+  /// without a router.
+  final VoidCallback? onPairAdapter;
+
   const AutoRecordSection({
     super.key,
     required this.vehicleId,
     this.requestBackgroundLocation,
     this.requestForegroundLocation,
     this.openSettings,
+    this.onPairAdapter,
   });
 
   static Future<PermissionStatus> _defaultRequestBackgroundLocation() {
@@ -113,13 +134,11 @@ class AutoRecordSection extends ConsumerWidget {
           ),
           if (profile.autoRecord) ...[
             const SizedBox(height: 8),
-            _PhaseStatusBanner(
-              text: l?.autoRecordPhaseStatusBanner ??
-                  'Auto-record is being rolled out in phases. Turning '
-                      'this on saves your preference, but the background '
-                      'recording flow is still in development — your '
-                      'trips are not yet auto-captured.',
+            _AutoRecordStatusBanner(
+              state: _statusFor(profile),
               theme: theme,
+              l: l,
+              onPairAdapter: () => _handlePairAdapter(context),
             ),
             const SizedBox(height: 16),
             _SpeedThresholdSlider(
@@ -173,6 +192,46 @@ class AutoRecordSection extends ConsumerWidget {
 
   Future<void> _persist(WidgetRef ref, VehicleProfile next) {
     return ref.read(vehicleProfileListProvider.notifier).save(next);
+  }
+
+  /// Map the four real states the auto-record orchestrator gates on
+  /// to the banner shown on this card (#1310). Mirrors
+  /// `AutoRecordOrchestrator._isAutoRecordReady`: a vehicle is
+  /// "active" only when `pairedAdapterMac` is non-empty AND
+  /// `backgroundLocationConsent` is true.
+  _AutoRecordStatus _statusFor(VehicleProfile profile) {
+    final mac = profile.pairedAdapterMac;
+    if (mac == null || mac.isEmpty) {
+      return _AutoRecordStatus.needsPairing;
+    }
+    if (!profile.backgroundLocationConsent) {
+      return _AutoRecordStatus.needsBackgroundLocation;
+    }
+    return _AutoRecordStatus.active;
+  }
+
+  /// "Pair an adapter" CTA on the [_AutoRecordStatus.needsPairing]
+  /// banner. Defers to the injected [onPairAdapter] (tests) when
+  /// supplied; falls back to `GoRouter.go('/setup')` so the user
+  /// lands on the OBD2 onboarding wizard. There is no standalone
+  /// "pair an adapter" route — the wizard's OBD2 step is the
+  /// closest reachable surface that runs the picker AND persists
+  /// `pairedAdapterMac` (#1310).
+  void _handlePairAdapter(BuildContext context) {
+    final hook = onPairAdapter;
+    if (hook != null) {
+      hook();
+      return;
+    }
+    // Production fallback — push the onboarding wizard. Best-effort:
+    // if the router context is missing (isolated widget pump without
+    // a router) we silently no-op rather than throw, so the surface
+    // remains testable.
+    try {
+      GoRouter.of(context).go('/setup');
+    } catch (e, st) {
+      debugPrint('AutoRecordSection: pair-adapter navigation failed: $e\n$st');
+    }
   }
 
   /// Two-step background-location grant flow (#1302).
@@ -319,40 +378,116 @@ class AutoRecordSection extends ConsumerWidget {
   }
 }
 
-class _PhaseStatusBanner extends StatelessWidget {
-  final String text;
-  final ThemeData theme;
+/// Three real prerequisites the auto-record orchestrator gates on
+/// (#1310). Drives the colour, icon, copy, and presence of the
+/// "Pair an adapter" CTA on [_AutoRecordStatusBanner].
+enum _AutoRecordStatus {
+  /// Adapter paired and background-location consent granted —
+  /// orchestrator will arm next time the user enters the car.
+  active,
 
-  const _PhaseStatusBanner({required this.text, required this.theme});
+  /// `pairedAdapterMac` is null/empty. The orchestrator silently
+  /// drops this vehicle until an adapter is paired.
+  needsPairing,
+
+  /// Adapter paired but `backgroundLocationConsent` is false. The
+  /// foreground service can connect, but trips lose their GPS path
+  /// once the screen locks.
+  needsBackgroundLocation,
+}
+
+class _AutoRecordStatusBanner extends StatelessWidget {
+  final _AutoRecordStatus state;
+  final ThemeData theme;
+  final AppLocalizations? l;
+  final VoidCallback onPairAdapter;
+
+  const _AutoRecordStatusBanner({
+    required this.state,
+    required this.theme,
+    required this.l,
+    required this.onPairAdapter,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final isActive = state == _AutoRecordStatus.active;
+    final container = isActive
+        ? theme.colorScheme.primaryContainer
+        : theme.colorScheme.tertiaryContainer;
+    final onContainer = isActive
+        ? theme.colorScheme.onPrimaryContainer
+        : theme.colorScheme.onTertiaryContainer;
+    final icon = isActive ? Icons.check_circle : Icons.warning_amber_rounded;
+
     return Container(
+      key: Key(_keyFor(state)),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.tertiaryContainer,
+        color: container,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(
-            Icons.science_outlined,
-            color: theme.colorScheme.onTertiaryContainer,
-            size: 20,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, color: onContainer, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  _labelFor(state, l),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: onContainer,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onTertiaryContainer,
+          if (state == _AutoRecordStatus.needsPairing) ...[
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton.tonalIcon(
+                key: const Key('autoRecordStatusPairAdapterCta'),
+                onPressed: onPairAdapter,
+                icon: const Icon(Icons.bluetooth_searching),
+                label: Text(
+                  l?.autoRecordStatusPairAdapterCta ?? 'Pair an adapter',
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );
+  }
+
+  static String _labelFor(_AutoRecordStatus s, AppLocalizations? l) {
+    switch (s) {
+      case _AutoRecordStatus.active:
+        return l?.autoRecordStatusActiveLabel ??
+            'Auto-record will activate the next time you enter the car.';
+      case _AutoRecordStatus.needsPairing:
+        return l?.autoRecordStatusNeedsPairingLabel ??
+            'Pair an OBD2 adapter to enable auto-record.';
+      case _AutoRecordStatus.needsBackgroundLocation:
+        return l?.autoRecordStatusNeedsBackgroundLocationLabel ??
+            'Allow background location so auto-record keeps running '
+                'with the screen off.';
+    }
+  }
+
+  static String _keyFor(_AutoRecordStatus s) {
+    switch (s) {
+      case _AutoRecordStatus.active:
+        return 'autoRecordStatusBannerActive';
+      case _AutoRecordStatus.needsPairing:
+        return 'autoRecordStatusBannerNeedsPairing';
+      case _AutoRecordStatus.needsBackgroundLocation:
+        return 'autoRecordStatusBannerNeedsBackgroundLocation';
+    }
   }
 }
 

@@ -110,6 +110,47 @@ Future<ResolvedObd2Candidate?> showObd2AdapterPairer(BuildContext context) {
   );
 }
 
+/// Bundle of the live OBD2 service plus the MAC of the adapter the
+/// user picked in the sheet (#1310). Surfaces the MAC at the same
+/// boundary the existing [showObd2AdapterPicker] returns so the OBD2
+/// onboarding step can persist [VehicleProfile.pairedAdapterMac] on a
+/// freshly-saved profile — without this the orchestrator silently
+/// dropped users who finished onboarding (auto-record gate requires
+/// `pairedAdapterMac` to be non-empty).
+class PickedObd2Connection {
+  /// Live OBD2 connection ready for VIN + PID reads.
+  final Obd2Service service;
+
+  /// Stable BLE/Classic identifier for the picked adapter.
+  final String mac;
+
+  /// Friendly label for the adapter (advertised name, falling back
+  /// to the registry's display name).
+  final String name;
+
+  const PickedObd2Connection({
+    required this.service,
+    required this.mac,
+    required this.name,
+  });
+}
+
+/// Connect-and-pick variant of [showObd2AdapterPicker] used by the
+/// OBD2 onboarding step (#1310). Returns both the live service AND
+/// the picked adapter's MAC so the caller can persist it onto the
+/// vehicle profile they're about to save. Pops with `null` on cancel
+/// or failure, matching [showObd2AdapterPicker]'s contract.
+Future<PickedObd2Connection?> showObd2AdapterPickerWithMac(
+  BuildContext context,
+) {
+  return showModalBottomSheet<PickedObd2Connection>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (_) => const Obd2AdapterPickerSheet(returnPickedConnection: true),
+  );
+}
+
 class Obd2AdapterPickerSheet extends ConsumerStatefulWidget {
   /// When true, tapping a candidate pops the sheet with the
   /// [ResolvedObd2Candidate] instead of opening a connection. Used
@@ -117,7 +158,19 @@ class Obd2AdapterPickerSheet extends ConsumerStatefulWidget {
   /// adapter on the vehicle profile without starting a trip.
   final bool pairOnly;
 
-  const Obd2AdapterPickerSheet({super.key, this.pairOnly = false});
+  /// When true, after a successful connect the sheet pops with a
+  /// [PickedObd2Connection] (service + MAC + name) instead of just
+  /// the [Obd2Service] (#1310). Used by the OBD2 onboarding step so
+  /// it can write `pairedAdapterMac` onto the freshly-saved profile.
+  /// Mutually exclusive with [pairOnly] in practice — onboarding
+  /// always wants to also connect.
+  final bool returnPickedConnection;
+
+  const Obd2AdapterPickerSheet({
+    super.key,
+    this.pairOnly = false,
+    this.returnPickedConnection = false,
+  });
 
   @override
   ConsumerState<Obd2AdapterPickerSheet> createState() =>
@@ -190,7 +243,21 @@ class _Obd2AdapterPickerSheetState
       // path the user just completed.
       await _persistPickedAdapterToActiveVehicle(candidate);
       if (!mounted) return;
-      Navigator.of(context).pop(service);
+      if (widget.returnPickedConnection) {
+        // #1310 — onboarding flow needs the MAC alongside the service
+        // so it can persist `pairedAdapterMac` on the freshly-saved
+        // profile (no `active` vehicle exists yet during onboarding,
+        // so [_persistPickedAdapterToActiveVehicle] no-ops).
+        final mac = candidate.candidate.deviceId;
+        final name = candidate.candidate.deviceName.isEmpty
+            ? candidate.profile.displayName
+            : candidate.candidate.deviceName;
+        Navigator.of(context).pop(
+          PickedObd2Connection(service: service, mac: mac, name: name),
+        );
+      } else {
+        Navigator.of(context).pop(service);
+      }
     } on Obd2ConnectionError catch (e, st) { // ignore: unused_catch_stack
       if (!mounted) return;
       setState(() {
@@ -205,6 +272,13 @@ class _Obd2AdapterPickerSheetState
   /// only when an active profile exists; no-op otherwise. Errors are
   /// swallowed (debug-printed) — the connect path the user is
   /// completing is the priority.
+  ///
+  /// Also persists [VehicleProfile.pairedAdapterMac] (#1310) so the
+  /// auto-record orchestrator's gate
+  /// (`pairedAdapterMac != null && backgroundLocationConsent`) flips
+  /// to ready as soon as the user successfully pairs — without this,
+  /// the auto-record toggle silently dropped users who picked an
+  /// adapter outside the OBD2 onboarding wizard.
   Future<void> _persistPickedAdapterToActiveVehicle(
     ResolvedObd2Candidate candidate,
   ) async {
@@ -215,12 +289,15 @@ class _Obd2AdapterPickerSheetState
       final name = candidate.candidate.deviceName.isEmpty
           ? candidate.profile.displayName
           : candidate.candidate.deviceName;
-      if (active.obd2AdapterMac == mac && active.obd2AdapterName == name) {
+      if (active.obd2AdapterMac == mac &&
+          active.obd2AdapterName == name &&
+          active.pairedAdapterMac == mac) {
         return; // already persisted — skip the redundant write.
       }
       final updated = active.copyWith(
         obd2AdapterMac: mac,
         obd2AdapterName: name,
+        pairedAdapterMac: mac,
       );
       await ref.read(vehicleProfileListProvider.notifier).save(updated);
     } catch (e, st) {

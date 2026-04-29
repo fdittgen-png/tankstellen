@@ -3180,8 +3180,19 @@ class AppLocalizationsEl extends AppLocalizations {
   String get autoRecordToggleLabel => 'Auto-record trips';
 
   @override
-  String get autoRecordPhaseStatusBanner =>
-      'Auto-record is being rolled out in phases. Turning this on saves your preference, but the background recording flow is still in development — your trips are not yet auto-captured.';
+  String get autoRecordStatusActiveLabel =>
+      'Auto-record will activate the next time you enter the car.';
+
+  @override
+  String get autoRecordStatusNeedsPairingLabel =>
+      'Pair an OBD2 adapter to enable auto-record.';
+
+  @override
+  String get autoRecordStatusNeedsBackgroundLocationLabel =>
+      'Allow background location so auto-record keeps running with the screen off.';
+
+  @override
+  String get autoRecordStatusPairAdapterCta => 'Pair an adapter';
 
   @override
   String get autoRecordSpeedThresholdLabel => 'Start speed (km/h)';
