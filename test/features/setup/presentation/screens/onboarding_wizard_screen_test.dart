@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/setup/presentation/screens/onboarding_wizard_screen.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/onboarding_progress_indicator.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/welcome_step.dart';
@@ -319,7 +318,7 @@ void main() {
 /// picker path (that's covered by the dedicated OBD2 step test).
 class _NullObd2Connector implements OnboardingObd2Connector {
   @override
-  Future<Obd2Service?> connect(_) async => null;
+  Future<OnboardingObd2Session?> connect(_) async => null;
 
   @override
   Future<String?> readVin(_) async => null;

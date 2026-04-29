@@ -253,6 +253,108 @@ void main() {
       expect(find.text('Maybe later'), findsOneWidget);
     });
   });
+
+  group('OnboardingObd2Step — pairedAdapterMac persistence (#1310)', () {
+    testWidgets(
+      'happy path: connect + VIN read + confirm → saved profile carries '
+      'the picked MAC on BOTH obd2AdapterMac AND pairedAdapterMac',
+      (tester) async {
+        const pickedMac = 'AA:BB:CC:11:22:33';
+        final service = _buildService();
+        final connector = _FakeConnector(
+          onConnect: () async => service,
+          onReadVin: (_) async => '1HGCM82633A004352',
+          pickedMac: pickedMac,
+        );
+        final decoder = _StubDecoder(
+          (vin) => VinData(
+            vin: vin,
+            make: 'Honda',
+            model: 'Accord',
+            modelYear: 2003,
+            displacementL: 2.4,
+            cylinderCount: 4,
+            fuelTypePrimary: 'Gasoline',
+            source: VinDataSource.vpic,
+          ),
+        );
+
+        late ProviderContainer container;
+        await _pumpStep(
+          tester,
+          connector: connector,
+          vinDecoder: decoder,
+          onProceed: () {},
+          onAutoFillSuccess: () {},
+          onContainerReady: (c) => container = c,
+        );
+
+        await tester.tap(find.text('Connect adapter'));
+        await tester.pumpAndSettle();
+
+        // Accept the auto-fill in the VIN confirm dialog.
+        await tester.tap(find.text('Yes, auto-fill'));
+        await tester.pumpAndSettle();
+
+        // Without the #1310 fix, the saved profile carried no MAC at
+        // all — the orchestrator's `pairedAdapterMac != null` gate
+        // silently dropped the user.
+        final vehicles = container.read(vehicleProfileListProvider);
+        expect(vehicles, hasLength(1));
+        final saved = vehicles.first;
+        expect(saved.pairedAdapterMac, pickedMac,
+            reason: 'auto-record orchestrator gates on pairedAdapterMac '
+                'being non-empty (#1310)');
+        expect(saved.obd2AdapterMac, pickedMac,
+            reason: 'pinned-MAC fast path keys on obd2AdapterMac (#1188)');
+      },
+    );
+
+    testWidgets(
+      'connector reports an empty MAC → saved profile leaves '
+      'pairedAdapterMac null (does not persist a bogus value)',
+      (tester) async {
+        final service = _buildService();
+        final connector = _FakeConnector(
+          onConnect: () async => service,
+          onReadVin: (_) async => '1HGCM82633A004352',
+          pickedMac: '', // production picker always supplies a non-empty
+          // id, but defensively the empty case must not write a bogus
+          // value into pairedAdapterMac.
+        );
+        final decoder = _StubDecoder(
+          (vin) => VinData(
+            vin: vin,
+            make: 'Honda',
+            model: 'Accord',
+            modelYear: 2003,
+            displacementL: 2.4,
+            cylinderCount: 4,
+            source: VinDataSource.vpic,
+          ),
+        );
+
+        late ProviderContainer container;
+        await _pumpStep(
+          tester,
+          connector: connector,
+          vinDecoder: decoder,
+          onProceed: () {},
+          onAutoFillSuccess: () {},
+          onContainerReady: (c) => container = c,
+        );
+
+        await tester.tap(find.text('Connect adapter'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Yes, auto-fill'));
+        await tester.pumpAndSettle();
+
+        final saved = container.read(vehicleProfileListProvider).first;
+        expect(saved.pairedAdapterMac, isNull);
+        expect(saved.obd2AdapterMac, isNull);
+      },
+    );
+  });
 }
 
 // --- helpers ---------------------------------------------------------
@@ -303,20 +405,27 @@ Future<void> _pumpStep(
 Obd2Service _buildService() => Obd2Service(FakeObd2Transport());
 
 class _FakeConnector implements OnboardingObd2Connector {
-  _FakeConnector({this.onConnect, this.onReadVin});
+  _FakeConnector({this.onConnect, this.onReadVin, this.pickedMac = ''});
 
   final Future<Obd2Service?> Function()? onConnect;
   final Future<String?> Function(Obd2Service)? onReadVin;
+
+  /// MAC the fake reports as picked. Empty by default so legacy tests
+  /// keep the original "no MAC threaded" behaviour; #1310 tests
+  /// override with a real value to assert the persistence path.
+  final String pickedMac;
 
   int connectCalls = 0;
   int readVinCalls = 0;
 
   @override
-  Future<Obd2Service?> connect(BuildContext context) async {
+  Future<OnboardingObd2Session?> connect(BuildContext context) async {
     connectCalls++;
     final factory = onConnect;
     if (factory == null) return null;
-    return factory();
+    final service = await factory();
+    if (service == null) return null;
+    return OnboardingObd2Session(service: service, mac: pickedMac);
   }
 
   @override

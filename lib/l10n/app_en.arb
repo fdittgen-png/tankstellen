@@ -1508,9 +1508,21 @@
   "@autoRecordToggleLabel": {
     "description": "Label for the master ON/OFF switch that opts a vehicle into hands-free trip recording."
   },
-  "autoRecordPhaseStatusBanner": "Auto-record is being rolled out in phases. Turning this on saves your preference, but the background recording flow is still in development — your trips are not yet auto-captured.",
-  "@autoRecordPhaseStatusBanner": {
-    "description": "Soft warning banner shown when auto-record is enabled but the background phases (2-4) are not yet shipped."
+  "autoRecordStatusActiveLabel": "Auto-record will activate the next time you enter the car.",
+  "@autoRecordStatusActiveLabel": {
+    "description": "Active-state banner shown when auto-record is enabled, an adapter is paired, and background-location consent is granted (#1310). Replaces the stale phase-status banner."
+  },
+  "autoRecordStatusNeedsPairingLabel": "Pair an OBD2 adapter to enable auto-record.",
+  "@autoRecordStatusNeedsPairingLabel": {
+    "description": "Warning banner shown when auto-record is enabled but no OBD2 adapter has been paired — the orchestrator gate cannot arm without a MAC (#1310)."
+  },
+  "autoRecordStatusNeedsBackgroundLocationLabel": "Allow background location so auto-record keeps running with the screen off.",
+  "@autoRecordStatusNeedsBackgroundLocationLabel": {
+    "description": "Warning banner shown when an OBD2 adapter is paired but background-location consent is missing — auto-record runs BT-only without GPS metadata (#1310)."
+  },
+  "autoRecordStatusPairAdapterCta": "Pair an adapter",
+  "@autoRecordStatusPairAdapterCta": {
+    "description": "CTA button on the 'needs pairing' banner that opens the OBD2 onboarding wizard so the user can pair an adapter (#1310)."
   },
   "autoRecordSpeedThresholdLabel": "Start speed (km/h)",
   "@autoRecordSpeedThresholdLabel": {

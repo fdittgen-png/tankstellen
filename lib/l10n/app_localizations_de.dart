@@ -3203,8 +3203,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String get autoRecordToggleLabel => 'Fahrten automatisch aufzeichnen';
 
   @override
-  String get autoRecordPhaseStatusBanner =>
-      'Die automatische Aufzeichnung wird schrittweise eingeführt. Das Aktivieren speichert deine Einstellung, aber der Hintergrundablauf ist noch in Entwicklung — Fahrten werden noch nicht automatisch erfasst.';
+  String get autoRecordStatusActiveLabel =>
+      'Auto-Aufzeichnung wird beim nächsten Einsteigen aktiv.';
+
+  @override
+  String get autoRecordStatusNeedsPairingLabel =>
+      'Verbinde einen OBD2-Adapter, damit die automatische Aufzeichnung läuft.';
+
+  @override
+  String get autoRecordStatusNeedsBackgroundLocationLabel =>
+      'Standort im Hintergrund erlauben, damit die automatische Aufzeichnung bei ausgeschaltetem Bildschirm weiterläuft.';
+
+  @override
+  String get autoRecordStatusPairAdapterCta => 'Adapter verbinden';
 
   @override
   String get autoRecordSpeedThresholdLabel => 'Startgeschwindigkeit (km/h)';

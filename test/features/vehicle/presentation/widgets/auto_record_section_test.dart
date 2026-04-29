@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/presentation/widgets/auto_record_section.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -38,6 +41,7 @@ Future<_FakeVehicleProfileList> _pumpSection(
   Future<PermissionStatus> Function()? requestBackgroundLocation,
   Future<PermissionStatus> Function()? requestForegroundLocation,
   Future<void> Function()? openSettings,
+  VoidCallback? onPairAdapter,
 }) async {
   // Tall canvas so the slider/banner stack does not overflow when the
   // master toggle is on. Mirror the size used by the extras section
@@ -55,6 +59,7 @@ Future<_FakeVehicleProfileList> _pumpSection(
         requestBackgroundLocation: requestBackgroundLocation,
         requestForegroundLocation: requestForegroundLocation,
         openSettings: openSettings,
+        onPairAdapter: onPairAdapter,
       ),
     ),
     overrides: [
@@ -84,11 +89,15 @@ void main() {
 
       // Master toggle is rendered.
       expect(find.byKey(const Key('autoRecordToggle')), findsOneWidget);
-      // No sliders, no banner copy.
+      // No sliders, no banner.
       expect(find.byKey(const Key('autoRecordSpeedThreshold')), findsNothing);
       expect(find.byKey(const Key('autoRecordSaveDelay')), findsNothing);
       expect(
-        find.textContaining('rolled out in phases'),
+        find.byKey(const Key('autoRecordStatusBannerNeedsPairing')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('autoRecordStatusBannerActive')),
         findsNothing,
       );
     });
@@ -100,9 +109,9 @@ void main() {
       ]);
       await _pumpSection(tester, vehicleId: 'v1', list: list);
 
-      // Phase status banner is visible.
+      // State-aware banner is visible (no paired adapter → needsPairing).
       expect(
-        find.textContaining('rolled out in phases'),
+        find.byKey(const Key('autoRecordStatusBannerNeedsPairing')),
         findsOneWidget,
       );
 
@@ -367,6 +376,268 @@ void main() {
         expect(openSettingsCalls, 1);
         expect(list.savedProfiles, isEmpty,
             reason: 'Permanent-denied path must not flip consent silently');
+      },
+    );
+  });
+
+  group('AutoRecordSection — status indicator (#1310)', () {
+    testWidgets('autoRecord OFF — no status banner is rendered',
+        (tester) async {
+      final list = _FakeVehicleProfileList([
+        const VehicleProfile(id: 'v1', name: 'Golf'),
+      ]);
+      await _pumpSection(tester, vehicleId: 'v1', list: list);
+
+      expect(
+        find.byKey(const Key('autoRecordStatusBannerNeedsPairing')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('autoRecordStatusBannerNeedsBackgroundLocation')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('autoRecordStatusBannerActive')),
+        findsNothing,
+      );
+    });
+
+    testWidgets(
+      'autoRecord ON, no paired MAC — needsPairing banner with the '
+      '"Pair an adapter" CTA',
+      (tester) async {
+        final list = _FakeVehicleProfileList([
+          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
+        ]);
+        await _pumpSection(tester, vehicleId: 'v1', list: list);
+
+        expect(
+          find.byKey(const Key('autoRecordStatusBannerNeedsPairing')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('autoRecordStatusPairAdapterCta')),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Pair an OBD2 adapter to enable auto-record.'),
+          findsOneWidget,
+        );
+        // Other states must NOT render simultaneously.
+        expect(
+          find.byKey(const Key('autoRecordStatusBannerNeedsBackgroundLocation')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const Key('autoRecordStatusBannerActive')),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'autoRecord ON, MAC paired, backgroundLocationConsent=false — '
+      'needsBackgroundLocation banner without the pair CTA',
+      (tester) async {
+        final list = _FakeVehicleProfileList([
+          const VehicleProfile(
+            id: 'v1',
+            name: 'Golf',
+            autoRecord: true,
+            pairedAdapterMac: '00:11:22:33:44:55',
+          ),
+        ]);
+        await _pumpSection(tester, vehicleId: 'v1', list: list);
+
+        expect(
+          find.byKey(const Key('autoRecordStatusBannerNeedsBackgroundLocation')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('autoRecordStatusPairAdapterCta')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const Key('autoRecordStatusBannerActive')),
+          findsNothing,
+        );
+        expect(
+          find.textContaining('Allow background location'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'autoRecord ON, MAC paired, backgroundLocationConsent=true — '
+      'active banner with the green check icon',
+      (tester) async {
+        final list = _FakeVehicleProfileList([
+          const VehicleProfile(
+            id: 'v1',
+            name: 'Golf',
+            autoRecord: true,
+            pairedAdapterMac: '00:11:22:33:44:55',
+            backgroundLocationConsent: true,
+          ),
+        ]);
+        await _pumpSection(tester, vehicleId: 'v1', list: list);
+
+        expect(
+          find.byKey(const Key('autoRecordStatusBannerActive')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('autoRecordStatusBannerNeedsPairing')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const Key('autoRecordStatusBannerNeedsBackgroundLocation')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const Key('autoRecordStatusPairAdapterCta')),
+          findsNothing,
+        );
+        // The active state shows a check_circle icon (not warning_amber).
+        // Restrict to the descendant of the active banner so we don't
+        // collide with the consent row's check icon.
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('autoRecordStatusBannerActive')),
+            matching: find.byIcon(Icons.check_circle),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Auto-record will activate the next time you '
+              'enter the car.'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'tapping the "Pair an adapter" CTA navigates to /setup '
+      '(GoRouter wrapper)',
+      (tester) async {
+        // Tall canvas so the banner + sliders fit without overflow.
+        tester.view.physicalSize = const Size(900, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final list = _FakeVehicleProfileList([
+          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
+        ]);
+
+        final router = GoRouter(
+          initialLocation: '/edit',
+          routes: [
+            GoRoute(
+              path: '/edit',
+              builder: (_, _) => const Scaffold(
+                body: SingleChildScrollView(
+                  child: AutoRecordSection(vehicleId: 'v1'),
+                ),
+              ),
+            ),
+            GoRoute(
+              path: '/setup',
+              builder: (_, _) => const Scaffold(
+                key: Key('setupScreenStub'),
+                body: Text('OBD2 onboarding'),
+              ),
+            ),
+          ],
+        );
+        addTearDown(router.dispose);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              vehicleProfileListProvider.overrideWith(() => list),
+            ],
+            child: MaterialApp.router(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: const Locale('en'),
+              routerConfig: router,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Sanity — sitting on /edit with the needsPairing banner.
+        expect(
+          find.byKey(const Key('autoRecordStatusBannerNeedsPairing')),
+          findsOneWidget,
+        );
+
+        await tester.tap(
+          find.byKey(const Key('autoRecordStatusPairAdapterCta')),
+        );
+        // Pump twice to allow the route push to settle without
+        // invoking pumpAndSettle (some Flutter versions hold a frame).
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
+
+        expect(find.byKey(const Key('setupScreenStub')), findsOneWidget);
+        expect(
+          router.routerDelegate.currentConfiguration.uri.toString(),
+          '/setup',
+        );
+      },
+    );
+
+    testWidgets(
+      'rendered tree NEVER contains the substring "in development" '
+      '(regression guard for the stale phase-status banner)',
+      (tester) async {
+        // Cycle through every state once and assert the forbidden
+        // string is absent. Use a `find.byWidgetPredicate` over Text
+        // widgets so we catch literal copy regressions even if the
+        // banner shape changes again later.
+        final fixtures = [
+          // OFF
+          const VehicleProfile(id: 'v1', name: 'Golf'),
+          // needsPairing
+          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
+          // needsBackgroundLocation
+          const VehicleProfile(
+            id: 'v1',
+            name: 'Golf',
+            autoRecord: true,
+            pairedAdapterMac: 'DE:AD:BE:EF:00:01',
+          ),
+          // active
+          const VehicleProfile(
+            id: 'v1',
+            name: 'Golf',
+            autoRecord: true,
+            pairedAdapterMac: 'DE:AD:BE:EF:00:01',
+            backgroundLocationConsent: true,
+          ),
+        ];
+
+        for (final profile in fixtures) {
+          final list = _FakeVehicleProfileList([profile]);
+          await _pumpSection(tester, vehicleId: 'v1', list: list);
+          expect(
+            find.byWidgetPredicate((w) =>
+                w is Text &&
+                (w.data?.toLowerCase().contains('in development') ?? false)),
+            findsNothing,
+            reason: '"in development" must not appear in any state',
+          );
+          expect(
+            find.byWidgetPredicate((w) =>
+                w is Text &&
+                (w.data?.toLowerCase().contains('rolled out') ?? false)),
+            findsNothing,
+            reason: '"rolled out" must not appear in any state',
+          );
+        }
       },
     );
   });

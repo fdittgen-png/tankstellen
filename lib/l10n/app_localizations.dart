@@ -5960,11 +5960,29 @@ abstract class AppLocalizations {
   /// **'Auto-record trips'**
   String get autoRecordToggleLabel;
 
-  /// Soft warning banner shown when auto-record is enabled but the background phases (2-4) are not yet shipped.
+  /// Active-state banner shown when auto-record is enabled, an adapter is paired, and background-location consent is granted (#1310). Replaces the stale phase-status banner.
   ///
   /// In en, this message translates to:
-  /// **'Auto-record is being rolled out in phases. Turning this on saves your preference, but the background recording flow is still in development — your trips are not yet auto-captured.'**
-  String get autoRecordPhaseStatusBanner;
+  /// **'Auto-record will activate the next time you enter the car.'**
+  String get autoRecordStatusActiveLabel;
+
+  /// Warning banner shown when auto-record is enabled but no OBD2 adapter has been paired — the orchestrator gate cannot arm without a MAC (#1310).
+  ///
+  /// In en, this message translates to:
+  /// **'Pair an OBD2 adapter to enable auto-record.'**
+  String get autoRecordStatusNeedsPairingLabel;
+
+  /// Warning banner shown when an OBD2 adapter is paired but background-location consent is missing — auto-record runs BT-only without GPS metadata (#1310).
+  ///
+  /// In en, this message translates to:
+  /// **'Allow background location so auto-record keeps running with the screen off.'**
+  String get autoRecordStatusNeedsBackgroundLocationLabel;
+
+  /// CTA button on the 'needs pairing' banner that opens the OBD2 onboarding wizard so the user can pair an adapter (#1310).
+  ///
+  /// In en, this message translates to:
+  /// **'Pair an adapter'**
+  String get autoRecordStatusPairAdapterCta;
 
   /// Label for the slider that controls the movement-start threshold above which an auto-record trip begins.
   ///
