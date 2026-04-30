@@ -6,6 +6,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/app/current_shell_branch_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/widgets/page_scaffold.dart';
+import 'package:tankstellen/features/ev/presentation/widgets/ev_map_overlay.dart';
 import 'package:tankstellen/features/map/presentation/screens/map_screen.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
@@ -33,7 +34,8 @@ void main() {
       expect(find.text('Map'), findsOneWidget);
     });
 
-    testWidgets('renders compact app bar with small height', (tester) async {
+    testWidgets('renders an AppBar with default toolbar metrics',
+        (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
@@ -46,7 +48,8 @@ void main() {
         ],
       );
 
-      // App bar should be present with preferredSize height of 36
+      // Carte uses the canonical PageScaffold AppBar — no compact-height
+      // override. Title metrics match every other bottom-nav tab.
       expect(find.byType(AppBar), findsAtLeast(1));
     });
 
@@ -231,8 +234,7 @@ void main() {
     );
 
     testWidgets(
-      'AppBar title preserves theme foreground color when titleTextStyle '
-      'is overridden (#1164 bug 2 — invisible title)',
+      'EvToggleButton is in AppBar.actions and title uses default styling',
       (tester) async {
         final test = standardTestOverrides();
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -246,14 +248,6 @@ void main() {
           ],
         );
 
-        // Locate the AppBar in MapScreen and assert its titleTextStyle
-        // carries an explicit color. AppBar's title-style resolution
-        // does NOT merge with the theme defaults when the caller
-        // supplies a non-null titleTextStyle, so a bare
-        // `TextStyle(fontSize: 16)` would leave the title color null
-        // and fall back to the DefaultTextStyle of the surrounding
-        // material — near-invisible against the FlexColorScheme app
-        // bar surface.
         final appBar = tester.widget<AppBar>(
           find.descendant(
             of: find.byType(MapScreen),
@@ -261,39 +255,40 @@ void main() {
           ),
         );
 
+        // Title styling: no custom titleTextStyle override — Carte tab
+        // matches every other tab's title size and font.
         expect(
           appBar.titleTextStyle,
-          isNotNull,
-          reason: 'MapScreen passes a custom titleTextStyle.',
+          isNull,
+          reason: 'MapScreen no longer overrides titleTextStyle — title '
+              'inherits the AppBarTheme default so all bottom-nav tabs '
+              'render the same title metrics.',
         );
         expect(
-          appBar.titleTextStyle!.color,
-          isNotNull,
-          reason:
-              'titleTextStyle.color must be non-null. Otherwise AppBar '
-              'wraps the title in a DefaultTextStyle with color: null '
-              'and the title inherits whatever DefaultTextStyle ancestor '
-              'is in scope (typically near-invisible against the '
-              'FlexColorScheme app bar surface). #1164 bug 2.',
+          appBar.toolbarHeight,
+          isNull,
+          reason: 'MapScreen no longer overrides toolbarHeight — matches '
+              'sibling tabs.',
         );
 
-        // The expected color is the theme foreground for the AppBar —
-        // either appBarTheme.foregroundColor or colorScheme.onSurface.
-        final context = tester.element(find.byType(MapScreen));
-        final theme = Theme.of(context);
-        final expectedForeground = theme.appBarTheme.foregroundColor ??
-            theme.colorScheme.onSurface;
+        // EvToggleButton lives in AppBar.actions (not floating in the body).
         expect(
-          appBar.titleTextStyle!.color,
-          expectedForeground,
-          reason:
-              'Title color must match the theme foreground so it stays '
-              'legible (≥ AA contrast against the app bar surface) '
-              'across cold-start and tab round-trip — #1164 bug 2.',
+          find.descendant(
+            of: find.byType(AppBar),
+            matching: find.byType(EvToggleButton),
+          ),
+          findsOneWidget,
+          reason: 'EvToggleButton must render inside the AppBar actions slot.',
         );
-
-        // The compact-mode font-size override must still apply.
-        expect(appBar.titleTextStyle!.fontSize, 16);
+        expect(
+          find.descendant(
+            of: find.byType(Positioned),
+            matching: find.byType(EvToggleButton),
+          ),
+          findsNothing,
+          reason: 'EvToggleButton must NOT render as a Positioned overlay '
+              'inside the body Stack any more.',
+        );
       },
     );
 
@@ -470,56 +465,6 @@ void main() {
               'would cancel any tile fetches that would otherwise be '
               'covered by the standard tab-flip listener when the user '
               'returns to Carte (#1268).',
-        );
-      },
-    );
-
-    testWidgets(
-      'AppBar title color survives a tab round-trip '
-      '(#1164 bug 2 regression guard)',
-      (tester) async {
-        final test = standardTestOverrides();
-        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-
-        await pumpApp(
-          tester,
-          const MapScreen(),
-          overrides: [
-            ...test.overrides,
-            userPositionNullOverride(),
-          ],
-        );
-
-        AppBar appBarSnapshot() => tester.widget<AppBar>(
-              find.descendant(
-                of: find.byType(MapScreen),
-                matching: find.byType(AppBar),
-              ),
-            );
-
-        final initialColor = appBarSnapshot().titleTextStyle!.color;
-
-        // Simulate the tab round-trip that historically corrupted the
-        // title color: leave Carte (branch 0), then re-enter (branch 1).
-        final container = ProviderScope.containerOf(
-          tester.element(find.byType(MapScreen)),
-        );
-        container.read(currentShellBranchProvider.notifier).set(0);
-        await tester.pump();
-        await tester.pump();
-        container.read(currentShellBranchProvider.notifier).set(1);
-        await tester.pump();
-        await tester.pump();
-
-        final afterRoundTripColor = appBarSnapshot().titleTextStyle!.color;
-        expect(
-          afterRoundTripColor,
-          equals(initialColor),
-          reason:
-              'AppBar title color must remain stable across tab '
-              'round-trips. The stale-theme bug (#1164 bug 2) flipped '
-              'the foreground to a near-invisible default when tiles '
-              'painted after the second visit.',
         );
       },
     );
