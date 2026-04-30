@@ -1,5 +1,6 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,9 +10,10 @@ import '../../../../core/widgets/tab_switcher.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
-import '../../data/csv_exporter.dart';
+import '../../data/exporters/backup/full_backup_exporter.dart';
 import '../../providers/charging_logs_provider.dart';
 import '../../providers/consumption_providers.dart';
+import '../../providers/trip_history_provider.dart';
 import '../widgets/charging_tab.dart';
 import '../widgets/fuel_tab.dart';
 import '../widgets/obd2_status_chip.dart';
@@ -32,6 +34,15 @@ import 'add_charging_log_screen.dart';
 /// looking at — no hidden overflow menu entries.
 class ConsumptionScreen extends ConsumerStatefulWidget {
   const ConsumptionScreen({super.key});
+
+  /// Test-only override for the backup exporter wired into the AppBar
+  /// download button (#1317). Lets widget tests assert the export
+  /// flow is invoked without driving the real `share_plus` plugin.
+  ///
+  /// Production keeps this null and the screen instantiates a fresh
+  /// [FullBackupExporter] on tap.
+  @visibleForTesting
+  static FullBackupExporter? debugExporterOverride;
 
   @override
   ConsumerState<ConsumptionScreen> createState() =>
@@ -102,6 +113,48 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
   void dispose() {
     _tabController?.dispose();
     super.dispose();
+  }
+
+  /// Run the full XML-in-ZIP backup export pipeline (#1317).
+  ///
+  /// Pulls the latest vehicles / fill-ups / trips / charging-log
+  /// snapshots from the Riverpod graph, hands them to
+  /// [FullBackupExporter], and surfaces a confirmation snackbar on
+  /// success or a styled error snack on failure. The exporter itself
+  /// owns the temp-file write + share-sheet handoff, so the screen
+  /// stays purely orchestration.
+  Future<void> _runBackupExport() async {
+    final l = AppLocalizations.of(context);
+    try {
+      final vehicles = ref.read(vehicleProfileListProvider);
+      final fillUps = ref.read(fillUpListProvider);
+      final tripsRepo = ref.read(tripHistoryRepositoryProvider);
+      final trips = tripsRepo?.loadAll() ?? const [];
+      final chargingLogs =
+          ref.read(chargingLogsProvider).asData?.value ?? const [];
+
+      final exporter =
+          ConsumptionScreen.debugExporterOverride ?? FullBackupExporter();
+      await exporter.export(
+        vehicles: vehicles,
+        fillUps: fillUps,
+        trips: trips,
+        chargingLogs: chargingLogs,
+      );
+
+      if (!mounted) return;
+      SnackBarHelper.showSuccess(
+        context,
+        l?.exportBackupReady ?? 'Backup ready — pick a destination',
+      );
+    } catch (e, st) {
+      debugPrint('ConsumptionScreen._runBackupExport failed: $e\n$st');
+      if (!mounted) return;
+      SnackBarHelper.showError(
+        context,
+        l?.exportBackupFailed ?? 'Backup export failed — please try again',
+      );
+    }
   }
 
   @override
@@ -183,20 +236,10 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
         // itself otherwise so unpaired users see no chrome.
         const Obd2StatusChip(),
         IconButton(
-          key: const Key('export_csv'),
-          tooltip: 'Export CSV',
+          key: const Key('export_backup'),
+          tooltip: l?.exportBackupTooltip ?? 'Export backup',
           icon: const Icon(Icons.download_outlined),
-          onPressed: fillUps.isEmpty
-              ? null
-              : () async {
-                  final csv = ConsumptionCsvExporter.toCsv(fillUps);
-                  await Clipboard.setData(ClipboardData(text: csv));
-                  if (!context.mounted) return;
-                  SnackBarHelper.show(
-                    context,
-                    'CSV copied to clipboard — paste into a spreadsheet',
-                  );
-                },
+          onPressed: () => unawaited(_runBackupExport()),
         ),
         IconButton(
           key: const Key('open_carbon_dashboard'),

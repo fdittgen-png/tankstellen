@@ -6056,6 +6056,24 @@ abstract class AppLocalizations {
   /// **'Clear counter'**
   String get autoRecordBadgeClearTooltip;
 
+  /// AppBar IconButton tooltip on the consumption screen for the full XML-in-ZIP backup export (#1317).
+  ///
+  /// In en, this message translates to:
+  /// **'Export backup'**
+  String get exportBackupTooltip;
+
+  /// SnackBar shown after a successful backup export when the share sheet is about to appear (#1317).
+  ///
+  /// In en, this message translates to:
+  /// **'Backup ready — pick a destination'**
+  String get exportBackupReady;
+
+  /// SnackBar shown when the backup export pipeline throws (#1317).
+  ///
+  /// In en, this message translates to:
+  /// **'Backup export failed — please try again'**
+  String get exportBackupFailed;
+
   /// Label for the fuel fill-ups tab on the ConsumptionScreen (#582 phase 2).
   ///
   /// In en, this message translates to:

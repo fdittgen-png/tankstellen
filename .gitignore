@@ -89,6 +89,7 @@ docs/guides/*
 !docs/guides/vehicle-catalog.md
 !docs/guides/driving-insights.md
 !docs/guides/auto-record.md
+!docs/guides/SCHEMA-BACKUP-XML.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/

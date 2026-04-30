@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tankstellen/features/consumption/data/exporters/backup/backup_xml_writer.dart';
+import 'package:tankstellen/features/consumption/data/exporters/backup/backup_zipper.dart';
+import 'package:tankstellen/features/consumption/data/exporters/backup/full_backup_exporter.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/consumption_screen.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
@@ -20,12 +22,58 @@ class _FixedFillUpList extends FillUpList {
   List<FillUp> build() => _value;
 }
 
-/// #702 — ConsumptionScreen now watches activeVehicleProfileProvider
-/// to render the Edit-vehicle shortcut. This override keeps it out of
-/// the way of the CSV-export assertions.
 class _NoActiveVehicle extends ActiveVehicleProfile {
   @override
   VehicleProfile? build() => null;
+}
+
+class _EmptyVehicleList extends VehicleProfileList {
+  @override
+  List<VehicleProfile> build() => const [];
+}
+
+/// Test double for [FullBackupExporter] that captures the call without
+/// touching `path_provider` or `share_plus`. We keep the constructor
+/// shape compatible with the production class so the screen's wiring
+/// code is exercised verbatim.
+class _RecordingExporter extends FullBackupExporter {
+  int callCount = 0;
+  List<FillUp>? lastFillUps;
+  List<VehicleProfile>? lastVehicles;
+
+  _RecordingExporter()
+      : super(xmlWriter: BackupXmlWriter(), zipper: const BackupZipper());
+
+  @override
+  Future<FullBackupExportResult> export({
+    required List<VehicleProfile> vehicles,
+    required List<FillUp> fillUps,
+    required List trips,
+    required List chargingLogs,
+  }) async {
+    callCount++;
+    lastFillUps = fillUps;
+    lastVehicles = vehicles;
+    return const FullBackupExportResult(
+      filePath: '/tmp/test_backup.zip',
+      byteSize: 1234,
+    );
+  }
+}
+
+class _ThrowingExporter extends FullBackupExporter {
+  _ThrowingExporter()
+      : super(xmlWriter: BackupXmlWriter(), zipper: const BackupZipper());
+
+  @override
+  Future<FullBackupExportResult> export({
+    required List<VehicleProfile> vehicles,
+    required List<FillUp> fillUps,
+    required List trips,
+    required List chargingLogs,
+  }) async {
+    throw StateError('share-sheet refused');
+  }
 }
 
 Future<void> _pumpScreen(
@@ -39,7 +87,6 @@ Future<void> _pumpScreen(
         path: '/consumption',
         builder: (_, _) => const ConsumptionScreen(),
       ),
-      // Minimal stubs so pushes in the screen don't crash.
       GoRoute(path: '/consumption/add', builder: (_, _) => const SizedBox()),
       GoRoute(path: '/carbon', builder: (_, _) => const SizedBox()),
     ],
@@ -51,9 +98,7 @@ Future<void> _pumpScreen(
     overrides: [
       fillUpListProvider.overrideWith(() => _FixedFillUpList(fillUps)),
       activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
-      // #1194 — FuelTab now reads gamificationEnabledProvider; default
-      // to true here so the BadgeShelf gating doesn't depend on a
-      // (Hive-backed) profile lookup that these tests don't seed.
+      vehicleProfileListProvider.overrideWith(() => _EmptyVehicleList()),
       gamificationEnabledProvider.overrideWith((ref) => true),
     ],
   );
@@ -63,26 +108,39 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {
-    // Capture clipboard writes in-memory so we can assert on them.
-    _InMemoryClipboard.install();
+    // Belt-and-braces: even if the screen instantiated a real exporter
+    // somehow, swap the share-sheet sink for a no-op so the test
+    // doesn't open the OS dialog.
+    debugBackupShareSinkOverride = (_) async {};
   });
 
   tearDown(() {
-    _InMemoryClipboard.uninstall();
+    ConsumptionScreen.debugExporterOverride = null;
+    debugBackupShareSinkOverride = null;
+    debugBackupTempDirectoryOverride = null;
+    debugBackupClockOverride = null;
+    debugBackupAppVersionOverride = null;
   });
 
-  group('ConsumptionScreen CSV export (#583)', () {
-    testWidgets('export button is disabled when the list is empty',
-        (tester) async {
+  group('ConsumptionScreen full-backup export (#1317)', () {
+    testWidgets('export button is enabled even with no fill-ups', (tester) async {
+      // The full-backup export covers vehicles + trips + charging logs
+      // too, so an empty fill-up list is no longer a reason to disable
+      // the button. (CSV export was fill-up-only and gated on emptiness;
+      // the new flow is not.)
       await _pumpScreen(tester, fillUps: const []);
 
       final button = tester.widget<IconButton>(
-        find.byKey(const Key('export_csv')),
+        find.byKey(const Key('export_backup')),
       );
-      expect(button.onPressed, isNull);
+      expect(button.onPressed, isNotNull);
     });
 
-    testWidgets('export button writes CSV to the clipboard', (tester) async {
+    testWidgets('tapping the button invokes the FullBackupExporter',
+        (tester) async {
+      final exporter = _RecordingExporter();
+      ConsumptionScreen.debugExporterOverride = exporter;
+
       final fillUp = FillUp(
         id: '1',
         date: DateTime.utc(2026, 4, 15, 10, 0),
@@ -92,21 +150,21 @@ void main() {
         fuelType: FuelType.diesel,
         stationName: 'Total',
       );
-
       await _pumpScreen(tester, fillUps: [fillUp]);
 
-      await tester.tap(find.byKey(const Key('export_csv')));
-      await tester.pump();
+      await tester.tap(find.byKey(const Key('export_backup')));
+      await tester.pumpAndSettle();
 
-      final copied = _InMemoryClipboard.lastWrite;
-      expect(copied, isNotNull);
-      expect(copied!, contains('Date,Station,Fuel Type'),
-          reason: 'Clipboard must contain the CSV header row.');
-      expect(copied, contains('Total'));
-      expect(copied, contains('diesel'));
+      expect(exporter.callCount, 1);
+      // The screen must hand the active fill-up snapshot through.
+      expect(exporter.lastFillUps, isNotNull);
+      expect(exporter.lastFillUps!.single.id, '1');
     });
 
-    testWidgets('shows confirmation snackbar after copy', (tester) async {
+    testWidgets('shows confirmation snackbar after a successful export',
+        (tester) async {
+      ConsumptionScreen.debugExporterOverride = _RecordingExporter();
+
       final fillUp = FillUp(
         id: '1',
         date: DateTime.utc(2026, 4, 15),
@@ -115,38 +173,38 @@ void main() {
         odometerKm: 10000,
         fuelType: FuelType.e10,
       );
-
       await _pumpScreen(tester, fillUps: [fillUp]);
-      await tester.tap(find.byKey(const Key('export_csv')));
-      await tester.pump();
+
+      await tester.tap(find.byKey(const Key('export_backup')));
+      await tester.pumpAndSettle();
 
       expect(
-        find.textContaining('CSV copied to clipboard'),
+        find.textContaining('Backup ready'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('surfaces an error snackbar when the exporter throws',
+        (tester) async {
+      ConsumptionScreen.debugExporterOverride = _ThrowingExporter();
+
+      final fillUp = FillUp(
+        id: '1',
+        date: DateTime.utc(2026, 4, 15),
+        liters: 40,
+        totalCost: 60,
+        odometerKm: 10000,
+        fuelType: FuelType.e10,
+      );
+      await _pumpScreen(tester, fillUps: [fillUp]);
+
+      await tester.tap(find.byKey(const Key('export_backup')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('Backup export failed'),
         findsOneWidget,
       );
     });
   });
-}
-
-/// Intercepts `Clipboard.setData` calls via the platform channel so tests
-/// can assert the copied text without hitting a real clipboard.
-class _InMemoryClipboard {
-  static String? lastWrite;
-
-  static void install() {
-    lastWrite = null;
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
-      if (call.method == 'Clipboard.setData') {
-        final args = call.arguments as Map<dynamic, dynamic>;
-        lastWrite = args['text'] as String?;
-      }
-      return null;
-    });
-  }
-
-  static void uninstall() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(SystemChannels.platform, null);
-  }
 }

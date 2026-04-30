@@ -71,6 +71,7 @@ dependencies:
   supabase_flutter: ^2.12.4
   wakelock_plus: ^1.2.8
   app_badge_plus: ^1.2.9
+  archive: ^4.0.9
 
 dev_dependencies:
   flutter_test:
@@ -109,6 +110,7 @@ flutter:
     - assets/
     - assets/receipt_overrides/index.json
     - assets/reference_vehicles/vehicles.json
+    - assets/schemas/
 
 flutter_launcher_icons:
   android: true

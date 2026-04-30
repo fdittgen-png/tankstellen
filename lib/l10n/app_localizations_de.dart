@@ -3261,6 +3261,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get autoRecordBadgeClearTooltip => 'Zähler zurücksetzen';
 
   @override
+  String get exportBackupTooltip => 'Sicherung exportieren';
+
+  @override
+  String get exportBackupReady => 'Sicherung bereit – Ziel auswählen';
+
+  @override
+  String get exportBackupFailed =>
+      'Sicherungsexport fehlgeschlagen – bitte erneut versuchen';
+
+  @override
   String get consumptionTabFuel => 'Kraftstoff';
 
   @override

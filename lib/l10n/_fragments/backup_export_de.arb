@@ -1,0 +1,5 @@
+{
+  "exportBackupTooltip": "Sicherung exportieren",
+  "exportBackupReady": "Sicherung bereit – Ziel auswählen",
+  "exportBackupFailed": "Sicherungsexport fehlgeschlagen – bitte erneut versuchen"
+}
