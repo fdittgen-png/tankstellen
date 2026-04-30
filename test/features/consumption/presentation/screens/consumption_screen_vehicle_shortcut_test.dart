@@ -9,9 +9,12 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
 
-/// #702: the consumption tab should shortcut to the active vehicle's
-/// edit screen so the user doesn't have to go via Settings →
-/// Vehicles when the log is the thing in front of them.
+/// #702 originally surfaced an "edit vehicle" shortcut in the
+/// ConsumptionScreen AppBar. #1313 removed it (alongside the
+/// trip-history shortcut) — the Conso title bar is now reserved for
+/// export-CSV, the carbon dashboard, and the OBD2 status chip.
+/// This test guards the deletion: regardless of whether a vehicle is
+/// active, the shortcut must NOT render.
 class _FixedFillUpList extends FillUpList {
   @override
   List<FillUp> build() => const [];
@@ -31,15 +34,10 @@ class _NoActiveVehicle extends ActiveVehicleProfile {
   VehicleProfile? build() => null;
 }
 
-String? _lastRoute;
-Object? _lastExtra;
-
 Future<void> _pump(
   WidgetTester tester, {
   required bool withActiveVehicle,
 }) async {
-  _lastRoute = null;
-  _lastExtra = null;
   final router = GoRouter(
     initialLocation: '/consumption',
     routes: [
@@ -51,14 +49,6 @@ Future<void> _pump(
       GoRoute(path: '/consumption/pick-station',
           builder: (_, _) => const SizedBox()),
       GoRoute(path: '/carbon', builder: (_, _) => const SizedBox()),
-      GoRoute(
-        path: '/vehicles/edit',
-        builder: (_, state) {
-          _lastRoute = '/vehicles/edit';
-          _lastExtra = state.extra;
-          return const SizedBox();
-        },
-      ),
     ],
   );
   await pumpApp(
@@ -76,26 +66,23 @@ Future<void> _pump(
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('ConsumptionScreen vehicle shortcut (#702)', () {
-    testWidgets('renders an Edit-vehicle IconButton when a vehicle is active',
+  group('ConsumptionScreen vehicle shortcut removed (#1313)', () {
+    testWidgets('no Edit-vehicle IconButton when a vehicle is active',
         (tester) async {
       await _pump(tester, withActiveVehicle: true);
-      expect(find.byKey(const Key('open_active_vehicle')), findsOneWidget);
+      expect(find.byKey(const Key('open_active_vehicle')), findsNothing);
     });
 
-    testWidgets('tapping the Edit-vehicle button routes to /vehicles/edit '
-        'with the active vehicle id as extra', (tester) async {
-      await _pump(tester, withActiveVehicle: true);
-      await tester.tap(find.byKey(const Key('open_active_vehicle')));
-      await tester.pumpAndSettle();
-      expect(_lastRoute, '/vehicles/edit');
-      expect(_lastExtra, 'daily-driver');
-    });
-
-    testWidgets('hides the shortcut when no vehicle is active',
+    testWidgets('no Edit-vehicle IconButton when no vehicle is active',
         (tester) async {
       await _pump(tester, withActiveVehicle: false);
       expect(find.byKey(const Key('open_active_vehicle')), findsNothing);
+    });
+
+    testWidgets('no trip-history IconButton (the Trajets sub-tab covers it)',
+        (tester) async {
+      await _pump(tester, withActiveVehicle: true);
+      expect(find.byKey(const Key('open_trip_history')), findsNothing);
     });
   });
 }

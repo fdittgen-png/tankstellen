@@ -293,6 +293,42 @@ void main() {
     );
 
     testWidgets(
+      'AppBar exposes a Refresh action alongside the EvToggleButton (#1313)',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        await pumpApp(
+          tester,
+          const MapScreen(),
+          overrides: [
+            ...test.overrides,
+            userPositionNullOverride(),
+          ],
+        );
+
+        // Refresh icon must live inside the Carte AppBar — mirrors
+        // favorites_screen.dart's refresh affordance so every tab that
+        // can re-fetch data has the same control surface (#1313).
+        final refreshInAppBar = find.descendant(
+          of: find.byType(AppBar),
+          matching: find.widgetWithIcon(IconButton, Icons.refresh),
+        );
+        expect(refreshInAppBar, findsOneWidget);
+
+        // The EV toggle still ships next to it — order is
+        // [Refresh, EvToggleButton].
+        expect(
+          find.descendant(
+            of: find.byType(AppBar),
+            matching: find.byType(EvToggleButton),
+          ),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
       'app-resume after >10s on Carte tab rebuilds FlutterMap subtree '
       '(#1268 — tile + chip refresh on resume)',
       (tester) async {

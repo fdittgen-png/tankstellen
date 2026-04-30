@@ -253,7 +253,18 @@ class _MapScreenState extends ConsumerState<MapScreen>
 
     return PageScaffold(
       title: l10n?.map ?? 'Map',
-      actions: const [EvToggleButton()],
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: () {
+            unawaited(
+              ref.read(searchStateProvider.notifier).repeatLastSearch(),
+            );
+          },
+          tooltip: l10n?.refreshPrices ?? 'Refresh prices',
+        ),
+        const EvToggleButton(),
+      ],
       bodyPadding: EdgeInsets.zero,
       floatingActionButton: const DrivingModeFab(),
       body: Column(
