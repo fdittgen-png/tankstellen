@@ -13,6 +13,7 @@
   "trajetDetailSummaryTitle": "Zusammenfassung",
   "trajetDetailFieldDate": "Datum",
   "trajetDetailFieldVehicle": "Fahrzeug",
+  "trajetDetailFieldAdapter": "OBD2-Adapter",
   "trajetDetailFieldDistance": "Strecke",
   "trajetDetailFieldDuration": "Dauer",
   "trajetDetailFieldAvgConsumption": "Ø Verbrauch",

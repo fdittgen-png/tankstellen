@@ -3992,6 +3992,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get trajetDetailFieldVehicle => 'Vehicle';
 
   @override
+  String get trajetDetailFieldAdapter => 'OBD2 adapter';
+
+  @override
   String get trajetDetailFieldDistance => 'Distance';
 
   @override

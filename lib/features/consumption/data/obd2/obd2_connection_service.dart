@@ -108,6 +108,15 @@ class Obd2ConnectionService {
     };
     final transport = BluetoothObd2Transport(channel);
     final service = Obd2Service(transport);
+    // #1312 — stamp adapter identity onto the service so the trip
+    // recorder can persist it on the saved [TripHistoryEntry] and the
+    // detail screen can name the device that produced the recording.
+    // The friendly name falls back to the registry's display label
+    // when the BLE advertisement was empty (matches the picker rule).
+    service.adapterMac = candidate.candidate.deviceId;
+    service.adapterName = candidate.candidate.deviceName.isEmpty
+        ? candidate.profile.displayName
+        : candidate.candidate.deviceName;
     final ok = await service.connect();
     if (!ok) {
       await service.disconnect();

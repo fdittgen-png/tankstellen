@@ -87,6 +87,24 @@ class TripSummaryCard extends ConsumerWidget {
               label: l?.trajetDetailFieldVehicle ?? 'Vehicle',
               value: vehicleName,
             ),
+            // #1312 — surface the OBD2 adapter identity directly
+            // under Vehicle so device-test bug reports can name the
+            // suspect device (different ELM327 clones expose different
+            // PID subsets). Hidden when no field was captured —
+            // legacy trips, fake-service tests, and any path that
+            // bypassed [Obd2ConnectionService] all carry null
+            // adapter fields and the row collapses cleanly.
+            if (entry.adapterMac != null ||
+                entry.adapterName != null ||
+                entry.adapterFirmware != null)
+              _SummaryRow(
+                label: l?.trajetDetailFieldAdapter ?? 'OBD2 adapter',
+                value: _formatAdapter(
+                  entry.adapterName,
+                  entry.adapterMac,
+                  entry.adapterFirmware,
+                ),
+              ),
             _SummaryRow(
               label: l?.trajetDetailFieldDistance ?? 'Distance',
               value: distance,
@@ -150,6 +168,31 @@ class TripSummaryCard extends ConsumerWidget {
       if (s.speedKmh > maxV) maxV = s.speedKmh;
     }
     return '${maxV.toStringAsFixed(1)} km/h';
+  }
+
+  /// Render the adapter identity as a single-line summary value
+  /// (#1312). Format is `name • mac` when both are present, just
+  /// one when only one is, with the firmware appended in parentheses
+  /// when known. Total length is capped at ~40 chars (head-truncated
+  /// with an ellipsis) so the row doesn't push the summary card into
+  /// a multi-line layout on narrow phones.
+  static String _formatAdapter(
+    String? name,
+    String? mac,
+    String? firmware,
+  ) {
+    final parts = <String>[];
+    if (name != null && name.isNotEmpty) parts.add(name);
+    if (mac != null && mac.isNotEmpty) parts.add(mac);
+    var label = parts.join(' • ');
+    if (firmware != null && firmware.isNotEmpty) {
+      label = label.isEmpty ? firmware : '$label ($firmware)';
+    }
+    const maxLen = 40;
+    if (label.length > maxLen) {
+      label = '${label.substring(0, maxLen - 1)}…';
+    }
+    return label;
   }
 
   static String _fmtDate(DateTime d) {

@@ -4027,6 +4027,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trajetDetailFieldVehicle => 'Fahrzeug';
 
   @override
+  String get trajetDetailFieldAdapter => 'OBD2-Adapter';
+
+  @override
   String get trajetDetailFieldDistance => 'Strecke';
 
   @override

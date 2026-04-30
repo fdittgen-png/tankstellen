@@ -40,12 +40,33 @@ class TripHistoryEntry {
   /// well below the rolling-log cap.
   final List<TripSample> samples;
 
+  /// Stable BLE remote-id / Classic MAC of the OBD2 adapter that was
+  /// connected when this trip was recorded (#1312). Lets the trip
+  /// detail summary card name the suspect device when the user files
+  /// a bug report about adapter-specific PID gaps. Null for trips
+  /// recorded before #1312 landed and for any trip whose connect path
+  /// didn't stamp the service (e.g. test fakes).
+  final String? adapterMac;
+  /// Friendly device name advertised by the OBD2 adapter, falling
+  /// back to the registry's display label when the advertisement was
+  /// empty (#1312). Same null-semantics as [adapterMac].
+  final String? adapterName;
+  /// ELM327 firmware string returned by `ATI` during the init
+  /// sequence, when the connect path captured one (#1312). Currently
+  /// always null in production; persisted as a forward-compat field
+  /// so a future enhancement that snapshots `ATI` doesn't have to
+  /// migrate the trip-history schema again.
+  final String? adapterFirmware;
+
   const TripHistoryEntry({
     required this.id,
     required this.vehicleId,
     required this.summary,
     this.automatic = false,
     this.samples = const [],
+    this.adapterMac,
+    this.adapterName,
+    this.adapterFirmware,
   });
 
   Map<String, dynamic> toJson() => {
@@ -55,6 +76,14 @@ class TripHistoryEntry {
         if (automatic) 'automatic': true,
         if (samples.isNotEmpty)
           'samples': samples.map(_sampleToJson).toList(growable: false),
+        // #1312 — adapter identity. Compact keys so the per-trip JSON
+        // payload doesn't balloon (most trips carry one MAC + one
+        // name; firmware stays null until the connect path captures
+        // it). Each key is omitted when null so legacy entries
+        // round-trip unchanged.
+        if (adapterMac != null) 'adapterMac': adapterMac,
+        if (adapterName != null) 'adapterName': adapterName,
+        if (adapterFirmware != null) 'adapterFirmware': adapterFirmware,
       };
 
   static TripHistoryEntry fromJson(Map<String, dynamic> json) =>
@@ -70,6 +99,13 @@ class TripHistoryEntry {
                     (e) => _sampleFromJson((e as Map).cast<String, dynamic>()))
                 .toList(growable: false) ??
             const [],
+        // #1312 — adapter identity. Reads as `String?` so legacy
+        // entries written before this field landed deserialise with
+        // null rather than throwing (mirrors the schema-drift lesson
+        // from #1301).
+        adapterMac: json['adapterMac'] as String?,
+        adapterName: json['adapterName'] as String?,
+        adapterFirmware: json['adapterFirmware'] as String?,
       );
 }
 

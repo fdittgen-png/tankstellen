@@ -73,6 +73,10 @@
   "@trajetDetailFieldVehicle": {
     "description": "Label for the vehicle-name row in the Trip detail summary card (#890)."
   },
+  "trajetDetailFieldAdapter": "OBD2 adapter",
+  "@trajetDetailFieldAdapter": {
+    "description": "Label for the OBD2-adapter identity row in the Trip detail summary card (#1312). Shown immediately under the Vehicle row when the trip carries any adapter MAC, name, or firmware so device-test bug reports can name the suspect device. Hidden when none of the three fields were captured."
+  },
   "trajetDetailFieldDistance": "Distance",
   "@trajetDetailFieldDistance": {
     "description": "Label for the distance row in the Trip detail summary card (#890)."

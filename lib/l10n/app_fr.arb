@@ -935,6 +935,7 @@
   "tripStartProgressReadingVehicleData": "Lecture des données du véhicule…",
   "tripStartProgressStartingRecording": "Démarrage de l'enregistrement…",
   "trajetDetailFieldFuelCost": "Coût du carburant",
+  "trajetDetailFieldAdapter": "Adaptateur OBD2",
   "trajetDetailShareAction": "Partager",
   "trajetDetailShareSubject": "Tankstellen — trajet du {date}",
   "trajetDetailShareError": "Impossible de générer l'image à partager",
