@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tankstellen full-backup schema, v1.0 (#1317).
+
+  A `<TankstellenBackup>` document captures every domain entity the
+  app stores locally — vehicle profiles, fuel fill-ups, OBD2 trip
+  history (with per-tick samples) and EV charging logs — in a single
+  versioned XML file. The export pipeline zips the document into a
+  one-entry archive and hands it to the OS share sheet so the user
+  can route it to Drive / OneDrive / mail without an in-app cloud
+  dependency.
+
+  Schema versioning is via the top-level `version` attribute. Bumping
+  the schema (new required field, removed field) requires a fresh
+  XSD file (`tankstellen_backup_v2.xsd`) so existing v1 archives stay
+  readable; the writer encodes the version it produced and a future
+  importer dispatches on that value.
+
+  Validate a backup against this schema with:
+    xmllint --noout --schema assets/schemas/tankstellen_backup_v1.xsd \
+            <unzipped-backup>.xml
+
+  Element naming convention: PascalCase for elements, ISO-8601 UTC
+  for every timestamp, period as the decimal separator, no locale
+  formatting on numbers. Optional fields use `minOccurs="0"`; null
+  values are encoded by omitting the element entirely (never an empty
+  element) so the round-trip is unambiguous.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="https://tankstellen.app/backup/v1"
+           targetNamespace="https://tankstellen.app/backup/v1"
+           elementFormDefault="qualified"
+           version="1.0">
+
+  <!-- ============================================================ -->
+  <!-- Simple types (enumerations + reusable atomic types)          -->
+  <!-- ============================================================ -->
+
+  <xs:simpleType name="VersionType">
+    <xs:annotation>
+      <xs:documentation>
+        Schema version this document was emitted against. Pinned to
+        "1.0" for the v1 namespace; future schemas live in their own
+        targetNamespace.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1.0"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="VehicleEngineType">
+    <xs:annotation>
+      <xs:documentation>
+        Powertrain classification — mirrors the in-app
+        `VehicleType` enum.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="combustion"/>
+      <xs:enumeration value="hybrid"/>
+      <xs:enumeration value="ev"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ConnectorTypeEnum">
+    <xs:annotation>
+      <xs:documentation>
+        EV connector standards. Used inside `Vehicle/SupportedConnectors`.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="type2"/>
+      <xs:enumeration value="ccs"/>
+      <xs:enumeration value="chademo"/>
+      <xs:enumeration value="tesla"/>
+      <xs:enumeration value="schuko"/>
+      <xs:enumeration value="type1"/>
+      <xs:enumeration value="three_pin"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FuelTypeEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Canonical fuel-type identifiers used by `FillUp/FuelType`.
+        Mirrors the `apiValue` of the in-app `FuelType` sealed class.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="e5"/>
+      <xs:enumeration value="e10"/>
+      <xs:enumeration value="e98"/>
+      <xs:enumeration value="diesel"/>
+      <xs:enumeration value="diesel_premium"/>
+      <xs:enumeration value="e85"/>
+      <xs:enumeration value="lpg"/>
+      <xs:enumeration value="cng"/>
+      <xs:enumeration value="hydrogen"/>
+      <xs:enumeration value="electric"/>
+      <xs:enumeration value="all"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CalibrationModeEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Per-vehicle baseline classifier mode (#894). `rule` for the
+        original winner-take-all classifier, `fuzzy` for the
+        membership-weighted variant.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="rule"/>
+      <xs:enumeration value="fuzzy"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DistanceSourceEnum">
+    <xs:annotation>
+      <xs:documentation>
+        Provenance of a trip's recorded distance. `real` when sourced
+        from the car's odometer; `virtual` when integrated from speed
+        samples (the recorder default).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="real"/>
+      <xs:enumeration value="virtual"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ============================================================ -->
+  <!-- Complex types — domain entities                              -->
+  <!-- ============================================================ -->
+
+  <xs:complexType name="ChargingPreferencesType">
+    <xs:annotation>
+      <xs:documentation>
+        EV charging guard-rails persisted alongside the vehicle. Bands
+        are integer percentages of full battery capacity.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="MinSocPercent" type="xs:int"/>
+      <xs:element name="MaxSocPercent" type="xs:int"/>
+      <xs:element name="PreferredNetworks" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Network" type="xs:string"
+                        minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="VehicleType">
+    <xs:annotation>
+      <xs:documentation>
+        One stored `VehicleProfile`. Combustion-only fields and EV-only
+        fields are both optional so a single schema covers ICE,
+        hybrid and EV vehicles. See the schema doc page for the full
+        per-field reference.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Id" type="xs:string"/>
+      <xs:element name="Name" type="xs:string"/>
+      <xs:element name="EngineType" type="VehicleEngineType"/>
+
+      <!-- EV fields -->
+      <xs:element name="BatteryKwh" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="MaxChargingKw" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="SupportedConnectors" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Connector" type="ConnectorTypeEnum"
+                        minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ChargingPreferences"
+                  type="ChargingPreferencesType" minOccurs="0"/>
+
+      <!-- Combustion fields -->
+      <xs:element name="TankCapacityL" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="PreferredFuelType" type="xs:string" minOccurs="0"/>
+
+      <!-- Engine parameters for the speed-density fuel-rate fallback (#812) -->
+      <xs:element name="EngineDisplacementCc" type="xs:int" minOccurs="0"/>
+      <xs:element name="EngineCylinders" type="xs:int" minOccurs="0"/>
+      <xs:element name="VolumetricEfficiency" type="xs:decimal"/>
+      <xs:element name="VolumetricEfficiencySamples" type="xs:int"/>
+
+      <!-- Curb weight in kilograms (#812) -->
+      <xs:element name="CurbWeightKg" type="xs:int" minOccurs="0"/>
+
+      <!-- OBD2 adapter pairing (#784 / #1004) -->
+      <xs:element name="Obd2AdapterMac" type="xs:string" minOccurs="0"/>
+      <xs:element name="Obd2AdapterName" type="xs:string" minOccurs="0"/>
+      <xs:element name="PairedAdapterMac" type="xs:string" minOccurs="0"/>
+
+      <xs:element name="Vin" type="xs:string" minOccurs="0"/>
+      <xs:element name="CalibrationMode" type="CalibrationModeEnum"/>
+
+      <!-- Hands-free auto-record configuration (#1004) -->
+      <xs:element name="AutoRecord" type="xs:boolean"/>
+      <xs:element name="MovementStartThresholdKmh" type="xs:decimal"/>
+      <xs:element name="DisconnectSaveDelaySec" type="xs:int"/>
+      <xs:element name="BackgroundLocationConsent" type="xs:boolean"/>
+
+      <!-- Reference catalog identification (#950 phase 4) -->
+      <xs:element name="Make" type="xs:string" minOccurs="0"/>
+      <xs:element name="Model" type="xs:string" minOccurs="0"/>
+      <xs:element name="Year" type="xs:int" minOccurs="0"/>
+      <xs:element name="ReferenceVehicleId" type="xs:string" minOccurs="0"/>
+
+      <!-- Aggregate-update bookkeeping (#1193). Histogram payloads are
+           omitted for now to keep the schema compact; downstream
+           analytics can recompute them from the trips. -->
+      <xs:element name="AggregatesUpdatedAt" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="AggregatesTripCount" type="xs:int" minOccurs="0"/>
+
+      <!-- Gear-inference per-vehicle calibration (#1263 phase 2) -->
+      <xs:element name="TireCircumferenceMeters" type="xs:decimal"/>
+      <xs:element name="GearCentroids" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Centroid" type="xs:decimal"
+                        minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="FillUpType">
+    <xs:annotation>
+      <xs:documentation>
+        One fuel fill-up event logged by the user.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Id" type="xs:string"/>
+      <xs:element name="VehicleId" type="xs:string" minOccurs="0"/>
+      <xs:element name="Date" type="xs:dateTime"/>
+      <xs:element name="FuelType" type="FuelTypeEnum"/>
+      <xs:element name="Liters" type="xs:decimal"/>
+      <xs:element name="TotalCost" type="xs:decimal"/>
+      <xs:element name="OdometerKm" type="xs:decimal"/>
+      <xs:element name="StationId" type="xs:string" minOccurs="0"/>
+      <xs:element name="StationName" type="xs:string" minOccurs="0"/>
+      <xs:element name="Notes" type="xs:string" minOccurs="0"/>
+      <xs:element name="IsFullTank" type="xs:boolean"/>
+      <xs:element name="LinkedTripIds" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="TripId" type="xs:string"
+                        minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TripSampleType">
+    <xs:annotation>
+      <xs:documentation>
+        A single OBD2 telemetry tick captured during a trip recording.
+        Only `Timestamp`, `SpeedKmh` and `Rpm` are mandatory — the
+        derived PIDs (fuel rate, throttle, engine load, coolant) are
+        omitted on cars that don't expose them.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Timestamp" type="xs:dateTime"/>
+      <xs:element name="SpeedKmh" type="xs:decimal"/>
+      <xs:element name="Rpm" type="xs:decimal"/>
+      <xs:element name="FuelRateLPerHour" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="ThrottlePercent" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="EngineLoadPercent" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="CoolantTempC" type="xs:decimal" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TripSummaryType">
+    <xs:annotation>
+      <xs:documentation>
+        Aggregate metrics derived from the per-tick samples — distance,
+        max RPM, harsh-event counts, fuel-rate-derived consumption,
+        cold-start surcharge bit. Mirrors the in-app `TripSummary`.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="DistanceKm" type="xs:decimal"/>
+      <xs:element name="MaxRpm" type="xs:decimal"/>
+      <xs:element name="HighRpmSeconds" type="xs:decimal"/>
+      <xs:element name="IdleSeconds" type="xs:decimal"/>
+      <xs:element name="HarshBrakes" type="xs:int"/>
+      <xs:element name="HarshAccelerations" type="xs:int"/>
+      <xs:element name="AvgLPer100Km" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="FuelLitersConsumed" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="StartedAt" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="EndedAt" type="xs:dateTime" minOccurs="0"/>
+      <xs:element name="DistanceSource" type="DistanceSourceEnum"/>
+      <xs:element name="ColdStartSurcharge" type="xs:boolean"/>
+      <xs:element name="SecondsBelowOptimalGear" type="xs:decimal"
+                  minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TripType">
+    <xs:annotation>
+      <xs:documentation>
+        One persisted OBD2 trip. The `Samples` block carries the
+        per-tick payload; legacy trips written before #1040 may have
+        an empty `Samples` element.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Id" type="xs:string"/>
+      <xs:element name="VehicleId" type="xs:string" minOccurs="0"/>
+      <xs:element name="Automatic" type="xs:boolean"/>
+      <xs:element name="AdapterMac" type="xs:string" minOccurs="0"/>
+      <xs:element name="AdapterName" type="xs:string" minOccurs="0"/>
+      <xs:element name="AdapterFirmware" type="xs:string" minOccurs="0"/>
+      <xs:element name="Summary" type="TripSummaryType"/>
+      <xs:element name="Samples">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Sample" type="TripSampleType"
+                        minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ChargingLogType">
+    <xs:annotation>
+      <xs:documentation>
+        One EV charging session logged by the user.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Id" type="xs:string"/>
+      <xs:element name="VehicleId" type="xs:string"/>
+      <xs:element name="Date" type="xs:dateTime"/>
+      <xs:element name="Kwh" type="xs:decimal"/>
+      <xs:element name="CostEur" type="xs:decimal"/>
+      <xs:element name="ChargeTimeMin" type="xs:int"/>
+      <xs:element name="OdometerKm" type="xs:int"/>
+      <xs:element name="StationName" type="xs:string" minOccurs="0"/>
+      <xs:element name="ChargingStationId" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ============================================================ -->
+  <!-- Root element                                                 -->
+  <!-- ============================================================ -->
+
+  <xs:element name="TankstellenBackup">
+    <xs:annotation>
+      <xs:documentation>
+        Top-level backup container. Carries the schema version, the
+        moment the backup was produced (UTC), the producing app
+        version, and four collection elements — one per domain
+        entity.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="ExportedAt" type="xs:dateTime"/>
+        <xs:element name="AppVersion" type="xs:string"/>
+
+        <xs:element name="Vehicles">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Vehicle" type="VehicleType"
+                          minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="FillUps">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FillUp" type="FillUpType"
+                          minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="Trips">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Trip" type="TripType"
+                          minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="ChargingLogs">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ChargingLog" type="ChargingLogType"
+                          minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="version" type="VersionType" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

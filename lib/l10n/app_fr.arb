@@ -1,5 +1,8 @@
 {
   "@@locale": "fr",
+  "exportBackupTooltip": "Exporter la sauvegarde",
+  "exportBackupReady": "Sauvegarde prête — choisissez une destination",
+  "exportBackupFailed": "Échec de l'exportation — veuillez réessayer",
   "badScanReportCreateTicket": "Créer un ticket",
   "badScanReportOpenInBrowser": "Ouvrir dans le navigateur",
   "badScanReportFallbackToShare": "Échec de création — partage manuel",

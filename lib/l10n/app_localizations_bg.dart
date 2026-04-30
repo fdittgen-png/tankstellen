@@ -3235,6 +3235,15 @@ class AppLocalizationsBg extends AppLocalizations {
   String get autoRecordBadgeClearTooltip => 'Clear counter';
 
   @override
+  String get exportBackupTooltip => 'Export backup';
+
+  @override
+  String get exportBackupReady => 'Backup ready — pick a destination';
+
+  @override
+  String get exportBackupFailed => 'Backup export failed — please try again';
+
+  @override
   String get consumptionTabFuel => 'Fuel';
 
   @override

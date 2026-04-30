@@ -3262,6 +3262,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get autoRecordBadgeClearTooltip => 'Effacer le compteur';
 
   @override
+  String get exportBackupTooltip => 'Exporter la sauvegarde';
+
+  @override
+  String get exportBackupReady =>
+      'Sauvegarde prête — choisissez une destination';
+
+  @override
+  String get exportBackupFailed =>
+      'Échec de l\'exportation — veuillez réessayer';
+
+  @override
   String get consumptionTabFuel => 'Carburant';
 
   @override

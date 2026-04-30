@@ -1,0 +1,14 @@
+{
+  "exportBackupTooltip": "Export backup",
+  "@exportBackupTooltip": {
+    "description": "AppBar IconButton tooltip on the consumption screen for the full XML-in-ZIP backup export (#1317)."
+  },
+  "exportBackupReady": "Backup ready — pick a destination",
+  "@exportBackupReady": {
+    "description": "SnackBar shown after a successful backup export when the share sheet is about to appear (#1317)."
+  },
+  "exportBackupFailed": "Backup export failed — please try again",
+  "@exportBackupFailed": {
+    "description": "SnackBar shown when the backup export pipeline throws (#1317)."
+  }
+}
