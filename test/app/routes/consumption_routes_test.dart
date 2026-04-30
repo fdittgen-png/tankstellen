@@ -4,11 +4,12 @@ import 'package:tankstellen/app/routes/consumption_routes.dart';
 
 void main() {
   group('consumptionRoutes', () {
-    test('returns exactly 7 routes', () {
+    test('returns exactly 6 routes (#1313 removed /trip-history)', () {
       // Guards against accidental insert/delete — `/consumption-tab`
       // lives in shellBranches, but every other consumption route is
-      // owned here.
-      expect(consumptionRoutes.length, 7);
+      // owned here. #1313 removed the standalone /trip-history route
+      // because the Trajets sub-tab supersedes it.
+      expect(consumptionRoutes.length, 6);
     });
 
     test('route 0 path is "/consumption"', () {
@@ -33,23 +34,29 @@ void main() {
       expect(route.path, '/trip-recording');
     });
 
-    test('route 4 path is "/trip-history"', () {
-      final route = consumptionRoutes[4] as GoRoute;
-      expect(route.path, '/trip-history');
-    });
-
-    test('route 5 path is "/trip/:id" with id path parameter (#889)', () {
+    test('route 4 path is "/trip/:id" with id path parameter (#889)', () {
       // #889 — trip-detail route uses `:id` so it can be deep-linked
       // from the Trajets tab. The exact pattern is load-bearing — the
       // builder reads `state.pathParameters['id']`.
-      final route = consumptionRoutes[5] as GoRoute;
+      final route = consumptionRoutes[4] as GoRoute;
       expect(route.path, '/trip/:id');
       expect(route.path, contains(':id'));
     });
 
-    test('route 6 path is "/consumption/add"', () {
-      final route = consumptionRoutes[6] as GoRoute;
+    test('route 5 path is "/consumption/add"', () {
+      final route = consumptionRoutes[5] as GoRoute;
       expect(route.path, '/consumption/add');
+    });
+
+    test('no route declares the deleted "/trip-history" path (#1313)', () {
+      for (var i = 0; i < consumptionRoutes.length; i++) {
+        final route = consumptionRoutes[i] as GoRoute;
+        expect(
+          route.path,
+          isNot(equals('/trip-history')),
+          reason: 'route $i must not be the deleted /trip-history path',
+        );
+      }
     });
 
     test('every entry is a GoRoute', () {

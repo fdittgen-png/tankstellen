@@ -154,6 +154,9 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
 
     return PageScaffold(
       title: l?.consumptionLogTitle ?? 'Fuel consumption',
+      toolbarHeight: PageScaffold.compactToolbarHeight,
+      titleSpacing: PageScaffold.compactTitleSpacing,
+      titleTextStyle: PageScaffold.compactAppBarTitleStyle(context),
       bodyPadding: EdgeInsets.zero,
       bottom: TabSwitcher(
         controller: tabController,
@@ -204,26 +207,10 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
           icon: const Icon(Icons.eco_outlined),
           onPressed: () => context.push('/carbon'),
         ),
-        IconButton(
-          key: const Key('open_trip_history'),
-          tooltip: l?.tripHistoryTitle ?? 'Trip history',
-          icon: const Icon(Icons.route_outlined),
-          onPressed: () => context.push('/trip-history'),
-        ),
-        // Shortcut to edit the active vehicle — the primary
-        // "subject" the consumption log belongs to (#702). Hidden
-        // when no vehicle is configured; the fill-up FAB's empty
-        // state already surfaces the Add-vehicle CTA in that case.
-        if (activeVehicle != null)
-          IconButton(
-            key: const Key('open_active_vehicle'),
-            tooltip: l?.vehicleEditTitle ?? 'Edit vehicle',
-            icon: const Icon(Icons.directions_car_outlined),
-            onPressed: () => context.push(
-              '/vehicles/edit',
-              extra: activeVehicle.id,
-            ),
-          ),
+        // #1313 — the standalone trip-history shortcut and the
+        // active-vehicle shortcut were removed: the Trajets sub-tab
+        // already surfaces inline trip history, and the vehicle-edit
+        // entry lives in Settings → Vehicles where users expect it.
       ],
       floatingActionButton: isTrajetsTab
           // Trajets tab hides the global FAB — the "Start recording"

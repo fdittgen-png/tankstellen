@@ -75,14 +75,6 @@ void main() {
             builder: (_, _) => const SizedBox(),
           ),
           GoRoute(path: '/carbon', builder: (_, _) => const SizedBox()),
-          GoRoute(
-            path: '/trip-history',
-            builder: (_, _) => const SizedBox(),
-          ),
-          GoRoute(
-            path: '/vehicles/edit',
-            builder: (_, _) => const SizedBox(),
-          ),
         ],
       );
 

@@ -231,8 +231,6 @@ class _MapScreenState extends ConsumerState<MapScreen>
     final routeState = ref.watch(routeSearchStateProvider);
     final showEv = ref.watch(evShowOnMapProvider);
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final appBarTheme = theme.appBarTheme;
 
     final hasRouteResults = routeState.hasValue && routeState.value != null;
 
@@ -264,48 +262,31 @@ class _MapScreenState extends ConsumerState<MapScreen>
       },
     );
 
-    // #1164 — restore the inherited foreground color when overriding
-    // `titleTextStyle`. AppBar does NOT merge with the default title
-    // style when the caller supplies a non-null `titleTextStyle`, so a
-    // bare `TextStyle(fontSize: 16)` strips the color and the title
-    // renders near-invisible. Resolve the foreground color from the
-    // app-bar theme (FlexColorScheme) and preserve it explicitly.
-    final foregroundColor = appBarTheme.foregroundColor ??
-        theme.colorScheme.onSurface;
-    // Inline title text-theme refs are banned in feature screens by
-    // the `no_inline_title_theme_test` lint (#923) — including in
-    // comments, since the static scan greps for the literal string.
-    // The explicit `copyWith` below sets fontSize/color directly, and
-    // any unset family/weight is inherited from the AppBar default
-    // via DefaultTextStyle when `appBarTheme.titleTextStyle` is null.
-    final baseTitleStyle = appBarTheme.titleTextStyle ?? const TextStyle();
-    final compactTitleStyle = baseTitleStyle.copyWith(
-      fontSize: 16,
-      color: foregroundColor,
-    );
-
     return PageScaffold(
       title: l10n?.map ?? 'Map',
-      toolbarHeight: 36,
-      titleSpacing: 12,
-      titleTextStyle: compactTitleStyle,
+      toolbarHeight: PageScaffold.compactToolbarHeight,
+      titleSpacing: PageScaffold.compactTitleSpacing,
+      titleTextStyle: PageScaffold.compactAppBarTitleStyle(context),
       bodyPadding: EdgeInsets.zero,
+      actions: [
+        // #1313 — EV toggle moves out of the floating Stack overlay
+        // (which clipped tile rendering) into the AppBar actions row.
+        const EvToggleButton(),
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          tooltip: l10n?.refreshPrices ?? 'Refresh prices',
+          onPressed: () {
+            unawaited(
+              ref.read(searchStateProvider.notifier).repeatLastSearch(),
+            );
+          },
+        ),
+      ],
       floatingActionButton: const DrivingModeFab(),
       body: Column(
         children: [
           if (showEv) const EvFilterChips(),
-          Expanded(
-            child: Stack(
-              children: [
-                body,
-                const Positioned(
-                  left: 16,
-                  top: 16,
-                  child: EvToggleButton(),
-                ),
-              ],
-            ),
-          ),
+          Expanded(child: body),
         ],
       ),
     );

@@ -127,6 +127,33 @@ class PageScaffold extends StatelessWidget {
           'shows the title text). Drop the banner or pass `title`.',
         );
 
+  /// Standard compact toolbar height (#1313). Every bottom-tab screen
+  /// (Recherche, Carte, Favoris, Conso) shares this value so titles
+  /// align horizontally regardless of which tab the user lands on.
+  static const double compactToolbarHeight = 36;
+
+  /// Standard title-text spacing for the compact bottom-tab AppBar
+  /// (#1313). Pairs with [compactToolbarHeight].
+  static const double compactTitleSpacing = 12;
+
+  /// Resolves the compact title text style for the bottom-tab roots
+  /// (#1313). Pairs with [compactToolbarHeight] / [compactTitleSpacing].
+  ///
+  /// AppBar's `titleTextStyle` resolution does NOT merge with the
+  /// theme defaults when the caller supplies a non-null
+  /// `titleTextStyle`, so a bare `TextStyle(fontSize: 16)` would
+  /// render the title near-invisible (#1164 bug 2). This helper
+  /// preserves the foreground color and any inherited family/weight
+  /// while flattening the size to 16.
+  static TextStyle compactAppBarTitleStyle(BuildContext context) {
+    final theme = Theme.of(context);
+    final appBarTheme = theme.appBarTheme;
+    final foregroundColor =
+        appBarTheme.foregroundColor ?? theme.colorScheme.onSurface;
+    final base = appBarTheme.titleTextStyle ?? const TextStyle();
+    return base.copyWith(fontSize: 16, color: foregroundColor);
+  }
+
   @override
   Widget build(BuildContext context) {
     final effectivePadding = bodyPadding ?? Spacing.screenPadding;

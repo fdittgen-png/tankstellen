@@ -120,12 +120,28 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isWide = isWideScreen(context);
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
 
+    // #1313 — share the canonical compact AppBar shape with the other
+    // bottom-tab roots so titles align horizontally regardless of which
+    // tab the user lands on. The earlier landscape-only override (40 px)
+    // was dropped: a single height keeps Recherche/Carte/Favoris/Conso
+    // visually identical.
     return PageScaffold(
       title: l10n?.appTitle ?? 'Fuel Prices',
-      toolbarHeight: isLandscape ? 40 : null,
+      toolbarHeight: PageScaffold.compactToolbarHeight,
+      titleSpacing: PageScaffold.compactTitleSpacing,
+      titleTextStyle: PageScaffold.compactAppBarTitleStyle(context),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          tooltip: l10n?.refreshPrices ?? 'Refresh prices',
+          onPressed: () {
+            unawaited(
+              ref.read(searchStateProvider.notifier).repeatLastSearch(),
+            );
+          },
+        ),
+      ],
       bodyPadding: EdgeInsets.zero,
       body: isWide
           ? _buildWideLayout(context)

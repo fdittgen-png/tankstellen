@@ -46,6 +46,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
       length: 2,
       child: PageScaffold(
         title: l10n?.favorites ?? 'Favorites',
+        toolbarHeight: PageScaffold.compactToolbarHeight,
+        titleSpacing: PageScaffold.compactTitleSpacing,
+        titleTextStyle: PageScaffold.compactAppBarTitleStyle(context),
         actions: [
           if (favoriteIds.isNotEmpty)
             IconButton(
