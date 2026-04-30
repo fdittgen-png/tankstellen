@@ -73,17 +73,6 @@ import '../widgets/route_map_view.dart';
 ///      legitimately have no upstream data continue to render `--` (the
 ///      `priceColor(null,…)` grey signals "no data" — already distinct
 ///      from the loading state).
-///
-/// ## App-bar title color (#1164 bug 2)
-///
-/// `PageScaffold(titleTextStyle: const TextStyle(fontSize: 16))` would
-/// strip the inherited foreground color: AppBar's title text-style
-/// resolution does NOT merge with `defaults.titleTextStyle` when the
-/// caller supplies a non-null `titleTextStyle`, so the title would
-/// render in the DefaultTextStyle fallback (near-invisible against the
-/// FlexColorScheme app bar surface). We resolve the theme's
-/// foreground color explicitly so the compact 16pt size still inherits
-/// the proper on-surface contrast.
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key, this.clockOverride});
 
@@ -231,8 +220,6 @@ class _MapScreenState extends ConsumerState<MapScreen>
     final routeState = ref.watch(routeSearchStateProvider);
     final showEv = ref.watch(evShowOnMapProvider);
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final appBarTheme = theme.appBarTheme;
 
     final hasRouteResults = routeState.hasValue && routeState.value != null;
 
@@ -264,48 +251,15 @@ class _MapScreenState extends ConsumerState<MapScreen>
       },
     );
 
-    // #1164 — restore the inherited foreground color when overriding
-    // `titleTextStyle`. AppBar does NOT merge with the default title
-    // style when the caller supplies a non-null `titleTextStyle`, so a
-    // bare `TextStyle(fontSize: 16)` strips the color and the title
-    // renders near-invisible. Resolve the foreground color from the
-    // app-bar theme (FlexColorScheme) and preserve it explicitly.
-    final foregroundColor = appBarTheme.foregroundColor ??
-        theme.colorScheme.onSurface;
-    // Inline title text-theme refs are banned in feature screens by
-    // the `no_inline_title_theme_test` lint (#923) — including in
-    // comments, since the static scan greps for the literal string.
-    // The explicit `copyWith` below sets fontSize/color directly, and
-    // any unset family/weight is inherited from the AppBar default
-    // via DefaultTextStyle when `appBarTheme.titleTextStyle` is null.
-    final baseTitleStyle = appBarTheme.titleTextStyle ?? const TextStyle();
-    final compactTitleStyle = baseTitleStyle.copyWith(
-      fontSize: 16,
-      color: foregroundColor,
-    );
-
     return PageScaffold(
       title: l10n?.map ?? 'Map',
-      toolbarHeight: 36,
-      titleSpacing: 12,
-      titleTextStyle: compactTitleStyle,
+      actions: const [EvToggleButton()],
       bodyPadding: EdgeInsets.zero,
       floatingActionButton: const DrivingModeFab(),
       body: Column(
         children: [
           if (showEv) const EvFilterChips(),
-          Expanded(
-            child: Stack(
-              children: [
-                body,
-                const Positioned(
-                  left: 16,
-                  top: 16,
-                  child: EvToggleButton(),
-                ),
-              ],
-            ),
-          ),
+          Expanded(child: body),
         ],
       ),
     );
