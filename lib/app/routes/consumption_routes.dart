@@ -5,7 +5,6 @@ import '../../features/consumption/presentation/screens/add_fill_up_screen.dart'
 import '../../features/consumption/presentation/screens/consumption_screen.dart';
 import '../../features/consumption/presentation/screens/pick_station_for_fill_up_screen.dart';
 import '../../features/consumption/presentation/screens/trip_detail_screen.dart';
-import '../../features/consumption/presentation/screens/trip_history_screen.dart';
 import '../../features/consumption/presentation/screens/trip_recording_screen.dart';
 import '../../features/search/domain/entities/fuel_type.dart';
 import 'invalid_id_screen.dart';
@@ -36,10 +35,6 @@ List<RouteBase> get consumptionRoutes => [
       GoRoute(
         path: '/trip-recording',
         builder: (_, _) => const TripRecordingScreen(),
-      ),
-      GoRoute(
-        path: '/trip-history',
-        builder: (_, _) => const TripHistoryScreen(),
       ),
       // #889 — placeholder trip-detail route wired up alongside the
       // new Trajets tab on the Consumption screen. Full detail UI

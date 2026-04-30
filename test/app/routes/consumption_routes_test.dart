@@ -4,11 +4,12 @@ import 'package:tankstellen/app/routes/consumption_routes.dart';
 
 void main() {
   group('consumptionRoutes', () {
-    test('returns exactly 7 routes', () {
+    test('returns exactly 6 routes', () {
       // Guards against accidental insert/delete — `/consumption-tab`
       // lives in shellBranches, but every other consumption route is
-      // owned here.
-      expect(consumptionRoutes.length, 7);
+      // owned here. `/trip-history` was removed in #1313 — the Trajets
+      // sub-tab covers the same content inline.
+      expect(consumptionRoutes.length, 6);
     });
 
     test('route 0 path is "/consumption"', () {
@@ -33,23 +34,28 @@ void main() {
       expect(route.path, '/trip-recording');
     });
 
-    test('route 4 path is "/trip-history"', () {
-      final route = consumptionRoutes[4] as GoRoute;
-      expect(route.path, '/trip-history');
-    });
-
-    test('route 5 path is "/trip/:id" with id path parameter (#889)', () {
+    test('route 4 path is "/trip/:id" with id path parameter (#889)', () {
       // #889 — trip-detail route uses `:id` so it can be deep-linked
       // from the Trajets tab. The exact pattern is load-bearing — the
       // builder reads `state.pathParameters['id']`.
-      final route = consumptionRoutes[5] as GoRoute;
+      final route = consumptionRoutes[4] as GoRoute;
       expect(route.path, '/trip/:id');
       expect(route.path, contains(':id'));
     });
 
-    test('route 6 path is "/consumption/add"', () {
-      final route = consumptionRoutes[6] as GoRoute;
+    test('route 5 path is "/consumption/add"', () {
+      final route = consumptionRoutes[5] as GoRoute;
       expect(route.path, '/consumption/add');
+    });
+
+    test('"/trip-history" route is removed (#1313)', () {
+      // Trajets sub-tab inside ConsumptionScreen renders inline trip
+      // history; the standalone screen + route are gone.
+      final paths = consumptionRoutes
+          .whereType<GoRoute>()
+          .map((r) => r.path)
+          .toList();
+      expect(paths, isNot(contains('/trip-history')));
     });
 
     test('every entry is a GoRoute', () {

@@ -126,6 +126,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return PageScaffold(
       title: l10n?.appTitle ?? 'Fuel Prices',
       toolbarHeight: isLandscape ? 40 : null,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: () {
+            unawaited(
+              ref.read(searchStateProvider.notifier).repeatLastSearch(),
+            );
+          },
+          tooltip: l10n?.refreshPrices ?? 'Refresh prices',
+        ),
+      ],
       bodyPadding: EdgeInsets.zero,
       body: isWide
           ? _buildWideLayout(context)

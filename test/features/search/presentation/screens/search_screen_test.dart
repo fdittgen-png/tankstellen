@@ -119,6 +119,29 @@ void main() {
       expect(find.text('Search to find fuel stations.'), findsOneWidget);
     });
 
+    testWidgets('AppBar exposes a Refresh action (#1313)', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const SearchScreen(),
+        overrides: [
+          ...test.overrides,
+          userPositionNullOverride(),
+        ],
+      );
+
+      // Mirrors favorites_screen.dart:50-57 — the Recherche tab needs
+      // a manual refresh affordance so the typed query can re-fetch
+      // without the user editing the criteria (#1313).
+      final refreshInAppBar = find.descendant(
+        of: find.byType(AppBar),
+        matching: find.widgetWithIcon(IconButton, Icons.refresh),
+      );
+      expect(refreshInAppBar, findsOneWidget);
+    });
+
     testWidgets('results area dominates the viewport (≥60% vertical)',
         (tester) async {
       // Use a fixed-size phone viewport.
