@@ -510,6 +510,105 @@ void main() {
     });
   });
 
+  group('TripHistoryEntry adapter identity persistence (#1312)', () {
+    test(
+        'entry with all three adapter fields round-trips through save / '
+        'loadAll', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 4, 29, 12, 0);
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: 'car-a',
+        summary: mkSummary(startedAt: start),
+        adapterMac: 'AA:BB:CC:DD:EE:FF',
+        adapterName: 'Vgate iCar Pro',
+        adapterFirmware: 'ELM327 v2.2',
+      ));
+
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.adapterMac, 'AA:BB:CC:DD:EE:FF');
+      expect(loaded.first.adapterName, 'Vgate iCar Pro');
+      expect(loaded.first.adapterFirmware, 'ELM327 v2.2');
+    });
+
+    test(
+        'entry with all adapter fields null does NOT include the adapter '
+        'keys in stored JSON — matches the parsimony rule the rest of the '
+        'optional summary keys already follow', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 4, 29, 12, 0);
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: start),
+        // adapterMac / adapterName / adapterFirmware all null
+      ));
+
+      final raw = box.get(start.toIso8601String())!;
+      final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
+      expect(decoded.containsKey('adapterMac'), isFalse);
+      expect(decoded.containsKey('adapterName'), isFalse);
+      expect(decoded.containsKey('adapterFirmware'), isFalse);
+    });
+
+    test(
+        'legacy JSON (pre-#1312) without the adapter keys deserialises with '
+        'all three fields null — backward compat, mirrors the schema-drift '
+        'lesson from #1301 (no fromJson throw on missing optional keys)',
+        () async {
+      final start = DateTime(2026, 4, 29, 12, 0);
+      // Hand-craft a JSON payload as a pre-#1312 build would have
+      // written it: the persisted shape carries id/vehicleId/summary
+      // but none of the new adapter keys.
+      final legacyJson = jsonEncode({
+        'id': start.toIso8601String(),
+        'vehicleId': 'car-a',
+        'summary': {
+          'distanceKm': 10.0,
+          'maxRpm': 2800.0,
+          'highRpmSeconds': 0.0,
+          'idleSeconds': 0.0,
+          'harshBrakes': 0,
+          'harshAccelerations': 0,
+          'startedAt': start.toIso8601String(),
+        },
+        // 'adapterMac' / 'adapterName' / 'adapterFirmware' deliberately absent
+      });
+      await box.put(start.toIso8601String(), legacyJson);
+
+      final repo = TripHistoryRepository(box: box);
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.adapterMac, isNull);
+      expect(loaded.first.adapterName, isNull);
+      expect(loaded.first.adapterFirmware, isNull);
+      // Existing fields still parse — backward compat means the
+      // schema GAINS optional keys without breaking old entries.
+      expect(loaded.first.vehicleId, 'car-a');
+    });
+
+    test(
+        'partial adapter capture (name only, no mac, no firmware) round-trips '
+        '— each field is independently optional so we don\'t enshrine "all '
+        'or nothing" semantics', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 4, 29, 12, 0);
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: start),
+        adapterName: 'OBDII',
+        // mac + firmware null
+      ));
+
+      final loaded = repo.loadAll();
+      expect(loaded.first.adapterName, 'OBDII');
+      expect(loaded.first.adapterMac, isNull);
+      expect(loaded.first.adapterFirmware, isNull);
+    });
+  });
+
   group('TripSample engineLoad + coolantTemp persistence (#1262 phase 1)', () {
     test(
         'sample with engineLoadPercent and coolantTempC round-trips through '

@@ -26,6 +26,9 @@ TripHistoryEntry _entry({
   DateTime? startedAt,
   DateTime? endedAt,
   String distanceSource = 'virtual',
+  String? adapterMac,
+  String? adapterName,
+  String? adapterFirmware,
 }) {
   return TripHistoryEntry(
     id: id,
@@ -43,6 +46,9 @@ TripHistoryEntry _entry({
       endedAt: endedAt,
       distanceSource: distanceSource,
     ),
+    adapterMac: adapterMac,
+    adapterName: adapterName,
+    adapterFirmware: adapterFirmware,
   );
 }
 
@@ -338,6 +344,96 @@ void main() {
       );
       expect(find.text('60.0 km/h'), findsOneWidget);
       expect(find.text('80.0 km/h'), findsOneWidget);
+    });
+  });
+
+  group('TripSummaryCard — OBD2 adapter row (#1312)', () {
+    testWidgets(
+        'renders the adapter row with "name • mac" formatting when both fields '
+        'are populated', (tester) async {
+      await pumpApp(
+        tester,
+        TripSummaryCard(
+          entry: _entry(
+            adapterMac: 'AA:BB:CC:DD:EE:FF',
+            adapterName: 'Vgate iCar Pro',
+          ),
+          vehicle: _vehicle,
+          samples: const [],
+          isEv: false,
+        ),
+      );
+
+      // Label rendered from the en ARB key.
+      expect(find.text('OBD2 adapter'), findsOneWidget);
+      // Value formatted with the • separator.
+      expect(
+        find.text('Vgate iCar Pro • AA:BB:CC:DD:EE:FF'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets(
+        'hides the adapter row when all three adapter fields are null '
+        '(legacy trips, fake-service paths)', (tester) async {
+      await pumpApp(
+        tester,
+        TripSummaryCard(
+          entry: _entry(
+            // adapterMac / adapterName / adapterFirmware all null
+          ),
+          vehicle: _vehicle,
+          samples: const [],
+          isEv: false,
+        ),
+      );
+
+      expect(find.text('OBD2 adapter'), findsNothing);
+    });
+
+    testWidgets(
+        'renders just the name when mac is null and firmware is null '
+        '— format collapses cleanly without a stray separator',
+        (tester) async {
+      await pumpApp(
+        tester,
+        TripSummaryCard(
+          entry: _entry(
+            adapterName: 'OBDII',
+          ),
+          vehicle: _vehicle,
+          samples: const [],
+          isEv: false,
+        ),
+      );
+
+      expect(find.text('OBD2 adapter'), findsOneWidget);
+      expect(find.text('OBDII'), findsOneWidget);
+    });
+
+    testWidgets(
+        'appends firmware in parentheses when present, after the '
+        'name • mac value',
+        (tester) async {
+      await pumpApp(
+        tester,
+        TripSummaryCard(
+          entry: _entry(
+            adapterMac: 'AA:BB:CC:DD:EE:FF',
+            adapterName: 'OBDII',
+            adapterFirmware: 'ELM327 v1.5',
+          ),
+          vehicle: _vehicle,
+          samples: const [],
+          isEv: false,
+        ),
+      );
+
+      // ~40-char cap leaves the full value intact here.
+      expect(
+        find.text('OBDII • AA:BB:CC:DD:EE:FF (ELM327 v1.5)'),
+        findsOneWidget,
+      );
     });
   });
 

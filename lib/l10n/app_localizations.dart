@@ -7394,6 +7394,12 @@ abstract class AppLocalizations {
   /// **'Vehicle'**
   String get trajetDetailFieldVehicle;
 
+  /// Label for the OBD2-adapter identity row in the Trip detail summary card (#1312). Shown immediately under the Vehicle row when the trip carries any adapter MAC, name, or firmware so device-test bug reports can name the suspect device. Hidden when none of the three fields were captured.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 adapter'**
+  String get trajetDetailFieldAdapter;
+
   /// Label for the distance row in the Trip detail summary card (#890).
   ///
   /// In en, this message translates to:

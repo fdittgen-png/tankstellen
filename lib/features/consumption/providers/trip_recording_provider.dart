@@ -63,6 +63,17 @@ class TripRecording extends _$TripRecording {
   String? _vehicleId;
   ConsumptionFuelFamily _fuelFamily = ConsumptionFuelFamily.gasoline;
 
+  // #1312 — adapter identity captured at trip-start so it survives
+  // into the saved [TripHistoryEntry] even if the [Obd2Service] has
+  // been disconnected by the time `_saveToHistory` runs (`stop`
+  // disconnects the service before saving). Sourced from the service
+  // fields stamped by [Obd2ConnectionService] on connect; null when
+  // the service was constructed without going through the connection
+  // layer (test fakes).
+  String? _adapterMac;
+  String? _adapterName;
+  String? _adapterFirmware;
+
   /// Tests count haptic fires via these instead of hooking the
   /// platform channel. The production path also still calls
   /// [HapticFeedback], so counting here doesn't short-circuit the
@@ -210,6 +221,14 @@ class TripRecording extends _$TripRecording {
     if (state.isActive) return;
     _lastTripStartedAt ??= DateTime.now();
     _service = service;
+    // #1312 — snapshot adapter identity NOW. The service is
+    // disconnected during `stop` before `_saveToHistory` runs, so we
+    // can't read these off the live service at save time. Best-effort
+    // — a null reading just means the trip detail card will hide the
+    // adapter row.
+    _adapterMac = service.adapterMac;
+    _adapterName = service.adapterName;
+    _adapterFirmware = service.adapterFirmware;
     // #812 phase 3 — snapshot the active vehicle so the controller
     // can hand it to `readFuelRateLPerHour` on every tick. The
     // speed-density fallback reads engineDisplacementCc +
@@ -530,6 +549,12 @@ class TripRecording extends _$TripRecording {
     }
     _store = null;
     _vehicleId = null;
+    // #1312 — clear the captured adapter identity once the trip has
+    // been persisted; the next [start] call snapshots fresh values
+    // from whichever service it receives.
+    _adapterMac = null;
+    _adapterName = null;
+    _adapterFirmware = null;
     try {
       await svc.disconnect();
     } catch (e, st) {
@@ -952,6 +977,12 @@ class TripRecording extends _$TripRecording {
         summary: summary,
         automatic: automatic,
         samples: samples,
+        // #1312 — adapter identity snapshotted at [start] time. Null
+        // for legacy / fake-service code paths; the detail card hides
+        // the row entirely in that case.
+        adapterMac: _adapterMac,
+        adapterName: _adapterName,
+        adapterFirmware: _adapterFirmware,
       ));
       ref.read(tripHistoryListProvider.notifier).refresh();
       // Phase 5 (#1004): bump the launcher-icon badge so the user sees

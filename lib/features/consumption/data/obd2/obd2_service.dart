@@ -49,6 +49,30 @@ class Obd2Service {
   /// for the exact semantics).
   Set<int>? _supportedPids;
 
+  /// Stable adapter identifier (BLE remote-id / Classic MAC) for the
+  /// device backing this session (#1312). Stamped by
+  /// [Obd2ConnectionService] on connect so downstream consumers
+  /// (the trip recorder) can attribute a recorded trip to a specific
+  /// hardware adapter without reaching back into the connection
+  /// service. Null when the service was constructed without going
+  /// through the connection layer (test fakes / direct transport
+  /// construction).
+  String? adapterMac;
+
+  /// Friendly device name advertised by the adapter (#1312). Falls
+  /// back to the registry's display name when the BLE advertisement
+  /// is empty. Stamped at the same moment as [adapterMac].
+  String? adapterName;
+
+  /// ELM327 firmware string (whatever `ATI` returned during init), if
+  /// the adapter reported one (#1312). Currently null in production
+  /// because the connect path does not snapshot the response — the
+  /// field is wired so a future enhancement can populate it without
+  /// touching the trip-history schema again. Persisted/round-tripped
+  /// by [TripHistoryEntry] so device-test reports can name the exact
+  /// firmware variant when we eventually capture it.
+  String? adapterFirmware;
+
   Obd2Service(
     this._transport, {
     SupportedPidsCache? pidsCache,
