@@ -20,6 +20,34 @@ Future<Obd2Service> _connected(Map<String, String> extra) async {
   return service;
 }
 
+/// Minimal transport that records the order of [sendCommand] calls
+/// into the supplied list. Used by the #1330 regression test that
+/// pins the legacy init sequence.
+class _RecordingTransport implements Obd2Transport {
+  final Map<String, String> _responses;
+  final List<String> _log;
+  bool _connected = false;
+
+  _RecordingTransport(this._responses, this._log);
+
+  @override
+  bool get isConnected => _connected;
+
+  @override
+  Future<void> connect() async => _connected = true;
+
+  @override
+  Future<String> sendCommand(String command) async {
+    if (!_connected) throw StateError('Not connected');
+    final cmd = command.trim();
+    _log.add(cmd);
+    return _responses[cmd] ?? 'NO DATA>';
+  }
+
+  @override
+  Future<void> disconnect() async => _connected = false;
+}
+
 void main() {
   group('Obd2Service PID expansion (#717)', () {
     test('readEngineLoad parses PID 04', () async {
@@ -613,6 +641,30 @@ void main() {
       expect(connected, isTrue);
       expect(service.isConnected, isTrue);
     });
+
+    test(
+      'connect with default adapter sends legacy init sequence (#1330)',
+      () async {
+        // Phase 1 regression: the default profile MUST drive the
+        // service's connect path with the legacy hardcoded init list.
+        // If [GenericElm327Adapter.initSequence] or the connect loop
+        // diverges, this test fails before any production user does.
+        final sent = <String>[];
+        final transport = _RecordingTransport(
+          {
+            'ATZ': 'ELM327 v1.5>',
+            'ATE0': 'OK>',
+            'ATL0': 'OK>',
+            'ATH0': 'OK>',
+            'ATSP0': 'OK>',
+          },
+          sent,
+        );
+        final service = Obd2Service(transport);
+        await service.connect();
+        expect(sent, ['ATZ', 'ATE0', 'ATL0', 'ATH0', 'ATSP0']);
+      },
+    );
 
     test('readOdometerKm returns odometer from PID A6', () async {
       final transport = FakeObd2Transport({

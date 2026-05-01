@@ -117,7 +117,11 @@ class Obd2ConnectionService {
     service.adapterName = candidate.candidate.deviceName.isEmpty
         ? candidate.profile.displayName
         : candidate.candidate.deviceName;
-    final ok = await service.connect();
+    // #1330 — hand the per-adapter ELM327 adapter into [Obd2Service]
+    // so its init sequence + timing matches the connected adapter's
+    // quirks. Phase 1 ships only [GenericElm327Adapter], so runtime
+    // behaviour is unchanged for every paired adapter.
+    final ok = await service.connect(adapter: candidate.profile.adapter);
     if (!ok) {
       await service.disconnect();
       throw const Obd2AdapterUnresponsive();
