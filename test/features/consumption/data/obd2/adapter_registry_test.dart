@@ -1,5 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
+import 'package:tankstellen/features/consumption/data/obd2/adapters/smart_obd_adapter.dart';
+import 'package:tankstellen/features/consumption/data/obd2/adapters/v_linker_fs_adapter.dart';
+import 'package:tankstellen/features/consumption/data/obd2/elm327_adapter.dart';
 
 void main() {
   final registry = Obd2AdapterRegistry.defaults();
@@ -243,25 +246,48 @@ void main() {
   });
 
   group('Obd2AdapterProfile', () {
-    test('vLinker BLE defaults to 100 ms init delay', () {
-      final v =
-          registry.profiles.firstWhere((p) => p.id == 'vlinker-ble');
-      expect(v.initDelay, const Duration(milliseconds: 100));
+    test('vLinker BLE defaults to GenericElm327Adapter (100 ms / 100 ms)', () {
+      final v = registry.profiles.firstWhere((p) => p.id == 'vlinker-ble');
+      expect(v.adapter, isA<GenericElm327Adapter>());
+      expect(v.adapter.postResetDelay, const Duration(milliseconds: 100));
+      expect(v.adapter.interCommandDelay, const Duration(milliseconds: 100));
     });
 
-    test('generic BLE fallback uses a longer init delay for slow clones',
+    test('generic BLE fallback also uses GenericElm327Adapter (#1330 phase 2)',
         () {
-      final g =
-          registry.profiles.firstWhere((p) => p.id == 'generic-fff0');
-      expect(g.initDelay, const Duration(milliseconds: 300));
+      final g = registry.profiles.firstWhere((p) => p.id == 'generic-fff0');
+      expect(g.adapter, isA<GenericElm327Adapter>());
     });
 
-    test('generic-classic fallback also uses the 300 ms init delay (#761)',
+    test('generic-classic fallback uses GenericElm327Adapter (#761, #1330)',
         () {
-      final g =
-          registry.profiles.firstWhere((p) => p.id == 'generic-classic');
-      expect(g.initDelay, const Duration(milliseconds: 300));
+      final g = registry.profiles.firstWhere((p) => p.id == 'generic-classic');
+      expect(g.adapter, isA<GenericElm327Adapter>());
       expect(g.transport, BluetoothTransport.classic);
+    });
+  });
+
+  group('Obd2AdapterProfile.adapter wiring (#1330 phase 2)', () {
+    test('vLinker FS Classic profile is wired to VLinkerFsAdapter', () {
+      final v =
+          registry.profiles.firstWhere((p) => p.id == 'vlinker-fs-classic');
+      expect(v.adapter, isA<VLinkerFsAdapter>());
+      expect(v.adapter.id, 'vlinker-fs');
+      expect(v.adapter.postResetDelay, const Duration(milliseconds: 200));
+      expect(v.adapter.interCommandDelay, const Duration(milliseconds: 50));
+    });
+
+    test('SmartOBD BLE profile is wired to SmartObdAdapter', () {
+      final s = registry.profiles.firstWhere((p) => p.id == 'smartobd-ble');
+      expect(s.adapter, isA<SmartObdAdapter>());
+      expect(s.adapter.id, 'smart-obd');
+      expect(s.adapter.postResetDelay, const Duration(milliseconds: 400));
+      expect(s.adapter.interCommandDelay, const Duration(milliseconds: 200));
+    });
+
+    test('SmartOBD Classic profile is wired to SmartObdAdapter', () {
+      final s = registry.profiles.firstWhere((p) => p.id == 'smartobd-classic');
+      expect(s.adapter, isA<SmartObdAdapter>());
     });
   });
 }
