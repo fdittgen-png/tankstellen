@@ -5,18 +5,14 @@ import '../../../../l10n/app_localizations.dart';
 /// Explanatory placeholder shown on the loyalty settings screen when
 /// the user has not registered any fuel-club card yet.
 ///
-/// Renders the brand-membership icon, a short explanation of what a
-/// card buys the user, and a primary "Add card" CTA that delegates to
-/// [onAdd] (the parent screen typically opens the add-card bottom
-/// sheet). Extracted from `loyalty_settings_screen.dart` (#563) to keep
-/// the screen file under the 300-LOC guideline; behaviour and visual
-/// contract are unchanged.
+/// Renders the brand-membership icon and a short explanation of what
+/// a card buys the user. The actual "Add card" action lives on the
+/// parent screen's bottom-right `FloatingActionButton` — duplicating
+/// it inside the empty state was redundant (#1329). Extracted from
+/// `loyalty_settings_screen.dart` (#563) to keep the screen file
+/// under the 300-LOC guideline.
 class LoyaltyEmptyState extends StatelessWidget {
-  /// Invoked when the user taps the empty-state CTA. The parent screen
-  /// is expected to open the add-card sheet (or any equivalent flow).
-  final VoidCallback onAdd;
-
-  const LoyaltyEmptyState({super.key, required this.onAdd});
+  const LoyaltyEmptyState({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +42,6 @@ class LoyaltyEmptyState extends StatelessWidget {
                       'matching stations automatically.',
               style: theme.textTheme.bodyMedium,
               textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            FilledButton.icon(
-              onPressed: onAdd,
-              icon: const Icon(Icons.add),
-              label: Text(l?.loyaltyAddCard ?? 'Add card'),
             ),
           ],
         ),

@@ -70,8 +70,12 @@ void main() {
       await pumpScreen(tester);
 
       expect(find.text('No fuel club cards yet'), findsOneWidget);
-      // Both the empty-state CTA and the FAB expose "Add card".
-      expect(find.text('Add card'), findsAtLeastNWidgets(1));
+      // Exactly one "Add card" surface — the bottom-right FAB (#1329).
+      expect(find.text('Add card'), findsOneWidget);
+      expect(
+        find.widgetWithText(FloatingActionButton, 'Add card'),
+        findsOneWidget,
+      );
     });
 
     testWidgets(
