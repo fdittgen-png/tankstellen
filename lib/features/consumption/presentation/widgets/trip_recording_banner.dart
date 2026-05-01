@@ -73,7 +73,27 @@ class TripRecordingBanner extends ConsumerWidget {
                 bottom: false,
                 child: InkWell(
                   key: const Key('tripRecordingBanner'),
-                  onTap: () => GoRouter.of(context).push('/trip-recording'),
+                  onTap: () {
+                    // #1322 — TripRecordingBanner is wrapped via
+                    // MaterialApp.builder, so its context can sit
+                    // ABOVE the Router/Navigator subtree on certain
+                    // modal paths (e.g. /privacy-dashboard). In those
+                    // cases GoRouter.of throws "No GoRouter found in
+                    // context". Use maybeOf + a ScaffoldMessenger
+                    // fallback so the banner never crashes.
+                    final router = GoRouter.maybeOf(context);
+                    if (router != null) {
+                      router.push('/trip-recording');
+                      return;
+                    }
+                    final messenger = ScaffoldMessenger.maybeOf(context);
+                    messenger?.showSnackBar(SnackBar(
+                      content: Text(
+                        l?.tripBannerOpenFromConsumptionTab ??
+                            'Open the active trip from the Conso tab',
+                      ),
+                    ));
+                  },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 6),

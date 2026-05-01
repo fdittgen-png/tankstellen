@@ -4127,6 +4127,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Recording continues in the background. Tap the red banner at the top of any screen to return.';
 
   @override
+  String get tripBannerOpenFromConsumptionTab =>
+      'Open the active trip from the Conso tab';
+
+  @override
   String get vinLabel => 'VIN (optional)';
 
   @override

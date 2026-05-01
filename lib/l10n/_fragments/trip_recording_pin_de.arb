@@ -14,5 +14,6 @@
   "tripRecordingPinHelpTooltip": "Was macht das Anpinnen?",
   "tripRecordingPinHelpTitle": "Über das Anpinnen",
   "tripRecordingPinHelpBody": "Anpinnen hält den Bildschirm an und blendet die Systemleisten aus, damit das Formular auf einer Armaturenhalterung lesbar bleibt. Erneut tippen, um zu lösen. Wird automatisch beendet, wenn die Fahrt stoppt.",
-  "tripRecordingResumeHintMessage": "Die Aufnahme läuft im Hintergrund weiter. Tippe oben auf das rote Banner, um zurückzukehren."
+  "tripRecordingResumeHintMessage": "Die Aufnahme läuft im Hintergrund weiter. Tippe oben auf das rote Banner, um zurückzukehren.",
+  "tripBannerOpenFromConsumptionTab": "Aktive Fahrt aus dem Verbrauchs-Tab öffnen"
 }
