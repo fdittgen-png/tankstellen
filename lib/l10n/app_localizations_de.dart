@@ -4164,6 +4164,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Aufnahme läuft im Hintergrund weiter. Tippe oben auf das rote Banner, um zurückzukehren.';
 
   @override
+  String get tripBannerOpenFromConsumptionTab =>
+      'Aktive Fahrt aus dem Verbrauchs-Tab öffnen';
+
+  @override
   String get vinLabel => 'FIN (optional)';
 
   @override

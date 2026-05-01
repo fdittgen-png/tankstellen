@@ -7634,6 +7634,12 @@ abstract class AppLocalizations {
   /// **'Recording continues in the background. Tap the red banner at the top of any screen to return.'**
   String get tripRecordingResumeHintMessage;
 
+  /// Snackbar shown when the user taps the trip-recording banner on a screen whose context is above the GoRouter ancestor (#1322). Falls back from a navigation push to a hint pointing the user at the consumption tab.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the active trip from the Conso tab'**
+  String get tripBannerOpenFromConsumptionTab;
+
   /// No description provided for @vinLabel.
   ///
   /// In en, this message translates to:

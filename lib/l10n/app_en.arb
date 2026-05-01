@@ -2756,6 +2756,10 @@
   "@tripRecordingResumeHintMessage": {
     "description": "One-time tooltip shown the first time the user backs out of the recording screen while a trip is still recording (#1273). Tells them they can tap the persistent banner to return. Persisted dismissal — never fires twice."
   },
+  "tripBannerOpenFromConsumptionTab": "Open the active trip from the Conso tab",
+  "@tripBannerOpenFromConsumptionTab": {
+    "description": "Snackbar shown when the user taps the trip-recording banner on a screen whose context is above the GoRouter ancestor (#1322). Falls back from a navigation push to a hint pointing the user at the consumption tab."
+  },
   "vinLabel": "VIN (optional)",
   "vinDecodeTooltip": "Decode VIN",
   "vinConfirmAction": "Yes, auto-fill",
