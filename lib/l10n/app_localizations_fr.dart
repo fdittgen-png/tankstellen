@@ -3829,6 +3829,15 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get refuelUnitPerLiter => '/L';
+
+  @override
+  String get refuelUnitPerKwh => '/kWh';
+
+  @override
+  String get refuelUnitPerSession => '/séance';
+
+  @override
   String get speedConsumptionCardTitle => 'Consommation par vitesse';
 
   @override

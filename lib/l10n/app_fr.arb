@@ -1060,5 +1060,8 @@
   "speedBandMotorwayFast": "Autoroute rapide (130+)",
   "speedConsumptionInsufficientData": "Enregistrez plus de 30 minutes de trajets avec l'adaptateur OBD2 pour débloquer l'analyse vitesse/consommation.",
   "speedConsumptionTimeShare": "{percent} % de conduite",
-  "speedConsumptionNeedMoreData": "Plus de données nécessaires"
+  "speedConsumptionNeedMoreData": "Plus de données nécessaires",
+  "refuelUnitPerLiter": "/L",
+  "refuelUnitPerKwh": "/kWh",
+  "refuelUnitPerSession": "/séance"
 }

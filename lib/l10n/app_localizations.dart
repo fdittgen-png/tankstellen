@@ -7052,6 +7052,24 @@ abstract class AppLocalizations {
   /// **'A station is at {price} € (target: {threshold} €)'**
   String radiusAlertNotificationBody(String price, String threshold);
 
+  /// Trailing unit suffix on a fuel-pump price in the unified RefuelOptionCard (#1116 phase 3b). Renders below the numeric price (e.g. "1,799" + "/L" → "1,799 /L").
+  ///
+  /// In en, this message translates to:
+  /// **'/L'**
+  String get refuelUnitPerLiter;
+
+  /// Trailing unit suffix on an EV charging price in the unified RefuelOptionCard (#1116 phase 3b).
+  ///
+  /// In en, this message translates to:
+  /// **'/kWh'**
+  String get refuelUnitPerKwh;
+
+  /// Trailing unit suffix when an EV network bills a flat per-session price instead of per-kWh in the unified RefuelOptionCard (#1116 phase 3b).
+  ///
+  /// In en, this message translates to:
+  /// **'/session'**
+  String get refuelUnitPerSession;
+
   /// Title of the consumption-by-speed card on the Carbon dashboard Charts tab — bins per-second OBD2 samples by speed band so the user can see what motorway speed is costing them per 100 km (#1192).
   ///
   /// In en, this message translates to:
