@@ -1,14 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/carbon/presentation/screens/carbon_dashboard_screen.dart';
-import 'package:tankstellen/features/carbon/presentation/widgets/fuel_vs_ev_card.dart';
-import 'package:tankstellen/features/carbon/presentation/widgets/milestones_card.dart';
 import 'package:tankstellen/features/carbon/presentation/widgets/monthly_bar_chart.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
-import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
 import '../../helpers/pump_app.dart';
@@ -57,14 +53,13 @@ void main() {
       const CarbonDashboardScreen(),
       overrides: [
         settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
-        gamificationEnabledProvider.overrideWith((ref) => true),
       ],
     );
     expect(find.text('No data yet'), findsOneWidget);
     expect(find.byType(MonthlyBarChart), findsNothing);
   });
 
-  testWidgets('renders charts tab with bar charts when data exists',
+  testWidgets('renders charts with bar charts when data exists',
       (tester) async {
     await pumpApp(
       tester,
@@ -72,11 +67,10 @@ void main() {
       overrides: [
         settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
         fillUpListProvider.overrideWith(_FakeFillUpList.new),
-        gamificationEnabledProvider.overrideWith((ref) => true),
       ],
     );
-    // Two bar charts on the Charts tab. skipOffstage: false because the
-    // tab is now tall enough that the second chart sits below the 800x600
+    // Two bar charts on the Charts pane. skipOffstage: false because the
+    // pane is now tall enough that the second chart sits below the 800x600
     // test viewport — the assertion is "the chart is in the tree", not
     // "the chart is in the initial scroll window".
     expect(
@@ -92,86 +86,6 @@ void main() {
       findsOneWidget,
     );
   });
-
-  testWidgets('switches to achievements tab showing milestones + EV card',
-      (tester) async {
-    await pumpApp(
-      tester,
-      const CarbonDashboardScreen(),
-      overrides: [
-        settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
-        fillUpListProvider.overrideWith(_FakeFillUpList.new),
-        gamificationEnabledProvider.overrideWith((ref) => true),
-      ],
-    );
-    await tester.tap(find.text('Achievements'));
-    await tester.pumpAndSettle();
-    expect(
-      find.byType(MilestonesCard, skipOffstage: false),
-      findsOneWidget,
-    );
-    expect(
-      find.byType(FuelVsEvCard, skipOffstage: false),
-      findsOneWidget,
-    );
-    expect(find.text('Milestones'), findsOneWidget);
-  });
-
-  // -------------------------------------------------------------------------
-  // #1194 — gamification opt-out gating
-  // -------------------------------------------------------------------------
-  testWidgets(
-    'shows both Charts and Achievements tabs when gamification is enabled',
-    (tester) async {
-      await pumpApp(
-        tester,
-        const CarbonDashboardScreen(),
-        overrides: [
-          settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
-          fillUpListProvider.overrideWith(_FakeFillUpList.new),
-          gamificationEnabledProvider.overrideWith((ref) => true),
-        ],
-      );
-      // Both tabs are present (one TabBar with two Tab children).
-      expect(find.byType(TabBar), findsOneWidget);
-      expect(find.byType(Tab), findsNWidgets(2));
-      expect(find.text('Charts'), findsOneWidget);
-      expect(find.text('Achievements'), findsOneWidget);
-    },
-  );
-
-  testWidgets(
-    'collapses to a single Charts pane when gamification is disabled',
-    (tester) async {
-      await pumpApp(
-        tester,
-        const CarbonDashboardScreen(),
-        overrides: [
-          settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
-          fillUpListProvider.overrideWith(_FakeFillUpList.new),
-          gamificationEnabledProvider.overrideWith((ref) => false),
-        ],
-      );
-      // No TabBar, no Achievements tab — just the Charts pane.
-      expect(find.byType(TabBar), findsNothing);
-      expect(find.text('Achievements'), findsNothing);
-      // Charts content is still rendered. skipOffstage: false — the
-      // pane is taller than 600 px since the trip-length and
-      // speed-consumption cards landed.
-      expect(
-        find.byType(MonthlyBarChart, skipOffstage: false),
-        findsNWidgets(2),
-      );
-      expect(
-        find.text('Monthly costs', skipOffstage: false),
-        findsOneWidget,
-      );
-      expect(
-        find.text('Monthly CO2 emissions', skipOffstage: false),
-        findsOneWidget,
-      );
-    },
-  );
 }
 
 class _FakeFillUpList extends FillUpList {

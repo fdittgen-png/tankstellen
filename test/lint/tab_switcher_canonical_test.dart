@@ -12,12 +12,6 @@ import 'package:flutter_test/flutter_test.dart';
 /// `TabBar` constructor reintroduces the underline-style tab the epic
 /// (#923) specifically deprecated.
 ///
-/// Allowlist: `lib/features/carbon/presentation/screens/
-/// carbon_dashboard_screen.dart` keeps `TabBar` intentionally — the
-/// segmented-button pattern was inappropriate for that screen's tab
-/// semantics (Charts / Achievements pair with `TabBarView` content).
-/// Decision recorded in phase 3c of the epic.
-///
 /// The regex `(?<![A-Za-z0-9_])TabBar\s*\(` matches the constructor
 /// call only — `TabBarView(`, `TabBarTheme(`, and identifiers like
 /// `MyTabBar(` are excluded by the trailing `\s*\(` (which requires
@@ -27,14 +21,7 @@ void main() {
   test(
     'no raw `TabBar(...)` in lib/features/**/presentation (#923 final)',
     () {
-      // Carbon dashboard intentionally uses TabBar — phase 3c of #923
-      // reviewed and ratified this exception. The Charts /
-      // Achievements pair maps to a TabBarView and the underline
-      // affordance suits the screen better than TabSwitcher's chip
-      // pattern.
-      const allowlist = <String>{
-        'lib/features/carbon/presentation/screens/carbon_dashboard_screen.dart',
-      };
+      const allowlist = <String>{};
 
       // `TabBar(` only — TabBarView is excluded because the `View`
       // characters force `\s*\(` to fail.
