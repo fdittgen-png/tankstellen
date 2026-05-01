@@ -55,10 +55,6 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   // first successful load so subsequent provider updates (e.g. from
   // `_save()` writing the freshest profile) don't clobber user edits.
   bool _hasInitiallyLoaded = false;
-  // #1162 — pairedAdapterMac (#1004) gates the "Read VIN from car"
-  // button. Distinct from [_adapterMac] which is the currently-
-  // connected OBD2 picker selection.
-  String? _pairedAdapterMac;
 
   // #812 phase 2 — engine params populated by the VIN decoder;
   // carried through _save for phase-3 OBD2 math.
@@ -112,7 +108,6 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
         ..addAll(snap.connectors);
       _adapterMac = snap.adapterMac;
       _adapterName = snap.adapterName;
-      _pairedAdapterMac = snap.pairedAdapterMac;
       _engineDisplacementCc = snap.engineDisplacementCc;
       _engineCylinders = snap.engineCylinders;
       _curbWeightKg = snap.curbWeightKg;
@@ -240,7 +235,12 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   /// editable.
   Future<void> _readVinFromCar() async {
     final l = AppLocalizations.of(context);
-    final mac = _pairedAdapterMac;
+    // #1339 — gate on the basic adapter-selection field
+    // (`obd2AdapterMac`, surfaced here as `_adapterMac`), NOT the
+    // auto-record `pairedAdapterMac` flag (#1004). VIN reading via
+    // Mode 09 PID 02 only needs an adapter to talk to; auto-record
+    // pairing is unrelated.
+    final mac = _adapterMac;
     if (mac == null || mac.isEmpty) return;
 
     setState(() => _readingVinFromCar = true);
@@ -354,12 +354,18 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
               onDecodeVin: _decodeVin,
               onShowVinInfo: _showVinInfo,
               // #1328 — always show the "Read VIN from car" button. When
-              // no adapter is paired we pass `onReadVinFromCar = null`
+              // no adapter is selected we pass `onReadVinFromCar = null`
               // (which renders the button visibly disabled with a hint)
               // so users discover the feature even before pairing.
-              pairedAdapterMac: _pairedAdapterMac,
+              // #1339 — "selected" here is the basic `obd2AdapterMac`
+              // state (`_adapterMac`), NOT the auto-record
+              // `pairedAdapterMac` flag (#1004); VIN reading only needs
+              // an adapter to talk to.
+              adapterMac: _adapterMac,
               onReadVinFromCar:
-                  _pairedAdapterMac != null ? _readVinFromCar : null,
+                  (_adapterMac != null && _adapterMac!.isNotEmpty)
+                      ? _readVinFromCar
+                      : null,
               readingVinFromCar: _readingVinFromCar,
             ),
             const SizedBox(height: 16),
