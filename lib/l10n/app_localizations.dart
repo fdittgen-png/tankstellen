@@ -6344,6 +6344,24 @@ abstract class AppLocalizations {
   /// **'Smarter drive — favours steady highway over zigzag shortcuts.'**
   String get ecoRouteHint;
 
+  /// AppBar action tooltip for the share-favorites button on the Favorites screen (#1344).
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get favoritesShareAction;
+
+  /// Subject / preview text passed to the OS share sheet when the user shares the Favorites screen as an image (#1344). The {date} placeholder is replaced with a localised short date.
+  ///
+  /// In en, this message translates to:
+  /// **'Tankstellen — favourites on {date}'**
+  String favoritesShareSubject(String date);
+
+  /// Snackbar shown when the favorites Share action fails to render or hand off the report PNG (#1344).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t generate share image'**
+  String get favoritesShareError;
+
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
   /// In en, this message translates to:

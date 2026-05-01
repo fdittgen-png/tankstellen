@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:tankstellen/features/consumption/data/trip_share_renderer.dart';
+import 'package:tankstellen/core/sharing/widget_share_renderer.dart';
 
-/// #1189 — coverage for [shareTripAsImage].
+/// #1189 / #1344 — coverage for [shareWidgetAsImage].
 ///
 /// Wraps a tiny coloured box in a [RepaintBoundary], invokes the
 /// renderer with a fake share sink + temp directory, and asserts that:
@@ -21,7 +21,7 @@ void main() {
   late Directory tempDir;
 
   setUp(() {
-    tempDir = Directory.systemTemp.createTempSync('trip_share_renderer_');
+    tempDir = Directory.systemTemp.createTempSync('widget_share_renderer_');
     debugTemporaryDirectoryOverride = () async => tempDir;
   });
 
@@ -69,7 +69,7 @@ void main() {
       // never resolves the engine-side rasterisation. `runAsync` lets
       // the engine resolve the GPU work that produces the PNG bytes.
       await tester.runAsync(() async {
-        await shareTripAsImage(
+        await shareWidgetAsImage(
           boundaryKey: boundaryKey,
           subject: 'Tankstellen — trip on April 22, 2026',
           fileNameStem: 'tankstellen_trip_test',
@@ -110,7 +110,7 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
 
       await expectLater(
-        () => shareTripAsImage(
+        () => shareWidgetAsImage(
           boundaryKey: orphanKey,
           subject: 'subject',
           fileNameStem: 'no_boundary',
@@ -138,7 +138,7 @@ void main() {
       );
 
       await expectLater(
-        () => shareTripAsImage(
+        () => shareWidgetAsImage(
           boundaryKey: wrongKey,
           subject: 'subject',
           fileNameStem: 'wrong_target',

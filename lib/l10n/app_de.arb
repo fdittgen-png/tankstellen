@@ -1383,6 +1383,9 @@
   "@ecoRouteHint": {
     "description": "Hilfetext unterhalb des Eco-Chips, der erklärt, wann der Nutzer ihn wählen sollte (#1123). Kurz halten; das Leitmotiv 'Smarter pump. Smarter drive.' soll erkennbar bleiben."
   },
+  "favoritesShareAction": "Teilen",
+  "favoritesShareSubject": "Tankstellen — Favoriten am {date}",
+  "favoritesShareError": "Bild konnte nicht erstellt werden",
   "feedbackConsentTitle": "Bericht an GitHub senden?",
   "feedbackConsentBody": "Damit wird ein öffentliches Ticket in unserem GitHub-Repository mit deinem Foto und dem OCR-Text erstellt. Es werden keine personenbezogenen Daten (Standort, Konto-ID) gesendet. Fortfahren?",
   "feedbackConsentContinue": "Fortfahren",

@@ -3435,6 +3435,17 @@ class AppLocalizationsDe extends AppLocalizations {
       'Smarter fahren — bevorzugt ruhige Autobahn statt Zickzack-Abkürzungen.';
 
   @override
+  String get favoritesShareAction => 'Teilen';
+
+  @override
+  String favoritesShareSubject(String date) {
+    return 'Tankstellen — Favoriten am $date';
+  }
+
+  @override
+  String get favoritesShareError => 'Bild konnte nicht erstellt werden';
+
+  @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';
 
   @override

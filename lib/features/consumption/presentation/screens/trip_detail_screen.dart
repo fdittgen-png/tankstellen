@@ -4,12 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/feedback/auto_record_badge_provider.dart';
+import '../../../../core/sharing/widget_share_renderer.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/trip_history_repository.dart';
-import '../../data/trip_share_renderer.dart';
 import '../../domain/trip_recorder.dart';
 import '../../providers/trip_history_provider.dart';
 import '../widgets/trip_detail_body.dart';
@@ -18,7 +18,7 @@ import '../widgets/trip_detail_charts.dart';
 /// Test-only override for the trip-detail Share renderer (#1189).
 ///
 /// When set, the trip detail screen routes its Share action through
-/// this function instead of [shareTripAsImage]. Lets widget tests
+/// this function instead of [shareWidgetAsImage]. Lets widget tests
 /// assert on the share invocation without driving the offscreen
 /// rasterisation pipeline (which the fake-async clock can't resolve).
 @visibleForTesting
@@ -201,7 +201,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     final subject = l?.trajetDetailShareSubject(formattedDate) ??
         'Tankstellen — trip on $formattedDate';
     final messenger = ScaffoldMessenger.maybeOf(context);
-    final renderer = debugTripDetailShareOverride ?? shareTripAsImage;
+    final renderer = debugTripDetailShareOverride ?? shareWidgetAsImage;
     try {
       await renderer(
         boundaryKey: _shareBoundaryKey,

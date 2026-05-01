@@ -3408,6 +3408,17 @@ class AppLocalizationsNl extends AppLocalizations {
       'Smarter drive — favours steady highway over zigzag shortcuts.';
 
   @override
+  String get favoritesShareAction => 'Share';
+
+  @override
+  String favoritesShareSubject(String date) {
+    return 'Tankstellen — favourites on $date';
+  }
+
+  @override
+  String get favoritesShareError => 'Couldn\'t generate share image';
+
+  @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
 
   @override
