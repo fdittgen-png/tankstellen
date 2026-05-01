@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../app/router.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/cold_start_baselines.dart';
 import '../../domain/situation_classifier.dart';
@@ -73,7 +73,15 @@ class TripRecordingBanner extends ConsumerWidget {
                 bottom: false,
                 child: InkWell(
                   key: const Key('tripRecordingBanner'),
-                  onTap: () => GoRouter.of(context).push('/trip-recording'),
+                  // #1322 — read the router from Riverpod instead of
+                  // looking it up in `context`. The banner is mounted
+                  // inside `MaterialApp.router(builder: …)` (see
+                  // `lib/app/app.dart`), so this BuildContext is above
+                  // the GoRouter's widget tree and `GoRouter.of(context)`
+                  // throws "No GoRouter found in context". The Riverpod
+                  // lookup has no InheritedWidget dependency and works
+                  // from anywhere under the ProviderScope.
+                  onTap: () => ref.read(routerProvider).push('/trip-recording'),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 6),

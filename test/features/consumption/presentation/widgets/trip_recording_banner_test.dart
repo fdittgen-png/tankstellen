@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:tankstellen/app/router.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/domain/cold_start_baselines.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_recording_banner.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -132,6 +136,88 @@ void main() {
       expect(label, contains('-12%'));
       expect(label, isNot(contains('+-12%')));
       handle.dispose();
+    });
+  });
+
+  group('TripRecordingBanner navigation (#1322)', () {
+    // Regression: the banner is mounted in `MaterialApp.router(builder: …)`
+    // (see `lib/app/app.dart`), so its BuildContext sits ABOVE the GoRouter's
+    // widget tree. `GoRouter.of(context)` therefore throws "No GoRouter
+    // found in context" — reproduced from the privacy-dashboard route.
+    // The fix reads the router via Riverpod, which has no InheritedWidget
+    // dependency. This test pumps the banner inside a plain `MaterialApp`
+    // (NOT `MaterialApp.router`) to exercise the same structural scope.
+    testWidgets(
+        'tap pushes /trip-recording via Riverpod-provided router '
+        '— survives mounting outside the GoRouter widget scope',
+        (tester) async {
+      // Mirror the production wiring exactly: the banner sits in
+      // MaterialApp.router's `builder` (above the GoRouter's widget
+      // tree). `GoRouter.of(context)` would throw "No GoRouter found
+      // in context" from this scope — that's the #1322 bug. The fix
+      // reads the router via Riverpod, which has no InheritedWidget
+      // dependency.
+      String? landedOn;
+      final fakeRouter = GoRouter(
+        initialLocation: '/from',
+        routes: [
+          GoRoute(path: '/from', builder: (_, _) => const Text('from')),
+          GoRoute(
+            path: '/trip-recording',
+            builder: (_, _) {
+              landedOn = '/trip-recording';
+              return const Text('trip-recording');
+            },
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            tripRecordingProvider.overrideWith(
+              () => _FakeTripRecording(_activeState()),
+            ),
+            routerProvider.overrideWith((_) => fakeRouter),
+          ],
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: fakeRouter,
+            builder: (context, child) => TripRecordingBanner(
+              child: child ?? const SizedBox.shrink(),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      // Sanity: we start on /from, banner is mounted ABOVE that route's
+      // widget tree (i.e. outside the InheritedGoRouter scope).
+      expect(find.text('from'), findsOneWidget);
+      expect(find.byKey(const Key('tripRecordingBanner')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('tripRecordingBanner')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      expect(landedOn, '/trip-recording',
+          reason: 'banner should have pushed via the Riverpod-provided '
+              'router; if this fails the GoRouter.of(context) regression '
+              'is back');
+      expect(find.text('trip-recording'), findsOneWidget);
+    });
+
+    testWidgets('idle state renders no banner — no tap target exists',
+        (tester) async {
+      // No provider override: TripRecording.build() throws because it
+      // expects a vehicle/baselines wired up, so we must override with
+      // an idle fake to keep the banner-zero-height path deterministic.
+      await pumpApp(
+        tester,
+        const TripRecordingBanner(child: SizedBox(key: Key('child'))),
+      );
+      expect(find.byKey(const Key('tripRecordingBanner')), findsNothing);
+      expect(find.byKey(const Key('child')), findsOneWidget);
     });
   });
 }
