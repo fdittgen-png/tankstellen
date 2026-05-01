@@ -3181,18 +3181,6 @@ abstract class AppLocalizations {
   /// **'Carbon dashboard'**
   String get carbonDashboardTitle;
 
-  /// No description provided for @carbonTabCharts.
-  ///
-  /// In en, this message translates to:
-  /// **'Charts'**
-  String get carbonTabCharts;
-
-  /// No description provided for @carbonTabAchievements.
-  ///
-  /// In en, this message translates to:
-  /// **'Achievements'**
-  String get carbonTabAchievements;
-
   /// No description provided for @carbonEmptyTitle.
   ///
   /// In en, this message translates to:
@@ -3228,120 +3216,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Monthly CO2 emissions'**
   String get monthlyEmissionsTitle;
-
-  /// No description provided for @milestonesTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Milestones'**
-  String get milestonesTitle;
-
-  /// No description provided for @milestoneFirstFillUp.
-  ///
-  /// In en, this message translates to:
-  /// **'First fill-up logged'**
-  String get milestoneFirstFillUp;
-
-  /// No description provided for @milestoneTenFillUps.
-  ///
-  /// In en, this message translates to:
-  /// **'10 fill-ups tracked'**
-  String get milestoneTenFillUps;
-
-  /// No description provided for @milestoneFiftyFillUps.
-  ///
-  /// In en, this message translates to:
-  /// **'50 fill-ups tracked'**
-  String get milestoneFiftyFillUps;
-
-  /// No description provided for @milestoneHundredLiters.
-  ///
-  /// In en, this message translates to:
-  /// **'100 L tracked'**
-  String get milestoneHundredLiters;
-
-  /// No description provided for @milestoneThousandLiters.
-  ///
-  /// In en, this message translates to:
-  /// **'1000 L tracked'**
-  String get milestoneThousandLiters;
-
-  /// No description provided for @milestoneHundredKgCo2.
-  ///
-  /// In en, this message translates to:
-  /// **'100 kg CO2 tracked'**
-  String get milestoneHundredKgCo2;
-
-  /// No description provided for @milestoneOneTonneCo2.
-  ///
-  /// In en, this message translates to:
-  /// **'1 tonne CO2 tracked'**
-  String get milestoneOneTonneCo2;
-
-  /// No description provided for @milestoneThousandKm.
-  ///
-  /// In en, this message translates to:
-  /// **'1000 km driven'**
-  String get milestoneThousandKm;
-
-  /// No description provided for @milestoneTenThousandKm.
-  ///
-  /// In en, this message translates to:
-  /// **'10,000 km driven'**
-  String get milestoneTenThousandKm;
-
-  /// No description provided for @fuelVsEvTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Fuel vs EV'**
-  String get fuelVsEvTitle;
-
-  /// No description provided for @fuelVsEvSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'CO2 comparison for the same distance driven'**
-  String get fuelVsEvSubtitle;
-
-  /// No description provided for @fuelVsEvYourFuel.
-  ///
-  /// In en, this message translates to:
-  /// **'Your fuel'**
-  String get fuelVsEvYourFuel;
-
-  /// No description provided for @fuelVsEvEquivalent.
-  ///
-  /// In en, this message translates to:
-  /// **'Equivalent EV'**
-  String get fuelVsEvEquivalent;
-
-  /// No description provided for @fuelVsEvDistance.
-  ///
-  /// In en, this message translates to:
-  /// **'Distance'**
-  String get fuelVsEvDistance;
-
-  /// No description provided for @fuelVsEvDifference.
-  ///
-  /// In en, this message translates to:
-  /// **'Difference'**
-  String get fuelVsEvDifference;
-
-  /// No description provided for @shareProgress.
-  ///
-  /// In en, this message translates to:
-  /// **'Share'**
-  String get shareProgress;
-
-  /// No description provided for @shareCopied.
-  ///
-  /// In en, this message translates to:
-  /// **'Copied to clipboard'**
-  String get shareCopied;
-
-  /// No description provided for @shareCo2Message.
-  ///
-  /// In en, this message translates to:
-  /// **'I tracked {kg} kg CO2 with Tankstellen.'**
-  String shareCo2Message(String kg);
 
   /// No description provided for @vehiclesTitle.
   ///

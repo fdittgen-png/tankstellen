@@ -40,9 +40,6 @@ void main() {
       // running rationale list — keep adjacent to the Set so future
       // additions stay justified.
       //
-      // - carbon_dashboard_screen.dart  : `titleLarge` for big total
-      //   cost / total CO2 numbers on two SectionCards. Numeric
-      //   value emphasis, not a heading.
       // - ev/ev_station_detail_screen.dart : `titleMedium` "Connectors"
       //   label. Migration to SectionHeader tracked as #923-followup.
       // - alerts_screen.dart : `titleMedium` "Radius alerts (n)"
@@ -69,7 +66,6 @@ void main() {
       //   `titleLarge` in Hero flight + `titleMedium` "Price History"
       //   section header.
       const allowlist = <String>{
-        'lib/features/carbon/presentation/screens/carbon_dashboard_screen.dart',
         'lib/features/ev/presentation/screens/ev_station_detail_screen.dart',
         'lib/features/alerts/presentation/screens/alerts_screen.dart',
         'lib/features/price_history/presentation/screens/price_history_screen.dart',
