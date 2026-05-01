@@ -4181,6 +4181,18 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aktive Fahrt aus dem Verbrauchs-Tab öffnen';
 
   @override
+  String get unifiedFilterFuel => 'Kraftstoff';
+
+  @override
+  String get unifiedFilterEv => 'EV';
+
+  @override
+  String get unifiedFilterBoth => 'Beide';
+
+  @override
+  String get unifiedNoResultsForFilter => 'Keine Ergebnisse für diesen Filter';
+
+  @override
   String get vinLabel => 'FIN (optional)';
 
   @override

@@ -1063,5 +1063,9 @@
   "speedConsumptionNeedMoreData": "Plus de données nécessaires",
   "refuelUnitPerLiter": "/L",
   "refuelUnitPerKwh": "/kWh",
-  "refuelUnitPerSession": "/séance"
+  "refuelUnitPerSession": "/séance",
+  "unifiedFilterFuel": "Carburant",
+  "unifiedFilterEv": "VE",
+  "unifiedFilterBoth": "Les deux",
+  "unifiedNoResultsForFilter": "Aucun résultat pour ce filtre"
 }
