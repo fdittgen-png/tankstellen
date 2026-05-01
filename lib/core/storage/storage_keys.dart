@@ -61,4 +61,12 @@ class StorageKeys {
   /// fires twice for the same user.
   static const String tripRecordingResumeHintShown =
       'trip_recording_resume_hint_shown';
+
+  /// #1116 phase 3 — feature flag for the unified fuel + EV search
+  /// results list. Defaults to `false`; flipping it on swaps the
+  /// fuel-only `searchStateProvider` consumption for
+  /// `unifiedSearchResultsProvider`. UI cards land in phase 3b; this
+  /// flag is a no-op until then.
+  static const String unifiedSearchResultsEnabled =
+      'unified_search_results_enabled';
 }
