@@ -60,6 +60,26 @@ enum TripRecordingControllerState {
   stopped,
 }
 
+/// Why the controller transitioned into
+/// [TripRecordingControllerState.pausedDueToDrop] (#1330 phase 3).
+///
+/// Distinguishes the two failure modes that share the
+/// pause-with-grace recovery path:
+///
+///  * [transportError] — repeated transport-level failures
+///    (BT link dropped, three consecutive errors within the window,
+///    or a typed `Obd2DisconnectedException`). The user-visible
+///    surface is "OBD2 connection lost".
+///  * [silentFailure] — adapter is connected and answering, but every
+///    high-priority PID parse returns null for [_silentFailureThreshold]
+///    consecutive ticks. ECU off, vehicle protocol mismatch, defective
+///    adapter firmware. Without this signal the user sees "trip
+///    recorded" with empty charts and no notification (#1330).
+enum TripDropReason {
+  transportError,
+  silentFailure,
+}
+
 /// Drives the priority-tiered PID polling loop that feeds an
 /// [Obd2Service]'s live PIDs into a [TripRecorder] (#726, #814).
 ///
@@ -190,6 +210,15 @@ class TripRecordingController {
   final Duration _dropWindow;
   final int _dropThreshold;
 
+  /// Threshold for the "adapter connected but every PID parse returns
+  /// null" silent-failure heuristic (#1330 phase 3). At the 5 Hz fast
+  /// tier 50 consecutive null parses ≈ 10 s — long enough to ride out a
+  /// brief noise burst, short enough that the user gets a notification
+  /// before they've driven a meaningful distance with no data.
+  /// Test-only: tests inject a small value (e.g. 3) so a fake service
+  /// can drive the counter past the threshold without 50 round-trips.
+  final int _silentFailureThreshold;
+
   /// Pinned adapter MAC that the auto-reconnect scanner (#797 phase 3)
   /// will search for when a drop flips us into
   /// [TripRecordingControllerState.pausedDueToDrop]. Null-able
@@ -236,6 +265,33 @@ class TripRecordingController {
   /// Consecutive-error bookkeeping for the drop heuristic. First entry
   /// is the oldest. Reset on a successful transport read.
   final List<DateTime> _recentErrors = <DateTime>[];
+
+  /// Consecutive-null-parse counter for the silent-failure heuristic
+  /// (#1330 phase 3). Incremented from every high-priority PID
+  /// callback when the parser returns null; reset to zero the moment
+  /// any high-priority PID parses a non-null value. Distinct from
+  /// [_recentErrors] which counts *transport-level* failures —
+  /// silent-failure is the case where the transport is healthy but
+  /// the ECU never speaks.
+  int _consecutiveNullReads = 0;
+
+  /// Sticky flag so the silent-failure handler only fires once per
+  /// recording session — even if more null parses keep arriving past
+  /// the threshold, we don't want to keep re-entering [_handleDrop].
+  /// Reset on stop()/resume() so a subsequent recording (or a manual
+  /// resume followed by another silent stretch) can fire again.
+  bool _silentFailureFired = false;
+
+  /// Reason the most recent [_handleDrop] fired (#1330 phase 3).
+  /// Null when no drop has occurred. Read by the provider so the
+  /// pause banner can surface a different message on silent-failure
+  /// vs transport-error.
+  TripDropReason? _dropReason;
+
+  /// Why the controller flipped into
+  /// [TripRecordingControllerState.pausedDueToDrop] (#1330 phase 3).
+  /// Null when the controller is not in that state.
+  TripDropReason? get dropReason => _dropReason;
 
   /// Rolling buffer of `(timestamp, speedKmh)` samples used by the
   /// virtual odometer (#800). Populated by the 5 Hz speed
@@ -301,6 +357,7 @@ class TripRecordingController {
     Duration pauseGraceWindow = const Duration(minutes: 15),
     Duration dropWindow = const Duration(seconds: 5),
     int dropThreshold = 3,
+    int silentFailureThreshold = 50,
     Duration schedulerTickRate = const Duration(milliseconds: 100),
     String? pinnedAdapterMac,
     bool automatic = false,
@@ -320,6 +377,7 @@ class TripRecordingController {
         _pauseGraceWindow = pauseGraceWindow,
         _dropWindow = dropWindow,
         _dropThreshold = dropThreshold,
+        _silentFailureThreshold = silentFailureThreshold,
         _schedulerTickRate = schedulerTickRate,
         _pinnedAdapterMac = pinnedAdapterMac,
         _automatic = automatic,
@@ -375,6 +433,13 @@ class TripRecordingController {
       _graceTimer?.cancel();
       _graceTimer = null;
       _pausedDueToDrop = false;
+      _dropReason = null;
+      // #1330 phase 3 — clear the silent-failure latch so a
+      // post-resume stretch of nulls can fire again. Without this,
+      // a user who resumes after a silent-failure drop and then hits
+      // a fresh silent failure would never get a second snackbar.
+      _silentFailureFired = false;
+      _consecutiveNullReads = 0;
       // Also tear down the auto-reconnect scanner (#797 phase 3) —
       // either we got here because the scanner fired its callback
       // (in which case it already stopped itself), or the user
@@ -442,6 +507,8 @@ class TripRecordingController {
     _started = false;
     _stopped = true;
     _pausedDueToDrop = false;
+    _silentFailureFired = false;
+    _consecutiveNullReads = 0;
     _emitState();
     if (!_stateController.isClosed) {
       await _stateController.close();
@@ -701,9 +768,64 @@ class TripRecordingController {
     return false;
   }
 
-  void _handleDrop() {
+  /// Bookkeeping for the silent-failure heuristic (#1330 phase 3).
+  ///
+  /// Called from every high-priority PID callback right after the
+  /// parser returned. A null parse increments the consecutive-null
+  /// counter; ANY non-null parse resets it to zero — even from a
+  /// different PID, because we're trying to detect "ECU is dead",
+  /// not "this specific PID is unsupported".
+  ///
+  /// Once the counter reaches [_silentFailureThreshold] AND the
+  /// transport-error drop hasn't already fired, [_onSilentFailure]
+  /// drives the same pause-with-grace path that [_handleDrop] does
+  /// for transport errors, but stamps a [TripDropReason.silentFailure]
+  /// reason so the UI can surface a different message.
+  void _observeHighPriorityParse(Object? parsedValue) {
+    if (parsedValue != null) {
+      // ANY successful high-priority parse clears the window — we're
+      // detecting "ECU is dead", not "this one PID is unsupported".
+      _consecutiveNullReads = 0;
+      return;
+    }
+    if (_silentFailureFired) return;
+    if (_pausedDueToDrop || _stopped) return;
+    _consecutiveNullReads++;
+    if (_consecutiveNullReads >= _silentFailureThreshold) {
+      _onSilentFailure();
+    }
+  }
+
+  /// Silent-failure handler (#1330 phase 3). Fired exactly once per
+  /// recording session when the consecutive-null counter crosses the
+  /// threshold. Drives the same pause-with-grace recovery as
+  /// [_handleDrop] for transport errors, but tags the drop with
+  /// [TripDropReason.silentFailure] so the UI surfaces "OBD2 adapter
+  /// connected but not returning data" instead of "OBD2 connection
+  /// lost".
+  void _onSilentFailure() {
+    if (_silentFailureFired) return;
+    if (_pausedDueToDrop || _stopped) {
+      // The transport-error drop already paused us — don't double-fire
+      // and don't override the reason. The user is already seeing the
+      // "connection lost" banner; switching it mid-flight to "not
+      // responding" would be misleading.
+      return;
+    }
+    _silentFailureFired = true;
+    debugPrint(
+      'TripRecordingController: silent-failure detected — '
+      '$_consecutiveNullReads consecutive null PID parses',
+    );
+    _handleDrop(reason: TripDropReason.silentFailure);
+  }
+
+  void _handleDrop({
+    TripDropReason reason = TripDropReason.transportError,
+  }) {
     if (_pausedDueToDrop) return;
     _pausedDueToDrop = true;
+    _dropReason = reason;
     _scheduler?.stop();
     _recentErrors.clear();
     _persistPausedSnapshot();
@@ -854,6 +976,7 @@ class TripRecordingController {
       (r) {
         final v = Elm327Protocol.parseEngineRpm(r);
         if (v != null) _latestRpm = v;
+        _observeHighPriorityParse(v);
       },
     );
     scheduler.subscribe(
@@ -865,6 +988,7 @@ class TripRecordingController {
           _latestSpeedKmh = v.toDouble();
           _recordSpeedSample(v.toDouble());
         }
+        _observeHighPriorityParse(v);
       },
     );
     // MAF and MAP are the two alternate air-mass inputs to the fuel-
@@ -878,6 +1002,7 @@ class TripRecordingController {
         (r) {
           final v = Elm327Protocol.parseMafGramsPerSecond(r);
           if (v != null) _latestMaf = v;
+          _observeHighPriorityParse(v);
         },
       );
     }
@@ -888,6 +1013,7 @@ class TripRecordingController {
         (r) {
           final v = Elm327Protocol.parseManifoldPressureKpa(r);
           if (v != null) _latestMapKpa = v;
+          _observeHighPriorityParse(v);
         },
       );
     }
@@ -897,6 +1023,7 @@ class TripRecordingController {
       (r) {
         final v = Elm327Protocol.parseThrottlePercent(r);
         if (v != null) _latestThrottlePercent = v;
+        _observeHighPriorityParse(v);
       },
     );
     // PID 5E is only present on ~2014+ ECUs. Skip when #811 discovery
@@ -909,6 +1036,7 @@ class TripRecordingController {
         (r) {
           final v = Elm327Protocol.parseFuelRateLPerHour(r);
           if (v != null) _latestDirectFuelRate = v;
+          _observeHighPriorityParse(v);
         },
       );
     }
@@ -1150,6 +1278,26 @@ class TripRecordingController {
   void debugTriggerDrop() {
     _handleDrop();
   }
+
+  /// Exposed for tests: drive the silent-failure observer with a
+  /// hand-built parse outcome so tests don't have to spin up a fake
+  /// service that returns null forever (#1330 phase 3). Pass `null`
+  /// to increment the counter, any non-null value to reset it.
+  @visibleForTesting
+  void debugObserveHighPriorityParse(Object? parsedValue) {
+    _observeHighPriorityParse(parsedValue);
+  }
+
+  /// Exposed for tests: current consecutive-null count. Lets the
+  /// silent-failure tests assert "49 nulls did NOT trigger" before
+  /// the 50th lands (#1330 phase 3).
+  @visibleForTesting
+  int get debugConsecutiveNullReads => _consecutiveNullReads;
+
+  /// Exposed for tests: whether the silent-failure handler has fired
+  /// for this recording session. Resets on resume() / stop().
+  @visibleForTesting
+  bool get debugSilentFailureFired => _silentFailureFired;
 
   /// Exposed for tests: synchronously drive the grace-window
   /// finalisation path. Useful with fake-async patterns where

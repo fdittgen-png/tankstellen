@@ -4122,6 +4122,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trajetDetailDeleteConfirmConfirm => 'Löschen';
 
   @override
+  String get tripRecordingObd2NotResponding =>
+      'OBD2-Adapter verbunden, aber liefert keine Daten. Probiere einen anderen Adapter oder prüfe das Diagnose-Protokoll des Fahrzeugs.';
+
+  @override
   String get tripLengthCardTitle => 'Verbrauch nach Fahrtlänge';
 
   @override

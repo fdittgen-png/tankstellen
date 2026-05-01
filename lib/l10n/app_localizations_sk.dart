@@ -4086,6 +4086,10 @@ class AppLocalizationsSk extends AppLocalizations {
   String get trajetDetailDeleteConfirmConfirm => 'Delete';
 
   @override
+  String get tripRecordingObd2NotResponding =>
+      'OBD2 adapter connected but not returning data. Try a different adapter or check the vehicle\'s diagnostic protocol.';
+
+  @override
   String get tripLengthCardTitle => 'Consumption by trip length';
 
   @override

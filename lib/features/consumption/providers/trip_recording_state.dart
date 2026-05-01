@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../data/obd2/trip_live_reading.dart';
+import '../data/obd2/trip_recording_controller.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/situation_classifier.dart';
 import 'trip_recording_phase.dart';
@@ -19,12 +19,19 @@ class TripRecordingState {
   /// be computed (idle uses L/h — caller formats it differently).
   final double? liveDeltaFraction;
 
+  /// Why the controller flipped into [TripRecordingPhase.pausedDueToDrop]
+  /// (#1330 phase 3). Null in any other phase. Drives the pause-banner
+  /// copy: "OBD2 connection lost" for transport errors, "OBD2 adapter
+  /// connected but not returning data" for silent failure.
+  final TripDropReason? dropReason;
+
   const TripRecordingState({
     this.phase = TripRecordingPhase.idle,
     this.live,
     this.situation = DrivingSituation.idle,
     this.band = ConsumptionBand.normal,
     this.liveDeltaFraction,
+    this.dropReason,
   });
 
   TripRecordingState copyWith({
@@ -34,6 +41,8 @@ class TripRecordingState {
     ConsumptionBand? band,
     double? liveDeltaFraction,
     bool clearDelta = false,
+    TripDropReason? dropReason,
+    bool clearDropReason = false,
   }) =>
       TripRecordingState(
         phase: phase ?? this.phase,
@@ -43,6 +52,9 @@ class TripRecordingState {
         liveDeltaFraction: clearDelta
             ? null
             : (liveDeltaFraction ?? this.liveDeltaFraction),
+        dropReason: clearDropReason
+            ? null
+            : (dropReason ?? this.dropReason),
       );
 
   bool get isActive =>

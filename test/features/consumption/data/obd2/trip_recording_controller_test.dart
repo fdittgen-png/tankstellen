@@ -725,6 +725,233 @@ void main() {
       expect(pausedRepo.loadAll(), isEmpty);
     });
   });
+
+  group('silent-failure detection — #1330 phase 3', () {
+    late Directory tmpDir;
+    late Box<String> pausedBox;
+    late Box<String> historyBox;
+    late PausedTripRepository pausedRepo;
+    late TripHistoryRepository historyRepo;
+
+    setUp(() async {
+      tmpDir = Directory.systemTemp.createTempSync('silent_fail_test_');
+      Hive.init(tmpDir.path);
+      pausedBox = await Hive.openBox<String>(
+        'paused_${DateTime.now().microsecondsSinceEpoch}',
+      );
+      historyBox = await Hive.openBox<String>(
+        'history_${DateTime.now().microsecondsSinceEpoch}',
+      );
+      pausedRepo = PausedTripRepository(box: pausedBox);
+      historyRepo = TripHistoryRepository(box: historyBox);
+    });
+
+    tearDown(() async {
+      await pausedBox.deleteFromDisk();
+      await historyBox.deleteFromDisk();
+      await Hive.close();
+      tmpDir.deleteSync(recursive: true);
+    });
+
+    Map<String, String> initResponses() => {
+          'ATZ': 'ELM327 v1.5>',
+          'ATE0': 'OK>',
+          'ATL0': 'OK>',
+          'ATH0': 'OK>',
+          'ATSP0': 'OK>',
+          '01A6': 'NO DATA>',
+        };
+
+    test(
+        'counter resets on a non-null parse — 49 nulls then a hit '
+        'must NOT trigger silent failure', () async {
+      // Pin the threshold at 50 (the production constant) so the test
+      // proves the boundary the user-visible code is actually using.
+      // 49 nulls then a non-null reset, then 49 more nulls — neither
+      // run reaches 50 because the reset zeroed the counter.
+      final transport = FakeObd2Transport(initResponses());
+      await transport.connect();
+      final ctl = TripRecordingController(
+        service: Obd2Service(transport),
+        pollInterval: const Duration(minutes: 1),
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+        // Default threshold = 50.
+      );
+      await ctl.start();
+
+      // 49 consecutive null parses — one short of the threshold.
+      for (var i = 0; i < 49; i++) {
+        ctl.debugObserveHighPriorityParse(null);
+      }
+      expect(ctl.debugConsecutiveNullReads, 49);
+      expect(ctl.debugSilentFailureFired, isFalse);
+      expect(
+        ctl.currentState,
+        TripRecordingControllerState.recording,
+        reason: '49 nulls is one short of the threshold; no drop yet',
+      );
+
+      // A single non-null parse zeroes the counter.
+      ctl.debugObserveHighPriorityParse(1234);
+      expect(ctl.debugConsecutiveNullReads, 0,
+          reason: 'any non-null high-priority parse must reset the '
+              'consecutive-null counter to zero');
+
+      // Another 49 nulls — still under the threshold because the
+      // counter was reset by the non-null read above.
+      for (var i = 0; i < 49; i++) {
+        ctl.debugObserveHighPriorityParse(null);
+      }
+      expect(ctl.debugSilentFailureFired, isFalse);
+      expect(
+        ctl.currentState,
+        TripRecordingControllerState.recording,
+        reason: 'a single non-null read between two 49-null runs '
+            'must keep the controller in recording state',
+      );
+      expect(pausedRepo.loadAll(), isEmpty,
+          reason: 'no drop fired → no paused-trip snapshot should '
+              'have been persisted',
+      );
+    });
+
+    test(
+        'fires exactly once after threshold consecutive null parses '
+        'with TripDropReason.silentFailure', () async {
+      // Drive the threshold via the constructor override so the test
+      // doesn't have to push 50 events. The default threshold is 50;
+      // a value of 5 here is purely a test-ergonomics dial.
+      final transport = FakeObd2Transport(initResponses());
+      await transport.connect();
+      final ctl = TripRecordingController(
+        service: Obd2Service(transport),
+        pollInterval: const Duration(minutes: 1),
+        vehicleId: 'silent-failure-car',
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+        pauseGraceWindow: const Duration(minutes: 5),
+        silentFailureThreshold: 5,
+      );
+      final states = <TripRecordingControllerState>[];
+      final sub = ctl.stateChanges.listen(states.add);
+      await ctl.start();
+
+      // 4 nulls — still under the test threshold.
+      for (var i = 0; i < 4; i++) {
+        ctl.debugObserveHighPriorityParse(null);
+      }
+      expect(ctl.debugSilentFailureFired, isFalse);
+
+      // 5th null → fires the silent-failure handler.
+      ctl.debugObserveHighPriorityParse(null);
+      // The state stream is a broadcast controller — it delivers
+      // events on the microtask loop. A short async hop lets the
+      // listener catch the pausedDueToDrop transition.
+      await Future<void>.delayed(Duration.zero);
+
+      expect(ctl.debugSilentFailureFired, isTrue);
+      expect(
+        ctl.currentState,
+        TripRecordingControllerState.pausedDueToDrop,
+        reason: 'silent failure must drive the same pause-with-grace '
+            'state as a transport-error drop',
+      );
+      expect(
+        ctl.dropReason,
+        TripDropReason.silentFailure,
+        reason: 'the drop reason exposed to the UI must distinguish '
+            'silent failure from transport error',
+      );
+      expect(
+        states,
+        contains(TripRecordingControllerState.pausedDueToDrop),
+        reason: 'state stream must surface the silent-failure-driven '
+            'transition so listeners (the provider, banners) react',
+      );
+
+      // A snapshot landed in the paused-trips box — same path as a
+      // transport-error drop.
+      expect(pausedRepo.loadAll(), hasLength(1));
+      expect(pausedRepo.loadAll().single.vehicleId, 'silent-failure-car');
+
+      // Idempotency: more nulls past the threshold must NOT re-fire
+      // the handler — the latch prevents double-banner / double-save.
+      for (var i = 0; i < 20; i++) {
+        ctl.debugObserveHighPriorityParse(null);
+      }
+      // Still exactly one paused-trip row, still pausedDueToDrop.
+      expect(pausedRepo.loadAll(), hasLength(1),
+          reason: 'silent-failure handler must fire exactly once per '
+              'recording session — extra null parses past the '
+              'threshold are no-ops');
+      // No second pausedDueToDrop transition emitted.
+      final dropTransitions = states
+          .where((s) => s == TripRecordingControllerState.pausedDueToDrop)
+          .length;
+      expect(dropTransitions, 1,
+          reason: 'state stream must emit pausedDueToDrop exactly once');
+
+      await sub.cancel();
+    });
+
+    test(
+        'does NOT fire when the transport-error drop has already '
+        'paused the controller', () async {
+      // The transport-error drop fires first (via debugTriggerDrop).
+      // Subsequent null parses past the threshold must be a no-op —
+      // the user is already seeing the "connection lost" banner;
+      // switching to "not responding" mid-flight would be misleading.
+      final transport = FakeObd2Transport(initResponses());
+      await transport.connect();
+      final ctl = TripRecordingController(
+        service: Obd2Service(transport),
+        pollInterval: const Duration(minutes: 1),
+        vehicleId: 'transport-error-first',
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+        pauseGraceWindow: const Duration(minutes: 5),
+        silentFailureThreshold: 3,
+      );
+      await ctl.start();
+
+      // Existing transport-error drop fires — drop reason transportError.
+      ctl.debugTriggerDrop();
+      expect(
+        ctl.currentState,
+        TripRecordingControllerState.pausedDueToDrop,
+      );
+      expect(ctl.dropReason, TripDropReason.transportError);
+      expect(pausedRepo.loadAll(), hasLength(1));
+
+      // Now blast nulls well past the silent-failure threshold.
+      for (var i = 0; i < 20; i++) {
+        ctl.debugObserveHighPriorityParse(null);
+      }
+
+      // Reason must NOT have flipped — the user-visible message
+      // stays "connection lost", not "not responding".
+      expect(
+        ctl.dropReason,
+        TripDropReason.transportError,
+        reason: 'silent-failure path must be a no-op once the '
+            'transport-error drop has already fired',
+      );
+      expect(
+        ctl.debugSilentFailureFired,
+        isFalse,
+        reason: 'latch must NOT have been set — the silent-failure '
+            'handler short-circuited because pausedDueToDrop was '
+            'already true',
+      );
+      expect(
+        pausedRepo.loadAll(),
+        hasLength(1),
+        reason: 'no second paused-trip snapshot should have been '
+            'persisted — the silent-failure path is fully suppressed',
+      );
+    });
+  });
 }
 
 /// Counts how many times each command is sent. Used to assert

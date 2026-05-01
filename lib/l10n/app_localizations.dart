@@ -7574,6 +7574,12 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get trajetDetailDeleteConfirmConfirm;
 
+  /// OBD2 pause banner copy (#1330 phase 3) when the adapter is connected but every high-priority PID parse returned null for ~10 s. Distinct from the 'connection lost' message — the link is fine, but the ECU isn't answering. Suggests trying a different adapter or checking the vehicle's diagnostic protocol.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 adapter connected but not returning data. Try a different adapter or check the vehicle\'s diagnostic protocol.'**
+  String get tripRecordingObd2NotResponding;
+
   /// Title of the trip-length consumption card on the Carbon dashboard Charts tab — splits trips into short/medium/long buckets so the user can see cold-start fuel waste vs. cruising efficiency (#1191).
   ///
   /// In en, this message translates to:
