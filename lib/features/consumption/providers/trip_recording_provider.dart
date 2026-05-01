@@ -38,6 +38,10 @@ export 'haptic_feedback_policy.dart'
     show HapticIntensity, hapticForBandTransition;
 export 'trip_recording_phase.dart' show TripRecordingPhase;
 export 'trip_recording_state.dart' show TripRecordingState;
+// #1330 phase 3 — re-export TripDropReason so widgets watching
+// `tripRecordingProvider.select((s) => s.dropReason)` resolve the
+// type without a second import.
+export '../data/obd2/trip_recording_controller.dart' show TripDropReason;
 
 part 'trip_recording_provider.g.dart';
 
@@ -313,7 +317,21 @@ class TripRecording extends _$TripRecording {
     // live listener). Pure state transitions don't reshape band/delta,
     // so we only copyWith the phase here.
     _stateSub = ctl.stateChanges.listen((_) {
-      state = state.copyWith(phase: _phaseFor(ctl));
+      final newPhase = _phaseFor(ctl);
+      // #1330 phase 3 — surface the controller's drop reason so the
+      // pause banner can pick the right copy (transport error vs
+      // silent failure). Cleared when leaving the drop state.
+      if (newPhase == TripRecordingPhase.pausedDueToDrop) {
+        state = state.copyWith(
+          phase: newPhase,
+          dropReason: ctl.dropReason,
+        );
+      } else {
+        state = state.copyWith(
+          phase: newPhase,
+          clearDropReason: true,
+        );
+      }
       // #1303 — phase transitions force an immediate snapshot so
       // a recovered crash lands on the right phase (the controller
       // moving from recording → pausedDueToDrop should NOT be lost

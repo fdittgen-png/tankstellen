@@ -36,5 +36,6 @@
   "trajetDetailDeleteConfirmTitle": "Diese Fahrt löschen?",
   "trajetDetailDeleteConfirmBody": "Diese Fahrt wird dauerhaft aus deinem Verlauf entfernt.",
   "trajetDetailDeleteConfirmCancel": "Abbrechen",
-  "trajetDetailDeleteConfirmConfirm": "Löschen"
+  "trajetDetailDeleteConfirmConfirm": "Löschen",
+  "tripRecordingObd2NotResponding": "OBD2-Adapter verbunden, aber liefert keine Daten. Probiere einen anderen Adapter oder prüfe das Diagnose-Protokoll des Fahrzeugs."
 }

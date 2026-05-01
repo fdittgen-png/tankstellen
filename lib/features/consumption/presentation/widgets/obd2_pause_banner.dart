@@ -20,6 +20,13 @@ import '../../providers/trip_recording_provider.dart';
 /// The widget renders zero-height unless the phase is
 /// [TripRecordingPhase.pausedDueToDrop], so it's safe to drop into
 /// any layout that always-on renders the trip chrome.
+///
+/// #1330 phase 3 — when the drop reason is
+/// [TripDropReason.silentFailure] (adapter connected but every PID
+/// parse returned null) the banner swaps copy to
+/// `tripRecordingObd2NotResponding` so the user knows to try a
+/// different adapter rather than wait for a Bluetooth reconnect that
+/// never happens.
 class Obd2PauseBanner extends ConsumerWidget {
   const Obd2PauseBanner({super.key});
 
@@ -34,9 +41,13 @@ class Obd2PauseBanner extends ConsumerWidget {
     if (phase != TripRecordingPhase.pausedDueToDrop) {
       return const SizedBox.shrink();
     }
+    final dropReason = ref.watch(
+      tripRecordingProvider.select((s) => s.dropReason),
+    );
 
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final isSilentFailure = dropReason == TripDropReason.silentFailure;
     return MaterialBanner(
       key: const Key('obd2PauseBanner'),
       backgroundColor: theme.colorScheme.errorContainer,
@@ -44,12 +55,19 @@ class Obd2PauseBanner extends ConsumerWidget {
         color: theme.colorScheme.onErrorContainer,
       ),
       leading: Icon(
-        Icons.bluetooth_disabled,
+        isSilentFailure
+            ? Icons.report_gmailerrorred_outlined
+            : Icons.bluetooth_disabled,
         color: theme.colorScheme.onErrorContainer,
       ),
       content: Text(
-        l?.obd2PauseBannerTitle ??
-            'OBD2 connection lost — recording paused',
+        isSilentFailure
+            ? (l?.tripRecordingObd2NotResponding ??
+                'OBD2 adapter connected but not returning data. Try a '
+                "different adapter or check the vehicle's diagnostic "
+                'protocol.')
+            : (l?.obd2PauseBannerTitle ??
+                'OBD2 connection lost — recording paused'),
       ),
       actions: [
         TextButton(
