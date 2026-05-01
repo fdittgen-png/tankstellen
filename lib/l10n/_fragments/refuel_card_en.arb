@@ -1,0 +1,14 @@
+{
+  "refuelUnitPerLiter": "/L",
+  "@refuelUnitPerLiter": {
+    "description": "Trailing unit suffix on a fuel-pump price in the unified RefuelOptionCard (#1116 phase 3b). Renders below the numeric price (e.g. \"1,799\" + \"/L\" → \"1,799 /L\")."
+  },
+  "refuelUnitPerKwh": "/kWh",
+  "@refuelUnitPerKwh": {
+    "description": "Trailing unit suffix on an EV charging price in the unified RefuelOptionCard (#1116 phase 3b)."
+  },
+  "refuelUnitPerSession": "/session",
+  "@refuelUnitPerSession": {
+    "description": "Trailing unit suffix when an EV network bills a flat per-session price instead of per-kWh in the unified RefuelOptionCard (#1116 phase 3b)."
+  }
+}

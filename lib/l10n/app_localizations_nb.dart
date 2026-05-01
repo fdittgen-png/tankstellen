@@ -3794,6 +3794,15 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String get refuelUnitPerLiter => '/L';
+
+  @override
+  String get refuelUnitPerKwh => '/kWh';
+
+  @override
+  String get refuelUnitPerSession => '/session';
+
+  @override
   String get speedConsumptionCardTitle => 'Consumption by speed';
 
   @override
