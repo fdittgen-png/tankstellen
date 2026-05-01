@@ -36,7 +36,7 @@ class LoyaltySettingsScreen extends ConsumerWidget {
           'Apply your loyalty discount to displayed prices',
       bannerIcon: Icons.card_membership,
       body: cards.isEmpty
-          ? LoyaltyEmptyState(onAdd: () => _openAddSheet(context, ref))
+          ? const LoyaltyEmptyState()
           : ListView.separated(
               padding: const EdgeInsets.only(bottom: 96),
               itemCount: cards.length,
