@@ -1,3 +1,5 @@
+import 'adapters/smart_obd_adapter.dart';
+import 'adapters/v_linker_fs_adapter.dart';
 import 'elm327_adapter.dart';
 import 'elm327_protocol.dart';
 
@@ -68,31 +70,11 @@ class Obd2AdapterProfile {
   /// generic-fallback profile that has no naming signature.
   final List<String> nameMatchers;
 
-  /// Some clones need a few hundred ms between consecutive ELM
-  /// init commands — otherwise the chip drops bytes. Default is
-  /// 100 ms (what [Obd2Service.connect] already does).
-  ///
-  /// Deprecated in #1330 phase 1 — use [adapter.postResetDelay] /
-  /// [adapter.interCommandDelay] instead. Field stays in place so
-  /// the few historical call sites still compile; will be removed
-  /// in phase 2 once every caller routes through [adapter].
-  @Deprecated('Use adapter.postResetDelay / adapter.interCommandDelay')
-  final Duration initDelay;
-
-  /// Extra AT commands appended after the shared init sequence
-  /// (e.g. `ATSP6\r` to pin ISO 15765-4 on Volvos; `ATST FF\r` for
-  /// slow cars that miss the default 200 ms timeout).
-  ///
-  /// Deprecated in #1330 phase 1 — use [adapter.extraInitCommands]
-  /// instead. Removed in phase 2.
-  @Deprecated('Use adapter.extraInitCommands')
-  final List<String> extraInitCommands;
-
   /// Per-adapter ELM327 protocol quirks (#1330): init sequence,
-  /// timing, response pre-parse hook. Phase 1 ships only the
-  /// [GenericElm327Adapter] default — runtime behaviour is identical
-  /// for every profile until phases 2/3 introduce specialised
-  /// adapters.
+  /// timing, response pre-parse hook. Phase 2 ships
+  /// [GenericElm327Adapter] as the default, [VLinkerFsAdapter] for
+  /// vLinker FS-class adapters, and [SmartObdAdapter] for SmartOBD
+  /// clones (which need longer delays + a stray-`>` preParse).
   final Elm327Adapter adapter;
 
   const Obd2AdapterProfile({
@@ -103,8 +85,6 @@ class Obd2AdapterProfile {
     this.writeCharUuid = '',
     this.notifyCharUuid = '',
     this.nameMatchers = const [],
-    this.initDelay = const Duration(milliseconds: 100),
-    this.extraInitCommands = const [],
     this.adapter = const GenericElm327Adapter(),
   });
 
@@ -215,6 +195,7 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     displayName: 'vLinker FS (Classic)',
     transport: BluetoothTransport.classic,
     nameMatchers: ['vlinker fs', 'vlinker ms', 'vlink fs', 'vgate fs'],
+    adapter: VLinkerFsAdapter(),
   ),
   // vLinker FD / MC — the BLE variants. Nordic UART: FFF0 service,
   // FFF2 write, FFF1 notify. Name advertises as "vLinker FD" / "MC".
@@ -267,12 +248,14 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
     notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
     nameMatchers: ['smartobd'],
+    adapter: SmartObdAdapter(),
   ),
   Obd2AdapterProfile(
     id: 'smartobd-classic',
     displayName: 'SmartOBD (Classic)',
     transport: BluetoothTransport.classic,
     nameMatchers: ['smartobd'],
+    adapter: SmartObdAdapter(),
   ),
   // ieGeek Scanner — ELM327 v2.1 BLE clone, advertises as "ieGeek…"
   // (#949). Nordic UART FFF0 family.
@@ -346,7 +329,6 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
     writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
     notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
-    initDelay: Duration(milliseconds: 300),
   ),
   // Generic ELM327 Classic SPP fallback (#761). Matches any bonded
   // device whose name contains "obd" or "elm327" — the common ones
@@ -358,7 +340,6 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     displayName: 'Generic ELM327 (Classic)',
     transport: BluetoothTransport.classic,
     nameMatchers: ['obdii', 'obd-ii', 'obd ii', 'obd2', 'elm327'],
-    initDelay: Duration(milliseconds: 300),
   ),
 ];
 
