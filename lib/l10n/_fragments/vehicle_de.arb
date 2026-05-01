@@ -7,5 +7,6 @@
   "vehicleReadVinFromCarButton": "FIN aus dem Auto auslesen",
   "vehicleReadVinFromCarTooltip": "FIN vom gekoppelten OBD2-Adapter auslesen",
   "vehicleReadVinFailedUnsupportedSnackbar": "FIN nicht verfügbar (Modus 09 PID 02 wird vor 2005 nicht unterstützt)",
-  "vehicleReadVinFailedGenericSnackbar": "FIN-Auslesen fehlgeschlagen — bitte manuell eingeben"
+  "vehicleReadVinFailedGenericSnackbar": "FIN-Auslesen fehlgeschlagen — bitte manuell eingeben",
+  "vehicleReadVinNoAdapterHint": "OBD2-Adapter koppeln, um VIN automatisch auszulesen"
 }

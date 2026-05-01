@@ -1634,6 +1634,7 @@
   "vehicleReadVinFromCarTooltip": "FIN vom gekoppelten OBD2-Adapter auslesen",
   "vehicleReadVinFailedUnsupportedSnackbar": "FIN nicht verfügbar (Modus 09 PID 02 wird vor 2005 nicht unterstützt)",
   "vehicleReadVinFailedGenericSnackbar": "FIN-Auslesen fehlgeschlagen — bitte manuell eingeben",
+  "vehicleReadVinNoAdapterHint": "OBD2-Adapter koppeln, um VIN automatisch auszulesen",
   "vinInfoTooltip": "Was ist eine FIN?",
   "vinInfoSectionWhatTitle": "Was ist eine FIN?",
   "vinInfoSectionWhatBody": "Die Fahrzeug-Identifizierungsnummer ist ein 17-stelliger Code, der Ihr Fahrzeug eindeutig kennzeichnet. Sie ist im Chassis eingeprägt und steht in Ihrem Fahrzeugschein.",

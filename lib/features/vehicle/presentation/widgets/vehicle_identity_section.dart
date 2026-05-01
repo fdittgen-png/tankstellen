@@ -11,10 +11,12 @@ import '../../../../l10n/app_localizations.dart';
 /// this widget is intentionally dumb so all VIN-decoder state stays
 /// at the screen level where the provider already lives.
 ///
-/// When the active profile has a paired OBD2 adapter, the section
-/// also shows a "Read VIN from car" button that triggers a Mode 09
-/// PID 02 read against the adapter (#1162). The button is hidden
-/// otherwise so users without an adapter don't see a no-op control.
+/// The section also shows a "Read VIN from car" button that triggers a
+/// Mode 09 PID 02 read against the paired OBD2 adapter (#1162). The
+/// button is always rendered (#1328); when no adapter is paired
+/// ([pairedAdapterMac] is null OR [onReadVinFromCar] is null) it is
+/// shown visibly disabled with a small helper text, so users discover
+/// the feature even before pairing.
 class VehicleIdentitySection extends StatelessWidget {
   final TextEditingController nameController;
   final TextEditingController vinController;
@@ -24,13 +26,16 @@ class VehicleIdentitySection extends StatelessWidget {
   final VoidCallback onDecodeVin;
   final VoidCallback onShowVinInfo;
 
-  /// Optional — when non-null, render the "Read VIN from car" button
-  /// (#1162). The screen passes the active profile's
-  /// `pairedAdapterMac` here; null hides the button entirely.
+  /// The active profile's paired adapter MAC (#1162). When null AND
+  /// [onReadVinFromCar] is null, the "Read VIN from car" button is
+  /// rendered disabled with a helper hint instead of being hidden — see
+  /// #1328 for why discoverability beats minimalism here.
   final String? pairedAdapterMac;
 
   /// Callback fired when the user taps the "Read VIN from car" button
-  /// (#1162). Required when [pairedAdapterMac] is non-null.
+  /// (#1162). When null, the button is rendered visibly disabled
+  /// (Flutter's stock OutlinedButton handling) with a small helper
+  /// hint underneath telling the user to pair an adapter first.
   final VoidCallback? onReadVinFromCar;
 
   /// True while the OBD2 VIN read is in flight (#1162). Disables the
@@ -123,31 +128,57 @@ class VehicleIdentitySection extends StatelessWidget {
             ),
           ],
         ),
-        // "Read VIN from car" — only visible when a paired adapter is
-        // available (#1162). Renders below the VIN row so the visual
-        // grouping mirrors the relationship: this button writes into
-        // the VIN field above. Disabled while a read is in flight to
-        // prevent double-taps spawning concurrent OBD2 sessions.
-        if (pairedAdapterMac != null && onReadVinFromCar != null) ...[
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: OutlinedButton.icon(
-              key: const Key('vehicleReadVinFromCar'),
-              onPressed: readingVinFromCar ? null : onReadVinFromCar,
-              icon: readingVinFromCar
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.bluetooth_searching),
-              label: Tooltip(
-                message: l?.vehicleReadVinFromCarTooltip ??
-                    'Read VIN from the paired OBD2 adapter',
-                child: Text(
-                  l?.vehicleReadVinFromCarButton ?? 'Read VIN from car',
-                ),
+        // "Read VIN from car" — always visible (#1328). When no
+        // adapter is paired, the button is rendered disabled with a
+        // small helper text so users discover the feature even before
+        // pairing. Renders below the VIN row so the visual grouping
+        // mirrors the relationship: this button writes into the VIN
+        // field above. Disabled while a read is in flight to prevent
+        // double-taps spawning concurrent OBD2 sessions.
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: OutlinedButton.icon(
+            key: const Key('vehicleReadVinFromCar'),
+            onPressed: (onReadVinFromCar == null || readingVinFromCar)
+                ? null
+                : onReadVinFromCar,
+            icon: readingVinFromCar
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.bluetooth_searching),
+            label: Tooltip(
+              message: l?.vehicleReadVinFromCarTooltip ??
+                  'Read VIN from the paired OBD2 adapter',
+              child: Text(
+                l?.vehicleReadVinFromCarButton ?? 'Read VIN from car',
+              ),
+            ),
+          ),
+        ),
+        // Helper text shown when the button is disabled because no
+        // adapter is paired yet (#1328). Tells the user how to enable
+        // the auto-read flow without forcing them to discover the
+        // pairing screen blindly. Wrapped in `Semantics(container: true)`
+        // so the label doesn't merge with the sibling info-icon
+        // Semantics annotation above (which would break the existing
+        // `bySemanticsLabel('What is a VIN?')` test in #895).
+        if (onReadVinFromCar == null) ...[
+          const SizedBox(height: 4),
+          Semantics(
+            container: true,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: Text(
+                l?.vehicleReadVinNoAdapterHint ??
+                    'Pair an OBD2 adapter first to read VIN automatically',
+                key: const Key('vehicleReadVinNoAdapterHint'),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ),
             ),
           ),

@@ -4160,6 +4160,10 @@ class AppLocalizationsLt extends AppLocalizations {
       'VIN read failed — please enter manually';
 
   @override
+  String get vehicleReadVinNoAdapterHint =>
+      'Pair an OBD2 adapter first to read VIN automatically';
+
+  @override
   String get vinInfoTooltip => 'What is a VIN?';
 
   @override

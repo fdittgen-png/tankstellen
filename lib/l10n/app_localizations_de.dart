@@ -4198,6 +4198,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'FIN-Auslesen fehlgeschlagen — bitte manuell eingeben';
 
   @override
+  String get vehicleReadVinNoAdapterHint =>
+      'OBD2-Adapter koppeln, um VIN automatisch auszulesen';
+
+  @override
   String get vinInfoTooltip => 'Was ist eine FIN?';
 
   @override
