@@ -12,11 +12,13 @@ import '../../../../l10n/app_localizations.dart';
 /// at the screen level where the provider already lives.
 ///
 /// The section also shows a "Read VIN from car" button that triggers a
-/// Mode 09 PID 02 read against the paired OBD2 adapter (#1162). The
-/// button is always rendered (#1328); when no adapter is paired
-/// ([pairedAdapterMac] is null OR [onReadVinFromCar] is null) it is
+/// Mode 09 PID 02 read against the selected OBD2 adapter (#1162). The
+/// button is always rendered (#1328); when no adapter is selected
+/// ([adapterMac] is null OR [onReadVinFromCar] is null) it is
 /// shown visibly disabled with a small helper text, so users discover
-/// the feature even before pairing.
+/// the feature even before pairing. (#1339 — gated on the basic
+/// `obd2AdapterMac` field, NOT the auto-record `pairedAdapterMac`
+/// flag, so the button enables as soon as the user picks an adapter.)
 class VehicleIdentitySection extends StatelessWidget {
   final TextEditingController nameController;
   final TextEditingController vinController;
@@ -26,11 +28,13 @@ class VehicleIdentitySection extends StatelessWidget {
   final VoidCallback onDecodeVin;
   final VoidCallback onShowVinInfo;
 
-  /// The active profile's paired adapter MAC (#1162). When null AND
-  /// [onReadVinFromCar] is null, the "Read VIN from car" button is
-  /// rendered disabled with a helper hint instead of being hidden — see
-  /// #1328 for why discoverability beats minimalism here.
-  final String? pairedAdapterMac;
+  /// The active profile's selected adapter MAC (#1162 / #1339). When
+  /// null AND [onReadVinFromCar] is null, the "Read VIN from car"
+  /// button is rendered disabled with a helper hint instead of being
+  /// hidden — see #1328 for why discoverability beats minimalism here.
+  /// This is the basic `obd2AdapterMac` selection (the bottom adapter-
+  /// picker), NOT the auto-record `pairedAdapterMac` flag (#1004).
+  final String? adapterMac;
 
   /// Callback fired when the user taps the "Read VIN from car" button
   /// (#1162). When null, the button is rendered visibly disabled
@@ -52,7 +56,7 @@ class VehicleIdentitySection extends StatelessWidget {
     required this.decodingVin,
     required this.onDecodeVin,
     required this.onShowVinInfo,
-    this.pairedAdapterMac,
+    this.adapterMac,
     this.onReadVinFromCar,
     this.readingVinFromCar = false,
   });

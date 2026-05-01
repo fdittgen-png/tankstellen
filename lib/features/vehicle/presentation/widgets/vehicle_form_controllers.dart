@@ -181,8 +181,9 @@ class VehicleFormSnapshot {
 
   /// Long-lived "this adapter belongs to this car" marker (#1004).
   /// Distinct from [adapterMac] — that field holds the currently-
-  /// connected adapter from the OBD2 picker. The read-VIN-from-car
-  /// button (#1162) gates on this field.
+  /// connected adapter from the OBD2 picker. The auto-record flow
+  /// (#1004) watches this field for BLE auto-connect; the
+  /// read-VIN-from-car button (#1162) gates on [adapterMac] (#1339).
   final String? pairedAdapterMac;
 
   final int? engineDisplacementCc;
