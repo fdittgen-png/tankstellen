@@ -7658,6 +7658,30 @@ abstract class AppLocalizations {
   /// **'Open the active trip from the Conso tab'**
   String get tripBannerOpenFromConsumptionTab;
 
+  /// Filter chip label that narrows the unified search list to fuel pumps only (#1116 phase 3c).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel'**
+  String get unifiedFilterFuel;
+
+  /// Filter chip label that narrows the unified search list to EV chargers only (#1116 phase 3c).
+  ///
+  /// In en, this message translates to:
+  /// **'EV'**
+  String get unifiedFilterEv;
+
+  /// Filter chip label that shows fuel pumps and EV chargers together in the unified search list (default selection, #1116 phase 3c).
+  ///
+  /// In en, this message translates to:
+  /// **'Both'**
+  String get unifiedFilterBoth;
+
+  /// Empty-state placeholder shown in the unified search list when the active filter (Fuel / EV / Both) leaves zero options (#1116 phase 3c).
+  ///
+  /// In en, this message translates to:
+  /// **'No results match this filter'**
+  String get unifiedNoResultsForFilter;
+
   /// No description provided for @vinLabel.
   ///
   /// In en, this message translates to:

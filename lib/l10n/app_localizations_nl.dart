@@ -4142,6 +4142,18 @@ class AppLocalizationsNl extends AppLocalizations {
       'Open the active trip from the Conso tab';
 
   @override
+  String get unifiedFilterFuel => 'Fuel';
+
+  @override
+  String get unifiedFilterEv => 'EV';
+
+  @override
+  String get unifiedFilterBoth => 'Both';
+
+  @override
+  String get unifiedNoResultsForFilter => 'No results match this filter';
+
+  @override
   String get vinLabel => 'VIN (optional)';
 
   @override

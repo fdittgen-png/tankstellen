@@ -4177,6 +4177,18 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ouvrez le trajet actif depuis l\'onglet Conso';
 
   @override
+  String get unifiedFilterFuel => 'Carburant';
+
+  @override
+  String get unifiedFilterEv => 'VE';
+
+  @override
+  String get unifiedFilterBoth => 'Les deux';
+
+  @override
+  String get unifiedNoResultsForFilter => 'Aucun résultat pour ce filtre';
+
+  @override
   String get vinLabel => 'VIN (optionnel)';
 
   @override

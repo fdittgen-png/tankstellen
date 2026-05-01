@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/refuel/unified_search_results_enabled.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -12,6 +13,7 @@ import '../../providers/search_provider.dart';
 import 'nearest_shortcut_card.dart';
 import 'route_results_view.dart';
 import 'search_results_list.dart';
+import 'unified_search_results_view.dart';
 
 /// Renders the result panel of `SearchScreen` based on the current
 /// [SearchMode] and [FuelType]:
@@ -40,6 +42,16 @@ class SearchResultsContent extends ConsumerWidget {
       return const CustomScrollView(
         slivers: [RouteResultsView()],
       );
+    }
+
+    // #1116 phase 3c — when the unified-search flag is on, the new
+    // mixed fuel + EV view owns the entire results panel (filter chips
+    // + RefuelOptionCard list). The flag is off by default so the
+    // legacy branches below remain the canonical path until the
+    // feature ships.
+    final unifiedEnabled = ref.watch(unifiedSearchResultsEnabledProvider);
+    if (unifiedEnabled) {
+      return const UnifiedSearchResultsView();
     }
 
     // #494 — the nearest-stations shortcut only makes sense for users

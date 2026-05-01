@@ -1,0 +1,18 @@
+{
+  "unifiedFilterFuel": "Fuel",
+  "@unifiedFilterFuel": {
+    "description": "Filter chip label that narrows the unified search list to fuel pumps only (#1116 phase 3c)."
+  },
+  "unifiedFilterEv": "EV",
+  "@unifiedFilterEv": {
+    "description": "Filter chip label that narrows the unified search list to EV chargers only (#1116 phase 3c)."
+  },
+  "unifiedFilterBoth": "Both",
+  "@unifiedFilterBoth": {
+    "description": "Filter chip label that shows fuel pumps and EV chargers together in the unified search list (default selection, #1116 phase 3c)."
+  },
+  "unifiedNoResultsForFilter": "No results match this filter",
+  "@unifiedNoResultsForFilter": {
+    "description": "Empty-state placeholder shown in the unified search list when the active filter (Fuel / EV / Both) leaves zero options (#1116 phase 3c)."
+  }
+}

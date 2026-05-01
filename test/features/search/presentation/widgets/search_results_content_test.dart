@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/core/refuel/unified_search_results_enabled.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/widgets/shimmer_placeholder.dart';
 import 'package:tankstellen/features/profile/domain/entities/user_profile.dart';
@@ -11,6 +12,7 @@ import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/nearest_shortcut_card.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_results_content.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_results_list.dart';
+import 'package:tankstellen/features/search/presentation/widgets/unified_search_results_view.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
@@ -135,7 +137,69 @@ void main() {
 
       expect(find.byType(SearchResultsList), findsOneWidget);
     });
+
+    testWidgets(
+        '#1116 phase 3c — when unified flag is on, renders '
+        'UnifiedSearchResultsView (not the legacy fuel branch)',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
+      when(() => test.mockStorage.getRatings())
+          .thenReturn(const <String, int>{});
+
+      await pumpApp(
+        tester,
+        SearchResultsContent(onGpsRetry: noopRetry),
+        overrides: [
+          ...test.overrides,
+          searchStateProvider.overrideWith(
+            () => _LoadedSearchState([testStation]),
+          ),
+          unifiedSearchResultsEnabledProvider.overrideWith(
+            _FlagOnUnifiedSearchResultsEnabled.new,
+          ),
+        ].cast(),
+      );
+
+      expect(find.byType(UnifiedSearchResultsView), findsOneWidget);
+      expect(find.byType(SearchResultsList), findsNothing,
+          reason: 'unified flag must short-circuit the legacy fuel '
+              'results list path');
+      expect(find.byType(NearestShortcutCard), findsNothing,
+          reason: 'unified path owns its own empty/loaded rendering');
+    });
+
+    testWidgets(
+        '#1116 phase 3c — when unified flag is OFF (default), the legacy '
+        'fuel-list path still renders unchanged', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
+      when(() => test.mockStorage.getRatings())
+          .thenReturn(const <String, int>{});
+
+      await pumpApp(
+        tester,
+        SearchResultsContent(onGpsRetry: noopRetry),
+        overrides: [
+          ...test.overrides,
+          searchStateProvider.overrideWith(
+            () => _LoadedSearchState([testStation]),
+          ),
+        ].cast(),
+      );
+
+      expect(find.byType(UnifiedSearchResultsView), findsNothing);
+      expect(find.byType(SearchResultsList), findsOneWidget);
+    });
   });
+}
+
+class _FlagOnUnifiedSearchResultsEnabled
+    extends UnifiedSearchResultsEnabled {
+  @override
+  bool build() => true;
 }
 
 class _LoadingSearchState extends SearchState {
