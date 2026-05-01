@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
+import 'package:tankstellen/core/location/location_service.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/services/geocoding_chain.dart';
 import 'package:tankstellen/core/services/service_providers.dart';
@@ -19,6 +23,8 @@ import '../../../fakes/fake_hive_storage.dart';
 import '../../../mocks/mocks.dart';
 
 class MockGeocodingChain extends Mock implements GeocodingChain {}
+
+class MockLocationService extends Mock implements LocationService {}
 
 class _NullUserPosition extends UserPosition {
   @override
@@ -851,6 +857,197 @@ void main() {
       // (it stays in initial state because EV dispatch returned early)
       final state = container.read(searchStateProvider);
       expect(state.value!.data, isEmpty);
+    });
+  });
+
+  group('dispose-mid-flight (#1321 — ref-not-mounted crash)', () {
+    /// Builds a [Position] without going through geolocator's platform
+    /// channel — `Position` has a public const-ish ctor we can fill.
+    Position fakePosition() => Position(
+          latitude: 52.52,
+          longitude: 13.41,
+          timestamp: DateTime.now(),
+          accuracy: 5.0,
+          altitude: 0.0,
+          altitudeAccuracy: 0.0,
+          heading: 0.0,
+          headingAccuracy: 0.0,
+          speed: 0.0,
+          speedAccuracy: 0.0,
+        );
+
+    test(
+        'GPS dispose mid-flight does not throw when inner future '
+        'completes after dispose', () async {
+      final mockLocation = MockLocationService();
+      // Hold the GPS future open so we can dispose mid-flight, then
+      // complete it AFTER the container is gone.
+      final positionCompleter = Completer<Position>();
+      when(() => mockLocation.getCurrentPosition())
+          .thenAnswer((_) => positionCompleter.future);
+
+      when(() => mockGeocoding.coordinatesToAddress(any(), any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) async => ServiceResult(
+                data: 'Berlin',
+                source: ServiceSource.nominatimGeocoding,
+                fetchedAt: DateTime.now(),
+              ));
+      when(() => mockStationService.searchStations(any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) async => ServiceResult(
+                data: [testStation],
+                source: ServiceSource.tankerkoenigApi,
+                fetchedAt: DateTime.now(),
+              ));
+
+      final container = ProviderContainer(overrides: [
+        hiveStorageProvider.overrideWithValue(fakeStorage),
+        stationServiceProvider.overrideWithValue(mockStationService),
+        geocodingChainProvider.overrideWithValue(mockGeocoding),
+        locationServiceProvider.overrideWithValue(mockLocation),
+        userPositionProvider.overrideWith(() => _NullUserPosition()),
+      ]);
+
+      // Fire the search but don't await — we need to dispose mid-flight.
+      final searchFuture =
+          container.read(searchStateProvider.notifier).searchByGps();
+
+      // Dispose the container while searchByGps is awaiting GPS.
+      container.dispose();
+
+      // Now complete the GPS future. Without the ref.mounted guards,
+      // every post-await `state =` write would throw on the disposed
+      // provider; with them, the search exits cleanly.
+      positionCompleter.complete(fakePosition());
+
+      await expectLater(searchFuture, completes);
+    });
+
+    test(
+        'GPS dispose mid-await with throw does not propagate '
+        'Ref._throwIfInvalidUsage', () async {
+      final mockLocation = MockLocationService();
+      final positionCompleter = Completer<Position>();
+      when(() => mockLocation.getCurrentPosition())
+          .thenAnswer((_) => positionCompleter.future);
+
+      final container = ProviderContainer(overrides: [
+        hiveStorageProvider.overrideWithValue(fakeStorage),
+        stationServiceProvider.overrideWithValue(mockStationService),
+        geocodingChainProvider.overrideWithValue(mockGeocoding),
+        locationServiceProvider.overrideWithValue(mockLocation),
+        userPositionProvider.overrideWith(() => _NullUserPosition()),
+      ]);
+
+      final searchFuture =
+          container.read(searchStateProvider.notifier).searchByGps();
+
+      container.dispose();
+
+      // Throw AFTER dispose — without the catch-block guard this would
+      // try to `state = classified` on a disposed ref and bubble up
+      // Riverpod's "set state on disposed provider" StateError.
+      positionCompleter.completeError(
+        Exception('Network error after dispose'),
+      );
+
+      await expectLater(searchFuture, completes);
+    });
+
+    test('ZipCode dispose mid-flight does not throw', () async {
+      final geocodeCompleter =
+          Completer<ServiceResult<({double lat, double lng})>>();
+      when(() => mockGeocoding.zipCodeToCoordinates('10115',
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) => geocodeCompleter.future);
+      when(() => mockGeocoding.coordinatesToAddress(any(), any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) async => ServiceResult(
+                data: 'Berlin',
+                source: ServiceSource.nominatimGeocoding,
+                fetchedAt: DateTime.now(),
+              ));
+      when(() => mockStationService.searchStations(any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) async => ServiceResult(
+                data: [testStation],
+                source: ServiceSource.tankerkoenigApi,
+                fetchedAt: DateTime.now(),
+              ));
+
+      final container = createContainer();
+      final searchFuture = container
+          .read(searchStateProvider.notifier)
+          .searchByZipCode(zipCode: '10115');
+
+      // Dispose while geocoding is still pending.
+      container.dispose();
+
+      // Complete the geocoding result post-dispose. The continuation
+      // would normally write `state = AsyncValue.data(...)` after
+      // each subsequent await — every write must short-circuit on
+      // !ref.mounted.
+      geocodeCompleter.complete(ServiceResult(
+        data: (lat: 52.52, lng: 13.41),
+        source: ServiceSource.nominatimGeocoding,
+        fetchedAt: DateTime.now(),
+      ));
+
+      await expectLater(searchFuture, completes);
+    });
+
+    test(
+        'CancelToken is cancelled on container dispose so in-flight '
+        'HTTP is dropped', () async {
+      // Capture the CancelToken handed to the station service so we
+      // can assert it was cancelled when the container was disposed.
+      CancelToken? capturedToken;
+      final stationCompleter =
+          Completer<ServiceResult<List<Station>>>();
+      when(() => mockStationService.searchStations(any(),
+          cancelToken: any(named: 'cancelToken'))).thenAnswer((inv) {
+        capturedToken =
+            inv.namedArguments[#cancelToken] as CancelToken?;
+        return stationCompleter.future;
+      });
+
+      final container = createContainer();
+      // searchStateProvider is autoDispose; keep it alive across the
+      // read+delay so the autoDispose timer doesn't run our onDispose
+      // before we manually dispose the container.
+      final sub = container.listen(
+        searchStateProvider,
+        (_, _) {},
+      );
+      addTearDown(sub.close);
+
+      final searchFuture = container
+          .read(searchStateProvider.notifier)
+          .searchByCoordinates(lat: 52.52, lng: 13.41);
+
+      // Yield so the search reaches the station-service await and
+      // the CancelToken is captured.
+      await Future<void>.delayed(Duration.zero);
+      expect(capturedToken, isNotNull,
+          reason: 'station service must be reached before dispose');
+      expect(capturedToken!.isCancelled, isFalse);
+
+      container.dispose();
+
+      expect(capturedToken!.isCancelled, isTrue,
+          reason:
+              'ref.onDispose in build() must cancel the active token '
+              'so the in-flight HTTP request is dropped (#1321).');
+
+      // Complete the station future with a cancel error — the search
+      // must still complete cleanly (no unhandled exception).
+      stationCompleter.completeError(DioException(
+        type: DioExceptionType.cancel,
+        requestOptions: RequestOptions(),
+      ));
+
+      await expectLater(searchFuture, completes);
     });
   });
 
