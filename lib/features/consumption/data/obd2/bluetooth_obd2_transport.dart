@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import 'elm327_protocol.dart';
 import 'elm_byte_channel.dart';
+import 'event_channel_cancel.dart';
 import 'obd2_transport.dart';
 
 /// [Obd2Transport] that moves bytes over a generic [ElmByteChannel]
@@ -63,7 +64,7 @@ class BluetoothObd2Transport implements Obd2Transport {
   @override
   Future<void> disconnect() async {
     _connected = false;
-    await _subscription?.cancel();
+    await _subscription?.safeCancel();
     _subscription = null;
     await _channel.close();
     _failPending(StateError('Transport closed'));
