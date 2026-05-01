@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'background_adapter_listener.dart';
+import 'event_channel_cancel.dart';
 
 /// Production [BackgroundAdapterListener] backed by the native Android
 /// foreground service shipped in #1004 phase 2b-1.
@@ -91,7 +92,7 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
   @override
   Future<void> stop() async {
     await _methods.invokeMethod<bool>('stop');
-    await _platformSubscription?.cancel();
+    await _platformSubscription?.safeCancel();
     _platformSubscription = null;
   }
 
@@ -165,7 +166,7 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
   /// Test-only hook to drain resources between tests.
   @visibleForTesting
   Future<void> dispose() async {
-    await _platformSubscription?.cancel();
+    await _platformSubscription?.safeCancel();
     _platformSubscription = null;
     if (!_controller.isClosed) {
       await _controller.close();
