@@ -55,6 +55,11 @@ class SearchState extends _$SearchState {
 
   @override
   AsyncValue<ServiceResult<List<SearchResultItem>>> build() {
+    // #1321 — when the provider is disposed mid-flight (e.g. user
+    // navigates away while searchByGps is awaiting), cancel the active
+    // HTTP request so we drop the in-flight DioException via cancel
+    // rather than letting it bubble into a disposed `state =` write.
+    ref.onDispose(() => _activeCancelToken?.cancel('Provider disposed'));
     return AsyncValue.data(ServiceResult(
       data: const [],
       source: ServiceSource.cache,
@@ -81,14 +86,21 @@ class SearchState extends _$SearchState {
   /// handling. Cancellations are silently dropped; every other
   /// exception flows into [AsyncValue.error] via [classifySearchError]
   /// so the UI can surface a fallback summary.
+  ///
+  /// #1321 — every post-await `state =` write is guarded by
+  /// `ref.mounted` to avoid the "set state on disposed provider" crash
+  /// when the user navigates away (e.g. /search → /trip-recording)
+  /// while a search future is in flight.
   Future<void> _runSearch(
     Future<void> Function(CancelToken cancelToken) search,
   ) async {
+    if (!ref.mounted) return;
     state = const AsyncValue.loading();
     final cancelToken = _newCancelToken();
     try {
       await search(cancelToken);
     } catch (e, st) {
+      if (!ref.mounted) return;
       final classified = classifySearchError(e, st);
       if (classified != null) state = classified;
     }
@@ -112,6 +124,7 @@ class SearchState extends _$SearchState {
     await _runSearch((cancelToken) async {
       final position =
           await ref.read(locationServiceProvider).getCurrentPosition();
+      if (!ref.mounted) return;
       ref.read(userPositionProvider.notifier).setFromGps(
             position.latitude, position.longitude,
           );
@@ -124,6 +137,7 @@ class SearchState extends _$SearchState {
         lng: position.longitude,
         radiusKm: resolved.radiusKm,
       );
+      if (!ref.mounted) return;
       if (ev != null) { state = ev; return; }
 
       // Reverse-geocode for a postal code (Prix-Carburants + co).
@@ -132,6 +146,7 @@ class SearchState extends _$SearchState {
         position.latitude, position.longitude,
         cancelToken: cancelToken,
       );
+      if (!ref.mounted) return;
       String? resolvedPostalCode;
       if (addr != null) {
         resolvedPostalCode = extractPostalCode(addr);
@@ -149,6 +164,7 @@ class SearchState extends _$SearchState {
       final result = await ref
           .read(stationServiceProvider)
           .searchStations(params, cancelToken: cancelToken);
+      if (!ref.mounted) return;
       state = AsyncValue.data(wrapFuelResultAsSearchItems(result));
     });
   }
@@ -172,10 +188,12 @@ class SearchState extends _$SearchState {
         );
     await _runSearch((cancelToken) async {
       await autoUpdatePositionIfEnabled(ref);
+      if (!ref.mounted) return;
       final geocoding = ref.read(geocodingChainProvider);
       final coordsResult = await geocoding.zipCodeToCoordinates(
         zipCode, cancelToken: cancelToken,
       );
+      if (!ref.mounted) return;
 
       final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
       final ev = await dispatchEvIfNeeded(
@@ -185,12 +203,14 @@ class SearchState extends _$SearchState {
         lng: coordsResult.data.lng,
         radiusKm: resolved.radiusKm,
       );
+      if (!ref.mounted) return;
       if (ev != null) { state = ev; return; }
 
       final cityName = await tryReverseGeocode(
         geocoding, coordsResult.data.lat, coordsResult.data.lng,
         cancelToken: cancelToken,
       );
+      if (!ref.mounted) return;
 
       final locationLabel = '$zipCode ${cityName ?? ''}'.trim();
       ref.read(searchLocationProvider.notifier).set(locationLabel);
@@ -207,6 +227,7 @@ class SearchState extends _$SearchState {
       final result = await ref
           .read(stationServiceProvider)
           .searchStations(params, cancelToken: cancelToken);
+      if (!ref.mounted) return;
 
       final adjustedStations =
           recalcDistancesFrom(result.data, ref.read(userPositionProvider));
@@ -244,6 +265,7 @@ class SearchState extends _$SearchState {
         );
     await _runSearch((cancelToken) async {
       await autoUpdatePositionIfEnabled(ref);
+      if (!ref.mounted) return;
       if (locationName != null) {
         ref.read(searchLocationProvider.notifier).set(locationName);
       }
@@ -256,6 +278,7 @@ class SearchState extends _$SearchState {
         lng: lng,
         radiusKm: resolved.radiusKm,
       );
+      if (!ref.mounted) return;
       if (ev != null) { state = ev; return; }
 
       final params = SearchParams(
@@ -269,6 +292,7 @@ class SearchState extends _$SearchState {
       final result = await ref
           .read(stationServiceProvider)
           .searchStations(params, cancelToken: cancelToken);
+      if (!ref.mounted) return;
       final adjustedStations =
           recalcDistancesFrom(result.data, ref.read(userPositionProvider));
 
