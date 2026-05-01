@@ -22,11 +22,11 @@ extension SafeEventChannelCancel<T> on StreamSubscription<T> {
   Future<void> safeCancel() async {
     try {
       await cancel();
-    } on PlatformException catch (e) {
+    } on PlatformException catch (e, st) {
       if (e.message == 'No active stream to cancel') {
         debugPrint(
           'EventChannel safeCancel: swallowed benign '
-          'PlatformException(${e.code}: ${e.message})',
+          'PlatformException(${e.code}: ${e.message})\n$st',
         );
         return;
       }

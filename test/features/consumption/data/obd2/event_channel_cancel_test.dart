@@ -54,6 +54,7 @@ class _FakeStreamSubscription<T> implements StreamSubscription<T> {
 void main() {
   group('SafeEventChannelCancel.safeCancel', () {
     test('completes normally when subscription cancel() succeeds', () async {
+      // ignore: cancel_subscriptions
       final sub = _FakeStreamSubscription<int>();
 
       await sub.safeCancel();
@@ -63,6 +64,7 @@ void main() {
 
     test('swallows benign "No active stream to cancel" PlatformException',
         () async {
+      // ignore: cancel_subscriptions
       final sub = _FakeStreamSubscription<int>(
         cancelError: PlatformException(
           code: 'error',
@@ -77,6 +79,7 @@ void main() {
     });
 
     test('rethrows PlatformException with a different message', () async {
+      // ignore: cancel_subscriptions
       final sub = _FakeStreamSubscription<int>(
         cancelError: PlatformException(
           code: 'error',
@@ -98,6 +101,7 @@ void main() {
     });
 
     test('rethrows non-PlatformException errors unchanged', () async {
+      // ignore: cancel_subscriptions
       final sub = _FakeStreamSubscription<int>(
         cancelError: StateError('boom'),
       );
