@@ -2784,6 +2784,10 @@
   "@vehicleReadVinFailedGenericSnackbar": {
     "description": "Snackbar shown when reading the VIN failed for a non-unsupported reason (timeout, malformed, IO) (#1162)."
   },
+  "vehicleReadVinNoAdapterHint": "Pair an OBD2 adapter first to read VIN automatically",
+  "@vehicleReadVinNoAdapterHint": {
+    "description": "Helper text shown under the disabled \"Read VIN from car\" button on the vehicle edit screen when no OBD2 adapter is paired yet (#1328). Tells the user how to enable the auto-read flow."
+  },
   "vinInfoTooltip": "What is a VIN?",
   "@vinInfoTooltip": {
     "description": "Tooltip + Semantics label for the info icon next to the VIN field on EditVehicleScreen (#895)."

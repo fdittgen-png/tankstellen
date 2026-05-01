@@ -998,6 +998,7 @@
   "vehicleReadVinFromCarTooltip": "Lire le VIN depuis l'adaptateur OBD2 jumelé",
   "vehicleReadVinFailedGenericSnackbar": "Échec de la lecture du VIN — veuillez le saisir manuellement",
   "vehicleReadVinFailedUnsupportedSnackbar": "VIN indisponible (Mode 09 PID 02 non pris en charge avant 2005)",
+  "vehicleReadVinNoAdapterHint": "Couplez un adaptateur OBD2 pour lire la VIN automatiquement",
   "vinLabel": "VIN (optionnel)",
   "vinDecodeTooltip": "Décoder le VIN",
   "vinDecodeError": "Impossible de décoder ce VIN",

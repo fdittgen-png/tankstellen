@@ -7694,6 +7694,12 @@ abstract class AppLocalizations {
   /// **'VIN read failed — please enter manually'**
   String get vehicleReadVinFailedGenericSnackbar;
 
+  /// Helper text shown under the disabled "Read VIN from car" button on the vehicle edit screen when no OBD2 adapter is paired yet (#1328). Tells the user how to enable the auto-read flow.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair an OBD2 adapter first to read VIN automatically'**
+  String get vehicleReadVinNoAdapterHint;
+
   /// Tooltip + Semantics label for the info icon next to the VIN field on EditVehicleScreen (#895).
   ///
   /// In en, this message translates to:

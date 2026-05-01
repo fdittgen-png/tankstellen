@@ -21,28 +21,50 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 void main() {
   group('EditVehicleScreen — Read-VIN-from-car button (#1162)', () {
     testWidgets(
-      'button is hidden when the vehicle has no paired adapter',
+      'button is visible but disabled with a hint when the vehicle has '
+      'no paired adapter (#1328)',
       (tester) async {
         await _pumpWithProfile(tester, withPairedAdapter: false);
 
-        expect(find.byKey(const Key('vehicleReadVinFromCar')), findsNothing);
+        // #1328 — the button is always rendered so users discover the
+        // feature. With no paired adapter it is disabled (onPressed
+        // null) and a small helper text is shown underneath.
+        final buttonFinder = find.byKey(const Key('vehicleReadVinFromCar'));
+        expect(buttonFinder, findsOneWidget);
+        final button = tester.widget<OutlinedButton>(buttonFinder);
+        expect(button.onPressed, isNull,
+            reason: 'No paired adapter → button must render disabled');
+        expect(
+          find.byKey(const Key('vehicleReadVinNoAdapterHint')),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Pair an OBD2 adapter first to read VIN automatically'),
+          findsOneWidget,
+        );
       },
     );
 
     testWidgets(
-      'button is visible with a tooltip when the vehicle has a paired '
-      'adapter',
+      'button is visible and enabled with a tooltip when the vehicle '
+      'has a paired adapter',
       (tester) async {
         await _pumpWithProfile(tester, withPairedAdapter: true);
 
-        expect(
-          find.byKey(const Key('vehicleReadVinFromCar')),
-          findsOneWidget,
-        );
+        final buttonFinder = find.byKey(const Key('vehicleReadVinFromCar'));
+        expect(buttonFinder, findsOneWidget);
+        final button = tester.widget<OutlinedButton>(buttonFinder);
+        expect(button.onPressed, isNotNull,
+            reason: 'Paired adapter → button must be tappable');
         expect(find.text('Read VIN from car'), findsOneWidget);
         expect(
           find.byTooltip('Read VIN from the paired OBD2 adapter'),
           findsOneWidget,
+        );
+        // The "no adapter" hint is gone when paired.
+        expect(
+          find.byKey(const Key('vehicleReadVinNoAdapterHint')),
+          findsNothing,
         );
       },
     );

@@ -4198,6 +4198,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec de la lecture du VIN — veuillez le saisir manuellement';
 
   @override
+  String get vehicleReadVinNoAdapterHint =>
+      'Couplez un adaptateur OBD2 pour lire la VIN automatiquement';
+
+  @override
   String get vinInfoTooltip => 'Qu\'est-ce qu\'un VIN ?';
 
   @override

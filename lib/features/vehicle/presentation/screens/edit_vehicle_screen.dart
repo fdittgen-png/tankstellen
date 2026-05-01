@@ -44,6 +44,17 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   String? _existingId;
   String? _adapterMac;
   String? _adapterName;
+  // #1328 — `_loadExisting()` runs in a postFrameCallback so it sees a
+  // snapshot of `vehicleProfileListProvider` that may still be empty
+  // while Hive is resolving (the provider is sync but the underlying
+  // settings storage may rebuild). When that happens the VIN field
+  // (and every other controller) stays blank. We belt-and-suspender the
+  // initial path by also listening to provider transitions in `build()`
+  // and re-running the load if the form is editing an existing profile
+  // that hasn't been hydrated yet. This flag flips to true after the
+  // first successful load so subsequent provider updates (e.g. from
+  // `_save()` writing the freshest profile) don't clobber user edits.
+  bool _hasInitiallyLoaded = false;
   // #1162 — pairedAdapterMac (#1004) gates the "Read VIN from car"
   // button. Distinct from [_adapterMac] which is the currently-
   // connected OBD2 picker selection.
@@ -77,8 +88,21 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
 
   void _loadExisting() {
     final list = ref.read(vehicleProfileListProvider);
+    _applyLoadedList(list);
+  }
+
+  /// Copy the matching [VehicleProfile] from [list] into the form's
+  /// controllers and scalar state. Returns true when a profile matched
+  /// and was applied, false when none was found (the provider hasn't
+  /// resolved yet, the id was deleted, etc.).
+  ///
+  /// Used by both the initial postFrameCallback path and the
+  /// `ref.listen` second-chance refill (#1328). The
+  /// [_hasInitiallyLoaded] flag is set on success so subsequent
+  /// rebuilds don't clobber user edits.
+  bool _applyLoadedList(List<VehicleProfile> list) {
     final existing = list.where((v) => v.id == widget.vehicleId).firstOrNull;
-    if (existing == null) return;
+    if (existing == null) return false;
     final snap = _ctrl.load(existing);
     setState(() {
       _existingId = snap.id;
@@ -92,7 +116,9 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
       _engineDisplacementCc = snap.engineDisplacementCc;
       _engineCylinders = snap.engineCylinders;
       _curbWeightKg = snap.curbWeightKg;
+      _hasInitiallyLoaded = true;
     });
+    return true;
   }
 
   @override
@@ -274,6 +300,25 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
     final isEdit = _existingId != null || widget.vehicleId != null;
     final accent = _brandAccent(context);
 
+    // #1328 — second-chance refill for the pre-population race. When the
+    // initial postFrameCallback ran before the provider resolved (Hive
+    // box still hydrating, etc.), the form controllers stayed blank.
+    // Listening here re-runs the load the moment the provider produces
+    // a list that contains our target id. Guarded by
+    // `_hasInitiallyLoaded` so user edits aren't clobbered by later
+    // provider updates (e.g. `_save()` writing the persisted profile
+    // back into the list).
+    final targetId = widget.vehicleId;
+    if (targetId != null) {
+      ref.listen<List<VehicleProfile>>(vehicleProfileListProvider,
+          (prev, next) {
+        if (_hasInitiallyLoaded) return;
+        if (next.any((v) => v.id == targetId)) {
+          _applyLoadedList(next);
+        }
+      });
+    }
+
     return PageScaffold(
       title: isEdit
           ? (l?.vehicleEditTitle ?? 'Edit vehicle')
@@ -308,6 +353,10 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
               decodingVin: _decodingVin,
               onDecodeVin: _decodeVin,
               onShowVinInfo: _showVinInfo,
+              // #1328 — always show the "Read VIN from car" button. When
+              // no adapter is paired we pass `onReadVinFromCar = null`
+              // (which renders the button visibly disabled with a hint)
+              // so users discover the feature even before pairing.
               pairedAdapterMac: _pairedAdapterMac,
               onReadVinFromCar:
                   _pairedAdapterMac != null ? _readVinFromCar : null,
