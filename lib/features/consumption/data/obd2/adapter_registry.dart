@@ -1,3 +1,4 @@
+import 'elm327_adapter.dart';
 import 'elm327_protocol.dart';
 
 /// Thin value-object describing one BLE scan result. Kept
@@ -70,12 +71,29 @@ class Obd2AdapterProfile {
   /// Some clones need a few hundred ms between consecutive ELM
   /// init commands — otherwise the chip drops bytes. Default is
   /// 100 ms (what [Obd2Service.connect] already does).
+  ///
+  /// Deprecated in #1330 phase 1 — use [adapter.postResetDelay] /
+  /// [adapter.interCommandDelay] instead. Field stays in place so
+  /// the few historical call sites still compile; will be removed
+  /// in phase 2 once every caller routes through [adapter].
+  @Deprecated('Use adapter.postResetDelay / adapter.interCommandDelay')
   final Duration initDelay;
 
   /// Extra AT commands appended after the shared init sequence
   /// (e.g. `ATSP6\r` to pin ISO 15765-4 on Volvos; `ATST FF\r` for
   /// slow cars that miss the default 200 ms timeout).
+  ///
+  /// Deprecated in #1330 phase 1 — use [adapter.extraInitCommands]
+  /// instead. Removed in phase 2.
+  @Deprecated('Use adapter.extraInitCommands')
   final List<String> extraInitCommands;
+
+  /// Per-adapter ELM327 protocol quirks (#1330): init sequence,
+  /// timing, response pre-parse hook. Phase 1 ships only the
+  /// [GenericElm327Adapter] default — runtime behaviour is identical
+  /// for every profile until phases 2/3 introduce specialised
+  /// adapters.
+  final Elm327Adapter adapter;
 
   const Obd2AdapterProfile({
     required this.id,
@@ -87,6 +105,7 @@ class Obd2AdapterProfile {
     this.nameMatchers = const [],
     this.initDelay = const Duration(milliseconds: 100),
     this.extraInitCommands = const [],
+    this.adapter = const GenericElm327Adapter(),
   });
 
   /// Compares service uuid against the advertised set, case-insensitive.

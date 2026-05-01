@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import 'elm327_adapter.dart';
 import 'elm327_protocol.dart';
 import 'fuel_rate_estimator.dart' as estimator;
 import 'obd2_transport.dart';
@@ -73,6 +74,19 @@ class Obd2Service {
   /// firmware variant when we eventually capture it.
   String? adapterFirmware;
 
+  /// Per-adapter ELM327 quirks (#1330). Set by [connect] from the
+  /// caller-supplied `adapter` parameter; defaults to the
+  /// [GenericElm327Adapter] which mirrors today's hardcoded init
+  /// sequence + 100 ms delays + identity preParse. Phase 2 will hand
+  /// in vLinker / SmartOBD specialisations from the adapter registry.
+  Elm327Adapter _adapter = const GenericElm327Adapter();
+
+  /// Adapter snapshot used during the most recent [connect]. Exposed
+  /// for tests + diagnostics; production callers should use the typed
+  /// read* methods rather than reaching for the adapter directly.
+  @visibleForTesting
+  Elm327Adapter get adapter => _adapter;
+
   Obd2Service(
     this._transport, {
     SupportedPidsCache? pidsCache,
@@ -95,6 +109,12 @@ class Obd2Service {
 
   /// Connect and initialize the ELM327 adapter.
   ///
+  /// The init sequence + timing is sourced from [adapter] (#1330).
+  /// Default is [GenericElm327Adapter] — same byte-for-byte init
+  /// sequence and 100 ms delays the service has used since the
+  /// feature shipped. Phases 2/3 will hand in vLinker / SmartOBD
+  /// specialisations.
+  ///
   /// After the init sequence, if a [SupportedPidsCache] was wired in
   /// via the constructor (#811) this also:
   ///   1. Reads the VIN from the car (Mode 09 PID 02). Falls back to
@@ -104,19 +124,32 @@ class Obd2Service {
   ///      saves 8 × `01 XX` Bluetooth round-trips every session.
   ///   3. On cache miss, runs [discoverSupportedPids] and persists
   ///      the result under the chosen key for next time.
-  Future<bool> connect() async {
+  Future<bool> connect({
+    Elm327Adapter adapter = const GenericElm327Adapter(),
+  }) async {
     try {
+      _adapter = adapter;
       await _transport.connect();
 
       // Clear the per-connection supported-PIDs cache. A new session
       // may be a different car / different adapter firmware.
       _supportedPids = null;
 
-      // Run initialization sequence
-      for (final cmd in Elm327Protocol.initCommands) {
-        await _transport.sendCommand(cmd);
-        // Brief delay between init commands
-        await Future.delayed(const Duration(milliseconds: 100));
+      // Adapter-driven init sequence (#1330). [GenericElm327Adapter]
+      // matches the legacy hardcoded behaviour byte-for-byte: the
+      // shared ELM init list followed by 100 ms after the first
+      // command (ATZ) and 100 ms between each subsequent command.
+      final sequence = <String>[
+        ...adapter.initSequence,
+        ...adapter.extraInitCommands,
+      ];
+      for (var i = 0; i < sequence.length; i++) {
+        await _transport.sendCommand(sequence[i]);
+        // First command is the ATZ-style reset — its post-delay can
+        // differ from the rest on slow clones.
+        final delay =
+            i == 0 ? adapter.postResetDelay : adapter.interCommandDelay;
+        await Future.delayed(delay);
       }
 
       await _primeSupportedPidsCache();
@@ -168,7 +201,7 @@ class Obd2Service {
   /// available, at which point the cache is skipped this session.
   Future<String?> _resolveVehicleCacheKey() async {
     try {
-      final response = await _transport.sendCommand(Elm327Protocol.vinCommand);
+      final response = await _send(Elm327Protocol.vinCommand);
       final vin = Elm327Protocol.parseVin(response);
       if (vin != null && vin.isNotEmpty) return vin;
     } catch (e, st) {
@@ -230,14 +263,12 @@ class Obd2Service {
 
     try {
       // 1. Direct odometer (standard PID A6)
-      final a6 =
-          await _transport.sendCommand(Elm327Protocol.odometerCommand);
+      final a6 = await _send(Elm327Protocol.odometerCommand);
       final odometer = Elm327Protocol.parseOdometer(a6);
       if (odometer != null) return odometer;
 
       // 2. Distance since DTC cleared (standard PID 31)
-      final pid31 = await _transport
-          .sendCommand(Elm327Protocol.distanceSinceDtcClearedCommand);
+      final pid31 = await _send(Elm327Protocol.distanceSinceDtcClearedCommand);
       final distance = Elm327Protocol.parseDistanceSinceDtcCleared(pid31);
       if (distance != null) return distance.toDouble();
 
@@ -249,8 +280,7 @@ class Obd2Service {
       // Legacy path: identify brand from VIN and iterate catalog.
       // Silent failure on unknown-brand is intentional — we'd rather
       // return null than spam the car with commands it rejects.
-      final vinResponse =
-          await _transport.sendCommand(Elm327Protocol.vinCommand);
+      final vinResponse = await _send(Elm327Protocol.vinCommand);
       final vin = Elm327Protocol.parseVin(vinResponse);
       final brand = vehicleBrandFromVin(vin);
       if (brand == VehicleBrand.unknown) return null;
@@ -293,7 +323,7 @@ class Obd2Service {
   Future<double?> _readOdometerFromCatalogByBrand(VehicleBrand brand) async {
     for (final entry in Elm327Protocol.mfgOdometerCatalog) {
       if (entry.brand != brand) continue;
-      final response = await _transport.sendCommand(entry.command);
+      final response = await _send(entry.command);
       final value = switch (entry.kind) {
         MfgOdometerKind.threeBytesKm =>
           Elm327Protocol.parseMfgOdometer3Byte(
@@ -323,8 +353,7 @@ class Obd2Service {
     if (!_transport.isConnected) return null;
 
     try {
-      final response =
-          await _transport.sendCommand(Elm327Protocol.vehicleSpeedCommand);
+      final response = await _send(Elm327Protocol.vehicleSpeedCommand);
       return Elm327Protocol.parseVehicleSpeed(response);
     } catch (e, st) {
       debugPrint('OBD2 readSpeed failed: $e\n$st');
@@ -363,7 +392,7 @@ class Obd2Service {
       // bases, so we just hex-parse the middle two chars.
       final groupBase = int.parse(command.substring(2, 4), radix: 16);
       try {
-        final response = await _transport.sendCommand(command);
+        final response = await _send(command);
         final bitmap =
             Elm327Protocol.parseSupportedPidsBitmap(response, groupBase);
         if (bitmap == null) break;
@@ -387,8 +416,7 @@ class Obd2Service {
     if (!_transport.isConnected) return null;
 
     try {
-      final response =
-          await _transport.sendCommand(Elm327Protocol.engineRpmCommand);
+      final response = await _send(Elm327Protocol.engineRpmCommand);
       return Elm327Protocol.parseEngineRpm(response);
     } catch (e, st) {
       debugPrint('OBD2 readRpm failed: $e\n$st');
@@ -657,11 +685,22 @@ class Obd2Service {
   }) async {
     if (!_transport.isConnected) return null;
     try {
-      final response = await _transport.sendCommand(command);
+      final response = await _send(command);
       return parser(response);
     } catch (e, st) {
       debugPrint('OBD2 read $label failed: $e\n$st');
       return null;
     }
+  }
+
+  /// Send [command] over the transport and apply the active adapter's
+  /// [Elm327Adapter.preParse] hook before handing the string off to a
+  /// parser (#1330). Phase 1: [GenericElm327Adapter.preParse] is the
+  /// identity function so behaviour matches today's direct
+  /// `_transport.sendCommand` exactly. Adapter-specific subclasses in
+  /// later phases can strip stray prompts / echoes here.
+  Future<String> _send(String command) async {
+    final raw = await _transport.sendCommand(command);
+    return _adapter.preParse(raw);
   }
 }
