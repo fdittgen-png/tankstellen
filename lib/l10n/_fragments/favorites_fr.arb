@@ -1,0 +1,5 @@
+{
+  "favoritesShareAction": "Partager",
+  "favoritesShareSubject": "Tankstellen — favoris du {date}",
+  "favoritesShareError": "Impossible de générer l'image"
+}

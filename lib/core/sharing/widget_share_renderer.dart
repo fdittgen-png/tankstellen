@@ -7,36 +7,36 @@ import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-/// Hook for the share-sheet handoff (#1189).
+/// Hook for the share-sheet handoff (#1189, generalised in #1344).
 ///
 /// Production calls [SharePlus.instance.share] directly; tests substitute
 /// a fake via [debugShareSinkOverride] so widget tests can assert on the
 /// outgoing [ShareParams] without launching the OS share sheet.
-typedef TripShareSink = Future<void> Function(ShareParams params);
+typedef WidgetShareSink = Future<void> Function(ShareParams params);
 
-/// Test-only override for the share sink used by [shareTripAsImage].
+/// Test-only override for the share sink used by [shareWidgetAsImage].
 ///
 /// Set inside a widget test (and remember to clear it in `addTearDown`)
 /// so the renderer routes [SharePlus.instance.share] through a fake.
 @visibleForTesting
-TripShareSink? debugShareSinkOverride;
+WidgetShareSink? debugShareSinkOverride;
 
-/// Hook for the temporary-directory lookup used by [shareTripAsImage].
+/// Hook for the temporary-directory lookup used by [shareWidgetAsImage].
 ///
 /// Production calls [getTemporaryDirectory] from `path_provider`; tests
 /// substitute a fake via [debugTemporaryDirectoryOverride] so the
 /// generated PNG is written into the test sandbox instead of the real
 /// platform temp folder.
-typedef TripShareTempDirectoryProvider = Future<Directory> Function();
+typedef WidgetShareTempDirectoryProvider = Future<Directory> Function();
 
 /// Test-only override for the temp-directory lookup used by
-/// [shareTripAsImage]. Returns a [Directory] the renderer is allowed to
+/// [shareWidgetAsImage]. Returns a [Directory] the renderer is allowed to
 /// write into.
 @visibleForTesting
-TripShareTempDirectoryProvider? debugTemporaryDirectoryOverride;
+WidgetShareTempDirectoryProvider? debugTemporaryDirectoryOverride;
 
 /// Renders the widget identified by [boundaryKey] to a PNG and hands it
-/// to the OS share sheet via `share_plus` (#1189).
+/// to the OS share sheet via `share_plus` (#1189, generalised in #1344).
 ///
 /// The caller is responsible for wrapping the visible report content in
 /// a [RepaintBoundary] keyed by [boundaryKey] — the renderer pulls
@@ -52,7 +52,7 @@ TripShareTempDirectoryProvider? debugTemporaryDirectoryOverride;
 /// [RenderRepaintBoundary]. Errors from [SharePlus] propagate to the
 /// caller — wrap the call in your own try/catch and surface the failure
 /// via a snackbar / error logger when a UI integration calls this.
-Future<void> shareTripAsImage({
+Future<void> shareWidgetAsImage({
   required GlobalKey boundaryKey,
   required String subject,
   required String fileNameStem,
@@ -61,14 +61,14 @@ Future<void> shareTripAsImage({
   final boundaryContext = boundaryKey.currentContext;
   if (boundaryContext == null) {
     throw StateError(
-      'shareTripAsImage: boundary key has no currentContext — the '
+      'shareWidgetAsImage: boundary key has no currentContext — the '
       'RepaintBoundary is not mounted.',
     );
   }
   final renderObject = boundaryContext.findRenderObject();
   if (renderObject is! RenderRepaintBoundary) {
     throw StateError(
-      'shareTripAsImage: expected a RenderRepaintBoundary, got '
+      'shareWidgetAsImage: expected a RenderRepaintBoundary, got '
       '${renderObject.runtimeType}.',
     );
   }
@@ -81,7 +81,7 @@ Future<void> shareTripAsImage({
     image.dispose();
   }
   if (byteData == null) {
-    throw StateError('shareTripAsImage: PNG encoding returned null bytes.');
+    throw StateError('shareWidgetAsImage: PNG encoding returned null bytes.');
   }
   final bytes = byteData.buffer.asUint8List();
 

@@ -3435,6 +3435,17 @@ class AppLocalizationsFr extends AppLocalizations {
       'Smarter drive — favours steady highway over zigzag shortcuts.';
 
   @override
+  String get favoritesShareAction => 'Partager';
+
+  @override
+  String favoritesShareSubject(String date) {
+    return 'Tankstellen — favoris du $date';
+  }
+
+  @override
+  String get favoritesShareError => 'Impossible de générer l\'image';
+
+  @override
   String get feedbackConsentTitle => 'Envoyer le rapport à GitHub ?';
 
   @override

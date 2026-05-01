@@ -1,0 +1,19 @@
+{
+  "favoritesShareAction": "Share",
+  "@favoritesShareAction": {
+    "description": "AppBar action tooltip for the share-favorites button on the Favorites screen (#1344)."
+  },
+  "favoritesShareSubject": "Tankstellen — favourites on {date}",
+  "@favoritesShareSubject": {
+    "description": "Subject / preview text passed to the OS share sheet when the user shares the Favorites screen as an image (#1344). The {date} placeholder is replaced with a localised short date.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "favoritesShareError": "Couldn't generate share image",
+  "@favoritesShareError": {
+    "description": "Snackbar shown when the favorites Share action fails to render or hand off the report PNG (#1344)."
+  }
+}
