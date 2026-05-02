@@ -50,7 +50,7 @@ enum ObdVinFailureReason {
 /// decoder pipeline (#812 phase 2) can pre-fill make/model/year/engine
 /// without forcing the user to type 17 characters.
 ///
-/// Bounded by [timeout] (3 seconds by default) so a stuck adapter
+/// Bounded by [timeout] (8 seconds by default) so a stuck adapter
 /// can't hang the UI. Never throws — every error path produces an
 /// [ObdVinResult.failure] with a typed reason.
 class Obd2VinReader {
@@ -62,11 +62,18 @@ class Obd2VinReader {
   /// Maximum time to wait for the response. Mirrors the bounded shape
   /// used by [TripRecordingController._readVinOnce] so a failing
   /// adapter degrades the UX rather than blocking it.
+  ///
+  /// #1365 — bumped from 3 s to 8 s after field traces (build 5.0.0+7122)
+  /// showed slow ELM327 clones (SmartOBD: 200 ms inter-command, 400 ms
+  /// post-reset) regularly exceeding 3 s on the multi-frame Mode 09
+  /// response. 8 s covers every adapter currently in the registry with
+  /// headroom; a future iteration could make this adapter-aware via
+  /// [Obd2AdapterProfile.adapter.interCommandDelay].
   final Duration timeout;
 
   Obd2VinReader({
     required this.service,
-    this.timeout = const Duration(seconds: 3),
+    this.timeout = const Duration(seconds: 8),
   });
 
   /// Send Mode 09 PID 02 and decode the response.

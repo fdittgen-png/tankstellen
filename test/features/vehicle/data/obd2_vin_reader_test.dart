@@ -135,6 +135,28 @@ void main() {
       },
     );
   });
+
+  group('Obd2VinReader default timeout (#1365)', () {
+    test(
+      'default constructor timeout is at least 8 s — slow ELM327 clones '
+      'need the headroom on the multi-frame Mode 09 response',
+      () {
+        // Field traces (build 5.0.0+7122) showed the prior 3 s default
+        // firing on SmartOBD-class adapters with 200 ms inter-command
+        // delay. Guard against accidental regression below 8 s.
+        final reader = Obd2VinReader(service: Obd2Service(_FakeTransport.forCommand(
+          Elm327Protocol.vinCommand,
+          'NO DATA\r\n>',
+        )));
+        expect(
+          reader.timeout,
+          greaterThanOrEqualTo(const Duration(seconds: 8)),
+          reason: 'See #1365 — slow adapters must have enough wall-clock '
+              'budget for the Mode 09 PID 02 multi-frame exchange',
+        );
+      },
+    );
+  });
 }
 
 /// In-memory [TraceRecorder] used to drain `errorLogger.log` calls
