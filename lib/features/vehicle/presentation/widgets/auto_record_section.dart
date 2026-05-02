@@ -6,6 +6,8 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../consumption/data/obd2/adapter_registry.dart';
+import '../../../consumption/presentation/widgets/obd2_adapter_picker.dart';
 import '../../domain/entities/vehicle_profile.dart';
 import '../../providers/vehicle_providers.dart';
 
@@ -65,11 +67,21 @@ class AutoRecordSection extends ConsumerWidget {
   final Future<void> Function()? openSettings;
 
   /// Hook invoked when the user taps the "Pair an adapter" CTA on the
-  /// state-aware status banner (#1310). Null defers to the production
-  /// behaviour — push `/setup` (the OBD2 onboarding wizard) via
-  /// [GoRouter]. Tests inject a counter to assert the navigation
-  /// without a router.
+  /// state-aware status banner (#1310). When supplied this hook fully
+  /// owns the CTA — the production picker + persist + `/setup`
+  /// fallback are all skipped. Tests inject a counter to assert the
+  /// CTA dispatched without bringing up the picker. Null defers to
+  /// the production behaviour — open [showObd2AdapterPairer] inline
+  /// and persist the picked adapter onto the current profile (#1350).
   final VoidCallback? onPairAdapter;
+
+  /// Picker seam for [_handlePairAdapter] (#1350). Null defers to the
+  /// production [showObd2AdapterPairer] which mounts the modal sheet
+  /// and resolves with a [ResolvedObd2Candidate] on pick or `null`
+  /// on cancel. Tests inject a stub so the candidate flows into the
+  /// persist path without binding the OBD2 stack.
+  final Future<ResolvedObd2Candidate?> Function(BuildContext)?
+      showAdapterPicker;
 
   const AutoRecordSection({
     super.key,
@@ -78,6 +90,7 @@ class AutoRecordSection extends ConsumerWidget {
     this.requestForegroundLocation,
     this.openSettings,
     this.onPairAdapter,
+    this.showAdapterPicker,
   });
 
   static Future<PermissionStatus> _defaultRequestBackgroundLocation() {
@@ -138,7 +151,11 @@ class AutoRecordSection extends ConsumerWidget {
               state: _statusFor(profile),
               theme: theme,
               l: l,
-              onPairAdapter: () => _handlePairAdapter(context),
+              onPairAdapter: () => _handlePairAdapter(
+                context: context,
+                ref: ref,
+                profile: profile,
+              ),
             ),
             const SizedBox(height: 16),
             _SpeedThresholdSlider(
@@ -211,26 +228,91 @@ class AutoRecordSection extends ConsumerWidget {
   }
 
   /// "Pair an adapter" CTA on the [_AutoRecordStatus.needsPairing]
-  /// banner. Defers to the injected [onPairAdapter] (tests) when
-  /// supplied; falls back to `GoRouter.go('/setup')` so the user
-  /// lands on the OBD2 onboarding wizard. There is no standalone
-  /// "pair an adapter" route — the wizard's OBD2 step is the
-  /// closest reachable surface that runs the picker AND persists
-  /// `pairedAdapterMac` (#1310).
-  void _handlePairAdapter(BuildContext context) {
+  /// banner.
+  ///
+  /// Behaviour (#1350):
+  ///   1. If [onPairAdapter] is injected (tests) it fully owns the
+  ///      tap — invoked and returned, no picker, no fallback.
+  ///   2. Otherwise open [showObd2AdapterPairer] (or the injected
+  ///      [showAdapterPicker] seam) inline. On a non-null result,
+  ///      persist `pairedAdapterMac` + `obd2AdapterMac` +
+  ///      `obd2AdapterName` onto the current profile so the banner
+  ///      flips to `active` (or `needsBackgroundLocation`) on the
+  ///      next rebuild.
+  ///   3. On cancel (null result) OR on picker exception, fall back
+  ///      to `GoRouter.go('/setup')` per the issue spec — the user
+  ///      asked to pair, so route them somewhere that still surfaces
+  ///      the wizard rather than silently dropping the tap.
+  ///
+  /// Pre-#1350 the production fallback ALWAYS routed to `/setup`
+  /// even on a successful pick, sending the user into an unrelated
+  /// onboarding wizard whose result landed on a freshly-saved
+  /// profile rather than the vehicle they were editing. The picker
+  /// is now invoked inline and writes back to the right profile.
+  Future<void> _handlePairAdapter({
+    required BuildContext context,
+    required WidgetRef ref,
+    required VehicleProfile profile,
+  }) async {
     final hook = onPairAdapter;
     if (hook != null) {
       hook();
       return;
     }
-    // Production fallback — push the onboarding wizard. Best-effort:
-    // if the router context is missing (isolated widget pump without
-    // a router) we silently no-op rather than throw, so the surface
-    // remains testable.
+    final picker = showAdapterPicker ?? showObd2AdapterPairer;
+    ResolvedObd2Candidate? result;
+    try {
+      result = await picker(context);
+    } catch (e, st) {
+      // Surface picker failures via debugPrint (cheap, test-safe — the
+      // structured `errorLogger` opens a Hive box that isolated widget
+      // pumps don't initialise). No silent catch — body has a log
+      // statement so `no_silent_catch_test` stays green.
+      debugPrint(
+        'AutoRecordSection: pair-adapter picker failed: $e\n$st',
+      );
+      if (!context.mounted) return;
+      _navigateToSetupFallback(context);
+      return;
+    }
+    if (result == null) {
+      // User cancelled the picker. Per the #1350 spec the `/setup`
+      // fallback fires here so the user has SOMEWHERE to land — the
+      // CTA must never feel like a no-op.
+      if (!context.mounted) return;
+      _navigateToSetupFallback(context);
+      return;
+    }
+    final mac = result.candidate.deviceId;
+    final name = result.candidate.deviceName.isEmpty
+        ? result.profile.displayName
+        : result.candidate.deviceName;
+    await _persist(
+      ref,
+      profile.copyWith(
+        pairedAdapterMac: mac,
+        obd2AdapterMac: mac,
+        obd2AdapterName: name,
+      ),
+    );
+  }
+
+  /// Best-effort `/setup` route push used as the cancel/error
+  /// fallback for [_handlePairAdapter]. A missing router context
+  /// (isolated widget pump) is logged via [debugPrint] rather than
+  /// thrown so the surface stays testable. We deliberately avoid the
+  /// structured [errorLogger] here because it opens a Hive box and
+  /// widget tests that pump this section without initialising Hive
+  /// would fail noisily on what is otherwise a benign test-pump
+  /// shape.
+  void _navigateToSetupFallback(BuildContext context) {
     try {
       GoRouter.of(context).go('/setup');
     } catch (e, st) {
-      debugPrint('AutoRecordSection: pair-adapter navigation failed: $e\n$st');
+      // No silent catch — body logs the failure.
+      debugPrint(
+        'AutoRecordSection: pair-adapter setup-fallback nav failed: $e\n$st',
+      );
     }
   }
 
