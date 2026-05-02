@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/feedback/auto_record_badge_provider.dart';
+import '../../../core/feedback/auto_record_badge_service.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../../../core/storage/storage_providers.dart';
@@ -493,7 +494,21 @@ class TripRecording extends _$TripRecording {
 
   void resume() {
     final ctl = _controller;
-    if (ctl == null) return;
+    if (ctl == null) {
+      // #1347 — cold-start recovery left us with a snapshot but no
+      // controller. The pause banner's Resume button reaches us
+      // here; without this path the tap is a silent no-op and the
+      // captured samples are stranded in Hive forever. True "continue
+      // recording" requires re-pairing the OBD2 adapter (out of scope
+      // — see the #1347 follow-up issue); the minimum correct
+      // behaviour is to finalise the snapshot into trip history so
+      // the partial drive is preserved.
+      if (_activeSnapshot != null &&
+          state.phase == TripRecordingPhase.pausedDueToDrop) {
+        unawaited(_finalizeRecoveredSnapshot());
+      }
+      return;
+    }
     if (state.phase != TripRecordingPhase.paused &&
         state.phase != TripRecordingPhase.pausedDueToDrop) {
       return;
@@ -517,6 +532,16 @@ class TripRecording extends _$TripRecording {
     final ctl = _controller;
     final svc = _service;
     if (ctl == null || svc == null) {
+      // #1347 — cold-start recovery left us with a snapshot on disk
+      // but no controller / service. The pause banner's End button
+      // reaches us here; without this path the tap silently throws
+      // away the captured samples (`StoppedTripResult.empty()` and a
+      // zero-state reset). Salvage the snapshot into trip history so
+      // the user keeps their partial drive.
+      if (_activeSnapshot != null &&
+          state.phase == TripRecordingPhase.pausedDueToDrop) {
+        return _finalizeRecoveredSnapshot();
+      }
       state = const TripRecordingState();
       return const StoppedTripResult.empty();
     }
@@ -817,6 +842,110 @@ class TripRecording extends _$TripRecording {
     } catch (e, st) {
       debugPrint('TripRecording flush snapshot failed: $e\n$st');
     }
+  }
+
+  /// #1347 — finalise the recovered active-trip snapshot into trip
+  /// history when the user taps Resume / End on the pause banner
+  /// after a cold-start recovery. The controller is null in this
+  /// state (`restoreFromSnapshot` deliberately leaves it that way),
+  /// so [stop] cannot run its normal teardown; this helper writes
+  /// the snapshot's captured samples + summary into the rolling
+  /// trip-history log instead, clears the snapshot from Hive, and
+  /// transitions state to `finished` so the recording screen renders
+  /// the summary view.
+  ///
+  /// True "continue recording" — re-pair the adapter, reattach a
+  /// controller carrying the snapshot's session id + prior samples,
+  /// and resume polling — is intentionally out of scope here. See the
+  /// #1347 follow-up issue. The salvage path's only job is to make
+  /// sure the partial drive isn't silently lost.
+  Future<StoppedTripResult> _finalizeRecoveredSnapshot() async {
+    final snapshot = _activeSnapshot;
+    if (snapshot == null) {
+      state = const TripRecordingState();
+      return const StoppedTripResult.empty();
+    }
+    // Resolve every Riverpod-backed dependency synchronously up
+    // front. Reading `ref` after an `await` is unsafe — the provider
+    // could be disposed by then (rare in production thanks to
+    // `keepAlive: true`, frequent in tests where the container goes
+    // out of scope before the unawaited future settles).
+    TripHistoryRepository? historyRepo;
+    TripHistoryList? historyList;
+    Future<AutoRecordBadgeService>? badgeFuture;
+    try {
+      historyRepo = ref.read(tripHistoryRepositoryProvider);
+    } catch (e, st) {
+      debugPrint(
+          'TripRecording recovered finalise: history repo read failed: $e\n$st');
+    }
+    try {
+      historyList = ref.read(tripHistoryListProvider.notifier);
+    } catch (e, st) {
+      debugPrint(
+          'TripRecording recovered finalise: history list read failed: $e\n$st');
+    }
+    if (snapshot.automatic) {
+      try {
+        badgeFuture = ref.read(autoRecordBadgeServiceProvider.future);
+      } catch (e, st) {
+        debugPrint(
+            'TripRecording recovered finalise: badge service read failed: $e\n$st');
+      }
+    }
+
+    final result = StoppedTripResult(
+      summary: snapshot.summary,
+      odometerStartKm: snapshot.odometerStartKm,
+      odometerLatestKm: snapshot.odometerLatestKm,
+    );
+    // Transition state synchronously so the recording screen flips to
+    // the summary view immediately — even if the Hive writes below
+    // race against provider disposal in a test harness.
+    state = state.copyWith(phase: TripRecordingPhase.finished);
+
+    if (historyRepo != null) {
+      try {
+        await historyRepo.save(TripHistoryEntry(
+          id: snapshot.id,
+          vehicleId: snapshot.vehicleId,
+          summary: snapshot.summary,
+          automatic: snapshot.automatic,
+          samples: snapshot.samples,
+        ));
+      } catch (e, st) {
+        debugPrint(
+            'TripRecording recovered finalise: save failed: $e\n$st');
+      }
+    }
+
+    // Clear the snapshot BEFORE the best-effort observer-refresh and
+    // badge bump below — the recovery service must not resurrect a
+    // finalised trip on next launch even if those follow-up steps
+    // throw or race against provider disposal in a test harness.
+    await _clearActiveSnapshot();
+
+    try {
+      historyList?.refresh();
+    } catch (e, st) {
+      debugPrint(
+          'TripRecording recovered finalise: list refresh failed: $e\n$st');
+    }
+
+    // Mirror the auto-record badge bookkeeping the regular
+    // `_saveToHistory` path applies — a recovered auto-trip is still
+    // an "unseen" trip the user should see in the launcher.
+    if (badgeFuture != null) {
+      try {
+        final badge = await badgeFuture;
+        await badge.increment();
+      } catch (e, st) {
+        debugPrint(
+            'TripRecording recovered finalise: badge bump failed: $e\n$st');
+      }
+    }
+
+    return result;
   }
 
   /// Drop the persisted snapshot + clear in-memory bookkeeping.
