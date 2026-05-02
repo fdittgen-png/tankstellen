@@ -3278,6 +3278,24 @@ class AppLocalizationsFr extends AppLocalizations {
       'Partagez anonymement vos heures d\'arrivée et de départ aux stations pour que l\'application affiche les temps d\'attente typiques. Aucune coordonnée GPS n\'est envoyée — uniquement l\'identifiant de la station.';
 
   @override
+  String consumptionStatsOpenWindowBanner(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count ravitaillements partiels en attente du plein complet — non inclus dans la moyenne',
+      one:
+          '1 ravitaillement partiel en attente du plein complet — non inclus dans la moyenne',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String consumptionStatsCorrectionShareHint(int percent) {
+    return '$percent% du carburant provient d\'auto-corrections — vérifier les entrées';
+  }
+
+  @override
   String get fillUpCorrectionLabel => 'Auto-correction — appuyez pour modifier';
 
   @override

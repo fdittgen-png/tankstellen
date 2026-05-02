@@ -1,0 +1,20 @@
+{
+  "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 partial fill pending plein complet — not in average} other{{count} partial fills pending plein complet — not in average}}",
+  "@consumptionStatsOpenWindowBanner": {
+    "description": "Banner shown above the consumption stats card when one or more partial fill-ups have been logged after the most recent plein-complet (#1362). The fills are excluded from the L/100km average until the next plein-complet closes the window.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "consumptionStatsCorrectionShareHint": "{percent}% of fuel from auto-corrections — review entries",
+  "@consumptionStatsCorrectionShareHint": {
+    "description": "Hint shown when more than 5% of the totalled fuel volume comes from auto-generated correction fill-ups (#1362). Encourages the user to review the orange correction entries in the fill-up list.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  }
+}

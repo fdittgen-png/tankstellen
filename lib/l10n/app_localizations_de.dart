@@ -3277,6 +3277,24 @@ class AppLocalizationsDe extends AppLocalizations {
       'Teile anonym, wann du an einer Tankstelle ankommst und wieder fährst, damit die App typische Wartezeiten anzeigen kann. Es werden keine GPS-Koordinaten übertragen — nur die Tankstellen-ID.';
 
   @override
+  String consumptionStatsOpenWindowBanner(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count Teilbetankungen warten auf nächste Volltankung — nicht im Durchschnitt',
+      one:
+          '1 Teilbetankung wartet auf nächste Volltankung — nicht im Durchschnitt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String consumptionStatsCorrectionShareHint(int percent) {
+    return '$percent% des Kraftstoffs aus Auto-Korrekturen — Einträge prüfen';
+  }
+
+  @override
   String get fillUpCorrectionLabel => 'Auto-Korrektur — zum Bearbeiten tippen';
 
   @override

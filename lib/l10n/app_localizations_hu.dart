@@ -3251,6 +3251,22 @@ class AppLocalizationsHu extends AppLocalizations {
       'Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.';
 
   @override
+  String consumptionStatsOpenWindowBanner(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count partial fills pending plein complet — not in average',
+      one: '1 partial fill pending plein complet — not in average',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String consumptionStatsCorrectionShareHint(int percent) {
+    return '$percent% of fuel from auto-corrections — review entries';
+  }
+
+  @override
   String get fillUpCorrectionLabel => 'Auto-correction — tap to edit';
 
   @override

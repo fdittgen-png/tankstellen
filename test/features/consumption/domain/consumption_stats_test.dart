@@ -11,6 +11,8 @@ FillUp _f({
   required double cost,
   required double odo,
   FuelType fuelType = FuelType.e10,
+  bool isFullTank = true,
+  bool isCorrection = false,
 }) =>
     FillUp(
       id: id,
@@ -19,6 +21,8 @@ FillUp _f({
       totalCost: cost,
       odometerKm: odo,
       fuelType: fuelType,
+      isFullTank: isFullTank,
+      isCorrection: isCorrection,
     );
 
 void main() {
@@ -229,6 +233,252 @@ void main() {
       ]);
       expect(stats.totalDistanceKm, 1000);
       expect(stats.avgConsumptionL100km, closeTo(8.0, 0.0001));
+    });
+
+    // ─── #1362 — window walker ──────────────────────────────────────
+    //
+    // The walker must produce byte-identical numbers to the legacy
+    // `sorted.skip(1).fold(liters)` formula for the all-plein case,
+    // skip the in-progress window after the latest plein, and surface
+    // auto-correction contribution to the user.
+
+    test(
+      'BACKWARD COMPAT — all-plein three-fillup case is byte-identical to '
+      'the legacy fold formula',
+      () {
+        // Replays the existing "three fill-ups: excludes first tank"
+        // fixture and asserts on the exact closed-window math:
+        // - litersBetween (legacy) = 40 + 40 = 80
+        // - totalDistance (legacy) = 11000 - 10000 = 1000
+        // - avgL100 = 80 / 1000 * 100 = 8.0 EXACT
+        // The new walker MUST hit the same 8.0 to the bit.
+        final stats = ConsumptionStats.fromFillUps([
+          _f(
+              id: '1',
+              date: DateTime(2026, 1, 1),
+              liters: 30,
+              cost: 45,
+              odo: 10000),
+          _f(
+              id: '2',
+              date: DateTime(2026, 1, 10),
+              liters: 40,
+              cost: 60,
+              odo: 10500),
+          _f(
+              id: '3',
+              date: DateTime(2026, 1, 20),
+              liters: 40,
+              cost: 60,
+              odo: 11000),
+        ]);
+
+        // Byte-identical guarantee (the load-bearing assertion):
+        expect(stats.avgConsumptionL100km, 8.0);
+        expect(stats.avgCostPerKm, (60 + 60) / 1000);
+        // Open window must be empty — every fill is plein-complet.
+        expect(stats.openWindowFillCount, 0);
+        expect(stats.openWindowLiters, 0);
+        // No corrections — share must be exactly zero.
+        expect(stats.correctionLitersTotal, 0);
+        expect(stats.correctionShare, 0);
+      },
+    );
+
+    test(
+      'plein → partial → plein closes one window with the partial included',
+      () {
+        // Window: opens at fill 1 (plein), closes at fill 3 (plein).
+        // Partial fill 2 sits inside.
+        // closed liters (sum after opening) = 20 + 40 = 60
+        // closed distance = 11000 - 10000 = 1000
+        // avg L/100km = 60 / 1000 * 100 = 6.0 EXACT
+        final stats = ConsumptionStats.fromFillUps([
+          _f(
+            id: '1',
+            date: DateTime(2026, 1, 1),
+            liters: 50,
+            cost: 75,
+            odo: 10000,
+          ),
+          _f(
+            id: '2',
+            date: DateTime(2026, 1, 8),
+            liters: 20,
+            cost: 30,
+            odo: 10400,
+            isFullTank: false,
+          ),
+          _f(
+            id: '3',
+            date: DateTime(2026, 1, 20),
+            liters: 40,
+            cost: 60,
+            odo: 11000,
+          ),
+        ]);
+        expect(stats.avgConsumptionL100km, 6.0);
+        expect(stats.totalDistanceKm, 1000);
+        expect(stats.openWindowFillCount, 0);
+        expect(stats.openWindowLiters, 0);
+      },
+    );
+
+    test(
+      'open window after the latest plein is excluded from the average and '
+      'surfaced via openWindowFillCount/openWindowLiters',
+      () {
+        // Closed window: fill 1 → fill 3 (60 L over 1000 km = 6.0 L/100km).
+        // Open window: fill 4 (partial, 15 L) — excluded from average,
+        // counted on openWindowFillCount/openWindowLiters.
+        final stats = ConsumptionStats.fromFillUps([
+          _f(
+            id: '1',
+            date: DateTime(2026, 1, 1),
+            liters: 50,
+            cost: 75,
+            odo: 10000,
+          ),
+          _f(
+            id: '2',
+            date: DateTime(2026, 1, 8),
+            liters: 20,
+            cost: 30,
+            odo: 10400,
+            isFullTank: false,
+          ),
+          _f(
+            id: '3',
+            date: DateTime(2026, 1, 20),
+            liters: 40,
+            cost: 60,
+            odo: 11000,
+          ),
+          _f(
+            id: '4',
+            date: DateTime(2026, 1, 28),
+            liters: 15,
+            cost: 22.5,
+            odo: 11200,
+            isFullTank: false,
+          ),
+        ]);
+        // Avg only sees the closed window — same 6.0 as the previous test.
+        expect(stats.avgConsumptionL100km, 6.0);
+        // Open window surfaced for the UI.
+        expect(stats.openWindowFillCount, 1);
+        expect(stats.openWindowLiters, 15);
+      },
+    );
+
+    test(
+      'plein → correction → plein keeps correction liters in the average and '
+      'surfaces the correction share to the user',
+      () {
+        // Closed window: fills 2..3 → liters = 5 + 40 = 45 over 1000 km
+        // → 4.5 L/100km. The correction liter total is 5 and
+        // totalLiters = 50 + 5 + 40 = 95, so share = 5/95 ≈ 0.0526.
+        final stats = ConsumptionStats.fromFillUps([
+          _f(
+            id: '1',
+            date: DateTime(2026, 1, 1),
+            liters: 50,
+            cost: 75,
+            odo: 10000,
+          ),
+          _f(
+            id: '2',
+            date: DateTime(2026, 1, 8),
+            liters: 5,
+            cost: 7.5,
+            odo: 10500,
+            isFullTank: false,
+            isCorrection: true,
+          ),
+          _f(
+            id: '3',
+            date: DateTime(2026, 1, 20),
+            liters: 40,
+            cost: 60,
+            odo: 11000,
+          ),
+        ]);
+        expect(stats.avgConsumptionL100km, 4.5);
+        expect(stats.correctionLitersTotal, 5);
+        expect(stats.correctionShare, closeTo(5 / 95, 0.0001));
+      },
+    );
+
+    test('single fill — stats blank, openWindowFillCount stays at 0', () {
+      // Spec: "single fill → stats blank (no window closed yet),
+      //       openWindowFillCount: 1". The first fill itself OPENS the
+      // window — fills strictly INSIDE the open window (i.e. logged
+      // after the first fill) are what we count toward partials. With
+      // exactly one fill there is no partial inside, so the count is 0.
+      final stats = ConsumptionStats.fromFillUps([
+        _f(
+          id: '1',
+          date: DateTime(2026, 1, 1),
+          liters: 50,
+          cost: 75,
+          odo: 10000,
+        ),
+      ]);
+      expect(stats.fillUpCount, 1);
+      expect(stats.avgConsumptionL100km, isNull);
+      expect(stats.openWindowFillCount, 0);
+      expect(stats.openWindowLiters, 0);
+    });
+
+    test('two pleins, no trips/corrections → equivalent to old formula', () {
+      // Old formula: liters = sorted.skip(1).fold(liters) = 50,
+      // distance = 11000 - 10000 = 1000, avg = 50/1000*100 = 5.0.
+      final stats = ConsumptionStats.fromFillUps([
+        _f(
+          id: '1',
+          date: DateTime(2026, 1, 1),
+          liters: 40,
+          cost: 60,
+          odo: 10000,
+        ),
+        _f(
+          id: '2',
+          date: DateTime(2026, 1, 15),
+          liters: 50,
+          cost: 80,
+          odo: 11000,
+        ),
+      ]);
+      expect(stats.avgConsumptionL100km, 5.0);
+      expect(stats.openWindowFillCount, 0);
+      expect(stats.correctionShare, 0);
+    });
+
+    test('two partials, no plein → entire history is the open window', () {
+      // Spec edge: with no plein-complet anywhere the very first fill
+      // opens the window; nothing closes it; the average has no closed
+      // window to draw from.
+      final stats = ConsumptionStats.fromFillUps([
+        _f(
+          id: '1',
+          date: DateTime(2026, 1, 1),
+          liters: 20,
+          cost: 30,
+          odo: 10000,
+          isFullTank: false,
+        ),
+        _f(
+          id: '2',
+          date: DateTime(2026, 1, 8),
+          liters: 25,
+          cost: 37.5,
+          odo: 10300,
+          isFullTank: false,
+        ),
+      ]);
+      expect(stats.avgConsumptionL100km, isNull);
+      expect(stats.openWindowFillCount, 1);
+      expect(stats.openWindowLiters, 25);
     });
   });
 

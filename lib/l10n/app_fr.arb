@@ -1079,5 +1079,7 @@
   "fillUpCorrectionEditTitle": "Modifier l'auto-correction",
   "fillUpCorrectionEditExplainer": "Cette entrée a été générée automatiquement pour combler l'écart entre les trajets enregistrés et le carburant pompé. Ajustez les valeurs si vous connaissez les chiffres réels.",
   "fillUpCorrectionDelete": "Supprimer la correction",
-  "fillUpCorrectionStation": "Nom de la station (facultatif)"
+  "fillUpCorrectionStation": "Nom de la station (facultatif)",
+  "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 ravitaillement partiel en attente du plein complet — non inclus dans la moyenne} other{{count} ravitaillements partiels en attente du plein complet — non inclus dans la moyenne}}",
+  "consumptionStatsCorrectionShareHint": "{percent}% du carburant provient d'auto-corrections — vérifier les entrées"
 }
