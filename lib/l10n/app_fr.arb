@@ -1070,5 +1070,8 @@
   "unifiedFilterFuel": "Carburant",
   "unifiedFilterEv": "VE",
   "unifiedFilterBoth": "Les deux",
-  "unifiedNoResultsForFilter": "Aucun résultat pour ce filtre"
+  "unifiedNoResultsForFilter": "Aucun résultat pour ce filtre",
+  "gdprCommunityWaitTimeTitle": "Temps d'attente partagés",
+  "gdprCommunityWaitTimeShort": "Partager anonymement les temps d'attente",
+  "gdprCommunityWaitTimeDescription": "Partagez anonymement vos heures d'arrivée et de départ aux stations pour que l'application affiche les temps d'attente typiques. Aucune coordonnée GPS n'est envoyée — uniquement l'identifiant de la station."
 }

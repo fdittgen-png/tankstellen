@@ -90,16 +90,24 @@ bool hasGdprConsent(Ref ref) {
   return storage.getSetting(StorageKeys.gdprConsentGiven) == true;
 }
 
-/// GDPR consent state: location, error reporting, cloud sync.
+/// GDPR consent state: location, error reporting, cloud sync,
+/// community wait-time pings (#1119).
 @Riverpod(keepAlive: true)
 class GdprConsent extends _$GdprConsent {
   @override
-  ({bool location, bool errorReporting, bool cloudSync}) build() {
+  ({
+    bool location,
+    bool errorReporting,
+    bool cloudSync,
+    bool communityWaitTime,
+  }) build() {
     final storage = ref.watch(storageRepositoryProvider);
     return (
       location: storage.getSetting(StorageKeys.consentLocation) as bool? ?? false,
       errorReporting: storage.getSetting(StorageKeys.consentErrorReporting) as bool? ?? false,
       cloudSync: storage.getSetting(StorageKeys.consentCloudSync) as bool? ?? false,
+      communityWaitTime:
+          storage.getSetting(StorageKeys.consentCommunityWaitTime) as bool? ?? false,
     );
   }
 
@@ -107,18 +115,24 @@ class GdprConsent extends _$GdprConsent {
     required bool location,
     required bool errorReporting,
     required bool cloudSync,
+    required bool communityWaitTime,
   }) async {
     final storage = ref.read(storageRepositoryProvider);
     await storage.putSetting(StorageKeys.gdprConsentGiven, true);
     await storage.putSetting(StorageKeys.consentLocation, location);
     await storage.putSetting(StorageKeys.consentErrorReporting, errorReporting);
     await storage.putSetting(StorageKeys.consentCloudSync, cloudSync);
+    await storage.putSetting(
+      StorageKeys.consentCommunityWaitTime,
+      communityWaitTime,
+    );
     // Also update the legacy location_consent key for backward compatibility
     await storage.putSetting('location_consent', location);
     state = (
       location: location,
       errorReporting: errorReporting,
       cloudSync: cloudSync,
+      communityWaitTime: communityWaitTime,
     );
   }
 }

@@ -6056,6 +6056,24 @@ abstract class AppLocalizations {
   /// **'Month'**
   String get chargingChartsMonthAxis;
 
+  /// GDPR consent toggle — short title for the opt-in to anonymously share station arrival/departure timestamps so the app can surface typical wait times (#1119). Used in both the first-launch consent screen and the settings page.
+  ///
+  /// In en, this message translates to:
+  /// **'Community Wait Times'**
+  String get gdprCommunityWaitTimeTitle;
+
+  /// GDPR consent toggle — one-line subtitle shown in the settings page alongside the toggle (#1119). Kept terse; the first-launch consent screen uses gdprCommunityWaitTimeDescription for the longer explanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymously share station wait times'**
+  String get gdprCommunityWaitTimeShort;
+
+  /// GDPR consent toggle — full description used on the first-launch consent screen (#1119). Mentions exactly what is uploaded (station ID + arrival/departure timestamps) and what is NOT uploaded (raw lat/lng) so the user can give informed consent.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.'**
+  String get gdprCommunityWaitTimeDescription;
+
   /// No description provided for @greeceApiProvider.
   ///
   /// In en, this message translates to:

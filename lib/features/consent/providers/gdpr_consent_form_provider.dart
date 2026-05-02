@@ -11,23 +11,28 @@ class GdprConsentFormState {
   final bool locationConsent;
   final bool errorReportingConsent;
   final bool cloudSyncConsent;
+  final bool communityWaitTimeConsent;
 
   const GdprConsentFormState({
     this.locationConsent = false,
     this.errorReportingConsent = false,
     this.cloudSyncConsent = false,
+    this.communityWaitTimeConsent = false,
   });
 
   GdprConsentFormState copyWith({
     bool? locationConsent,
     bool? errorReportingConsent,
     bool? cloudSyncConsent,
+    bool? communityWaitTimeConsent,
   }) {
     return GdprConsentFormState(
       locationConsent: locationConsent ?? this.locationConsent,
       errorReportingConsent:
           errorReportingConsent ?? this.errorReportingConsent,
       cloudSyncConsent: cloudSyncConsent ?? this.cloudSyncConsent,
+      communityWaitTimeConsent:
+          communityWaitTimeConsent ?? this.communityWaitTimeConsent,
     );
   }
 }
@@ -47,5 +52,9 @@ class GdprConsentFormController extends _$GdprConsentFormController {
 
   void setCloudSync(bool value) {
     state = state.copyWith(cloudSyncConsent: value);
+  }
+
+  void setCommunityWaitTime(bool value) {
+    state = state.copyWith(communityWaitTimeConsent: value);
   }
 }

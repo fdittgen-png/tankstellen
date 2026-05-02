@@ -3266,6 +3266,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Monat';
 
   @override
+  String get gdprCommunityWaitTimeTitle => 'Wartezeiten der Community';
+
+  @override
+  String get gdprCommunityWaitTimeShort =>
+      'Wartezeiten an Tankstellen anonym teilen';
+
+  @override
+  String get gdprCommunityWaitTimeDescription =>
+      'Teile anonym, wann du an einer Tankstelle ankommst und wieder fährst, damit die App typische Wartezeiten anzeigen kann. Es werden keine GPS-Koordinaten übertragen — nur die Tankstellen-ID.';
+
+  @override
   String get greeceApiProvider => 'Paratiritirio Timon (Greece)';
 
   @override

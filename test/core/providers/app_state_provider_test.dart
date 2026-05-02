@@ -130,18 +130,22 @@ void main() {
       expect(state.location, isFalse);
       expect(state.errorReporting, isFalse);
       expect(state.cloudSync, isFalse);
+      expect(state.communityWaitTime, isFalse);
     });
 
     test('build reflects stored values', () async {
       await fakeStorage.putSetting(StorageKeys.consentLocation, true);
       await fakeStorage.putSetting(StorageKeys.consentErrorReporting, false);
       await fakeStorage.putSetting(StorageKeys.consentCloudSync, true);
+      await fakeStorage.putSetting(
+          StorageKeys.consentCommunityWaitTime, true);
 
       final c = createContainer();
       final state = c.read(gdprConsentProvider);
       expect(state.location, isTrue);
       expect(state.errorReporting, isFalse);
       expect(state.cloudSync, isTrue);
+      expect(state.communityWaitTime, isTrue);
     });
 
     test('save persists all consent values and sets gdprConsentGiven',
@@ -151,12 +155,15 @@ void main() {
             location: true,
             errorReporting: false,
             cloudSync: true,
+            communityWaitTime: true,
           );
 
       expect(fakeStorage.getSetting(StorageKeys.gdprConsentGiven), true);
       expect(fakeStorage.getSetting(StorageKeys.consentLocation), true);
       expect(fakeStorage.getSetting(StorageKeys.consentErrorReporting), false);
       expect(fakeStorage.getSetting(StorageKeys.consentCloudSync), true);
+      expect(
+          fakeStorage.getSetting(StorageKeys.consentCommunityWaitTime), true);
       // Also updates legacy location_consent key
       expect(fakeStorage.getSetting('location_consent'), true);
 
@@ -164,6 +171,28 @@ void main() {
       expect(state.location, isTrue);
       expect(state.errorReporting, isFalse);
       expect(state.cloudSync, isTrue);
+      expect(state.communityWaitTime, isTrue);
+    });
+
+    test('save can persist communityWaitTime independently of others',
+        () async {
+      final c = createContainer();
+      await c.read(gdprConsentProvider.notifier).save(
+            location: false,
+            errorReporting: false,
+            cloudSync: false,
+            communityWaitTime: true,
+          );
+
+      expect(
+          fakeStorage.getSetting(StorageKeys.consentCommunityWaitTime), true);
+      expect(fakeStorage.getSetting(StorageKeys.consentLocation), false);
+
+      final state = c.read(gdprConsentProvider);
+      expect(state.communityWaitTime, isTrue);
+      expect(state.location, isFalse);
+      expect(state.errorReporting, isFalse);
+      expect(state.cloudSync, isFalse);
     });
   });
 }
