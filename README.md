@@ -1,4 +1,8 @@
-﻿# Tankstellen
+﻿<p align="center">
+  <img src="assets/icon.png" alt="Tankstellen app icon" width="160" height="160" />
+</p>
+
+# Tankstellen
 
 > **The cost of driving, attacked from three sides.**
 >
