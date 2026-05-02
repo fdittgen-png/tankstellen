@@ -1521,6 +1521,7 @@
   "tankLevelEmptyNoFillUp": "Tankvorgang erfassen, um den Tankfüllstand zu sehen",
   "tankLevelDetailSheetTitle": "Fahrten seit dem letzten Tankvorgang",
   "addFillUpIsFullTankLabel": "Voller Tank",
+  "addFillUpIsFullTankSubtitle": "Tank bis zum Rand gefüllt — abwählen, wenn es eine Teilbetankung war",
   "themeCardTitle": "Design",
   "themeCardSubtitleSystem": "System",
   "themeCardSubtitleLight": "Hell",

@@ -56,5 +56,9 @@
   "addFillUpIsFullTankLabel": "Full tank",
   "@addFillUpIsFullTankLabel": {
     "description": "Label of the Full-tank toggle on the Add fill-up screen — defaults on, captures whether the fill-up topped the tank up to capacity (#1195)."
+  },
+  "addFillUpIsFullTankSubtitle": "Tank filled to the brim — uncheck if this was a partial fill",
+  "@addFillUpIsFullTankSubtitle": {
+    "description": "Subtitle of the Full-tank toggle on the Add fill-up screen — explains the partial-fill alternative so users know when to flip the switch off (#1360)."
   }
 }

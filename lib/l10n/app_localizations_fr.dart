@@ -3872,6 +3872,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addFillUpIsFullTankLabel => 'Plein complet';
 
   @override
+  String get addFillUpIsFullTankSubtitle =>
+      'Réservoir rempli à ras bord — décochez s\'il s\'agissait d\'un plein partiel';
+
+  @override
   String get themeCardTitle => 'Thème';
 
   @override

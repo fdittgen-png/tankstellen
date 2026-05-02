@@ -35,19 +35,22 @@ TankLevelEstimate tankLevel(Ref ref, String vehicleId) {
   // The fill-up list is already newest-first via FillUpRepository, but
   // be defensive: a malformed import could hand us a different order.
   fillUps.sort((a, b) => b.date.compareTo(a.date));
-  final lastFillUpDate = fillUps.first.date;
 
+  // Pass every trip for the vehicle (with a real `startedAt`) — the
+  // estimator needs prior trips to compute "level just before the
+  // most recent partial fill" (#1360). Trips with null `startedAt`
+  // are dropped because they can't be placed on the timeline.
+  // The estimator additionally filters by date for the post-fill
+  // consumption tally, so the broader input is safe.
   final allTrips = ref.watch(tripHistoryListProvider);
-  final tripsSinceLastFillUp = allTrips.where((t) {
+  final vehicleTrips = allTrips.where((t) {
     if (t.vehicleId != vehicleId) return false;
-    final startedAt = t.summary.startedAt;
-    if (startedAt == null) return false;
-    return !startedAt.isBefore(lastFillUpDate);
+    return t.summary.startedAt != null;
   }).toList(growable: false);
 
   return estimateTankLevel(
     vehicle: vehicle,
     fillUps: fillUps,
-    trips: tripsSinceLastFillUp,
+    trips: vehicleTrips,
   );
 }

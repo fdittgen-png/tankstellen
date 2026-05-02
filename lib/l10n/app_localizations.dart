@@ -7112,6 +7112,12 @@ abstract class AppLocalizations {
   /// **'Full tank'**
   String get addFillUpIsFullTankLabel;
 
+  /// Subtitle of the Full-tank toggle on the Add fill-up screen — explains the partial-fill alternative so users know when to flip the switch off (#1360).
+  ///
+  /// In en, this message translates to:
+  /// **'Tank filled to the brim — uncheck if this was a partial fill'**
+  String get addFillUpIsFullTankSubtitle;
+
   /// Title of the Theme card on the Settings screen (#897). The card matches the Privacy + Storage card pattern and navigates to a dedicated theme picker screen.
   ///
   /// In en, this message translates to:

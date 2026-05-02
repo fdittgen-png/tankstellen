@@ -3874,6 +3874,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get addFillUpIsFullTankLabel => 'Voller Tank';
 
   @override
+  String get addFillUpIsFullTankSubtitle =>
+      'Tank bis zum Rand gefüllt — abwählen, wenn es eine Teilbetankung war';
+
+  @override
   String get themeCardTitle => 'Design';
 
   @override
