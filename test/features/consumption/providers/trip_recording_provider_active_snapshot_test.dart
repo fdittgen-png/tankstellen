@@ -7,6 +7,7 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/consumption/data/obd2/active_trip_repository.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
+import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 
@@ -227,6 +228,147 @@ void main() {
       expect(applied, isFalse,
           reason: 'a fresh launch that already started a trip must not '
               'be hijacked by a stale recovery snapshot');
+    },
+  );
+
+  // ---------------------------------------------------------------------------
+  // #1347 — after cold-start recovery the controller is null. The
+  // banner's Resume + End buttons must not silently no-op; the
+  // captured samples already on disk must be preserved into trip
+  // history so the user does not lose their interrupted drive.
+  // ---------------------------------------------------------------------------
+
+  test(
+    'stop() after restoreFromSnapshot persists snapshot samples to '
+    'history (#1347)',
+    () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final notifier = container.read(tripRecordingProvider.notifier);
+      notifier.debugSetActiveRepo(activeRepo);
+
+      final start = DateTime.utc(2026, 5, 2, 10, 0);
+      final samples = List<TripSample>.generate(
+        6,
+        (i) => _sampleFor(start, i),
+      );
+      final snap = ActiveTripSnapshot(
+        id: start.toIso8601String(),
+        vehicleId: 'veh-recovered',
+        vin: 'VIN-RECOVERED',
+        automatic: false,
+        phase: 'pausedDueToDrop',
+        summary: const TripSummary(
+          distanceKm: 5.5,
+          maxRpm: 3500,
+          highRpmSeconds: 2,
+          idleSeconds: 30,
+          harshBrakes: 1,
+          harshAccelerations: 0,
+        ),
+        samples: samples,
+        odometerStartKm: 1000.0,
+        odometerLatestKm: 1010.0,
+        startedAt: start,
+        lastFlushedAt: start.add(const Duration(minutes: 30)),
+      );
+      // Persist the snapshot to disk too — the salvage path must clear
+      // the box, otherwise the recovery service would resurrect the
+      // already-finalised trip on next launch.
+      await activeRepo.saveSnapshot(snap);
+      final restored = notifier.restoreFromSnapshot(snap);
+      expect(restored, isTrue);
+      expect(notifier.debugController, isNull,
+          reason: 'restoreFromSnapshot deliberately leaves _controller '
+              'null — that is the bug surface #1347 patches');
+
+      // The user taps "End recording" on the OBD2 pause banner.
+      final result = await notifier.stop();
+
+      final historyRepo = TripHistoryRepository(box: historyBox);
+      final entries = historyRepo.loadAll();
+      expect(entries, hasLength(1),
+          reason: 'stop() in the recovered-no-controller state must '
+              'finalise the snapshot into trip history so the user does '
+              'not silently lose their partial drive (#1347)');
+      expect(entries.first.id, snap.id);
+      expect(entries.first.vehicleId, 'veh-recovered');
+      expect(entries.first.samples, hasLength(6));
+      expect(entries.first.summary.distanceKm, closeTo(5.5, 0.001));
+
+      expect(activeRepo.loadSnapshot(), isNull,
+          reason: 'finalised snapshot must be cleared so the recovery '
+              'service does not resurrect it on next launch');
+      expect(notifier.state.phase, TripRecordingPhase.finished);
+      expect(result.summary.distanceKm, closeTo(5.5, 0.001));
+    },
+  );
+
+  test(
+    'resume() after restoreFromSnapshot also salvages snapshot to '
+    'history (#1347)',
+    () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final notifier = container.read(tripRecordingProvider.notifier);
+      notifier.debugSetActiveRepo(activeRepo);
+
+      final start = DateTime.utc(2026, 5, 2, 10, 0);
+      final samples = List<TripSample>.generate(
+        4,
+        (i) => _sampleFor(start, i),
+      );
+      final snap = ActiveTripSnapshot(
+        id: start.toIso8601String(),
+        vehicleId: 'veh-resumed',
+        vin: null,
+        automatic: true, // auto-record path
+        phase: 'pausedDueToDrop',
+        summary: const TripSummary(
+          distanceKm: 3.2,
+          maxRpm: 3000,
+          highRpmSeconds: 0,
+          idleSeconds: 10,
+          harshBrakes: 0,
+          harshAccelerations: 0,
+        ),
+        samples: samples,
+        odometerStartKm: null,
+        odometerLatestKm: null,
+        startedAt: start,
+        lastFlushedAt: start.add(const Duration(minutes: 5)),
+      );
+      await activeRepo.saveSnapshot(snap);
+      notifier.restoreFromSnapshot(snap);
+
+      // The user taps "Resume recording" on the OBD2 pause banner. A
+      // true continuation requires re-pairing the OBD2 adapter (out of
+      // scope of #1347 — see follow-up issue); the minimum correct
+      // behaviour is that the captured samples are not silently lost.
+      notifier.resume();
+
+      // resume() is `void` and fires its salvage as an unawaited
+      // future — drain the microtask queue so the chained Hive
+      // writes (save → clearSnapshot) settle before we assert. A
+      // small real-time delay is necessary because Hive's internal
+      // write futures don't all chain off a single microtask.
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      final historyRepo = TripHistoryRepository(box: historyBox);
+      final entries = historyRepo.loadAll();
+      expect(entries, hasLength(1),
+          reason: 'resume() with no live controller must salvage the '
+              'snapshot into history rather than silently no-op (#1347)');
+      expect(entries.first.id, snap.id);
+      expect(entries.first.automatic, isTrue,
+          reason: 'auto-record provenance must survive the salvage path '
+              'so the unseen-trip badge bookkeeping stays consistent');
+      expect(entries.first.samples, hasLength(4));
+
+      expect(activeRepo.loadSnapshot(), isNull);
+      expect(notifier.state.phase, TripRecordingPhase.finished);
     },
   );
 }
