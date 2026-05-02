@@ -3278,6 +3278,22 @@ class AppLocalizationsFr extends AppLocalizations {
       'Partagez anonymement vos heures d\'arrivée et de départ aux stations pour que l\'application affiche les temps d\'attente typiques. Aucune coordonnée GPS n\'est envoyée — uniquement l\'identifiant de la station.';
 
   @override
+  String get fillUpCorrectionLabel => 'Auto-correction — appuyez pour modifier';
+
+  @override
+  String get fillUpCorrectionEditTitle => 'Modifier l\'auto-correction';
+
+  @override
+  String get fillUpCorrectionEditExplainer =>
+      'Cette entrée a été générée automatiquement pour combler l\'écart entre les trajets enregistrés et le carburant pompé. Ajustez les valeurs si vous connaissez les chiffres réels.';
+
+  @override
+  String get fillUpCorrectionDelete => 'Supprimer la correction';
+
+  @override
+  String get fillUpCorrectionStation => 'Nom de la station (facultatif)';
+
+  @override
   String get greeceApiProvider => 'Paratiritirio Timon (Greece)';
 
   @override
