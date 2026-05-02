@@ -21,6 +21,29 @@ void main() {
       await expectLater(svc.scan().toList(), throwsA(isA<Obd2PermissionDenied>()));
     });
 
+    test(
+      'propagates Obd2BluetoothOff from the BLE facade verbatim — the '
+      'service must not catch it as a scan timeout (#1369)',
+      () async {
+        // The facade emits a typed Obd2BluetoothOff once it has
+        // identified that FlutterBluePlus rejected startScan with
+        // "Bluetooth must be turned on". The connection service is a
+        // pass-through; the picker / VIN reader catches the typed
+        // error and renders the "Turn on Bluetooth" message.
+        final svc = _build(
+          permState: Obd2PermissionState.granted,
+          bt: _FakeFacade(
+            batches: const [],
+            error: const Obd2BluetoothOff(),
+          ),
+        );
+        await expectLater(
+          svc.scan().toList(),
+          throwsA(isA<Obd2BluetoothOff>()),
+        );
+      },
+    );
+
     test('throws Obd2ScanTimeout when no known adapter is seen', () async {
       final svc = _build(
         permState: Obd2PermissionState.granted,
@@ -285,7 +308,8 @@ class _FakeClassicFacade implements ClassicBluetoothFacade {
 class _FakeFacade implements BluetoothFacade {
   final List<List<Obd2AdapterCandidate>> batches;
   final ElmByteChannel? channel;
-  _FakeFacade({required this.batches, this.channel});
+  final Object? error;
+  _FakeFacade({required this.batches, this.channel, this.error});
 
   @override
   Stream<List<Obd2AdapterCandidate>> scan({
@@ -294,6 +318,10 @@ class _FakeFacade implements BluetoothFacade {
   }) async* {
     for (final batch in batches) {
       yield batch;
+    }
+    final err = error;
+    if (err != null) {
+      throw err;
     }
   }
 

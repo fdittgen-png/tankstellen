@@ -20,6 +20,19 @@ class Obd2PermissionDenied extends Obd2ConnectionError {
   const Obd2PermissionDenied([super.message = 'Bluetooth permission denied']);
 }
 
+/// The OS Bluetooth radio is turned off (#1369). The user has the
+/// permission but the adapter itself is disabled — `FlutterBluePlus`
+/// rejects `startScan` with `PlatformException(startScan, "Bluetooth
+/// must be turned on", ...)` in this state. Surfaced as its own typed
+/// error so the picker / VIN reader can render a "Turn on Bluetooth
+/// and try again" message instead of leaking the raw plugin exception
+/// through the global error handler.
+class Obd2BluetoothOff extends Obd2ConnectionError {
+  const Obd2BluetoothOff([
+    super.message = 'Turn on Bluetooth and try again',
+  ]);
+}
+
 /// The scan window expired without any known adapter responding.
 /// Usually means the vLinker is off, out of range, or the wrong
 /// service UUID for its firmware variant.
