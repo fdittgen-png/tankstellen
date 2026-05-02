@@ -1,0 +1,4 @@
+{
+  "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 Teilbetankung wartet auf nächste Volltankung — nicht im Durchschnitt} other{{count} Teilbetankungen warten auf nächste Volltankung — nicht im Durchschnitt}}",
+  "consumptionStatsCorrectionShareHint": "{percent}% des Kraftstoffs aus Auto-Korrekturen — Einträge prüfen"
+}

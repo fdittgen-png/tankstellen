@@ -4,6 +4,19 @@ import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/consumption_stats.dart';
 
 /// Card summarising aggregated consumption statistics.
+///
+/// Since #1362 the card grows two optional decorations on top of the
+/// existing stat tiles:
+///
+///   * a grey **open-window banner** when partial fills sit after the
+///     most recent plein-complet — those fills are excluded from the
+///     average and the user is told why.
+///   * an orange-tinted **correction-share hint** when more than 5 %
+///     of the totalled fuel volume came from auto-generated corrections,
+///     nudging the user to review the orange entries in the list.
+///
+/// When neither condition fires, the card renders exactly as before so
+/// the all-plein, no-corrections case keeps its calm UX.
 class ConsumptionStatsCard extends StatelessWidget {
   final ConsumptionStats stats;
 
@@ -17,6 +30,9 @@ class ConsumptionStatsCard extends StatelessWidget {
     final avgConsumption = stats.avgConsumptionL100km;
     final avgCostKm = stats.avgCostPerKm;
 
+    final showOpenWindowBanner = stats.openWindowFillCount > 0;
+    final showCorrectionHint = stats.correctionShare > 0.05;
+
     return Card(
       margin: const EdgeInsets.all(16),
       child: Padding(
@@ -24,6 +40,26 @@ class ConsumptionStatsCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (showOpenWindowBanner) ...[
+              _OpenWindowBanner(
+                text: l?.consumptionStatsOpenWindowBanner(
+                      stats.openWindowFillCount,
+                    ) ??
+                    '${stats.openWindowFillCount} partial fill(s) pending '
+                        'plein complet — not in average',
+              ),
+              const SizedBox(height: 8),
+            ],
+            if (showCorrectionHint) ...[
+              _CorrectionShareHint(
+                text: l?.consumptionStatsCorrectionShareHint(
+                      (stats.correctionShare * 100).round(),
+                    ) ??
+                    '${(stats.correctionShare * 100).round()}% of fuel from '
+                        'auto-corrections — review entries',
+              ),
+              const SizedBox(height: 8),
+            ],
             Text(
               l?.consumptionStatsTitle ?? 'Consumption stats',
               style: theme.textTheme.titleMedium
@@ -80,6 +116,82 @@ class ConsumptionStatsCard extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Grey informational banner — partials are pending a plein-complet
+/// close. Non-tappable v1; tap-to-jump to fill-up list is a follow-up.
+class _OpenWindowBanner extends StatelessWidget {
+  final String text;
+
+  const _OpenWindowBanner({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.hourglass_bottom,
+            size: 18,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Orange-tinted hint — too much of the average comes from auto-
+/// corrections. Encourages the user to review the orange entries.
+class _CorrectionShareHint extends StatelessWidget {
+  final String text;
+
+  const _CorrectionShareHint({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    // Reuse the orange palette established by the correction fill-up
+    // card (#1361) so the visual language stays consistent.
+    final orange = Colors.orange.shade700;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: orange.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: orange.withValues(alpha: 0.40)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.warning_amber_outlined, size: 18, color: orange),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: theme.textTheme.bodySmall,
+            ),
+          ),
+        ],
       ),
     );
   }

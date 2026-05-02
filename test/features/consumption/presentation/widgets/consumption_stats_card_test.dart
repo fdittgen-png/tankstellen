@@ -15,6 +15,10 @@ ConsumptionStats _stats({
   double totalDistanceKm = 0,
   double? avgConsumptionL100km,
   double? avgCostPerKm,
+  double correctionLitersTotal = 0,
+  double correctionShare = 0,
+  int openWindowFillCount = 0,
+  double openWindowLiters = 0,
 }) {
   return ConsumptionStats(
     fillUpCount: fillUpCount,
@@ -23,6 +27,10 @@ ConsumptionStats _stats({
     totalDistanceKm: totalDistanceKm,
     avgConsumptionL100km: avgConsumptionL100km,
     avgCostPerKm: avgCostPerKm,
+    correctionLitersTotal: correctionLitersTotal,
+    correctionShare: correctionShare,
+    openWindowFillCount: openWindowFillCount,
+    openWindowLiters: openWindowLiters,
   );
 }
 
@@ -201,4 +209,164 @@ void main() {
       expect(find.text('—'), findsNothing); // no nullable fallbacks fired
     });
   });
+
+  // ─── #1362 — open-window banner & correction-share hint ───────────
+  //
+  // The card grows two optional decorations on top of the stat tiles
+  // when the underlying stats indicate partial fills are pending the
+  // next plein-complet OR a meaningful share of fuel came from auto-
+  // corrections. When neither condition holds the card must render
+  // exactly as before.
+
+  group('ConsumptionStatsCard — open-window banner', () {
+    testWidgets(
+      'shows the banner when openWindowFillCount > 0',
+      (tester) async {
+        await pumpApp(
+          tester,
+          ConsumptionStatsCard(
+            stats: _stats(
+              fillUpCount: 3,
+              totalLiters: 90,
+              openWindowFillCount: 2,
+              openWindowLiters: 30,
+            ),
+          ),
+        );
+        expect(
+          find.textContaining('partial fills pending plein complet'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'hides the banner when openWindowFillCount is zero',
+      (tester) async {
+        await pumpApp(
+          tester,
+          ConsumptionStatsCard(stats: _stats(fillUpCount: 2)),
+        );
+        expect(
+          find.textContaining('partial fill'),
+          findsNothing,
+        );
+        expect(
+          find.textContaining('plein complet'),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'pluralises to singular when exactly 1 partial fill is pending',
+      (tester) async {
+        await pumpApp(
+          tester,
+          ConsumptionStatsCard(
+            stats: _stats(
+              fillUpCount: 2,
+              totalLiters: 60,
+              openWindowFillCount: 1,
+              openWindowLiters: 15,
+            ),
+          ),
+        );
+        // Singular "1 partial fill pending plein complet — not in average".
+        expect(
+          find.textContaining('1 partial fill pending plein complet'),
+          findsOneWidget,
+        );
+      },
+    );
+  });
+
+  group('ConsumptionStatsCard — correction-share hint', () {
+    testWidgets(
+      'shows the hint when correctionShare > 5 %',
+      (tester) async {
+        await pumpApp(
+          tester,
+          ConsumptionStatsCard(
+            stats: _stats(
+              fillUpCount: 3,
+              totalLiters: 100,
+              correctionLitersTotal: 12,
+              correctionShare: 0.12,
+            ),
+          ),
+        );
+        // "12% of fuel from auto-corrections — review entries"
+        expect(
+          find.textContaining('% of fuel from auto-corrections'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'hides the hint when correctionShare is at the 5 % threshold',
+      (tester) async {
+        await pumpApp(
+          tester,
+          ConsumptionStatsCard(
+            stats: _stats(
+              fillUpCount: 3,
+              totalLiters: 100,
+              correctionLitersTotal: 5,
+              correctionShare: 0.05,
+            ),
+          ),
+        );
+        expect(
+          find.textContaining('auto-corrections'),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'hides the hint when correctionShare is zero',
+      (tester) async {
+        await pumpApp(
+          tester,
+          ConsumptionStatsCard(stats: _stats(fillUpCount: 3)),
+        );
+        expect(
+          find.textContaining('auto-corrections'),
+          findsNothing,
+        );
+      },
+    );
+  });
+
+  group(
+    'ConsumptionStatsCard — all-plein no-corrections render is unchanged',
+    () {
+      testWidgets(
+        'no banner, no hint when openWindowFillCount==0 AND correctionShare==0',
+        (tester) async {
+          await pumpApp(
+            tester,
+            ConsumptionStatsCard(
+              stats: _stats(
+                fillUpCount: 5,
+                totalLiters: 200,
+                totalSpent: 300,
+                avgConsumptionL100km: 6.4,
+                avgCostPerKm: 0.10,
+              ),
+            ),
+          );
+          // Neither decoration must be present.
+          expect(find.textContaining('partial fill'), findsNothing);
+          expect(find.textContaining('plein complet'), findsNothing);
+          expect(find.textContaining('auto-corrections'), findsNothing);
+          // Existing chrome still renders.
+          expect(find.text('Consumption stats'), findsOneWidget);
+          expect(find.text('Fill-ups: 5'), findsOneWidget);
+        },
+      );
+    },
+  );
 }
