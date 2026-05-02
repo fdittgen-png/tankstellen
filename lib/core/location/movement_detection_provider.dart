@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../features/consumption/data/obd2/event_channel_cancel.dart';
 import '../utils/geo_utils.dart';
 import 'geolocator_wrapper.dart';
 
@@ -193,7 +194,14 @@ class MovementDetection extends _$MovementDetection {
   }
 
   void _stopListening() {
-    _positionSubscription?.cancel();
+    // #1352 — `Geolocator.getPositionStream()` is backed by the
+    // `flutter.baseflow.com/geolocator_updates_android` EventChannel.
+    // When the user revokes the location permission mid-stream, or the
+    // OS kills the position service, the platform side tears the
+    // broadcast down before we cancel — Flutter then rethrows a benign
+    // `PlatformException("No active stream to cancel")` that would
+    // otherwise pollute the privacy-dashboard error log.
+    unawaited(_positionSubscription?.safeCancel());
     _positionSubscription = null;
   }
 }

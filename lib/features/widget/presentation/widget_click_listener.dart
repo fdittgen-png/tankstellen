@@ -7,6 +7,7 @@ import 'package:home_widget/home_widget.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../app/router.dart';
+import '../../consumption/data/obd2/event_channel_cancel.dart';
 
 part 'widget_click_listener.g.dart';
 
@@ -97,7 +98,13 @@ class _WidgetClickListenerState extends ConsumerState<WidgetClickListener> {
 
   @override
   void dispose() {
-    _subscription?.cancel();
+    // #1352 — `HomeWidget.widgetClicked` is backed by the
+    // `home_widget/updates` EventChannel; the platform may have
+    // already torn the broadcast down (lifecycle race during navigation
+    // or process kill), and the resulting benign
+    // `PlatformException("No active stream to cancel")` would otherwise
+    // bubble through the privacy-dashboard error log.
+    unawaited(_subscription?.safeCancel());
     super.dispose();
   }
 
