@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
@@ -371,4 +372,133 @@ void main() {
       );
     });
   });
+
+  group('MovementDetection EventChannel cleanup (#1352)', () {
+    // `Geolocator.getPositionStream()` is backed by the
+    // `flutter.baseflow.com/geolocator_updates_android` EventChannel.
+    // When the OS tears the broadcast down before the Dart cancel
+    // (permission revoked, position service stopped), Flutter rethrows
+    // the benign `PlatformException("No active stream to cancel")`
+    // through cancel's future. Without `safeCancel` that exception
+    // bubbles up into the privacy-dashboard error log (#1352) and
+    // masks real bugs. These tests pin the migration so a future
+    // rewrite that drops the `safeCancel()` call fails loudly.
+
+    test(
+        'stop() swallows the benign "No active stream to cancel" '
+        'PlatformException raised by the EventChannel-backed cancel',
+        () async {
+      final fake = _ThrowingFakeGeolocator(
+        cancelError: PlatformException(
+          code: 'error',
+          message: 'No active stream to cancel',
+        ),
+      );
+      final container = ProviderContainer(
+        overrides: [
+          geolocatorWrapperProvider.overrideWithValue(fake),
+        ],
+      );
+      addTearDown(container.dispose);
+      addTearDown(fake.dispose);
+
+      final notifier = container.read(movementDetectionProvider.notifier);
+      notifier.start();
+      // Pump the listen so the underlying subscription is established
+      // and `stop()` will actually invoke `cancel()`.
+      await Future<void>.delayed(Duration.zero);
+
+      // `stop()` must NOT rethrow — the PlatformException is benign
+      // and `safeCancel` is responsible for swallowing it.
+      expect(notifier.stop, returnsNormally);
+      expect(fake.cancelCount, 1);
+    });
+
+    test(
+        'stop() rethrows non-benign PlatformExceptions raised by cancel '
+        '(safeCancel only swallows the exact "No active stream" message)',
+        () async {
+      final fake = _ThrowingFakeGeolocator(
+        cancelError: PlatformException(
+          code: 'error',
+          message: 'Different platform error',
+        ),
+      );
+      final container = ProviderContainer(
+        overrides: [
+          geolocatorWrapperProvider.overrideWithValue(fake),
+        ],
+      );
+      addTearDown(container.dispose);
+      addTearDown(fake.dispose);
+
+      final notifier = container.read(movementDetectionProvider.notifier);
+      notifier.start();
+      await Future<void>.delayed(Duration.zero);
+
+      // The cancel happens through `unawaited(...safeCancel())` so the
+      // synchronous `stop()` returns normally — but the unawaited
+      // future must surface the rethrown error to the zone. Catch it
+      // explicitly via runZonedGuarded so the test can assert on the
+      // rethrown PlatformException without a leaked uncaught error.
+      Object? caughtError;
+      await runZonedGuarded<Future<void>>(() async {
+        notifier.stop();
+        // Allow microtasks for the unawaited safeCancel to settle.
+        await Future<void>.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
+      }, (e, _) {
+        caughtError = e;
+      });
+
+      expect(
+        caughtError,
+        isA<PlatformException>().having(
+          (e) => e.message,
+          'message',
+          'Different platform error',
+        ),
+      );
+      expect(fake.cancelCount, 1);
+    });
+  });
+}
+
+/// Variant of [_FakeGeolocator] whose subscription's `cancel()` throws.
+/// Lets us prove the `safeCancel` migration in
+/// [MovementDetection._stopListening] swallows the benign EventChannel
+/// PlatformException (#1352) without removing real cancellation
+/// semantics.
+class _ThrowingFakeGeolocator extends GeolocatorWrapper {
+  _ThrowingFakeGeolocator({required this.cancelError});
+
+  final Object cancelError;
+  int cancelCount = 0;
+  StreamController<Position>? _controller;
+
+  @override
+  Stream<Position> getPositionStream({LocationSettings? locationSettings}) {
+    // Closed in [dispose] — owned by the test fake, not the production
+    // notifier (the notifier only ever holds the subscription, never
+    // the underlying controller).
+    // ignore: close_sinks
+    final controller = StreamController<Position>(
+      onCancel: () async {
+        cancelCount++;
+        throw cancelError;
+      },
+    );
+    _controller = controller;
+    return controller.stream;
+  }
+
+  void dispose() {
+    final c = _controller;
+    if (c != null && !c.isClosed) {
+      // Detach the throwing onCancel before disposing — tearDown must
+      // not be the path that triggers the test's expected throw.
+      c.onCancel = null;
+      c.close();
+    }
+  }
 }
