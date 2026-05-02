@@ -11,6 +11,7 @@ import '../../domain/entities/consumption_stats.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
 import 'consumption_stats_card.dart';
+import 'edit_correction_fill_up_sheet.dart';
 import 'fill_up_card.dart';
 import 'tank_level_card.dart';
 
@@ -90,9 +91,25 @@ class FuelTab extends ConsumerWidget {
           child: FillUpCard(
             fillUp: fillUp,
             ecoScore: ref.watch(ecoScoreForFillUpProvider(fillUp.id)),
+            // #1361 phase 2b — tapping a correction entry opens the
+            // edit sheet. Non-correction cards keep the existing
+            // no-op tap behaviour (a future fill-up detail screen
+            // would wire here).
+            onTap: fillUp.isCorrection
+                ? () => _openCorrectionEditor(context, fillUp)
+                : null,
           ),
         );
       },
+    );
+  }
+
+  void _openCorrectionEditor(BuildContext context, FillUp fillUp) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (_) => EditCorrectionFillUpSheet(fillUp: fillUp),
     );
   }
 }

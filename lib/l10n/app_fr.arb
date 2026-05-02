@@ -1074,5 +1074,10 @@
   "unifiedNoResultsForFilter": "Aucun résultat pour ce filtre",
   "gdprCommunityWaitTimeTitle": "Temps d'attente partagés",
   "gdprCommunityWaitTimeShort": "Partager anonymement les temps d'attente",
-  "gdprCommunityWaitTimeDescription": "Partagez anonymement vos heures d'arrivée et de départ aux stations pour que l'application affiche les temps d'attente typiques. Aucune coordonnée GPS n'est envoyée — uniquement l'identifiant de la station."
+  "gdprCommunityWaitTimeDescription": "Partagez anonymement vos heures d'arrivée et de départ aux stations pour que l'application affiche les temps d'attente typiques. Aucune coordonnée GPS n'est envoyée — uniquement l'identifiant de la station.",
+  "fillUpCorrectionLabel": "Auto-correction — appuyez pour modifier",
+  "fillUpCorrectionEditTitle": "Modifier l'auto-correction",
+  "fillUpCorrectionEditExplainer": "Cette entrée a été générée automatiquement pour combler l'écart entre les trajets enregistrés et le carburant pompé. Ajustez les valeurs si vous connaissez les chiffres réels.",
+  "fillUpCorrectionDelete": "Supprimer la correction",
+  "fillUpCorrectionStation": "Nom de la station (facultatif)"
 }

@@ -13,6 +13,13 @@ import 'eco_score_badge.dart';
 /// fill-up history), an eco-score badge appears under the cost line —
 /// turning the card from a passive record into a driving-behaviour
 /// nudge. See issue #676 ("Smarter pump. Smarter drive. Save twice.").
+///
+/// When [FillUp.isCorrection] is true (#1361 phase 2b), the card uses
+/// the orange-amber correction theme: a 4 px left border, an
+/// `auto_fix_high` leading icon on an orange background, and an inline
+/// "Auto-correction — tap to edit" subtitle. Tapping a correction card
+/// is expected to open the [EditCorrectionFillUpSheet] — the tap
+/// handler is wired by the parent (the Fuel tab list builder).
 class FillUpCard extends StatelessWidget {
   final FillUp fillUp;
   final EcoScore? ecoScore;
@@ -42,15 +49,41 @@ class FillUpCard extends StatelessWidget {
         '${fillUp.totalCost.toStringAsFixed(2)} ${PriceFormatter.currency}';
     final ppl = UnitFormatter.formatPricePerUnit(fillUp.pricePerLiter);
 
-    return Card(
+    final isCorrection = fillUp.isCorrection;
+    // Material amber/orange that reads cleanly against both M3 light
+    // and dark backgrounds. Picked shade 700 for the border + circle
+    // background so the contrast vs. white text on the avatar stays
+    // readable at smaller sizes.
+    final correctionColor = Colors.orange.shade700;
+
+    final card = Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      // The outline gives a 4 px left border via shape; we paint the
+      // rest of the card normally. Using `Card.shape` keeps the
+      // material elevation/ink ripple intact (vs. wrapping in a
+      // Container, which would clip the ListTile splash).
+      shape: isCorrection
+          ? RoundedRectangleBorder(
+              side: BorderSide(color: correctionColor, width: 4),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                bottomLeft: Radius.circular(12),
+                topRight: Radius.circular(4),
+                bottomRight: Radius.circular(4),
+              ),
+            )
+          : null,
       child: ListTile(
         onTap: onTap,
         leading: CircleAvatar(
-          backgroundColor: theme.colorScheme.primaryContainer,
+          backgroundColor: isCorrection
+              ? correctionColor
+              : theme.colorScheme.primaryContainer,
           child: Icon(
-            Icons.local_gas_station,
-            color: theme.colorScheme.onPrimaryContainer,
+            isCorrection ? Icons.auto_fix_high : Icons.local_gas_station,
+            color: isCorrection
+                ? Colors.white
+                : theme.colorScheme.onPrimaryContainer,
           ),
         ),
         title: Text(
@@ -68,6 +101,17 @@ class FillUpCard extends StatelessWidget {
               '$volume · $costStr · $ppl',
               style: theme.textTheme.bodySmall,
             ),
+            if (isCorrection) ...[
+              const SizedBox(height: 4),
+              Text(
+                l?.fillUpCorrectionLabel ??
+                    'Auto-correction — tap to edit',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: correctionColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
             if (ecoScore != null) ...[
               const SizedBox(height: 4),
               EcoScoreBadge(score: ecoScore!),
@@ -81,6 +125,8 @@ class FillUpCard extends StatelessWidget {
         ),
       ),
     );
+
+    return card;
   }
 
   String _pad(int n) => n.toString().padLeft(2, '0');

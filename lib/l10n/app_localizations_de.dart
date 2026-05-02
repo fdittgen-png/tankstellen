@@ -3277,6 +3277,22 @@ class AppLocalizationsDe extends AppLocalizations {
       'Teile anonym, wann du an einer Tankstelle ankommst und wieder fährst, damit die App typische Wartezeiten anzeigen kann. Es werden keine GPS-Koordinaten übertragen — nur die Tankstellen-ID.';
 
   @override
+  String get fillUpCorrectionLabel => 'Auto-Korrektur — zum Bearbeiten tippen';
+
+  @override
+  String get fillUpCorrectionEditTitle => 'Auto-Korrektur bearbeiten';
+
+  @override
+  String get fillUpCorrectionEditExplainer =>
+      'Dieser Eintrag wurde automatisch erstellt, um die Differenz zwischen aufgezeichneten Fahrten und getanktem Kraftstoff auszugleichen. Passe die Werte an, wenn du die tatsächlichen Zahlen kennst.';
+
+  @override
+  String get fillUpCorrectionDelete => 'Korrektur löschen';
+
+  @override
+  String get fillUpCorrectionStation => 'Tankstelle (optional)';
+
+  @override
   String get greeceApiProvider => 'Paratiritirio Timon (Greece)';
 
   @override

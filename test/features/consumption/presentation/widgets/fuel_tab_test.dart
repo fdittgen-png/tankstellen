@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/achievements/domain/achievement.dart';
 import 'package:tankstellen/features/achievements/presentation/widgets/badge_shelf.dart';
 import 'package:tankstellen/features/achievements/providers/achievements_provider.dart';
 import 'package:tankstellen/features/consumption/domain/entities/consumption_stats.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/edit_correction_fill_up_sheet.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/fuel_tab.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
 import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
@@ -76,6 +78,50 @@ void main() {
     // the tree either — that's the user-visible signal that the gate
     // worked.
     expect(find.text('Achievements'), findsNothing);
+  });
+
+  // #1361 phase 2b — tapping a correction card opens the editor sheet.
+  testWidgets(
+      'tapping a correction fill-up card opens EditCorrectionFillUpSheet',
+      (tester) async {
+    final correctionFills = <FillUp>[
+      FillUp(
+        id: 'correction_p1',
+        date: DateTime(2026, 4, 15),
+        liters: 3.4,
+        totalCost: 0,
+        odometerKm: 12500,
+        fuelType: FuelType.e10,
+        isCorrection: true,
+      ),
+    ];
+    await pumpApp(
+      tester,
+      FuelTab(fillUps: correctionFills, stats: stats, l: null),
+      overrides: [
+        achievementsProvider.overrideWithValue(const <EarnedAchievement>[]),
+        gamificationEnabledProvider.overrideWith((ref) => false),
+        activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
+        fillUpListProvider
+            .overrideWith(() => _FixedFillUpList(correctionFills)),
+      ],
+    );
+
+    expect(find.byType(EditCorrectionFillUpSheet), findsNothing);
+
+    // Tap the correction card. The card lives inside a Dismissible so
+    // we target the auto_fix_high icon (only present on corrections)
+    // to disambiguate from the header column items.
+    await tester.tap(find.byIcon(Icons.auto_fix_high));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(
+      find.byType(EditCorrectionFillUpSheet),
+      findsOneWidget,
+      reason:
+          'Tapping a correction card must open the bottom-sheet editor.',
+    );
   });
 }
 

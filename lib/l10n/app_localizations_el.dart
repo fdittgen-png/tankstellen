@@ -3251,6 +3251,22 @@ class AppLocalizationsEl extends AppLocalizations {
       'Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.';
 
   @override
+  String get fillUpCorrectionLabel => 'Auto-correction — tap to edit';
+
+  @override
+  String get fillUpCorrectionEditTitle => 'Edit auto-correction';
+
+  @override
+  String get fillUpCorrectionEditExplainer =>
+      'This entry was auto-generated to close the gap between recorded trips and pumped fuel. Adjust the values if you know the actual figures.';
+
+  @override
+  String get fillUpCorrectionDelete => 'Delete correction';
+
+  @override
+  String get fillUpCorrectionStation => 'Station name (optional)';
+
+  @override
   String get greeceApiProvider => 'Paratiritirio Timon (Greece)';
 
   @override
