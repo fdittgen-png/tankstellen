@@ -135,6 +135,40 @@ void main() {
       expect(profile!.id, 'vlinker-bm-plus');
     });
 
+    test(
+      'vLinker BM-Android (Classic SPP) matches vlinker-bm-android-classic '
+      '(#1349)',
+      () {
+        // User-reported 2026-05-02: bonded device "vLinker BM-Android"
+        // was hidden from the picker entirely because no profile
+        // matched the name. Classic transport — Bluetooth bonded list
+        // carries no advertised services.
+        final hit = _candidate(name: 'vLinker BM-Android', services: []);
+        final profile = registry.resolve(hit);
+        expect(profile, isNotNull,
+            reason: 'BM-Android variant must surface in the picker, '
+                'not be silently dropped because the registry has no '
+                'matcher (#1349)');
+        expect(profile!.id, 'vlinker-bm-android-classic');
+        expect(profile.transport, BluetoothTransport.classic);
+      },
+    );
+
+    test(
+      'vLinker BM+ does not collide with the new BM-Android entry (#1349)',
+      () {
+        // Regression guard: the BM+ matcher requires the literal "+"
+        // and the BM-Android matcher requires the literal "-android".
+        // Neither glyph appears in the other so the entries are
+        // disjoint regardless of profile-list ordering.
+        final hit = _candidate(
+          name: 'vLinker BM+',
+          services: const ['0000fff0-0000-1000-8000-00805f9b34fb'],
+        );
+        expect(registry.resolve(hit)?.id, 'vlinker-bm-plus');
+      },
+    );
+
     test('vLinker BM (no plus) does NOT collide with the BM+ entry', () {
       // Regression guard: a plain "vLinker BM" advert must not be
       // hijacked by the BM+ matcher — the "+" is the distinguishing

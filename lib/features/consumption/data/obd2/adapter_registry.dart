@@ -279,6 +279,23 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
     nameMatchers: ['vlinker bm+', 'vlink bm+'],
   ),
+  // vLinker BM-Android — Classic SPP firmware variant of the vLinker
+  // BM line that ships with an Android-specific advertising name
+  // (#1349). User-reported on a Samsung device 2026-05-02: bonded
+  // device list shows "vLinker BM-Android" and the picker hid it
+  // because no profile carried a matcher for the "-android" suffix
+  // (the BM+ entry above requires the literal "+", and the generic
+  // Classic fallback only catches names containing "obd" / "elm327").
+  // Listed BEFORE the generic-classic fallback so this specific
+  // match wins. The Android-suffixed name is the conservative match —
+  // a plain "vLinker BM" Classic device would still need its own
+  // entry, but evidence in the field is for the -Android variant.
+  Obd2AdapterProfile(
+    id: 'vlinker-bm-android-classic',
+    displayName: 'vLinker BM-Android (Classic)',
+    transport: BluetoothTransport.classic,
+    nameMatchers: ['vlinker bm-android', 'vlink bm-android'],
+  ),
   // Konnwei KW902 — Classic Bluetooth ELM327 v1.5 clone, extremely
   // common on Amazon / AliExpress. Advertises as "KONNWEI" or "KW902"
   // in bonded-device lists (#949).
