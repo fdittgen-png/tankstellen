@@ -447,6 +447,152 @@ void main() {
     );
 
     testWidgets(
+      'cold-start on Carte tab fires a one-shot incarnation bump on first '
+      'frame (#1316 phase 1 — last_visited_tab=Carte path)',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        await pumpApp(
+          tester,
+          const MapScreen(),
+          overrides: [
+            ...test.overrides,
+            userPositionNullOverride(),
+            // Pre-seed the shell branch as Carte (1) — this simulates the
+            // app being relaunched onto its last-visited tab.
+            currentShellBranchProvider.overrideWith(
+              () => _CarteBranchSeed(),
+            ),
+          ],
+        );
+
+        int currentIncarnation() {
+          final subtree = tester
+              .widgetList<KeyedSubtree>(
+                find.descendant(
+                  of: find.byType(MapScreen),
+                  matching: find.byType(KeyedSubtree),
+                ),
+              )
+              .firstWhere((w) => w.key is ValueKey<int>);
+          return (subtree.key as ValueKey<int>).value;
+        }
+
+        // After the initial pumpApp (which calls pumpAndSettle inside),
+        // the one-shot post-frame callback has already fired and the
+        // incarnation should be greater than the initial 0. Without the
+        // cold-start bump, the incarnation would stay at 0 and TileLayer
+        // would never re-run its first-layout pass against real
+        // constraints.
+        expect(
+          currentIncarnation(),
+          greaterThan(0),
+          reason:
+              'On cold-start with currentShellBranchProvider already at the '
+              'Carte branch (no tab-flip transition), MapScreen must still '
+              'fire a one-shot incarnation bump so the FlutterMap subtree '
+              'gets rebuilt with real post-layout constraints (#1316).',
+        );
+      },
+    );
+
+    testWidgets(
+      'cold-start one-shot bump fires only once per State instance '
+      '(#1316 phase 1 — guard against repeated rebuilds)',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        await pumpApp(
+          tester,
+          const MapScreen(),
+          overrides: [
+            ...test.overrides,
+            userPositionNullOverride(),
+            currentShellBranchProvider.overrideWith(
+              () => _CarteBranchSeed(),
+            ),
+          ],
+        );
+
+        int currentIncarnation() {
+          final subtree = tester
+              .widgetList<KeyedSubtree>(
+                find.descendant(
+                  of: find.byType(MapScreen),
+                  matching: find.byType(KeyedSubtree),
+                ),
+              )
+              .firstWhere((w) => w.key is ValueKey<int>);
+          return (subtree.key as ValueKey<int>).value;
+        }
+
+        final afterColdStart = currentIncarnation();
+
+        // Pump a few additional frames — these would re-enter [build]
+        // and, without the [_coldStartBumpFired] guard, fire the
+        // one-shot again (continuously cancelling tile fetches).
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
+        await tester.pump();
+
+        expect(
+          currentIncarnation(),
+          equals(afterColdStart),
+          reason:
+              'The cold-start one-shot must fire exactly once per State '
+              'instance — repeated bumps on every build would cancel the '
+              'tile fetches that the bump itself just kicked off (#1316).',
+        );
+      },
+    );
+
+    testWidgets(
+      'LayoutBuilder gate suppresses FlutterMap when constraints are below '
+      '100px on either axis (#1316 phase 1 — Android placeholder pass)',
+      (tester) async {
+        // Force the body LayoutBuilder to receive constraints well
+        // below the new 100px threshold but keep enough total viewport
+        // height for the AppBar so we are NOT measuring AppBar
+        // overflow. AppBar takes ~56px; with a 130px-tall viewport,
+        // the body's Expanded gets ~74px — below 100 → must be
+        // suppressed. Width is wide enough (600) that the AppBar
+        // chrome fits.
+        tester.view.physicalSize = const Size(600, 130);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        await pumpApp(
+          tester,
+          const MapScreen(),
+          overrides: [
+            ...test.overrides,
+            userPositionNullOverride(),
+            searchStateProvider.overrideWith(
+              () => _LoadedSearchState(const [_seedStation]),
+            ),
+          ],
+        );
+
+        expect(
+          find.byType(FlutterMap),
+          findsNothing,
+          reason:
+              'LayoutBuilder gate must suppress FlutterMap below the 100px '
+              'threshold so Android placeholder layout passes never reach '
+              'TileLayer with degenerate constraints (#1316). With a 130px '
+              'viewport and a 56px AppBar, the body gets ~74px height — '
+              'below the threshold and therefore suppressed.',
+        );
+      },
+    );
+
+    testWidgets(
       'app-resume on a non-Carte tab does NOT rebuild FlutterMap '
       '(#1268 — only refresh when Carte is visible)',
       (tester) async {
@@ -521,6 +667,15 @@ class _LoadedSearchState extends SearchState {
           fetchedAt: DateTime.now(),
         ),
       );
+}
+
+/// Override that seeds [currentShellBranchProvider] at branch 1 (Carte)
+/// from initial state — simulates the cold-start path where
+/// `last_visited_tab = Carte` is restored from disk and no tab-flip
+/// transition is ever observed.
+class _CarteBranchSeed extends CurrentShellBranch {
+  @override
+  int build() => 1;
 }
 
 const _seedStation = Station(

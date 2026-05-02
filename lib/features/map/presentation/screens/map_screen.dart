@@ -73,6 +73,32 @@ import '../widgets/route_map_view.dart';
 ///      legitimately have no upstream data continue to render `--` (the
 ///      `priceColor(null,…)` grey signals "no data" — already distinct
 ///      from the loading state).
+///
+/// ## Cold-start one-shot bump (#1316 phase 1)
+///
+/// The 5-fix stack above (#473/#498/#709/#1164/#1268) regressed
+/// because none of the rebuild triggers fire when the user opens the
+/// app DIRECTLY onto the Carte tab (e.g. `last_visited_tab = Carte`
+/// restored from disk). The [currentShellBranchProvider] listener at
+/// the top of [build] only fires on TRANSITIONS to branch 1 — the
+/// initial render at branch 1 is not a transition, so it is silent.
+/// The lifecycle observer only fires on resume from background, not
+/// on first launch. The [LayoutBuilder] gate prevents degenerate
+/// constraints from reaching TileLayer but cannot recover if a 1×1
+/// Android placeholder pass slips through (see the gate threshold
+/// below).
+///
+/// Phase 1 adds a one-shot incarnation bump on the first build that
+/// observes `currentShellBranchProvider == _mapBranchIndex`. This
+/// mirrors the tab-flip rebuild pattern (controller swap, dispose
+/// after next frame) and is guarded by [_coldStartBumpFired] so it
+/// fires exactly once per [_MapScreenState] instance. Phase 1 also
+/// scatters [debugPrint] breadcrumbs across every cold-start path
+/// (tagged `[map-cold-start]`, `[map-layout]`, `[map-incarn]`,
+/// `[map-lifecycle]`, `[map-branch]`) so a `adb logcat | grep map-`
+/// during a repro yields actionable evidence — the issue body
+/// explicitly calls out "a diagnostic logging pass before any 'fix'
+/// is the right move".
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key, this.clockOverride});
 
@@ -112,11 +138,24 @@ class _MapScreenState extends ConsumerState<MapScreen>
   /// [_resumeRefreshThreshold].
   DateTime? _pausedAt;
 
+  /// Guard for the cold-start one-shot incarnation bump (#1316 phase
+  /// 1). Set to `true` the first time [build] observes
+  /// `currentShellBranchProvider == _mapBranchIndex`, which schedules
+  /// a single post-frame controller swap so TileLayer re-runs its
+  /// first-layout pass against real constraints. Subsequent builds
+  /// skip the bump — repeat tab visits are covered by the
+  /// [currentShellBranchProvider] listener.
+  bool _coldStartBumpFired = false;
+
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
     WidgetsBinding.instance.addObserver(this);
+    debugPrint(
+      '[map-lifecycle] initState — incarnation=$_mapIncarnation, '
+      'observer attached',
+    );
   }
 
   @override
@@ -131,6 +170,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
+    debugPrint('[map-lifecycle] state=$state, pausedAt=$_pausedAt');
     if (state == AppLifecycleState.resumed) {
       _onAppResumed();
     } else if (state == AppLifecycleState.paused ||
@@ -153,19 +193,43 @@ class _MapScreenState extends ConsumerState<MapScreen>
     final pausedAt = _pausedAt;
     _pausedAt = null;
     if (!mounted) return;
-    if (pausedAt == null) return;
-    if (_now().difference(pausedAt) < _resumeRefreshThreshold) {
+    if (pausedAt == null) {
+      debugPrint('[map-lifecycle] resume skipped: no pausedAt timestamp');
+      return;
+    }
+    final pauseDuration = _now().difference(pausedAt);
+    if (pauseDuration < _resumeRefreshThreshold) {
+      debugPrint(
+        '[map-lifecycle] resume skipped: pauseDuration=$pauseDuration '
+        '< threshold=$_resumeRefreshThreshold',
+      );
       return;
     }
     final currentBranch = ref.read(currentShellBranchProvider);
-    if (currentBranch != _mapBranchIndex) return;
+    if (currentBranch != _mapBranchIndex) {
+      debugPrint(
+        '[map-lifecycle] resume skipped: currentBranch=$currentBranch '
+        '(not on Carte=$_mapBranchIndex)',
+      );
+      return;
+    }
+    debugPrint(
+      '[map-lifecycle] resume firing refresh: pauseDuration=$pauseDuration, '
+      'incarnation=$_mapIncarnation -> ${_mapIncarnation + 1}',
+    );
 
+    // App-resume rebuild also covers the cold-start case; mark the
+    // one-shot as fired so the next [build] doesn't pile on.
+    _coldStartBumpFired = true;
     final old = _mapController;
     try {
       setState(() {
         _mapController = MapController();
         _mapIncarnation++;
       });
+      debugPrint(
+        '[map-incarn] bumped to $_mapIncarnation (trigger: app-resume)',
+      );
     } catch (e, st) {
       debugPrint('MapScreen rebuild on app-resume: $e\n$st');
     }
@@ -188,9 +252,21 @@ class _MapScreenState extends ConsumerState<MapScreen>
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<int>(currentShellBranchProvider, (_, next) {
-      const mapBranchIndex = 1;
-      if (next != mapBranchIndex) return;
+    ref.listen<int>(currentShellBranchProvider, (previous, next) {
+      debugPrint(
+        '[map-branch] listener fired: $previous -> $next '
+        '(mapBranch=$_mapBranchIndex, incarnation=$_mapIncarnation)',
+      );
+      if (next != _mapBranchIndex) {
+        debugPrint(
+          '[map-branch] skipped rebuild: next=$next is not mapBranch',
+        );
+        return;
+      }
+      // A tab-flip rebuild already covers the cold-start case — mark
+      // the one-shot as fired so the post-flip [build] doesn't pile a
+      // second redundant rebuild on top.
+      _coldStartBumpFired = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         final old = _mapController;
@@ -199,6 +275,9 @@ class _MapScreenState extends ConsumerState<MapScreen>
             _mapController = MapController();
             _mapIncarnation++;
           });
+          debugPrint(
+            '[map-incarn] bumped to $_mapIncarnation (trigger: tab-flip)',
+          );
         } catch (e, st) {
           debugPrint('MapScreen rebuild on tab-flip: $e\n$st');
         }
@@ -213,6 +292,46 @@ class _MapScreenState extends ConsumerState<MapScreen>
         });
       });
     });
+
+    // #1316 phase 1 — cold-start one-shot incarnation bump. Covers the
+    // case where the user opens the app directly onto Carte (no tab
+    // flip → the listener above stays silent → TileLayer keeps any
+    // degenerate constraints captured during the IndexedStack
+    // pre-mount). Mirrors the tab-flip rebuild pattern (controller
+    // swap + dispose on next frame). Guarded by [_coldStartBumpFired]
+    // so it fires exactly once per [_MapScreenState] instance.
+    final currentBranch = ref.read(currentShellBranchProvider);
+    if (!_coldStartBumpFired && currentBranch == _mapBranchIndex) {
+      _coldStartBumpFired = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        debugPrint(
+          '[map-cold-start] firing one-shot incarnation bump on first '
+          'Carte build',
+        );
+        final old = _mapController;
+        try {
+          setState(() {
+            _mapController = MapController();
+            _mapIncarnation++;
+          });
+          debugPrint(
+            '[map-incarn] bumped to $_mapIncarnation (trigger: cold-start)',
+          );
+        } catch (e, st) {
+          debugPrint('MapScreen rebuild on cold-start: $e\n$st');
+        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          try {
+            old.dispose();
+          } catch (e, st) {
+            debugPrint(
+              'MapScreen old controller dispose on cold-start: $e\n$st',
+            );
+          }
+        });
+      });
+    }
 
     final searchState = ref.watch(searchStateProvider);
     final selectedFuel = ref.watch(selectedFuelTypeProvider);
@@ -230,7 +349,19 @@ class _MapScreenState extends ConsumerState<MapScreen>
     // visits.
     final body = LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth <= 0 || constraints.maxHeight <= 0) {
+        // #1316: Some Android layout passes use a 1×1 placeholder before the
+        // real constraints arrive — the prior `<= 0` gate let those through
+        // and TileLayer captured a degenerate viewport. Require at least
+        // 100px on each axis so the gate covers placeholder constraints too.
+        final suppressed = constraints.maxWidth < 100 ||
+            constraints.maxHeight < 100;
+        debugPrint(
+          '[map-layout] LayoutBuilder constraints='
+          '${constraints.maxWidth.toStringAsFixed(1)}x'
+          '${constraints.maxHeight.toStringAsFixed(1)}, '
+          'suppressed=$suppressed, incarnation=$_mapIncarnation',
+        );
+        if (suppressed) {
           return const SizedBox.shrink();
         }
         return KeyedSubtree(
