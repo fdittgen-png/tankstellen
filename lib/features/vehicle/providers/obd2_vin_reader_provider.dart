@@ -33,17 +33,17 @@ class Obd2VinReaderService implements VinReaderService {
 
   @override
   Future<ObdVinResult> readVin({required String pairedAdapterMac}) async {
-    // Connect to the highest-RSSI candidate from the most recent scan.
-    // The adapter-edit UI runs a scan immediately before tapping the
-    // button, so [connectBest] resolves the paired MAC. If no scan has
-    // run, [connectBest] returns null → io failure.
-    //
-    // We don't currently filter by [pairedAdapterMac] inside
-    // [Obd2ConnectionService] — the parameter is forwarded so a future
-    // refinement can pin the connection to the user's paired adapter
-    // (#1162 follow-up).
+    // #1351 — connect to the *paired* adapter by MAC. The previous
+    // implementation called [Obd2ConnectionService.connectBest] which
+    // depends on a fresh scan having run beforehand and otherwise
+    // either returns null OR connects to the wrong adapter (the
+    // highest-RSSI candidate from a stale [_lastRanked]). The vehicle-
+    // edit screen does NOT run a scan before this button is tapped,
+    // so [connectBest] could not work in practice. [connectByMac]
+    // owns its own short scan window and short-circuits on the first
+    // candidate matching [pairedAdapterMac] — exactly what we want.
     try {
-      final service = await connection.connectBest();
+      final service = await connection.connectByMac(pairedAdapterMac);
       if (service == null) {
         return const ObdVinResult.failure(ObdVinFailureReason.io);
       }

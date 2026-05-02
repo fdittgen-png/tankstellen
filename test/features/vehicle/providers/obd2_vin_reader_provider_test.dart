@@ -15,19 +15,19 @@ import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 import 'package:tankstellen/features/vehicle/data/obd2_vin_reader.dart';
 import 'package:tankstellen/features/vehicle/providers/obd2_vin_reader_provider.dart';
 
-/// Unit tests for [Obd2VinReaderService] (#1162, Refs #561).
+/// Unit tests for [Obd2VinReaderService] (#1162, Refs #561, #1351).
 ///
 /// The underlying [Obd2VinReader] already has direct coverage in
 /// `test/features/vehicle/data/obd2_vin_reader_test.dart`. This file
 /// targets the orchestrator wrapper class, which composes
-/// `connectBest` + `Obd2VinReader.read` + `disconnect` and was
+/// `connectByMac` + `Obd2VinReader.read` + `disconnect` and was
 /// previously only exercised through widget-test overrides — the
 /// production `Obd2VinReaderService` itself had zero direct coverage.
 ///
 /// Cases:
-///   1. `connectBest` returns null (no scan run yet) → io failure,
+///   1. `connectByMac` returns null (adapter out of range) → io failure,
 ///      no errorLogger entry (this branch deliberately skips logging).
-///   2. `connectBest` throws (permission denied / scan timeout / ...)
+///   2. `connectByMac` throws (permission denied / scan timeout / ...)
 ///      → io failure AND an errorLogger entry with
 ///      `op: 'vinReaderService.readVin'` + `reason: 'connect'`.
 ///   3. Happy path: a fake `Obd2Service` (real class over a
@@ -37,6 +37,9 @@ import 'package:tankstellen/features/vehicle/providers/obd2_vin_reader_provider.
 ///   4. Read-failure path: the transport returns `NO DATA` → result
 ///      is `unsupported` AND `disconnect` was still called (proves
 ///      the `finally` block runs even when the read fails).
+///   5. The `pairedAdapterMac` argument is forwarded to
+///      `connectByMac` verbatim (#1351 — without this guard the
+///      orchestrator would silently connect to the wrong adapter).
 void main() {
   // Wire the global errorLogger to an in-memory recorder so the
   // failure-path branches don't try to spool through Hive (which is
@@ -56,11 +59,11 @@ void main() {
 
   group('Obd2VinReaderService.readVin', () {
     test(
-      'returns failure(io) when connectBest yields null '
-      '(no scan has run yet) and does NOT log an error',
+      'returns failure(io) when connectByMac yields null '
+      '(adapter out of range) and does NOT log an error',
       () async {
         final connection = _FakeObd2ConnectionService(
-          connectBestResult: null,
+          connectByMacResult: null,
         );
         final service = Obd2VinReaderService(connection: connection);
 
@@ -73,13 +76,13 @@ void main() {
         // The null branch deliberately surfaces a typed failure
         // without logging — only the catch path logs.
         expect(recorder.records, isEmpty);
-        expect(connection.connectBestCalls, 1);
+        expect(connection.connectByMacCalls, 1);
       },
     );
 
     test(
       'returns failure(io) and logs the connect error when '
-      'connectBest throws',
+      'connectByMac throws',
       () async {
         final connection = _FakeObd2ConnectionService(
           throwOnConnect: Exception('bluetooth permission denied'),
@@ -92,7 +95,7 @@ void main() {
 
         expect(result.isSuccess, isFalse);
         expect(result.failure, ObdVinFailureReason.io);
-        expect(connection.connectBestCalls, 1);
+        expect(connection.connectByMacCalls, 1);
         // The catch path MUST log the error so a failing connect is
         // diagnosable. The wrapped error stringifies with the layer
         // and context map (#1104 contract) — assert on those markers.
@@ -101,6 +104,30 @@ void main() {
         expect(logged, contains('background'));
         expect(logged, contains('vinReaderService.readVin'));
         expect(logged, contains('connect'));
+      },
+    );
+
+    test(
+      'forwards pairedAdapterMac verbatim into connectByMac (#1351)',
+      () async {
+        // Regression guard for #1351: the previous implementation
+        // called connectBest(), which ignored pairedAdapterMac and
+        // routed to the highest-RSSI candidate from the most recent
+        // scan. The fix routes through connectByMac with the user's
+        // paired MAC — verify the argument is plumbed through.
+        const mac = 'D4:E9:5E:A8:CD:7E';
+        final connection = _FakeObd2ConnectionService(
+          connectByMacResult: null,
+        );
+        final service = Obd2VinReaderService(connection: connection);
+
+        await service.readVin(pairedAdapterMac: mac);
+
+        expect(connection.connectByMacCalls, 1);
+        expect(connection.lastConnectByMacArg, mac,
+            reason: 'connectByMac must receive the exact MAC the UI '
+                'passed in — anything else risks connecting to the '
+                'wrong adapter');
       },
     );
 
@@ -124,7 +151,7 @@ void main() {
         final obd2Service = Obd2Service(transport);
 
         final connection = _FakeObd2ConnectionService(
-          connectBestResult: obd2Service,
+          connectByMacResult: obd2Service,
         );
         final service = Obd2VinReaderService(connection: connection);
 
@@ -158,7 +185,7 @@ void main() {
         final obd2Service = Obd2Service(transport);
 
         final connection = _FakeObd2ConnectionService(
-          connectBestResult: obd2Service,
+          connectByMacResult: obd2Service,
         );
         final service = Obd2VinReaderService(connection: connection);
 
@@ -203,11 +230,11 @@ class _CapturingTraceRecorder implements TraceRecorder {
 
 /// Fake [Obd2ConnectionService] wired with the minimum-viable
 /// dependencies its non-virtual super-constructor demands. We only
-/// override `connectBest` — every other method is unused by
+/// override `connectByMac` — every other method is unused by
 /// [Obd2VinReaderService] so the inert defaults are safe.
 class _FakeObd2ConnectionService extends Obd2ConnectionService {
   _FakeObd2ConnectionService({
-    this.connectBestResult,
+    this.connectByMacResult,
     this.throwOnConnect,
   }) : super(
           registry: Obd2AdapterRegistry.defaults(),
@@ -215,25 +242,33 @@ class _FakeObd2ConnectionService extends Obd2ConnectionService {
           bluetooth: _UnusedBluetoothFacade(),
         );
 
-  /// Service to return from [connectBest]. Null reproduces the
-  /// "no scan run yet" branch.
-  final Obd2Service? connectBestResult;
+  /// Service to return from [connectByMac]. Null reproduces the
+  /// "adapter out of range" branch.
+  final Obd2Service? connectByMacResult;
 
-  /// When non-null, [connectBest] throws this object instead of
+  /// When non-null, [connectByMac] throws this object instead of
   /// returning a service — used to drive the orchestrator's catch
   /// path.
   final Object? throwOnConnect;
 
-  /// Number of [connectBest] calls; lets tests assert the
+  /// Number of [connectByMac] calls; lets tests assert the
   /// orchestrator actually attempted a connect.
-  int connectBestCalls = 0;
+  int connectByMacCalls = 0;
+
+  /// Last MAC argument passed to [connectByMac] — lets tests verify
+  /// the orchestrator forwards `pairedAdapterMac` verbatim.
+  String? lastConnectByMacArg;
 
   @override
-  Future<Obd2Service?> connectBest() async {
-    connectBestCalls++;
+  Future<Obd2Service?> connectByMac(
+    String mac, {
+    Duration timeout = const Duration(seconds: 5),
+  }) async {
+    connectByMacCalls++;
+    lastConnectByMacArg = mac;
     final err = throwOnConnect;
     if (err != null) throw err;
-    return connectBestResult;
+    return connectByMacResult;
   }
 }
 
