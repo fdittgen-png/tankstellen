@@ -88,7 +88,7 @@ class TankLevelEstimate {
 }
 
 /// Compute the current tank level for a vehicle from its fill-up history
-/// and the trips logged since the most recent fill-up (#1195).
+/// and the trips logged since the most recent fill-up (#1195, #1360).
 ///
 /// Inputs:
 /// * [vehicle] — the [VehicleProfile] this tank belongs to. Drives the
@@ -96,23 +96,34 @@ class TankLevelEstimate {
 ///   path. Once #1191 lands the overall avg from
 ///   `tripLengthAggregates` will replace the hard-coded 7.0.
 /// * [fillUps] — every fill-up logged for the vehicle, newest first.
-///   Only the head entry is consulted; older fills don't change the
-///   answer because the tank was reset at the most recent fill.
-/// * [trips] — every trip recorded since the most recent fill-up. The
-///   caller is responsible for the filtering (provider does this); the
-///   estimator additionally drops trips with `startedAt == null` or
-///   `startedAt < lastFillUp.date` as a defensive belt-and-braces
-///   guard so the function stays correct in unit tests that pass a
-///   broader list.
+///   When the most recent fill is a full "plein" the older entries
+///   don't change the answer (the tank was reset at the most recent
+///   fill). When the most recent fill is partial (#1360) the estimator
+///   walks earlier fills + trips between them to derive the level just
+///   before the partial top-up.
+/// * [trips] — trip history for the vehicle. The caller (provider)
+///   filters by vehicle and drops null `startedAt`; this function adds
+///   defensive guards. Trips after the most recent fill subtract from
+///   the level; trips between earlier fills are used to compute the
+///   level just before a partial-fill anchor.
 ///
 /// Returns [TankLevelEstimate.unknown] when [fillUps] is empty.
 ///
-/// v1: assumes every fill-up tops the tank up to capacity (the common
-/// "plein" pattern). The freshly-added [FillUp.isFullTank] flag is
-/// captured but not yet honoured here — once partial-fill UI lands the
-/// branch flips to `previous_level + liters_added` for `isFullTank ==
-/// false`. Today the data is recorded so the estimator can become
-/// flag-aware without a migration.
+/// Partial-fill branch (#1360):
+/// * `lastFillUp.isFullTank == true` → starting level resets to
+///   `vehicle.tankCapacityL` (or `lastFillUp.liters` when no capacity
+///   is configured) — historical behaviour.
+/// * `lastFillUp.isFullTank == false` → starting level is
+///   `previous_level + lastFillUp.liters`, clamped into
+///   `[0, capacityL]`. The "previous level" is computed by walking
+///   earlier fill-ups oldest→newest and subtracting trip consumption
+///   between them, anchored by the most recent prior full fill (or 0
+///   when no full anchor exists, the honest fallback for a tank with
+///   partials only).
+///
+/// `tripsSince`, `method`, and `rangeKm` are derived solely from trips
+/// AFTER the most recent fill-up — partial or full. The "trips since
+/// last fill-up" caption stays meaningful regardless of the toggle.
 TankLevelEstimate estimateTankLevel({
   required VehicleProfile vehicle,
   required List<FillUp> fillUps,
@@ -124,14 +135,21 @@ TankLevelEstimate estimateTankLevel({
 
   final lastFillUp = fillUps.first;
   final capacityL = vehicle.tankCapacityL;
-  // Initial tank level. Capacity wins when known; otherwise we fall
-  // back to "tank held at least the litres the user just pumped in",
-  // which is honest for a partial-fill case where capacity isn't set.
-  final startLevelL = capacityL ?? lastFillUp.liters;
+  final upperBound = capacityL ?? double.infinity;
 
   // TODO(#1191): replace with vehicle.tripLengthAggregates
   //   ?.overallAvgLPer100Km once the carbon-dashboard aggregates land.
   const avgLPer100Km = _defaultAvgLPer100Km;
+
+  // Compute the starting level right after [lastFillUp] (#1360 partial-
+  // fill branch). For full fills this is just capacity; for partials
+  // we walk back through earlier history.
+  final startLevelL = _initialLevelAfterFill(
+    fillUps: fillUps,
+    trips: trips,
+    capacityL: capacityL,
+    avgLPer100Km: avgLPer100Km,
+  );
 
   var consumed = 0.0;
   var consideredTrips = 0;
@@ -157,7 +175,6 @@ TankLevelEstimate estimateTankLevel({
   // tank holds (defensive against a rare negative-consumption write
   // race) or a negative level (consumed > capacity, e.g. user logged
   // a full week of trips without a fill-up).
-  final upperBound = capacityL ?? double.infinity;
   final levelL = (startLevelL - consumed).clamp(0.0, upperBound);
 
   final TankLevelEstimationMethod method;
@@ -186,4 +203,127 @@ TankLevelEstimate estimateTankLevel({
     rangeKm: rangeKm,
     tripsSince: consideredTrips,
   );
+}
+
+/// Compute the level right after the most recent fill (#1360).
+///
+/// `fillUps` is the same input the estimator received: newest first,
+/// for one vehicle. `trips` includes both pre- and post-fill trips —
+/// the post-fill ones are subtracted by the caller, so this helper
+/// only consults trips strictly between earlier fills.
+///
+/// Algorithm:
+///  1. If the most recent fill is full, return `capacityL ?? lastFill.liters`
+///     (no need to walk history — the tank just got reset).
+///  2. Else, find the most recent prior FULL fill, anchor the level at
+///     capacity there, then walk forward applying intermediate partial
+///     fills and trip consumption between them. The result is the level
+///     just before the most recent (partial) fill; add its litres,
+///     clamp into `[0, capacity]`, and return.
+///  3. If no prior full anchor exists, start from 0 — honest worst-
+///     case for a tank whose history is partials only (the user's
+///     starting state is unknown). The clamp keeps the answer within
+///     `[0, capacity]`.
+double _initialLevelAfterFill({
+  required List<FillUp> fillUps,
+  required List<TripHistoryEntry> trips,
+  required double? capacityL,
+  required double avgLPer100Km,
+}) {
+  final upper = capacityL ?? double.infinity;
+  final lastFill = fillUps.first;
+
+  if (lastFill.isFullTank) {
+    // Capacity wins when known; otherwise fall back to "tank held at
+    // least the litres the user just pumped in", which is honest when
+    // capacity isn't configured.
+    return capacityL ?? lastFill.liters;
+  }
+
+  // Build a chronological (oldest→newest) view of every prior fill.
+  final priorFills = fillUps.skip(1).toList(growable: false).reversed.toList();
+
+  // Find the most recent full fill before lastFill — the anchor.
+  int anchorIdx = -1;
+  for (var i = priorFills.length - 1; i >= 0; i--) {
+    if (priorFills[i].isFullTank) {
+      anchorIdx = i;
+      break;
+    }
+  }
+
+  // No anchor → honest fallback: start from 0 and let the partials
+  // accumulate (clamp keeps the answer within capacity). When capacity
+  // is unknown we still return `lastFill.liters` clamped — same shape
+  // as the no-capacity branch above for the full-tank path.
+  double level;
+  int startIdx;
+  if (anchorIdx < 0) {
+    level = 0;
+    startIdx = 0;
+  } else {
+    level = capacityL ?? priorFills[anchorIdx].liters;
+    startIdx = anchorIdx + 1;
+  }
+
+  // Walk forward: for each prior fill from startIdx to the end, apply
+  // trip consumption between the previous boundary and this fill, then
+  // apply the partial top-up.
+  var prevBoundary = anchorIdx >= 0 ? priorFills[anchorIdx].date : null;
+  for (var i = startIdx; i < priorFills.length; i++) {
+    final f = priorFills[i];
+    final consumed = _consumedBetween(
+      trips: trips,
+      from: prevBoundary,
+      to: f.date,
+      avgLPer100Km: avgLPer100Km,
+    );
+    level = (level - consumed).clamp(0.0, upper);
+    // Each partial in the chain adds its litres. (Full fills before
+    // lastFill are also clamped — anchorIdx already pointed at the
+    // most recent one, so any later "full" entries don't appear here
+    // by construction.)
+    level = (level + f.liters).clamp(0.0, upper);
+    prevBoundary = f.date;
+  }
+
+  // Finally, consume between the last prior boundary and lastFill,
+  // then add lastFill.liters (the partial top-up).
+  final consumedToLast = _consumedBetween(
+    trips: trips,
+    from: prevBoundary,
+    to: lastFill.date,
+    avgLPer100Km: avgLPer100Km,
+  );
+  level = (level - consumedToLast).clamp(0.0, upper);
+  level = (level + lastFill.liters).clamp(0.0, upper);
+  return level;
+}
+
+/// Sum trip consumption strictly between [from] (exclusive) and [to]
+/// (exclusive). Null `from` means "since the beginning of time".
+///
+/// Trips with `startedAt == null` are skipped (defensive — the provider
+/// already drops these). OBD2 measurements win when present; otherwise
+/// the distance × avg L/100 km fallback applies.
+double _consumedBetween({
+  required List<TripHistoryEntry> trips,
+  required DateTime? from,
+  required DateTime to,
+  required double avgLPer100Km,
+}) {
+  var total = 0.0;
+  for (final t in trips) {
+    final startedAt = t.summary.startedAt;
+    if (startedAt == null) continue;
+    if (from != null && !startedAt.isAfter(from)) continue;
+    if (!startedAt.isBefore(to)) continue;
+    final measured = t.summary.fuelLitersConsumed;
+    if (measured != null) {
+      total += measured;
+    } else {
+      total += t.summary.distanceKm * avgLPer100Km / 100.0;
+    }
+  }
+  return total;
 }

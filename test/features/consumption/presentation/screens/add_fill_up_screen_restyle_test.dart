@@ -231,5 +231,22 @@ void main() {
       );
       expect(toggle.value, isFalse);
     });
+
+    testWidgets('renders the partial-fill subtitle (#1360)', (tester) async {
+      await _pumpWithTallView(
+        tester,
+        const AddFillUpScreen(),
+        overrides: _withVehicle,
+      );
+
+      // Subtitle explains when to flip the toggle off — landed by
+      // #1360 alongside the estimator's partial-fill branch.
+      expect(
+        find.text(
+          'Tank filled to the brim — uncheck if this was a partial fill',
+        ),
+        findsOneWidget,
+      );
+    });
   });
 }

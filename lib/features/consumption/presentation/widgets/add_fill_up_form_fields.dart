@@ -187,17 +187,22 @@ class AddFillUpFormFields extends StatelessWidget {
                 ],
               ),
             ),
-            // #1195 — Full-tank toggle. Defaults ON because the typical
-            // pattern is a "plein". Off = partial top-up so the tank-
-            // level estimator can branch on previous_level + liters_added
-            // once that path is wired (today the data is captured but
-            // the v1 estimator still assumes capacity reset).
+            // #1195 / #1360 — Full-tank toggle. Defaults ON because the
+            // typical pattern is a "plein". Off = partial top-up; the
+            // tank-level estimator now honours the flag and branches
+            // on `previous_level + liters_added` (#1360 lands the
+            // partial-fill path the original v1 left as a TODO).
             FormFieldTile(
               icon: Icons.local_gas_station_outlined,
               content: SwitchListTile(
                 key: const Key('add_fill_up_is_full_tank_toggle'),
                 contentPadding: EdgeInsets.zero,
                 title: Text(l?.addFillUpIsFullTankLabel ?? 'Full tank'),
+                subtitle: Text(
+                  l?.addFillUpIsFullTankSubtitle ??
+                      'Tank filled to the brim — uncheck if this was a '
+                          'partial fill',
+                ),
                 value: isFullTank,
                 onChanged: onIsFullTankChanged,
               ),

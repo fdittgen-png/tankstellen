@@ -968,6 +968,7 @@
   "tankLevelEmptyNoFillUp": "Enregistrez un plein pour voir le niveau du réservoir",
   "tankLevelDetailSheetTitle": "Trajets depuis le dernier plein",
   "addFillUpIsFullTankLabel": "Plein complet",
+  "addFillUpIsFullTankSubtitle": "Réservoir rempli à ras bord — décochez s'il s'agissait d'un plein partiel",
   "profileGamificationToggleTitle": "Afficher les succès et scores",
   "profileGamificationToggleSubtitle": "Désactivé, les badges, scores et trophées sont masqués dans toute l'app.",
   "vehicleEditTitle": "Modifier le véhicule",

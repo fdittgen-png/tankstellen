@@ -46,6 +46,41 @@ void main() {
     });
   });
 
+  group('FillUp.isFullTank round-trip (#1360)', () {
+    test('defaults to true on construction', () {
+      expect(_makeFillUp().isFullTank, isTrue);
+    });
+
+    test('persists `false` through JSON round-trip', () {
+      final partial = _makeFillUp().copyWith(isFullTank: false);
+      final json = partial.toJson();
+      final back = FillUp.fromJson(json);
+      expect(back.isFullTank, isFalse);
+    });
+
+    test('persists `true` through JSON round-trip', () {
+      final fullTank = _makeFillUp().copyWith(isFullTank: true);
+      final json = fullTank.toJson();
+      final back = FillUp.fromJson(json);
+      expect(back.isFullTank, isTrue);
+    });
+
+    test('older JSON without isFullTank deserialises as true (default)', () {
+      // Existing fill-ups predate the toggle; they must keep working
+      // as full-tank fills so the tank-level estimator stays correct.
+      final legacy = <String, dynamic>{
+        'id': 'legacy',
+        'date': DateTime(2026, 3, 15).toIso8601String(),
+        'liters': 50,
+        'totalCost': 80,
+        'odometerKm': 12345,
+        'fuelType': 'diesel',
+      };
+      final back = FillUp.fromJson(legacy);
+      expect(back.isFullTank, isTrue);
+    });
+  });
+
   group('FillUpX.co2Kg', () {
     test('returns non-zero for diesel', () {
       final f = _makeFillUp(liters: 50, fuelType: FuelType.diesel);

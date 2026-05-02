@@ -329,6 +329,213 @@ void main() {
     });
   });
 
+  group('estimateTankLevel — partial-fill branch (#1360)', () {
+    // 40 L tank for a clean walkthrough that maps to the brief's
+    // sequence: [plein 40L → 40L, drive 10L → 30L, partial 5L → 35L,
+    // plein 30L → 40L]. Each test pins one snapshot in that timeline.
+    const smallTank = VehicleProfile(
+      id: 'v1',
+      name: 'Small Tank',
+      type: VehicleType.combustion,
+      tankCapacityL: 40,
+    );
+
+    final pleinT0 = FillUp(
+      id: 'plein-0',
+      date: DateTime(2026, 4, 1, 8),
+      liters: 40,
+      totalCost: 70,
+      odometerKm: 100000,
+      fuelType: FuelType.diesel,
+      vehicleId: 'v1',
+      // isFullTank defaults to true.
+    );
+
+    final tripT1 = trip(
+      id: 'drive-1',
+      startedAt: DateTime(2026, 4, 2, 9),
+      distanceKm: 30,
+      fuelLitersConsumed: 10, // exactly 10 L for the brief's case
+    );
+
+    final partialT2 = FillUp(
+      id: 'partial-2',
+      date: DateTime(2026, 4, 3, 8),
+      liters: 5,
+      totalCost: 9,
+      odometerKm: 100030,
+      fuelType: FuelType.diesel,
+      vehicleId: 'v1',
+      isFullTank: false,
+    );
+
+    final pleinT3 = FillUp(
+      id: 'plein-3',
+      date: DateTime(2026, 4, 4, 8),
+      liters: 30,
+      totalCost: 54,
+      odometerKm: 100050,
+      fuelType: FuelType.diesel,
+      vehicleId: 'v1',
+      // isFullTank defaults to true.
+    );
+
+    test('after plein 40L → level == 40 (capacity reset)', () {
+      final result = estimateTankLevel(
+        vehicle: smallTank,
+        fillUps: [pleinT0],
+        trips: const [],
+      );
+
+      expect(result.levelL, 40);
+    });
+
+    test('after plein 40L + drive 10L → level == 30', () {
+      final result = estimateTankLevel(
+        vehicle: smallTank,
+        fillUps: [pleinT0],
+        trips: [tripT1],
+      );
+
+      expect(result.levelL, closeTo(30, 0.001));
+    });
+
+    test('after plein 40L + drive 10L + partial 5L → level == 35', () {
+      // Newest first: partialT2 then pleinT0. tripT1 sits between.
+      final result = estimateTankLevel(
+        vehicle: smallTank,
+        fillUps: [partialT2, pleinT0],
+        trips: [tripT1],
+      );
+
+      // Anchor at pleinT0 (40 L) → drive 10L (30 L) → +5 L partial = 35.
+      expect(result.levelL, closeTo(35, 0.001));
+      expect(result.lastFillUpDate, partialT2.date);
+      // tripsSince counts trips after the most recent fill (partialT2),
+      // none in this fixture.
+      expect(result.tripsSince, 0);
+    });
+
+    test('after the full plein-30L closer → level resets to capacity (40)',
+        () {
+      final result = estimateTankLevel(
+        vehicle: smallTank,
+        fillUps: [pleinT3, partialT2, pleinT0],
+        trips: [tripT1],
+      );
+
+      // Latest fill is full → reset to capacity. Earlier history doesn't
+      // change the answer.
+      expect(result.levelL, 40);
+      expect(result.lastFillUpDate, pleinT3.date);
+    });
+
+    test('partial fill clamps to capacity when level + liters > capacity',
+        () {
+      // No trips between → level just before partial == 40 (capacity).
+      // Adding 5 L would overflow, so the clamp pins at capacity.
+      final result = estimateTankLevel(
+        vehicle: smallTank,
+        fillUps: [partialT2, pleinT0],
+        trips: const [],
+      );
+
+      expect(result.levelL, 40);
+    });
+
+    test('partial fill on top of trips that drove tank dry → starts at 0 + liters',
+        () {
+      // Drive 100 km × 7.0 / 100 = 7 L between fills, but actual
+      // OBD2 says 50 L (more than capacity). Clamp pins level pre-
+      // partial at 0; partial 5 L bumps to 5.
+      final massiveTrip = trip(
+        id: 'huge',
+        startedAt: DateTime(2026, 4, 2, 9),
+        distanceKm: 1000,
+        fuelLitersConsumed: 50,
+      );
+      final result = estimateTankLevel(
+        vehicle: smallTank,
+        fillUps: [partialT2, pleinT0],
+        trips: [massiveTrip],
+      );
+
+      expect(result.levelL, closeTo(5, 0.001));
+    });
+
+    test('post-partial trips subtract from the partial-derived level', () {
+      // After the partial top-up the level should be 35; a 7 L trip
+      // after that brings it to 28.
+      final postPartialTrip = trip(
+        id: 'after-partial',
+        startedAt: DateTime(2026, 4, 3, 12),
+        distanceKm: 30,
+        fuelLitersConsumed: 7,
+      );
+      final result = estimateTankLevel(
+        vehicle: smallTank,
+        fillUps: [partialT2, pleinT0],
+        trips: [tripT1, postPartialTrip],
+      );
+
+      expect(result.levelL, closeTo(28, 0.001));
+      expect(result.tripsSince, 1);
+    });
+
+    test('chain of partials with no prior plein anchor → starts from 0',
+        () {
+      // Two partials in a row, no plein in history. Honest worst case:
+      // start at 0, add liters as we walk forward.
+      final partialA = FillUp(
+        id: 'part-a',
+        date: DateTime(2026, 4, 1),
+        liters: 10,
+        totalCost: 18,
+        odometerKm: 100000,
+        fuelType: FuelType.diesel,
+        vehicleId: 'v1',
+        isFullTank: false,
+      );
+      final partialB = FillUp(
+        id: 'part-b',
+        date: DateTime(2026, 4, 2),
+        liters: 5,
+        totalCost: 9,
+        odometerKm: 100020,
+        fuelType: FuelType.diesel,
+        vehicleId: 'v1',
+        isFullTank: false,
+      );
+
+      final result = estimateTankLevel(
+        vehicle: smallTank,
+        fillUps: [partialB, partialA],
+        trips: const [],
+      );
+
+      // 0 + 10 (partialA) + 5 (partialB) = 15.
+      expect(result.levelL, closeTo(15, 0.001));
+    });
+
+    test('no capacity configured → partial branch still adds litres', () {
+      const noCap = VehicleProfile(
+        id: 'v3',
+        name: 'No-cap',
+        type: VehicleType.combustion,
+      );
+      final result = estimateTankLevel(
+        vehicle: noCap,
+        fillUps: [partialT2, pleinT0],
+        trips: [tripT1],
+      );
+
+      // Anchor at pleinT0 → start = lastFill-anchor.liters (40, since
+      // capacity is null). drive 10 L → 30. partial 5 L → 35. The
+      // upper clamp is infinite without capacity, so 35 stands.
+      expect(result.levelL, closeTo(35, 0.001));
+    });
+  });
+
   group('estimateTankLevel — vehicle without tankCapacityL', () {
     test('falls back to lastFillUp.liters as start level', () {
       const vehicleNoCap = VehicleProfile(

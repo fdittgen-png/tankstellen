@@ -3835,6 +3835,10 @@ class AppLocalizationsNb extends AppLocalizations {
   String get addFillUpIsFullTankLabel => 'Full tank';
 
   @override
+  String get addFillUpIsFullTankSubtitle =>
+      'Tank filled to the brim — uncheck if this was a partial fill';
+
+  @override
   String get themeCardTitle => 'Theme';
 
   @override
