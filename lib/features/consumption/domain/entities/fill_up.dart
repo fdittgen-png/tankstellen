@@ -47,6 +47,13 @@ abstract class FillUp with _$FillUp {
     /// Existing fill-ups deserialise with the default so historical
     /// data keeps working as full-tank fills.
     @Default(true) bool isFullTank,
+
+    /// Whether this fill-up is an auto-generated correction entry that
+    /// closes the gap between OBD-recorded trip fuel and pumped liters
+    /// over a plein-to-plein window (#1361). Correction entries are
+    /// rendered orange in the fill-up list and are user-editable.
+    /// Defaults `false` so existing fill-ups deserialise unchanged.
+    @Default(false) bool isCorrection,
   }) = _FillUp;
 
   factory FillUp.fromJson(Map<String, dynamic> json) => _$FillUpFromJson(json);
