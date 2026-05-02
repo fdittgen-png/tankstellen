@@ -1,10 +1,13 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import 'adapter_registry.dart';
 import 'elm_byte_channel.dart';
 import 'flutter_blue_plus_elm_channel.dart';
+import 'obd2_connection_errors.dart';
 
 /// Thin façade over flutter_blue_plus for the connection service
 /// (#741). Keeps the plugin API pinned to a small surface we can
@@ -45,10 +48,23 @@ class PluginBluetoothFacade implements BluetoothFacade {
     final controller = StreamController<List<Obd2AdapterCandidate>>();
     final accumulated = <String, Obd2AdapterCandidate>{};
 
-    // Start the real plugin scan.
-    FlutterBluePlus.startScan(
-      withServices: serviceUuids.map(Guid.new).toList(),
-      timeout: timeout,
+    // #1369 — `FlutterBluePlus.startScan` is async; previously its
+    // future was unawaited so a `PlatformException(startScan,
+    // "Bluetooth must be turned on", ...)` (BT radio off) leaked to
+    // the zone error handler instead of reaching the consumer's
+    // onError. Route the rejection back through the controller so
+    // the picker / VIN reader sees a typed `Obd2BluetoothOff` (or
+    // the original plugin exception for any unrelated failure).
+    unawaited(
+      FlutterBluePlus.startScan(
+        withServices: serviceUuids.map(Guid.new).toList(),
+        timeout: timeout,
+      ).catchError((Object e, StackTrace st) {
+        if (controller.isClosed) return;
+        final mapped = _looksBluetoothOff(e) ? const Obd2BluetoothOff() : e;
+        controller.addError(mapped, st);
+        unawaited(controller.close());
+      }),
     );
 
     final sub = FlutterBluePlus.scanResults.listen(
@@ -81,6 +97,22 @@ class PluginBluetoothFacade implements BluetoothFacade {
     });
 
     return controller.stream;
+  }
+
+  /// Recognise the platform-channel rejection FlutterBluePlus emits
+  /// when the OS Bluetooth radio is disabled. The exact wording comes
+  /// from `flutter_blue_plus_android`; matched case-insensitively
+  /// against a substring so a future plugin update''s phrasing tweak
+  /// does not silently downgrade us to the generic-error path.
+  @visibleForTesting
+  static bool debugLooksBluetoothOff(Object e) => _looksBluetoothOff(e);
+
+  static bool _looksBluetoothOff(Object e) {
+    if (e is! PlatformException) return false;
+    final msg = (e.message ?? '').toLowerCase();
+    return msg.contains('must be turned on') ||
+        msg.contains('bluetooth must be on') ||
+        msg.contains('bluetooth_off');
   }
 
   @override
