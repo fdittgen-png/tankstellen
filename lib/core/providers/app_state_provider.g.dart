@@ -459,19 +459,27 @@ final class HasGdprConsentProvider extends $FunctionalProvider<bool, bool, bool>
 
 String _$hasGdprConsentHash() => r'712d0d516ea832af3bc75b97776e595ce699d2dc';
 
-/// GDPR consent state: location, error reporting, cloud sync.
+/// GDPR consent state: location, error reporting, cloud sync,
+/// community wait-time pings (#1119).
 
 @ProviderFor(GdprConsent)
 final gdprConsentProvider = GdprConsentProvider._();
 
-/// GDPR consent state: location, error reporting, cloud sync.
+/// GDPR consent state: location, error reporting, cloud sync,
+/// community wait-time pings (#1119).
 final class GdprConsentProvider
     extends
         $NotifierProvider<
           GdprConsent,
-          ({bool cloudSync, bool errorReporting, bool location})
+          ({
+            bool cloudSync,
+            bool communityWaitTime,
+            bool errorReporting,
+            bool location,
+          })
         > {
-  /// GDPR consent state: location, error reporting, cloud sync.
+  /// GDPR consent state: location, error reporting, cloud sync,
+  /// community wait-time pings (#1119).
   GdprConsentProvider._()
     : super(
         from: null,
@@ -492,42 +500,88 @@ final class GdprConsentProvider
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(
-    ({bool cloudSync, bool errorReporting, bool location}) value,
+    ({
+      bool cloudSync,
+      bool communityWaitTime,
+      bool errorReporting,
+      bool location,
+    })
+    value,
   ) {
     return $ProviderOverride(
       origin: this,
       providerOverride:
           $SyncValueProvider<
-            ({bool cloudSync, bool errorReporting, bool location})
+            ({
+              bool cloudSync,
+              bool communityWaitTime,
+              bool errorReporting,
+              bool location,
+            })
           >(value),
     );
   }
 }
 
-String _$gdprConsentHash() => r'404146470e98e8cd8d4b07fca8048e97f65ea059';
+String _$gdprConsentHash() => r'e08e226d7aea82864ce1a8371d949f92be135975';
 
-/// GDPR consent state: location, error reporting, cloud sync.
+/// GDPR consent state: location, error reporting, cloud sync,
+/// community wait-time pings (#1119).
 
 abstract class _$GdprConsent
-    extends $Notifier<({bool cloudSync, bool errorReporting, bool location})> {
-  ({bool cloudSync, bool errorReporting, bool location}) build();
+    extends
+        $Notifier<
+          ({
+            bool cloudSync,
+            bool communityWaitTime,
+            bool errorReporting,
+            bool location,
+          })
+        > {
+  ({bool cloudSync, bool communityWaitTime, bool errorReporting, bool location})
+  build();
   @$mustCallSuper
   @override
   void runBuild() {
     final ref =
         this.ref
             as $Ref<
-              ({bool cloudSync, bool errorReporting, bool location}),
-              ({bool cloudSync, bool errorReporting, bool location})
+              ({
+                bool cloudSync,
+                bool communityWaitTime,
+                bool errorReporting,
+                bool location,
+              }),
+              ({
+                bool cloudSync,
+                bool communityWaitTime,
+                bool errorReporting,
+                bool location,
+              })
             >;
     final element =
         ref.element
             as $ClassProviderElement<
               AnyNotifier<
-                ({bool cloudSync, bool errorReporting, bool location}),
-                ({bool cloudSync, bool errorReporting, bool location})
+                ({
+                  bool cloudSync,
+                  bool communityWaitTime,
+                  bool errorReporting,
+                  bool location,
+                }),
+                ({
+                  bool cloudSync,
+                  bool communityWaitTime,
+                  bool errorReporting,
+                  bool location,
+                })
               >,
-              ({bool cloudSync, bool errorReporting, bool location}),
+              ({
+                bool cloudSync,
+                bool communityWaitTime,
+                bool errorReporting,
+                bool location,
+              }),
               Object?,
               Object?
             >;

@@ -3267,6 +3267,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Month';
 
   @override
+  String get gdprCommunityWaitTimeTitle => 'Temps d\'attente partagés';
+
+  @override
+  String get gdprCommunityWaitTimeShort =>
+      'Partager anonymement les temps d\'attente';
+
+  @override
+  String get gdprCommunityWaitTimeDescription =>
+      'Partagez anonymement vos heures d\'arrivée et de départ aux stations pour que l\'application affiche les temps d\'attente typiques. Aucune coordonnée GPS n\'est envoyée — uniquement l\'identifiant de la station.';
+
+  @override
   String get greeceApiProvider => 'Paratiritirio Timon (Greece)';
 
   @override

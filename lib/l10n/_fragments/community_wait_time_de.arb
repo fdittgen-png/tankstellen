@@ -1,0 +1,5 @@
+{
+  "gdprCommunityWaitTimeTitle": "Wartezeiten der Community",
+  "gdprCommunityWaitTimeShort": "Wartezeiten an Tankstellen anonym teilen",
+  "gdprCommunityWaitTimeDescription": "Teile anonym, wann du an einer Tankstelle ankommst und wieder fährst, damit die App typische Wartezeiten anzeigen kann. Es werden keine GPS-Koordinaten übertragen — nur die Tankstellen-ID."
+}

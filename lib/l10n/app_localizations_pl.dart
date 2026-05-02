@@ -3238,6 +3238,17 @@ class AppLocalizationsPl extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Month';
 
   @override
+  String get gdprCommunityWaitTimeTitle => 'Community Wait Times';
+
+  @override
+  String get gdprCommunityWaitTimeShort =>
+      'Anonymously share station wait times';
+
+  @override
+  String get gdprCommunityWaitTimeDescription =>
+      'Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.';
+
+  @override
   String get greeceApiProvider => 'Paratiritirio Timon (Greece)';
 
   @override

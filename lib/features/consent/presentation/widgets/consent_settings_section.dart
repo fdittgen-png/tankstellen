@@ -43,6 +43,7 @@ class ConsentSettingsSection extends ConsumerWidget {
                 location: v,
                 errorReporting: consent.errorReporting,
                 cloudSync: consent.cloudSync,
+                communityWaitTime: consent.communityWaitTime,
               ),
         ),
         SwitchListTile(
@@ -58,6 +59,7 @@ class ConsentSettingsSection extends ConsumerWidget {
                 location: consent.location,
                 errorReporting: v,
                 cloudSync: consent.cloudSync,
+                communityWaitTime: consent.communityWaitTime,
               ),
         ),
         SwitchListTile(
@@ -73,6 +75,24 @@ class ConsentSettingsSection extends ConsumerWidget {
                 location: consent.location,
                 errorReporting: consent.errorReporting,
                 cloudSync: v,
+                communityWaitTime: consent.communityWaitTime,
+              ),
+        ),
+        SwitchListTile(
+          secondary: const Icon(Icons.timer_outlined, size: 20),
+          title:
+              Text(l10n?.gdprCommunityWaitTimeTitle ?? 'Community Wait Times'),
+          subtitle: Text(
+            l10n?.gdprCommunityWaitTimeShort ??
+                'Anonymously share station wait times',
+            style: theme.textTheme.bodySmall,
+          ),
+          value: consent.communityWaitTime,
+          onChanged: (v) => ref.read(gdprConsentProvider.notifier).save(
+                location: consent.location,
+                errorReporting: consent.errorReporting,
+                cloudSync: consent.cloudSync,
+                communityWaitTime: v,
               ),
         ),
       ],
