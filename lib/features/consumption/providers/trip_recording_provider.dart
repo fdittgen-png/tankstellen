@@ -2,15 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../core/feedback/auto_record_badge_service.dart';
+import '../../../core/location/geolocator_wrapper.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/baselines_sync.dart';
+import '../../feature_management/application/feature_flags_provider.dart';
+import '../../feature_management/domain/feature.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
@@ -63,6 +67,13 @@ class TripRecording extends _$TripRecording {
   TripRecordingController? _controller;
   StreamSubscription<TripLiveReading>? _liveSub;
   StreamSubscription<TripRecordingControllerState>? _stateSub;
+  // #1374 phase 1 — Geolocator position stream feeding the
+  // controller's per-tick GPS latch. Only created when
+  // `Feature.gpsTripPath` is enabled at trip-start; the flag-off
+  // path leaves this null and never touches the plugin, so the
+  // battery / permission cost is exactly zero for users who haven't
+  // opted in. Cancelled on stop alongside the live + state subs.
+  StreamSubscription<Position>? _gpsSub;
   SituationClassifier? _classifier;
   BaselineStore? _store;
   String? _vehicleId;
@@ -288,6 +299,15 @@ class TripRecording extends _$TripRecording {
     }
 
     await ctl.start();
+    // #1374 phase 1 — opt-in GPS sampling. Only when the user has
+    // explicitly turned the feature on do we open a Geolocator
+    // position stream; the flag-off path skips the plugin entirely so
+    // a default-config user pays no battery cost. Errors on the
+    // stream are logged and swallowed (a permission revoke mid-trip
+    // must not derail the recording) — the controller's per-tick
+    // latch simply stops being refreshed and subsequent samples
+    // carry `latitude: null, longitude: null`.
+    _startGpsSubscriptionIfEnabled(ctl);
     // #1303 — seed the active-trip snapshot identity now that the
     // controller knows its session id + odometer reads. The first
     // flush happens off the live-stream debounce below; if the
@@ -561,6 +581,12 @@ class TripRecording extends _$TripRecording {
     _liveSub = null;
     await _stateSub?.cancel();
     _stateSub = null;
+    // #1374 phase 1 — tear down the Geolocator subscription if one
+    // was opened (flag-on path only). Best-effort: a null sub is the
+    // common case (flag off) and a cancel that throws shouldn't
+    // block trip teardown.
+    await _gpsSub?.cancel();
+    _gpsSub = null;
     _controller = null;
     // #726 — persist to the trip history rolling log. Every trip
     // (including discarded ones) is logged; the fill-up flow is a
@@ -670,6 +696,47 @@ class TripRecording extends _$TripRecording {
     } catch (e, st) {
       debugPrint('TripRecording active repo: $e\n$st');
       return null;
+    }
+  }
+
+  /// Open a Geolocator position stream and route every fix through
+  /// [TripRecordingController.updateGpsFix] (#1374 phase 1).
+  ///
+  /// No-op when [Feature.gpsTripPath] is disabled — that's the
+  /// default for every existing user, so this method must NEVER pull
+  /// on the Geolocator plugin in that case (zero battery cost). When
+  /// the flag is on we open the stream at [LocationAccuracy.high]
+  /// because the eventual heatmap (Phase 3) wants ~10 m precision;
+  /// downgrading to medium / low is a Phase 2 follow-up if device
+  /// testing flags battery as an issue.
+  ///
+  /// Stream errors are logged and swallowed: a permission revoke
+  /// mid-trip, a temporary loss of fix, or the OS killing the
+  /// position service must NOT derail the OBD2 trip recording. The
+  /// controller's per-tick latch simply stops being refreshed and
+  /// subsequent samples carry `latitude: null, longitude: null`.
+  void _startGpsSubscriptionIfEnabled(TripRecordingController ctl) {
+    final flags = ref.read(featureFlagsProvider.notifier);
+    if (!flags.isEnabled(Feature.gpsTripPath)) return;
+    final geolocator = ref.read(geolocatorWrapperProvider);
+    try {
+      _gpsSub = geolocator
+          .getPositionStream(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      )
+          .listen(
+        (pos) => ctl.updateGpsFix(
+          latitude: pos.latitude,
+          longitude: pos.longitude,
+        ),
+        onError: (Object error) {
+          debugPrint('TripRecording GPS stream error: $error');
+        },
+      );
+    } catch (e, st) {
+      debugPrint('TripRecording GPS subscribe failed: $e\n$st');
     }
   }
 

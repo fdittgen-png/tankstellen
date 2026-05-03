@@ -716,4 +716,135 @@ void main() {
       expect(s.fuelRateLPerHour, 4.2);
     });
   });
+
+  group('TripSample GPS coords persistence (#1374 phase 1)', () {
+    test(
+        'sample with latitude + longitude round-trips through save / loadAll '
+        '— the future heatmap (Phase 2/3) needs every recorded fix to come '
+        'back exactly as it went in', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 5, 1, 9);
+      final ts = start.add(const Duration(seconds: 5));
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: start),
+        samples: [
+          TripSample(
+            timestamp: ts,
+            speedKmh: 55,
+            rpm: 1800,
+            fuelRateLPerHour: 4.2,
+            throttlePercent: 37.5,
+            engineLoadPercent: 42.5,
+            coolantTempC: 82.0,
+            latitude: 43.4567,
+            longitude: 3.5821,
+          ),
+        ],
+      ));
+
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.samples, hasLength(1));
+      final s = loaded.first.samples.first;
+      // Lock the precision the heatmap will rely on — millidegree
+      // (~110 m at the equator) is the minimum useful resolution.
+      expect(s.latitude, closeTo(43.4567, 1e-9));
+      expect(s.longitude, closeTo(3.5821, 1e-9));
+      // None of the existing keys regressed.
+      expect(s.engineLoadPercent, 42.5);
+      expect(s.coolantTempC, 82.0);
+      expect(s.throttlePercent, 37.5);
+      expect(s.fuelRateLPerHour, 4.2);
+    });
+
+    test(
+        'sample with null latitude / longitude does NOT include "la" / "lo" '
+        'keys in stored JSON — matches the parsimony rule the "f" / "th" / '
+        '"el" / "ct" keys already follow', () async {
+      // Phase-1 default: feature flag off → no Geolocator subscription
+      // → every sample is built with `latitude: null, longitude: null`.
+      // The persisted JSON for such a trip MUST be byte-equivalent to a
+      // pre-#1374 trip; otherwise the storage budget regresses on every
+      // existing user even though they never opted in.
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 5, 1, 9);
+      final ts = start.add(const Duration(seconds: 5));
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: start),
+        samples: [
+          TripSample(
+            timestamp: ts,
+            speedKmh: 55,
+            rpm: 1800,
+            // latitude / longitude both null
+          ),
+        ],
+      ));
+
+      final raw = box.get(start.toIso8601String())!;
+      final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
+      final samples = (decoded['samples'] as List).cast<Map>();
+      expect(samples.first.containsKey('la'), isFalse,
+          reason: 'flag-off ticks must not bloat the JSON');
+      expect(samples.first.containsKey('lo'), isFalse,
+          reason: 'flag-off ticks must not bloat the JSON');
+    });
+
+    test(
+        'legacy JSON (pre-#1374) without "la" / "lo" keys deserialises with '
+        'latitude: null AND longitude: null — backward compat for the trips '
+        'every existing user already has on disk', () async {
+      // Hand-craft a JSON payload exactly as a pre-#1374 build would
+      // have written it: every existing compact key present, no new
+      // ones. This is the file shape a v5.0 user upgrades onto, so a
+      // regression here would silently drop / corrupt their entire
+      // trip history.
+      final start = DateTime(2026, 4, 21);
+      final ts = start.add(const Duration(seconds: 5));
+      final legacyJson = jsonEncode({
+        'id': start.toIso8601String(),
+        'vehicleId': null,
+        'summary': {
+          'distanceKm': 10.0,
+          'maxRpm': 2800.0,
+          'highRpmSeconds': 0.0,
+          'idleSeconds': 0.0,
+          'harshBrakes': 0,
+          'harshAccelerations': 0,
+          'startedAt': start.toIso8601String(),
+        },
+        'samples': [
+          {
+            't': ts.millisecondsSinceEpoch,
+            's': 55.0,
+            'r': 1800.0,
+            'f': 4.2,
+            'th': 30.0,
+            'el': 42.0,
+            'ct': 82.0,
+          },
+        ],
+      });
+      await box.put(start.toIso8601String(), legacyJson);
+
+      final repo = TripHistoryRepository(box: box);
+      final loaded = repo.loadAll();
+      expect(loaded, hasLength(1));
+      expect(loaded.first.samples, hasLength(1));
+      final s = loaded.first.samples.first;
+      expect(s.latitude, isNull);
+      expect(s.longitude, isNull);
+      // Existing fields still parse cleanly — backward compat means
+      // we add to the schema, we don't break what the old schema
+      // persisted.
+      expect(s.fuelRateLPerHour, 4.2);
+      expect(s.throttlePercent, 30.0);
+      expect(s.engineLoadPercent, 42.0);
+      expect(s.coolantTempC, 82.0);
+    });
+  });
 }

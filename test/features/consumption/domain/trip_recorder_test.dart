@@ -316,6 +316,92 @@ void main() {
       });
     });
 
+    group('GPS fix on TripSample (#1374 phase 1)', () {
+      test('latitude / longitude default to null when omitted', () {
+        // Mirrors the throttle / engineLoad / coolant defaults — a
+        // pre-#1374 build never wrote these fields, so the constructor
+        // MUST accept the legacy two-arg shape (or the four-arg shape
+        // that includes the existing optionals) and surface null.
+        final ts = DateTime.utc(2026);
+        final sample = TripSample(timestamp: ts, speedKmh: 50, rpm: 1500);
+        expect(sample.latitude, isNull);
+        expect(sample.longitude, isNull);
+      });
+
+      test('explicit lat/lng round-trip onto the sample', () {
+        // A flag-on tick: the provider pushed a Position into the
+        // controller, which stamped both coords onto the sample. The
+        // round-trip is trivial (the field is just a final double),
+        // but locking the assertion here flags any future refactor
+        // that accidentally drops one of the two fields.
+        final ts = DateTime.utc(2026);
+        final sample = TripSample(
+          timestamp: ts,
+          speedKmh: 60,
+          rpm: 2000,
+          latitude: 43.4567,
+          longitude: 3.5821,
+        );
+        expect(sample.latitude, closeTo(43.4567, 1e-9));
+        expect(sample.longitude, closeTo(3.5821, 1e-9));
+        // Existing optional fields stay null when not supplied — the
+        // GPS additions must not hijack the slot for any other PID.
+        expect(sample.fuelRateLPerHour, isNull);
+        expect(sample.throttlePercent, isNull);
+        expect(sample.engineLoadPercent, isNull);
+        expect(sample.coolantTempC, isNull);
+      });
+
+      test(
+          'half-set fix is allowed by the type system but discouraged — '
+          'phase 1 records both or neither at the integration site',
+          () {
+        // The phase-1 integration site (provider) only ever calls
+        // `controller.updateGpsFix(latitude: pos.latitude,
+        // longitude: pos.longitude)`, so a half-set TripSample never
+        // appears in production. We still allow the constructor to
+        // build one because keeping the fields independent (rather
+        // than adding a `LatLng?` wrapper) keeps the JSON encoding
+        // symmetric with the existing per-field compact keys.
+        final ts = DateTime.utc(2026);
+        final sample =
+            TripSample(timestamp: ts, speedKmh: 0, rpm: 0, latitude: 50.0);
+        expect(sample.latitude, 50.0);
+        expect(sample.longitude, isNull);
+      });
+
+      test(
+          'recorder.onSample accepts samples with GPS coords without '
+          'changing aggregate metrics — coords are persisted, not '
+          'integrated into distance / RPM / fuel maths', () {
+        // Distance still comes from speed × Δt; the GPS coords are
+        // sample-level metadata for the future heatmap (Phase 2/3),
+        // not an input to the existing virtual-odometer math.
+        // Without this guard, a future change that wires GPS into
+        // distance would silently break every legacy trip's distance
+        // value (their coords are null → division by zero / NaN).
+        final start = DateTime.utc(2026);
+        recorder.onSample(TripSample(
+          timestamp: start,
+          speedKmh: 60,
+          rpm: 2000,
+          latitude: 43.45,
+          longitude: 3.58,
+        ));
+        recorder.onSample(TripSample(
+          timestamp: start.add(const Duration(seconds: 60)),
+          speedKmh: 60,
+          rpm: 2000,
+          latitude: 43.46,
+          longitude: 3.59,
+        ));
+        // Same expected distance as the legacy "60 km/h for 60 s"
+        // case earlier in this file — proves the coord plumbing
+        // doesn't perturb the integration.
+        expect(recorder.buildSummary().distanceKm, closeTo(1.0, 0.01));
+      });
+    });
+
     test('configurable thresholds override the defaults', () {
       final strict = TripRecorder(
         highRpmThreshold: 2500,
