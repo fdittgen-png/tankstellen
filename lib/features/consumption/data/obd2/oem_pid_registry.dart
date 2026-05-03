@@ -1,15 +1,23 @@
 import 'adapter_capability.dart';
 import 'oem_pid_table.dart';
+import 'oem_pid_tables/psa_oem_pid_table.dart';
 
 /// Registry of [OemPidTable] implementations keyed by VIN WMI prefix
-/// (#1401 phase 3).
+/// (#1401 phase 3, expanded phase 4).
 ///
-/// Phase 3 ships the registry empty by default — the first concrete
-/// table (PSA) lands in phase 4. Until then, [resolveForCapability]
-/// returns null for every VIN, so callers behave as if the feature
-/// were off. This serves as the implicit kill-switch while a proper
+/// Two construction paths:
+///
+///   * `OemPidRegistry()` — empty by default. Production callers that
+///     have not opted into OEM reads (or tests) hit this path; every
+///     lookup returns null and the feature is effectively off.
+///   * `OemPidRegistry.withDefaults()` — pre-populated with every
+///     shipped OEM table (PSA in phase 4; more in subsequent issues).
+///     Production code that wants OEM reads switches to this factory.
+///
+/// The default-empty constructor is the kill-switch while a proper
 /// `experimental_oem_pids` feature flag is plumbed in alongside the
-/// #1373 feature-management rework.
+/// #1373 feature-management rework — flipping a single call site
+/// between the two constructors disables OEM reads everywhere.
 ///
 /// ## Capability gate
 ///
@@ -37,11 +45,28 @@ class OemPidRegistry {
   /// "Overlap precedence" in the class docstring.
   final List<OemPidTable> _tables;
 
-  /// Create a registry holding [tables]. The default empty list is
-  /// the production path until phase 4 lands the PSA table; tests
-  /// inject fakes via the parameter.
+  /// Create a registry holding [tables]. The default empty list keeps
+  /// the registry inert — production callers wanting OEM reads must
+  /// either inject explicit tables or use [OemPidRegistry.withDefaults].
+  /// Tests inject fakes via the parameter.
   OemPidRegistry({List<OemPidTable> tables = const []})
       : _tables = List.unmodifiable(tables);
+
+  /// Production factory pre-populating the registry with every
+  /// shipped OEM table (#1401 phase 4 onward).
+  ///
+  /// Phase 4 ships PSA only; subsequent phases / issues will append
+  /// VAG, BMW, Toyota and friends. Call sites opt into OEM reads by
+  /// switching from the default constructor (empty / inert) to this
+  /// factory — which is the kill-switch story described in the class
+  /// docstring. The empty default constructor remains the implicit
+  /// "feature off" state until [resolveForCapability] grows a proper
+  /// `experimental_oem_pids` flag check alongside #1373.
+  factory OemPidRegistry.withDefaults() => OemPidRegistry(
+        tables: const [
+          PsaOemPidTable(),
+        ],
+      );
 
   /// Find the table claiming [wmiPrefix] (3 upper-case VIN chars).
   ///

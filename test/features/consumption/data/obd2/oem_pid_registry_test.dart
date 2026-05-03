@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_capability.dart';
 import 'package:tankstellen/features/consumption/data/obd2/oem_pid_registry.dart';
 import 'package:tankstellen/features/consumption/data/obd2/oem_pid_table.dart';
+import 'package:tankstellen/features/consumption/data/obd2/oem_pid_tables/psa_oem_pid_table.dart';
 
 /// Lightweight [OemPidTable] stand-in that does not actually issue
 /// commands — registry tests only care about lookup mechanics, not
@@ -235,6 +236,55 @@ void main() {
         final hit = registry.lookupByWmi('VF3');
         expect(hit, same(psaPrimary));
         expect(hit?.oemKey, 'PSA-primary');
+      });
+    });
+
+    group('withDefaults factory (#1401 phase 4)', () {
+      test('finds PsaOemPidTable for a Peugeot VIN (VF3 prefix)', () {
+        final registry = OemPidRegistry.withDefaults();
+
+        final hit = registry.lookupByVin('VF31234567890ABCD');
+
+        expect(hit, isA<PsaOemPidTable>());
+        expect(hit?.oemKey, 'PSA');
+      });
+
+      test('finds PsaOemPidTable for a Citroën VIN (VF7 prefix)', () {
+        final registry = OemPidRegistry.withDefaults();
+
+        expect(
+          registry.lookupByVin('VF71234567890ABCD'),
+          isA<PsaOemPidTable>(),
+        );
+      });
+
+      test('returns null for non-PSA VINs (e.g. BMW WBA prefix)', () {
+        final registry = OemPidRegistry.withDefaults();
+
+        // WBA is BMW — not registered in phase 4. Subsequent epic
+        // phases / issues may add it; this test pins the current
+        // PSA-only scope so a future "added BMW" PR has to update
+        // the assertion deliberately.
+        expect(registry.lookupByVin('WBA1234567890ABCD'), isNull);
+      });
+
+      test('respects the capability gate even with the PSA table loaded', () {
+        final registry = OemPidRegistry.withDefaults();
+
+        expect(
+          registry.resolveForCapability(
+            'VF31234567890ABCD',
+            Obd2AdapterCapability.standardOnly,
+          ),
+          isNull,
+        );
+        expect(
+          registry.resolveForCapability(
+            'VF31234567890ABCD',
+            Obd2AdapterCapability.oemPidsCapable,
+          ),
+          isA<PsaOemPidTable>(),
+        );
       });
     });
 
