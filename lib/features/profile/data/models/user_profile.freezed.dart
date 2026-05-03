@@ -41,7 +41,7 @@ mixin _$UserProfile {
 /// are hidden across the app — the underlying achievement
 /// evaluation continues to run so toggling back on instantly
 /// restores any earned badges.
- bool get gamificationEnabled;
+@Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.') bool get gamificationEnabled;
 /// Create a copy of UserProfile
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -74,7 +74,7 @@ abstract mixin class $UserProfileCopyWith<$Res>  {
   factory $UserProfileCopyWith(UserProfile value, $Res Function(UserProfile) _then) = _$UserProfileCopyWithImpl;
 @useResult
 $Res call({
- String id, String name,@FuelTypeJsonConverter() FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways, bool showFuel, bool showElectric, String ratingMode, List<StationAmenity> preferredAmenities, String? defaultVehicleId,@FuelTypeJsonConverter() FuelType? hybridFuelChoice, bool showConsumptionTab, bool gamificationEnabled
+ String id, String name,@FuelTypeJsonConverter() FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways, bool showFuel, bool showElectric, String ratingMode, List<StationAmenity> preferredAmenities, String? defaultVehicleId,@FuelTypeJsonConverter() FuelType? hybridFuelChoice, bool showConsumptionTab,@Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.') bool gamificationEnabled
 });
 
 
@@ -198,7 +198,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities,  String? defaultVehicleId, @FuelTypeJsonConverter()  FuelType? hybridFuelChoice,  bool showConsumptionTab,  bool gamificationEnabled)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities,  String? defaultVehicleId, @FuelTypeJsonConverter()  FuelType? hybridFuelChoice,  bool showConsumptionTab, @Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.')  bool gamificationEnabled)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserProfile() when $default != null:
 return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode,_that.preferredAmenities,_that.defaultVehicleId,_that.hybridFuelChoice,_that.showConsumptionTab,_that.gamificationEnabled);case _:
@@ -219,7 +219,7 @@ return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchR
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities,  String? defaultVehicleId, @FuelTypeJsonConverter()  FuelType? hybridFuelChoice,  bool showConsumptionTab,  bool gamificationEnabled)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities,  String? defaultVehicleId, @FuelTypeJsonConverter()  FuelType? hybridFuelChoice,  bool showConsumptionTab, @Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.')  bool gamificationEnabled)  $default,) {final _that = this;
 switch (_that) {
 case _UserProfile():
 return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode,_that.preferredAmenities,_that.defaultVehicleId,_that.hybridFuelChoice,_that.showConsumptionTab,_that.gamificationEnabled);case _:
@@ -239,7 +239,7 @@ return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchR
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities,  String? defaultVehicleId, @FuelTypeJsonConverter()  FuelType? hybridFuelChoice,  bool showConsumptionTab,  bool gamificationEnabled)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities,  String? defaultVehicleId, @FuelTypeJsonConverter()  FuelType? hybridFuelChoice,  bool showConsumptionTab, @Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.')  bool gamificationEnabled)?  $default,) {final _that = this;
 switch (_that) {
 case _UserProfile() when $default != null:
 return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode,_that.preferredAmenities,_that.defaultVehicleId,_that.hybridFuelChoice,_that.showConsumptionTab,_that.gamificationEnabled);case _:
@@ -254,7 +254,7 @@ return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchR
 @JsonSerializable()
 
 class _UserProfile implements UserProfile {
-  const _UserProfile({required this.id, required this.name, @FuelTypeJsonConverter() this.preferredFuelType = FuelType.e10, this.defaultSearchRadius = 10.0, this.landingScreen = LandingScreen.nearest, final  List<String> favoriteStationIds = const [], this.homeZipCode, this.autoUpdatePosition = false, this.countryCode, this.languageCode, this.routeSegmentKm = 50.0, this.avoidHighways = false, this.showFuel = true, this.showElectric = true, this.ratingMode = 'local', final  List<StationAmenity> preferredAmenities = const [], this.defaultVehicleId, @FuelTypeJsonConverter() this.hybridFuelChoice, this.showConsumptionTab = false, this.gamificationEnabled = true}): _favoriteStationIds = favoriteStationIds,_preferredAmenities = preferredAmenities;
+  const _UserProfile({required this.id, required this.name, @FuelTypeJsonConverter() this.preferredFuelType = FuelType.e10, this.defaultSearchRadius = 10.0, this.landingScreen = LandingScreen.nearest, final  List<String> favoriteStationIds = const [], this.homeZipCode, this.autoUpdatePosition = false, this.countryCode, this.languageCode, this.routeSegmentKm = 50.0, this.avoidHighways = false, this.showFuel = true, this.showElectric = true, this.ratingMode = 'local', final  List<StationAmenity> preferredAmenities = const [], this.defaultVehicleId, @FuelTypeJsonConverter() this.hybridFuelChoice, this.showConsumptionTab = false, @Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.') this.gamificationEnabled = true}): _favoriteStationIds = favoriteStationIds,_preferredAmenities = preferredAmenities;
   factory _UserProfile.fromJson(Map<String, dynamic> json) => _$UserProfileFromJson(json);
 
 @override final  String id;
@@ -316,7 +316,7 @@ class _UserProfile implements UserProfile {
 /// are hidden across the app — the underlying achievement
 /// evaluation continues to run so toggling back on instantly
 /// restores any earned badges.
-@override@JsonKey() final  bool gamificationEnabled;
+@override@JsonKey()@Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.') final  bool gamificationEnabled;
 
 /// Create a copy of UserProfile
 /// with the given fields replaced by the non-null parameter values.
@@ -351,7 +351,7 @@ abstract mixin class _$UserProfileCopyWith<$Res> implements $UserProfileCopyWith
   factory _$UserProfileCopyWith(_UserProfile value, $Res Function(_UserProfile) _then) = __$UserProfileCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name,@FuelTypeJsonConverter() FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways, bool showFuel, bool showElectric, String ratingMode, List<StationAmenity> preferredAmenities, String? defaultVehicleId,@FuelTypeJsonConverter() FuelType? hybridFuelChoice, bool showConsumptionTab, bool gamificationEnabled
+ String id, String name,@FuelTypeJsonConverter() FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways, bool showFuel, bool showElectric, String ratingMode, List<StationAmenity> preferredAmenities, String? defaultVehicleId,@FuelTypeJsonConverter() FuelType? hybridFuelChoice, bool showConsumptionTab,@Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.') bool gamificationEnabled
 });
 
 

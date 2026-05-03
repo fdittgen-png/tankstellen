@@ -140,9 +140,9 @@ Future<({_FixedTripHistoryList tripsNotifier})> _pumpDetail(
       vehicleProfileListProvider
           .overrideWith(() => _FixedVehicleProfileList(vehicles)),
       // #1194 — TripDetailBody now reads gamificationEnabledProvider;
-      // override here so it doesn't fall through to the (Hive-backed)
-      // active profile lookup that these tests don't seed.
-      gamificationEnabledProvider.overrideWith((ref) => true),
+      // override here so it doesn't fall through to the central
+      // featureFlagsProvider chain that these tests don't seed.
+      gamificationEnabledProvider.overrideWithValue(true),
       // #1209 — TripSummaryCard now watches tripFuelCostProvider, which
       // composes fillUpListProvider (Hive-backed). These tests don't
       // seed Hive; return null so the cost row hides cleanly.

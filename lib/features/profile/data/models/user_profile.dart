@@ -77,6 +77,9 @@ abstract class UserProfile with _$UserProfile {
     /// are hidden across the app — the underlying achievement
     /// evaluation continues to run so toggling back on instantly
     /// restores any earned badges.
+    @Deprecated(
+      'Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.',
+    )
     @Default(true) bool gamificationEnabled,
   }) = _UserProfile;
 

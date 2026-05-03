@@ -7,16 +7,20 @@ import '../../providers/profile_provider.dart';
 
 /// Settings-screen toggle for the master gamification opt-out (#1194).
 ///
-/// Persists by mutating the active [UserProfile.gamificationEnabled]
-/// flag through [activeProfileProvider]. The watch on
-/// [gamificationEnabledProvider] keeps the switch reactive — toggling
-/// it elsewhere (e.g. from a future "first-run" interstitial) flips
-/// the visible switch immediately.
+/// As of #1373 phase 3b mutation goes through the central
+/// `featureFlagsProvider` system via [gamificationEnabledProvider.set].
+/// The watch on [gamificationEnabledProvider] keeps the switch reactive
+/// — toggling it elsewhere (e.g. from a future "first-run" interstitial)
+/// flips the visible switch immediately.
 ///
 /// Renders nothing when no profile is loaded yet — the wrapping
 /// settings screen guards profile creation up-front, but a paranoid
 /// null check keeps test fixtures that omit the profile from
-/// throwing.
+/// throwing. The guard is no longer functionally required after the
+/// 3b migration (the feature flag store is independent of the active
+/// profile), but it minimises blast radius for the wider Settings
+/// screen and existing test fixtures that depend on this null-guard
+/// behaviour.
 class GamificationSettingsTile extends ConsumerWidget {
   const GamificationSettingsTile({super.key});
 
@@ -41,8 +45,7 @@ class GamificationSettingsTile extends ConsumerWidget {
         style: theme.textTheme.bodySmall,
       ),
       onChanged: (v) {
-        final updated = profile.copyWith(gamificationEnabled: v);
-        ref.read(activeProfileProvider.notifier).updateProfile(updated);
+        ref.read(gamificationEnabledProvider.notifier).set(v);
       },
       contentPadding: EdgeInsets.zero,
     );

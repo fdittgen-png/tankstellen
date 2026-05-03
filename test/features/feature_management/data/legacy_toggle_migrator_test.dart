@@ -7,6 +7,7 @@ import 'package:tankstellen/features/feature_management/data/feature_flags_repos
 import 'package:tankstellen/features/feature_management/data/legacy_toggle_migrator.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
+import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 
 /// Coverage for [migrateLegacyToggles] (#1373 phase 3a).
 ///
@@ -207,5 +208,205 @@ void main() {
             'migrator must not write to the repository when the gate is set.',
       );
     });
+  });
+
+  group('migrateUserProfileToggles — gamification', () {
+    UserProfile profileWith({required bool gamification}) {
+      // The gamificationEnabled field is `@Deprecated` post-#1373
+      // phase 3b. The migrator still reads it for the one-shot promotion
+      // — see `legacy_toggle_migrator.dart` for the same suppression.
+      // ignore: deprecated_member_use_from_same_package
+      return UserProfile(
+        id: 'p1',
+        name: 'Test',
+        // ignore: deprecated_member_use_from_same_package
+        gamificationEnabled: gamification,
+      );
+    }
+
+    test(
+      'cascade-enables on activeProfile.gamificationEnabled = true — final '
+      'feature set contains both obd2TripRecording AND gamification',
+      () async {
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: profileWith(gamification: true),
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          contains(Feature.gamification),
+          reason:
+              'Legacy true must promote into the central feature-flag set '
+              'so the user does not have to re-enable gamification after '
+              'the migration.',
+        );
+        expect(
+          after,
+          contains(Feature.obd2TripRecording),
+          reason:
+              'Feature.gamification requires obd2TripRecording per the '
+              'manifest; enabling the dependent without the prerequisite '
+              'would leave the central state in a contract-violating shape.',
+        );
+        expect(
+          settings.get(gamificationMigratedKey),
+          isTrue,
+          reason:
+              'The migration gate must be set so a subsequent run is a '
+              'no-op and a user who later disables gamification does not '
+              'get it re-enabled on the next launch.',
+        );
+      },
+    );
+
+    test(
+      'preserves legacy false — explicit opt-out survives the manifest '
+      'default, migrated key written',
+      () async {
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: profileWith(gamification: false),
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          isNot(contains(Feature.gamification)),
+          reason:
+              'Feature.gamification has manifest defaultEnabled=true, so '
+              'a no-op (no write) would silently restore gamification for '
+              'users who had explicitly opted out. The migrator must '
+              'persist the user’s false choice by writing a state that '
+              'excludes Feature.gamification — otherwise the explicit '
+              'preference is lost across the migration.',
+        );
+        expect(
+          settings.get(gamificationMigratedKey),
+          isTrue,
+          reason:
+              'Even a legacy=false migration must set the gate so we '
+              'never re-read the deprecated field on subsequent launches.',
+        );
+      },
+    );
+
+    test(
+      'no-op on activeProfile == null — feature set unchanged AND migrated '
+      'key NOT written (will retry next launch)',
+      () async {
+        // Seed central state to a known shape so we can detect any writes.
+        await repo.saveEnabled(<Feature>{Feature.priceAlerts});
+
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: null,
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          equals(<Feature>{Feature.priceAlerts}),
+          reason:
+              'Without an active profile the migrator must be a complete '
+              'no-op — no central writes, the seeded state must be '
+              'preserved verbatim.',
+        );
+        expect(
+          settings.get(gamificationMigratedKey),
+          isNull,
+          reason:
+              'The migrated-key flag MUST NOT be written when no profile '
+              'is loaded — otherwise the next launch (when the profile '
+              'IS loaded) would skip the migration and silently lose any '
+              'explicit gamificationEnabled = false the user had set.',
+        );
+      },
+    );
+
+    test(
+      'idempotent — running twice with the same inputs does NOT re-promote '
+      '(second call exits at the migrated-key check)',
+      () async {
+        // First run promotes.
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: profileWith(gamification: true),
+        );
+        final afterFirst = await repo.loadEnabled();
+        expect(afterFirst, contains(Feature.gamification));
+        expect(settings.get(gamificationMigratedKey), isTrue);
+
+        // Simulate the user disabling gamification after the migration
+        // (e.g. via the central settings UI). The second run must NOT
+        // re-enable it.
+        final disabled = {...afterFirst}..remove(Feature.gamification);
+        await repo.saveEnabled(disabled);
+
+        // Second run with same activeProfile (legacy still true).
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: profileWith(gamification: true),
+        );
+
+        final afterSecond = await repo.loadEnabled();
+        expect(
+          afterSecond,
+          isNot(contains(Feature.gamification)),
+          reason:
+              'A second migration run must not re-promote the legacy true '
+              'value — the user has explicitly disabled gamification since '
+              'and that choice must survive.',
+        );
+      },
+    );
+
+    test(
+      'gate-skip when gamificationMigratedKey is already true — no read of '
+      'activeProfile.gamificationEnabled',
+      () async {
+        await settings.put(gamificationMigratedKey, true);
+        // Seed central state to a known shape so we can detect any writes.
+        await repo.saveEnabled(<Feature>{Feature.priceAlerts});
+
+        // Pass a profile with gamification=true; the migrator must skip
+        // it entirely because the gate is set.
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: profileWith(gamification: true),
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          isNot(contains(Feature.gamification)),
+          reason:
+              'When the migration gate is already set, the legacy field '
+              'must not be re-read and the central state must stay exactly '
+              'as the user left it after the first migration.',
+        );
+        expect(
+          after,
+          contains(Feature.priceAlerts),
+          reason:
+              'The seeded central state must be preserved verbatim — the '
+              'migrator must not write to the repository when the gate is '
+              'set.',
+        );
+      },
+    );
   });
 }

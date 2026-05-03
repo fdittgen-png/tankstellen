@@ -47,7 +47,7 @@ void main() {
 
   List<Object> overrides({required bool gamification}) => [
         achievementsProvider.overrideWithValue(earned),
-        gamificationEnabledProvider.overrideWith((ref) => gamification),
+        gamificationEnabledProvider.overrideWithValue(gamification),
         activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
         fillUpListProvider.overrideWith(() => _FixedFillUpList(fillUps)),
       ];
@@ -100,7 +100,7 @@ void main() {
       FuelTab(fillUps: correctionFills, stats: stats, l: null),
       overrides: [
         achievementsProvider.overrideWithValue(const <EarnedAchievement>[]),
-        gamificationEnabledProvider.overrideWith((ref) => false),
+        gamificationEnabledProvider.overrideWithValue(false),
         activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
         fillUpListProvider
             .overrideWith(() => _FixedFillUpList(correctionFills)),

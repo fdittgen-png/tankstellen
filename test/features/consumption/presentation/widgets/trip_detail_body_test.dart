@@ -72,7 +72,7 @@ TripDetailSample _sampleWithEngineLoad(int sec, double speed, double load) =>
 /// value so the underlying active-profile chain isn't traversed (those
 /// tests don't set up Hive).
 final List<Object> _defaultOverrides = [
-  gamificationEnabledProvider.overrideWith((ref) => true),
+  gamificationEnabledProvider.overrideWithValue(true),
 ];
 
 Future<void> _pump(WidgetTester tester, Widget body) =>
