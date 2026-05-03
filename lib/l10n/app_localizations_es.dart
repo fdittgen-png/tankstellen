@@ -4255,6 +4255,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get tripPathCardTitle => 'Trip path';
+
+  @override
+  String get tripPathCardSubtitle => 'GPS-recorded route';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Pinning keeps the screen on — uses more battery';
 

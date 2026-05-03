@@ -158,6 +158,20 @@ void main() {
               'featureBlockedDisable_ key — the Feature management section '
               'in Settings must not fall back to English for French users '
               '(#1373 phase 2)');
+
+      // #1374 phase 2 — the GPS trip-path overlay card on the trip
+      // detail screen is a French-reachable surface. Its title and
+      // subtitle must have French translations so the card isn't an
+      // English island in an otherwise French screen.
+      final frenchMissingTripPath = frenchMissing
+          .where((k) => k.startsWith('tripPath'))
+          .toList()
+        ..sort();
+      expect(frenchMissingTripPath, isEmpty,
+          reason: 'French (fr) must have every tripPath* key — the '
+              'GPS trip-path overlay on the trip detail screen must '
+              'not fall back to English for French users (#1374 '
+              'phase 2)');
     });
 
     test('no locale has extra keys not in app_en.arb', () {

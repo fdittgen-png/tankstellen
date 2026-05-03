@@ -4297,6 +4297,12 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get tripPathCardTitle => 'Trace du trajet';
+
+  @override
+  String get tripPathCardSubtitle => 'Itinéraire enregistré par GPS';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Pinning keeps the screen on — uses more battery';
 

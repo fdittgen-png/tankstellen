@@ -53,6 +53,19 @@ class TripDetailSample {
   /// phase 3 of #1262.
   final double? coolantTempC;
 
+  /// GPS latitude in degrees (#1374 phase 2). Null when the
+  /// `Feature.gpsTripPath` flag was disabled at recording time, when
+  /// no fix had landed yet, when location permission was revoked, or
+  /// when the trip was persisted by a build before #1374 phase 1.
+  /// Mirrors `TripSample.latitude` in the domain layer; the
+  /// trip-detail GPS-path overlay reads non-null pairs to draw the
+  /// recorded route.
+  final double? latitude;
+
+  /// GPS longitude in degrees (#1374 phase 2). Same null-semantics as
+  /// [latitude]; the two fields are always written and read together.
+  final double? longitude;
+
   const TripDetailSample({
     required this.timestamp,
     required this.speedKmh,
@@ -61,6 +74,8 @@ class TripDetailSample {
     this.throttlePercent,
     this.engineLoadPercent,
     this.coolantTempC,
+    this.latitude,
+    this.longitude,
   });
 }
 
