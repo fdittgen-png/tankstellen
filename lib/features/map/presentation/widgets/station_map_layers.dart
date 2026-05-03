@@ -45,6 +45,30 @@ import 'station_marker.dart';
 /// pathologies. The KeyedSubtree+incarnation rebuild in [MapScreen]
 /// already destroys this state on tab-flip, so the provider lifetime
 /// is bounded by the visible-tab lifetime.
+///
+/// ## Cold-start tile reset window (#1316 phase 3)
+///
+/// The single `addPostFrameCallback` reset added in #1234 fires
+/// before two later events that also invalidate TileLayer's captured
+/// viewport:
+///   1. `NearbyMapView` schedules its own post-frame `fitCamera` call
+///      every build — that move arrives AFTER the initState reset, so
+///      TileLayer reloads against the bootstrap camera and never
+///      sees the settled camera the user actually wants tiles for.
+///   2. `FlutterMap` only emits `MapEventNonRotatedSizeChange` once
+///      its internal LayoutBuilder lays out — also AFTER the
+///      initState reset. If the bootstrap layout was small (the
+///      <100px LayoutBuilder gate in [MapScreen] only catches the
+///      worst placeholder layouts), TileLayer captured a tiny tile
+///      range that survives the size update.
+/// Both produced the "3 tile patches over a grey background"
+/// symptom the user reported. The fix subscribes to
+/// [MapController.mapEventStream] for [_coldStartResetWindow] (3 s)
+/// and re-emits on the reset stream every time a programmatic move,
+/// `fitCamera`, or `nonRotatedSizeChange` event arrives. After the
+/// window the subscription cancels itself so steady-state pans use
+/// TileLayer's normal load-on-event path (resetting on every pan
+/// would briefly blank the visible tiles).
 class StationMapLayers extends StatefulWidget {
   final MapController mapController;
   final List<Station> stations;
@@ -153,7 +177,29 @@ class _StationMapLayersState extends State<StationMapLayers> {
   /// it once after the first frame to cover the case where TileLayer's
   /// initial `didChangeDependencies` ran against a degenerate camera
   /// and never re-issued requests when the camera settled.
-  final StreamController<void> _resetController = StreamController<void>.broadcast();
+  final StreamController<void> _resetController =
+      StreamController<void>.broadcast();
+
+  /// Subscription on [MapController.mapEventStream] used during the
+  /// cold-start window to force a tile-reset every time the map size
+  /// or camera moves programmatically. Cancelled after
+  /// [_coldStartResetWindow] so steady-state interactions are not
+  /// disturbed (#1316 phase 3 — see class doc).
+  StreamSubscription<MapEvent>? _coldStartEventSub;
+
+  /// Timer that closes the cold-start reset window. Cancelled in
+  /// [dispose] so a late firing cannot touch a disposed state.
+  Timer? _coldStartCloseTimer;
+
+  /// How long to keep firing tile-resets on programmatic
+  /// size/camera changes after init. Three seconds covers the worst
+  /// observed cold-start sequence (offstage IndexedStack pre-mount
+  /// → onstage promotion → LayoutBuilder gate clears → FlutterMap
+  /// internal LayoutBuilder lays out → `fitCamera` post-frame
+  /// callback fires → camera settles). Shorter windows missed the
+  /// late `fitCamera` on slow devices; longer windows risk
+  /// interfering with the user's first deliberate zoom.
+  static const Duration _coldStartResetWindow = Duration(seconds: 3);
 
   @override
   void initState() {
@@ -171,10 +217,51 @@ class _StationMapLayersState extends State<StationMapLayers> {
       if (!mounted || _resetController.isClosed) return;
       _resetController.add(null);
     });
+
+    // #1316 phase 3 — the single first-paint reset above fires before
+    // [NearbyMapView]'s post-frame `fitCamera` runs and before
+    // FlutterMap's own LayoutBuilder finishes propagating the real
+    // viewport size. Result: reset hits TileLayer with the bootstrap
+    // camera, TileLayer fetches a tiny tile set, then `fitCamera`
+    // moves the camera + the size-change event arrives — but
+    // TileLayer's reaction at that point only loads tiles INSIDE the
+    // already-captured (small) viewport, leaving most of the visible
+    // map grey (the "3 patches" symptom in the issue's screenshots).
+    //
+    // Fix: subscribe to the map event stream and re-fire the reset on
+    // every programmatic event that changes either the viewport size
+    // or the camera position during the [_coldStartResetWindow].
+    // After the window, unsubscribe — steady-state pans/zooms do not
+    // need a tile-pipeline reset (TileLayer's normal load-on-event
+    // path handles them just fine, and gratuitous resets would cause
+    // visible tile pop-in on every pan).
+    _coldStartEventSub =
+        widget.mapController.mapEventStream.listen(_onColdStartEvent);
+    _coldStartCloseTimer = Timer(_coldStartResetWindow, () {
+      _coldStartEventSub?.cancel();
+      _coldStartEventSub = null;
+    });
+  }
+
+  /// Fire a tile-reset on programmatic size/camera changes during the
+  /// cold-start window. Filters to events that actually invalidate the
+  /// captured viewport — pure user interaction (drag, scroll-wheel,
+  /// pinch) is ignored because if the user is interacting, the bug
+  /// did not reproduce on this open and we should not interrupt them.
+  void _onColdStartEvent(MapEvent event) {
+    if (!mounted || _resetController.isClosed) return;
+    final src = event.source;
+    final relevant = src == MapEventSource.nonRotatedSizeChange ||
+        src == MapEventSource.fitCamera ||
+        src == MapEventSource.mapController;
+    if (!relevant) return;
+    _resetController.add(null);
   }
 
   @override
   void dispose() {
+    _coldStartCloseTimer?.cancel();
+    _coldStartEventSub?.cancel();
     _resetController.close();
     _tileProvider.dispose();
     super.dispose();
