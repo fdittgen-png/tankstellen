@@ -54,6 +54,10 @@ class StorageKeys {
   /// #1122 — opt-in toggle for the real-time eco-coaching haptic that
   /// fires on sustained-high-throttle / low-Δspeed cruise. Defaults to
   /// off so we never buzz a user who hasn't asked for live feedback.
+  @Deprecated(
+    'Migrated to Feature.hapticEcoCoach in #1373 phase 3a; '
+    'kept for one-shot migration read.',
+  )
   static const String hapticEcoCoachEnabled = 'haptic_eco_coach_enabled';
 
   /// #1273 — flag set the first time the user backs out of the trip

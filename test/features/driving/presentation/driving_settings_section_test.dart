@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
-import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/widgets/settings_menu_tile.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_settings_section.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/gamification_settings_tile.dart';
 
 import '../../../fakes/fake_storage_repository.dart';
@@ -12,27 +13,47 @@ import '../../../helpers/pump_app.dart';
 
 /// Widget coverage for [DrivingSettingsSection] (#1122).
 ///
+/// As of #1373 phase 3a the haptic eco-coach toggle reads/writes
+/// through the central [featureFlagsProvider] rather than the legacy
+/// settings box. The widget surface (key, label, ordering) is
+/// unchanged; the test overrides now point at a synthetic
+/// in-memory feature-flag notifier ([_TestFeatureFlags]) instead of
+/// the real Hive-backed repository to keep these tests fast and
+/// platform-deterministic.
+///
 /// Two scenarios:
 ///   1. Default-OFF state renders the switch as off and tapping it
-///      writes `true` to the canonical storage key.
-///   2. Persisted-true storage renders the switch in the on state on
-///      first paint — confirming the provider reads from storage on
-///      build, not just on subsequent toggles.
+///      flips the central feature-flag set on (assertions inspect the
+///      synthetic notifier's state directly).
+///   2. Pre-seeded central state with hapticEcoCoach enabled hydrates
+///      the switch to on on first paint.
 ///
-/// We swap in a fake [SettingsStorage] so the tests don't need a real
-/// Hive box and stay deterministic across runs.
+/// We intentionally bypass the real [FeatureFlagsRepository] /
+/// `featureFlagsRepositoryProvider` here because real Hive boxes
+/// triggered hangs in `pumpAndSettle` on Windows after the toggle's
+/// fire-and-forget save (see memory file
+/// `feedback_hive_widget_test_teardown.md`). Persistence is covered
+/// in `test/features/feature_management/feature_flags_provider_test.dart`.
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   testWidgets(
     'renders the haptic eco-coach toggle in the off state by default and '
-    'persists `true` when tapped',
+    'flips the central feature-flag set when tapped',
     (tester) async {
-      final fake = _FakeSettingsStorage();
+      // Seed prerequisite (obd2TripRecording) so the central enable
+      // succeeds — without it the shim would silently swallow the
+      // dependency-violation StateError.
+      final fakeFlags = _TestFeatureFlags(<Feature>{Feature.obd2TripRecording});
+
       await pumpApp(
         tester,
         const DrivingSettingsSection(),
         overrides: [
-          settingsStorageProvider.overrideWithValue(fake),
+          settingsStorageProvider
+              .overrideWithValue(_FakeSettingsStorage()),
           storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
+          featureFlagsProvider.overrideWith(() => fakeFlags),
         ],
       );
 
@@ -46,35 +67,45 @@ void main() {
       );
 
       await tester.tap(switchFinder);
-      await tester.pumpAndSettle();
+      // Two pumps: drain microtasks then advance simulated time so the
+      // notifier's `enable` Future settles before assertion.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
 
+      // Central state must have flipped on.
       expect(
-        fake.data[StorageKeys.hapticEcoCoachEnabled],
-        isTrue,
+        fakeFlags.state,
+        contains(Feature.hapticEcoCoach),
         reason:
-            'Tapping the toggle must persist the new value to the canonical '
-            'storage key so the setting survives an app restart.',
+            'Tapping the toggle must enable hapticEcoCoach in the central '
+            'feature-flag set so the setting survives an app restart via '
+            'the central repository (#1373 phase 3a).',
       );
       final flipped = tester.widget<SwitchListTile>(switchFinder);
       expect(
         flipped.value,
         isTrue,
-        reason: 'The switch must reflect the new persisted value immediately.',
+        reason: 'The switch must reflect the new central state immediately.',
       );
     },
   );
 
   testWidgets(
-    'reads the persisted true value on build so the switch starts on',
+    'reads the persisted central state on build so the switch starts on',
     (tester) async {
-      final fake = _FakeSettingsStorage()
-        ..data[StorageKeys.hapticEcoCoachEnabled] = true;
+      final fakeFlags = _TestFeatureFlags(<Feature>{
+        Feature.obd2TripRecording,
+        Feature.hapticEcoCoach,
+      });
+
       await pumpApp(
         tester,
         const DrivingSettingsSection(),
         overrides: [
-          settingsStorageProvider.overrideWithValue(fake),
+          settingsStorageProvider
+              .overrideWithValue(_FakeSettingsStorage()),
           storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
+          featureFlagsProvider.overrideWith(() => fakeFlags),
         ],
       );
 
@@ -84,9 +115,9 @@ void main() {
         tile.value,
         isTrue,
         reason:
-            'A persisted-true value must hydrate the toggle on first '
-            'paint — otherwise the user would have to flip it twice on '
-            'every cold start.',
+            'A persisted-true central state must hydrate the toggle on '
+            'first paint — otherwise the user would have to flip it twice '
+            'on every cold start.',
       );
     },
   );
@@ -101,6 +132,7 @@ void main() {
         overrides: [
           settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
           storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
+          featureFlagsProvider.overrideWith(() => _TestFeatureFlags()),
         ],
       );
 
@@ -143,6 +175,7 @@ void main() {
         overrides: [
           settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
           storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
+          featureFlagsProvider.overrideWith(() => _TestFeatureFlags()),
         ],
       );
 
@@ -160,6 +193,35 @@ void main() {
       );
     },
   );
+}
+
+/// Synthetic in-memory [FeatureFlags] notifier for widget tests.
+///
+/// Unlike the real notifier, this implementation:
+///   - has no Hive dependency (no `pumpAndSettle` hangs on Windows);
+///   - returns the seeded `initial` set synchronously from `build`;
+///   - implements `enable` / `disable` as pure in-memory mutations
+///     that throw [StateError] for prerequisite violations to mirror
+///     the real central-provider contract the shim relies on.
+class _TestFeatureFlags extends FeatureFlags {
+  _TestFeatureFlags([Set<Feature>? initial]) : _initial = initial ?? <Feature>{};
+
+  final Set<Feature> _initial;
+
+  @override
+  Set<Feature> build() => {..._initial};
+
+  @override
+  Future<void> enable(Feature feature) async {
+    if (state.contains(feature)) return;
+    state = {...state, feature};
+  }
+
+  @override
+  Future<void> disable(Feature feature) async {
+    if (!state.contains(feature)) return;
+    state = {...state}..remove(feature);
+  }
 }
 
 class _FakeSettingsStorage implements SettingsStorage {
