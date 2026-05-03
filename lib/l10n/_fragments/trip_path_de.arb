@@ -1,4 +1,8 @@
 {
   "tripPathCardTitle": "Fahrtstrecke",
-  "tripPathCardSubtitle": "Per GPS aufgezeichnete Strecke"
+  "tripPathCardSubtitle": "Per GPS aufgezeichnete Strecke",
+  "tripPathLegendTitle": "Verbrauch",
+  "tripPathLegendEfficient": "Effizient (< 6 L/100km)",
+  "tripPathLegendBorderline": "Grenzwertig (6–10 L/100km)",
+  "tripPathLegendWasteful": "Verschwenderisch (≥ 10 L/100km)"
 }

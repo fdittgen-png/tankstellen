@@ -1,34 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_detail_charts.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_path_map_card.dart';
 
 import '../../../../helpers/pump_app.dart';
 
-/// #1374 phase 2 — widget coverage for [TripPathMapCard], the
-/// trip-detail card that renders the GPS-recorded route as a single-
-/// colour polyline on an OpenStreetMap tile layer.
+/// #1374 phases 2 + 3 — widget coverage for [TripPathMapCard], the
+/// trip-detail card that renders the GPS-recorded route as a polyline
+/// on an OpenStreetMap tile layer.
 ///
-/// The widget is the user-visible surface of Phase 1's GPS sampling
-/// work; phase 3 will swap the single colour for a per-segment
-/// heatmap. These tests pin the Phase 2 contract:
+/// Phase 2 pinned the render-gating contract (single-colour polyline,
+/// self-suppressing on legacy / opted-out trips). Phase 3 swaps the
+/// single colour for a per-segment heatmap derived from the
+/// instantaneous L/100 km, with a 3-bucket legend below the map. The
+/// tests here cover both phases:
 ///
-///  * Renders the [FlutterMap] + [PolylineLayer] only when the trip
-///    carries at least one fully-coord sample.
-///  * Self-suppresses (returns [SizedBox.shrink]) for legacy /
-///    opted-out trips so the trip-detail layout stays unchanged.
-///  * The polyline points list is the in-order projection of the
-///    samples that have BOTH lat and lng — half-set fixes are dropped.
+///  * Render gating: FlutterMap + PolylineLayer only when at least
+///    one sample carries both lat + lng; SizedBox.shrink otherwise.
+///  * Polyline points: in-order projection of the fully-coord samples,
+///    half-set fixes dropped.
+///  * Phase 3 heatmap: per-segment colours by computed L/100 km,
+///    same-colour runs collapsed into one polyline, low-speed and
+///    null-fuel-rate segments pinned to efficient (green).
+///  * Legend: three labels rendered with the matching swatch colours.
 TripDetailSample _sample({
   required int sec,
   double speed = 60.0,
   double? lat,
   double? lng,
+  double? fuelRate,
 }) {
   return TripDetailSample(
     timestamp: DateTime.utc(2026, 5, 3, 10, 0, sec),
     speedKmh: speed,
+    fuelRateLPerHour: fuelRate,
     latitude: lat,
     longitude: lng,
   );
@@ -84,8 +91,16 @@ void main() {
   });
 
   group('TripPathMapCard — polyline points', () {
-    testWidgets('polyline points match the non-null coord sequence in order',
+    testWidgets(
+        'polyline coverage spans the full non-null coord sequence in order',
         (tester) async {
+      // With Phase 3 the path is split across N polylines (one per
+      // colour bucket run). The full coord sequence still has to be
+      // covered, so flatten all polyline points and assert the
+      // concatenation matches the input order. Same-bucket samples
+      // collapse to a single polyline; here every segment is
+      // efficient (no fuel-rate data), so the layer holds exactly
+      // one polyline of all 3 points.
       final samples = [
         _sample(sec: 0, lat: 43.46, lng: 3.43),
         _sample(sec: 1, lat: 43.47, lng: 3.44),
@@ -124,6 +139,9 @@ void main() {
       await pumpApp(tester, TripPathMapCard(samples: samples));
 
       final layer = tester.widget<PolylineLayer>(find.byType(PolylineLayer));
+      // All kept samples are efficient (no fuel rate) → one polyline
+      // covering every kept point.
+      expect(layer.polylines, hasLength(1));
       final pts = layer.polylines.single.points;
       expect(pts, hasLength(3));
       expect(pts[0].latitude, closeTo(43.46, 1e-9));
@@ -135,7 +153,9 @@ void main() {
         (tester) async {
       // Edge case: a very short trip with exactly one GPS fix should
       // still surface the card (the user got a fix — that's worth
-      // showing) without throwing on the bounds calculation.
+      // showing) without throwing on the bounds calculation. With
+      // Phase 3 there are zero segments to colour, so the polyline
+      // layer is empty but the map still renders.
       final samples = [
         _sample(sec: 0, lat: 43.46, lng: 3.43),
       ];
@@ -144,17 +164,125 @@ void main() {
 
       expect(find.byType(FlutterMap), findsOneWidget);
       final layer = tester.widget<PolylineLayer>(find.byType(PolylineLayer));
-      expect(layer.polylines.single.points, hasLength(1));
+      expect(layer.polylines, isEmpty);
     });
   });
 
-  group('TripPathMapCard — polyline colour', () {
-    testWidgets('polyline uses theme colorScheme.primary (Phase 2 single colour)',
+  group('TripPathMapCard — phase 3 heatmap', () {
+    testWidgets(
+        'three consecutive bucket transitions yield three coloured polylines',
         (tester) async {
-      // Phase 2 specifies a single theme-driven colour. Phase 3 will
-      // replace this with per-segment heatmap colours; this test
-      // pins the Phase 2 contract so any accidental colour change
-      // (e.g. inlining Colors.green) is caught immediately.
+      // Construct samples whose computed L/100 km lands cleanly in
+      // each bucket. L/100 km = fuelRate / speed * 100.
+      //   * efficient   speed=60, fuel=3.0  → 5.0  (< 6)
+      //   * borderline  speed=60, fuel=4.8  → 8.0  (6 ≤ x < 10)
+      //   * wasteful    speed=60, fuel=7.2  → 12.0 (≥ 10)
+      // Four points → three segments → one polyline per bucket.
+      final samples = [
+        _sample(sec: 0, lat: 43.40, lng: 3.40, speed: 60, fuelRate: 3.0),
+        _sample(sec: 1, lat: 43.41, lng: 3.41, speed: 60, fuelRate: 4.8),
+        _sample(sec: 2, lat: 43.42, lng: 3.42, speed: 60, fuelRate: 7.2),
+        _sample(sec: 3, lat: 43.43, lng: 3.43, speed: 60, fuelRate: 7.2),
+      ];
+
+      await pumpApp(tester, TripPathMapCard(samples: samples));
+
+      final layer = tester.widget<PolylineLayer>(find.byType(PolylineLayer));
+      expect(layer.polylines, hasLength(3));
+
+      final ctx = tester.element(find.byType(FlutterMap));
+      expect(layer.polylines[0].color, DarkModeColors.success(ctx));
+      expect(layer.polylines[1].color, DarkModeColors.warning(ctx));
+      expect(layer.polylines[2].color, DarkModeColors.error(ctx));
+    });
+
+    testWidgets('consecutive same-bucket segments collapse into one polyline',
+        (tester) async {
+      // Six samples → five segments. Bucket sequence:
+      //   eff, eff, bord, bord, eff
+      // → three polylines: efficient run (3 pts), borderline run
+      // (3 pts), efficient run (2 pts). Adjacent runs share the
+      // boundary point so the line stays visually continuous.
+      final samples = [
+        _sample(sec: 0, lat: 43.40, lng: 3.40, speed: 60, fuelRate: 3.0),
+        _sample(sec: 1, lat: 43.41, lng: 3.41, speed: 60, fuelRate: 3.0),
+        _sample(sec: 2, lat: 43.42, lng: 3.42, speed: 60, fuelRate: 4.8),
+        _sample(sec: 3, lat: 43.43, lng: 3.43, speed: 60, fuelRate: 4.8),
+        _sample(sec: 4, lat: 43.44, lng: 3.44, speed: 60, fuelRate: 3.0),
+        _sample(sec: 5, lat: 43.45, lng: 3.45, speed: 60, fuelRate: 3.0),
+      ];
+
+      await pumpApp(tester, TripPathMapCard(samples: samples));
+
+      final layer = tester.widget<PolylineLayer>(find.byType(PolylineLayer));
+      expect(layer.polylines, hasLength(3));
+
+      final ctx = tester.element(find.byType(FlutterMap));
+      expect(layer.polylines[0].color, DarkModeColors.success(ctx));
+      expect(layer.polylines[1].color, DarkModeColors.warning(ctx));
+      expect(layer.polylines[2].color, DarkModeColors.success(ctx));
+    });
+
+    testWidgets(
+        'samples with null fuel rate render as a single efficient polyline',
+        (tester) async {
+      // Legacy / partial samples (no PID 5E and no MAF fallback)
+      // should NOT paint red just because fuel rate wasn't measured.
+      // The classifier collapses them to efficient (green).
+      final samples = [
+        _sample(sec: 0, lat: 43.40, lng: 3.40, speed: 60),
+        _sample(sec: 1, lat: 43.41, lng: 3.41, speed: 60),
+        _sample(sec: 2, lat: 43.42, lng: 3.42, speed: 60),
+      ];
+
+      await pumpApp(tester, TripPathMapCard(samples: samples));
+
+      final layer = tester.widget<PolylineLayer>(find.byType(PolylineLayer));
+      expect(layer.polylines, hasLength(1));
+      final ctx = tester.element(find.byType(FlutterMap));
+      expect(layer.polylines.single.color, DarkModeColors.success(ctx));
+    });
+
+    testWidgets(
+        'low-speed segments classify as efficient regardless of fuel rate',
+        (tester) async {
+      // Speed below 5 km/h produces a divide-by-near-zero L/100 km
+      // that's meaningless for coaching (creep, idle). Lock the
+      // classifier to efficient so idle / parking-lot crawl doesn't
+      // show up red. Even with a high fuel rate (idling engine),
+      // the segments must come back green.
+      final samples = [
+        _sample(sec: 0, lat: 43.40, lng: 3.40, speed: 1.0, fuelRate: 1.5),
+        _sample(sec: 1, lat: 43.40001, lng: 3.40001, speed: 2.0, fuelRate: 1.5),
+        _sample(sec: 2, lat: 43.40002, lng: 3.40002, speed: 3.0, fuelRate: 1.5),
+      ];
+
+      await pumpApp(tester, TripPathMapCard(samples: samples));
+
+      final layer = tester.widget<PolylineLayer>(find.byType(PolylineLayer));
+      expect(layer.polylines, hasLength(1));
+      final ctx = tester.element(find.byType(FlutterMap));
+      expect(layer.polylines.single.color, DarkModeColors.success(ctx));
+    });
+
+    testWidgets('single GPS sample renders zero polylines without throwing',
+        (tester) async {
+      // One GPS fix → zero segments → zero polylines, but FlutterMap
+      // still renders so the card surfaces the start marker.
+      final samples = [
+        _sample(sec: 0, lat: 43.46, lng: 3.43, speed: 60, fuelRate: 5.0),
+      ];
+
+      await pumpApp(tester, TripPathMapCard(samples: samples));
+
+      expect(find.byType(FlutterMap), findsOneWidget);
+      final layer = tester.widget<PolylineLayer>(find.byType(PolylineLayer));
+      expect(layer.polylines, isEmpty);
+    });
+
+    testWidgets('legend renders the three bucket labels', (tester) async {
+      // The legend must surface all three colour buckets so a user
+      // can decode the heatmap without referring to docs.
       final samples = [
         _sample(sec: 0, lat: 43.46, lng: 3.43),
         _sample(sec: 1, lat: 43.47, lng: 3.44),
@@ -162,11 +290,9 @@ void main() {
 
       await pumpApp(tester, TripPathMapCard(samples: samples));
 
-      final layer = tester.widget<PolylineLayer>(find.byType(PolylineLayer));
-      // Resolve the same primary colour the widget would have read.
-      final ctx = tester.element(find.byType(FlutterMap));
-      final expectedColor = Theme.of(ctx).colorScheme.primary;
-      expect(layer.polylines.single.color, expectedColor);
+      expect(find.text('Efficient (< 6 L/100km)'), findsOneWidget);
+      expect(find.text('Borderline (6–10 L/100km)'), findsOneWidget);
+      expect(find.text('Wasteful (≥ 10 L/100km)'), findsOneWidget);
     });
   });
 }

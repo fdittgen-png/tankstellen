@@ -4255,6 +4255,18 @@ class AppLocalizationsSl extends AppLocalizations {
   String get tripPathCardSubtitle => 'GPS-recorded route';
 
   @override
+  String get tripPathLegendTitle => 'Consumption';
+
+  @override
+  String get tripPathLegendEfficient => 'Efficient (< 6 L/100km)';
+
+  @override
+  String get tripPathLegendBorderline => 'Borderline (6–10 L/100km)';
+
+  @override
+  String get tripPathLegendWasteful => 'Wasteful (≥ 10 L/100km)';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Pinning keeps the screen on — uses more battery';
 

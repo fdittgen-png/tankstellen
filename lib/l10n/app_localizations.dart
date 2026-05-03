@@ -7832,6 +7832,30 @@ abstract class AppLocalizations {
   /// **'GPS-recorded route'**
   String get tripPathCardSubtitle;
 
+  /// Header label above the trip-path heatmap legend (#1374 phase 3) — names the metric the colour coding represents.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption'**
+  String get tripPathLegendTitle;
+
+  /// Legend entry for the green heatmap bucket on the trip-path card (#1374 phase 3): segments where computed L/100 km is below 6.
+  ///
+  /// In en, this message translates to:
+  /// **'Efficient (< 6 L/100km)'**
+  String get tripPathLegendEfficient;
+
+  /// Legend entry for the orange heatmap bucket on the trip-path card (#1374 phase 3): segments where computed L/100 km is between 6 and 10.
+  ///
+  /// In en, this message translates to:
+  /// **'Borderline (6–10 L/100km)'**
+  String get tripPathLegendBorderline;
+
+  /// Legend entry for the red heatmap bucket on the trip-path card (#1374 phase 3): segments where computed L/100 km is at least 10.
+  ///
+  /// In en, this message translates to:
+  /// **'Wasteful (≥ 10 L/100km)'**
+  String get tripPathLegendWasteful;
+
   /// Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost.
   ///
   /// In en, this message translates to:

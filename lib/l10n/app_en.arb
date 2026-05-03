@@ -2971,6 +2971,22 @@
   "@tripPathCardSubtitle": {
     "description": "Sub-line beneath the trip-path card title clarifying that the polyline comes from the GPS samples captured during the trip."
   },
+  "tripPathLegendTitle": "Consumption",
+  "@tripPathLegendTitle": {
+    "description": "Header label above the trip-path heatmap legend (#1374 phase 3) — names the metric the colour coding represents."
+  },
+  "tripPathLegendEfficient": "Efficient (< 6 L/100km)",
+  "@tripPathLegendEfficient": {
+    "description": "Legend entry for the green heatmap bucket on the trip-path card (#1374 phase 3): segments where computed L/100 km is below 6."
+  },
+  "tripPathLegendBorderline": "Borderline (6–10 L/100km)",
+  "@tripPathLegendBorderline": {
+    "description": "Legend entry for the orange heatmap bucket on the trip-path card (#1374 phase 3): segments where computed L/100 km is between 6 and 10."
+  },
+  "tripPathLegendWasteful": "Wasteful (≥ 10 L/100km)",
+  "@tripPathLegendWasteful": {
+    "description": "Legend entry for the red heatmap bucket on the trip-path card (#1374 phase 3): segments where computed L/100 km is at least 10."
+  },
   "tripRecordingPinTooltip": "Pinning keeps the screen on — uses more battery",
   "@tripRecordingPinTooltip": {
     "description": "Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost."

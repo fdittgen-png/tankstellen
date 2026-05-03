@@ -4300,6 +4300,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripPathCardSubtitle => 'Per GPS aufgezeichnete Strecke';
 
   @override
+  String get tripPathLegendTitle => 'Verbrauch';
+
+  @override
+  String get tripPathLegendEfficient => 'Effizient (< 6 L/100km)';
+
+  @override
+  String get tripPathLegendBorderline => 'Grenzwertig (6–10 L/100km)';
+
+  @override
+  String get tripPathLegendWasteful => 'Verschwenderisch (≥ 10 L/100km)';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Anpinnen hält den Bildschirm an — verbraucht mehr Akku';
 
