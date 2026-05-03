@@ -1137,5 +1137,7 @@
   "featureBlockedEnable_glideCoach": "Activez d'abord l'enregistrement OBD2 des trajets",
   "featureBlockedEnable_gpsTripPath": "Activez d'abord l'enregistrement OBD2 des trajets",
   "featureBlockedDisable_obd2TripRecording": "Désactivez d'abord les fonctionnalités dépendantes : {dependents}",
-  "featureBlockedDisable_tankSync": "Désactivez d'abord les fonctionnalités dépendantes : {dependents}"
+  "featureBlockedDisable_tankSync": "Désactivez d'abord les fonctionnalités dépendantes : {dependents}",
+  "tripPathCardTitle": "Trace du trajet",
+  "tripPathCardSubtitle": "Itinéraire enregistré par GPS"
 }

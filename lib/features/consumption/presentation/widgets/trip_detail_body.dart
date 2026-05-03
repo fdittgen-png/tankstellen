@@ -15,6 +15,7 @@ import 'driving_insights_card.dart';
 import 'driving_score_card.dart';
 import 'throttle_rpm_histogram_card.dart';
 import 'trip_detail_charts.dart';
+import 'trip_path_map_card.dart';
 import 'trip_summary_card.dart';
 
 /// Scrollable body of the trip detail screen (#890): summary card
@@ -170,6 +171,13 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
           isEv: widget.isEv,
         ),
         const SizedBox(height: 8),
+        // GPS path overlay (#1374 phase 2). Self-suppresses when the
+        // trip carries no GPS samples — legacy trips, opted-out trips,
+        // trips that never got a fix — so no parent-side gating is
+        // needed and the layout stays unchanged for those trips.
+        // Phase 3 will replace the single-colour polyline with a
+        // per-segment heatmap.
+        TripPathMapCard(samples: widget.samples),
         // Composite driving score (#1041 phase 5a — Card A). Sits at
         // the top of the Insights group: a single big 0..100 number
         // with a brief breakdown chip row beneath it. EV trips and

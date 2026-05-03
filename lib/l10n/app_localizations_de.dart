@@ -4294,6 +4294,12 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get tripPathCardTitle => 'Fahrtstrecke';
+
+  @override
+  String get tripPathCardSubtitle => 'Per GPS aufgezeichnete Strecke';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Anpinnen hält den Bildschirm an — verbraucht mehr Akku';
 

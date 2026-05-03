@@ -273,4 +273,10 @@ TripDetailSample _toDetailSample(TripSample s) => TripDetailSample(
       throttlePercent: s.throttlePercent,
       engineLoadPercent: s.engineLoadPercent,
       coolantTempC: s.coolantTempC,
+      // #1374 phase 2 — plumb GPS coords through the presentation
+      // layer so the trip-detail map overlay can render the recorded
+      // route. Legacy trips deserialise with null on both fields and
+      // the overlay self-suppresses in that case.
+      latitude: s.latitude,
+      longitude: s.longitude,
     );

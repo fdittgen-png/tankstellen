@@ -1,0 +1,10 @@
+{
+  "tripPathCardTitle": "Trip path",
+  "@tripPathCardTitle": {
+    "description": "Title of the trip-detail card that shows the GPS-recorded route as a polyline on a map (#1374 phase 2)."
+  },
+  "tripPathCardSubtitle": "GPS-recorded route",
+  "@tripPathCardSubtitle": {
+    "description": "Sub-line beneath the trip-path card title clarifying that the polyline comes from the GPS samples captured during the trip."
+  }
+}

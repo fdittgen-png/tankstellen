@@ -7820,6 +7820,18 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{no trips} one{1 trip} other{{count} trips}}'**
   String tripLengthBucketTripCount(int count);
 
+  /// Title of the trip-detail card that shows the GPS-recorded route as a polyline on a map (#1374 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Trip path'**
+  String get tripPathCardTitle;
+
+  /// Sub-line beneath the trip-path card title clarifying that the polyline comes from the GPS samples captured during the trip.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS-recorded route'**
+  String get tripPathCardSubtitle;
+
   /// Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost.
   ///
   /// In en, this message translates to:
