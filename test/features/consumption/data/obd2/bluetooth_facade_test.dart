@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 
 /// Unit tests for the [PluginBluetoothFacade] BT-off classifier
 /// (#1369).
@@ -74,6 +75,54 @@ void main() {
     test('handles a PlatformException with a null message gracefully', () {
       final ex = PlatformException(code: 'startScan');
       expect(PluginBluetoothFacade.debugLooksBluetoothOff(ex), isFalse);
+    });
+  });
+
+  // #1392 — the explicit `startScan` future was wrapped by #1370, but
+  // the `scanResults` stream's `onError` was forwarding the raw
+  // `PlatformException(startScan, "Bluetooth must be turned on", ...)`
+  // straight through. Both code paths must funnel through the same
+  // `_mapBluetoothError` helper so a BT-off rejection on either path
+  // surfaces as `Obd2BluetoothOff`.
+  group('PluginBluetoothFacade.debugMapBluetoothError (#1392)', () {
+    test(
+      'scanResults stream BT-off rejection maps to Obd2BluetoothOff',
+      () {
+        // Same shape as the FlutterBluePlus rejection that previously
+        // leaked through the `scanResults` stream's onError to the
+        // global zone error handler as `[other] PlatformException`.
+        final ex = PlatformException(
+          code: 'startScan',
+          message: 'Bluetooth must be turned on',
+        );
+        final mapped = PluginBluetoothFacade.debugMapBluetoothError(ex);
+        expect(
+          mapped,
+          isA<Obd2BluetoothOff>(),
+          reason:
+              'BT-off PlatformException must be normalised to the typed '
+              'error regardless of which call site (explicit-future or '
+              'scanResults stream) caught it.',
+        );
+      },
+    );
+
+    test(
+      'returns the original error for non-BT-off PlatformExceptions',
+      () {
+        final ex = PlatformException(
+          code: 'permission_denied',
+          message: 'BLUETOOTH_SCAN permission required',
+        );
+        final mapped = PluginBluetoothFacade.debugMapBluetoothError(ex);
+        expect(mapped, same(ex));
+      },
+    );
+
+    test('returns the original error for non-PlatformException objects', () {
+      final err = StateError('transport closed');
+      final mapped = PluginBluetoothFacade.debugMapBluetoothError(err);
+      expect(mapped, same(err));
     });
   });
 }
