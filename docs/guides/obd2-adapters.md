@@ -12,25 +12,42 @@ The registry source of truth is
 `lib/features/consumption/data/obd2/adapter_registry.dart`; the
 catalogue below is curated manually from that file.
 
+## Compatibility status
+
+Each adapter row carries one of three states, sourced from the
+`Obd2AdapterCompatibility` enum in
+`lib/features/consumption/data/obd2/adapter_registry.dart`:
+
+- ✅ **tested** — the maintainer has confirmed connect + live PID
+  stream on real hardware.
+- 👤 **user-verified** — at least one user reported it working in a
+  GitHub issue (cite the issue number in the row's Notes column when
+  helpful).
+- ⚠️ **theoretical** — name-matched profile only; adapter has not
+  been verified end-to-end by anyone. Should still work because the
+  GATT profile / SPP transport is correct, but if you have one and
+  it works (or doesn't), please open an issue so we can promote it.
+
 ## Supported adapters
 
-| Display name | Transport | Name matchers | Notes |
-|---|---|---|---|
-| vLinker FS (Classic) | Classic BT | `vlinker fs`, `vlinker ms`, `vlink fs`, `vgate fs` | Dominant Amazon-EU model; Classic SPP |
-| vLinker FD / MC (BLE) | BLE | `vlinker fd`, `vlinker mc`, `vlink fd`, `vlink mc` | Nordic UART FFF0 family |
-| OBDLink MX+ | BLE | `obdlink` | Scantool premium adapter; custom 18f0 service |
-| Carista OBD2 | BLE | `carista` | Nordic UART FFF0 family |
-| Veepeak BLE+ | BLE | `veepeak` | Nordic UART FFF0 family |
-| SmartOBD (BLE) | BLE | `smartobd` | Generic ELM327 v1.5 clone |
-| SmartOBD (Classic) | Classic BT | `smartobd` | Same brand, Classic SPP variant |
-| ieGeek Scanner | BLE | `iegeek` | ELM327 v2.1 BLE clone |
-| vLinker BM+ (BLE) | BLE | `vlinker bm+`, `vlink bm+` | BLE-only sibling to vLinker BM; the "+" is load-bearing |
-| Konnwei KW902 | Classic BT | `konnwei`, `kw902` | ELM327 v1.5 Classic clone |
-| Vgate iCar Pro | BLE | `vgate`, `icar pro` | Chinese brand; BLE variant (WiFi variant handled by TCP facade) |
-| Panlong WiFi | Classic BT (no-op) | `panlong` | WiFi-only adapter; name kept so the UI can label a mis-paired Classic entry |
-| BAFX 34t5 | Classic BT | `bafx` | Legacy ELM327 v1.5 adapter, still sold in the US |
-| Generic ELM327 (BLE) | BLE | — (matched by FFF0 service UUID) | Catch-all for unfamiliar BLE FFF0 clones |
-| Generic ELM327 (Classic) | Classic BT | `obdii`, `obd-ii`, `obd ii`, `obd2`, `elm327` | Catch-all for unfamiliar Classic-SPP clones |
+| Display name | Transport | Name matchers | Notes | Compatibility |
+|---|---|---|---|---|
+| vLinker FS (Classic) | Classic BT | `vlinker fs`, `vlinker ms`, `vlink fs`, `vgate fs` | Dominant Amazon-EU model; Classic SPP | ✅ tested |
+| vLinker FD / MC (BLE) | BLE | `vlinker fd`, `vlinker mc`, `vlink fd`, `vlink mc` | Nordic UART FFF0 family | ⚠️ theoretical |
+| OBDLink MX+ | BLE | `obdlink` | Scantool premium adapter; custom 18f0 service | ⚠️ theoretical |
+| Carista OBD2 | BLE | `carista` | Nordic UART FFF0 family | ⚠️ theoretical |
+| Veepeak BLE+ | BLE | `veepeak` | Nordic UART FFF0 family | ⚠️ theoretical |
+| SmartOBD (BLE) | BLE | `smartobd` | Generic ELM327 v1.5 clone | 👤 user-verified |
+| SmartOBD (Classic) | Classic BT | `smartobd` | Same brand, Classic SPP variant | 👤 user-verified |
+| ieGeek Scanner | BLE | `iegeek` | ELM327 v2.1 BLE clone | ⚠️ theoretical |
+| vLinker BM+ (BLE) | BLE | `vlinker bm+`, `vlink bm+` | BLE-only sibling to vLinker BM; the "+" is load-bearing | ⚠️ theoretical |
+| vLinker BM-Android (Classic) | Classic BT | `vlinker bm-android`, `vlink bm-android` | Classic SPP sibling to vLinker BM+ | ✅ tested |
+| Konnwei KW902 | Classic BT | `konnwei`, `kw902` | ELM327 v1.5 Classic clone | ⚠️ theoretical |
+| Vgate iCar Pro | BLE | `vgate`, `icar pro` | Chinese brand; BLE variant (WiFi variant handled by TCP facade) | ⚠️ theoretical |
+| Panlong WiFi | Classic BT (no-op) | `panlong` | WiFi-only adapter; name kept so the UI can label a mis-paired Classic entry | ⚠️ theoretical |
+| BAFX 34t5 | Classic BT | `bafx` | Legacy ELM327 v1.5 adapter, still sold in the US | ⚠️ theoretical |
+| Generic ELM327 (BLE) | BLE | — (matched by FFF0 service UUID) | Catch-all for unfamiliar BLE FFF0 clones | ⚠️ theoretical |
+| Generic ELM327 (Classic) | Classic BT | `obdii`, `obd-ii`, `obd ii`, `obd2`, `elm327` | Catch-all for unfamiliar Classic-SPP clones | ⚠️ theoretical |
 
 ## How to add a new adapter
 
