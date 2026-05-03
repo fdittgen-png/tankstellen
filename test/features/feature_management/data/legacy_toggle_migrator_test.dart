@@ -409,4 +409,139 @@ void main() {
       },
     );
   });
+
+  group('migrateLegacyToggles — unifiedSearchResults', () {
+    test(
+      'promotes legacy true → enables unifiedSearchResults; sets migration '
+      'flag (no prerequisites in the manifest, so no cascade)',
+      () async {
+        // ignore: deprecated_member_use_from_same_package
+        await settings.put(StorageKeys.unifiedSearchResultsEnabled, true);
+
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          contains(Feature.unifiedSearchResults),
+          reason:
+              'Legacy true must promote into the central feature-flag set '
+              'so the user does not have to re-enable unifiedSearchResults '
+              'after the migration.',
+        );
+        expect(
+          settings.get(unifiedSearchResultsMigratedKey),
+          isTrue,
+          reason:
+              'The migration gate must be set so a subsequent run is a '
+              'no-op and a user who later disables unifiedSearchResults '
+              'does not get it re-enabled on the next launch.',
+        );
+      },
+    );
+
+    test('legacy false → leaves central state untouched; sets migration flag',
+        () async {
+      // ignore: deprecated_member_use_from_same_package
+      await settings.put(StorageKeys.unifiedSearchResultsEnabled, false);
+
+      await migrateLegacyToggles(
+        settings: settings,
+        featureFlags: repo,
+        manifest: FeatureManifest.defaultManifest,
+      );
+
+      final after = await repo.loadEnabled();
+      expect(
+        after,
+        isNot(contains(Feature.unifiedSearchResults)),
+        reason:
+            'A legacy explicit-false must not promote anything — the '
+            'central system already defaults unifiedSearchResults to off '
+            '(manifest defaultEnabled=false), so a no-op write would have '
+            'been semantically equivalent anyway. Mirrors the haptic '
+            'precedent.',
+      );
+      expect(
+        settings.get(unifiedSearchResultsMigratedKey),
+        isTrue,
+        reason:
+            'Even a no-op migration must set the gate so we never re-read '
+            'the deprecated key on subsequent launches.',
+      );
+    });
+
+    test(
+      'legacy null (key never written) → no central state change; flag set',
+      () async {
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          isNot(contains(Feature.unifiedSearchResults)),
+          reason:
+              'A first-launch profile (no legacy value) must land at '
+              'central manifest defaults — unifiedSearchResults off.',
+        );
+        expect(
+          settings.get(unifiedSearchResultsMigratedKey),
+          isTrue,
+          reason:
+              'Absent legacy value still flips the gate so we do not '
+              're-do the work each launch.',
+        );
+      },
+    );
+
+    test(
+      'idempotent — running twice on legacy=true leaves the central state '
+      'unchanged the second time',
+      () async {
+        // ignore: deprecated_member_use_from_same_package
+        await settings.put(StorageKeys.unifiedSearchResultsEnabled, true);
+
+        // First run promotes.
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+        final afterFirst = await repo.loadEnabled();
+        expect(afterFirst, contains(Feature.unifiedSearchResults));
+        expect(settings.get(unifiedSearchResultsMigratedKey), isTrue);
+
+        // Simulate the user disabling unifiedSearchResults after the
+        // migration (e.g. via the central settings UI). The second run
+        // must NOT re-enable it.
+        final disabled = {...afterFirst}..remove(Feature.unifiedSearchResults);
+        await repo.saveEnabled(disabled);
+
+        // Second run.
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+
+        final afterSecond = await repo.loadEnabled();
+        expect(
+          afterSecond,
+          isNot(contains(Feature.unifiedSearchResults)),
+          reason:
+              'A second migration run must not re-promote the legacy true '
+              'value — the user has explicitly disabled '
+              'unifiedSearchResults since and that choice must survive.',
+        );
+      },
+    );
+  });
 }

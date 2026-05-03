@@ -10,21 +10,18 @@ part of 'unified_search_results_enabled.dart';
 // ignore_for_file: type=lint, type=warning
 /// Feature flag for the #1116 phase-3 unified fuel + EV search results.
 ///
-/// Phase 3a (this PR) introduces only the flag and the
-/// [unifiedSearchResultsProvider] foundation; the search screen still
-/// reads `searchStateProvider` directly. Phase 3b ships the mixed
-/// fuel/EV card widgets, and phase 3c rewires the search screen to
-/// consume [unifiedSearchResultsProvider] when this flag is on.
+/// As of #1373 phase 3f this is a thin shim over [featureFlagsProvider]
+/// — the canonical state lives in the central feature-flag set keyed by
+/// [Feature.unifiedSearchResults]. The legacy
+/// `StorageKeys.unifiedSearchResultsEnabled` Hive-settings key is read
+/// once by the `legacyToggleMigrationProvider` on first launch after
+/// upgrade and promoted into the central set; subsequent reads/writes
+/// go through here.
 ///
-/// Persisted to the settings box so the user's preference survives
-/// restarts. Defaults to `false` because the unified UI is not yet
-/// shipping — flipping the flag without phase 3b/c installed produces
-/// an empty result list, which is the safer fallback than a partial
-/// rendering.
-///
-/// Mirrors the [EvShowOnMap] pattern from `lib/features/ev/providers/
-/// ev_providers.dart`: keep-alive, Hive-backed, with [toggle] and [set]
-/// mutators.
+/// Defaults to `false` per the manifest because the unified UI is still
+/// converging — flipping the flag without all phase 3b/c surfaces
+/// installed produces an empty result list, which is the safer
+/// fallback than a partial rendering.
 
 @ProviderFor(UnifiedSearchResultsEnabled)
 final unifiedSearchResultsEnabledProvider =
@@ -32,40 +29,34 @@ final unifiedSearchResultsEnabledProvider =
 
 /// Feature flag for the #1116 phase-3 unified fuel + EV search results.
 ///
-/// Phase 3a (this PR) introduces only the flag and the
-/// [unifiedSearchResultsProvider] foundation; the search screen still
-/// reads `searchStateProvider` directly. Phase 3b ships the mixed
-/// fuel/EV card widgets, and phase 3c rewires the search screen to
-/// consume [unifiedSearchResultsProvider] when this flag is on.
+/// As of #1373 phase 3f this is a thin shim over [featureFlagsProvider]
+/// — the canonical state lives in the central feature-flag set keyed by
+/// [Feature.unifiedSearchResults]. The legacy
+/// `StorageKeys.unifiedSearchResultsEnabled` Hive-settings key is read
+/// once by the `legacyToggleMigrationProvider` on first launch after
+/// upgrade and promoted into the central set; subsequent reads/writes
+/// go through here.
 ///
-/// Persisted to the settings box so the user's preference survives
-/// restarts. Defaults to `false` because the unified UI is not yet
-/// shipping — flipping the flag without phase 3b/c installed produces
-/// an empty result list, which is the safer fallback than a partial
-/// rendering.
-///
-/// Mirrors the [EvShowOnMap] pattern from `lib/features/ev/providers/
-/// ev_providers.dart`: keep-alive, Hive-backed, with [toggle] and [set]
-/// mutators.
+/// Defaults to `false` per the manifest because the unified UI is still
+/// converging — flipping the flag without all phase 3b/c surfaces
+/// installed produces an empty result list, which is the safer
+/// fallback than a partial rendering.
 final class UnifiedSearchResultsEnabledProvider
     extends $NotifierProvider<UnifiedSearchResultsEnabled, bool> {
   /// Feature flag for the #1116 phase-3 unified fuel + EV search results.
   ///
-  /// Phase 3a (this PR) introduces only the flag and the
-  /// [unifiedSearchResultsProvider] foundation; the search screen still
-  /// reads `searchStateProvider` directly. Phase 3b ships the mixed
-  /// fuel/EV card widgets, and phase 3c rewires the search screen to
-  /// consume [unifiedSearchResultsProvider] when this flag is on.
+  /// As of #1373 phase 3f this is a thin shim over [featureFlagsProvider]
+  /// — the canonical state lives in the central feature-flag set keyed by
+  /// [Feature.unifiedSearchResults]. The legacy
+  /// `StorageKeys.unifiedSearchResultsEnabled` Hive-settings key is read
+  /// once by the `legacyToggleMigrationProvider` on first launch after
+  /// upgrade and promoted into the central set; subsequent reads/writes
+  /// go through here.
   ///
-  /// Persisted to the settings box so the user's preference survives
-  /// restarts. Defaults to `false` because the unified UI is not yet
-  /// shipping — flipping the flag without phase 3b/c installed produces
-  /// an empty result list, which is the safer fallback than a partial
-  /// rendering.
-  ///
-  /// Mirrors the [EvShowOnMap] pattern from `lib/features/ev/providers/
-  /// ev_providers.dart`: keep-alive, Hive-backed, with [toggle] and [set]
-  /// mutators.
+  /// Defaults to `false` per the manifest because the unified UI is still
+  /// converging — flipping the flag without all phase 3b/c surfaces
+  /// installed produces an empty result list, which is the safer
+  /// fallback than a partial rendering.
   UnifiedSearchResultsEnabledProvider._()
     : super(
         from: null,
@@ -94,25 +85,22 @@ final class UnifiedSearchResultsEnabledProvider
 }
 
 String _$unifiedSearchResultsEnabledHash() =>
-    r'f3861b3c635983e95666508988811f0937a77b15';
+    r'bd0c4c48b32ee20ae7ecce4037b844d23f513f48';
 
 /// Feature flag for the #1116 phase-3 unified fuel + EV search results.
 ///
-/// Phase 3a (this PR) introduces only the flag and the
-/// [unifiedSearchResultsProvider] foundation; the search screen still
-/// reads `searchStateProvider` directly. Phase 3b ships the mixed
-/// fuel/EV card widgets, and phase 3c rewires the search screen to
-/// consume [unifiedSearchResultsProvider] when this flag is on.
+/// As of #1373 phase 3f this is a thin shim over [featureFlagsProvider]
+/// — the canonical state lives in the central feature-flag set keyed by
+/// [Feature.unifiedSearchResults]. The legacy
+/// `StorageKeys.unifiedSearchResultsEnabled` Hive-settings key is read
+/// once by the `legacyToggleMigrationProvider` on first launch after
+/// upgrade and promoted into the central set; subsequent reads/writes
+/// go through here.
 ///
-/// Persisted to the settings box so the user's preference survives
-/// restarts. Defaults to `false` because the unified UI is not yet
-/// shipping — flipping the flag without phase 3b/c installed produces
-/// an empty result list, which is the safer fallback than a partial
-/// rendering.
-///
-/// Mirrors the [EvShowOnMap] pattern from `lib/features/ev/providers/
-/// ev_providers.dart`: keep-alive, Hive-backed, with [toggle] and [set]
-/// mutators.
+/// Defaults to `false` per the manifest because the unified UI is still
+/// converging — flipping the flag without all phase 3b/c surfaces
+/// installed produces an empty result list, which is the safer
+/// fallback than a partial rendering.
 
 abstract class _$UnifiedSearchResultsEnabled extends $Notifier<bool> {
   bool build();

@@ -7,7 +7,6 @@ import 'package:tankstellen/core/refuel/station_as_refuel_option.dart';
 import 'package:tankstellen/core/refuel/unified_search_results_enabled.dart';
 import 'package:tankstellen/core/refuel/unified_search_results_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
-import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
@@ -121,6 +120,11 @@ ChargingStation _charger({String id = 'ev1', String? operator = 'Ionity'}) =>
 /// in-memory settings store. Profile is null by default so
 /// `selectedFuelTypeProvider` falls back to [FuelType.all]; tests that
 /// need a specific fuel type call `select()` on the notifier.
+///
+/// As of #1373 phase 3f the `unifiedSearchResultsEnabled` flag is
+/// backed by [featureFlagsProvider]. Tests flip the flag by overriding
+/// the shim provider directly with `overrideWithValue(true)` rather
+/// than writing to the legacy settings key.
 ProviderContainer _container({
   required AsyncValue<ServiceResult<List<SearchResultItem>>> fuel,
   required AsyncValue<ServiceResult<List<ChargingStation>>> ev,
@@ -133,13 +137,9 @@ ProviderContainer _container({
       activeProfileProvider.overrideWith(_NullProfile.new),
       searchStateProvider.overrideWith(() => _FakeSearchState(fuel)),
       eVSearchStateProvider.overrideWith(() => _FakeEvSearchState(ev)),
+      if (flagOn) unifiedSearchResultsEnabledProvider.overrideWithValue(true),
     ],
   );
-  if (flagOn) {
-    // Flip the persisted value before any read; the flag's `build` will
-    // observe `true` on first watch.
-    storage.putSetting(StorageKeys.unifiedSearchResultsEnabled, true);
-  }
   return container;
 }
 
