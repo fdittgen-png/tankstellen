@@ -8,6 +8,7 @@ import 'package:tankstellen/core/telemetry/upload/trace_uploader.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 
 /// Fake TraceStorage that records calls in memory.
@@ -203,6 +204,45 @@ void main() {
       final trace = storage.stored.first;
       expect(trace.networkState, isNotNull);
       expect(trace.networkState.isOnline, isA<bool>());
+    });
+
+    // #1394 — when the error arrives wrapped in [ContextualError]
+    // (i.e. via `errorLogger.log`), the recorder must unwrap it so the
+    // category reflects the real layer and the errorType reflects the
+    // root exception class — not the wrapper.
+    test('ContextualError is unwrapped: category from layer + type from inner',
+        () async {
+      final wrapped = ContextualError(
+        layer: ErrorLayer.services,
+        error: Exception('boom'),
+        context: null,
+      );
+      await recorder.record(wrapped, StackTrace.current);
+
+      final trace = storage.stored.first;
+      expect(trace.category, ErrorCategory.api,
+          reason: 'services layer must infer api, not unknown');
+      expect(trace.errorType, contains('Exception'),
+          reason: 'errorType must reflect the unwrapped exception, '
+              'not the ContextualError wrapper');
+      expect(trace.errorMessage, contains('[services]'),
+          reason: 'wrapper toString preserves the layer prefix for grep');
+    });
+
+    test('ContextualError preserves classifier match for known types',
+        () async {
+      // ApiException carries enough type info on its own — the
+      // classifier should still win even when the wrapper is present.
+      final wrapped = ContextualError(
+        layer: ErrorLayer.ui,
+        error: const ApiException(message: 'rate limited', statusCode: 429),
+        context: null,
+      );
+      await recorder.record(wrapped, StackTrace.current);
+
+      expect(storage.stored.first.category, ErrorCategory.api,
+          reason: 'ApiException stays api — layer fallback only fires '
+              'when classifier returns unknown');
     });
   });
 }
