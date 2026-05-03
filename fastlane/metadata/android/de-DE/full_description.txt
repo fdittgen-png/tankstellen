@@ -2,8 +2,8 @@ Tankstellen ist eine kostenlose Open-Source-App zum Vergleich von Kraftstoff- un
 
 FUNKTIONEN
 
-Preisvergleich in 15 Laendern
-- Echtzeit-Kraftstoffpreise von offiziellen Regierungs-APIs in Deutschland (Tankerkoenig/MTS-K), Frankreich (Prix Carburants), Oesterreich (Spritpreisrechner), Spanien (Geoportal), Italien (MASE/MiSE), Daenemark, Portugal (DGEG), Grossbritannien (GOV.UK), Australien (FuelWatch), Slowenien, Luxemburg, Suedkorea (Opinet), Chile (CNE), Argentinien und Mexiko.
+Preisvergleich in 17 Laendern
+- Echtzeit-Kraftstoffpreise von offiziellen Regierungs-APIs in Deutschland (Tankerkoenig/MTS-K), Frankreich (Prix Carburants), Oesterreich (Spritpreisrechner), Spanien (Geoportal), Italien (MASE/MiSE), Daenemark, Portugal (DGEG), Grossbritannien (CMA Fuel Finder), Australien (FuelCheck NSW), Slowenien (goriva.si), Luxemburg, Suedkorea (Opinet), Chile (CNE Bencina en Linea), Griechenland (Paratiritirio Timon), Rumaenien (Monitorul Preturilor), Argentinien und Mexiko.
 - Interaktive Karte mit OpenStreetMap-Kacheln und Marker-Clustering fuer schnelles Navigieren auch in dichten Stadtgebieten.
 - Suche nach Stadt, Postleitzahl oder GPS-Position mit einstellbarem Radius.
 - EV-Ladestationen von OpenChargeMap mit Stecker- und Leistungsdetails neben den Kraftstoffpreisen.

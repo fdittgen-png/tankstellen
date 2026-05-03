@@ -2,8 +2,8 @@ Tankstellen is a free, open-source fuel and EV charging price comparison app tha
 
 FEATURES
 
-Price comparison across 15 countries
-- Real-time fuel prices from official government APIs in Germany (Tankerkoenig/MTS-K), France (Prix Carburants), Austria (Spritpreisrechner), Spain (Geoportal), Italy (MASE/MiSE), Denmark, Portugal (DGEG), United Kingdom (GOV.UK), Australia (FuelWatch), Slovenia, Luxembourg, South Korea (Opinet), Chile (CNE), Argentina, and Mexico.
+Price comparison across 17 countries
+- Real-time fuel prices from official government APIs in Germany (Tankerkoenig/MTS-K), France (Prix Carburants), Austria (Spritpreisrechner), Spain (Geoportal), Italy (MASE/MiSE), Denmark, Portugal (DGEG), United Kingdom (CMA Fuel Finder), Australia (FuelCheck NSW), Slovenia (goriva.si), Luxembourg, South Korea (Opinet), Chile (CNE Bencina en Línea), Greece (Paratiritirio Timon), Romania (Monitorul Prețurilor), Argentina, and Mexico.
 - Interactive map with OpenStreetMap tiles and marker clustering for fast browsing even in dense urban areas.
 - Search by city, postal code, or GPS position with a configurable radius.
 - EV charging stations from OpenChargeMap with connector and power details alongside fuel prices.

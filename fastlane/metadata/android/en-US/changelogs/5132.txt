@@ -1,0 +1,9 @@
+v5.0.0 — Major release
+• 17 countries supported (added Greece, Romania, Slovenia, Luxembourg, South Korea, Chile)
+• EV charging stations from OpenChargeMap alongside fuel prices
+• Trip recording with OBD2 (Bluetooth ELM327) — real consumption data
+• Fill-up history with receipt OCR (Super U, Carrefour, generic)
+• Radius and velocity price alerts with local notifications
+• Optional self-hosted Supabase sync (TankSync)
+• Android Auto, home-screen widgets, cross-border price comparison
+• 23 languages — privacy-first, no ads, no tracking, MIT-licensed

@@ -2,8 +2,8 @@ Tankstellen est une application gratuite et open source de comparaison des prix 
 
 FONCTIONNALITES
 
-Comparaison de prix dans 15 pays
-- Prix en temps reel provenant des API gouvernementales officielles en Allemagne (Tankerkoenig/MTS-K), France (Prix Carburants), Autriche (Spritpreisrechner), Espagne (Geoportal), Italie (MASE/MiSE), Danemark, Portugal (DGEG), Royaume-Uni (GOV.UK), Australie (FuelWatch), Slovenie, Luxembourg, Coree du Sud (Opinet), Chili (CNE), Argentine et Mexique.
+Comparaison de prix dans 17 pays
+- Prix en temps reel provenant des API gouvernementales officielles en Allemagne (Tankerkoenig/MTS-K), France (Prix Carburants), Autriche (Spritpreisrechner), Espagne (Geoportal), Italie (MASE/MiSE), Danemark, Portugal (DGEG), Royaume-Uni (CMA Fuel Finder), Australie (FuelCheck NSW), Slovenie (goriva.si), Luxembourg, Coree du Sud (Opinet), Chili (CNE Bencina en Linea), Grece (Paratiritirio Timon), Roumanie (Monitorul Preturilor), Argentine et Mexique.
 - Carte interactive avec tuiles OpenStreetMap et regroupement de marqueurs pour une navigation rapide meme dans les zones urbaines denses.
 - Recherche par nom de ville, code postal ou position GPS avec rayon configurable.
 - Bornes de recharge electrique OpenChargeMap avec details des connecteurs et de la puissance a cote des prix des carburants.

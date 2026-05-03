@@ -1,0 +1,9 @@
+v5.0.0 — Version majeure
+• 17 pays pris en charge (nouveaux : Grece, Roumanie, Slovenie, Luxembourg, Coree du Sud, Chili)
+• Bornes de recharge electrique OpenChargeMap a cote des prix des carburants
+• Enregistrement de trajets via OBD2 (Bluetooth ELM327) — donnees de consommation reelles
+• Historique des pleins avec OCR pour les tickets (Super U, Carrefour, generiques)
+• Alertes de prix par rayon et par vitesse avec notifications locales
+• Synchronisation Supabase auto-hebergee optionnelle (TankSync)
+• Android Auto, widgets d'ecran d'accueil, comparaison transfrontaliere
+• 23 langues — vie privee respectee, sans publicite, sans tracage, licence MIT

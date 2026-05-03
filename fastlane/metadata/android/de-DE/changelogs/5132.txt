@@ -1,0 +1,9 @@
+v5.0.0 — Major-Release
+• 17 Laender unterstuetzt (neu: Griechenland, Rumaenien, Slowenien, Luxemburg, Suedkorea, Chile)
+• EV-Ladestationen von OpenChargeMap neben den Kraftstoffpreisen
+• Fahrtaufzeichnung via OBD2 (Bluetooth ELM327) — echte Verbrauchsdaten
+• Tank-Historie mit Beleg-OCR (Super U, Carrefour, generisch)
+• Radius- und Geschwindigkeits-Preisalarme mit lokalen Benachrichtigungen
+• Optionale selbst gehostete Supabase-Synchronisation (TankSync)
+• Android Auto, Startbildschirm-Widgets, grenzueberschreitender Preisvergleich
+• 23 Sprachen — Datenschutz an erster Stelle, ohne Werbung, ohne Tracking, MIT-lizenziert
