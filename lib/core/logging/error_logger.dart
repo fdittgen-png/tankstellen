@@ -134,7 +134,7 @@ class ErrorLogger {
     try {
       if (testRecorderOverride != null) {
         await testRecorderOverride!.record(
-          _ContextualError(layer: layer, error: error, context: context),
+          ContextualError(layer: layer, error: error, context: context),
           stackTrace,
         );
         return;
@@ -145,10 +145,11 @@ class ErrorLogger {
         // Wrap in a contextual error so the layer + context map land
         // in `error.toString()` (which TraceRecorder serialises to
         // `errorMessage`) without requiring a TraceRecorder API
-        // change.
+        // change. The recorder also unwraps [ContextualError] to
+        // extract the layer for [ErrorCategory] inference (#1394).
         final recorder = container.read(traceRecorderProvider);
         await recorder.record(
-          _ContextualError(layer: layer, error: error, context: context),
+          ContextualError(layer: layer, error: error, context: context),
           stackTrace,
         );
         return;
@@ -190,16 +191,16 @@ class ErrorLogger {
 
 /// Wrapper error that carries the [ErrorLayer] and context map through
 /// [TraceRecorder]'s `errorMessage` field (which is built from
-/// `error.toString()`). This avoids a breaking change to
-/// `TraceRecorder.record` — the recorder still gets a single `Object`
-/// + `StackTrace`, but the rendered message includes the structured
-/// metadata for grep / log triage.
-class _ContextualError implements Exception {
+/// `error.toString()`). The rendered message includes the structured
+/// metadata for grep / log triage, while the recorder also pattern-
+/// matches on the wrapper type to extract the [layer] for category
+/// inference (#1394).
+class ContextualError implements Exception {
   final ErrorLayer layer;
   final Object error;
   final Map<String, Object?>? context;
 
-  _ContextualError({
+  ContextualError({
     required this.layer,
     required this.error,
     required this.context,
