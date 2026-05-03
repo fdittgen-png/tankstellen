@@ -3655,50 +3655,49 @@ class AppLocalizationsFr extends AppLocalizations {
       'Easy on the throttle — coasting saves more';
 
   @override
-  String get loyaltySettingsTitle => 'Fuel club cards';
+  String get loyaltySettingsTitle => 'Mes cartes de fidélité';
 
   @override
   String get loyaltySettingsSubtitle =>
-      'Apply your loyalty discount to displayed prices';
+      'Appliquer votre remise fidélité aux prix affichés';
 
   @override
-  String get loyaltyMenuTitle => 'Fuel club cards';
+  String get loyaltyMenuTitle => 'Cartes de fidélité';
 
   @override
-  String get loyaltyMenuSubtitle =>
-      'Apply per-litre discounts from Total, Aral, Shell, …';
+  String get loyaltyMenuSubtitle => 'Remises par litre Total, Aral, Shell…';
 
   @override
-  String get loyaltyAddCard => 'Add card';
+  String get loyaltyAddCard => 'Ajouter une carte';
 
   @override
-  String get loyaltyAddCardSheetTitle => 'Add fuel club card';
+  String get loyaltyAddCardSheetTitle => 'Ajouter une carte de fidélité';
 
   @override
-  String get loyaltyBrandLabel => 'Brand';
+  String get loyaltyBrandLabel => 'Enseigne';
 
   @override
-  String get loyaltyCardLabelLabel => 'Label (optional)';
+  String get loyaltyCardLabelLabel => 'Libellé (facultatif)';
 
   @override
-  String get loyaltyDiscountLabel => 'Discount (per litre)';
+  String get loyaltyDiscountLabel => 'Remise (par litre)';
 
   @override
-  String get loyaltyDiscountInvalid => 'Enter a positive number';
+  String get loyaltyDiscountInvalid => 'Saisissez un nombre positif';
 
   @override
-  String get loyaltyDeleteConfirmTitle => 'Delete card?';
+  String get loyaltyDeleteConfirmTitle => 'Supprimer la carte ?';
 
   @override
   String get loyaltyDeleteConfirmBody =>
-      'This card will stop applying its discount.';
+      'Cette carte n\'appliquera plus sa remise.';
 
   @override
-  String get loyaltyEmptyTitle => 'No fuel club cards yet';
+  String get loyaltyEmptyTitle => 'Aucune carte de fidélité';
 
   @override
   String get loyaltyEmptyBody =>
-      'Add a card to apply your per-litre discount to matching stations automatically.';
+      'Ajoutez une carte pour appliquer automatiquement votre remise par litre aux stations correspondantes.';
 
   @override
   String get loyaltyBadgePrefix => '−';

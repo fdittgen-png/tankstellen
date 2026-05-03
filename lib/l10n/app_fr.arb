@@ -1086,5 +1086,20 @@
   "mapDebugOverlayDisabledSnack": "Superposition de débogage de la carte désactivée",
   "mapDebugOverlayClearButton": "Effacer",
   "mapDebugOverlayCloseButton": "Fermer",
-  "mapDebugOverlayTitle": "Traces de la carte"
+  "mapDebugOverlayTitle": "Traces de la carte",
+  "loyaltySettingsTitle": "Mes cartes de fidélité",
+  "loyaltySettingsSubtitle": "Appliquer votre remise fidélité aux prix affichés",
+  "loyaltyMenuTitle": "Cartes de fidélité",
+  "loyaltyMenuSubtitle": "Remises par litre Total, Aral, Shell…",
+  "loyaltyAddCard": "Ajouter une carte",
+  "loyaltyAddCardSheetTitle": "Ajouter une carte de fidélité",
+  "loyaltyBrandLabel": "Enseigne",
+  "loyaltyCardLabelLabel": "Libellé (facultatif)",
+  "loyaltyDiscountLabel": "Remise (par litre)",
+  "loyaltyDiscountInvalid": "Saisissez un nombre positif",
+  "loyaltyDeleteConfirmTitle": "Supprimer la carte ?",
+  "loyaltyDeleteConfirmBody": "Cette carte n'appliquera plus sa remise.",
+  "loyaltyEmptyTitle": "Aucune carte de fidélité",
+  "loyaltyEmptyBody": "Ajoutez une carte pour appliquer automatiquement votre remise par litre aux stations correspondantes.",
+  "loyaltyBadgePrefix": "−"
 }
