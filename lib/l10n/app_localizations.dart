@@ -5954,6 +5954,18 @@ abstract class AppLocalizations {
   /// **'Backup export failed — please try again'**
   String get exportBackupFailed;
 
+  /// One-time snackbar (#1396) shown when a diesel-marked vehicle profile resolves to a non-diesel reference catalog row. The placeholder is the make + model, e.g. 'Dacia Duster'.
+  ///
+  /// In en, this message translates to:
+  /// **'Your {makeModel} is marked as diesel but matches a petrol catalog entry. Tap to update.'**
+  String catalogReresolveSnackbarMessage(String makeModel);
+
+  /// Action button on the #1396 catalog re-resolve snackbar — taps push the vehicle edit screen so the user can re-pick their catalog row.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get catalogReresolveSnackbarAction;
+
   /// Label for the fuel fill-ups tab on the ConsumptionScreen (#582 phase 2).
   ///
   /// In en, this message translates to:

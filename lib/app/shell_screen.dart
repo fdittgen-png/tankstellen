@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/utils/frame_callbacks.dart';
+import '../features/vehicle/presentation/widgets/catalog_reresolve_snackbar_host.dart';
 import '../features/vehicle/providers/vehicle_providers.dart';
 import '../l10n/app_localizations.dart';
 import 'current_shell_branch_provider.dart';
@@ -206,21 +207,28 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     // the snap above on the next frame).
     final selectedSlot = branchForSlot.indexOf(_currentIndex);
 
-    final body = GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onHorizontalDragEnd:
-          screenSize == ScreenSize.compact ? _onHorizontalDragEnd : null,
-      child: AnimatedBuilder(
-        animation: _transitionController,
-        builder: (context, _) {
-          return SlideTransition(
-            position: _slideInAnim,
-            child: FadeTransition(
-              opacity: _fadeAnim,
-              child: widget.navigationShell,
-            ),
-          );
-        },
+    // #1396 — surface the one-time diesel/petrol catalog mismatch
+    // snackbar from inside the shell so it has a Scaffold-level
+    // ScaffoldMessenger to push into. The host is a passthrough
+    // widget; it returns its child verbatim and renders nothing of
+    // its own.
+    final body = CatalogReresolveSnackbarHost(
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onHorizontalDragEnd:
+            screenSize == ScreenSize.compact ? _onHorizontalDragEnd : null,
+        child: AnimatedBuilder(
+          animation: _transitionController,
+          builder: (context, _) {
+            return SlideTransition(
+              position: _slideInAnim,
+              child: FadeTransition(
+                opacity: _fadeAnim,
+                child: widget.navigationShell,
+              ),
+            );
+          },
+        ),
       ),
     );
 

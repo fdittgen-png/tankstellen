@@ -3210,6 +3210,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Sicherungsexport fehlgeschlagen – bitte erneut versuchen';
 
   @override
+  String catalogReresolveSnackbarMessage(String makeModel) {
+    return 'Dein $makeModel ist als Diesel markiert, passt aber zu einem Benziner-Eintrag im Katalog. Tippe zum Aktualisieren.';
+  }
+
+  @override
+  String get catalogReresolveSnackbarAction => 'Aktualisieren';
+
+  @override
   String get consumptionTabFuel => 'Kraftstoff';
 
   @override
