@@ -1277,6 +1277,47 @@
   "exportBackupTooltip": "Sicherung exportieren",
   "exportBackupReady": "Sicherung bereit – Ziel auswählen",
   "exportBackupFailed": "Sicherungsexport fehlgeschlagen – bitte erneut versuchen",
+  "calibrationAdvancedTitle": "Erweiterte Kalibrierung",
+  "calibrationDisplacementLabel": "Hubraum (cm³)",
+  "calibrationVolumetricEfficiencyLabel": "Volumetrischer Wirkungsgrad (η_v)",
+  "calibrationAfrLabel": "Luft-Kraftstoff-Verhältnis (AFR)",
+  "calibrationFuelDensityLabel": "Kraftstoffdichte (g/L)",
+  "calibrationSourceDetected": "(aus FIN erkannt)",
+  "calibrationSourceCatalog": "(Katalog: {makeModel})",
+  "@calibrationSourceCatalog": {
+    "placeholders": {
+      "makeModel": {
+        "type": "String"
+      }
+    }
+  },
+  "calibrationSourceDefault": "(Standard)",
+  "calibrationSourceManual": "(manuell)",
+  "calibrationResetToDetected": "Auf erkannten Wert zurücksetzen",
+  "calibrationLearnerStatusCalibrated": "η_v: {eta} (kalibriert, {samples} Messungen)",
+  "@calibrationLearnerStatusCalibrated": {
+    "placeholders": {
+      "eta": {
+        "type": "String"
+      },
+      "samples": {
+        "type": "int"
+      }
+    }
+  },
+  "calibrationLearnerStatusLearning": "η_v: {eta} (lernt, {samples} Messungen)",
+  "@calibrationLearnerStatusLearning": {
+    "placeholders": {
+      "eta": {
+        "type": "String"
+      },
+      "samples": {
+        "type": "int"
+      }
+    }
+  },
+  "calibrationLearnerStatusNoSamples": "η_v: 0.85 (Standard – noch keine Volltankung)",
+  "calibrationResetLearner": "Lernalgorithmus zurücksetzen",
   "catalogReresolveSnackbarMessage": "Dein {makeModel} ist als Diesel markiert, passt aber zu einem Benziner-Eintrag im Katalog. Tippe zum Aktualisieren.",
   "@catalogReresolveSnackbarMessage": {
     "description": "One-time snackbar (#1396) shown when a diesel-marked vehicle profile resolves to a non-diesel reference catalog row. The placeholder is the make + model, e.g. 'Dacia Duster'.",

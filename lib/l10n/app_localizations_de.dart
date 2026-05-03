@@ -3210,6 +3210,56 @@ class AppLocalizationsDe extends AppLocalizations {
       'Sicherungsexport fehlgeschlagen – bitte erneut versuchen';
 
   @override
+  String get calibrationAdvancedTitle => 'Erweiterte Kalibrierung';
+
+  @override
+  String get calibrationDisplacementLabel => 'Hubraum (cm³)';
+
+  @override
+  String get calibrationVolumetricEfficiencyLabel =>
+      'Volumetrischer Wirkungsgrad (η_v)';
+
+  @override
+  String get calibrationAfrLabel => 'Luft-Kraftstoff-Verhältnis (AFR)';
+
+  @override
+  String get calibrationFuelDensityLabel => 'Kraftstoffdichte (g/L)';
+
+  @override
+  String get calibrationSourceDetected => '(aus FIN erkannt)';
+
+  @override
+  String calibrationSourceCatalog(String makeModel) {
+    return '(Katalog: $makeModel)';
+  }
+
+  @override
+  String get calibrationSourceDefault => '(Standard)';
+
+  @override
+  String get calibrationSourceManual => '(manuell)';
+
+  @override
+  String get calibrationResetToDetected => 'Auf erkannten Wert zurücksetzen';
+
+  @override
+  String calibrationLearnerStatusCalibrated(String eta, int samples) {
+    return 'η_v: $eta (kalibriert, $samples Messungen)';
+  }
+
+  @override
+  String calibrationLearnerStatusLearning(String eta, int samples) {
+    return 'η_v: $eta (lernt, $samples Messungen)';
+  }
+
+  @override
+  String get calibrationLearnerStatusNoSamples =>
+      'η_v: 0.85 (Standard – noch keine Volltankung)';
+
+  @override
+  String get calibrationResetLearner => 'Lernalgorithmus zurücksetzen';
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Dein $makeModel ist als Diesel markiert, passt aber zu einem Benziner-Eintrag im Katalog. Tippe zum Aktualisieren.';
   }

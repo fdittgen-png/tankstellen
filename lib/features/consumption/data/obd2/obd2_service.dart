@@ -542,30 +542,33 @@ class Obd2Service {
     VehicleProfile? vehicle,
     ReferenceVehicle? referenceVehicle,
   }) async {
-    // Precedence (#950 phase 2):
-    //   1. VehicleProfile field (user-set, may be tuned to override
-    //      the catalog defaults).
-    //   2. ReferenceVehicle catalog entry (data-driven defaults).
-    //   3. Generic estimator constants (last-resort 1500 cc / 0.85
-    //      VE — bumped from the legacy 1000 cc when a catalog entry
-    //      is missing AND the user hasn't filled in the engine spec).
-    final engineDisplacementCc = vehicle?.engineDisplacementCc ??
-        referenceVehicle?.displacementCc ??
-        estimator.kDefaultEngineDisplacementCc;
+    // Precedence (#950 phase 2 + #1397):
+    //   1. Manual override on the VehicleProfile (user typed a value
+    //      into the "Advanced calibration" card — overrides everything).
+    //   2. VehicleProfile field (set during onboarding / VIN decode).
+    //   3. ReferenceVehicle catalog entry (data-driven defaults).
+    //   4. Generic estimator constants (last-resort fallback).
+    final engineDisplacementCc =
+        vehicle?.manualEngineDisplacementCcOverride?.round() ??
+            vehicle?.engineDisplacementCc ??
+            referenceVehicle?.displacementCc ??
+            estimator.kDefaultEngineDisplacementCc;
     // VE on VehicleProfile is a non-nullable double with its own
-    // default (0.85). Using it directly here is equivalent to the
-    // service-level fallback for that field. When vehicle is null the
-    // ReferenceVehicle catalog VE wins; absent both, the estimator's
-    // 0.85 default is the final fallback.
-    final volumetricEfficiency = vehicle?.volumetricEfficiency ??
+    // default (0.85). The manual override takes precedence so a user
+    // can pin the value while the auto-learner is still bootstrapping.
+    final volumetricEfficiency = vehicle?.manualVolumetricEfficiencyOverride ??
+        vehicle?.volumetricEfficiency ??
         referenceVehicle?.volumetricEfficiency ??
         estimator.kDefaultVolumetricEfficiency;
     final isDiesel = vehicle != null
         ? estimator.isDieselProfile(vehicle)
         : referenceVehicle?.fuelType.toLowerCase() == 'diesel';
-    final afr = isDiesel ? estimator.kDieselAfr : estimator.kPetrolAfr;
-    final fuelDensityGPerL =
-        isDiesel ? estimator.kDieselDensityGPerL : estimator.kPetrolDensityGPerL;
+    final afr = vehicle?.manualAfrOverride ??
+        (isDiesel ? estimator.kDieselAfr : estimator.kPetrolAfr);
+    final fuelDensityGPerL = vehicle?.manualFuelDensityGPerLOverride ??
+        (isDiesel
+            ? estimator.kDieselDensityGPerL
+            : estimator.kPetrolDensityGPerL);
     // #1395 — pre-coerce displacement to double for breadcrumb pushes
     // (the recorder typed displacement as `double?` so the overlay can
     // render it as a plain number; the estimator below stays on int).

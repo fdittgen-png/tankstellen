@@ -369,6 +369,73 @@ void main() {
     });
   });
 
+  group('VehicleProfile manual calibration overrides (#1397)', () {
+    test('default profile carries every override null', () {
+      const v = VehicleProfile(id: 'fresh', name: 'Fresh');
+      expect(v.manualEngineDisplacementCcOverride, isNull);
+      expect(v.manualVolumetricEfficiencyOverride, isNull);
+      expect(v.manualAfrOverride, isNull);
+      expect(v.manualFuelDensityGPerLOverride, isNull);
+    });
+
+    test('round-trip with all four overrides populated preserves '
+        'equality', () {
+      const original = VehicleProfile(
+        id: 'overrides',
+        name: 'Manual Overrides',
+        manualEngineDisplacementCcOverride: 1700.5,
+        manualVolumetricEfficiencyOverride: 0.92,
+        manualAfrOverride: 14.0,
+        manualFuelDensityGPerLOverride: 800.0,
+      );
+      final json = original.toJson();
+      final restored = VehicleProfile.fromJson(json);
+      expect(restored, equals(original));
+      expect(restored.manualEngineDisplacementCcOverride, 1700.5);
+      expect(restored.manualVolumetricEfficiencyOverride, 0.92);
+      expect(restored.manualAfrOverride, 14.0);
+      expect(restored.manualFuelDensityGPerLOverride, 800.0);
+    });
+
+    test('round-trip with all four overrides null preserves null '
+        '(backwards compat)', () {
+      const original = VehicleProfile(id: 'no-override', name: 'NoOverride');
+      final json = original.toJson();
+      final restored = VehicleProfile.fromJson(json);
+      expect(restored, equals(original));
+      expect(restored.manualEngineDisplacementCcOverride, isNull);
+      expect(restored.manualVolumetricEfficiencyOverride, isNull);
+      expect(restored.manualAfrOverride, isNull);
+      expect(restored.manualFuelDensityGPerLOverride, isNull);
+    });
+
+    test('legacy JSON without override keys deserializes with nulls', () {
+      // Pre-#1397 Hive payloads simply omit the new keys.
+      final json = <String, dynamic>{
+        'id': 'legacy-1397',
+        'name': 'LegacyProfile',
+        'type': 'combustion',
+      };
+      final restored = VehicleProfile.fromJson(json);
+      expect(restored.manualEngineDisplacementCcOverride, isNull);
+      expect(restored.manualVolumetricEfficiencyOverride, isNull);
+      expect(restored.manualAfrOverride, isNull);
+      expect(restored.manualFuelDensityGPerLOverride, isNull);
+    });
+
+    test('copyWith nulls a previously-set override', () {
+      const original = VehicleProfile(
+        id: 'reset',
+        name: 'Reset',
+        manualVolumetricEfficiencyOverride: 0.92,
+      );
+      final reset = original.copyWith(
+        manualVolumetricEfficiencyOverride: null,
+      );
+      expect(reset.manualVolumetricEfficiencyOverride, isNull);
+    });
+  });
+
   group('ChargingPreferences', () {
     test('defaults match documented values', () {
       const prefs = ChargingPreferences();

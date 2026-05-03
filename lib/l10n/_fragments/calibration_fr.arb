@@ -1,0 +1,33 @@
+{
+  "calibrationAdvancedTitle": "Calibrage avancé",
+  "calibrationDisplacementLabel": "Cylindrée (cm³)",
+  "calibrationVolumetricEfficiencyLabel": "Rendement volumétrique (η_v)",
+  "calibrationAfrLabel": "Rapport air/carburant (AFR)",
+  "calibrationFuelDensityLabel": "Densité du carburant (g/L)",
+  "calibrationSourceDetected": "(détecté depuis le VIN)",
+  "calibrationSourceCatalog": "(catalogue : {makeModel})",
+  "@calibrationSourceCatalog": {
+    "placeholders": {
+      "makeModel": {"type": "String"}
+    }
+  },
+  "calibrationSourceDefault": "(par défaut)",
+  "calibrationSourceManual": "(manuel)",
+  "calibrationResetToDetected": "Restaurer la valeur détectée",
+  "calibrationLearnerStatusCalibrated": "η_v : {eta} (calibré, {samples} pleins)",
+  "@calibrationLearnerStatusCalibrated": {
+    "placeholders": {
+      "eta": {"type": "String"},
+      "samples": {"type": "int"}
+    }
+  },
+  "calibrationLearnerStatusLearning": "η_v : {eta} (apprentissage, {samples} pleins)",
+  "@calibrationLearnerStatusLearning": {
+    "placeholders": {
+      "eta": {"type": "String"},
+      "samples": {"type": "int"}
+    }
+  },
+  "calibrationLearnerStatusNoSamples": "η_v : 0.85 (par défaut — aucun plein complet)",
+  "calibrationResetLearner": "Réinitialiser l'apprentissage"
+}

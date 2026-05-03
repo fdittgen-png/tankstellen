@@ -14,6 +14,7 @@ import '../../providers/vehicle_providers.dart';
 import '../../providers/vin_adapter_pair_auto_populator_provider.dart';
 import '../../providers/vin_decoder_provider.dart';
 import '../widgets/auto_record_section.dart';
+import '../widgets/calibration_section.dart';
 import '../widgets/ve_reset_confirm_dialog.dart';
 import '../widgets/vehicle_drivetrain_section.dart';
 import '../widgets/vehicle_extras_section.dart';
@@ -24,6 +25,12 @@ import '../widgets/vehicle_save_actions.dart';
 import '../widgets/vehicle_save_bar.dart';
 import '../widgets/vin_confirm_dialog.dart';
 import '../widgets/vin_info_sheet.dart';
+
+/// Sentinel for the four "leave alone" arguments on
+/// [_EditVehicleScreenState._saveCalibrationOverride] — `null` is a
+/// valid override value (clears the manual override) so a separate
+/// marker is needed to distinguish "don't touch" from "set to null".
+const Object _kSentinel = Object();
 
 /// Form for adding or editing a [VehicleProfile].
 ///
@@ -450,6 +457,43 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     await ref.resetVolumetricEfficiency(id);
   }
 
+  /// #1397 — persist a single calibration-override field. Reads the
+  /// freshest profile from the provider so the copyWith doesn't clobber
+  /// fields the user changed in another section since the form last
+  /// loaded.
+  Future<void> _saveCalibrationOverride({
+    Object? manualEngineDisplacementCcOverride = _kSentinel,
+    Object? manualVolumetricEfficiencyOverride = _kSentinel,
+    Object? manualAfrOverride = _kSentinel,
+    Object? manualFuelDensityGPerLOverride = _kSentinel,
+  }) async {
+    final id = _existingId;
+    if (id == null) return;
+    final existing = ref
+        .read(vehicleProfileListProvider)
+        .where((v) => v.id == id)
+        .firstOrNull;
+    if (existing == null) return;
+    final updated = existing.copyWith(
+      manualEngineDisplacementCcOverride:
+          identical(manualEngineDisplacementCcOverride, _kSentinel)
+              ? existing.manualEngineDisplacementCcOverride
+              : manualEngineDisplacementCcOverride as double?,
+      manualVolumetricEfficiencyOverride:
+          identical(manualVolumetricEfficiencyOverride, _kSentinel)
+              ? existing.manualVolumetricEfficiencyOverride
+              : manualVolumetricEfficiencyOverride as double?,
+      manualAfrOverride: identical(manualAfrOverride, _kSentinel)
+          ? existing.manualAfrOverride
+          : manualAfrOverride as double?,
+      manualFuelDensityGPerLOverride:
+          identical(manualFuelDensityGPerLOverride, _kSentinel)
+              ? existing.manualFuelDensityGPerLOverride
+              : manualFuelDensityGPerLOverride as double?,
+    );
+    await ref.read(vehicleProfileListProvider.notifier).save(updated);
+  }
+
   /// Brand-accent colour from the vehicle name. Falls back to the
   /// theme primary when no brand matches. The brand mapper is shared
   /// with fuel stations — overlap is rare but harmless.
@@ -592,6 +636,38 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
                 vehicleId: _existingId!,
                 onScrollToObd2Card: _scrollToAndHighlightObd2Card,
               ),
+              const SizedBox(height: 16),
+              // #1397 — collapsed-by-default expansion tile that lets
+              // users override the four physics constants the OBD2
+              // estimator uses (displacement, η_v, AFR, fuel density).
+              // Each row labels its source so users know whether the
+              // value came from VIN decode / catalog / default / their
+              // own keyboard. The auto-learner (#815) writes back into
+              // `volumetricEfficiency`; the readout panel + reset
+              // button surface its state.
+              Builder(builder: (context) {
+                final profile = ref
+                    .watch(vehicleProfileListProvider)
+                    .where((v) => v.id == _existingId)
+                    .firstOrNull;
+                if (profile == null) return const SizedBox.shrink();
+                return CalibrationSection(
+                  profile: profile,
+                  onDisplacementChanged: (v) => _saveCalibrationOverride(
+                    manualEngineDisplacementCcOverride: v,
+                  ),
+                  onVolumetricEfficiencyChanged: (v) =>
+                      _saveCalibrationOverride(
+                    manualVolumetricEfficiencyOverride: v,
+                  ),
+                  onAfrChanged: (v) =>
+                      _saveCalibrationOverride(manualAfrOverride: v),
+                  onFuelDensityChanged: (v) => _saveCalibrationOverride(
+                    manualFuelDensityGPerLOverride: v,
+                  ),
+                  onResetLearner: _resetVolumetricEfficiency,
+                );
+              }),
             ],
           ],
         ),

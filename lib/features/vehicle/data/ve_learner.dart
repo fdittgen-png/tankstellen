@@ -99,10 +99,17 @@ class VeLearner {
   /// from trip duration (≈1 Hz polling); tests inject a fixed count.
   final int minObd2Samples;
 
-  /// Maximum |gap| fraction tolerated. 0.40 (40 %) from the issue
-  /// spec — larger gaps almost always mean the user skipped logging
-  /// a fill-up or typed the wrong litres.
-  final double maxGapFraction;
+  /// Legacy fixed gap fraction (#815). When non-null, overrides the
+  /// sample-dependent [maxRelativeGap] schedule with a single blanket
+  /// threshold for every sample count — kept for the small handful of
+  /// tests that pin a known boundary.
+  ///
+  /// Production wiring leaves it null so the aggressive bootstrap from
+  /// #1397 is active: sample 0 accepts up to 5×, sample 1 up to 2×,
+  /// etc. — so a Duster with a wildly off cold-start η_v can converge
+  /// after a single plein-complet rather than waiting for the user to
+  /// happen to hit a tankful within 40 % of stoichiometric integration.
+  final double? maxGapFraction;
 
   /// EWMA weight on the existing stored value. 0.7 matches the issue
   /// spec — gentle blending so one odd tankful can't tank the η.
@@ -119,7 +126,7 @@ class VeLearner {
     TripSampleCounter? sampleCounter,
     this.minDistanceKm = 50.0,
     this.minObd2Samples = 10,
-    this.maxGapFraction = 0.40,
+    this.maxGapFraction,
     this.ewmaBlend = 0.70,
     this.minVe = 0.50,
     this.maxVe = 1.00,
@@ -133,12 +140,48 @@ class VeLearner {
     TripSampleCounter? sampleCounter,
     this.minDistanceKm = 50.0,
     this.minObd2Samples = 10,
-    this.maxGapFraction = 0.40,
+    this.maxGapFraction,
     this.ewmaBlend = 0.70,
     this.minVe = 0.50,
     this.maxVe = 1.00,
   })  : tripHistoryLoader = tripHistoryRepository.loadAll,
         sampleCounter = sampleCounter ?? _defaultSampleCount;
+
+  /// Sample-dependent maximum |gap| fraction (#1397).
+  ///
+  /// The pre-#1397 schedule rejected any tankful whose
+  /// `|integrated − pumped| / pumped` exceeded a fixed `0.40`. That
+  /// blanket threshold protected against typo'd litres but also left
+  /// vehicles like the Duster — whose cold-start η_v default of 0.85
+  /// is wildly wrong for a Renault 1.5 dCi — stuck on the default
+  /// indefinitely: every plein-complet exceeded 40 % so the learner
+  /// never accepted a sample.
+  ///
+  /// The aggressive bootstrap below opens the floodgate for the first
+  /// few tankfuls (when we know nothing about the engine, anything
+  /// that integrates to within 5× pump is signal we should learn from)
+  /// and clamps down once we have a calibrated baseline. Returned value
+  /// is multiplied by `pumpedLiters` to get the absolute litres
+  /// threshold inside [reconcileAfterFillUp].
+  ///
+  /// Schedule (ratios):
+  ///   0   samples → 5.0  (first-ever — very wide)
+  ///   1   sample  → 2.0  (still figuring it out)
+  ///   2   samples → 1.0
+  ///   3-4 samples → 0.6
+  ///   5+  samples → 0.4  (back to the original safety net)
+  ///
+  /// When the legacy [maxGapFraction] is non-null it overrides this
+  /// schedule entirely — useful for boundary-tests pinning the old
+  /// behaviour.
+  @visibleForTesting
+  double maxRelativeGap(int sampleCount) {
+    if (sampleCount == 0) return 5.0;
+    if (sampleCount == 1) return 2.0;
+    if (sampleCount == 2) return 1.0;
+    if (sampleCount < 5) return 0.6;
+    return 0.4;
+  }
 
   /// Reconcile the OBD2 integrated fuel estimate against [pumpedLiters]
   /// and, if every guard passes, write the updated η_v back to the
@@ -191,9 +234,17 @@ class VeLearner {
       return null;
     }
     final gap = (integrated - pumpedLiters).abs() / pumpedLiters;
-    if (gap > maxGapFraction) {
+    // #1397 — sample-dependent gap threshold so the first plein-complet
+    // on a freshly-paired vehicle (sampleCount = 0) can accept a wildly
+    // off integration and start converging. Legacy fixed [maxGapFraction]
+    // wins when callers pinned it explicitly.
+    final currentSampleCount = profile.volumetricEfficiencySamples;
+    final gapThreshold =
+        maxGapFraction ?? maxRelativeGap(currentSampleCount);
+    if (gap > gapThreshold) {
       debugPrint('VeLearner: skip — gap ${(gap * 100).toStringAsFixed(1)}% '
-          '> ${(maxGapFraction * 100).toStringAsFixed(0)}%');
+          '> ${(gapThreshold * 100).toStringAsFixed(0)}% '
+          '(sampleCount=$currentSampleCount)');
       return null;
     }
 

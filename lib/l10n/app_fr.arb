@@ -1157,5 +1157,19 @@
   "tripPathLegendBorderline": "Modérée (6–10 L/100km)",
   "tripPathLegendWasteful": "Excessive (≥ 10 L/100km)",
   "catalogReresolveSnackbarMessage": "Votre {makeModel} est marqué comme diesel mais correspond à une entrée essence du catalogue. Touchez pour mettre à jour.",
-  "catalogReresolveSnackbarAction": "Mettre à jour"
+  "catalogReresolveSnackbarAction": "Mettre à jour",
+  "calibrationAdvancedTitle": "Calibrage avancé",
+  "calibrationDisplacementLabel": "Cylindrée (cm³)",
+  "calibrationVolumetricEfficiencyLabel": "Rendement volumétrique (η_v)",
+  "calibrationAfrLabel": "Rapport air/carburant (AFR)",
+  "calibrationFuelDensityLabel": "Densité du carburant (g/L)",
+  "calibrationSourceDetected": "(détecté depuis le VIN)",
+  "calibrationSourceCatalog": "(catalogue : {makeModel})",
+  "calibrationSourceDefault": "(par défaut)",
+  "calibrationSourceManual": "(manuel)",
+  "calibrationResetToDetected": "Restaurer la valeur détectée",
+  "calibrationLearnerStatusCalibrated": "η_v : {eta} (calibré, {samples} pleins)",
+  "calibrationLearnerStatusLearning": "η_v : {eta} (apprentissage, {samples} pleins)",
+  "calibrationLearnerStatusNoSamples": "η_v : 0.85 (par défaut — aucun plein complet)",
+  "calibrationResetLearner": "Réinitialiser l'apprentissage"
 }

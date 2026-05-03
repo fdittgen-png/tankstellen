@@ -1,0 +1,72 @@
+{
+  "calibrationAdvancedTitle": "Advanced calibration",
+  "@calibrationAdvancedTitle": {
+    "description": "ExpansionTile title for the user-overridable calibration constants section on the edit-vehicle screen (#1397)."
+  },
+  "calibrationDisplacementLabel": "Engine displacement (cc)",
+  "@calibrationDisplacementLabel": {
+    "description": "TextFormField label for the manual displacement override in cubic centimetres."
+  },
+  "calibrationVolumetricEfficiencyLabel": "Volumetric efficiency (η_v)",
+  "@calibrationVolumetricEfficiencyLabel": {
+    "description": "TextFormField label for the manual volumetric efficiency override (0.50–1.00)."
+  },
+  "calibrationAfrLabel": "Air-to-fuel ratio (AFR)",
+  "@calibrationAfrLabel": {
+    "description": "TextFormField label for the manual AFR override in kg/kg (~14.7 petrol / ~14.5 diesel)."
+  },
+  "calibrationFuelDensityLabel": "Fuel density (g/L)",
+  "@calibrationFuelDensityLabel": {
+    "description": "TextFormField label for the manual fuel density override in g/L (~740 petrol / ~832 diesel)."
+  },
+  "calibrationSourceDetected": "(detected from VIN)",
+  "@calibrationSourceDetected": {
+    "description": "Helper text shown beneath a calibration field when its current value comes from a VIN decode."
+  },
+  "calibrationSourceCatalog": "(catalog: {makeModel})",
+  "@calibrationSourceCatalog": {
+    "description": "Helper text shown when the current value comes from the reference-vehicle catalog row.",
+    "placeholders": {
+      "makeModel": {
+        "type": "String",
+        "example": "Dacia Duster 1.5 dCi"
+      }
+    }
+  },
+  "calibrationSourceDefault": "(default)",
+  "@calibrationSourceDefault": {
+    "description": "Helper text shown when the current value is the generic estimator fallback constant."
+  },
+  "calibrationSourceManual": "(manual)",
+  "@calibrationSourceManual": {
+    "description": "Helper text shown when the current value is a user-entered override."
+  },
+  "calibrationResetToDetected": "Reset to detected value",
+  "@calibrationResetToDetected": {
+    "description": "Tooltip / a11y label for the per-field reset IconButton that nulls a manual override."
+  },
+  "calibrationLearnerStatusCalibrated": "η_v: {eta} (calibrated, {samples} samples)",
+  "@calibrationLearnerStatusCalibrated": {
+    "description": "Live readout when the learner has accepted at least 3 plein-complet samples.",
+    "placeholders": {
+      "eta": {"type": "String", "example": "0.87"},
+      "samples": {"type": "int", "example": "5"}
+    }
+  },
+  "calibrationLearnerStatusLearning": "η_v: {eta} (learning, {samples} samples)",
+  "@calibrationLearnerStatusLearning": {
+    "description": "Live readout while the learner is bootstrapping (1-2 samples).",
+    "placeholders": {
+      "eta": {"type": "String", "example": "0.85"},
+      "samples": {"type": "int", "example": "1"}
+    }
+  },
+  "calibrationLearnerStatusNoSamples": "η_v: 0.85 (default — no plein-complet yet)",
+  "@calibrationLearnerStatusNoSamples": {
+    "description": "Live readout before the first plein-complet has been logged."
+  },
+  "calibrationResetLearner": "Reset learner",
+  "@calibrationResetLearner": {
+    "description": "OutlinedButton label that resets η_v back to 0.85 and clears the sample counter."
+  }
+}

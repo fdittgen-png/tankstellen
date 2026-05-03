@@ -155,6 +155,31 @@ abstract class VehicleProfile with _$VehicleProfile {
     @Default(0.85) double volumetricEfficiency,
     @Default(0) int volumetricEfficiencySamples,
 
+    // User-editable calibration overrides (#1397). Each is null until
+    // the user types a value into the "Advanced calibration" section
+    // of the edit-vehicle screen; non-null values take precedence over
+    // every other source in the resolution chain
+    //   manualOverride → vehicle.<field> → referenceVehicle.<field> → kDefault
+    // wired through `lib/features/consumption/data/obd2/obd2_service.dart`
+    // and `trip_recording_controller.dart`. The "Reset to detected"
+    // button in the calibration card simply nulls the matching field.
+    //
+    //   manualEngineDisplacementCcOverride: cubic centimetres, free-text
+    //     input. Stored as `double?` (not `int?`) so the user can enter
+    //     fractional values that the form parser turns into a clean
+    //     double; the OBD2 callers `.round().toInt()` it before
+    //     forwarding to the int-typed estimator.
+    //   manualVolumetricEfficiencyOverride: 0.50–1.00 — same physical
+    //     range the [VeLearner] enforces.
+    //   manualAfrOverride: stoichiometric AFR in kg/kg. ~14.7 for petrol,
+    //     ~14.5 for diesel; users with LPG conversions / E85 can override.
+    //   manualFuelDensityGPerLOverride: density in g/L at ~15 °C. Petrol
+    //     ~740, diesel ~832; for unusual blends the user can override.
+    double? manualEngineDisplacementCcOverride,
+    double? manualVolumetricEfficiencyOverride,
+    double? manualAfrOverride,
+    double? manualFuelDensityGPerLOverride,
+
     // Curb weight in kilograms (#812). Populated by the VIN decoder
     // phase 2 onboarding flow (GVWR-minus-payload on the NHTSA side,
     // or manufacturer spec sheets via a future secondary lookup).

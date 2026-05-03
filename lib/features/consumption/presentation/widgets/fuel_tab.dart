@@ -7,6 +7,7 @@ import '../../../../core/widgets/help_banner.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../achievements/presentation/widgets/badge_shelf.dart';
 import '../../../profile/providers/gamification_enabled_provider.dart';
+import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../domain/entities/consumption_stats.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
@@ -46,6 +47,10 @@ class FuelTab extends ConsumerWidget {
     // (above the ListView) so the BadgeShelf is omitted from the
     // header column without churning the itemCount.
     final showGamification = ref.watch(gamificationEnabledProvider);
+    // #1397 — surface the auto-learner's η_v on the stats card.
+    // Active-vehicle profile is null in the no-vehicle / pre-paired
+    // state, in which case the chip is omitted entirely.
+    final activeVehicle = ref.watch(activeVehicleProfileProvider);
     return ListView.builder(
       padding: EdgeInsets.only(
         top: 8,
@@ -71,7 +76,12 @@ class FuelTab extends ConsumerWidget {
               // configured (FuelTab itself shows the no-fill-ups empty
               // state above this point).
               const TankLevelCard(),
-              ConsumptionStatsCard(stats: stats),
+              ConsumptionStatsCard(
+                stats: stats,
+                volumetricEfficiency: activeVehicle?.volumetricEfficiency,
+                volumetricEfficiencySamples:
+                    activeVehicle?.volumetricEfficiencySamples,
+              ),
             ],
           );
         }

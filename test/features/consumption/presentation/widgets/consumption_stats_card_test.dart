@@ -5,6 +5,14 @@ import 'package:tankstellen/features/consumption/presentation/widgets/consumptio
 
 import '../../../../helpers/pump_app.dart';
 
+/// Matcher for a [Chip] whose label text contains the given substring.
+Finder _findChipContaining(String fragment) {
+  return find.ancestor(
+    of: find.textContaining(fragment),
+    matching: find.byType(Chip),
+  );
+}
+
 /// Builds a [ConsumptionStats] with sensible defaults so each test only
 /// spells out the field it cares about. Mirrors the freezed factory at
 /// `lib/features/consumption/domain/entities/consumption_stats.dart`.
@@ -369,4 +377,54 @@ void main() {
       );
     },
   );
+
+  group('ConsumptionStatsCard — calibration chip (#1397)', () {
+    testWidgets('no chip when volumetricEfficiencySamples == null',
+        (tester) async {
+      await pumpApp(tester, ConsumptionStatsCard(stats: _stats()));
+      expect(find.byType(Chip), findsNothing);
+    });
+
+    testWidgets('samples == 0 → "no plein-complet yet" chip',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(),
+          volumetricEfficiency: 0.85,
+          volumetricEfficiencySamples: 0,
+        ),
+      );
+      expect(_findChipContaining('no plein-complet'), findsOneWidget);
+    });
+
+    testWidgets('0 < samples < 3 → learning chip with sample count',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(),
+          volumetricEfficiency: 0.87,
+          volumetricEfficiencySamples: 2,
+        ),
+      );
+      expect(_findChipContaining('learning'), findsOneWidget);
+      expect(find.textContaining('0.87'), findsOneWidget);
+      expect(find.textContaining('2'), findsWidgets);
+    });
+
+    testWidgets('samples >= 3 → calibrated chip with sample count',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ConsumptionStatsCard(
+          stats: _stats(),
+          volumetricEfficiency: 0.91,
+          volumetricEfficiencySamples: 5,
+        ),
+      );
+      expect(_findChipContaining('calibrated'), findsOneWidget);
+      expect(find.textContaining('0.91'), findsOneWidget);
+    });
+  });
 }
