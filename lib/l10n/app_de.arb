@@ -1277,6 +1277,20 @@
   "exportBackupTooltip": "Sicherung exportieren",
   "exportBackupReady": "Sicherung bereit – Ziel auswählen",
   "exportBackupFailed": "Sicherungsexport fehlgeschlagen – bitte erneut versuchen",
+  "catalogReresolveSnackbarMessage": "Dein {makeModel} ist als Diesel markiert, passt aber zu einem Benziner-Eintrag im Katalog. Tippe zum Aktualisieren.",
+  "@catalogReresolveSnackbarMessage": {
+    "description": "One-time snackbar (#1396) shown when a diesel-marked vehicle profile resolves to a non-diesel reference catalog row. The placeholder is the make + model, e.g. 'Dacia Duster'.",
+    "placeholders": {
+      "makeModel": {
+        "type": "String",
+        "example": "Dacia Duster"
+      }
+    }
+  },
+  "catalogReresolveSnackbarAction": "Aktualisieren",
+  "@catalogReresolveSnackbarAction": {
+    "description": "Action button on the #1396 catalog re-resolve snackbar — taps push the vehicle edit screen so the user can re-pick their catalog row."
+  },
   "consumptionTabFuel": "Kraftstoff",
   "consumptionTabCharging": "Laden",
   "noChargingLogsTitle": "Noch keine Ladeeinträge",

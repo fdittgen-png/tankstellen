@@ -3212,6 +3212,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec de l\'exportation — veuillez réessayer';
 
   @override
+  String catalogReresolveSnackbarMessage(String makeModel) {
+    return 'Votre $makeModel est marqué comme diesel mais correspond à une entrée essence du catalogue. Touchez pour mettre à jour.';
+  }
+
+  @override
+  String get catalogReresolveSnackbarAction => 'Mettre à jour';
+
+  @override
   String get consumptionTabFuel => 'Carburant';
 
   @override

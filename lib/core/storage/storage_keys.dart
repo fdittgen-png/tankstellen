@@ -89,4 +89,20 @@ class StorageKeys {
   /// summary, via a hidden 5-tap gesture on the trip-recording
   /// screen title. Defaults to `false`.
   static const String obd2DebugOverlayEnabled = 'obd2_debug_overlay_enabled';
+
+  /// #1396 — prefix for the per-vehicle "we already nudged this user
+  /// to re-pick their catalog row" Hive flag. The full key is
+  /// `<prefix><vehicleId>` and stores a `bool true` once the snackbar
+  /// fires for a given vehicle, so it never fires twice for the same
+  /// profile even if the user dismisses the snackbar without tapping.
+  ///
+  /// The detector flags vehicles whose `preferredFuelType == "diesel"`
+  /// but whose resolved [referenceVehicleId] points at a non-diesel
+  /// catalog entry — which used to be the only outcome for a 1.5 dCi
+  /// Dacia Duster (the catalog shipped only the TCe 130 petrol row
+  /// for that body). With the diesel siblings added in this PR the
+  /// nudge gives existing users a one-time prompt to update their
+  /// pick.
+  static const String vehicleCatalogReresolveSuggestedPrefix =
+      'vehicle_catalog_reresolve_suggested_';
 }

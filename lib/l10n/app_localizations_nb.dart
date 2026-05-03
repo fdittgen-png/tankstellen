@@ -3180,6 +3180,14 @@ class AppLocalizationsNb extends AppLocalizations {
   String get exportBackupFailed => 'Backup export failed — please try again';
 
   @override
+  String catalogReresolveSnackbarMessage(String makeModel) {
+    return 'Your $makeModel is marked as diesel but matches a petrol catalog entry. Tap to update.';
+  }
+
+  @override
+  String get catalogReresolveSnackbarAction => 'Update';
+
+  @override
   String get consumptionTabFuel => 'Fuel';
 
   @override

@@ -1149,5 +1149,7 @@
   "tripPathLegendTitle": "Consommation",
   "tripPathLegendEfficient": "Économe (< 6 L/100km)",
   "tripPathLegendBorderline": "Modérée (6–10 L/100km)",
-  "tripPathLegendWasteful": "Excessive (≥ 10 L/100km)"
+  "tripPathLegendWasteful": "Excessive (≥ 10 L/100km)",
+  "catalogReresolveSnackbarMessage": "Votre {makeModel} est marqué comme diesel mais correspond à une entrée essence du catalogue. Touchez pour mettre à jour.",
+  "catalogReresolveSnackbarAction": "Mettre à jour"
 }
