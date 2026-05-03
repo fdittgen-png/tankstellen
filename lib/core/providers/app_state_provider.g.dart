@@ -434,6 +434,92 @@ abstract class _$MapDebugOverlay extends $Notifier<bool> {
   }
 }
 
+/// In-app OBD2 fuel-rate diagnostic overlay flag (#1395).
+///
+/// `kDebugMode` always shows the overlay; this Hive-backed flag flips
+/// it on for release builds when the user enables it via the hidden
+/// 5-tap gesture on the trip-recording screen title. Persisted so the
+/// overlay stays visible across launches once the user has opted in.
+/// Mirrors [MapDebugOverlay] (#1316 phase 2) bit-for-bit so the two
+/// debug toggles can be reasoned about as a single pattern.
+
+@ProviderFor(Obd2DebugOverlay)
+final obd2DebugOverlayProvider = Obd2DebugOverlayProvider._();
+
+/// In-app OBD2 fuel-rate diagnostic overlay flag (#1395).
+///
+/// `kDebugMode` always shows the overlay; this Hive-backed flag flips
+/// it on for release builds when the user enables it via the hidden
+/// 5-tap gesture on the trip-recording screen title. Persisted so the
+/// overlay stays visible across launches once the user has opted in.
+/// Mirrors [MapDebugOverlay] (#1316 phase 2) bit-for-bit so the two
+/// debug toggles can be reasoned about as a single pattern.
+final class Obd2DebugOverlayProvider
+    extends $NotifierProvider<Obd2DebugOverlay, bool> {
+  /// In-app OBD2 fuel-rate diagnostic overlay flag (#1395).
+  ///
+  /// `kDebugMode` always shows the overlay; this Hive-backed flag flips
+  /// it on for release builds when the user enables it via the hidden
+  /// 5-tap gesture on the trip-recording screen title. Persisted so the
+  /// overlay stays visible across launches once the user has opted in.
+  /// Mirrors [MapDebugOverlay] (#1316 phase 2) bit-for-bit so the two
+  /// debug toggles can be reasoned about as a single pattern.
+  Obd2DebugOverlayProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'obd2DebugOverlayProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$obd2DebugOverlayHash();
+
+  @$internal
+  @override
+  Obd2DebugOverlay create() => Obd2DebugOverlay();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$obd2DebugOverlayHash() => r'47e78a455f432ced81b0204c4077f074edb9817a';
+
+/// In-app OBD2 fuel-rate diagnostic overlay flag (#1395).
+///
+/// `kDebugMode` always shows the overlay; this Hive-backed flag flips
+/// it on for release builds when the user enables it via the hidden
+/// 5-tap gesture on the trip-recording screen title. Persisted so the
+/// overlay stays visible across launches once the user has opted in.
+/// Mirrors [MapDebugOverlay] (#1316 phase 2) bit-for-bit so the two
+/// debug toggles can be reasoned about as a single pattern.
+
+abstract class _$Obd2DebugOverlay extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
 /// Auto-switch profile setting.
 
 @ProviderFor(AutoSwitchProfile)

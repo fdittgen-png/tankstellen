@@ -3896,6 +3896,23 @@ class AppLocalizationsFr extends AppLocalizations {
       'Au moins 3 trajets par mois sont nécessaires pour la comparaison';
 
   @override
+  String get obd2DebugOverlayEnabledSnack =>
+      'Superposition de diagnostic OBD2 activée';
+
+  @override
+  String get obd2DebugOverlayDisabledSnack =>
+      'Superposition de diagnostic OBD2 désactivée';
+
+  @override
+  String get obd2DebugOverlayClearButton => 'Effacer';
+
+  @override
+  String get obd2DebugOverlayCloseButton => 'Fermer';
+
+  @override
+  String get obd2DebugOverlayTitle => 'Traces OBD2';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Impossible de joindre \'$adapterName\' — choisissez un autre adaptateur';
   }

@@ -1,0 +1,22 @@
+{
+  "obd2DebugOverlayEnabledSnack": "OBD2 diagnostic overlay enabled",
+  "@obd2DebugOverlayEnabledSnack": {
+    "description": "Snackbar shown when the user has flipped the in-app OBD2 fuel-rate diagnostic overlay ON via the hidden 5-tap gesture on the trip-recording screen title (#1395)."
+  },
+  "obd2DebugOverlayDisabledSnack": "OBD2 diagnostic overlay disabled",
+  "@obd2DebugOverlayDisabledSnack": {
+    "description": "Snackbar shown when the user has flipped the in-app OBD2 fuel-rate diagnostic overlay OFF via the hidden 5-tap gesture (#1395)."
+  },
+  "obd2DebugOverlayClearButton": "Clear",
+  "@obd2DebugOverlayClearButton": {
+    "description": "Button on the in-app OBD2 fuel-rate diagnostic overlay that empties the recorded breadcrumb list (#1395)."
+  },
+  "obd2DebugOverlayCloseButton": "Close",
+  "@obd2DebugOverlayCloseButton": {
+    "description": "Button on the in-app OBD2 fuel-rate diagnostic overlay that hides the overlay by disabling the persisted flag (#1395)."
+  },
+  "obd2DebugOverlayTitle": "OBD2 breadcrumbs",
+  "@obd2DebugOverlayTitle": {
+    "description": "Title shown at the top of the in-app OBD2 fuel-rate diagnostic overlay panel (#1395)."
+  }
+}

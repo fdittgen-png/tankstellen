@@ -77,4 +77,12 @@ class StorageKeys {
   /// users who reproduce the cold-start gray-tile bug, via a hidden
   /// 5-tap gesture on the Carte tab title. Defaults to `false`.
   static const String mapDebugOverlayEnabled = 'map_debug_overlay_enabled';
+
+  /// #1395 — toggle that surfaces the in-app OBD2 fuel-rate
+  /// diagnostic overlay in release builds. The overlay is always
+  /// visible in `kDebugMode`; this flag flips it on for production
+  /// users investigating a suspicious L/100 km figure on a trip
+  /// summary, via a hidden 5-tap gesture on the trip-recording
+  /// screen title. Defaults to `false`.
+  static const String obd2DebugOverlayEnabled = 'obd2_debug_overlay_enabled';
 }

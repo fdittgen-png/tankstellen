@@ -3856,6 +3856,22 @@ class AppLocalizationsFi extends AppLocalizations {
       'Need at least 3 trips per month for comparison';
 
   @override
+  String get obd2DebugOverlayEnabledSnack => 'OBD2 diagnostic overlay enabled';
+
+  @override
+  String get obd2DebugOverlayDisabledSnack =>
+      'OBD2 diagnostic overlay disabled';
+
+  @override
+  String get obd2DebugOverlayClearButton => 'Clear';
+
+  @override
+  String get obd2DebugOverlayCloseButton => 'Close';
+
+  @override
+  String get obd2DebugOverlayTitle => 'OBD2 breadcrumbs';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Couldn\'t reach \'$adapterName\' — pick another adapter';
   }

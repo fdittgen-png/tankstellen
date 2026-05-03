@@ -2421,6 +2421,26 @@
   "@consumptionMonthlyComparisonNotReliable": {
     "description": "Caption shown on the monthly-insights card when one or both months has fewer than 3 trips. The card still shows the current-month numbers but skips the previous-month column and the delta arrows (#1041 phase 4)."
   },
+  "obd2DebugOverlayEnabledSnack": "OBD2 diagnostic overlay enabled",
+  "@obd2DebugOverlayEnabledSnack": {
+    "description": "Snackbar shown when the user has flipped the in-app OBD2 fuel-rate diagnostic overlay ON via the hidden 5-tap gesture on the trip-recording screen title (#1395)."
+  },
+  "obd2DebugOverlayDisabledSnack": "OBD2 diagnostic overlay disabled",
+  "@obd2DebugOverlayDisabledSnack": {
+    "description": "Snackbar shown when the user has flipped the in-app OBD2 fuel-rate diagnostic overlay OFF via the hidden 5-tap gesture (#1395)."
+  },
+  "obd2DebugOverlayClearButton": "Clear",
+  "@obd2DebugOverlayClearButton": {
+    "description": "Button on the in-app OBD2 fuel-rate diagnostic overlay that empties the recorded breadcrumb list (#1395)."
+  },
+  "obd2DebugOverlayCloseButton": "Close",
+  "@obd2DebugOverlayCloseButton": {
+    "description": "Button on the in-app OBD2 fuel-rate diagnostic overlay that hides the overlay by disabling the persisted flag (#1395)."
+  },
+  "obd2DebugOverlayTitle": "OBD2 breadcrumbs",
+  "@obd2DebugOverlayTitle": {
+    "description": "Title shown at the top of the in-app OBD2 fuel-rate diagnostic overlay panel (#1395)."
+  },
   "obd2PickerPinnedFallback": "Couldn't reach '{adapterName}' — pick another adapter",
   "@obd2PickerPinnedFallback": {
     "description": "Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.",

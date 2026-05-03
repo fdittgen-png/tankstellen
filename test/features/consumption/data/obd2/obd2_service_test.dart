@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_breadcrumb_collector.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';
@@ -1024,6 +1025,154 @@ void main() {
 
       final km = await service.readOdometerKm();
       expect(km, closeTo(123456.7, 0.1));
+    });
+  });
+
+  group('readFuelRateLPerHour breadcrumb + sanity bounds (#1395)', () {
+    test(
+        'PID 5E read pushes a 5E branch breadcrumb with the directRate '
+        'AND vehicle constants', () async {
+      final collector = Obd2BreadcrumbCollector();
+      final service = await _connected({
+        // 0x00 0x50 = 80 → 80 × 0.05 = 4.0 L/h.
+        '015E': '41 5E 00 50>',
+      });
+      service.breadcrumbCollector = collector;
+
+      await service.readFuelRateLPerHour();
+
+      expect(collector.entries, hasLength(1));
+      final crumb = collector.entries.first;
+      expect(crumb.branch, equals(Obd2BranchTag.pid5E));
+      expect(crumb.fuelRateLPerHour, closeTo(4.0, 0.01));
+      expect(crumb.pid5ELPerHour, closeTo(4.0, 0.01));
+      expect(crumb.afr, closeTo(14.7, 0.01));
+      expect(crumb.fuelDensityGPerL, closeTo(740, 0.5));
+    });
+
+    test(
+        'sanity-bound A: PID 5E < 0.3 L/h at RPM > 1500 records '
+        'suspicious-low flag — value is NOT dropped', () async {
+      final collector = Obd2BreadcrumbCollector();
+      final service = await _connected({
+        // 0x00 0x04 = 4 × 0.05 = 0.2 L/h, which trips the < 0.3 guard.
+        '015E': '41 5E 00 04>',
+        // RPM = ((A*256)+B)/4. 0x22 0x00 → 8704/4 = 2176, well above
+        // the 1500 threshold.
+        '010C': '41 0C 22 00>',
+      });
+      service.breadcrumbCollector = collector;
+
+      final rate = await service.readFuelRateLPerHour();
+
+      // The 0.2 L/h value is still surfaced — the trip integrator
+      // uses it; the suspect bit is a per-trip rollup, not a per-tick
+      // rejection.
+      expect(rate, closeTo(0.2, 0.01));
+      expect(collector.entries, hasLength(1));
+      expect(
+        collector.entries.first.flag,
+        equals(Obd2BreadcrumbCollector.flagSuspiciousLow),
+      );
+      expect(collector.suspiciousSampleCount, equals(1));
+    });
+
+    test(
+        'sanity-bound A: PID 5E < 0.3 L/h at RPM <= 1500 does NOT '
+        'flag — idle ECU is allowed to report 0', () async {
+      final collector = Obd2BreadcrumbCollector();
+      final service = await _connected({
+        '015E': '41 5E 00 04>', // 0.2 L/h
+        '010C': '41 0C 0C 80>', // RPM 800 (idle)
+      });
+      service.breadcrumbCollector = collector;
+
+      await service.readFuelRateLPerHour();
+
+      expect(collector.entries.first.flag, isNull);
+      expect(collector.suspiciousSampleCount, equals(0));
+    });
+
+    test(
+        'sanity-bound B: PID 5E vs MAF divergence > 50 % records '
+        '5e-vs-maf-divergent flag', () async {
+      final collector = Obd2BreadcrumbCollector();
+      final service = await _connected({
+        // PID 5E: 0x01 0x40 = 320 × 0.05 = 16.0 L/h.
+        '015E': '41 5E 01 40>',
+        // MAF 10.24 g/s → derived = 10.24 × 3600 / (14.7 × 745)
+        // ≈ 3.367 L/h. |16-3.37|/3.37 ≈ 3.7 → divergent.
+        '0110': '41 10 04 00>',
+        // RPM 800 — keeps us above the suspicious-low threshold AND
+        // doesn't trip the < 0.3 guard since 16 L/h is high.
+        '010C': '41 0C 0C 80>',
+      });
+      service.breadcrumbCollector = collector;
+
+      await service.readFuelRateLPerHour();
+
+      // The breadcrumb's `flag` is set to 5e-vs-maf-divergent because
+      // the cross-check ran AFTER the initial record.
+      expect(collector.entries, hasLength(1));
+      expect(
+        collector.entries.first.flag,
+        equals(Obd2BreadcrumbCollector.flag5eVsMafDivergent),
+      );
+      expect(collector.suspiciousSampleCount, equals(1));
+    });
+
+    test(
+        'sanity-bound B: PID 5E vs MAF within 50 % does NOT flag — '
+        'normal sensor agreement', () async {
+      final collector = Obd2BreadcrumbCollector();
+      final service = await _connected({
+        // PID 5E: 0x00 0x44 = 68 × 0.05 = 3.4 L/h.
+        '015E': '41 5E 00 44>',
+        // MAF 10.24 g/s → derived ≈ 3.367 L/h. |3.4 - 3.367|/3.367
+        // ≈ 0.01 — well inside the 50 % band.
+        '0110': '41 10 04 00>',
+        '010C': '41 0C 0C 80>',
+      });
+      service.breadcrumbCollector = collector;
+
+      await service.readFuelRateLPerHour();
+
+      expect(collector.entries, hasLength(1));
+      expect(collector.entries.first.flag, isNull);
+      expect(collector.suspiciousSampleCount, equals(0));
+    });
+
+    test(
+        'MAF branch records a MAF breadcrumb when PID 5E is not '
+        'available', () async {
+      final collector = Obd2BreadcrumbCollector();
+      final service = await _connected({
+        '015E': 'NO DATA>',
+        '0110': '41 10 04 00>', // MAF 10.24 g/s
+      });
+      service.breadcrumbCollector = collector;
+
+      await service.readFuelRateLPerHour();
+
+      expect(collector.entries, hasLength(1));
+      expect(collector.entries.first.branch, equals(Obd2BranchTag.maf));
+      expect(
+        collector.entries.first.mafGramsPerSecond,
+        closeTo(10.24, 0.01),
+      );
+    });
+
+    test(
+        'when no breadcrumb collector is wired, the service stays '
+        'fully backwards-compatible', () async {
+      // No collector — exercises the null-safe `?.` paths in
+      // readFuelRateLPerHour. The trip recorder must integrate the
+      // returned value as before.
+      // 0x01 0x80 = 384 × 0.05 = 19.2 L/h.
+      final service = await _connected({'015E': '41 5E 01 80>'});
+
+      final rate = await service.readFuelRateLPerHour();
+      expect(rate, closeTo(19.2, 0.1));
     });
   });
 }
