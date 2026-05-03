@@ -1139,5 +1139,9 @@
   "featureBlockedDisable_obd2TripRecording": "Désactivez d'abord les fonctionnalités dépendantes : {dependents}",
   "featureBlockedDisable_tankSync": "Désactivez d'abord les fonctionnalités dépendantes : {dependents}",
   "tripPathCardTitle": "Trace du trajet",
-  "tripPathCardSubtitle": "Itinéraire enregistré par GPS"
+  "tripPathCardSubtitle": "Itinéraire enregistré par GPS",
+  "tripPathLegendTitle": "Consommation",
+  "tripPathLegendEfficient": "Économe (< 6 L/100km)",
+  "tripPathLegendBorderline": "Modérée (6–10 L/100km)",
+  "tripPathLegendWasteful": "Excessive (≥ 10 L/100km)"
 }

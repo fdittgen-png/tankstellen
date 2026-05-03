@@ -4303,6 +4303,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tripPathCardSubtitle => 'Itinéraire enregistré par GPS';
 
   @override
+  String get tripPathLegendTitle => 'Consommation';
+
+  @override
+  String get tripPathLegendEfficient => 'Économe (< 6 L/100km)';
+
+  @override
+  String get tripPathLegendBorderline => 'Modérée (6–10 L/100km)';
+
+  @override
+  String get tripPathLegendWasteful => 'Excessive (≥ 10 L/100km)';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Pinning keeps the screen on — uses more battery';
 

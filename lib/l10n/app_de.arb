@@ -1656,6 +1656,10 @@
   "tripLengthBucketTripCount": "{count, plural, =0{keine Fahrten} one{1 Fahrt} other{{count} Fahrten}}",
   "tripPathCardTitle": "Fahrtstrecke",
   "tripPathCardSubtitle": "Per GPS aufgezeichnete Strecke",
+  "tripPathLegendTitle": "Verbrauch",
+  "tripPathLegendEfficient": "Effizient (< 6 L/100km)",
+  "tripPathLegendBorderline": "Grenzwertig (6–10 L/100km)",
+  "tripPathLegendWasteful": "Verschwenderisch (≥ 10 L/100km)",
   "tripRecordingPinTooltip": "Anpinnen hält den Bildschirm an — verbraucht mehr Akku",
   "@tripRecordingPinTooltip": {
     "description": "Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost."
