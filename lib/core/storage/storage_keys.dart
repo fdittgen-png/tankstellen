@@ -79,6 +79,10 @@ class StorageKeys {
   /// fuel-only `searchStateProvider` consumption for
   /// `unifiedSearchResultsProvider`. UI cards land in phase 3b; this
   /// flag is a no-op until then.
+  @Deprecated(
+    'Migrated to Feature.unifiedSearchResults in #1373 phase 3f; '
+    'kept for one-shot migration read.',
+  )
   static const String unifiedSearchResultsEnabled =
       'unified_search_results_enabled';
 
