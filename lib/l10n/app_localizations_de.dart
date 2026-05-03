@@ -3196,6 +3196,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get autoRecordBadgeClearTooltip => 'Zähler zurücksetzen';
 
   @override
+  String get autoRecordPairAdapterLinkText =>
+      'Adapter im Abschnitt unten koppeln, um automatisches Aufzeichnen zu aktivieren';
+
+  @override
   String get exportBackupTooltip => 'Sicherung exportieren';
 
   @override

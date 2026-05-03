@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/presentation/widgets/auto_record_section.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
-import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -42,8 +38,7 @@ Future<_FakeVehicleProfileList> _pumpSection(
   Future<PermissionStatus> Function()? requestBackgroundLocation,
   Future<PermissionStatus> Function()? requestForegroundLocation,
   Future<void> Function()? openSettings,
-  VoidCallback? onPairAdapter,
-  Future<ResolvedObd2Candidate?> Function(BuildContext)? showAdapterPicker,
+  VoidCallback? onScrollToObd2Card,
 }) async {
   // Tall canvas so the slider/banner stack does not overflow when the
   // master toggle is on. Mirror the size used by the extras section
@@ -61,8 +56,7 @@ Future<_FakeVehicleProfileList> _pumpSection(
         requestBackgroundLocation: requestBackgroundLocation,
         requestForegroundLocation: requestForegroundLocation,
         openSettings: openSettings,
-        onPairAdapter: onPairAdapter,
-        showAdapterPicker: showAdapterPicker,
+        onScrollToObd2Card: onScrollToObd2Card,
       ),
     ),
     overrides: [
@@ -70,28 +64,6 @@ Future<_FakeVehicleProfileList> _pumpSection(
     ],
   );
   return list;
-}
-
-/// Build a [ResolvedObd2Candidate] for the picker stub. Mirrors the
-/// shape produced by the real BLE/Classic scanner so the persist
-/// path receives the same `(deviceId, deviceName, profile)` tuple
-/// it would in production.
-ResolvedObd2Candidate _candidate({
-  String mac = 'AA:BB:CC:DD:EE:FF',
-  String name = 'vLinker FS 1234',
-}) {
-  return ResolvedObd2Candidate(
-    candidate: Obd2AdapterCandidate(
-      deviceId: mac,
-      deviceName: name,
-      advertisedServiceUuids: const [],
-      rssi: -55,
-    ),
-    profile: const Obd2AdapterProfile(
-      id: 'vlinker-fs-classic',
-      displayName: 'vLinker FS (Classic)',
-    ),
-  );
 }
 
 void main() {
@@ -114,7 +86,7 @@ void main() {
 
       // Master toggle is rendered.
       expect(find.byKey(const Key('autoRecordToggle')), findsOneWidget);
-      // No sliders, no banner.
+      // No sliders, no banner, no link.
       expect(find.byKey(const Key('autoRecordSpeedThreshold')), findsNothing);
       expect(find.byKey(const Key('autoRecordSaveDelay')), findsNothing);
       expect(
@@ -123,6 +95,10 @@ void main() {
       );
       expect(
         find.byKey(const Key('autoRecordStatusBannerActive')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('autoRecordPairAdapterLink')),
         findsNothing,
       );
     });
@@ -134,9 +110,14 @@ void main() {
       ]);
       await _pumpSection(tester, vehicleId: 'v1', list: list);
 
-      // State-aware banner is visible (no paired adapter → needsPairing).
+      // State-aware banner is visible (no paired adapter → needsPairing
+      // renders the passive link, #1400).
       expect(
         find.byKey(const Key('autoRecordStatusBannerNeedsPairing')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('autoRecordPairAdapterLink')),
         findsOneWidget,
       );
 
@@ -425,44 +406,15 @@ void main() {
         find.byKey(const Key('autoRecordStatusBannerActive')),
         findsNothing,
       );
+      expect(
+        find.byKey(const Key('autoRecordPairAdapterLink')),
+        findsNothing,
+      );
     });
 
     testWidgets(
-      'autoRecord ON, no paired MAC — needsPairing banner with the '
-      '"Pair an adapter" CTA',
-      (tester) async {
-        final list = _FakeVehicleProfileList([
-          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
-        ]);
-        await _pumpSection(tester, vehicleId: 'v1', list: list);
-
-        expect(
-          find.byKey(const Key('autoRecordStatusBannerNeedsPairing')),
-          findsOneWidget,
-        );
-        expect(
-          find.byKey(const Key('autoRecordStatusPairAdapterCta')),
-          findsOneWidget,
-        );
-        expect(
-          find.text('Pair an OBD2 adapter to enable auto-record.'),
-          findsOneWidget,
-        );
-        // Other states must NOT render simultaneously.
-        expect(
-          find.byKey(const Key('autoRecordStatusBannerNeedsBackgroundLocation')),
-          findsNothing,
-        );
-        expect(
-          find.byKey(const Key('autoRecordStatusBannerActive')),
-          findsNothing,
-        );
-      },
-    );
-
-    testWidgets(
       'autoRecord ON, MAC paired, backgroundLocationConsent=false — '
-      'needsBackgroundLocation banner without the pair CTA',
+      'needsBackgroundLocation banner without the pair link (#1400)',
       (tester) async {
         final list = _FakeVehicleProfileList([
           const VehicleProfile(
@@ -479,7 +431,7 @@ void main() {
           findsOneWidget,
         );
         expect(
-          find.byKey(const Key('autoRecordStatusPairAdapterCta')),
+          find.byKey(const Key('autoRecordPairAdapterLink')),
           findsNothing,
         );
         expect(
@@ -521,7 +473,7 @@ void main() {
           findsNothing,
         );
         expect(
-          find.byKey(const Key('autoRecordStatusPairAdapterCta')),
+          find.byKey(const Key('autoRecordPairAdapterLink')),
           findsNothing,
         );
         // The active state shows a check_circle icon (not warning_amber).
@@ -539,256 +491,6 @@ void main() {
               'enter the car.'),
           findsOneWidget,
         );
-      },
-    );
-
-    testWidgets(
-      'tapping the "Pair an adapter" CTA falls back to /setup when the '
-      'picker is cancelled (GoRouter wrapper) — #1350',
-      (tester) async {
-        // Tall canvas so the banner + sliders fit without overflow.
-        tester.view.physicalSize = const Size(900, 2400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        final list = _FakeVehicleProfileList([
-          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
-        ]);
-
-        // Stub picker that simulates user cancel (null result). Per the
-        // #1350 spec the /setup fallback fires on cancel so the CTA
-        // still has somewhere to land.
-        Future<ResolvedObd2Candidate?> cancelledPicker(BuildContext _) async {
-          return null;
-        }
-
-        final router = GoRouter(
-          initialLocation: '/edit',
-          routes: [
-            GoRoute(
-              path: '/edit',
-              builder: (_, _) => Scaffold(
-                body: SingleChildScrollView(
-                  child: AutoRecordSection(
-                    vehicleId: 'v1',
-                    showAdapterPicker: cancelledPicker,
-                  ),
-                ),
-              ),
-            ),
-            GoRoute(
-              path: '/setup',
-              builder: (_, _) => const Scaffold(
-                key: Key('setupScreenStub'),
-                body: Text('OBD2 onboarding'),
-              ),
-            ),
-          ],
-        );
-        addTearDown(router.dispose);
-
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              vehicleProfileListProvider.overrideWith(() => list),
-            ],
-            child: MaterialApp.router(
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              locale: const Locale('en'),
-              routerConfig: router,
-            ),
-          ),
-        );
-        await tester.pumpAndSettle();
-
-        // Sanity — sitting on /edit with the needsPairing banner.
-        expect(
-          find.byKey(const Key('autoRecordStatusBannerNeedsPairing')),
-          findsOneWidget,
-        );
-
-        await tester.tap(
-          find.byKey(const Key('autoRecordStatusPairAdapterCta')),
-        );
-        // Pump twice to allow the route push to settle without
-        // invoking pumpAndSettle (some Flutter versions hold a frame).
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 50));
-
-        expect(find.byKey(const Key('setupScreenStub')), findsOneWidget);
-        expect(
-          router.routerDelegate.currentConfiguration.uri.toString(),
-          '/setup',
-        );
-        // Cancel must NOT persist anything onto the profile.
-        expect(list.savedProfiles, isEmpty);
-      },
-    );
-
-    testWidgets(
-      'tapping the "Pair an adapter" CTA persists the picked adapter '
-      'onto the current profile (#1350 happy path)',
-      (tester) async {
-        final list = _FakeVehicleProfileList([
-          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
-        ]);
-
-        Future<ResolvedObd2Candidate?> pickerStub(BuildContext _) async {
-          return _candidate(
-            mac: 'DE:AD:BE:EF:00:01',
-            name: 'vLinker FS 9000',
-          );
-        }
-
-        await _pumpSection(
-          tester,
-          vehicleId: 'v1',
-          list: list,
-          showAdapterPicker: pickerStub,
-        );
-
-        // Sanity — needsPairing banner is up before the tap.
-        expect(
-          find.byKey(const Key('autoRecordStatusBannerNeedsPairing')),
-          findsOneWidget,
-        );
-
-        await tester.tap(
-          find.byKey(const Key('autoRecordStatusPairAdapterCta')),
-        );
-        // Bounded pumps — the picker stub resolves synchronously but
-        // the persist + rebuild needs at least one frame.
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 50));
-
-        // Repository got exactly one save call carrying the picked
-        // adapter's MAC + name on the original profile.
-        expect(list.savedProfiles, hasLength(1));
-        final saved = list.savedProfiles.single;
-        expect(saved.id, 'v1');
-        expect(saved.name, 'Golf');
-        expect(saved.autoRecord, isTrue);
-        expect(saved.pairedAdapterMac, 'DE:AD:BE:EF:00:01');
-        expect(saved.obd2AdapterMac, 'DE:AD:BE:EF:00:01');
-        expect(saved.obd2AdapterName, 'vLinker FS 9000');
-
-        // After persist the banner flips off needsPairing — the
-        // backgroundLocationConsent gate is still missing so we land
-        // on needsBackgroundLocation, not active.
-        expect(
-          find.byKey(const Key('autoRecordStatusBannerNeedsPairing')),
-          findsNothing,
-        );
-        expect(
-          find.byKey(const Key('autoRecordStatusBannerNeedsBackgroundLocation')),
-          findsOneWidget,
-        );
-      },
-    );
-
-    testWidgets(
-      'happy path uses the registry display name when the candidate '
-      'advertises an empty deviceName (#1350)',
-      (tester) async {
-        final list = _FakeVehicleProfileList([
-          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
-        ]);
-
-        Future<ResolvedObd2Candidate?> pickerStub(BuildContext _) async {
-          return _candidate(
-            mac: '11:22:33:44:55:66',
-            name: '', // empty advertised name → fall back to profile.displayName
-          );
-        }
-
-        await _pumpSection(
-          tester,
-          vehicleId: 'v1',
-          list: list,
-          showAdapterPicker: pickerStub,
-        );
-
-        await tester.tap(
-          find.byKey(const Key('autoRecordStatusPairAdapterCta')),
-        );
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 50));
-
-        expect(list.savedProfiles, hasLength(1));
-        expect(list.savedProfiles.single.obd2AdapterName,
-            'vLinker FS (Classic)');
-        expect(list.savedProfiles.single.pairedAdapterMac,
-            '11:22:33:44:55:66');
-      },
-    );
-
-    testWidgets(
-      'cancel path (picker returns null) does NOT persist anything '
-      '(#1350)',
-      (tester) async {
-        final list = _FakeVehicleProfileList([
-          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
-        ]);
-
-        Future<ResolvedObd2Candidate?> cancelledPicker(BuildContext _) async {
-          return null;
-        }
-
-        await _pumpSection(
-          tester,
-          vehicleId: 'v1',
-          list: list,
-          showAdapterPicker: cancelledPicker,
-        );
-
-        await tester.tap(
-          find.byKey(const Key('autoRecordStatusPairAdapterCta')),
-        );
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 50));
-
-        expect(list.savedProfiles, isEmpty);
-        // Banner stays on needsPairing — the user cancelled.
-        expect(
-          find.byKey(const Key('autoRecordStatusBannerNeedsPairing')),
-          findsOneWidget,
-        );
-      },
-    );
-
-    testWidgets(
-      'onPairAdapter test hook still takes precedence over the picker '
-      'when supplied (#1350)',
-      (tester) async {
-        final list = _FakeVehicleProfileList([
-          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
-        ]);
-        var hookCalls = 0;
-        var pickerCalls = 0;
-
-        await _pumpSection(
-          tester,
-          vehicleId: 'v1',
-          list: list,
-          onPairAdapter: () => hookCalls++,
-          showAdapterPicker: (_) async {
-            pickerCalls++;
-            return null;
-          },
-        );
-
-        await tester.tap(
-          find.byKey(const Key('autoRecordStatusPairAdapterCta')),
-        );
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 50));
-
-        expect(hookCalls, 1);
-        expect(pickerCalls, 0,
-            reason: 'onPairAdapter must short-circuit the picker path');
-        expect(list.savedProfiles, isEmpty);
       },
     );
 
@@ -840,6 +542,156 @@ void main() {
             reason: '"rolled out" must not appear in any state',
           );
         }
+      },
+    );
+  });
+
+  group('AutoRecordSection — pair-adapter link (#1400)', () {
+    testWidgets(
+      'autoRecord ON, no paired MAC — passive informational link is '
+      'rendered with the canonical copy and arrow_downward icon',
+      (tester) async {
+        final list = _FakeVehicleProfileList([
+          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
+        ]);
+        await _pumpSection(tester, vehicleId: 'v1', list: list);
+
+        // The passive link carries the needsPairing banner key so
+        // existing /screen tests that find by banner key still match.
+        expect(
+          find.byKey(const Key('autoRecordStatusBannerNeedsPairing')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('autoRecordPairAdapterLink')),
+          findsOneWidget,
+        );
+        // Canonical copy from the en ARB fragment.
+        expect(
+          find.text(
+            'Pair an adapter in the section below to enable '
+            'auto-recording',
+          ),
+          findsOneWidget,
+        );
+        // Visual cue — info_outline + arrow_downward icons.
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('autoRecordPairAdapterLink')),
+            matching: find.byIcon(Icons.info_outline),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('autoRecordPairAdapterLink')),
+            matching: find.byIcon(Icons.arrow_downward),
+          ),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'no orange-tinted "Pair an adapter" CTA button is rendered '
+      'anywhere on the auto-record card (#1400)',
+      (tester) async {
+        // Cycle through both relevant on-states; the deprecated CTA
+        // pre-#1400 only ever rendered on needsPairing but we cover
+        // needsBackgroundLocation too as a belt-and-suspender.
+        final fixtures = [
+          // needsPairing
+          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
+          // needsBackgroundLocation
+          const VehicleProfile(
+            id: 'v1',
+            name: 'Golf',
+            autoRecord: true,
+            pairedAdapterMac: 'DE:AD:BE:EF:00:01',
+          ),
+        ];
+
+        for (final profile in fixtures) {
+          final list = _FakeVehicleProfileList([profile]);
+          await _pumpSection(tester, vehicleId: 'v1', list: list);
+
+          expect(
+            find.byKey(const Key('autoRecordStatusPairAdapterCta')),
+            findsNothing,
+            reason: 'Pre-#1400 CTA button must not survive consolidation',
+          );
+        }
+      },
+    );
+
+    testWidgets(
+      'tapping the link calls onScrollToObd2Card exactly once (#1400)',
+      (tester) async {
+        final list = _FakeVehicleProfileList([
+          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
+        ]);
+        var taps = 0;
+        await _pumpSection(
+          tester,
+          vehicleId: 'v1',
+          list: list,
+          onScrollToObd2Card: () => taps++,
+        );
+
+        await tester.tap(
+          find.byKey(const Key('autoRecordPairAdapterLink')),
+        );
+        await tester.pump();
+
+        expect(taps, 1);
+        // The link is passive — tapping it must NOT persist anything.
+        expect(list.savedProfiles, isEmpty);
+      },
+    );
+
+    testWidgets(
+      'tapping the link with a null callback is a safe no-op (#1400)',
+      (tester) async {
+        final list = _FakeVehicleProfileList([
+          const VehicleProfile(id: 'v1', name: 'Golf', autoRecord: true),
+        ]);
+        // No onScrollToObd2Card — isolated widget pump shape.
+        await _pumpSection(tester, vehicleId: 'v1', list: list);
+
+        // Tap should not throw even though the callback is null —
+        // InkWell with null onTap is a no-op.
+        await tester.tap(
+          find.byKey(const Key('autoRecordPairAdapterLink')),
+        );
+        await tester.pump();
+
+        expect(list.savedProfiles, isEmpty);
+      },
+    );
+
+    testWidgets(
+      'paired-adapter state hides the link entirely (#1400)',
+      (tester) async {
+        final list = _FakeVehicleProfileList([
+          const VehicleProfile(
+            id: 'v1',
+            name: 'Golf',
+            autoRecord: true,
+            pairedAdapterMac: 'AA:BB:CC:11:22:33',
+            backgroundLocationConsent: true,
+          ),
+        ]);
+        await _pumpSection(tester, vehicleId: 'v1', list: list);
+
+        expect(
+          find.byKey(const Key('autoRecordPairAdapterLink')),
+          findsNothing,
+        );
+        // Active banner takes its place.
+        expect(
+          find.byKey(const Key('autoRecordStatusBannerActive')),
+          findsOneWidget,
+        );
       },
     );
   });

@@ -1273,6 +1273,7 @@
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "Standortberechtigung erforderlich",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Hintergrundstandort konnte nicht angefordert werden",
   "autoRecordBadgeClearTooltip": "Zähler zurücksetzen",
+  "autoRecordPairAdapterLinkText": "Adapter im Abschnitt unten koppeln, um automatisches Aufzeichnen zu aktivieren",
   "exportBackupTooltip": "Sicherung exportieren",
   "exportBackupReady": "Sicherung bereit – Ziel auswählen",
   "exportBackupFailed": "Sicherungsexport fehlgeschlagen – bitte erneut versuchen",
