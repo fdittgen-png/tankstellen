@@ -4412,6 +4412,28 @@ class AppLocalizationsRo extends AppLocalizations {
       'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Tankstellen servers.';
 
   @override
+  String get gdprVinOnlineDecodeTitle => 'VIN online decode';
+
+  @override
+  String get gdprVinOnlineDecodeShort =>
+      'Decode the VIN via NHTSA\'s free public service';
+
+  @override
+  String get gdprVinOnlineDecodeDescription =>
+      'When you pair an adapter, your vehicle\'s VIN is read locally to identify the car. Enabling this sends the 17-char VIN to NHTSA\'s free vPIC service to look up additional details (model, engine displacement, fuel type). The VIN is the only data sent — no other information leaves your device.';
+
+  @override
+  String get vehicleDetectedFromVinBadge => '(detected)';
+
+  @override
+  String vehicleDetectedFromVinSnackbar(String summary) {
+    return 'Detected from VIN: $summary. Apply?';
+  }
+
+  @override
+  String get vehicleDetectedFromVinApply => 'Apply';
+
+  @override
   String get widgetVariantDefault => 'Current price only';
 
   @override

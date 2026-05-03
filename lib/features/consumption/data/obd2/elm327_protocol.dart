@@ -68,6 +68,7 @@ class Elm327Protocol {
       Elm327Commands.shortTermFuelTrimCommand;
   static const longTermFuelTrimCommand = Elm327Commands.longTermFuelTrimCommand;
   static const fuelTankLevelCommand = Elm327Commands.fuelTankLevelCommand;
+  static const fuelTypeCommand = Elm327Commands.fuelTypeCommand;
   static const vinCommand = Elm327Commands.vinCommand;
   static const mfgOdometerCatalog = Elm327Commands.mfgOdometerCatalog;
 
@@ -155,6 +156,9 @@ class Elm327Protocol {
       );
 
   static String? parseVin(String raw) => Elm327Parsers.parseVin(raw);
+
+  static String? parseFuelType(String raw) =>
+      Elm327Parsers.parseFuelType(raw);
 
   static String? cleanResponse22(String raw) =>
       Elm327Parsers.cleanResponse22(raw);

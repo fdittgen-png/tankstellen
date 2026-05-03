@@ -29,7 +29,20 @@ import 'wmi_table.dart' as wmi;
 class VinDecoder {
   final Dio _dio;
 
-  VinDecoder({Dio? dio})
+  /// When false, [decode] never hits the vPIC network endpoint and
+  /// always returns a [VinDataSource.wmiOffline] result with whatever
+  /// the offline WMI table + position-10 year decoder can produce
+  /// (#1399). The default is `true` to preserve the pre-#1399 contract
+  /// (existing call sites that have already shown the user the VIN
+  /// dialog do not need the new GDPR-consent gate).
+  ///
+  /// New auto-population call sites (the adapter-pair flow) wire this
+  /// to the value of `gdprConsentProvider.vinOnlineDecode`. When the
+  /// user has not opted in, the flag is `false`, the network call is
+  /// skipped, and the offline-only path runs.
+  final bool allowOnlineLookup;
+
+  VinDecoder({Dio? dio, this.allowOnlineLookup = true})
       : _dio = dio ??
             DioFactory.create(
               baseUrl: 'https://vpic.nhtsa.dot.gov',
@@ -45,8 +58,14 @@ class VinDecoder {
   /// the data:
   ///
   ///   - [VinDataSource.vpic]       → full network response.
-  ///   - [VinDataSource.wmiOffline] → make + country only (offline).
+  ///   - [VinDataSource.wmiOffline] → make + country + (#1399) decoded
+  ///     model year from position 10. Engine fields stay null.
   ///   - [VinDataSource.invalid]    → nothing; input failed validation.
+  ///
+  /// When [allowOnlineLookup] is false (#1399 — user has not consented
+  /// to sending the VIN to NHTSA), the vPIC tier is skipped entirely
+  /// and the result is always either [VinDataSource.wmiOffline] or
+  /// [VinDataSource.invalid].
   ///
   /// Always returns a non-null result (the `?` in the signature is
   /// kept for forward-compatibility should a future caller want to
@@ -57,24 +76,73 @@ class VinDecoder {
       return VinData(vin: vin, source: VinDataSource.invalid);
     }
 
-    try {
-      final response = await _dio.get<Map<String, dynamic>>(
-        '/api/vehicles/decodevin/$cleaned',
-        queryParameters: const {'format': 'json'},
-      );
-      final data = response.data;
-      if (data != null) {
-        final parsed = _parseVpic(cleaned, data);
-        if (parsed != null) return parsed;
+    if (allowOnlineLookup) {
+      try {
+        final response = await _dio.get<Map<String, dynamic>>(
+          '/api/vehicles/decodevin/$cleaned',
+          queryParameters: const {'format': 'json'},
+        );
+        final data = response.data;
+        if (data != null) {
+          final parsed = _parseVpic(cleaned, data);
+          if (parsed != null) return parsed;
+        }
+      } on DioException catch (e, st) {
+        debugPrint(
+            'VinDecoder: vPIC failed (${e.type}): falling back to WMI\n$st');
+      } on Object catch (e, st) {
+        debugPrint('VinDecoder: unexpected error $e — falling back to WMI\n$st');
       }
-    } on DioException catch (e, st) { // ignore: unused_catch_stack
-      debugPrint('VinDecoder: vPIC failed (${e.type}): falling back to WMI');
-    } on Object catch (e, st) {
-      debugPrint('VinDecoder: unexpected error $e — falling back to WMI\n$st');
+    } else {
+      debugPrint(
+          'VinDecoder: online decode disabled by GDPR consent — '
+          'using offline WMI + position-10 year only');
     }
 
     return _fallbackFromWmi(cleaned);
   }
+
+  /// Decode the model year from position 10 of a 17-character VIN per
+  /// ISO 3779 (#1399). Returns null when the position-10 character is
+  /// not in the alphabet or when the input is too short.
+  ///
+  /// Two 30-year cycles share the same characters. The decoder picks
+  /// the cycle whose year is within ±1 of the current year — for a
+  /// 2026 user, "L" decodes to 2020 (current cycle) rather than 1990
+  /// (prior cycle). Edge cases at the boundary fall back to the latest
+  /// cycle.
+  static int? decodeModelYearFromPosition10(
+    String vin, {
+    DateTime? now,
+  }) {
+    if (vin.length < 10) return null;
+    final ch = vin[9].toUpperCase();
+    final cycleYear = _vinYearCycle[ch];
+    if (cycleYear == null) return null;
+    // The character maps to two candidate years — `cycleYear` and
+    // `cycleYear + 30`. Pick whichever is closer to "now without
+    // skewing into the future" — anything within 2 years ahead of
+    // `now` is plausible (model-year 2027 cars sell in late 2026).
+    final currentYear = (now ?? DateTime.now()).year;
+    final older = cycleYear;
+    final newer = cycleYear + 30;
+    if (newer <= currentYear + 1) return newer;
+    if (older <= currentYear + 1) return older;
+    // Both candidates are in the future — fall back to the older one.
+    return older;
+  }
+
+  /// ISO 3779 model-year code table. Each character maps to the
+  /// earliest year in its 30-year cycle. The decoder picks the most
+  /// recent year that's within +1 of "now".
+  static const Map<String, int> _vinYearCycle = {
+    'A': 1980, 'B': 1981, 'C': 1982, 'D': 1983, 'E': 1984,
+    'F': 1985, 'G': 1986, 'H': 1987, 'J': 1988, 'K': 1989,
+    'L': 1990, 'M': 1991, 'N': 1992, 'P': 1993, 'R': 1994,
+    'S': 1995, 'T': 1996, 'V': 1997, 'W': 1998, 'X': 1999,
+    'Y': 2000, '1': 2001, '2': 2002, '3': 2003, '4': 2004,
+    '5': 2005, '6': 2006, '7': 2007, '8': 2008, '9': 2009,
+  };
 
   /// Validate the VIN — must be exactly 17 characters of the SAE VIN
   /// alphabet (A–Z + 0–9, minus I, O, Q which VINs never contain).
@@ -147,19 +215,26 @@ class VinDecoder {
     return int.tryParse(match.group(1)!.replaceAll(',', ''));
   }
 
-  /// WMI-only decode. Returns a [VinData] with make + country when the
-  /// prefix is known; otherwise returns an empty [VinData] with
-  /// [VinDataSource.wmiOffline] so the caller still knows the decoder
+  /// WMI-only decode. Returns a [VinData] with make + country + (when
+  /// position 10 is a recognised year code) model year. Returns an
+  /// otherwise-empty [VinData] with [VinDataSource.wmiOffline] when
+  /// the WMI prefix is unknown so the caller still knows the decoder
   /// ran (and didn't just fail validation).
   static VinData _fallbackFromWmi(String vin) {
     final entry = wmi.lookup(vin);
+    final year = decodeModelYearFromPosition10(vin);
     if (entry == null) {
-      return VinData(vin: vin, source: VinDataSource.wmiOffline);
+      return VinData(
+        vin: vin,
+        modelYear: year,
+        source: VinDataSource.wmiOffline,
+      );
     }
     return VinData(
       vin: vin,
       make: entry.brand,
       country: entry.country,
+      modelYear: year,
       source: VinDataSource.wmiOffline,
     );
   }

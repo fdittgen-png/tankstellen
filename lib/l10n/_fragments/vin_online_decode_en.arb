@@ -1,0 +1,32 @@
+{
+  "gdprVinOnlineDecodeTitle": "VIN online decode",
+  "@gdprVinOnlineDecodeTitle": {
+    "description": "GDPR consent toggle — short title for the opt-in to send the 17-character VIN to NHTSA's free public vPIC service to look up additional vehicle details (#1399). Used in both the first-launch consent screen and the settings page."
+  },
+  "gdprVinOnlineDecodeShort": "Decode the VIN via NHTSA's free public service",
+  "@gdprVinOnlineDecodeShort": {
+    "description": "GDPR consent toggle — one-line subtitle shown in the settings page alongside the toggle (#1399). Kept terse; the first-launch consent screen uses gdprVinOnlineDecodeDescription for the longer explanation."
+  },
+  "gdprVinOnlineDecodeDescription": "When you pair an adapter, your vehicle's VIN is read locally to identify the car. Enabling this sends the 17-char VIN to NHTSA's free vPIC service to look up additional details (model, engine displacement, fuel type). The VIN is the only data sent — no other information leaves your device.",
+  "@gdprVinOnlineDecodeDescription": {
+    "description": "GDPR consent toggle — full description used on the first-launch consent screen (#1399). Mentions exactly what is sent (the VIN) and what is NOT sent (anything else) so the user can give informed consent."
+  },
+  "vehicleDetectedFromVinBadge": "(detected)",
+  "@vehicleDetectedFromVinBadge": {
+    "description": "Short badge shown next to a vehicle profile field (make, model, year, etc.) whose value matches the VIN-decoded value, to signal the field was auto-populated rather than typed by the user (#1399)."
+  },
+  "vehicleDetectedFromVinSnackbar": "Detected from VIN: {summary}. Apply?",
+  "@vehicleDetectedFromVinSnackbar": {
+    "description": "Snackbar shown when the VIN-decoded values differ from values the user has already entered, offering to apply the detected values without silently overwriting (#1399).",
+    "placeholders": {
+      "summary": {
+        "type": "String",
+        "example": "Peugeot 208 2019"
+      }
+    }
+  },
+  "vehicleDetectedFromVinApply": "Apply",
+  "@vehicleDetectedFromVinApply": {
+    "description": "Snackbar action button label — confirm applying the VIN-decoded values to the vehicle profile (#1399)."
+  }
+}

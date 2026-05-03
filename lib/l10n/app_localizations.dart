@@ -8102,6 +8102,42 @@ abstract class AppLocalizations {
   /// **'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Tankstellen servers.'**
   String get vinConfirmPrivacyNote;
 
+  /// GDPR consent toggle — short title for the opt-in to send the 17-character VIN to NHTSA's free public vPIC service to look up additional vehicle details (#1399). Used in both the first-launch consent screen and the settings page.
+  ///
+  /// In en, this message translates to:
+  /// **'VIN online decode'**
+  String get gdprVinOnlineDecodeTitle;
+
+  /// GDPR consent toggle — one-line subtitle shown in the settings page alongside the toggle (#1399). Kept terse; the first-launch consent screen uses gdprVinOnlineDecodeDescription for the longer explanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Decode the VIN via NHTSA\'s free public service'**
+  String get gdprVinOnlineDecodeShort;
+
+  /// GDPR consent toggle — full description used on the first-launch consent screen (#1399). Mentions exactly what is sent (the VIN) and what is NOT sent (anything else) so the user can give informed consent.
+  ///
+  /// In en, this message translates to:
+  /// **'When you pair an adapter, your vehicle\'s VIN is read locally to identify the car. Enabling this sends the 17-char VIN to NHTSA\'s free vPIC service to look up additional details (model, engine displacement, fuel type). The VIN is the only data sent — no other information leaves your device.'**
+  String get gdprVinOnlineDecodeDescription;
+
+  /// Short badge shown next to a vehicle profile field (make, model, year, etc.) whose value matches the VIN-decoded value, to signal the field was auto-populated rather than typed by the user (#1399).
+  ///
+  /// In en, this message translates to:
+  /// **'(detected)'**
+  String get vehicleDetectedFromVinBadge;
+
+  /// Snackbar shown when the VIN-decoded values differ from values the user has already entered, offering to apply the detected values without silently overwriting (#1399).
+  ///
+  /// In en, this message translates to:
+  /// **'Detected from VIN: {summary}. Apply?'**
+  String vehicleDetectedFromVinSnackbar(String summary);
+
+  /// Snackbar action button label — confirm applying the VIN-decoded values to the vehicle profile (#1399).
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get vehicleDetectedFromVinApply;
+
   /// Label for the default home-widget content variant — shows just the current pump price (#1121).
   ///
   /// In en, this message translates to:

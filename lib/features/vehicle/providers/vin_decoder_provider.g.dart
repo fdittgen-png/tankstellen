@@ -69,6 +69,95 @@ final class VinDecoderProvider
 
 String _$vinDecoderHash() => r'7577674da37299c1f3c94f0c8edcb332ec2fb578';
 
+/// VIN decoder for the auto-population flow (#1399). Honors the
+/// `vinOnlineDecode` GDPR consent toggle: when the user has not opted
+/// in, the network call is skipped entirely and the decoder runs in
+/// offline-only mode (WMI + position-10 year).
+///
+/// Distinct from [vinDecoderProvider] — that decoder is for the
+/// existing manual VIN-entry flow on the edit-vehicle screen, where
+/// the user has explicitly typed a VIN and tapped "decode" so the
+/// online lookup is implicitly consented to. The auto-population flow
+/// runs silently on adapter pair, so it must respect the explicit
+/// consent toggle.
+///
+/// NOT keepAlive: rebuilds when the consent toggles so the next
+/// adapter-pair flow honors the freshest setting without an app
+/// restart.
+
+@ProviderFor(consentAwareVinDecoder)
+final consentAwareVinDecoderProvider = ConsentAwareVinDecoderProvider._();
+
+/// VIN decoder for the auto-population flow (#1399). Honors the
+/// `vinOnlineDecode` GDPR consent toggle: when the user has not opted
+/// in, the network call is skipped entirely and the decoder runs in
+/// offline-only mode (WMI + position-10 year).
+///
+/// Distinct from [vinDecoderProvider] — that decoder is for the
+/// existing manual VIN-entry flow on the edit-vehicle screen, where
+/// the user has explicitly typed a VIN and tapped "decode" so the
+/// online lookup is implicitly consented to. The auto-population flow
+/// runs silently on adapter pair, so it must respect the explicit
+/// consent toggle.
+///
+/// NOT keepAlive: rebuilds when the consent toggles so the next
+/// adapter-pair flow honors the freshest setting without an app
+/// restart.
+
+final class ConsentAwareVinDecoderProvider
+    extends $FunctionalProvider<VinDecoder, VinDecoder, VinDecoder>
+    with $Provider<VinDecoder> {
+  /// VIN decoder for the auto-population flow (#1399). Honors the
+  /// `vinOnlineDecode` GDPR consent toggle: when the user has not opted
+  /// in, the network call is skipped entirely and the decoder runs in
+  /// offline-only mode (WMI + position-10 year).
+  ///
+  /// Distinct from [vinDecoderProvider] — that decoder is for the
+  /// existing manual VIN-entry flow on the edit-vehicle screen, where
+  /// the user has explicitly typed a VIN and tapped "decode" so the
+  /// online lookup is implicitly consented to. The auto-population flow
+  /// runs silently on adapter pair, so it must respect the explicit
+  /// consent toggle.
+  ///
+  /// NOT keepAlive: rebuilds when the consent toggles so the next
+  /// adapter-pair flow honors the freshest setting without an app
+  /// restart.
+  ConsentAwareVinDecoderProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'consentAwareVinDecoderProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$consentAwareVinDecoderHash();
+
+  @$internal
+  @override
+  $ProviderElement<VinDecoder> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  VinDecoder create(Ref ref) {
+    return consentAwareVinDecoder(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(VinDecoder value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<VinDecoder>(value),
+    );
+  }
+}
+
+String _$consentAwareVinDecoderHash() =>
+    r'85926c4c59bc47084043169d0a7e9780b6159340';
+
 /// Async family that decodes a given [vin] into [VinData] via the
 /// shared [VinDecoder] (#812 phase 2).
 ///

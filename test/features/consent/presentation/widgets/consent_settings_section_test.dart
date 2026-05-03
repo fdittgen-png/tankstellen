@@ -20,12 +20,15 @@ void main() {
     bool errorReporting = false,
     bool cloudSync = false,
     bool communityWaitTime = false,
+    bool vinOnlineDecode = false,
   }) {
     fakeStorage.putSetting(StorageKeys.consentLocation, location);
     fakeStorage.putSetting(StorageKeys.consentErrorReporting, errorReporting);
     fakeStorage.putSetting(StorageKeys.consentCloudSync, cloudSync);
     fakeStorage.putSetting(
         StorageKeys.consentCommunityWaitTime, communityWaitTime);
+    fakeStorage.putSetting(
+        StorageKeys.consentVinOnlineDecode, vinOnlineDecode);
 
     return ProviderScope(
       overrides: [
@@ -41,11 +44,11 @@ void main() {
   }
 
   group('ConsentSettingsSection', () {
-    testWidgets('shows four toggle switches', (tester) async {
+    testWidgets('shows five toggle switches', (tester) async {
       await tester.pumpWidget(buildWidget());
       await tester.pumpAndSettle();
 
-      expect(find.byType(SwitchListTile), findsNWidgets(4));
+      expect(find.byType(SwitchListTile), findsNWidgets(5));
     });
 
     testWidgets('shows correct labels', (tester) async {
@@ -56,6 +59,7 @@ void main() {
       expect(find.text('Error Reporting'), findsOneWidget);
       expect(find.text('Cloud Sync'), findsOneWidget);
       expect(find.text('Community Wait Times'), findsOneWidget);
+      expect(find.text('VIN online decode'), findsOneWidget);
     });
 
     testWidgets('reflects stored consent values', (tester) async {
@@ -64,6 +68,7 @@ void main() {
         errorReporting: false,
         cloudSync: true,
         communityWaitTime: true,
+        vinOnlineDecode: true,
       ));
       await tester.pumpAndSettle();
 
@@ -73,6 +78,7 @@ void main() {
       expect(tiles[1].value, isFalse); // error reporting
       expect(tiles[2].value, isTrue); // cloud sync
       expect(tiles[3].value, isTrue); // community wait time
+      expect(tiles[4].value, isTrue); // vin online decode
     });
 
     testWidgets('toggling location saves to storage', (tester) async {
@@ -99,6 +105,25 @@ void main() {
       expect(fakeStorage.getSetting(StorageKeys.consentLocation), false);
       expect(fakeStorage.getSetting(StorageKeys.consentErrorReporting), false);
       expect(fakeStorage.getSetting(StorageKeys.consentCloudSync), false);
+      expect(
+          fakeStorage.getSetting(StorageKeys.consentVinOnlineDecode), false);
+    });
+
+    testWidgets('toggling VIN online decode saves only that key (#1399)',
+        (tester) async {
+      await tester.pumpWidget(buildWidget());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(Switch).at(4));
+      await tester.pumpAndSettle();
+
+      expect(
+          fakeStorage.getSetting(StorageKeys.consentVinOnlineDecode), true);
+      expect(fakeStorage.getSetting(StorageKeys.consentLocation), false);
+      expect(fakeStorage.getSetting(StorageKeys.consentErrorReporting), false);
+      expect(fakeStorage.getSetting(StorageKeys.consentCloudSync), false);
+      expect(
+          fakeStorage.getSetting(StorageKeys.consentCommunityWaitTime), false);
     });
 
     testWidgets(

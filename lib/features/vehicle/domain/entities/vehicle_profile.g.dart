@@ -92,6 +92,16 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
       gearCentroids: (json['gearCentroids'] as List<dynamic>?)
           ?.map((e) => (e as num).toDouble())
           .toList(),
+      lastReadVin: json['lastReadVin'] as String?,
+      lastVinReadAt: json['lastVinReadAt'] == null
+          ? null
+          : DateTime.parse(json['lastVinReadAt'] as String),
+      detectedMake: json['detectedMake'] as String?,
+      detectedModel: json['detectedModel'] as String?,
+      detectedYear: (json['detectedYear'] as num?)?.toInt(),
+      detectedEngineDisplacementCc:
+          (json['detectedEngineDisplacementCc'] as num?)?.toInt(),
+      detectedFuelType: json['detectedFuelType'] as String?,
     );
 
 Map<String, dynamic> _$VehicleProfileToJson(
@@ -136,4 +146,11 @@ Map<String, dynamic> _$VehicleProfileToJson(
   'aggregatesTripCount': instance.aggregatesTripCount,
   'tireCircumferenceMeters': instance.tireCircumferenceMeters,
   'gearCentroids': instance.gearCentroids,
+  'lastReadVin': instance.lastReadVin,
+  'lastVinReadAt': instance.lastVinReadAt?.toIso8601String(),
+  'detectedMake': instance.detectedMake,
+  'detectedModel': instance.detectedModel,
+  'detectedYear': instance.detectedYear,
+  'detectedEngineDisplacementCc': instance.detectedEngineDisplacementCc,
+  'detectedFuelType': instance.detectedFuelType,
 };

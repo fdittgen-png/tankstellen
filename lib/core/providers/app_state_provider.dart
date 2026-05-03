@@ -145,7 +145,7 @@ bool hasGdprConsent(Ref ref) {
 }
 
 /// GDPR consent state: location, error reporting, cloud sync,
-/// community wait-time pings (#1119).
+/// community wait-time pings (#1119), VIN online decode (#1399).
 @Riverpod(keepAlive: true)
 class GdprConsent extends _$GdprConsent {
   @override
@@ -154,6 +154,7 @@ class GdprConsent extends _$GdprConsent {
     bool errorReporting,
     bool cloudSync,
     bool communityWaitTime,
+    bool vinOnlineDecode,
   }) build() {
     final storage = ref.watch(storageRepositoryProvider);
     return (
@@ -162,6 +163,8 @@ class GdprConsent extends _$GdprConsent {
       cloudSync: storage.getSetting(StorageKeys.consentCloudSync) as bool? ?? false,
       communityWaitTime:
           storage.getSetting(StorageKeys.consentCommunityWaitTime) as bool? ?? false,
+      vinOnlineDecode:
+          storage.getSetting(StorageKeys.consentVinOnlineDecode) as bool? ?? false,
     );
   }
 
@@ -170,6 +173,7 @@ class GdprConsent extends _$GdprConsent {
     required bool errorReporting,
     required bool cloudSync,
     required bool communityWaitTime,
+    required bool vinOnlineDecode,
   }) async {
     final storage = ref.read(storageRepositoryProvider);
     await storage.putSetting(StorageKeys.gdprConsentGiven, true);
@@ -180,6 +184,10 @@ class GdprConsent extends _$GdprConsent {
       StorageKeys.consentCommunityWaitTime,
       communityWaitTime,
     );
+    await storage.putSetting(
+      StorageKeys.consentVinOnlineDecode,
+      vinOnlineDecode,
+    );
     // Also update the legacy location_consent key for backward compatibility
     await storage.putSetting('location_consent', location);
     state = (
@@ -187,6 +195,7 @@ class GdprConsent extends _$GdprConsent {
       errorReporting: errorReporting,
       cloudSync: cloudSync,
       communityWaitTime: communityWaitTime,
+      vinOnlineDecode: vinOnlineDecode,
     );
   }
 }

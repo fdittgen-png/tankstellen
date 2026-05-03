@@ -243,6 +243,7 @@ void main() {
       expect(state.errorReporting, isFalse);
       expect(state.cloudSync, isFalse);
       expect(state.communityWaitTime, isFalse);
+      expect(state.vinOnlineDecode, isFalse);
     });
 
     test('build reflects stored values', () async {
@@ -251,6 +252,8 @@ void main() {
       await fakeStorage.putSetting(StorageKeys.consentCloudSync, true);
       await fakeStorage.putSetting(
           StorageKeys.consentCommunityWaitTime, true);
+      await fakeStorage.putSetting(
+          StorageKeys.consentVinOnlineDecode, true);
 
       final c = createContainer();
       final state = c.read(gdprConsentProvider);
@@ -258,6 +261,7 @@ void main() {
       expect(state.errorReporting, isFalse);
       expect(state.cloudSync, isTrue);
       expect(state.communityWaitTime, isTrue);
+      expect(state.vinOnlineDecode, isTrue);
     });
 
     test('save persists all consent values and sets gdprConsentGiven',
@@ -268,6 +272,7 @@ void main() {
             errorReporting: false,
             cloudSync: true,
             communityWaitTime: true,
+            vinOnlineDecode: true,
           );
 
       expect(fakeStorage.getSetting(StorageKeys.gdprConsentGiven), true);
@@ -276,6 +281,8 @@ void main() {
       expect(fakeStorage.getSetting(StorageKeys.consentCloudSync), true);
       expect(
           fakeStorage.getSetting(StorageKeys.consentCommunityWaitTime), true);
+      expect(
+          fakeStorage.getSetting(StorageKeys.consentVinOnlineDecode), true);
       // Also updates legacy location_consent key
       expect(fakeStorage.getSetting('location_consent'), true);
 
@@ -284,6 +291,7 @@ void main() {
       expect(state.errorReporting, isFalse);
       expect(state.cloudSync, isTrue);
       expect(state.communityWaitTime, isTrue);
+      expect(state.vinOnlineDecode, isTrue);
     });
 
     test('save can persist communityWaitTime independently of others',
@@ -294,17 +302,44 @@ void main() {
             errorReporting: false,
             cloudSync: false,
             communityWaitTime: true,
+            vinOnlineDecode: false,
           );
 
       expect(
           fakeStorage.getSetting(StorageKeys.consentCommunityWaitTime), true);
       expect(fakeStorage.getSetting(StorageKeys.consentLocation), false);
+      expect(
+          fakeStorage.getSetting(StorageKeys.consentVinOnlineDecode), false);
 
       final state = c.read(gdprConsentProvider);
       expect(state.communityWaitTime, isTrue);
       expect(state.location, isFalse);
       expect(state.errorReporting, isFalse);
       expect(state.cloudSync, isFalse);
+      expect(state.vinOnlineDecode, isFalse);
+    });
+
+    test('save can persist vinOnlineDecode independently of others (#1399)',
+        () async {
+      final c = createContainer();
+      await c.read(gdprConsentProvider.notifier).save(
+            location: false,
+            errorReporting: false,
+            cloudSync: false,
+            communityWaitTime: false,
+            vinOnlineDecode: true,
+          );
+
+      expect(
+          fakeStorage.getSetting(StorageKeys.consentVinOnlineDecode), true);
+      expect(fakeStorage.getSetting(StorageKeys.consentLocation), false);
+      expect(
+          fakeStorage.getSetting(StorageKeys.consentCommunityWaitTime), false);
+
+      final state = c.read(gdprConsentProvider);
+      expect(state.vinOnlineDecode, isTrue);
+      expect(state.location, isFalse);
+      expect(state.communityWaitTime, isFalse);
     });
   });
 }

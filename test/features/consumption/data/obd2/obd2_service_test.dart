@@ -623,6 +623,52 @@ void main() {
       expect(await service.readFuelRateLPerHour(), isNull);
       expect(await service.readMafGramsPerSecond(), isNull);
       expect(await service.readFuelLevelPercent(), isNull);
+      expect(await service.readVin(), isNull);
+      expect(await service.readFuelType(), isNull);
+    });
+  });
+
+  group('Obd2Service.readVin (#1399)', () {
+    test('parses Mode 09 PID 02 multi-frame response into 17-char VIN',
+        () async {
+      // Build a realistic Mode 09 PID 02 multi-frame response. Same
+      // shape exercised by [Elm327Parsers.parseVin] tests — frame
+      // headers `49 02 NN` are stripped + 17 ASCII bytes remain.
+      const vin = 'WVWZZZ1KZ8W123456';
+      final body = vin.codeUnits
+          .map((c) => c.toRadixString(16).padLeft(2, '0').toUpperCase())
+          .join(' ');
+      final response =
+          '49 02 01 $body 49 02 02 49 02 03 49 02 04 49 02 05>';
+      final service = await _connected({'0902': response});
+      expect(await service.readVin(), vin);
+    });
+
+    test('NO DATA returns null', () async {
+      final service = await _connected({'0902': 'NO DATA>'});
+      expect(await service.readVin(), isNull);
+    });
+  });
+
+  group('Obd2Service.readFuelType (#1399 PID 0x51)', () {
+    test('petrol code 0x01 maps to "petrol"', () async {
+      final service = await _connected({'0151': '41 51 01>'});
+      expect(await service.readFuelType(), 'petrol');
+    });
+
+    test('diesel code 0x04 maps to "diesel"', () async {
+      final service = await _connected({'0151': '41 51 04>'});
+      expect(await service.readFuelType(), 'diesel');
+    });
+
+    test('unsupported (NO DATA) returns null', () async {
+      final service = await _connected({'0151': 'NO DATA>'});
+      expect(await service.readFuelType(), isNull);
+    });
+
+    test('reserved code returns null', () async {
+      final service = await _connected({'0151': '41 51 FF>'});
+      expect(await service.readFuelType(), isNull);
     });
   });
 

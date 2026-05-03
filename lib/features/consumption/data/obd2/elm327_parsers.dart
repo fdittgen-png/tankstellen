@@ -270,6 +270,61 @@ class Elm327Parsers {
     return (milesTimes10 / 10.0) * 1.609344;
   }
 
+  /// Parse fuel type from Mode 01 PID 51 response (#1399).
+  ///
+  /// Single-byte response per SAE-J1979 Table 6 — maps to the project's
+  /// `preferredFuelType` enum strings. The ECU truth wins over offline
+  /// WMI / online vPIC during the VIN-driven adapter-pair auto-population
+  /// flow because PID 0x51 reports what the ECU is actually configured
+  /// for at runtime, not what a reference table thinks the model ships
+  /// with.
+  ///
+  /// Recognised codes:
+  ///   0x01 → 'petrol'  (Gasoline)
+  ///   0x04 → 'diesel'  (Diesel)
+  ///   0x05 → 'lpg'     (Liquefied Petroleum Gas)
+  ///   0x06 → 'cng'     (Compressed Natural Gas)
+  ///   0x08 → 'electric'
+  ///   0x09 → 'petrol'  (Hybrid Gasoline — the combustion side is petrol)
+  ///   0x0A → 'petrol'  (Hybrid Ethanol — close enough, default petrol)
+  ///   0x0B → 'diesel'  (Hybrid Diesel)
+  ///   0x0C → 'electric' (Hybrid Electric — predominantly electric)
+  ///   0x0D → 'petrol'  (Hybrid mixed combustion-only)
+  ///
+  /// Other / reserved / unknown codes return null so the caller falls
+  /// back to other signals.
+  static String? parseFuelType(String raw) {
+    final bytes = _parseModeOneBody(raw, 0x51, minBytes: 3);
+    if (bytes == null) return null;
+    return fuelTypeCodeToProfileKey(bytes[2]);
+  }
+
+  /// Map an SAE-J1979 PID 0x51 fuel-type byte to the project's
+  /// `preferredFuelType` enum strings ("petrol", "diesel", ...).
+  /// Visible to tests and to the obd2_service so it can re-use the
+  /// mapping when reading the value through a different path.
+  static String? fuelTypeCodeToProfileKey(int code) {
+    switch (code) {
+      case 0x01:
+      case 0x09: // hybrid gasoline
+      case 0x0A: // hybrid ethanol
+      case 0x0D: // hybrid mixed
+        return 'petrol';
+      case 0x04:
+      case 0x0B: // hybrid diesel
+        return 'diesel';
+      case 0x05:
+        return 'lpg';
+      case 0x06:
+        return 'cng';
+      case 0x08:
+      case 0x0C: // hybrid electric
+        return 'electric';
+      default:
+        return null;
+    }
+  }
+
   /// Parse the ASCII VIN from a Mode 09 PID 02 response. ELM frames
   /// the 17-byte VIN across 4–5 CAN frames, each prefixed with the
   /// 3-byte header `49 02 NN` (where NN is a frame counter).
