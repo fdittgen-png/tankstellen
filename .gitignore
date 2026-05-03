@@ -88,6 +88,7 @@ docs/guides/*
 !docs/guides/PLAY-STORE-LISTING-REFRESH.md
 !docs/guides/obd2-adapters.md
 !docs/guides/vehicle-catalog.md
+!docs/guides/vehicle-abstraction.md
 !docs/guides/driving-insights.md
 !docs/guides/auto-record.md
 !docs/guides/SCHEMA-BACKUP-XML.md
