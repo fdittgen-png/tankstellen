@@ -109,7 +109,8 @@ void main() {
         final connected = await service.connect();
 
         expect(connected, isTrue);
-        // Captured commands match the legacy init list exactly.
+        // Captured commands match the legacy init list exactly,
+        // followed by the #1401 phase 1 firmware-version probe.
         final sent = transport.commands.map((c) => c.command).toList();
         expect(sent, [
           'ATZ',
@@ -117,6 +118,7 @@ void main() {
           'ATL0',
           'ATH0',
           'ATSP0',
+          'ATI',
         ]);
 
         // Inter-command intervals are at least the configured 100 ms
