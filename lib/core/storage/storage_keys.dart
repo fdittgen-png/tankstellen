@@ -48,6 +48,10 @@ class StorageKeys {
   /// #780 — opt-in switch for per-vehicle baseline sync. Defaults to
   /// false (off) so users who only want favourite sync aren't
   /// silently uploading driving data.
+  @Deprecated(
+    'Migrated to Feature.baselineSync in #1373 phase 3e; '
+    'kept for one-shot migration read.',
+  )
   static const String syncBaselinesEnabled = 'sync_baselines_enabled';
 
   /// #950 phase 4 — flag set once the

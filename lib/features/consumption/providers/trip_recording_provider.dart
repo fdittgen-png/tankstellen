@@ -10,12 +10,11 @@ import '../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../core/feedback/auto_record_badge_service.dart';
 import '../../../core/location/geolocator_wrapper.dart';
 import '../../../core/storage/hive_boxes.dart';
-import '../../../core/storage/storage_keys.dart';
-import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/baselines_sync.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
 import '../../search/domain/entities/fuel_type.dart';
+import '../../sync/providers/baseline_sync_enabled_provider.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/baseline_store.dart';
@@ -1098,11 +1097,10 @@ class TripRecording extends _$TripRecording {
       // users who never toggled it in the sync setup screen don't
       // silently upload driving data. Ungated favourite sync etc.
       // are unaffected.
-      final settings = ref.read(settingsStorageProvider);
-      final enabled = settings.getSetting(
-            StorageKeys.syncBaselinesEnabled,
-          ) ==
-          true;
+      // #1373 phase 3e — read the central feature flag instead of the
+      // legacy Hive key. ref.read (not watch) — this is a one-shot
+      // gate at flush time, not a reactive dependency.
+      final enabled = ref.read(baselineSyncEnabledProvider);
       if (!enabled) return;
       if (!Hive.isBoxOpen(HiveBoxes.obd2Baselines)) return;
       final box = Hive.box<String>(HiveBoxes.obd2Baselines);

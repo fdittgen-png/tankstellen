@@ -28,6 +28,13 @@ const String gamificationMigratedKey = 'gamificationMigrated';
 /// tells us whether the migration has already run.
 const String unifiedSearchResultsMigratedKey = 'unifiedSearchResultsMigrated';
 
+/// Settings-box key written once after the legacy
+/// `syncBaselinesEnabled` value has been promoted into the central
+/// feature-flag set (#1373 phase 3e). Persisted in the same
+/// `settings` Hive box as the legacy toggle itself so a single read
+/// tells us whether the migration has already run.
+const String syncBaselinesMigratedKey = 'syncBaselinesMigrated';
+
 /// One-shot migrator that promotes legacy scattered toggles into the
 /// central [FeatureFlagsRepository] (#1373 phase 3a).
 ///
@@ -51,20 +58,28 @@ const String unifiedSearchResultsMigratedKey = 'unifiedSearchResultsMigrated';
 /// because the legacy value lives on the profile entity rather than
 /// the settings box.
 ///
-/// Phase 3f (this PR) adds [_migrateUnifiedSearchResults] for the
+/// Phase 3f adds [_migrateUnifiedSearchResults] for the
 /// settings-box-backed `unifiedSearchResultsEnabled` toggle. It
 /// follows the same shape as [_migrateHapticEcoCoach] but with no
 /// prerequisites to cascade-enable (the manifest declares no
 /// `requires:` for [Feature.unifiedSearchResults]).
+///
+/// Phase 3e (this PR) adds [_migrateSyncBaselines] for the
+/// settings-box-backed `syncBaselinesEnabled` toggle. The manifest
+/// declares [Feature.tankSync] as a hard prerequisite of
+/// [Feature.baselineSync], so the cascade promotes BOTH on a legacy
+/// `true` (mirroring the haptic precedent's
+/// `obd2TripRecording → hapticEcoCoach` cascade).
 ///
 /// Phase status:
 ///   - 3a hapticEcoCoach (settings-box, default-false) ✅
 ///   - 3b gamification (UserProfile, default-true) ✅ via
 ///     [migrateUserProfileToggles]
 ///   - 3f unifiedSearchResults (settings-box, default-false) ✅
+///   - 3e syncBaselines (settings-box, default-false) ✅
 ///
-/// Future phases (3c, 3d, 3e) extend this migrator with additional
-/// scattered toggles (`showFuel`, `autoRecord`, `syncBaselinesEnabled`,
+/// Future phases (3c, 3d) extend this migrator with additional
+/// scattered toggles (`showConsumptionTab`, per-vehicle `autoRecord`,
 /// etc.). Each new migration follows the same shape: read the legacy
 /// value, gate on a `<featureName>Migrated` flag, force-enable
 /// prerequisites first, persist, then write the gate flag.
@@ -79,6 +94,11 @@ Future<void> migrateLegacyToggles({
     manifest: manifest,
   );
   await _migrateUnifiedSearchResults(
+    settings: settings,
+    featureFlags: featureFlags,
+    manifest: manifest,
+  );
+  await _migrateSyncBaselines(
     settings: settings,
     featureFlags: featureFlags,
     manifest: manifest,
@@ -280,6 +300,56 @@ Future<void> _migrateUnifiedSearchResults({
   } catch (e, st) {
     debugPrint(
       'migrateLegacyToggles: writing $unifiedSearchResultsMigratedKey failed: $e\n$st',
+    );
+  }
+}
+
+Future<void> _migrateSyncBaselines({
+  required Box<dynamic> settings,
+  required FeatureFlagsRepository featureFlags,
+  required FeatureManifest manifest,
+}) async {
+  // Already migrated → idempotent no-op. The user may have toggled
+  // syncBaselines OFF after a previous migration; we must not
+  // re-promote the legacy `true` value.
+  if (settings.get(syncBaselinesMigratedKey) == true) {
+    return;
+  }
+
+  // ignore: deprecated_member_use_from_same_package
+  final legacyValue = settings.get(StorageKeys.syncBaselinesEnabled);
+
+  if (legacyValue == true) {
+    try {
+      final current = await featureFlags.loadEnabled();
+      // Force-enable the prerequisite first per the manifest's
+      // dependency graph — [Feature.baselineSync] requires
+      // [Feature.tankSync], so the cascade promotes both. Without
+      // this the central system would refuse the baselineSync enable
+      // on its first toggle attempt.
+      final entry = manifest.entryFor(Feature.baselineSync);
+      final next = <Feature>{
+        ...current,
+        ...entry.requires,
+        Feature.baselineSync,
+      };
+      await featureFlags.saveEnabled(next);
+    } catch (e, st) {
+      // Don't block startup on a migration failure — the user can
+      // re-toggle from settings if the central state is missing.
+      debugPrint(
+        'migrateLegacyToggles: syncBaselines promote failed: $e\n$st',
+      );
+    }
+  }
+
+  // Always set the flag (even when legacyValue is false / null) so we
+  // never re-read the legacy key on subsequent launches.
+  try {
+    await settings.put(syncBaselinesMigratedKey, true);
+  } catch (e, st) {
+    debugPrint(
+      'migrateLegacyToggles: writing $syncBaselinesMigratedKey failed: $e\n$st',
     );
   }
 }
