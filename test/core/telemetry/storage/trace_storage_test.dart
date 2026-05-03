@@ -287,5 +287,115 @@ void main() {
         expect(decoded['unparsedRaw'], isEmpty);
       });
     });
+
+    /// #1388 — Hive returns `Map<dynamic, dynamic>` for every nested map
+    /// (deviceInfo, appState, networkState, breadcrumbs entries). The
+    /// generated `_$ErrorTraceFromJson` casts each as `Map<String, dynamic>`
+    /// which throws `TypeError`, the broad catch swallows it, and the
+    /// trace lands in `unparsedRaw`. Result on the user's device: every
+    /// trace fails to parse, parsedCount=0. The fix deep-coerces every
+    /// nested Map / List<Map> into a JSON-compatible structure before
+    /// calling `ErrorTrace.fromJson`.
+    group('Hive nested-map coercion (#1388)', () {
+      /// Build a `Map<dynamic, dynamic>` whose nested values are themselves
+      /// `Map<dynamic, dynamic>` and `List<Map<dynamic, dynamic>>` — the
+      /// EXACT runtime shape Hive returns from `_box.values`. Using the
+      /// fixture from the user's 2026-05-03 export (issue body).
+      Map<dynamic, dynamic> hiveShapedTrace() {
+        final deviceInfo = <dynamic, dynamic>{
+          'os': 'android',
+          'osVersion': 'BP2A.250605.031.A3.S918U1UES7EZCI',
+          'platform': 'mobile',
+          'locale': 'fr_FR',
+          'screenWidth': 384.0,
+          'screenHeight': 823.4666666666667,
+          'appVersion': '5.0.0+5132',
+        };
+        final appState = <dynamic, dynamic>{
+          'activeRoute': '/vehicles/edit',
+          'activeProfileId': 'profile-1',
+          'activeProfileName': 'Standard',
+          'lastApiEndpoint': null,
+          'lastSearchParams': null,
+        };
+        final networkState = <dynamic, dynamic>{
+          'isOnline': false,
+          'connectivityType': 'none',
+        };
+        final breadcrumbs = <dynamic>[
+          <dynamic, dynamic>{
+            'timestamp': '2026-05-02T23:07:23.000000',
+            'action': 'navigate:/vehicles/edit',
+            'detail': null,
+          },
+        ];
+        return <dynamic, dynamic>{
+          'id': '30be7070-8aa2-4f9e-bfc0-e61fa4e486ca',
+          'timestamp': '2026-05-02T23:07:23.808494',
+          'timezoneOffset': '+02:00',
+          'category': 'unknown',
+          'errorType': '_ContextualError',
+          'errorMessage': '[other] Obd2ScanTimeout: No OBD2 adapter found in range',
+          'stackTrace': '#0      Obd2ConnectionService.scan ...',
+          'deviceInfo': deviceInfo,
+          'appState': appState,
+          'serviceChainState': null,
+          'networkState': networkState,
+          'breadcrumbs': breadcrumbs,
+        };
+      }
+
+      test('getAll parses Hive-shaped Map<dynamic, dynamic> trace', () async {
+        final box = Hive.box('error_traces');
+        await box.put('30be7070-8aa2-4f9e-bfc0-e61fa4e486ca', hiveShapedTrace());
+
+        final all = storage.getAll();
+        expect(all, hasLength(1),
+            reason: 'Hive-shaped nested maps must be deep-coerced before fromJson');
+        final t = all.first;
+        expect(t.id, '30be7070-8aa2-4f9e-bfc0-e61fa4e486ca');
+        expect(t.errorType, '_ContextualError');
+        expect(t.deviceInfo.locale, 'fr_FR');
+        expect(t.networkState.isOnline, isFalse);
+        expect(t.breadcrumbs, hasLength(1));
+        expect(t.breadcrumbs.first.action, 'navigate:/vehicles/edit');
+      });
+
+      test('getUnparsedRaw is empty when input is Hive-shaped', () async {
+        final box = Hive.box('error_traces');
+        await box.put('30be7070-8aa2-4f9e-bfc0-e61fa4e486ca', hiveShapedTrace());
+
+        expect(storage.getUnparsedRaw(), isEmpty);
+        expect(storage.parsedCount, 1);
+        expect(storage.unparsedCount, 0);
+      });
+
+      test('getById parses Hive-shaped Map<dynamic, dynamic> trace',
+          () async {
+        final box = Hive.box('error_traces');
+        await box.put('30be7070-8aa2-4f9e-bfc0-e61fa4e486ca', hiveShapedTrace());
+
+        final t = storage.getById('30be7070-8aa2-4f9e-bfc0-e61fa4e486ca');
+        expect(t, isNotNull);
+        expect(t!.deviceInfo.os, 'android');
+      });
+
+      test(
+          'malformed entries still surface in unparsedRaw (regression: #1301 '
+          'broad-catch path is preserved)', () async {
+        final box = Hive.box('error_traces');
+        // Hive-shaped map with the required `id` field removed — schema drift.
+        final broken = hiveShapedTrace()..remove('id');
+        await box.put('broken', broken);
+
+        expect(storage.parsedCount, 0);
+        final unparsed = storage.getUnparsedRaw();
+        expect(unparsed, hasLength(1));
+        // The captured raw entry must round-trip through JsonEncoder cleanly
+        // — i.e. it's already a plain Map<String, dynamic> tree, not a
+        // Hive-shaped Map<dynamic, dynamic> that would blow up on encode.
+        expect(() => jsonEncode(unparsed), returnsNormally);
+      });
+    });
   });
 }
