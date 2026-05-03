@@ -81,6 +81,10 @@ class HiveBoxes {
   /// keys are available.
   static const String isolateErrorSpool = 'isolate_error_spool';
 
+  /// Glide-coach OSM traffic-signal cache (#1125 phase 1). Public OSM
+  /// data, no PII — unencrypted like the other low-sensitivity boxes.
+  static const String trafficSignalsCache = 'traffic_signals_cache';
+
   static const _encryptedBoxes = {
     settings,
     profiles,
@@ -182,6 +186,8 @@ class HiveBoxes {
     // initialiser into TraceRecorder. Unencrypted so the BG isolate
     // can write before consent / keychain unlock.
     await Hive.openBox<String>(isolateErrorSpool);
+    // #1125 — glide-coach OSM traffic-signal cache (phase 1).
+    await Hive.openBox<String>(trafficSignalsCache);
   }
 
   /// Initialize Hive in a background isolate with proper encryption.
