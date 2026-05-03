@@ -85,6 +85,9 @@ class HiveBoxes {
   /// data, no PII — unencrypted like the other low-sensitivity boxes.
   static const String trafficSignalsCache = 'traffic_signals_cache';
 
+  /// Central feature-flag set (#1373 phase 1).
+  static const String featureFlags = 'feature_flags';
+
   static const _encryptedBoxes = {
     settings,
     profiles,
@@ -188,6 +191,8 @@ class HiveBoxes {
     await Hive.openBox<String>(isolateErrorSpool);
     // #1125 — glide-coach OSM traffic-signal cache (phase 1).
     await Hive.openBox<String>(trafficSignalsCache);
+    // #1373 — central feature-flag set (phase 1).
+    await Hive.openBox<dynamic>(featureFlags);
   }
 
   /// Initialize Hive in a background isolate with proper encryption.
