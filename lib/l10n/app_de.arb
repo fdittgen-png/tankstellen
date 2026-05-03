@@ -1722,6 +1722,12 @@
   "vinInfoSectionWhereBody": "Schauen Sie unten links in der Windschutzscheibe (Fahrerseite) durch das Glas, prüfen Sie den Aufkleber am Türrahmen der Fahrertür bei geöffneter Tür, oder lesen Sie sie in Ihrem Fahrzeugschein ab.",
   "vinInfoDismiss": "Verstanden",
   "vinConfirmPrivacyNote": "Wir haben Ihre FIN in NHTSA's kostenloser Fahrzeugdatenbank nachgeschlagen — nichts wurde an Tankstellen-Server gesendet.",
+  "gdprVinOnlineDecodeTitle": "VIN online dekodieren",
+  "gdprVinOnlineDecodeShort": "VIN über den kostenlosen NHTSA-Dienst dekodieren",
+  "gdprVinOnlineDecodeDescription": "Beim Koppeln eines Adapters wird die VIN deines Fahrzeugs lokal gelesen, um das Auto zu identifizieren. Wenn du dies aktivierst, wird die 17-stellige VIN an den kostenlosen vPIC-Dienst der NHTSA gesendet, um zusätzliche Details (Modell, Hubraum, Kraftstofftyp) abzurufen. Es wird nur die VIN gesendet — keine weiteren Daten verlassen dein Gerät.",
+  "vehicleDetectedFromVinBadge": "(erkannt)",
+  "vehicleDetectedFromVinSnackbar": "Aus VIN erkannt: {summary}. Übernehmen?",
+  "vehicleDetectedFromVinApply": "Übernehmen",
   "widgetVariantDefault": "Nur aktueller Preis",
   "widgetVariantPredictive": "Prognose: bester Tankzeitpunkt",
   "widgetPredictiveNowPrefix": "jetzt"

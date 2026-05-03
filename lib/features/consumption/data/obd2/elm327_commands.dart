@@ -199,6 +199,14 @@ class Elm327Commands {
   /// Request fuel tank level input (%). Mode 01, PID 2F. (#717)
   static const fuelTankLevelCommand = '012F\r';
 
+  /// Request fuel type. Mode 01, PID 51. (#1399). Single-byte response
+  /// per SAE-J1979 Table 6 — see [Elm327Parsers.parseFuelType] for the
+  /// mapping. Used during the VIN-driven adapter-pair auto-population
+  /// flow as a confirmation/override signal: when the ECU reports a
+  /// fuel type via PID 0x51, that wins over both the offline WMI
+  /// decoder and the online vPIC response.
+  static const fuelTypeCommand = '0151\r';
+
   /// Request Vehicle Identification Number. Mode 09, PID 02. Used to
   /// pick a manufacturer-specific odometer PID on cars that do not
   /// support the standard PID A6 (#719).

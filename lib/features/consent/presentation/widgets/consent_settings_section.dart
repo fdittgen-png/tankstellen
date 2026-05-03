@@ -44,6 +44,7 @@ class ConsentSettingsSection extends ConsumerWidget {
                 errorReporting: consent.errorReporting,
                 cloudSync: consent.cloudSync,
                 communityWaitTime: consent.communityWaitTime,
+                vinOnlineDecode: consent.vinOnlineDecode,
               ),
         ),
         SwitchListTile(
@@ -60,6 +61,7 @@ class ConsentSettingsSection extends ConsumerWidget {
                 errorReporting: v,
                 cloudSync: consent.cloudSync,
                 communityWaitTime: consent.communityWaitTime,
+                vinOnlineDecode: consent.vinOnlineDecode,
               ),
         ),
         SwitchListTile(
@@ -76,6 +78,7 @@ class ConsentSettingsSection extends ConsumerWidget {
                 errorReporting: consent.errorReporting,
                 cloudSync: v,
                 communityWaitTime: consent.communityWaitTime,
+                vinOnlineDecode: consent.vinOnlineDecode,
               ),
         ),
         SwitchListTile(
@@ -93,6 +96,24 @@ class ConsentSettingsSection extends ConsumerWidget {
                 errorReporting: consent.errorReporting,
                 cloudSync: consent.cloudSync,
                 communityWaitTime: v,
+                vinOnlineDecode: consent.vinOnlineDecode,
+              ),
+        ),
+        SwitchListTile(
+          secondary: const Icon(Icons.directions_car_outlined, size: 20),
+          title: Text(l10n?.gdprVinOnlineDecodeTitle ?? 'VIN online decode'),
+          subtitle: Text(
+            l10n?.gdprVinOnlineDecodeShort ??
+                "Decode the VIN via NHTSA's free public service",
+            style: theme.textTheme.bodySmall,
+          ),
+          value: consent.vinOnlineDecode,
+          onChanged: (v) => ref.read(gdprConsentProvider.notifier).save(
+                location: consent.location,
+                errorReporting: consent.errorReporting,
+                cloudSync: consent.cloudSync,
+                communityWaitTime: consent.communityWaitTime,
+                vinOnlineDecode: v,
               ),
         ),
       ],

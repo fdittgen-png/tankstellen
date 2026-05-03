@@ -850,6 +850,58 @@ class Obd2Service {
         label: 'fuelLevel',
       );
 
+  /// Read fuel type via Mode 01 PID 0x51 (#1399). Returns one of the
+  /// project's `preferredFuelType` enum keys ("petrol", "diesel",
+  /// "lpg", "cng", "electric") or null when:
+  ///   * the adapter isn't connected,
+  ///   * the ECU returned NO DATA (PID unsupported),
+  ///   * the response carried a reserved / unknown fuel-type code.
+  ///
+  /// Used during the VIN-driven adapter-pair auto-population flow as
+  /// the highest-priority signal — when this method returns a value,
+  /// it overrides both the offline WMI decoder and the online vPIC
+  /// `Fuel Type - Primary` field because PID 0x51 reports what the ECU
+  /// is actually configured for at runtime.
+  Future<String?> readFuelType() async {
+    if (!_transport.isConnected) return null;
+    try {
+      final response = await _send(Elm327Protocol.fuelTypeCommand);
+      return Elm327Protocol.parseFuelType(response);
+    } catch (e, st) {
+      debugPrint('OBD2 readFuelType failed: $e\n$st');
+      return null;
+    }
+  }
+
+  /// Read the Vehicle Identification Number via Mode 09 PID 02 (#1399).
+  ///
+  /// Public wrapper around the same command path used internally by
+  /// [_resolveVehicleCacheKey] (#811). Returns the parsed 17-character
+  /// VIN, or null when the adapter isn't connected, the ECU returned
+  /// NO DATA (most pre-2005 vehicles), or [Elm327Protocol.parseVin]
+  /// could not extract 17 valid VIN characters from the response.
+  ///
+  /// The ELM327 typically auto-handles the multi-frame ISO-15765-2
+  /// response — [Elm327Protocol.parseVin] strips the per-frame
+  /// `49 02 NN` headers + padding and returns the trailing 17 ASCII
+  /// chars.
+  ///
+  /// Errors are swallowed — every failure path returns null. The
+  /// caller surfaces "couldn't read VIN" UX based on the null result;
+  /// stack traces stay in the debug log via [debugPrint].
+  Future<String?> readVin() async {
+    if (!_transport.isConnected) return null;
+    try {
+      final response = await _send(Elm327Protocol.vinCommand);
+      final vin = Elm327Protocol.parseVin(response);
+      if (vin == null || vin.isEmpty) return null;
+      return vin;
+    } catch (e, st) {
+      debugPrint('OBD2 readVin failed: $e\n$st');
+      return null;
+    }
+  }
+
   /// Close the transport connection. Safe to call multiple times.
   Future<void> disconnect() async {
     await _transport.disconnect();

@@ -288,6 +288,27 @@ abstract class VehicleProfile with _$VehicleProfile {
     //     storage so the read path is ready when it lands.
     @Default(1.95) double tireCircumferenceMeters,
     List<double>? gearCentroids,
+
+    // VIN-driven auto-population fields (#1399). Stored separately from
+    // the user-entered fields above so the UI can:
+    //   1. Render a "(detected)" badge next to any user field whose
+    //      value matches the corresponding `detectedX` field.
+    //   2. Decide whether to auto-fill empty user fields on adapter
+    //      pair (yes when user field is null and detected is non-null).
+    //   3. Surface a "differs from detected — apply?" snackbar when
+    //      the user has manually entered a value that contradicts the
+    //      decoded one (no silent overwrite).
+    //
+    // `lastReadVin` / `lastVinReadAt` capture the timestamp of the
+    // most recent Mode 09 PID 02 read; the rest are the decoded fields
+    // from the offline WMI table + (optional) NHTSA vPIC response.
+    String? lastReadVin,
+    DateTime? lastVinReadAt,
+    String? detectedMake,
+    String? detectedModel,
+    int? detectedYear,
+    int? detectedEngineDisplacementCc,
+    String? detectedFuelType,
   }) = _VehicleProfile;
 
   factory VehicleProfile.fromJson(Map<String, dynamic> json) =>

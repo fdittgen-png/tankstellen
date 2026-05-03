@@ -233,6 +233,149 @@ void main() {
       expect(roundTripped, equals(data));
     });
   });
+
+  group('VinDecoder.decodeModelYearFromPosition10 (#1399)', () {
+    test('"L" at position 10 decodes to 2020 in 2026', () {
+      // Position 10 is index 9 (0-based). VIN has 9 chars + L + 7 chars = 17.
+      // L appears in both cycles: 1990 and 2020. With "now=2026", the
+      // decoder picks 2020 (newer cycle within +1 of now).
+      final year = VinDecoder.decodeModelYearFromPosition10(
+        'VF3123456L1234567',
+        now: DateTime(2026),
+      );
+      expect(year, 2020);
+    });
+
+    test('"L" at position 10 decodes to 1990 in 1995', () {
+      // In 1995 the newer cycle (2020) is in the future — fall back
+      // to the older cycle.
+      final year = VinDecoder.decodeModelYearFromPosition10(
+        'VF3123456L1234567',
+        now: DateTime(1995),
+      );
+      expect(year, 1990);
+    });
+
+    test('"8" at position 10 decodes to 2008 (only one cycle hit)', () {
+      // Digits start at 2001 — so "8" maps to 2008. The 2038 candidate
+      // is beyond +1 of any plausible "now" used in production today.
+      // VIN VF36B8HZL8R123456 — position 10 (index 9) = '8'.
+      final year = VinDecoder.decodeModelYearFromPosition10(
+        'VF36B8HZL8R123456',
+        now: DateTime(2026),
+      );
+      expect(year, 2008);
+    });
+
+    test('returns null for VIN shorter than 10 characters', () {
+      expect(
+        VinDecoder.decodeModelYearFromPosition10('VF38HKF'),
+        isNull,
+      );
+    });
+
+    test('returns null for forbidden character at position 10', () {
+      // VINs never use I/O/Q, but if a malformed string somehow has 'I'
+      // at position 10 we return null rather than throwing.
+      expect(
+        VinDecoder.decodeModelYearFromPosition10(
+          'VF3123456I1234567',
+          now: DateTime(2026),
+        ),
+        isNull,
+      );
+    });
+
+    test('boundary year-2010 character "A"', () {
+      // 'A' is 1980 in the older cycle and 2010 in the newer. In 2026,
+      // pick 2010.
+      final year = VinDecoder.decodeModelYearFromPosition10(
+        'VF3123456A1234567',
+        now: DateTime(2026),
+      );
+      expect(year, 2010);
+    });
+  });
+
+  group('VinDecoder offline path also decodes year (#1399)', () {
+    test('WMI fallback populates modelYear from position 10', () async {
+      final dio = _MockDio();
+      when(() => dio.get<Map<String, dynamic>>(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          )).thenThrow(DioException(
+        requestOptions: RequestOptions(path: ''),
+        type: DioExceptionType.connectionError,
+      ));
+      final dec = VinDecoder(dio: dio);
+      // Position 10 = '8' → 2008.
+      final r = await dec.decode('VF36B8HZL8R123456');
+      expect(r, isNotNull);
+      expect(r!.source, VinDataSource.wmiOffline);
+      expect(r.make, 'Peugeot');
+      expect(r.modelYear, 2008);
+    });
+
+    test('unknown WMI still gets year from position 10', () async {
+      final dio = _MockDio();
+      when(() => dio.get<Map<String, dynamic>>(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          )).thenThrow(DioException(
+        requestOptions: RequestOptions(path: ''),
+        type: DioExceptionType.connectionError,
+      ));
+      final dec = VinDecoder(dio: dio);
+      // Unknown WMI prefix ZZZ; position 10 (index 9) = '5' → 2005.
+      // Total length must be 17.
+      final r = await dec.decode('ZZZ1234565R123456');
+      expect(r, isNotNull);
+      expect(r!.source, VinDataSource.wmiOffline);
+      expect(r.make, isNull);
+      expect(r.modelYear, 2005);
+    });
+  });
+
+  group('VinDecoder gating on allowOnlineLookup (#1399)', () {
+    test('allowOnlineLookup=false skips network and returns wmiOffline',
+        () async {
+      final dio = _MockDio();
+      // Strict expectation: dio.get must NEVER be called when the
+      // online lookup flag is off.
+      final dec = VinDecoder(dio: dio, allowOnlineLookup: false);
+      final r = await dec.decode('VF36B8HZL8R123456');
+
+      expect(r, isNotNull);
+      expect(r!.source, VinDataSource.wmiOffline);
+      expect(r.make, 'Peugeot');
+      verifyNever(() => dio.get<Map<String, dynamic>>(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          ));
+    });
+
+    test('allowOnlineLookup=true (default) hits network', () async {
+      final dio = _MockDio();
+      when(() => dio.get<Map<String, dynamic>>(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          )).thenAnswer((_) async => Response<Map<String, dynamic>>(
+            requestOptions: RequestOptions(path: ''),
+            statusCode: 200,
+            data: _peugeot107VpicResponse,
+          ));
+
+      final dec = VinDecoder(dio: dio);
+      final r = await dec.decode('VF36B8HZL8R123456');
+
+      expect(r, isNotNull);
+      expect(r!.source, VinDataSource.vpic);
+      verify(() => dio.get<Map<String, dynamic>>(
+            any(),
+            queryParameters: any(named: 'queryParameters'),
+          )).called(1);
+    });
+  });
 }
 
 /// Condensed vPIC response. Real vPIC returns 130+ variables; we only

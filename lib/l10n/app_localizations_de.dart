@@ -4452,6 +4452,28 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wir haben Ihre FIN in NHTSA\'s kostenloser Fahrzeugdatenbank nachgeschlagen — nichts wurde an Tankstellen-Server gesendet.';
 
   @override
+  String get gdprVinOnlineDecodeTitle => 'VIN online dekodieren';
+
+  @override
+  String get gdprVinOnlineDecodeShort =>
+      'VIN über den kostenlosen NHTSA-Dienst dekodieren';
+
+  @override
+  String get gdprVinOnlineDecodeDescription =>
+      'Beim Koppeln eines Adapters wird die VIN deines Fahrzeugs lokal gelesen, um das Auto zu identifizieren. Wenn du dies aktivierst, wird die 17-stellige VIN an den kostenlosen vPIC-Dienst der NHTSA gesendet, um zusätzliche Details (Modell, Hubraum, Kraftstofftyp) abzurufen. Es wird nur die VIN gesendet — keine weiteren Daten verlassen dein Gerät.';
+
+  @override
+  String get vehicleDetectedFromVinBadge => '(erkannt)';
+
+  @override
+  String vehicleDetectedFromVinSnackbar(String summary) {
+    return 'Aus VIN erkannt: $summary. Übernehmen?';
+  }
+
+  @override
+  String get vehicleDetectedFromVinApply => 'Übernehmen';
+
+  @override
   String get widgetVariantDefault => 'Nur aktueller Preis';
 
   @override

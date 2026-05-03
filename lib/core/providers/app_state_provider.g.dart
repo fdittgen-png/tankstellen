@@ -624,13 +624,13 @@ final class HasGdprConsentProvider extends $FunctionalProvider<bool, bool, bool>
 String _$hasGdprConsentHash() => r'712d0d516ea832af3bc75b97776e595ce699d2dc';
 
 /// GDPR consent state: location, error reporting, cloud sync,
-/// community wait-time pings (#1119).
+/// community wait-time pings (#1119), VIN online decode (#1399).
 
 @ProviderFor(GdprConsent)
 final gdprConsentProvider = GdprConsentProvider._();
 
 /// GDPR consent state: location, error reporting, cloud sync,
-/// community wait-time pings (#1119).
+/// community wait-time pings (#1119), VIN online decode (#1399).
 final class GdprConsentProvider
     extends
         $NotifierProvider<
@@ -640,10 +640,11 @@ final class GdprConsentProvider
             bool communityWaitTime,
             bool errorReporting,
             bool location,
+            bool vinOnlineDecode,
           })
         > {
   /// GDPR consent state: location, error reporting, cloud sync,
-  /// community wait-time pings (#1119).
+  /// community wait-time pings (#1119), VIN online decode (#1399).
   GdprConsentProvider._()
     : super(
         from: null,
@@ -669,6 +670,7 @@ final class GdprConsentProvider
       bool communityWaitTime,
       bool errorReporting,
       bool location,
+      bool vinOnlineDecode,
     })
     value,
   ) {
@@ -681,16 +683,17 @@ final class GdprConsentProvider
               bool communityWaitTime,
               bool errorReporting,
               bool location,
+              bool vinOnlineDecode,
             })
           >(value),
     );
   }
 }
 
-String _$gdprConsentHash() => r'e08e226d7aea82864ce1a8371d949f92be135975';
+String _$gdprConsentHash() => r'db485b9d7fdb29445d66a954a7162f6dff704b0c';
 
 /// GDPR consent state: location, error reporting, cloud sync,
-/// community wait-time pings (#1119).
+/// community wait-time pings (#1119), VIN online decode (#1399).
 
 abstract class _$GdprConsent
     extends
@@ -700,9 +703,16 @@ abstract class _$GdprConsent
             bool communityWaitTime,
             bool errorReporting,
             bool location,
+            bool vinOnlineDecode,
           })
         > {
-  ({bool cloudSync, bool communityWaitTime, bool errorReporting, bool location})
+  ({
+    bool cloudSync,
+    bool communityWaitTime,
+    bool errorReporting,
+    bool location,
+    bool vinOnlineDecode,
+  })
   build();
   @$mustCallSuper
   @override
@@ -715,12 +725,14 @@ abstract class _$GdprConsent
                 bool communityWaitTime,
                 bool errorReporting,
                 bool location,
+                bool vinOnlineDecode,
               }),
               ({
                 bool cloudSync,
                 bool communityWaitTime,
                 bool errorReporting,
                 bool location,
+                bool vinOnlineDecode,
               })
             >;
     final element =
@@ -732,12 +744,14 @@ abstract class _$GdprConsent
                   bool communityWaitTime,
                   bool errorReporting,
                   bool location,
+                  bool vinOnlineDecode,
                 }),
                 ({
                   bool cloudSync,
                   bool communityWaitTime,
                   bool errorReporting,
                   bool location,
+                  bool vinOnlineDecode,
                 })
               >,
               ({
@@ -745,6 +759,7 @@ abstract class _$GdprConsent
                 bool communityWaitTime,
                 bool errorReporting,
                 bool location,
+                bool vinOnlineDecode,
               }),
               Object?,
               Object?

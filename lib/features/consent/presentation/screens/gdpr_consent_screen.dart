@@ -27,6 +27,7 @@ class GdprConsentScreen extends ConsumerWidget {
           errorReporting: form.errorReportingConsent,
           cloudSync: form.cloudSyncConsent,
           communityWaitTime: form.communityWaitTimeConsent,
+          vinOnlineDecode: form.vinOnlineDecodeConsent,
         );
     if (context.mounted) context.go('/setup');
   }
@@ -37,6 +38,7 @@ class GdprConsentScreen extends ConsumerWidget {
           errorReporting: true,
           cloudSync: true,
           communityWaitTime: true,
+          vinOnlineDecode: true,
         );
     if (context.mounted) context.go('/setup');
   }
@@ -125,6 +127,18 @@ class GdprConsentScreen extends ConsumerWidget {
                           'Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.',
                       value: form.communityWaitTimeConsent,
                       onChanged: notifier.setCommunityWaitTime,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // VIN online decode consent (#1399)
+                    _ConsentToggle(
+                      icon: Icons.directions_car_outlined,
+                      title: l10n?.gdprVinOnlineDecodeTitle ??
+                          'VIN online decode',
+                      description: l10n?.gdprVinOnlineDecodeDescription ??
+                          "When you pair an adapter, your vehicle's VIN is read locally to identify the car. Enabling this sends the 17-char VIN to NHTSA's free vPIC service to look up additional details (model, engine displacement, fuel type). The VIN is the only data sent — no other information leaves your device.",
+                      value: form.vinOnlineDecodeConsent,
+                      onChanged: notifier.setVinOnlineDecode,
                     ),
                     const SizedBox(height: 24),
 

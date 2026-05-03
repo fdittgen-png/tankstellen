@@ -847,4 +847,59 @@ void main() {
       expect(Elm327Parsers.parseVin(extraThenVin), tail);
     });
   });
+
+  group('parseFuelType (Mode 01 PID 51) — #1399', () {
+    test('0x01 (gasoline) maps to petrol', () {
+      expect(Elm327Parsers.parseFuelType('41 51 01'), 'petrol');
+    });
+
+    test('0x04 (diesel) maps to diesel', () {
+      expect(Elm327Parsers.parseFuelType('41 51 04'), 'diesel');
+    });
+
+    test('0x05 (LPG) maps to lpg', () {
+      expect(Elm327Parsers.parseFuelType('41 51 05'), 'lpg');
+    });
+
+    test('0x06 (CNG) maps to cng', () {
+      expect(Elm327Parsers.parseFuelType('41 51 06'), 'cng');
+    });
+
+    test('0x08 (electric) maps to electric', () {
+      expect(Elm327Parsers.parseFuelType('41 51 08'), 'electric');
+    });
+
+    test('0x09 (hybrid gasoline) maps to petrol', () {
+      expect(Elm327Parsers.parseFuelType('41 51 09'), 'petrol');
+    });
+
+    test('0x0B (hybrid diesel) maps to diesel', () {
+      expect(Elm327Parsers.parseFuelType('41 51 0B'), 'diesel');
+    });
+
+    test('0x0C (hybrid electric) maps to electric', () {
+      expect(Elm327Parsers.parseFuelType('41 51 0C'), 'electric');
+    });
+
+    test('reserved code 0x00 returns null', () {
+      expect(Elm327Parsers.parseFuelType('41 51 00'), isNull);
+    });
+
+    test('unknown code 0xFF returns null', () {
+      expect(Elm327Parsers.parseFuelType('41 51 FF'), isNull);
+    });
+
+    test('NO DATA returns null', () {
+      expect(Elm327Parsers.parseFuelType('NO DATA'), isNull);
+    });
+
+    test('mismatched PID echo returns null', () {
+      // Wrong PID — 0x52 instead of 0x51.
+      expect(Elm327Parsers.parseFuelType('41 52 01'), isNull);
+    });
+
+    test('short response returns null', () {
+      expect(Elm327Parsers.parseFuelType('41 51'), isNull);
+    });
+  });
 }

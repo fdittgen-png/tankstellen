@@ -4456,6 +4456,28 @@ class AppLocalizationsFr extends AppLocalizations {
       'Nous avons interrogé votre VIN dans la base de données gratuite NHTSA — rien n\'a été envoyé aux serveurs Tankstellen.';
 
   @override
+  String get gdprVinOnlineDecodeTitle => 'Décodage VIN en ligne';
+
+  @override
+  String get gdprVinOnlineDecodeShort =>
+      'Décoder le VIN via le service public gratuit de la NHTSA';
+
+  @override
+  String get gdprVinOnlineDecodeDescription =>
+      'Lorsque vous appairez un adaptateur, le VIN de votre véhicule est lu localement pour identifier la voiture. En activant cette option, le VIN à 17 caractères est envoyé au service vPIC gratuit de la NHTSA pour obtenir plus de détails (modèle, cylindrée, type de carburant). Seul le VIN est transmis — aucune autre donnée ne quitte votre appareil.';
+
+  @override
+  String get vehicleDetectedFromVinBadge => '(détecté)';
+
+  @override
+  String vehicleDetectedFromVinSnackbar(String summary) {
+    return 'Détecté à partir du VIN : $summary. Appliquer ?';
+  }
+
+  @override
+  String get vehicleDetectedFromVinApply => 'Appliquer';
+
+  @override
   String get widgetVariantDefault => 'Current price only';
 
   @override

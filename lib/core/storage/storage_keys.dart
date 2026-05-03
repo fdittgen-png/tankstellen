@@ -19,6 +19,13 @@ class StorageKeys {
   static const String consentErrorReporting = 'consent_error_reporting';
   static const String consentCloudSync = 'consent_cloud_sync';
   static const String consentCommunityWaitTime = 'consent_community_wait_time';
+  /// #1399 — opt-in toggle for sending the 17-character VIN to NHTSA's
+  /// free public vPIC service to enrich the VIN-driven profile auto-
+  /// population with full make/model/displacement/cylinders/fuel type.
+  /// Defaults to `false`: the offline WMI decoder (make + country +
+  /// year-from-position-10) always runs locally regardless of this
+  /// flag; only the network call is gated.
+  static const String consentVinOnlineDecode = 'consent_vin_online_decode';
   static const String swipeTutorialShown = 'swipe_tutorial_shown';
   static const String consumptionLog = 'consumption_log';
   static const String vehicleProfiles = 'vehicle_profiles';

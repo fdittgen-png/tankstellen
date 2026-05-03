@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,6 +11,7 @@ import '../../domain/entities/vehicle_profile.dart';
 import '../../domain/entities/vin_data.dart';
 import '../../providers/obd2_vin_reader_provider.dart';
 import '../../providers/vehicle_providers.dart';
+import '../../providers/vin_adapter_pair_auto_populator_provider.dart';
 import '../../providers/vin_decoder_provider.dart';
 import '../widgets/auto_record_section.dart';
 import '../widgets/ve_reset_confirm_dialog.dart';
@@ -350,6 +353,92 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
       _adapterMac = mac;
     });
     _save();
+    // #1399 — fire-and-forget VIN-driven auto-population. Only runs
+    // when an adapter was just PAIRED (not unpaired) and we have an
+    // existing profile id to write the detected fields onto. The
+    // populator is silent on every error path; the only user-facing
+    // surface is an optional "Detected: ... Apply?" snackbar when the
+    // decoded values disagree with values the user has entered.
+    if (mac != null && mac.isNotEmpty) {
+      unawaited(_runAutoPopulationAfterPair(mac));
+    }
+  }
+
+  /// #1399 — run the post-pair auto-population flow. Always returns
+  /// quickly (the orchestrator owns the connect/disconnect lifecycle
+  /// and a bounded timeout); never throws.
+  Future<void> _runAutoPopulationAfterPair(String pairedAdapterMac) async {
+    final id = _existingId;
+    if (id == null) return;
+    final populator = ref.read(vinAdapterPairAutoPopulatorProvider);
+    final existing = ref
+        .read(vehicleProfileListProvider)
+        .where((v) => v.id == id)
+        .firstOrNull;
+    if (existing == null) return;
+
+    final outcome = await populator.run(
+      pairedAdapterMac: pairedAdapterMac,
+      profile: existing,
+    );
+    if (!mounted) return;
+
+    final updated = outcome.profile;
+    if (updated == null) return;
+
+    // Persist the merged profile + reload local form state so the
+    // "(detected)" badges reflect the fresh detected-* values and any
+    // auto-filled user fields (make/model/year/displacement/fuelType)
+    // show up immediately in the controllers.
+    await ref.read(vehicleProfileListProvider.notifier).save(updated);
+    if (!mounted) return;
+    setState(() {
+      _engineDisplacementCc = updated.engineDisplacementCc;
+      _engineCylinders = updated.engineCylinders;
+      _curbWeightKg = updated.curbWeightKg;
+      // The form controllers re-read the canonical profile via the
+      // load() helper so VIN / preferredFuelType etc. land in the
+      // text fields as well.
+      _ctrl.load(updated);
+    });
+
+    final summary = outcome.conflictSummary;
+    if (summary == null) return;
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          l?.vehicleDetectedFromVinSnackbar(summary) ??
+              'Detected from VIN: $summary. Apply?',
+        ),
+        action: SnackBarAction(
+          label: l?.vehicleDetectedFromVinApply ?? 'Apply',
+          onPressed: () => _applyDetectedConflicts(updated),
+        ),
+      ),
+    );
+  }
+
+  /// #1399 — overwrite the user-entered fields with the detected-*
+  /// values when they disagree, after the user explicitly tapped
+  /// "Apply" on the conflict snackbar.
+  Future<void> _applyDetectedConflicts(VehicleProfile profile) async {
+    final overwritten = profile.copyWith(
+      make: profile.detectedMake ?? profile.make,
+      model: profile.detectedModel ?? profile.model,
+      year: profile.detectedYear ?? profile.year,
+      engineDisplacementCc:
+          profile.detectedEngineDisplacementCc ?? profile.engineDisplacementCc,
+      preferredFuelType:
+          profile.detectedFuelType ?? profile.preferredFuelType,
+    );
+    await ref.read(vehicleProfileListProvider.notifier).save(overwritten);
+    if (!mounted) return;
+    setState(() {
+      _engineDisplacementCc = overwritten.engineDisplacementCc;
+      _ctrl.load(overwritten);
+    });
   }
 
   /// #815 — confirm-dialog → write default η_v (0.85), reset samples.
