@@ -124,6 +124,20 @@ void main() {
           reason: 'French (fr) must have every vehicle-edit, calibration, '
               'service-reminder and VIN key — the Edit vehicle screen '
               'must not fall back to English for French users (#1218)');
+
+      // The Fuel Club Cards (loyalty) settings sub-screen shipped with
+      // only `en` + `de` ARB fragments, so French users saw an entirely
+      // English screen — including the menu tile that opens it. Same
+      // rule as onboarding / vehicle-edit: surfaces a French user can
+      // reach must not fall back to English.
+      final frenchMissingLoyalty = frenchMissing
+          .where((k) => k.startsWith('loyalty'))
+          .toList()
+        ..sort();
+      expect(frenchMissingLoyalty, isEmpty,
+          reason: 'French (fr) must have every loyalty* key — the '
+              'Fuel club cards screen and its add-card sheet must not '
+              'fall back to English for French users');
     });
 
     test('no locale has extra keys not in app_en.arb', () {
