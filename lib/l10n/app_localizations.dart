@@ -8120,6 +8120,42 @@ abstract class AppLocalizations {
   /// **'Pair an OBD2 adapter first to read VIN automatically'**
   String get vehicleReadVinNoAdapterHint;
 
+  /// Button on the new-vehicle edit screen that opens the reference catalog picker (#1372 phase 3) so users can pre-fill make/model/year/displacement/volumetricEfficiency from a curated list.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick from catalog'**
+  String get pickerButtonLabel;
+
+  /// Hint text shown in the search field of the reference vehicle picker bottom sheet (#1372 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Search make or model'**
+  String get pickerSearchHint;
+
+  /// Helper subtitle next to the picker button explaining the catalog size (#1372 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-fill from 50+ supported vehicles'**
+  String get pickerHelpText;
+
+  /// Empty-state shown in the picker sheet when the search query matches no catalog entries (#1372 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'No matches'**
+  String get pickerEmptyResults;
+
+  /// Cancel button in the reference vehicle picker bottom sheet (#1372 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get pickerCancel;
+
+  /// Loading-state label shown in the reference vehicle picker bottom sheet while the catalog asset is decoding (#1372 phase 3).
+  ///
+  /// In en, this message translates to:
+  /// **'Loading catalog…'**
+  String get pickerLoading;
+
   /// Tooltip + Semantics label for the info icon next to the VIN field on EditVehicleScreen (#895).
   ///
   /// In en, this message translates to:

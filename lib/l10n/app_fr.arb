@@ -1171,5 +1171,11 @@
   "calibrationLearnerStatusCalibrated": "η_v : {eta} (calibré, {samples} pleins)",
   "calibrationLearnerStatusLearning": "η_v : {eta} (apprentissage, {samples} pleins)",
   "calibrationLearnerStatusNoSamples": "η_v : 0.85 (par défaut — aucun plein complet)",
-  "calibrationResetLearner": "Réinitialiser l'apprentissage"
+  "calibrationResetLearner": "Réinitialiser l'apprentissage",
+  "pickerButtonLabel": "Choisir dans le catalogue",
+  "pickerSearchHint": "Rechercher marque ou modèle",
+  "pickerHelpText": "Pré-remplir depuis 50+ véhicules pris en charge",
+  "pickerEmptyResults": "Aucun résultat",
+  "pickerCancel": "Annuler",
+  "pickerLoading": "Chargement du catalogue…"
 }

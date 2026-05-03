@@ -4464,6 +4464,24 @@ class AppLocalizationsDe extends AppLocalizations {
       'OBD2-Adapter koppeln, um VIN automatisch auszulesen';
 
   @override
+  String get pickerButtonLabel => 'Aus Katalog wählen';
+
+  @override
+  String get pickerSearchHint => 'Marke oder Modell suchen';
+
+  @override
+  String get pickerHelpText => 'Aus 50+ unterstützten Fahrzeugen vorbefüllen';
+
+  @override
+  String get pickerEmptyResults => 'Keine Treffer';
+
+  @override
+  String get pickerCancel => 'Abbrechen';
+
+  @override
+  String get pickerLoading => 'Katalog wird geladen…';
+
+  @override
   String get vinInfoTooltip => 'Was ist eine FIN?';
 
   @override
