@@ -91,6 +91,7 @@ docs/guides/*
 !docs/guides/driving-insights.md
 !docs/guides/auto-record.md
 !docs/guides/SCHEMA-BACKUP-XML.md
+!docs/guides/ios-auto-record.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
