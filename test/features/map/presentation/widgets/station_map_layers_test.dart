@@ -199,6 +199,130 @@ void main() {
       },
     );
   });
+
+  group('StationMapLayers cold-start tile reset window (#1316 phase 3)', () {
+    testWidgets(
+      'reset stream re-fires on programmatic camera moves during the '
+      'cold-start window so TileLayer reloads after `fitCamera` settles',
+      (tester) async {
+        tester.view.physicalSize = const Size(900, 1600);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final mapController = MapController();
+        addTearDown(mapController.dispose);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: StationMapLayers(
+                mapController: mapController,
+                stations: const [_seedStation],
+                center: const LatLng(52.5210, 13.4100),
+                zoom: 12,
+                searchRadiusKm: 10,
+                selectedFuel: FuelType.diesel,
+              ),
+            ),
+          ),
+        );
+
+        // The initState first-paint reset fired during pumpWidget's
+        // post-frame stage, so a listener attached now misses it
+        // (broadcast streams do not replay). That part is already
+        // covered by the existing "TileLayer.reset stream is wired"
+        // test above. Here we focus on the phase-3 invariant: a
+        // programmatic camera move during the cold-start window must
+        // produce at least one fresh reset.
+        final reset = tester.widget<TileLayer>(find.byType(TileLayer)).reset!;
+        final emissions = <void>[];
+        final sub = reset.listen(emissions.add);
+        addTearDown(sub.cancel);
+
+        // Simulate `NearbyMapView`s post-frame `fitCamera` arriving
+        // AFTER the initState reset already fired. Before #1316
+        // phase 3, this left TileLayer with whatever tile range it
+        // computed at the bootstrap camera — typically only a handful
+        // of tiles around the (possibly stale) initial centre. Now
+        // the cold-start subscriber must catch this event and
+        // re-emit reset so TileLayer reloads against the settled
+        // camera.
+        mapController.move(const LatLng(43.4500, 3.4900), 12);
+        await tester.pump(const Duration(milliseconds: 16));
+
+        expect(
+          emissions,
+          isNotEmpty,
+          reason:
+              '#1316 — programmatic camera moves during the cold-start '
+              'window must re-emit on the reset stream so TileLayer '
+              'recomputes its visible-tile set against the settled '
+              'camera. Previously the initState reset fired against the '
+              'bootstrap camera; if `fitCamera` (or any controller move) '
+              'arrived later, TileLayer kept the small tile set from '
+              'the bootstrap camera, leaving most of the map grey.',
+        );
+      },
+    );
+
+    testWidgets(
+      'after the cold-start window, programmatic moves no longer trigger '
+      'extra resets (steady-state pans must not pop tiles)',
+      (tester) async {
+        tester.view.physicalSize = const Size(900, 1600);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final mapController = MapController();
+        addTearDown(mapController.dispose);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: StationMapLayers(
+                mapController: mapController,
+                stations: const [_seedStation],
+                center: const LatLng(52.5210, 13.4100),
+                zoom: 12,
+                searchRadiusKm: 10,
+                selectedFuel: FuelType.diesel,
+              ),
+            ),
+          ),
+        );
+
+        final reset = tester.widget<TileLayer>(find.byType(TileLayer)).reset!;
+        final emissions = <void>[];
+        final sub = reset.listen(emissions.add);
+        addTearDown(sub.cancel);
+
+        // Burn past the 3-second cold-start window.
+        await tester.pump(const Duration(seconds: 4));
+        final baseline = emissions.length;
+
+        // Programmatic move AFTER the window — must not re-emit on
+        // the reset stream. TileLayer has its own load-on-event
+        // handling for steady-state pans; gratuitous resets pop the
+        // visible tiles back to their loading state.
+        mapController.move(const LatLng(43.4500, 3.4900), 12);
+        await tester.pump(const Duration(milliseconds: 16));
+
+        expect(
+          emissions.length,
+          baseline,
+          reason:
+              'After [_coldStartResetWindow] elapses, programmatic '
+              'camera moves must no longer fire the reset stream — '
+              'TileLayer\'s normal event-driven load path handles '
+              'steady-state pans and an extra reset would briefly '
+              'wipe the visible tiles. The cold-start subscription '
+              'must self-cancel.',
+        );
+      },
+    );
+  });
 }
 
 const _seedStation = Station(
