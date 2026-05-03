@@ -31,7 +31,7 @@ class TraceStorage {
         .map((raw) {
           if (raw is! Map) return null;
           try {
-            return ErrorTrace.fromJson(Map<String, dynamic>.from(raw));
+            return ErrorTrace.fromJson(_jsonMapFrom(raw));
           } on Object catch (e, st) {
             // #1301 — schema migrations can leave entries that throw
             // TypeError (missing required field) rather than the
@@ -52,7 +52,7 @@ class TraceStorage {
     final raw = _box.get(id);
     if (raw is! Map) return null;
     try {
-      return ErrorTrace.fromJson(Map<String, dynamic>.from(raw));
+      return ErrorTrace.fromJson(_jsonMapFrom(raw));
     } on Object catch (e, st) {
       // See [getAll] for the rationale behind the broad catch (#1301).
       debugPrint('TraceStorage: trace parse failed: $e\n$st');
@@ -100,7 +100,7 @@ class TraceStorage {
     final unparsed = <Map<String, dynamic>>[];
     for (final raw in _box.values) {
       if (raw is! Map) continue;
-      final asMap = Map<String, dynamic>.from(raw);
+      final asMap = _jsonMapFrom(raw);
       try {
         ErrorTrace.fromJson(asMap);
       } on Object catch (e, st) {
@@ -109,6 +109,28 @@ class TraceStorage {
       }
     }
     return unparsed;
+  }
+
+  /// Recursively coerces a Hive-returned [Map] (which is typed
+  /// `Map<dynamic, dynamic>` for every nested map and `List<dynamic>` for
+  /// nested lists) into a JSON-compatible structure where every map is
+  /// `Map<String, dynamic>` and every list of maps is
+  /// `List<Map<String, dynamic>>`. Without this, `_$ErrorTraceFromJson`
+  /// (and every nested `_$XFromJson`) throws `TypeError` on the first
+  /// `as Map<String, dynamic>` cast against a Hive-shaped nested map —
+  /// see #1388.
+  Map<String, dynamic> _jsonMapFrom(Map raw) {
+    final result = <String, dynamic>{};
+    raw.forEach((key, value) {
+      result[key.toString()] = _coerceJsonValue(value);
+    });
+    return result;
+  }
+
+  dynamic _coerceJsonValue(dynamic value) {
+    if (value is Map) return _jsonMapFrom(value);
+    if (value is List) return value.map(_coerceJsonValue).toList();
+    return value;
   }
 
   /// Serialises every persisted trace into a single JSON document the
