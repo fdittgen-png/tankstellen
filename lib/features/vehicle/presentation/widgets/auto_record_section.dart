@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../consumption/data/obd2/adapter_registry.dart';
-import '../../../consumption/presentation/widgets/obd2_adapter_picker.dart';
 import '../../domain/entities/vehicle_profile.dart';
 import '../../providers/vehicle_providers.dart';
 
@@ -23,8 +20,10 @@ import '../../providers/vehicle_providers.dart';
 ///
 ///   * Active — both prerequisites satisfied; auto-record arms next
 ///     drive.
-///   * Needs pairing — no `pairedAdapterMac` set; CTA pushes the
-///     OBD2 onboarding wizard.
+///   * Needs pairing — no `pairedAdapterMac` set. #1400 — the card
+///     surfaces a passive informational link pointing the user at
+///     the canonical "OBD2 adapter" card below; the actual pair CTA
+///     lives there to consolidate the two adapter-pair entry points.
 ///   * Needs background location — adapter paired but consent
 ///     missing; the existing background-location row below already
 ///     surfaces the OS prompt.
@@ -66,22 +65,14 @@ class AutoRecordSection extends ConsumerWidget {
   /// real Android intent.
   final Future<void> Function()? openSettings;
 
-  /// Hook invoked when the user taps the "Pair an adapter" CTA on the
-  /// state-aware status banner (#1310). When supplied this hook fully
-  /// owns the CTA — the production picker + persist + `/setup`
-  /// fallback are all skipped. Tests inject a counter to assert the
-  /// CTA dispatched without bringing up the picker. Null defers to
-  /// the production behaviour — open [showObd2AdapterPairer] inline
-  /// and persist the picked adapter onto the current profile (#1350).
-  final VoidCallback? onPairAdapter;
-
-  /// Picker seam for [_handlePairAdapter] (#1350). Null defers to the
-  /// production [showObd2AdapterPairer] which mounts the modal sheet
-  /// and resolves with a [ResolvedObd2Candidate] on pick or `null`
-  /// on cancel. Tests inject a stub so the candidate flows into the
-  /// persist path without binding the OBD2 stack.
-  final Future<ResolvedObd2Candidate?> Function(BuildContext)?
-      showAdapterPicker;
+  /// Hook invoked when the user taps the passive "Pair an adapter in
+  /// the section below" link rendered while the vehicle has no paired
+  /// adapter (#1400). Wired by [EditVehicleScreen] to scroll the host
+  /// `ListView` to the canonical "OBD2 adapter" card and pulse its
+  /// border. Null is permitted (e.g. isolated widget tests that don't
+  /// care about scrolling); the link still renders and tapping it is a
+  /// safe no-op.
+  final VoidCallback? onScrollToObd2Card;
 
   const AutoRecordSection({
     super.key,
@@ -89,8 +80,7 @@ class AutoRecordSection extends ConsumerWidget {
     this.requestBackgroundLocation,
     this.requestForegroundLocation,
     this.openSettings,
-    this.onPairAdapter,
-    this.showAdapterPicker,
+    this.onScrollToObd2Card,
   });
 
   static Future<PermissionStatus> _defaultRequestBackgroundLocation() {
@@ -151,11 +141,7 @@ class AutoRecordSection extends ConsumerWidget {
               state: _statusFor(profile),
               theme: theme,
               l: l,
-              onPairAdapter: () => _handlePairAdapter(
-                context: context,
-                ref: ref,
-                profile: profile,
-              ),
+              onScrollToObd2Card: onScrollToObd2Card,
             ),
             const SizedBox(height: 16),
             _SpeedThresholdSlider(
@@ -225,95 +211,6 @@ class AutoRecordSection extends ConsumerWidget {
       return _AutoRecordStatus.needsBackgroundLocation;
     }
     return _AutoRecordStatus.active;
-  }
-
-  /// "Pair an adapter" CTA on the [_AutoRecordStatus.needsPairing]
-  /// banner.
-  ///
-  /// Behaviour (#1350):
-  ///   1. If [onPairAdapter] is injected (tests) it fully owns the
-  ///      tap — invoked and returned, no picker, no fallback.
-  ///   2. Otherwise open [showObd2AdapterPairer] (or the injected
-  ///      [showAdapterPicker] seam) inline. On a non-null result,
-  ///      persist `pairedAdapterMac` + `obd2AdapterMac` +
-  ///      `obd2AdapterName` onto the current profile so the banner
-  ///      flips to `active` (or `needsBackgroundLocation`) on the
-  ///      next rebuild.
-  ///   3. On cancel (null result) OR on picker exception, fall back
-  ///      to `GoRouter.go('/setup')` per the issue spec — the user
-  ///      asked to pair, so route them somewhere that still surfaces
-  ///      the wizard rather than silently dropping the tap.
-  ///
-  /// Pre-#1350 the production fallback ALWAYS routed to `/setup`
-  /// even on a successful pick, sending the user into an unrelated
-  /// onboarding wizard whose result landed on a freshly-saved
-  /// profile rather than the vehicle they were editing. The picker
-  /// is now invoked inline and writes back to the right profile.
-  Future<void> _handlePairAdapter({
-    required BuildContext context,
-    required WidgetRef ref,
-    required VehicleProfile profile,
-  }) async {
-    final hook = onPairAdapter;
-    if (hook != null) {
-      hook();
-      return;
-    }
-    final picker = showAdapterPicker ?? showObd2AdapterPairer;
-    ResolvedObd2Candidate? result;
-    try {
-      result = await picker(context);
-    } catch (e, st) {
-      // Surface picker failures via debugPrint (cheap, test-safe — the
-      // structured `errorLogger` opens a Hive box that isolated widget
-      // pumps don't initialise). No silent catch — body has a log
-      // statement so `no_silent_catch_test` stays green.
-      debugPrint(
-        'AutoRecordSection: pair-adapter picker failed: $e\n$st',
-      );
-      if (!context.mounted) return;
-      _navigateToSetupFallback(context);
-      return;
-    }
-    if (result == null) {
-      // User cancelled the picker. Per the #1350 spec the `/setup`
-      // fallback fires here so the user has SOMEWHERE to land — the
-      // CTA must never feel like a no-op.
-      if (!context.mounted) return;
-      _navigateToSetupFallback(context);
-      return;
-    }
-    final mac = result.candidate.deviceId;
-    final name = result.candidate.deviceName.isEmpty
-        ? result.profile.displayName
-        : result.candidate.deviceName;
-    await _persist(
-      ref,
-      profile.copyWith(
-        pairedAdapterMac: mac,
-        obd2AdapterMac: mac,
-        obd2AdapterName: name,
-      ),
-    );
-  }
-
-  /// Best-effort `/setup` route push used as the cancel/error
-  /// fallback for [_handlePairAdapter]. A missing router context
-  /// (isolated widget pump) is logged via [debugPrint] rather than
-  /// thrown so the surface stays testable. We deliberately avoid the
-  /// structured [errorLogger] here because it opens a Hive box and
-  /// widget tests that pump this section without initialising Hive
-  /// would fail noisily on what is otherwise a benign test-pump
-  /// shape.
-  void _navigateToSetupFallback(BuildContext context) {
-    try {
-      GoRouter.of(context).go('/setup');
-    } catch (e, st) {
-      // No silent catch — body logs the failure.
-      debugPrint(
-        'AutoRecordSection: pair-adapter setup-fallback nav failed: $e\n$st',
-      );
-    }
   }
 
   /// Two-step background-location grant flow (#1302).
@@ -462,7 +359,10 @@ class AutoRecordSection extends ConsumerWidget {
 
 /// Three real prerequisites the auto-record orchestrator gates on
 /// (#1310). Drives the colour, icon, copy, and presence of the
-/// "Pair an adapter" CTA on [_AutoRecordStatusBanner].
+/// passive "Pair an adapter in the section below" link on
+/// [_AutoRecordStatusBanner] (#1400 — replaces the pre-#1400
+/// orange-tinted "Pair an adapter" CTA that duplicated the canonical
+/// pair button on the OBD2 card directly below).
 enum _AutoRecordStatus {
   /// Adapter paired and background-location consent granted —
   /// orchestrator will arm next time the user enters the car.
@@ -482,17 +382,30 @@ class _AutoRecordStatusBanner extends StatelessWidget {
   final _AutoRecordStatus state;
   final ThemeData theme;
   final AppLocalizations? l;
-  final VoidCallback onPairAdapter;
+  final VoidCallback? onScrollToObd2Card;
 
   const _AutoRecordStatusBanner({
     required this.state,
     required this.theme,
     required this.l,
-    required this.onPairAdapter,
+    required this.onScrollToObd2Card,
   });
 
   @override
   Widget build(BuildContext context) {
+    // #1400 — needsPairing renders a passive informational link
+    // pointing the user at the canonical OBD2 adapter card below
+    // instead of duplicating the pair CTA inline. Other states keep
+    // the pre-#1400 banner shape.
+    if (state == _AutoRecordStatus.needsPairing) {
+      return _PairAdapterLink(
+        key: const Key('autoRecordStatusBannerNeedsPairing'),
+        theme: theme,
+        l: l,
+        onTap: onScrollToObd2Card,
+      );
+    }
+
     final isActive = state == _AutoRecordStatus.active;
     final container = isActive
         ? theme.colorScheme.primaryContainer
@@ -509,38 +422,19 @@ class _AutoRecordStatusBanner extends StatelessWidget {
         color: container,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, color: onContainer, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  _labelFor(state, l),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: onContainer,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (state == _AutoRecordStatus.needsPairing) ...[
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: FilledButton.tonalIcon(
-                key: const Key('autoRecordStatusPairAdapterCta'),
-                onPressed: onPairAdapter,
-                icon: const Icon(Icons.bluetooth_searching),
-                label: Text(
-                  l?.autoRecordStatusPairAdapterCta ?? 'Pair an adapter',
-                ),
+          Icon(icon, color: onContainer, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              _labelFor(state, l),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: onContainer,
               ),
             ),
-          ],
+          ),
         ],
       ),
     );
@@ -552,6 +446,10 @@ class _AutoRecordStatusBanner extends StatelessWidget {
         return l?.autoRecordStatusActiveLabel ??
             'Auto-record will activate the next time you enter the car.';
       case _AutoRecordStatus.needsPairing:
+        // Unused for needsPairing — the passive link in
+        // [_PairAdapterLink] supplies its own copy. Kept as a fallback
+        // for completeness so a future refactor that re-routes this
+        // helper for needsPairing still gets a sensible string.
         return l?.autoRecordStatusNeedsPairingLabel ??
             'Pair an OBD2 adapter to enable auto-record.';
       case _AutoRecordStatus.needsBackgroundLocation:
@@ -570,6 +468,56 @@ class _AutoRecordStatusBanner extends StatelessWidget {
       case _AutoRecordStatus.needsBackgroundLocation:
         return 'autoRecordStatusBannerNeedsBackgroundLocation';
     }
+  }
+}
+
+/// Passive informational link rendered in the [_AutoRecordStatus.needsPairing]
+/// state (#1400). Replaces the pre-#1400 orange-tinted "Pair an
+/// adapter" button + warning box that duplicated the canonical pair
+/// CTA on the OBD2 adapter card directly below this section. Tapping
+/// the link calls [onTap] (wired by [EditVehicleScreen] to scroll to
+/// and pulse the OBD2 card); a null callback is a safe no-op so
+/// isolated widget tests don't need to wire scroll plumbing.
+class _PairAdapterLink extends StatelessWidget {
+  final ThemeData theme;
+  final AppLocalizations? l;
+  final VoidCallback? onTap;
+
+  const _PairAdapterLink({
+    super.key,
+    required this.theme,
+    required this.l,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = theme.colorScheme.onSurfaceVariant;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: InkWell(
+        key: const Key('autoRecordPairAdapterLink'),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              Icon(Icons.info_outline, size: 18, color: color),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l?.autoRecordPairAdapterLinkText ??
+                      'Pair an adapter in the section below to enable '
+                          'auto-recording',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ),
+              Icon(Icons.arrow_downward, size: 16, color: color),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

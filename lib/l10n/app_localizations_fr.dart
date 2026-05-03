@@ -3197,6 +3197,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get autoRecordBadgeClearTooltip => 'Effacer le compteur';
 
   @override
+  String get autoRecordPairAdapterLinkText =>
+      'Associez un adaptateur dans la section ci-dessous pour activer l\'enregistrement automatique';
+
+  @override
   String get exportBackupTooltip => 'Exporter la sauvegarde';
 
   @override

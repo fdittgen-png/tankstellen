@@ -34,9 +34,28 @@ class EditVehicleScreen extends ConsumerStatefulWidget {
   ConsumerState<EditVehicleScreen> createState() => _EditVehicleScreenState();
 }
 
-class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
+class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _ctrl = VehicleFormControllers();
+
+  // #1400 — anchors the OBD2 adapter card in the scrollable so the
+  // passive "Pair an adapter in the section below" link on the
+  // auto-record card can `Scrollable.ensureVisible` to it.
+  final GlobalKey _obd2CardKey = GlobalKey();
+
+  // #1400 — scroll controller for the host `ListView`. Owned here
+  // (instead of relying on the implicit primary controller) so the
+  // auto-record link's tap handler can fall back to an `animateTo(0)`
+  // when the OBD2 card has been virtualised out of the tree by
+  // ListView's lazy build, then run `Scrollable.ensureVisible` once
+  // the card remounts.
+  final ScrollController _scrollController = ScrollController();
+
+  // #1400 — drives a brief amber border pulse on the OBD2 card after
+  // the user taps the auto-record link. forward → reverse runs
+  // 1 s end-to-end (500 ms each way).
+  late final AnimationController _obd2HighlightController;
 
   // #710 — combustion default; user can flip to Hybrid/Electric.
   VehicleType _type = VehicleType.combustion;
@@ -75,6 +94,10 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
     super.initState();
     // Rebuild on every name keystroke so the header title tracks input.
     _ctrl.nameController.addListener(_refresh);
+    _obd2HighlightController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
     if (widget.vehicleId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _loadExisting());
     }
@@ -120,7 +143,64 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
   void dispose() {
     _ctrl.nameController.removeListener(_refresh);
     _ctrl.dispose();
+    _obd2HighlightController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  /// Scrolls the host `ListView` so the OBD2 adapter card is visible
+  /// near the top of the viewport and pulses an amber border around
+  /// it for ~1 s (#1400). Wired to the passive "Pair an adapter in
+  /// the section below" link on the auto-record card so users have a
+  /// single canonical place to pair an adapter — this method just
+  /// surfaces it.
+  ///
+  /// Two-stage scroll: ListView lazily builds children, so when the
+  /// user has scrolled the auto-record link into view the OBD2 card
+  /// (which lives ABOVE) may have already been virtualised out of
+  /// the tree. In that case `_obd2CardKey.currentContext` is null
+  /// and `Scrollable.ensureVisible` cannot fire. We `animateTo(0)`
+  /// first to pull the OBD2 card back into the tree, then run
+  /// `ensureVisible` so the card lands near the top of the viewport
+  /// regardless of small layout shifts above (header / identity /
+  /// drivetrain cards).
+  ///
+  /// Safe no-op if the OBD2 card isn't in the tree even after the
+  /// pull-back (e.g. brand-new vehicle that hasn't been saved yet —
+  /// the extras section is gated on `_existingId != null`).
+  Future<void> _scrollToAndHighlightObd2Card() async {
+    // Stage 1 — pull the OBD2 card back into the tree. Cheap no-op
+    // when the controller has no clients (e.g. isolated widget
+    // pumps that don't mount a Scrollable) or when offset is
+    // already near zero.
+    if (_scrollController.hasClients && _scrollController.offset > 0) {
+      await _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+      if (!mounted) return;
+    }
+    // Stage 2 — once the card is in the tree, ensure it lands at
+    // alignment 0.1 (near the top, with a small breathing-room
+    // strip above so the user can see we scrolled). The
+    // `currentContext` lookup happens AFTER the previous await so
+    // we always pick up the freshly-mounted element.
+    final ctx = _obd2CardKey.currentContext;
+    if (ctx == null || !ctx.mounted) return;
+    await Scrollable.ensureVisible(
+      ctx,
+      duration: const Duration(milliseconds: 400),
+      alignment: 0.1,
+    );
+    if (!mounted) return;
+    // Run the highlight controller once forward → reverse so the
+    // border fades in over 500 ms then back out over 500 ms (1 s
+    // total). Awaiting forward then reverse keeps the controller
+    // sequence deterministic for tests.
+    await _obd2HighlightController.forward(from: 0.0);
+    if (!mounted) return;
+    await _obd2HighlightController.reverse();
   }
 
   /// Open the VIN explanation sheet (#895). Restores focus on dismiss
@@ -334,6 +414,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
+          controller: _scrollController,
           padding: EdgeInsets.fromLTRB(16, 16, 16,
               MediaQuery.of(context).viewPadding.bottom + 96),
           children: [
@@ -405,12 +486,23 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen> {
                 onAdapterForget: () => _onAdapterChanged(null, null),
                 onResetVolumetricEfficiency: _resetVolumetricEfficiency,
                 currentOdometerKm: ref.latestOdometerKm(_existingId!),
+                obd2CardKey: _obd2CardKey,
+                obd2HighlightAnimation: _obd2HighlightController,
               ),
               // Card: hands-free auto-record settings (#1004 phase 6).
               // Spread alongside the extras list so the host ListView
               // owns scroll virtualisation for the row.
+              // #1400 — the auto-record card's "Pair an adapter in the
+              // section below" link calls back into the screen so we
+              // can `Scrollable.ensureVisible` the canonical OBD2 card
+              // and pulse its border. The link replaces the duplicate
+              // orange-tinted "Pair an adapter" button that lived in
+              // the auto-record card before #1400.
               const SizedBox(height: 16),
-              AutoRecordSection(vehicleId: _existingId!),
+              AutoRecordSection(
+                vehicleId: _existingId!,
+                onScrollToObd2Card: _scrollToAndHighlightObd2Card,
+              ),
             ],
           ],
         ),

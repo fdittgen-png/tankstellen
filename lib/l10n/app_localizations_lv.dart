@@ -3171,6 +3171,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get autoRecordBadgeClearTooltip => 'Clear counter';
 
   @override
+  String get autoRecordPairAdapterLinkText =>
+      'Pair an adapter in the section below to enable auto-recording';
+
+  @override
   String get exportBackupTooltip => 'Export backup';
 
   @override

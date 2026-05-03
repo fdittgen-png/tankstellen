@@ -5930,6 +5930,12 @@ abstract class AppLocalizations {
   /// **'Clear counter'**
   String get autoRecordBadgeClearTooltip;
 
+  /// Passive informational link rendered on the auto-record card when no adapter is paired (#1400). Replaces the duplicate orange-tinted 'Pair an adapter' CTA that lived in the auto-record card before #1400; tapping the link scrolls to the canonical 'OBD2 adapter' card below and pulses its border.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair an adapter in the section below to enable auto-recording'**
+  String get autoRecordPairAdapterLinkText;
+
   /// AppBar IconButton tooltip on the consumption screen for the full XML-in-ZIP backup export (#1317).
   ///
   /// In en, this message translates to:

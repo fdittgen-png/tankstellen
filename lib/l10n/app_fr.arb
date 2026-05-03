@@ -930,6 +930,7 @@
   "autoRecordBackgroundLocationForegroundDeniedSnackbar": "L'autorisation de localisation est requise",
   "autoRecordBackgroundLocationRequestFailedSnackbar": "Impossible de demander la localisation en arrière-plan",
   "autoRecordBadgeClearTooltip": "Effacer le compteur",
+  "autoRecordPairAdapterLinkText": "Associez un adaptateur dans la section ci-dessous pour activer l'enregistrement automatique",
   "consumptionLogTitle": "Consommation",
   "consumptionTabFuel": "Carburant",
   "trajetsTabLabel": "Trajets",
