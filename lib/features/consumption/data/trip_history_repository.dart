@@ -110,13 +110,15 @@ class TripHistoryEntry {
 }
 
 /// Serialise a single [TripSample]. Compact key names
-/// ('t','s','r','f','th','el','ct') keep per-trip JSON small — a
-/// 39-min trip × 1 Hz lands around 19 KB compressed at this density.
-/// Use millisecondsSinceEpoch for the timestamp so the JSON parses
-/// fast and round-trips precisely. The optional `'th'` (#1261),
+/// ('t','s','r','f','th','el','ct','la','lo') keep per-trip JSON small
+/// — a 39-min trip × 1 Hz lands around 19 KB compressed at this
+/// density. Use millisecondsSinceEpoch for the timestamp so the JSON
+/// parses fast and round-trips precisely. The optional `'th'` (#1261),
 /// `'el'` and `'ct'` (#1262) keys are only emitted when the
-/// corresponding PID was actually read — legacy trips written before
-/// each key landed deserialise with the field null.
+/// corresponding PID was actually read; the `'la'` / `'lo'` keys
+/// (#1374 phase 1) are only emitted when the GPS-trip-path feature
+/// flag is enabled AND a fix landed for that tick. Legacy trips
+/// written before each key landed deserialise with the field null.
 Map<String, dynamic> _sampleToJson(TripSample s) => {
       't': s.timestamp.millisecondsSinceEpoch,
       's': s.speedKmh,
@@ -125,6 +127,8 @@ Map<String, dynamic> _sampleToJson(TripSample s) => {
       if (s.throttlePercent != null) 'th': s.throttlePercent,
       if (s.engineLoadPercent != null) 'el': s.engineLoadPercent,
       if (s.coolantTempC != null) 'ct': s.coolantTempC,
+      if (s.latitude != null) 'la': s.latitude,
+      if (s.longitude != null) 'lo': s.longitude,
     };
 
 TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
@@ -137,6 +141,11 @@ TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
       throttlePercent: (j['th'] as num?)?.toDouble(),
       engineLoadPercent: (j['el'] as num?)?.toDouble(),
       coolantTempC: (j['ct'] as num?)?.toDouble(),
+      // #1374 phase 1: GPS fix per sample. Legacy trips written before
+      // this PR carry no key → null on both, which is the right answer
+      // for "we don't know where this sample was taken".
+      latitude: (j['la'] as num?)?.toDouble(),
+      longitude: (j['lo'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _summaryToJson(TripSummary s) => {

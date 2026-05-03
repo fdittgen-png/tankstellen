@@ -202,6 +202,11 @@ Map<String, dynamic> _sampleToJson(TripSample s) => {
       if (s.throttlePercent != null) 'th': s.throttlePercent,
       if (s.engineLoadPercent != null) 'el': s.engineLoadPercent,
       if (s.coolantTempC != null) 'ct': s.coolantTempC,
+      // #1374 phase 1: GPS fix mirror keys. Aligned with
+      // `trip_history_repository.dart` so a recovered active trip's
+      // samples deserialise identically when the user finishes it.
+      if (s.latitude != null) 'la': s.latitude,
+      if (s.longitude != null) 'lo': s.longitude,
     };
 
 TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
@@ -214,6 +219,10 @@ TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
       throttlePercent: (j['th'] as num?)?.toDouble(),
       engineLoadPercent: (j['el'] as num?)?.toDouble(),
       coolantTempC: (j['ct'] as num?)?.toDouble(),
+      // #1374 phase 1: legacy active-trip snapshots written before
+      // this PR carry no GPS keys → null on both fields.
+      latitude: (j['la'] as num?)?.toDouble(),
+      longitude: (j['lo'] as num?)?.toDouble(),
     );
 
 /// Hive-backed singleton store for the live, in-progress trip

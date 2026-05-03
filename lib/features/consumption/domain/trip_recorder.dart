@@ -26,6 +26,20 @@ class TripSample {
   /// warm-up.
   final double? coolantTempC;
 
+  /// GPS latitude in degrees (#1374 phase 1). Null when the
+  /// `Feature.gpsTripPath` flag is disabled (default), when no fix has
+  /// landed yet (cold-start indoors), or when the user revoked the
+  /// location permission. Persisted so a future map overlay (Phase 2)
+  /// and a per-segment heatmap (Phase 3) can render the recorded
+  /// trip's path. Legacy samples from trips recorded before this PR
+  /// deserialise with `latitude: null`.
+  final double? latitude;
+
+  /// GPS longitude in degrees (#1374 phase 1). Same null-semantics as
+  /// [latitude]; the two fields are always written and read together
+  /// — a half-set fix is meaningless on a map.
+  final double? longitude;
+
   const TripSample({
     required this.timestamp,
     required this.speedKmh,
@@ -34,6 +48,8 @@ class TripSample {
     this.throttlePercent,
     this.engineLoadPercent,
     this.coolantTempC,
+    this.latitude,
+    this.longitude,
   });
 }
 

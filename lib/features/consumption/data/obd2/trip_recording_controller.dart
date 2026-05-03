@@ -344,6 +344,21 @@ class TripRecordingController {
   double? _latestDirectFuelRate;
   String? _vin;
 
+  // #1374 phase 1 — most recent GPS fix, pushed in by the provider
+  // when the `Feature.gpsTripPath` flag is enabled. The controller
+  // does NOT subscribe to Geolocator itself — that decision lives at
+  // the provider layer so the controller stays free of plugin
+  // imports and tests can drive the latch with hand-built doubles.
+  // When the flag is off the provider never calls [updateGpsFix],
+  // both fields stay null, and every persisted sample carries
+  // `latitude: null, longitude: null` (matching pre-#1374 behaviour
+  // bit-for-bit). When the flag is on but no fix has landed yet
+  // (cold-start, indoors, permission revoked), the fields are also
+  // null and the corresponding sample is written with both keys
+  // absent — better than failing the trip.
+  double? _latestLatitude;
+  double? _latestLongitude;
+
   TripRecordingController({
     required Obd2Service service,
     TripRecorder? recorder,
@@ -460,6 +475,39 @@ class TripRecordingController {
     _scheduler?.start();
     _emitState();
   }
+
+  /// Push the most recent GPS fix into the per-tick snapshot
+  /// (#1374 phase 1).
+  ///
+  /// Called by the trip-recording provider when the
+  /// `Feature.gpsTripPath` flag is enabled and a Geolocator position
+  /// stream has produced an update. The next [_emit] tick stamps the
+  /// stored values onto the [TripSample] it builds. Pass `null` for
+  /// either coord to clear the latch — the sample is then written
+  /// with that field omitted (legacy-compatible behaviour).
+  ///
+  /// Intentionally takes raw doubles instead of a `Position` so this
+  /// file stays free of `package:geolocator` imports — the GPS plugin
+  /// only lives at the provider seam, which keeps unit-testing the
+  /// controller cheap (no Geolocator mocks required) and lets the
+  /// flag-off path skip the plugin entirely.
+  void updateGpsFix({double? latitude, double? longitude}) {
+    _latestLatitude = latitude;
+    _latestLongitude = longitude;
+  }
+
+  /// Read-only snapshot of the most recent GPS latitude pushed in via
+  /// [updateGpsFix] (#1374 phase 1). Exposed for tests + diagnostics;
+  /// production reads the value through the persisted [TripSample]
+  /// fields, not this getter.
+  @visibleForTesting
+  double? get debugLatestLatitude => _latestLatitude;
+
+  /// Read-only snapshot of the most recent GPS longitude pushed in via
+  /// [updateGpsFix] (#1374 phase 1). Same caveats as
+  /// [debugLatestLatitude].
+  @visibleForTesting
+  double? get debugLatestLongitude => _latestLongitude;
 
   /// Start polling. Reads the odometer and VIN ONCE to pin trip
   /// identity; subsequent ticks are scheduled per-PID by
@@ -1134,6 +1182,12 @@ class TripRecordingController {
         throttlePercent: _latestThrottlePercent,
         engineLoadPercent: _latestEngineLoadPercent,
         coolantTempC: _latestCoolantTempC,
+        // #1374 phase 1 — stamp the most recent GPS fix when the
+        // provider has pushed one in. Both fields stay null when the
+        // feature flag is off (no Geolocator subscription was ever
+        // started) or before the first fix lands.
+        latitude: _latestLatitude,
+        longitude: _latestLongitude,
       );
       _recorder.onSample(sample);
       _lastSampleAt = nowTs;
