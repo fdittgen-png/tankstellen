@@ -1,0 +1,22 @@
+{
+  "mapDebugOverlayEnabledSnack": "Map debug overlay enabled",
+  "@mapDebugOverlayEnabledSnack": {
+    "description": "Snackbar shown when the user has flipped the in-app map debug breadcrumb overlay ON via the hidden 5-tap gesture on the Carte AppBar title (#1316 phase 2)."
+  },
+  "mapDebugOverlayDisabledSnack": "Map debug overlay disabled",
+  "@mapDebugOverlayDisabledSnack": {
+    "description": "Snackbar shown when the user has flipped the in-app map debug breadcrumb overlay OFF via the hidden 5-tap gesture (#1316 phase 2)."
+  },
+  "mapDebugOverlayClearButton": "Clear",
+  "@mapDebugOverlayClearButton": {
+    "description": "Button on the in-app map debug breadcrumb overlay that empties the recorded breadcrumb list (#1316 phase 2)."
+  },
+  "mapDebugOverlayCloseButton": "Close",
+  "@mapDebugOverlayCloseButton": {
+    "description": "Button on the in-app map debug breadcrumb overlay that hides the overlay by disabling the persisted flag (#1316 phase 2)."
+  },
+  "mapDebugOverlayTitle": "Map breadcrumbs",
+  "@mapDebugOverlayTitle": {
+    "description": "Title shown at the top of the in-app map debug breadcrumb overlay panel (#1316 phase 2)."
+  }
+}

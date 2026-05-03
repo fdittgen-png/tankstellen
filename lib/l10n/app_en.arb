@@ -2221,6 +2221,26 @@
   "@maintenanceActionSnooze": {
     "description": "Label on the 'Snooze 30 days' button of the predictive-maintenance card — silences the card for the standard 30-day snooze window (#1124)."
   },
+  "mapDebugOverlayEnabledSnack": "Map debug overlay enabled",
+  "@mapDebugOverlayEnabledSnack": {
+    "description": "Snackbar shown when the user has flipped the in-app map debug breadcrumb overlay ON via the hidden 5-tap gesture on the Carte AppBar title (#1316 phase 2)."
+  },
+  "mapDebugOverlayDisabledSnack": "Map debug overlay disabled",
+  "@mapDebugOverlayDisabledSnack": {
+    "description": "Snackbar shown when the user has flipped the in-app map debug breadcrumb overlay OFF via the hidden 5-tap gesture (#1316 phase 2)."
+  },
+  "mapDebugOverlayClearButton": "Clear",
+  "@mapDebugOverlayClearButton": {
+    "description": "Button on the in-app map debug breadcrumb overlay that empties the recorded breadcrumb list (#1316 phase 2)."
+  },
+  "mapDebugOverlayCloseButton": "Close",
+  "@mapDebugOverlayCloseButton": {
+    "description": "Button on the in-app map debug breadcrumb overlay that hides the overlay by disabling the persisted flag (#1316 phase 2)."
+  },
+  "mapDebugOverlayTitle": "Map breadcrumbs",
+  "@mapDebugOverlayTitle": {
+    "description": "Title shown at the top of the in-app map debug breadcrumb overlay panel (#1316 phase 2)."
+  },
   "consumptionMonthlyInsightsTitle": "This month vs last month",
   "@consumptionMonthlyInsightsTitle": {
     "description": "Title of the monthly-insights card on the Trajets tab landing screen — aggregates all trips into a current-vs-previous-month comparison (#1041 phase 4)."
