@@ -1,3 +1,10 @@
+// `gamificationEnabled` is `@Deprecated` post-#1373 phase 3b but the
+// field is still around (kept for the one-shot migration read in
+// `legacy_toggle_migrator.dart`). These tests pin the persistence /
+// copyWith semantics that the migrator relies on, so they read the
+// deprecated field deliberately.
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';

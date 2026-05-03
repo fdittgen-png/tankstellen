@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 import '../../../core/storage/storage_keys.dart';
+import '../../profile/data/models/user_profile.dart';
 import '../domain/feature.dart';
 import '../domain/feature_manifest.dart';
 import 'feature_flags_repository.dart';
@@ -12,6 +13,13 @@ import 'feature_flags_repository.dart';
 /// toggle itself so a single read tells us whether the migration has
 /// already run.
 const String hapticEcoCoachMigratedKey = 'hapticEcoCoachMigrated';
+
+/// Settings-box key written once after the legacy
+/// `UserProfile.gamificationEnabled` value has been promoted into the
+/// central feature-flag set (#1373 phase 3b). Persisted in the same
+/// `settings` Hive box as the haptic-eco-coach gate so a single read
+/// tells us whether the gamification migration has already run.
+const String gamificationMigratedKey = 'gamificationMigrated';
 
 /// One-shot migrator that promotes legacy scattered toggles into the
 /// central [FeatureFlagsRepository] (#1373 phase 3a).
@@ -29,11 +37,18 @@ const String hapticEcoCoachMigratedKey = 'hapticEcoCoachMigrated';
 /// read with no writes. Safe to call from a `Future.microtask` on
 /// app-startup providers without blocking.
 ///
-/// Future phases (3b, 3c, …) extend this migrator with additional
-/// scattered toggles (`gamificationEnabled`, `showFuel`, `autoRecord`,
-/// etc.). Each new migration follows the same shape: read the legacy
-/// value, gate on a `<featureName>Migrated` flag, force-enable
-/// prerequisites first, persist, then write the gate flag.
+/// As of phase 3b a parallel entry point [migrateUserProfileToggles]
+/// handles UserProfile-backed legacy toggles (the
+/// `UserProfile.gamificationEnabled` field). The shape mirrors this
+/// function but takes the active profile as an extra (nullable) input
+/// because the legacy value lives on the profile entity rather than
+/// the settings box.
+///
+/// Future phases (3c, 3d, …) extend this migrator with additional
+/// scattered toggles (`showFuel`, `autoRecord`, etc.). Each new
+/// migration follows the same shape: read the legacy value, gate on a
+/// `<featureName>Migrated` flag, force-enable prerequisites first,
+/// persist, then write the gate flag.
 Future<void> migrateLegacyToggles({
   required Box<dynamic> settings,
   required FeatureFlagsRepository featureFlags,
@@ -43,6 +58,44 @@ Future<void> migrateLegacyToggles({
     settings: settings,
     featureFlags: featureFlags,
     manifest: manifest,
+  );
+}
+
+/// One-shot migrator for UserProfile-backed legacy toggles (#1373
+/// phase 3b).
+///
+/// Reads the legacy [UserProfile.gamificationEnabled] value from the
+/// passed-in [activeProfile]. The migrator is a no-op when [activeProfile]
+/// is null — the next launch will retry; idempotency is preserved by
+/// NOT writing the migrated-key flag in that case.
+///
+/// When a profile is present and the [gamificationMigratedKey] flag has
+/// not yet been written, the migrator promotes the legacy value into
+/// the central feature-flag set:
+///   - legacy true  → cascade-enable [Feature.obd2TripRecording]
+///                    (the manifest prerequisite) and [Feature.gamification]
+///   - legacy false → persist a state that EXCLUDES [Feature.gamification]
+///                    so the user's explicit opt-out survives. Without
+///                    this branch the manifest default (gamification=true)
+///                    would silently restore the surfaces the user
+///                    deliberately turned off.
+/// In both cases the [gamificationMigratedKey] gate is then set so
+/// subsequent runs are no-ops.
+///
+/// Safe to call alongside [migrateLegacyToggles] from the same provider
+/// (see `legacyToggleMigrationProvider`). The two functions touch
+/// disjoint settings-box keys.
+Future<void> migrateUserProfileToggles({
+  required Box<dynamic> settings,
+  required FeatureFlagsRepository featureFlags,
+  required FeatureManifest manifest,
+  required UserProfile? activeProfile,
+}) async {
+  await _migrateGamification(
+    settings: settings,
+    featureFlags: featureFlags,
+    manifest: manifest,
+    activeProfile: activeProfile,
   );
 }
 
@@ -88,6 +141,71 @@ Future<void> _migrateHapticEcoCoach({
   } catch (e, st) {
     debugPrint(
       'migrateLegacyToggles: writing $hapticEcoCoachMigratedKey failed: $e\n$st',
+    );
+  }
+}
+
+Future<void> _migrateGamification({
+  required Box<dynamic> settings,
+  required FeatureFlagsRepository featureFlags,
+  required FeatureManifest manifest,
+  required UserProfile? activeProfile,
+}) async {
+  // Already migrated → idempotent no-op. The user may have toggled
+  // gamification OFF after a previous migration; we must not re-promote
+  // the legacy `true` value.
+  if (settings.get(gamificationMigratedKey) == true) {
+    return;
+  }
+
+  // No profile loaded yet → try again next launch. We deliberately do
+  // NOT write the gate flag because that would lock in the manifest
+  // default and silently discard any explicit `gamificationEnabled =
+  // false` the user had set.
+  if (activeProfile == null) {
+    return;
+  }
+
+  // ignore: deprecated_member_use_from_same_package
+  final legacyValue = activeProfile.gamificationEnabled;
+
+  try {
+    final current = await featureFlags.loadEnabled();
+    if (legacyValue == true) {
+      // Force-enable the prerequisite first per the manifest's
+      // dependency graph — otherwise the central system would refuse
+      // the gamification enable on its first toggle attempt.
+      final entry = manifest.entryFor(Feature.gamification);
+      final next = <Feature>{
+        ...current,
+        ...entry.requires,
+        Feature.gamification,
+      };
+      await featureFlags.saveEnabled(next);
+    } else {
+      // Legacy explicit-false. Feature.gamification's manifest default
+      // is `true`, so a no-op (no write) would silently RESTORE the
+      // gamification surfaces for users who had explicitly opted out.
+      // Persist the current set with gamification removed so the
+      // user's preference survives the migration.
+      final next = {...current}..remove(Feature.gamification);
+      await featureFlags.saveEnabled(next);
+    }
+  } catch (e, st) {
+    // Don't block startup on a migration failure — the user can
+    // re-toggle from settings if the central state is missing.
+    debugPrint(
+      'migrateUserProfileToggles: gamification promote failed: $e\n$st',
+    );
+  }
+
+  // Always set the flag (even when the persistence above failed) so we
+  // never re-read the legacy field on subsequent launches.
+  try {
+    await settings.put(gamificationMigratedKey, true);
+  } catch (e, st) {
+    debugPrint(
+      'migrateUserProfileToggles: writing $gamificationMigratedKey failed: $e\n$st',
     );
   }
 }

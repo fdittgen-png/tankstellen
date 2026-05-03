@@ -99,7 +99,7 @@ Future<void> _pumpScreen(
       fillUpListProvider.overrideWith(() => _FixedFillUpList(fillUps)),
       activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
       vehicleProfileListProvider.overrideWith(() => _EmptyVehicleList()),
-      gamificationEnabledProvider.overrideWith((ref) => true),
+      gamificationEnabledProvider.overrideWithValue(true),
     ],
   );
 }
