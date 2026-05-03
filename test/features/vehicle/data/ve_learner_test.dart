@@ -147,9 +147,17 @@ void main() {
       expect(profileRepo.getById('veh-a')!.volumetricEfficiency, 0.85);
     });
 
-    test('outlier (|gap|/pumped > 40%) is ignored', () async {
-      // integrated=80, pumped=50 — 60 % gap, way over the 40 % outlier
-      // cutoff. The user probably missed logging an earlier fill-up.
+    test('outlier (|gap|/pumped > 40%) is ignored once the learner is '
+        'calibrated (sampleCount >= 5)', () async {
+      // #1397 — the gap threshold is sample-dependent. Once the learner
+      // has 5+ plein-complet samples the threshold drops to the original
+      // 0.40, so a 60 % outlier on a calibrated profile still rejects.
+      // (The aggressive bootstrap covers the cold-start case below.)
+      await profileRepo.save(const VehicleProfile(
+        id: 'veh-a',
+        name: 'Peugeot 107',
+        volumetricEfficiencySamples: 5,
+      ));
       trips.entries.add(_tripEntry(
         id: 't1',
         vehicleId: 'veh-a',
@@ -343,6 +351,120 @@ void main() {
       expect(result!.sampleCount, 1);
     });
 
+    test('aggressive bootstrap — Duster scenario: 4× gap on first '
+        'plein-complet is accepted (sampleCount=0 → threshold=5.0)',
+        () async {
+      // The cold-start motivating case for #1397. A Duster paired
+      // with the default η_v=0.85 integrates ~3.5 L while the user
+      // pumped 14 L — gap = 10.5 / 14 = 75 %. Pre-#1397 this was
+      // rejected as an "outlier" so η stayed locked at 0.85. The
+      // aggressive bootstrap accepts it because sampleCount=0 → 5.0.
+      trips.entries.add(_tripEntry(
+        id: 't1',
+        vehicleId: 'veh-a',
+        startedAt: previousFill.add(const Duration(hours: 2)),
+        endedAt: previousFill.add(const Duration(hours: 5)),
+        distanceKm: 200,
+        fuelLitersConsumed: 3.5,
+      ));
+
+      final result = await learner.reconcileAfterFillUp(
+        vehicleId: 'veh-a',
+        pumpedLiters: 14,
+        fillUpTimestamp: currentFill,
+        previousFillUpTimestamp: previousFill,
+      );
+      expect(result, isNotNull,
+          reason: 'first plein-complet must be accepted regardless of '
+              'how far off the cold-start η is');
+      expect(result!.sampleCount, 1);
+      // η moves substantially (clamped at 1.0 on extreme over-pump).
+      expect(result.newVe, greaterThan(0.85));
+    });
+
+    test('aggressive bootstrap — second tankful with 50 % gap is '
+        'accepted (sampleCount=1 → threshold=2.0)', () async {
+      // Same vehicle, now seeded with one prior calibration.
+      await profileRepo.save(const VehicleProfile(
+        id: 'veh-a',
+        name: 'Dacia Duster',
+        volumetricEfficiency: 0.95,
+        volumetricEfficiencySamples: 1,
+      ));
+      trips.entries.add(_tripEntry(
+        id: 't1',
+        vehicleId: 'veh-a',
+        startedAt: previousFill.add(const Duration(hours: 2)),
+        endedAt: previousFill.add(const Duration(hours: 5)),
+        distanceKm: 200,
+        fuelLitersConsumed: 7.5, // pumped=15 → gap = 50 %
+      ));
+
+      final result = await learner.reconcileAfterFillUp(
+        vehicleId: 'veh-a',
+        pumpedLiters: 15,
+        fillUpTimestamp: currentFill,
+        previousFillUpTimestamp: previousFill,
+      );
+      expect(result, isNotNull);
+      expect(result!.sampleCount, 2);
+    });
+
+    test('aggressive bootstrap — third tankful with 10 % gap is '
+        'accepted (sampleCount=2 → threshold=1.0)', () async {
+      await profileRepo.save(const VehicleProfile(
+        id: 'veh-a',
+        name: 'Dacia Duster',
+        volumetricEfficiency: 0.85,
+        volumetricEfficiencySamples: 2,
+      ));
+      trips.entries.add(_tripEntry(
+        id: 't1',
+        vehicleId: 'veh-a',
+        startedAt: previousFill.add(const Duration(hours: 2)),
+        endedAt: previousFill.add(const Duration(hours: 5)),
+        distanceKm: 200,
+        fuelLitersConsumed: 13.5, // pumped=15 → 10 %
+      ));
+
+      final result = await learner.reconcileAfterFillUp(
+        vehicleId: 'veh-a',
+        pumpedLiters: 15,
+        fillUpTimestamp: currentFill,
+        previousFillUpTimestamp: previousFill,
+      );
+      expect(result, isNotNull);
+      expect(result!.sampleCount, 3);
+    });
+
+    test('legacy maxGapFraction override still rejects outlier on '
+        'sampleCount=0 when caller pins it', () async {
+      final pinned = VeLearner(
+        profileRepository: profileRepo,
+        tripHistoryLoader: trips.loadAll,
+        sampleCounter: (_) => 600,
+        maxGapFraction: 0.40,
+      );
+      trips.entries.add(_tripEntry(
+        id: 't1',
+        vehicleId: 'veh-a',
+        startedAt: previousFill.add(const Duration(hours: 2)),
+        endedAt: previousFill.add(const Duration(hours: 10)),
+        distanceKm: 400,
+        fuelLitersConsumed: 80,
+      ));
+
+      final result = await pinned.reconcileAfterFillUp(
+        vehicleId: 'veh-a',
+        pumpedLiters: 50,
+        fillUpTimestamp: currentFill,
+        previousFillUpTimestamp: previousFill,
+      );
+      expect(result, isNull,
+          reason: 'an explicit fixed threshold must override the '
+              'sample-dependent schedule');
+    });
+
     test('accuracy improvement is a positive percentage', () async {
       trips.entries.add(_tripEntry(
         id: 't1',
@@ -363,6 +485,44 @@ void main() {
       expect(result, isNotNull);
       expect(result!.accuracyImprovementPct, greaterThan(0));
       expect(result.accuracyImprovementPct, lessThanOrEqualTo(100));
+    });
+  });
+
+  group('VeLearner.maxRelativeGap (#1397 aggressive bootstrap)', () {
+    final learner = VeLearner(
+      profileRepository: VehicleProfileRepository(_FakeSettings()),
+      tripHistoryLoader: () => const <TripHistoryEntry>[],
+    );
+
+    test('sampleCount=0 returns 5.0 (very wide cold-start window)', () {
+      expect(learner.maxRelativeGap(0), 5.0);
+    });
+
+    test('sampleCount=1 returns 2.0', () {
+      expect(learner.maxRelativeGap(1), 2.0);
+    });
+
+    test('sampleCount=2 returns 1.0', () {
+      expect(learner.maxRelativeGap(2), 1.0);
+    });
+
+    test('sampleCount=4 returns 0.6', () {
+      expect(learner.maxRelativeGap(4), 0.6);
+    });
+
+    test('sampleCount=10 returns 0.4 (calibrated steady state)', () {
+      expect(learner.maxRelativeGap(10), 0.4);
+    });
+
+    test('schedule is monotonically non-increasing', () {
+      double prev = double.infinity;
+      for (var n = 0; n < 12; n++) {
+        final v = learner.maxRelativeGap(n);
+        expect(v, lessThanOrEqualTo(prev),
+            reason: 'threshold for $n samples ($v) must not exceed '
+                'threshold for $n-1 samples ($prev)');
+        prev = v;
+      }
     });
   });
 }

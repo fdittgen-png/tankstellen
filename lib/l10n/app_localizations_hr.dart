@@ -3180,6 +3180,56 @@ class AppLocalizationsHr extends AppLocalizations {
   String get exportBackupFailed => 'Backup export failed — please try again';
 
   @override
+  String get calibrationAdvancedTitle => 'Advanced calibration';
+
+  @override
+  String get calibrationDisplacementLabel => 'Engine displacement (cc)';
+
+  @override
+  String get calibrationVolumetricEfficiencyLabel =>
+      'Volumetric efficiency (η_v)';
+
+  @override
+  String get calibrationAfrLabel => 'Air-to-fuel ratio (AFR)';
+
+  @override
+  String get calibrationFuelDensityLabel => 'Fuel density (g/L)';
+
+  @override
+  String get calibrationSourceDetected => '(detected from VIN)';
+
+  @override
+  String calibrationSourceCatalog(String makeModel) {
+    return '(catalog: $makeModel)';
+  }
+
+  @override
+  String get calibrationSourceDefault => '(default)';
+
+  @override
+  String get calibrationSourceManual => '(manual)';
+
+  @override
+  String get calibrationResetToDetected => 'Reset to detected value';
+
+  @override
+  String calibrationLearnerStatusCalibrated(String eta, int samples) {
+    return 'η_v: $eta (calibrated, $samples samples)';
+  }
+
+  @override
+  String calibrationLearnerStatusLearning(String eta, int samples) {
+    return 'η_v: $eta (learning, $samples samples)';
+  }
+
+  @override
+  String get calibrationLearnerStatusNoSamples =>
+      'η_v: 0.85 (default — no plein-complet yet)';
+
+  @override
+  String get calibrationResetLearner => 'Reset learner';
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Your $makeModel is marked as diesel but matches a petrol catalog entry. Tap to update.';
   }

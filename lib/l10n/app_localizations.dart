@@ -5954,6 +5954,90 @@ abstract class AppLocalizations {
   /// **'Backup export failed — please try again'**
   String get exportBackupFailed;
 
+  /// ExpansionTile title for the user-overridable calibration constants section on the edit-vehicle screen (#1397).
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced calibration'**
+  String get calibrationAdvancedTitle;
+
+  /// TextFormField label for the manual displacement override in cubic centimetres.
+  ///
+  /// In en, this message translates to:
+  /// **'Engine displacement (cc)'**
+  String get calibrationDisplacementLabel;
+
+  /// TextFormField label for the manual volumetric efficiency override (0.50–1.00).
+  ///
+  /// In en, this message translates to:
+  /// **'Volumetric efficiency (η_v)'**
+  String get calibrationVolumetricEfficiencyLabel;
+
+  /// TextFormField label for the manual AFR override in kg/kg (~14.7 petrol / ~14.5 diesel).
+  ///
+  /// In en, this message translates to:
+  /// **'Air-to-fuel ratio (AFR)'**
+  String get calibrationAfrLabel;
+
+  /// TextFormField label for the manual fuel density override in g/L (~740 petrol / ~832 diesel).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel density (g/L)'**
+  String get calibrationFuelDensityLabel;
+
+  /// Helper text shown beneath a calibration field when its current value comes from a VIN decode.
+  ///
+  /// In en, this message translates to:
+  /// **'(detected from VIN)'**
+  String get calibrationSourceDetected;
+
+  /// Helper text shown when the current value comes from the reference-vehicle catalog row.
+  ///
+  /// In en, this message translates to:
+  /// **'(catalog: {makeModel})'**
+  String calibrationSourceCatalog(String makeModel);
+
+  /// Helper text shown when the current value is the generic estimator fallback constant.
+  ///
+  /// In en, this message translates to:
+  /// **'(default)'**
+  String get calibrationSourceDefault;
+
+  /// Helper text shown when the current value is a user-entered override.
+  ///
+  /// In en, this message translates to:
+  /// **'(manual)'**
+  String get calibrationSourceManual;
+
+  /// Tooltip / a11y label for the per-field reset IconButton that nulls a manual override.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to detected value'**
+  String get calibrationResetToDetected;
+
+  /// Live readout when the learner has accepted at least 3 plein-complet samples.
+  ///
+  /// In en, this message translates to:
+  /// **'η_v: {eta} (calibrated, {samples} samples)'**
+  String calibrationLearnerStatusCalibrated(String eta, int samples);
+
+  /// Live readout while the learner is bootstrapping (1-2 samples).
+  ///
+  /// In en, this message translates to:
+  /// **'η_v: {eta} (learning, {samples} samples)'**
+  String calibrationLearnerStatusLearning(String eta, int samples);
+
+  /// Live readout before the first plein-complet has been logged.
+  ///
+  /// In en, this message translates to:
+  /// **'η_v: 0.85 (default — no plein-complet yet)'**
+  String get calibrationLearnerStatusNoSamples;
+
+  /// OutlinedButton label that resets η_v back to 0.85 and clears the sample counter.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset learner'**
+  String get calibrationResetLearner;
+
   /// One-time snackbar (#1396) shown when a diesel-marked vehicle profile resolves to a non-diesel reference catalog row. The placeholder is the make + model, e.g. 'Dacia Duster'.
   ///
   /// In en, this message translates to:

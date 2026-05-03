@@ -1261,12 +1261,23 @@ class TripRecordingController {
     final preferredFuel =
         _vehicle?.preferredFuelType?.trim().toLowerCase() ?? '';
     final isDiesel = preferredFuel.contains('diesel');
-    final afr = isDiesel ? Obd2Service.dieselAfr : Obd2Service.petrolAfr;
-    final density = isDiesel
-        ? Obd2Service.dieselDensityGPerL
-        : Obd2Service.petrolDensityGPerL;
-    final displacement = _vehicle?.engineDisplacementCc ?? 1000;
-    final ve = _vehicle?.volumetricEfficiency ?? 0.85;
+    // #1397 — manual overrides take precedence over the inferred /
+    // catalog-resolved values. Mirrors the resolution chain in
+    // [Obd2Service.readFuelRateLPerHour] so the live integrator and the
+    // pull-mode estimator agree on every scalar.
+    final afr = _vehicle?.manualAfrOverride ??
+        (isDiesel ? Obd2Service.dieselAfr : Obd2Service.petrolAfr);
+    final density = _vehicle?.manualFuelDensityGPerLOverride ??
+        (isDiesel
+            ? Obd2Service.dieselDensityGPerL
+            : Obd2Service.petrolDensityGPerL);
+    final displacement = _vehicle?.manualEngineDisplacementCcOverride
+            ?.round() ??
+        _vehicle?.engineDisplacementCc ??
+        1000;
+    final ve = _vehicle?.manualVolumetricEfficiencyOverride ??
+        _vehicle?.volumetricEfficiency ??
+        0.85;
     final collector = _breadcrumbCollector;
 
     // Step 1: direct PID 5E. Already post-trim, no correction.

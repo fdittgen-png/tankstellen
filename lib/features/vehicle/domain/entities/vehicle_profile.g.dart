@@ -52,6 +52,13 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
           (json['volumetricEfficiency'] as num?)?.toDouble() ?? 0.85,
       volumetricEfficiencySamples:
           (json['volumetricEfficiencySamples'] as num?)?.toInt() ?? 0,
+      manualEngineDisplacementCcOverride:
+          (json['manualEngineDisplacementCcOverride'] as num?)?.toDouble(),
+      manualVolumetricEfficiencyOverride:
+          (json['manualVolumetricEfficiencyOverride'] as num?)?.toDouble(),
+      manualAfrOverride: (json['manualAfrOverride'] as num?)?.toDouble(),
+      manualFuelDensityGPerLOverride:
+          (json['manualFuelDensityGPerLOverride'] as num?)?.toDouble(),
       curbWeightKg: (json['curbWeightKg'] as num?)?.toInt(),
       obd2AdapterMac: json['obd2AdapterMac'] as String?,
       obd2AdapterName: json['obd2AdapterName'] as String?,
@@ -124,6 +131,12 @@ Map<String, dynamic> _$VehicleProfileToJson(
   'engineCylinders': instance.engineCylinders,
   'volumetricEfficiency': instance.volumetricEfficiency,
   'volumetricEfficiencySamples': instance.volumetricEfficiencySamples,
+  'manualEngineDisplacementCcOverride':
+      instance.manualEngineDisplacementCcOverride,
+  'manualVolumetricEfficiencyOverride':
+      instance.manualVolumetricEfficiencyOverride,
+  'manualAfrOverride': instance.manualAfrOverride,
+  'manualFuelDensityGPerLOverride': instance.manualFuelDensityGPerLOverride,
   'curbWeightKg': instance.curbWeightKg,
   'obd2AdapterMac': instance.obd2AdapterMac,
   'obd2AdapterName': instance.obd2AdapterName,

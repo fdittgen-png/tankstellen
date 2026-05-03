@@ -20,7 +20,23 @@ import '../../domain/entities/consumption_stats.dart';
 class ConsumptionStatsCard extends StatelessWidget {
   final ConsumptionStats stats;
 
-  const ConsumptionStatsCard({super.key, required this.stats});
+  /// Active vehicle's auto-learned η_v (#1397). When null the
+  /// convergence chip is skipped — useful for tests / no-vehicle
+  /// states / EV vehicles where the speed-density estimator never
+  /// runs.
+  final double? volumetricEfficiency;
+
+  /// Number of plein-complet samples the learner has folded into
+  /// [volumetricEfficiency] (#1397). 0 surfaces the "no plein-complet
+  /// yet" state, 1-2 the bootstrap state, 3+ the calibrated state.
+  final int? volumetricEfficiencySamples;
+
+  const ConsumptionStatsCard({
+    super.key,
+    required this.stats,
+    this.volumetricEfficiency,
+    this.volumetricEfficiencySamples,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -114,6 +130,16 @@ class ConsumptionStatsCard extends StatelessWidget {
                 style: theme.textTheme.bodySmall,
               ),
             ],
+            // #1397 — convergence chip surfacing the auto-learner's
+            // η_v state. Renders nothing when the active vehicle hasn't
+            // been wired in (volumetricEfficiencySamples == null).
+            if (volumetricEfficiencySamples != null) ...[
+              const SizedBox(height: 8),
+              _CalibrationChip(
+                volumetricEfficiency: volumetricEfficiency ?? 0.85,
+                samples: volumetricEfficiencySamples!,
+              ),
+            ],
           ],
         ),
       ),
@@ -192,6 +218,51 @@ class _CorrectionShareHint extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Inline chip surfacing the auto-learner's η_v state (#1397).
+///
+/// Three branches drive the label:
+///   * `samples >= 3` → "η_v: 0.87 (calibrated, N samples)"
+///   * `0 < samples < 3` → "η_v: 0.87 (learning, N samples)"
+///   * `samples == 0` → "η_v: ?? (no plein-complet yet)"
+///
+/// Variance tracking would let us print "± 0.04" alongside the mean,
+/// but the existing [VeLearner] only stores the EWMA scalar — adding
+/// a Welford branch is left to a follow-up. For now the calibrated
+/// branch keeps the bare mean.
+class _CalibrationChip extends StatelessWidget {
+  final double volumetricEfficiency;
+  final int samples;
+
+  const _CalibrationChip({
+    required this.volumetricEfficiency,
+    required this.samples,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final eta = volumetricEfficiency.toStringAsFixed(2);
+    final String label;
+    if (samples == 0) {
+      label = l?.calibrationLearnerStatusNoSamples ??
+          'η_v: ?? (no plein-complet yet)';
+    } else if (samples < 3) {
+      label = l?.calibrationLearnerStatusLearning(eta, samples) ??
+          'η_v: $eta (learning, $samples samples)';
+    } else {
+      label = l?.calibrationLearnerStatusCalibrated(eta, samples) ??
+          'η_v: $eta (calibrated, $samples samples)';
+    }
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Chip(
+        label: Text(label),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     );
   }
