@@ -3426,6 +3426,139 @@ class AppLocalizationsFr extends AppLocalizations {
   String get favoritesShareError => 'Impossible de générer l\'image';
 
   @override
+  String get featureManagementSectionTitle => 'Gestion des fonctionnalités';
+
+  @override
+  String get featureManagementSectionSubtitle =>
+      'Activez ou désactivez chaque fonctionnalité. Certaines dépendent d\'autres — leurs interrupteurs restent désactivés tant que les prérequis ne sont pas remplis.';
+
+  @override
+  String get featureLabel_obd2TripRecording =>
+      'Enregistrement OBD2 des trajets';
+
+  @override
+  String get featureDescription_obd2TripRecording =>
+      'Enregistre les trajets automatiquement via OBD2.';
+
+  @override
+  String get featureLabel_gamification => 'Gamification';
+
+  @override
+  String get featureDescription_gamification =>
+      'Scores de conduite et badges gagnés.';
+
+  @override
+  String get featureLabel_hapticEcoCoach => 'Éco-coach haptique';
+
+  @override
+  String get featureDescription_hapticEcoCoach =>
+      'Retour haptique en temps réel pendant la conduite.';
+
+  @override
+  String get featureLabel_tankSync => 'TankSync';
+
+  @override
+  String get featureDescription_tankSync =>
+      'Synchronisation multi-appareils via Supabase.';
+
+  @override
+  String get featureLabel_consumptionAnalytics => 'Analyse de consommation';
+
+  @override
+  String get featureDescription_consumptionAnalytics =>
+      'Onglet d\'analyse des pleins et des trajets.';
+
+  @override
+  String get featureLabel_baselineSync => 'Synchronisation des références';
+
+  @override
+  String get featureDescription_baselineSync =>
+      'Synchronise les références de conduite via TankSync.';
+
+  @override
+  String get featureLabel_unifiedSearchResults =>
+      'Résultats de recherche unifiés';
+
+  @override
+  String get featureDescription_unifiedSearchResults =>
+      'Une seule liste combinant stations carburant et bornes de recharge.';
+
+  @override
+  String get featureLabel_priceAlerts => 'Alertes de prix';
+
+  @override
+  String get featureDescription_priceAlerts =>
+      'Notifications quand un prix passe sous un seuil.';
+
+  @override
+  String get featureLabel_priceHistory => 'Historique des prix';
+
+  @override
+  String get featureDescription_priceHistory =>
+      'Graphiques des prix sur 30 jours dans le détail station.';
+
+  @override
+  String get featureLabel_routePlanning => 'Planification d\'itinéraire';
+
+  @override
+  String get featureDescription_routePlanning =>
+      'Arrêt le moins cher sur votre trajet.';
+
+  @override
+  String get featureLabel_evCharging => 'Recharge VE';
+
+  @override
+  String get featureDescription_evCharging =>
+      'Bornes de recharge via OpenChargeMap.';
+
+  @override
+  String get featureLabel_glideCoach => 'Glide-coach';
+
+  @override
+  String get featureDescription_glideCoach =>
+      'Conseils d\'éco-conduite à partir des feux OSM.';
+
+  @override
+  String get featureLabel_gpsTripPath => 'Trace GPS des trajets';
+
+  @override
+  String get featureDescription_gpsTripPath =>
+      'Conserve les points GPS de chaque trajet.';
+
+  @override
+  String get featureBlockedEnable_gamification =>
+      'Activez d\'abord l\'enregistrement OBD2 des trajets';
+
+  @override
+  String get featureBlockedEnable_hapticEcoCoach =>
+      'Activez d\'abord l\'enregistrement OBD2 des trajets';
+
+  @override
+  String get featureBlockedEnable_consumptionAnalytics =>
+      'Activez d\'abord l\'enregistrement OBD2 des trajets';
+
+  @override
+  String get featureBlockedEnable_baselineSync => 'Activez d\'abord TankSync';
+
+  @override
+  String get featureBlockedEnable_glideCoach =>
+      'Activez d\'abord l\'enregistrement OBD2 des trajets';
+
+  @override
+  String get featureBlockedEnable_gpsTripPath =>
+      'Activez d\'abord l\'enregistrement OBD2 des trajets';
+
+  @override
+  String featureBlockedDisable_obd2TripRecording(String dependents) {
+    return 'Désactivez d\'abord les fonctionnalités dépendantes : $dependents';
+  }
+
+  @override
+  String featureBlockedDisable_tankSync(String dependents) {
+    return 'Désactivez d\'abord les fonctionnalités dépendantes : $dependents';
+  }
+
+  @override
   String get feedbackConsentTitle => 'Envoyer le rapport à GitHub ?';
 
   @override

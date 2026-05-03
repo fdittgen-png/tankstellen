@@ -6296,6 +6296,222 @@ abstract class AppLocalizations {
   /// **'Couldn\'t generate share image'**
   String get favoritesShareError;
 
+  /// Title of the foldable settings section that lets the user toggle each top-level app feature on or off (#1373 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Feature management'**
+  String get featureManagementSectionTitle;
+
+  /// One-line subtitle shown at the top of the Feature management section explaining the dependency-aware behaviour.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn individual features on or off. Some features depend on others — switches are disabled until prerequisites are met.'**
+  String get featureManagementSectionSubtitle;
+
+  /// Display name for the OBD2 trip recording feature in the Feature management list.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 trip recording'**
+  String get featureLabel_obd2TripRecording;
+
+  /// One-line description for the OBD2 trip recording feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture trips automatically over OBD2.'**
+  String get featureDescription_obd2TripRecording;
+
+  /// Display name for the gamification feature in the Feature management list.
+  ///
+  /// In en, this message translates to:
+  /// **'Gamification'**
+  String get featureLabel_gamification;
+
+  /// One-line description for the gamification feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Driving scores and earned badges.'**
+  String get featureDescription_gamification;
+
+  /// Display name for the haptic eco-coach feature in the Feature management list.
+  ///
+  /// In en, this message translates to:
+  /// **'Haptic eco-coach'**
+  String get featureLabel_hapticEcoCoach;
+
+  /// One-line description for the haptic eco-coach feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Real-time haptic feedback during a trip.'**
+  String get featureDescription_hapticEcoCoach;
+
+  /// Display name for the TankSync (cross-device sync) feature in the Feature management list.
+  ///
+  /// In en, this message translates to:
+  /// **'TankSync'**
+  String get featureLabel_tankSync;
+
+  /// One-line description for the TankSync feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Cross-device sync via Supabase.'**
+  String get featureDescription_tankSync;
+
+  /// Display name for the consumption analytics feature in the Feature management list.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption analytics'**
+  String get featureLabel_consumptionAnalytics;
+
+  /// One-line description for the consumption analytics feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill-up and trip analysis tab.'**
+  String get featureDescription_consumptionAnalytics;
+
+  /// Display name for the driving-baseline sync feature in the Feature management list.
+  ///
+  /// In en, this message translates to:
+  /// **'Baseline sync'**
+  String get featureLabel_baselineSync;
+
+  /// One-line description for the baseline sync feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync driving baselines via TankSync.'**
+  String get featureDescription_baselineSync;
+
+  /// Display name for the unified fuel + EV search results feature in the Feature management list.
+  ///
+  /// In en, this message translates to:
+  /// **'Unified search results'**
+  String get featureLabel_unifiedSearchResults;
+
+  /// One-line description for the unified search results feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Single result list combining fuel and EV stations.'**
+  String get featureDescription_unifiedSearchResults;
+
+  /// Display name for the price alerts feature in the Feature management list.
+  ///
+  /// In en, this message translates to:
+  /// **'Price alerts'**
+  String get featureLabel_priceAlerts;
+
+  /// One-line description for the price alerts feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Threshold-based price-drop notifications.'**
+  String get featureDescription_priceAlerts;
+
+  /// Display name for the price history feature in the Feature management list.
+  ///
+  /// In en, this message translates to:
+  /// **'Price history'**
+  String get featureLabel_priceHistory;
+
+  /// One-line description for the price history feature.
+  ///
+  /// In en, this message translates to:
+  /// **'30-day price charts on station details.'**
+  String get featureDescription_priceHistory;
+
+  /// Display name for the route planning feature in the Feature management list.
+  ///
+  /// In en, this message translates to:
+  /// **'Route planning'**
+  String get featureLabel_routePlanning;
+
+  /// One-line description for the route planning feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest stop along your route.'**
+  String get featureDescription_routePlanning;
+
+  /// Display name for the EV charging feature in the Feature management list.
+  ///
+  /// In en, this message translates to:
+  /// **'EV charging'**
+  String get featureLabel_evCharging;
+
+  /// One-line description for the EV charging feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Charging stations via OpenChargeMap.'**
+  String get featureDescription_evCharging;
+
+  /// Display name for the hypermiling glide-coach feature in the Feature management list.
+  ///
+  /// In en, this message translates to:
+  /// **'Glide-coach'**
+  String get featureLabel_glideCoach;
+
+  /// One-line description for the glide-coach feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Hypermiling guidance using OSM traffic signals.'**
+  String get featureDescription_glideCoach;
+
+  /// Display name for the GPS trip path feature in the Feature management list.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS trip path'**
+  String get featureLabel_gpsTripPath;
+
+  /// One-line description for the GPS trip path feature.
+  ///
+  /// In en, this message translates to:
+  /// **'Persist GPS path samples alongside each trip.'**
+  String get featureDescription_gpsTripPath;
+
+  /// Tooltip shown on the disabled gamification toggle when its prerequisite (OBD2 trip recording) is off.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable OBD2 trip recording first'**
+  String get featureBlockedEnable_gamification;
+
+  /// Tooltip shown on the disabled haptic eco-coach toggle when its prerequisite (OBD2 trip recording) is off.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable OBD2 trip recording first'**
+  String get featureBlockedEnable_hapticEcoCoach;
+
+  /// Tooltip shown on the disabled consumption analytics toggle when its prerequisite (OBD2 trip recording) is off.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable OBD2 trip recording first'**
+  String get featureBlockedEnable_consumptionAnalytics;
+
+  /// Tooltip shown on the disabled baseline sync toggle when its prerequisite (TankSync) is off.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable TankSync first'**
+  String get featureBlockedEnable_baselineSync;
+
+  /// Tooltip shown on the disabled glide-coach toggle when its prerequisite (OBD2 trip recording) is off.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable OBD2 trip recording first'**
+  String get featureBlockedEnable_glideCoach;
+
+  /// Tooltip shown on the disabled GPS trip path toggle when its prerequisite (OBD2 trip recording) is off.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable OBD2 trip recording first'**
+  String get featureBlockedEnable_gpsTripPath;
+
+  /// Tooltip shown on the disabled OBD2 trip recording toggle when one or more dependent features are still enabled. The placeholder is filled with a comma-separated list of localised feature names.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable dependent features first: {dependents}'**
+  String featureBlockedDisable_obd2TripRecording(String dependents);
+
+  /// Tooltip shown on the disabled TankSync toggle when one or more dependent features are still enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable dependent features first: {dependents}'**
+  String featureBlockedDisable_tankSync(String dependents);
+
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
   /// In en, this message translates to:
