@@ -324,6 +324,67 @@ void main() {
       expect(s.adapter, isA<SmartObdAdapter>());
     });
   });
+
+  group('Obd2AdapterProfile.compatibility (#1371 phase 1)', () {
+    test('default compatibility for an unspecified entry is theoretical', () {
+      // The Carista entry in _defaultProfiles intentionally omits the
+      // compatibility argument — it must surface as theoretical so
+      // adding new entries stays conservative without ceremony.
+      final c = registry.profiles.firstWhere((p) => p.id == 'carista');
+      expect(c.compatibility, Obd2AdapterCompatibility.theoretical);
+    });
+
+    test('vLinker FS Classic is marked as tested', () {
+      final v =
+          registry.profiles.firstWhere((p) => p.id == 'vlinker-fs-classic');
+      expect(v.compatibility, Obd2AdapterCompatibility.tested);
+    });
+
+    test('vLinker BM-Android Classic is marked as tested', () {
+      final v = registry.profiles
+          .firstWhere((p) => p.id == 'vlinker-bm-android-classic');
+      expect(v.compatibility, Obd2AdapterCompatibility.tested);
+    });
+
+    test('both SmartOBD entries are marked as userVerified', () {
+      // Maintainer confirmed the hardware works but the bonded list
+      // showed the same name for both transports — neither variant
+      // can be promoted past userVerified yet.
+      final ble = registry.profiles.firstWhere((p) => p.id == 'smartobd-ble');
+      final classic =
+          registry.profiles.firstWhere((p) => p.id == 'smartobd-classic');
+      expect(ble.compatibility, Obd2AdapterCompatibility.userVerified);
+      expect(classic.compatibility, Obd2AdapterCompatibility.userVerified);
+    });
+
+    test('every default profile carries a non-null compatibility value', () {
+      // Guard so a future entry can't accidentally land with a null
+      // value via a refactor — the field is non-nullable today, but
+      // documenting the contract here means the wiki matrix can rely
+      // on `profile.compatibility.name` without a defensive fallback.
+      for (final p in registry.profiles) {
+        expect(
+          Obd2AdapterCompatibility.values.contains(p.compatibility),
+          isTrue,
+          reason: 'profile ${p.id} has invalid compatibility value '
+              '${p.compatibility}',
+        );
+      }
+    });
+
+    test('exactly two profiles are tested today (#1371 maintainer baseline)',
+        () {
+      // Regression guard on the phase-1 maintainer baseline. Bumping
+      // this count requires a deliberate edit to acknowledge a new
+      // verified adapter — and a wiki/docs update in phase 2/3.
+      final tested = registry.profiles
+          .where((p) => p.compatibility == Obd2AdapterCompatibility.tested)
+          .map((p) => p.id)
+          .toList();
+      expect(tested,
+          unorderedEquals(['vlinker-fs-classic', 'vlinker-bm-android-classic']));
+    });
+  });
 }
 
 Obd2AdapterCandidate _candidate({
