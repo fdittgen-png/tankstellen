@@ -61,7 +61,7 @@ class PluginBluetoothFacade implements BluetoothFacade {
         timeout: timeout,
       ).catchError((Object e, StackTrace st) {
         if (controller.isClosed) return;
-        final mapped = _looksBluetoothOff(e) ? const Obd2BluetoothOff() : e;
+        final mapped = _mapBluetoothError(e);
         controller.addError(mapped, st);
         unawaited(controller.close());
       }),
@@ -83,7 +83,17 @@ class PluginBluetoothFacade implements BluetoothFacade {
         }
         controller.add(accumulated.values.toList());
       },
-      onError: controller.addError,
+      // #1392 — mirror the explicit-future catchError above. Without
+      // this mapping the raw `PlatformException(startScan, "Bluetooth
+      // must be turned on", ...)` reaches the consumer (and from there
+      // the global zone error handler as `[other] PlatformException`)
+      // when FlutterBluePlus rejects via the stream rather than the
+      // future. The `isClosed` guard handles the race with the timeout
+      // timer below that may have already closed the controller.
+      onError: (Object e, StackTrace st) {
+        if (controller.isClosed) return;
+        controller.addError(_mapBluetoothError(e), st);
+      },
     );
 
     // Clean up when the caller cancels or the timeout elapses.
@@ -107,6 +117,13 @@ class PluginBluetoothFacade implements BluetoothFacade {
   @visibleForTesting
   static bool debugLooksBluetoothOff(Object e) => _looksBluetoothOff(e);
 
+  /// Test seam for the error mapping used by both the explicit-future
+  /// `catchError` and the `scanResults` stream's `onError` (#1392).
+  /// Both call sites must funnel through this helper so a BT-off
+  /// rejection on either path surfaces as `Obd2BluetoothOff`.
+  @visibleForTesting
+  static Object debugMapBluetoothError(Object e) => _mapBluetoothError(e);
+
   static bool _looksBluetoothOff(Object e) {
     if (e is! PlatformException) return false;
     final msg = (e.message ?? '').toLowerCase();
@@ -114,6 +131,9 @@ class PluginBluetoothFacade implements BluetoothFacade {
         msg.contains('bluetooth must be on') ||
         msg.contains('bluetooth_off');
   }
+
+  static Object _mapBluetoothError(Object e) =>
+      _looksBluetoothOff(e) ? const Obd2BluetoothOff() : e;
 
   @override
   Future<void> stopScan() => FlutterBluePlus.stopScan();
