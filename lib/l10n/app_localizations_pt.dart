@@ -3396,6 +3396,136 @@ class AppLocalizationsPt extends AppLocalizations {
   String get favoritesShareError => 'Couldn\'t generate share image';
 
   @override
+  String get featureManagementSectionTitle => 'Feature management';
+
+  @override
+  String get featureManagementSectionSubtitle =>
+      'Turn individual features on or off. Some features depend on others — switches are disabled until prerequisites are met.';
+
+  @override
+  String get featureLabel_obd2TripRecording => 'OBD2 trip recording';
+
+  @override
+  String get featureDescription_obd2TripRecording =>
+      'Capture trips automatically over OBD2.';
+
+  @override
+  String get featureLabel_gamification => 'Gamification';
+
+  @override
+  String get featureDescription_gamification =>
+      'Driving scores and earned badges.';
+
+  @override
+  String get featureLabel_hapticEcoCoach => 'Haptic eco-coach';
+
+  @override
+  String get featureDescription_hapticEcoCoach =>
+      'Real-time haptic feedback during a trip.';
+
+  @override
+  String get featureLabel_tankSync => 'TankSync';
+
+  @override
+  String get featureDescription_tankSync => 'Cross-device sync via Supabase.';
+
+  @override
+  String get featureLabel_consumptionAnalytics => 'Consumption analytics';
+
+  @override
+  String get featureDescription_consumptionAnalytics =>
+      'Fill-up and trip analysis tab.';
+
+  @override
+  String get featureLabel_baselineSync => 'Baseline sync';
+
+  @override
+  String get featureDescription_baselineSync =>
+      'Sync driving baselines via TankSync.';
+
+  @override
+  String get featureLabel_unifiedSearchResults => 'Unified search results';
+
+  @override
+  String get featureDescription_unifiedSearchResults =>
+      'Single result list combining fuel and EV stations.';
+
+  @override
+  String get featureLabel_priceAlerts => 'Price alerts';
+
+  @override
+  String get featureDescription_priceAlerts =>
+      'Threshold-based price-drop notifications.';
+
+  @override
+  String get featureLabel_priceHistory => 'Price history';
+
+  @override
+  String get featureDescription_priceHistory =>
+      '30-day price charts on station details.';
+
+  @override
+  String get featureLabel_routePlanning => 'Route planning';
+
+  @override
+  String get featureDescription_routePlanning =>
+      'Cheapest stop along your route.';
+
+  @override
+  String get featureLabel_evCharging => 'EV charging';
+
+  @override
+  String get featureDescription_evCharging =>
+      'Charging stations via OpenChargeMap.';
+
+  @override
+  String get featureLabel_glideCoach => 'Glide-coach';
+
+  @override
+  String get featureDescription_glideCoach =>
+      'Hypermiling guidance using OSM traffic signals.';
+
+  @override
+  String get featureLabel_gpsTripPath => 'GPS trip path';
+
+  @override
+  String get featureDescription_gpsTripPath =>
+      'Persist GPS path samples alongside each trip.';
+
+  @override
+  String get featureBlockedEnable_gamification =>
+      'Enable OBD2 trip recording first';
+
+  @override
+  String get featureBlockedEnable_hapticEcoCoach =>
+      'Enable OBD2 trip recording first';
+
+  @override
+  String get featureBlockedEnable_consumptionAnalytics =>
+      'Enable OBD2 trip recording first';
+
+  @override
+  String get featureBlockedEnable_baselineSync => 'Enable TankSync first';
+
+  @override
+  String get featureBlockedEnable_glideCoach =>
+      'Enable OBD2 trip recording first';
+
+  @override
+  String get featureBlockedEnable_gpsTripPath =>
+      'Enable OBD2 trip recording first';
+
+  @override
+  String featureBlockedDisable_obd2TripRecording(String dependents) {
+    return 'Disable dependent features first: $dependents';
+  }
+
+  @override
+  String featureBlockedDisable_tankSync(String dependents) {
+    return 'Disable dependent features first: $dependents';
+  }
+
+  @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
 
   @override

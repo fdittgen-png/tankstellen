@@ -10,6 +10,7 @@ import '../../../consent/presentation/widgets/consent_settings_section.dart';
 import '../../../driving/presentation/widgets/driving_settings_section.dart';
 import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
+import '../widgets/feature_management_section.dart';
 import '../widgets/feedback_token_section.dart';
 import '../widgets/location_section_widget.dart';
 import '../widgets/profile_list_section.dart';
@@ -141,6 +142,20 @@ class ProfileScreen extends ConsumerWidget {
             subtitle: l?.privacyDashboardSubtitle ??
                 'View, export, or delete your data',
             onTap: () => context.push('/privacy-dashboard'),
+          ),
+          const SizedBox(height: 8),
+
+          // #1373 phase 2 — central feature-management toggles. Placed
+          // near the bottom (above About, below Privacy) because most
+          // users will never visit it; advanced controls don't belong
+          // at the top of a settings screen. The engine ships in
+          // PARALLEL with the existing scattered toggles — Phase 3 of
+          // #1373 will route legacy paths through this provider one
+          // feature at a time.
+          _FoldableSection(
+            icon: Icons.tune,
+            title: l?.featureManagementSectionTitle ?? 'Feature management',
+            child: const FeatureManagementSection(),
           ),
           const SizedBox(height: 16),
 

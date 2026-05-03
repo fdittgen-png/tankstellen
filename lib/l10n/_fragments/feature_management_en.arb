@@ -1,0 +1,158 @@
+{
+  "featureManagementSectionTitle": "Feature management",
+  "@featureManagementSectionTitle": {
+    "description": "Title of the foldable settings section that lets the user toggle each top-level app feature on or off (#1373 phase 2)."
+  },
+  "featureManagementSectionSubtitle": "Turn individual features on or off. Some features depend on others — switches are disabled until prerequisites are met.",
+  "@featureManagementSectionSubtitle": {
+    "description": "One-line subtitle shown at the top of the Feature management section explaining the dependency-aware behaviour."
+  },
+  "featureLabel_obd2TripRecording": "OBD2 trip recording",
+  "@featureLabel_obd2TripRecording": {
+    "description": "Display name for the OBD2 trip recording feature in the Feature management list."
+  },
+  "featureDescription_obd2TripRecording": "Capture trips automatically over OBD2.",
+  "@featureDescription_obd2TripRecording": {
+    "description": "One-line description for the OBD2 trip recording feature."
+  },
+  "featureLabel_gamification": "Gamification",
+  "@featureLabel_gamification": {
+    "description": "Display name for the gamification feature in the Feature management list."
+  },
+  "featureDescription_gamification": "Driving scores and earned badges.",
+  "@featureDescription_gamification": {
+    "description": "One-line description for the gamification feature."
+  },
+  "featureLabel_hapticEcoCoach": "Haptic eco-coach",
+  "@featureLabel_hapticEcoCoach": {
+    "description": "Display name for the haptic eco-coach feature in the Feature management list."
+  },
+  "featureDescription_hapticEcoCoach": "Real-time haptic feedback during a trip.",
+  "@featureDescription_hapticEcoCoach": {
+    "description": "One-line description for the haptic eco-coach feature."
+  },
+  "featureLabel_tankSync": "TankSync",
+  "@featureLabel_tankSync": {
+    "description": "Display name for the TankSync (cross-device sync) feature in the Feature management list."
+  },
+  "featureDescription_tankSync": "Cross-device sync via Supabase.",
+  "@featureDescription_tankSync": {
+    "description": "One-line description for the TankSync feature."
+  },
+  "featureLabel_consumptionAnalytics": "Consumption analytics",
+  "@featureLabel_consumptionAnalytics": {
+    "description": "Display name for the consumption analytics feature in the Feature management list."
+  },
+  "featureDescription_consumptionAnalytics": "Fill-up and trip analysis tab.",
+  "@featureDescription_consumptionAnalytics": {
+    "description": "One-line description for the consumption analytics feature."
+  },
+  "featureLabel_baselineSync": "Baseline sync",
+  "@featureLabel_baselineSync": {
+    "description": "Display name for the driving-baseline sync feature in the Feature management list."
+  },
+  "featureDescription_baselineSync": "Sync driving baselines via TankSync.",
+  "@featureDescription_baselineSync": {
+    "description": "One-line description for the baseline sync feature."
+  },
+  "featureLabel_unifiedSearchResults": "Unified search results",
+  "@featureLabel_unifiedSearchResults": {
+    "description": "Display name for the unified fuel + EV search results feature in the Feature management list."
+  },
+  "featureDescription_unifiedSearchResults": "Single result list combining fuel and EV stations.",
+  "@featureDescription_unifiedSearchResults": {
+    "description": "One-line description for the unified search results feature."
+  },
+  "featureLabel_priceAlerts": "Price alerts",
+  "@featureLabel_priceAlerts": {
+    "description": "Display name for the price alerts feature in the Feature management list."
+  },
+  "featureDescription_priceAlerts": "Threshold-based price-drop notifications.",
+  "@featureDescription_priceAlerts": {
+    "description": "One-line description for the price alerts feature."
+  },
+  "featureLabel_priceHistory": "Price history",
+  "@featureLabel_priceHistory": {
+    "description": "Display name for the price history feature in the Feature management list."
+  },
+  "featureDescription_priceHistory": "30-day price charts on station details.",
+  "@featureDescription_priceHistory": {
+    "description": "One-line description for the price history feature."
+  },
+  "featureLabel_routePlanning": "Route planning",
+  "@featureLabel_routePlanning": {
+    "description": "Display name for the route planning feature in the Feature management list."
+  },
+  "featureDescription_routePlanning": "Cheapest stop along your route.",
+  "@featureDescription_routePlanning": {
+    "description": "One-line description for the route planning feature."
+  },
+  "featureLabel_evCharging": "EV charging",
+  "@featureLabel_evCharging": {
+    "description": "Display name for the EV charging feature in the Feature management list."
+  },
+  "featureDescription_evCharging": "Charging stations via OpenChargeMap.",
+  "@featureDescription_evCharging": {
+    "description": "One-line description for the EV charging feature."
+  },
+  "featureLabel_glideCoach": "Glide-coach",
+  "@featureLabel_glideCoach": {
+    "description": "Display name for the hypermiling glide-coach feature in the Feature management list."
+  },
+  "featureDescription_glideCoach": "Hypermiling guidance using OSM traffic signals.",
+  "@featureDescription_glideCoach": {
+    "description": "One-line description for the glide-coach feature."
+  },
+  "featureLabel_gpsTripPath": "GPS trip path",
+  "@featureLabel_gpsTripPath": {
+    "description": "Display name for the GPS trip path feature in the Feature management list."
+  },
+  "featureDescription_gpsTripPath": "Persist GPS path samples alongside each trip.",
+  "@featureDescription_gpsTripPath": {
+    "description": "One-line description for the GPS trip path feature."
+  },
+  "featureBlockedEnable_gamification": "Enable OBD2 trip recording first",
+  "@featureBlockedEnable_gamification": {
+    "description": "Tooltip shown on the disabled gamification toggle when its prerequisite (OBD2 trip recording) is off."
+  },
+  "featureBlockedEnable_hapticEcoCoach": "Enable OBD2 trip recording first",
+  "@featureBlockedEnable_hapticEcoCoach": {
+    "description": "Tooltip shown on the disabled haptic eco-coach toggle when its prerequisite (OBD2 trip recording) is off."
+  },
+  "featureBlockedEnable_consumptionAnalytics": "Enable OBD2 trip recording first",
+  "@featureBlockedEnable_consumptionAnalytics": {
+    "description": "Tooltip shown on the disabled consumption analytics toggle when its prerequisite (OBD2 trip recording) is off."
+  },
+  "featureBlockedEnable_baselineSync": "Enable TankSync first",
+  "@featureBlockedEnable_baselineSync": {
+    "description": "Tooltip shown on the disabled baseline sync toggle when its prerequisite (TankSync) is off."
+  },
+  "featureBlockedEnable_glideCoach": "Enable OBD2 trip recording first",
+  "@featureBlockedEnable_glideCoach": {
+    "description": "Tooltip shown on the disabled glide-coach toggle when its prerequisite (OBD2 trip recording) is off."
+  },
+  "featureBlockedEnable_gpsTripPath": "Enable OBD2 trip recording first",
+  "@featureBlockedEnable_gpsTripPath": {
+    "description": "Tooltip shown on the disabled GPS trip path toggle when its prerequisite (OBD2 trip recording) is off."
+  },
+  "featureBlockedDisable_obd2TripRecording": "Disable dependent features first: {dependents}",
+  "@featureBlockedDisable_obd2TripRecording": {
+    "description": "Tooltip shown on the disabled OBD2 trip recording toggle when one or more dependent features are still enabled. The placeholder is filled with a comma-separated list of localised feature names.",
+    "placeholders": {
+      "dependents": {
+        "type": "String",
+        "example": "Gamification, Haptic eco-coach"
+      }
+    }
+  },
+  "featureBlockedDisable_tankSync": "Disable dependent features first: {dependents}",
+  "@featureBlockedDisable_tankSync": {
+    "description": "Tooltip shown on the disabled TankSync toggle when one or more dependent features are still enabled.",
+    "placeholders": {
+      "dependents": {
+        "type": "String",
+        "example": "Baseline sync"
+      }
+    }
+  }
+}

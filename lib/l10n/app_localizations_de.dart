@@ -3426,6 +3426,137 @@ class AppLocalizationsDe extends AppLocalizations {
   String get favoritesShareError => 'Bild konnte nicht erstellt werden';
 
   @override
+  String get featureManagementSectionTitle => 'Funktionen verwalten';
+
+  @override
+  String get featureManagementSectionSubtitle =>
+      'Einzelne Funktionen ein- oder ausschalten. Manche Funktionen hängen von anderen ab — ihre Schalter bleiben deaktiviert, bis die Voraussetzungen erfüllt sind.';
+
+  @override
+  String get featureLabel_obd2TripRecording => 'OBD2-Fahrtaufzeichnung';
+
+  @override
+  String get featureDescription_obd2TripRecording =>
+      'Fahrten automatisch über OBD2 aufzeichnen.';
+
+  @override
+  String get featureLabel_gamification => 'Gamification';
+
+  @override
+  String get featureDescription_gamification =>
+      'Fahrwertungen und Auszeichnungen.';
+
+  @override
+  String get featureLabel_hapticEcoCoach => 'Haptischer Eco-Coach';
+
+  @override
+  String get featureDescription_hapticEcoCoach =>
+      'Haptische Rückmeldungen während der Fahrt in Echtzeit.';
+
+  @override
+  String get featureLabel_tankSync => 'TankSync';
+
+  @override
+  String get featureDescription_tankSync =>
+      'Geräteübergreifende Synchronisierung über Supabase.';
+
+  @override
+  String get featureLabel_consumptionAnalytics => 'Verbrauchsanalyse';
+
+  @override
+  String get featureDescription_consumptionAnalytics =>
+      'Tank- und Fahrtanalyse-Tab.';
+
+  @override
+  String get featureLabel_baselineSync => 'Basislinien-Synchronisierung';
+
+  @override
+  String get featureDescription_baselineSync =>
+      'Fahrbasislinien über TankSync abgleichen.';
+
+  @override
+  String get featureLabel_unifiedSearchResults =>
+      'Vereinheitlichte Suchergebnisse';
+
+  @override
+  String get featureDescription_unifiedSearchResults =>
+      'Eine Ergebnisliste für Tankstellen und Ladesäulen.';
+
+  @override
+  String get featureLabel_priceAlerts => 'Preisalarme';
+
+  @override
+  String get featureDescription_priceAlerts =>
+      'Benachrichtigungen, sobald Preise unter einen Schwellwert fallen.';
+
+  @override
+  String get featureLabel_priceHistory => 'Preisverlauf';
+
+  @override
+  String get featureDescription_priceHistory =>
+      '30-Tage-Preisdiagramme im Stationsdetail.';
+
+  @override
+  String get featureLabel_routePlanning => 'Routenplanung';
+
+  @override
+  String get featureDescription_routePlanning =>
+      'Günstigster Tankstopp entlang deiner Route.';
+
+  @override
+  String get featureLabel_evCharging => 'Elektromobilität';
+
+  @override
+  String get featureDescription_evCharging => 'Ladesäulen über OpenChargeMap.';
+
+  @override
+  String get featureLabel_glideCoach => 'Glide-Coach';
+
+  @override
+  String get featureDescription_glideCoach =>
+      'Spritspar-Hinweise anhand von OSM-Ampeldaten.';
+
+  @override
+  String get featureLabel_gpsTripPath => 'GPS-Fahrtaufzeichnung';
+
+  @override
+  String get featureDescription_gpsTripPath =>
+      'GPS-Spur zu jeder Fahrt mitspeichern.';
+
+  @override
+  String get featureBlockedEnable_gamification =>
+      'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
+
+  @override
+  String get featureBlockedEnable_hapticEcoCoach =>
+      'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
+
+  @override
+  String get featureBlockedEnable_consumptionAnalytics =>
+      'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
+
+  @override
+  String get featureBlockedEnable_baselineSync => 'Aktiviere zuerst TankSync';
+
+  @override
+  String get featureBlockedEnable_glideCoach =>
+      'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
+
+  @override
+  String get featureBlockedEnable_gpsTripPath =>
+      'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
+
+  @override
+  String featureBlockedDisable_obd2TripRecording(String dependents) {
+    return 'Schalte zuerst die abhängigen Funktionen aus: $dependents';
+  }
+
+  @override
+  String featureBlockedDisable_tankSync(String dependents) {
+    return 'Schalte zuerst die abhängigen Funktionen aus: $dependents';
+  }
+
+  @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';
 
   @override

@@ -138,6 +138,26 @@ void main() {
           reason: 'French (fr) must have every loyalty* key — the '
               'Fuel club cards screen and its add-card sheet must not '
               'fall back to English for French users');
+
+      // #1373 phase 2 — the Feature management section in Settings is
+      // a French-reachable surface. Every per-feature label, description
+      // and blocked-transition tooltip must have a French translation
+      // so the section isn't a wall of English on French devices.
+      final frenchMissingFeatureMgmt = frenchMissing
+          .where((k) =>
+              k.startsWith('featureManagementSection') ||
+              k.startsWith('featureLabel_') ||
+              k.startsWith('featureDescription_') ||
+              k.startsWith('featureBlockedEnable_') ||
+              k.startsWith('featureBlockedDisable_'))
+          .toList()
+        ..sort();
+      expect(frenchMissingFeatureMgmt, isEmpty,
+          reason: 'French (fr) must have every featureManagement / '
+              'featureLabel_ / featureDescription_ / featureBlockedEnable_ / '
+              'featureBlockedDisable_ key — the Feature management section '
+              'in Settings must not fall back to English for French users '
+              '(#1373 phase 2)');
     });
 
     test('no locale has extra keys not in app_en.arb', () {
