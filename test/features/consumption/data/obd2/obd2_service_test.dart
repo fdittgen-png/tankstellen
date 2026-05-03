@@ -649,6 +649,9 @@ void main() {
         // service's connect path with the legacy hardcoded init list.
         // If [GenericElm327Adapter.initSequence] or the connect loop
         // diverges, this test fails before any production user does.
+        // #1401 phase 1 appended a follow-up `ATI` (firmware-version
+        // probe) — included in the expected list but does not change
+        // the init sequence itself.
         final sent = <String>[];
         final transport = _RecordingTransport(
           {
@@ -657,12 +660,13 @@ void main() {
             'ATL0': 'OK>',
             'ATH0': 'OK>',
             'ATSP0': 'OK>',
+            'ATI': 'ELM327 v1.5>',
           },
           sent,
         );
         final service = Obd2Service(transport);
         await service.connect();
-        expect(sent, ['ATZ', 'ATE0', 'ATL0', 'ATH0', 'ATSP0']);
+        expect(sent, ['ATZ', 'ATE0', 'ATL0', 'ATH0', 'ATSP0', 'ATI']);
       },
     );
 

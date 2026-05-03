@@ -110,7 +110,10 @@ void main() {
         expect(service.adapter, isA<VLinkerFsAdapter>());
 
         final sent = transport.commands.map((c) => c.command).toList();
-        expect(sent, ['ATZ', 'ATE0', 'ATL0', 'ATH0', 'ATSP0']);
+        // #1401 phase 1: the connect path now appends an `ATI`
+        // firmware-version probe after the init sequence. Subject to
+        // the same interCommandDelay as the rest of the loop.
+        expect(sent, ['ATZ', 'ATE0', 'ATL0', 'ATH0', 'ATSP0', 'ATI']);
 
         // Gap between cmd[0] (ATZ) and cmd[1] (ATE0) reflects the
         // 200 ms postResetDelay. Generous lower bound (180 ms) avoids

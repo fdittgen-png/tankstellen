@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/data/obd2/adapter_capability.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapters/smart_obd_adapter.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm327_commands.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
@@ -154,7 +155,10 @@ void main() {
         expect(service.adapter, isA<SmartObdAdapter>());
 
         final sent = transport.commands.map((c) => c.command).toList();
-        expect(sent, ['ATZ', 'ATE0', 'ATL0', 'ATH0', 'ATSP0']);
+        // #1401 phase 1: connect appends a firmware-version probe
+        // (`ATI`) after the init sequence — same interCommandDelay
+        // applies, so it slots into the gap-bound assertions below.
+        expect(sent, ['ATZ', 'ATE0', 'ATL0', 'ATH0', 'ATSP0', 'ATI']);
 
         // Gap before ATE0 reflects the 400 ms postResetDelay.
         final firstGap = transport.commands[1].at - transport.commands[0].at;
@@ -181,6 +185,46 @@ void main() {
                 'not the 400 ms postResetDelay',
           );
         }
+      },
+    );
+  });
+
+  group('Obd2Service capability detection (#1401 phase 1)', () {
+    test('default capability is standardOnly before connect', () {
+      final transport = _RecordingObd2Transport();
+      final service = Obd2Service(transport);
+      // Pre-connect: no firmware string read yet → safe default.
+      expect(service.capability, Obd2AdapterCapability.standardOnly);
+      expect(service.adapterFirmware, isNull);
+    });
+
+    test(
+      'connect captures firmware string and exposes parsed capability '
+      '(STN1110 v4.0.4 → passiveCanCapable)',
+      () async {
+        final transport = _RecordingObd2Transport({
+          'ATZ': 'ELM327 v1.5>',
+          'ATE0': 'OK>',
+          'ATL0': 'OK>',
+          'ATH0': 'OK>',
+          'ATSP0': 'OK>',
+          // Real OBDLink MX+ firmware string. Comes back via `ATI`
+          // after the init sequence completes.
+          'ATI': 'STN1110 v4.0.4\r\r>',
+        });
+        final service = Obd2Service(transport);
+
+        // Default before connect — proves the getter is wired and the
+        // value updates only as a result of connect().
+        expect(service.capability, Obd2AdapterCapability.standardOnly);
+
+        final connected = await service.connect();
+        expect(connected, isTrue);
+
+        // After connect: firmware string snapshotted, capability
+        // upgraded to passive CAN.
+        expect(service.adapterFirmware, 'STN1110 v4.0.4');
+        expect(service.capability, Obd2AdapterCapability.passiveCanCapable);
       },
     );
   });

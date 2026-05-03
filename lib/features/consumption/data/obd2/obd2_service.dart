@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import 'adapter_capability.dart';
 import 'elm327_adapter.dart';
 import 'elm327_protocol.dart';
 import 'fuel_rate_estimator.dart' as estimator;
@@ -66,13 +67,24 @@ class Obd2Service {
   String? adapterName;
 
   /// ELM327 firmware string (whatever `ATI` returned during init), if
-  /// the adapter reported one (#1312). Currently null in production
-  /// because the connect path does not snapshot the response — the
-  /// field is wired so a future enhancement can populate it without
-  /// touching the trip-history schema again. Persisted/round-tripped
-  /// by [TripHistoryEntry] so device-test reports can name the exact
-  /// firmware variant when we eventually capture it.
+  /// the adapter reported one (#1312, #1401). Populated by [connect]
+  /// after the init sequence completes — null only when the adapter
+  /// returned an empty / NO-DATA response to `ATI`, or when the test
+  /// fake didn't wire one in. Persisted/round-tripped by
+  /// [TripHistoryEntry] so device-test reports can name the exact
+  /// firmware variant.
   String? adapterFirmware;
+
+  /// Runtime capability tier of the connected adapter (#1401 phase 1).
+  /// Defaults to [Obd2AdapterCapability.standardOnly] before [connect]
+  /// has read the firmware string, and is replaced with the parsed
+  /// value after the init sequence runs. Phase 1 ships read-only —
+  /// no production call site branches on this value yet.
+  Obd2AdapterCapability _capability = Obd2AdapterCapability.standardOnly;
+
+  /// Runtime capability tier of the connected adapter (#1401 phase 1).
+  /// See [_capability] for semantics.
+  Obd2AdapterCapability get capability => _capability;
 
   /// Per-adapter ELM327 quirks (#1330). Set by [connect] from the
   /// caller-supplied `adapter` parameter; defaults to the
@@ -93,6 +105,24 @@ class Obd2Service {
     String? vehicleFallbackKey,
   })  : _pidsCache = pidsCache,
         _vehicleFallbackKey = vehicleFallbackKey;
+
+  /// AT command that asks the ELM327 to identify itself. Returns a
+  /// version string like `ELM327 v1.5` / `ELM327 v2.2` /
+  /// `STN1110 v4.0.4` (#1401 phase 1).
+  static const String _atiCommand = 'ATI\r';
+
+  /// Strip the trailing ELM prompt (`>`) plus any CR/LF noise from a
+  /// raw `ATI` response. Returns null when the response was a
+  /// NO-DATA-style placeholder.
+  static String? _parseFirmwareString(String raw) {
+    var s = raw.replaceAll('\r', ' ').replaceAll('\n', ' ');
+    s = s.replaceAll('>', '').trim();
+    // Collapse runs of whitespace introduced by stripping CR/LF.
+    s = s.replaceAll(RegExp(r'\s+'), ' ');
+    if (s.isEmpty) return null;
+    if (s.toUpperCase().contains('NO DATA')) return null;
+    return s;
+  }
 
   /// `true` when the underlying [Obd2Transport] currently has an open
   /// connection to the vehicle's ELM327 adapter.
@@ -150,6 +180,23 @@ class Obd2Service {
         final delay =
             i == 0 ? adapter.postResetDelay : adapter.interCommandDelay;
         await Future.delayed(delay);
+      }
+
+      // Capture the firmware-version string and derive the runtime
+      // capability tier (#1401 phase 1). Sent after the init sequence
+      // so echo / line-feeds / headers are off and the response is
+      // clean. Failures here are non-fatal — we keep the
+      // [Obd2AdapterCapability.standardOnly] default and let the
+      // connect succeed. No call site branches on `capability` yet.
+      try {
+        final raw = await _transport.sendCommand(_atiCommand);
+        final firmware = _parseFirmwareString(raw);
+        if (firmware != null && firmware.isNotEmpty) {
+          adapterFirmware = firmware;
+        }
+        _capability = detectCapabilityFromFirmwareString(firmware);
+      } catch (e, st) {
+        debugPrint('OBD2 ATI firmware read failed: $e\n$st');
       }
 
       await _primeSupportedPidsCache();
