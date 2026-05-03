@@ -7130,6 +7130,36 @@ abstract class AppLocalizations {
   /// **'Need at least 3 trips per month for comparison'**
   String get consumptionMonthlyComparisonNotReliable;
 
+  /// Snackbar shown when the user has flipped the in-app OBD2 fuel-rate diagnostic overlay ON via the hidden 5-tap gesture on the trip-recording screen title (#1395).
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 diagnostic overlay enabled'**
+  String get obd2DebugOverlayEnabledSnack;
+
+  /// Snackbar shown when the user has flipped the in-app OBD2 fuel-rate diagnostic overlay OFF via the hidden 5-tap gesture (#1395).
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 diagnostic overlay disabled'**
+  String get obd2DebugOverlayDisabledSnack;
+
+  /// Button on the in-app OBD2 fuel-rate diagnostic overlay that empties the recorded breadcrumb list (#1395).
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get obd2DebugOverlayClearButton;
+
+  /// Button on the in-app OBD2 fuel-rate diagnostic overlay that hides the overlay by disabling the persisted flag (#1395).
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get obd2DebugOverlayCloseButton;
+
+  /// Title shown at the top of the in-app OBD2 fuel-rate diagnostic overlay panel (#1395).
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 breadcrumbs'**
+  String get obd2DebugOverlayTitle;
+
   /// Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.
   ///
   /// In en, this message translates to:

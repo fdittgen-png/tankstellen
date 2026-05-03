@@ -100,6 +100,18 @@ class TripSummary {
   /// (no centroids, EV, insufficient samples).
   final double? secondsBelowOptimalGear;
 
+  /// Whether the fuel-rate samples that produced [fuelLitersConsumed]
+  /// / [avgLPer100Km] tripped the cross-check sanity bounds at a
+  /// meaningful rate during the trip (#1395). Set true at trip end
+  /// when the breadcrumb collector reports
+  /// `suspiciousSampleCount / totalSampleCount > 0.3` — i.e. more
+  /// than 30 % of samples were either implausibly low (RPM > 1500
+  /// AND L/h < 0.3) or showed > 50 % divergence between PID 5E and
+  /// the MAF-derived rate. Stays false when no samples or no flagged
+  /// samples were recorded; UI surfaces (#1395 phase 4) render a chip
+  /// on the trip summary card based on this bit.
+  final bool fuelRateSuspect;
+
   const TripSummary({
     required this.distanceKm,
     required this.maxRpm,
@@ -114,6 +126,7 @@ class TripSummary {
     this.distanceSource = 'virtual',
     this.coldStartSurcharge = false,
     this.secondsBelowOptimalGear,
+    this.fuelRateSuspect = false,
   });
 }
 

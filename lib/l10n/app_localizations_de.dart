@@ -3899,6 +3899,22 @@ class AppLocalizationsDe extends AppLocalizations {
       'Mindestens 3 Fahrten pro Monat für den Vergleich nötig';
 
   @override
+  String get obd2DebugOverlayEnabledSnack => 'OBD2-Diagnose-Overlay aktiviert';
+
+  @override
+  String get obd2DebugOverlayDisabledSnack =>
+      'OBD2-Diagnose-Overlay deaktiviert';
+
+  @override
+  String get obd2DebugOverlayClearButton => 'Leeren';
+
+  @override
+  String get obd2DebugOverlayCloseButton => 'Schließen';
+
+  @override
+  String get obd2DebugOverlayTitle => 'OBD2-Spuren';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Konnte \'$adapterName\' nicht erreichen — wähle einen anderen Adapter';
   }

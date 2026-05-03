@@ -145,6 +145,62 @@ void main() {
     });
   });
 
+  group('Obd2DebugOverlay (#1395)', () {
+    test('build returns false when flag never set', () {
+      final c = createContainer();
+      expect(c.read(obd2DebugOverlayProvider), isFalse);
+    });
+
+    test('build reflects stored true value', () async {
+      await fakeStorage.putSetting(StorageKeys.obd2DebugOverlayEnabled, true);
+      final c = createContainer();
+      expect(c.read(obd2DebugOverlayProvider), isTrue);
+    });
+
+    test('enable persists true to storage and updates state', () async {
+      final c = createContainer();
+      await c.read(obd2DebugOverlayProvider.notifier).enable();
+
+      expect(
+        fakeStorage.getSetting(StorageKeys.obd2DebugOverlayEnabled),
+        isTrue,
+      );
+      expect(c.read(obd2DebugOverlayProvider), isTrue);
+    });
+
+    test('disable persists false to storage and updates state', () async {
+      await fakeStorage.putSetting(StorageKeys.obd2DebugOverlayEnabled, true);
+      final c = createContainer();
+      expect(c.read(obd2DebugOverlayProvider), isTrue);
+
+      await c.read(obd2DebugOverlayProvider.notifier).disable();
+      expect(
+        fakeStorage.getSetting(StorageKeys.obd2DebugOverlayEnabled),
+        isFalse,
+      );
+      expect(c.read(obd2DebugOverlayProvider), isFalse);
+    });
+
+    test('toggle flips false→true→false across calls', () async {
+      final c = createContainer();
+      expect(c.read(obd2DebugOverlayProvider), isFalse);
+
+      await c.read(obd2DebugOverlayProvider.notifier).toggle();
+      expect(c.read(obd2DebugOverlayProvider), isTrue);
+      expect(
+        fakeStorage.getSetting(StorageKeys.obd2DebugOverlayEnabled),
+        isTrue,
+      );
+
+      await c.read(obd2DebugOverlayProvider.notifier).toggle();
+      expect(c.read(obd2DebugOverlayProvider), isFalse);
+      expect(
+        fakeStorage.getSetting(StorageKeys.obd2DebugOverlayEnabled),
+        isFalse,
+      );
+    });
+  });
+
   group('LocationConsent', () {
     test('build returns false when no consent', () {
       final c = createContainer();

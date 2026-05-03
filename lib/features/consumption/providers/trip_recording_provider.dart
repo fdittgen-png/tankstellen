@@ -25,6 +25,7 @@ import '../data/obd2/adapter_reconnect_scanner.dart';
 import '../data/obd2/obd2_connection_service.dart';
 import '../data/obd2/obd2_service.dart';
 import '../data/obd2/trip_recording_controller.dart';
+import 'obd2_breadcrumb_provider.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/situation_classifier.dart';
@@ -265,6 +266,20 @@ class TripRecording extends _$TripRecording {
     // [Obd2ConnectionService] to drive the BT scan + reconnect,
     // keeping the controller free of plugin imports.
     final pinnedMac = activeVehicle?.obd2AdapterMac;
+    // #1395 — wire the diagnostic breadcrumb sink for this trip. Both
+    // the controller (for `_deriveFuelRateLPerHour` snapshots) and
+    // the underlying [Obd2Service] (for the live PID 5E + MAF reads
+    // inside `readFuelRateLPerHour`) push through the SAME notifier
+    // — the provider keeps it keepAlive across recordings so the
+    // user can still inspect the trace from the overlay after the
+    // recording screen pops. Going through the notifier (which
+    // implements [Obd2BreadcrumbRecorder]) means every push also
+    // republishes the entries list to the overlay listeners.
+    final breadcrumbs = ref.read(obd2BreadcrumbsProvider.notifier);
+    // Clear any leftover breadcrumbs from a prior trip — we want a
+    // fresh suspicion-rate denominator for THIS recording.
+    breadcrumbs.clear();
+    service.breadcrumbCollector = breadcrumbs;
     final ctl = TripRecordingController(
       service: service,
       vehicle: activeVehicle,
@@ -272,6 +287,7 @@ class TripRecording extends _$TripRecording {
       pinnedAdapterMac: pinnedMac,
       automatic: automatic,
       reconnectScannerFactory: _buildReconnectScannerFactory(),
+      breadcrumbCollector: breadcrumbs,
     );
     _controller = ctl;
     _classifier = SituationClassifier();

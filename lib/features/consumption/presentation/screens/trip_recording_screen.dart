@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -14,6 +15,7 @@ import '../../../driving/providers/haptic_eco_coach_provider.dart';
 import '../../domain/trip_recorder.dart';
 import '../../providers/trip_recording_provider.dart';
 import '../../providers/wakelock_facade.dart';
+import '../widgets/obd2_breadcrumb_overlay.dart';
 
 /// Result returned when the user confirms saving a recorded trip
 /// from the summary screen (#726, #1185).
@@ -56,6 +58,20 @@ class TripRecordingScreen extends ConsumerStatefulWidget {
 class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
   StoppedTripResult? _stopped;
   bool _stopping = false;
+
+  /// #1395 — hidden 5-tap gesture state for the OBD2 diagnostic
+  /// overlay toggle. Mirrors the [MapScreen] gesture (PR #1378) bit-
+  /// for-bit so the two debug toggles can be reasoned about as a
+  /// single pattern.
+  ///
+  /// Five taps within [_debugGestureWindow] flips
+  /// [obd2DebugOverlayProvider]; a stray double-tap during normal
+  /// use cannot accidentally enable the overlay because the count
+  /// resets after a 2-second pause.
+  static const Duration _debugGestureWindow = Duration(seconds: 2);
+  static const int _debugGestureTapThreshold = 5;
+  int _debugTapCount = 0;
+  DateTime? _lastDebugTapAt;
 
   /// #891 — ephemeral pin state. Enabling keeps the screen on + hides
   /// system bars so the live recording form stays readable at the
@@ -139,6 +155,42 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         ),
       ),
     );
+  }
+
+  /// Hidden gesture handler — counts trip-recording-screen title taps
+  /// inside [_debugGestureWindow] and toggles
+  /// [obd2DebugOverlayProvider] on reaching [_debugGestureTapThreshold]
+  /// (#1395). Sibling to `_bumpDebugTapCount` in [MapScreen]
+  /// (PR #1378).
+  void _bumpDebugTapCount() {
+    final now = DateTime.now();
+    final last = _lastDebugTapAt;
+    if (last == null || now.difference(last) > _debugGestureWindow) {
+      _debugTapCount = 1;
+    } else {
+      _debugTapCount++;
+    }
+    _lastDebugTapAt = now;
+
+    if (_debugTapCount >= _debugGestureTapThreshold) {
+      _debugTapCount = 0;
+      _lastDebugTapAt = null;
+      final wasEnabled = ref.read(obd2DebugOverlayProvider);
+      unawaited(
+        ref.read(obd2DebugOverlayProvider.notifier).toggle().then((_) {
+          if (!mounted) return;
+          final l10n = AppLocalizations.of(context);
+          final msg = wasEnabled
+              ? (l10n?.obd2DebugOverlayDisabledSnack ??
+                  'OBD2 diagnostic overlay disabled')
+              : (l10n?.obd2DebugOverlayEnabledSnack ??
+                  'OBD2 diagnostic overlay enabled');
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(content: Text(msg)));
+        }),
+      );
+    }
   }
 
   Future<void> _onStop() async {
@@ -329,8 +381,23 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
             : (l?.tripRecordingTitle ?? 'Recording trip');
 
     // After stop: show the summary. Until then: live view.
+    // #1395 — wrap the title in a GestureDetector so the hidden
+    // 5-tap gesture can flip [obd2DebugOverlayProvider]. `behavior:
+    // opaque` ensures the tap is captured even when the title's
+    // intrinsic size leaves empty space inside the AppBar's title
+    // slot. `excludeFromSemantics: true` keeps the title out of the
+    // accessibility tap-target audit (it's a developer-only hidden
+    // gesture; the title was always a non-tappable header).
     return PageScaffold(
-      title: title,
+      titleWidget: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        excludeFromSemantics: true,
+        onTap: _bumpDebugTapCount,
+        child: Semantics(
+          header: true,
+          child: Text(title),
+        ),
+      ),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         tooltip: l?.tooltipBack ?? 'Back',
@@ -399,13 +466,23 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
               ),
             ],
       bodyPadding: EdgeInsets.zero,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: stopped == null
-              ? _buildRecording(context, l, state)
-              : _buildSummary(context, l, stopped),
-        ),
+      // #1395 — wrap the body in a Stack so the diagnostic overlay
+      // can float above the live recording / summary content. The
+      // overlay self-hides as a [SizedBox.shrink] when neither
+      // `kDebugMode` nor [obd2DebugOverlayProvider] is set, so the
+      // wrap is zero-cost in production builds where the flag is off.
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: stopped == null
+                  ? _buildRecording(context, l, state)
+                  : _buildSummary(context, l, stopped),
+            ),
+          ),
+          const Obd2BreadcrumbOverlay(),
+        ],
       ),
     );
   }

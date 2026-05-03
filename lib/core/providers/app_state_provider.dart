@@ -93,6 +93,34 @@ class MapDebugOverlay extends _$MapDebugOverlay {
   }
 }
 
+/// In-app OBD2 fuel-rate diagnostic overlay flag (#1395).
+///
+/// `kDebugMode` always shows the overlay; this Hive-backed flag flips
+/// it on for release builds when the user enables it via the hidden
+/// 5-tap gesture on the trip-recording screen title. Persisted so the
+/// overlay stays visible across launches once the user has opted in.
+/// Mirrors [MapDebugOverlay] (#1316 phase 2) bit-for-bit so the two
+/// debug toggles can be reasoned about as a single pattern.
+@riverpod
+class Obd2DebugOverlay extends _$Obd2DebugOverlay {
+  @override
+  bool build() {
+    final storage = ref.watch(storageRepositoryProvider);
+    return storage.getSetting(StorageKeys.obd2DebugOverlayEnabled) as bool? ??
+        false;
+  }
+
+  Future<void> enable() => _set(true);
+  Future<void> disable() => _set(false);
+  Future<void> toggle() => _set(!state);
+
+  Future<void> _set(bool value) async {
+    final storage = ref.read(storageRepositoryProvider);
+    await storage.putSetting(StorageKeys.obd2DebugOverlayEnabled, value);
+    state = value;
+  }
+}
+
 /// Auto-switch profile setting.
 @riverpod
 class AutoSwitchProfile extends _$AutoSwitchProfile {

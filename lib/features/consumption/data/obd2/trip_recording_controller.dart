@@ -10,6 +10,7 @@ import '../../domain/trip_recorder.dart';
 import '../trip_history_repository.dart';
 import 'adapter_reconnect_scanner.dart';
 import 'elm327_protocol.dart';
+import 'obd2_breadcrumb_collector.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_service.dart';
 import 'paused_trip_repository.dart';
@@ -380,6 +381,7 @@ class TripRecordingController {
       String pinnedMac,
       VoidCallback onReconnect,
     )? reconnectScannerFactory,
+    Obd2BreadcrumbRecorder? breadcrumbCollector,
   })  : _service = service,
         _recorder = recorder ?? TripRecorder(),
         _pollInterval = pollInterval,
@@ -396,7 +398,19 @@ class TripRecordingController {
         _schedulerTickRate = schedulerTickRate,
         _pinnedAdapterMac = pinnedAdapterMac,
         _automatic = automatic,
-        _reconnectScannerFactory = reconnectScannerFactory;
+        _reconnectScannerFactory = reconnectScannerFactory,
+        _breadcrumbCollector = breadcrumbCollector;
+
+  /// Optional fuel-rate diagnostic breadcrumb sink (#1395). Wired in
+  /// by [tripRecordingProvider] when a recording starts so the
+  /// controller can record the resolved branch + AFR/density/
+  /// displacement/VE actually used by [_deriveFuelRateLPerHour] each
+  /// emit, plus surface the running suspicion-rate at trip-end via
+  /// [TripSummary.fuelRateSuspect]. Typed as the [Obd2BreadcrumbRecorder]
+  /// interface so production passes the Riverpod notifier
+  /// (state-republishing) and unit tests pass a raw
+  /// [Obd2BreadcrumbCollector].
+  final Obd2BreadcrumbRecorder? _breadcrumbCollector;
 
   /// Live metrics stream — subscribe to update the recording UI.
   Stream<TripLiveReading> get live => _liveController.stream;
@@ -604,6 +618,22 @@ class TripRecordingController {
     } else if (base.fuelLitersConsumed == null) {
       avg = null;
     }
+    // #1395 — roll the running breadcrumb flag-counts into a single
+    // suspect bit on the trip summary. Threshold matches the spec:
+    // when more than 30 % of fuel-rate samples tripped a sanity flag
+    // (suspicious-low at cruise OR 5E-vs-MAF divergent > 50 %), the
+    // resulting L/100 km is unreliable and a downstream UI chip
+    // (#1395 phase 4) will warn the user. The snapshot resets the
+    // running counters so a subsequent recording starts clean.
+    var fuelRateSuspect = false;
+    final collector = _breadcrumbCollector;
+    if (collector != null) {
+      final snapshot = collector.snapshotAndResetCounters();
+      if (snapshot.total > 0 &&
+          snapshot.suspicious / snapshot.total > 0.3) {
+        fuelRateSuspect = true;
+      }
+    }
     return TripSummary(
       distanceKm: distanceKm,
       maxRpm: base.maxRpm,
@@ -617,6 +647,7 @@ class TripRecordingController {
       endedAt: base.endedAt,
       distanceSource: source,
       secondsBelowOptimalGear: _computeGearCoachingMetric(),
+      fuelRateSuspect: fuelRateSuspect,
     );
   }
 
@@ -1234,16 +1265,73 @@ class TripRecordingController {
     final density = isDiesel
         ? Obd2Service.dieselDensityGPerL
         : Obd2Service.petrolDensityGPerL;
+    final displacement = _vehicle?.engineDisplacementCc ?? 1000;
+    final ve = _vehicle?.volumetricEfficiency ?? 0.85;
+    final collector = _breadcrumbCollector;
 
     // Step 1: direct PID 5E. Already post-trim, no correction.
     final direct = _latestDirectFuelRate;
-    if (direct != null) return direct;
+    if (direct != null) {
+      // #1395 — sanity bound A: implausibly-low at non-idle RPM.
+      // Same threshold as Obd2Service.readFuelRateLPerHour but evaluated
+      // on the controller's most-recent RPM snapshot so this works
+      // even when the trip is being driven by raw scheduler callbacks
+      // rather than the readFuelRate API.
+      String? lowFlag;
+      String? lowDetail;
+      final rpm = _latestRpm;
+      if (direct < 0.3 && rpm != null && rpm > 1500) {
+        lowFlag = Obd2BreadcrumbCollector.flagSuspiciousLow;
+        lowDetail = 'directRate=${direct.toStringAsFixed(2)};'
+            'rpm=${rpm.toStringAsFixed(0)}';
+      }
+      collector?.record(
+        branch: Obd2BranchTag.pid5E,
+        fuelRateLPerHour: direct,
+        pid5ELPerHour: direct,
+        rpm: rpm,
+        afr: afr,
+        fuelDensityGPerL: density,
+        engineDisplacementCc: displacement.toDouble(),
+        volumetricEfficiency: ve,
+        flag: lowFlag,
+        flagDetail: lowDetail,
+      );
+      // Sanity bound B: 5E vs MAF cross-check on the controller's
+      // cached MAF snapshot. Evaluated AFTER the breadcrumb is
+      // pushed so [recordFlag] mutates the same row.
+      final mafSnapshot = _latestMaf;
+      if (mafSnapshot != null) {
+        final mafDerived = mafSnapshot * 3600.0 / (afr * density);
+        if (mafDerived > 0 &&
+            (direct - mafDerived).abs() / mafDerived > 0.5) {
+          collector?.recordFlag(
+            Obd2BreadcrumbCollector.flag5eVsMafDivergent,
+            'direct=${direct.toStringAsFixed(2)};'
+                'mafDerived=${mafDerived.toStringAsFixed(2)};'
+                'maf=${mafSnapshot.toStringAsFixed(2)}',
+          );
+        }
+      }
+      return direct;
+    }
 
     // Step 2: MAF-based. L/h = MAF × 3600 / (AFR × density).
     final maf = _latestMaf;
     if (maf != null) {
       final raw = maf * 3600.0 / (afr * density);
-      return _applyTrim(raw);
+      final corrected = _applyTrim(raw);
+      collector?.record(
+        branch: Obd2BranchTag.maf,
+        fuelRateLPerHour: corrected,
+        mafGramsPerSecond: maf,
+        rpm: _latestRpm,
+        afr: afr,
+        fuelDensityGPerL: density,
+        engineDisplacementCc: displacement.toDouble(),
+        volumetricEfficiency: ve,
+      );
+      return corrected;
     }
 
     // Step 3: speed-density from MAP+IAT+RPM. Feeds the pre-#810
@@ -1251,18 +1339,54 @@ class TripRecordingController {
     final mapKpa = _latestMapKpa;
     final iat = _latestIatCelsius;
     final rpm = _latestRpm;
-    if (mapKpa == null || iat == null || rpm == null) return null;
+    if (mapKpa == null || iat == null || rpm == null) {
+      collector?.record(
+        branch: Obd2BranchTag.none,
+        mapKpa: mapKpa,
+        iatCelsius: iat,
+        rpm: rpm,
+        afr: afr,
+        fuelDensityGPerL: density,
+        engineDisplacementCc: displacement.toDouble(),
+        volumetricEfficiency: ve,
+      );
+      return null;
+    }
     final raw = Obd2Service.estimateFuelRateLPerHourFromMap(
       mapKpa: mapKpa,
       iatCelsius: iat,
       rpm: rpm,
-      engineDisplacementCc: _vehicle?.engineDisplacementCc ?? 1000,
-      volumetricEfficiency: _vehicle?.volumetricEfficiency ?? 0.85,
+      engineDisplacementCc: displacement,
+      volumetricEfficiency: ve,
       afr: afr,
       fuelDensityGPerL: density,
     );
-    if (raw == null) return null;
-    return _applyTrim(raw);
+    if (raw == null) {
+      collector?.record(
+        branch: Obd2BranchTag.none,
+        mapKpa: mapKpa,
+        iatCelsius: iat,
+        rpm: rpm,
+        afr: afr,
+        fuelDensityGPerL: density,
+        engineDisplacementCc: displacement.toDouble(),
+        volumetricEfficiency: ve,
+      );
+      return null;
+    }
+    final corrected = _applyTrim(raw);
+    collector?.record(
+      branch: Obd2BranchTag.speedDensity,
+      fuelRateLPerHour: corrected,
+      mapKpa: mapKpa,
+      iatCelsius: iat,
+      rpm: rpm,
+      afr: afr,
+      fuelDensityGPerL: density,
+      engineDisplacementCc: displacement.toDouble(),
+      volumetricEfficiency: ve,
+    );
+    return corrected;
   }
 
   /// Apply the STFT + LTFT correction used on the MAF / speed-density
