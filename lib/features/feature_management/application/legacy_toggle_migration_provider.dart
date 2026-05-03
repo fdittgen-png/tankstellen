@@ -1,0 +1,79 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../data/legacy_toggle_migrator.dart';
+import 'feature_flags_provider.dart';
+
+part 'legacy_toggle_migration_provider.g.dart';
+
+/// Hive box name for the app `settings` store. Hard-coded here rather
+/// than imported from `lib/core/storage/hive_boxes.dart` because the
+/// coordinator's hot-file list flags `hive_boxes.dart` as off-limits
+/// for #1373 phase-3 PRs — the value `'settings'` is stable since the
+/// box was first introduced.
+const String _settingsBoxName = 'settings';
+
+/// One-shot Riverpod hook that runs [migrateLegacyToggles] once after
+/// app startup (#1373 phase 3a).
+///
+/// Returns a [Future] that completes when the migration finishes (or
+/// resolves immediately to `null` when either the settings box or the
+/// central feature-flags repository is not yet available — in tests
+/// without Hive, or before [HiveBoxes.init] runs in production).
+///
+/// The migration itself is idempotent and gated on the
+/// [hapticEcoCoachMigratedKey] flag, so re-firing this provider in
+/// tests / hot-reload is safe.
+///
+/// `keepAlive: true` so the migration runs at most once per app
+/// lifetime — Riverpod will not rebuild the provider unless one of
+/// its dependencies changes (in this case, `featureFlagsRepository`,
+/// which itself is `keepAlive`).
+///
+/// Wiring: any provider / widget can `ref.watch(...)` this to
+/// guarantee the migration has run before they read
+/// [featureFlagsProvider]. The default app-init path watches it from
+/// the central feature-flags screen so the migration runs the first
+/// time the user navigates there — there is no requirement to run it
+/// at app start. (#1373 phase 3a defers the explicit startup wire-up
+/// because that path lives in `app_initializer.dart`, which is on the
+/// hot-file list.)
+@Riverpod(keepAlive: true)
+Future<void> legacyToggleMigration(Ref ref) async {
+  final featureFlags = ref.watch(featureFlagsRepositoryProvider);
+  if (featureFlags == null) {
+    // Hive not initialised → nothing to migrate. Tests that don't
+    // open the feature_flags box take this path and the provider
+    // resolves immediately.
+    return;
+  }
+  if (!Hive.isBoxOpen(_settingsBoxName)) {
+    // Settings box absent → can't read the legacy toggle. This is the
+    // expected path in pre-Hive tests; production opens the box well
+    // before any UI reads this provider.
+    return;
+  }
+  final settings = Hive.box<dynamic>(_settingsBoxName);
+  final manifest = ref.read(featureManifestProvider);
+
+  // Defer the actual migration to the next microtask so this
+  // provider's `build` returns fast and any synchronous reads of
+  // [featureFlagsProvider] inside the same frame don't race the
+  // promotion write.
+  await Future<void>.microtask(() async {
+    try {
+      await migrateLegacyToggles(
+        settings: settings,
+        featureFlags: featureFlags,
+        manifest: manifest,
+      );
+    } catch (e, st) {
+      // Failure is non-fatal — the central state stays at manifest
+      // defaults and the user can re-enable from the settings UI.
+      debugPrint('legacyToggleMigration failed: $e\n$st');
+    }
+  });
+}

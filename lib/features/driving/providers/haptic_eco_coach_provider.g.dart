@@ -9,32 +9,47 @@ part of 'haptic_eco_coach_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Persisted opt-in switch for the real-time eco-coaching haptic
-/// (#1122). Stored in the Hive `settings` box under
-/// [StorageKeys.hapticEcoCoachEnabled]; defaults to **false** so the
-/// haptic only fires for users who explicitly turned it on in the
-/// settings screen. Lives for the app's lifetime — flipping the
-/// toggle invalidates [hapticEcoCoachLifecycleProvider] so the
-/// subscription is torn down or spun up immediately.
+/// (#1122). As of #1373 phase 3a this is a thin shim over
+/// [featureFlagsProvider] — the canonical state lives in the central
+/// feature-flag set keyed by [Feature.hapticEcoCoach]. The legacy
+/// [StorageKeys.hapticEcoCoachEnabled] key is read once by the
+/// `legacyToggleMigrationProvider` on first launch after upgrade and
+/// promoted into the central set; subsequent reads/writes go through
+/// here.
+///
+/// Lives for the app's lifetime — flipping the toggle invalidates
+/// [hapticEcoCoachLifecycleProvider] so the subscription is torn down
+/// or spun up immediately.
 
 @ProviderFor(HapticEcoCoachEnabled)
 final hapticEcoCoachEnabledProvider = HapticEcoCoachEnabledProvider._();
 
 /// Persisted opt-in switch for the real-time eco-coaching haptic
-/// (#1122). Stored in the Hive `settings` box under
-/// [StorageKeys.hapticEcoCoachEnabled]; defaults to **false** so the
-/// haptic only fires for users who explicitly turned it on in the
-/// settings screen. Lives for the app's lifetime — flipping the
-/// toggle invalidates [hapticEcoCoachLifecycleProvider] so the
-/// subscription is torn down or spun up immediately.
+/// (#1122). As of #1373 phase 3a this is a thin shim over
+/// [featureFlagsProvider] — the canonical state lives in the central
+/// feature-flag set keyed by [Feature.hapticEcoCoach]. The legacy
+/// [StorageKeys.hapticEcoCoachEnabled] key is read once by the
+/// `legacyToggleMigrationProvider` on first launch after upgrade and
+/// promoted into the central set; subsequent reads/writes go through
+/// here.
+///
+/// Lives for the app's lifetime — flipping the toggle invalidates
+/// [hapticEcoCoachLifecycleProvider] so the subscription is torn down
+/// or spun up immediately.
 final class HapticEcoCoachEnabledProvider
     extends $NotifierProvider<HapticEcoCoachEnabled, bool> {
   /// Persisted opt-in switch for the real-time eco-coaching haptic
-  /// (#1122). Stored in the Hive `settings` box under
-  /// [StorageKeys.hapticEcoCoachEnabled]; defaults to **false** so the
-  /// haptic only fires for users who explicitly turned it on in the
-  /// settings screen. Lives for the app's lifetime — flipping the
-  /// toggle invalidates [hapticEcoCoachLifecycleProvider] so the
-  /// subscription is torn down or spun up immediately.
+  /// (#1122). As of #1373 phase 3a this is a thin shim over
+  /// [featureFlagsProvider] — the canonical state lives in the central
+  /// feature-flag set keyed by [Feature.hapticEcoCoach]. The legacy
+  /// [StorageKeys.hapticEcoCoachEnabled] key is read once by the
+  /// `legacyToggleMigrationProvider` on first launch after upgrade and
+  /// promoted into the central set; subsequent reads/writes go through
+  /// here.
+  ///
+  /// Lives for the app's lifetime — flipping the toggle invalidates
+  /// [hapticEcoCoachLifecycleProvider] so the subscription is torn down
+  /// or spun up immediately.
   HapticEcoCoachEnabledProvider._()
     : super(
         from: null,
@@ -63,15 +78,20 @@ final class HapticEcoCoachEnabledProvider
 }
 
 String _$hapticEcoCoachEnabledHash() =>
-    r'24a83e36f764b747db17afbe7c7649c290c85b62';
+    r'3096c59d7861ed73c242e1925c49efe3e7f03ad8';
 
 /// Persisted opt-in switch for the real-time eco-coaching haptic
-/// (#1122). Stored in the Hive `settings` box under
-/// [StorageKeys.hapticEcoCoachEnabled]; defaults to **false** so the
-/// haptic only fires for users who explicitly turned it on in the
-/// settings screen. Lives for the app's lifetime — flipping the
-/// toggle invalidates [hapticEcoCoachLifecycleProvider] so the
-/// subscription is torn down or spun up immediately.
+/// (#1122). As of #1373 phase 3a this is a thin shim over
+/// [featureFlagsProvider] — the canonical state lives in the central
+/// feature-flag set keyed by [Feature.hapticEcoCoach]. The legacy
+/// [StorageKeys.hapticEcoCoachEnabled] key is read once by the
+/// `legacyToggleMigrationProvider` on first launch after upgrade and
+/// promoted into the central set; subsequent reads/writes go through
+/// here.
+///
+/// Lives for the app's lifetime — flipping the toggle invalidates
+/// [hapticEcoCoachLifecycleProvider] so the subscription is torn down
+/// or spun up immediately.
 
 abstract class _$HapticEcoCoachEnabled extends $Notifier<bool> {
   bool build();

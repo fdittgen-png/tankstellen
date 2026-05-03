@@ -2,37 +2,66 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../core/storage/storage_keys.dart';
-import '../../../core/storage/storage_providers.dart';
 import '../../consumption/data/obd2/trip_live_reading.dart';
 import '../../consumption/providers/trip_recording_provider.dart';
+import '../../feature_management/application/feature_flags_provider.dart';
+import '../../feature_management/domain/feature.dart';
 import '../haptic_eco_coach.dart';
 
 part 'haptic_eco_coach_provider.g.dart';
 
 /// Persisted opt-in switch for the real-time eco-coaching haptic
-/// (#1122). Stored in the Hive `settings` box under
-/// [StorageKeys.hapticEcoCoachEnabled]; defaults to **false** so the
-/// haptic only fires for users who explicitly turned it on in the
-/// settings screen. Lives for the app's lifetime — flipping the
-/// toggle invalidates [hapticEcoCoachLifecycleProvider] so the
-/// subscription is torn down or spun up immediately.
+/// (#1122). As of #1373 phase 3a this is a thin shim over
+/// [featureFlagsProvider] — the canonical state lives in the central
+/// feature-flag set keyed by [Feature.hapticEcoCoach]. The legacy
+/// [StorageKeys.hapticEcoCoachEnabled] key is read once by the
+/// `legacyToggleMigrationProvider` on first launch after upgrade and
+/// promoted into the central set; subsequent reads/writes go through
+/// here.
+///
+/// Lives for the app's lifetime — flipping the toggle invalidates
+/// [hapticEcoCoachLifecycleProvider] so the subscription is torn down
+/// or spun up immediately.
 @Riverpod(keepAlive: true)
 class HapticEcoCoachEnabled extends _$HapticEcoCoachEnabled {
   @override
   bool build() {
-    final settings = ref.watch(settingsStorageProvider);
-    return settings.getSetting(StorageKeys.hapticEcoCoachEnabled) == true;
+    return ref.watch(featureFlagsProvider).contains(Feature.hapticEcoCoach);
   }
 
-  /// Persist [value] and update the in-memory state. The lifecycle
-  /// provider invalidates on any state flip, so a `set(true)` while a
-  /// trip is recording starts the coach immediately, and a `set(false)`
-  /// cancels its subscription on the next frame.
+  /// Delegate to [featureFlagsProvider]'s `enable` / `disable`. The
+  /// lifecycle provider invalidates on any state flip, so a `set(true)`
+  /// while a trip is recording starts the coach immediately, and a
+  /// `set(false)` cancels its subscription on the next frame.
+  ///
+  /// A [StateError] from a dependency-violation is intentionally
+  /// swallowed and the toggle stays at its prior state — see the
+  /// catch block below for why.
   Future<void> set(bool value) async {
-    final settings = ref.read(settingsStorageProvider);
-    await settings.putSetting(StorageKeys.hapticEcoCoachEnabled, value);
-    state = value;
+    final notifier = ref.read(featureFlagsProvider.notifier);
+    try {
+      if (value) {
+        await notifier.enable(Feature.hapticEcoCoach);
+      } else {
+        await notifier.disable(Feature.hapticEcoCoach);
+      }
+      // The central provider throws a StateError specifically for
+      // dependency-violation; we want to swallow ONLY that — see the
+      // body comment for why. The lint deliberately discourages
+      // catching Error subclasses, but the central API's contract
+      // documents this exact StateError as the dependency-violation
+      // signal, so the catch is intentional and narrow.
+      // ignore: avoid_catching_errors
+    } on StateError {
+      // TODO(1373): Phase 2's settings UI already pre-checks
+      // `canEnable` / `blockingDisable` before invoking this setter, so
+      // a dependency-violation here is a defensive-only catch — the UI
+      // path can't currently reach it. We swallow rather than rethrow
+      // so a programmatic caller (e.g. a test or a future call site)
+      // sees the toggle stay at its prior state instead of crashing
+      // the widget tree. Remove once every call site has been audited
+      // for `canEnable` pre-check coverage.
+    }
   }
 }
 
