@@ -356,6 +356,84 @@ abstract class _$LocationConsent extends $Notifier<bool> {
   }
 }
 
+/// In-app map debug breadcrumb overlay flag (#1316 phase 2).
+///
+/// `kDebugMode` always shows the overlay; this Hive-backed flag flips
+/// it on for release builds when the user enables it via the hidden
+/// 5-tap gesture on the Carte AppBar title. Persisted so the overlay
+/// stays visible across launches once the user has opted in.
+
+@ProviderFor(MapDebugOverlay)
+final mapDebugOverlayProvider = MapDebugOverlayProvider._();
+
+/// In-app map debug breadcrumb overlay flag (#1316 phase 2).
+///
+/// `kDebugMode` always shows the overlay; this Hive-backed flag flips
+/// it on for release builds when the user enables it via the hidden
+/// 5-tap gesture on the Carte AppBar title. Persisted so the overlay
+/// stays visible across launches once the user has opted in.
+final class MapDebugOverlayProvider
+    extends $NotifierProvider<MapDebugOverlay, bool> {
+  /// In-app map debug breadcrumb overlay flag (#1316 phase 2).
+  ///
+  /// `kDebugMode` always shows the overlay; this Hive-backed flag flips
+  /// it on for release builds when the user enables it via the hidden
+  /// 5-tap gesture on the Carte AppBar title. Persisted so the overlay
+  /// stays visible across launches once the user has opted in.
+  MapDebugOverlayProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'mapDebugOverlayProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$mapDebugOverlayHash();
+
+  @$internal
+  @override
+  MapDebugOverlay create() => MapDebugOverlay();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$mapDebugOverlayHash() => r'ca167242bfa852d27b4d4ee1e964de59a549019d';
+
+/// In-app map debug breadcrumb overlay flag (#1316 phase 2).
+///
+/// `kDebugMode` always shows the overlay; this Hive-backed flag flips
+/// it on for release builds when the user enables it via the hidden
+/// 5-tap gesture on the Carte AppBar title. Persisted so the overlay
+/// stays visible across launches once the user has opted in.
+
+abstract class _$MapDebugOverlay extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
 /// Auto-switch profile setting.
 
 @ProviderFor(AutoSwitchProfile)

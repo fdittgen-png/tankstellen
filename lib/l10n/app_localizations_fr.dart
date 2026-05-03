@@ -3727,6 +3727,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get maintenanceActionSnooze => 'Snooze 30 days';
 
   @override
+  String get mapDebugOverlayEnabledSnack =>
+      'Superposition de débogage de la carte activée';
+
+  @override
+  String get mapDebugOverlayDisabledSnack =>
+      'Superposition de débogage de la carte désactivée';
+
+  @override
+  String get mapDebugOverlayClearButton => 'Effacer';
+
+  @override
+  String get mapDebugOverlayCloseButton => 'Fermer';
+
+  @override
+  String get mapDebugOverlayTitle => 'Traces de la carte';
+
+  @override
   String get consumptionMonthlyInsightsTitle =>
       'Ce mois-ci vs. le mois dernier';
 

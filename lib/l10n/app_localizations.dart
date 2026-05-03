@@ -6842,6 +6842,36 @@ abstract class AppLocalizations {
   /// **'Snooze 30 days'**
   String get maintenanceActionSnooze;
 
+  /// Snackbar shown when the user has flipped the in-app map debug breadcrumb overlay ON via the hidden 5-tap gesture on the Carte AppBar title (#1316 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Map debug overlay enabled'**
+  String get mapDebugOverlayEnabledSnack;
+
+  /// Snackbar shown when the user has flipped the in-app map debug breadcrumb overlay OFF via the hidden 5-tap gesture (#1316 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Map debug overlay disabled'**
+  String get mapDebugOverlayDisabledSnack;
+
+  /// Button on the in-app map debug breadcrumb overlay that empties the recorded breadcrumb list (#1316 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get mapDebugOverlayClearButton;
+
+  /// Button on the in-app map debug breadcrumb overlay that hides the overlay by disabling the persisted flag (#1316 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get mapDebugOverlayCloseButton;
+
+  /// Title shown at the top of the in-app map debug breadcrumb overlay panel (#1316 phase 2).
+  ///
+  /// In en, this message translates to:
+  /// **'Map breadcrumbs'**
+  String get mapDebugOverlayTitle;
+
   /// Title of the monthly-insights card on the Trajets tab landing screen — aggregates all trips into a current-vs-previous-month comparison (#1041 phase 4).
   ///
   /// In en, this message translates to:

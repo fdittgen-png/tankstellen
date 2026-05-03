@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/app/current_shell_branch_provider.dart';
+import 'package:tankstellen/core/providers/app_state_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/widgets/page_scaffold.dart';
 import 'package:tankstellen/features/ev/presentation/widgets/ev_map_overlay.dart';
@@ -593,6 +594,228 @@ void main() {
     );
 
     testWidgets(
+      'delayed retry-bump fires 1.5s after cold-start when no user '
+      'interaction (#1316 phase 2)',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        await pumpApp(
+          tester,
+          const MapScreen(),
+          overrides: [
+            ...test.overrides,
+            userPositionNullOverride(),
+            currentShellBranchProvider.overrideWith(
+              () => _CarteBranchSeed(),
+            ),
+          ],
+        );
+
+        int currentIncarnation() {
+          final subtree = tester
+              .widgetList<KeyedSubtree>(
+                find.descendant(
+                  of: find.byType(MapScreen),
+                  matching: find.byType(KeyedSubtree),
+                ),
+              )
+              .firstWhere((w) => w.key is ValueKey<int>);
+          return (subtree.key as ValueKey<int>).value;
+        }
+
+        // After pumpApp, cold-start bump has fired (incarnation==1).
+        final afterColdStart = currentIncarnation();
+        expect(afterColdStart, greaterThan(0));
+
+        // Advance the test clock past the 1500ms retry-bump delay.
+        // Timer fires inside the WidgetTester binding, schedules the
+        // setState, then the next pump processes it.
+        await tester.pump(const Duration(milliseconds: 1500));
+        await tester.pump();
+
+        expect(
+          currentIncarnation(),
+          greaterThan(afterColdStart),
+          reason:
+              'When the user has not interacted with the map within '
+              '1.5s of the cold-start bump, the screen must fire one '
+              'more incarnation bump as a defensive retry — the first '
+              'bump may have run against a still-laying-out viewport '
+              '(#1316 phase 2).',
+        );
+      },
+    );
+
+    testWidgets(
+      'delayed retry-bump skipped when user pan/zooms before 1.5s '
+      '(#1316 phase 2 — interaction latch)',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        await pumpApp(
+          tester,
+          const MapScreen(),
+          overrides: [
+            ...test.overrides,
+            userPositionNullOverride(),
+            currentShellBranchProvider.overrideWith(
+              () => _CarteBranchSeed(),
+            ),
+            searchStateProvider.overrideWith(
+              () => _LoadedSearchState(const [_seedStation]),
+            ),
+          ],
+        );
+
+        int currentIncarnation() {
+          final subtree = tester
+              .widgetList<KeyedSubtree>(
+                find.descendant(
+                  of: find.byType(MapScreen),
+                  matching: find.byType(KeyedSubtree),
+                ),
+              )
+              .firstWhere((w) => w.key is ValueKey<int>);
+          return (subtree.key as ValueKey<int>).value;
+        }
+
+        final afterColdStart = currentIncarnation();
+
+        // Find the live MapController and emit a user-source event.
+        // FlutterMap.mapController is non-null because MapScreen
+        // always passes one through NearbyMapView/RouteMapView.
+        // [MapControllerImpl] exposes the gesture-emit hooks
+        // (moveStarted) that the gesture detectors normally call from
+        // inside the FlutterMap widget tree — calling it directly
+        // simulates the user starting a pan without needing to
+        // synthesise a real touch event.
+        final flutterMap = tester.widget<FlutterMap>(find.byType(FlutterMap));
+        final controller = flutterMap.mapController! as MapControllerImpl;
+        controller.moveStarted(MapEventSource.dragStart);
+        await tester.pump();
+
+        // Now advance past the 1500ms delay — the retry must NOT fire.
+        await tester.pump(const Duration(milliseconds: 1500));
+        await tester.pump();
+
+        expect(
+          currentIncarnation(),
+          equals(afterColdStart),
+          reason:
+              'If the user has already pan/zoomed the map, the bug '
+              'either did not reproduce or the user already self-'
+              'corrected — the retry-bump must be skipped to avoid '
+              'cancelling in-flight tile fetches (#1316 phase 2).',
+        );
+      },
+    );
+
+    testWidgets(
+      'delayed retry-bump cancelled on tab-flip away from Carte '
+      '(#1316 phase 2 — no offstage rebuilds)',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        await pumpApp(
+          tester,
+          const MapScreen(),
+          overrides: [
+            ...test.overrides,
+            userPositionNullOverride(),
+            currentShellBranchProvider.overrideWith(
+              () => _CarteBranchSeed(),
+            ),
+          ],
+        );
+
+        int currentIncarnation() {
+          final subtree = tester
+              .widgetList<KeyedSubtree>(
+                find.descendant(
+                  of: find.byType(MapScreen),
+                  matching: find.byType(KeyedSubtree),
+                ),
+              )
+              .firstWhere((w) => w.key is ValueKey<int>);
+          return (subtree.key as ValueKey<int>).value;
+        }
+
+        final afterColdStart = currentIncarnation();
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(MapScreen)),
+        );
+
+        // Flip away from Carte BEFORE the timer fires.
+        container.read(currentShellBranchProvider.notifier).set(0);
+        await tester.pump();
+        await tester.pump();
+
+        // Advance past the 1500ms delay — the timer is cancelled, so
+        // no more bumps should land.
+        await tester.pump(const Duration(milliseconds: 1500));
+        await tester.pump();
+
+        expect(
+          currentIncarnation(),
+          equals(afterColdStart),
+          reason:
+              'A tab-flip away from Carte must cancel the pending '
+              'retry-bump — rebuilding an offstage map would cancel '
+              'tile fetches that the eventual return-to-Carte '
+              'tab-flip will issue (#1316 phase 2).',
+        );
+      },
+    );
+
+    testWidgets(
+      '5 taps on AppBar title within 2s flips mapDebugOverlayProvider '
+      '(#1316 phase 2 — hidden gesture)',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+        await pumpApp(
+          tester,
+          const MapScreen(),
+          overrides: [
+            ...test.overrides,
+            userPositionNullOverride(),
+            mapDebugOverlayProvider.overrideWith(() => _MutableOverlay(false)),
+          ],
+        );
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(MapScreen)),
+        );
+        expect(container.read(mapDebugOverlayProvider), isFalse);
+
+        // 4 taps must NOT toggle.
+        for (var i = 0; i < 4; i++) {
+          await tester.tap(find.text('Map'));
+          await tester.pump();
+        }
+        expect(container.read(mapDebugOverlayProvider), isFalse);
+
+        // 5th tap toggles.
+        await tester.tap(find.text('Map'));
+        await tester.pump();
+        // Toggle is async — let microtasks drain.
+        await tester.pump();
+        expect(
+          container.read(mapDebugOverlayProvider),
+          isTrue,
+          reason:
+              '5 consecutive taps on the Carte AppBar title within 2s '
+              'must flip the in-app debug overlay flag (#1316 phase '
+              '2).',
+        );
+      },
+    );
+
+    testWidgets(
       'app-resume on a non-Carte tab does NOT rebuild FlutterMap '
       '(#1268 — only refresh when Carte is visible)',
       (tester) async {
@@ -676,6 +899,33 @@ class _LoadedSearchState extends SearchState {
 class _CarteBranchSeed extends CurrentShellBranch {
   @override
   int build() => 1;
+}
+
+/// Notifier override for [mapDebugOverlayProvider] that supports
+/// `toggle()` from a known initial state without touching real Hive
+/// storage. Used by the hidden-gesture test to verify the 5-tap
+/// threshold flips the flag.
+class _MutableOverlay extends MapDebugOverlay {
+  _MutableOverlay(this._initial);
+  final bool _initial;
+
+  @override
+  bool build() => _initial;
+
+  @override
+  Future<void> enable() async {
+    state = true;
+  }
+
+  @override
+  Future<void> disable() async {
+    state = false;
+  }
+
+  @override
+  Future<void> toggle() async {
+    state = !state;
+  }
 }
 
 const _seedStation = Station(

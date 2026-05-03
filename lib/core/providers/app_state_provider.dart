@@ -67,6 +67,32 @@ class LocationConsent extends _$LocationConsent {
   }
 }
 
+/// In-app map debug breadcrumb overlay flag (#1316 phase 2).
+///
+/// `kDebugMode` always shows the overlay; this Hive-backed flag flips
+/// it on for release builds when the user enables it via the hidden
+/// 5-tap gesture on the Carte AppBar title. Persisted so the overlay
+/// stays visible across launches once the user has opted in.
+@riverpod
+class MapDebugOverlay extends _$MapDebugOverlay {
+  @override
+  bool build() {
+    final storage = ref.watch(storageRepositoryProvider);
+    return storage.getSetting(StorageKeys.mapDebugOverlayEnabled) as bool? ??
+        false;
+  }
+
+  Future<void> enable() => _set(true);
+  Future<void> disable() => _set(false);
+  Future<void> toggle() => _set(!state);
+
+  Future<void> _set(bool value) async {
+    final storage = ref.read(storageRepositoryProvider);
+    await storage.putSetting(StorageKeys.mapDebugOverlayEnabled, value);
+    state = value;
+  }
+}
+
 /// Auto-switch profile setting.
 @riverpod
 class AutoSwitchProfile extends _$AutoSwitchProfile {

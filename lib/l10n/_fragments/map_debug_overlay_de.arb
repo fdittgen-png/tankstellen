@@ -1,0 +1,7 @@
+{
+  "mapDebugOverlayEnabledSnack": "Karten-Debug-Overlay aktiviert",
+  "mapDebugOverlayDisabledSnack": "Karten-Debug-Overlay deaktiviert",
+  "mapDebugOverlayClearButton": "Leeren",
+  "mapDebugOverlayCloseButton": "Schließen",
+  "mapDebugOverlayTitle": "Karten-Spuren"
+}

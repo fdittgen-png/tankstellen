@@ -89,6 +89,62 @@ void main() {
     });
   });
 
+  group('MapDebugOverlay (#1316 phase 2)', () {
+    test('build returns false when flag never set', () {
+      final c = createContainer();
+      expect(c.read(mapDebugOverlayProvider), isFalse);
+    });
+
+    test('build reflects stored true value', () async {
+      await fakeStorage.putSetting(StorageKeys.mapDebugOverlayEnabled, true);
+      final c = createContainer();
+      expect(c.read(mapDebugOverlayProvider), isTrue);
+    });
+
+    test('enable persists true to storage and updates state', () async {
+      final c = createContainer();
+      await c.read(mapDebugOverlayProvider.notifier).enable();
+
+      expect(
+        fakeStorage.getSetting(StorageKeys.mapDebugOverlayEnabled),
+        isTrue,
+      );
+      expect(c.read(mapDebugOverlayProvider), isTrue);
+    });
+
+    test('disable persists false to storage and updates state', () async {
+      await fakeStorage.putSetting(StorageKeys.mapDebugOverlayEnabled, true);
+      final c = createContainer();
+      expect(c.read(mapDebugOverlayProvider), isTrue);
+
+      await c.read(mapDebugOverlayProvider.notifier).disable();
+      expect(
+        fakeStorage.getSetting(StorageKeys.mapDebugOverlayEnabled),
+        isFalse,
+      );
+      expect(c.read(mapDebugOverlayProvider), isFalse);
+    });
+
+    test('toggle flips false→true→false across calls', () async {
+      final c = createContainer();
+      expect(c.read(mapDebugOverlayProvider), isFalse);
+
+      await c.read(mapDebugOverlayProvider.notifier).toggle();
+      expect(c.read(mapDebugOverlayProvider), isTrue);
+      expect(
+        fakeStorage.getSetting(StorageKeys.mapDebugOverlayEnabled),
+        isTrue,
+      );
+
+      await c.read(mapDebugOverlayProvider.notifier).toggle();
+      expect(c.read(mapDebugOverlayProvider), isFalse);
+      expect(
+        fakeStorage.getSetting(StorageKeys.mapDebugOverlayEnabled),
+        isFalse,
+      );
+    });
+  });
+
   group('LocationConsent', () {
     test('build returns false when no consent', () {
       final c = createContainer();

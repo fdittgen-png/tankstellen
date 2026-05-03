@@ -3692,6 +3692,21 @@ class AppLocalizationsFi extends AppLocalizations {
   String get maintenanceActionSnooze => 'Snooze 30 days';
 
   @override
+  String get mapDebugOverlayEnabledSnack => 'Map debug overlay enabled';
+
+  @override
+  String get mapDebugOverlayDisabledSnack => 'Map debug overlay disabled';
+
+  @override
+  String get mapDebugOverlayClearButton => 'Clear';
+
+  @override
+  String get mapDebugOverlayCloseButton => 'Close';
+
+  @override
+  String get mapDebugOverlayTitle => 'Map breadcrumbs';
+
+  @override
   String get consumptionMonthlyInsightsTitle => 'This month vs last month';
 
   @override

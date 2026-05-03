@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/current_shell_branch_provider.dart';
+import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../driving/presentation/widgets/driving_mode_fab.dart';
@@ -12,6 +13,8 @@ import '../../../ev/presentation/widgets/ev_map_overlay.dart';
 import '../../../ev/providers/ev_providers.dart';
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../../search/providers/search_provider.dart';
+import '../../providers/map_breadcrumb_provider.dart';
+import '../widgets/map_debug_breadcrumb_overlay.dart';
 import '../widgets/nearby_map_view.dart';
 import '../widgets/route_map_view.dart';
 
@@ -99,6 +102,27 @@ import '../widgets/route_map_view.dart';
 /// during a repro yields actionable evidence — the issue body
 /// explicitly calls out "a diagnostic logging pass before any 'fix'
 /// is the right move".
+///
+/// ## In-app breadcrumb overlay + delayed retry-bump (#1316 phase 2)
+///
+/// Phase 1 routed actionable diagnostics through `adb logcat`, but the
+/// user has not been able to capture logcat across any prior repro,
+/// leaving the diagnostic loop open. Phase 2 routes the same messages
+/// through [MapBreadcrumbsNotifier] so an in-app overlay
+/// ([MapDebugBreadcrumbOverlay]) can render them on-device. The user
+/// flips the overlay on via a hidden 5-tap gesture on the AppBar title
+/// (no-op until the gate threshold is reached, so accidental presses
+/// during normal use are harmless).
+///
+/// Phase 2 also takes one defensive swing at the timing: 1.5 s after
+/// the cold-start one-shot bump, if the user hasn't pan/zoomed the map,
+/// the screen bumps the incarnation once more. The first bump might
+/// have run against a still-laying-out viewport; the delayed bump
+/// catches the post-stabilised constraints. If the user already
+/// interacted with the map (latched via [_userInteractedWithMap], set
+/// from [MapController.mapEventStream] for any user-source event) the
+/// retry is skipped — the bug doesn't reproduce, or the user
+/// already self-corrected.
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key, this.clockOverride});
 
@@ -133,6 +157,24 @@ class _MapScreenState extends ConsumerState<MapScreen>
   /// acceptance criterion in the issue.
   static const Duration _resumeRefreshThreshold = Duration(seconds: 10);
 
+  /// Delay before the defensive retry-bump fires after a cold-start
+  /// (#1316 phase 2). 1.5 s is long enough that any first-frame layout
+  /// thrash has settled (a typical cold-start finishes its layout in
+  /// well under one second on mid-range hardware) and short enough
+  /// that the user is still looking at the map if the bug reproduced
+  /// — they have not yet given up and switched tabs.
+  static const Duration _retryBumpDelay = Duration(milliseconds: 1500);
+
+  /// Window for the hidden 5-tap gesture that toggles
+  /// [mapDebugOverlayProvider]. Taps are reset to zero if the user
+  /// pauses for more than this many milliseconds — a stray double-tap
+  /// during normal use cannot accidentally enable the overlay.
+  static const Duration _debugGestureWindow = Duration(seconds: 2);
+
+  /// Tap threshold for the hidden gesture. Five taps within
+  /// [_debugGestureWindow] flips [mapDebugOverlayProvider].
+  static const int _debugGestureTapThreshold = 5;
+
   /// When the app last entered a non-resumed state. Compared against
   /// the resume timestamp to decide whether to refresh — see
   /// [_resumeRefreshThreshold].
@@ -147,19 +189,48 @@ class _MapScreenState extends ConsumerState<MapScreen>
   /// [currentShellBranchProvider] listener.
   bool _coldStartBumpFired = false;
 
+  /// Pending defensive retry-bump timer (#1316 phase 2). Scheduled
+  /// once after the cold-start bump. Cancelled in [dispose] and on
+  /// tab-flip-away so a late firing cannot rebuild an offstage map.
+  Timer? _retryBumpTimer;
+
+  /// Latches `true` the first time [_mapController] emits a
+  /// user-source map event. Once set, never resets — the retry-bump
+  /// stays disarmed for the lifetime of the [State] (the user has
+  /// proven the screen is interactive, so the bug did not reproduce).
+  bool _userInteractedWithMap = false;
+
+  /// Subscription on [_mapController.mapEventStream] that drives
+  /// [_userInteractedWithMap]. Cancelled and re-subscribed on every
+  /// controller swap so the latch tracks the LIVE controller, not a
+  /// stale one that was disposed by a previous incarnation bump.
+  StreamSubscription<MapEvent>? _mapEventSub;
+
+  /// Number of consecutive AppBar-title taps the user has accumulated
+  /// inside [_debugGestureWindow]. Reset on idle.
+  int _debugTapCount = 0;
+
+  /// Last AppBar-title tap timestamp, used to enforce
+  /// [_debugGestureWindow] — taps separated by more than the window
+  /// reset the counter.
+  DateTime? _lastDebugTapAt;
+
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
+    _subscribeToMapEvents();
     WidgetsBinding.instance.addObserver(this);
-    debugPrint(
-      '[map-lifecycle] initState — incarnation=$_mapIncarnation, '
-      'observer attached',
+    _crumb(
+      'map-lifecycle',
+      'initState — incarnation=$_mapIncarnation, observer attached',
     );
   }
 
   @override
   void dispose() {
+    _retryBumpTimer?.cancel();
+    _mapEventSub?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _mapController.dispose();
     super.dispose();
@@ -167,10 +238,109 @@ class _MapScreenState extends ConsumerState<MapScreen>
 
   DateTime _now() => widget.clockOverride?.call() ?? DateTime.now();
 
+  /// Pushes a `[tag] message` to the in-app breadcrumb collector AND
+  /// to [debugPrint] so existing `adb logcat`-based workflows still
+  /// work (#1316 phase 2). Safe to call from any State callback —
+  /// guarded by [mounted] because Riverpod's [ref] is invalidated
+  /// after [dispose]. The Riverpod state mutation is deferred via
+  /// [WidgetsBinding.addPostFrameCallback] so callers can [_crumb]
+  /// from inside [build], [initState], and [LayoutBuilder.builder]
+  /// without tripping Riverpod's "modify-in-lifecycle" guard.
+  void _crumb(String tag, String message) {
+    debugPrint('[$tag] $message');
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(mapBreadcrumbsProvider.notifier).record(tag, message);
+    });
+  }
+
+  /// Subscribes to [_mapController.mapEventStream] to latch
+  /// [_userInteractedWithMap] on the first user-driven event. Called
+  /// from [initState] and after every controller swap so the
+  /// subscription always points at the LIVE controller.
+  void _subscribeToMapEvents() {
+    _mapEventSub?.cancel();
+    _mapEventSub = _mapController.mapEventStream.listen((event) {
+      if (_userInteractedWithMap) return;
+      if (_isUserDrivenEvent(event)) {
+        _userInteractedWithMap = true;
+        _crumb(
+          'map-cold-start',
+          'user interaction detected (${event.source.name}); '
+              'retry-bump disarmed',
+        );
+      }
+    });
+  }
+
+  /// True if [event] was issued by the user (drag, pinch, scroll-wheel,
+  /// double-tap, fling, keyboard rotate, …) rather than a programmatic
+  /// move (`mapController.move(...)`, fitCamera, interactiveFlags
+  /// change). Mirrors the source enum at flutter_map 8.3.x — keep in
+  /// sync if upgrading.
+  bool _isUserDrivenEvent(MapEvent event) {
+    switch (event.source) {
+      case MapEventSource.dragStart:
+      case MapEventSource.onDrag:
+      case MapEventSource.dragEnd:
+      case MapEventSource.multiFingerGestureStart:
+      case MapEventSource.onMultiFinger:
+      case MapEventSource.multiFingerEnd:
+      case MapEventSource.doubleTap:
+      case MapEventSource.doubleTapHold:
+      case MapEventSource.doubleTapZoomAnimationController:
+      case MapEventSource.flingAnimationController:
+      case MapEventSource.scrollWheel:
+      case MapEventSource.tap:
+      case MapEventSource.longPress:
+      case MapEventSource.cursorKeyboardRotation:
+      case MapEventSource.keyboard:
+        return true;
+      case MapEventSource.mapController:
+      case MapEventSource.fitCamera:
+      case MapEventSource.interactiveFlagsChanged:
+      case MapEventSource.nonRotatedSizeChange:
+      case MapEventSource.custom:
+      case MapEventSource.secondaryTap:
+        return false;
+    }
+  }
+
+  /// Increments [_mapIncarnation], swaps [_mapController], and
+  /// re-subscribes the event stream. Used by every rebuild trigger
+  /// (tab-flip, lifecycle resume, cold-start, delayed retry) so the
+  /// controller-swap + dispose sequence is identical across paths.
+  void _swapControllerAndBump(String trigger) {
+    final old = _mapController;
+    try {
+      setState(() {
+        _mapController = MapController();
+        _mapIncarnation++;
+      });
+      _subscribeToMapEvents();
+      _crumb(
+        'map-incarn',
+        'bumped to $_mapIncarnation (trigger: $trigger)',
+      );
+    } catch (e, st) {
+      debugPrint('MapScreen rebuild on $trigger: $e\n$st');
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        old.dispose();
+      } catch (e, st) {
+        debugPrint(
+          'MapScreen old controller dispose on $trigger: $e\n$st',
+        );
+      }
+    });
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    debugPrint('[map-lifecycle] state=$state, pausedAt=$_pausedAt');
+    _crumb('map-lifecycle', 'state=$state, pausedAt=$_pausedAt');
     if (state == AppLifecycleState.resumed) {
       _onAppResumed();
     } else if (state == AppLifecycleState.paused ||
@@ -194,52 +364,37 @@ class _MapScreenState extends ConsumerState<MapScreen>
     _pausedAt = null;
     if (!mounted) return;
     if (pausedAt == null) {
-      debugPrint('[map-lifecycle] resume skipped: no pausedAt timestamp');
+      _crumb('map-lifecycle', 'resume skipped: no pausedAt timestamp');
       return;
     }
     final pauseDuration = _now().difference(pausedAt);
     if (pauseDuration < _resumeRefreshThreshold) {
-      debugPrint(
-        '[map-lifecycle] resume skipped: pauseDuration=$pauseDuration '
-        '< threshold=$_resumeRefreshThreshold',
+      _crumb(
+        'map-lifecycle',
+        'resume skipped: pauseDuration=$pauseDuration '
+            '< threshold=$_resumeRefreshThreshold',
       );
       return;
     }
     final currentBranch = ref.read(currentShellBranchProvider);
     if (currentBranch != _mapBranchIndex) {
-      debugPrint(
-        '[map-lifecycle] resume skipped: currentBranch=$currentBranch '
-        '(not on Carte=$_mapBranchIndex)',
+      _crumb(
+        'map-lifecycle',
+        'resume skipped: currentBranch=$currentBranch '
+            '(not on Carte=$_mapBranchIndex)',
       );
       return;
     }
-    debugPrint(
-      '[map-lifecycle] resume firing refresh: pauseDuration=$pauseDuration, '
-      'incarnation=$_mapIncarnation -> ${_mapIncarnation + 1}',
+    _crumb(
+      'map-lifecycle',
+      'resume firing refresh: pauseDuration=$pauseDuration, '
+          'incarnation=$_mapIncarnation -> ${_mapIncarnation + 1}',
     );
 
     // App-resume rebuild also covers the cold-start case; mark the
     // one-shot as fired so the next [build] doesn't pile on.
     _coldStartBumpFired = true;
-    final old = _mapController;
-    try {
-      setState(() {
-        _mapController = MapController();
-        _mapIncarnation++;
-      });
-      debugPrint(
-        '[map-incarn] bumped to $_mapIncarnation (trigger: app-resume)',
-      );
-    } catch (e, st) {
-      debugPrint('MapScreen rebuild on app-resume: $e\n$st');
-    }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      try {
-        old.dispose();
-      } catch (e, st) {
-        debugPrint('MapScreen old controller dispose on resume: $e\n$st');
-      }
-    });
+    _swapControllerAndBump('app-resume');
 
     // Fire-and-forget: re-issue the most recent search so the station
     // data underlying the price chips is refreshed. Failures (no last
@@ -250,16 +405,62 @@ class _MapScreenState extends ConsumerState<MapScreen>
     );
   }
 
+  /// Hidden gesture handler — counts AppBar-title taps inside
+  /// [_debugGestureWindow] and toggles [mapDebugOverlayProvider] on
+  /// reaching [_debugGestureTapThreshold] (#1316 phase 2).
+  void _bumpDebugTapCount() {
+    final now = _now();
+    final last = _lastDebugTapAt;
+    if (last == null || now.difference(last) > _debugGestureWindow) {
+      _debugTapCount = 1;
+    } else {
+      _debugTapCount++;
+    }
+    _lastDebugTapAt = now;
+
+    if (_debugTapCount >= _debugGestureTapThreshold) {
+      _debugTapCount = 0;
+      _lastDebugTapAt = null;
+      final wasEnabled = ref.read(mapDebugOverlayProvider);
+      unawaited(
+        ref.read(mapDebugOverlayProvider.notifier).toggle().then((_) {
+          if (!mounted) return;
+          final l10n = AppLocalizations.of(context);
+          final msg = wasEnabled
+              ? (l10n?.mapDebugOverlayDisabledSnack ??
+                  'Map debug overlay disabled')
+              : (l10n?.mapDebugOverlayEnabledSnack ??
+                  'Map debug overlay enabled');
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(content: Text(msg)));
+        }),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.listen<int>(currentShellBranchProvider, (previous, next) {
-      debugPrint(
-        '[map-branch] listener fired: $previous -> $next '
-        '(mapBranch=$_mapBranchIndex, incarnation=$_mapIncarnation)',
+      _crumb(
+        'map-branch',
+        'listener fired: $previous -> $next '
+            '(mapBranch=$_mapBranchIndex, incarnation=$_mapIncarnation)',
       );
       if (next != _mapBranchIndex) {
-        debugPrint(
-          '[map-branch] skipped rebuild: next=$next is not mapBranch',
+        // Tab-flip away from Carte — cancel any pending retry-bump so
+        // it can't rebuild an offstage map a second later (#1316
+        // phase 2).
+        if (_retryBumpTimer?.isActive ?? false) {
+          _retryBumpTimer?.cancel();
+          _crumb(
+            'map-cold-start',
+            'retry-bump timer cancelled (tab-flip away from Carte)',
+          );
+        }
+        _crumb(
+          'map-branch',
+          'skipped rebuild: next=$next is not mapBranch',
         );
         return;
       }
@@ -269,27 +470,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
       _coldStartBumpFired = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        final old = _mapController;
-        try {
-          setState(() {
-            _mapController = MapController();
-            _mapIncarnation++;
-          });
-          debugPrint(
-            '[map-incarn] bumped to $_mapIncarnation (trigger: tab-flip)',
-          );
-        } catch (e, st) {
-          debugPrint('MapScreen rebuild on tab-flip: $e\n$st');
-        }
-        // Dispose the previous controller after the next frame so the
-        // old FlutterMap has fully detached from it.
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          try {
-            old.dispose();
-          } catch (e, st) {
-            debugPrint('MapScreen old controller dispose: $e\n$st');
-          }
-        });
+        _swapControllerAndBump('tab-flip');
       });
     });
 
@@ -305,31 +486,12 @@ class _MapScreenState extends ConsumerState<MapScreen>
       _coldStartBumpFired = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        debugPrint(
-          '[map-cold-start] firing one-shot incarnation bump on first '
-          'Carte build',
+        _crumb(
+          'map-cold-start',
+          'firing one-shot incarnation bump on first Carte build',
         );
-        final old = _mapController;
-        try {
-          setState(() {
-            _mapController = MapController();
-            _mapIncarnation++;
-          });
-          debugPrint(
-            '[map-incarn] bumped to $_mapIncarnation (trigger: cold-start)',
-          );
-        } catch (e, st) {
-          debugPrint('MapScreen rebuild on cold-start: $e\n$st');
-        }
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          try {
-            old.dispose();
-          } catch (e, st) {
-            debugPrint(
-              'MapScreen old controller dispose on cold-start: $e\n$st',
-            );
-          }
-        });
+        _swapControllerAndBump('cold-start');
+        _scheduleDelayedRetryBump();
       });
     }
 
@@ -355,11 +517,12 @@ class _MapScreenState extends ConsumerState<MapScreen>
         // 100px on each axis so the gate covers placeholder constraints too.
         final suppressed = constraints.maxWidth < 100 ||
             constraints.maxHeight < 100;
-        debugPrint(
-          '[map-layout] LayoutBuilder constraints='
-          '${constraints.maxWidth.toStringAsFixed(1)}x'
-          '${constraints.maxHeight.toStringAsFixed(1)}, '
-          'suppressed=$suppressed, incarnation=$_mapIncarnation',
+        _crumb(
+          'map-layout',
+          'LayoutBuilder constraints='
+              '${constraints.maxWidth.toStringAsFixed(1)}x'
+              '${constraints.maxHeight.toStringAsFixed(1)}, '
+              'suppressed=$suppressed, incarnation=$_mapIncarnation',
         );
         if (suppressed) {
           return const SizedBox.shrink();
@@ -382,8 +545,19 @@ class _MapScreenState extends ConsumerState<MapScreen>
       },
     );
 
+    final titleText = l10n?.map ?? 'Map';
     return PageScaffold(
-      title: l10n?.map ?? 'Map',
+      titleWidget: GestureDetector(
+        // The 5-tap gesture is hidden — `behavior: opaque` ensures the
+        // tap is captured even when the title's intrinsic size leaves
+        // empty space inside the AppBar's title slot.
+        behavior: HitTestBehavior.opaque,
+        onTap: _bumpDebugTapCount,
+        child: Semantics(
+          header: true,
+          child: Text(titleText),
+        ),
+      ),
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh),
@@ -398,12 +572,53 @@ class _MapScreenState extends ConsumerState<MapScreen>
       ],
       bodyPadding: EdgeInsets.zero,
       floatingActionButton: const DrivingModeFab(),
-      body: Column(
+      body: Stack(
         children: [
-          if (showEv) const EvFilterChips(),
-          Expanded(child: body),
+          Column(
+            children: [
+              if (showEv) const EvFilterChips(),
+              Expanded(child: body),
+            ],
+          ),
+          const MapDebugBreadcrumbOverlay(),
         ],
       ),
     );
+  }
+
+  /// Schedules the defensive retry-bump (#1316 phase 2). Fires
+  /// [_retryBumpDelay] after the cold-start bump if and only if the
+  /// user still hasn't interacted with the map AND Carte is still the
+  /// visible branch. The retry covers a hypothesised race where the
+  /// cold-start bump runs against a still-laying-out viewport — the
+  /// post-stabilised constraints catch up after a few hundred ms, so
+  /// rebuilding once more after 1.5 s gives TileLayer a clean second
+  /// chance.
+  void _scheduleDelayedRetryBump() {
+    _retryBumpTimer?.cancel();
+    _retryBumpTimer = Timer(_retryBumpDelay, () {
+      if (!mounted) return;
+      if (_userInteractedWithMap) {
+        _crumb(
+          'map-cold-start',
+          'delayed retry-bump skipped: user already interacted',
+        );
+        return;
+      }
+      final branch = ref.read(currentShellBranchProvider);
+      if (branch != _mapBranchIndex) {
+        _crumb(
+          'map-cold-start',
+          'delayed retry-bump skipped: branch=$branch '
+              '(not on Carte=$_mapBranchIndex)',
+        );
+        return;
+      }
+      _crumb(
+        'map-cold-start',
+        'delayed retry-bump fired (no user interaction)',
+      );
+      _swapControllerAndBump('delayed-retry');
+    });
   }
 }

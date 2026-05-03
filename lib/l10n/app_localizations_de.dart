@@ -3729,6 +3729,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get maintenanceActionSnooze => '30 Tage stumm';
 
   @override
+  String get mapDebugOverlayEnabledSnack => 'Karten-Debug-Overlay aktiviert';
+
+  @override
+  String get mapDebugOverlayDisabledSnack => 'Karten-Debug-Overlay deaktiviert';
+
+  @override
+  String get mapDebugOverlayClearButton => 'Leeren';
+
+  @override
+  String get mapDebugOverlayCloseButton => 'Schließen';
+
+  @override
+  String get mapDebugOverlayTitle => 'Karten-Spuren';
+
+  @override
   String get consumptionMonthlyInsightsTitle =>
       'Dieser Monat vs. letzter Monat';
 
