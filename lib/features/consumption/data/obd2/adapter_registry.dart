@@ -3,6 +3,33 @@ import 'adapters/v_linker_fs_adapter.dart';
 import 'elm327_adapter.dart';
 import 'elm327_protocol.dart';
 
+/// Per-adapter verification status (#1371). Documents how confident
+/// we are that a given profile actually drives the adapter end-to-end
+/// on a real device — separate from "is it listed in the picker".
+///
+/// Used by the docs/wiki to surface a "tested vs theoretical" matrix
+/// to users before they buy. Defaults to [theoretical] so adding a
+/// new entry stays conservative until someone verifies it.
+enum Obd2AdapterCompatibility {
+  /// Maintainer has confirmed the adapter works on their device:
+  /// scan → connect → live PID stream all green.
+  tested,
+
+  /// At least one user reported success but the variant is ambiguous
+  /// (e.g. the same hardware ships both BLE and Classic transports
+  /// and the report didn't pin down which one was used).
+  userVerified,
+
+  /// No verification yet. Expected to work because the matchers /
+  /// service UUIDs identify a known ELM327 family (Nordic UART FFF0,
+  /// SPP Classic, etc.), but never connected to in anger.
+  theoretical,
+
+  /// Listed but no information either way. Use sparingly — most
+  /// entries should be [theoretical] or better.
+  untested,
+}
+
 /// Thin value-object describing one BLE scan result. Kept
 /// flutter_blue_plus-free so the registry can be unit-tested without
 /// the platform plugin (the real connection service converts
@@ -77,6 +104,13 @@ class Obd2AdapterProfile {
   /// clones (which need longer delays + a stray-`>` preParse).
   final Elm327Adapter adapter;
 
+  /// Verification tier for this profile (#1371). Defaults to
+  /// [Obd2AdapterCompatibility.theoretical] so new entries are
+  /// conservative until someone confirms the adapter on a real
+  /// device. Surface this in the docs/wiki matrix — never gate
+  /// runtime behaviour on it.
+  final Obd2AdapterCompatibility compatibility;
+
   const Obd2AdapterProfile({
     required this.id,
     required this.displayName,
@@ -86,6 +120,7 @@ class Obd2AdapterProfile {
     this.notifyCharUuid = '',
     this.nameMatchers = const [],
     this.adapter = const GenericElm327Adapter(),
+    this.compatibility = Obd2AdapterCompatibility.theoretical,
   });
 
   /// Compares service uuid against the advertised set, case-insensitive.
@@ -196,6 +231,7 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     transport: BluetoothTransport.classic,
     nameMatchers: ['vlinker fs', 'vlinker ms', 'vlink fs', 'vgate fs'],
     adapter: VLinkerFsAdapter(),
+    compatibility: Obd2AdapterCompatibility.tested,
   ),
   // vLinker FD / MC — the BLE variants. Nordic UART: FFF0 service,
   // FFF2 write, FFF1 notify. Name advertises as "vLinker FD" / "MC".
@@ -249,6 +285,11 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
     nameMatchers: ['smartobd'],
     adapter: SmartObdAdapter(),
+    // Maintainer-confirmed the SmartOBD hardware works, but the
+    // bonded device list surfaces the same name for both transports
+    // and the maintainer's session didn't pin which one carried the
+    // live PID stream — flag both BLE+Classic as userVerified (#1371).
+    compatibility: Obd2AdapterCompatibility.userVerified,
   ),
   Obd2AdapterProfile(
     id: 'smartobd-classic',
@@ -256,6 +297,7 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     transport: BluetoothTransport.classic,
     nameMatchers: ['smartobd'],
     adapter: SmartObdAdapter(),
+    compatibility: Obd2AdapterCompatibility.userVerified,
   ),
   // ieGeek Scanner — ELM327 v2.1 BLE clone, advertises as "ieGeek…"
   // (#949). Nordic UART FFF0 family.
@@ -295,6 +337,7 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     displayName: 'vLinker BM-Android (Classic)',
     transport: BluetoothTransport.classic,
     nameMatchers: ['vlinker bm-android', 'vlink bm-android'],
+    compatibility: Obd2AdapterCompatibility.tested,
   ),
   // Konnwei KW902 — Classic Bluetooth ELM327 v1.5 clone, extremely
   // common on Amazon / AliExpress. Advertises as "KONNWEI" or "KW902"
