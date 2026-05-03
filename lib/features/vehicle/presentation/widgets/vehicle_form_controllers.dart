@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../data/vehicle_profile_catalog_matcher.dart';
+import '../../domain/entities/reference_vehicle.dart';
 import '../../domain/entities/vehicle_profile.dart';
 
 /// Bundles the text controllers, focus node, and scalar form state
@@ -56,6 +58,49 @@ class VehicleFormControllers {
     );
   }
 
+  /// Pre-fill the controllers from a [ReferenceVehicle] catalog entry
+  /// (#1372 phase 3). Called after the user picks a row in the
+  /// [ReferenceVehiclePicker] modal sheet.
+  ///
+  /// Sets:
+  ///   * [nameController] to `<make> <model>` so the brand-tinted
+  ///     header on the edit screen lights up immediately.
+  ///   * [fuelTypeController] to a sensible
+  ///     [VehicleProfile.preferredFuelType] derived from the catalog's
+  ///     coarse `petrol`/`diesel`/`hybrid`/`electric` enum:
+  ///       * `petrol` → `e10`   (the default for unleaded blends)
+  ///       * `diesel` → `diesel`
+  ///       * `hybrid` → `e10`   (most EU PHEVs are petrol-burning)
+  ///       * `electric` → `''`  (the EV section owns the connector
+  ///                            picker; no preferred fuel applies)
+  ///
+  /// All other catalog-derived fields (engine displacement, volumetric
+  /// efficiency, slug, make/model/year metadata) are owned by the
+  /// screen's scalar state since they aren't text-controller-backed —
+  /// the screen reads the picked entry directly.
+  void applyReferenceVehicle(ReferenceVehicle ref) {
+    nameController.text = '${ref.make} ${ref.model}'.trim();
+    fuelTypeController.text = _preferredFuelTypeFor(ref.fuelType);
+  }
+
+  /// Map the catalog's coarse fuel-type string onto a
+  /// [VehicleProfile.preferredFuelType] code (the same string the
+  /// `NullableFuelTypeDropdown` consumes). `electric` returns the
+  /// empty string so the EV path doesn't surface a meaningless
+  /// preferred-petrol selection.
+  static String _preferredFuelTypeFor(String catalogFuelType) {
+    switch (catalogFuelType.toLowerCase()) {
+      case 'diesel':
+        return 'diesel';
+      case 'electric':
+        return '';
+      case 'hybrid':
+      case 'petrol':
+      default:
+        return 'e10';
+    }
+  }
+
   /// Construct a [VehicleProfile] from the current controller values
   /// combined with the non-controller state passed in by the caller.
   ///
@@ -73,6 +118,14 @@ class VehicleFormControllers {
   ///
   /// When [existing] is null, the new-vehicle path mints a fresh uuid
   /// and constructs from defaults — no `VehicleProfile` to preserve.
+  ///
+  /// [referenceVehicle] is the catalog entry the user picked from the
+  /// new-vehicle picker (#1372 phase 3), or `null` when the user typed
+  /// every field by hand. When non-null, it threads the catalog-only
+  /// metadata (`make`, `model`, `year`, `referenceVehicleId`,
+  /// `volumetricEfficiency`) into the new profile so the OBD2 layer can
+  /// resolve the engine quirks without the user having to wait for the
+  /// VIN-driven backfill to land later.
   VehicleProfile buildProfile({
     required VehicleProfile? existing,
     required VehicleType type,
@@ -82,6 +135,7 @@ class VehicleFormControllers {
     required int? engineDisplacementCc,
     required int? engineCylinders,
     required int? curbWeightKg,
+    ReferenceVehicle? referenceVehicle,
   }) {
     final batteryKwh = type == VehicleType.combustion
         ? null
@@ -107,6 +161,22 @@ class VehicleFormControllers {
         : vinController.text.trim();
 
     if (existing == null) {
+      // `referenceVehicle` is only ever non-null on the new-vehicle
+      // path (the picker is hidden in edit mode to avoid silently
+      // overwriting user tweaks). When set, prefer the catalog values
+      // for the engine + catalog-metadata fields the user can't
+      // possibly have edited yet — they pre-populated the form by
+      // tapping a row.
+      final pickedDisplacement =
+          referenceVehicle?.displacementCc ?? engineDisplacementCc;
+      final pickedVe = referenceVehicle?.volumetricEfficiency ?? 0.85;
+      final pickedMake = referenceVehicle?.make;
+      final pickedModel = referenceVehicle?.model;
+      final pickedYear = referenceVehicle?.yearStart;
+      final pickedSlug = referenceVehicle == null
+          ? null
+          : VehicleProfileCatalogMatcher.slugFor(referenceVehicle);
+
       return VehicleProfile(
         id: _uuid.v4(),
         name: nameController.text.trim(),
@@ -120,9 +190,14 @@ class VehicleFormControllers {
         obd2AdapterMac: adapterMac,
         obd2AdapterName: adapterName,
         vin: vin,
-        engineDisplacementCc: engineDisplacementCc,
+        engineDisplacementCc: pickedDisplacement,
         engineCylinders: engineCylinders,
         curbWeightKg: curbWeightKg,
+        volumetricEfficiency: pickedVe,
+        make: pickedMake,
+        model: pickedModel,
+        year: pickedYear,
+        referenceVehicleId: pickedSlug,
       );
     }
 

@@ -7,6 +7,7 @@ import '../../../../core/utils/brand_logo_mapper.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2_vin_reader.dart';
+import '../../domain/entities/reference_vehicle.dart';
 import '../../domain/entities/vehicle_profile.dart';
 import '../../domain/entities/vin_data.dart';
 import '../../providers/obd2_vin_reader_provider.dart';
@@ -15,6 +16,7 @@ import '../../providers/vin_adapter_pair_auto_populator_provider.dart';
 import '../../providers/vin_decoder_provider.dart';
 import '../widgets/auto_record_section.dart';
 import '../widgets/calibration_section.dart';
+import '../widgets/reference_vehicle_picker.dart';
 import '../widgets/ve_reset_confirm_dialog.dart';
 import '../widgets/vehicle_drivetrain_section.dart';
 import '../widgets/vehicle_extras_section.dart';
@@ -98,6 +100,17 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
   // Disables the "Read VIN from car" button and shows a spinner so
   // the user has visible feedback during the bounded ~3 s window.
   bool _readingVinFromCar = false;
+
+  // #1372 phase 3 — the catalog row the user picked via
+  // [ReferenceVehiclePicker]. Non-null only on the new-vehicle path
+  // (the picker button is hidden for existing vehicles to avoid
+  // silently overwriting user tweaks). When set, `_save` threads it
+  // into `buildProfile` so the freshly-minted profile carries the
+  // catalog's `volumetricEfficiency`, `make`, `model`, `year`,
+  // `referenceVehicleId`, and `engineDisplacementCc` from the get-go.
+  // The user can still edit any controller-backed field before
+  // tapping Save; tapping the picker again replaces the prior pick.
+  ReferenceVehicle? _pickedReferenceVehicle;
 
   @override
   void initState() {
@@ -256,11 +269,40 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
       engineDisplacementCc: _engineDisplacementCc,
       engineCylinders: _engineCylinders,
       curbWeightKg: _curbWeightKg,
+      referenceVehicle: _pickedReferenceVehicle,
     );
     await ref.read(vehicleProfileListProvider.notifier).save(profile);
     await ref.syncActiveProfile(profile);
     if (!mounted) return;
     Navigator.of(context).pop();
+  }
+
+  /// Open the reference catalog picker (#1372 phase 3) and apply the
+  /// user's selection. New-vehicle path only — the button is hidden
+  /// when editing an existing profile so a tap doesn't silently
+  /// overwrite the user's tweaks.
+  ///
+  /// On selection:
+  ///   * `_ctrl.applyReferenceVehicle(...)` writes the catalog values
+  ///     into the text controllers (`name`, `preferredFuelType`).
+  ///   * Scalar engine state (`_engineDisplacementCc`) is overwritten
+  ///     with the catalog row's value so the OBD-II layer can use it
+  ///     immediately on the first trip.
+  ///   * The picked entry itself is stashed in
+  ///     [_pickedReferenceVehicle] so `_save` can thread the
+  ///     catalog-only metadata (slug, volumetricEfficiency, make,
+  ///     model, year) into the new profile via `buildProfile`.
+  ///
+  /// A second tap on the picker overwrites the prior pick — same flow,
+  /// no special handling.
+  Future<void> _openCatalogPicker() async {
+    final picked = await ReferenceVehiclePicker.show(context);
+    if (picked == null || !mounted) return;
+    setState(() {
+      _ctrl.applyReferenceVehicle(picked);
+      _engineDisplacementCc = picked.displacementCc;
+      _pickedReferenceVehicle = picked;
+    });
   }
 
   /// Decode the current VIN (#812 phase 2). Success → confirm dialog
@@ -558,6 +600,32 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
               type: _type,
             ),
             const SizedBox(height: 16),
+            // #1372 phase 3 — reference-catalog picker entry point.
+            // Visible only when creating a new vehicle (gated on
+            // `widget.vehicleId == null` AND no successful prior load).
+            // Hiding it in edit mode prevents a tap from silently
+            // overwriting the user's manually-tweaked fields.
+            if (!isEdit) ...[
+              OutlinedButton.icon(
+                onPressed: _openCatalogPicker,
+                icon: const Icon(Icons.directions_car_outlined),
+                label: Text(
+                  l?.pickerButtonLabel ?? 'Pick from catalog',
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                l?.pickerHelpText ??
+                    'Pre-fill from 50+ supported vehicles',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+            ],
             // Card 1: Identity (name + VIN).
             VehicleIdentitySection(
               nameController: _ctrl.nameController,

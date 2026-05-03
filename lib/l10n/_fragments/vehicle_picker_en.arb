@@ -1,0 +1,26 @@
+{
+  "pickerButtonLabel": "Pick from catalog",
+  "@pickerButtonLabel": {
+    "description": "Button on the new-vehicle edit screen that opens the reference catalog picker (#1372 phase 3) so users can pre-fill make/model/year/displacement/volumetricEfficiency from a curated list."
+  },
+  "pickerSearchHint": "Search make or model",
+  "@pickerSearchHint": {
+    "description": "Hint text shown in the search field of the reference vehicle picker bottom sheet (#1372 phase 3)."
+  },
+  "pickerHelpText": "Pre-fill from 50+ supported vehicles",
+  "@pickerHelpText": {
+    "description": "Helper subtitle next to the picker button explaining the catalog size (#1372 phase 3)."
+  },
+  "pickerEmptyResults": "No matches",
+  "@pickerEmptyResults": {
+    "description": "Empty-state shown in the picker sheet when the search query matches no catalog entries (#1372 phase 3)."
+  },
+  "pickerCancel": "Cancel",
+  "@pickerCancel": {
+    "description": "Cancel button in the reference vehicle picker bottom sheet (#1372 phase 3)."
+  },
+  "pickerLoading": "Loading catalog…",
+  "@pickerLoading": {
+    "description": "Loading-state label shown in the reference vehicle picker bottom sheet while the catalog asset is decoding (#1372 phase 3)."
+  }
+}

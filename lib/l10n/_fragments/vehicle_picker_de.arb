@@ -1,0 +1,8 @@
+{
+  "pickerButtonLabel": "Aus Katalog wählen",
+  "pickerSearchHint": "Marke oder Modell suchen",
+  "pickerHelpText": "Aus 50+ unterstützten Fahrzeugen vorbefüllen",
+  "pickerEmptyResults": "Keine Treffer",
+  "pickerCancel": "Abbrechen",
+  "pickerLoading": "Katalog wird geladen…"
+}

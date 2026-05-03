@@ -4424,6 +4424,24 @@ class AppLocalizationsCs extends AppLocalizations {
       'Pair an OBD2 adapter first to read VIN automatically';
 
   @override
+  String get pickerButtonLabel => 'Pick from catalog';
+
+  @override
+  String get pickerSearchHint => 'Search make or model';
+
+  @override
+  String get pickerHelpText => 'Pre-fill from 50+ supported vehicles';
+
+  @override
+  String get pickerEmptyResults => 'No matches';
+
+  @override
+  String get pickerCancel => 'Cancel';
+
+  @override
+  String get pickerLoading => 'Loading catalog…';
+
+  @override
   String get vinInfoTooltip => 'What is a VIN?';
 
   @override

@@ -4468,6 +4468,25 @@ class AppLocalizationsFr extends AppLocalizations {
       'Couplez un adaptateur OBD2 pour lire la VIN automatiquement';
 
   @override
+  String get pickerButtonLabel => 'Choisir dans le catalogue';
+
+  @override
+  String get pickerSearchHint => 'Rechercher marque ou modèle';
+
+  @override
+  String get pickerHelpText =>
+      'Pré-remplir depuis 50+ véhicules pris en charge';
+
+  @override
+  String get pickerEmptyResults => 'Aucun résultat';
+
+  @override
+  String get pickerCancel => 'Annuler';
+
+  @override
+  String get pickerLoading => 'Chargement du catalogue…';
+
+  @override
   String get vinInfoTooltip => 'Qu\'est-ce qu\'un VIN ?';
 
   @override
