@@ -8,6 +8,9 @@ import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../consent/presentation/widgets/consent_settings_section.dart';
 import '../../../driving/presentation/widgets/driving_settings_section.dart';
+import '../../../feature_management/application/feature_flags_provider.dart';
+import '../../../feature_management/domain/feature.dart';
+import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../widgets/about_section.dart';
 import '../widgets/api_key_section.dart';
 import '../widgets/feature_management_section.dart';
@@ -27,6 +30,22 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
+    // Cascading-feature gates (#1447 phase 3). Sections whose root
+    // feature is effectively-disabled vanish entirely so the user does
+    // not see settings whose UI cannot do anything. Re-enabling the
+    // root from the Feature management section restores them.
+    final manifest = ref.watch(featureManifestProvider);
+    final enabledFlags = ref.watch(featureFlagsProvider);
+    final tankSyncOn = isEffectivelyEnabled(
+      Feature.tankSync,
+      manifest,
+      enabledFlags,
+    );
+    final consumptionOn = isEffectivelyEnabled(
+      Feature.obd2TripRecording,
+      manifest,
+      enabledFlags,
+    );
 
     return PageScaffold(
       title: l?.settings ?? 'Settings',
@@ -61,12 +80,18 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 8),
 
           // #534 — TankSync closed by default (was initiallyExpanded: true).
-          const _FoldableSection(
-            icon: Icons.cloud_outlined,
-            title: 'TankSync',
-            child: TankSyncSection(),
-          ),
-          const SizedBox(height: 8),
+          // #1447 phase 3 — hidden entirely when Feature.tankSync is
+          // effectively disabled. Stored TankSync config (account,
+          // mode, etc.) is preserved; re-enabling the feature surfaces
+          // the section with the prior configuration intact.
+          if (tankSyncOn) ...[
+            const _FoldableSection(
+              icon: Icons.cloud_outlined,
+              title: 'TankSync',
+              child: TankSyncSection(),
+            ),
+            const SizedBox(height: 8),
+          ],
 
           // #952 phase 3 — bad-scan reporter PAT entry. Closed by
           // default; users without a token continue to use the
@@ -112,12 +137,19 @@ class ProfileScreen extends ConsumerWidget {
           // entry points (#1122 follow-up). The standalone "My vehicles"
           // and "Fuel club cards" tiles were folded INTO this section
           // so per-vehicle controls cluster under one heading.
-          _FoldableSection(
-            icon: Icons.local_gas_station_outlined,
-            title: l?.navConsumption ?? 'Consumption',
-            child: const DrivingSettingsSection(),
-          ),
-          const SizedBox(height: 8),
+          // #1447 phase 3 — hidden entirely when the root feature
+          // (`obd2TripRecording`) is effectively disabled. Per-vehicle
+          // and eco-coach state stays persisted; re-enabling
+          // consumption restores the section with its previous
+          // configuration.
+          if (consumptionOn) ...[
+            _FoldableSection(
+              icon: Icons.local_gas_station_outlined,
+              title: l?.navConsumption ?? 'Consumption',
+              child: const DrivingSettingsSection(),
+            ),
+            const SizedBox(height: 8),
+          ],
 
           // Storage & Cache
           _FoldableSection(

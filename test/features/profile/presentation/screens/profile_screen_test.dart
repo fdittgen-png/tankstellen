@@ -7,6 +7,8 @@ import 'package:tankstellen/app/router.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/profile/presentation/screens/profile_screen.dart';
 import 'package:tankstellen/core/widgets/settings_menu_tile.dart';
 
@@ -282,10 +284,19 @@ void main() {
         '"Conso" tab and contains vehicles + fuel-club cards entries '
         '(#1242)',
         (tester) async {
+      // Phase 3 of #1447 hides the Consumption section when its root
+      // feature (`obd2TripRecording`) is effectively-disabled. Seed
+      // the central enabled-set so the section renders for this test.
+      final seededOverrides = [
+        ...overrides,
+        featureFlagsProvider.overrideWith(
+          () => _ProfileTestFeatureFlags(<Feature>{Feature.obd2TripRecording}),
+        ),
+      ];
       await pumpApp(
         tester,
         const ProfileScreen(),
-        overrides: overrides,
+        overrides: seededOverrides,
       );
 
       // The new section header replaces the old "Driving" copy. We
@@ -537,4 +548,18 @@ void main() {
       );
     });
   });
+}
+
+/// Pinned FeatureFlags notifier for tests that need to assert section
+/// visibility (#1447 phase 3) without waiting on the Hive load path.
+class _ProfileTestFeatureFlags extends FeatureFlags {
+  _ProfileTestFeatureFlags(this._initial);
+
+  final Set<Feature> _initial;
+
+  @override
+  Set<Feature> build() {
+    ref.watch(featureManifestProvider);
+    return _initial;
+  }
 }
