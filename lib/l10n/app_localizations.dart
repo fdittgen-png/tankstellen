@@ -7226,6 +7226,36 @@ abstract class AppLocalizations {
   /// **'Need at least 3 trips per month for comparison'**
   String get consumptionMonthlyComparisonNotReliable;
 
+  /// Title of the card on the vehicle settings screen that surfaces the connected OBD2 adapter's runtime capability tier (#1401 phase 6).
+  ///
+  /// In en, this message translates to:
+  /// **'Adapter capabilities'**
+  String get obd2CapabilitySectionTitle;
+
+  /// Tier label for adapters that only support the OBD-II standard mode 01-09 PIDs — cheap clones / ELM327 v1.x (#1401 phase 6).
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get obd2CapabilityStandardOnly;
+
+  /// Tier label for adapters that can read manufacturer-specific PIDs via header switching — genuine ELM327 v2.2+ (#1401 phase 6).
+  ///
+  /// In en, this message translates to:
+  /// **'OEM PIDs'**
+  String get obd2CapabilityOemPids;
+
+  /// Tier label for adapters that support listen-mode CAN bus access — STN-chip family, OBDLink MX+/LX/CX/EX (#1401 phase 6).
+  ///
+  /// In en, this message translates to:
+  /// **'Full CAN'**
+  String get obd2CapabilityFullCan;
+
+  /// Informational one-liner shown only when the connected adapter is on the standardOnly tier (#1401 phase 6). Points users at the OBDLink STN-chip family without an affiliate link or purchase button.
+  ///
+  /// In en, this message translates to:
+  /// **'For exact litres-in-tank on Peugeot/Citroën, the app supports OBDLink MX+/LX/CX (STN chip).'**
+  String get obd2CapabilityUpgradeHintStandard;
+
   /// Snackbar shown when the user has flipped the in-app OBD2 fuel-rate diagnostic overlay ON via the hidden 5-tap gesture on the trip-recording screen title (#1395).
   ///
   /// In en, this message translates to:

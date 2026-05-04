@@ -16,6 +16,7 @@ import '../../providers/vin_adapter_pair_auto_populator_provider.dart';
 import '../../providers/vin_decoder_provider.dart';
 import '../widgets/auto_record_section.dart';
 import '../widgets/calibration_section.dart';
+import '../widgets/obd2_capability_section.dart';
 import '../widgets/reference_vehicle_picker.dart';
 import '../widgets/ve_reset_confirm_dialog.dart';
 import '../widgets/vehicle_drivetrain_section.dart';
@@ -704,6 +705,12 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
                 vehicleId: _existingId!,
                 onScrollToObd2Card: _scrollToAndHighlightObd2Card,
               ),
+              // #1401 phase 6 — adapter capability tier card. Renders
+              // nothing when no adapter is connected (collapsed via
+              // [SizedBox.shrink] inside the widget) so it doesn't
+              // pad the layout for users who haven't paired anything.
+              const SizedBox(height: 16),
+              const Obd2CapabilitySection(),
               const SizedBox(height: 16),
               // #1397 — collapsed-by-default expansion tile that lets
               // users override the four physics constants the OBD2

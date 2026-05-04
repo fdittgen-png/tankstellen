@@ -3922,6 +3922,22 @@ class AppLocalizationsNl extends AppLocalizations {
       'Need at least 3 trips per month for comparison';
 
   @override
+  String get obd2CapabilitySectionTitle => 'Adapter capabilities';
+
+  @override
+  String get obd2CapabilityStandardOnly => 'Standard';
+
+  @override
+  String get obd2CapabilityOemPids => 'OEM PIDs';
+
+  @override
+  String get obd2CapabilityFullCan => 'Full CAN';
+
+  @override
+  String get obd2CapabilityUpgradeHintStandard =>
+      'For exact litres-in-tank on Peugeot/Citroën, the app supports OBDLink MX+/LX/CX (STN chip).';
+
+  @override
   String get obd2DebugOverlayEnabledSnack => 'OBD2 diagnostic overlay enabled';
 
   @override

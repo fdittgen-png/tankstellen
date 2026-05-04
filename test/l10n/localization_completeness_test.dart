@@ -172,6 +172,21 @@ void main() {
               'GPS trip-path overlay on the trip detail screen must '
               'not fall back to English for French users (#1374 '
               'phase 2)');
+
+      // #1401 phase 6 — the adapter-capability card lives on the
+      // Edit-vehicle screen, which is a French-reachable surface
+      // (already enforced for `vehicle*` and `calibration*` keys).
+      // Same rule: every `obd2Capability*` key must be French so the
+      // tier label and OBDLink hint don't fall back to English.
+      final frenchMissingObd2Capability = frenchMissing
+          .where((k) => k.startsWith('obd2Capability'))
+          .toList()
+        ..sort();
+      expect(frenchMissingObd2Capability, isEmpty,
+          reason: 'French (fr) must have every obd2Capability* key — '
+              'the adapter-capability card on the Edit vehicle screen '
+              'must not fall back to English for French users (#1401 '
+              'phase 6)');
     });
 
     test('no locale has extra keys not in app_en.arb', () {
