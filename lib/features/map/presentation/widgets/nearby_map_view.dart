@@ -14,8 +14,13 @@ import 'station_map_layers.dart';
 
 /// Displays a map of nearby stations from the current search results.
 ///
-/// Shows the service status banner, station markers on the map,
-/// and a bottom info bar with station count and search radius.
+/// Layout: station markers fill the body, the bottom info bar pins to
+/// the bottom, and any [ServiceStatusBanner] (cache / fallback /
+/// offline) floats as a Positioned overlay at the top so it never
+/// pushes the map down. Pre-#1428 the banner was the first child of a
+/// Column and produced a visible grey strip between the AppBar and
+/// the map whenever a fallback fired — a permanent ~32 dp tax on
+/// every "stations were fetched via the secondary API" session.
 class NearbyMapView extends ConsumerWidget {
   final AsyncValue searchState;
   final dynamic selectedFuel;
@@ -103,28 +108,42 @@ class NearbyMapView extends ConsumerWidget {
           }
         });
 
-        return Column(
+        return Stack(
           children: [
-            ServiceStatusBanner(result: result),
-            Expanded(
-              child: StationMapLayers(
-                mapController: mapController,
-                stations: stations,
-                center: center,
-                zoom: zoom,
-                searchRadiusKm: searchRadiusKm,
-                selectedFuel: selectedFuel,
-                showRecenterButton: true,
-                onRecenter: () => mapController.fitCamera(
-                  CameraFit.bounds(
-                    bounds: bounds,
-                    padding: const EdgeInsets.all(32),
+            Column(
+              children: [
+                Expanded(
+                  child: StationMapLayers(
+                    mapController: mapController,
+                    stations: stations,
+                    center: center,
+                    zoom: zoom,
+                    searchRadiusKm: searchRadiusKm,
+                    selectedFuel: selectedFuel,
+                    showRecenterButton: true,
+                    onRecenter: () => mapController.fitCamera(
+                      CameraFit.bounds(
+                        bounds: bounds,
+                        padding: const EdgeInsets.all(32),
+                      ),
+                    ),
+                    extraLayers: extraLayers,
                   ),
                 ),
-                extraLayers: extraLayers,
-              ),
+                _buildInfoBar(context, l10n, stations, result),
+              ],
             ),
-            _buildInfoBar(context, l10n, stations, result),
+            // Stale / fallback banner as a floating overlay so it
+            // never steals vertical space from the map. Self-hides
+            // (returns SizedBox.shrink) when the result has neither
+            // staleness nor fallbacks, so the overlay is invisible
+            // on the happy path.
+            Positioned(
+              top: 8,
+              left: 8,
+              right: 8,
+              child: _OverlayBanner(result: result),
+            ),
           ],
         );
       },
@@ -174,6 +193,36 @@ class NearbyMapView extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Floating wrapper for [ServiceStatusBanner] used by the map view.
+///
+/// [ServiceStatusBanner] returns [SizedBox.shrink] when the result is
+/// neither stale nor used a fallback, so this widget is invisible on
+/// the happy path. When a banner IS rendered, the [Material] envelope
+/// gives it elevation + rounded corners so it reads as a floating
+/// chip overlaying the map rather than a full-bleed strip cutting the
+/// screen in half. [SafeArea] keeps the chip clear of the AppBar's
+/// shadow without inflating its size when the AppBar already provides
+/// its own SafeArea padding (the bottom side is disabled — the bottom
+/// info bar already pins to the safe area).
+class _OverlayBanner extends StatelessWidget {
+  final dynamic result;
+
+  const _OverlayBanner({required this.result});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      bottom: false,
+      child: Material(
+        elevation: 4,
+        borderRadius: BorderRadius.circular(8),
+        clipBehavior: Clip.antiAlias,
+        child: ServiceStatusBanner(result: result),
       ),
     );
   }
