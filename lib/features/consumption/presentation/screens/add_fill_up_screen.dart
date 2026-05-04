@@ -15,6 +15,7 @@ import '../../domain/entities/fill_up.dart';
 import '../../domain/fill_up_auto_cost_calculator.dart';
 import '../../domain/fill_up_variance.dart';
 import '../../providers/consumption_providers.dart';
+import '../../providers/current_obd2_fuel_level_provider.dart';
 import '../widgets/add_fill_up_form_fields.dart';
 import '../widgets/fill_up_no_vehicle_cta.dart';
 import '../widgets/fill_up_pinned_save_bar.dart';
@@ -94,6 +95,20 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   ReceiptScanOutcome? _lastScan;
   FillUpAutoCostCalculator? _autoCostCalc;
 
+  /// Adapter-captured tank level (litres) snapshotted at form-open
+  /// (#1434). Closes the producer-wiring gap from #1401 — paired with
+  /// [_fuelLevelAfterL] (captured at save) so the persisted [FillUp]
+  /// carries both reads, lighting up the verified-by-adapter badge
+  /// (#1430) and the variance prompt when the user-typed liters
+  /// disagrees with the adapter delta by >5 %.
+  ///
+  /// Null when no trip is recording, the adapter doesn't surface
+  /// PID 0x2F, or the active vehicle has no tankCapacityL configured.
+  /// Test seam [AddFillUpScreen.initialFuelLevelBeforeL] takes
+  /// precedence when set, so widget tests can drive the dialog flow
+  /// without standing up a live OBD2 stack.
+  double? _fuelLevelBeforeL;
+
   @override
   void initState() {
     super.initState();
@@ -105,6 +120,26 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     // #953 — accept an injected scan service so widget tests can drive
     // the failure flow without touching the platform camera channel.
     _scanService = widget.scanService;
+    // #1434 — snapshot the OBD2 tank level NOW so the persisted FillUp
+    // remembers what the adapter saw at form-open. The widget's test
+    // seam takes precedence so widget tests can pin a deterministic
+    // value without spinning up the trip-recording graph.
+    _fuelLevelBeforeL =
+        widget.initialFuelLevelBeforeL ?? _readObd2FuelLevelLitres();
+  }
+
+  /// One-shot read of the OBD2 fuel-level provider at the current
+  /// instant. `ref.read` (not `watch`) — we capture a single snapshot,
+  /// not a reactive subscription. Returns null when the provider is
+  /// unavailable in the test container or any other read-time failure
+  /// (defensive: a missing OBD2 reading must never block save).
+  double? _readObd2FuelLevelLitres() {
+    try {
+      return ref.read(currentObd2FuelLevelLitresProvider);
+    } catch (e, st) {
+      debugPrint('AddFillUp: OBD2 fuel-level read failed: $e\n$st');
+      return null;
+    }
   }
 
   /// Resolve the initial vehicle selection: prefer the profile's
@@ -220,6 +255,15 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final userLiters = AddFillUpValidators.parseDouble(_litersCtrl.text);
+    // #1434 — capture the post-fill tank level NOW (form-submit). The
+    // before-fill capture happened in initState and lives on the
+    // state field. The test seam takes precedence so widget tests can
+    // exercise the variance / no-variance flows without a live OBD2
+    // chain. Both nulls on a no-OBD2 phone leave the FillUp in the
+    // legacy "user-entered only" shape — variance prompt skips itself
+    // (FillUpVariance.hasAdapterCapture returns false).
+    final afterL =
+        widget.initialFuelLevelAfterL ?? _readObd2FuelLevelLitres();
     var fillUp = FillUp(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       date: _date,
@@ -232,8 +276,8 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
       vehicleId: _vehicleId,
       isFullTank: _isFullTank,
-      fuelLevelBeforeL: widget.initialFuelLevelBeforeL,
-      fuelLevelAfterL: widget.initialFuelLevelAfterL,
+      fuelLevelBeforeL: _fuelLevelBeforeL,
+      fuelLevelAfterL: afterL,
     );
 
     // #1401 phase 7b — when both adapter fuel-level captures are
