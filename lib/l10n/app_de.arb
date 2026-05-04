@@ -1255,6 +1255,12 @@
   "@authErrorGeneric": {
     "description": "Auth error pill — generic fallback when no specific mapping matches the raw exception (#1186)."
   },
+  "autoRecordConsentBadgeLabel": "Hintergrund-Standort — nur für automatisches Aufzeichnen",
+  "autoRecordConsentExplanationTitle": "Zu dieser Berechtigung",
+  "autoRecordConsentExplanationBody": "Die automatische Aufzeichnung braucht den Hintergrund-Standort, um zu erkennen, wann du losfährst, während die App geschlossen ist. Diese Berechtigung wird ausschließlich vom automatischen Aufzeichnen verwendet — die Stationssuche und die Kartenzentrierung nutzen eine separate Vordergrund-Berechtigung.",
+  "autoRecordConsentExplanationCloseButton": "Verstanden",
+  "autoRecordConsentExplanationTooltip": "Was bedeutet das?",
+  "autoRecordConsentRevokeAction": "Tippen, um in den Systemeinstellungen zu verwalten",
   "autoRecordSectionTitle": "Automatische Aufzeichnung",
   "autoRecordToggleLabel": "Fahrten automatisch aufzeichnen",
   "autoRecordStatusActiveLabel": "Auto-Aufzeichnung wird beim nächsten Einsteigen aktiv.",

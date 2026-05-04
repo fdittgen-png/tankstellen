@@ -5822,6 +5822,42 @@ abstract class AppLocalizations {
   /// **'Sign-in failed. Please try again.'**
   String get authErrorGeneric;
 
+  /// Scope-explicit label for the background-location consent badge on the auto-record card (#1439). Replaces the ambiguous pre-#1439 label that read as a profile-wide grant; clarifies that the consent is consumed exclusively by the auto-record service.
+  ///
+  /// In en, this message translates to:
+  /// **'Background location — for auto-record only'**
+  String get autoRecordConsentBadgeLabel;
+
+  /// Title of the explanation dialog opened by the help icon next to the auto-record consent badge (#1439).
+  ///
+  /// In en, this message translates to:
+  /// **'About this permission'**
+  String get autoRecordConsentExplanationTitle;
+
+  /// Body copy of the explanation dialog clarifying that the background-location grant is scoped to auto-record and does not affect search or map features (#1439).
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-record needs background location to detect when you start driving while the app is closed. This grant is used only by auto-record — station search and map centering use a separate foreground location grant.'**
+  String get autoRecordConsentExplanationBody;
+
+  /// Dismiss button for the auto-record consent explanation dialog (#1439).
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get autoRecordConsentExplanationCloseButton;
+
+  /// Tooltip on the help icon next to the auto-record consent badge (#1439); accessibility hint that tells the user the icon opens an explanation dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'What does this mean?'**
+  String get autoRecordConsentExplanationTooltip;
+
+  /// Accessibility hint and visual subline on the auto-record consent badge indicating that tapping it opens the OS app-info screen so the user can revoke the grant (#1439).
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to manage in system settings'**
+  String get autoRecordConsentRevokeAction;
+
   /// Title of the per-vehicle auto-record configuration section on the edit-vehicle screen (#1004 phase 6).
   ///
   /// In en, this message translates to:

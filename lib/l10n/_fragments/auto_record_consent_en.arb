@@ -1,0 +1,26 @@
+{
+  "autoRecordConsentBadgeLabel": "Background location — for auto-record only",
+  "@autoRecordConsentBadgeLabel": {
+    "description": "Scope-explicit label for the background-location consent badge on the auto-record card (#1439). Replaces the ambiguous pre-#1439 label that read as a profile-wide grant; clarifies that the consent is consumed exclusively by the auto-record service."
+  },
+  "autoRecordConsentExplanationTitle": "About this permission",
+  "@autoRecordConsentExplanationTitle": {
+    "description": "Title of the explanation dialog opened by the help icon next to the auto-record consent badge (#1439)."
+  },
+  "autoRecordConsentExplanationBody": "Auto-record needs background location to detect when you start driving while the app is closed. This grant is used only by auto-record — station search and map centering use a separate foreground location grant.",
+  "@autoRecordConsentExplanationBody": {
+    "description": "Body copy of the explanation dialog clarifying that the background-location grant is scoped to auto-record and does not affect search or map features (#1439)."
+  },
+  "autoRecordConsentExplanationCloseButton": "Got it",
+  "@autoRecordConsentExplanationCloseButton": {
+    "description": "Dismiss button for the auto-record consent explanation dialog (#1439)."
+  },
+  "autoRecordConsentExplanationTooltip": "What does this mean?",
+  "@autoRecordConsentExplanationTooltip": {
+    "description": "Tooltip on the help icon next to the auto-record consent badge (#1439); accessibility hint that tells the user the icon opens an explanation dialog."
+  },
+  "autoRecordConsentRevokeAction": "Tap to manage in system settings",
+  "@autoRecordConsentRevokeAction": {
+    "description": "Accessibility hint and visual subline on the auto-record consent badge indicating that tapping it opens the OS app-info screen so the user can revoke the grant (#1439)."
+  }
+}

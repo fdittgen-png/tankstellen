@@ -1,0 +1,8 @@
+{
+  "autoRecordConsentBadgeLabel": "Hintergrund-Standort — nur für automatisches Aufzeichnen",
+  "autoRecordConsentExplanationTitle": "Zu dieser Berechtigung",
+  "autoRecordConsentExplanationBody": "Die automatische Aufzeichnung braucht den Hintergrund-Standort, um zu erkennen, wann du losfährst, während die App geschlossen ist. Diese Berechtigung wird ausschließlich vom automatischen Aufzeichnen verwendet — die Stationssuche und die Kartenzentrierung nutzen eine separate Vordergrund-Berechtigung.",
+  "autoRecordConsentExplanationCloseButton": "Verstanden",
+  "autoRecordConsentExplanationTooltip": "Was bedeutet das?",
+  "autoRecordConsentRevokeAction": "Tippen, um in den Systemeinstellungen zu verwalten"
+}

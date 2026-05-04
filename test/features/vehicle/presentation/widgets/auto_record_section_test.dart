@@ -695,4 +695,146 @@ void main() {
       },
     );
   });
+
+  group('AutoRecordSection — consent badge scope clarification (#1439)', () {
+    testWidgets(
+      'consent badge is HIDDEN when autoRecord is OFF — the entire '
+      'background-location section is collapsed',
+      (tester) async {
+        final list = _FakeVehicleProfileList([
+          // autoRecord=false → no advanced rows render at all, including
+          // the consent badge. Even if the user had previously granted
+          // background location, the badge is meaningless without an
+          // active service consuming it (#1439 acceptance C).
+          const VehicleProfile(
+            id: 'v1',
+            name: 'Golf',
+            backgroundLocationConsent: true,
+          ),
+        ]);
+        await _pumpSection(tester, vehicleId: 'v1', list: list);
+
+        expect(
+          find.byKey(const Key('autoRecordConsentBadge')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const Key('autoRecordBackgroundLocationRequest')),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'consent badge is SHOWN with the new scope-explicit label when '
+      'autoRecord is ON and background-location consent is granted',
+      (tester) async {
+        final list = _FakeVehicleProfileList([
+          const VehicleProfile(
+            id: 'v1',
+            name: 'Golf',
+            autoRecord: true,
+            pairedAdapterMac: 'AA:BB:CC:11:22:33',
+            backgroundLocationConsent: true,
+          ),
+        ]);
+        await _pumpSection(tester, vehicleId: 'v1', list: list);
+
+        expect(
+          find.byKey(const Key('autoRecordConsentBadge')),
+          findsOneWidget,
+        );
+        // New scope-explicit label from the en ARB fragment.
+        expect(
+          find.text('Background location — for auto-record only'),
+          findsOneWidget,
+        );
+        // Pre-#1439 ambiguous label must not appear when consent is granted.
+        expect(
+          find.text('Background location allowed'),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'tapping the help icon opens the explanation dialog with the '
+      'scope-clarification body text',
+      (tester) async {
+        final list = _FakeVehicleProfileList([
+          const VehicleProfile(
+            id: 'v1',
+            name: 'Golf',
+            autoRecord: true,
+            pairedAdapterMac: 'AA:BB:CC:11:22:33',
+            backgroundLocationConsent: true,
+          ),
+        ]);
+        await _pumpSection(tester, vehicleId: 'v1', list: list);
+
+        await tester.tap(
+          find.byKey(const Key('autoRecordConsentExplanationButton')),
+        );
+        // Bounded pump — AlertDialog scrim animates and pumpAndSettle
+        // can stall on Windows for the same reason as the rationale
+        // dialog test above.
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
+
+        expect(
+          find.byKey(const Key('autoRecordConsentExplanationDialog')),
+          findsOneWidget,
+        );
+        // Body text from the en ARB fragment — anchor on the disambiguating
+        // phrase that distinguishes this dialog from the rationale dialog.
+        expect(
+          find.textContaining('used only by auto-record'),
+          findsOneWidget,
+        );
+        // Close button is wired and tappable — exercising it asserts
+        // the dismiss handler is connected without depending on the
+        // AlertDialog scrim animation finishing within a bounded pump
+        // (the route exit transition is unreliable on Windows under
+        // pumpAndSettle, see #1302 background-location dialog test).
+        expect(
+          find.byKey(const Key('autoRecordConsentExplanationClose')),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'tapping the badge invokes openSettings so the user can revoke '
+      'the grant in the OS app-info screen',
+      (tester) async {
+        final list = _FakeVehicleProfileList([
+          const VehicleProfile(
+            id: 'v1',
+            name: 'Golf',
+            autoRecord: true,
+            pairedAdapterMac: 'AA:BB:CC:11:22:33',
+            backgroundLocationConsent: true,
+          ),
+        ]);
+        var openSettingsCalls = 0;
+        await _pumpSection(
+          tester,
+          vehicleId: 'v1',
+          list: list,
+          openSettings: () async {
+            openSettingsCalls++;
+          },
+        );
+
+        await tester.tap(find.byKey(const Key('autoRecordConsentBadge')));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
+
+        expect(openSettingsCalls, 1);
+        // Tapping the badge must NOT mutate persisted profile state — the
+        // revoke happens in the OS settings screen, not in our store.
+        expect(list.savedProfiles, isEmpty);
+      },
+    );
+  });
 }

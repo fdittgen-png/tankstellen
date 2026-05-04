@@ -3105,6 +3105,27 @@ class AppLocalizationsFi extends AppLocalizations {
   String get authErrorGeneric => 'Sign-in failed. Please try again.';
 
   @override
+  String get autoRecordConsentBadgeLabel =>
+      'Background location — for auto-record only';
+
+  @override
+  String get autoRecordConsentExplanationTitle => 'About this permission';
+
+  @override
+  String get autoRecordConsentExplanationBody =>
+      'Auto-record needs background location to detect when you start driving while the app is closed. This grant is used only by auto-record — station search and map centering use a separate foreground location grant.';
+
+  @override
+  String get autoRecordConsentExplanationCloseButton => 'Got it';
+
+  @override
+  String get autoRecordConsentExplanationTooltip => 'What does this mean?';
+
+  @override
+  String get autoRecordConsentRevokeAction =>
+      'Tap to manage in system settings';
+
+  @override
   String get autoRecordSectionTitle => 'Auto-record';
 
   @override
