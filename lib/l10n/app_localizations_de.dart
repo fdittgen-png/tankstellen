@@ -3586,6 +3586,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'GPS-Spur zu jeder Fahrt mitspeichern.';
 
   @override
+  String get featureLabel_autoRecord => 'Automatische Aufzeichnung';
+
+  @override
+  String get featureDescription_autoRecord =>
+      'Fahrt automatisch starten, sobald der OBD2-Adapter mit einem fahrenden Fahrzeug verbunden ist.';
+
+  @override
   String get featureBlockedEnable_gamification =>
       'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
 
@@ -3607,6 +3614,15 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get featureBlockedEnable_gpsTripPath =>
       'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
+
+  @override
+  String get featureBlockedEnable_autoRecord =>
+      'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
+
+  @override
+  String featureBlockedDisable_autoRecord(String dependents) {
+    return 'Schalte zuerst die abhängigen Funktionen aus: $dependents';
+  }
 
   @override
   String featureBlockedDisable_obd2TripRecording(String dependents) {

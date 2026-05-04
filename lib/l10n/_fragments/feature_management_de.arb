@@ -27,12 +27,16 @@
   "featureDescription_glideCoach": "Spritspar-Hinweise anhand von OSM-Ampeldaten.",
   "featureLabel_gpsTripPath": "GPS-Fahrtaufzeichnung",
   "featureDescription_gpsTripPath": "GPS-Spur zu jeder Fahrt mitspeichern.",
+  "featureLabel_autoRecord": "Automatische Aufzeichnung",
+  "featureDescription_autoRecord": "Fahrt automatisch starten, sobald der OBD2-Adapter mit einem fahrenden Fahrzeug verbunden ist.",
   "featureBlockedEnable_gamification": "Aktiviere zuerst die OBD2-Fahrtaufzeichnung",
   "featureBlockedEnable_hapticEcoCoach": "Aktiviere zuerst die OBD2-Fahrtaufzeichnung",
   "featureBlockedEnable_consumptionAnalytics": "Aktiviere zuerst die OBD2-Fahrtaufzeichnung",
   "featureBlockedEnable_baselineSync": "Aktiviere zuerst TankSync",
   "featureBlockedEnable_glideCoach": "Aktiviere zuerst die OBD2-Fahrtaufzeichnung",
   "featureBlockedEnable_gpsTripPath": "Aktiviere zuerst die OBD2-Fahrtaufzeichnung",
+  "featureBlockedEnable_autoRecord": "Aktiviere zuerst die OBD2-Fahrtaufzeichnung",
   "featureBlockedDisable_obd2TripRecording": "Schalte zuerst die abhängigen Funktionen aus: {dependents}",
-  "featureBlockedDisable_tankSync": "Schalte zuerst die abhängigen Funktionen aus: {dependents}"
+  "featureBlockedDisable_tankSync": "Schalte zuerst die abhängigen Funktionen aus: {dependents}",
+  "featureBlockedDisable_autoRecord": "Schalte zuerst die abhängigen Funktionen aus: {dependents}"
 }

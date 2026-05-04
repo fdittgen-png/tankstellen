@@ -176,6 +176,8 @@ String _featureLabel(AppLocalizations? l, Feature f) {
       return l?.featureLabel_glideCoach ?? 'Glide-coach';
     case Feature.gpsTripPath:
       return l?.featureLabel_gpsTripPath ?? 'GPS trip path';
+    case Feature.autoRecord:
+      return l?.featureLabel_autoRecord ?? 'Auto-record';
   }
 }
 
@@ -220,6 +222,9 @@ String _featureDescription(AppLocalizations? l, Feature f) {
     case Feature.gpsTripPath:
       return l?.featureDescription_gpsTripPath ??
           'Persist GPS path samples alongside each trip.';
+    case Feature.autoRecord:
+      return l?.featureDescription_autoRecord ??
+          'Automatically start a trip when the OBD2 adapter connects to a moving vehicle.';
   }
 }
 
@@ -242,6 +247,9 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
           'Enable OBD2 trip recording first';
     case Feature.gpsTripPath:
       return l?.featureBlockedEnable_gpsTripPath ??
+          'Enable OBD2 trip recording first';
+    case Feature.autoRecord:
+      return l?.featureBlockedEnable_autoRecord ??
           'Enable OBD2 trip recording first';
     // Features without prerequisites can never reach this branch — the
     // dependency-graph helpers short-circuit. Return a generic fallback
@@ -282,6 +290,7 @@ String _blockedDisableMessage(
     case Feature.evCharging:
     case Feature.glideCoach:
     case Feature.gpsTripPath:
+    case Feature.autoRecord:
       return 'Disable dependent features first: $dependents';
   }
 }

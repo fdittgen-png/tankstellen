@@ -3556,6 +3556,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Persist GPS path samples alongside each trip.';
 
   @override
+  String get featureLabel_autoRecord => 'Auto-record';
+
+  @override
+  String get featureDescription_autoRecord =>
+      'Automatically start a trip when the OBD2 adapter connects to a moving vehicle.';
+
+  @override
   String get featureBlockedEnable_gamification =>
       'Enable OBD2 trip recording first';
 
@@ -3577,6 +3584,15 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get featureBlockedEnable_gpsTripPath =>
       'Enable OBD2 trip recording first';
+
+  @override
+  String get featureBlockedEnable_autoRecord =>
+      'Enable OBD2 trip recording first';
+
+  @override
+  String featureBlockedDisable_autoRecord(String dependents) {
+    return 'Disable dependent features first: $dependents';
+  }
 
   @override
   String featureBlockedDisable_obd2TripRecording(String dependents) {

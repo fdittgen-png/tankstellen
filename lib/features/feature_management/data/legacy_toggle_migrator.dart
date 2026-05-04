@@ -3,6 +3,7 @@ import 'package:hive/hive.dart';
 
 import '../../../core/storage/storage_keys.dart';
 import '../../profile/data/models/user_profile.dart';
+import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../domain/feature.dart';
 import '../domain/feature_manifest.dart';
 import 'feature_flags_repository.dart';
@@ -35,6 +36,18 @@ const String unifiedSearchResultsMigratedKey = 'unifiedSearchResultsMigrated';
 /// tells us whether the migration has already run.
 const String syncBaselinesMigratedKey = 'syncBaselinesMigrated';
 
+/// Settings-box key written once after the per-vehicle
+/// `VehicleProfile.autoRecord` bools have been inspected for the
+/// phase-3d wrap migration (#1373 phase 3d). Unlike previous phases
+/// this is NOT a 1:1 promotion — the per-vehicle bool STAYS so each
+/// vehicle keeps its individual opt-in. We only flip the new central
+/// [Feature.autoRecord] master gate to `false` when EVERY existing
+/// vehicle had the per-vehicle bool off (an explicit "the user
+/// doesn't want auto-record at all" signal). Otherwise the central
+/// feature stays at the manifest default of `true` and the per-
+/// vehicle bools continue to gate per-vehicle behaviour as before.
+const String autoRecordMigratedKey = 'autoRecordMigrated';
+
 /// One-shot migrator that promotes legacy scattered toggles into the
 /// central [FeatureFlagsRepository] (#1373 phase 3a).
 ///
@@ -64,12 +77,28 @@ const String syncBaselinesMigratedKey = 'syncBaselinesMigrated';
 /// prerequisites to cascade-enable (the manifest declares no
 /// `requires:` for [Feature.unifiedSearchResults]).
 ///
-/// Phase 3e (this PR) adds [_migrateSyncBaselines] for the
+/// Phase 3e adds [_migrateSyncBaselines] for the
 /// settings-box-backed `syncBaselinesEnabled` toggle. The manifest
 /// declares [Feature.tankSync] as a hard prerequisite of
 /// [Feature.baselineSync], so the cascade promotes BOTH on a legacy
 /// `true` (mirroring the haptic precedent's
 /// `obd2TripRecording → hapticEcoCoach` cascade).
+///
+/// Phase 3d (this PR) adds [_migrateAutoRecord] — the FIRST
+/// "wrap, not replace" migration. The per-vehicle
+/// [VehicleProfile.autoRecord] bool stays: each vehicle keeps its
+/// own opt-in. The new [Feature.autoRecord] central feature is a
+/// MASTER gate consulted before the per-vehicle bool. The migrator
+/// only flips the central feature OFF when EVERY existing vehicle
+/// had the per-vehicle bool off (explicit "no auto-record at all"
+/// intent); otherwise the central feature stays at the manifest
+/// default of `true` and the per-vehicle bools continue to govern
+/// per-vehicle behaviour exactly as before. This shape is
+/// deliberately NOT the haptic / unified-search precedent — there
+/// the legacy field was 1:1 replaced by the central feature, and
+/// the legacy field was deprecated. Here the legacy field is the
+/// authoritative per-vehicle state and the central feature is a
+/// new, additional layer on top.
 ///
 /// Phase status:
 ///   - 3a hapticEcoCoach (settings-box, default-false) ✅
@@ -77,12 +106,12 @@ const String syncBaselinesMigratedKey = 'syncBaselinesMigrated';
 ///     [migrateUserProfileToggles]
 ///   - 3f unifiedSearchResults (settings-box, default-false) ✅
 ///   - 3e syncBaselines (settings-box, default-false) ✅
+///   - 3d autoRecord (per-vehicle, default-true, WRAP not replace) ✅
 ///
-/// Future phases (3c, 3d) extend this migrator with additional
-/// scattered toggles (`showConsumptionTab`, per-vehicle `autoRecord`,
-/// etc.). Each new migration follows the same shape: read the legacy
-/// value, gate on a `<featureName>Migrated` flag, force-enable
-/// prerequisites first, persist, then write the gate flag.
+/// Future phases extend this migrator with additional scattered
+/// toggles. Each new migration follows the same shape: read the
+/// legacy value, gate on a `<featureName>Migrated` flag, force-
+/// enable prerequisites first, persist, then write the gate flag.
 Future<void> migrateLegacyToggles({
   required Box<dynamic> settings,
   required FeatureFlagsRepository featureFlags,
@@ -99,6 +128,11 @@ Future<void> migrateLegacyToggles({
     manifest: manifest,
   );
   await _migrateSyncBaselines(
+    settings: settings,
+    featureFlags: featureFlags,
+    manifest: manifest,
+  );
+  await _migrateAutoRecord(
     settings: settings,
     featureFlags: featureFlags,
     manifest: manifest,
@@ -350,6 +384,122 @@ Future<void> _migrateSyncBaselines({
   } catch (e, st) {
     debugPrint(
       'migrateLegacyToggles: writing $syncBaselinesMigratedKey failed: $e\n$st',
+    );
+  }
+}
+
+/// Phase-3d wrap migration for the per-vehicle
+/// [VehicleProfile.autoRecord] bool (#1373 phase 3d).
+///
+/// Shape — and the reason it differs from the haptic / unified-search
+/// precedent: this migration WRAPS the legacy field rather than
+/// replacing it. The per-vehicle bool stays, each vehicle keeps its
+/// own opt-in, and the new [Feature.autoRecord] central feature is a
+/// master gate consulted before the per-vehicle check. We only flip
+/// the central feature OFF when EVERY existing vehicle had the per-
+/// vehicle bool off — that's the only signal we can read at migration
+/// time that means "user doesn't want auto-record at all". When at
+/// least one vehicle has the bool on (or there are no vehicles at
+/// all — fresh installs), the central feature stays at the manifest
+/// default of `true` so the wrapping is transparent.
+///
+/// Read path: [VehicleProfileRepository] persists profiles as a List
+/// in the same `settings` Hive box under
+/// [StorageKeys.vehicleProfiles] (keep this read in lockstep with
+/// that repository — if the storage shape ever moves to a dedicated
+/// box, this migrator must follow). Each list entry is a
+/// JSON-serialised [VehicleProfile] map; we decode it via
+/// [VehicleProfile.fromJson] so a future schema bump rides through
+/// freezed's `@Default` values without us having to mirror the
+/// schema here.
+///
+/// Idempotent: gated on [autoRecordMigratedKey]. The flag is set on
+/// every code path (success, failure, no-vehicles, all-on, all-off,
+/// mixed) so a subsequent launch is always a no-op.
+Future<void> _migrateAutoRecord({
+  required Box<dynamic> settings,
+  required FeatureFlagsRepository featureFlags,
+  required FeatureManifest manifest,
+}) async {
+  // Already migrated → idempotent no-op. Subsequent runs must not
+  // re-inspect the per-vehicle bools (the user may have flipped the
+  // central feature back on after the initial migration disabled it,
+  // and that choice must survive).
+  if (settings.get(autoRecordMigratedKey) == true) {
+    return;
+  }
+
+  bool? allVehiclesAutoRecordFalse;
+  try {
+    final raw = settings.get(StorageKeys.vehicleProfiles);
+    if (raw is List && raw.isNotEmpty) {
+      var allFalse = true;
+      var anyDecoded = false;
+      for (final item in raw) {
+        if (item is! Map) continue;
+        // VehicleProfile.fromJson expects Map<String, dynamic>; Hive
+        // round-trips Map<dynamic, dynamic>, so coerce here.
+        final asMap = <String, dynamic>{};
+        item.forEach((k, v) {
+          if (k is String) asMap[k] = v;
+        });
+        try {
+          final profile = VehicleProfile.fromJson(asMap);
+          anyDecoded = true;
+          if (profile.autoRecord) {
+            allFalse = false;
+            break;
+          }
+        } catch (e, st) {
+          // A single malformed row must not block the migration. If
+          // every row is malformed [anyDecoded] stays false and we
+          // treat it like "no vehicles" (manifest default wins).
+          debugPrint(
+            'migrateLegacyToggles: skipping malformed vehicle profile '
+            'during autoRecord migration: $e\n$st',
+          );
+        }
+      }
+      if (anyDecoded) {
+        allVehiclesAutoRecordFalse = allFalse;
+      }
+    }
+  } catch (e, st) {
+    debugPrint(
+      'migrateLegacyToggles: reading vehicle profiles for autoRecord '
+      'migration failed: $e\n$st',
+    );
+  }
+
+  if (allVehiclesAutoRecordFalse == true) {
+    // Every existing vehicle had the per-vehicle bool off → user
+    // intent is "no auto-record at all". Flip the central master
+    // gate off so a future vehicle added with the per-vehicle
+    // default-on bool does NOT silently start recording.
+    try {
+      final current = await featureFlags.loadEnabled();
+      final next = {...current}..remove(Feature.autoRecord);
+      await featureFlags.saveEnabled(next);
+    } catch (e, st) {
+      // Don't block startup on a migration failure — the user can
+      // re-toggle from settings if the central state is missing.
+      debugPrint(
+        'migrateLegacyToggles: autoRecord disable failed: $e\n$st',
+      );
+    }
+  }
+  // else: allVehiclesAutoRecordFalse == false (at least one vehicle
+  // had the bool on — preserve the manifest default-true) OR null
+  // (no vehicles or all malformed — manifest default wins; if /
+  // when the user adds a vehicle they can flip the central feature
+  // off explicitly).
+
+  // Always set the flag so subsequent launches are no-ops.
+  try {
+    await settings.put(autoRecordMigratedKey, true);
+  } catch (e, st) {
+    debugPrint(
+      'migrateLegacyToggles: writing $autoRecordMigratedKey failed: $e\n$st',
     );
   }
 }

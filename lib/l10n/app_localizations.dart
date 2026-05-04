@@ -6566,6 +6566,18 @@ abstract class AppLocalizations {
   /// **'Persist GPS path samples alongside each trip.'**
   String get featureDescription_gpsTripPath;
 
+  /// Display name for the master auto-record feature gate (#1373 phase 3d). The per-vehicle auto-record toggle is independent; this central switch is the master gate consulted first.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-record'**
+  String get featureLabel_autoRecord;
+
+  /// One-line description for the master auto-record feature gate.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically start a trip when the OBD2 adapter connects to a moving vehicle.'**
+  String get featureDescription_autoRecord;
+
   /// Tooltip shown on the disabled gamification toggle when its prerequisite (OBD2 trip recording) is off.
   ///
   /// In en, this message translates to:
@@ -6601,6 +6613,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enable OBD2 trip recording first'**
   String get featureBlockedEnable_gpsTripPath;
+
+  /// Tooltip shown on the disabled master auto-record toggle when its prerequisite (OBD2 trip recording) is off.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable OBD2 trip recording first'**
+  String get featureBlockedEnable_autoRecord;
+
+  /// Tooltip shown on the disabled master auto-record toggle when one or more dependent features are still enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable dependent features first: {dependents}'**
+  String featureBlockedDisable_autoRecord(String dependents);
 
   /// Tooltip shown on the disabled OBD2 trip recording toggle when one or more dependent features are still enabled. The placeholder is filled with a comma-separated list of localised feature names.
   ///
