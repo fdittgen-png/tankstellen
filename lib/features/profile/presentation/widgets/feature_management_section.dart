@@ -10,22 +10,28 @@ import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../../../feature_management/domain/feature_manifest.dart';
 
 /// Settings-screen section that exposes every [Feature] as a toggle
-/// (#1373 phase 2).
+/// (#1373 phase 2; #1440 grouping).
 ///
-/// Renders one [SwitchListTile] per entry in [featureManifestProvider]. The
-/// dependency graph is consulted BEFORE attempting a transition so the
-/// provider's `StateError` never reaches the UI:
+/// Renders one [SwitchListTile] per entry in [featureManifestProvider],
+/// VISUALLY GROUPED so dependent features sit indented under the parent
+/// they require (#1440). Each group is a [Card] containing the parent
+/// row at full width followed by indented dependent rows separated by a
+/// subtle divider.
+///
+/// The dependency graph is consulted BEFORE attempting a transition so
+/// the provider's `StateError` never reaches the UI:
 /// - When a disabled feature's prerequisites are missing the switch is
 ///   disabled and wrapped in a [Tooltip] naming the missing prerequisite
-///   via `featureBlockedEnable_<feature.name>`.
-/// - When an enabled feature has dependents that are still on, the switch
-///   is disabled and the tooltip lists the dependents using the
+///   via `featureBlockedEnable_<feature.name>`. A single tap on the
+///   disabled row also surfaces the same message via [SnackBar] (#1440).
+/// - When an enabled feature has dependents that are still on, the
+///   switch is disabled and the tooltip lists the dependents using the
 ///   `featureBlockedDisable_<feature.name>` template.
 ///
-/// Phase 1 of #1373 ships the engine in PARALLEL with the existing
+/// Phase 1 of #1373 shipped the engine in PARALLEL with the existing
 /// scattered toggles — this section therefore does NOT yet replace
-/// `autoRecord` / `gamificationEnabled` / etc. Phase 3 will migrate
-/// them one PR at a time.
+/// `autoRecord` / `gamificationEnabled` / etc. Phase 3 migrated them
+/// one PR at a time.
 class FeatureManagementSection extends ConsumerWidget {
   const FeatureManagementSection({super.key});
 
@@ -36,10 +42,14 @@ class FeatureManagementSection extends ConsumerWidget {
     final manifest = ref.watch(featureManifestProvider);
     final enabled = ref.watch(featureFlagsProvider);
 
-    // Iterate in manifest declaration order so the UI matches the order
-    // chosen in [FeatureManifest.defaultManifest] (foundation features
-    // first, follow-on / future features last).
-    final features = manifest.entries.keys.toList(growable: false);
+    // Build groups in manifest declaration order (#1440). A feature with
+    // no `requires` (or whose `requires` does not reference an already-
+    // seen parent) becomes a new group; otherwise it is appended to the
+    // first matching parent's group. Most dependents in the active
+    // manifest depend on a single parent, but multi-parent dependents
+    // attach to the first parent they reference in declaration order so
+    // grouping placement is deterministic.
+    final groups = _buildGroups(manifest);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -56,14 +66,120 @@ class FeatureManagementSection extends ConsumerWidget {
               style: theme.textTheme.bodySmall,
             ),
           ),
-          for (final feature in features)
-            _FeatureToggle(
-              feature: feature,
-              isEnabled: enabled.contains(feature),
+          for (final group in groups)
+            _FeatureGroupCard(
+              group: group,
               manifest: manifest,
               currentlyEnabled: enabled,
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// A parent feature plus the dependents that should render indented
+/// beneath it (#1440). The parent itself is always the first row in the
+/// rendered Card; [children] is empty for stand-alone parents.
+class _FeatureGroup {
+  final Feature parent;
+  final List<Feature> children;
+
+  const _FeatureGroup({required this.parent, required this.children});
+}
+
+/// Walks [manifest] in declaration order and produces a list of groups
+/// in the same order. A feature with empty `requires` ALWAYS opens a
+/// new group; a feature with `requires` is appended to the first parent
+/// it references — falling back to a stand-alone group when none of its
+/// prerequisites are themselves declared in [manifest] (defensive: this
+/// should never happen in practice but the function stays total).
+List<_FeatureGroup> _buildGroups(FeatureManifest manifest) {
+  final groups = <_FeatureGroup>[];
+  // Index of the group whose parent is `Feature`, for O(1) child append.
+  final parentIndex = <Feature, int>{};
+
+  for (final feature in manifest.entries.keys) {
+    final entry = manifest.entries[feature]!;
+    if (entry.requires.isEmpty) {
+      parentIndex[feature] = groups.length;
+      groups.add(_FeatureGroup(parent: feature, children: <Feature>[]));
+      continue;
+    }
+    // Pick the first prerequisite that is itself a parent we have
+    // already seen — keeps ordering stable and predictable.
+    int? targetIndex;
+    for (final required in entry.requires) {
+      final idx = parentIndex[required];
+      if (idx != null) {
+        targetIndex = idx;
+        break;
+      }
+    }
+    if (targetIndex == null) {
+      // Defensive: dependent whose prerequisite is missing from the
+      // manifest — render as its own group so the user still sees the
+      // toggle.
+      parentIndex[feature] = groups.length;
+      groups.add(_FeatureGroup(parent: feature, children: <Feature>[]));
+    } else {
+      groups[targetIndex].children.add(feature);
+    }
+  }
+  return groups;
+}
+
+/// Renders one [_FeatureGroup] as a [Card] containing the parent toggle
+/// at full width followed by any dependent rows indented beneath it
+/// (#1440). When the group has no children the card collapses to just
+/// the parent row — no divider, no indent.
+class _FeatureGroupCard extends StatelessWidget {
+  final _FeatureGroup group;
+  final FeatureManifest manifest;
+  final Set<Feature> currentlyEnabled;
+
+  const _FeatureGroupCard({
+    required this.group,
+    required this.manifest,
+    required this.currentlyEnabled,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final hasChildren = group.children.isNotEmpty;
+    return Card(
+      key: Key('featureGroup_${group.parent.name}'),
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _FeatureToggle(
+              feature: group.parent,
+              isEnabled: currentlyEnabled.contains(group.parent),
+              manifest: manifest,
+              currentlyEnabled: currentlyEnabled,
+            ),
+            if (hasChildren)
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: theme.dividerColor.withValues(alpha: 0.4),
+              ),
+            for (final child in group.children)
+              Padding(
+                padding: const EdgeInsets.only(left: 24),
+                child: _FeatureToggle(
+                  feature: child,
+                  isEnabled: currentlyEnabled.contains(child),
+                  manifest: manifest,
+                  currentlyEnabled: currentlyEnabled,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -131,9 +247,29 @@ class _FeatureToggle extends ConsumerWidget {
     if (blockedReason == null) {
       return tile;
     }
+    // The switch's onChanged is null (disabled) so taps would be
+    // swallowed silently. Wrap the row in a GestureDetector that
+    // surfaces the blocker via SnackBar (#1440) — long-press still
+    // shows the existing Tooltip.
+    final reason = blockedReason;
     return Tooltip(
-      message: blockedReason,
-      child: tile,
+      message: reason,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          final messenger = ScaffoldMessenger.maybeOf(context);
+          if (messenger == null) return;
+          messenger
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(reason),
+                duration: const Duration(seconds: 3),
+              ),
+            );
+        },
+        child: tile,
+      ),
     );
   }
 }
