@@ -144,4 +144,4 @@ final class LegacyToggleMigrationProvider
 }
 
 String _$legacyToggleMigrationHash() =>
-    r'28fd0649daf74093c0e9c3f9f0154f4a10fc5b0e';
+    r'f56d28476cf26cc102db777b9ad413103a99d2fb';

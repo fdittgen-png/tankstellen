@@ -43,7 +43,6 @@ _UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
     json['hybridFuelChoice'],
     const FuelTypeJsonConverter().fromJson,
   ),
-  showConsumptionTab: json['showConsumptionTab'] as bool? ?? false,
   gamificationEnabled: json['gamificationEnabled'] as bool? ?? true,
 );
 
@@ -74,7 +73,6 @@ Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
         instance.hybridFuelChoice,
         const FuelTypeJsonConverter().toJson,
       ),
-      'showConsumptionTab': instance.showConsumptionTab,
       'gamificationEnabled': instance.gamificationEnabled,
     };
 

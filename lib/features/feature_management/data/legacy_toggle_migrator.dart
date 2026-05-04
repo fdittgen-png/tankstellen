@@ -48,6 +48,20 @@ const String syncBaselinesMigratedKey = 'syncBaselinesMigrated';
 /// vehicle bools continue to gate per-vehicle behaviour as before.
 const String autoRecordMigratedKey = 'autoRecordMigrated';
 
+/// Settings-box key written once after the orphan
+/// `UserProfile.showConsumptionTab` field has been stripped from the
+/// active profile's persisted JSON (#1373 phase 3c). This is NOT a
+/// promotion to a central feature — the field had zero consumers in
+/// `lib/` or `test/` (likely orphaned by #1342 when the
+/// carbon/Achievements tab was removed) so phase 3c is a pure
+/// deletion. The migrator step exists so an upgrading user with a
+/// persisted profile from before the field was deleted gets the
+/// orphan key cleared from disk on the next launch — without it the
+/// stale `showConsumptionTab: true` row would survive every
+/// re-serialisation as long as no other write path touched the
+/// profile.
+const String showConsumptionTabDroppedKey = 'showConsumptionTabDropped';
+
 /// One-shot migrator that promotes legacy scattered toggles into the
 /// central [FeatureFlagsRepository] (#1373 phase 3a).
 ///
@@ -104,6 +118,8 @@ const String autoRecordMigratedKey = 'autoRecordMigrated';
 ///   - 3a hapticEcoCoach (settings-box, default-false) ✅
 ///   - 3b gamification (UserProfile, default-true) ✅ via
 ///     [migrateUserProfileToggles]
+///   - 3c showConsumptionTab (UserProfile, ORPHAN deletion — not a
+///     central-feature migration) ✅ via [migrateUserProfileToggles]
 ///   - 3f unifiedSearchResults (settings-box, default-false) ✅
 ///   - 3e syncBaselines (settings-box, default-false) ✅
 ///   - 3d autoRecord (per-vehicle, default-true, WRAP not replace) ✅
@@ -140,7 +156,7 @@ Future<void> migrateLegacyToggles({
 }
 
 /// One-shot migrator for UserProfile-backed legacy toggles (#1373
-/// phase 3b).
+/// phase 3b + 3c).
 ///
 /// Reads the legacy [UserProfile.gamificationEnabled] value from the
 /// passed-in [activeProfile]. The migrator is a no-op when [activeProfile]
@@ -160,6 +176,24 @@ Future<void> migrateLegacyToggles({
 /// In both cases the [gamificationMigratedKey] gate is then set so
 /// subsequent runs are no-ops.
 ///
+/// Phase 3c additionally drops the orphan
+/// `UserProfile.showConsumptionTab` field. Because the field has zero
+/// consumers in `lib/` or `test/` (likely orphaned by #1342 when the
+/// carbon/Achievements tab was removed) phase 3c is a pure deletion,
+/// NOT a Feature-flag promotion. The drop step calls [saveActiveProfile]
+/// once per upgrading user so the freshly-serialised profile JSON no
+/// longer carries the orphan key. The Freezed `@Default` removal alone
+/// would handle deserialisation (an unknown key is silently ignored)
+/// but a re-serialise path that read-then-wrote the profile would
+/// preserve the stale row indefinitely; the explicit save closes that
+/// window. Idempotent via [showConsumptionTabDroppedKey].
+///
+/// [saveActiveProfile] is optional — when null (e.g. unit tests that
+/// don't wire the profile repository) the drop step still records the
+/// gate flag and returns. Production wires it to
+/// `ActiveProfile.updateProfile` via the
+/// `legacyToggleMigrationProvider`.
+///
 /// Safe to call alongside [migrateLegacyToggles] from the same provider
 /// (see `legacyToggleMigrationProvider`). The two functions touch
 /// disjoint settings-box keys.
@@ -168,12 +202,18 @@ Future<void> migrateUserProfileToggles({
   required FeatureFlagsRepository featureFlags,
   required FeatureManifest manifest,
   required UserProfile? activeProfile,
+  Future<void> Function(UserProfile profile)? saveActiveProfile,
 }) async {
   await _migrateGamification(
     settings: settings,
     featureFlags: featureFlags,
     manifest: manifest,
     activeProfile: activeProfile,
+  );
+  await _dropShowConsumptionTab(
+    settings: settings,
+    activeProfile: activeProfile,
+    saveActiveProfile: saveActiveProfile,
   );
 }
 
@@ -500,6 +540,87 @@ Future<void> _migrateAutoRecord({
   } catch (e, st) {
     debugPrint(
       'migrateLegacyToggles: writing $autoRecordMigratedKey failed: $e\n$st',
+    );
+  }
+}
+
+/// Phase-3c orphan deletion of the `UserProfile.showConsumptionTab`
+/// field (#1373 phase 3c).
+///
+/// The field had zero consumers in `lib/` or `test/` — likely orphaned
+/// by #1342 when the carbon/Achievements tab was removed — so this is
+/// a pure deletion, NOT a Feature-flag promotion. The Freezed
+/// `@Default` removal alone handles deserialisation (an unknown JSON
+/// key is silently ignored on read), but a re-serialise path that
+/// reads then writes the profile would preserve the stale
+/// `showConsumptionTab: true` row indefinitely. To close that window
+/// the migrator saves the active profile back via [saveActiveProfile]
+/// once on the upgrading user's first launch — the freshly serialised
+/// JSON does not contain the dropped key.
+///
+/// Idempotent — gated on [showConsumptionTabDroppedKey]. The flag is
+/// written even when [activeProfile] is null but only AFTER a
+/// successful save; an absent active profile defers the work to the
+/// next launch (mirrors the gamification step's null-profile handling).
+Future<void> _dropShowConsumptionTab({
+  required Box<dynamic> settings,
+  required UserProfile? activeProfile,
+  required Future<void> Function(UserProfile profile)? saveActiveProfile,
+}) async {
+  // Already dropped → idempotent no-op. Subsequent runs must not
+  // re-save the profile (a no-op write is cheap but unnecessary, and
+  // forwarding through the repository invalidates Riverpod listeners
+  // that re-fetch the profile every launch otherwise).
+  if (settings.get(showConsumptionTabDroppedKey) == true) {
+    return;
+  }
+
+  // No profile loaded yet → defer to next launch. We deliberately do
+  // NOT write the gate flag because that would skip the drop on the
+  // launch where the profile IS available, leaving the orphan key on
+  // disk forever.
+  if (activeProfile == null) {
+    return;
+  }
+
+  // No saver wired (e.g. unit tests that don't depend on the profile
+  // repository). Set the flag anyway so the test environment doesn't
+  // re-enter this branch on every provider rebuild.
+  if (saveActiveProfile == null) {
+    try {
+      await settings.put(showConsumptionTabDroppedKey, true);
+    } catch (e, st) {
+      debugPrint(
+        'migrateUserProfileToggles: writing $showConsumptionTabDroppedKey '
+        'failed: $e\n$st',
+      );
+    }
+    return;
+  }
+
+  try {
+    // Re-saving the same profile object writes a freshly serialised
+    // JSON map. After the field deletion `toJson()` no longer emits
+    // the orphan key, so persistence drops it for good.
+    await saveActiveProfile(activeProfile);
+  } catch (e, st) {
+    // Don't block startup on a save failure — the orphan key is inert
+    // (no consumer reads it) so leaving it for the next launch to
+    // retry is harmless. We deliberately DO NOT set the gate flag in
+    // this branch so the next launch tries again.
+    debugPrint(
+      'migrateUserProfileToggles: showConsumptionTab drop save failed: '
+      '$e\n$st',
+    );
+    return;
+  }
+
+  try {
+    await settings.put(showConsumptionTabDroppedKey, true);
+  } catch (e, st) {
+    debugPrint(
+      'migrateUserProfileToggles: writing $showConsumptionTabDroppedKey '
+      'failed: $e\n$st',
     );
   }
 }

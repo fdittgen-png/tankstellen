@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../profile/data/models/user_profile.dart';
 import '../../profile/providers/profile_provider.dart';
 import '../data/legacy_toggle_migrator.dart';
 import 'feature_flags_provider.dart';
@@ -70,6 +71,14 @@ Future<void> legacyToggleMigration(Ref ref) async {
   final manifest = ref.read(featureManifestProvider);
   final activeProfile = ref.watch(activeProfileProvider);
 
+  // Phase 3c needs to write the active profile back through the
+  // repository so the freshly-serialised JSON drops the orphan
+  // `showConsumptionTab` key. Forward through ActiveProfile.updateProfile
+  // (not the raw repository) so the in-memory state stays in sync.
+  Future<void> saveActiveProfile(UserProfile profile) async {
+    await ref.read(activeProfileProvider.notifier).updateProfile(profile);
+  }
+
   // Defer the actual migration to the next microtask so this
   // provider's `build` returns fast and any synchronous reads of
   // [featureFlagsProvider] inside the same frame don't race the
@@ -86,6 +95,7 @@ Future<void> legacyToggleMigration(Ref ref) async {
         featureFlags: featureFlags,
         manifest: manifest,
         activeProfile: activeProfile,
+        saveActiveProfile: saveActiveProfile,
       );
     } catch (e, st) {
       // Failure is non-fatal — the central state stays at manifest

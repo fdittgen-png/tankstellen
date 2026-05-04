@@ -65,12 +65,6 @@ abstract class UserProfile with _$UserProfile {
     /// combustion fuel, they treat it like a petrol/diesel car.
     /// Defaults to null so existing profiles don't need migration.
     @FuelTypeJsonConverter() FuelType? hybridFuelChoice,
-    /// Opt-in visibility of the Consumption tab in the bottom nav
-    /// (#701). The tab stays hidden unless this is true AND at least
-    /// one vehicle is configured — the log is vehicle-centric and a
-    /// first-time user without a vehicle would only see the empty
-    /// state.
-    @Default(false) bool showConsumptionTab,
     /// Master toggle for gamification surfaces (#1194). Defaults to
     /// true so existing users see no behaviour change. When flipped
     /// off, badges, scores, achievement tabs, and trophy iconography

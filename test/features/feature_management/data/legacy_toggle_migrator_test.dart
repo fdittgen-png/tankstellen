@@ -932,4 +932,178 @@ void main() {
       },
     );
   });
+
+  /// Phase-3c orphan-deletion coverage for `UserProfile.showConsumptionTab`.
+  ///
+  /// Distinct from the gamification / haptic / sync precedents because
+  /// the migrator does NOT promote anything into the central feature
+  /// flag set — the field had zero consumers in `lib/` or `test/`
+  /// (likely orphaned by #1342) so phase 3c is a pure deletion. The
+  /// migrator only exists to strip the orphan key from any active
+  /// profile that was persisted before the field was removed; one save
+  /// through the repository writes a fresh JSON without the dropped key.
+  group('migrateUserProfileToggles — showConsumptionTab drop (phase 3c)', () {
+    test(
+      'first run with an active profile invokes the saver and sets the '
+      'gate flag',
+      () async {
+        const profile = UserProfile(id: 'p1', name: 'Test');
+        var savedCount = 0;
+        UserProfile? lastSaved;
+
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: profile,
+          saveActiveProfile: (p) async {
+            savedCount += 1;
+            lastSaved = p;
+          },
+        );
+
+        expect(
+          savedCount,
+          1,
+          reason:
+              'The drop step must call the repository saver exactly once '
+              'per upgrading user — the freshly-serialised JSON drops the '
+              'orphan showConsumptionTab key.',
+        );
+        expect(
+          lastSaved,
+          same(profile),
+          reason:
+              'The saver must receive the active profile verbatim — the '
+              'migrator does not mutate the profile, only triggers a '
+              're-serialisation through repository.updateProfile so '
+              'toJson() runs against the post-deletion shape.',
+        );
+        expect(
+          settings.get(showConsumptionTabDroppedKey),
+          isTrue,
+          reason:
+              'The migration gate must be set so a subsequent run does '
+              'not re-enter the saver branch (idempotency + avoids '
+              'invalidating Riverpod listeners on every launch).',
+        );
+      },
+    );
+
+    test(
+      'second run after the gate is set is a no-op (saver not invoked)',
+      () async {
+        const profile = UserProfile(id: 'p1', name: 'Test');
+        await settings.put(showConsumptionTabDroppedKey, true);
+        var savedCount = 0;
+
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: profile,
+          saveActiveProfile: (p) async {
+            savedCount += 1;
+          },
+        );
+
+        expect(
+          savedCount,
+          0,
+          reason:
+              'When the gate flag is already set the migrator must not '
+              're-save the profile — re-serialisation is idempotent on '
+              'the wire, but invalidates the active-profile Riverpod '
+              'listener and triggers spurious rebuilds.',
+        );
+      },
+    );
+
+    test(
+      'no active profile → no save, gate NOT set (will retry next launch)',
+      () async {
+        var savedCount = 0;
+
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: null,
+          saveActiveProfile: (p) async {
+            savedCount += 1;
+          },
+        );
+
+        expect(
+          savedCount,
+          0,
+          reason:
+              'Without an active profile there is nothing to re-serialise — '
+              'the saver must not fire.',
+        );
+        expect(
+          settings.get(showConsumptionTabDroppedKey),
+          isNull,
+          reason:
+              'The gate flag MUST NOT be written when no profile is loaded '
+              '— otherwise the next launch (when the profile IS loaded) '
+              'would skip the drop step and the orphan key would survive '
+              'on disk forever.',
+        );
+      },
+    );
+
+    test(
+      'saver-failure does NOT set the gate so the next launch retries',
+      () async {
+        const profile = UserProfile(id: 'p1', name: 'Test');
+
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: profile,
+          saveActiveProfile: (p) async {
+            throw StateError('disk full simulation');
+          },
+        );
+
+        expect(
+          settings.get(showConsumptionTabDroppedKey),
+          isNull,
+          reason:
+              'A save failure must keep the gate unset — the orphan key '
+              'is inert (no consumer reads it) so retrying on the next '
+              'launch is the correct recovery, not silent gate-set.',
+        );
+      },
+    );
+
+    test(
+      'no saver wired (callback null) → gate flag still set so test '
+      'environments are not re-entered every provider rebuild',
+      () async {
+        const profile = UserProfile(id: 'p1', name: 'Test');
+
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: profile,
+          // saveActiveProfile omitted — covers the unit-test path that
+          // doesn't wire the profile repository.
+        );
+
+        expect(
+          settings.get(showConsumptionTabDroppedKey),
+          isTrue,
+          reason:
+              'When no saver is wired the migrator cannot strip the orphan '
+              'key — but it must still set the gate so a watcher in a unit '
+              'test that rebuilds the provider does not re-enter this '
+              'branch on every rebuild.',
+        );
+      },
+    );
+  });
 }
