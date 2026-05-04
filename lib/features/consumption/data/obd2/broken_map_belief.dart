@@ -24,6 +24,12 @@ enum BrokenMapReason {
   /// VeLearner converged to a η_v above what's physically possible.
   etaImplausible,
 
+  /// Recalled from a prior session via [ObdAdapterBlocklist] — the
+  /// adapter was already known to be suspect from earlier observations
+  /// (#1423 phase 4). Used by the populator to surface a warning at
+  /// the next pair attempt without re-probing.
+  priorObservation,
+
   /// Not yet triggered by a strong observation (default).
   none,
 }

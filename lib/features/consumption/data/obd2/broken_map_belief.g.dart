@@ -31,5 +31,6 @@ const _$BrokenMapReasonEnumMap = {
   BrokenMapReason.revDeltaMissing: 'revDeltaMissing',
   BrokenMapReason.pleinCompletDiscrepancy: 'pleinCompletDiscrepancy',
   BrokenMapReason.etaImplausible: 'etaImplausible',
+  BrokenMapReason.priorObservation: 'priorObservation',
   BrokenMapReason.none: 'none',
 };

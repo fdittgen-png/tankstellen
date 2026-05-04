@@ -5,6 +5,7 @@ import '../../consumption/data/obd2/broken_map_belief.dart';
 import '../../consumption/data/obd2/broken_map_detector.dart';
 import '../../consumption/data/obd2/obd2_connection_service.dart';
 import '../../consumption/data/obd2/obd2_service.dart';
+import '../../consumption/data/obd2/obd_adapter_blocklist.dart';
 import '../domain/entities/vehicle_profile.dart';
 import '../domain/entities/vin_data.dart';
 import 'vin_auto_populator.dart';
@@ -96,11 +97,33 @@ class VinAdapterPairAutoPopulator {
   /// flow then behaves exactly as before.
   final BrokenMapDetector? brokenMapDetector;
 
+  /// Optional persistent broken-MAP blocklist (#1423 phase 4). When
+  /// provided AND the connected adapter reports a stable ELM ID via
+  /// `ATI` (captured into [Obd2Service.adapterFirmware]), the
+  /// populator recalls a prior belief BEFORE running the probe — a
+  /// known-broken adapter (recalled confidence > 0.7) short-circuits
+  /// the probe and surfaces immediately. After the probe runs, beliefs
+  /// crossing the same threshold are persisted back to the blocklist
+  /// so future sessions inherit the warning. Null in tests / legacy
+  /// call sites that haven't opted in.
+  final ObdAdapterBlocklist? blocklist;
+
+  /// Threshold above which a recalled / freshly-probed belief is
+  /// considered actionable enough to:
+  ///   1. short-circuit the next pair-time probe (recall path), and
+  ///   2. land in the persistent blocklist for future sessions
+  ///      (probe-result path).
+  /// Mirrors [brokenMapBlocklistThreshold] in `consumption_providers`
+  /// — kept here as a private constant rather than imported to avoid
+  /// pulling in the providers layer from a data-layer class.
+  static const double _blocklistThreshold = 0.7;
+
   VinAdapterPairAutoPopulator({
     required this.connection,
     required this.decoder,
     this.populator = const VinAutoPopulator(),
     this.brokenMapDetector,
+    this.blocklist,
   });
 
   /// Run the post-pair flow against [pairedAdapterMac], merging into
@@ -165,29 +188,76 @@ class VinAdapterPairAutoPopulator {
         pidFuelType: pidFuelType,
       );
 
-      // Optional broken-MAP idle probe (#1423 phase 2). Runs against
-      // the live service before disconnect; never derails the pair
-      // flow on failure. Diesel branch is selected from whichever
+      // Optional broken-MAP idle probe (#1423 phase 2 + 4). Runs
+      // against the live service before disconnect; never derails the
+      // pair flow on failure. Diesel branch is selected from whichever
       // fuel-type signal we already resolved — PID 0x51 wins, the
       // populator's merged result wins next, then nothing (default
-      // petrol). Phase 4 will swap the empty `prior` for a recall
-      // from the persistent blocklist.
+      // petrol).
+      //
+      // Phase 4: when a [blocklist] is wired AND the adapter reported
+      // a stable firmware id, recall the prior belief BEFORE probing.
+      // A known-broken adapter (recalled confidence > 0.7) skips the
+      // probe entirely — we already know it's suspect, surface the
+      // warning immediately and let the user act. After the probe
+      // completes (or short-circuits), beliefs crossing the threshold
+      // are persisted back so future pair attempts inherit the
+      // warning.
       BrokenMapBelief? brokenMapBelief;
       final detector = brokenMapDetector;
+      final adapterId = service.adapterFirmware;
       if (detector != null) {
         try {
-          final fuelKey = (pidFuelType ??
-                  result.profile.preferredFuelType ??
-                  result.profile.detectedFuelType ??
-                  '')
-              .toLowerCase();
-          final isDiesel = fuelKey.contains('diesel');
-          brokenMapBelief = await detector.probe(
-            service,
-            isDiesel: isDiesel,
-            prior: const BrokenMapBelief(),
-            now: DateTime.now(),
-          );
+          // Recall path — short-circuit when the adapter is on the
+          // blocklist with actionable confidence.
+          final blocklistRef = blocklist;
+          if (blocklistRef != null &&
+              adapterId != null &&
+              adapterId.isNotEmpty) {
+            final priorConfidence = await blocklistRef.recall(adapterId);
+            if (priorConfidence != null &&
+                priorConfidence > _blocklistThreshold) {
+              brokenMapBelief = BrokenMapBelief(
+                confidence: priorConfidence,
+                // observationCount: 0 distinguishes "hydrated from a
+                // prior session" from a freshly-probed belief whose
+                // updater would have bumped the count.
+                observationCount: 0,
+                lastUpdate: DateTime.now(),
+                lastTrigger: BrokenMapReason.priorObservation,
+              );
+            }
+          }
+
+          // Probe path — only when the recall didn't short-circuit.
+          if (brokenMapBelief == null) {
+            final fuelKey = (pidFuelType ??
+                    result.profile.preferredFuelType ??
+                    result.profile.detectedFuelType ??
+                    '')
+                .toLowerCase();
+            final isDiesel = fuelKey.contains('diesel');
+            brokenMapBelief = await detector.probe(
+              service,
+              isDiesel: isDiesel,
+              prior: const BrokenMapBelief(),
+              now: DateTime.now(),
+            );
+
+            // Persist back to the blocklist when the freshly-probed
+            // confidence crosses the actionable threshold. Same
+            // adapter id used by the recall path above so future
+            // sessions short-circuit instead of re-probing.
+            if (blocklistRef != null &&
+                adapterId != null &&
+                adapterId.isNotEmpty &&
+                brokenMapBelief.confidence > _blocklistThreshold) {
+              await blocklistRef.recordBelief(
+                adapterId,
+                brokenMapBelief.confidence,
+              );
+            }
+          }
         } catch (e, st) {
           await errorLogger.log(
             ErrorLayer.background,

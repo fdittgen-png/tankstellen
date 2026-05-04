@@ -1,12 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/data/storage_repository.dart';
+import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../vehicle/data/ve_learner.dart';
 import '../../vehicle/providers/service_reminder_providers.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/broken_map_belief.dart';
 import '../data/obd2/broken_map_detector.dart';
+import '../data/obd2/obd_adapter_blocklist.dart';
 import '../data/repositories/fill_up_repository.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/entities/consumption_stats.dart';
@@ -43,19 +48,43 @@ VeLearner? veLearner(Ref ref) {
   );
 }
 
-/// Detector for the broken-MAP belief system (#1423 phase 3). Phase 4
-/// will swap this empty-prior factory for one that recalls the latest
-/// persisted belief; for phase 3 (logic-only) the detector is a single
+/// Detector for the broken-MAP belief system (#1423 phase 3). Single
 /// stateless instance shared across observations.
 @Riverpod(keepAlive: true)
 BrokenMapDetector brokenMapDetector(Ref ref) => const BrokenMapDetector();
 
+/// Persistent per-adapter broken-MAP blocklist (#1423 phase 4). Reads
+/// and writes the latest belief confidence by ELM ID through the
+/// shared [SettingsStorage] (Hive `settings` box). The populator
+/// recalls before each pair attempt so a known-broken adapter
+/// surfaces a warning without re-probing.
+@Riverpod(keepAlive: true)
+ObdAdapterBlocklist obdAdapterBlocklist(Ref ref) =>
+    ObdAdapterBlocklist(ref.watch(settingsStorageProvider));
+
+/// Settings-box key prefix used by [BrokenMapBeliefByVehicle] for
+/// per-vehicle persistence (#1423 phase 4). Separate namespace from
+/// [ObdAdapterBlocklist]'s adapter-keyed entries — the two are
+/// orthogonal: vehicle-keyed survives an adapter change; adapter-keyed
+/// survives a vehicle change.
+@visibleForTesting
+const String brokenMapBeliefSettingsKeyPrefix = 'brokenMapBelief:';
+
+/// Threshold above which a belief is considered actionable enough to
+/// persist into the [ObdAdapterBlocklist] (#1423 phase 4). Mirrors the
+/// spec § C wording: "if matched and confidence > 0.7, surface the
+/// warning". Below this we still update the per-vehicle belief in
+/// settings, but don't pollute the adapter blocklist with weak signals.
+@visibleForTesting
+const double brokenMapBlocklistThreshold = 0.7;
+
 /// Holds the most recent per-vehicle [BrokenMapBelief] (#1423 phase 3).
 ///
-/// In-memory only — phase 4 will replace this with a Hive-backed
-/// per-vehicle store so beliefs survive app restart. Phase 3 keeps the
-/// state Riverpod-scoped so widget tests can inspect / seed prior
-/// beliefs without touching storage.
+/// Hive-backed via [SettingsStorage] (#1423 phase 4) — beliefs survive
+/// app restart. Lazy-loaded on first [beliefFor] call per vehicle;
+/// [set] writes back to settings fire-and-forget. Errors are logged
+/// via [errorLogger] but never propagate (a storage hiccup must not
+/// break the fill-up save flow that triggered the update).
 ///
 /// Keyed by `vehicleId`. Beliefs default to [BrokenMapBelief()] when
 /// the vehicle hasn't been observed yet.
@@ -65,15 +94,81 @@ class BrokenMapBeliefByVehicle extends _$BrokenMapBeliefByVehicle {
   Map<String, BrokenMapBelief> build() => <String, BrokenMapBelief>{};
 
   /// Read the current belief for [vehicleId]; defaults to a fresh
-  /// [BrokenMapBelief] when nothing has been recorded yet.
-  BrokenMapBelief beliefFor(String vehicleId) =>
-      state[vehicleId] ?? const BrokenMapBelief();
+  /// [BrokenMapBelief] when nothing has been recorded yet. Hydrates
+  /// lazily from [SettingsStorage] on first access — subsequent calls
+  /// hit the cached state.
+  BrokenMapBelief beliefFor(String vehicleId) {
+    final cached = state[vehicleId];
+    if (cached != null) return cached;
+    final stored = _loadFromStorage(vehicleId);
+    if (stored != null) {
+      // Cache without re-firing the setter's persistence path.
+      state = {...state, vehicleId: stored};
+      return stored;
+    }
+    return const BrokenMapBelief();
+  }
 
-  /// Replace the belief for [vehicleId] with [belief]. Used by the
-  /// plein-complet hook after a reconciliation observation folds in.
+  /// Replace the belief for [vehicleId] with [belief]. Persists to
+  /// [SettingsStorage] in the background; persistence failures are
+  /// logged but never thrown so the calling save flow stays atomic.
   void set(String vehicleId, BrokenMapBelief belief) {
     state = {...state, vehicleId: belief};
+    // ignore: discarded_futures
+    _persist(vehicleId, belief);
   }
+
+  /// Synchronously decode the persisted belief for [vehicleId]. Returns
+  /// null when no entry exists or when the JSON payload can't be
+  /// parsed (defensive against schema drift / hand-edited values).
+  BrokenMapBelief? _loadFromStorage(String vehicleId) {
+    try {
+      final storage = ref.read(settingsStorageProvider);
+      final raw = storage.getSetting(_keyFor(vehicleId));
+      if (raw is! String || raw.isEmpty) return null;
+      final json = jsonDecode(raw);
+      if (json is! Map<String, dynamic>) return null;
+      return BrokenMapBelief.fromJson(json);
+    } catch (e, st) {
+      // Fire-and-forget log so the diagnostic overlay can see why a
+      // belief defaulted to empty after a restart. Returning null
+      // falls back to a fresh belief — the worst case is one re-
+      // probed pair, not a crash.
+      // ignore: discarded_futures
+      errorLogger.log(
+        ErrorLayer.background,
+        e,
+        st,
+        context: const {
+          'op': 'brokenMapBeliefByVehicle.load',
+        },
+      );
+      return null;
+    }
+  }
+
+  /// Persist [belief] under [vehicleId]. Async-throws are caught and
+  /// logged — the calling fill-up save must not be derailed by a
+  /// storage hiccup.
+  Future<void> _persist(String vehicleId, BrokenMapBelief belief) async {
+    try {
+      final SettingsStorage storage = ref.read(settingsStorageProvider);
+      final encoded = jsonEncode(belief.toJson());
+      await storage.putSetting(_keyFor(vehicleId), encoded);
+    } catch (e, st) {
+      await errorLogger.log(
+        ErrorLayer.background,
+        e,
+        st,
+        context: const {
+          'op': 'brokenMapBeliefByVehicle.persist',
+        },
+      );
+    }
+  }
+
+  String _keyFor(String vehicleId) =>
+      '$brokenMapBeliefSettingsKeyPrefix$vehicleId';
 }
 
 /// Holds the most recent [VeLearnResult] (#815) so the UI can show a
@@ -469,9 +564,52 @@ class FillUpList extends _$FillUpList {
         now: DateTime.now(),
       );
       beliefs.set(vehicleId, updated);
+      // #1423 phase 4 — when the belief crosses the actionable
+      // threshold, also persist into the per-adapter blocklist so a
+      // future pair attempt with the SAME adapter (possibly on a
+      // different vehicle) recalls without re-probing. The adapter
+      // identifier comes from the most recent trip for this vehicle
+      // — null when no trip has captured firmware yet, in which case
+      // we skip the adapter-keyed write but still kept the per-
+      // vehicle persistence above.
+      if (updated.confidence > brokenMapBlocklistThreshold) {
+        final adapterId = _latestAdapterFirmwareFor(vehicleId);
+        if (adapterId != null && adapterId.isNotEmpty) {
+          await ref
+              .read(obdAdapterBlocklistProvider)
+              .recordBelief(adapterId, updated.confidence);
+        }
+      }
     } catch (e, st) {
       debugPrint('FillUpList: broken-MAP observation failed: $e\n$st');
     }
+  }
+
+  /// Look up the most-recently captured `adapterFirmware` across the
+  /// trip history for [vehicleId] (#1423 phase 4). Returns null when
+  /// the vehicle has no trips, or every trip pre-dates the
+  /// `adapterFirmware` capture path landing — both cases result in
+  /// the blocklist staying out of the loop, which is harmless (the
+  /// per-vehicle belief still persisted in
+  /// [_recordBrokenMapObservation] above).
+  String? _latestAdapterFirmwareFor(String vehicleId) {
+    final repo = ref.read(tripHistoryRepositoryProvider);
+    if (repo == null) return null;
+    final history = repo.loadAll();
+    DateTime? bestWhen;
+    String? best;
+    for (final entry in history) {
+      if (entry.vehicleId != vehicleId) continue;
+      final firmware = entry.adapterFirmware;
+      if (firmware == null || firmware.isEmpty) continue;
+      final when = entry.summary.endedAt ?? entry.summary.startedAt;
+      if (when == null) continue;
+      if (bestWhen == null || when.isAfter(bestWhen)) {
+        bestWhen = when;
+        best = firmware;
+      }
+    }
+    return best;
   }
 
   Future<void> _evaluateReminders(FillUp fillUp) async {
