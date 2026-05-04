@@ -8,6 +8,8 @@ import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
+import 'package:tankstellen/features/consumption/data/obd2/broken_map_belief.dart';
+import 'package:tankstellen/features/consumption/data/obd2/broken_map_detector.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
@@ -240,6 +242,67 @@ void main() {
       expect(outcome.profile!.make, 'Renault');
       expect(outcome.profile!.detectedMake, 'PEUGEOT');
       expect(outcome.conflictSummary, isNotNull);
+    });
+  });
+
+  group('broken-MAP detector wiring (#1423 phase 2)', () {
+    test(
+        'when a detector is provided, the outcome carries the resulting '
+        'belief and a broken-MAP fixture pushes confidence above zero',
+        () async {
+      const vin = 'VF36B8HZL8R123456';
+      // Petrol PID 0x51 wins, so the detector picks the petrol branch
+      // (vacuum check). Idle MAP at 99 kPa with baro 101 kPa → score
+      // clamps to 1.0 → confidence after one EMA fold = α (0.4).
+      // Throttle 0x03 → ~1.18 % — clearly closed.
+      final service = buildConnectedService({
+        '0902': buildValidVinResponse(vin),
+        '0151': '41 51 01>', // gasoline → petrol branch
+        '0111': '41 11 03>', // tps ≈ 1.18 %
+        '010B': '41 0B 63>', // mapIdle = 0x63 = 99 kPa
+        '0133': '41 33 65>', // baro = 0x65 = 101 kPa
+      });
+      final connection = _FakeConnection(connectByMacResult: service);
+      final populator = VinAdapterPairAutoPopulator(
+        connection: connection,
+        decoder: buildDecoder(online: false),
+        brokenMapDetector: const BrokenMapDetector(),
+      );
+
+      final outcome = await populator.run(
+        pairedAdapterMac: 'AA:BB',
+        profile: baseProfile(),
+      );
+
+      expect(outcome.brokenMapBelief, isNotNull);
+      expect(outcome.brokenMapBelief!.observationCount, 1);
+      expect(outcome.brokenMapBelief!.confidence, closeTo(0.4, 1e-9));
+      expect(
+        outcome.brokenMapBelief!.lastTrigger,
+        BrokenMapReason.idleVacuumMissing,
+      );
+    });
+
+    test(
+        'when no detector is provided the outcome.brokenMapBelief is null '
+        '(legacy call sites stay green)', () async {
+      const vin = 'VF36B8HZL8R123456';
+      final service = buildConnectedService({
+        '0902': buildValidVinResponse(vin),
+      });
+      final connection = _FakeConnection(connectByMacResult: service);
+      final populator = VinAdapterPairAutoPopulator(
+        connection: connection,
+        decoder: buildDecoder(online: false),
+        // brokenMapDetector intentionally omitted.
+      );
+
+      final outcome = await populator.run(
+        pairedAdapterMac: 'AA:BB',
+        profile: baseProfile(),
+      );
+
+      expect(outcome.brokenMapBelief, isNull);
     });
   });
 }
