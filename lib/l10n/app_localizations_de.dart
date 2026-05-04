@@ -3132,6 +3132,27 @@ class AppLocalizationsDe extends AppLocalizations {
       'Anmeldung fehlgeschlagen. Bitte erneut versuchen.';
 
   @override
+  String get autoRecordConsentBadgeLabel =>
+      'Hintergrund-Standort — nur für automatisches Aufzeichnen';
+
+  @override
+  String get autoRecordConsentExplanationTitle => 'Zu dieser Berechtigung';
+
+  @override
+  String get autoRecordConsentExplanationBody =>
+      'Die automatische Aufzeichnung braucht den Hintergrund-Standort, um zu erkennen, wann du losfährst, während die App geschlossen ist. Diese Berechtigung wird ausschließlich vom automatischen Aufzeichnen verwendet — die Stationssuche und die Kartenzentrierung nutzen eine separate Vordergrund-Berechtigung.';
+
+  @override
+  String get autoRecordConsentExplanationCloseButton => 'Verstanden';
+
+  @override
+  String get autoRecordConsentExplanationTooltip => 'Was bedeutet das?';
+
+  @override
+  String get autoRecordConsentRevokeAction =>
+      'Tippen, um in den Systemeinstellungen zu verwalten';
+
+  @override
   String get autoRecordSectionTitle => 'Automatische Aufzeichnung';
 
   @override

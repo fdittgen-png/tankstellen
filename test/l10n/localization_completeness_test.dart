@@ -203,6 +203,23 @@ void main() {
               'key — the verified-by-adapter badge and variance prompt '
               'on the fill-up flow must not fall back to English for '
               'French users (#1401 phase 7b)');
+
+      // #1439 — the auto-record consent scope-clarification badge,
+      // help-icon explanation dialog and revoke hint live on the Edit
+      // vehicle screen. Every `autoRecordConsent*` key must have a
+      // French translation so the badge label, dialog title/body and
+      // tap-to-revoke hint don't fall back to English for French users
+      // (the original ambiguous label "Localisation en arrière-plan
+      // autorisée" was reported by a French-locale user).
+      final frenchMissingAutoRecordConsent = frenchMissing
+          .where((k) => k.startsWith('autoRecordConsent'))
+          .toList()
+        ..sort();
+      expect(frenchMissingAutoRecordConsent, isEmpty,
+          reason: 'French (fr) must have every autoRecordConsent* key — '
+              'the scope-clarification badge, help dialog and revoke '
+              'hint on the Edit vehicle screen must not fall back to '
+              'English for French users (#1439)');
     });
 
     test('no locale has extra keys not in app_en.arb', () {

@@ -186,6 +186,11 @@ class AutoRecordSection extends ConsumerWidget {
                 profile: profile,
                 l: l,
               ),
+              onShowExplanation: () => _showConsentExplanationDialog(
+                context: context,
+                l: l,
+              ),
+              onRevoke: () => (openSettings ?? _defaultOpenSettings)(),
             ),
           ],
         ],
@@ -313,6 +318,45 @@ class AutoRecordSection extends ConsumerWidget {
         ),
       );
     }
+  }
+
+  /// Scope-clarification dialog opened by the help icon next to the
+  /// consent badge (#1439). Explains that the background-location
+  /// grant is consumed exclusively by auto-record and is *not* used
+  /// by station search or map centering — the latter run on a separate
+  /// foreground location grant. Resolves the consent-scope ambiguity
+  /// reported in user feedback (issue #1439).
+  Future<void> _showConsentExplanationDialog({
+    required BuildContext context,
+    required AppLocalizations? l,
+  }) {
+    return showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          key: const Key('autoRecordConsentExplanationDialog'),
+          title: Text(
+            l?.autoRecordConsentExplanationTitle ?? 'About this permission',
+          ),
+          content: Text(
+            l?.autoRecordConsentExplanationBody ??
+                'Auto-record needs background location to detect when you '
+                    'start driving while the app is closed. This grant is '
+                    'used only by auto-record — station search and map '
+                    'centering use a separate foreground location grant.',
+          ),
+          actions: [
+            TextButton(
+              key: const Key('autoRecordConsentExplanationClose'),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(
+                l?.autoRecordConsentExplanationCloseButton ?? 'Got it',
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _showRationaleDialog({
@@ -654,6 +698,8 @@ class _BackgroundLocationRow extends StatelessWidget {
   final String requestLabel;
   final ThemeData theme;
   final Future<void> Function() onRequest;
+  final Future<void> Function() onShowExplanation;
+  final Future<void> Function() onRevoke;
 
   const _BackgroundLocationRow({
     required this.consent,
@@ -661,21 +707,86 @@ class _BackgroundLocationRow extends StatelessWidget {
     required this.requestLabel,
     required this.theme,
     required this.onRequest,
+    required this.onShowExplanation,
+    required this.onRevoke,
   });
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+
+    if (consent) {
+      // #1439 — when the grant is in place, surface a scope-explicit
+      // badge: short label says "for auto-record only", help icon
+      // opens the explanation dialog, tapping the row body opens the
+      // system app-settings page so the user can revoke. Hides the
+      // pre-#1439 ambiguous "Background location allowed" check.
+      final badgeLabel = l?.autoRecordConsentBadgeLabel ??
+          'Background location — for auto-record only';
+      final revokeHint = l?.autoRecordConsentRevokeAction ??
+          'Tap to manage in system settings';
+      final helpTooltip = l?.autoRecordConsentExplanationTooltip ??
+          'What does this mean?';
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            key: const Key('autoRecordConsentBadge'),
+            onTap: onRevoke,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.check_circle,
+                    size: 20,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          badgeLabel,
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          revokeHint,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    key: const Key('autoRecordConsentExplanationButton'),
+                    icon: const Icon(Icons.help_outline, size: 20),
+                    tooltip: helpTooltip,
+                    visualDensity: VisualDensity.compact,
+                    onPressed: onShowExplanation,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             Icon(
-              consent ? Icons.check_circle : Icons.cancel_outlined,
+              Icons.cancel_outlined,
               size: 20,
-              color: consent
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurfaceVariant,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -683,18 +794,16 @@ class _BackgroundLocationRow extends StatelessWidget {
             ),
           ],
         ),
-        if (!consent) ...[
-          const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: OutlinedButton.icon(
-              key: const Key('autoRecordBackgroundLocationRequest'),
-              onPressed: onRequest,
-              icon: const Icon(Icons.location_on_outlined),
-              label: Text(requestLabel),
-            ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: OutlinedButton.icon(
+            key: const Key('autoRecordBackgroundLocationRequest'),
+            onPressed: onRequest,
+            icon: const Icon(Icons.location_on_outlined),
+            label: Text(requestLabel),
           ),
-        ],
+        ),
       ],
     );
   }

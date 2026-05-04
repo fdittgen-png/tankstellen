@@ -3132,6 +3132,29 @@ class AppLocalizationsFr extends AppLocalizations {
   String get authErrorGeneric => 'Échec de la connexion. Veuillez réessayer.';
 
   @override
+  String get autoRecordConsentBadgeLabel =>
+      'Localisation en arrière-plan — uniquement pour l\'enregistrement automatique';
+
+  @override
+  String get autoRecordConsentExplanationTitle =>
+      'À propos de cette autorisation';
+
+  @override
+  String get autoRecordConsentExplanationBody =>
+      'L\'enregistrement automatique a besoin de la localisation en arrière-plan pour détecter quand vous montez en voiture, même lorsque l\'application est fermée. Cette autorisation ne sert qu\'à ça — la recherche de stations et le centrage de la carte utilisent une autorisation de localisation séparée (au premier plan).';
+
+  @override
+  String get autoRecordConsentExplanationCloseButton => 'J\'ai compris';
+
+  @override
+  String get autoRecordConsentExplanationTooltip =>
+      'Qu\'est-ce que cela signifie ?';
+
+  @override
+  String get autoRecordConsentRevokeAction =>
+      'Appuyez pour gérer dans les paramètres système';
+
+  @override
   String get autoRecordSectionTitle => 'Enregistrement automatique';
 
   @override
