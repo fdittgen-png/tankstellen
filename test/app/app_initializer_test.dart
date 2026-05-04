@@ -136,6 +136,55 @@ void main() {
     });
   });
 
+  group('Legacy-toggle migration kick-off (#1373 phase 3a/3b/3e/3f follow-up)',
+      () {
+    test(
+        'AppInitializer.run schedules legacyToggleMigrationProvider on a '
+        'post-first-frame microtask via container.read(...future)', () {
+      // Source-level pin: the wiring must live inside a `_deferPostFirstFrame`
+      // block (so it never delays the first paint) AND it must read the
+      // provider's `.future` (not just `read(provider)` which would only
+      // observe the synchronous AsyncValue placeholder and never let the
+      // migrator microtask be scheduled at the framework level).
+      final runBody = _extractMethodBody(initSource, 'static Future<void> run');
+      expect(runBody, isNotNull);
+      expect(
+        runBody,
+        contains('legacyToggleMigrationProvider'),
+        reason: 'AppInitializer.run must reference the provider so the '
+            'legacy-toggle migrators fire at every cold start, not only when '
+            'the user opens the feature-flags settings screen',
+      );
+      expect(
+        runBody,
+        contains('legacyToggleMigrationProvider.future'),
+        reason: 'The kick-off must read `.future` so the underlying microtask '
+            'actually runs the migrators (a plain `read(provider)` returns '
+            'the synchronous AsyncValue placeholder without firing build())',
+      );
+
+      // The reference must sit inside a `_deferPostFirstFrame` block so it
+      // can never delay the first paint. We assert the textual order: the
+      // FIRST `_deferPostFirstFrame` opening brace must precede the
+      // legacyToggleMigrationProvider mention, AND the import must be
+      // present (otherwise the file wouldn't compile).
+      final deferIdx = runBody!.indexOf('_deferPostFirstFrame');
+      final providerIdx = runBody.indexOf('legacyToggleMigrationProvider');
+      expect(deferIdx, isNonNegative);
+      expect(providerIdx, isNonNegative);
+      expect(deferIdx, lessThan(providerIdx),
+          reason: 'legacy-toggle migration must be scheduled INSIDE a '
+              '_deferPostFirstFrame block so it never blocks the first paint');
+
+      expect(
+        initSource,
+        contains(
+            "import '../features/feature_management/application/legacy_toggle_migration_provider.dart';"),
+        reason: 'the provider must be imported so the wiring compiles',
+      );
+    });
+  });
+
   group('Sentry observability wiring (#476)', () {
     test(
         'resolveSentryDsn prefers the user-stored sentry_dsn setting over '

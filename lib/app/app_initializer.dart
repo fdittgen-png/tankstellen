@@ -33,6 +33,7 @@ import '../features/consumption/data/obd2/paused_trip_repository.dart';
 import '../features/consumption/data/trip_history_repository.dart';
 import '../features/consumption/providers/auto_record_orchestrator.dart';
 import '../features/consumption/providers/trip_recording_provider.dart';
+import '../features/feature_management/application/legacy_toggle_migration_provider.dart';
 import '../features/profile/data/repositories/profile_repository.dart';
 import '../features/vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../features/vehicle/data/repositories/vehicle_profile_repository.dart';
@@ -61,9 +62,13 @@ import 'router.dart';
 ///    the main-isolate box opens already being done) (#795 phase 1).
 /// 3. **services** — notifications, background tasks, home widget.
 ///    Independent of each other → parallelised with `Future.wait`.
-/// 4. **optional (deferred)** — community config + TankSync. Scheduled for
-///    a post-first-frame microtask so the app paints before Supabase is
-///    touched (#795 phase 1). Failures are logged but never block startup.
+/// 4. **optional (deferred)** — community config + TankSync, plus
+///    one-shot migrations (vehicle reference-catalog backfill #950, and
+///    the feature-flag legacy-toggle promoter #1373 phase 3a/3b/3e/3f).
+///    All scheduled for a post-first-frame microtask so the app paints
+///    before Supabase is touched (#795 phase 1) and before any Hive
+///    walks for the migrators run. Failures are logged but never block
+///    startup.
 /// 5. **runApp** — wires global error handlers and hands control to the
 ///    Flutter framework. Wrapped in `SentryFlutter.init` when a DSN is
 ///    configured so framework + platform errors land in Sentry.
@@ -136,6 +141,29 @@ class AppInitializer {
             'VehicleProfileCatalogMigrator: matched $matched profile(s)');
       } catch (e, st) {
         debugPrint('VehicleProfileCatalogMigrator: deferred run failed: $e\n$st');
+      }
+    });
+
+    // #1373 phase 3a/3b/3e/3f — kick off the legacy-toggle migrations
+    // at every cold start. Reading the provider's future triggers its
+    // `build`, which runs `migrateLegacyToggles` + `migrateUserProfileToggles`
+    // inside a microtask. The provider is `keepAlive: true` and idempotent
+    // (each migrator is gated on its own `*Migrated` flag), so re-firing
+    // on subsequent launches is a cheap no-op once the flags are set.
+    //
+    // Non-awaited: failures are non-fatal (the provider itself swallows +
+    // `debugPrint`s), and we don't want a slow Hive read to delay any
+    // other deferred work scheduled on the post-first-frame microtask.
+    // Previously this only fired when the user navigated to the
+    // feature-flags settings screen — see the docstring on
+    // `legacyToggleMigrationProvider` for why startup wiring was deferred
+    // during the original phase-3 dispatches.
+    _deferPostFirstFrame(() async {
+      try {
+        unawaited(container.read(legacyToggleMigrationProvider.future));
+      } catch (e, st) {
+        debugPrint(
+            'AppInitializer: legacyToggleMigration kick-off failed: $e\n$st');
       }
     });
 
