@@ -3650,44 +3650,14 @@ class AppLocalizationsCs extends AppLocalizations {
       'Enable OBD2 trip recording first';
 
   @override
-  String featureBlockedDisable_autoRecord(String dependents) {
-    return 'Disable dependent features first: $dependents';
-  }
-
-  @override
   String get featureBlockedEnable_showFuel => 'Prerequisites not met';
-
-  @override
-  String featureBlockedDisable_showFuel(String dependents) {
-    return 'Disable dependent features first: $dependents';
-  }
 
   @override
   String get featureBlockedEnable_showElectric => 'Prerequisites not met';
 
   @override
-  String featureBlockedDisable_showElectric(String dependents) {
-    return 'Disable dependent features first: $dependents';
-  }
-
-  @override
   String get featureBlockedEnable_showConsumptionTab =>
       'Enable OBD2 trip recording first';
-
-  @override
-  String featureBlockedDisable_showConsumptionTab(String dependents) {
-    return 'Disable dependent features first: $dependents';
-  }
-
-  @override
-  String featureBlockedDisable_obd2TripRecording(String dependents) {
-    return 'Disable dependent features first: $dependents';
-  }
-
-  @override
-  String featureBlockedDisable_tankSync(String dependents) {
-    return 'Disable dependent features first: $dependents';
-  }
 
   @override
   String get feedbackConsentTitle => 'Send report to GitHub?';

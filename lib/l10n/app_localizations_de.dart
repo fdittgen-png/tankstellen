@@ -3682,45 +3682,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
 
   @override
-  String featureBlockedDisable_autoRecord(String dependents) {
-    return 'Schalte zuerst die abhängigen Funktionen aus: $dependents';
-  }
-
-  @override
   String get featureBlockedEnable_showFuel => 'Voraussetzungen nicht erfüllt';
-
-  @override
-  String featureBlockedDisable_showFuel(String dependents) {
-    return 'Schalte zuerst die abhängigen Funktionen aus: $dependents';
-  }
 
   @override
   String get featureBlockedEnable_showElectric =>
       'Voraussetzungen nicht erfüllt';
 
   @override
-  String featureBlockedDisable_showElectric(String dependents) {
-    return 'Schalte zuerst die abhängigen Funktionen aus: $dependents';
-  }
-
-  @override
   String get featureBlockedEnable_showConsumptionTab =>
       'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
-
-  @override
-  String featureBlockedDisable_showConsumptionTab(String dependents) {
-    return 'Schalte zuerst die abhängigen Funktionen aus: $dependents';
-  }
-
-  @override
-  String featureBlockedDisable_obd2TripRecording(String dependents) {
-    return 'Schalte zuerst die abhängigen Funktionen aus: $dependents';
-  }
-
-  @override
-  String featureBlockedDisable_tankSync(String dependents) {
-    return 'Schalte zuerst die abhängigen Funktionen aus: $dependents';
-  }
 
   @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';

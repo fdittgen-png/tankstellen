@@ -6728,23 +6728,11 @@ abstract class AppLocalizations {
   /// **'Enable OBD2 trip recording first'**
   String get featureBlockedEnable_autoRecord;
 
-  /// Tooltip shown on the disabled master auto-record toggle when one or more dependent features are still enabled.
-  ///
-  /// In en, this message translates to:
-  /// **'Disable dependent features first: {dependents}'**
-  String featureBlockedDisable_autoRecord(String dependents);
-
   /// Tooltip shown on the disabled show-fuel-stations toggle. The feature has no prerequisites today so this string is a defensive fallback for the dependency-graph helpers.
   ///
   /// In en, this message translates to:
   /// **'Prerequisites not met'**
   String get featureBlockedEnable_showFuel;
-
-  /// Tooltip shown on the disabled show-fuel-stations toggle when one or more dependent features are still enabled. Defensive fallback — nothing in the manifest currently depends on showFuel.
-  ///
-  /// In en, this message translates to:
-  /// **'Disable dependent features first: {dependents}'**
-  String featureBlockedDisable_showFuel(String dependents);
 
   /// Tooltip shown on the disabled show-EV-charging-stations toggle. The feature has no prerequisites today so this string is a defensive fallback for the dependency-graph helpers.
   ///
@@ -6752,35 +6740,11 @@ abstract class AppLocalizations {
   /// **'Prerequisites not met'**
   String get featureBlockedEnable_showElectric;
 
-  /// Tooltip shown on the disabled show-EV-charging-stations toggle when one or more dependent features are still enabled. Defensive fallback — nothing in the manifest currently depends on showElectric.
-  ///
-  /// In en, this message translates to:
-  /// **'Disable dependent features first: {dependents}'**
-  String featureBlockedDisable_showElectric(String dependents);
-
   /// Tooltip shown on the disabled consumption-tab toggle when its prerequisite (OBD2 trip recording) is off.
   ///
   /// In en, this message translates to:
   /// **'Enable OBD2 trip recording first'**
   String get featureBlockedEnable_showConsumptionTab;
-
-  /// Tooltip shown on the disabled consumption-tab toggle when one or more dependent features are still enabled. Defensive fallback — nothing currently depends on showConsumptionTab.
-  ///
-  /// In en, this message translates to:
-  /// **'Disable dependent features first: {dependents}'**
-  String featureBlockedDisable_showConsumptionTab(String dependents);
-
-  /// Tooltip shown on the disabled OBD2 trip recording toggle when one or more dependent features are still enabled. The placeholder is filled with a comma-separated list of localised feature names.
-  ///
-  /// In en, this message translates to:
-  /// **'Disable dependent features first: {dependents}'**
-  String featureBlockedDisable_obd2TripRecording(String dependents);
-
-  /// Tooltip shown on the disabled TankSync toggle when one or more dependent features are still enabled.
-  ///
-  /// In en, this message translates to:
-  /// **'Disable dependent features first: {dependents}'**
-  String featureBlockedDisable_tankSync(String dependents);
 
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
