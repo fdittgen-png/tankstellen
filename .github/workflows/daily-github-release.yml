@@ -1,0 +1,251 @@
+name: Daily GitHub Release
+
+# Builds master at ~23:00 Europe/Paris and publishes a pre-release on
+# https://github.com/${{ github.repository }}/releases with the AAB +
+# 3 split APKs attached and a changelog summarising commits since the
+# previous nightly release. Skips silently when no commits landed
+# since the last nightly so we don't ship empty releases.
+#
+# Cron is fixed UTC (21:00 → 23:00 Paris in summer / 22:00 in winter).
+# The ±1h DST drift mirrors `daily-beta.yml`'s convention; flip to
+# `0 22 * * *` if you want 23:00 Paris during winter instead.
+on:
+  schedule:
+    - cron: '0 21 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: daily-github-release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Find previous nightly tag
+        id: prev
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          PREV=$(gh release list --limit 50 --json tagName \
+            --jq '[.[] | select(.tagName | startswith("nightly-"))][0].tagName // ""')
+          if [ -z "$PREV" ]; then
+            echo "No prior nightly release; using master root commit as base."
+            BASE=$(git rev-list --max-parents=0 HEAD | head -1)
+          else
+            echo "Previous nightly release: $PREV"
+            BASE=$(git rev-parse "$PREV")
+          fi
+          {
+            echo "previous_tag=$PREV"
+            echo "base_sha=$BASE"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Check for new commits since last release
+        id: check
+        run: |
+          set -euo pipefail
+          BASE='${{ steps.prev.outputs.base_sha }}'
+          COUNT=$(git rev-list "${BASE}..HEAD" --count)
+          echo "commit_count=$COUNT" >> "$GITHUB_OUTPUT"
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::notice::No new commits since the last nightly release; will skip build + publish."
+          else
+            echo "Will release $COUNT new commit(s) since the previous nightly."
+          fi
+
+      - name: Compute date-based build number and tag
+        if: steps.check.outputs.commit_count != '0'
+        id: bn
+        run: |
+          set -euo pipefail
+          BN=$(TZ=Europe/Paris date +%Y%m%d)
+          DATE=$(TZ=Europe/Paris date +%Y-%m-%d)
+          # If there's already a nightly-YYYYMMDD release (e.g. a
+          # workflow_dispatch re-run), suffix with -HHMM to keep tags
+          # unique.
+          TAG="nightly-$BN"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            SUFFIX=$(TZ=Europe/Paris date +%H%M)
+            TAG="nightly-${BN}-${SUFFIX}"
+          fi
+          {
+            echo "build_number=$BN"
+            echo "tag=$TAG"
+            echo "release_name=Nightly $DATE"
+          } >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - uses: actions/setup-java@v5
+        if: steps.check.outputs.commit_count != '0'
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        if: steps.check.outputs.commit_count != '0'
+        with:
+          channel: stable
+          cache: true
+
+      - name: Decode signing keystore
+        if: steps.check.outputs.commit_count != '0'
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ] || [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_ALIAS" ]; then
+            echo "::error::Missing keystore secrets. Configure ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS." >&2
+            exit 1
+          fi
+          KEYSTORE_PATH="$RUNNER_TEMP/upload-keystore.jks"
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
+          {
+            echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH"
+            echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD"
+            echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS"
+          } >> "$GITHUB_ENV"
+
+      - name: Flutter pub get
+        if: steps.check.outputs.commit_count != '0'
+        run: flutter pub get
+
+      - name: Build AAB (play flavor)
+        if: steps.check.outputs.commit_count != '0'
+        run: |
+          flutter build appbundle --release --flavor play \
+            --build-number=${{ steps.bn.outputs.build_number }}
+
+      - name: Build per-ABI APKs (play flavor)
+        if: steps.check.outputs.commit_count != '0'
+        run: |
+          flutter build apk --release --flavor play --split-per-abi \
+            --build-number=${{ steps.bn.outputs.build_number }}
+
+      - name: Clean up decoded keystore
+        if: always() && env.ANDROID_KEYSTORE_PATH != ''
+        run: rm -f "$ANDROID_KEYSTORE_PATH"
+
+      - name: Compose release notes
+        if: steps.check.outputs.commit_count != '0'
+        id: notes
+        run: |
+          set -euo pipefail
+          BASE='${{ steps.prev.outputs.base_sha }}'
+          PREV='${{ steps.prev.outputs.previous_tag }}'
+          NOTES_FILE="$RUNNER_TEMP/release_notes.md"
+
+          {
+            if [ -z "$PREV" ]; then
+              echo "## First nightly release"
+              echo
+              echo "All commits in master are included."
+            else
+              echo "## What's new since [$PREV](https://github.com/${{ github.repository }}/releases/tag/$PREV)"
+            fi
+          } > "$NOTES_FILE"
+
+          # Group conventional-commit prefixes into a Markdown changelog.
+          # Each line we emit from `git log` is "subject|short-sha". The
+          # while-read consumer parses subjects of the form
+          # "<type>(<scope>): <subject>" and strips the prefix for a
+          # clean bullet, then we group bullets by type below.
+          tmp=$(mktemp)
+          git log "${BASE}..HEAD" --no-merges --pretty=format:'%s|%h' > "$tmp"
+
+          for type in feat fix perf refactor docs test chore; do
+            case "$type" in
+              feat)     header="### ✨ Added" ;;
+              fix)      header="### 🐛 Fixed" ;;
+              perf)     header="### ⚡ Performance" ;;
+              refactor) header="### 🛠 Refactored" ;;
+              docs)     header="### 📝 Docs" ;;
+              test)     header="### ✅ Tests" ;;
+              chore)    header="### 🧹 Chores" ;;
+            esac
+
+            matches=$(grep -E "^${type}(\(|:)" "$tmp" || true)
+            if [ -n "$matches" ]; then
+              {
+                echo
+                echo "$header"
+                echo
+              } >> "$NOTES_FILE"
+              echo "$matches" | while IFS='|' read -r subject sha; do
+                clean=$(echo "$subject" | sed -E "s/^${type}(\([^)]*\))?:[[:space:]]*//")
+                echo "- $clean (\`$sha\`)" >> "$NOTES_FILE"
+              done
+            fi
+          done
+
+          # Anything that isn't conventional-style still appears, so a
+          # one-off subject doesn't silently disappear from the changelog.
+          other=$(grep -vE '^(feat|fix|perf|refactor|docs|test|chore)(\(|:)' "$tmp" || true)
+          if [ -n "$other" ]; then
+            {
+              echo
+              echo "### Other"
+              echo
+            } >> "$NOTES_FILE"
+            echo "$other" | while IFS='|' read -r subject sha; do
+              echo "- $subject (\`$sha\`)" >> "$NOTES_FILE"
+            done
+          fi
+
+          {
+            echo
+            echo "---"
+            echo "_Build number: ${{ steps.bn.outputs.build_number }} · Built from \`${{ github.sha }}\`_"
+          } >> "$NOTES_FILE"
+
+          echo "notes_file=$NOTES_FILE" >> "$GITHUB_OUTPUT"
+          echo "Generated release notes:"
+          cat "$NOTES_FILE"
+
+      - name: Create GitHub release
+        if: steps.check.outputs.commit_count != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create '${{ steps.bn.outputs.tag }}' \
+            --title '${{ steps.bn.outputs.release_name }}' \
+            --notes-file '${{ steps.notes.outputs.notes_file }}' \
+            --prerelease \
+            --target '${{ github.sha }}' \
+            build/app/outputs/bundle/playRelease/app-play-release.aab \
+            build/app/outputs/flutter-apk/app-arm64-v8a-play-release.apk \
+            build/app/outputs/flutter-apk/app-armeabi-v7a-play-release.apk \
+            build/app/outputs/flutter-apk/app-x86_64-play-release.apk
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Daily GitHub Release"
+            echo
+            if [ "${{ steps.check.outputs.commit_count }}" = "0" ]; then
+              if [ -n "${{ steps.prev.outputs.previous_tag }}" ]; then
+                echo "**Skipped:** no new commits since [\`${{ steps.prev.outputs.previous_tag }}\`](https://github.com/${{ github.repository }}/releases/tag/${{ steps.prev.outputs.previous_tag }})."
+              else
+                echo "**Skipped:** no commits in master."
+              fi
+            else
+              echo "- **Tag:** [\`${{ steps.bn.outputs.tag }}\`](https://github.com/${{ github.repository }}/releases/tag/${{ steps.bn.outputs.tag }})"
+              echo "- **Build number:** ${{ steps.bn.outputs.build_number }}"
+              echo "- **Commits since last release:** ${{ steps.check.outputs.commit_count }}"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
