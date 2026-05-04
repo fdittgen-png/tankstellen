@@ -29,5 +29,17 @@
     }
   },
   "calibrationLearnerStatusNoSamples": "η_v : 0.85 (par défaut — aucun plein complet)",
-  "calibrationResetLearner": "Réinitialiser l'apprentissage"
+  "calibrationResetLearner": "Réinitialiser l'apprentissage",
+  "calibrationBasisAtkinson": "cycle Atkinson",
+  "calibrationBasisVnt": "diesel à turbo VGT + injection directe",
+  "calibrationBasisTurboDi": "turbo + injection directe",
+  "calibrationBasisTurbo": "turbo",
+  "calibrationBasisNaDi": "atmosphérique + injection directe",
+  "calibrationSourceCatalogWithBasis": "(catalogue : {makeModel} — valeur par défaut pour {basis})",
+  "@calibrationSourceCatalogWithBasis": {
+    "placeholders": {
+      "makeModel": {"type": "String"},
+      "basis": {"type": "String"}
+    }
+  }
 }

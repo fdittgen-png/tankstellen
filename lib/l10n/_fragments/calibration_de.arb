@@ -29,5 +29,17 @@
     }
   },
   "calibrationLearnerStatusNoSamples": "η_v: 0.85 (Standard – noch keine Volltankung)",
-  "calibrationResetLearner": "Lernalgorithmus zurücksetzen"
+  "calibrationResetLearner": "Lernalgorithmus zurücksetzen",
+  "calibrationBasisAtkinson": "Atkinson-Zyklus",
+  "calibrationBasisVnt": "VTG-Diesel + Direkteinspritzung",
+  "calibrationBasisTurboDi": "Turbo + Direkteinspritzung",
+  "calibrationBasisTurbo": "Turbo",
+  "calibrationBasisNaDi": "Saugmotor + Direkteinspritzung",
+  "calibrationSourceCatalogWithBasis": "(Katalog: {makeModel} — Standard für {basis})",
+  "@calibrationSourceCatalogWithBasis": {
+    "placeholders": {
+      "makeModel": {"type": "String"},
+      "basis": {"type": "String"}
+    }
+  }
 }

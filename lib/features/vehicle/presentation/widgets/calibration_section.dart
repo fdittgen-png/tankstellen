@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../domain/entities/reference_vehicle.dart';
 import '../../domain/entities/vehicle_profile.dart';
 
 /// One of the four manual-override calibration fields surfaced by
@@ -77,6 +78,19 @@ class CalibrationSection extends StatefulWidget {
   /// `volumetricEfficiencySamples`.
   final VoidCallback onResetLearner;
 
+  /// Optional resolved [ReferenceVehicle] for [profile] (#1422 phase 2).
+  ///
+  /// When non-null AND the volumetricEfficiency field is currently
+  /// sourced from the catalog, the helper-text origin tag is enriched
+  /// with the engine-tech basis label, e.g.
+  /// `(catalog: Dacia Duster — VNT diesel + DI default)`.
+  ///
+  /// Parents that already resolve the reference vehicle (e.g. the
+  /// edit-vehicle screen via [VehicleProfileCatalogMatcher]) pass it
+  /// through; callers that don't can leave this null and the widget
+  /// falls back to the plain `(catalog: ...)` label for every field.
+  final ReferenceVehicle? referenceVehicle;
+
   const CalibrationSection({
     super.key,
     required this.profile,
@@ -85,6 +99,7 @@ class CalibrationSection extends StatefulWidget {
     required this.onAfrChanged,
     required this.onFuelDensityChanged,
     required this.onResetLearner,
+    this.referenceVehicle,
   });
 
   @override
@@ -218,6 +233,7 @@ class _CalibrationSectionState extends State<CalibrationSection> {
   String _sourceLabel(
     AppLocalizations? l,
     CalibrationValueSource source,
+    _CalibrationField field,
   ) {
     final p = widget.profile;
     switch (source) {
@@ -231,10 +247,45 @@ class _CalibrationSectionState extends State<CalibrationSection> {
           if (p.model != null && p.model!.isNotEmpty) p.model,
         ].whereType<String>().join(' ');
         final label = makeModel.isEmpty ? 'catalog' : makeModel;
+        // #1422 phase 2 — for the η_v field specifically, enrich the
+        // catalog tag with the engine-tech basis (Atkinson / VNT / Turbo
+        // ± DI / NA + DI) so the user sees WHY the helper picked the
+        // value it did. Other fields keep the plain `(catalog: ...)`
+        // label — only η_v varies by induction + injection class.
+        final ref = widget.referenceVehicle;
+        if (field == _CalibrationField.volumetricEfficiency && ref != null) {
+          final basisKey = volumetricEfficiencyBasisKey(ref);
+          final basisLabel = _basisLabel(l, basisKey);
+          if (basisLabel != null) {
+            return l?.calibrationSourceCatalogWithBasis(label, basisLabel) ??
+                '(catalog: $label — $basisLabel default)';
+          }
+        }
         return l?.calibrationSourceCatalog(label) ?? '(catalog: $label)';
       case CalibrationValueSource.defaultConstant:
         return l?.calibrationSourceDefault ?? '(default)';
     }
+  }
+
+  /// Resolves the engine-tech basis ARB key into its localized label,
+  /// or `null` when the helper returned `null` (NA + no-DI baseline —
+  /// no enrichment needed). Falls back to the English literal if
+  /// localizations are unavailable, matching the rest of this widget.
+  String? _basisLabel(AppLocalizations? l, String? basisKey) {
+    if (basisKey == null) return null;
+    switch (basisKey) {
+      case 'calibrationBasisAtkinson':
+        return l?.calibrationBasisAtkinson ?? 'Atkinson cycle';
+      case 'calibrationBasisVnt':
+        return l?.calibrationBasisVnt ?? 'VNT diesel + DI';
+      case 'calibrationBasisTurboDi':
+        return l?.calibrationBasisTurboDi ?? 'Turbocharged + DI';
+      case 'calibrationBasisTurbo':
+        return l?.calibrationBasisTurbo ?? 'Turbocharged';
+      case 'calibrationBasisNaDi':
+        return l?.calibrationBasisNaDi ?? 'Naturally aspirated + DI';
+    }
+    return null;
   }
 
   String _formatDouble(double value) {
@@ -395,7 +446,7 @@ class _CalibrationSectionState extends State<CalibrationSection> {
           const TextInputType.numberWithOptions(decimal: true, signed: false),
       decoration: InputDecoration(
         labelText: labelText,
-        helperText: _sourceLabel(l, source),
+        helperText: _sourceLabel(l, source, field),
         suffixIcon: IconButton(
           icon: const Icon(Icons.restart_alt),
           tooltip: l?.calibrationResetToDetected ?? 'Reset to detected value',

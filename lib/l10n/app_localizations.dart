@@ -6038,6 +6038,42 @@ abstract class AppLocalizations {
   /// **'Reset learner'**
   String get calibrationResetLearner;
 
+  /// Engine-tech basis label for η_v (#1422 phase 2). Shown inside the catalog origin tag when the reference vehicle is an Atkinson-cycle hybrid (Toyota Hybrid, Mazda Skyactiv-X).
+  ///
+  /// In en, this message translates to:
+  /// **'Atkinson cycle'**
+  String get calibrationBasisAtkinson;
+
+  /// Engine-tech basis label for η_v. VNT = variable-geometry turbocharger; DI = direct injection. Common on modern diesels (Renault/Dacia dCi, etc.).
+  ///
+  /// In en, this message translates to:
+  /// **'VNT diesel + DI'**
+  String get calibrationBasisVnt;
+
+  /// Engine-tech basis label for η_v. Petrol / diesel turbo with direct injection (VW TSI, Audi TFSI, BlueHDi, etc.).
+  ///
+  /// In en, this message translates to:
+  /// **'Turbocharged + DI'**
+  String get calibrationBasisTurboDi;
+
+  /// Engine-tech basis label for η_v. Turbocharged with port injection (older turbo petrol).
+  ///
+  /// In en, this message translates to:
+  /// **'Turbocharged'**
+  String get calibrationBasisTurbo;
+
+  /// Engine-tech basis label for η_v. Naturally aspirated petrol with direct injection (some Toyota / Mazda petrol).
+  ///
+  /// In en, this message translates to:
+  /// **'Naturally aspirated + DI'**
+  String get calibrationBasisNaDi;
+
+  /// Helper text shown beneath the η_v field when value comes from the catalog AND the engine-tech basis is known (#1422 phase 2). Replaces the plain `calibrationSourceCatalog` for this field only.
+  ///
+  /// In en, this message translates to:
+  /// **'(catalog: {makeModel} — {basis} default)'**
+  String calibrationSourceCatalogWithBasis(String makeModel, String basis);
+
   /// One-time snackbar (#1396) shown when a diesel-marked vehicle profile resolves to a non-diesel reference catalog row. The placeholder is the make + model, e.g. 'Dacia Duster'.
   ///
   /// In en, this message translates to:

@@ -53,6 +53,31 @@ double defaultVolumetricEfficiency(ReferenceVehicle v) {
   return v.directInjection ? 0.88 : 0.85;
 }
 
+/// Optional human-readable basis for the helper-derived η_v default
+/// (#1422 phase 2).
+///
+/// Returns one of 5 ARB keys to look up via `AppLocalizations`, or
+/// `null` for the NA + no-DI baseline (no enrichment needed — the
+/// helper output is the legacy 0.85 default and the plain
+/// `(catalog: <make model>)` label already conveys everything the user
+/// needs to know).
+///
+/// Mirrors the 5 distinct paths in [defaultVolumetricEfficiency]; the
+/// `CalibrationSection` consumer uses this to extend the
+/// `(catalog: Dacia Duster)` origin tag into
+/// `(catalog: Dacia Duster — VNT diesel + DI default)`.
+String? volumetricEfficiencyBasisKey(ReferenceVehicle v) {
+  if (v.atkinsonCycle) return 'calibrationBasisAtkinson';
+  if (v.inductionType == InductionType.vnt) return 'calibrationBasisVnt';
+  if (v.inductionType == InductionType.turbocharged ||
+      v.inductionType == InductionType.supercharged) {
+    return v.directInjection
+        ? 'calibrationBasisTurboDi'
+        : 'calibrationBasisTurbo';
+  }
+  return v.directInjection ? 'calibrationBasisNaDi' : null;
+}
+
 /// A single entry in the reference vehicle catalog (#950 phase 1).
 ///
 /// The catalog ships ~30 popular EU passenger cars compiled from

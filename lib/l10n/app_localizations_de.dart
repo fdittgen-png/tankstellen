@@ -3260,6 +3260,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String get calibrationResetLearner => 'Lernalgorithmus zurücksetzen';
 
   @override
+  String get calibrationBasisAtkinson => 'Atkinson-Zyklus';
+
+  @override
+  String get calibrationBasisVnt => 'VTG-Diesel + Direkteinspritzung';
+
+  @override
+  String get calibrationBasisTurboDi => 'Turbo + Direkteinspritzung';
+
+  @override
+  String get calibrationBasisTurbo => 'Turbo';
+
+  @override
+  String get calibrationBasisNaDi => 'Saugmotor + Direkteinspritzung';
+
+  @override
+  String calibrationSourceCatalogWithBasis(String makeModel, String basis) {
+    return '(Katalog: $makeModel — Standard für $basis)';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Dein $makeModel ist als Diesel markiert, passt aber zu einem Benziner-Eintrag im Katalog. Tippe zum Aktualisieren.';
   }
