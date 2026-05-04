@@ -10,6 +10,7 @@ import 'elm327_protocol.dart';
 import 'fuel_rate_estimator.dart' as estimator;
 import 'obd2_breadcrumb_collector.dart';
 import 'obd2_transport.dart';
+import 'oem_pid_table.dart';
 import 'supported_pids_cache.dart';
 
 // Re-export the pure-math estimator + stoichiometric constants so
@@ -34,7 +35,12 @@ export 'fuel_rate_estimator.dart'
 ///
 /// Wraps [Obd2Transport] and [Elm327Protocol] to provide a clean API
 /// for reading odometer, speed, and other vehicle parameters.
-class Obd2Service {
+///
+/// Also implements [Obd2RawCommandPort] (#1401 phase 3 / #1423 phase 2)
+/// — the narrow facade OEM tables and the broken-MAP detector accept.
+/// The [sendRaw] method delegates to [sendCommand]; production callers
+/// pass the live service unchanged, tests pass a 5-line fake.
+class Obd2Service implements Obd2RawCommandPort {
   final Obd2Transport _transport;
 
   /// Optional persistent supported-PID cache (#811). When present and
@@ -152,6 +158,13 @@ class Obd2Service {
   /// escape hatch on the service lets the transport stay private.
   Future<String> sendCommand(String command) =>
       _transport.sendCommand(command);
+
+  /// [Obd2RawCommandPort] facade — verbatim pass-through to
+  /// [sendCommand]. Lets OEM tables (#1401 phase 3) and the
+  /// broken-MAP detector (#1423 phase 2) accept the live service
+  /// without depending on the full surface area.
+  @override
+  Future<String> sendRaw(String command) => sendCommand(command);
 
   /// Connect and initialize the ELM327 adapter.
   ///
