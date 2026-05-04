@@ -10,7 +10,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "psaUds",
-    "notes": "PureTech 1.2 three-cylinder. Electric e-208 sibling shares body but uses electric fuelType."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "PureTech 1.2 three-cylinder turbo DI. Electric e-208 sibling shares body but uses electric fuelType."
   },
   {
     "make": "Peugeot",
@@ -23,7 +25,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "psaUds",
-    "notes": "EMP2 V3 platform, PureTech 130 most common variant."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "EMP2 V3 platform, PureTech 130 turbo DI most common variant."
   },
   {
     "make": "Peugeot",
@@ -36,7 +40,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.88,
     "odometerPidStrategy": "psaUds",
-    "notes": "BlueHDi 130; petrol 1.2 PureTech and PHEV variants exist."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "BlueHDi 130 turbo DI; petrol 1.2 PureTech and PHEV variants exist."
   },
   {
     "make": "Peugeot",
@@ -49,7 +55,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.88,
     "odometerPidStrategy": "psaUds",
-    "notes": "Seven-seater family SUV, shares EMP2 platform with 3008."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "BlueHDi 130 turbo DI; seven-seater family SUV, shares EMP2 platform with 3008."
   },
   {
     "make": "Renault",
@@ -62,7 +70,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "stdA6",
-    "notes": "TCe 100 three-cylinder turbo. E-Tech hybrid uses 1.6 atmospheric."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "TCe 100 three-cylinder turbo DI. E-Tech hybrid uses 1.6 atmospheric."
   },
   {
     "make": "Renault",
@@ -75,7 +85,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "stdA6",
-    "notes": "TCe 140 most common; dCi 115 diesel and E-Tech PHEV also sold."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "TCe 140 turbo DI most common; dCi 115 diesel and E-Tech PHEV also sold."
   },
   {
     "make": "Renault",
@@ -88,7 +100,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "stdA6",
-    "notes": "CMF-B platform, shared with Clio V."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "TCe 100 turbo DI; CMF-B platform, shared with Clio V."
   },
   {
     "make": "Renault",
@@ -101,7 +115,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "stdA6",
-    "notes": "TCe 140; replaced by Austral in 2022."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "TCe 140 turbo DI; replaced by Austral in 2022."
   },
   {
     "make": "Citroen",
@@ -114,7 +130,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "psaUds",
-    "notes": "PureTech 83. New gen IV launched 2024 keeps PSA UDS strategy."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "PureTech 83 turbo DI. New gen IV launched 2024 keeps PSA UDS strategy."
   },
   {
     "make": "Citroen",
@@ -127,7 +145,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "psaUds",
-    "notes": "PureTech 130 EAT8; e-C4 electric sibling on same body."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "PureTech 130 turbo DI EAT8; e-C4 electric sibling on same body."
   },
   {
     "make": "Citroen",
@@ -140,7 +160,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.88,
     "odometerPidStrategy": "psaUds",
-    "notes": "BlueHDi 130; PHEV 225 variant uses different VE — see notes for migration."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "BlueHDi 130 turbo DI; PHEV 225 variant uses different VE — see notes for migration."
   },
   {
     "make": "Dacia",
@@ -153,7 +175,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "stdA6",
-    "notes": "TCe 90; CMF-B platform shared with Renault Clio V."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "TCe 90 turbo DI; CMF-B platform shared with Renault Clio V."
   },
   {
     "make": "Dacia",
@@ -166,7 +190,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "stdA6",
-    "notes": "TCe 130; dCi 115 diesel and Bi-Fuel LPG variants also common."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "TCe 130 turbo DI; dCi 115 diesel and Bi-Fuel LPG variants also common."
   },
   {
     "make": "Volkswagen",
@@ -179,7 +205,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "vwUds",
-    "notes": "1.5 TSI eTSI mild-hybrid most common; GTI/GTD/GTE share PID strategy."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.5 TSI eTSI mild-hybrid turbo DI most common; GTI/GTD/GTE share PID strategy."
   },
   {
     "make": "Volkswagen",
@@ -192,7 +220,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "vwUds",
-    "notes": "1.0 TSI; MQB A0 platform shared with Skoda Fabia."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.0 TSI turbo DI; MQB A0 platform shared with Skoda Fabia."
   },
   {
     "make": "Volkswagen",
@@ -205,7 +235,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.88,
     "odometerPidStrategy": "vwUds",
-    "notes": "2.0 TDI most common; 1.5 TSI petrol and eHybrid variants exist."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "2.0 TDI turbo DI most common; 1.5 TSI petrol and eHybrid variants exist."
   },
   {
     "make": "Volkswagen",
@@ -218,7 +250,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.88,
     "odometerPidStrategy": "vwUds",
-    "notes": "2.0 TDI Evo; B9 generation (2024-) keeps vwUds strategy."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "2.0 TDI Evo turbo DI; B9 generation (2024-) keeps vwUds strategy."
   },
   {
     "make": "Ford",
@@ -231,7 +265,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "stdA6",
-    "notes": "1.0 EcoBoost three-cylinder. Discontinued July 2023."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.0 EcoBoost three-cylinder turbo DI. Discontinued July 2023."
   },
   {
     "make": "Ford",
@@ -244,7 +280,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "stdA6",
-    "notes": "1.0 EcoBoost mHEV; production ended 2025."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.0 EcoBoost mHEV turbo DI; production ended 2025."
   },
   {
     "make": "Ford",
@@ -257,7 +295,8 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "stdA6",
-    "notes": "2.5 Duratec FHEV/PHEV variants dominate EU sales."
+    "atkinsonCycle": true,
+    "notes": "2.5 Duratec FHEV/PHEV Atkinson cycle dominate EU sales."
   },
   {
     "make": "Opel",
@@ -270,7 +309,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "psaUds",
-    "notes": "Built on PSA CMP platform; shares engine + PID strategy with Peugeot 208."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "Built on PSA CMP platform; 1.2 PureTech turbo DI shares engine + PID strategy with Peugeot 208."
   },
   {
     "make": "Opel",
@@ -283,7 +324,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "psaUds",
-    "notes": "EMP2 V3 platform; shares PSA UDS strategy with Peugeot 308."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "EMP2 V3 platform; 1.2 PureTech turbo DI shares PSA UDS strategy with Peugeot 308."
   },
   {
     "make": "Toyota",
@@ -296,7 +339,8 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.88,
     "odometerPidStrategy": "stdA6",
-    "notes": "1.5 Hybrid Dynamic Force; over 80% of EU sales are hybrid trim."
+    "atkinsonCycle": true,
+    "notes": "1.5 Hybrid Dynamic Force Atkinson cycle; over 80% of EU sales are hybrid trim."
   },
   {
     "make": "Toyota",
@@ -309,7 +353,8 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.88,
     "odometerPidStrategy": "stdA6",
-    "notes": "1.8 Hybrid most common; 2.0 Hybrid sportier trim shares PID strategy."
+    "atkinsonCycle": true,
+    "notes": "1.8 Hybrid Atkinson most common; 2.0 Hybrid sportier trim shares PID strategy."
   },
   {
     "make": "Toyota",
@@ -322,7 +367,8 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.88,
     "odometerPidStrategy": "stdA6",
-    "notes": "2.5 Hybrid AWD-i; PHEV variant shares PID strategy."
+    "atkinsonCycle": true,
+    "notes": "2.5 Hybrid AWD-i Atkinson cycle; PHEV variant shares PID strategy."
   },
   {
     "make": "Skoda",
@@ -335,7 +381,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "vwUds",
-    "notes": "1.5 TSI eTSI; MQB Evo platform shared with VW Golf VIII."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.5 TSI eTSI turbo DI; MQB Evo platform shared with VW Golf VIII."
   },
   {
     "make": "Skoda",
@@ -348,7 +396,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "vwUds",
-    "notes": "1.0 TSI; MQB A0 platform shared with VW Polo."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.0 TSI turbo DI; MQB A0 platform shared with VW Polo."
   },
   {
     "make": "Fiat",
@@ -387,7 +437,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "stdA6",
-    "notes": "1.6 T-GDi Smartstream HEV/PHEV; petrol and diesel mHEV also offered."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.6 T-GDi Smartstream HEV/PHEV turbo DI; petrol and diesel mHEV also offered."
   },
   {
     "make": "Hyundai",
@@ -400,7 +452,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "stdA6",
-    "notes": "1.6 T-GDi HEV; Kona Electric sibling uses electric fuelType."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.6 T-GDi HEV turbo DI; Kona Electric sibling uses electric fuelType."
   },
   {
     "make": "BMW",
@@ -413,7 +467,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "bmwCan",
-    "notes": "118i 1.5 three-cylinder turbo; FAAR FWD platform."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "118i 1.5 three-cylinder turbo DI; FAAR FWD platform."
   },
   {
     "make": "BMW",
@@ -426,7 +482,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "bmwCan",
-    "notes": "320i B48 2.0 turbo; 330e PHEV and 320d diesel share PID strategy."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "320i B48 2.0 turbo DI; 330e PHEV and 320d diesel share PID strategy."
   },
   {
     "make": "BMW",
@@ -439,7 +497,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "bmwCan",
-    "notes": "sDrive20i B48; iX1 BEV sibling on same body."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "sDrive20i B48 turbo DI; iX1 BEV sibling on same body."
   },
   {
     "make": "Mini",
@@ -452,7 +512,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "bmwCan",
-    "notes": "1.5 three-cylinder B38; replaced by F66 in 2024."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.5 three-cylinder B38 turbo DI; replaced by F66 in 2024."
   },
   {
     "make": "Mercedes-Benz",
@@ -465,7 +527,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "stdA6",
-    "notes": "A180 M282 1.3 turbo (Renault-sourced); A250e PHEV variant exists."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "A180 M282 1.3 turbo DI (Renault-sourced); A250e PHEV variant exists."
   },
   {
     "make": "Mercedes-Benz",
@@ -478,7 +542,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "stdA6",
-    "notes": "C200 M254 1.5 turbo with ISG mild-hybrid; MRA2 platform."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "C200 M254 1.5 turbo DI with ISG mild-hybrid; MRA2 platform."
   },
   {
     "make": "Mercedes-Benz",
@@ -491,7 +557,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "stdA6",
-    "notes": "GLA 200 M282 1.3; shares MFA2 platform with W177 A-Class."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "GLA 200 M282 1.3 turbo DI; shares MFA2 platform with W177 A-Class."
   },
   {
     "make": "Audi",
@@ -504,7 +572,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "vwUds",
-    "notes": "35 TFSI 1.5 eTSI mild-hybrid; MQB Evo platform shared with Golf VIII."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "35 TFSI 1.5 eTSI turbo DI mild-hybrid; MQB Evo platform shared with Golf VIII."
   },
   {
     "make": "Audi",
@@ -517,7 +587,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.88,
     "odometerPidStrategy": "vwUds",
-    "notes": "40 TDI 2.0 EA288; 35/45 TFSI petrol variants share PID strategy."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "40 TDI 2.0 EA288 turbo DI; 35/45 TFSI petrol variants share PID strategy."
   },
   {
     "make": "Audi",
@@ -530,7 +602,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "vwUds",
-    "notes": "35 TFSI 1.5 EA211 evo; MQB A2 platform."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "35 TFSI 1.5 EA211 evo turbo DI; MQB A2 platform."
   },
   {
     "make": "SEAT",
@@ -543,7 +617,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "vwUds",
-    "notes": "1.0 TSI; MQB A0 platform shared with VW Polo and Skoda Fabia."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.0 TSI turbo DI; MQB A0 platform shared with VW Polo and Skoda Fabia."
   },
   {
     "make": "SEAT",
@@ -556,7 +632,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "vwUds",
-    "notes": "1.5 TSI eTSI; MQB Evo platform shared with VW Golf VIII and Skoda Octavia."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.5 TSI eTSI turbo DI; MQB Evo platform shared with VW Golf VIII and Skoda Octavia."
   },
   {
     "make": "Tesla",
@@ -595,7 +673,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "stdA6",
-    "notes": "1.5 e-Power series hybrid; 1.3 DIG-T mHEV petrol also offered. CMF-C platform."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.5 e-Power series hybrid turbo DI; 1.3 DIG-T mHEV petrol also offered. CMF-C platform."
   },
   {
     "make": "Nissan",
@@ -608,7 +688,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "stdA6",
-    "notes": "1.0 DIG-T HR10DDT; CMF-B platform shared with Renault Captur."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.0 DIG-T HR10DDT turbo DI; CMF-B platform shared with Renault Captur."
   },
   {
     "make": "Kia",
@@ -621,7 +703,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "stdA6",
-    "notes": "1.6 T-GDi Smartstream HEV/PHEV; shares N3 platform with Hyundai Tucson IV."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.6 T-GDi Smartstream HEV/PHEV turbo DI; shares N3 platform with Hyundai Tucson IV."
   },
   {
     "make": "Kia",
@@ -634,7 +718,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.85,
     "odometerPidStrategy": "stdA6",
-    "notes": "1.4 T-GDi Kappa; 1.0 T-GDi and 1.6 CRDi diesel variants share PID strategy."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.4 T-GDi Kappa turbo DI; 1.0 T-GDi and 1.6 CRDi diesel variants share PID strategy."
   },
   {
     "make": "Volvo",
@@ -647,7 +733,9 @@
     "transmission": "automatic",
     "volumetricEfficiency": 0.87,
     "odometerPidStrategy": "stdA6",
-    "notes": "B4 2.0 mild-hybrid; 1.5 T3 three-cylinder also offered. CMA platform."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "B4 2.0 turbo DI mild-hybrid; 1.5 T3 three-cylinder also offered. CMA platform."
   },
   {
     "make": "Dacia",
@@ -660,7 +748,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.95,
     "odometerPidStrategy": "stdA6",
-    "notes": "1.5 dCi K9K Blue diesel. Sibling of TCe 130 petrol entry; tank 50 L."
+    "inductionType": "vnt",
+    "directInjection": true,
+    "notes": "1.5 dCi K9K Blue diesel VNT + DI. Sibling of TCe 130 petrol entry; tank 50 L."
   },
   {
     "make": "Dacia",
@@ -673,7 +763,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.95,
     "odometerPidStrategy": "stdA6",
-    "notes": "1.5 dCi K9K Blue diesel. Stepway sibling shares engine; tank 50 L."
+    "inductionType": "vnt",
+    "directInjection": true,
+    "notes": "1.5 dCi K9K Blue diesel VNT + DI. Stepway sibling shares engine; tank 50 L."
   },
   {
     "make": "Renault",
@@ -686,7 +778,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.95,
     "odometerPidStrategy": "stdA6",
-    "notes": "1.5 dCi 90 Energy. Common French city diesel; tank 45 L."
+    "inductionType": "vnt",
+    "directInjection": true,
+    "notes": "1.5 dCi 90 Energy VNT + DI. Common French city diesel; tank 45 L."
   },
   {
     "make": "Renault",
@@ -699,7 +793,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.95,
     "odometerPidStrategy": "stdA6",
-    "notes": "1.5 dCi K9K Energy diesel. Shares Clio IV platform; tank 45 L."
+    "inductionType": "vnt",
+    "directInjection": true,
+    "notes": "1.5 dCi K9K Energy diesel VNT + DI. Shares Clio IV platform; tank 45 L."
   },
   {
     "make": "Citroen",
@@ -712,7 +808,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.95,
     "odometerPidStrategy": "psaUds",
-    "notes": "1.5 BlueHDi DV5R diesel. Sibling of PureTech 83 petrol entry; tank 45 L."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.5 BlueHDi DV5R diesel turbo DI. Sibling of PureTech 83 petrol entry; tank 45 L."
   },
   {
     "make": "Peugeot",
@@ -725,7 +823,9 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.95,
     "odometerPidStrategy": "psaUds",
-    "notes": "1.5 BlueHDi DV5R diesel. Replaced earlier 1.6 HDi mid-cycle; tank 50 L."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.5 BlueHDi DV5R diesel turbo DI. Replaced earlier 1.6 HDi mid-cycle; tank 50 L."
   },
   {
     "make": "Volkswagen",
@@ -738,6 +838,8 @@
     "transmission": "manual",
     "volumetricEfficiency": 0.95,
     "odometerPidStrategy": "vwUds",
-    "notes": "1.6 TDI EA288 diesel; sibling of 1.0 TSI petrol entry. Tank 40 L."
+    "inductionType": "turbocharged",
+    "directInjection": true,
+    "notes": "1.6 TDI EA288 diesel turbo DI; sibling of 1.0 TSI petrol entry. Tank 40 L."
   }
 ]

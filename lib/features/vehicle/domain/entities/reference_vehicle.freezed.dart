@@ -39,7 +39,17 @@ mixin _$ReferenceVehicle {
 ///   - "vwUds"   — VAG group (VW, Skoda, Seat, Audi) UDS PID.
 ///   - "unknown" — no working strategy known; consumer falls back to
 ///                 trip integration.
- String get odometerPidStrategy;/// Optional free-form notes (e.g. "PHEV variant uses different VE").
+ String get odometerPidStrategy;/// Engine induction technology (#1422 phase 1). Drives
+/// [defaultVolumetricEfficiency]. Defaults to
+/// [InductionType.naturallyAspirated] so legacy rows without the
+/// field deserialize unchanged.
+ InductionType get inductionType;/// Whether the engine uses gasoline / diesel direct injection
+/// (#1422 phase 1). Defaults to false for backward-compat with
+/// rows that pre-date the schema addition.
+ bool get directInjection;/// Whether the engine runs the Atkinson cycle (#1422 phase 1).
+/// Toyota HSD (Prius / Yaris HSD / Auris HSD / Corolla Hybrid),
+/// Mazda Skyactiv-X. Defaults to false.
+ bool get atkinsonCycle;/// Optional free-form notes (e.g. "PHEV variant uses different VE").
  String? get notes;
 /// Create a copy of ReferenceVehicle
 /// with the given fields replaced by the non-null parameter values.
@@ -53,16 +63,16 @@ $ReferenceVehicleCopyWith<ReferenceVehicle> get copyWith => _$ReferenceVehicleCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReferenceVehicle&&(identical(other.make, make) || other.make == make)&&(identical(other.model, model) || other.model == model)&&(identical(other.generation, generation) || other.generation == generation)&&(identical(other.yearStart, yearStart) || other.yearStart == yearStart)&&(identical(other.yearEnd, yearEnd) || other.yearEnd == yearEnd)&&(identical(other.displacementCc, displacementCc) || other.displacementCc == displacementCc)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.transmission, transmission) || other.transmission == transmission)&&(identical(other.volumetricEfficiency, volumetricEfficiency) || other.volumetricEfficiency == volumetricEfficiency)&&(identical(other.odometerPidStrategy, odometerPidStrategy) || other.odometerPidStrategy == odometerPidStrategy)&&(identical(other.notes, notes) || other.notes == notes));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ReferenceVehicle&&(identical(other.make, make) || other.make == make)&&(identical(other.model, model) || other.model == model)&&(identical(other.generation, generation) || other.generation == generation)&&(identical(other.yearStart, yearStart) || other.yearStart == yearStart)&&(identical(other.yearEnd, yearEnd) || other.yearEnd == yearEnd)&&(identical(other.displacementCc, displacementCc) || other.displacementCc == displacementCc)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.transmission, transmission) || other.transmission == transmission)&&(identical(other.volumetricEfficiency, volumetricEfficiency) || other.volumetricEfficiency == volumetricEfficiency)&&(identical(other.odometerPidStrategy, odometerPidStrategy) || other.odometerPidStrategy == odometerPidStrategy)&&(identical(other.inductionType, inductionType) || other.inductionType == inductionType)&&(identical(other.directInjection, directInjection) || other.directInjection == directInjection)&&(identical(other.atkinsonCycle, atkinsonCycle) || other.atkinsonCycle == atkinsonCycle)&&(identical(other.notes, notes) || other.notes == notes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,make,model,generation,yearStart,yearEnd,displacementCc,fuelType,transmission,volumetricEfficiency,odometerPidStrategy,notes);
+int get hashCode => Object.hash(runtimeType,make,model,generation,yearStart,yearEnd,displacementCc,fuelType,transmission,volumetricEfficiency,odometerPidStrategy,inductionType,directInjection,atkinsonCycle,notes);
 
 @override
 String toString() {
-  return 'ReferenceVehicle(make: $make, model: $model, generation: $generation, yearStart: $yearStart, yearEnd: $yearEnd, displacementCc: $displacementCc, fuelType: $fuelType, transmission: $transmission, volumetricEfficiency: $volumetricEfficiency, odometerPidStrategy: $odometerPidStrategy, notes: $notes)';
+  return 'ReferenceVehicle(make: $make, model: $model, generation: $generation, yearStart: $yearStart, yearEnd: $yearEnd, displacementCc: $displacementCc, fuelType: $fuelType, transmission: $transmission, volumetricEfficiency: $volumetricEfficiency, odometerPidStrategy: $odometerPidStrategy, inductionType: $inductionType, directInjection: $directInjection, atkinsonCycle: $atkinsonCycle, notes: $notes)';
 }
 
 
@@ -73,7 +83,7 @@ abstract mixin class $ReferenceVehicleCopyWith<$Res>  {
   factory $ReferenceVehicleCopyWith(ReferenceVehicle value, $Res Function(ReferenceVehicle) _then) = _$ReferenceVehicleCopyWithImpl;
 @useResult
 $Res call({
- String make, String model, String generation, int yearStart, int? yearEnd, int displacementCc, String fuelType, String transmission, double volumetricEfficiency, String odometerPidStrategy, String? notes
+ String make, String model, String generation, int yearStart, int? yearEnd, int displacementCc, String fuelType, String transmission, double volumetricEfficiency, String odometerPidStrategy, InductionType inductionType, bool directInjection, bool atkinsonCycle, String? notes
 });
 
 
@@ -90,7 +100,7 @@ class _$ReferenceVehicleCopyWithImpl<$Res>
 
 /// Create a copy of ReferenceVehicle
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? make = null,Object? model = null,Object? generation = null,Object? yearStart = null,Object? yearEnd = freezed,Object? displacementCc = null,Object? fuelType = null,Object? transmission = null,Object? volumetricEfficiency = null,Object? odometerPidStrategy = null,Object? notes = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? make = null,Object? model = null,Object? generation = null,Object? yearStart = null,Object? yearEnd = freezed,Object? displacementCc = null,Object? fuelType = null,Object? transmission = null,Object? volumetricEfficiency = null,Object? odometerPidStrategy = null,Object? inductionType = null,Object? directInjection = null,Object? atkinsonCycle = null,Object? notes = freezed,}) {
   return _then(_self.copyWith(
 make: null == make ? _self.make : make // ignore: cast_nullable_to_non_nullable
 as String,model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
@@ -102,7 +112,10 @@ as int,fuelType: null == fuelType ? _self.fuelType : fuelType // ignore: cast_nu
 as String,transmission: null == transmission ? _self.transmission : transmission // ignore: cast_nullable_to_non_nullable
 as String,volumetricEfficiency: null == volumetricEfficiency ? _self.volumetricEfficiency : volumetricEfficiency // ignore: cast_nullable_to_non_nullable
 as double,odometerPidStrategy: null == odometerPidStrategy ? _self.odometerPidStrategy : odometerPidStrategy // ignore: cast_nullable_to_non_nullable
-as String,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String,inductionType: null == inductionType ? _self.inductionType : inductionType // ignore: cast_nullable_to_non_nullable
+as InductionType,directInjection: null == directInjection ? _self.directInjection : directInjection // ignore: cast_nullable_to_non_nullable
+as bool,atkinsonCycle: null == atkinsonCycle ? _self.atkinsonCycle : atkinsonCycle // ignore: cast_nullable_to_non_nullable
+as bool,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -188,10 +201,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String make,  String model,  String generation,  int yearStart,  int? yearEnd,  int displacementCc,  String fuelType,  String transmission,  double volumetricEfficiency,  String odometerPidStrategy,  String? notes)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String make,  String model,  String generation,  int yearStart,  int? yearEnd,  int displacementCc,  String fuelType,  String transmission,  double volumetricEfficiency,  String odometerPidStrategy,  InductionType inductionType,  bool directInjection,  bool atkinsonCycle,  String? notes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ReferenceVehicle() when $default != null:
-return $default(_that.make,_that.model,_that.generation,_that.yearStart,_that.yearEnd,_that.displacementCc,_that.fuelType,_that.transmission,_that.volumetricEfficiency,_that.odometerPidStrategy,_that.notes);case _:
+return $default(_that.make,_that.model,_that.generation,_that.yearStart,_that.yearEnd,_that.displacementCc,_that.fuelType,_that.transmission,_that.volumetricEfficiency,_that.odometerPidStrategy,_that.inductionType,_that.directInjection,_that.atkinsonCycle,_that.notes);case _:
   return orElse();
 
 }
@@ -209,10 +222,10 @@ return $default(_that.make,_that.model,_that.generation,_that.yearStart,_that.ye
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String make,  String model,  String generation,  int yearStart,  int? yearEnd,  int displacementCc,  String fuelType,  String transmission,  double volumetricEfficiency,  String odometerPidStrategy,  String? notes)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String make,  String model,  String generation,  int yearStart,  int? yearEnd,  int displacementCc,  String fuelType,  String transmission,  double volumetricEfficiency,  String odometerPidStrategy,  InductionType inductionType,  bool directInjection,  bool atkinsonCycle,  String? notes)  $default,) {final _that = this;
 switch (_that) {
 case _ReferenceVehicle():
-return $default(_that.make,_that.model,_that.generation,_that.yearStart,_that.yearEnd,_that.displacementCc,_that.fuelType,_that.transmission,_that.volumetricEfficiency,_that.odometerPidStrategy,_that.notes);case _:
+return $default(_that.make,_that.model,_that.generation,_that.yearStart,_that.yearEnd,_that.displacementCc,_that.fuelType,_that.transmission,_that.volumetricEfficiency,_that.odometerPidStrategy,_that.inductionType,_that.directInjection,_that.atkinsonCycle,_that.notes);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -229,10 +242,10 @@ return $default(_that.make,_that.model,_that.generation,_that.yearStart,_that.ye
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String make,  String model,  String generation,  int yearStart,  int? yearEnd,  int displacementCc,  String fuelType,  String transmission,  double volumetricEfficiency,  String odometerPidStrategy,  String? notes)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String make,  String model,  String generation,  int yearStart,  int? yearEnd,  int displacementCc,  String fuelType,  String transmission,  double volumetricEfficiency,  String odometerPidStrategy,  InductionType inductionType,  bool directInjection,  bool atkinsonCycle,  String? notes)?  $default,) {final _that = this;
 switch (_that) {
 case _ReferenceVehicle() when $default != null:
-return $default(_that.make,_that.model,_that.generation,_that.yearStart,_that.yearEnd,_that.displacementCc,_that.fuelType,_that.transmission,_that.volumetricEfficiency,_that.odometerPidStrategy,_that.notes);case _:
+return $default(_that.make,_that.model,_that.generation,_that.yearStart,_that.yearEnd,_that.displacementCc,_that.fuelType,_that.transmission,_that.volumetricEfficiency,_that.odometerPidStrategy,_that.inductionType,_that.directInjection,_that.atkinsonCycle,_that.notes);case _:
   return null;
 
 }
@@ -244,7 +257,7 @@ return $default(_that.make,_that.model,_that.generation,_that.yearStart,_that.ye
 @JsonSerializable()
 
 class _ReferenceVehicle extends ReferenceVehicle {
-  const _ReferenceVehicle({required this.make, required this.model, required this.generation, required this.yearStart, this.yearEnd, required this.displacementCc, required this.fuelType, required this.transmission, this.volumetricEfficiency = 0.85, this.odometerPidStrategy = 'stdA6', this.notes}): super._();
+  const _ReferenceVehicle({required this.make, required this.model, required this.generation, required this.yearStart, this.yearEnd, required this.displacementCc, required this.fuelType, required this.transmission, this.volumetricEfficiency = 0.85, this.odometerPidStrategy = 'stdA6', this.inductionType = InductionType.naturallyAspirated, this.directInjection = false, this.atkinsonCycle = false, this.notes}): super._();
   factory _ReferenceVehicle.fromJson(Map<String, dynamic> json) => _$ReferenceVehicleFromJson(json);
 
 /// Manufacturer brand, e.g. "Peugeot", "Renault".
@@ -281,6 +294,19 @@ class _ReferenceVehicle extends ReferenceVehicle {
 ///   - "unknown" — no working strategy known; consumer falls back to
 ///                 trip integration.
 @override@JsonKey() final  String odometerPidStrategy;
+/// Engine induction technology (#1422 phase 1). Drives
+/// [defaultVolumetricEfficiency]. Defaults to
+/// [InductionType.naturallyAspirated] so legacy rows without the
+/// field deserialize unchanged.
+@override@JsonKey() final  InductionType inductionType;
+/// Whether the engine uses gasoline / diesel direct injection
+/// (#1422 phase 1). Defaults to false for backward-compat with
+/// rows that pre-date the schema addition.
+@override@JsonKey() final  bool directInjection;
+/// Whether the engine runs the Atkinson cycle (#1422 phase 1).
+/// Toyota HSD (Prius / Yaris HSD / Auris HSD / Corolla Hybrid),
+/// Mazda Skyactiv-X. Defaults to false.
+@override@JsonKey() final  bool atkinsonCycle;
 /// Optional free-form notes (e.g. "PHEV variant uses different VE").
 @override final  String? notes;
 
@@ -297,16 +323,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReferenceVehicle&&(identical(other.make, make) || other.make == make)&&(identical(other.model, model) || other.model == model)&&(identical(other.generation, generation) || other.generation == generation)&&(identical(other.yearStart, yearStart) || other.yearStart == yearStart)&&(identical(other.yearEnd, yearEnd) || other.yearEnd == yearEnd)&&(identical(other.displacementCc, displacementCc) || other.displacementCc == displacementCc)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.transmission, transmission) || other.transmission == transmission)&&(identical(other.volumetricEfficiency, volumetricEfficiency) || other.volumetricEfficiency == volumetricEfficiency)&&(identical(other.odometerPidStrategy, odometerPidStrategy) || other.odometerPidStrategy == odometerPidStrategy)&&(identical(other.notes, notes) || other.notes == notes));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ReferenceVehicle&&(identical(other.make, make) || other.make == make)&&(identical(other.model, model) || other.model == model)&&(identical(other.generation, generation) || other.generation == generation)&&(identical(other.yearStart, yearStart) || other.yearStart == yearStart)&&(identical(other.yearEnd, yearEnd) || other.yearEnd == yearEnd)&&(identical(other.displacementCc, displacementCc) || other.displacementCc == displacementCc)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.transmission, transmission) || other.transmission == transmission)&&(identical(other.volumetricEfficiency, volumetricEfficiency) || other.volumetricEfficiency == volumetricEfficiency)&&(identical(other.odometerPidStrategy, odometerPidStrategy) || other.odometerPidStrategy == odometerPidStrategy)&&(identical(other.inductionType, inductionType) || other.inductionType == inductionType)&&(identical(other.directInjection, directInjection) || other.directInjection == directInjection)&&(identical(other.atkinsonCycle, atkinsonCycle) || other.atkinsonCycle == atkinsonCycle)&&(identical(other.notes, notes) || other.notes == notes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,make,model,generation,yearStart,yearEnd,displacementCc,fuelType,transmission,volumetricEfficiency,odometerPidStrategy,notes);
+int get hashCode => Object.hash(runtimeType,make,model,generation,yearStart,yearEnd,displacementCc,fuelType,transmission,volumetricEfficiency,odometerPidStrategy,inductionType,directInjection,atkinsonCycle,notes);
 
 @override
 String toString() {
-  return 'ReferenceVehicle(make: $make, model: $model, generation: $generation, yearStart: $yearStart, yearEnd: $yearEnd, displacementCc: $displacementCc, fuelType: $fuelType, transmission: $transmission, volumetricEfficiency: $volumetricEfficiency, odometerPidStrategy: $odometerPidStrategy, notes: $notes)';
+  return 'ReferenceVehicle(make: $make, model: $model, generation: $generation, yearStart: $yearStart, yearEnd: $yearEnd, displacementCc: $displacementCc, fuelType: $fuelType, transmission: $transmission, volumetricEfficiency: $volumetricEfficiency, odometerPidStrategy: $odometerPidStrategy, inductionType: $inductionType, directInjection: $directInjection, atkinsonCycle: $atkinsonCycle, notes: $notes)';
 }
 
 
@@ -317,7 +343,7 @@ abstract mixin class _$ReferenceVehicleCopyWith<$Res> implements $ReferenceVehic
   factory _$ReferenceVehicleCopyWith(_ReferenceVehicle value, $Res Function(_ReferenceVehicle) _then) = __$ReferenceVehicleCopyWithImpl;
 @override @useResult
 $Res call({
- String make, String model, String generation, int yearStart, int? yearEnd, int displacementCc, String fuelType, String transmission, double volumetricEfficiency, String odometerPidStrategy, String? notes
+ String make, String model, String generation, int yearStart, int? yearEnd, int displacementCc, String fuelType, String transmission, double volumetricEfficiency, String odometerPidStrategy, InductionType inductionType, bool directInjection, bool atkinsonCycle, String? notes
 });
 
 
@@ -334,7 +360,7 @@ class __$ReferenceVehicleCopyWithImpl<$Res>
 
 /// Create a copy of ReferenceVehicle
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? make = null,Object? model = null,Object? generation = null,Object? yearStart = null,Object? yearEnd = freezed,Object? displacementCc = null,Object? fuelType = null,Object? transmission = null,Object? volumetricEfficiency = null,Object? odometerPidStrategy = null,Object? notes = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? make = null,Object? model = null,Object? generation = null,Object? yearStart = null,Object? yearEnd = freezed,Object? displacementCc = null,Object? fuelType = null,Object? transmission = null,Object? volumetricEfficiency = null,Object? odometerPidStrategy = null,Object? inductionType = null,Object? directInjection = null,Object? atkinsonCycle = null,Object? notes = freezed,}) {
   return _then(_ReferenceVehicle(
 make: null == make ? _self.make : make // ignore: cast_nullable_to_non_nullable
 as String,model: null == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
@@ -346,7 +372,10 @@ as int,fuelType: null == fuelType ? _self.fuelType : fuelType // ignore: cast_nu
 as String,transmission: null == transmission ? _self.transmission : transmission // ignore: cast_nullable_to_non_nullable
 as String,volumetricEfficiency: null == volumetricEfficiency ? _self.volumetricEfficiency : volumetricEfficiency // ignore: cast_nullable_to_non_nullable
 as double,odometerPidStrategy: null == odometerPidStrategy ? _self.odometerPidStrategy : odometerPidStrategy // ignore: cast_nullable_to_non_nullable
-as String,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String,inductionType: null == inductionType ? _self.inductionType : inductionType // ignore: cast_nullable_to_non_nullable
+as InductionType,directInjection: null == directInjection ? _self.directInjection : directInjection // ignore: cast_nullable_to_non_nullable
+as bool,atkinsonCycle: null == atkinsonCycle ? _self.atkinsonCycle : atkinsonCycle // ignore: cast_nullable_to_non_nullable
+as bool,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

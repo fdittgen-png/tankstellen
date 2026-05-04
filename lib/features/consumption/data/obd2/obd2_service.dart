@@ -558,10 +558,20 @@ class Obd2Service {
     // VE on VehicleProfile is a non-nullable double with its own
     // default (0.85). The manual override takes precedence so a user
     // can pin the value while the auto-learner is still bootstrapping.
+    //
+    // #1422 phase 1 — when the user's profile carries the legacy 0.85
+    // default AND the VeLearner hasn't accumulated any samples yet,
+    // fall through to the engine-tech-derived helper instead of the
+    // raw catalog literal. This kicks Atkinson / VNT diesel / DI turbo
+    // engines off 0.85 from day one, without disturbing existing
+    // VeLearner-converged users (samples > 0 keeps the stored value)
+    // or users who explicitly typed a non-default value through the
+    // calibration card.
     final volumetricEfficiency = vehicle?.manualVolumetricEfficiencyOverride ??
-        vehicle?.volumetricEfficiency ??
-        referenceVehicle?.volumetricEfficiency ??
-        estimator.kDefaultVolumetricEfficiency;
+        _resolveProfileVolumetricEfficiency(vehicle, referenceVehicle) ??
+        (referenceVehicle != null
+            ? defaultVolumetricEfficiency(referenceVehicle)
+            : estimator.kDefaultVolumetricEfficiency);
     final isDiesel = vehicle != null
         ? estimator.isDieselProfile(vehicle)
         : referenceVehicle?.fuelType.toLowerCase() == 'diesel';
@@ -1111,4 +1121,37 @@ class Obd2Service {
     final raw = await _transport.sendCommand(command);
     return _adapter.preParse(raw);
   }
+}
+
+/// Returns the user-profile η_v that should beat the catalog helper, or
+/// null when the engine-tech default should kick in instead (#1422 phase 1).
+///
+/// Resolution rules:
+///   - Profile is null → null (caller falls back to catalog helper).
+///   - Profile carries a learned EWMA value
+///     (`volumetricEfficiencySamples > 0`) → return the stored value, no
+///     matter what it is. The user's own car beats the table.
+///   - Profile carries a non-default value (anything ≠ 0.85) → return it.
+///     This covers users who typed a non-default value somewhere upstream
+///     even though the sample counter never bumped.
+///   - Profile sits at the cold-start default 0.85 with zero learned
+///     samples → null. Caller resolves
+///     `defaultVolumetricEfficiency(reference)` instead so a Dacia dCi
+///     gets 0.95 from day one rather than being stuck at 0.85 until
+///     VeLearner converges over several plein cycles.
+double? _resolveProfileVolumetricEfficiency(
+  VehicleProfile? vehicle,
+  ReferenceVehicle? referenceVehicle,
+) {
+  if (vehicle == null) return null;
+  // Without a reference vehicle to derive a better default from, the
+  // stored value is the best we have — even if it equals 0.85.
+  if (referenceVehicle == null) return vehicle.volumetricEfficiency;
+  if (vehicle.volumetricEfficiencySamples > 0) {
+    return vehicle.volumetricEfficiency;
+  }
+  if (vehicle.volumetricEfficiency != estimator.kDefaultVolumetricEfficiency) {
+    return vehicle.volumetricEfficiency;
+  }
+  return null;
 }
