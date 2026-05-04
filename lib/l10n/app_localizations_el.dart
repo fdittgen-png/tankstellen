@@ -3235,6 +3235,26 @@ class AppLocalizationsEl extends AppLocalizations {
   String get calibrationResetLearner => 'Reset learner';
 
   @override
+  String get calibrationBasisAtkinson => 'Atkinson cycle';
+
+  @override
+  String get calibrationBasisVnt => 'VNT diesel + DI';
+
+  @override
+  String get calibrationBasisTurboDi => 'Turbocharged + DI';
+
+  @override
+  String get calibrationBasisTurbo => 'Turbocharged';
+
+  @override
+  String get calibrationBasisNaDi => 'Naturally aspirated + DI';
+
+  @override
+  String calibrationSourceCatalogWithBasis(String makeModel, String basis) {
+    return '(catalog: $makeModel — $basis default)';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Your $makeModel is marked as diesel but matches a petrol catalog entry. Tap to update.';
   }

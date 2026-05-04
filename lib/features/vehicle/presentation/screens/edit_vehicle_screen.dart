@@ -7,6 +7,8 @@ import '../../../../core/utils/brand_logo_mapper.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2_vin_reader.dart';
+import '../../data/reference_vehicle_catalog_provider.dart';
+import '../../data/vehicle_profile_catalog_matcher.dart';
 import '../../domain/entities/reference_vehicle.dart';
 import '../../domain/entities/vehicle_profile.dart';
 import '../../domain/entities/vin_data.dart';
@@ -726,8 +728,32 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
                     .where((v) => v.id == _existingId)
                     .firstOrNull;
                 if (profile == null) return const SizedBox.shrink();
+                // #1422 phase 2 — resolve the matching ReferenceVehicle
+                // (by stored slug, or via the matcher as a fallback)
+                // so the η_v helper-text origin tag can show the
+                // engine-tech basis. The catalog provider is keep-alive,
+                // so this watch is cheap.
+                final catalog = ref
+                        .watch(referenceVehicleCatalogProvider)
+                        .value ??
+                    const <ReferenceVehicle>[];
+                ReferenceVehicle? referenceVehicle;
+                if (profile.referenceVehicleId != null) {
+                  for (final entry in catalog) {
+                    if (VehicleProfileCatalogMatcher.slugFor(entry) ==
+                        profile.referenceVehicleId) {
+                      referenceVehicle = entry;
+                      break;
+                    }
+                  }
+                }
+                referenceVehicle ??= VehicleProfileCatalogMatcher.bestMatch(
+                  profile: profile,
+                  catalog: catalog,
+                );
                 return CalibrationSection(
                   profile: profile,
+                  referenceVehicle: referenceVehicle,
                   onDisplacementChanged: (v) => _saveCalibrationOverride(
                     manualEngineDisplacementCcOverride: v,
                   ),

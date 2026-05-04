@@ -68,5 +68,33 @@
   "calibrationResetLearner": "Reset learner",
   "@calibrationResetLearner": {
     "description": "OutlinedButton label that resets η_v back to 0.85 and clears the sample counter."
+  },
+  "calibrationBasisAtkinson": "Atkinson cycle",
+  "@calibrationBasisAtkinson": {
+    "description": "Engine-tech basis label for η_v (#1422 phase 2). Shown inside the catalog origin tag when the reference vehicle is an Atkinson-cycle hybrid (Toyota Hybrid, Mazda Skyactiv-X)."
+  },
+  "calibrationBasisVnt": "VNT diesel + DI",
+  "@calibrationBasisVnt": {
+    "description": "Engine-tech basis label for η_v. VNT = variable-geometry turbocharger; DI = direct injection. Common on modern diesels (Renault/Dacia dCi, etc.)."
+  },
+  "calibrationBasisTurboDi": "Turbocharged + DI",
+  "@calibrationBasisTurboDi": {
+    "description": "Engine-tech basis label for η_v. Petrol / diesel turbo with direct injection (VW TSI, Audi TFSI, BlueHDi, etc.)."
+  },
+  "calibrationBasisTurbo": "Turbocharged",
+  "@calibrationBasisTurbo": {
+    "description": "Engine-tech basis label for η_v. Turbocharged with port injection (older turbo petrol)."
+  },
+  "calibrationBasisNaDi": "Naturally aspirated + DI",
+  "@calibrationBasisNaDi": {
+    "description": "Engine-tech basis label for η_v. Naturally aspirated petrol with direct injection (some Toyota / Mazda petrol)."
+  },
+  "calibrationSourceCatalogWithBasis": "(catalog: {makeModel} — {basis} default)",
+  "@calibrationSourceCatalogWithBasis": {
+    "description": "Helper text shown beneath the η_v field when value comes from the catalog AND the engine-tech basis is known (#1422 phase 2). Replaces the plain `calibrationSourceCatalog` for this field only.",
+    "placeholders": {
+      "makeModel": {"type": "String", "example": "Dacia Duster 1.5 dCi"},
+      "basis": {"type": "String", "example": "VNT diesel + DI"}
+    }
   }
 }

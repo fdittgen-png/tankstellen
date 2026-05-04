@@ -210,6 +210,75 @@ void main() {
       });
     });
 
+    group('volumetricEfficiencyBasisKey helper (#1422 phase 2)', () {
+      const baseRow = ReferenceVehicle(
+        make: 'X',
+        model: 'Y',
+        generation: 'I',
+        yearStart: 2020,
+        displacementCc: 1500,
+        fuelType: 'petrol',
+        transmission: 'manual',
+      );
+
+      test('atkinsonCycle short-circuits to calibrationBasisAtkinson '
+          '(takes precedence over induction + DI flags)', () {
+        final v = baseRow.copyWith(
+          atkinsonCycle: true,
+          inductionType: InductionType.turbocharged,
+          directInjection: true,
+        );
+        expect(volumetricEfficiencyBasisKey(v), 'calibrationBasisAtkinson');
+      });
+
+      test('VNT induction returns calibrationBasisVnt', () {
+        final v = baseRow.copyWith(
+          inductionType: InductionType.vnt,
+          directInjection: true,
+        );
+        expect(volumetricEfficiencyBasisKey(v), 'calibrationBasisVnt');
+      });
+
+      test('turbocharged + DI returns calibrationBasisTurboDi', () {
+        final v = baseRow.copyWith(
+          inductionType: InductionType.turbocharged,
+          directInjection: true,
+        );
+        expect(volumetricEfficiencyBasisKey(v), 'calibrationBasisTurboDi');
+      });
+
+      test('supercharged + DI also returns calibrationBasisTurboDi', () {
+        // Supercharged + turbocharged share the same basis label since
+        // they share the same η_v default in the helper.
+        final v = baseRow.copyWith(
+          inductionType: InductionType.supercharged,
+          directInjection: true,
+        );
+        expect(volumetricEfficiencyBasisKey(v), 'calibrationBasisTurboDi');
+      });
+
+      test('turbocharged + no DI returns calibrationBasisTurbo', () {
+        final v = baseRow.copyWith(
+          inductionType: InductionType.turbocharged,
+        );
+        expect(volumetricEfficiencyBasisKey(v), 'calibrationBasisTurbo');
+      });
+
+      test('NA + DI returns calibrationBasisNaDi', () {
+        final v = baseRow.copyWith(directInjection: true);
+        expect(volumetricEfficiencyBasisKey(v), 'calibrationBasisNaDi');
+      });
+
+      test('NA + no DI returns null (legacy 0.85 baseline — no '
+          'enrichment needed)', () {
+        // The helper falls through to 0.85, the same value the catalog
+        // shipped before #1422 — the plain `(catalog: <make model>)`
+        // label already conveys everything, so we suppress the basis
+        // suffix on this branch.
+        expect(volumetricEfficiencyBasisKey(baseRow), isNull);
+      });
+    });
+
     group('coversYear', () {
       test('returns true for the start year', () {
         const v = ReferenceVehicle(
