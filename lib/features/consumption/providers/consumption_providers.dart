@@ -130,19 +130,16 @@ class BrokenMapBeliefByVehicle extends _$BrokenMapBeliefByVehicle {
       if (json is! Map<String, dynamic>) return null;
       return BrokenMapBelief.fromJson(json);
     } catch (e, st) {
-      // Fire-and-forget log so the diagnostic overlay can see why a
-      // belief defaulted to empty after a restart. Returning null
-      // falls back to a fresh belief — the worst case is one re-
-      // probed pair, not a crash.
-      // ignore: discarded_futures
-      errorLogger.log(
-        ErrorLayer.background,
-        e,
-        st,
-        context: const {
-          'op': 'brokenMapBeliefByVehicle.load',
-        },
-      );
+      // Synchronous debugPrint instead of errorLogger.log: when this
+      // provider runs in an unbound zone (ProviderContainer without
+      // bindContainer — every unit test for the notifier), errorLogger
+      // falls through to IsolateErrorSpool.enqueue, which opens a Hive
+      // box. That fire-and-forget Hive open races the test's tearDown
+      // (which deletes the temp Hive dir) and surfaces as
+      // PathNotFoundException + LateInitializationError "after test
+      // completion". Returning null falls back to a fresh belief —
+      // the worst case is one re-probed pair, not a crash.
+      debugPrint('brokenMapBeliefByVehicle.load failed: $e\n$st');
       return null;
     }
   }
