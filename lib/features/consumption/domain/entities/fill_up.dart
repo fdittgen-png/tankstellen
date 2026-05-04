@@ -54,6 +54,23 @@ abstract class FillUp with _$FillUp {
     /// rendered orange in the fill-up list and are user-editable.
     /// Defaults `false` so existing fill-ups deserialise unchanged.
     @Default(false) bool isCorrection,
+
+    /// Tank level in litres read from OBD2 immediately before the pump
+    /// started (#1401 phase 7a). Used by the upcoming reconciliation
+    /// flow to verify pumped litres against tank-delta and surface a
+    /// "verified by adapter" badge. Null when not captured — phone away
+    /// from the car, no adapter paired, fuel-level PID unsupported, or
+    /// the user logged the fill-up after the fact. Existing fill-ups
+    /// deserialise with null so historical data keeps working.
+    double? fuelLevelBeforeL,
+
+    /// Tank level in litres read from OBD2 after the pump finished
+    /// (#1401 phase 7a). Paired with [fuelLevelBeforeL] to compute the
+    /// adapter-measured tank delta and compare it against the pumped
+    /// volume. Null when not captured for the same reasons as
+    /// [fuelLevelBeforeL]. Existing fill-ups deserialise with null so
+    /// historical data keeps working.
+    double? fuelLevelAfterL,
   }) = _FillUp;
 
   factory FillUp.fromJson(Map<String, dynamic> json) => _$FillUpFromJson(json);
