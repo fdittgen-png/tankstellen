@@ -111,6 +111,14 @@
   "@featureDescription_gpsTripPath": {
     "description": "One-line description for the GPS trip path feature."
   },
+  "featureLabel_autoRecord": "Auto-record",
+  "@featureLabel_autoRecord": {
+    "description": "Display name for the master auto-record feature gate (#1373 phase 3d). The per-vehicle auto-record toggle is independent; this central switch is the master gate consulted first."
+  },
+  "featureDescription_autoRecord": "Automatically start a trip when the OBD2 adapter connects to a moving vehicle.",
+  "@featureDescription_autoRecord": {
+    "description": "One-line description for the master auto-record feature gate."
+  },
   "featureBlockedEnable_gamification": "Enable OBD2 trip recording first",
   "@featureBlockedEnable_gamification": {
     "description": "Tooltip shown on the disabled gamification toggle when its prerequisite (OBD2 trip recording) is off."
@@ -134,6 +142,20 @@
   "featureBlockedEnable_gpsTripPath": "Enable OBD2 trip recording first",
   "@featureBlockedEnable_gpsTripPath": {
     "description": "Tooltip shown on the disabled GPS trip path toggle when its prerequisite (OBD2 trip recording) is off."
+  },
+  "featureBlockedEnable_autoRecord": "Enable OBD2 trip recording first",
+  "@featureBlockedEnable_autoRecord": {
+    "description": "Tooltip shown on the disabled master auto-record toggle when its prerequisite (OBD2 trip recording) is off."
+  },
+  "featureBlockedDisable_autoRecord": "Disable dependent features first: {dependents}",
+  "@featureBlockedDisable_autoRecord": {
+    "description": "Tooltip shown on the disabled master auto-record toggle when one or more dependent features are still enabled.",
+    "placeholders": {
+      "dependents": {
+        "type": "String",
+        "example": "Some dependent feature"
+      }
+    }
   },
   "featureBlockedDisable_obd2TripRecording": "Disable dependent features first: {dependents}",
   "@featureBlockedDisable_obd2TripRecording": {

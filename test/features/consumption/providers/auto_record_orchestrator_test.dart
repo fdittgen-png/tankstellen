@@ -10,6 +10,9 @@ import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/providers/auto_record_orchestrator.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
+import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
@@ -198,13 +201,21 @@ void main() {
 
   ProviderContainer makeContainer({
     required _FakeVehicleProfileList vehicleList,
+    Set<Feature>? initialFeatureFlags,
   }) {
+    // Default: include Feature.autoRecord (manifest default-true) so
+    // existing tests that don't pin the central gate keep their
+    // pre-#1373-phase-3d behaviour. Tests that exercise the central
+    // gate pass a custom set.
+    final flags = initialFeatureFlags ??
+        FeatureManifest.defaultManifest.defaultEnabledSet();
     return ProviderContainer(
       overrides: [
         vehicleProfileListProvider.overrideWith(() => vehicleList),
         tripRecordingProvider.overrideWith(() => fakeTripRecording),
         autoRecordListenerFactoryProvider.overrideWithValue(harness.factory()),
         autoRecordSessionOpenerFactoryProvider.overrideWithValue(fakeOpener()),
+        featureFlagsProvider.overrideWith(() => _TestFeatureFlags(flags)),
       ],
     );
   }
@@ -442,4 +453,196 @@ void main() {
           'returned — ownership transfer, not copy',
     );
   }, timeout: const Timeout(Duration(seconds: 15)));
+
+  // -------------------------------------------------------------------------
+  // Central master-gate behaviour (#1373 phase 3d).
+  //
+  // The per-vehicle [VehicleProfile.autoRecord] bool stays unchanged —
+  // each vehicle keeps its own opt-in. The central [Feature.autoRecord]
+  // is a master gate consulted FIRST: when off, no vehicle auto-records
+  // regardless of its bool; when on, the per-vehicle bool decides.
+  // -------------------------------------------------------------------------
+
+  group('central master gate (Feature.autoRecord)', () {
+    test(
+      'central feature disabled + per-vehicle bool true → no coordinator',
+      () async {
+        final list = _FakeVehicleProfileList(
+          [_profile(id: 'v1', autoRecord: true)],
+        );
+        final container = makeContainer(
+          vehicleList: list,
+          initialFeatureFlags: <Feature>{
+            // Manifest defaults MINUS autoRecord (master gate off).
+            // obd2TripRecording stays absent — autoRecord requires it
+            // but the test doesn't toggle it through the central API,
+            // and the fake skips dependency checks anyway.
+            Feature.gamification,
+            Feature.priceAlerts,
+            Feature.priceHistory,
+            Feature.routePlanning,
+            Feature.evCharging,
+          },
+        );
+        addTearDown(container.dispose);
+
+        container.read(autoRecordOrchestratorProvider);
+        await Future<void>.delayed(Duration.zero);
+
+        final orchestrator =
+            container.read(autoRecordOrchestratorProvider.notifier);
+        expect(
+          orchestrator.activeVehicleIdsForTest,
+          isEmpty,
+          reason:
+              'When the central master gate is off, NO vehicle is armed '
+              'regardless of its per-vehicle bool. This is the whole point '
+              'of the wrap — a single central toggle disables auto-record '
+              'across the whole app without touching per-vehicle state.',
+        );
+        expect(
+          harness.created,
+          isEmpty,
+          reason:
+              'No coordinator means no listener factory call — the gate '
+              'short-circuits before the orchestrator constructs anything.',
+        );
+      },
+    );
+
+    test(
+      'central feature enabled + per-vehicle bool false → no coordinator',
+      () async {
+        // Independent gate verification — the per-vehicle bool still
+        // matters even when the central feature is on. This pins the
+        // wrap semantics (BOTH must be true) rather than a replace
+        // (central wins).
+        final list = _FakeVehicleProfileList(
+          [_profile(id: 'v1', autoRecord: false)],
+        );
+        final container = makeContainer(vehicleList: list);
+        addTearDown(container.dispose);
+
+        container.read(autoRecordOrchestratorProvider);
+        await Future<void>.delayed(Duration.zero);
+
+        final orchestrator =
+            container.read(autoRecordOrchestratorProvider.notifier);
+        expect(
+          orchestrator.activeVehicleIdsForTest,
+          isEmpty,
+          reason:
+              'Per-vehicle bool false must STILL prevent auto-record when '
+              'the central feature is on — this confirms the central gate '
+              'wraps (AND logic) rather than overrides the per-vehicle bool.',
+        );
+      },
+    );
+
+    test(
+      'central feature enabled + per-vehicle bool true → coordinator armed',
+      () async {
+        final list = _FakeVehicleProfileList(
+          [_profile(id: 'v1', autoRecord: true)],
+        );
+        final container = makeContainer(vehicleList: list);
+        addTearDown(container.dispose);
+
+        container.read(autoRecordOrchestratorProvider);
+        await Future<void>.delayed(Duration.zero);
+
+        final orchestrator =
+            container.read(autoRecordOrchestratorProvider.notifier);
+        expect(
+          orchestrator.activeVehicleIdsForTest,
+          {'v1'},
+          reason:
+              'Both gates open → coordinator armed exactly as before. '
+              'Pre-3d behaviour preserved when nothing is touched.',
+        );
+        expect(
+          harness.listenerArmedFor('AA:BB:CC:DD:EE:FF'),
+          isNotNull,
+        );
+      },
+    );
+
+    test(
+      'flipping the central feature off after arming tears the coordinator '
+      'down',
+      () async {
+        final list = _FakeVehicleProfileList(
+          [_profile(id: 'v1', autoRecord: true)],
+        );
+        final container = makeContainer(vehicleList: list);
+        addTearDown(container.dispose);
+
+        container.read(autoRecordOrchestratorProvider);
+        await Future<void>.delayed(Duration.zero);
+
+        final listener = harness.listenerArmedFor('AA:BB:CC:DD:EE:FF')!;
+        expect(listener.startCalls, 1);
+
+        // Disable the central feature externally — the orchestrator's
+        // build() watches featureFlagsProvider so a flip rebuilds the
+        // provider and re-runs the diff against the unchanged vehicle
+        // list, dropping every active coordinator.
+        await container
+            .read(featureFlagsProvider.notifier)
+            .disable(Feature.autoRecord);
+        await Future<void>.delayed(Duration.zero);
+
+        final orchestrator =
+            container.read(autoRecordOrchestratorProvider.notifier);
+        expect(
+          orchestrator.activeVehicleIdsForTest,
+          isEmpty,
+          reason:
+              'Disabling the central master gate at runtime must tear '
+              'down every active coordinator. The orchestrator watches '
+              'the feature-flag set so it rebuilds + re-diffs on every '
+              'flip.',
+        );
+        expect(
+          listener.stopCalls,
+          1,
+          reason:
+              'The torn-down coordinator must call stop() on its listener '
+              'so the native foreground service un-arms.',
+        );
+      },
+    );
+  });
+}
+
+/// Synthetic in-memory [FeatureFlags] notifier used to drive the
+/// orchestrator's master-gate behaviour without going through the
+/// Hive-backed repository AND without enforcing the manifest
+/// dependency graph (so a test can put the system in a state the
+/// graph would normally reject — e.g. autoRecord disabled while
+/// obd2TripRecording is also absent).
+///
+/// Mirrors the equivalent test doubles in
+/// `test/features/sync/providers/baseline_sync_enabled_provider_test.dart`
+/// and `test/core/refuel/unified_search_results_enabled_test.dart`.
+class _TestFeatureFlags extends FeatureFlags {
+  _TestFeatureFlags([Set<Feature>? initial])
+      : _initial = initial ?? <Feature>{};
+
+  final Set<Feature> _initial;
+
+  @override
+  Set<Feature> build() => {..._initial};
+
+  @override
+  Future<void> enable(Feature feature) async {
+    if (state.contains(feature)) return;
+    state = {...state, feature};
+  }
+
+  @override
+  Future<void> disable(Feature feature) async {
+    if (!state.contains(feature)) return;
+    state = {...state}..remove(feature);
+  }
 }

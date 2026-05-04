@@ -8,6 +8,7 @@ import 'package:tankstellen/features/feature_management/data/legacy_toggle_migra
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 
 /// Coverage for [migrateLegacyToggles] (#1373 phase 3a).
 ///
@@ -701,6 +702,233 @@ void main() {
               'baselineSync, and the migrator must not touch unrelated '
               'features on the idempotent second run.',
         );
+      },
+    );
+  });
+
+  /// Phase-3d coverage for the per-vehicle [VehicleProfile.autoRecord]
+  /// wrap migration.
+  ///
+  /// Distinct from earlier phases because it does NOT 1:1 promote a
+  /// legacy value: the per-vehicle bool stays as the source of truth,
+  /// and the central [Feature.autoRecord] is a master gate consulted
+  /// FIRST. The migrator only flips the central feature OFF when
+  /// EVERY existing vehicle had the per-vehicle bool off (explicit
+  /// "no auto-record at all" intent). Otherwise the central feature
+  /// stays at the manifest default of `true` and the per-vehicle
+  /// bools continue to govern per-vehicle behaviour.
+  group('migrateLegacyToggles — autoRecord (phase 3d wrap)', () {
+    /// Persists [profiles] under [StorageKeys.vehicleProfiles] in the
+    /// shape [VehicleProfileRepository] uses (List of JSON maps with
+    /// String keys). Mirrors the production write path so the
+    /// migrator's read code exercises the real serialised shape.
+    Future<void> seedProfiles(List<VehicleProfile> profiles) async {
+      await settings.put(
+        StorageKeys.vehicleProfiles,
+        profiles.map((p) => p.toJson()).toList(),
+      );
+    }
+
+    VehicleProfile profile({
+      required String id,
+      required bool autoRecord,
+    }) {
+      return VehicleProfile(
+        id: id,
+        name: 'Vehicle $id',
+        type: VehicleType.combustion,
+        autoRecord: autoRecord,
+      );
+    }
+
+    test(
+      'all vehicles autoRecord=true → central feature stays at default '
+      '(enabled); flag set',
+      () async {
+        await seedProfiles([
+          profile(id: 'a', autoRecord: true),
+          profile(id: 'b', autoRecord: true),
+        ]);
+
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          contains(Feature.autoRecord),
+          reason:
+              'At least one vehicle had the per-vehicle bool on, so the '
+              'master gate must stay at its manifest default of true. The '
+              'per-vehicle bools continue to govern per-vehicle behaviour '
+              'unchanged — this is a wrap, not a replacement.',
+        );
+        expect(
+          settings.get(autoRecordMigratedKey),
+          isTrue,
+          reason:
+              'The migration gate must be set so a subsequent run does '
+              'not re-inspect the per-vehicle bools.',
+        );
+      },
+    );
+
+    test(
+      'all vehicles autoRecord=false → central feature flips to disabled; '
+      'flag set',
+      () async {
+        await seedProfiles([
+          profile(id: 'a', autoRecord: false),
+          profile(id: 'b', autoRecord: false),
+        ]);
+
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          isNot(contains(Feature.autoRecord)),
+          reason:
+              'Every vehicle had the per-vehicle bool off — that is the '
+              'only signal we can read at migration time meaning "user '
+              'doesn\'t want auto-record at all". The master gate flips '
+              'OFF so a future vehicle added with the per-vehicle '
+              'default-on bool does NOT silently start recording.',
+        );
+        expect(settings.get(autoRecordMigratedKey), isTrue);
+      },
+    );
+
+    test(
+      'mixed (one true, one false) → central feature stays enabled '
+      '(per-vehicle intent preserved); flag set',
+      () async {
+        await seedProfiles([
+          profile(id: 'a', autoRecord: false),
+          profile(id: 'b', autoRecord: true),
+        ]);
+
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          contains(Feature.autoRecord),
+          reason:
+              'At least one vehicle wants auto-record, so the master gate '
+              'must stay enabled. The per-vehicle bools (preserved) handle '
+              'the disable-this-one-vehicle case.',
+        );
+        expect(settings.get(autoRecordMigratedKey), isTrue);
+      },
+    );
+
+    test(
+      'no vehicles → central feature stays at default (enabled); flag set',
+      () async {
+        // No `seedProfiles` call → key is absent / empty list.
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          contains(Feature.autoRecord),
+          reason:
+              'A fresh install (no vehicles yet) lands at manifest '
+              'defaults — the master gate is enabled. The first vehicle '
+              'the user adds will respect the per-vehicle default-off bool, '
+              'so nothing records until they explicitly opt in per vehicle.',
+        );
+        expect(settings.get(autoRecordMigratedKey), isTrue);
+      },
+    );
+
+    test(
+      'idempotent — re-running after the gate is set is a no-op even when '
+      'every vehicle had autoRecord=false',
+      () async {
+        // First run with all-false → migrator flips central off and sets
+        // the gate.
+        await seedProfiles([profile(id: 'a', autoRecord: false)]);
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+        expect(await repo.loadEnabled(), isNot(contains(Feature.autoRecord)));
+        expect(settings.get(autoRecordMigratedKey), isTrue);
+
+        // Simulate the user (or a follow-up provider write) re-enabling
+        // the central feature. Then re-run the migrator.
+        final nowEnabled = {
+          ...await repo.loadEnabled(),
+          Feature.autoRecord,
+          // autoRecord requires obd2TripRecording per the manifest;
+          // include it so the persisted set is dependency-consistent.
+          Feature.obd2TripRecording,
+        };
+        await repo.saveEnabled(nowEnabled);
+
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+
+        final afterSecond = await repo.loadEnabled();
+        expect(
+          afterSecond,
+          contains(Feature.autoRecord),
+          reason:
+              'A second migration run must not re-disable the central '
+              'feature — the user explicitly re-enabled it after the '
+              'first migration and that choice must survive.',
+        );
+      },
+    );
+
+    test(
+      'malformed vehicle entry is skipped without aborting the migration',
+      () async {
+        // Seed a list with one bogus entry and one valid all-false
+        // profile. The bogus entry must not block the migration; the
+        // single valid entry has autoRecord=false → all-vehicles-false
+        // path → central flips off.
+        await settings.put(StorageKeys.vehicleProfiles, <dynamic>[
+          'not a map at all',
+          profile(id: 'a', autoRecord: false).toJson(),
+        ]);
+
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          isNot(contains(Feature.autoRecord)),
+          reason:
+              'The valid profile (autoRecord=false) wins — the bogus row '
+              'is skipped per the migrator\'s try/catch guard.',
+        );
+        expect(settings.get(autoRecordMigratedKey), isTrue);
       },
     );
   });

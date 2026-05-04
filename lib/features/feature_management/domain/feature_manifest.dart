@@ -166,5 +166,18 @@ class FeatureManifest {
       displayName: 'GPS trip path',
       description: 'Persist GPS path samples alongside each trip.',
     ),
+    Feature.autoRecord: FeatureManifestEntry(
+      feature: Feature.autoRecord,
+      // Default-true to mirror today's behaviour: vehicles that have
+      // explicitly opted in to per-vehicle `autoRecord: true` keep
+      // recording. Users can disable the master gate from the central
+      // settings UI; the migrator (phase 3d) flips this to false only
+      // when EVERY existing vehicle had the per-vehicle bool off.
+      defaultEnabled: true,
+      requires: {Feature.obd2TripRecording},
+      displayName: 'Auto-record',
+      description:
+          'Automatically start a trip when the OBD2 adapter connects to a moving vehicle.',
+    ),
   });
 }

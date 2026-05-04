@@ -50,4 +50,12 @@ enum Feature {
   /// GPS path persistence on trips (#1374 phase 1, future). Requires
   /// [obd2TripRecording].
   gpsTripPath,
+
+  /// Master gate for hands-free trip auto-record (#1004). Wraps the
+  /// per-vehicle [VehicleProfile.autoRecord] bool — the per-vehicle
+  /// field STAYS so each vehicle keeps its own opt-in, but this central
+  /// flag is consulted FIRST: when off, no vehicle auto-records
+  /// regardless of its bool. Requires [obd2TripRecording] (auto-record
+  /// without trip-capture is a contradiction).
+  autoRecord,
 }

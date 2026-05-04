@@ -3588,6 +3588,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Conserve les points GPS de chaque trajet.';
 
   @override
+  String get featureLabel_autoRecord => 'Enregistrement automatique';
+
+  @override
+  String get featureDescription_autoRecord =>
+      'Démarre automatiquement un trajet dès que l\'adaptateur OBD2 se connecte à un véhicule en mouvement.';
+
+  @override
   String get featureBlockedEnable_gamification =>
       'Activez d\'abord l\'enregistrement OBD2 des trajets';
 
@@ -3609,6 +3616,15 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get featureBlockedEnable_gpsTripPath =>
       'Activez d\'abord l\'enregistrement OBD2 des trajets';
+
+  @override
+  String get featureBlockedEnable_autoRecord =>
+      'Activez d\'abord l\'enregistrement OBD2 des trajets';
+
+  @override
+  String featureBlockedDisable_autoRecord(String dependents) {
+    return 'Désactivez d\'abord les fonctionnalités dépendantes : $dependents';
+  }
 
   @override
   String featureBlockedDisable_obd2TripRecording(String dependents) {

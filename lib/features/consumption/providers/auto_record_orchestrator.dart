@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../feature_management/application/feature_flags_provider.dart';
+import '../../feature_management/domain/feature.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/android_background_adapter_listener.dart';
@@ -75,6 +77,13 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
 
   @override
   void build() {
+    // Watch the central master gate (#1373 phase 3d). Any flip rebuilds
+    // this provider and re-runs the diff against the current vehicle
+    // list — when the gate goes off the diff sees an empty `wanted`
+    // set and tears down every active coordinator; when it flips back
+    // on the diff re-arms the eligible vehicles.
+    ref.watch(featureFlagsProvider);
+
     // ref.listen fires on every change to the vehicle list, including
     // the synthetic initial fire when this provider is first read. We
     // route both the initial fire and subsequent updates through the
@@ -144,6 +153,18 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
   }
 
   bool _isAutoRecordReady(VehicleProfile p) {
+    // Central master gate (#1373 phase 3d). The per-vehicle
+    // [VehicleProfile.autoRecord] bool stays — each vehicle keeps its
+    // own opt-in — but this central feature is consulted FIRST so a
+    // user can disable auto-record for the whole app from the central
+    // settings screen without flipping every vehicle's bool. When the
+    // central feature flips, the orchestrator's `build()` re-runs (via
+    // `ref.watch(featureFlagsProvider)`) and re-diffs the vehicle list,
+    // tearing down or re-arming coordinators as needed.
+    final centralEnabled = ref
+        .read(featureFlagsProvider)
+        .contains(Feature.autoRecord);
+    if (!centralEnabled) return false;
     if (!p.autoRecord) return false;
     final mac = p.pairedAdapterMac;
     if (mac == null || mac.isEmpty) return false;
