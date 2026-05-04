@@ -45,12 +45,11 @@ const String _settingsBoxName = 'settings';
 ///
 /// Wiring: any provider / widget can `ref.watch(...)` this to
 /// guarantee the migrations have run before they read
-/// [featureFlagsProvider]. The default app-init path watches it from
-/// the central feature-flags screen so the migration runs the first
-/// time the user navigates there — there is no requirement to run it
-/// at app start. (#1373 phase 3a/3b defer the explicit startup
-/// wire-up because that path lives in `app_initializer.dart`, which
-/// is on the hot-file list.)
+/// [featureFlagsProvider]. As of the post-#1421 follow-up, the
+/// app-init path also kicks the provider's future in a post-first-frame
+/// microtask (see `app_initializer.dart` — phase 4 deferred work) so
+/// migrations run on every cold start instead of only the first time
+/// the user navigates to the feature-flags screen.
 @Riverpod(keepAlive: true)
 Future<void> legacyToggleMigration(Ref ref) async {
   final featureFlags = ref.watch(featureFlagsRepositoryProvider);
