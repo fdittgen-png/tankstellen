@@ -120,6 +120,168 @@ final class VeLearnerProvider
 
 String _$veLearnerHash() => r'3ee7af1d1504ef129c160480ac732df0494e036f';
 
+/// Detector for the broken-MAP belief system (#1423 phase 3). Phase 4
+/// will swap this empty-prior factory for one that recalls the latest
+/// persisted belief; for phase 3 (logic-only) the detector is a single
+/// stateless instance shared across observations.
+
+@ProviderFor(brokenMapDetector)
+final brokenMapDetectorProvider = BrokenMapDetectorProvider._();
+
+/// Detector for the broken-MAP belief system (#1423 phase 3). Phase 4
+/// will swap this empty-prior factory for one that recalls the latest
+/// persisted belief; for phase 3 (logic-only) the detector is a single
+/// stateless instance shared across observations.
+
+final class BrokenMapDetectorProvider
+    extends
+        $FunctionalProvider<
+          BrokenMapDetector,
+          BrokenMapDetector,
+          BrokenMapDetector
+        >
+    with $Provider<BrokenMapDetector> {
+  /// Detector for the broken-MAP belief system (#1423 phase 3). Phase 4
+  /// will swap this empty-prior factory for one that recalls the latest
+  /// persisted belief; for phase 3 (logic-only) the detector is a single
+  /// stateless instance shared across observations.
+  BrokenMapDetectorProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'brokenMapDetectorProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$brokenMapDetectorHash();
+
+  @$internal
+  @override
+  $ProviderElement<BrokenMapDetector> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  BrokenMapDetector create(Ref ref) {
+    return brokenMapDetector(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(BrokenMapDetector value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<BrokenMapDetector>(value),
+    );
+  }
+}
+
+String _$brokenMapDetectorHash() => r'401fe3bdd10c78d2b90c351588fea002125d89a2';
+
+/// Holds the most recent per-vehicle [BrokenMapBelief] (#1423 phase 3).
+///
+/// In-memory only — phase 4 will replace this with a Hive-backed
+/// per-vehicle store so beliefs survive app restart. Phase 3 keeps the
+/// state Riverpod-scoped so widget tests can inspect / seed prior
+/// beliefs without touching storage.
+///
+/// Keyed by `vehicleId`. Beliefs default to [BrokenMapBelief()] when
+/// the vehicle hasn't been observed yet.
+
+@ProviderFor(BrokenMapBeliefByVehicle)
+final brokenMapBeliefByVehicleProvider = BrokenMapBeliefByVehicleProvider._();
+
+/// Holds the most recent per-vehicle [BrokenMapBelief] (#1423 phase 3).
+///
+/// In-memory only — phase 4 will replace this with a Hive-backed
+/// per-vehicle store so beliefs survive app restart. Phase 3 keeps the
+/// state Riverpod-scoped so widget tests can inspect / seed prior
+/// beliefs without touching storage.
+///
+/// Keyed by `vehicleId`. Beliefs default to [BrokenMapBelief()] when
+/// the vehicle hasn't been observed yet.
+final class BrokenMapBeliefByVehicleProvider
+    extends
+        $NotifierProvider<
+          BrokenMapBeliefByVehicle,
+          Map<String, BrokenMapBelief>
+        > {
+  /// Holds the most recent per-vehicle [BrokenMapBelief] (#1423 phase 3).
+  ///
+  /// In-memory only — phase 4 will replace this with a Hive-backed
+  /// per-vehicle store so beliefs survive app restart. Phase 3 keeps the
+  /// state Riverpod-scoped so widget tests can inspect / seed prior
+  /// beliefs without touching storage.
+  ///
+  /// Keyed by `vehicleId`. Beliefs default to [BrokenMapBelief()] when
+  /// the vehicle hasn't been observed yet.
+  BrokenMapBeliefByVehicleProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'brokenMapBeliefByVehicleProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$brokenMapBeliefByVehicleHash();
+
+  @$internal
+  @override
+  BrokenMapBeliefByVehicle create() => BrokenMapBeliefByVehicle();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, BrokenMapBelief> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Map<String, BrokenMapBelief>>(value),
+    );
+  }
+}
+
+String _$brokenMapBeliefByVehicleHash() =>
+    r'd1f5bdc514ec49d5b419f659ef7c2e4baccb8d7a';
+
+/// Holds the most recent per-vehicle [BrokenMapBelief] (#1423 phase 3).
+///
+/// In-memory only — phase 4 will replace this with a Hive-backed
+/// per-vehicle store so beliefs survive app restart. Phase 3 keeps the
+/// state Riverpod-scoped so widget tests can inspect / seed prior
+/// beliefs without touching storage.
+///
+/// Keyed by `vehicleId`. Beliefs default to [BrokenMapBelief()] when
+/// the vehicle hasn't been observed yet.
+
+abstract class _$BrokenMapBeliefByVehicle
+    extends $Notifier<Map<String, BrokenMapBelief>> {
+  Map<String, BrokenMapBelief> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref
+            as $Ref<Map<String, BrokenMapBelief>, Map<String, BrokenMapBelief>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                Map<String, BrokenMapBelief>,
+                Map<String, BrokenMapBelief>
+              >,
+              Map<String, BrokenMapBelief>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
 /// Holds the most recent [VeLearnResult] (#815) so the UI can show a
 /// one-shot calibration snackbar after the fill-up save flow closes.
 ///
@@ -242,7 +404,7 @@ final class FillUpListProvider
   }
 }
 
-String _$fillUpListHash() => r'19fbdb49d46bcdac836823682343d66cc90b4594';
+String _$fillUpListHash() => r'ca9867e29fd5ba03e407a2fb44bda82a6c66687d';
 
 /// Mutable list of all fill-ups, newest first.
 
@@ -324,7 +486,7 @@ String _$consumptionStatsHash() => r'6613eff02126b04dc046d555deafd254b7211e9b';
 ///
 /// Keyed by fill-up id so the Riverpod graph invalidates just the
 /// affected card when a single fill-up is edited, not the whole list.
-/// See #676 and the project leitmotiv in CLAUDE.md.
+/// See #676 ("Smarter pump. Smarter drive. Save twice.").
 
 @ProviderFor(ecoScoreForFillUp)
 final ecoScoreForFillUpProvider = EcoScoreForFillUpFamily._();
@@ -338,7 +500,7 @@ final ecoScoreForFillUpProvider = EcoScoreForFillUpFamily._();
 ///
 /// Keyed by fill-up id so the Riverpod graph invalidates just the
 /// affected card when a single fill-up is edited, not the whole list.
-/// See #676 and the project leitmotiv in CLAUDE.md.
+/// See #676 ("Smarter pump. Smarter drive. Save twice.").
 
 final class EcoScoreForFillUpProvider
     extends $FunctionalProvider<EcoScore?, EcoScore?, EcoScore?>
@@ -352,7 +514,7 @@ final class EcoScoreForFillUpProvider
   ///
   /// Keyed by fill-up id so the Riverpod graph invalidates just the
   /// affected card when a single fill-up is edited, not the whole list.
-  /// See #676 and the project leitmotiv in CLAUDE.md.
+  /// See #676 ("Smarter pump. Smarter drive. Save twice.").
   EcoScoreForFillUpProvider._({
     required EcoScoreForFillUpFamily super.from,
     required String super.argument,
@@ -415,7 +577,7 @@ String _$ecoScoreForFillUpHash() => r'd73756e1f350917069211ef38a04a8d020682ca3';
 ///
 /// Keyed by fill-up id so the Riverpod graph invalidates just the
 /// affected card when a single fill-up is edited, not the whole list.
-/// See #676 and the project leitmotiv in CLAUDE.md.
+/// See #676 ("Smarter pump. Smarter drive. Save twice.").
 
 final class EcoScoreForFillUpFamily extends $Family
     with $FunctionalFamilyOverride<EcoScore?, String> {
@@ -437,7 +599,7 @@ final class EcoScoreForFillUpFamily extends $Family
   ///
   /// Keyed by fill-up id so the Riverpod graph invalidates just the
   /// affected card when a single fill-up is edited, not the whole list.
-  /// See #676 and the project leitmotiv in CLAUDE.md.
+  /// See #676 ("Smarter pump. Smarter drive. Save twice.").
 
   EcoScoreForFillUpProvider call(String fillUpId) =>
       EcoScoreForFillUpProvider._(argument: fillUpId, from: this);
