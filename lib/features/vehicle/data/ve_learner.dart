@@ -35,6 +35,17 @@ class VeLearnResult {
   /// Post-update sample count for the vehicle's η_v field.
   final int sampleCount;
 
+  /// Raw proposed η_v before EWMA blending and [VeLearner.minVe] /
+  /// [VeLearner.maxVe] clamping (#1423 phase 3). Equals
+  /// `previousVe × (pumpedLiters / integratedLiters)` — the first-order
+  /// estimate of the true η_v this tankful "wants". Surfaced so the
+  /// broken-MAP belief system (#1423) can score implausible values
+  /// (η_v ≫ 0.97 means the learner is compensating for a fuel under-
+  /// count that's actually MAP-derived). Always finite when this
+  /// result is non-null because [VeLearner.reconcileAfterFillUp]
+  /// rejects `integrated <= 0` upstream.
+  final double proposedEta;
+
   const VeLearnResult({
     required this.vehicleId,
     required this.previousVe,
@@ -43,6 +54,7 @@ class VeLearnResult {
     required this.pumpedLiters,
     required this.accuracyImprovementPct,
     required this.sampleCount,
+    required this.proposedEta,
   });
 }
 
@@ -286,6 +298,7 @@ class VeLearner {
       pumpedLiters: pumpedLiters,
       accuracyImprovementPct: improvement,
       sampleCount: updated.volumetricEfficiencySamples,
+      proposedEta: rawNewVe,
     );
   }
 

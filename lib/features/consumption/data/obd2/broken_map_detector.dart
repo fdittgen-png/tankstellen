@@ -174,6 +174,87 @@ class BrokenMapDetector {
       return prior;
     }
   }
+
+  /// Weight on the discrepancy-severity term in the combined plein-
+  /// complet observation. Spec § E pairs this with a 0.4 weight on the
+  /// η_v implausibility term — discrepancy carries more signal because
+  /// it's measured against pump receipts (ground truth) while the η_v
+  /// path is one inferential step removed (depends on the integrator).
+  static const double _discrepancyWeight = 0.6;
+
+  /// Weight on the η_v-implausibility term. See [_discrepancyWeight].
+  static const double _etaWeight = 0.4;
+
+  /// Fold a plein-complet (full-tank reconciliation) observation into
+  /// [prior] (#1423 phase 3).
+  ///
+  /// Combined score per spec § E:
+  /// ```
+  /// observationScore = 0.6 * discrepancySeverityScore(ratio)
+  ///                  + 0.4 * etaImplausibilityScore(proposedEta)
+  /// ```
+  /// where `ratio = reconciledLPer100km / estimatedLPer100km`.
+  ///
+  /// When [proposedEta] is null (the [VeLearner] had no candidate to
+  /// propose this cycle — e.g. distance under the gate, no integrated
+  /// fuel) the η_v term drops out and the score collapses to the pure
+  /// discrepancy severity. This avoids spuriously punishing a sensor
+  /// just because the learner didn't have enough data to opine; it
+  /// also avoids needing to invent a sentinel η_v value.
+  ///
+  /// Returns [prior] unchanged when:
+  ///   * [estimatedLPer100km] is non-positive (can't form a ratio),
+  ///   * [reconciledLPer100km] is non-positive (degenerate window).
+  ///
+  /// Pure — no I/O, no Hive, no Riverpod. Phase 4 will wrap the call
+  /// in a persistence pathway; phase 3 stays caller-driven so unit
+  /// tests can assert the score math without mocking storage.
+  BrokenMapBelief recordPleinCompletObservation({
+    required BrokenMapBelief prior,
+    required double reconciledLPer100km,
+    required double estimatedLPer100km,
+    required double? proposedEta,
+    required DateTime now,
+  }) {
+    if (estimatedLPer100km <= 0 || reconciledLPer100km <= 0) {
+      return prior;
+    }
+    final ratio = reconciledLPer100km / estimatedLPer100km;
+    final discrepancyScore = BrokenMapBeliefUpdater.discrepancySeverityScore(
+      ratio: ratio,
+    );
+
+    double observationScore;
+    BrokenMapReason reason;
+    if (proposedEta == null) {
+      // Learner had nothing to propose — fall back to discrepancy-only
+      // weight (full weight on the only available signal). Reason tag
+      // mirrors the dominant input so the diagnostic overlay can
+      // explain the trigger.
+      observationScore = discrepancyScore;
+      reason = BrokenMapReason.pleinCompletDiscrepancy;
+    } else {
+      final etaScore = BrokenMapBeliefUpdater.etaImplausibilityScore(
+        proposedEta: proposedEta,
+      );
+      observationScore =
+          _discrepancyWeight * discrepancyScore + _etaWeight * etaScore;
+      // Attribute the trigger to whichever input contributed more.
+      // The updater gates [lastTrigger] on its own strong-observation
+      // threshold, so passing the reason unconditionally is safe: weak
+      // combined scores leave the prior trigger sticky.
+      reason = etaScore > discrepancyScore
+          ? BrokenMapReason.etaImplausible
+          : BrokenMapReason.pleinCompletDiscrepancy;
+    }
+
+    return BrokenMapBeliefUpdater.update(
+      prior,
+      observationScore,
+      now: now,
+      reason: reason,
+    );
+  }
 }
 
 /// Parse Mode 01 PID 0x33 (absolute barometric pressure) response.

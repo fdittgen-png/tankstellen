@@ -5,6 +5,8 @@ import '../../../core/storage/storage_providers.dart';
 import '../../vehicle/data/ve_learner.dart';
 import '../../vehicle/providers/service_reminder_providers.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
+import '../data/obd2/broken_map_belief.dart';
+import '../data/obd2/broken_map_detector.dart';
 import '../data/repositories/fill_up_repository.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/entities/consumption_stats.dart';
@@ -12,6 +14,7 @@ import '../domain/entities/eco_score.dart';
 import '../domain/entities/fill_up.dart';
 import '../domain/services/eco_score_calculator.dart';
 import '../domain/services/reconciler.dart';
+import '../domain/trip_recorder.dart';
 import 'trip_history_provider.dart';
 
 part 'consumption_providers.g.dart';
@@ -38,6 +41,39 @@ VeLearner? veLearner(Ref ref) {
     profileRepository: profileRepo,
     tripHistoryRepository: history,
   );
+}
+
+/// Detector for the broken-MAP belief system (#1423 phase 3). Phase 4
+/// will swap this empty-prior factory for one that recalls the latest
+/// persisted belief; for phase 3 (logic-only) the detector is a single
+/// stateless instance shared across observations.
+@Riverpod(keepAlive: true)
+BrokenMapDetector brokenMapDetector(Ref ref) => const BrokenMapDetector();
+
+/// Holds the most recent per-vehicle [BrokenMapBelief] (#1423 phase 3).
+///
+/// In-memory only — phase 4 will replace this with a Hive-backed
+/// per-vehicle store so beliefs survive app restart. Phase 3 keeps the
+/// state Riverpod-scoped so widget tests can inspect / seed prior
+/// beliefs without touching storage.
+///
+/// Keyed by `vehicleId`. Beliefs default to [BrokenMapBelief()] when
+/// the vehicle hasn't been observed yet.
+@Riverpod(keepAlive: true)
+class BrokenMapBeliefByVehicle extends _$BrokenMapBeliefByVehicle {
+  @override
+  Map<String, BrokenMapBelief> build() => <String, BrokenMapBelief>{};
+
+  /// Read the current belief for [vehicleId]; defaults to a fresh
+  /// [BrokenMapBelief] when nothing has been recorded yet.
+  BrokenMapBelief beliefFor(String vehicleId) =>
+      state[vehicleId] ?? const BrokenMapBelief();
+
+  /// Replace the belief for [vehicleId] with [belief]. Used by the
+  /// plein-complet hook after a reconciliation observation folds in.
+  void set(String vehicleId, BrokenMapBelief belief) {
+    state = {...state, vehicleId: belief};
+  }
 }
 
 /// Holds the most recent [VeLearnResult] (#815) so the UI can show a
@@ -101,10 +137,21 @@ class FillUpList extends _$FillUpList {
     await _relinkOpenWindow(linked);
     state = repo.getAll();
     await _evaluateReminders(linked);
-    await _reconcileVolumetricEfficiency(linked, previous);
+    final veResult = await _reconcileVolumetricEfficiency(linked, previous);
     // #1361 — trip-vs-pump reconciliation. Only runs on plein fills;
     // partials extend the open window and don't trigger a closing.
-    await _reconcileTripVsPump(linked);
+    final reconciliation = await _reconcileTripVsPump(linked);
+    // #1423 phase 3 — feed the plein-complet observation into the
+    // broken-MAP belief. Only when the trip-vs-pump reconciler
+    // actually evaluated the window (created OR skippedBelowThreshold —
+    // both produce a meaningful pumped/consumed pair). The
+    // skippedNoTrips and clampedNegative buckets carry no L/100km
+    // signal so we don't fold them in.
+    await _recordBrokenMapObservation(
+      fillUp: linked,
+      reconciliation: reconciliation,
+      veResult: veResult,
+    );
   }
 
   /// Compute the trip-history ids recorded for [fillUp.vehicleId]
@@ -275,14 +322,22 @@ class FillUpList extends _$FillUpList {
   /// without a bound vehicle, the synthesised correction itself, or
   /// when the trip-history repository isn't available. Errors are
   /// swallowed — a failed reconciliation must not break the save flow.
-  Future<void> _reconcileTripVsPump(FillUp fillUp) async {
-    if (fillUp.isCorrection) return;
-    if (!fillUp.isFullTank) return;
+  ///
+  /// Returns the [_TripVsPumpReconciliation] outcome so downstream
+  /// hooks (#1423 phase 3 broken-MAP belief) can score the same
+  /// reconciliation without redoing the window math. Returns `null`
+  /// when reconciliation was skipped (partial fill, no vehicle,
+  /// missing trip-history repo, throw).
+  Future<_TripVsPumpReconciliation?> _reconcileTripVsPump(
+    FillUp fillUp,
+  ) async {
+    if (fillUp.isCorrection) return null;
+    if (!fillUp.isFullTank) return null;
     final vehicleId = fillUp.vehicleId;
-    if (vehicleId == null) return;
+    if (vehicleId == null) return null;
     try {
       final tripRepo = ref.read(tripHistoryRepositoryProvider);
-      if (tripRepo == null) return;
+      if (tripRepo == null) return null;
       final fillRepo = ref.read(fillUpRepositoryProvider);
       final allFills = fillRepo.getAll();
       final history = tripRepo.loadAll();
@@ -296,13 +351,126 @@ class FillUpList extends _$FillUpList {
         allFillUpsForVehicle: allFills,
         tripsForVehicle: trips,
       );
-      final correction = result?.correction;
+      if (result == null) return null;
+      final correction = result.correction;
       if (correction != null) {
         await fillRepo.save(correction);
         state = fillRepo.getAll();
       }
+      // Sum the window-trip distances — used by the broken-MAP hook
+      // to convert pumped/consumed litres into L/100 km. Mirrors the
+      // window logic inside [Reconciler.reconcile]; we don't reach
+      // into the result for it because the reconciler stays pure (no
+      // distance field on [ReconciliationResult]).
+      final windowDistanceKm = _windowDistanceKm(
+        closingPlein: fillUp,
+        allFillUpsForVehicle: allFills,
+        tripsForVehicle: trips,
+      );
+      return _TripVsPumpReconciliation(
+        result: result,
+        windowDistanceKm: windowDistanceKm,
+      );
     } catch (e, st) {
       debugPrint('FillUpList: trip-vs-pump reconciliation failed: $e\n$st');
+      return null;
+    }
+  }
+
+  /// Sum the [TripSummary.distanceKm] across every trip in the same
+  /// plein-to-plein window the [Reconciler] uses. Inlined here so the
+  /// reconciler can stay pure and free of the L/100 km derivation.
+  double _windowDistanceKm({
+    required FillUp closingPlein,
+    required List<FillUp> allFillUpsForVehicle,
+    required List<TripSummary> tripsForVehicle,
+  }) {
+    final vehicleId = closingPlein.vehicleId;
+    final sameVehicleFills = allFillUpsForVehicle
+        .where(
+          (f) =>
+              f.vehicleId == vehicleId &&
+              !f.isCorrection &&
+              f.id != closingPlein.id,
+        )
+        .toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+    FillUp? previousPlein;
+    for (final f in sameVehicleFills) {
+      if (!f.date.isBefore(closingPlein.date)) continue;
+      if (!f.isFullTank) continue;
+      if (previousPlein == null || f.date.isAfter(previousPlein.date)) {
+        previousPlein = f;
+      }
+    }
+    DateTime windowStart;
+    bool inclusiveLower;
+    if (previousPlein != null) {
+      windowStart = previousPlein.date;
+      inclusiveLower = false;
+    } else {
+      windowStart = sameVehicleFills.isEmpty
+          ? closingPlein.date
+          : sameVehicleFills.first.date;
+      inclusiveLower = true;
+    }
+    double sum = 0;
+    for (final t in tripsForVehicle) {
+      final when = t.startedAt;
+      if (when == null) continue;
+      final afterStart = inclusiveLower
+          ? !when.isBefore(windowStart)
+          : when.isAfter(windowStart);
+      if (!afterStart) continue;
+      if (when.isAfter(closingPlein.date)) continue;
+      sum += t.distanceKm;
+    }
+    return sum;
+  }
+
+  /// #1423 phase 3 — fold the plein-complet observation into the
+  /// broken-MAP belief. No-op when the trip-vs-pump reconciler didn't
+  /// produce a usable pumped/consumed pair, when the closing fill
+  /// isn't a plein, or when the window distance is too small to form
+  /// a meaningful L/100 km. Errors are swallowed — a broken-MAP
+  /// scoring failure must not break the save flow.
+  Future<void> _recordBrokenMapObservation({
+    required FillUp fillUp,
+    required _TripVsPumpReconciliation? reconciliation,
+    required VeLearnResult? veResult,
+  }) async {
+    if (reconciliation == null) return;
+    final vehicleId = fillUp.vehicleId;
+    if (vehicleId == null) return;
+    if (!fillUp.isFullTank || fillUp.isCorrection) return;
+    final result = reconciliation.result;
+    // Only fold in observations where both sides of the ratio are
+    // populated. skippedNoTrips means consumed = 0 (degenerate), and
+    // clampedNegative means the integrator over-reported (the
+    // discrepancy score isn't meaningful in that direction).
+    if (result.action != ReconciliationAction.created &&
+        result.action != ReconciliationAction.skippedBelowThreshold) {
+      return;
+    }
+    if (result.consumed <= 0) return;
+    final distance = reconciliation.windowDistanceKm;
+    if (distance <= 0) return;
+    try {
+      final detector = ref.read(brokenMapDetectorProvider);
+      final beliefs = ref.read(brokenMapBeliefByVehicleProvider.notifier);
+      final prior = beliefs.beliefFor(vehicleId);
+      final reconciledLPer100km = result.pumped * 100.0 / distance;
+      final estimatedLPer100km = result.consumed * 100.0 / distance;
+      final updated = detector.recordPleinCompletObservation(
+        prior: prior,
+        reconciledLPer100km: reconciledLPer100km,
+        estimatedLPer100km: estimatedLPer100km,
+        proposedEta: veResult?.proposedEta,
+        now: DateTime.now(),
+      );
+      beliefs.set(vehicleId, updated);
+    } catch (e, st) {
+      debugPrint('FillUpList: broken-MAP observation failed: $e\n$st');
     }
   }
 
@@ -323,16 +491,20 @@ class FillUpList extends _$FillUpList {
     }
   }
 
-  Future<void> _reconcileVolumetricEfficiency(
+  /// Run the η_v learner against the new fill-up. Returns the resulting
+  /// [VeLearnResult] (or `null` when guards rejected) so downstream
+  /// hooks (#1423 phase 3 broken-MAP belief) can read
+  /// [VeLearnResult.proposedEta] without re-running the learner.
+  Future<VeLearnResult?> _reconcileVolumetricEfficiency(
     FillUp fillUp,
     FillUp? previous,
   ) async {
     final vehicleId = fillUp.vehicleId;
-    if (vehicleId == null) return;
-    if (fillUp.liters <= 0) return;
+    if (vehicleId == null) return null;
+    if (fillUp.liters <= 0) return null;
     try {
       final learner = ref.read(veLearnerProvider);
-      if (learner == null) return;
+      if (learner == null) return null;
       final result = await learner.reconcileAfterFillUp(
         vehicleId: vehicleId,
         pumpedLiters: fillUp.liters,
@@ -347,8 +519,10 @@ class FillUpList extends _$FillUpList {
         // bumped η_v sample count immediately.
         ref.invalidate(vehicleProfileListProvider);
       }
+      return result;
     } catch (e, st) {
       debugPrint('FillUpList: VE reconciliation failed: $e\n$st');
+      return null;
     }
   }
 
@@ -394,6 +568,20 @@ class FillUpList extends _$FillUpList {
 ConsumptionStats consumptionStats(Ref ref) {
   final fillUps = ref.watch(fillUpListProvider);
   return ConsumptionStats.fromFillUps(fillUps);
+}
+
+/// Bundle the [Reconciler] outcome with the per-window distance the
+/// broken-MAP hook (#1423 phase 3) needs to convert pumped/consumed
+/// litres into L/100 km. Private to this file — the public reconciler
+/// stays distance-agnostic.
+class _TripVsPumpReconciliation {
+  final ReconciliationResult result;
+  final double windowDistanceKm;
+
+  const _TripVsPumpReconciliation({
+    required this.result,
+    required this.windowDistanceKm,
+  });
 }
 
 /// Per-fill-up eco-score — compares this tank's L/100 km to the
