@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
+import '../../feature_management/domain/feature_dependency_graph.dart';
 
 part 'baseline_sync_enabled_provider.g.dart';
 
@@ -28,7 +29,13 @@ part 'baseline_sync_enabled_provider.g.dart';
 class BaselineSyncEnabled extends _$BaselineSyncEnabled {
   @override
   bool build() {
-    return ref.watch(featureFlagsProvider).contains(Feature.baselineSync);
+    // Gates on the **effective** state (#1447): when `tankSync` (the
+    // parent) is off, this surfaces as `false` regardless of the stored
+    // value. The trip-flush hook reads this via `ref.read` at flush
+    // time and skips the upload when the parent is gone.
+    final enabled = ref.watch(featureFlagsProvider);
+    final manifest = ref.watch(featureManifestProvider);
+    return isEffectivelyEnabled(Feature.baselineSync, manifest, enabled);
   }
 
   /// Delegate to [featureFlagsProvider]'s `enable` / `disable`. The

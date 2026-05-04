@@ -6,6 +6,7 @@ import '../../consumption/data/obd2/trip_live_reading.dart';
 import '../../consumption/providers/trip_recording_provider.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
+import '../../feature_management/domain/feature_dependency_graph.dart';
 import '../haptic_eco_coach.dart';
 
 part 'haptic_eco_coach_provider.g.dart';
@@ -26,7 +27,13 @@ part 'haptic_eco_coach_provider.g.dart';
 class HapticEcoCoachEnabled extends _$HapticEcoCoachEnabled {
   @override
   bool build() {
-    return ref.watch(featureFlagsProvider).contains(Feature.hapticEcoCoach);
+    // Gates on the **effective** state (#1447): when `obd2TripRecording`
+    // (the parent) is off, this surfaces as `false` regardless of the
+    // stored haptic-coach value. The lifecycle provider re-runs and
+    // tears down its subscription on the next frame.
+    final enabled = ref.watch(featureFlagsProvider);
+    final manifest = ref.watch(featureManifestProvider);
+    return isEffectivelyEnabled(Feature.hapticEcoCoach, manifest, enabled);
   }
 
   /// Delegate to [featureFlagsProvider]'s `enable` / `disable`. The

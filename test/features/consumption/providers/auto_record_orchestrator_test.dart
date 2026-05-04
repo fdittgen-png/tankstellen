@@ -203,12 +203,16 @@ void main() {
     required _FakeVehicleProfileList vehicleList,
     Set<Feature>? initialFeatureFlags,
   }) {
-    // Default: include Feature.autoRecord (manifest default-true) so
-    // existing tests that don't pin the central gate keep their
-    // pre-#1373-phase-3d behaviour. Tests that exercise the central
-    // gate pass a custom set.
+    // Default: include Feature.autoRecord (manifest default-true) AND
+    // Feature.obd2TripRecording (its prerequisite) so existing tests
+    // that don't pin the central gate observe the orchestrator as
+    // "effectively enabled" under #1447 cascading-disable. Tests that
+    // exercise the central gate or the parent edge pass a custom set.
     final flags = initialFeatureFlags ??
-        FeatureManifest.defaultManifest.defaultEnabledSet();
+        {
+          ...FeatureManifest.defaultManifest.defaultEnabledSet(),
+          Feature.obd2TripRecording,
+        };
     return ProviderContainer(
       overrides: [
         vehicleProfileListProvider.overrideWith(() => vehicleList),

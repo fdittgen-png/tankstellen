@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
+import '../../feature_management/domain/feature_dependency_graph.dart';
 
 part 'show_electric_enabled_provider.g.dart';
 
@@ -32,7 +33,13 @@ part 'show_electric_enabled_provider.g.dart';
 class ShowElectricEnabled extends _$ShowElectricEnabled {
   @override
   bool build() {
-    return ref.watch(featureFlagsProvider).contains(Feature.showElectric);
+    // Routes through `isEffectivelyEnabled` for symmetry with the other
+    // shims and forward-compat (#1447). `Feature.showElectric` has no
+    // requires today so the helper short-circuits to `state.contains` —
+    // identical observable behaviour to the prior `.contains` call.
+    final enabled = ref.watch(featureFlagsProvider);
+    final manifest = ref.watch(featureManifestProvider);
+    return isEffectivelyEnabled(Feature.showElectric, manifest, enabled);
   }
 
   /// Delegate to [featureFlagsProvider]'s `enable` / `disable`. The
