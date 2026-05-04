@@ -544,4 +544,164 @@ void main() {
       },
     );
   });
+
+  group('migrateLegacyToggles — syncBaselines', () {
+    test(
+      'promotes legacy true → cascade-enables both Feature.tankSync '
+      '(prerequisite) AND Feature.baselineSync; sets migration flag',
+      () async {
+        // ignore: deprecated_member_use_from_same_package
+        await settings.put(StorageKeys.syncBaselinesEnabled, true);
+
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          contains(Feature.baselineSync),
+          reason:
+              'Legacy true must promote into the central feature-flag set '
+              'so the user does not have to re-enable baseline sync after '
+              'the migration.',
+        );
+        expect(
+          after,
+          contains(Feature.tankSync),
+          reason:
+              'baselineSync requires tankSync per the manifest; enabling '
+              'the dependent without the prerequisite would leave the '
+              'central state in a contract-violating shape. Mirrors the '
+              'haptic precedent which cascades obd2TripRecording.',
+        );
+        expect(
+          settings.get(syncBaselinesMigratedKey),
+          isTrue,
+          reason:
+              'The migration gate must be set so a subsequent run is a '
+              'no-op and a user who later disables baselineSync does not '
+              'get it re-enabled on the next launch.',
+        );
+      },
+    );
+
+    test('legacy false → leaves central state untouched; sets migration flag',
+        () async {
+      // ignore: deprecated_member_use_from_same_package
+      await settings.put(StorageKeys.syncBaselinesEnabled, false);
+
+      await migrateLegacyToggles(
+        settings: settings,
+        featureFlags: repo,
+        manifest: FeatureManifest.defaultManifest,
+      );
+
+      final after = await repo.loadEnabled();
+      expect(
+        after,
+        isNot(contains(Feature.baselineSync)),
+        reason:
+            'A legacy explicit-false must not promote anything — the '
+            'central system already defaults baselineSync to off '
+            '(manifest defaultEnabled=false), so a no-op write is '
+            'semantically equivalent.',
+      );
+      expect(
+        after,
+        isNot(contains(Feature.tankSync)),
+        reason:
+            'tankSync must NOT be cascade-enabled when the legacy value '
+            'is false — the cascade only runs on the legacy=true branch.',
+      );
+      expect(
+        settings.get(syncBaselinesMigratedKey),
+        isTrue,
+        reason:
+            'Even a no-op migration must set the gate so we never '
+            're-read the deprecated key on subsequent launches.',
+      );
+    });
+
+    test(
+      'legacy null (key never written) → no central state change; flag set',
+      () async {
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          isNot(contains(Feature.baselineSync)),
+          reason:
+              'A first-launch profile (no legacy value) must land at '
+              'central manifest defaults — baselineSync off.',
+        );
+        expect(
+          settings.get(syncBaselinesMigratedKey),
+          isTrue,
+          reason:
+              'Absent legacy value still flips the gate so we do not '
+              're-do the work each launch.',
+        );
+      },
+    );
+
+    test(
+      'idempotent — running twice on legacy=true leaves the central state '
+      'unchanged the second time (user disable survives)',
+      () async {
+        // ignore: deprecated_member_use_from_same_package
+        await settings.put(StorageKeys.syncBaselinesEnabled, true);
+
+        // First run promotes (cascades tankSync + baselineSync).
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+        final afterFirst = await repo.loadEnabled();
+        expect(afterFirst, contains(Feature.baselineSync));
+        expect(afterFirst, contains(Feature.tankSync));
+        expect(settings.get(syncBaselinesMigratedKey), isTrue);
+
+        // Simulate the user disabling baselineSync after the migration
+        // (e.g. via the central settings UI). The tankSync prereq stays
+        // because favourite sync depends on it independently. The
+        // second run must NOT re-enable baselineSync.
+        final disabled = {...afterFirst}..remove(Feature.baselineSync);
+        await repo.saveEnabled(disabled);
+
+        // Second run.
+        await migrateLegacyToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+        );
+
+        final afterSecond = await repo.loadEnabled();
+        expect(
+          afterSecond,
+          isNot(contains(Feature.baselineSync)),
+          reason:
+              'A second migration run must not re-promote the legacy '
+              'true value — the user has explicitly disabled '
+              'baselineSync since and that choice must survive.',
+        );
+        expect(
+          afterSecond,
+          contains(Feature.tankSync),
+          reason:
+              'tankSync must remain enabled — the user only disabled '
+              'baselineSync, and the migrator must not touch unrelated '
+              'features on the idempotent second run.',
+        );
+      },
+    );
+  });
 }

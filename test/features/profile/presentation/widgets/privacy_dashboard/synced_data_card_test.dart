@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/privacy_dashboard/privacy_data_row.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/privacy_dashboard/synced_data_card.dart';
 import 'package:tankstellen/features/profile/providers/privacy_data_provider.dart';
+import 'package:tankstellen/features/sync/providers/baseline_sync_enabled_provider.dart';
 
 import '../../../../../helpers/mock_providers.dart';
 import '../../../../../helpers/pump_app.dart';
@@ -31,14 +31,38 @@ PrivacyDataSnapshot _snapshot({
       estimatedTotalBytes: 1024,
     );
 
+/// Override [baselineSyncEnabledProvider] with a fixed boolean. Used
+/// instead of seeding the legacy [StorageKeys.syncBaselinesEnabled]
+/// Hive key after the #1373 phase 3e migration — the canonical state
+/// now lives in the central feature-flag set.
+Object _baselineSyncOverride(bool value) {
+  return baselineSyncEnabledProvider.overrideWith(() => _FakeBaselineSync(value));
+}
+
+class _FakeBaselineSync extends BaselineSyncEnabled {
+  _FakeBaselineSync(this._value);
+
+  final bool _value;
+
+  @override
+  bool build() => _value;
+
+  @override
+  Future<void> set(bool value) async {
+    state = value;
+  }
+}
+
 void main() {
   group('SyncedDataCard', () {
     testWidgets('header renders cloud icon + bold title', (tester) async {
       final overrides = standardTestOverrides();
+      // Default the toggle to false so the disabled-body branch is
+      // exercised cleanly.
       await pumpApp(
         tester,
         SyncedDataCard(snapshot: _snapshot()),
-        overrides: overrides.overrides,
+        overrides: [...overrides.overrides, _baselineSyncOverride(false)],
       );
 
       expect(find.byIcon(Icons.cloud_outlined), findsOneWidget);
@@ -54,7 +78,7 @@ void main() {
       await pumpApp(
         tester,
         SyncedDataCard(snapshot: _snapshot(syncEnabled: false)),
-        overrides: overrides.overrides,
+        overrides: [...overrides.overrides, _baselineSyncOverride(false)],
       );
 
       // Disabled banner has the cloud_off icon + the disabled copy.
@@ -75,7 +99,9 @@ void main() {
         'enabled snapshot renders sync mode, masked user id, and CTA',
         (tester) async {
       final overrides = standardTestOverrides();
-      // syncBaselinesToggle starts as false (default getSetting → null).
+      // syncBaselinesToggle starts as false (default per manifest).
+      // Stub out generic getSetting calls to keep mocktail happy if the
+      // widget reads any unrelated settings.
       when(() => overrides.mockStorage.getSetting(any()))
           .thenReturn(null);
 
@@ -89,7 +115,7 @@ void main() {
             syncUserId: 'abcd1234-aaaa-bbbb-cccc-deadbeefcafe',
           ),
         ),
-        overrides: overrides.overrides,
+        overrides: [...overrides.overrides, _baselineSyncOverride(false)],
       );
 
       // Two PrivacyDataRows: sync mode + user id.
@@ -121,7 +147,7 @@ void main() {
         SyncedDataCard(
           snapshot: _snapshot(syncEnabled: true),
         ),
-        overrides: overrides.overrides,
+        overrides: [...overrides.overrides, _baselineSyncOverride(false)],
       );
 
       // Two rows still render — but their values fall back to "-".
@@ -130,31 +156,7 @@ void main() {
     });
 
     testWidgets(
-        'baseline-sync toggle reflects stored value (true)',
-        (tester) async {
-      final overrides = standardTestOverrides();
-      when(() => overrides.mockStorage
-              .getSetting(StorageKeys.syncBaselinesEnabled))
-          .thenReturn(true);
-      // Anything else returns null.
-      when(() => overrides.mockStorage.getSetting(
-              any(that: isNot(StorageKeys.syncBaselinesEnabled))))
-          .thenReturn(null);
-
-      await pumpApp(
-        tester,
-        SyncedDataCard(snapshot: _snapshot(syncEnabled: true)),
-        overrides: overrides.overrides,
-      );
-
-      final toggle = tester.widget<SwitchListTile>(
-        find.byKey(const Key('syncBaselinesToggle')),
-      );
-      expect(toggle.value, isTrue);
-    });
-
-    testWidgets(
-        'baseline-sync toggle is OFF when stored value is missing/false',
+        'baseline-sync toggle reflects the central feature-flag value (true)',
         (tester) async {
       final overrides = standardTestOverrides();
       when(() => overrides.mockStorage.getSetting(any()))
@@ -163,7 +165,33 @@ void main() {
       await pumpApp(
         tester,
         SyncedDataCard(snapshot: _snapshot(syncEnabled: true)),
-        overrides: overrides.overrides,
+        overrides: [...overrides.overrides, _baselineSyncOverride(true)],
+      );
+
+      final toggle = tester.widget<SwitchListTile>(
+        find.byKey(const Key('syncBaselinesToggle')),
+      );
+      expect(
+        toggle.value,
+        isTrue,
+        reason:
+            'After #1373 phase 3e the toggle reads from '
+            'baselineSyncEnabledProvider — a true override must surface '
+            'as a checked switch.',
+      );
+    });
+
+    testWidgets(
+        'baseline-sync toggle is OFF when the central feature-flag is false',
+        (tester) async {
+      final overrides = standardTestOverrides();
+      when(() => overrides.mockStorage.getSetting(any()))
+          .thenReturn(null);
+
+      await pumpApp(
+        tester,
+        SyncedDataCard(snapshot: _snapshot(syncEnabled: true)),
+        overrides: [...overrides.overrides, _baselineSyncOverride(false)],
       );
 
       final toggle = tester.widget<SwitchListTile>(
@@ -188,7 +216,7 @@ void main() {
       await pumpApp(
         tester,
         SyncedDataCard(snapshot: _snapshot(syncEnabled: true)),
-        overrides: overrides.overrides,
+        overrides: [...overrides.overrides, _baselineSyncOverride(false)],
       );
 
       expect(

@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../../core/storage/storage_keys.dart';
-import '../../../../../core/storage/storage_providers.dart';
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../sync/providers/baseline_sync_enabled_provider.dart';
 import '../../../providers/privacy_data_provider.dart';
 import 'privacy_data_row.dart';
 
@@ -95,9 +94,7 @@ class _SyncEnabledBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userId = snapshot.syncUserId;
-    final settings = ref.watch(settingsStorageProvider);
-    final baselineSyncOn =
-        settings.getSetting(StorageKeys.syncBaselinesEnabled) == true;
+    final baselineSyncOn = ref.watch(baselineSyncEnabledProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -135,11 +132,7 @@ class _SyncEnabledBody extends ConsumerWidget {
             style: theme.textTheme.bodySmall,
           ),
           onChanged: (v) async {
-            await settings.putSetting(
-              StorageKeys.syncBaselinesEnabled,
-              v,
-            );
-            ref.invalidate(settingsStorageProvider);
+            await ref.read(baselineSyncEnabledProvider.notifier).set(v);
           },
           contentPadding: EdgeInsets.zero,
         ),
