@@ -8,6 +8,7 @@ import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
+import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/features/consumption/data/obd2/broken_map_belief.dart';
 import 'package:tankstellen/features/consumption/data/obd2/broken_map_detector.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
@@ -15,6 +16,8 @@ import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_servi
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd_adapter_blocklist.dart';
+import 'package:tankstellen/features/consumption/data/obd2/oem_pid_table.dart';
 import 'package:tankstellen/features/vehicle/data/vin_adapter_pair_auto_populator.dart';
 import 'package:tankstellen/features/vehicle/data/vin_decoder.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
@@ -305,6 +308,257 @@ void main() {
       expect(outcome.brokenMapBelief, isNull);
     });
   });
+
+  group('persistent blocklist wiring (#1423 phase 4)', () {
+    test(
+        'a blocklist hit (recall confidence > 0.7) short-circuits the probe '
+        'and surfaces a priorObservation belief', () async {
+      const vin = 'VF36B8HZL8R123456';
+      final initResponses = {
+        'ATZ': 'ELM327 v1.5>',
+        'ATE0': 'OK>',
+        'ATL0': 'OK>',
+        'ATH0': 'OK>',
+        'ATSP0': 'OK>',
+        'ATI': 'ELM327 v1.5>',
+      };
+      final transport = FakeObd2Transport({
+        ...initResponses,
+        '0902': buildValidVinResponse(vin),
+      });
+      final service = Obd2Service(transport);
+      final connection = _FakeConnection(connectByMacResult: service);
+
+      final storage = _FakeSettingsStorage()
+        ..data['obdAdapterBroken:ELM327 v1.5'] = 0.85;
+      final blocklist = ObdAdapterBlocklist(storage);
+
+      final populator = VinAdapterPairAutoPopulator(
+        connection: connection,
+        decoder: buildDecoder(online: false),
+        brokenMapDetector: const BrokenMapDetector(),
+        blocklist: blocklist,
+      );
+
+      final outcome = await populator.run(
+        pairedAdapterMac: 'AA:BB',
+        profile: baseProfile(),
+      );
+
+      expect(outcome.brokenMapBelief, isNotNull);
+      expect(outcome.brokenMapBelief!.confidence, closeTo(0.85, 1e-9));
+      expect(outcome.brokenMapBelief!.observationCount, 0,
+          reason:
+              'observationCount=0 signals "hydrated from a prior session" '
+              '— never bumped because no fresh probe ran.');
+      expect(outcome.brokenMapBelief!.lastTrigger,
+          BrokenMapReason.priorObservation);
+
+      // The probe issues 0111 (TPS), 010B (MAP), 0133 (baro). NONE of
+      // these may have been sent — the blocklist hit short-circuited
+      // the detector entirely.
+      final sent = transport.sentCommands;
+      expect(sent.any((c) => c.startsWith('0111')), isFalse,
+          reason: 'TPS probe must not run on blocklist hit');
+      expect(sent.any((c) => c.startsWith('010B')), isFalse,
+          reason: 'MAP probe must not run on blocklist hit');
+      expect(sent.any((c) => c.startsWith('0133')), isFalse,
+          reason: 'baro probe must not run on blocklist hit');
+    });
+
+    test(
+        'a blocklist value at-or-below 0.7 does NOT short-circuit — fresh '
+        'probe runs and overwrites the prior belief', () async {
+      const vin = 'VF36B8HZL8R123456';
+      // Healthy MAP fixture from the existing detector tests — vacuum
+      // delta 71 → score 0 → confidence stays at 0 after one fold.
+      final service = buildConnectedService({
+        '0902': buildValidVinResponse(vin),
+        '0151': '41 51 01>',
+        '0111': '41 11 03>',
+        '010B': '41 0B 1E>', // 0x1E = 30 kPa
+        '0133': '41 33 65>', // 0x65 = 101 kPa
+      });
+      final connection = _FakeConnection(connectByMacResult: service);
+      final storage = _FakeSettingsStorage()
+        ..data['obdAdapterBroken:ELM327 v1.5'] = 0.4;
+      final blocklist = ObdAdapterBlocklist(storage);
+
+      final populator = VinAdapterPairAutoPopulator(
+        connection: connection,
+        decoder: buildDecoder(online: false),
+        brokenMapDetector: const BrokenMapDetector(),
+        blocklist: blocklist,
+      );
+
+      final outcome = await populator.run(
+        pairedAdapterMac: 'AA:BB',
+        profile: baseProfile(),
+      );
+
+      expect(outcome.brokenMapBelief, isNotNull);
+      // Probe ran from a fresh prior — confidence 0 (healthy MAP).
+      expect(outcome.brokenMapBelief!.confidence, closeTo(0.0, 1e-9));
+      expect(outcome.brokenMapBelief!.observationCount, 1);
+      // Below-threshold probe result must NOT touch the blocklist.
+      expect(storage.data['obdAdapterBroken:ELM327 v1.5'], 0.4,
+          reason: 'sub-threshold probe result must not overwrite blocklist');
+    });
+
+    test(
+        'a probe that yields confidence > 0.7 is persisted into the '
+        'blocklist for the connected adapter', () async {
+      const vin = 'VF36B8HZL8R123456';
+      // Broken MAP fixture — vacuum delta 2 kPa → score 1.0 → after
+      // one EMA fold from prior 0.85 → confidence ~0.91 (> threshold).
+      final storage = _FakeSettingsStorage();
+      // Pre-seed a non-blocking entry so the recall doesn't short-
+      // circuit, and verify persistence overwrites cleanly.
+      final blocklist = ObdAdapterBlocklist(storage);
+      // Use an artificially-elevated prior via the detector's own
+      // `prior` parameter wouldn't help here — the populator always
+      // probes from `const BrokenMapBelief()`. To exercise the
+      // > 0.7 persistence branch with a single observation, drive the
+      // probe with an extreme broken-MAP fixture that pushes one-shot
+      // confidence to α (= 0.4)? That's below 0.7. So instead seed
+      // the blocklist below threshold and run the populator twice
+      // — but the populator is single-shot. Easiest path: use the
+      // detector directly with a strong prior to assert the
+      // populator's persistence call site, via a custom detector.
+      //
+      // Workaround: stub the detector to return a high-confidence
+      // belief unconditionally so the populator exercises the
+      // persistence branch. The integration of "real probe → strong
+      // confidence" is covered by the broken_map_detector tests; we
+      // just need to prove the populator wires recordBelief
+      // correctly.
+      final service = buildConnectedService({
+        '0902': buildValidVinResponse(vin),
+        '0151': '41 51 01>',
+      });
+      final connection = _FakeConnection(connectByMacResult: service);
+
+      final populator = VinAdapterPairAutoPopulator(
+        connection: connection,
+        decoder: buildDecoder(online: false),
+        brokenMapDetector: const _StubHighConfidenceDetector(0.92),
+        blocklist: blocklist,
+      );
+
+      final outcome = await populator.run(
+        pairedAdapterMac: 'AA:BB',
+        profile: baseProfile(),
+      );
+
+      expect(outcome.brokenMapBelief, isNotNull);
+      expect(outcome.brokenMapBelief!.confidence, closeTo(0.92, 1e-9));
+      // Persisted into the blocklist under the connected adapter's id.
+      expect(storage.data['obdAdapterBroken:ELM327 v1.5'], 0.92);
+    });
+
+    test(
+        'no blocklist + no detector → outcome.brokenMapBelief is null '
+        '(legacy behaviour preserved)', () async {
+      const vin = 'VF36B8HZL8R123456';
+      final service = buildConnectedService({
+        '0902': buildValidVinResponse(vin),
+      });
+      final connection = _FakeConnection(connectByMacResult: service);
+      final populator = VinAdapterPairAutoPopulator(
+        connection: connection,
+        decoder: buildDecoder(online: false),
+        // Both omitted.
+      );
+
+      final outcome = await populator.run(
+        pairedAdapterMac: 'AA:BB',
+        profile: baseProfile(),
+      );
+
+      expect(outcome.brokenMapBelief, isNull);
+    });
+
+    test(
+        'a blocklist with no entry for this adapter falls through to a '
+        'fresh probe', () async {
+      const vin = 'VF36B8HZL8R123456';
+      final service = buildConnectedService({
+        '0902': buildValidVinResponse(vin),
+        '0151': '41 51 01>',
+        '0111': '41 11 03>',
+        '010B': '41 0B 1E>',
+        '0133': '41 33 65>',
+      });
+      final connection = _FakeConnection(connectByMacResult: service);
+      final storage = _FakeSettingsStorage();
+      final blocklist = ObdAdapterBlocklist(storage);
+
+      final populator = VinAdapterPairAutoPopulator(
+        connection: connection,
+        decoder: buildDecoder(online: false),
+        brokenMapDetector: const BrokenMapDetector(),
+        blocklist: blocklist,
+      );
+
+      final outcome = await populator.run(
+        pairedAdapterMac: 'AA:BB',
+        profile: baseProfile(),
+      );
+
+      expect(outcome.brokenMapBelief, isNotNull);
+      expect(outcome.brokenMapBelief!.observationCount, 1,
+          reason: 'fresh probe ran — observationCount bumped from 0 to 1');
+      // Healthy MAP → no blocklist write.
+      expect(storage.data, isEmpty);
+    });
+  });
+}
+
+/// Detector double for the populator persistence test. The real
+/// detector's probe path is exercised in broken_map_detector_test;
+/// here we just need to assert the populator's wiring of
+/// [ObdAdapterBlocklist.recordBelief]. Returning a fixed high
+/// confidence keeps the test deterministic without recreating the
+/// full broken-MAP fixture in this file.
+class _StubHighConfidenceDetector extends BrokenMapDetector {
+  final double confidence;
+  const _StubHighConfidenceDetector(this.confidence);
+
+  @override
+  Future<BrokenMapBelief> probe(
+    Obd2RawCommandPort port, {
+    required bool isDiesel,
+    required BrokenMapBelief prior,
+    required DateTime now,
+  }) async {
+    return BrokenMapBelief(
+      confidence: confidence,
+      observationCount: 1,
+      lastUpdate: now,
+      lastTrigger: BrokenMapReason.idleVacuumMissing,
+    );
+  }
+}
+
+class _FakeSettingsStorage implements SettingsStorage {
+  final Map<String, dynamic> data = {};
+
+  @override
+  dynamic getSetting(String key) => data[key];
+
+  @override
+  Future<void> putSetting(String key, dynamic value) async {
+    data[key] = value;
+  }
+
+  @override
+  bool get isSetupComplete => false;
+  @override
+  bool get isSetupSkipped => false;
+  @override
+  Future<void> skipSetup() async {}
+  @override
+  Future<void> resetSetupSkip() async {}
 }
 
 class _FakeConnection extends Obd2ConnectionService {

@@ -120,17 +120,13 @@ final class VeLearnerProvider
 
 String _$veLearnerHash() => r'3ee7af1d1504ef129c160480ac732df0494e036f';
 
-/// Detector for the broken-MAP belief system (#1423 phase 3). Phase 4
-/// will swap this empty-prior factory for one that recalls the latest
-/// persisted belief; for phase 3 (logic-only) the detector is a single
+/// Detector for the broken-MAP belief system (#1423 phase 3). Single
 /// stateless instance shared across observations.
 
 @ProviderFor(brokenMapDetector)
 final brokenMapDetectorProvider = BrokenMapDetectorProvider._();
 
-/// Detector for the broken-MAP belief system (#1423 phase 3). Phase 4
-/// will swap this empty-prior factory for one that recalls the latest
-/// persisted belief; for phase 3 (logic-only) the detector is a single
+/// Detector for the broken-MAP belief system (#1423 phase 3). Single
 /// stateless instance shared across observations.
 
 final class BrokenMapDetectorProvider
@@ -141,9 +137,7 @@ final class BrokenMapDetectorProvider
           BrokenMapDetector
         >
     with $Provider<BrokenMapDetector> {
-  /// Detector for the broken-MAP belief system (#1423 phase 3). Phase 4
-  /// will swap this empty-prior factory for one that recalls the latest
-  /// persisted belief; for phase 3 (logic-only) the detector is a single
+  /// Detector for the broken-MAP belief system (#1423 phase 3). Single
   /// stateless instance shared across observations.
   BrokenMapDetectorProvider._()
     : super(
@@ -181,12 +175,78 @@ final class BrokenMapDetectorProvider
 
 String _$brokenMapDetectorHash() => r'401fe3bdd10c78d2b90c351588fea002125d89a2';
 
+/// Persistent per-adapter broken-MAP blocklist (#1423 phase 4). Reads
+/// and writes the latest belief confidence by ELM ID through the
+/// shared [SettingsStorage] (Hive `settings` box). The populator
+/// recalls before each pair attempt so a known-broken adapter
+/// surfaces a warning without re-probing.
+
+@ProviderFor(obdAdapterBlocklist)
+final obdAdapterBlocklistProvider = ObdAdapterBlocklistProvider._();
+
+/// Persistent per-adapter broken-MAP blocklist (#1423 phase 4). Reads
+/// and writes the latest belief confidence by ELM ID through the
+/// shared [SettingsStorage] (Hive `settings` box). The populator
+/// recalls before each pair attempt so a known-broken adapter
+/// surfaces a warning without re-probing.
+
+final class ObdAdapterBlocklistProvider
+    extends
+        $FunctionalProvider<
+          ObdAdapterBlocklist,
+          ObdAdapterBlocklist,
+          ObdAdapterBlocklist
+        >
+    with $Provider<ObdAdapterBlocklist> {
+  /// Persistent per-adapter broken-MAP blocklist (#1423 phase 4). Reads
+  /// and writes the latest belief confidence by ELM ID through the
+  /// shared [SettingsStorage] (Hive `settings` box). The populator
+  /// recalls before each pair attempt so a known-broken adapter
+  /// surfaces a warning without re-probing.
+  ObdAdapterBlocklistProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'obdAdapterBlocklistProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$obdAdapterBlocklistHash();
+
+  @$internal
+  @override
+  $ProviderElement<ObdAdapterBlocklist> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  ObdAdapterBlocklist create(Ref ref) {
+    return obdAdapterBlocklist(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ObdAdapterBlocklist value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ObdAdapterBlocklist>(value),
+    );
+  }
+}
+
+String _$obdAdapterBlocklistHash() =>
+    r'56c0d8086fe53973b194d6ba305a520e91b9783b';
+
 /// Holds the most recent per-vehicle [BrokenMapBelief] (#1423 phase 3).
 ///
-/// In-memory only — phase 4 will replace this with a Hive-backed
-/// per-vehicle store so beliefs survive app restart. Phase 3 keeps the
-/// state Riverpod-scoped so widget tests can inspect / seed prior
-/// beliefs without touching storage.
+/// Hive-backed via [SettingsStorage] (#1423 phase 4) — beliefs survive
+/// app restart. Lazy-loaded on first [beliefFor] call per vehicle;
+/// [set] writes back to settings fire-and-forget. Errors are logged
+/// via [errorLogger] but never propagate (a storage hiccup must not
+/// break the fill-up save flow that triggered the update).
 ///
 /// Keyed by `vehicleId`. Beliefs default to [BrokenMapBelief()] when
 /// the vehicle hasn't been observed yet.
@@ -196,10 +256,11 @@ final brokenMapBeliefByVehicleProvider = BrokenMapBeliefByVehicleProvider._();
 
 /// Holds the most recent per-vehicle [BrokenMapBelief] (#1423 phase 3).
 ///
-/// In-memory only — phase 4 will replace this with a Hive-backed
-/// per-vehicle store so beliefs survive app restart. Phase 3 keeps the
-/// state Riverpod-scoped so widget tests can inspect / seed prior
-/// beliefs without touching storage.
+/// Hive-backed via [SettingsStorage] (#1423 phase 4) — beliefs survive
+/// app restart. Lazy-loaded on first [beliefFor] call per vehicle;
+/// [set] writes back to settings fire-and-forget. Errors are logged
+/// via [errorLogger] but never propagate (a storage hiccup must not
+/// break the fill-up save flow that triggered the update).
 ///
 /// Keyed by `vehicleId`. Beliefs default to [BrokenMapBelief()] when
 /// the vehicle hasn't been observed yet.
@@ -211,10 +272,11 @@ final class BrokenMapBeliefByVehicleProvider
         > {
   /// Holds the most recent per-vehicle [BrokenMapBelief] (#1423 phase 3).
   ///
-  /// In-memory only — phase 4 will replace this with a Hive-backed
-  /// per-vehicle store so beliefs survive app restart. Phase 3 keeps the
-  /// state Riverpod-scoped so widget tests can inspect / seed prior
-  /// beliefs without touching storage.
+  /// Hive-backed via [SettingsStorage] (#1423 phase 4) — beliefs survive
+  /// app restart. Lazy-loaded on first [beliefFor] call per vehicle;
+  /// [set] writes back to settings fire-and-forget. Errors are logged
+  /// via [errorLogger] but never propagate (a storage hiccup must not
+  /// break the fill-up save flow that triggered the update).
   ///
   /// Keyed by `vehicleId`. Beliefs default to [BrokenMapBelief()] when
   /// the vehicle hasn't been observed yet.
@@ -246,14 +308,15 @@ final class BrokenMapBeliefByVehicleProvider
 }
 
 String _$brokenMapBeliefByVehicleHash() =>
-    r'd1f5bdc514ec49d5b419f659ef7c2e4baccb8d7a';
+    r'aff722180306e0f98424bbdcdbe47b0f46c68be5';
 
 /// Holds the most recent per-vehicle [BrokenMapBelief] (#1423 phase 3).
 ///
-/// In-memory only — phase 4 will replace this with a Hive-backed
-/// per-vehicle store so beliefs survive app restart. Phase 3 keeps the
-/// state Riverpod-scoped so widget tests can inspect / seed prior
-/// beliefs without touching storage.
+/// Hive-backed via [SettingsStorage] (#1423 phase 4) — beliefs survive
+/// app restart. Lazy-loaded on first [beliefFor] call per vehicle;
+/// [set] writes back to settings fire-and-forget. Errors are logged
+/// via [errorLogger] but never propagate (a storage hiccup must not
+/// break the fill-up save flow that triggered the update).
 ///
 /// Keyed by `vehicleId`. Beliefs default to [BrokenMapBelief()] when
 /// the vehicle hasn't been observed yet.
@@ -404,7 +467,7 @@ final class FillUpListProvider
   }
 }
 
-String _$fillUpListHash() => r'ca9867e29fd5ba03e407a2fb44bda82a6c66687d';
+String _$fillUpListHash() => r'747131c8306e9ae42c11e49c6d6093d0d490251a';
 
 /// Mutable list of all fill-ups, newest first.
 
