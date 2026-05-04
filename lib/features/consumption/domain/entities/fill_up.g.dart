@@ -24,6 +24,8 @@ _FillUp _$FillUpFromJson(Map<String, dynamic> json) => _FillUp(
       const <String>[],
   isFullTank: json['isFullTank'] as bool? ?? true,
   isCorrection: json['isCorrection'] as bool? ?? false,
+  fuelLevelBeforeL: (json['fuelLevelBeforeL'] as num?)?.toDouble(),
+  fuelLevelAfterL: (json['fuelLevelAfterL'] as num?)?.toDouble(),
 );
 
 Map<String, dynamic> _$FillUpToJson(_FillUp instance) => <String, dynamic>{
@@ -40,4 +42,6 @@ Map<String, dynamic> _$FillUpToJson(_FillUp instance) => <String, dynamic>{
   'linkedTripIds': instance.linkedTripIds,
   'isFullTank': instance.isFullTank,
   'isCorrection': instance.isCorrection,
+  'fuelLevelBeforeL': instance.fuelLevelBeforeL,
+  'fuelLevelAfterL': instance.fuelLevelAfterL,
 };
