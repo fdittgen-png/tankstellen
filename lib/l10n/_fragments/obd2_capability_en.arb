@@ -1,0 +1,22 @@
+{
+  "obd2CapabilitySectionTitle": "Adapter capabilities",
+  "@obd2CapabilitySectionTitle": {
+    "description": "Title of the card on the vehicle settings screen that surfaces the connected OBD2 adapter's runtime capability tier (#1401 phase 6)."
+  },
+  "obd2CapabilityStandardOnly": "Standard",
+  "@obd2CapabilityStandardOnly": {
+    "description": "Tier label for adapters that only support the OBD-II standard mode 01-09 PIDs — cheap clones / ELM327 v1.x (#1401 phase 6)."
+  },
+  "obd2CapabilityOemPids": "OEM PIDs",
+  "@obd2CapabilityOemPids": {
+    "description": "Tier label for adapters that can read manufacturer-specific PIDs via header switching — genuine ELM327 v2.2+ (#1401 phase 6)."
+  },
+  "obd2CapabilityFullCan": "Full CAN",
+  "@obd2CapabilityFullCan": {
+    "description": "Tier label for adapters that support listen-mode CAN bus access — STN-chip family, OBDLink MX+/LX/CX/EX (#1401 phase 6)."
+  },
+  "obd2CapabilityUpgradeHintStandard": "For exact litres-in-tank on Peugeot/Citroën, the app supports OBDLink MX+/LX/CX (STN chip).",
+  "@obd2CapabilityUpgradeHintStandard": {
+    "description": "Informational one-liner shown only when the connected adapter is on the standardOnly tier (#1401 phase 6). Points users at the OBDLink STN-chip family without an affiliate link or purchase button."
+  }
+}

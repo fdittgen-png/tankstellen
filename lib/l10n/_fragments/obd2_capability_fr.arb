@@ -1,0 +1,7 @@
+{
+  "obd2CapabilitySectionTitle": "Capacités de l'adaptateur",
+  "obd2CapabilityStandardOnly": "Standard",
+  "obd2CapabilityOemPids": "PID constructeur",
+  "obd2CapabilityFullCan": "Accès CAN complet",
+  "obd2CapabilityUpgradeHintStandard": "Pour un volume exact de carburant en litres sur Peugeot/Citroën, l'application prend en charge OBDLink MX+/LX/CX (puce STN)."
+}

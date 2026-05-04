@@ -1,0 +1,7 @@
+{
+  "obd2CapabilitySectionTitle": "Adapter-Fähigkeiten",
+  "obd2CapabilityStandardOnly": "Standard",
+  "obd2CapabilityOemPids": "OEM-PIDs",
+  "obd2CapabilityFullCan": "Voller CAN-Zugriff",
+  "obd2CapabilityUpgradeHintStandard": "Für exakte Tankfüllung in Litern bei Peugeot/Citroën unterstützt die App OBDLink MX+/LX/CX (STN-Chip)."
+}

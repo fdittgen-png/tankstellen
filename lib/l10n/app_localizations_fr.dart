@@ -3958,6 +3958,22 @@ class AppLocalizationsFr extends AppLocalizations {
       'Au moins 3 trajets par mois sont nécessaires pour la comparaison';
 
   @override
+  String get obd2CapabilitySectionTitle => 'Capacités de l\'adaptateur';
+
+  @override
+  String get obd2CapabilityStandardOnly => 'Standard';
+
+  @override
+  String get obd2CapabilityOemPids => 'PID constructeur';
+
+  @override
+  String get obd2CapabilityFullCan => 'Accès CAN complet';
+
+  @override
+  String get obd2CapabilityUpgradeHintStandard =>
+      'Pour un volume exact de carburant en litres sur Peugeot/Citroën, l\'application prend en charge OBDLink MX+/LX/CX (puce STN).';
+
+  @override
   String get obd2DebugOverlayEnabledSnack =>
       'Superposition de diagnostic OBD2 activée';
 

@@ -3957,6 +3957,22 @@ class AppLocalizationsDe extends AppLocalizations {
       'Mindestens 3 Fahrten pro Monat für den Vergleich nötig';
 
   @override
+  String get obd2CapabilitySectionTitle => 'Adapter-Fähigkeiten';
+
+  @override
+  String get obd2CapabilityStandardOnly => 'Standard';
+
+  @override
+  String get obd2CapabilityOemPids => 'OEM-PIDs';
+
+  @override
+  String get obd2CapabilityFullCan => 'Voller CAN-Zugriff';
+
+  @override
+  String get obd2CapabilityUpgradeHintStandard =>
+      'Für exakte Tankfüllung in Litern bei Peugeot/Citroën unterstützt die App OBDLink MX+/LX/CX (STN-Chip).';
+
+  @override
   String get obd2DebugOverlayEnabledSnack => 'OBD2-Diagnose-Overlay aktiviert';
 
   @override

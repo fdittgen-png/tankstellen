@@ -63,7 +63,7 @@ final class Obd2ConnectionStatusProvider
 }
 
 String _$obd2ConnectionStatusHash() =>
-    r'd2bbb5adc70687b3a989fabd094394d0205a4d12';
+    r'ab14da187622ea41fad1dbb4a80bd1bbe85e9082';
 
 /// App-wide owner of the OBD2 connection status (#784).
 ///
