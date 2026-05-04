@@ -125,7 +125,17 @@ void main() {
         container.read(featureFlagsProvider),
         isNot(contains(Feature.tankSync)),
       );
-      await tester.tap(find.byKey(const Key('featureToggle_tankSync')));
+      // Post-#1440 the section renders grouped cards which can push
+      // the tankSync row below the 800x600 default surface. Scroll it
+      // into view before tapping so the hit test lands on the switch.
+      final tankSyncFinder = find.byKey(const Key('featureToggle_tankSync'));
+      await tester.scrollUntilVisible(
+        tankSyncFinder,
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(tankSyncFinder);
       // Pump the synchronous state update + the in-flight Future. We
       // don't pumpAndSettle because the section has no animations.
       await tester.pump();
