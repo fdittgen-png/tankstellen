@@ -5,6 +5,21 @@
   "obd2CapabilityOemPids": "PID constructeur",
   "obd2CapabilityFullCan": "Accès CAN complet",
   "obd2CapabilityUpgradeHintStandard": "Pour un volume exact de carburant en litres sur Peugeot/Citroën, l'application prend en charge OBDLink MX+/LX/CX (puce STN).",
+  "fillUpReconciliationVerifiedBadgeLabel": "Vérifié par l'adaptateur",
+  "fillUpReconciliationVarianceDialogTitle": "Ne correspond pas à l'adaptateur",
+  "fillUpReconciliationVarianceDialogBody": "Votre saisie : {userL} L. L'adaptateur indique : {adapterL} L (différence entre les niveaux de carburant avant et après). Utiliser la valeur de l'adaptateur ?",
+  "@fillUpReconciliationVarianceDialogBody": {
+    "placeholders": {
+      "userL": {
+        "type": "String"
+      },
+      "adapterL": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpReconciliationVarianceDialogKeepMine": "Garder ma saisie",
+  "fillUpReconciliationVarianceDialogUseAdapter": "Utiliser la valeur de l'adaptateur",
   "exportBackupTooltip": "Exporter la sauvegarde",
   "exportBackupReady": "Sauvegarde prête — choisissez une destination",
   "exportBackupFailed": "Échec de l'exportation — veuillez réessayer",

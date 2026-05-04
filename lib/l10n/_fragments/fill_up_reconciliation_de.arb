@@ -1,0 +1,17 @@
+{
+  "fillUpReconciliationVerifiedBadgeLabel": "Vom Adapter bestätigt",
+  "fillUpReconciliationVarianceDialogTitle": "Stimmt nicht mit Adapter überein",
+  "fillUpReconciliationVarianceDialogBody": "Deine Eingabe: {userL} L. Adapter meldet: {adapterL} L (Differenz aus Tankstand vor/nach dem Tanken). Adapterwert übernehmen?",
+  "@fillUpReconciliationVarianceDialogBody": {
+    "placeholders": {
+      "userL": {
+        "type": "String"
+      },
+      "adapterL": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpReconciliationVarianceDialogKeepMine": "Meine Eingabe behalten",
+  "fillUpReconciliationVarianceDialogUseAdapter": "Adapterwert übernehmen"
+}

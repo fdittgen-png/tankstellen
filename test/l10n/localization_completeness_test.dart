@@ -187,6 +187,22 @@ void main() {
               'the adapter-capability card on the Edit vehicle screen '
               'must not fall back to English for French users (#1401 '
               'phase 6)');
+
+      // #1401 phase 7b — the verified-by-adapter badge sits on every
+      // fill-up card and the variance dialog fires inside the Add
+      // fill-up flow, both reachable for French users. Every
+      // `fillUpReconciliation*` key must have a French translation
+      // so the chip label and confirmation prompt don't fall back to
+      // English on the Fuel tab.
+      final frenchMissingFillUpReconciliation = frenchMissing
+          .where((k) => k.startsWith('fillUpReconciliation'))
+          .toList()
+        ..sort();
+      expect(frenchMissingFillUpReconciliation, isEmpty,
+          reason: 'French (fr) must have every fillUpReconciliation* '
+              'key — the verified-by-adapter badge and variance prompt '
+              'on the fill-up flow must not fall back to English for '
+              'French users (#1401 phase 7b)');
     });
 
     test('no locale has extra keys not in app_en.arb', () {

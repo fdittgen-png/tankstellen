@@ -6788,6 +6788,36 @@ abstract class AppLocalizations {
   /// **'Personal Access Token'**
   String get feedbackTokenFieldLabel;
 
+  /// Chip label rendered on a fill-up card when both fuelLevelBeforeL and fuelLevelAfterL were captured by the OBD2 adapter, signalling the pumped litres match the car's own tank-level sensor delta (#1401 phase 7b).
+  ///
+  /// In en, this message translates to:
+  /// **'Verified by adapter'**
+  String get fillUpReconciliationVerifiedBadgeLabel;
+
+  /// Title of the confirmation dialog shown on save when the user-entered litres differ from the adapter-derived tank delta by more than 5 percent (#1401 phase 7b).
+  ///
+  /// In en, this message translates to:
+  /// **'Doesn\'t match adapter reading'**
+  String get fillUpReconciliationVarianceDialogTitle;
+
+  /// Body of the variance confirmation dialog. Shows both numeric values pre-formatted by the caller so the dialog stays locale-agnostic (#1401 phase 7b).
+  ///
+  /// In en, this message translates to:
+  /// **'Your entry: {userL} L. Adapter says: {adapterL} L (delta from before/after fuel-level capture). Use adapter value?'**
+  String fillUpReconciliationVarianceDialogBody(String userL, String adapterL);
+
+  /// Button on the variance dialog that closes the prompt and proceeds to save the fill-up with the user-entered litres value (#1401 phase 7b).
+  ///
+  /// In en, this message translates to:
+  /// **'Keep my entry'**
+  String get fillUpReconciliationVarianceDialogKeepMine;
+
+  /// Button on the variance dialog that closes the prompt and replaces the user-entered litres with the adapter-derived tank delta before saving (#1401 phase 7b).
+  ///
+  /// In en, this message translates to:
+  /// **'Use adapter value'**
+  String get fillUpReconciliationVarianceDialogUseAdapter;
+
   /// Snackbar shown on the Add-Fill-Up screen when the receipt scan returns no usable fields (#751).
   ///
   /// In en, this message translates to:
