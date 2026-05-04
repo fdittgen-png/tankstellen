@@ -15,6 +15,9 @@ import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../sync/providers/baseline_sync_enabled_provider.dart';
+import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
+import '../../vehicle/data/vehicle_profile_catalog_matcher.dart';
+import '../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/baseline_store.dart';
@@ -279,9 +282,17 @@ class TripRecording extends _$TripRecording {
     // fresh suspicion-rate denominator for THIS recording.
     breadcrumbs.clear();
     service.breadcrumbCollector = breadcrumbs;
+    // #1422 phase 1 — match the active vehicle to the bundled catalog
+    // so the controller can fall through to the engine-tech-derived
+    // η_v default (e.g. 0.95 for a Dacia dCi VNT diesel) instead of
+    // the legacy 0.85 catalog literal until VeLearner converges. Null
+    // on a no-vehicle / no-catalog / no-match path; the controller then
+    // falls back to the stored profile value as before.
+    final matchedReference = _tryMatchReferenceVehicle(activeVehicle);
     final ctl = TripRecordingController(
       service: service,
       vehicle: activeVehicle,
+      referenceVehicle: matchedReference,
       vehicleId: eagerVehicleId,
       pinnedAdapterMac: pinnedMac,
       automatic: automatic,
@@ -430,6 +441,27 @@ class TripRecording extends _$TripRecording {
       return ref.read(activeVehicleProfileProvider);
     } catch (e, st) {
       debugPrint('TripRecording: active vehicle unavailable: $e\n$st');
+      return null;
+    }
+  }
+
+  /// Resolve the catalog row for [profile], returning null when the
+  /// catalog hasn't loaded yet, the profile is null, or no tier of
+  /// [VehicleProfileCatalogMatcher.bestMatch] hits (#1422 phase 1).
+  /// Swallows provider-wiring errors the same way [_tryReadActiveVehicle]
+  /// does so widget tests don't have to override the catalog graph just
+  /// to start a recording.
+  ReferenceVehicle? _tryMatchReferenceVehicle(VehicleProfile? profile) {
+    if (profile == null) return null;
+    try {
+      final catalog = ref.read(referenceVehicleCatalogProvider).value;
+      if (catalog == null || catalog.isEmpty) return null;
+      return VehicleProfileCatalogMatcher.bestMatch(
+        profile: profile,
+        catalog: catalog,
+      );
+    } catch (e, st) {
+      debugPrint('TripRecording: reference catalog unavailable: $e\n$st');
       return null;
     }
   }

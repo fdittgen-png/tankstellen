@@ -829,7 +829,8 @@ void main() {
     );
 
     // VW Golf VIII — 1498 cc, vwUds. The VW odometer command is
-    // 222203 returning a 3-byte km value.
+    // 222203 returning a 3-byte km value. 1.5 TSI turbo DI engine —
+    // #1422 phase 1 helper derives 0.93 for this combo.
     const vwGolf = ReferenceVehicle(
       make: 'Volkswagen',
       model: 'Golf',
@@ -840,6 +841,8 @@ void main() {
       transmission: 'automatic',
       volumetricEfficiency: 0.87,
       odometerPidStrategy: 'vwUds',
+      inductionType: InductionType.turbocharged,
+      directInjection: true,
     );
 
     // Fictional vehicle the catalog does not cover. Phase 2 callers
@@ -929,7 +932,15 @@ void main() {
 
     test(
         'readFuelRateLPerHour with VW Golf ReferenceVehicle uses 1498 cc + '
-        '0.87 VE (catalog values, not 1000 cc / 0.85 default)', () async {
+        '0.93 VE (turbo+DI engine-tech default, not 1000 cc / 0.85 default)',
+        () async {
+      // #1422 phase 1 — when no VehicleProfile is supplied the chain
+      // now consults `defaultVolumetricEfficiency(referenceVehicle)`
+      // instead of the catalog `volumetricEfficiency` literal. The VW
+      // Golf VIII 1.5 TSI is turbocharged + direct-injected, so the
+      // helper returns 0.93 (not the literal 0.87 the catalog ships).
+      // A turbo+DI engine that runs at 0.85 is the bug #1422 was filed
+      // to fix; the regression test below pins the new behaviour.
       final transport = FakeObd2Transport({
         ..._initResponses,
         '015E': 'NO DATA>',
@@ -951,13 +962,13 @@ void main() {
         iatCelsius: 30,
         rpm: 2500,
         engineDisplacementCc: 1498,
-        volumetricEfficiency: 0.87,
+        volumetricEfficiency: 0.93,
       );
       expect(rate, isNotNull);
       expect(expected, isNotNull);
       expect(rate, closeTo(expected!, 1e-3));
 
-      // Sanity: 1498 cc / 0.87 VE must produce a clearly different
+      // Sanity: 1498 cc / 0.93 VE must produce a clearly different
       // rate from the 1000 cc / 0.85 generic default.
       final defaultRate = Obd2Service.estimateFuelRateLPerHourFromMap(
         mapKpa: 65,

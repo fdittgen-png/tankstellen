@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 import '../../../../core/storage/hive_boxes.dart';
+import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../domain/services/gear_inference.dart';
 import '../../domain/trip_recorder.dart';
@@ -150,6 +151,14 @@ class TripRecordingController {
   /// null, `readFuelRateLPerHour` falls back to its generic 1.0 L /
   /// η_v 0.85 defaults — still honest, just less precise.
   final VehicleProfile? _vehicle;
+
+  /// Reference catalog row matched to [_vehicle] at construction
+  /// (#1422 phase 1). Drives the engine-tech-derived η_v default so a
+  /// fresh Dacia dCi profile resolves 0.95 instead of the legacy 0.85
+  /// catalog literal until VeLearner converges. Null when the active
+  /// vehicle has no catalog match (custom EV, niche import, etc.) — the
+  /// controller falls back to the stored profile value.
+  final ReferenceVehicle? _referenceVehicle;
 
   /// Vehicle id tagged on paused snapshots + trip-history finalisations
   /// (#797 phase 1). The controller itself doesn't know about the
@@ -366,6 +375,7 @@ class TripRecordingController {
     Duration pollInterval = const Duration(milliseconds: 250),
     DateTime Function()? now,
     VehicleProfile? vehicle,
+    ReferenceVehicle? referenceVehicle,
     String? vehicleId,
     PidScheduler? scheduler,
     PausedTripRepository? pausedRepo,
@@ -387,6 +397,7 @@ class TripRecordingController {
         _pollInterval = pollInterval,
         _now = now ?? DateTime.now,
         _vehicle = vehicle,
+        _referenceVehicle = referenceVehicle,
         _vehicleId = vehicleId,
         _schedulerOverride = scheduler,
         _pausedRepoOverride = pausedRepo,
@@ -1275,9 +1286,17 @@ class TripRecordingController {
             ?.round() ??
         _vehicle?.engineDisplacementCc ??
         1000;
+    // #1422 phase 1 — same precedence as Obd2Service.readFuelRateLPerHour:
+    // manual override → stored profile (when learned or non-default) →
+    // engine-tech helper on the reference catalog row → hard 0.85
+    // fallback. The two paths must agree so the live integrator and
+    // the pull-mode estimator produce identical numbers for the same
+    // tick.
     final ve = _vehicle?.manualVolumetricEfficiencyOverride ??
-        _vehicle?.volumetricEfficiency ??
-        0.85;
+        _resolveControllerProfileVe() ??
+        (_referenceVehicle != null
+            ? defaultVolumetricEfficiency(_referenceVehicle)
+            : 0.85);
     final collector = _breadcrumbCollector;
 
     // Step 1: direct PID 5E. Already post-trim, no correction.
@@ -1398,6 +1417,29 @@ class TripRecordingController {
       volumetricEfficiency: ve,
     );
     return corrected;
+  }
+
+  /// Returns the user profile's η_v that should beat the engine-tech
+  /// helper, or null when the helper should kick in instead (#1422
+  /// phase 1). Mirrors the rules in [_resolveProfileVolumetricEfficiency]
+  /// in `obd2_service.dart` so both the live integrator and the
+  /// pull-mode estimator agree on a per-tick basis.
+  ///
+  /// Profile null → null (caller will use the helper or hard fallback).
+  /// Without a reference catalog row the stored profile value is the
+  /// best we can do, even if it equals the legacy 0.85 default.
+  /// Otherwise: keep the stored value when the VeLearner has logged at
+  /// least one sample OR when the value differs from the legacy 0.85
+  /// default. A cold-start profile sitting on 0.85 with zero samples
+  /// returns null, letting the engine-tech helper provide a closer
+  /// initial guess (e.g. 0.95 for a Dacia dCi VNT diesel).
+  double? _resolveControllerProfileVe() {
+    final v = _vehicle;
+    if (v == null) return null;
+    if (_referenceVehicle == null) return v.volumetricEfficiency;
+    if (v.volumetricEfficiencySamples > 0) return v.volumetricEfficiency;
+    if (v.volumetricEfficiency != 0.85) return v.volumetricEfficiency;
+    return null;
   }
 
   /// Apply the STFT + LTFT correction used on the MAF / speed-density

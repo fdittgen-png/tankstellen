@@ -19,6 +19,11 @@ _ReferenceVehicle _$ReferenceVehicleFromJson(Map<String, dynamic> json) =>
       volumetricEfficiency:
           (json['volumetricEfficiency'] as num?)?.toDouble() ?? 0.85,
       odometerPidStrategy: json['odometerPidStrategy'] as String? ?? 'stdA6',
+      inductionType:
+          $enumDecodeNullable(_$InductionTypeEnumMap, json['inductionType']) ??
+          InductionType.naturallyAspirated,
+      directInjection: json['directInjection'] as bool? ?? false,
+      atkinsonCycle: json['atkinsonCycle'] as bool? ?? false,
       notes: json['notes'] as String?,
     );
 
@@ -34,5 +39,15 @@ Map<String, dynamic> _$ReferenceVehicleToJson(_ReferenceVehicle instance) =>
       'transmission': instance.transmission,
       'volumetricEfficiency': instance.volumetricEfficiency,
       'odometerPidStrategy': instance.odometerPidStrategy,
+      'inductionType': _$InductionTypeEnumMap[instance.inductionType]!,
+      'directInjection': instance.directInjection,
+      'atkinsonCycle': instance.atkinsonCycle,
       'notes': instance.notes,
     };
+
+const _$InductionTypeEnumMap = {
+  InductionType.naturallyAspirated: 'naturallyAspirated',
+  InductionType.turbocharged: 'turbocharged',
+  InductionType.supercharged: 'supercharged',
+  InductionType.vnt: 'vnt',
+};
