@@ -3686,46 +3686,16 @@ class AppLocalizationsFr extends AppLocalizations {
       'Activez d\'abord l\'enregistrement OBD2 des trajets';
 
   @override
-  String featureBlockedDisable_autoRecord(String dependents) {
-    return 'Désactivez d\'abord les fonctionnalités dépendantes : $dependents';
-  }
-
-  @override
   String get featureBlockedEnable_showFuel =>
       'Conditions préalables non remplies';
-
-  @override
-  String featureBlockedDisable_showFuel(String dependents) {
-    return 'Désactivez d\'abord les fonctionnalités dépendantes : $dependents';
-  }
 
   @override
   String get featureBlockedEnable_showElectric =>
       'Conditions préalables non remplies';
 
   @override
-  String featureBlockedDisable_showElectric(String dependents) {
-    return 'Désactivez d\'abord les fonctionnalités dépendantes : $dependents';
-  }
-
-  @override
   String get featureBlockedEnable_showConsumptionTab =>
       'Activez d\'abord l\'enregistrement OBD2 des trajets';
-
-  @override
-  String featureBlockedDisable_showConsumptionTab(String dependents) {
-    return 'Désactivez d\'abord les fonctionnalités dépendantes : $dependents';
-  }
-
-  @override
-  String featureBlockedDisable_obd2TripRecording(String dependents) {
-    return 'Désactivez d\'abord les fonctionnalités dépendantes : $dependents';
-  }
-
-  @override
-  String featureBlockedDisable_tankSync(String dependents) {
-    return 'Désactivez d\'abord les fonctionnalités dépendantes : $dependents';
-  }
 
   @override
   String get feedbackConsentTitle => 'Envoyer le rapport à GitHub ?';

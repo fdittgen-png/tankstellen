@@ -171,76 +171,16 @@
   "@featureBlockedEnable_autoRecord": {
     "description": "Tooltip shown on the disabled master auto-record toggle when its prerequisite (OBD2 trip recording) is off."
   },
-  "featureBlockedDisable_autoRecord": "Disable dependent features first: {dependents}",
-  "@featureBlockedDisable_autoRecord": {
-    "description": "Tooltip shown on the disabled master auto-record toggle when one or more dependent features are still enabled.",
-    "placeholders": {
-      "dependents": {
-        "type": "String",
-        "example": "Some dependent feature"
-      }
-    }
-  },
   "featureBlockedEnable_showFuel": "Prerequisites not met",
   "@featureBlockedEnable_showFuel": {
     "description": "Tooltip shown on the disabled show-fuel-stations toggle. The feature has no prerequisites today so this string is a defensive fallback for the dependency-graph helpers."
-  },
-  "featureBlockedDisable_showFuel": "Disable dependent features first: {dependents}",
-  "@featureBlockedDisable_showFuel": {
-    "description": "Tooltip shown on the disabled show-fuel-stations toggle when one or more dependent features are still enabled. Defensive fallback — nothing in the manifest currently depends on showFuel.",
-    "placeholders": {
-      "dependents": {
-        "type": "String",
-        "example": "Some dependent feature"
-      }
-    }
   },
   "featureBlockedEnable_showElectric": "Prerequisites not met",
   "@featureBlockedEnable_showElectric": {
     "description": "Tooltip shown on the disabled show-EV-charging-stations toggle. The feature has no prerequisites today so this string is a defensive fallback for the dependency-graph helpers."
   },
-  "featureBlockedDisable_showElectric": "Disable dependent features first: {dependents}",
-  "@featureBlockedDisable_showElectric": {
-    "description": "Tooltip shown on the disabled show-EV-charging-stations toggle when one or more dependent features are still enabled. Defensive fallback — nothing in the manifest currently depends on showElectric.",
-    "placeholders": {
-      "dependents": {
-        "type": "String",
-        "example": "Some dependent feature"
-      }
-    }
-  },
   "featureBlockedEnable_showConsumptionTab": "Enable OBD2 trip recording first",
   "@featureBlockedEnable_showConsumptionTab": {
     "description": "Tooltip shown on the disabled consumption-tab toggle when its prerequisite (OBD2 trip recording) is off."
-  },
-  "featureBlockedDisable_showConsumptionTab": "Disable dependent features first: {dependents}",
-  "@featureBlockedDisable_showConsumptionTab": {
-    "description": "Tooltip shown on the disabled consumption-tab toggle when one or more dependent features are still enabled. Defensive fallback — nothing currently depends on showConsumptionTab.",
-    "placeholders": {
-      "dependents": {
-        "type": "String",
-        "example": "Some dependent feature"
-      }
-    }
-  },
-  "featureBlockedDisable_obd2TripRecording": "Disable dependent features first: {dependents}",
-  "@featureBlockedDisable_obd2TripRecording": {
-    "description": "Tooltip shown on the disabled OBD2 trip recording toggle when one or more dependent features are still enabled. The placeholder is filled with a comma-separated list of localised feature names.",
-    "placeholders": {
-      "dependents": {
-        "type": "String",
-        "example": "Gamification, Haptic eco-coach"
-      }
-    }
-  },
-  "featureBlockedDisable_tankSync": "Disable dependent features first: {dependents}",
-  "@featureBlockedDisable_tankSync": {
-    "description": "Tooltip shown on the disabled TankSync toggle when one or more dependent features are still enabled.",
-    "placeholders": {
-      "dependents": {
-        "type": "String",
-        "example": "Baseline sync"
-      }
-    }
   }
 }
