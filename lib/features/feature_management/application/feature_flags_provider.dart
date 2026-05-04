@@ -80,25 +80,26 @@ class FeatureFlags extends _$FeatureFlags {
     state = next;
   }
 
-  /// Disables [feature], throwing [StateError] when one or more enabled
-  /// features depend on it. The error message names the dependents so
-  /// the Phase 2 UI can prompt the user to disable them first.
+  /// Disables [feature]. Always succeeds — children that `requires` this
+  /// feature stay in the stored set (their preferences are preserved) but
+  /// become **effectively** disabled via [isEffectivelyEnabled], so every
+  /// UI surface that gates on the helper hides them without prompting the
+  /// user (#1447).
+  ///
+  /// Re-enabling [feature] later restores those children to their previous
+  /// user-visible state, no manual re-toggling required.
   Future<void> disable(Feature feature) async {
-    final manifest = ref.read(featureManifestProvider);
     if (!state.contains(feature)) return;
-    final blockers = blockingDisable(feature, manifest, state);
-    if (blockers.isNotEmpty) {
-      final names = blockers.map((f) => f.name).join(', ');
-      throw StateError(
-        'Cannot disable ${feature.name}: $names depend on it',
-      );
-    }
     final next = {...state}..remove(feature);
     await _persist(next);
     state = next;
   }
 
-  /// True when [feature] is currently enabled.
+  /// True when [feature] is currently in the stored enabled set. Does NOT
+  /// walk the dependency chain — when the manifest declares prerequisites
+  /// for [feature] and the caller wants the user-visible "is this surface
+  /// reachable right now" answer, use the pure helper
+  /// `isEffectivelyEnabled` from `feature_dependency_graph.dart` (#1447).
   bool isEnabled(Feature feature) => state.contains(feature);
 
   Future<void> _persist(Set<Feature> next) async {

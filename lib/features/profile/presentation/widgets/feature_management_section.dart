@@ -10,7 +10,7 @@ import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../../../feature_management/domain/feature_manifest.dart';
 
 /// Settings-screen section that exposes every [Feature] as a toggle
-/// (#1373 phase 2; #1440 grouping).
+/// (#1373 phase 2; #1440 grouping; #1447 cascading-disable).
 ///
 /// Renders one [SwitchListTile] per entry in [featureManifestProvider],
 /// VISUALLY GROUPED so dependent features sit indented under the parent
@@ -18,20 +18,16 @@ import '../../../feature_management/domain/feature_manifest.dart';
 /// row at full width followed by indented dependent rows separated by a
 /// subtle divider.
 ///
-/// The dependency graph is consulted BEFORE attempting a transition so
-/// the provider's `StateError` never reaches the UI:
-/// - When a disabled feature's prerequisites are missing the switch is
-///   disabled and wrapped in a [Tooltip] naming the missing prerequisite
-///   via `featureBlockedEnable_<feature.name>`. A single tap on the
-///   disabled row also surfaces the same message via [SnackBar] (#1440).
-/// - When an enabled feature has dependents that are still on, the
-///   switch is disabled and the tooltip lists the dependents using the
-///   `featureBlockedDisable_<feature.name>` template.
+/// Cascading-disable model (#1447): disabling a parent always succeeds.
+/// Children stay in the stored set so re-enabling the parent restores the
+/// user's previous setup, but they render as disabled-with-tooltip while
+/// any ancestor is off — the tooltip names the missing prerequisite via
+/// `featureBlockedEnable_<feature.name>`. A single tap on a blocked row
+/// also surfaces the same message via [SnackBar] (#1440).
 ///
-/// Phase 1 of #1373 shipped the engine in PARALLEL with the existing
-/// scattered toggles — this section therefore does NOT yet replace
-/// `autoRecord` / `gamificationEnabled` / etc. Phase 3 migrated them
-/// one PR at a time.
+/// Enabling a child still requires its parent to be on; that path
+/// surfaces the same blocked-enable tooltip when the user taps a disabled
+/// child whose stored value is `false`.
 class FeatureManagementSection extends ConsumerWidget {
   const FeatureManagementSection({super.key});
 
@@ -208,22 +204,19 @@ class _FeatureToggle extends ConsumerWidget {
     final title = _featureLabel(l, feature);
     final subtitle = _featureDescription(l, feature);
 
-    // Pre-check the next transition. If turning the switch will throw,
-    // we render the row disabled and wrap it in a Tooltip naming the
-    // blocker so the user understands why.
+    // Pre-check the next transition. The row is disabled with a tooltip
+    // when:
+    //   * the feature is OFF and its prerequisites are missing — tapping
+    //     would call `enable(feature)` which throws, OR
+    //   * any ancestor on the `requires` chain is OFF (cascading-disable
+    //     #1447) — the row is effectively-disabled even when the stored
+    //     value is `true`. We let the child stay "switch-on visually" so
+    //     the user can see what their preference WAS, but the toggle is
+    //     non-interactive until they re-enable the parent.
     String? blockedReason;
-    if (isEnabled) {
-      // A user tap would call `disable(feature)` — find dependents.
-      final dependents = blockingDisable(feature, manifest, currentlyEnabled);
-      if (dependents.isNotEmpty) {
-        final names = dependents.map((f) => _featureLabel(l, f)).join(', ');
-        blockedReason = _blockedDisableMessage(l, feature, names);
-      }
-    } else {
-      // A user tap would call `enable(feature)` — check prerequisites.
-      if (!canEnable(feature, manifest, currentlyEnabled)) {
-        blockedReason = _blockedEnableMessage(l, feature);
-      }
+    if (!isEffectivelyEnabled(feature, manifest, currentlyEnabled) &&
+        !canEnable(feature, manifest, currentlyEnabled)) {
+      blockedReason = _blockedEnableMessage(l, feature);
     }
 
     final tile = SwitchListTile(
@@ -421,35 +414,3 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
   }
 }
 
-String _blockedDisableMessage(
-  AppLocalizations? l,
-  Feature f,
-  String dependents,
-) {
-  switch (f) {
-    case Feature.obd2TripRecording:
-      return l?.featureBlockedDisable_obd2TripRecording(dependents) ??
-          'Disable dependent features first: $dependents';
-    case Feature.tankSync:
-      return l?.featureBlockedDisable_tankSync(dependents) ??
-          'Disable dependent features first: $dependents';
-    // Features that nothing depends on never reach this branch — the
-    // graph helpers short-circuit. Generic fallback for safety.
-    case Feature.gamification:
-    case Feature.hapticEcoCoach:
-    case Feature.consumptionAnalytics:
-    case Feature.baselineSync:
-    case Feature.unifiedSearchResults:
-    case Feature.priceAlerts:
-    case Feature.priceHistory:
-    case Feature.routePlanning:
-    case Feature.evCharging:
-    case Feature.glideCoach:
-    case Feature.gpsTripPath:
-    case Feature.autoRecord:
-    case Feature.showFuel:
-    case Feature.showElectric:
-    case Feature.showConsumptionTab:
-      return 'Disable dependent features first: $dependents';
-  }
-}

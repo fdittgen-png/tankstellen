@@ -29,6 +29,112 @@ void main() {
     });
   });
 
+  group('isEffectivelyEnabled (#1447 cascading-disable)', () {
+    test('returns false when the feature itself is not enabled', () {
+      // Stored set empty → consumption analytics is not effectively on.
+      expect(
+        isEffectivelyEnabled(
+          Feature.consumptionAnalytics,
+          manifest,
+          <Feature>{},
+        ),
+        isFalse,
+      );
+    });
+
+    test(
+        'returns false when the feature is enabled but a direct parent is off',
+        () {
+      // gamification stored on, but obd2TripRecording (parent) is off.
+      // The user's preference is preserved (still in the set) but the
+      // surface should not render.
+      expect(
+        isEffectivelyEnabled(
+          Feature.gamification,
+          manifest,
+          <Feature>{Feature.gamification},
+        ),
+        isFalse,
+        reason:
+            'Stored child state with parent off is the cascading-disable '
+            'sentinel — user re-enables parent to restore the surface.',
+      );
+    });
+
+    test('returns true when the feature and every ancestor are enabled', () {
+      expect(
+        isEffectivelyEnabled(
+          Feature.gamification,
+          manifest,
+          <Feature>{Feature.obd2TripRecording, Feature.gamification},
+        ),
+        isTrue,
+      );
+    });
+
+    test('returns true for a root feature with no requires when enabled', () {
+      expect(
+        isEffectivelyEnabled(
+          Feature.tankSync,
+          manifest,
+          <Feature>{Feature.tankSync},
+        ),
+        isTrue,
+      );
+    });
+
+    test(
+        'walks transitive ancestors — child is effectively-off when a '
+        'grandparent is off', () {
+      // Synthetic three-level chain to exercise the walk: g -> p -> r,
+      // with the root r missing from the enabled set.
+      const chain = FeatureManifest({
+        Feature.priceAlerts: FeatureManifestEntry(
+          feature: Feature.priceAlerts,
+          defaultEnabled: false,
+          displayName: 'root',
+          description: 'three-level chain root',
+        ),
+        Feature.priceHistory: FeatureManifestEntry(
+          feature: Feature.priceHistory,
+          defaultEnabled: false,
+          requires: {Feature.priceAlerts},
+          displayName: 'parent',
+          description: 'three-level chain parent',
+        ),
+        Feature.gamification: FeatureManifestEntry(
+          feature: Feature.gamification,
+          defaultEnabled: false,
+          requires: {Feature.priceHistory},
+          displayName: 'leaf',
+          description: 'three-level chain leaf',
+        ),
+      });
+
+      expect(
+        isEffectivelyEnabled(
+          Feature.gamification,
+          chain,
+          <Feature>{Feature.priceHistory, Feature.gamification},
+        ),
+        isFalse,
+        reason: 'Root priceAlerts is off, so the leaf is effectively-off.',
+      );
+      expect(
+        isEffectivelyEnabled(
+          Feature.gamification,
+          chain,
+          <Feature>{
+            Feature.priceAlerts,
+            Feature.priceHistory,
+            Feature.gamification,
+          },
+        ),
+        isTrue,
+      );
+    });
+  });
+
   group('blockingDisable', () {
     test('returns dependents that would break', () {
       // Disabling obd2TripRecording while gamification + glideCoach are on
