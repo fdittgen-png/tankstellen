@@ -96,28 +96,38 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
             tooltip: l10n?.refreshPrices ?? 'Refresh prices',
           ),
       ],
-      bottom: TabSwitcher(
-        controller: _tabController,
-        tabs: [
-          TabSwitcherEntry(
-            label: l10n?.favorites ?? 'Favorites',
-            icon: Icons.star_outline,
-          ),
-          TabSwitcherEntry(
-            label: l10n?.priceAlerts ?? 'Price Alerts',
-            icon: Icons.notifications_outlined,
-          ),
-        ],
-      ),
       bodyPadding: EdgeInsets.zero,
-      body: TabBarView(
-        controller: _tabController,
+      // #1441 — TabSwitcher lives inside the body so the AppBar height
+      // matches the other top-level tabs (Recherche, Carte, Conso,
+      // Paramètres). Keeping the switcher in `bottom:` made the AppBar
+      // visually taller than its siblings.
+      body: Column(
         children: [
-          RepaintBoundary(
-            key: _shareBoundaryKey,
-            child: const FavoritesFuelTab(),
+          TabSwitcher(
+            controller: _tabController,
+            tabs: [
+              TabSwitcherEntry(
+                label: l10n?.favorites ?? 'Favorites',
+                icon: Icons.star_outline,
+              ),
+              TabSwitcherEntry(
+                label: l10n?.priceAlerts ?? 'Price Alerts',
+                icon: Icons.notifications_outlined,
+              ),
+            ],
           ),
-          const AlertsTab(),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                RepaintBoundary(
+                  key: _shareBoundaryKey,
+                  child: const FavoritesFuelTab(),
+                ),
+                const AlertsTab(),
+              ],
+            ),
+          ),
         ],
       ),
     );

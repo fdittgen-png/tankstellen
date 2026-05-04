@@ -208,28 +208,6 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     return PageScaffold(
       title: l?.consumptionLogTitle ?? 'Fuel consumption',
       bodyPadding: EdgeInsets.zero,
-      bottom: TabSwitcher(
-        controller: tabController,
-        tabs: [
-          TabSwitcherEntry(
-            label: l?.consumptionTabFuel ?? 'Fuel',
-            icon: Icons.local_gas_station_outlined,
-          ),
-          TabSwitcherEntry(
-            label: l?.trajetsTabLabel ?? 'Trips',
-            icon: Icons.route_outlined,
-          ),
-          // #892 — Charging tab is hidden when the active vehicle
-          // is a pure combustion engine. Hybrid and EV profiles
-          // still see it; the no-vehicle case keeps the tab (a
-          // dedicated onboarding story covers that path).
-          if (showCharging)
-            TabSwitcherEntry(
-              label: l?.consumptionTabCharging ?? 'Charging',
-              icon: Icons.ev_station_outlined,
-            ),
-        ],
-      ),
       actions: [
         // #797 phase 3 — title-bar chip announcing "OBD2 connected"
         // when the pinned adapter is currently linked. Hides
@@ -274,17 +252,49 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
                     : (l?.addChargingLog ?? 'Log charging'),
               ),
             ),
-      body: TabBarView(
-        controller: tabController,
+      // #1441 — TabSwitcher lives inside the body so the AppBar height
+      // matches the other top-level tabs (Recherche, Carte, Favoris,
+      // Paramètres). Keeping the switcher in `bottom:` made the AppBar
+      // visually taller than its siblings.
+      body: Column(
         children: [
-          FuelTab(fillUps: fillUps, stats: stats, l: l),
-          TrajetsTab(vehicleId: activeVehicle?.id),
-          // Charging view is only mounted when the active vehicle
-          // can actually charge — hiding it for ICE profiles (#892)
-          // removes a dead-end tap for combustion-only users without
-          // touching `chargingLogsProvider`, so flipping back to a
-          // hybrid/EV restores the logs exactly.
-          if (showCharging) ChargingTab(async: chargingLogsAsync, l: l),
+          TabSwitcher(
+            controller: tabController,
+            tabs: [
+              TabSwitcherEntry(
+                label: l?.consumptionTabFuel ?? 'Fuel',
+                icon: Icons.local_gas_station_outlined,
+              ),
+              TabSwitcherEntry(
+                label: l?.trajetsTabLabel ?? 'Trips',
+                icon: Icons.route_outlined,
+              ),
+              // #892 — Charging tab is hidden when the active vehicle
+              // is a pure combustion engine. Hybrid and EV profiles
+              // still see it; the no-vehicle case keeps the tab (a
+              // dedicated onboarding story covers that path).
+              if (showCharging)
+                TabSwitcherEntry(
+                  label: l?.consumptionTabCharging ?? 'Charging',
+                  icon: Icons.ev_station_outlined,
+                ),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: tabController,
+              children: [
+                FuelTab(fillUps: fillUps, stats: stats, l: l),
+                TrajetsTab(vehicleId: activeVehicle?.id),
+                // Charging view is only mounted when the active vehicle
+                // can actually charge — hiding it for ICE profiles (#892)
+                // removes a dead-end tap for combustion-only users without
+                // touching `chargingLogsProvider`, so flipping back to a
+                // hybrid/EV restores the logs exactly.
+                if (showCharging) ChargingTab(async: chargingLogsAsync, l: l),
+              ],
+            ),
+          ),
         ],
       ),
     );
