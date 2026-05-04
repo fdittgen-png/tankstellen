@@ -10,6 +10,9 @@ import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../feature_management/application/feature_flags_provider.dart';
+import '../../../feature_management/domain/feature.dart';
+import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../route_search/domain/entities/route_info.dart';
 import '../../../route_search/presentation/widgets/route_input.dart';
@@ -131,9 +134,23 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final radius = ref.watch(searchRadiusProvider);
-    final mode = ref.watch(activeSearchModeProvider);
+    final storedMode = ref.watch(activeSearchModeProvider);
     final openOnly = ref.watch(openOnlyFilterProvider);
     final amenities = ref.watch(selectedAmenitiesProvider);
+
+    // Cascading-feature gate (#1447 phase 4). When `Feature.routePlanning`
+    // is effectively-disabled, the "Along route" mode is unreachable —
+    // hide the toggle entirely AND treat the persisted mode as Nearby
+    // so the body never renders the route input. The stored mode value
+    // is preserved (re-enabling the feature restores the prior choice).
+    final manifest = ref.watch(featureManifestProvider);
+    final enabledFlags = ref.watch(featureFlagsProvider);
+    final routePlanningOn = isEffectivelyEnabled(
+      Feature.routePlanning,
+      manifest,
+      enabledFlags,
+    );
+    final mode = routePlanningOn ? storedMode : SearchMode.nearby;
 
     return PageScaffold(
       title: l10n?.searchCriteriaTitle ?? 'Search criteria',
@@ -159,12 +176,14 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
                 message: l10n?.helpBannerCriteria ??
                     'Your profile defaults are pre-filled. Adjust criteria below to refine your search.',
               ),
-              SearchModeToggle(
-                mode: mode,
-                onChanged: (m) =>
-                    ref.read(activeSearchModeProvider.notifier).set(m),
-              ),
-              const SizedBox(height: 12),
+              if (routePlanningOn) ...[
+                SearchModeToggle(
+                  mode: mode,
+                  onChanged: (m) =>
+                      ref.read(activeSearchModeProvider.notifier).set(m),
+                ),
+                const SizedBox(height: 12),
+              ],
               if (mode == SearchMode.nearby) ...[
                 Text(
                   l10n?.gpsLocation ?? 'Location',
