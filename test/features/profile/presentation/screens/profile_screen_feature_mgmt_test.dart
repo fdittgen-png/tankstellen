@@ -13,10 +13,13 @@ import '../../../../helpers/pump_app.dart';
 import '../../../../mocks/mocks.dart';
 
 /// Widget tests for the #1373 phase-2 Feature management section on the
-/// Settings screen. The Phase-1 engine ships with `enable` / `disable`
-/// throwing `StateError` on illegal transitions; the UI must pre-check
-/// and disable + tooltip the switch instead of letting the error reach
-/// the user.
+/// Settings screen. The engine's `enable` still throws on a missing
+/// prerequisite; the UI must pre-check and render the switch disabled +
+/// tooltip in that case. As of #1447 phase 1 (cascading-disable),
+/// `disable` no longer throws — disabling a parent always succeeds and
+/// dependent switches become disabled-with-tooltip via
+/// `isEffectivelyEnabled`, with their stored state preserved so
+/// re-enabling the parent restores the prior surface.
 void main() {
   group('ProfileScreen — Feature management section (#1373 phase 2)', () {
     late MockHiveStorage mockStorage;
@@ -206,26 +209,23 @@ void main() {
     });
 
     testWidgets(
-        'disabling obd2TripRecording while gamification is ON is blocked '
-        '(switch disabled + tooltip names the dependent)', (tester) async {
+        'disabling obd2TripRecording while gamification is ON succeeds — '
+        'gamification switch then renders disabled-with-tooltip (#1447 '
+        'cascading-disable)', (tester) async {
       final container = ProviderContainer(
         overrides: baseOverrides.cast(),
       );
       addTearDown(container.dispose);
 
-      // Set up the state where obd2TripRecording is ON (so its switch
-      // shows ON) and gamification is also ON (depends on it).
       await container
           .read(featureFlagsProvider.notifier)
           .enable(Feature.obd2TripRecording);
-      // gamification is on by default; verify the precondition.
       expect(
         container.read(featureFlagsProvider),
-        contains(Feature.gamification),
-      );
-      expect(
-        container.read(featureFlagsProvider),
-        contains(Feature.obd2TripRecording),
+        containsAll(<Feature>[
+          Feature.obd2TripRecording,
+          Feature.gamification,
+        ]),
       );
 
       await tester.pumpWidget(
@@ -240,26 +240,52 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // The obd2TripRecording switch must be disabled (the user must
-      // turn dependents off first).
+      // Pre-disable: parent switch is interactive, child switch is
+      // interactive (everything is in the effectively-enabled state).
       final obd2Switch = tester.widget<SwitchListTile>(
         find.byKey(const Key('featureToggle_obd2TripRecording')),
       );
-      expect(obd2Switch.onChanged, isNull,
-          reason: 'obd2TripRecording switch must be disabled while '
-              'gamification still depends on it');
+      expect(obd2Switch.onChanged, isNotNull,
+          reason: 'parent switch must be interactive — disabling no '
+              'longer requires the user to clear dependents first.');
 
-      // The wrapping Tooltip must name `gamification` (English label).
+      // Disabling the parent succeeds — gamification stays in the
+      // stored set so re-enabling restores the prior surface, but the
+      // gamification row now renders disabled-with-tooltip.
+      await container
+          .read(featureFlagsProvider.notifier)
+          .disable(Feature.obd2TripRecording);
+      await tester.pumpAndSettle();
+
+      expect(
+        container.read(featureFlagsProvider),
+        isNot(contains(Feature.obd2TripRecording)),
+      );
+      expect(
+        container.read(featureFlagsProvider),
+        contains(Feature.gamification),
+        reason: 'Stored child state must survive parent-disable so the '
+            'user does not lose their preference.',
+      );
+
+      final gamificationSwitchAfter = tester.widget<SwitchListTile>(
+        find.byKey(const Key('featureToggle_gamification')),
+      );
+      expect(gamificationSwitchAfter.onChanged, isNull,
+          reason: 'With parent off, the child switch must be '
+              'effectively-disabled (non-interactive) until the user '
+              're-enables the parent.');
+
       final tooltip = tester.widget<Tooltip>(
         find.ancestor(
-          of: find.byKey(const Key('featureToggle_obd2TripRecording')),
+          of: find.byKey(const Key('featureToggle_gamification')),
           matching: find.byType(Tooltip),
         ),
       );
       expect(tooltip.message, isNotNull);
-      expect(tooltip.message!, contains('Gamification'),
-          reason: 'tooltip must name the dependent feature so the user '
-              'knows which switch to flip first');
+      expect(tooltip.message!, contains('OBD2 trip recording'),
+          reason: 'tooltip must point the user at the parent they need '
+              'to flip back on to make the child reachable.');
     });
   });
 }
