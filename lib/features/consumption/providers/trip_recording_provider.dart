@@ -16,6 +16,8 @@ import '../../feature_management/domain/feature.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../sync/providers/baseline_sync_enabled_provider.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../vehicle/domain/fuzzy_classifier.dart';
+import '../../vehicle/providers/calibration_mode_providers.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/baseline_store.dart';
 import '../data/obd2/active_trip_repository.dart';
@@ -447,11 +449,81 @@ class TripRecording extends _$TripRecording {
     final baseline = coldStartBaseline(_fuelFamily, situation);
     final live = _liveConsumptionFor(r, baseline);
     if (live == null) return;
+
+    // #894 wiring (#1426): when the active vehicle has opted into
+    // fuzzy calibration, route this sample through the fuzzy
+    // classifier and record one weighted vote per non-zero
+    // membership bucket. Rule mode keeps the legacy single-bucket
+    // path so users who haven't opted in see no behaviour change.
+    final profile = _tryReadActiveVehicle();
+    if (profile?.calibrationMode == VehicleCalibrationMode.fuzzy) {
+      _recordFuzzy(store, vid, r, live);
+      return;
+    }
+
     store.record(
       vehicleId: vid,
       situation: situation,
       value: live,
     );
+  }
+
+  /// Fuzzy path: split [live] across all non-transient buckets the
+  /// classifier flags as members, weighted by membership.
+  ///
+  /// `accel` and `grade` aren't on the OBD2 live stream, so we pass
+  /// 0 — the classifier degrades gracefully (decel and climbing zero
+  /// out, which is the same conservative result the rule path
+  /// produces when those signals are missing). [Situation.fuelCut]
+  /// maps onto a transient and is filtered by [BaselineStore]; we
+  /// drop it pre-call so the bridge stays explicit.
+  void _recordFuzzy(
+    BaselineStore store,
+    String vehicleId,
+    TripLiveReading r,
+    double live,
+  ) {
+    final classifier = ref.read(fuzzyClassifierProvider);
+    final memberships = classifier.classify(
+      speedKmh: r.speedKmh ?? 0,
+      accel: 0,
+      grade: 0,
+      throttlePct: r.engineLoadPercent ?? 0,
+      rpm: r.rpm ?? 0,
+    );
+    for (final entry in memberships.entries) {
+      if (entry.value <= 0) continue;
+      final ds = _bridgeFuzzySituation(entry.key);
+      if (ds == null) continue;
+      store.recordWeighted(
+        vehicleId: vehicleId,
+        situation: ds,
+        value: live,
+        weight: entry.value,
+      );
+    }
+  }
+
+  /// Bridge between the vehicle layer's [Situation] enum (#894) and
+  /// the consumption layer's [DrivingSituation] enum (#769). Returns
+  /// null for transient buckets the [BaselineStore] doesn't persist.
+  static DrivingSituation? _bridgeFuzzySituation(Situation s) {
+    switch (s) {
+      case Situation.idle:
+        return DrivingSituation.idle;
+      case Situation.stopAndGo:
+        return DrivingSituation.stopAndGo;
+      case Situation.urban:
+        return DrivingSituation.urbanCruise;
+      case Situation.highway:
+        return DrivingSituation.highwayCruise;
+      case Situation.climbing:
+        return DrivingSituation.climbingOrLoaded;
+      case Situation.decel:
+        return DrivingSituation.deceleration;
+      case Situation.fuelCut:
+        return null;
+    }
   }
 
   SituationBaseline _baselineFor(DrivingSituation situation) {
