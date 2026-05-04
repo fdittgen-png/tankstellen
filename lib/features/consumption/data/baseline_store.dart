@@ -77,11 +77,40 @@ class BaselineStore {
   /// Feed one sample into the (vehicle, situation) accumulator.
   /// Silently ignores transient situations — they don't have a
   /// stable mean to learn.
+  ///
+  /// Defaults to weight 1.0 — the rule-mode (winner-take-all) path.
+  /// The fuzzy path (#894) calls [recordWeighted] instead so it can
+  /// split a single sample across multiple buckets.
   void record({
     required String vehicleId,
     required DrivingSituation situation,
     required double value,
+  }) =>
+      recordWeighted(
+        vehicleId: vehicleId,
+        situation: situation,
+        value: value,
+        weight: 1.0,
+      );
+
+  /// Feed one sample at [weight] into the (vehicle, situation)
+  /// accumulator. Used by the fuzzy calibration path (#894 wiring) to
+  /// route each driving sample's membership vector — one
+  /// `recordWeighted` call per non-zero bucket — into a per-bucket
+  /// [WelfordAccumulator] without inflating the rule-mode sample
+  /// counter on near-zero votes.
+  ///
+  /// Zero weights are a no-op (the membership produced no contribution
+  /// for this bucket). Transient situations are still skipped — the
+  /// fuzzy classifier can flag `fuelCut` but it's not a baseline we
+  /// learn a stable mean for.
+  void recordWeighted({
+    required String vehicleId,
+    required DrivingSituation situation,
+    required double value,
+    required double weight,
   }) {
+    if (weight <= 0) return;
     if (situation == DrivingSituation.hardAccel ||
         situation == DrivingSituation.fuelCutCoast) {
       return;
@@ -89,13 +118,22 @@ class BaselineStore {
     final byVehicle = _cache.putIfAbsent(vehicleId, () => {});
     final acc =
         byVehicle.putIfAbsent(situation.name, () => WelfordAccumulator());
-    acc.update(value);
+    acc.updateWeighted(value, weight);
   }
 
   /// Look up the blended baseline for a (vehicle, situation) —
   /// learned-weight ramps linearly from 0 to 1 across
   /// [fullConfidenceSamples]. Returns the cold-start default unit,
   /// so callers don't have to juggle L/h vs L/100 km.
+  ///
+  /// Uses [WelfordAccumulator.effectiveSampleCount] (#1426) rather
+  /// than the raw count — under the fuzzy path a bucket fed by 30
+  /// samples × 0.05 weight has effective N = 1.5, not 30, and the
+  /// blend correctly stays close to the cold-start default until the
+  /// bucket actually accumulates ground-truth-equivalent evidence.
+  /// Pre-#1426 persisted baselines decode with effective-N == raw
+  /// count (see [WelfordAccumulator.fromJson]) so existing users see
+  /// no behaviour change.
   SituationBaseline lookup({
     required String vehicleId,
     required DrivingSituation situation,
@@ -103,14 +141,19 @@ class BaselineStore {
   }) {
     final coldStart = coldStartBaseline(fuelFamily, situation);
     final acc = _cache[vehicleId]?[situation.name];
-    if (acc == null || acc.n == 0) return coldStart;
-    final weight = (acc.n / fullConfidenceSamples).clamp(0.0, 1.0);
+    if (acc == null || acc.effectiveSampleCount <= 0) return coldStart;
+    final weight =
+        (acc.effectiveSampleCount / fullConfidenceSamples).clamp(0.0, 1.0);
     final blended = acc.mean * weight + coldStart.value * (1.0 - weight);
     return SituationBaseline(blended, coldStart.unit);
   }
 
   /// Sample count for the (vehicle, situation) pair — useful for the
   /// UI to show "learning…" until the learned weight is meaningful.
+  /// Returns the raw [WelfordAccumulator.n] count, which under the
+  /// fuzzy path can over-state confidence. The blend math in [lookup]
+  /// uses the effective-N formula and is the correct number to drive
+  /// behaviour off; this getter is for the UI counter only.
   int sampleCount({
     required String vehicleId,
     required DrivingSituation situation,
