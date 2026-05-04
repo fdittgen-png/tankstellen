@@ -81,6 +81,15 @@ class FeatureManifest {
   /// - `unifiedSearchResults`: false (kept off pending UX work)
   /// - `priceAlerts`, `priceHistory`, `routePlanning`, `evCharging`: true
   /// - `glideCoach`, `gpsTripPath`: false (future features, opt-in)
+  /// - `showFuel`, `showElectric`: true (#1373 phase 3c — both
+  ///   surfaces visible by default; mirrors the historical
+  ///   `UserProfile.showFuel` / `showElectric` defaults so existing
+  ///   users see no behaviour change post-migration)
+  /// - `showConsumptionTab`: true with `requires: {obd2TripRecording}`
+  ///   (#1373 phase 3c — the consumption analytics tab has nothing
+  ///   to render without trip data, so the dependency edge guards
+  ///   against an empty surface; default-true mirrors the wrap-not-
+  ///   replace shape used for `autoRecord` in phase 3d)
   static const FeatureManifest defaultManifest = FeatureManifest({
     Feature.obd2TripRecording: FeatureManifestEntry(
       feature: Feature.obd2TripRecording,
@@ -178,6 +187,44 @@ class FeatureManifest {
       displayName: 'Auto-record',
       description:
           'Automatically start a trip when the OBD2 adapter connects to a moving vehicle.',
+    ),
+    Feature.showFuel: FeatureManifestEntry(
+      feature: Feature.showFuel,
+      // Default-true mirrors the historical `UserProfile.showFuel`
+      // default; existing users see no behaviour change after the
+      // phase-3c migration.
+      defaultEnabled: true,
+      displayName: 'Show fuel stations',
+      description:
+          'Display petrol/diesel station results in search and on the map.',
+    ),
+    Feature.showElectric: FeatureManifestEntry(
+      feature: Feature.showElectric,
+      // Default-true mirrors the historical `UserProfile.showElectric`
+      // default; existing users see no behaviour change after the
+      // phase-3c migration.
+      defaultEnabled: true,
+      displayName: 'Show charging stations',
+      description:
+          'Display EV charging stations in search and on the map.',
+    ),
+    Feature.showConsumptionTab: FeatureManifestEntry(
+      feature: Feature.showConsumptionTab,
+      // Default-true with `requires: {obd2TripRecording}` — the
+      // consumption analytics tab has nothing to render without trip
+      // data, so the dependency edge guards against an empty surface.
+      // The legacy `UserProfile.showConsumptionTab` field defaulted to
+      // `false`; the phase-3c migrator preserves explicit-true (rare,
+      // user has to have flipped it on) and respects the manifest
+      // default-true otherwise — the dependency on `obd2TripRecording`
+      // (default-off) means the surface stays effectively hidden until
+      // the user enables trip recording, matching the original
+      // user-facing shape.
+      defaultEnabled: true,
+      requires: {Feature.obd2TripRecording},
+      displayName: 'Consumption tab',
+      description:
+          'Show the consumption analytics tab in the bottom navigation.',
     ),
   });
 }

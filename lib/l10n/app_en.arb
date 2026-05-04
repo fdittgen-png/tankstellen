@@ -2081,6 +2081,30 @@
   "@featureDescription_autoRecord": {
     "description": "One-line description for the master auto-record feature gate."
   },
+  "featureLabel_showFuel": "Show fuel stations",
+  "@featureLabel_showFuel": {
+    "description": "Display name for the show-fuel-stations feature gate (#1373 phase 3c). Migrated from the legacy UserProfile.showFuel bool."
+  },
+  "featureDescription_showFuel": "Display petrol/diesel station results in search and on the map.",
+  "@featureDescription_showFuel": {
+    "description": "One-line description for the show-fuel-stations feature gate."
+  },
+  "featureLabel_showElectric": "Show charging stations",
+  "@featureLabel_showElectric": {
+    "description": "Display name for the show-EV-charging-stations feature gate (#1373 phase 3c). Migrated from the legacy UserProfile.showElectric bool."
+  },
+  "featureDescription_showElectric": "Display EV charging stations in search and on the map.",
+  "@featureDescription_showElectric": {
+    "description": "One-line description for the show-EV-charging-stations feature gate."
+  },
+  "featureLabel_showConsumptionTab": "Consumption tab",
+  "@featureLabel_showConsumptionTab": {
+    "description": "Display name for the consumption-tab visibility feature gate (#1373 phase 3c). Migrated from the legacy UserProfile.showConsumptionTab bool."
+  },
+  "featureDescription_showConsumptionTab": "Show the consumption analytics tab in the bottom navigation.",
+  "@featureDescription_showConsumptionTab": {
+    "description": "One-line description for the consumption-tab visibility feature gate."
+  },
   "featureBlockedEnable_gamification": "Enable OBD2 trip recording first",
   "@featureBlockedEnable_gamification": {
     "description": "Tooltip shown on the disabled gamification toggle when its prerequisite (OBD2 trip recording) is off."
@@ -2112,6 +2136,48 @@
   "featureBlockedDisable_autoRecord": "Disable dependent features first: {dependents}",
   "@featureBlockedDisable_autoRecord": {
     "description": "Tooltip shown on the disabled master auto-record toggle when one or more dependent features are still enabled.",
+    "placeholders": {
+      "dependents": {
+        "type": "String",
+        "example": "Some dependent feature"
+      }
+    }
+  },
+  "featureBlockedEnable_showFuel": "Prerequisites not met",
+  "@featureBlockedEnable_showFuel": {
+    "description": "Tooltip shown on the disabled show-fuel-stations toggle. The feature has no prerequisites today so this string is a defensive fallback for the dependency-graph helpers."
+  },
+  "featureBlockedDisable_showFuel": "Disable dependent features first: {dependents}",
+  "@featureBlockedDisable_showFuel": {
+    "description": "Tooltip shown on the disabled show-fuel-stations toggle when one or more dependent features are still enabled. Defensive fallback — nothing in the manifest currently depends on showFuel.",
+    "placeholders": {
+      "dependents": {
+        "type": "String",
+        "example": "Some dependent feature"
+      }
+    }
+  },
+  "featureBlockedEnable_showElectric": "Prerequisites not met",
+  "@featureBlockedEnable_showElectric": {
+    "description": "Tooltip shown on the disabled show-EV-charging-stations toggle. The feature has no prerequisites today so this string is a defensive fallback for the dependency-graph helpers."
+  },
+  "featureBlockedDisable_showElectric": "Disable dependent features first: {dependents}",
+  "@featureBlockedDisable_showElectric": {
+    "description": "Tooltip shown on the disabled show-EV-charging-stations toggle when one or more dependent features are still enabled. Defensive fallback — nothing in the manifest currently depends on showElectric.",
+    "placeholders": {
+      "dependents": {
+        "type": "String",
+        "example": "Some dependent feature"
+      }
+    }
+  },
+  "featureBlockedEnable_showConsumptionTab": "Enable OBD2 trip recording first",
+  "@featureBlockedEnable_showConsumptionTab": {
+    "description": "Tooltip shown on the disabled consumption-tab toggle when its prerequisite (OBD2 trip recording) is off."
+  },
+  "featureBlockedDisable_showConsumptionTab": "Disable dependent features first: {dependents}",
+  "@featureBlockedDisable_showConsumptionTab": {
+    "description": "Tooltip shown on the disabled consumption-tab toggle when one or more dependent features are still enabled. Defensive fallback — nothing currently depends on showConsumptionTab.",
     "placeholders": {
       "dependents": {
         "type": "String",

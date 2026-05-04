@@ -8,6 +8,13 @@ void main() {
   // Fully-populated fixture so every field has a non-default, distinguishable
   // value. Tests that mutate one field can then assert the rest survived
   // unchanged, catching future drift in copyWith / fromProfile.
+  //
+  // Note (#1373 phase 3c): `showFuel` / `showElectric` no longer round-
+  // trip through ProfileEditState — they live in the central feature-flag
+  // set and are read+written via the shim providers from the edit sheet
+  // directly. The legacy [UserProfile.showFuel] / `showElectric` fields
+  // are preserved for the one-shot migration and still settable here, but
+  // the values do NOT propagate into ProfileEditState.
   const profile = UserProfile(
     id: 'p1',
     name: 'Test',
@@ -18,8 +25,6 @@ void main() {
     languageCode: 'de',
     routeSegmentKm: 100,
     avoidHighways: false,
-    showFuel: true,
-    showElectric: false,
     ratingMode: 'local',
     defaultVehicleId: 'veh-1',
   );
@@ -53,10 +58,6 @@ void main() {
     if (skip != 'avoidHighways') {
       expect(actual.avoidHighways, reference.avoidHighways);
     }
-    if (skip != 'showFuel') expect(actual.showFuel, reference.showFuel);
-    if (skip != 'showElectric') {
-      expect(actual.showElectric, reference.showElectric);
-    }
     if (skip != 'ratingMode') {
       expect(actual.ratingMode, reference.ratingMode);
     }
@@ -82,8 +83,6 @@ void main() {
       expect(s.languageCode, profile.languageCode);
       expect(s.routeSegmentKm, profile.routeSegmentKm);
       expect(s.avoidHighways, profile.avoidHighways);
-      expect(s.showFuel, profile.showFuel);
-      expect(s.showElectric, profile.showElectric);
       expect(s.ratingMode, profile.ratingMode);
       expect(s.defaultVehicleId, profile.defaultVehicleId);
     });
@@ -101,8 +100,6 @@ void main() {
       expect(s.landingScreen, LandingScreen.nearest);
       expect(s.routeSegmentKm, 50.0);
       expect(s.avoidHighways, isFalse);
-      expect(s.showFuel, isTrue);
-      expect(s.showElectric, isTrue);
       expect(s.ratingMode, 'local');
     });
   });
@@ -186,20 +183,6 @@ void main() {
       expectAllFieldsExcept(copy, base, skip: 'avoidHighways');
     });
 
-    test('showFuel only changes showFuel', () {
-      final base = baseState();
-      final copy = base.copyWith(showFuel: false);
-      expect(copy.showFuel, isFalse);
-      expectAllFieldsExcept(copy, base, skip: 'showFuel');
-    });
-
-    test('showElectric only changes showElectric', () {
-      final base = baseState();
-      final copy = base.copyWith(showElectric: true);
-      expect(copy.showElectric, isTrue);
-      expectAllFieldsExcept(copy, base, skip: 'showElectric');
-    });
-
     test('ratingMode only changes ratingMode', () {
       final base = baseState();
       final copy = base.copyWith(ratingMode: 'shared');
@@ -239,8 +222,6 @@ void main() {
       expect(s.languageCode, 'de');
       expect(s.routeSegmentKm, 100);
       expect(s.avoidHighways, isFalse);
-      expect(s.showFuel, isTrue);
-      expect(s.showElectric, isFalse);
       expect(s.ratingMode, 'local');
       expect(s.defaultVehicleId, 'veh-1');
     });
@@ -279,24 +260,6 @@ void main() {
       final s = c.read(profileEditControllerProvider(profile));
       expect(s.avoidHighways, isTrue);
       expectAllFieldsExcept(s, baseState(), skip: 'avoidHighways');
-    });
-
-    test('setShowFuel updates showFuel only', () {
-      final c = makeContainer();
-      final ctrl = c.read(profileEditControllerProvider(profile).notifier);
-      ctrl.setShowFuel(false);
-      final s = c.read(profileEditControllerProvider(profile));
-      expect(s.showFuel, isFalse);
-      expectAllFieldsExcept(s, baseState(), skip: 'showFuel');
-    });
-
-    test('setShowElectric updates showElectric only', () {
-      final c = makeContainer();
-      final ctrl = c.read(profileEditControllerProvider(profile).notifier);
-      ctrl.setShowElectric(true);
-      final s = c.read(profileEditControllerProvider(profile));
-      expect(s.showElectric, isTrue);
-      expectAllFieldsExcept(s, baseState(), skip: 'showElectric');
     });
 
     test('setRatingMode updates ratingMode only', () {
@@ -380,8 +343,6 @@ void main() {
       ctrl.setRadius(20);
       ctrl.setRouteSegmentKm(250);
       ctrl.setAvoidHighways(true);
-      ctrl.setShowFuel(false);
-      ctrl.setShowElectric(true);
       ctrl.setRatingMode('shared');
       ctrl.setLandingScreen(LandingScreen.cheapest);
       ctrl.setCountryCode('FR');
@@ -393,8 +354,6 @@ void main() {
       expect(s.radius, 20);
       expect(s.routeSegmentKm, 250);
       expect(s.avoidHighways, isTrue);
-      expect(s.showFuel, isFalse);
-      expect(s.showElectric, isTrue);
       expect(s.ratingMode, 'shared');
       expect(s.landingScreen, LandingScreen.cheapest);
       expect(s.countryCode, 'FR');

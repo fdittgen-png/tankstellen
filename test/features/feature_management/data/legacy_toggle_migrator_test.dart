@@ -932,4 +932,364 @@ void main() {
       },
     );
   });
+
+  /// Phase-3c coverage for the bundled `showFuel` + `showElectric` +
+  /// `showConsumptionTab` migrations. All three live on UserProfile; the
+  /// first two have manifest defaultEnabled=true with no prerequisites,
+  /// so they mirror the gamification precedent's preserve-explicit-false
+  /// shape. `showConsumptionTab` defaults to true with a hard prerequisite
+  /// on `obd2TripRecording`, so a legacy=true cascades both into the
+  /// central set.
+  group('migrateUserProfileToggles — showFuel (phase 3c)', () {
+    UserProfile profileWith({required bool showFuel}) {
+      // ignore: deprecated_member_use_from_same_package
+      return UserProfile(
+        id: 'p1',
+        name: 'Test',
+        // ignore: deprecated_member_use_from_same_package
+        showFuel: showFuel,
+      );
+    }
+
+    test('legacy true → central state contains showFuel; flag set',
+        () async {
+      await migrateUserProfileToggles(
+        settings: settings,
+        featureFlags: repo,
+        manifest: FeatureManifest.defaultManifest,
+        activeProfile: profileWith(showFuel: true),
+      );
+
+      final after = await repo.loadEnabled();
+      expect(
+        after,
+        contains(Feature.showFuel),
+        reason:
+            'Legacy true must promote into the central feature-flag set '
+            'so the user does not have to re-enable showFuel after the '
+            'migration. Manifest default is also true, so this is a '
+            'no-op-but-explicit write that preserves the user intent.',
+      );
+      expect(settings.get(showFuelMigratedKey), isTrue);
+    });
+
+    test('legacy false → central state excludes showFuel; flag set',
+        () async {
+      await migrateUserProfileToggles(
+        settings: settings,
+        featureFlags: repo,
+        manifest: FeatureManifest.defaultManifest,
+        activeProfile: profileWith(showFuel: false),
+      );
+
+      final after = await repo.loadEnabled();
+      expect(
+        after,
+        isNot(contains(Feature.showFuel)),
+        reason:
+            'Feature.showFuel has manifest defaultEnabled=true. A no-op '
+            '(no write) on legacy=false would silently restore the fuel-'
+            'station surface for users who explicitly turned it off. '
+            'The migrator must persist a state that excludes the feature '
+            'so the user preference survives the migration.',
+      );
+      expect(settings.get(showFuelMigratedKey), isTrue);
+    });
+
+    test(
+      'no-op when activeProfile is null — gate flag NOT written, retries '
+      'next launch',
+      () async {
+        await repo.saveEnabled(<Feature>{Feature.priceAlerts});
+
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: null,
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          equals(<Feature>{Feature.priceAlerts}),
+          reason:
+              'Without an active profile the migrator must be a complete '
+              'no-op — no central writes, the seeded state must be '
+              'preserved verbatim.',
+        );
+        expect(
+          settings.get(showFuelMigratedKey),
+          isNull,
+          reason:
+              'The migrated-key flag MUST NOT be written when no profile '
+              'is loaded — otherwise the next launch (when the profile '
+              'IS loaded) would skip the migration and silently lose any '
+              'explicit showFuel = false the user had set.',
+        );
+      },
+    );
+
+    test('idempotent — second run after user re-enable preserves the choice',
+        () async {
+      await migrateUserProfileToggles(
+        settings: settings,
+        featureFlags: repo,
+        manifest: FeatureManifest.defaultManifest,
+        activeProfile: profileWith(showFuel: false),
+      );
+      expect(await repo.loadEnabled(), isNot(contains(Feature.showFuel)));
+      expect(settings.get(showFuelMigratedKey), isTrue);
+
+      // User re-enables via the central settings UI.
+      await repo.saveEnabled(<Feature>{Feature.showFuel});
+
+      // Second run with the same legacy=false profile must NOT undo the
+      // user's explicit re-enable.
+      await migrateUserProfileToggles(
+        settings: settings,
+        featureFlags: repo,
+        manifest: FeatureManifest.defaultManifest,
+        activeProfile: profileWith(showFuel: false),
+      );
+
+      expect(
+        await repo.loadEnabled(),
+        contains(Feature.showFuel),
+        reason:
+            'The gate flag short-circuits the second run; the user\'s '
+            'explicit re-enable must survive.',
+      );
+    });
+
+    test('skipped when migration flag already true — central state untouched',
+        () async {
+      await settings.put(showFuelMigratedKey, true);
+      await repo.saveEnabled(<Feature>{Feature.priceAlerts});
+
+      await migrateUserProfileToggles(
+        settings: settings,
+        featureFlags: repo,
+        manifest: FeatureManifest.defaultManifest,
+        activeProfile: profileWith(showFuel: false),
+      );
+
+      final after = await repo.loadEnabled();
+      expect(
+        after,
+        contains(Feature.priceAlerts),
+        reason:
+            'When the migration gate is already set, the legacy field '
+            'must not be re-read and the central state must stay exactly '
+            'as the user left it after the first migration.',
+      );
+    });
+  });
+
+  group('migrateUserProfileToggles — showElectric (phase 3c)', () {
+    UserProfile profileWith({required bool showElectric}) {
+      // ignore: deprecated_member_use_from_same_package
+      return UserProfile(
+        id: 'p1',
+        name: 'Test',
+        // ignore: deprecated_member_use_from_same_package
+        showElectric: showElectric,
+      );
+    }
+
+    test('legacy true → central state contains showElectric; flag set',
+        () async {
+      await migrateUserProfileToggles(
+        settings: settings,
+        featureFlags: repo,
+        manifest: FeatureManifest.defaultManifest,
+        activeProfile: profileWith(showElectric: true),
+      );
+
+      final after = await repo.loadEnabled();
+      expect(after, contains(Feature.showElectric));
+      expect(settings.get(showElectricMigratedKey), isTrue);
+    });
+
+    test(
+      'legacy false → central state excludes showElectric (preserves the '
+      'explicit opt-out against the manifest default-true); flag set',
+      () async {
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: profileWith(showElectric: false),
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          isNot(contains(Feature.showElectric)),
+          reason:
+              'Mirrors the showFuel rationale — manifest defaultEnabled='
+              'true means no-op writes silently re-enable, so the '
+              'explicit-false branch must persist the exclusion.',
+        );
+        expect(settings.get(showElectricMigratedKey), isTrue);
+      },
+    );
+
+    test('idempotent — second run after user re-enable preserves the choice',
+        () async {
+      await migrateUserProfileToggles(
+        settings: settings,
+        featureFlags: repo,
+        manifest: FeatureManifest.defaultManifest,
+        activeProfile: profileWith(showElectric: false),
+      );
+      expect(await repo.loadEnabled(), isNot(contains(Feature.showElectric)));
+
+      await repo.saveEnabled(<Feature>{Feature.showElectric});
+
+      await migrateUserProfileToggles(
+        settings: settings,
+        featureFlags: repo,
+        manifest: FeatureManifest.defaultManifest,
+        activeProfile: profileWith(showElectric: false),
+      );
+
+      expect(await repo.loadEnabled(), contains(Feature.showElectric));
+    });
+  });
+
+  group('migrateUserProfileToggles — showConsumptionTab (phase 3c)', () {
+    UserProfile profileWith({required bool showConsumptionTab}) {
+      // ignore: deprecated_member_use_from_same_package
+      return UserProfile(
+        id: 'p1',
+        name: 'Test',
+        // ignore: deprecated_member_use_from_same_package
+        showConsumptionTab: showConsumptionTab,
+      );
+    }
+
+    test(
+      'legacy true → cascade-enables both Feature.obd2TripRecording '
+      '(prerequisite) AND Feature.showConsumptionTab; flag set',
+      () async {
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: profileWith(showConsumptionTab: true),
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          contains(Feature.showConsumptionTab),
+          reason:
+              'Legacy true must promote — the user explicitly enabled the '
+              'consumption tab in their profile and that intent must '
+              'survive the migration.',
+        );
+        expect(
+          after,
+          contains(Feature.obd2TripRecording),
+          reason:
+              'Feature.showConsumptionTab requires obd2TripRecording per '
+              'the manifest; enabling the dependent without the '
+              'prerequisite would leave the central state in a '
+              'contract-violating shape.',
+        );
+        expect(settings.get(showConsumptionTabMigratedKey), isTrue);
+      },
+    );
+
+    test(
+      'legacy false → central state excludes showConsumptionTab '
+      '(preserves the original hidden default against the new '
+      'manifest default-true); flag set',
+      () async {
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: profileWith(showConsumptionTab: false),
+        );
+
+        final after = await repo.loadEnabled();
+        expect(
+          after,
+          isNot(contains(Feature.showConsumptionTab)),
+          reason:
+              'The legacy field defaulted to false — most users never '
+              'flipped it. The new manifest defaults Feature.show'
+              'ConsumptionTab to true, so a no-op write would silently '
+              'reveal the tab for users who never had it on. The '
+              'migrator persists a state that excludes the feature so '
+              'the original user-facing shape (tab hidden) is preserved.',
+        );
+        // Note: obd2TripRecording may still be enabled in `after` if the
+        // gamification migrator (which runs first inside
+        // migrateUserProfileToggles) cascade-enabled it from the
+        // default-true UserProfile.gamificationEnabled. That is the
+        // gamification migrator's contract, not this branch's. The
+        // assertion we DO care about is that the showConsumptionTab
+        // migration did not promote the dependent.
+        expect(settings.get(showConsumptionTabMigratedKey), isTrue);
+      },
+    );
+
+    test(
+      'no-op when activeProfile is null — gate flag NOT written, retries '
+      'next launch',
+      () async {
+        await repo.saveEnabled(<Feature>{Feature.priceAlerts});
+
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: null,
+        );
+
+        expect(settings.get(showConsumptionTabMigratedKey), isNull);
+      },
+    );
+
+    test(
+      'idempotent — second run with same inputs after user disable '
+      'preserves the disable',
+      () async {
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: profileWith(showConsumptionTab: true),
+        );
+        expect(
+          await repo.loadEnabled(),
+          contains(Feature.showConsumptionTab),
+        );
+
+        // User disables in the central settings UI.
+        final stillEnabled = {...await repo.loadEnabled()}
+          ..remove(Feature.showConsumptionTab);
+        await repo.saveEnabled(stillEnabled);
+
+        // Second run must NOT re-promote.
+        await migrateUserProfileToggles(
+          settings: settings,
+          featureFlags: repo,
+          manifest: FeatureManifest.defaultManifest,
+          activeProfile: profileWith(showConsumptionTab: true),
+        );
+
+        expect(
+          await repo.loadEnabled(),
+          isNot(contains(Feature.showConsumptionTab)),
+          reason:
+              'The gate flag short-circuits the second run; the user\'s '
+              'explicit disable must survive.',
+        );
+      },
+    );
+  });
 }

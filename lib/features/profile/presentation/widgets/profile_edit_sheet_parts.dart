@@ -46,15 +46,26 @@ class _RouteSegmentSection extends StatelessWidget {
 }
 
 /// Three toggles: avoid highways, show fuel stations, show EV stations.
-class _TogglesSection extends StatelessWidget {
+///
+/// As of #1373 phase 3c the show-fuel and show-electric switches no
+/// longer route through [ProfileEditController]. They read+write the
+/// central feature-flag shim providers directly so a flip is
+/// immediately visible to consumers (search results, map markers)
+/// without waiting for the Save button. This mirrors the gamification
+/// settings tile precedent (#1373 phase 3b). The avoid-highways
+/// toggle stays on the local edit state because it persists on
+/// `UserProfile`.
+class _TogglesSection extends ConsumerWidget {
   final ProfileEditState state;
   final ProfileEditController ctrl;
 
   const _TogglesSection({required this.state, required this.ctrl});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final showFuel = ref.watch(showFuelEnabledProvider);
+    final showElectric = ref.watch(showElectricEnabledProvider);
     return Column(
       children: [
         SwitchListTile(
@@ -66,16 +77,24 @@ class _TogglesSection extends StatelessWidget {
           dense: true,
         ),
         SwitchListTile(
-          value: state.showFuel,
-          onChanged: ctrl.setShowFuel,
+          value: showFuel,
+          onChanged: (v) {
+            unawaited(
+              ref.read(showFuelEnabledProvider.notifier).set(v),
+            );
+          },
           title: Text(l10n?.showFuelStations ?? 'Show fuel stations'),
           subtitle: Text(l10n?.showFuelStationsDesc ??
               'Include gas, diesel, LPG, CNG stations'),
           dense: true,
         ),
         SwitchListTile(
-          value: state.showElectric,
-          onChanged: ctrl.setShowElectric,
+          value: showElectric,
+          onChanged: (v) {
+            unawaited(
+              ref.read(showElectricEnabledProvider.notifier).set(v),
+            );
+          },
           title: Text(l10n?.showEvStations ?? 'Show EV charging stations'),
           subtitle: Text(l10n?.showEvStationsDesc ??
               'Include electric charging stations in search results'),
@@ -232,6 +251,14 @@ class _SaveDeleteActions extends StatelessWidget {
         Expanded(
           child: FilledButton(
             onPressed: () async {
+              // showFuel / showElectric are intentionally NOT included
+              // in this copyWith — as of #1373 phase 3c they live in
+              // the central feature-flag set, not on UserProfile. The
+              // legacy bool fields stay populated on the saved
+              // profile (carrying their previous value) so the
+              // legacy-toggle migrator can still read them on a
+              // downgrade-then-reupgrade path; the central flag is
+              // the authoritative source.
               final updated = profile.copyWith(
                 name: nameController.text.trim(),
                 preferredFuelType: state.fuelType,
@@ -244,8 +271,6 @@ class _SaveDeleteActions extends StatelessWidget {
                 languageCode: state.languageCode,
                 routeSegmentKm: state.routeSegmentKm,
                 avoidHighways: state.avoidHighways,
-                showFuel: state.showFuel,
-                showElectric: state.showElectric,
                 ratingMode: state.ratingMode,
                 defaultVehicleId: state.defaultVehicleId,
               );

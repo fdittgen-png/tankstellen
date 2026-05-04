@@ -6578,6 +6578,42 @@ abstract class AppLocalizations {
   /// **'Automatically start a trip when the OBD2 adapter connects to a moving vehicle.'**
   String get featureDescription_autoRecord;
 
+  /// Display name for the show-fuel-stations feature gate (#1373 phase 3c). Migrated from the legacy UserProfile.showFuel bool.
+  ///
+  /// In en, this message translates to:
+  /// **'Show fuel stations'**
+  String get featureLabel_showFuel;
+
+  /// One-line description for the show-fuel-stations feature gate.
+  ///
+  /// In en, this message translates to:
+  /// **'Display petrol/diesel station results in search and on the map.'**
+  String get featureDescription_showFuel;
+
+  /// Display name for the show-EV-charging-stations feature gate (#1373 phase 3c). Migrated from the legacy UserProfile.showElectric bool.
+  ///
+  /// In en, this message translates to:
+  /// **'Show charging stations'**
+  String get featureLabel_showElectric;
+
+  /// One-line description for the show-EV-charging-stations feature gate.
+  ///
+  /// In en, this message translates to:
+  /// **'Display EV charging stations in search and on the map.'**
+  String get featureDescription_showElectric;
+
+  /// Display name for the consumption-tab visibility feature gate (#1373 phase 3c). Migrated from the legacy UserProfile.showConsumptionTab bool.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption tab'**
+  String get featureLabel_showConsumptionTab;
+
+  /// One-line description for the consumption-tab visibility feature gate.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the consumption analytics tab in the bottom navigation.'**
+  String get featureDescription_showConsumptionTab;
+
   /// Tooltip shown on the disabled gamification toggle when its prerequisite (OBD2 trip recording) is off.
   ///
   /// In en, this message translates to:
@@ -6625,6 +6661,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Disable dependent features first: {dependents}'**
   String featureBlockedDisable_autoRecord(String dependents);
+
+  /// Tooltip shown on the disabled show-fuel-stations toggle. The feature has no prerequisites today so this string is a defensive fallback for the dependency-graph helpers.
+  ///
+  /// In en, this message translates to:
+  /// **'Prerequisites not met'**
+  String get featureBlockedEnable_showFuel;
+
+  /// Tooltip shown on the disabled show-fuel-stations toggle when one or more dependent features are still enabled. Defensive fallback — nothing in the manifest currently depends on showFuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable dependent features first: {dependents}'**
+  String featureBlockedDisable_showFuel(String dependents);
+
+  /// Tooltip shown on the disabled show-EV-charging-stations toggle. The feature has no prerequisites today so this string is a defensive fallback for the dependency-graph helpers.
+  ///
+  /// In en, this message translates to:
+  /// **'Prerequisites not met'**
+  String get featureBlockedEnable_showElectric;
+
+  /// Tooltip shown on the disabled show-EV-charging-stations toggle when one or more dependent features are still enabled. Defensive fallback — nothing in the manifest currently depends on showElectric.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable dependent features first: {dependents}'**
+  String featureBlockedDisable_showElectric(String dependents);
+
+  /// Tooltip shown on the disabled consumption-tab toggle when its prerequisite (OBD2 trip recording) is off.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable OBD2 trip recording first'**
+  String get featureBlockedEnable_showConsumptionTab;
+
+  /// Tooltip shown on the disabled consumption-tab toggle when one or more dependent features are still enabled. Defensive fallback — nothing currently depends on showConsumptionTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable dependent features first: {dependents}'**
+  String featureBlockedDisable_showConsumptionTab(String dependents);
 
   /// Tooltip shown on the disabled OBD2 trip recording toggle when one or more dependent features are still enabled. The placeholder is filled with a comma-separated list of localised feature names.
   ///

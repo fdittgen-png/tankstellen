@@ -3595,6 +3595,27 @@ class AppLocalizationsFr extends AppLocalizations {
       'Démarre automatiquement un trajet dès que l\'adaptateur OBD2 se connecte à un véhicule en mouvement.';
 
   @override
+  String get featureLabel_showFuel => 'Afficher les stations-service';
+
+  @override
+  String get featureDescription_showFuel =>
+      'Afficher les stations essence/diesel dans la recherche et sur la carte.';
+
+  @override
+  String get featureLabel_showElectric => 'Afficher les bornes de recharge';
+
+  @override
+  String get featureDescription_showElectric =>
+      'Afficher les bornes de recharge dans la recherche et sur la carte.';
+
+  @override
+  String get featureLabel_showConsumptionTab => 'Onglet Consommation';
+
+  @override
+  String get featureDescription_showConsumptionTab =>
+      'Afficher l\'onglet d\'analyse de consommation dans la barre de navigation.';
+
+  @override
   String get featureBlockedEnable_gamification =>
       'Activez d\'abord l\'enregistrement OBD2 des trajets';
 
@@ -3623,6 +3644,33 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String featureBlockedDisable_autoRecord(String dependents) {
+    return 'Désactivez d\'abord les fonctionnalités dépendantes : $dependents';
+  }
+
+  @override
+  String get featureBlockedEnable_showFuel =>
+      'Conditions préalables non remplies';
+
+  @override
+  String featureBlockedDisable_showFuel(String dependents) {
+    return 'Désactivez d\'abord les fonctionnalités dépendantes : $dependents';
+  }
+
+  @override
+  String get featureBlockedEnable_showElectric =>
+      'Conditions préalables non remplies';
+
+  @override
+  String featureBlockedDisable_showElectric(String dependents) {
+    return 'Désactivez d\'abord les fonctionnalités dépendantes : $dependents';
+  }
+
+  @override
+  String get featureBlockedEnable_showConsumptionTab =>
+      'Activez d\'abord l\'enregistrement OBD2 des trajets';
+
+  @override
+  String featureBlockedDisable_showConsumptionTab(String dependents) {
     return 'Désactivez d\'abord les fonctionnalités dépendantes : $dependents';
   }
 

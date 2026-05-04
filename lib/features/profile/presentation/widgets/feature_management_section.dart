@@ -178,6 +178,12 @@ String _featureLabel(AppLocalizations? l, Feature f) {
       return l?.featureLabel_gpsTripPath ?? 'GPS trip path';
     case Feature.autoRecord:
       return l?.featureLabel_autoRecord ?? 'Auto-record';
+    case Feature.showFuel:
+      return l?.featureLabel_showFuel ?? 'Show fuel stations';
+    case Feature.showElectric:
+      return l?.featureLabel_showElectric ?? 'Show charging stations';
+    case Feature.showConsumptionTab:
+      return l?.featureLabel_showConsumptionTab ?? 'Consumption tab';
   }
 }
 
@@ -225,6 +231,15 @@ String _featureDescription(AppLocalizations? l, Feature f) {
     case Feature.autoRecord:
       return l?.featureDescription_autoRecord ??
           'Automatically start a trip when the OBD2 adapter connects to a moving vehicle.';
+    case Feature.showFuel:
+      return l?.featureDescription_showFuel ??
+          'Display petrol/diesel station results in search and on the map.';
+    case Feature.showElectric:
+      return l?.featureDescription_showElectric ??
+          'Display EV charging stations in search and on the map.';
+    case Feature.showConsumptionTab:
+      return l?.featureDescription_showConsumptionTab ??
+          'Show the consumption analytics tab in the bottom navigation.';
   }
 }
 
@@ -251,6 +266,9 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
     case Feature.autoRecord:
       return l?.featureBlockedEnable_autoRecord ??
           'Enable OBD2 trip recording first';
+    case Feature.showConsumptionTab:
+      return l?.featureBlockedEnable_showConsumptionTab ??
+          'Enable OBD2 trip recording first';
     // Features without prerequisites can never reach this branch — the
     // dependency-graph helpers short-circuit. Return a generic fallback
     // so the function is total in case the manifest changes.
@@ -261,6 +279,8 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
     case Feature.priceHistory:
     case Feature.routePlanning:
     case Feature.evCharging:
+    case Feature.showFuel:
+    case Feature.showElectric:
       return 'Prerequisites not met';
   }
 }
@@ -291,6 +311,9 @@ String _blockedDisableMessage(
     case Feature.glideCoach:
     case Feature.gpsTripPath:
     case Feature.autoRecord:
+    case Feature.showFuel:
+    case Feature.showElectric:
+    case Feature.showConsumptionTab:
       return 'Disable dependent features first: $dependents';
   }
 }
