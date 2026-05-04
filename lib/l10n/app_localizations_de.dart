@@ -3676,6 +3676,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String get feedbackTokenFieldLabel => 'Personal Access Token';
 
   @override
+  String get fillUpReconciliationVerifiedBadgeLabel => 'Vom Adapter bestätigt';
+
+  @override
+  String get fillUpReconciliationVarianceDialogTitle =>
+      'Stimmt nicht mit Adapter überein';
+
+  @override
+  String fillUpReconciliationVarianceDialogBody(String userL, String adapterL) {
+    return 'Deine Eingabe: $userL L. Adapter meldet: $adapterL L (Differenz aus Tankstand vor/nach dem Tanken). Adapterwert übernehmen?';
+  }
+
+  @override
+  String get fillUpReconciliationVarianceDialogKeepMine =>
+      'Meine Eingabe behalten';
+
+  @override
+  String get fillUpReconciliationVarianceDialogUseAdapter =>
+      'Adapterwert übernehmen';
+
+  @override
   String get scanReceiptNoData =>
       'Keine Belegdaten gefunden — bitte erneut versuchen';
 

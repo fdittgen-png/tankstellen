@@ -3678,6 +3678,26 @@ class AppLocalizationsFr extends AppLocalizations {
   String get feedbackTokenFieldLabel => 'Personal Access Token';
 
   @override
+  String get fillUpReconciliationVerifiedBadgeLabel =>
+      'Vérifié par l\'adaptateur';
+
+  @override
+  String get fillUpReconciliationVarianceDialogTitle =>
+      'Ne correspond pas à l\'adaptateur';
+
+  @override
+  String fillUpReconciliationVarianceDialogBody(String userL, String adapterL) {
+    return 'Votre saisie : $userL L. L\'adaptateur indique : $adapterL L (différence entre les niveaux de carburant avant et après). Utiliser la valeur de l\'adaptateur ?';
+  }
+
+  @override
+  String get fillUpReconciliationVarianceDialogKeepMine => 'Garder ma saisie';
+
+  @override
+  String get fillUpReconciliationVarianceDialogUseAdapter =>
+      'Utiliser la valeur de l\'adaptateur';
+
+  @override
   String get scanReceiptNoData => 'No receipt data found — try again';
 
   @override

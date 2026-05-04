@@ -13,11 +13,13 @@ import '../../domain/add_fill_up_fuel_resolver.dart';
 import '../../domain/add_fill_up_validators.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../domain/fill_up_auto_cost_calculator.dart';
+import '../../domain/fill_up_variance.dart';
 import '../../providers/consumption_providers.dart';
 import '../widgets/add_fill_up_form_fields.dart';
 import '../widgets/fill_up_no_vehicle_cta.dart';
 import '../widgets/fill_up_pinned_save_bar.dart';
 import '../widgets/fill_up_scan_handlers.dart';
+import '../widgets/fill_up_variance_prompt.dart';
 
 /// Form to add a new [FillUp] entry.
 class AddFillUpScreen extends ConsumerStatefulWidget {
@@ -43,6 +45,20 @@ class AddFillUpScreen extends ConsumerStatefulWidget {
   @visibleForTesting
   final ReceiptScanService? scanService;
 
+  /// Test seam (#1401 phase 7b) — adapter-captured tank level read
+  /// at the moment the pump started. Production callers will populate
+  /// this from the live OBD2 producer chain (tracked in a follow-up
+  /// to #1401); until that wiring lands the value is always null and
+  /// the variance prompt never fires. Tests inject a value to
+  /// exercise the dialog flow end-to-end.
+  @visibleForTesting
+  final double? initialFuelLevelBeforeL;
+
+  /// Test seam (#1401 phase 7b) — adapter-captured tank level read
+  /// at pump end. See [initialFuelLevelBeforeL] for context.
+  @visibleForTesting
+  final double? initialFuelLevelAfterL;
+
   const AddFillUpScreen({
     super.key,
     this.stationId,
@@ -50,6 +66,8 @@ class AddFillUpScreen extends ConsumerStatefulWidget {
     this.preFilledFuelType,
     this.preFilledPricePerLiter,
     this.scanService,
+    this.initialFuelLevelBeforeL,
+    this.initialFuelLevelAfterL,
   });
 
   @override
@@ -201,10 +219,11 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final fillUp = FillUp(
+    final userLiters = AddFillUpValidators.parseDouble(_litersCtrl.text);
+    var fillUp = FillUp(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       date: _date,
-      liters: AddFillUpValidators.parseDouble(_litersCtrl.text),
+      liters: userLiters,
       totalCost: AddFillUpValidators.parseDouble(_costCtrl.text),
       odometerKm: AddFillUpValidators.parseDouble(_odoCtrl.text),
       fuelType: _fuelType,
@@ -213,7 +232,30 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
       vehicleId: _vehicleId,
       isFullTank: _isFullTank,
+      fuelLevelBeforeL: widget.initialFuelLevelBeforeL,
+      fuelLevelAfterL: widget.initialFuelLevelAfterL,
     );
+
+    // #1401 phase 7b — when both adapter fuel-level captures are
+    // present and the user-entered litres differ from the adapter
+    // delta by more than 5 %, ask before persisting. Skip the gate
+    // entirely when either capture is missing — no baseline, no
+    // dialog. Dismissing the dialog is treated as "Keep my entry"
+    // (the user's typed value wins).
+    if (FillUpVariance.hasAdapterCapture(fillUp)) {
+      final adapterDelta = FillUpVariance.adapterDeltaL(fillUp)!;
+      if (FillUpVariance.isVarianceAbove5Percent(userLiters, adapterDelta)) {
+        final choice = await showFillUpVarianceDialog(
+          context: context,
+          userL: userLiters.toStringAsFixed(2),
+          adapterL: adapterDelta.toStringAsFixed(2),
+        );
+        if (!mounted) return;
+        if (choice == FillUpVarianceChoice.useAdapter) {
+          fillUp = fillUp.copyWith(liters: adapterDelta);
+        }
+      }
+    }
 
     await ref.read(fillUpListProvider.notifier).add(fillUp);
     if (!mounted) return;

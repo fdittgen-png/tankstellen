@@ -3642,6 +3642,25 @@ class AppLocalizationsDa extends AppLocalizations {
   String get feedbackTokenFieldLabel => 'Personal Access Token';
 
   @override
+  String get fillUpReconciliationVerifiedBadgeLabel => 'Verified by adapter';
+
+  @override
+  String get fillUpReconciliationVarianceDialogTitle =>
+      'Doesn\'t match adapter reading';
+
+  @override
+  String fillUpReconciliationVarianceDialogBody(String userL, String adapterL) {
+    return 'Your entry: $userL L. Adapter says: $adapterL L (delta from before/after fuel-level capture). Use adapter value?';
+  }
+
+  @override
+  String get fillUpReconciliationVarianceDialogKeepMine => 'Keep my entry';
+
+  @override
+  String get fillUpReconciliationVarianceDialogUseAdapter =>
+      'Use adapter value';
+
+  @override
   String get scanReceiptNoData => 'No receipt data found — try again';
 
   @override

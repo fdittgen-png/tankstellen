@@ -5,6 +5,7 @@ import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/eco_score.dart';
 import '../../domain/entities/fill_up.dart';
+import '../../domain/fill_up_variance.dart';
 import 'eco_score_badge.dart';
 
 /// Compact card showing a single [FillUp] entry.
@@ -20,6 +21,13 @@ import 'eco_score_badge.dart';
 /// "Auto-correction — tap to edit" subtitle. Tapping a correction card
 /// is expected to open the [EditCorrectionFillUpSheet] — the tap
 /// handler is wired by the parent (the Fuel tab list builder).
+///
+/// When both [FillUp.fuelLevelBeforeL] and [FillUp.fuelLevelAfterL] are
+/// non-null (#1401 phase 7b), a small "Verified by adapter" chip is
+/// rendered under the volume / cost line. The chip uses the theme's
+/// primary colour (matching how other "trusted-source" badges in the
+/// app are rendered) plus a check icon. Either fuel-level field
+/// missing — no chip; the badge is a positive signal, never an error.
 class FillUpCard extends StatelessWidget {
   final FillUp fillUp;
   final EcoScore? ecoScore;
@@ -55,6 +63,9 @@ class FillUpCard extends StatelessWidget {
     // background so the contrast vs. white text on the avatar stays
     // readable at smaller sizes.
     final correctionColor = Colors.orange.shade700;
+    // #1401 phase 7b — only render the verified-by-adapter chip when
+    // both fuel-level captures are present. Either missing → no chip.
+    final isVerifiedByAdapter = FillUpVariance.hasAdapterCapture(fillUp);
 
     final card = Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -109,6 +120,45 @@ class FillUpCard extends StatelessWidget {
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: correctionColor,
                   fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+            if (isVerifiedByAdapter) ...[
+              const SizedBox(height: 4),
+              // #1401 phase 7b — small "Verified by adapter" chip. Uses
+              // the theme primary colour for the chip background tint
+              // and a check icon so the affordance reads at a glance
+              // without relying on colour alone.
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        size: 14,
+                        color: theme.colorScheme.onPrimaryContainer,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        l?.fillUpReconciliationVerifiedBadgeLabel ??
+                            'Verified by adapter',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
