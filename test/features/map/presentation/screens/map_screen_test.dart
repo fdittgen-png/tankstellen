@@ -771,8 +771,8 @@ void main() {
     );
 
     testWidgets(
-      '5 taps on AppBar title within 2s flips mapDebugOverlayProvider '
-      '(#1316 phase 2 — hidden gesture)',
+      '5 taps on hidden region under AppBar within 2s flips '
+      'mapDebugOverlayProvider (#1316 phase 2 / #1441 — hidden gesture)',
       (tester) async {
         final test = standardTestOverrides();
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -792,15 +792,32 @@ void main() {
         );
         expect(container.read(mapDebugOverlayProvider), isFalse);
 
+        // #1441 — gesture target moved off the AppBar title into a
+        // transparent `Positioned` region in the body Stack. Locate it
+        // by `Stack`-of-`MapScreen` -> the GestureDetector that owns
+        // the SizedBox.expand child. Multiple GestureDetectors exist
+        // in the subtree (flutter_map etc.), so narrow by the
+        // Positioned ancestor whose `top` is 0.
+        final hiddenTapTarget = find.descendant(
+          of: find.byType(MapScreen),
+          matching: find.byWidgetPredicate(
+            (w) =>
+                w is GestureDetector &&
+                w.behavior == HitTestBehavior.translucent &&
+                w.child is SizedBox,
+          ),
+        );
+        expect(hiddenTapTarget, findsOneWidget);
+
         // 4 taps must NOT toggle.
         for (var i = 0; i < 4; i++) {
-          await tester.tap(find.text('Map'));
+          await tester.tap(hiddenTapTarget, warnIfMissed: false);
           await tester.pump();
         }
         expect(container.read(mapDebugOverlayProvider), isFalse);
 
         // 5th tap toggles.
-        await tester.tap(find.text('Map'));
+        await tester.tap(hiddenTapTarget, warnIfMissed: false);
         await tester.pump();
         // Toggle is async — let microtasks drain.
         await tester.pump();
@@ -808,9 +825,9 @@ void main() {
           container.read(mapDebugOverlayProvider),
           isTrue,
           reason:
-              '5 consecutive taps on the Carte AppBar title within 2s '
-              'must flip the in-app debug overlay flag (#1316 phase '
-              '2).',
+              '5 consecutive taps on the hidden region directly under '
+              'the Carte AppBar within 2s must flip the in-app debug '
+              'overlay flag (#1316 phase 2 / #1441).',
         );
       },
     );

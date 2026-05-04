@@ -175,6 +175,16 @@ class _MapScreenState extends ConsumerState<MapScreen>
   /// [_debugGestureWindow] flips [mapDebugOverlayProvider].
   static const int _debugGestureTapThreshold = 5;
 
+  /// Vertical extent of the transparent hit region that hosts the
+  /// hidden 5-tap gesture (#1441). The gesture used to live on the
+  /// AppBar title widget itself; relocating it here let us normalise
+  /// the title slot to plain `title:` so MapScreen's AppBar matches
+  /// the other 4 top-level tabs. 56 dp is the Material AppBar height
+  /// — the region sits flush under the AppBar and covers the slice of
+  /// body real estate immediately below the title text, so users who
+  /// tap "around the title" still trigger the overlay.
+  static const double _debugGestureRegionHeight = 56;
+
   /// When the app last entered a non-resumed state. Compared against
   /// the resume timestamp to decide whether to refresh — see
   /// [_resumeRefreshThreshold].
@@ -547,17 +557,15 @@ class _MapScreenState extends ConsumerState<MapScreen>
 
     final titleText = l10n?.map ?? 'Map';
     return PageScaffold(
-      titleWidget: GestureDetector(
-        // The 5-tap gesture is hidden — `behavior: opaque` ensures the
-        // tap is captured even when the title's intrinsic size leaves
-        // empty space inside the AppBar's title slot.
-        behavior: HitTestBehavior.opaque,
-        onTap: _bumpDebugTapCount,
-        child: Semantics(
-          header: true,
-          child: Text(titleText),
-        ),
-      ),
+      // #1441 — title was a `GestureDetector(Text)` to host the 5-tap
+      // hidden debug gesture (#1316 phase 2). That diverged from the
+      // other 4 main tabs which all use plain `title:`. The gesture is
+      // now a transparent `Positioned` overlay at the top of the body
+      // Stack (see below), preserving the hidden-tap discoverability
+      // ("tap the title" still works because the overlay sits exactly
+      // under the title slot) while letting `PageScaffold` wrap the
+      // text in its canonical `Semantics(header: true, Text)`.
+      title: titleText,
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh),
@@ -581,6 +589,25 @@ class _MapScreenState extends ConsumerState<MapScreen>
             ],
           ),
           const MapDebugBreadcrumbOverlay(),
+          // #1441 — hidden 5-tap gesture relocated out of the AppBar
+          // title slot. The overlay is invisible, sits at the very
+          // top of the body Stack, and only spans the central title
+          // region — leaving the AppBar's refresh + EV-toggle actions
+          // and the leading slot fully tappable. Behavior `opaque` so
+          // taps in the empty body area below the AppBar still
+          // register; `top: 0` because PageScaffold's body Column
+          // starts directly under the AppBar bottom edge.
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: _debugGestureRegionHeight,
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: _bumpDebugTapCount,
+              child: const SizedBox.expand(),
+            ),
+          ),
         ],
       ),
     );
