@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/data/feature_flags_repository.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
+import 'package:tankstellen/features/feature_management/domain/feature_dependency_graph.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 
 void main() {
@@ -103,27 +104,57 @@ void main() {
       expect(state, contains(Feature.gamification));
     });
 
-    test('disable(obd2TripRecording) throws when gamification is enabled',
+    test(
+        'disable(obd2TripRecording) succeeds while gamification is enabled — '
+        'gamification stays in stored set but is effectively disabled (#1447)',
         () async {
       final c = makeContainer();
       await pumpLoad(c);
       await c
           .read(featureFlagsProvider.notifier)
           .enable(Feature.obd2TripRecording);
-      // gamification is on by default; ensure it's still set after the
-      // pre-condition above.
       expect(c.read(featureFlagsProvider), contains(Feature.gamification));
 
+      // Cascading-disable: parent comes off, child stays in storage so the
+      // user's preference is preserved, but the user-visible "is this
+      // surface available" answer is false.
+      await c
+          .read(featureFlagsProvider.notifier)
+          .disable(Feature.obd2TripRecording);
+
+      final state = c.read(featureFlagsProvider);
+      expect(state, isNot(contains(Feature.obd2TripRecording)));
       expect(
-        () => c
-            .read(featureFlagsProvider.notifier)
-            .disable(Feature.obd2TripRecording),
-        throwsA(isA<StateError>().having(
-          (e) => e.message,
-          'message',
-          allOf(contains('Cannot disable obd2TripRecording'),
-              contains('gamification')),
-        )),
+        state,
+        contains(Feature.gamification),
+        reason:
+            'Child stored state must be preserved on parent-disable so '
+            're-enabling the parent restores the prior setup.',
+      );
+      expect(
+        isEffectivelyEnabled(
+          Feature.gamification,
+          FeatureManifest.defaultManifest,
+          state,
+        ),
+        isFalse,
+        reason:
+            'With obd2TripRecording off, gamification is not effectively '
+            'enabled regardless of its stored value.',
+      );
+
+      // Re-enabling the parent flips the child back to effectively-on
+      // without any explicit child re-toggle.
+      await c
+          .read(featureFlagsProvider.notifier)
+          .enable(Feature.obd2TripRecording);
+      expect(
+        isEffectivelyEnabled(
+          Feature.gamification,
+          FeatureManifest.defaultManifest,
+          c.read(featureFlagsProvider),
+        ),
+        isTrue,
       );
     });
 
