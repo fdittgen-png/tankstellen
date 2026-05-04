@@ -3593,6 +3593,27 @@ class AppLocalizationsDe extends AppLocalizations {
       'Fahrt automatisch starten, sobald der OBD2-Adapter mit einem fahrenden Fahrzeug verbunden ist.';
 
   @override
+  String get featureLabel_showFuel => 'Tankstellen anzeigen';
+
+  @override
+  String get featureDescription_showFuel =>
+      'Benzin-/Dieseltankstellen in Suche und Karte anzeigen.';
+
+  @override
+  String get featureLabel_showElectric => 'Ladesäulen anzeigen';
+
+  @override
+  String get featureDescription_showElectric =>
+      'Ladesäulen in Suche und Karte anzeigen.';
+
+  @override
+  String get featureLabel_showConsumptionTab => 'Verbrauchs-Tab';
+
+  @override
+  String get featureDescription_showConsumptionTab =>
+      'Verbrauchsanalyse-Tab in der unteren Navigationsleiste anzeigen.';
+
+  @override
   String get featureBlockedEnable_gamification =>
       'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
 
@@ -3621,6 +3642,32 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String featureBlockedDisable_autoRecord(String dependents) {
+    return 'Schalte zuerst die abhängigen Funktionen aus: $dependents';
+  }
+
+  @override
+  String get featureBlockedEnable_showFuel => 'Voraussetzungen nicht erfüllt';
+
+  @override
+  String featureBlockedDisable_showFuel(String dependents) {
+    return 'Schalte zuerst die abhängigen Funktionen aus: $dependents';
+  }
+
+  @override
+  String get featureBlockedEnable_showElectric =>
+      'Voraussetzungen nicht erfüllt';
+
+  @override
+  String featureBlockedDisable_showElectric(String dependents) {
+    return 'Schalte zuerst die abhängigen Funktionen aus: $dependents';
+  }
+
+  @override
+  String get featureBlockedEnable_showConsumptionTab =>
+      'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
+
+  @override
+  String featureBlockedDisable_showConsumptionTab(String dependents) {
     return 'Schalte zuerst die abhängigen Funktionen aus: $dependents';
   }
 

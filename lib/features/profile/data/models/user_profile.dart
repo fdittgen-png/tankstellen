@@ -44,7 +44,13 @@ abstract class UserProfile with _$UserProfile {
     String? languageCode,
     @Default(50.0) double routeSegmentKm,
     @Default(false) bool avoidHighways,
+    @Deprecated(
+      'Migrated to Feature.showFuel in #1373 phase 3c; kept for one-shot migration read.',
+    )
     @Default(true) bool showFuel,
+    @Deprecated(
+      'Migrated to Feature.showElectric in #1373 phase 3c; kept for one-shot migration read.',
+    )
     @Default(true) bool showElectric,
     /// Rating sharing mode:
     /// - 'local' — ratings saved only on this device
@@ -70,6 +76,9 @@ abstract class UserProfile with _$UserProfile {
     /// one vehicle is configured — the log is vehicle-centric and a
     /// first-time user without a vehicle would only see the empty
     /// state.
+    @Deprecated(
+      'Migrated to Feature.showConsumptionTab in #1373 phase 3c; kept for one-shot migration read.',
+    )
     @Default(false) bool showConsumptionTab,
     /// Master toggle for gamification surfaces (#1194). Defaults to
     /// true so existing users see no behaviour change. When flipped

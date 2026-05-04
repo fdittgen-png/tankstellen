@@ -58,4 +58,24 @@ enum Feature {
   /// regardless of its bool. Requires [obd2TripRecording] (auto-record
   /// without trip-capture is a contradiction).
   autoRecord,
+
+  /// Visibility of fuel-station results in search and on the map
+  /// (#1373 phase 3c). Wraps the legacy `UserProfile.showFuel` bool —
+  /// the central flag is the single source of truth post-migration;
+  /// the legacy field stays for the one-shot migration read.
+  showFuel,
+
+  /// Visibility of EV charging-station results in search and on the
+  /// map (#1373 phase 3c). Wraps the legacy `UserProfile.showElectric`
+  /// bool — the central flag is the single source of truth post-
+  /// migration; the legacy field stays for the one-shot migration read.
+  showElectric,
+
+  /// Visibility of the consumption analytics tab in the bottom
+  /// navigation (#1373 phase 3c). Wraps the legacy
+  /// `UserProfile.showConsumptionTab` bool. Requires
+  /// [obd2TripRecording] — the consumption analytics tab has nothing
+  /// to render without trip data, so the dependency edge guards
+  /// against an empty surface in the UI.
+  showConsumptionTab,
 }

@@ -48,6 +48,25 @@ const String syncBaselinesMigratedKey = 'syncBaselinesMigrated';
 /// vehicle bools continue to gate per-vehicle behaviour as before.
 const String autoRecordMigratedKey = 'autoRecordMigrated';
 
+/// Settings-box key written once after the legacy
+/// `UserProfile.showFuel` value has been promoted into the central
+/// feature-flag set (#1373 phase 3c). Persisted in the same `settings`
+/// Hive box as the other migration gates so a single read tells us
+/// whether the migration has already run.
+const String showFuelMigratedKey = 'showFuelMigrated';
+
+/// Settings-box key written once after the legacy
+/// `UserProfile.showElectric` value has been promoted into the
+/// central feature-flag set (#1373 phase 3c).
+const String showElectricMigratedKey = 'showElectricMigrated';
+
+/// Settings-box key written once after the legacy
+/// `UserProfile.showConsumptionTab` value has been promoted into the
+/// central feature-flag set (#1373 phase 3c). The manifest declares
+/// [Feature.showConsumptionTab] as requiring [Feature.obd2TripRecording],
+/// so a legacy `true` cascades the prerequisite as well.
+const String showConsumptionTabMigratedKey = 'showConsumptionTabMigrated';
+
 /// One-shot migrator that promotes legacy scattered toggles into the
 /// central [FeatureFlagsRepository] (#1373 phase 3a).
 ///
@@ -107,6 +126,8 @@ const String autoRecordMigratedKey = 'autoRecordMigrated';
 ///   - 3f unifiedSearchResults (settings-box, default-false) ✅
 ///   - 3e syncBaselines (settings-box, default-false) ✅
 ///   - 3d autoRecord (per-vehicle, default-true, WRAP not replace) ✅
+///   - 3c showFuel + showElectric + showConsumptionTab (UserProfile,
+///     bundled phase, default-true) ✅ via [migrateUserProfileToggles]
 ///
 /// Future phases extend this migrator with additional scattered
 /// toggles. Each new migration follows the same shape: read the
@@ -170,6 +191,24 @@ Future<void> migrateUserProfileToggles({
   required UserProfile? activeProfile,
 }) async {
   await _migrateGamification(
+    settings: settings,
+    featureFlags: featureFlags,
+    manifest: manifest,
+    activeProfile: activeProfile,
+  );
+  await _migrateShowFuel(
+    settings: settings,
+    featureFlags: featureFlags,
+    manifest: manifest,
+    activeProfile: activeProfile,
+  );
+  await _migrateShowElectric(
+    settings: settings,
+    featureFlags: featureFlags,
+    manifest: manifest,
+    activeProfile: activeProfile,
+  );
+  await _migrateShowConsumptionTab(
     settings: settings,
     featureFlags: featureFlags,
     manifest: manifest,
@@ -500,6 +539,174 @@ Future<void> _migrateAutoRecord({
   } catch (e, st) {
     debugPrint(
       'migrateLegacyToggles: writing $autoRecordMigratedKey failed: $e\n$st',
+    );
+  }
+}
+
+/// Phase-3c migration for the legacy [UserProfile.showFuel] bool
+/// (#1373 phase 3c).
+///
+/// Mirrors [_migrateGamification]: the manifest defaults
+/// [Feature.showFuel] to `true`, so a no-op (no write) on legacy=true
+/// would land at the same state. The legacy=false branch is the one
+/// that needs an explicit central write — without it the manifest
+/// default would silently restore the fuel-stations surface for users
+/// who had explicitly turned it off. The migration is gated on
+/// [showFuelMigratedKey] and skipped when the active profile is
+/// null (next launch retries), preserving the same idempotency
+/// contract as the gamification precedent.
+Future<void> _migrateShowFuel({
+  required Box<dynamic> settings,
+  required FeatureFlagsRepository featureFlags,
+  required FeatureManifest manifest,
+  required UserProfile? activeProfile,
+}) async {
+  if (settings.get(showFuelMigratedKey) == true) {
+    return;
+  }
+  if (activeProfile == null) {
+    return;
+  }
+
+  // ignore: deprecated_member_use_from_same_package
+  final legacyValue = activeProfile.showFuel;
+
+  try {
+    final current = await featureFlags.loadEnabled();
+    if (legacyValue == true) {
+      // Manifest default is true — but the persisted set may have been
+      // mutated by a previous launch / migration. Re-add to be safe;
+      // [Feature.showFuel] has no prerequisites so no cascade needed.
+      final next = <Feature>{...current, Feature.showFuel};
+      await featureFlags.saveEnabled(next);
+    } else {
+      // Legacy explicit-false. Without an explicit write the manifest
+      // default-true would silently restore the surface for users who
+      // deliberately turned it off.
+      final next = {...current}..remove(Feature.showFuel);
+      await featureFlags.saveEnabled(next);
+    }
+  } catch (e, st) {
+    debugPrint(
+      'migrateUserProfileToggles: showFuel promote failed: $e\n$st',
+    );
+  }
+
+  try {
+    await settings.put(showFuelMigratedKey, true);
+  } catch (e, st) {
+    debugPrint(
+      'migrateUserProfileToggles: writing $showFuelMigratedKey failed: $e\n$st',
+    );
+  }
+}
+
+/// Phase-3c migration for the legacy [UserProfile.showElectric] bool
+/// (#1373 phase 3c). Mirrors [_migrateShowFuel] verbatim — same
+/// default-true semantics, no manifest prerequisites.
+Future<void> _migrateShowElectric({
+  required Box<dynamic> settings,
+  required FeatureFlagsRepository featureFlags,
+  required FeatureManifest manifest,
+  required UserProfile? activeProfile,
+}) async {
+  if (settings.get(showElectricMigratedKey) == true) {
+    return;
+  }
+  if (activeProfile == null) {
+    return;
+  }
+
+  // ignore: deprecated_member_use_from_same_package
+  final legacyValue = activeProfile.showElectric;
+
+  try {
+    final current = await featureFlags.loadEnabled();
+    if (legacyValue == true) {
+      final next = <Feature>{...current, Feature.showElectric};
+      await featureFlags.saveEnabled(next);
+    } else {
+      final next = {...current}..remove(Feature.showElectric);
+      await featureFlags.saveEnabled(next);
+    }
+  } catch (e, st) {
+    debugPrint(
+      'migrateUserProfileToggles: showElectric promote failed: $e\n$st',
+    );
+  }
+
+  try {
+    await settings.put(showElectricMigratedKey, true);
+  } catch (e, st) {
+    debugPrint(
+      'migrateUserProfileToggles: writing $showElectricMigratedKey failed: $e\n$st',
+    );
+  }
+}
+
+/// Phase-3c migration for the legacy [UserProfile.showConsumptionTab]
+/// bool (#1373 phase 3c).
+///
+/// Distinct from [_migrateShowFuel] / [_migrateShowElectric] because
+/// the manifest declares [Feature.obd2TripRecording] as a hard
+/// prerequisite of [Feature.showConsumptionTab]. The legacy field
+/// defaulted to `false` (the user had to explicitly opt in), so the
+/// common case is legacy=false → remove the central feature. Legacy=
+/// true is the rare case where the user previously enabled the tab;
+/// we cascade-enable the OBD2 prerequisite alongside so the central
+/// state is dependency-consistent.
+Future<void> _migrateShowConsumptionTab({
+  required Box<dynamic> settings,
+  required FeatureFlagsRepository featureFlags,
+  required FeatureManifest manifest,
+  required UserProfile? activeProfile,
+}) async {
+  if (settings.get(showConsumptionTabMigratedKey) == true) {
+    return;
+  }
+  if (activeProfile == null) {
+    return;
+  }
+
+  // ignore: deprecated_member_use_from_same_package
+  final legacyValue = activeProfile.showConsumptionTab;
+
+  try {
+    final current = await featureFlags.loadEnabled();
+    if (legacyValue == true) {
+      // Force-enable the prerequisite first per the manifest's
+      // dependency graph — [Feature.showConsumptionTab] requires
+      // [Feature.obd2TripRecording], so the cascade promotes both.
+      // Without this the persisted set would be in a contract-
+      // violating shape (dependent enabled, prerequisite disabled).
+      final entry = manifest.entryFor(Feature.showConsumptionTab);
+      final next = <Feature>{
+        ...current,
+        ...entry.requires,
+        Feature.showConsumptionTab,
+      };
+      await featureFlags.saveEnabled(next);
+    } else {
+      // Legacy explicit-false (the common case — the field defaulted
+      // to false and most users never flipped it). Manifest default
+      // is true, so a no-op write would silently SHOW the tab for
+      // users who never had it on. Persist a state that excludes the
+      // feature so the original user-facing shape (tab hidden) is
+      // preserved.
+      final next = {...current}..remove(Feature.showConsumptionTab);
+      await featureFlags.saveEnabled(next);
+    }
+  } catch (e, st) {
+    debugPrint(
+      'migrateUserProfileToggles: showConsumptionTab promote failed: $e\n$st',
+    );
+  }
+
+  try {
+    await settings.put(showConsumptionTabMigratedKey, true);
+  } catch (e, st) {
+    debugPrint(
+      'migrateUserProfileToggles: writing $showConsumptionTabMigratedKey failed: $e\n$st',
     );
   }
 }

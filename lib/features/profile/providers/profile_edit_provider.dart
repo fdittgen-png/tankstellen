@@ -8,6 +8,14 @@ part 'profile_edit_provider.g.dart';
 /// UI state for the profile edit sheet. Text input values live in
 /// [TextEditingController]s owned by the sheet itself (Flutter lifecycle);
 /// everything the form needs to rebuild on lives here.
+///
+/// As of #1373 phase 3c the `showFuel` / `showElectric` toggles no
+/// longer round-trip through this state: they read+write the central
+/// feature-flag shim providers directly so a flip in the edit sheet is
+/// immediately visible to consumers (search results, map markers).
+/// The legacy [UserProfile.showFuel] / `showElectric` fields are
+/// preserved for the one-shot migration read but are no longer
+/// authoritative.
 class ProfileEditState {
   final FuelType fuelType;
   final double radius;
@@ -16,8 +24,6 @@ class ProfileEditState {
   final String? languageCode;
   final double routeSegmentKm;
   final bool avoidHighways;
-  final bool showFuel;
-  final bool showElectric;
   final String ratingMode;
   final String? defaultVehicleId;
 
@@ -29,8 +35,6 @@ class ProfileEditState {
     required this.languageCode,
     required this.routeSegmentKm,
     required this.avoidHighways,
-    required this.showFuel,
-    required this.showElectric,
     required this.ratingMode,
     required this.defaultVehicleId,
   });
@@ -43,8 +47,6 @@ class ProfileEditState {
         languageCode: p.languageCode,
         routeSegmentKm: p.routeSegmentKm,
         avoidHighways: p.avoidHighways,
-        showFuel: p.showFuel,
-        showElectric: p.showElectric,
         ratingMode: p.ratingMode,
         defaultVehicleId: p.defaultVehicleId,
       );
@@ -59,8 +61,6 @@ class ProfileEditState {
     bool clearLanguage = false,
     double? routeSegmentKm,
     bool? avoidHighways,
-    bool? showFuel,
-    bool? showElectric,
     String? ratingMode,
     String? defaultVehicleId,
     bool clearDefaultVehicle = false,
@@ -73,8 +73,6 @@ class ProfileEditState {
       languageCode: clearLanguage ? null : (languageCode ?? this.languageCode),
       routeSegmentKm: routeSegmentKm ?? this.routeSegmentKm,
       avoidHighways: avoidHighways ?? this.avoidHighways,
-      showFuel: showFuel ?? this.showFuel,
-      showElectric: showElectric ?? this.showElectric,
       ratingMode: ratingMode ?? this.ratingMode,
       defaultVehicleId: clearDefaultVehicle
           ? null
@@ -97,8 +95,6 @@ class ProfileEditController extends _$ProfileEditController {
   void setRouteSegmentKm(double v) =>
       state = state.copyWith(routeSegmentKm: v);
   void setAvoidHighways(bool v) => state = state.copyWith(avoidHighways: v);
-  void setShowFuel(bool v) => state = state.copyWith(showFuel: v);
-  void setShowElectric(bool v) => state = state.copyWith(showElectric: v);
   void setRatingMode(String v) => state = state.copyWith(ratingMode: v);
   void setLandingScreen(LandingScreen v) =>
       state = state.copyWith(landingScreen: v);

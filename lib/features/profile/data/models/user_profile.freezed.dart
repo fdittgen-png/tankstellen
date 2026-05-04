@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserProfile {
 
- String get id; String get name;@FuelTypeJsonConverter() FuelType get preferredFuelType; double get defaultSearchRadius; LandingScreen get landingScreen; List<String> get favoriteStationIds; String? get homeZipCode; bool get autoUpdatePosition; String? get countryCode; String? get languageCode; double get routeSegmentKm; bool get avoidHighways; bool get showFuel; bool get showElectric;/// Rating sharing mode:
+ String get id; String get name;@FuelTypeJsonConverter() FuelType get preferredFuelType; double get defaultSearchRadius; LandingScreen get landingScreen; List<String> get favoriteStationIds; String? get homeZipCode; bool get autoUpdatePosition; String? get countryCode; String? get languageCode; double get routeSegmentKm; bool get avoidHighways;@Deprecated('Migrated to Feature.showFuel in #1373 phase 3c; kept for one-shot migration read.') bool get showFuel;@Deprecated('Migrated to Feature.showElectric in #1373 phase 3c; kept for one-shot migration read.') bool get showElectric;/// Rating sharing mode:
 /// - 'local' — ratings saved only on this device
 /// - 'private' — synced with user's database but not shared
 /// - 'shared' — visible to all users of the database
@@ -35,7 +35,7 @@ mixin _$UserProfile {
 /// one vehicle is configured — the log is vehicle-centric and a
 /// first-time user without a vehicle would only see the empty
 /// state.
- bool get showConsumptionTab;/// Master toggle for gamification surfaces (#1194). Defaults to
+@Deprecated('Migrated to Feature.showConsumptionTab in #1373 phase 3c; kept for one-shot migration read.') bool get showConsumptionTab;/// Master toggle for gamification surfaces (#1194). Defaults to
 /// true so existing users see no behaviour change. When flipped
 /// off, badges, scores, achievement tabs, and trophy iconography
 /// are hidden across the app — the underlying achievement
@@ -74,7 +74,7 @@ abstract mixin class $UserProfileCopyWith<$Res>  {
   factory $UserProfileCopyWith(UserProfile value, $Res Function(UserProfile) _then) = _$UserProfileCopyWithImpl;
 @useResult
 $Res call({
- String id, String name,@FuelTypeJsonConverter() FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways, bool showFuel, bool showElectric, String ratingMode, List<StationAmenity> preferredAmenities, String? defaultVehicleId,@FuelTypeJsonConverter() FuelType? hybridFuelChoice, bool showConsumptionTab,@Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.') bool gamificationEnabled
+ String id, String name,@FuelTypeJsonConverter() FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways,@Deprecated('Migrated to Feature.showFuel in #1373 phase 3c; kept for one-shot migration read.') bool showFuel,@Deprecated('Migrated to Feature.showElectric in #1373 phase 3c; kept for one-shot migration read.') bool showElectric, String ratingMode, List<StationAmenity> preferredAmenities, String? defaultVehicleId,@FuelTypeJsonConverter() FuelType? hybridFuelChoice,@Deprecated('Migrated to Feature.showConsumptionTab in #1373 phase 3c; kept for one-shot migration read.') bool showConsumptionTab,@Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.') bool gamificationEnabled
 });
 
 
@@ -198,7 +198,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities,  String? defaultVehicleId, @FuelTypeJsonConverter()  FuelType? hybridFuelChoice,  bool showConsumptionTab, @Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.')  bool gamificationEnabled)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways, @Deprecated('Migrated to Feature.showFuel in #1373 phase 3c; kept for one-shot migration read.')  bool showFuel, @Deprecated('Migrated to Feature.showElectric in #1373 phase 3c; kept for one-shot migration read.')  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities,  String? defaultVehicleId, @FuelTypeJsonConverter()  FuelType? hybridFuelChoice, @Deprecated('Migrated to Feature.showConsumptionTab in #1373 phase 3c; kept for one-shot migration read.')  bool showConsumptionTab, @Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.')  bool gamificationEnabled)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserProfile() when $default != null:
 return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode,_that.preferredAmenities,_that.defaultVehicleId,_that.hybridFuelChoice,_that.showConsumptionTab,_that.gamificationEnabled);case _:
@@ -219,7 +219,7 @@ return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchR
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities,  String? defaultVehicleId, @FuelTypeJsonConverter()  FuelType? hybridFuelChoice,  bool showConsumptionTab, @Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.')  bool gamificationEnabled)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways, @Deprecated('Migrated to Feature.showFuel in #1373 phase 3c; kept for one-shot migration read.')  bool showFuel, @Deprecated('Migrated to Feature.showElectric in #1373 phase 3c; kept for one-shot migration read.')  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities,  String? defaultVehicleId, @FuelTypeJsonConverter()  FuelType? hybridFuelChoice, @Deprecated('Migrated to Feature.showConsumptionTab in #1373 phase 3c; kept for one-shot migration read.')  bool showConsumptionTab, @Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.')  bool gamificationEnabled)  $default,) {final _that = this;
 switch (_that) {
 case _UserProfile():
 return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode,_that.preferredAmenities,_that.defaultVehicleId,_that.hybridFuelChoice,_that.showConsumptionTab,_that.gamificationEnabled);case _:
@@ -239,7 +239,7 @@ return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchR
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways,  bool showFuel,  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities,  String? defaultVehicleId, @FuelTypeJsonConverter()  FuelType? hybridFuelChoice,  bool showConsumptionTab, @Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.')  bool gamificationEnabled)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name, @FuelTypeJsonConverter()  FuelType preferredFuelType,  double defaultSearchRadius,  LandingScreen landingScreen,  List<String> favoriteStationIds,  String? homeZipCode,  bool autoUpdatePosition,  String? countryCode,  String? languageCode,  double routeSegmentKm,  bool avoidHighways, @Deprecated('Migrated to Feature.showFuel in #1373 phase 3c; kept for one-shot migration read.')  bool showFuel, @Deprecated('Migrated to Feature.showElectric in #1373 phase 3c; kept for one-shot migration read.')  bool showElectric,  String ratingMode,  List<StationAmenity> preferredAmenities,  String? defaultVehicleId, @FuelTypeJsonConverter()  FuelType? hybridFuelChoice, @Deprecated('Migrated to Feature.showConsumptionTab in #1373 phase 3c; kept for one-shot migration read.')  bool showConsumptionTab, @Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.')  bool gamificationEnabled)?  $default,) {final _that = this;
 switch (_that) {
 case _UserProfile() when $default != null:
 return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchRadius,_that.landingScreen,_that.favoriteStationIds,_that.homeZipCode,_that.autoUpdatePosition,_that.countryCode,_that.languageCode,_that.routeSegmentKm,_that.avoidHighways,_that.showFuel,_that.showElectric,_that.ratingMode,_that.preferredAmenities,_that.defaultVehicleId,_that.hybridFuelChoice,_that.showConsumptionTab,_that.gamificationEnabled);case _:
@@ -254,7 +254,7 @@ return $default(_that.id,_that.name,_that.preferredFuelType,_that.defaultSearchR
 @JsonSerializable()
 
 class _UserProfile implements UserProfile {
-  const _UserProfile({required this.id, required this.name, @FuelTypeJsonConverter() this.preferredFuelType = FuelType.e10, this.defaultSearchRadius = 10.0, this.landingScreen = LandingScreen.nearest, final  List<String> favoriteStationIds = const [], this.homeZipCode, this.autoUpdatePosition = false, this.countryCode, this.languageCode, this.routeSegmentKm = 50.0, this.avoidHighways = false, this.showFuel = true, this.showElectric = true, this.ratingMode = 'local', final  List<StationAmenity> preferredAmenities = const [], this.defaultVehicleId, @FuelTypeJsonConverter() this.hybridFuelChoice, this.showConsumptionTab = false, @Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.') this.gamificationEnabled = true}): _favoriteStationIds = favoriteStationIds,_preferredAmenities = preferredAmenities;
+  const _UserProfile({required this.id, required this.name, @FuelTypeJsonConverter() this.preferredFuelType = FuelType.e10, this.defaultSearchRadius = 10.0, this.landingScreen = LandingScreen.nearest, final  List<String> favoriteStationIds = const [], this.homeZipCode, this.autoUpdatePosition = false, this.countryCode, this.languageCode, this.routeSegmentKm = 50.0, this.avoidHighways = false, @Deprecated('Migrated to Feature.showFuel in #1373 phase 3c; kept for one-shot migration read.') this.showFuel = true, @Deprecated('Migrated to Feature.showElectric in #1373 phase 3c; kept for one-shot migration read.') this.showElectric = true, this.ratingMode = 'local', final  List<StationAmenity> preferredAmenities = const [], this.defaultVehicleId, @FuelTypeJsonConverter() this.hybridFuelChoice, @Deprecated('Migrated to Feature.showConsumptionTab in #1373 phase 3c; kept for one-shot migration read.') this.showConsumptionTab = false, @Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.') this.gamificationEnabled = true}): _favoriteStationIds = favoriteStationIds,_preferredAmenities = preferredAmenities;
   factory _UserProfile.fromJson(Map<String, dynamic> json) => _$UserProfileFromJson(json);
 
 @override final  String id;
@@ -275,8 +275,8 @@ class _UserProfile implements UserProfile {
 @override final  String? languageCode;
 @override@JsonKey() final  double routeSegmentKm;
 @override@JsonKey() final  bool avoidHighways;
-@override@JsonKey() final  bool showFuel;
-@override@JsonKey() final  bool showElectric;
+@override@JsonKey()@Deprecated('Migrated to Feature.showFuel in #1373 phase 3c; kept for one-shot migration read.') final  bool showFuel;
+@override@JsonKey()@Deprecated('Migrated to Feature.showElectric in #1373 phase 3c; kept for one-shot migration read.') final  bool showElectric;
 /// Rating sharing mode:
 /// - 'local' — ratings saved only on this device
 /// - 'private' — synced with user's database but not shared
@@ -309,7 +309,7 @@ class _UserProfile implements UserProfile {
 /// one vehicle is configured — the log is vehicle-centric and a
 /// first-time user without a vehicle would only see the empty
 /// state.
-@override@JsonKey() final  bool showConsumptionTab;
+@override@JsonKey()@Deprecated('Migrated to Feature.showConsumptionTab in #1373 phase 3c; kept for one-shot migration read.') final  bool showConsumptionTab;
 /// Master toggle for gamification surfaces (#1194). Defaults to
 /// true so existing users see no behaviour change. When flipped
 /// off, badges, scores, achievement tabs, and trophy iconography
@@ -351,7 +351,7 @@ abstract mixin class _$UserProfileCopyWith<$Res> implements $UserProfileCopyWith
   factory _$UserProfileCopyWith(_UserProfile value, $Res Function(_UserProfile) _then) = __$UserProfileCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name,@FuelTypeJsonConverter() FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways, bool showFuel, bool showElectric, String ratingMode, List<StationAmenity> preferredAmenities, String? defaultVehicleId,@FuelTypeJsonConverter() FuelType? hybridFuelChoice, bool showConsumptionTab,@Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.') bool gamificationEnabled
+ String id, String name,@FuelTypeJsonConverter() FuelType preferredFuelType, double defaultSearchRadius, LandingScreen landingScreen, List<String> favoriteStationIds, String? homeZipCode, bool autoUpdatePosition, String? countryCode, String? languageCode, double routeSegmentKm, bool avoidHighways,@Deprecated('Migrated to Feature.showFuel in #1373 phase 3c; kept for one-shot migration read.') bool showFuel,@Deprecated('Migrated to Feature.showElectric in #1373 phase 3c; kept for one-shot migration read.') bool showElectric, String ratingMode, List<StationAmenity> preferredAmenities, String? defaultVehicleId,@FuelTypeJsonConverter() FuelType? hybridFuelChoice,@Deprecated('Migrated to Feature.showConsumptionTab in #1373 phase 3c; kept for one-shot migration read.') bool showConsumptionTab,@Deprecated('Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.') bool gamificationEnabled
 });
 
 
