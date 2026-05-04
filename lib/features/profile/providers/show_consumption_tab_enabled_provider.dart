@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
+import '../../feature_management/domain/feature_dependency_graph.dart';
 
 part 'show_consumption_tab_enabled_provider.g.dart';
 
@@ -33,9 +34,14 @@ part 'show_consumption_tab_enabled_provider.g.dart';
 class ShowConsumptionTabEnabled extends _$ShowConsumptionTabEnabled {
   @override
   bool build() {
-    return ref
-        .watch(featureFlagsProvider)
-        .contains(Feature.showConsumptionTab);
+    // Gates on the **effective** state (#1447): when `obd2TripRecording`
+    // (the parent) is off, the consumption tab is hidden from the
+    // bottom-nav regardless of the stored `showConsumptionTab` value.
+    // The user's tab-visibility preference is preserved so re-enabling
+    // trip recording restores the prior layout.
+    final enabled = ref.watch(featureFlagsProvider);
+    final manifest = ref.watch(featureManifestProvider);
+    return isEffectivelyEnabled(Feature.showConsumptionTab, manifest, enabled);
   }
 
   /// Delegate to [featureFlagsProvider]'s `enable` / `disable`. The

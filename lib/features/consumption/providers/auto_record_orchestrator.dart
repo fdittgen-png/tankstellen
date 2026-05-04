@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
+import '../../feature_management/domain/feature_dependency_graph.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/android_background_adapter_listener.dart';
@@ -153,17 +154,21 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
   }
 
   bool _isAutoRecordReady(VehicleProfile p) {
-    // Central master gate (#1373 phase 3d). The per-vehicle
-    // [VehicleProfile.autoRecord] bool stays — each vehicle keeps its
-    // own opt-in — but this central feature is consulted FIRST so a
-    // user can disable auto-record for the whole app from the central
-    // settings screen without flipping every vehicle's bool. When the
-    // central feature flips, the orchestrator's `build()` re-runs (via
-    // `ref.watch(featureFlagsProvider)`) and re-diffs the vehicle list,
-    // tearing down or re-arming coordinators as needed.
-    final centralEnabled = ref
-        .read(featureFlagsProvider)
-        .contains(Feature.autoRecord);
+    // Central master gate (#1373 phase 3d, cascading-disable #1447).
+    // The per-vehicle [VehicleProfile.autoRecord] bool stays — each
+    // vehicle keeps its own opt-in — but this central feature is
+    // consulted FIRST. Routing through `isEffectivelyEnabled` means
+    // disabling the parent (`Feature.obd2TripRecording`) also tears
+    // down every coordinator, regardless of the stored autoRecord
+    // value, so the user disabling consumption tracking gets a clean
+    // shutdown of the whole hands-free chain.
+    final manifest = ref.read(featureManifestProvider);
+    final enabled = ref.read(featureFlagsProvider);
+    final centralEnabled = isEffectivelyEnabled(
+      Feature.autoRecord,
+      manifest,
+      enabled,
+    );
     if (!centralEnabled) return false;
     if (!p.autoRecord) return false;
     final mac = p.pairedAdapterMac;

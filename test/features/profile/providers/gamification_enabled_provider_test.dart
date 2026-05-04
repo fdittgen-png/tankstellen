@@ -72,18 +72,47 @@ void main() {
   }
 
   group('gamificationEnabledProvider — shim over featureFlagsProvider', () {
-    test('defaults to true on a fresh install (manifest default)', () async {
-      final container = makeContainer();
-      await pumpLoad(container);
+    test(
+      'defaults to false on a fresh install — gamification is manifest '
+      'default-true but obd2TripRecording (its parent) is default-false, so '
+      'cascading-disable surfaces the shim as false (#1447 phase 2)',
+      () async {
+        final container = makeContainer();
+        await pumpLoad(container);
 
-      expect(
-        container.read(gamificationEnabledProvider),
-        isTrue,
-        reason:
-            'Default-ON is the contract: existing users see no behaviour '
-            'change. Manifest declares Feature.gamification defaultEnabled=true.',
-      );
-    });
+        expect(
+          container.read(gamificationEnabledProvider),
+          isFalse,
+          reason:
+              'Phase 2 of #1447 routes the shim through isEffectivelyEnabled. '
+              'Even though Feature.gamification is manifest default-true, '
+              'Feature.obd2TripRecording is default-false, so the cascade '
+              'returns false. Enabling the parent flips this back without '
+              'the user re-toggling gamification.',
+        );
+      },
+    );
+
+    test(
+      'turns true when both feature and parent are enabled (#1447 phase 2)',
+      () async {
+        await repo.saveEnabled(<Feature>{
+          Feature.obd2TripRecording,
+          Feature.gamification,
+        });
+
+        final container = makeContainer();
+        await pumpLoad(container);
+
+        expect(
+          container.read(gamificationEnabledProvider),
+          isTrue,
+          reason:
+              'Both feature itself and its parent enabled → cascade lets '
+              'the shim surface true.',
+        );
+      },
+    );
 
     test('reads the central enabled-set on build', () async {
       // Pre-seed central state with both prerequisite + dependent.
@@ -251,7 +280,12 @@ void main() {
         // not re-trigger the upstream's `build` on consecutive reads.
         // A non-keepAlive shim would dispose between reads and re-watch
         // the upstream, bumping the counter.
-        final fake = _BuildCountingFlags(<Feature>{Feature.gamification});
+        // Seed both gamification AND its prerequisite so the shim
+        // (post-#1447 phase 2) surfaces as effectively-enabled.
+        final fake = _BuildCountingFlags(<Feature>{
+          Feature.obd2TripRecording,
+          Feature.gamification,
+        });
         final container = makeContainer(extraOverrides: [
           featureFlagsProvider.overrideWith(() => fake),
         ]);

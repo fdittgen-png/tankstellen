@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
+import '../../feature_management/domain/feature_dependency_graph.dart';
 
 part 'gamification_enabled_provider.g.dart';
 
@@ -35,7 +36,14 @@ part 'gamification_enabled_provider.g.dart';
 class GamificationEnabled extends _$GamificationEnabled {
   @override
   bool build() {
-    return ref.watch(featureFlagsProvider).contains(Feature.gamification);
+    // Gates on the **effective** state (#1447): if any ancestor on the
+    // `requires` chain is disabled, this surfaces as `false` regardless
+    // of the stored value. Disabling the parent (`obd2TripRecording`)
+    // therefore hides the gamification UI without touching the user's
+    // gamification preference; re-enabling the parent restores it.
+    final enabled = ref.watch(featureFlagsProvider);
+    final manifest = ref.watch(featureManifestProvider);
+    return isEffectivelyEnabled(Feature.gamification, manifest, enabled);
   }
 
   /// Delegate to [featureFlagsProvider]'s `enable` / `disable`. The

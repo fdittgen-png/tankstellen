@@ -58,23 +58,22 @@ void main() {
   group('showConsumptionTabEnabledProvider — shim over featureFlagsProvider',
       () {
     test(
-      'defaults to true on a fresh install (manifest default), even though '
-      'the prerequisite obd2TripRecording is off — the shim surfaces the '
-      'manifest default and the dependency-graph helpers gate the toggle '
-      'in the UI separately',
+      'defaults to false on a fresh install — showConsumptionTab is '
+      'manifest default-true but obd2TripRecording (its parent) is '
+      'default-false, so cascading-disable surfaces the shim as false '
+      '(#1447 phase 2)',
       () async {
         final container = makeContainer();
         await pumpLoad(container);
 
         expect(
           container.read(showConsumptionTabEnabledProvider),
-          isTrue,
+          isFalse,
           reason:
-              'Manifest declares Feature.showConsumptionTab default'
-              'Enabled=true. Even with the prerequisite obd2TripRecording '
-              'off, the shim surfaces the manifest default — bottom-nav '
-              'visibility logic should AND this with a separate '
-              'obd2TripRecording check.',
+              'Phase 2 of #1447 routes the shim through '
+              'isEffectivelyEnabled — the cascade returns false because '
+              'the parent obd2TripRecording is default-off. The bottom-'
+              'nav consumes this directly; no separate AND-check needed.',
         );
       },
     );
@@ -201,6 +200,11 @@ void main() {
     });
 
     test('external mutation on featureFlagsProvider propagates', () async {
+      // Seed the prerequisite so cascading lets the shim surface true.
+      await repo.saveEnabled(<Feature>{
+        Feature.obd2TripRecording,
+        Feature.showConsumptionTab,
+      });
       final container = makeContainer();
       await pumpLoad(container);
 
@@ -212,5 +216,44 @@ void main() {
 
       expect(container.read(showConsumptionTabEnabledProvider), isFalse);
     });
+
+    test(
+      'cascading-disable: disabling the parent obd2TripRecording flips the '
+      'shim to false even though showConsumptionTab is still in the stored '
+      'set (#1447 phase 2)',
+      () async {
+        await repo.saveEnabled(<Feature>{
+          Feature.obd2TripRecording,
+          Feature.showConsumptionTab,
+        });
+        final container = makeContainer();
+        await pumpLoad(container);
+
+        expect(container.read(showConsumptionTabEnabledProvider), isTrue);
+
+        // Disabling the parent must cascade — child stays in storage so
+        // re-enabling the parent restores the prior visible state, but
+        // the user-visible shim flips to false immediately.
+        await container
+            .read(featureFlagsProvider.notifier)
+            .disable(Feature.obd2TripRecording);
+
+        expect(container.read(showConsumptionTabEnabledProvider), isFalse);
+        expect(
+          container.read(featureFlagsProvider),
+          contains(Feature.showConsumptionTab),
+          reason:
+              'Stored child state must survive parent-disable so '
+              're-enabling the parent restores the user\'s preference '
+              'without an explicit re-toggle.',
+        );
+
+        // Re-enable the parent → shim flips back to true automatically.
+        await container
+            .read(featureFlagsProvider.notifier)
+            .enable(Feature.obd2TripRecording);
+        expect(container.read(showConsumptionTabEnabledProvider), isTrue);
+      },
+    );
   });
 }

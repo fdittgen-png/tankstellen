@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../features/feature_management/application/feature_flags_provider.dart';
 import '../../features/feature_management/domain/feature.dart';
+import '../../features/feature_management/domain/feature_dependency_graph.dart';
 
 part 'unified_search_results_enabled.g.dart';
 
@@ -23,9 +24,17 @@ part 'unified_search_results_enabled.g.dart';
 class UnifiedSearchResultsEnabled extends _$UnifiedSearchResultsEnabled {
   @override
   bool build() {
-    return ref
-        .watch(featureFlagsProvider)
-        .contains(Feature.unifiedSearchResults);
+    // Routes through `isEffectivelyEnabled` for symmetry with the other
+    // shims and forward-compat (#1447). `Feature.unifiedSearchResults`
+    // has no requires today so the helper short-circuits to
+    // `state.contains` — identical observable behaviour.
+    final enabled = ref.watch(featureFlagsProvider);
+    final manifest = ref.watch(featureManifestProvider);
+    return isEffectivelyEnabled(
+      Feature.unifiedSearchResults,
+      manifest,
+      enabled,
+    );
   }
 
   /// Flip the flag. Delegates to [set] so the toggle/set paths share a
