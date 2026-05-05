@@ -3205,6 +3205,35 @@ class AppLocalizationsSk extends AppLocalizations {
   String get exportBackupFailed => 'Backup export failed — please try again';
 
   @override
+  String get brokenMapChipVerifying => 'MAP sensor verifying…';
+
+  @override
+  String get brokenMapChipDisclaimer => 'MAP readings suspicious';
+
+  @override
+  String get brokenMapSnackbarUnreliable =>
+      'MAP sensor reads incorrectly — fuel readings may be 50–80% too low. Try a different adapter.';
+
+  @override
+  String get brokenMapBannerHardDisable =>
+      'MAP sensor unreliable. Showing fill-up averages instead of live fuel rate.';
+
+  @override
+  String brokenMapOverlayVerified(String confidence) {
+    return 'MAP sensor: verified ($confidence)';
+  }
+
+  @override
+  String brokenMapOverlayUnverified(String confidence) {
+    return 'MAP sensor: verifying ($confidence)';
+  }
+
+  @override
+  String brokenMapOverlaySuspicious(String confidence) {
+    return 'MAP sensor: suspicious ($confidence)';
+  }
+
+  @override
   String get calibrationAdvancedTitle => 'Advanced calibration';
 
   @override

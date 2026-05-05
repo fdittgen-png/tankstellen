@@ -12,9 +12,15 @@ import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../driving/haptic_eco_coach.dart';
 import '../../../driving/providers/haptic_eco_coach_provider.dart';
+import '../../../vehicle/providers/vehicle_providers.dart';
+import '../../data/obd2/broken_map_belief.dart';
+import '../../domain/entities/consumption_stats.dart';
 import '../../domain/trip_recorder.dart';
+import '../../providers/broken_map_warned_vehicles_provider.dart';
+import '../../providers/consumption_providers.dart';
 import '../../providers/trip_recording_provider.dart';
 import '../../providers/wakelock_facade.dart';
+import '../widgets/broken_map_widgets.dart';
 import '../widgets/obd2_breadcrumb_overlay.dart';
 
 /// Result returned when the user confirms saving a recorded trip
@@ -368,11 +374,87 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     }
   }
 
+  /// #1423 phase 5 — fire the broken-MAP snackbar exactly once per
+  /// session per vehicle when its belief crosses into the warning band
+  /// (0.7-0.9). The crossing is detected via [ref.listen]: only fires
+  /// when the previous belief was BELOW the warning threshold AND the
+  /// new belief is at or above it. The hard-disable band (>=0.9) does
+  /// NOT re-fire — the persistent banner takes over for that level.
+  ///
+  /// Uses [BrokenMapWarnedVehicles.markIfFirst] as the per-session
+  /// guard so a vehicle that crosses, decays back below 0.7, and
+  /// crosses again only warns once.
+  void _maybeFireBrokenMapSnackbar(
+    String vehicleId,
+    BrokenMapBand previousBand,
+    BrokenMapBand currentBand,
+  ) {
+    if (currentBand != BrokenMapBand.warning) return;
+    if (previousBand == BrokenMapBand.warning ||
+        previousBand == BrokenMapBand.hardDisable) {
+      return;
+    }
+    final warned =
+        ref.read(brokenMapWarnedVehiclesProvider.notifier);
+    if (!warned.markIfFirst(vehicleId)) return;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    if (messenger == null) return;
+    final l = AppLocalizations.of(context);
+    messenger.showSnackBar(
+      SnackBar(
+        key: const Key('brokenMapWarningSnackBar'),
+        duration: const Duration(seconds: 8),
+        content: Text(
+          l?.brokenMapSnackbarUnreliable ??
+              'MAP sensor reads incorrectly — fuel readings may be '
+                  '50–80% too low. Try a different adapter.',
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final state = ref.watch(tripRecordingProvider);
     final stopped = _stopped;
+
+    // #1423 phase 5 — listen for the active vehicle's broken-MAP
+    // belief crossing into the 0.7-0.9 warning band. The listener
+    // is wired here (not in initState) so it picks up the scaffold
+    // messenger for the current build context. `ref.listen` only
+    // fires on actual state changes, so the no-op default belief
+    // doesn't trigger anything.
+    //
+    // Both reads are wrapped in a try/catch so widget tests that
+    // pump this screen without bootstrapping Hive (a long-standing
+    // pattern — see `Obd2BreadcrumbOverlay` for the same defence)
+    // don't fail with a `HiveError: Box not found` when the active-
+    // vehicle / belief providers walk down to `settingsStorage`.
+    try {
+      final activeVehicle = ref.watch(activeVehicleProfileProvider);
+      if (activeVehicle != null) {
+        ref.listen<Map<String, BrokenMapBelief>>(
+          brokenMapBeliefByVehicleProvider,
+          (previous, next) {
+            final vehicleId = activeVehicle.id;
+            final prev =
+                previous?[vehicleId]?.confidence ?? 0.0;
+            final curr =
+                next[vehicleId]?.confidence ?? 0.0;
+            if (prev == curr) return;
+            _maybeFireBrokenMapSnackbar(
+              vehicleId,
+              brokenMapBandFor(prev),
+              brokenMapBandFor(curr),
+            );
+          },
+        );
+      }
+    } catch (e, st) {
+      debugPrint('TripRecordingScreen broken-MAP listener wiring failed: '
+          '$e\n$st');
+    }
 
     final title = stopped != null
         ? (l?.tripSummaryTitle ?? 'Trip summary')
@@ -476,9 +558,22 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: stopped == null
-                  ? _buildRecording(context, l, state)
-                  : _buildSummary(context, l, stopped),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // #1423 phase 5 — persistent banner shown only when
+                  // the active vehicle's broken-MAP belief is at or
+                  // above 0.9. Self-hides as [SizedBox.shrink] for
+                  // every other band so the layout pays nothing in
+                  // the common case.
+                  const BrokenMapBanner(),
+                  Expanded(
+                    child: stopped == null
+                        ? _buildRecording(context, l, state)
+                        : _buildSummary(context, l, stopped),
+                  ),
+                ],
+              ),
             ),
           ),
           const Obd2BreadcrumbOverlay(),
@@ -493,6 +588,26 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     TripRecordingState state,
   ) {
     final r = state.live;
+
+    // #1423 phase 5 — when the active vehicle's broken-MAP belief is
+    // at or above 0.9, hard-disable the live L/100 km derived from
+    // MAP-fallback fuel-rate and fall back to the receipt-derived
+    // average for that vehicle. The chip below the value surfaces in
+    // the 0.7-0.9 band as a disclaimer.
+    final belief = readActiveVehicleBelief(ref);
+    final band = belief == null
+        ? BrokenMapBand.silent
+        : brokenMapBandFor(belief.confidence);
+    final liveAvg = r?.liveAvgLPer100Km;
+    final String avgValue;
+    if (band == BrokenMapBand.hardDisable) {
+      avgValue = _receiptDerivedLPer100Km(ref) ?? '—';
+    } else {
+      avgValue = liveAvg == null
+          ? '—'
+          : '${liveAvg.toStringAsFixed(1)} L/100 km';
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -523,10 +638,9 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         _MetricCard(
           icon: Icons.eco,
           label: l?.tripMetricAvgConsumption ?? 'Avg',
-          value: r?.liveAvgLPer100Km == null
-              ? '—'
-              : '${r!.liveAvgLPer100Km!.toStringAsFixed(1)} L/100 km',
+          value: avgValue,
         ),
+        const BrokenMapDisclaimerChip(),
         const SizedBox(height: 8),
         _MetricCard(
           icon: Icons.timer,
@@ -535,6 +649,29 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         ),
       ],
     );
+  }
+
+  /// #1423 phase 5 — receipt-derived L/100 km for the active vehicle,
+  /// formatted to one decimal. Returns null when there isn't enough
+  /// fill-up history to compute one (single tank or no closed plein-
+  /// to-plein window). Used to fill the live-Avg metric while the
+  /// broken-MAP belief is in the hard-disable band.
+  String? _receiptDerivedLPer100Km(WidgetRef ref) {
+    try {
+      final active = ref.watch(activeVehicleProfileProvider);
+      if (active == null) return null;
+      final fills = ref
+          .watch(fillUpListProvider)
+          .where((f) => f.vehicleId == active.id)
+          .toList();
+      if (fills.length < 2) return null;
+      final stats = ConsumptionStats.fromFillUps(fills);
+      final avg = stats.avgConsumptionL100km;
+      if (avg == null) return null;
+      return '${avg.toStringAsFixed(1)} L/100 km';
+    } catch (_) {
+      return null;
+    }
   }
 
   Widget _buildSummary(
