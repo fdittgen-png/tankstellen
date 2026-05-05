@@ -5990,6 +5990,48 @@ abstract class AppLocalizations {
   /// **'Backup export failed — please try again'**
   String get exportBackupFailed;
 
+  /// Diagnostic-overlay chip shown while the broken-MAP belief is in the 0.4–0.7 confidence band — the app is still gathering observations and not yet ready to warn the user (#1423 phase 5).
+  ///
+  /// In en, this message translates to:
+  /// **'MAP sensor verifying…'**
+  String get brokenMapChipVerifying;
+
+  /// Small chip displayed alongside the live fuel-rate metric while the broken-MAP belief sits in the 0.7–0.9 confidence band — the rate continues to be shown but the user is told it may be unreliable (#1423 phase 5).
+  ///
+  /// In en, this message translates to:
+  /// **'MAP readings suspicious'**
+  String get brokenMapChipDisclaimer;
+
+  /// Snackbar fired once per session per vehicle when the broken-MAP belief crosses 0.7. Tells the user the live fuel-rate numbers are likely undercounting heavily and suggests trying a different OBD2 adapter (#1423 phase 5).
+  ///
+  /// In en, this message translates to:
+  /// **'MAP sensor reads incorrectly — fuel readings may be 50–80% too low. Try a different adapter.'**
+  String get brokenMapSnackbarUnreliable;
+
+  /// Persistent MaterialBanner shown at the top of the trip-recording screen when the broken-MAP belief is at or above 0.9 — the live fuel-rate display is hard-disabled and the app falls back to per-fill L/100km from receipts (#1423 phase 5).
+  ///
+  /// In en, this message translates to:
+  /// **'MAP sensor unreliable. Showing fill-up averages instead of live fuel rate.'**
+  String get brokenMapBannerHardDisable;
+
+  /// Diagnostic-overlay row shown in the OBD2 breadcrumb panel when the broken-MAP belief sits below 0.4 — the sensor has been observed and looks healthy (#1423 phase 5).
+  ///
+  /// In en, this message translates to:
+  /// **'MAP sensor: verified ({confidence})'**
+  String brokenMapOverlayVerified(String confidence);
+
+  /// Diagnostic-overlay row shown in the OBD2 breadcrumb panel when the broken-MAP belief sits in 0.4–0.7 — the app is still building confidence (#1423 phase 5).
+  ///
+  /// In en, this message translates to:
+  /// **'MAP sensor: verifying ({confidence})'**
+  String brokenMapOverlayUnverified(String confidence);
+
+  /// Diagnostic-overlay row shown in the OBD2 breadcrumb panel when the broken-MAP belief sits at or above 0.7 — strong evidence the MAP sensor is broken (#1423 phase 5).
+  ///
+  /// In en, this message translates to:
+  /// **'MAP sensor: suspicious ({confidence})'**
+  String brokenMapOverlaySuspicious(String confidence);
+
   /// ExpansionTile title for the user-overridable calibration constants section on the edit-vehicle screen (#1397).
   ///
   /// In en, this message translates to:

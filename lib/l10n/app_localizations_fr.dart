@@ -3235,6 +3235,35 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec de l\'exportation — veuillez réessayer';
 
   @override
+  String get brokenMapChipVerifying => 'Vérification du capteur MAP…';
+
+  @override
+  String get brokenMapChipDisclaimer => 'Lectures MAP suspectes';
+
+  @override
+  String get brokenMapSnackbarUnreliable =>
+      'Le capteur MAP donne des valeurs incorrectes — la consommation affichée peut être 50 à 80 % trop basse. Essayez un autre adaptateur.';
+
+  @override
+  String get brokenMapBannerHardDisable =>
+      'Capteur MAP non fiable. Affichage de la moyenne par plein au lieu du débit en direct.';
+
+  @override
+  String brokenMapOverlayVerified(String confidence) {
+    return 'Capteur MAP : vérifié ($confidence)';
+  }
+
+  @override
+  String brokenMapOverlayUnverified(String confidence) {
+    return 'Capteur MAP : en cours de vérification ($confidence)';
+  }
+
+  @override
+  String brokenMapOverlaySuspicious(String confidence) {
+    return 'Capteur MAP : suspect ($confidence)';
+  }
+
+  @override
   String get calibrationAdvancedTitle => 'Calibrage avancé';
 
   @override

@@ -3231,6 +3231,35 @@ class AppLocalizationsDe extends AppLocalizations {
       'Sicherungsexport fehlgeschlagen – bitte erneut versuchen';
 
   @override
+  String get brokenMapChipVerifying => 'MAP-Sensor wird geprüft…';
+
+  @override
+  String get brokenMapChipDisclaimer => 'MAP-Werte verdächtig';
+
+  @override
+  String get brokenMapSnackbarUnreliable =>
+      'Der MAP-Sensor liest falsch — die Verbrauchswerte können 50–80 % zu niedrig sein. Bitte einen anderen Adapter probieren.';
+
+  @override
+  String get brokenMapBannerHardDisable =>
+      'MAP-Sensor unzuverlässig. Statt Live-Verbrauch wird der Tankdurchschnitt angezeigt.';
+
+  @override
+  String brokenMapOverlayVerified(String confidence) {
+    return 'MAP-Sensor: bestätigt ($confidence)';
+  }
+
+  @override
+  String brokenMapOverlayUnverified(String confidence) {
+    return 'MAP-Sensor: prüfen ($confidence)';
+  }
+
+  @override
+  String brokenMapOverlaySuspicious(String confidence) {
+    return 'MAP-Sensor: verdächtig ($confidence)';
+  }
+
+  @override
   String get calibrationAdvancedTitle => 'Erweiterte Kalibrierung';
 
   @override

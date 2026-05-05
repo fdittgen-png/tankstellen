@@ -6,6 +6,7 @@ import '../../../../core/providers/app_state_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2/obd2_breadcrumb_collector.dart';
 import '../../providers/obd2_breadcrumb_provider.dart';
+import 'broken_map_widgets.dart';
 
 /// In-app overlay that renders the most recent fuel-rate breadcrumbs
 /// captured by [Obd2BreadcrumbsNotifier] (#1395). Sibling to the map
@@ -132,6 +133,12 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
                     ],
                   ),
                   const Divider(color: Colors.white24, height: 8),
+                  // #1423 phase 5 — broken-MAP belief diagnostic row,
+                  // self-hides when the active vehicle has zero
+                  // observations. Appears above the breadcrumb list so
+                  // the latest belief snapshot is always visible without
+                  // scrolling, even on long crumb sets.
+                  const BrokenMapOverlayRow(),
                   Flexible(
                     child: SingleChildScrollView(
                       reverse: true,
