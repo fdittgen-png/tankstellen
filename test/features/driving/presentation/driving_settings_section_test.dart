@@ -6,6 +6,7 @@ import 'package:tankstellen/core/widgets/settings_menu_tile.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_settings_section.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
+import 'package:tankstellen/features/glide_coach/data/traffic_signal_repository.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/gamification_settings_tile.dart';
 
 import '../../../fakes/fake_storage_repository.dart';
@@ -161,6 +162,45 @@ void main() {
         reason: 'Exactly two SettingsMenuTile children: vehicles + fuel '
             'club. Adding more would risk drift between this section '
             'and the Conso-tab landing screen.',
+      );
+    },
+  );
+
+  testWidgets(
+    'glide-coach beta toggle stays invisible while the master flag '
+    'kGlideCoachEnabled is false (#1125 phase 3b)',
+    (tester) async {
+      await pumpApp(
+        tester,
+        const DrivingSettingsSection(),
+        overrides: [
+          settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
+          storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
+          featureFlagsProvider.overrideWith(() => _TestFeatureFlags()),
+        ],
+      );
+
+      // The compile-time master flag is the user-facing safety: when
+      // it's false (production today), the entire toggle MUST stay
+      // invisible so users cannot accidentally enable a half-baked
+      // feature. Flipping the flag in a future release is the
+      // deliberate gate that makes the toggle appear.
+      expect(
+        kGlideCoachEnabled,
+        isFalse,
+        reason:
+            'This test pins the production contract. When the master '
+            'flag flips to true, replace this with a positive '
+            'findsOneWidget assertion instead of inverting it.',
+      );
+      expect(
+        find.byKey(const Key('glideCoachToggle')),
+        findsNothing,
+        reason:
+            'kGlideCoachEnabled == false MUST hide the glide-coach '
+            'toggle entirely. Even users who would happily try the '
+            'beta cannot enable a half-baked feature until the master '
+            'flag flips after a driving-test cohort.',
       );
     },
   );

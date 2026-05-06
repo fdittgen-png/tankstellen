@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../glide_coach/data/traffic_signal_repository.dart';
+import '../../../glide_coach/providers/glide_coach_settings_provider.dart';
 import '../../../profile/presentation/widgets/gamification_settings_tile.dart';
 import '../../providers/haptic_eco_coach_provider.dart';
 
@@ -71,8 +73,49 @@ class DrivingSettingsSection extends ConsumerWidget {
               ref.read(hapticEcoCoachEnabledProvider.notifier).set(v),
           contentPadding: EdgeInsets.zero,
         ),
+        // #1125 phase 3b — glide-coach beta opt-in. The entire tile is
+        // wrapped in `if (kGlideCoachEnabled)` so it stays invisible in
+        // production: even users who would happily try it cannot enable
+        // a half-baked feature until the master flag flips after a
+        // driving-test cohort. When the flag flips, the toggle appears
+        // here without any further UI work.
+        if (kGlideCoachEnabled) const _GlideCoachToggleTile(),
         const GamificationSettingsTile(),
       ],
+    );
+  }
+}
+
+/// Beta opt-in tile for the glide-coach haptic (#1125 phase 3b).
+///
+/// Rendered only when the compile-time master flag
+/// [`kGlideCoachEnabled`] is true; the call site in
+/// [DrivingSettingsSection] gates visibility via `if (kGlideCoachEnabled)`.
+/// Keeping the widget itself in this file (rather than in the
+/// glide_coach feature folder) avoids importing presentation widgets
+/// from a feature whose UI surface doesn't exist yet, and matches the
+/// pattern of [GamificationSettingsTile] / [HapticEcoCoach toggle] —
+/// each toggle co-locates with the section it belongs to.
+class _GlideCoachToggleTile extends ConsumerWidget {
+  const _GlideCoachToggleTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final settings = ref.watch(glideCoachSettingsProvider);
+    return SwitchListTile(
+      key: const Key('glideCoachToggle'),
+      value: settings.enabled,
+      title: const Text('Glide-coach beta (experimental)'),
+      subtitle: Text(
+        'Subtle haptic when slowing down ahead of a red light. '
+        'Off by default — distraction risk.',
+        style: theme.textTheme.bodySmall,
+      ),
+      onChanged: (v) => ref
+          .read(glideCoachSettingsProvider.notifier)
+          .setEnabled(v),
+      contentPadding: EdgeInsets.zero,
     );
   }
 }
