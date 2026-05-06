@@ -217,11 +217,19 @@ class VinAdapterPairAutoPopulator {
             final priorConfidence = await blocklistRef.recall(adapterId);
             if (priorConfidence != null &&
                 priorConfidence > _blocklistThreshold) {
+              // #1424 — the blocklist stores a single scalar
+              // (the prior posterior mean). Reconstruct a Beta
+              // posterior from it: pick a nominal pseudo-count of
+              // 10 so the recalled belief has a reasonable
+              // concentration without claiming more evidence than
+              // we actually have. observationCount: 0 still
+              // distinguishes "hydrated from a prior session"
+              // from a freshly-probed belief whose updater would
+              // have bumped the count.
+              const pseudoCount = 10.0;
               brokenMapBelief = BrokenMapBelief(
-                confidence: priorConfidence,
-                // observationCount: 0 distinguishes "hydrated from a
-                // prior session" from a freshly-probed belief whose
-                // updater would have bumped the count.
+                alpha: priorConfidence * pseudoCount,
+                beta: (1.0 - priorConfidence) * pseudoCount,
                 observationCount: 0,
                 lastUpdate: DateTime.now(),
                 lastTrigger: BrokenMapReason.priorObservation,
@@ -251,10 +259,10 @@ class VinAdapterPairAutoPopulator {
             if (blocklistRef != null &&
                 adapterId != null &&
                 adapterId.isNotEmpty &&
-                brokenMapBelief.confidence > _blocklistThreshold) {
+                brokenMapBelief.pointEstimate > _blocklistThreshold) {
               await blocklistRef.recordBelief(
                 adapterId,
-                brokenMapBelief.confidence,
+                brokenMapBelief.pointEstimate,
               );
             }
           }

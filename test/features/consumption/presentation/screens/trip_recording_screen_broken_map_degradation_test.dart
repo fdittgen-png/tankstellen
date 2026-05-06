@@ -46,13 +46,14 @@ void main() {
   });
 
   testWidgets(
-      'confidence 0.85 → live MAP-derived L/100 km is rendered',
+      'posterior ≈ 0.85 → live MAP-derived L/100 km is rendered',
       (tester) async {
     await _pumpRecordingScreen(
       tester,
       coachEvents: events,
       belief: const BrokenMapBelief(
-        confidence: 0.85,
+        alpha: 85,
+        beta: 15,
         observationCount: 5,
       ),
       live: const TripLiveReading(
@@ -75,14 +76,15 @@ void main() {
   });
 
   testWidgets(
-      'confidence 0.92 → live rate is replaced by receipt-derived '
+      'posterior ≈ 0.92 → live rate is replaced by receipt-derived '
       'L/100 km AND the persistent banner appears',
       (tester) async {
     await _pumpRecordingScreen(
       tester,
       coachEvents: events,
       belief: const BrokenMapBelief(
-        confidence: 0.92,
+        alpha: 92,
+        beta: 8,
         observationCount: 8,
       ),
       live: const TripLiveReading(

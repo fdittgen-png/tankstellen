@@ -2,12 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/broken_map_belief.dart';
 import 'package:tankstellen/features/consumption/data/obd2/broken_map_detector.dart';
 
-/// Reference EMA α used by the underlying updater. Mirrored here so
-/// each test's expected confidence has a self-explanatory derivation
-/// — assertions that would fail if α were retuned document the
-/// production constant they depend on.
-const double _alpha = 0.4;
-
 /// Helper: pumped / consumed = ratio = reconciledLPer100km /
 /// estimatedLPer100km. Build a `(reconciled, estimated)` pair from a
 /// target ratio and a fixed-but-arbitrary L/100 km baseline.
@@ -17,18 +11,18 @@ const double _alpha = 0.4;
 }
 
 void main() {
-  // Deterministic time injected into every observation so the EMA /
-  // lastUpdate assertions are reproducible.
+  // Deterministic time injected into every observation so the
+  // posterior / lastUpdate assertions are reproducible.
   final fixedNow = DateTime(2026, 5, 4, 10, 30);
 
-  group('recordPleinCompletObservation — combined-score math', () {
+  group('recordPleinCompletObservation — combined-score math (#1424)', () {
     test(
         'high discrepancy + implausible eta → strong observation pushes '
-        'confidence to ~α', () async {
+        'posterior into the verifying band on a single fold', () async {
       // ratio 2.5 → discrepancyScore clamps to 1.0;
-      // eta 1.30 → etaScore clamps to 1.0 ((1.3 - 0.97) / 0.25 = 1.32 → 1.0).
+      // eta 1.30 → etaScore clamps to 1.0.
       // combined = 0.6 × 1 + 0.4 × 1 = 1.0.
-      // EMA from 0: α × 1 + (1-α) × 0 = 0.4.
+      // α' = 0.5·1 + 8·1 = 8.5 ; β' = 0.5·9 + 0 = 4.5.
       final pair = _pairForRatio(2.5);
 
       final updated = const BrokenMapDetector().recordPleinCompletObservation(
@@ -39,24 +33,23 @@ void main() {
         now: fixedNow,
       );
 
-      expect(updated.confidence, closeTo(_alpha, 1e-9));
+      expect(updated.alpha, closeTo(8.5, 1e-9));
+      expect(updated.beta, closeTo(4.5, 1e-9));
+      expect(updated.pointEstimate, closeTo(8.5 / 13.0, 1e-9));
       expect(updated.observationCount, 1);
       expect(updated.lastUpdate, fixedNow);
-      // Strong combined score (1.0 > 0.5) — trigger MUST land. eta and
-      // discrepancy tied at 1.0 so the implementation prefers
+      // Strong combined score (1.0 > 0.5) — trigger MUST land. eta
+      // and discrepancy tied at 1.0 so the implementation prefers
       // discrepancy (eta is not strictly greater).
       expect(updated.lastTrigger, BrokenMapReason.pleinCompletDiscrepancy);
     });
 
     test(
-        'eta dominates over discrepancy → trigger tagged etaImplausible',
-        () async {
+        'eta dominates over weak discrepancy — combined score below '
+        'strong threshold leaves trigger at default', () async {
       // ratio 1.4 → discrepancyScore = (1.4 - 1.3) / 0.9 ≈ 0.111.
       // eta 1.22 → etaScore = 1.0.
       // combined = 0.6 × 0.111 + 0.4 × 1.0 ≈ 0.467 — below strong (0.5).
-      // So the trigger is NOT updated — phase 1 spec gates the trigger
-      // on score > 0.5. Verify the score stays under the threshold but
-      // confidence still lifts via EMA.
       final pair = _pairForRatio(1.4);
 
       final updated = const BrokenMapDetector().recordPleinCompletObservation(
@@ -67,8 +60,9 @@ void main() {
         now: fixedNow,
       );
 
-      // 0.4 × 0.467 ≈ 0.187
-      expect(updated.confidence, closeTo(0.4 * 0.467, 0.01));
+      // Beta fold: α' = 0.5 + 8·0.467 ≈ 4.233 ; β' = 4.5 + 0.533 ≈ 5.033.
+      expect(updated.pointEstimate, greaterThan(0.4));
+      expect(updated.pointEstimate, lessThan(0.55));
       expect(updated.observationCount, 1);
       // Not strong enough for trigger to flip — stays at default.
       expect(updated.lastTrigger, BrokenMapReason.none);
@@ -77,15 +71,9 @@ void main() {
     test(
         'eta strongly dominant → strong observation tags etaImplausible',
         () async {
-      // ratio 2.2 → discrepancyScore = 1.0
-      // eta 1.50 → etaScore clamps to 1.0
-      // combined = 1.0 — strong. eta NOT strictly > discrepancy
-      // (both 1.0) → label is pleinCompletDiscrepancy by tiebreak.
-      // To force etaImplausible we need eta > discrepancy: pick a
-      // moderate ratio with high eta.
       // ratio 1.6 → discrepancyScore = (1.6 - 1.3) / 0.9 = 0.333.
-      // eta 1.22 → etaScore = 1.0. combined = 0.6 × 0.333 + 0.4 × 1.0 = 0.6
-      // — strong (>0.5). etaScore (1.0) > discrepancyScore (0.333).
+      // eta 1.22 → etaScore = 1.0. combined = 0.6 × 0.333 + 0.4 × 1.0 = 0.6.
+      // Strong (>0.5). etaScore (1.0) > discrepancyScore (0.333).
       final pair = _pairForRatio(1.6);
 
       final updated = const BrokenMapDetector().recordPleinCompletObservation(
@@ -96,8 +84,10 @@ void main() {
         now: fixedNow,
       );
 
-      // EMA: α × 0.6 = 0.24
-      expect(updated.confidence, closeTo(0.24, 1e-9));
+      // α' = 0.5 + 8·0.6 = 5.3 ; β' = 4.5 + 0.4 = 4.9 ;
+      // mean = 5.3/10.2 ≈ 0.520.
+      expect(updated.alpha, closeTo(5.3, 1e-9));
+      expect(updated.beta, closeTo(4.9, 1e-9));
       expect(updated.lastTrigger, BrokenMapReason.etaImplausible);
     });
   });
@@ -118,14 +108,16 @@ void main() {
         now: fixedNow,
       );
 
-      // EMA: α × 1.0 = 0.4
-      expect(updated.confidence, closeTo(_alpha, 1e-9));
-      expect(updated.confidence.isNaN, isFalse);
+      // α' = 0.5 + 8 = 8.5 ; β' = 4.5 + 0 = 4.5.
+      expect(updated.alpha, closeTo(8.5, 1e-9));
+      expect(updated.beta, closeTo(4.5, 1e-9));
+      expect(updated.pointEstimate.isNaN, isFalse);
       expect(updated.observationCount, 1);
       expect(updated.lastTrigger, BrokenMapReason.pleinCompletDiscrepancy);
     });
 
-    test('null eta + clean ratio → score 0, confidence stays 0', () {
+    test('null eta + clean ratio → score 0, posterior decays toward 0',
+        () {
       // ratio 1.1 → discrepancyScore clamps to 0 (below 1.3 boundary).
       final pair = _pairForRatio(1.1);
 
@@ -137,7 +129,10 @@ void main() {
         now: fixedNow,
       );
 
-      expect(updated.confidence, 0.0);
+      // α' = 0.5·1 + 0 = 0.5 ; β' = 0.5·9 + 1 = 5.5 ; mean ≈ 0.083.
+      expect(updated.alpha, closeTo(0.5, 1e-9));
+      expect(updated.beta, closeTo(5.5, 1e-9));
+      expect(updated.pointEstimate, lessThan(0.1));
       expect(updated.observationCount, 1);
       expect(updated.lastTrigger, BrokenMapReason.none);
     });
@@ -146,7 +141,8 @@ void main() {
   group('recordPleinCompletObservation — degenerate inputs', () {
     test('zero estimatedLPer100km returns prior unchanged', () {
       const prior = BrokenMapBelief(
-        confidence: 0.3,
+        alpha: 3,
+        beta: 7,
         observationCount: 5,
         lastTrigger: BrokenMapReason.idleVacuumMissing,
       );
@@ -163,7 +159,9 @@ void main() {
     });
 
     test('zero reconciledLPer100km returns prior unchanged', () {
-      const prior = BrokenMapBelief(confidence: 0.7, observationCount: 2);
+      const prior = BrokenMapBelief(
+        alpha: 7, beta: 3, observationCount: 2,
+      );
 
       final updated = const BrokenMapDetector().recordPleinCompletObservation(
         prior: prior,
@@ -177,11 +175,12 @@ void main() {
     });
   });
 
-  group('recordPleinCompletObservation — EMA decay', () {
+  group('recordPleinCompletObservation — Bayesian decay', () {
     test(
-        'after a strong observation, a clean ratio decays confidence via EMA',
+        'after a strong observation, a clean ratio decays the posterior '
+        'toward the prior — posterior stays positive but shrinks',
         () {
-      // First: strong observation lifts confidence to ~0.4.
+      // First: strong observation.
       final highPair = _pairForRatio(2.5);
       final after1 = const BrokenMapDetector().recordPleinCompletObservation(
         prior: const BrokenMapBelief(),
@@ -190,10 +189,11 @@ void main() {
         proposedEta: 1.30,
         now: fixedNow,
       );
-      expect(after1.confidence, closeTo(0.4, 1e-9));
+      expect(after1.alpha, closeTo(8.5, 1e-9));
+      expect(after1.beta, closeTo(4.5, 1e-9));
 
-      // Second: clean ratio, healthy eta → score = 0.6 × 0 + 0.4 × 0 = 0.
-      // EMA: α × 0 + (1-α) × 0.4 = 0.24.
+      // Second: clean ratio + healthy eta → score = 0.
+      // α' = 0.5·8.5 + 0 = 4.25 ; β' = 0.5·4.5 + 1 = 3.25.
       final cleanPair = _pairForRatio(1.0);
       final after2 = const BrokenMapDetector().recordPleinCompletObservation(
         prior: after1,
@@ -203,7 +203,8 @@ void main() {
         now: fixedNow,
       );
 
-      expect(after2.confidence, closeTo(0.24, 1e-9));
+      expect(after2.alpha, closeTo(4.25, 1e-9));
+      expect(after2.beta, closeTo(3.25, 1e-9));
       expect(after2.observationCount, 2);
       // Strong trigger from observation 1 stays sticky — observation 2
       // was weak (score 0 < 0.5) so the updater leaves lastTrigger

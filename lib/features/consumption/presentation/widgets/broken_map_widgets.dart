@@ -7,7 +7,9 @@ import '../../data/obd2/broken_map_belief.dart';
 import '../../providers/consumption_providers.dart';
 
 /// Confidence band thresholds shared by every broken-MAP UI surface
-/// (#1423 phase 5). Mirrors the table in the issue spec § E:
+/// (#1423 phase 5; #1424 reuses against the Bayesian
+/// [BrokenMapBelief.pointEstimate]). Mirrors the table in the
+/// issue spec § E:
 ///   - <0.4   silent
 ///   - 0.4-0.7 verifying chip / overlay row
 ///   - 0.7-0.9 disclaimer chip + snackbar
@@ -23,11 +25,11 @@ const double brokenMapWarningThreshold = 0.7;
 @visibleForTesting
 const double brokenMapHardDisableThreshold = 0.9;
 
-/// Bands for [BrokenMapBelief.confidence]. Computed once per build
+/// Bands for [BrokenMapBelief.pointEstimate]. Computed once per build
 /// so the widgets read a single enum instead of re-comparing floats.
 enum BrokenMapBand { silent, verifying, warning, hardDisable }
 
-/// Map a raw [BrokenMapBelief.confidence] to a band. Pure helper —
+/// Map a raw [BrokenMapBelief.pointEstimate] to a band. Pure helper —
 /// exposed so tests can assert the band thresholds without spinning
 /// up a widget tree.
 BrokenMapBand brokenMapBandFor(double confidence) {
@@ -80,7 +82,7 @@ class BrokenMapBanner extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final belief = readActiveVehicleBelief(ref);
     if (belief == null) return const SizedBox.shrink();
-    if (brokenMapBandFor(belief.confidence) != BrokenMapBand.hardDisable) {
+    if (brokenMapBandFor(belief.pointEstimate) != BrokenMapBand.hardDisable) {
       return const SizedBox.shrink();
     }
     final l = AppLocalizations.of(context);
@@ -116,7 +118,7 @@ class BrokenMapDisclaimerChip extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final belief = readActiveVehicleBelief(ref);
     if (belief == null) return const SizedBox.shrink();
-    if (brokenMapBandFor(belief.confidence) != BrokenMapBand.warning) {
+    if (brokenMapBandFor(belief.pointEstimate) != BrokenMapBand.warning) {
       return const SizedBox.shrink();
     }
     final l = AppLocalizations.of(context);
@@ -148,15 +150,21 @@ class BrokenMapDisclaimerChip extends ConsumerWidget {
 }
 
 /// Diagnostic row added to the OBD2 breadcrumb overlay (#1395 +
-/// #1423 phase 5). Renders one of three localised lines based on the
-/// active vehicle's belief band:
-///   - silent (<0.4)        -> hidden (the row also hides when there
-///                              is no observation yet — overlay would
-///                              otherwise flash a "verified (0.00)"
-///                              row for vehicles we've never probed)
-///   - verifying (0.4-0.7)  -> "MAP sensor: verifying (0.43)"
-///   - warning (0.7-0.9)    -> "MAP sensor: suspicious (0.75)"
-///   - hardDisable (>=0.9)  -> "MAP sensor: suspicious (0.92)"
+/// #1423 phase 5; #1424 deliverable G). Renders the active vehicle's
+/// posterior point estimate and the half-width of the 95 % credible
+/// interval, formatted as a percentage:
+///
+///   - silent (<0.4)        -> "MAP sensor: 5% ± 8%"   (green; or
+///                              "MAP sensor: 5% ± 8% (verified)" once
+///                              the auto-clear gate has fired)
+///   - verifying (0.4-0.7)  -> "MAP sensor: 43% ± 12%" (amber)
+///   - warning (0.7-0.9)    -> "MAP sensor: 75% ± 7%"  (red)
+///   - hardDisable (>=0.9)  -> "MAP sensor: 92% ± 4%"  (red)
+///
+/// The CI half-width is `(upper - lower) / 2` — the same shape Bayesian
+/// reporting traditionally uses for a single-number margin. The
+/// (verified) badge is only added in the silent band, when
+/// [BrokenMapBelief.isVerifiedClean] is true.
 ///
 /// Defensive: returns [SizedBox.shrink] whenever the belief lookup
 /// throws or the active vehicle has zero observations (i.e. has
@@ -172,33 +180,38 @@ class BrokenMapOverlayRow extends ConsumerWidget {
       return const SizedBox.shrink();
     }
     final l = AppLocalizations.of(context);
-    final band = brokenMapBandFor(belief.confidence);
-    final formatted = belief.confidence.toStringAsFixed(2);
+    final pe = belief.pointEstimate;
+    final band = brokenMapBandFor(pe);
+    final ci = belief.credibleInterval;
+    final pePct = (pe * 100).toStringAsFixed(0);
+    final marginPct = ((ci.$2 - ci.$1) / 2 * 100).toStringAsFixed(0);
     final String text;
     final Color color;
     switch (band) {
       case BrokenMapBand.silent:
-      case BrokenMapBand.verifying:
-        // Verified (silent) and verifying are both rendered with the
-        // same "verified" string for confidence < 0.4, and the
-        // "verifying" string for 0.4-0.7 — different copy keys, same
-        // colour. The silent band is allowed through here because
-        // observationCount > 0 means we DO want to show the user
-        // "verified (0.05)" rather than nothing.
-        if (band == BrokenMapBand.silent) {
-          text = l?.brokenMapOverlayVerified(formatted) ??
-              'MAP sensor: verified ($formatted)';
-          color = Colors.greenAccent;
+        // Silent band gets a "verified" badge appended when the
+        // auto-clear gate has fired (50+ obs, mean<0.1, upper-CI<0.3).
+        // Otherwise it's still informative ("MAP sensor: 5% ± 8%")
+        // because observationCount > 0 means we DO want to show the
+        // user the live posterior rather than hide it entirely.
+        if (belief.isVerifiedClean) {
+          text = l?.brokenMapOverlayPosteriorVerified(pePct, marginPct) ??
+              'MAP sensor: $pePct% ± $marginPct% (verified)';
         } else {
-          text = l?.brokenMapOverlayUnverified(formatted) ??
-              'MAP sensor: verifying ($formatted)';
-          color = Colors.amber;
+          text = l?.brokenMapOverlayPosterior(pePct, marginPct) ??
+              'MAP sensor: $pePct% ± $marginPct%';
         }
+        color = Colors.greenAccent;
+        break;
+      case BrokenMapBand.verifying:
+        text = l?.brokenMapOverlayPosterior(pePct, marginPct) ??
+            'MAP sensor: $pePct% ± $marginPct%';
+        color = Colors.amber;
         break;
       case BrokenMapBand.warning:
       case BrokenMapBand.hardDisable:
-        text = l?.brokenMapOverlaySuspicious(formatted) ??
-            'MAP sensor: suspicious ($formatted)';
+        text = l?.brokenMapOverlayPosterior(pePct, marginPct) ??
+            'MAP sensor: $pePct% ± $marginPct%';
         color = Colors.redAccent;
         break;
     }

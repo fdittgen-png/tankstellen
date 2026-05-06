@@ -3230,6 +3230,16 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
+  String brokenMapOverlayPosterior(String posterior, String margin) {
+    return 'MAP sensor: $posterior% ± $margin%';
+  }
+
+  @override
+  String brokenMapOverlayPosteriorVerified(String posterior, String margin) {
+    return 'MAP sensor: $posterior% ± $margin% (verified)';
+  }
+
+  @override
   String get calibrationAdvancedTitle => 'Advanced calibration';
 
   @override

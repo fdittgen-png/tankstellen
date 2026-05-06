@@ -20,6 +20,7 @@ import 'package:tankstellen/features/consumption/data/obd2/obd_adapter_blocklist
 import 'package:tankstellen/features/consumption/data/obd2/oem_pid_table.dart';
 import 'package:tankstellen/features/vehicle/data/vin_adapter_pair_auto_populator.dart';
 import 'package:tankstellen/features/vehicle/data/vin_decoder.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 
 /// Integration tests for [VinAdapterPairAutoPopulator] (#1399).
@@ -251,12 +252,14 @@ void main() {
   group('broken-MAP detector wiring (#1423 phase 2)', () {
     test(
         'when a detector is provided, the outcome carries the resulting '
-        'belief and a broken-MAP fixture pushes confidence above zero',
+        'belief and a broken-MAP fixture pushes the posterior past the '
+        'verifying band',
         () async {
       const vin = 'VF36B8HZL8R123456';
       // Petrol PID 0x51 wins, so the detector picks the petrol branch
       // (vacuum check). Idle MAP at 99 kPa with baro 101 kPa → score
-      // clamps to 1.0 → confidence after one EMA fold = α (0.4).
+      // clamps to 1.0 → posterior after one Bayesian fold from the
+      // default Beta(1, 9) prior: α=8.5, β=4.5, mean ≈ 0.654.
       // Throttle 0x03 → ~1.18 % — clearly closed.
       final service = buildConnectedService({
         '0902': buildValidVinResponse(vin),
@@ -279,7 +282,12 @@ void main() {
 
       expect(outcome.brokenMapBelief, isNotNull);
       expect(outcome.brokenMapBelief!.observationCount, 1);
-      expect(outcome.brokenMapBelief!.confidence, closeTo(0.4, 1e-9));
+      expect(outcome.brokenMapBelief!.alpha, closeTo(8.5, 1e-9));
+      expect(outcome.brokenMapBelief!.beta, closeTo(4.5, 1e-9));
+      expect(
+        outcome.brokenMapBelief!.pointEstimate,
+        closeTo(8.5 / 13.0, 1e-9),
+      );
       expect(
         outcome.brokenMapBelief!.lastTrigger,
         BrokenMapReason.idleVacuumMissing,
@@ -346,7 +354,11 @@ void main() {
       );
 
       expect(outcome.brokenMapBelief, isNotNull);
-      expect(outcome.brokenMapBelief!.confidence, closeTo(0.85, 1e-9));
+      // Recalled scalar 0.85 → reconstructed Beta(α, β) with
+      // pseudoCount = 10: α = 8.5, β = 1.5, mean = 0.85.
+      expect(outcome.brokenMapBelief!.pointEstimate, closeTo(0.85, 1e-9));
+      expect(outcome.brokenMapBelief!.alpha, closeTo(8.5, 1e-9));
+      expect(outcome.brokenMapBelief!.beta, closeTo(1.5, 1e-9));
       expect(outcome.brokenMapBelief!.observationCount, 0,
           reason:
               'observationCount=0 signals "hydrated from a prior session" '
@@ -397,8 +409,11 @@ void main() {
       );
 
       expect(outcome.brokenMapBelief, isNotNull);
-      // Probe ran from a fresh prior — confidence 0 (healthy MAP).
-      expect(outcome.brokenMapBelief!.confidence, closeTo(0.0, 1e-9));
+      // Probe ran from a fresh prior — score 0 → α=0.5, β=5.5,
+      // posterior mean ≈ 0.083 (silent band, no blocklist write).
+      expect(outcome.brokenMapBelief!.alpha, closeTo(0.5, 1e-9));
+      expect(outcome.brokenMapBelief!.beta, closeTo(5.5, 1e-9));
+      expect(outcome.brokenMapBelief!.pointEstimate, lessThan(0.4));
       expect(outcome.brokenMapBelief!.observationCount, 1);
       // Below-threshold probe result must NOT touch the blocklist.
       expect(storage.data['obdAdapterBroken:ELM327 v1.5'], 0.4,
@@ -451,9 +466,10 @@ void main() {
       );
 
       expect(outcome.brokenMapBelief, isNotNull);
-      expect(outcome.brokenMapBelief!.confidence, closeTo(0.92, 1e-9));
+      expect(outcome.brokenMapBelief!.pointEstimate, closeTo(0.92, 1e-9));
       // Persisted into the blocklist under the connected adapter's id.
-      expect(storage.data['obdAdapterBroken:ELM327 v1.5'], 0.92);
+      // The blocklist stores the posterior mean, not the raw α/β.
+      expect(storage.data['obdAdapterBroken:ELM327 v1.5'], closeTo(0.92, 1e-9));
     });
 
     test(
@@ -518,11 +534,11 @@ void main() {
 /// detector's probe path is exercised in broken_map_detector_test;
 /// here we just need to assert the populator's wiring of
 /// [ObdAdapterBlocklist.recordBelief]. Returning a fixed high
-/// confidence keeps the test deterministic without recreating the
+/// posterior keeps the test deterministic without recreating the
 /// full broken-MAP fixture in this file.
 class _StubHighConfidenceDetector extends BrokenMapDetector {
-  final double confidence;
-  const _StubHighConfidenceDetector(this.confidence);
+  final double pointEstimate;
+  const _StubHighConfidenceDetector(this.pointEstimate);
 
   @override
   Future<BrokenMapBelief> probe(
@@ -530,9 +546,14 @@ class _StubHighConfidenceDetector extends BrokenMapDetector {
     required bool isDiesel,
     required BrokenMapBelief prior,
     required DateTime now,
+    ReferenceVehicle? vehicle,
   }) async {
+    // Reconstruct a Beta posterior with pseudoCount=10 around the
+    // requested mean — same shape the production recall path uses.
+    const pseudoCount = 10.0;
     return BrokenMapBelief(
-      confidence: confidence,
+      alpha: pointEstimate * pseudoCount,
+      beta: (1.0 - pointEstimate) * pseudoCount,
       observationCount: 1,
       lastUpdate: now,
       lastTrigger: BrokenMapReason.idleVacuumMissing,

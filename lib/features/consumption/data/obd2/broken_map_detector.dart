@@ -1,4 +1,5 @@
 import '../../../../core/logging/error_logger.dart';
+import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import 'broken_map_belief.dart';
 import 'broken_map_belief_updater.dart';
 import 'elm327_parsers.dart';
@@ -77,7 +78,12 @@ class BrokenMapDetector {
   /// [isDiesel] selects the petrol vacuum check vs diesel rev-delta
   /// branch. [prior] is folded with the new observation via
   /// [BrokenMapBeliefUpdater.update]. [now] is injected for tests; in
-  /// production callers pass `DateTime.now()`.
+  /// production callers pass `DateTime.now()`. [vehicle] is the
+  /// active vehicle's catalog entry; passed through to the updater so
+  /// induction-class priors (#1424 § E) scale the Bayes factor —
+  /// `null` is acceptable (the populator commonly hits this path
+  /// before profile resolution settles) and yields a neutral 1.0
+  /// adjustment.
   ///
   /// Returns [prior] unchanged when:
   ///   * any of the three PID reads fails / returns malformed bytes,
@@ -92,6 +98,7 @@ class BrokenMapDetector {
     required bool isDiesel,
     required BrokenMapBelief prior,
     required DateTime now,
+    ReferenceVehicle? vehicle,
   }) async {
     try {
       // Throttle gate first — cheapest way to bail on a bad sample.
@@ -158,6 +165,7 @@ class BrokenMapDetector {
         prior,
         observationScore,
         now: now,
+        vehicle: vehicle,
         reason: reason,
       );
     } catch (e, st) {
@@ -215,6 +223,7 @@ class BrokenMapDetector {
     required double estimatedLPer100km,
     required double? proposedEta,
     required DateTime now,
+    ReferenceVehicle? vehicle,
   }) {
     if (estimatedLPer100km <= 0 || reconciledLPer100km <= 0) {
       return prior;
@@ -252,6 +261,7 @@ class BrokenMapDetector {
       prior,
       observationScore,
       now: now,
+      vehicle: vehicle,
       reason: reason,
     );
   }

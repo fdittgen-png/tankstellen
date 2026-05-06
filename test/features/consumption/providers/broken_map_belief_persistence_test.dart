@@ -139,7 +139,11 @@ void main() {
     expect(raw, isA<String>(), reason: 'belief is JSON-encoded');
     final json = jsonDecode(raw as String) as Map<String, dynamic>;
     final restored = BrokenMapBelief.fromJson(json);
-    expect(restored.confidence, closeTo(0.4, 1e-9));
+    // High-discrepancy plein → score = 1.0 → α' = 0.5 + 8 = 8.5,
+    // β' = 4.5 + 0 = 4.5 (#1424 update math).
+    expect(restored.alpha, closeTo(8.5, 1e-9));
+    expect(restored.beta, closeTo(4.5, 1e-9));
+    expect(restored.pointEstimate, closeTo(8.5 / 13.0, 1e-9));
     expect(restored.observationCount, 1);
     expect(restored.lastTrigger, BrokenMapReason.pleinCompletDiscrepancy);
   });
@@ -152,7 +156,8 @@ void main() {
     // a belief — equivalent to opening the app after an upgrade.
     final storage = _FakeSettingsStorage();
     final priorBelief = BrokenMapBelief(
-      confidence: 0.82,
+      alpha: 41,
+      beta: 9,
       observationCount: 3,
       lastUpdate: DateTime(2026, 4, 30),
       lastTrigger: BrokenMapReason.pleinCompletDiscrepancy,
@@ -170,8 +175,40 @@ void main() {
     final hydrated = container
         .read(brokenMapBeliefByVehicleProvider.notifier)
         .beliefFor('veh-a');
-    expect(hydrated.confidence, closeTo(0.82, 1e-9));
+    expect(hydrated.alpha, closeTo(41, 1e-9));
+    expect(hydrated.beta, closeTo(9, 1e-9));
+    expect(hydrated.pointEstimate, closeTo(0.82, 1e-9));
     expect(hydrated.observationCount, 3);
+    expect(hydrated.lastTrigger, BrokenMapReason.pleinCompletDiscrepancy);
+  });
+
+  test(
+      'legacy confidence-shape JSON in storage migrates to Beta(α, β) form '
+      'on first beliefFor call (#1424 backward-compat)', () async {
+    // Pre-#1424 records carried confidence + observationCount.
+    // Migration: pseudoCount = max(observationCount, 1).
+    //   α = confidence·n + 1; β = (1-confidence)·n + 9.
+    final storage = _FakeSettingsStorage();
+    storage.data['${brokenMapBeliefSettingsKeyPrefix}veh-a'] = jsonEncode({
+      'confidence': 0.6,
+      'observationCount': 4,
+      'lastTrigger': 'pleinCompletDiscrepancy',
+    });
+
+    final container = ProviderContainer(
+      overrides: [
+        settingsStorageProvider.overrideWithValue(storage),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final hydrated = container
+        .read(brokenMapBeliefByVehicleProvider.notifier)
+        .beliefFor('veh-a');
+    // pseudoCount = 4 → α = 0.6·4 + 1 = 3.4 ; β = 0.4·4 + 9 = 10.6.
+    expect(hydrated.alpha, closeTo(3.4, 1e-9));
+    expect(hydrated.beta, closeTo(10.6, 1e-9));
+    expect(hydrated.observationCount, 4);
     expect(hydrated.lastTrigger, BrokenMapReason.pleinCompletDiscrepancy);
   });
 
@@ -224,13 +261,15 @@ void main() {
       ),
     ));
 
-    // Pre-seed a strong belief so a single high-discrepancy
-    // observation pushes confidence above 0.7 in one EMA fold.
-    // Starting at 0.85, observation = 1.0 → α(1.0) + (1-α)(0.85)
-    //                                       = 0.4 + 0.51 = 0.91.
+    // Pre-seed a Beta(α, β) prior with mean ≈ 0.85 so a single
+    // high-discrepancy observation (score = 1.0) lifts the posterior
+    // past the 0.7 blocklist threshold under the #1424 update math:
+    //   α' = 0.5·17 + 8·1 = 16.5 ; β' = 0.5·3 + 0 = 1.5 ;
+    //   mean = 16.5 / 18 ≈ 0.917.
     storage.data['${brokenMapBeliefSettingsKeyPrefix}veh-a'] = jsonEncode(
       const BrokenMapBelief(
-        confidence: 0.85,
+        alpha: 17,
+        beta: 3,
         observationCount: 5,
         lastTrigger: BrokenMapReason.pleinCompletDiscrepancy,
       ).toJson(),

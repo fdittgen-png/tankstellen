@@ -6032,6 +6032,18 @@ abstract class AppLocalizations {
   /// **'MAP sensor: suspicious ({confidence})'**
   String brokenMapOverlaySuspicious(String confidence);
 
+  /// Diagnostic-overlay row showing the Bayesian posterior point estimate and the half-width of the 95% credible interval for the broken-MAP belief (#1424 deliverable G).
+  ///
+  /// In en, this message translates to:
+  /// **'MAP sensor: {posterior}% ± {margin}%'**
+  String brokenMapOverlayPosterior(String posterior, String margin);
+
+  /// Diagnostic-overlay row variant when the auto-clear gate has fired (#1424 deliverable D) — appends a (verified) badge to the posterior + credible-interval row. Shown only when isVerifiedClean is true (50+ observations, mean<0.1, upper-CI<0.3).
+  ///
+  /// In en, this message translates to:
+  /// **'MAP sensor: {posterior}% ± {margin}% (verified)'**
+  String brokenMapOverlayPosteriorVerified(String posterior, String margin);
+
   /// ExpansionTile title for the user-overridable calibration constants section on the edit-vehicle screen (#1397).
   ///
   /// In en, this message translates to:

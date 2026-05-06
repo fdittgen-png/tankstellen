@@ -1,16 +1,18 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/broken_map_belief.dart';
 import 'package:tankstellen/features/consumption/data/obd2/broken_map_belief_updater.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';
 
-/// Reference EMA α used by [BrokenMapBeliefUpdater.update]. Kept here
-/// as a literal so test assertions are self-explanatory; if production
-/// retunes α the failing tests document the change.
-const double _alpha = 0.4;
-
+/// Membership-function tests are unchanged from the #1423 phase 1
+/// surface — the four scoring helpers stay put under the Bayesian
+/// migration (#1424).
+///
+/// The `update` mechanics tests were rewritten for the Beta(α, β)
+/// posterior: see the bottom group for the two issue-#1424 acceptance
+/// tests (5×0.4 → posterior > 0.8; 5×0.9 then 20×0.05 → posterior < 0.4).
 void main() {
   group('vacuumMissingScore', () {
     test('returns 0.0 when delta is at the healthy boundary (45 kPa)', () {
-      // baro 100 kPa, map 55 kPa → delta 45 kPa → healthy.
       final s = BrokenMapBeliefUpdater.vacuumMissingScore(
         baroKpa: 100,
         mapKpa: 55,
@@ -20,8 +22,6 @@ void main() {
 
     test('returns 1.0 when delta is at/below the suspicious boundary (15 kPa)',
         () {
-      // baro 100 kPa, map 90 kPa → delta 10 kPa → strong evidence
-      // (clamped from a negative formula value).
       final s = BrokenMapBeliefUpdater.vacuumMissingScore(
         baroKpa: 100,
         mapKpa: 90,
@@ -30,7 +30,6 @@ void main() {
     });
 
     test('linear interp at delta 30 returns 0.5', () {
-      // baro 100 kPa, map 70 kPa → delta 30 → midpoint between 15 and 45.
       final s = BrokenMapBeliefUpdater.vacuumMissingScore(
         baroKpa: 100,
         mapKpa: 70,
@@ -58,7 +57,6 @@ void main() {
     });
 
     test('linear interp at delta 19 returns 0.5', () {
-      // |rev - idle| = 19 → midpoint between 8 and 30.
       final s = BrokenMapBeliefUpdater.revDeltaMissingScore(
         mapIdleKpa: 100,
         mapRevvedKpa: 81,
@@ -108,64 +106,181 @@ void main() {
     });
   });
 
-  group('update — EMA mechanics', () {
-    test('single update of score 1.0 yields confidence == α', () {
-      final now = DateTime.utc(2026, 5, 4, 12);
-      const prev = BrokenMapBelief();
-
-      final next = BrokenMapBeliefUpdater.update(prev, 1.0, now: now);
-
-      expect(next.confidence, closeTo(_alpha, 1e-9));
-      expect(next.observationCount, 1);
-      expect(next.lastUpdate, now);
+  group('bayesFactorAdjustment (#1424 § E)', () {
+    test('null vehicle → neutral 1.0 (no class boost)', () {
+      expect(BrokenMapBeliefUpdater.bayesFactorAdjustment(null), 1.0);
     });
 
-    test('five sequential 0.4 observations stay around 0.4 (no compounding)',
-        () {
-      // EMA with constant input converges to that input — it does NOT
-      // compound the way Bayesian accumulation does. Spec §E flags this.
-      // Closed form after n updates from 0: x × (1 - (1-α)^n)
-      // For n=5, α=0.4 → 0.4 × (1 - 0.6^5) ≈ 0.369. Confidence MUST stay
-      // bounded by the input — never exceed it — and asymptotically
-      // approach it.
-      final now = DateTime.utc(2026, 5, 4, 12);
-      BrokenMapBelief belief = const BrokenMapBelief();
-      final history = <double>[];
-      for (var i = 0; i < 5; i++) {
-        belief = BrokenMapBeliefUpdater.update(belief, 0.4, now: now);
-        history.add(belief.confidence);
-      }
-      // Never exceeds the input — would only happen if EMA compounded.
-      expect(history.every((c) => c <= 0.4 + 1e-9), isTrue);
-      // Approaching the input, not stuck.
-      expect(belief.confidence, greaterThan(0.3));
-      expect(belief.confidence, closeTo(0.369, 0.01));
-      expect(belief.observationCount, 5);
+    test('Atkinson cycle → 0.3 (legitimately weird MAP)', () {
+      // Atkinson dominates over induction — even a turbo Atkinson
+      // (rare but exists, e.g. Toyota's 2.5L hybrid) returns 0.3.
+      const atkNa = ReferenceVehicle(
+        make: 'Toyota',
+        model: 'Yaris',
+        generation: 'IV (2020-)',
+        yearStart: 2020,
+        displacementCc: 1490,
+        fuelType: 'hybrid',
+        transmission: 'automatic',
+        atkinsonCycle: true,
+      );
+      const atkTurbo = ReferenceVehicle(
+        make: 'Toyota',
+        model: 'RAV4',
+        generation: 'V (2018-)',
+        yearStart: 2018,
+        displacementCc: 2500,
+        fuelType: 'hybrid',
+        transmission: 'automatic',
+        inductionType: InductionType.turbocharged,
+        atkinsonCycle: true,
+      );
+      expect(BrokenMapBeliefUpdater.bayesFactorAdjustment(atkNa), 0.3);
+      expect(BrokenMapBeliefUpdater.bayesFactorAdjustment(atkTurbo), 0.3);
+    });
 
-      // Many more iterations get arbitrarily close to 0.4.
-      for (var i = 0; i < 50; i++) {
-        belief = BrokenMapBeliefUpdater.update(belief, 0.4, now: now);
-      }
-      expect(belief.confidence, closeTo(0.4, 1e-6));
+    test('turbocharged or VNT → 1.5 (turbo flat-MAP is stronger evidence)', () {
+      const turboPort = ReferenceVehicle(
+        make: 'Volkswagen',
+        model: 'Golf',
+        generation: 'VII (2012-2019)',
+        yearStart: 2012,
+        yearEnd: 2019,
+        displacementCc: 1390,
+        fuelType: 'petrol',
+        transmission: 'manual',
+        inductionType: InductionType.turbocharged,
+      );
+      const turboDi = ReferenceVehicle(
+        make: 'Volkswagen',
+        model: 'Golf',
+        generation: 'VIII (2019-)',
+        yearStart: 2019,
+        displacementCc: 1498,
+        fuelType: 'petrol',
+        transmission: 'manual',
+        inductionType: InductionType.turbocharged,
+        directInjection: true,
+      );
+      const vntDiesel = ReferenceVehicle(
+        make: 'Peugeot',
+        model: '208',
+        generation: 'II (2019-)',
+        yearStart: 2019,
+        displacementCc: 1499,
+        fuelType: 'diesel',
+        transmission: 'manual',
+        inductionType: InductionType.vnt,
+        directInjection: true,
+      );
+      expect(BrokenMapBeliefUpdater.bayesFactorAdjustment(turboPort), 1.5);
+      expect(BrokenMapBeliefUpdater.bayesFactorAdjustment(turboDi), 1.5);
+      expect(BrokenMapBeliefUpdater.bayesFactorAdjustment(vntDiesel), 1.5);
+    });
+
+    test('NA petrol/diesel → 1.0 neutral, with or without DI', () {
+      const naPort = ReferenceVehicle(
+        make: 'Renault',
+        model: 'Clio',
+        generation: 'V (2019-)',
+        yearStart: 2019,
+        displacementCc: 999,
+        fuelType: 'petrol',
+        transmission: 'manual',
+      );
+      const naDi = ReferenceVehicle(
+        make: 'Mazda',
+        model: '3',
+        generation: 'IV (2019-)',
+        yearStart: 2019,
+        displacementCc: 1998,
+        fuelType: 'petrol',
+        transmission: 'automatic',
+        directInjection: true,
+      );
+      expect(BrokenMapBeliefUpdater.bayesFactorAdjustment(naPort), 1.0);
+      expect(BrokenMapBeliefUpdater.bayesFactorAdjustment(naDi), 1.0);
+    });
+
+    test('supercharged (no Atkinson) → 1.0 — only turbo/VNT amplify', () {
+      const supercharged = ReferenceVehicle(
+        make: 'Mercedes-Benz',
+        model: 'C-Class',
+        generation: 'W205 (2014-2021)',
+        yearStart: 2014,
+        yearEnd: 2021,
+        displacementCc: 1991,
+        fuelType: 'petrol',
+        transmission: 'automatic',
+        inductionType: InductionType.supercharged,
+        directInjection: true,
+      );
+      expect(BrokenMapBeliefUpdater.bayesFactorAdjustment(supercharged), 1.0);
+    });
+  });
+
+  group('bayesFactor (#1424)', () {
+    test('s = 0.5 with null vehicle is approximately 1 (neutral evidence)', () {
+      // base = 0.5 / (0.5 + 0.01) ≈ 0.98 — slightly under 1 because
+      // the epsilon nudges the denominator.
+      final bf = BrokenMapBeliefUpdater.bayesFactor(0.5, null);
+      expect(bf, closeTo(0.98, 0.01));
+    });
+
+    test('s = 0.9 produces a strong > 1 BF', () {
+      final bf = BrokenMapBeliefUpdater.bayesFactor(0.9, null);
+      // 0.9 / 0.11 ≈ 8.18.
+      expect(bf, closeTo(8.18, 0.05));
+    });
+
+    test('turbocharged vehicle scales the BF by 1.5', () {
+      const turbo = ReferenceVehicle(
+        make: 'BMW',
+        model: '3-Series',
+        generation: 'F30 (2012-2019)',
+        yearStart: 2012,
+        yearEnd: 2019,
+        displacementCc: 1995,
+        fuelType: 'petrol',
+        transmission: 'automatic',
+        inductionType: InductionType.turbocharged,
+        directInjection: true,
+      );
+      final neutralBf = BrokenMapBeliefUpdater.bayesFactor(0.7, null);
+      final turboBf = BrokenMapBeliefUpdater.bayesFactor(0.7, turbo);
+      expect(turboBf, closeTo(neutralBf * 1.5, 1e-9));
+    });
+  });
+
+  group('update — Bayesian mechanics', () {
+    final fixedNow = DateTime.utc(2026, 5, 4, 12);
+
+    test('default prior has α=1, β=9 → mean 0.1', () {
+      const belief = BrokenMapBelief();
+      expect(belief.alpha, 1.0);
+      expect(belief.beta, 9.0);
+      expect(belief.pointEstimate, closeTo(0.1, 1e-9));
     });
 
     test('strong observation with reason updates lastTrigger and stamps fields',
         () {
-      final now = DateTime.utc(2026, 5, 4, 12);
       const prev = BrokenMapBelief();
 
       final next = BrokenMapBeliefUpdater.update(
         prev,
         0.9,
-        now: now,
+        now: fixedNow,
+        vehicle: null,
         reason: BrokenMapReason.idleVacuumMissing,
       );
 
       expect(next.lastTrigger, BrokenMapReason.idleVacuumMissing);
       expect(next.observationCount, 1);
-      expect(next.lastUpdate, now);
-      // 0.4 × 0.9 + 0.6 × 0 = 0.36
-      expect(next.confidence, closeTo(0.36, 1e-9));
+      expect(next.lastUpdate, fixedNow);
+      // α' = 0.5*1 + 8*0.9*1 = 7.7 ; β' = 0.5*9 + 1*0.1 = 4.6
+      expect(next.alpha, closeTo(7.7, 1e-9));
+      expect(next.beta, closeTo(4.6, 1e-9));
+      expect(next.pointEstimate, closeTo(7.7 / 12.3, 1e-9));
     });
 
     test('weak observation does NOT overwrite a previously-set lastTrigger',
@@ -174,49 +289,197 @@ void main() {
       final t1 = DateTime.utc(2026, 5, 4, 12, 5);
       const prev = BrokenMapBelief();
 
-      // Strong hit sets the trigger.
       final after = BrokenMapBeliefUpdater.update(
         prev,
         0.9,
         now: t0,
+        vehicle: null,
         reason: BrokenMapReason.idleVacuumMissing,
       );
       expect(after.lastTrigger, BrokenMapReason.idleVacuumMissing);
 
-      // Weak follow-up — score below the strong threshold AND a different
-      // reason supplied. Trigger must remain sticky.
       final later = BrokenMapBeliefUpdater.update(
         after,
         0.2,
         now: t1,
+        vehicle: null,
         reason: BrokenMapReason.revDeltaMissing,
       );
       expect(later.lastTrigger, BrokenMapReason.idleVacuumMissing);
       expect(later.observationCount, 2);
     });
 
-    test('belief at 0.8 decays toward 0 after five zero-score updates', () {
-      final now = DateTime.utc(2026, 5, 4, 12);
-      BrokenMapBelief belief = const BrokenMapBelief(confidence: 0.8);
-      for (var i = 0; i < 5; i++) {
-        belief = BrokenMapBeliefUpdater.update(belief, 0.0, now: now);
-      }
-      // (1 - α)^5 × 0.8 ≈ 0.6^5 × 0.8 ≈ 0.0622
-      expect(belief.confidence, lessThan(0.1));
-      expect(belief.confidence, greaterThan(0.0));
-    });
-
-    test('observationScore above 1.0 is clamped — confidence stays in [0,1]',
-        () {
-      final now = DateTime.utc(2026, 5, 4, 12);
+    test('observationScore above 1.0 is clamped — α/β stay finite, point '
+        'estimate in [0, 1]', () {
       const prev = BrokenMapBelief();
 
-      final next = BrokenMapBeliefUpdater.update(prev, 1.5, now: now);
+      final next = BrokenMapBeliefUpdater.update(
+        prev,
+        1.5,
+        now: fixedNow,
+        vehicle: null,
+      );
 
-      expect(next.confidence, lessThanOrEqualTo(1.0));
-      expect(next.confidence, greaterThanOrEqualTo(0.0));
-      // Should equal α × 1.0 (clamped) = 0.4
-      expect(next.confidence, closeTo(_alpha, 1e-9));
+      expect(next.alpha.isFinite, isTrue);
+      expect(next.beta.isFinite, isTrue);
+      expect(next.pointEstimate, lessThanOrEqualTo(1.0));
+      expect(next.pointEstimate, greaterThanOrEqualTo(0.0));
+      // Score clamped to 1.0:
+      // α' = 0.5*1 + 8*1*1 = 8.5 ; β' = 0.5*9 + 1*0 = 4.5.
+      expect(next.alpha, closeTo(8.5, 1e-9));
+      expect(next.beta, closeTo(4.5, 1e-9));
+    });
+
+    test('verified-clean prior is sticky — no observation moves it',
+        () {
+      // Construct a belief that satisfies the auto-clear gate
+      // (observationCount > 50, mean < 0.1, upper-CI < 0.3). Beta(5, 95)
+      // has mean 0.05 and a tight CI (~0.014–0.10) — well within
+      // the gate.
+      const verified = BrokenMapBelief(
+        alpha: 5,
+        beta: 95,
+        observationCount: 60,
+      );
+      expect(verified.isVerifiedClean, isTrue);
+
+      // Try to fold in a strong "broken" observation — should be
+      // silently rejected.
+      final next = BrokenMapBeliefUpdater.update(
+        verified,
+        1.0,
+        now: fixedNow,
+        vehicle: null,
+        reason: BrokenMapReason.idleVacuumMissing,
+      );
+      expect(next, equals(verified));
+    });
+
+    test('vehicle-class boost amplifies α-side of a broken observation',
+        () {
+      const prev = BrokenMapBelief();
+      const turbo = ReferenceVehicle(
+        make: 'BMW',
+        model: '3-Series',
+        generation: 'F30 (2012-2019)',
+        yearStart: 2012,
+        yearEnd: 2019,
+        displacementCc: 1995,
+        fuelType: 'petrol',
+        transmission: 'automatic',
+        inductionType: InductionType.turbocharged,
+      );
+      // Same observation, neutral vs turbo vehicle:
+      final neutral =
+          BrokenMapBeliefUpdater.update(prev, 0.7, now: fixedNow, vehicle: null);
+      final amplified = BrokenMapBeliefUpdater.update(
+        prev,
+        0.7,
+        now: fixedNow,
+        vehicle: turbo,
+      );
+      expect(amplified.alpha, greaterThan(neutral.alpha));
+      expect(amplified.pointEstimate, greaterThan(neutral.pointEstimate));
+    });
+
+    test('Atkinson vehicle dampens the α-side of a broken observation',
+        () {
+      const prev = BrokenMapBelief();
+      const atkinson = ReferenceVehicle(
+        make: 'Toyota',
+        model: 'Prius',
+        generation: 'IV (2015-2022)',
+        yearStart: 2015,
+        yearEnd: 2022,
+        displacementCc: 1798,
+        fuelType: 'hybrid',
+        transmission: 'automatic',
+        atkinsonCycle: true,
+      );
+      final neutral =
+          BrokenMapBeliefUpdater.update(prev, 0.7, now: fixedNow, vehicle: null);
+      final dampened = BrokenMapBeliefUpdater.update(
+        prev,
+        0.7,
+        now: fixedNow,
+        vehicle: atkinson,
+      );
+      expect(dampened.alpha, lessThan(neutral.alpha));
+      expect(dampened.pointEstimate, lessThan(neutral.pointEstimate));
+    });
+  });
+
+  group('update — issue #1424 acceptance tests', () {
+    final fixedNow = DateTime.utc(2026, 5, 4, 12);
+
+    test('5 × score 0.4 against neutral vehicle pushes posterior > 0.8 '
+        '(Bayes compounds where EMA didn\'t)', () {
+      BrokenMapBelief belief = const BrokenMapBelief();
+      for (var i = 0; i < 5; i++) {
+        belief = BrokenMapBeliefUpdater.update(
+          belief,
+          0.4,
+          now: fixedNow,
+          vehicle: null,
+        );
+      }
+      expect(
+        belief.pointEstimate,
+        greaterThan(0.8),
+        reason:
+            'Five borderline-0.4 observations should compound past 0.8 with '
+            'γ=0.5, αW=8, βW=1 (#1424 § B calibration). Got '
+            'α=${belief.alpha}, β=${belief.beta}.',
+      );
+      expect(belief.observationCount, 5);
+    });
+
+    test('5 × score 0.9 then 20 × score 0.05 against neutral vehicle decays '
+        'posterior below 0.4 (contradicting evidence eventually wins)', () {
+      BrokenMapBelief belief = const BrokenMapBelief();
+      for (var i = 0; i < 5; i++) {
+        belief = BrokenMapBeliefUpdater.update(
+          belief,
+          0.9,
+          now: fixedNow,
+          vehicle: null,
+        );
+      }
+      // Sanity check — strong observations got us above 0.9.
+      expect(
+        belief.pointEstimate,
+        greaterThan(0.9),
+        reason:
+            'Five strong observations should put the posterior in the '
+            'hard-disable band before we test recovery. Got '
+            'α=${belief.alpha}, β=${belief.beta}.',
+      );
+
+      for (var i = 0; i < 20; i++) {
+        belief = BrokenMapBeliefUpdater.update(
+          belief,
+          0.05,
+          now: fixedNow,
+          vehicle: null,
+        );
+      }
+      expect(
+        belief.pointEstimate,
+        lessThan(0.4),
+        reason:
+            'Twenty clean (s=0.05) observations should decay the posterior '
+            'back below the verifying-band threshold. Got '
+            'α=${belief.alpha}, β=${belief.beta}, '
+            'mean=${belief.pointEstimate}.',
+      );
+      expect(
+        belief.pointEstimate,
+        greaterThan(0.05),
+        reason:
+            'Even fully-decayed observations leave some residual posterior — '
+            'we never fully unlearn the prior strong evidence (#1424 § H).',
+      );
+      expect(belief.observationCount, 25);
     });
   });
 }

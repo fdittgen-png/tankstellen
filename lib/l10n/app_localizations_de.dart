@@ -3260,6 +3260,16 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String brokenMapOverlayPosterior(String posterior, String margin) {
+    return 'MAP-Sensor: $posterior % ± $margin %';
+  }
+
+  @override
+  String brokenMapOverlayPosteriorVerified(String posterior, String margin) {
+    return 'MAP-Sensor: $posterior % ± $margin % (bestätigt)';
+  }
+
+  @override
   String get calibrationAdvancedTitle => 'Erweiterte Kalibrierung';
 
   @override

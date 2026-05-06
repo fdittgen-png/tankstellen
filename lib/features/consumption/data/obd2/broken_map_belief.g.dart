@@ -8,7 +8,8 @@ part of 'broken_map_belief.dart';
 
 _BrokenMapBelief _$BrokenMapBeliefFromJson(Map<String, dynamic> json) =>
     _BrokenMapBelief(
-      confidence: (json['confidence'] as num?)?.toDouble() ?? 0.0,
+      alpha: (json['alpha'] as num?)?.toDouble() ?? 1.0,
+      beta: (json['beta'] as num?)?.toDouble() ?? 9.0,
       observationCount: (json['observationCount'] as num?)?.toInt() ?? 0,
       lastUpdate: json['lastUpdate'] == null
           ? null
@@ -20,7 +21,8 @@ _BrokenMapBelief _$BrokenMapBeliefFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$BrokenMapBeliefToJson(_BrokenMapBelief instance) =>
     <String, dynamic>{
-      'confidence': instance.confidence,
+      'alpha': instance.alpha,
+      'beta': instance.beta,
       'observationCount': instance.observationCount,
       'lastUpdate': instance.lastUpdate?.toIso8601String(),
       'lastTrigger': _$BrokenMapReasonEnumMap[instance.lastTrigger]!,

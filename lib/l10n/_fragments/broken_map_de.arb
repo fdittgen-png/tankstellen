@@ -5,5 +5,7 @@
   "brokenMapBannerHardDisable": "MAP-Sensor unzuverlässig. Statt Live-Verbrauch wird der Tankdurchschnitt angezeigt.",
   "brokenMapOverlayVerified": "MAP-Sensor: bestätigt ({confidence})",
   "brokenMapOverlayUnverified": "MAP-Sensor: prüfen ({confidence})",
-  "brokenMapOverlaySuspicious": "MAP-Sensor: verdächtig ({confidence})"
+  "brokenMapOverlaySuspicious": "MAP-Sensor: verdächtig ({confidence})",
+  "brokenMapOverlayPosterior": "MAP-Sensor: {posterior} % ± {margin} %",
+  "brokenMapOverlayPosteriorVerified": "MAP-Sensor: {posterior} % ± {margin} % (bestätigt)"
 }

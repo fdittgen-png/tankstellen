@@ -60,10 +60,11 @@ void main() {
       findsNothing,
     );
 
-    // Cross from 0.0 -> 0.75 (warning band entry).
+    // Cross from default prior (mean=0.1) -> mean ≈ 0.75 (warning
+    // band entry).
     beliefs.set(
       'veh-a',
-      const BrokenMapBelief(confidence: 0.75, observationCount: 4),
+      const BrokenMapBelief(alpha: 75, beta: 25, observationCount: 4),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 250));
@@ -88,7 +89,7 @@ void main() {
     // First crossing fires once.
     beliefs.set(
       'veh-a',
-      const BrokenMapBelief(confidence: 0.72, observationCount: 4),
+      const BrokenMapBelief(alpha: 72, beta: 28, observationCount: 4),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 250));
@@ -109,13 +110,13 @@ void main() {
     // should re-fire because the warned-vehicles guard is set.
     beliefs.set(
       'veh-a',
-      const BrokenMapBelief(confidence: 0.78, observationCount: 5),
+      const BrokenMapBelief(alpha: 78, beta: 22, observationCount: 5),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 250));
     beliefs.set(
       'veh-a',
-      const BrokenMapBelief(confidence: 0.85, observationCount: 6),
+      const BrokenMapBelief(alpha: 85, beta: 15, observationCount: 6),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 250));
@@ -129,11 +130,12 @@ void main() {
   });
 
   testWidgets(
-      'persistent banner appears at confidence >= 0.9 (not at 0.85)',
+      'persistent banner appears at posterior >= 0.9 (not at 0.85)',
       (tester) async {
     final beliefs = _MutableBeliefByVehicle({
       'veh-a': const BrokenMapBelief(
-        confidence: 0.85,
+        alpha: 85,
+        beta: 15,
         observationCount: 5,
       ),
     });
@@ -149,7 +151,7 @@ void main() {
     // Push to 0.92 — hard-disable band, banner appears.
     beliefs.set(
       'veh-a',
-      const BrokenMapBelief(confidence: 0.92, observationCount: 7),
+      const BrokenMapBelief(alpha: 92, beta: 8, observationCount: 7),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
