@@ -12,6 +12,12 @@ part of 'price_prediction_provider.dart';
 ///
 /// Returns `null` when fewer than 10 data points are available — not enough
 /// data to produce meaningful predictions.
+///
+/// As of #1117 phase 1, the provider also enriches the result with a
+/// [PricePrediction.holidayPremium] derived from the new
+/// [PriceFeatureExtractor] / [FeatureVector] contract. The future TFLite
+/// phase 2 will replace this heuristic with model inference using the
+/// same [FeatureVector] inputs.
 
 @ProviderFor(pricePrediction)
 final pricePredictionProvider = PricePredictionFamily._();
@@ -20,6 +26,12 @@ final pricePredictionProvider = PricePredictionFamily._();
 ///
 /// Returns `null` when fewer than 10 data points are available — not enough
 /// data to produce meaningful predictions.
+///
+/// As of #1117 phase 1, the provider also enriches the result with a
+/// [PricePrediction.holidayPremium] derived from the new
+/// [PriceFeatureExtractor] / [FeatureVector] contract. The future TFLite
+/// phase 2 will replace this heuristic with model inference using the
+/// same [FeatureVector] inputs.
 
 final class PricePredictionProvider
     extends
@@ -33,6 +45,12 @@ final class PricePredictionProvider
   ///
   /// Returns `null` when fewer than 10 data points are available — not enough
   /// data to produce meaningful predictions.
+  ///
+  /// As of #1117 phase 1, the provider also enriches the result with a
+  /// [PricePrediction.holidayPremium] derived from the new
+  /// [PriceFeatureExtractor] / [FeatureVector] contract. The future TFLite
+  /// phase 2 will replace this heuristic with model inference using the
+  /// same [FeatureVector] inputs.
   PricePredictionProvider._({
     required PricePredictionFamily super.from,
     required (String, FuelType) super.argument,
@@ -84,12 +102,18 @@ final class PricePredictionProvider
   }
 }
 
-String _$pricePredictionHash() => r'7be988a602ce629e340ac017ab850b2a83d23951';
+String _$pricePredictionHash() => r'e1e22ff3f93f070d8f979bc3cc25bdd66a584254';
 
 /// Computes "best time to fill" predictions from locally stored price history.
 ///
 /// Returns `null` when fewer than 10 data points are available — not enough
 /// data to produce meaningful predictions.
+///
+/// As of #1117 phase 1, the provider also enriches the result with a
+/// [PricePrediction.holidayPremium] derived from the new
+/// [PriceFeatureExtractor] / [FeatureVector] contract. The future TFLite
+/// phase 2 will replace this heuristic with model inference using the
+/// same [FeatureVector] inputs.
 
 final class PricePredictionFamily extends $Family
     with $FunctionalFamilyOverride<PricePrediction?, (String, FuelType)> {
@@ -106,6 +130,12 @@ final class PricePredictionFamily extends $Family
   ///
   /// Returns `null` when fewer than 10 data points are available — not enough
   /// data to produce meaningful predictions.
+  ///
+  /// As of #1117 phase 1, the provider also enriches the result with a
+  /// [PricePrediction.holidayPremium] derived from the new
+  /// [PriceFeatureExtractor] / [FeatureVector] contract. The future TFLite
+  /// phase 2 will replace this heuristic with model inference using the
+  /// same [FeatureVector] inputs.
 
   PricePredictionProvider call(String stationId, FuelType fuelType) =>
       PricePredictionProvider._(argument: (stationId, fuelType), from: this);

@@ -344,6 +344,133 @@ void main() {
     });
   });
 
+  group('pricePrediction — holidayPremium (#1117 phase 1)', () {
+    test('holidayPremium is null when fewer than 3 holiday samples exist',
+        () {
+      // 12 records spread across non-holiday weekdays in May 2026; only
+      // 1 of them happens on May 3 (PL Constitution Day). With country
+      // resolved to PL via the 'pl-' prefix we'd have 1 holiday sample
+      // → below threshold → null.
+      final records = <PriceRecord>[];
+      // Single holiday record on May 3, 2026 (Sunday).
+      records.add(PriceRecord(
+        stationId: 'pl-station-1',
+        recordedAt: DateTime(2026, 5, 3, 10),
+        e10: 1.80,
+      ));
+      // 11 non-holiday records spread across other May days.
+      for (int i = 0; i < 11; i++) {
+        records.add(PriceRecord(
+          stationId: 'pl-station-1',
+          recordedAt: DateTime(2026, 5, 5 + i, 10),
+          e10: 1.60,
+        ));
+      }
+
+      // Note: 'pl-' is not in Countries._stationIdPrefixToCountry, so
+      // country resolves to null and PL Constitution Day does NOT
+      // flag. holidayPremium therefore stays null. This is the
+      // realistic phase-1 behaviour for unsupported-prefix countries.
+      final container = makeContainer(records);
+      final result =
+          container.read(pricePredictionProvider('pl-station-1', FuelType.e10));
+
+      expect(result, isNotNull);
+      expect(result!.holidayPremium, isNull);
+    });
+
+    test(
+        'holidayPremium is computed when 3+ holiday samples exist and '
+        'appended to recommendation when premium > 2 ct/L', () {
+      // FR station ('fr-' prefix → country FR via station-id lookup).
+      // 3 records on Bastille Day at distinct hours; 9 non-holiday
+      // records the next day. Holiday avg = 1.80, non-holiday = 1.60
+      // → premium = +0.20 EUR/L.
+      final records = <PriceRecord>[];
+      for (int hour = 8; hour <= 10; hour++) {
+        records.add(PriceRecord(
+          stationId: 'fr-station-1',
+          recordedAt: DateTime(2026, 7, 14, hour),
+          e10: 1.80,
+        ));
+      }
+      for (int day = 15; day <= 23; day++) {
+        records.add(PriceRecord(
+          stationId: 'fr-station-1',
+          recordedAt: DateTime(2026, 7, day, 10),
+          e10: 1.60,
+        ));
+      }
+
+      final container = makeContainer(records);
+      final result =
+          container.read(pricePredictionProvider('fr-station-1', FuelType.e10));
+
+      expect(result, isNotNull);
+      expect(result!.holidayPremium, closeTo(0.20, 0.001));
+      // Premium > 2 ct/L → recommendation gets a holiday hint.
+      expect(result.recommendation, contains('Holidays trend'));
+      expect(result.recommendation, contains('higher'));
+    });
+
+    test('negative holidayPremium → recommendation says "lower"', () {
+      // Holiday samples cheaper than non-holiday samples.
+      final records = <PriceRecord>[];
+      for (int hour = 8; hour <= 10; hour++) {
+        records.add(PriceRecord(
+          stationId: 'fr-station-2',
+          recordedAt: DateTime(2026, 7, 14, hour),
+          e10: 1.40,
+        ));
+      }
+      for (int day = 15; day <= 23; day++) {
+        records.add(PriceRecord(
+          stationId: 'fr-station-2',
+          recordedAt: DateTime(2026, 7, day, 10),
+          e10: 1.60,
+        ));
+      }
+
+      final container = makeContainer(records);
+      final result =
+          container.read(pricePredictionProvider('fr-station-2', FuelType.e10));
+
+      expect(result, isNotNull);
+      expect(result!.holidayPremium, lessThan(0));
+      expect(result.recommendation, contains('lower'));
+    });
+
+    test(
+        'small premium (<= 2 ct/L) does NOT append a hint to recommendation',
+        () {
+      // Holiday samples only marginally different from baseline.
+      final records = <PriceRecord>[];
+      for (int hour = 8; hour <= 10; hour++) {
+        records.add(PriceRecord(
+          stationId: 'fr-station-3',
+          recordedAt: DateTime(2026, 7, 14, hour),
+          e10: 1.605, // baseline + 0.5 ct/L
+        ));
+      }
+      for (int day = 15; day <= 23; day++) {
+        records.add(PriceRecord(
+          stationId: 'fr-station-3',
+          recordedAt: DateTime(2026, 7, day, 10),
+          e10: 1.60,
+        ));
+      }
+
+      final container = makeContainer(records);
+      final result =
+          container.read(pricePredictionProvider('fr-station-3', FuelType.e10));
+
+      expect(result, isNotNull);
+      expect(result!.holidayPremium, isNotNull);
+      expect(result.holidayPremium!.abs(), lessThanOrEqualTo(0.02));
+      expect(result.recommendation, isNot(contains('Holidays trend')));
+    });
+  });
+
   group('pricePrediction — covers every supported FuelType', () {
     // For each fuel field, feed 12 records with that field set; assert non-null.
     test('FuelType.e5', () {
