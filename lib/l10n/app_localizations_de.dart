@@ -3959,6 +3959,30 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wenn aus, sind Abzeichen, Punkte und Pokal-Symbole überall ausgeblendet.';
 
   @override
+  String get gpsDiagnosticsTitle => 'GPS-Abtastungsdiagnose';
+
+  @override
+  String gpsDiagnosticsHeader(String count, String span, int gaps) {
+    String _temp0 = intl.Intl.pluralLogic(
+      gaps,
+      locale: localeName,
+      other: '$gaps Lücken',
+      one: '1 Lücke',
+      zero: 'keine Lücken',
+    );
+    return '$count Messpunkte · $span · $_temp0';
+  }
+
+  @override
+  String gpsDiagnosticsCadence(int ms) {
+    return 'Median-Intervall: $ms ms';
+  }
+
+  @override
+  String get gpsDiagnosticsExplain =>
+      'Wird während der Aufzeichnung erfasst, um die GPS-Abtastung im Standby-Modus zu prüfen.';
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Fahrweise';
 
   @override

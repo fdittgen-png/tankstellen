@@ -13,6 +13,7 @@ import '../../domain/services/throttle_rpm_histogram_calculator.dart';
 import '../../domain/trip_recorder.dart';
 import 'driving_insights_card.dart';
 import 'driving_score_card.dart';
+import 'gps_diagnostics_card.dart';
 import 'throttle_rpm_histogram_card.dart';
 import 'trip_detail_charts.dart';
 import 'trip_path_map_card.dart';
@@ -209,6 +210,16 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         // empty-samples-skip rules.
         if (!widget.isEv && widget.samples.isNotEmpty)
           ThrottleRpmHistogramCard(histogram: _histogram),
+        // GPS sample diagnostics inspector (#1458 phase 2.5).
+        // Read-only — rendered only when at least one diagnostic was
+        // captured (legacy trips and flag-off trips skip this card so
+        // their layout is unchanged). Phase 3 (Android foreground GPS
+        // service) is conditional on what this card surfaces during
+        // field testing.
+        if (widget.entry.gpsSampleDiagnostics.isNotEmpty)
+          GpsDiagnosticsCard(
+            diagnostics: widget.entry.gpsSampleDiagnostics,
+          ),
         _ChartSection(
           title: l?.trajetDetailChartSpeed ?? 'Speed (km/h)',
           chart: TripDetailSpeedChart(samples: widget.samples),
