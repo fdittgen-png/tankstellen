@@ -538,9 +538,9 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
           (previous, next) {
             final vehicleId = activeVehicle.id;
             final prev =
-                previous?[vehicleId]?.confidence ?? 0.0;
+                previous?[vehicleId]?.pointEstimate ?? 0.0;
             final curr =
-                next[vehicleId]?.confidence ?? 0.0;
+                next[vehicleId]?.pointEstimate ?? 0.0;
             if (prev == curr) return;
             _maybeFireBrokenMapSnackbar(
               vehicleId,
@@ -696,7 +696,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     final belief = readActiveVehicleBelief(ref);
     final band = belief == null
         ? BrokenMapBand.silent
-        : brokenMapBandFor(belief.confidence);
+        : brokenMapBandFor(belief.pointEstimate);
     final liveAvg = r?.liveAvgLPer100Km;
     final String avgValue;
     if (band == BrokenMapBand.hardDisable) {

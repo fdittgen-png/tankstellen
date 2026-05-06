@@ -15,12 +15,14 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$BrokenMapBelief {
 
-/// EMA-smoothed confidence in [0.0, 1.0]. Updater clamps on every
-/// step.
- double get confidence;/// Number of observations folded into [confidence]. Useful for
-/// "verified" auto-clear (phase 2 of #1424 will gate on this).
- int get observationCount;/// Last time [BrokenMapBeliefUpdater.update] was called. Null when
-/// the belief was just constructed and has never been updated.
+/// Beta-distribution α parameter. Higher α → more "broken" mass.
+/// Defaults to 1.0 (paired with β=9.0 → mean=0.1, weak prior
+/// toward "working").
+ double get alpha;/// Beta-distribution β parameter. Higher β → more "working" mass.
+ double get beta;/// Number of observations folded into the posterior. Used by
+/// [isVerifiedClean] (auto-clear gate, #1424 deliverable D).
+ int get observationCount;/// Last time the updater was called. Null when the belief was
+/// just constructed and has never been updated.
  DateTime? get lastUpdate;/// Last reason that contributed a *strong* observation
 /// (`observationScore > 0.5`). Sticky — only overwritten on the
 /// next strong observation.
@@ -37,16 +39,16 @@ $BrokenMapBeliefCopyWith<BrokenMapBelief> get copyWith => _$BrokenMapBeliefCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BrokenMapBelief&&(identical(other.confidence, confidence) || other.confidence == confidence)&&(identical(other.observationCount, observationCount) || other.observationCount == observationCount)&&(identical(other.lastUpdate, lastUpdate) || other.lastUpdate == lastUpdate)&&(identical(other.lastTrigger, lastTrigger) || other.lastTrigger == lastTrigger));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BrokenMapBelief&&(identical(other.alpha, alpha) || other.alpha == alpha)&&(identical(other.beta, beta) || other.beta == beta)&&(identical(other.observationCount, observationCount) || other.observationCount == observationCount)&&(identical(other.lastUpdate, lastUpdate) || other.lastUpdate == lastUpdate)&&(identical(other.lastTrigger, lastTrigger) || other.lastTrigger == lastTrigger));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,confidence,observationCount,lastUpdate,lastTrigger);
+int get hashCode => Object.hash(runtimeType,alpha,beta,observationCount,lastUpdate,lastTrigger);
 
 @override
 String toString() {
-  return 'BrokenMapBelief(confidence: $confidence, observationCount: $observationCount, lastUpdate: $lastUpdate, lastTrigger: $lastTrigger)';
+  return 'BrokenMapBelief(alpha: $alpha, beta: $beta, observationCount: $observationCount, lastUpdate: $lastUpdate, lastTrigger: $lastTrigger)';
 }
 
 
@@ -57,7 +59,7 @@ abstract mixin class $BrokenMapBeliefCopyWith<$Res>  {
   factory $BrokenMapBeliefCopyWith(BrokenMapBelief value, $Res Function(BrokenMapBelief) _then) = _$BrokenMapBeliefCopyWithImpl;
 @useResult
 $Res call({
- double confidence, int observationCount, DateTime? lastUpdate, BrokenMapReason lastTrigger
+ double alpha, double beta, int observationCount, DateTime? lastUpdate, BrokenMapReason lastTrigger
 });
 
 
@@ -74,9 +76,10 @@ class _$BrokenMapBeliefCopyWithImpl<$Res>
 
 /// Create a copy of BrokenMapBelief
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? confidence = null,Object? observationCount = null,Object? lastUpdate = freezed,Object? lastTrigger = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? alpha = null,Object? beta = null,Object? observationCount = null,Object? lastUpdate = freezed,Object? lastTrigger = null,}) {
   return _then(_self.copyWith(
-confidence: null == confidence ? _self.confidence : confidence // ignore: cast_nullable_to_non_nullable
+alpha: null == alpha ? _self.alpha : alpha // ignore: cast_nullable_to_non_nullable
+as double,beta: null == beta ? _self.beta : beta // ignore: cast_nullable_to_non_nullable
 as double,observationCount: null == observationCount ? _self.observationCount : observationCount // ignore: cast_nullable_to_non_nullable
 as int,lastUpdate: freezed == lastUpdate ? _self.lastUpdate : lastUpdate // ignore: cast_nullable_to_non_nullable
 as DateTime?,lastTrigger: null == lastTrigger ? _self.lastTrigger : lastTrigger // ignore: cast_nullable_to_non_nullable
@@ -165,10 +168,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double confidence,  int observationCount,  DateTime? lastUpdate,  BrokenMapReason lastTrigger)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double alpha,  double beta,  int observationCount,  DateTime? lastUpdate,  BrokenMapReason lastTrigger)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _BrokenMapBelief() when $default != null:
-return $default(_that.confidence,_that.observationCount,_that.lastUpdate,_that.lastTrigger);case _:
+return $default(_that.alpha,_that.beta,_that.observationCount,_that.lastUpdate,_that.lastTrigger);case _:
   return orElse();
 
 }
@@ -186,10 +189,10 @@ return $default(_that.confidence,_that.observationCount,_that.lastUpdate,_that.l
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double confidence,  int observationCount,  DateTime? lastUpdate,  BrokenMapReason lastTrigger)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double alpha,  double beta,  int observationCount,  DateTime? lastUpdate,  BrokenMapReason lastTrigger)  $default,) {final _that = this;
 switch (_that) {
 case _BrokenMapBelief():
-return $default(_that.confidence,_that.observationCount,_that.lastUpdate,_that.lastTrigger);case _:
+return $default(_that.alpha,_that.beta,_that.observationCount,_that.lastUpdate,_that.lastTrigger);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -206,10 +209,10 @@ return $default(_that.confidence,_that.observationCount,_that.lastUpdate,_that.l
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double confidence,  int observationCount,  DateTime? lastUpdate,  BrokenMapReason lastTrigger)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double alpha,  double beta,  int observationCount,  DateTime? lastUpdate,  BrokenMapReason lastTrigger)?  $default,) {final _that = this;
 switch (_that) {
 case _BrokenMapBelief() when $default != null:
-return $default(_that.confidence,_that.observationCount,_that.lastUpdate,_that.lastTrigger);case _:
+return $default(_that.alpha,_that.beta,_that.observationCount,_that.lastUpdate,_that.lastTrigger);case _:
   return null;
 
 }
@@ -221,17 +224,20 @@ return $default(_that.confidence,_that.observationCount,_that.lastUpdate,_that.l
 @JsonSerializable()
 
 class _BrokenMapBelief extends BrokenMapBelief {
-  const _BrokenMapBelief({this.confidence = 0.0, this.observationCount = 0, this.lastUpdate, this.lastTrigger = BrokenMapReason.none}): super._();
+  const _BrokenMapBelief({this.alpha = 1.0, this.beta = 9.0, this.observationCount = 0, this.lastUpdate, this.lastTrigger = BrokenMapReason.none}): super._();
   factory _BrokenMapBelief.fromJson(Map<String, dynamic> json) => _$BrokenMapBeliefFromJson(json);
 
-/// EMA-smoothed confidence in [0.0, 1.0]. Updater clamps on every
-/// step.
-@override@JsonKey() final  double confidence;
-/// Number of observations folded into [confidence]. Useful for
-/// "verified" auto-clear (phase 2 of #1424 will gate on this).
+/// Beta-distribution α parameter. Higher α → more "broken" mass.
+/// Defaults to 1.0 (paired with β=9.0 → mean=0.1, weak prior
+/// toward "working").
+@override@JsonKey() final  double alpha;
+/// Beta-distribution β parameter. Higher β → more "working" mass.
+@override@JsonKey() final  double beta;
+/// Number of observations folded into the posterior. Used by
+/// [isVerifiedClean] (auto-clear gate, #1424 deliverable D).
 @override@JsonKey() final  int observationCount;
-/// Last time [BrokenMapBeliefUpdater.update] was called. Null when
-/// the belief was just constructed and has never been updated.
+/// Last time the updater was called. Null when the belief was
+/// just constructed and has never been updated.
 @override final  DateTime? lastUpdate;
 /// Last reason that contributed a *strong* observation
 /// (`observationScore > 0.5`). Sticky — only overwritten on the
@@ -251,16 +257,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BrokenMapBelief&&(identical(other.confidence, confidence) || other.confidence == confidence)&&(identical(other.observationCount, observationCount) || other.observationCount == observationCount)&&(identical(other.lastUpdate, lastUpdate) || other.lastUpdate == lastUpdate)&&(identical(other.lastTrigger, lastTrigger) || other.lastTrigger == lastTrigger));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BrokenMapBelief&&(identical(other.alpha, alpha) || other.alpha == alpha)&&(identical(other.beta, beta) || other.beta == beta)&&(identical(other.observationCount, observationCount) || other.observationCount == observationCount)&&(identical(other.lastUpdate, lastUpdate) || other.lastUpdate == lastUpdate)&&(identical(other.lastTrigger, lastTrigger) || other.lastTrigger == lastTrigger));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,confidence,observationCount,lastUpdate,lastTrigger);
+int get hashCode => Object.hash(runtimeType,alpha,beta,observationCount,lastUpdate,lastTrigger);
 
 @override
 String toString() {
-  return 'BrokenMapBelief(confidence: $confidence, observationCount: $observationCount, lastUpdate: $lastUpdate, lastTrigger: $lastTrigger)';
+  return 'BrokenMapBelief(alpha: $alpha, beta: $beta, observationCount: $observationCount, lastUpdate: $lastUpdate, lastTrigger: $lastTrigger)';
 }
 
 
@@ -271,7 +277,7 @@ abstract mixin class _$BrokenMapBeliefCopyWith<$Res> implements $BrokenMapBelief
   factory _$BrokenMapBeliefCopyWith(_BrokenMapBelief value, $Res Function(_BrokenMapBelief) _then) = __$BrokenMapBeliefCopyWithImpl;
 @override @useResult
 $Res call({
- double confidence, int observationCount, DateTime? lastUpdate, BrokenMapReason lastTrigger
+ double alpha, double beta, int observationCount, DateTime? lastUpdate, BrokenMapReason lastTrigger
 });
 
 
@@ -288,9 +294,10 @@ class __$BrokenMapBeliefCopyWithImpl<$Res>
 
 /// Create a copy of BrokenMapBelief
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? confidence = null,Object? observationCount = null,Object? lastUpdate = freezed,Object? lastTrigger = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? alpha = null,Object? beta = null,Object? observationCount = null,Object? lastUpdate = freezed,Object? lastTrigger = null,}) {
   return _then(_BrokenMapBelief(
-confidence: null == confidence ? _self.confidence : confidence // ignore: cast_nullable_to_non_nullable
+alpha: null == alpha ? _self.alpha : alpha // ignore: cast_nullable_to_non_nullable
+as double,beta: null == beta ? _self.beta : beta // ignore: cast_nullable_to_non_nullable
 as double,observationCount: null == observationCount ? _self.observationCount : observationCount // ignore: cast_nullable_to_non_nullable
 as int,lastUpdate: freezed == lastUpdate ? _self.lastUpdate : lastUpdate // ignore: cast_nullable_to_non_nullable
 as DateTime?,lastTrigger: null == lastTrigger ? _self.lastTrigger : lastTrigger // ignore: cast_nullable_to_non_nullable

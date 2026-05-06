@@ -44,5 +44,33 @@
         "example": "0.92"
       }
     }
+  },
+  "brokenMapOverlayPosterior": "MAP sensor: {posterior}% ± {margin}%",
+  "@brokenMapOverlayPosterior": {
+    "description": "Diagnostic-overlay row showing the Bayesian posterior point estimate and the half-width of the 95% credible interval for the broken-MAP belief (#1424 deliverable G).",
+    "placeholders": {
+      "posterior": {
+        "type": "String",
+        "example": "75"
+      },
+      "margin": {
+        "type": "String",
+        "example": "7"
+      }
+    }
+  },
+  "brokenMapOverlayPosteriorVerified": "MAP sensor: {posterior}% ± {margin}% (verified)",
+  "@brokenMapOverlayPosteriorVerified": {
+    "description": "Diagnostic-overlay row variant when the auto-clear gate has fired (#1424 deliverable D) — appends a (verified) badge to the posterior + credible-interval row. Shown only when isVerifiedClean is true (50+ observations, mean<0.1, upper-CI<0.3).",
+    "placeholders": {
+      "posterior": {
+        "type": "String",
+        "example": "5"
+      },
+      "margin": {
+        "type": "String",
+        "example": "3"
+      }
+    }
   }
 }

@@ -95,7 +95,7 @@ void main() {
 
   test(
       'high-discrepancy plein-complet (pumped 2.4× consumed) → broken-MAP '
-      'belief confidence rises after one observation', () async {
+      'posterior lifts after one observation', () async {
     final container = makeContainer();
 
     // Seed an OBD-integrated 5 L trip across 100 km. Then a plein
@@ -131,8 +131,11 @@ void main() {
     final belief = beliefs['veh-a']!;
     // Discrepancy alone (no VeLearner because no vehicle profile is
     // wired in this test container — VeLearner returns null on missing
-    // profile) → score = discrepancyScore (1.0). EMA from 0: α × 1 = 0.4.
-    expect(belief.confidence, closeTo(0.4, 1e-9));
+    // profile) → score = discrepancyScore (1.0). Bayesian fold from
+    // the default prior: α=0.5+8=8.5, β=4.5+0=4.5, mean=8.5/13≈0.654.
+    expect(belief.alpha, closeTo(8.5, 1e-9));
+    expect(belief.beta, closeTo(4.5, 1e-9));
+    expect(belief.pointEstimate, closeTo(8.5 / 13.0, 1e-9));
     expect(belief.observationCount, 1);
     expect(belief.lastTrigger, BrokenMapReason.pleinCompletDiscrepancy);
   });
@@ -167,7 +170,11 @@ void main() {
     final belief = container
         .read(brokenMapBeliefByVehicleProvider.notifier)
         .beliefFor('veh-a');
-    expect(belief.confidence, 0.0);
+    // Clean ratio → score 0 → α=0.5·1=0.5, β=0.5·9+1=5.5,
+    // mean=0.5/6≈0.083 (silent band).
+    expect(belief.alpha, closeTo(0.5, 1e-9));
+    expect(belief.beta, closeTo(5.5, 1e-9));
+    expect(belief.pointEstimate, lessThan(0.1));
     expect(belief.observationCount, 1);
     expect(belief.lastTrigger, BrokenMapReason.none);
   });
@@ -245,8 +252,8 @@ void main() {
   });
 
   test(
-      'two consecutive high-discrepancy observations fold per EMA — '
-      'confidence rises monotonically', () async {
+      'two consecutive high-discrepancy observations compound the '
+      'posterior past 0.8', () async {
     final container = makeContainer();
 
     // First window — opening + closing plein with high discrepancy.
@@ -272,7 +279,7 @@ void main() {
     final after1 = container
         .read(brokenMapBeliefByVehicleProvider.notifier)
         .beliefFor('veh-a');
-    expect(after1.confidence, closeTo(0.4, 1e-9));
+    expect(after1.pointEstimate, closeTo(8.5 / 13.0, 1e-9));
 
     // Second window — another high-discrepancy plein.
     await seedTrip(
@@ -291,8 +298,11 @@ void main() {
     final after2 = container
         .read(brokenMapBeliefByVehicleProvider.notifier)
         .beliefFor('veh-a');
-    // EMA: α × 1 + (1-α) × 0.4 = 0.64.
-    expect(after2.confidence, closeTo(0.64, 1e-9));
+    // Bayesian fold of a second strong observation:
+    // α=0.5·8.5 + 8 = 12.25; β=0.5·4.5 + 0 = 2.25; mean ≈ 0.845.
+    expect(after2.alpha, closeTo(12.25, 1e-9));
+    expect(after2.beta, closeTo(2.25, 1e-9));
+    expect(after2.pointEstimate, greaterThan(0.8));
     expect(after2.observationCount, 2);
   });
 }

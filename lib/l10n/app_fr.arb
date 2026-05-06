@@ -1133,6 +1133,8 @@
   "brokenMapOverlayVerified": "Capteur MAP : vérifié ({confidence})",
   "brokenMapOverlayUnverified": "Capteur MAP : en cours de vérification ({confidence})",
   "brokenMapOverlaySuspicious": "Capteur MAP : suspect ({confidence})",
+  "brokenMapOverlayPosterior": "Capteur MAP : {posterior} % ± {margin} %",
+  "brokenMapOverlayPosteriorVerified": "Capteur MAP : {posterior} % ± {margin} % (vérifié)",
   "loyaltySettingsTitle": "Mes cartes de fidélité",
   "loyaltySettingsSubtitle": "Appliquer votre remise fidélité aux prix affichés",
   "loyaltyMenuTitle": "Cartes de fidélité",

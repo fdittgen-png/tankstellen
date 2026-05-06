@@ -6,7 +6,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/data/storage_repository.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
+import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../../vehicle/data/ve_learner.dart';
+import '../../vehicle/data/vehicle_profile_catalog_matcher.dart';
+import '../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../vehicle/providers/service_reminder_providers.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/broken_map_belief.dart';
@@ -553,12 +556,19 @@ class FillUpList extends _$FillUpList {
       final prior = beliefs.beliefFor(vehicleId);
       final reconciledLPer100km = result.pumped * 100.0 / distance;
       final estimatedLPer100km = result.consumed * 100.0 / distance;
+      // #1424 deliverable F — resolve the active vehicle's catalog
+      // entry so the updater can apply the induction-class Bayes-factor
+      // adjustment. `null` is acceptable (legacy profiles, or rows
+      // whose reference catalog hasn't loaded yet) — the updater
+      // treats it as a neutral 1.0 multiplier.
+      final vehicle = _resolveReferenceVehicle(vehicleId);
       final updated = detector.recordPleinCompletObservation(
         prior: prior,
         reconciledLPer100km: reconciledLPer100km,
         estimatedLPer100km: estimatedLPer100km,
         proposedEta: veResult?.proposedEta,
         now: DateTime.now(),
+        vehicle: vehicle,
       );
       beliefs.set(vehicleId, updated);
       // #1423 phase 4 — when the belief crosses the actionable
@@ -569,17 +579,38 @@ class FillUpList extends _$FillUpList {
       // — null when no trip has captured firmware yet, in which case
       // we skip the adapter-keyed write but still kept the per-
       // vehicle persistence above.
-      if (updated.confidence > brokenMapBlocklistThreshold) {
+      if (updated.pointEstimate > brokenMapBlocklistThreshold) {
         final adapterId = _latestAdapterFirmwareFor(vehicleId);
         if (adapterId != null && adapterId.isNotEmpty) {
           await ref
               .read(obdAdapterBlocklistProvider)
-              .recordBelief(adapterId, updated.confidence);
+              .recordBelief(adapterId, updated.pointEstimate);
         }
       }
     } catch (e, st) {
       debugPrint('FillUpList: broken-MAP observation failed: $e\n$st');
     }
+  }
+
+  /// Resolve the [ReferenceVehicle] for [vehicleId] using the loaded
+  /// catalog (#1424 deliverable F). Returns `null` when:
+  ///   - the vehicle profile isn't in the list,
+  ///   - the catalog hasn't finished loading (AsyncValue still
+  ///     resolving),
+  ///   - no catalog row matches the profile's make/model/year.
+  /// In all three cases, the updater falls back to a neutral 1.0
+  /// Bayes-factor adjustment — observations still fold cleanly.
+  ReferenceVehicle? _resolveReferenceVehicle(String vehicleId) {
+    final profiles = ref.read(vehicleProfileListProvider);
+    final profile = profiles.where((p) => p.id == vehicleId).firstOrNull;
+    if (profile == null) return null;
+    final catalog =
+        ref.read(referenceVehicleCatalogProvider).value ?? const [];
+    if (catalog.isEmpty) return null;
+    return VehicleProfileCatalogMatcher.bestMatch(
+      profile: profile,
+      catalog: catalog,
+    );
   }
 
   /// Look up the most-recently captured `adapterFirmware` across the

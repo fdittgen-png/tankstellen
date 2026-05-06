@@ -2,7 +2,7 @@ import '../../../../core/data/storage_repository.dart';
 
 /// Persistent per-adapter broken-MAP blocklist (#1423 phase 4).
 ///
-/// Stores the latest [BrokenMapBelief.confidence] keyed by ELM
+/// Stores the latest [BrokenMapBelief.pointEstimate] keyed by ELM
 /// firmware identifier (whatever `ATI` returned during pair). The
 /// populator recalls this BEFORE running an idle probe at the next
 /// pair attempt — when a known-broken adapter is recognised, the

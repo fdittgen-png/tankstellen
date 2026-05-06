@@ -111,9 +111,12 @@ void main() {
         now: fixedNow,
       );
 
-      // delta = 71 → vacuumMissingScore clamps to 0 → confidence stays
-      // at 0 after one EMA fold (α × 0 + (1-α) × 0).
-      expect(updated.confidence, closeTo(0.0, 1e-9));
+      // delta = 71 → vacuumMissingScore clamps to 0.
+      // Bayesian fold: α' = 0.5·1 + 8·0 = 0.5, β' = 0.5·9 + 1 = 5.5.
+      // pointEstimate = 0.5/6 ≈ 0.083 — well under 0.4 (silent band).
+      expect(updated.alpha, closeTo(0.5, 1e-9));
+      expect(updated.beta, closeTo(5.5, 1e-9));
+      expect(updated.pointEstimate, lessThan(0.4));
       expect(updated.observationCount, 1);
       expect(updated.lastUpdate, fixedNow);
       // Weak observation — lastTrigger should NOT be set.
@@ -122,7 +125,8 @@ void main() {
 
     test(
         'broken MAP (mapIdle=99, baro=101, tps=1%) yields ~1.0 observation '
-        'and confidence rises to ~0.4', () async {
+        'and posterior lifts toward the verifying band on a single fold',
+        () async {
       final port = _FakeObd2RawCommandPort.single({
         '0111\r': _resp(0x11, 3),
         '010B\r': _resp(0x0B, 99),
@@ -136,9 +140,11 @@ void main() {
         now: fixedNow,
       );
 
-      // delta = 2 → vacuumMissingScore clamps to 1.0 → confidence
-      // jumps to α (0.4) on first observation.
-      expect(updated.confidence, closeTo(0.4, 1e-9));
+      // delta = 2 → vacuumMissingScore clamps to 1.0.
+      // α' = 0.5 + 8 = 8.5, β' = 4.5 + 0 = 4.5 → mean = 8.5/13 ≈ 0.654.
+      expect(updated.alpha, closeTo(8.5, 1e-9));
+      expect(updated.beta, closeTo(4.5, 1e-9));
+      expect(updated.pointEstimate, closeTo(8.5 / 13.0, 1e-9));
       expect(updated.observationCount, 1);
       // Strong observation — reason tag MUST land.
       expect(updated.lastTrigger, BrokenMapReason.idleVacuumMissing);
@@ -160,9 +166,10 @@ void main() {
       );
 
       // delta = 31 → score = 1 - (31-15)/30 = 0.4666...
-      // Confidence after one fold = α × 0.4666 ≈ 0.1866 — interior.
-      expect(updated.confidence, greaterThan(0.4 * 0.4));
-      expect(updated.confidence, lessThan(0.4 * 0.6));
+      // α' = 0.5 + 8·0.4666 ≈ 4.233; β' = 4.5 + 0.533 ≈ 5.033;
+      // mean ≈ 0.457 — squarely in the verifying band.
+      expect(updated.pointEstimate, greaterThan(0.4));
+      expect(updated.pointEstimate, lessThan(0.55));
       expect(updated.observationCount, 1);
     });
   });
@@ -184,8 +191,9 @@ void main() {
       );
 
       // |110 - 85| = 25 → revDeltaMissingScore = 1 - (25-8)/22 ≈ 0.227.
-      // After one fold from 0: α × 0.227 ≈ 0.091.
-      expect(updated.confidence, lessThan(0.15));
+      // α' = 0.5 + 8·0.227 ≈ 2.316; β' = 4.5 + 0.773 ≈ 5.273;
+      // mean ≈ 0.305 — in the silent band.
+      expect(updated.pointEstimate, lessThan(0.4));
       expect(updated.observationCount, 1);
       // Weak observation — lastTrigger stays at the default.
       expect(updated.lastTrigger, BrokenMapReason.none);
@@ -207,8 +215,10 @@ void main() {
         now: fixedNow,
       );
 
-      // |99 - 98| = 1 → score clamps to 1.0 → confidence jumps to α.
-      expect(updated.confidence, closeTo(0.4, 1e-9));
+      // |99 - 98| = 1 → score clamps to 1.0 → α' = 8.5, β' = 4.5
+      // → mean ≈ 0.654.
+      expect(updated.alpha, closeTo(8.5, 1e-9));
+      expect(updated.beta, closeTo(4.5, 1e-9));
       expect(updated.lastTrigger, BrokenMapReason.revDeltaMissing);
     });
   });
@@ -223,7 +233,8 @@ void main() {
         '0133\r': _resp(0x33, 101),
       });
       const prior = BrokenMapBelief(
-        confidence: 0.25,
+        alpha: 3,
+        beta: 9,
         observationCount: 3,
         lastTrigger: BrokenMapReason.idleVacuumMissing,
       );
@@ -235,10 +246,8 @@ void main() {
         now: fixedNow,
       );
 
-      // identical() is the strongest assertion the entity supports —
-      // the detector must short-circuit before constructing a new
-      // belief, so observationCount stays at 3 and confidence stays
-      // at 0.25.
+      // The detector must short-circuit before folding any observation,
+      // so the entity is byte-for-byte identical to the input.
       expect(updated, equals(prior));
       expect(updated.observationCount, 3);
       // The detector must NOT have wasted bytes on the MAP / baro
@@ -254,7 +263,7 @@ void main() {
         '010B\r': '41 0C 30\r>',
         '0133\r': _resp(0x33, 101),
       });
-      const prior = BrokenMapBelief(confidence: 0.3, observationCount: 2);
+      const prior = BrokenMapBelief(alpha: 3, beta: 7, observationCount: 2);
 
       final updated = await const BrokenMapDetector().probe(
         port,
@@ -272,7 +281,7 @@ void main() {
         '010B\r': '',
         '0133\r': _resp(0x33, 101),
       });
-      const prior = BrokenMapBelief(confidence: 0.5, observationCount: 1);
+      const prior = BrokenMapBelief(alpha: 5, beta: 5, observationCount: 1);
 
       final updated = await const BrokenMapDetector().probe(
         port,
@@ -285,7 +294,7 @@ void main() {
     });
 
     test('throwing port returns prior unchanged', () async {
-      const prior = BrokenMapBelief(confidence: 0.6, observationCount: 5);
+      const prior = BrokenMapBelief(alpha: 6, beta: 4, observationCount: 5);
 
       final updated = await const BrokenMapDetector().probe(
         _ThrowingPort(),
@@ -318,13 +327,14 @@ void main() {
     });
   });
 
-  group('BrokenMapDetector — EMA folding mechanics', () {
+  group('BrokenMapDetector — Bayesian folding mechanics', () {
     test(
-        'two consecutive broken-MAP observations fold per EMA recurrence',
+        'two consecutive broken-MAP observations push the posterior past 0.9',
         () async {
       // Same broken-MAP fixture twice → score 1.0 each time.
-      // EMA: c0 = 0; c1 = 0.4 × 1 + 0.6 × 0 = 0.4;
-      //                c2 = 0.4 × 1 + 0.6 × 0.4 = 0.64.
+      // After 1: α=8.5, β=4.5, mean ≈ 0.654.
+      // After 2: α=0.5·8.5 + 8 = 12.25; β=0.5·4.5 + 0 = 2.25;
+      //          mean = 12.25/14.5 ≈ 0.845.
       final port = _FakeObd2RawCommandPort.single({
         '0111\r': _resp(0x11, 3),
         '010B\r': _resp(0x0B, 99),
@@ -345,8 +355,10 @@ void main() {
         now: fixedNow,
       );
 
-      expect(after1.confidence, closeTo(0.4, 1e-9));
-      expect(after2.confidence, closeTo(0.64, 1e-9));
+      expect(after1.pointEstimate, closeTo(8.5 / 13.0, 1e-9));
+      expect(after2.alpha, closeTo(12.25, 1e-9));
+      expect(after2.beta, closeTo(2.25, 1e-9));
+      expect(after2.pointEstimate, closeTo(12.25 / 14.5, 1e-9));
       expect(after2.observationCount, 2);
       expect(after2.lastTrigger, BrokenMapReason.idleVacuumMissing);
     });

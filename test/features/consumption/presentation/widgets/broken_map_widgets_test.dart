@@ -27,54 +27,82 @@ void main() {
       expect(find.byKey(const Key('brokenMapOverlayRow')), findsNothing);
     });
 
-    testWidgets('renders "verified" copy when confidence < 0.4', (tester) async {
+    testWidgets('renders posterior + ± margin in the silent band (#1424 G)',
+        (tester) async {
+      // α=1, β=19 → mean = 0.05.
       await pumpApp(
         tester,
         const BrokenMapOverlayRow(),
         overrides: [
           ..._belief(const BrokenMapBelief(
-            confidence: 0.05,
+            alpha: 1,
+            beta: 19,
             observationCount: 2,
+          )),
+        ],
+      );
+      expect(find.byKey(const Key('brokenMapOverlayRow')), findsOneWidget);
+      expect(find.textContaining('5%'), findsOneWidget);
+      expect(find.textContaining('±'), findsOneWidget);
+      // Not yet at the auto-clear gate (observationCount = 2 ≤ 50) so
+      // the (verified) badge must NOT appear.
+      expect(find.textContaining('verified'), findsNothing);
+    });
+
+    testWidgets('renders (verified) badge once isVerifiedClean fires',
+        (tester) async {
+      // 60 obs, α=5 β=95 → satisfies the auto-clear gate.
+      await pumpApp(
+        tester,
+        const BrokenMapOverlayRow(),
+        overrides: [
+          ..._belief(const BrokenMapBelief(
+            alpha: 5,
+            beta: 95,
+            observationCount: 60,
           )),
         ],
       );
       expect(find.byKey(const Key('brokenMapOverlayRow')), findsOneWidget);
       expect(find.textContaining('verified'), findsOneWidget);
-      expect(find.textContaining('0.05'), findsOneWidget);
     });
 
-    testWidgets('renders "verifying" copy when 0.4 <= confidence < 0.7',
+    testWidgets('renders posterior + ± margin in the verifying band',
         (tester) async {
+      // α=4.3 β=5 → mean ≈ 0.46 (verifying band).
       await pumpApp(
         tester,
         const BrokenMapOverlayRow(),
         overrides: [
           ..._belief(const BrokenMapBelief(
-            confidence: 0.43,
+            alpha: 4.3,
+            beta: 5,
             observationCount: 2,
           )),
         ],
       );
       expect(find.byKey(const Key('brokenMapOverlayRow')), findsOneWidget);
-      expect(find.textContaining('verifying'), findsOneWidget);
-      expect(find.textContaining('0.43'), findsOneWidget);
+      expect(find.textContaining('±'), findsOneWidget);
+      expect(find.textContaining('46%'), findsOneWidget);
     });
 
-    testWidgets('renders "suspicious" copy when confidence >= 0.7',
+    testWidgets('renders posterior + ± margin in the warning/hardDisable band',
         (tester) async {
+      // α=92 β=8 → mean = 0.92 (hard-disable band).
       await pumpApp(
         tester,
         const BrokenMapOverlayRow(),
         overrides: [
           ..._belief(const BrokenMapBelief(
-            confidence: 0.92,
+            alpha: 92,
+            beta: 8,
             observationCount: 5,
           )),
         ],
       );
       expect(find.byKey(const Key('brokenMapOverlayRow')), findsOneWidget);
-      expect(find.textContaining('suspicious'), findsOneWidget);
-      expect(find.textContaining('0.92'), findsOneWidget);
+      expect(find.textContaining('92%'), findsOneWidget);
+      expect(find.textContaining('±'), findsOneWidget);
     });
 
     testWidgets('hidden when no active vehicle is set', (tester) async {
@@ -91,14 +119,16 @@ void main() {
   });
 
   group('BrokenMapBanner (#1423 phase 5)', () {
-    testWidgets('hidden when confidence is in the warning band (0.85)',
+    testWidgets('hidden when posterior is in the warning band (~0.85)',
         (tester) async {
+      // mean = 17/20 = 0.85 (warning band, NOT hard-disable).
       await pumpApp(
         tester,
         const BrokenMapBanner(),
         overrides: [
           ..._belief(const BrokenMapBelief(
-            confidence: 0.85,
+            alpha: 17,
+            beta: 3,
             observationCount: 6,
           )),
         ],
@@ -106,13 +136,15 @@ void main() {
       expect(find.byKey(const Key('brokenMapBanner')), findsNothing);
     });
 
-    testWidgets('rendered when confidence is at or above 0.9', (tester) async {
+    testWidgets('rendered when posterior is at or above 0.9', (tester) async {
+      // mean = 92/100 = 0.92 (hard-disable).
       await pumpApp(
         tester,
         const BrokenMapBanner(),
         overrides: [
           ..._belief(const BrokenMapBelief(
-            confidence: 0.92,
+            alpha: 92,
+            beta: 8,
             observationCount: 8,
           )),
         ],
@@ -122,13 +154,15 @@ void main() {
   });
 
   group('BrokenMapDisclaimerChip (#1423 phase 5)', () {
-    testWidgets('hidden when confidence < 0.7', (tester) async {
+    testWidgets('hidden when posterior < 0.7', (tester) async {
+      // mean = 5/10 = 0.5.
       await pumpApp(
         tester,
         const BrokenMapDisclaimerChip(),
         overrides: [
           ..._belief(const BrokenMapBelief(
-            confidence: 0.5,
+            alpha: 5,
+            beta: 5,
             observationCount: 3,
           )),
         ],
@@ -137,12 +171,14 @@ void main() {
     });
 
     testWidgets('visible in the 0.7-0.9 band', (tester) async {
+      // mean = 78/100 = 0.78.
       await pumpApp(
         tester,
         const BrokenMapDisclaimerChip(),
         overrides: [
           ..._belief(const BrokenMapBelief(
-            confidence: 0.78,
+            alpha: 78,
+            beta: 22,
             observationCount: 4,
           )),
         ],
@@ -154,12 +190,14 @@ void main() {
     });
 
     testWidgets('hidden again at hard-disable (>=0.9)', (tester) async {
+      // mean = 94/100 = 0.94.
       await pumpApp(
         tester,
         const BrokenMapDisclaimerChip(),
         overrides: [
           ..._belief(const BrokenMapBelief(
-            confidence: 0.94,
+            alpha: 94,
+            beta: 6,
             observationCount: 9,
           )),
         ],
