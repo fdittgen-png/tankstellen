@@ -85,6 +85,19 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
   /// user opts back in each drive so battery-drain never lingers.
   bool _pinned = false;
 
+  /// #1458 phase 2 — sticky guard so the unpinned-recording GPS
+  /// warning SnackBar fires AT MOST once per recording-screen mount.
+  /// Pinning + unpinning + leaving + returning intentionally re-fires
+  /// because it's a fresh mount each time; what we want to avoid is
+  /// spamming on every rebuild that re-enters the post-frame check.
+  bool _unpinnedWarningShown = false;
+
+  /// #1458 phase 2 — deferred-show timer for the unpinned-recording
+  /// warning. Cancelled on dispose so the SnackBar never fires after
+  /// the screen has been popped (which would inject the warning into
+  /// the next route's messenger, polluting unrelated screens).
+  Timer? _unpinnedWarningTimer;
+
   /// Cached facade handle so [dispose] can release the wake lock
   /// without touching `ref` (Riverpod forbids `ref.read` after the
   /// widget is deactivated). Populated the first time the user pins.
@@ -106,6 +119,20 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     // so a `setState`-light listener is fine here.
     final lifecycle = ref.read(hapticEcoCoachLifecycleProvider.notifier);
     _coachEventsSub = lifecycle.coachEvents.listen(_onCoachEvent);
+    // #1458 phase 2 — schedule the unpinned-recording GPS warning
+    // shortly after the screen has settled. We defer rather than fire
+    // in the immediate post-frame callback for two reasons:
+    //   1. Other on-mount SnackBars (broken-MAP belief crossings,
+    //      eco-coach live events) win the race and own the messenger
+    //      slot during the first frame; queueing ours behind theirs
+    //      would let them clobber each other.
+    //   2. Production users see the warning ~0.6 s after landing —
+    //      late enough that it doesn't compete with other initial
+    //      animations, early enough that they read it before the
+    //      first GPS sample interval.
+    _unpinnedWarningTimer = Timer(const Duration(milliseconds: 600), () {
+      _maybeShowUnpinnedWarning();
+    });
   }
 
   @override
@@ -128,6 +155,11 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     }
     _coachEventsSub?.cancel();
     _coachEventsSub = null;
+    // #1458 phase 2 — cancel any pending unpinned-warning fire so the
+    // SnackBar never lands in the next route's messenger after the
+    // user has popped this screen.
+    _unpinnedWarningTimer?.cancel();
+    _unpinnedWarningTimer = null;
     super.dispose();
   }
 
@@ -155,6 +187,67 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
               child: Text(
                 l?.hapticEcoCoachSnackBarMessage ??
                     'Easy on the throttle — coasting saves more',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// #1458 phase 2 — surface a one-shot SnackBar warning when the user
+  /// arrives at the recording screen with the pin toggle OFF AND a
+  /// trip is currently active. Pinning keeps the screen on + hides
+  /// system bars; without it, Android may throttle GPS during sleep
+  /// and the trip path heatmap will show gaps. Production telemetry
+  /// (issue #1458 phase 2) feeds the persisted [GpsSampleDiagnostic]
+  /// list so a future iteration can quantify the throttle rate per
+  /// device — the warning is the upfront mitigation while we
+  /// instrument the live behaviour.
+  ///
+  /// Suppressed when [_pinned] is true because pinning is the actual
+  /// fix; nagging the user who already opted in would be noise. The
+  /// [_unpinnedWarningShown] guard prevents re-firing within a single
+  /// screen mount even if the post-frame callback runs multiple
+  /// times (it fires once per [WidgetsBinding.instance] schedule —
+  /// the guard is a defence against the observed case where a parent
+  /// rebuild re-enters initState during pumpAndSettle in widget
+  /// tests).
+  void _maybeShowUnpinnedWarning() {
+    if (!mounted) return;
+    if (_unpinnedWarningShown) return;
+    if (_pinned) return;
+    final notifier = ref.read(tripRecordingProvider.notifier);
+    final recordingState = ref.read(tripRecordingProvider);
+    if (!recordingState.isActive) return;
+    // Only fire on a FRESH recording mount — i.e. the user just tapped
+    // Start Recording in the trajets tab and was navigated here. When
+    // they return to the screen later via the banner (after backing
+    // out mid-trip), `lastTripStartedAt` is well in the past and the
+    // warning would just be noise. We use a 10 s window so the
+    // 600 ms post-mount delay + any test-pump + any production
+    // initState→post-frame race comfortably falls inside.
+    final startedAt = notifier.lastTripStartedAt;
+    if (startedAt == null) return;
+    final age = DateTime.now().difference(startedAt);
+    if (age > const Duration(seconds: 10)) return;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    if (messenger == null) return;
+    final l = AppLocalizations.of(context);
+    _unpinnedWarningShown = true;
+    messenger.showSnackBar(
+      SnackBar(
+        key: const Key('tripRecordingUnpinnedWarningSnackBar'),
+        duration: const Duration(seconds: 8),
+        content: Row(
+          children: [
+            const Icon(Icons.gps_off, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                l?.tripRecordingUnpinnedWarning ??
+                    'Pin the screen to keep GPS active during the trip '
+                        '— Android may throttle GPS during sleep.',
               ),
             ),
           ],
@@ -202,6 +295,12 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
   Future<void> _onStop() async {
     if (_stopping) return;
     setState(() => _stopping = true);
+    // #1458 phase 2 — hide the unpinned-recording warning if it's still
+    // visible. The warning is about an in-progress recording; once the
+    // user has tapped Stop, the recording is over and the SnackBar
+    // would just be sitting on top of the summary view's discard /
+    // save buttons until its auto-dismiss timer elapsed.
+    ScaffoldMessenger.maybeOf(context)?.hideCurrentSnackBar();
     final result = await ref.read(tripRecordingProvider.notifier).stop();
     if (!mounted) return;
     // #891 — when the recording ends, auto-release the wake lock

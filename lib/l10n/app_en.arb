@@ -3319,6 +3319,10 @@
   "@tripBannerOpenFromConsumptionTab": {
     "description": "Snackbar shown when the user taps the trip-recording banner on a screen whose context is above the GoRouter ancestor (#1322). Falls back from a navigation push to a hint pointing the user at the consumption tab."
   },
+  "tripRecordingUnpinnedWarning": "Pin the screen to keep GPS active during the trip — Android may throttle GPS during sleep.",
+  "@tripRecordingUnpinnedWarning": {
+    "description": "One-shot SnackBar shown the moment the user lands on the trip-recording screen with the pin toggle OFF (#1458 phase 2). Warns that without pinning, Android may suspend or throttle GPS while the screen sleeps and the captured path will show gaps."
+  },
   "unifiedFilterFuel": "Fuel",
   "@unifiedFilterFuel": {
     "description": "Filter chip label that narrows the unified search list to fuel pumps only (#1116 phase 3c)."
