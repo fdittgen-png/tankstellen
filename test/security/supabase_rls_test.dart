@@ -114,6 +114,12 @@ void main() {
     'obd2_baselines': {
       'obd2_baselines_own': 'ALL',
     },
+    'wait_time_pings': {
+      'wait_time_pings_own': 'ALL',
+    },
+    'wait_time_aggregates': {
+      'wait_aggregates_read': 'SELECT',
+    },
   };
 
   group('Supabase RLS matrix (#1110)', () {

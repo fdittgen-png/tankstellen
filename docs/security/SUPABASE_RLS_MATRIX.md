@@ -64,6 +64,8 @@ Legend:
 | `vehicles`         | own          | own             | own        | own                | Single `vehicles_own` `FOR ALL`. |
 | `fill_ups`         | own          | own             | own        | own                | Single `fill_ups_own` `FOR ALL`. |
 | `obd2_baselines`   | own          | own             | own        | own                | Single `obd2_baselines_own` `FOR ALL`. |
+| `wait_time_pings`  | own          | own             | own        | own                | Single `wait_time_pings_own` `FOR ALL`. Aggregator runs as service_role and bypasses RLS. |
+| `wait_time_aggregates` | all      | (svc)           | (svc)      | (svc)              | Single `wait_aggregates_read` SELECT-only policy. Anonymized rolling-median rows are visible to every authenticated client; only Edge Functions write. |
 
 The migration source-of-truth lives in `supabase/migrations/`:
 
@@ -80,6 +82,10 @@ The migration source-of-truth lives in `supabase/migrations/`:
 - `20260418000001_vehicles_and_fillups.sql` — `vehicles`, `fill_ups`.
 - `20260421000001_obd2_baselines.sql` — `obd2_baselines`.
 - `20260403000001_pg_cron_alert_schedules.sql` — schedules only,
+  service-role-driven, no public-table RLS change.
+- `20260506000001_wait_time_pings.sql` — `wait_time_pings`,
+  `wait_time_aggregates` (#1119).
+- `20260506000002_wait_time_aggregator_schedule.sql` — schedule only,
   service-role-driven, no public-table RLS change.
 
 If a migration not listed above is found in `supabase/migrations/`,
