@@ -16,6 +16,7 @@ library;
 
 import '../domain/driving_insight.dart';
 import '../domain/trip_recorder.dart';
+import '../presentation/widgets/trip_detail_charts.dart';
 
 /// RPM above which a sample counts as "high RPM".
 const double _highRpmThreshold = 3000;
@@ -193,6 +194,53 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
   candidates.sort((a, b) => b.litersWasted.compareTo(a.litersWasted));
   if (candidates.length <= _topN) return candidates;
   return candidates.sublist(0, _topN);
+}
+
+/// Returns the indices of samples (in the sorted-by-timestamp ordering)
+/// where a hard-acceleration event ended — i.e. where the speed delta
+/// from the previous sample exceeds [_hardAccelThresholdMps2]. Mirrors
+/// the detection logic in [analyzeTrip] so the trip-detail map can
+/// render markers at the matching positions (#1458 phase 1).
+///
+/// Sorting + dt-guard contract identical to [analyzeTrip]:
+///   * input is copied + sorted by timestamp before iteration so an
+///     out-of-order list never spuriously reports an event;
+///   * intervals with `dt <= 0` are skipped (duplicate timestamps);
+///   * the first sample (index 0) is never an event because there's
+///     no previous sample to derive an acceleration from.
+///
+/// IMPORTANT: the returned indices reference positions in the
+/// INTERNALLY-SORTED list, NOT the caller's input order. Callers that
+/// want to map indices back to coordinates must sort their own samples
+/// by timestamp the same way before indexing. The trip-detail map
+/// already passes timestamp-sorted samples (recorder writes monotonic
+/// timestamps), so it can use the indices directly.
+List<int> hardAccelSampleIndices(List<TripDetailSample> samples) {
+  if (samples.length < 2) return const <int>[];
+
+  // Copy + sort so out-of-order persistence (#1040 race conditions)
+  // doesn't blow up the integration. Same pattern as [analyzeTrip].
+  final sorted = [...samples]
+    ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+  final indices = <int>[];
+  for (var i = 1; i < sorted.length; i++) {
+    final prev = sorted[i - 1];
+    final cur = sorted[i];
+    final dt =
+        cur.timestamp.difference(prev.timestamp).inMicroseconds /
+            Duration.microsecondsPerSecond;
+    if (dt <= 0) continue;
+
+    // Same conversion as [analyzeTrip]: km/h → m/s by / 3.6, then
+    // divide by Δt to get acceleration in m/s².
+    final dvMps = (cur.speedKmh - prev.speedKmh) / 3.6;
+    final accelMps2 = dvMps / dt;
+    if (accelMps2 >= _hardAccelThresholdMps2) {
+      indices.add(i);
+    }
+  }
+  return indices;
 }
 
 /// Fallback when no fuel-rate samples are available during the

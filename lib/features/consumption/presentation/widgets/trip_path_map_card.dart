@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../data/driving_insights_analyzer.dart';
 import 'trip_detail_charts.dart';
 
 // ---------------------------------------------------------------------------
@@ -286,6 +287,29 @@ class _TripPathMapState extends State<_TripPathMap> {
     final start = widget.points.first;
     final end = widget.points.last;
     final polylines = _buildHeatmapPolylines(context);
+
+    // Hard-acceleration markers (#1458 phase 1). The recorder writes
+    // monotonic timestamps so `widget.pointSamples` is already sorted
+    // by timestamp, which means [hardAccelSampleIndices]'s indices line
+    // up 1:1 with `widget.points`. The helper sorts defensively so a
+    // future caller that passes unsorted samples won't silently mismap
+    // markers — but if that ever changes we'd need to sort here too.
+    final hardAccelIndices = hardAccelSampleIndices(widget.pointSamples);
+    final hardAccelMarkers = <Marker>[
+      for (final idx in hardAccelIndices)
+        if (idx >= 0 && idx < widget.points.length)
+          Marker(
+            point: widget.points[idx],
+            width: 20,
+            height: 20,
+            child: Icon(
+              Icons.bolt,
+              size: 16,
+              color: theme.colorScheme.error,
+            ),
+          ),
+    ];
+
     return FlutterMap(
       mapController: _mapController,
       options: MapOptions(
@@ -329,6 +353,7 @@ class _TripPathMapState extends State<_TripPathMap> {
                 icon: Icons.flag,
               ),
             ),
+            ...hardAccelMarkers,
           ],
         ),
         const RichAttributionWidget(
