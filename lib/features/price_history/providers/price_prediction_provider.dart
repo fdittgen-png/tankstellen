@@ -1,8 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/country/country_config.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../data/models/price_prediction.dart';
-import '../data/models/price_record.dart';
+import '../domain/entities/feature_vector.dart';
+import '../domain/services/price_feature_extractor.dart';
 import 'price_history_provider.dart';
 
 part 'price_prediction_provider.g.dart';
@@ -18,10 +20,25 @@ const _dayNames = {
   7: 'Sunday',
 };
 
+/// Minimum holiday samples required to surface a [PricePrediction.holidayPremium].
+/// Below this, the signal is too noisy to be useful (#1117 phase 1).
+const int _kMinHolidaySamples = 3;
+
+/// Threshold (EUR/L) above which the holiday premium is appended to the
+/// recommendation string. Below 2 cents the difference is not worth
+/// nagging the user about.
+const double _kHolidayPremiumNoticeThreshold = 0.02;
+
 /// Computes "best time to fill" predictions from locally stored price history.
 ///
 /// Returns `null` when fewer than 10 data points are available — not enough
 /// data to produce meaningful predictions.
+///
+/// As of #1117 phase 1, the provider also enriches the result with a
+/// [PricePrediction.holidayPremium] derived from the new
+/// [PriceFeatureExtractor] / [FeatureVector] contract. The future TFLite
+/// phase 2 will replace this heuristic with model inference using the
+/// same [FeatureVector] inputs.
 @riverpod
 PricePrediction? pricePrediction(
   Ref ref,
@@ -33,22 +50,24 @@ PricePrediction? pricePrediction(
 
   if (history.length < 10) return null;
 
-  // Extract price/time pairs, filtering out records without a price for this
-  // fuel type.
-  final pairs = <_PriceTime>[];
-  for (final record in history) {
-    final price = _priceForFuelType(record, fuelType);
-    if (price != null) {
-      pairs.add(_PriceTime(price: price, time: record.recordedAt));
-    }
-  }
+  // Build per-record feature vectors so the holiday flag (and future
+  // brand / country features) flow through the same path that phase-2
+  // training data will use. We don't have a Station entity here, so
+  // brand stays null; country is derived from the station-id prefix.
+  const extractor = PriceFeatureExtractor();
+  final country = Countries.countryCodeForStationId(stationId);
+  final vectors = extractor.extract(
+    records: history,
+    fuelType: fuelType,
+    countryCodeOverride: country,
+  );
 
-  if (pairs.length < 10) return null;
+  if (vectors.length < 10) return null;
 
   // --- Group by hour of day ---
   final hourBuckets = <int, List<double>>{};
-  for (final p in pairs) {
-    hourBuckets.putIfAbsent(p.time.hour, () => []).add(p.price);
+  for (final v in vectors) {
+    hourBuckets.putIfAbsent(v.hourOfDay, () => []).add(v.priceEur);
   }
   final hourlyAverages = hourBuckets.entries.map((e) {
     final avg = e.value.reduce((a, b) => a + b) / e.value.length;
@@ -62,8 +81,8 @@ PricePrediction? pricePrediction(
 
   // --- Group by day of week ---
   final dayBuckets = <int, List<double>>{};
-  for (final p in pairs) {
-    dayBuckets.putIfAbsent(p.time.weekday, () => []).add(p.price);
+  for (final v in vectors) {
+    dayBuckets.putIfAbsent(v.dayOfWeek, () => []).add(v.priceEur);
   }
   final dailyAverages = dayBuckets.entries.map((e) {
     final avg = e.value.reduce((a, b) => a + b) / e.value.length;
@@ -93,10 +112,15 @@ PricePrediction? pricePrediction(
   final potentialSaving =
       hourlySaving > 0.001 ? double.parse(hourlySaving.toStringAsFixed(3)) : null;
 
+  // --- Holiday premium (#1117 phase 1) ---
+  final holidayPremium = _computeHolidayPremium(vectors);
+
   // --- Recommendation text ---
   final dayName = _dayNames[cheapestDay.dayOfWeek] ?? 'Unknown';
   final hourLabel = _formatHourRange(cheapestHour.hour);
-  final recommendation = 'Prices typically drop $dayName $hourLabel';
+  final base = 'Prices typically drop $dayName $hourLabel';
+  final recommendation =
+      _maybeAppendHolidayHint(base, holidayPremium);
 
   return PricePrediction(
     recommendation: recommendation,
@@ -105,7 +129,43 @@ PricePrediction? pricePrediction(
     bestDayOfWeek: cheapestDay.dayOfWeek,
     hourlyAverages: hourlyAverages,
     dailyAverages: dailyAverages,
+    holidayPremium: holidayPremium,
   );
+}
+
+/// Average EUR/L delta between holiday and non-holiday samples in
+/// [vectors]. Returns `null` when fewer than [_kMinHolidaySamples]
+/// holiday observations exist or when no non-holiday baseline is
+/// available.
+double? _computeHolidayPremium(List<FeatureVector> vectors) {
+  final holidayPrices = <double>[];
+  final nonHolidayPrices = <double>[];
+  for (final v in vectors) {
+    if (v.isHoliday) {
+      holidayPrices.add(v.priceEur);
+    } else {
+      nonHolidayPrices.add(v.priceEur);
+    }
+  }
+  if (holidayPrices.length < _kMinHolidaySamples) return null;
+  if (nonHolidayPrices.isEmpty) return null;
+
+  final hAvg =
+      holidayPrices.reduce((a, b) => a + b) / holidayPrices.length;
+  final nAvg = nonHolidayPrices.reduce((a, b) => a + b) /
+      nonHolidayPrices.length;
+  final delta = hAvg - nAvg;
+  return double.parse(delta.toStringAsFixed(3));
+}
+
+/// Optionally appends a one-sentence holiday hint to [base] when the
+/// computed [holidayPremium] is large enough to be actionable.
+String _maybeAppendHolidayHint(String base, double? holidayPremium) {
+  if (holidayPremium == null) return base;
+  if (holidayPremium.abs() <= _kHolidayPremiumNoticeThreshold) return base;
+  final cents = (holidayPremium.abs() * 100).toStringAsFixed(1);
+  final direction = holidayPremium > 0 ? 'higher' : 'lower';
+  return '$base. Holidays trend $cents ct/L $direction';
 }
 
 /// Formats an hour (0-23) as a human-readable time range, e.g. "6-8 PM".
@@ -120,24 +180,4 @@ String _formatHour(int hour) {
   if (hour < 12) return '$hour AM';
   if (hour == 12) return '12 PM';
   return '${hour - 12} PM';
-}
-
-double? _priceForFuelType(PriceRecord record, FuelType fuelType) {
-  return switch (fuelType) {
-    FuelTypeE5() => record.e5,
-    FuelTypeE10() => record.e10,
-    FuelTypeE98() => record.e98,
-    FuelTypeDiesel() => record.diesel,
-    FuelTypeDieselPremium() => record.dieselPremium,
-    FuelTypeE85() => record.e85,
-    FuelTypeLpg() => record.lpg,
-    FuelTypeCng() => record.cng,
-    FuelTypeHydrogen() || FuelTypeElectric() || FuelTypeAll() => null,
-  };
-}
-
-class _PriceTime {
-  final double price;
-  final DateTime time;
-  const _PriceTime({required this.price, required this.time});
 }

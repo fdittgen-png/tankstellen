@@ -44,6 +44,17 @@ class PricePrediction {
   /// Average price per day of week.
   final List<DayOfWeekAverage> dailyAverages;
 
+  /// Average EUR/L delta between holiday and non-holiday samples for
+  /// this station + fuel. Positive = holidays trend more expensive;
+  /// negative = holidays trend cheaper. `null` when fewer than three
+  /// holiday samples are available — the signal is too noisy below
+  /// that threshold.
+  ///
+  /// Surfaced via #1117 phase 1 alongside the future-TFLite
+  /// [FeatureVector] contract; phase 2 will replace the heuristic
+  /// average with a model-derived prediction.
+  final double? holidayPremium;
+
   const PricePrediction({
     required this.recommendation,
     this.potentialSaving,
@@ -51,5 +62,6 @@ class PricePrediction {
     required this.bestDayOfWeek,
     required this.hourlyAverages,
     required this.dailyAverages,
+    this.holidayPremium,
   });
 }
