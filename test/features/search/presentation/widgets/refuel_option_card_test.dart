@@ -8,6 +8,9 @@ import 'package:tankstellen/core/refuel/refuel_provider.dart';
 import 'package:tankstellen/core/refuel/station_as_refuel_option.dart';
 import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/features/search/domain/entities/station_amenity.dart';
+import 'package:tankstellen/features/search/presentation/widgets/amenity_chips.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/presentation/widgets/refuel_option_card.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
@@ -31,12 +34,23 @@ class _FakeRefuelOption extends RefuelOption {
   final RefuelAvailability availability;
   @override
   final String id;
+  @override
+  String get address => '';
+  @override
+  double? get distanceMeters => null;
+  @override
+  final bool is24h;
+  @override
+  DateTime? get lastUpdated => null;
+  @override
+  Object get source => this;
 
   const _FakeRefuelOption({
     required this.id,
     required this.provider,
     required this.availability,
     this.price,
+    this.is24h = false,
   });
 }
 
@@ -392,27 +406,12 @@ void main() {
     });
 
     testWidgets(
-        'showDistanceAtRight=false hides the trailing distance slot',
+        'showDistanceAtRight=false hides the distance text under the title',
         (tester) async {
-      // The distance slot is a SizedBox.shrink() that occupies no
-      // visible space — verify by counting siblings of the price column.
-      // When the gate is on, the slot is in the tree; when off, it
-      // isn't. We assert by widget descendant count.
-      await pumpApp(
-        tester,
-        const RefuelOptionCard(
-          option: StationAsRefuelOption(testStation, FuelType.e10),
-        ),
-      );
-      // Find the inner Row of the card.
-      final rowOn = tester.widget<Row>(find.descendant(
-        of: find.byType(RefuelOptionCard),
-        matching: find.byType(Row),
-      ).first);
-      final childCountOn = rowOn.children.length;
-
-      await tester.pumpWidget(const SizedBox.shrink());
-
+      // testStation.dist is 1.5 km → distanceMeters 1500. With the gate
+      // on the card renders a "1.5 km"-style line; with it off the
+      // distance text should NOT appear (the updated-at icon may still
+      // appear since it is independent of the distance gate).
       await pumpApp(
         tester,
         const RefuelOptionCard(
@@ -420,18 +419,213 @@ void main() {
           showDistanceAtRight: false,
         ),
       );
-      final rowOff = tester.widget<Row>(find.descendant(
-        of: find.byType(RefuelOptionCard),
-        matching: find.byType(Row),
-      ).first);
-      final childCountOff = rowOff.children.length;
+      // Distance is formatted via PriceFormatter — the digits "1.5" or
+      // "1,5" must not appear in any Text widget in the card when the
+      // gate is off. (The price digits are 1.799 so a literal "1.5"
+      // search still uniquely matches a distance label.)
+      final hasDistanceText = tester
+          .widgetList<Text>(find.byType(Text))
+          .any((w) =>
+              (w.data ?? '').contains('1.5') ||
+              (w.data ?? '').contains('1,5'));
+      expect(hasDistanceText, isFalse,
+          reason: 'distance text must not appear when '
+              'showDistanceAtRight is false');
+    });
 
-      expect(
-        childCountOn - childCountOff,
-        1,
-        reason: 'showDistanceAtRight=false must remove exactly one '
-            'slot from the trailing row',
-      );
+    group('phase 4 enrichment (#1116)', () {
+      testWidgets('renders the address line under the title', (tester) async {
+        // testStation: street "Hauptstr.", postCode "10115", place
+        // "Berlin" → "Hauptstr., 10115 Berlin". The card must surface
+        // this so the user can identify the station without tapping
+        // through to detail.
+        await pumpApp(
+          tester,
+          const RefuelOptionCard(
+            option: StationAsRefuelOption(testStation, FuelType.e10),
+          ),
+        );
+
+        expect(find.text('Hauptstr., 10115 Berlin'), findsOneWidget);
+      });
+
+      testWidgets('renders the distance label when distanceMeters is set',
+          (tester) async {
+        // testStation.dist = 1.5 km. PriceFormatter localises the
+        // separator (1.5 vs 1,5), so assert on the digit substring that
+        // survives both forms.
+        await pumpApp(
+          tester,
+          const RefuelOptionCard(
+            option: StationAsRefuelOption(testStation, FuelType.e10),
+          ),
+        );
+
+        final hasDistanceDigits = tester
+            .widgetList<Text>(find.byType(Text))
+            .any((w) =>
+                (w.data ?? '').contains('1.5') ||
+                (w.data ?? '').contains('1,5'));
+        expect(hasDistanceDigits, isTrue,
+            reason: 'distance "1.5 km" digits must appear under the title');
+      });
+
+      testWidgets('renders the updated-at icon when lastUpdated is set',
+          (tester) async {
+        // testStation.updatedAt sets a real timestamp → the card must
+        // render the Icons.update marker next to the elapsed-time text.
+        await pumpApp(
+          tester,
+          const RefuelOptionCard(
+            option: StationAsRefuelOption(testStation, FuelType.e10),
+          ),
+        );
+
+        expect(find.byIcon(Icons.update), findsOneWidget);
+      });
+
+      testWidgets('renders the 24h badge when option.is24h is true',
+          (tester) async {
+        // The 24h badge sits under the status dot in the leading
+        // status column — same shape as the legacy StationCard.
+        const option = _FakeRefuelOption(
+          id: 'fuel:24h',
+          provider: RefuelProvider(
+            name: 'Total Access',
+            kind: RefuelProviderKind.fuel,
+          ),
+          availability: RefuelAvailability.open,
+          is24h: true,
+        );
+
+        await pumpApp(
+          tester,
+          const RefuelOptionCard(option: option),
+        );
+
+        expect(find.text('24h'), findsOneWidget);
+      });
+
+      testWidgets('omits the 24h badge when option.is24h is false',
+          (tester) async {
+        const option = _FakeRefuelOption(
+          id: 'fuel:no24',
+          provider: RefuelProvider(
+            name: 'Total',
+            kind: RefuelProviderKind.fuel,
+          ),
+          availability: RefuelAvailability.open,
+          is24h: false,
+        );
+
+        await pumpApp(
+          tester,
+          const RefuelOptionCard(option: option),
+        );
+
+        expect(find.text('24h'), findsNothing);
+      });
+
+      testWidgets('renders amenity chips for fuel-kind options', (tester) async {
+        // testStation has no amenities, so build a station with one to
+        // exercise the path. We use the public `Station` constructor
+        // directly here rather than a fixture clone — keeps the test
+        // narrow and free of helper imports.
+        const stationWithAmenities = Station(
+          id: 'amen-1',
+          name: 'Test',
+          brand: 'Total',
+          street: 'Hauptstr.',
+          postCode: '10115',
+          place: 'Berlin',
+          lat: 52.5,
+          lng: 13.4,
+          dist: 0.5,
+          isOpen: true,
+          amenities: {StationAmenity.toilet, StationAmenity.shop},
+        );
+
+        await pumpApp(
+          tester,
+          const RefuelOptionCard(
+            option: StationAsRefuelOption(stationWithAmenities, FuelType.e10),
+          ),
+        );
+
+        // AmenityChips renders a Wrap with one _AmenityChip per amenity;
+        // assert by widget type from the helper.
+        expect(find.byType(AmenityChips), findsOneWidget);
+        final chips = tester.widget<AmenityChips>(find.byType(AmenityChips));
+        expect(chips.amenities, {StationAmenity.toilet, StationAmenity.shop});
+      });
+
+      testWidgets('omits amenity chips when fuel station has no amenities',
+          (tester) async {
+        // testStation.amenities is the default `{}` set.
+        await pumpApp(
+          tester,
+          const RefuelOptionCard(
+            option: StationAsRefuelOption(testStation, FuelType.e10),
+          ),
+        );
+
+        // AmenityChips returns SizedBox.shrink() on an empty set, but
+        // the parent widget must not even instantiate it when empty —
+        // that guards against accidental layout space being reserved.
+        expect(find.byType(AmenityChips), findsNothing);
+      });
+
+      testWidgets('renders EV stats row for EV-kind options', (tester) async {
+        // _evChargingStation has one CCS connector at 350 kW (status
+        // is the legacy default, which decodes to ConnectorStatus
+        // .unknown — so available count is 0/1).
+        await pumpApp(
+          tester,
+          const RefuelOptionCard(
+            option: ChargingStationAsRefuelOption(_evChargingStation),
+          ),
+        );
+
+        expect(find.byIcon(Icons.electrical_services), findsOneWidget);
+        // The stats text should include the kW number, the X/Y count,
+        // and the connector type. The exact separator is "·" but we
+        // only assert the substrings to keep the test resilient.
+        final hasStats = tester
+            .widgetList<Text>(find.byType(Text))
+            .any((w) =>
+                (w.data ?? '').contains('350 kW') &&
+                (w.data ?? '').contains('CCS'));
+        expect(hasStats, isTrue,
+            reason: 'EV stats row must include kW + connector type');
+      });
+
+      testWidgets(
+          'omits the address line when option.address is empty',
+          (tester) async {
+        // A sparse option (no address data) must not render an empty
+        // address Text widget — the card collapses gracefully.
+        const option = _FakeRefuelOption(
+          id: 'sparse:1',
+          provider: RefuelProvider(
+            name: 'Generic Station',
+            kind: RefuelProviderKind.fuel,
+          ),
+          availability: RefuelAvailability.open,
+        );
+
+        await pumpApp(
+          tester,
+          const RefuelOptionCard(option: option),
+        );
+
+        // Generic Station appears (title), the availability fallback
+        // ("Open") appears under it. No empty Text widgets.
+        final emptyTexts = tester
+            .widgetList<Text>(find.byType(Text))
+            .where((w) => (w.data ?? '').isEmpty);
+        expect(emptyTexts, isEmpty,
+            reason: 'no empty Text widgets when address is unavailable');
+      });
     });
 
     testWidgets('option with null price (EV phase-2 adapter) renders cleanly',

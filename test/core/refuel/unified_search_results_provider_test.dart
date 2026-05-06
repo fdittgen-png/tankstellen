@@ -92,6 +92,7 @@ Station _fuelStation({
   double? e10 = 1.749,
   double? diesel,
   String brand = 'Total',
+  double dist = 0,
 }) =>
     Station(
       id: id,
@@ -102,18 +103,24 @@ Station _fuelStation({
       place: 'Testtown',
       lat: 52.5,
       lng: 13.4,
+      dist: dist,
       e10: e10,
       diesel: diesel,
       isOpen: true,
     );
 
-ChargingStation _charger({String id = 'ev1', String? operator = 'Ionity'}) =>
+ChargingStation _charger({
+  String id = 'ev1',
+  String? operator = 'Ionity',
+  double dist = 0,
+}) =>
     ChargingStation(
       id: id,
       name: 'Charger $id',
       operator: operator,
       latitude: 52.5,
       longitude: 13.4,
+      dist: dist,
     );
 
 /// Build a container with the canned fuel + EV upstreams plus an
@@ -257,7 +264,13 @@ void main() {
   });
 
   group('unifiedSearchResultsProvider — flag on, both sides', () {
-    test('combines fuel + EV adapters with fuel first', () {
+    test('combines fuel + EV adapters when neither has a distance '
+        '(falls back to fuel-then-EV concat order)', () {
+      // Both stations have `dist == 0` (the freezed default), which the
+      // adapters surface as `distanceMeters == null`. Distance-less
+      // options sink to the bottom; among themselves the original
+      // concat order (fuel-first, then EV) is preserved by the stable
+      // List.sort.
       final c = _container(
         fuel: _fuelData([
           FuelStationResult(_fuelStation(id: 'f1', e10: 1.749)),
@@ -272,6 +285,57 @@ void main() {
       expect(list.map((o) => o.id).toList(), ['fuel:f1', 'ev:ev1']);
       expect(list.first, isA<StationAsRefuelOption>());
       expect(list.last, isA<ChargingStationAsRefuelOption>());
+    });
+
+    test('phase 4 (#1116): interleaves fuel + EV by ascending distance',
+        () {
+      // Three options with intentionally interleaved distances. The
+      // unified provider must sort by `distanceMeters` ascending so a
+      // user with both fuel and EV preferences sees the closest options
+      // first regardless of kind, NOT all fuel then all EV.
+      final c = _container(
+        fuel: _fuelData([
+          FuelStationResult(_fuelStation(id: 'far', e10: 1.749, dist: 5.0)),
+          FuelStationResult(_fuelStation(id: 'near', e10: 1.799, dist: 0.5)),
+        ]),
+        ev: _evData([
+          _charger(id: 'mid', dist: 2.0),
+        ]),
+        flagOn: true,
+      );
+      addTearDown(c.dispose);
+      c.read(selectedFuelTypeProvider.notifier).select(FuelType.e10);
+
+      final list = c.read(unifiedSearchResultsProvider);
+      expect(
+        list.map((o) => o.id).toList(),
+        ['fuel:near', 'ev:mid', 'fuel:far'],
+      );
+    });
+
+    test('phase 4 (#1116): options without distance sink to the bottom',
+        () {
+      // The `noDist` fuel station has dist=0 (unknown) and must sort
+      // AFTER the two real-distance options regardless of kind, so a
+      // sparse upstream record never bumps a real near-by option down.
+      final c = _container(
+        fuel: _fuelData([
+          FuelStationResult(_fuelStation(id: 'noDist', e10: 1.749)),
+        ]),
+        ev: _evData([
+          _charger(id: 'evNear', dist: 0.5),
+          _charger(id: 'evFar', dist: 3.0),
+        ]),
+        flagOn: true,
+      );
+      addTearDown(c.dispose);
+      c.read(selectedFuelTypeProvider.notifier).select(FuelType.e10);
+
+      final list = c.read(unifiedSearchResultsProvider);
+      expect(
+        list.map((o) => o.id).toList(),
+        ['ev:evNear', 'ev:evFar', 'fuel:noDist'],
+      );
     });
   });
 

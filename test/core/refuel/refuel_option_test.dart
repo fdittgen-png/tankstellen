@@ -21,6 +21,16 @@ class _TestRefuelOption extends RefuelOption {
   final RefuelAvailability availability;
   @override
   final String id;
+  @override
+  final String address;
+  @override
+  final double? distanceMeters;
+  @override
+  final bool is24h;
+  @override
+  final DateTime? lastUpdated;
+  @override
+  Object get source => this;
 
   const _TestRefuelOption({
     required this.coordinates,
@@ -28,6 +38,10 @@ class _TestRefuelOption extends RefuelOption {
     required this.provider,
     required this.availability,
     required this.id,
+    this.address = '',
+    this.distanceMeters,
+    this.is24h = false,
+    this.lastUpdated,
   });
 }
 
@@ -106,6 +120,47 @@ void main() {
       );
 
       expect(o.price?.unit, RefuelPriceUnit.perSession);
+    });
+
+    test('phase-4 fields default sensibly when not specified', () {
+      // The abstract contract requires the new getters but a concrete
+      // subtype that has no upstream data for them should still be
+      // expressible. The defaults on `_TestRefuelOption` mirror what
+      // the real adapters return when the underlying entity is
+      // sparse — empty address, null distance, not-24h, no timestamp.
+      const o = _TestRefuelOption(
+        id: 'fuel:no-detail',
+        coordinates: (lat: 0.0, lng: 0.0),
+        price: null,
+        provider: RefuelProvider.unknown,
+        availability: RefuelAvailability.unknown,
+      );
+      expect(o.address, '');
+      expect(o.distanceMeters, isNull);
+      expect(o.is24h, isFalse);
+      expect(o.lastUpdated, isNull);
+    });
+
+    test('phase-4 fields round-trip through the contract', () {
+      final ts = DateTime.utc(2026, 5, 4, 12, 0);
+      final o = _TestRefuelOption(
+        id: 'fuel:detail',
+        coordinates: const (lat: 48.0, lng: 2.0),
+        price: null,
+        provider: const RefuelProvider(
+          name: 'Total',
+          kind: RefuelProviderKind.fuel,
+        ),
+        availability: RefuelAvailability.open,
+        address: '12 Rue de la Paix, 75002 Paris',
+        distanceMeters: 850.0,
+        is24h: true,
+        lastUpdated: ts,
+      );
+      expect(o.address, '12 Rue de la Paix, 75002 Paris');
+      expect(o.distanceMeters, 850.0);
+      expect(o.is24h, isTrue);
+      expect(o.lastUpdated, ts);
     });
 
     test('id format documents the type-prefix convention', () {

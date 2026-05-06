@@ -29,8 +29,10 @@ part 'unified_search_results_provider.g.dart';
 ///     currently selected fuel from [selectedFuelTypeProvider];
 ///   - the EV side via [eVSearchStateProvider], mapping every
 ///     [ChargingStation] through [ChargingStationAsRefuelOption].
-///   The two lists are concatenated (fuel first, EV after) so the
-///   downstream UI can apply its own sort/filter chips deterministically.
+///   The two lists are merged and sorted by [RefuelOption.distanceMeters]
+///   ascending so the closest options interleave regardless of kind
+///   (#1116 phase 4). Options without a known distance sink to the
+///   bottom in their original relative order.
 /// * Stations whose price for the active fuel is `null` are skipped on
 ///   the fuel side. The phase-2 [StationAsRefuelOption] returns a null
 ///   price for those stations, but the unified list is consumed by
@@ -85,5 +87,21 @@ List<RefuelOption> unifiedSearchResults(Ref ref) {
     }
   }
 
-  return [...fuelOptions, ...evOptions];
+  // Phase 4 (#1116): interleave by proximity rather than concatenating
+  // fuel-then-EV. Users want a truly unified list — closest options
+  // first regardless of kind, mirroring how the legacy fuel-only
+  // search has always sorted. Options without a known distance sink
+  // to the bottom (preserving deterministic order among themselves
+  // via the original concat order — `List.sort` is stable on the Dart
+  // VM as of SDK 3.x).
+  final merged = <RefuelOption>[...fuelOptions, ...evOptions];
+  merged.sort((a, b) {
+    final ad = a.distanceMeters;
+    final bd = b.distanceMeters;
+    if (ad == null && bd == null) return 0;
+    if (ad == null) return 1;
+    if (bd == null) return -1;
+    return ad.compareTo(bd);
+  });
+  return merged;
 }

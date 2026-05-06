@@ -58,8 +58,11 @@ class StationAsRefuelOption extends RefuelOption {
   }
 
   @override
+  Object get source => station;
+
+  @override
   RefuelPrice? get price {
-    final eur = _eurValueFor(fuelType);
+    final eur = _eurValueFor(fuelType) ?? _allFuelsFallbackEur();
     if (eur == null) return null;
     // Convert EUR/L (or EUR/kg for CNG; see note below) to cents.
     // EU pumps display 0.1-cent precision (e.g. €1.749 → 174.9¢), so
@@ -101,6 +104,28 @@ class StationAsRefuelOption extends RefuelOption {
     };
   }
 
+  /// Phase 5 (#1116): when [fuelType] is [FuelType.all], pick the
+  /// first available fuel field so a station with prices for at least
+  /// one fuel surfaces in the unified results. Without this, every
+  /// fuel station would be filtered out by the unified provider's
+  /// `price == null` guard whenever the user has the all-fuels
+  /// selector active — a real regression vs the legacy fuel-only path
+  /// that always renders fuel stations regardless of selector. Order
+  /// mirrors EU-pump prevalence: e10 (most common) → e5 → diesel →
+  /// e98 → lpg → e85 → dieselPremium → cng. Returns null only when
+  /// the station truly has no price for any fuel.
+  double? _allFuelsFallbackEur() {
+    if (fuelType is! FuelTypeAll) return null;
+    return station.e10 ??
+        station.e5 ??
+        station.diesel ??
+        station.e98 ??
+        station.lpg ??
+        station.e85 ??
+        station.dieselPremium ??
+        station.cng;
+  }
+
   /// Best-effort parse of [Station.updatedAt] (ISO-8601 string) into a
   /// [DateTime]. Returns `null` when the field is absent or malformed
   /// — the [RefuelPrice.lastUpdated] field accepts null and the UI
@@ -110,4 +135,36 @@ class StationAsRefuelOption extends RefuelOption {
     if (raw == null || raw.isEmpty) return null;
     return DateTime.tryParse(raw);
   }
+
+  @override
+  String get address {
+    final street = station.street.trim();
+    final post = station.postCode.trim();
+    final place = station.place.trim();
+    final cityParts = <String>[
+      if (post.isNotEmpty) post,
+      if (place.isNotEmpty) place,
+    ];
+    final city = cityParts.join(' ');
+    if (street.isNotEmpty && city.isNotEmpty) return '$street, $city';
+    if (street.isNotEmpty) return street;
+    return city;
+  }
+
+  // [Station.dist] is upstream-provided in kilometres; convert to
+  // metres at the abstract layer so [RefuelOption] consumers don't
+  // have to know about the per-source unit. The freezed default of
+  // `0.0` is treated as "distance unknown" so a station that genuinely
+  // sits 0m away (very rare in practice — would mean the user is
+  // standing on the pump) still sorts deterministically with the rest
+  // rather than always pinning to the top.
+  @override
+  double? get distanceMeters =>
+      station.dist > 0 ? station.dist * 1000.0 : null;
+
+  @override
+  bool get is24h => station.is24h;
+
+  @override
+  DateTime? get lastUpdated => _lastUpdated;
 }

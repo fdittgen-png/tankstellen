@@ -45,4 +45,42 @@ abstract class RefuelOption {
   /// search list can deduplicate without colliding on shared
   /// numeric ids between the two source systems.
   String get id;
+
+  /// Human-readable address line for the unified results card. Format
+  /// is best-effort `"<street>, <postCode> <place>"` when those parts
+  /// are populated, else a shorter fallback (or empty string when no
+  /// address data is available at all). Drives the address line on the
+  /// unified card so fuel pumps and EV chargers render with the same
+  /// density as the legacy `StationCard` (#1116 phase 4).
+  String get address;
+
+  /// Distance from the user's reference point, in metres. `null` when
+  /// the upstream search did not compute distance. Drives the distance
+  /// label on the unified card and the merged-list sort order in
+  /// `unifiedSearchResultsProvider` so EV + fuel options interleave by
+  /// proximity rather than appearing as two segregated blocks.
+  double? get distanceMeters;
+
+  /// Whether the option is open 24h/24. Drives the small "24h" badge
+  /// the unified card stacks under the status dot. Defaults to `false`
+  /// for upstream entities that don't expose a 24h flag.
+  bool get is24h;
+
+  /// Best-known timestamp for the displayed station data, parsed from
+  /// the upstream `updatedAt` string. Distinct from
+  /// [RefuelPrice.lastUpdated] (which is `null` when the price is
+  /// unavailable for the active fuel) — the unified card needs an
+  /// updated-at marker even on closed / price-less rows so users can
+  /// see how recent the data is at a glance.
+  DateTime? get lastUpdated;
+
+  /// The underlying entity this option wraps — type-erased so the
+  /// abstract layer stays free of `Station` / `ChargingStation`
+  /// imports. Phase 5 (#1116) opens this seam so the unified card can
+  /// downcast for kind-specific extras (amenity icon chips for fuel,
+  /// connector stats for EV) without spreading those imports across
+  /// generic consumers. Generic consumers (sort, filter, dedup) MUST
+  /// NOT depend on the concrete type — only the rendering layer is
+  /// allowed to peek inside.
+  Object get source;
 }

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/refuel/refuel_option.dart';
 import '../../../../core/refuel/refuel_provider.dart';
 import '../../../../core/refuel/unified_search_results_provider.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../ev/domain/entities/charging_station.dart';
+import '../../domain/entities/station.dart';
 import 'refuel_option_card.dart';
 import 'unified_filter_chips.dart';
 
@@ -58,12 +61,29 @@ class UnifiedSearchResultsView extends ConsumerWidget {
                     return RefuelOptionCard(
                       key: ValueKey('refuel-${option.id}'),
                       option: option,
+                      onTap: () => _openDetail(context, option),
                     );
                   },
                 ),
         ),
       ],
     );
+  }
+
+  /// Open the detail screen for a tapped option, dispatching by the
+  /// underlying entity type. Mirrors the legacy fuel/EV detail routes
+  /// — `/station/:id` for fuel, `/ev-station` (with the
+  /// `ChargingStation` as `extra`) for EV — so a user switching
+  /// between the legacy and unified views lands on the same screens.
+  /// Sparse upstream rows that don't map to a concrete type are a
+  /// no-op (rare; logged via debug-print would be too noisy).
+  void _openDetail(BuildContext context, RefuelOption option) {
+    final source = option.source;
+    if (source is Station) {
+      context.push('/station/${source.id}');
+    } else if (source is ChargingStation) {
+      context.push('/ev-station', extra: source);
+    }
   }
 
   /// Pure filter — operates on the public [RefuelProviderKind]
