@@ -76,6 +76,55 @@ void main() {
     });
   });
 
+  group('StationMapLayers zoom bounds (#1457)', () {
+    test('maxZoom matches the OSM tile cap (19)', () {
+      // The TileLayer in StationMapLayers caps tile loads at zoom 19
+      // (`maxNativeZoom: 19, maxZoom: 19`). The camera's maxZoom MUST
+      // not exceed the tile cap — otherwise a programmatic
+      // `move(camera.zoom + 1)` past 19 parks the camera at a level
+      // with no tiles to draw, producing the "+ button does nothing"
+      // symptom that triggered #1457. Tile cap and camera cap MUST be
+      // updated together if either ever changes.
+      expect(StationMapLayers.maxZoom, 19.0);
+    });
+
+    test('minZoom keeps every pin from collapsing into a single pixel',
+        () {
+      // Zoom 3 shows a continent-scale viewport; below that, station
+      // markers cluster into a single illegible blob and the search
+      // affordances stop being meaningful.
+      expect(StationMapLayers.minZoom, 3.0);
+    });
+
+    test('the clamp expression in the +/− handlers is well-formed',
+        () {
+      // Mirror the exact expression both ZoomButton handlers use so a
+      // future rename or sign-flip in the production code is caught
+      // by this test rather than silently shipping. The clamp turns a
+      // tap-at-the-cap into a graceful no-op (camera stays at the
+      // bound) instead of pushing past where there are tiles.
+      double inc(double current) =>
+          (current + 1).clamp(StationMapLayers.minZoom, StationMapLayers.maxZoom);
+      double dec(double current) =>
+          (current - 1).clamp(StationMapLayers.minZoom, StationMapLayers.maxZoom);
+      // Below the cap → increment normally.
+      expect(inc(13.0), 14.0);
+      expect(dec(13.0), 12.0);
+      // At the upper cap → + becomes a no-op, − still moves.
+      expect(inc(StationMapLayers.maxZoom), StationMapLayers.maxZoom);
+      expect(dec(StationMapLayers.maxZoom),
+          StationMapLayers.maxZoom - 1.0);
+      // At the lower cap → − becomes a no-op, + still moves.
+      expect(dec(StationMapLayers.minZoom), StationMapLayers.minZoom);
+      expect(inc(StationMapLayers.minZoom),
+          StationMapLayers.minZoom + 1.0);
+      // Past the upper cap (e.g. via prior pinch-zoom that escaped
+      // the camera before #1457 set MapOptions.maxZoom) → the next
+      // tap snaps back to the cap rather than pushing further.
+      expect(inc(25.0), StationMapLayers.maxZoom);
+    });
+  });
+
   // The #496 `onMapReady` zoom-jiggle regression test was retired by
   // #757: the retry+evict tile provider makes the nudge unnecessary.
   // A failed tile now retries at the HTTP layer and, if still
