@@ -25,6 +25,16 @@ class _FakeRefuelOption extends RefuelOption {
   final RefuelAvailability availability;
   @override
   final String id;
+  @override
+  String get address => '';
+  @override
+  double? get distanceMeters => null;
+  @override
+  bool get is24h => false;
+  @override
+  DateTime? get lastUpdated => null;
+  @override
+  Object get source => this;
 
   const _FakeRefuelOption({
     required this.id,

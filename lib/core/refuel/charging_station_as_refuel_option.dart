@@ -84,7 +84,55 @@ class ChargingStationAsRefuelOption extends RefuelOption {
     return RefuelAvailability.unknown;
   }
 
+  @override
+  Object get source => station;
+
   /// Always `null` in phase 2. See class doc for rationale.
   @override
   RefuelPrice? get price => null;
+
+  @override
+  String get address {
+    final addr = station.address?.trim() ?? '';
+    final post = station.postCode?.trim() ?? '';
+    final place = station.place?.trim() ?? '';
+    final cityParts = <String>[
+      if (post.isNotEmpty) post,
+      if (place.isNotEmpty) place,
+    ];
+    final city = cityParts.join(' ');
+    if (addr.isNotEmpty && city.isNotEmpty) return '$addr, $city';
+    if (addr.isNotEmpty) return addr;
+    return city;
+  }
+
+  // [ChargingStation.dist] is upstream-provided in kilometres (mirrors
+  // the fuel-side [Station.dist] convention introduced when the legacy
+  // search-side EV entity was consolidated under #560). Convert to
+  // metres so [RefuelOption] consumers see one unit; treat `0.0` as
+  // "distance unknown" for the same reason as the fuel adapter.
+  @override
+  double? get distanceMeters =>
+      station.dist > 0 ? station.dist * 1000.0 : null;
+
+  // The EV upstream [ChargingStation] does not (yet) expose a 24h
+  // flag — the [openingHours] field carries weekday-by-weekday windows
+  // and a true 24h derivation would require parsing each day's window.
+  // Default to `false` here; the unified card therefore won't render
+  // a 24h badge for EV rows. A future enrichment can compute this from
+  // `openingHours` if a UI consumer needs it.
+  @override
+  bool get is24h => false;
+
+  @override
+  DateTime? get lastUpdated {
+    // Prefer the structured [lastUpdate] when available; fall back to
+    // the legacy string [updatedAt] (kept for API-compat with the
+    // pre-#560 entity shape — see class doc).
+    final structured = station.lastUpdate;
+    if (structured != null) return structured;
+    final raw = station.updatedAt;
+    if (raw == null || raw.isEmpty) return null;
+    return DateTime.tryParse(raw);
+  }
 }

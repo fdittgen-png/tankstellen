@@ -12,8 +12,12 @@ import 'package:tankstellen/features/search/domain/entities/station.dart';
 Station _station({
   String id = '42',
   String brand = 'Total',
+  String street = 'rue de Test',
+  String postCode = '75001',
+  String place = 'Paris',
   double lat = 48.8566,
   double lng = 2.3522,
+  double dist = 0,
   double? e5,
   double? e10,
   double? e98,
@@ -30,11 +34,12 @@ Station _station({
       id: id,
       name: 'Station $id',
       brand: brand,
-      street: 'rue de Test',
-      postCode: '75001',
-      place: 'Paris',
+      street: street,
+      postCode: postCode,
+      place: place,
       lat: lat,
       lng: lng,
+      dist: dist,
       e5: e5,
       e10: e10,
       e98: e98,
@@ -171,12 +176,17 @@ void main() {
       expect(adapter.price, isNull);
     });
 
-    test('FuelType.all (meta wildcard) → null price', () {
+    test('FuelType.all (meta wildcard) → falls back to e10 price '
+        '(#1116 phase 5)', () {
+      // Phase 5: a station with at least one fuel field set must
+      // surface in the unified all-fuels view. The fallback chain
+      // prefers e10 (most common in EU); see the dedicated phase-5
+      // group below for the full ordering matrix.
       final adapter = StationAsRefuelOption(
         _station(e10: 1.699),
         FuelType.all,
       );
-      expect(adapter.price, isNull);
+      expect(adapter.price?.value, 169.9);
     });
 
     test('IEEE-754 float drift is stripped (0.1-cent precision)', () {
@@ -244,6 +254,127 @@ void main() {
         _station(e10: 1.699, updatedAt: 'not-a-date'),
       );
       expect(adapter.price?.lastUpdated, isNull);
+    });
+  });
+
+  group('StationAsRefuelOption — phase 4 enrichment (#1116)', () {
+    test('address composes "<street>, <postCode> <place>"', () {
+      final adapter = StationAsRefuelOption(
+        _station(
+          street: '12 Rue de la Paix',
+          postCode: '75002',
+          place: 'Paris',
+        ),
+      );
+      expect(adapter.address, '12 Rue de la Paix, 75002 Paris');
+    });
+
+    test('address falls back to street alone when city parts are empty',
+        () {
+      final adapter = StationAsRefuelOption(
+        _station(street: 'Hauptstraße 5', postCode: '', place: ''),
+      );
+      expect(adapter.address, 'Hauptstraße 5');
+    });
+
+    test('address falls back to "<postCode> <place>" when no street', () {
+      final adapter = StationAsRefuelOption(
+        _station(street: '', postCode: '34540', place: 'Castelnau'),
+      );
+      expect(adapter.address, '34540 Castelnau');
+    });
+
+    test('distanceMeters converts station.dist (km) to metres', () {
+      final adapter = StationAsRefuelOption(_station(dist: 1.25));
+      expect(adapter.distanceMeters, 1250.0);
+    });
+
+    test('distanceMeters is null when station.dist is the freezed '
+        'default 0', () {
+      final adapter = StationAsRefuelOption(_station(dist: 0));
+      expect(adapter.distanceMeters, isNull);
+    });
+
+    test('is24h passes through from the underlying station', () {
+      expect(StationAsRefuelOption(_station(is24h: true)).is24h, isTrue);
+      expect(StationAsRefuelOption(_station(is24h: false)).is24h, isFalse);
+    });
+
+    test('lastUpdated parses station.updatedAt into a DateTime', () {
+      final adapter = StationAsRefuelOption(
+        _station(updatedAt: '2026-05-04T08:30:00Z'),
+      );
+      expect(adapter.lastUpdated, DateTime.parse('2026-05-04T08:30:00Z'));
+    });
+
+    test('lastUpdated is null when updatedAt is missing or unparseable',
+        () {
+      expect(
+        StationAsRefuelOption(_station(updatedAt: null)).lastUpdated,
+        isNull,
+      );
+      expect(
+        StationAsRefuelOption(_station(updatedAt: '')).lastUpdated,
+        isNull,
+      );
+      expect(
+        StationAsRefuelOption(_station(updatedAt: 'garbage')).lastUpdated,
+        isNull,
+      );
+    });
+
+    test('source returns the wrapped Station', () {
+      final s = _station(id: 'abc');
+      final adapter = StationAsRefuelOption(s);
+      expect(adapter.source, same(s));
+    });
+  });
+
+  group('StationAsRefuelOption — phase 5 all-fuels fallback (#1116)', () {
+    test('FuelType.all + e10 set returns the e10 price (preferred fallback)',
+        () {
+      final adapter = StationAsRefuelOption(
+        _station(e10: 1.749, e5: 1.799, diesel: 1.659),
+        FuelType.all,
+      );
+      expect(adapter.price?.value, 174.9);
+    });
+
+    test('FuelType.all + only diesel set returns the diesel price', () {
+      final adapter = StationAsRefuelOption(
+        _station(e10: null, e5: null, diesel: 1.659),
+        FuelType.all,
+      );
+      expect(adapter.price?.value, 165.9);
+    });
+
+    test('FuelType.all + only e85 set returns the e85 price (rare path)',
+        () {
+      final adapter = StationAsRefuelOption(
+        _station(e10: null, e5: null, diesel: null, e85: 0.799),
+        FuelType.all,
+      );
+      expect(adapter.price?.value, 79.9);
+    });
+
+    test('FuelType.all + every fuel null returns null price', () {
+      final adapter = StationAsRefuelOption(
+        _station(e5: null, e10: null, diesel: null),
+        FuelType.all,
+      );
+      expect(adapter.price, isNull);
+    });
+
+    test('FuelType.e10 fallback does NOT trigger when fuelType is specific',
+        () {
+      // With e10 explicitly null and FuelType.e10 selected, we must
+      // return null (the user asked for e10 specifically). The
+      // all-fuels fallback only kicks in for FuelType.all.
+      final adapter = StationAsRefuelOption(
+        _station(e10: null, e5: 1.799, diesel: 1.659),
+        FuelType.e10,
+      );
+      expect(adapter.price, isNull);
     });
   });
 }
