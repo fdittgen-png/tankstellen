@@ -14,6 +14,14 @@ import '../../../search/domain/entities/station.dart';
 import 'price_legend.dart';
 import 'station_marker.dart';
 
+/// Camera zoom bounds (#1457). Top end matches the OSM tile cap so a
+/// `move(camera.zoom + 1)` past the cap doesn't park the user on a
+/// grey viewport with no tiles to draw. Bottom end is conservative —
+/// flutter_map wraps the world at zoom 0, but anything below ~3 puts
+/// every pin in a single pixel which is unhelpful UX.
+const double _kMinZoom = 3.0;
+const double _kMaxZoom = 19.0;
+
 /// Shared map widget containing all layers: tiles, search radius circle,
 /// center marker, station markers with clustering, attribution, zoom
 /// controls, and price legend.
@@ -107,6 +115,17 @@ class StationMapLayers extends StatefulWidget {
 
   @override
   State<StationMapLayers> createState() => _StationMapLayersState();
+
+  /// Camera zoom bounds for the +/− button handlers + the [MapOptions]
+  /// camera constraints. Aligned with the OSM tile cap (`maxNativeZoom: 19`)
+  /// so a programmatic zoom-in past the cap doesn't park the camera at
+  /// a level with no tiles to render. The min is conservative — flutter_map
+  /// itself wraps the world at zoom 0, but anything below ~3 puts every
+  /// pin in a single pixel, which is unhelpful UX. Per #1457.
+  @visibleForTesting
+  static const double minZoom = _kMinZoom;
+  @visibleForTesting
+  static const double maxZoom = _kMaxZoom;
 
   /// Calculate zoom level from search radius.
   static double zoomForRadius(double radiusKm) {
@@ -280,6 +299,16 @@ class _StationMapLayersState extends State<StationMapLayers> {
           options: MapOptions(
             initialCenter: widget.center,
             initialZoom: widget.zoom,
+            // #1457 — clamp the camera to the tile-layer's max zoom (19)
+            // so a programmatic `move(camera.zoom + 1)` past 19 doesn't
+            // leave the user staring at a grey viewport (tiles only
+            // render up to maxNativeZoom). The default flutter_map
+            // MapOptions.maxZoom is 25 — that lets the camera stride
+            // past where there are tiles to draw, which looks broken to
+            // the user. Min clamp guards against accidental zoom-out
+            // beyond the world wrap.
+            minZoom: _kMinZoom,
+            maxZoom: _kMaxZoom,
             interactionOptions: const InteractionOptions(
               flags: InteractiveFlag.all,
             ),
@@ -428,7 +457,16 @@ class _StationMapLayersState extends State<StationMapLayers> {
               ZoomButton(
                 icon: Icons.add,
                 onPressed: () {
-                  final z = widget.mapController.camera.zoom + 1;
+                  // #1457 — clamp to [_kMinZoom, _kMaxZoom]. Without
+                  // the clamp, a + tap at the cap silently no-ops AND
+                  // pushes the camera to a zoom level with no tiles
+                  // (the user sees a grey screen and assumes the button
+                  // is broken). The clamp turns it into a graceful
+                  // no-op AT the cap — the visible feedback is "I'm
+                  // already at max zoom" instead of "the button is
+                  // dead".
+                  final z = (widget.mapController.camera.zoom + 1)
+                      .clamp(_kMinZoom, _kMaxZoom);
                   widget.mapController
                       .move(widget.mapController.camera.center, z);
                 },
@@ -437,7 +475,8 @@ class _StationMapLayersState extends State<StationMapLayers> {
               ZoomButton(
                 icon: Icons.remove,
                 onPressed: () {
-                  final z = widget.mapController.camera.zoom - 1;
+                  final z = (widget.mapController.camera.zoom - 1)
+                      .clamp(_kMinZoom, _kMaxZoom);
                   widget.mapController
                       .move(widget.mapController.camera.center, z);
                 },
