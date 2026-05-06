@@ -8270,6 +8270,12 @@ abstract class AppLocalizations {
   /// **'Open the active trip from the Conso tab'**
   String get tripBannerOpenFromConsumptionTab;
 
+  /// One-shot SnackBar shown the moment the user lands on the trip-recording screen with the pin toggle OFF (#1458 phase 2). Warns that without pinning, Android may suspend or throttle GPS while the screen sleeps and the captured path will show gaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin the screen to keep GPS active during the trip — Android may throttle GPS during sleep.'**
+  String get tripRecordingUnpinnedWarning;
+
   /// Filter chip label that narrows the unified search list to fuel pumps only (#1116 phase 3c).
   ///
   /// In en, this message translates to:

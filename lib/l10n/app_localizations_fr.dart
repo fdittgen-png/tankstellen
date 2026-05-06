@@ -4564,6 +4564,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ouvrez le trajet actif depuis l\'onglet Conso';
 
   @override
+  String get tripRecordingUnpinnedWarning =>
+      'Épinglez l\'écran pour garder le GPS actif pendant le trajet — Android peut limiter le GPS en veille.';
+
+  @override
   String get unifiedFilterFuel => 'Carburant';
 
   @override

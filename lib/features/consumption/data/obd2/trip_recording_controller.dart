@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import '../../../../core/storage/hive_boxes.dart';
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../domain/entities/gps_sample_diagnostic.dart';
 import '../../domain/services/gear_inference.dart';
 import '../../domain/trip_recorder.dart';
 import '../trip_history_repository.dart';
@@ -336,6 +337,28 @@ class TripRecordingController {
   /// [TripHistoryEntry] at stop time.
   List<TripSample> get capturedSamples => List.unmodifiable(_capturedSamples);
 
+  /// Per-trip GPS cadence diagnostics buffer (#1458 phase 2). Appended
+  /// to by [recordGpsSampleDiagnostic] every time the provider's
+  /// position-stream listener fires; persisted onto the saved
+  /// [TripHistoryEntry] at stop time. Capped at
+  /// [_gpsSampleDiagnosticCap] so a forgotten recording can't eat
+  /// unbounded memory.
+  final List<GpsSampleDiagnostic> _gpsSampleDiagnostics =
+      <GpsSampleDiagnostic>[];
+
+  /// Cap on the GPS diagnostics buffer (#1458 phase 2). At ~1 Hz GPS
+  /// fix cadence the cap covers ~33 hours — comfortably above any
+  /// plausible single trip and well below the trip-detail JSON
+  /// size budget.
+  static const int _gpsSampleDiagnosticCap = 120000;
+
+  /// Read-only snapshot of the GPS cadence diagnostics buffer
+  /// (#1458 phase 2). The list is unmodifiable so callers can't
+  /// accidentally mutate the controller's state — the provider clones
+  /// it into the persisted [TripHistoryEntry] at stop time.
+  List<GpsSampleDiagnostic> get capturedGpsSampleDiagnostics =>
+      List.unmodifiable(_gpsSampleDiagnostics);
+
   /// Latest parsed values, keyed by PID command. Written by scheduler
   /// callbacks, read by [_emit] when assembling [TripLiveReading]. Not
   /// using a typed struct because most fields are optional doubles
@@ -519,6 +542,48 @@ class TripRecordingController {
   void updateGpsFix({double? latitude, double? longitude}) {
     _latestLatitude = latitude;
     _latestLongitude = longitude;
+  }
+
+  /// #1458 phase 2 — append one cadence-diagnostic record at [now]
+  /// with the given app [lifecycleState]. The provider calls this from
+  /// its position-stream listener immediately AFTER [updateGpsFix] so
+  /// the two streams stay aligned: the user-facing
+  /// [TripSample.latitude]/[TripSample.longitude] capture path is
+  /// unchanged, and the diagnostic is a strictly additive observation
+  /// of "did this fix arrive while the app was foreground or paused".
+  ///
+  /// The index assigned to the diagnostic is the buffer's length at
+  /// insertion time so it is monotonic per trip and stable across
+  /// process restarts (a forgotten recording that bumps into
+  /// [_gpsSampleDiagnosticCap] drops the OLDEST samples first — the
+  /// `index` field surfaces those gaps).
+  void recordGpsSampleDiagnostic({
+    required DateTime now,
+    required String lifecycleState,
+  }) {
+    final entry = GpsSampleDiagnostic(
+      timestamp: now,
+      lifecycleState: lifecycleState,
+      index: _gpsSampleDiagnostics.length,
+    );
+    _gpsSampleDiagnostics.add(entry);
+    if (_gpsSampleDiagnostics.length > _gpsSampleDiagnosticCap) {
+      // Drop the oldest slice — losing the early stretch is preferable
+      // to letting a forgotten overnight recording eat unbounded memory.
+      _gpsSampleDiagnostics.removeRange(
+        0,
+        _gpsSampleDiagnostics.length - _gpsSampleDiagnosticCap,
+      );
+    }
+  }
+
+  /// Exposed for tests: append a cadence diagnostic without going
+  /// through [recordGpsSampleDiagnostic]. Lets the provider tests
+  /// pre-seed a controller's buffer + drive [stop] end-to-end without
+  /// needing a real Geolocator stream.
+  @visibleForTesting
+  void debugCaptureGpsSampleDiagnostic(GpsSampleDiagnostic diagnostic) {
+    _gpsSampleDiagnostics.add(diagnostic);
   }
 
   /// Read-only snapshot of the most recent GPS latitude pushed in via

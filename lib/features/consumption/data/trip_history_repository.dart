@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
+import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/trip_recorder.dart';
 
 /// One finalised trip as shown in the Trip history list (#726).
@@ -58,6 +59,16 @@ class TripHistoryEntry {
   /// migrate the trip-history schema again.
   final String? adapterFirmware;
 
+  /// Per-sample GPS cadence diagnostics captured under phone-sleep
+  /// conditions (#1458 phase 2). Records the wall-clock timestamp and
+  /// app-lifecycle state at every position fix, plus a monotonic index
+  /// — lets a future diagnostics sheet (or a power user inspecting
+  /// the persisted entry) reconstruct exactly when the OS throttled or
+  /// paused the GPS stream during an unpinned recording. Empty for
+  /// trips recorded before #1458 phase 2 landed and for trips whose
+  /// `Feature.gpsTripPath` flag was off at recording start.
+  final List<GpsSampleDiagnostic> gpsSampleDiagnostics;
+
   const TripHistoryEntry({
     required this.id,
     required this.vehicleId,
@@ -67,6 +78,7 @@ class TripHistoryEntry {
     this.adapterMac,
     this.adapterName,
     this.adapterFirmware,
+    this.gpsSampleDiagnostics = const [],
   });
 
   Map<String, dynamic> toJson() => {
@@ -84,6 +96,14 @@ class TripHistoryEntry {
         if (adapterMac != null) 'adapterMac': adapterMac,
         if (adapterName != null) 'adapterName': adapterName,
         if (adapterFirmware != null) 'adapterFirmware': adapterFirmware,
+        // #1458 phase 2 — GPS cadence diagnostics. Compact key 'gpsd'
+        // keeps the per-trip JSON tight; emitted only when at least one
+        // diagnostic was recorded so legacy trips and flag-off trips
+        // round-trip unchanged.
+        if (gpsSampleDiagnostics.isNotEmpty)
+          'gpsd': gpsSampleDiagnostics
+              .map((d) => d.toJson())
+              .toList(growable: false),
       };
 
   static TripHistoryEntry fromJson(Map<String, dynamic> json) =>
@@ -106,6 +126,15 @@ class TripHistoryEntry {
         adapterMac: json['adapterMac'] as String?,
         adapterName: json['adapterName'] as String?,
         adapterFirmware: json['adapterFirmware'] as String?,
+        // #1458 phase 2 — GPS cadence diagnostics. Missing key →
+        // empty list so trips recorded before this PR (and flag-off
+        // trips that never recorded a diagnostic) deserialise cleanly.
+        gpsSampleDiagnostics: (json['gpsd'] as List?)
+                ?.map((e) => GpsSampleDiagnostic.fromJson(
+                      (e as Map).cast<String, dynamic>(),
+                    ))
+                .toList(growable: false) ??
+            const [],
       );
 }
 

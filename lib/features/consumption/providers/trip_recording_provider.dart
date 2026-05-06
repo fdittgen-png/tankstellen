@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -32,6 +32,7 @@ import '../data/obd2/trip_recording_controller.dart';
 import 'obd2_breadcrumb_provider.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/cold_start_baselines.dart';
+import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/situation_classifier.dart';
 import '../domain/trip_recorder.dart';
 import 'haptic_feedback_policy.dart';
@@ -94,6 +95,16 @@ class TripRecording extends _$TripRecording {
   String? _adapterMac;
   String? _adapterName;
   String? _adapterFirmware;
+
+  // #1458 phase 2 — most recent app lifecycle state observed by the
+  // wiring layer's [WidgetsBindingObserver]. Read by the GPS stream
+  // listener every time a position fix arrives so the resulting
+  // [GpsSampleDiagnostic] carries an accurate "was the phone awake?"
+  // tag. Defaults to `resumed` so the very first sample on a freshly
+  // started recording (where no lifecycle event has fired yet) is
+  // tagged optimistically — the user just tapped Start, the app is
+  // certainly foreground.
+  AppLifecycleState _lifecycleState = AppLifecycleState.resumed;
 
   /// Tests count haptic fires via these instead of hooking the
   /// platform channel. The production path also still calls
@@ -693,6 +704,14 @@ class TripRecording extends _$TripRecording {
     // the controller — without this the trip-detail charts render the
     // "No samples recorded" empty state on every saved trip (#1040).
     final capturedSamples = List<TripSample>.unmodifiable(ctl.capturedSamples);
+    // #1458 phase 2 — snapshot the GPS cadence diagnostics buffer
+    // BEFORE the controller is torn down, same reason as the sample
+    // buffer above. Always captured (empty list when the GPS feature
+    // flag was off for this trip) so the persistence path stays
+    // unconditional and the JSON encoder elides the key when empty.
+    final capturedGpsDiagnostics = List<GpsSampleDiagnostic>.unmodifiable(
+      ctl.capturedGpsSampleDiagnostics,
+    );
     final summary = await ctl.stop();
     final odometerStartKm = ctl.odometerStartKm;
     final odometerLatestKm = ctl.odometerLatestKm;
@@ -714,6 +733,7 @@ class TripRecording extends _$TripRecording {
     await _saveToHistory(
       summary,
       samples: capturedSamples,
+      gpsSampleDiagnostics: capturedGpsDiagnostics,
       automatic: automatic,
     );
     // #769 — flush learned baselines before releasing the service so
@@ -846,10 +866,22 @@ class TripRecording extends _$TripRecording {
         ),
       )
           .listen(
-        (pos) => ctl.updateGpsFix(
-          latitude: pos.latitude,
-          longitude: pos.longitude,
-        ),
+        (pos) {
+          ctl.updateGpsFix(
+            latitude: pos.latitude,
+            longitude: pos.longitude,
+          );
+          // #1458 phase 2 — record one cadence-diagnostic per fix so the
+          // user can see, post-trip, whether the OS kept delivering
+          // position updates while the phone was asleep / unpinned. The
+          // call is cheap (one allocation + one list append, capped) so
+          // it's safe on the hot path; the in-memory buffer is flushed
+          // onto the persisted [TripHistoryEntry] at trip-stop time.
+          ctl.recordGpsSampleDiagnostic(
+            now: DateTime.now(),
+            lifecycleState: _lifecycleState.name,
+          );
+        },
         onError: (Object error) {
           debugPrint('TripRecording GPS stream error: $error');
         },
@@ -1163,6 +1195,27 @@ class TripRecording extends _$TripRecording {
     await _flushActiveSnapshot(force: true);
   }
 
+  /// #1458 phase 2 — track every app-lifecycle transition so the GPS
+  /// diagnostic recorder knows whether each fix arrived while the
+  /// phone was foreground (`resumed`) or backgrounded (`paused` /
+  /// `inactive` / `hidden`). Wired in from the same
+  /// [WidgetsBindingObserver] that fires [onAppBackgrounded] so the
+  /// two hooks stay in lock-step. Cheap (a single field write) so it's
+  /// safe to fire on every transition regardless of recording state —
+  /// reading [_lifecycleState] from the GPS stream listener is then a
+  /// pure local read.
+  void onAppLifecycleStateChanged(AppLifecycleState state) {
+    _lifecycleState = state;
+  }
+
+  /// Exposed for tests — reads back the most recent lifecycle state
+  /// pushed in via [onAppLifecycleStateChanged]. Lets a test verify
+  /// that a diagnostic was tagged with the right state at the moment
+  /// the GPS fix arrived without depending on platform-channel
+  /// plumbing.
+  @visibleForTesting
+  AppLifecycleState get debugLifecycleState => _lifecycleState;
+
   /// Surface the recovered snapshot from a previous cold-start
   /// recovery walk. Phase 2 of #1303: hands the user back into a
   /// `pausedDueToDrop`-shaped state with their captured samples
@@ -1293,6 +1346,7 @@ class TripRecording extends _$TripRecording {
     TripSummary summary, {
     bool automatic = false,
     List<TripSample> samples = const [],
+    List<GpsSampleDiagnostic> gpsSampleDiagnostics = const [],
   }) async {
     // Skip empty trips — the user tapped Stop without any usable
     // sample, or the service disconnected immediately. No signal, no
@@ -1315,6 +1369,10 @@ class TripRecording extends _$TripRecording {
         adapterMac: _adapterMac,
         adapterName: _adapterName,
         adapterFirmware: _adapterFirmware,
+        // #1458 phase 2 — GPS cadence diagnostics captured during
+        // recording. Empty when the GPS feature flag was off for this
+        // trip; the entry's JSON serialiser elides the key in that case.
+        gpsSampleDiagnostics: gpsSampleDiagnostics,
       ));
       ref.read(tripHistoryListProvider.notifier).refresh();
       // Phase 5 (#1004): bump the launcher-icon badge so the user sees

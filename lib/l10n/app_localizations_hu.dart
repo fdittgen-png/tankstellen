@@ -4517,6 +4517,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Open the active trip from the Conso tab';
 
   @override
+  String get tripRecordingUnpinnedWarning =>
+      'Pin the screen to keep GPS active during the trip — Android may throttle GPS during sleep.';
+
+  @override
   String get unifiedFilterFuel => 'Fuel';
 
   @override

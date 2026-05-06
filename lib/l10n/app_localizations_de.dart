@@ -4557,6 +4557,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aktive Fahrt aus dem Verbrauchs-Tab öffnen';
 
   @override
+  String get tripRecordingUnpinnedWarning =>
+      'Bildschirm anpinnen, damit das GPS während der Fahrt aktiv bleibt — Android kann das GPS im Ruhezustand drosseln.';
+
+  @override
   String get unifiedFilterFuel => 'Kraftstoff';
 
   @override

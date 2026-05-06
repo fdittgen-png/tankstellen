@@ -59,6 +59,18 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
+    // #1458 phase 2 — push every lifecycle transition into the trip
+    // provider so the GPS sampling diagnostics recorder can tag each
+    // fix with the right state. Cheap (single field write) so always
+    // fire regardless of recording state.
+    try {
+      ref
+          .read(tripRecordingProvider.notifier)
+          .onAppLifecycleStateChanged(state);
+    } catch (e, st) {
+      debugPrint(
+          'TankstellenApp: onAppLifecycleStateChanged failed: $e\n$st');
+    }
     if (state != AppLifecycleState.paused &&
         state != AppLifecycleState.inactive) {
       return;
