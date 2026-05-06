@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/driving_insights_analyzer.dart';
 import 'package:tankstellen/features/consumption/domain/driving_insight.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/trip_detail_charts.dart';
 
 /// Pure-logic tests for the driving-insights analyzer (#1041 phase 1).
 ///
@@ -308,6 +309,110 @@ void main() {
       expect(a, equals(b));
       expect(a.hashCode, b.hashCode);
       expect(a, isNot(equals(c)));
+    });
+  });
+
+  group('hardAccelSampleIndices (#1458 phase 1)', () {
+    final start = DateTime.utc(2026);
+
+    TripDetailSample sample({
+      required int sec,
+      required double speedKmh,
+    }) =>
+        TripDetailSample(
+          timestamp: start.add(Duration(seconds: sec)),
+          speedKmh: speedKmh,
+        );
+
+    test('empty samples → empty list', () {
+      expect(hardAccelSampleIndices(const []), isEmpty);
+    });
+
+    test('single sample → empty list (no Δt to derive accel)', () {
+      expect(
+        hardAccelSampleIndices([sample(sec: 0, speedKmh: 0)]),
+        isEmpty,
+      );
+    });
+
+    test('two samples at constant speed → no events', () {
+      final samples = [
+        sample(sec: 0, speedKmh: 50),
+        sample(sec: 1, speedKmh: 50),
+      ];
+      expect(hardAccelSampleIndices(samples), isEmpty);
+    });
+
+    test('two samples crossing the threshold → index 1 reported', () {
+      // 0 → 50 km/h in 2 s: dv = 50/3.6 ≈ 13.89 m/s, accel ≈ 6.94 m/s²,
+      // well above the 3.0 m/s² threshold.
+      final samples = [
+        sample(sec: 0, speedKmh: 0),
+        sample(sec: 2, speedKmh: 50),
+      ];
+      expect(hardAccelSampleIndices(samples), [1]);
+    });
+
+    test(
+        'five samples with one accel event in the middle → only that index '
+        'is reported', () {
+      // Indices and segments:
+      //   0 → 1: 30 → 32 km/h over 1 s → accel ≈ 0.56 m/s² (below).
+      //   1 → 2: 32 → 80 km/h over 1 s → accel ≈ 13.33 m/s² (above).
+      //   2 → 3: 80 → 82 km/h over 1 s → accel ≈ 0.56 m/s² (below).
+      //   3 → 4: 82 → 80 km/h over 1 s → DECEL (negative, ignored).
+      // Only index 2 (the end of the middle interval) trips the
+      // threshold.
+      final samples = [
+        sample(sec: 0, speedKmh: 30),
+        sample(sec: 1, speedKmh: 32),
+        sample(sec: 2, speedKmh: 80),
+        sample(sec: 3, speedKmh: 82),
+        sample(sec: 4, speedKmh: 80),
+      ];
+      expect(hardAccelSampleIndices(samples), [2]);
+    });
+
+    test('intervals with dt == 0 are skipped (no spurious events)', () {
+      // Duplicate timestamps at sec=1 — the second pair has a huge
+      // speed delta but dt = 0, so the analyzer must NOT emit an event
+      // there. The genuine accel between sec=1 and sec=3 still fires.
+      final samples = [
+        sample(sec: 0, speedKmh: 0),
+        sample(sec: 1, speedKmh: 0),
+        sample(sec: 1, speedKmh: 80), // dt = 0 — must be skipped
+        sample(sec: 3, speedKmh: 80),
+      ];
+      // After internal sort by timestamp the dup-timestamp pair stays
+      // adjacent; only the (1s, 0) → (1s, 80) interval has dt == 0 and
+      // is skipped. The other intervals are below threshold.
+      expect(hardAccelSampleIndices(samples), isEmpty);
+    });
+
+    test(
+        'samples passed in reverse timestamp order are sorted internally '
+        'before detection', () {
+      // Same single-event setup as the two-sample test, but the caller
+      // hands the samples in REVERSE order. The helper must sort
+      // internally and still report the event at the post-sort index 1.
+      final samples = [
+        sample(sec: 2, speedKmh: 50),
+        sample(sec: 0, speedKmh: 0),
+      ];
+      expect(hardAccelSampleIndices(samples), [1]);
+    });
+
+    test('caller is not mutated when samples arrive out of order', () {
+      // Defensive contract — the helper must copy before sorting so
+      // the caller's list keeps its original order. Mirrors the same
+      // safety [analyzeTrip] provides.
+      final original = [
+        sample(sec: 2, speedKmh: 50),
+        sample(sec: 0, speedKmh: 0),
+      ];
+      final snapshot = List<TripDetailSample>.from(original);
+      hardAccelSampleIndices(original);
+      expect(original, snapshot);
     });
   });
 }

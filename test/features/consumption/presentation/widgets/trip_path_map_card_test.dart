@@ -280,6 +280,50 @@ void main() {
       expect(layer.polylines, isEmpty);
     });
 
+    testWidgets(
+        'hard-acceleration events render bolt markers on top of the heatmap',
+        (tester) async {
+      // Two hard-accel events: 0 → 60 km/h in 1 s (≈ 16.67 m/s²) at the
+      // 0 → 1 boundary, and 30 → 80 km/h in 1 s (≈ 13.89 m/s²) at the
+      // 4 → 5 boundary. Both well above the 3.0 m/s² threshold. The
+      // segments between them stay calm so no other event fires.
+      final samples = [
+        _sample(sec: 0, lat: 43.40, lng: 3.40, speed: 0),
+        _sample(sec: 1, lat: 43.41, lng: 3.41, speed: 60), // hard accel #1
+        _sample(sec: 2, lat: 43.42, lng: 3.42, speed: 60),
+        _sample(sec: 3, lat: 43.43, lng: 3.43, speed: 60),
+        _sample(sec: 4, lat: 43.44, lng: 3.44, speed: 30),
+        _sample(sec: 5, lat: 43.45, lng: 3.45, speed: 80), // hard accel #2
+        _sample(sec: 6, lat: 43.46, lng: 3.46, speed: 80),
+      ];
+
+      await pumpApp(tester, TripPathMapCard(samples: samples));
+
+      // Two bolt icons — one per detected event.
+      expect(find.byIcon(Icons.bolt), findsNWidgets(2));
+
+      // Regression guard: the start (play_arrow) and end (flag) pins
+      // are still rendered alongside the bolt overlays.
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      expect(find.byIcon(Icons.flag), findsOneWidget);
+    });
+
+    testWidgets('no hard-acceleration events → no bolt markers',
+        (tester) async {
+      // Constant-speed cruise — analyzer reports zero events.
+      final samples = [
+        _sample(sec: 0, lat: 43.40, lng: 3.40, speed: 60),
+        _sample(sec: 1, lat: 43.41, lng: 3.41, speed: 60),
+        _sample(sec: 2, lat: 43.42, lng: 3.42, speed: 60),
+      ];
+
+      await pumpApp(tester, TripPathMapCard(samples: samples));
+
+      expect(find.byIcon(Icons.bolt), findsNothing);
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      expect(find.byIcon(Icons.flag), findsOneWidget);
+    });
+
     testWidgets('legend renders the three bucket labels', (tester) async {
       // The legend must surface all three colour buckets so a user
       // can decode the heatmap without referring to docs.
