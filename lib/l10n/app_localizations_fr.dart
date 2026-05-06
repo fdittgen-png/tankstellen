@@ -3962,6 +3962,30 @@ class AppLocalizationsFr extends AppLocalizations {
       'Désactivé, les badges, scores et trophées sont masqués dans toute l\'app.';
 
   @override
+  String get gpsDiagnosticsTitle => 'Diagnostic d\'échantillonnage GPS';
+
+  @override
+  String gpsDiagnosticsHeader(String count, String span, int gaps) {
+    String _temp0 = intl.Intl.pluralLogic(
+      gaps,
+      locale: localeName,
+      other: '$gaps lacunes',
+      one: '1 lacune',
+      zero: 'aucune lacune',
+    );
+    return '$count échantillons · $span · $_temp0';
+  }
+
+  @override
+  String gpsDiagnosticsCadence(int ms) {
+    return 'Intervalle médian : $ms ms';
+  }
+
+  @override
+  String get gpsDiagnosticsExplain =>
+      'Capturé pendant l\'enregistrement pour vérifier la cadence GPS en veille.';
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Driving';
 
   @override

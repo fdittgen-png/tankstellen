@@ -1233,5 +1233,21 @@
   "pickerHelpText": "Pré-remplir depuis 50+ véhicules pris en charge",
   "pickerEmptyResults": "Aucun résultat",
   "pickerCancel": "Annuler",
-  "pickerLoading": "Chargement du catalogue…"
+  "pickerLoading": "Chargement du catalogue…",
+  "gpsDiagnosticsTitle": "Diagnostic d'échantillonnage GPS",
+  "gpsDiagnosticsHeader": "{count} échantillons · {span} · {gaps, plural, =0{aucune lacune} =1{1 lacune} other{{gaps} lacunes}}",
+  "@gpsDiagnosticsHeader": {
+    "placeholders": {
+      "count": {"type": "String"},
+      "span": {"type": "String"},
+      "gaps": {"type": "int"}
+    }
+  },
+  "gpsDiagnosticsCadence": "Intervalle médian : {ms} ms",
+  "@gpsDiagnosticsCadence": {
+    "placeholders": {
+      "ms": {"type": "int"}
+    }
+  },
+  "gpsDiagnosticsExplain": "Capturé pendant l'enregistrement pour vérifier la cadence GPS en veille."
 }

@@ -3919,6 +3919,30 @@ class AppLocalizationsDa extends AppLocalizations {
       'When off, badges, scores and trophy icons are hidden across the app.';
 
   @override
+  String get gpsDiagnosticsTitle => 'GPS sampling diagnostics';
+
+  @override
+  String gpsDiagnosticsHeader(String count, String span, int gaps) {
+    String _temp0 = intl.Intl.pluralLogic(
+      gaps,
+      locale: localeName,
+      other: '$gaps gaps',
+      one: '1 gap',
+      zero: 'no gaps',
+    );
+    return '$count samples · $span · $_temp0';
+  }
+
+  @override
+  String gpsDiagnosticsCadence(int ms) {
+    return 'Median interval: $ms ms';
+  }
+
+  @override
+  String get gpsDiagnosticsExplain =>
+      'Captured during recording to verify GPS cadence under phone-sleep.';
+
+  @override
   String get hapticEcoCoachSectionTitle => 'Driving';
 
   @override

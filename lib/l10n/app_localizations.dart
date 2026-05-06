@@ -7214,6 +7214,30 @@ abstract class AppLocalizations {
   /// **'When off, badges, scores and trophy icons are hidden across the app.'**
   String get profileGamificationToggleSubtitle;
 
+  /// Title of the read-only GPS sample diagnostics card on the Trip detail screen — surfaces the cadence + lifecycle-state info captured by #1458 phase 2 so the user can verify that the OS did not throttle the GPS stream during phone-sleep, ahead of deciding whether phase 3 (foreground service) is needed.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS sampling diagnostics'**
+  String get gpsDiagnosticsTitle;
+
+  /// Collapsed-header summary line of the GPS diagnostics card (#1458 phase 2.5). At-a-glance triple: total sample count, total trip time span, and the number of GPS gaps detected (intervals at least 3x the median). count and span are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} samples · {span} · {gaps, plural, =0{no gaps} =1{1 gap} other{{gaps} gaps}}'**
+  String gpsDiagnosticsHeader(String count, String span, int gaps);
+
+  /// Expanded-body line on the GPS diagnostics card (#1458 phase 2.5) showing the median sample-to-sample interval (rounded to 100ms). A healthy ~1000ms median says the OS is not throttling; a 5000ms+ median means the GPS stream paused during sleep.
+  ///
+  /// In en, this message translates to:
+  /// **'Median interval: {ms} ms'**
+  String gpsDiagnosticsCadence(int ms);
+
+  /// Subtle one-line explanation at the bottom of the GPS diagnostics card (#1458 phase 2.5) reminding the user why this card exists — they probably opened the trip detail to look at consumption, not GPS plumbing.
+  ///
+  /// In en, this message translates to:
+  /// **'Captured during recording to verify GPS cadence under phone-sleep.'**
+  String get gpsDiagnosticsExplain;
+
   /// Section header on the Settings screen grouping wheel-lens (driving-behaviour) settings (#1122).
   ///
   /// In en, this message translates to:

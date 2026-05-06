@@ -1,0 +1,34 @@
+{
+  "gpsDiagnosticsTitle": "GPS-Abtastungsdiagnose",
+  "@gpsDiagnosticsTitle": {
+    "description": "Title of the read-only GPS sample diagnostics card on the Trip detail screen (#1458 phase 2.5)."
+  },
+  "gpsDiagnosticsHeader": "{count} Messpunkte · {span} · {gaps, plural, =0{keine Lücken} =1{1 Lücke} other{{gaps} Lücken}}",
+  "@gpsDiagnosticsHeader": {
+    "description": "Collapsed-header summary line of the GPS diagnostics card (#1458 phase 2.5).",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "span": {
+        "type": "String"
+      },
+      "gaps": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsDiagnosticsCadence": "Median-Intervall: {ms} ms",
+  "@gpsDiagnosticsCadence": {
+    "description": "Expanded-body line on the GPS diagnostics card (#1458 phase 2.5).",
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsDiagnosticsExplain": "Wird während der Aufzeichnung erfasst, um die GPS-Abtastung im Standby-Modus zu prüfen.",
+  "@gpsDiagnosticsExplain": {
+    "description": "Subtle one-line explanation at the bottom of the GPS diagnostics card (#1458 phase 2.5)."
+  }
+}
