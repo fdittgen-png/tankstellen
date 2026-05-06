@@ -79,6 +79,7 @@ docs/*
 !docs/screenshots/
 !docs/design/
 !docs/security/
+!docs/feature-concepts/
 docs/guides/*
 !docs/guides/NETWORK_TESTS.md
 !docs/guides/NEW_COUNTRY.md
