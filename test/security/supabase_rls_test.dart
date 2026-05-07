@@ -114,6 +114,12 @@ void main() {
     'obd2_baselines': {
       'obd2_baselines_own': 'ALL',
     },
+    'trip_summaries': {
+      'trip_summaries_own': 'ALL',
+    },
+    'trip_details': {
+      'trip_details_own': 'ALL',
+    },
     'wait_time_pings': {
       'wait_time_pings_own': 'ALL',
     },
