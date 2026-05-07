@@ -64,6 +64,8 @@ Legend:
 | `vehicles`         | own          | own             | own        | own                | Single `vehicles_own` `FOR ALL`. |
 | `fill_ups`         | own          | own             | own        | own                | Single `fill_ups_own` `FOR ALL`. |
 | `obd2_baselines`   | own          | own             | own        | own                | Single `obd2_baselines_own` `FOR ALL`. |
+| `trip_summaries`   | own          | own             | own        | own                | Single `trip_summaries_own` `FOR ALL`. |
+| `trip_details`     | own          | own             | own        | own                | Single `trip_details_own` `FOR ALL`.   |
 | `wait_time_pings`  | own          | own             | own        | own                | Single `wait_time_pings_own` `FOR ALL`. Aggregator runs as service_role and bypasses RLS. |
 | `wait_time_aggregates` | all      | (svc)           | (svc)      | (svc)              | Single `wait_aggregates_read` SELECT-only policy. Anonymized rolling-median rows are visible to every authenticated client; only Edge Functions write. |
 
@@ -87,6 +89,7 @@ The migration source-of-truth lives in `supabase/migrations/`:
   `wait_time_aggregates` (#1119).
 - `20260506000002_wait_time_aggregator_schedule.sql` — schedule only,
   service-role-driven, no public-table RLS change.
+- `20260507000001_trip_summaries_and_details.sql` — `trip_summaries`, `trip_details`.
 
 If a migration not listed above is found in `supabase/migrations/`,
 this matrix is stale. See "How to update" below.
