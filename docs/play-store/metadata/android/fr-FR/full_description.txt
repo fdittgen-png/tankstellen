@@ -1,0 +1,39 @@
+Trouvez les prix carburants et bornes de recharge EV les moins chers autour de vous, dans 17 pays — en temps réel, gratuit, sans compte, sans publicité. Indépendant et open source.
+
+POURQUOI CETTE APPLI
+• Prix en temps réel issus de partenaires open-data officiels — pas d'estimations crowdsourcées.
+• 17 pays, une recherche unifiée — essence, gazole, GPL, GNV, E85 et bornes EV sur la même carte.
+• Pensé pour les conducteurs qui ne veulent pas y penser : appairez votre adaptateur OBD2 une fois et les trajets s'enregistrent tout seuls.
+• Vie privée avant tout : aucune donnée personnelle ne quitte l'appareil, aucune inférence en ligne, suppression complète des données en un seul tap.
+
+FONCTIONNALITÉS PRINCIPALES
+• Recherche par position actuelle, adresse ou rayon favori — triée par meilleur prix pour votre carburant.
+• Carte avec le pin du moins cher mis en évidence, plus le détail complet de la station (horaires, marque, paiement, distance).
+• Historique local des prix sur 30 jours avec prédicteur « meilleur moment pour faire le plein » et ajustements jours fériés.
+• Alertes prix : station unique ou par rayon, avec évaluateurs respectueux du consentement qui ne tournent qu'à proximité.
+• Favoris, suggestion d'économies transfrontalières (ex. FR → DE / DE → CZ), widget écran d'accueil, annonce vocale pendant la conduite.
+
+CONDUITE
+• Enregistrement de trajet OBD2 — appairez un adaptateur compatible ELM327 une seule fois, l'appli enregistre chaque trajet de bout en bout.
+• Auto-enregistrement mains libres (optionnel) : les trajets démarrent au démarrage moteur et se sauvegardent à la déconnexion. Un badge sur l'icône signale les nouveaux auto-enregistrements à consulter.
+• Analyse de conduite avec marqueurs d'accélérations fortes sur la carte du trajet, histogrammes RPM/accélérateur, conseils éco-conduite.
+• Suivi de consommation, rappels d'entretien, sauvegarde/restauration complète.
+
+PAYS PRIS EN CHARGE (données temps réel)
+Allemagne, Argentine, Australie, Autriche, Chili, Corée du Sud, Danemark, Espagne, France, Grèce, Italie, Luxembourg, Mexique, Portugal, Roumanie, Royaume-Uni, Slovénie.
+
+RECHARGE EV
+Intégration Open Charge Map — chaque borne publique apparaît à côté des pompes dans la recherche unifiée, avec type de prise / puissance dans le détail.
+
+LANGUES
+23 langues d'interface : allemand, anglais, bulgare, croate, danois, espagnol, estonien, finnois, français, grec, hongrois, italien, letton, lituanien, néerlandais, norvégien (bokmål), polonais, portugais, roumain, slovaque, slovène, suédois, tchèque.
+
+VERSION SANS GMS
+Un build F-Droid distinct, sans Google Mobile Services, est disponible pour les utilisateurs d'Android dégooglisé.
+
+DOCUMENTATION + COMMUNAUTÉ
+Le manuel utilisateur complet, la FAQ, la matrice de compatibilité des adaptateurs et la doc contributeur vivent sur le wiki du projet :
+https://github.com/fdittgen-png/tankstellen/wiki
+
+L'appli est open source — tickets et contributions bienvenus sur :
+https://github.com/fdittgen-png/tankstellen

@@ -1,0 +1,5 @@
+• Recherche unifiée carburant + recharge EV
+• Auto-enregistrement OBD2 mains libres avec badge sur l'icône
+• Marqueurs d'accélérations fortes sur la carte du trajet
+• Historique des prix 30 jours avec prédicteur « meilleur moment »
+• 17 pays, 23 langues

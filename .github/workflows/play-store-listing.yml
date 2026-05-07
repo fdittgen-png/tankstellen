@@ -1,0 +1,156 @@
+name: Play Store listing
+
+# Pushes the metadata + screenshots under docs/play-store/ to the
+# Google Play Console without rebuilding the app. Defaults to the
+# `internal` track so a stale or wrong copy never accidentally lands on
+# production. To promote to production, dispatch manually with the
+# `track` input set to `production`.
+#
+# Triggers:
+# - workflow_dispatch (manual, with track + dry-run inputs)
+# - push to master that touches docs/play-store/metadata/** or
+#   docs/play-store/screenshots/published/** (auto-publishes to internal
+#   track only — never production from a push)
+#
+# Secret required:
+# - PLAY_STORE_JSON_KEY: base64-encoded contents of the Google Play
+#   Developer service-account JSON. Generated under Play Console →
+#   Setup → API access → service accounts.
+#
+# Companion: the `/play-store-shots` slash command syncs raw captures
+# from docs/play-store/screenshots/inbox/ into the canonical paths this
+# workflow uploads from.
+
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Play Console track to publish to'
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+        default: internal
+      dry_run:
+        description: 'Dry-run (validate only, no upload)'
+        type: boolean
+        default: false
+  push:
+    branches: [master]
+    paths:
+      - 'docs/play-store/metadata/**'
+      - 'docs/play-store/screenshots/published/**'
+
+concurrency:
+  group: play-store-listing
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Resolve track
+        id: track
+        run: |
+          set -euo pipefail
+          # Pushes to master always go to the safest track (internal);
+          # only an explicit workflow_dispatch can promote further.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "track=${{ inputs.track }}" >> "$GITHUB_OUTPUT"
+            echo "dry_run=${{ inputs.dry_run }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "track=internal" >> "$GITHUB_OUTPUT"
+            echo "dry_run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Decode service-account JSON
+        env:
+          PLAY_STORE_JSON_KEY: ${{ secrets.PLAY_STORE_JSON_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PLAY_STORE_JSON_KEY:-}" ]; then
+            echo "::error::PLAY_STORE_JSON_KEY secret is not set. Configure it under Settings → Secrets → Actions."
+            exit 1
+          fi
+          echo "$PLAY_STORE_JSON_KEY" | base64 -d > /tmp/play-store-key.json
+          echo "Decoded key — $(wc -c < /tmp/play-store-key.json) bytes."
+
+      - name: Validate metadata
+        run: |
+          set -euo pipefail
+          ROOT=docs/play-store/metadata/android
+          MISSING=0
+          for locale in en-US de-DE fr-FR; do
+            for f in title.txt short_description.txt full_description.txt changelogs/default.txt; do
+              path="$ROOT/$locale/$f"
+              if [ ! -f "$path" ]; then
+                echo "::error file=$path::missing required metadata file"
+                MISSING=1
+              fi
+            done
+          done
+          # Length budgets enforced client-side too — Play Console rejects but better to fail fast.
+          for locale in en-US de-DE fr-FR; do
+            t=$(wc -c < "$ROOT/$locale/title.txt")
+            s=$(wc -c < "$ROOT/$locale/short_description.txt")
+            l=$(wc -c < "$ROOT/$locale/full_description.txt")
+            (( t <= 31 ))   || { echo "::error::$locale title $t bytes > 30"; MISSING=1; }
+            (( s <= 81 ))   || { echo "::error::$locale short $s bytes > 80"; MISSING=1; }
+            (( l <= 4001 )) || { echo "::error::$locale full $l bytes > 4000"; MISSING=1; }
+          done
+          [ "$MISSING" = "0" ]
+
+      - name: Mirror published screenshots into per-locale directories
+        run: |
+          set -euo pipefail
+          SRC=docs/play-store/screenshots/published
+          if [ ! -d "$SRC" ] || [ -z "$(ls -A $SRC 2>/dev/null | grep -v -E '^(\.gitkeep|README\.md)$')" ]; then
+            echo "No published screenshots — skipping screenshot upload (metadata-only run)."
+            exit 0
+          fi
+          for locale in en-US de-DE fr-FR; do
+            dst=docs/play-store/metadata/android/$locale/images/phoneScreenshots
+            mkdir -p "$dst"
+            # Convert canonical NN-name.png → fastlane NN_name.png
+            for src in "$SRC"/[0-9][0-9]-*.png; do
+              [ -f "$src" ] || continue
+              base=$(basename "$src")
+              renamed=$(echo "$base" | sed 's/^\([0-9][0-9]\)-/\1_/')
+              cp "$src" "$dst/$renamed"
+            done
+            echo "Mirrored $(ls $dst | wc -l) screenshots → $locale"
+          done
+
+      - name: Upload to Google Play
+        if: steps.track.outputs.dry_run != 'true'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: /tmp/play-store-key.json
+          packageName: de.tankstellen.fuelprices
+          track: ${{ steps.track.outputs.track }}
+          status: completed
+          changesNotSentForReview: false
+          # Metadata + screenshots only — no AAB upload here. AABs ship
+          # via the daily-beta + manual release workflows.
+          mappingFile: ''
+          whatsNewDirectory: ''  # changelogs live inside the metadata tree
+          releaseFiles: ''
+          metadataDirectory: docs/play-store/metadata
+
+      - name: Dry-run summary
+        if: steps.track.outputs.dry_run == 'true'
+        run: |
+          echo "::notice::Dry run — validated metadata + mirrored screenshots, did NOT upload."
+          echo "Would have uploaded to track: ${{ steps.track.outputs.track }}"
+
+      - name: Cleanup
+        if: always()
+        run: rm -f /tmp/play-store-key.json

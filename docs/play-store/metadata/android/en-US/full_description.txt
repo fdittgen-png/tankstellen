@@ -1,0 +1,39 @@
+Find the cheapest fuel and EV chargers around you in 17 countries — real-time, free, no account, no ads. Independent and open-source.
+
+WHY THIS APP
+• Real-time prices from official open-data partners — not crowdsourced guesses.
+• 17 countries supported, with one unified search that mixes petrol, diesel, LPG, CNG, e85 and EV charging stations on the same map.
+• Built for drivers who don't want to think about it: pair your OBD2 adapter once and trips record themselves.
+• Privacy-first: no PII leaves your device, no online inference, full data deletion in one tap.
+
+CORE FEATURES
+• Search by current location, address, or favourite radius — sorted by best price for your fuel type.
+• Map view with the cheapest pin highlighted, plus full station detail (opening hours, brand, payment, distance).
+• 30-day local price history with a "best time to fill" predictor and holiday-aware adjustments.
+• Price alerts: single station or radius, with consent-respecting evaluators that run only when you're nearby.
+• Favourites, cross-border savings hint (e.g. FR → DE / DE → CZ), home-screen widget, voice announcement during driving.
+
+DRIVING
+• OBD2 trip recording — pair an ELM327-compatible adapter once and the app records every trip end to end.
+• Hands-free auto-record (optional): trips start when the engine spins up and save themselves on disconnect. A launcher badge tells you new auto-recordings are waiting.
+• Driving insights with hard-acceleration markers on the trip-detail map, RPM/throttle histograms, eco-coach hints.
+• Consumption tracker, maintenance reminders, full backup/restore.
+
+SUPPORTED COUNTRIES (real-time data)
+Austria, Argentina, Australia, Chile, Denmark, France, Germany, Greece, Italy, Luxembourg, Mexico, Portugal, Romania, Slovenia, South Korea, Spain, United Kingdom.
+
+EV CHARGING
+Open Charge Map integration — every public charger surfaces alongside fuel pumps in the unified search results, with connector/power info on the detail screen.
+
+LANGUAGES
+23 UI languages: Bulgarian, Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, German, Greek, Hungarian, Italian, Latvian, Lithuanian, Norwegian Bokmål, Polish, Portuguese, Romanian, Slovak, Slovenian, Spanish, Swedish.
+
+GMS-FREE
+A separate F-Droid build is available with no Google Mobile Services dependency, for users who run de-Googled Android variants.
+
+DOCUMENTATION + COMMUNITY
+The full user manual, FAQ, supported-adapter matrix, and contributor docs live on the project wiki:
+https://github.com/fdittgen-png/tankstellen/wiki
+
+The app is open source — issues and contributions welcome at:
+https://github.com/fdittgen-png/tankstellen
