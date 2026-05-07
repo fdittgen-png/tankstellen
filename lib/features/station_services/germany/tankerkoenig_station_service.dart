@@ -9,7 +9,7 @@ import '../../../core/services/station_service.dart';
 import 'tankerkoenig_batch_price_fetcher.dart';
 
 // Key für den Zugriff auf die freie Tankerkönig-Spritpreis-API
-// Für eigenen Key bitte hier https://creativecommons.tankerkoenig.de
+// Für eigenen Key bitte hier https://onboarding.tankerkoenig.de
 // registrieren.
 //
 // Compliance notes (#713):

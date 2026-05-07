@@ -15,7 +15,7 @@ const _germany = CountryConfig(
   postalCodeLabel: 'PLZ',
   requiresApiKey: true,
   apiProvider: 'Tankerkoenig',
-  apiKeyRegistrationUrl: 'https://creativecommons.tankerkoenig.de/',
+  apiKeyRegistrationUrl: 'https://onboarding.tankerkoenig.de/',
 );
 
 const _germanyNoUrl = CountryConfig(

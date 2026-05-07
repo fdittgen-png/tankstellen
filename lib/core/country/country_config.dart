@@ -86,7 +86,7 @@ class Countries {
     postalCodeRegex: r'^\d{5}$',
     postalCodeLabel: 'PLZ',
     requiresApiKey: true,
-    apiKeyRegistrationUrl: 'https://creativecommons.tankerkoenig.de/',
+    apiKeyRegistrationUrl: 'https://onboarding.tankerkoenig.de/',
     apiProvider: 'Tankerkönig',
     attribution: 'Daten von Tankerkoenig.de (CC BY 4.0)',
     fuelTypes: ['Super E5', 'Super E10', 'Diesel'],

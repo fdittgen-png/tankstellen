@@ -19,7 +19,7 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
   static String? _apiKeyCache;
 
   // Key für den Zugriff auf die freie Tankerkönig-Spritpreis-API
-  // Für eigenen Key bitte hier https://creativecommons.tankerkoenig.de
+  // Für eigenen Key bitte hier https://onboarding.tankerkoenig.de
   // registrieren.
   //
   // The Tankerkönig terms of service (#713) forbid publishing any API key
