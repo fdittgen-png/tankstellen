@@ -114,7 +114,7 @@ GeocodingChain geocodingChain(Ref ref) {
 // ---------------------------------------------------------------------------
 
 // Key für den Zugriff auf die freie Tankerkönig-Spritpreis-API
-// Für eigenen Key bitte hier https://creativecommons.tankerkoenig.de
+// Für eigenen Key bitte hier https://onboarding.tankerkoenig.de
 // registrieren.
 class _ApiKeyInterceptor extends Interceptor {
   final Ref _ref;

@@ -119,9 +119,14 @@ class AboutSection extends StatelessWidget {
           ),
           const Divider(height: 1),
           // Attributions
-          const ListTile(
-            leading: Icon(Icons.data_usage),
-            title: Text(AppConstants.tankerkoenigAttribution),
+          ListTile(
+            leading: const Icon(Icons.data_usage),
+            title: const Text(AppConstants.tankerkoenigAttribution),
+            trailing: const Icon(Icons.open_in_new, size: 18),
+            onTap: () => launchUrl(
+              Uri.parse(AppConstants.tankerkoenigCreativeCommonsUrl),
+              mode: LaunchMode.externalApplication,
+            ),
           ),
           const ListTile(
             leading: Icon(Icons.map),

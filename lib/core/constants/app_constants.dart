@@ -38,7 +38,14 @@ class AppConstants {
   static const String osmAttribution =
       '\u00a9 OpenStreetMap contributors';
 
+  /// Where the user requests a personal Tankerk\u00f6nig API key.
   static const String tankerkoenigRegistrationUrl =
+      'https://onboarding.tankerkoenig.de/';
+
+  /// Where the [tankerkoenigAttribution] string points \u2014 the project's
+  /// CC BY 4.0 page that documents the data licence + how the dataset
+  /// is built. Linked from the about / parameters screen.
+  static const String tankerkoenigCreativeCommonsUrl =
       'https://creativecommons.tankerkoenig.de/';
 
   static const String privacyPolicyUrl =

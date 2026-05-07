@@ -67,5 +67,46 @@ void main() {
       expect(find.text('PayPal'), findsOneWidget);
       expect(find.text('Revolut'), findsOneWidget);
     });
+
+    testWidgets(
+        'Tankerkoenig attribution row is tappable + carries the open-in-new affordance',
+        (tester) async {
+      // Per #1473 the attribution must link to the CC BY 4.0 page so a
+      // user reading "Daten von Tankerkoenig.de" on the Parameters
+      // screen can jump to the licence + dataset documentation.
+      await pumpApp(
+        tester,
+        const SingleChildScrollView(child: AboutSection()),
+      );
+
+      final tile = tester.widget<ListTile>(
+        find.ancestor(
+          of: find.text(AppConstants.tankerkoenigAttribution),
+          matching: find.byType(ListTile),
+        ),
+      );
+      expect(tile.onTap, isNotNull,
+          reason: 'attribution row must launch the CC BY 4.0 page on tap');
+      expect(tile.trailing, isA<Icon>(),
+          reason: 'attribution row should carry the open-in-new affordance');
+    });
+
+    test('CreativeCommons URL constant is HTTPS and points at the CC BY page',
+        () {
+      expect(AppConstants.tankerkoenigCreativeCommonsUrl,
+          'https://creativecommons.tankerkoenig.de/');
+    });
+
+    test(
+        'Registration URL constant points at the onboarding host '
+        '(not the legacy creativecommons one)', () {
+      // The onboarding subdomain is the post-2026 home for new API
+      // key requests; creativecommons remains the licence/data page,
+      // covered by [tankerkoenigCreativeCommonsUrl].
+      expect(AppConstants.tankerkoenigRegistrationUrl,
+          'https://onboarding.tankerkoenig.de/');
+      expect(AppConstants.tankerkoenigRegistrationUrl,
+          isNot(contains('creativecommons')));
+    });
   });
 }
