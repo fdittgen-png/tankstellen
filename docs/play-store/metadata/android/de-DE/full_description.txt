@@ -1,0 +1,39 @@
+Finde die günstigsten Kraftstoffpreise und EV-Ladestationen in deiner Nähe – in 17 Ländern, in Echtzeit, kostenlos, ohne Konto und ohne Werbung. Unabhängig und Open Source.
+
+WARUM DIESE APP
+• Echtzeitpreise von offiziellen Open-Data-Partnern – keine Crowdsourcing-Schätzungen.
+• 17 Länder, eine vereinte Suche – Benzin, Diesel, LPG, CNG, E85 und EV-Ladesäulen auf derselben Karte.
+• Für Fahrer, die nicht ständig dran denken wollen: OBD2-Adapter einmal koppeln, dann zeichnet sich die Fahrt von selbst auf.
+• Datenschutz zuerst: keine personenbezogenen Daten verlassen das Gerät, keine Online-Inferenz, vollständige Datenlöschung mit einem Tipp.
+
+KERN-FEATURES
+• Suche nach aktuellem Standort, Adresse oder Lieblingsumkreis – sortiert nach bestem Preis für deine Kraftstoffsorte.
+• Kartenansicht mit dem günstigsten Pin hervorgehoben, plus vollständige Stationsdetails (Öffnungszeiten, Marke, Zahlung, Entfernung).
+• 30-Tage-Preisverlauf vor Ort mit „beste Tankzeit"-Vorhersage und Feiertagsanpassung.
+• Preisalarme: einzelne Station oder Umkreis, mit datenschutzkonformen Auswertern, die nur in der Nähe laufen.
+• Favoriten, Hinweis auf Grenzersparnis (z. B. FR → DE / DE → CZ), Homescreen-Widget, Sprachausgabe während der Fahrt.
+
+FAHREN
+• OBD2-Fahrtaufzeichnung – ELM327-kompatiblen Adapter einmal koppeln, dann zeichnet die App jede Fahrt vollständig auf.
+• Freihändige Auto-Aufzeichnung (optional): Fahrten starten beim Anlassen und speichern sich beim Trennen selbst. Ein Launcher-Badge zeigt dir neue Auto-Aufzeichnungen an.
+• Fahranalyse mit Markern für starke Beschleunigung auf der Fahrtkarte, Drehzahl-/Drosselklappen-Histogramme, Eco-Coach-Hinweise.
+• Verbrauchstracker, Wartungserinnerungen, vollständiges Backup/Restore.
+
+UNTERSTÜTZTE LÄNDER (Echtzeitdaten)
+Argentinien, Australien, Chile, Dänemark, Deutschland, Frankreich, Griechenland, Italien, Luxemburg, Mexiko, Österreich, Portugal, Rumänien, Slowenien, Spanien, Südkorea, Vereinigtes Königreich.
+
+EV-LADEN
+Open-Charge-Map-Integration – jede öffentliche Ladestation erscheint neben den Tankstellen in der vereinten Suche, mit Anschluss/Leistung im Detail.
+
+SPRACHEN
+23 UI-Sprachen: Bulgarisch, Dänisch, Deutsch, Englisch, Estnisch, Finnisch, Französisch, Griechisch, Italienisch, Kroatisch, Lettisch, Litauisch, Niederländisch, Norwegisch (Bokmål), Polnisch, Portugiesisch, Rumänisch, Schwedisch, Slowakisch, Slowenisch, Spanisch, Tschechisch, Ungarisch.
+
+GMS-FREI
+Ein separater F-Droid-Build ohne Google Mobile Services ist verfügbar – für Nutzer entgoogleter Android-Varianten.
+
+DOKUMENTATION + COMMUNITY
+Das vollständige Handbuch, FAQ, die Adapter-Kompatibilitätstabelle und die Mitwirkenden-Doku leben im Projekt-Wiki:
+https://github.com/fdittgen-png/tankstellen/wiki
+
+Die App ist Open Source – Tickets und Beiträge willkommen unter:
+https://github.com/fdittgen-png/tankstellen

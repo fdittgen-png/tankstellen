@@ -1,0 +1,5 @@
+• Unified fuel + EV search results
+• Hands-free OBD2 auto-record with launcher badge
+• Hard-acceleration markers on the trip-detail map
+• 30-day price history with best-time-to-fill predictor
+• 17 countries, 23 languages
