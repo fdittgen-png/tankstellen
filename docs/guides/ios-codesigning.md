@@ -101,6 +101,37 @@ bundle exec fastlane match development --force
 The first command registers the device with Apple; the second regenerates
 the development profile to include it.
 
+## CI auth — `MATCH_GIT_BASIC_AUTHORIZATION`
+
+CI on `macos-latest` doesn't have your local git credential helper, so it
+needs an explicit token to clone the encrypted match repo. The convention
+is a fine-grained Personal Access Token scoped to **just the match repo**,
+stored in main-repo Actions secrets and base64-encoded the way fastlane
+match auto-detects.
+
+One-time setup:
+
+1. Go to <https://github.com/settings/personal-access-tokens/new>.
+2. Token name: `tankstellen-ios-certs read-only`.
+3. Resource owner: `fdittgen-png`.
+4. Expiration: 1 year (renewing yearly is the cost of scoping the token).
+5. Repository access: **Only select repositories** → tick
+   `fdittgen-png/tankstellen-ios-certs`.
+6. Permissions → Repository permissions → **Contents: Read-only**. Leave
+   every other category at the default of "No access".
+7. Generate token. Copy the value (`github_pat_…`) immediately — GitHub
+   only shows it once.
+8. From a terminal that has `gh` authenticated, paste the token into:
+
+   ```bash
+   echo -n "fdittgen-png:<paste the github_pat_… here>" | base64 \
+     | gh secret set MATCH_GIT_BASIC_AUTHORIZATION --repo fdittgen-png/tankstellen
+   ```
+
+The CI workflow consumes the secret as an env var; fastlane match auto-
+detects the env var and rewrites HTTPS git ops to attach the token as a
+basic auth header.
+
 ## If something is wrong
 
 - **Match repo cannot be cloned**: verify your local git auth has read access
