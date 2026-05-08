@@ -40,4 +40,61 @@ platform :ios do
     match(type: "development", api_key: key, readonly: false)
     match(type: "appstore", api_key: key, readonly: false)
   end
+
+  desc "Build a signed appstore-distribution IPA. Expects match_appstore to have populated the keychain first."
+  lane :build_appstore do |options|
+    build_number = options[:build_number] || ENV["IOS_BUILD_NUMBER"] || Time.now.strftime("%Y%m%d")
+    profile_name = ENV["sigh_de.tankstellen.fuelprices_appstore_profile-name"] || "match AppStore de.tankstellen.fuelprices"
+
+    # Bump CFBundleVersion in the project so each TestFlight upload has a
+    # unique build number — App Store Connect rejects re-uploads of the
+    # same number.
+    increment_build_number(
+      xcodeproj: "Runner.xcodeproj",
+      build_number: build_number,
+    )
+
+    # `flutter build ipa` is a thin wrapper that doesn't expose the manual-
+    # signing options we need for match-managed certs, so drive xcodebuild
+    # directly through gym after Flutter has produced the precompiled host
+    # artifacts.
+    sh("flutter build ios --release --no-codesign")
+
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      configuration: "Release",
+      output_directory: "../build/ios/ipa",
+      output_name: "Runner.ipa",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "de.tankstellen.fuelprices" => profile_name,
+        },
+        signingStyle: "manual",
+        teamID: "C4Y5RDF8P9",
+      },
+      clean: false,
+      include_symbols: true,
+      include_bitcode: false,
+    )
+  end
+
+  desc "Upload the IPA at build/ios/ipa/Runner.ipa to TestFlight (no review submission)."
+  lane :upload_testflight do |options|
+    changelog = options[:changelog] || ENV["TESTFLIGHT_CHANGELOG"] || "Daily build."
+    pilot(
+      api_key: asc_api_key,
+      ipa: "../build/ios/ipa/Runner.ipa",
+      skip_waiting_for_build_processing: true,
+      changelog: changelog,
+    )
+  end
+
+  desc "End-to-end CI release: fetch certs, build, and upload to TestFlight."
+  lane :release_testflight do |options|
+    match(type: "appstore", api_key: asc_api_key)
+    build_appstore(build_number: options[:build_number])
+    upload_testflight(changelog: options[:changelog])
+  end
 end
