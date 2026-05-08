@@ -199,6 +199,12 @@ jobs:
           key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
           restore-keys: pods-${{ runner.os }}-
 
+      - name: Install CocoaPods under active Ruby
+        # See ios-testflight.yml for the long-form rationale: the runner's
+        # system pod is bound to a different Ruby than ruby/setup-ruby's, so
+        # flutter's pod check fails. Reinstall pod under the active Ruby.
+        run: gem install cocoapods --no-document
+
       - name: Flutter pub get
         run: flutter pub get
 

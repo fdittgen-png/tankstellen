@@ -37,19 +37,35 @@ void main() {
       );
     });
 
-    test('CarAppService has permission restriction', () {
-      // The TankstellenCarAppService must have a permission attribute
-      // to restrict which apps can bind to it.
+    test('CarAppService — when active — has permission restriction', () {
+      // While Google Play's Foreground Service Use form is unapproved
+      // (#1498), the TankstellenCarAppService entry is commented out so
+      // the AAB ships without foreground-service permissions. Skip the
+      // restriction check when the service is absent, but enforce it the
+      // moment the entry is restored.
+      final stripped =
+          manifestContent.replaceAll(RegExp(r'<!--[\s\S]*?-->'), '');
       final servicePattern = RegExp(
         r'<service[^>]*android:name="\.TankstellenCarAppService"[^>]*>',
         dotAll: true,
       );
 
-      final match = servicePattern.firstMatch(manifestContent);
-      expect(match, isNotNull,
-          reason: 'TankstellenCarAppService must exist in manifest');
+      final match = servicePattern.firstMatch(stripped);
+      if (match == null) {
+        // Service entry is currently commented out — verify it's actually
+        // commented (not silently deleted) so the restore path stays valid.
+        expect(
+          manifestContent,
+          contains('TankstellenCarAppService'),
+          reason:
+              'TankstellenCarAppService must remain in the manifest, even '
+              'if commented out, so the post-FS-form restore is a single '
+              'block uncomment.',
+        );
+        return;
+      }
 
-      final serviceTag = match!.group(0)!;
+      final serviceTag = match.group(0)!;
       expect(
         serviceTag,
         contains('android:permission='),

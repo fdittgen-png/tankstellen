@@ -58,6 +58,14 @@ jobs:
           key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
           restore-keys: pods-${{ runner.os }}-
 
+      - name: Install CocoaPods under active Ruby
+        # The macos-latest runner ships a system pod bound to system Ruby; once
+        # `ruby/setup-ruby` switches the active Ruby to 3.3, that system pod's
+        # GEM_HOME no longer matches and flutter sees "CocoaPods is installed
+        # but broken." Reinstall under the active Ruby so `pod` on PATH works
+        # both for the explicit step below and for flutter's auto-pod fallback.
+        run: gem install cocoapods --no-document
+
       - name: Flutter pub get
         run: flutter pub get
 
