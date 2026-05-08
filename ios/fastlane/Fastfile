@@ -58,7 +58,20 @@ platform :ios do
     # signing options we need for match-managed certs, so drive xcodebuild
     # directly through gym after Flutter has produced the precompiled host
     # artifacts.
-    sh("flutter build ios --release --no-codesign")
+    #
+    # The `flutter build ios` step internally invokes `pod install`. We are
+    # running under `bundle exec fastlane` on CI, which clamps GEM_PATH and
+    # RUBYOPT to the bundler-managed `vendor/bundle`. CocoaPods is installed
+    # under the active Ruby (via `gem install cocoapods` in the workflow)
+    # and lives outside that clamped path, so when flutter's child shell
+    # calls `pod` it can find the binary on PATH but cannot load its gems —
+    # surfacing as "CocoaPods is installed but broken. Skipping pod install."
+    # `Bundler.with_unbundled_env` strips the bundler env vars for the
+    # duration of the block so the child process sees the normal Ruby
+    # environment where CocoaPods is loadable.
+    Bundler.with_unbundled_env do
+      sh("flutter build ios --release --no-codesign")
+    end
 
     build_app(
       workspace: "Runner.xcworkspace",
