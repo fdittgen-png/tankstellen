@@ -1,0 +1,11 @@
+git_url("https://github.com/fdittgen-png/tankstellen-ios-certs.git")
+storage_mode("git")
+
+type("appstore")
+app_identifier(["de.tankstellen.fuelprices"])
+team_id("C4Y5RDF8P9")
+
+# CI must always run match in readonly mode — only humans on a trusted
+# machine should ever be allowed to mint new certs/profiles, since that
+# touches the Apple Developer Portal and the encrypted match repo.
+readonly(ENV["CI"] == "true")
