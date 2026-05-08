@@ -79,7 +79,7 @@ void main() {
       final snapshot = enabledContainer.read(privacyDataProvider);
 
       expect(snapshot.syncEnabled, isTrue);
-      expect(snapshot.syncMode, 'Tankstellen Community');
+      expect(snapshot.syncMode, 'Sparkilo Community');
       expect(snapshot.syncUserId, 'user-123');
     });
 

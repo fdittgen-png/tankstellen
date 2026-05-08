@@ -3,7 +3,7 @@
   "@favoritesShareAction": {
     "description": "AppBar action tooltip for the share-favorites button on the Favorites screen (#1344)."
   },
-  "favoritesShareSubject": "Tankstellen — favourites on {date}",
+  "favoritesShareSubject": "Sparkilo — favourites on {date}",
   "@favoritesShareSubject": {
     "description": "Subject / preview text passed to the OS share sheet when the user shares the Favorites screen as an image (#1344). The {date} placeholder is replaced with a localised short date.",
     "placeholders": {

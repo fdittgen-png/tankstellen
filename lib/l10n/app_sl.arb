@@ -1,6 +1,6 @@
 {
   "@@locale": "sl",
-  "appTitle": "Cene goriv",
+  "appTitle": "Sparkilo",
   "search": "Iskanje",
   "favorites": "Priljubljene",
   "map": "Zemljevid",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "API ključ",
   "register": "Registracija",
   "continueButton": "Nadaljuj",
-  "welcome": "Cene goriv",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Najdite najcenejše gorivo v bližini.",
   "profileName": "Ime profila",
   "preferredFuel": "Prednostno gorivo",

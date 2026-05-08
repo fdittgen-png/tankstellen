@@ -83,10 +83,10 @@ void main() {
           reason:
               'The dialog must reassure the user that the VIN was '
               'looked up on a public NHTSA database, not a '
-              'Tankstellen server (#895).',
+              'Sparkilo server (#895).',
         );
         expect(
-          find.textContaining('Tankstellen servers'),
+          find.textContaining('Sparkilo servers'),
           findsOneWidget,
         );
       },

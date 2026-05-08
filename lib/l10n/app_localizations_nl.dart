@@ -9,7 +9,7 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
-  String get appTitle => 'Brandstofprijzen';
+  String get appTitle => 'Sparkilo';
 
   @override
   String get search => 'Zoeken';
@@ -116,7 +116,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get continueButton => 'Doorgaan';
 
   @override
-  String get welcome => 'Brandstofprijzen';
+  String get welcome => 'Sparkilo';
 
   @override
   String get welcomeSubtitle =>
@@ -2579,7 +2579,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Your app works fully offline. Cloud sync is optional.';
 
   @override
-  String get syncModeCommunityTitle => 'Tankstellen Community';
+  String get syncModeCommunityTitle => 'Sparkilo Community';
 
   @override
   String get syncModeCommunitySubtitle =>
@@ -3532,7 +3532,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String favoritesShareSubject(String date) {
-    return 'Tankstellen — favourites on $date';
+    return 'Sparkilo — favourites on $date';
   }
 
   @override
@@ -4227,7 +4227,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get speedConsumptionNeedMoreData => 'Need more data';
 
   @override
-  String get splashLoadingLabel => 'Loading Tankstellen';
+  String get splashLoadingLabel => 'Loading Sparkilo';
 
   @override
   String get tankLevelTitle => 'Tank level';
@@ -4451,7 +4451,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String trajetDetailShareSubject(String date) {
-    return 'Tankstellen — trip on $date';
+    return 'Sparkilo — trip on $date';
   }
 
   @override
@@ -4640,7 +4640,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get vinInfoSectionPrivacyBody =>
-      'Your VIN is stored only locally in the app\'s encrypted storage — it\'s never uploaded to Tankstellen servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.';
+      'Your VIN is stored only locally in the app\'s encrypted storage — it\'s never uploaded to Sparkilo servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.';
 
   @override
   String get vinInfoSectionWhereTitle => 'Where to find it';
@@ -4654,7 +4654,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get vinConfirmPrivacyNote =>
-      'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Tankstellen servers.';
+      'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Sparkilo servers.';
 
   @override
   String get gdprVinOnlineDecodeTitle => 'VIN online decode';

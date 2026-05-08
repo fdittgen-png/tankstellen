@@ -50,7 +50,7 @@ void main() {
     test('community', () {
       expect(
         const SyncConfig(mode: SyncMode.community).modeName,
-        'Tankstellen Community',
+        'Sparkilo Community',
       );
     });
 

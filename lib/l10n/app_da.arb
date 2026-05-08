@@ -1,6 +1,6 @@
 {
   "@@locale": "da",
-  "appTitle": "Brændstofpriser",
+  "appTitle": "Sparkilo",
   "search": "Søg",
   "favorites": "Favoritter",
   "map": "Kort",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "API-nøgle",
   "register": "Registrering",
   "continueButton": "Fortsæt",
-  "welcome": "Brændstofpriser",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Find den billigste brændstof i nærheden.",
   "profileName": "Profilnavn",
   "preferredFuel": "Foretrukket brændstof",

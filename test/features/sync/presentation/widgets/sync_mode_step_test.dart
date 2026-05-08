@@ -30,7 +30,7 @@ void main() {
         onStayOffline: () {},
       );
 
-      expect(find.text('Tankstellen Community'), findsOneWidget);
+      expect(find.text('Sparkilo Community'), findsOneWidget);
       expect(find.text('Private Database'), findsOneWidget);
       expect(find.text('Join a Group'), findsOneWidget);
       expect(find.text('Stay offline'), findsOneWidget);
@@ -45,7 +45,7 @@ void main() {
         onStayOffline: () {},
       );
 
-      await tester.tap(find.text('Tankstellen Community'));
+      await tester.tap(find.text('Sparkilo Community'));
       await tester.pump();
 
       expect(captured, SyncMode.community);

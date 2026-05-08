@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Tankstellen</string>
+	<string>Sparkilo</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>tankstellen</string>
+	<string>Sparkilo</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -60,19 +60,19 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Tankstellen needs your location to find nearby fuel stations and show prices in your area.</string>
+	<string>Sparkilo needs your location to find nearby fuel stations and show prices in your area.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Tankstellen uses background location to check fuel prices and send price alert notifications.</string>
+	<string>Sparkilo uses background location to check fuel prices and send price alert notifications.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Tankstellen uses background location to check fuel prices and send price alert notifications.</string>
+	<string>Sparkilo uses background location to check fuel prices and send price alert notifications.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Tankstellen uses Bluetooth to connect to your OBD2 adapter and read live consumption from your vehicle.</string>
+	<string>Sparkilo uses Bluetooth to connect to your OBD2 adapter and read live consumption from your vehicle.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Tankstellen uses Bluetooth to connect to your OBD2 adapter and read live consumption from your vehicle.</string>
+	<string>Sparkilo uses Bluetooth to connect to your OBD2 adapter and read live consumption from your vehicle.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Tankstellen uses the camera to scan fuel receipts and payment QR codes.</string>
+	<string>Sparkilo uses the camera to scan fuel receipts and payment QR codes.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Tankstellen needs access to your photo library so you can attach an existing receipt photo to a fill-up entry.</string>
+	<string>Sparkilo needs access to your photo library so you can attach an existing receipt photo to a fill-up entry.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

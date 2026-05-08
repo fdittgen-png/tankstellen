@@ -31,9 +31,9 @@ void main() {
     testWidgets('renders the welcome title and subtitle in English',
         (tester) async {
       await pumpHeader(tester);
-      // The welcome key resolves to "Fuel Prices" in English; subtitle to
+      // The welcome key resolves to "Sparkilo" in English; subtitle to
       // "Find the cheapest fuel near you." Both must render.
-      expect(find.text('Fuel Prices'), findsOneWidget);
+      expect(find.text('Sparkilo'), findsOneWidget);
       expect(find.text('Find the cheapest fuel near you.'), findsOneWidget);
     });
 
@@ -46,7 +46,7 @@ void main() {
             w is Semantics &&
             w.properties.header == true &&
             w.child is Text &&
-            (w.child as Text).data == 'Fuel Prices',
+            (w.child as Text).data == 'Sparkilo',
       );
       expect(headerSemantics, findsOneWidget);
     });

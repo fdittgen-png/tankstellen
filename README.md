@@ -1,12 +1,14 @@
 ﻿<p align="center">
-  <img src="assets/icon.png" alt="Tankstellen app icon" width="160" height="160" />
+  <img src="assets/icon.png" alt="Sparkilo app icon" width="160" height="160" />
 </p>
 
-# Tankstellen
+# Sparkilo
+
+<sub>The repository, bundle id (`de.tankstellen.fuelprices`), and internal package name remain `tankstellen` — that's the project's technical identity. **Sparkilo** is the public-facing brand on the App Store, Play Store, and the app's home-screen tile.</sub>
 
 > **The cost of driving, attacked from three sides.**
 >
-> A car loses you money in three places: at the pump, on the road, and in everything you forgot to track. Tankstellen tackles all three — pay less per litre, burn fewer of them per kilometre, and see exactly where the money actually went.
+> A car loses you money in three places: at the pump, on the road, and in everything you forgot to track. Sparkilo tackles all three — pay less per litre, burn fewer of them per kilometre, and see exactly where the money actually went.
 
 [![CI](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml/badge.svg)](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -26,7 +28,7 @@
 
 **A free, open-source companion app for cutting the running cost of your car.** 11 countries, 23 languages, privacy-first, no ads, no tracking.
 
-Tankstellen aggregates real-time fuel prices from official government APIs, plugs into your car's OBD-II port to see how it actually drives, and keeps a tidy log of every fill-up and trip so the savings stop being theoretical.
+Sparkilo aggregates real-time fuel prices from official government APIs, plugs into your car's OBD-II port to see how it actually drives, and keeps a tidy log of every fill-up and trip so the savings stop being theoretical.
 
 ## The objective: a cheaper kilometre
 
@@ -138,7 +140,7 @@ flutter run
 
 ### API Keys
 
-Tankstellen uses official government fuel price APIs. Some require a free API key:
+Sparkilo uses official government fuel price APIs. Some require a free API key:
 
 | Country | API | Key Required |
 |---------|-----|:------------:|

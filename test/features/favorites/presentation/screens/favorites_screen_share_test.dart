@@ -112,7 +112,7 @@ void main() {
           reason: 'XFile path must be a real temp-file path');
       expect(shared.path.endsWith('.png'), isTrue,
           reason: 'expected PNG file, got ${shared.path}');
-      // The English ARB renders "Tankstellen — favourites on <date>".
+      // The English ARB renders "Sparkilo — favourites on <date>".
       expect(captured!.subject, isNotNull);
       expect(captured!.subject, contains('favourites'));
     },

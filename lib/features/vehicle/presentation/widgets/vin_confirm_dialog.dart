@@ -71,7 +71,7 @@ class VinConfirmDialog extends StatelessWidget {
           Text(
             l?.vinConfirmPrivacyNote ??
                 "We looked up your VIN on NHTSA's free vehicle "
-                    'database — nothing sent to Tankstellen servers.',
+                    'database — nothing sent to Sparkilo servers.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.primary,
                 ),

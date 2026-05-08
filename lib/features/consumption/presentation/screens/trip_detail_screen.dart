@@ -199,7 +199,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     final formattedDate =
         DateFormat.yMMMd(locale.toString()).format(shareDate);
     final subject = l?.trajetDetailShareSubject(formattedDate) ??
-        'Tankstellen — trip on $formattedDate';
+        'Sparkilo — trip on $formattedDate';
     final messenger = ScaffoldMessenger.maybeOf(context);
     final renderer = debugTripDetailShareOverride ?? shareWidgetAsImage;
     try {

@@ -44,12 +44,12 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
-    testWidgets('renders the Tankstellen wordmark', (tester) async {
+    testWidgets('renders the Sparkilo wordmark', (tester) async {
       await _pumpSplash(tester);
-      // `appTitle` resolves to "Fuel Prices" in the English locale — the
+      // `appTitle` resolves to "Sparkilo" in the English locale — the
       // wordmark pulls the same localized string as the rest of the app,
       // so this asserts the localization hook works end-to-end.
-      expect(find.text('Fuel Prices'), findsOneWidget);
+      expect(find.text('Sparkilo'), findsOneWidget);
     });
 
     testWidgets('renders an indeterminate progress indicator',
@@ -97,7 +97,7 @@ void main() {
       // The semantic label is rendered via a Semantics node with
       // liveRegion:true so TalkBack/VoiceOver announces it as the splash
       // appears. Assert on the raw label string for locale `en`.
-      expect(find.bySemanticsLabel('Loading Tankstellen'), findsOneWidget);
+      expect(find.bySemanticsLabel('Loading Sparkilo'), findsOneWidget);
     });
   });
 

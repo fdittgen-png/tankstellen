@@ -68,7 +68,7 @@ void main() {
   group('SyncConfig.modeName', () {
     test('returns correct name for community mode', () {
       const config = SyncConfig(mode: SyncMode.community);
-      expect(config.modeName, 'Tankstellen Community');
+      expect(config.modeName, 'Sparkilo Community');
     });
 
     test('returns correct name for joinExisting mode', () {

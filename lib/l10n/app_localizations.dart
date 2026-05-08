@@ -143,7 +143,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Fuel Prices'**
+  /// **'Sparkilo'**
   String get appTitle;
 
   /// No description provided for @search.
@@ -347,7 +347,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcome.
   ///
   /// In en, this message translates to:
-  /// **'Fuel Prices'**
+  /// **'Sparkilo'**
   String get welcome;
 
   /// No description provided for @welcomeSubtitle.
@@ -4858,7 +4858,7 @@ abstract class AppLocalizations {
   /// No description provided for @syncModeCommunityTitle.
   ///
   /// In en, this message translates to:
-  /// **'Tankstellen Community'**
+  /// **'Sparkilo Community'**
   String get syncModeCommunityTitle;
 
   /// No description provided for @syncModeCommunitySubtitle.
@@ -6515,7 +6515,7 @@ abstract class AppLocalizations {
   /// Subject / preview text passed to the OS share sheet when the user shares the Favorites screen as an image (#1344). The {date} placeholder is replaced with a localised short date.
   ///
   /// In en, this message translates to:
-  /// **'Tankstellen — favourites on {date}'**
+  /// **'Sparkilo — favourites on {date}'**
   String favoritesShareSubject(String date);
 
   /// Snackbar shown when the favorites Share action fails to render or hand off the report PNG (#1344).
@@ -7739,7 +7739,7 @@ abstract class AppLocalizations {
   /// Accessibility label announced by TalkBack/VoiceOver while the animated splash screen is visible. Not rendered visually; keep it concise and speakable.
   ///
   /// In en, this message translates to:
-  /// **'Loading Tankstellen'**
+  /// **'Loading Sparkilo'**
   String get splashLoadingLabel;
 
   /// Title of the tank-level card on the Fuel tab — shows the current estimated litres in the tank above the consumption stats card (#1195).
@@ -8141,7 +8141,7 @@ abstract class AppLocalizations {
   /// Subject / preview text passed to the OS share sheet when the user shares a trip detail report as an image (#1189). The {date} placeholder is replaced with a localised short date.
   ///
   /// In en, this message translates to:
-  /// **'Tankstellen — trip on {date}'**
+  /// **'Sparkilo — trip on {date}'**
   String trajetDetailShareSubject(String date);
 
   /// Snackbar shown when the trip-detail Share action fails to render or hand off the report PNG (#1189).
@@ -8471,7 +8471,7 @@ abstract class AppLocalizations {
   /// Body of the 'Privacy' section of the VIN info sheet (#895).
   ///
   /// In en, this message translates to:
-  /// **'Your VIN is stored only locally in the app\'s encrypted storage — it\'s never uploaded to Tankstellen servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.'**
+  /// **'Your VIN is stored only locally in the app\'s encrypted storage — it\'s never uploaded to Sparkilo servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.'**
   String get vinInfoSectionPrivacyBody;
 
   /// Heading for the 'Where to find it' section of the VIN info sheet (#895).
@@ -8495,7 +8495,7 @@ abstract class AppLocalizations {
   /// One-line privacy reassurance shown near the top of the VIN confirm dialog (#895).
   ///
   /// In en, this message translates to:
-  /// **'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Tankstellen servers.'**
+  /// **'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Sparkilo servers.'**
   String get vinConfirmPrivacyNote;
 
   /// GDPR consent toggle — short title for the opt-in to send the 17-character VIN to NHTSA's free public vPIC service to look up additional vehicle details (#1399). Used in both the first-launch consent screen and the settings page.

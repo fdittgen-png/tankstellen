@@ -1,6 +1,6 @@
 {
   "@@locale": "it",
-  "appTitle": "Prezzi Carburanti",
+  "appTitle": "Sparkilo",
   "search": "Cerca",
   "favorites": "Preferiti",
   "map": "Mappa",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "Chiave API",
   "register": "Registrazione",
   "continueButton": "Continua",
-  "welcome": "Prezzi Carburanti",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Trova il carburante più economico vicino a te.",
   "profileName": "Nome profilo",
   "preferredFuel": "Carburante preferito",

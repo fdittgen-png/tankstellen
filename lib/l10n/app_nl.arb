@@ -1,6 +1,6 @@
 {
   "@@locale": "nl",
-  "appTitle": "Brandstofprijzen",
+  "appTitle": "Sparkilo",
   "search": "Zoeken",
   "favorites": "Favorieten",
   "map": "Kaart",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "API-sleutel",
   "register": "Registratie",
   "continueButton": "Doorgaan",
-  "welcome": "Brandstofprijzen",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Vind de goedkoopste brandstof bij jou in de buurt.",
   "profileName": "Profielnaam",
   "preferredFuel": "Voorkeursbrandstof",

@@ -1,6 +1,6 @@
 {
   "@@locale": "fi",
-  "appTitle": "Polttoainehinnat",
+  "appTitle": "Sparkilo",
   "search": "Haku",
   "favorites": "Suosikit",
   "map": "Kartta",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "API-avain",
   "register": "Rekisteröinti",
   "continueButton": "Jatka",
-  "welcome": "Polttoainehinnat",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Löydä edullisin polttoaine läheltäsi.",
   "profileName": "Profiilin nimi",
   "preferredFuel": "Ensisijainen polttoaine",

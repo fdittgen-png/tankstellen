@@ -1,6 +1,6 @@
 {
   "@@locale": "sk",
-  "appTitle": "Ceny pohonných hmôt",
+  "appTitle": "Sparkilo",
   "search": "Hľadať",
   "favorites": "Obľúbené",
   "map": "Mapa",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "Kľúč API",
   "register": "Registrácia",
   "continueButton": "Pokračovať",
-  "welcome": "Ceny pohonných hmôt",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Nájdite najlacnejšie palivo vo vašom okolí.",
   "profileName": "Názov profilu",
   "preferredFuel": "Preferované palivo",

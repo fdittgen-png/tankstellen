@@ -1,6 +1,6 @@
 {
   "@@locale": "pl",
-  "appTitle": "Ceny Paliw",
+  "appTitle": "Sparkilo",
   "search": "Szukaj",
   "favorites": "Ulubione",
   "map": "Mapa",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "Klucz API",
   "register": "Rejestracja",
   "continueButton": "Kontynuuj",
-  "welcome": "Ceny Paliw",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Znajdź najtańsze paliwo w pobliżu.",
   "profileName": "Nazwa profilu",
   "preferredFuel": "Preferowane paliwo",

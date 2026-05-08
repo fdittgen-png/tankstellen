@@ -50,7 +50,7 @@ class SyncConfig {
 
   /// Human-readable mode name for UI display.
   String get modeName => switch (mode) {
-    SyncMode.community => 'Tankstellen Community',
+    SyncMode.community => 'Sparkilo Community',
     SyncMode.joinExisting => 'Shared Group',
     SyncMode.private => 'Private Database',
     SyncMode.none => 'Local Only',

@@ -78,8 +78,8 @@ void main() {
       );
 
       expect(find.byIcon(Icons.local_gas_station), findsOneWidget);
-      // Welcome text from l10n?.welcome ?? 'Fuel Prices'
-      expect(find.text('Fuel Prices'), findsOneWidget);
+      // Welcome text from l10n?.welcome ?? 'Sparkilo'
+      expect(find.text('Sparkilo'), findsOneWidget);
     });
 
     testWidgets('shows no validation indicator when API key field is empty',
