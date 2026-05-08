@@ -119,12 +119,18 @@ flutter:
     - assets/schemas/
 
 flutter_launcher_icons:
-  android: true
+  # Android icon is hand-tuned (adaptive vector + optimized legacy PNGs).
+  # Don't regenerate it from this pipeline — keep `android: false` so a
+  # rerun doesn't clobber the curated mipmap-*/ic_launcher.png files or
+  # the adaptive-icon XML's safe-zone notes.
+  android: false
   ios: true
   image_path: "assets/icon.png"
-  adaptive_icon_foreground: "assets/icon_foreground.png"
-  adaptive_icon_background: "#2E7D32"
-  min_sdk_android: 21
+  # Apple rejects iOS app icons with an alpha channel — flatten transparency
+  # onto the brand-green background so the App Store validator accepts the
+  # build. The brand asset itself keeps its alpha for non-iOS use.
+  remove_alpha_ios: true
+  background_color_ios: "#2E7D32"
   web:
     generate: false
 
