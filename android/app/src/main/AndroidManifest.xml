@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -36,19 +37,32 @@
     <uses-feature android:name="android.hardware.bluetooth_le"
         android:required="false"/>
 
-    <!-- Hands-free trip auto-record (#1004 phase 2b-1).
-         The AutoRecordForegroundService observes BLE auto-connect for
-         the paired adapter while the app is not in the foreground. It
-         requires:
-           * FOREGROUND_SERVICE              base permission since API 28
-           * FOREGROUND_SERVICE_CONNECTED_DEVICE  required by Android 14
-             (API 34+) for `connectedDevice` foreground service type
-           * POST_NOTIFICATIONS              Android 13+ runtime perm so
-             the persistent low-importance auto-record notification can
-             render. Without it the service still runs but the channel
-             is silenced. -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
+    <!-- Hands-free trip auto-record (#1004 phase 2b-1) and Android Auto
+         car-app integration both depend on foreground-service permissions.
+         Google Play's "Foreground Service Use" declaration form is a hard
+         gate on every reviewed track (Open Testing, Closed Testing,
+         Production): edits.commit returns 403 with
+         "You must let us know whether your app uses any Foreground Service
+         permissions." until the form is submitted via the web UI.
+         Mirroring the ACCESS_BACKGROUND_LOCATION precedent (line ~21):
+         the FOREGROUND_SERVICE* permissions and the foreground-service
+         components (AutoRecordForegroundService, TankstellenCarAppService,
+         the androidx.car.app meta-data) are dropped from the manifest so
+         the very-first public Open Testing build can ship.
+         tools:node="remove" defends against manifest-merge: androidx.car.app
+         declares FOREGROUND_SERVICE in its own manifest and would otherwise
+         pull it back in despite our line being commented out.
+         Functional impact while disabled:
+           * Hands-free trip auto-record (already off because BG location is
+             gone) calls invokeMethod('start') and gets a graceful failure.
+           * Android Auto integration is unreachable — the Auto host can't
+             find a CarAppService matching the intent-filter.
+         Restore all five lines below the moment the Foreground Service Use
+         form is approved (#1498). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"
+        tools:node="remove"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"
+        tools:node="remove"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
@@ -109,18 +123,17 @@
         </activity>
 
         <!-- Hands-free trip auto-record foreground service (#1004
-             phase 2b-1). Internal-only — exported=false so no other
-             app can bind. foregroundServiceType="connectedDevice"
-             matches the BLE listener's role: observe transitions on
-             the paired OBD2 adapter only. -->
+             phase 2b-1) and Android Auto CarAppService — both
+             commented out for the Open Testing release. See the
+             FOREGROUND_SERVICE permission block above for the full
+             rationale (Google Play "Foreground Service Use" form
+             gate); restore alongside the permissions when #1498's
+             form is approved.
         <service
             android:name=".autorecord.AutoRecordForegroundService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice"/>
 
-        <!-- Android Auto car app service -->
-        <!-- exported=true required: Android Auto host binds via this intent-filter.
-             Permission restricts binding to holders of FOREGROUND_SERVICE permission. -->
         <service
             android:name=".TankstellenCarAppService"
             android:exported="true"
@@ -134,6 +147,7 @@
         <meta-data
             android:name="androidx.car.app.minCarApiLevel"
             android:value="1" />
+        -->
 
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
