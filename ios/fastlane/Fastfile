@@ -1,0 +1,43 @@
+default_platform(:ios)
+
+# Builds an App Store Connect API key payload that match / pilot / sigh can
+# all consume. Sources the key material from env vars whose names are
+# deliberately chosen to avoid collision with fastlane's auto-discovered
+# ones (the auto-discovery uses APP_STORE_CONNECT_API_KEY_PATH for the
+# JSON-wrapper path, which clashes with the convention of pointing
+# APP_STORE_CONNECT_API_KEY_* at the .p8 itself).
+#
+# Locally: set ASC_API_KEY_FILEPATH to the on-disk .p8.
+# In CI:    set APP_STORE_CONNECT_API_KEY_BASE64 to the base64 of the .p8.
+def asc_api_key
+  base64_content = ENV["APP_STORE_CONNECT_API_KEY_BASE64"]
+  app_store_connect_api_key(
+    key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ID"),
+    issuer_id: ENV.fetch("APP_STORE_CONNECT_API_ISSUER_ID"),
+    key_filepath: ENV["ASC_API_KEY_FILEPATH"],
+    key_content: base64_content,
+    is_key_content_base64: !base64_content.nil?,
+    in_house: false,
+  )
+end
+
+platform :ios do
+  desc "Fetch development cert + profile (readonly on CI)."
+  lane :match_dev do
+    match(type: "development", api_key: asc_api_key)
+  end
+
+  desc "Fetch appstore distribution cert + profile (readonly on CI)."
+  lane :match_appstore do
+    match(type: "appstore", api_key: asc_api_key)
+  end
+
+  desc "One-time bootstrap: generate dev + appstore certs and push them to the match repo."
+  desc "Run on a developer's macOS workstation, not on CI."
+  lane :match_bootstrap do
+    UI.user_error!("Refusing to bootstrap from CI — run this lane locally") if ENV["CI"] == "true"
+    key = asc_api_key
+    match(type: "development", api_key: key, readonly: false)
+    match(type: "appstore", api_key: key, readonly: false)
+  end
+end

@@ -94,6 +94,11 @@ docs/guides/*
 !docs/guides/auto-record.md
 !docs/guides/SCHEMA-BACKUP-XML.md
 !docs/guides/ios-auto-record.md
+!docs/guides/ios-codesigning.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
+
+# fastlane (Ruby) — local bundler install path
+vendor/bundle/
+.bundle/
