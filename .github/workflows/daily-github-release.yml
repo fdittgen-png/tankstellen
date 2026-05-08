@@ -1,14 +1,22 @@
 name: Daily GitHub Release
 
 # Builds master at ~23:00 Europe/Paris and publishes a pre-release on
-# https://github.com/${{ github.repository }}/releases with the AAB +
-# 3 split APKs attached and a changelog summarising commits since the
-# previous nightly release. Skips silently when no commits landed
-# since the last nightly so we don't ship empty releases.
+# https://github.com/${{ github.repository }}/releases with the Android AAB +
+# 3 split APKs and the iOS IPA + dSYMs attached, plus a changelog
+# summarising commits since the previous nightly. Skips silently when no
+# commits landed since the last nightly so we don't ship empty releases.
 #
 # Cron is fixed UTC (21:00 → 23:00 Paris in summer / 22:00 in winter).
 # The ±1h DST drift mirrors `daily-beta.yml`'s convention; flip to
 # `0 22 * * *` if you want 23:00 Paris during winter instead.
+#
+# Pipeline shape:
+#   pre-check  → decide whether to release at all and produce the build
+#                number / tag / release notes used by every later job.
+#   build-android  → ubuntu-latest, AAB + 3 split APKs (parallel with iOS).
+#   build-ios      → macos-latest, signed IPA + dSYMs (parallel with Android).
+#   release        → ubuntu-latest, downloads both build artifacts and
+#                    creates the GitHub release with all attachments.
 on:
   schedule:
     - cron: '0 21 * * *'
@@ -22,9 +30,16 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  pre-check:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 5
+    outputs:
+      commit_count: ${{ steps.check.outputs.commit_count }}
+      previous_tag: ${{ steps.prev.outputs.previous_tag }}
+      base_sha: ${{ steps.prev.outputs.base_sha }}
+      build_number: ${{ steps.bn.outputs.build_number }}
+      tag: ${{ steps.bn.outputs.tag }}
+      release_name: ${{ steps.bn.outputs.release_name }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -67,6 +82,8 @@ jobs:
       - name: Compute date-based build number and tag
         if: steps.check.outputs.commit_count != '0'
         id: bn
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           BN=$(TZ=Europe/Paris date +%Y%m%d)
@@ -84,23 +101,28 @@ jobs:
             echo "tag=$TAG"
             echo "release_name=Nightly $DATE"
           } >> "$GITHUB_OUTPUT"
-        env:
-          GH_TOKEN: ${{ github.token }}
+
+  build-android:
+    needs: pre-check
+    if: needs.pre-check.outputs.commit_count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: master
 
       - uses: actions/setup-java@v5
-        if: steps.check.outputs.commit_count != '0'
         with:
           distribution: temurin
           java-version: '17'
 
       - uses: subosito/flutter-action@v2
-        if: steps.check.outputs.commit_count != '0'
         with:
           channel: stable
           cache: true
 
       - name: Decode signing keystore
-        if: steps.check.outputs.commit_count != '0'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -120,32 +142,150 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Flutter pub get
-        if: steps.check.outputs.commit_count != '0'
         run: flutter pub get
 
       - name: Build AAB (play flavor)
-        if: steps.check.outputs.commit_count != '0'
         run: |
           flutter build appbundle --release --flavor play \
-            --build-number=${{ steps.bn.outputs.build_number }}
+            --build-number=${{ needs.pre-check.outputs.build_number }}
 
       - name: Build per-ABI APKs (play flavor)
-        if: steps.check.outputs.commit_count != '0'
         run: |
           flutter build apk --release --flavor play --split-per-abi \
-            --build-number=${{ steps.bn.outputs.build_number }}
+            --build-number=${{ needs.pre-check.outputs.build_number }}
 
       - name: Clean up decoded keystore
         if: always() && env.ANDROID_KEYSTORE_PATH != ''
         run: rm -f "$ANDROID_KEYSTORE_PATH"
 
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: |
+            build/app/outputs/bundle/playRelease/app-play-release.aab
+            build/app/outputs/flutter-apk/app-arm64-v8a-play-release.apk
+            build/app/outputs/flutter-apk/app-armeabi-v7a-play-release.apk
+            build/app/outputs/flutter-apk/app-x86_64-play-release.apk
+          if-no-files-found: error
+          retention-days: 7
+
+  build-ios:
+    needs: pre-check
+    if: needs.pre-check.outputs.commit_count != '0'
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: master
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/Library/Caches/CocoaPods
+            ios/Pods
+          key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: pods-${{ runner.os }}-
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Pod install
+        run: cd ios && pod install --repo-update
+
+      - name: Decode App Store Connect API key
+        env:
+          ASC_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+        run: |
+          if [ -z "$ASC_KEY_BASE64" ]; then
+            echo "::error::APP_STORE_CONNECT_API_KEY_BASE64 secret is not set." >&2
+            exit 1
+          fi
+          KEY_PATH="$RUNNER_TEMP/asc-api-key.p8"
+          echo "$ASC_KEY_BASE64" | base64 --decode > "$KEY_PATH"
+          echo "ASC_API_KEY_FILEPATH=$KEY_PATH" >> "$GITHUB_ENV"
+
+      - name: Validate match-repo auth secret
+        env:
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+        run: |
+          if [ -z "$MATCH_GIT_BASIC_AUTHORIZATION" ]; then
+            echo "::error::MATCH_GIT_BASIC_AUTHORIZATION secret is not set. See docs/guides/ios-codesigning.md." >&2
+            exit 1
+          fi
+
+      - name: fastlane match_appstore + build_appstore
+        working-directory: ios
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          IOS_BUILD_NUMBER: ${{ needs.pre-check.outputs.build_number }}
+          FASTLANE_DISABLE_COLORS: '1'
+          FASTLANE_HIDE_CHANGELOG: '1'
+        run: |
+          # match_appstore (readonly via Matchfile pinning) populates the
+          # ephemeral keychain; build_appstore then runs `flutter build ios`
+          # plus gym to produce a signed IPA + dSYMs at build/ios/ipa/.
+          bundle exec fastlane match_appstore
+          bundle exec fastlane build_appstore build_number:"${IOS_BUILD_NUMBER}"
+
+      - name: Clean up decoded API key
+        if: always()
+        run: rm -f "$ASC_API_KEY_FILEPATH"
+
+      - name: Upload iOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-release
+          path: |
+            build/ios/ipa/Runner.ipa
+            build/ios/ipa/*.app.dSYM.zip
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    needs: [pre-check, build-android, build-ios]
+    if: needs.pre-check.outputs.commit_count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Download Android artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: android-release
+          path: artifacts/android
+
+      - name: Download iOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-release
+          path: artifacts/ios
+
       - name: Compose release notes
-        if: steps.check.outputs.commit_count != '0'
         id: notes
         run: |
           set -euo pipefail
-          BASE='${{ steps.prev.outputs.base_sha }}'
-          PREV='${{ steps.prev.outputs.previous_tag }}'
+          BASE='${{ needs.pre-check.outputs.base_sha }}'
+          PREV='${{ needs.pre-check.outputs.previous_tag }}'
           NOTES_FILE="$RUNNER_TEMP/release_notes.md"
 
           {
@@ -208,7 +348,19 @@ jobs:
           {
             echo
             echo "---"
-            echo "_Build number: ${{ steps.bn.outputs.build_number }} · Built from \`${{ github.sha }}\`_"
+            echo "### 📦 Attached artifacts"
+            echo
+            echo "**Android (Play flavor, signed):**"
+            echo "- \`app-play-release.aab\` — Play Store bundle"
+            echo "- \`app-arm64-v8a-play-release.apk\` — sideload, modern 64-bit ARM"
+            echo "- \`app-armeabi-v7a-play-release.apk\` — sideload, legacy 32-bit ARM"
+            echo "- \`app-x86_64-play-release.apk\` — sideload, x86_64 emulators"
+            echo
+            echo "**iOS (App Store distribution, signed):**"
+            echo "- \`Runner.ipa\` — distribution build (TestFlight / App Store; not directly sideloadable on consumer devices)"
+            echo "- \`*.app.dSYM.zip\` — debug symbols for crash symbolication"
+            echo
+            echo "_Build number: ${{ needs.pre-check.outputs.build_number }} · Built from \`${{ github.sha }}\`_"
           } >> "$NOTES_FILE"
 
           echo "notes_file=$NOTES_FILE" >> "$GITHUB_OUTPUT"
@@ -216,20 +368,31 @@ jobs:
           cat "$NOTES_FILE"
 
       - name: Create GitHub release
-        if: steps.check.outputs.commit_count != '0'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh release create '${{ steps.bn.outputs.tag }}' \
-            --title '${{ steps.bn.outputs.release_name }}' \
+          # Collect every artifact that's actually present — `find`-based so
+          # an extra dSYM zip from a workspace target (e.g. WidgetKit
+          # extension once it's wired) gets included automatically.
+          mapfile -t ASSETS < <(
+            find artifacts/android artifacts/ios -type f \
+              \( -name '*.aab' -o -name '*.apk' -o -name '*.ipa' -o -name '*.dSYM.zip' \) \
+              | sort
+          )
+          if [ ${#ASSETS[@]} -eq 0 ]; then
+            echo "::error::No release artifacts found under artifacts/." >&2
+            exit 1
+          fi
+          echo "Attaching ${#ASSETS[@]} asset(s):"
+          printf '  - %s\n' "${ASSETS[@]}"
+
+          gh release create '${{ needs.pre-check.outputs.tag }}' \
+            --title '${{ needs.pre-check.outputs.release_name }}' \
             --notes-file '${{ steps.notes.outputs.notes_file }}' \
             --prerelease \
             --target '${{ github.sha }}' \
-            build/app/outputs/bundle/playRelease/app-play-release.aab \
-            build/app/outputs/flutter-apk/app-arm64-v8a-play-release.apk \
-            build/app/outputs/flutter-apk/app-armeabi-v7a-play-release.apk \
-            build/app/outputs/flutter-apk/app-x86_64-play-release.apk
+            "${ASSETS[@]}"
 
       - name: Summary
         if: always()
@@ -237,15 +400,26 @@ jobs:
           {
             echo "## Daily GitHub Release"
             echo
-            if [ "${{ steps.check.outputs.commit_count }}" = "0" ]; then
-              if [ -n "${{ steps.prev.outputs.previous_tag }}" ]; then
-                echo "**Skipped:** no new commits since [\`${{ steps.prev.outputs.previous_tag }}\`](https://github.com/${{ github.repository }}/releases/tag/${{ steps.prev.outputs.previous_tag }})."
-              else
-                echo "**Skipped:** no commits in master."
-              fi
+            echo "- **Tag:** [\`${{ needs.pre-check.outputs.tag }}\`](https://github.com/${{ github.repository }}/releases/tag/${{ needs.pre-check.outputs.tag }})"
+            echo "- **Build number:** ${{ needs.pre-check.outputs.build_number }}"
+            echo "- **Commits since last release:** ${{ needs.pre-check.outputs.commit_count }}"
+            echo "- **Artifacts:** Android AAB + 3× APK splits, iOS IPA + dSYMs"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  skipped-summary:
+    needs: pre-check
+    if: needs.pre-check.outputs.commit_count == '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Summary
+        run: |
+          {
+            echo "## Daily GitHub Release"
+            echo
+            if [ -n "${{ needs.pre-check.outputs.previous_tag }}" ]; then
+              echo "**Skipped:** no new commits since [\`${{ needs.pre-check.outputs.previous_tag }}\`](https://github.com/${{ github.repository }}/releases/tag/${{ needs.pre-check.outputs.previous_tag }})."
             else
-              echo "- **Tag:** [\`${{ steps.bn.outputs.tag }}\`](https://github.com/${{ github.repository }}/releases/tag/${{ steps.bn.outputs.tag }})"
-              echo "- **Build number:** ${{ steps.bn.outputs.build_number }}"
-              echo "- **Commits since last release:** ${{ steps.check.outputs.commit_count }}"
+              echo "**Skipped:** no commits in master."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
