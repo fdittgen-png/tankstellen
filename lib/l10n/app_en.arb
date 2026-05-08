@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Fuel Prices",
+  "appTitle": "Sparkilo",
   "search": "Search",
   "favorites": "Favorites",
   "map": "Map",
@@ -48,7 +48,7 @@
   "apiKeyLabel": "API Key",
   "register": "Registration",
   "continueButton": "Continue",
-  "welcome": "Fuel Prices",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Find the cheapest fuel near you.",
   "profileName": "Profile name",
   "preferredFuel": "Preferred fuel",
@@ -1128,7 +1128,7 @@
   "syncOrDivider": "or",
   "syncHowToSyncQuestion": "How would you like to sync?",
   "syncOfflineDescription": "Your app works fully offline. Cloud sync is optional.",
-  "syncModeCommunityTitle": "Tankstellen Community",
+  "syncModeCommunityTitle": "Sparkilo Community",
   "syncModeCommunitySubtitle": "Share favorites & ratings with all users",
   "syncModePrivateTitle": "Private Database",
   "syncModePrivateSubtitle": "Your own Supabase — full data control",
@@ -2080,7 +2080,7 @@
   "@favoritesShareAction": {
     "description": "AppBar action tooltip for the share-favorites button on the Favorites screen (#1344)."
   },
-  "favoritesShareSubject": "Tankstellen — favourites on {date}",
+  "favoritesShareSubject": "Sparkilo — favourites on {date}",
   "@favoritesShareSubject": {
     "description": "Subject / preview text passed to the OS share sheet when the user shares the Favorites screen as an image (#1344). The {date} placeholder is replaced with a localised short date.",
     "placeholders": {
@@ -2948,7 +2948,7 @@
   "@speedConsumptionNeedMoreData": {
     "description": "Placeholder shown on a speed-band bar when the bin's sample count is under the statistical floor — averaging a thin sliver of seconds isn't meaningful (#1192)."
   },
-  "splashLoadingLabel": "Loading Tankstellen",
+  "splashLoadingLabel": "Loading Sparkilo",
   "@splashLoadingLabel": {
     "description": "Accessibility label announced by TalkBack/VoiceOver while the animated splash screen is visible. Not rendered visually; keep it concise and speakable."
   },
@@ -3257,7 +3257,7 @@
   "@trajetDetailShareAction": {
     "description": "AppBar action tooltip for the share-trip button on the Trip detail screen (#890, #1189)."
   },
-  "trajetDetailShareSubject": "Tankstellen — trip on {date}",
+  "trajetDetailShareSubject": "Sparkilo — trip on {date}",
   "@trajetDetailShareSubject": {
     "description": "Subject / preview text passed to the OS share sheet when the user shares a trip detail report as an image (#1189). The {date} placeholder is replaced with a localised short date.",
     "placeholders": {
@@ -3475,7 +3475,7 @@
   "@vinInfoSectionPrivacyTitle": {
     "description": "Heading for the 'Privacy' section of the VIN info sheet (#895)."
   },
-  "vinInfoSectionPrivacyBody": "Your VIN is stored only locally in the app's encrypted storage — it's never uploaded to Tankstellen servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.",
+  "vinInfoSectionPrivacyBody": "Your VIN is stored only locally in the app's encrypted storage — it's never uploaded to Sparkilo servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.",
   "@vinInfoSectionPrivacyBody": {
     "description": "Body of the 'Privacy' section of the VIN info sheet (#895)."
   },
@@ -3491,7 +3491,7 @@
   "@vinInfoDismiss": {
     "description": "Dismiss button label on the VIN info sheet (#895)."
   },
-  "vinConfirmPrivacyNote": "We looked up your VIN on NHTSA's free vehicle database — nothing sent to Tankstellen servers.",
+  "vinConfirmPrivacyNote": "We looked up your VIN on NHTSA's free vehicle database — nothing sent to Sparkilo servers.",
   "@vinConfirmPrivacyNote": {
     "description": "One-line privacy reassurance shown near the top of the VIN confirm dialog (#895)."
   },

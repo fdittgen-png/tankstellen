@@ -215,7 +215,7 @@ void main() {
     test('modeName returns correct strings for each mode', () {
       expect(
         const SyncConfig(mode: SyncMode.community).modeName,
-        'Tankstellen Community',
+        'Sparkilo Community',
       );
       expect(
         const SyncConfig(mode: SyncMode.joinExisting).modeName,

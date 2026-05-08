@@ -101,7 +101,7 @@ String buildBadScanShareBody({
   if (kind == ScanKind.receipt) {
     final p = receiptScan!.parse;
     buffer
-      ..writeln('Tankstellen receipt scan report')
+      ..writeln('Sparkilo receipt scan report')
       ..writeln('================================')
       ..writeln('App version: $appVersion')
       ..writeln('Brand layout: ${p.brandLayout}')
@@ -119,7 +119,7 @@ String buildBadScanShareBody({
   } else {
     final p = pumpScan!.parse;
     buffer
-      ..writeln('Tankstellen pump-display scan report')
+      ..writeln('Sparkilo pump-display scan report')
       ..writeln('=====================================')
       ..writeln('App version: $appVersion')
       ..writeln()

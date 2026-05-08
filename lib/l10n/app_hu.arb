@@ -1,6 +1,6 @@
 {
   "@@locale": "hu",
-  "appTitle": "Üzemanyagárak",
+  "appTitle": "Sparkilo",
   "search": "Keresés",
   "favorites": "Kedvencek",
   "map": "Térkép",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "API-kulcs",
   "register": "Regisztráció",
   "continueButton": "Tovább",
-  "welcome": "Üzemanyagárak",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Találja meg a legolcsóbb üzemanyagot a közelben.",
   "profileName": "Profil neve",
   "preferredFuel": "Preferált üzemanyag",

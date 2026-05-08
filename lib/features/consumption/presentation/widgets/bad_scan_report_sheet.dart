@@ -243,8 +243,8 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
         ocrText: widget._ocrText,
       ),
       subject: widget.kind == ScanKind.receipt
-          ? 'Tankstellen receipt scan issue'
-          : 'Tankstellen pump-display scan issue',
+          ? 'Sparkilo receipt scan issue'
+          : 'Sparkilo pump-display scan issue',
     );
 
     // Show the snackbar before awaiting share() so the message is

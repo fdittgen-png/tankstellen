@@ -1,6 +1,6 @@
 {
   "@@locale": "ro",
-  "appTitle": "Prețuri Carburanți",
+  "appTitle": "Sparkilo",
   "search": "Căutare",
   "favorites": "Favorite",
   "map": "Hartă",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "Cheie API",
   "register": "Înregistrare",
   "continueButton": "Continuă",
-  "welcome": "Prețuri Carburanți",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Găsiți cel mai ieftin carburant în apropierea dvs.",
   "profileName": "Numele profilului",
   "preferredFuel": "Carburant preferat",

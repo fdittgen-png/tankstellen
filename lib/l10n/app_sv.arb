@@ -1,6 +1,6 @@
 {
   "@@locale": "sv",
-  "appTitle": "Bränslepriser",
+  "appTitle": "Sparkilo",
   "search": "Sök",
   "favorites": "Favoriter",
   "map": "Karta",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "API-nyckel",
   "register": "Registrering",
   "continueButton": "Fortsätt",
-  "welcome": "Bränslepriser",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Hitta det billigaste bränslet nära dig.",
   "profileName": "Profilnamn",
   "preferredFuel": "Föredraget bränsle",

@@ -144,7 +144,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
     final formattedDate =
         DateFormat.yMMMd(locale.toString()).format(DateTime.now());
     final subject = l10n?.favoritesShareSubject(formattedDate) ??
-        'Tankstellen — favourites on $formattedDate';
+        'Sparkilo — favourites on $formattedDate';
     // Filename stem uses ISO-style yyyyMMdd so the filename is stable
     // and locale-independent (the user-visible subject still carries
     // the localised date).

@@ -23,7 +23,7 @@
   "@vinInfoSectionPrivacyTitle": {
     "description": "Heading for the 'Privacy' section of the VIN info sheet (#895)."
   },
-  "vinInfoSectionPrivacyBody": "Your VIN is stored only locally in the app's encrypted storage — it's never uploaded to Tankstellen servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.",
+  "vinInfoSectionPrivacyBody": "Your VIN is stored only locally in the app's encrypted storage — it's never uploaded to Sparkilo servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.",
   "@vinInfoSectionPrivacyBody": {
     "description": "Body of the 'Privacy' section of the VIN info sheet (#895)."
   },
@@ -39,7 +39,7 @@
   "@vinInfoDismiss": {
     "description": "Dismiss button label on the VIN info sheet (#895)."
   },
-  "vinConfirmPrivacyNote": "We looked up your VIN on NHTSA's free vehicle database — nothing sent to Tankstellen servers.",
+  "vinConfirmPrivacyNote": "We looked up your VIN on NHTSA's free vehicle database — nothing sent to Sparkilo servers.",
   "@vinConfirmPrivacyNote": {
     "description": "One-line privacy reassurance shown near the top of the VIN confirm dialog (#895)."
   }

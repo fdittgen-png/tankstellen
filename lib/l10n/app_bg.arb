@@ -1,6 +1,6 @@
 {
   "@@locale": "bg",
-  "appTitle": "Цени на горива",
+  "appTitle": "Sparkilo",
   "search": "Търсене",
   "favorites": "Любими",
   "map": "Карта",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "API ключ",
   "register": "Регистрация",
   "continueButton": "Продължи",
-  "welcome": "Цени на горива",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Намерете най-евтиното гориво наблизо.",
   "profileName": "Име на профила",
   "preferredFuel": "Предпочитано гориво",

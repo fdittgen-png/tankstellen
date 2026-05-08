@@ -71,7 +71,7 @@ void main() {
       await tester.runAsync(() async {
         await shareWidgetAsImage(
           boundaryKey: boundaryKey,
-          subject: 'Tankstellen — trip on April 22, 2026',
+          subject: 'Sparkilo — trip on April 22, 2026',
           fileNameStem: 'tankstellen_trip_test',
           // Tiny pixel ratio keeps the test surface fast — the encoder
           // path is the same regardless of multiplier so the magic
@@ -81,8 +81,8 @@ void main() {
       });
 
       expect(captured, isNotNull, reason: 'share sink was not invoked');
-      expect(captured!.subject, 'Tankstellen — trip on April 22, 2026');
-      expect(captured!.text, 'Tankstellen — trip on April 22, 2026');
+      expect(captured!.subject, 'Sparkilo — trip on April 22, 2026');
+      expect(captured!.text, 'Sparkilo — trip on April 22, 2026');
       expect(captured!.files, isNotNull);
       expect(captured!.files!.length, 1);
       final shared = captured!.files!.single;

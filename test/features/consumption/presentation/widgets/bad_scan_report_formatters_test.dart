@@ -233,7 +233,7 @@ void main() {
         ocrText: 'RAW OCR PAYLOAD',
       );
 
-      expect(body, contains('Tankstellen receipt scan report'));
+      expect(body, contains('Sparkilo receipt scan report'));
       expect(body, contains('App version: 4.3.0+1234'));
       expect(body, contains('Brand layout: generic'));
       expect(body, contains('Liters:   32.50   →   32.40'));
@@ -274,7 +274,7 @@ void main() {
         ocrText: 'PUMP OCR',
       );
 
-      expect(body, contains('Tankstellen pump-display scan report'));
+      expect(body, contains('Sparkilo pump-display scan report'));
       // No "Brand layout" line on pump-display.
       expect(body, isNot(contains('Brand layout:')));
       expect(body, contains('Liters:   40.00   →   39.90'));

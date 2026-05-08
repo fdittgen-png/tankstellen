@@ -51,7 +51,7 @@ void main() {
       await pumpWizard(tester);
 
       expect(find.byType(WelcomeStep), findsOneWidget);
-      expect(find.text('Fuel Prices'), findsOneWidget);
+      expect(find.text('Sparkilo'), findsOneWidget);
       expect(find.text('Next'), findsOneWidget);
     });
 

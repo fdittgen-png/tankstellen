@@ -1,6 +1,6 @@
 {
   "@@locale": "de",
-  "appTitle": "Tankstellen",
+  "appTitle": "Sparkilo",
   "search": "Suche",
   "favorites": "Favoriten",
   "map": "Karte",
@@ -48,7 +48,7 @@
   "apiKeyLabel": "API-Schlüssel",
   "register": "Registrierung",
   "continueButton": "Weiter",
-  "welcome": "Tankstellen",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Finden Sie die günstigsten Kraftstoffpreise in Ihrer Nähe.",
   "profileName": "Profilname",
   "preferredFuel": "Bevorzugter Kraftstoff",

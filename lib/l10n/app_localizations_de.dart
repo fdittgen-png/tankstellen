@@ -9,7 +9,7 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
-  String get appTitle => 'Tankstellen';
+  String get appTitle => 'Sparkilo';
 
   @override
   String get search => 'Suche';
@@ -116,7 +116,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get continueButton => 'Weiter';
 
   @override
-  String get welcome => 'Tankstellen';
+  String get welcome => 'Sparkilo';
 
   @override
   String get welcomeSubtitle =>
@@ -3561,7 +3561,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String favoritesShareSubject(String date) {
-    return 'Tankstellen — Favoriten am $date';
+    return 'Sparkilo — Favoriten am $date';
   }
 
   @override
@@ -4264,7 +4264,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get speedConsumptionNeedMoreData => 'Mehr Daten nötig';
 
   @override
-  String get splashLoadingLabel => 'Tankstellen wird geladen';
+  String get splashLoadingLabel => 'Sparkilo wird geladen';
 
   @override
   String get tankLevelTitle => 'Tankfüllstand';
@@ -4491,7 +4491,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String trajetDetailShareSubject(String date) {
-    return 'Tankstellen — Fahrt vom $date';
+    return 'Sparkilo — Fahrt vom $date';
   }
 
   @override
@@ -4680,7 +4680,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get vinInfoSectionPrivacyBody =>
-      'Ihre FIN wird nur lokal in der verschlüsselten App-Datenbank gespeichert — sie wird niemals an Tankstellen-Server gesendet. Die NHTSA vPIC-Datenbank wird mit der FIN abgefragt, liefert jedoch ausschließlich anonyme Fahrzeugdaten zurück; NHTSA verknüpft die FIN mit keinerlei persönlichen Daten. Ohne Netzwerk liefert eine Offline-Suche nur Hersteller und Land.';
+      'Ihre FIN wird nur lokal in der verschlüsselten App-Datenbank gespeichert — sie wird niemals an Sparkilo-Server gesendet. Die NHTSA vPIC-Datenbank wird mit der FIN abgefragt, liefert jedoch ausschließlich anonyme Fahrzeugdaten zurück; NHTSA verknüpft die FIN mit keinerlei persönlichen Daten. Ohne Netzwerk liefert eine Offline-Suche nur Hersteller und Land.';
 
   @override
   String get vinInfoSectionWhereTitle => 'Wo Sie sie finden';
@@ -4694,7 +4694,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get vinConfirmPrivacyNote =>
-      'Wir haben Ihre FIN in NHTSA\'s kostenloser Fahrzeugdatenbank nachgeschlagen — nichts wurde an Tankstellen-Server gesendet.';
+      'Wir haben Ihre FIN in NHTSA\'s kostenloser Fahrzeugdatenbank nachgeschlagen — nichts wurde an Sparkilo-Server gesendet.';
 
   @override
   String get gdprVinOnlineDecodeTitle => 'VIN online dekodieren';

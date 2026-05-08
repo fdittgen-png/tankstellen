@@ -1,4 +1,4 @@
-Tankstellen ist eine kostenlose Open-Source-App zum Vergleich von Kraftstoff- und EV-Ladepreisen, die Ihnen hilft, an der Zapfsaeule weniger zu zahlen und am Steuer weniger zu verbrauchen. Datenschutz steht im Mittelpunkt: keine Werbung, kein Tracking, keine Telemetrie. Ihre Standortdaten verlassen niemals Ihr Geraet, es sei denn, Sie aktivieren die optionale Cloud-Synchronisation.
+Sparkilo ist eine kostenlose Open-Source-App zum Vergleich von Kraftstoff- und EV-Ladepreisen, die Ihnen hilft, an der Zapfsaeule weniger zu zahlen und am Steuer weniger zu verbrauchen. Datenschutz steht im Mittelpunkt: keine Werbung, kein Tracking, keine Telemetrie. Ihre Standortdaten verlassen niemals Ihr Geraet, es sei denn, Sie aktivieren die optionale Cloud-Synchronisation.
 
 FUNKTIONEN
 
@@ -22,17 +22,17 @@ Informiert bleiben
 
 DATENSCHUTZ
 
-Tankstellen benoetigt die Standortberechtigung nur bei der aktiven Suche. Kein Konto erforderlich. Standardmaessig werden keine Daten an Dritte uebermittelt. Die App funktioniert vollstaendig offline fuer zwischengespeicherte Ergebnisse. Vollstaendige Lokalisierung in 23 Sprachen.
+Sparkilo benoetigt die Standortberechtigung nur bei der aktiven Suche. Kein Konto erforderlich. Standardmaessig werden keine Daten an Dritte uebermittelt. Die App funktioniert vollstaendig offline fuer zwischengespeicherte Ergebnisse. Vollstaendige Lokalisierung in 23 Sprachen.
 
 OPTIONALE CLOUD-SYNCHRONISATION (TankSync)
 
-Fuer Benutzer, die Favoriten, Fahrzeuge, Tankungen und Alarme geraeteuebergreifend synchronisieren moechten, unterstuetzt Tankstellen ein optionales selbst gehostetes Supabase-Backend namens TankSync. Sie betreiben Ihre eigene Instanz, geben URL und anonymen Schluessel ein, und die App synchronisiert Ihre Daten auf Ihren eigenen Server. Volle Datentransparenz: Sie koennen jederzeit alles einsehen, exportieren oder loeschen.
+Fuer Benutzer, die Favoriten, Fahrzeuge, Tankungen und Alarme geraeteuebergreifend synchronisieren moechten, unterstuetzt Sparkilo ein optionales selbst gehostetes Supabase-Backend namens TankSync. Sie betreiben Ihre eigene Instanz, geben URL und anonymen Schluessel ein, und die App synchronisiert Ihre Daten auf Ihren eigenen Server. Volle Datentransparenz: Sie koennen jederzeit alles einsehen, exportieren oder loeschen.
 
 Push-Benachrichtigungen fuer Preisalarme werden ueber ntfy.sh geliefert, einen Open-Source-Push-Benachrichtigungsdienst, sodass keine Google Play Services oder Firebase erforderlich sind.
 
 OPEN SOURCE
 
-Tankstellen ist unter MIT lizenziert. Der vollstaendige Quellcode, Supabase-Migrationsskripte und die Deployment-Dokumentation sind auf GitHub verfuegbar. Beitraege und Uebersetzungen sind willkommen.
+Sparkilo ist unter MIT lizenziert. Der vollstaendige Quellcode, Supabase-Migrationsskripte und die Deployment-Dokumentation sind auf GitHub verfuegbar. Beitraege und Uebersetzungen sind willkommen.
 
 UNTERSTUETZTE PLATTFORMEN
 

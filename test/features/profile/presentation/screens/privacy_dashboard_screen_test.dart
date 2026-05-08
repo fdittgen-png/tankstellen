@@ -147,7 +147,7 @@ void main() {
         ],
       );
 
-      expect(find.text('Tankstellen Community'), findsOneWidget);
+      expect(find.text('Sparkilo Community'), findsOneWidget);
       expect(find.textContaining('user-abc'), findsOneWidget);
       expect(find.text('View server data'), findsOneWidget);
     });

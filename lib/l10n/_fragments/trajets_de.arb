@@ -30,7 +30,7 @@
   "trajetsRowColdStartTooltip": "Der Motor erreichte während dieser Fahrt nicht die Betriebstemperatur — der Verbrauch war höher als üblich.",
   "trajetDetailChartEmpty": "Keine Messwerte",
   "trajetDetailShareAction": "Teilen",
-  "trajetDetailShareSubject": "Tankstellen — Fahrt vom {date}",
+  "trajetDetailShareSubject": "Sparkilo — Fahrt vom {date}",
   "trajetDetailShareError": "Bild konnte nicht erstellt werden",
   "trajetDetailDeleteAction": "Löschen",
   "trajetDetailDeleteConfirmTitle": "Diese Fahrt löschen?",

@@ -26,7 +26,7 @@ import '../../l10n/app_localizations.dart';
 ///     (lower-contrast green on dark, since the launcher already pre-tints
 ///     the viewport green and stacking more saturation reads as a bug).
 ///   * **Accessible.** A `Semantics(label: ..., liveRegion: true)` wrapper
-///     exposes "Loading Tankstellen" to TalkBack/VoiceOver so assistive
+///     exposes "Loading Sparkilo" to TalkBack/VoiceOver so assistive
 ///     tech users get a meaningful announcement instead of a silent pause.
 ///
 /// The widget is stateful because it owns the scale/fade [AnimationController].
@@ -91,7 +91,7 @@ class _AnimatedSplashState extends State<AnimatedSplash>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final loadingLabel = l10n?.splashLoadingLabel ?? 'Loading Tankstellen';
+    final loadingLabel = l10n?.splashLoadingLabel ?? 'Loading Sparkilo';
     return Semantics(
       label: loadingLabel,
       liveRegion: true,
@@ -130,7 +130,7 @@ class _AnimatedSplashState extends State<AnimatedSplash>
                     FadeTransition(
                       opacity: _fade,
                       child: Text(
-                        l10n?.appTitle ?? 'Tankstellen',
+                        l10n?.appTitle ?? 'Sparkilo',
                         style: const TextStyle(
                           color: AnimatedSplash.logoColor,
                           fontSize: 22,
@@ -250,7 +250,7 @@ class SplashHost extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WidgetsApp(
-      title: 'Tankstellen',
+      title: 'Sparkilo',
       color: AnimatedSplash.brandBackground,
       debugShowCheckedModeBanner: false,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

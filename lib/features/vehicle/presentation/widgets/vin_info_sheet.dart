@@ -82,7 +82,7 @@ class VinInfoSheet extends StatelessWidget {
                 body: l?.vinInfoSectionPrivacyBody ??
                     'Your VIN is stored only locally in the app\'s '
                         'encrypted storage — it\'s never uploaded to '
-                        'Tankstellen servers. The NHTSA vPIC database '
+                        'Sparkilo servers. The NHTSA vPIC database '
                         'is queried with the VIN but returns only '
                         'anonymous technical specs; NHTSA does not '
                         'link the VIN to any personal data. Without '

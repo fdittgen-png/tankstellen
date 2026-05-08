@@ -43,11 +43,11 @@ class SyncModeStep extends StatelessWidget {
         const SizedBox(height: 20),
         Semantics(
           label:
-              'Tankstellen Community, shared. Share favorites and ratings with all users.',
+              'Sparkilo Community, shared. Share favorites and ratings with all users.',
           button: true,
           child: SyncModeCard(
             icon: Icons.public,
-            title: l10n?.syncModeCommunityTitle ?? 'Tankstellen Community',
+            title: l10n?.syncModeCommunityTitle ?? 'Sparkilo Community',
             subtitle: l10n?.syncModeCommunitySubtitle ??
                 'Share favorites & ratings with all users',
             privacyLabel: l10n?.syncPrivacyShared ?? 'Shared',

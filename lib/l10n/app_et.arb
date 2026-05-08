@@ -1,6 +1,6 @@
 {
   "@@locale": "et",
-  "appTitle": "Kütusehinnad",
+  "appTitle": "Sparkilo",
   "search": "Otsi",
   "favorites": "Lemmikud",
   "map": "Kaart",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "API võti",
   "register": "Registreerumine",
   "continueButton": "Jätka",
-  "welcome": "Kütusehinnad",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Leidke lähim odavaim kütus.",
   "profileName": "Profiili nimi",
   "preferredFuel": "Eelistatud kütus",

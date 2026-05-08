@@ -9,7 +9,7 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
-  String get appTitle => 'Prix Carburants';
+  String get appTitle => 'Sparkilo';
 
   @override
   String get search => 'Recherche';
@@ -116,7 +116,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get continueButton => 'Continuer';
 
   @override
-  String get welcome => 'Prix Carburants';
+  String get welcome => 'Sparkilo';
 
   @override
   String get welcomeSubtitle =>
@@ -2594,7 +2594,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'L\'application fonctionne entièrement hors ligne. La synchronisation cloud est optionnelle.';
 
   @override
-  String get syncModeCommunityTitle => 'Communauté Tankstellen';
+  String get syncModeCommunityTitle => 'Communauté Sparkilo';
 
   @override
   String get syncModeCommunitySubtitle =>
@@ -3563,7 +3563,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String favoritesShareSubject(String date) {
-    return 'Tankstellen — favoris du $date';
+    return 'Sparkilo — favoris du $date';
   }
 
   @override
@@ -4269,7 +4269,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get speedConsumptionNeedMoreData => 'Plus de données nécessaires';
 
   @override
-  String get splashLoadingLabel => 'Loading Tankstellen';
+  String get splashLoadingLabel => 'Loading Sparkilo';
 
   @override
   String get tankLevelTitle => 'Niveau du réservoir';
@@ -4497,7 +4497,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String trajetDetailShareSubject(String date) {
-    return 'Tankstellen — trajet du $date';
+    return 'Sparkilo — trajet du $date';
   }
 
   @override
@@ -4688,7 +4688,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get vinInfoSectionPrivacyBody =>
-      'Votre VIN est stocké uniquement en local dans le stockage chiffré de l\'application — il n\'est jamais envoyé aux serveurs Tankstellen. La base de données NHTSA vPIC est interrogée avec le VIN mais ne renvoie que des spécifications techniques anonymes ; NHTSA n\'associe le VIN à aucune donnée personnelle. Sans réseau, une recherche hors ligne ne renvoie que le constructeur et le pays.';
+      'Votre VIN est stocké uniquement en local dans le stockage chiffré de l\'application — il n\'est jamais envoyé aux serveurs Sparkilo. La base de données NHTSA vPIC est interrogée avec le VIN mais ne renvoie que des spécifications techniques anonymes ; NHTSA n\'associe le VIN à aucune donnée personnelle. Sans réseau, une recherche hors ligne ne renvoie que le constructeur et le pays.';
 
   @override
   String get vinInfoSectionWhereTitle => 'Où le trouver';
@@ -4702,7 +4702,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get vinConfirmPrivacyNote =>
-      'Nous avons interrogé votre VIN dans la base de données gratuite NHTSA — rien n\'a été envoyé aux serveurs Tankstellen.';
+      'Nous avons interrogé votre VIN dans la base de données gratuite NHTSA — rien n\'a été envoyé aux serveurs Sparkilo.';
 
   @override
   String get gdprVinOnlineDecodeTitle => 'Décodage VIN en ligne';

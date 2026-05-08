@@ -140,7 +140,7 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       // Should redirect to setup
-      expect(find.text('Fuel Prices'), findsOneWidget); // Welcome title
+      expect(find.text('Sparkilo'), findsOneWidget); // Welcome title
     });
 
     testWidgets('/ renders shell with search when setup is complete',
@@ -168,7 +168,7 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       // The search screen AppBar title
-      expect(find.text('Fuel Prices'), findsOneWidget);
+      expect(find.text('Sparkilo'), findsOneWidget);
     });
 
     testWidgets('shell has 5 navigation branches (#778)', (tester) async {

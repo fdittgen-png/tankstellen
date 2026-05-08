@@ -1,6 +1,6 @@
 {
   "@@locale": "lv",
-  "appTitle": "Degvielas cenas",
+  "appTitle": "Sparkilo",
   "search": "Meklēt",
   "favorites": "Izlase",
   "map": "Karte",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "API atslēga",
   "register": "Reģistrācija",
   "continueButton": "Turpināt",
-  "welcome": "Degvielas cenas",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Atrodiet lētāko degvielu tuvumā.",
   "profileName": "Profila nosaukums",
   "preferredFuel": "Izvēlētā degviela",

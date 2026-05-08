@@ -1,6 +1,6 @@
 {
   "@@locale": "el",
-  "appTitle": "Τιμές Καυσίμων",
+  "appTitle": "Sparkilo",
   "search": "Αναζήτηση",
   "favorites": "Αγαπημένα",
   "map": "Χάρτης",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "Κλειδί API",
   "register": "Εγγραφή",
   "continueButton": "Συνέχεια",
-  "welcome": "Τιμές Καυσίμων",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Βρείτε τα φθηνότερα καύσιμα κοντά σας.",
   "profileName": "Όνομα προφίλ",
   "preferredFuel": "Προτιμώμενο καύσιμο",

@@ -347,11 +347,11 @@ void main() {
         expect(capturedKey!.currentContext, isNotNull,
             reason: 'boundary key must point at a mounted widget so the '
                 'real renderer can rasterise it');
-        // The subject template is "Tankstellen — trip on {date}" in
+        // The subject template is "Sparkilo — trip on {date}" in
         // English (the trip's startedAt is 2026-04-22). Verify the
         // brand + the year ended up in the share subject.
         expect(capturedSubject, isNotNull);
-        expect(capturedSubject, contains('Tankstellen'));
+        expect(capturedSubject, contains('Sparkilo'));
         expect(capturedSubject, contains('2026'));
         expect(capturedFileNameStem, 'tankstellen_trip_trip-1');
         // Should NOT be a clipboard snackbar — make sure no legacy

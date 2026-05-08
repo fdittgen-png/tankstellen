@@ -1,6 +1,6 @@
 {
   "@@locale": "lt",
-  "appTitle": "Degalų kainos",
+  "appTitle": "Sparkilo",
   "search": "Ieškoti",
   "favorites": "Mėgstami",
   "map": "Žemėlapis",
@@ -37,7 +37,7 @@
   "apiKeyLabel": "API raktas",
   "register": "Registracija",
   "continueButton": "Tęsti",
-  "welcome": "Degalų kainos",
+  "welcome": "Sparkilo",
   "welcomeSubtitle": "Raskite pigiausius degalus netoliese.",
   "profileName": "Profilio pavadinimas",
   "preferredFuel": "Pageidaujami degalai",

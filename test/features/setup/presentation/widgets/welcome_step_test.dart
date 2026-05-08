@@ -9,7 +9,7 @@ void main() {
       await pumpApp(tester, const WelcomeStep());
 
       expect(find.byIcon(Icons.local_gas_station), findsOneWidget);
-      expect(find.text('Fuel Prices'), findsOneWidget);
+      expect(find.text('Sparkilo'), findsOneWidget);
       expect(
         find.text('Find the cheapest fuel near you.'),
         findsOneWidget,
@@ -32,7 +32,7 @@ void main() {
         locale: const Locale('de'),
       );
 
-      expect(find.text('Tankstellen'), findsOneWidget);
+      expect(find.text('Sparkilo'), findsOneWidget);
       expect(
         find.text('Richten Sie die App in wenigen Schritten ein.'),
         findsOneWidget,

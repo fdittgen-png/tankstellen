@@ -1,4 +1,4 @@
-Tankstellen is a free, open-source fuel and EV charging price comparison app that helps you spend less at the pump and burn less fuel behind the wheel. Built with privacy as a core principle, it contains no ads, no tracking, and no telemetry. Your location never leaves your device unless you explicitly opt into cloud sync.
+Sparkilo is a free, open-source fuel and EV charging price comparison app that helps you spend less at the pump and burn less fuel behind the wheel. Built with privacy as a core principle, it contains no ads, no tracking, and no telemetry. Your location never leaves your device unless you explicitly opt into cloud sync.
 
 FEATURES
 
@@ -28,13 +28,13 @@ Privacy-first
 
 OPTIONAL CLOUD SYNC (TankSync)
 
-For users who want to sync favorites, vehicles, fill-ups, and alerts across multiple devices, Tankstellen supports an optional self-hosted Supabase backend called TankSync. You deploy your own instance, enter the URL and anonymous key, and the app syncs to your own server. Full data transparency: view, export, or delete everything at any time from within the app.
+For users who want to sync favorites, vehicles, fill-ups, and alerts across multiple devices, Sparkilo supports an optional self-hosted Supabase backend called TankSync. You deploy your own instance, enter the URL and anonymous key, and the app syncs to your own server. Full data transparency: view, export, or delete everything at any time from within the app.
 
 Push notifications for price alerts are delivered via ntfy.sh, an open-source push notification service, so no Google Play Services or Firebase are required.
 
 OPEN SOURCE
 
-Tankstellen is licensed under MIT. Full source code, Supabase migration scripts, and deployment documentation are available on GitHub. Contributions and translations are welcome.
+Sparkilo is licensed under MIT. Full source code, Supabase migration scripts, and deployment documentation are available on GitHub. Contributions and translations are welcome.
 
 SUPPORTED PLATFORMS
 
