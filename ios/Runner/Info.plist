@@ -65,6 +65,14 @@
 	<string>Tankstellen uses background location to check fuel prices and send price alert notifications.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Tankstellen uses background location to check fuel prices and send price alert notifications.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Tankstellen uses Bluetooth to connect to your OBD2 adapter and read live consumption from your vehicle.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Tankstellen uses Bluetooth to connect to your OBD2 adapter and read live consumption from your vehicle.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Tankstellen uses the camera to scan fuel receipts and payment QR codes.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Tankstellen needs access to your photo library so you can attach an existing receipt photo to a fill-up entry.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -73,7 +81,7 @@
 	</array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>de.tankstellen.tankstellen.background</string>
+		<string>de.tankstellen.fuelprices.background</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
