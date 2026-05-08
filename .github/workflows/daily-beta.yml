@@ -4,8 +4,12 @@ name: Daily Open-Testing Build
 # Cron is UTC: 16:00 UTC = 18:00 CEST (summer) / 17:00 CET (winter).
 # Adjust to '0 17 * * *' if you want 18:00 Paris during winter instead.
 #
-# Build numbers are date-based (YYYYMMDD) computed at build time, so there's no
-# commit pushed back to master. pubspec.yaml's +N keeps tracking manual releases.
+# Build numbers are date+hour-based (YYYYMMDDHH) computed at build time, so
+# there's no commit pushed back to master and re-runs on the same day get
+# distinct, monotonically-increasing version codes (Play Store version codes
+# are global across tracks, so YYYYMMDD alone collides if Internal and Open
+# Testing both upload on the same day). pubspec.yaml's +N keeps tracking
+# manual releases. Max value at year 2099 fits Android's 2,100,000,000 cap.
 on:
   schedule:
     - cron: '0 16 * * *'
@@ -42,7 +46,7 @@ jobs:
       - name: Compute date-based build number
         id: bn
         run: |
-          BN=$(TZ=Europe/Paris date +%Y%m%d)
+          BN=$(TZ=Europe/Paris date +%Y%m%d%H)
           echo "build_number=$BN" >> "$GITHUB_OUTPUT"
           echo "Daily build number: $BN"
 

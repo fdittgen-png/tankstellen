@@ -3,8 +3,9 @@ name: iOS TestFlight Build
 # Build a signed iOS IPA on a macOS runner and upload it to TestFlight via the
 # App Store Connect API. Mirror of `daily-beta.yml` but for iOS.
 #
-# Build numbers are date-based (YYYYMMDD) computed at build time, so there's no
-# commit pushed back to master.
+# Build numbers are date+hour-based (YYYYMMDDHH) computed at build time, so
+# there's no commit pushed back to master and re-runs on the same day get
+# distinct, monotonically-increasing CFBundleVersions.
 
 on:
   workflow_dispatch:
@@ -34,7 +35,7 @@ jobs:
       - name: Compute date-based build number
         id: bn
         run: |
-          BN=$(TZ=Europe/Paris date +%Y%m%d)
+          BN=$(TZ=Europe/Paris date +%Y%m%d%H)
           echo "build_number=$BN" >> "$GITHUB_OUTPUT"
           echo "Daily build number: $BN"
 
@@ -75,20 +76,25 @@ jobs:
           echo "$ASC_KEY_BASE64" | base64 --decode > "$KEY_PATH"
           echo "ASC_API_KEY_FILEPATH=$KEY_PATH" >> "$GITHUB_ENV"
 
-      - name: Validate match-repo auth secret
-        env:
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+      - name: Set up SSH agent with match deploy key
+        # The match repo (fdittgen-png/tankstellen-ios-certs) is fetched
+        # via SSH using a deploy key stored in MATCH_DEPLOY_KEY. PAT-based
+        # auth was tried first but GitHub's fine-grained PAT scope kept
+        # rejecting clone requests with 403; deploy keys bypass the PAT
+        # scoping entirely and are read-only by design (#1498).
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.MATCH_DEPLOY_KEY }}
+
+      - name: Add github.com to known_hosts
         run: |
-          if [ -z "$MATCH_GIT_BASIC_AUTHORIZATION" ]; then
-            echo "::error::MATCH_GIT_BASIC_AUTHORIZATION secret is not set. See docs/guides/ios-codesigning.md." >&2
-            exit 1
-          fi
+          mkdir -p ~/.ssh
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
 
       - name: fastlane release_testflight
         working-directory: ios
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           # ASC_API_KEY_FILEPATH was exported by the decode step above so the

@@ -217,20 +217,22 @@ jobs:
           echo "$ASC_KEY_BASE64" | base64 --decode > "$KEY_PATH"
           echo "ASC_API_KEY_FILEPATH=$KEY_PATH" >> "$GITHUB_ENV"
 
-      - name: Validate match-repo auth secret
-        env:
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+      - name: Set up SSH agent with match deploy key
+        # Match repo is fetched via SSH using a deploy key stored as
+        # MATCH_DEPLOY_KEY (read-only, scoped to the certs repo).
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.MATCH_DEPLOY_KEY }}
+
+      - name: Add github.com to known_hosts
         run: |
-          if [ -z "$MATCH_GIT_BASIC_AUTHORIZATION" ]; then
-            echo "::error::MATCH_GIT_BASIC_AUTHORIZATION secret is not set. See docs/guides/ios-codesigning.md." >&2
-            exit 1
-          fi
+          mkdir -p ~/.ssh
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
 
       - name: fastlane match_appstore + build_appstore
         working-directory: ios
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           IOS_BUILD_NUMBER: ${{ needs.pre-check.outputs.build_number }}
