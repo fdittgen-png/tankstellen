@@ -101,11 +101,18 @@ jobs:
           echo "PLAY_KEY_PATH=$RUNNER_TEMP/play-key.json" >> "$GITHUB_ENV"
 
       - name: Upload to Play Store
+        # Cron-default track is `internal` until the ACCESS_BACKGROUND_LOCATION
+        # sensitive-permissions declaration is approved in Play Console (see
+        # issue #1498). The Open Testing (`beta`) track currently 403s at
+        # `edits.commit` because that declaration is missing. Internal Testing
+        # accepts the same AAB without the declaration. Manual workflow_dispatch
+        # runs can still pick `beta` / `alpha` / `production` from the input.
+        # Flip back to `'beta'` once Google approves the form.
         run: |
           python tools/upload_to_play.py \
             --aab build/app/outputs/bundle/playRelease/app-play-release.aab \
             --key "$PLAY_KEY_PATH" \
-            --track "${{ github.event.inputs.track || 'beta' }}" \
+            --track "${{ github.event.inputs.track || 'internal' }}" \
             ${{ github.event.inputs.release_notes && format('--release-notes "{0}"', github.event.inputs.release_notes) || '' }}
 
       - name: Clean up service-account key
@@ -118,5 +125,5 @@ jobs:
           echo "## Daily Open-Testing Release" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Build number:** ${{ steps.bn.outputs.build_number }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Track:** ${{ github.event.inputs.track || 'beta' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Track:** ${{ github.event.inputs.track || 'internal' }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Trigger:** ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
