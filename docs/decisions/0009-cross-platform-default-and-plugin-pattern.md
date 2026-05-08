@@ -112,6 +112,32 @@ PR that intentionally trades one platform for the other is rejected.
 - **Secure storage** — `flutter_secure_storage` does the same for
   Android Keystore and iOS Keychain.
 
+## Alternatives Considered
+
+**Inline `if (Platform.isIOS) { ... }` branches in shared code.** Rejected
+— already covered in the Decision section. Short-term cheap, long-term
+ruinous: turns the shared code's import graph into a per-platform
+dependency soup, and makes deleting a platform an archaeological project
+rather than just removing one plugin file.
+
+**Separate Dart packages per platform-specific feature** (e.g. an
+`obd2_ble_android` and `obd2_ble_ios` package consumed by the main app).
+Rejected for v1: adds packaging overhead (path dependencies, version
+pinning, separate test runs) for plugins that today are all single-impl
+files. Reconsider if a third party ever wants to ship a platform impl
+without forking the whole repo.
+
+**Single platform target.** Rejected: the iOS bootstrap (#1456 + #9
+follow-ups) was already a deliberate, completed investment. Walking it
+back now would invalidate signing infra (fastlane match repo, ASC API
+key, App Store Connect record) and the Mac CI runner job that already
+exists.
+
+**Conditional imports** (Dart's `if (dart.library.io)` pattern). Useful
+for the web/io split but a poor fit for our iOS/Android divide —
+`dart.library.io` is true on both, so it can't carry the platform
+branch. The plugin pattern subsumes this anyway.
+
 ## Out of scope
 
 This ADR doesn't say anything about *which* APIs we use on each platform
