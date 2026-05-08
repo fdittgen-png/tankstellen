@@ -12,9 +12,17 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Flutter-3.41-blue.svg)](https://flutter.dev)
 
-<a href="https://play.google.com/store/apps/details?id=de.tankstellen.fuelprices">
-  <img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="80"/>
-</a>
+<p>
+  <a href="https://play.google.com/store/apps/details?id=de.tankstellen.fuelprices">
+    <img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="64"/>
+  </a>
+  &nbsp;
+  <a href="https://apps.apple.com/app/id6766543414">
+    <img alt="Download on the App Store" src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="64"/>
+  </a>
+</p>
+
+<sub>iPhone listing currently in <strong>TestFlight beta</strong> — the App Store page will populate once Apple's first-build review clears.</sub>
 
 **A free, open-source companion app for cutting the running cost of your car.** 11 countries, 23 languages, privacy-first, no ads, no tracking.
 
@@ -80,8 +88,9 @@ Features that don't serve at least one of those three layers don't belong.
 
 - **Local-first** — Hive storage, smart caching, offline-capable
 - **Cross-device sync** — optional TankSync cloud backend (self-hostable via Supabase)
-- **Privacy** — no Firebase, no Google Play Services, no tracking, no ads, GDPR-compliant
-- **Accessibility** — meets Android tap-target guidelines, semantic labels throughout
+- **Privacy** — no Firebase, no Google Play Services, no Apple analytics SDKs, no tracking, no ads, GDPR-compliant
+- **Accessibility** — meets Android tap-target and Apple Human Interface tap-target guidelines, semantic labels throughout
+- **Platform parity** — iOS and Android share the same Dart codebase; platform-specific surfaces (BLE OBD2, background tasks, widgets) live behind plugin interfaces, never inline `Platform.isIOS` branches
 
 ## Screenshots
 
@@ -107,8 +116,8 @@ Captured on a Samsung S23 Ultra running the **Play** flavour against the live `P
 ### Prerequisites
 
 - [Flutter SDK](https://docs.flutter.dev/get-started/install) (stable channel, 3.41+)
-- Android SDK with at least one emulator or connected device
-- JDK 17
+- **For Android builds:** Android SDK with at least one emulator or connected device, plus JDK 17
+- **For iOS builds (macOS only):** Xcode 26+, CocoaPods 1.16+, Ruby 3.0+ with Bundler (see [docs/guides/ios-codesigning.md](docs/guides/ios-codesigning.md) for the fastlane match setup)
 
 ### Setup
 
@@ -139,7 +148,7 @@ Tankstellen uses official government fuel price APIs. Some require a free API ke
 | Spain | [MiTECO](https://sedeaplicaciones.mineco.gob.es/) | No |
 | Italy | [MISE](https://dgsaie.mise.gov.it/) | No |
 
-Keys are stored securely on-device (Android Keystore) — never embedded in source code.
+Keys are stored securely on-device (Android Keystore on Android, iOS Keychain on iOS via `flutter_secure_storage`) — never embedded in source code.
 
 ## Architecture
 
