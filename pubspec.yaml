@@ -52,7 +52,17 @@ dependencies:
   xml: ^6.6.1
   path_provider: ^2.1.5
   uuid: ^4.5.1
-  connectivity_plus: ^7.1.1
+  # Hold below 7.1.0: connectivity_plus 7.1.x's iOS PathMonitor source
+  # references `NWPath.isUltraConstrained`, an iOS 26 SDK symbol guarded by
+  # `#available(iOS 26.0, *)`. The runtime guard does NOT save us at compile
+  # time — Swift still type-checks the property access against whatever SDK
+  # Xcode is using, and the macos-latest GitHub runner has Xcode 16 (iOS 18
+  # SDK) which doesn't define `isUltraConstrained`. The build fails with
+  # "Value of type 'NWPath' has no member 'isUltraConstrained'". Restore to
+  # ^7.1.x once GitHub's macos-* runner image ships Xcode 26+ with the iOS
+  # 26 SDK (or once connectivity_plus moves the iOS 26 path behind a Swift
+  # `#if canImport(...)` / compiler-version gate).
+  connectivity_plus: '>=7.0.0 <7.1.0'
   shared_preferences: ^2.5.5
   url_launcher: ^6.3.1
   http: ^1.3.0
