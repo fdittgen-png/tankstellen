@@ -3,14 +3,23 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <!-- Hands-free trip auto-record (#1004 / #1302).
-         Required so the OS shows the "Allow all the time" option for
-         location when the user opts into auto-record. Without this
-         declaration, `Permission.locationAlways.request()` returns
-         `denied` immediately with no UI. On Android 11+ the OS does
-         NOT grant this via runtime dialog after the first prompt —
-         the app must send the user to Settings via openAppSettings(). -->
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <!-- ACCESS_BACKGROUND_LOCATION removed for Open Testing release.
+         Google Play's Sensitive Permissions policy requires a written +
+         video-recorded declaration before any *reviewed* track (Open
+         Testing, Closed Testing, Production) accepts an AAB that
+         declares this permission. The declaration is a manual web-UI
+         submission tracked in #1498. Until that's approved, this
+         permission is dropped from the manifest so the app stays
+         publicly distributable.
+         Functional impact: hands-free trip auto-record (#1004 / #1302)
+         degrades to foreground-only — `Permission.locationAlways
+         .request()` returns `denied` because the manifest doesn't
+         declare it, the auto-record toggle in Settings shows the
+         `featureBlockedDisable_*` rationale, and trips that begin
+         while the app is backgrounded are missed. Restore this line
+         the moment Google approves the sensitive-permissions form. -->
+    <!-- <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/> -->
+
 
     <!-- Bluetooth — used by the OBD2 adapter transport (#716). -->
     <!-- Android <= 11 (API 30) BT permissions. -->
