@@ -161,16 +161,23 @@ jobs:
           set -euo pipefail
           # --skip_upload_aab / --skip_upload_apk: metadata-only run.
           # AABs ship from daily-beta.yml + daily-github-release.yml.
-          # The defaults push title + descriptions + changelogs +
-          # icon + featureGraphic + phoneScreenshots from the metadata
-          # tree at $SUPPLY_METADATA_PATH/<locale>/.
+          # --skip_upload_changelogs: this listing workflow pushes
+          # title + descriptions + icon + featureGraphic +
+          # phoneScreenshots only. Changelogs travel WITH each AAB
+          # (the AAB-upload workflows already handle them keyed by
+          # versionCode), and `supply` rejects a metadata-only run
+          # that touches `default.txt` without a `--version_code`
+          # to attach it to (run 25608959525).
+          # The defaults still push everything else from the
+          # metadata tree at $SUPPLY_METADATA_PATH/<locale>/.
           bundle exec fastlane supply \
             --json_key "$SUPPLY_JSON_KEY" \
             --package_name "$SUPPLY_PACKAGE_NAME" \
             --track "$SUPPLY_TRACK" \
             --metadata_path "$SUPPLY_METADATA_PATH" \
             --skip_upload_aab \
-            --skip_upload_apk
+            --skip_upload_apk \
+            --skip_upload_changelogs
 
       - name: Dry-run summary
         if: steps.track.outputs.dry_run == 'true'
