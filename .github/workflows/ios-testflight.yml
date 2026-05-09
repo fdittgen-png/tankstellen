@@ -39,6 +39,19 @@ jobs:
           echo "build_number=$BN" >> "$GITHUB_OUTPUT"
           echo "Daily build number: $BN"
 
+      - name: Select Xcode 26+
+        # macos-latest selects Xcode 16.4 (iOS 18.5 SDK) by default. Apple
+        # rejects TestFlight uploads built with anything older than Xcode 26
+        # since the iOS 26 release: altool returns
+        #   "SDK version issue. This app was built with the iOS 18.5 SDK.
+        #    All iOS and iPadOS apps must be built with the iOS 26 SDK or
+        #    later, included in Xcode 26 or later"
+        # The runner image ships multiple Xcodes side-by-side; this picks
+        # the newest stable and points DEVELOPER_DIR at it.
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
