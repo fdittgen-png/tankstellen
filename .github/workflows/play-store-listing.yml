@@ -150,14 +150,20 @@ jobs:
           SUPPLY_JSON_KEY: /tmp/play-store-key.json
           SUPPLY_PACKAGE_NAME: de.tankstellen.fuelprices
           SUPPLY_TRACK: ${{ steps.track.outputs.track }}
-          SUPPLY_METADATA_PATH: docs/play-store/metadata
+          # `supply --metadata_path` expects a directory whose direct
+          # children are locale folders (`en-US/`, `de-DE/`, …). Our
+          # tree adds an `android/` parent, so point supply INTO that
+          # parent, not at it — otherwise supply treats `android` as a
+          # locale name and Google's API rejects the upload with
+          # `android - Invalid request` (run 25607897831).
+          SUPPLY_METADATA_PATH: docs/play-store/metadata/android
         run: |
           set -euo pipefail
           # --skip_upload_aab / --skip_upload_apk: metadata-only run.
           # AABs ship from daily-beta.yml + daily-github-release.yml.
           # The defaults push title + descriptions + changelogs +
           # icon + featureGraphic + phoneScreenshots from the metadata
-          # tree at $SUPPLY_METADATA_PATH/android/<locale>/.
+          # tree at $SUPPLY_METADATA_PATH/<locale>/.
           bundle exec fastlane supply \
             --json_key "$SUPPLY_JSON_KEY" \
             --package_name "$SUPPLY_PACKAGE_NAME" \
