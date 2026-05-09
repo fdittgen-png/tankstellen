@@ -1,5 +1,3 @@
-• Vereinte Suche für Kraftstoff + EV-Laden
-• Freihändige OBD2-Auto-Aufzeichnung mit Launcher-Badge
-• Marker für starke Beschleunigung auf der Fahrtkarte
-• 30-Tage-Preisverlauf mit „beste Tankzeit"-Vorhersage
-• 17 Länder, 23 Sprachen
+WICHTIG — bitte deinstalliere die vorherige Version (Tankstellen / Prix Carburants), bevor du diese installierst. Die neue Version ist mit einem neuen Schlüssel signiert; Android kann nicht direkt aktualisieren.
+
+Willkommen bei Sparkilo — Tankstellen + Prix Carburants jetzt eine App: vereinte Suche Kraftstoff + EV in 17 Ländern, OBD2-Auto-Aufzeichnung, 30-Tage-Preisverlauf, 23 Sprachen.
