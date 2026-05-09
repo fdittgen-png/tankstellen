@@ -78,7 +78,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('section renders with one toggle per feature (17 total)',
+    testWidgets('section renders with one toggle per feature (19 total)',
         (tester) async {
       await pumpApp(tester, const ProfileScreen(), overrides: baseOverrides);
       await openSection(tester);
@@ -93,12 +93,14 @@ void main() {
           reason: 'expected a switch for ${f.name}',
         );
       }
-      expect(Feature.values.length, 17,
+      expect(Feature.values.length, 19,
           reason: '#1373 phase 1 shipped 13 features; phase 3d added '
               'autoRecord as a master gate over the per-vehicle bool '
               '(14); phase 3c bundled showFuel + showElectric + '
-              'showConsumptionTab (total 17). Update the test if a '
-              'new feature was added or removed.');
+              'showConsumptionTab (17); #1517 added manualConsumption + '
+              'loyaltyCards for the Medium / Full use-mode profile '
+              'bundles (total 19). Update the test if a new feature was '
+              'added or removed.');
     });
 
     testWidgets(

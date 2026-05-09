@@ -313,6 +313,14 @@ String _featureLabel(AppLocalizations? l, Feature f) {
       return l?.featureLabel_showElectric ?? 'Show charging stations';
     case Feature.showConsumptionTab:
       return l?.featureLabel_showConsumptionTab ?? 'Consumption tab';
+    case Feature.manualConsumption:
+      // #1517: ARB strings to follow in a localisation pass; English-
+      // only fallback for now so the toggle is at least readable.
+      return 'Manual consumption logging';
+    case Feature.loyaltyCards:
+      // #1517: ARB strings to follow in a localisation pass; English-
+      // only fallback for now so the toggle is at least readable.
+      return 'Loyalty cards';
   }
 }
 
@@ -369,6 +377,12 @@ String _featureDescription(AppLocalizations? l, Feature f) {
     case Feature.showConsumptionTab:
       return l?.featureDescription_showConsumptionTab ??
           'Show the consumption analytics tab in the bottom navigation.';
+    case Feature.manualConsumption:
+      // #1517: ARB strings to follow in a localisation pass.
+      return 'Track fuel fill-ups and EV charging sessions by hand (no OBD2 adapter required).';
+    case Feature.loyaltyCards:
+      // #1517: ARB strings to follow in a localisation pass.
+      return 'Fuel-club / loyalty program cards with per-litre discounts in price comparisons.';
   }
 }
 
@@ -410,6 +424,8 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
     case Feature.evCharging:
     case Feature.showFuel:
     case Feature.showElectric:
+    case Feature.manualConsumption:
+    case Feature.loyaltyCards:
       return 'Prerequisites not met';
   }
 }
