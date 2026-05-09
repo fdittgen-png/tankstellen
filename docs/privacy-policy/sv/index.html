@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sparkilo — Integritetspolicy</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+
+<h1>Integritetspolicy</h1>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen på iOS, de.tankstellen.fuelprices på Android) &mdash; Senast uppdaterad: 9 maj 2026</p>
+<p class="langs">Tillgängliga språk: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
+
+<h2>1. Översikt</h2>
+<p>Sparkilo (tidigare Fuel Prices Europe & More) är en gratis öppen källkods-app för jämförelse av drivmedels- och laddpriser. Den är byggd kring en <strong>local-first, integritetsvänlig</strong> arkitektur. Inga annonser, inga spårningspixlar, inga annons-ID:n.</p>
+
+<h2>2. Data vi använder</h2>
+
+<h3>2.1 Ungefärlig plats</h3>
+<p>När du beviljar platsbehörighet läser appen din ungefärliga position för att hitta drivmedels- och laddstationer i närheten. Koordinaterna skickas till tredje parts API:er (se avsnitt 4) som en del av sökningen. Din position <strong>lagras inte på någon server vi driver</strong> och används aldrig för spårning eller profilering.</p>
+
+<h3>2.2 API-nycklar du anger själv</h3>
+<p>Om du anger en egen API-nyckel (t.ex. Tankerkönig) lagras den lokalt i krypterad lagring (Android Keystore / iOS Keychain). Nyckeln skickas endast till motsvarande API-leverantör, aldrig till oss eller till tredje part.</p>
+
+<h3>2.3 Favoriter, profiler och inställningar</h3>
+<p>Dina favoriter, sökprofiler, drivmedelsval och appinställningar lagras lokalt på din enhet via Hive, en inbyggd lokal databas.</p>
+
+<h3>2.4 TankSync (valfri molnsynkronisering)</h3>
+<p>Om du aktiverar TankSync skapas ett anonymt konto via Supabase. Synkroniserade data:</p>
+<ul>
+  <li>Anonym användar-ID (UUID — ingen e-post eller namn)</li>
+  <li>ID:n för favoritstationer</li>
+  <li>Konfigurationer för prislarm</li>
+  <li>Communityrapporter om priser (stations-ID, drivmedelstyp, pris, tidsstämpel)</li>
+</ul>
+<p>TankSync är valfritt och inaktiverat som standard. Du kan visa, exportera och radera all serverdata från skärmen « Datatransparens » i appen.</p>
+
+<h3>2.5 Krasch- och diagnosrapporter (opt-in)</h3>
+<p>Om du aktiverar diagnos i Inställningar skickas anonyma kraschrapporter och prestandaspår till Sentry. Ingen personlig information, plats eller innehåll ingår. Diagnos är avstängd som standard.</p>
+
+<h2>3. Data vi INTE samlar in</h2>
+<ul>
+  <li>Namn, e-postadress eller telefonnummer</li>
+  <li>Finansiell information eller betalningsuppgifter</li>
+  <li>Hälso- eller träningsdata</li>
+  <li>Kontakter, meddelanden eller samtalsloggar</li>
+  <li>Foton, videor eller filer (åtkomst till kamera och bildbibliotek används endast för kvittoskanning som du själv startar)</li>
+  <li>Webbhistorik</li>
+  <li>Annons-ID:n från enheten</li>
+</ul>
+
+<h2>4. Tredjepartstjänster</h2>
+<p>Appen kommunicerar med följande tredjeparts-API:er:</p>
+<ul>
+  <li><strong>Tankerkönig</strong> (creativecommons.tankerkoenig.de) — tyska priser. Tar emot: sökkoordinater, din API-nyckel.</li>
+  <li><strong>Prix Carburants</strong> (data.economie.gouv.fr) — franska priser. Tar emot: sökkoordinater.</li>
+  <li><strong>Italiensk pris-API</strong> (osservaprezzi.mise.gov.it) — italienska priser. Tar emot: sökkoordinater.</li>
+  <li><strong>Spansk pris-API</strong> (sedeaplicaciones.minetur.gob.es) — spanska priser. Tar emot: sökkoordinater.</li>
+  <li><strong>Spritpreisrechner</strong> (spritpreisrechner.at) — österrikiska priser. Tar emot: sökkoordinater.</li>
+  <li><strong>FuelWatch</strong> (fuelwatch.be) — belgiska priser. Tar emot: sökkoordinater.</li>
+  <li><strong>data.public.lu</strong> — luxemburgska priser. Tar emot: sökkoordinater.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) — laddstationer. Tar emot: sökkoordinater.</li>
+  <li><strong>Nominatim / OpenStreetMap</strong> (nominatim.openstreetmap.org) — geokodning. Tar emot: söktext eller koordinater.</li>
+  <li><strong>OpenStreetMap-tile-servrar</strong> (tile.openstreetmap.org) — kartrutor. Tar emot: rutkoordinater.</li>
+  <li><strong>Supabase</strong> (endast om TankSync är aktivt) — backend för molnsynkronisering.</li>
+  <li><strong>Sentry</strong> (endast om diagnos är aktiv) — anonyma krasch- och prestandarapporter.</li>
+</ul>
+<p>Varje leverantör har en egen integritetspolicy. Vi rekommenderar att du läser dem. Appen delar inte data mellan dessa leverantörer.</p>
+
+<h2>5. Datasäkerhet</h2>
+<ul>
+  <li>All nätverkskommunikation använder HTTPS (TLS-kryptering under transport).</li>
+  <li>API-nycklar lagras i plattformens nativa krypterade lagring (Android Keystore / iOS Keychain).</li>
+  <li>Lokal data lagras på din enhet via Hive.</li>
+  <li>Inga data skickas till någon server om du inte själv startar en sökning eller aktiverar TankSync / diagnos.</li>
+</ul>
+
+<h2>6. Dina rättigheter</h2>
+<p>Du har rätt att:</p>
+<ul>
+  <li><strong>Få åtkomst</strong> — visa all lokalt lagrad data i appens Lagring-avsnitt.</li>
+  <li><strong>Exportera</strong> — exportera dina TankSync-data som JSON från skärmen Datatransparens.</li>
+  <li><strong>Radera</strong> — radera all lokal data via Inställningar → Radera all data; radera all serverdata via TankSync → Datatransparens → Radera allt.</li>
+  <li><strong>Återkalla samtycke</strong> — återkalla platsbehörigheten i enhetens inställningar, eller stänga av TankSync / diagnos när som helst.</li>
+</ul>
+
+<h2>7. Barns integritet</h2>
+<p>Appen riktar sig inte till barn under 13 år. Vi samlar inte medvetet in personlig information från barn.</p>
+
+<h2>8. Ändringar i denna policy</h2>
+<p>Vi kan uppdatera denna policy från tid till annan. Ändringar publiceras på denna URL med ett uppdaterat datum. Fortsatt användning av appen utgör godkännande av den uppdaterade policyn.</p>
+
+<h2>9. Kontakt</h2>
+<div class="contact">
+  <p><strong>Utvecklare:</strong> Florian DITTGEN</p>
+  <p><strong>E-post:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Källkod:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+
+</body>
+</html>

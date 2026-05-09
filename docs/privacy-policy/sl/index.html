@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sparkilo — Pravilnik o zasebnosti</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+
+<h1>Pravilnik o zasebnosti</h1>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen v iOS-u, de.tankstellen.fuelprices v Androidu) &mdash; Zadnja posodobitev: 9. maj 2026</p>
+<p class="langs">Razpoložljivi jeziki: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
+
+<h2>1. Pregled</h2>
+<p>Sparkilo (prej Fuel Prices Europe & More) je brezplačna odprtokodna aplikacija za primerjavo cen goriv in polnilnih postaj za električna vozila. Zgrajena je po <strong>local-first, zasebnost spoštujočem</strong> načelu. Brez oglasov, brez sledilnih pikslov, brez oglaševalskih ID-jev.</p>
+
+<h2>2. Podatki, ki jih uporabljamo</h2>
+
+<h3>2.1 Približna lokacija</h3>
+<p>Ko dovolite dostop do lokacije, aplikacija prebere vaš približni položaj, da poišče bližnje črpalke in polnilne postaje. Koordinate se kot del poizvedbe pošljejo API-jem tretjih oseb (glejte razdelek 4). Vaša lokacija <strong>se ne shrani na noben naš strežnik</strong> in se nikoli ne uporablja za sledenje ali profiliranje.</p>
+
+<h3>2.2 API ključi, ki jih posredujete sami</h3>
+<p>Če posredujete svoj API ključ (npr. Tankerkönig), je shranjen lokalno v šifriranem shranjevalniku (Android Keystore / iOS Keychain). Ključ se pošlje samo ustreznemu ponudniku API-ja, nikoli nam ali tretjim osebam.</p>
+
+<h3>2.3 Priljubljene, profili in nastavitve</h3>
+<p>Vaše priljubljene, iskalni profili, nastavitve goriv in nastavitve aplikacije se shranjujejo lokalno na vašo napravo v zbirko Hive.</p>
+
+<h3>2.4 TankSync (neobvezna sinhronizacija v oblaku)</h3>
+<p>Če omogočite TankSync, se prek storitve Supabase ustvari anonimni račun. Sinhronizirani podatki:</p>
+<ul>
+  <li>Anonimni ID uporabnika (UUID — brez e-pošte ali imena)</li>
+  <li>ID-ji priljubljenih črpalk</li>
+  <li>Nastavitve cenovnih opozoril</li>
+  <li>Skupnostni podatki o cenah (ID črpalke, vrsta goriva, cena, časovni žig)</li>
+</ul>
+<p>TankSync je neobvezen in privzeto izklopljen. Vse podatke na strežniku si lahko ogledate, izvozite in izbrišete iz zaslona « Preglednost podatkov » znotraj aplikacije.</p>
+
+<h3>2.5 Poročila o sesutjih in diagnostika (po izbiri)</h3>
+<p>Če v Nastavitvah omogočite diagnostiko, se v Sentry pošljejo anonimna poročila o sesutjih in sledi delovanja. Vključenih ni nobenih osebnih podatkov, lokacije ali vsebine. Diagnostika je privzeto izklopljena.</p>
+
+<h2>3. Podatki, ki jih NE zbiramo</h2>
+<ul>
+  <li>Ime, e-poštni naslov ali telefonsko številko</li>
+  <li>Finančne ali plačilne podatke</li>
+  <li>Zdravstvene ali fitnes podatke</li>
+  <li>Stike, sporočila ali dnevnike klicev</li>
+  <li>Fotografije, video posnetke ali datoteke (dostop do kamere in galerije se uporablja le za skeniranje računov, ki ga sami sprožite)</li>
+  <li>Zgodovino brskanja</li>
+  <li>Oglaševalske identifikatorje naprave</li>
+</ul>
+
+<h2>4. Storitve tretjih oseb</h2>
+<p>Aplikacija komunicira z naslednjimi API-ji tretjih oseb:</p>
+<ul>
+  <li><strong>Tankerkönig</strong> (creativecommons.tankerkoenig.de) — nemške cene. Prejme: koordinate iskanja, vaš API ključ.</li>
+  <li><strong>Prix Carburants</strong> (data.economie.gouv.fr) — francoske cene. Prejme: koordinate iskanja.</li>
+  <li><strong>Italijanski API cen</strong> (osservaprezzi.mise.gov.it) — italijanske cene. Prejme: koordinate iskanja.</li>
+  <li><strong>Španski API cen</strong> (sedeaplicaciones.minetur.gob.es) — španske cene. Prejme: koordinate iskanja.</li>
+  <li><strong>Spritpreisrechner</strong> (spritpreisrechner.at) — avstrijske cene. Prejme: koordinate iskanja.</li>
+  <li><strong>FuelWatch</strong> (fuelwatch.be) — belgijske cene. Prejme: koordinate iskanja.</li>
+  <li><strong>data.public.lu</strong> — luksemburške cene. Prejme: koordinate iskanja.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) — polnilne postaje. Prejme: koordinate iskanja.</li>
+  <li><strong>Nominatim / OpenStreetMap</strong> (nominatim.openstreetmap.org) — geokodiranje. Prejme: iskalno besedilo ali koordinate.</li>
+  <li><strong>Strežniki ploščic OpenStreetMap</strong> (tile.openstreetmap.org) — zemljevidne ploščice. Prejme: koordinate ploščice.</li>
+  <li><strong>Supabase</strong> (samo če je TankSync omogočen) — zaledje za sinhronizacijo v oblaku.</li>
+  <li><strong>Sentry</strong> (samo če je diagnostika omogočena) — anonimna poročila o sesutjih in delovanju.</li>
+</ul>
+<p>Vsak ponudnik ima svoj pravilnik o zasebnosti. Priporočamo, da jih preberete. Aplikacija med temi ponudniki ne deli podatkov.</p>
+
+<h2>5. Varnost podatkov</h2>
+<ul>
+  <li>Vsa omrežna komunikacija poteka prek HTTPS (TLS šifriranje med prenosom).</li>
+  <li>API ključi se shranjujejo v platformi lastnem šifriranem shranjevalniku (Android Keystore / iOS Keychain).</li>
+  <li>Lokalni podatki se shranjujejo na vaši napravi prek Hive.</li>
+  <li>Nobeni podatki se ne pošiljajo na strežnik, razen če sami sprožite iskanje ali omogočite TankSync / diagnostiko.</li>
+</ul>
+
+<h2>6. Vaše pravice</h2>
+<p>Imate pravico do:</p>
+<ul>
+  <li><strong>Vpogleda</strong> — vse lokalno shranjene podatke si lahko ogledate v razdelku Shramba znotraj aplikacije.</li>
+  <li><strong>Izvoza</strong> — podatke TankSync lahko izvozite v JSON s zaslona Preglednost podatkov.</li>
+  <li><strong>Izbrisa</strong> — vse lokalne podatke izbrišete prek Nastavitve → Izbriši vse podatke; vse strežniške podatke prek TankSync → Preglednost podatkov → Izbriši vse.</li>
+  <li><strong>Preklica privolitve</strong> — preklicati dovoljenje za lokacijo v sistemskih nastavitvah ali kadar koli onemogočiti TankSync / diagnostiko.</li>
+</ul>
+
+<h2>7. Zasebnost otrok</h2>
+<p>Aplikacija ni namenjena otrokom, mlajšim od 13 let. Zavestno ne zbiramo osebnih podatkov otrok.</p>
+
+<h2>8. Spremembe tega pravilnika</h2>
+<p>Pravilnik lahko občasno posodobimo. Spremembe bomo objavili na tem URL-ju z ažurnim datumom. Z nadaljnjo uporabo aplikacije se strinjate s posodobljenim pravilnikom.</p>
+
+<h2>9. Kontakt</h2>
+<div class="contact">
+  <p><strong>Razvijalec:</strong> Florian DITTGEN</p>
+  <p><strong>E-pošta:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Izvorna koda:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+
+</body>
+</html>

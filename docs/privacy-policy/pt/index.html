@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sparkilo — Política de privacidade</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+
+<h1>Política de privacidade</h1>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen no iOS, de.tankstellen.fuelprices no Android) &mdash; Última atualização: 9 de maio de 2026</p>
+<p class="langs">Idiomas disponíveis: <a href="../">English</a> <a href="../de/">Deutsch</a> <a href="../fr/">Français</a> <a href="../es/">Español</a> <a href="../it/">Italiano</a> <a href="../nl/">Nederlands</a> <a href="../pt/">Português</a> <a href="../sv/">Svenska</a> <a href="../fi/">Suomi</a> <a href="../da/">Dansk</a> <a href="../pl/">Polski</a> <a href="../sl/">Slovenščina</a> <a href="../ko/">한국어</a></p>
+
+<h2>1. Visão geral</h2>
+<p>O Sparkilo (anteriormente Fuel Prices Europe & More) é uma aplicação gratuita e de código aberto para comparar preços de combustível e de pontos de carregamento elétrico. É construída segundo uma arquitetura <strong>local-first, respeitadora da privacidade</strong>. Sem anúncios, sem píxeis de rastreamento, sem identificadores publicitários.</p>
+
+<h2>2. Dados que utilizamos</h2>
+
+<h3>2.1 Localização aproximada</h3>
+<p>Quando concede a permissão de localização, a app lê a sua posição aproximada para encontrar postos e pontos de carregamento próximos. As coordenadas são enviadas a APIs de terceiros (ver secção 4) como parte da consulta. A sua localização <strong>não é armazenada em nenhum servidor que operamos</strong> e nunca é usada para rastreamento ou perfis.</p>
+
+<h3>2.2 Chaves de API que você fornece</h3>
+<p>Se fornecer a sua própria chave de API (por exemplo, Tankerkönig), ela é guardada localmente em armazenamento cifrado (Android Keystore / iOS Keychain). A chave é enviada apenas ao fornecedor de API correspondente, nunca a nós nem a terceiros.</p>
+
+<h3>2.3 Favoritos, perfis e definições</h3>
+<p>Os seus favoritos, perfis de pesquisa, preferências de combustível e definições da app são guardados localmente no seu dispositivo através do Hive, uma base de dados local incorporada.</p>
+
+<h3>2.4 TankSync (sincronização na nuvem opcional)</h3>
+<p>Se ativar o TankSync, é criada uma conta anónima através do Supabase. Os dados sincronizados são:</p>
+<ul>
+  <li>Identificador anónimo de utilizador (UUID — sem email nem nome)</li>
+  <li>IDs dos postos favoritos</li>
+  <li>Configurações de alertas de preço</li>
+  <li>Relatos comunitários de preço (ID do posto, tipo de combustível, preço, carimbo de tempo)</li>
+</ul>
+<p>O TankSync é opcional e desativado por predefinição. Pode ver, exportar e eliminar todos os dados do servidor a partir do ecrã « Transparência de dados » dentro da app.</p>
+
+<h3>2.5 Relatórios de erro e diagnóstico (opt-in)</h3>
+<p>Se ativar os diagnósticos nas Definições, são enviados ao Sentry relatórios anónimos de erro e traços de desempenho. Não é incluída nenhuma informação pessoal, localização nem conteúdo. Os diagnósticos estão desativados por predefinição.</p>
+
+<h2>3. Dados que NÃO recolhemos</h2>
+<ul>
+  <li>Nome, endereço de email ou número de telefone</li>
+  <li>Informações financeiras ou de pagamento</li>
+  <li>Dados de saúde ou de fitness</li>
+  <li>Contactos, mensagens ou registos de chamadas</li>
+  <li>Fotos, vídeos ou ficheiros (o acesso à câmara e à galeria é usado apenas para digitalizar talões quando você inicia)</li>
+  <li>Histórico de navegação</li>
+  <li>Identificadores publicitários do dispositivo</li>
+</ul>
+
+<h2>4. Serviços de terceiros</h2>
+<p>A app comunica com as seguintes APIs de terceiros:</p>
+<ul>
+  <li><strong>Tankerkönig</strong> (creativecommons.tankerkoenig.de) — preços alemães. Recebe: coordenadas de pesquisa, a sua chave de API.</li>
+  <li><strong>Prix Carburants</strong> (data.economie.gouv.fr) — preços franceses. Recebe: coordenadas de pesquisa.</li>
+  <li><strong>API italiana de preços</strong> (osservaprezzi.mise.gov.it) — preços italianos. Recebe: coordenadas de pesquisa.</li>
+  <li><strong>API espanhola de preços</strong> (sedeaplicaciones.minetur.gob.es) — preços espanhóis. Recebe: coordenadas de pesquisa.</li>
+  <li><strong>Spritpreisrechner</strong> (spritpreisrechner.at) — preços austríacos. Recebe: coordenadas de pesquisa.</li>
+  <li><strong>FuelWatch</strong> (fuelwatch.be) — preços belgas. Recebe: coordenadas de pesquisa.</li>
+  <li><strong>data.public.lu</strong> — preços luxemburgueses. Recebe: coordenadas de pesquisa.</li>
+  <li><strong>OpenChargeMap</strong> (api.openchargemap.io) — pontos de carregamento. Recebe: coordenadas de pesquisa.</li>
+  <li><strong>Nominatim / OpenStreetMap</strong> (nominatim.openstreetmap.org) — geocodificação. Recebe: texto ou coordenadas de pesquisa.</li>
+  <li><strong>Servidores de tiles do OpenStreetMap</strong> (tile.openstreetmap.org) — tiles do mapa. Recebe: coordenadas do tile.</li>
+  <li><strong>Supabase</strong> (apenas se o TankSync estiver ativado) — backend de sincronização na nuvem.</li>
+  <li><strong>Sentry</strong> (apenas se os diagnósticos estiverem ativados) — relatórios anónimos de erro e desempenho.</li>
+</ul>
+<p>Cada fornecedor tem a sua própria política de privacidade. Recomendamos que as consulte. A app não partilha dados entre estes fornecedores.</p>
+
+<h2>5. Segurança dos dados</h2>
+<ul>
+  <li>Toda a comunicação em rede usa HTTPS (cifragem TLS em trânsito).</li>
+  <li>As chaves de API são guardadas no armazenamento cifrado nativo da plataforma (Android Keystore / iOS Keychain).</li>
+  <li>Os dados locais são guardados no seu dispositivo através do Hive.</li>
+  <li>Não são enviados dados para qualquer servidor a menos que inicie uma pesquisa ou ative o TankSync / diagnósticos.</li>
+</ul>
+
+<h2>6. Os seus direitos</h2>
+<p>Tem o direito de:</p>
+<ul>
+  <li><strong>Acesso</strong> — ver todos os dados guardados localmente na secção Armazenamento da app.</li>
+  <li><strong>Exportação</strong> — exportar os seus dados TankSync em JSON a partir do ecrã Transparência de dados.</li>
+  <li><strong>Eliminação</strong> — eliminar todos os dados locais via Definições → Eliminar todos os dados; eliminar todos os dados de servidor via TankSync → Transparência de dados → Eliminar tudo.</li>
+  <li><strong>Retirar consentimento</strong> — revogar a permissão de localização nas definições do dispositivo, ou desativar o TankSync / diagnósticos a qualquer momento.</li>
+</ul>
+
+<h2>7. Privacidade de crianças</h2>
+<p>A app não é dirigida a crianças com menos de 13 anos. Não recolhemos conscientemente informação pessoal de crianças.</p>
+
+<h2>8. Alterações a esta política</h2>
+<p>Podemos atualizar esta política periodicamente. As alterações serão publicadas neste URL com uma data atualizada. A continuação do uso da app constitui aceitação da política atualizada.</p>
+
+<h2>9. Contacto</h2>
+<div class="contact">
+  <p><strong>Programador:</strong> Florian DITTGEN</p>
+  <p><strong>Email:</strong> <a href="mailto:fdittgen@gmail.com">fdittgen@gmail.com</a></p>
+  <p><strong>Código-fonte:</strong> <a href="https://github.com/fdittgen-png/tankstellen">github.com/fdittgen-png/tankstellen</a></p>
+</div>
+
+</body>
+</html>

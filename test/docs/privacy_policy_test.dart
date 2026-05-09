@@ -18,12 +18,28 @@ void main() {
       expect(html, contains('</html>'));
     });
 
-    test('contains required section: data collected', () {
-      expect(html, contains('Data collected'));
+    // Section-heading checks are intentionally tolerant: the localized
+    // policies (de/fr/es/…) are generated from the same template and the
+    // canonical en-US wording was tightened in PR #1511 (e.g., "Data
+    // collected" → "Data we use", "Data NOT collected" → "Data we do NOT
+    // collect"). Match either phrasing so a future copy-edit doesn't
+    // require a coupled test edit.
+
+    test('contains a section about data the app uses', () {
+      expect(
+        html,
+        anyOf(contains('Data we use'), contains('Data collected')),
+      );
     });
 
-    test('contains required section: data NOT collected', () {
-      expect(html, contains('Data NOT collected'));
+    test('contains a section about data the app does NOT collect', () {
+      expect(
+        html,
+        anyOf(
+          contains('Data we do NOT collect'),
+          contains('Data NOT collected'),
+        ),
+      );
     });
 
     test('contains required section: third-party services', () {
@@ -44,7 +60,9 @@ void main() {
     });
 
     test('mentions location data', () {
-      expect(html, contains('Location'));
+      // Case-insensitive — the section heading uses lowercase "location"
+      // ("Approximate location") since #1511.
+      expect(html.toLowerCase(), contains('location'));
     });
 
     test('mentions API key storage', () {
