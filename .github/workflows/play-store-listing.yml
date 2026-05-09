@@ -131,21 +131,53 @@ jobs:
             echo "Mirrored $(ls $dst | wc -l) screenshots → $locale"
           done
 
-      - name: Upload to Google Play
+      - name: Set up Ruby + bundler
+        # We push metadata via `fastlane supply` (fastlane is already in
+        # the repo's Gemfile for the iOS lanes). `r0adkll/upload-google-
+        # play@v1` was the previous uploader but its action requires a
+        # `releaseFiles` AAB — there's no metadata-only mode — so it
+        # can't drive a listing-copy refresh. `fastlane supply
+        # --skip_upload_aab` is the canonical replacement.
         if: steps.track.outputs.dry_run != 'true'
-        uses: r0adkll/upload-google-play@v1
+        uses: ruby/setup-ruby@v1
         with:
-          serviceAccountJson: /tmp/play-store-key.json
-          packageName: de.tankstellen.fuelprices
-          track: ${{ steps.track.outputs.track }}
-          status: completed
-          changesNotSentForReview: false
-          # Metadata + screenshots only — no AAB upload here. AABs ship
-          # via the daily-beta + manual release workflows.
-          mappingFile: ''
-          whatsNewDirectory: ''  # changelogs live inside the metadata tree
-          releaseFiles: ''
-          metadataDirectory: docs/play-store/metadata
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: fastlane supply (metadata + listing assets)
+        if: steps.track.outputs.dry_run != 'true'
+        env:
+          SUPPLY_JSON_KEY: /tmp/play-store-key.json
+          SUPPLY_PACKAGE_NAME: de.tankstellen.fuelprices
+          SUPPLY_TRACK: ${{ steps.track.outputs.track }}
+          # `supply --metadata_path` expects a directory whose direct
+          # children are locale folders (`en-US/`, `de-DE/`, …). Our
+          # tree adds an `android/` parent, so point supply INTO that
+          # parent, not at it — otherwise supply treats `android` as a
+          # locale name and Google's API rejects the upload with
+          # `android - Invalid request` (run 25607897831).
+          SUPPLY_METADATA_PATH: docs/play-store/metadata/android
+        run: |
+          set -euo pipefail
+          # --skip_upload_aab / --skip_upload_apk: metadata-only run.
+          # AABs ship from daily-beta.yml + daily-github-release.yml.
+          # --skip_upload_changelogs: this listing workflow pushes
+          # title + descriptions + icon + featureGraphic +
+          # phoneScreenshots only. Changelogs travel WITH each AAB
+          # (the AAB-upload workflows already handle them keyed by
+          # versionCode), and `supply` rejects a metadata-only run
+          # that touches `default.txt` without a `--version_code`
+          # to attach it to (run 25608959525).
+          # The defaults still push everything else from the
+          # metadata tree at $SUPPLY_METADATA_PATH/<locale>/.
+          bundle exec fastlane supply \
+            --json_key "$SUPPLY_JSON_KEY" \
+            --package_name "$SUPPLY_PACKAGE_NAME" \
+            --track "$SUPPLY_TRACK" \
+            --metadata_path "$SUPPLY_METADATA_PATH" \
+            --skip_upload_aab \
+            --skip_upload_apk \
+            --skip_upload_changelogs
 
       - name: Dry-run summary
         if: steps.track.outputs.dry_run == 'true'
