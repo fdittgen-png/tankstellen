@@ -385,7 +385,25 @@ jobs:
 
       - name: Create GitHub release
         env:
-          GH_TOKEN: ${{ github.token }}
+          # The default GITHUB_TOKEN started returning HTTP 403 ("Resource
+          # not accessible by integration") on `POST /repos/.../releases`
+          # in May 2026 even with workflow-level `permissions: contents:
+          # write` (verified identical token grants `Contents: write,
+          # Metadata: read` on a working May-7 run vs. a failing May-9
+          # re-run, and the repo-level `default_workflow_permissions`
+          # being read OR write made no difference). The error means
+          # the GitHub App installation token (= GITHUB_TOKEN) is being
+          # rejected at the resource level, not on token scope.
+          #
+          # Workaround: use a Personal Access Token saved as the
+          # `RELEASE_TOKEN` repo secret. The token needs `contents:
+          # read/write` on this repo and nothing else. Falling back to
+          # `github.token` if RELEASE_TOKEN is absent so a fresh fork
+          # without the secret still attempts the workflow (it'll fail
+          # the same way the default token does today, but at least the
+          # error message stays self-explanatory rather than the workflow
+          # silently noop'ing).
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
         run: |
           set -euo pipefail
           # Collect every artifact that's actually present — `find`-based so
