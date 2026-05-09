@@ -1,5 +1,3 @@
-• Unified fuel + EV search results
-• Hands-free OBD2 auto-record with launcher badge
-• Hard-acceleration markers on the trip-detail map
-• 30-day price history with best-time-to-fill predictor
-• 17 countries, 23 languages
+IMPORTANT — please uninstall the previous version (Tankstellen / Prix Carburants) before installing this one. The new release is signed with a new key, so Android cannot upgrade in place.
+
+Welcome to Sparkilo — Tankstellen + Prix Carburants are now one app: unified fuel + EV charging search across 17 countries, OBD2 auto-record, 30-day price history, best-time-to-fill predictor, 23 languages.

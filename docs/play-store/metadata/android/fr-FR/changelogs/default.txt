@@ -1,5 +1,3 @@
-• Recherche unifiée carburant + recharge EV
-• Auto-enregistrement OBD2 mains libres avec badge sur l'icône
-• Marqueurs d'accélérations fortes sur la carte du trajet
-• Historique des prix 30 jours avec prédicteur « meilleur moment »
-• 17 pays, 23 langues
+IMPORTANT — désinstallez la version précédente (Tankstellen / Prix Carburants) avant d'installer celle-ci. Nouvelle clé de signature : Android ne peut pas mettre à jour par-dessus.
+
+Bienvenue dans Sparkilo — Tankstellen + Prix Carburants désormais une seule appli : recherche unifiée carburant + recharge EV dans 17 pays, auto-enregistrement OBD2, historique 30 jours, 23 langues.

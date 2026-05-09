@@ -13,9 +13,11 @@ name: Play Store listing
 #   track only — never production from a push)
 #
 # Secret required:
-# - PLAY_STORE_JSON_KEY: base64-encoded contents of the Google Play
-#   Developer service-account JSON. Generated under Play Console →
-#   Setup → API access → service accounts.
+# - PLAY_STORE_SERVICE_ACCOUNT_JSON: raw JSON contents of the Google
+#   Play Developer service-account key. Same secret the daily AAB
+#   upload (daily-beta.yml) uses, so a single secret covers both
+#   pipelines. Generated under Play Console → Setup → API access →
+#   service accounts.
 #
 # Companion: the `/play-store-shots` slash command syncs raw captures
 # from docs/play-store/screenshots/inbox/ into the canonical paths this
@@ -71,17 +73,17 @@ jobs:
             echo "dry_run=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Decode service-account JSON
+      - name: Write service-account JSON
         env:
-          PLAY_STORE_JSON_KEY: ${{ secrets.PLAY_STORE_JSON_KEY }}
+          SA_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
         run: |
           set -euo pipefail
-          if [ -z "${PLAY_STORE_JSON_KEY:-}" ]; then
-            echo "::error::PLAY_STORE_JSON_KEY secret is not set. Configure it under Settings → Secrets → Actions."
+          if [ -z "${SA_JSON:-}" ]; then
+            echo "::error::PLAY_STORE_SERVICE_ACCOUNT_JSON secret is not set. Configure it under Settings → Secrets → Actions (same secret as daily-beta.yml)."
             exit 1
           fi
-          echo "$PLAY_STORE_JSON_KEY" | base64 -d > /tmp/play-store-key.json
-          echo "Decoded key — $(wc -c < /tmp/play-store-key.json) bytes."
+          printf '%s' "$SA_JSON" > /tmp/play-store-key.json
+          echo "Wrote key — $(wc -c < /tmp/play-store-key.json) bytes."
 
       - name: Validate metadata
         run: |
