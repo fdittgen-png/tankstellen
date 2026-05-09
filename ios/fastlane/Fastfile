@@ -22,6 +22,20 @@ def asc_api_key
 end
 
 platform :ios do
+  # On CI, create + unlock a dedicated temporary keychain and set it as
+  # default before any signing-related action runs. Without this, fastlane
+  # match installs the distribution cert into ~/Library/Keychains/login
+  # .keychain-db (which is locked on a headless GitHub-hosted runner) —
+  # match warns "Could not configure imported keychain item to prevent UI
+  # permission popup when code signing", and later xcodebuild's codesign
+  # step hangs indefinitely waiting on a UI prompt that never arrives. The
+  # 45-min job timeout then cancels the run before the IPA is uploaded.
+  # `setup_ci` is fastlane's standard one-liner for this; it's a no-op
+  # locally so developer workflows are unaffected.
+  before_all do
+    setup_ci if ENV["CI"] == "true"
+  end
+
   desc "Fetch development cert + profile (readonly on CI)."
   lane :match_dev do
     match(type: "development", api_key: asc_api_key)
