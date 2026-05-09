@@ -81,7 +81,7 @@
 	</array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>de.tankstellen.fuelprices.background</string>
+		<string>de.tankstellen.tankstellen.background</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
