@@ -174,7 +174,7 @@ jobs:
     needs: pre-check
     if: needs.pre-check.outputs.commit_count != '0'
     runs-on: macos-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v6
         with:

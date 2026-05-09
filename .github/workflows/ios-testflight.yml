@@ -28,7 +28,7 @@ concurrency:
 jobs:
   build-and-upload:
     runs-on: macos-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v6
 
