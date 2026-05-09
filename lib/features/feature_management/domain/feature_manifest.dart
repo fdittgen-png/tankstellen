@@ -220,11 +220,35 @@ class FeatureManifest {
       // (default-off) means the surface stays effectively hidden until
       // the user enables trip recording, matching the original
       // user-facing shape.
+      //
+      // For the Medium use-mode profile (#1517), the consumption-tab
+      // visibility is OR-extended programmatically at the bottom-nav
+      // render site so `manualConsumption` (no OBD2 prereq) also
+      // surfaces the tab. That OR check lives outside the manifest
+      // because `requires` is AND-only.
       defaultEnabled: true,
       requires: {Feature.obd2TripRecording},
       displayName: 'Consumption tab',
       description:
           'Show the consumption analytics tab in the bottom navigation.',
+    ),
+    Feature.manualConsumption: FeatureManifestEntry(
+      feature: Feature.manualConsumption,
+      // Default-off; the `AppProfile.medium` and `AppProfile.full`
+      // presets flip it on. No prerequisite — the Medium tier should
+      // work without an OBD2 adapter or any vehicle hardware.
+      defaultEnabled: false,
+      displayName: 'Manual consumption logging',
+      description:
+          'Track fuel fill-ups and EV charging sessions by hand (no OBD2 adapter required).',
+    ),
+    Feature.loyaltyCards: FeatureManifestEntry(
+      feature: Feature.loyaltyCards,
+      // Default-off; only the `AppProfile.full` preset flips it on.
+      defaultEnabled: false,
+      displayName: 'Loyalty cards',
+      description:
+          'Fuel-club / loyalty program cards with per-litre discounts in price comparisons.',
     ),
   });
 }

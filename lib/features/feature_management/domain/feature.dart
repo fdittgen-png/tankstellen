@@ -78,4 +78,18 @@ enum Feature {
   /// to render without trip data, so the dependency edge guards
   /// against an empty surface in the UI.
   showConsumptionTab,
+
+  /// Manual fuel fill-up + manual EV charging logs without OBD2
+  /// (#1517 — Medium use-mode profile). Surfaces the Fuel and
+  /// Charging tabs of the consumption screen for users who track
+  /// their consumption by hand. Default-off; flipped on by the
+  /// `AppProfile.medium` and `AppProfile.full` presets.
+  manualConsumption,
+
+  /// Loyalty / fuel-club discount cards (e.g. TotalEnergies pilot)
+  /// (#1517 — Full use-mode profile). Surfaces the "Fuel club cards"
+  /// section in Settings → Consumption and applies per-litre
+  /// discounts in price comparisons. Default-off; flipped on only
+  /// by the `AppProfile.full` preset.
+  loyaltyCards,
 }

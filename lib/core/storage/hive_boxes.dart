@@ -88,6 +88,14 @@ class HiveBoxes {
   /// Central feature-flag set (#1373 phase 1).
   static const String featureFlags = 'feature_flags';
 
+  /// Active "use mode" profile (#1517). One entry keyed `profile`
+  /// holding the [AppProfile] enum name. Empty box → user has not
+  /// onboarded yet → wizard's profile-choice page is the gate. A
+  /// pre-#1517 install with feature_flags already populated migrates
+  /// to `AppProfile.custom` on first launch (see
+  /// `app_profile_provider.dart`).
+  static const String appProfile = 'app_profile';
+
   static const _encryptedBoxes = {
     settings,
     profiles,
@@ -193,6 +201,10 @@ class HiveBoxes {
     await Hive.openBox<String>(trafficSignalsCache);
     // #1373 — central feature-flag set (phase 1).
     await Hive.openBox<dynamic>(featureFlags);
+    // #1517 — active "use mode" profile (Basic / Medium / Full /
+    // Custom). Tiny box, always one entry; opened next to feature_flags
+    // since the two systems collaborate at startup.
+    await Hive.openBox<dynamic>(appProfile);
   }
 
   /// Initialize Hive in a background isolate with proper encryption.
