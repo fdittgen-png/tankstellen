@@ -57,7 +57,8 @@ void main() {
       await tester.pump();
     });
 
-    testWidgets('shows the retry button + error message on permission denied',
+    testWidgets(
+        'shows the retry button + error message + open-settings CTA on permission denied',
         (tester) async {
       final svc = Obd2ConnectionService(
         registry: Obd2AdapterRegistry.defaults(),
@@ -67,9 +68,22 @@ void main() {
       await _pump(tester, svc);
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('obdPickerError')), findsOneWidget);
+      // The denial error message itself is rendered.
+      expect(
+        find.text('Bluetooth permission denied'),
+        findsOneWidget,
+      );
+      // Retry stays visible — the user might be on a transient denial
+      // (first prompt, "Don't Allow") and Retry will re-prompt.
       expect(find.byKey(const Key('obdPickerRetry')), findsOneWidget);
-      expect(find.textContaining('permission', findRichText: false),
-          findsOneWidget);
+      // New CTA introduced for the iOS permanently-denied case: deep-
+      // link into the app's Settings row so the user can flip the
+      // Bluetooth toggle. Tappable by key — we don't verify the platform
+      // channel call here (it's a no-op in widget tests by default).
+      expect(
+        find.byKey(const Key('obdPickerOpenSettings')),
+        findsOneWidget,
+      );
     });
   });
 

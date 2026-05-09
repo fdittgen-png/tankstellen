@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
@@ -370,6 +371,17 @@ class _Obd2AdapterPickerSheetState
           ],
         );
       case _Phase.error:
+        // When the underlying error is a permission denial we surface
+        // a second CTA — "Open Settings" — alongside the existing
+        // Retry. This unblocks users who have already tapped "Don't
+        // Allow" on the iOS Bluetooth prompt (the system stops
+        // re-prompting and Retry alone never reaches a granted state).
+        // Tapping the button calls permission_handler's
+        // [openAppSettings], which deep-links into the app's row in
+        // iOS Settings (or the Apps page on Android). On a successful
+        // grant, the user comes back to the picker and Retry now
+        // succeeds.
+        final isPermissionError = _error is Obd2PermissionDenied;
         return Column(
           key: const Key('obdPickerError'),
           children: [
@@ -387,6 +399,24 @@ class _Obd2AdapterPickerSheetState
               icon: const Icon(Icons.refresh),
               label: Text(l?.retry ?? 'Retry'),
             ),
+            if (isPermissionError) ...[
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                key: const Key('obdPickerOpenSettings'),
+                onPressed: () {
+                  // Fire-and-forget — the OS handles the deep link, we
+                  // don't need the resolved bool. Best-effort: if the
+                  // platform reports failure we still leave the picker
+                  // in its error state so Retry stays accessible.
+                  unawaited(openAppSettings());
+                },
+                icon: const Icon(Icons.settings),
+                label: Text(
+                  l?.obdPermissionDenied ??
+                      'Grant Bluetooth permission in system settings',
+                ),
+              ),
+            ],
           ],
         );
     }
