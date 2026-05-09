@@ -124,7 +124,7 @@ jobs:
             echo "## iOS TestFlight Release"
             echo ""
             echo "- **Build number:** ${{ steps.bn.outputs.build_number }}"
-            echo "- **Bundle ID:** de.tankstellen.fuelprices"
+            echo "- **Bundle ID:** de.tankstellen.tankstellen"
             echo "- **Trigger:** ${{ github.event_name }}"
             echo "- **Changelog:** ${{ github.event.inputs.release_notes || 'Daily build.' }}"
           } >> "$GITHUB_STEP_SUMMARY"

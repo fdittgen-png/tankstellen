@@ -509,7 +509,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 5.0;
-				PRODUCT_BUNDLE_IDENTIFIER = de.tankstellen.fuelprices;
+				PRODUCT_BUNDLE_IDENTIFIER = de.tankstellen.tankstellen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -531,7 +531,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = de.tankstellen.fuelprices.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = de.tankstellen.tankstellen.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -549,7 +549,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = de.tankstellen.fuelprices.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = de.tankstellen.tankstellen.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -565,7 +565,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = de.tankstellen.fuelprices.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = de.tankstellen.tankstellen.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -703,7 +703,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 5.0;
-				PRODUCT_BUNDLE_IDENTIFIER = de.tankstellen.fuelprices;
+				PRODUCT_BUNDLE_IDENTIFIER = de.tankstellen.tankstellen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -737,9 +737,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 5.0;
-				PRODUCT_BUNDLE_IDENTIFIER = de.tankstellen.fuelprices;
+				PRODUCT_BUNDLE_IDENTIFIER = de.tankstellen.tankstellen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "match AppStore de.tankstellen.fuelprices";
+				PROVISIONING_PROFILE_SPECIFIER = "match AppStore de.tankstellen.tankstellen";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
