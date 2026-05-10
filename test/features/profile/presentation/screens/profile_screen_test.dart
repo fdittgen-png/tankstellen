@@ -285,12 +285,18 @@ void main() {
         '(#1242)',
         (tester) async {
       // Phase 3 of #1447 hides the Consumption section when its root
-      // feature (`obd2TripRecording`) is effectively-disabled. Seed
-      // the central enabled-set so the section renders for this test.
+      // feature (`obd2TripRecording`) is effectively-disabled. #1520
+      // adds an OR with `manualConsumption` and gates the loyalty tile
+      // separately on `loyaltyCards`. Seed the full Consumption
+      // surface so the section renders AND both inner tiles show.
       final seededOverrides = [
         ...overrides,
         featureFlagsProvider.overrideWith(
-          () => _ProfileTestFeatureFlags(<Feature>{Feature.obd2TripRecording}),
+          () => _ProfileTestFeatureFlags(<Feature>{
+            Feature.obd2TripRecording,
+            Feature.showConsumptionTab,
+            Feature.loyaltyCards,
+          }),
         ),
       ];
       await pumpApp(

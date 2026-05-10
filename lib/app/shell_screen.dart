@@ -184,6 +184,13 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     // back to 5.
     final hasVehicle = ref.watch(vehicleProfileListProvider).isNotEmpty;
 
+    // #778 contract preserved: the bottom-nav Consumption slot is
+    // gated SOLELY on `hasVehicle`. Profile-tier gating (Basic
+    // skips the vehicle wizard step → no vehicle added → no
+    // Consumption slot) happens implicitly via the wizard. Stricter
+    // gating belongs in the Settings → Consumption section
+    // (`isConsumptionTabReachable`), not in the nav bar — see
+    // `shell_consumption_tab_test.dart`.
     final destinations =
         resolveShellDestinations(l10n: l10n, hasVehicle: hasVehicle);
     final visibleDestinations = destinations.items;

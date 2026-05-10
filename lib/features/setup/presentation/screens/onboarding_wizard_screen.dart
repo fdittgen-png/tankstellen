@@ -6,6 +6,8 @@ import '../../../../core/language/language_provider.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../feature_management/application/app_profile_provider.dart';
+import '../../../feature_management/domain/app_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../providers/api_key_validator_provider.dart';
 import '../../providers/onboarding_wizard_provider.dart';
@@ -17,18 +19,29 @@ import '../widgets/onboarding_navigation_buttons.dart';
 import '../widgets/onboarding_obd2_step.dart';
 import '../widgets/onboarding_progress_indicator.dart';
 import '../widgets/preferences_step.dart';
+import '../widgets/profile_choice_step.dart';
 import '../widgets/vehicles_step.dart';
-import '../widgets/welcome_step.dart';
 
 /// Multi-step onboarding wizard with progress indicator.
 ///
-/// Steps:
-/// 1. Welcome — app branding and introduction
-/// 2. Country & Language — select locale preferences
-/// 3. API Key — optional key entry (only if country requires it)
-/// 4. Done — confirmation and finish
+/// Step layout depends on the user's [AppProfile] choice on the first
+/// page (#1517 / #1518):
 ///
-/// The API Key step is conditionally shown based on the selected country.
+/// | Step | Basic | Medium | Full |
+/// | --- | :-: | :-: | :-: |
+/// | 0 — Profile choice (Welcome + Sparkilo brand + 3 cards) | ✓ | ✓ | ✓ |
+/// | 1 — Country & Language | ✓ | ✓ | ✓ |
+/// | 2 — Vehicle | — | ✓ | ✓ |
+/// | 3 — OBD2 adapter (paired with the vehicle from step 2) | — | — | ✓ |
+/// | 4 — Preferences | ✓ | ✓ | ✓ |
+/// | 5 — Landing screen | ✓ | ✓ | ✓ |
+/// | 6 — API key (only if country requires) | cond | cond | cond |
+/// | 7 — Done | ✓ | ✓ | ✓ |
+///
+/// Vehicle is shown for Medium because manual fill-up logging needs a
+/// vehicle to attach to. OBD2 is Full only because the rest of the
+/// OBD2 stack (auto-record, gamification, consumption analytics) is
+/// also Full-only.
 ///
 /// Wizard progress and loading flag live in
 /// [onboardingWizardControllerProvider]; the API-key [TextEditingController]
@@ -47,28 +60,36 @@ class _OnboardingWizardScreenState
   final _pageController = PageController();
   final _apiKeyController = TextEditingController();
 
-  /// Returns the total number of steps based on whether the selected country
-  /// requires an API key.
-  int get _stepCount {
-    final country = ref.read(activeCountryProvider);
-    // Welcome, Country, OBD2, Vehicles, Preferences, Landing, [API Key], Done
-    return country.requiresApiKey ? 8 : 7;
+  /// Returns the total number of steps based on profile + API-key need.
+  /// Always derived from `_buildSteps().length` so changing step
+  /// composition (e.g. profile-driven inclusion) updates step counts
+  /// automatically.
+  int get _stepCount => _buildSteps().length;
+
+  /// Zero-based index of the Vehicles step under the active profile,
+  /// or -1 when the profile doesn't include it (Basic).
+  int get _vehiclesStepIndex {
+    final profile = ref.read(activeAppProfileProvider);
+    if (profile == AppProfile.basic || profile == null) return -1;
+    return 2; // Welcome+Profile (0), Country (1), Vehicle (2)
   }
 
-  /// Zero-based index of the optional OBD2 adapter step (#816). Placed
-  /// BEFORE the Vehicles step so a successful VIN read can skip the
-  /// manual vehicle entry entirely.
-  static const int _obd2StepIndex = 2;
-
-  /// Zero-based index of the Vehicles step. Placed BEFORE Preferences so
-  /// the user can pick a vehicle first — the fuel preference can then
-  /// derive from the vehicle's fuel (#695).
-  static const int _vehiclesStepIndex = 3;
+  /// Zero-based index of the OBD2 adapter step under the active
+  /// profile, or -1 when the profile doesn't include it
+  /// (Basic + Medium).
+  int get _obd2StepIndex {
+    final profile = ref.read(activeAppProfileProvider);
+    if (profile != AppProfile.full && profile != AppProfile.custom) return -1;
+    return 3; // Welcome+Profile (0), Country (1), Vehicle (2), OBD2 (3)
+  }
 
   /// Zero-based index of the optional API key step.
   int get _apiKeyStepIndex {
     final country = ref.read(activeCountryProvider);
-    return country.requiresApiKey ? 6 : -1;
+    if (!country.requiresApiKey) return -1;
+    // API-key sits just before the Done step. Compute it relative to
+    // _stepCount so we don't drift when other steps come and go.
+    return _stepCount - 2;
   }
 
   bool _isLastStep(int currentStep) => currentStep == _stepCount - 1;
@@ -90,6 +111,19 @@ class _OnboardingWizardScreenState
   }
 
   void _next(int currentStep) {
+    // Step 0 (ProfileChoiceStep) advances itself via `onProfilePicked`
+    // once the user taps a card. If they hit the wizard's "Next" button
+    // without picking, refuse with a hint — otherwise the wizard would
+    // enter the next step with a null `activeAppProfileProvider`.
+    if (currentStep == 0 &&
+        ref.read(activeAppProfileProvider) == null) {
+      // English-only for now; ARB string to follow in a follow-up.
+      SnackBarHelper.showError(
+        context,
+        'Pick a use mode to continue.',
+      );
+      return;
+    }
     if (_isLastStep(currentStep)) {
       _finishOnboarding();
     } else {
@@ -179,41 +213,56 @@ class _OnboardingWizardScreenState
 
   /// Returns whether the current step is an optional one that can be skipped.
   bool _isCurrentStepSkippable(int currentStep) {
-    // OBD2 + Vehicles are always skippable; API key is skippable when
-    // it shows. The OBD2 step owns its own skip button, but surfacing
-    // the wizard's "Skip" too keeps the UX consistent with the rest
-    // of the optional steps.
-    if (currentStep == _obd2StepIndex) return true;
-    if (currentStep == _vehiclesStepIndex) return true;
-    return currentStep == _apiKeyStepIndex && _apiKeyStepIndex != -1;
+    // OBD2 + Vehicles are always skippable when shown; API key is
+    // skippable when it shows. The OBD2 step owns its own skip button,
+    // but surfacing the wizard's "Skip" too keeps the UX consistent
+    // with the rest of the optional steps.
+    if (_obd2StepIndex != -1 && currentStep == _obd2StepIndex) return true;
+    if (_vehiclesStepIndex != -1 && currentStep == _vehiclesStepIndex) {
+      return true;
+    }
+    return _apiKeyStepIndex != -1 && currentStep == _apiKeyStepIndex;
   }
 
-  /// Advance past the manual VehiclesStep in response to a successful
-  /// OBD2-driven auto-fill (#816). Jumps to the step AFTER Vehicles so
-  /// the user isn't prompted to re-enter what we just decoded.
-  void _advanceAfterObd2AutoFill() {
-    // _vehiclesStepIndex + 1 — the OBD2 step saves the profile itself,
-    // then we skip straight to Preferences.
-    _goToStep(_vehiclesStepIndex + 1);
-  }
-
-  /// Continue from the OBD2 step in response to a skip / partial
-  /// decode / VIN read failure — hand control to the manual Vehicles
-  /// step.
+  /// Advance past the OBD2 step in response to skip / partial decode /
+  /// VIN read failure. The OBD2 step is now AFTER Vehicle (#1518), so
+  /// failure cases hand control to the next step (Preferences).
   void _advanceFromObd2() {
+    if (_obd2StepIndex == -1) return; // OBD2 not in the active profile
     _goToStep(_obd2StepIndex + 1);
+  }
+
+  /// Successful OBD2-driven auto-fill (#816). With Vehicle now BEFORE
+  /// OBD2 (#1518), the auto-fill writes the decoded VIN data onto the
+  /// vehicle the user already created, then advances to the next step
+  /// after OBD2 (Preferences).
+  void _advanceAfterObd2AutoFill() {
+    if (_obd2StepIndex == -1) return;
+    _goToStep(_obd2StepIndex + 1);
+  }
+
+  /// Picks a profile from step 0 and advances to step 1.
+  void _onProfilePicked() {
+    _goToStep(1);
   }
 
   List<Widget> _buildSteps() {
     final country = ref.watch(activeCountryProvider);
+    final profile = ref.watch(activeAppProfileProvider);
+    final showVehicle =
+        profile == AppProfile.medium ||
+            profile == AppProfile.full ||
+            profile == AppProfile.custom;
+    final showObd2 = profile == AppProfile.full || profile == AppProfile.custom;
     return [
-      const WelcomeStep(),
+      ProfileChoiceStep(onProfilePicked: _onProfilePicked),
       const CountryLanguageStep(),
-      OnboardingObd2Step(
-        onProceed: _advanceFromObd2,
-        onAutoFillSuccess: _advanceAfterObd2AutoFill,
-      ),
-      const VehiclesStep(),
+      if (showVehicle) const VehiclesStep(),
+      if (showObd2)
+        OnboardingObd2Step(
+          onProceed: _advanceFromObd2,
+          onAutoFillSuccess: _advanceAfterObd2AutoFill,
+        ),
       const PreferencesStep(),
       const LandingScreenStep(),
       if (country.requiresApiKey)

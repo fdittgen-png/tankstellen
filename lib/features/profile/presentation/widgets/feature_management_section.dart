@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../feature_management/application/app_profile_provider.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../../feature_management/domain/feature_dependency_graph.dart';
@@ -233,7 +234,7 @@ class _FeatureToggle extends ConsumerWidget {
               // future only completes the Hive write. Fire-and-forget is
               // acceptable for a settings toggle — Riverpod surfaces the
               // new state synchronously.
-              unawaited(next ? notifier.enable(feature) : notifier.disable(feature));
+              unawaited(_toggleAndReconcile(ref, notifier, feature, next));
             },
     );
 
@@ -430,3 +431,27 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
   }
 }
 
+/// Toggles [feature] then asks [activeAppProfileProvider] to reconcile
+/// the active profile against the new flag set (#1517 / #1519).
+///
+/// When the user toggles a flag manually here and the new set no
+/// longer matches the active preset, the active profile flips to
+/// [AppProfile.custom] and the Use-mode section above re-renders to
+/// show the Custom card. Re-selecting a preset later overwrites the
+/// flag set back to the canonical bundle.
+Future<void> _toggleAndReconcile(
+  WidgetRef ref,
+  FeatureFlags notifier,
+  Feature feature,
+  bool next,
+) async {
+  if (next) {
+    await notifier.enable(feature);
+  } else {
+    await notifier.disable(feature);
+  }
+  final newFlags = ref.read(featureFlagsProvider);
+  await ref
+      .read(activeAppProfileProvider.notifier)
+      .reconcileWithFlags(newFlags);
+}

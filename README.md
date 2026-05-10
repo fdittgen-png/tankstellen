@@ -96,22 +96,47 @@ Features that don't serve at least one of those three layers don't belong.
 
 ## Screenshots
 
-Captured on a Samsung S23 Ultra running the **Play** flavour against the live `Prix Carburants` (France) API.
+Captured on a Samsung Galaxy S20 (Android 14, French locale) running Sparkilo against the live `Prix Carburants` (France) API. UI is fully localised — these are the French strings; English / German renders the same screens.
+
+### Find fuel & EV charging
 
 | Search results | Search criteria | Map view |
 |:--:|:--:|:--:|
-| ![Search results — list of nearby stations with prices, distance, and amenity chips](docs/screenshots/search-results.png) | ![Search criteria modal — toggle nearby vs along-route, fuel type, radius, and amenity filters](docs/screenshots/search-criteria.png) | ![Map view — color-coded price markers around the user's GPS position with cheap/expensive legend](docs/screenshots/map-view.png) |
-| Real-time prices ranked by distance, with brand-specific 24h / amenity badges. | Modal sheet for switching between nearby and along-route searches and tweaking filters. | Interactive map with color-coded price markers and a one-tap "driving mode" launcher. |
+| ![Sparkilo home — list of 10 nearby stations with prices, distance, and 24h badges](docs/screenshots/search-results.png) | ![Search criteria modal — nearby vs along-route, fuel type, radius slider, amenity chips](docs/screenshots/search-criteria.png) | ![Map view — color-coded price markers across Hérault with the bon-marché/cher legend](docs/screenshots/map-view.png) |
+| Real-time prices ranked by distance with brand 24h / amenity badges and a swipe-to-navigate hint. | Modal sheet for nearby vs along-route, fuel type, radius slider, and 8 amenity filters. | Interactive map with green-to-red price markers and a one-tap driving-mode launcher. |
 
-| Favorites | Price alerts | Profile edit |
+| Map (EV) | Station detail | Price alert |
 |:--:|:--:|:--:|
-| ![Favorites tab — saved stations with the swipe-to-navigate / swipe-to-remove tutorial banner](docs/screenshots/favorites.png) | ![Price alerts tab — per-station price thresholds with on/off toggles](docs/screenshots/price-alerts.png) | ![Profile edit screen — preferred fuel, default radius, route segment, ratings privacy](docs/screenshots/profile-edit.png) |
-| Saved stations with multi-fuel pricing and swipe-to-navigate / swipe-to-remove gestures. | Threshold-based price alerts that fire once per 30-min background check. | Per-profile preferred fuel, default radius, route segment, and station rating privacy mode. |
+| ![Map view with EV charging stations — Type 2 / CCS / CHAdeMO filter chips, green charger icons](docs/screenshots/map-ev-charging.png) | ![Total station detail — Super E5 / E10 / Diesel / Super 98 prices, address, opening hours, region](docs/screenshots/station-detail.png) | ![Create price alert dialog — pick fuel type, set target threshold in EUR/L](docs/screenshots/price-alert-create.png) |
+| Same map, EV mode: charger filter chips (Type 2 / CCS / CHAdeMO) and connector availability. | Per-fuel pricing with last-update timestamp, full address, opening hours, region badge. | Per-station, per-fuel-type threshold; the background check fires every 30 min. |
 
-| Settings & privacy |   |   |
+### Save & follow
+
+| Favorites | Price alerts | Use mode |
 |:--:|:--:|:--:|
-| ![Settings screen — configuration & privacy summary listing the active profile, API keys, TankSync state, and a privacy summary block](docs/screenshots/settings.png) |   |   |
-| Configuration & privacy summary: profile, API keys, TankSync auth mode, and a one-glance privacy statement. |   |   |
+| ![Favorites tab with two saved stations and per-fuel pricing](docs/screenshots/favorites.png) | ![Price alerts tab — single Diesel ≤ 2,200 € alert with on/off toggle and 30-min check explainer](docs/screenshots/price-alerts.png) | ![Settings — Use mode selector with Basic / Medium / Full preset cards](docs/screenshots/settings.png) |
+| Saved stations with multi-fuel pricing and swipe-to-navigate / swipe-to-remove gestures. | Threshold-based price alerts; one toggle per station + fuel type. | First Settings section — pick the feature bundle that matches how you use the app. |
+
+### Track your consumption (Medium + Full profiles)
+
+| Empty state | Pick a station | Tank + stats |
+|:--:|:--:|:--:|
+| ![Fuel consumption empty state with prominent Add fill-up CTA](docs/screenshots/consumption-empty.png) | ![Pick a station picker — auto-fills brand, fuel type, and price from the search history](docs/screenshots/consumption-pick-station.png) | ![Fuel consumption with data — tank level 30L / 429 km of range, consumption stats card](docs/screenshots/consumption-tank-stats.png) |
+| Fuel + Trips tabs; empty state guides the user to the first fill-up. | Pre-fills brand, fuel type, and current price from the user's recent search results. | Live tank level (OBD2-measured when an adapter is paired) plus L/100 km, cost/km, totals. |
+
+### Vehicle & OBD2 (Full profile)
+
+| Pick from catalog | Service reminders + Auto-record | OBD2 + Baseline |
+|:--:|:--:|:--:|
+| ![Vehicle catalog picker — searchable Peugeot / Renault list with engine + year + fuel](docs/screenshots/vehicle-catalog-picker.png) | ![Edit vehicle — Service reminder presets, Auto-record toggle with start-speed and save-delay sliders](docs/screenshots/profile-edit.png) | ![Edit vehicle — OBD2 adapter pairing block + 6-axis baseline calibration progress](docs/screenshots/vehicle-obd2-baseline.png) |
+| 30-vehicle catalog (more landing every release) keyed by make / model / year / engine. | One-tap reminder presets + per-vehicle hands-free auto-record with configurable thresholds. | Pair an ELM327-compatible adapter and the app learns a per-driving-situation fuel baseline. |
+
+### Privacy first
+
+| Consent | Privacy Dashboard | Export & delete |
+|:--:|:--:|:--:|
+| ![GDPR consent screen — per-purpose toggles for Location and Error Reporting](docs/screenshots/privacy-consent.png) | ![Privacy Dashboard top — profile, API keys, cloud sync state, privacy summary](docs/screenshots/privacy-dashboard.png) | ![Privacy Dashboard scrolled — Data on this device counts + JSON / CSV export + delete-all](docs/screenshots/privacy-dashboard-export.png) |
+| Per-purpose GDPR consent at first launch — granular and revocable any time. | One-glance summary of what's stored, who has it, and which API keys are in use. | One-tap export of every stored row as JSON or CSV; one-tap delete-all. |
 
 ## Getting Started
 
