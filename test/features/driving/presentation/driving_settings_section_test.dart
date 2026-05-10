@@ -133,7 +133,14 @@ void main() {
         overrides: [
           settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
           storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
-          featureFlagsProvider.overrideWith(() => _TestFeatureFlags()),
+          // #1517 / #1520 — the Fuel club cards tile is now gated by
+          // `Feature.loyaltyCards`. Pin it on so this composition test
+          // still asserts both tiles render together. Default-off
+          // semantics are covered separately by the gating-audit
+          // unit tests.
+          featureFlagsProvider.overrideWith(
+            () => _TestFeatureFlags(<Feature>{Feature.loyaltyCards}),
+          ),
         ],
       );
 

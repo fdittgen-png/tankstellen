@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/utils/frame_callbacks.dart';
-import '../features/feature_management/application/feature_flags_provider.dart';
-import '../features/feature_management/domain/consumption_tab_visibility.dart';
 import '../features/vehicle/presentation/widgets/catalog_reresolve_snackbar_host.dart';
 import '../features/vehicle/providers/vehicle_providers.dart';
 import '../l10n/app_localizations.dart';
@@ -186,19 +184,15 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     // back to 5.
     final hasVehicle = ref.watch(vehicleProfileListProvider).isNotEmpty;
 
-    // #1517 / #1520 — additional gate on the Consumption tab. Even
-    // with at least one vehicle, the tab only earns its slot when the
-    // active use-mode profile turns on a data source: manualConsumption
-    // (Medium tier) or obd2TripRecording (Full tier). Basic users who
-    // happen to have added a vehicle through Settings still get the
-    // 4-item nav.
-    final manifest = ref.watch(featureManifestProvider);
-    final flags = ref.watch(featureFlagsProvider);
-    final consumptionReachable = isConsumptionTabReachable(manifest, flags);
-    final showConsumptionTab = hasVehicle && consumptionReachable;
-
+    // #778 contract preserved: the bottom-nav Consumption slot is
+    // gated SOLELY on `hasVehicle`. Profile-tier gating (Basic
+    // skips the vehicle wizard step → no vehicle added → no
+    // Consumption slot) happens implicitly via the wizard. Stricter
+    // gating belongs in the Settings → Consumption section
+    // (`isConsumptionTabReachable`), not in the nav bar — see
+    // `shell_consumption_tab_test.dart`.
     final destinations =
-        resolveShellDestinations(l10n: l10n, hasVehicle: showConsumptionTab);
+        resolveShellDestinations(l10n: l10n, hasVehicle: hasVehicle);
     final visibleDestinations = destinations.items;
     final branchForSlot = destinations.branchForSlot;
     _branchForSlot = branchForSlot;
