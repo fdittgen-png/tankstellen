@@ -145,7 +145,8 @@ bool hasGdprConsent(Ref ref) {
 }
 
 /// GDPR consent state: location, error reporting, cloud sync,
-/// community wait-time pings (#1119), VIN online decode (#1399).
+/// community wait-time pings (#1119), VIN online decode (#1399),
+/// trip-sync to TankSync (#1479 phase 1).
 @Riverpod(keepAlive: true)
 class GdprConsent extends _$GdprConsent {
   @override
@@ -155,6 +156,7 @@ class GdprConsent extends _$GdprConsent {
     bool cloudSync,
     bool communityWaitTime,
     bool vinOnlineDecode,
+    bool syncTrips,
   }) build() {
     final storage = ref.watch(storageRepositoryProvider);
     return (
@@ -165,6 +167,8 @@ class GdprConsent extends _$GdprConsent {
           storage.getSetting(StorageKeys.consentCommunityWaitTime) as bool? ?? false,
       vinOnlineDecode:
           storage.getSetting(StorageKeys.consentVinOnlineDecode) as bool? ?? false,
+      syncTrips:
+          storage.getSetting(StorageKeys.consentSyncTrips) as bool? ?? false,
     );
   }
 
@@ -174,6 +178,7 @@ class GdprConsent extends _$GdprConsent {
     required bool cloudSync,
     required bool communityWaitTime,
     required bool vinOnlineDecode,
+    bool syncTrips = false,
   }) async {
     final storage = ref.read(storageRepositoryProvider);
     await storage.putSetting(StorageKeys.gdprConsentGiven, true);
@@ -188,6 +193,14 @@ class GdprConsent extends _$GdprConsent {
       StorageKeys.consentVinOnlineDecode,
       vinOnlineDecode,
     );
+    // #1479 — trip-sync consent gates the trip → cloud upload path.
+    // Force off when the master cloudSync consent is off so a stale
+    // syncTrips=true value can't ride past a cloudSync=false toggle.
+    final effectiveSyncTrips = cloudSync ? syncTrips : false;
+    await storage.putSetting(
+      StorageKeys.consentSyncTrips,
+      effectiveSyncTrips,
+    );
     // Also update the legacy location_consent key for backward compatibility
     await storage.putSetting('location_consent', location);
     state = (
@@ -196,6 +209,7 @@ class GdprConsent extends _$GdprConsent {
       cloudSync: cloudSync,
       communityWaitTime: communityWaitTime,
       vinOnlineDecode: vinOnlineDecode,
+      syncTrips: effectiveSyncTrips,
     );
   }
 }

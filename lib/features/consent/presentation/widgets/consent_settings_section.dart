@@ -7,6 +7,12 @@ import '../../../../l10n/app_localizations.dart';
 ///
 /// Reads current consent state from [gdprConsentProvider] and allows
 /// the user to toggle individual consents on/off.
+///
+/// #1479 phase 1 — adds the `Sync trip recordings` toggle, gated on
+/// the master `Cloud Sync` consent. Disabling Cloud Sync also force-
+/// disables Sync trips at the provider layer (`save()`'s
+/// `effectiveSyncTrips`), so the UI stays in sync with the persisted
+/// state without an extra round-trip.
 class ConsentSettingsSection extends ConsumerWidget {
   const ConsentSettingsSection({super.key});
 
@@ -45,6 +51,7 @@ class ConsentSettingsSection extends ConsumerWidget {
                 cloudSync: consent.cloudSync,
                 communityWaitTime: consent.communityWaitTime,
                 vinOnlineDecode: consent.vinOnlineDecode,
+                syncTrips: consent.syncTrips,
               ),
         ),
         SwitchListTile(
@@ -62,6 +69,7 @@ class ConsentSettingsSection extends ConsumerWidget {
                 cloudSync: consent.cloudSync,
                 communityWaitTime: consent.communityWaitTime,
                 vinOnlineDecode: consent.vinOnlineDecode,
+                syncTrips: consent.syncTrips,
               ),
         ),
         SwitchListTile(
@@ -79,6 +87,7 @@ class ConsentSettingsSection extends ConsumerWidget {
                 cloudSync: v,
                 communityWaitTime: consent.communityWaitTime,
                 vinOnlineDecode: consent.vinOnlineDecode,
+                syncTrips: consent.syncTrips,
               ),
         ),
         SwitchListTile(
@@ -97,6 +106,7 @@ class ConsentSettingsSection extends ConsumerWidget {
                 cloudSync: consent.cloudSync,
                 communityWaitTime: v,
                 vinOnlineDecode: consent.vinOnlineDecode,
+                syncTrips: consent.syncTrips,
               ),
         ),
         SwitchListTile(
@@ -114,7 +124,37 @@ class ConsentSettingsSection extends ConsumerWidget {
                 cloudSync: consent.cloudSync,
                 communityWaitTime: consent.communityWaitTime,
                 vinOnlineDecode: v,
+                syncTrips: consent.syncTrips,
               ),
+        ),
+        // #1479 phase 1 — trip-sync consent. Sits LAST so the
+        // historical 0..4 SwitchListTile indices in older tests stay
+        // stable. Gated on the master Cloud Sync above; the toggle
+        // is disabled (onChanged: null) when cloudSync is off and the
+        // provider's `save()` enforces effective-false when
+        // cloudSync=false so the visible position stays honest.
+        SwitchListTile(
+          key: const Key('consentSyncTripsToggle'),
+          secondary: const Icon(Icons.route_outlined, size: 20),
+          title: const Text('Sync trip recordings'),
+          subtitle: Text(
+            consent.cloudSync
+                ? 'Back up OBD2 + GPS trips to TankSync. '
+                    'Cross-device, opt-in.'
+                : 'Enable Cloud Sync above to back up trips.',
+            style: theme.textTheme.bodySmall,
+          ),
+          value: consent.syncTrips,
+          onChanged: consent.cloudSync
+              ? (v) => ref.read(gdprConsentProvider.notifier).save(
+                    location: consent.location,
+                    errorReporting: consent.errorReporting,
+                    cloudSync: consent.cloudSync,
+                    communityWaitTime: consent.communityWaitTime,
+                    vinOnlineDecode: consent.vinOnlineDecode,
+                    syncTrips: v,
+                  )
+              : null,
         ),
       ],
     );

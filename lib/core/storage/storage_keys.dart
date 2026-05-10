@@ -26,6 +26,14 @@ class StorageKeys {
   /// year-from-position-10) always runs locally regardless of this
   /// flag; only the network call is gated.
   static const String consentVinOnlineDecode = 'consent_vin_online_decode';
+
+  /// #1479 phase 1 — opt-in consent for syncing OBD2 + GPS trip
+  /// recordings to TankSync (cross-device backup). Defaults to false.
+  /// Gated on `consentCloudSync` at the toggle UI layer — without
+  /// the master TankSync consent the trip-sync toggle cannot be
+  /// enabled at all.
+  static const String consentSyncTrips = 'consent_sync_trips';
+
   static const String swipeTutorialShown = 'swipe_tutorial_shown';
   static const String consumptionLog = 'consumption_log';
   static const String vehicleProfiles = 'vehicle_profiles';

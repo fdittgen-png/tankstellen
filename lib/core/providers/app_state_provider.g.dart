@@ -624,13 +624,15 @@ final class HasGdprConsentProvider extends $FunctionalProvider<bool, bool, bool>
 String _$hasGdprConsentHash() => r'712d0d516ea832af3bc75b97776e595ce699d2dc';
 
 /// GDPR consent state: location, error reporting, cloud sync,
-/// community wait-time pings (#1119), VIN online decode (#1399).
+/// community wait-time pings (#1119), VIN online decode (#1399),
+/// trip-sync to TankSync (#1479 phase 1).
 
 @ProviderFor(GdprConsent)
 final gdprConsentProvider = GdprConsentProvider._();
 
 /// GDPR consent state: location, error reporting, cloud sync,
-/// community wait-time pings (#1119), VIN online decode (#1399).
+/// community wait-time pings (#1119), VIN online decode (#1399),
+/// trip-sync to TankSync (#1479 phase 1).
 final class GdprConsentProvider
     extends
         $NotifierProvider<
@@ -640,11 +642,13 @@ final class GdprConsentProvider
             bool communityWaitTime,
             bool errorReporting,
             bool location,
+            bool syncTrips,
             bool vinOnlineDecode,
           })
         > {
   /// GDPR consent state: location, error reporting, cloud sync,
-  /// community wait-time pings (#1119), VIN online decode (#1399).
+  /// community wait-time pings (#1119), VIN online decode (#1399),
+  /// trip-sync to TankSync (#1479 phase 1).
   GdprConsentProvider._()
     : super(
         from: null,
@@ -670,6 +674,7 @@ final class GdprConsentProvider
       bool communityWaitTime,
       bool errorReporting,
       bool location,
+      bool syncTrips,
       bool vinOnlineDecode,
     })
     value,
@@ -683,6 +688,7 @@ final class GdprConsentProvider
               bool communityWaitTime,
               bool errorReporting,
               bool location,
+              bool syncTrips,
               bool vinOnlineDecode,
             })
           >(value),
@@ -690,10 +696,11 @@ final class GdprConsentProvider
   }
 }
 
-String _$gdprConsentHash() => r'db485b9d7fdb29445d66a954a7162f6dff704b0c';
+String _$gdprConsentHash() => r'd373fc8312c1d19d065507cb41b695b86fe3eb2e';
 
 /// GDPR consent state: location, error reporting, cloud sync,
-/// community wait-time pings (#1119), VIN online decode (#1399).
+/// community wait-time pings (#1119), VIN online decode (#1399),
+/// trip-sync to TankSync (#1479 phase 1).
 
 abstract class _$GdprConsent
     extends
@@ -703,6 +710,7 @@ abstract class _$GdprConsent
             bool communityWaitTime,
             bool errorReporting,
             bool location,
+            bool syncTrips,
             bool vinOnlineDecode,
           })
         > {
@@ -711,6 +719,7 @@ abstract class _$GdprConsent
     bool communityWaitTime,
     bool errorReporting,
     bool location,
+    bool syncTrips,
     bool vinOnlineDecode,
   })
   build();
@@ -725,6 +734,7 @@ abstract class _$GdprConsent
                 bool communityWaitTime,
                 bool errorReporting,
                 bool location,
+                bool syncTrips,
                 bool vinOnlineDecode,
               }),
               ({
@@ -732,6 +742,7 @@ abstract class _$GdprConsent
                 bool communityWaitTime,
                 bool errorReporting,
                 bool location,
+                bool syncTrips,
                 bool vinOnlineDecode,
               })
             >;
@@ -744,6 +755,7 @@ abstract class _$GdprConsent
                   bool communityWaitTime,
                   bool errorReporting,
                   bool location,
+                  bool syncTrips,
                   bool vinOnlineDecode,
                 }),
                 ({
@@ -751,6 +763,7 @@ abstract class _$GdprConsent
                   bool communityWaitTime,
                   bool errorReporting,
                   bool location,
+                  bool syncTrips,
                   bool vinOnlineDecode,
                 })
               >,
@@ -759,6 +772,7 @@ abstract class _$GdprConsent
                 bool communityWaitTime,
                 bool errorReporting,
                 bool location,
+                bool syncTrips,
                 bool vinOnlineDecode,
               }),
               Object?,
