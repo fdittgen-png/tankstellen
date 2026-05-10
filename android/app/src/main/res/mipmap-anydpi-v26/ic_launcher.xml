@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Adaptive launcher icon (API 26+). The `<background>` MUST point to a
-  drawable, not a `@color/X` reference, because Samsung OneUI and
-  several other third-party launchers silently ignore `@color/X` in
-  the background slot and render only the foreground — which on a
-  transparent foreground PNG makes the icon look like a white glyph
-  on a checkered/transparent background instead of green.
+  Adaptive launcher icon (API 26+). The foreground is a vector drawable
+  whose geometry already respects the 72dp safe zone; no inset wrapper
+  needed. Pre-API-26 devices fall back to the legacy PNG in
+  mipmap-<density>/ic_launcher.png (kept intentionally — see ASSET_SPEC
+  "Legacy square icon" section).
+
+  This is the icon shape that worked on Samsung OneUI in production —
+  the version-5.0.0+60507 build users had on their devices showed
+  green-plate + white-shield-droplet correctly. The pump-nozzle PNG
+  rebrand (#1516) and the @drawable shape background workaround (#1525)
+  both rendered as transparent on Samsung. Reverting to the proven
+  vector-foreground + @color-background shape (#1526).
 -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-  <background android:drawable="@drawable/ic_launcher_background"/>
-  <foreground>
-      <inset
-          android:drawable="@drawable/ic_launcher_foreground"
-          android:inset="16%" />
-  </foreground>
+  <background android:drawable="@color/ic_launcher_background"/>
+  <foreground android:drawable="@drawable/ic_launcher_foreground"/>
 </adaptive-icon>
