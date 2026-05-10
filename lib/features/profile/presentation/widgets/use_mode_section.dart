@@ -1,0 +1,217 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../feature_management/application/app_profile_provider.dart';
+import '../../../feature_management/domain/app_profile.dart';
+
+/// Settings-screen "Use mode" selector (#1519 / #1517).
+///
+/// Renders four cards — the three preset profiles
+/// ([AppProfile.basic] / [AppProfile.medium] / [AppProfile.full]) plus a
+/// fourth read-only [AppProfile.custom] card that surfaces the user's
+/// current state when they've toggled features outside any preset.
+/// Tapping a preset card calls [ActiveAppProfile.select] which both
+/// persists the choice and applies the corresponding flag bundle to
+/// `featureFlagsProvider`.
+///
+/// Sits at the very top of `ProfileScreen` (above the existing Profile
+/// section) because it gates everything else: changing the use-mode
+/// re-derives which other Settings sections (Consumption, Loyalty,
+/// Vehicles, Achievements) are visible at all.
+class UseModeSection extends ConsumerWidget {
+  const UseModeSection({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final activeProfile = ref.watch(activeAppProfileProvider);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 4, right: 4, bottom: 8),
+            child: Text(
+              // #1517 follow-up: ARB strings will localise this — using
+              // English-only inline copy for the initial ship.
+              'Right-size the app to how you actually use it. Picking '
+                  'a preset enables the matching set of features.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          _PresetCard(
+            profile: AppProfile.basic,
+            icon: Icons.local_gas_station_outlined,
+            title: 'Basic',
+            description:
+                'Cheapest fuel and EV charging prices nearby. '
+                    'Favorites and price alerts.',
+            isActive: activeProfile == AppProfile.basic,
+            onTap: () => _select(context, ref, AppProfile.basic),
+          ),
+          const SizedBox(height: 8),
+          _PresetCard(
+            profile: AppProfile.medium,
+            icon: Icons.analytics_outlined,
+            title: 'Medium',
+            description:
+                'Everything in Basic, plus track your fuel fill-ups '
+                    'and EV charging by hand.',
+            isActive: activeProfile == AppProfile.medium,
+            onTap: () => _select(context, ref, AppProfile.medium),
+          ),
+          const SizedBox(height: 8),
+          _PresetCard(
+            profile: AppProfile.full,
+            icon: Icons.directions_car_filled,
+            title: 'Full',
+            description:
+                'Everything in Medium, plus automatic OBD2 trip '
+                    'recording, driving scores, and loyalty cards.',
+            isActive: activeProfile == AppProfile.full,
+            onTap: () => _select(context, ref, AppProfile.full),
+          ),
+          if (activeProfile == AppProfile.custom) ...[
+            const SizedBox(height: 8),
+            const _PresetCard(
+              profile: AppProfile.custom,
+              icon: Icons.tune_outlined,
+              title: 'Custom',
+              description:
+                  'Your feature mix doesn\'t match any preset. Pick '
+                      'one above to overwrite, or keep customising '
+                      'individual features in the section below.',
+              isActive: true,
+              onTap: null,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Future<void> _select(
+    BuildContext context,
+    WidgetRef ref,
+    AppProfile profile,
+  ) async {
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    await ref.read(activeAppProfileProvider.notifier).select(profile);
+    if (messenger != null && context.mounted) {
+      SnackBarHelper.showSuccess(
+        context,
+        // English-only inline; ARB-localised in a follow-up.
+        'Use mode set to ${_label(profile)}.',
+      );
+    }
+  }
+
+  String _label(AppProfile profile) {
+    switch (profile) {
+      case AppProfile.basic:
+        return 'Basic';
+      case AppProfile.medium:
+        return 'Medium';
+      case AppProfile.full:
+        return 'Full';
+      case AppProfile.custom:
+        return 'Custom';
+    }
+  }
+}
+
+/// One row in the Use-mode selector. Mirrors the wizard's
+/// `ProfileChoiceStep` card but compressed for the Settings surface.
+class _PresetCard extends StatelessWidget {
+  final AppProfile profile;
+  final IconData icon;
+  final String title;
+  final String description;
+  final bool isActive;
+  final VoidCallback? onTap;
+
+  const _PresetCard({
+    required this.profile,
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    const brandGreen = Color(0xFF2E7D32);
+    final borderColor = isActive ? brandGreen : theme.dividerColor;
+    return Card(
+      key: Key('useModeCard_${profile.name}'),
+      elevation: isActive ? 2 : 0,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: borderColor, width: isActive ? 2 : 1),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                icon,
+                size: 32,
+                color: isActive
+                    ? brandGreen
+                    : theme.colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          title,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: isActive
+                                ? brandGreen
+                                : theme.colorScheme.onSurface,
+                          ),
+                        ),
+                        if (isActive) ...[
+                          const SizedBox(width: 6),
+                          const Icon(
+                            Icons.check_circle,
+                            color: brandGreen,
+                            size: 16,
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

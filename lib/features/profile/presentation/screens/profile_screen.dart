@@ -19,6 +19,7 @@ import '../widgets/location_section_widget.dart';
 import '../widgets/profile_list_section.dart';
 import '../widgets/storage_section.dart';
 import '../widgets/tank_sync_section.dart';
+import '../widgets/use_mode_section.dart';
 
 /// Settings / profile screen that composes extracted section widgets.
 ///
@@ -58,8 +59,19 @@ class ProfileScreen extends ConsumerWidget {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.zero,
         children: [
-          // Profiles — always visible, the primary interaction on the
-          // Settings screen.
+          // Use mode (#1517 / #1519) — first thing on the Settings
+          // screen because it gates which other sections (Consumption,
+          // Loyalty, Vehicles, Achievements) are visible at all.
+          const SectionHeader(
+            leadingIcon: Icons.tune,
+            title: 'Use mode',
+            padding: EdgeInsets.zero,
+          ),
+          const SizedBox(height: 4),
+          const UseModeSection(),
+          const SizedBox(height: 16),
+
+          // Profiles — primary user-data section.
           SectionHeader(
             leadingIcon: Icons.person,
             title: l?.sectionProfile ?? 'Profile',
