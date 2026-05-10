@@ -9,7 +9,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../core/feedback/auto_record_badge_service.dart';
 import '../../../core/location/geolocator_wrapper.dart';
+import '../../../core/providers/app_state_provider.dart';
 import '../../../core/storage/hive_boxes.dart';
+import '../../../core/sync/trips_sync.dart';
 import '../../../core/sync/baselines_sync.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
@@ -1478,6 +1480,32 @@ class TripRecording extends _$TripRecording {
         } catch (e, st) {
           debugPrint('TripRecording auto-record badge increment: $e\n$st');
         }
+      }
+      // #1479 phase 2 — opportunistic upload of the freshly saved
+      // summary to TankSync. Gated on the user's opt-in
+      // `consentSyncTrips` consent (which is itself gated on the
+      // master `cloudSync` consent at the toggle layer). Read here
+      // rather than hoisted into the orchestrator so a manual stop
+      // path also benefits — the user opted in once, every trip
+      // they save flows through the same `_saveToHistory`.
+      try {
+        final consent = ref.read(gdprConsentProvider);
+        if (consent.syncTrips) {
+          final entry = repo.loadAll().firstWhere(
+            (e) => e.id == id,
+            orElse: () => TripHistoryEntry(
+              id: id,
+              vehicleId: _vehicleId,
+              summary: summary,
+              automatic: automatic,
+            ),
+          );
+          // Fire-and-forget: an upload failure must not roll back the
+          // local save. TripsSync swallows + debugPrints internally.
+          unawaited(TripsSync.uploadSummary(entry));
+        }
+      } catch (e, st) {
+        debugPrint('TripRecording trip-sync hook: $e\n$st');
       }
     } catch (e, st) {
       debugPrint('TripRecording._saveToHistory: $e\n$st');
