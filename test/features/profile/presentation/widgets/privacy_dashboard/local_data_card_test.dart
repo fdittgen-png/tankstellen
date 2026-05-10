@@ -38,13 +38,60 @@ PrivacyDataSnapshot _snapshot({
 
 void main() {
   group('LocalDataCard', () {
-    testWidgets('renders 10 data rows — one per data category',
-        (tester) async {
-      await pumpApp(tester, LocalDataCard(snapshot: _snapshot()));
-      // 10 categories: favorites, ignored, ratings, alerts,
-      // priceHistory, profiles, itineraries, cache, hasApiKey,
-      // hasEvApiKey.
+    testWidgets(
+      '#1529 — hides zero-value rows by default; shows non-empty ones only',
+      (tester) async {
+        // Snapshot: only profiles=1 is non-empty. The 9 other rows are
+        // 0 / No and must collapse out of the dashboard.
+        await pumpApp(tester, LocalDataCard(snapshot: _snapshot()));
+
+        expect(find.byType(PrivacyDataRow), findsOneWidget,
+            reason: 'Only the non-zero "Search profiles" row should render '
+                'when every other category is empty.');
+        // The "Show N empty rows" toggle must surface so the user can
+        // still inspect the full list.
+        expect(
+          find.byKey(const Key('privacyShowAllRowsToggle')),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      '#1529 — tapping the show-all toggle reveals every category row',
+      (tester) async {
+        await pumpApp(tester, LocalDataCard(snapshot: _snapshot()));
+        await tester.tap(find.byKey(const Key('privacyShowAllRowsToggle')));
+        await tester.pumpAndSettle();
+        // 10 categories total — all visible after expand.
+        expect(find.byType(PrivacyDataRow), findsNWidgets(10));
+      },
+    );
+
+    testWidgets('renders all 10 rows when no value is empty', (tester) async {
+      await pumpApp(
+        tester,
+        LocalDataCard(
+          snapshot: _snapshot(
+            favorites: 12,
+            ignored: 3,
+            ratings: 7,
+            alerts: 2,
+            priceHistory: 5,
+            profiles: 2,
+            cache: 87,
+            itineraries: 4,
+            hasApiKey: true,
+            hasEvApiKey: true,
+          ),
+        ),
+      );
       expect(find.byType(PrivacyDataRow), findsNWidgets(10));
+      // No toggle when nothing is hidden.
+      expect(
+        find.byKey(const Key('privacyShowAllRowsToggle')),
+        findsNothing,
+      );
     });
 
     testWidgets('each category count surfaces in a row', (tester) async {
@@ -80,8 +127,12 @@ void main() {
           snapshot: _snapshot(hasApiKey: true, hasEvApiKey: false),
         ),
       );
-      // Both a "Yes" and a "No" row should be present.
+      // hasApiKey=true → "Yes" row visible by default. hasEvApiKey=false
+      // → "No" row hidden behind the show-all toggle.
       expect(find.text('Yes'), findsOneWidget);
+      // Reveal the hidden empty rows to verify the No appears too.
+      await tester.tap(find.byKey(const Key('privacyShowAllRowsToggle')));
+      await tester.pumpAndSettle();
       expect(find.text('No'), findsOneWidget);
     });
 
@@ -106,9 +157,13 @@ void main() {
       expect(find.textContaining('KB'), findsOneWidget);
     });
 
-    testWidgets('category icons are all present', (tester) async {
+    testWidgets('category icons are all present after expand',
+        (tester) async {
       await pumpApp(tester, LocalDataCard(snapshot: _snapshot()));
-      // Pinned icons = the visual contract for the dashboard.
+      // Default view hides empty rows (and their icons). Expand to
+      // verify the visual contract still holds for the full list.
+      await tester.tap(find.byKey(const Key('privacyShowAllRowsToggle')));
+      await tester.pumpAndSettle();
       expect(find.byIcon(Icons.favorite), findsOneWidget);
       expect(find.byIcon(Icons.visibility_off), findsOneWidget);
       expect(find.byIcon(Icons.star), findsOneWidget);
