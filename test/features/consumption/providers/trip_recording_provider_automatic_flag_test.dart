@@ -127,6 +127,81 @@ void main() {
   );
 
   test(
+    '#1004 phase 2b-3 — startTrip(service:..., automatic: true) plumbs '
+    'the flag through to the controller (orchestrator no-picker path)',
+    () async {
+      // Until the orchestrator no-picker call site lands,
+      // startTrip(service:, automatic:) is the public entry point that
+      // mirrors what the orchestrator will do directly. Verifying the
+      // flag plumbing here pins the contract so the orchestrator can
+      // wire up without re-discovering the seam.
+      final fakeBadge = _FakeAutoRecordBadgeService();
+      final container = ProviderContainer(overrides: [
+        autoRecordBadgeServiceProvider.overrideWith((ref) async => fakeBadge),
+      ]);
+      addTearDown(container.dispose);
+
+      final service = Obd2Service(FakeObd2Transport(_elmOk()));
+      await service.connect();
+      final notifier = container.read(tripRecordingProvider.notifier);
+      final outcome = await notifier.startTrip(
+        service: service,
+        automatic: true,
+      );
+      expect(outcome.toString(), endsWith('.started'),
+          reason: 'startTrip with a service should resolve to started');
+      final ctl = notifier.debugController!;
+      final start = DateTime.now();
+      for (int i = 0; i < 5; i++) {
+        ctl.debugInjectSample(
+          speedKmh: 50 + i.toDouble(),
+          rpm: 2000 + i * 10,
+          at: start.add(Duration(seconds: i)),
+          fuelRateLPerHour: 6.0,
+        );
+      }
+      await notifier.stopAndSaveAutomatic();
+
+      final repo = container.read(tripHistoryRepositoryProvider)!;
+      final history = repo.loadAll();
+      expect(history.first.automatic, isTrue,
+          reason: 'startTrip(automatic: true) must make the resulting '
+              'persisted entry inherit the auto-record provenance');
+    },
+  );
+
+  test(
+    'startTrip(service:..., automatic: false) stays manual',
+    () async {
+      final fakeBadge = _FakeAutoRecordBadgeService();
+      final container = ProviderContainer(overrides: [
+        autoRecordBadgeServiceProvider.overrideWith((ref) async => fakeBadge),
+      ]);
+      addTearDown(container.dispose);
+
+      final service = Obd2Service(FakeObd2Transport(_elmOk()));
+      await service.connect();
+      final notifier = container.read(tripRecordingProvider.notifier);
+      await notifier.startTrip(service: service);
+      final ctl = notifier.debugController!;
+      final start = DateTime.now();
+      for (int i = 0; i < 5; i++) {
+        ctl.debugInjectSample(
+          speedKmh: 50 + i.toDouble(),
+          rpm: 2000 + i * 10,
+          at: start.add(Duration(seconds: i)),
+          fuelRateLPerHour: 6.0,
+        );
+      }
+      await notifier.stop();
+
+      final repo = container.read(tripHistoryRepositoryProvider)!;
+      expect(repo.loadAll().first.automatic, isFalse,
+          reason: 'default automatic=false keeps the trip manual');
+    },
+  );
+
+  test(
     'stop() with no automatic flag stays manual — no badge increment',
     () async {
       final fakeBadge = _FakeAutoRecordBadgeService();

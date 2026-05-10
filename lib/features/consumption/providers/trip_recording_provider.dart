@@ -210,10 +210,17 @@ class TripRecording extends _$TripRecording {
   /// fill-up, does NOT block on one, and does NOT read any fill-up
   /// state. The fill-up save path (#888) derives the trip→tank link
   /// from the rolling trip-history log independently.
+  ///
+  /// [automatic] flags the controller so any [PausedTripEntry]
+  /// written on a mid-trip BLE drop (#1004 phase 4-WAL) carries the
+  /// auto-record provenance. Defaults to `false` so manual UI
+  /// callers are unchanged; the orchestrator no-picker path
+  /// (`AutoTripCoordinator`) passes `true`.
   Future<StartTripOutcome> startTrip({
     String? vehicleId,
     String? adapterMac,
     Obd2Service? service,
+    bool automatic = false,
   }) async {
     if (state.isActive) return StartTripOutcome.alreadyActive;
     final activeVehicle = _tryReadActiveVehicle();
@@ -222,16 +229,14 @@ class TripRecording extends _$TripRecording {
     _lastTripVehicleId = resolvedVehicleId;
     _lastTripStartedAt = DateTime.now();
     if (service != null) {
-      await start(service);
+      // #1004 phase 2b-3 — orchestrator-driven no-picker start path.
+      // The caller supplies the connected `Obd2Service` directly so
+      // `automatic: true` flows through to the controller and the
+      // resulting [PausedTripEntry] (if BLE drops mid-trip) carries
+      // the auto-record provenance at WAL recovery time.
+      await start(service, automatic: automatic);
       return StartTripOutcome.started;
     }
-    // TODO(#1004 phase 2b-3) — when the orchestrator's no-picker
-    // start lands, plumb `automatic: true` into the resulting [start]
-    // call here so the [PausedTripEntry] written on a mid-trip BLE
-    // drop carries the automatic flag at WAL recovery time. For now
-    // the picker fork below is the only orchestrator-driven path and
-    // it goes through UI before re-entering [start], which provides
-    // the [automatic] argument explicitly.
     if (resolvedMac == null || resolvedMac.isEmpty) {
       return StartTripOutcome.needsPicker;
     }
