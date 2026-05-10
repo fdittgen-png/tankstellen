@@ -39,14 +39,22 @@ abstract class Obd2Permissions {
 /// permission — legacy contract. We ask for `location` in that case
 /// so scanning actually returns results.
 ///
-/// iOS: the framework currently targets Android only; iOS returns
-/// [Obd2PermissionState.denied] so callers can surface a "not
-/// supported on iOS yet" empty state instead of crashing.
+/// iOS 13+: a single unified `Permission.bluetooth` check, backed by
+/// `NSBluetoothAlwaysUsageDescription` in `Info.plist`. The first call
+/// to [request] surfaces the system Bluetooth-permission prompt;
+/// `denied` covers both the "not yet asked" and "user tapped Don't
+/// Allow" cases. `permanentlyDenied` triggers when iOS will no longer
+/// re-prompt — the picker UI offers an "Open Settings" deep link in
+/// that branch.
 class PluginObd2Permissions implements Obd2Permissions {
   const PluginObd2Permissions();
 
   @override
   Future<Obd2PermissionState> request() async {
+    if (Platform.isIOS) {
+      final status = await Permission.bluetooth.request();
+      return _stateFromStatus(status);
+    }
     if (!Platform.isAndroid) return Obd2PermissionState.denied;
     final sdkInt = await _androidSdkInt();
     final needed = _permissionsFor(sdkInt);
@@ -56,6 +64,10 @@ class PluginObd2Permissions implements Obd2Permissions {
 
   @override
   Future<Obd2PermissionState> current() async {
+    if (Platform.isIOS) {
+      final status = await Permission.bluetooth.status;
+      return _stateFromStatus(status);
+    }
     if (!Platform.isAndroid) return Obd2PermissionState.denied;
     final sdkInt = await _androidSdkInt();
     final needed = _permissionsFor(sdkInt);
@@ -64,6 +76,18 @@ class PluginObd2Permissions implements Obd2Permissions {
       statuses[p] = await p.status;
     }
     return _aggregate(statuses);
+  }
+
+  /// Map the single iOS [PermissionStatus] (Bluetooth is a unified perm
+  /// since iOS 13) onto our coarse three-value state.
+  static Obd2PermissionState _stateFromStatus(PermissionStatus status) {
+    if (status.isGranted || status.isLimited) {
+      return Obd2PermissionState.granted;
+    }
+    if (status.isPermanentlyDenied || status.isRestricted) {
+      return Obd2PermissionState.permanentlyDenied;
+    }
+    return Obd2PermissionState.denied;
   }
 
   /// Android 12+ uses the split BLE permissions with neverForLocation;
