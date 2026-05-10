@@ -263,3 +263,68 @@ remaining phases:
 
 None of phases 3-5 are autonomous-worker targets either — each
 needs a Mac for at least the verification step.
+
+## iOS-only onboarding copy (ready for translation)
+
+The user-facing "iOS auto-record requires three things" screen
+that needs to land in the existing onboarding flow when the
+device is iOS. Drafted here so the translator pass can start
+before the actual screen widget is wired up. ARB keys prefixed
+`iosAutoRecordOnboarding…` so a future ARB-search lands them all
+together.
+
+### Screen title
+> **Stay out of the app — but don't quit it.**
+
+### Body bullets
+
+1. **Open Sparkilo once after each reboot.**
+   *Sub-line:* Apple wakes Sparkilo only after you've opened it at
+   least once since the phone restarted. After that, your trips
+   record automatically.
+
+2. **Don't swipe Sparkilo away in the app switcher.**
+   *Sub-line:* "Force-quit" tells iOS to stop relaunching the app.
+   Your trips will stop recording until you open Sparkilo again.
+
+3. **When iOS asks for "Always" location, please say yes.**
+   *Sub-line:* The fallback that records your trip when the OBD2
+   adapter is slow needs background location. We never share it.
+
+### CTA
+> **Got it — start the OBD2 pairing**
+
+This is the screen that ships in Phase 6 (UI integration), AFTER
+the Phase 1 spike + Phase 3 lifecycle + Phase 4 notification work
+have proven the flow actually fires on-device.
+
+## Mac-developer remaining checklist (post-#1532)
+
+PR #1532 landed the Info.plist `bluetooth-central` + `location`
+declarations + the `IosStateRestorationService` Dart scaffold.
+What still needs Mac-side hands-on work before iOS hands-free is
+shippable:
+
+- [ ] **App Store review claim** for `bluetooth-central`.
+      Apple reviews ask: "Why does this app need to use BLE in the
+      background?" Canonical answer drafted in the issue body of
+      #1295, paste verbatim in App Store Connect.
+- [ ] **App Privacy** under ASC's "Data Usage" tab. Confirm Bluetooth
+      + Location are both declared as collected and link to the
+      privacy-policy section already shipped at
+      docs/privacy-policy/.
+- [ ] **flutter_blue_plus version bump** to `^2.0.0` so the
+      `setOptions(restoreState: true)` call is actually wired into
+      `CBCentralManagerOptionRestoreIdentifierKey`. v1.35.x doesn't
+      forward the option (verified by reading the FBP changelog).
+      Major-version migration; budget a half-day for breaking-API
+      cleanup in `lib/features/consumption/data/obd2/`.
+- [ ] **MFi adapter decision.** Are we adding an External Accessory
+      / classic-BT path for vLinker FS / OBDLink MX+, or restricting
+      iOS users to BLE adapters only? Document the decision in
+      docs/guides/obd2-adapters.md once it lands.
+- [ ] **On-device verification spike.** Real iPhone + real BLE ELM327.
+      Acceptance script in "Phase 5 — Device-test acceptance" above.
+- [ ] **Localise the onboarding copy** (block above) into the 23
+      locales the app already supports. ARB pass; no Dart needed
+      until the screen widget is wired.
