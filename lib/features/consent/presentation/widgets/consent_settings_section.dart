@@ -13,14 +13,37 @@ import '../../../../l10n/app_localizations.dart';
 /// disables Sync trips at the provider layer (`save()`'s
 /// `effectiveSyncTrips`), so the UI stays in sync with the persisted
 /// state without an extra round-trip.
-class ConsentSettingsSection extends ConsumerWidget {
+///
+/// #1529 — subtitle compaction. The first two consents (Location +
+/// Error Reporting) keep their full description because they're the
+/// most consequential / most likely to be touched on a given visit.
+/// The other four collapse their subtitle to a single ellipsised
+/// line by default, with a "Show details" / "Hide details" affordance
+/// at the bottom of the section to flip every collapsed row open at
+/// once. Saves ~250 dp on subsequent visits while keeping the toggle
+/// surface tap-friendly.
+class ConsentSettingsSection extends ConsumerStatefulWidget {
   const ConsentSettingsSection({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsentSettingsSection> createState() =>
+      _ConsentSettingsSectionState();
+}
+
+class _ConsentSettingsSectionState
+    extends ConsumerState<ConsentSettingsSection> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
     final consent = ref.watch(gdprConsentProvider);
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    // Helper for the 4 collapsible subtitles: when _expanded, render
+    // full text; otherwise constrain to a single ellipsised line.
+    int? collapsedMaxLines() => _expanded ? null : 1;
+    TextOverflow? collapsedOverflow() =>
+        _expanded ? null : TextOverflow.ellipsis;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,6 +102,8 @@ class ConsentSettingsSection extends ConsumerWidget {
             l10n?.gdprCloudSyncShort ??
                 'Sync favorites and alerts across devices',
             style: theme.textTheme.bodySmall,
+            maxLines: collapsedMaxLines(),
+            overflow: collapsedOverflow(),
           ),
           value: consent.cloudSync,
           onChanged: (v) => ref.read(gdprConsentProvider.notifier).save(
@@ -98,6 +123,8 @@ class ConsentSettingsSection extends ConsumerWidget {
             l10n?.gdprCommunityWaitTimeShort ??
                 'Anonymously share station wait times',
             style: theme.textTheme.bodySmall,
+            maxLines: collapsedMaxLines(),
+            overflow: collapsedOverflow(),
           ),
           value: consent.communityWaitTime,
           onChanged: (v) => ref.read(gdprConsentProvider.notifier).save(
@@ -116,6 +143,8 @@ class ConsentSettingsSection extends ConsumerWidget {
             l10n?.gdprVinOnlineDecodeShort ??
                 "Decode the VIN via NHTSA's free public service",
             style: theme.textTheme.bodySmall,
+            maxLines: collapsedMaxLines(),
+            overflow: collapsedOverflow(),
           ),
           value: consent.vinOnlineDecode,
           onChanged: (v) => ref.read(gdprConsentProvider.notifier).save(
@@ -143,6 +172,8 @@ class ConsentSettingsSection extends ConsumerWidget {
                     'Cross-device, opt-in.'
                 : 'Enable Cloud Sync above to back up trips.',
             style: theme.textTheme.bodySmall,
+            maxLines: collapsedMaxLines(),
+            overflow: collapsedOverflow(),
           ),
           value: consent.syncTrips,
           onChanged: consent.cloudSync
@@ -155,6 +186,31 @@ class ConsentSettingsSection extends ConsumerWidget {
                     syncTrips: v,
                   )
               : null,
+        ),
+        // #1529 — section-level expand toggle for the 4 collapsed
+        // subtitles (Cloud Sync, Community Wait Times, VIN online
+        // decode, Sync trip recordings). The first two consents
+        // (Location, Error Reporting) keep their full text always
+        // because they're the ones a user is most likely to revisit.
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: TextButton.icon(
+            key: const Key('consentSubtitleExpandToggle'),
+            onPressed: () => setState(() => _expanded = !_expanded),
+            icon: Icon(
+              _expanded ? Icons.expand_less : Icons.expand_more,
+              size: 18,
+            ),
+            label: Text(
+              // English-only inline; ARB strings to follow.
+              _expanded ? 'Hide details' : 'Show details',
+            ),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
         ),
       ],
     );
