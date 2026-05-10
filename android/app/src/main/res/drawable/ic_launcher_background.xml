@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Solid-green plate behind the white pump glyph in the adaptive
+  launcher icon (API 26+). This MUST be a `<shape>` drawable, NOT a
+  `@color/X` reference: Samsung's OneUI launcher (and several other
+  third-party launchers) silently ignore `@color/X` references in the
+  adaptive-icon `<background>` slot and render only the foreground —
+  which makes the icon appear as a white pump on a transparent /
+  checkered background instead of green.
+
+  Hex matches the brand-green plate used in `assets/icon.png` (the
+  source the iOS launcher icon and Play Store listing icon are
+  derived from), so the icon is identical across iOS launcher,
+  Android launcher, and the Google Play store listing.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="rectangle">
+  <solid android:color="#2E7D32" />
+</shape>

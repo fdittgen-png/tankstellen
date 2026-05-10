@@ -177,7 +177,8 @@ jobs:
             --metadata_path "$SUPPLY_METADATA_PATH" \
             --skip_upload_aab \
             --skip_upload_apk \
-            --skip_upload_changelogs
+            --skip_upload_changelogs \
+            --sync_image_upload
 
       - name: Dry-run summary
         if: steps.track.outputs.dry_run == 'true'
