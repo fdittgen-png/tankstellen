@@ -80,6 +80,16 @@
 		<string>fetch</string>
 		<string>processing</string>
 		<string>remote-notification</string>
+		<!-- #1295 phase 1 — iOS hands-free auto-record. `bluetooth-central`
+		     gates Core Bluetooth State Preservation/Restoration so the OS
+		     can relaunch Sparkilo into the background when the paired
+		     ELM327 powers on. `location` is the partner mode that lets
+		     the relaunched app keep a CLLocationManager session open for
+		     trip GPS without losing it on first idle. Apple reviews both
+		     declarations against the actual usage; any time we add a
+		     non-OBD2 reason to keep BLE/GPS alive, document it here. -->
+		<string>bluetooth-central</string>
+		<string>location</string>
 	</array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>

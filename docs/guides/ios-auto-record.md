@@ -1,12 +1,16 @@
 # iOS hands-free trip auto-record (port from #1004)
 
-Status: phase 2 — Dart-side scaffolding shipped. Native iOS layer
-NOT YET applied or verified — see "How to verify on a Mac" below.
+Status: **phase 1 + phase 2 scaffolding shipped**. Info.plist
+declarations for `bluetooth-central` + `location` UIBackgroundModes
+are in the tree (#1295 phase 1, this PR). The Dart-side scaffolding
+(`IosStateRestorationService`) is in place from a prior PR. **Real
+iOS verification still requires a Mac + iPhone + ELM327** — see
+"How to verify on a Mac" below.
 
 This document explains the iOS port of the hands-free trip
 auto-record flow tracked in #1295 (sibling of the Android flow in
-#1004), and the platform-side changes a Mac-equipped developer must
-apply before the iOS path can be exercised end-to-end.
+#1004), and the remaining platform-side changes a Mac-equipped
+developer must apply before the iOS path is exercised end-to-end.
 
 ## Why this scaffolding ships before iOS verification
 
@@ -23,7 +27,19 @@ background relaunch — requires a Mac, an iPhone, and an ELM327 BLE
 adapter. That work is a human-driven phase, not autonomous-worker
 territory.
 
-## Info.plist changes the developer must apply on a Mac
+## Info.plist changes — applied in this PR ✅
+
+`UIBackgroundModes` now includes `bluetooth-central` and `location`
+(in addition to the prior `fetch` / `processing` /
+`remote-notification`). The `NSBluetoothAlwaysUsageDescription` +
+`NSLocationAlwaysAndWhenInUseUsageDescription` +
+`NSLocationAlwaysUsageDescription` strings were already in place
+from prior iOS work — verified in this PR.
+
+What remains for the Mac-equipped developer is the **App Store
+review claim** for `bluetooth-central` (Apple asks why you need
+it during review) and validating the App Privacy answers under
+ASC's "Data Usage" tab — both are runtime-only, not source-tracked.
 
 The values below are quoted **verbatim** from the issue body of
 #1295:
