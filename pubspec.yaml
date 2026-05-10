@@ -129,11 +129,7 @@ flutter:
     - assets/schemas/
 
 flutter_launcher_icons:
-  # Android icon is hand-tuned (adaptive vector + optimized legacy PNGs).
-  # Don't regenerate it from this pipeline — keep `android: false` so a
-  # rerun doesn't clobber the curated mipmap-*/ic_launcher.png files or
-  # the adaptive-icon XML's safe-zone notes.
-  android: false
+  android: "ic_launcher"
   ios: true
   image_path: "assets/icon.png"
   # Apple rejects iOS app icons with an alpha channel — flatten transparency
@@ -141,6 +137,13 @@ flutter_launcher_icons:
   # build. The brand asset itself keeps its alpha for non-iOS use.
   remove_alpha_ios: true
   background_color_ios: "#2E7D32"
+  # Adaptive launcher icon (API 26+): white pump-on-shield glyph on the
+  # brand-green plate. Keeps parity with the iOS icon and the Play Store
+  # listing icon (assets/play_store_icon_512.png), so users see the same
+  # Sparkilo identity on the home screen they saw on the store page.
+  adaptive_icon_background: "#2E7D32"
+  adaptive_icon_foreground: "assets/icon_foreground.png"
+  min_sdk_android: 21
   web:
     generate: false
 

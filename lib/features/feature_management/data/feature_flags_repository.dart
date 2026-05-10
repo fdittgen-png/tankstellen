@@ -27,6 +27,14 @@ class FeatureFlagsRepository {
   /// Hive box that holds the persisted feature-flag set.
   static const String boxName = 'feature_flags';
 
+  /// True when the box has never been written to. Used by the AppProfile
+  /// migration (#1517) to distinguish a fresh install from a pre-#1517
+  /// install with persisted flags — the in-memory state of
+  /// [FeatureFlags] is identical (manifest defaults) in both cases for
+  /// the first frame, so the provider would otherwise mis-classify a
+  /// migrated user.
+  bool get isEmpty => _box.isEmpty;
+
   /// Returns the currently-enabled feature set.
   ///
   /// First launch (empty box) → manifest defaults. Subsequent launches
