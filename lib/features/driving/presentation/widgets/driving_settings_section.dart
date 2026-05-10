@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../feature_management/application/feature_flags_provider.dart';
+import '../../../feature_management/domain/feature.dart';
 import '../../../glide_coach/data/traffic_signal_repository.dart';
 import '../../../glide_coach/providers/glide_coach_settings_provider.dart';
 import '../../../profile/presentation/widgets/gamification_settings_tile.dart';
@@ -36,6 +38,12 @@ class DrivingSettingsSection extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final enabled = ref.watch(hapticEcoCoachEnabledProvider);
+    // #1517 / #1520 — gate the Loyalty tile by the new
+    // [Feature.loyaltyCards] flag. Default-off; only the
+    // `AppProfile.full` preset turns it on, so Basic + Medium users
+    // never see the Fuel club cards entry-point in Settings.
+    final loyaltyOn =
+        ref.watch(featureFlagsProvider).contains(Feature.loyaltyCards);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -49,14 +57,15 @@ class DrivingSettingsSection extends ConsumerWidget {
           onTap: () => context.push('/vehicles'),
         ),
         const SizedBox(height: 8),
-        SettingsMenuTile(
-          key: const Key('consoleFuelClubCardsTile'),
-          icon: Icons.card_membership,
-          title: l?.loyaltyMenuTitle ?? 'Fuel club cards',
-          subtitle: l?.loyaltyMenuSubtitle ??
-              'Apply per-litre discounts from Total, Aral, Shell, …',
-          onTap: () => context.push('/loyalty-settings'),
-        ),
+        if (loyaltyOn)
+          SettingsMenuTile(
+            key: const Key('consoleFuelClubCardsTile'),
+            icon: Icons.card_membership,
+            title: l?.loyaltyMenuTitle ?? 'Fuel club cards',
+            subtitle: l?.loyaltyMenuSubtitle ??
+                'Apply per-litre discounts from Total, Aral, Shell, …',
+            onTap: () => context.push('/loyalty-settings'),
+          ),
         SwitchListTile(
           key: const Key('hapticEcoCoachToggle'),
           value: enabled,

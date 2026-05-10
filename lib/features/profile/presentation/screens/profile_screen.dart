@@ -9,6 +9,7 @@ import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../consent/presentation/widgets/consent_settings_section.dart';
 import '../../../driving/presentation/widgets/driving_settings_section.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
+import '../../../feature_management/domain/consumption_tab_visibility.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../widgets/about_section.dart';
@@ -42,11 +43,13 @@ class ProfileScreen extends ConsumerWidget {
       manifest,
       enabledFlags,
     );
-    final consumptionOn = isEffectivelyEnabled(
-      Feature.obd2TripRecording,
-      manifest,
-      enabledFlags,
-    );
+    // #1517 / #1520 — Consumption section is reachable when
+    // `showConsumptionTab` is on AND at least one data source is on
+    // (manualConsumption for Medium tier OR obd2TripRecording for Full
+    // tier). Replaces the prior obd2-only gate so Medium-profile users
+    // (manual fill-ups, no OBD2) can still configure their vehicle
+    // and reach the Consumption surface.
+    final consumptionOn = isConsumptionTabReachable(manifest, enabledFlags);
 
     return PageScaffold(
       title: l?.settings ?? 'Settings',
