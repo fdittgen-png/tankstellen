@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Adaptive icon foreground — placeholder vector.
+
+  Canvas: 108dp × 108dp (Android adaptive-icon requirement). The rendered
+  content must live inside a 72dp × 72dp safe zone centered on the canvas
+  so that launchers can crop / mask the outer 18dp bleed without clipping
+  the glyph (#589).
+
+  Composition (fuel drop nested in a shield):
+    * Shield outline  — soft-cornered "crest" silhouette, stroke only, white.
+    * Fuel drop       — classic teardrop, centered in the shield, white fill.
+
+  The drop-in-shield motif is the brand signature: a fuel drop under a
+  shield = the privacy pledge (no Google Play Services, user-provided API
+  keys). Icon + splash + onboarding privacy step all reuse this glyph so
+  the identity is consistent.
+
+  Style constraints (see docs/design/ASSET_SPEC.md § 1):
+    * 2-tone only: white glyph on ic_launcher_background (#2E7D32 today,
+      slated to shift to the theme primary #4059AD once the generator
+      produces the final asset — see ASSET_SPEC).
+    * No gradients, no drop shadow, no text.
+    * Keep all geometry inside the 18dp–90dp safe-zone band on each axis.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Shield outline. Stroke-only; the fuel drop sits inside. -->
+    <path
+        android:pathData="M54,24
+                          L78,32
+                          L78,58
+                          C78,72 68,82 54,86
+                          C40,82 30,72 30,58
+                          L30,32
+                          Z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000" />
+
+    <!-- Fuel drop. Classic teardrop: pointed apex, rounded bell. -->
+    <path
+        android:pathData="M54,38
+                          C54,38 42,52 42,62
+                          C42,69.18 47.37,75 54,75
+                          C60.63,75 66,69.18 66,62
+                          C66,52 54,38 54,38
+                          Z"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Highlight inside the drop — tiny lozenge, gives it a liquid feel
+         without a gradient (gradients are banned on adaptive icons). -->
+    <path
+        android:pathData="M50,60
+                          C50,57 51.5,55 53,55
+                          C54.5,55 55,57 54,60
+                          C53,62 51.5,62.5 50.5,62
+                          C49.8,61.5 49.8,60.8 50,60
+                          Z"
+        android:fillColor="#2E7D32"
+        android:fillAlpha="0.25" />
+</vector>
