@@ -428,6 +428,40 @@ jobs:
             --target '${{ github.sha }}' \
             "${ASSETS[@]}"
 
+      - name: Prune old nightly releases (keep latest only)
+        env:
+          # Same RELEASE_TOKEN used by `gh release create` above — needs
+          # `contents: write` to delete releases AND tags.
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
+          NEW_TAG: ${{ needs.pre-check.outputs.tag }}
+        run: |
+          set -euo pipefail
+          # Storage hygiene: each nightly bundles ~300 MB of artifacts
+          # (AAB + 3 APK splits + IPA + dSYMs). Keeping every nightly
+          # forever balloons the GitHub release storage quota and the
+          # Releases page becomes noisy. Keep ONLY the just-published
+          # release; delete every other `nightly-*` tag along with its
+          # assets and git tag.
+          #
+          # We filter strictly on the `nightly-` tag prefix so:
+          #   - `permissions-evidence-2026-05-08` and other ad-hoc tags
+          #     are preserved (they document point-in-time evidence).
+          #   - Any future `v5.0.0` / real-release tags are preserved
+          #     (semver releases are not garbage).
+          #
+          # `--cleanup-tag` removes the underlying git tag too — without
+          # it the release would disappear but the tag would linger
+          # forever in `git tag -l`.
+          gh release list --limit 200 --json tagName \
+            --jq ".[] | select(.tagName | startswith(\"nightly-\")) | select(.tagName != \"$NEW_TAG\") | .tagName" \
+          | while read -r tag; do
+              [ -z "$tag" ] && continue
+              echo "Pruning old nightly release: $tag"
+              if ! gh release delete "$tag" --cleanup-tag --yes; then
+                echo "::warning::failed to delete release $tag — continuing"
+              fi
+            done
+
       - name: Summary
         if: always()
         run: |
