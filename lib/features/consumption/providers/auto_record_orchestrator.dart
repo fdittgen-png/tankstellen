@@ -188,18 +188,22 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
       listener: listener,
       startTrip: (Obd2Service service) async {
         // Phase 2b-3 — hand the live OBD2 session to the trip recorder
-        // and tag the trip as automatic so [PausedTripEntry] /
-        // launcher-icon badge bookkeeping picks it up. The recorder
-        // takes ownership of the session; the coordinator's pointer
-        // has already been nulled out before this callback fires.
-        await ref
+        // through the unified [TripRecording.startTrip] entry point
+        // (which routes to [start] internally and threads
+        // `automatic: true` per the seam landed in #1531). Going via
+        // `startTrip` rather than calling `start` directly means:
+        //   - vehicle-id resolution from the active profile happens
+        //     centrally (no duplicated lookup in the orchestrator)
+        //   - the "already recording" guard short-circuits before
+        //     the recorder takes ownership of the session
+        //   - the typed [StartTripOutcome] flows back to the
+        //     coordinator's classifier as-is, no string synthesis.
+        // The recorder takes ownership of the session; the
+        // coordinator's pointer has already been nulled out before
+        // this callback fires.
+        return ref
             .read(tripRecordingProvider.notifier)
-            .start(service, automatic: true);
-        // The coordinator's outcome classifier looks for the trailing
-        // segment 'started' on a `Type.value` toString to tag a
-        // `tripStarted` trace entry. The provider's `start()` returns
-        // void, so we synthesise the marker here.
-        return 'StartTripOutcome.started';
+            .startTrip(service: service, automatic: true);
       },
       stopAndSaveAutomatic: () async {
         await ref.read(tripRecordingProvider.notifier).stopAndSaveAutomatic();
