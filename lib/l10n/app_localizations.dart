@@ -4513,6 +4513,48 @@ abstract class AppLocalizations {
   /// **'Choose which screen opens when you launch the app.'**
   String get onboardingLandingHint;
 
+  /// No description provided for @iosAutoRecordOnboardingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay out of the app — but don\'t quit it.'**
+  String get iosAutoRecordOnboardingTitle;
+
+  /// No description provided for @iosAutoRecordOnboardingBullet1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Sparkilo once after each reboot.'**
+  String get iosAutoRecordOnboardingBullet1Title;
+
+  /// No description provided for @iosAutoRecordOnboardingBullet1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple wakes Sparkilo only after you\'ve opened it at least once since the phone restarted. After that, your trips record automatically.'**
+  String get iosAutoRecordOnboardingBullet1Body;
+
+  /// No description provided for @iosAutoRecordOnboardingBullet2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t swipe Sparkilo away in the app switcher.'**
+  String get iosAutoRecordOnboardingBullet2Title;
+
+  /// No description provided for @iosAutoRecordOnboardingBullet2Body.
+  ///
+  /// In en, this message translates to:
+  /// **'\"Force-quit\" tells iOS to stop relaunching the app. Your trips will stop recording until you open Sparkilo again.'**
+  String get iosAutoRecordOnboardingBullet2Body;
+
+  /// No description provided for @iosAutoRecordOnboardingBullet3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'When iOS asks for \"Always\" location, please say yes.'**
+  String get iosAutoRecordOnboardingBullet3Title;
+
+  /// No description provided for @iosAutoRecordOnboardingBullet3Body.
+  ///
+  /// In en, this message translates to:
+  /// **'The fallback that records your trip when the OBD2 adapter is slow needs background location. We never share it.'**
+  String get iosAutoRecordOnboardingBullet3Body;
+
   /// No description provided for @scanReceipt.
   ///
   /// In en, this message translates to:

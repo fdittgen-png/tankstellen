@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,6 +8,7 @@ import 'package:tankstellen/features/feature_management/application/app_profile_
 import 'package:tankstellen/features/feature_management/data/app_profile_repository.dart';
 import 'package:tankstellen/features/feature_management/domain/app_profile.dart';
 import 'package:tankstellen/features/setup/presentation/screens/onboarding_wizard_screen.dart';
+import 'package:tankstellen/features/setup/presentation/widgets/onboarding_ios_standby_step.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/onboarding_progress_indicator.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/profile_choice_step.dart';
 import 'package:tankstellen/features/setup/providers/onboarding_obd2_connector.dart';
@@ -333,6 +335,77 @@ void main() {
       expect(find.text('Skip'), findsOneWidget);
       expect(find.text('Maybe later'), findsOneWidget);
     });
+  });
+
+  group('OnboardingWizardScreen — iOS standby step (#1542 phase 6)', () {
+    // `debugDefaultTargetPlatformOverride` is verified by the test
+    // framework before tearDown callbacks fire, so we set it at the
+    // top of each test and reset before returning via try/finally.
+
+    Future<void> pumpIosWizard(WidgetTester tester) async {
+      final std = standardTestOverrides();
+      when(() => std.mockStorage.isSetupComplete).thenReturn(false);
+      when(() => std.mockStorage.isSetupSkipped).thenReturn(false);
+      when(() => std.mockStorage.hasApiKey()).thenReturn(false);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...std.overrides,
+            onboardingObd2ConnectorProvider
+                .overrideWithValue(_NullObd2Connector()),
+            appProfileRepositoryProvider
+                .overrideWithValue(_FullProfileRepository()),
+          ].cast(),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
+            home: OnboardingWizardScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets(
+      'on iOS, Full profile, German country: 9 steps total (extra iOS '
+      'standby explainer between Vehicle and OBD2)',
+      (tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        try {
+          await pumpIosWizard(tester);
+          // 8 → 9: the platform-specific step is included.
+          expect(find.text('1 / 9'), findsOneWidget);
+        } finally {
+          debugDefaultTargetPlatformOverride = null;
+        }
+      },
+    );
+
+    testWidgets(
+      'walking past Vehicle lands on the iOS standby step (not OBD2)',
+      (tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        try {
+          await pumpIosWizard(tester);
+          await tester.tap(find.text('Next')); // → Country
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Next')); // → Vehicle
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Skip')); // past Vehicle
+          await tester.pumpAndSettle();
+
+          expect(find.byType(OnboardingIosStandbyStep), findsOneWidget);
+          expect(
+            find.text("Stay out of the app — but don't quit it."),
+            findsOneWidget,
+          );
+        } finally {
+          debugDefaultTargetPlatformOverride = null;
+        }
+      },
+    );
   });
 }
 

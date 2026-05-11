@@ -2405,6 +2405,34 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wählen Sie, welcher Bildschirm beim Start der App angezeigt wird.';
 
   @override
+  String get iosAutoRecordOnboardingTitle =>
+      'Bleib aus der App — aber schließe sie nicht.';
+
+  @override
+  String get iosAutoRecordOnboardingBullet1Title =>
+      'Sparkilo nach jedem Neustart einmal öffnen.';
+
+  @override
+  String get iosAutoRecordOnboardingBullet1Body =>
+      'Apple weckt Sparkilo erst auf, wenn du die App seit dem letzten Neustart mindestens einmal geöffnet hast. Danach werden deine Fahrten automatisch aufgezeichnet.';
+
+  @override
+  String get iosAutoRecordOnboardingBullet2Title =>
+      'Sparkilo nicht im App-Umschalter weg­wischen.';
+
+  @override
+  String get iosAutoRecordOnboardingBullet2Body =>
+      '„Beenden erzwingen“ teilt iOS mit, die App nicht mehr neu zu starten. Deine Fahrten werden dann nicht mehr aufgezeichnet, bis du Sparkilo erneut öffnest.';
+
+  @override
+  String get iosAutoRecordOnboardingBullet3Title =>
+      'Wenn iOS nach „Immer“-Standort fragt, bitte zustimmen.';
+
+  @override
+  String get iosAutoRecordOnboardingBullet3Body =>
+      'Die Fallback-Aufzeichnung greift, wenn der OBD2-Adapter zu langsam reagiert — sie braucht Hintergrund-Standort. Wir teilen ihn niemals.';
+
+  @override
   String get scanReceipt => 'Beleg scannen';
 
   @override

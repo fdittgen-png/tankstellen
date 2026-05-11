@@ -2388,6 +2388,34 @@ class AppLocalizationsEs extends AppLocalizations {
       'Choose which screen opens when you launch the app.';
 
   @override
+  String get iosAutoRecordOnboardingTitle =>
+      'Stay out of the app — but don\'t quit it.';
+
+  @override
+  String get iosAutoRecordOnboardingBullet1Title =>
+      'Open Sparkilo once after each reboot.';
+
+  @override
+  String get iosAutoRecordOnboardingBullet1Body =>
+      'Apple wakes Sparkilo only after you\'ve opened it at least once since the phone restarted. After that, your trips record automatically.';
+
+  @override
+  String get iosAutoRecordOnboardingBullet2Title =>
+      'Don\'t swipe Sparkilo away in the app switcher.';
+
+  @override
+  String get iosAutoRecordOnboardingBullet2Body =>
+      '\"Force-quit\" tells iOS to stop relaunching the app. Your trips will stop recording until you open Sparkilo again.';
+
+  @override
+  String get iosAutoRecordOnboardingBullet3Title =>
+      'When iOS asks for \"Always\" location, please say yes.';
+
+  @override
+  String get iosAutoRecordOnboardingBullet3Body =>
+      'The fallback that records your trip when the OBD2 adapter is slow needs background location. We never share it.';
+
+  @override
   String get scanReceipt => 'Scan receipt';
 
   @override
