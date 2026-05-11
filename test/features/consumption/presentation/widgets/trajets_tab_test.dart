@@ -73,6 +73,7 @@ class _RecordingThrowsTripRecording extends TripRecording {
     String? vehicleId,
     String? adapterMac,
     Obd2Service? service,
+    bool automatic = false,
   }) async {
     startTripCallCount++;
     // Surfacing an Obd2ScanTimeout exercises the `on Obd2ConnectionError`
@@ -96,6 +97,7 @@ class _PendingTripRecording extends TripRecording {
     String? vehicleId,
     String? adapterMac,
     Obd2Service? service,
+    bool automatic = false,
   }) {
     return gate.future;
   }
@@ -112,6 +114,7 @@ class _IdleTripRecording extends TripRecording {
     String? vehicleId,
     String? adapterMac,
     Obd2Service? service,
+    bool automatic = false,
   }) async {
     return StartTripOutcome.alreadyActive;
   }
@@ -131,6 +134,7 @@ class _NeedsPickerTripRecording extends TripRecording {
     String? vehicleId,
     String? adapterMac,
     Obd2Service? service,
+    bool automatic = false,
   }) async {
     startTripCallCount++;
     return StartTripOutcome.needsPicker;
@@ -886,6 +890,7 @@ class _ActiveRecordingTrip extends TripRecording {
     String? vehicleId,
     String? adapterMac,
     Obd2Service? service,
+    bool automatic = false,
   }) async =>
       StartTripOutcome.alreadyActive;
 }
