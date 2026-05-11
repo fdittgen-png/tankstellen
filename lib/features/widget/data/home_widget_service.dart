@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -25,8 +26,28 @@ import 'predictive_payload.dart';
 /// 2. This service reads cached data -> writes to SharedPreferences via home_widget
 /// 3. Native Android widgets read SharedPreferences -> render UI
 ///
-/// Widget group ID must match the `android:authorities` in AndroidManifest.
-const _widgetGroupId = 'de.tankstellen.fuelprices.widget';
+/// Android: the SharedPreferences file the `home_widget` plugin writes
+/// to. Must match the prefs file that `StationWidgetRenderer.kt` reads
+/// — keep the two literals in lock-step.
+const _androidWidgetGroupId = 'de.tankstellen.fuelprices.widget';
+
+/// iOS: the App Group identifier the WidgetKit extension shares with
+/// the host app. MUST start with `group.` (Apple convention) and
+/// match the entitlements on BOTH targets:
+/// - `ios/Runner/Runner.entitlements`
+/// - `ios/TankstellenWidget/TankstellenWidget.entitlements`
+/// — and `kTankstellenAppGroupId` in
+/// `ios/TankstellenWidget/NearestStationsProvider.swift`. All four
+/// strings break together; keep them in lock-step.
+const _iosWidgetGroupId = 'group.de.tankstellen.tankstellen';
+
+/// Platform-correct widget-data scope. The same `HomeWidget.saveWidgetData`
+/// call goes through this string — Android treats it as the prefs file
+/// name, iOS as an `UserDefaults(suiteName:)` argument backed by the
+/// App Group container. Branching at the source keeps the two
+/// platforms' shared-storage conventions tidy.
+String get _widgetGroupId =>
+    Platform.isIOS ? _iosWidgetGroupId : _androidWidgetGroupId;
 // Single provider class (#713) — the widget toggles between favorites
 // and nearest modes internally. The old NearestWidgetProvider receiver
 // was dropped from the manifest.

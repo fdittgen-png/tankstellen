@@ -95,6 +95,7 @@ docs/guides/*
 !docs/guides/SCHEMA-BACKUP-XML.md
 !docs/guides/ios-auto-record.md
 !docs/guides/ios-codesigning.md
+!docs/guides/ios-widget-extension.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
