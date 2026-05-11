@@ -24,6 +24,7 @@ class _FixedTripHistoryList extends TripHistoryList {
   final List<TripHistoryEntry> _value;
   int deleteCallCount = 0;
   String? lastDeletedId;
+  final List<TripHistoryEntry> saveCalls = [];
 
   _FixedTripHistoryList(this._value);
 
@@ -34,6 +35,11 @@ class _FixedTripHistoryList extends TripHistoryList {
   Future<void> delete(String id) async {
     deleteCallCount++;
     lastDeletedId = id;
+  }
+
+  @override
+  Future<void> save(TripHistoryEntry entry) async {
+    saveCalls.add(entry);
   }
 }
 
@@ -482,5 +488,110 @@ void main() {
         findsOneWidget,
       );
     });
+  });
+
+  group('TripDetailScreen lazy-fetch (#1541 phase 4)', () {
+    tearDown(() {
+      debugTripDetailFetchDetailsOverride = null;
+    });
+
+    testWidgets(
+      'entry with empty samples triggers fetchDetails and saves the merged '
+      'entry back to the history notifier',
+      (tester) async {
+        // Capture the trip-id the fetcher gets called with so we can
+        // prove the screen wires the local entry's id (and not, say,
+        // a constant) into the lazy fetch.
+        String? fetchedTripId;
+        debugTripDetailFetchDetailsOverride = (tripId) async {
+          fetchedTripId = tripId;
+          return {
+            'samples': [
+              {
+                't': DateTime.utc(2026, 5, 11, 12).millisecondsSinceEpoch,
+                's': 42.0,
+                'r': 1200.0,
+              },
+            ],
+            'gpsd': const [],
+          };
+        };
+
+        final entry = _seedEntry(id: 'server-only-trip');
+        // The entry comes from the merge pass — summary populated,
+        // samples + gpsd empty (live in trip_details, not yet fetched).
+        expect(entry.samples, isEmpty);
+        expect(entry.gpsSampleDiagnostics, isEmpty);
+
+        final handles = await _pumpDetail(
+          tester,
+          entry: entry,
+          activeVehicle: vehicle,
+          vehicles: const [vehicle],
+        );
+        // Drain the post-frame callback that schedules the lazy fetch.
+        await tester.pumpAndSettle();
+
+        expect(fetchedTripId, 'server-only-trip');
+        expect(handles.tripsNotifier.saveCalls, hasLength(1));
+        final saved = handles.tripsNotifier.saveCalls.single;
+        expect(saved.id, entry.id);
+        expect(saved.samples, hasLength(1),
+            reason: 'merged entry must carry the fetched samples so a '
+                'subsequent mount renders the charts from local cache');
+        expect(saved.samples.single.speedKmh, 42.0);
+      },
+    );
+
+    testWidgets(
+      'entry that already has samples skips the lazy fetch '
+      '(no wasted round-trip)',
+      (tester) async {
+        var fetchCalls = 0;
+        debugTripDetailFetchDetailsOverride = (tripId) async {
+          fetchCalls++;
+          return null;
+        };
+
+        // Seed the entry with a non-empty samples list — mirrors the
+        // happy path where the trip was recorded on this device and
+        // the per-tick blob is already on disk.
+        final start = DateTime.utc(2026, 5, 11, 12);
+        final entry = TripHistoryEntry(
+          id: 'local-trip',
+          vehicleId: 'v1',
+          summary: TripSummary(
+            startedAt: start,
+            endedAt: start.add(const Duration(minutes: 20)),
+            distanceKm: 10,
+            maxRpm: 2500,
+            highRpmSeconds: 0,
+            idleSeconds: 0,
+            harshBrakes: 0,
+            harshAccelerations: 0,
+          ),
+          samples: [
+            TripSample(
+              timestamp: start,
+              speedKmh: 30,
+              rpm: 1500,
+            ),
+          ],
+        );
+
+        final handles = await _pumpDetail(
+          tester,
+          entry: entry,
+          activeVehicle: vehicle,
+          vehicles: const [vehicle],
+        );
+        await tester.pumpAndSettle();
+
+        expect(fetchCalls, 0,
+            reason: 'an entry with local samples must short-circuit '
+                'before the post-frame fetch fires');
+        expect(handles.tripsNotifier.saveCalls, isEmpty);
+      },
+    );
   });
 }

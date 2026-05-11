@@ -995,6 +995,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get allDataDeleted => 'Alle Serverdaten gelöscht';
 
   @override
+  String get forgetAllSyncedTripsButton =>
+      'Alle synchronisierten Fahrten vergessen';
+
+  @override
+  String get forgetAllSyncedTripsConfirmTitle =>
+      'Alle synchronisierten Fahrten vergessen?';
+
+  @override
+  String get forgetAllSyncedTripsConfirmBody =>
+      'Alle Fahrtzusammenfassungen und Detail-Blobs werden vom Server entfernt. Deine lokale Fahrtenhistorie auf diesem Gerät bleibt unverändert.\n\nDiese Aktion kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get forgetAllSyncedTripsConfirmAction => 'Alle vergessen';
+
+  @override
+  String get forgetAllSyncedTripsSuccess =>
+      'Alle synchronisierten Fahrten vom Server entfernt';
+
+  @override
   String get disconnectConfirm => 'TankSync trennen?';
 
   @override

@@ -24,6 +24,7 @@ import '../core/storage/hive_boxes.dart';
 import '../core/storage/hive_storage.dart';
 import '../core/sync/community_config.dart';
 import '../core/sync/supabase_client.dart';
+import '../core/sync/trips_sync.dart';
 import '../core/telemetry/pii_scrubber.dart';
 import '../core/utils/edge_to_edge.dart';
 import '../features/consumption/data/obd2/active_trip_recovery_service.dart';
@@ -105,6 +106,10 @@ class AppInitializer {
     _deferPostFirstFrame(() async {
       await CommunityConfig.load();
       await _maybeInitTankSync(storage);
+      // #1541 — run the trip-summaries merge + details retention pass
+      // once TankSync is up. No-ops cleanly when the user is signed
+      // out or when the trip-history Hive box isn't open.
+      await _runTripsSyncMerge();
     });
 
     // Cache runtime version so AppConstants.appVersion is accurate (#570).
@@ -409,6 +414,50 @@ class AppInitializer {
       debugPrint('TankSync: init timed out after 8s, proceeding without sync');
     } catch (e, st) {
       debugPrint('TankSync init failed: $e\n$st');
+    }
+  }
+
+  /// #1541 — on app launch, merge local trip summaries with the
+  /// server's `trip_summaries` rows so cross-device entries land in
+  /// the user's history without needing a manual sync gesture. Heavy
+  /// `trip_details` rows older than 90 days are pruned in the same
+  /// pass.
+  ///
+  /// No-ops cleanly when:
+  /// - TankSync isn't initialised (the user opted out or init
+  ///   timed out above), or
+  /// - the `obd2_trip_history` Hive box isn't open, or
+  /// - the user isn't authenticated (the `TripsSync` methods
+  ///   themselves short-circuit on null user id).
+  ///
+  /// Failures are caught + logged. The merge result tolerates a
+  /// missing server row — `TripsSync.merge` returns the input
+  /// unchanged on error so a transient network blip never costs the
+  /// user their local history view.
+  static Future<void> _runTripsSyncMerge() async {
+    if (TankSyncClient.client == null) return;
+    if (!Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) return;
+    try {
+      final repo = TripHistoryRepository(
+        box: Hive.box<String>(HiveBoxes.obd2TripHistory),
+      );
+      final local = repo.loadAll();
+      final localIds = local.map((e) => e.id).toSet();
+      final merged = await TripsSync.merge(local);
+      // Persist server-only entries — those whose ids weren't in the
+      // local set before the merge. The summaries-only blob lands now;
+      // the heavy samples + gpsd payload arrives via the trip-detail
+      // screen's lazy fetch on first open.
+      for (final entry in merged) {
+        if (localIds.contains(entry.id)) continue;
+        await repo.save(entry);
+      }
+      // Retention pass — drop server-side detail blobs that have
+      // aged past the default 90-day window so the per-user storage
+      // budget stays bounded.
+      await TripsSync.pruneOldDetails();
+    } catch (e, st) {
+      debugPrint('AppInitializer._runTripsSyncMerge failed: $e\n$st');
     }
   }
 

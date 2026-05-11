@@ -84,5 +84,38 @@ void main() {
         await TripsSync.pruneOldDetails(olderThanDays: 30);
       },
     );
+
+    test(
+      '#1541 phase 4 — uploadDetails is a no-op when not signed in',
+      () async {
+        final entry = TripHistoryEntry(
+          id: 'details-noauth',
+          vehicleId: null,
+          summary: TripSummary(
+            startedAt: DateTime(2026, 5, 11, 12),
+            endedAt: DateTime(2026, 5, 11, 12, 20),
+            distanceKm: 9,
+            maxRpm: 2700,
+            highRpmSeconds: 0,
+            idleSeconds: 12,
+            harshBrakes: 0,
+            harshAccelerations: 0,
+          ),
+        );
+        // No samples / gpsd here so even an authenticated caller would
+        // skip the upsert. The point of THIS test is the auth gate.
+        await TripsSync.uploadDetails(entry);
+      },
+    );
+
+    test(
+      '#1541 phase 4 — fetchDetails returns null when not signed in',
+      () async {
+        final result = await TripsSync.fetchDetails('any-trip-id');
+        expect(result, isNull,
+            reason: 'unauth fetch must return null so the trip-detail '
+                'screen falls back to its empty-samples render path');
+      },
+    );
   });
 }

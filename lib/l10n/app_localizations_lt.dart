@@ -992,6 +992,23 @@ class AppLocalizationsLt extends AppLocalizations {
   String get allDataDeleted => 'Visi serverio duomenys ištrinti';
 
   @override
+  String get forgetAllSyncedTripsButton => 'Forget all synced trips';
+
+  @override
+  String get forgetAllSyncedTripsConfirmTitle => 'Forget all synced trips?';
+
+  @override
+  String get forgetAllSyncedTripsConfirmBody =>
+      'Every trip summary and detail blob will be removed from the server. Your local trip history on this device won\'t be affected.\n\nThis action cannot be undone.';
+
+  @override
+  String get forgetAllSyncedTripsConfirmAction => 'Forget all';
+
+  @override
+  String get forgetAllSyncedTripsSuccess =>
+      'All synced trips removed from server';
+
+  @override
   String get disconnectConfirm => 'Atjungti TankSync?';
 
   @override

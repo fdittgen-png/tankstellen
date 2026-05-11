@@ -49,4 +49,15 @@ class TripHistoryList extends _$TripHistoryList {
     await repo.delete(id);
     state = repo.loadAll();
   }
+
+  /// Persist [entry] (insert or update) and refresh the list. Used by
+  /// the trip-detail lazy-fetch (#1541 phase 4) when the screen
+  /// downloads a server-only `trip_details` row, and by the app-launch
+  /// merge hook for newly-discovered server summaries.
+  Future<void> save(TripHistoryEntry entry) async {
+    final repo = ref.read(tripHistoryRepositoryProvider);
+    if (repo == null) return;
+    await repo.save(entry);
+    state = repo.loadAll();
+  }
 }
