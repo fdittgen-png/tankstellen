@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/station.dart';
@@ -67,8 +68,9 @@ class StationDetailScreen extends ConsumerWidget {
   }
 }
 
-/// Scaffold used by the loading and error states — fixed `AppBar`,
-/// Hero-tagged title, back button. No sliver / collapse behaviour.
+/// Scaffold used by the loading and error states — fixed AppBar via
+/// `PageScaffold` (required by the #923 design-system lint), Hero-tagged
+/// title, back button. No sliver / collapse behaviour.
 class _StationDetailPlain extends StatelessWidget {
   final String stationId;
   final String appBarTitle;
@@ -83,15 +85,14 @@ class _StationDetailPlain extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-          tooltip: l10n?.tooltipBack ?? 'Back',
-        ),
-        title: _HeroTitle(stationId: stationId, title: appBarTitle),
+    return PageScaffold(
+      titleWidget: _HeroTitle(stationId: stationId, title: appBarTitle),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () => context.pop(),
+        tooltip: l10n?.tooltipBack ?? 'Back',
       ),
+      bodyPadding: EdgeInsets.zero,
       body: body,
     );
   }
