@@ -41,6 +41,7 @@ class FavoritesFuelTab extends ConsumerWidget {
               'Tap the star on a station to save it here',
           actionLabel: l10n?.search ?? 'Search Stations',
           onAction: () => context.go('/'),
+          topBiased: true,
         ),
       );
     }

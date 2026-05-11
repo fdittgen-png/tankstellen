@@ -41,6 +41,7 @@ class FuelTab extends ConsumerWidget {
         title: l?.noFillUpsTitle ?? 'No fill-ups yet',
         subtitle: l?.noFillUpsSubtitle ??
             'Log your first fill-up to start tracking consumption.',
+        topBiased: true,
       );
     }
     // #1194 — opt-out gate for gamification surfaces. Watching here
