@@ -178,6 +178,7 @@ class _TrajetsTabState extends ConsumerState<TrajetsTab> {
               title: l?.trajetsEmptyStateTitle ?? 'No trips yet',
               subtitle: l?.trajetsEmptyStateBody ??
                   'Tap Start recording to begin logging your drives.',
+              topBiased: true,
             ),
           ),
         ],
