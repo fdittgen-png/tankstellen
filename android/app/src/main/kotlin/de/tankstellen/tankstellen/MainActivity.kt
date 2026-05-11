@@ -1,5 +1,6 @@
 package de.tankstellen.tankstellen
 
+import android.content.Intent
 import de.tankstellen.tankstellen.autorecord.BackgroundAdapterChannel
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -21,5 +22,24 @@ class MainActivity : FlutterActivity() {
         // foreground service that the channel starts on demand owns
         // its own GATT client.
         BackgroundAdapterChannel.registerWith(flutterEngine, applicationContext)
+    }
+
+    /**
+     * Forwards new intents to `getIntent()` so the `home_widget` plugin
+     * (and any other plugin that reads the current launch intent on
+     * demand) sees the URI from the latest widget tap rather than the
+     * one that originally cold-started the activity.
+     *
+     * Without `setIntent(intent)` the `home_widget` plugin's
+     * `widgetClicked` stream still fires via its NewIntent listener,
+     * but warm-click probes that fall back to
+     * `activity?.intent?.data` (e.g. some side-channel diagnostics)
+     * keep returning stale data. Calling `setIntent` keeps the two
+     * paths consistent and matches the home_widget README's
+     * recommended host-side wiring.
+     */
+    override fun onNewIntent(intent: Intent) {
+        setIntent(intent)
+        super.onNewIntent(intent)
     }
 }
