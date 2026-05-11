@@ -115,9 +115,14 @@ void main() {
         overrides: overrides(),
       );
 
-      // API key stored should show Yes
+      // hasApiKey=true → Yes row visible by default.
       expect(find.text('Yes'), findsOneWidget);
-      // EV API key should show No
+      // hasEvApiKey=false → No row hidden behind the #1530
+      // 'Show N empty rows' toggle. Reveal it to verify the No row
+      // is still present in the rendered tree.
+      await tester
+          .tap(find.byKey(const Key('privacyShowAllRowsToggle')));
+      await tester.pumpAndSettle();
       expect(find.text('No'), findsOneWidget);
     });
 
