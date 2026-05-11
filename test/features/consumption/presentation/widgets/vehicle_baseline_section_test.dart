@@ -10,11 +10,17 @@ const _vehicleId = 'car-a';
 
 /// Convenience: wraps the section in a sized container so the
 /// `LinearProgressIndicator`s have a real width to lay out against.
+///
+/// `expandDetailsByDefault: true` so existing tests written against
+/// the per-situation row view (#779) keep their assertions valid
+/// after the #1529 collapse-by-default change. Default-collapsed
+/// behaviour gets its own dedicated test below.
 Widget _host({int fullConfidenceSamples = 30}) => SizedBox(
       width: 600,
       child: VehicleBaselineSection(
         vehicleId: _vehicleId,
         fullConfidenceSamples: fullConfidenceSamples,
+        expandDetailsByDefault: true,
       ),
     );
 
@@ -43,9 +49,11 @@ void main() {
       expect(find.textContaining('OBD2 trip'), findsOneWidget);
 
       // Reset button is disabled when nothing has been learned —
-      // no point wiping a baseline that doesn't exist.
-      final resetBtn =
-          tester.widget<TextButton>(find.byType(TextButton).first);
+      // no point wiping a baseline that doesn't exist. Address by
+      // key (#1529 introduced a sibling show-details TextButton, so
+      // `byType(TextButton).first` no longer points at reset).
+      final resetBtn = tester.widget<TextButton>(
+          find.byKey(const Key('resetBaselinesButton')));
       expect(resetBtn.onPressed, isNull);
     });
 
@@ -72,15 +80,18 @@ void main() {
             find.byType(LinearProgressIndicator),
           )
           .toList();
-      expect(bars.length, 6);
-      // One of the bars must be at 0.5 — exact ordering is the widget's
-      // concern, not the test's.
+      // 6 per-situation bars + 1 aggregate bar (#1529).
+      expect(bars.length, 7);
+      // One of the per-situation bars must be at 0.5 — exact ordering
+      // is the widget's concern, not the test's.
       expect(
         bars.where((b) => (b.value ?? 0) == 0.5).length,
         1,
         reason: 'urbanCruise row should render at 50% progress',
       );
-      // The other 5 are at 0.
+      // The other 5 per-situation bars are at 0; the aggregate bar
+      // sits at 15 / (6 × 30) ≈ 0.083 — neither 0 nor 0.5 — so it
+      // doesn't disturb either count.
       expect(bars.where((b) => (b.value ?? -1) == 0.0).length, 5);
     });
 
@@ -164,9 +175,42 @@ void main() {
       expect(find.text('hardAccel'), findsNothing);
       expect(find.text('fuelCutCoast'), findsNothing);
 
-      // Exactly 6 progress bars — one per persisted situation.
-      expect(find.byType(LinearProgressIndicator), findsNWidgets(6));
+      // 6 per-situation bars + 1 aggregate progress bar (#1529).
+      expect(find.byType(LinearProgressIndicator), findsNWidgets(7));
     });
+
+    testWidgets(
+      '#1529 — per-situation rows are HIDDEN by default; show-details '
+      'toggle reveals them and bumps the bar count from 1 (aggregate) '
+      'to 7',
+      (tester) async {
+        // No `expandDetailsByDefault` override — this is the production
+        // default the user sees on the vehicle-edit screen.
+        await pumpApp(
+          tester,
+          const SizedBox(
+            width: 600,
+            child: VehicleBaselineSection(vehicleId: _vehicleId),
+          ),
+          overrides: [
+            _summaryOverride(const {DrivingSituation.idle: 4}),
+          ],
+        );
+        // Only the aggregate progress bar in the collapsed view.
+        expect(find.byType(LinearProgressIndicator), findsOneWidget);
+        // Per-situation labels invisible until expand.
+        expect(find.text('Idle'), findsNothing);
+
+        await tester.tap(
+          find.byKey(const Key('vehicleBaselineDetailsToggle')),
+        );
+        await tester.pumpAndSettle();
+
+        // 1 aggregate + 6 per-situation = 7 bars; labels visible.
+        expect(find.byType(LinearProgressIndicator), findsNWidgets(7));
+        expect(find.text('Idle'), findsOneWidget);
+      },
+    );
 
     testWidgets(
         'reset button is enabled once any sample exists, and tapping '
