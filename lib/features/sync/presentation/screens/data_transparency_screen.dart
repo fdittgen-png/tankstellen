@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/sync/trips_sync.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -102,6 +103,52 @@ class DataTransparencyScreen extends ConsumerWidget {
     );
   }
 
+  Future<void> _forgetAllTrips(BuildContext context, WidgetRef ref) async {
+    final l = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          l?.forgetAllSyncedTripsConfirmTitle ?? 'Forget all synced trips?',
+        ),
+        content: Text(
+          l?.forgetAllSyncedTripsConfirmBody ??
+              'Every trip summary and detail blob will be removed from the '
+                  "server. Your local trip history on this device won't be "
+                  'affected.\n\nThis action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l?.cancel ?? 'Cancel'),
+          ),
+          FilledButton(
+            key: const Key('forget_all_synced_trips_confirm'),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              l?.forgetAllSyncedTripsConfirmAction ?? 'Forget all',
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+    await TripsSync.forgetAllForUser();
+    // Re-run the transparency fetch so the synced-data card reflects
+    // the empty server-side state without forcing the user to pull-
+    // to-refresh.
+    await ref
+        .read(dataTransparencyControllerProvider.notifier)
+        .forceSyncAndReload();
+    if (!context.mounted) return;
+    SnackBarHelper.showSuccess(
+      context,
+      l?.forgetAllSyncedTripsSuccess ?? 'All synced trips removed from server',
+    );
+  }
+
   Future<void> _disconnect(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -167,6 +214,7 @@ class DataTransparencyScreen extends ConsumerWidget {
                             _showRawJson(context, uiState.data!),
                         onExportJson: () => _exportJson(context, uiState.data!),
                         onDeleteAll: () => _deleteAllData(context, ref),
+                        onForgetAllTrips: () => _forgetAllTrips(context, ref),
                         onDisconnect: () => _disconnect(context, ref),
                       ),
                     ],

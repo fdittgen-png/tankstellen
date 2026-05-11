@@ -89,6 +89,7 @@ class DataActionButtons extends StatelessWidget {
   final VoidCallback onViewRawJson;
   final VoidCallback onExportJson;
   final VoidCallback onDeleteAll;
+  final VoidCallback onForgetAllTrips;
   final VoidCallback onDisconnect;
 
   const DataActionButtons({
@@ -99,6 +100,7 @@ class DataActionButtons extends StatelessWidget {
     required this.onViewRawJson,
     required this.onExportJson,
     required this.onDeleteAll,
+    required this.onForgetAllTrips,
     required this.onDisconnect,
   });
 
@@ -155,6 +157,22 @@ class DataActionButtons extends StatelessWidget {
             onPressed: onDeleteAll,
             icon: const Icon(Icons.delete_forever),
             label: Text(l?.deleteAllServerData ?? 'Delete all server data'),
+          ),
+          const SizedBox(height: 8),
+          // #1541 — narrower destructive action: wipes only the
+          // synced trip history (both `trip_summaries` and
+          // `trip_details`) without touching the user's other
+          // server-side data. Outlined rather than filled so it
+          // visually defers to the broader "Delete all server data"
+          // above it.
+          OutlinedButton.icon(
+            key: const Key('forget_all_synced_trips_button'),
+            style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+            onPressed: onForgetAllTrips,
+            icon: const Icon(Icons.history_toggle_off),
+            label: Text(
+              l?.forgetAllSyncedTripsButton ?? 'Forget all synced trips',
+            ),
           ),
           const SizedBox(height: 8),
         ],

@@ -62,13 +62,87 @@ class TripsSync {
         // The summary blob stays compact: just the entity's JSON form
         // WITHOUT the per-tick `samples` and GPS-diagnostics arrays
         // so a 60-min commute is ~1 KB instead of ~250 KB. The full-
-        // detail row lands in phase 4 under `public.trip_details`.
+        // blob (samples + gpsd) goes to `public.trip_details` in
+        // [uploadDetails] right after.
         'data': _compactSummaryJson(entry),
         'updated_at': DateTime.now().toIso8601String(),
       }, onConflict: 'user_id,id');
       debugPrint('TripsSync.uploadSummary: uploaded ${entry.id}');
     } catch (e, st) {
       debugPrint('TripsSync.uploadSummary FAILED for ${entry.id}: $e\n$st');
+    }
+    // Phase 4 (#1541) — fan out the heavy blob to `trip_details`.
+    // [uploadDetails] no-ops when the entry has no samples /
+    // diagnostics, so legacy / empty trips don't pay a wasted round
+    // trip. Errors are logged inside and intentionally don't propagate
+    // — a missing details row is a soft degradation (the list view
+    // still works), not a hard failure of the summary upload.
+    await uploadDetails(entry);
+  }
+
+  /// Upload the heavy per-tick blob — `samples` + `gpsd` — for [entry]
+  /// to `public.trip_details` (#1479 phase 4). No-op when the user
+  /// isn't signed in or when the entry carries no samples and no
+  /// diagnostics (an empty payload would just round-trip as nothing).
+  ///
+  /// Sibling to [uploadSummary]: the summary table powers the cheap
+  /// cross-device list view, the details table is the per-trip blob
+  /// fetched on-demand when the user opens a trip recorded on
+  /// another phone. Same `(user_id, id)` composite primary key as
+  /// the migration in
+  /// `supabase/migrations/20260507000001_trip_summaries_and_details.sql`.
+  static Future<void> uploadDetails(TripHistoryEntry entry) async {
+    final client = TankSyncClient.client;
+    final userId = client?.auth.currentUser?.id;
+    if (client == null || userId == null) {
+      debugPrint('TripsSync.uploadDetails: not authenticated, skipping');
+      return;
+    }
+    if (entry.samples.isEmpty && entry.gpsSampleDiagnostics.isEmpty) {
+      // Nothing heavy to ship — the compact summary already
+      // carries everything the list view needs.
+      return;
+    }
+    try {
+      await client.from('trip_details').upsert({
+        'id': entry.id,
+        'user_id': userId,
+        'data': _detailsJson(entry),
+        'updated_at': DateTime.now().toIso8601String(),
+      }, onConflict: 'user_id,id');
+      debugPrint('TripsSync.uploadDetails: uploaded ${entry.id}');
+    } catch (e, st) {
+      debugPrint('TripsSync.uploadDetails FAILED for ${entry.id}: $e\n$st');
+    }
+  }
+
+  /// Fetch the `trip_details.data` blob for [tripId] — `{samples, gpsd}`
+  /// — or `null` when the row is missing (server has no details), the
+  /// user isn't signed in, or the fetch fails. The trip-detail screen
+  /// calls this lazily when the local Hive entry has empty samples
+  /// (typically because it was downloaded by [merge] from another
+  /// device).
+  static Future<Map<String, dynamic>?> fetchDetails(String tripId) async {
+    final client = TankSyncClient.client;
+    final userId = client?.auth.currentUser?.id;
+    if (client == null || userId == null) {
+      debugPrint('TripsSync.fetchDetails: not authenticated');
+      return null;
+    }
+    try {
+      final row = await client
+          .from('trip_details')
+          .select('data')
+          .eq('user_id', userId)
+          .eq('id', tripId)
+          .maybeSingle();
+      if (row == null) return null;
+      final data = row['data'];
+      if (data is! Map) return null;
+      return data.cast<String, dynamic>();
+    } catch (e, st) {
+      debugPrint('TripsSync.fetchDetails FAILED for $tripId: $e\n$st');
+      return null;
     }
   }
 
@@ -224,4 +298,18 @@ Map<String, dynamic> _compactSummaryJson(TripHistoryEntry entry) {
   json.remove('samples');
   json.remove('gpsd');
   return json;
+}
+
+/// Mirror of [_compactSummaryJson] for the heavy blob: returns just
+/// `samples` + `gpsd` so the `trip_details.data` payload stays
+/// focused on the per-tick telemetry. Empty arrays are emitted
+/// explicitly so a future fetch round-trips through
+/// `TripHistoryEntry.fromJson` cleanly even when only one of the
+/// two arrays was populated at recording time.
+Map<String, dynamic> _detailsJson(TripHistoryEntry entry) {
+  final json = entry.toJson();
+  return {
+    'samples': json['samples'] ?? const [],
+    'gpsd': json['gpsd'] ?? const [],
+  };
 }

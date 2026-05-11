@@ -1964,6 +1964,36 @@ abstract class AppLocalizations {
   /// **'All server data deleted'**
   String get allDataDeleted;
 
+  /// No description provided for @forgetAllSyncedTripsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Forget all synced trips'**
+  String get forgetAllSyncedTripsButton;
+
+  /// No description provided for @forgetAllSyncedTripsConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Forget all synced trips?'**
+  String get forgetAllSyncedTripsConfirmTitle;
+
+  /// No description provided for @forgetAllSyncedTripsConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every trip summary and detail blob will be removed from the server. Your local trip history on this device won\'t be affected.\n\nThis action cannot be undone.'**
+  String get forgetAllSyncedTripsConfirmBody;
+
+  /// No description provided for @forgetAllSyncedTripsConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Forget all'**
+  String get forgetAllSyncedTripsConfirmAction;
+
+  /// No description provided for @forgetAllSyncedTripsSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'All synced trips removed from server'**
+  String get forgetAllSyncedTripsSuccess;
+
   /// No description provided for @disconnectConfirm.
   ///
   /// In en, this message translates to:
