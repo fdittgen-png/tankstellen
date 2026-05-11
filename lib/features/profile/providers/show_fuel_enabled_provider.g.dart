@@ -107,7 +107,7 @@ final class ShowFuelEnabledProvider
   }
 }
 
-String _$showFuelEnabledHash() => r'8684b30abfec185bc65a3f64a54e1be453ca35f6';
+String _$showFuelEnabledHash() => r'21cc73828648685c439dda8634ce9caa511f4de7';
 
 /// Visibility gate for fuel-station results in search and on the map
 /// (#1373 phase 3c).

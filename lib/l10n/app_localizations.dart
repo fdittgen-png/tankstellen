@@ -6872,6 +6872,24 @@ abstract class AppLocalizations {
   /// **'Enable OBD2 trip recording first'**
   String get featureBlockedEnable_showConsumptionTab;
 
+  /// Settings toggle label for the on-device TFLite price-prediction model (#1543).
+  ///
+  /// In en, this message translates to:
+  /// **'TFLite price prediction'**
+  String get featureLabel_tflitePricePrediction;
+
+  /// Settings toggle description for the on-device TFLite price-prediction model (#1543). Emphasises that no data leaves the device.
+  ///
+  /// In en, this message translates to:
+  /// **'On-device price forecast model — inference runs locally; features and predictions never leave the device.'**
+  String get featureDescription_tflitePricePrediction;
+
+  /// Tooltip shown on the disabled TFLite-prediction toggle when its prerequisite (priceHistory) is off.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable price history first'**
+  String get featureBlockedEnable_tflitePricePrediction;
+
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
   /// In en, this message translates to:

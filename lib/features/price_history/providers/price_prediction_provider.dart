@@ -1,11 +1,15 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/country/country_config.dart';
+import '../../feature_management/application/feature_flags_provider.dart';
+import '../../feature_management/domain/feature.dart';
+import '../../feature_management/domain/feature_dependency_graph.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../data/models/price_prediction.dart';
 import '../domain/entities/feature_vector.dart';
 import '../domain/services/price_feature_extractor.dart';
 import 'price_history_provider.dart';
+import 'tflite_price_predictor_provider.dart';
 
 part 'price_prediction_provider.g.dart';
 
@@ -122,6 +126,21 @@ PricePrediction? pricePrediction(
   final recommendation =
       _maybeAppendHolidayHint(base, holidayPremium);
 
+  // --- TFLite model prediction (#1543 — triple-gated) ---
+  // Gate 1: user-facing feature flag, walks the `requires` chain so a
+  // disabled `priceHistory` parent cascades through automatically.
+  // Gate 2: the compile-time `kTflitePredictorEnabled` const lives
+  // inside `TflitePricePredictor.fromAsset` and makes the loader
+  // return null until a trained artifact ships.
+  // Gate 3: `.predict()` itself rejects out-of-band / non-finite
+  // outputs and returns null on disposed predictors.
+  // When any gate trips, `modelPredictedCents` stays null and the
+  // heuristic above is the only output — same UX as before #1543.
+  final modelPredictedCents = _maybeModelPredict(
+    ref: ref,
+    latest: vectors.last,
+  );
+
   return PricePrediction(
     recommendation: recommendation,
     potentialSaving: potentialSaving,
@@ -130,7 +149,35 @@ PricePrediction? pricePrediction(
     hourlyAverages: hourlyAverages,
     dailyAverages: dailyAverages,
     holidayPremium: holidayPremium,
+    modelPredictedCents: modelPredictedCents,
   );
+}
+
+/// Runs the on-device TFLite predictor against the most recent
+/// feature vector when every gate from #1543 passes. Returns `null`
+/// in every failure path so the caller can fall back to the
+/// heuristic-only [PricePrediction] shape without a try/catch.
+double? _maybeModelPredict({
+  required Ref ref,
+  required FeatureVector latest,
+}) {
+  final manifest = ref.watch(featureManifestProvider);
+  final enabled = ref.watch(featureFlagsProvider);
+  if (!isEffectivelyEnabled(
+    Feature.tflitePricePrediction,
+    manifest,
+    enabled,
+  )) {
+    return null;
+  }
+  // `AsyncValue.value` returns the resolved data when present, or
+  // `null` while the asset is still loading or has errored — the
+  // predictor is opportunistic, never blocking.
+  final predictor =
+      ref.watch(tflitePricePredictorProvider).value;
+  if (predictor == null) return null;
+  final result = predictor.predict(latest);
+  return result?.predictedPriceCents;
 }
 
 /// Average EUR/L delta between holiday and non-holiday samples in

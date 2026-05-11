@@ -106,7 +106,7 @@ final class TankLevelProvider
   }
 }
 
-String _$tankLevelHash() => r'baa693c62ec9c5252dafab00acab04293a788d06';
+String _$tankLevelHash() => r'28e95db22eaecc4ad3a7b376b02e549af3bd3be6';
 
 /// Current tank-level estimate for [vehicleId] (#1195).
 ///

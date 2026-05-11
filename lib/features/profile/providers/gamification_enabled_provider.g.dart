@@ -120,7 +120,7 @@ final class GamificationEnabledProvider
 }
 
 String _$gamificationEnabledHash() =>
-    r'd7fcd834f133f5c0a09e13d51100bc49cb785a50';
+    r'7b107298eae3d49674cc71a66fcfb0e975e29b5b';
 
 /// Master gate for gamification surfaces (#1194).
 ///

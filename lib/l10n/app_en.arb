@@ -2289,6 +2289,18 @@
   "@featureBlockedEnable_showConsumptionTab": {
     "description": "Tooltip shown on the disabled consumption-tab toggle when its prerequisite (OBD2 trip recording) is off."
   },
+  "featureLabel_tflitePricePrediction": "TFLite price prediction",
+  "@featureLabel_tflitePricePrediction": {
+    "description": "Settings toggle label for the on-device TFLite price-prediction model (#1543)."
+  },
+  "featureDescription_tflitePricePrediction": "On-device price forecast model — inference runs locally; features and predictions never leave the device.",
+  "@featureDescription_tflitePricePrediction": {
+    "description": "Settings toggle description for the on-device TFLite price-prediction model (#1543). Emphasises that no data leaves the device."
+  },
+  "featureBlockedEnable_tflitePricePrediction": "Enable price history first",
+  "@featureBlockedEnable_tflitePricePrediction": {
+    "description": "Tooltip shown on the disabled TFLite-prediction toggle when its prerequisite (priceHistory) is off."
+  },
   "feedbackConsentTitle": "Send report to GitHub?",
   "@feedbackConsentTitle": {
     "description": "Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3)."
