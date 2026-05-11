@@ -75,7 +75,7 @@ final class NearestWidgetRefreshProvider
 }
 
 String _$nearestWidgetRefreshHash() =>
-    r'4d4209e966c92c0919d9ff081c49fe34fb7c8f5c';
+    r'a6630c70cbbb2f0bbed3a1b9ca87ceb64d13723c';
 
 /// Foreground heartbeat that rebuilds the nearest home-screen widget every
 /// [kNearestWidgetForegroundInterval].

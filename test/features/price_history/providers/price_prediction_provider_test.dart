@@ -1,10 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/price_history/data/models/price_record.dart';
 import 'package:tankstellen/features/price_history/data/repositories/price_history_repository.dart';
+import 'package:tankstellen/features/price_history/data/tflite_interpreter.dart';
+import 'package:tankstellen/features/price_history/data/tflite_price_predictor.dart';
 import 'package:tankstellen/features/price_history/providers/price_history_provider.dart';
 import 'package:tankstellen/features/price_history/providers/price_prediction_provider.dart';
+import 'package:tankstellen/features/price_history/providers/tflite_price_predictor_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
 /// Tests for the [pricePredictionProvider].
@@ -585,6 +590,127 @@ void main() {
       expect(result, isNotNull);
     });
   });
+
+  group('pricePrediction — TFLite model gate (#1543)', () {
+    /// 12 e10 records, enough to clear the < 10-record short-circuit.
+    List<PriceRecord> seedRecords() => List.generate(
+          12,
+          (i) => PriceRecord(
+            stationId: 's1',
+            recordedAt: DateTime(2026, 3, 1, i),
+            e10: 1.50 + i * 0.001,
+          ),
+        );
+
+    ProviderContainer makeGatedContainer({
+      required Set<Feature> enabled,
+      TflitePricePredictor? predictor,
+    }) {
+      final c = ProviderContainer(overrides: [
+        priceHistoryRepositoryProvider
+            .overrideWithValue(_FakePriceHistoryRepository(seedRecords())),
+        featureFlagsProvider.overrideWith(() => _TestFeatureFlags(enabled)),
+        tflitePricePredictorProvider.overrideWith((ref) async => predictor),
+      ]);
+      addTearDown(c.dispose);
+      return c;
+    }
+
+    test(
+      'flag off → modelPredictedCents is null, heuristic fields populated',
+      () async {
+        final container = makeGatedContainer(
+          enabled: {Feature.priceHistory},
+          predictor: TflitePricePredictor.test(
+            interpreter: _ConstInterpreter(165.0),
+            enabled: true,
+          ),
+        );
+        // Resolve the FutureProvider so .value isn't null inside the
+        // sync provider's watch.
+        await container.read(tflitePricePredictorProvider.future);
+        final result =
+            container.read(pricePredictionProvider('s1', FuelType.e10));
+        expect(result, isNotNull);
+        expect(result!.modelPredictedCents, isNull,
+            reason: 'flag off → the model branch must be skipped entirely');
+      },
+    );
+
+    test(
+      'flag on + requires (priceHistory) off → modelPredictedCents is null '
+      '(cascade gate via isEffectivelyEnabled)',
+      () async {
+        final container = makeGatedContainer(
+          // priceHistory missing → tflitePricePrediction is effectively off
+          // even though its own flag is set.
+          enabled: {Feature.tflitePricePrediction},
+          predictor: TflitePricePredictor.test(
+            interpreter: _ConstInterpreter(165.0),
+            enabled: true,
+          ),
+        );
+        await container.read(tflitePricePredictorProvider.future);
+        final result =
+            container.read(pricePredictionProvider('s1', FuelType.e10));
+        expect(result!.modelPredictedCents, isNull);
+      },
+    );
+
+    test(
+      'flag on + predictor null → modelPredictedCents is null (heuristic '
+      'stays authoritative when the asset is missing)',
+      () async {
+        final container = makeGatedContainer(
+          enabled: {Feature.priceHistory, Feature.tflitePricePrediction},
+          predictor: null,
+        );
+        await container.read(tflitePricePredictorProvider.future);
+        final result =
+            container.read(pricePredictionProvider('s1', FuelType.e10));
+        expect(result!.modelPredictedCents, isNull);
+      },
+    );
+
+    test(
+      'flag on + predictor returns a value → modelPredictedCents reflects '
+      'the predictor output',
+      () async {
+        final container = makeGatedContainer(
+          enabled: {Feature.priceHistory, Feature.tflitePricePrediction},
+          predictor: TflitePricePredictor.test(
+            interpreter: _ConstInterpreter(165.0),
+            enabled: true,
+          ),
+        );
+        await container.read(tflitePricePredictorProvider.future);
+        final result =
+            container.read(pricePredictionProvider('s1', FuelType.e10));
+        expect(result!.modelPredictedCents, 165.0);
+        // Heuristic fields stay populated alongside the model output.
+        expect(result.hourlyAverages, isNotEmpty);
+      },
+    );
+
+    test(
+      'flag on + predictor returns out-of-band value → modelPredictedCents '
+      'is null (static confidence gate kicks in)',
+      () async {
+        final container = makeGatedContainer(
+          enabled: {Feature.priceHistory, Feature.tflitePricePrediction},
+          predictor: TflitePricePredictor.test(
+            // 30 cents/L is below the 50 ct floor — predictor returns null.
+            interpreter: _ConstInterpreter(30.0),
+            enabled: true,
+          ),
+        );
+        await container.read(tflitePricePredictorProvider.future);
+        final result =
+            container.read(pricePredictionProvider('s1', FuelType.e10));
+        expect(result!.modelPredictedCents, isNull);
+      },
+    );
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -630,6 +756,35 @@ class _FakePriceHistoryRepository extends PriceHistoryRepository {
   List<PriceRecord> getHistory(String stationId, {int days = 30}) {
     return List.of(_records);
   }
+}
+
+/// Notifier override that returns a fixed enabled-set for the test's
+/// lifetime. Same shape as `_TestFeatureFlags` in
+/// `test/features/consumption/providers/auto_record_orchestrator_test.dart`.
+class _TestFeatureFlags extends FeatureFlags {
+  _TestFeatureFlags(this._initial);
+  final Set<Feature> _initial;
+
+  @override
+  Set<Feature> build() => {..._initial};
+}
+
+/// Fake [TfliteInterpreter] that fills `output[0][0]` with a fixed
+/// cents-per-litre value on every `run()` call. Lets the wiring test
+/// drive the predict() → modelPredictedCents path without parsing a
+/// real `.tflite` artifact.
+class _ConstInterpreter implements TfliteInterpreter {
+  _ConstInterpreter(this.cents);
+  final double cents;
+
+  @override
+  void run(Object input, Object output) {
+    final tensor = output as List<List<double>>;
+    tensor[0][0] = cents;
+  }
+
+  @override
+  void close() {}
 }
 
 /// Stub [PriceHistoryStorage] used only to satisfy the

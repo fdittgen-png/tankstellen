@@ -55,6 +55,15 @@ class PricePrediction {
   /// average with a model-derived prediction.
   final double? holidayPremium;
 
+  /// On-device TFLite model's price prediction for the *current* hour
+  /// (cents per litre). `null` when the predictor is disabled
+  /// (compile-time const, feature flag, or missing asset), still
+  /// loading, or returns a low-confidence / out-of-band value. The
+  /// heuristic fields above stay authoritative; this is an additive
+  /// signal a UI consumer can choose to render alongside the
+  /// heuristic-derived recommendation (#1543).
+  final double? modelPredictedCents;
+
   const PricePrediction({
     required this.recommendation,
     this.potentialSaving,
@@ -63,5 +72,6 @@ class PricePrediction {
     required this.hourlyAverages,
     required this.dailyAverages,
     this.holidayPremium,
+    this.modelPredictedCents,
   });
 }

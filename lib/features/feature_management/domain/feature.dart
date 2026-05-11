@@ -92,4 +92,12 @@ enum Feature {
   /// discounts in price comparisons. Default-off; flipped on only
   /// by the `AppProfile.full` preset.
   loyaltyCards,
+
+  /// On-device TFLite price-prediction model (#1543, future). Requires
+  /// [priceHistory] — the predictor consumes the same 30-day window the
+  /// history feature already collects. Default-off and gated by a
+  /// compile-time `kTflitePredictorEnabled` const so the toggle is a
+  /// no-op until a trained `.tflite` artifact is committed and the
+  /// const is flipped. Heuristic fallback always covers the gap.
+  tflitePricePrediction,
 }

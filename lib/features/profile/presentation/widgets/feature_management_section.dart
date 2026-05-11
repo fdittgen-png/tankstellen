@@ -322,6 +322,9 @@ String _featureLabel(AppLocalizations? l, Feature f) {
       // #1517: ARB strings to follow in a localisation pass; English-
       // only fallback for now so the toggle is at least readable.
       return 'Loyalty cards';
+    case Feature.tflitePricePrediction:
+      return l?.featureLabel_tflitePricePrediction ??
+          'TFLite price prediction';
   }
 }
 
@@ -384,6 +387,10 @@ String _featureDescription(AppLocalizations? l, Feature f) {
     case Feature.loyaltyCards:
       // #1517: ARB strings to follow in a localisation pass.
       return 'Fuel-club / loyalty program cards with per-litre discounts in price comparisons.';
+    case Feature.tflitePricePrediction:
+      return l?.featureDescription_tflitePricePrediction ??
+          'On-device price forecast model — inference runs locally; '
+              'features and predictions never leave the device.';
   }
 }
 
@@ -413,6 +420,9 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
     case Feature.showConsumptionTab:
       return l?.featureBlockedEnable_showConsumptionTab ??
           'Enable OBD2 trip recording first';
+    case Feature.tflitePricePrediction:
+      return l?.featureBlockedEnable_tflitePricePrediction ??
+          'Enable price history first';
     // Features without prerequisites can never reach this branch — the
     // dependency-graph helpers short-circuit. Return a generic fallback
     // so the function is total in case the manifest changes.

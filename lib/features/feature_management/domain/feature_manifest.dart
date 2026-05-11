@@ -250,5 +250,20 @@ class FeatureManifest {
       description:
           'Fuel-club / loyalty program cards with per-litre discounts in price comparisons.',
     ),
+    Feature.tflitePricePrediction: FeatureManifestEntry(
+      feature: Feature.tflitePricePrediction,
+      // Default-off and double-gated. The compile-time
+      // `kTflitePredictorEnabled` const in
+      // `lib/features/price_history/data/tflite_price_predictor.dart`
+      // stays false until the trained `.tflite` artifact ships under
+      // `assets/models/`. With either gate off, the heuristic
+      // `pricePredictionProvider` renders unchanged.
+      defaultEnabled: false,
+      requires: {Feature.priceHistory},
+      displayName: 'TFLite price prediction',
+      description:
+          'On-device price forecast model — inference runs locally; '
+              'features and predictions never leave the device.',
+    ),
   });
 }

@@ -3744,6 +3744,17 @@ class AppLocalizationsBg extends AppLocalizations {
       'Enable OBD2 trip recording first';
 
   @override
+  String get featureLabel_tflitePricePrediction => 'TFLite price prediction';
+
+  @override
+  String get featureDescription_tflitePricePrediction =>
+      'On-device price forecast model — inference runs locally; features and predictions never leave the device.';
+
+  @override
+  String get featureBlockedEnable_tflitePricePrediction =>
+      'Enable price history first';
+
+  @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
 
   @override

@@ -27,8 +27,10 @@ part of 'unified_search_results_provider.dart';
 ///     currently selected fuel from [selectedFuelTypeProvider];
 ///   - the EV side via [eVSearchStateProvider], mapping every
 ///     [ChargingStation] through [ChargingStationAsRefuelOption].
-///   The two lists are concatenated (fuel first, EV after) so the
-///   downstream UI can apply its own sort/filter chips deterministically.
+///   The two lists are merged and sorted by [RefuelOption.distanceMeters]
+///   ascending so the closest options interleave regardless of kind
+///   (#1116 phase 4). Options without a known distance sink to the
+///   bottom in their original relative order.
 /// * Stations whose price for the active fuel is `null` are skipped on
 ///   the fuel side. The phase-2 [StationAsRefuelOption] returns a null
 ///   price for those stations, but the unified list is consumed by
@@ -70,8 +72,10 @@ final unifiedSearchResultsProvider = UnifiedSearchResultsProvider._();
 ///     currently selected fuel from [selectedFuelTypeProvider];
 ///   - the EV side via [eVSearchStateProvider], mapping every
 ///     [ChargingStation] through [ChargingStationAsRefuelOption].
-///   The two lists are concatenated (fuel first, EV after) so the
-///   downstream UI can apply its own sort/filter chips deterministically.
+///   The two lists are merged and sorted by [RefuelOption.distanceMeters]
+///   ascending so the closest options interleave regardless of kind
+///   (#1116 phase 4). Options without a known distance sink to the
+///   bottom in their original relative order.
 /// * Stations whose price for the active fuel is `null` are skipped on
 ///   the fuel side. The phase-2 [StationAsRefuelOption] returns a null
 ///   price for those stations, but the unified list is consumed by
@@ -118,8 +122,10 @@ final class UnifiedSearchResultsProvider
   ///     currently selected fuel from [selectedFuelTypeProvider];
   ///   - the EV side via [eVSearchStateProvider], mapping every
   ///     [ChargingStation] through [ChargingStationAsRefuelOption].
-  ///   The two lists are concatenated (fuel first, EV after) so the
-  ///   downstream UI can apply its own sort/filter chips deterministically.
+  ///   The two lists are merged and sorted by [RefuelOption.distanceMeters]
+  ///   ascending so the closest options interleave regardless of kind
+  ///   (#1116 phase 4). Options without a known distance sink to the
+  ///   bottom in their original relative order.
   /// * Stations whose price for the active fuel is `null` are skipped on
   ///   the fuel side. The phase-2 [StationAsRefuelOption] returns a null
   ///   price for those stations, but the unified list is consumed by
@@ -173,4 +179,4 @@ final class UnifiedSearchResultsProvider
 }
 
 String _$unifiedSearchResultsHash() =>
-    r'54035757d018d4552a630dbe75311e74affca4c5';
+    r'f2ae627e617a44e783c7b0c66d2001228cf30032';
