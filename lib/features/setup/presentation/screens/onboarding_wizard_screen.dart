@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,6 +16,7 @@ import '../widgets/api_key_step.dart';
 import '../widgets/completion_step.dart';
 import '../widgets/country_language_step.dart';
 import '../widgets/landing_screen_step.dart';
+import '../widgets/onboarding_ios_standby_step.dart';
 import '../widgets/onboarding_navigation_buttons.dart';
 import '../widgets/onboarding_obd2_step.dart';
 import '../widgets/onboarding_progress_indicator.dart';
@@ -76,11 +78,15 @@ class _OnboardingWizardScreenState
 
   /// Zero-based index of the OBD2 adapter step under the active
   /// profile, or -1 when the profile doesn't include it
-  /// (Basic + Medium).
+  /// (Basic + Medium). On iOS the index shifts by one because the
+  /// iOS-only standby explainer (#1542 phase 6) sits between Vehicle
+  /// and OBD2.
   int get _obd2StepIndex {
     final profile = ref.read(activeAppProfileProvider);
     if (profile != AppProfile.full && profile != AppProfile.custom) return -1;
-    return 3; // Welcome+Profile (0), Country (1), Vehicle (2), OBD2 (3)
+    // Welcome+Profile (0), Country (1), Vehicle (2), [iOS standby (3)],
+    // OBD2 (3 or 4 depending on platform).
+    return defaultTargetPlatform == TargetPlatform.iOS ? 4 : 3;
   }
 
   /// Zero-based index of the optional API key step.
@@ -254,10 +260,19 @@ class _OnboardingWizardScreenState
             profile == AppProfile.full ||
             profile == AppProfile.custom;
     final showObd2 = profile == AppProfile.full || profile == AppProfile.custom;
+    // #1542 phase 6 — on iOS, prepend an explainer step before the
+    // OBD2 pairing so the user understands the three iOS-only
+    // compromises (open once after reboot, don't force-quit, grant
+    // Always location). Same gating as `showObd2`: an iOS user who
+    // skipped OBD2 doesn't need to be warned about a flow they're
+    // not setting up.
+    final showIosStandby = showObd2 &&
+        defaultTargetPlatform == TargetPlatform.iOS;
     return [
       ProfileChoiceStep(onProfilePicked: _onProfilePicked),
       const CountryLanguageStep(),
       if (showVehicle) const VehiclesStep(),
+      if (showIosStandby) const OnboardingIosStandbyStep(),
       if (showObd2)
         OnboardingObd2Step(
           onProceed: _advanceFromObd2,
