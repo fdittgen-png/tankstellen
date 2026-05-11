@@ -12,7 +12,13 @@ import '../../providers/vehicle_baseline_summary_provider.dart';
 /// close each one is to full confidence (30 samples). A Reset button
 /// wipes the vehicle's baselines — useful when a car's fuel economy
 /// shifts (new tyres, new firmware, heavy load).
-class VehicleBaselineSection extends ConsumerWidget {
+///
+/// #1529 — collapsed by default to a single aggregate progress bar
+/// + sample tally. Tap the "Show details" affordance to reveal the
+/// per-driving-situation breakdown (the original 6-row view). Saves
+/// ~360 dp on the vehicle-edit screen for users who only care
+/// whether their baseline is "ready" or not.
+class VehicleBaselineSection extends ConsumerStatefulWidget {
   final String vehicleId;
 
   /// Sample count at which the baseline is considered fully learned —
@@ -21,16 +27,33 @@ class VehicleBaselineSection extends ConsumerWidget {
   /// 30 synthetic samples.
   final int fullConfidenceSamples;
 
+  /// Test/diagnostic seam: when true, the per-driving-situation
+  /// breakdown is visible from the first frame instead of behind the
+  /// "Show details" toggle (#1529). Production callers leave it
+  /// `false` so the user gets the compact aggregate view by default.
+  final bool expandDetailsByDefault;
+
   const VehicleBaselineSection({
     super.key,
     required this.vehicleId,
     this.fullConfidenceSamples = 30,
+    this.expandDetailsByDefault = false,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<VehicleBaselineSection> createState() =>
+      _VehicleBaselineSectionState();
+}
+
+class _VehicleBaselineSectionState
+    extends ConsumerState<VehicleBaselineSection> {
+  late bool _showDetails = widget.expandDetailsByDefault;
+
+  @override
+  Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final counts = ref.watch(vehicleBaselineSummaryProvider(vehicleId));
+    final counts =
+        ref.watch(vehicleBaselineSummaryProvider(widget.vehicleId));
     final theme = Theme.of(context);
 
     // Persisted situations only — transients never accumulate.
@@ -45,6 +68,7 @@ class VehicleBaselineSection extends ConsumerWidget {
 
     final totalSamples =
         situations.fold<int>(0, (acc, s) => acc + (counts[s] ?? 0));
+    final maxTotal = situations.length * widget.fullConfidenceSamples;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -76,12 +100,55 @@ class VehicleBaselineSection extends ConsumerWidget {
               style: theme.textTheme.bodySmall,
             ),
             const SizedBox(height: 12),
-            for (final s in situations)
-              _BaselineRow(
-                label: _label(s, l),
-                count: counts[s] ?? 0,
-                fullConfidenceSamples: fullConfidenceSamples,
+            // #1529 — aggregate progress bar shown always; per-
+            // situation breakdown only when the user taps Show
+            // details. Saves 5 of the 6 rows (~300 dp) on the
+            // common path.
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: maxTotal == 0 ? 0 : totalSamples / maxTotal,
+                minHeight: 8,
               ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '$totalSamples / $maxTotal samples',
+              style: theme.textTheme.labelSmall,
+              textAlign: TextAlign.right,
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: TextButton.icon(
+                key: const Key('vehicleBaselineDetailsToggle'),
+                onPressed: () =>
+                    setState(() => _showDetails = !_showDetails),
+                icon: Icon(
+                  _showDetails ? Icons.expand_less : Icons.expand_more,
+                  size: 18,
+                ),
+                label: Text(
+                  // English-only inline; ARB pass to follow.
+                  _showDetails ? 'Hide per-situation breakdown' : 'Show per-situation breakdown',
+                ),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 4),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ),
+            ),
+            if (_showDetails) ...[
+              const SizedBox(height: 4),
+              for (final s in situations)
+                _BaselineRow(
+                  label: _label(s, l),
+                  count: counts[s] ?? 0,
+                  fullConfidenceSamples: widget.fullConfidenceSamples,
+                ),
+            ],
             const SizedBox(height: 8),
             Align(
               alignment: Alignment.centerRight,
@@ -139,7 +206,7 @@ class VehicleBaselineSection extends ConsumerWidget {
       ),
     );
     if (confirm != true) return;
-    await ref.read(resetVehicleBaselinesProvider(vehicleId).future);
+    await ref.read(resetVehicleBaselinesProvider(widget.vehicleId).future);
   }
 
   String _label(DrivingSituation s, AppLocalizations? l) {
