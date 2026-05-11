@@ -90,6 +90,125 @@ class TripsSync {
       debugPrint('TripsSync.deleteSummary FAILED for $tripId: $e\n$st');
     }
   }
+
+  /// Merge [localEntries] with the user's `trip_summaries` rows on
+  /// Supabase (#1479 phase 3). Returns the union (local + server-only)
+  /// so the caller can persist any newly-downloaded summaries into
+  /// the local Hive box for cross-device continuity.
+  ///
+  /// - Unauthenticated → returns the input unchanged.
+  /// - Local-only entries are uploaded (mirrors the
+  ///   [uploadSummary] path so a missing server row is healed).
+  /// - Server-only entries are decoded from the compact summary JSON
+  ///   and added to the result. Their `samples` + `gpsd` fields are
+  ///   empty (those live in `trip_details` and arrive on demand in
+  ///   phase 4).
+  /// - Decode failures are skipped silently — one corrupt row should
+  ///   never block the whole merge.
+  static Future<List<TripHistoryEntry>> merge(
+    List<TripHistoryEntry> localEntries,
+  ) async {
+    final client = TankSyncClient.client;
+    final userId = client?.auth.currentUser?.id;
+    if (client == null || userId == null) {
+      debugPrint('TripsSync.merge: not authenticated');
+      return localEntries;
+    }
+    try {
+      final serverRows = await client
+          .from('trip_summaries')
+          .select('id, data')
+          .eq('user_id', userId);
+
+      final serverIds = <String>{};
+      for (final r in serverRows) {
+        final id = r['id'];
+        if (id is String) serverIds.add(id);
+      }
+      final localIds = localEntries.map((e) => e.id).toSet();
+
+      // Upload local-only entries — heals a missing server row from
+      // a previous offline save without waiting for the next stop.
+      final localOnly =
+          localEntries.where((e) => !serverIds.contains(e.id)).toList();
+      for (final entry in localOnly) {
+        // Reuse the single-row upload path to keep the JSON-shape
+        // contract centralised. Errors swallowed inside.
+        await uploadSummary(entry);
+      }
+
+      // Download server-only entries.
+      final downloaded = <TripHistoryEntry>[];
+      for (final r in serverRows) {
+        final id = r['id'];
+        if (id is! String || localIds.contains(id)) continue;
+        final data = r['data'];
+        if (data is! Map) continue;
+        try {
+          downloaded.add(
+            TripHistoryEntry.fromJson(data.cast<String, dynamic>()),
+          );
+        } catch (e, st) {
+          debugPrint('TripsSync.merge decode failed for $id: $e\n$st');
+        }
+      }
+      debugPrint('TripsSync.merge: local=${localIds.length} '
+          'server=${serverIds.length} downloaded=${downloaded.length}');
+      return [...localEntries, ...downloaded];
+    } catch (e, st) {
+      debugPrint('TripsSync.merge FAILED: $e\n$st');
+      return localEntries;
+    }
+  }
+
+  /// Wipe every synced trip for the current user from BOTH
+  /// `trip_summaries` AND `trip_details` (#1479 phase 5 — 'Forget
+  /// all synced trips' button on the TankSync transparency screen).
+  ///
+  /// Local Hive entries are NOT touched — the user explicitly opted
+  /// to drop the cloud copy, not to delete their on-device history.
+  /// A subsequent merge will re-download nothing because the server
+  /// is empty; the local entries remain authoritative.
+  static Future<void> forgetAllForUser() async {
+    final client = TankSyncClient.client;
+    final userId = client?.auth.currentUser?.id;
+    if (client == null || userId == null) {
+      debugPrint('TripsSync.forgetAllForUser: not authenticated');
+      return;
+    }
+    try {
+      await client.from('trip_summaries').delete().eq('user_id', userId);
+      await client.from('trip_details').delete().eq('user_id', userId);
+      debugPrint('TripsSync.forgetAllForUser: wiped server-side rows');
+    } catch (e, st) {
+      debugPrint('TripsSync.forgetAllForUser FAILED: $e\n$st');
+    }
+  }
+
+  /// Prune `trip_details` rows older than [olderThanDays] for the
+  /// current user (#1479 phase 5 — retention). Summary rows keep
+  /// forever; only the heavy per-tick blobs auto-prune so the
+  /// cross-device list view stays complete while storage stays
+  /// bounded.
+  ///
+  /// Default 90 days matches the issue's spec. Caller decides when
+  /// to invoke (typically on app launch alongside the other sync
+  /// passes).
+  static Future<void> pruneOldDetails({int olderThanDays = 90}) async {
+    final client = TankSyncClient.client;
+    final userId = client?.auth.currentUser?.id;
+    if (client == null || userId == null) return;
+    final cutoff = DateTime.now().subtract(Duration(days: olderThanDays));
+    try {
+      await client
+          .from('trip_details')
+          .delete()
+          .eq('user_id', userId)
+          .lt('updated_at', cutoff.toIso8601String());
+    } catch (e, st) {
+      debugPrint('TripsSync.pruneOldDetails FAILED: $e\n$st');
+    }
+  }
 }
 
 /// Strips the per-tick `samples` and GPS-diagnostics arrays from a

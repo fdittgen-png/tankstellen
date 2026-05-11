@@ -43,5 +43,46 @@ void main() {
       // Same do-no-harm guarantee for the local-delete companion.
       await TripsSync.deleteSummary('test-trip-id');
     });
+
+    test(
+      '#1479 phase 3 — merge() returns local entries unchanged when not '
+      'signed in (do-no-harm contract for the merge path)',
+      () async {
+        final local = [
+          TripHistoryEntry(
+            id: 'a',
+            vehicleId: null,
+            summary: TripSummary(
+              startedAt: DateTime(2026, 5, 10, 9),
+              endedAt: DateTime(2026, 5, 10, 9, 30),
+              distanceKm: 8,
+              maxRpm: 2500,
+              highRpmSeconds: 0,
+              idleSeconds: 60,
+              harshBrakes: 0,
+              harshAccelerations: 0,
+            ),
+          ),
+        ];
+        final merged = await TripsSync.merge(local);
+        expect(merged, local,
+            reason: 'unauth merge must return the input list verbatim');
+      },
+    );
+
+    test(
+      '#1479 phase 5 — forgetAllForUser is a no-op when not signed in',
+      () async {
+        await TripsSync.forgetAllForUser();
+      },
+    );
+
+    test(
+      '#1479 phase 5 — pruneOldDetails is a no-op when not signed in',
+      () async {
+        await TripsSync.pruneOldDetails();
+        await TripsSync.pruneOldDetails(olderThanDays: 30);
+      },
+    );
   });
 }
