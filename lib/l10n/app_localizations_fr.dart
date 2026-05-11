@@ -3782,15 +3782,15 @@ class AppLocalizationsFr extends AppLocalizations {
       'Activez d\'abord l\'enregistrement OBD2 des trajets';
 
   @override
-  String get featureLabel_tflitePricePrediction => 'TFLite price prediction';
+  String get featureLabel_tflitePricePrediction => 'Prédiction de prix TFLite';
 
   @override
   String get featureDescription_tflitePricePrediction =>
-      'On-device price forecast model — inference runs locally; features and predictions never leave the device.';
+      'Modèle de prévision de prix sur l\'appareil — l\'inférence s\'exécute localement ; les caractéristiques et les prédictions ne quittent jamais l\'appareil.';
 
   @override
   String get featureBlockedEnable_tflitePricePrediction =>
-      'Enable price history first';
+      'Activez d\'abord l\'historique des prix';
 
   @override
   String get feedbackConsentTitle => 'Envoyer le rapport à GitHub ?';
