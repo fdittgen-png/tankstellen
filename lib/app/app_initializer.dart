@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -42,6 +43,7 @@ import '../features/vehicle/data/vehicle_profile_migrator.dart';
 import '../features/vehicle/providers/vehicle_aggregate_updater_provider.dart';
 import '../features/widget/data/home_widget_service.dart';
 import '../features/widget/providers/nearest_widget_refresh_provider.dart';
+import '../features/widget/providers/pending_widget_uri_provider.dart';
 import 'router.dart';
 
 /// Drives the cold-start sequence in well-defined phases instead of one
@@ -171,6 +173,15 @@ class AppInitializer {
             'AppInitializer: legacyToggleMigration kick-off failed: $e\n$st');
       }
     });
+
+    // Eagerly resolve the home-widget cold-launch URI BEFORE we build
+    // the router so the very first redirect pass can land directly on
+    // the requested station detail (#widget-deeplink). Capped at 200 ms
+    // so a stuck plugin never blocks cold start — if the read overruns,
+    // the warm-click stream still handles the URI a moment later (one
+    // visible landing-screen flash is the worst case).
+    await _stashWidgetLaunchUri(container);
+    StartupTimer.instance.mark('widget_launch_probe');
 
     StartupTimer.instance.mark('pre_run_app');
 
@@ -458,6 +469,36 @@ class AppInitializer {
       await TripsSync.pruneOldDetails();
     } catch (e, st) {
       debugPrint('AppInitializer._runTripsSyncMerge failed: $e\n$st');
+    }
+  }
+
+  /// Reads the URI carried by the home-widget tap that cold-started
+  /// the app (if any) and stashes it in [pendingWidgetUriProvider] so
+  /// the router's redirect chain can land the user on the station
+  /// detail directly — no landing-screen flash, no post-frame race.
+  ///
+  /// Capped by a short timeout: the `home_widget` plugin's platform
+  /// channel is normally instant, but a stuck implementation must not
+  /// block cold start. On timeout / error the warm-click stream still
+  /// delivers the URI a few frames later — the cost is the very
+  /// situation this method was written to remove (a brief landing-
+  /// screen flash), not data loss.
+  static Future<void> _stashWidgetLaunchUri(
+    ProviderContainer container,
+  ) async {
+    try {
+      final uri = await HomeWidget.initiallyLaunchedFromHomeWidget()
+          .timeout(const Duration(milliseconds: 200));
+      if (uri != null) {
+        container.read(pendingWidgetUriProvider.notifier).set(uri);
+      }
+    } on TimeoutException {
+      debugPrint(
+        'AppInitializer: widget-launch probe timed out at 200 ms — '
+        'falling back to the warm-click stream',
+      );
+    } catch (e, st) {
+      debugPrint('AppInitializer._stashWidgetLaunchUri failed: $e\n$st');
     }
   }
 

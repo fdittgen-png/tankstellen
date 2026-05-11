@@ -8,26 +8,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../app/router.dart';
 import '../../consumption/data/obd2/event_channel_cancel.dart';
+import 'widget_uri_parser.dart';
+
+export 'widget_uri_parser.dart' show widgetUriToPath;
 
 part 'widget_click_listener.g.dart';
-
-/// Parse a widget launch URI into the router path it should push.
-///
-/// URI contract (set natively by `StationWidgetRenderer.buildActivity`):
-/// `tankstellenwidget://station?id=<stationId>`. EV stations use the
-/// OpenChargeMap `ocm-` prefix; those route to the EV detail screen so
-/// the user sees connectors/power rather than the fuel-price UI.
-///
-/// Returns `null` for any URI that isn't a valid widget launch — the
-/// caller must treat that as a no-op.
-String? widgetUriToPath(Uri? uri) {
-  if (uri == null) return null;
-  if (uri.scheme != 'tankstellenwidget') return null;
-  if (uri.host != 'station') return null;
-  final id = uri.queryParameters['id'];
-  if (id == null || id.isEmpty) return null;
-  return id.startsWith('ocm-') ? '/ev-station/$id' : '/station/$id';
-}
 
 /// Pushes the widget-launch destination onto the router.
 ///
@@ -67,16 +52,20 @@ WidgetLaunchHandler widgetLaunchHandler(Ref ref) {
 }
 
 /// Listens for taps on a home-screen widget row and navigates the app
-/// to the matching station detail screen. Two code paths:
+/// to the matching station detail screen.
 ///
-/// 1. **Cold start** — the app was launched by tapping a widget row.
-///    [HomeWidget.initiallyLaunchedFromHomeWidget] returns the URI the
-///    PendingIntent carried.
-/// 2. **Warm click** — the app is already running when the user taps a
-///    row. [HomeWidget.widgetClicked] emits the URI.
+/// **Warm click only**: the app is already running and the user taps a
+/// row in the home-screen widget. [HomeWidget.widgetClicked] emits the
+/// URI and we push the matching route on top of the current navigation
+/// stack.
 ///
-/// Both paths delegate to [WidgetLaunchHandler] so the routing logic
-/// has a single, tested entry point.
+/// **Cold start** is handled one layer up by the router's redirect
+/// chain, which consumes the URI stashed by
+/// `AppInitializer._stashWidgetLaunchUri` before the first frame paints
+/// (#widget-deeplink). Reading the URI synchronously at app boot —
+/// rather than racing a post-frame callback against the redirect — is
+/// what stops the landing-screen flash and the (intermittent) lost
+/// deep link.
 class WidgetClickListener extends ConsumerStatefulWidget {
   final Widget child;
   const WidgetClickListener({super.key, required this.child});
@@ -92,7 +81,6 @@ class _WidgetClickListenerState extends ConsumerState<WidgetClickListener> {
   @override
   void initState() {
     super.initState();
-    _handleInitialLaunch();
     _subscription = HomeWidget.widgetClicked.listen(_dispatch);
   }
 
@@ -106,18 +94,6 @@ class _WidgetClickListenerState extends ConsumerState<WidgetClickListener> {
     // bubble through the privacy-dashboard error log.
     unawaited(_subscription?.safeCancel());
     super.dispose();
-  }
-
-  Future<void> _handleInitialLaunch() async {
-    try {
-      final uri = await HomeWidget.initiallyLaunchedFromHomeWidget();
-      // The router may not have attached its Navigator yet on cold
-      // start. Defer until after the first frame so `push` lands on a
-      // live navigator rather than an empty stack.
-      WidgetsBinding.instance.addPostFrameCallback((_) => _dispatch(uri));
-    } catch (e, st) {
-      debugPrint('WidgetClickListener: initial launch probe failed: $e\n$st');
-    }
   }
 
   void _dispatch(Uri? uri) {

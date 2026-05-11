@@ -5,6 +5,8 @@ import '../core/data/storage_repository.dart';
 import '../core/telemetry/integrations/navigation_trace_observer.dart';
 import '../core/storage/storage_keys.dart';
 import '../core/storage/storage_providers.dart';
+import '../features/widget/presentation/widget_uri_parser.dart';
+import '../features/widget/providers/pending_widget_uri_provider.dart';
 import 'routes/consumption_routes.dart';
 import 'routes/onboarding_routes.dart';
 import 'routes/profile_routes.dart';
@@ -15,6 +17,27 @@ import 'routes/sync_routes.dart';
 import 'shell_screen.dart';
 
 part 'router.g.dart';
+
+/// Consumes the pending home-widget cold-launch URI (set by
+/// `AppInitializer._stashWidgetLaunchUri`) and converts it to a router
+/// path. Returns `null` when no URI is pending or the URI doesn't
+/// resolve to a known route — callers fall back to their default
+/// landing behaviour.
+///
+/// `consume()` clears the stash so the redirect only re-routes the
+/// first time the router evaluates after a widget tap.
+String? _consumePendingWidgetPath(Ref ref) {
+  // `consumeDeferred` schedules the state clear via `Future.microtask`
+  // so the mutation lands AFTER the router redirect / widget build
+  // returns — Riverpod asserts against state writes during the build
+  // phase. The URI itself is returned synchronously so the redirect
+  // can act on it in the same tick.
+  final pending = ref
+      .read(pendingWidgetUriProvider.notifier)
+      .consumeDeferred();
+  if (pending == null) return null;
+  return widgetUriToPath(pending);
+}
 
 /// Resolves the route to land on based on the active profile's
 /// `landingScreen` preference. `cheapest` and `nearest` both open the Search
@@ -84,7 +107,17 @@ GoRouter router(Ref ref) {
       // Step 1: GDPR consent must be given before anything else
       if (!hasConsent && !isConsent) return '/consent';
       if (hasConsent && isConsent) {
-        return isReady ? resolveLandingLocation(storage) : '/setup';
+        if (!isReady) return '/setup';
+        // Past consent + past setup: prefer a pending widget cold-launch
+        // URI over the user's configured landing screen so a home-widget
+        // tap lands directly on the station detail. `consumeDeferred`
+        // clears the stash via a microtask (Riverpod forbids state
+        // writes during a widget-tree build) so a subsequent redirect
+        // — e.g. the user backing out of the detail — falls through to
+        // the normal landing flow.
+        final widgetPath = _consumePendingWidgetPath(ref);
+        if (widgetPath != null) return widgetPath;
+        return resolveLandingLocation(storage);
       }
 
       // Step 2: Setup (onboarding) must be complete before main app
@@ -94,7 +127,14 @@ GoRouter router(Ref ref) {
       // Landing preference is only applied when leaving the setup flow — not
       // on every subsequent navigation back to '/', which would trap the
       // user on their landing tab.
-      if (isReady && isSetup) return resolveLandingLocation(storage);
+      if (isReady && isSetup) {
+        // Same widget-URI precedence as the consent->landing step above:
+        // a fresh-install user who completes setup AND has a pending
+        // widget URI should also land on the station detail.
+        final widgetPath = _consumePendingWidgetPath(ref);
+        if (widgetPath != null) return widgetPath;
+        return resolveLandingLocation(storage);
+      }
       return null;
     },
     routes: [

@@ -13,6 +13,7 @@ import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
+import 'package:tankstellen/features/widget/providers/pending_widget_uri_provider.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../helpers/mock_providers.dart';
@@ -237,5 +238,135 @@ void main() {
       expect(goRouter.configuration.routes.length, 8);
       goRouter.dispose();
     });
+
+    /// Pumps a minimal Router-driven widget tree so the redirect chain
+    /// fires, then returns the path go_router resolved to. The target
+    /// screen (e.g. `/station/:id`) may not have its full provider
+    /// chain seeded — we drain `tester.takeException()` to absorb the
+    /// expected build error, which doesn't change what
+    /// `routerDelegate.currentConfiguration.uri` reports.
+    Future<String> resolveRedirect(
+      WidgetTester tester,
+      ProviderContainer container,
+    ) async {
+      tester.view.physicalSize = const Size(800, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      late GoRouter testRouter;
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: Consumer(builder: (context, ref, _) {
+            testRouter = ref.watch(routerProvider);
+            return MaterialApp.router(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: const Locale('en'),
+              routerConfig: testRouter,
+            );
+          }),
+        ),
+      );
+      await tester.pump(const Duration(seconds: 1));
+      // Drain any build exception from the redirect target's screen —
+      // tests don't seed every provider transitive of every possible
+      // landing route. The routerDelegate already has the matched
+      // location locked in before the screen tries to render.
+      tester.takeException();
+      final resolved = testRouter
+          .routerDelegate
+          .currentConfiguration
+          .uri
+          .toString();
+      // Drain any pending microtasks / Riverpod retry timers spawned
+      // by the target screen's failed provider reads. Without this
+      // the test runner's invariant check (`!timersPending`) trips
+      // and the test fails on cleanup, not on the assertion we
+      // actually care about.
+      await tester.pumpAndSettle(const Duration(seconds: 1));
+      tester.takeException();
+      return resolved;
+    }
+
+    testWidgets(
+      '#widget-deeplink — pending widget URI redirects to /station/:id '
+      'instead of the configured landing screen on cold start',
+      (tester) async {
+        final container = ProviderContainer(overrides: overrides.cast());
+        addTearDown(container.dispose);
+
+        container.read(pendingWidgetUriProvider.notifier).set(
+            Uri.parse('tankstellenwidget://station?id=fr-12345'));
+
+        expect(
+          await resolveRedirect(tester, container),
+          '/station/fr-12345',
+          reason: 'pending widget URI must win over the configured '
+              'landing screen so the cold-start flow lands on the '
+              'station detail without the landing-screen flash',
+        );
+      },
+    );
+
+    testWidgets(
+      '#widget-deeplink — pending widget URI is consumed exactly once',
+      (tester) async {
+        final container = ProviderContainer(overrides: overrides.cast());
+        addTearDown(container.dispose);
+
+        container.read(pendingWidgetUriProvider.notifier).set(
+            Uri.parse('tankstellenwidget://station?id=de-99'));
+        await resolveRedirect(tester, container);
+
+        // Stash is one-shot: the underlying provider state must be
+        // null after the redirect consumed it. Without this contract
+        // the user would be trapped on the same station detail forever
+        // when they back out.
+        expect(container.read(pendingWidgetUriProvider), isNull);
+      },
+    );
+
+    testWidgets(
+      '#widget-deeplink — EV widget URI redirects to /ev-station/:id',
+      (tester) async {
+        final container = ProviderContainer(overrides: overrides.cast());
+        addTearDown(container.dispose);
+
+        container.read(pendingWidgetUriProvider.notifier).set(
+            Uri.parse('tankstellenwidget://station?id=ocm-42'));
+
+        expect(
+          await resolveRedirect(tester, container),
+          '/ev-station/ocm-42',
+          reason: 'OCM-prefixed widget IDs must route to the EV detail '
+              'screen, not the fuel detail screen (parity with the '
+              'warm-click path)',
+        );
+      },
+    );
+
+    testWidgets(
+      '#widget-deeplink — invalid widget URI falls through to the '
+      'configured landing screen',
+      (tester) async {
+        final container = ProviderContainer(overrides: overrides.cast());
+        addTearDown(container.dispose);
+
+        // Scheme matches but host is garbage; widgetUriToPath returns
+        // null and the redirect falls back to resolveLandingLocation.
+        container.read(pendingWidgetUriProvider.notifier).set(
+            Uri.parse('tankstellenwidget://garbage?nope=yes'));
+
+        expect(await resolveRedirect(tester, container), '/');
+        // Stash still drains so a future malformed URI can't keep
+        // re-triggering this branch. Note: `widgetUriToPath` returns
+        // null for unparseable URIs but `_consumePendingWidgetPath`
+        // ALWAYS drains the stash so a single bad URI doesn't bounce
+        // the redirect chain on every navigation.
+        expect(container.read(pendingWidgetUriProvider), isNull);
+      },
+    );
   });
 }
