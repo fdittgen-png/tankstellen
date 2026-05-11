@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart' show Size;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
@@ -117,37 +118,51 @@ void main() {
     testWidgets(
       'both foldables render when both root features are enabled',
       (tester) async {
+        // The ListView in ProfileScreen lazy-builds children based on
+        // viewport. The default 800×600 surface scrolls the
+        // Consumption foldable far off-stage, and the lazy delegate
+        // doesn't materialise it until it's near the viewport — so
+        // `skipOffstage: false` finds nothing. Set a tall surface so
+        // every foldable renders eagerly (#1545 fix).
+        await tester.binding.setSurfaceSize(const Size(1200, 3200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
         await pumpApp(
           tester,
           const ProfileScreen(),
           overrides: overridesWithFlags(<Feature>{
             Feature.tankSync,
             Feature.obd2TripRecording,
+            // #1520: Consumption section visibility now requires the
+            // `showConsumptionTab` flag in the stored set in addition
+            // to a data source (obd2TripRecording OR manualConsumption).
+            // Pin it so the foldable renders.
+            Feature.showConsumptionTab,
           }),
         );
 
-        // Settings list scrolls — section titles may be off-screen
-        // until scrolled into view, so probe the widget tree directly.
         expect(find.text('TankSync', skipOffstage: false), findsOneWidget);
         expect(find.text('Consumption', skipOffstage: false), findsOneWidget);
       },
-      // Pre-existing flake — passed in PR #1521 CI but fails locally and
-      // in subsequent PR CIs. Adding the Use mode section above the
-      // Consumption foldable in #1528 didn't introduce the flake (test
-      // also fails on master without #1528's changes), but the larger
-      // tree may have made the lazy-build-window edge case more likely
-      // to bite. Tracked separately; do not block #1528 on this.
-      skip: true,
     );
 
     testWidgets(
       'TankSync foldable hides without affecting Consumption when only '
       'tankSync is off (independent gates)',
       (tester) async {
+        // Same surface-size fix as the 'both foldables render' test
+        // above (#1545) — the lazy ListView won't materialise the
+        // Consumption row at the default 800×600 viewport.
+        await tester.binding.setSurfaceSize(const Size(1200, 3200));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
         await pumpApp(
           tester,
           const ProfileScreen(),
-          overrides: overridesWithFlags(<Feature>{Feature.obd2TripRecording}),
+          overrides: overridesWithFlags(<Feature>{
+            Feature.obd2TripRecording,
+            // #1520: same gate change — pin showConsumptionTab so the
+            // foldable renders even when tankSync is off.
+            Feature.showConsumptionTab,
+          }),
         );
 
         expect(find.text('TankSync', skipOffstage: false), findsNothing);
