@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTD/PropertyList-1.0.dtd">
+<!--
+  Widget extension entitlements.
+
+  Same App Group identifier as `ios/Runner/Runner.entitlements` — both
+  targets MUST declare the SAME string. Without this entitlement the
+  widget extension cannot read the host app's `nearest_json` /
+  `stations_json` payload via `UserDefaults(suiteName: …)`.
+
+  The Apple Developer Portal App ID for the widget extension's bundle
+  identifier (`de.tankstellen.tankstellen.TankstellenWidget`) must have
+  the "App Groups" capability enabled and include this exact group
+  string. Provisioning profiles must be regenerated AFTER adding the
+  capability.
+-->
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.de.tankstellen.tankstellen</string>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTD/PropertyList-1.0.dtd">
+<!--
+  App entitlements for the main iOS app target.
+
+  The `com.apple.security.application-groups` entry is REQUIRED for the
+  TankstellenWidget extension to share data (nearest-stations JSON, etc.)
+  with the host app through `UserDefaults(suiteName:)`.
+
+  The group identifier MUST be `group.<bundle-id>` per Apple's App Group
+  naming rules. Match the value to the one in
+  `ios/TankstellenWidget/TankstellenWidget.entitlements` — both targets
+  must declare the SAME group string and both must be code-signed by
+  provisioning profiles that include this App Group capability (set up
+  in the Apple Developer Portal → Identifiers).
+-->
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.de.tankstellen.tankstellen</string>
+	</array>
+</dict>
+</plist>
