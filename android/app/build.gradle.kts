@@ -120,16 +120,37 @@ android {
             // back to the debug signing key: that produced artefacts that
             // looked valid in CI but would not upgrade an existing install
             // on user devices.
+            //
+            // The throw is deferred to ACTUAL release tasks only. Without
+            // this guard the exception would fire at config-evaluation
+            // time even for `assemblePlayDebug` (Dependabot CI runs that
+            // legitimately can't read the keystore secrets — GitHub's
+            // bot-actor security policy strips them from PRs).
             signingConfig = if (releaseSigning != null) {
                 signingConfigs.getByName("release")
             } else {
-                throw GradleException(
-                    "No release signing configuration available. " +
-                        "Set ANDROID_KEYSTORE_PATH / ANDROID_KEYSTORE_PASSWORD / " +
-                        "ANDROID_KEY_ALIAS environment variables (CI: use GitHub " +
-                        "Secrets), or create android/key.properties locally. " +
-                        "Release builds never fall back to the debug key — see #48."
-                )
+                val taskNames = gradle.startParameter.taskNames
+                    .map { it.lowercase() }
+                val isReleaseRequested = taskNames.any { name ->
+                    name.contains("release") && !name.contains("debug")
+                }
+                if (isReleaseRequested) {
+                    throw GradleException(
+                        "No release signing configuration available. " +
+                            "Set ANDROID_KEYSTORE_PATH / ANDROID_KEYSTORE_PASSWORD / " +
+                            "ANDROID_KEY_ALIAS environment variables (CI: use GitHub " +
+                            "Secrets), or create android/key.properties locally. " +
+                            "Release builds never fall back to the debug key — see #48."
+                    )
+                }
+                // Debug-only builds (e.g. `assemblePlayDebug`) don't need
+                // a release signing config. Leaving this null lets the
+                // configuration phase complete; any subsequent attempt to
+                // actually assemble a release variant would fail at the
+                // signing task, which is still strictly safer than
+                // silently signing with the debug key (the original #48
+                // failure mode).
+                null
             }
         }
     }
