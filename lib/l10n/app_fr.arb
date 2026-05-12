@@ -1254,5 +1254,19 @@
       "ms": {"type": "int"}
     }
   },
-  "gpsDiagnosticsExplain": "Capturé pendant l'enregistrement pour vérifier la cadence GPS en veille."
+  "gpsDiagnosticsExplain": "Capturé pendant l'enregistrement pour vérifier la cadence GPS en veille.",
+  "waitTimeHint": "~{minutes} min d'attente",
+  "@waitTimeHint": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "waitTimeTrackStart": "Suivre mon attente",
+  "waitTimeTrackEnd": "Je pars maintenant",
+  "waitTimeElapsedShort": "{minutes} min jusqu'à présent",
+  "@waitTimeElapsedShort": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  }
 }
