@@ -1,0 +1,121 @@
+name: Dev APK (arm64)
+
+# Manual-only workflow that produces a single arm64-v8a APK for the
+# developer's own device. Triggered from the Actions UI; the APK lands
+# in the run's Artifacts pane (NOT a public release attachment).
+#
+# Background: public Releases dropped APK distribution intentionally
+# because Play App Signing re-signs every Play install with Google's
+# app-signing key, and the GitHub APKs (signed by the upload key) had a
+# different signature, blocking cross-channel updates on user devices.
+# This workflow keeps a tightly-scoped APK path for developers who
+# need to flash a specific commit onto a personal Android — they
+# uninstall + reinstall once, knowing the APK isn't update-compatible
+# with the Play Store version.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch, tag, or SHA to build (defaults to master)'
+        required: false
+        default: 'master'
+        type: string
+
+concurrency:
+  group: dev-apk-${{ github.event.inputs.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      - name: Decode signing keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          if [ -z "$ANDROID_KEYSTORE_BASE64" ] || [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_ALIAS" ]; then
+            echo "::error::Missing keystore secrets. Configure ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS in the repo or environment secrets." >&2
+            exit 1
+          fi
+          KEYSTORE_PATH="$RUNNER_TEMP/upload-keystore.jks"
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
+          {
+            echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH"
+            echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD"
+            echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS"
+          } >> "$GITHUB_ENV"
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Build arm64-v8a APK (play flavor, release)
+        # `--target-platform android-arm64` keeps the build to the
+        # single ABI the modern Samsung device cares about — smaller
+        # download, faster CI (~5-6 min instead of ~13 for split-per-
+        # abi).
+        run: |
+          flutter build apk --release --flavor play \
+            --target-platform android-arm64
+
+      - name: Clean up decoded keystore
+        if: always() && env.ANDROID_KEYSTORE_PATH != ''
+        run: rm -f "$ANDROID_KEYSTORE_PATH"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: dev-apk-arm64-${{ github.event.inputs.ref }}-${{ github.run_number }}
+          path: build/app/outputs/flutter-apk/app-play-release.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Summary
+        run: |
+          {
+            echo "### Dev APK ready"
+            echo
+            echo "- **Ref built:** \`${{ github.event.inputs.ref }}\`"
+            echo "- **Run #:** ${{ github.run_number }}"
+            echo "- **ABI:** arm64-v8a (modern 64-bit ARM, e.g. Samsung Galaxy S20+)"
+            echo "- **Signed with:** upload key (\`ANDROID_KEYSTORE\` secret)"
+            echo
+            echo "Download from the run's Artifacts pane above."
+            echo
+            echo "**Reminder:** this APK's signing certificate does NOT match"
+            echo "the one Google uses to re-sign Play Store installs. To put"
+            echo "it on a device that has the Play version installed:"
+            echo "1. Uninstall the Play Store version (this loses local data)."
+            echo "2. Install this APK via adb or by tapping it on the device."
+            echo "3. Future Play Store updates will be blocked until you"
+            echo "   uninstall this APK and reinstall from Play."
+          } >> "$GITHUB_STEP_SUMMARY"
