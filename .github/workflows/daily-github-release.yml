@@ -149,10 +149,16 @@ jobs:
           flutter build appbundle --release --flavor play \
             --build-number=${{ needs.pre-check.outputs.build_number }}
 
-      - name: Build per-ABI APKs (play flavor)
-        run: |
-          flutter build apk --release --flavor play --split-per-abi \
-            --build-number=${{ needs.pre-check.outputs.build_number }}
+      # Per-ABI APKs were dropped from the public nightly release on
+      # purpose — Play App Signing re-signs every Play install with
+      # Google's app-signing key (different from the upload key the
+      # CI keystore uses), so sideloaded APKs from the GitHub release
+      # ALWAYS clashed with Play installs (Android refuses to update
+      # across signing certs). Single-channel distribution via Play
+      # Store / TestFlight is now the canonical path for end-users.
+      # Developers needing a personal APK can trigger `.github/
+      # workflows/dev-apk.yml` from the Actions UI; the artifact lives
+      # on the run, not on the public Releases page.
 
       - name: Clean up decoded keystore
         if: always() && env.ANDROID_KEYSTORE_PATH != ''
@@ -164,9 +170,6 @@ jobs:
           name: android-release
           path: |
             build/app/outputs/bundle/playRelease/app-play-release.aab
-            build/app/outputs/flutter-apk/app-arm64-v8a-play-release.apk
-            build/app/outputs/flutter-apk/app-armeabi-v7a-play-release.apk
-            build/app/outputs/flutter-apk/app-x86_64-play-release.apk
           if-no-files-found: error
           retention-days: 7
 
@@ -368,13 +371,16 @@ jobs:
             echo
             echo "**Android (Play flavor, signed):**"
             echo "- \`app-play-release.aab\` — Play Store bundle"
-            echo "- \`app-arm64-v8a-play-release.apk\` — sideload, modern 64-bit ARM"
-            echo "- \`app-armeabi-v7a-play-release.apk\` — sideload, legacy 32-bit ARM"
-            echo "- \`app-x86_64-play-release.apk\` — sideload, x86_64 emulators"
             echo
             echo "**iOS (App Store distribution, signed):**"
             echo "- \`Runner.ipa\` — distribution build (TestFlight / App Store; not directly sideloadable on consumer devices)"
             echo "- \`*.app.dSYM.zip\` — debug symbols for crash symbolication"
+            echo
+            echo "### 📱 Install / update"
+            echo
+            echo "- **Android users:** install via the [Sparkilo Play Store listing](https://play.google.com/store/apps/details?id=de.tankstellen.fuelprices). Public APKs are intentionally not attached — Play App Signing re-signs every Play install with Google's key, so sideloaded APKs would conflict with Play updates on the same device."
+            echo "- **iOS users:** install via TestFlight."
+            echo "- **Developers needing a local APK:** trigger the [\`Dev APK (arm64)\`](../actions/workflows/dev-apk.yml) workflow from the Actions UI. The APK is signed with the upload key and downloads from the run's Artifacts pane — useful for inspecting a specific commit on your own device. NOT distributable, NOT cross-channel-updatable with Play."
             echo
             echo "_Build number: ${{ needs.pre-check.outputs.build_number }} · Built from \`${{ github.sha }}\`_"
           } >> "$NOTES_FILE"
