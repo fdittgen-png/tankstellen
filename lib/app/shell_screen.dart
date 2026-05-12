@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/utils/frame_callbacks.dart';
 import '../features/vehicle/presentation/widgets/catalog_reresolve_snackbar_host.dart';
-import '../features/vehicle/providers/vehicle_providers.dart';
 import '../l10n/app_localizations.dart';
 import 'current_shell_branch_provider.dart';
 import 'responsive_search_layout.dart';
@@ -173,41 +172,17 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
-    // #893 — Conso tab is only visible once the user has configured at
-    // least one vehicle. A fresh install (no vehicles) shows the 4
-    // canonical destinations (Search, Map, Favorites, Settings); the
-    // Conso branch still exists in the router (deep links to
-    // `/consumption-tab` and `/consumption/...` remain functional),
-    // only the bottom-nav item is conditional. `ref.watch` makes this
-    // reactive — removing the last vehicle from Settings instantly
-    // collapses the tab to 4, and adding the first vehicle grows it
-    // back to 5.
-    final hasVehicle = ref.watch(vehicleProfileListProvider).isNotEmpty;
-
-    // #778 contract preserved: the bottom-nav Consumption slot is
-    // gated SOLELY on `hasVehicle`. Profile-tier gating (Basic
-    // skips the vehicle wizard step → no vehicle added → no
-    // Consumption slot) happens implicitly via the wizard. Stricter
-    // gating belongs in the Settings → Consumption section
-    // (`isConsumptionTabReachable`), not in the nav bar — see
-    // `shell_consumption_tab_test.dart`.
-    final destinations =
-        resolveShellDestinations(l10n: l10n, hasVehicle: hasVehicle);
+    // Conso tab is always visible — the empty-state inside the
+    // consumption screen owns the "no vehicle yet" affordance so the
+    // Medium use-mode profile (#1517) can reach the consumption flow
+    // without first configuring a vehicle. The #893 vehicle gate that
+    // used to live here created a catch-22 for Medium users (vehicle
+    // configured FROM the conso screen, conso hidden UNTIL a vehicle
+    // exists).
+    final destinations = resolveShellDestinations(l10n: l10n);
     final visibleDestinations = destinations.items;
     final branchForSlot = destinations.branchForSlot;
     _branchForSlot = branchForSlot;
-
-    // If the user was on the Conso tab and just deleted their last
-    // vehicle, snap the selection to Search (branch 0) — the Conso
-    // slot has disappeared from the nav bar and leaving
-    // `_currentIndex` pointing at it would leave no item highlighted.
-    if (!hasVehicle && _currentIndex == kConsumptionBranchIndex) {
-      safePostFrame(() {
-        if (!mounted) return;
-        if (_currentIndex != kConsumptionBranchIndex) return;
-        _goToPage(0);
-      });
-    }
 
     // Display-slot the animated nav bar should highlight. `-1` when
     // the active branch has no visible slot (transient, resolved by

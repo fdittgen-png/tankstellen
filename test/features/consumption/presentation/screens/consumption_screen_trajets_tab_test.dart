@@ -9,10 +9,20 @@ import 'package:tankstellen/features/consumption/providers/charging_logs_provide
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
 import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
+
+/// Tests that need the Trajets tab visible (default-off feature flag)
+/// override featureFlagsProvider with this notifier — Trajets is gated
+/// on `Feature.obd2TripRecording` per #conso-coherence.
+class _TrajetsEnabledFlags extends FeatureFlags {
+  @override
+  Set<Feature> build() => <Feature>{Feature.obd2TripRecording};
+}
 
 /// #889 — the ConsumptionScreen grows a Trajets tab between Fuel and
 /// Charging, and each row taps through to `/trip/:id`. These tests
@@ -135,6 +145,10 @@ Future<void> _pumpScreen(
           .overrideWith(() => _FixedVehicleProfileList(vehicles)),
       tripHistoryListProvider
           .overrideWith(() => _FixedTripHistoryList(trips)),
+      // Trajets tab is gated on obd2TripRecording (#conso-coherence).
+      // This whole test file asserts Trajets behaviour, so enable the
+      // flag for every test in here.
+      featureFlagsProvider.overrideWith(() => _TrajetsEnabledFlags()),
     ],
   );
 }
@@ -276,5 +290,64 @@ void main() {
       expect(_lastTripIdVisited, equals('2026-04-22T09:00:00.000Z'));
       expect(find.text('TripDetailStub'), findsOneWidget);
     });
+  });
+
+  group('ConsumptionScreen Trajets tab gating (#conso-coherence)', () {
+    const vehicle = VehicleProfile(
+      id: 'v1',
+      name: 'Test vehicle',
+      type: VehicleType.hybrid,
+    );
+
+    /// Pumps the screen WITHOUT enabling Feature.obd2TripRecording so
+    /// the Trajets tab should be hidden. Mirrors `_pumpScreen` above
+    /// except for the missing featureFlagsProvider override.
+    Future<void> pumpWithoutObd(WidgetTester tester) async {
+      final router = GoRouter(
+        initialLocation: '/consumption',
+        routes: [
+          GoRoute(
+            path: '/consumption',
+            builder: (_, _) => const ConsumptionScreen(),
+          ),
+          GoRoute(
+            path: '/trip/:id',
+            builder: (_, _) => const Scaffold(body: Text('TripDetailStub')),
+          ),
+        ],
+      );
+
+      await pumpApp(
+        tester,
+        MaterialApp.router(routerConfig: router),
+        overrides: [
+          fillUpListProvider.overrideWith(() => _FixedFillUpList(const [])),
+          chargingLogsProvider
+              .overrideWith(() => _FixedChargingLogs(const [])),
+          activeVehicleProfileProvider
+              .overrideWith(() => _FixedActiveVehicle(vehicle)),
+          vehicleProfileListProvider
+              .overrideWith(() => _FixedVehicleProfileList(const [vehicle])),
+          tripHistoryListProvider
+              .overrideWith(() => _FixedTripHistoryList(const [])),
+          // No featureFlagsProvider override → defaults are used →
+          // obd2TripRecording is `false` per the manifest.
+        ],
+      );
+    }
+
+    testWidgets(
+      'Trajets tab is hidden when Feature.obd2TripRecording is off — '
+      'Fuel + Charging only',
+      (tester) async {
+        await pumpWithoutObd(tester);
+        expect(find.text('Fuel'), findsOneWidget);
+        expect(find.text('Trips'), findsNothing,
+            reason: 'Trajets tab must hide when obd2TripRecording is '
+                'off — Medium use-mode users have no trips to render');
+        // Hybrid vehicle still shows Charging.
+        expect(find.text('Charging'), findsOneWidget);
+      },
+    );
   });
 }

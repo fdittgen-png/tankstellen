@@ -6,10 +6,21 @@ import 'package:tankstellen/features/consumption/presentation/screens/consumptio
 import 'package:tankstellen/features/consumption/providers/charging_logs_provider.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
+
+/// Enables `Feature.obd2TripRecording` so the Trajets tab renders —
+/// this test file's expected tab counts (2 vs 3) assume Trajets is
+/// always present, which is the case once OBD2 trip recording is on
+/// (#conso-coherence gated Trajets on the feature flag).
+class _ObdEnabledFlags extends FeatureFlags {
+  @override
+  Set<Feature> build() => <Feature>{Feature.obd2TripRecording};
+}
 
 /// #892 — the Charging tab on [ConsumptionScreen] is hidden for ICE
 /// vehicles (combustion) and visible for hybrid / EV profiles. The
@@ -115,6 +126,7 @@ Future<_MutableActiveVehicle> _pumpScreen(
       activeVehicleProfileProvider.overrideWith(() => activeNotifier),
       vehicleProfileListProvider
           .overrideWith(() => _FixedVehicleProfileList(vehicles)),
+      featureFlagsProvider.overrideWith(() => _ObdEnabledFlags()),
     ],
   );
 

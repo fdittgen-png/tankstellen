@@ -62,17 +62,10 @@ class ProfileScreen extends ConsumerWidget {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.zero,
         children: [
-          // Use mode (#1517 / #1519) — first thing on the Settings
-          // screen because it gates which other sections (Consumption,
-          // Loyalty, Vehicles, Achievements) are visible at all.
-          const SectionHeader(
-            leadingIcon: Icons.tune,
-            title: 'Use mode',
-            padding: EdgeInsets.zero,
-          ),
-          const SizedBox(height: 4),
-          const UseModeSection(),
-          const SizedBox(height: 16),
+          // Use mode (#1517 / #1519) used to sit at the top of the
+          // Settings screen; it now lives INSIDE the Consumption
+          // _FoldableSection below so the use-mode chooser is grouped
+          // with the consumption-tier-dependent toggles it gates.
 
           // Profiles — primary user-data section.
           SectionHeader(
@@ -161,7 +154,20 @@ class ProfileScreen extends ConsumerWidget {
             _FoldableSection(
               icon: Icons.local_gas_station_outlined,
               title: l?.navConsumption ?? 'Consumption',
-              child: const DrivingSettingsSection(),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Use mode chooser anchors the Consumption section
+                  // because the profile (Basic / Medium / Full / Custom)
+                  // is what determines which downstream toggles are
+                  // visible at all. Moved here from the top of the
+                  // Settings screen so users discover the chooser at
+                  // the same time as the toggles it gates.
+                  UseModeSection(),
+                  SizedBox(height: 8),
+                  DrivingSettingsSection(),
+                ],
+              ),
             ),
             const SizedBox(height: 8),
           ],
