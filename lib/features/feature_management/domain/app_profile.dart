@@ -47,19 +47,35 @@ enum AppProfile {
 /// flag — the bundles are exhaustive, not additive, so re-applying the
 /// same profile is idempotent.
 ///
-/// Bundle composition (from #1517 product brief):
-/// - **Basic** — pure search/discovery experience. Includes the
-///   manifest's default-on visibility flags (`showFuel`, `showElectric`,
-///   `priceAlerts`, `priceHistory`, `routePlanning`, `evCharging`). No
-///   consumption, no OBD2, no loyalty.
-/// - **Medium** — Basic + manual fill-up logging
-///   (`manualConsumption`).
-/// - **Full** — Medium + OBD2 stack (`obd2TripRecording`, `autoRecord`,
-///   `consumptionAnalytics`, `gamification`, `showConsumptionTab`) +
-///   `loyaltyCards`. Opt-in extras (`hapticEcoCoach`, `glideCoach`,
-///   `gpsTripPath`, `tankSync`, `baselineSync`, `unifiedSearchResults`)
-///   stay off — Full does NOT mean "every flag on", it means "every
-///   flag on the canonical Full path".
+/// Bundle composition (revised post-#1517):
+///
+/// **Basic** — search / discovery + cross-device sync
+/// - Visibility + discovery: `showFuel`, `showElectric`, `priceAlerts`,
+///   `priceHistory`, `routePlanning`, `evCharging`
+/// - Cross-device sync: `tankSync`, `baselineSync`
+///   (baseline driving-stat sync requires `tankSync` per the manifest
+///   `requires:` edge; both go in together so the requires graph stays
+///   satisfied)
+///
+/// **Medium** — Basic + manual fill-up logging
+/// - All Basic features
+/// - `manualConsumption` — fuel fill-ups + EV charging logged by hand
+///
+/// Trajets / OBD2 stay off on Medium; the Trajets tab self-hides via
+/// the `obd2TripRecording` gate (#conso-coherence).
+///
+/// **Full** — Medium + OBD2 + ergonomics
+/// - All Medium features
+/// - OBD2 stack: `obd2TripRecording`, `autoRecord`,
+///   `consumptionAnalytics`, `gamification`, `showConsumptionTab`,
+///   `loyaltyCards`
+/// - Ergonomics opt-ins: `hapticEcoCoach`, `glideCoach`, `gpsTripPath`
+///   (all three `requires: {obd2TripRecording}` per the manifest)
+///
+/// Off in **every** preset (user opts in individually):
+/// - `unifiedSearchResults` (single fuel + EV list — opinionated UX,
+///   not the default)
+/// - `tflitePricePrediction` (model artifact still off-band; #1543)
 const Map<AppProfile, Set<Feature>> appProfileBundles = {
   AppProfile.basic: {
     Feature.showFuel,
@@ -68,6 +84,8 @@ const Map<AppProfile, Set<Feature>> appProfileBundles = {
     Feature.priceHistory,
     Feature.routePlanning,
     Feature.evCharging,
+    Feature.tankSync,
+    Feature.baselineSync,
   },
   AppProfile.medium: {
     Feature.showFuel,
@@ -76,6 +94,8 @@ const Map<AppProfile, Set<Feature>> appProfileBundles = {
     Feature.priceHistory,
     Feature.routePlanning,
     Feature.evCharging,
+    Feature.tankSync,
+    Feature.baselineSync,
     Feature.manualConsumption,
   },
   AppProfile.full: {
@@ -85,6 +105,8 @@ const Map<AppProfile, Set<Feature>> appProfileBundles = {
     Feature.priceHistory,
     Feature.routePlanning,
     Feature.evCharging,
+    Feature.tankSync,
+    Feature.baselineSync,
     Feature.manualConsumption,
     Feature.loyaltyCards,
     Feature.obd2TripRecording,
@@ -92,6 +114,9 @@ const Map<AppProfile, Set<Feature>> appProfileBundles = {
     Feature.consumptionAnalytics,
     Feature.gamification,
     Feature.showConsumptionTab,
+    Feature.hapticEcoCoach,
+    Feature.glideCoach,
+    Feature.gpsTripPath,
   },
   // The custom sentinel has no bundle — the user's flag set is
   // whatever they last persisted, and re-selecting `custom` from the

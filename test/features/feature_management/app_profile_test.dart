@@ -7,7 +7,8 @@ import 'package:tankstellen/features/feature_management/domain/feature.dart';
 /// drives both the wizard's first page and the Settings selector.
 void main() {
   group('appProfileBundles', () {
-    test('basic only includes the price/discovery flags', () {
+    test('basic includes the price / discovery flags + sync foundation',
+        () {
       final basic = appProfileBundles[AppProfile.basic]!;
       expect(basic, contains(Feature.showFuel));
       expect(basic, contains(Feature.showElectric));
@@ -15,6 +16,11 @@ void main() {
       expect(basic, contains(Feature.priceHistory));
       expect(basic, contains(Feature.routePlanning));
       expect(basic, contains(Feature.evCharging));
+      // Cross-device sync is part of every preset, including Basic —
+      // users running search-only workflows still benefit from
+      // favorites + price-history sync across phones.
+      expect(basic, contains(Feature.tankSync));
+      expect(basic, contains(Feature.baselineSync));
       // Basic must NOT include the consumption / OBD2 / loyalty stack.
       expect(basic, isNot(contains(Feature.manualConsumption)));
       expect(basic, isNot(contains(Feature.obd2TripRecording)));
@@ -41,27 +47,29 @@ void main() {
       expect(medium, isNot(contains(Feature.loyaltyCards)));
     });
 
-    test('full includes the OBD2 stack and loyalty on top of medium', () {
+    test('full includes the OBD2 stack + loyalty + ergonomic opt-ins '
+        'on top of medium', () {
       final medium = appProfileBundles[AppProfile.medium]!;
       final full = appProfileBundles[AppProfile.full]!;
       for (final f in medium) {
         expect(full, contains(f),
             reason: 'full must include every medium flag');
       }
-      // Full adds OBD2 + loyalty.
+      // Full adds OBD2 + loyalty + ergonomic opt-ins.
       expect(full, contains(Feature.obd2TripRecording));
       expect(full, contains(Feature.autoRecord));
       expect(full, contains(Feature.gamification));
       expect(full, contains(Feature.consumptionAnalytics));
       expect(full, contains(Feature.showConsumptionTab));
       expect(full, contains(Feature.loyaltyCards));
-      // Full does NOT mean "every flag on" — opt-in extras stay off.
-      expect(full, isNot(contains(Feature.hapticEcoCoach)));
-      expect(full, isNot(contains(Feature.glideCoach)));
-      expect(full, isNot(contains(Feature.gpsTripPath)));
-      expect(full, isNot(contains(Feature.tankSync)));
-      expect(full, isNot(contains(Feature.baselineSync)));
+      expect(full, contains(Feature.hapticEcoCoach));
+      expect(full, contains(Feature.glideCoach));
+      expect(full, contains(Feature.gpsTripPath));
+      // Full does NOT mean "every flag on" — `unifiedSearchResults`
+      // and `tflitePricePrediction` stay off until the user opts in
+      // (opinionated UX + off-band model artifact respectively).
       expect(full, isNot(contains(Feature.unifiedSearchResults)));
+      expect(full, isNot(contains(Feature.tflitePricePrediction)));
     });
 
     test('custom has an empty bundle (it is a sentinel, not a preset)', () {
@@ -102,7 +110,10 @@ void main() {
         () {
       final flags = {
         ...appProfileBundles[AppProfile.basic]!,
-        Feature.tankSync, // Not in any preset bundle.
+        // `unifiedSearchResults` is in NO preset bundle (opinionated
+        // UX kept off by default) — adding it to Basic drifts the
+        // user off the canonical Basic flag set.
+        Feature.unifiedSearchResults,
       };
       expect(detectProfileFromFlags(flags), AppProfile.custom);
     });
@@ -120,8 +131,10 @@ void main() {
     test('returns custom for a flag set that is a strict superset of full', () {
       final flags = {
         ...appProfileBundles[AppProfile.full]!,
-        Feature.tankSync,
-        Feature.glideCoach,
+        // Neither of these lands in any preset bundle, so adding them
+        // to Full drifts the user off the canonical Full flag set.
+        Feature.unifiedSearchResults,
+        Feature.tflitePricePrediction,
       };
       expect(detectProfileFromFlags(flags), AppProfile.custom);
     });
