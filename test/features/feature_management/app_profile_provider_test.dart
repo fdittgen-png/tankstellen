@@ -165,10 +165,13 @@ void main() {
       await c
           .read(activeAppProfileProvider.notifier)
           .select(AppProfile.medium);
-      // User toggles tankSync — not in any preset bundle.
+      // User toggles a flag that is NOT in any preset bundle —
+      // `unifiedSearchResults` is the canonical off-bundle flag,
+      // kept off by every preset and reserved for explicit user
+      // opt-in.
       final next = {
         ...appProfileBundles[AppProfile.medium]!,
-        Feature.tankSync,
+        Feature.unifiedSearchResults,
       };
       await c
           .read(activeAppProfileProvider.notifier)
