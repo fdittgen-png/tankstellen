@@ -131,4 +131,4 @@ final class GlideCoachEvaluatorProvider
 }
 
 String _$glideCoachEvaluatorHash() =>
-    r'ef913767ef8e86320dc9ffc4b4beadfb6cfa69a6';
+    r'e77d3eafbc0e1793f0e46d91190f16a08f24f140';

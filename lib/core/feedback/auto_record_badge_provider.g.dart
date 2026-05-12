@@ -140,7 +140,7 @@ final class AutoRecordBadgeCountProvider
 }
 
 String _$autoRecordBadgeCountHash() =>
-    r'c5a24468db696e7f608480933646d490dcb5e09f';
+    r'39468b537fc93b32e48f2fbb4a8a9273a9621fc3';
 
 /// Reactive counter mirroring [AutoRecordBadgeService.count] for UI
 /// consumers (#1004 phase 6). The service writes to
