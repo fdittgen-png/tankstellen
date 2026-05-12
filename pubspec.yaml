@@ -62,7 +62,7 @@ dependencies:
   # ^7.1.x once GitHub's macos-* runner image ships Xcode 26+ with the iOS
   # 26 SDK (or once connectivity_plus moves the iOS 26 path behind a Swift
   # `#if canImport(...)` / compiler-version gate).
-  connectivity_plus: '>=7.0.0 <7.1.0'
+  connectivity_plus: ^7.1.1
   shared_preferences: ^2.5.5
   url_launcher: ^6.3.1
   http: ^1.3.0
@@ -70,9 +70,9 @@ dependencies:
   flutter_blue_plus: ^1.35.5
   async: ^2.11.0
   permission_handler: ^12.0.0+1
-  flutter_secure_storage: ^10.0.0
+  flutter_secure_storage: ^10.2.0
   package_info_plus: ^8.3.1
-  sentry_flutter: ^9.19.0
+  sentry_flutter: ^9.20.0
   home_widget: ^0.9.1
   workmanager: ^0.9.0
   shimmer: ^3.0.0
@@ -80,7 +80,7 @@ dependencies:
   flutter_local_notifications: ^21.0.0
   supabase_flutter: ^2.12.4
   wakelock_plus: ^1.2.8
-  app_badge_plus: ^1.2.9
+  app_badge_plus: ^1.2.10
   archive: ^4.0.9
 
   # On-device ML inference (#1117 phase 2 — price prediction).
