@@ -151,7 +151,15 @@ jobs:
       # file, then export the three env vars gradle's resolveReleaseSigning()
       # helper reads. The keystore file is written to a runner-local path
       # outside the checkout so it never ends up in an artifact.
+      #
+      # Dependabot-triggered runs cannot read repository secrets per
+      # GitHub's "no secrets to bot actors" policy. On those PRs we skip
+      # signing entirely and fall back to a debug build below — still
+      # validates that the deps Dependabot bumped actually compile + link,
+      # without the keystore-decode step exiting non-zero. Regular PRs
+      # and pushes to master use the existing signed-release path.
       - name: Decode signing keystore
+        if: github.actor != 'dependabot[bot]'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -171,17 +179,28 @@ jobs:
           echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
           echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS" >> "$GITHUB_ENV"
       - name: Build APK (split per ABI)
+        if: github.actor != 'dependabot[bot]'
         run: flutter build apk --release --split-per-abi --flavor play
       - name: Build App Bundle
+        if: github.actor != 'dependabot[bot]'
         run: flutter build appbundle --release --flavor play
+      # Dependabot smoke build — unsigned debug APK. Confirms the bumped
+      # dependencies still compile + link end-to-end without needing the
+      # release keystore. Branch protection is satisfied because the job
+      # as a whole still completes successfully.
+      - name: Build APK (debug, Dependabot smoke)
+        if: github.actor == 'dependabot[bot]'
+        run: flutter build apk --debug --flavor play
       - name: Clean up decoded keystore
         if: always()
         run: rm -f "$RUNNER_TEMP/tankstellen-release.jks"
       - uses: actions/upload-artifact@v7
+        if: github.actor != 'dependabot[bot]'
         with:
           name: android-apk
           path: build/app/outputs/flutter-apk/app-*-play-release.apk
       - uses: actions/upload-artifact@v7
+        if: github.actor != 'dependabot[bot]'
         with:
           name: android-aab
           path: build/app/outputs/bundle/playRelease/app-play-release.aab
