@@ -4730,6 +4730,22 @@ class AppLocalizationsHr extends AppLocalizations {
   String get vehicleDetectedFromVinApply => 'Apply';
 
   @override
+  String waitTimeHint(int minutes) {
+    return '~$minutes min wait';
+  }
+
+  @override
+  String get waitTimeTrackStart => 'Track my wait';
+
+  @override
+  String get waitTimeTrackEnd => 'I\'m leaving';
+
+  @override
+  String waitTimeElapsedShort(int minutes) {
+    return '$minutes min so far';
+  }
+
+  @override
   String get widgetVariantDefault => 'Current price only';
 
   @override

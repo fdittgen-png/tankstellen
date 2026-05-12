@@ -8624,6 +8624,30 @@ abstract class AppLocalizations {
   /// **'Apply'**
   String get vehicleDetectedFromVinApply;
 
+  /// Aggregate wait-time hint shown above the 'Track my wait' toggle on the station-detail screen (#1119 phase 2). Sourced from the `wait_time_aggregates` table; only renders when the most recent hour bucket has at least 5 paired pings.
+  ///
+  /// In en, this message translates to:
+  /// **'~{minutes} min wait'**
+  String waitTimeHint(int minutes);
+
+  /// Label for the 'Track my wait' tonal button on the station-detail screen (#1119 phase 2). Visible only when community-wait-time consent is ON. Tapping records an 'arrived' ping and switches the section into elapsed-time mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Track my wait'**
+  String get waitTimeTrackStart;
+
+  /// Label for the 'I'm leaving' tonal button shown on the station-detail screen while a wait-time session is in flight (#1119 phase 2). Tapping fires the matching 'left' ping so the server can pair it with the arrival.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'m leaving'**
+  String get waitTimeTrackEnd;
+
+  /// Live elapsed-time label rendered next to the 'I'm leaving' button on the station-detail screen while a wait-time session is in flight (#1119 phase 2). Updates every 30s.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min so far'**
+  String waitTimeElapsedShort(int minutes);
+
   /// Label for the default home-widget content variant — shows just the current pump price (#1121).
   ///
   /// In en, this message translates to:

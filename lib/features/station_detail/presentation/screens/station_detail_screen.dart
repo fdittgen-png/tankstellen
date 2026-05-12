@@ -17,6 +17,7 @@ import '../widgets/station_info_section.dart';
 import '../widgets/station_prices_section.dart';
 import '../widgets/station_rating_section.dart';
 import '../widgets/station_status_row.dart';
+import '../widgets/wait_time_section.dart';
 
 /// Detail screen for a single fuel station.
 ///
@@ -193,6 +194,12 @@ class _StationDetailLoaded extends StatelessWidget {
             sliver: SliverList(
               delegate: SliverChildListDelegate.fixed([
                 StationPricesSection(station: station),
+                const SizedBox(height: 16),
+                // #1119 phase 2 — community wait-time hint + "Track my wait"
+                // toggle. Hidden entirely when consent is OFF; renders the
+                // toggle alone when consent is ON but the aggregate row is
+                // still sparse (< 5 samples server-side).
+                WaitTimeSection(stationId: stationId),
                 const SizedBox(height: 16),
                 StationInfoSection(station: station, detail: detail),
                 const SizedBox(height: 16),

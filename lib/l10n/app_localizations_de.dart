@@ -4777,6 +4777,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get vehicleDetectedFromVinApply => 'Übernehmen';
 
   @override
+  String waitTimeHint(int minutes) {
+    return '~$minutes Min Wartezeit';
+  }
+
+  @override
+  String get waitTimeTrackStart => 'Meine Wartezeit verfolgen';
+
+  @override
+  String get waitTimeTrackEnd => 'Ich gehe gerade';
+
+  @override
+  String waitTimeElapsedShort(int minutes) {
+    return 'Bisher $minutes Min';
+  }
+
+  @override
   String get widgetVariantDefault => 'Nur aktueller Preis';
 
   @override

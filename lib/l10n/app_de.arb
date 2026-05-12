@@ -1884,6 +1884,10 @@
   "vehicleDetectedFromVinBadge": "(erkannt)",
   "vehicleDetectedFromVinSnackbar": "Aus VIN erkannt: {summary}. Übernehmen?",
   "vehicleDetectedFromVinApply": "Übernehmen",
+  "waitTimeHint": "~{minutes} Min Wartezeit",
+  "waitTimeTrackStart": "Meine Wartezeit verfolgen",
+  "waitTimeTrackEnd": "Ich gehe gerade",
+  "waitTimeElapsedShort": "Bisher {minutes} Min",
   "widgetVariantDefault": "Nur aktueller Preis",
   "widgetVariantPredictive": "Prognose: bester Tankzeitpunkt",
   "widgetPredictiveNowPrefix": "jetzt"
