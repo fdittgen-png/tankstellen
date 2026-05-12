@@ -159,7 +159,7 @@ jobs:
         run: rm -f "$ANDROID_KEYSTORE_PATH"
 
       - name: Upload Android artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: android-release
           path: |
@@ -234,7 +234,7 @@ jobs:
       - name: Set up SSH agent with match deploy key
         # Match repo is fetched via SSH using a deploy key stored as
         # MATCH_DEPLOY_KEY (read-only, scoped to the certs repo).
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.MATCH_DEPLOY_KEY }}
 
@@ -264,7 +264,7 @@ jobs:
         run: rm -f "$ASC_API_KEY_FILEPATH"
 
       - name: Upload iOS artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ios-release
           path: |
@@ -285,13 +285,13 @@ jobs:
           fetch-depth: 0
 
       - name: Download Android artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: android-release
           path: artifacts/android
 
       - name: Download iOS artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: ios-release
           path: artifacts/ios
