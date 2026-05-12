@@ -103,7 +103,7 @@ jobs:
         # auth was tried first but GitHub's fine-grained PAT scope kept
         # rejecting clone requests with 403; deploy keys bypass the PAT
         # scoping entirely and are read-only by design (#1498).
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.MATCH_DEPLOY_KEY }}
 
