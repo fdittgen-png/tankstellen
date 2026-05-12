@@ -6,10 +6,19 @@ import 'package:tankstellen/features/consumption/presentation/screens/consumptio
 import 'package:tankstellen/features/consumption/providers/charging_logs_provider.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
+
+/// Enables `Feature.obd2TripRecording` — Trajets tab is gated on it
+/// (#conso-coherence) and this test asserts all three icons render.
+class _ObdEnabledFlags extends FeatureFlags {
+  @override
+  Set<Feature> build() => <Feature>{Feature.obd2TripRecording};
+}
 
 /// #1163 — counterpart to `favorites_screen_tab_icons_test.dart`.
 /// Lock that the Conso sub-tabs keep their icon-above-label rendering.
@@ -97,6 +106,7 @@ void main() {
               .overrideWith(() => _FixedActiveVehicle(_evVehicle)),
           vehicleProfileListProvider
               .overrideWith(() => _FixedVehicleProfileList(const [_evVehicle])),
+          featureFlagsProvider.overrideWith(() => _ObdEnabledFlags()),
         ],
       );
 

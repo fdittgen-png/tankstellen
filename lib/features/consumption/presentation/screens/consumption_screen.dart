@@ -8,6 +8,9 @@ import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/tab_switcher.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../feature_management/application/feature_flags_provider.dart';
+import '../../../feature_management/domain/feature.dart';
+import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/exporters/backup/full_backup_exporter.dart';
@@ -71,10 +74,11 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
   }
 
   void _ensureTabController({
+    required bool showTrajets,
     required bool showCharging,
     int? preferredIndex,
   }) {
-    final newLength = showCharging ? 3 : 2;
+    final newLength = 1 + (showTrajets ? 1 : 0) + (showCharging ? 1 : 0);
     final previous = _tabController;
     if (previous != null && previous.length == newLength) {
       return;
@@ -82,16 +86,11 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
 
     // Clamp the previous index into the new controller's range so we
     // don't strand the user on a now-missing tab. When the Charging
-    // tab vanishes while the user is on it, fall back to Trajets
-    // (index 1) rather than Fuel — it's the closest neighbour in the
+    // tab vanishes while the user is on it, fall back to Trajets when
+    // it's visible or Fuel otherwise — closest neighbour in the
     // mental model of "what I was just looking at".
     final oldIndex = preferredIndex ?? previous?.index ?? 0;
-    final int initialIndex;
-    if (!showCharging && oldIndex >= newLength) {
-      initialIndex = 1; // Trajets
-    } else {
-      initialIndex = oldIndex.clamp(0, newLength - 1);
-    }
+    final initialIndex = oldIndex.clamp(0, newLength - 1);
 
     final controller = TabController(
       length: newLength,
@@ -164,12 +163,28 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     final stats = ref.watch(consumptionStatsProvider);
     final activeVehicle = ref.watch(activeVehicleProfileProvider);
     final showCharging = _shouldShowCharging(activeVehicle);
+    // Trajets tab is gated on the OBD2 trip-recording feature — users
+    // who haven't enabled OBD2 capture have no trips to render and the
+    // empty tab was confusing. The flag is read via the manifest's
+    // effective-enabled walk so a disabled prerequisite (e.g.
+    // priceHistory, future deps) cascades through.
+    final manifest = ref.watch(featureManifestProvider);
+    final enabledFlags = ref.watch(featureFlagsProvider);
+    final showTrajets = isEffectivelyEnabled(
+      Feature.obd2TripRecording,
+      manifest,
+      enabledFlags,
+    );
     // Recreate the TabController when the tab-set cardinality
-    // changes (#892). Doing this in build — rather than in initState
-    // — lets us react to live vehicle switches without a ref.listen
-    // round-trip, and keeps the controller's length always consistent
-    // with the rendered Tab list (length mismatch throws at runtime).
-    _ensureTabController(showCharging: showCharging);
+    // changes (#892, #conso-coherence). Doing this in build — rather
+    // than in initState — lets us react to live vehicle switches /
+    // feature-flag toggles without a ref.listen round-trip, and
+    // keeps the controller's length always consistent with the
+    // rendered Tab list (length mismatch throws at runtime).
+    _ensureTabController(
+      showTrajets: showTrajets,
+      showCharging: showCharging,
+    );
     final tabController = _tabController!;
     final l = AppLocalizations.of(context);
 
@@ -195,15 +210,20 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
       ref.read(lastVeLearnResultProvider.notifier).set(null);
     });
 
-    // #889 — tabs are 0 Fuel, 1 Trajets, and (ICE vehicles excepted
-    // per #892) 2 Charging. The FAB rebinds per-tab: Fuel ->
-    // pick-station sheet, Trajets hides the FAB (the "Start
-    // recording" CTA lives inside the tab header), Charging -> Add
-    // charging log sheet.
+    // Tab indices shift based on which optional tabs are present:
+    //   Fuel is always slot 0.
+    //   Trajets sits at slot 1 when `showTrajets` is true.
+    //   Charging sits at the next slot after that (slot 1 when
+    //   Trajets is hidden; slot 2 when Trajets is shown).
+    // The FAB rebinds per-tab: Fuel → pick-station sheet, Trajets
+    // hides the FAB (the "Start recording" CTA lives in the tab
+    // header), Charging → Add charging log sheet.
+    final trajetsIndex = showTrajets ? 1 : -1;
+    final chargingIndex = showCharging ? (showTrajets ? 2 : 1) : -1;
     final tabIndex = tabController.index;
     final isFuelTab = tabIndex == 0;
-    final isTrajetsTab = tabIndex == 1;
-    final isChargingTab = showCharging && tabIndex == 2;
+    final isTrajetsTab = trajetsIndex >= 0 && tabIndex == trajetsIndex;
+    final isChargingTab = chargingIndex >= 0 && tabIndex == chargingIndex;
 
     return PageScaffold(
       title: l?.consumptionLogTitle ?? 'Fuel consumption',
@@ -265,10 +285,15 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
                 label: l?.consumptionTabFuel ?? 'Fuel',
                 icon: Icons.local_gas_station_outlined,
               ),
-              TabSwitcherEntry(
-                label: l?.trajetsTabLabel ?? 'Trips',
-                icon: Icons.route_outlined,
-              ),
+              // Trajets tab is hidden when `Feature.obd2TripRecording`
+              // is off — users who haven't enabled OBD2 capture have
+              // no trips to render and the empty tab confused Medium
+              // use-mode users.
+              if (showTrajets)
+                TabSwitcherEntry(
+                  label: l?.trajetsTabLabel ?? 'Trips',
+                  icon: Icons.route_outlined,
+                ),
               // #892 — Charging tab is hidden when the active vehicle
               // is a pure combustion engine. Hybrid and EV profiles
               // still see it; the no-vehicle case keeps the tab (a
@@ -285,7 +310,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
               controller: tabController,
               children: [
                 FuelTab(fillUps: fillUps, stats: stats, l: l),
-                TrajetsTab(vehicleId: activeVehicle?.id),
+                if (showTrajets) TrajetsTab(vehicleId: activeVehicle?.id),
                 // Charging view is only mounted when the active vehicle
                 // can actually charge — hiding it for ICE profiles (#892)
                 // removes a dead-end tap for combustion-only users without

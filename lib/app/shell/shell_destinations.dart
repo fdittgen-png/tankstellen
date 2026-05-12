@@ -13,8 +13,9 @@ const int kConsumptionBranchIndex = 3;
 ///
 /// [items] is the list the bottom-bar / rail should iterate over.
 /// [branchForSlot] maps each visible slot back to its router-branch
-/// index — when Conso is hidden (#893), Settings still routes to
-/// branch 4 even though it sits at display-slot 3.
+/// index. The list is kept stable across renders so destinations
+/// don't reorder — every slot index always points at the same
+/// router branch.
 class ShellDestinations {
   final List<ShellNavItem> items;
   final List<int> branchForSlot;
@@ -25,18 +26,26 @@ class ShellDestinations {
   });
 }
 
-/// Build the canonical 5-item nav list, then strip the Conso slot
-/// when no vehicle is configured. Pure function — no Flutter state,
-/// no Riverpod — the shell decides _when_ to call it (every build)
-/// and what `hasVehicle` evaluates to.
+/// Build the canonical 5-item nav list.
+///
+/// History: #893 hid the Conso slot when no vehicle was configured.
+/// That created a catch-22 for the Medium use-mode profile (#1517) —
+/// the user couldn't reach the consumption screen to add their first
+/// fill-up + vehicle because the tab was hidden until a vehicle
+/// existed. The gate was removed so the Conso tab is always visible;
+/// the empty-state inside the consumption screen owns the "no vehicle
+/// yet" affordance now.
+///
+/// Pure function — no Flutter state, no Riverpod — kept lean so the
+/// shell can re-resolve on every build without paying provider-read
+/// overhead.
 ShellDestinations resolveShellDestinations({
   required AppLocalizations? l10n,
-  required bool hasVehicle,
 }) {
   // Kept in router-branch order so the index handed to
-  // `navigationShell.goBranch()` still lines up: Search=0, Map=1,
+  // `navigationShell.goBranch()` lines up directly: Search=0, Map=1,
   // Favorites=2, Consumption=3, Settings=4.
-  final allDestinations = <ShellNavItem>[
+  final destinations = <ShellNavItem>[
     ShellNavItem(
       Icons.search_outlined,
       Icons.search,
@@ -60,18 +69,8 @@ ShellDestinations resolveShellDestinations({
     ),
   ];
 
-  // Visible items + the router-branch index each one maps to. When
-  // Conso is hidden, Settings still routes to branch 4 even though
-  // it renders at display-slot 3.
-  final visibleDestinations = <ShellNavItem>[];
-  final branchForSlot = <int>[];
-  for (var i = 0; i < allDestinations.length; i++) {
-    if (i == kConsumptionBranchIndex && !hasVehicle) continue;
-    visibleDestinations.add(allDestinations[i]);
-    branchForSlot.add(i);
-  }
   return ShellDestinations(
-    items: visibleDestinations,
-    branchForSlot: branchForSlot,
+    items: destinations,
+    branchForSlot: List<int>.generate(destinations.length, (i) => i),
   );
 }
