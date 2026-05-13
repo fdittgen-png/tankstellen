@@ -258,13 +258,10 @@ void main() {
 
       // My vehicles + Fuel club cards must NOT appear at the top
       // level — they were folded into the Consumption section.
-      expect(
-        observedTitles.contains('My vehicles'),
-        isFalse,
-        reason: 'My vehicles tile moved INSIDE the Consumption '
-            'foldable; it must not render as a top-level entry too '
-            '(would be a duplicate).',
-      );
+      // #1568 reversed this for "My vehicles" only: it's now a
+      // top-level Settings entry so Medium-tier users can reach
+      // vehicle config without first expanding the Conso foldable.
+      // Fuel club cards stays inside.
       expect(
         observedTitles.contains('Fuel club cards'),
         isFalse,
@@ -323,38 +320,31 @@ void main() {
             'so users correlate the Settings group with the bottom-nav tab.',
       );
 
-      // Foldable starts collapsed — child tiles should not be in the
-      // tree yet.
+      // #1568 — My vehicles is a top-level Settings entry, visible
+      // even while the Conso foldable is collapsed.
       expect(
-        find.byKey(const Key('consoleVehiclesTile')),
-        findsNothing,
-        reason: 'Consumption foldable must start collapsed; vehicle '
-            'tile should only mount after the user expands it.',
+        find.byKey(const Key('settingsRootVehiclesTile')),
+        findsOneWidget,
+        reason: 'My vehicles tile must be reachable at Settings root '
+            'without expanding the Conso foldable (#1568).',
       );
 
-      // Expand the foldable.
+      // Expand the foldable to verify the remaining toggles still
+      // render inside.
       await tester.tap(consumptionHeader);
       await tester.pumpAndSettle();
 
-      // Now both moved tiles should be present, plus the existing
-      // eco-coaching toggle.
-      expect(
-        find.byKey(const Key('consoleVehiclesTile')),
-        findsOneWidget,
-        reason: 'My vehicles tile must live inside the expanded '
-            'Consumption foldable (was at top level before #1242).',
-      );
       expect(
         find.byKey(const Key('consoleFuelClubCardsTile')),
         findsOneWidget,
-        reason: 'Fuel club cards tile must live inside the expanded '
+        reason: 'Fuel club cards tile lives inside the expanded '
             'Consumption foldable (was at top level before #1242).',
       );
       expect(
         find.byKey(const Key('hapticEcoCoachToggle')),
         findsOneWidget,
         reason: 'The eco-coach haptic toggle remains in the same '
-            'group, now grouped with vehicles + fuel club cards.',
+            'group, alongside the fuel-club tile.',
       );
     });
 

@@ -97,6 +97,11 @@ const Map<AppProfile, Set<Feature>> appProfileBundles = {
     Feature.tankSync,
     Feature.baselineSync,
     Feature.manualConsumption,
+    // #1568 — without this the `isConsumptionTabReachable` gate
+    // short-circuits to false and the Conso settings section vanishes,
+    // leaving Medium users no path to configure a vehicle for the
+    // manual fill-up flow they just opted into.
+    Feature.showConsumptionTab,
   },
   AppProfile.full: {
     Feature.showFuel,

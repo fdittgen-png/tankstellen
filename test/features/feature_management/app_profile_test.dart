@@ -29,7 +29,7 @@ void main() {
       expect(basic, isNot(contains(Feature.consumptionAnalytics)));
     });
 
-    test('medium adds manualConsumption to basic, no OBD2 stack', () {
+    test('medium adds manualConsumption + showConsumptionTab to basic, no OBD2 stack', () {
       final basic = appProfileBundles[AppProfile.basic]!;
       final medium = appProfileBundles[AppProfile.medium]!;
       // Medium is a superset of Basic.
@@ -37,8 +37,12 @@ void main() {
         expect(medium, contains(f),
             reason: 'medium must include every basic flag');
       }
-      // Medium adds manualConsumption.
+      // Medium adds manualConsumption + the surface flag for the Conso
+      // settings section (#1568 — without showConsumptionTab the
+      // isConsumptionTabReachable gate short-circuits and Medium users
+      // can't reach the vehicle-add affordance).
       expect(medium, contains(Feature.manualConsumption));
+      expect(medium, contains(Feature.showConsumptionTab));
       // Medium STILL excludes the OBD2 stack — that is the Full tier.
       expect(medium, isNot(contains(Feature.obd2TripRecording)));
       expect(medium, isNot(contains(Feature.autoRecord)));

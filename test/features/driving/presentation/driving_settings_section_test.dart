@@ -144,11 +144,15 @@ void main() {
         ],
       );
 
-      // Both moved-in tiles must render with their canonical keys.
+      // #1568 — My vehicles tile was promoted back to Settings root so
+      // Medium-tier users can reach vehicle config without expanding
+      // the Conso foldable. The fuel-club tile remains the only menu
+      // tile inside this section.
       expect(
         find.byKey(const Key('consoleVehiclesTile')),
-        findsOneWidget,
-        reason: 'My vehicles tile is part of the Consumption group.',
+        findsNothing,
+        reason: 'My vehicles tile must NOT be inside DrivingSettingsSection '
+            'after #1568 — it lives at Settings root now.',
       );
       expect(
         find.byKey(const Key('consoleFuelClubCardsTile')),
@@ -156,8 +160,6 @@ void main() {
         reason: 'Fuel club cards tile is part of the Consumption group.',
       );
 
-      // The eco-coach toggle is the third element, after the two
-      // menu tiles.
       final children = <Widget>[
         for (final t in tester
             .widgetList<SettingsMenuTile>(find.byType(SettingsMenuTile)))
@@ -165,10 +167,9 @@ void main() {
       ];
       expect(
         children.length,
-        2,
-        reason: 'Exactly two SettingsMenuTile children: vehicles + fuel '
-            'club. Adding more would risk drift between this section '
-            'and the Conso-tab landing screen.',
+        1,
+        reason: 'Exactly one SettingsMenuTile child: fuel club cards. '
+            'My vehicles was promoted to Settings root in #1568.',
       );
     },
   );
