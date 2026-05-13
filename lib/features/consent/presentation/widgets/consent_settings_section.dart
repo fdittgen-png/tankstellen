@@ -165,12 +165,14 @@ class _ConsentSettingsSectionState
         SwitchListTile(
           key: const Key('consentSyncTripsToggle'),
           secondary: const Icon(Icons.route_outlined, size: 20),
-          title: const Text('Sync trip recordings'),
+          title: Text(l10n?.consentSyncTripsTitle ?? 'Sync trip recordings'),
           subtitle: Text(
             consent.cloudSync
-                ? 'Back up OBD2 + GPS trips to TankSync. '
-                    'Cross-device, opt-in.'
-                : 'Enable Cloud Sync above to back up trips.',
+                ? (l10n?.consentSyncTripsSubtitle ??
+                    'Back up OBD2 + GPS trips to TankSync. '
+                        'Cross-device, opt-in.')
+                : (l10n?.consentSyncTripsDisabledHint ??
+                    'Enable Cloud Sync above to back up trips.'),
             style: theme.textTheme.bodySmall,
             maxLines: collapsedMaxLines(),
             overflow: collapsedOverflow(),
@@ -202,8 +204,9 @@ class _ConsentSettingsSectionState
               size: 18,
             ),
             label: Text(
-              // English-only inline; ARB strings to follow.
-              _expanded ? 'Hide details' : 'Show details',
+              _expanded
+                  ? (l10n?.consentHideDetails ?? 'Hide details')
+                  : (l10n?.consentShowDetails ?? 'Show details'),
             ),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),

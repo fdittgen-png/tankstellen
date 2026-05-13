@@ -4114,6 +4114,154 @@ class AppLocalizationsDe extends AppLocalizations {
       'Locker vom Pedal — Ausrollen spart mehr';
 
   @override
+  String get anonKeyLabel => 'Anon Key';
+
+  @override
+  String get anonKeyHideTooltip => 'Schlüssel verbergen';
+
+  @override
+  String get anonKeyShowTooltip => 'Schlüssel zur Prüfung anzeigen';
+
+  @override
+  String anonKeyTooLong(int length) {
+    return 'Schlüssel ist zu lang ($length Zeichen) — auf Zusätze prüfen';
+  }
+
+  @override
+  String anonKeyLooksCorrect(int length) {
+    return 'Schlüssel sieht korrekt aus ($length Zeichen)';
+  }
+
+  @override
+  String get anonKeyShouldBeJwt =>
+      'Schlüssel sollte ein JWT sein (header.payload.signature)';
+
+  @override
+  String anonKeyMayBeTruncated(int length) {
+    return 'Schlüssel ist eventuell abgeschnitten ($length von ~208 erwarteten Zeichen)';
+  }
+
+  @override
+  String get anonKeyExceedsMax => 'Schlüssel überschreitet die Maximallänge';
+
+  @override
+  String get qrShareTitle => 'Datenbank teilen';
+
+  @override
+  String get qrShareSubtitle =>
+      'Andere können diesen QR-Code zum Verbinden scannen';
+
+  @override
+  String get qrShareCopyAsText => 'Als Text kopieren';
+
+  @override
+  String get authInfoTitle => 'Warum ein Konto anlegen?';
+
+  @override
+  String get authInfoBenefit1 =>
+      '• Favoriten, Alarme und Routen geräteübergreifend synchronisieren';
+
+  @override
+  String get authInfoBenefit2 => '• Route am Handy planen, im Auto nutzen';
+
+  @override
+  String get authInfoBenefit3 => '• Keine Daten an Dritte weitergegeben';
+
+  @override
+  String get authInfoBenefit4 => '• Konto jederzeit löschbar';
+
+  @override
+  String get privacyLocalDataEmpty =>
+      'Noch nichts gespeichert. Fügen Sie einen Favoriten hinzu oder richten Sie einen Preisalarm ein, um Einträge zu sehen.';
+
+  @override
+  String get privacyHideEmptyRows => 'Leere Zeilen ausblenden';
+
+  @override
+  String privacyShowEmptyRows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count leere Zeilen anzeigen',
+      one: '$count leere Zeile anzeigen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get apiKeySetupTitle => 'API-Schlüssel einrichten (optional)';
+
+  @override
+  String get apiKeySetupDescription =>
+      'Registrieren Sie sich für einen kostenlosen API-Schlüssel oder erkunden Sie die App mit Demo-Daten.';
+
+  @override
+  String apiKeyRegistrationButton(String provider) {
+    return '$provider Registrierung';
+  }
+
+  @override
+  String apiKeyTerms(String provider) {
+    return 'Mit Eingabe eines API-Schlüssels akzeptieren Sie die Nutzungsbedingungen von $provider. Datenweitergabe ist untersagt.';
+  }
+
+  @override
+  String get calculatorDistanceHint => 'z. B. 150';
+
+  @override
+  String get calculatorConsumptionHint => 'z. B. 7,0';
+
+  @override
+  String get calculatorPriceHint => 'z. B. 1,899';
+
+  @override
+  String get routeStrategyLabel => 'Strategie:';
+
+  @override
+  String get routeStrategyUniform => 'Gleichmäßig';
+
+  @override
+  String get routeStrategyBalanced => 'Ausgewogen';
+
+  @override
+  String get glideCoachBetaTitle => 'Glide-Coach Beta (experimentell)';
+
+  @override
+  String get glideCoachBetaSubtitle =>
+      'Sanftes Haptik-Signal beim Verzögern vor einer roten Ampel. Standardmäßig aus — Ablenkungsrisiko.';
+
+  @override
+  String get consentSyncTripsTitle => 'Fahrtaufzeichnungen synchronisieren';
+
+  @override
+  String get consentSyncTripsSubtitle =>
+      'OBD2- und GPS-Fahrten in TankSync sichern. Geräteübergreifend, opt-in.';
+
+  @override
+  String get consentSyncTripsDisabledHint =>
+      'Cloud-Sync oben aktivieren, um Fahrten zu sichern.';
+
+  @override
+  String get consentHideDetails => 'Details ausblenden';
+
+  @override
+  String get consentShowDetails => 'Details anzeigen';
+
+  @override
+  String get dialogOk => 'OK';
+
+  @override
+  String get invalidLinkTitle => 'Ungültiger Link';
+
+  @override
+  String invalidLinkBody(String path) {
+    return 'Der Link \"$path\" ist ungültig.';
+  }
+
+  @override
+  String get home => 'Startseite';
+
+  @override
   String get loyaltySettingsTitle => 'Tankstellen-Kundenkarten';
 
   @override

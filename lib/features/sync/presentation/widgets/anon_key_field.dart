@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 /// Text field for entering a Supabase anon key with:
 /// - Visibility toggle to verify the full key was pasted
 /// - Character count with color (green=correct, orange=truncated)
@@ -25,6 +27,7 @@ class AnonKeyField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final keyLen = controller.text.length;
     final isComplete = keyLen >= minExpectedKeyLength;
     final isTooLong = keyLen > maxKeyLength;
@@ -34,23 +37,27 @@ class AnonKeyField extends StatelessWidget {
     Color helperColor = Colors.orange;
     if (keyLen > 0) {
       if (isTooLong) {
-        helperText = 'Key is too long ($keyLen chars) — check for extra text';
+        helperText = l?.anonKeyTooLong(keyLen) ??
+            'Key is too long ($keyLen chars) — check for extra text';
         helperColor = Colors.red;
       } else if (isComplete && isJwtFormat) {
-        helperText = 'Key looks correct ($keyLen chars)';
+        helperText = l?.anonKeyLooksCorrect(keyLen) ??
+            'Key looks correct ($keyLen chars)';
         helperColor = Colors.green;
       } else if (!isJwtFormat && keyLen > 10) {
-        helperText = 'Key should be a JWT (header.payload.signature)';
+        helperText = l?.anonKeyShouldBeJwt ??
+            'Key should be a JWT (header.payload.signature)';
         helperColor = Colors.red;
       } else {
-        helperText = 'Key may be truncated ($keyLen of ~208 expected chars)';
+        helperText = l?.anonKeyMayBeTruncated(keyLen) ??
+            'Key may be truncated ($keyLen of ~208 expected chars)';
       }
     }
 
     return TextField(
       controller: controller,
       decoration: InputDecoration(
-        labelText: 'Anon Key',
+        labelText: l?.anonKeyLabel ?? 'Anon Key',
         hintText: 'eyJhbGciOiJIUzI1NiIs...',
         border: const OutlineInputBorder(),
         prefixIcon: const Icon(Icons.key),
@@ -68,14 +75,18 @@ class AnonKeyField extends StatelessWidget {
             IconButton(
               icon: Icon(showKey ? Icons.visibility_off : Icons.visibility, size: 20),
               onPressed: onToggleVisibility,
-              tooltip: showKey ? 'Hide key' : 'Show key to verify',
+              tooltip: showKey
+                  ? (l?.anonKeyHideTooltip ?? 'Hide key')
+                  : (l?.anonKeyShowTooltip ?? 'Show key to verify'),
             ),
           ],
         ),
         helperText: helperText,
         helperMaxLines: 2,
         helperStyle: TextStyle(color: helperColor, fontSize: 11),
-        errorText: isTooLong ? 'Key exceeds maximum length' : null,
+        errorText: isTooLong
+            ? (l?.anonKeyExceedsMax ?? 'Key exceeds maximum length')
+            : null,
       ),
       obscureText: !showKey,
       maxLines: showKey ? 3 : 1,

@@ -111,14 +111,16 @@ class _GlideCoachToggleTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
     final settings = ref.watch(glideCoachSettingsProvider);
     return SwitchListTile(
       key: const Key('glideCoachToggle'),
       value: settings.enabled,
-      title: const Text('Glide-coach beta (experimental)'),
+      title: Text(l?.glideCoachBetaTitle ?? 'Glide-coach beta (experimental)'),
       subtitle: Text(
-        'Subtle haptic when slowing down ahead of a red light. '
-        'Off by default — distraction risk.',
+        l?.glideCoachBetaSubtitle ??
+            'Subtle haptic when slowing down ahead of a red light. '
+                'Off by default — distraction risk.',
         style: theme.textTheme.bodySmall,
       ),
       onChanged: (v) => ref

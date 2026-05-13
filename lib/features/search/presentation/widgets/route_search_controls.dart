@@ -38,7 +38,8 @@ class RouteSearchControls extends ConsumerWidget {
         // Strategy selector chips
         Row(
           children: [
-            Text('Strategy:', style: theme.textTheme.bodySmall),
+            Text(l10n?.routeStrategyLabel ?? 'Strategy:',
+                style: theme.textTheme.bodySmall),
             const SizedBox(width: 8),
             for (final strategy in RouteSearchStrategyType.values)
               Padding(
@@ -87,11 +88,11 @@ class RouteSearchControls extends ConsumerWidget {
   String _strategyLabel(RouteSearchStrategyType type, AppLocalizations? l10n) {
     switch (type) {
       case RouteSearchStrategyType.uniform:
-        return 'Uniform';
+        return l10n?.routeStrategyUniform ?? 'Uniform';
       case RouteSearchStrategyType.cheapest:
         return l10n?.cheapest ?? 'Cheapest';
       case RouteSearchStrategyType.balanced:
-        return 'Balanced';
+        return l10n?.routeStrategyBalanced ?? 'Balanced';
       case RouteSearchStrategyType.eco:
         return l10n?.ecoRouteOption ?? 'Eco';
     }

@@ -7442,6 +7442,246 @@ abstract class AppLocalizations {
   /// **'Easy on the throttle — coasting saves more'**
   String get hapticEcoCoachSnackBarMessage;
 
+  /// No description provided for @anonKeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Anon Key'**
+  String get anonKeyLabel;
+
+  /// No description provided for @anonKeyHideTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide key'**
+  String get anonKeyHideTooltip;
+
+  /// No description provided for @anonKeyShowTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Show key to verify'**
+  String get anonKeyShowTooltip;
+
+  /// No description provided for @anonKeyTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Key is too long ({length} chars) — check for extra text'**
+  String anonKeyTooLong(int length);
+
+  /// No description provided for @anonKeyLooksCorrect.
+  ///
+  /// In en, this message translates to:
+  /// **'Key looks correct ({length} chars)'**
+  String anonKeyLooksCorrect(int length);
+
+  /// No description provided for @anonKeyShouldBeJwt.
+  ///
+  /// In en, this message translates to:
+  /// **'Key should be a JWT (header.payload.signature)'**
+  String get anonKeyShouldBeJwt;
+
+  /// No description provided for @anonKeyMayBeTruncated.
+  ///
+  /// In en, this message translates to:
+  /// **'Key may be truncated ({length} of ~208 expected chars)'**
+  String anonKeyMayBeTruncated(int length);
+
+  /// No description provided for @anonKeyExceedsMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Key exceeds maximum length'**
+  String get anonKeyExceedsMax;
+
+  /// No description provided for @qrShareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your database'**
+  String get qrShareTitle;
+
+  /// No description provided for @qrShareSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Others can scan this QR code to connect'**
+  String get qrShareSubtitle;
+
+  /// No description provided for @qrShareCopyAsText.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy as text'**
+  String get qrShareCopyAsText;
+
+  /// No description provided for @authInfoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Why create an account?'**
+  String get authInfoTitle;
+
+  /// No description provided for @authInfoBenefit1.
+  ///
+  /// In en, this message translates to:
+  /// **'• Sync favorites, alerts, and saved routes across devices'**
+  String get authInfoBenefit1;
+
+  /// No description provided for @authInfoBenefit2.
+  ///
+  /// In en, this message translates to:
+  /// **'• Prepare a route on your phone, use it in your car'**
+  String get authInfoBenefit2;
+
+  /// No description provided for @authInfoBenefit3.
+  ///
+  /// In en, this message translates to:
+  /// **'• No data is shared with third parties'**
+  String get authInfoBenefit3;
+
+  /// No description provided for @authInfoBenefit4.
+  ///
+  /// In en, this message translates to:
+  /// **'• You can delete your account at any time'**
+  String get authInfoBenefit4;
+
+  /// No description provided for @privacyLocalDataEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing stored yet. Add a favorite or set a price alert to see entries here.'**
+  String get privacyLocalDataEmpty;
+
+  /// No description provided for @privacyHideEmptyRows.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide empty rows'**
+  String get privacyHideEmptyRows;
+
+  /// No description provided for @privacyShowEmptyRows.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Show {count} empty row} other{Show {count} empty rows}}'**
+  String privacyShowEmptyRows(int count);
+
+  /// No description provided for @apiKeySetupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'API key setup (optional)'**
+  String get apiKeySetupTitle;
+
+  /// No description provided for @apiKeySetupDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Register for a free API key, or skip to explore the app with demo data.'**
+  String get apiKeySetupDescription;
+
+  /// No description provided for @apiKeyRegistrationButton.
+  ///
+  /// In en, this message translates to:
+  /// **'{provider} Registration'**
+  String apiKeyRegistrationButton(String provider);
+
+  /// No description provided for @apiKeyTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'By entering an API key you accept the terms of {provider}. Data redistribution is prohibited.'**
+  String apiKeyTerms(String provider);
+
+  /// No description provided for @calculatorDistanceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 150'**
+  String get calculatorDistanceHint;
+
+  /// No description provided for @calculatorConsumptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 7.0'**
+  String get calculatorConsumptionHint;
+
+  /// No description provided for @calculatorPriceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 1.899'**
+  String get calculatorPriceHint;
+
+  /// No description provided for @routeStrategyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Strategy:'**
+  String get routeStrategyLabel;
+
+  /// No description provided for @routeStrategyUniform.
+  ///
+  /// In en, this message translates to:
+  /// **'Uniform'**
+  String get routeStrategyUniform;
+
+  /// No description provided for @routeStrategyBalanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Balanced'**
+  String get routeStrategyBalanced;
+
+  /// No description provided for @glideCoachBetaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Glide-coach beta (experimental)'**
+  String get glideCoachBetaTitle;
+
+  /// No description provided for @glideCoachBetaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtle haptic when slowing down ahead of a red light. Off by default — distraction risk.'**
+  String get glideCoachBetaSubtitle;
+
+  /// No description provided for @consentSyncTripsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync trip recordings'**
+  String get consentSyncTripsTitle;
+
+  /// No description provided for @consentSyncTripsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Back up OBD2 + GPS trips to TankSync. Cross-device, opt-in.'**
+  String get consentSyncTripsSubtitle;
+
+  /// No description provided for @consentSyncTripsDisabledHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Cloud Sync above to back up trips.'**
+  String get consentSyncTripsDisabledHint;
+
+  /// No description provided for @consentHideDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide details'**
+  String get consentHideDetails;
+
+  /// No description provided for @consentShowDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Show details'**
+  String get consentShowDetails;
+
+  /// No description provided for @dialogOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get dialogOk;
+
+  /// No description provided for @invalidLinkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid link'**
+  String get invalidLinkTitle;
+
+  /// No description provided for @invalidLinkBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The link \"{path}\" is not valid.'**
+  String invalidLinkBody(String path);
+
+  /// No description provided for @home.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get home;
+
   /// Title of the loyalty settings sub-screen where the user manages fuel-club cards (#1120).
   ///
   /// In en, this message translates to:

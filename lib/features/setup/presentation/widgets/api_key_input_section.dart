@@ -38,11 +38,13 @@ class ApiKeyInputSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('API key setup (optional)', style: theme.textTheme.titleMedium),
+        Text(l10n?.apiKeySetupTitle ?? 'API key setup (optional)',
+            style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
         Text(
-          'Register for a free API key, or skip to explore '
-          'the app with demo data.',
+          l10n?.apiKeySetupDescription ??
+              'Register for a free API key, or skip to explore '
+                  'the app with demo data.',
           style: theme.textTheme.bodyMedium,
         ),
         const SizedBox(height: 12),
@@ -58,7 +60,10 @@ class ApiKeyInputSection extends StatelessWidget {
               }
             },
             icon: const Icon(Icons.open_in_new),
-            label: Text('${country.apiProvider} Registration'),
+            label: Text(
+              l10n?.apiKeyRegistrationButton(country.apiProvider ?? '') ??
+                  '${country.apiProvider} Registration',
+            ),
           ),
         const SizedBox(height: 16),
         TextField(
@@ -77,8 +82,9 @@ class ApiKeyInputSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'By entering an API key you accept the terms of '
-          '${country.apiProvider}. Data redistribution is prohibited.',
+          l10n?.apiKeyTerms(country.apiProvider ?? '') ??
+              'By entering an API key you accept the terms of '
+                  '${country.apiProvider}. Data redistribution is prohibited.',
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
