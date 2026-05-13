@@ -13,9 +13,9 @@ const int kConsumptionBranchIndex = 3;
 ///
 /// [items] is the list the bottom-bar / rail should iterate over.
 /// [branchForSlot] maps each visible slot back to its router-branch
-/// index. The list is kept stable across renders so destinations
-/// don't reorder — every slot index always points at the same
-/// router branch.
+/// index. When Conso is hidden, Settings still routes to branch 4
+/// even though it renders at display-slot 3 — same contract the #893
+/// gate had.
 class ShellDestinations {
   final List<ShellNavItem> items;
   final List<int> branchForSlot;
@@ -26,26 +26,30 @@ class ShellDestinations {
   });
 }
 
-/// Build the canonical 5-item nav list.
+/// Build the canonical 5-item nav list, hiding the Conso slot when
+/// [showConsumption] is false.
 ///
-/// History: #893 hid the Conso slot when no vehicle was configured.
-/// That created a catch-22 for the Medium use-mode profile (#1517) —
-/// the user couldn't reach the consumption screen to add their first
-/// fill-up + vehicle because the tab was hidden until a vehicle
-/// existed. The gate was removed so the Conso tab is always visible;
-/// the empty-state inside the consumption screen owns the "no vehicle
-/// yet" affordance now.
+/// The original #893 gate hid Conso "when no vehicle is configured",
+/// which created a catch-22 for the Medium use-mode profile (#1517)
+/// — the consumption screen is where users add their first vehicle,
+/// but it was hidden until a vehicle existed. The gate is now driven
+/// by `isConsumptionTabReachable(manifest, enabledFlags)` instead:
+/// true when the user has either `manualConsumption` OR
+/// `obd2TripRecording` effectively enabled. That's true for Medium /
+/// Full profiles and false for Basic — matching the user-mode bundle
+/// the wizard sells.
 ///
 /// Pure function — no Flutter state, no Riverpod — kept lean so the
 /// shell can re-resolve on every build without paying provider-read
 /// overhead.
 ShellDestinations resolveShellDestinations({
   required AppLocalizations? l10n,
+  required bool showConsumption,
 }) {
   // Kept in router-branch order so the index handed to
   // `navigationShell.goBranch()` lines up directly: Search=0, Map=1,
   // Favorites=2, Consumption=3, Settings=4.
-  final destinations = <ShellNavItem>[
+  final allDestinations = <ShellNavItem>[
     ShellNavItem(
       Icons.search_outlined,
       Icons.search,
@@ -69,8 +73,15 @@ ShellDestinations resolveShellDestinations({
     ),
   ];
 
+  final visibleItems = <ShellNavItem>[];
+  final branchForSlot = <int>[];
+  for (var i = 0; i < allDestinations.length; i++) {
+    if (i == kConsumptionBranchIndex && !showConsumption) continue;
+    visibleItems.add(allDestinations[i]);
+    branchForSlot.add(i);
+  }
   return ShellDestinations(
-    items: destinations,
-    branchForSlot: List<int>.generate(destinations.length, (i) => i),
+    items: visibleItems,
+    branchForSlot: branchForSlot,
   );
 }

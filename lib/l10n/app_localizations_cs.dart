@@ -2093,6 +2093,55 @@ class AppLocalizationsCs extends AppLocalizations {
   String get wizardVehicleDefaultBadge => 'Default';
 
   @override
+  String get wizardProfileChoiceHint =>
+      'Choose how you want to use the app. You can change this later in Settings.';
+
+  @override
+  String get wizardProfileChoiceFooter =>
+      'You can change your choice any time from Settings → Use mode.';
+
+  @override
+  String get wizardProfileBasicName => 'Basic';
+
+  @override
+  String get wizardProfileBasicDescription =>
+      'Cheapest fuel and EV charging prices nearby. Favorites and price alerts.';
+
+  @override
+  String get wizardProfileMediumName => 'Medium';
+
+  @override
+  String get wizardProfileMediumDescription =>
+      'Everything in Basic, plus track your fuel fill-ups and EV charging by hand.';
+
+  @override
+  String get wizardProfileFullName => 'Full';
+
+  @override
+  String get wizardProfileFullDescription =>
+      'Everything in Medium, plus automatic OBD2 trip recording, driving scores, and loyalty cards.';
+
+  @override
+  String get wizardProfileCustomName => 'Custom';
+
+  @override
+  String get wizardProfileCustomDescription =>
+      'Your own combination of features. Tweak each toggle below.';
+
+  @override
+  String get useModeSectionHint =>
+      'Right-size the app to how you actually use it. Picking a preset enables the matching set of features.';
+
+  @override
+  String get useModeCustomSettingsDescription =>
+      'Your feature mix doesn\'t match any preset. Pick one above to overwrite, or keep customising individual features in the section below.';
+
+  @override
+  String useModeSwitchedSnack(String profile) {
+    return 'Use mode set to $profile.';
+  }
+
+  @override
   String get profileDefaultVehicleLabel => 'Default vehicle (optional)';
 
   @override

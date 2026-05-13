@@ -3,25 +3,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tankstellen/app/shell_screen.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
-/// The Conso bottom-nav tab used to be hidden when no vehicle was
-/// configured (#893). That gate was removed in #conso-coherence —
-/// the Medium use-mode profile needs to reach the consumption screen
-/// to configure its first vehicle / log its first manual fill-up, and
-/// the original gate created a catch-22 (vehicle added FROM the
-/// consumption screen, conso hidden UNTIL a vehicle existed).
+/// Bottom-nav Conso-tab gating, profile-driven (post-#conso-coherence-2).
 ///
-/// These tests lock in the new always-visible behaviour so a future
-/// refactor that accidentally re-introduces vehicle-based hiding
-/// trips here first.
-
-class _EmptyVehicleList extends VehicleProfileList {
-  @override
-  List<VehicleProfile> build() => const [];
-}
+/// History:
+/// - #893 hid Conso when no vehicle was configured.
+/// - #conso-coherence-1 removed the gate entirely.
+/// - #conso-coherence-2 (these tests) re-gates Conso on the
+///   `isConsumptionTabReachable` helper — the same one the Settings
+///   section uses. True when `manualConsumption` OR `obd2TripRecording`
+///   is effectively enabled. Maps cleanly to wizard profiles:
+///     Basic    → neither flag → no Conso tab
+///     Medium   → manualConsumption on → Conso tab visible
+///     Full     → obd2TripRecording on → Conso tab visible
 
 class _OneVehicleList extends VehicleProfileList {
   @override
@@ -34,9 +33,17 @@ class _OneVehicleList extends VehicleProfileList {
       ];
 }
 
+class _TestFeatureFlags extends FeatureFlags {
+  _TestFeatureFlags(this._initial);
+  final Set<Feature> _initial;
+
+  @override
+  Set<Feature> build() => {..._initial};
+}
+
 Future<void> _pumpShell(
   WidgetTester tester, {
-  required List<Object> overrides,
+  required Set<Feature> enabledFeatures,
   String initialLocation = '/',
 }) async {
   // Force phone-size canvas so the compact bottom nav renders (not
@@ -83,7 +90,14 @@ Future<void> _pumpShell(
 
   await tester.pumpWidget(
     ProviderScope(
-      overrides: overrides.cast(),
+      overrides: [
+        // Seed a vehicle so other vehicle-aware providers don't hit
+        // their own empty-state paths during the pump — we're only
+        // testing the bottom-nav Conso gate here, not vehicle gating.
+        vehicleProfileListProvider.overrideWith(() => _OneVehicleList()),
+        featureFlagsProvider
+            .overrideWith(() => _TestFeatureFlags(enabledFeatures)),
+      ],
       child: MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
@@ -98,17 +112,59 @@ Future<void> _pumpShell(
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('ShellScreen — Conso always-visible contract', () {
+  group('ShellScreen — Conso gated on isConsumptionTabReachable', () {
     testWidgets(
-      'fresh install with zero vehicles still renders all 5 tabs '
-      '(including Consumption) — Medium use-mode needs the tab '
-      'reachable to add its first manual fill-up',
+      'Basic profile (no manualConsumption, no obd2) → Conso tab '
+      'HIDDEN (4 tabs total)',
       (tester) async {
+        // Basic bundle: visibility / search flags only.
         await _pumpShell(
           tester,
-          overrides: [
-            vehicleProfileListProvider.overrideWith(() => _EmptyVehicleList()),
-          ],
+          enabledFeatures: {
+            Feature.showFuel,
+            Feature.showElectric,
+            Feature.priceAlerts,
+            Feature.priceHistory,
+            Feature.routePlanning,
+            Feature.evCharging,
+          },
+        );
+
+        expect(find.text('Search'), findsOneWidget);
+        expect(find.text('Map'), findsOneWidget);
+        expect(find.text('Favorites'), findsOneWidget);
+        expect(find.text('Settings'), findsOneWidget);
+        expect(find.text('Consumption'), findsNothing,
+            reason: 'Basic profile must not surface the Conso tab — '
+                'no consumption features are reachable.');
+        expect(find.byIcon(Icons.local_gas_station_outlined),
+            findsNothing);
+      },
+    );
+
+    testWidgets(
+      'Medium profile (manualConsumption + showConsumptionTab on) → '
+      'Conso tab VISIBLE (5 tabs total)',
+      (tester) async {
+        // `isConsumptionTabReachable` is
+        // `showConsumptionTab && (manualConsumption || obd2TripRecording)`
+        // — both halves of the AND must be on. Seeding
+        // showConsumptionTab explicitly because `_TestFeatureFlags.build()`
+        // returns ONLY the seeded set (overrides any manifest default).
+        await _pumpShell(
+          tester,
+          enabledFeatures: {
+            Feature.showFuel,
+            Feature.showElectric,
+            Feature.priceAlerts,
+            Feature.priceHistory,
+            Feature.routePlanning,
+            Feature.evCharging,
+            Feature.tankSync,
+            Feature.baselineSync,
+            Feature.manualConsumption,
+            Feature.showConsumptionTab,
+          },
         );
 
         expect(find.text('Search'), findsOneWidget);
@@ -122,21 +178,33 @@ void main() {
     );
 
     testWidgets(
-      'one vehicle configured renders the same 5 tabs — vehicle '
-      'count is no longer an input to the bottom-nav layout',
+      'Full profile (OBD2 stack on) → Conso tab VISIBLE',
       (tester) async {
         await _pumpShell(
           tester,
-          overrides: [
-            vehicleProfileListProvider.overrideWith(() => _OneVehicleList()),
-          ],
+          enabledFeatures: {
+            Feature.showFuel,
+            Feature.showElectric,
+            Feature.priceAlerts,
+            Feature.priceHistory,
+            Feature.routePlanning,
+            Feature.evCharging,
+            Feature.tankSync,
+            Feature.baselineSync,
+            Feature.manualConsumption,
+            Feature.obd2TripRecording,
+            Feature.showConsumptionTab,
+            Feature.autoRecord,
+            Feature.gamification,
+            Feature.consumptionAnalytics,
+            Feature.loyaltyCards,
+            Feature.hapticEcoCoach,
+            Feature.glideCoach,
+            Feature.gpsTripPath,
+          },
         );
 
-        expect(find.text('Search'), findsOneWidget);
-        expect(find.text('Map'), findsOneWidget);
-        expect(find.text('Favorites'), findsOneWidget);
         expect(find.text('Consumption'), findsOneWidget);
-        expect(find.text('Settings'), findsOneWidget);
         expect(find.byIcon(Icons.local_gas_station_outlined),
             findsOneWidget);
       },

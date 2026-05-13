@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/utils/frame_callbacks.dart';
+import '../features/feature_management/application/feature_flags_provider.dart';
+import '../features/feature_management/domain/consumption_tab_visibility.dart';
 import '../features/vehicle/presentation/widgets/catalog_reresolve_snackbar_host.dart';
 import '../l10n/app_localizations.dart';
 import 'current_shell_branch_provider.dart';
@@ -172,17 +174,35 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
-    // Conso tab is always visible — the empty-state inside the
-    // consumption screen owns the "no vehicle yet" affordance so the
-    // Medium use-mode profile (#1517) can reach the consumption flow
-    // without first configuring a vehicle. The #893 vehicle gate that
-    // used to live here created a catch-22 for Medium users (vehicle
-    // configured FROM the conso screen, conso hidden UNTIL a vehicle
-    // exists).
-    final destinations = resolveShellDestinations(l10n: l10n);
+    // Conso tab is gated on the consumption-tab-reachable feature
+    // helper (the same one the Settings section uses): true when the
+    // user has manualConsumption OR obd2TripRecording effectively
+    // enabled. Maps cleanly to the wizard profile presets — Basic
+    // gets no Conso tab; Medium / Full do. Replaces the old #893
+    // hasVehicle gate which created a catch-22 for Medium users.
+    final manifest = ref.watch(featureManifestProvider);
+    final enabledFlags = ref.watch(featureFlagsProvider);
+    final showConsumption = isConsumptionTabReachable(manifest, enabledFlags);
+    final destinations = resolveShellDestinations(
+      l10n: l10n,
+      showConsumption: showConsumption,
+    );
     final visibleDestinations = destinations.items;
     final branchForSlot = destinations.branchForSlot;
     _branchForSlot = branchForSlot;
+
+    // If the user was on the Conso tab and just disabled the gating
+    // features (e.g. switched profile from Full to Basic), snap the
+    // selection to Search (branch 0) — the Conso slot is gone from
+    // the nav bar and leaving `_currentIndex` pointing at it would
+    // leave no item highlighted.
+    if (!showConsumption && _currentIndex == kConsumptionBranchIndex) {
+      safePostFrame(() {
+        if (!mounted) return;
+        if (_currentIndex != kConsumptionBranchIndex) return;
+        _goToPage(0);
+      });
+    }
 
     // Display-slot the animated nav bar should highlight. `-1` when
     // the active branch has no visible slot (transient, resolved by

@@ -7,6 +7,8 @@ import 'package:tankstellen/app/shell_screen.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
@@ -38,7 +40,7 @@ class _EmptySearchState extends SearchState {
 }
 
 /// Stubs one configured vehicle so the shell renders all 5 tabs —
-/// #893 hides the Conso tab when no vehicle is configured.
+/// some downstream widgets still gate behaviour on vehicle presence.
 class _OneVehicleList extends VehicleProfileList {
   @override
   List<VehicleProfile> build() => const [
@@ -48,6 +50,19 @@ class _OneVehicleList extends VehicleProfileList {
           type: VehicleType.combustion,
         ),
       ];
+}
+
+/// Seeds OBD2 + showConsumptionTab so `isConsumptionTabReachable`
+/// returns true — the bottom-nav Conso gate (#conso-coherence-2)
+/// drops the slot when neither manualConsumption nor
+/// obd2TripRecording is on. Layout tests below assume the 5-tab
+/// shell.
+class _FullProfileFlags extends FeatureFlags {
+  @override
+  Set<Feature> build() => const {
+        Feature.obd2TripRecording,
+        Feature.showConsumptionTab,
+      };
 }
 
 /// Fixed FavoriteStations returning empty data.
@@ -82,9 +97,10 @@ void main() {
         userPositionNullOverride(),
         searchStateProvider.overrideWith(() => _EmptySearchState()),
         favoriteStationsProvider.overrideWith(() => _EmptyFavoriteStations()),
-        // #893 — seed a vehicle so the Conso tab is visible for the
+        // Seed a vehicle so the Conso tab is visible for the
         // existing 5-tab assertions below.
         vehicleProfileListProvider.overrideWith(() => _OneVehicleList()),
+        featureFlagsProvider.overrideWith(() => _FullProfileFlags()),
       ];
     });
 

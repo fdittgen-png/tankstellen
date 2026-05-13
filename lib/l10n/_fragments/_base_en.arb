@@ -941,6 +941,24 @@
   "vehicleFuelNotSet": "Not set",
   "wizardVehicleTapToEdit": "Tap to edit",
   "wizardVehicleDefaultBadge": "Default",
+  "wizardProfileChoiceHint": "Choose how you want to use the app. You can change this later in Settings.",
+  "wizardProfileChoiceFooter": "You can change your choice any time from Settings → Use mode.",
+  "wizardProfileBasicName": "Basic",
+  "wizardProfileBasicDescription": "Cheapest fuel and EV charging prices nearby. Favorites and price alerts.",
+  "wizardProfileMediumName": "Medium",
+  "wizardProfileMediumDescription": "Everything in Basic, plus track your fuel fill-ups and EV charging by hand.",
+  "wizardProfileFullName": "Full",
+  "wizardProfileFullDescription": "Everything in Medium, plus automatic OBD2 trip recording, driving scores, and loyalty cards.",
+  "wizardProfileCustomName": "Custom",
+  "wizardProfileCustomDescription": "Your own combination of features. Tweak each toggle below.",
+  "useModeSectionHint": "Right-size the app to how you actually use it. Picking a preset enables the matching set of features.",
+  "useModeCustomSettingsDescription": "Your feature mix doesn't match any preset. Pick one above to overwrite, or keep customising individual features in the section below.",
+  "useModeSwitchedSnack": "Use mode set to {profile}.",
+  "@useModeSwitchedSnack": {
+    "placeholders": {
+      "profile": { "type": "String" }
+    }
+  },
   "profileDefaultVehicleLabel": "Default vehicle (optional)",
   "profileDefaultVehicleNone": "No default",
   "profileFuelFromVehicleHint": "Fuel type is derived from your default vehicle. Clear the vehicle to pick a fuel directly.",

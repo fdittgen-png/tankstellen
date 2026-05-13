@@ -154,20 +154,7 @@ class ProfileScreen extends ConsumerWidget {
             _FoldableSection(
               icon: Icons.local_gas_station_outlined,
               title: l?.navConsumption ?? 'Consumption',
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Use mode chooser anchors the Consumption section
-                  // because the profile (Basic / Medium / Full / Custom)
-                  // is what determines which downstream toggles are
-                  // visible at all. Moved here from the top of the
-                  // Settings screen so users discover the chooser at
-                  // the same time as the toggles it gates.
-                  UseModeSection(),
-                  SizedBox(height: 8),
-                  DrivingSettingsSection(),
-                ],
-              ),
+              child: const DrivingSettingsSection(),
             ),
             const SizedBox(height: 8),
           ],
@@ -201,14 +188,23 @@ class ProfileScreen extends ConsumerWidget {
           // #1373 phase 2 — central feature-management toggles. Placed
           // near the bottom (above About, below Privacy) because most
           // users will never visit it; advanced controls don't belong
-          // at the top of a settings screen. The engine ships in
-          // PARALLEL with the existing scattered toggles — Phase 3 of
-          // #1373 will route legacy paths through this provider one
-          // feature at a time.
+          // at the top of a settings screen.
+          //
+          // The Use-mode chooser (Basic / Medium / Full / Custom) sits
+          // at the TOP of this section because picking a preset
+          // overwrites every toggle below it — users discover the
+          // chooser at the same time as the toggles it gates.
           _FoldableSection(
             icon: Icons.tune,
             title: l?.featureManagementSectionTitle ?? 'Feature management',
-            child: const FeatureManagementSection(),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                UseModeSection(),
+                SizedBox(height: 12),
+                FeatureManagementSection(),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
 

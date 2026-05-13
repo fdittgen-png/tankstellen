@@ -3961,6 +3961,84 @@ abstract class AppLocalizations {
   /// **'Default'**
   String get wizardVehicleDefaultBadge;
 
+  /// No description provided for @wizardProfileChoiceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how you want to use the app. You can change this later in Settings.'**
+  String get wizardProfileChoiceHint;
+
+  /// No description provided for @wizardProfileChoiceFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'You can change your choice any time from Settings → Use mode.'**
+  String get wizardProfileChoiceFooter;
+
+  /// No description provided for @wizardProfileBasicName.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic'**
+  String get wizardProfileBasicName;
+
+  /// No description provided for @wizardProfileBasicDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest fuel and EV charging prices nearby. Favorites and price alerts.'**
+  String get wizardProfileBasicDescription;
+
+  /// No description provided for @wizardProfileMediumName.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get wizardProfileMediumName;
+
+  /// No description provided for @wizardProfileMediumDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything in Basic, plus track your fuel fill-ups and EV charging by hand.'**
+  String get wizardProfileMediumDescription;
+
+  /// No description provided for @wizardProfileFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full'**
+  String get wizardProfileFullName;
+
+  /// No description provided for @wizardProfileFullDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything in Medium, plus automatic OBD2 trip recording, driving scores, and loyalty cards.'**
+  String get wizardProfileFullDescription;
+
+  /// No description provided for @wizardProfileCustomName.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get wizardProfileCustomName;
+
+  /// No description provided for @wizardProfileCustomDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own combination of features. Tweak each toggle below.'**
+  String get wizardProfileCustomDescription;
+
+  /// No description provided for @useModeSectionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Right-size the app to how you actually use it. Picking a preset enables the matching set of features.'**
+  String get useModeSectionHint;
+
+  /// No description provided for @useModeCustomSettingsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your feature mix doesn\'t match any preset. Pick one above to overwrite, or keep customising individual features in the section below.'**
+  String get useModeCustomSettingsDescription;
+
+  /// No description provided for @useModeSwitchedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Use mode set to {profile}.'**
+  String useModeSwitchedSnack(String profile);
+
   /// No description provided for @profileDefaultVehicleLabel.
   ///
   /// In en, this message translates to:
