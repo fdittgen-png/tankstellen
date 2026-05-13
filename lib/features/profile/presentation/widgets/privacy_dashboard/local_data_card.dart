@@ -127,9 +127,9 @@ class _LocalDataCardState extends State<LocalDataCard> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
-                  // English-only inline; ARB strings to follow.
-                  'Nothing stored yet. Add a favorite or set a price '
-                      'alert to see entries here.',
+                  l?.privacyLocalDataEmpty ??
+                      'Nothing stored yet. Add a favorite or set a price '
+                          'alert to see entries here.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -153,10 +153,10 @@ class _LocalDataCardState extends State<LocalDataCard> {
                     size: 18,
                   ),
                   label: Text(
-                    // English-only inline; ARB strings to follow.
                     _showAll
-                        ? 'Hide empty rows'
-                        : 'Show $hiddenCount empty row${hiddenCount == 1 ? '' : 's'}',
+                        ? (l?.privacyHideEmptyRows ?? 'Hide empty rows')
+                        : (l?.privacyShowEmptyRows(hiddenCount) ??
+                            'Show $hiddenCount empty row${hiddenCount == 1 ? '' : 's'}'),
                   ),
                   style: TextButton.styleFrom(
                     padding:

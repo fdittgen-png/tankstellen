@@ -1281,5 +1281,66 @@
     "placeholders": {
       "minutes": {"type": "int"}
     }
-  }
+  },
+  "anonKeyLabel": "Clé Anon",
+  "anonKeyHideTooltip": "Masquer la clé",
+  "anonKeyShowTooltip": "Afficher la clé pour vérifier",
+  "anonKeyTooLong": "La clé est trop longue ({length} car.) — vérifiez les caractères en trop",
+  "@anonKeyTooLong": {
+    "placeholders": {"length": {"type": "int"}}
+  },
+  "anonKeyLooksCorrect": "La clé semble correcte ({length} car.)",
+  "@anonKeyLooksCorrect": {
+    "placeholders": {"length": {"type": "int"}}
+  },
+  "anonKeyShouldBeJwt": "La clé doit être un JWT (header.payload.signature)",
+  "anonKeyMayBeTruncated": "La clé est peut-être tronquée ({length} sur ~208 car. attendus)",
+  "@anonKeyMayBeTruncated": {
+    "placeholders": {"length": {"type": "int"}}
+  },
+  "anonKeyExceedsMax": "La clé dépasse la longueur maximale",
+  "qrShareTitle": "Partager votre base de données",
+  "qrShareSubtitle": "Les autres peuvent scanner ce QR code pour se connecter",
+  "qrShareCopyAsText": "Copier comme texte",
+  "authInfoTitle": "Pourquoi créer un compte ?",
+  "authInfoBenefit1": "• Synchronisez favoris, alertes et itinéraires entre vos appareils",
+  "authInfoBenefit2": "• Préparez un itinéraire sur votre téléphone, utilisez-le en voiture",
+  "authInfoBenefit3": "• Aucune donnée n'est partagée avec des tiers",
+  "authInfoBenefit4": "• Vous pouvez supprimer votre compte à tout moment",
+  "privacyLocalDataEmpty": "Rien d'enregistré pour l'instant. Ajoutez un favori ou créez une alerte prix pour voir apparaître des entrées.",
+  "privacyHideEmptyRows": "Masquer les lignes vides",
+  "privacyShowEmptyRows": "{count, plural, =1{Afficher {count} ligne vide} other{Afficher {count} lignes vides}}",
+  "@privacyShowEmptyRows": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "apiKeySetupTitle": "Configuration de la clé API (optionnel)",
+  "apiKeySetupDescription": "Inscrivez-vous pour obtenir une clé API gratuite, ou passez pour explorer l'application avec des données de démonstration.",
+  "apiKeyRegistrationButton": "Inscription {provider}",
+  "@apiKeyRegistrationButton": {
+    "placeholders": {"provider": {"type": "String"}}
+  },
+  "apiKeyTerms": "En saisissant une clé API, vous acceptez les conditions de {provider}. La redistribution des données est interdite.",
+  "@apiKeyTerms": {
+    "placeholders": {"provider": {"type": "String"}}
+  },
+  "calculatorDistanceHint": "ex. 150",
+  "calculatorConsumptionHint": "ex. 7,0",
+  "calculatorPriceHint": "ex. 1,899",
+  "routeStrategyLabel": "Stratégie :",
+  "routeStrategyUniform": "Uniforme",
+  "routeStrategyBalanced": "Équilibrée",
+  "glideCoachBetaTitle": "Glide-coach bêta (expérimental)",
+  "glideCoachBetaSubtitle": "Légère vibration au ralentissement avant un feu rouge. Désactivé par défaut — risque de distraction.",
+  "consentSyncTripsTitle": "Synchroniser les trajets enregistrés",
+  "consentSyncTripsSubtitle": "Sauvegardez les trajets OBD2 + GPS dans TankSync. Multi-appareil, opt-in.",
+  "consentSyncTripsDisabledHint": "Activez Cloud Sync ci-dessus pour sauvegarder les trajets.",
+  "consentHideDetails": "Masquer les détails",
+  "consentShowDetails": "Afficher les détails",
+  "dialogOk": "OK",
+  "invalidLinkTitle": "Lien invalide",
+  "invalidLinkBody": "Le lien « {path} » n'est pas valide.",
+  "@invalidLinkBody": {
+    "placeholders": {"path": {"type": "String"}}
+  },
+  "home": "Accueil"
 }

@@ -4115,6 +4115,157 @@ class AppLocalizationsFr extends AppLocalizations {
       'Easy on the throttle — coasting saves more';
 
   @override
+  String get anonKeyLabel => 'Clé Anon';
+
+  @override
+  String get anonKeyHideTooltip => 'Masquer la clé';
+
+  @override
+  String get anonKeyShowTooltip => 'Afficher la clé pour vérifier';
+
+  @override
+  String anonKeyTooLong(int length) {
+    return 'La clé est trop longue ($length car.) — vérifiez les caractères en trop';
+  }
+
+  @override
+  String anonKeyLooksCorrect(int length) {
+    return 'La clé semble correcte ($length car.)';
+  }
+
+  @override
+  String get anonKeyShouldBeJwt =>
+      'La clé doit être un JWT (header.payload.signature)';
+
+  @override
+  String anonKeyMayBeTruncated(int length) {
+    return 'La clé est peut-être tronquée ($length sur ~208 car. attendus)';
+  }
+
+  @override
+  String get anonKeyExceedsMax => 'La clé dépasse la longueur maximale';
+
+  @override
+  String get qrShareTitle => 'Partager votre base de données';
+
+  @override
+  String get qrShareSubtitle =>
+      'Les autres peuvent scanner ce QR code pour se connecter';
+
+  @override
+  String get qrShareCopyAsText => 'Copier comme texte';
+
+  @override
+  String get authInfoTitle => 'Pourquoi créer un compte ?';
+
+  @override
+  String get authInfoBenefit1 =>
+      '• Synchronisez favoris, alertes et itinéraires entre vos appareils';
+
+  @override
+  String get authInfoBenefit2 =>
+      '• Préparez un itinéraire sur votre téléphone, utilisez-le en voiture';
+
+  @override
+  String get authInfoBenefit3 =>
+      '• Aucune donnée n\'est partagée avec des tiers';
+
+  @override
+  String get authInfoBenefit4 =>
+      '• Vous pouvez supprimer votre compte à tout moment';
+
+  @override
+  String get privacyLocalDataEmpty =>
+      'Rien d\'enregistré pour l\'instant. Ajoutez un favori ou créez une alerte prix pour voir apparaître des entrées.';
+
+  @override
+  String get privacyHideEmptyRows => 'Masquer les lignes vides';
+
+  @override
+  String privacyShowEmptyRows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Afficher $count lignes vides',
+      one: 'Afficher $count ligne vide',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get apiKeySetupTitle => 'Configuration de la clé API (optionnel)';
+
+  @override
+  String get apiKeySetupDescription =>
+      'Inscrivez-vous pour obtenir une clé API gratuite, ou passez pour explorer l\'application avec des données de démonstration.';
+
+  @override
+  String apiKeyRegistrationButton(String provider) {
+    return 'Inscription $provider';
+  }
+
+  @override
+  String apiKeyTerms(String provider) {
+    return 'En saisissant une clé API, vous acceptez les conditions de $provider. La redistribution des données est interdite.';
+  }
+
+  @override
+  String get calculatorDistanceHint => 'ex. 150';
+
+  @override
+  String get calculatorConsumptionHint => 'ex. 7,0';
+
+  @override
+  String get calculatorPriceHint => 'ex. 1,899';
+
+  @override
+  String get routeStrategyLabel => 'Stratégie :';
+
+  @override
+  String get routeStrategyUniform => 'Uniforme';
+
+  @override
+  String get routeStrategyBalanced => 'Équilibrée';
+
+  @override
+  String get glideCoachBetaTitle => 'Glide-coach bêta (expérimental)';
+
+  @override
+  String get glideCoachBetaSubtitle =>
+      'Légère vibration au ralentissement avant un feu rouge. Désactivé par défaut — risque de distraction.';
+
+  @override
+  String get consentSyncTripsTitle => 'Synchroniser les trajets enregistrés';
+
+  @override
+  String get consentSyncTripsSubtitle =>
+      'Sauvegardez les trajets OBD2 + GPS dans TankSync. Multi-appareil, opt-in.';
+
+  @override
+  String get consentSyncTripsDisabledHint =>
+      'Activez Cloud Sync ci-dessus pour sauvegarder les trajets.';
+
+  @override
+  String get consentHideDetails => 'Masquer les détails';
+
+  @override
+  String get consentShowDetails => 'Afficher les détails';
+
+  @override
+  String get dialogOk => 'OK';
+
+  @override
+  String get invalidLinkTitle => 'Lien invalide';
+
+  @override
+  String invalidLinkBody(String path) {
+    return 'Le lien « $path » n\'est pas valide.';
+  }
+
+  @override
+  String get home => 'Accueil';
+
+  @override
   String get loyaltySettingsTitle => 'Mes cartes de fidélité';
 
   @override

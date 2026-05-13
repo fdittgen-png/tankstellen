@@ -30,13 +30,15 @@ class QrShareWidget extends ConsumerWidget {
     });
 
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
 
     return Column(
       children: [
-        Text('Share your database', style: theme.textTheme.titleSmall),
+        Text(l?.qrShareTitle ?? 'Share your database',
+            style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Text(
-          'Others can scan this QR code to connect',
+          l?.qrShareSubtitle ?? 'Others can scan this QR code to connect',
           style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
           textAlign: TextAlign.center,
         ),
@@ -56,7 +58,7 @@ class QrShareWidget extends ConsumerWidget {
             SnackBarHelper.show(context, AppLocalizations.of(context)?.connectionDataCopied ?? 'Connection data copied');
           },
           icon: const Icon(Icons.copy, size: 16),
-          label: const Text('Copy as text'),
+          label: Text(l?.qrShareCopyAsText ?? 'Copy as text'),
         ),
       ],
     );

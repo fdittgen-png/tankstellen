@@ -74,7 +74,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
           CalculatorInputField(
             controller: _distanceController,
             labelText: l10n?.distanceKm ?? 'Distance (km)',
-            hintText: 'e.g. 150',
+            hintText: l10n?.calculatorDistanceHint ?? 'e.g. 150',
             icon: Icons.straighten,
             onParsed: notifier.setDistance,
           ),
@@ -82,7 +82,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
           CalculatorInputField(
             controller: _consumptionController,
             labelText: l10n?.consumptionL100km ?? 'Consumption (L/100km)',
-            hintText: 'e.g. 7.0',
+            hintText: l10n?.calculatorConsumptionHint ?? 'e.g. 7.0',
             icon: Icons.local_gas_station,
             onParsed: notifier.setConsumption,
           ),
@@ -90,7 +90,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
           CalculatorInputField(
             controller: _priceController,
             labelText: l10n?.fuelPriceEurL ?? 'Fuel price (\u20ac/L)',
-            hintText: 'e.g. 1.899',
+            hintText: l10n?.calculatorPriceHint ?? 'e.g. 1.899',
             icon: Icons.euro,
             onParsed: notifier.setPrice,
           ),

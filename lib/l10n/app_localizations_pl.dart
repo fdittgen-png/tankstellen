@@ -4074,6 +4074,154 @@ class AppLocalizationsPl extends AppLocalizations {
       'Easy on the throttle — coasting saves more';
 
   @override
+  String get anonKeyLabel => 'Anon Key';
+
+  @override
+  String get anonKeyHideTooltip => 'Hide key';
+
+  @override
+  String get anonKeyShowTooltip => 'Show key to verify';
+
+  @override
+  String anonKeyTooLong(int length) {
+    return 'Key is too long ($length chars) — check for extra text';
+  }
+
+  @override
+  String anonKeyLooksCorrect(int length) {
+    return 'Key looks correct ($length chars)';
+  }
+
+  @override
+  String get anonKeyShouldBeJwt =>
+      'Key should be a JWT (header.payload.signature)';
+
+  @override
+  String anonKeyMayBeTruncated(int length) {
+    return 'Key may be truncated ($length of ~208 expected chars)';
+  }
+
+  @override
+  String get anonKeyExceedsMax => 'Key exceeds maximum length';
+
+  @override
+  String get qrShareTitle => 'Share your database';
+
+  @override
+  String get qrShareSubtitle => 'Others can scan this QR code to connect';
+
+  @override
+  String get qrShareCopyAsText => 'Copy as text';
+
+  @override
+  String get authInfoTitle => 'Why create an account?';
+
+  @override
+  String get authInfoBenefit1 =>
+      '• Sync favorites, alerts, and saved routes across devices';
+
+  @override
+  String get authInfoBenefit2 =>
+      '• Prepare a route on your phone, use it in your car';
+
+  @override
+  String get authInfoBenefit3 => '• No data is shared with third parties';
+
+  @override
+  String get authInfoBenefit4 => '• You can delete your account at any time';
+
+  @override
+  String get privacyLocalDataEmpty =>
+      'Nothing stored yet. Add a favorite or set a price alert to see entries here.';
+
+  @override
+  String get privacyHideEmptyRows => 'Hide empty rows';
+
+  @override
+  String privacyShowEmptyRows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Show $count empty rows',
+      one: 'Show $count empty row',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get apiKeySetupTitle => 'API key setup (optional)';
+
+  @override
+  String get apiKeySetupDescription =>
+      'Register for a free API key, or skip to explore the app with demo data.';
+
+  @override
+  String apiKeyRegistrationButton(String provider) {
+    return '$provider Registration';
+  }
+
+  @override
+  String apiKeyTerms(String provider) {
+    return 'By entering an API key you accept the terms of $provider. Data redistribution is prohibited.';
+  }
+
+  @override
+  String get calculatorDistanceHint => 'e.g. 150';
+
+  @override
+  String get calculatorConsumptionHint => 'e.g. 7.0';
+
+  @override
+  String get calculatorPriceHint => 'e.g. 1.899';
+
+  @override
+  String get routeStrategyLabel => 'Strategy:';
+
+  @override
+  String get routeStrategyUniform => 'Uniform';
+
+  @override
+  String get routeStrategyBalanced => 'Balanced';
+
+  @override
+  String get glideCoachBetaTitle => 'Glide-coach beta (experimental)';
+
+  @override
+  String get glideCoachBetaSubtitle =>
+      'Subtle haptic when slowing down ahead of a red light. Off by default — distraction risk.';
+
+  @override
+  String get consentSyncTripsTitle => 'Sync trip recordings';
+
+  @override
+  String get consentSyncTripsSubtitle =>
+      'Back up OBD2 + GPS trips to TankSync. Cross-device, opt-in.';
+
+  @override
+  String get consentSyncTripsDisabledHint =>
+      'Enable Cloud Sync above to back up trips.';
+
+  @override
+  String get consentHideDetails => 'Hide details';
+
+  @override
+  String get consentShowDetails => 'Show details';
+
+  @override
+  String get dialogOk => 'OK';
+
+  @override
+  String get invalidLinkTitle => 'Invalid link';
+
+  @override
+  String invalidLinkBody(String path) {
+    return 'The link \"$path\" is not valid.';
+  }
+
+  @override
+  String get home => 'Home';
+
+  @override
   String get loyaltySettingsTitle => 'Fuel club cards';
 
   @override

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 /// Informational card explaining the benefits of creating an account.
 ///
 /// Displayed below the sign-in/sign-up form for unauthenticated users.
@@ -9,6 +11,16 @@ class AuthInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
+
+    final bullets = <String>[
+      l?.authInfoBenefit1 ??
+          '• Sync favorites, alerts, and saved routes across devices',
+      l?.authInfoBenefit2 ??
+          '• Prepare a route on your phone, use it in your car',
+      l?.authInfoBenefit3 ?? '• No data is shared with third parties',
+      l?.authInfoBenefit4 ?? '• You can delete your account at any time',
+    ];
 
     return Card(
       child: Padding(
@@ -20,16 +32,13 @@ class AuthInfoCard extends StatelessWidget {
               children: [
                 const Icon(Icons.info_outline, size: 18),
                 const SizedBox(width: 8),
-                Text('Why create an account?',
+                Text(l?.authInfoTitle ?? 'Why create an account?',
                     style: theme.textTheme.titleSmall),
               ],
             ),
             const SizedBox(height: 8),
             Text(
-              '• Sync favorites, alerts, and saved routes across devices\n'
-              '• Prepare a route on your phone, use it in your car\n'
-              '• No data is shared with third parties\n'
-              '• You can delete your account at any time',
+              bullets.join('\n'),
               style: theme.textTheme.bodySmall
                   ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),

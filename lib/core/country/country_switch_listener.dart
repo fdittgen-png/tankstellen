@@ -126,7 +126,7 @@ class _CountrySwitchListenerState extends ConsumerState<CountrySwitchListener> {
         actions: [
           FilledButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK'),
+            child: Text(l?.dialogOk ?? 'OK'),
           ),
         ],
       ),

@@ -2641,6 +2641,102 @@
   "@hapticEcoCoachSnackBarMessage": {
     "description": "SnackBar copy shown on the trip-recording screen when the eco-coach heuristic fires (#1273). Co-located with the haptic; same toggle gates both surfaces."
   },
+  "anonKeyLabel": "Anon Key",
+  "anonKeyHideTooltip": "Hide key",
+  "anonKeyShowTooltip": "Show key to verify",
+  "anonKeyTooLong": "Key is too long ({length} chars) — check for extra text",
+  "@anonKeyTooLong": {
+    "placeholders": {
+      "length": {
+        "type": "int",
+        "example": "600"
+      }
+    }
+  },
+  "anonKeyLooksCorrect": "Key looks correct ({length} chars)",
+  "@anonKeyLooksCorrect": {
+    "placeholders": {
+      "length": {
+        "type": "int",
+        "example": "208"
+      }
+    }
+  },
+  "anonKeyShouldBeJwt": "Key should be a JWT (header.payload.signature)",
+  "anonKeyMayBeTruncated": "Key may be truncated ({length} of ~208 expected chars)",
+  "@anonKeyMayBeTruncated": {
+    "placeholders": {
+      "length": {
+        "type": "int",
+        "example": "120"
+      }
+    }
+  },
+  "anonKeyExceedsMax": "Key exceeds maximum length",
+  "qrShareTitle": "Share your database",
+  "qrShareSubtitle": "Others can scan this QR code to connect",
+  "qrShareCopyAsText": "Copy as text",
+  "authInfoTitle": "Why create an account?",
+  "authInfoBenefit1": "• Sync favorites, alerts, and saved routes across devices",
+  "authInfoBenefit2": "• Prepare a route on your phone, use it in your car",
+  "authInfoBenefit3": "• No data is shared with third parties",
+  "authInfoBenefit4": "• You can delete your account at any time",
+  "privacyLocalDataEmpty": "Nothing stored yet. Add a favorite or set a price alert to see entries here.",
+  "privacyHideEmptyRows": "Hide empty rows",
+  "privacyShowEmptyRows": "{count, plural, =1{Show {count} empty row} other{Show {count} empty rows}}",
+  "@privacyShowEmptyRows": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "apiKeySetupTitle": "API key setup (optional)",
+  "apiKeySetupDescription": "Register for a free API key, or skip to explore the app with demo data.",
+  "apiKeyRegistrationButton": "{provider} Registration",
+  "@apiKeyRegistrationButton": {
+    "placeholders": {
+      "provider": {
+        "type": "String",
+        "example": "ADAC"
+      }
+    }
+  },
+  "apiKeyTerms": "By entering an API key you accept the terms of {provider}. Data redistribution is prohibited.",
+  "@apiKeyTerms": {
+    "placeholders": {
+      "provider": {
+        "type": "String",
+        "example": "ADAC"
+      }
+    }
+  },
+  "calculatorDistanceHint": "e.g. 150",
+  "calculatorConsumptionHint": "e.g. 7.0",
+  "calculatorPriceHint": "e.g. 1.899",
+  "routeStrategyLabel": "Strategy:",
+  "routeStrategyUniform": "Uniform",
+  "routeStrategyBalanced": "Balanced",
+  "glideCoachBetaTitle": "Glide-coach beta (experimental)",
+  "glideCoachBetaSubtitle": "Subtle haptic when slowing down ahead of a red light. Off by default — distraction risk.",
+  "consentSyncTripsTitle": "Sync trip recordings",
+  "consentSyncTripsSubtitle": "Back up OBD2 + GPS trips to TankSync. Cross-device, opt-in.",
+  "consentSyncTripsDisabledHint": "Enable Cloud Sync above to back up trips.",
+  "consentHideDetails": "Hide details",
+  "consentShowDetails": "Show details",
+  "dialogOk": "OK",
+  "invalidLinkTitle": "Invalid link",
+  "invalidLinkBody": "The link \"{path}\" is not valid.",
+  "@invalidLinkBody": {
+    "placeholders": {
+      "path": {
+        "type": "String",
+        "example": "/station/foo"
+      }
+    }
+  },
+  "home": "Home",
   "loyaltySettingsTitle": "Fuel club cards",
   "@loyaltySettingsTitle": {
     "description": "Title of the loyalty settings sub-screen where the user manages fuel-club cards (#1120)."
