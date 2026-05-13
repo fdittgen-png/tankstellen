@@ -139,18 +139,30 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
 
-          // Consumption-tab settings group: vehicles, fuel club cards,
-          // and the real-time eco-coaching toggle. Section title matches
-          // the bottom-nav "Conso" tab so users can correlate the two
-          // entry points (#1122 follow-up). The standalone "My vehicles"
-          // and "Fuel club cards" tiles were folded INTO this section
-          // so per-vehicle controls cluster under one heading.
-          // #1447 phase 3 — hidden entirely when the root feature
-          // (`obd2TripRecording`) is effectively disabled. Per-vehicle
-          // and eco-coach state stays persisted; re-enabling
-          // consumption restores the section with its previous
-          // configuration.
+          // #1568 — "My vehicles" promoted back to a top-level Settings
+          // entry (it lived inside the Conso foldable since #1242). The
+          // Medium use-mode tier's primary feature is manual fill-up
+          // logging, which is useless without a configured vehicle —
+          // burying the entry-point inside a collapsed foldable made
+          // the configuration unreachable. Top-level placement makes
+          // it discoverable in one tap from Settings root for both
+          // Medium and Full users.
           if (consumptionOn) ...[
+            SettingsMenuTile(
+              key: const Key('settingsRootVehiclesTile'),
+              icon: Icons.directions_car,
+              title: l?.vehiclesMenuTitle ?? 'My vehicles',
+              subtitle: l?.vehiclesMenuSubtitle ??
+                  'Battery, connectors, charging preferences',
+              onTap: () => context.push('/vehicles'),
+            ),
+            const SizedBox(height: 8),
+            // Consumption-tab settings group: fuel club cards, eco-coach,
+            // glide-coach, and gamification. Section title matches the
+            // bottom-nav "Conso" tab so users can correlate the two
+            // entry points (#1122 follow-up). Hidden entirely when
+            // `isConsumptionTabReachable` returns false; per-vehicle
+            // state stays persisted across hide/show.
             _FoldableSection(
               icon: Icons.local_gas_station_outlined,
               title: l?.navConsumption ?? 'Consumption',

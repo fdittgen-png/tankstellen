@@ -48,15 +48,10 @@ class DrivingSettingsSection extends ConsumerWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SettingsMenuTile(
-          key: const Key('consoleVehiclesTile'),
-          icon: Icons.directions_car,
-          title: l?.vehiclesMenuTitle ?? 'My vehicles',
-          subtitle: l?.vehiclesMenuSubtitle ??
-              'Battery, connectors, charging preferences',
-          onTap: () => context.push('/vehicles'),
-        ),
-        const SizedBox(height: 8),
+        // #1568 — "My vehicles" tile moved up to Settings root so the
+        // entry-point is discoverable without expanding the Conso
+        // foldable. The fuel-club + eco-coach + gamification toggles
+        // stay clustered here.
         if (loyaltyOn)
           SettingsMenuTile(
             key: const Key('consoleFuelClubCardsTile'),
