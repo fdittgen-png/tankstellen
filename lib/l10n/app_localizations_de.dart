@@ -2108,6 +2108,55 @@ class AppLocalizationsDe extends AppLocalizations {
   String get wizardVehicleDefaultBadge => 'Standard';
 
   @override
+  String get wizardProfileChoiceHint =>
+      'Wähle, wie du die App nutzen möchtest. Du kannst dies später in den Einstellungen ändern.';
+
+  @override
+  String get wizardProfileChoiceFooter =>
+      'Du kannst deine Auswahl jederzeit unter Einstellungen → Nutzungsmodus ändern.';
+
+  @override
+  String get wizardProfileBasicName => 'Basis';
+
+  @override
+  String get wizardProfileBasicDescription =>
+      'Günstigste Kraftstoff- und EV-Ladepreise in der Nähe. Favoriten und Preisalarme.';
+
+  @override
+  String get wizardProfileMediumName => 'Mittel';
+
+  @override
+  String get wizardProfileMediumDescription =>
+      'Alles aus Basis, plus manuelles Erfassen von Tankvorgängen und EV-Ladungen.';
+
+  @override
+  String get wizardProfileFullName => 'Voll';
+
+  @override
+  String get wizardProfileFullDescription =>
+      'Alles aus Mittel, plus automatische OBD2-Fahrtaufzeichnung, Fahrwertung und Treuekarten.';
+
+  @override
+  String get wizardProfileCustomName => 'Individuell';
+
+  @override
+  String get wizardProfileCustomDescription =>
+      'Deine eigene Kombination an Funktionen. Passe jeden Schalter unten an.';
+
+  @override
+  String get useModeSectionHint =>
+      'Passe die App an deine tatsächliche Nutzung an. Eine Voreinstellung aktiviert das passende Funktionsbündel.';
+
+  @override
+  String get useModeCustomSettingsDescription =>
+      'Deine Funktionsauswahl passt zu keiner Voreinstellung. Wähle oben eine aus, um sie zu überschreiben, oder passe einzelne Funktionen unten weiter an.';
+
+  @override
+  String useModeSwitchedSnack(String profile) {
+    return 'Nutzungsmodus auf $profile gesetzt.';
+  }
+
+  @override
   String get profileDefaultVehicleLabel => 'Standardfahrzeug (optional)';
 
   @override

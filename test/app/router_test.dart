@@ -8,6 +8,8 @@ import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
@@ -40,8 +42,9 @@ class _EmptySearchState extends SearchState {
   }
 }
 
-/// Stubs one configured vehicle so the #893 Conso-tab gating keeps
-/// the 5-tab shell visible in tests that assert all five icons.
+/// Stubs one configured vehicle. Some downstream widgets gate on
+/// vehicle presence; seeding one keeps them out of the empty-state
+/// paths during these layout tests.
 class _OneVehicleList extends VehicleProfileList {
   @override
   List<VehicleProfile> build() => const [
@@ -51,6 +54,17 @@ class _OneVehicleList extends VehicleProfileList {
           type: VehicleType.combustion,
         ),
       ];
+}
+
+/// Seeds OBD2 + showConsumptionTab so `isConsumptionTabReachable`
+/// is true and the bottom-nav Conso slot (#conso-coherence-2) stays
+/// visible for the 5-branch assertions below.
+class _FullProfileFlags extends FeatureFlags {
+  @override
+  Set<Feature> build() => const {
+        Feature.obd2TripRecording,
+        Feature.showConsumptionTab,
+      };
 }
 
 /// Fixed FavoriteStations returning empty data.
@@ -100,6 +114,7 @@ void main() {
         // so tests that assert the 5-tab layout must seed at least one
         // vehicle.
         vehicleProfileListProvider.overrideWith(() => _OneVehicleList()),
+        featureFlagsProvider.overrideWith(() => _FullProfileFlags()),
       ].cast();
     });
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/app_profile_provider.dart';
 import '../../../feature_management/domain/app_profile.dart';
 
@@ -25,6 +26,7 @@ class UseModeSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
     final activeProfile = ref.watch(activeAppProfileProvider);
 
     return Padding(
@@ -35,10 +37,10 @@ class UseModeSection extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(left: 4, right: 4, bottom: 8),
             child: Text(
-              // #1517 follow-up: ARB strings will localise this — using
-              // English-only inline copy for the initial ship.
-              'Right-size the app to how you actually use it. Picking '
-                  'a preset enables the matching set of features.',
+              l?.useModeSectionHint ??
+                  'Right-size the app to how you actually use it. '
+                      'Picking a preset enables the matching set of '
+                      'features.',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -47,43 +49,43 @@ class UseModeSection extends ConsumerWidget {
           _PresetCard(
             profile: AppProfile.basic,
             icon: Icons.local_gas_station_outlined,
-            title: 'Basic',
-            description:
+            title: l?.wizardProfileBasicName ?? 'Basic',
+            description: l?.wizardProfileBasicDescription ??
                 'Cheapest fuel and EV charging prices nearby. '
                     'Favorites and price alerts.',
             isActive: activeProfile == AppProfile.basic,
-            onTap: () => _select(context, ref, AppProfile.basic),
+            onTap: () => _select(context, ref, AppProfile.basic, l),
           ),
           const SizedBox(height: 8),
           _PresetCard(
             profile: AppProfile.medium,
             icon: Icons.analytics_outlined,
-            title: 'Medium',
-            description:
+            title: l?.wizardProfileMediumName ?? 'Medium',
+            description: l?.wizardProfileMediumDescription ??
                 'Everything in Basic, plus track your fuel fill-ups '
                     'and EV charging by hand.',
             isActive: activeProfile == AppProfile.medium,
-            onTap: () => _select(context, ref, AppProfile.medium),
+            onTap: () => _select(context, ref, AppProfile.medium, l),
           ),
           const SizedBox(height: 8),
           _PresetCard(
             profile: AppProfile.full,
             icon: Icons.directions_car_filled,
-            title: 'Full',
-            description:
+            title: l?.wizardProfileFullName ?? 'Full',
+            description: l?.wizardProfileFullDescription ??
                 'Everything in Medium, plus automatic OBD2 trip '
                     'recording, driving scores, and loyalty cards.',
             isActive: activeProfile == AppProfile.full,
-            onTap: () => _select(context, ref, AppProfile.full),
+            onTap: () => _select(context, ref, AppProfile.full, l),
           ),
           if (activeProfile == AppProfile.custom) ...[
             const SizedBox(height: 8),
-            const _PresetCard(
+            _PresetCard(
               profile: AppProfile.custom,
               icon: Icons.tune_outlined,
-              title: 'Custom',
-              description:
-                  'Your feature mix doesn\'t match any preset. Pick '
+              title: l?.wizardProfileCustomName ?? 'Custom',
+              description: l?.useModeCustomSettingsDescription ??
+                  "Your feature mix doesn't match any preset. Pick "
                       'one above to overwrite, or keep customising '
                       'individual features in the section below.',
               isActive: true,
@@ -99,28 +101,29 @@ class UseModeSection extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     AppProfile profile,
+    AppLocalizations? l,
   ) async {
     final messenger = ScaffoldMessenger.maybeOf(context);
     await ref.read(activeAppProfileProvider.notifier).select(profile);
     if (messenger != null && context.mounted) {
+      final name = _localizedName(profile, l);
       SnackBarHelper.showSuccess(
         context,
-        // English-only inline; ARB-localised in a follow-up.
-        'Use mode set to ${_label(profile)}.',
+        l?.useModeSwitchedSnack(name) ?? 'Use mode set to $name.',
       );
     }
   }
 
-  String _label(AppProfile profile) {
+  String _localizedName(AppProfile profile, AppLocalizations? l) {
     switch (profile) {
       case AppProfile.basic:
-        return 'Basic';
+        return l?.wizardProfileBasicName ?? 'Basic';
       case AppProfile.medium:
-        return 'Medium';
+        return l?.wizardProfileMediumName ?? 'Medium';
       case AppProfile.full:
-        return 'Full';
+        return l?.wizardProfileFullName ?? 'Full';
       case AppProfile.custom:
-        return 'Custom';
+        return l?.wizardProfileCustomName ?? 'Custom';
     }
   }
 }

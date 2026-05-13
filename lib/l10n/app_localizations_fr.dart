@@ -2104,6 +2104,55 @@ class AppLocalizationsFr extends AppLocalizations {
   String get wizardVehicleDefaultBadge => 'Par défaut';
 
   @override
+  String get wizardProfileChoiceHint =>
+      'Choisissez comment vous voulez utiliser l\'application. Vous pourrez modifier ce choix plus tard dans les Paramètres.';
+
+  @override
+  String get wizardProfileChoiceFooter =>
+      'Vous pouvez changer votre choix à tout moment depuis Paramètres → Mode d\'utilisation.';
+
+  @override
+  String get wizardProfileBasicName => 'Basique';
+
+  @override
+  String get wizardProfileBasicDescription =>
+      'Prix carburant et recharge électrique les moins chers à proximité. Favoris et alertes de prix.';
+
+  @override
+  String get wizardProfileMediumName => 'Moyen';
+
+  @override
+  String get wizardProfileMediumDescription =>
+      'Tout du mode Basique, plus le suivi manuel de vos pleins et recharges électriques.';
+
+  @override
+  String get wizardProfileFullName => 'Complet';
+
+  @override
+  String get wizardProfileFullDescription =>
+      'Tout du mode Moyen, plus l\'enregistrement automatique des trajets via OBD2, scores de conduite et cartes de fidélité.';
+
+  @override
+  String get wizardProfileCustomName => 'Personnalisé';
+
+  @override
+  String get wizardProfileCustomDescription =>
+      'Votre propre combinaison de fonctionnalités. Ajustez chaque option ci-dessous.';
+
+  @override
+  String get useModeSectionHint =>
+      'Adaptez l\'application à votre usage réel. Choisir un préréglage active l\'ensemble des fonctionnalités correspondant.';
+
+  @override
+  String get useModeCustomSettingsDescription =>
+      'Votre combinaison de fonctionnalités ne correspond à aucun préréglage. Choisissez-en un ci-dessus pour l\'écraser, ou continuez à personnaliser les fonctionnalités ci-dessous.';
+
+  @override
+  String useModeSwitchedSnack(String profile) {
+    return 'Mode d\'utilisation : $profile.';
+  }
+
+  @override
   String get profileDefaultVehicleLabel => 'Véhicule par défaut (facultatif)';
 
   @override

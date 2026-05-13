@@ -7,6 +7,8 @@ import 'package:tankstellen/app/shell_screen.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
+import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
@@ -38,7 +40,7 @@ class _EmptySearchState extends SearchState {
 }
 
 /// Stubs one configured vehicle so the shell renders all 5 tabs —
-/// #893 hides the Conso tab when the vehicle list is empty.
+/// some downstream widgets gate behaviour on vehicle presence.
 class _OneVehicleList extends VehicleProfileList {
   @override
   List<VehicleProfile> build() => const [
@@ -48,6 +50,16 @@ class _OneVehicleList extends VehicleProfileList {
           type: VehicleType.combustion,
         ),
       ];
+}
+
+/// Seeds OBD2 + showConsumptionTab so the bottom-nav Conso gate
+/// (#conso-coherence-2) keeps the slot visible.
+class _FullProfileFlags extends FeatureFlags {
+  @override
+  Set<Feature> build() => const {
+        Feature.obd2TripRecording,
+        Feature.showConsumptionTab,
+      };
 }
 
 /// Fixed FavoriteStations returning empty data.
@@ -85,6 +97,7 @@ void main() {
         // #893 — seed a vehicle so the Conso tab shows up and the
         // existing 5-tab / 5-label assertions below still hold.
         vehicleProfileListProvider.overrideWith(() => _OneVehicleList()),
+        featureFlagsProvider.overrideWith(() => _FullProfileFlags()),
       ];
     });
 
