@@ -23,8 +23,8 @@ Future<({int exitCode, String stdout, String stderr})> _runSelector({
   );
   p.stdin.writeln(stdinInput);
   await p.stdin.close();
-  final outF = p.stdout.transform(SystemEncoding().decoder).join();
-  final errF = p.stderr.transform(SystemEncoding().decoder).join();
+  final outF = p.stdout.transform(const SystemEncoding().decoder).join();
+  final errF = p.stderr.transform(const SystemEncoding().decoder).join();
   final code = await p.exitCode;
   return (exitCode: code, stdout: await outF, stderr: await errF);
 }
