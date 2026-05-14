@@ -320,31 +320,37 @@ void main() {
             'so users correlate the Settings group with the bottom-nav tab.',
       );
 
-      // #1568 — My vehicles is a top-level Settings entry, visible
-      // even while the Conso foldable is collapsed.
+      // #1572 — Mes véhicules is a labelled sub-section INSIDE the
+      // Conso foldable, not a top-level Settings tile. Reverses #1568.
       expect(
         find.byKey(const Key('settingsRootVehiclesTile')),
-        findsOneWidget,
-        reason: 'My vehicles tile must be reachable at Settings root '
-            'without expanding the Conso foldable (#1568).',
+        findsNothing,
+        reason: 'My vehicles must NOT render as a top-level Settings '
+            'tile after #1572 — it is a sub-section inside the Conso '
+            'foldable.',
       );
 
-      // Expand the foldable to verify the remaining toggles still
-      // render inside.
+      // Expand the foldable to verify the sub-sections render inside.
       await tester.tap(consumptionHeader);
       await tester.pumpAndSettle();
 
       expect(
+        find.byKey(const Key('consoleVehiclesTile')),
+        findsOneWidget,
+        reason: 'My vehicles tile lives inside the expanded Conso '
+            'foldable as the first sub-section (#1572).',
+      );
+      expect(
         find.byKey(const Key('consoleFuelClubCardsTile')),
         findsOneWidget,
-        reason: 'Fuel club cards tile lives inside the expanded '
-            'Consumption foldable (was at top level before #1242).',
+        reason: 'Fuel club cards tile lives inside the Driving '
+            'sub-section of the Conso foldable.',
       );
       expect(
         find.byKey(const Key('hapticEcoCoachToggle')),
         findsOneWidget,
-        reason: 'The eco-coach haptic toggle remains in the same '
-            'group, alongside the fuel-club tile.',
+        reason: 'The eco-coach haptic toggle is part of the Driving '
+            'sub-section alongside the fuel-club tile.',
       );
     });
 

@@ -1922,6 +1922,9 @@
   "consoModeOffDescription": "No Conso tab and no Conso settings section.",
   "consoModeFuelDescription": "Manual fill-ups only. Useful without an OBD2 adapter.",
   "consoModeFuelAndTripsDescription": "Adds automatic OBD2 trip recording. Requires a paired adapter.",
+  "consoSubsectionVehicles": "My vehicles",
+  "consoSubsectionTrajets": "Trips (OBD2)",
+  "consoSubsectionToggles": "Driving",
   "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 partial fill pending plein complet — not in average} other{{count} partial fills pending plein complet — not in average}}",
   "@consumptionStatsOpenWindowBanner": {
     "description": "Banner shown above the consumption stats card when one or more partial fill-ups have been logged after the most recent plein-complet (#1362). The fills are excluded from the L/100km average until the next plein-complet closes the window.",

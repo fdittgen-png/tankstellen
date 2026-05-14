@@ -139,30 +139,14 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
 
-          // #1568 — "My vehicles" promoted back to a top-level Settings
-          // entry (it lived inside the Conso foldable since #1242). The
-          // Medium use-mode tier's primary feature is manual fill-up
-          // logging, which is useless without a configured vehicle —
-          // burying the entry-point inside a collapsed foldable made
-          // the configuration unreachable. Top-level placement makes
-          // it discoverable in one tap from Settings root for both
-          // Medium and Full users.
+          // #1572 — Conso foldable contains every parameter that
+          // pairs with a Conso functionality: Mes véhicules, optional
+          // Trips (OBD2) sub-section, and the Driving toggles
+          // (eco-coach, gamification, fuel-club). DrivingSettingsSection
+          // itself owns the sub-section layout. The top-level
+          // *Mes véhicules* tile added in #1568 was reverted here in
+          // favour of the in-foldable sub-section header.
           if (consumptionOn) ...[
-            SettingsMenuTile(
-              key: const Key('settingsRootVehiclesTile'),
-              icon: Icons.directions_car,
-              title: l?.vehiclesMenuTitle ?? 'My vehicles',
-              subtitle: l?.vehiclesMenuSubtitle ??
-                  'Battery, connectors, charging preferences',
-              onTap: () => context.push('/vehicles'),
-            ),
-            const SizedBox(height: 8),
-            // Consumption-tab settings group: fuel club cards, eco-coach,
-            // glide-coach, and gamification. Section title matches the
-            // bottom-nav "Conso" tab so users can correlate the two
-            // entry points (#1122 follow-up). Hidden entirely when
-            // `isConsumptionTabReachable` returns false; per-vehicle
-            // state stays persisted across hide/show.
             _FoldableSection(
               icon: Icons.local_gas_station_outlined,
               title: l?.navConsumption ?? 'Consumption',

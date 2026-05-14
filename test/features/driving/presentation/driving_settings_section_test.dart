@@ -144,20 +144,18 @@ void main() {
         ],
       );
 
-      // #1568 — My vehicles tile was promoted back to Settings root so
-      // Medium-tier users can reach vehicle config without expanding
-      // the Conso foldable. The fuel-club tile remains the only menu
-      // tile inside this section.
+      // #1572 — Mes véhicules is back inside the Conso foldable as the
+      // first sub-section. Fuel-club lives in the Driving sub-section.
       expect(
         find.byKey(const Key('consoleVehiclesTile')),
-        findsNothing,
-        reason: 'My vehicles tile must NOT be inside DrivingSettingsSection '
-            'after #1568 — it lives at Settings root now.',
+        findsOneWidget,
+        reason: 'My vehicles tile must render inside the Conso section '
+            'as the first sub-section after #1572.',
       );
       expect(
         find.byKey(const Key('consoleFuelClubCardsTile')),
         findsOneWidget,
-        reason: 'Fuel club cards tile is part of the Consumption group.',
+        reason: 'Fuel club cards tile is part of the Driving sub-section.',
       );
 
       final children = <Widget>[
@@ -167,9 +165,10 @@ void main() {
       ];
       expect(
         children.length,
-        1,
-        reason: 'Exactly one SettingsMenuTile child: fuel club cards. '
-            'My vehicles was promoted to Settings root in #1568.',
+        2,
+        reason: 'Exactly two SettingsMenuTile children: My vehicles '
+            '(Mes véhicules sub-section) + Fuel club cards (Driving '
+            'sub-section).',
       );
     },
   );

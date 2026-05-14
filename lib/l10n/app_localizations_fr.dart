@@ -3544,6 +3544,15 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ajoute l\'enregistrement OBD2 automatique des trajets. Nécessite un adaptateur appairé.';
 
   @override
+  String get consoSubsectionVehicles => 'Mes véhicules';
+
+  @override
+  String get consoSubsectionTrajets => 'Trajets (OBD2)';
+
+  @override
+  String get consoSubsectionToggles => 'Conduite';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
+import '../../../feature_management/domain/conso_mode.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../../glide_coach/data/traffic_signal_repository.dart';
 import '../../../glide_coach/providers/glide_coach_settings_provider.dart';
@@ -13,23 +15,20 @@ import '../../providers/haptic_eco_coach_provider.dart';
 
 /// Consumption / driving settings group on the profile screen.
 ///
-/// Surfaced under the Conso-tab-aliased "Consumption" foldable, this
-/// section composes everything the user might want to tune for the
-/// vehicle they are currently driving:
-///   1. **My vehicles** (battery, connectors, charging prefs).
-///   2. **Fuel club cards** (per-litre discounts).
-///   3. **Real-time eco coaching** (haptic when over-driving on cruise).
-///   4. **Show achievements & scores** (master gamification opt-out —
-///      badges, scores, achievement tab).
+/// Surfaced inside the Settings → Conso foldable, this widget is the
+/// single child responsible for rendering every Conso-related
+/// parameter. After #1572 it splits into three labelled sub-sections so
+/// the user can see which functionality each parameter pairs with:
 ///
-/// The first two were standalone `SettingsMenuTile`s on the Settings
-/// page; pulling them inside one foldable that matches the "Conso" tab
-/// label keeps the per-vehicle controls clustered (#1122 follow-up).
-///
-/// Default of the eco-coach toggle is **off** —
-/// `HapticEcoCoachEnabled` reads the persisted Hive setting, which is
-/// null for first-launch users and only flips to true after an
-/// explicit tap.
+///   1. **My vehicles** — always visible when the foldable is rendered.
+///      The vehicles tile is the primary affordance for both Medium
+///      (manual fill-up tier) and Full (OBD2 trip tier).
+///   2. **Trips (OBD2)** — only when [ConsoMode.fuelAndTrips]. Houses
+///      the glide-coach beta toggle and reserves room for future
+///      OBD2-specific parameters.
+///   3. **Driving** — always visible. Real-time eco-coach,
+///      gamification, and (when [Feature.loyaltyCards] is on) the fuel-
+///      club entry-point.
 class DrivingSettingsSection extends ConsumerWidget {
   const DrivingSettingsSection({super.key});
 
@@ -37,21 +36,57 @@ class DrivingSettingsSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final enabled = ref.watch(hapticEcoCoachEnabledProvider);
+    final ecoEnabled = ref.watch(hapticEcoCoachEnabledProvider);
+    final flags = ref.watch(featureFlagsProvider);
     // #1517 / #1520 — gate the Loyalty tile by the new
     // [Feature.loyaltyCards] flag. Default-off; only the
     // `AppProfile.full` preset turns it on, so Basic + Medium users
     // never see the Fuel club cards entry-point in Settings.
-    final loyaltyOn =
-        ref.watch(featureFlagsProvider).contains(Feature.loyaltyCards);
+    final loyaltyOn = flags.contains(Feature.loyaltyCards);
+    final mode = consoModeFromFlags(flags);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // #1568 — "My vehicles" tile moved up to Settings root so the
-        // entry-point is discoverable without expanding the Conso
-        // foldable. The fuel-club + eco-coach + gamification toggles
-        // stay clustered here.
+        // 1. Mes véhicules sub-section — always present (the foldable
+        //    itself is hidden when consumptionOn is false in
+        //    ProfileScreen, so reaching this widget already means the
+        //    Conso surface is on).
+        SectionHeader(
+          title: l?.consoSubsectionVehicles ?? 'My vehicles',
+          leadingIcon: Icons.directions_car,
+          padding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
+        ),
+        SettingsMenuTile(
+          key: const Key('consoleVehiclesTile'),
+          icon: Icons.directions_car,
+          title: l?.vehiclesMenuTitle ?? 'My vehicles',
+          subtitle: l?.vehiclesMenuSubtitle ??
+              'Battery, connectors, charging preferences',
+          onTap: () => context.push('/vehicles'),
+        ),
+
+        // 2. Trips (OBD2) sub-section — only when the OBD2 stack is on
+        //    (consoMode == fuelAndTrips). Houses glide-coach beta and
+        //    leaves room for future Trajets-specific parameters.
+        if (mode == ConsoMode.fuelAndTrips) ...[
+          const SizedBox(height: 8),
+          SectionHeader(
+            title: l?.consoSubsectionTrajets ?? 'Trips (OBD2)',
+            leadingIcon: Icons.route_outlined,
+            padding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
+          ),
+          if (kGlideCoachEnabled) const _GlideCoachToggleTile(),
+        ],
+
+        // 3. Driving sub-section — eco-coach + gamification + fuel-club.
+        const SizedBox(height: 8),
+        SectionHeader(
+          title: l?.consoSubsectionToggles ?? 'Driving',
+          leadingIcon: Icons.tune,
+          padding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
+        ),
         if (loyaltyOn)
           SettingsMenuTile(
             key: const Key('consoleFuelClubCardsTile'),
@@ -63,7 +98,7 @@ class DrivingSettingsSection extends ConsumerWidget {
           ),
         SwitchListTile(
           key: const Key('hapticEcoCoachToggle'),
-          value: enabled,
+          value: ecoEnabled,
           title: Text(
             l?.hapticEcoCoachSettingTitle ?? 'Real-time eco coaching',
           ),
@@ -77,13 +112,6 @@ class DrivingSettingsSection extends ConsumerWidget {
               ref.read(hapticEcoCoachEnabledProvider.notifier).set(v),
           contentPadding: EdgeInsets.zero,
         ),
-        // #1125 phase 3b — glide-coach beta opt-in. The entire tile is
-        // wrapped in `if (kGlideCoachEnabled)` so it stays invisible in
-        // production: even users who would happily try it cannot enable
-        // a half-baked feature until the master flag flips after a
-        // driving-test cohort. When the flag flips, the toggle appears
-        // here without any further UI work.
-        if (kGlideCoachEnabled) const _GlideCoachToggleTile(),
         const GamificationSettingsTile(),
       ],
     );
@@ -95,11 +123,6 @@ class DrivingSettingsSection extends ConsumerWidget {
 /// Rendered only when the compile-time master flag
 /// [`kGlideCoachEnabled`] is true; the call site in
 /// [DrivingSettingsSection] gates visibility via `if (kGlideCoachEnabled)`.
-/// Keeping the widget itself in this file (rather than in the
-/// glide_coach feature folder) avoids importing presentation widgets
-/// from a feature whose UI surface doesn't exist yet, and matches the
-/// pattern of [GamificationSettingsTile] / [HapticEcoCoach toggle] —
-/// each toggle co-locates with the section it belongs to.
 class _GlideCoachToggleTile extends ConsumerWidget {
   const _GlideCoachToggleTile();
 
