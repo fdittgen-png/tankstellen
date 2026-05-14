@@ -98,8 +98,12 @@ Future<void> main(List<String> argv) async {
   _scanDartFiles(_libRoot, imports);
   _scanDartFiles(_testRoot, imports);
 
-  // For each test, compute its transitive lib imports.
-  final allTests = imports.keys.where((k) => k.startsWith(_testRoot)).toList()
+  // For each test file, compute its transitive lib imports. Only
+  // `_test.dart` files are emitted — helpers / fixtures in
+  // `test/helpers/`, `test/mocks/`, etc. aren't directly runnable.
+  final allTests = imports.keys
+      .where((k) => k.startsWith(_testRoot) && k.endsWith('_test.dart'))
+      .toList()
     ..sort();
 
   final affected = <String>{};

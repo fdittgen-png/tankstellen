@@ -83,6 +83,7 @@ docs/*
 # Quality / process audit reports — pattern-allowlisted (live at docs root,
 # not inside docs/decisions/ which is reserved for ADRs).
 !docs/test-audit-*.md
+!docs/test-always-run-bucket-*.md
 docs/guides/*
 !docs/guides/NETWORK_TESTS.md
 !docs/guides/NEW_COUNTRY.md
