@@ -9,3 +9,11 @@ tags:
       Tests that hit real third-party APIs over the network. Intermittent
       upstream timeouts mean these cannot block PRs. Run on demand with
       `flutter test --tags=network`.
+  flaky:
+    description: >
+      Tests that have observably flaked in CI without a related code
+      change — usually because they exercise a platform plugin
+      (share_plus, etc.) whose channel timing is unreliable in the
+      headless test environment. Excluded from PR + master runs; the
+      nightly flaky-suite workflow re-runs them so genuine regressions
+      still surface within a day.
