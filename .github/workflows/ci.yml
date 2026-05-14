@@ -51,9 +51,11 @@ jobs:
   # for the test phase drops from ~30 min to ~7-8 min; total billed
   # minutes go up ~4× (acceptable trade — same quality).
   #
-  # Coverage threshold + startup-budget enforcement moved to the
-  # downstream `coverage-merge` job so the shards stay single-purpose
-  # and we don't enforce a threshold on incomplete data.
+  # #1582 — `--coverage` is dropped on PR runs (it doubles per-shard
+  # wall clock for a report no one reviews mid-PR). Master pushes and
+  # the weekly schedule still produce coverage so the lcov artefact
+  # and threshold check stay current. Startup-budget enforcement
+  # moved to its own job so PRs still get that gate.
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -81,7 +83,15 @@ jobs:
       # APIs (Argentina, Italy MIMIT, etc.) that intermittently time out
       # and cannot block PRs. Run them on demand with
       # `flutter test --tags=network` from a workstation.
-      - name: Run test shard ${{ matrix.shard }} of 4
+      - name: Run test shard ${{ matrix.shard }} of 4 (PR — no coverage)
+        if: github.event_name == 'pull_request'
+        run: |
+          flutter test \
+            --exclude-tags=network \
+            --total-shards=4 \
+            --shard-index=${{ matrix.shard }}
+      - name: Run test shard ${{ matrix.shard }} of 4 (master/nightly — with coverage)
+        if: github.event_name != 'pull_request'
         run: |
           flutter test \
             --coverage \
@@ -89,6 +99,7 @@ jobs:
             --total-shards=4 \
             --shard-index=${{ matrix.shard }}
       - name: Upload shard coverage
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v7
         with:
           name: coverage-shard-${{ matrix.shard }}
@@ -98,9 +109,10 @@ jobs:
 
   # Aggregates the 4 shard coverage reports into one merged lcov.info
   # and enforces the project-wide threshold over the unified view.
-  # Also runs the startup-budget structural check here so the matrix
-  # shards stay single-purpose.
+  # #1582 — Only runs on master push + the weekly schedule. PRs skip
+  # this job; coverage is regenerated when a PR's commits land on master.
   coverage-merge:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     needs: [test]
     steps:
@@ -135,6 +147,27 @@ jobs:
           echo "Merged ${#ARGS[@]} shard lcov files into coverage/lcov.info"
       - name: Check coverage threshold
         run: bash scripts/check_coverage.sh
+
+  # #1582 — Startup-budget gate split out of coverage-merge so PRs
+  # still enforce it. Cheap: runs only the test/core/perf/ subset.
+  startup-budget:
+    runs-on: ubuntu-latest
+    needs: [analyze]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
       - name: Check startup time budget
         run: bash scripts/check_startup_budget.sh
 
