@@ -1,0 +1,10 @@
+{
+  "consoFeatureGroupTitle": "Conso",
+  "consoFeatureGroupDescription": "Track your consumption — manual fill-ups, or automatic OBD2 trip recording.",
+  "consoModeOff": "Off",
+  "consoModeFuel": "Fuel",
+  "consoModeFuelAndTrips": "Fuel + Trips",
+  "consoModeOffDescription": "No Conso tab and no Conso settings section.",
+  "consoModeFuelDescription": "Manual fill-ups only. Useful without an OBD2 adapter.",
+  "consoModeFuelAndTripsDescription": "Adds automatic OBD2 trip recording. Requires a paired adapter."
+}

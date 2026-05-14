@@ -3516,6 +3516,34 @@ class AppLocalizationsFr extends AppLocalizations {
       'Partagez anonymement vos heures d\'arrivée et de départ aux stations pour que l\'application affiche les temps d\'attente typiques. Aucune coordonnée GPS n\'est envoyée — uniquement l\'identifiant de la station.';
 
   @override
+  String get consoFeatureGroupTitle => 'Conso';
+
+  @override
+  String get consoFeatureGroupDescription =>
+      'Suivez votre consommation — pleins manuels ou enregistrement OBD2 automatique des trajets.';
+
+  @override
+  String get consoModeOff => 'Désactivé';
+
+  @override
+  String get consoModeFuel => 'Carburant';
+
+  @override
+  String get consoModeFuelAndTrips => 'Carburant + Trajets';
+
+  @override
+  String get consoModeOffDescription =>
+      'Aucun onglet Conso ni section Conso dans les paramètres.';
+
+  @override
+  String get consoModeFuelDescription =>
+      'Pleins manuels uniquement. Utile sans adaptateur OBD2.';
+
+  @override
+  String get consoModeFuelAndTripsDescription =>
+      'Ajoute l\'enregistrement OBD2 automatique des trajets. Nécessite un adaptateur appairé.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

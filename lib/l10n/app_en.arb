@@ -1914,6 +1914,14 @@
   "@gdprCommunityWaitTimeDescription": {
     "description": "GDPR consent toggle — full description used on the first-launch consent screen (#1119). Mentions exactly what is uploaded (station ID + arrival/departure timestamps) and what is NOT uploaded (raw lat/lng) so the user can give informed consent."
   },
+  "consoFeatureGroupTitle": "Conso",
+  "consoFeatureGroupDescription": "Track your consumption — manual fill-ups, or automatic OBD2 trip recording.",
+  "consoModeOff": "Off",
+  "consoModeFuel": "Fuel",
+  "consoModeFuelAndTrips": "Fuel + Trips",
+  "consoModeOffDescription": "No Conso tab and no Conso settings section.",
+  "consoModeFuelDescription": "Manual fill-ups only. Useful without an OBD2 adapter.",
+  "consoModeFuelAndTripsDescription": "Adds automatic OBD2 trip recording. Requires a paired adapter.",
   "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 partial fill pending plein complet — not in average} other{{count} partial fills pending plein complet — not in average}}",
   "@consumptionStatsOpenWindowBanner": {
     "description": "Banner shown above the consumption stats card when one or more partial fill-ups have been logged after the most recent plein-complet (#1362). The fills are excluded from the L/100km average until the next plein-complet closes the window.",

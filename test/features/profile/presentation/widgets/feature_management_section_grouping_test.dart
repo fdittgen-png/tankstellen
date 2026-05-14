@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/conso_mode.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/feature_management_section.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
@@ -68,33 +69,45 @@ void main() {
       );
     }
 
-    testWidgets('obd2TripRecording group contains its 7 dependents',
+    testWidgets('Conso group card contains its Trajets-tier dependents',
         (tester) async {
       await pumpSection(tester);
 
-      // Every feature whose `requires` set is `{obd2TripRecording}` must
-      // render as a descendant of the obd2TripRecording group card.
+      // #1571 — `obd2TripRecording` no longer renders as its own group
+      // card. The Conso card hosts the 3-way segmented control plus
+      // the Trajets-tier dependents (every feature whose `requires`
+      // chain includes obd2TripRecording, minus `showConsumptionTab`
+      // which is now derived from the segmented control).
       const dependents = <Feature>[
+        Feature.consumptionAnalytics,
         Feature.gamification,
         Feature.hapticEcoCoach,
-        Feature.consumptionAnalytics,
         Feature.glideCoach,
         Feature.gpsTripPath,
         Feature.autoRecord,
-        Feature.showConsumptionTab,
       ];
+      final consoCard = find.byKey(const Key('featureGroup_conso'));
+      expect(consoCard, findsOneWidget,
+          reason: 'Conso card must exist at the top of the section');
       for (final child in dependents) {
-        expectChildInGroup(Feature.obd2TripRecording, child);
+        expect(
+          find.descendant(
+            of: consoCard,
+            matching: find.byKey(Key('featureToggle_${child.name}')),
+          ),
+          findsOneWidget,
+          reason: '${child.name} must render inside the Conso card',
+        );
       }
-
-      // The parent toggle itself must be inside its group.
-      expect(
-        find.descendant(
-          of: find.byKey(const Key('featureGroup_obd2TripRecording')),
-          matching: find.byKey(const Key('featureToggle_obd2TripRecording')),
-        ),
-        findsOneWidget,
-      );
+      // The old obd2TripRecording / showConsumptionTab / manualConsumption
+      // standalone toggles must NOT render — they're replaced by the
+      // segmented control.
+      expect(find.byKey(const Key('featureToggle_obd2TripRecording')),
+          findsNothing);
+      expect(find.byKey(const Key('featureToggle_showConsumptionTab')),
+          findsNothing);
+      expect(find.byKey(const Key('featureToggle_manualConsumption')),
+          findsNothing);
     });
 
     testWidgets('tankSync group contains baselineSync', (tester) async {
@@ -124,37 +137,31 @@ void main() {
               'must contain exactly one SwitchListTile (itself)');
     });
 
-    testWidgets('parent toggles render before their children in the card',
+    testWidgets('segmented control renders above the Trajets-tier dependents',
         (tester) async {
       await pumpSection(tester);
 
-      // Topology check: in the obd2TripRecording group the parent's
-      // toggle key must appear before any dependent toggle key in
-      // widget-tree order. Use rect.top as the order proxy because the
-      // card is a Column.
-      final parentRect = tester.getRect(
-        find.byKey(const Key('featureToggle_obd2TripRecording')),
-      );
+      // Topology check (#1571): the Conso segmented control sits at the
+      // top of the Conso card; the Trajets-tier toggles render beneath.
+      final segmented = tester.getRect(find.byType(SegmentedButton<ConsoMode>));
       final childRect = tester.getRect(
         find.byKey(const Key('featureToggle_gamification')),
       );
-      expect(parentRect.top, lessThan(childRect.top),
-          reason: 'parent must render above its dependent inside the card');
+      expect(segmented.top, lessThan(childRect.top),
+          reason: 'segmented control must render above its dependent toggles');
     });
 
-    testWidgets('children are visually indented relative to the parent',
+    testWidgets('Trajets-tier toggles are indented inside the Conso card',
         (tester) async {
       await pumpSection(tester);
 
-      final parentRect = tester.getRect(
-        find.byKey(const Key('featureToggle_obd2TripRecording')),
-      );
+      final segmented = tester.getRect(find.byType(SegmentedButton<ConsoMode>));
       final childRect = tester.getRect(
         find.byKey(const Key('featureToggle_gamification')),
       );
-      expect(childRect.left, greaterThan(parentRect.left),
-          reason: 'dependent rows must be indented right of the parent '
-              'so the hierarchy is visually obvious');
+      expect(childRect.left, greaterThan(segmented.left),
+          reason: 'dependent rows must be indented right of the segmented '
+              'control so the Conso hierarchy is visually obvious');
     });
   });
 
@@ -274,6 +281,86 @@ void main() {
       expect(find.byType(SnackBar), findsNothing,
           reason: 'unblocked toggles must NOT trigger the snackbar — '
               'the snackbar is only the blocked-tap path');
+    });
+  });
+
+  group('FeatureManagementSection — Conso segmented control (#1571)', () {
+    testWidgets(
+        'tapping the Fuel segment turns on showConsumptionTab + '
+        'manualConsumption and turns off obd2TripRecording', (tester) async {
+      final container = ProviderContainer(
+        overrides: [
+          featureFlagsRepositoryProvider.overrideWithValue(null),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      // Start in a state where obd2TripRecording is ON to prove the
+      // segment switch actually disables it.
+      await container
+          .read(featureFlagsProvider.notifier)
+          .enable(Feature.obd2TripRecording);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
+            home: Scaffold(
+              body: SingleChildScrollView(child: FeatureManagementSection()),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Tap the "Fuel" segment.
+      await tester.tap(find.text('Fuel'));
+      await tester.pumpAndSettle();
+
+      final flags = container.read(featureFlagsProvider);
+      expect(flags, contains(Feature.showConsumptionTab));
+      expect(flags, contains(Feature.manualConsumption));
+      expect(flags, isNot(contains(Feature.obd2TripRecording)));
+    });
+
+    testWidgets('tapping the Off segment clears all three Conso flags',
+        (tester) async {
+      final container = ProviderContainer(
+        overrides: [
+          featureFlagsRepositoryProvider.overrideWithValue(null),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container
+          .read(featureFlagsProvider.notifier)
+          .enable(Feature.obd2TripRecording);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
+            home: Scaffold(
+              body: SingleChildScrollView(child: FeatureManagementSection()),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Off'));
+      await tester.pumpAndSettle();
+
+      final flags = container.read(featureFlagsProvider);
+      expect(flags, isNot(contains(Feature.showConsumptionTab)));
+      expect(flags, isNot(contains(Feature.manualConsumption)));
+      expect(flags, isNot(contains(Feature.obd2TripRecording)));
     });
   });
 }

@@ -6452,6 +6452,54 @@ abstract class AppLocalizations {
   /// **'Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.'**
   String get gdprCommunityWaitTimeDescription;
 
+  /// No description provided for @consoFeatureGroupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Conso'**
+  String get consoFeatureGroupTitle;
+
+  /// No description provided for @consoFeatureGroupDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Track your consumption — manual fill-ups, or automatic OBD2 trip recording.'**
+  String get consoFeatureGroupDescription;
+
+  /// No description provided for @consoModeOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get consoModeOff;
+
+  /// No description provided for @consoModeFuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel'**
+  String get consoModeFuel;
+
+  /// No description provided for @consoModeFuelAndTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel + Trips'**
+  String get consoModeFuelAndTrips;
+
+  /// No description provided for @consoModeOffDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'No Conso tab and no Conso settings section.'**
+  String get consoModeOffDescription;
+
+  /// No description provided for @consoModeFuelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual fill-ups only. Useful without an OBD2 adapter.'**
+  String get consoModeFuelDescription;
+
+  /// No description provided for @consoModeFuelAndTripsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Adds automatic OBD2 trip recording. Requires a paired adapter.'**
+  String get consoModeFuelAndTripsDescription;
+
   /// Banner shown above the consumption stats card when one or more partial fill-ups have been logged after the most recent plein-complet (#1362). The fills are excluded from the L/100km average until the next plein-complet closes the window.
   ///
   /// In en, this message translates to:

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/app_profile_provider.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
+import '../../../feature_management/domain/conso_mode.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../../../feature_management/domain/feature_manifest.dart';
@@ -48,6 +49,45 @@ class FeatureManagementSection extends ConsumerWidget {
     // grouping placement is deterministic.
     final groups = _buildGroups(manifest);
 
+    // #1571 — Conso surface owns its own card with a 3-way segmented
+    // control (Off / Fuel / Fuel + Trips). Suppress the underlying
+    // flag toggles from the manifest list so the user only sees the
+    // mode selector + its Trajets-tier dependents grouped together.
+    final consoModeFlags = <Feature>{
+      Feature.obd2TripRecording,
+      Feature.manualConsumption,
+      Feature.showConsumptionTab,
+    };
+    // Dependents that visually belong inside the Conso card (Trajets
+    // tier) — they only become tappable when consoMode == fuelAndTrips
+    // because their manifest `requires` chain includes obd2TripRecording.
+    final consoDependents = <Feature>[
+      Feature.consumptionAnalytics,
+      Feature.gamification,
+      Feature.hapticEcoCoach,
+      Feature.glideCoach,
+      Feature.gpsTripPath,
+      Feature.autoRecord,
+    ];
+
+    // Filter the regular group rendering: drop the Conso "parent" flags
+    // (replaced by the segmented control) AND drop the Conso dependents
+    // (re-rendered inside the Conso card). Other groups (TankSync,
+    // priceAlerts, …) flow through unchanged.
+    final filteredGroups = <_FeatureGroup>[
+      for (final group in groups)
+        if (!consoModeFlags.contains(group.parent))
+          _FeatureGroup(
+            parent: group.parent,
+            children: [
+              for (final c in group.children)
+                if (!consoDependents.contains(c) &&
+                    !consoModeFlags.contains(c))
+                  c,
+            ],
+          ),
+    ];
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
@@ -63,7 +103,15 @@ class FeatureManagementSection extends ConsumerWidget {
               style: theme.textTheme.bodySmall,
             ),
           ),
-          for (final group in groups)
+          // Conso group card (#1571) — sits at the top because every
+          // other Conso-tier dependent reads from its current mode.
+          _ConsoFeatureCard(
+            mode: consoModeFromFlags(enabled),
+            dependents: consoDependents,
+            manifest: manifest,
+            currentlyEnabled: enabled,
+          ),
+          for (final group in filteredGroups)
             _FeatureGroupCard(
               group: group,
               manifest: manifest,
@@ -72,6 +120,138 @@ class FeatureManagementSection extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+/// Conso group card (#1571). Renders the 3-way [ConsoMode] segmented
+/// control at the top followed by the Trajets-tier dependent toggles
+/// indented beneath it. The dependents render as [_FeatureToggle]s
+/// just like in [_FeatureGroupCard] so the cascading-disable behaviour
+/// (#1447) keeps applying — when mode is Off or Fuel, the dependents
+/// stay visually disabled with the standard blocked-enable tooltip.
+class _ConsoFeatureCard extends ConsumerWidget {
+  final ConsoMode mode;
+  final List<Feature> dependents;
+  final FeatureManifest manifest;
+  final Set<Feature> currentlyEnabled;
+
+  const _ConsoFeatureCard({
+    required this.mode,
+    required this.dependents,
+    required this.manifest,
+    required this.currentlyEnabled,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    return Card(
+      key: const Key('featureGroup_conso'),
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l?.consoFeatureGroupTitle ?? 'Conso',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              l?.consoFeatureGroupDescription ??
+                  'Track your consumption — manual fill-ups, or '
+                      'automatic OBD2 trip recording.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 12),
+            SegmentedButton<ConsoMode>(
+              segments: <ButtonSegment<ConsoMode>>[
+                ButtonSegment<ConsoMode>(
+                  value: ConsoMode.off,
+                  label: Text(l?.consoModeOff ?? 'Off'),
+                ),
+                ButtonSegment<ConsoMode>(
+                  value: ConsoMode.fuel,
+                  label: Text(l?.consoModeFuel ?? 'Fuel'),
+                ),
+                ButtonSegment<ConsoMode>(
+                  value: ConsoMode.fuelAndTrips,
+                  label: Text(l?.consoModeFuelAndTrips ?? 'Fuel + Trips'),
+                ),
+              ],
+              selected: <ConsoMode>{mode},
+              showSelectedIcon: false,
+              onSelectionChanged: (selected) {
+                final next = selected.first;
+                if (next == mode) return;
+                unawaited(_applyConsoMode(ref, next));
+              },
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _modeDescription(l, mode),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            if (dependents.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: theme.dividerColor.withValues(alpha: 0.4),
+              ),
+              for (final child in dependents)
+                Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: _FeatureToggle(
+                    feature: child,
+                    isEnabled: currentlyEnabled.contains(child),
+                    manifest: manifest,
+                    currentlyEnabled: currentlyEnabled,
+                  ),
+                ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _modeDescription(AppLocalizations? l, ConsoMode m) {
+    switch (m) {
+      case ConsoMode.off:
+        return l?.consoModeOffDescription ??
+            'No Conso tab and no Conso settings section.';
+      case ConsoMode.fuel:
+        return l?.consoModeFuelDescription ??
+            'Manual fill-ups only. Useful without an OBD2 adapter.';
+      case ConsoMode.fuelAndTrips:
+        return l?.consoModeFuelAndTripsDescription ??
+            'Adds automatic OBD2 trip recording. Requires a paired adapter.';
+    }
+  }
+
+  Future<void> _applyConsoMode(WidgetRef ref, ConsoMode next) async {
+    final delta = consoModeFlagDelta(next);
+    final notifier = ref.read(featureFlagsProvider.notifier);
+    for (final f in delta.toAdd) {
+      await notifier.enable(f);
+    }
+    for (final f in delta.toRemove) {
+      await notifier.disable(f);
+    }
+    final newFlags = ref.read(featureFlagsProvider);
+    await ref
+        .read(activeAppProfileProvider.notifier)
+        .reconcileWithFlags(newFlags);
   }
 }
 
