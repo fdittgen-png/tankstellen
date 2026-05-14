@@ -6500,6 +6500,24 @@ abstract class AppLocalizations {
   /// **'Adds automatic OBD2 trip recording. Requires a paired adapter.'**
   String get consoModeFuelAndTripsDescription;
 
+  /// No description provided for @consoSubsectionVehicles.
+  ///
+  /// In en, this message translates to:
+  /// **'My vehicles'**
+  String get consoSubsectionVehicles;
+
+  /// No description provided for @consoSubsectionTrajets.
+  ///
+  /// In en, this message translates to:
+  /// **'Trips (OBD2)'**
+  String get consoSubsectionTrajets;
+
+  /// No description provided for @consoSubsectionToggles.
+  ///
+  /// In en, this message translates to:
+  /// **'Driving'**
+  String get consoSubsectionToggles;
+
   /// Banner shown above the consumption stats card when one or more partial fill-ups have been logged after the most recent plein-complet (#1362). The fills are excluded from the L/100km average until the next plein-complet closes the window.
   ///
   /// In en, this message translates to:

@@ -3512,6 +3512,15 @@ class AppLocalizationsSv extends AppLocalizations {
       'Adds automatic OBD2 trip recording. Requires a paired adapter.';
 
   @override
+  String get consoSubsectionVehicles => 'My vehicles';
+
+  @override
+  String get consoSubsectionTrajets => 'Trips (OBD2)';
+
+  @override
+  String get consoSubsectionToggles => 'Driving';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

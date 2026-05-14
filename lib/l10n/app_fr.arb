@@ -1350,5 +1350,8 @@
   "consoModeFuelAndTrips": "Carburant + Trajets",
   "consoModeOffDescription": "Aucun onglet Conso ni section Conso dans les paramètres.",
   "consoModeFuelDescription": "Pleins manuels uniquement. Utile sans adaptateur OBD2.",
-  "consoModeFuelAndTripsDescription": "Ajoute l'enregistrement OBD2 automatique des trajets. Nécessite un adaptateur appairé."
+  "consoModeFuelAndTripsDescription": "Ajoute l'enregistrement OBD2 automatique des trajets. Nécessite un adaptateur appairé.",
+  "consoSubsectionVehicles": "Mes véhicules",
+  "consoSubsectionTrajets": "Trajets (OBD2)",
+  "consoSubsectionToggles": "Conduite"
 }
