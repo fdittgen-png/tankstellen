@@ -78,29 +78,43 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('section renders with one toggle per feature (20 total)',
+    testWidgets('section renders one toggle per feature (minus Conso-mode flags)',
         (tester) async {
       await pumpApp(tester, const ProfileScreen(), overrides: baseOverrides);
       await openSection(tester);
 
-      // Every Feature enum value must surface a SwitchListTile keyed
-      // `featureToggle_<name>`. The test pins the count at the current
-      // enum size so adding a feature without wiring it up fails here.
+      // #1571 — three Conso-surface flags are no longer rendered as
+      // per-feature switches: `obd2TripRecording`, `manualConsumption`,
+      // and `showConsumptionTab` are now driven by the segmented
+      // control inside the Conso card. Every other Feature enum value
+      // still surfaces a SwitchListTile keyed `featureToggle_<name>`.
+      const consoModeFlags = <Feature>{
+        Feature.obd2TripRecording,
+        Feature.manualConsumption,
+        Feature.showConsumptionTab,
+      };
       for (final f in Feature.values) {
-        expect(
-          find.byKey(Key('featureToggle_${f.name}')),
-          findsOneWidget,
-          reason: 'expected a switch for ${f.name}',
-        );
+        if (consoModeFlags.contains(f)) {
+          expect(
+            find.byKey(Key('featureToggle_${f.name}')),
+            findsNothing,
+            reason: '${f.name} is driven by the Conso segmented control '
+                '(#1571) — it must not render as a stand-alone switch.',
+          );
+        } else {
+          expect(
+            find.byKey(Key('featureToggle_${f.name}')),
+            findsOneWidget,
+            reason: 'expected a switch for ${f.name}',
+          );
+        }
       }
       expect(Feature.values.length, 20,
           reason: '#1373 phase 1 shipped 13 features; phase 3d added '
-              'autoRecord as a master gate over the per-vehicle bool '
-              '(14); phase 3c bundled showFuel + showElectric + '
+              'autoRecord (14); phase 3c bundled showFuel + showElectric + '
               'showConsumptionTab (17); #1517 added manualConsumption + '
-              'loyaltyCards (19); #1543 added tflitePricePrediction '
-              '(total 20). Update the test if a new feature was added '
-              'or removed.');
+              'loyaltyCards (19); #1543 added tflitePricePrediction (20). '
+              'Update the test if a new feature was added or removed.');
     });
 
     testWidgets(
@@ -211,9 +225,10 @@ void main() {
     });
 
     testWidgets(
-        'disabling obd2TripRecording while gamification is ON succeeds — '
-        'gamification switch then renders disabled-with-tooltip (#1447 '
-        'cascading-disable)', (tester) async {
+        'disabling obd2TripRecording via the provider while gamification is '
+        'ON succeeds — gamification switch then renders disabled-with-'
+        'tooltip (#1447 cascading-disable, #1571 segmented control)',
+        (tester) async {
       final container = ProviderContainer(
         overrides: baseOverrides.cast(),
       );
@@ -242,18 +257,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Pre-disable: parent switch is interactive, child switch is
-      // interactive (everything is in the effectively-enabled state).
-      final obd2Switch = tester.widget<SwitchListTile>(
-        find.byKey(const Key('featureToggle_obd2TripRecording')),
-      );
-      expect(obd2Switch.onChanged, isNotNull,
-          reason: 'parent switch must be interactive — disabling no '
-              'longer requires the user to clear dependents first.');
-
-      // Disabling the parent succeeds — gamification stays in the
-      // stored set so re-enabling restores the prior surface, but the
-      // gamification row now renders disabled-with-tooltip.
+      // #1571 — `obd2TripRecording` is no longer a stand-alone switch.
+      // The user-facing path is the Conso segmented control's "Off"
+      // segment; we drive the underlying flag directly here to keep
+      // this test focused on the cascading-disable behaviour rather
+      // than the segmented control wiring (covered in
+      // `feature_management_section_grouping_test.dart`).
       await container
           .read(featureFlagsProvider.notifier)
           .disable(Feature.obd2TripRecording);
