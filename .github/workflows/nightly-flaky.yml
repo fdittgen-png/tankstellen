@@ -1,0 +1,57 @@
+name: Nightly Flaky + Network Suite
+
+# Companion to #1584. The `flaky` + `network` buckets are excluded from
+# PR + master CI because their failures are intermittent and would
+# block merges. This workflow re-runs them once a day so a real
+# regression in a tagged test still surfaces within ~24 h.
+#
+# Tag scope:
+#   - `network` — live-API tests (Italy MIMIT, Argentina, etc).
+#   - `flaky`   — platform-plugin tests whose channel timing is
+#                 unreliable in headless runners (share_plus, etc).
+
+on:
+  schedule:
+    # 05:00 UTC = 07:00 Europe/Paris (CEST) / 06:00 (CET).
+    # Runs an hour after the nightly-full suite so failures don't
+    # collide with the full-suite comment on #1591.
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: nightly-flaky
+  cancel-in-progress: false
+
+jobs:
+  flaky-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: master
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - name: Run flaky + network suites
+        # Includes both tags so we cover everything the PR/master path
+        # excludes. Single invocation — comma-separated tags is the
+        # `flutter test --tags=` syntax.
+        run: flutter test --tags=flaky,network
+      - name: Surface failure on tracking issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment 1584 --body \
+            "Nightly flaky+network run failed on $(date -u +%F): https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
