@@ -13,11 +13,15 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
 
-/// Enables `Feature.obd2TripRecording` — Trajets tab is gated on it
-/// (#conso-coherence) and this test asserts all three icons render.
+/// Enables the full Trajets surface so all three tab icons render.
+/// Per #1573 the gate is `consoMode == fuelAndTrips`, requires both
+/// `showConsumptionTab` and `obd2TripRecording`.
 class _ObdEnabledFlags extends FeatureFlags {
   @override
-  Set<Feature> build() => <Feature>{Feature.obd2TripRecording};
+  Set<Feature> build() => <Feature>{
+        Feature.showConsumptionTab,
+        Feature.obd2TripRecording,
+      };
 }
 
 /// #1163 — counterpart to `favorites_screen_tab_icons_test.dart`.

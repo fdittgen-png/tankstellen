@@ -13,13 +13,17 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
 
-/// Enables `Feature.obd2TripRecording` so the Trajets tab renders —
-/// this test file's expected tab counts (2 vs 3) assume Trajets is
-/// always present, which is the case once OBD2 trip recording is on
-/// (#conso-coherence gated Trajets on the feature flag).
+/// Enables the full Trajets surface so this test file's expected tab
+/// counts (2 vs 3 tabs) hold. Per #1573 the gate is `consoMode ==
+/// fuelAndTrips`, which requires BOTH `showConsumptionTab` and
+/// `obd2TripRecording` — seeding only the latter resolves to
+/// `ConsoMode.off` and hides Trajets.
 class _ObdEnabledFlags extends FeatureFlags {
   @override
-  Set<Feature> build() => <Feature>{Feature.obd2TripRecording};
+  Set<Feature> build() => <Feature>{
+        Feature.showConsumptionTab,
+        Feature.obd2TripRecording,
+      };
 }
 
 /// #892 — the Charging tab on [ConsumptionScreen] is hidden for ICE
