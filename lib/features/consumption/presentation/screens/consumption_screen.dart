@@ -9,8 +9,7 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/tab_switcher.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
-import '../../../feature_management/domain/feature.dart';
-import '../../../feature_management/domain/feature_dependency_graph.dart';
+import '../../../feature_management/domain/conso_mode.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/exporters/backup/full_backup_exporter.dart';
@@ -163,18 +162,16 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     final stats = ref.watch(consumptionStatsProvider);
     final activeVehicle = ref.watch(activeVehicleProfileProvider);
     final showCharging = _shouldShowCharging(activeVehicle);
-    // Trajets tab is gated on the OBD2 trip-recording feature — users
-    // who haven't enabled OBD2 capture have no trips to render and the
-    // empty tab was confusing. The flag is read via the manifest's
-    // effective-enabled walk so a disabled prerequisite (e.g.
-    // priceHistory, future deps) cascades through.
-    final manifest = ref.watch(featureManifestProvider);
+    // #1573 — Trajets sub-tab is visible only in the Trajets-tier
+    // ConsoMode (fuel + trips). The Fuel-only mode (manual fill-up
+    // tier, the Medium use-mode) renders the Conso screen with just
+    // the Fuel sub-tab; OBD2-driven trip history has nothing to show
+    // without trip recording enabled, and the empty tab confused
+    // Medium users. Reading ConsoMode directly is clearer than
+    // walking the dependency graph for obd2TripRecording.
     final enabledFlags = ref.watch(featureFlagsProvider);
-    final showTrajets = isEffectivelyEnabled(
-      Feature.obd2TripRecording,
-      manifest,
-      enabledFlags,
-    );
+    final showTrajets = consoModeFromFlags(enabledFlags) ==
+        ConsoMode.fuelAndTrips;
     // Recreate the TabController when the tab-set cardinality
     // changes (#892, #conso-coherence). Doing this in build — rather
     // than in initState — lets us react to live vehicle switches /
