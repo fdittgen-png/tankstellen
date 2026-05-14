@@ -3485,6 +3485,34 @@ class AppLocalizationsBg extends AppLocalizations {
       'Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.';
 
   @override
+  String get consoFeatureGroupTitle => 'Conso';
+
+  @override
+  String get consoFeatureGroupDescription =>
+      'Track your consumption — manual fill-ups, or automatic OBD2 trip recording.';
+
+  @override
+  String get consoModeOff => 'Off';
+
+  @override
+  String get consoModeFuel => 'Fuel';
+
+  @override
+  String get consoModeFuelAndTrips => 'Fuel + Trips';
+
+  @override
+  String get consoModeOffDescription =>
+      'No Conso tab and no Conso settings section.';
+
+  @override
+  String get consoModeFuelDescription =>
+      'Manual fill-ups only. Useful without an OBD2 adapter.';
+
+  @override
+  String get consoModeFuelAndTripsDescription =>
+      'Adds automatic OBD2 trip recording. Requires a paired adapter.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

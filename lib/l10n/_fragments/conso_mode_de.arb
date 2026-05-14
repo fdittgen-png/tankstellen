@@ -1,0 +1,10 @@
+{
+  "consoFeatureGroupTitle": "Verbrauch",
+  "consoFeatureGroupDescription": "Verfolgen Sie Ihren Verbrauch — manuelle Tankvorgänge oder automatische OBD2-Fahrtaufzeichnung.",
+  "consoModeOff": "Aus",
+  "consoModeFuel": "Kraftstoff",
+  "consoModeFuelAndTrips": "Kraftstoff + Fahrten",
+  "consoModeOffDescription": "Kein Verbrauchs-Tab und kein Verbrauchs-Bereich in den Einstellungen.",
+  "consoModeFuelDescription": "Nur manuelle Tankvorgänge. Ohne OBD2-Adapter nutzbar.",
+  "consoModeFuelAndTripsDescription": "Fügt automatische OBD2-Fahrtaufzeichnung hinzu. Erfordert einen gekoppelten Adapter."
+}

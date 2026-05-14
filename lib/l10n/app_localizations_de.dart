@@ -3515,6 +3515,34 @@ class AppLocalizationsDe extends AppLocalizations {
       'Teile anonym, wann du an einer Tankstelle ankommst und wieder fährst, damit die App typische Wartezeiten anzeigen kann. Es werden keine GPS-Koordinaten übertragen — nur die Tankstellen-ID.';
 
   @override
+  String get consoFeatureGroupTitle => 'Verbrauch';
+
+  @override
+  String get consoFeatureGroupDescription =>
+      'Verfolgen Sie Ihren Verbrauch — manuelle Tankvorgänge oder automatische OBD2-Fahrtaufzeichnung.';
+
+  @override
+  String get consoModeOff => 'Aus';
+
+  @override
+  String get consoModeFuel => 'Kraftstoff';
+
+  @override
+  String get consoModeFuelAndTrips => 'Kraftstoff + Fahrten';
+
+  @override
+  String get consoModeOffDescription =>
+      'Kein Verbrauchs-Tab und kein Verbrauchs-Bereich in den Einstellungen.';
+
+  @override
+  String get consoModeFuelDescription =>
+      'Nur manuelle Tankvorgänge. Ohne OBD2-Adapter nutzbar.';
+
+  @override
+  String get consoModeFuelAndTripsDescription =>
+      'Fügt automatische OBD2-Fahrtaufzeichnung hinzu. Erfordert einen gekoppelten Adapter.';
+
+  @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
