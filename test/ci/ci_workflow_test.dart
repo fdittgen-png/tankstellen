@@ -20,7 +20,16 @@ void main() {
 
     test('contains test job with coverage', () {
       expect(ciYaml, contains('test:'));
-      expect(ciYaml, contains('flutter test --coverage'));
+      // #1581 — test job is now a 4-way shard matrix; the
+      // `flutter test --coverage ... --total-shards=4` invocation
+      // spans multiple lines inside a YAML `run: |` block, so the
+      // literal substring check became multi-token. Assert the
+      // distinctive pieces individually.
+      expect(ciYaml, contains('flutter test'));
+      expect(ciYaml, contains('--coverage'));
+      expect(ciYaml, contains('--total-shards=4'));
+      // Coverage threshold enforcement moved into the downstream
+      // `coverage-merge` job (still in this workflow).
       expect(ciYaml, contains('Check coverage threshold'));
     });
 
@@ -41,9 +50,12 @@ void main() {
       expect(ciYaml, contains('scripts/pub_outdated_check.sh'));
     });
 
-    test('contains build-android job gated on analyze and test', () {
+    test('contains build-android job gated on analyze only', () {
       expect(ciYaml, contains('build-android:'));
-      expect(ciYaml, contains('needs: [analyze, test]'));
+      // #1580 — `test` removed from build-android's needs so it runs
+      // in parallel with the (sharded, slow) test job. `analyze`
+      // stays as a fast pre-gate against build-on-broken-syntax.
+      expect(ciYaml, contains('needs: [analyze]'));
     });
 
     test('contains release job gated on build-android', () {

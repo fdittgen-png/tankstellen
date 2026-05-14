@@ -162,7 +162,12 @@ void main() {
         reason: 'the trace entry must carry the configured MAC');
   });
 
-  test('a successful read resets the consecutive-failure counter', () async {
+  // Quarantined (#1598) — Stream-timing race intermittently sees an
+  // AutoRecordEvent emitted before the counter-reset microtask. Flaked
+  // 4+ times across May-2026 CI runs without any related code change.
+  // Remove `skip:` after #1598's deterministic-timing fix lands.
+  test('a successful read resets the consecutive-failure counter',
+      skip: 'race condition tracked in #1598', () async {
     // Pattern: null × 2, 20, null × 2 — with threshold 3 this should
     // NEVER fire the failure trace because the counter resets at 20.
     final transport = _FakeTransport(

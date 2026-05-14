@@ -45,8 +45,23 @@ jobs:
       - name: Check feature-module boundaries
         run: bash scripts/check_module_boundaries.sh
 
+  # #1581 — Test job sharded 4× across parallel runners. Each shard
+  # runs `flutter test --total-shards=4 --shard-index=N` so every
+  # test in the suite runs exactly once across the matrix. Wall clock
+  # for the test phase drops from ~30 min to ~7-8 min; total billed
+  # minutes go up ~4× (acceptable trade — same quality).
+  #
+  # Coverage threshold + startup-budget enforcement moved to the
+  # downstream `coverage-merge` job so the shards stay single-purpose
+  # and we don't enforce a threshold on incomplete data.
   test:
     runs-on: ubuntu-latest
+    strategy:
+      # Don't cancel sibling shards when one fails — we want every
+      # failing shard's output visible in a single CI run.
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
     steps:
       - uses: actions/checkout@v6
       - uses: subosito/flutter-action@v2
@@ -66,7 +81,58 @@ jobs:
       # APIs (Argentina, Italy MIMIT, etc.) that intermittently time out
       # and cannot block PRs. Run them on demand with
       # `flutter test --tags=network` from a workstation.
-      - run: flutter test --coverage --exclude-tags=network
+      - name: Run test shard ${{ matrix.shard }} of 4
+        run: |
+          flutter test \
+            --coverage \
+            --exclude-tags=network \
+            --total-shards=4 \
+            --shard-index=${{ matrix.shard }}
+      - name: Upload shard coverage
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-shard-${{ matrix.shard }}
+          path: coverage/lcov.info
+          if-no-files-found: error
+          retention-days: 1
+
+  # Aggregates the 4 shard coverage reports into one merged lcov.info
+  # and enforces the project-wide threshold over the unified view.
+  # Also runs the startup-budget structural check here so the matrix
+  # shards stay single-purpose.
+  coverage-merge:
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+      - run: flutter pub get
+      - name: Install lcov
+        run: sudo apt-get update && sudo apt-get install -y lcov
+      - name: Download shard coverage artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: coverage-shard-*
+          path: coverage-shards
+      - name: Merge shard lcov files
+        run: |
+          mkdir -p coverage
+          ARGS=()
+          for f in coverage-shards/coverage-shard-*/lcov.info; do
+            ARGS+=(-a "$f")
+          done
+          lcov "${ARGS[@]}" -o coverage/lcov.info
+          echo "Merged ${#ARGS[@]} shard lcov files into coverage/lcov.info"
       - name: Check coverage threshold
         run: bash scripts/check_coverage.sh
       - name: Check startup time budget
