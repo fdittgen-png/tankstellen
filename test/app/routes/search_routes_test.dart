@@ -4,29 +4,26 @@ import 'package:tankstellen/app/routes/search_routes.dart';
 
 void main() {
   group('searchRoutes', () {
-    test('returns exactly 4 routes', () {
+    test('returns exactly 3 routes', () {
       // Guards against accidental insert/delete — the search-adjacent
-      // flow expects all four push-on-shell screens to be registered.
-      expect(searchRoutes.length, 4);
+      // flow expects all three push-on-shell screens to be registered.
+      // (#1706 removed the unused `/search/criteria` route — the
+      // SearchCriteriaScreen is reached via a MaterialPageRoute.)
+      expect(searchRoutes.length, 3);
     });
 
-    test('route 0 path is "/search/criteria"', () {
+    test('route 0 path is "/driving"', () {
       final route = searchRoutes[0] as GoRoute;
-      expect(route.path, '/search/criteria');
-    });
-
-    test('route 1 path is "/driving"', () {
-      final route = searchRoutes[1] as GoRoute;
       expect(route.path, '/driving');
     });
 
-    test('route 2 path is "/alerts"', () {
-      final route = searchRoutes[2] as GoRoute;
+    test('route 1 path is "/alerts"', () {
+      final route = searchRoutes[1] as GoRoute;
       expect(route.path, '/alerts');
     });
 
-    test('route 3 path is "/calculator"', () {
-      final route = searchRoutes[3] as GoRoute;
+    test('route 2 path is "/calculator"', () {
+      final route = searchRoutes[2] as GoRoute;
       expect(route.path, '/calculator');
     });
 
