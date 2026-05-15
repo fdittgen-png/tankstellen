@@ -48,31 +48,119 @@ class BrokenMapBeliefUpdater {
   /// observation.
   static const double _bayesFactorEpsilon = 0.01;
 
+  /// Sea-level reference barometric pressure (kPa). The membership-
+  /// function kPa windows were originally calibrated here; away from
+  /// sea level the windows scale relative to this baseline (#1623).
+  static const double _seaLevelBaroKpa = 101.325;
+
+  /// Resolve the `(low, high)` kPa anchors of a membership function,
+  /// scaled for ambient barometric pressure and induction class
+  /// (#1623). The stock anchors ([lowKpa], [highKpa]) were calibrated
+  /// for a sea-level naturally-aspirated engine.
+  ///
+  /// Two independent corrections:
+  ///
+  ///  - **Barometric** — manifold-pressure deltas scale ~linearly with
+  ///    ambient pressure, so at altitude (lower baro) the window
+  ///    shrinks proportionally. Without this a healthy high-altitude
+  ///    engine reads as "low vacuum / small rev swing" and
+  ///    false-positives. The factor is clamped to `[0.6, 1.1]` so a
+  ///    malformed baro reading cannot invert or explode the window. A
+  ///    null [baroKpa] (signal unavailable) leaves the window stock.
+  ///
+  ///  - **Induction** — forced-induction (turbo / VNT / supercharged)
+  ///    engines have MAP excursions the NA calibration models loosely.
+  ///    Their transition band is widened symmetrically around its
+  ///    midpoint, so a borderline reading scores nearer 0.5 (neutral)
+  ///    and the Bayesian updater needs corroborating observations
+  ///    before the belief moves. Widening never produces a *confident*
+  ///    false reading — it only adds tolerance.
+  static (double, double) scaledMembershipAnchors(
+    double lowKpa,
+    double highKpa, {
+    required double? baroKpa,
+    required InductionType? inductionType,
+  }) {
+    final baroFactor = baroKpa == null
+        ? 1.0
+        : (baroKpa / _seaLevelBaroKpa).clamp(0.6, 1.1);
+    var lo = lowKpa * baroFactor;
+    var hi = highKpa * baroFactor;
+    final widen = _inductionBandWiden(inductionType);
+    if (widen != 1.0) {
+      final mid = (lo + hi) / 2.0;
+      lo = mid - (mid - lo) * widen;
+      hi = mid + (hi - mid) * widen;
+    }
+    return (lo, hi);
+  }
+
+  /// Transition-band widening factor by induction class (#1623). `>1`
+  /// widens the neutral band; `1.0` leaves it stock. Forced-induction
+  /// engines all share the same widen — the NA calibration is equally
+  /// loose for any boosted intake.
+  static double _inductionBandWiden(InductionType? type) {
+    switch (type) {
+      case InductionType.turbocharged:
+      case InductionType.supercharged:
+      case InductionType.vnt:
+        return 1.3;
+      case InductionType.naturallyAspirated:
+      case null:
+        return 1.0;
+    }
+  }
+
   /// Idle-vacuum-missing membership. On a healthy NA petrol engine,
-  /// `baro - map` at idle is typically 30-45 kPa (strong vacuum).
-  /// On a broken MAP that returns atmospheric, the delta is ≤ 5 kPa.
-  ///   - Returns 0.0 when delta ≥ 45 kPa (healthy vacuum).
-  ///   - Returns 1.0 when delta ≤ 15 kPa (no vacuum — likely broken).
+  /// `baro - map` at idle is a strong vacuum; a broken MAP that
+  /// returns atmospheric collapses the delta.
+  ///   - Returns 0.0 at/above the healthy anchor (45 kPa at sea level).
+  ///   - Returns 1.0 at/below the suspicious anchor (15 kPa at sea
+  ///     level).
   ///   - Linear interp in between.
+  ///
+  /// Both anchors are scaled by [scaledMembershipAnchors] for ambient
+  /// barometric pressure and [inductionType] (#1623).
   static double vacuumMissingScore({
     required double baroKpa,
     required double mapKpa,
+    InductionType? inductionType,
   }) {
     final delta = baroKpa - mapKpa;
-    return (1.0 - ((delta - 15.0) / 30.0)).clamp(0.0, 1.0);
+    final (lo, hi) = scaledMembershipAnchors(
+      15.0,
+      45.0,
+      baroKpa: baroKpa,
+      inductionType: inductionType,
+    );
+    return (1.0 - ((delta - lo) / (hi - lo))).clamp(0.0, 1.0);
   }
 
   /// Diesel-rev-delta membership. Diesels run unthrottled so idle MAP
   /// is near baro; the discriminator is how much MAP *changes* under
-  /// a brief rev. Healthy: ≥ 30 kPa swing. Broken: ≤ 8 kPa swing.
-  ///   - Returns 0.0 when |rev - idle| ≥ 30 kPa.
-  ///   - Returns 1.0 when |rev - idle| ≤ 8 kPa.
+  /// a brief rev. Healthy: large swing. Broken: small swing.
+  ///   - Returns 0.0 at/above the healthy anchor (30 kPa at sea level).
+  ///   - Returns 1.0 at/below the suspicious anchor (8 kPa at sea
+  ///     level).
+  ///
+  /// Both anchors are scaled by [scaledMembershipAnchors] for ambient
+  /// barometric pressure and [inductionType] (#1623). [baroKpa] is
+  /// optional — the diesel probe reads it best-effort; a null leaves
+  /// the window at its sea-level width.
   static double revDeltaMissingScore({
     required double mapIdleKpa,
     required double mapRevvedKpa,
+    double? baroKpa,
+    InductionType? inductionType,
   }) {
     final delta = (mapRevvedKpa - mapIdleKpa).abs();
-    return (1.0 - ((delta - 8.0) / 22.0)).clamp(0.0, 1.0);
+    final (lo, hi) = scaledMembershipAnchors(
+      8.0,
+      30.0,
+      baroKpa: baroKpa,
+      inductionType: inductionType,
+    );
+    return (1.0 - ((delta - lo) / (hi - lo))).clamp(0.0, 1.0);
   }
 
   /// Plein-complet ratio severity. Reconciler computes

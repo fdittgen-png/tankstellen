@@ -11,11 +11,13 @@ import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.d
 /// posterior: see the bottom group for the two issue-#1424 acceptance
 /// tests (5×0.4 → posterior > 0.8; 5×0.9 then 20×0.05 → posterior < 0.4).
 void main() {
-  group('vacuumMissingScore', () {
+  // Anchors at the sea-level reference baro (101.325 kPa) so the
+  // window is exactly 15-45 kPa — these pin the stock calibration.
+  group('vacuumMissingScore (sea-level reference)', () {
     test('returns 0.0 when delta is at the healthy boundary (45 kPa)', () {
       final s = BrokenMapBeliefUpdater.vacuumMissingScore(
-        baroKpa: 100,
-        mapKpa: 55,
+        baroKpa: 101.325,
+        mapKpa: 56.325,
       );
       expect(s, 0.0);
     });
@@ -23,16 +25,16 @@ void main() {
     test('returns 1.0 when delta is at/below the suspicious boundary (15 kPa)',
         () {
       final s = BrokenMapBeliefUpdater.vacuumMissingScore(
-        baroKpa: 100,
-        mapKpa: 90,
+        baroKpa: 101.325,
+        mapKpa: 86.325,
       );
       expect(s, 1.0);
     });
 
     test('linear interp at delta 30 returns 0.5', () {
       final s = BrokenMapBeliefUpdater.vacuumMissingScore(
-        baroKpa: 100,
-        mapKpa: 70,
+        baroKpa: 101.325,
+        mapKpa: 71.325,
       );
       expect(s, closeTo(0.5, 1e-9));
     });
@@ -62,6 +64,131 @@ void main() {
         mapRevvedKpa: 81,
       );
       expect(s, closeTo(0.5, 1e-9));
+    });
+  });
+
+  // #1623 — membership-anchor scaling for barometric pressure +
+  // induction class.
+  group('scaledMembershipAnchors (#1623)', () {
+    test('sea-level NA leaves the stock window untouched', () {
+      final (lo, hi) = BrokenMapBeliefUpdater.scaledMembershipAnchors(
+        15.0,
+        45.0,
+        baroKpa: 101.325,
+        inductionType: InductionType.naturallyAspirated,
+      );
+      expect(lo, closeTo(15.0, 1e-9));
+      expect(hi, closeTo(45.0, 1e-9));
+    });
+
+    test('a null baro leaves the window stock', () {
+      final (lo, hi) = BrokenMapBeliefUpdater.scaledMembershipAnchors(
+        8.0,
+        30.0,
+        baroKpa: null,
+        inductionType: null,
+      );
+      expect(lo, closeTo(8.0, 1e-9));
+      expect(hi, closeTo(30.0, 1e-9));
+    });
+
+    test('high altitude (low baro) shrinks the window proportionally', () {
+      // baro 81.06 kPa ≈ 2000 m → factor 0.8.
+      final (lo, hi) = BrokenMapBeliefUpdater.scaledMembershipAnchors(
+        15.0,
+        45.0,
+        baroKpa: 81.06,
+        inductionType: null,
+      );
+      expect(lo, closeTo(12.0, 1e-3));
+      expect(hi, closeTo(36.0, 1e-3));
+    });
+
+    test('an absurdly low baro is clamped at factor 0.6', () {
+      final (lo, hi) = BrokenMapBeliefUpdater.scaledMembershipAnchors(
+        15.0,
+        45.0,
+        baroKpa: 10.0,
+        inductionType: null,
+      );
+      // 0.6 floor → 15*0.6, 45*0.6; window never inverts.
+      expect(lo, closeTo(9.0, 1e-6));
+      expect(hi, closeTo(27.0, 1e-6));
+      expect(hi, greaterThan(lo));
+    });
+
+    test('forced induction widens the band symmetrically about its midpoint',
+        () {
+      final (lo, hi) = BrokenMapBeliefUpdater.scaledMembershipAnchors(
+        8.0,
+        30.0,
+        baroKpa: 101.325,
+        inductionType: InductionType.turbocharged,
+      );
+      // mid = 19; widen 1.3 → lo = 19 - 11*1.3, hi = 19 + 11*1.3.
+      expect(lo, closeTo(19.0 - 14.3, 1e-6));
+      expect(hi, closeTo(19.0 + 14.3, 1e-6));
+      // Midpoint is preserved — widening adds tolerance, not a shift.
+      expect((lo + hi) / 2, closeTo(19.0, 1e-6));
+    });
+  });
+
+  group('membership functions scale for altitude + induction (#1623)', () {
+    test(
+        'vacuum: the same kPa delta reads healthier at altitude than at '
+        'sea level', () {
+      // Absolute delta of 40 kPa. At sea level that is mid-band; at
+      // altitude the window has shrunk so 40 kPa is clearly healthy.
+      final seaLevel = BrokenMapBeliefUpdater.vacuumMissingScore(
+        baroKpa: 101.325,
+        mapKpa: 61.325, // delta 40
+      );
+      final altitude = BrokenMapBeliefUpdater.vacuumMissingScore(
+        baroKpa: 81.06,
+        mapKpa: 41.06, // delta 40
+      );
+      expect(seaLevel, greaterThan(0.0));
+      expect(altitude, lessThan(seaLevel));
+      expect(altitude, 0.0);
+    });
+
+    test(
+        'rev-delta: a turbo diesel scores a borderline swing nearer neutral '
+        'than a NA diesel would', () {
+      // A 19 kPa swing is exactly mid-band (0.5) for a NA diesel.
+      final na = BrokenMapBeliefUpdater.revDeltaMissingScore(
+        mapIdleKpa: 100,
+        mapRevvedKpa: 119,
+        baroKpa: 101.325,
+        inductionType: InductionType.naturallyAspirated,
+      );
+      // The same swing on a turbo diesel: the band is wider, but the
+      // midpoint is unchanged, so a mid-band swing still scores ~0.5.
+      final turbo = BrokenMapBeliefUpdater.revDeltaMissingScore(
+        mapIdleKpa: 100,
+        mapRevvedKpa: 119,
+        baroKpa: 101.325,
+        inductionType: InductionType.turbocharged,
+      );
+      expect(na, closeTo(0.5, 1e-9));
+      expect(turbo, closeTo(0.5, 1e-9));
+
+      // ...but a near-healthy swing (28 kPa) that NA scores as almost
+      // clean, the turbo scores less confidently (nearer neutral) —
+      // the wider band demands a bigger swing for full confidence.
+      final naClean = BrokenMapBeliefUpdater.revDeltaMissingScore(
+        mapIdleKpa: 100,
+        mapRevvedKpa: 128,
+        baroKpa: 101.325,
+        inductionType: InductionType.naturallyAspirated,
+      );
+      final turboClean = BrokenMapBeliefUpdater.revDeltaMissingScore(
+        mapIdleKpa: 100,
+        mapRevvedKpa: 128,
+        baroKpa: 101.325,
+        inductionType: InductionType.turbocharged,
+      );
+      expect(naClean, lessThan(turboClean));
     });
   });
 
