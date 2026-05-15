@@ -194,5 +194,13 @@
   "featureBlockedEnable_tflitePricePrediction": "Enable price history first",
   "@featureBlockedEnable_tflitePricePrediction": {
     "description": "Tooltip shown on the disabled TFLite-prediction toggle when its prerequisite (priceHistory) is off."
+  },
+  "featureLabel_fuelCalculator": "Fuel calculator",
+  "@featureLabel_fuelCalculator": {
+    "description": "Settings toggle label for the fuel-cost Calculator feature (#1613)."
+  },
+  "featureDescription_fuelCalculator": "Reachable fuel-cost calculator from the search results.",
+  "@featureDescription_fuelCalculator": {
+    "description": "Settings toggle description for the fuel-cost Calculator feature (#1613)."
   }
 }

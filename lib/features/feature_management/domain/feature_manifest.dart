@@ -265,5 +265,14 @@ class FeatureManifest {
           'On-device price forecast model — inference runs locally; '
               'features and predictions never leave the device.',
     ),
+    Feature.fuelCalculator: FeatureManifestEntry(
+      feature: Feature.fuelCalculator,
+      // Default-on (#1613): the fuel-cost Calculator is a finished,
+      // self-contained, harmless utility — exposing it is the whole
+      // point of the gate. No `requires` edge: it depends on nothing.
+      defaultEnabled: true,
+      displayName: 'Fuel calculator',
+      description: 'Reachable fuel-cost calculator from the search results.',
+    ),
   });
 }

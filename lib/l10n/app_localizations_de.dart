@@ -3876,6 +3876,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aktiviere zuerst den Preisverlauf';
 
   @override
+  String get featureLabel_fuelCalculator => 'Tankkostenrechner';
+
+  @override
+  String get featureDescription_fuelCalculator =>
+      'Erreichbarer Tankkostenrechner aus den Suchergebnissen.';
+
+  @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';
 
   @override

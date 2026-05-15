@@ -163,6 +163,18 @@ const kFeatureLoyaltyCards = FeatureClass(
       'price comparisons.',
 );
 
+const kFeatureFuelCalculator = FeatureClass(
+  id: 'fuelCalculator',
+  parent: _none,
+  requires: _empty,
+  defaultEnabled: true,
+  maturity: FeatureMaturity.production,
+  displayKey: 'featureLabel_fuelCalculator',
+  displayName: 'Fuel calculator',
+  descriptionKey: 'featureDescription_fuelCalculator',
+  description: 'Reachable fuel-cost calculator from the search results.',
+);
+
 // ----------------------------------------------------------------------------
 // Children of obd2TripRecording
 // ----------------------------------------------------------------------------

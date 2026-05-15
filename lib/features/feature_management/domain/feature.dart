@@ -100,4 +100,9 @@ enum Feature {
   /// no-op until a trained `.tflite` artifact is committed and the
   /// const is flipped. Heuristic fallback always covers the gap.
   tflitePricePrediction,
+
+  /// The fuel-cost Calculator (#1613). The screen + logic already exist
+  /// and are tested; this flag gates the navigation entry point that
+  /// makes its `/calculator` route reachable. Default-on.
+  fuelCalculator,
 }

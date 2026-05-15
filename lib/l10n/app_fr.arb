@@ -1206,6 +1206,8 @@
   "featureBlockedEnable_showConsumptionTab": "Activez d'abord l'enregistrement OBD2 des trajets",
   "featureLabel_tflitePricePrediction": "Prédiction de prix TFLite",
   "featureDescription_tflitePricePrediction": "Modèle de prévision de prix sur l'appareil — l'inférence s'exécute localement ; les caractéristiques et les prédictions ne quittent jamais l'appareil.",
+  "featureLabel_fuelCalculator": "Calculateur de coût de carburant",
+  "featureDescription_fuelCalculator": "Calculateur de coût de carburant accessible depuis les résultats de recherche.",
   "featureBlockedEnable_tflitePricePrediction": "Activez d'abord l'historique des prix",
   "tripPathCardTitle": "Trace du trajet",
   "tripPathCardSubtitle": "Itinéraire enregistré par GPS",

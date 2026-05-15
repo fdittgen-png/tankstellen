@@ -14,6 +14,8 @@ import '../../../../core/widgets/staggered_fade_in.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/presentation/widgets/swipe_tutorial_banner.dart';
 import '../../../favorites/providers/favorites_provider.dart';
+import '../../../feature_management/application/feature_flags_provider.dart';
+import '../../../feature_management/domain/feature.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_result_item.dart';
 import '../../domain/entities/station.dart';
@@ -93,6 +95,30 @@ class SearchResultsList extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 4),
+              // #1613 — gated entry point for the fuel-cost Calculator.
+              // The /calculator route exists but had no navigation entry
+              // point anywhere in lib/; this affordance makes it
+              // reachable when Feature.fuelCalculator is enabled.
+              if (ref
+                  .watch(featureFlagsProvider)
+                  .contains(Feature.fuelCalculator)) ...[
+                Semantics(
+                  label: l10n?.fuelCostCalculator ?? 'Fuel Cost Calculator',
+                  button: true,
+                  child: InkWell(
+                    onTap: () => context.go('/calculator'),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
+                      child: Icon(Icons.calculate,
+                          size: 18,
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+              ],
               FreshnessBadge(result: result),
             ],
           ),
