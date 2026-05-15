@@ -155,6 +155,7 @@
   "supportDescription": "Diese App ist kostenlos, Open Source und ohne Werbung. Wenn Sie sie nützlich finden, unterstützen Sie den Entwickler.",
   "reportBug": "Fehler melden / Funktion vorschlagen",
   "reportThisIssue": "Dieses Problem melden",
+  "reportAlreadySent": "Du hast dieses Problem bereits gemeldet.",
   "reportConsentTitle": "Auf GitHub melden?",
   "reportConsentBody": "Dies öffnet ein öffentliches GitHub-Issue mit den unten gezeigten Fehlerdetails. Keine GPS-Koordinaten, API-Schlüssel oder persönlichen Daten werden übermittelt.",
   "reportConsentConfirm": "GitHub öffnen",

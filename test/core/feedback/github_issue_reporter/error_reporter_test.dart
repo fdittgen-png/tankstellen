@@ -26,6 +26,11 @@ Widget _wrap(Widget child) {
 }
 
 void main() {
+  // The #1606 dedup ring buffer is process-static — reset it before
+  // every test so a fingerprint recorded by one test does not bleed
+  // into the next.
+  setUp(ErrorReporter.resetDedupRingForTest);
+
   group('ErrorReporter.consentPreview', () {
     test('lists source, error type, status, app, platform, locale', () {
       final preview = ErrorReporter.consentPreview(_samplePayload());
@@ -160,6 +165,75 @@ void main() {
         requireConsent: false,
       );
       expect(ok, isFalse);
+    });
+  });
+
+  group('ErrorReporter client-side dedup (#1606)', () {
+    testWidgets('reporting the same error twice composes only one URL',
+        (tester) async {
+      final launched = <Uri>[];
+      final reporter = ErrorReporter(launcher: (uri) async {
+        launched.add(uri);
+        return true;
+      });
+
+      late BuildContext captured;
+      await tester.pumpWidget(_wrap(Builder(builder: (ctx) {
+        captured = ctx;
+        return const SizedBox();
+      })));
+
+      final first = await reporter.reportError(captured, _samplePayload(),
+          requireConsent: false);
+      await tester.pumpAndSettle();
+      final second = await reporter.reportError(captured, _samplePayload(),
+          requireConsent: false);
+      await tester.pumpAndSettle();
+
+      expect(first, isTrue, reason: 'the first report launches');
+      expect(second, isFalse,
+          reason: 'the duplicate is suppressed — no second URL');
+      expect(launched, hasLength(1),
+          reason: 'only ONE issue URL composed for two identical reports');
+      expect(find.text('You already reported this issue.'), findsOneWidget);
+    });
+
+    test('the dedup ring records a fingerprint only after a launch', () async {
+      final fp = _samplePayload().fingerprint;
+      expect(ErrorReporter.hasRecentlyReported(fp), isFalse);
+    });
+
+    testWidgets('a different error is not blocked by the dedup ring',
+        (tester) async {
+      final launched = <Uri>[];
+      final reporter = ErrorReporter(launcher: (uri) async {
+        launched.add(uri);
+        return true;
+      });
+
+      late BuildContext captured;
+      await tester.pumpWidget(_wrap(Builder(builder: (ctx) {
+        captured = ctx;
+        return const SizedBox();
+      })));
+
+      await reporter.reportError(captured, _samplePayload(),
+          requireConsent: false);
+      final other = ErrorReportPayload(
+        errorType: 'CacheException',
+        errorMessage: 'a different failure',
+        appVersion: '4.3.0',
+        platform: 'Android',
+        locale: 'en',
+        capturedAt: DateTime.utc(2026, 4, 15),
+      );
+      final ok = await reporter.reportError(captured, other,
+          requireConsent: false);
+      await tester.pumpAndSettle();
+
+      expect(ok, isTrue);
+      expect(launched, hasLength(2),
+          reason: 'distinct fingerprints each compose their own URL');
     });
   });
 }

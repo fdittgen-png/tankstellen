@@ -860,6 +860,12 @@ abstract class AppLocalizations {
   /// **'Report this issue'**
   String get reportThisIssue;
 
+  /// No description provided for @reportAlreadySent.
+  ///
+  /// In en, this message translates to:
+  /// **'You already reported this issue.'**
+  String get reportAlreadySent;
+
   /// No description provided for @reportConsentTitle.
   ///
   /// In en, this message translates to:

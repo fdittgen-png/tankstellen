@@ -1,4 +1,5 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+﻿import 'package:dio/dio.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/feedback/github_issue_reporter/error_report_payload.dart';
 import 'package:tankstellen/core/services/service_result.dart';
@@ -382,6 +383,75 @@ void main() {
 
       expect(payload.locale, 'fr_FR');
       expect(payload.countryCode, 'FR');
+    });
+  });
+
+  group('reportability assessment (#1606)', () {
+    ErrorReportPayload build(Object error) => ErrorReportPayload.fromError(
+          error,
+          appVersion: '4.3.0',
+          platform: 'Android',
+          locale: 'en',
+        );
+
+    test('a normal error is reportable', () {
+      final a = ErrorReportPayload.assessReportability(
+          Exception('something genuinely broke'));
+      expect(a.reportable, isTrue);
+      expect(a.transient, isFalse);
+      expect(build(Exception('boom')).reportable, isTrue);
+    });
+
+    test('a "Tracked in #NNN" stop-gap message is not reportable', () {
+      // Mirrors backlog #513 — the reporter captured the app's own
+      // designed-in message and filed it back as a bug.
+      final err =
+          Exception('NSW FuelCheck retired in 2024. Tracked in #504.');
+      final a = ErrorReportPayload.assessReportability(err);
+      expect(a.reportable, isFalse);
+      expect(a.transient, isFalse);
+      expect(ErrorReportPayload.isKnownTrackedIssue('… Tracked in #504'),
+          isTrue);
+      expect(build(err).reportable, isFalse);
+    });
+
+    test('a status-less Dio network error is transient and not reportable',
+        () {
+      final err = DioException(
+        requestOptions: RequestOptions(path: '/stations'),
+        type: DioExceptionType.connectionError,
+      );
+      final a = ErrorReportPayload.assessReportability(err);
+      expect(a.transient, isTrue);
+      expect(a.reportable, isFalse);
+      final payload = build(err);
+      expect(payload.isTransientNetwork, isTrue);
+      expect(payload.reportable, isFalse);
+    });
+
+    test('a status-less network message is transient', () {
+      final a = ErrorReportPayload.assessReportability(
+          Exception('Network error (status: null)'));
+      expect(a.transient, isTrue);
+      expect(a.reportable, isFalse);
+    });
+
+    test('a network message that carries an HTTP status stays reportable',
+        () {
+      // "Network error (status: 503)" is a real server failure, not a
+      // transient connectivity loss — it should still be reportable.
+      final a = ErrorReportPayload.assessReportability(
+          Exception('Network error (status: 503)'));
+      expect(a.transient, isFalse);
+      expect(a.reportable, isTrue);
+    });
+
+    test('fingerprint is stable for the same error and differs across types',
+        () {
+      final p1 = build(Exception('boom'));
+      final p2 = build(Exception('boom'));
+      expect(p1.fingerprint, p2.fingerprint);
+      expect(p1.fingerprint, isNot(build(Exception('different')).fingerprint));
     });
   });
 }
