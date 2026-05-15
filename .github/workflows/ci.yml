@@ -114,8 +114,18 @@ jobs:
       - name: Compute affected tests (PR only)
         if: github.event_name == 'pull_request'
         run: |
+          # `dart run` emits `Running build hooks...` progress text to stdout
+          # (with `\r` overwrites). Naively redirecting `> affected_tests.txt`
+          # captures that prefix and concatenates it with the first real test
+          # path, so the shard then tries to load a bogus path like
+          # `.../Running build hooks...test/foo_test.dart` and every shard fails
+          # at suite-load time. Filter the stream to lines that look like test
+          # files so the selector output stays clean even if dart prepends
+          # noise. Empty output still triggers the full-suite fallback below.
           dart run tool/test_selector.dart \
             --base origin/${{ github.base_ref }} \
+            2>/dev/null \
+            | grep -E '^test/.*_test\.dart$' \
             > affected_tests.txt || true
           if [ -s affected_tests.txt ]; then
             echo "Selector produced $(wc -l < affected_tests.txt) test files"
