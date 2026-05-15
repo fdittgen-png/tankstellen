@@ -41,7 +41,7 @@ import '../domain/cold_start_baselines.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/situation_classifier.dart';
 import '../domain/trip_recorder.dart';
-import 'haptic_feedback_policy.dart';
+import 'trip_haptic_controller.dart';
 import 'trip_history_provider.dart';
 import 'trip_recording_phase.dart';
 import 'trip_recording_state.dart';
@@ -112,14 +112,20 @@ class TripRecording extends _$TripRecording {
   // certainly foreground.
   AppLifecycleState _lifecycleState = AppLifecycleState.resumed;
 
+  /// #767 band-transition haptics, extracted into a focused
+  /// collaborator (#1679). Constructed once and reused across
+  /// recordings so the test counters accumulate exactly as the
+  /// inlined fields did.
+  final TripHapticController _haptics = TripHapticController();
+
   /// Tests count haptic fires via these instead of hooking the
   /// platform channel. The production path also still calls
   /// [HapticFeedback], so counting here doesn't short-circuit the
   /// real vibration on a device.
   @visibleForTesting
-  int hapticLightCount = 0;
+  int get hapticLightCount => _haptics.lightCount;
   @visibleForTesting
-  int hapticMediumCount = 0;
+  int get hapticMediumCount => _haptics.mediumCount;
 
   /// Exposed for tests: the underlying [TripRecordingController] while
   /// a trip is active. Lets the #1040 sample-persistence test inject a
@@ -370,7 +376,7 @@ class TripRecording extends _$TripRecording {
       _recordToStore(reading, situation);
       final band = _classifyBandFrom(reading, situation);
       final delta = _computeDelta(reading, situation);
-      _fireBandTransitionHaptic(state.band, band);
+      _haptics.fireForBandTransition(state.band, band);
       state = state.copyWith(
         phase: _phaseFor(ctl),
         live: reading,
@@ -427,25 +433,6 @@ class TripRecording extends _$TripRecording {
         return TripRecordingPhase.pausedDueToDrop;
       case TripRecordingControllerState.stopped:
         return TripRecordingPhase.finished;
-    }
-  }
-
-  /// #767 — fire a short haptic when the band crosses *into* heavy
-  /// territory. Positive improvements (normal → eco) stay silent so
-  /// the vibration is a corrective nudge, not constant feedback.
-  void _fireBandTransitionHaptic(
-    ConsumptionBand previous,
-    ConsumptionBand current,
-  ) {
-    switch (hapticForBandTransition(previous, current)) {
-      case HapticIntensity.light:
-        hapticLightCount++;
-        HapticFeedback.lightImpact();
-      case HapticIntensity.medium:
-        hapticMediumCount++;
-        HapticFeedback.mediumImpact();
-      case HapticIntensity.none:
-        break;
     }
   }
 
