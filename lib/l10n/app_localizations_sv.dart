@@ -3342,6 +3342,41 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String get brokenMapDiagnosticsCardTitle => 'MAP sensor diagnostics';
+
+  @override
+  String brokenMapDiagnosticsBeliefLine(String posterior, String margin) {
+    return 'Broken-MAP confidence: $posterior% ± $margin%';
+  }
+
+  @override
+  String brokenMapDiagnosticsObservationCount(int count) {
+    return '$count observations recorded';
+  }
+
+  @override
+  String get brokenMapDiagnosticsVerifiedBadge => 'Verified clean';
+
+  @override
+  String get brokenMapDiagnosticsBeliefNone =>
+      'This vehicle\'s MAP sensor hasn\'t been observed yet.';
+
+  @override
+  String get brokenMapDiagnosticsBlocklistHeading => 'Blocklisted adapters';
+
+  @override
+  String get brokenMapDiagnosticsBlocklistEmpty =>
+      'No adapters are blocklisted.';
+
+  @override
+  String brokenMapDiagnosticsBlocklistEntry(String adapter, String percent) {
+    return '$adapter — flagged $percent% broken';
+  }
+
+  @override
+  String get brokenMapDiagnosticsClearButton => 'Clear';
+
+  @override
   String get calibrationAdvancedTitle => 'Advanced calibration';
 
   @override

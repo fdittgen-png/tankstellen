@@ -6206,6 +6206,60 @@ abstract class AppLocalizations {
   /// **'MAP sensor: {posterior}% ± {margin}% (verified)'**
   String brokenMapOverlayPosteriorVerified(String posterior, String margin);
 
+  /// Title of the broken-MAP diagnostics card on the vehicle settings screen — surfaces the belief + the adapter blocklist (#1622).
+  ///
+  /// In en, this message translates to:
+  /// **'MAP sensor diagnostics'**
+  String get brokenMapDiagnosticsCardTitle;
+
+  /// Line on the broken-MAP diagnostics card showing the active vehicle's Bayesian posterior point estimate and the half-width of the 95% credible interval (#1622).
+  ///
+  /// In en, this message translates to:
+  /// **'Broken-MAP confidence: {posterior}% ± {margin}%'**
+  String brokenMapDiagnosticsBeliefLine(String posterior, String margin);
+
+  /// Line on the broken-MAP diagnostics card showing how many observations have been folded into the belief (#1622).
+  ///
+  /// In en, this message translates to:
+  /// **'{count} observations recorded'**
+  String brokenMapDiagnosticsObservationCount(int count);
+
+  /// Badge on the broken-MAP diagnostics card shown when the belief has reached the verified-clean terminal state (#1622).
+  ///
+  /// In en, this message translates to:
+  /// **'Verified clean'**
+  String get brokenMapDiagnosticsVerifiedBadge;
+
+  /// Placeholder on the broken-MAP diagnostics card when the active vehicle has no broken-MAP observations recorded yet (#1622).
+  ///
+  /// In en, this message translates to:
+  /// **'This vehicle\'s MAP sensor hasn\'t been observed yet.'**
+  String get brokenMapDiagnosticsBeliefNone;
+
+  /// Sub-heading on the broken-MAP diagnostics card above the list of OBD2 adapters flagged as having a broken MAP sensor (#1622).
+  ///
+  /// In en, this message translates to:
+  /// **'Blocklisted adapters'**
+  String get brokenMapDiagnosticsBlocklistHeading;
+
+  /// Empty-state line on the broken-MAP diagnostics card when no OBD2 adapter is on the broken-MAP blocklist (#1622).
+  ///
+  /// In en, this message translates to:
+  /// **'No adapters are blocklisted.'**
+  String get brokenMapDiagnosticsBlocklistEmpty;
+
+  /// A single blocklisted-adapter row on the broken-MAP diagnostics card: the adapter's ELM firmware id and its recorded broken-confidence (#1622).
+  ///
+  /// In en, this message translates to:
+  /// **'{adapter} — flagged {percent}% broken'**
+  String brokenMapDiagnosticsBlocklistEntry(String adapter, String percent);
+
+  /// Button on a blocklisted-adapter row that removes the adapter from the broken-MAP blocklist — the manual escape hatch for a healthy adapter that was mis-flagged (#1622).
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get brokenMapDiagnosticsClearButton;
+
   /// ExpansionTile title for the user-overridable calibration constants section on the edit-vehicle screen (#1397).
   ///
   /// In en, this message translates to:

@@ -3372,6 +3372,40 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get brokenMapDiagnosticsCardTitle => 'MAP-Sensor-Diagnose';
+
+  @override
+  String brokenMapDiagnosticsBeliefLine(String posterior, String margin) {
+    return 'MAP-Defekt-Konfidenz: $posterior % ± $margin %';
+  }
+
+  @override
+  String brokenMapDiagnosticsObservationCount(int count) {
+    return '$count Beobachtungen erfasst';
+  }
+
+  @override
+  String get brokenMapDiagnosticsVerifiedBadge => 'Als intakt bestätigt';
+
+  @override
+  String get brokenMapDiagnosticsBeliefNone =>
+      'Der MAP-Sensor dieses Fahrzeugs wurde noch nicht beobachtet.';
+
+  @override
+  String get brokenMapDiagnosticsBlocklistHeading => 'Gesperrte Adapter';
+
+  @override
+  String get brokenMapDiagnosticsBlocklistEmpty => 'Keine Adapter gesperrt.';
+
+  @override
+  String brokenMapDiagnosticsBlocklistEntry(String adapter, String percent) {
+    return '$adapter — als $percent % defekt markiert';
+  }
+
+  @override
+  String get brokenMapDiagnosticsClearButton => 'Aufheben';
+
+  @override
   String get calibrationAdvancedTitle => 'Erweiterte Kalibrierung';
 
   @override

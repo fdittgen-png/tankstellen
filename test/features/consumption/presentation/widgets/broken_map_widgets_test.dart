@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/features/consumption/data/obd2/broken_map_belief.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd_adapter_blocklist.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/broken_map_widgets.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
@@ -218,6 +220,97 @@ void main() {
       expect(brokenMapBandFor(1.0), BrokenMapBand.hardDisable);
     });
   });
+
+  // #1622 — broken-MAP belief + adapter-blocklist diagnostics card.
+  group('BrokenMapDiagnosticsCard (#1622)', () {
+    testWidgets(
+        'hidden when the vehicle has no observations and the blocklist '
+        'is empty', (tester) async {
+      final blocklist = ObdAdapterBlocklist(_FakeSettingsStorage());
+      await pumpApp(
+        tester,
+        const BrokenMapDiagnosticsCard(),
+        overrides: [
+          obdAdapterBlocklistProvider.overrideWithValue(blocklist),
+        ],
+      );
+      await tester.pumpAndSettle();
+      expect(find.textContaining('MAP sensor diagnostics'), findsNothing);
+    });
+
+    testWidgets('renders blocklisted adapters with a Clear button',
+        (tester) async {
+      final blocklist = ObdAdapterBlocklist(_FakeSettingsStorage());
+      await blocklist.recordBelief('ELM327 v2.1', 0.85);
+
+      await pumpApp(
+        tester,
+        const BrokenMapDiagnosticsCard(),
+        overrides: [
+          obdAdapterBlocklistProvider.overrideWithValue(blocklist),
+        ],
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('ELM327 v2.1'), findsOneWidget);
+      expect(
+        find.byKey(const Key('brokenMapBlocklistClear_ELM327 v2.1')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('tapping Clear removes the adapter from the blocklist',
+        (tester) async {
+      final blocklist = ObdAdapterBlocklist(_FakeSettingsStorage());
+      await blocklist.recordBelief('ELM327 v2.1', 0.85);
+
+      await pumpApp(
+        tester,
+        const BrokenMapDiagnosticsCard(),
+        overrides: [
+          obdAdapterBlocklistProvider.overrideWithValue(blocklist),
+        ],
+      );
+      await tester.pumpAndSettle();
+      expect(find.textContaining('ELM327 v2.1'), findsOneWidget);
+
+      await tester.tap(
+          find.byKey(const Key('brokenMapBlocklistClear_ELM327 v2.1')));
+      await tester.pumpAndSettle();
+
+      // The row is gone, and the underlying blocklist no longer
+      // recalls the adapter.
+      expect(find.textContaining('ELM327 v2.1'), findsNothing);
+      expect(await blocklist.recall('ELM327 v2.1'), isNull);
+    });
+
+    testWidgets('renders the belief line when the vehicle has observations',
+        (tester) async {
+      // α=8, β=2 → point estimate 0.8.
+      final blocklist = ObdAdapterBlocklist(_FakeSettingsStorage());
+      await pumpApp(
+        tester,
+        const BrokenMapDiagnosticsCard(vehicleId: 'veh-a'),
+        overrides: [
+          brokenMapBeliefByVehicleProvider.overrideWith(
+            () => _FixedBeliefByVehicle({
+              'veh-a': const BrokenMapBelief(
+                alpha: 8,
+                beta: 2,
+                observationCount: 6,
+              ),
+            }),
+          ),
+          obdAdapterBlocklistProvider.overrideWithValue(blocklist),
+        ],
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('MAP sensor diagnostics'), findsOneWidget);
+      expect(find.textContaining('80%'), findsOneWidget);
+      expect(find.textContaining('6 observations'), findsOneWidget);
+    });
+  });
 }
 
 /// Build the override list for a fixed [BrokenMapBelief] under the
@@ -231,6 +324,30 @@ List<Override> _belief(BrokenMapBelief belief) => [
         () => _FixedBeliefByVehicle({'veh-a': belief}),
       ),
     ];
+
+/// In-memory [SettingsStorage] double — backs the [ObdAdapterBlocklist]
+/// in the diagnostics-card tests so `entries()` / `clearEntry()` run
+/// against real blocklist logic (#1622).
+class _FakeSettingsStorage implements SettingsStorage {
+  final Map<String, dynamic> data = {};
+
+  @override
+  dynamic getSetting(String key) => data[key];
+
+  @override
+  Future<void> putSetting(String key, dynamic value) async {
+    data[key] = value;
+  }
+
+  @override
+  bool get isSetupComplete => false;
+  @override
+  bool get isSetupSkipped => false;
+  @override
+  Future<void> skipSetup() async {}
+  @override
+  Future<void> resetSetupSkip() async {}
+}
 
 class _FixedBeliefByVehicle extends BrokenMapBeliefByVehicle {
   _FixedBeliefByVehicle(this._initial);
