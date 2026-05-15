@@ -3164,6 +3164,9 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String get fillUpSavedSnackbar => 'Fill-up saved';
+
+  @override
   String get achievementSmoothDriver => 'Smooth streak';
 
   @override
@@ -4861,6 +4864,9 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get unifiedNoResultsForFilter => 'No results match this filter';
+
+  @override
+  String get searchFailedSnackbar => 'Search failed — please try again';
 
   @override
   String get vinLabel => 'VIN (optional)';

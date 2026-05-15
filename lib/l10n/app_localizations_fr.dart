@@ -3189,6 +3189,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get fillUpSavedSnackbar => 'Fill-up saved';
+
+  @override
   String get achievementSmoothDriver => 'Série souple';
 
   @override
@@ -4912,6 +4915,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get unifiedNoResultsForFilter => 'Aucun résultat pour ce filtre';
+
+  @override
+  String get searchFailedSnackbar => 'Search failed — please try again';
 
   @override
   String get vinLabel => 'VIN (optionnel)';

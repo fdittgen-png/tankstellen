@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/widgets/page_scaffold.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/fuel_type.dart';
@@ -301,9 +302,19 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       }
     }
 
+    // Capture the root messenger + theme before the screen pops — the
+    // success confirmation appears on the surface we return to (#1692).
+    final messenger = ScaffoldMessenger.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final savedMessage = AppLocalizations.of(context)?.fillUpSavedSnackbar ??
+        'Fill-up saved';
+
     await ref.read(fillUpListProvider.notifier).add(fillUp);
     if (!mounted) return;
     context.pop();
+    messenger.showSnackBar(
+      SnackBarHelper.successSnackBar(scheme, savedMessage),
+    );
   }
 
   String _pad(int n) => n.toString().padLeft(2, '0');
