@@ -163,6 +163,7 @@
   "supportDescription": "This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.",
   "reportBug": "Report a bug / Suggest a feature",
   "reportThisIssue": "Report this issue",
+  "reportAlreadySent": "You already reported this issue.",
   "reportConsentTitle": "Report to GitHub?",
   "reportConsentBody": "This will open a public GitHub issue with the error details below. No GPS coordinates, API keys, or personal data are included.",
   "reportConsentConfirm": "Open GitHub",

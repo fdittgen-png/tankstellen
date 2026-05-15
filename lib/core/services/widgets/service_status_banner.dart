@@ -214,12 +214,19 @@ class ServiceChainErrorWidget extends StatelessWidget {
                 icon: const Icon(Icons.refresh),
                 label: Text(l10n?.retry ?? 'Try again'),
               ),
-            const SizedBox(height: 8),
-            TextButton.icon(
-              onPressed: () => _onReportPressed(context),
-              icon: const Icon(Icons.bug_report_outlined, size: 18),
-              label: Text(l10n?.reportThisIssue ?? 'Report this issue'),
-            ),
+            // #1606 — suppress the report CTA for errors that should
+            // never become a GitHub issue: designed-in stop-gap
+            // messages tied to a tracked issue, and transient
+            // connectivity failures. The hint above already tells the
+            // user what to do in those cases.
+            if (ErrorReportPayload.assessReportability(error).reportable) ...[
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: () => _onReportPressed(context),
+                icon: const Icon(Icons.bug_report_outlined, size: 18),
+                label: Text(l10n?.reportThisIssue ?? 'Report this issue'),
+              ),
+            ],
             const SizedBox(height: 12),
             // Expandable technical details
             Theme(

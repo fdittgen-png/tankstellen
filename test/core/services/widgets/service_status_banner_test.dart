@@ -271,6 +271,37 @@ void main() {
         expect(find.byIcon(Icons.bug_report_outlined), findsOneWidget);
       });
 
+      testWidgets('hides the report CTA for a tracked stop-gap error (#1606)',
+          (tester) async {
+        await tester.pumpWidget(wrapWithL10n(
+          ServiceChainErrorWidget(
+            error: Exception('NSW FuelCheck retired. Tracked in #504'),
+            onRetry: () {},
+          ),
+        ));
+        await tester.pumpAndSettle();
+
+        // A designed-in message tied to a tracked issue must not offer
+        // a "report a bug" CTA — filing it just creates triage noise.
+        expect(find.text('Report this issue'), findsNothing);
+        expect(find.byIcon(Icons.bug_report_outlined), findsNothing);
+      });
+
+      testWidgets('hides the report CTA for a transient network error (#1606)',
+          (tester) async {
+        await tester.pumpWidget(wrapWithL10n(
+          ServiceChainErrorWidget(
+            error: Exception('Network error (status: null)'),
+            onRetry: () {},
+          ),
+        ));
+        await tester.pumpAndSettle();
+
+        // A status-less connectivity failure is non-actionable as a bug
+        // report — the hint tells the user to check their connection.
+        expect(find.text('Report this issue'), findsNothing);
+      });
+
       testWidgets('tapping report opens the consent dialog, not the browser',
           (tester) async {
         Uri? launched;

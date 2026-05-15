@@ -395,6 +395,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reportThisIssue => 'Signaler ce problème';
 
   @override
+  String get reportAlreadySent => 'Vous avez déjà signalé ce problème.';
+
+  @override
   String get reportConsentTitle => 'Signaler sur GitHub ?';
 
   @override

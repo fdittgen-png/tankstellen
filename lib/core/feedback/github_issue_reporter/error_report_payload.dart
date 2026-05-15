@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../../error/exceptions.dart';
 import '../../services/service_result.dart';
 
@@ -48,6 +50,17 @@ class ErrorReportPayload {
   /// What the user was doing (e.g. `GPS search`, `ZIP search 34120`).
   final String? searchContext;
 
+  /// False when this error must NOT offer a "report a bug" CTA — it is
+  /// either a designed-in stop-gap message tied to an already-tracked
+  /// issue, or a transient connectivity failure. Filing either as a new
+  /// GitHub issue just creates triage noise (#1606).
+  final bool reportable;
+
+  /// True when the error is a status-less network / connectivity
+  /// failure — the UI shows a "check your connection" hint rather than
+  /// a report CTA.
+  final bool isTransientNetwork;
+
   const ErrorReportPayload({
     required this.errorType,
     required this.errorMessage,
@@ -62,7 +75,15 @@ class ErrorReportPayload {
     this.stackExcerpt,
     this.networkState,
     this.searchContext,
+    this.reportable = true,
+    this.isTransientNetwork = false,
   });
+
+  /// Stable fingerprint for client-side dedup (#1606) — type + source +
+  /// sanitized message. Two reports of the same underlying failure
+  /// share a fingerprint, so the reporter can suppress a duplicate.
+  String get fingerprint =>
+      '$errorType|${sourceLabel ?? ''}|$errorMessage';
 
   /// Builds a payload from an error object, extracting structured fields
   /// from well-known exception types.
@@ -103,6 +124,8 @@ class ErrorReportPayload {
       }
     }
 
+    final assessment = assessReportability(error);
+
     return ErrorReportPayload(
       errorType: error.runtimeType.toString(),
       errorMessage: message,
@@ -117,7 +140,66 @@ class ErrorReportPayload {
       stackExcerpt: _extractStackExcerpt(stackTrace),
       networkState: networkState,
       searchContext: searchContext,
+      reportable: assessment.reportable,
+      isTransientNetwork: assessment.transient,
     );
+  }
+
+  /// Assess whether [error] should offer a report CTA (#1606).
+  ///
+  /// - `reportable` is false for a designed-in stop-gap message tied to
+  ///   a tracked issue, or a transient network failure.
+  /// - `transient` is true for a status-less connectivity failure.
+  ///
+  /// Exposed so a UI surface can decide whether to render the "report"
+  /// button without building a full payload.
+  static ({bool reportable, bool transient}) assessReportability(
+      Object error) {
+    final msg = _primaryMessage(error);
+    final transient = _looksTransientNetwork(error, msg);
+    final known = isKnownTrackedIssue(msg);
+    return (reportable: !transient && !known, transient: transient);
+  }
+
+  /// True when [message] is a deliberate, already-tracked stop-gap
+  /// message (e.g. "NSW FuelCheck retired … Tracked in #504") rather
+  /// than an unexpected bug. Matches the `Tracked in #NNN` convention.
+  static bool isKnownTrackedIssue(String message) =>
+      RegExp(r'tracked in #\d+', caseSensitive: false).hasMatch(message);
+
+  /// True when [error] is a status-less network / connectivity failure
+  /// (a Dio connection/timeout error, or a message that names a network
+  /// failure with no HTTP status) — non-actionable as a bug report.
+  static bool _looksTransientNetwork(Object error, String message) {
+    if (error is DioException) {
+      return error.type == DioExceptionType.connectionError ||
+          error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout ||
+          error.type == DioExceptionType.sendTimeout;
+    }
+    final lower = message.toLowerCase();
+    final mentionsNetwork = lower.contains('network error') ||
+        lower.contains('connection failed') ||
+        lower.contains('connection error') ||
+        lower.contains('failed host lookup') ||
+        lower.contains('no internet');
+    final hasHttpStatus = RegExp(r'status:?\s*[1-5]\d\d').hasMatch(lower);
+    return mentionsNetwork && !hasHttpStatus;
+  }
+
+  /// The primary, sanitized message for an error — the first inner
+  /// service error for a [ServiceChainExhaustedException], else the
+  /// error's own string form.
+  static String _primaryMessage(Object error) {
+    if (error is ServiceChainExhaustedException) {
+      for (final inner in error.errors) {
+        if (inner is ServiceError) return _sanitizeMessage(inner.message);
+      }
+      if (error.errors.isNotEmpty) {
+        return _sanitizeMessage(error.errors.first.toString());
+      }
+    }
+    return _sanitizeMessage(error.toString());
   }
 
   /// Extracts a short, privacy-safe stack trace excerpt.

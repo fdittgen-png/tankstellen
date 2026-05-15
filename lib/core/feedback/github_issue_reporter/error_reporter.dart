@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../widgets/snackbar_helper.dart';
 import 'error_report_formatter.dart';
 import 'error_report_payload.dart';
 
@@ -34,11 +35,52 @@ class ErrorReporter {
   const ErrorReporter({UrlLauncher launcher = _defaultLauncher})
       : _launcher = launcher;
 
+  /// Recently-reported error fingerprints — a process-lifetime ring
+  /// buffer so the same failure reported twice in a session does not
+  /// compose a second GitHub issue (#1606). Three of the six
+  /// not-planned issues in the backlog were byte-identical duplicates
+  /// filed through this path.
+  static final List<String> _recentFingerprints = <String>[];
+  static const int _dedupRingSize = 20;
+
+  static void _rememberFingerprint(String fingerprint) {
+    _recentFingerprints
+      ..remove(fingerprint)
+      ..add(fingerprint);
+    if (_recentFingerprints.length > _dedupRingSize) {
+      _recentFingerprints.removeAt(0);
+    }
+  }
+
+  /// Test seam — whether [fingerprint] is in the dedup ring.
+  @visibleForTesting
+  static bool hasRecentlyReported(String fingerprint) =>
+      _recentFingerprints.contains(fingerprint);
+
+  /// Test seam — clears the dedup ring so each test starts fresh.
+  @visibleForTesting
+  static void resetDedupRingForTest() => _recentFingerprints.clear();
+
   Future<bool> reportError(
     BuildContext context,
     ErrorReportPayload payload, {
     bool requireConsent = true,
   }) async {
+    // #1606 — client-side dedup. A fingerprint already in the ring
+    // buffer means this exact failure was reported before; don't
+    // compose a second issue URL, just tell the user it's already
+    // filed.
+    if (_recentFingerprints.contains(payload.fingerprint)) {
+      if (context.mounted) {
+        final l10n = AppLocalizations.of(context);
+        SnackBarHelper.show(
+          context,
+          l10n?.reportAlreadySent ?? 'You already reported this issue.',
+        );
+      }
+      return false;
+    }
+
     if (requireConsent) {
       final confirmed = await _showConsentDialog(context, payload);
       if (confirmed != true) return false;
@@ -46,7 +88,9 @@ class ErrorReporter {
 
     final url = ErrorReportFormatter.buildIssueUrl(payload);
     try {
-      return await _launcher(url);
+      final launched = await _launcher(url);
+      if (launched) _rememberFingerprint(payload.fingerprint);
+      return launched;
     } catch (e, st) {
       debugPrint('ErrorReporter launch failed: $e\n$st');
       return false;
