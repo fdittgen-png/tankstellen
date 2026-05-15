@@ -3879,6 +3879,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Activez d\'abord l\'historique des prix';
 
   @override
+  String get featureLabel_fuelCalculator => 'Fuel calculator';
+
+  @override
+  String get featureDescription_fuelCalculator =>
+      'Reachable fuel-cost calculator from the search results.';
+
+  @override
   String get feedbackConsentTitle => 'Envoyer le rapport à GitHub ?';
 
   @override

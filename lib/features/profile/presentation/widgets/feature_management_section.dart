@@ -505,6 +505,8 @@ String _featureLabel(AppLocalizations? l, Feature f) {
     case Feature.tflitePricePrediction:
       return l?.featureLabel_tflitePricePrediction ??
           'TFLite price prediction';
+    case Feature.fuelCalculator:
+      return l?.featureLabel_fuelCalculator ?? 'Fuel calculator';
   }
 }
 
@@ -571,6 +573,9 @@ String _featureDescription(AppLocalizations? l, Feature f) {
       return l?.featureDescription_tflitePricePrediction ??
           'On-device price forecast model — inference runs locally; '
               'features and predictions never leave the device.';
+    case Feature.fuelCalculator:
+      return l?.featureDescription_fuelCalculator ??
+          'Reachable fuel-cost calculator from the search results.';
   }
 }
 
@@ -617,6 +622,7 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
     case Feature.showElectric:
     case Feature.manualConsumption:
     case Feature.loyaltyCards:
+    case Feature.fuelCalculator:
       return 'Prerequisites not met';
   }
 }

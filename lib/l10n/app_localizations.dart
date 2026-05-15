@@ -7034,6 +7034,18 @@ abstract class AppLocalizations {
   /// **'Enable price history first'**
   String get featureBlockedEnable_tflitePricePrediction;
 
+  /// Settings toggle label for the fuel-cost Calculator feature (#1613).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel calculator'**
+  String get featureLabel_fuelCalculator;
+
+  /// Settings toggle description for the fuel-cost Calculator feature (#1613).
+  ///
+  /// In en, this message translates to:
+  /// **'Reachable fuel-cost calculator from the search results.'**
+  String get featureDescription_fuelCalculator;
+
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
   /// In en, this message translates to:
