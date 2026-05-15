@@ -19,6 +19,7 @@ import 'paused_trip_repository.dart';
 import 'pid_scheduler.dart';
 import 'trip_distance_source.dart';
 import 'trip_live_reading.dart';
+import 'trip_sample_buffer.dart';
 import 'virtual_odometer.dart';
 
 // Re-export the DTO + distance-source constants so existing callers
@@ -312,52 +313,23 @@ class TripRecordingController {
   /// real odometer.
   final List<VirtualOdometerSample> _speedSamples = <VirtualOdometerSample>[];
 
-  /// Per-tick sample buffer used by the trip-detail charts (#1040).
-  /// Decimated to ~1 Hz inside [_emit] — the user-facing charts don't
-  /// need the 4 Hz emit cadence, and 1 Hz × 8 fields keeps a 39-min
-  /// trip's payload well under 20 KB compressed. Capped at
-  /// [_capturedSampleCap] so a forgotten recording can't eat unbounded
-  /// memory; the cap covers a 33-hour drive at 1 Hz which is more
-  /// than enough headroom.
-  final List<TripSample> _capturedSamples = <TripSample>[];
-
-  /// Timestamp of the most recently *captured* (decimated) sample.
-  /// Distinct from [_lastSampleAt] which tracks the recorder feed at
-  /// the full 4 Hz emit cadence.
-  DateTime? _lastCapturedAt;
-
-  /// Cap on the captured-sample buffer (#1040). 120000 samples = 33 h
-  /// at 1 Hz — comfortably above any plausible single trip — so this
-  /// only kicks in if the user forgets to stop a recording overnight.
-  static const int _capturedSampleCap = 120000;
+  /// Owns the #1040 captured-sample buffer and the #1458 GPS
+  /// cadence-diagnostics buffer — both per-trip ring buffers
+  /// extracted into a focused collaborator (#1679).
+  final TripSampleBuffer _sampleBuffer = TripSampleBuffer();
 
   /// Read-only snapshot of the captured sample buffer (#1040). The
   /// list is unmodifiable so callers can't accidentally mutate the
   /// controller's state — the provider clones it into the persisted
   /// [TripHistoryEntry] at stop time.
-  List<TripSample> get capturedSamples => List.unmodifiable(_capturedSamples);
-
-  /// Per-trip GPS cadence diagnostics buffer (#1458 phase 2). Appended
-  /// to by [recordGpsSampleDiagnostic] every time the provider's
-  /// position-stream listener fires; persisted onto the saved
-  /// [TripHistoryEntry] at stop time. Capped at
-  /// [_gpsSampleDiagnosticCap] so a forgotten recording can't eat
-  /// unbounded memory.
-  final List<GpsSampleDiagnostic> _gpsSampleDiagnostics =
-      <GpsSampleDiagnostic>[];
-
-  /// Cap on the GPS diagnostics buffer (#1458 phase 2). At ~1 Hz GPS
-  /// fix cadence the cap covers ~33 hours — comfortably above any
-  /// plausible single trip and well below the trip-detail JSON
-  /// size budget.
-  static const int _gpsSampleDiagnosticCap = 120000;
+  List<TripSample> get capturedSamples => _sampleBuffer.capturedSamples;
 
   /// Read-only snapshot of the GPS cadence diagnostics buffer
   /// (#1458 phase 2). The list is unmodifiable so callers can't
   /// accidentally mutate the controller's state — the provider clones
   /// it into the persisted [TripHistoryEntry] at stop time.
   List<GpsSampleDiagnostic> get capturedGpsSampleDiagnostics =>
-      List.unmodifiable(_gpsSampleDiagnostics);
+      _sampleBuffer.capturedGpsSampleDiagnostics;
 
   /// Latest parsed values, keyed by PID command. Written by scheduler
   /// callbacks, read by [_emit] when assembling [TripLiveReading]. Not
@@ -561,20 +533,10 @@ class TripRecordingController {
     required DateTime now,
     required String lifecycleState,
   }) {
-    final entry = GpsSampleDiagnostic(
-      timestamp: now,
+    _sampleBuffer.recordGpsSampleDiagnostic(
+      now: now,
       lifecycleState: lifecycleState,
-      index: _gpsSampleDiagnostics.length,
     );
-    _gpsSampleDiagnostics.add(entry);
-    if (_gpsSampleDiagnostics.length > _gpsSampleDiagnosticCap) {
-      // Drop the oldest slice — losing the early stretch is preferable
-      // to letting a forgotten overnight recording eat unbounded memory.
-      _gpsSampleDiagnostics.removeRange(
-        0,
-        _gpsSampleDiagnostics.length - _gpsSampleDiagnosticCap,
-      );
-    }
   }
 
   /// Exposed for tests: append a cadence diagnostic without going
@@ -583,7 +545,7 @@ class TripRecordingController {
   /// needing a real Geolocator stream.
   @visibleForTesting
   void debugCaptureGpsSampleDiagnostic(GpsSampleDiagnostic diagnostic) {
-    _gpsSampleDiagnostics.add(diagnostic);
+    _sampleBuffer.debugCaptureGpsSampleDiagnostic(diagnostic);
   }
 
   /// Read-only snapshot of the most recent GPS latitude pushed in via
@@ -747,11 +709,12 @@ class TripRecordingController {
     // gears. Hybrids DO have a step-ratio transmission on the
     // combustion side, so they fall through to the inference path.
     if (vehicle.type == VehicleType.ev) return null;
-    if (_capturedSamples.isEmpty) return null;
+    final captured = _sampleBuffer.capturedSamples;
+    if (captured.isEmpty) return null;
     final tireC = vehicle.tireCircumferenceMeters;
     if (tireC <= 0) return null;
     final result = inferGears(
-      samples: _capturedSamples,
+      samples: captured,
       tireCircumferenceMeters: tireC,
       priorCentroids: vehicle.gearCentroids,
     );
@@ -761,7 +724,7 @@ class TripRecordingController {
           .map((s) => (timestamp: s.timestamp, gear: s.gear))
           .toList(growable: false),
       optimalRpmCeiling: _optimalRpmCeiling,
-      samples: _capturedSamples,
+      samples: captured,
       centroids: result.centroids,
     );
   }
@@ -1298,7 +1261,7 @@ class TripRecordingController {
       );
       _recorder.onSample(sample);
       _lastSampleAt = nowTs;
-      _maybeCaptureSample(sample);
+      _sampleBuffer.maybeCapture(sample);
     }
     if (fuelRate != null) {
       _fuelRateSeen = true;
@@ -1518,40 +1481,13 @@ class TripRecordingController {
     return Obd2Service.applyFuelTrimCorrection(raw, stft: stft, ltft: ltft);
   }
 
-  /// Append [sample] to the captured-samples buffer when at least
-  /// 1 second has elapsed since the previous capture. The 4 Hz emit
-  /// loop drops 3 of every 4 candidate samples — the chart layer
-  /// renders at 1 Hz and the storage budget is sized for that
-  /// cadence (#1040).
-  void _maybeCaptureSample(TripSample sample) {
-    final last = _lastCapturedAt;
-    if (last != null) {
-      // Use 950 ms as the gate so a 1 Hz scheduler that's slightly
-      // jittered (998 ms / 1003 ms) still captures every tick. Without
-      // the slack a 998 ms gap would slip through the >=1000 check
-      // and we'd silently halve the captured rate.
-      if (sample.timestamp.difference(last).inMilliseconds < 950) return;
-    }
-    _capturedSamples.add(sample);
-    _lastCapturedAt = sample.timestamp;
-    if (_capturedSamples.length > _capturedSampleCap) {
-      // Drop the oldest slice — losing the early stretch is preferable
-      // to letting a forgotten overnight recording eat unbounded memory.
-      _capturedSamples.removeRange(
-        0,
-        _capturedSamples.length - _capturedSampleCap,
-      );
-    }
-  }
-
   /// Exposed for tests: append a sample to the captured-samples buffer
   /// without going through the scheduler / debounced emit timer
   /// (#1040). Tests use this to populate a deterministic buffer + then
   /// drive [TripRecording.stop] end-to-end.
   @visibleForTesting
   void debugCaptureSample(TripSample sample) {
-    _capturedSamples.add(sample);
-    _lastCapturedAt = sample.timestamp;
+    _sampleBuffer.debugCaptureSample(sample);
   }
 
   /// Exposed for tests: force an emit immediately instead of waiting
