@@ -37,7 +37,8 @@ void main() {
       expect(find.text('Short message'), findsOneWidget);
     });
 
-    testWidgets('showSuccess() displays green snackbar', (tester) async {
+    testWidgets('showSuccess() displays a themed snackbar with a check icon',
+        (tester) async {
       await pumpApp(tester, Builder(
         builder: (context) => ElevatedButton(
           onPressed: () => SnackBarHelper.showSuccess(context, 'Success!'),
@@ -50,12 +51,17 @@ void main() {
 
       expect(find.text('Success!'), findsOneWidget);
 
-      // Verify green background
+      // #1683/#1692 — themed via colorScheme (never hard-coded green, so
+      // dark mode stays harmonious) and carries a check icon so success
+      // is signalled by more than colour alone.
       final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-      expect(snackBar.backgroundColor, Colors.green);
+      expect(snackBar.backgroundColor, isNotNull);
+      expect(snackBar.backgroundColor, isNot(Colors.green));
+      expect(find.byIcon(Icons.check_circle_outline), findsOneWidget);
     });
 
-    testWidgets('showError() displays red snackbar', (tester) async {
+    testWidgets('showError() displays a themed snackbar with an error icon',
+        (tester) async {
       await pumpApp(tester, Builder(
         builder: (context) => ElevatedButton(
           onPressed: () => SnackBarHelper.showError(context, 'Error occurred'),
@@ -68,11 +74,11 @@ void main() {
 
       expect(find.text('Error occurred'), findsOneWidget);
 
-      // Verify error color background
       final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
       expect(snackBar.backgroundColor, isNotNull);
-      // Theme.of(context).colorScheme.error — just verify it's not null/green
       expect(snackBar.backgroundColor, isNot(Colors.green));
+      // #1692 — error is signalled by an icon, not colour alone.
+      expect(find.byIcon(Icons.error_outline), findsOneWidget);
     });
 
     testWidgets('showError() has 5-second duration', (tester) async {
