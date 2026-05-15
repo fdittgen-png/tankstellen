@@ -12,6 +12,7 @@ import '../../domain/trip_recorder.dart';
 import '../trip_history_repository.dart';
 import 'adapter_reconnect_scanner.dart';
 import 'elm327_protocol.dart';
+import 'live_sample_snapshot.dart';
 import 'obd2_breadcrumb_collector.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_service.dart';
@@ -305,38 +306,18 @@ class TripRecordingController {
   List<GpsSampleDiagnostic> get capturedGpsSampleDiagnostics =>
       _sampleBuffer.capturedGpsSampleDiagnostics;
 
-  /// Latest parsed values, keyed by PID command. Written by scheduler
-  /// callbacks, read by [_emit] when assembling [TripLiveReading]. Not
-  /// using a typed struct because most fields are optional doubles
-  /// and adding a freezed class for this scratch space buys nothing.
-  double? _latestSpeedKmh;
-  double? _latestRpm;
-  double? _latestMaf;
-  double? _latestMapKpa;
-  double? _latestIatCelsius;
-  double? _latestThrottlePercent;
-  double? _latestEngineLoadPercent;
-  double? _latestCoolantTempC;
-  double? _latestFuelLevelPercent;
-  double? _latestStft;
-  double? _latestLtft;
-  double? _latestDirectFuelRate;
+  /// VIN read once at [start]. Null on older ECUs / adapters that
+  /// can't answer Mode 09 PID 02.
   String? _vin;
 
-  // #1374 phase 1 — most recent GPS fix, pushed in by the provider
-  // when the `Feature.gpsTripPath` flag is enabled. The controller
-  // does NOT subscribe to Geolocator itself — that decision lives at
-  // the provider layer so the controller stays free of plugin
-  // imports and tests can drive the latch with hand-built doubles.
-  // When the flag is off the provider never calls [updateGpsFix],
-  // both fields stay null, and every persisted sample carries
-  // `latitude: null, longitude: null` (matching pre-#1374 behaviour
-  // bit-for-bit). When the flag is on but no fix has landed yet
-  // (cold-start, indoors, permission revoked), the fields are also
-  // null and the corresponding sample is written with both keys
-  // absent — better than failing the trip.
-  double? _latestLatitude;
-  double? _latestLongitude;
+  /// The "clock"-side snapshot — the per-PID latest-value scratch
+  /// space, the scheduler subscription wiring, and the tier-1/2/3
+  /// fuel-rate derivation — extracted into a focused collaborator
+  /// (#1679). The emit timer + [_emit] stay on the controller; this
+  /// collaborator owns the values that [_emit] reads. Built in the
+  /// constructor body so it can capture the [_observeHighPriorityParse]
+  /// and [_recordSpeedSample] tear-offs.
+  late final LiveSampleSnapshot _liveSampleSnapshot;
 
   TripRecordingController({
     required Obd2Service service,
@@ -382,6 +363,14 @@ class TripRecordingController {
       dropWindow: dropWindow,
       dropThreshold: dropThreshold,
       silentFailureThreshold: silentFailureThreshold,
+    );
+    _liveSampleSnapshot = LiveSampleSnapshot(
+      service: _service,
+      vehicle: _vehicle,
+      referenceVehicle: _referenceVehicle,
+      breadcrumbCollector: _breadcrumbCollector,
+      onHighPriorityParse: _observeHighPriorityParse,
+      onSpeedSample: _recordSpeedSample,
     );
   }
 
@@ -489,8 +478,10 @@ class TripRecordingController {
   /// controller cheap (no Geolocator mocks required) and lets the
   /// flag-off path skip the plugin entirely.
   void updateGpsFix({double? latitude, double? longitude}) {
-    _latestLatitude = latitude;
-    _latestLongitude = longitude;
+    _liveSampleSnapshot.updateGpsFix(
+      latitude: latitude,
+      longitude: longitude,
+    );
   }
 
   /// #1458 phase 2 — append one cadence-diagnostic record at [now]
@@ -530,13 +521,13 @@ class TripRecordingController {
   /// production reads the value through the persisted [TripSample]
   /// fields, not this getter.
   @visibleForTesting
-  double? get debugLatestLatitude => _latestLatitude;
+  double? get debugLatestLatitude => _liveSampleSnapshot.latestLatitude;
 
   /// Read-only snapshot of the most recent GPS longitude pushed in via
   /// [updateGpsFix] (#1374 phase 1). Same caveats as
   /// [debugLatestLatitude].
   @visibleForTesting
-  double? get debugLatestLongitude => _latestLongitude;
+  double? get debugLatestLongitude => _liveSampleSnapshot.latestLongitude;
 
   /// Start polling. Reads the odometer and VIN ONCE to pin trip
   /// identity; subsequent ticks are scheduled per-PID by
@@ -559,7 +550,7 @@ class TripRecordingController {
     _vin = await _readVinOnce();
 
     _scheduler = _schedulerOverride ?? _buildScheduler();
-    _subscribeAllTiers(_scheduler!);
+    _liveSampleSnapshot.subscribeAllTiers(_scheduler!);
     _scheduler!.start();
 
     _emitTimer = Timer.periodic(_pollInterval, (_) => _emit());
@@ -1032,138 +1023,6 @@ class TripRecordingController {
     _stateController.add(currentState);
   }
 
-  void _subscribeAllTiers(PidScheduler scheduler) {
-    // ---- 5 Hz tier (high priority) --------------------------------
-    // RPM and speed are consumed directly by TripSample → TripRecorder
-    // for distance/idle/harsh-accel accumulation, so they need the
-    // highest refresh we can squeeze out of the adapter.
-    scheduler.subscribe(
-      Elm327Protocol.engineRpmCommand,
-      ScheduledPid(hz: 5.0, priority: PidPriority.high),
-      (r) {
-        final v = Elm327Protocol.parseEngineRpm(r);
-        if (v != null) _latestRpm = v;
-        _observeHighPriorityParse(v);
-      },
-    );
-    scheduler.subscribe(
-      Elm327Protocol.vehicleSpeedCommand,
-      ScheduledPid(hz: 5.0, priority: PidPriority.high),
-      (r) {
-        final v = Elm327Protocol.parseVehicleSpeed(r);
-        if (v != null) {
-          _latestSpeedKmh = v.toDouble();
-          _recordSpeedSample(v.toDouble());
-        }
-        _observeHighPriorityParse(v);
-      },
-    );
-    // MAF and MAP are the two alternate air-mass inputs to the fuel-
-    // rate derivation. Cheap cars (Peugeot 107) only have MAP+IAT;
-    // modern cars expose MAF. We subscribe both and let the snapshot-
-    // based derivation pick whichever landed most recently.
-    if (_service.supportsPid(0x10)) {
-      scheduler.subscribe(
-        Elm327Protocol.mafCommand,
-        ScheduledPid(hz: 5.0, priority: PidPriority.high),
-        (r) {
-          final v = Elm327Protocol.parseMafGramsPerSecond(r);
-          if (v != null) _latestMaf = v;
-          _observeHighPriorityParse(v);
-        },
-      );
-    }
-    if (_service.supportsPid(0x0B)) {
-      scheduler.subscribe(
-        Elm327Protocol.intakeManifoldPressureCommand,
-        ScheduledPid(hz: 5.0, priority: PidPriority.high),
-        (r) {
-          final v = Elm327Protocol.parseManifoldPressureKpa(r);
-          if (v != null) _latestMapKpa = v;
-          _observeHighPriorityParse(v);
-        },
-      );
-    }
-    scheduler.subscribe(
-      Elm327Protocol.throttlePositionCommand,
-      ScheduledPid(hz: 5.0, priority: PidPriority.high),
-      (r) {
-        final v = Elm327Protocol.parseThrottlePercent(r);
-        if (v != null) _latestThrottlePercent = v;
-        _observeHighPriorityParse(v);
-      },
-    );
-    // PID 5E is only present on ~2014+ ECUs. Skip when #811 discovery
-    // already proved the car rejects it, to save the 200 ms round-
-    // trip of a guaranteed NO DATA.
-    if (_service.supportsPid(0x5E)) {
-      scheduler.subscribe(
-        Elm327Protocol.engineFuelRateCommand,
-        ScheduledPid(hz: 5.0, priority: PidPriority.high),
-        (r) {
-          final v = Elm327Protocol.parseFuelRateLPerHour(r);
-          if (v != null) _latestDirectFuelRate = v;
-          _observeHighPriorityParse(v);
-        },
-      );
-    }
-
-    // ---- 1 Hz tier (medium priority) ------------------------------
-    scheduler.subscribe(
-      Elm327Protocol.engineLoadCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseEngineLoad(r);
-        if (v != null) _latestEngineLoadPercent = v;
-      },
-    );
-    scheduler.subscribe(
-      Elm327Protocol.intakeAirTempCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseIntakeAirTempCelsius(r);
-        if (v != null) _latestIatCelsius = v;
-      },
-    );
-    // Coolant temp drifts slowly — 1 Hz is more than enough resolution
-    // for the cold-start surcharge heuristic (#1262 phase 2) to detect
-    // whether the trip ever crossed operating temperature.
-    scheduler.subscribe(
-      Elm327Protocol.coolantTempCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseCoolantTempCelsius(r);
-        if (v != null) _latestCoolantTempC = v;
-      },
-    );
-    scheduler.subscribe(
-      Elm327Protocol.shortTermFuelTrimCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseShortTermFuelTrim(r);
-        if (v != null) _latestStft = v;
-      },
-    );
-    scheduler.subscribe(
-      Elm327Protocol.longTermFuelTrimCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseLongTermFuelTrim(r);
-        if (v != null) _latestLtft = v;
-      },
-    );
-
-    // ---- 0.1 Hz tier (low priority) -------------------------------
-    scheduler.subscribe(
-      Elm327Protocol.fuelTankLevelCommand,
-      ScheduledPid(hz: 0.1, priority: PidPriority.low),
-      (r) {
-        final v = Elm327Protocol.parseFuelLevelPercent(r);
-        if (v != null) _latestFuelLevelPercent = v;
-      },
-    );
-  }
-
   /// Read the VIN exactly once at [start]. Wrapped so the one-shot
   /// decision is visible to readers of [start] — if we ever need to
   /// re-read mid-trip (e.g. user hot-swaps cars) this is the place
@@ -1185,28 +1044,34 @@ class TripRecordingController {
     if (_paused || _pausedDueToDrop) return; // don't flood while paused
     if (_liveController.isClosed) return;
 
+    final snap = _liveSampleSnapshot;
     final nowTs = _now();
-    final fuelRate = _deriveFuelRateLPerHour();
+    final fuelRate = snap.deriveFuelRateLPerHour();
+    final speedKmh = snap.latestSpeedKmh;
+    final rpm = snap.latestRpm;
+    final throttlePercent = snap.latestThrottlePercent;
+    final engineLoadPercent = snap.latestEngineLoadPercent;
+    final coolantTempC = snap.latestCoolantTempC;
     // The recorder integrates fuel rate and Δt itself, so we only
     // hand it one TripSample per emit — not per PID callback. At a
     // 250 ms emit cadence that's 4 Hz into the recorder, matching
     // the pre-#814 1 Hz loop's behavior closely enough that the
     // distance/fuelLitersConsumed integration is unchanged.
-    if (_latestSpeedKmh != null || _latestRpm != null) {
+    if (speedKmh != null || rpm != null) {
       final sample = TripSample(
         timestamp: nowTs,
-        speedKmh: _latestSpeedKmh ?? 0,
-        rpm: _latestRpm ?? 0,
+        speedKmh: speedKmh ?? 0,
+        rpm: rpm ?? 0,
         fuelRateLPerHour: fuelRate,
-        throttlePercent: _latestThrottlePercent,
-        engineLoadPercent: _latestEngineLoadPercent,
-        coolantTempC: _latestCoolantTempC,
+        throttlePercent: throttlePercent,
+        engineLoadPercent: engineLoadPercent,
+        coolantTempC: coolantTempC,
         // #1374 phase 1 — stamp the most recent GPS fix when the
         // provider has pushed one in. Both fields stay null when the
         // feature flag is off (no Geolocator subscription was ever
         // started) or before the first fix lands.
-        latitude: _latestLatitude,
-        longitude: _latestLongitude,
+        latitude: snap.latestLatitude,
+        longitude: snap.latestLongitude,
       );
       _recorder.onSample(sample);
       _lastSampleAt = nowTs;
@@ -1218,13 +1083,13 @@ class TripRecordingController {
           (_recorder.buildSummary().fuelLitersConsumed) ?? _fuelLitersSoFar;
     }
     final reading = TripLiveReading(
-      speedKmh: _latestSpeedKmh,
-      rpm: _latestRpm,
+      speedKmh: speedKmh,
+      rpm: rpm,
       fuelRateLPerHour: fuelRate,
-      fuelLevelPercent: _latestFuelLevelPercent,
-      engineLoadPercent: _latestEngineLoadPercent,
-      throttlePercent: _latestThrottlePercent,
-      coolantTempC: _latestCoolantTempC,
+      fuelLevelPercent: snap.latestFuelLevelPercent,
+      engineLoadPercent: engineLoadPercent,
+      throttlePercent: throttlePercent,
+      coolantTempC: coolantTempC,
       distanceKmSoFar: _recorder.buildSummary().distanceKm,
       fuelLitersSoFar: _fuelRateSeen ? _fuelLitersSoFar : null,
       elapsed: nowTs.difference(_startedAt ?? nowTs),
@@ -1232,202 +1097,6 @@ class TripRecordingController {
       odometerNowKm: _odometerLatestKm,
     );
     _liveController.add(reading);
-  }
-
-  /// Derive the current fuel rate (L/h) from whatever snapshot
-  /// values have landed so far. Mirrors the tier-1/2/3 fallback in
-  /// [Obd2Service.readFuelRateLPerHour], but over snapshot values
-  /// instead of live I/O — the scheduler has already done the
-  /// reads. Returns null when not enough inputs have arrived yet
-  /// (e.g. first 200 ms of a trip before MAP/IAT both land).
-  ///
-  /// AFR + density are chosen from the active vehicle's preferred
-  /// fuel type (#800). Diesel profiles get AFR 14.5 / density 832 g/L;
-  /// anything else (including null / unknown) stays on the petrol
-  /// defaults the pre-#800 path used.
-  double? _deriveFuelRateLPerHour() {
-    final preferredFuel =
-        _vehicle?.preferredFuelType?.trim().toLowerCase() ?? '';
-    final isDiesel = preferredFuel.contains('diesel');
-    // #1397 — manual overrides take precedence over the inferred /
-    // catalog-resolved values. Mirrors the resolution chain in
-    // [Obd2Service.readFuelRateLPerHour] so the live integrator and the
-    // pull-mode estimator agree on every scalar.
-    final afr = _vehicle?.manualAfrOverride ??
-        (isDiesel ? Obd2Service.dieselAfr : Obd2Service.petrolAfr);
-    final density = _vehicle?.manualFuelDensityGPerLOverride ??
-        (isDiesel
-            ? Obd2Service.dieselDensityGPerL
-            : Obd2Service.petrolDensityGPerL);
-    final displacement = _vehicle?.manualEngineDisplacementCcOverride
-            ?.round() ??
-        _vehicle?.engineDisplacementCc ??
-        1000;
-    // #1422 phase 1 — same precedence as Obd2Service.readFuelRateLPerHour:
-    // manual override → stored profile (when learned or non-default) →
-    // engine-tech helper on the reference catalog row → hard 0.85
-    // fallback. The two paths must agree so the live integrator and
-    // the pull-mode estimator produce identical numbers for the same
-    // tick.
-    final ve = _vehicle?.manualVolumetricEfficiencyOverride ??
-        _resolveControllerProfileVe() ??
-        (_referenceVehicle != null
-            ? defaultVolumetricEfficiency(_referenceVehicle)
-            : 0.85);
-    final collector = _breadcrumbCollector;
-
-    // Step 1: direct PID 5E. Already post-trim, no correction.
-    final direct = _latestDirectFuelRate;
-    if (direct != null) {
-      // #1395 — sanity bound A: implausibly-low at non-idle RPM.
-      // Same threshold as Obd2Service.readFuelRateLPerHour but evaluated
-      // on the controller's most-recent RPM snapshot so this works
-      // even when the trip is being driven by raw scheduler callbacks
-      // rather than the readFuelRate API.
-      String? lowFlag;
-      String? lowDetail;
-      final rpm = _latestRpm;
-      if (direct < 0.3 && rpm != null && rpm > 1500) {
-        lowFlag = Obd2BreadcrumbCollector.flagSuspiciousLow;
-        lowDetail = 'directRate=${direct.toStringAsFixed(2)};'
-            'rpm=${rpm.toStringAsFixed(0)}';
-      }
-      collector?.record(
-        branch: Obd2BranchTag.pid5E,
-        fuelRateLPerHour: direct,
-        pid5ELPerHour: direct,
-        rpm: rpm,
-        afr: afr,
-        fuelDensityGPerL: density,
-        engineDisplacementCc: displacement.toDouble(),
-        volumetricEfficiency: ve,
-        flag: lowFlag,
-        flagDetail: lowDetail,
-      );
-      // Sanity bound B: 5E vs MAF cross-check on the controller's
-      // cached MAF snapshot. Evaluated AFTER the breadcrumb is
-      // pushed so [recordFlag] mutates the same row.
-      final mafSnapshot = _latestMaf;
-      if (mafSnapshot != null) {
-        final mafDerived = mafSnapshot * 3600.0 / (afr * density);
-        if (mafDerived > 0 &&
-            (direct - mafDerived).abs() / mafDerived > 0.5) {
-          collector?.recordFlag(
-            Obd2BreadcrumbCollector.flag5eVsMafDivergent,
-            'direct=${direct.toStringAsFixed(2)};'
-                'mafDerived=${mafDerived.toStringAsFixed(2)};'
-                'maf=${mafSnapshot.toStringAsFixed(2)}',
-          );
-        }
-      }
-      return direct;
-    }
-
-    // Step 2: MAF-based. L/h = MAF × 3600 / (AFR × density).
-    final maf = _latestMaf;
-    if (maf != null) {
-      final raw = maf * 3600.0 / (afr * density);
-      final corrected = _applyTrim(raw);
-      collector?.record(
-        branch: Obd2BranchTag.maf,
-        fuelRateLPerHour: corrected,
-        mafGramsPerSecond: maf,
-        rpm: _latestRpm,
-        afr: afr,
-        fuelDensityGPerL: density,
-        engineDisplacementCc: displacement.toDouble(),
-        volumetricEfficiency: ve,
-      );
-      return corrected;
-    }
-
-    // Step 3: speed-density from MAP+IAT+RPM. Feeds the pre-#810
-    // estimator with the active vehicle's displacement + VE (#812).
-    final mapKpa = _latestMapKpa;
-    final iat = _latestIatCelsius;
-    final rpm = _latestRpm;
-    if (mapKpa == null || iat == null || rpm == null) {
-      collector?.record(
-        branch: Obd2BranchTag.none,
-        mapKpa: mapKpa,
-        iatCelsius: iat,
-        rpm: rpm,
-        afr: afr,
-        fuelDensityGPerL: density,
-        engineDisplacementCc: displacement.toDouble(),
-        volumetricEfficiency: ve,
-      );
-      return null;
-    }
-    final raw = Obd2Service.estimateFuelRateLPerHourFromMap(
-      mapKpa: mapKpa,
-      iatCelsius: iat,
-      rpm: rpm,
-      engineDisplacementCc: displacement,
-      volumetricEfficiency: ve,
-      afr: afr,
-      fuelDensityGPerL: density,
-    );
-    if (raw == null) {
-      collector?.record(
-        branch: Obd2BranchTag.none,
-        mapKpa: mapKpa,
-        iatCelsius: iat,
-        rpm: rpm,
-        afr: afr,
-        fuelDensityGPerL: density,
-        engineDisplacementCc: displacement.toDouble(),
-        volumetricEfficiency: ve,
-      );
-      return null;
-    }
-    final corrected = _applyTrim(raw);
-    collector?.record(
-      branch: Obd2BranchTag.speedDensity,
-      fuelRateLPerHour: corrected,
-      mapKpa: mapKpa,
-      iatCelsius: iat,
-      rpm: rpm,
-      afr: afr,
-      fuelDensityGPerL: density,
-      engineDisplacementCc: displacement.toDouble(),
-      volumetricEfficiency: ve,
-    );
-    return corrected;
-  }
-
-  /// Returns the user profile's η_v that should beat the engine-tech
-  /// helper, or null when the helper should kick in instead (#1422
-  /// phase 1). Mirrors the rules in [_resolveProfileVolumetricEfficiency]
-  /// in `obd2_service.dart` so both the live integrator and the
-  /// pull-mode estimator agree on a per-tick basis.
-  ///
-  /// Profile null → null (caller will use the helper or hard fallback).
-  /// Without a reference catalog row the stored profile value is the
-  /// best we can do, even if it equals the legacy 0.85 default.
-  /// Otherwise: keep the stored value when the VeLearner has logged at
-  /// least one sample OR when the value differs from the legacy 0.85
-  /// default. A cold-start profile sitting on 0.85 with zero samples
-  /// returns null, letting the engine-tech helper provide a closer
-  /// initial guess (e.g. 0.95 for a Dacia dCi VNT diesel).
-  double? _resolveControllerProfileVe() {
-    final v = _vehicle;
-    if (v == null) return null;
-    if (_referenceVehicle == null) return v.volumetricEfficiency;
-    if (v.volumetricEfficiencySamples > 0) return v.volumetricEfficiency;
-    if (v.volumetricEfficiency != 0.85) return v.volumetricEfficiency;
-    return null;
-  }
-
-  /// Apply the STFT + LTFT correction used on the MAF / speed-density
-  /// branches (#813). Returns [raw] unchanged when either trim hasn't
-  /// landed yet — better an uncorrected estimate than one shifted by
-  /// half the real signal.
-  double _applyTrim(double raw) {
-    final stft = _latestStft;
-    final ltft = _latestLtft;
-    if (stft == null || ltft == null) return raw;
-    return Obd2Service.applyFuelTrimCorrection(raw, stft: stft, ltft: ltft);
   }
 
   /// Exposed for tests: append a sample to the captured-samples buffer
