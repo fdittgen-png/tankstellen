@@ -10,14 +10,14 @@ import '../../../../helpers/pump_app.dart';
 /// skips the real provider's SharedPreferences load — widget tests do
 /// not register plugin channels for SharedPreferences.
 class _FixedThemeMode extends ThemeModeSetting {
-  final ThemeMode _initial;
+  final AppThemeChoice _initial;
   _FixedThemeMode(this._initial);
 
   @override
-  ThemeMode build() => _initial;
+  AppThemeChoice build() => _initial;
 
   @override
-  Future<void> set(ThemeMode mode) async {
+  Future<void> set(AppThemeChoice mode) async {
     state = mode;
   }
 }
@@ -31,7 +31,7 @@ void main() {
         const ThemeSettingsScreen(),
         overrides: [
           themeModeSettingProvider
-              .overrideWith(() => _FixedThemeMode(ThemeMode.system)),
+              .overrideWith(() => _FixedThemeMode(AppThemeChoice.system)),
         ],
       );
 
@@ -46,7 +46,7 @@ void main() {
         const ThemeSettingsScreen(),
         overrides: [
           themeModeSettingProvider
-              .overrideWith(() => _FixedThemeMode(ThemeMode.system)),
+              .overrideWith(() => _FixedThemeMode(AppThemeChoice.system)),
         ],
       );
 
@@ -76,7 +76,7 @@ void main() {
         ProviderScope(
           overrides: [
             themeModeSettingProvider
-                .overrideWith(() => _FixedThemeMode(ThemeMode.system)),
+                .overrideWith(() => _FixedThemeMode(AppThemeChoice.system)),
           ],
           child: Builder(
             builder: (ctx) {
@@ -89,13 +89,13 @@ void main() {
       await tester.pumpAndSettle();
 
       // Baseline — System is active.
-      expect(container.read(themeModeSettingProvider), ThemeMode.system);
+      expect(container.read(themeModeSettingProvider), AppThemeChoice.system);
 
       // Tap the Light card.
       await tester.tap(find.byKey(const Key('themeSettingsOptionLight')));
       await tester.pumpAndSettle();
 
-      expect(container.read(themeModeSettingProvider), ThemeMode.light);
+      expect(container.read(themeModeSettingProvider), AppThemeChoice.light);
     });
 
     testWidgets('tapping Dark option updates ThemeModeSetting',
@@ -105,7 +105,7 @@ void main() {
         ProviderScope(
           overrides: [
             themeModeSettingProvider
-                .overrideWith(() => _FixedThemeMode(ThemeMode.system)),
+                .overrideWith(() => _FixedThemeMode(AppThemeChoice.system)),
           ],
           child: Builder(
             builder: (ctx) {
@@ -117,12 +117,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(container.read(themeModeSettingProvider), ThemeMode.system);
+      expect(container.read(themeModeSettingProvider), AppThemeChoice.system);
 
       await tester.tap(find.byKey(const Key('themeSettingsOptionDark')));
       await tester.pumpAndSettle();
 
-      expect(container.read(themeModeSettingProvider), ThemeMode.dark);
+      expect(container.read(themeModeSettingProvider), AppThemeChoice.dark);
     });
 
     testWidgets('tapping System option from Dark resets to System',
@@ -132,7 +132,7 @@ void main() {
         ProviderScope(
           overrides: [
             themeModeSettingProvider
-                .overrideWith(() => _FixedThemeMode(ThemeMode.dark)),
+                .overrideWith(() => _FixedThemeMode(AppThemeChoice.dark)),
           ],
           child: Builder(
             builder: (ctx) {
@@ -144,12 +144,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(container.read(themeModeSettingProvider), ThemeMode.dark);
+      expect(container.read(themeModeSettingProvider), AppThemeChoice.dark);
 
       await tester.tap(find.byKey(const Key('themeSettingsOptionSystem')));
       await tester.pumpAndSettle();
 
-      expect(container.read(themeModeSettingProvider), ThemeMode.system);
+      expect(container.read(themeModeSettingProvider), AppThemeChoice.system);
     });
 
     testWidgets('all interactive options meet the 48dp tap-target guideline',
@@ -159,7 +159,7 @@ void main() {
         const ThemeSettingsScreen(),
         overrides: [
           themeModeSettingProvider
-              .overrideWith(() => _FixedThemeMode(ThemeMode.system)),
+              .overrideWith(() => _FixedThemeMode(AppThemeChoice.system)),
         ],
       );
 

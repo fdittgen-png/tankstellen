@@ -1828,6 +1828,8 @@
   "themeSettingsSystemDescription": "Verwendet die aktuelle Darstellung des Geräts.",
   "themeSettingsLightDescription": "Helle Hintergründe — ideal tagsüber.",
   "themeSettingsDarkDescription": "Dunkle Hintergründe — augenschonend bei Nacht und stromsparend auf OLED-Displays.",
+  "themeSettingsEcoLabel": "Öko",
+  "themeSettingsEcoDescription": "Der charakteristische grüne Look der App — hell und gut lesbar, mit sanft grün getönten Hintergründen.",
   "throttleRpmHistogramTitle": "So hast du den Motor genutzt",
   "throttleRpmHistogramThrottleSection": "Gaspedalstellung",
   "throttleRpmHistogramRpmSection": "Motordrehzahl",

@@ -4594,6 +4594,13 @@ class AppLocalizationsSk extends AppLocalizations {
       'Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.';
 
   @override
+  String get themeSettingsEcoLabel => 'Eco';
+
+  @override
+  String get themeSettingsEcoDescription =>
+      'The app\'s signature green look — bright and easy to read, with softly green-tinted backgrounds.';
+
+  @override
   String get throttleRpmHistogramTitle => 'How you used the engine';
 
   @override

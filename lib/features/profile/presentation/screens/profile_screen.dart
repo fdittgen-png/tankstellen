@@ -261,13 +261,15 @@ class _FoldableSection extends StatelessWidget {
 
 /// Active-mode subtitle on the Theme `SettingsMenuTile` (#897).
 String _themeSubtitle(WidgetRef ref, AppLocalizations? l) {
-  final mode = ref.watch(themeModeSettingProvider);
-  switch (mode) {
-    case ThemeMode.light:
+  final choice = ref.watch(themeModeSettingProvider);
+  switch (choice) {
+    case AppThemeChoice.light:
       return l?.themeCardSubtitleLight ?? 'Light';
-    case ThemeMode.dark:
+    case AppThemeChoice.dark:
       return l?.themeCardSubtitleDark ?? 'Dark';
-    case ThemeMode.system:
+    case AppThemeChoice.eco:
+      return l?.themeSettingsEcoLabel ?? 'Eco';
+    case AppThemeChoice.system:
       return l?.themeCardSubtitleSystem ?? 'System';
   }
 }

@@ -61,11 +61,11 @@ class _FixedActiveLanguage extends ActiveLanguage {
 /// notifier short-circuits that I/O so the tests don't depend on
 /// platform-channel stubs for SharedPreferences.
 class _FixedThemeMode extends ThemeModeSetting {
-  final ThemeMode _mode;
+  final AppThemeChoice _mode;
   _FixedThemeMode(this._mode);
 
   @override
-  ThemeMode build() => _mode;
+  AppThemeChoice build() => _mode;
 }
 
 /// A trivial single-screen [GoRouter] used in place of the real one.
@@ -142,7 +142,7 @@ void main() {
   /// pass-through behaviour.
   List<Object> buildOverrides({
     required AppLanguage language,
-    required ThemeMode themeMode,
+    required AppThemeChoice themeMode,
     required GoRouter router,
   }) {
     final test = standardTestOverrides();
@@ -170,7 +170,7 @@ void main() {
         ProviderScope(
           overrides: buildOverrides(
             language: AppLanguages.byCode('en')!,
-            themeMode: ThemeMode.system,
+            themeMode: AppThemeChoice.system,
             router: router,
           ).cast(),
           child: const TankstellenApp(),
@@ -192,7 +192,7 @@ void main() {
         ProviderScope(
           overrides: buildOverrides(
             language: AppLanguages.byCode('en')!,
-            themeMode: ThemeMode.system,
+            themeMode: AppThemeChoice.system,
             router: router,
           ).cast(),
           child: const TankstellenApp(),
@@ -213,7 +213,7 @@ void main() {
         ProviderScope(
           overrides: buildOverrides(
             language: AppLanguages.byCode('en')!,
-            themeMode: ThemeMode.dark,
+            themeMode: AppThemeChoice.dark,
             router: router,
           ).cast(),
           child: const TankstellenApp(),
@@ -236,7 +236,7 @@ void main() {
         ProviderScope(
           overrides: buildOverrides(
             language: french,
-            themeMode: ThemeMode.system,
+            themeMode: AppThemeChoice.system,
             router: router,
           ).cast(),
           child: const TankstellenApp(),
@@ -259,7 +259,7 @@ void main() {
         ProviderScope(
           overrides: buildOverrides(
             language: AppLanguages.byCode('en')!,
-            themeMode: ThemeMode.system,
+            themeMode: AppThemeChoice.system,
             router: router,
           ).cast(),
           child: const TankstellenApp(),
@@ -282,7 +282,7 @@ void main() {
         ProviderScope(
           overrides: buildOverrides(
             language: AppLanguages.byCode('en')!,
-            themeMode: ThemeMode.system,
+            themeMode: AppThemeChoice.system,
             router: router,
           ).cast(),
           child: const TankstellenApp(),

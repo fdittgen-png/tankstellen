@@ -92,7 +92,7 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
   Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
     final language = ref.watch(activeLanguageProvider);
-    final themeMode = ref.watch(themeModeSettingProvider);
+    final themeChoice = ref.watch(themeModeSettingProvider);
 
     return MaterialApp.router(
       // Keying on language.code forces a full rebuild whenever the user
@@ -100,9 +100,13 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
       key: ValueKey(language.code),
       title: 'Fuel Prices',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
+      // #1712 — the green Eco theme occupies the `light` slot: when
+      // chosen it is supplied here and `themeMode` resolves to light.
+      theme: themeChoice == AppThemeChoice.eco
+          ? AppTheme.eco()
+          : AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: themeMode,
+      themeMode: themeChoice.themeMode,
       routerConfig: router,
       locale: language.locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,

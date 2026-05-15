@@ -8,7 +8,7 @@ part of 'theme_mode_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Persisted theme-mode preference (#752).
+/// Persisted theme preference (#752; Eco theme added #1712).
 ///
 /// Stored as a plain string in SharedPreferences rather than Hive —
 /// the value is device-local (not profile-bound), read on startup
@@ -21,7 +21,7 @@ part of 'theme_mode_provider.dart';
 @ProviderFor(ThemeModeSetting)
 final themeModeSettingProvider = ThemeModeSettingProvider._();
 
-/// Persisted theme-mode preference (#752).
+/// Persisted theme preference (#752; Eco theme added #1712).
 ///
 /// Stored as a plain string in SharedPreferences rather than Hive —
 /// the value is device-local (not profile-bound), read on startup
@@ -31,8 +31,8 @@ final themeModeSettingProvider = ThemeModeSettingProvider._();
 /// The pattern mirrors `activeLanguageProvider` — the app's other
 /// strictly-device-local preference.
 final class ThemeModeSettingProvider
-    extends $NotifierProvider<ThemeModeSetting, ThemeMode> {
-  /// Persisted theme-mode preference (#752).
+    extends $NotifierProvider<ThemeModeSetting, AppThemeChoice> {
+  /// Persisted theme preference (#752; Eco theme added #1712).
   ///
   /// Stored as a plain string in SharedPreferences rather than Hive —
   /// the value is device-local (not profile-bound), read on startup
@@ -60,17 +60,17 @@ final class ThemeModeSettingProvider
   ThemeModeSetting create() => ThemeModeSetting();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(ThemeMode value) {
+  Override overrideWithValue(AppThemeChoice value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<ThemeMode>(value),
+      providerOverride: $SyncValueProvider<AppThemeChoice>(value),
     );
   }
 }
 
-String _$themeModeSettingHash() => r'391748e063daef817d379f2abdebd42cbe07c8ff';
+String _$themeModeSettingHash() => r'3a434cc7afb6cd8664151d3d5fee6458df9392c5';
 
-/// Persisted theme-mode preference (#752).
+/// Persisted theme preference (#752; Eco theme added #1712).
 ///
 /// Stored as a plain string in SharedPreferences rather than Hive —
 /// the value is device-local (not profile-bound), read on startup
@@ -80,17 +80,17 @@ String _$themeModeSettingHash() => r'391748e063daef817d379f2abdebd42cbe07c8ff';
 /// The pattern mirrors `activeLanguageProvider` — the app's other
 /// strictly-device-local preference.
 
-abstract class _$ThemeModeSetting extends $Notifier<ThemeMode> {
-  ThemeMode build();
+abstract class _$ThemeModeSetting extends $Notifier<AppThemeChoice> {
+  AppThemeChoice build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<ThemeMode, ThemeMode>;
+    final ref = this.ref as $Ref<AppThemeChoice, AppThemeChoice>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<ThemeMode, ThemeMode>,
-              ThemeMode,
+              AnyNotifier<AppThemeChoice, AppThemeChoice>,
+              AppThemeChoice,
               Object?,
               Object?
             >;

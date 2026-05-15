@@ -42,5 +42,13 @@
   "themeSettingsDarkDescription": "Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.",
   "@themeSettingsDarkDescription": {
     "description": "Description text under the Dark option on the Theme settings screen (#897)."
+  },
+  "themeSettingsEcoLabel": "Eco",
+  "@themeSettingsEcoLabel": {
+    "description": "Radio option label for the green Eco theme on the Theme settings screen (#1712)."
+  },
+  "themeSettingsEcoDescription": "The app's signature green look — bright and easy to read, with softly green-tinted backgrounds.",
+  "@themeSettingsEcoDescription": {
+    "description": "Description text under the Eco option on the Theme settings screen (#1712)."
   }
 }

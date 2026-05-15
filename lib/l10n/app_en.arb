@@ -3205,6 +3205,14 @@
   "@themeSettingsDarkDescription": {
     "description": "Description text under the Dark option on the Theme settings screen (#897)."
   },
+  "themeSettingsEcoLabel": "Eco",
+  "@themeSettingsEcoLabel": {
+    "description": "Radio option label for the green Eco theme on the Theme settings screen (#1712)."
+  },
+  "themeSettingsEcoDescription": "The app's signature green look — bright and easy to read, with softly green-tinted backgrounds.",
+  "@themeSettingsEcoDescription": {
+    "description": "Description text under the Eco option on the Theme settings screen (#1712)."
+  },
   "throttleRpmHistogramTitle": "How you used the engine",
   "@throttleRpmHistogramTitle": {
     "description": "Title of the throttle / RPM histogram card on the Trip detail screen — surfaces the share of time the driver spent at each throttle quartile and RPM band (#1041 phase 3a)."

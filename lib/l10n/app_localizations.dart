@@ -8342,6 +8342,18 @@ abstract class AppLocalizations {
   /// **'Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.'**
   String get themeSettingsDarkDescription;
 
+  /// Radio option label for the green Eco theme on the Theme settings screen (#1712).
+  ///
+  /// In en, this message translates to:
+  /// **'Eco'**
+  String get themeSettingsEcoLabel;
+
+  /// Description text under the Eco option on the Theme settings screen (#1712).
+  ///
+  /// In en, this message translates to:
+  /// **'The app\'s signature green look — bright and easy to read, with softly green-tinted backgrounds.'**
+  String get themeSettingsEcoDescription;
+
   /// Title of the throttle / RPM histogram card on the Trip detail screen — surfaces the share of time the driver spent at each throttle quartile and RPM band (#1041 phase 3a).
   ///
   /// In en, this message translates to:
