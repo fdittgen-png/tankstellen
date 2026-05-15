@@ -1557,6 +1557,8 @@
   "featureBlockedEnable_tflitePricePrediction": "Aktiviere zuerst den Preisverlauf",
   "featureLabel_fuelCalculator": "Tankkostenrechner",
   "featureDescription_fuelCalculator": "Erreichbarer Tankkostenrechner aus den Suchergebnissen.",
+  "featureLabel_carbonDashboard": "CO2-Dashboard",
+  "featureDescription_carbonDashboard": "CO2-Bilanz-Dashboard, erreichbar über den Verbrauch-Tab.",
   "feedbackConsentTitle": "Bericht an GitHub senden?",
   "feedbackConsentBody": "Damit wird ein öffentliches Ticket in unserem GitHub-Repository mit deinem Foto und dem OCR-Text erstellt. Es werden keine personenbezogenen Daten (Standort, Konto-ID) gesendet. Fortfahren?",
   "feedbackConsentContinue": "Fortfahren",

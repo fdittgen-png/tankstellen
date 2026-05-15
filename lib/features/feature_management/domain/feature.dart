@@ -105,4 +105,10 @@ enum Feature {
   /// and are tested; this flag gates the navigation entry point that
   /// makes its `/calculator` route reachable. Default-on.
   fuelCalculator,
+
+  /// The Carbon dashboard (#1613). Gates the Consumption-tab AppBar eco
+  /// action and the `/carbon` route. Default-on — the dashboard already
+  /// shipped reachable, so the flag preserves current behaviour while
+  /// bringing it under central feature management.
+  carbonDashboard,
 }

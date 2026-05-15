@@ -2340,6 +2340,14 @@
   "@featureDescription_fuelCalculator": {
     "description": "Settings toggle description for the fuel-cost Calculator feature (#1613)."
   },
+  "featureLabel_carbonDashboard": "Carbon dashboard",
+  "@featureLabel_carbonDashboard": {
+    "description": "Settings toggle label for the Carbon dashboard feature (#1613)."
+  },
+  "featureDescription_carbonDashboard": "CO2 footprint dashboard reachable from the Consumption tab.",
+  "@featureDescription_carbonDashboard": {
+    "description": "Settings toggle description for the Carbon dashboard feature (#1613)."
+  },
   "feedbackConsentTitle": "Send report to GitHub?",
   "@feedbackConsentTitle": {
     "description": "Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3)."

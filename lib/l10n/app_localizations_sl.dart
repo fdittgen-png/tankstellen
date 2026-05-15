@@ -3843,6 +3843,13 @@ class AppLocalizationsSl extends AppLocalizations {
       'Reachable fuel-cost calculator from the search results.';
 
   @override
+  String get featureLabel_carbonDashboard => 'Carbon dashboard';
+
+  @override
+  String get featureDescription_carbonDashboard =>
+      'CO2 footprint dashboard reachable from the Consumption tab.';
+
+  @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
 
   @override

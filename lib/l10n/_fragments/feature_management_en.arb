@@ -202,5 +202,13 @@
   "featureDescription_fuelCalculator": "Reachable fuel-cost calculator from the search results.",
   "@featureDescription_fuelCalculator": {
     "description": "Settings toggle description for the fuel-cost Calculator feature (#1613)."
+  },
+  "featureLabel_carbonDashboard": "Carbon dashboard",
+  "@featureLabel_carbonDashboard": {
+    "description": "Settings toggle label for the Carbon dashboard feature (#1613)."
+  },
+  "featureDescription_carbonDashboard": "CO2 footprint dashboard reachable from the Consumption tab.",
+  "@featureDescription_carbonDashboard": {
+    "description": "Settings toggle description for the Carbon dashboard feature (#1613)."
   }
 }
