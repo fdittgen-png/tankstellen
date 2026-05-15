@@ -134,6 +134,14 @@ class BrokenMapDetector {
       BrokenMapReason reason;
 
       if (isDiesel) {
+        // #1623 — read ambient baro best-effort BEFORE the rev so the
+        // rev-delta membership window scales for altitude. A failed
+        // read leaves baro null and the window stays sea-level wide;
+        // it never aborts the diesel probe (unlike the petrol path,
+        // where baro is load-bearing).
+        final dieselBaroRaw = await port.sendRaw(_baroCommand);
+        final dieselBaro = _parseBaroPressureKpa(dieselBaroRaw);
+
         // Soft "rev" step — phase 2 placeholder. Wait, then re-read
         // PID 0x0B. A cooperating user blipped the throttle in this
         // window; an uncooperative one didn't and the delta will be
@@ -147,6 +155,8 @@ class BrokenMapDetector {
         observationScore = BrokenMapBeliefUpdater.revDeltaMissingScore(
           mapIdleKpa: mapIdle,
           mapRevvedKpa: mapRev,
+          baroKpa: dieselBaro,
+          inductionType: vehicle?.inductionType,
         );
         reason = BrokenMapReason.revDeltaMissing;
       } else {
@@ -157,6 +167,7 @@ class BrokenMapDetector {
         observationScore = BrokenMapBeliefUpdater.vacuumMissingScore(
           baroKpa: baro,
           mapKpa: mapIdle,
+          inductionType: vehicle?.inductionType,
         );
         reason = BrokenMapReason.idleVacuumMissing;
       }
