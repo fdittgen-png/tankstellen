@@ -9,7 +9,6 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../alerts/data/models/price_alert.dart';
 import '../../../alerts/providers/alert_provider.dart';
 
 /// Tab showing the user's price alerts with swipe-to-delete and toggle support.
@@ -32,7 +31,7 @@ class AlertsTab extends StatelessWidget {
               subtitle: l10n?.noPriceAlertsHint ??
                   'Create an alert from a station\'s detail page.',
             )
-          : _priceAlertsList(context, ref, l10n, alerts);
+          : _priceAlertsList(context, ref, l10n);
       return Column(
         children: [
           const _RadiusAlertsEntry(),
@@ -46,8 +45,11 @@ class AlertsTab extends StatelessWidget {
     BuildContext context,
     WidgetRef ref,
     AppLocalizations? l10n,
-    List<PriceAlert> alerts,
   ) {
+    // Re-read here (cheap, idempotent) so the helper carries no
+    // explicit alert-model type — keeping favorites/presentation off a
+    // direct import of the alerts feature's data layer.
+    final alerts = ref.watch(alertProvider);
     return Column(
         children: [
           HelpBanner(
