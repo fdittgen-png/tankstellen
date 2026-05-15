@@ -299,10 +299,20 @@ class VinAdapterPairAutoPopulator {
     } finally {
       try {
         await service?.disconnect();
-      } catch (_) {
-        // Disconnect failures aren't actionable here. The next pair
-        // attempt re-runs the connect path which handles a stuck
-        // transport.
+      } catch (e, st) {
+        // Disconnect failures aren't actionable here — the next pair
+        // attempt re-runs the connect path, which handles a stuck
+        // transport — but log so a recurring field failure isn't
+        // invisible (#1682). Routed through errorLogger to match the
+        // rest of this file rather than a raw debugPrint.
+        await errorLogger.log(
+          ErrorLayer.background,
+          e,
+          st,
+          context: const {
+            'op': 'vinAdapterPairAutoPopulator.disconnect',
+          },
+        );
       }
     }
   }
