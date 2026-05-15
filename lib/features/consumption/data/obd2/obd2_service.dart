@@ -224,6 +224,18 @@ class Obd2Service implements Obd2RawCommandPort {
           adapterFirmware = firmware;
         }
         _capability = detectCapabilityFromFirmwareString(firmware);
+
+        // #1614 — the ATI firmware string can lie: a v2.1-class clone
+        // routinely reports `v2.2` and is then classed oemPidsCapable,
+        // which would hang the OBD-II loop on OEM commands it cannot
+        // route. When the string claims a tier above standardOnly, run
+        // a runtime multi-frame ISO 15765 probe and downgrade if the
+        // adapter cannot actually reassemble a multi-frame reply.
+        if (_capability != Obd2AdapterCapability.standardOnly) {
+          final probe =
+              await probeMultiFrameCapability(_transport.sendCommand);
+          _capability = reconcileCapabilityWithProbe(_capability, probe);
+        }
       } catch (e, st) {
         debugPrint('OBD2 ATI firmware read failed: $e\n$st');
       }

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/data/obd2/adapter_capability.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_breadcrumb_collector.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
@@ -716,6 +717,75 @@ void main() {
         expect(sent, ['ATZ', 'ATE0', 'ATL0', 'ATH0', 'ATSP0', 'ATI']);
       },
     );
+
+    // #1614 — runtime feature-probe that downgrades clones whose ATI
+    // firmware string lies about their tier.
+    group('runtime capability probe (#1614)', () {
+      test(
+          'a lying clone — ATI reports v2.2 but the multi-frame probe '
+          'fails — is downgraded below oemPidsCapable', () async {
+        final transport = FakeObd2Transport({
+          'ATZ': 'ELM327 v2.2>',
+          'ATE0': 'OK>',
+          'ATL0': 'OK>',
+          'ATH0': 'OK>',
+          'ATSP0': 'OK>',
+          'ATI': 'ELM327 v2.2>',
+          // The clone cannot route a multi-frame ISO 15765 request.
+          '0902': 'CAN ERROR>',
+        });
+        final service = Obd2Service(transport);
+        await service.connect();
+
+        expect(service.capability, Obd2AdapterCapability.standardOnly);
+        expect(
+          service.capability.index <
+              Obd2AdapterCapability.oemPidsCapable.index,
+          isTrue,
+        );
+      });
+
+      test(
+          'a genuine v2.2 adapter — ATI reports v2.2 and the probe '
+          'returns a valid multi-frame VIN reply — keeps oemPidsCapable',
+          () async {
+        final transport = FakeObd2Transport({
+          'ATZ': 'ELM327 v2.2>',
+          'ATE0': 'OK>',
+          'ATL0': 'OK>',
+          'ATH0': 'OK>',
+          'ATSP0': 'OK>',
+          'ATI': 'ELM327 v2.2>',
+          '0902': '014\n0: 49 02 01 57 50 30\n1: 5A 5A 5A 39 38 5A>',
+        });
+        final service = Obd2Service(transport);
+        await service.connect();
+
+        expect(service.capability, Obd2AdapterCapability.oemPidsCapable);
+      });
+
+      test(
+          'a standardOnly adapter (ATI v1.5) skips the probe — no 0902 '
+          'is sent', () async {
+        final sent = <String>[];
+        final transport = _RecordingTransport(
+          {
+            'ATZ': 'ELM327 v1.5>',
+            'ATE0': 'OK>',
+            'ATL0': 'OK>',
+            'ATH0': 'OK>',
+            'ATSP0': 'OK>',
+            'ATI': 'ELM327 v1.5>',
+          },
+          sent,
+        );
+        final service = Obd2Service(transport);
+        await service.connect();
+
+        expect(service.capability, Obd2AdapterCapability.standardOnly);
+        expect(sent, isNot(contains('0902')));
+      });
+    });
 
     test('readOdometerKm returns odometer from PID A6', () async {
       final transport = FakeObd2Transport({
