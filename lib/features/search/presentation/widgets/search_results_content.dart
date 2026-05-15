@@ -19,9 +19,9 @@ import 'unified_search_results_view.dart';
 /// [SearchMode] and [FuelType]:
 ///
 ///  * Route mode -> [RouteResultsView] inside a `CustomScrollView`
-///  * Electric fuel -> [EvSearchResultsView]
-///  * Otherwise -> the standard `searchStateProvider` `AsyncValue` with
-///    shimmer/empty/loaded/error branches
+///  * Otherwise -> [UnifiedSearchResultsView] over the standard
+///    `searchStateProvider` `AsyncValue` (shimmer/empty/loaded/error),
+///    rendering fuel and EV results in one combined list
 ///
 /// Pulled out of `search_screen.dart` so the screen's `_buildResults`
 /// helper drops 50 lines and so the empty/loading/error branches can be
