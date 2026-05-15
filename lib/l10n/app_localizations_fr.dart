@@ -3879,11 +3879,18 @@ class AppLocalizationsFr extends AppLocalizations {
       'Activez d\'abord l\'historique des prix';
 
   @override
-  String get featureLabel_fuelCalculator => 'Fuel calculator';
+  String get featureLabel_fuelCalculator => 'Calculateur de coût de carburant';
 
   @override
   String get featureDescription_fuelCalculator =>
-      'Reachable fuel-cost calculator from the search results.';
+      'Calculateur de coût de carburant accessible depuis les résultats de recherche.';
+
+  @override
+  String get featureLabel_carbonDashboard => 'Tableau de bord carbone';
+
+  @override
+  String get featureDescription_carbonDashboard =>
+      'Tableau de bord de l\'empreinte CO2 accessible depuis l\'onglet Consommation.';
 
   @override
   String get feedbackConsentTitle => 'Envoyer le rapport à GitHub ?';

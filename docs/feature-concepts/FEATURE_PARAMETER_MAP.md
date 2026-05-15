@@ -56,6 +56,8 @@ The audit was run on 2026-05-14 against
 | `manualConsumption` | Conso card (set by Fuel / Fuel+Trips) | *Conso* tab → Fuel + Charging logs | Vehicle list + fill-up sheet inside Conso settings | No |
 | `loyaltyCards` | Settings → *Fuel club cards* section | Per-station discount application | `loyalty_settings_screen.dart` (card management) | No |
 | `tflitePricePrediction` | Feature management toggle (compile-time gated) | Station detail → prediction chip | None yet — model artifact off-band (#1543) | **Tracked in #1543** |
+| `fuelCalculator` | Feature management toggle | Search results header → calculator affordance → `/calculator` | View-only; `calculator_screen.dart` (inputs are in-screen, not settings) | No (#1613 — was orphan; entry point added) |
+| `carbonDashboard` | Feature management toggle | Conso tab → AppBar eco action → `/carbon` | View-only; `carbon_dashboard_screen.dart` aggregates trip data | No (#1613 — brought under the Feature enum) |
 
 ## Cross-references
 

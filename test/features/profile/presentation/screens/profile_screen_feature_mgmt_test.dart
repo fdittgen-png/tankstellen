@@ -109,12 +109,12 @@ void main() {
           );
         }
       }
-      expect(Feature.values.length, 21,
+      expect(Feature.values.length, 22,
           reason: '#1373 phase 1 shipped 13 features; phase 3d added '
               'autoRecord (14); phase 3c bundled showFuel + showElectric + '
               'showConsumptionTab (17); #1517 added manualConsumption + '
               'loyaltyCards (19); #1543 added tflitePricePrediction (20); '
-              '#1613 added fuelCalculator (21). '
+              '#1613 added fuelCalculator (21) + carbonDashboard (22). '
               'Update the test if a new feature was added or removed.');
     });
 

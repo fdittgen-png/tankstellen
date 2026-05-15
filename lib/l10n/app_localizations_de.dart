@@ -3883,6 +3883,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Erreichbarer Tankkostenrechner aus den Suchergebnissen.';
 
   @override
+  String get featureLabel_carbonDashboard => 'CO2-Dashboard';
+
+  @override
+  String get featureDescription_carbonDashboard =>
+      'CO2-Bilanz-Dashboard, erreichbar über den Verbrauch-Tab.';
+
+  @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';
 
   @override

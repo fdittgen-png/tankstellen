@@ -175,6 +175,18 @@ const kFeatureFuelCalculator = FeatureClass(
   description: 'Reachable fuel-cost calculator from the search results.',
 );
 
+const kFeatureCarbonDashboard = FeatureClass(
+  id: 'carbonDashboard',
+  parent: _none,
+  requires: _empty,
+  defaultEnabled: true,
+  maturity: FeatureMaturity.production,
+  displayKey: 'featureLabel_carbonDashboard',
+  displayName: 'Carbon dashboard',
+  descriptionKey: 'featureDescription_carbonDashboard',
+  description: 'CO2 footprint dashboard reachable from the Consumption tab.',
+);
+
 // ----------------------------------------------------------------------------
 // Children of obd2TripRecording
 // ----------------------------------------------------------------------------

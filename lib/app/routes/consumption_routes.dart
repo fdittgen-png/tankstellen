@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/carbon/presentation/screens/carbon_dashboard_screen.dart';
@@ -6,6 +8,8 @@ import '../../features/consumption/presentation/screens/consumption_screen.dart'
 import '../../features/consumption/presentation/screens/pick_station_for_fill_up_screen.dart';
 import '../../features/consumption/presentation/screens/trip_detail_screen.dart';
 import '../../features/consumption/presentation/screens/trip_recording_screen.dart';
+import '../../features/feature_management/application/feature_flags_provider.dart';
+import '../../features/feature_management/domain/feature.dart';
 import '../../features/search/domain/entities/fuel_type.dart';
 import 'invalid_id_screen.dart';
 
@@ -20,7 +24,24 @@ List<RouteBase> get consumptionRoutes => [
       ),
       GoRoute(
         path: '/carbon',
-        builder: (context, state) => const CarbonDashboardScreen(),
+        // #1613 — the Carbon dashboard is gated on Feature.carbonDashboard.
+        // Guarding the route (not just the entry-point button) means a
+        // deep link or restored navigation stack cannot reach the
+        // dashboard when the feature is disabled.
+        builder: (context, state) => Consumer(
+          builder: (context, ref, _) {
+            final enabled = ref
+                .watch(featureFlagsProvider)
+                .contains(Feature.carbonDashboard);
+            if (!enabled) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (context.mounted) context.go('/consumption-tab');
+              });
+              return const SizedBox.shrink();
+            }
+            return const CarbonDashboardScreen();
+          },
+        ),
       ),
       GoRoute(
         path: '/consumption/pick-station',

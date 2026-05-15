@@ -10,6 +10,7 @@ import '../../../../core/widgets/tab_switcher.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/conso_mode.dart';
+import '../../../feature_management/domain/feature.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/exporters/backup/full_backup_exporter.dart';
@@ -236,12 +237,15 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
           icon: const Icon(Icons.download_outlined),
           onPressed: () => unawaited(_runBackupExport()),
         ),
-        IconButton(
-          key: const Key('open_carbon_dashboard'),
-          tooltip: l?.carbonDashboardTitle ?? 'Carbon dashboard',
-          icon: const Icon(Icons.eco_outlined),
-          onPressed: () => context.push('/carbon'),
-        ),
+        // #1613 — the Carbon dashboard entry point is gated on the
+        // central Feature enum so it can be toggled per profile.
+        if (ref.watch(featureFlagsProvider).contains(Feature.carbonDashboard))
+          IconButton(
+            key: const Key('open_carbon_dashboard'),
+            tooltip: l?.carbonDashboardTitle ?? 'Carbon dashboard',
+            icon: const Icon(Icons.eco_outlined),
+            onPressed: () => context.push('/carbon'),
+          ),
       ],
       floatingActionButton: isTrajetsTab
           // Trajets tab hides the global FAB — the "Start recording"

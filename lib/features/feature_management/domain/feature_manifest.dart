@@ -274,5 +274,15 @@ class FeatureManifest {
       displayName: 'Fuel calculator',
       description: 'Reachable fuel-cost calculator from the search results.',
     ),
+    Feature.carbonDashboard: FeatureManifestEntry(
+      feature: Feature.carbonDashboard,
+      // Default-on (#1613): the Carbon dashboard already shipped live
+      // and reachable — default-on preserves current behaviour while
+      // bringing it under central feature management. No prerequisites.
+      defaultEnabled: true,
+      displayName: 'Carbon dashboard',
+      description: 'CO2 footprint dashboard reachable from the Consumption '
+          'tab.',
+    ),
   });
 }
