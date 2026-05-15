@@ -69,6 +69,10 @@ class FeatureManagementSection extends ConsumerWidget {
       Feature.glideCoach,
       Feature.gpsTripPath,
       Feature.autoRecord,
+      // #1615 — the OEM-PID exact-fuel-level read only runs inside a
+      // trip recording, so it belongs to the Trajets tier just like
+      // glideCoach / gpsTripPath.
+      Feature.experimentalOemPids,
     ];
 
     // Filter the regular group rendering: drop the Conso "parent" flags
