@@ -41,33 +41,19 @@ class HapticEcoCoachEnabled extends _$HapticEcoCoachEnabled {
   /// while a trip is recording starts the coach immediately, and a
   /// `set(false)` cancels its subscription on the next frame.
   ///
-  /// A [StateError] from a dependency-violation is intentionally
-  /// swallowed and the toggle stays at its prior state — see the
-  /// catch block below for why.
+  /// Enabling `hapticEcoCoach` while its `obd2TripRecording` parent is
+  /// off is a dependency violation — `featureFlagsProvider.enable`
+  /// throws a [StateError] for it, and this setter lets that surface
+  /// (#1608). Callers MUST pre-check [canEnable] first; the only call
+  /// site, the driving-settings toggle, disables itself when the parent
+  /// is off. A swallow used to hide this (`TODO(1373)`) — removed once
+  /// the single call site was audited for pre-check coverage.
   Future<void> set(bool value) async {
     final notifier = ref.read(featureFlagsProvider.notifier);
-    try {
-      if (value) {
-        await notifier.enable(Feature.hapticEcoCoach);
-      } else {
-        await notifier.disable(Feature.hapticEcoCoach);
-      }
-      // The central provider throws a StateError specifically for
-      // dependency-violation; we want to swallow ONLY that — see the
-      // body comment for why. The lint deliberately discourages
-      // catching Error subclasses, but the central API's contract
-      // documents this exact StateError as the dependency-violation
-      // signal, so the catch is intentional and narrow.
-      // ignore: avoid_catching_errors
-    } on StateError {
-      // TODO(1373): Phase 2's settings UI already pre-checks
-      // `canEnable` / `blockingDisable` before invoking this setter, so
-      // a dependency-violation here is a defensive-only catch — the UI
-      // path can't currently reach it. We swallow rather than rethrow
-      // so a programmatic caller (e.g. a test or a future call site)
-      // sees the toggle stay at its prior state instead of crashing
-      // the widget tree. Remove once every call site has been audited
-      // for `canEnable` pre-check coverage.
+    if (value) {
+      await notifier.enable(Feature.hapticEcoCoach);
+    } else {
+      await notifier.disable(Feature.hapticEcoCoach);
     }
   }
 }

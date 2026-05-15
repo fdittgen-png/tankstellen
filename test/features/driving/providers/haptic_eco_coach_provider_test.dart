@@ -21,10 +21,10 @@ import 'package:tankstellen/features/feature_management/domain/feature.dart';
 ///      [Feature.hapticEcoCoach].
 ///   2. `set(true)` enables `hapticEcoCoach` in the central provider.
 ///   3. `set(false)` disables it.
-///   4. A dependency-violation is swallowed and the toggle stays at
-///      its prior state — the central provider throws StateError when
-///      `obd2TripRecording` is missing; the shim's catch must surface
-///      that as "no-op" rather than a thrown error.
+///   4. A dependency-violation surfaces (#1608): enabling
+///      `hapticEcoCoach` while `obd2TripRecording` is missing throws
+///      the central provider's StateError — the shim no longer
+///      swallows it, so a mis-gated call site fails loudly.
 ///
 /// Migration concerns (the legacy `hapticEcoCoachEnabled` Hive key
 /// → central state promotion) are covered in
@@ -159,33 +159,29 @@ void main() {
       expect(container.read(hapticEcoCoachEnabledProvider), isFalse);
     });
 
-    test('set(true) is a no-op when prerequisite is missing — does NOT throw',
-        () async {
-      // Prerequisite obd2TripRecording is OFF. Calling enable on the
-      // central provider would throw StateError; the shim must swallow
-      // it and leave the toggle at its prior state.
+    test('set(true) surfaces a StateError when the prerequisite is missing '
+        '(#1608)', () async {
+      // Prerequisite obd2TripRecording is OFF — enabling hapticEcoCoach
+      // is a dependency violation. Since #1608 the shim no longer
+      // swallows it: the central provider's StateError surfaces so a
+      // mis-gated call site fails loudly instead of silently no-op'ing.
+      // The only real call site, the driving-settings toggle, disables
+      // itself when the parent is off (canEnable pre-check), so the UI
+      // path can never reach this — only a programmatic caller can.
       final container = makeContainer();
       await pumpLoad(container);
 
-      // No throw expected.
-      await container
-          .read(hapticEcoCoachEnabledProvider.notifier)
-          .set(true);
-
-      expect(
-        container.read(hapticEcoCoachEnabledProvider),
-        isFalse,
-        reason:
-            'Dependency-violation must be silent at the shim layer — the '
-            'Phase 2 settings UI pre-checks `canEnable`, so reaching this '
-            'path means a programmatic / test caller bypassed the guard. '
-            'The shim swallows so the widget tree stays standing rather '
-            'than crashing on a developer mistake.',
+      await expectLater(
+        container.read(hapticEcoCoachEnabledProvider.notifier).set(true),
+        throwsStateError,
       );
+
+      // The violating enable did not take effect — state is unchanged.
       expect(
         container.read(featureFlagsProvider),
         isNot(contains(Feature.hapticEcoCoach)),
       );
+      expect(container.read(hapticEcoCoachEnabledProvider), isFalse);
     });
   });
 

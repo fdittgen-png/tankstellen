@@ -8,6 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/conso_mode.dart';
 import '../../../feature_management/domain/feature.dart';
+import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../../../glide_coach/data/traffic_signal_repository.dart';
 import '../../../glide_coach/providers/glide_coach_settings_provider.dart';
 import '../../../profile/presentation/widgets/gamification_settings_tile.dart';
@@ -38,6 +39,17 @@ class DrivingSettingsSection extends ConsumerWidget {
     final theme = Theme.of(context);
     final ecoEnabled = ref.watch(hapticEcoCoachEnabledProvider);
     final flags = ref.watch(featureFlagsProvider);
+    // #1608 — the haptic eco-coach toggle must pre-check the dependency:
+    // enabling it while `obd2TripRecording` is off throws a StateError
+    // in the central provider. When the parent is off (and the toggle
+    // isn't already on) the switch is disabled rather than letting the
+    // tap fail.
+    final canToggleEco = ecoEnabled ||
+        canEnable(
+          Feature.hapticEcoCoach,
+          ref.watch(featureManifestProvider),
+          flags,
+        );
     // #1517 / #1520 — gate the Loyalty tile by the new
     // [Feature.loyaltyCards] flag. Default-off; only the
     // `AppProfile.full` preset turns it on, so Basic + Medium users
@@ -108,8 +120,10 @@ class DrivingSettingsSection extends ConsumerWidget {
                     'during cruise',
             style: theme.textTheme.bodySmall,
           ),
-          onChanged: (v) =>
-              ref.read(hapticEcoCoachEnabledProvider.notifier).set(v),
+          onChanged: canToggleEco
+              ? (v) =>
+                  ref.read(hapticEcoCoachEnabledProvider.notifier).set(v)
+              : null,
           contentPadding: EdgeInsets.zero,
         ),
         const GamificationSettingsTile(),
