@@ -5912,6 +5912,12 @@ abstract class AppLocalizations {
   /// **'{stationCount} stations dropped by up to {maxDropCents}¢ in the last hour'**
   String velocityAlertBody(int stationCount, int maxDropCents);
 
+  /// Success snackbar confirming a fill-up was saved, shown after the Add fill-up screen pops back to the consumption list (#1692).
+  ///
+  /// In en, this message translates to:
+  /// **'Fill-up saved'**
+  String get fillUpSavedSnackbar;
+
   /// Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5).
   ///
   /// In en, this message translates to:
@@ -8821,6 +8827,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No results match this filter'**
   String get unifiedNoResultsForFilter;
+
+  /// Error snackbar shown when a search request fails. Replaces a raw exception toString() that previously leaked stack-like text to the user (#1692).
+  ///
+  /// In en, this message translates to:
+  /// **'Search failed — please try again'**
+  String get searchFailedSnackbar;
 
   /// No description provided for @vinLabel.
   ///

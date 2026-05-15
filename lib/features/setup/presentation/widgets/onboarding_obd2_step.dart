@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/data/obd2/obd2_service.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
@@ -90,13 +91,10 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
       // later" button — the skip path is still available below the
       // scaffold body.
       setState(() => _phase = _Phase.initial);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n?.onboardingObd2ConnectFailed ??
-                "Couldn't connect to the adapter. You can retry or skip.",
-          ),
-        ),
+      SnackBarHelper.show(
+        context,
+        l10n?.onboardingObd2ConnectFailed ??
+            "Couldn't connect to the adapter. You can retry or skip.",
       );
       return;
     }

@@ -1458,5 +1458,9 @@
         "example": "5"
       }
     }
+  },
+  "fillUpSavedSnackbar": "Fill-up saved",
+  "@fillUpSavedSnackbar": {
+    "description": "Success snackbar confirming a fill-up was saved, shown after the Add fill-up screen pops back to the consumption list (#1692)."
   }
 }

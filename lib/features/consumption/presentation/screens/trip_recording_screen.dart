@@ -9,6 +9,7 @@ import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/page_scaffold.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../driving/haptic_eco_coach.dart';
 import '../../../driving/providers/haptic_eco_coach_provider.dart';
@@ -286,7 +287,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
                   'OBD2 diagnostic overlay enabled');
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text(msg)));
+            ..showSnackBar(SnackBarHelper.infoSnackBar(msg));
         }),
       );
     }

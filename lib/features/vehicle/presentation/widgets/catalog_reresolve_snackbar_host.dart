@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/catalog_reresolve_detector.dart';
 import '../../providers/catalog_reresolve_provider.dart';
@@ -82,8 +83,8 @@ class _CatalogReresolveSnackbarHostState
     final action = l10n?.catalogReresolveSnackbarAction ?? 'Update';
 
     messenger.showSnackBar(
-      SnackBar(
-        content: Text(message),
+      SnackBarHelper.infoSnackBar(
+        message,
         duration: const Duration(seconds: 8),
         action: SnackBarAction(
           label: action,

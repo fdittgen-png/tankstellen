@@ -14,5 +14,9 @@
   "unifiedNoResultsForFilter": "No results match this filter",
   "@unifiedNoResultsForFilter": {
     "description": "Empty-state placeholder shown in the unified search list when the active filter (Fuel / EV / Both) leaves zero options (#1116 phase 3c)."
+  },
+  "searchFailedSnackbar": "Search failed — please try again",
+  "@searchFailedSnackbar": {
+    "description": "Error snackbar shown when a search request fails. Replaces a raw exception toString() that previously leaked stack-like text to the user (#1692)."
   }
 }

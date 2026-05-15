@@ -186,9 +186,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               if (state.hasValue && state.value!.data.isNotEmpty) {
                 unawaited(_performGpsSearch());
               }
-            } catch (e, st) { // ignore: unused_catch_stack
+            } catch (e, st) {
+              // #1692 — never surface a raw exception toString() to the
+              // user; show a localized, actionable message instead. The
+              // cause is kept for support via debugPrint below.
+              debugPrint('SearchScreen GPS update failed: $e\n$st');
               if (!context.mounted) return;
-              SnackBarHelper.showError(context, e.toString());
+              SnackBarHelper.showError(
+                context,
+                AppLocalizations.of(context)?.searchFailedSnackbar ??
+                    'Search failed — please try again',
+              );
             }
           },
         ),

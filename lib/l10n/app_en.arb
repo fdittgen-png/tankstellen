@@ -1461,6 +1461,10 @@
       }
     }
   },
+  "fillUpSavedSnackbar": "Fill-up saved",
+  "@fillUpSavedSnackbar": {
+    "description": "Success snackbar confirming a fill-up was saved, shown after the Add fill-up screen pops back to the consumption list (#1692)."
+  },
   "achievementSmoothDriver": "Smooth streak",
   "@achievementSmoothDriver": {
     "description": "Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5)."
@@ -3554,6 +3558,10 @@
   "unifiedNoResultsForFilter": "No results match this filter",
   "@unifiedNoResultsForFilter": {
     "description": "Empty-state placeholder shown in the unified search list when the active filter (Fuel / EV / Both) leaves zero options (#1116 phase 3c)."
+  },
+  "searchFailedSnackbar": "Search failed — please try again",
+  "@searchFailedSnackbar": {
+    "description": "Error snackbar shown when a search request fails. Replaces a raw exception toString() that previously leaked stack-like text to the user (#1692)."
   },
   "vinLabel": "VIN (optional)",
   "vinDecodeTooltip": "Decode VIN",

@@ -1237,6 +1237,7 @@
   "obd2ConnectedTooltip": "OBD2 verbunden: {adapterName}",
   "velocityAlertTitle": "{fuelLabel} an Tankstellen in der Nähe gefallen",
   "velocityAlertBody": "{stationCount} Tankstellen um bis zu {maxDropCents}¢ in der letzten Stunde gefallen",
+  "fillUpSavedSnackbar": "Tankvorgang gespeichert",
   "achievementSmoothDriver": "Ruhige Serie",
   "@achievementSmoothDriver": {
     "description": "Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5)."
@@ -1917,6 +1918,7 @@
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Beide",
   "unifiedNoResultsForFilter": "Keine Ergebnisse für diesen Filter",
+  "searchFailedSnackbar": "Suche fehlgeschlagen – bitte erneut versuchen",
   "vinLabel": "FIN (optional)",
   "vinDecodeTooltip": "FIN entschlüsseln",
   "vinConfirmAction": "Ja, automatisch ausfüllen",

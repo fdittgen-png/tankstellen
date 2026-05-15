@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/feedback/feedback_consent.dart';
 import '../../../../core/feedback/github_issue_reporter.dart';
 import '../../../../core/feedback/github_issue_reporter_provider.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/receipt_scan_service.dart';
 import 'bad_scan_form_view.dart';
@@ -253,11 +254,9 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
     // outlives this modal sheet.
     if (showSnackbar) {
       messenger?.showSnackBar(
-        SnackBar(
-          content: Text(
-            l?.badScanReportFallbackToShare ??
-                'Submission failed — manual share',
-          ),
+        SnackBarHelper.infoSnackBar(
+          l?.badScanReportFallbackToShare ??
+              'Submission failed — manual share',
         ),
       );
     }

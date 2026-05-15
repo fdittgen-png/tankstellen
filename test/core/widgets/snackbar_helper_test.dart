@@ -189,5 +189,162 @@ void main() {
       final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
       expect(snackBar.duration, const Duration(seconds: 3));
     });
+
+    // #1692 — every snackbar's content is wrapped in a `liveRegion`
+    // Semantics node so assistive technologies announce the message
+    // when it appears (colour and motion are not the only signal).
+    testWidgets('snackbar content is announced via a liveRegion',
+        (tester) async {
+      await pumpApp(tester, Builder(
+        builder: (context) => ElevatedButton(
+          onPressed: () => SnackBarHelper.show(context, 'Announce me'),
+          child: const Text('Tap'),
+        ),
+      ));
+
+      await tester.tap(find.text('Tap'));
+      await tester.pump();
+
+      final liveRegion = find.descendant(
+        of: find.byType(SnackBar),
+        matching: find.byWidgetPredicate(
+          (w) => w is Semantics && w.properties.liveRegion == true,
+        ),
+      );
+      expect(liveRegion, findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('showSuccess() content is announced via a liveRegion',
+        (tester) async {
+      await pumpApp(tester, Builder(
+        builder: (context) => ElevatedButton(
+          onPressed: () => SnackBarHelper.showSuccess(context, 'Saved'),
+          child: const Text('Tap'),
+        ),
+      ));
+
+      await tester.tap(find.text('Tap'));
+      await tester.pump();
+
+      final liveRegion = find.descendant(
+        of: find.byType(SnackBar),
+        matching: find.byWidgetPredicate(
+          (w) => w is Semantics && w.properties.liveRegion == true,
+        ),
+      );
+      expect(liveRegion, findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('show() with an action renders the action button',
+        (tester) async {
+      await pumpApp(tester, Builder(
+        builder: (context) => ElevatedButton(
+          onPressed: () => SnackBarHelper.show(
+            context,
+            'With action',
+            action: SnackBarAction(label: 'Go', onPressed: () {}),
+          ),
+          child: const Text('Tap'),
+        ),
+      ));
+
+      await tester.tap(find.text('Tap'));
+      await tester.pump();
+
+      final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+      expect(snackBar.action, isNotNull);
+      expect(snackBar.action!.label, 'Go');
+    });
+
+    group('builders', () {
+      // The `*SnackBar` builders are pure — they let async call sites
+      // capture a messenger before an `await` and theme the snackbar
+      // without holding a BuildContext across the gap.
+      testWidgets('infoSnackBar() builds a plain SnackBar with the message',
+          (tester) async {
+        await pumpApp(tester, Builder(
+          builder: (context) => ElevatedButton(
+            onPressed: () => ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBarHelper.infoSnackBar('Built info')),
+            child: const Text('Tap'),
+          ),
+        ));
+
+        await tester.tap(find.text('Tap'));
+        await tester.pump();
+
+        expect(find.text('Built info'), findsOneWidget);
+        final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+        expect(snackBar.action, isNull);
+      });
+
+      testWidgets('infoSnackBar() carries the supplied action + key',
+          (tester) async {
+        await pumpApp(tester, Builder(
+          builder: (context) => ElevatedButton(
+            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+              SnackBarHelper.infoSnackBar(
+                'Built with action',
+                key: const Key('builtSnack'),
+                action: SnackBarAction(label: 'Act', onPressed: () {}),
+              ),
+            ),
+            child: const Text('Tap'),
+          ),
+        ));
+
+        await tester.tap(find.text('Tap'));
+        await tester.pump();
+
+        final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+        expect(snackBar.key, const Key('builtSnack'));
+        expect(snackBar.action!.label, 'Act');
+      });
+
+      testWidgets('errorSnackBar() is themed (errorContainer) with an icon',
+          (tester) async {
+        late ColorScheme scheme;
+        await pumpApp(tester, Builder(
+          builder: (context) {
+            scheme = Theme.of(context).colorScheme;
+            return ElevatedButton(
+              onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBarHelper.errorSnackBar(scheme, 'Built error')),
+              child: const Text('Tap'),
+            );
+          },
+        ));
+
+        await tester.tap(find.text('Tap'));
+        await tester.pump();
+
+        final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+        expect(snackBar.backgroundColor, scheme.errorContainer);
+        expect(snackBar.duration, const Duration(seconds: 5));
+        expect(find.byIcon(Icons.error_outline), findsOneWidget);
+      });
+
+      testWidgets('successSnackBar() is themed (tertiaryContainer) with icon',
+          (tester) async {
+        late ColorScheme scheme;
+        await pumpApp(tester, Builder(
+          builder: (context) {
+            scheme = Theme.of(context).colorScheme;
+            return ElevatedButton(
+              onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBarHelper.successSnackBar(scheme, 'Built success')),
+              child: const Text('Tap'),
+            );
+          },
+        ));
+
+        await tester.tap(find.text('Tap'));
+        await tester.pump();
+
+        final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+        expect(snackBar.backgroundColor, scheme.tertiaryContainer);
+        expect(find.byIcon(Icons.check_circle_outline), findsOneWidget);
+      });
+    });
   });
 }

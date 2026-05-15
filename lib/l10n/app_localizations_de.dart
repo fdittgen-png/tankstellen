@@ -3190,6 +3190,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get fillUpSavedSnackbar => 'Tankvorgang gespeichert';
+
+  @override
   String get achievementSmoothDriver => 'Ruhige Serie';
 
   @override
@@ -4906,6 +4909,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get unifiedNoResultsForFilter => 'Keine Ergebnisse für diesen Filter';
+
+  @override
+  String get searchFailedSnackbar =>
+      'Suche fehlgeschlagen – bitte erneut versuchen';
 
   @override
   String get vinLabel => 'FIN (optional)';

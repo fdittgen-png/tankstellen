@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/app_profile_provider.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
@@ -435,12 +436,7 @@ class _FeatureToggle extends ConsumerWidget {
           if (messenger == null) return;
           messenger
             ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                content: Text(reason),
-                duration: const Duration(seconds: 3),
-              ),
-            );
+            ..showSnackBar(SnackBarHelper.infoSnackBar(reason));
         },
         child: tile,
       ),
