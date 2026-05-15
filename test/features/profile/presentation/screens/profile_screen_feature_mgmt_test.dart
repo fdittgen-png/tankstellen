@@ -143,7 +143,7 @@ void main() {
       // tankSync defaults to false in the manifest; toggling it on is
       // unblocked because it has no prerequisites.
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         isNot(contains(Feature.tankSync)),
       );
       // Post-#1440 the section renders grouped cards which can push
@@ -163,7 +163,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 50));
 
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         contains(Feature.tankSync),
       );
     });
@@ -184,11 +184,11 @@ void main() {
           .disable(Feature.gamification);
       // Sanity: we are now in the state we want to test against.
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         isNot(contains(Feature.gamification)),
       );
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         isNot(contains(Feature.obd2TripRecording)),
       );
 
@@ -240,7 +240,7 @@ void main() {
           .read(featureFlagsProvider.notifier)
           .enable(Feature.obd2TripRecording);
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         containsAll(<Feature>[
           Feature.obd2TripRecording,
           Feature.gamification,
@@ -271,11 +271,11 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         isNot(contains(Feature.obd2TripRecording)),
       );
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         contains(Feature.gamification),
         reason: 'Stored child state must survive parent-disable so the '
             'user does not lose their preference.',

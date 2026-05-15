@@ -3,11 +3,41 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/data/feature_flags_repository.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_dependency_graph.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
+
+/// A [FeatureFlagsRepository] whose [loadEnabled] always throws — used to
+/// exercise the #1681 AsyncNotifier error path (the Hive read failing).
+class _ThrowingRepo extends FeatureFlagsRepository {
+  _ThrowingRepo(Box<dynamic> box) : super(box: box);
+
+  @override
+  Future<Set<Feature>> loadEnabled() async =>
+      throw StateError('simulated Hive read failure');
+}
+
+/// Minimal [TraceRecorder] fake — captures whatever [errorLogger] routes
+/// to it so the test can assert the failure was surfaced, not swallowed.
+class _FakeTraceRecorder implements TraceRecorder {
+  Object? capturedError;
+  int recordCount = 0;
+
+  @override
+  Future<void> record(
+    Object error,
+    StackTrace stackTrace, {
+    ServiceChainSnapshot? serviceChainState,
+  }) async {
+    capturedError = error;
+    recordCount++;
+  }
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -31,9 +61,12 @@ void main() {
     tmpDir.deleteSync(recursive: true);
   });
 
-  ProviderContainer makeContainer({FeatureManifest? manifest}) {
+  ProviderContainer makeContainer({
+    FeatureManifest? manifest,
+    FeatureFlagsRepository? repository,
+  }) {
     final c = ProviderContainer(overrides: [
-      featureFlagsRepositoryProvider.overrideWithValue(repo),
+      featureFlagsRepositoryProvider.overrideWithValue(repository ?? repo),
       if (manifest != null)
         featureManifestProvider.overrideWithValue(manifest),
     ]);
@@ -41,21 +74,18 @@ void main() {
     return c;
   }
 
-  /// Drains the post-build async load so reads observe the persisted set
-  /// rather than the synchronous manifest-default placeholder.
+  /// Awaits the AsyncNotifier `build()` so reads observe the persisted
+  /// set rather than the synchronous manifest-default placeholder
+  /// [enabledFeaturesProvider] returns during the load frame (#1681).
   Future<void> pumpLoad(ProviderContainer c) async {
-    c.read(featureFlagsProvider);
-    // Two microtask drains — one for repo.loadEnabled().then, one for the
-    // setter. A single delay covers both in practice.
-    await Future<void>.delayed(Duration.zero);
-    await Future<void>.delayed(Duration.zero);
+    await c.read(featureFlagsProvider.future);
   }
 
   group('FeatureFlags initial state', () {
     test('matches defaultManifest defaults on an empty box', () async {
       final c = makeContainer();
       await pumpLoad(c);
-      final state = c.read(featureFlagsProvider);
+      final state = c.read(enabledFeaturesProvider);
       expect(state, FeatureManifest.defaultManifest.defaultEnabledSet());
       // Sanity-check a few that should default true / false respectively.
       expect(state, contains(Feature.gamification));
@@ -99,7 +129,7 @@ void main() {
           .read(featureFlagsProvider.notifier)
           .enable(Feature.gamification);
 
-      final state = c.read(featureFlagsProvider);
+      final state = c.read(enabledFeaturesProvider);
       expect(state, contains(Feature.obd2TripRecording));
       expect(state, contains(Feature.gamification));
     });
@@ -113,7 +143,7 @@ void main() {
       await c
           .read(featureFlagsProvider.notifier)
           .enable(Feature.obd2TripRecording);
-      expect(c.read(featureFlagsProvider), contains(Feature.gamification));
+      expect(c.read(enabledFeaturesProvider), contains(Feature.gamification));
 
       // Cascading-disable: parent comes off, child stays in storage so the
       // user's preference is preserved, but the user-visible "is this
@@ -122,7 +152,7 @@ void main() {
           .read(featureFlagsProvider.notifier)
           .disable(Feature.obd2TripRecording);
 
-      final state = c.read(featureFlagsProvider);
+      final state = c.read(enabledFeaturesProvider);
       expect(state, isNot(contains(Feature.obd2TripRecording)));
       expect(
         state,
@@ -152,7 +182,7 @@ void main() {
         isEffectivelyEnabled(
           Feature.gamification,
           FeatureManifest.defaultManifest,
-          c.read(featureFlagsProvider),
+          c.read(enabledFeaturesProvider),
         ),
         isTrue,
       );
@@ -174,12 +204,12 @@ void main() {
       final c1 = makeContainer();
       await pumpLoad(c1);
       await c1.read(featureFlagsProvider.notifier).enable(Feature.tankSync);
-      expect(c1.read(featureFlagsProvider), contains(Feature.tankSync));
+      expect(c1.read(enabledFeaturesProvider), contains(Feature.tankSync));
 
       // Fresh container, same Hive box → persisted set wins over defaults.
       final c2 = makeContainer();
       await pumpLoad(c2);
-      final state = c2.read(featureFlagsProvider);
+      final state = c2.read(enabledFeaturesProvider);
       expect(state, contains(Feature.tankSync));
       // Things on by default that were never touched stay on.
       expect(state, contains(Feature.priceAlerts));
@@ -195,7 +225,8 @@ void main() {
 
       final c2 = makeContainer();
       await pumpLoad(c2);
-      expect(c2.read(featureFlagsProvider), isNot(contains(Feature.priceAlerts)));
+      expect(c2.read(enabledFeaturesProvider),
+          isNot(contains(Feature.priceAlerts)));
     });
   });
 
@@ -218,16 +249,42 @@ void main() {
         ),
       });
       final c = makeContainer(manifest: cyclic);
-      // Riverpod wraps build-time throws inside ProviderException; the
-      // contract we care about is that the StateError surfaces (matched
-      // by message), not the wrapper class.
-      expect(
-        () => c.read(featureFlagsProvider),
+      // `assertNoCycles` throws inside the async `build()`, so the
+      // failure surfaces as a rejected `future` rather than a
+      // synchronous throw. The contract we care about is that the
+      // StateError naming the cycle surfaces (matched by message).
+      await expectLater(
+        c.read(featureFlagsProvider.future),
         throwsA(predicate(
           (e) => e.toString().contains('Feature dependency cycle'),
           'wraps a StateError naming the cycle',
         )),
       );
+    });
+  });
+
+  group('FeatureFlags Hive-read failure (#1681)', () {
+    test('a failed loadEnabled is logged and falls back to manifest defaults',
+        () async {
+      final recorder = _FakeTraceRecorder();
+      errorLogger.testRecorderOverride = recorder;
+      addTearDown(errorLogger.resetForTest);
+
+      final c = makeContainer(repository: _ThrowingRepo(box));
+
+      // build() catches the throwing loadEnabled, logs it, and resolves
+      // to the manifest defaults — the future completes, never rejects.
+      final state = await c.read(featureFlagsProvider.future);
+      expect(state, FeatureManifest.defaultManifest.defaultEnabledSet());
+      expect(c.read(enabledFeaturesProvider),
+          FeatureManifest.defaultManifest.defaultEnabledSet());
+
+      // The failure was surfaced through the central error pipeline,
+      // tagged as a storage-layer error — not silently swallowed.
+      expect(recorder.recordCount, greaterThan(0));
+      final captured = recorder.capturedError;
+      expect(captured, isA<ContextualError>());
+      expect((captured! as ContextualError).layer, ErrorLayer.storage);
     });
   });
 }

@@ -37,7 +37,7 @@ class ProfileScreen extends ConsumerWidget {
     // not see settings whose UI cannot do anything. Re-enabling the
     // root from the Feature management section restores them.
     final manifest = ref.watch(featureManifestProvider);
-    final enabledFlags = ref.watch(featureFlagsProvider);
+    final enabledFlags = ref.watch(enabledFeaturesProvider);
     final tankSyncOn = isEffectivelyEnabled(
       Feature.tankSync,
       manifest,

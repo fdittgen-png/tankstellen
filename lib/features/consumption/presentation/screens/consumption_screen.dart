@@ -170,7 +170,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     // without trip recording enabled, and the empty tab confused
     // Medium users. Reading ConsoMode directly is clearer than
     // walking the dependency graph for obd2TripRecording.
-    final enabledFlags = ref.watch(featureFlagsProvider);
+    final enabledFlags = ref.watch(enabledFeaturesProvider);
     final showTrajets = consoModeFromFlags(enabledFlags) ==
         ConsoMode.fuelAndTrips;
     // Recreate the TabController when the tab-set cardinality
@@ -239,7 +239,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
         ),
         // #1613 — the Carbon dashboard entry point is gated on the
         // central Feature enum so it can be toggled per profile.
-        if (ref.watch(featureFlagsProvider).contains(Feature.carbonDashboard))
+        if (ref.watch(enabledFeaturesProvider).contains(Feature.carbonDashboard))
           IconButton(
             key: const Key('open_carbon_dashboard'),
             tooltip: l?.carbonDashboardTitle ?? 'Carbon dashboard',

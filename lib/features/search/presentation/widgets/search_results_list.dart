@@ -100,7 +100,7 @@ class SearchResultsList extends ConsumerWidget {
               // point anywhere in lib/; this affordance makes it
               // reachable when Feature.fuelCalculator is enabled.
               if (ref
-                  .watch(featureFlagsProvider)
+                  .watch(enabledFeaturesProvider)
                   .contains(Feature.fuelCalculator)) ...[
                 Semantics(
                   label: l10n?.fuelCostCalculator ?? 'Fuel Cost Calculator',

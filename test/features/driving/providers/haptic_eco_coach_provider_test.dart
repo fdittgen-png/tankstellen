@@ -63,7 +63,7 @@ void main() {
   /// observe the persisted set rather than the manifest-default
   /// placeholder.
   Future<void> pumpLoad(ProviderContainer c) async {
-    c.read(featureFlagsProvider);
+    c.read(enabledFeaturesProvider);
     await Future<void>.delayed(Duration.zero);
     await Future<void>.delayed(Duration.zero);
   }
@@ -119,7 +119,7 @@ void main() {
           .set(true);
 
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         contains(Feature.hapticEcoCoach),
         reason:
             'set(true) must route through featureFlagsProvider.enable so '
@@ -153,7 +153,7 @@ void main() {
           .set(false);
 
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         isNot(contains(Feature.hapticEcoCoach)),
       );
       expect(container.read(hapticEcoCoachEnabledProvider), isFalse);
@@ -178,7 +178,7 @@ void main() {
 
       // The violating enable did not take effect — state is unchanged.
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         isNot(contains(Feature.hapticEcoCoach)),
       );
       expect(container.read(hapticEcoCoachEnabledProvider), isFalse);

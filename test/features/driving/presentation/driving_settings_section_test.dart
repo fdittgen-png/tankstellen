@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
@@ -75,7 +76,7 @@ void main() {
 
       // Central state must have flipped on.
       expect(
-        fakeFlags.state,
+        fakeFlags.state.requireValue,
         contains(Feature.hapticEcoCoach),
         reason:
             'Tapping the toggle must enable hapticEcoCoach in the central '
@@ -260,14 +261,14 @@ class _TestFeatureFlags extends FeatureFlags {
 
   @override
   Future<void> enable(Feature feature) async {
-    if (state.contains(feature)) return;
-    state = {...state, feature};
+    final current = state.value ?? const <Feature>{}; if (current.contains(feature)) return;
+    state = AsyncData({...current, feature});
   }
 
   @override
   Future<void> disable(Feature feature) async {
-    if (!state.contains(feature)) return;
-    state = {...state}..remove(feature);
+    final current = state.value ?? const <Feature>{}; if (!current.contains(feature)) return;
+    state = AsyncData({...current}..remove(feature));
   }
 }
 

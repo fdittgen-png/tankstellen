@@ -33,7 +33,7 @@ class BaselineSyncEnabled extends _$BaselineSyncEnabled {
     // parent) is off, this surfaces as `false` regardless of the stored
     // value. The trip-flush hook reads this via `ref.read` at flush
     // time and skips the upload when the parent is gone.
-    final enabled = ref.watch(featureFlagsProvider);
+    final enabled = ref.watch(enabledFeaturesProvider);
     final manifest = ref.watch(featureManifestProvider);
     return isEffectivelyEnabled(Feature.baselineSync, manifest, enabled);
   }

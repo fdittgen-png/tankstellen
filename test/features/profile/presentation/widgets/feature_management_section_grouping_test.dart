@@ -183,11 +183,11 @@ void main() {
           .read(featureFlagsProvider.notifier)
           .disable(Feature.gamification);
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         isNot(contains(Feature.gamification)),
       );
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         isNot(contains(Feature.obd2TripRecording)),
       );
 
@@ -320,7 +320,7 @@ void main() {
       await tester.tap(find.text('Fuel'));
       await tester.pumpAndSettle();
 
-      final flags = container.read(featureFlagsProvider);
+      final flags = container.read(enabledFeaturesProvider);
       expect(flags, contains(Feature.showConsumptionTab));
       expect(flags, contains(Feature.manualConsumption));
       expect(flags, isNot(contains(Feature.obd2TripRecording)));
@@ -357,7 +357,7 @@ void main() {
       await tester.tap(find.text('Off'));
       await tester.pumpAndSettle();
 
-      final flags = container.read(featureFlagsProvider);
+      final flags = container.read(enabledFeaturesProvider);
       expect(flags, isNot(contains(Feature.showConsumptionTab)));
       expect(flags, isNot(contains(Feature.manualConsumption)));
       expect(flags, isNot(contains(Feature.obd2TripRecording)));

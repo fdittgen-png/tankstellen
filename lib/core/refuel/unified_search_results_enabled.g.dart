@@ -85,7 +85,7 @@ final class UnifiedSearchResultsEnabledProvider
 }
 
 String _$unifiedSearchResultsEnabledHash() =>
-    r'8a3ef4f95d3d5dd8851ab79ae2ef26211e2a1f71';
+    r'b613b6452445f9e0f52991b0e2c3ca0c2b5c0ee4';
 
 /// Feature flag for the #1116 phase-3 unified fuel + EV search results.
 ///

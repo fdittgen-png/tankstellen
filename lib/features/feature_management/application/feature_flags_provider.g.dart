@@ -137,6 +137,20 @@ String _$featureManifestHash() => r'7b67cbf211fcf268808f6c329950be1d4ba91881';
 /// toggles — no consumer is migrated yet. Phase 3 of #1373 will route
 /// `autoRecord`, `gamificationEnabled`, `hapticEcoCoachEnabled`, etc.
 /// through this provider one feature at a time.
+///
+/// ## AsyncNotifier (#1681)
+///
+/// `build` is an `async` `FutureOr<Set<Feature>>` so the Hive read is
+/// awaited inside it — Riverpod owns the loading frame instead of the
+/// old pattern of returning manifest defaults synchronously and then
+/// mutating `state` from a `.then()` callback (which needed an
+/// `invalid_use_of_protected_member` ignore and swallowed read errors).
+/// A failed Hive read is now logged via [errorLogger] and falls back to
+/// the manifest defaults rather than failing silently.
+///
+/// Most consumers want the resolved `Set<Feature>` and have a sensible
+/// answer for the brief pre-load frame; they watch [enabledFeaturesProvider]
+/// (a synchronous derived view) rather than this provider directly.
 
 @ProviderFor(FeatureFlags)
 final featureFlagsProvider = FeatureFlagsProvider._();
@@ -152,8 +166,22 @@ final featureFlagsProvider = FeatureFlagsProvider._();
 /// toggles — no consumer is migrated yet. Phase 3 of #1373 will route
 /// `autoRecord`, `gamificationEnabled`, `hapticEcoCoachEnabled`, etc.
 /// through this provider one feature at a time.
+///
+/// ## AsyncNotifier (#1681)
+///
+/// `build` is an `async` `FutureOr<Set<Feature>>` so the Hive read is
+/// awaited inside it — Riverpod owns the loading frame instead of the
+/// old pattern of returning manifest defaults synchronously and then
+/// mutating `state` from a `.then()` callback (which needed an
+/// `invalid_use_of_protected_member` ignore and swallowed read errors).
+/// A failed Hive read is now logged via [errorLogger] and falls back to
+/// the manifest defaults rather than failing silently.
+///
+/// Most consumers want the resolved `Set<Feature>` and have a sensible
+/// answer for the brief pre-load frame; they watch [enabledFeaturesProvider]
+/// (a synchronous derived view) rather than this provider directly.
 final class FeatureFlagsProvider
-    extends $NotifierProvider<FeatureFlags, Set<Feature>> {
+    extends $AsyncNotifierProvider<FeatureFlags, Set<Feature>> {
   /// Central feature-flag store (#1373 phase 1).
   ///
   /// State is the set of currently-enabled features. The provider validates
@@ -165,6 +193,20 @@ final class FeatureFlagsProvider
   /// toggles — no consumer is migrated yet. Phase 3 of #1373 will route
   /// `autoRecord`, `gamificationEnabled`, `hapticEcoCoachEnabled`, etc.
   /// through this provider one feature at a time.
+  ///
+  /// ## AsyncNotifier (#1681)
+  ///
+  /// `build` is an `async` `FutureOr<Set<Feature>>` so the Hive read is
+  /// awaited inside it — Riverpod owns the loading frame instead of the
+  /// old pattern of returning manifest defaults synchronously and then
+  /// mutating `state` from a `.then()` callback (which needed an
+  /// `invalid_use_of_protected_member` ignore and swallowed read errors).
+  /// A failed Hive read is now logged via [errorLogger] and falls back to
+  /// the manifest defaults rather than failing silently.
+  ///
+  /// Most consumers want the resolved `Set<Feature>` and have a sensible
+  /// answer for the brief pre-load frame; they watch [enabledFeaturesProvider]
+  /// (a synchronous derived view) rather than this provider directly.
   FeatureFlagsProvider._()
     : super(
         from: null,
@@ -182,17 +224,9 @@ final class FeatureFlagsProvider
   @$internal
   @override
   FeatureFlags create() => FeatureFlags();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(Set<Feature> value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<Set<Feature>>(value),
-    );
-  }
 }
 
-String _$featureFlagsHash() => r'1c1ae2547cc2a9c678e75604243e9984a36e16e4';
+String _$featureFlagsHash() => r'10bea65d477d5590e5d8737bedcfa91b7d61920e';
 
 /// Central feature-flag store (#1373 phase 1).
 ///
@@ -205,21 +239,114 @@ String _$featureFlagsHash() => r'1c1ae2547cc2a9c678e75604243e9984a36e16e4';
 /// toggles — no consumer is migrated yet. Phase 3 of #1373 will route
 /// `autoRecord`, `gamificationEnabled`, `hapticEcoCoachEnabled`, etc.
 /// through this provider one feature at a time.
+///
+/// ## AsyncNotifier (#1681)
+///
+/// `build` is an `async` `FutureOr<Set<Feature>>` so the Hive read is
+/// awaited inside it — Riverpod owns the loading frame instead of the
+/// old pattern of returning manifest defaults synchronously and then
+/// mutating `state` from a `.then()` callback (which needed an
+/// `invalid_use_of_protected_member` ignore and swallowed read errors).
+/// A failed Hive read is now logged via [errorLogger] and falls back to
+/// the manifest defaults rather than failing silently.
+///
+/// Most consumers want the resolved `Set<Feature>` and have a sensible
+/// answer for the brief pre-load frame; they watch [enabledFeaturesProvider]
+/// (a synchronous derived view) rather than this provider directly.
 
-abstract class _$FeatureFlags extends $Notifier<Set<Feature>> {
-  Set<Feature> build();
+abstract class _$FeatureFlags extends $AsyncNotifier<Set<Feature>> {
+  FutureOr<Set<Feature>> build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<Set<Feature>, Set<Feature>>;
+    final ref = this.ref as $Ref<AsyncValue<Set<Feature>>, Set<Feature>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<Set<Feature>, Set<Feature>>,
-              Set<Feature>,
+              AnyNotifier<AsyncValue<Set<Feature>>, Set<Feature>>,
+              AsyncValue<Set<Feature>>,
               Object?,
               Object?
             >;
     element.handleCreate(ref, build);
   }
 }
+
+/// Synchronous view of the enabled-feature set (#1681).
+///
+/// [featureFlagsProvider] is an `AsyncNotifier`, so watching it directly
+/// yields an `AsyncValue<Set<Feature>>`. Almost every consumer only
+/// needs the resolved `Set<Feature>` and has a sensible answer for the
+/// brief pre-Hive-load frame: the manifest defaults. This derived
+/// provider encapsulates that — during the load frame (or on an
+/// `AsyncError` fallback) it resolves to `defaultEnabledSet()`, matching
+/// the pre-#1681 synchronous-`build()` behaviour bit-for-bit.
+///
+/// Callers that mutate flags still go through
+/// `featureFlagsProvider.notifier` (`enable` / `disable` / `isEnabled`).
+
+@ProviderFor(enabledFeatures)
+final enabledFeaturesProvider = EnabledFeaturesProvider._();
+
+/// Synchronous view of the enabled-feature set (#1681).
+///
+/// [featureFlagsProvider] is an `AsyncNotifier`, so watching it directly
+/// yields an `AsyncValue<Set<Feature>>`. Almost every consumer only
+/// needs the resolved `Set<Feature>` and has a sensible answer for the
+/// brief pre-Hive-load frame: the manifest defaults. This derived
+/// provider encapsulates that — during the load frame (or on an
+/// `AsyncError` fallback) it resolves to `defaultEnabledSet()`, matching
+/// the pre-#1681 synchronous-`build()` behaviour bit-for-bit.
+///
+/// Callers that mutate flags still go through
+/// `featureFlagsProvider.notifier` (`enable` / `disable` / `isEnabled`).
+
+final class EnabledFeaturesProvider
+    extends $FunctionalProvider<Set<Feature>, Set<Feature>, Set<Feature>>
+    with $Provider<Set<Feature>> {
+  /// Synchronous view of the enabled-feature set (#1681).
+  ///
+  /// [featureFlagsProvider] is an `AsyncNotifier`, so watching it directly
+  /// yields an `AsyncValue<Set<Feature>>`. Almost every consumer only
+  /// needs the resolved `Set<Feature>` and has a sensible answer for the
+  /// brief pre-Hive-load frame: the manifest defaults. This derived
+  /// provider encapsulates that — during the load frame (or on an
+  /// `AsyncError` fallback) it resolves to `defaultEnabledSet()`, matching
+  /// the pre-#1681 synchronous-`build()` behaviour bit-for-bit.
+  ///
+  /// Callers that mutate flags still go through
+  /// `featureFlagsProvider.notifier` (`enable` / `disable` / `isEnabled`).
+  EnabledFeaturesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'enabledFeaturesProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$enabledFeaturesHash();
+
+  @$internal
+  @override
+  $ProviderElement<Set<Feature>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  Set<Feature> create(Ref ref) {
+    return enabledFeatures(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Set<Feature> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Set<Feature>>(value),
+    );
+  }
+}
+
+String _$enabledFeaturesHash() => r'2e79e8e31e5bd3a1f94ce3e095d1b76c3ed0b306';

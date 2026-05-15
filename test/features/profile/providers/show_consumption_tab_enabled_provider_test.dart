@@ -50,7 +50,7 @@ void main() {
   }
 
   Future<void> pumpLoad(ProviderContainer c) async {
-    c.read(featureFlagsProvider);
+    c.read(enabledFeaturesProvider);
     await Future<void>.delayed(Duration.zero);
     await Future<void>.delayed(Duration.zero);
   }
@@ -114,11 +114,11 @@ void main() {
             .set(true);
 
         expect(
-          container.read(featureFlagsProvider),
+          container.read(enabledFeaturesProvider),
           contains(Feature.showConsumptionTab),
         );
         expect(
-          container.read(featureFlagsProvider),
+          container.read(enabledFeaturesProvider),
           contains(Feature.obd2TripRecording),
           reason:
               'The prerequisite must remain enabled — set(true) only '
@@ -163,7 +163,7 @@ void main() {
               'The shim swallows so the widget tree stays standing.',
         );
         expect(
-          container.read(featureFlagsProvider),
+          container.read(enabledFeaturesProvider),
           isNot(contains(Feature.showConsumptionTab)),
         );
       },
@@ -186,11 +186,11 @@ void main() {
           .set(false);
 
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         isNot(contains(Feature.showConsumptionTab)),
       );
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         contains(Feature.obd2TripRecording),
         reason:
             'set(false) on the dependent must NOT disturb the '
@@ -240,7 +240,7 @@ void main() {
 
         expect(container.read(showConsumptionTabEnabledProvider), isFalse);
         expect(
-          container.read(featureFlagsProvider),
+          container.read(enabledFeaturesProvider),
           contains(Feature.showConsumptionTab),
           reason:
               'Stored child state must survive parent-disable so '

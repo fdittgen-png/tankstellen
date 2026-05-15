@@ -31,7 +31,7 @@ class HapticEcoCoachEnabled extends _$HapticEcoCoachEnabled {
     // (the parent) is off, this surfaces as `false` regardless of the
     // stored haptic-coach value. The lifecycle provider re-runs and
     // tears down its subscription on the next frame.
-    final enabled = ref.watch(featureFlagsProvider);
+    final enabled = ref.watch(enabledFeaturesProvider);
     final manifest = ref.watch(featureManifestProvider);
     return isEffectivelyEnabled(Feature.hapticEcoCoach, manifest, enabled);
   }

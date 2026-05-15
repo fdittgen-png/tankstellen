@@ -28,7 +28,7 @@ class UnifiedSearchResultsEnabled extends _$UnifiedSearchResultsEnabled {
     // shims and forward-compat (#1447). `Feature.unifiedSearchResults`
     // has no requires today so the helper short-circuits to
     // `state.contains` — identical observable behaviour.
-    final enabled = ref.watch(featureFlagsProvider);
+    final enabled = ref.watch(enabledFeaturesProvider);
     final manifest = ref.watch(featureManifestProvider);
     return isEffectivelyEnabled(
       Feature.unifiedSearchResults,

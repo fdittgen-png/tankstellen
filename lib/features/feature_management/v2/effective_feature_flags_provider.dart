@@ -24,7 +24,7 @@ part 'effective_feature_flags_provider.g.dart';
 /// enum names, both APIs read the same persistence record.
 @Riverpod(keepAlive: true)
 Map<String, bool> effectiveFeatureFlags(Ref ref) {
-  final v1Enabled = ref.watch(featureFlagsProvider);
+  final v1Enabled = ref.watch(enabledFeaturesProvider);
   final enabledIds = v1Enabled.map((f) => f.name).toSet();
   return {
     for (final fc in featureRegistry)

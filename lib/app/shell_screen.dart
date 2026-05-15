@@ -181,7 +181,7 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     // gets no Conso tab; Medium / Full do. Replaces the old #893
     // hasVehicle gate which created a catch-22 for Medium users.
     final manifest = ref.watch(featureManifestProvider);
-    final enabledFlags = ref.watch(featureFlagsProvider);
+    final enabledFlags = ref.watch(enabledFeaturesProvider);
     final showConsumption = isConsumptionTabReachable(manifest, enabledFlags);
     final destinations = resolveShellDestinations(
       l10n: l10n,
