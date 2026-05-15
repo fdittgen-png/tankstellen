@@ -3193,6 +3193,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fillUpSavedSnackbar => 'Tankvorgang gespeichert';
 
   @override
+  String get radiusAlertsEntryTitle => 'Umkreis-Alarme & Statistik';
+
+  @override
+  String get radiusAlertsEntrySubtitle =>
+      'Werde benachrichtigt, wenn die Preise in deiner Nähe fallen';
+
+  @override
   String get achievementSmoothDriver => 'Ruhige Serie';
 
   @override

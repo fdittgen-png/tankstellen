@@ -234,6 +234,58 @@ void main() {
       expect(landedOn, '/station/shell-42');
       expect(find.text('station shell-42'), findsOneWidget);
     });
+
+    // #1701 — the radius-alerts + statistics screen at `/alerts` had no
+    // navigation entry point anywhere. This entry is it.
+    testWidgets(
+        'the radius-alerts entry is reachable (empty state) and routes '
+        'to /alerts', (tester) async {
+      final mockStorageOverride = mockStorageRepositoryOverride();
+      when(() => mockStorageOverride.mock.getSetting(any())).thenReturn(null);
+
+      String? landedOn;
+      final router = GoRouter(
+        initialLocation: '/',
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (_, _) => const Scaffold(body: AlertsTab()),
+          ),
+          GoRoute(
+            path: '/alerts',
+            builder: (_, _) {
+              landedOn = '/alerts';
+              return const Scaffold(body: Text('alerts screen'));
+            },
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: <Object>[
+            mockStorageOverride.override,
+            // Zero price alerts → empty state; the entry must still show.
+            alertProvider.overrideWith(() => _RecordingAlerts(const [])),
+          ].cast(),
+          child: MaterialApp.router(
+            routerConfig: router,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('radiusAlertsEntry')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('radiusAlertsEntry')));
+      await tester.pumpAndSettle();
+
+      expect(landedOn, '/alerts');
+      expect(find.text('alerts screen'), findsOneWidget);
+    });
   });
 }
 

@@ -3192,6 +3192,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fillUpSavedSnackbar => 'Fill-up saved';
 
   @override
+  String get radiusAlertsEntryTitle => 'Radius alerts & statistics';
+
+  @override
+  String get radiusAlertsEntrySubtitle =>
+      'Get notified when prices drop near you';
+
+  @override
   String get achievementSmoothDriver => 'Série souple';
 
   @override

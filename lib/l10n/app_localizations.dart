@@ -5918,6 +5918,18 @@ abstract class AppLocalizations {
   /// **'Fill-up saved'**
   String get fillUpSavedSnackbar;
 
+  /// Title of the navigation entry on the favorites Alerts tab that opens the radius-alerts + statistics screen (#1701).
+  ///
+  /// In en, this message translates to:
+  /// **'Radius alerts & statistics'**
+  String get radiusAlertsEntryTitle;
+
+  /// Subtitle of the radius-alerts navigation entry on the favorites Alerts tab — explains what radius alerts do (#1701).
+  ///
+  /// In en, this message translates to:
+  /// **'Get notified when prices drop near you'**
+  String get radiusAlertsEntrySubtitle;
+
   /// Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5).
   ///
   /// In en, this message translates to:

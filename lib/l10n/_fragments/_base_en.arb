@@ -1462,5 +1462,13 @@
   "fillUpSavedSnackbar": "Fill-up saved",
   "@fillUpSavedSnackbar": {
     "description": "Success snackbar confirming a fill-up was saved, shown after the Add fill-up screen pops back to the consumption list (#1692)."
+  },
+  "radiusAlertsEntryTitle": "Radius alerts & statistics",
+  "@radiusAlertsEntryTitle": {
+    "description": "Title of the navigation entry on the favorites Alerts tab that opens the radius-alerts + statistics screen (#1701)."
+  },
+  "radiusAlertsEntrySubtitle": "Get notified when prices drop near you",
+  "@radiusAlertsEntrySubtitle": {
+    "description": "Subtitle of the radius-alerts navigation entry on the favorites Alerts tab — explains what radius alerts do (#1701)."
   }
 }
