@@ -1,0 +1,51 @@
+name: Nightly Full Test Suite
+
+# Paranoia net for #1591's path-affected test selector — if the selector
+# ever misses a transitively-affected test, this workflow catches it
+# within a day by running the full suite (no selector, no exclude-tags
+# except `network` because the live-API tests can't run reliably from
+# GitHub-hosted runners).
+#
+# Failure surfaces by reopening / commenting on the tracking issue
+# (#1591) so the user sees it without having to check Actions UI.
+
+on:
+  schedule:
+    # 04:00 UTC = 06:00 Europe/Paris (CEST) / 05:00 (CET).
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: nightly-full
+  cancel-in-progress: false
+
+jobs:
+  full-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: master
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - name: Run full test suite (selector bypassed)
+        run: flutter test --coverage --exclude-tags=network
+      - name: Surface failure on tracking issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment 1591 --body \
+            "Nightly full-suite run failed on $(date -u +%F): https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"

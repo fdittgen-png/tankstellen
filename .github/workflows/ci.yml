@@ -51,9 +51,28 @@ jobs:
   # for the test phase drops from ~30 min to ~7-8 min; total billed
   # minutes go up ~4× (acceptable trade — same quality).
   #
-  # Coverage threshold + startup-budget enforcement moved to the
-  # downstream `coverage-merge` job so the shards stay single-purpose
-  # and we don't enforce a threshold on incomplete data.
+  # #1582 — `--coverage` is dropped on PR runs (it doubles per-shard
+  # wall clock for a report no one reviews mid-PR). Master pushes and
+  # the weekly schedule still produce coverage so the lcov artefact
+  # and threshold check stay current. Startup-budget enforcement
+  # moved to its own job so PRs still get that gate.
+  #
+  # #1584 — `--exclude-tags=flaky` (plus the existing `network`
+  # exclusion) on PR + master + scheduled runs. The flaky tag covers
+  # plugin tests (share_plus, etc.) whose channel timing is unreliable
+  # in the headless test environment. The nightly flaky-suite workflow
+  # re-runs those with the tag so a real regression still surfaces.
+  #
+  # #1585 — Cache the `build/` directory keyed on pubspec + lib hash
+  # so re-runs of the same branch skip the build_runner regen step
+  # and avoid recompiling Dart sources untouched since the last run.
+  #
+  # #1594 — On `pull_request` events a `dart run tool/test_selector.dart`
+  # pre-step writes the affected-test list to `affected_tests.txt`. The
+  # shard then either runs ONLY those tests (sharded across the matrix)
+  # or, if the selector emits an empty list (or fails), falls back to
+  # the full suite as a paranoia net. Master pushes + the weekly cron
+  # ignore the selector entirely.
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -64,6 +83,10 @@ jobs:
         shard: [0, 1, 2, 3]
     steps:
       - uses: actions/checkout@v6
+        with:
+          # #1594 — selector needs `git diff master...HEAD` to work.
+          # Shallow clone (default) has no master tip locally.
+          fetch-depth: 0
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -75,20 +98,79 @@ jobs:
             .dart_tool
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
+      # #1585 — Cache compiled artefacts. Same-branch reruns and rebase
+      # rounds reuse build_runner output keyed on the source state.
+      - uses: actions/cache@v5
+        with:
+          path: build/
+          key: ${{ runner.os }}-build-${{ hashFiles('pubspec.lock', 'lib/**/*.dart') }}
+          restore-keys: ${{ runner.os }}-build-
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
-      # Excludes the `network` tag — those tests hit real third-party
-      # APIs (Argentina, Italy MIMIT, etc.) that intermittently time out
-      # and cannot block PRs. Run them on demand with
-      # `flutter test --tags=network` from a workstation.
-      - name: Run test shard ${{ matrix.shard }} of 4
+      # #1594 — Compute the affected-test list once per shard. Fast
+      # (pure Dart, file-walk) and per-shard so the selector cost is
+      # parallelised. Empty output triggers a full-suite fallback in
+      # the run step.
+      - name: Compute affected tests (PR only)
+        if: github.event_name == 'pull_request'
+        run: |
+          # `dart run` emits `Running build hooks...` progress text to stdout
+          # (with `\r` overwrites). Naively redirecting `> affected_tests.txt`
+          # captures that prefix and concatenates it with the first real test
+          # path, so the shard then tries to load a bogus path like
+          # `.../Running build hooks...test/foo_test.dart` and every shard fails
+          # at suite-load time. Filter the stream to lines that look like test
+          # files so the selector output stays clean even if dart prepends
+          # noise. Empty output still triggers the full-suite fallback below.
+          dart run tool/test_selector.dart \
+            --base origin/${{ github.base_ref }} \
+            2>/dev/null \
+            | grep -E '^test/.*_test\.dart$' \
+            > affected_tests.txt || true
+          if [ -s affected_tests.txt ]; then
+            echo "Selector produced $(wc -l < affected_tests.txt) test files"
+            head -20 affected_tests.txt
+          else
+            echo "Selector emitted empty list — shard will fall back to full suite"
+          fi
+      # Excludes the `network` + `flaky` tags — those tests hit real
+      # third-party APIs (Argentina, Italy MIMIT) or platform plugins
+      # (share_plus) that intermittently fail and cannot block PRs.
+      # The nightly-flaky workflow re-runs both buckets.
+      - name: Run test shard ${{ matrix.shard }} of 4 (PR — affected only, no coverage)
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          if [ -s affected_tests.txt ]; then
+            # Read into a bash array so flutter test receives all
+            # files in a single invocation; sharding then splits
+            # this stable, sorted list deterministically across
+            # the 4 matrix runners.
+            mapfile -t TESTS < affected_tests.txt
+            flutter test "${TESTS[@]}" \
+              --exclude-tags=network \
+              --exclude-tags=flaky \
+              --total-shards=4 \
+              --shard-index=${{ matrix.shard }}
+          else
+            # Empty selector output ⇒ paranoia: run full suite.
+            flutter test \
+              --exclude-tags=network \
+              --exclude-tags=flaky \
+              --total-shards=4 \
+              --shard-index=${{ matrix.shard }}
+          fi
+      - name: Run test shard ${{ matrix.shard }} of 4 (master/nightly — full suite + coverage)
+        if: github.event_name != 'pull_request'
         run: |
           flutter test \
             --coverage \
             --exclude-tags=network \
+            --exclude-tags=flaky \
             --total-shards=4 \
             --shard-index=${{ matrix.shard }}
       - name: Upload shard coverage
+        if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v7
         with:
           name: coverage-shard-${{ matrix.shard }}
@@ -98,9 +180,10 @@ jobs:
 
   # Aggregates the 4 shard coverage reports into one merged lcov.info
   # and enforces the project-wide threshold over the unified view.
-  # Also runs the startup-budget structural check here so the matrix
-  # shards stay single-purpose.
+  # #1582 — Only runs on master push + the weekly schedule. PRs skip
+  # this job; coverage is regenerated when a PR's commits land on master.
   coverage-merge:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     needs: [test]
     steps:
@@ -135,6 +218,27 @@ jobs:
           echo "Merged ${#ARGS[@]} shard lcov files into coverage/lcov.info"
       - name: Check coverage threshold
         run: bash scripts/check_coverage.sh
+
+  # #1582 — Startup-budget gate split out of coverage-merge so PRs
+  # still enforce it. Cheap: runs only the test/core/perf/ subset.
+  startup-budget:
+    runs-on: ubuntu-latest
+    needs: [analyze]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
       - name: Check startup time budget
         run: bash scripts/check_startup_budget.sh
 
@@ -216,6 +320,12 @@ jobs:
             .dart_tool
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
+      # #1585 — Cache compiled Flutter artefacts for same-branch reruns.
+      - uses: actions/cache@v5
+        with:
+          path: build/
+          key: ${{ runner.os }}-build-android-${{ hashFiles('pubspec.lock', 'lib/**/*.dart', 'android/**') }}
+          restore-keys: ${{ runner.os }}-build-android-
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
       # #48 — Decode the release keystore from a GitHub secret into a temp
