@@ -952,6 +952,58 @@ void main() {
       );
     });
   });
+
+  group('OEM-PID exact litres — #1615', () {
+    test(
+        'updateOemFuelLevelLitres surfaces on TripLiveReading.fuelLevelLitres',
+        () async {
+      final transport = _CountingTransport(responses: {
+        'ATZ': 'ELM327 v1.5>',
+        'ATE0': 'OK>',
+        'ATL0': 'OK>',
+        'ATH0': 'OK>',
+        'ATSP0': 'OK>',
+      });
+      final service = Obd2Service(transport);
+      await service.connect();
+
+      final ctl = TripRecordingController(
+        service: service,
+        pollInterval: const Duration(minutes: 1),
+      );
+      final readings = <TripLiveReading>[];
+      final sub = ctl.live.listen(readings.add);
+      await ctl.start();
+
+      // The stream delivers events on a microtask, so let the event
+      // loop turn after each emit before inspecting `readings`.
+      Future<void> emitAndSettle() async {
+        ctl.debugEmitNow();
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
+
+      // Flag-off / no-OEM-read regression guard: until the provider
+      // seam pushes a value the field stays null and the reading is
+      // identical to pre-#1615 behaviour.
+      await emitAndSettle();
+      expect(readings, isNotEmpty);
+      expect(readings.last.fuelLevelLitres, isNull);
+
+      // After the provider seam (TripOemFuelLevelController) pushes an
+      // exact-litre OEM reading, the next emit carries it through.
+      ctl.updateOemFuelLevelLitres(43.5);
+      await emitAndSettle();
+      expect(readings.last.fuelLevelLitres, 43.5);
+
+      // A null clear (OEM read returned NO DATA) drops the latch.
+      ctl.updateOemFuelLevelLitres(null);
+      await emitAndSettle();
+      expect(readings.last.fuelLevelLitres, isNull);
+
+      await sub.cancel();
+      await ctl.stop();
+    });
+  });
 }
 
 /// Counts how many times each command is sent. Used to assert

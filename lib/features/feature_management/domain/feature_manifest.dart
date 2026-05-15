@@ -284,5 +284,19 @@ class FeatureManifest {
       description: 'CO2 footprint dashboard reachable from the Consumption '
           'tab.',
     ),
+    Feature.experimentalOemPids: FeatureManifestEntry(
+      feature: Feature.experimentalOemPids,
+      // Default-off (#1615): an opt-in experiment. Even when enabled it
+      // is a no-op unless the connected adapter is OEM-PID-capable, so
+      // the flag-off path is the existing percent×capacity conversion
+      // bit-for-bit. `requires: {obd2TripRecording}` — an OEM fuel read
+      // only happens inside the trip-recording fuel sampler.
+      defaultEnabled: false,
+      requires: {Feature.obd2TripRecording},
+      displayName: 'Experimental OEM PIDs',
+      description:
+          'Read exact tank litres via manufacturer-specific PIDs on '
+          'supported adapters.',
+    ),
   });
 }

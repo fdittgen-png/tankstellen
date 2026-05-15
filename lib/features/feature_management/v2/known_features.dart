@@ -283,6 +283,22 @@ const kFeatureShowConsumptionTab = FeatureClass(
   description: 'Show the consumption analytics tab in the bottom navigation.',
 );
 
+const kFeatureExperimentalOemPids = FeatureClass(
+  id: 'experimentalOemPids',
+  parent: _obd2,
+  requires: _obd2Set,
+  defaultEnabled: false,
+  // Experimental opt-in (#1615): the exact-litre OEM-PID fuel path has
+  // a runtime implementation but is gated additionally on the adapter
+  // capability tier. Beta keeps it out of the profile preset bundles.
+  maturity: FeatureMaturity.beta,
+  displayKey: 'featureLabel_experimentalOemPids',
+  displayName: 'Experimental OEM PIDs',
+  descriptionKey: 'featureDescription_experimentalOemPids',
+  description: 'Read exact tank litres via manufacturer-specific PIDs on '
+      'supported adapters.',
+);
+
 // ----------------------------------------------------------------------------
 // Child of tankSync
 // ----------------------------------------------------------------------------

@@ -484,6 +484,19 @@ class TripRecordingController {
     );
   }
 
+  /// #1615 — push the most recent exact-litre OEM-PID fuel reading into
+  /// the live snapshot. The next [_emit] tick reads it back onto
+  /// [TripLiveReading.fuelLevelLitres]. Pass `null` to clear the latch.
+  ///
+  /// Like [updateGpsFix], this is the provider seam: the OEM read (a
+  /// multi-command async sequence against `OemPidRegistry`) lives in
+  /// `TripOemFuelLevelController` at the provider layer, so this file
+  /// stays free of feature-flag and registry imports and the flag-off
+  /// path never constructs an OEM read.
+  void updateOemFuelLevelLitres(double? litres) {
+    _liveSampleSnapshot.updateOemFuelLevelLitres(litres);
+  }
+
   /// #1458 phase 2 — append one cadence-diagnostic record at [now]
   /// with the given app [lifecycleState]. The provider calls this from
   /// its position-stream listener immediately AFTER [updateGpsFix] so
@@ -1087,6 +1100,11 @@ class TripRecordingController {
       rpm: rpm,
       fuelRateLPerHour: fuelRate,
       fuelLevelPercent: snap.latestFuelLevelPercent,
+      // #1615 — exact OEM-PID litres when the provider layer has pushed
+      // one in; null (and consumers fall back to percent×capacity) when
+      // the `experimentalOemPids` flag is off or the adapter is not
+      // OEM-capable.
+      fuelLevelLitres: snap.latestOemFuelLevelLitres,
       engineLoadPercent: engineLoadPercent,
       throttlePercent: throttlePercent,
       coolantTempC: coolantTempC,

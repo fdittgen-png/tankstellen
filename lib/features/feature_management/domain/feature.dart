@@ -111,4 +111,12 @@ enum Feature {
   /// shipped reachable, so the flag preserves current behaviour while
   /// bringing it under central feature management.
   carbonDashboard,
+
+  /// Experimental OEM-PID exact-fuel-level path (#1615). When on and the
+  /// connected adapter is OEM-PID-capable, the trip-recording fuel
+  /// sampler reads exact litres-in-tank via [OemPidRegistry] instead of
+  /// the coarse `percent × tank capacity` conversion. Default-off — an
+  /// opt-in experiment gated additionally on the adapter capability tier.
+  /// Requires [obd2TripRecording].
+  experimentalOemPids,
 }

@@ -10,6 +10,8 @@ import '../../../core/feedback/auto_record_badge_service.dart';
 import '../../../core/providers/app_state_provider.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/sync/trips_sync.dart';
+import '../../feature_management/application/feature_flags_provider.dart';
+import '../../feature_management/domain/feature.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../../vehicle/data/vehicle_profile_catalog_matcher.dart';
@@ -30,6 +32,7 @@ import '../domain/trip_recorder.dart';
 import 'trip_baseline_recorder.dart';
 import 'trip_gps_stream_controller.dart';
 import 'trip_haptic_controller.dart';
+import 'trip_oem_fuel_level_controller.dart';
 import 'trip_history_provider.dart';
 import 'trip_recording_phase.dart';
 import 'trip_recording_state.dart';
@@ -110,6 +113,14 @@ class TripRecording extends _$TripRecording {
   /// classify → record → band → delta pipeline — extracted into a
   /// focused collaborator (#1679). `late` so it can capture [ref].
   late final TripBaselineRecorder _baselines = TripBaselineRecorder(ref);
+
+  /// #1615 experimental OEM-PID exact-fuel-level concern — the slow
+  /// poll that reads exact litres-in-tank via the OEM-PID registry and
+  /// pushes them into the controller's fuel sampler. Inert unless the
+  /// `experimentalOemPids` flag is on (the provider reads the flag and
+  /// passes it to [TripOemFuelLevelController.start]) AND the connected
+  /// adapter is OEM-PID-capable.
+  final TripOemFuelLevelController _oemFuel = TripOemFuelLevelController();
 
   /// Tests count haptic fires via these instead of hooking the
   /// platform channel. The production path also still calls
@@ -335,6 +346,18 @@ class TripRecording extends _$TripRecording {
     // position stream; the flag-off path skips the plugin entirely so
     // a default-config user pays no battery cost.
     _gps.start(ctl);
+    // #1615 — opt-in experimental OEM-PID exact-fuel-level poll. A
+    // no-op (no timer, no registry resolution) when the flag is off or
+    // the adapter is not OEM-PID-capable, so a default-config user pays
+    // nothing. The OEM read needs the VIN, which `ctl.start()` above
+    // has just resolved.
+    _oemFuel.start(
+      enabled: _readOemPidsFlag(),
+      vin: ctl.vin,
+      capability: service.capability,
+      port: service,
+      onLitres: ctl.updateOemFuelLevelLitres,
+    );
     // #1303 — seed the active-trip snapshot identity now that the
     // controller knows its session id + odometer reads. The first
     // flush happens off the live-stream debounce below; if the
@@ -445,6 +468,22 @@ class TripRecording extends _$TripRecording {
     }
   }
 
+  /// #1615 — read the `experimentalOemPids` feature flag, swallowing
+  /// any provider-wiring error the same way [_tryReadActiveVehicle]
+  /// does. Widget tests that start a recording without overriding the
+  /// feature-flags Riverpod graph then simply see the flag as off,
+  /// which is the safe default (the OEM poll never arms).
+  bool _readOemPidsFlag() {
+    try {
+      return ref
+          .read(featureFlagsProvider.notifier)
+          .isEnabled(Feature.experimentalOemPids);
+    } catch (e, st) {
+      debugPrint('TripRecording: feature flags unavailable: $e\n$st');
+      return false;
+    }
+  }
+
   void pause() {
     final ctl = _controller;
     if (ctl == null || !state.isActive) return;
@@ -534,6 +573,9 @@ class TripRecording extends _$TripRecording {
     // common case (flag off) and a cancel that throws shouldn't
     // block trip teardown.
     await _gps.stop();
+    // #1615 — tear down the OEM-PID fuel-level poll. Best-effort: a
+    // null timer is the common case (flag off / incapable adapter).
+    await _oemFuel.stop();
     _controller = null;
     // #726 — persist to the trip history rolling log. Every trip
     // (including discarded ones) is logged; the fill-up flow is a

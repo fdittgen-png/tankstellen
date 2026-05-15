@@ -69,6 +69,16 @@ class LiveSampleSnapshot {
   double? _latestLatitude;
   double? _latestLongitude;
 
+  // #1615 — most recent exact-litre OEM-PID fuel reading, pushed in by
+  // the provider layer (`TripOemFuelLevelController`) when the
+  // `experimentalOemPids` flag is on and an OEM-capable adapter
+  // resolved a manufacturer table. The OEM read is a multi-command
+  // async sequence that does NOT fit the per-PID scheduler, so this
+  // class never issues it itself — it only holds the latch. When the
+  // flag is off (or no OEM read ever lands) this stays null and `_emit`
+  // produces a reading identical to pre-#1615 behaviour.
+  double? _latestOemFuelLevelLitres;
+
   double? get latestSpeedKmh => _latestSpeedKmh;
   double? get latestRpm => _latestRpm;
   double? get latestThrottlePercent => _latestThrottlePercent;
@@ -77,12 +87,22 @@ class LiveSampleSnapshot {
   double? get latestFuelLevelPercent => _latestFuelLevelPercent;
   double? get latestLatitude => _latestLatitude;
   double? get latestLongitude => _latestLongitude;
+  double? get latestOemFuelLevelLitres => _latestOemFuelLevelLitres;
 
   /// Push the most recent GPS fix into the per-tick snapshot
   /// (#1374 phase 1). Pass `null` for either coord to clear the latch.
   void updateGpsFix({double? latitude, double? longitude}) {
     _latestLatitude = latitude;
     _latestLongitude = longitude;
+  }
+
+  /// Push the most recent exact-litre OEM-PID fuel reading into the
+  /// per-tick snapshot (#1615). Pass `null` to clear the latch (e.g.
+  /// the OEM read returned NO DATA). Called by the provider-layer
+  /// `TripOemFuelLevelController`; the controller's `_emit` reads it
+  /// back into `TripLiveReading.fuelLevelLitres`.
+  void updateOemFuelLevelLitres(double? litres) {
+    _latestOemFuelLevelLitres = litres;
   }
 
   /// Wire every priority tier's PID subscriptions onto [scheduler].

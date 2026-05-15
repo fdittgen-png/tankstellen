@@ -51,5 +51,8 @@
   "featureLabel_fuelCalculator": "Tankkostenrechner",
   "featureDescription_fuelCalculator": "Erreichbarer Tankkostenrechner aus den Suchergebnissen.",
   "featureLabel_carbonDashboard": "CO2-Dashboard",
-  "featureDescription_carbonDashboard": "CO2-Bilanz-Dashboard, erreichbar über den Verbrauch-Tab."
+  "featureDescription_carbonDashboard": "CO2-Bilanz-Dashboard, erreichbar über den Verbrauch-Tab.",
+  "featureLabel_experimentalOemPids": "Experimentelle OEM-PIDs",
+  "featureDescription_experimentalOemPids": "Exakte Tankfüllung in Litern über herstellerspezifische PIDs auf unterstützten Adaptern auslesen.",
+  "featureBlockedEnable_experimentalOemPids": "Aktiviere zuerst die OBD2-Fahrtaufzeichnung"
 }

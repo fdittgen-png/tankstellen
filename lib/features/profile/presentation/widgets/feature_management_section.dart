@@ -505,6 +505,8 @@ String _featureLabel(AppLocalizations? l, Feature f) {
       return l?.featureLabel_fuelCalculator ?? 'Fuel calculator';
     case Feature.carbonDashboard:
       return l?.featureLabel_carbonDashboard ?? 'Carbon dashboard';
+    case Feature.experimentalOemPids:
+      return l?.featureLabel_experimentalOemPids ?? 'Experimental OEM PIDs';
   }
 }
 
@@ -577,6 +579,10 @@ String _featureDescription(AppLocalizations? l, Feature f) {
     case Feature.carbonDashboard:
       return l?.featureDescription_carbonDashboard ??
           'CO2 footprint dashboard reachable from the Consumption tab.';
+    case Feature.experimentalOemPids:
+      return l?.featureDescription_experimentalOemPids ??
+          'Read exact tank litres via manufacturer-specific PIDs on '
+              'supported adapters.';
   }
 }
 
@@ -605,6 +611,9 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
           'Enable OBD2 trip recording first';
     case Feature.showConsumptionTab:
       return l?.featureBlockedEnable_showConsumptionTab ??
+          'Enable OBD2 trip recording first';
+    case Feature.experimentalOemPids:
+      return l?.featureBlockedEnable_experimentalOemPids ??
           'Enable OBD2 trip recording first';
     case Feature.tflitePricePrediction:
       return l?.featureBlockedEnable_tflitePricePrediction ??

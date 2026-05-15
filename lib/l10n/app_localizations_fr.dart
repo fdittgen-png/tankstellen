@@ -3941,6 +3941,17 @@ class AppLocalizationsFr extends AppLocalizations {
       'Tableau de bord de l\'empreinte CO2 accessible depuis l\'onglet Consommation.';
 
   @override
+  String get featureLabel_experimentalOemPids => 'PID OEM expérimentaux';
+
+  @override
+  String get featureDescription_experimentalOemPids =>
+      'Lire le niveau exact du réservoir en litres via des PID spécifiques au constructeur sur les adaptateurs compatibles.';
+
+  @override
+  String get featureBlockedEnable_experimentalOemPids =>
+      'Activez d\'abord l\'enregistrement OBD2 des trajets';
+
+  @override
   String get feedbackConsentTitle => 'Envoyer le rapport à GitHub ?';
 
   @override
