@@ -114,7 +114,7 @@ final class ShowConsumptionTabEnabledProvider
 }
 
 String _$showConsumptionTabEnabledHash() =>
-    r'ee0e997da35419922ab33b0101f0350d4365a285';
+    r'7f4e06a34794e6349e6b9e15c3ca1592ef6af4dd';
 
 /// Visibility gate for the consumption analytics tab in the bottom
 /// navigation (#1373 phase 3c).

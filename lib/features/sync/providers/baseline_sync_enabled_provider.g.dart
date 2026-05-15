@@ -99,7 +99,7 @@ final class BaselineSyncEnabledProvider
 }
 
 String _$baselineSyncEnabledHash() =>
-    r'8a46849953aa43c536e5200e65e9d1064af762bf';
+    r'd2a8d202603c3a20adecd5bc02d33079ef8c2f12';
 
 /// Persisted opt-in switch for per-vehicle driving-baseline sync via
 /// TankSync (#780). As of #1373 phase 3e this is a thin shim over

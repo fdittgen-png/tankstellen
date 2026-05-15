@@ -640,13 +640,13 @@ class _TestFeatureFlags extends FeatureFlags {
 
   @override
   Future<void> enable(Feature feature) async {
-    if (state.contains(feature)) return;
-    state = {...state, feature};
+    final current = state.value ?? const <Feature>{}; if (current.contains(feature)) return;
+    state = AsyncData({...current, feature});
   }
 
   @override
   Future<void> disable(Feature feature) async {
-    if (!state.contains(feature)) return;
-    state = {...state}..remove(feature);
+    final current = state.value ?? const <Feature>{}; if (!current.contains(feature)) return;
+    state = AsyncData({...current}..remove(feature));
   }
 }

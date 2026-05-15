@@ -83,6 +83,12 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
     // list — when the gate goes off the diff sees an empty `wanted`
     // set and tears down every active coordinator; when it flips back
     // on the diff re-arms the eligible vehicles.
+    //
+    // #1681 — watch the `featureFlagsProvider` AsyncNotifier directly
+    // (one dependency hop) rather than the derived `enabledFeatures`
+    // view: a `keepAlive` orchestrator with no external listener
+    // rebuilds reliably on a direct dependency change, and the diff
+    // below reads the resolved set via `enabledFeaturesProvider`.
     ref.watch(featureFlagsProvider);
 
     // ref.listen fires on every change to the vehicle list, including
@@ -163,7 +169,7 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
     // value, so the user disabling consumption tracking gets a clean
     // shutdown of the whole hands-free chain.
     final manifest = ref.read(featureManifestProvider);
-    final enabled = ref.read(featureFlagsProvider);
+    final enabled = ref.read(enabledFeaturesProvider);
     final centralEnabled = isEffectivelyEnabled(
       Feature.autoRecord,
       manifest,

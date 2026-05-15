@@ -162,7 +162,7 @@ double? _maybeModelPredict({
   required FeatureVector latest,
 }) {
   final manifest = ref.watch(featureManifestProvider);
-  final enabled = ref.watch(featureFlagsProvider);
+  final enabled = ref.watch(enabledFeaturesProvider);
   if (!isEffectivelyEnabled(
     Feature.tflitePricePrediction,
     manifest,

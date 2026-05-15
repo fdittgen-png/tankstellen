@@ -51,7 +51,7 @@ void main() {
   }
 
   Future<void> pumpLoad(ProviderContainer c) async {
-    c.read(featureFlagsProvider);
+    c.read(enabledFeaturesProvider);
     await Future<void>.delayed(Duration.zero);
     await Future<void>.delayed(Duration.zero);
   }
@@ -99,7 +99,7 @@ void main() {
       await container.read(showFuelEnabledProvider.notifier).set(true);
 
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         contains(Feature.showFuel),
         reason:
             'set(true) must route through featureFlagsProvider.enable so '
@@ -120,7 +120,7 @@ void main() {
       await container.read(showFuelEnabledProvider.notifier).set(false);
 
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         isNot(contains(Feature.showFuel)),
       );
       expect(container.read(showFuelEnabledProvider), isFalse);

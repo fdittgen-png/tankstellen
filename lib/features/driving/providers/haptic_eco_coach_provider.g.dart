@@ -78,7 +78,7 @@ final class HapticEcoCoachEnabledProvider
 }
 
 String _$hapticEcoCoachEnabledHash() =>
-    r'b880f6dd2f782b95a5e1450d6a2ca8c3244241e3';
+    r'fc559e030c6448a2d1a8023cc27e9696c90ef420';
 
 /// Persisted opt-in switch for the real-time eco-coaching haptic
 /// (#1122). As of #1373 phase 3a this is a thin shim over

@@ -53,7 +53,7 @@ void main() {
   }
 
   Future<void> pumpLoad(ProviderContainer c) async {
-    c.read(featureFlagsProvider);
+    c.read(enabledFeaturesProvider);
     await Future<void>.delayed(Duration.zero);
     await Future<void>.delayed(Duration.zero);
   }
@@ -94,7 +94,7 @@ void main() {
       final c = makeContainer();
       await pumpLoad(c);
       await c.read(activeAppProfileProvider.notifier).select(AppProfile.basic);
-      final flags = c.read(featureFlagsProvider);
+      final flags = c.read(enabledFeaturesProvider);
       expect(flags, appProfileBundles[AppProfile.basic]);
       expect(c.read(activeAppProfileProvider), AppProfile.basic);
       expect(profileRepo.load(), AppProfile.basic);
@@ -106,7 +106,7 @@ void main() {
       await c
           .read(activeAppProfileProvider.notifier)
           .select(AppProfile.medium);
-      final flags = c.read(featureFlagsProvider);
+      final flags = c.read(enabledFeaturesProvider);
       expect(flags, contains(Feature.manualConsumption));
       expect(flags, contains(Feature.priceAlerts));
       expect(flags, isNot(contains(Feature.obd2TripRecording)));
@@ -116,7 +116,7 @@ void main() {
       final c = makeContainer();
       await pumpLoad(c);
       await c.read(activeAppProfileProvider.notifier).select(AppProfile.full);
-      final flags = c.read(featureFlagsProvider);
+      final flags = c.read(enabledFeaturesProvider);
       expect(flags, contains(Feature.obd2TripRecording));
       expect(flags, contains(Feature.gamification));
       expect(flags, contains(Feature.loyaltyCards));
@@ -132,14 +132,14 @@ void main() {
       await pumpLoad(c);
       await c.read(activeAppProfileProvider.notifier).select(AppProfile.full);
       await c.read(activeAppProfileProvider.notifier).select(AppProfile.basic);
-      final flags = c.read(featureFlagsProvider);
+      final flags = c.read(enabledFeaturesProvider);
       expect(flags, isNot(contains(Feature.obd2TripRecording)));
       expect(flags, isNot(contains(Feature.gamification)));
       expect(flags, isNot(contains(Feature.loyaltyCards)));
       expect(flags, isNot(contains(Feature.manualConsumption)));
       // Re-applying basic should be a no-op.
       await c.read(activeAppProfileProvider.notifier).select(AppProfile.basic);
-      final flagsAgain = c.read(featureFlagsProvider);
+      final flagsAgain = c.read(enabledFeaturesProvider);
       expect(flagsAgain, flags);
     });
 
@@ -147,11 +147,11 @@ void main() {
       final c = makeContainer();
       await pumpLoad(c);
       await c.read(activeAppProfileProvider.notifier).select(AppProfile.full);
-      final beforeCustom = Set<Feature>.from(c.read(featureFlagsProvider));
+      final beforeCustom = Set<Feature>.from(c.read(enabledFeaturesProvider));
       await c
           .read(activeAppProfileProvider.notifier)
           .select(AppProfile.custom);
-      final afterCustom = c.read(featureFlagsProvider);
+      final afterCustom = c.read(enabledFeaturesProvider);
       expect(afterCustom, beforeCustom);
       expect(c.read(activeAppProfileProvider), AppProfile.custom);
     });

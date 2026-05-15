@@ -31,7 +31,7 @@ List<RouteBase> get consumptionRoutes => [
         builder: (context, state) => Consumer(
           builder: (context, ref, _) {
             final enabled = ref
-                .watch(featureFlagsProvider)
+                .watch(enabledFeaturesProvider)
                 .contains(Feature.carbonDashboard);
             if (!enabled) {
               WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -36,7 +36,7 @@ class ShowFuelEnabled extends _$ShowFuelEnabled {
     // shims and forward-compat (#1447). `Feature.showFuel` has no
     // requires today so the helper short-circuits to `state.contains` —
     // identical observable behaviour to the prior `.contains` call.
-    final enabled = ref.watch(featureFlagsProvider);
+    final enabled = ref.watch(enabledFeaturesProvider);
     final manifest = ref.watch(featureManifestProvider);
     return isEffectivelyEnabled(Feature.showFuel, manifest, enabled);
   }

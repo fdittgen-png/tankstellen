@@ -41,7 +41,7 @@ class GamificationEnabled extends _$GamificationEnabled {
     // of the stored value. Disabling the parent (`obd2TripRecording`)
     // therefore hides the gamification UI without touching the user's
     // gamification preference; re-enabling the parent restores it.
-    final enabled = ref.watch(featureFlagsProvider);
+    final enabled = ref.watch(enabledFeaturesProvider);
     final manifest = ref.watch(featureManifestProvider);
     return isEffectivelyEnabled(Feature.gamification, manifest, enabled);
   }

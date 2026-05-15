@@ -39,7 +39,7 @@ class ShowConsumptionTabEnabled extends _$ShowConsumptionTabEnabled {
     // bottom-nav regardless of the stored `showConsumptionTab` value.
     // The user's tab-visibility preference is preserved so re-enabling
     // trip recording restores the prior layout.
-    final enabled = ref.watch(featureFlagsProvider);
+    final enabled = ref.watch(enabledFeaturesProvider);
     final manifest = ref.watch(featureManifestProvider);
     return isEffectivelyEnabled(Feature.showConsumptionTab, manifest, enabled);
   }

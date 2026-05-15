@@ -64,7 +64,7 @@ void main() {
   /// observe the persisted set rather than the manifest-default
   /// placeholder.
   Future<void> pumpLoad(ProviderContainer c) async {
-    c.read(featureFlagsProvider);
+    c.read(enabledFeaturesProvider);
     await Future<void>.delayed(Duration.zero);
     await Future<void>.delayed(Duration.zero);
   }
@@ -115,7 +115,7 @@ void main() {
           .set(true);
 
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         contains(Feature.unifiedSearchResults),
         reason:
             'set(true) must route through featureFlagsProvider.enable so '
@@ -147,7 +147,7 @@ void main() {
           .set(false);
 
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         isNot(contains(Feature.unifiedSearchResults)),
       );
       expect(container.read(unifiedSearchResultsEnabledProvider), isFalse);
@@ -172,7 +172,7 @@ void main() {
             'state stay in sync.',
       );
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         contains(Feature.unifiedSearchResults),
       );
 
@@ -187,7 +187,7 @@ void main() {
             'verifies both branches of the toggle delegate to set().',
       );
       expect(
-        container.read(featureFlagsProvider),
+        container.read(enabledFeaturesProvider),
         isNot(contains(Feature.unifiedSearchResults)),
       );
     });
@@ -259,7 +259,7 @@ void main() {
               'than crashing on a developer mistake.',
         );
         expect(
-          container.read(featureFlagsProvider),
+          container.read(enabledFeaturesProvider),
           isNot(contains(Feature.unifiedSearchResults)),
         );
       },
@@ -282,14 +282,14 @@ class _TestFeatureFlags extends FeatureFlags {
 
   @override
   Future<void> enable(Feature feature) async {
-    if (state.contains(feature)) return;
-    state = {...state, feature};
+    final current = state.value ?? const <Feature>{}; if (current.contains(feature)) return;
+    state = AsyncData({...current, feature});
   }
 
   @override
   Future<void> disable(Feature feature) async {
-    if (!state.contains(feature)) return;
-    state = {...state}..remove(feature);
+    final current = state.value ?? const <Feature>{}; if (!current.contains(feature)) return;
+    state = AsyncData({...current}..remove(feature));
   }
 }
 

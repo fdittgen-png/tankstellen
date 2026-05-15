@@ -39,7 +39,7 @@ class FeatureManagementSection extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final manifest = ref.watch(featureManifestProvider);
-    final enabled = ref.watch(featureFlagsProvider);
+    final enabled = ref.watch(enabledFeaturesProvider);
 
     // Build groups in manifest declaration order (#1440). A feature with
     // no `requires` (or whose `requires` does not reference an already-
@@ -253,7 +253,7 @@ class _ConsoFeatureCard extends ConsumerWidget {
     for (final f in delta.toRemove) {
       await notifier.disable(f);
     }
-    final newFlags = ref.read(featureFlagsProvider);
+    final newFlags = ref.read(enabledFeaturesProvider);
     await ref
         .read(activeAppProfileProvider.notifier)
         .reconcileWithFlags(newFlags);
@@ -661,7 +661,7 @@ Future<void> _toggleAndReconcile(
   } else {
     await notifier.disable(feature);
   }
-  final newFlags = ref.read(featureFlagsProvider);
+  final newFlags = ref.read(enabledFeaturesProvider);
   await ref
       .read(activeAppProfileProvider.notifier)
       .reconcileWithFlags(newFlags);

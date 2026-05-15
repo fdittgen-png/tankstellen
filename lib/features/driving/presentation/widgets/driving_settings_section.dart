@@ -38,7 +38,7 @@ class DrivingSettingsSection extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final ecoEnabled = ref.watch(hapticEcoCoachEnabledProvider);
-    final flags = ref.watch(featureFlagsProvider);
+    final flags = ref.watch(enabledFeaturesProvider);
     // #1608 — the haptic eco-coach toggle must pre-check the dependency:
     // enabling it while `obd2TripRecording` is off throws a StateError
     // in the central provider. When the parent is off (and the toggle

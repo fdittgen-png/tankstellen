@@ -144,7 +144,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     // so the body never renders the route input. The stored mode value
     // is preserved (re-enabling the feature restores the prior choice).
     final manifest = ref.watch(featureManifestProvider);
-    final enabledFlags = ref.watch(featureFlagsProvider);
+    final enabledFlags = ref.watch(enabledFeaturesProvider);
     final routePlanningOn = isEffectivelyEnabled(
       Feature.routePlanning,
       manifest,
