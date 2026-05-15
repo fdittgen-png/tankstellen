@@ -9,26 +9,28 @@ void main() {
     SharedPreferences.setMockInitialValues(const {});
   });
 
-  group('themeModeSettingProvider (#752)', () {
-    test('defaults to ThemeMode.system on first launch', () async {
+  group('themeModeSettingProvider (#752; Eco theme #1712)', () {
+    test('defaults to AppThemeChoice.system on first launch', () async {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      expect(container.read(themeModeSettingProvider), ThemeMode.system);
+      expect(
+        container.read(themeModeSettingProvider),
+        AppThemeChoice.system,
+      );
     });
 
-    test('restores a previously-persisted ThemeMode on startup', () async {
+    test('restores a previously-persisted choice on startup', () async {
       SharedPreferences.setMockInitialValues(const {
         'settings.themeMode': 'dark',
       });
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      // _load fires async on build; give the microtask queue a chance.
       container.read(themeModeSettingProvider);
       await Future<void>.delayed(Duration.zero);
 
-      expect(container.read(themeModeSettingProvider), ThemeMode.dark);
+      expect(container.read(themeModeSettingProvider), AppThemeChoice.dark);
     });
 
     test('set() updates the in-memory state and persists to prefs',
@@ -38,9 +40,9 @@ void main() {
 
       await container
           .read(themeModeSettingProvider.notifier)
-          .set(ThemeMode.light);
+          .set(AppThemeChoice.light);
 
-      expect(container.read(themeModeSettingProvider), ThemeMode.light);
+      expect(container.read(themeModeSettingProvider), AppThemeChoice.light);
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getString('settings.themeMode'), 'light');
     });
@@ -51,7 +53,7 @@ void main() {
 
       await container
           .read(themeModeSettingProvider.notifier)
-          .set(ThemeMode.system);
+          .set(AppThemeChoice.system);
 
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getString('settings.themeMode'), 'system');
@@ -67,7 +69,51 @@ void main() {
       container.read(themeModeSettingProvider);
       await Future<void>.delayed(Duration.zero);
 
-      expect(container.read(themeModeSettingProvider), ThemeMode.system);
+      expect(
+        container.read(themeModeSettingProvider),
+        AppThemeChoice.system,
+      );
+    });
+
+    group('Eco theme (#1712)', () {
+      test('set(eco) updates state and persists the "eco" keyword',
+          () async {
+        final container = ProviderContainer();
+        addTearDown(container.dispose);
+
+        await container
+            .read(themeModeSettingProvider.notifier)
+            .set(AppThemeChoice.eco);
+
+        expect(container.read(themeModeSettingProvider), AppThemeChoice.eco);
+        final prefs = await SharedPreferences.getInstance();
+        expect(prefs.getString('settings.themeMode'), 'eco');
+      });
+
+      test('restores a persisted "eco" choice on startup', () async {
+        SharedPreferences.setMockInitialValues(const {
+          'settings.themeMode': 'eco',
+        });
+        final container = ProviderContainer();
+        addTearDown(container.dispose);
+
+        container.read(themeModeSettingProvider);
+        await Future<void>.delayed(Duration.zero);
+
+        expect(container.read(themeModeSettingProvider), AppThemeChoice.eco);
+      });
+
+      test('eco resolves to the light ThemeMode slot', () {
+        // The Eco theme is light-family — never dark. The app supplies
+        // AppTheme.eco() as MaterialApp.theme when this choice is active.
+        expect(AppThemeChoice.eco.themeMode, ThemeMode.light);
+      });
+
+      test('each choice maps to the expected ThemeMode', () {
+        expect(AppThemeChoice.system.themeMode, ThemeMode.system);
+        expect(AppThemeChoice.light.themeMode, ThemeMode.light);
+        expect(AppThemeChoice.dark.themeMode, ThemeMode.dark);
+      });
     });
   });
 }

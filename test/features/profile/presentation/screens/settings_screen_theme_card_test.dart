@@ -14,14 +14,14 @@ import '../../../../mocks/mocks.dart';
 /// skips the real provider's SharedPreferences load — it would fail in
 /// widget tests where plugin channels are not registered.
 class _FixedThemeMode extends ThemeModeSetting {
-  final ThemeMode _initial;
+  final AppThemeChoice _initial;
   _FixedThemeMode(this._initial);
 
   @override
-  ThemeMode build() => _initial;
+  AppThemeChoice build() => _initial;
 
   @override
-  Future<void> set(ThemeMode mode) async {
+  Future<void> set(AppThemeChoice mode) async {
     state = mode;
   }
 }
@@ -30,7 +30,7 @@ void main() {
   group('ProfileScreen Theme card (#897)', () {
     late MockHiveStorage mockStorage;
 
-    List<Object> buildOverrides(ThemeMode themeMode) {
+    List<Object> buildOverrides(AppThemeChoice themeMode) {
       mockStorage = MockHiveStorage();
       when(() => mockStorage.hasApiKey()).thenReturn(false);
       when(() => mockStorage.getApiKey()).thenReturn(null);
@@ -72,7 +72,7 @@ void main() {
       await pumpApp(
         tester,
         const ProfileScreen(),
-        overrides: buildOverrides(ThemeMode.system),
+        overrides: buildOverrides(AppThemeChoice.system),
       );
 
       // Scroll so the Theme card is realized in the ListView.
@@ -98,7 +98,7 @@ void main() {
         themeTiles.single.subtitle,
         'System',
         reason: '#897: the Theme card subtitle reflects the active '
-            'ThemeMode.system — "System"',
+            'AppThemeChoice.system — "System"',
       );
     });
 
@@ -107,7 +107,7 @@ void main() {
       await pumpApp(
         tester,
         const ProfileScreen(),
-        overrides: buildOverrides(ThemeMode.light),
+        overrides: buildOverrides(AppThemeChoice.light),
       );
 
       await tester.scrollUntilVisible(
@@ -127,7 +127,7 @@ void main() {
       await pumpApp(
         tester,
         const ProfileScreen(),
-        overrides: buildOverrides(ThemeMode.dark),
+        overrides: buildOverrides(AppThemeChoice.dark),
       );
 
       await tester.scrollUntilVisible(
@@ -148,7 +148,7 @@ void main() {
       await pumpApp(
         tester,
         const ProfileScreen(),
-        overrides: buildOverrides(ThemeMode.system),
+        overrides: buildOverrides(AppThemeChoice.system),
       );
 
       // The bespoke Theme bottom-sheet tile had key 'themeModeTile'.

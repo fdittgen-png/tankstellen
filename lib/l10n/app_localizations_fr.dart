@@ -4640,6 +4640,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Arrière-plans sombres — plus doux pour les yeux la nuit et économe en batterie sur les écrans OLED.';
 
   @override
+  String get themeSettingsEcoLabel => 'Éco';
+
+  @override
+  String get themeSettingsEcoDescription =>
+      'Le look vert emblématique de l\'application — clair et facile à lire, avec des arrière-plans légèrement teintés de vert.';
+
+  @override
   String get throttleRpmHistogramTitle => 'How you used the engine';
 
   @override

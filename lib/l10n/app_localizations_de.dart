@@ -4636,6 +4636,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dunkle Hintergründe — augenschonend bei Nacht und stromsparend auf OLED-Displays.';
 
   @override
+  String get themeSettingsEcoLabel => 'Öko';
+
+  @override
+  String get themeSettingsEcoDescription =>
+      'Der charakteristische grüne Look der App — hell und gut lesbar, mit sanft grün getönten Hintergründen.';
+
+  @override
   String get throttleRpmHistogramTitle => 'So hast du den Motor genutzt';
 
   @override

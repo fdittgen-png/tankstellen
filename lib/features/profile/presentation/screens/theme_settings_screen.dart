@@ -5,67 +5,74 @@ import '../../../../core/theme/theme_mode_provider.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 
-/// Dedicated Theme settings screen (#897).
+/// Dedicated Theme settings screen (#897; Eco theme added #1712).
 ///
 /// Opened from the Theme [SettingsMenuTile] on the profile/settings
-/// screen. Presents the three theme-mode choices (System / Light /
-/// Dark) as full-width radio rows with descriptive copy below each
+/// screen. Presents the four theme choices (System / Light / Dark /
+/// Eco) as full-width radio rows with descriptive copy below each
 /// option — the same layout convention as `PrivacyDashboardScreen`:
-/// `Scaffold` + `AppBar` + `ListView` body with 16 dp padding.
-///
-/// The picker was previously inlined on the Settings screen as a
-/// `Card` + bottom sheet (`ThemeModeTile`). Extracting it here lets
-/// the Theme entry match the Privacy and Storage entries, which both
-/// push to a dedicated screen rather than opening a sheet.
+/// `PageScaffold` + `ListView` body with 16 dp padding.
 class ThemeSettingsScreen extends ConsumerWidget {
   const ThemeSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
-    final mode = ref.watch(themeModeSettingProvider);
+    final choice = ref.watch(themeModeSettingProvider);
 
     return PageScaffold(
       title: l?.themeSettingsScreenTitle ?? 'Theme',
       bodyPadding: EdgeInsets.zero,
-      body: RadioGroup<ThemeMode>(
-        groupValue: mode,
+      body: RadioGroup<AppThemeChoice>(
+        groupValue: choice,
         onChanged: (picked) => _select(ref, picked),
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            _ThemeModeOption(
-              mode: ThemeMode.system,
+            _ThemeChoiceOption(
+              choice: AppThemeChoice.system,
               icon: Icons.smartphone,
               label: l?.themeSettingsSystemLabel ?? 'Follow system',
               description: l?.themeSettingsSystemDescription ??
                   'Match the current device appearance.',
-              selected: mode == ThemeMode.system,
-              onTap: () => _select(ref, ThemeMode.system),
+              selected: choice == AppThemeChoice.system,
+              onTap: () => _select(ref, AppThemeChoice.system),
               keyValue: 'themeSettingsOptionSystem',
             ),
             const SizedBox(height: 8),
-            _ThemeModeOption(
-              mode: ThemeMode.light,
+            _ThemeChoiceOption(
+              choice: AppThemeChoice.light,
               icon: Icons.light_mode,
               label: l?.themeSettingsLightLabel ?? 'Light',
               description: l?.themeSettingsLightDescription ??
                   'Bright backgrounds — best for daytime use.',
-              selected: mode == ThemeMode.light,
-              onTap: () => _select(ref, ThemeMode.light),
+              selected: choice == AppThemeChoice.light,
+              onTap: () => _select(ref, AppThemeChoice.light),
               keyValue: 'themeSettingsOptionLight',
             ),
             const SizedBox(height: 8),
-            _ThemeModeOption(
-              mode: ThemeMode.dark,
+            _ThemeChoiceOption(
+              choice: AppThemeChoice.dark,
               icon: Icons.dark_mode,
               label: l?.themeSettingsDarkLabel ?? 'Dark',
               description: l?.themeSettingsDarkDescription ??
                   'Dark backgrounds — easier on the eyes at night and '
                       'saves battery on OLED screens.',
-              selected: mode == ThemeMode.dark,
-              onTap: () => _select(ref, ThemeMode.dark),
+              selected: choice == AppThemeChoice.dark,
+              onTap: () => _select(ref, AppThemeChoice.dark),
               keyValue: 'themeSettingsOptionDark',
+            ),
+            const SizedBox(height: 8),
+            _ThemeChoiceOption(
+              choice: AppThemeChoice.eco,
+              icon: Icons.energy_savings_leaf,
+              label: l?.themeSettingsEcoLabel ?? 'Eco',
+              description: l?.themeSettingsEcoDescription ??
+                  "The app's signature green look — bright and easy "
+                      'to read, with softly green-tinted backgrounds.',
+              selected: choice == AppThemeChoice.eco,
+              onTap: () => _select(ref, AppThemeChoice.eco),
+              keyValue: 'themeSettingsOptionEco',
             ),
             SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 16),
           ],
@@ -74,7 +81,7 @@ class ThemeSettingsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _select(WidgetRef ref, ThemeMode? picked) async {
+  Future<void> _select(WidgetRef ref, AppThemeChoice? picked) async {
     if (picked == null) return;
     await ref.read(themeModeSettingProvider.notifier).set(picked);
   }
@@ -82,8 +89,8 @@ class ThemeSettingsScreen extends ConsumerWidget {
 
 /// A single radio row on the theme settings screen — card-wrapped
 /// for visual parity with the rest of the profile surface.
-class _ThemeModeOption extends StatelessWidget {
-  final ThemeMode mode;
+class _ThemeChoiceOption extends StatelessWidget {
+  final AppThemeChoice choice;
   final bool selected;
   final IconData icon;
   final String label;
@@ -91,8 +98,8 @@ class _ThemeModeOption extends StatelessWidget {
   final VoidCallback onTap;
   final String keyValue;
 
-  const _ThemeModeOption({
-    required this.mode,
+  const _ThemeChoiceOption({
+    required this.choice,
     required this.selected,
     required this.icon,
     required this.label,
@@ -115,7 +122,7 @@ class _ThemeModeOption extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Radio<ThemeMode>(value: mode),
+              Radio<AppThemeChoice>(value: choice),
               const SizedBox(width: 4),
               Icon(icon, size: 20),
               const SizedBox(width: 12),
