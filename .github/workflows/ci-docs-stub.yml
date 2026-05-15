@@ -22,7 +22,19 @@ jobs:
     steps:
       - run: echo "docs-only change — analyze skipped (stub passes for branch protection)"
 
+  # Mirror the sharded matrix from ci.yml (#1581) so the required-status
+  # check names `test (0)..test (3)` resolve on docs-only PRs. Without
+  # this, branch protection blocks every docs PR with `mergeStateStatus: BLOCKED`.
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shard: [0, 1, 2, 3]
     steps:
-      - run: echo "docs-only change — test skipped (stub passes for branch protection)"
+      - run: echo "docs-only change — test shard ${{ matrix.shard }} skipped (stub passes for branch protection)"
+
+  coverage-merge:
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - run: echo "docs-only change — coverage-merge skipped (stub passes for branch protection)"
