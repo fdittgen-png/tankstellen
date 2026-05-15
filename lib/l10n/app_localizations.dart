@@ -7136,6 +7136,24 @@ abstract class AppLocalizations {
   /// **'CO2 footprint dashboard reachable from the Consumption tab.'**
   String get featureDescription_carbonDashboard;
 
+  /// Settings toggle label for the experimental OEM-PID exact-fuel-level feature (#1615).
+  ///
+  /// In en, this message translates to:
+  /// **'Experimental OEM PIDs'**
+  String get featureLabel_experimentalOemPids;
+
+  /// Settings toggle description for the experimental OEM-PID exact-fuel-level feature (#1615).
+  ///
+  /// In en, this message translates to:
+  /// **'Read exact tank litres via manufacturer-specific PIDs on supported adapters.'**
+  String get featureDescription_experimentalOemPids;
+
+  /// Shown when the user taps the experimental OEM-PID toggle while its OBD2-trip-recording prerequisite is off (#1615).
+  ///
+  /// In en, this message translates to:
+  /// **'Enable OBD2 trip recording first'**
+  String get featureBlockedEnable_experimentalOemPids;
+
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
   /// In en, this message translates to:

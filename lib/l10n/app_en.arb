@@ -2423,6 +2423,18 @@
   "@featureDescription_carbonDashboard": {
     "description": "Settings toggle description for the Carbon dashboard feature (#1613)."
   },
+  "featureLabel_experimentalOemPids": "Experimental OEM PIDs",
+  "@featureLabel_experimentalOemPids": {
+    "description": "Settings toggle label for the experimental OEM-PID exact-fuel-level feature (#1615)."
+  },
+  "featureDescription_experimentalOemPids": "Read exact tank litres via manufacturer-specific PIDs on supported adapters.",
+  "@featureDescription_experimentalOemPids": {
+    "description": "Settings toggle description for the experimental OEM-PID exact-fuel-level feature (#1615)."
+  },
+  "featureBlockedEnable_experimentalOemPids": "Enable OBD2 trip recording first",
+  "@featureBlockedEnable_experimentalOemPids": {
+    "description": "Shown when the user taps the experimental OEM-PID toggle while its OBD2-trip-recording prerequisite is off (#1615)."
+  },
   "feedbackConsentTitle": "Send report to GitHub?",
   "@feedbackConsentTitle": {
     "description": "Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3)."

@@ -3901,6 +3901,17 @@ class AppLocalizationsDa extends AppLocalizations {
       'CO2 footprint dashboard reachable from the Consumption tab.';
 
   @override
+  String get featureLabel_experimentalOemPids => 'Experimental OEM PIDs';
+
+  @override
+  String get featureDescription_experimentalOemPids =>
+      'Read exact tank litres via manufacturer-specific PIDs on supported adapters.';
+
+  @override
+  String get featureBlockedEnable_experimentalOemPids =>
+      'Enable OBD2 trip recording first';
+
+  @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
 
   @override

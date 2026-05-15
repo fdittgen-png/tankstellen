@@ -35,6 +35,7 @@ const List<FeatureClass> featureRegistry = <FeatureClass>[
   kFeatureGpsTripPath,
   kFeatureAutoRecord,
   kFeatureShowConsumptionTab,
+  kFeatureExperimentalOemPids,
 
   // Child of tankSync
   kFeatureBaselineSync,

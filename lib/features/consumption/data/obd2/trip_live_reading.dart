@@ -15,6 +15,16 @@ class TripLiveReading {
   final double? rpm;
   final double? fuelRateLPerHour;
   final double? fuelLevelPercent;
+
+  /// Exact tank fuel level in litres from an OEM-specific PID
+  /// (#1615). Non-null only when the `experimentalOemPids` flag is on
+  /// AND the connected adapter is OEM-PID-capable AND a manufacturer
+  /// table resolved for the vehicle's VIN — otherwise null, and
+  /// consumers fall back to the coarse `fuelLevelPercent × capacity`
+  /// conversion. Independent of [fuelLevelPercent]: the standard PID
+  /// `0x2F` percentage keeps flowing regardless.
+  final double? fuelLevelLitres;
+
   final double? engineLoadPercent;
 
   /// Absolute throttle position, 0–100 %. Subscribed to the 5 Hz tier
@@ -41,6 +51,7 @@ class TripLiveReading {
     this.rpm,
     this.fuelRateLPerHour,
     this.fuelLevelPercent,
+    this.fuelLevelLitres,
     this.engineLoadPercent,
     this.throttlePercent,
     this.coolantTempC,

@@ -40,13 +40,14 @@ part of 'current_obd2_fuel_level_provider.dart';
 ///   * no active vehicle profile, or its [tankCapacityL] is null /
 ///     non-positive (we can't convert).
 ///
-/// PSA OEM-PID / passive-CAN paths (#1415, #1417, #1420) emit litres
-/// natively but their producer wiring into Riverpod is not yet
-/// complete — the data-layer service that owns those streams is
-/// privately held by the trip-recording stack today (see comments in
-/// [psaFuelLevelObd2ServiceProvider]). When that wiring lands, this
-/// provider can prefer the native litres source and skip the
-/// percent×capacity conversion entirely.
+/// OEM-PID native-litres path (#1615): when the `experimentalOemPids`
+/// flag is on and an OEM-capable adapter resolved a manufacturer table,
+/// the trip-recording fuel sampler populates
+/// [TripLiveReading.fuelLevelLitres] with the exact litres read via the
+/// OEM-PID registry. This provider prefers that native source and skips
+/// the percent×capacity conversion entirely. When the field is null
+/// (flag off, incapable adapter, or no table for the VIN) the coarse
+/// percent×capacity path below runs unchanged.
 
 @ProviderFor(currentObd2FuelLevelLitres)
 final currentObd2FuelLevelLitresProvider =
@@ -84,13 +85,14 @@ final currentObd2FuelLevelLitresProvider =
 ///   * no active vehicle profile, or its [tankCapacityL] is null /
 ///     non-positive (we can't convert).
 ///
-/// PSA OEM-PID / passive-CAN paths (#1415, #1417, #1420) emit litres
-/// natively but their producer wiring into Riverpod is not yet
-/// complete — the data-layer service that owns those streams is
-/// privately held by the trip-recording stack today (see comments in
-/// [psaFuelLevelObd2ServiceProvider]). When that wiring lands, this
-/// provider can prefer the native litres source and skip the
-/// percent×capacity conversion entirely.
+/// OEM-PID native-litres path (#1615): when the `experimentalOemPids`
+/// flag is on and an OEM-capable adapter resolved a manufacturer table,
+/// the trip-recording fuel sampler populates
+/// [TripLiveReading.fuelLevelLitres] with the exact litres read via the
+/// OEM-PID registry. This provider prefers that native source and skips
+/// the percent×capacity conversion entirely. When the field is null
+/// (flag off, incapable adapter, or no table for the VIN) the coarse
+/// percent×capacity path below runs unchanged.
 
 final class CurrentObd2FuelLevelLitresProvider
     extends $FunctionalProvider<double?, double?, double?>
@@ -127,13 +129,14 @@ final class CurrentObd2FuelLevelLitresProvider
   ///   * no active vehicle profile, or its [tankCapacityL] is null /
   ///     non-positive (we can't convert).
   ///
-  /// PSA OEM-PID / passive-CAN paths (#1415, #1417, #1420) emit litres
-  /// natively but their producer wiring into Riverpod is not yet
-  /// complete — the data-layer service that owns those streams is
-  /// privately held by the trip-recording stack today (see comments in
-  /// [psaFuelLevelObd2ServiceProvider]). When that wiring lands, this
-  /// provider can prefer the native litres source and skip the
-  /// percent×capacity conversion entirely.
+  /// OEM-PID native-litres path (#1615): when the `experimentalOemPids`
+  /// flag is on and an OEM-capable adapter resolved a manufacturer table,
+  /// the trip-recording fuel sampler populates
+  /// [TripLiveReading.fuelLevelLitres] with the exact litres read via the
+  /// OEM-PID registry. This provider prefers that native source and skips
+  /// the percent×capacity conversion entirely. When the field is null
+  /// (flag off, incapable adapter, or no table for the VIN) the coarse
+  /// percent×capacity path below runs unchanged.
   CurrentObd2FuelLevelLitresProvider._()
     : super(
         from: null,
@@ -168,4 +171,4 @@ final class CurrentObd2FuelLevelLitresProvider
 }
 
 String _$currentObd2FuelLevelLitresHash() =>
-    r'7e989a3321f641df7c42a0e95822850224bddb7d';
+    r'993b6f89c0a10892656fcca6866851a0d485418d';

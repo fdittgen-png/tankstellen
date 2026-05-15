@@ -3937,6 +3937,17 @@ class AppLocalizationsDe extends AppLocalizations {
       'CO2-Bilanz-Dashboard, erreichbar über den Verbrauch-Tab.';
 
   @override
+  String get featureLabel_experimentalOemPids => 'Experimentelle OEM-PIDs';
+
+  @override
+  String get featureDescription_experimentalOemPids =>
+      'Exakte Tankfüllung in Litern über herstellerspezifische PIDs auf unterstützten Adaptern auslesen.';
+
+  @override
+  String get featureBlockedEnable_experimentalOemPids =>
+      'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
+
+  @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';
 
   @override

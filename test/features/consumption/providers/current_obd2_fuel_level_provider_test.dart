@@ -39,11 +39,13 @@ class _StubActiveVehicle extends ActiveVehicleProfile {
 void main() {
   TripRecordingState recordingWith({
     double? fuelLevelPercent,
+    double? fuelLevelLitres,
   }) {
     return TripRecordingState(
       phase: TripRecordingPhase.recording,
       live: TripLiveReading(
         fuelLevelPercent: fuelLevelPercent,
+        fuelLevelLitres: fuelLevelLitres,
         distanceKmSoFar: 0,
         elapsed: const Duration(seconds: 1),
       ),
@@ -234,6 +236,69 @@ void main() {
       expect(
         c.read(currentObd2FuelLevelLitresProvider),
         closeTo(22.5, 0.0001),
+      );
+    });
+  });
+
+  group('currentObd2FuelLevelLitresProvider — OEM-PID native litres (#1615)',
+      () {
+    test('prefers the exact OEM litres over the percent×capacity path', () {
+      // When the trip-recording sampler has populated fuelLevelLitres
+      // (flag on + OEM-capable adapter), the provider returns that
+      // value verbatim — NOT 50 % × 50 L = 25 L. The OEM read is exact;
+      // the percentage path is the coarse fallback.
+      final c = makeContainer(
+        tripState: recordingWith(fuelLevelPercent: 50, fuelLevelLitres: 41.5),
+        activeVehicle: vehicleWithCapacity,
+      );
+
+      expect(
+        c.read(currentObd2FuelLevelLitresProvider),
+        closeTo(41.5, 0.0001),
+      );
+    });
+
+    test('OEM litres are returned even with no vehicle / no capacity', () {
+      // The OEM read is litres-native, so it does not need the
+      // user-entered tank capacity at all — it must surface even when
+      // the percent path would have been gated out by a null capacity.
+      final c = makeContainer(
+        tripState: recordingWith(fuelLevelLitres: 33.0),
+        activeVehicle: null,
+      );
+
+      expect(
+        c.read(currentObd2FuelLevelLitresProvider),
+        closeTo(33.0, 0.0001),
+      );
+    });
+
+    test('falls through to percent×capacity when OEM litres are null', () {
+      // Flag off / incapable adapter / no table for the VIN — the
+      // sampler leaves fuelLevelLitres null and the coarse path runs
+      // unchanged (50 % × 50 L = 25 L).
+      final c = makeContainer(
+        tripState: recordingWith(fuelLevelPercent: 50, fuelLevelLitres: null),
+        activeVehicle: vehicleWithCapacity,
+      );
+
+      expect(
+        c.read(currentObd2FuelLevelLitresProvider),
+        closeTo(25, 0.0001),
+      );
+    });
+
+    test('a negative OEM litres value falls through to the percent path', () {
+      // Defensive: a corrupt/negative OEM read is treated as "no
+      // reading" and the percent×capacity fallback takes over.
+      final c = makeContainer(
+        tripState: recordingWith(fuelLevelPercent: 50, fuelLevelLitres: -1),
+        activeVehicle: vehicleWithCapacity,
+      );
+
+      expect(
+        c.read(currentObd2FuelLevelLitresProvider),
+        closeTo(25, 0.0001),
       );
     });
   });
