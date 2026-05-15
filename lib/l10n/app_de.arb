@@ -1238,6 +1238,8 @@
   "velocityAlertTitle": "{fuelLabel} an Tankstellen in der Nähe gefallen",
   "velocityAlertBody": "{stationCount} Tankstellen um bis zu {maxDropCents}¢ in der letzten Stunde gefallen",
   "fillUpSavedSnackbar": "Tankvorgang gespeichert",
+  "radiusAlertsEntryTitle": "Umkreis-Alarme & Statistik",
+  "radiusAlertsEntrySubtitle": "Werde benachrichtigt, wenn die Preise in deiner Nähe fallen",
   "achievementSmoothDriver": "Ruhige Serie",
   "@achievementSmoothDriver": {
     "description": "Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5)."

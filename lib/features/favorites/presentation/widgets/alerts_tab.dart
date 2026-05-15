@@ -21,15 +21,36 @@ class AlertsTab extends StatelessWidget {
 
     return Consumer(builder: (context, ref, _) {
       final alerts = ref.watch(alertProvider);
-      if (alerts.isEmpty) {
-        return EmptyState(
-          icon: Icons.notifications_off_outlined,
-          title: l10n?.noPriceAlerts ?? 'No price alerts',
-          subtitle: l10n?.noPriceAlertsHint ??
-              'Create an alert from a station\'s detail page.',
-        );
-      }
+      // The radius-alerts + statistics entry is always shown — it is
+      // the only navigation path to the `/alerts` screen (#1701), so it
+      // must be reachable whether or not the user has price alerts.
+      final body = alerts.isEmpty
+          ? EmptyState(
+              icon: Icons.notifications_off_outlined,
+              title: l10n?.noPriceAlerts ?? 'No price alerts',
+              subtitle: l10n?.noPriceAlertsHint ??
+                  'Create an alert from a station\'s detail page.',
+            )
+          : _priceAlertsList(context, ref, l10n);
       return Column(
+        children: [
+          const _RadiusAlertsEntry(),
+          Expanded(child: body),
+        ],
+      );
+    });
+  }
+
+  Widget _priceAlertsList(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations? l10n,
+  ) {
+    // Re-read here (cheap, idempotent) so the helper carries no
+    // explicit alert-model type — keeping favorites/presentation off a
+    // direct import of the alerts feature's data layer.
+    final alerts = ref.watch(alertProvider);
+    return Column(
         children: [
           HelpBanner(
             storageKey: StorageKeys.helpBannerAlerts,
@@ -99,6 +120,62 @@ class AlertsTab extends StatelessWidget {
           ),
         ],
       );
-    });
+  }
+}
+
+/// Tappable entry on the Alerts tab that opens the radius-alerts +
+/// statistics screen at `/alerts` (#1701).
+///
+/// `/alerts` (`AlertsScreen` — radius alerts + `AlertStatisticsCard`)
+/// had no `context.go`/`push` anywhere, so the whole radius-alerts
+/// feature was unreachable. This entry is the navigation path; it sits
+/// above the price-alert list and shows in the empty state too, so it
+/// is always reachable.
+class _RadiusAlertsEntry extends StatelessWidget {
+  const _RadiusAlertsEntry();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Card(
+      margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+      child: InkWell(
+        key: const Key('radiusAlertsEntry'),
+        onTap: () => context.push('/alerts'),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Icon(Icons.radar, color: theme.colorScheme.primary),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n?.radiusAlertsEntryTitle ??
+                          'Radius alerts & statistics',
+                      style: theme.textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n?.radiusAlertsEntrySubtitle ??
+                          'Get notified when prices drop near you',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right,
+                  color: theme.colorScheme.onSurfaceVariant),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

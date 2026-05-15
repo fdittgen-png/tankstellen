@@ -1237,5 +1237,7 @@
   "obd2ConnectedTooltip": "OBD2 verbunden: {adapterName}",
   "velocityAlertTitle": "{fuelLabel} an Tankstellen in der Nähe gefallen",
   "velocityAlertBody": "{stationCount} Tankstellen um bis zu {maxDropCents}¢ in der letzten Stunde gefallen",
-  "fillUpSavedSnackbar": "Tankvorgang gespeichert"
+  "fillUpSavedSnackbar": "Tankvorgang gespeichert",
+  "radiusAlertsEntryTitle": "Umkreis-Alarme & Statistik",
+  "radiusAlertsEntrySubtitle": "Werde benachrichtigt, wenn die Preise in deiner Nähe fallen"
 }
