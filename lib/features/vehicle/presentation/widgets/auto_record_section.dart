@@ -4,6 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/widgets/section_card.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/vehicle_profile.dart';
 import '../../providers/vehicle_providers.dart';
@@ -239,7 +240,6 @@ class AutoRecordSection extends ConsumerWidget {
     required VehicleProfile profile,
     required AppLocalizations? l,
   }) async {
-    final messenger = ScaffoldMessenger.maybeOf(context);
     final navigator = Navigator.maybeOf(context);
     final foregroundPrompt =
         requestForegroundLocation ?? _defaultRequestForegroundLocation;
@@ -252,13 +252,10 @@ class AutoRecordSection extends ConsumerWidget {
       final fgStatus = await foregroundPrompt();
       if (!fgStatus.isGranted) {
         if (!context.mounted) return;
-        messenger?.showSnackBar(
-          SnackBar(
-            content: Text(
-              l?.autoRecordBackgroundLocationForegroundDeniedSnackbar ??
-                  'Location permission required',
-            ),
-          ),
+        SnackBarHelper.show(
+          context,
+          l?.autoRecordBackgroundLocationForegroundDeniedSnackbar ??
+              'Location permission required',
         );
         return;
       }
@@ -309,13 +306,10 @@ class AutoRecordSection extends ConsumerWidget {
         },
       );
       if (!context.mounted) return;
-      messenger?.showSnackBar(
-        SnackBar(
-          content: Text(
-            l?.autoRecordBackgroundLocationRequestFailedSnackbar ??
-                'Could not request background location',
-          ),
-        ),
+      SnackBarHelper.showError(
+        context,
+        l?.autoRecordBackgroundLocationRequestFailedSnackbar ??
+            'Could not request background location',
       );
     }
   }

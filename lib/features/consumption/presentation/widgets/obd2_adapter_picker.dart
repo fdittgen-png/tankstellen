@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/obd2/adapter_registry.dart';
@@ -79,11 +80,9 @@ Future<Obd2Service?> _showPickerSheet(
     if (messenger != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         messenger.showSnackBar(
-          SnackBar(
-            content: Text(
-              l?.obd2PickerPinnedFallback(fallbackAdapterName) ??
-                  "Couldn't reach '$fallbackAdapterName' — pick another adapter",
-            ),
+          SnackBarHelper.infoSnackBar(
+            l?.obd2PickerPinnedFallback(fallbackAdapterName) ??
+                "Couldn't reach '$fallbackAdapterName' — pick another adapter",
           ),
         );
       });

@@ -7,6 +7,7 @@ import '../../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../../core/sharing/widget_share_renderer.dart';
 import '../../../../core/sync/trips_sync.dart';
 import '../../../../core/widgets/page_scaffold.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
@@ -252,6 +253,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     final subject = l?.trajetDetailShareSubject(formattedDate) ??
         'Sparkilo — trip on $formattedDate';
     final messenger = ScaffoldMessenger.maybeOf(context);
+    final scheme = Theme.of(context).colorScheme;
     final renderer = debugTripDetailShareOverride ?? shareWidgetAsImage;
     try {
       await renderer(
@@ -267,7 +269,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       if (messenger == null) return;
       final errorMsg = l?.trajetDetailShareError ??
           "Couldn't generate share image";
-      messenger.showSnackBar(SnackBar(content: Text(errorMsg)));
+      messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));
     }
   }
 

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/sharing/widget_share_renderer.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/widgets/page_scaffold.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/tab_switcher.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/favorites_provider.dart';
@@ -151,6 +152,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
     final fileNameStem =
         'tankstellen_favorites_${DateFormat('yyyyMMdd').format(DateTime.now())}';
     final messenger = ScaffoldMessenger.maybeOf(context);
+    final scheme = Theme.of(context).colorScheme;
     try {
       await shareWidgetAsImage(
         boundaryKey: _shareBoundaryKey,
@@ -165,7 +167,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
       if (messenger == null) return;
       final errorMsg = l10n?.favoritesShareError ??
           "Couldn't generate share image";
-      messenger.showSnackBar(SnackBar(content: Text(errorMsg)));
+      messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));
     }
   }
 }

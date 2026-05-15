@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/brand_logo_mapper.dart';
 import '../../../../core/widgets/page_scaffold.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2_vin_reader.dart';
 import '../../data/reference_vehicle_catalog_provider.dart';
@@ -314,9 +315,8 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     final l = AppLocalizations.of(context);
     final vin = _ctrl.vinController.text.trim();
     if (vin.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l?.vinInvalidFormat ?? 'Invalid VIN format')),
-      );
+      SnackBarHelper.show(
+          context, l?.vinInvalidFormat ?? 'Invalid VIN format');
       return;
     }
 
@@ -332,12 +332,11 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
 
     if (decoded == null || decoded.source == VinDataSource.invalid) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(decoded == null
-              ? (l?.vinDecodeError ?? "Couldn't decode this VIN")
-              : (l?.vinInvalidFormat ?? 'Invalid VIN format')),
-        ),
+      SnackBarHelper.showError(
+        context,
+        decoded == null
+            ? (l?.vinDecodeError ?? "Couldn't decode this VIN")
+            : (l?.vinInvalidFormat ?? 'Invalid VIN format'),
       );
       return;
     }
@@ -390,13 +389,12 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
       return;
     }
 
-    final messenger = ScaffoldMessenger.of(context);
     final message = result.failure == ObdVinFailureReason.unsupported
         ? (l?.vehicleReadVinFailedUnsupportedSnackbar ??
             'VIN not available (Mode 09 PID 02 unsupported on pre-2005 vehicles)')
         : (l?.vehicleReadVinFailedGenericSnackbar ??
             'VIN read failed — please enter manually');
-    messenger.showSnackBar(SnackBar(content: Text(message)));
+    SnackBarHelper.show(context, message);
   }
 
   void _onAdapterChanged(String? name, String? mac) {
@@ -457,17 +455,13 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     final summary = outcome.conflictSummary;
     if (summary == null) return;
     final l = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(
-          l?.vehicleDetectedFromVinSnackbar(summary) ??
-              'Detected from VIN: $summary. Apply?',
-        ),
-        action: SnackBarAction(
-          label: l?.vehicleDetectedFromVinApply ?? 'Apply',
-          onPressed: () => _applyDetectedConflicts(updated),
-        ),
+    SnackBarHelper.show(
+      context,
+      l?.vehicleDetectedFromVinSnackbar(summary) ??
+          'Detected from VIN: $summary. Apply?',
+      action: SnackBarAction(
+        label: l?.vehicleDetectedFromVinApply ?? 'Apply',
+        onPressed: () => _applyDetectedConflicts(updated),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/cold_start_baselines.dart';
 import '../../domain/situation_classifier.dart';
@@ -87,11 +88,9 @@ class TripRecordingBanner extends ConsumerWidget {
                       return;
                     }
                     final messenger = ScaffoldMessenger.maybeOf(context);
-                    messenger?.showSnackBar(SnackBar(
-                      content: Text(
-                        l?.tripBannerOpenFromConsumptionTab ??
-                            'Open the active trip from the Conso tab',
-                      ),
+                    messenger?.showSnackBar(SnackBarHelper.infoSnackBar(
+                      l?.tripBannerOpenFromConsumptionTab ??
+                          'Open the active trip from the Conso tab',
                     ));
                   },
                   child: Padding(
