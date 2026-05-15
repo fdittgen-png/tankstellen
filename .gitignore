@@ -33,6 +33,12 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Golden-test failure artifacts — diff dumps the test framework writes
+# when a golden mismatches locally. Transient build output, never
+# source. The committed golden *masters* (test/goldens/*.png) stay
+# tracked (#1723).
+test/goldens/failures/
+
 # Symbolication related
 app.*.symbols
 
