@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/obd2/broken_map_belief.dart';
@@ -226,6 +227,211 @@ class BrokenMapOverlayRow extends ConsumerWidget {
           fontFamily: 'monospace',
           height: 1.2,
         ),
+      ),
+    );
+  }
+}
+
+/// Diagnostics card surfacing the active vehicle's broken-MAP belief
+/// and the persistent per-adapter [ObdAdapterBlocklist], with a manual
+/// "Clear" escape hatch (#1622).
+///
+/// Without this card a user whose healthy adapter got mis-flagged has
+/// no way to undo the blocklist entry — the VIN populator keeps
+/// short-circuiting future pair attempts with a stale warning recalled
+/// from the blocklist.
+///
+/// The belief shown is for [vehicleId] (the vehicle the host screen is
+/// about — read directly from [brokenMapBeliefByVehicleProvider] rather
+/// than via the active-vehicle provider, to keep the card off the
+/// vehicle-list provider graph); the blocklist is global. Collapses to
+/// [SizedBox.shrink] when the vehicle has zero observations AND the
+/// blocklist is empty — the common healthy case costs no layout.
+class BrokenMapDiagnosticsCard extends ConsumerStatefulWidget {
+  const BrokenMapDiagnosticsCard({super.key, this.vehicleId});
+
+  /// The vehicle whose broken-MAP belief to display. Null → the belief
+  /// section is omitted and only the global adapter blocklist shows.
+  final String? vehicleId;
+
+  @override
+  ConsumerState<BrokenMapDiagnosticsCard> createState() =>
+      _BrokenMapDiagnosticsCardState();
+}
+
+class _BrokenMapDiagnosticsCardState
+    extends ConsumerState<BrokenMapDiagnosticsCard> {
+  Future<Map<String, double>>? _entries;
+
+  @override
+  void initState() {
+    super.initState();
+    _entries = ref.read(obdAdapterBlocklistProvider).entries();
+  }
+
+  Future<void> _clear(String elmId) async {
+    await ref.read(obdAdapterBlocklistProvider).clearEntry(elmId);
+    if (!mounted) return;
+    setState(() {
+      _entries = ref.read(obdAdapterBlocklistProvider).entries();
+    });
+  }
+
+  /// The broken-MAP belief for [BrokenMapDiagnosticsCard.vehicleId],
+  /// read directly off [brokenMapBeliefByVehicleProvider]. Returns null
+  /// when no vehicle id was supplied or the lookup throws (Hive may not
+  /// be open in widget tests) — defensive, the card is decorative.
+  BrokenMapBelief? _belief() {
+    final id = widget.vehicleId;
+    if (id == null || id.isEmpty) return null;
+    try {
+      // Watch the state so the card rebuilds when the belief map flips.
+      ref.watch(brokenMapBeliefByVehicleProvider);
+      return ref
+          .read(brokenMapBeliefByVehicleProvider.notifier)
+          .beliefFor(id);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final belief = _belief();
+    final hasBelief = belief != null && belief.observationCount > 0;
+    return FutureBuilder<Map<String, double>>(
+      future: _entries,
+      builder: (context, snap) {
+        final blocklist = snap.data ?? const <String, double>{};
+        // Nothing observed, nothing blocklisted → render nothing.
+        if (!hasBelief && blocklist.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        final l = AppLocalizations.of(context);
+        final theme = Theme.of(context);
+        return SectionCard(
+          title: l?.brokenMapDiagnosticsCardTitle ?? 'MAP sensor diagnostics',
+          leadingIcon: Icons.sensors,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _beliefSection(l, theme, belief, hasBelief),
+              const SizedBox(height: 12),
+              Text(
+                l?.brokenMapDiagnosticsBlocklistHeading ??
+                    'Blocklisted adapters',
+                style: theme.textTheme.titleSmall,
+              ),
+              const SizedBox(height: 4),
+              if (blocklist.isEmpty)
+                Text(
+                  l?.brokenMapDiagnosticsBlocklistEmpty ??
+                      'No adapters are blocklisted.',
+                  style: theme.textTheme.bodyMedium,
+                )
+              else
+                ...blocklist.entries.map(
+                  (e) => _BlocklistRow(
+                    elmId: e.key,
+                    confidence: e.value,
+                    onClear: () => _clear(e.key),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _beliefSection(AppLocalizations? l, ThemeData theme,
+      BrokenMapBelief? belief, bool hasBelief) {
+    if (!hasBelief) {
+      return Text(
+        l?.brokenMapDiagnosticsBeliefNone ??
+            "This vehicle's MAP sensor hasn't been observed yet.",
+        style: theme.textTheme.bodyMedium,
+      );
+    }
+    final pe = belief!.pointEstimate;
+    final ci = belief.credibleInterval;
+    final pePct = (pe * 100).toStringAsFixed(0);
+    final marginPct = ((ci.$2 - ci.$1) / 2 * 100).toStringAsFixed(0);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          l?.brokenMapDiagnosticsBeliefLine(pePct, marginPct) ??
+              'Broken-MAP confidence: $pePct% ± $marginPct%',
+          style: theme.textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 2),
+        Text(
+          l?.brokenMapDiagnosticsObservationCount(belief.observationCount) ??
+              '${belief.observationCount} observations recorded',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        if (belief.isVerifiedClean) ...[
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(Icons.verified_outlined,
+                  size: 16, color: theme.colorScheme.primary),
+              const SizedBox(width: 4),
+              Text(
+                l?.brokenMapDiagnosticsVerifiedBadge ?? 'Verified clean',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// One blocklisted-adapter row inside [BrokenMapDiagnosticsCard]: the
+/// adapter's ELM firmware id, its recorded broken-confidence, and a
+/// "Clear" button that removes it from the blocklist.
+class _BlocklistRow extends StatelessWidget {
+  const _BlocklistRow({
+    required this.elmId,
+    required this.confidence,
+    required this.onClear,
+  });
+
+  final String elmId;
+  final double confidence;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final pct = (confidence * 100).toStringAsFixed(0);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              l?.brokenMapDiagnosticsBlocklistEntry(elmId, pct) ??
+                  '$elmId — flagged $pct% broken',
+              style: theme.textTheme.bodyMedium,
+            ),
+          ),
+          TextButton(
+            key: Key('brokenMapBlocklistClear_$elmId'),
+            onPressed: onClear,
+            child: Text(
+              l?.brokenMapDiagnosticsClearButton ?? 'Clear',
+            ),
+          ),
+        ],
       ),
     );
   }

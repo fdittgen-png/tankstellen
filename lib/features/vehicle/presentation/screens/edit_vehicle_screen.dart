@@ -7,6 +7,7 @@ import '../../../../core/utils/brand_logo_mapper.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../consumption/presentation/widgets/broken_map_widgets.dart';
 import '../../data/obd2_vin_reader.dart';
 import '../../data/reference_vehicle_catalog_provider.dart';
 import '../../data/vehicle_profile_catalog_matcher.dart';
@@ -707,6 +708,12 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
               // pad the layout for users who haven't paired anything.
               const SizedBox(height: 16),
               const Obd2CapabilitySection(),
+              // #1622 — broken-MAP belief + adapter-blocklist
+              // diagnostics card. Collapses to [SizedBox.shrink] when
+              // there is nothing observed and nothing blocklisted, so
+              // it costs no layout space for the common healthy case.
+              const SizedBox(height: 16),
+              BrokenMapDiagnosticsCard(vehicleId: _existingId),
               const SizedBox(height: 16),
               // #1397 — collapsed-by-default expansion tile that lets
               // users override the four physics constants the OBD2

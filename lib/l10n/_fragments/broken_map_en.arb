@@ -72,5 +72,67 @@
         "example": "3"
       }
     }
+  },
+  "brokenMapDiagnosticsCardTitle": "MAP sensor diagnostics",
+  "@brokenMapDiagnosticsCardTitle": {
+    "description": "Title of the broken-MAP diagnostics card on the vehicle settings screen — surfaces the belief + the adapter blocklist (#1622)."
+  },
+  "brokenMapDiagnosticsBeliefLine": "Broken-MAP confidence: {posterior}% ± {margin}%",
+  "@brokenMapDiagnosticsBeliefLine": {
+    "description": "Line on the broken-MAP diagnostics card showing the active vehicle's Bayesian posterior point estimate and the half-width of the 95% credible interval (#1622).",
+    "placeholders": {
+      "posterior": {
+        "type": "String",
+        "example": "75"
+      },
+      "margin": {
+        "type": "String",
+        "example": "7"
+      }
+    }
+  },
+  "brokenMapDiagnosticsObservationCount": "{count} observations recorded",
+  "@brokenMapDiagnosticsObservationCount": {
+    "description": "Line on the broken-MAP diagnostics card showing how many observations have been folded into the belief (#1622).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "brokenMapDiagnosticsVerifiedBadge": "Verified clean",
+  "@brokenMapDiagnosticsVerifiedBadge": {
+    "description": "Badge on the broken-MAP diagnostics card shown when the belief has reached the verified-clean terminal state (#1622)."
+  },
+  "brokenMapDiagnosticsBeliefNone": "This vehicle's MAP sensor hasn't been observed yet.",
+  "@brokenMapDiagnosticsBeliefNone": {
+    "description": "Placeholder on the broken-MAP diagnostics card when the active vehicle has no broken-MAP observations recorded yet (#1622)."
+  },
+  "brokenMapDiagnosticsBlocklistHeading": "Blocklisted adapters",
+  "@brokenMapDiagnosticsBlocklistHeading": {
+    "description": "Sub-heading on the broken-MAP diagnostics card above the list of OBD2 adapters flagged as having a broken MAP sensor (#1622)."
+  },
+  "brokenMapDiagnosticsBlocklistEmpty": "No adapters are blocklisted.",
+  "@brokenMapDiagnosticsBlocklistEmpty": {
+    "description": "Empty-state line on the broken-MAP diagnostics card when no OBD2 adapter is on the broken-MAP blocklist (#1622)."
+  },
+  "brokenMapDiagnosticsBlocklistEntry": "{adapter} — flagged {percent}% broken",
+  "@brokenMapDiagnosticsBlocklistEntry": {
+    "description": "A single blocklisted-adapter row on the broken-MAP diagnostics card: the adapter's ELM firmware id and its recorded broken-confidence (#1622).",
+    "placeholders": {
+      "adapter": {
+        "type": "String",
+        "example": "ELM327 v2.1"
+      },
+      "percent": {
+        "type": "String",
+        "example": "85"
+      }
+    }
+  },
+  "brokenMapDiagnosticsClearButton": "Clear",
+  "@brokenMapDiagnosticsClearButton": {
+    "description": "Button on a blocklisted-adapter row that removes the adapter from the broken-MAP blocklist — the manual escape hatch for a healthy adapter that was mis-flagged (#1622)."
   }
 }

@@ -91,5 +91,60 @@ void main() {
       final v = await blocklist.recall('ELM327 v1.5');
       expect(v, isNull);
     });
+
+    // #1622 — list + clear surface for the diagnostics card.
+    group('entries() + clearEntry() (#1622)', () {
+      test('entries() is empty before anything is recorded', () async {
+        expect(await blocklist.entries(), isEmpty);
+      });
+
+      test('entries() returns every recorded adapter with its confidence',
+          () async {
+        await blocklist.recordBelief('ELM327 v2.1', 0.85);
+        await blocklist.recordBelief('STN1110 v4.0.4', 0.72);
+        final entries = await blocklist.entries();
+        expect(entries.length, 2);
+        expect(entries['ELM327 v2.1'], closeTo(0.85, 1e-9));
+        expect(entries['STN1110 v4.0.4'], closeTo(0.72, 1e-9));
+      });
+
+      test('recording the same adapter twice yields one index entry',
+          () async {
+        await blocklist.recordBelief('ELM327 v2.1', 0.5);
+        await blocklist.recordBelief('ELM327 v2.1', 0.9);
+        final entries = await blocklist.entries();
+        expect(entries.length, 1);
+        expect(entries['ELM327 v2.1'], closeTo(0.9, 1e-9));
+      });
+
+      test(
+          'clearEntry removes the adapter from entries() AND neutralises '
+          'recall', () async {
+        await blocklist.recordBelief('ELM327 v2.1', 0.85);
+        await blocklist.recordBelief('STN1110 v4.0.4', 0.72);
+
+        await blocklist.clearEntry('ELM327 v2.1');
+
+        final entries = await blocklist.entries();
+        expect(entries.keys, isNot(contains('ELM327 v2.1')));
+        expect(entries.keys, contains('STN1110 v4.0.4'));
+        // recall must behave as if the adapter was never observed —
+        // otherwise the populator keeps short-circuiting on a stale
+        // warning.
+        expect(await blocklist.recall('ELM327 v2.1'), isNull);
+      });
+
+      test('clearEntry on an unknown id does not throw', () async {
+        await blocklist.recordBelief('ELM327 v2.1', 0.85);
+        await blocklist.clearEntry('never-seen');
+        expect((await blocklist.entries()).keys, contains('ELM327 v2.1'));
+      });
+
+      test('clearEntry with an empty id is a no-op', () async {
+        await blocklist.recordBelief('ELM327 v2.1', 0.85);
+        await blocklist.clearEntry('');
+        expect((await blocklist.entries()).length, 1);
+      });
+    });
   });
 }
