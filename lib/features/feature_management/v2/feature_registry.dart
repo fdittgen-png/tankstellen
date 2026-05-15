@@ -24,6 +24,7 @@ const List<FeatureClass> featureRegistry = <FeatureClass>[
   kFeatureShowElectric,
   kFeatureManualConsumption,
   kFeatureLoyaltyCards,
+  kFeatureFuelCalculator,
 
   // Children of obd2TripRecording
   kFeatureGamification,
