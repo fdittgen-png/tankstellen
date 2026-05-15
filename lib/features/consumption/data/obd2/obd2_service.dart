@@ -12,6 +12,7 @@ import 'obd2_breadcrumb_collector.dart';
 import 'obd2_transport.dart';
 import 'oem_pid_table.dart';
 import 'supported_pids_cache.dart';
+import 'supported_pids_resolver.dart';
 
 // Re-export the pure-math estimator + stoichiometric constants so
 // callers that only need the math (e.g. [TripRecordingController]'s
@@ -43,22 +44,11 @@ export 'fuel_rate_estimator.dart'
 class Obd2Service implements Obd2RawCommandPort {
   final Obd2Transport _transport;
 
-  /// Optional persistent supported-PID cache (#811). When present and
-  /// a VIN (or [vehicleFallbackKey]) resolves to a cached entry,
-  /// [connect] skips the 8 × `01 XX` bitmap scan entirely.
-  final SupportedPidsCache? _pidsCache;
-
-  /// Fallback cache key for when the car doesn't return a VIN (old
-  /// ECUs / incompatible adapters). Typically `'${make}:${model}:${year}'`
-  /// — see [SupportedPidsCache.fallbackKey].
-  final String? _vehicleFallbackKey;
-
-  /// Per-connection cache of the Mode 01 PIDs the car supports,
-  /// populated by [discoverSupportedPids] or reloaded from [_pidsCache]
-  /// during [connect]. `null` means "we haven't asked the car yet,
-  /// so don't trust this cache to reject PIDs" (see [isPidSupported]
-  /// for the exact semantics).
-  Set<int>? _supportedPids;
+  /// Owns the #811 supported-PID concern — the persistent cache, the
+  /// per-connection PID set, and the vehicle-key resolution that
+  /// picks the cache slot. Extracted from this class in #1679; built
+  /// in the constructor body so it can capture the [_send] tear-off.
+  late final SupportedPidsResolver _pids;
 
   /// Stable adapter identifier (BLE remote-id / Classic MAC) for the
   /// device backing this session (#1312). Stamped by
@@ -125,8 +115,14 @@ class Obd2Service implements Obd2RawCommandPort {
     SupportedPidsCache? pidsCache,
     String? vehicleFallbackKey,
     this.breadcrumbCollector,
-  })  : _pidsCache = pidsCache,
-        _vehicleFallbackKey = vehicleFallbackKey;
+  }) {
+    _pids = SupportedPidsResolver(
+      send: _send,
+      isConnected: () => _transport.isConnected,
+      cache: pidsCache,
+      vehicleFallbackKey: vehicleFallbackKey,
+    );
+  }
 
   /// AT command that asks the ELM327 to identify itself. Returns a
   /// version string like `ELM327 v1.5` / `ELM327 v2.2` /
@@ -192,7 +188,7 @@ class Obd2Service implements Obd2RawCommandPort {
 
       // Clear the per-connection supported-PIDs cache. A new session
       // may be a different car / different adapter firmware.
-      _supportedPids = null;
+      _pids.resetForNewConnection();
 
       // Adapter-driven init sequence (#1330). [GenericElm327Adapter]
       // matches the legacy hardcoded behaviour byte-for-byte: the
@@ -240,7 +236,7 @@ class Obd2Service implements Obd2RawCommandPort {
         debugPrint('OBD2 ATI firmware read failed: $e\n$st');
       }
 
-      await _primeSupportedPidsCache();
+      await _pids.prime();
 
       return true;
     } catch (e, st) {
@@ -249,57 +245,8 @@ class Obd2Service implements Obd2RawCommandPort {
     }
   }
 
-  /// Attempt to load the supported-PID set from the persistent cache
-  /// (#811). Silent no-op when no cache was injected. Always swallows
-  /// errors: a broken cache must not break the connect flow — worst
-  /// case we fall back to blind querying, which is exactly what the
-  /// adapter did before this feature landed.
-  Future<void> _primeSupportedPidsCache() async {
-    final cache = _pidsCache;
-    if (cache == null) return;
-    try {
-      final key = await _resolveVehicleCacheKey();
-      if (key == null) {
-        debugPrint(
-            'OBD2 supported-PID cache: no VIN and no fallback key — '
-            'scanning blindly this session');
-        return;
-      }
-      final cached = cache.get(key);
-      if (cached != null) {
-        _supportedPids = cached;
-        debugPrint(
-            'OBD2 supported-PID cache HIT for "$key" '
-            '(${cached.length} PIDs) — skipping scan');
-        return;
-      }
-      debugPrint('OBD2 supported-PID cache MISS for "$key" — scanning');
-      final discovered = await discoverSupportedPids();
-      if (discovered.isNotEmpty) {
-        await cache.put(key, discovered);
-      }
-    } catch (e, st) {
-      debugPrint('OBD2 supported-PID cache prime failed: $e\n$st');
-    }
-  }
-
-  /// Resolve the cache key for the currently-connected vehicle.
-  /// Prefers the VIN; falls back to the static [_vehicleFallbackKey]
-  /// provided at construction time. Returns null when neither is
-  /// available, at which point the cache is skipped this session.
-  Future<String?> _resolveVehicleCacheKey() async {
-    try {
-      final response = await _send(Elm327Protocol.vinCommand);
-      final vin = Elm327Protocol.parseVin(response);
-      if (vin != null && vin.isNotEmpty) return vin;
-    } catch (e, st) {
-      debugPrint('OBD2 VIN read for cache key failed: $e\n$st');
-    }
-    return _vehicleFallbackKey;
-  }
-
   /// Whether [pid] is known to be supported by the connected vehicle
-  /// (#811). Key semantics:
+  /// (#811). Delegates to [SupportedPidsResolver]. Key semantics:
   ///
   ///   - When [discoverSupportedPids] has NOT been called yet
   ///     (cache is null), returns `true` — we don't know enough to
@@ -309,21 +256,20 @@ class Obd2Service implements Obd2RawCommandPort {
   ///     `true`.
   ///   - When the cache IS populated and [pid] is absent, returns
   ///     `false` — callers skip the query.
-  bool isPidSupported(int pid) =>
-      _supportedPids == null || _supportedPids!.contains(pid);
+  bool isPidSupported(int pid) => _pids.isPidSupported(pid);
 
   /// Alias for [isPidSupported] — matches the name used in the #811
   /// issue. Same semantics: `true` when the cache is unpopulated or
   /// [pid] is present, `false` only when we know the car doesn't
   /// implement it.
-  bool supportsPid(int pid) => isPidSupported(pid);
+  bool supportsPid(int pid) => _pids.supportsPid(pid);
 
   /// Direct view of the supported-PID set for tests and diagnostics.
   /// Returns an unmodifiable empty set when discovery hasn't run —
   /// callers that want "is this supported?" should use [supportsPid]
   /// instead to respect the "unknown ⇒ allow" semantics.
   @visibleForTesting
-  Set<int> get debugSupportedPids => Set.unmodifiable(_supportedPids ?? {});
+  Set<int> get debugSupportedPids => _pids.debugSupportedPids;
 
   /// Read the odometer value in km.
   ///
@@ -471,33 +417,7 @@ class Obd2Service implements Obd2RawCommandPort {
   /// [isPidSupported] calls short-circuit queries for PIDs the car
   /// doesn't implement. One walk per trip-recording session is
   /// enough.
-  Future<Set<int>> discoverSupportedPids() async {
-    if (!_transport.isConnected) return const <int>{};
-    final supported = <int>{};
-    for (final command in Elm327Protocol.supportedPidsCommands) {
-      // Derive the 32-PID group base from the command (e.g. "0140\r"
-      // → 0x40). The commands list is in lockstep with the group
-      // bases, so we just hex-parse the middle two chars.
-      final groupBase = int.parse(command.substring(2, 4), radix: 16);
-      try {
-        final response = await _send(command);
-        final bitmap =
-            Elm327Protocol.parseSupportedPidsBitmap(response, groupBase);
-        if (bitmap == null) break;
-        supported.addAll(bitmap);
-        // "Bit 32" of the bitmap — i.e. PID (groupBase + 32) — is
-        // conventionally the "are PIDs in the next range supported?"
-        // flag. If it's not in the set we just parsed, stop walking.
-        final nextRangeFlag = groupBase + 32;
-        if (!bitmap.contains(nextRangeFlag)) break;
-      } catch (e, st) {
-        debugPrint('OBD2 discoverSupportedPids failed on $command: $e\n$st');
-        break;
-      }
-    }
-    _supportedPids = supported;
-    return supported;
-  }
+  Future<Set<int>> discoverSupportedPids() => _pids.discoverSupportedPids();
 
   /// Read current engine RPM.
   Future<double?> readRpm() async {

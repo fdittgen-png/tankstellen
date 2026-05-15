@@ -12,13 +12,16 @@ import '../../domain/trip_recorder.dart';
 import '../trip_history_repository.dart';
 import 'adapter_reconnect_scanner.dart';
 import 'elm327_protocol.dart';
+import 'live_sample_snapshot.dart';
 import 'obd2_breadcrumb_collector.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_service.dart';
 import 'paused_trip_repository.dart';
 import 'pid_scheduler.dart';
 import 'trip_distance_source.dart';
+import 'trip_drop_detector.dart';
 import 'trip_live_reading.dart';
+import 'trip_sample_buffer.dart';
 import 'virtual_odometer.dart';
 
 // Re-export the DTO + distance-source constants so existing callers
@@ -215,20 +218,13 @@ class TripRecordingController {
   /// (e.g. 100 ms) to exercise the auto-finalise path.
   final Duration _pauseGraceWindow;
 
-  /// Sliding window used for the "3 consecutive transport errors"
-  /// heuristic (#797 phase 1). The counter resets on every successful
-  /// read. Override for tests that want to pin the exact threshold.
-  final Duration _dropWindow;
-  final int _dropThreshold;
-
-  /// Threshold for the "adapter connected but every PID parse returns
-  /// null" silent-failure heuristic (#1330 phase 3). At the 5 Hz fast
-  /// tier 50 consecutive null parses ≈ 10 s — long enough to ride out a
-  /// brief noise burst, short enough that the user gets a notification
-  /// before they've driven a meaningful distance with no data.
-  /// Test-only: tests inject a small value (e.g. 3) so a fake service
-  /// can drive the counter past the threshold without 50 round-trips.
-  final int _silentFailureThreshold;
+  /// Owns the connection-drop *detection* heuristics — the #797
+  /// transport-error sliding window and the #1330 silent-failure
+  /// null-parse counter — extracted into a focused collaborator
+  /// (#1679). The controller keeps the *reaction* ([_handleDrop],
+  /// grace timer, reconnect scanner). Built in the constructor body
+  /// so it can capture the resolved [_now] clock.
+  late final TripDropDetector _dropDetector;
 
   /// Pinned adapter MAC that the auto-reconnect scanner (#797 phase 3)
   /// will search for when a drop flips us into
@@ -273,26 +269,6 @@ class TripRecordingController {
   bool _stopped = false;
   String? _sessionId; // ISO start-ts, stable across pause→resume cycles
 
-  /// Consecutive-error bookkeeping for the drop heuristic. First entry
-  /// is the oldest. Reset on a successful transport read.
-  final List<DateTime> _recentErrors = <DateTime>[];
-
-  /// Consecutive-null-parse counter for the silent-failure heuristic
-  /// (#1330 phase 3). Incremented from every high-priority PID
-  /// callback when the parser returns null; reset to zero the moment
-  /// any high-priority PID parses a non-null value. Distinct from
-  /// [_recentErrors] which counts *transport-level* failures —
-  /// silent-failure is the case where the transport is healthy but
-  /// the ECU never speaks.
-  int _consecutiveNullReads = 0;
-
-  /// Sticky flag so the silent-failure handler only fires once per
-  /// recording session — even if more null parses keep arriving past
-  /// the threshold, we don't want to keep re-entering [_handleDrop].
-  /// Reset on stop()/resume() so a subsequent recording (or a manual
-  /// resume followed by another silent stretch) can fire again.
-  bool _silentFailureFired = false;
-
   /// Reason the most recent [_handleDrop] fired (#1330 phase 3).
   /// Null when no drop has occurred. Read by the provider so the
   /// pause banner can surface a different message on silent-failure
@@ -312,85 +288,36 @@ class TripRecordingController {
   /// real odometer.
   final List<VirtualOdometerSample> _speedSamples = <VirtualOdometerSample>[];
 
-  /// Per-tick sample buffer used by the trip-detail charts (#1040).
-  /// Decimated to ~1 Hz inside [_emit] — the user-facing charts don't
-  /// need the 4 Hz emit cadence, and 1 Hz × 8 fields keeps a 39-min
-  /// trip's payload well under 20 KB compressed. Capped at
-  /// [_capturedSampleCap] so a forgotten recording can't eat unbounded
-  /// memory; the cap covers a 33-hour drive at 1 Hz which is more
-  /// than enough headroom.
-  final List<TripSample> _capturedSamples = <TripSample>[];
-
-  /// Timestamp of the most recently *captured* (decimated) sample.
-  /// Distinct from [_lastSampleAt] which tracks the recorder feed at
-  /// the full 4 Hz emit cadence.
-  DateTime? _lastCapturedAt;
-
-  /// Cap on the captured-sample buffer (#1040). 120000 samples = 33 h
-  /// at 1 Hz — comfortably above any plausible single trip — so this
-  /// only kicks in if the user forgets to stop a recording overnight.
-  static const int _capturedSampleCap = 120000;
+  /// Owns the #1040 captured-sample buffer and the #1458 GPS
+  /// cadence-diagnostics buffer — both per-trip ring buffers
+  /// extracted into a focused collaborator (#1679).
+  final TripSampleBuffer _sampleBuffer = TripSampleBuffer();
 
   /// Read-only snapshot of the captured sample buffer (#1040). The
   /// list is unmodifiable so callers can't accidentally mutate the
   /// controller's state — the provider clones it into the persisted
   /// [TripHistoryEntry] at stop time.
-  List<TripSample> get capturedSamples => List.unmodifiable(_capturedSamples);
-
-  /// Per-trip GPS cadence diagnostics buffer (#1458 phase 2). Appended
-  /// to by [recordGpsSampleDiagnostic] every time the provider's
-  /// position-stream listener fires; persisted onto the saved
-  /// [TripHistoryEntry] at stop time. Capped at
-  /// [_gpsSampleDiagnosticCap] so a forgotten recording can't eat
-  /// unbounded memory.
-  final List<GpsSampleDiagnostic> _gpsSampleDiagnostics =
-      <GpsSampleDiagnostic>[];
-
-  /// Cap on the GPS diagnostics buffer (#1458 phase 2). At ~1 Hz GPS
-  /// fix cadence the cap covers ~33 hours — comfortably above any
-  /// plausible single trip and well below the trip-detail JSON
-  /// size budget.
-  static const int _gpsSampleDiagnosticCap = 120000;
+  List<TripSample> get capturedSamples => _sampleBuffer.capturedSamples;
 
   /// Read-only snapshot of the GPS cadence diagnostics buffer
   /// (#1458 phase 2). The list is unmodifiable so callers can't
   /// accidentally mutate the controller's state — the provider clones
   /// it into the persisted [TripHistoryEntry] at stop time.
   List<GpsSampleDiagnostic> get capturedGpsSampleDiagnostics =>
-      List.unmodifiable(_gpsSampleDiagnostics);
+      _sampleBuffer.capturedGpsSampleDiagnostics;
 
-  /// Latest parsed values, keyed by PID command. Written by scheduler
-  /// callbacks, read by [_emit] when assembling [TripLiveReading]. Not
-  /// using a typed struct because most fields are optional doubles
-  /// and adding a freezed class for this scratch space buys nothing.
-  double? _latestSpeedKmh;
-  double? _latestRpm;
-  double? _latestMaf;
-  double? _latestMapKpa;
-  double? _latestIatCelsius;
-  double? _latestThrottlePercent;
-  double? _latestEngineLoadPercent;
-  double? _latestCoolantTempC;
-  double? _latestFuelLevelPercent;
-  double? _latestStft;
-  double? _latestLtft;
-  double? _latestDirectFuelRate;
+  /// VIN read once at [start]. Null on older ECUs / adapters that
+  /// can't answer Mode 09 PID 02.
   String? _vin;
 
-  // #1374 phase 1 — most recent GPS fix, pushed in by the provider
-  // when the `Feature.gpsTripPath` flag is enabled. The controller
-  // does NOT subscribe to Geolocator itself — that decision lives at
-  // the provider layer so the controller stays free of plugin
-  // imports and tests can drive the latch with hand-built doubles.
-  // When the flag is off the provider never calls [updateGpsFix],
-  // both fields stay null, and every persisted sample carries
-  // `latitude: null, longitude: null` (matching pre-#1374 behaviour
-  // bit-for-bit). When the flag is on but no fix has landed yet
-  // (cold-start, indoors, permission revoked), the fields are also
-  // null and the corresponding sample is written with both keys
-  // absent — better than failing the trip.
-  double? _latestLatitude;
-  double? _latestLongitude;
+  /// The "clock"-side snapshot — the per-PID latest-value scratch
+  /// space, the scheduler subscription wiring, and the tier-1/2/3
+  /// fuel-rate derivation — extracted into a focused collaborator
+  /// (#1679). The emit timer + [_emit] stay on the controller; this
+  /// collaborator owns the values that [_emit] reads. Built in the
+  /// constructor body so it can capture the [_observeHighPriorityParse]
+  /// and [_recordSpeedSample] tear-offs.
+  late final LiveSampleSnapshot _liveSampleSnapshot;
 
   TripRecordingController({
     required Obd2Service service,
@@ -426,14 +353,26 @@ class TripRecordingController {
         _pausedRepoOverride = pausedRepo,
         _historyRepoOverride = historyRepo,
         _pauseGraceWindow = pauseGraceWindow,
-        _dropWindow = dropWindow,
-        _dropThreshold = dropThreshold,
-        _silentFailureThreshold = silentFailureThreshold,
         _schedulerTickRate = schedulerTickRate,
         _pinnedAdapterMac = pinnedAdapterMac,
         _automatic = automatic,
         _reconnectScannerFactory = reconnectScannerFactory,
-        _breadcrumbCollector = breadcrumbCollector;
+        _breadcrumbCollector = breadcrumbCollector {
+    _dropDetector = TripDropDetector(
+      now: _now,
+      dropWindow: dropWindow,
+      dropThreshold: dropThreshold,
+      silentFailureThreshold: silentFailureThreshold,
+    );
+    _liveSampleSnapshot = LiveSampleSnapshot(
+      service: _service,
+      vehicle: _vehicle,
+      referenceVehicle: _referenceVehicle,
+      breadcrumbCollector: _breadcrumbCollector,
+      onHighPriorityParse: _observeHighPriorityParse,
+      onSpeedSample: _recordSpeedSample,
+    );
+  }
 
   /// Optional fuel-rate diagnostic breadcrumb sink (#1395). Wired in
   /// by [tripRecordingProvider] when a recording starts so the
@@ -501,8 +440,7 @@ class TripRecordingController {
       // post-resume stretch of nulls can fire again. Without this,
       // a user who resumes after a silent-failure drop and then hits
       // a fresh silent failure would never get a second snackbar.
-      _silentFailureFired = false;
-      _consecutiveNullReads = 0;
+      _dropDetector.reset();
       // Also tear down the auto-reconnect scanner (#797 phase 3) —
       // either we got here because the scanner fired its callback
       // (in which case it already stopped itself), or the user
@@ -540,8 +478,10 @@ class TripRecordingController {
   /// controller cheap (no Geolocator mocks required) and lets the
   /// flag-off path skip the plugin entirely.
   void updateGpsFix({double? latitude, double? longitude}) {
-    _latestLatitude = latitude;
-    _latestLongitude = longitude;
+    _liveSampleSnapshot.updateGpsFix(
+      latitude: latitude,
+      longitude: longitude,
+    );
   }
 
   /// #1458 phase 2 — append one cadence-diagnostic record at [now]
@@ -561,20 +501,10 @@ class TripRecordingController {
     required DateTime now,
     required String lifecycleState,
   }) {
-    final entry = GpsSampleDiagnostic(
-      timestamp: now,
+    _sampleBuffer.recordGpsSampleDiagnostic(
+      now: now,
       lifecycleState: lifecycleState,
-      index: _gpsSampleDiagnostics.length,
     );
-    _gpsSampleDiagnostics.add(entry);
-    if (_gpsSampleDiagnostics.length > _gpsSampleDiagnosticCap) {
-      // Drop the oldest slice — losing the early stretch is preferable
-      // to letting a forgotten overnight recording eat unbounded memory.
-      _gpsSampleDiagnostics.removeRange(
-        0,
-        _gpsSampleDiagnostics.length - _gpsSampleDiagnosticCap,
-      );
-    }
   }
 
   /// Exposed for tests: append a cadence diagnostic without going
@@ -583,7 +513,7 @@ class TripRecordingController {
   /// needing a real Geolocator stream.
   @visibleForTesting
   void debugCaptureGpsSampleDiagnostic(GpsSampleDiagnostic diagnostic) {
-    _gpsSampleDiagnostics.add(diagnostic);
+    _sampleBuffer.debugCaptureGpsSampleDiagnostic(diagnostic);
   }
 
   /// Read-only snapshot of the most recent GPS latitude pushed in via
@@ -591,13 +521,13 @@ class TripRecordingController {
   /// production reads the value through the persisted [TripSample]
   /// fields, not this getter.
   @visibleForTesting
-  double? get debugLatestLatitude => _latestLatitude;
+  double? get debugLatestLatitude => _liveSampleSnapshot.latestLatitude;
 
   /// Read-only snapshot of the most recent GPS longitude pushed in via
   /// [updateGpsFix] (#1374 phase 1). Same caveats as
   /// [debugLatestLatitude].
   @visibleForTesting
-  double? get debugLatestLongitude => _latestLongitude;
+  double? get debugLatestLongitude => _liveSampleSnapshot.latestLongitude;
 
   /// Start polling. Reads the odometer and VIN ONCE to pin trip
   /// identity; subsequent ticks are scheduled per-PID by
@@ -620,7 +550,7 @@ class TripRecordingController {
     _vin = await _readVinOnce();
 
     _scheduler = _schedulerOverride ?? _buildScheduler();
-    _subscribeAllTiers(_scheduler!);
+    _liveSampleSnapshot.subscribeAllTiers(_scheduler!);
     _scheduler!.start();
 
     _emitTimer = Timer.periodic(_pollInterval, (_) => _emit());
@@ -645,8 +575,7 @@ class TripRecordingController {
     _started = false;
     _stopped = true;
     _pausedDueToDrop = false;
-    _silentFailureFired = false;
-    _consecutiveNullReads = 0;
+    _dropDetector.reset();
     _emitState();
     if (!_stateController.isClosed) {
       await _stateController.close();
@@ -747,11 +676,12 @@ class TripRecordingController {
     // gears. Hybrids DO have a step-ratio transmission on the
     // combustion side, so they fall through to the inference path.
     if (vehicle.type == VehicleType.ev) return null;
-    if (_capturedSamples.isEmpty) return null;
+    final captured = _sampleBuffer.capturedSamples;
+    if (captured.isEmpty) return null;
     final tireC = vehicle.tireCircumferenceMeters;
     if (tireC <= 0) return null;
     final result = inferGears(
-      samples: _capturedSamples,
+      samples: captured,
       tireCircumferenceMeters: tireC,
       priorCentroids: vehicle.gearCentroids,
     );
@@ -761,7 +691,7 @@ class TripRecordingController {
           .map((s) => (timestamp: s.timestamp, gear: s.gear))
           .toList(growable: false),
       optimalRpmCeiling: _optimalRpmCeiling,
-      samples: _capturedSamples,
+      samples: captured,
       centroids: result.centroids,
     );
   }
@@ -885,7 +815,7 @@ class TripRecordingController {
       // A clean read is the only signal strong enough to clear the
       // error window; ELM327 NO DATA responses come back via the
       // response string, not an exception.
-      _recentErrors.clear();
+      _dropDetector.registerSuccess();
       return response;
     } catch (e, st) { // ignore: unused_catch_stack
       _registerTransportError(e);
@@ -893,34 +823,15 @@ class TripRecordingController {
     }
   }
 
+  /// Funnel a transport error through the drop detector and react to
+  /// its verdict (#797 phase 1). The lifecycle guard stays here — the
+  /// detector counts, the controller owns the "are we already
+  /// pausing?" state.
   void _registerTransportError(Object error) {
     if (_pausedDueToDrop || _stopped) return;
-    final now = _now();
-    _recentErrors.add(now);
-    // Keep only errors inside the window so the heuristic doesn't
-    // count a ten-minute-old blip.
-    _recentErrors.removeWhere(
-      (ts) => now.difference(ts) > _dropWindow,
-    );
-    final typedDisconnect = _isTypedDisconnect(error);
-    if (typedDisconnect || _recentErrors.length >= _dropThreshold) {
+    if (_dropDetector.registerTransportError(error)) {
       _handleDrop();
     }
-  }
-
-  bool _isTypedDisconnect(Object error) {
-    if (error is Obd2DisconnectedException) return true;
-    // The live Bluetooth transport throws `StateError('Transport
-    // closed')` once its channel is shut down by the OS / user.
-    // Match by message so the controller works against the real
-    // implementation without reaching into platform-specific
-    // exception types.
-    if (error is StateError) {
-      final msg = error.message.toLowerCase();
-      if (msg.contains('transport closed')) return true;
-      if (msg.contains('not connected')) return true;
-    }
-    return false;
   }
 
   /// Bookkeeping for the silent-failure heuristic (#1330 phase 3).
@@ -940,37 +851,29 @@ class TripRecordingController {
     if (parsedValue != null) {
       // ANY successful high-priority parse clears the window — we're
       // detecting "ECU is dead", not "this one PID is unsupported".
-      _consecutiveNullReads = 0;
+      _dropDetector.observeHighPriorityParse(parsedValue);
       return;
     }
-    if (_silentFailureFired) return;
+    // The transport-error drop already paused us — don't let a stretch
+    // of nulls double-fire into a second drop. The lifecycle guard
+    // stays here; the detector just counts.
     if (_pausedDueToDrop || _stopped) return;
-    _consecutiveNullReads++;
-    if (_consecutiveNullReads >= _silentFailureThreshold) {
+    if (_dropDetector.observeHighPriorityParse(parsedValue)) {
       _onSilentFailure();
     }
   }
 
   /// Silent-failure handler (#1330 phase 3). Fired exactly once per
-  /// recording session when the consecutive-null counter crosses the
-  /// threshold. Drives the same pause-with-grace recovery as
-  /// [_handleDrop] for transport errors, but tags the drop with
-  /// [TripDropReason.silentFailure] so the UI surfaces "OBD2 adapter
-  /// connected but not returning data" instead of "OBD2 connection
-  /// lost".
+  /// recording session when the drop detector's consecutive-null
+  /// counter crosses the threshold. Drives the same pause-with-grace
+  /// recovery as [_handleDrop] for transport errors, but tags the drop
+  /// with [TripDropReason.silentFailure] so the UI surfaces "OBD2
+  /// adapter connected but not returning data" instead of "OBD2
+  /// connection lost".
   void _onSilentFailure() {
-    if (_silentFailureFired) return;
-    if (_pausedDueToDrop || _stopped) {
-      // The transport-error drop already paused us — don't double-fire
-      // and don't override the reason. The user is already seeing the
-      // "connection lost" banner; switching it mid-flight to "not
-      // responding" would be misleading.
-      return;
-    }
-    _silentFailureFired = true;
     debugPrint(
       'TripRecordingController: silent-failure detected — '
-      '$_consecutiveNullReads consecutive null PID parses',
+      '${_dropDetector.consecutiveNullReads} consecutive null PID parses',
     );
     _handleDrop(reason: TripDropReason.silentFailure);
   }
@@ -982,7 +885,7 @@ class TripRecordingController {
     _pausedDueToDrop = true;
     _dropReason = reason;
     _scheduler?.stop();
-    _recentErrors.clear();
+    _dropDetector.clearErrorWindow();
     _persistPausedSnapshot();
     _graceTimer?.cancel();
     _graceTimer = Timer(_pauseGraceWindow, _onGraceWindowElapsed);
@@ -1120,138 +1023,6 @@ class TripRecordingController {
     _stateController.add(currentState);
   }
 
-  void _subscribeAllTiers(PidScheduler scheduler) {
-    // ---- 5 Hz tier (high priority) --------------------------------
-    // RPM and speed are consumed directly by TripSample → TripRecorder
-    // for distance/idle/harsh-accel accumulation, so they need the
-    // highest refresh we can squeeze out of the adapter.
-    scheduler.subscribe(
-      Elm327Protocol.engineRpmCommand,
-      ScheduledPid(hz: 5.0, priority: PidPriority.high),
-      (r) {
-        final v = Elm327Protocol.parseEngineRpm(r);
-        if (v != null) _latestRpm = v;
-        _observeHighPriorityParse(v);
-      },
-    );
-    scheduler.subscribe(
-      Elm327Protocol.vehicleSpeedCommand,
-      ScheduledPid(hz: 5.0, priority: PidPriority.high),
-      (r) {
-        final v = Elm327Protocol.parseVehicleSpeed(r);
-        if (v != null) {
-          _latestSpeedKmh = v.toDouble();
-          _recordSpeedSample(v.toDouble());
-        }
-        _observeHighPriorityParse(v);
-      },
-    );
-    // MAF and MAP are the two alternate air-mass inputs to the fuel-
-    // rate derivation. Cheap cars (Peugeot 107) only have MAP+IAT;
-    // modern cars expose MAF. We subscribe both and let the snapshot-
-    // based derivation pick whichever landed most recently.
-    if (_service.supportsPid(0x10)) {
-      scheduler.subscribe(
-        Elm327Protocol.mafCommand,
-        ScheduledPid(hz: 5.0, priority: PidPriority.high),
-        (r) {
-          final v = Elm327Protocol.parseMafGramsPerSecond(r);
-          if (v != null) _latestMaf = v;
-          _observeHighPriorityParse(v);
-        },
-      );
-    }
-    if (_service.supportsPid(0x0B)) {
-      scheduler.subscribe(
-        Elm327Protocol.intakeManifoldPressureCommand,
-        ScheduledPid(hz: 5.0, priority: PidPriority.high),
-        (r) {
-          final v = Elm327Protocol.parseManifoldPressureKpa(r);
-          if (v != null) _latestMapKpa = v;
-          _observeHighPriorityParse(v);
-        },
-      );
-    }
-    scheduler.subscribe(
-      Elm327Protocol.throttlePositionCommand,
-      ScheduledPid(hz: 5.0, priority: PidPriority.high),
-      (r) {
-        final v = Elm327Protocol.parseThrottlePercent(r);
-        if (v != null) _latestThrottlePercent = v;
-        _observeHighPriorityParse(v);
-      },
-    );
-    // PID 5E is only present on ~2014+ ECUs. Skip when #811 discovery
-    // already proved the car rejects it, to save the 200 ms round-
-    // trip of a guaranteed NO DATA.
-    if (_service.supportsPid(0x5E)) {
-      scheduler.subscribe(
-        Elm327Protocol.engineFuelRateCommand,
-        ScheduledPid(hz: 5.0, priority: PidPriority.high),
-        (r) {
-          final v = Elm327Protocol.parseFuelRateLPerHour(r);
-          if (v != null) _latestDirectFuelRate = v;
-          _observeHighPriorityParse(v);
-        },
-      );
-    }
-
-    // ---- 1 Hz tier (medium priority) ------------------------------
-    scheduler.subscribe(
-      Elm327Protocol.engineLoadCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseEngineLoad(r);
-        if (v != null) _latestEngineLoadPercent = v;
-      },
-    );
-    scheduler.subscribe(
-      Elm327Protocol.intakeAirTempCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseIntakeAirTempCelsius(r);
-        if (v != null) _latestIatCelsius = v;
-      },
-    );
-    // Coolant temp drifts slowly — 1 Hz is more than enough resolution
-    // for the cold-start surcharge heuristic (#1262 phase 2) to detect
-    // whether the trip ever crossed operating temperature.
-    scheduler.subscribe(
-      Elm327Protocol.coolantTempCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseCoolantTempCelsius(r);
-        if (v != null) _latestCoolantTempC = v;
-      },
-    );
-    scheduler.subscribe(
-      Elm327Protocol.shortTermFuelTrimCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseShortTermFuelTrim(r);
-        if (v != null) _latestStft = v;
-      },
-    );
-    scheduler.subscribe(
-      Elm327Protocol.longTermFuelTrimCommand,
-      ScheduledPid(hz: 1.0),
-      (r) {
-        final v = Elm327Protocol.parseLongTermFuelTrim(r);
-        if (v != null) _latestLtft = v;
-      },
-    );
-
-    // ---- 0.1 Hz tier (low priority) -------------------------------
-    scheduler.subscribe(
-      Elm327Protocol.fuelTankLevelCommand,
-      ScheduledPid(hz: 0.1, priority: PidPriority.low),
-      (r) {
-        final v = Elm327Protocol.parseFuelLevelPercent(r);
-        if (v != null) _latestFuelLevelPercent = v;
-      },
-    );
-  }
-
   /// Read the VIN exactly once at [start]. Wrapped so the one-shot
   /// decision is visible to readers of [start] — if we ever need to
   /// re-read mid-trip (e.g. user hot-swaps cars) this is the place
@@ -1273,32 +1044,38 @@ class TripRecordingController {
     if (_paused || _pausedDueToDrop) return; // don't flood while paused
     if (_liveController.isClosed) return;
 
+    final snap = _liveSampleSnapshot;
     final nowTs = _now();
-    final fuelRate = _deriveFuelRateLPerHour();
+    final fuelRate = snap.deriveFuelRateLPerHour();
+    final speedKmh = snap.latestSpeedKmh;
+    final rpm = snap.latestRpm;
+    final throttlePercent = snap.latestThrottlePercent;
+    final engineLoadPercent = snap.latestEngineLoadPercent;
+    final coolantTempC = snap.latestCoolantTempC;
     // The recorder integrates fuel rate and Δt itself, so we only
     // hand it one TripSample per emit — not per PID callback. At a
     // 250 ms emit cadence that's 4 Hz into the recorder, matching
     // the pre-#814 1 Hz loop's behavior closely enough that the
     // distance/fuelLitersConsumed integration is unchanged.
-    if (_latestSpeedKmh != null || _latestRpm != null) {
+    if (speedKmh != null || rpm != null) {
       final sample = TripSample(
         timestamp: nowTs,
-        speedKmh: _latestSpeedKmh ?? 0,
-        rpm: _latestRpm ?? 0,
+        speedKmh: speedKmh ?? 0,
+        rpm: rpm ?? 0,
         fuelRateLPerHour: fuelRate,
-        throttlePercent: _latestThrottlePercent,
-        engineLoadPercent: _latestEngineLoadPercent,
-        coolantTempC: _latestCoolantTempC,
+        throttlePercent: throttlePercent,
+        engineLoadPercent: engineLoadPercent,
+        coolantTempC: coolantTempC,
         // #1374 phase 1 — stamp the most recent GPS fix when the
         // provider has pushed one in. Both fields stay null when the
         // feature flag is off (no Geolocator subscription was ever
         // started) or before the first fix lands.
-        latitude: _latestLatitude,
-        longitude: _latestLongitude,
+        latitude: snap.latestLatitude,
+        longitude: snap.latestLongitude,
       );
       _recorder.onSample(sample);
       _lastSampleAt = nowTs;
-      _maybeCaptureSample(sample);
+      _sampleBuffer.maybeCapture(sample);
     }
     if (fuelRate != null) {
       _fuelRateSeen = true;
@@ -1306,13 +1083,13 @@ class TripRecordingController {
           (_recorder.buildSummary().fuelLitersConsumed) ?? _fuelLitersSoFar;
     }
     final reading = TripLiveReading(
-      speedKmh: _latestSpeedKmh,
-      rpm: _latestRpm,
+      speedKmh: speedKmh,
+      rpm: rpm,
       fuelRateLPerHour: fuelRate,
-      fuelLevelPercent: _latestFuelLevelPercent,
-      engineLoadPercent: _latestEngineLoadPercent,
-      throttlePercent: _latestThrottlePercent,
-      coolantTempC: _latestCoolantTempC,
+      fuelLevelPercent: snap.latestFuelLevelPercent,
+      engineLoadPercent: engineLoadPercent,
+      throttlePercent: throttlePercent,
+      coolantTempC: coolantTempC,
       distanceKmSoFar: _recorder.buildSummary().distanceKm,
       fuelLitersSoFar: _fuelRateSeen ? _fuelLitersSoFar : null,
       elapsed: nowTs.difference(_startedAt ?? nowTs),
@@ -1322,236 +1099,13 @@ class TripRecordingController {
     _liveController.add(reading);
   }
 
-  /// Derive the current fuel rate (L/h) from whatever snapshot
-  /// values have landed so far. Mirrors the tier-1/2/3 fallback in
-  /// [Obd2Service.readFuelRateLPerHour], but over snapshot values
-  /// instead of live I/O — the scheduler has already done the
-  /// reads. Returns null when not enough inputs have arrived yet
-  /// (e.g. first 200 ms of a trip before MAP/IAT both land).
-  ///
-  /// AFR + density are chosen from the active vehicle's preferred
-  /// fuel type (#800). Diesel profiles get AFR 14.5 / density 832 g/L;
-  /// anything else (including null / unknown) stays on the petrol
-  /// defaults the pre-#800 path used.
-  double? _deriveFuelRateLPerHour() {
-    final preferredFuel =
-        _vehicle?.preferredFuelType?.trim().toLowerCase() ?? '';
-    final isDiesel = preferredFuel.contains('diesel');
-    // #1397 — manual overrides take precedence over the inferred /
-    // catalog-resolved values. Mirrors the resolution chain in
-    // [Obd2Service.readFuelRateLPerHour] so the live integrator and the
-    // pull-mode estimator agree on every scalar.
-    final afr = _vehicle?.manualAfrOverride ??
-        (isDiesel ? Obd2Service.dieselAfr : Obd2Service.petrolAfr);
-    final density = _vehicle?.manualFuelDensityGPerLOverride ??
-        (isDiesel
-            ? Obd2Service.dieselDensityGPerL
-            : Obd2Service.petrolDensityGPerL);
-    final displacement = _vehicle?.manualEngineDisplacementCcOverride
-            ?.round() ??
-        _vehicle?.engineDisplacementCc ??
-        1000;
-    // #1422 phase 1 — same precedence as Obd2Service.readFuelRateLPerHour:
-    // manual override → stored profile (when learned or non-default) →
-    // engine-tech helper on the reference catalog row → hard 0.85
-    // fallback. The two paths must agree so the live integrator and
-    // the pull-mode estimator produce identical numbers for the same
-    // tick.
-    final ve = _vehicle?.manualVolumetricEfficiencyOverride ??
-        _resolveControllerProfileVe() ??
-        (_referenceVehicle != null
-            ? defaultVolumetricEfficiency(_referenceVehicle)
-            : 0.85);
-    final collector = _breadcrumbCollector;
-
-    // Step 1: direct PID 5E. Already post-trim, no correction.
-    final direct = _latestDirectFuelRate;
-    if (direct != null) {
-      // #1395 — sanity bound A: implausibly-low at non-idle RPM.
-      // Same threshold as Obd2Service.readFuelRateLPerHour but evaluated
-      // on the controller's most-recent RPM snapshot so this works
-      // even when the trip is being driven by raw scheduler callbacks
-      // rather than the readFuelRate API.
-      String? lowFlag;
-      String? lowDetail;
-      final rpm = _latestRpm;
-      if (direct < 0.3 && rpm != null && rpm > 1500) {
-        lowFlag = Obd2BreadcrumbCollector.flagSuspiciousLow;
-        lowDetail = 'directRate=${direct.toStringAsFixed(2)};'
-            'rpm=${rpm.toStringAsFixed(0)}';
-      }
-      collector?.record(
-        branch: Obd2BranchTag.pid5E,
-        fuelRateLPerHour: direct,
-        pid5ELPerHour: direct,
-        rpm: rpm,
-        afr: afr,
-        fuelDensityGPerL: density,
-        engineDisplacementCc: displacement.toDouble(),
-        volumetricEfficiency: ve,
-        flag: lowFlag,
-        flagDetail: lowDetail,
-      );
-      // Sanity bound B: 5E vs MAF cross-check on the controller's
-      // cached MAF snapshot. Evaluated AFTER the breadcrumb is
-      // pushed so [recordFlag] mutates the same row.
-      final mafSnapshot = _latestMaf;
-      if (mafSnapshot != null) {
-        final mafDerived = mafSnapshot * 3600.0 / (afr * density);
-        if (mafDerived > 0 &&
-            (direct - mafDerived).abs() / mafDerived > 0.5) {
-          collector?.recordFlag(
-            Obd2BreadcrumbCollector.flag5eVsMafDivergent,
-            'direct=${direct.toStringAsFixed(2)};'
-                'mafDerived=${mafDerived.toStringAsFixed(2)};'
-                'maf=${mafSnapshot.toStringAsFixed(2)}',
-          );
-        }
-      }
-      return direct;
-    }
-
-    // Step 2: MAF-based. L/h = MAF × 3600 / (AFR × density).
-    final maf = _latestMaf;
-    if (maf != null) {
-      final raw = maf * 3600.0 / (afr * density);
-      final corrected = _applyTrim(raw);
-      collector?.record(
-        branch: Obd2BranchTag.maf,
-        fuelRateLPerHour: corrected,
-        mafGramsPerSecond: maf,
-        rpm: _latestRpm,
-        afr: afr,
-        fuelDensityGPerL: density,
-        engineDisplacementCc: displacement.toDouble(),
-        volumetricEfficiency: ve,
-      );
-      return corrected;
-    }
-
-    // Step 3: speed-density from MAP+IAT+RPM. Feeds the pre-#810
-    // estimator with the active vehicle's displacement + VE (#812).
-    final mapKpa = _latestMapKpa;
-    final iat = _latestIatCelsius;
-    final rpm = _latestRpm;
-    if (mapKpa == null || iat == null || rpm == null) {
-      collector?.record(
-        branch: Obd2BranchTag.none,
-        mapKpa: mapKpa,
-        iatCelsius: iat,
-        rpm: rpm,
-        afr: afr,
-        fuelDensityGPerL: density,
-        engineDisplacementCc: displacement.toDouble(),
-        volumetricEfficiency: ve,
-      );
-      return null;
-    }
-    final raw = Obd2Service.estimateFuelRateLPerHourFromMap(
-      mapKpa: mapKpa,
-      iatCelsius: iat,
-      rpm: rpm,
-      engineDisplacementCc: displacement,
-      volumetricEfficiency: ve,
-      afr: afr,
-      fuelDensityGPerL: density,
-    );
-    if (raw == null) {
-      collector?.record(
-        branch: Obd2BranchTag.none,
-        mapKpa: mapKpa,
-        iatCelsius: iat,
-        rpm: rpm,
-        afr: afr,
-        fuelDensityGPerL: density,
-        engineDisplacementCc: displacement.toDouble(),
-        volumetricEfficiency: ve,
-      );
-      return null;
-    }
-    final corrected = _applyTrim(raw);
-    collector?.record(
-      branch: Obd2BranchTag.speedDensity,
-      fuelRateLPerHour: corrected,
-      mapKpa: mapKpa,
-      iatCelsius: iat,
-      rpm: rpm,
-      afr: afr,
-      fuelDensityGPerL: density,
-      engineDisplacementCc: displacement.toDouble(),
-      volumetricEfficiency: ve,
-    );
-    return corrected;
-  }
-
-  /// Returns the user profile's η_v that should beat the engine-tech
-  /// helper, or null when the helper should kick in instead (#1422
-  /// phase 1). Mirrors the rules in [_resolveProfileVolumetricEfficiency]
-  /// in `obd2_service.dart` so both the live integrator and the
-  /// pull-mode estimator agree on a per-tick basis.
-  ///
-  /// Profile null → null (caller will use the helper or hard fallback).
-  /// Without a reference catalog row the stored profile value is the
-  /// best we can do, even if it equals the legacy 0.85 default.
-  /// Otherwise: keep the stored value when the VeLearner has logged at
-  /// least one sample OR when the value differs from the legacy 0.85
-  /// default. A cold-start profile sitting on 0.85 with zero samples
-  /// returns null, letting the engine-tech helper provide a closer
-  /// initial guess (e.g. 0.95 for a Dacia dCi VNT diesel).
-  double? _resolveControllerProfileVe() {
-    final v = _vehicle;
-    if (v == null) return null;
-    if (_referenceVehicle == null) return v.volumetricEfficiency;
-    if (v.volumetricEfficiencySamples > 0) return v.volumetricEfficiency;
-    if (v.volumetricEfficiency != 0.85) return v.volumetricEfficiency;
-    return null;
-  }
-
-  /// Apply the STFT + LTFT correction used on the MAF / speed-density
-  /// branches (#813). Returns [raw] unchanged when either trim hasn't
-  /// landed yet — better an uncorrected estimate than one shifted by
-  /// half the real signal.
-  double _applyTrim(double raw) {
-    final stft = _latestStft;
-    final ltft = _latestLtft;
-    if (stft == null || ltft == null) return raw;
-    return Obd2Service.applyFuelTrimCorrection(raw, stft: stft, ltft: ltft);
-  }
-
-  /// Append [sample] to the captured-samples buffer when at least
-  /// 1 second has elapsed since the previous capture. The 4 Hz emit
-  /// loop drops 3 of every 4 candidate samples — the chart layer
-  /// renders at 1 Hz and the storage budget is sized for that
-  /// cadence (#1040).
-  void _maybeCaptureSample(TripSample sample) {
-    final last = _lastCapturedAt;
-    if (last != null) {
-      // Use 950 ms as the gate so a 1 Hz scheduler that's slightly
-      // jittered (998 ms / 1003 ms) still captures every tick. Without
-      // the slack a 998 ms gap would slip through the >=1000 check
-      // and we'd silently halve the captured rate.
-      if (sample.timestamp.difference(last).inMilliseconds < 950) return;
-    }
-    _capturedSamples.add(sample);
-    _lastCapturedAt = sample.timestamp;
-    if (_capturedSamples.length > _capturedSampleCap) {
-      // Drop the oldest slice — losing the early stretch is preferable
-      // to letting a forgotten overnight recording eat unbounded memory.
-      _capturedSamples.removeRange(
-        0,
-        _capturedSamples.length - _capturedSampleCap,
-      );
-    }
-  }
-
   /// Exposed for tests: append a sample to the captured-samples buffer
   /// without going through the scheduler / debounced emit timer
   /// (#1040). Tests use this to populate a deterministic buffer + then
   /// drive [TripRecording.stop] end-to-end.
   @visibleForTesting
   void debugCaptureSample(TripSample sample) {
-    _capturedSamples.add(sample);
-    _lastCapturedAt = sample.timestamp;
+    _sampleBuffer.debugCaptureSample(sample);
   }
 
   /// Exposed for tests: force an emit immediately instead of waiting
@@ -1588,12 +1142,12 @@ class TripRecordingController {
   /// silent-failure tests assert "49 nulls did NOT trigger" before
   /// the 50th lands (#1330 phase 3).
   @visibleForTesting
-  int get debugConsecutiveNullReads => _consecutiveNullReads;
+  int get debugConsecutiveNullReads => _dropDetector.consecutiveNullReads;
 
   /// Exposed for tests: whether the silent-failure handler has fired
   /// for this recording session. Resets on resume() / stop().
   @visibleForTesting
-  bool get debugSilentFailureFired => _silentFailureFired;
+  bool get debugSilentFailureFired => _dropDetector.silentFailureFired;
 
   /// Exposed for tests: synchronously drive the grace-window
   /// finalisation path. Useful with fake-async patterns where

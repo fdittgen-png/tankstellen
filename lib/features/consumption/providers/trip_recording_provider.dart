@@ -2,33 +2,20 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../core/feedback/auto_record_badge_service.dart';
-import '../../../core/location/geolocator_wrapper.dart';
 import '../../../core/providers/app_state_provider.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/sync/trips_sync.dart';
-import '../../../core/sync/baselines_sync.dart';
-import '../../feature_management/application/feature_flags_provider.dart';
-import '../../feature_management/domain/feature.dart';
-import '../../glide_coach/data/traffic_signal_repository.dart';
-import '../../glide_coach/domain/entities/glide_coach_advice.dart';
-import '../../glide_coach/providers/glide_coach_evaluator_provider.dart';
-import '../../glide_coach/providers/glide_coach_settings_provider.dart';
 import '../../search/domain/entities/fuel_type.dart';
-import '../../sync/providers/baseline_sync_enabled_provider.dart';
 import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../../vehicle/data/vehicle_profile_catalog_matcher.dart';
 import '../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
-import '../../vehicle/domain/fuzzy_classifier.dart';
-import '../../vehicle/providers/calibration_mode_providers.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
-import '../data/baseline_store.dart';
 import '../data/obd2/active_trip_repository.dart';
 import '../data/obd2/adapter_registry.dart';
 import '../data/obd2/adapter_reconnect_scanner.dart';
@@ -39,9 +26,10 @@ import 'obd2_breadcrumb_provider.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
-import '../domain/situation_classifier.dart';
 import '../domain/trip_recorder.dart';
-import 'haptic_feedback_policy.dart';
+import 'trip_baseline_recorder.dart';
+import 'trip_gps_stream_controller.dart';
+import 'trip_haptic_controller.dart';
 import 'trip_history_provider.dart';
 import 'trip_recording_phase.dart';
 import 'trip_recording_state.dart';
@@ -79,17 +67,6 @@ class TripRecording extends _$TripRecording {
   TripRecordingController? _controller;
   StreamSubscription<TripLiveReading>? _liveSub;
   StreamSubscription<TripRecordingControllerState>? _stateSub;
-  // #1374 phase 1 — Geolocator position stream feeding the
-  // controller's per-tick GPS latch. Only created when
-  // `Feature.gpsTripPath` is enabled at trip-start; the flag-off
-  // path leaves this null and never touches the plugin, so the
-  // battery / permission cost is exactly zero for users who haven't
-  // opted in. Cancelled on stop alongside the live + state subs.
-  StreamSubscription<Position>? _gpsSub;
-  SituationClassifier? _classifier;
-  BaselineStore? _store;
-  String? _vehicleId;
-  ConsumptionFuelFamily _fuelFamily = ConsumptionFuelFamily.gasoline;
 
   // #1312 — adapter identity captured at trip-start so it survives
   // into the saved [TripHistoryEntry] even if the [Obd2Service] has
@@ -112,14 +89,36 @@ class TripRecording extends _$TripRecording {
   // certainly foreground.
   AppLifecycleState _lifecycleState = AppLifecycleState.resumed;
 
+  /// #767 band-transition haptics, extracted into a focused
+  /// collaborator (#1679). Constructed once and reused across
+  /// recordings so the test counters accumulate exactly as the
+  /// inlined fields did.
+  final TripHapticController _haptics = TripHapticController();
+
+  /// #1374 / #1125 / #1458 GPS concern — the opt-in Geolocator
+  /// position stream, the per-fix cadence diagnostics, and the
+  /// glide-coach evaluation hook — extracted into a focused
+  /// collaborator (#1679). `late` so it can capture [ref] and the
+  /// [_lifecycleState] getter.
+  late final TripGpsStreamController _gps = TripGpsStreamController(
+    ref: ref,
+    lifecycleState: () => _lifecycleState,
+  );
+
+  /// #769 / #780 / #894 baseline-learning concern — the per-trip
+  /// situation classifier, the learned-baseline store, and the
+  /// classify → record → band → delta pipeline — extracted into a
+  /// focused collaborator (#1679). `late` so it can capture [ref].
+  late final TripBaselineRecorder _baselines = TripBaselineRecorder(ref);
+
   /// Tests count haptic fires via these instead of hooking the
   /// platform channel. The production path also still calls
   /// [HapticFeedback], so counting here doesn't short-circuit the
   /// real vibration on a device.
   @visibleForTesting
-  int hapticLightCount = 0;
+  int get hapticLightCount => _haptics.lightCount;
   @visibleForTesting
-  int hapticMediumCount = 0;
+  int get hapticMediumCount => _haptics.mediumCount;
 
   /// Exposed for tests: the underlying [TripRecordingController] while
   /// a trip is active. Lets the #1040 sample-persistence test inject a
@@ -324,40 +323,18 @@ class TripRecording extends _$TripRecording {
       breadcrumbCollector: breadcrumbs,
     );
     _controller = ctl;
-    _classifier = SituationClassifier();
 
     // #769 — resolve the active vehicle + fuel family and load its
-    // learned baselines from Hive. Falls back silently to cold-start
-    // defaults when the box isn't open (widget tests) or the active
-    // vehicle is unavailable.
-    try {
-      final vehicle = ref.read(activeVehicleProfileProvider);
-      _vehicleId = vehicle?.id;
-      _lastTripVehicleId ??= vehicle?.id;
-      _fuelFamily = _resolveFuelFamily(vehicle?.preferredFuelType);
-      if (Hive.isBoxOpen(HiveBoxes.obd2Baselines)) {
-        _store = BaselineStore(
-          box: Hive.box<String>(HiveBoxes.obd2Baselines),
-        );
-        if (_vehicleId != null) {
-          await _store!.loadVehicle(_vehicleId!);
-        }
-      }
-    } catch (e, st) {
-      debugPrint('TripRecording.start: baseline setup failed: $e\n$st');
-      _store = null;
-    }
+    // learned baselines from Hive (delegated to TripBaselineRecorder).
+    _lastTripVehicleId ??= activeVehicle?.id;
+    await _baselines.load();
 
     await ctl.start();
     // #1374 phase 1 — opt-in GPS sampling. Only when the user has
     // explicitly turned the feature on do we open a Geolocator
     // position stream; the flag-off path skips the plugin entirely so
-    // a default-config user pays no battery cost. Errors on the
-    // stream are logged and swallowed (a permission revoke mid-trip
-    // must not derail the recording) — the controller's per-tick
-    // latch simply stops being refreshed and subsequent samples
-    // carry `latitude: null, longitude: null`.
-    _startGpsSubscriptionIfEnabled(ctl);
+    // a default-config user pays no battery cost.
+    _gps.start(ctl);
     // #1303 — seed the active-trip snapshot identity now that the
     // controller knows its session id + odometer reads. The first
     // flush happens off the live-stream debounce below; if the
@@ -366,17 +343,14 @@ class TripRecording extends _$TripRecording {
     // recording UI on next launch.
     _seedActiveSnapshot();
     _liveSub = ctl.live.listen((reading) {
-      final situation = _classifyFrom(reading);
-      _recordToStore(reading, situation);
-      final band = _classifyBandFrom(reading, situation);
-      final delta = _computeDelta(reading, situation);
-      _fireBandTransitionHaptic(state.band, band);
+      final classified = _baselines.recordAndClassify(reading);
+      _haptics.fireForBandTransition(state.band, classified.band);
       state = state.copyWith(
         phase: _phaseFor(ctl),
         live: reading,
-        situation: situation,
-        band: band,
-        liveDeltaFraction: delta,
+        situation: classified.situation,
+        band: classified.band,
+        liveDeltaFraction: classified.delta,
       );
       // #1303 — debounced write-through. Cheap when the gate
       // rejects (a single timestamp comparison + counter bump).
@@ -430,25 +404,6 @@ class TripRecording extends _$TripRecording {
     }
   }
 
-  /// #767 — fire a short haptic when the band crosses *into* heavy
-  /// territory. Positive improvements (normal → eco) stay silent so
-  /// the vibration is a corrective nudge, not constant feedback.
-  void _fireBandTransitionHaptic(
-    ConsumptionBand previous,
-    ConsumptionBand current,
-  ) {
-    switch (hapticForBandTransition(previous, current)) {
-      case HapticIntensity.light:
-        hapticLightCount++;
-        HapticFeedback.lightImpact();
-      case HapticIntensity.medium:
-        hapticMediumCount++;
-        HapticFeedback.mediumImpact();
-      case HapticIntensity.none:
-        break;
-    }
-  }
-
   /// Map a [FuelType] apiValue onto a [ConsumptionFuelFamily] for
   /// the cold-start tables. Everything that isn't diesel maps to
   /// gasoline — LPG/CNG calorific values are close enough to petrol
@@ -488,162 +443,6 @@ class TripRecording extends _$TripRecording {
       debugPrint('TripRecording: reference catalog unavailable: $e\n$st');
       return null;
     }
-  }
-
-  ConsumptionFuelFamily _resolveFuelFamily(String? apiValue) {
-    if (apiValue == null) return ConsumptionFuelFamily.gasoline;
-    if (apiValue.startsWith('diesel')) return ConsumptionFuelFamily.diesel;
-    return ConsumptionFuelFamily.gasoline;
-  }
-
-  void _recordToStore(TripLiveReading r, DrivingSituation situation) {
-    final store = _store;
-    final vid = _vehicleId;
-    if (store == null || vid == null) return;
-    final baseline = coldStartBaseline(_fuelFamily, situation);
-    final live = _liveConsumptionFor(r, baseline);
-    if (live == null) return;
-
-    // #894 wiring (#1426): when the active vehicle has opted into
-    // fuzzy calibration, route this sample through the fuzzy
-    // classifier and record one weighted vote per non-zero
-    // membership bucket. Rule mode keeps the legacy single-bucket
-    // path so users who haven't opted in see no behaviour change.
-    final profile = _tryReadActiveVehicle();
-    if (profile?.calibrationMode == VehicleCalibrationMode.fuzzy) {
-      _recordFuzzy(store, vid, r, live);
-      return;
-    }
-
-    store.record(
-      vehicleId: vid,
-      situation: situation,
-      value: live,
-    );
-  }
-
-  /// Fuzzy path: split [live] across all non-transient buckets the
-  /// classifier flags as members, weighted by membership.
-  ///
-  /// `accel` and `grade` aren't on the OBD2 live stream, so we pass
-  /// 0 — the classifier degrades gracefully (decel and climbing zero
-  /// out, which is the same conservative result the rule path
-  /// produces when those signals are missing). [Situation.fuelCut]
-  /// maps onto a transient and is filtered by [BaselineStore]; we
-  /// drop it pre-call so the bridge stays explicit.
-  void _recordFuzzy(
-    BaselineStore store,
-    String vehicleId,
-    TripLiveReading r,
-    double live,
-  ) {
-    final classifier = ref.read(fuzzyClassifierProvider);
-    final memberships = classifier.classify(
-      speedKmh: r.speedKmh ?? 0,
-      accel: 0,
-      grade: 0,
-      throttlePct: r.engineLoadPercent ?? 0,
-      rpm: r.rpm ?? 0,
-    );
-    for (final entry in memberships.entries) {
-      if (entry.value <= 0) continue;
-      final ds = _bridgeFuzzySituation(entry.key);
-      if (ds == null) continue;
-      store.recordWeighted(
-        vehicleId: vehicleId,
-        situation: ds,
-        value: live,
-        weight: entry.value,
-      );
-    }
-  }
-
-  /// Bridge between the vehicle layer's [Situation] enum (#894) and
-  /// the consumption layer's [DrivingSituation] enum (#769). Returns
-  /// null for transient buckets the [BaselineStore] doesn't persist.
-  static DrivingSituation? _bridgeFuzzySituation(Situation s) {
-    switch (s) {
-      case Situation.idle:
-        return DrivingSituation.idle;
-      case Situation.stopAndGo:
-        return DrivingSituation.stopAndGo;
-      case Situation.urban:
-        return DrivingSituation.urbanCruise;
-      case Situation.highway:
-        return DrivingSituation.highwayCruise;
-      case Situation.climbing:
-        return DrivingSituation.climbingOrLoaded;
-      case Situation.decel:
-        return DrivingSituation.deceleration;
-      case Situation.fuelCut:
-        return null;
-    }
-  }
-
-  SituationBaseline _baselineFor(DrivingSituation situation) {
-    final store = _store;
-    final vid = _vehicleId;
-    if (store == null || vid == null) {
-      return coldStartBaseline(_fuelFamily, situation);
-    }
-    return store.lookup(
-      vehicleId: vid,
-      situation: situation,
-      fuelFamily: _fuelFamily,
-    );
-  }
-
-  DrivingSituation _classifyFrom(TripLiveReading r) {
-    final cls = _classifier;
-    if (cls == null) return DrivingSituation.idle;
-    return cls.onSample(DrivingSample(
-      timestamp: DateTime.now(),
-      speedKmh: r.speedKmh ?? 0,
-      rpm: r.rpm ?? 0,
-      throttlePercent: r.engineLoadPercent, // close-enough proxy
-      engineLoadPercent: r.engineLoadPercent,
-      fuelRateLPerHour: r.fuelRateLPerHour,
-    ));
-  }
-
-  ConsumptionBand _classifyBandFrom(
-    TripLiveReading r,
-    DrivingSituation situation,
-  ) {
-    final baseline = _baselineFor(situation);
-    final live = _liveConsumptionFor(r, baseline);
-    if (live == null) return ConsumptionBand.normal;
-    return classifyBand(
-      situation: situation,
-      live: live,
-      baseline: baseline,
-    );
-  }
-
-  double? _computeDelta(
-    TripLiveReading r,
-    DrivingSituation situation,
-  ) {
-    final baseline = _baselineFor(situation);
-    if (baseline.value <= 0) return null;
-    final live = _liveConsumptionFor(r, baseline);
-    if (live == null) return null;
-    return (live - baseline.value) / baseline.value;
-  }
-
-  /// Compute the live consumption value in the baseline's unit —
-  /// L/h for idle baselines, L/100 km otherwise. Returns null when
-  /// the car isn't reporting enough data to derive the metric.
-  double? _liveConsumptionFor(
-    TripLiveReading r,
-    SituationBaseline baseline,
-  ) {
-    final fuelRate = r.fuelRateLPerHour;
-    final speed = r.speedKmh;
-    if (fuelRate == null) return null;
-    if (baseline.unit == BaselineUnit.lPerHour) return fuelRate;
-    if (speed == null || speed <= 5) return null; // avoid /0
-    return fuelRate * 100.0 / speed;
   }
 
   void pause() {
@@ -734,8 +533,7 @@ class TripRecording extends _$TripRecording {
     // was opened (flag-on path only). Best-effort: a null sub is the
     // common case (flag off) and a cancel that throws shouldn't
     // block trip teardown.
-    await _gpsSub?.cancel();
-    _gpsSub = null;
+    await _gps.stop();
     _controller = null;
     // #726 — persist to the trip history rolling log. Every trip
     // (including discarded ones) is logged; the fill-up flow is a
@@ -747,27 +545,10 @@ class TripRecording extends _$TripRecording {
       gpsSampleDiagnostics: capturedGpsDiagnostics,
       automatic: automatic,
     );
-    // #769 — flush learned baselines before releasing the service so
-    // the next trip starts from the updated values. Best-effort: a
-    // Hive write failure here shouldn't block teardown.
-    final store = _store;
-    final vid = _vehicleId;
-    if (store != null && vid != null) {
-      try {
-        await store.flush(vid);
-      } catch (e, st) {
-        debugPrint('TripRecording.stop: baseline flush failed: $e\n$st');
-      }
-      // #780 — fold in the server copy once the local flush lands.
-      // `syncVehicleBaseline` returns the merged JSON; if the merge
-      // changed anything, we rewrite Hive and reload so the next
-      // trip sees the higher-confidence per-situation accumulators.
-      // Entirely best-effort: offline, unauthenticated, or sync
-      // errors all return the local payload unchanged.
-      await _syncBaselineAfterFlush(vid);
-    }
-    _store = null;
-    _vehicleId = null;
+    // #769 / #780 — flush learned baselines + fold in the server copy
+    // before releasing the service so the next trip starts from the
+    // updated values. Delegated to TripBaselineRecorder; best-effort.
+    await _baselines.flushAndSync();
     // #1312 — clear the captured adapter identity once the trip has
     // been persisted; the next [start] call snapshots fresh values
     // from whichever service it receives.
@@ -849,142 +630,6 @@ class TripRecording extends _$TripRecording {
     }
   }
 
-  /// Open a Geolocator position stream and route every fix through
-  /// [TripRecordingController.updateGpsFix] (#1374 phase 1).
-  ///
-  /// No-op when [Feature.gpsTripPath] is disabled — that's the
-  /// default for every existing user, so this method must NEVER pull
-  /// on the Geolocator plugin in that case (zero battery cost). When
-  /// the flag is on we open the stream at [LocationAccuracy.high]
-  /// because the eventual heatmap (Phase 3) wants ~10 m precision;
-  /// downgrading to medium / low is a Phase 2 follow-up if device
-  /// testing flags battery as an issue.
-  ///
-  /// Stream errors are logged and swallowed: a permission revoke
-  /// mid-trip, a temporary loss of fix, or the OS killing the
-  /// position service must NOT derail the OBD2 trip recording. The
-  /// controller's per-tick latch simply stops being refreshed and
-  /// subsequent samples carry `latitude: null, longitude: null`.
-  void _startGpsSubscriptionIfEnabled(TripRecordingController ctl) {
-    final flags = ref.read(featureFlagsProvider.notifier);
-    if (!flags.isEnabled(Feature.gpsTripPath)) return;
-    final geolocator = ref.read(geolocatorWrapperProvider);
-    try {
-      _gpsSub = geolocator
-          .getPositionStream(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
-      )
-          .listen(
-        (pos) {
-          ctl.updateGpsFix(
-            latitude: pos.latitude,
-            longitude: pos.longitude,
-          );
-          // #1458 phase 2 — record one cadence-diagnostic per fix so the
-          // user can see, post-trip, whether the OS kept delivering
-          // position updates while the phone was asleep / unpinned. The
-          // call is cheap (one allocation + one list append, capped) so
-          // it's safe on the hot path; the in-memory buffer is flushed
-          // onto the persisted [TripHistoryEntry] at trip-stop time.
-          ctl.recordGpsSampleDiagnostic(
-            now: DateTime.now(),
-            lifecycleState: _lifecycleState.name,
-          );
-          // #1125 phase 3b — opt-in glide-coach evaluation. The hook is
-          // gated by:
-          //   1. The compile-time master flag kGlideCoachEnabled (false
-          //      in production; this branch compiles to a constant
-          //      no-op the optimiser can fully elide).
-          //   2. The user-facing toggle GlideCoachSettings.enabled.
-          //   3. The presence of a recent throttle reading (cars
-          //      without PID 0x11 — or a freshly-started trip whose
-          //      first sample hasn't landed — short-circuit to "do
-          //      nothing").
-          // Both flags must be true for the haptic to fire. See the
-          // class doc on `GlideCoachEvaluator` for the 5-rule decision
-          // flow that the evaluator itself runs.
-          unawaited(_maybeFireGlideCoach(ctl, pos));
-        },
-        onError: (Object error) {
-          debugPrint('TripRecording GPS stream error: $error');
-        },
-      );
-    } catch (e, st) {
-      debugPrint('TripRecording GPS subscribe failed: $e\n$st');
-    }
-  }
-
-  /// Per-GPS-fix glide-coach evaluator hook (#1125 phase 3b).
-  ///
-  /// Layered gate (in order — each rejects the next):
-  ///   1. Compile-time `kGlideCoachEnabled` master flag. False in
-  ///      production today; the call is a constant-folded no-op.
-  ///   2. User-facing toggle from `GlideCoachSettings`.
-  ///   3. Latest throttle reading from the controller's captured-sample
-  ///      buffer (cars without PID 0x11 → null → evaluator returns
-  ///      `hold` per its rule 2; the haptic does not fire).
-  ///   4. Provider returns null (Hive box closed in widget tests, etc.) —
-  ///      treat as feature off.
-  ///
-  /// The evaluator's 5-rule flow then decides between
-  /// `lift` / `hold` / `cooldown`. Only `lift` translates into a
-  /// `HapticFeedback.lightImpact()` call — "subtle" per the issue body
-  /// (#1125), distinct from the medium / heavy intensities used by the
-  /// over-throttle eco-coach (#767).
-  ///
-  /// Errors are caught and logged: a permission revoke mid-trip, an
-  /// Overpass timeout, or a stale Hive box must NOT derail the OBD2
-  /// recording. Best-effort, non-blocking.
-  Future<void> _maybeFireGlideCoach(
-    TripRecordingController ctl,
-    Position pos,
-  ) async {
-    // Rule 1 — compile-time master flag. The constant gate makes this
-    // path constant-fold to nothing in a flag-false build.
-    if (!kGlideCoachEnabled) return;
-    try {
-      // Rule 2 — user toggle. Defaults to false; even with the master
-      // flag flipped, an opt-in is required.
-      final settings = ref.read(glideCoachSettingsProvider);
-      if (!settings.enabled) return;
-      // Rule 4 — provider returns null when the feature is fully
-      // unavailable (Hive box closed in tests). Resolved AFTER the
-      // user-toggle gate so an off-by-default user pays no Hive read.
-      final evaluator = ref.read(glideCoachEvaluatorProvider);
-      if (evaluator == null) return;
-      // Rule 3 — pull the latest throttle from the controller's
-      // captured-sample buffer. The buffer accumulates at 1 Hz (#1040);
-      // the GPS listener cadence is set by `LocationAccuracy.high`
-      // (typically also ~1 Hz). Cars without PID 0x11 carry
-      // `throttlePercent == null` on every sample; the evaluator's
-      // rule 2 short-circuits that to `hold` so this getter returning
-      // null is fine.
-      final samples = ctl.capturedSamples;
-      final throttle = samples.isEmpty
-          ? null
-          : samples.last.throttlePercent;
-      final reading = (
-        latitude: pos.latitude,
-        longitude: pos.longitude,
-        headingDegrees: pos.heading,
-      );
-      final advice = await evaluator.evaluate(
-        reading: reading,
-        throttlePercent: throttle,
-      );
-      if (advice == GlideCoachAdvice.lift) {
-        // Subtle on purpose — `lightImpact`, not `mediumImpact`. The
-        // issue body explicitly calls out distraction risk; the haptic
-        // is a hint, not a brake-warning.
-        await HapticFeedback.lightImpact();
-      }
-    } catch (e, st) {
-      debugPrint('TripRecording glide-coach evaluation failed: $e\n$st');
-    }
-  }
-
   /// Initialise [_activeSnapshot] from controller state immediately
   /// after [start] succeeds. The snapshot is kept null until then so
   /// the lifecycle-paused hook on a never-started provider is a no-op.
@@ -995,7 +640,7 @@ class TripRecording extends _$TripRecording {
     final startedAt = _lastTripStartedAt ?? DateTime.now();
     _activeSnapshot = ActiveTripSnapshot(
       id: id,
-      vehicleId: _lastTripVehicleId ?? _vehicleId,
+      vehicleId: _lastTripVehicleId ?? _baselines.vehicleId,
       vin: ctl.vin,
       automatic: false, // refined on every flush via _buildSnapshotFor
       phase: 'recording',
@@ -1335,44 +980,6 @@ class TripRecording extends _$TripRecording {
     return true;
   }
 
-  /// #780 — merge local + server baselines for [vehicleId] via the
-  /// sync service. Called after the Hive flush so the payload on
-  /// disk is what actually gets sent, and the merged result (higher
-  /// per-situation sample counts) overwrites disk for the next
-  /// trip. No-op when the Hive box is closed or the sync client
-  /// is offline/unauthenticated — both paths return the input
-  /// payload unchanged.
-  Future<void> _syncBaselineAfterFlush(String vehicleId) async {
-    try {
-      // #780 phase 3 — honour the opt-in setting. Default false so
-      // users who never toggled it in the sync setup screen don't
-      // silently upload driving data. Ungated favourite sync etc.
-      // are unaffected.
-      // #1373 phase 3e — read the central feature flag instead of the
-      // legacy Hive key. ref.read (not watch) — this is a one-shot
-      // gate at flush time, not a reactive dependency.
-      final enabled = ref.read(baselineSyncEnabledProvider);
-      if (!enabled) return;
-      if (!Hive.isBoxOpen(HiveBoxes.obd2Baselines)) return;
-      final box = Hive.box<String>(HiveBoxes.obd2Baselines);
-      final key = 'baseline:$vehicleId';
-      final localJson = box.get(key);
-      final merged = await BaselinesSync.merge(
-        vehicleId: vehicleId,
-        localJson: localJson,
-      );
-      if (merged != null && merged != localJson) {
-        await box.put(key, merged);
-        // No in-memory cache refresh needed — _store is nulled out
-        // right after this call and the next trip creates a fresh
-        // BaselineStore whose loadVehicle reads the merged JSON
-        // from disk.
-      }
-    } catch (e, st) {
-      debugPrint('TripRecording.stop: baseline sync failed: $e\n$st');
-    }
-  }
-
   /// Build the reconnect-scanner factory handed to
   /// [TripRecordingController] (#797 phase 3). The returned closure
   /// is called once per drop with the pinned MAC + an onReconnect
@@ -1453,7 +1060,7 @@ class TripRecording extends _$TripRecording {
           DateTime.now().toIso8601String();
       await repo.save(TripHistoryEntry(
         id: id,
-        vehicleId: _vehicleId,
+        vehicleId: _baselines.vehicleId,
         summary: summary,
         automatic: automatic,
         samples: samples,
@@ -1495,7 +1102,7 @@ class TripRecording extends _$TripRecording {
             (e) => e.id == id,
             orElse: () => TripHistoryEntry(
               id: id,
-              vehicleId: _vehicleId,
+              vehicleId: _baselines.vehicleId,
               summary: summary,
               automatic: automatic,
             ),
