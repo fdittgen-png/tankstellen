@@ -768,7 +768,11 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
       final avg = stats.avgConsumptionL100km;
       if (avg == null) return null;
       return '${avg.toStringAsFixed(1)} L/100 km';
-    } catch (_) {
+    } catch (e, st) {
+      // A malformed fill-up set must not crash the summary card —
+      // but log the cause rather than hiding it silently (#1682).
+      debugPrint(
+          'TripRecordingScreen: consumption summary calc failed: $e\n$st');
       return null;
     }
   }

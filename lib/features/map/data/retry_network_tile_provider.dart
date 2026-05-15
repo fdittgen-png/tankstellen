@@ -248,7 +248,12 @@ class RetryingTileHttpClient extends http.BaseClient {
       final when = HttpDate.parse(raw);
       final diff = when.difference(DateTime.now());
       return diff.isNegative ? Duration.zero : diff;
-    } catch (_) {
+    } catch (e, st) {
+      // Malformed Retry-After header — fall back to exponential
+      // backoff. Log so a persistently-bad upstream header is visible
+      // rather than silently discarded (#1682).
+      debugPrint(
+          'RetryingTileHttpClient: unparseable Retry-After "$raw": $e\n$st');
       return null;
     }
   }
