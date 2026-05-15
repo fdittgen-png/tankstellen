@@ -40,10 +40,47 @@ jobs:
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
       - run: flutter pub get
-      - run: dart run build_runner build --delete-conflicting-outputs
+      # #1730 — no `build_runner build` here. The .g.dart / .freezed.dart
+      # outputs are committed and kept honest by the `codegen-drift` job
+      # below, so `analyze` trusts the checked-in generated files instead
+      # of paying a redundant codegen pass.
       - run: flutter analyze --no-fatal-infos
       - name: Check feature-module boundaries
         run: bash scripts/check_module_boundaries.sh
+
+  # #1730 — committed-codegen guard. Every `.g.dart` / `.freezed.dart`
+  # is committed to the repo, so the `analyze`, `test` and
+  # `startup-budget` jobs trust the checked-in files instead of
+  # regenerating them (which previously cost ~6 redundant build_runner
+  # passes per CI run). This job is what keeps that trust honest: it
+  # regenerates from a clean checkout and fails if the committed output
+  # is stale — i.e. someone edited a `@riverpod` / `@freezed` class but
+  # forgot to run build_runner. Before this gate the staleness was
+  # invisible: every other job regenerated over the top of the stale
+  # files, so CI went green and the drift rotted in the repo.
+  codegen-drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - name: Fail if committed codegen is stale
+        run: |
+          if ! git diff --exit-code -- '*.g.dart' '*.freezed.dart'; then
+            echo "::error::Committed generated files are stale. Run 'dart run build_runner build --delete-conflicting-outputs' locally and commit the result." >&2
+            exit 1
+          fi
 
   # #1581 — Test job sharded 4× across parallel runners. Each shard
   # runs `flutter test --total-shards=4 --shard-index=N` so every
@@ -64,8 +101,8 @@ jobs:
   # re-runs those with the tag so a real regression still surfaces.
   #
   # #1585 — Cache the `build/` directory keyed on pubspec + lib hash
-  # so re-runs of the same branch skip the build_runner regen step
-  # and avoid recompiling Dart sources untouched since the last run.
+  # so re-runs of the same branch avoid recompiling Dart sources
+  # untouched since the last run.
   #
   # #1594 — On `pull_request` events a `dart run tool/test_selector.dart`
   # pre-step writes the affected-test list to `affected_tests.txt`. The
@@ -99,14 +136,15 @@ jobs:
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
       # #1585 — Cache compiled artefacts. Same-branch reruns and rebase
-      # rounds reuse build_runner output keyed on the source state.
+      # rounds reuse the compiled Dart output keyed on the source state.
       - uses: actions/cache@v5
         with:
           path: build/
           key: ${{ runner.os }}-build-${{ hashFiles('pubspec.lock', 'lib/**/*.dart') }}
           restore-keys: ${{ runner.os }}-build-
       - run: flutter pub get
-      - run: dart run build_runner build --delete-conflicting-outputs
+      # #1730 — no `build_runner build` here. Committed generated files
+      # are trusted; the `codegen-drift` job gates their freshness.
       # #1594 — Compute the affected-test list once per shard. Fast
       # (pure Dart, file-walk) and per-shard so the selector cost is
       # parallelised. Empty output triggers a full-suite fallback in
@@ -238,7 +276,8 @@ jobs:
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
       - run: flutter pub get
-      - run: dart run build_runner build --delete-conflicting-outputs
+      # #1730 — no `build_runner build` here. Committed generated files
+      # are trusted; the `codegen-drift` job gates their freshness.
       - name: Check startup time budget
         run: bash scripts/check_startup_budget.sh
 
