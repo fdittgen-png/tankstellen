@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/feature_management/domain/app_profile.dart';
+import 'package:tankstellen/features/feature_management/domain/conso_mode.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 
 /// Pure-domain coverage for the [AppProfile] bundles and the detection
@@ -141,6 +142,73 @@ void main() {
         Feature.tflitePricePrediction,
       };
       expect(detectProfileFromFlags(flags), AppProfile.custom);
+    });
+  });
+
+  // #1574 — Lock the profile bundles to clean ConsoMode values so a
+  // future bundle edit that drifts (e.g. enables obd2TripRecording on
+  // Medium, or strips manualConsumption from Full) trips a clear test
+  // instead of presenting a half-broken Conso surface to users.
+  group('profile bundles map to clean ConsoMode values', () {
+    test('basic ⇒ ConsoMode.off (no Conso surface at all)', () {
+      expect(
+        consoModeFromFlags(appProfileBundles[AppProfile.basic]!),
+        ConsoMode.off,
+      );
+    });
+
+    test('medium ⇒ ConsoMode.fuel (manual fill-ups, no Trajets)', () {
+      expect(
+        consoModeFromFlags(appProfileBundles[AppProfile.medium]!),
+        ConsoMode.fuel,
+      );
+    });
+
+    test('full ⇒ ConsoMode.fuelAndTrips (full Conso + OBD2)', () {
+      expect(
+        consoModeFromFlags(appProfileBundles[AppProfile.full]!),
+        ConsoMode.fuelAndTrips,
+      );
+    });
+  });
+
+  // #1574 — Structural invariants over every preset bundle: the Conso
+  // flag set must be self-consistent so the runtime never has to deal
+  // with "trips on but no fill-ups" or "Trajets opt-ins without OBD2".
+  group('profile bundles satisfy Conso surface invariants', () {
+    test('no bundle has obd2TripRecording without manualConsumption + '
+        'showConsumptionTab', () {
+      for (final entry in appProfileBundles.entries) {
+        final bundle = entry.value;
+        if (bundle.contains(Feature.obd2TripRecording)) {
+          expect(bundle, contains(Feature.manualConsumption),
+              reason:
+                  '${entry.key.name}: obd2TripRecording implies manualConsumption');
+          expect(bundle, contains(Feature.showConsumptionTab),
+              reason:
+                  '${entry.key.name}: obd2TripRecording implies showConsumptionTab');
+        }
+      }
+    });
+
+    test('no bundle has Trajets-tier opt-ins (autoRecord, gpsTripPath, '
+        'hapticEcoCoach, glideCoach) without obd2TripRecording', () {
+      const trajetsTierFlags = {
+        Feature.autoRecord,
+        Feature.gpsTripPath,
+        Feature.hapticEcoCoach,
+        Feature.glideCoach,
+      };
+      for (final entry in appProfileBundles.entries) {
+        final bundle = entry.value;
+        for (final flag in trajetsTierFlags) {
+          if (bundle.contains(flag)) {
+            expect(bundle, contains(Feature.obd2TripRecording),
+                reason:
+                    '${entry.key.name}: ${flag.name} requires obd2TripRecording');
+          }
+        }
+      }
     });
   });
 }
