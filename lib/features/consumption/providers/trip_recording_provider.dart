@@ -2,23 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/feedback/auto_record_badge_provider.dart';
 import '../../../core/feedback/auto_record_badge_service.dart';
-import '../../../core/location/geolocator_wrapper.dart';
 import '../../../core/providers/app_state_provider.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/sync/trips_sync.dart';
 import '../../../core/sync/baselines_sync.dart';
-import '../../feature_management/application/feature_flags_provider.dart';
-import '../../feature_management/domain/feature.dart';
-import '../../glide_coach/data/traffic_signal_repository.dart';
-import '../../glide_coach/domain/entities/glide_coach_advice.dart';
-import '../../glide_coach/providers/glide_coach_evaluator_provider.dart';
-import '../../glide_coach/providers/glide_coach_settings_provider.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../sync/providers/baseline_sync_enabled_provider.dart';
 import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
@@ -41,6 +33,7 @@ import '../domain/cold_start_baselines.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/situation_classifier.dart';
 import '../domain/trip_recorder.dart';
+import 'trip_gps_stream_controller.dart';
 import 'trip_haptic_controller.dart';
 import 'trip_history_provider.dart';
 import 'trip_recording_phase.dart';
@@ -79,13 +72,6 @@ class TripRecording extends _$TripRecording {
   TripRecordingController? _controller;
   StreamSubscription<TripLiveReading>? _liveSub;
   StreamSubscription<TripRecordingControllerState>? _stateSub;
-  // #1374 phase 1 — Geolocator position stream feeding the
-  // controller's per-tick GPS latch. Only created when
-  // `Feature.gpsTripPath` is enabled at trip-start; the flag-off
-  // path leaves this null and never touches the plugin, so the
-  // battery / permission cost is exactly zero for users who haven't
-  // opted in. Cancelled on stop alongside the live + state subs.
-  StreamSubscription<Position>? _gpsSub;
   SituationClassifier? _classifier;
   BaselineStore? _store;
   String? _vehicleId;
@@ -117,6 +103,16 @@ class TripRecording extends _$TripRecording {
   /// recordings so the test counters accumulate exactly as the
   /// inlined fields did.
   final TripHapticController _haptics = TripHapticController();
+
+  /// #1374 / #1125 / #1458 GPS concern — the opt-in Geolocator
+  /// position stream, the per-fix cadence diagnostics, and the
+  /// glide-coach evaluation hook — extracted into a focused
+  /// collaborator (#1679). `late` so it can capture [ref] and the
+  /// [_lifecycleState] getter.
+  late final TripGpsStreamController _gps = TripGpsStreamController(
+    ref: ref,
+    lifecycleState: () => _lifecycleState,
+  );
 
   /// Tests count haptic fires via these instead of hooking the
   /// platform channel. The production path also still calls
@@ -358,12 +354,8 @@ class TripRecording extends _$TripRecording {
     // #1374 phase 1 — opt-in GPS sampling. Only when the user has
     // explicitly turned the feature on do we open a Geolocator
     // position stream; the flag-off path skips the plugin entirely so
-    // a default-config user pays no battery cost. Errors on the
-    // stream are logged and swallowed (a permission revoke mid-trip
-    // must not derail the recording) — the controller's per-tick
-    // latch simply stops being refreshed and subsequent samples
-    // carry `latitude: null, longitude: null`.
-    _startGpsSubscriptionIfEnabled(ctl);
+    // a default-config user pays no battery cost.
+    _gps.start(ctl);
     // #1303 — seed the active-trip snapshot identity now that the
     // controller knows its session id + odometer reads. The first
     // flush happens off the live-stream debounce below; if the
@@ -721,8 +713,7 @@ class TripRecording extends _$TripRecording {
     // was opened (flag-on path only). Best-effort: a null sub is the
     // common case (flag off) and a cancel that throws shouldn't
     // block trip teardown.
-    await _gpsSub?.cancel();
-    _gpsSub = null;
+    await _gps.stop();
     _controller = null;
     // #726 — persist to the trip history rolling log. Every trip
     // (including discarded ones) is logged; the fill-up flow is a
@@ -833,142 +824,6 @@ class TripRecording extends _$TripRecording {
     } catch (e, st) {
       debugPrint('TripRecording active repo: $e\n$st');
       return null;
-    }
-  }
-
-  /// Open a Geolocator position stream and route every fix through
-  /// [TripRecordingController.updateGpsFix] (#1374 phase 1).
-  ///
-  /// No-op when [Feature.gpsTripPath] is disabled — that's the
-  /// default for every existing user, so this method must NEVER pull
-  /// on the Geolocator plugin in that case (zero battery cost). When
-  /// the flag is on we open the stream at [LocationAccuracy.high]
-  /// because the eventual heatmap (Phase 3) wants ~10 m precision;
-  /// downgrading to medium / low is a Phase 2 follow-up if device
-  /// testing flags battery as an issue.
-  ///
-  /// Stream errors are logged and swallowed: a permission revoke
-  /// mid-trip, a temporary loss of fix, or the OS killing the
-  /// position service must NOT derail the OBD2 trip recording. The
-  /// controller's per-tick latch simply stops being refreshed and
-  /// subsequent samples carry `latitude: null, longitude: null`.
-  void _startGpsSubscriptionIfEnabled(TripRecordingController ctl) {
-    final flags = ref.read(featureFlagsProvider.notifier);
-    if (!flags.isEnabled(Feature.gpsTripPath)) return;
-    final geolocator = ref.read(geolocatorWrapperProvider);
-    try {
-      _gpsSub = geolocator
-          .getPositionStream(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
-      )
-          .listen(
-        (pos) {
-          ctl.updateGpsFix(
-            latitude: pos.latitude,
-            longitude: pos.longitude,
-          );
-          // #1458 phase 2 — record one cadence-diagnostic per fix so the
-          // user can see, post-trip, whether the OS kept delivering
-          // position updates while the phone was asleep / unpinned. The
-          // call is cheap (one allocation + one list append, capped) so
-          // it's safe on the hot path; the in-memory buffer is flushed
-          // onto the persisted [TripHistoryEntry] at trip-stop time.
-          ctl.recordGpsSampleDiagnostic(
-            now: DateTime.now(),
-            lifecycleState: _lifecycleState.name,
-          );
-          // #1125 phase 3b — opt-in glide-coach evaluation. The hook is
-          // gated by:
-          //   1. The compile-time master flag kGlideCoachEnabled (false
-          //      in production; this branch compiles to a constant
-          //      no-op the optimiser can fully elide).
-          //   2. The user-facing toggle GlideCoachSettings.enabled.
-          //   3. The presence of a recent throttle reading (cars
-          //      without PID 0x11 — or a freshly-started trip whose
-          //      first sample hasn't landed — short-circuit to "do
-          //      nothing").
-          // Both flags must be true for the haptic to fire. See the
-          // class doc on `GlideCoachEvaluator` for the 5-rule decision
-          // flow that the evaluator itself runs.
-          unawaited(_maybeFireGlideCoach(ctl, pos));
-        },
-        onError: (Object error) {
-          debugPrint('TripRecording GPS stream error: $error');
-        },
-      );
-    } catch (e, st) {
-      debugPrint('TripRecording GPS subscribe failed: $e\n$st');
-    }
-  }
-
-  /// Per-GPS-fix glide-coach evaluator hook (#1125 phase 3b).
-  ///
-  /// Layered gate (in order — each rejects the next):
-  ///   1. Compile-time `kGlideCoachEnabled` master flag. False in
-  ///      production today; the call is a constant-folded no-op.
-  ///   2. User-facing toggle from `GlideCoachSettings`.
-  ///   3. Latest throttle reading from the controller's captured-sample
-  ///      buffer (cars without PID 0x11 → null → evaluator returns
-  ///      `hold` per its rule 2; the haptic does not fire).
-  ///   4. Provider returns null (Hive box closed in widget tests, etc.) —
-  ///      treat as feature off.
-  ///
-  /// The evaluator's 5-rule flow then decides between
-  /// `lift` / `hold` / `cooldown`. Only `lift` translates into a
-  /// `HapticFeedback.lightImpact()` call — "subtle" per the issue body
-  /// (#1125), distinct from the medium / heavy intensities used by the
-  /// over-throttle eco-coach (#767).
-  ///
-  /// Errors are caught and logged: a permission revoke mid-trip, an
-  /// Overpass timeout, or a stale Hive box must NOT derail the OBD2
-  /// recording. Best-effort, non-blocking.
-  Future<void> _maybeFireGlideCoach(
-    TripRecordingController ctl,
-    Position pos,
-  ) async {
-    // Rule 1 — compile-time master flag. The constant gate makes this
-    // path constant-fold to nothing in a flag-false build.
-    if (!kGlideCoachEnabled) return;
-    try {
-      // Rule 2 — user toggle. Defaults to false; even with the master
-      // flag flipped, an opt-in is required.
-      final settings = ref.read(glideCoachSettingsProvider);
-      if (!settings.enabled) return;
-      // Rule 4 — provider returns null when the feature is fully
-      // unavailable (Hive box closed in tests). Resolved AFTER the
-      // user-toggle gate so an off-by-default user pays no Hive read.
-      final evaluator = ref.read(glideCoachEvaluatorProvider);
-      if (evaluator == null) return;
-      // Rule 3 — pull the latest throttle from the controller's
-      // captured-sample buffer. The buffer accumulates at 1 Hz (#1040);
-      // the GPS listener cadence is set by `LocationAccuracy.high`
-      // (typically also ~1 Hz). Cars without PID 0x11 carry
-      // `throttlePercent == null` on every sample; the evaluator's
-      // rule 2 short-circuits that to `hold` so this getter returning
-      // null is fine.
-      final samples = ctl.capturedSamples;
-      final throttle = samples.isEmpty
-          ? null
-          : samples.last.throttlePercent;
-      final reading = (
-        latitude: pos.latitude,
-        longitude: pos.longitude,
-        headingDegrees: pos.heading,
-      );
-      final advice = await evaluator.evaluate(
-        reading: reading,
-        throttlePercent: throttle,
-      );
-      if (advice == GlideCoachAdvice.lift) {
-        // Subtle on purpose — `lightImpact`, not `mediumImpact`. The
-        // issue body explicitly calls out distraction risk; the haptic
-        // is a hint, not a brake-warning.
-        await HapticFeedback.lightImpact();
-      }
-    } catch (e, st) {
-      debugPrint('TripRecording glide-coach evaluation failed: $e\n$st');
     }
   }
 
