@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/auto_record_trace_log.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm327_protocol.dart';
@@ -162,39 +163,47 @@ void main() {
         reason: 'the trace entry must carry the configured MAC');
   });
 
-  // Quarantined (#1598) — Stream-timing race intermittently sees an
-  // AutoRecordEvent emitted before the counter-reset microtask. Flaked
-  // 4+ times across May-2026 CI runs without any related code change.
-  // Remove `skip:` after #1598's deterministic-timing fix lands.
-  test('a successful read resets the consecutive-failure counter',
-      skip: 'race condition tracked in #1598', () async {
-    // Pattern: null × 2, 20, null × 2 — with threshold 3 this should
-    // NEVER fire the failure trace because the counter resets at 20.
-    final transport = _FakeTransport(
-      Queue<int?>.of(<int?>[null, null, 20, null, null, null]),
-    );
-    final service = Obd2Service(transport);
-    final stream = Obd2SpeedStream(
-      service,
-      mac: mac,
-      pollPeriod: shortPoll,
-      failureLogThreshold: 3,
-    );
+  // #1598 — Was previously flaky on real wall-clock timers because
+  // `await Future.delayed(shortPoll * 5)` could let one extra
+  // periodic tick slip in, consuming an extra null and crossing the
+  // threshold. `fake_async` advances the clock deterministically so
+  // the tick count is exactly what the test intends.
+  test('a successful read resets the consecutive-failure counter', () {
+    // Pattern: null × 2, 20, null × 2 — threshold 3.
+    //   Reset works:   counter 1, 2, (20→0), 1, 2 → max 2 < 3 → 0 failures.
+    //   Reset broken:  counter 1, 2, (stays at 2), 3→FIRE, 4 → 1 failure.
+    // 0 vs 1 failure cleanly distinguishes the reset behaviour without
+    // depending on how many ticks the polling timer manages to fire.
+    fakeAsync((async) {
+      final transport = _FakeTransport(
+        Queue<int?>.of(<int?>[null, null, 20, null, null]),
+      );
+      final service = Obd2Service(transport);
+      final stream = Obd2SpeedStream(
+        service,
+        mac: mac,
+        pollPeriod: shortPoll,
+        failureLogThreshold: 3,
+      );
 
-    final received = <double>[];
-    final sub = stream.stream.listen(received.add);
-    // Drive enough ticks to consume the queue but stop before the
-    // post-success null run alone reaches threshold.
-    await Future<void>.delayed(shortPoll * 5);
-    await sub.cancel();
+      final received = <double>[];
+      final sub = stream.stream.listen(received.add);
+      // Immediate tick fires at t=0; periodic ticks fire at
+      // t=5, 10, 15, 20 ms — total 5 ticks consume the whole queue.
+      // Elapsing 4×shortPoll lands on the 4th periodic boundary
+      // inclusively, so the 5th read completes before cancel.
+      async.elapse(shortPoll * 4);
+      sub.cancel();
+      async.flushMicrotasks();
 
-    expect(received, [20.0]);
-    final failures = AutoRecordTraceLog.snapshot()
-        .where((e) => e.kind == AutoRecordEventKind.obd2SpeedReadFailed)
-        .toList();
-    expect(failures, isEmpty,
-        reason: 'a successful read in the middle of a null run must reset '
-            'the counter so the threshold is never crossed');
+      expect(received, [20.0]);
+      final failures = AutoRecordTraceLog.snapshot()
+          .where((e) => e.kind == AutoRecordEventKind.obd2SpeedReadFailed)
+          .toList();
+      expect(failures, isEmpty,
+          reason: 'a successful read in the middle of a null run must reset '
+              'the counter so the threshold is never crossed');
+    });
   });
 
   test('a thrown read is logged and counted as a failure', () async {
