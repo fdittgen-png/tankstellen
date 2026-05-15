@@ -15,16 +15,16 @@ void main() {
         reason:
             'MapScreen must dispose MapController to prevent stale references',
       );
-      // The controller is reassigned on every Carte tab-flip rebuild
-      // (see _mapIncarnation in the screen), so it cannot be `late
-      // final` — it's `late MapController _mapController` and the
-      // previous instance is disposed in the post-frame callback that
-      // bumps the incarnation.
+      // #1605 — the structural viewport gate replaced the per-tab-flip
+      // controller swap. There is now exactly one controller for the
+      // lifetime of the State, so it is `late final` (created in
+      // initState, never reassigned).
       expect(
-        source.contains('late MapController _mapController'),
+        source.contains('late final MapController _mapController'),
         isTrue,
-        reason: 'MapController should be `late MapController` (mutable), '
-            'created in initState and reassigned on tab-flip rebuild',
+        reason: 'MapController should be `late final` — created once in '
+            'initState, never reassigned (the incarnation controller-swap '
+            'was removed by the #1605 structural gate)',
       );
     });
 
@@ -72,47 +72,38 @@ void main() {
     });
 
     test(
-      '#473 / #498 / #709: MapScreen keeps the `_mapIncarnation` + '
-      '`KeyedSubtree` tab-flip teardown — RetryNetworkTileProvider does '
-      'NOT subsume it',
+      '#1605: MapScreen gates the map subtree on currentShellBranchProvider '
+      '— the structural cure for the #473-#1316 grey-tile patch-pile',
       () {
         final source = File(
           'lib/features/map/presentation/screens/map_screen.dart',
         ).readAsStringSync();
 
-        // Earlier reasoning (in the ddeace4 commit message) was that
-        // RetryNetworkTileProvider + evictErrorTileStrategy at the HTTP
-        // layer would make this workaround redundant. They don't:
-        //
-        //   * Retry handles failed HTTP fetches.
-        //   * The IndexedStack offstage-mount bug is a fetch that's
-        //     never *issued* — TileLayer captures a zero-sized
-        //     viewport on its first layout pass and settles into a
-        //     "no tiles to fetch" state.
-        //
-        // The only reliable fix is to tear down + rebuild the
-        // FlutterMap subtree when the Carte tab becomes visible so it
-        // lays out against real constraints. Removing this guard
-        // ships a gray map on first open (#473, #498, #709).
-        expect(
-          source.contains('_mapIncarnation'),
-          isTrue,
-          reason: 'subtree-rebuild counter is required to defeat the '
-              'IndexedStack offstage zero-viewport bug — see screen '
-              'docstring',
-        );
-        expect(
-          source.contains('KeyedSubtree'),
-          isTrue,
-          reason: 'KeyedSubtree(ValueKey<int>(_mapIncarnation)) is what '
-              'forces flutter_map teardown on tab-flip',
-        );
+        // The IndexedStack offstage-mount bug is a tile fetch that is
+        // never *issued* — TileLayer captures a zero-sized viewport on
+        // its first layout pass while the Carte branch is offstage. The
+        // structural fix is to never build the FlutterMap subtree until
+        // Carte is the visible shell branch, so the first layout pass
+        // always runs against real onstage constraints. This replaces
+        // the incarnation controller-swap, the cold-start one-shot bump,
+        // the delayed retry-bump and the `< 100`px LayoutBuilder gate.
         expect(
           source.contains('currentShellBranchProvider'),
           isTrue,
-          reason: 'tab-flip rebuild is driven by listening to '
-              'currentShellBranchProvider — the producer is in '
-              'ShellScreen and must have a consumer here',
+          reason: 'the map subtree must be gated on the visible shell '
+              'branch — the producer is in ShellScreen',
+        );
+        expect(
+          source.contains('_mapIncarnation'),
+          isFalse,
+          reason: 'the incarnation controller-swap was removed by #1605 — '
+              'the structural gate makes it redundant',
+        );
+        expect(
+          source.contains('_retryBumpTimer') ||
+              source.contains('_scheduleDelayedRetryBump'),
+          isFalse,
+          reason: 'the defensive retry-bump timer was removed by #1605',
         );
       },
     );
