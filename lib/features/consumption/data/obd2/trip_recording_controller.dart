@@ -18,6 +18,7 @@ import 'obd2_service.dart';
 import 'paused_trip_repository.dart';
 import 'pid_scheduler.dart';
 import 'trip_distance_source.dart';
+import 'trip_drop_detector.dart';
 import 'trip_live_reading.dart';
 import 'trip_sample_buffer.dart';
 import 'virtual_odometer.dart';
@@ -216,20 +217,13 @@ class TripRecordingController {
   /// (e.g. 100 ms) to exercise the auto-finalise path.
   final Duration _pauseGraceWindow;
 
-  /// Sliding window used for the "3 consecutive transport errors"
-  /// heuristic (#797 phase 1). The counter resets on every successful
-  /// read. Override for tests that want to pin the exact threshold.
-  final Duration _dropWindow;
-  final int _dropThreshold;
-
-  /// Threshold for the "adapter connected but every PID parse returns
-  /// null" silent-failure heuristic (#1330 phase 3). At the 5 Hz fast
-  /// tier 50 consecutive null parses ≈ 10 s — long enough to ride out a
-  /// brief noise burst, short enough that the user gets a notification
-  /// before they've driven a meaningful distance with no data.
-  /// Test-only: tests inject a small value (e.g. 3) so a fake service
-  /// can drive the counter past the threshold without 50 round-trips.
-  final int _silentFailureThreshold;
+  /// Owns the connection-drop *detection* heuristics — the #797
+  /// transport-error sliding window and the #1330 silent-failure
+  /// null-parse counter — extracted into a focused collaborator
+  /// (#1679). The controller keeps the *reaction* ([_handleDrop],
+  /// grace timer, reconnect scanner). Built in the constructor body
+  /// so it can capture the resolved [_now] clock.
+  late final TripDropDetector _dropDetector;
 
   /// Pinned adapter MAC that the auto-reconnect scanner (#797 phase 3)
   /// will search for when a drop flips us into
@@ -273,26 +267,6 @@ class TripRecordingController {
   bool _started = false;
   bool _stopped = false;
   String? _sessionId; // ISO start-ts, stable across pause→resume cycles
-
-  /// Consecutive-error bookkeeping for the drop heuristic. First entry
-  /// is the oldest. Reset on a successful transport read.
-  final List<DateTime> _recentErrors = <DateTime>[];
-
-  /// Consecutive-null-parse counter for the silent-failure heuristic
-  /// (#1330 phase 3). Incremented from every high-priority PID
-  /// callback when the parser returns null; reset to zero the moment
-  /// any high-priority PID parses a non-null value. Distinct from
-  /// [_recentErrors] which counts *transport-level* failures —
-  /// silent-failure is the case where the transport is healthy but
-  /// the ECU never speaks.
-  int _consecutiveNullReads = 0;
-
-  /// Sticky flag so the silent-failure handler only fires once per
-  /// recording session — even if more null parses keep arriving past
-  /// the threshold, we don't want to keep re-entering [_handleDrop].
-  /// Reset on stop()/resume() so a subsequent recording (or a manual
-  /// resume followed by another silent stretch) can fire again.
-  bool _silentFailureFired = false;
 
   /// Reason the most recent [_handleDrop] fired (#1330 phase 3).
   /// Null when no drop has occurred. Read by the provider so the
@@ -398,14 +372,18 @@ class TripRecordingController {
         _pausedRepoOverride = pausedRepo,
         _historyRepoOverride = historyRepo,
         _pauseGraceWindow = pauseGraceWindow,
-        _dropWindow = dropWindow,
-        _dropThreshold = dropThreshold,
-        _silentFailureThreshold = silentFailureThreshold,
         _schedulerTickRate = schedulerTickRate,
         _pinnedAdapterMac = pinnedAdapterMac,
         _automatic = automatic,
         _reconnectScannerFactory = reconnectScannerFactory,
-        _breadcrumbCollector = breadcrumbCollector;
+        _breadcrumbCollector = breadcrumbCollector {
+    _dropDetector = TripDropDetector(
+      now: _now,
+      dropWindow: dropWindow,
+      dropThreshold: dropThreshold,
+      silentFailureThreshold: silentFailureThreshold,
+    );
+  }
 
   /// Optional fuel-rate diagnostic breadcrumb sink (#1395). Wired in
   /// by [tripRecordingProvider] when a recording starts so the
@@ -473,8 +451,7 @@ class TripRecordingController {
       // post-resume stretch of nulls can fire again. Without this,
       // a user who resumes after a silent-failure drop and then hits
       // a fresh silent failure would never get a second snackbar.
-      _silentFailureFired = false;
-      _consecutiveNullReads = 0;
+      _dropDetector.reset();
       // Also tear down the auto-reconnect scanner (#797 phase 3) —
       // either we got here because the scanner fired its callback
       // (in which case it already stopped itself), or the user
@@ -607,8 +584,7 @@ class TripRecordingController {
     _started = false;
     _stopped = true;
     _pausedDueToDrop = false;
-    _silentFailureFired = false;
-    _consecutiveNullReads = 0;
+    _dropDetector.reset();
     _emitState();
     if (!_stateController.isClosed) {
       await _stateController.close();
@@ -848,7 +824,7 @@ class TripRecordingController {
       // A clean read is the only signal strong enough to clear the
       // error window; ELM327 NO DATA responses come back via the
       // response string, not an exception.
-      _recentErrors.clear();
+      _dropDetector.registerSuccess();
       return response;
     } catch (e, st) { // ignore: unused_catch_stack
       _registerTransportError(e);
@@ -856,34 +832,15 @@ class TripRecordingController {
     }
   }
 
+  /// Funnel a transport error through the drop detector and react to
+  /// its verdict (#797 phase 1). The lifecycle guard stays here — the
+  /// detector counts, the controller owns the "are we already
+  /// pausing?" state.
   void _registerTransportError(Object error) {
     if (_pausedDueToDrop || _stopped) return;
-    final now = _now();
-    _recentErrors.add(now);
-    // Keep only errors inside the window so the heuristic doesn't
-    // count a ten-minute-old blip.
-    _recentErrors.removeWhere(
-      (ts) => now.difference(ts) > _dropWindow,
-    );
-    final typedDisconnect = _isTypedDisconnect(error);
-    if (typedDisconnect || _recentErrors.length >= _dropThreshold) {
+    if (_dropDetector.registerTransportError(error)) {
       _handleDrop();
     }
-  }
-
-  bool _isTypedDisconnect(Object error) {
-    if (error is Obd2DisconnectedException) return true;
-    // The live Bluetooth transport throws `StateError('Transport
-    // closed')` once its channel is shut down by the OS / user.
-    // Match by message so the controller works against the real
-    // implementation without reaching into platform-specific
-    // exception types.
-    if (error is StateError) {
-      final msg = error.message.toLowerCase();
-      if (msg.contains('transport closed')) return true;
-      if (msg.contains('not connected')) return true;
-    }
-    return false;
   }
 
   /// Bookkeeping for the silent-failure heuristic (#1330 phase 3).
@@ -903,37 +860,29 @@ class TripRecordingController {
     if (parsedValue != null) {
       // ANY successful high-priority parse clears the window — we're
       // detecting "ECU is dead", not "this one PID is unsupported".
-      _consecutiveNullReads = 0;
+      _dropDetector.observeHighPriorityParse(parsedValue);
       return;
     }
-    if (_silentFailureFired) return;
+    // The transport-error drop already paused us — don't let a stretch
+    // of nulls double-fire into a second drop. The lifecycle guard
+    // stays here; the detector just counts.
     if (_pausedDueToDrop || _stopped) return;
-    _consecutiveNullReads++;
-    if (_consecutiveNullReads >= _silentFailureThreshold) {
+    if (_dropDetector.observeHighPriorityParse(parsedValue)) {
       _onSilentFailure();
     }
   }
 
   /// Silent-failure handler (#1330 phase 3). Fired exactly once per
-  /// recording session when the consecutive-null counter crosses the
-  /// threshold. Drives the same pause-with-grace recovery as
-  /// [_handleDrop] for transport errors, but tags the drop with
-  /// [TripDropReason.silentFailure] so the UI surfaces "OBD2 adapter
-  /// connected but not returning data" instead of "OBD2 connection
-  /// lost".
+  /// recording session when the drop detector's consecutive-null
+  /// counter crosses the threshold. Drives the same pause-with-grace
+  /// recovery as [_handleDrop] for transport errors, but tags the drop
+  /// with [TripDropReason.silentFailure] so the UI surfaces "OBD2
+  /// adapter connected but not returning data" instead of "OBD2
+  /// connection lost".
   void _onSilentFailure() {
-    if (_silentFailureFired) return;
-    if (_pausedDueToDrop || _stopped) {
-      // The transport-error drop already paused us — don't double-fire
-      // and don't override the reason. The user is already seeing the
-      // "connection lost" banner; switching it mid-flight to "not
-      // responding" would be misleading.
-      return;
-    }
-    _silentFailureFired = true;
     debugPrint(
       'TripRecordingController: silent-failure detected — '
-      '$_consecutiveNullReads consecutive null PID parses',
+      '${_dropDetector.consecutiveNullReads} consecutive null PID parses',
     );
     _handleDrop(reason: TripDropReason.silentFailure);
   }
@@ -945,7 +894,7 @@ class TripRecordingController {
     _pausedDueToDrop = true;
     _dropReason = reason;
     _scheduler?.stop();
-    _recentErrors.clear();
+    _dropDetector.clearErrorWindow();
     _persistPausedSnapshot();
     _graceTimer?.cancel();
     _graceTimer = Timer(_pauseGraceWindow, _onGraceWindowElapsed);
@@ -1524,12 +1473,12 @@ class TripRecordingController {
   /// silent-failure tests assert "49 nulls did NOT trigger" before
   /// the 50th lands (#1330 phase 3).
   @visibleForTesting
-  int get debugConsecutiveNullReads => _consecutiveNullReads;
+  int get debugConsecutiveNullReads => _dropDetector.consecutiveNullReads;
 
   /// Exposed for tests: whether the silent-failure handler has fired
   /// for this recording session. Resets on resume() / stop().
   @visibleForTesting
-  bool get debugSilentFailureFired => _silentFailureFired;
+  bool get debugSilentFailureFired => _dropDetector.silentFailureFired;
 
   /// Exposed for tests: synchronously drive the grace-window
   /// finalisation path. Useful with fake-async patterns where
