@@ -10,17 +10,12 @@ import '../../../core/feedback/auto_record_badge_service.dart';
 import '../../../core/providers/app_state_provider.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/sync/trips_sync.dart';
-import '../../../core/sync/baselines_sync.dart';
 import '../../search/domain/entities/fuel_type.dart';
-import '../../sync/providers/baseline_sync_enabled_provider.dart';
 import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../../vehicle/data/vehicle_profile_catalog_matcher.dart';
 import '../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
-import '../../vehicle/domain/fuzzy_classifier.dart';
-import '../../vehicle/providers/calibration_mode_providers.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
-import '../data/baseline_store.dart';
 import '../data/obd2/active_trip_repository.dart';
 import '../data/obd2/adapter_registry.dart';
 import '../data/obd2/adapter_reconnect_scanner.dart';
@@ -31,8 +26,8 @@ import 'obd2_breadcrumb_provider.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
-import '../domain/situation_classifier.dart';
 import '../domain/trip_recorder.dart';
+import 'trip_baseline_recorder.dart';
 import 'trip_gps_stream_controller.dart';
 import 'trip_haptic_controller.dart';
 import 'trip_history_provider.dart';
@@ -72,10 +67,6 @@ class TripRecording extends _$TripRecording {
   TripRecordingController? _controller;
   StreamSubscription<TripLiveReading>? _liveSub;
   StreamSubscription<TripRecordingControllerState>? _stateSub;
-  SituationClassifier? _classifier;
-  BaselineStore? _store;
-  String? _vehicleId;
-  ConsumptionFuelFamily _fuelFamily = ConsumptionFuelFamily.gasoline;
 
   // #1312 — adapter identity captured at trip-start so it survives
   // into the saved [TripHistoryEntry] even if the [Obd2Service] has
@@ -113,6 +104,12 @@ class TripRecording extends _$TripRecording {
     ref: ref,
     lifecycleState: () => _lifecycleState,
   );
+
+  /// #769 / #780 / #894 baseline-learning concern — the per-trip
+  /// situation classifier, the learned-baseline store, and the
+  /// classify → record → band → delta pipeline — extracted into a
+  /// focused collaborator (#1679). `late` so it can capture [ref].
+  late final TripBaselineRecorder _baselines = TripBaselineRecorder(ref);
 
   /// Tests count haptic fires via these instead of hooking the
   /// platform channel. The production path also still calls
@@ -326,29 +323,11 @@ class TripRecording extends _$TripRecording {
       breadcrumbCollector: breadcrumbs,
     );
     _controller = ctl;
-    _classifier = SituationClassifier();
 
     // #769 — resolve the active vehicle + fuel family and load its
-    // learned baselines from Hive. Falls back silently to cold-start
-    // defaults when the box isn't open (widget tests) or the active
-    // vehicle is unavailable.
-    try {
-      final vehicle = ref.read(activeVehicleProfileProvider);
-      _vehicleId = vehicle?.id;
-      _lastTripVehicleId ??= vehicle?.id;
-      _fuelFamily = _resolveFuelFamily(vehicle?.preferredFuelType);
-      if (Hive.isBoxOpen(HiveBoxes.obd2Baselines)) {
-        _store = BaselineStore(
-          box: Hive.box<String>(HiveBoxes.obd2Baselines),
-        );
-        if (_vehicleId != null) {
-          await _store!.loadVehicle(_vehicleId!);
-        }
-      }
-    } catch (e, st) {
-      debugPrint('TripRecording.start: baseline setup failed: $e\n$st');
-      _store = null;
-    }
+    // learned baselines from Hive (delegated to TripBaselineRecorder).
+    _lastTripVehicleId ??= activeVehicle?.id;
+    await _baselines.load();
 
     await ctl.start();
     // #1374 phase 1 — opt-in GPS sampling. Only when the user has
@@ -364,17 +343,14 @@ class TripRecording extends _$TripRecording {
     // recording UI on next launch.
     _seedActiveSnapshot();
     _liveSub = ctl.live.listen((reading) {
-      final situation = _classifyFrom(reading);
-      _recordToStore(reading, situation);
-      final band = _classifyBandFrom(reading, situation);
-      final delta = _computeDelta(reading, situation);
-      _haptics.fireForBandTransition(state.band, band);
+      final classified = _baselines.recordAndClassify(reading);
+      _haptics.fireForBandTransition(state.band, classified.band);
       state = state.copyWith(
         phase: _phaseFor(ctl),
         live: reading,
-        situation: situation,
-        band: band,
-        liveDeltaFraction: delta,
+        situation: classified.situation,
+        band: classified.band,
+        liveDeltaFraction: classified.delta,
       );
       // #1303 — debounced write-through. Cheap when the gate
       // rejects (a single timestamp comparison + counter bump).
@@ -467,162 +443,6 @@ class TripRecording extends _$TripRecording {
       debugPrint('TripRecording: reference catalog unavailable: $e\n$st');
       return null;
     }
-  }
-
-  ConsumptionFuelFamily _resolveFuelFamily(String? apiValue) {
-    if (apiValue == null) return ConsumptionFuelFamily.gasoline;
-    if (apiValue.startsWith('diesel')) return ConsumptionFuelFamily.diesel;
-    return ConsumptionFuelFamily.gasoline;
-  }
-
-  void _recordToStore(TripLiveReading r, DrivingSituation situation) {
-    final store = _store;
-    final vid = _vehicleId;
-    if (store == null || vid == null) return;
-    final baseline = coldStartBaseline(_fuelFamily, situation);
-    final live = _liveConsumptionFor(r, baseline);
-    if (live == null) return;
-
-    // #894 wiring (#1426): when the active vehicle has opted into
-    // fuzzy calibration, route this sample through the fuzzy
-    // classifier and record one weighted vote per non-zero
-    // membership bucket. Rule mode keeps the legacy single-bucket
-    // path so users who haven't opted in see no behaviour change.
-    final profile = _tryReadActiveVehicle();
-    if (profile?.calibrationMode == VehicleCalibrationMode.fuzzy) {
-      _recordFuzzy(store, vid, r, live);
-      return;
-    }
-
-    store.record(
-      vehicleId: vid,
-      situation: situation,
-      value: live,
-    );
-  }
-
-  /// Fuzzy path: split [live] across all non-transient buckets the
-  /// classifier flags as members, weighted by membership.
-  ///
-  /// `accel` and `grade` aren't on the OBD2 live stream, so we pass
-  /// 0 — the classifier degrades gracefully (decel and climbing zero
-  /// out, which is the same conservative result the rule path
-  /// produces when those signals are missing). [Situation.fuelCut]
-  /// maps onto a transient and is filtered by [BaselineStore]; we
-  /// drop it pre-call so the bridge stays explicit.
-  void _recordFuzzy(
-    BaselineStore store,
-    String vehicleId,
-    TripLiveReading r,
-    double live,
-  ) {
-    final classifier = ref.read(fuzzyClassifierProvider);
-    final memberships = classifier.classify(
-      speedKmh: r.speedKmh ?? 0,
-      accel: 0,
-      grade: 0,
-      throttlePct: r.engineLoadPercent ?? 0,
-      rpm: r.rpm ?? 0,
-    );
-    for (final entry in memberships.entries) {
-      if (entry.value <= 0) continue;
-      final ds = _bridgeFuzzySituation(entry.key);
-      if (ds == null) continue;
-      store.recordWeighted(
-        vehicleId: vehicleId,
-        situation: ds,
-        value: live,
-        weight: entry.value,
-      );
-    }
-  }
-
-  /// Bridge between the vehicle layer's [Situation] enum (#894) and
-  /// the consumption layer's [DrivingSituation] enum (#769). Returns
-  /// null for transient buckets the [BaselineStore] doesn't persist.
-  static DrivingSituation? _bridgeFuzzySituation(Situation s) {
-    switch (s) {
-      case Situation.idle:
-        return DrivingSituation.idle;
-      case Situation.stopAndGo:
-        return DrivingSituation.stopAndGo;
-      case Situation.urban:
-        return DrivingSituation.urbanCruise;
-      case Situation.highway:
-        return DrivingSituation.highwayCruise;
-      case Situation.climbing:
-        return DrivingSituation.climbingOrLoaded;
-      case Situation.decel:
-        return DrivingSituation.deceleration;
-      case Situation.fuelCut:
-        return null;
-    }
-  }
-
-  SituationBaseline _baselineFor(DrivingSituation situation) {
-    final store = _store;
-    final vid = _vehicleId;
-    if (store == null || vid == null) {
-      return coldStartBaseline(_fuelFamily, situation);
-    }
-    return store.lookup(
-      vehicleId: vid,
-      situation: situation,
-      fuelFamily: _fuelFamily,
-    );
-  }
-
-  DrivingSituation _classifyFrom(TripLiveReading r) {
-    final cls = _classifier;
-    if (cls == null) return DrivingSituation.idle;
-    return cls.onSample(DrivingSample(
-      timestamp: DateTime.now(),
-      speedKmh: r.speedKmh ?? 0,
-      rpm: r.rpm ?? 0,
-      throttlePercent: r.engineLoadPercent, // close-enough proxy
-      engineLoadPercent: r.engineLoadPercent,
-      fuelRateLPerHour: r.fuelRateLPerHour,
-    ));
-  }
-
-  ConsumptionBand _classifyBandFrom(
-    TripLiveReading r,
-    DrivingSituation situation,
-  ) {
-    final baseline = _baselineFor(situation);
-    final live = _liveConsumptionFor(r, baseline);
-    if (live == null) return ConsumptionBand.normal;
-    return classifyBand(
-      situation: situation,
-      live: live,
-      baseline: baseline,
-    );
-  }
-
-  double? _computeDelta(
-    TripLiveReading r,
-    DrivingSituation situation,
-  ) {
-    final baseline = _baselineFor(situation);
-    if (baseline.value <= 0) return null;
-    final live = _liveConsumptionFor(r, baseline);
-    if (live == null) return null;
-    return (live - baseline.value) / baseline.value;
-  }
-
-  /// Compute the live consumption value in the baseline's unit —
-  /// L/h for idle baselines, L/100 km otherwise. Returns null when
-  /// the car isn't reporting enough data to derive the metric.
-  double? _liveConsumptionFor(
-    TripLiveReading r,
-    SituationBaseline baseline,
-  ) {
-    final fuelRate = r.fuelRateLPerHour;
-    final speed = r.speedKmh;
-    if (fuelRate == null) return null;
-    if (baseline.unit == BaselineUnit.lPerHour) return fuelRate;
-    if (speed == null || speed <= 5) return null; // avoid /0
-    return fuelRate * 100.0 / speed;
   }
 
   void pause() {
@@ -725,27 +545,10 @@ class TripRecording extends _$TripRecording {
       gpsSampleDiagnostics: capturedGpsDiagnostics,
       automatic: automatic,
     );
-    // #769 — flush learned baselines before releasing the service so
-    // the next trip starts from the updated values. Best-effort: a
-    // Hive write failure here shouldn't block teardown.
-    final store = _store;
-    final vid = _vehicleId;
-    if (store != null && vid != null) {
-      try {
-        await store.flush(vid);
-      } catch (e, st) {
-        debugPrint('TripRecording.stop: baseline flush failed: $e\n$st');
-      }
-      // #780 — fold in the server copy once the local flush lands.
-      // `syncVehicleBaseline` returns the merged JSON; if the merge
-      // changed anything, we rewrite Hive and reload so the next
-      // trip sees the higher-confidence per-situation accumulators.
-      // Entirely best-effort: offline, unauthenticated, or sync
-      // errors all return the local payload unchanged.
-      await _syncBaselineAfterFlush(vid);
-    }
-    _store = null;
-    _vehicleId = null;
+    // #769 / #780 — flush learned baselines + fold in the server copy
+    // before releasing the service so the next trip starts from the
+    // updated values. Delegated to TripBaselineRecorder; best-effort.
+    await _baselines.flushAndSync();
     // #1312 — clear the captured adapter identity once the trip has
     // been persisted; the next [start] call snapshots fresh values
     // from whichever service it receives.
@@ -837,7 +640,7 @@ class TripRecording extends _$TripRecording {
     final startedAt = _lastTripStartedAt ?? DateTime.now();
     _activeSnapshot = ActiveTripSnapshot(
       id: id,
-      vehicleId: _lastTripVehicleId ?? _vehicleId,
+      vehicleId: _lastTripVehicleId ?? _baselines.vehicleId,
       vin: ctl.vin,
       automatic: false, // refined on every flush via _buildSnapshotFor
       phase: 'recording',
@@ -1177,44 +980,6 @@ class TripRecording extends _$TripRecording {
     return true;
   }
 
-  /// #780 — merge local + server baselines for [vehicleId] via the
-  /// sync service. Called after the Hive flush so the payload on
-  /// disk is what actually gets sent, and the merged result (higher
-  /// per-situation sample counts) overwrites disk for the next
-  /// trip. No-op when the Hive box is closed or the sync client
-  /// is offline/unauthenticated — both paths return the input
-  /// payload unchanged.
-  Future<void> _syncBaselineAfterFlush(String vehicleId) async {
-    try {
-      // #780 phase 3 — honour the opt-in setting. Default false so
-      // users who never toggled it in the sync setup screen don't
-      // silently upload driving data. Ungated favourite sync etc.
-      // are unaffected.
-      // #1373 phase 3e — read the central feature flag instead of the
-      // legacy Hive key. ref.read (not watch) — this is a one-shot
-      // gate at flush time, not a reactive dependency.
-      final enabled = ref.read(baselineSyncEnabledProvider);
-      if (!enabled) return;
-      if (!Hive.isBoxOpen(HiveBoxes.obd2Baselines)) return;
-      final box = Hive.box<String>(HiveBoxes.obd2Baselines);
-      final key = 'baseline:$vehicleId';
-      final localJson = box.get(key);
-      final merged = await BaselinesSync.merge(
-        vehicleId: vehicleId,
-        localJson: localJson,
-      );
-      if (merged != null && merged != localJson) {
-        await box.put(key, merged);
-        // No in-memory cache refresh needed — _store is nulled out
-        // right after this call and the next trip creates a fresh
-        // BaselineStore whose loadVehicle reads the merged JSON
-        // from disk.
-      }
-    } catch (e, st) {
-      debugPrint('TripRecording.stop: baseline sync failed: $e\n$st');
-    }
-  }
-
   /// Build the reconnect-scanner factory handed to
   /// [TripRecordingController] (#797 phase 3). The returned closure
   /// is called once per drop with the pinned MAC + an onReconnect
@@ -1295,7 +1060,7 @@ class TripRecording extends _$TripRecording {
           DateTime.now().toIso8601String();
       await repo.save(TripHistoryEntry(
         id: id,
-        vehicleId: _vehicleId,
+        vehicleId: _baselines.vehicleId,
         summary: summary,
         automatic: automatic,
         samples: samples,
@@ -1337,7 +1102,7 @@ class TripRecording extends _$TripRecording {
             (e) => e.id == id,
             orElse: () => TripHistoryEntry(
               id: id,
-              vehicleId: _vehicleId,
+              vehicleId: _baselines.vehicleId,
               summary: summary,
               automatic: automatic,
             ),
