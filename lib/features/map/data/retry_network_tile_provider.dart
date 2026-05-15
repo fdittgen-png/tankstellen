@@ -165,7 +165,7 @@ class RetryingTileHttpClient extends http.BaseClient {
       }
 
       if (attempt == _maxAttempts - 1) break;
-      await _sleep(_nextDelay(attempt));
+      await _sleep(_nextDelay(attempt, lastResponse?.headers));
     }
 
     if (lastResponse != null) return lastResponse;
@@ -205,12 +205,20 @@ class RetryingTileHttpClient extends http.BaseClient {
   static bool _isRetryable(int statusCode) =>
       isRetryableStatusCode(statusCode);
 
-  /// Backoff: 200 ms, 800 ms, 3.2 s, … with ±20% jitter. The
-  /// jitter breaks thundering-herd when many tiles fail at once.
+  /// Delay before the next attempt.
+  ///
+  /// When the failing response carries a `Retry-After` header — OSM's
+  /// preferred rate-limit signal on a 429 — that value wins outright.
+  /// Otherwise: jittered exponential backoff (200 ms, 800 ms, 3.2 s, …
+  /// with ±20% jitter), where the jitter breaks thundering-herd when
+  /// many tiles fail at once.
   @visibleForTesting
-  Duration nextDelay(int attempt) => _nextDelay(attempt);
+  Duration nextDelay(int attempt, [Map<String, String>? headers]) =>
+      _nextDelay(attempt, headers);
 
-  Duration _nextDelay(int attempt) {
+  Duration _nextDelay(int attempt, [Map<String, String>? headers]) {
+    final retryAfter = _parseRetryAfter(headers?['retry-after']);
+    if (retryAfter != null) return retryAfter;
     final baseMs =
         (_baseDelay.inMilliseconds * math.pow(_backoffMultiplier, attempt))
             .toInt();
@@ -220,6 +228,29 @@ class RetryingTileHttpClient extends http.BaseClient {
     // ceiling while still breaking thundering-herd.
     final jitter = (baseMs * 0.2 * (_random.nextDouble() * 2 - 1)).toInt();
     return Duration(milliseconds: math.max(0, baseMs + jitter));
+  }
+
+  /// Parse a `Retry-After` header — either delay-seconds (`"60"`) or an
+  /// HTTP-date (`"Wed, 21 Oct 2026 07:28:00 GMT"`). Returns `null` when
+  /// the header is absent or unparseable, so the caller falls back to
+  /// exponential backoff. Folded in from the former `osm_retry_client.dart`
+  /// when that dead near-duplicate retry client was deleted (#1605).
+  @visibleForTesting
+  static Duration? parseRetryAfter(String? raw) => _parseRetryAfter(raw);
+
+  static Duration? _parseRetryAfter(String? raw) {
+    if (raw == null || raw.isEmpty) return null;
+    final seconds = int.tryParse(raw.trim());
+    if (seconds != null) {
+      return seconds < 0 ? Duration.zero : Duration(seconds: seconds);
+    }
+    try {
+      final when = HttpDate.parse(raw);
+      final diff = when.difference(DateTime.now());
+      return diff.isNegative ? Duration.zero : diff;
+    } catch (_) {
+      return null;
+    }
   }
 
   void _logAttempt(Uri url, int attempt, String reason) {

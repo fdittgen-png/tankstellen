@@ -98,13 +98,6 @@ class StorageKeys {
   static const String unifiedSearchResultsEnabled =
       'unified_search_results_enabled';
 
-  /// #1316 phase 2 — toggle that surfaces the in-app map debug
-  /// breadcrumb overlay in release builds. The overlay is always
-  /// visible in `kDebugMode`; this flag flips it on for production
-  /// users who reproduce the cold-start gray-tile bug, via a hidden
-  /// 5-tap gesture on the Carte tab title. Defaults to `false`.
-  static const String mapDebugOverlayEnabled = 'map_debug_overlay_enabled';
-
   /// #1395 — toggle that surfaces the in-app OBD2 fuel-rate
   /// diagnostic overlay in release builds. The overlay is always
   /// visible in `kDebugMode`; this flag flips it on for production

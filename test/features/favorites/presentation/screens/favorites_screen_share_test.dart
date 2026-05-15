@@ -1,3 +1,11 @@
+// #1584 — Tagged `flaky` because share_plus's platform channel
+// occasionally returns null or doesn't call back in the headless
+// test environment, so the captured ShareParams arrives late or not
+// at all. The nightly flaky-suite re-runs this file with the tag so
+// a real regression still surfaces within a day.
+@Tags(['flaky'])
+library;
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
