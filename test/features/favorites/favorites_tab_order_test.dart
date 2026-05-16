@@ -27,7 +27,7 @@ void main() {
     'FavoritesSectionHeader order helper — fuel header appears before EV header',
     (tester) async {
       // Pin the visual ordering by composing the two headers the same way
-      // `FavoritesFuelTab` now does (fuel first, then EV).
+      // `FavoritesTab` now does (fuel first, then EV).
       await tester.pumpWidget(
         MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,

@@ -5,7 +5,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
-import 'package:tankstellen/features/favorites/presentation/widgets/favorites_fuel_tab.dart';
+import 'package:tankstellen/features/favorites/presentation/widgets/favorites_tab.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/favorites/presentation/widgets/ev_favorite_card.dart';
@@ -30,7 +30,7 @@ ChargingStation _evStation({String id = 'ev-1', String name = 'Test Charger'}) {
 }
 
 void main() {
-  group('FavoritesFuelTab', () {
+  group('FavoritesTab', () {
     testWidgets('renders empty state when no favorites of any kind',
         (tester) async {
       final test = standardTestOverrides(favoriteIds: []);
@@ -38,7 +38,7 @@ void main() {
 
       await pumpApp(
         tester,
-        const Material(child: FavoritesFuelTab()),
+        const Material(child: FavoritesTab()),
         overrides: test.overrides,
       );
 
@@ -55,7 +55,7 @@ void main() {
 
       await pumpApp(
         tester,
-        const Material(child: FavoritesFuelTab()),
+        const Material(child: FavoritesTab()),
         overrides: [
           ...test.overrides,
           evFavoriteStationsProvider
@@ -81,7 +81,7 @@ void main() {
 
       await pumpApp(
         tester,
-        const Material(child: FavoritesFuelTab()),
+        const Material(child: FavoritesTab()),
         overrides: [
           ...test.overrides,
           favoriteStationsProvider.overrideWith(
@@ -115,7 +115,7 @@ void main() {
 
       await pumpApp(
         tester,
-        const Material(child: FavoritesFuelTab()),
+        const Material(child: FavoritesTab()),
         overrides: [
           ...test.overrides,
           favoriteStationsProvider
