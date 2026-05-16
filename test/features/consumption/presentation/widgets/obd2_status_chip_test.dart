@@ -3,22 +3,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/obd2_status_chip.dart';
 import 'package:tankstellen/features/consumption/providers/obd2_connection_state_provider.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Pumps the chip inside a minimal MaterialApp so AppLocalizations +
-/// theme are available. Accepts an [Obd2ConnectionSnapshot] to drive
-/// the provider — we override the whole notifier class rather than
-/// stubbing a single method so tap-through tests can read state back
-/// without reaching into the internals.
+/// theme are available. [snapshot] drives the connection-state
+/// provider; [pairedAdapterMac] drives the active vehicle's paired
+/// adapter (#1695) — null means "no adapter paired", which is what
+/// flips the not-connected chip from hidden to the pairing affordance.
 Future<void> _pumpChip(
   WidgetTester tester, {
   required Obd2ConnectionSnapshot snapshot,
+  String? pairedAdapterMac,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         obd2ConnectionStatusProvider.overrideWith(
           () => _FakeStatus(snapshot),
+        ),
+        activeVehicleProfileProvider.overrideWith(
+          () => _StubActiveVehicle(pairedAdapterMac),
         ),
       ],
       child: MaterialApp(
@@ -41,6 +47,22 @@ class _FakeStatus extends Obd2ConnectionStatus {
   final Obd2ConnectionSnapshot _initial;
   @override
   Obd2ConnectionSnapshot build() => _initial;
+}
+
+/// Stub active vehicle — carries [_mac] as its paired OBD2 adapter, or
+/// resolves to "no vehicle" when [_mac] is null.
+class _StubActiveVehicle extends ActiveVehicleProfile {
+  _StubActiveVehicle(this._mac);
+  final String? _mac;
+  @override
+  VehicleProfile? build() => _mac == null
+      ? null
+      : VehicleProfile(
+          id: 'v1',
+          name: 'Test Car',
+          type: VehicleType.combustion,
+          obd2AdapterMac: _mac,
+        );
 }
 
 void main() {
@@ -74,38 +96,52 @@ void main() {
       expect(button.tooltip, contains('OBD2 connected'));
     });
 
-    testWidgets('renders SizedBox.shrink when the adapter is NOT '
-        'connected (attempting)', (tester) async {
+    testWidgets('stays hidden when an adapter is paired but the '
+        'connection is attempting', (tester) async {
+      // An adapter IS paired — the transient disconnect is the
+      // Obd2StatusDot's job to surface, so the chip stays quiet.
       await _pumpChip(
         tester,
         snapshot: const Obd2ConnectionSnapshot(
           state: Obd2ConnectionState.attempting,
           adapterName: 'vLinker FS',
         ),
+        pairedAdapterMac: 'AA:BB:CC',
       );
       expect(find.byKey(const Key('obd2StatusChip')), findsNothing);
-      expect(find.byIcon(Icons.bluetooth_connected), findsNothing);
+      expect(find.byKey(const Key('obd2PairChip')), findsNothing);
     });
 
-    testWidgets('renders SizedBox.shrink when the adapter is NOT '
-        'connected (unreachable)', (tester) async {
+    testWidgets('stays hidden when an adapter is paired but the '
+        'connection is unreachable', (tester) async {
       await _pumpChip(
         tester,
         snapshot: const Obd2ConnectionSnapshot(
           state: Obd2ConnectionState.unreachable,
           adapterName: 'vLinker FS',
         ),
+        pairedAdapterMac: 'AA:BB:CC',
       );
       expect(find.byKey(const Key('obd2StatusChip')), findsNothing);
+      expect(find.byKey(const Key('obd2PairChip')), findsNothing);
     });
 
-    testWidgets('renders SizedBox.shrink when the state is idle '
-        '(no adapter paired)', (tester) async {
+    testWidgets('shows a discoverable pairing affordance when NO '
+        'adapter is paired (#1695)', (tester) async {
+      // idle state + no paired adapter — there is no status-dot signal
+      // either, so the chip surfaces a "pair an adapter" entry point.
       await _pumpChip(
         tester,
         snapshot: const Obd2ConnectionSnapshot(),
       );
       expect(find.byKey(const Key('obd2StatusChip')), findsNothing);
+      final pairChip = find.byKey(const Key('obd2PairChip'));
+      expect(pairChip, findsOneWidget);
+      expect(find.byIcon(Icons.bluetooth_searching), findsOneWidget);
+      final button = tester.widget<IconButton>(pairChip);
+      expect(button.tooltip, contains('Pair'));
+      expect(button.onPressed, isNotNull,
+          reason: 'tapping the pair chip must open the adapter picker');
     });
 
     testWidgets('tap opens a modal — proves the adapter-picker '
@@ -117,12 +153,6 @@ void main() {
           adapterName: 'vLinker FS',
         ),
       );
-      // The adapter picker sheet reads obd2ConnectionProvider which
-      // isn't wired here; we only assert the tap fires a modal route.
-      // An uncaught exception inside showModalBottomSheet is swallowed
-      // by tester.takeException — we verify via the observer below
-      // that a new route was pushed OR an exception was raised on
-      // tap. Either way the IconButton's onPressed is wired.
       final button = tester.widget<IconButton>(
         find.byKey(const Key('obd2StatusChip')),
       );
@@ -139,6 +169,18 @@ void main() {
           state: Obd2ConnectionState.connected,
           adapterName: 'vLinker FS',
         ),
+      );
+      await expectLater(
+        tester,
+        meetsGuideline(androidTapTargetGuideline),
+      );
+    });
+
+    testWidgets('the pairing affordance also meets the 48 dp guideline',
+        (tester) async {
+      await _pumpChip(
+        tester,
+        snapshot: const Obd2ConnectionSnapshot(),
       );
       await expectLater(
         tester,

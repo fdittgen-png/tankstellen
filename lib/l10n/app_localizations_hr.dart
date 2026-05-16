@@ -3152,6 +3152,9 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String get obd2PairChipTooltip => 'Pair an OBD2 adapter';
+
+  @override
   String velocityAlertTitle(String fuelLabel) {
     return '$fuelLabel dropped at nearby stations';
   }

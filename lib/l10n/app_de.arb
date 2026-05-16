@@ -1235,6 +1235,7 @@
   "alertsRadiusCancel": "Abbrechen",
   "alertsRadiusDeleteConfirm": "Umkreis-Alarm löschen?",
   "obd2ConnectedTooltip": "OBD2 verbunden: {adapterName}",
+  "obd2PairChipTooltip": "OBD2-Adapter koppeln",
   "velocityAlertTitle": "{fuelLabel} an Tankstellen in der Nähe gefallen",
   "velocityAlertBody": "{stationCount} Tankstellen um bis zu {maxDropCents}¢ in der letzten Stunde gefallen",
   "fillUpSavedSnackbar": "Tankvorgang gespeichert",
