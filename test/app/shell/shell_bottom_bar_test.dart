@@ -232,6 +232,151 @@ void main() {
     });
   });
 
+  group('ShellBottomBar accessibility (#1697)', () {
+    testWidgets('portrait labels use the themed labelMedium size, not a '
+        'fixed 10/11 px font', (tester) async {
+      await pumpBar(
+        tester,
+        items: items,
+        branchForSlot: const [0, 1, 2],
+        currentIndex: 0,
+        iconControllers: [newController(), newController(), newController()],
+        isLandscape: false,
+        onTap: (_) {},
+      );
+
+      // #1697 — the label font is the themed `labelMedium` size rather
+      // than a hardcoded 10/11. Every slot's AnimatedDefaultTextStyle
+      // carries that size (weight/colour differ for the selected slot).
+      final ctx = tester.element(find.byType(ShellBottomBar));
+      final themed = Theme.of(ctx).textTheme.labelMedium?.fontSize;
+      expect(themed, isNotNull);
+      final styles = tester
+          .widgetList<AnimatedDefaultTextStyle>(
+            find.descendant(
+              of: find.byType(ShellBottomBar),
+              matching: find.byType(AnimatedDefaultTextStyle),
+            ),
+          )
+          .toList();
+      expect(styles, hasLength(items.length));
+      for (final ads in styles) {
+        expect(ads.style.fontSize, themed);
+      }
+    });
+
+    testWidgets('labels survive 3x OS text scaling without overflow',
+        (tester) async {
+      tester.view.physicalSize = const Size(360, 720);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MediaQuery(
+            data: const MediaQueryData(textScaler: TextScaler.linear(3.0)),
+            child: Scaffold(
+              body: Align(
+                alignment: Alignment.bottomCenter,
+                child: ShellBottomBar(
+                  items: items,
+                  branchForSlot: const [0, 1, 2],
+                  currentIndex: 0,
+                  iconControllers: [
+                    newController(),
+                    newController(),
+                    newController(),
+                  ],
+                  isLandscape: false,
+                  onTap: (_) {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // No RenderFlex overflow was thrown, and every label is still
+      // present (FittedBox scaled it to fit rather than clipping it).
+      for (final item in items) {
+        expect(find.text(item.label), findsOneWidget);
+      }
+    });
+
+    testWidgets('landscape slots carry a Tooltip with the destination name',
+        (tester) async {
+      await pumpBar(
+        tester,
+        items: items,
+        branchForSlot: const [0, 1, 2],
+        currentIndex: 0,
+        iconControllers: [newController(), newController(), newController()],
+        isLandscape: true,
+        onTap: (_) {},
+      );
+
+      // Landscape drops the visible label row, so each slot is wrapped
+      // in a Tooltip carrying the destination name instead.
+      final tooltips =
+          tester.widgetList<Tooltip>(find.byType(Tooltip)).toList();
+      expect(tooltips, hasLength(items.length));
+      expect(
+        tooltips.map((t) => t.message).toSet(),
+        items.map((i) => i.label).toSet(),
+      );
+    });
+
+    testWidgets('meets the Android 48dp tap-target guideline (portrait)',
+        (tester) async {
+      await pumpBar(
+        tester,
+        items: items,
+        branchForSlot: const [0, 1, 2],
+        currentIndex: 0,
+        iconControllers: [newController(), newController(), newController()],
+        isLandscape: false,
+        onTap: (_) {},
+      );
+      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+    });
+
+    testWidgets('renders under RTL directionality without overflow',
+        (tester) async {
+      // No shipped locale is RTL today; this is a robustness check so
+      // the bar is safe if an RTL locale is ever added (#1697).
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Directionality(
+            textDirection: TextDirection.rtl,
+            child: Scaffold(
+              body: Align(
+                alignment: Alignment.bottomCenter,
+                child: ShellBottomBar(
+                  items: items,
+                  branchForSlot: const [0, 1, 2],
+                  currentIndex: 0,
+                  iconControllers: [
+                    newController(),
+                    newController(),
+                    newController(),
+                  ],
+                  isLandscape: false,
+                  onTap: (_) {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(InkWell), findsNWidgets(items.length));
+      for (final item in items) {
+        expect(find.text(item.label), findsOneWidget);
+      }
+    });
+  });
+
   group('ShellBottomBar branchForSlot indirection', () {
     testWidgets(
       'non-identity branchForSlot wires the matching iconControllers',
