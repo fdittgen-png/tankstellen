@@ -298,5 +298,25 @@ class FeatureManifest {
           'Read exact tank litres via manufacturer-specific PIDs on '
           'supported adapters.',
     ),
+    Feature.paymentQrScan: FeatureManifestEntry(
+      feature: Feature.paymentQrScan,
+      // Default-on (#1638): the scan-payment-QR action already shipped
+      // live on the station-detail AppBar — default-on preserves current
+      // behaviour while bringing it under central management. No
+      // prerequisites: the scanner depends on nothing else.
+      defaultEnabled: true,
+      displayName: 'Scan payment QR',
+      description: 'Scan-to-pay QR reader on the station detail screen.',
+    ),
+    Feature.communityPriceReports: FeatureManifestEntry(
+      feature: Feature.communityPriceReports,
+      // Default-on (#1638): the report-price action already shipped live
+      // on the station-detail AppBar — default-on preserves current
+      // behaviour while bringing it under central management. No
+      // prerequisites.
+      defaultEnabled: true,
+      displayName: 'Community price reports',
+      description: 'Report a station price from the station detail screen.',
+    ),
   });
 }

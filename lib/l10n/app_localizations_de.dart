@@ -4015,6 +4015,20 @@ class AppLocalizationsDe extends AppLocalizations {
       'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
 
   @override
+  String get featureLabel_paymentQrScan => 'Zahlungs-QR scannen';
+
+  @override
+  String get featureDescription_paymentQrScan =>
+      'QR-Scanner zum Bezahlen auf der Tankstellen-Detailseite.';
+
+  @override
+  String get featureLabel_communityPriceReports => 'Community-Preismeldungen';
+
+  @override
+  String get featureDescription_communityPriceReports =>
+      'Einen Tankstellenpreis von der Detailseite aus melden.';
+
+  @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';
 
   @override

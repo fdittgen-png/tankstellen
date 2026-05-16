@@ -54,5 +54,9 @@
   "featureDescription_carbonDashboard": "CO2-Bilanz-Dashboard, erreichbar über den Verbrauch-Tab.",
   "featureLabel_experimentalOemPids": "Experimentelle OEM-PIDs",
   "featureDescription_experimentalOemPids": "Exakte Tankfüllung in Litern über herstellerspezifische PIDs auf unterstützten Adaptern auslesen.",
-  "featureBlockedEnable_experimentalOemPids": "Aktiviere zuerst die OBD2-Fahrtaufzeichnung"
+  "featureBlockedEnable_experimentalOemPids": "Aktiviere zuerst die OBD2-Fahrtaufzeichnung",
+  "featureLabel_paymentQrScan": "Zahlungs-QR scannen",
+  "featureDescription_paymentQrScan": "QR-Scanner zum Bezahlen auf der Tankstellen-Detailseite.",
+  "featureLabel_communityPriceReports": "Community-Preismeldungen",
+  "featureDescription_communityPriceReports": "Einen Tankstellenpreis von der Detailseite aus melden."
 }

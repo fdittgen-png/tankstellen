@@ -7256,6 +7256,30 @@ abstract class AppLocalizations {
   /// **'Enable OBD2 trip recording first'**
   String get featureBlockedEnable_experimentalOemPids;
 
+  /// Settings toggle label for the scan-payment-QR station-detail action (#1638).
+  ///
+  /// In en, this message translates to:
+  /// **'Scan payment QR'**
+  String get featureLabel_paymentQrScan;
+
+  /// Settings toggle description for the scan-payment-QR station-detail action (#1638).
+  ///
+  /// In en, this message translates to:
+  /// **'Scan-to-pay QR reader on the station detail screen.'**
+  String get featureDescription_paymentQrScan;
+
+  /// Settings toggle label for the community price-report station-detail action (#1638).
+  ///
+  /// In en, this message translates to:
+  /// **'Community price reports'**
+  String get featureLabel_communityPriceReports;
+
+  /// Settings toggle description for the community price-report station-detail action (#1638).
+  ///
+  /// In en, this message translates to:
+  /// **'Report a station price from the station detail screen.'**
+  String get featureDescription_communityPriceReports;
+
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
   /// In en, this message translates to:

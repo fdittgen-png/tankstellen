@@ -222,5 +222,21 @@
   "featureBlockedEnable_experimentalOemPids": "Enable OBD2 trip recording first",
   "@featureBlockedEnable_experimentalOemPids": {
     "description": "Shown when the user taps the experimental OEM-PID toggle while its OBD2-trip-recording prerequisite is off (#1615)."
+  },
+  "featureLabel_paymentQrScan": "Scan payment QR",
+  "@featureLabel_paymentQrScan": {
+    "description": "Settings toggle label for the scan-payment-QR station-detail action (#1638)."
+  },
+  "featureDescription_paymentQrScan": "Scan-to-pay QR reader on the station detail screen.",
+  "@featureDescription_paymentQrScan": {
+    "description": "Settings toggle description for the scan-payment-QR station-detail action (#1638)."
+  },
+  "featureLabel_communityPriceReports": "Community price reports",
+  "@featureLabel_communityPriceReports": {
+    "description": "Settings toggle label for the community price-report station-detail action (#1638)."
+  },
+  "featureDescription_communityPriceReports": "Report a station price from the station detail screen.",
+  "@featureDescription_communityPriceReports": {
+    "description": "Settings toggle description for the community price-report station-detail action (#1638)."
   }
 }
