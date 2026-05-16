@@ -6272,6 +6272,24 @@ abstract class AppLocalizations {
   /// **'Clear'**
   String get brokenMapDiagnosticsClearButton;
 
+  /// Title of the diesel rev prompt shown during a broken-MAP probe — asks the user to blip the throttle so the detector reads the MAP delta off a confirmed rev instead of a blind fixed delay (#1621).
+  ///
+  /// In en, this message translates to:
+  /// **'Rev the engine'**
+  String get brokenMapRevPromptTitle;
+
+  /// Body text of the diesel rev prompt — instructs the user to give a short throttle blip during the broken-MAP detection window (#1621).
+  ///
+  /// In en, this message translates to:
+  /// **'Briefly blip the throttle so the app can check the MAP sensor responds.'**
+  String get brokenMapRevPromptBody;
+
+  /// Confirmation button on the diesel rev prompt — the user taps it once they have blipped the throttle so the probe takes the rev MAP read (#1621).
+  ///
+  /// In en, this message translates to:
+  /// **'Done — I revved'**
+  String get brokenMapRevPromptConfirm;
+
   /// ExpansionTile title for the user-overridable calibration constants section on the edit-vehicle screen (#1397).
   ///
   /// In en, this message translates to:

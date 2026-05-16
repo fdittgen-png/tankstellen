@@ -1765,6 +1765,18 @@
   "@brokenMapDiagnosticsClearButton": {
     "description": "Button on a blocklisted-adapter row that removes the adapter from the broken-MAP blocklist — the manual escape hatch for a healthy adapter that was mis-flagged (#1622)."
   },
+  "brokenMapRevPromptTitle": "Rev the engine",
+  "@brokenMapRevPromptTitle": {
+    "description": "Title of the diesel rev prompt shown during a broken-MAP probe — asks the user to blip the throttle so the detector reads the MAP delta off a confirmed rev instead of a blind fixed delay (#1621)."
+  },
+  "brokenMapRevPromptBody": "Briefly blip the throttle so the app can check the MAP sensor responds.",
+  "@brokenMapRevPromptBody": {
+    "description": "Body text of the diesel rev prompt — instructs the user to give a short throttle blip during the broken-MAP detection window (#1621)."
+  },
+  "brokenMapRevPromptConfirm": "Done — I revved",
+  "@brokenMapRevPromptConfirm": {
+    "description": "Confirmation button on the diesel rev prompt — the user taps it once they have blipped the throttle so the probe takes the rev MAP read (#1621)."
+  },
   "calibrationAdvancedTitle": "Advanced calibration",
   "@calibrationAdvancedTitle": {
     "description": "ExpansionTile title for the user-overridable calibration constants section on the edit-vehicle screen (#1397)."

@@ -93,12 +93,22 @@ class BrokenMapDetector {
   /// Errors and the throttle-not-closed retry signal are surfaced via
   /// [errorLogger.log] under `op: 'brokenMapDetector.probe'` so the
   /// diagnostic overlay can see whether the probe actually ran.
+  /// [awaitUserRev] (#1621) — the diesel rev step. When supplied, the
+  /// probe shows a UI prompt asking the user to blip the throttle and
+  /// keys the rev MAP read off the *confirmed* rev: the callback
+  /// resolves `true` once the user revved, or `false` on a
+  /// timeout / decline. A `false` result is treated as **no
+  /// observation** — [prior] is returned untouched rather than scoring
+  /// a meaningless un-revved reading. When `null` the probe falls back
+  /// to the legacy blind fixed-delay window ([_revDelay]) — the
+  /// petrol path never revs, so it ignores this parameter entirely.
   Future<BrokenMapBelief> probe(
     Obd2RawCommandPort port, {
     required bool isDiesel,
     required BrokenMapBelief prior,
     required DateTime now,
     ReferenceVehicle? vehicle,
+    Future<bool> Function()? awaitUserRev,
   }) async {
     try {
       // Throttle gate first — cheapest way to bail on a bad sample.
@@ -142,13 +152,32 @@ class BrokenMapDetector {
         final dieselBaroRaw = await port.sendRaw(_baroCommand);
         final dieselBaro = _parseBaroPressureKpa(dieselBaroRaw);
 
-        // Soft "rev" step — phase 2 placeholder. Wait, then re-read
-        // PID 0x0B. A cooperating user blipped the throttle in this
-        // window; an uncooperative one didn't and the delta will be
-        // small (which biases toward false positive on diesels — by
-        // design, since a single low score won't push confidence past
-        // the 0.7 user-warning threshold on its own).
-        await Future<void>.delayed(_revDelay);
+        // The "rev" step. #1621 phase 5 — when a prompt callback is
+        // wired, ask the user to rev and key the re-read off the
+        // confirmed rev; a declined / timed-out prompt is no
+        // observation, so leave the belief untouched. Without the
+        // callback, fall back to the phase-2 blind fixed-delay window:
+        // a cooperating user blipped the throttle in it, an
+        // uncooperative one didn't and the delta is small (biasing
+        // toward a false positive — by design, a single low score
+        // can't cross the 0.7 warning threshold on its own).
+        if (awaitUserRev != null) {
+          final revved = await awaitUserRev();
+          if (!revved) {
+            await errorLogger.log(
+              ErrorLayer.background,
+              StateError('diesel rev prompt not confirmed'),
+              StackTrace.current,
+              context: const {
+                'op': 'brokenMapDetector.probe',
+                'reason': 'revNotConfirmed',
+              },
+            );
+            return prior;
+          }
+        } else {
+          await Future<void>.delayed(_revDelay);
+        }
         final mapRevRaw = await port.sendRaw(_mapCommand);
         final mapRev = Elm327Parsers.parseManifoldPressureKpa(mapRevRaw);
         if (mapRev == null) return prior;

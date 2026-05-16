@@ -221,6 +221,59 @@ void main() {
       expect(updated.beta, closeTo(4.5, 1e-9));
       expect(updated.lastTrigger, BrokenMapReason.revDeltaMissing);
     });
+
+    test('prompted rev (#1621) — a confirmed rev scores the rev-delta',
+        () async {
+      // With an `awaitUserRev` callback the probe keys off the
+      // confirmed rev instead of the blind 1.5 s window. A confirmed
+      // rev behaves exactly like the broken-diesel case above: idle +
+      // rev MAP are both read and folded into the belief.
+      final port = _FakeObd2RawCommandPort(<String, List<String>>{
+        '0111\r': [_resp(0x11, 3)],
+        '010B\r': [_resp(0x0B, 98), _resp(0x0B, 99)],
+      });
+
+      final updated = await const BrokenMapDetector().probe(
+        port,
+        isDiesel: true,
+        prior: const BrokenMapBelief(),
+        now: fixedNow,
+        awaitUserRev: () async => true,
+      );
+
+      expect(updated.lastTrigger, BrokenMapReason.revDeltaMissing);
+      expect(updated.observationCount, 1);
+      // Both the idle and the rev MAP read happened.
+      expect(port.callCount['010B\r'], 2);
+    });
+
+    test('prompted rev (#1621) — a declined rev records no observation',
+        () async {
+      // The user dismissed / timed out the prompt: `awaitUserRev`
+      // resolves false. An un-revved reading is meaningless, so the
+      // probe must leave the belief untouched and never take the rev
+      // MAP read.
+      final port = _FakeObd2RawCommandPort(<String, List<String>>{
+        '0111\r': [_resp(0x11, 3)],
+        '010B\r': [_resp(0x0B, 98), _resp(0x0B, 99)],
+      });
+      const prior = BrokenMapBelief();
+
+      final updated = await const BrokenMapDetector().probe(
+        port,
+        isDiesel: true,
+        prior: prior,
+        now: fixedNow,
+        awaitUserRev: () async => false,
+      );
+
+      // Belief untouched — no observation folded in.
+      expect(updated.observationCount, 0);
+      expect(updated.alpha, prior.alpha);
+      expect(updated.beta, prior.beta);
+      // Only the idle MAP read ran — the rev read was skipped.
+      expect(port.callCount['010B\r'], 1);
+    });
   });
 
   group('BrokenMapDetector — gating + failure modes', () {
