@@ -48,18 +48,18 @@ class AppLocalizationsRo extends AppLocalizations {
   String get searchButton => 'Caută';
 
   @override
-  String get searchCriteriaTitle => 'Search criteria';
+  String get searchCriteriaTitle => 'Criterii de căutare';
 
   @override
-  String get searchCriteriaOpen => 'Search';
+  String get searchCriteriaOpen => 'Căutare';
 
   @override
   String searchCriteriaRadiusBadge(String km) {
-    return 'Within $km km';
+    return 'În raza de $km km';
   }
 
   @override
-  String get searchCriteriaTapToSearch => 'Tap to start searching';
+  String get searchCriteriaTapToSearch => 'Apăsați pentru a căuta';
 
   @override
   String get noResults => 'Nu s-au găsit benzinării.';
@@ -150,31 +150,31 @@ class AppLocalizationsRo extends AppLocalizations {
   String get cancel => 'Anulează';
 
   @override
-  String get countryChangeTitle => 'Switch country?';
+  String get countryChangeTitle => 'Schimbați țara?';
 
   @override
   String countryChangeBody(String country) {
-    return 'Switching to $country will change:';
+    return 'Trecerea la $country va modifica:';
   }
 
   @override
-  String get countryChangeCurrency => 'Currency';
+  String get countryChangeCurrency => 'Moneda';
 
   @override
-  String get countryChangeDistance => 'Distance';
+  String get countryChangeDistance => 'Distanța';
 
   @override
-  String get countryChangeVolume => 'Volume';
+  String get countryChangeVolume => 'Volumul';
 
   @override
-  String get countryChangePricePerUnit => 'Price format';
+  String get countryChangePricePerUnit => 'Formatul prețului';
 
   @override
   String get countryChangeNote =>
-      'Existing favorites and fill-up logs are not rewritten; only new entries use the new units.';
+      'Favoritele și jurnalele de alimentare existente nu sunt rescrise; doar intrările noi vor folosi noile unități.';
 
   @override
-  String get countryChangeConfirm => 'Switch';
+  String get countryChangeConfirm => 'Schimbați';
 
   @override
   String get delete => 'Șterge';
@@ -392,108 +392,109 @@ class AppLocalizationsRo extends AppLocalizations {
   String get reportBug => 'Raportează eroare / Sugerează funcție';
 
   @override
-  String get reportThisIssue => 'Report this issue';
+  String get reportThisIssue => 'Raportați această problemă';
 
   @override
-  String get reportAlreadySent => 'You already reported this issue.';
+  String get reportAlreadySent => 'Ați raportat deja această problemă.';
 
   @override
-  String get reportConsentTitle => 'Report to GitHub?';
+  String get reportConsentTitle => 'Raportați pe GitHub?';
 
   @override
   String get reportConsentBody =>
-      'This will open a public GitHub issue with the error details below. No GPS coordinates, API keys, or personal data are included.';
+      'Aceasta va deschide o problemă publică pe GitHub cu detaliile erorii de mai jos. Nu sunt incluse coordonate GPS, chei API sau date personale.';
 
   @override
-  String get reportConsentConfirm => 'Open GitHub';
+  String get reportConsentConfirm => 'Deschide GitHub';
 
   @override
-  String get reportConsentCancel => 'Cancel';
+  String get reportConsentCancel => 'Anulare';
 
   @override
-  String get configProfileSection => 'Profile';
+  String get configProfileSection => 'Profil';
 
   @override
-  String get configActiveProfile => 'Active profile';
+  String get configActiveProfile => 'Profil activ';
 
   @override
-  String get configPreferredFuel => 'Preferred fuel';
+  String get configPreferredFuel => 'Combustibil preferat';
 
   @override
-  String get configCountry => 'Country';
+  String get configCountry => 'Țara';
 
   @override
-  String get configRouteSegment => 'Route segment';
+  String get configRouteSegment => 'Segment de rută';
 
   @override
-  String get configApiKeysSection => 'API keys';
+  String get configApiKeysSection => 'Chei API';
 
   @override
-  String get configTankerkoenigKey => 'Tankerkoenig API key';
+  String get configTankerkoenigKey => 'Cheie API Tankerkoenig';
 
   @override
-  String get configApiKeyConfigured => 'Configured';
+  String get configApiKeyConfigured => 'Configurată';
 
   @override
-  String get configApiKeyNotSet => 'Not set (demo mode)';
+  String get configApiKeyNotSet => 'Neconfigurată (mod demo)';
 
   @override
-  String get configApiKeyCommunity => 'Default (community key)';
+  String get configApiKeyCommunity => 'Implicită (cheie comunitate)';
 
   @override
-  String get searchLocationPlaceholder => 'Address, postal code or city';
+  String get searchLocationPlaceholder => 'Adresă, cod poștal sau oraș';
 
   @override
-  String get configEvKey => 'EV charging API key';
+  String get configEvKey => 'Cheie API stații EV';
 
   @override
-  String get configEvKeyCustom => 'Custom key';
+  String get configEvKeyCustom => 'Cheie personalizată';
 
   @override
-  String get configEvKeyShared => 'Default (shared)';
+  String get configEvKeyShared => 'Implicită (partajată)';
 
   @override
-  String get configCloudSyncSection => 'Cloud Sync';
+  String get configCloudSyncSection => 'Sincronizare cloud';
 
   @override
-  String get configTankSyncConnected => 'Connected';
+  String get configTankSyncConnected => 'Conectat';
 
   @override
-  String get configTankSyncDisabled => 'Disabled';
+  String get configTankSyncDisabled => 'Dezactivat';
 
   @override
-  String get configAuthMode => 'Auth mode';
+  String get configAuthMode => 'Mod autentificare';
 
   @override
   String get configAuthEmail => 'Email (persistent)';
 
   @override
-  String get configAuthAnonymous => 'Anonymous (device-only)';
+  String get configAuthAnonymous => 'Anonim (doar pe dispozitiv)';
 
   @override
-  String get configDatabase => 'Database';
+  String get configDatabase => 'Bază de date';
 
   @override
-  String get configPrivacySummary => 'Privacy summary';
+  String get configPrivacySummary => 'Rezumat confidențialitate';
 
   @override
   String configPrivacySummarySynced(Object authNote) {
-    return '• Favorites, alerts, and ignored stations are synced to your private database\n• GPS position and API keys never leave your device\n• $authNote';
+    return '• Favoritele, alertele și stațiile ignorate sunt sincronizate cu baza dvs. de date privată\n• Poziția GPS și cheile API nu părăsesc niciodată dispozitivul\n• $authNote';
   }
 
   @override
   String get configPrivacySummaryLocal =>
-      '• All data is stored locally on this device only\n• No data is sent to any server\n• API keys encrypted in device secure storage';
+      '• Toate datele sunt stocate local doar pe acest dispozitiv\n• Nicio dată nu este trimisă la niciun server\n• Cheile API sunt criptate în spațiul de stocare securizat al dispozitivului';
 
   @override
-  String get configAuthNoteEmail => 'Email account enables cross-device access';
+  String get configAuthNoteEmail =>
+      'Contul de email permite accesul de pe mai multe dispozitive';
 
   @override
   String get configAuthNoteAnonymous =>
-      'Anonymous account — data tied to this device';
+      'Cont anonim — date legate de acest dispozitiv';
 
   @override
-  String get configNone => 'None';
+  String get configNone => 'Niciunul';
 
   @override
   String get privacyPolicy => 'Politica de confidențialitate';
@@ -533,7 +534,7 @@ class AppLocalizationsRo extends AppLocalizations {
   String get demoModeBanner => 'Mod demo. Configurați cheia API în setări.';
 
   @override
-  String get demoModeBannerAction => 'Get live prices';
+  String get demoModeBannerAction => 'Obțineți prețuri live';
 
   @override
   String get sortDistance => 'Distanță';
@@ -542,10 +543,10 @@ class AppLocalizationsRo extends AppLocalizations {
   String get sortOpen24h => '24h';
 
   @override
-  String get sortRating => 'Rating';
+  String get sortRating => 'Evaluare';
 
   @override
-  String get sortPriceDistance => 'Price/km';
+  String get sortPriceDistance => 'Preț/km';
 
   @override
   String get cheap => 'ieftin';
@@ -999,21 +1000,23 @@ class AppLocalizationsRo extends AppLocalizations {
   String get allDataDeleted => 'Toate datele de pe server șterse';
 
   @override
-  String get forgetAllSyncedTripsButton => 'Forget all synced trips';
+  String get forgetAllSyncedTripsButton =>
+      'Ștergeți toate călătoriile sincronizate';
 
   @override
-  String get forgetAllSyncedTripsConfirmTitle => 'Forget all synced trips?';
+  String get forgetAllSyncedTripsConfirmTitle =>
+      'Ștergeți toate călătoriile sincronizate?';
 
   @override
   String get forgetAllSyncedTripsConfirmBody =>
-      'Every trip summary and detail blob will be removed from the server. Your local trip history on this device won\'t be affected.\n\nThis action cannot be undone.';
+      'Fiecare rezumat de călătorie și blob de detalii va fi eliminat de pe server. Istoricul local al călătoriilor de pe acest dispozitiv nu va fi afectat.\n\nAceastă acțiune nu poate fi anulată.';
 
   @override
-  String get forgetAllSyncedTripsConfirmAction => 'Forget all';
+  String get forgetAllSyncedTripsConfirmAction => 'Ștergeți toate';
 
   @override
   String get forgetAllSyncedTripsSuccess =>
-      'All synced trips removed from server';
+      'Toate călătoriile sincronizate au fost eliminate de pe server';
 
   @override
   String get disconnectConfirm => 'Deconectați TankSync?';
@@ -1061,48 +1064,49 @@ class AppLocalizationsRo extends AppLocalizations {
   String get close => 'Închide';
 
   @override
-  String get account => 'Account';
+  String get account => 'Cont';
 
   @override
-  String get continueAsGuest => 'Continue as guest';
+  String get continueAsGuest => 'Continuați ca oaspete';
 
   @override
-  String get createAccount => 'Create account';
+  String get createAccount => 'Creați cont';
 
   @override
-  String get signIn => 'Sign in';
+  String get signIn => 'Conectați-vă';
 
   @override
-  String get upgradeToEmail => 'Create email account';
+  String get upgradeToEmail => 'Creați cont cu email';
 
   @override
-  String get savedRoutes => 'Saved Routes';
+  String get savedRoutes => 'Rute salvate';
 
   @override
-  String get noSavedRoutes => 'No saved routes';
+  String get noSavedRoutes => 'Nicio rută salvată';
 
   @override
   String get noSavedRoutesHint =>
-      'Search along a route and save it for quick access later.';
+      'Căutați de-a lungul unei rute și salvați-o pentru acces rapid ulterior.';
 
   @override
-  String get saveRoute => 'Save route';
+  String get saveRoute => 'Salvați ruta';
 
   @override
-  String get routeName => 'Route name';
+  String get routeName => 'Numele rutei';
 
   @override
   String itineraryDeleted(String name) {
-    return '$name deleted';
+    return '$name șters';
   }
 
   @override
   String loadingRoute(String name) {
-    return 'Loading route: $name';
+    return 'Se încarcă ruta: $name';
   }
 
   @override
-  String get refreshFailed => 'Refresh failed. Please try again.';
+  String get refreshFailed =>
+      'Actualizarea a eșuat. Vă rugăm să încercați din nou.';
 
   @override
   String get deleteProfileTitle => 'Delete profile?';
@@ -1150,214 +1154,218 @@ class AppLocalizationsRo extends AppLocalizations {
   String get errorUnknown => 'An unexpected error occurred.';
 
   @override
-  String get onboardingWelcomeHint => 'Set up the app in a few quick steps.';
+  String get onboardingWelcomeHint =>
+      'Configurați aplicația în câțiva pași rapizi.';
 
   @override
   String get onboardingApiKeyDescription =>
-      'Register for a free API key, or skip to explore the app with demo data.';
+      'Înregistrați-vă pentru o cheie API gratuită sau omiteți pentru a explora aplicația cu date demo.';
 
   @override
-  String get onboardingComplete => 'All set!';
+  String get onboardingComplete => 'Totul e gata!';
 
   @override
   String get onboardingCompleteHint =>
-      'You can change these settings anytime in your profile.';
+      'Puteți modifica aceste setări oricând din profilul dvs.';
 
   @override
-  String get onboardingBack => 'Back';
+  String get onboardingBack => 'Înapoi';
 
   @override
-  String get onboardingNext => 'Next';
+  String get onboardingNext => 'Înainte';
 
   @override
-  String get onboardingSkip => 'Skip';
+  String get onboardingSkip => 'Omiteți';
 
   @override
-  String get onboardingFinish => 'Get started';
+  String get onboardingFinish => 'Începeți';
 
   @override
   String crossBorderNearby(String country) {
-    return '$country is nearby';
+    return '$country este în apropiere';
   }
 
   @override
   String crossBorderDistance(int km) {
-    return '~$km km to border';
+    return '~$km km până la frontieră';
   }
 
   @override
   String crossBorderAvgPrice(String price, int count) {
-    return 'Avg here: $price EUR ($count stations)';
+    return 'Medie aici: $price EUR ($count stații)';
   }
 
   @override
-  String get allPricesView => 'All prices';
+  String get allPricesView => 'Toate prețurile';
 
   @override
   String get compactView => 'Compact';
 
   @override
-  String get switchToAllPricesView => 'Switch to all-prices view';
+  String get switchToAllPricesView =>
+      'Comutați la vizualizarea tuturor prețurilor';
 
   @override
-  String get switchToCompactView => 'Switch to compact view';
+  String get switchToCompactView => 'Comutați la vizualizarea compactă';
 
   @override
-  String get unavailable => 'N/A';
+  String get unavailable => 'N/D';
 
   @override
-  String get outOfStock => 'Out of stock';
+  String get outOfStock => 'Stoc epuizat';
 
   @override
-  String get gdprTitle => 'Your Privacy';
+  String get gdprTitle => 'Confidențialitatea dvs.';
 
   @override
   String get gdprSubtitle =>
-      'This app respects your privacy. Choose which data you want to share. You can change these settings anytime.';
+      'Această aplicație vă respectă confidențialitatea. Alegeți ce date doriți să partajați. Puteți modifica aceste setări oricând.';
 
   @override
-  String get gdprLocationTitle => 'Location Access';
+  String get gdprLocationTitle => 'Acces la locație';
 
   @override
   String get gdprLocationDescription =>
-      'Your coordinates are sent to the fuel price API to find nearby stations. Location data is never stored on a server and is not used for tracking.';
+      'Coordonatele dvs. sunt trimise la API-ul de prețuri combustibil pentru a găsi stații din apropiere. Datele de locație nu sunt niciodată stocate pe un server și nu sunt utilizate pentru urmărire.';
 
   @override
   String get gdprLocationShort =>
-      'Find nearby fuel stations using your location';
+      'Găsiți stații de combustibil din apropiere folosind locația dvs.';
 
   @override
-  String get gdprErrorReportingTitle => 'Error Reporting';
+  String get gdprErrorReportingTitle => 'Raportare erori';
 
   @override
   String get gdprErrorReportingDescription =>
-      'Anonymous crash reports help improve the app. No personal data is included. Reports are sent via Sentry only when configured.';
+      'Rapoartele anonime de blocare ajută la îmbunătățirea aplicației. Nu sunt incluse date personale. Rapoartele sunt trimise prin Sentry doar când este configurat.';
 
   @override
   String get gdprErrorReportingShort =>
-      'Send anonymous crash reports to improve the app';
+      'Trimiteți rapoarte anonime de blocare pentru îmbunătățirea aplicației';
 
   @override
-  String get gdprCloudSyncTitle => 'Cloud Sync';
+  String get gdprCloudSyncTitle => 'Sincronizare cloud';
 
   @override
   String get gdprCloudSyncDescription =>
-      'Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.';
+      'Sincronizați favoritele și alertele pe mai multe dispozitive prin TankSync. Folosește autentificare anonimă. Datele dvs. sunt criptate în tranzit.';
 
   @override
-  String get gdprCloudSyncShort => 'Sync favorites and alerts across devices';
+  String get gdprCloudSyncShort =>
+      'Sincronizați favoritele și alertele pe mai multe dispozitive';
 
   @override
   String get gdprLegalBasis =>
-      'Legal basis: Art. 6(1)(a) GDPR (Consent). You can withdraw consent anytime in Settings.';
+      'Baza legală: Art. 6(1)(a) GDPR (Consimțământ). Puteți retrage consimțământul oricând din Setări.';
 
   @override
-  String get gdprAcceptAll => 'Accept All';
+  String get gdprAcceptAll => 'Acceptați toate';
 
   @override
-  String get gdprAcceptSelected => 'Accept Selected';
+  String get gdprAcceptSelected => 'Acceptați selecția';
 
   @override
   String get gdprSettingsHint =>
-      'You can change your privacy choices at any time.';
+      'Puteți modifica preferințele de confidențialitate oricând.';
 
   @override
-  String get routeSaved => 'Route saved!';
+  String get routeSaved => 'Ruta salvată!';
 
   @override
-  String get routeSaveFailed => 'Failed to save route';
+  String get routeSaveFailed => 'Salvarea rutei a eșuat';
 
   @override
-  String get sqlCopied => 'SQL copied to clipboard';
+  String get sqlCopied => 'SQL copiat în clipboard';
 
   @override
-  String get connectionDataCopied => 'Connection data copied';
+  String get connectionDataCopied => 'Datele de conexiune copiate';
 
   @override
-  String get accountDeleted => 'Account deleted. Local data preserved.';
+  String get accountDeleted => 'Contul a fost șters. Datele locale păstrate.';
 
   @override
-  String get switchedToAnonymous => 'Switched to anonymous session';
+  String get switchedToAnonymous => 'Trecut la sesiune anonimă';
 
   @override
   String failedToSwitch(String error) {
-    return 'Failed to switch: $error';
+    return 'Comutarea a eșuat: $error';
   }
 
   @override
-  String get topicUrlCopied => 'Topic URL copied';
+  String get topicUrlCopied => 'URL-ul temei copiat';
 
   @override
-  String get testNotificationSent => 'Test notification sent!';
+  String get testNotificationSent => 'Notificare de test trimisă!';
 
   @override
-  String get testNotificationFailed => 'Failed to send test notification';
+  String get testNotificationFailed => 'Trimiterea notificării de test a eșuat';
 
   @override
-  String get pushUpdateFailed => 'Failed to update push notification setting';
+  String get pushUpdateFailed =>
+      'Actualizarea setării de notificare push a eșuat';
 
   @override
-  String get connectedAsGuest => 'Connected as guest';
+  String get connectedAsGuest => 'Conectat ca oaspete';
 
   @override
-  String get accountCreated => 'Account created!';
+  String get accountCreated => 'Contul a fost creat!';
 
   @override
-  String get signedIn => 'Signed in!';
+  String get signedIn => 'Conectat!';
 
   @override
   String stationHidden(String name) {
-    return '$name hidden';
+    return '$name ascunsă';
   }
 
   @override
   String removedFromFavoritesName(String name) {
-    return '$name removed from favorites';
+    return '$name eliminată din favorite';
   }
 
   @override
   String invalidApiKey(String error) {
-    return 'Invalid API key: $error';
+    return 'Cheie API invalidă: $error';
   }
 
   @override
-  String get invalidQrCode => 'Invalid QR code format';
+  String get invalidQrCode => 'Format cod QR invalid';
 
   @override
   String get invalidQrCodeTankSync =>
-      'Invalid QR code — expected TankSync format';
+      'Cod QR invalid — format TankSync așteptat';
 
   @override
-  String get tankSyncConnected => 'TankSync connected!';
+  String get tankSyncConnected => 'TankSync conectat!';
 
   @override
-  String get syncCompleted => 'Sync completed — data refreshed';
+  String get syncCompleted => 'Sincronizare finalizată — date actualizate';
 
   @override
-  String get deviceCodeCopied => 'Device code copied';
+  String get deviceCodeCopied => 'Codul dispozitivului copiat';
 
   @override
-  String get undo => 'Undo';
+  String get undo => 'Anulați';
 
   @override
   String invalidPostalCode(String length, String label) {
-    return 'Please enter a valid $length-digit $label';
+    return 'Introduceți un $label valid de $length cifre';
   }
 
   @override
-  String get freshnessAgo => 'ago';
+  String get freshnessAgo => 'în urmă';
 
   @override
-  String get freshnessStale => 'Stale';
+  String get freshnessStale => 'Expirat';
 
   @override
   String freshnessBadgeSemantics(String age) {
-    return 'Data freshness: $age';
+    return 'Prospețimea datelor: $age';
   }
 
   @override
   String brandLogoLabel(String brand) {
-    return '$brand logo';
+    return 'Logo $brand';
   }
 
   @override
@@ -1365,51 +1373,51 @@ class AppLocalizationsRo extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Rate $count stars',
-      one: 'Rate 1 star',
+      other: 'Acordați $count stele',
+      one: 'Acordați 1 stea',
     );
     return '$_temp0';
   }
 
   @override
-  String get passwordStrengthWeak => 'Weak';
+  String get passwordStrengthWeak => 'Slab';
 
   @override
-  String get passwordStrengthFair => 'Fair';
+  String get passwordStrengthFair => 'Acceptabil';
 
   @override
-  String get passwordStrengthStrong => 'Strong';
+  String get passwordStrengthStrong => 'Puternic';
 
   @override
-  String get passwordReqMinLength => 'At least 8 characters';
+  String get passwordReqMinLength => 'Minimum 8 caractere';
 
   @override
-  String get passwordReqUppercase => 'At least 1 uppercase letter';
+  String get passwordReqUppercase => 'Cel puțin 1 literă majusculă';
 
   @override
-  String get passwordReqLowercase => 'At least 1 lowercase letter';
+  String get passwordReqLowercase => 'Cel puțin 1 literă mică';
 
   @override
-  String get passwordReqDigit => 'At least 1 number';
+  String get passwordReqDigit => 'Cel puțin 1 cifră';
 
   @override
-  String get passwordReqSpecial => 'At least 1 special character';
+  String get passwordReqSpecial => 'Cel puțin 1 caracter special';
 
   @override
-  String get passwordTooWeak => 'Password does not meet all requirements';
+  String get passwordTooWeak => 'Parola nu îndeplinește toate cerințele';
 
   @override
-  String get brandFilterAll => 'All';
+  String get brandFilterAll => 'Toate';
 
   @override
-  String get brandFilterNoHighway => 'No highway';
+  String get brandFilterNoHighway => 'Fără autostradă';
 
   @override
   String get swipeTutorialMessage =>
-      'Swipe right to navigate, swipe left to remove';
+      'Glisați dreapta pentru navigare, glisați stânga pentru a elimina';
 
   @override
-  String get swipeTutorialDismiss => 'Got it';
+  String get swipeTutorialDismiss => 'Am înțeles';
 
   @override
   String get alertStatsActive => 'Active';
@@ -1421,100 +1429,101 @@ class AppLocalizationsRo extends AppLocalizations {
   String get alertStatsThisWeek => 'Săptămâna aceasta';
 
   @override
-  String get privacyDashboardTitle => 'Privacy Dashboard';
+  String get privacyDashboardTitle => 'Tablou de bord confidențialitate';
 
   @override
-  String get privacyDashboardSubtitle => 'View, export, or delete your data';
+  String get privacyDashboardSubtitle =>
+      'Vizualizați, exportați sau ștergeți datele dvs.';
 
   @override
   String get privacyDashboardBanner =>
-      'Your data belongs to you. Here you can see everything this app stores, export it, or delete it.';
+      'Datele dvs. vă aparțin. Aici puteți vedea tot ce stochează această aplicație, le puteți exporta sau șterge.';
 
   @override
-  String get privacyLocalData => 'Data on this device';
+  String get privacyLocalData => 'Date pe acest dispozitiv';
 
   @override
-  String get privacyIgnoredStations => 'Ignored stations';
+  String get privacyIgnoredStations => 'Stații ignorate';
 
   @override
-  String get privacyRatings => 'Station ratings';
+  String get privacyRatings => 'Evaluări stații';
 
   @override
-  String get privacyPriceHistory => 'Price history stations';
+  String get privacyPriceHistory => 'Stații cu istoric prețuri';
 
   @override
-  String get privacyProfiles => 'Search profiles';
+  String get privacyProfiles => 'Profile de căutare';
 
   @override
-  String get privacyItineraries => 'Saved routes';
+  String get privacyItineraries => 'Rute salvate';
 
   @override
-  String get privacyCacheEntries => 'Cache entries';
+  String get privacyCacheEntries => 'Intrări în cache';
 
   @override
-  String get privacyApiKey => 'API key stored';
+  String get privacyApiKey => 'Cheie API stocată';
 
   @override
-  String get privacyEvApiKey => 'EV API key stored';
+  String get privacyEvApiKey => 'Cheie API EV stocată';
 
   @override
-  String get privacyEstimatedSize => 'Estimated storage';
+  String get privacyEstimatedSize => 'Spațiu estimat';
 
   @override
-  String get privacySyncedData => 'Cloud sync (TankSync)';
+  String get privacySyncedData => 'Sincronizare cloud (TankSync)';
 
   @override
   String get privacySyncDisabled =>
-      'Cloud sync is disabled. All data stays on this device only.';
+      'Sincronizarea cloud este dezactivată. Toate datele rămân doar pe acest dispozitiv.';
 
   @override
-  String get privacySyncMode => 'Sync mode';
+  String get privacySyncMode => 'Mod sincronizare';
 
   @override
-  String get privacySyncUserId => 'User ID';
+  String get privacySyncUserId => 'ID utilizator';
 
   @override
   String get privacySyncDescription =>
-      'When sync is enabled, favorites, alerts, ignored stations, and ratings are also stored on the TankSync server.';
+      'Când sincronizarea este activată, favoritele, alertele, stațiile ignorate și evaluările sunt stocate și pe serverul TankSync.';
 
   @override
-  String get privacyViewServerData => 'View server data';
+  String get privacyViewServerData => 'Vizualizați datele de pe server';
 
   @override
-  String get privacyExportButton => 'Export all data as JSON';
+  String get privacyExportButton => 'Exportați toate datele ca JSON';
 
   @override
-  String get privacyExportSuccess => 'Data exported to clipboard';
+  String get privacyExportSuccess => 'Date exportate în clipboard';
 
   @override
-  String get privacyExportCsvButton => 'Export all data as CSV';
+  String get privacyExportCsvButton => 'Exportați toate datele ca CSV';
 
   @override
-  String get privacyExportCsvSuccess => 'CSV data exported to clipboard';
+  String get privacyExportCsvSuccess => 'Date CSV exportate în clipboard';
 
   @override
-  String get privacyDeleteButton => 'Delete all data';
+  String get privacyDeleteButton => 'Ștergeți toate datele';
 
   @override
   String privacyCopyErrorLog(int count) {
-    return 'Copy error log to clipboard ($count)';
+    return 'Copiați jurnalul de erori în clipboard ($count)';
   }
 
   @override
-  String get privacyDeleteTitle => 'Delete all data?';
+  String get privacyDeleteTitle => 'Ștergeți toate datele?';
 
   @override
   String get privacyDeleteBody =>
-      'This will permanently delete:\n\n- All favorites and station data\n- All search profiles\n- All price alerts\n- All price history\n- All cached data\n- Your API key\n- All app settings\n\nThe app will reset to its initial state. This action cannot be undone.';
+      'Aceasta va șterge permanent:\n\n- Toate favoritele și datele stațiilor\n- Toate profilurile de căutare\n- Toate alertele de prețuri\n- Tot istoricul prețurilor\n- Toate datele din cache\n- Cheia dvs. API\n- Toate setările aplicației\n\nAplicația se va reseta la starea inițială. Această acțiune nu poate fi anulată.';
 
   @override
-  String get privacyDeleteConfirm => 'Delete everything';
+  String get privacyDeleteConfirm => 'Ștergeți totul';
 
   @override
-  String get yes => 'Yes';
+  String get yes => 'Da';
 
   @override
-  String get no => 'No';
+  String get no => 'Nu';
 
   @override
   String get amenities => 'Amenities';
@@ -1544,10 +1553,10 @@ class AppLocalizationsRo extends AppLocalizations {
   String get amenityEv => 'EV';
 
   @override
-  String get paymentMethods => 'Payment methods';
+  String get paymentMethods => 'Metode de plată';
 
   @override
-  String get paymentMethodCash => 'Cash';
+  String get paymentMethodCash => 'Numerar';
 
   @override
   String get paymentMethodCard => 'Card';
@@ -1556,14 +1565,14 @@ class AppLocalizationsRo extends AppLocalizations {
   String get paymentMethodContactless => 'Contactless';
 
   @override
-  String get paymentMethodFuelCard => 'Fuel Card';
+  String get paymentMethodFuelCard => 'Card combustibil';
 
   @override
-  String get paymentMethodApp => 'App';
+  String get paymentMethodApp => 'Aplicație';
 
   @override
   String payWithApp(String app) {
-    return 'Pay with $app';
+    return 'Plătiți cu $app';
   }
 
   @override
@@ -1573,49 +1582,49 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String ecoScoreTooltip(String avg) {
-    return 'Compared to the rolling average over your last 3 fill-ups ($avg L/100 km).';
+    return 'Comparativ cu media rulantă din ultimele 3 alimentări ($avg L/100 km).';
   }
 
   @override
   String ecoScoreSemantics(String value, String delta) {
-    return 'Consumption $value L/100 km, $delta versus your rolling average';
+    return 'Consum $value L/100 km, $delta față de media dvs. rulantă';
   }
 
   @override
-  String get drivingMode => 'Driving Mode';
+  String get drivingMode => 'Mod de condus';
 
   @override
-  String get drivingExit => 'Exit';
+  String get drivingExit => 'Ieșire';
 
   @override
-  String get drivingNearestStation => 'Nearest';
+  String get drivingNearestStation => 'Cea mai apropiată';
 
   @override
-  String get drivingTapToUnlock => 'Tap to unlock';
+  String get drivingTapToUnlock => 'Apăsați pentru deblocare';
 
   @override
-  String get drivingSafetyTitle => 'Safety Notice';
+  String get drivingSafetyTitle => 'Avertisment de siguranță';
 
   @override
   String get drivingSafetyMessage =>
-      'Do not operate the app while driving. Pull over to a safe location before interacting with the screen. The driver is responsible for safe operation of the vehicle at all times.';
+      'Nu utilizați aplicația în timp ce conduceți. Opriți-vă într-un loc sigur înainte de a interacționa cu ecranul. Șoferul este responsabil pentru operarea în siguranță a vehiculului în orice moment.';
 
   @override
-  String get drivingSafetyAccept => 'I understand';
+  String get drivingSafetyAccept => 'Am înțeles';
 
   @override
-  String get voiceAnnouncementsTitle => 'Voice Announcements';
+  String get voiceAnnouncementsTitle => 'Anunțuri vocale';
 
   @override
   String get voiceAnnouncementsDescription =>
-      'Announce nearby cheap stations while driving';
+      'Anunță stații ieftine din apropiere în timp ce conduceți';
 
   @override
-  String get voiceAnnouncementsEnabled => 'Enable voice announcements';
+  String get voiceAnnouncementsEnabled => 'Activați anunțurile vocale';
 
   @override
   String voiceAnnouncementThreshold(String price) {
-    return 'Only below $price';
+    return 'Doar sub $price';
   }
 
   @override
@@ -1625,14 +1634,14 @@ class AppLocalizationsRo extends AppLocalizations {
     String fuelType,
     String price,
   ) {
-    return '$station, $distance kilometers ahead, $fuelType $price';
+    return '$station, la $distance kilometri înainte, $fuelType $price';
   }
 
   @override
-  String get voiceAnnouncementProximityRadius => 'Announcement radius';
+  String get voiceAnnouncementProximityRadius => 'Raza de anunț';
 
   @override
-  String get voiceAnnouncementCooldown => 'Repeat interval';
+  String get voiceAnnouncementCooldown => 'Interval de repetare';
 
   @override
   String get nearestStations => 'Cele mai apropiate statii';
@@ -1642,572 +1651,575 @@ class AppLocalizationsRo extends AppLocalizations {
       'Gasiti cele mai apropiate statii cu locatia dvs. actuala';
 
   @override
-  String get consumptionLogTitle => 'Fuel consumption';
+  String get consumptionLogTitle => 'Consum combustibil';
 
   @override
-  String get consumptionLogMenuTitle => 'Consumption log';
+  String get consumptionLogMenuTitle => 'Jurnal consum';
 
   @override
   String get consumptionLogMenuSubtitle =>
-      'Track fill-ups and calculate L/100km';
+      'Urmăriți alimentările și calculați L/100km';
 
   @override
-  String get consumptionStatsTitle => 'Consumption stats';
+  String get consumptionStatsTitle => 'Statistici consum';
 
   @override
-  String get addFillUp => 'Add fill-up';
+  String get addFillUp => 'Adăugați alimentare';
 
   @override
-  String get noFillUpsTitle => 'No fill-ups yet';
+  String get noFillUpsTitle => 'Nicio alimentare încă';
 
   @override
   String get noFillUpsSubtitle =>
-      'Log your first fill-up to start tracking consumption.';
+      'Înregistrați prima alimentare pentru a începe urmărirea consumului.';
 
   @override
-  String get fillUpDate => 'Date';
+  String get fillUpDate => 'Data';
 
   @override
-  String get liters => 'Liters';
+  String get liters => 'Litri';
 
   @override
-  String get odometerKm => 'Odometer (km)';
+  String get odometerKm => 'Odometru (km)';
 
   @override
-  String get notesOptional => 'Notes (optional)';
+  String get notesOptional => 'Note (opțional)';
 
   @override
-  String get stationPreFilled => 'Station pre-filled';
+  String get stationPreFilled => 'Stație precompletată';
 
   @override
-  String get statAvgConsumption => 'Avg L/100km';
+  String get statAvgConsumption => 'Medie L/100km';
 
   @override
-  String get statAvgCostPerKm => 'Avg cost/km';
+  String get statAvgCostPerKm => 'Cost mediu/km';
 
   @override
-  String get statTotalLiters => 'Total liters';
+  String get statTotalLiters => 'Total litri';
 
   @override
-  String get statTotalSpent => 'Total spent';
+  String get statTotalSpent => 'Total cheltuit';
 
   @override
-  String get statFillUpCount => 'Fill-ups';
+  String get statFillUpCount => 'Alimentări';
 
   @override
-  String get fieldRequired => 'Required';
+  String get fieldRequired => 'Obligatoriu';
 
   @override
-  String get fieldInvalidNumber => 'Invalid number';
+  String get fieldInvalidNumber => 'Număr invalid';
 
   @override
-  String get carbonDashboardTitle => 'Carbon dashboard';
+  String get carbonDashboardTitle => 'Tablou de bord carbon';
 
   @override
-  String get carbonEmptyTitle => 'No data yet';
+  String get carbonEmptyTitle => 'Nicio dată încă';
 
   @override
   String get carbonEmptySubtitle =>
-      'Log fill-ups to see your carbon dashboard.';
+      'Înregistrați alimentări pentru a vedea tabloul de bord carbon.';
 
   @override
-  String get carbonSummaryTotalCost => 'Total cost';
+  String get carbonSummaryTotalCost => 'Cost total';
 
   @override
-  String get carbonSummaryTotalCo2 => 'Total CO2';
+  String get carbonSummaryTotalCo2 => 'CO2 total';
 
   @override
-  String get monthlyCostsTitle => 'Monthly costs';
+  String get monthlyCostsTitle => 'Costuri lunare';
 
   @override
-  String get monthlyEmissionsTitle => 'Monthly CO2 emissions';
+  String get monthlyEmissionsTitle => 'Emisii lunare de CO2';
 
   @override
-  String get vehiclesTitle => 'My vehicles';
+  String get vehiclesTitle => 'Vehiculele mele';
 
   @override
-  String get vehiclesMenuTitle => 'My vehicles';
+  String get vehiclesMenuTitle => 'Vehiculele mele';
 
   @override
   String get vehiclesMenuSubtitle =>
-      'Battery, connectors, charging preferences';
+      'Baterie, conectori, preferințe de încărcare';
 
   @override
   String get vehiclesEmptyMessage =>
-      'Add your car to filter by connector and estimate charging costs.';
+      'Adăugați mașina dvs. pentru a filtra după conector și a estima costurile de încărcare.';
 
   @override
-  String get vehiclesWizardTitle => 'My vehicles (optional)';
+  String get vehiclesWizardTitle => 'Vehiculele mele (opțional)';
 
   @override
   String get vehiclesWizardSubtitle =>
-      'Add your car to pre-fill the consumption log and enable EV connector filters. You can skip this and add vehicles later.';
+      'Adăugați mașina pentru a precompletă jurnalul de consum și a activa filtrele de conectori EV. Puteți omite și adăuga vehicule mai târziu.';
 
   @override
-  String get vehiclesWizardNoneYet => 'No vehicle configured yet.';
+  String get vehiclesWizardNoneYet => 'Niciun vehicul configurat încă.';
 
   @override
   String vehiclesWizardYoursList(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count vehicles',
-      one: '1 vehicle',
+      other: '$count vehicule',
+      one: '1 vehicul',
     );
-    return 'You have $_temp0:';
+    return 'Aveți $_temp0:';
   }
 
   @override
   String get vehiclesWizardSkipHint =>
-      'Skip to finish setup — you can add vehicles anytime from Settings.';
+      'Omiteți pentru a finaliza configurarea — puteți adăuga vehicule oricând din Setări.';
 
   @override
-  String get fillUpVehicleLabel => 'Vehicle';
+  String get fillUpVehicleLabel => 'Vehicul';
 
   @override
-  String get fillUpVehicleNone => 'No vehicle';
+  String get fillUpVehicleNone => 'Niciun vehicul';
 
   @override
-  String get fillUpVehicleRequired => 'Vehicle is required';
+  String get fillUpVehicleRequired => 'Vehiculul este obligatoriu';
 
   @override
-  String get reportScanError => 'Report scan error';
+  String get reportScanError => 'Raportați eroare de scanare';
 
   @override
-  String get pickStationTitle => 'Pick a station';
+  String get pickStationTitle => 'Alegeți o stație';
 
   @override
   String get pickStationHelper =>
-      'Start the fill-up from a known station so prices, brand and fuel type fill themselves in.';
+      'Porniți alimentarea de la o stație cunoscută pentru a completa automat prețurile, marca și tipul de combustibil.';
 
   @override
   String get pickStationEmpty =>
-      'No favorite stations yet — add some from Search or Favorites, or skip and fill in manually.';
+      'Nicio stație favorită încă — adăugați din Căutare sau Favorite sau omiteți și completați manual.';
 
   @override
-  String get pickStationSkip => 'Skip — add without a station';
+  String get pickStationSkip => 'Omiteți — adăugați fără stație';
 
   @override
-  String get scanPump => 'Scan pump';
+  String get scanPump => 'Scanați pompa';
 
   @override
-  String get scanPayment => 'Scan payment QR';
+  String get scanPayment => 'Scanați QR de plată';
 
   @override
-  String get qrPaymentBeneficiary => 'Beneficiary';
+  String get qrPaymentBeneficiary => 'Beneficiar';
 
   @override
-  String get qrPaymentAmount => 'Amount';
+  String get qrPaymentAmount => 'Suma';
 
   @override
-  String get qrPaymentEpcTitle => 'SEPA payment';
+  String get qrPaymentEpcTitle => 'Plată SEPA';
 
   @override
-  String get qrPaymentEpcEmpty => 'No fields decoded';
+  String get qrPaymentEpcEmpty => 'Niciun câmp decodat';
 
   @override
-  String get qrPaymentOpenInBank => 'Open in bank app';
+  String get qrPaymentOpenInBank => 'Deschideți în aplicația bancară';
 
   @override
-  String get qrPaymentLaunchFailed => 'No app available to open this code';
+  String get qrPaymentLaunchFailed =>
+      'Nicio aplicație disponibilă pentru a deschide acest cod';
 
   @override
-  String get qrPaymentUnknownTitle => 'Unrecognised code';
+  String get qrPaymentUnknownTitle => 'Cod nerecunoscut';
 
   @override
-  String get qrPaymentCopyRaw => 'Copy raw text';
+  String get qrPaymentCopyRaw => 'Copiați textul brut';
 
   @override
-  String get qrPaymentCopiedRaw => 'Copied to clipboard';
+  String get qrPaymentCopiedRaw => 'Copiat în clipboard';
 
   @override
-  String get qrPaymentReport => 'Report this scan';
+  String get qrPaymentReport => 'Raportați această scanare';
 
   @override
   String get qrPaymentEpcCopied =>
-      'Bank details copied — paste into your banking app';
+      'Detalii bancare copiate — lipiți în aplicația dvs. bancară';
 
   @override
-  String get qrScannerGuidance => 'Point the camera at a QR code';
+  String get qrScannerGuidance => 'Îndreptați camera spre un cod QR';
 
   @override
   String get qrScannerPermissionDenied =>
-      'Camera access is needed to scan QR codes.';
+      'Accesul la cameră este necesar pentru a scana coduri QR.';
 
   @override
   String get qrScannerPermissionPermanentlyDenied =>
-      'Camera access was denied. Open settings to grant it.';
+      'Accesul la cameră a fost refuzat. Deschideți setările pentru a-l permite.';
 
   @override
-  String get qrScannerRetryPermission => 'Try again';
+  String get qrScannerRetryPermission => 'Încercați din nou';
 
   @override
-  String get qrScannerOpenSettings => 'Open settings';
+  String get qrScannerOpenSettings => 'Deschideți setările';
 
   @override
   String get qrScannerTimeout =>
-      'No QR code detected. Move closer or try again.';
+      'Niciun cod QR detectat. Apropiați-vă sau încercați din nou.';
 
   @override
-  String get qrScannerRetry => 'Try again';
+  String get qrScannerRetry => 'Încercați din nou';
 
   @override
-  String get torchOn => 'Turn flash on';
+  String get torchOn => 'Activați blițul';
 
   @override
-  String get torchOff => 'Turn flash off';
+  String get torchOff => 'Dezactivați blițul';
 
   @override
-  String get obdNoAdapter => 'No OBD2 adapter in range';
+  String get obdNoAdapter => 'Niciun adaptor OBD2 în rază';
 
   @override
-  String get obdOdometerUnavailable => 'Could not read odometer';
+  String get obdOdometerUnavailable => 'Nu s-a putut citi odometrul';
 
   @override
   String get obdPermissionDenied =>
-      'Grant Bluetooth permission in system settings';
+      'Acordați permisiunea Bluetooth în setările sistemului';
 
   @override
   String get obdAdapterUnresponsive =>
-      'Adapter didn\'t answer — turn the ignition on and retry';
+      'Adaptorul nu a răspuns — porniți contactul și reîncercați';
 
   @override
-  String get obdPickerTitle => 'Pick an OBD2 adapter';
+  String get obdPickerTitle => 'Alegeți un adaptor OBD2';
 
   @override
-  String get obdPickerScanning => 'Scanning for adapters…';
+  String get obdPickerScanning => 'Se caută adaptoare…';
 
   @override
-  String get obdPickerConnecting => 'Connecting…';
+  String get obdPickerConnecting => 'Se conectează…';
 
   @override
-  String get themeSettingTitle => 'Theme';
+  String get themeSettingTitle => 'Temă';
 
   @override
-  String get themeModeLight => 'Light';
+  String get themeModeLight => 'Luminos';
 
   @override
-  String get themeModeDark => 'Dark';
+  String get themeModeDark => 'Întunecat';
 
   @override
-  String get themeModeSystem => 'Follow system';
+  String get themeModeSystem => 'Urmați sistemul';
 
   @override
-  String get tripRecordingTitle => 'Recording trip';
+  String get tripRecordingTitle => 'Se înregistrează călătoria';
 
   @override
-  String get tripSummaryTitle => 'Trip summary';
+  String get tripSummaryTitle => 'Rezumat călătorie';
 
   @override
-  String get tripMetricDistance => 'Distance';
+  String get tripMetricDistance => 'Distanță';
 
   @override
-  String get tripMetricSpeed => 'Speed';
+  String get tripMetricSpeed => 'Viteză';
 
   @override
-  String get tripMetricFuelUsed => 'Fuel used';
+  String get tripMetricFuelUsed => 'Combustibil utilizat';
 
   @override
-  String get tripMetricAvgConsumption => 'Avg';
+  String get tripMetricAvgConsumption => 'Medie';
 
   @override
-  String get tripMetricElapsed => 'Elapsed';
+  String get tripMetricElapsed => 'Timp scurs';
 
   @override
-  String get tripMetricOdometer => 'Odometer';
+  String get tripMetricOdometer => 'Odometru';
 
   @override
-  String get tripStop => 'Stop recording';
+  String get tripStop => 'Opriți înregistrarea';
 
   @override
-  String get tripPause => 'Pause';
+  String get tripPause => 'Pauză';
 
   @override
-  String get tripResume => 'Resume';
+  String get tripResume => 'Reluați';
 
   @override
-  String get tripBannerRecording => 'Recording trip';
+  String get tripBannerRecording => 'Se înregistrează călătoria';
 
   @override
-  String get tripBannerPaused => 'Trip paused — tap to resume';
+  String get tripBannerPaused => 'Călătorie în pauză — apăsați pentru a relua';
 
   @override
-  String get navConsumption => 'Consumption';
+  String get navConsumption => 'Consum';
 
   @override
-  String get vehicleBaselineSectionTitle => 'Baseline calibration';
+  String get vehicleBaselineSectionTitle => 'Calibrare referință';
 
   @override
   String get vehicleBaselineEmpty =>
-      'No samples yet — start an OBD2 trip to begin learning this vehicle\'s fuel profile.';
+      'Niciun eșantion încă — porniți o călătorie OBD2 pentru a învăța profilul de combustibil al acestui vehicul.';
 
   @override
   String get vehicleBaselineProgress =>
-      'Learned from samples across driving situations.';
+      'Învățat din eșantioane în diverse situații de condus.';
 
   @override
-  String get vehicleBaselineReset => 'Reset driving-situation baseline';
+  String get vehicleBaselineReset => 'Resetați referința situației de condus';
 
   @override
   String get vehicleBaselineResetConfirmTitle =>
-      'Reset driving-situation baseline?';
+      'Resetați referința situației de condus?';
 
   @override
   String get vehicleBaselineResetConfirmBody =>
-      'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.';
+      'Aceasta șterge toate eșantioanele învățate pentru acest vehicul. Veți reveni la valorile implicite de pornire la rece până când noile călătorii vor reumple profilul.';
 
   @override
-  String get vehicleAdapterSectionTitle => 'OBD2 adapter';
+  String get vehicleAdapterSectionTitle => 'Adaptor OBD2';
 
   @override
   String get vehicleAdapterEmpty =>
-      'No adapter paired. Pair one so the app can reconnect automatically next time.';
+      'Niciun adaptor asociat. Asociați unul pentru ca aplicația să se poată reconecta automat data viitoare.';
 
   @override
-  String get vehicleAdapterUnnamed => 'Unknown adapter';
+  String get vehicleAdapterUnnamed => 'Adaptor necunoscut';
 
   @override
-  String get vehicleAdapterPair => 'Pair adapter';
+  String get vehicleAdapterPair => 'Asociați adaptorul';
 
   @override
-  String get vehicleAdapterForget => 'Forget adapter';
+  String get vehicleAdapterForget => 'Uitați adaptorul';
 
   @override
-  String get achievementsTitle => 'Achievements';
+  String get achievementsTitle => 'Realizări';
 
   @override
-  String get achievementFirstTrip => 'First trip';
+  String get achievementFirstTrip => 'Prima călătorie';
 
   @override
-  String get achievementFirstTripDesc => 'Record your first OBD2 trip.';
+  String get achievementFirstTripDesc => 'Înregistrați prima călătorie OBD2.';
 
   @override
-  String get achievementFirstFillUp => 'First fill-up';
+  String get achievementFirstFillUp => 'Prima alimentare';
 
   @override
-  String get achievementFirstFillUpDesc => 'Log your first fill-up.';
+  String get achievementFirstFillUpDesc => 'Înregistrați prima alimentare.';
 
   @override
-  String get achievementTenTrips => '10 trips';
+  String get achievementTenTrips => '10 călătorii';
 
   @override
-  String get achievementTenTripsDesc => 'Record 10 OBD2 trips.';
+  String get achievementTenTripsDesc => 'Înregistrați 10 călătorii OBD2.';
 
   @override
-  String get achievementZeroHarsh => 'Smooth driver';
+  String get achievementZeroHarsh => 'Șofer lin';
 
   @override
   String get achievementZeroHarshDesc =>
-      'Complete a trip of 10 km or more with no harsh braking or acceleration.';
+      'Finalizați o călătorie de 10 km sau mai mult fără frânări sau accelerări bruște.';
 
   @override
-  String get achievementEcoWeek => 'Eco week';
+  String get achievementEcoWeek => 'Săptămână eco';
 
   @override
   String get achievementEcoWeekDesc =>
-      'Drive 7 consecutive days with at least one smooth trip each day.';
+      'Conduceți 7 zile consecutive cu cel puțin o călătorie lină în fiecare zi.';
 
   @override
-  String get achievementPriceWin => 'Price win';
+  String get achievementPriceWin => 'Câștig la preț';
 
   @override
   String get achievementPriceWinDesc =>
-      'Log a fill-up that beats the station\'s 30-day average by 5 % or more.';
+      'Înregistrați o alimentare cu 5% sau mai mult sub media de 30 de zile a stației.';
 
   @override
-  String get syncBaselinesToggleTitle => 'Share learned vehicle profiles';
+  String get syncBaselinesToggleTitle =>
+      'Partajați profilurile vehiculelor învățate';
 
   @override
   String get syncBaselinesToggleSubtitle =>
-      'Upload per-vehicle consumption baselines so a second device can reuse them.';
+      'Încărcați referințele de consum per vehicul pentru a le reutiliza pe un al doilea dispozitiv.';
 
   @override
-  String get obd2StatusConnected => 'OBD2 adapter: connected';
+  String get obd2StatusConnected => 'Adaptor OBD2: conectat';
 
   @override
-  String get obd2StatusAttempting => 'OBD2 adapter: connecting';
+  String get obd2StatusAttempting => 'Adaptor OBD2: se conectează';
 
   @override
-  String get obd2StatusUnreachable => 'OBD2 adapter: unreachable';
+  String get obd2StatusUnreachable => 'Adaptor OBD2: inaccesibil';
 
   @override
   String get obd2StatusPermissionDenied =>
-      'OBD2 adapter: Bluetooth permission needed';
+      'Adaptor OBD2: permisiune Bluetooth necesară';
 
   @override
-  String get obd2StatusConnectedBody => 'Ready to record a trip.';
+  String get obd2StatusConnectedBody =>
+      'Gata pentru înregistrarea unei călătorii.';
 
   @override
-  String get obd2StatusAttemptingBody => 'Connecting in the background…';
+  String get obd2StatusAttemptingBody => 'Se conectează în fundal…';
 
   @override
   String get obd2StatusUnreachableBody =>
-      'Adapter out of range or already in use by another app.';
+      'Adaptorul este în afara razei sau deja utilizat de o altă aplicație.';
 
   @override
   String get obd2StatusPermissionDeniedBody =>
-      'Grant Bluetooth permission in system settings to reconnect automatically.';
+      'Acordați permisiunea Bluetooth în setările sistemului pentru a vă reconecta automat.';
 
   @override
-  String get obd2StatusNoAdapter => 'No adapter paired';
+  String get obd2StatusNoAdapter => 'Niciun adaptor asociat';
 
   @override
-  String get obd2StatusForget => 'Forget adapter';
+  String get obd2StatusForget => 'Uitați adaptorul';
 
   @override
-  String get tripHistoryTitle => 'Trip history';
+  String get tripHistoryTitle => 'Istoricul călătoriilor';
 
   @override
-  String get tripHistoryEmptyTitle => 'No trips yet';
+  String get tripHistoryEmptyTitle => 'Nicio călătorie încă';
 
   @override
   String get tripHistoryEmptySubtitle =>
-      'Connect an OBD2 adapter and record a trip to start building your driving history.';
+      'Conectați un adaptor OBD2 și înregistrați o călătorie pentru a începe istoricul de condus.';
 
   @override
-  String get tripHistoryUnknownDate => 'Unknown date';
+  String get tripHistoryUnknownDate => 'Dată necunoscută';
 
   @override
-  String get situationIdle => 'Idle';
+  String get situationIdle => 'Ralanti';
 
   @override
-  String get situationStopAndGo => 'Stop & go';
+  String get situationStopAndGo => 'Stop & Go';
 
   @override
   String get situationUrban => 'Urban';
 
   @override
-  String get situationHighway => 'Highway';
+  String get situationHighway => 'Autostradă';
 
   @override
-  String get situationDecel => 'Decelerating';
+  String get situationDecel => 'Decelerare';
 
   @override
-  String get situationClimbing => 'Climbing / loaded';
+  String get situationClimbing => 'Urcare / încărcat';
 
   @override
-  String get situationHardAccel => 'Hard accel';
+  String get situationHardAccel => 'Accelerare bruscă';
 
   @override
-  String get situationFuelCut => 'Fuel cut — coast';
+  String get situationFuelCut => 'Tăiere combustibil — inerție';
 
   @override
-  String get tripSaveAsFillUp => 'Save as fill-up';
+  String get tripSaveAsFillUp => 'Salvați ca alimentare';
 
   @override
-  String get tripSaveRecording => 'Save trip';
+  String get tripSaveRecording => 'Salvați călătoria';
 
   @override
-  String get tripDiscard => 'Discard';
+  String get tripDiscard => 'Renunțați';
 
   @override
   String obdOdometerRead(int km) {
-    return 'Odometer read: $km km';
+    return 'Odometru citit: $km km';
   }
 
   @override
-  String get vehicleFuelNotSet => 'Not set';
+  String get vehicleFuelNotSet => 'Nesetat';
 
   @override
-  String get wizardVehicleTapToEdit => 'Tap to edit';
+  String get wizardVehicleTapToEdit => 'Apăsați pentru a edita';
 
   @override
-  String get wizardVehicleDefaultBadge => 'Default';
+  String get wizardVehicleDefaultBadge => 'Implicit';
 
   @override
   String get wizardProfileChoiceHint =>
-      'Choose how you want to use the app. You can change this later in Settings.';
+      'Alegeți cum doriți să utilizați aplicația. Puteți modifica aceasta mai târziu din Setări.';
 
   @override
   String get wizardProfileChoiceFooter =>
-      'You can change your choice any time from Settings → Use mode.';
+      'Puteți schimba oricând alegerea din Setări → Mod de utilizare.';
 
   @override
-  String get wizardProfileBasicName => 'Basic';
+  String get wizardProfileBasicName => 'De bază';
 
   @override
   String get wizardProfileBasicDescription =>
-      'Cheapest fuel and EV charging prices nearby. Favorites and price alerts.';
+      'Cele mai ieftine prețuri de combustibil și încărcare EV din apropiere. Favorite și alerte de prețuri.';
 
   @override
-  String get wizardProfileMediumName => 'Medium';
+  String get wizardProfileMediumName => 'Mediu';
 
   @override
   String get wizardProfileMediumDescription =>
-      'Everything in Basic, plus track your fuel fill-ups and EV charging by hand.';
+      'Tot din De bază, plus urmărirea manuală a alimentărilor și a încărcărilor EV.';
 
   @override
-  String get wizardProfileFullName => 'Full';
+  String get wizardProfileFullName => 'Complet';
 
   @override
   String get wizardProfileFullDescription =>
-      'Everything in Medium, plus automatic OBD2 trip recording, driving scores, and loyalty cards.';
+      'Tot din Mediu, plus înregistrarea automată a călătoriilor OBD2, scoruri de condus și carduri de fidelitate.';
 
   @override
-  String get wizardProfileCustomName => 'Custom';
+  String get wizardProfileCustomName => 'Personalizat';
 
   @override
   String get wizardProfileCustomDescription =>
-      'Your own combination of features. Tweak each toggle below.';
+      'Propria combinație de funcționalități. Ajustați fiecare comutator mai jos.';
 
   @override
   String get useModeSectionHint =>
-      'Right-size the app to how you actually use it. Picking a preset enables the matching set of features.';
+      'Adaptați aplicația la modul în care o utilizați efectiv. Alegând un preset se activează setul corespunzător de funcționalități.';
 
   @override
   String get useModeCustomSettingsDescription =>
-      'Your feature mix doesn\'t match any preset. Pick one above to overwrite, or keep customising individual features in the section below.';
+      'Combinația dvs. de funcționalități nu corespunde niciunui preset. Alegeți unul de mai sus pentru a suprascrie sau continuați personalizarea funcționalităților individuale în secțiunea de mai jos.';
 
   @override
   String useModeSwitchedSnack(String profile) {
-    return 'Use mode set to $profile.';
+    return 'Modul de utilizare setat la $profile.';
   }
 
   @override
-  String get profileDefaultVehicleLabel => 'Default vehicle (optional)';
+  String get profileDefaultVehicleLabel => 'Vehicul implicit (opțional)';
 
   @override
-  String get profileDefaultVehicleNone => 'No default';
+  String get profileDefaultVehicleNone => 'Fără implicit';
 
   @override
   String get profileFuelFromVehicleHint =>
-      'Fuel type is derived from your default vehicle. Clear the vehicle to pick a fuel directly.';
+      'Tipul de combustibil este derivat din vehiculul dvs. implicit. Ștergeți vehiculul pentru a alege direct combustibilul.';
 
   @override
-  String get consumptionNoVehicleTitle => 'Add a vehicle first';
+  String get consumptionNoVehicleTitle => 'Adăugați mai întâi un vehicul';
 
   @override
   String get consumptionNoVehicleBody =>
-      'Fill-ups are attributed to a vehicle. Add your car to start logging consumption.';
+      'Alimentările sunt atribuite unui vehicul. Adăugați mașina dvs. pentru a începe înregistrarea consumului.';
 
   @override
-  String get vehicleAdd => 'Add vehicle';
+  String get vehicleAdd => 'Adăugați vehicul';
 
   @override
-  String get vehicleAddTitle => 'Add vehicle';
+  String get vehicleAddTitle => 'Adăugați vehicul';
 
   @override
-  String get vehicleEditTitle => 'Edit vehicle';
+  String get vehicleEditTitle => 'Editați vehiculul';
 
   @override
-  String get vehicleDeleteTitle => 'Delete vehicle?';
+  String get vehicleDeleteTitle => 'Ștergeți vehiculul?';
 
   @override
   String vehicleDeleteMessage(String name) {
-    return 'Remove \"$name\" from your profiles?';
+    return 'Eliminați \"$name\" din profilurile dvs.?';
   }
 
   @override
-  String get vehicleNameLabel => 'Name';
+  String get vehicleNameLabel => 'Nume';
 
   @override
-  String get vehicleNameHint => 'e.g. My Tesla Model 3';
+  String get vehicleNameHint => 'ex. Mașina mea Tesla Model 3';
 
   @override
-  String get vehicleTypeCombustion => 'Combustion';
+  String get vehicleTypeCombustion => 'Combustie';
 
   @override
-  String get vehicleTypeHybrid => 'Hybrid';
+  String get vehicleTypeHybrid => 'Hibrid';
 
   @override
   String get vehicleTypeEv => 'Electric';
@@ -2216,28 +2228,28 @@ class AppLocalizationsRo extends AppLocalizations {
   String get vehicleEvSectionTitle => 'Electric';
 
   @override
-  String get vehicleCombustionSectionTitle => 'Combustion';
+  String get vehicleCombustionSectionTitle => 'Combustie';
 
   @override
-  String get vehicleBatteryLabel => 'Battery capacity (kWh)';
+  String get vehicleBatteryLabel => 'Capacitate baterie (kWh)';
 
   @override
-  String get vehicleMaxChargeLabel => 'Max charging power (kW)';
+  String get vehicleMaxChargeLabel => 'Putere maximă de încărcare (kW)';
 
   @override
-  String get vehicleConnectorsLabel => 'Supported connectors';
+  String get vehicleConnectorsLabel => 'Conectori suportați';
 
   @override
-  String get vehicleMinSocLabel => 'Min SoC %';
+  String get vehicleMinSocLabel => 'SoC minim %';
 
   @override
-  String get vehicleMaxSocLabel => 'Max SoC %';
+  String get vehicleMaxSocLabel => 'SoC maxim %';
 
   @override
-  String get vehicleTankLabel => 'Tank capacity (L)';
+  String get vehicleTankLabel => 'Capacitate rezervor (L)';
 
   @override
-  String get vehiclePreferredFuelLabel => 'Preferred fuel';
+  String get vehiclePreferredFuelLabel => 'Combustibil preferat';
 
   @override
   String get connectorType2 => 'Type 2';
@@ -2258,64 +2270,64 @@ class AppLocalizationsRo extends AppLocalizations {
   String get connectorType1 => 'Type 1';
 
   @override
-  String get connectorThreePin => '3-pin';
+  String get connectorThreePin => '3 pini';
 
   @override
-  String get evShowOnMap => 'Show EV stations';
+  String get evShowOnMap => 'Afișați stații EV';
 
   @override
-  String get evAvailableOnly => 'Available only';
+  String get evAvailableOnly => 'Numai disponibile';
 
   @override
-  String get evMinPower => 'Min power';
+  String get evMinPower => 'Putere minimă';
 
   @override
-  String get evMaxPower => 'Max power';
+  String get evMaxPower => 'Putere maximă';
 
   @override
   String get evOperator => 'Operator';
 
   @override
-  String get evLastUpdate => 'Last update';
+  String get evLastUpdate => 'Ultima actualizare';
 
   @override
-  String get evStatusAvailable => 'Available';
+  String get evStatusAvailable => 'Disponibil';
 
   @override
-  String get evStatusOccupied => 'Occupied';
+  String get evStatusOccupied => 'Ocupat';
 
   @override
-  String get evStatusOutOfOrder => 'Out of order';
+  String get evStatusOutOfOrder => 'Defect';
 
   @override
-  String get openOnlyFilter => 'Open only';
+  String get openOnlyFilter => 'Numai deschise';
 
   @override
-  String get saveAsDefaults => 'Save as my defaults';
+  String get saveAsDefaults => 'Salvați ca setări implicite';
 
   @override
-  String get criteriaSavedToProfile => 'Saved as defaults';
+  String get criteriaSavedToProfile => 'Salvat ca setări implicite';
 
   @override
-  String get profileNotFound => 'No active profile';
+  String get profileNotFound => 'Niciun profil activ';
 
   @override
-  String get updatingFavorites => 'Updating your favorites...';
+  String get updatingFavorites => 'Se actualizează favoritele...';
 
   @override
-  String get fetchingLatestPrices => 'Fetching the latest prices';
+  String get fetchingLatestPrices => 'Se preiau cele mai recente prețuri';
 
   @override
-  String get noDataAvailable => 'No data';
+  String get noDataAvailable => 'Fără date';
 
   @override
-  String get configAndPrivacy => 'Configuration & Privacy';
+  String get configAndPrivacy => 'Configurare și confidențialitate';
 
   @override
-  String get searchToSeeMap => 'Search to see stations on the map';
+  String get searchToSeeMap => 'Căutați pentru a vedea stațiile pe hartă';
 
   @override
-  String get evPowerAny => 'Any';
+  String get evPowerAny => 'Oricare';
 
   @override
   String evPowerKw(int kw) {
@@ -2323,209 +2335,212 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String get sectionProfile => 'Profile';
+  String get sectionProfile => 'Profil';
 
   @override
-  String get sectionLocation => 'Location';
+  String get sectionLocation => 'Locație';
 
   @override
-  String get tooltipBack => 'Back';
+  String get tooltipBack => 'Înapoi';
 
   @override
-  String get tooltipClose => 'Close';
+  String get tooltipClose => 'Închideți';
 
   @override
-  String get tooltipClearSearch => 'Clear search input';
+  String get tooltipClearSearch => 'Ștergeți căutarea';
 
   @override
-  String get tooltipUseGps => 'Use GPS location';
+  String get tooltipUseGps => 'Utilizați locația GPS';
 
   @override
-  String get tooltipShowPassword => 'Show password';
+  String get tooltipShowPassword => 'Afișați parola';
 
   @override
-  String get tooltipHidePassword => 'Hide password';
+  String get tooltipHidePassword => 'Ascundeți parola';
 
   @override
-  String get evConnectorsLabel => 'Available connectors';
+  String get evConnectorsLabel => 'Conectori disponibili';
 
   @override
-  String get evConnectorsNone => 'No connector information';
+  String get evConnectorsNone => 'Nicio informație despre conectori';
 
   @override
-  String get switchToEmail => 'Switch to email';
+  String get switchToEmail => 'Treceți la email';
 
   @override
   String get switchToEmailSubtitle =>
-      'Keep data, add sign-in from other devices';
+      'Păstrați datele, adăugați autentificare de pe alte dispozitive';
 
   @override
-  String get switchToAnonymousAction => 'Switch to anonymous';
+  String get switchToAnonymousAction => 'Treceți la anonim';
 
   @override
   String get switchToAnonymousSubtitle =>
-      'Keep local data, use new anonymous session';
+      'Păstrați datele locale, utilizați o sesiune anonimă nouă';
 
   @override
-  String get linkDevice => 'Link device';
+  String get linkDevice => 'Conectați dispozitivul';
 
   @override
-  String get shareDatabase => 'Share database';
+  String get shareDatabase => 'Partajați baza de date';
 
   @override
-  String get disconnectAction => 'Disconnect';
+  String get disconnectAction => 'Deconectați';
 
   @override
-  String get disconnectSubtitle => 'Stop syncing (local data kept)';
+  String get disconnectSubtitle =>
+      'Opriți sincronizarea (datele locale păstrate)';
 
   @override
-  String get deleteAccountAction => 'Delete account';
+  String get deleteAccountAction => 'Ștergeți contul';
 
   @override
-  String get deleteAccountSubtitle => 'Remove all server data permanently';
+  String get deleteAccountSubtitle =>
+      'Eliminați permanent toate datele de pe server';
 
   @override
-  String get localOnly => 'Local only';
+  String get localOnly => 'Numai local';
 
   @override
   String get localOnlySubtitle =>
-      'Optional: sync favorites, alerts, and ratings across devices';
+      'Opțional: sincronizați favorite, alerte și evaluări pe mai multe dispozitive';
 
   @override
-  String get setupCloudSync => 'Set up cloud sync';
+  String get setupCloudSync => 'Configurați sincronizarea cloud';
 
   @override
-  String get disconnectTitle => 'Disconnect TankSync?';
+  String get disconnectTitle => 'Deconectați TankSync?';
 
   @override
   String get disconnectBody =>
-      'Cloud sync will be disabled. Your local data (favorites, alerts, history) is preserved on this device. Server data is not deleted.';
+      'Sincronizarea cloud va fi dezactivată. Datele dvs. locale (favorite, alerte, istoric) sunt păstrate pe acest dispozitiv. Datele de pe server nu sunt șterse.';
 
   @override
-  String get deleteAccountTitle => 'Delete account?';
+  String get deleteAccountTitle => 'Ștergeți contul?';
 
   @override
   String get deleteAccountBody =>
-      'This permanently deletes all your data from the server (favorites, alerts, ratings, routes). Local data on this device is preserved.\n\nThis cannot be undone.';
+      'Aceasta șterge permanent toate datele dvs. de pe server (favorite, alerte, evaluări, rute). Datele locale de pe acest dispozitiv sunt păstrate.\n\nAceastă acțiune nu poate fi anulată.';
 
   @override
-  String get switchToAnonymousTitle => 'Switch to anonymous?';
+  String get switchToAnonymousTitle => 'Treceți la anonim?';
 
   @override
   String get switchToAnonymousBody =>
-      'You will be signed out of your email account and continue with a new anonymous session.\n\nYour local data (favorites, alerts) is kept on this device and will be synced to the new anonymous account.';
+      'Veți fi deconectat din contul de email și veți continua cu o sesiune anonimă nouă.\n\nDatele locale (favorite, alerte) sunt păstrate pe acest dispozitiv și vor fi sincronizate cu noul cont anonim.';
 
   @override
-  String get switchAction => 'Switch';
+  String get switchAction => 'Comutați';
 
   @override
   String get helpBannerCriteria =>
-      'Your profile defaults are pre-filled. Adjust criteria below to refine your search.';
+      'Setările implicite ale profilului sunt precompletate. Ajustați criteriile de mai jos pentru a rafina căutarea.';
 
   @override
   String get helpBannerAlerts =>
-      'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.';
+      'Setați un prag de preț pentru o stație. Veți fi notificat când prețurile scad sub acesta. Verificările se efectuează la fiecare 30 de minute.';
 
   @override
   String get helpBannerConsumption =>
-      'Log every fill-up to track your real-world consumption and CO₂ footprint. Swipe left to delete an entry.';
+      'Înregistrați fiecare alimentare pentru a urmări consumul real și amprenta de CO₂. Glisați stânga pentru a șterge o intrare.';
 
   @override
   String get helpBannerVehicles =>
-      'Add your vehicles so fill-ups and fuel preferences default correctly. The first vehicle becomes your default.';
+      'Adăugați vehiculele pentru ca alimentările și preferințele de combustibil să fie precompletate corect. Primul vehicul devine cel implicit.';
 
   @override
-  String get syncNow => 'Sync now';
+  String get syncNow => 'Sincronizați acum';
 
   @override
-  String get onboardingPreferencesTitle => 'Your preferences';
+  String get onboardingPreferencesTitle => 'Preferințele dvs.';
 
   @override
-  String get onboardingZipHelper => 'Used when GPS is unavailable';
+  String get onboardingZipHelper => 'Folosit când GPS-ul nu este disponibil';
 
   @override
-  String get onboardingRadiusHelper => 'Larger radius = more results';
+  String get onboardingRadiusHelper => 'Rază mai mare = mai multe rezultate';
 
   @override
   String get onboardingPrivacy =>
-      'These settings are stored only on your device and never shared.';
+      'Aceste setări sunt stocate doar pe dispozitivul dvs. și nu sunt niciodată partajate.';
 
   @override
-  String get onboardingLandingTitle => 'Home screen';
+  String get onboardingLandingTitle => 'Ecranul principal';
 
   @override
   String get onboardingLandingHint =>
-      'Choose which screen opens when you launch the app.';
+      'Alegeți ce ecran se deschide când lansați aplicația.';
 
   @override
   String get iosAutoRecordOnboardingTitle =>
-      'Stay out of the app — but don\'t quit it.';
+      'Stați departe de aplicație — dar nu o închideți.';
 
   @override
   String get iosAutoRecordOnboardingBullet1Title =>
-      'Open Sparkilo once after each reboot.';
+      'Deschideți Sparkilo o dată după fiecare repornire.';
 
   @override
   String get iosAutoRecordOnboardingBullet1Body =>
-      'Apple wakes Sparkilo only after you\'ve opened it at least once since the phone restarted. After that, your trips record automatically.';
+      'Apple activează Sparkilo doar după ce l-ați deschis cel puțin o dată de la ultima repornire a telefonului. După aceea, călătoriile dvs. sunt înregistrate automat.';
 
   @override
   String get iosAutoRecordOnboardingBullet2Title =>
-      'Don\'t swipe Sparkilo away in the app switcher.';
+      'Nu închideți forțat Sparkilo din comutătorul de aplicații.';
 
   @override
   String get iosAutoRecordOnboardingBullet2Body =>
-      '\"Force-quit\" tells iOS to stop relaunching the app. Your trips will stop recording until you open Sparkilo again.';
+      '\"Forțarea închiderii\" îi spune iOS să nu mai relanseze aplicația. Călătoriile dvs. nu vor mai fi înregistrate până când nu deschideți din nou Sparkilo.';
 
   @override
   String get iosAutoRecordOnboardingBullet3Title =>
-      'When iOS asks for \"Always\" location, please say yes.';
+      'Când iOS cere locație \"Întotdeauna\", vă rugăm să spuneți da.';
 
   @override
   String get iosAutoRecordOnboardingBullet3Body =>
-      'The fallback that records your trip when the OBD2 adapter is slow needs background location. We never share it.';
+      'Mecanismul de rezervă care înregistrează călătoria când adaptorul OBD2 este lent necesită locație în fundal. Nu o partajăm niciodată.';
 
   @override
-  String get scanReceipt => 'Scan receipt';
+  String get scanReceipt => 'Scanați bonul';
 
   @override
   String get obdConnect => 'OBD-II';
 
   @override
-  String get stationTypeFuel => 'Fuel';
+  String get stationTypeFuel => 'Combustibil';
 
   @override
   String get stationTypeEv => 'EV';
 
   @override
-  String get brandFilterHighway => 'Highway';
+  String get brandFilterHighway => 'Autostradă';
 
   @override
   String get ratingModeLocal => 'Local';
 
   @override
-  String get ratingModePrivate => 'Private';
+  String get ratingModePrivate => 'Privat';
 
   @override
-  String get ratingModeShared => 'Shared';
+  String get ratingModeShared => 'Partajat';
 
   @override
-  String get ratingDescLocal => 'Ratings saved on this device only';
+  String get ratingDescLocal => 'Evaluări salvate doar pe acest dispozitiv';
 
   @override
   String get ratingDescPrivate =>
-      'Synced with your database (not visible to others)';
+      'Sincronizate cu baza dvs. de date (invizibile pentru alții)';
 
   @override
-  String get ratingDescShared => 'Visible to all users of your database';
+  String get ratingDescShared =>
+      'Vizibile pentru toți utilizatorii bazei dvs. de date';
 
   @override
   String get errorNoEvApiKey =>
-      'OpenChargeMap API key not configured. Add one in Settings to search EV charging stations.';
+      'Cheia API OpenChargeMap nu este configurată. Adăugați una în Setări pentru a căuta stații de încărcare EV.';
 
   @override
   String errorUpstreamCertExpired(String host) {
-    return 'The data provider ($host) is serving an expired or invalid TLS certificate. The app cannot load data from this source until the provider fixes it. Please contact $host.';
+    return 'Furnizorul de date ($host) servește un certificat TLS expirat sau invalid. Aplicația nu poate încărca date din această sursă până când furnizorul nu rezolvă problema. Contactați $host.';
   }
 
   @override
@@ -2533,294 +2548,301 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String fallbackSummary(String failed, String current) {
-    return '$failed unavailable. Using $current.';
+    return '$failed indisponibil. Se folosește $current.';
   }
 
   @override
-  String get errorTitleApiKey => 'API key required';
+  String get errorTitleApiKey => 'Cheie API necesară';
 
   @override
-  String get errorTitleLocation => 'Location unavailable';
+  String get errorTitleLocation => 'Locație indisponibilă';
 
   @override
   String get errorHintNoStations =>
-      'Try increasing the search radius or search a different location.';
+      'Încercați să măriți raza de căutare sau căutați o altă locație.';
 
   @override
-  String get errorHintApiKey => 'Configure your API key in Settings.';
+  String get errorHintApiKey => 'Configurați cheia API în Setări.';
 
   @override
   String get errorHintConnection =>
-      'Check your internet connection and try again.';
+      'Verificați conexiunea la internet și încercați din nou.';
 
   @override
   String get errorHintRouting =>
-      'Route calculation failed. Check your internet connection and try again.';
+      'Calculul rutei a eșuat. Verificați conexiunea la internet și încercați din nou.';
 
   @override
   String get errorHintFallback =>
-      'Try again or search by postal code / city name.';
+      'Încercați din nou sau căutați după cod poștal / nume de oraș.';
 
   @override
-  String get alertsLoadErrorTitle => 'Couldn\'t load your alerts';
+  String get alertsLoadErrorTitle => 'Nu s-au putut încărca alertele';
 
   @override
-  String get alertsBackgroundCheckErrorTitle => 'Alert background check failed';
+  String get alertsBackgroundCheckErrorTitle =>
+      'Verificarea alertei în fundal a eșuat';
 
   @override
-  String get detailsLabel => 'Details';
+  String get detailsLabel => 'Detalii';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'Eliminați';
 
   @override
-  String get showKey => 'Show key';
+  String get showKey => 'Afișați cheia';
 
   @override
-  String get hideKey => 'Hide key';
+  String get hideKey => 'Ascundeți cheia';
 
   @override
-  String get syncOptionalTitle => 'TankSync is optional';
+  String get syncOptionalTitle => 'TankSync este opțional';
 
   @override
   String get syncOptionalDescription =>
-      'Your app works fully without cloud sync. TankSync lets you sync favorites, alerts, and ratings across devices using Supabase (free tier available).';
+      'Aplicația funcționează complet fără sincronizare cloud. TankSync vă permite să sincronizați favorite, alerte și evaluări pe mai multe dispozitive folosind Supabase (nivel gratuit disponibil).';
 
   @override
-  String get syncHowToConnectQuestion => 'How would you like to connect?';
+  String get syncHowToConnectQuestion => 'Cum doriți să vă conectați?';
 
   @override
-  String get syncCreateOwnTitle => 'Create my own database';
+  String get syncCreateOwnTitle => 'Creați propria bază de date';
 
   @override
   String get syncCreateOwnSubtitle =>
-      'Free Supabase project — we\'ll guide you step by step';
+      'Proiect Supabase gratuit — vă ghidăm pas cu pas';
 
   @override
-  String get syncJoinExistingTitle => 'Join an existing database';
+  String get syncJoinExistingTitle =>
+      'Alăturați-vă unei baze de date existente';
 
   @override
   String get syncJoinExistingSubtitle =>
-      'Scan QR code from the database owner or paste credentials';
+      'Scanați codul QR de la proprietarul bazei de date sau lipiți credențialele';
 
   @override
-  String get syncChooseAccountType => 'Choose your account type';
+  String get syncChooseAccountType => 'Alegeți tipul de cont';
 
   @override
-  String get syncAccountTypeAnonymous => 'Anonymous';
+  String get syncAccountTypeAnonymous => 'Anonim';
 
   @override
   String get syncAccountTypeAnonymousDesc =>
-      'Instant, no email needed. Data tied to this device.';
+      'Instant, fără email. Datele legate de acest dispozitiv.';
 
   @override
-  String get syncAccountTypeEmail => 'Email Account';
+  String get syncAccountTypeEmail => 'Cont cu email';
 
   @override
   String get syncAccountTypeEmailDesc =>
-      'Sign in from any device. Recover data if phone is lost.';
+      'Conectați-vă de pe orice dispozitiv. Recuperați datele dacă telefonul se pierde.';
 
   @override
-  String get syncHaveAccountSignIn => 'Already have an account? Sign in';
+  String get syncHaveAccountSignIn => 'Aveți deja un cont? Conectați-vă';
 
   @override
-  String get syncCreateNewAccount => 'Create new account';
+  String get syncCreateNewAccount => 'Creați cont nou';
 
   @override
-  String get syncTestConnection => 'Test Connection';
+  String get syncTestConnection => 'Testați conexiunea';
 
   @override
-  String get syncTestingConnection => 'Testing...';
+  String get syncTestingConnection => 'Se testează...';
 
   @override
-  String get syncConnectButton => 'Connect';
+  String get syncConnectButton => 'Conectați';
 
   @override
-  String get syncConnectingButton => 'Connecting...';
+  String get syncConnectingButton => 'Se conectează...';
 
   @override
-  String get syncDatabaseReady => 'Database ready!';
+  String get syncDatabaseReady => 'Baza de date este gata!';
 
   @override
-  String get syncDatabaseNeedsSetup => 'Database needs setup';
+  String get syncDatabaseNeedsSetup => 'Baza de date necesită configurare';
 
   @override
   String get syncTableStatusOk => 'OK';
 
   @override
-  String get syncTableStatusMissing => 'Missing';
+  String get syncTableStatusMissing => 'Lipsă';
 
   @override
   String get syncSqlEditorInstructions =>
-      'Copy the SQL below and run it in your Supabase SQL Editor (Dashboard → SQL Editor → New Query → Paste → Run)';
+      'Copiați SQL-ul de mai jos și rulați-l în editorul SQL Supabase (Tablou de bord → SQL Editor → Interogare nouă → Lipiți → Rulați)';
 
   @override
-  String get syncCopySqlButton => 'Copy SQL to clipboard';
+  String get syncCopySqlButton => 'Copiați SQL în clipboard';
 
   @override
-  String get syncRecheckSchemaButton => 'Re-check schema';
+  String get syncRecheckSchemaButton => 'Reverificați schema';
 
   @override
-  String get syncDoneButton => 'Done';
+  String get syncDoneButton => 'Gata';
 
   @override
   String syncSignedInAs(String email) {
-    return 'Signed in as $email';
+    return 'Autentificat ca $email';
   }
 
   @override
   String get syncEmailDescription =>
-      'Your data syncs across all devices with this email.';
+      'Datele dvs. se sincronizează pe toate dispozitivele cu acest email.';
 
   @override
-  String get syncSwitchToAnonymousTitle => 'Switch to anonymous';
+  String get syncSwitchToAnonymousTitle => 'Treceți la anonim';
 
   @override
   String get syncSwitchToAnonymousDesc =>
-      'Continue without email, new anonymous session';
+      'Continuați fără email, sesiune anonimă nouă';
 
   @override
-  String get syncGuestDescription => 'Anonymous, no email needed.';
+  String get syncGuestDescription => 'Anonim, fără email.';
 
   @override
-  String get syncOrDivider => 'or';
+  String get syncOrDivider => 'sau';
 
   @override
-  String get syncHowToSyncQuestion => 'How would you like to sync?';
+  String get syncHowToSyncQuestion => 'Cum doriți să sincronizați?';
 
   @override
   String get syncOfflineDescription =>
-      'Your app works fully offline. Cloud sync is optional.';
+      'Aplicația funcționează complet offline. Sincronizarea cloud este opțională.';
 
   @override
-  String get syncModeCommunityTitle => 'Sparkilo Community';
+  String get syncModeCommunityTitle => 'Comunitatea Sparkilo';
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Share favorites & ratings with all users';
+      'Partajați favorite și evaluări cu toți utilizatorii';
 
   @override
-  String get syncModePrivateTitle => 'Private Database';
+  String get syncModePrivateTitle => 'Bază de date privată';
 
   @override
-  String get syncModePrivateSubtitle => 'Your own Supabase — full data control';
+  String get syncModePrivateSubtitle =>
+      'Propriul Supabase — control total al datelor';
 
   @override
-  String get syncModeGroupTitle => 'Join a Group';
+  String get syncModeGroupTitle => 'Alăturați-vă unui grup';
 
   @override
-  String get syncModeGroupSubtitle => 'Family or friends shared database';
+  String get syncModeGroupSubtitle =>
+      'Bază de date partajată cu familia sau prietenii';
 
   @override
-  String get syncPrivacyShared => 'Shared';
+  String get syncPrivacyShared => 'Partajat';
 
   @override
-  String get syncPrivacyPrivate => 'Private';
+  String get syncPrivacyPrivate => 'Privat';
 
   @override
-  String get syncPrivacyGroup => 'Group';
+  String get syncPrivacyGroup => 'Grup';
 
   @override
-  String get syncStayOfflineButton => 'Stay offline';
+  String get syncStayOfflineButton => 'Rămâneți offline';
 
   @override
-  String get syncSuccessTitle => 'Successfully connected!';
+  String get syncSuccessTitle => 'Conectat cu succes!';
 
   @override
-  String get syncSuccessDescription => 'Your data will now sync automatically.';
+  String get syncSuccessDescription =>
+      'Datele dvs. se vor sincroniza acum automat.';
 
   @override
-  String get syncWizardTitleConnect => 'Connect TankSync';
+  String get syncWizardTitleConnect => 'Conectați TankSync';
 
   @override
-  String get syncSetupTitleYourDatabase => 'Your database';
+  String get syncSetupTitleYourDatabase => 'Baza dvs. de date';
 
   @override
-  String get syncSetupTitleJoinGroup => 'Join a group';
+  String get syncSetupTitleJoinGroup => 'Alăturați-vă unui grup';
 
   @override
-  String get syncSetupTitleAccount => 'Your account';
+  String get syncSetupTitleAccount => 'Contul dvs.';
 
   @override
-  String get syncWizardBack => 'Back';
+  String get syncWizardBack => 'Înapoi';
 
   @override
-  String get syncWizardNext => 'Next';
+  String get syncWizardNext => 'Înainte';
 
   @override
   String syncWizardStepOfSteps(int current, int total) {
-    return 'Step $current of $total';
+    return 'Pasul $current din $total';
   }
 
   @override
-  String get syncWizardCreateSupabaseTitle => 'Create a Supabase project';
+  String get syncWizardCreateSupabaseTitle => 'Creați un proiect Supabase';
 
   @override
   String get syncWizardCreateSupabaseInstructions =>
-      '1. Tap \"Open Supabase\" below\n2. Create a free account (if you don\'t have one)\n3. Click \"New Project\"\n4. Choose a name and region\n5. Wait ~2 minutes for it to start';
+      '1. Apăsați \"Deschideți Supabase\" mai jos\n2. Creați un cont gratuit (dacă nu aveți unul)\n3. Apăsați \"New Project\"\n4. Alegeți un nume și o regiune\n5. Așteptați ~2 minute pentru pornire';
 
   @override
-  String get syncWizardOpenSupabase => 'Open Supabase';
+  String get syncWizardOpenSupabase => 'Deschideți Supabase';
 
   @override
-  String get syncWizardEnableAnonTitle => 'Enable Anonymous Sign-ins';
+  String get syncWizardEnableAnonTitle => 'Activați autentificarea anonimă';
 
   @override
   String get syncWizardEnableAnonInstructions =>
-      '1. In your Supabase dashboard:\n   Authentication → Providers\n2. Find \"Anonymous Sign-ins\"\n3. Toggle it ON\n4. Click \"Save\"';
+      '1. În tabloul de bord Supabase:\n   Authentication → Providers\n2. Găsiți \"Anonymous Sign-ins\"\n3. Activați-l\n4. Apăsați \"Save\"';
 
   @override
-  String get syncWizardOpenAuthSettings => 'Open Auth Settings';
+  String get syncWizardOpenAuthSettings =>
+      'Deschideți setările de autentificare';
 
   @override
-  String get syncWizardCopyCredentialsTitle => 'Copy your credentials';
+  String get syncWizardCopyCredentialsTitle => 'Copiați credențialele';
 
   @override
   String get syncWizardCopyCredentialsInstructions =>
-      '1. Go to Settings → API in your dashboard\n2. Copy the \"Project URL\"\n3. Copy the \"anon public\" key\n4. Paste them below';
+      '1. Mergeți la Settings → API în tabloul de bord\n2. Copiați \"Project URL\"\n3. Copiați cheia \"anon public\"\n4. Lipiți-le mai jos';
 
   @override
-  String get syncWizardOpenApiSettings => 'Open API Settings';
+  String get syncWizardOpenApiSettings => 'Deschideți setările API';
 
   @override
-  String get syncWizardSupabaseUrlLabel => 'Supabase URL';
+  String get syncWizardSupabaseUrlLabel => 'URL Supabase';
 
   @override
   String get syncWizardSupabaseUrlHint => 'https://your-project.supabase.co';
 
   @override
-  String get syncWizardJoinExistingTitle => 'Join an existing database';
+  String get syncWizardJoinExistingTitle =>
+      'Alăturați-vă unei baze de date existente';
 
   @override
-  String get syncWizardScanQrCode => 'Scan QR Code';
+  String get syncWizardScanQrCode => 'Scanați codul QR';
 
   @override
   String get syncWizardAskOwnerQr =>
-      'Ask the database owner to show you their QR code\n(Settings → TankSync → Share)';
+      'Rugați proprietarul bazei de date să vă arate codul QR\n(Setări → TankSync → Partajare)';
 
   @override
   String get syncWizardAskOwnerQrShort =>
-      'Ask the database owner to show their QR code';
+      'Rugați proprietarul bazei de date să vă arate codul QR';
 
   @override
-  String get syncWizardEnterManuallyTitle => 'Enter manually';
+  String get syncWizardEnterManuallyTitle => 'Introduceți manual';
 
   @override
-  String get syncWizardOrEnterManually => 'or enter manually';
+  String get syncWizardOrEnterManually => 'sau introduceți manual';
 
   @override
   String get syncWizardUrlHelperText =>
-      'Whitespace and line breaks removed automatically';
+      'Spațiile și întreruperile de linie sunt eliminate automat';
 
   @override
   String get syncCredentialsPrivateHint =>
-      'Enter your Supabase project credentials. You can find them in your dashboard under Settings > API.';
+      'Introduceți credențialele proiectului Supabase. Le găsiți în tabloul de bord la Settings > API.';
 
   @override
-  String get syncCredentialsDatabaseUrlLabel => 'Database URL';
+  String get syncCredentialsDatabaseUrlLabel => 'URL bază de date';
 
   @override
-  String get syncCredentialsAccessKeyLabel => 'Access Key';
+  String get syncCredentialsAccessKeyLabel => 'Cheie de acces';
 
   @override
   String get syncCredentialsAccessKeyHint => 'eyJhbGciOiJIUzI1NiIs...';
@@ -2829,259 +2851,262 @@ class AppLocalizationsRo extends AppLocalizations {
   String get authEmailLabel => 'Email';
 
   @override
-  String get authPasswordLabel => 'Password';
+  String get authPasswordLabel => 'Parolă';
 
   @override
-  String get authConfirmPasswordLabel => 'Confirm password';
+  String get authConfirmPasswordLabel => 'Confirmați parola';
 
   @override
-  String get authPleaseEnterEmail => 'Please enter your email';
+  String get authPleaseEnterEmail => 'Introduceți adresa de email';
 
   @override
-  String get authInvalidEmail => 'Invalid email address';
+  String get authInvalidEmail => 'Adresă de email invalidă';
 
   @override
-  String get authPasswordsDoNotMatch => 'Passwords do not match';
+  String get authPasswordsDoNotMatch => 'Parolele nu coincid';
 
   @override
-  String get authConnectAnonymously => 'Connect anonymously';
+  String get authConnectAnonymously => 'Conectați-vă anonim';
 
   @override
-  String get authCreateAccountAndConnect => 'Create account & connect';
+  String get authCreateAccountAndConnect => 'Creați cont și conectați';
 
   @override
-  String get authSignInAndConnect => 'Sign in & connect';
+  String get authSignInAndConnect => 'Autentificați-vă și conectați';
 
   @override
-  String get authAnonymousSegment => 'Anonymous';
+  String get authAnonymousSegment => 'Anonim';
 
   @override
   String get authEmailSegment => 'Email';
 
   @override
   String get authAnonymousDescription =>
-      'Instant access, no email needed. Data tied to this device.';
+      'Acces instant, fără email. Datele legate de acest dispozitiv.';
 
   @override
   String get authEmailDescription =>
-      'Sign in from any device. Recover your data if your phone is lost.';
+      'Conectați-vă de pe orice dispozitiv. Recuperați datele dacă telefonul se pierde.';
 
   @override
   String get authSyncAcrossDevices =>
-      'Sync data automatically across all your devices.';
+      'Sincronizați datele automat pe toate dispozitivele dvs.';
 
   @override
-  String get authNewHereCreateAccount => 'New here? Create account';
+  String get authNewHereCreateAccount => 'Nou aici? Creați cont';
 
   @override
-  String get ntfyCardTitle => 'Push Notifications (ntfy.sh)';
+  String get ntfyCardTitle => 'Notificări push (ntfy.sh)';
 
   @override
-  String get ntfyEnableTitle => 'Enable ntfy.sh push';
+  String get ntfyEnableTitle => 'Activați push ntfy.sh';
 
   @override
-  String get ntfyEnableSubtitle => 'Receive price alerts via ntfy.sh';
+  String get ntfyEnableSubtitle => 'Primiți alerte de prețuri prin ntfy.sh';
 
   @override
-  String get ntfyTopicUrlLabel => 'Topic URL';
+  String get ntfyTopicUrlLabel => 'URL temă';
 
   @override
-  String get ntfyCopyTopicUrlTooltip => 'Copy topic URL';
+  String get ntfyCopyTopicUrlTooltip => 'Copiați URL-ul temei';
 
   @override
-  String get ntfySendTestButton => 'Send test notification';
+  String get ntfySendTestButton => 'Trimiteți notificare de test';
 
   @override
   String get ntfyFdroidHint =>
-      'Install the ntfy app from F-Droid to receive push notifications on your device.';
+      'Instalați aplicația ntfy din F-Droid pentru a primi notificări push pe dispozitivul dvs.';
 
   @override
   String get ntfyConnectFirstHint =>
-      'Connect TankSync first to enable push notifications.';
+      'Conectați mai întâi TankSync pentru a activa notificările push.';
 
   @override
-  String get linkDeviceScreenTitle => 'Link Device';
+  String get linkDeviceScreenTitle => 'Conectați dispozitivul';
 
   @override
-  String get linkDeviceThisDeviceLabel => 'This device';
+  String get linkDeviceThisDeviceLabel => 'Acest dispozitiv';
 
   @override
   String get linkDeviceShareCodeHint =>
-      'Share this code with your other device:';
+      'Partajați acest cod cu celălalt dispozitiv:';
 
   @override
-  String get linkDeviceNotConnected => 'Not connected';
+  String get linkDeviceNotConnected => 'Neconectat';
 
   @override
-  String get linkDeviceCopyCodeTooltip => 'Copy code';
+  String get linkDeviceCopyCodeTooltip => 'Copiați codul';
 
   @override
-  String get linkDeviceImportSectionTitle => 'Import from another device';
+  String get linkDeviceImportSectionTitle => 'Importați de pe alt dispozitiv';
 
   @override
   String get linkDeviceImportDescription =>
-      'Enter the device code from your other device to import its favorites, alerts, vehicles, and consumption log. Each device keeps its own profile and defaults.';
+      'Introduceți codul dispozitivului de pe celălalt dispozitiv pentru a importa favoritele, alertele, vehiculele și jurnalul de consum. Fiecare dispozitiv își păstrează propriul profil și setările implicite.';
 
   @override
-  String get linkDeviceCodeFieldLabel => 'Device code';
+  String get linkDeviceCodeFieldLabel => 'Codul dispozitivului';
 
   @override
-  String get linkDeviceCodeFieldHint => 'Paste the UUID from other device';
+  String get linkDeviceCodeFieldHint =>
+      'Lipiți UUID-ul de pe celălalt dispozitiv';
 
   @override
-  String get linkDeviceImportButton => 'Import data';
+  String get linkDeviceImportButton => 'Importați datele';
 
   @override
-  String get linkDeviceHowItWorksTitle => 'How it works';
+  String get linkDeviceHowItWorksTitle => 'Cum funcționează';
 
   @override
   String get linkDeviceHowItWorksBody =>
-      '1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites, alerts, vehicles, and consumption logs\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity and its own profile (preferred fuel, default vehicle, landing screen). Data is merged, not moved.';
+      '1. Pe Dispozitivul A: copiați codul dispozitivului de mai sus\n2. Pe Dispozitivul B: lipiți-l în câmpul \"Codul dispozitivului\"\n3. Apăsați \"Importați datele\" pentru a combina favoritele, alertele, vehiculele și jurnalele de consum\n4. Ambele dispozitive vor avea toate datele combinate\n\nFiecare dispozitiv își păstrează propria identitate anonimă și propriul profil (combustibil preferat, vehicul implicit, ecran de start). Datele sunt combinate, nu mutate.';
 
   @override
-  String get vehicleSetActive => 'Set active';
+  String get vehicleSetActive => 'Setați ca activ';
 
   @override
-  String get swipeHide => 'Hide';
+  String get swipeHide => 'Ascundeți';
 
   @override
-  String get evChargingSection => 'EV Charging';
+  String get evChargingSection => 'Încărcare EV';
 
   @override
-  String get fuelStationsSection => 'Fuel Stations';
+  String get fuelStationsSection => 'Stații de combustibil';
 
   @override
-  String get yourRating => 'Your rating';
+  String get yourRating => 'Evaluarea dvs.';
 
   @override
-  String get noStorageUsed => 'No storage used';
+  String get noStorageUsed => 'Niciun spațiu utilizat';
 
   @override
-  String get aboutReportBug => 'Report a bug / Suggest a feature';
+  String get aboutReportBug => 'Raportați un bug / Sugerați o funcționalitate';
 
   @override
-  String get aboutSupportProject => 'Support this project';
+  String get aboutSupportProject => 'Susțineți acest proiect';
 
   @override
   String get aboutSupportDescription =>
-      'This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.';
+      'Această aplicație este gratuită, open source și fără reclame. Dacă o găsiți utilă, luați în considerare susținerea dezvoltatorului.';
 
   @override
   String get luxembourgRegulatedPricesNotice =>
-      'Luxembourg fuel prices are government-regulated and uniform nationwide.';
+      'Prețurile combustibililor din Luxembourg sunt reglementate de guvern și uniforme la nivel național.';
 
   @override
-  String get luxembourgFuelUnleaded95 => 'Unleaded 95';
+  String get luxembourgFuelUnleaded95 => 'Fără plumb 95';
 
   @override
-  String get luxembourgFuelUnleaded98 => 'Unleaded 98';
+  String get luxembourgFuelUnleaded98 => 'Fără plumb 98';
 
   @override
-  String get luxembourgFuelDiesel => 'Diesel';
+  String get luxembourgFuelDiesel => 'Motorină';
 
   @override
   String get luxembourgFuelLpg => 'LPG';
 
   @override
   String get luxembourgPricesUnavailable =>
-      'Luxembourg regulated prices are unavailable.';
+      'Prețurile reglementate din Luxembourg sunt indisponibile.';
 
   @override
-  String get reportIssueTitle => 'Report a problem';
+  String get reportIssueTitle => 'Raportați o problemă';
 
   @override
-  String get enterCorrection => 'Please enter the correction';
+  String get enterCorrection => 'Introduceți corecția';
 
   @override
   String get reportNoBackendAvailable =>
-      'The report could not be sent: no reporting service is configured for this country. Enable TankSync in Settings to send community reports.';
+      'Raportul nu a putut fi trimis: nu este configurat niciun serviciu de raportare pentru această țară. Activați TankSync în Setări pentru a trimite rapoarte comunității.';
 
   @override
-  String get correctName => 'Correct station name';
+  String get correctName => 'Corectați numele stației';
 
   @override
-  String get correctAddress => 'Correct address';
+  String get correctAddress => 'Corectați adresa';
 
   @override
-  String get wrongE85Price => 'Wrong E85 price';
+  String get wrongE85Price => 'Preț E85 incorect';
 
   @override
-  String get wrongE98Price => 'Wrong Super 98 price';
+  String get wrongE98Price => 'Preț Super 98 incorect';
 
   @override
-  String get wrongLpgPrice => 'Wrong LPG price';
+  String get wrongLpgPrice => 'Preț LPG incorect';
 
   @override
-  String get wrongStationName => 'Wrong station name';
+  String get wrongStationName => 'Nume stație incorect';
 
   @override
-  String get wrongStationAddress => 'Wrong address';
+  String get wrongStationAddress => 'Adresă incorectă';
 
   @override
-  String get independentStation => 'Independent station';
+  String get independentStation => 'Stație independentă';
 
   @override
-  String get serviceRemindersSection => 'Service reminders';
+  String get serviceRemindersSection => 'Mementouri de service';
 
   @override
-  String get serviceRemindersEmpty => 'No reminders yet — pick a preset above.';
+  String get serviceRemindersEmpty =>
+      'Niciun memento încă — alegeți un preset de mai sus.';
 
   @override
-  String get addServiceReminder => 'Add reminder';
+  String get addServiceReminder => 'Adăugați memento';
 
   @override
-  String get serviceReminderPresetOil => 'Oil (15,000 km)';
+  String get serviceReminderPresetOil => 'Ulei (15.000 km)';
 
   @override
-  String get serviceReminderPresetOilLabel => 'Oil change';
+  String get serviceReminderPresetOilLabel => 'Schimb ulei';
 
   @override
-  String get serviceReminderPresetTires => 'Tires (20,000 km)';
+  String get serviceReminderPresetTires => 'Anvelope (20.000 km)';
 
   @override
-  String get serviceReminderPresetTiresLabel => 'Tires';
+  String get serviceReminderPresetTiresLabel => 'Anvelope';
 
   @override
-  String get serviceReminderPresetInspection => 'Inspection (30,000 km)';
+  String get serviceReminderPresetInspection => 'Inspecție (30.000 km)';
 
   @override
-  String get serviceReminderPresetInspectionLabel => 'Inspection';
+  String get serviceReminderPresetInspectionLabel => 'Inspecție';
 
   @override
-  String get serviceReminderLabel => 'Label';
+  String get serviceReminderLabel => 'Etichetă';
 
   @override
   String get serviceReminderInterval => 'Interval (km)';
 
   @override
-  String get serviceReminderLastService => 'Last service';
+  String get serviceReminderLastService => 'Ultimul service';
 
   @override
-  String get serviceReminderMarkDone => 'Mark as done';
+  String get serviceReminderMarkDone => 'Marcați ca efectuat';
 
   @override
-  String get serviceReminderDueTitle => 'Service due';
+  String get serviceReminderDueTitle => 'Service scadent';
 
   @override
   String serviceReminderDueBody(String label, int kmOver) {
-    return '$label is due — $kmOver km past the interval.';
+    return '$label este scadent — $kmOver km peste interval.';
   }
 
   @override
   String get southKoreaApiKeyRequired =>
-      'Register at OPINET to get a free API key';
+      'Înregistrați-vă la OPINET pentru a obține o cheie API gratuită';
 
   @override
   String get southKoreaApiProvider => 'OPINET (KNOC)';
 
   @override
-  String get chileApiKeyRequired => 'Register at CNE to get a free API key';
+  String get chileApiKeyRequired =>
+      'Înregistrați-vă la CNE pentru a obține o cheie API gratuită';
 
   @override
   String get chileApiProvider => 'CNE Bencina en Linea';
 
   @override
-  String get vinConfirmTitle => 'Is this your car?';
+  String get vinConfirmTitle => 'Aceasta este mașina dvs.?';
 
   @override
   String vinConfirmBody(
@@ -3092,383 +3117,389 @@ class AppLocalizationsRo extends AppLocalizations {
     String cylinders,
     String fuel,
   ) {
-    return '$year $make $model — ${displacement}L, $cylinders-cyl, $fuel';
+    return '$year $make $model — ${displacement}L, $cylinders cilindri, $fuel';
   }
 
   @override
   String get vinPartialInfoNote =>
-      'Partial info (offline). You can edit below.';
+      'Informații parțiale (offline). Puteți edita mai jos.';
 
   @override
-  String get vinDecodeError => 'Couldn\'t decode this VIN';
+  String get vinDecodeError => 'Nu s-a putut decoda VIN-ul';
 
   @override
-  String get vinInvalidFormat => 'Invalid VIN format';
+  String get vinInvalidFormat => 'Format VIN invalid';
 
   @override
-  String get obd2PauseBannerTitle => 'OBD2 connection lost — recording paused';
+  String get obd2PauseBannerTitle =>
+      'Conexiune OBD2 pierdută — înregistrare în pauză';
 
   @override
-  String get obd2PauseBannerResume => 'Resume recording';
+  String get obd2PauseBannerResume => 'Reluați înregistrarea';
 
   @override
-  String get obd2PauseBannerEnd => 'End recording';
+  String get obd2PauseBannerEnd => 'Terminați înregistrarea';
 
   @override
   String veCalibratedTitle(String vehicleName, String percent) {
-    return 'Consumption calibration updated for $vehicleName — accuracy improved by $percent%';
+    return 'Calibrarea consumului actualizată pentru $vehicleName — precizie îmbunătățită cu $percent%';
   }
 
   @override
-  String get veResetConfirmTitle => 'Reset volumetric efficiency?';
+  String get veResetConfirmTitle => 'Resetați eficiența volumetrică?';
 
   @override
   String get veResetConfirmBody =>
-      'This will discard the learned volumetric efficiency (η_v) and restore the default value (0.85). Trip-level fuel-flow estimates will fall back to the manufacturer constant until the calibrator collects new samples from upcoming trips.';
+      'Aceasta va elimina eficiența volumetrică (η_v) învățată și va restaura valoarea implicită (0.85). Estimările de debit combustibil la nivel de călătorie vor reveni la constanta producătorului până când calibratorul colectează noi eșantioane din viitoarele călătorii.';
 
   @override
-  String get alertsRadiusSectionTitle => 'Radius alerts';
+  String get alertsRadiusSectionTitle => 'Alerte de rază';
 
   @override
-  String get alertsRadiusAdd => 'Add radius alert';
+  String get alertsRadiusAdd => 'Adăugați alertă de rază';
 
   @override
-  String get alertsRadiusEmptyTitle => 'No radius alerts yet';
+  String get alertsRadiusEmptyTitle => 'Nicio alertă de rază încă';
 
   @override
-  String get alertsRadiusEmptyCta => 'Create a radius alert';
+  String get alertsRadiusEmptyCta => 'Creați o alertă de rază';
 
   @override
-  String get alertsRadiusCreateTitle => 'Create radius alert';
+  String get alertsRadiusCreateTitle => 'Creați alertă de rază';
 
   @override
-  String get alertsRadiusLabelHint => 'Label (e.g. Home diesel)';
+  String get alertsRadiusLabelHint => 'Etichetă (ex. Motorină acasă)';
 
   @override
-  String get alertsRadiusFuelType => 'Fuel type';
+  String get alertsRadiusFuelType => 'Tip combustibil';
 
   @override
-  String get alertsRadiusThreshold => 'Threshold (€/L)';
+  String get alertsRadiusThreshold => 'Prag (€/L)';
 
   @override
-  String get alertsRadiusKm => 'Radius (km)';
+  String get alertsRadiusKm => 'Rază (km)';
 
   @override
-  String get alertsRadiusCenterGps => 'Use my location';
+  String get alertsRadiusCenterGps => 'Utilizați locația mea';
 
   @override
-  String get alertsRadiusCenterPostalCode => 'Postal code';
+  String get alertsRadiusCenterPostalCode => 'Cod poștal';
 
   @override
-  String get alertsRadiusSave => 'Save';
+  String get alertsRadiusSave => 'Salvați';
 
   @override
-  String get alertsRadiusCancel => 'Cancel';
+  String get alertsRadiusCancel => 'Anulare';
 
   @override
-  String get alertsRadiusDeleteConfirm => 'Delete radius alert?';
+  String get alertsRadiusDeleteConfirm => 'Ștergeți alerta de rază?';
 
   @override
   String obd2ConnectedTooltip(String adapterName) {
-    return 'OBD2 connected: $adapterName';
+    return 'OBD2 conectat: $adapterName';
   }
 
   @override
-  String get obd2PairChipTooltip => 'Pair an OBD2 adapter';
+  String get obd2PairChipTooltip => 'Asociați un adaptor OBD2';
 
   @override
   String velocityAlertTitle(String fuelLabel) {
-    return '$fuelLabel dropped at nearby stations';
+    return '$fuelLabel a scăzut la stații din apropiere';
   }
 
   @override
   String velocityAlertBody(int stationCount, int maxDropCents) {
-    return '$stationCount stations dropped by up to $maxDropCents¢ in the last hour';
+    return '$stationCount stații au scăzut cu până la $maxDropCents¢ în ultima oră';
   }
 
   @override
-  String get fillUpSavedSnackbar => 'Fill-up saved';
+  String get fillUpSavedSnackbar => 'Alimentare salvată';
 
   @override
-  String get radiusAlertsEntryTitle => 'Radius alerts & statistics';
+  String get radiusAlertsEntryTitle => 'Alerte de rază și statistici';
 
   @override
   String get radiusAlertsEntrySubtitle =>
-      'Get notified when prices drop near you';
+      'Fiți notificat când prețurile scad în zona dvs.';
 
   @override
-  String get notFoundTitle => 'Page not found';
+  String get notFoundTitle => 'Pagina nu a fost găsită';
 
   @override
   String notFoundBody(String location) {
-    return '\"$location\" not found.';
+    return '\"$location\" nu a fost găsit.';
   }
 
   @override
-  String get notFoundHomeButton => 'Home';
+  String get notFoundHomeButton => 'Acasă';
 
   @override
   String get consumptionTabHiddenNotice =>
-      'The Consumption tab was hidden by your profile settings.';
+      'Fila Consum a fost ascunsă de setările profilului dvs.';
 
   @override
   String get swipeBetweenTabsHint =>
-      'Tip: swipe left or right to switch between tabs.';
+      'Sfat: glisați stânga sau dreapta pentru a comuta între file.';
 
   @override
-  String get discardChangesTitle => 'Discard changes?';
+  String get discardChangesTitle => 'Renunțați la modificări?';
 
   @override
   String get discardChangesBody =>
-      'You have unsaved changes. Leaving now will discard them.';
+      'Aveți modificări nesalvate. Dacă plecați acum, acestea vor fi pierdute.';
 
   @override
-  String get discardChangesConfirm => 'Discard';
+  String get discardChangesConfirm => 'Renunțați';
 
   @override
-  String get discardChangesKeepEditing => 'Keep editing';
+  String get discardChangesKeepEditing => 'Continuați editarea';
 
   @override
-  String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
+  String get tankSyncSectionSubtitle =>
+      'Sincronizare cloud pe dispozitivele dvs.';
 
   @override
-  String get achievementSmoothDriver => 'Smooth streak';
+  String get achievementSmoothDriver => 'Serie de condus lin';
 
   @override
   String get achievementSmoothDriverDesc =>
-      'Drive 5 trips in a row with a smooth-driving score of 80 or higher.';
+      'Conduceți 5 călătorii consecutive cu un scor de condus lin de 80 sau mai mult.';
 
   @override
-  String get achievementColdStartAware => 'Cold-start aware';
+  String get achievementColdStartAware => 'Conștient de pornire la rece';
 
   @override
   String get achievementColdStartAwareDesc =>
-      'Keep a whole month\'s cold-start fuel cost under 2 % of total fuel — combine short trips.';
+      'Mențineți costul combustibilului de pornire la rece dintr-o lună întreagă sub 2% din total — combinați călătoriile scurte.';
 
   @override
-  String get achievementHighwayMaster => 'Highway master';
+  String get achievementHighwayMaster => 'Maestru de autostradă';
 
   @override
   String get achievementHighwayMasterDesc =>
-      'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.';
+      'Finalizați o călătorie de 30+ km la viteză constantă cu un scor de condus lin de 90 sau mai mult.';
 
   @override
-  String get authErrorNoNetwork => 'No network connection. Try again later.';
+  String get authErrorNoNetwork =>
+      'Nicio conexiune la rețea. Încercați mai târziu.';
 
   @override
   String get authErrorInvalidCredentials =>
-      'Invalid email or password. Check your credentials.';
+      'Email sau parolă incorectă. Verificați credențialele.';
 
   @override
   String get authErrorUserAlreadyExists =>
-      'This email is already registered. Try signing in instead.';
+      'Acest email este deja înregistrat. Încercați să vă conectați.';
 
   @override
   String get authErrorEmailNotConfirmed =>
-      'Please check your email and confirm your account first.';
+      'Vă rugăm să vă verificați emailul și să confirmați contul mai întâi.';
 
   @override
-  String get authErrorGeneric => 'Sign-in failed. Please try again.';
+  String get authErrorGeneric =>
+      'Autentificarea a eșuat. Vă rugăm să încercați din nou.';
 
   @override
   String get autoRecordConsentBadgeLabel =>
-      'Background location — for auto-record only';
+      'Locație în fundal — numai pentru înregistrare automată';
 
   @override
-  String get autoRecordConsentExplanationTitle => 'About this permission';
+  String get autoRecordConsentExplanationTitle => 'Despre această permisiune';
 
   @override
   String get autoRecordConsentExplanationBody =>
-      'Auto-record needs background location to detect when you start driving while the app is closed. This grant is used only by auto-record — station search and map centering use a separate foreground location grant.';
+      'Înregistrarea automată necesită locație în fundal pentru a detecta când începeți să conduceți cu aplicația închisă. Această permisiune este utilizată numai de înregistrarea automată — căutarea stațiilor și centrarea hărții folosesc o permisiune de locație separată în prim-plan.';
 
   @override
-  String get autoRecordConsentExplanationCloseButton => 'Got it';
+  String get autoRecordConsentExplanationCloseButton => 'Am înțeles';
 
   @override
-  String get autoRecordConsentExplanationTooltip => 'What does this mean?';
+  String get autoRecordConsentExplanationTooltip => 'Ce înseamnă aceasta?';
 
   @override
   String get autoRecordConsentRevokeAction =>
-      'Tap to manage in system settings';
+      'Apăsați pentru a gestiona în setările sistemului';
 
   @override
-  String get autoRecordSectionTitle => 'Auto-record';
+  String get autoRecordSectionTitle => 'Înregistrare automată';
 
   @override
-  String get autoRecordToggleLabel => 'Auto-record trips';
+  String get autoRecordToggleLabel => 'Înregistrare automată a călătoriilor';
 
   @override
   String get autoRecordStatusActiveLabel =>
-      'Auto-record will activate the next time you enter the car.';
+      'Înregistrarea automată se va activa data viitoare când intrați în mașină.';
 
   @override
   String get autoRecordStatusNeedsPairingLabel =>
-      'Pair an OBD2 adapter to enable auto-record.';
+      'Asociați un adaptor OBD2 pentru a activa înregistrarea automată.';
 
   @override
   String get autoRecordStatusNeedsBackgroundLocationLabel =>
-      'Allow background location so auto-record keeps running with the screen off.';
+      'Permiteți locația în fundal pentru ca înregistrarea automată să continue cu ecranul oprit.';
 
   @override
-  String get autoRecordStatusPairAdapterCta => 'Pair an adapter';
+  String get autoRecordStatusPairAdapterCta => 'Asociați un adaptor';
 
   @override
-  String get autoRecordSpeedThresholdLabel => 'Start speed (km/h)';
+  String get autoRecordSpeedThresholdLabel => 'Viteză de pornire (km/h)';
 
   @override
   String get autoRecordSaveDelayLabel =>
-      'Save delay after disconnect (seconds)';
+      'Întârziere salvare după deconectare (secunde)';
 
   @override
-  String get autoRecordPairedAdapterLabel => 'Paired adapter';
+  String get autoRecordPairedAdapterLabel => 'Adaptor asociat';
 
   @override
   String get autoRecordPairedAdapterNone =>
-      'No adapter paired. Pair one via the OBD2 onboarding first.';
+      'Niciun adaptor asociat. Asociați unul mai întâi prin configurarea OBD2.';
 
   @override
-  String get autoRecordBackgroundLocationLabel => 'Background location allowed';
+  String get autoRecordBackgroundLocationLabel => 'Locație în fundal permisă';
 
   @override
-  String get autoRecordBackgroundLocationRequest => 'Request permission';
+  String get autoRecordBackgroundLocationRequest => 'Solicitați permisiunea';
 
   @override
   String get autoRecordBackgroundLocationRationaleTitle =>
-      'Why \"Allow all the time\"?';
+      'De ce \"Permite întotdeauna\"?';
 
   @override
   String get autoRecordBackgroundLocationRationaleBody =>
-      'Auto-record streams GPS coordinates from the OBD-II foreground service while the screen is off so your trip route stays accurate. Android requires the \"Allow all the time\" option for that to keep working after the device locks.';
+      'Înregistrarea automată transmite coordonate GPS din serviciul de prim-plan OBD-II cu ecranul oprit, astfel încât ruta călătoriei să rămână precisă. Android necesită opțiunea \"Permite întotdeauna\" pentru ca aceasta să continue să funcționeze după blocarea dispozitivului.';
 
   @override
-  String get autoRecordBackgroundLocationOpenSettings => 'Open settings';
+  String get autoRecordBackgroundLocationOpenSettings => 'Deschideți setările';
 
   @override
   String get autoRecordBackgroundLocationForegroundDeniedSnackbar =>
-      'Location permission required';
+      'Permisiunea de locație este necesară';
 
   @override
   String get autoRecordBackgroundLocationRequestFailedSnackbar =>
-      'Could not request background location';
+      'Nu s-a putut solicita locația în fundal';
 
   @override
-  String get autoRecordBadgeClearTooltip => 'Clear counter';
+  String get autoRecordBadgeClearTooltip => 'Resetați contorul';
 
   @override
   String get autoRecordPairAdapterLinkText =>
-      'Pair an adapter in the section below to enable auto-recording';
+      'Asociați un adaptor în secțiunea de mai jos pentru a activa înregistrarea automată';
 
   @override
-  String get exportBackupTooltip => 'Export backup';
+  String get exportBackupTooltip => 'Exportați backup';
 
   @override
-  String get exportBackupReady => 'Backup ready — pick a destination';
+  String get exportBackupReady => 'Backup gata — alegeți destinația';
 
   @override
-  String get exportBackupFailed => 'Backup export failed — please try again';
+  String get exportBackupFailed =>
+      'Exportul backup-ului a eșuat — vă rugăm să încercați din nou';
 
   @override
-  String get brokenMapChipVerifying => 'MAP sensor verifying…';
+  String get brokenMapChipVerifying => 'Se verifică senzorul MAP…';
 
   @override
-  String get brokenMapChipDisclaimer => 'MAP readings suspicious';
+  String get brokenMapChipDisclaimer => 'Citiri MAP suspecte';
 
   @override
   String get brokenMapSnackbarUnreliable =>
-      'MAP sensor reads incorrectly — fuel readings may be 50–80% too low. Try a different adapter.';
+      'Senzorul MAP citește incorect — citirile de combustibil pot fi cu 50–80% prea mici. Încercați un adaptor diferit.';
 
   @override
   String get brokenMapBannerHardDisable =>
-      'MAP sensor unreliable. Showing fill-up averages instead of live fuel rate.';
+      'Senzorul MAP este nesigur. Se afișează mediile de alimentare în loc de debitul live de combustibil.';
 
   @override
   String brokenMapOverlayVerified(String confidence) {
-    return 'MAP sensor: verified ($confidence)';
+    return 'Senzor MAP: verificat ($confidence)';
   }
 
   @override
   String brokenMapOverlayUnverified(String confidence) {
-    return 'MAP sensor: verifying ($confidence)';
+    return 'Senzor MAP: se verifică ($confidence)';
   }
 
   @override
   String brokenMapOverlaySuspicious(String confidence) {
-    return 'MAP sensor: suspicious ($confidence)';
+    return 'Senzor MAP: suspect ($confidence)';
   }
 
   @override
   String brokenMapOverlayPosterior(String posterior, String margin) {
-    return 'MAP sensor: $posterior% ± $margin%';
+    return 'Senzor MAP: $posterior% ± $margin%';
   }
 
   @override
   String brokenMapOverlayPosteriorVerified(String posterior, String margin) {
-    return 'MAP sensor: $posterior% ± $margin% (verified)';
+    return 'Senzor MAP: $posterior% ± $margin% (verificat)';
   }
 
   @override
-  String get brokenMapDiagnosticsCardTitle => 'MAP sensor diagnostics';
+  String get brokenMapDiagnosticsCardTitle => 'Diagnostice senzor MAP';
 
   @override
   String brokenMapDiagnosticsBeliefLine(String posterior, String margin) {
-    return 'Broken-MAP confidence: $posterior% ± $margin%';
+    return 'Probabilitate MAP defect: $posterior% ± $margin%';
   }
 
   @override
   String brokenMapDiagnosticsObservationCount(int count) {
-    return '$count observations recorded';
+    return '$count observații înregistrate';
   }
 
   @override
-  String get brokenMapDiagnosticsVerifiedBadge => 'Verified clean';
+  String get brokenMapDiagnosticsVerifiedBadge => 'Verificat curat';
 
   @override
   String get brokenMapDiagnosticsBeliefNone =>
-      'This vehicle\'s MAP sensor hasn\'t been observed yet.';
+      'Senzorul MAP al acestui vehicul nu a fost observat încă.';
 
   @override
-  String get brokenMapDiagnosticsBlocklistHeading => 'Blocklisted adapters';
+  String get brokenMapDiagnosticsBlocklistHeading =>
+      'Adaptoare în lista de blocare';
 
   @override
   String get brokenMapDiagnosticsBlocklistEmpty =>
-      'No adapters are blocklisted.';
+      'Niciun adaptor în lista de blocare.';
 
   @override
   String brokenMapDiagnosticsBlocklistEntry(String adapter, String percent) {
-    return '$adapter — flagged $percent% broken';
+    return '$adapter — marcat $percent% defect';
   }
 
   @override
-  String get brokenMapDiagnosticsClearButton => 'Clear';
+  String get brokenMapDiagnosticsClearButton => 'Ștergeți';
 
   @override
-  String get brokenMapRevPromptTitle => 'Rev the engine';
+  String get brokenMapRevPromptTitle => 'Accelerați motorul';
 
   @override
   String get brokenMapRevPromptBody =>
-      'Briefly blip the throttle so the app can check the MAP sensor responds.';
+      'Apăsați scurt acceleratorul pentru ca aplicația să verifice că senzorul MAP răspunde.';
 
   @override
-  String get brokenMapRevPromptConfirm => 'Done — I revved';
+  String get brokenMapRevPromptConfirm => 'Gata — am accelerat';
 
   @override
-  String get calibrationAdvancedTitle => 'Advanced calibration';
+  String get calibrationAdvancedTitle => 'Calibrare avansată';
 
   @override
-  String get calibrationDisplacementLabel => 'Engine displacement (cc)';
+  String get calibrationDisplacementLabel => 'Cilindree motor (cc)';
 
   @override
   String get calibrationVolumetricEfficiencyLabel =>
-      'Volumetric efficiency (η_v)';
+      'Eficiență volumetrică (η_v)';
 
   @override
-  String get calibrationAfrLabel => 'Air-to-fuel ratio (AFR)';
+  String get calibrationAfrLabel => 'Raport aer-combustibil (AFR)';
 
   @override
-  String get calibrationFuelDensityLabel => 'Fuel density (g/L)';
+  String get calibrationFuelDensityLabel => 'Densitate combustibil (g/L)';
 
   @override
-  String get calibrationSourceDetected => '(detected from VIN)';
+  String get calibrationSourceDetected => '(detectat din VIN)';
 
   @override
   String calibrationSourceCatalog(String makeModel) {
@@ -3476,89 +3507,89 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String get calibrationSourceDefault => '(default)';
+  String get calibrationSourceDefault => '(implicit)';
 
   @override
   String get calibrationSourceManual => '(manual)';
 
   @override
-  String get calibrationResetToDetected => 'Reset to detected value';
+  String get calibrationResetToDetected => 'Resetați la valoarea detectată';
 
   @override
   String calibrationLearnerStatusCalibrated(String eta, int samples) {
-    return 'η_v: $eta (calibrated, $samples samples)';
+    return 'η_v: $eta (calibrat, $samples eșantioane)';
   }
 
   @override
   String calibrationLearnerStatusLearning(String eta, int samples) {
-    return 'η_v: $eta (learning, $samples samples)';
+    return 'η_v: $eta (se învață, $samples eșantioane)';
   }
 
   @override
   String get calibrationLearnerStatusNoSamples =>
-      'η_v: 0.85 (default — no plein-complet yet)';
+      'η_v: 0.85 (implicit — niciun plein-complet încă)';
 
   @override
-  String get calibrationResetLearner => 'Reset learner';
+  String get calibrationResetLearner => 'Resetați calibratorul';
 
   @override
-  String get calibrationBasisAtkinson => 'Atkinson cycle';
+  String get calibrationBasisAtkinson => 'Ciclu Atkinson';
 
   @override
-  String get calibrationBasisVnt => 'VNT diesel + DI';
+  String get calibrationBasisVnt => 'Diesel VNT + DI';
 
   @override
-  String get calibrationBasisTurboDi => 'Turbocharged + DI';
+  String get calibrationBasisTurboDi => 'Turbocompresor + DI';
 
   @override
-  String get calibrationBasisTurbo => 'Turbocharged';
+  String get calibrationBasisTurbo => 'Turbocompresor';
 
   @override
-  String get calibrationBasisNaDi => 'Naturally aspirated + DI';
+  String get calibrationBasisNaDi => 'Aspirat natural + DI';
 
   @override
   String calibrationSourceCatalogWithBasis(String makeModel, String basis) {
-    return '(catalog: $makeModel — $basis default)';
+    return '(catalog: $makeModel — implicit $basis)';
   }
 
   @override
   String catalogReresolveSnackbarMessage(String makeModel) {
-    return 'Your $makeModel is marked as diesel but matches a petrol catalog entry. Tap to update.';
+    return 'Vehiculul dvs. $makeModel este marcat ca diesel, dar corespunde unei intrări din catalog pentru benzină. Apăsați pentru actualizare.';
   }
 
   @override
-  String get catalogReresolveSnackbarAction => 'Update';
+  String get catalogReresolveSnackbarAction => 'Actualizați';
 
   @override
-  String get consumptionTabFuel => 'Fuel';
+  String get consumptionTabFuel => 'Combustibil';
 
   @override
-  String get consumptionTabCharging => 'Charging';
+  String get consumptionTabCharging => 'Încărcare';
 
   @override
-  String get noChargingLogsTitle => 'No charging logs yet';
+  String get noChargingLogsTitle => 'Niciun jurnal de încărcare încă';
 
   @override
   String get noChargingLogsSubtitle =>
-      'Log your first charging session to start tracking EUR/100 km and kWh/100 km.';
+      'Înregistrați prima sesiune de încărcare pentru a urmări EUR/100 km și kWh/100 km.';
 
   @override
-  String get addChargingLog => 'Log charging';
+  String get addChargingLog => 'Înregistrați încărcarea';
 
   @override
-  String get addChargingLogTitle => 'Log charging session';
+  String get addChargingLogTitle => 'Înregistrați sesiunea de încărcare';
 
   @override
-  String get chargingKwh => 'Energy (kWh)';
+  String get chargingKwh => 'Energie (kWh)';
 
   @override
-  String get chargingCost => 'Total cost';
+  String get chargingCost => 'Cost total';
 
   @override
-  String get chargingTimeMin => 'Charge time (min)';
+  String get chargingTimeMin => 'Timp de încărcare (min)';
 
   @override
-  String get chargingStationName => 'Station (optional)';
+  String get chargingStationName => 'Stație (opțional)';
 
   @override
   String chargingEurPer100km(String value) {
@@ -3571,152 +3602,156 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String get chargingDerivedHelper => 'Need a previous log to compare';
+  String get chargingDerivedHelper =>
+      'Este necesar un jurnal anterior pentru comparație';
 
   @override
-  String get chargingLogButtonLabel => 'Log charging';
+  String get chargingLogButtonLabel => 'Înregistrați încărcarea';
 
   @override
-  String get chargingCostTrendTitle => 'Charging cost trend';
+  String get chargingCostTrendTitle => 'Tendința costului de încărcare';
 
   @override
-  String get chargingEfficiencyTitle => 'Efficiency (kWh/100 km)';
+  String get chargingEfficiencyTitle => 'Eficiență (kWh/100 km)';
 
   @override
-  String get chargingChartsEmpty => 'Not enough data yet';
+  String get chargingChartsEmpty => 'Date insuficiente încă';
 
   @override
-  String get chargingChartsMonthAxis => 'Month';
+  String get chargingChartsMonthAxis => 'Luna';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Community Wait Times';
+  String get gdprCommunityWaitTimeTitle => 'Timpi de așteptare comunitate';
 
   @override
   String get gdprCommunityWaitTimeShort =>
-      'Anonymously share station wait times';
+      'Partajați anonim timpii de așteptare la stații';
 
   @override
   String get gdprCommunityWaitTimeDescription =>
-      'Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.';
+      'Partajați anonim când ajungeți la și plecați de la o stație de combustibil, astfel încât aplicația să poată afișa timpii tipici de așteptare. Nu se încarcă coordonate de locație — doar ID-ul stației.';
 
   @override
   String get consoFeatureGroupTitle => 'Conso';
 
   @override
   String get consoFeatureGroupDescription =>
-      'Track your consumption — manual fill-ups, or automatic OBD2 trip recording.';
+      'Urmăriți consumul — alimentări manuale sau înregistrare automată de călătorii OBD2.';
 
   @override
-  String get consoModeOff => 'Off';
+  String get consoModeOff => 'Oprit';
 
   @override
-  String get consoModeFuel => 'Fuel';
+  String get consoModeFuel => 'Combustibil';
 
   @override
-  String get consoModeFuelAndTrips => 'Fuel + Trips';
+  String get consoModeFuelAndTrips => 'Combustibil + Călătorii';
 
   @override
   String get consoModeOffDescription =>
-      'No Conso tab and no Conso settings section.';
+      'Fără fila Conso și fără secțiunea de setări Conso.';
 
   @override
   String get consoModeFuelDescription =>
-      'Manual fill-ups only. Useful without an OBD2 adapter.';
+      'Numai alimentări manuale. Util fără adaptor OBD2.';
 
   @override
   String get consoModeFuelAndTripsDescription =>
-      'Adds automatic OBD2 trip recording. Requires a paired adapter.';
+      'Adaugă înregistrarea automată a călătoriilor OBD2. Necesită un adaptor asociat.';
 
   @override
-  String get consoSubsectionVehicles => 'My vehicles';
+  String get consoSubsectionVehicles => 'Vehiculele mele';
 
   @override
-  String get consoSubsectionTrajets => 'Trips (OBD2)';
+  String get consoSubsectionTrajets => 'Călătorii (OBD2)';
 
   @override
-  String get consoSubsectionToggles => 'Driving';
+  String get consoSubsectionToggles => 'Condus';
 
   @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count partial fills pending plein complet — not in average',
-      one: '1 partial fill pending plein complet — not in average',
+      other:
+          '$count alimentări parțiale în așteptarea plein complet — nu în medie',
+      one: '1 alimentare parțială în așteptarea plein complet — nu în medie',
     );
     return '$_temp0';
   }
 
   @override
   String consumptionStatsCorrectionShareHint(int percent) {
-    return '$percent% of fuel from auto-corrections — review entries';
+    return '$percent% din combustibil provine din corecții automate — revizuiți intrările';
   }
 
   @override
-  String get fillUpCorrectionLabel => 'Auto-correction — tap to edit';
+  String get fillUpCorrectionLabel =>
+      'Corecție automată — apăsați pentru a edita';
 
   @override
-  String get fillUpCorrectionEditTitle => 'Edit auto-correction';
+  String get fillUpCorrectionEditTitle => 'Editați corecția automată';
 
   @override
   String get fillUpCorrectionEditExplainer =>
-      'This entry was auto-generated to close the gap between recorded trips and pumped fuel. Adjust the values if you know the actual figures.';
+      'Această intrare a fost generată automat pentru a închide diferența dintre călătoriile înregistrate și combustibilul pompat. Ajustați valorile dacă cunoașteți cifrele reale.';
 
   @override
-  String get fillUpCorrectionDelete => 'Delete correction';
+  String get fillUpCorrectionDelete => 'Ștergeți corecția';
 
   @override
-  String get fillUpCorrectionStation => 'Station name (optional)';
+  String get fillUpCorrectionStation => 'Nume stație (opțional)';
 
   @override
-  String get greeceApiProvider => 'Paratiritirio Timon (Greece)';
+  String get greeceApiProvider => 'Paratiritirio Timon (Grecia)';
 
   @override
   String get greeceCommunityApiNotice =>
-      'Powered by the community-maintained fuelpricesgr API';
+      'Alimentat de API-ul fuelpricesgr întreținut de comunitate';
 
   @override
-  String get romaniaApiProvider => 'Monitorul Prețurilor (Romania)';
+  String get romaniaApiProvider => 'Monitorul Prețurilor (România)';
 
   @override
   String get romaniaScrapingNotice =>
-      'Powered by pretcarburant.ro (Competition Council + ANPC)';
+      'Alimentat de pretcarburant.ro (Consiliul Concurenței + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {
-    return '$country stations $km km away — €$price/L cheaper';
+    return 'Stații în $country la $km km distanță — cu €$price/L mai ieftin';
   }
 
   @override
-  String get crossBorderTapToSwitch => 'Tap to switch country';
+  String get crossBorderTapToSwitch => 'Apăsați pentru a schimba țara';
 
   @override
-  String get crossBorderDismissTooltip => 'Dismiss';
+  String get crossBorderDismissTooltip => 'Respingeți';
 
   @override
-  String get insightCardTitle => 'Top wasteful behaviours';
+  String get insightCardTitle => 'Cele mai risipitoare comportamente';
 
   @override
-  String get insightEmptyState => 'No notable inefficiencies — keep it up!';
+  String get insightEmptyState =>
+      'Nicio ineficiență notabilă — continuați tot așa!';
 
   @override
   String insightHighRpm(String pctTime, String liters) {
-    return 'Engine over 3000 RPM ($pctTime% of trip): wasted $liters L';
+    return 'Motor peste 3000 RPM ($pctTime% din călătorie): $liters L risipiți';
   }
 
   @override
   String insightHardAccel(String count, String liters) {
-    return '$count hard accelerations: wasted $liters L';
+    return '$count accelerări bruște: $liters L risipiți';
   }
 
   @override
   String insightIdling(String pctTime, String liters) {
-    return 'Idling ($pctTime% of trip): wasted $liters L';
+    return 'Ralanti ($pctTime% din călătorie): $liters L risipiți';
   }
 
   @override
   String insightSubtitlePctOfTrip(String pctTime) {
-    return '$pctTime% of trip';
+    return '$pctTime% din călătorie';
   }
 
   @override
@@ -3726,889 +3761,905 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String insightLowGear(String minutes) {
-    return 'Labouring in low gear ($minutes min)';
+    return 'Mersul în treaptă mică ($minutes min)';
   }
 
   @override
-  String get drivingScoreCardTitle => 'Driving score';
+  String get drivingScoreCardTitle => 'Scor de condus';
 
   @override
   String get drivingScoreCardOutOf => '/100';
 
   @override
   String get drivingScoreCardSubtitle =>
-      'Composite score from idling, hard accelerations, hard braking, and high-RPM time. A \'better than X% of past trips\' comparison will land in a follow-up release.';
+      'Scor compus din ralanti, accelerări bruște, frânări bruște și timp la RPM ridicat. O comparație \'mai bun decât X% din călătoriile anterioare\' va apărea într-o versiune viitoare.';
 
   @override
   String drivingScoreCardSemanticsLabel(String score) {
-    return 'Driving score $score out of 100';
+    return 'Scor de condus $score din 100';
   }
 
   @override
-  String get drivingScorePenaltyIdling => 'Idling';
+  String get drivingScorePenaltyIdling => 'Ralanti';
 
   @override
-  String get drivingScorePenaltyHardAccel => 'Hard accelerations';
+  String get drivingScorePenaltyHardAccel => 'Accelerări bruște';
 
   @override
-  String get drivingScorePenaltyHardBrake => 'Hard braking';
+  String get drivingScorePenaltyHardBrake => 'Frânări bruște';
 
   @override
-  String get drivingScorePenaltyHighRpm => 'High RPM';
+  String get drivingScorePenaltyHighRpm => 'RPM ridicat';
 
   @override
-  String get drivingScorePenaltyFullThrottle => 'Full throttle';
+  String get drivingScorePenaltyFullThrottle => 'Accelerator la maxim';
 
   @override
   String get ecoRouteOption => 'Eco';
 
   @override
   String ecoRouteSavings(String liters) {
-    return '≈ $liters L saved';
+    return '≈ $liters L economisiți';
   }
 
   @override
   String get ecoRouteHint =>
-      'Smarter drive — favours steady highway over zigzag shortcuts.';
+      'Condus mai inteligent — favorizează autostrada constantă față de scurtăturile în zigzag.';
 
   @override
-  String get favoritesShareAction => 'Share';
+  String get favoritesShareAction => 'Partajați';
 
   @override
   String favoritesShareSubject(String date) {
-    return 'Sparkilo — favourites on $date';
+    return 'Sparkilo — favorite din $date';
   }
 
   @override
-  String get favoritesShareError => 'Couldn\'t generate share image';
+  String get favoritesShareError => 'Nu s-a putut genera imaginea de partajare';
 
   @override
-  String get featureManagementSectionTitle => 'Feature management';
+  String get featureManagementSectionTitle => 'Gestionarea funcționalităților';
 
   @override
   String get featureManagementSectionSubtitle =>
-      'Turn individual features on or off. Some features depend on others — switches are disabled until prerequisites are met.';
+      'Activați sau dezactivați funcționalitățile individuale. Unele funcționalități depind de altele — comutatoarele sunt dezactivate până când condițiile prealabile sunt îndeplinite.';
 
   @override
-  String get featureLabel_obd2TripRecording => 'OBD2 trip recording';
+  String get featureLabel_obd2TripRecording => 'Înregistrare călătorii OBD2';
 
   @override
   String get featureDescription_obd2TripRecording =>
-      'Capture trips automatically over OBD2.';
+      'Capturați călătorii automat prin OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Gamification';
+  String get featureLabel_gamification => 'Gamificare';
 
   @override
   String get featureDescription_gamification =>
-      'Driving scores and earned badges.';
+      'Scoruri de condus și insigne câștigate.';
 
   @override
-  String get featureLabel_hapticEcoCoach => 'Haptic eco-coach';
+  String get featureLabel_hapticEcoCoach => 'Eco-coach haptic';
 
   @override
   String get featureDescription_hapticEcoCoach =>
-      'Real-time haptic feedback during a trip.';
+      'Feedback haptic în timp real în timpul unei călătorii.';
 
   @override
   String get featureLabel_tankSync => 'TankSync';
 
   @override
-  String get featureDescription_tankSync => 'Cross-device sync via Supabase.';
+  String get featureDescription_tankSync =>
+      'Sincronizare între dispozitive prin Supabase.';
 
   @override
-  String get featureLabel_consumptionAnalytics => 'Consumption analytics';
+  String get featureLabel_consumptionAnalytics => 'Analitica consumului';
 
   @override
   String get featureDescription_consumptionAnalytics =>
-      'Fill-up and trip analysis tab.';
+      'Fila de analiză a alimentărilor și călătoriilor.';
 
   @override
-  String get featureLabel_baselineSync => 'Baseline sync';
+  String get featureLabel_baselineSync => 'Sincronizare referință';
 
   @override
   String get featureDescription_baselineSync =>
-      'Sync driving baselines via TankSync.';
+      'Sincronizați referințele de condus prin TankSync.';
 
   @override
-  String get featureLabel_unifiedSearchResults => 'Unified search results';
+  String get featureLabel_unifiedSearchResults =>
+      'Rezultate de căutare unificate';
 
   @override
   String get featureDescription_unifiedSearchResults =>
-      'Single result list combining fuel and EV stations.';
+      'Listă unică de rezultate combinând stații de combustibil și EV.';
 
   @override
-  String get featureLabel_priceAlerts => 'Price alerts';
+  String get featureLabel_priceAlerts => 'Alerte de prețuri';
 
   @override
   String get featureDescription_priceAlerts =>
-      'Threshold-based price-drop notifications.';
+      'Notificări de scădere a prețului bazate pe prag.';
 
   @override
-  String get featureLabel_priceHistory => 'Price history';
+  String get featureLabel_priceHistory => 'Istoricul prețurilor';
 
   @override
   String get featureDescription_priceHistory =>
-      '30-day price charts on station details.';
+      'Grafice de 30 de zile ale prețurilor în detaliile stației.';
 
   @override
-  String get featureLabel_routePlanning => 'Route planning';
+  String get featureLabel_routePlanning => 'Planificare rută';
 
   @override
   String get featureDescription_routePlanning =>
-      'Cheapest stop along your route.';
+      'Cea mai ieftină oprire de-a lungul rutei dvs.';
 
   @override
-  String get featureLabel_evCharging => 'EV charging';
+  String get featureLabel_evCharging => 'Încărcare EV';
 
   @override
   String get featureDescription_evCharging =>
-      'Charging stations via OpenChargeMap.';
+      'Stații de încărcare prin OpenChargeMap.';
 
   @override
   String get featureLabel_glideCoach => 'Glide-coach';
 
   @override
   String get featureDescription_glideCoach =>
-      'Hypermiling guidance using OSM traffic signals.';
+      'Ghidare hypermiling folosind semafoarele OSM.';
 
   @override
-  String get featureLabel_gpsTripPath => 'GPS trip path';
+  String get featureLabel_gpsTripPath => 'Traseul GPS al călătoriei';
 
   @override
   String get featureDescription_gpsTripPath =>
-      'Persist GPS path samples alongside each trip.';
+      'Stocați eșantioane GPS alături de fiecare călătorie.';
 
   @override
-  String get featureLabel_autoRecord => 'Auto-record';
+  String get featureLabel_autoRecord => 'Înregistrare automată';
 
   @override
   String get featureDescription_autoRecord =>
-      'Automatically start a trip when the OBD2 adapter connects to a moving vehicle.';
+      'Porniți automat o călătorie când adaptorul OBD2 se conectează la un vehicul în mișcare.';
 
   @override
-  String get featureLabel_showFuel => 'Show fuel stations';
+  String get featureLabel_showFuel => 'Afișați stații de combustibil';
 
   @override
   String get featureDescription_showFuel =>
-      'Display petrol/diesel station results in search and on the map.';
+      'Afișați rezultate cu stații de benzină/motorină în căutare și pe hartă.';
 
   @override
-  String get featureLabel_showElectric => 'Show charging stations';
+  String get featureLabel_showElectric => 'Afișați stații de încărcare';
 
   @override
   String get featureDescription_showElectric =>
-      'Display EV charging stations in search and on the map.';
+      'Afișați stații de încărcare EV în căutare și pe hartă.';
 
   @override
-  String get featureLabel_showConsumptionTab => 'Consumption tab';
+  String get featureLabel_showConsumptionTab => 'Fila Consum';
 
   @override
   String get featureDescription_showConsumptionTab =>
-      'Show the consumption analytics tab in the bottom navigation.';
+      'Afișați fila de analitica consumului în navigarea inferioară.';
 
   @override
   String get featureBlockedEnable_gamification =>
-      'Enable OBD2 trip recording first';
+      'Activați mai întâi înregistrarea călătoriilor OBD2';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
-      'Enable OBD2 trip recording first';
+      'Activați mai întâi înregistrarea călătoriilor OBD2';
 
   @override
   String get featureBlockedEnable_consumptionAnalytics =>
-      'Enable OBD2 trip recording first';
+      'Activați mai întâi înregistrarea călătoriilor OBD2';
 
   @override
-  String get featureBlockedEnable_baselineSync => 'Enable TankSync first';
+  String get featureBlockedEnable_baselineSync => 'Activați mai întâi TankSync';
 
   @override
   String get featureBlockedEnable_glideCoach =>
-      'Enable OBD2 trip recording first';
+      'Activați mai întâi înregistrarea călătoriilor OBD2';
 
   @override
   String get featureBlockedEnable_gpsTripPath =>
-      'Enable OBD2 trip recording first';
+      'Activați mai întâi înregistrarea călătoriilor OBD2';
 
   @override
   String get featureBlockedEnable_autoRecord =>
-      'Enable OBD2 trip recording first';
+      'Activați mai întâi înregistrarea călătoriilor OBD2';
 
   @override
-  String get featureBlockedEnable_showFuel => 'Prerequisites not met';
+  String get featureBlockedEnable_showFuel =>
+      'Condiții prealabile neîndeplinite';
 
   @override
-  String get featureBlockedEnable_showElectric => 'Prerequisites not met';
+  String get featureBlockedEnable_showElectric =>
+      'Condiții prealabile neîndeplinite';
 
   @override
   String get featureBlockedEnable_showConsumptionTab =>
-      'Enable OBD2 trip recording first';
+      'Activați mai întâi înregistrarea călătoriilor OBD2';
 
   @override
-  String get featureLabel_tflitePricePrediction => 'TFLite price prediction';
+  String get featureLabel_tflitePricePrediction => 'Predicție prețuri TFLite';
 
   @override
   String get featureDescription_tflitePricePrediction =>
-      'On-device price forecast model — inference runs locally; features and predictions never leave the device.';
+      'Model de prognoză a prețurilor pe dispozitiv — inferența rulează local; funcționalitățile și predicțiile nu părăsesc niciodată dispozitivul.';
 
   @override
   String get featureBlockedEnable_tflitePricePrediction =>
-      'Enable price history first';
+      'Activați mai întâi istoricul prețurilor';
 
   @override
-  String get featureLabel_fuelCalculator => 'Fuel calculator';
+  String get featureLabel_fuelCalculator => 'Calculator combustibil';
 
   @override
   String get featureDescription_fuelCalculator =>
-      'Reachable fuel-cost calculator from the search results.';
+      'Calculator de cost-combustibil accesibil din rezultatele de căutare.';
 
   @override
-  String get featureLabel_carbonDashboard => 'Carbon dashboard';
+  String get featureLabel_carbonDashboard => 'Tablou de bord carbon';
 
   @override
   String get featureDescription_carbonDashboard =>
-      'CO2 footprint dashboard reachable from the Consumption tab.';
+      'Tablou de bord amprentă CO2 accesibil din fila Consum.';
 
   @override
-  String get featureLabel_experimentalOemPids => 'Experimental OEM PIDs';
+  String get featureLabel_experimentalOemPids => 'PID-uri OEM experimentale';
 
   @override
   String get featureDescription_experimentalOemPids =>
-      'Read exact tank litres via manufacturer-specific PIDs on supported adapters.';
+      'Citiți litrii exacți din rezervor prin PID-uri specifice producătorului pe adaptoarele suportate.';
 
   @override
   String get featureBlockedEnable_experimentalOemPids =>
-      'Enable OBD2 trip recording first';
+      'Activați mai întâi înregistrarea călătoriilor OBD2';
 
   @override
-  String get featureLabel_paymentQrScan => 'Scan payment QR';
+  String get featureLabel_paymentQrScan => 'Scanare QR de plată';
 
   @override
   String get featureDescription_paymentQrScan =>
-      'Scan-to-pay QR reader on the station detail screen.';
+      'Cititor QR de plată pe ecranul de detalii al stației.';
 
   @override
-  String get featureLabel_communityPriceReports => 'Community price reports';
+  String get featureLabel_communityPriceReports =>
+      'Rapoarte de prețuri comunitate';
 
   @override
   String get featureDescription_communityPriceReports =>
-      'Report a station price from the station detail screen.';
+      'Raportați prețul unei stații din ecranul de detalii al stației.';
 
   @override
-  String get feedbackConsentTitle => 'Send report to GitHub?';
+  String get feedbackConsentTitle => 'Trimiteți raportul pe GitHub?';
 
   @override
   String get feedbackConsentBody =>
-      'This creates a public ticket on our GitHub repository with your photo and the OCR text. No personal data (location, account id) is sent. Continue?';
+      'Aceasta creează un tichet public în depozitul nostru GitHub cu fotografia și textul OCR. Nu sunt trimise date personale (locație, ID cont). Continuați?';
 
   @override
-  String get feedbackConsentContinue => 'Continue';
+  String get feedbackConsentContinue => 'Continuați';
 
   @override
-  String get feedbackConsentCancel => 'Cancel';
+  String get feedbackConsentCancel => 'Anulare';
 
   @override
-  String get feedbackConsentLater => 'Later';
+  String get feedbackConsentLater => 'Mai târziu';
 
   @override
-  String get feedbackTokenSectionTitle => 'Bad-scan feedback (GitHub)';
+  String get feedbackTokenSectionTitle => 'Feedback scanare eșuată (GitHub)';
 
   @override
   String get feedbackTokenDescription =>
-      'To automatically open a GitHub ticket from a failed scan, paste a GitHub PAT (`public_repo` scope on the tankstellen repository). Otherwise manual sharing remains available.';
+      'Pentru a deschide automat un tichet GitHub dintr-o scanare eșuată, lipiți un GitHub PAT (sfera `public_repo` pe depozitul tankstellen). Altfel, partajarea manuală rămâne disponibilă.';
 
   @override
-  String get feedbackTokenStatusSet => 'Token configured';
+  String get feedbackTokenStatusSet => 'Token configurat';
 
   @override
-  String get feedbackTokenStatusUnset => 'No token';
+  String get feedbackTokenStatusUnset => 'Niciun token';
 
   @override
-  String get feedbackTokenSet => 'Set';
+  String get feedbackTokenSet => 'Setați';
 
   @override
-  String get feedbackTokenClear => 'Clear';
+  String get feedbackTokenClear => 'Ștergeți';
 
   @override
   String get feedbackTokenDialogTitle => 'GitHub PAT';
 
   @override
-  String get feedbackTokenFieldLabel => 'Personal Access Token';
+  String get feedbackTokenFieldLabel => 'Token de acces personal';
 
   @override
-  String get fillUpReconciliationVerifiedBadgeLabel => 'Verified by adapter';
+  String get fillUpReconciliationVerifiedBadgeLabel => 'Verificat de adaptor';
 
   @override
   String get fillUpReconciliationVarianceDialogTitle =>
-      'Doesn\'t match adapter reading';
+      'Nu corespunde cu citirea adaptorului';
 
   @override
   String fillUpReconciliationVarianceDialogBody(String userL, String adapterL) {
-    return 'Your entry: $userL L. Adapter says: $adapterL L (delta from before/after fuel-level capture). Use adapter value?';
+    return 'Intrarea dvs.: $userL L. Adaptorul indică: $adapterL L (delta din captura nivelului combustibil înainte/după). Utilizați valoarea adaptorului?';
   }
 
   @override
-  String get fillUpReconciliationVarianceDialogKeepMine => 'Keep my entry';
+  String get fillUpReconciliationVarianceDialogKeepMine =>
+      'Păstrați intrarea mea';
 
   @override
   String get fillUpReconciliationVarianceDialogUseAdapter =>
-      'Use adapter value';
+      'Utilizați valoarea adaptorului';
 
   @override
-  String get scanReceiptNoData => 'No receipt data found — try again';
+  String get scanReceiptNoData =>
+      'Nicio dată găsită pe bon — încercați din nou';
 
   @override
   String get scanReceiptSuccess =>
-      'Receipt scanned — verify values. Tap \"Report scan error\" below if anything is off.';
+      'Bon scanat — verificați valorile. Apăsați \"Raportați eroare de scanare\" mai jos dacă ceva este greșit.';
 
   @override
   String scanReceiptFailed(String error) {
-    return 'Scan failed: $error';
+    return 'Scanarea a eșuat: $error';
   }
 
   @override
-  String get scanPumpUnreadable => 'Pump display not readable — try again';
+  String get scanPumpUnreadable =>
+      'Afișajul pompei nu poate fi citit — încercați din nou';
 
   @override
-  String get scanPumpSuccess => 'Pump display scanned — verify the values.';
+  String get scanPumpSuccess => 'Afișajul pompei scanat — verificați valorile.';
 
   @override
   String scanPumpFailed(String error) {
-    return 'Pump scan failed: $error';
+    return 'Scanarea pompei a eșuat: $error';
   }
 
   @override
-  String get badScanReportTitle => 'Report a scan error';
+  String get badScanReportTitle => 'Raportați o eroare de scanare';
 
   @override
-  String get badScanReportTitleReceipt => 'Report a scan error — Receipt';
+  String get badScanReportTitleReceipt => 'Raportați o eroare de scanare — Bon';
 
   @override
   String get badScanReportTitlePumpDisplay =>
-      'Report a scan error — Pump display';
+      'Raportați o eroare de scanare — Afișaj pompă';
 
   @override
-  String get pumpScanFailureTitle => 'Display unreadable';
+  String get pumpScanFailureTitle => 'Afișaj necitibil';
 
   @override
   String get pumpScanFailureBody =>
-      'The scan couldn\'t read the pump display. What would you like to do?';
+      'Scanarea nu a putut citi afișajul pompei. Ce doriți să faceți?';
 
   @override
-  String get pumpScanFailureCorrectManually => 'Correct manually';
+  String get pumpScanFailureCorrectManually => 'Corectați manual';
 
   @override
-  String get pumpScanFailureReport => 'Report';
+  String get pumpScanFailureReport => 'Raportați';
 
   @override
-  String get pumpScanFailureRemove => 'Remove photo';
+  String get pumpScanFailureRemove => 'Eliminați fotografia';
 
   @override
   String get badScanReportHint =>
-      'We\'ll share the receipt photo and both sets of values so the next build can learn this layout.';
+      'Vom partaja fotografia bonului și ambele seturi de valori pentru ca viitoarea versiune să poată învăța acest format.';
 
   @override
-  String get badScanReportShareAction => 'Share report + photo';
+  String get badScanReportShareAction => 'Partajați raportul + fotografia';
 
   @override
-  String get badScanReportFieldBrandLayout => 'Brand layout';
+  String get badScanReportFieldBrandLayout => 'Format brand';
 
   @override
   String get badScanReportFieldTotal => 'Total';
 
   @override
-  String get badScanReportFieldPricePerLiter => 'Price/L';
+  String get badScanReportFieldPricePerLiter => 'Preț/L';
 
   @override
-  String get badScanReportFieldStation => 'Station';
+  String get badScanReportFieldStation => 'Stație';
 
   @override
-  String get badScanReportFieldFuel => 'Fuel';
+  String get badScanReportFieldFuel => 'Combustibil';
 
   @override
-  String get badScanReportFieldDate => 'Date';
+  String get badScanReportFieldDate => 'Data';
 
   @override
-  String get badScanReportHeaderField => 'Field';
+  String get badScanReportHeaderField => 'Câmp';
 
   @override
-  String get badScanReportHeaderScanned => 'Scanned';
+  String get badScanReportHeaderScanned => 'Scanat';
 
   @override
-  String get badScanReportHeaderYouTyped => 'You typed';
+  String get badScanReportHeaderYouTyped => 'Ați introdus';
 
   @override
-  String get badScanReportCreateTicket => 'Create issue';
+  String get badScanReportCreateTicket => 'Creați tichet';
 
   @override
-  String get badScanReportOpenInBrowser => 'Open in browser';
+  String get badScanReportOpenInBrowser => 'Deschideți în browser';
 
   @override
-  String get badScanReportFallbackToShare => 'Submission failed — manual share';
+  String get badScanReportFallbackToShare =>
+      'Trimiterea a eșuat — partajare manuală';
 
   @override
-  String get fillUpSectionWhatTitle => 'What you filled';
+  String get fillUpSectionWhatTitle => 'Ce ați alimentat';
 
   @override
-  String get fillUpSectionWhatSubtitle => 'Fuel, amount, price';
+  String get fillUpSectionWhatSubtitle => 'Combustibil, cantitate, preț';
 
   @override
-  String get fillUpSectionWhereTitle => 'Where you were';
+  String get fillUpSectionWhereTitle => 'Unde erați';
 
   @override
-  String get fillUpSectionWhereSubtitle => 'Station, odometer, notes';
+  String get fillUpSectionWhereSubtitle => 'Stație, odometru, note';
 
   @override
-  String get fillUpImportFromLabel => 'Import from…';
+  String get fillUpImportFromLabel => 'Importați din…';
 
   @override
-  String get fillUpImportSheetTitle => 'Import fill-up data';
+  String get fillUpImportSheetTitle => 'Importați date de alimentare';
 
   @override
-  String get fillUpImportReceiptLabel => 'Receipt';
+  String get fillUpImportReceiptLabel => 'Bon';
 
   @override
   String get fillUpImportReceiptDescription =>
-      'Scan a paper receipt with the camera';
+      'Scanați un bon de hârtie cu camera';
 
   @override
-  String get fillUpImportPumpLabel => 'Pump display';
+  String get fillUpImportPumpLabel => 'Afișaj pompă';
 
   @override
   String get fillUpImportPumpDescription =>
-      'Read Betrag / Preis from the pump LCD';
+      'Citiți Betrag / Preis de pe LCD-ul pompei';
 
   @override
-  String get fillUpImportObdLabel => 'OBD-II adapter';
+  String get fillUpImportObdLabel => 'Adaptor OBD-II';
 
   @override
   String get fillUpImportObdDescription =>
-      'Read odometer from the OBD-II port over Bluetooth';
+      'Citiți odometrul de la portul OBD-II prin Bluetooth';
 
   @override
-  String get fillUpPricePerLiterLabel => 'Price per liter';
+  String get fillUpPricePerLiterLabel => 'Preț per litru';
 
   @override
-  String get vehicleHeaderPlateLabel => 'Plate';
+  String get vehicleHeaderPlateLabel => 'Număr';
 
   @override
-  String get vehicleHeaderUntitled => 'New vehicle';
+  String get vehicleHeaderUntitled => 'Vehicul nou';
 
   @override
-  String get vehicleSectionIdentityTitle => 'Identity';
+  String get vehicleSectionIdentityTitle => 'Identitate';
 
   @override
-  String get vehicleSectionIdentitySubtitle => 'Name & VIN';
+  String get vehicleSectionIdentitySubtitle => 'Nume și VIN';
 
   @override
-  String get vehicleSectionDrivetrainTitle => 'Drivetrain';
+  String get vehicleSectionDrivetrainTitle => 'Sistem de propulsie';
 
   @override
-  String get vehicleSectionDrivetrainSubtitle => 'How this vehicle moves';
+  String get vehicleSectionDrivetrainSubtitle => 'Cum se mișcă acest vehicul';
 
   @override
-  String get calibrationModeLabel => 'Calibration mode';
+  String get calibrationModeLabel => 'Mod de calibrare';
 
   @override
-  String get calibrationModeRule => 'Rule-based';
+  String get calibrationModeRule => 'Bazat pe reguli';
 
   @override
   String get calibrationModeFuzzy => 'Fuzzy';
 
   @override
   String get calibrationModeTooltip =>
-      'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.';
+      'Bazat pe reguli atribuie fiecare eșantion de condus exact unei situații. Fuzzy îl distribuie pe toate în funcție de cât de bine se potrivește fiecare — mai fluid în jurul a 60 km/h sau la gradienți în schimbare, dar mai lent la umplerea tuturor categoriilor.';
 
   @override
-  String get profileGamificationToggleTitle => 'Show achievements & scores';
+  String get profileGamificationToggleTitle => 'Afișați realizări și scoruri';
 
   @override
   String get profileGamificationToggleSubtitle =>
-      'When off, badges, scores and trophy icons are hidden across the app.';
+      'Când e dezactivat, insignele, scorurile și icoanele trofeu sunt ascunse în toată aplicația.';
 
   @override
-  String get gpsDiagnosticsTitle => 'GPS sampling diagnostics';
+  String get gpsDiagnosticsTitle => 'Diagnostice eșantionare GPS';
 
   @override
   String gpsDiagnosticsHeader(String count, String span, int gaps) {
     String _temp0 = intl.Intl.pluralLogic(
       gaps,
       locale: localeName,
-      other: '$gaps gaps',
-      one: '1 gap',
-      zero: 'no gaps',
+      other: '$gaps întreruperi',
+      one: '1 întrerupere',
+      zero: 'fără întreruperi',
     );
-    return '$count samples · $span · $_temp0';
+    return '$count eșantioane · $span · $_temp0';
   }
 
   @override
   String gpsDiagnosticsCadence(int ms) {
-    return 'Median interval: $ms ms';
+    return 'Interval mediu: $ms ms';
   }
 
   @override
   String get gpsDiagnosticsExplain =>
-      'Captured during recording to verify GPS cadence under phone-sleep.';
+      'Capturat în timpul înregistrării pentru a verifica cadența GPS în timpul somnului telefonului.';
 
   @override
-  String get hapticEcoCoachSectionTitle => 'Driving';
+  String get hapticEcoCoachSectionTitle => 'Condus';
 
   @override
-  String get hapticEcoCoachSettingTitle => 'Real-time eco coaching';
+  String get hapticEcoCoachSettingTitle => 'Coaching eco în timp real';
 
   @override
   String get hapticEcoCoachSettingSubtitle =>
-      'Gentle haptic + on-screen tip when you floor it during cruise';
+      'Feedback haptic blând + sfat pe ecran când apăsați acceleratorul în croazieră';
 
   @override
   String get hapticEcoCoachSnackBarMessage =>
-      'Easy on the throttle — coasting saves more';
+      'Ușor cu acceleratorul — inerția economisește mai mult';
 
   @override
-  String get anonKeyLabel => 'Anon Key';
+  String get anonKeyLabel => 'Cheie anonimă';
 
   @override
-  String get anonKeyHideTooltip => 'Hide key';
+  String get anonKeyHideTooltip => 'Ascundeți cheia';
 
   @override
-  String get anonKeyShowTooltip => 'Show key to verify';
+  String get anonKeyShowTooltip => 'Afișați cheia pentru verificare';
 
   @override
   String anonKeyTooLong(int length) {
-    return 'Key is too long ($length chars) — check for extra text';
+    return 'Cheia este prea lungă ($length caractere) — verificați dacă există text suplimentar';
   }
 
   @override
   String anonKeyLooksCorrect(int length) {
-    return 'Key looks correct ($length chars)';
+    return 'Cheia pare corectă ($length caractere)';
   }
 
   @override
   String get anonKeyShouldBeJwt =>
-      'Key should be a JWT (header.payload.signature)';
+      'Cheia trebuie să fie un JWT (antet.payload.semnătură)';
 
   @override
   String anonKeyMayBeTruncated(int length) {
-    return 'Key may be truncated ($length of ~208 expected chars)';
+    return 'Cheia poate fi trunchiată ($length din ~208 caractere așteptate)';
   }
 
   @override
-  String get anonKeyExceedsMax => 'Key exceeds maximum length';
+  String get anonKeyExceedsMax => 'Cheia depășește lungimea maximă';
 
   @override
-  String get qrShareTitle => 'Share your database';
+  String get qrShareTitle => 'Partajați baza dvs. de date';
 
   @override
-  String get qrShareSubtitle => 'Others can scan this QR code to connect';
+  String get qrShareSubtitle =>
+      'Alții pot scana acest cod QR pentru a se conecta';
 
   @override
-  String get qrShareCopyAsText => 'Copy as text';
+  String get qrShareCopyAsText => 'Copiați ca text';
 
   @override
-  String get authInfoTitle => 'Why create an account?';
+  String get authInfoTitle => 'De ce să creați un cont?';
 
   @override
   String get authInfoBenefit1 =>
-      '• Sync favorites, alerts, and saved routes across devices';
+      '• Sincronizați favorite, alerte și rute salvate pe mai multe dispozitive';
 
   @override
   String get authInfoBenefit2 =>
-      '• Prepare a route on your phone, use it in your car';
+      '• Pregătiți o rută pe telefon, folosiți-o în mașină';
 
   @override
-  String get authInfoBenefit3 => '• No data is shared with third parties';
+  String get authInfoBenefit3 => '• Nicio dată nu este partajată cu terți';
 
   @override
-  String get authInfoBenefit4 => '• You can delete your account at any time';
+  String get authInfoBenefit4 => '• Puteți șterge contul oricând';
 
   @override
   String get privacyLocalDataEmpty =>
-      'Nothing stored yet. Add a favorite or set a price alert to see entries here.';
+      'Nimic stocat încă. Adăugați un favorit sau setați o alertă de preț pentru a vedea intrările aici.';
 
   @override
-  String get privacyHideEmptyRows => 'Hide empty rows';
+  String get privacyHideEmptyRows => 'Ascundeți rândurile goale';
 
   @override
   String privacyShowEmptyRows(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Show $count empty rows',
-      one: 'Show $count empty row',
+      other: 'Afișați $count rânduri goale',
+      one: 'Afișați $count rând gol',
     );
     return '$_temp0';
   }
 
   @override
-  String get apiKeySetupTitle => 'API key setup (optional)';
+  String get apiKeySetupTitle => 'Configurare cheie API (opțional)';
 
   @override
   String get apiKeySetupDescription =>
-      'Register for a free API key, or skip to explore the app with demo data.';
+      'Înregistrați-vă pentru o cheie API gratuită sau omiteți pentru a explora aplicația cu date demo.';
 
   @override
   String apiKeyRegistrationButton(String provider) {
-    return '$provider Registration';
+    return 'Înregistrare $provider';
   }
 
   @override
   String apiKeyTerms(String provider) {
-    return 'By entering an API key you accept the terms of $provider. Data redistribution is prohibited.';
+    return 'Prin introducerea unei chei API acceptați termenii $provider. Redistribuirea datelor este interzisă.';
   }
 
   @override
-  String get calculatorDistanceHint => 'e.g. 150';
+  String get calculatorDistanceHint => 'ex. 150';
 
   @override
-  String get calculatorConsumptionHint => 'e.g. 7.0';
+  String get calculatorConsumptionHint => 'ex. 7.0';
 
   @override
-  String get calculatorPriceHint => 'e.g. 1.899';
+  String get calculatorPriceHint => 'ex. 1.899';
 
   @override
-  String get routeStrategyLabel => 'Strategy:';
+  String get routeStrategyLabel => 'Strategie:';
 
   @override
-  String get routeStrategyUniform => 'Uniform';
+  String get routeStrategyUniform => 'Uniformă';
 
   @override
-  String get routeStrategyBalanced => 'Balanced';
+  String get routeStrategyBalanced => 'Echilibrată';
 
   @override
   String get glideCoachBetaTitle => 'Glide-coach beta (experimental)';
 
   @override
   String get glideCoachBetaSubtitle =>
-      'Subtle haptic when slowing down ahead of a red light. Off by default — distraction risk.';
+      'Feedback haptic subtil la decelerare înainte de semafor roșu. Dezactivat implicit — risc de distragere.';
 
   @override
-  String get consentSyncTripsTitle => 'Sync trip recordings';
+  String get consentSyncTripsTitle =>
+      'Sincronizați înregistrările de călătorii';
 
   @override
   String get consentSyncTripsSubtitle =>
-      'Back up OBD2 + GPS trips to TankSync. Cross-device, opt-in.';
+      'Faceți backup la călătoriile OBD2 + GPS în TankSync. Cross-device, opt-in.';
 
   @override
   String get consentSyncTripsDisabledHint =>
-      'Enable Cloud Sync above to back up trips.';
+      'Activați mai întâi Sincronizarea cloud pentru a face backup la călătorii.';
 
   @override
-  String get consentHideDetails => 'Hide details';
+  String get consentHideDetails => 'Ascundeți detaliile';
 
   @override
-  String get consentShowDetails => 'Show details';
+  String get consentShowDetails => 'Afișați detaliile';
 
   @override
   String get dialogOk => 'OK';
 
   @override
-  String get invalidLinkTitle => 'Invalid link';
+  String get invalidLinkTitle => 'Link invalid';
 
   @override
   String invalidLinkBody(String path) {
-    return 'The link \"$path\" is not valid.';
+    return 'Link-ul \"$path\" nu este valid.';
   }
 
   @override
-  String get home => 'Home';
+  String get home => 'Acasă';
 
   @override
-  String get loyaltySettingsTitle => 'Fuel club cards';
+  String get loyaltySettingsTitle => 'Carduri de fidelitate combustibil';
 
   @override
   String get loyaltySettingsSubtitle =>
-      'Apply your loyalty discount to displayed prices';
+      'Aplicați reducerea de fidelitate la prețurile afișate';
 
   @override
-  String get loyaltyMenuTitle => 'Fuel club cards';
+  String get loyaltyMenuTitle => 'Carduri de fidelitate combustibil';
 
   @override
   String get loyaltyMenuSubtitle =>
-      'Apply per-litre discounts from Total, Aral, Shell, …';
+      'Aplicați reduceri per litru de la Total, Aral, Shell, …';
 
   @override
-  String get loyaltyAddCard => 'Add card';
+  String get loyaltyAddCard => 'Adăugați card';
 
   @override
-  String get loyaltyAddCardSheetTitle => 'Add fuel club card';
+  String get loyaltyAddCardSheetTitle =>
+      'Adăugați card de fidelitate combustibil';
 
   @override
   String get loyaltyBrandLabel => 'Brand';
 
   @override
-  String get loyaltyCardLabelLabel => 'Label (optional)';
+  String get loyaltyCardLabelLabel => 'Etichetă (opțional)';
 
   @override
-  String get loyaltyDiscountLabel => 'Discount (per litre)';
+  String get loyaltyDiscountLabel => 'Reducere (per litru)';
 
   @override
-  String get loyaltyDiscountInvalid => 'Enter a positive number';
+  String get loyaltyDiscountInvalid => 'Introduceți un număr pozitiv';
 
   @override
-  String get loyaltyDeleteConfirmTitle => 'Delete card?';
+  String get loyaltyDeleteConfirmTitle => 'Ștergeți cardul?';
 
   @override
   String get loyaltyDeleteConfirmBody =>
-      'This card will stop applying its discount.';
+      'Acest card nu va mai aplica reducerea sa.';
 
   @override
-  String get loyaltyEmptyTitle => 'No fuel club cards yet';
+  String get loyaltyEmptyTitle => 'Niciun card de fidelitate încă';
 
   @override
   String get loyaltyEmptyBody =>
-      'Add a card to apply your per-litre discount to matching stations automatically.';
+      'Adăugați un card pentru a aplica automat reducerea per litru la stațiile corespunzătoare.';
 
   @override
   String get loyaltyBadgePrefix => '−';
 
   @override
-  String get maintenanceSignalIdleRpmCreepTitle => 'Idle RPM creep detected';
+  String get maintenanceSignalIdleRpmCreepTitle =>
+      'Creștere RPM la ralanti detectată';
 
   @override
   String maintenanceSignalIdleRpmCreepBody(String percent, int tripCount) {
-    return 'Idle RPM has crept up by $percent% over your last $tripCount trips. Possible early sign of a clogged air filter or sensor drift.';
+    return 'RPM-ul la ralanti a crescut cu $percent% în ultimele $tripCount călătorii. Posibil semn timpuriu al unui filtru de aer înfundat sau derivă senzor.';
   }
 
   @override
   String get maintenanceSignalMafDeviationTitle =>
-      'Possible intake restriction';
+      'Posibilă restricție de admisie';
 
   @override
   String maintenanceSignalMafDeviationBody(String percent, int tripCount) {
-    return 'Cruise fuel rate has dropped by $percent% over your last $tripCount trips. Possible sign of a clogged air filter or restricted intake — worth a check-up.';
+    return 'Debitul de combustibil în croazieră a scăzut cu $percent% în ultimele $tripCount călătorii. Posibil semn al unui filtru de aer înfundat sau admisie restricționată — merită o verificare.';
   }
 
   @override
-  String get maintenanceActionDismiss => 'Dismiss';
+  String get maintenanceActionDismiss => 'Respingeți';
 
   @override
-  String get maintenanceActionSnooze => 'Snooze 30 days';
+  String get maintenanceActionSnooze => 'Amânați 30 de zile';
 
   @override
-  String get consumptionMonthlyInsightsTitle => 'This month vs last month';
+  String get consumptionMonthlyInsightsTitle =>
+      'Luna aceasta față de luna trecută';
 
   @override
-  String get consumptionMonthlyTripsLabel => 'Trips';
+  String get consumptionMonthlyTripsLabel => 'Călătorii';
 
   @override
-  String get consumptionMonthlyDriveTimeLabel => 'Drive time';
+  String get consumptionMonthlyDriveTimeLabel => 'Timp de condus';
 
   @override
-  String get consumptionMonthlyDistanceLabel => 'Distance';
+  String get consumptionMonthlyDistanceLabel => 'Distanță';
 
   @override
-  String get consumptionMonthlyAvgConsumptionLabel => 'Avg consumption';
+  String get consumptionMonthlyAvgConsumptionLabel => 'Consum mediu';
 
   @override
   String get consumptionMonthlyComparisonNotReliable =>
-      'Need at least 3 trips per month for comparison';
+      'Sunt necesare cel puțin 3 călătorii pe lună pentru comparație';
 
   @override
-  String get obd2CapabilitySectionTitle => 'Adapter capabilities';
+  String get obd2CapabilitySectionTitle => 'Capacitățile adaptorului';
 
   @override
   String get obd2CapabilityStandardOnly => 'Standard';
 
   @override
-  String get obd2CapabilityOemPids => 'OEM PIDs';
+  String get obd2CapabilityOemPids => 'PID-uri OEM';
 
   @override
-  String get obd2CapabilityFullCan => 'Full CAN';
+  String get obd2CapabilityFullCan => 'CAN complet';
 
   @override
   String get obd2CapabilityUpgradeHintStandard =>
-      'For exact litres-in-tank on Peugeot/Citroën, the app supports OBDLink MX+/LX/CX (STN chip).';
+      'Pentru litrii exacți din rezervor pe Peugeot/Citroën, aplicația suportă OBDLink MX+/LX/CX (chip STN).';
 
   @override
-  String get obd2DebugOverlayEnabledSnack => 'OBD2 diagnostic overlay enabled';
+  String get obd2DebugOverlayEnabledSnack =>
+      'Overlay de diagnostice OBD2 activat';
 
   @override
   String get obd2DebugOverlayDisabledSnack =>
-      'OBD2 diagnostic overlay disabled';
+      'Overlay de diagnostice OBD2 dezactivat';
 
   @override
-  String get obd2DebugOverlayClearButton => 'Clear';
+  String get obd2DebugOverlayClearButton => 'Ștergeți';
 
   @override
-  String get obd2DebugOverlayCloseButton => 'Close';
+  String get obd2DebugOverlayCloseButton => 'Închideți';
 
   @override
-  String get obd2DebugOverlayTitle => 'OBD2 breadcrumbs';
+  String get obd2DebugOverlayTitle => 'Traseu OBD2';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {
-    return 'Couldn\'t reach \'$adapterName\' — pick another adapter';
+    return 'Nu s-a putut accesa \'$adapterName\' — alegeți alt adaptor';
   }
 
   @override
-  String get onboardingObd2StepTitle => 'Connect your OBD2 adapter';
+  String get onboardingObd2StepTitle => 'Conectați adaptorul OBD2';
 
   @override
   String get onboardingObd2StepBody =>
-      'Plug your OBD2 adapter into the car\'s port and turn the ignition on. We\'ll read the VIN and fill in engine details for you.';
+      'Introduceți adaptorul OBD2 în portul mașinii și porniți contactul. Vom citi VIN-ul și vom completa detaliile motorului pentru dvs.';
 
   @override
-  String get onboardingObd2ConnectButton => 'Connect adapter';
+  String get onboardingObd2ConnectButton => 'Conectați adaptorul';
 
   @override
-  String get onboardingObd2SkipButton => 'Maybe later';
+  String get onboardingObd2SkipButton => 'Poate mai târziu';
 
   @override
-  String get onboardingObd2ReadingVin => 'Reading VIN…';
+  String get onboardingObd2ReadingVin => 'Se citește VIN-ul…';
 
   @override
   String get onboardingObd2VinReadFailed =>
-      'Couldn\'t read VIN — enter manually';
+      'Nu s-a putut citi VIN-ul — introduceți manual';
 
   @override
   String get onboardingObd2ConnectFailed =>
-      'Couldn\'t connect to the adapter. You can retry or skip.';
+      'Nu s-a putut conecta la adaptor. Puteți reîncerca sau omite.';
 
   @override
-  String get onboardingPickUseMode => 'Pick a use mode to continue.';
+  String get onboardingPickUseMode =>
+      'Alegeți un mod de utilizare pentru a continua.';
 
   @override
-  String get alertsRadiusFrequencyLabel => 'Check frequency';
+  String get alertsRadiusFrequencyLabel => 'Frecvența verificărilor';
 
   @override
-  String get alertsRadiusFrequencyDaily => 'Once a day';
+  String get alertsRadiusFrequencyDaily => 'O dată pe zi';
 
   @override
-  String get alertsRadiusFrequencyTwiceDaily => 'Twice a day';
+  String get alertsRadiusFrequencyTwiceDaily => 'De două ori pe zi';
 
   @override
-  String get alertsRadiusFrequencyThriceDaily => 'Three times a day';
+  String get alertsRadiusFrequencyThriceDaily => 'De trei ori pe zi';
 
   @override
-  String get alertsRadiusFrequencyFourTimesDaily => 'Four times a day';
+  String get alertsRadiusFrequencyFourTimesDaily => 'De patru ori pe zi';
 
   @override
-  String get radiusAlertPickOnMap => 'Pick on map';
+  String get radiusAlertPickOnMap => 'Alegeți pe hartă';
 
   @override
-  String get radiusAlertMapPickerTitle => 'Pick alert center';
+  String get radiusAlertMapPickerTitle => 'Alegeți centrul alertei';
 
   @override
-  String get radiusAlertMapPickerConfirm => 'Confirm';
+  String get radiusAlertMapPickerConfirm => 'Confirmați';
 
   @override
-  String get radiusAlertMapPickerCancel => 'Cancel';
+  String get radiusAlertMapPickerCancel => 'Anulare';
 
   @override
   String get radiusAlertMapPickerHint =>
-      'Drag the map to position the alert center';
+      'Trageți harta pentru a poziționa centrul alertei';
 
   @override
-  String get radiusAlertCenterFromMap => 'Map location';
+  String get radiusAlertCenterFromMap => 'Locație pe hartă';
 
   @override
   String radiusAlertNotificationTitle(String fuelLabel, String label) {
-    return '$fuelLabel near $label';
+    return '$fuelLabel lângă $label';
   }
 
   @override
   String radiusAlertNotificationBody(String price, String threshold) {
-    return 'A station is at $price € (target: $threshold €)';
+    return 'O stație are prețul $price € (țintă: $threshold €)';
   }
 
   @override
@@ -4618,13 +4669,13 @@ class AppLocalizationsRo extends AppLocalizations {
   String get refuelUnitPerKwh => '/kWh';
 
   @override
-  String get refuelUnitPerSession => '/session';
+  String get refuelUnitPerSession => '/sesiune';
 
   @override
-  String get speedConsumptionCardTitle => 'Consumption by speed';
+  String get speedConsumptionCardTitle => 'Consum pe viteză';
 
   @override
-  String get speedBandIdleJam => 'Idle / jam';
+  String get speedBandIdleJam => 'Ralanti / ambuteiaj';
 
   @override
   String get speedBandUrban => 'Urban (10–50)';
@@ -4636,31 +4687,31 @@ class AppLocalizationsRo extends AppLocalizations {
   String get speedBandRural => 'Rural (80–100)';
 
   @override
-  String get speedBandMotorwaySlow => 'Eco-cruise (100–115)';
+  String get speedBandMotorwaySlow => 'Croazieră eco (100–115)';
 
   @override
-  String get speedBandMotorway => 'Motorway (115–130)';
+  String get speedBandMotorway => 'Autostradă (115–130)';
 
   @override
-  String get speedBandMotorwayFast => 'Motorway fast (130+)';
+  String get speedBandMotorwayFast => 'Autostradă rapidă (130+)';
 
   @override
   String get speedConsumptionInsufficientData =>
-      'Record 30+ minutes of trips with the OBD2 adapter to unlock the speed/consumption analysis.';
+      'Înregistrați 30+ minute de călătorii cu adaptorul OBD2 pentru a debloca analiza viteză/consum.';
 
   @override
   String speedConsumptionTimeShare(int percent) {
-    return '$percent % of driving';
+    return '$percent % din condus';
   }
 
   @override
-  String get speedConsumptionNeedMoreData => 'Need more data';
+  String get speedConsumptionNeedMoreData => 'Sunt necesare mai multe date';
 
   @override
-  String get splashLoadingLabel => 'Loading Sparkilo';
+  String get splashLoadingLabel => 'Se încarcă Sparkilo';
 
   @override
-  String get tankLevelTitle => 'Tank level';
+  String get tankLevelTitle => 'Nivel rezervor';
 
   @override
   String tankLevelLitersFormat(String litres) {
@@ -4669,115 +4720,116 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String tankLevelRangeFormat(String kilometres) {
-    return '≈ $kilometres km of range';
+    return '≈ $kilometres km autonomie';
   }
 
   @override
   String tankLevelLastFillUpFormat(String date, String count) {
-    return 'Last fill-up: $date · $count trip(s) since';
+    return 'Ultima alimentare: $date · $count călătorie(călătorii) de atunci';
   }
 
   @override
-  String get tankLevelMethodObd2 => 'OBD2 measured';
+  String get tankLevelMethodObd2 => 'Măsurat OBD2';
 
   @override
-  String get tankLevelMethodDistanceFallback => 'distance-based estimate';
+  String get tankLevelMethodDistanceFallback => 'estimare bazată pe distanță';
 
   @override
-  String get tankLevelMethodMixed => 'mixed measurement';
+  String get tankLevelMethodMixed => 'măsurătoare mixtă';
 
   @override
-  String get tankLevelEmptyNoFillUp => 'Log a fill-up to see your tank level';
+  String get tankLevelEmptyNoFillUp =>
+      'Înregistrați o alimentare pentru a vedea nivelul rezervorului';
 
   @override
-  String get tankLevelDetailSheetTitle => 'Trips since last fill-up';
+  String get tankLevelDetailSheetTitle => 'Călătorii de la ultima alimentare';
 
   @override
-  String get addFillUpIsFullTankLabel => 'Full tank';
+  String get addFillUpIsFullTankLabel => 'Rezervor plin';
 
   @override
   String get addFillUpIsFullTankSubtitle =>
-      'Tank filled to the brim — uncheck if this was a partial fill';
+      'Rezervor umplut până la refuz — debifați dacă aceasta a fost o alimentare parțială';
 
   @override
-  String get themeCardTitle => 'Theme';
+  String get themeCardTitle => 'Temă';
 
   @override
-  String get themeCardSubtitleSystem => 'System';
+  String get themeCardSubtitleSystem => 'Sistem';
 
   @override
-  String get themeCardSubtitleLight => 'Light';
+  String get themeCardSubtitleLight => 'Luminos';
 
   @override
-  String get themeCardSubtitleDark => 'Dark';
+  String get themeCardSubtitleDark => 'Întunecat';
 
   @override
-  String get themeSettingsScreenTitle => 'Theme';
+  String get themeSettingsScreenTitle => 'Temă';
 
   @override
-  String get themeSettingsSystemLabel => 'Follow system';
+  String get themeSettingsSystemLabel => 'Urmați sistemul';
 
   @override
-  String get themeSettingsLightLabel => 'Light';
+  String get themeSettingsLightLabel => 'Luminos';
 
   @override
-  String get themeSettingsDarkLabel => 'Dark';
+  String get themeSettingsDarkLabel => 'Întunecat';
 
   @override
   String get themeSettingsSystemDescription =>
-      'Match the current device appearance.';
+      'Urmați aspectul actual al dispozitivului.';
 
   @override
   String get themeSettingsLightDescription =>
-      'Bright backgrounds — best for daytime use.';
+      'Fundal luminos — cel mai bun pentru utilizare ziua.';
 
   @override
   String get themeSettingsDarkDescription =>
-      'Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.';
+      'Fundal întunecat — mai ușor pe ochi noaptea și economisește bateria pe ecranele OLED.';
 
   @override
   String get themeSettingsEcoLabel => 'Eco';
 
   @override
   String get themeSettingsEcoDescription =>
-      'The app\'s signature green look — bright and easy to read, with softly green-tinted backgrounds.';
+      'Aspectul verde caracteristic al aplicației — luminos și ușor de citit, cu fundal ușor verzui.';
 
   @override
-  String get throttleRpmHistogramTitle => 'How you used the engine';
+  String get throttleRpmHistogramTitle => 'Cum ați folosit motorul';
 
   @override
-  String get throttleRpmHistogramThrottleSection => 'Throttle position';
+  String get throttleRpmHistogramThrottleSection => 'Poziția acceleratorului';
 
   @override
-  String get throttleRpmHistogramRpmSection => 'Engine RPM';
+  String get throttleRpmHistogramRpmSection => 'RPM motor';
 
   @override
-  String get throttleRpmHistogramThrottleCoast => 'Coast (0–25%)';
+  String get throttleRpmHistogramThrottleCoast => 'Inerție (0–25%)';
 
   @override
-  String get throttleRpmHistogramThrottleLight => 'Light (25–50%)';
+  String get throttleRpmHistogramThrottleLight => 'Ușor (25–50%)';
 
   @override
-  String get throttleRpmHistogramThrottleFirm => 'Firm (50–75%)';
+  String get throttleRpmHistogramThrottleFirm => 'Ferm (50–75%)';
 
   @override
-  String get throttleRpmHistogramThrottleWide => 'Wide-open (75–100%)';
+  String get throttleRpmHistogramThrottleWide => 'Complet deschis (75–100%)';
 
   @override
-  String get throttleRpmHistogramRpmIdle => 'Idle (≤900)';
+  String get throttleRpmHistogramRpmIdle => 'Ralanti (≤900)';
 
   @override
-  String get throttleRpmHistogramRpmCruise => 'Cruise (901–2000)';
+  String get throttleRpmHistogramRpmCruise => 'Croazieră (901–2000)';
 
   @override
-  String get throttleRpmHistogramRpmSpirited => 'Spirited (2001–3000)';
+  String get throttleRpmHistogramRpmSpirited => 'Dinamic (2001–3000)';
 
   @override
-  String get throttleRpmHistogramRpmHard => 'Hard (>3000)';
+  String get throttleRpmHistogramRpmHard => 'Intens (>3000)';
 
   @override
   String get throttleRpmHistogramEmpty =>
-      'No throttle or RPM samples in this trip.';
+      'Niciun eșantion de accelerator sau RPM în această călătorie.';
 
   @override
   String throttleRpmHistogramBarShare(String pct) {
@@ -4785,30 +4837,31 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String get trajetsTabLabel => 'Trips';
+  String get trajetsTabLabel => 'Călătorii';
 
   @override
-  String get trajetsStartRecordingButton => 'Start recording';
+  String get trajetsStartRecordingButton => 'Porniți înregistrarea';
 
   @override
-  String get trajetsResumeRecordingButton => 'Resume recording';
+  String get trajetsResumeRecordingButton => 'Reluați înregistrarea';
 
   @override
   String get tripStartProgressConnectingAdapter =>
-      'Connecting to OBD2 adapter…';
+      'Se conectează la adaptorul OBD2…';
 
   @override
-  String get tripStartProgressReadingVehicleData => 'Reading vehicle data…';
+  String get tripStartProgressReadingVehicleData =>
+      'Se citesc datele vehiculului…';
 
   @override
-  String get tripStartProgressStartingRecording => 'Starting recording…';
+  String get tripStartProgressStartingRecording => 'Se pornește înregistrarea…';
 
   @override
-  String get trajetsEmptyStateTitle => 'No trips yet';
+  String get trajetsEmptyStateTitle => 'Nicio călătorie încă';
 
   @override
   String get trajetsEmptyStateBody =>
-      'Tap Start recording to begin logging your drives.';
+      'Apăsați Porniți înregistrarea pentru a începe să înregistrați drumurile.';
 
   @override
   String trajetsRowDistance(String km) {
@@ -4826,339 +4879,343 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String get trajetDetailSummaryTitle => 'Summary';
+  String get trajetDetailSummaryTitle => 'Rezumat';
 
   @override
-  String get trajetDetailFieldDate => 'Date';
+  String get trajetDetailFieldDate => 'Data';
 
   @override
-  String get trajetDetailFieldVehicle => 'Vehicle';
+  String get trajetDetailFieldVehicle => 'Vehicul';
 
   @override
-  String get trajetDetailFieldAdapter => 'OBD2 adapter';
+  String get trajetDetailFieldAdapter => 'Adaptor OBD2';
 
   @override
-  String get trajetDetailFieldDistance => 'Distance';
+  String get trajetDetailFieldDistance => 'Distanță';
 
   @override
-  String get trajetDetailFieldDuration => 'Duration';
+  String get trajetDetailFieldDuration => 'Durată';
 
   @override
-  String get trajetDetailFieldAvgConsumption => 'Avg consumption';
+  String get trajetDetailFieldAvgConsumption => 'Consum mediu';
 
   @override
-  String get trajetDetailFieldFuelUsed => 'Fuel used';
+  String get trajetDetailFieldFuelUsed => 'Combustibil utilizat';
 
   @override
-  String get trajetDetailFieldFuelCost => 'Fuel cost';
+  String get trajetDetailFieldFuelCost => 'Cost combustibil';
 
   @override
-  String get trajetDetailFieldAvgSpeed => 'Avg speed';
+  String get trajetDetailFieldAvgSpeed => 'Viteză medie';
 
   @override
-  String get trajetDetailFieldMaxSpeed => 'Max speed';
+  String get trajetDetailFieldMaxSpeed => 'Viteză maximă';
 
   @override
   String get trajetDetailFieldValueUnknown => '—';
 
   @override
-  String get trajetDetailChartSpeed => 'Speed (km/h)';
+  String get trajetDetailChartSpeed => 'Viteză (km/h)';
 
   @override
-  String get trajetDetailChartFuelRate => 'Fuel rate (L/h)';
+  String get trajetDetailChartFuelRate => 'Debit combustibil (L/h)';
 
   @override
   String get trajetDetailChartRpm => 'RPM';
 
   @override
-  String get trajetDetailChartEngineLoad => 'Engine load (%)';
+  String get trajetDetailChartEngineLoad => 'Sarcină motor (%)';
 
   @override
-  String get trajetsRowColdStartChip => 'Cold start';
+  String get trajetsRowColdStartChip => 'Pornire la rece';
 
   @override
   String get trajetsRowColdStartTooltip =>
-      'Engine didn\'t reach operating temperature during this trip — fuel consumption was higher than usual.';
+      'Motorul nu a atins temperatura de funcționare în această călătorie — consumul a fost mai mare decât de obicei.';
 
   @override
-  String get trajetDetailChartEmpty => 'No samples recorded';
+  String get trajetDetailChartEmpty => 'Niciun eșantion înregistrat';
 
   @override
-  String get trajetDetailShareAction => 'Share';
+  String get trajetDetailShareAction => 'Partajați';
 
   @override
   String trajetDetailShareSubject(String date) {
-    return 'Sparkilo — trip on $date';
+    return 'Sparkilo — călătorie din $date';
   }
 
   @override
-  String get trajetDetailShareError => 'Couldn\'t generate share image';
+  String get trajetDetailShareError =>
+      'Nu s-a putut genera imaginea de partajare';
 
   @override
-  String get trajetDetailDeleteAction => 'Delete';
+  String get trajetDetailDeleteAction => 'Ștergeți';
 
   @override
-  String get trajetDetailDeleteConfirmTitle => 'Delete this trip?';
+  String get trajetDetailDeleteConfirmTitle => 'Ștergeți această călătorie?';
 
   @override
   String get trajetDetailDeleteConfirmBody =>
-      'This trip will be permanently removed from your history.';
+      'Această călătorie va fi eliminată permanent din istoricul dvs.';
 
   @override
-  String get trajetDetailDeleteConfirmCancel => 'Cancel';
+  String get trajetDetailDeleteConfirmCancel => 'Anulare';
 
   @override
-  String get trajetDetailDeleteConfirmConfirm => 'Delete';
+  String get trajetDetailDeleteConfirmConfirm => 'Ștergeți';
 
   @override
   String get tripRecordingObd2NotResponding =>
-      'OBD2 adapter connected but not returning data. Try a different adapter or check the vehicle\'s diagnostic protocol.';
+      'Adaptorul OBD2 este conectat dar nu returnează date. Încercați un adaptor diferit sau verificați protocolul de diagnosticare al vehiculului.';
 
   @override
-  String get tripLengthCardTitle => 'Consumption by trip length';
+  String get tripLengthCardTitle => 'Consum pe lungimea călătoriei';
 
   @override
-  String get tripLengthBucketShort => 'Short (<5 km)';
+  String get tripLengthBucketShort => 'Scurtă (<5 km)';
 
   @override
-  String get tripLengthBucketMedium => 'Medium (5–25 km)';
+  String get tripLengthBucketMedium => 'Medie (5–25 km)';
 
   @override
-  String get tripLengthBucketLong => 'Long (>25 km)';
+  String get tripLengthBucketLong => 'Lungă (>25 km)';
 
   @override
-  String get tripLengthBucketNeedMoreData => 'Need more data';
+  String get tripLengthBucketNeedMoreData => 'Sunt necesare mai multe date';
 
   @override
   String tripLengthBucketTripCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count trips',
-      one: '1 trip',
-      zero: 'no trips',
+      other: '$count călătorii',
+      one: '1 călătorie',
+      zero: 'nicio călătorie',
     );
     return '$_temp0';
   }
 
   @override
-  String get tripPathCardTitle => 'Trip path';
+  String get tripPathCardTitle => 'Traseul călătoriei';
 
   @override
-  String get tripPathCardSubtitle => 'GPS-recorded route';
+  String get tripPathCardSubtitle => 'Rută înregistrată GPS';
 
   @override
-  String get tripPathLegendTitle => 'Consumption';
+  String get tripPathLegendTitle => 'Consum';
 
   @override
-  String get tripPathLegendEfficient => 'Efficient (< 6 L/100km)';
+  String get tripPathLegendEfficient => 'Eficient (< 6 L/100km)';
 
   @override
-  String get tripPathLegendBorderline => 'Borderline (6–10 L/100km)';
+  String get tripPathLegendBorderline => 'La limită (6–10 L/100km)';
 
   @override
-  String get tripPathLegendWasteful => 'Wasteful (≥ 10 L/100km)';
+  String get tripPathLegendWasteful => 'Risipitor (≥ 10 L/100km)';
 
   @override
   String get tripRecordingPinTooltip =>
-      'Pinning keeps the screen on — uses more battery';
+      'Fixarea menține ecranul aprins — consumă mai multă baterie';
 
   @override
-  String get tripRecordingPinSemanticOn => 'Unpin recording form';
+  String get tripRecordingPinSemanticOn =>
+      'Defixați formularul de înregistrare';
 
   @override
-  String get tripRecordingPinSemanticOff => 'Pin recording form';
+  String get tripRecordingPinSemanticOff => 'Fixați formularul de înregistrare';
 
   @override
-  String get tripRecordingPinHelpTooltip => 'What does pin do?';
+  String get tripRecordingPinHelpTooltip => 'Ce face fixarea?';
 
   @override
-  String get tripRecordingPinHelpTitle => 'About pin';
+  String get tripRecordingPinHelpTitle => 'Despre fixare';
 
   @override
   String get tripRecordingPinHelpBody =>
-      'Pin keeps the screen on and hides system bars so the form stays readable on a dashboard mount. Tap again to release. Auto-releases when the trip stops.';
+      'Fixarea menține ecranul aprins și ascunde barele sistemului pentru ca formularul să rămână lizibil pe un suport de bord. Apăsați din nou pentru a elibera. Se eliberează automat când călătoria se oprește.';
 
   @override
   String get tripRecordingResumeHintMessage =>
-      'Recording continues in the background. Tap the red banner at the top of any screen to return.';
+      'Înregistrarea continuă în fundal. Apăsați bannerul roșu din partea de sus a oricărui ecran pentru a reveni.';
 
   @override
   String get tripBannerOpenFromConsumptionTab =>
-      'Open the active trip from the Conso tab';
+      'Deschideți călătoria activă din fila Conso';
 
   @override
   String get tripRecordingUnpinnedWarning =>
-      'Pin the screen to keep GPS active during the trip — Android may throttle GPS during sleep.';
+      'Fixați ecranul pentru a menține GPS-ul activ în timpul călătoriei — Android poate reduce GPS-ul în somn.';
 
   @override
-  String get unifiedFilterFuel => 'Fuel';
+  String get unifiedFilterFuel => 'Combustibil';
 
   @override
   String get unifiedFilterEv => 'EV';
 
   @override
-  String get unifiedFilterBoth => 'Both';
+  String get unifiedFilterBoth => 'Ambele';
 
   @override
-  String get unifiedNoResultsForFilter => 'No results match this filter';
+  String get unifiedNoResultsForFilter => 'Niciun rezultat pentru acest filtru';
 
   @override
-  String get searchFailedSnackbar => 'Search failed — please try again';
+  String get searchFailedSnackbar =>
+      'Căutarea a eșuat — vă rugăm să încercați din nou';
 
   @override
-  String get vinLabel => 'VIN (optional)';
+  String get vinLabel => 'VIN (opțional)';
 
   @override
-  String get vinDecodeTooltip => 'Decode VIN';
+  String get vinDecodeTooltip => 'Decodați VIN';
 
   @override
-  String get vinConfirmAction => 'Yes, auto-fill';
+  String get vinConfirmAction => 'Da, completați automat';
 
   @override
-  String get vinModifyAction => 'Modify manually';
+  String get vinModifyAction => 'Modificați manual';
 
   @override
-  String get veResetAction => 'Reset volumetric efficiency';
+  String get veResetAction => 'Resetați eficiența volumetrică';
 
   @override
-  String get vehicleReadVinFromCarButton => 'Read VIN from car';
+  String get vehicleReadVinFromCarButton => 'Citiți VIN-ul din mașină';
 
   @override
   String get vehicleReadVinFromCarTooltip =>
-      'Read VIN from the paired OBD2 adapter';
+      'Citiți VIN-ul din adaptorul OBD2 asociat';
 
   @override
   String get vehicleReadVinFailedUnsupportedSnackbar =>
-      'VIN not available (Mode 09 PID 02 unsupported on pre-2005 vehicles)';
+      'VIN indisponibil (Modul 09 PID 02 nesuportat pe vehicule pre-2005)';
 
   @override
   String get vehicleReadVinFailedGenericSnackbar =>
-      'VIN read failed — please enter manually';
+      'Citirea VIN a eșuat — introduceți manual';
 
   @override
   String get vehicleReadVinNoAdapterHint =>
-      'Pair an OBD2 adapter first to read VIN automatically';
+      'Asociați mai întâi un adaptor OBD2 pentru a citi VIN automat';
 
   @override
-  String get pickerButtonLabel => 'Pick from catalog';
+  String get pickerButtonLabel => 'Alegeți din catalog';
 
   @override
-  String get pickerSearchHint => 'Search make or model';
+  String get pickerSearchHint => 'Căutați marcă sau model';
 
   @override
-  String get pickerHelpText => 'Pre-fill from 50+ supported vehicles';
+  String get pickerHelpText => 'Precompletare din 50+ vehicule suportate';
 
   @override
-  String get pickerEmptyResults => 'No matches';
+  String get pickerEmptyResults => 'Niciun rezultat';
 
   @override
-  String get pickerCancel => 'Cancel';
+  String get pickerCancel => 'Anulare';
 
   @override
-  String get pickerLoading => 'Loading catalog…';
+  String get pickerLoading => 'Se încarcă catalogul…';
 
   @override
-  String get vinInfoTooltip => 'What is a VIN?';
+  String get vinInfoTooltip => 'Ce este un VIN?';
 
   @override
-  String get vinInfoSectionWhatTitle => 'What is a VIN?';
+  String get vinInfoSectionWhatTitle => 'Ce este un VIN?';
 
   @override
   String get vinInfoSectionWhatBody =>
-      'The Vehicle Identification Number is a 17-character code unique to your car. It\'s stamped on the chassis and printed on your vehicle registration document.';
+      'Numărul de identificare al vehiculului este un cod unic de 17 caractere specific mașinii dvs. Este ștanțat pe șasiu și tipărit pe documentul de înmatriculare.';
 
   @override
-  String get vinInfoSectionWhyTitle => 'Why we ask';
+  String get vinInfoSectionWhyTitle => 'De ce îl cerem';
 
   @override
   String get vinInfoSectionWhyBody =>
-      'Decoding the VIN auto-fills engine displacement, cylinder count, model year, primary fuel type, and gross weight — saving you from looking up technical specs manually. The OBD2 fuel-rate calculation uses these values to give you accurate consumption numbers.';
+      'Decodarea VIN-ului completează automat cilindreea motorului, numărul de cilindri, anul modelului, tipul principal de combustibil și greutatea brută — scutindu-vă de a căuta manual specificațiile tehnice. Calculul debitului de combustibil OBD2 folosește aceste valori pentru a vă oferi cifre precise de consum.';
 
   @override
-  String get vinInfoSectionPrivacyTitle => 'Privacy';
+  String get vinInfoSectionPrivacyTitle => 'Confidențialitate';
 
   @override
   String get vinInfoSectionPrivacyBody =>
-      'Your VIN is stored only locally in the app\'s encrypted storage — it\'s never uploaded to Sparkilo servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.';
+      'VIN-ul dvs. este stocat doar local în spațiul de stocare criptat al aplicației — nu este niciodată încărcat pe serverele Sparkilo. Baza de date NHTSA vPIC este interogată cu VIN-ul, dar returnează doar specificații tehnice anonime; NHTSA nu leagă VIN-ul de nicio dată personală. Fără rețea, o căutare offline returnează doar producătorul și țara.';
 
   @override
-  String get vinInfoSectionWhereTitle => 'Where to find it';
+  String get vinInfoSectionWhereTitle => 'Unde să îl găsiți';
 
   @override
   String get vinInfoSectionWhereBody =>
-      'Look through the windshield at the lower-left corner on the driver\'s side, check the driver-side door-frame sticker when the door is open, or read it off your vehicle registration document (card / Carte Grise).';
+      'Uitați-vă prin parbriz în colțul din stânga jos al părții șoferului, verificați autocolantul de pe cadrul ușii șoferului când ușa este deschisă sau citiți-l de pe documentul de înmatriculare (carte de identitate / Carte Grise).';
 
   @override
-  String get vinInfoDismiss => 'Got it';
+  String get vinInfoDismiss => 'Am înțeles';
 
   @override
   String get vinConfirmPrivacyNote =>
-      'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Sparkilo servers.';
+      'Am căutat VIN-ul dvs. în baza de date gratuită NHTSA — nimic trimis la serverele Sparkilo.';
 
   @override
-  String get gdprVinOnlineDecodeTitle => 'VIN online decode';
+  String get gdprVinOnlineDecodeTitle => 'Decodare VIN online';
 
   @override
   String get gdprVinOnlineDecodeShort =>
-      'Decode the VIN via NHTSA\'s free public service';
+      'Decodați VIN-ul prin serviciul public gratuit NHTSA';
 
   @override
   String get gdprVinOnlineDecodeDescription =>
-      'When you pair an adapter, your vehicle\'s VIN is read locally to identify the car. Enabling this sends the 17-char VIN to NHTSA\'s free vPIC service to look up additional details (model, engine displacement, fuel type). The VIN is the only data sent — no other information leaves your device.';
+      'Când asociați un adaptor, VIN-ul vehiculului dvs. este citit local pentru a identifica mașina. Activarea acestei opțiuni trimite VIN-ul de 17 caractere la serviciul gratuit vPIC al NHTSA pentru a obține detalii suplimentare (model, cilindree, tip combustibil). VIN-ul este singurul dat trimis — nicio altă informație nu părăsește dispozitivul.';
 
   @override
-  String get vehicleDetectedFromVinBadge => '(detected)';
+  String get vehicleDetectedFromVinBadge => '(detectat)';
 
   @override
   String vehicleDetectedFromVinSnackbar(String summary) {
-    return 'Detected from VIN: $summary. Apply?';
+    return 'Detectat din VIN: $summary. Aplicați?';
   }
 
   @override
-  String get vehicleDetectedFromVinApply => 'Apply';
+  String get vehicleDetectedFromVinApply => 'Aplicați';
 
   @override
   String waitTimeHint(int minutes) {
-    return '~$minutes min wait';
+    return '~$minutes min așteptare';
   }
 
   @override
-  String get waitTimeTrackStart => 'Track my wait';
+  String get waitTimeTrackStart => 'Urmăriți așteptarea mea';
 
   @override
-  String get waitTimeTrackEnd => 'I\'m leaving';
+  String get waitTimeTrackEnd => 'Plec';
 
   @override
   String waitTimeElapsedShort(int minutes) {
-    return '$minutes min so far';
+    return '$minutes min până acum';
   }
 
   @override
-  String get widgetHelpSectionTitle => 'Home-screen widget';
+  String get widgetHelpSectionTitle => 'Widget ecran principal';
 
   @override
   String get widgetHelpIntro =>
-      'Add the SparKilo widget to your home screen to see fuel and charging prices at a glance.';
+      'Adăugați widgetul SparKilo pe ecranul principal pentru a vedea prețurile la combustibil și încărcare dintr-o privire.';
 
   @override
   String get widgetHelpAdd =>
-      'Add it from your launcher\'s widget picker — long-press an empty area of the home screen, choose Widgets, and find SparKilo.';
+      'Adăugați-l din selectorul de widget-uri al launcher-ului — apăsați lung pe o zonă liberă a ecranului principal, alegeți Widget-uri și găsiți SparKilo.';
 
   @override
   String get widgetHelpTap =>
-      'Tap a station in the widget to open it in the app. Tap the refresh icon to update prices.';
+      'Apăsați o stație din widget pentru a o deschide în aplicație. Apăsați pictograma de actualizare pentru a actualiza prețurile.';
 
   @override
   String get widgetHelpConfigure =>
-      'On Android, long-press the widget and choose Reconfigure to change the profile, colour, and content.';
+      'Pe Android, apăsați lung pe widget și alegeți Reconfigurați pentru a modifica profilul, culoarea și conținutul.';
 
   @override
-  String get widgetVariantDefault => 'Current price only';
+  String get widgetVariantDefault => 'Numai prețul curent';
 
   @override
-  String get widgetVariantPredictive => 'Predictive: best time to fill';
+  String get widgetVariantPredictive =>
+      'Predictiv: cel mai bun moment pentru alimentare';
 
   @override
-  String get widgetPredictiveNowPrefix => 'now';
+  String get widgetPredictiveNowPrefix => 'acum';
 }
