@@ -1240,6 +1240,11 @@
   "fillUpSavedSnackbar": "Tankvorgang gespeichert",
   "radiusAlertsEntryTitle": "Umkreis-Alarme & Statistik",
   "radiusAlertsEntrySubtitle": "Werde benachrichtigt, wenn die Preise in deiner Nähe fallen",
+  "notFoundTitle": "Seite nicht gefunden",
+  "notFoundBody": "„{location}“ nicht gefunden.",
+  "notFoundHomeButton": "Startseite",
+  "consumptionTabHiddenNotice": "Der Verbrauch-Tab wurde durch deine Profileinstellungen ausgeblendet.",
+  "swipeBetweenTabsHint": "Tipp: Wische nach links oder rechts, um zwischen den Tabs zu wechseln.",
   "achievementSmoothDriver": "Ruhige Serie",
   "@achievementSmoothDriver": {
     "description": "Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5)."

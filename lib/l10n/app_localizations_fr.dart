@@ -3199,6 +3199,25 @@ class AppLocalizationsFr extends AppLocalizations {
       'Get notified when prices drop near you';
 
   @override
+  String get notFoundTitle => 'Page introuvable';
+
+  @override
+  String notFoundBody(String location) {
+    return '« $location » introuvable.';
+  }
+
+  @override
+  String get notFoundHomeButton => 'Accueil';
+
+  @override
+  String get consumptionTabHiddenNotice =>
+      'L\'onglet Consommation a été masqué par les réglages de votre profil.';
+
+  @override
+  String get swipeBetweenTabsHint =>
+      'Astuce : balayez vers la gauche ou la droite pour changer d\'onglet.';
+
+  @override
   String get achievementSmoothDriver => 'Série souple';
 
   @override

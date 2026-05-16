@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../core/data/storage_repository.dart';
+import '../l10n/app_localizations.dart';
 import '../core/telemetry/integrations/navigation_trace_observer.dart';
 import '../core/storage/storage_keys.dart';
 import '../core/storage/storage_providers.dart';
@@ -70,27 +71,35 @@ GoRouter router(Ref ref) {
   return GoRouter(
     initialLocation: '/consent',
     observers: [NavigationTraceObserver()],
-    errorBuilder: (context, state) => Scaffold(
-      appBar: AppBar(title: const Text('Page not found')),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.grey),
-            const SizedBox(height: 16),
-            Text(
-              '"${state.matchedLocation}" not found.',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () => context.go('/'),
-              child: const Text('Home'),
-            ),
-          ],
+    errorBuilder: (context, state) {
+      // #1690 — the 404 / page-not-found screen is localized so it
+      // doesn't render in English for non-English users.
+      final l = AppLocalizations.of(context);
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(l?.notFoundTitle ?? 'Page not found'),
         ),
-      ),
-    ),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, size: 64, color: Colors.grey),
+              const SizedBox(height: 16),
+              Text(
+                l?.notFoundBody(state.matchedLocation) ??
+                    '"${state.matchedLocation}" not found.',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () => context.go('/'),
+                child: Text(l?.notFoundHomeButton ?? 'Home'),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
     redirect: (context, state) {
       // Read live from storage each redirect — not cached at provider creation
       final hasConsent = storage.getSetting(StorageKeys.gdprConsentGiven) == true;

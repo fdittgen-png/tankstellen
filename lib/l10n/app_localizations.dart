@@ -5930,6 +5930,36 @@ abstract class AppLocalizations {
   /// **'Get notified when prices drop near you'**
   String get radiusAlertsEntrySubtitle;
 
+  /// AppBar title of the go_router 404 / error screen shown when a route cannot be matched (#1690).
+  ///
+  /// In en, this message translates to:
+  /// **'Page not found'**
+  String get notFoundTitle;
+
+  /// Body of the 404 / page-not-found screen, naming the unmatched route location (#1690).
+  ///
+  /// In en, this message translates to:
+  /// **'\"{location}\" not found.'**
+  String notFoundBody(String location);
+
+  /// Button on the 404 screen that returns the user to the home route (#1690).
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get notFoundHomeButton;
+
+  /// SnackBar shown when a profile change removes the Consumption tab at runtime and the bottom-nav selection jumps to Search — explains why the tab vanished (#1690).
+  ///
+  /// In en, this message translates to:
+  /// **'The Consumption tab was hidden by your profile settings.'**
+  String get consumptionTabHiddenNotice;
+
+  /// One-time first-run SnackBar hint that the bottom-nav tabs respond to a horizontal swipe gesture (#1690).
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: swipe left or right to switch between tabs.'**
+  String get swipeBetweenTabsHint;
+
   /// Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5).
   ///
   /// In en, this message translates to:
