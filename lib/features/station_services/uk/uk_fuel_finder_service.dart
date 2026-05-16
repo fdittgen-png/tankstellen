@@ -35,6 +35,24 @@ import 'uk_fuel_finder_token_manager.dart';
 /// Keeping the gate inline (not in a central config) deliberately
 /// minimises the blast radius of this dormant code path.
 ///
+/// ### Scheme status — verified 2026-05-16 (#1704)
+///
+/// The Fuel Finder statutory scheme is now **live and enforced**: since
+/// 2 Feb 2026 every UK forecourt must report price changes to the
+/// central database within 30 minutes, and from 1 May 2026 the CMA can
+/// fine non-compliant sites. The legacy voluntary per-retailer scheme
+/// that [UkStationService] consumes has had its GOV.UK guidance page
+/// withdrawn and may be decommissioned as the statutory scheme matures
+/// — so this service is a forward port, not dead code.
+///
+/// API access still requires OAuth2 client-credentials registration at
+/// `developer.fuel-finder.service.gov.uk`; there is no unauthenticated
+/// public JSON feed (a twice-daily CSV download exists as an
+/// alternative). The exact token + data endpoint paths defined below
+/// are best-effort guesses pending that registration — verify them
+/// once credentials exist. The keep / register decision is tracked by
+/// #1704.
+///
 /// ### File split (#563)
 ///
 /// OAuth2 lifecycle lives in
