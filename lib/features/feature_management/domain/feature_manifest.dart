@@ -1,3 +1,4 @@
+import 'build_channel.dart';
 import 'feature.dart';
 
 /// Metadata for a single [Feature] in the manifest (#1373 phase 1).
@@ -9,10 +10,15 @@ class FeatureManifestEntry {
   /// The feature this entry describes.
   final Feature feature;
 
-  /// Default state for fresh installs and migrated profiles. Mirrors the
-  /// behaviour of the equivalent scattered toggle TODAY so flipping the
-  /// new system on does not silently change anything.
-  final bool defaultEnabled;
+  /// Build channels this feature exists in (#1670 / #1673). A feature
+  /// absent from a channel is completely unavailable there — force-off
+  /// and hidden from that channel's feature-management UI.
+  final Set<BuildChannel> availableChannels;
+
+  /// Build channels where the feature defaults ON (opt-out). In an
+  /// available channel NOT listed here the feature defaults OFF
+  /// (opt-in). Always a subset of [availableChannels].
+  final Set<BuildChannel> defaultEnabledChannels;
 
   /// Hard prerequisites — every feature here must be enabled before
   /// [feature] can be enabled. Cycles are rejected by
@@ -29,11 +35,39 @@ class FeatureManifestEntry {
 
   const FeatureManifestEntry({
     required this.feature,
-    required this.defaultEnabled,
+    required this.availableChannels,
+    this.defaultEnabledChannels = const {},
     required this.displayName,
     required this.description,
     this.requires = const {},
   });
+
+  /// Convenience for a feature available in every build channel — the
+  /// shape of every feature that predates the channel model (#1673).
+  /// [defaultOn] sets opt-out (on) vs opt-in (off) uniformly across
+  /// channels, mirroring the old single `defaultEnabled` bool.
+  const FeatureManifestEntry.allChannels({
+    required this.feature,
+    required bool defaultOn,
+    required this.displayName,
+    required this.description,
+    this.requires = const {},
+  })  : availableChannels = const {
+          BuildChannel.production,
+          BuildChannel.beta,
+        },
+        defaultEnabledChannels = defaultOn
+            ? const {BuildChannel.production, BuildChannel.beta}
+            : const {};
+
+  /// Whether [feature] exists at all in [channel].
+  bool isAvailableIn(BuildChannel channel) =>
+      availableChannels.contains(channel);
+
+  /// Whether [feature] defaults enabled in [channel]. Always `false`
+  /// for a channel the feature is not available in.
+  bool defaultEnabledIn(BuildChannel channel) =>
+      defaultEnabledChannels.contains(channel);
 }
 
 /// Declarative registry of every [Feature] the app knows about.
@@ -60,13 +94,17 @@ class FeatureManifest {
     return entry;
   }
 
-  /// The set of features whose [FeatureManifestEntry.defaultEnabled] is
-  /// `true`. Used by the repository on first launch and as the fallback
-  /// when the persisted set cannot be read.
-  Set<Feature> defaultEnabledSet() {
+  /// The set of features that default ON in [channel]. Used by the
+  /// repository on first launch and as the fallback when the persisted
+  /// set cannot be read. Defaults to [BuildChannel.production] so
+  /// callers predating the live channel resolver (#1674) keep
+  /// production behaviour.
+  Set<Feature> defaultEnabledSet([
+    BuildChannel channel = BuildChannel.production,
+  ]) {
     return {
       for (final e in entries.values)
-        if (e.defaultEnabled) e.feature,
+        if (e.defaultEnabledIn(channel)) e.feature,
     };
   }
 
@@ -91,124 +129,124 @@ class FeatureManifest {
   ///   against an empty surface; default-true mirrors the wrap-not-
   ///   replace shape used for `autoRecord` in phase 3d)
   static const FeatureManifest defaultManifest = FeatureManifest({
-    Feature.obd2TripRecording: FeatureManifestEntry(
+    Feature.obd2TripRecording: FeatureManifestEntry.allChannels(
       feature: Feature.obd2TripRecording,
-      defaultEnabled: false,
+      defaultOn: false,
       displayName: 'OBD2 trip recording',
       description: 'Capture trips automatically over OBD2.',
     ),
-    Feature.gamification: FeatureManifestEntry(
+    Feature.gamification: FeatureManifestEntry.allChannels(
       feature: Feature.gamification,
-      defaultEnabled: true,
+      defaultOn: true,
       requires: {Feature.obd2TripRecording},
       displayName: 'Gamification',
       description: 'Driving scores and earned badges.',
     ),
-    Feature.hapticEcoCoach: FeatureManifestEntry(
+    Feature.hapticEcoCoach: FeatureManifestEntry.allChannels(
       feature: Feature.hapticEcoCoach,
-      defaultEnabled: false,
+      defaultOn: false,
       requires: {Feature.obd2TripRecording},
       displayName: 'Haptic eco-coach',
       description: 'Real-time haptic feedback during a trip.',
     ),
-    Feature.tankSync: FeatureManifestEntry(
+    Feature.tankSync: FeatureManifestEntry.allChannels(
       feature: Feature.tankSync,
-      defaultEnabled: false,
+      defaultOn: false,
       displayName: 'TankSync',
       description: 'Cross-device sync via Supabase.',
     ),
-    Feature.consumptionAnalytics: FeatureManifestEntry(
+    Feature.consumptionAnalytics: FeatureManifestEntry.allChannels(
       feature: Feature.consumptionAnalytics,
-      defaultEnabled: false,
+      defaultOn: false,
       requires: {Feature.obd2TripRecording},
       displayName: 'Consumption analytics',
       description: 'Fill-up and trip analysis tab.',
     ),
-    Feature.baselineSync: FeatureManifestEntry(
+    Feature.baselineSync: FeatureManifestEntry.allChannels(
       feature: Feature.baselineSync,
-      defaultEnabled: false,
+      defaultOn: false,
       requires: {Feature.tankSync},
       displayName: 'Baseline sync',
       description: 'Sync driving baselines via TankSync.',
     ),
-    Feature.unifiedSearchResults: FeatureManifestEntry(
+    Feature.unifiedSearchResults: FeatureManifestEntry.allChannels(
       feature: Feature.unifiedSearchResults,
-      defaultEnabled: false,
+      defaultOn: false,
       displayName: 'Unified search results',
       description: 'Single result list combining fuel and EV stations.',
     ),
-    Feature.priceAlerts: FeatureManifestEntry(
+    Feature.priceAlerts: FeatureManifestEntry.allChannels(
       feature: Feature.priceAlerts,
-      defaultEnabled: true,
+      defaultOn: true,
       displayName: 'Price alerts',
       description: 'Threshold-based price-drop notifications.',
     ),
-    Feature.priceHistory: FeatureManifestEntry(
+    Feature.priceHistory: FeatureManifestEntry.allChannels(
       feature: Feature.priceHistory,
-      defaultEnabled: true,
+      defaultOn: true,
       displayName: 'Price history',
       description: '30-day price charts on station details.',
     ),
-    Feature.routePlanning: FeatureManifestEntry(
+    Feature.routePlanning: FeatureManifestEntry.allChannels(
       feature: Feature.routePlanning,
-      defaultEnabled: true,
+      defaultOn: true,
       displayName: 'Route planning',
       description: 'Cheapest stop along your route.',
     ),
-    Feature.evCharging: FeatureManifestEntry(
+    Feature.evCharging: FeatureManifestEntry.allChannels(
       feature: Feature.evCharging,
-      defaultEnabled: true,
+      defaultOn: true,
       displayName: 'EV charging',
       description: 'Charging stations via OpenChargeMap.',
     ),
-    Feature.glideCoach: FeatureManifestEntry(
+    Feature.glideCoach: FeatureManifestEntry.allChannels(
       feature: Feature.glideCoach,
-      defaultEnabled: false,
+      defaultOn: false,
       requires: {Feature.obd2TripRecording},
       displayName: 'Glide-coach',
       description: 'Hypermiling guidance using OSM traffic signals.',
     ),
-    Feature.gpsTripPath: FeatureManifestEntry(
+    Feature.gpsTripPath: FeatureManifestEntry.allChannels(
       feature: Feature.gpsTripPath,
-      defaultEnabled: false,
+      defaultOn: false,
       requires: {Feature.obd2TripRecording},
       displayName: 'GPS trip path',
       description: 'Persist GPS path samples alongside each trip.',
     ),
-    Feature.autoRecord: FeatureManifestEntry(
+    Feature.autoRecord: FeatureManifestEntry.allChannels(
       feature: Feature.autoRecord,
       // Default-true to mirror today's behaviour: vehicles that have
       // explicitly opted in to per-vehicle `autoRecord: true` keep
       // recording. Users can disable the master gate from the central
       // settings UI; the migrator (phase 3d) flips this to false only
       // when EVERY existing vehicle had the per-vehicle bool off.
-      defaultEnabled: true,
+      defaultOn: true,
       requires: {Feature.obd2TripRecording},
       displayName: 'Auto-record',
       description:
           'Automatically start a trip when the OBD2 adapter connects to a moving vehicle.',
     ),
-    Feature.showFuel: FeatureManifestEntry(
+    Feature.showFuel: FeatureManifestEntry.allChannels(
       feature: Feature.showFuel,
       // Default-true mirrors the historical `UserProfile.showFuel`
       // default; existing users see no behaviour change after the
       // phase-3c migration.
-      defaultEnabled: true,
+      defaultOn: true,
       displayName: 'Show fuel stations',
       description:
           'Display petrol/diesel station results in search and on the map.',
     ),
-    Feature.showElectric: FeatureManifestEntry(
+    Feature.showElectric: FeatureManifestEntry.allChannels(
       feature: Feature.showElectric,
       // Default-true mirrors the historical `UserProfile.showElectric`
       // default; existing users see no behaviour change after the
       // phase-3c migration.
-      defaultEnabled: true,
+      defaultOn: true,
       displayName: 'Show charging stations',
       description:
           'Display EV charging stations in search and on the map.',
     ),
-    Feature.showConsumptionTab: FeatureManifestEntry(
+    Feature.showConsumptionTab: FeatureManifestEntry.allChannels(
       feature: Feature.showConsumptionTab,
       // Default-true with `requires: {obd2TripRecording}` — the
       // consumption analytics tab has nothing to render without trip
@@ -226,31 +264,31 @@ class FeatureManifest {
       // render site so `manualConsumption` (no OBD2 prereq) also
       // surfaces the tab. That OR check lives outside the manifest
       // because `requires` is AND-only.
-      defaultEnabled: true,
+      defaultOn: true,
       requires: {Feature.obd2TripRecording},
       displayName: 'Consumption tab',
       description:
           'Show the consumption analytics tab in the bottom navigation.',
     ),
-    Feature.manualConsumption: FeatureManifestEntry(
+    Feature.manualConsumption: FeatureManifestEntry.allChannels(
       feature: Feature.manualConsumption,
       // Default-off; the `AppProfile.medium` and `AppProfile.full`
       // presets flip it on. No prerequisite — the Medium tier should
       // work without an OBD2 adapter or any vehicle hardware.
-      defaultEnabled: false,
+      defaultOn: false,
       displayName: 'Manual consumption logging',
       description:
           'Track fuel fill-ups and EV charging sessions by hand (no OBD2 adapter required).',
     ),
-    Feature.loyaltyCards: FeatureManifestEntry(
+    Feature.loyaltyCards: FeatureManifestEntry.allChannels(
       feature: Feature.loyaltyCards,
       // Default-off; only the `AppProfile.full` preset flips it on.
-      defaultEnabled: false,
+      defaultOn: false,
       displayName: 'Loyalty cards',
       description:
           'Fuel-club / loyalty program cards with per-litre discounts in price comparisons.',
     ),
-    Feature.tflitePricePrediction: FeatureManifestEntry(
+    Feature.tflitePricePrediction: FeatureManifestEntry.allChannels(
       feature: Feature.tflitePricePrediction,
       // Default-off and double-gated. The compile-time
       // `kTflitePredictorEnabled` const in
@@ -258,63 +296,63 @@ class FeatureManifest {
       // stays false until the trained `.tflite` artifact ships under
       // `assets/models/`. With either gate off, the heuristic
       // `pricePredictionProvider` renders unchanged.
-      defaultEnabled: false,
+      defaultOn: false,
       requires: {Feature.priceHistory},
       displayName: 'TFLite price prediction',
       description:
           'On-device price forecast model — inference runs locally; '
               'features and predictions never leave the device.',
     ),
-    Feature.fuelCalculator: FeatureManifestEntry(
+    Feature.fuelCalculator: FeatureManifestEntry.allChannels(
       feature: Feature.fuelCalculator,
       // Default-on (#1613): the fuel-cost Calculator is a finished,
       // self-contained, harmless utility — exposing it is the whole
       // point of the gate. No `requires` edge: it depends on nothing.
-      defaultEnabled: true,
+      defaultOn: true,
       displayName: 'Fuel calculator',
       description: 'Reachable fuel-cost calculator from the search results.',
     ),
-    Feature.carbonDashboard: FeatureManifestEntry(
+    Feature.carbonDashboard: FeatureManifestEntry.allChannels(
       feature: Feature.carbonDashboard,
       // Default-on (#1613): the Carbon dashboard already shipped live
       // and reachable — default-on preserves current behaviour while
       // bringing it under central feature management. No prerequisites.
-      defaultEnabled: true,
+      defaultOn: true,
       displayName: 'Carbon dashboard',
       description: 'CO2 footprint dashboard reachable from the Consumption '
           'tab.',
     ),
-    Feature.experimentalOemPids: FeatureManifestEntry(
+    Feature.experimentalOemPids: FeatureManifestEntry.allChannels(
       feature: Feature.experimentalOemPids,
       // Default-off (#1615): an opt-in experiment. Even when enabled it
       // is a no-op unless the connected adapter is OEM-PID-capable, so
       // the flag-off path is the existing percent×capacity conversion
       // bit-for-bit. `requires: {obd2TripRecording}` — an OEM fuel read
       // only happens inside the trip-recording fuel sampler.
-      defaultEnabled: false,
+      defaultOn: false,
       requires: {Feature.obd2TripRecording},
       displayName: 'Experimental OEM PIDs',
       description:
           'Read exact tank litres via manufacturer-specific PIDs on '
           'supported adapters.',
     ),
-    Feature.paymentQrScan: FeatureManifestEntry(
+    Feature.paymentQrScan: FeatureManifestEntry.allChannels(
       feature: Feature.paymentQrScan,
       // Default-on (#1638): the scan-payment-QR action already shipped
       // live on the station-detail AppBar — default-on preserves current
       // behaviour while bringing it under central management. No
       // prerequisites: the scanner depends on nothing else.
-      defaultEnabled: true,
+      defaultOn: true,
       displayName: 'Scan payment QR',
       description: 'Scan-to-pay QR reader on the station detail screen.',
     ),
-    Feature.communityPriceReports: FeatureManifestEntry(
+    Feature.communityPriceReports: FeatureManifestEntry.allChannels(
       feature: Feature.communityPriceReports,
       // Default-on (#1638): the report-price action already shipped live
       // on the station-detail AppBar — default-on preserves current
       // behaviour while bringing it under central management. No
       // prerequisites.
-      defaultEnabled: true,
+      defaultOn: true,
       displayName: 'Community price reports',
       description: 'Report a station price from the station detail screen.',
     ),
