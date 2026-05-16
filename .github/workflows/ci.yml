@@ -24,6 +24,35 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # #1810 — paths gate. Detects whether a PR touches the dependency set
+  # (`pubspec.yaml` / `pubspec.lock`) so the pubspec-only audit jobs
+  # below (security-scan / license-audit / dependency-check) can skip
+  # when it doesn't. Uses `git diff` against the PR base — same pattern
+  # as the `test` job's affected-test selector — so no new third-party
+  # action is introduced. Non-PR events (master push, weekly schedule)
+  # always resolve to `true` so the audits keep running there.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      deps: ${{ steps.filter.outputs.deps }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - id: filter
+        name: Detect dependency-set changes
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "deps=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
+               | grep -qE '^pubspec\.(yaml|lock)$'; then
+            echo "deps=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "deps=false" >> "$GITHUB_OUTPUT"
+          fi
+
   analyze:
     runs-on: ubuntu-latest
     steps:
@@ -281,7 +310,16 @@ jobs:
       - name: Check startup time budget
         run: bash scripts/check_startup_budget.sh
 
+  # #1810 — security-scan / license-audit / dependency-check are pure
+  # functions of `pubspec.*`. They skip on PRs that don't touch the
+  # dependency set; master push + the weekly schedule always run them,
+  # so a newly-disclosed CVE against an unchanged lockfile still
+  # surfaces within a week. A job-level `if:` skip reports a `skipped`
+  # check conclusion, which branch protection counts as a pass — so
+  # `gh pr merge --auto` is unaffected even if these are required.
   security-scan:
+    needs: [changes]
+    if: ${{ needs.changes.outputs.deps == 'true' || github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -297,6 +335,8 @@ jobs:
             --lockfile=pubspec.lock
 
   license-audit:
+    needs: [changes]  # #1810 — see security-scan
+    if: ${{ needs.changes.outputs.deps == 'true' || github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -316,6 +356,8 @@ jobs:
         run: bash scripts/license_audit.sh
 
   dependency-check:
+    needs: [changes]  # #1810 — see security-scan
+    if: ${{ needs.changes.outputs.deps == 'true' || github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
