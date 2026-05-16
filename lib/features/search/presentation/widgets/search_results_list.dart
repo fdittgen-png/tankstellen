@@ -162,26 +162,6 @@ class SearchResultsList extends ConsumerWidget {
                 itemCount: sorted.length,
                 itemBuilder: (context, index) {
                   final item = sorted[index];
-                  final isFav = ref.watch(isFavoriteProvider(item.id));
-
-                  final card = switch (item) {
-                    FuelStationResult(:final station) => _buildFuelCard(
-                      context: context,
-                      ref: ref,
-                      station: station,
-                      isFavorite: isFav,
-                      allPrices: allPrices,
-                      cheapestMap: cheapestMap,
-                      fuelType: fuelType,
-                      priceRange: priceRange,
-                      profileFuel: profileFuel,
-                    ),
-                    EVStationResult() => EVStationCard(
-                      key: ValueKey('ev-${item.id}'),
-                      result: item,
-                      onTap: () => context.push('/ev-station', extra: item.station),
-                    ),
-                  };
                   // #595 — cap stagger so a 50-result search finishes
                   // fading in well under a second. Index key keeps the
                   // animation bound to the slot, so rebuilds (refresh,
@@ -189,7 +169,38 @@ class SearchResultsList extends ConsumerWidget {
                   return StaggeredFadeIn(
                     key: ValueKey('stagger-${item.id}'),
                     index: index,
-                    child: card,
+                    // #1771 — the favorite and rating providers are
+                    // watched inside this per-row Consumer, not in the
+                    // parent build. A favorite toggle or rating change
+                    // on one station now rebuilds only that row —
+                    // previously it rebuilt the whole list and re-ran
+                    // the filter/sort pipeline in the parent build.
+                    child: Consumer(
+                      builder: (context, ref, _) {
+                        final isFav =
+                            ref.watch(isFavoriteProvider(item.id));
+                        return switch (item) {
+                          FuelStationResult(:final station) =>
+                            _buildFuelCard(
+                              context: context,
+                              ref: ref,
+                              station: station,
+                              isFavorite: isFav,
+                              allPrices: allPrices,
+                              cheapestMap: cheapestMap,
+                              fuelType: fuelType,
+                              priceRange: priceRange,
+                              profileFuel: profileFuel,
+                            ),
+                          EVStationResult() => EVStationCard(
+                              key: ValueKey('ev-${item.id}'),
+                              result: item,
+                              onTap: () => context.push('/ev-station',
+                                  extra: item.station),
+                            ),
+                        };
+                      },
+                    ),
                   );
                 },
               );
