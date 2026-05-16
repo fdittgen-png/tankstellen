@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../ev/domain/entities/ev_price.dart';
 import '../../domain/entities/fuel_type.dart';
 import '../../domain/entities/search_result_item.dart';
 import 'ev_connector_chips.dart';
@@ -20,9 +22,19 @@ class EVStationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final station = result.station;
     final maxPower = result.maxPowerKW;
     final connectors = result.connectorTypes;
+
+    // #1785 — show a structured per-kWh / per-session price; free and
+    // unclassifiable `usageCost` strings degrade to the raw value.
+    final evPrice = EvPrice.parse(station.usageCost);
+    final priceLabel = evPrice.label(
+          perKwhUnit: l10n?.refuelUnitPerKwh ?? '/kWh',
+          perSessionUnit: l10n?.refuelUnitPerSession ?? '/session',
+        ) ??
+        station.usageCost;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
@@ -103,11 +115,11 @@ class EVStationCard extends StatelessWidget {
                           PriceFormatter.formatDistance(station.dist),
                           style: theme.textTheme.bodySmall,
                         ),
-                        if (station.usageCost != null) ...[
+                        if (priceLabel != null && priceLabel.isNotEmpty) ...[
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              station.usageCost!,
+                              priceLabel,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: const Color(0xFF009688),
                                 fontWeight: FontWeight.w600,
