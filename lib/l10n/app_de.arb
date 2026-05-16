@@ -1246,6 +1246,10 @@
   "notFoundHomeButton": "Startseite",
   "consumptionTabHiddenNotice": "Der Verbrauch-Tab wurde durch deine Profileinstellungen ausgeblendet.",
   "swipeBetweenTabsHint": "Tipp: Wische nach links oder rechts, um zwischen den Tabs zu wechseln.",
+  "discardChangesTitle": "Änderungen verwerfen?",
+  "discardChangesBody": "Du hast nicht gespeicherte Änderungen. Wenn du jetzt gehst, gehen sie verloren.",
+  "discardChangesConfirm": "Verwerfen",
+  "discardChangesKeepEditing": "Weiter bearbeiten",
   "achievementSmoothDriver": "Ruhige Serie",
   "@achievementSmoothDriver": {
     "description": "Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5)."

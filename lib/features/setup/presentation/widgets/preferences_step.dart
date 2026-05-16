@@ -65,7 +65,10 @@ class _PreferencesStepState extends ConsumerState<PreferencesStep> {
               prefixIcon: const Icon(Icons.home),
               border: const OutlineInputBorder(),
             ),
-            keyboardType: TextInputType.text,
+            // #1693 — postal codes in every supported country are
+            // numeric; show the number pad rather than the text
+            // keyboard.
+            keyboardType: TextInputType.number,
             onChanged: (value) => notifier.setHomeZipCode(
                 value.trim().isEmpty ? null : value.trim()),
           ),

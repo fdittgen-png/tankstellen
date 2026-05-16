@@ -543,6 +543,60 @@ void main() {
     });
   });
 
+  group('VehicleFormControllers — isDirty discard-guard tracking (#1693)', () {
+    test('isDirty is false before a baseline is captured', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      // No snapshotBaseline() yet — the guard must not fire spuriously
+      // in the pre-load frame.
+      c.nameController.text = 'edited';
+      expect(c.isDirty, isFalse);
+    });
+
+    test('isDirty is false right after snapshotBaseline', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.nameController.text = 'My Car';
+      c.tankController.text = '50';
+      c.snapshotBaseline();
+      expect(c.isDirty, isFalse);
+    });
+
+    test('isDirty turns true when a text field changes after the baseline',
+        () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.nameController.text = 'My Car';
+      c.snapshotBaseline();
+      c.nameController.text = 'My Car (renamed)';
+      expect(c.isDirty, isTrue);
+    });
+
+    test('editing then reverting a field clears isDirty again', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.vinController.text = 'VF3AAAA';
+      c.snapshotBaseline();
+      c.vinController.text = 'VF3AAAB';
+      expect(c.isDirty, isTrue);
+      c.vinController.text = 'VF3AAAA';
+      expect(c.isDirty, isFalse,
+          reason: 'reverting to the baseline value is no longer dirty');
+    });
+
+    test('a fresh snapshotBaseline re-bases the dirty check', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.tankController.text = '50';
+      c.snapshotBaseline();
+      c.tankController.text = '60';
+      expect(c.isDirty, isTrue);
+      // e.g. a VIN-decode reload re-snapshots — 60 is now the baseline.
+      c.snapshotBaseline();
+      expect(c.isDirty, isFalse);
+    });
+  });
+
   group('VehicleFormSnapshot', () {
     test('exposes constructor-supplied fields verbatim', () {
       final snapshot = VehicleFormSnapshot(

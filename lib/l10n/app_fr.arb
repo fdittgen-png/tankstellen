@@ -1366,5 +1366,9 @@
   "notFoundBody": "« {location} » introuvable.",
   "notFoundHomeButton": "Accueil",
   "consumptionTabHiddenNotice": "L'onglet Consommation a été masqué par les réglages de votre profil.",
-  "swipeBetweenTabsHint": "Astuce : balayez vers la gauche ou la droite pour changer d'onglet."
+  "swipeBetweenTabsHint": "Astuce : balayez vers la gauche ou la droite pour changer d'onglet.",
+  "discardChangesTitle": "Abandonner les modifications ?",
+  "discardChangesBody": "Vous avez des modifications non enregistrées. Quitter maintenant les supprimera.",
+  "discardChangesConfirm": "Abandonner",
+  "discardChangesKeepEditing": "Continuer la modification"
 }

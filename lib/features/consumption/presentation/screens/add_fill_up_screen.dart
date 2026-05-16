@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../core/widgets/discard_changes_dialog.dart';
 
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -317,13 +320,34 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     );
   }
 
-  String _pad(int n) => n.toString().padLeft(2, '0');
+  /// #1693 — true once the user has entered any fill-up data (typed or
+  /// receipt-scanned). The form's controllers all start empty, so any
+  /// non-empty field means there is unsaved data the discard guard
+  /// should protect.
+  bool get _isDirty =>
+      _litersCtrl.text.isNotEmpty ||
+      _costCtrl.text.isNotEmpty ||
+      _odoCtrl.text.isNotEmpty ||
+      _notesCtrl.text.isNotEmpty;
+
+  /// #1693 — discard guard for a blocked pop (system back / the
+  /// leading button via `Navigator.maybePop`). Confirms with the user
+  /// before discarding the unsaved fill-up.
+  Future<void> _onPopInvoked(bool didPop, Object? result) async {
+    if (didPop) return;
+    final discard = await showDiscardChangesDialog(context);
+    if (discard && mounted) {
+      Navigator.of(context).pop();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final dateStr =
-        '${_date.year}-${_pad(_date.month)}-${_pad(_date.day)}';
+    // #1693 — locale-aware date instead of a raw YYYY-MM-DD string.
+    final dateStr = DateFormat.yMMMd(
+      Localizations.localeOf(context).toString(),
+    ).format(_date);
     // Tolerate providers in error state during widget tests without
     // a real Hive storage — the selector simply hides itself (#694).
     List<VehicleProfile> vehicles;
@@ -341,16 +365,24 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       return const FillUpNoVehicleCta();
     }
 
-    return PageScaffold(
+    // #1693 — guard unsaved fill-up data. `canPop` blocks the system
+    // back gesture and `Navigator.maybePop` (the leading button)
+    // whenever the form is dirty; the save path uses an imperative
+    // `context.pop()` which is unaffected.
+    return PopScope(
+      canPop: !_isDirty,
+      onPopInvokedWithResult: _onPopInvoked,
+      child: PageScaffold(
       title: l?.addFillUp ?? 'Add fill-up',
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         tooltip: l?.tooltipBack ?? 'Back',
-        onPressed: () => context.pop(),
+        onPressed: () => Navigator.maybePop(context),
       ),
       bodyPadding: EdgeInsets.zero,
       body: Form(
         key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         child: ListView(
           padding: EdgeInsets.fromLTRB(
             16,
@@ -395,6 +427,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
         ),
       ),
       bottomNavigationBar: FillUpPinnedSaveBar(onSave: _save),
+      ),
     );
   }
 }

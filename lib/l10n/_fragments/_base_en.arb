@@ -1499,5 +1499,21 @@
   "swipeBetweenTabsHint": "Tip: swipe left or right to switch between tabs.",
   "@swipeBetweenTabsHint": {
     "description": "One-time first-run SnackBar hint that the bottom-nav tabs respond to a horizontal swipe gesture (#1690)."
+  },
+  "discardChangesTitle": "Discard changes?",
+  "@discardChangesTitle": {
+    "description": "Title of the confirm dialog shown when the user leaves a form (fill-up, vehicle edit) with unsaved changes (#1693)."
+  },
+  "discardChangesBody": "You have unsaved changes. Leaving now will discard them.",
+  "@discardChangesBody": {
+    "description": "Body of the unsaved-changes confirm dialog (#1693)."
+  },
+  "discardChangesConfirm": "Discard",
+  "@discardChangesConfirm": {
+    "description": "Confirm action on the unsaved-changes dialog — leaves the form and discards the edits (#1693)."
+  },
+  "discardChangesKeepEditing": "Keep editing",
+  "@discardChangesKeepEditing": {
+    "description": "Dismiss action on the unsaved-changes dialog — stays on the form (#1693)."
   }
 }

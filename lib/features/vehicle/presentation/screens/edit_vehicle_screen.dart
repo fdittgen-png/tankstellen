@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/brand_logo_mapper.dart';
+import '../../../../core/widgets/discard_changes_dialog.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -128,6 +129,10 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     );
     if (widget.vehicleId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _loadExisting());
+    } else {
+      // #1693 — new-vehicle path has no async load; the construction
+      // defaults are the discard-guard baseline.
+      _ctrl.snapshotBaseline();
     }
   }
 
@@ -151,6 +156,8 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     final existing = list.where((v) => v.id == widget.vehicleId).firstOrNull;
     if (existing == null) return false;
     final snap = _ctrl.load(existing);
+    // #1693 — the freshly-loaded profile is the discard-guard baseline.
+    _ctrl.snapshotBaseline();
     setState(() {
       _existingId = snap.id;
       _type = snap.type;
@@ -572,7 +579,14 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
       });
     }
 
-    return PageScaffold(
+    // #1693 — guard unsaved vehicle edits. `canPop` blocks the system
+    // back gesture and the AppBar back button (both route through
+    // `Navigator.maybePop`); the imperative `pop()` in the save path
+    // is unaffected.
+    return PopScope(
+      canPop: !_ctrl.isDirty,
+      onPopInvokedWithResult: _onPopInvoked,
+      child: PageScaffold(
       title: isEdit
           ? (l?.vehicleEditTitle ?? 'Edit vehicle')
           : (l?.vehicleAddTitle ?? 'Add vehicle'),
@@ -586,6 +600,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
       bodyPadding: EdgeInsets.zero,
       body: Form(
         key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         child: ListView(
           controller: _scrollController,
           padding: EdgeInsets.fromLTRB(16, 16, 16,
@@ -777,6 +792,17 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
       // Pinned bottom Save (#751 §3) — always in the tree regardless
       // of scroll, which tests and TalkBack rely on.
       bottomNavigationBar: VehicleSaveBar(onSave: _save),
+      ),
     );
+  }
+
+  /// #1693 — discard guard for a blocked pop (system back / AppBar
+  /// back button). Confirms before discarding unsaved vehicle edits.
+  Future<void> _onPopInvoked(bool didPop, Object? result) async {
+    if (didPop) return;
+    final discard = await showDiscardChangesDialog(context);
+    if (discard && mounted) {
+      Navigator.of(context).pop();
+    }
   }
 }

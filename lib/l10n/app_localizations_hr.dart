@@ -3194,6 +3194,19 @@ class AppLocalizationsHr extends AppLocalizations {
       'Tip: swipe left or right to switch between tabs.';
 
   @override
+  String get discardChangesTitle => 'Discard changes?';
+
+  @override
+  String get discardChangesBody =>
+      'You have unsaved changes. Leaving now will discard them.';
+
+  @override
+  String get discardChangesConfirm => 'Discard';
+
+  @override
+  String get discardChangesKeepEditing => 'Keep editing';
+
+  @override
   String get achievementSmoothDriver => 'Smooth streak';
 
   @override
