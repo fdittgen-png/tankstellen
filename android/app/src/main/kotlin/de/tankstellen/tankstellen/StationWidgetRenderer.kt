@@ -51,7 +51,9 @@ object StationWidgetRenderer {
 
     const val ACTION_TOGGLE_MODE = "de.tankstellen.fuelprices.TOGGLE_MODE"
     const val ACTION_OPEN_APP = "de.tankstellen.fuelprices.OPEN_APP"
-    const val ACTION_REFRESH = "de.tankstellen.fuelprices.REFRESH"
+    // #1801 — ACTION_REFRESH removed: the refresh icon is now an
+    // Activity PendingIntent (a broadcast can't reliably startActivity
+    // on Android 10+), so there is no refresh broadcast to name.
 
     const val EXTRA_APP_WIDGET_ID = "appWidgetId"
 
@@ -192,16 +194,17 @@ object StationWidgetRenderer {
             ),
         )
 
-        // Refresh icon — re-renders from cache and opens the app so the
-        // Flutter side can pull fresh prices.
+        // Refresh icon (#1801 / #1803) — an Activity PendingIntent that
+        // opens the app; the Flutter side then refreshes the widget on
+        // resume. This used to be a broadcast whose onReceive called
+        // `startActivity`, which Android 10+ blocks from a receiver — so
+        // the refresh button silently did nothing.
         views.setOnClickPendingIntent(
             R.id.widget_refresh,
-            buildBroadcast(
+            buildActivity(
                 context,
-                providerClass,
-                ACTION_REFRESH,
+                uri = null,
                 requestCode = appWidgetId * 10 + 2,
-                extraAppWidgetId = appWidgetId,
             ),
         )
 
