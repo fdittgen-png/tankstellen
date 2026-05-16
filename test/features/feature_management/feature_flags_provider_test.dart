@@ -8,6 +8,7 @@ import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/data/feature_flags_repository.dart';
+import 'package:tankstellen/features/feature_management/domain/build_channel.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_dependency_graph.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
@@ -18,7 +19,9 @@ class _ThrowingRepo extends FeatureFlagsRepository {
   _ThrowingRepo(Box<dynamic> box) : super(box: box);
 
   @override
-  Future<Set<Feature>> loadEnabled() async =>
+  Future<Set<Feature>> loadEnabled([
+    BuildChannel channel = BuildChannel.production,
+  ]) async =>
       throw StateError('simulated Hive read failure');
 }
 

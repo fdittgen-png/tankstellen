@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
 import '../data/feature_flags_repository.dart';
+import '../domain/build_channel.dart';
 import '../domain/feature.dart';
 import '../domain/feature_dependency_graph.dart';
 import '../domain/feature_manifest.dart';
@@ -29,6 +30,20 @@ FeatureFlagsRepository? featureFlagsRepository(Ref ref) {
 /// to inject a synthetic manifest (e.g. for cycle-rejection coverage).
 @Riverpod(keepAlive: true)
 FeatureManifest featureManifest(Ref ref) => FeatureManifest.defaultManifest;
+
+/// The build channel this app instance is running as (#1674).
+///
+/// Resolved from the compile-time `--dart-define=CHANNEL`, baked by
+/// CI / fastlane. Any value other than `beta` — including an absent
+/// define (a local `flutter run`) — resolves to
+/// [BuildChannel.production]: production is the safe default so a
+/// mis-configured build never accidentally exposes beta-only features.
+/// Overridable in tests via `ProviderContainer.overrides`.
+@Riverpod(keepAlive: true)
+BuildChannel buildChannel(Ref ref) {
+  const raw = String.fromEnvironment('CHANNEL');
+  return raw == 'beta' ? BuildChannel.beta : BuildChannel.production;
+}
 
 /// Central feature-flag store (#1373 phase 1).
 ///
@@ -61,12 +76,19 @@ class FeatureFlags extends _$FeatureFlags {
   FutureOr<Set<Feature>> build() async {
     final manifest = ref.watch(featureManifestProvider);
     assertNoCycles(manifest);
+    final channel = ref.watch(buildChannelProvider);
     final repo = ref.watch(featureFlagsRepositoryProvider);
     if (repo == null) {
-      return manifest.defaultEnabledSet();
+      return manifest.defaultEnabledSet(channel);
     }
     try {
-      return await repo.loadEnabled();
+      // First launch resolves to the channel's opt-in/opt-out defaults;
+      // a populated box returns its persisted set (#1674).
+      final loaded = await repo.loadEnabled(channel);
+      // #1674 — force-off any persisted feature that is not available
+      // in this build channel (e.g. a beta-only feature in a
+      // production build).
+      return _availableInChannel(loaded, manifest, channel);
     } catch (e, st) {
       // #1681 — a Hive read failure must not be silent. Log it through
       // the central pipeline, then fall back to manifest defaults so
@@ -77,19 +99,39 @@ class FeatureFlags extends _$FeatureFlags {
         st,
         context: {'op': 'FeatureFlags.loadEnabled'},
       );
-      return manifest.defaultEnabledSet();
+      return manifest.defaultEnabledSet(channel);
     }
   }
+
+  /// Drops every feature not available in [channel] — the channel gate
+  /// applied to a persisted set (#1674).
+  static Set<Feature> _availableInChannel(
+    Set<Feature> features,
+    FeatureManifest manifest,
+    BuildChannel channel,
+  ) =>
+      features
+          .where((f) => manifest.entries[f]?.isAvailableIn(channel) ?? false)
+          .toSet();
 
   /// Enables [feature], throwing [StateError] when a prerequisite is
   /// disabled. The error message names the missing prerequisites so the
   /// Phase 2 UI can surface a tooltip without a second lookup.
   Future<void> enable(Feature feature) async {
     final manifest = ref.read(featureManifestProvider);
+    final channel = ref.read(buildChannelProvider);
     // Await the in-flight (or resolved) build so a flip during the
     // initial Hive load operates on the persisted set, not stale state.
     final current = await future;
     if (current.contains(feature)) return;
+    // #1674 — a feature not available in this build channel can never
+    // be enabled, regardless of its prerequisites.
+    if (!manifest.entryFor(feature).isAvailableIn(channel)) {
+      throw StateError(
+        'Cannot enable ${feature.name}: not available in the '
+        '${channel.name} build channel',
+      );
+    }
     if (!canEnable(feature, manifest, current)) {
       final entry = manifest.entryFor(feature);
       final missing = entry.requires
@@ -155,5 +197,7 @@ class FeatureFlags extends _$FeatureFlags {
 @Riverpod(keepAlive: true)
 Set<Feature> enabledFeatures(Ref ref) {
   return ref.watch(featureFlagsProvider).asData?.value ??
-      ref.watch(featureManifestProvider).defaultEnabledSet();
+      ref
+          .watch(featureManifestProvider)
+          .defaultEnabledSet(ref.watch(buildChannelProvider));
 }
