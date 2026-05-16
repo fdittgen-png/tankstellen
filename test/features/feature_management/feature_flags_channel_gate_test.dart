@@ -13,10 +13,15 @@ import 'package:tankstellen/features/feature_management/domain/feature_manifest.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  // A synthetic manifest: one feature available everywhere, one
-  // beta-only feature that does not exist in production at all.
+  // A synthetic manifest exercising every channel shape:
+  // - [everywhere]        — available + default-on in both channels.
+  // - [betaOnly]          — exists in beta only.
+  // - [perChannelDefault] — available in both channels but default-on
+  //                         in beta only (opt-out in beta, opt-in in
+  //                         production).
   const everywhere = Feature.priceAlerts;
   const betaOnly = Feature.gamification;
+  const perChannelDefault = Feature.priceHistory;
   const manifest = FeatureManifest({
     everywhere: FeatureManifestEntry.allChannels(
       feature: everywhere,
@@ -30,6 +35,13 @@ void main() {
       defaultEnabledChannels: {BuildChannel.beta},
       displayName: 'beta-only',
       description: 'available in beta only',
+    ),
+    perChannelDefault: FeatureManifestEntry(
+      feature: perChannelDefault,
+      availableChannels: {BuildChannel.production, BuildChannel.beta},
+      defaultEnabledChannels: {BuildChannel.beta},
+      displayName: 'per-channel-default',
+      description: 'available in both channels, default-on in beta only',
     ),
   });
 
@@ -66,6 +78,23 @@ void main() {
       await c.read(featureFlagsProvider.future);
       final enabled = c.read(enabledFeaturesProvider);
       expect(enabled, containsAll(<Feature>{everywhere, betaOnly}));
+    });
+  });
+
+  group('per-channel opt-in / opt-out defaults resolve through FeatureFlags',
+      () {
+    test('a both-channels feature is opt-in (default-off) in production',
+        () async {
+      final c = containerFor(BuildChannel.production);
+      await c.read(featureFlagsProvider.future);
+      expect(c.read(enabledFeaturesProvider),
+          isNot(contains(perChannelDefault)));
+    });
+
+    test('the same feature is opt-out (default-on) in beta', () async {
+      final c = containerFor(BuildChannel.beta);
+      await c.read(featureFlagsProvider.future);
+      expect(c.read(enabledFeaturesProvider), contains(perChannelDefault));
     });
   });
 
