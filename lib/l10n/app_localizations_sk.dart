@@ -533,6 +533,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get demoModeBanner => 'Demo režim. Nastavte kľúč API v nastaveniach.';
 
   @override
+  String get demoModeBannerAction => 'Get live prices';
+
+  @override
   String get sortDistance => 'Vzdialenosť';
 
   @override
@@ -3209,6 +3212,9 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get discardChangesKeepEditing => 'Keep editing';
+
+  @override
+  String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
 
   @override
   String get achievementSmoothDriver => 'Smooth streak';

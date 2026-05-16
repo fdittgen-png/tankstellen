@@ -535,6 +535,9 @@ class AppLocalizationsNl extends AppLocalizations {
       'Demomodus. Configureer API-sleutel in instellingen.';
 
   @override
+  String get demoModeBannerAction => 'Get live prices';
+
+  @override
   String get sortDistance => 'Afstand';
 
   @override
@@ -3210,6 +3213,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get discardChangesKeepEditing => 'Keep editing';
+
+  @override
+  String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
 
   @override
   String get achievementSmoothDriver => 'Smooth streak';

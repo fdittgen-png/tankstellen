@@ -534,6 +534,9 @@ class AppLocalizationsLv extends AppLocalizations {
       'Demo režīms. Konfigurējiet API atslēgu iestatījumos.';
 
   @override
+  String get demoModeBannerAction => 'Get live prices';
+
+  @override
   String get sortDistance => 'Attālums';
 
   @override
@@ -3209,6 +3212,9 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get discardChangesKeepEditing => 'Keep editing';
+
+  @override
+  String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
 
   @override
   String get achievementSmoothDriver => 'Smooth streak';

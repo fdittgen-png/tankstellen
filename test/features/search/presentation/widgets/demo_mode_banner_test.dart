@@ -127,8 +127,31 @@ void main() {
           ],
         );
 
-        // The demo banner should have a TextButton (API key setup label)
+        // The demo banner should have a TextButton (the call-to-action).
         expect(find.byType(TextButton), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'demo banner copy is jargon-free — no "API key" wording (#1696)',
+      (tester) async {
+        final storage = mockHiveStorageOverride();
+        when(() => storage.mock.hasApiKey()).thenReturn(false);
+
+        await pumpApp(
+          tester,
+          const DemoModeBanner(country: Countries.germany),
+          overrides: [
+            storage.override,
+            activeCountryOverride(Countries.germany),
+          ],
+        );
+
+        // #1696 — neither the banner content nor its action exposes the
+        // "API key" jargon to a casual user.
+        expect(find.textContaining('API key'), findsNothing);
+        expect(find.textContaining('API-Schlüssel'), findsNothing);
+        expect(find.text('Get live prices'), findsOneWidget);
       },
     );
   });

@@ -531,8 +531,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Standortfreigabe abgelehnt. Sie können per PLZ suchen.';
 
   @override
-  String get demoModeBanner =>
-      'Demo-Modus. API-Schlüssel in den Einstellungen eingeben.';
+  String get demoModeBanner => 'Demo-Modus – Beispielpreise werden angezeigt.';
+
+  @override
+  String get demoModeBannerAction => 'Live-Preise aktivieren';
 
   @override
   String get sortDistance => 'Entfernung';
@@ -3233,6 +3235,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get discardChangesKeepEditing => 'Weiter bearbeiten';
+
+  @override
+  String get tankSyncSectionSubtitle =>
+      'Cloud-Synchronisierung über deine Geräte hinweg';
 
   @override
   String get achievementSmoothDriver => 'Ruhige Serie';
