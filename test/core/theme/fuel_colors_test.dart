@@ -47,11 +47,12 @@ void main() {
           reason: 'Fuel type colors must be pairwise distinct');
     });
 
-    test('diesel is orange, electric is teal (pinned brand signals)', () {
-      // These specific mappings surface in marketing screenshots and
-      // chart legends — callers should not silently re-tint them.
-      expect(FuelColors.forType(FuelType.diesel), const Color(0xFFFF9800));
-      expect(FuelColors.forType(FuelType.electric), const Color(0xFF009688));
+    test('diesel and electric keep their pinned (muted) hues (#1757)', () {
+      // These mappings surface in marketing screenshots and chart
+      // legends — pinned so callers cannot silently re-tint them. The
+      // muted values were chosen deliberately in #1757 (calmer palette).
+      expect(FuelColors.forType(FuelType.diesel), const Color(0xFFBE7C1E));
+      expect(FuelColors.forType(FuelType.electric), const Color(0xFF3B8079));
     });
   });
 

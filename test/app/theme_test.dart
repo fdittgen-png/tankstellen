@@ -14,9 +14,10 @@ void main() {
       expect(theme.brightness, Brightness.light);
     });
 
-    test('primary colour lands in the blue family (bahamaBlue scheme)', () {
+    test('primary colour lands in the green family (#1757 forest green)', () {
       final p = theme.colorScheme.primary;
-      expect(p.b, greaterThan(p.r));
+      expect(p.g, greaterThan(p.r));
+      expect(p.g, greaterThan(p.b));
     });
   });
 
@@ -31,9 +32,10 @@ void main() {
       expect(theme.brightness, Brightness.dark);
     });
 
-    test('dark primary is also in the blue family', () {
+    test('dark primary is also in the green family', () {
       final p = theme.colorScheme.primary;
-      expect(p.b, greaterThan(p.r));
+      expect(p.g, greaterThan(p.r));
+      expect(p.g, greaterThan(p.b));
     });
   });
 
