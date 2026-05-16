@@ -55,7 +55,11 @@ class StationMarkerBuilder {
       point: LatLng(station.lat, station.lng),
       width: kStationMarkerWidth,
       height: kStationMarkerHeight,
-      child: Semantics(
+      // #1772 — isolate each marker's raster so an animation or rebuild
+      // on one marker (e.g. the selected-station pastel swap) does not
+      // repaint the entire marker layer.
+      child: RepaintBoundary(
+        child: Semantics(
         label: semanticLabel,
         button: true,
         child: GestureDetector(
@@ -101,6 +105,7 @@ class StationMarkerBuilder {
             ),
           ),
         ),
+      ),
       ),
       ),
     );
