@@ -10,7 +10,6 @@ import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.d
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/favorites/presentation/widgets/ev_favorite_card.dart';
 import 'package:tankstellen/features/favorites/presentation/widgets/favorite_station_dismissible.dart';
-import 'package:tankstellen/features/favorites/presentation/widgets/favorites_section_header.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
 import '../../../../fixtures/stations.dart';
@@ -69,10 +68,8 @@ void main() {
     });
 
     testWidgets(
-        'renders BOTH the EV section header + EvFavoriteCard AND the Fuel '
-        'section header + FavoriteStationDismissible when the user has '
-        'starred at least one of each (regression guard for #475)',
-        (tester) async {
+        'renders fuel + EV favorites in one interleaved list — no section '
+        'headers (#1787)', (tester) async {
       final test = standardTestOverrides(favoriteIds: [testStation.id]);
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
       when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
@@ -93,17 +90,7 @@ void main() {
         ].cast(),
       );
 
-      // Both section headers must be rendered: EV first, then Fuel.
-      expect(find.byType(FavoritesSectionHeader), findsNWidgets(2));
-      // EV card should appear above the fuel card.
-      final evHeader = tester
-          .getCenter(find.byType(FavoritesSectionHeader).first)
-          .dy;
-      final fuelHeader =
-          tester.getCenter(find.byType(FavoritesSectionHeader).last).dy;
-      expect(evHeader, lessThan(fuelHeader),
-          reason: 'EV section header must appear above the Fuel section header');
-
+      // One interleaved list — a card of each kind, no section headers.
       expect(find.byType(EvFavoriteCard), findsOneWidget);
       expect(find.byType(FavoriteStationDismissible), findsOneWidget);
     });
