@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/feature_management/domain/build_channel.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 
@@ -25,7 +26,11 @@ void main() {
       });
 
       test('is default-enabled — preserves the action being reachable', () {
-        expect(manifest.entries[feature]!.defaultEnabled, isTrue);
+        expect(
+          manifest.entries[feature]!
+              .defaultEnabledIn(BuildChannel.production),
+          isTrue,
+        );
         expect(manifest.defaultEnabledSet(), contains(feature));
       });
 

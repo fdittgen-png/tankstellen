@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/feature_management/domain/build_channel.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 
@@ -44,7 +45,7 @@ void main() {
       for (final f in [Feature.fuelCalculator, Feature.carbonDashboard]) {
         final entry = manifest.entries[f];
         expect(entry, isNotNull, reason: '$f must be in the manifest');
-        expect(entry!.defaultEnabled, isTrue,
+        expect(entry!.defaultEnabledIn(BuildChannel.production), isTrue,
             reason: '$f ships default-on so the surface stays reachable');
         expect(entry.requires, isEmpty,
             reason: '$f has no prerequisites');

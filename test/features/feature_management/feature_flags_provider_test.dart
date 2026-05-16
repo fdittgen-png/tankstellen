@@ -233,16 +233,16 @@ void main() {
   group('FeatureFlags cycle detection', () {
     test('build throws when the manifest contains a cycle', () async {
       const cyclic = FeatureManifest({
-        Feature.gamification: FeatureManifestEntry(
+        Feature.gamification: FeatureManifestEntry.allChannels(
           feature: Feature.gamification,
-          defaultEnabled: false,
+          defaultOn: false,
           requires: {Feature.hapticEcoCoach},
           displayName: 'gamification',
           description: 'cycle test',
         ),
-        Feature.hapticEcoCoach: FeatureManifestEntry(
+        Feature.hapticEcoCoach: FeatureManifestEntry.allChannels(
           feature: Feature.hapticEcoCoach,
-          defaultEnabled: false,
+          defaultOn: false,
           requires: {Feature.gamification},
           displayName: 'hapticEcoCoach',
           description: 'cycle test',

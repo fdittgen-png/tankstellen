@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/feature_management/domain/build_channel.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 
@@ -20,7 +21,8 @@ void main() {
 
     test('is default-enabled — the Calculator must be reachable', () {
       expect(
-        manifest.entries[Feature.fuelCalculator]!.defaultEnabled,
+        manifest.entries[Feature.fuelCalculator]!
+            .defaultEnabledIn(BuildChannel.production),
         isTrue,
       );
       expect(manifest.defaultEnabledSet(), contains(Feature.fuelCalculator));

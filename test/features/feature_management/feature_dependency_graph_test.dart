@@ -89,22 +89,22 @@ void main() {
       // Synthetic three-level chain to exercise the walk: g -> p -> r,
       // with the root r missing from the enabled set.
       const chain = FeatureManifest({
-        Feature.priceAlerts: FeatureManifestEntry(
+        Feature.priceAlerts: FeatureManifestEntry.allChannels(
           feature: Feature.priceAlerts,
-          defaultEnabled: false,
+          defaultOn: false,
           displayName: 'root',
           description: 'three-level chain root',
         ),
-        Feature.priceHistory: FeatureManifestEntry(
+        Feature.priceHistory: FeatureManifestEntry.allChannels(
           feature: Feature.priceHistory,
-          defaultEnabled: false,
+          defaultOn: false,
           requires: {Feature.priceAlerts},
           displayName: 'parent',
           description: 'three-level chain parent',
         ),
-        Feature.gamification: FeatureManifestEntry(
+        Feature.gamification: FeatureManifestEntry.allChannels(
           feature: Feature.gamification,
-          defaultEnabled: false,
+          defaultOn: false,
           requires: {Feature.priceHistory},
           displayName: 'leaf',
           description: 'three-level chain leaf',
@@ -182,16 +182,16 @@ void main() {
       // a -> b -> a — pick two arbitrary Feature values to wire as a
       // direct two-node cycle.
       const cyclic = FeatureManifest({
-        Feature.gamification: FeatureManifestEntry(
+        Feature.gamification: FeatureManifestEntry.allChannels(
           feature: Feature.gamification,
-          defaultEnabled: false,
+          defaultOn: false,
           requires: {Feature.hapticEcoCoach},
           displayName: 'gamification',
           description: 'cycle test',
         ),
-        Feature.hapticEcoCoach: FeatureManifestEntry(
+        Feature.hapticEcoCoach: FeatureManifestEntry.allChannels(
           feature: Feature.hapticEcoCoach,
-          defaultEnabled: false,
+          defaultOn: false,
           requires: {Feature.gamification},
           displayName: 'hapticEcoCoach',
           description: 'cycle test',
