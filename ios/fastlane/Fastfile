@@ -84,7 +84,12 @@ platform :ios do
     # duration of the block so the child process sees the normal Ruby
     # environment where CocoaPods is loadable.
     Bundler.with_unbundled_env do
-      sh("flutter build ios --release --no-codesign")
+      # #1777 — obfuscate the Dart code in the release build and write
+      # the de-obfuscation symbol files. `sh` runs from `ios/`, so the
+      # `../build/symbols` path lands the symbols at the repo-root
+      # `build/symbols` (where the workflow's upload step collects them).
+      sh("flutter build ios --release --no-codesign " \
+         "--obfuscate --split-debug-info=../build/symbols")
     end
 
     build_app(
