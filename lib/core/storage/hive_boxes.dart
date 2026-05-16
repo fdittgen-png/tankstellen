@@ -151,10 +151,23 @@ class HiveBoxes {
   }
 
   /// Initialize all Hive boxes for the main isolate.
+  ///
+  /// #1764 — every box opens on the cold-start critical path before the
+  /// first frame. No box depends on another being open, so the two
+  /// phases below run their disk I/O concurrently via [Future.wait]
+  /// rather than awaiting ~30 `openBox` calls one at a time: the
+  /// encrypted-box migration probe is one parallel batch, and the real
+  /// opens are another. Every box is still open before `init()` returns,
+  /// so there is no "box not open" risk for any reader.
   static Future<void> init() async {
     await Hive.initFlutter();
     final cipher = await _loadCipher();
-    for (final boxName in _encryptedBoxes) {
+
+    // Phase 1 — probe the 6 encrypted boxes concurrently to detect a
+    // pre-encryption install that needs migrating. Each probe opens and
+    // closes its own box; the boxes are independent, so the probes (and
+    // any migration they trigger) run in parallel.
+    await Future.wait<void>(_encryptedBoxes.map((boxName) async {
       try {
         final box = await Hive.openBox(boxName, encryptionCipher: cipher);
         await box.close();
@@ -162,49 +175,56 @@ class HiveBoxes {
         debugPrint('Hive: migrating $boxName to encrypted storage');
         await _migrateToEncrypted(boxName, cipher);
       }
-    }
-    await Hive.openBox(settings, encryptionCipher: cipher);
-    await Hive.openBox(profiles, encryptionCipher: cipher);
-    await Hive.openBox(favorites, encryptionCipher: cipher);
-    await Hive.openBox(cache, encryptionCipher: cipher);
-    await Hive.openBox(priceHistory, encryptionCipher: cipher);
-    await Hive.openBox(alerts, encryptionCipher: cipher);
-    // #769 — OBD2 baselines are unencrypted JSON strings; low
-    // sensitivity and opened once at startup like the other boxes.
-    await Hive.openBox<String>(obd2Baselines);
-    // #726 — OBD2 trip history: rolling log of finalised trips.
-    await Hive.openBox<String>(obd2TripHistory);
-    // #781 — gamification badges: one entry per earned badge.
-    await Hive.openBox<String>(achievements);
-    // #811 — supported-PID bitmap cache (per VIN, or make:model:year
-    // fallback). Values are JSON-encoded `List<int>` of PID indices,
-    // mirroring the storage idiom used by the other OBD2 boxes so
-    // we don't need a custom adapter.
-    await Hive.openBox<String>(obd2SupportedPids);
-    // #584 — odometer-based service reminders: one entry per reminder.
-    await Hive.openBox<String>(serviceReminders);
-    // #797 — partial OBD2 trips paused by a BT drop. Same string-typed
-    // JSON pattern as [obd2TripHistory] so one box adapter covers both.
-    await Hive.openBox<String>(obd2PausedTrips);
-    // #1303 — write-through snapshot of the currently-recording trip.
-    // Single-entry box; the provider rewrites on a 5-second debounce
-    // and the recovery service reads it on next cold start.
-    await Hive.openBox<String>(obd2ActiveTrip);
-    // #579 — rolling price snapshots for the velocity detector.
-    await Hive.openBox<String>(priceSnapshots);
-    // #1105 — isolate error spool: background-isolate errors written
-    // here while Riverpod is unavailable, drained by the foreground
-    // initialiser into TraceRecorder. Unencrypted so the BG isolate
-    // can write before consent / keychain unlock.
-    await Hive.openBox<String>(isolateErrorSpool);
-    // #1125 — glide-coach OSM traffic-signal cache (phase 1).
-    await Hive.openBox<String>(trafficSignalsCache);
-    // #1373 — central feature-flag set (phase 1).
-    await Hive.openBox<dynamic>(featureFlags);
-    // #1517 — active "use mode" profile (Basic / Medium / Full /
-    // Custom). Tiny box, always one entry; opened next to feature_flags
-    // since the two systems collaborate at startup.
-    await Hive.openBox<dynamic>(appProfile);
+    }));
+
+    // Phase 2 — open every box in one parallel batch. The 6 encrypted
+    // boxes and the unencrypted domain boxes have no inter-box ordering
+    // dependency, so a single Future.wait collapses what used to be ~18
+    // sequential awaits into one I/O-bound wait.
+    await Future.wait<Box<dynamic>>([
+      Hive.openBox(settings, encryptionCipher: cipher),
+      Hive.openBox(profiles, encryptionCipher: cipher),
+      Hive.openBox(favorites, encryptionCipher: cipher),
+      Hive.openBox(cache, encryptionCipher: cipher),
+      Hive.openBox(priceHistory, encryptionCipher: cipher),
+      Hive.openBox(alerts, encryptionCipher: cipher),
+      // #769 — OBD2 baselines are unencrypted JSON strings; low
+      // sensitivity and opened once at startup like the other boxes.
+      Hive.openBox<String>(obd2Baselines),
+      // #726 — OBD2 trip history: rolling log of finalised trips.
+      Hive.openBox<String>(obd2TripHistory),
+      // #781 — gamification badges: one entry per earned badge.
+      Hive.openBox<String>(achievements),
+      // #811 — supported-PID bitmap cache (per VIN, or make:model:year
+      // fallback). Values are JSON-encoded `List<int>` of PID indices,
+      // mirroring the storage idiom used by the other OBD2 boxes so
+      // we don't need a custom adapter.
+      Hive.openBox<String>(obd2SupportedPids),
+      // #584 — odometer-based service reminders: one entry per reminder.
+      Hive.openBox<String>(serviceReminders),
+      // #797 — partial OBD2 trips paused by a BT drop. Same string-typed
+      // JSON pattern as [obd2TripHistory] so one box adapter covers both.
+      Hive.openBox<String>(obd2PausedTrips),
+      // #1303 — write-through snapshot of the currently-recording trip.
+      // Single-entry box; the provider rewrites on a 5-second debounce
+      // and the recovery service reads it on next cold start.
+      Hive.openBox<String>(obd2ActiveTrip),
+      // #579 — rolling price snapshots for the velocity detector.
+      Hive.openBox<String>(priceSnapshots),
+      // #1105 — isolate error spool: background-isolate errors written
+      // here while Riverpod is unavailable, drained by the foreground
+      // initialiser into TraceRecorder. Unencrypted so the BG isolate
+      // can write before consent / keychain unlock.
+      Hive.openBox<String>(isolateErrorSpool),
+      // #1125 — glide-coach OSM traffic-signal cache (phase 1).
+      Hive.openBox<String>(trafficSignalsCache),
+      // #1373 — central feature-flag set (phase 1).
+      Hive.openBox<dynamic>(featureFlags),
+      // #1517 — active "use mode" profile (Basic / Medium / Full /
+      // Custom). Tiny box, always one entry; opened next to feature_flags
+      // since the two systems collaborate at startup.
+      Hive.openBox<dynamic>(appProfile),
+    ]);
   }
 
   /// Initialize Hive in a background isolate with proper encryption.

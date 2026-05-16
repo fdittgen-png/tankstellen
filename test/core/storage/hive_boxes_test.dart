@@ -207,6 +207,34 @@ void main() {
       });
     });
 
+    group('cold-start parallelisation (#1764)', () {
+      test('init() opens boxes via concurrent Future.wait batches', () {
+        final source =
+            File('lib/core/storage/hive_boxes.dart').readAsStringSync();
+
+        final initMatch = RegExp(
+          r'static Future<void> init\(\) async \{(.*?)\n  \}',
+          dotAll: true,
+        ).firstMatch(source);
+        expect(initMatch, isNotNull);
+        final initBody = initMatch!.group(1)!;
+
+        // The ~18 boxes have no inter-box ordering dependency and all
+        // sit on the cold-start critical path. init() must open them
+        // concurrently: one Future.wait for the encrypted-box migration
+        // probe, one for the actual box-open batch.
+        final waitCount = 'Future.wait'.allMatches(initBody).length;
+        expect(
+          waitCount,
+          greaterThanOrEqualTo(2),
+          reason:
+              'init() must run the migration probe and the box-open batch '
+              'as two concurrent Future.wait phases (#1764) — not as ~30 '
+              'sequential awaits on the cold-start critical path.',
+        );
+      });
+    });
+
     group('toStringDynamicMap', () {
       test('returns null for null input', () {
         expect(HiveBoxes.toStringDynamicMap(null), isNull);
