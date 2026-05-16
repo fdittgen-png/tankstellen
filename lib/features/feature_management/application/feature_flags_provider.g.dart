@@ -126,6 +126,73 @@ final class FeatureManifestProvider
 
 String _$featureManifestHash() => r'7b67cbf211fcf268808f6c329950be1d4ba91881';
 
+/// The build channel this app instance is running as (#1674).
+///
+/// Resolved from the compile-time `--dart-define=CHANNEL`, baked by
+/// CI / fastlane. Any value other than `beta` — including an absent
+/// define (a local `flutter run`) — resolves to
+/// [BuildChannel.production]: production is the safe default so a
+/// mis-configured build never accidentally exposes beta-only features.
+/// Overridable in tests via `ProviderContainer.overrides`.
+
+@ProviderFor(buildChannel)
+final buildChannelProvider = BuildChannelProvider._();
+
+/// The build channel this app instance is running as (#1674).
+///
+/// Resolved from the compile-time `--dart-define=CHANNEL`, baked by
+/// CI / fastlane. Any value other than `beta` — including an absent
+/// define (a local `flutter run`) — resolves to
+/// [BuildChannel.production]: production is the safe default so a
+/// mis-configured build never accidentally exposes beta-only features.
+/// Overridable in tests via `ProviderContainer.overrides`.
+
+final class BuildChannelProvider
+    extends $FunctionalProvider<BuildChannel, BuildChannel, BuildChannel>
+    with $Provider<BuildChannel> {
+  /// The build channel this app instance is running as (#1674).
+  ///
+  /// Resolved from the compile-time `--dart-define=CHANNEL`, baked by
+  /// CI / fastlane. Any value other than `beta` — including an absent
+  /// define (a local `flutter run`) — resolves to
+  /// [BuildChannel.production]: production is the safe default so a
+  /// mis-configured build never accidentally exposes beta-only features.
+  /// Overridable in tests via `ProviderContainer.overrides`.
+  BuildChannelProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'buildChannelProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$buildChannelHash();
+
+  @$internal
+  @override
+  $ProviderElement<BuildChannel> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  BuildChannel create(Ref ref) {
+    return buildChannel(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(BuildChannel value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<BuildChannel>(value),
+    );
+  }
+}
+
+String _$buildChannelHash() => r'19d064de2926f0eb9ef2781dd22f3b5801cbb0b0';
+
 /// Central feature-flag store (#1373 phase 1).
 ///
 /// State is the set of currently-enabled features. The provider validates
@@ -226,7 +293,7 @@ final class FeatureFlagsProvider
   FeatureFlags create() => FeatureFlags();
 }
 
-String _$featureFlagsHash() => r'10bea65d477d5590e5d8737bedcfa91b7d61920e';
+String _$featureFlagsHash() => r'20bfb70113817172c44594d26d28ec033be230c2';
 
 /// Central feature-flag store (#1373 phase 1).
 ///
@@ -349,4 +416,4 @@ final class EnabledFeaturesProvider
   }
 }
 
-String _$enabledFeaturesHash() => r'2e79e8e31e5bd3a1f94ce3e095d1b76c3ed0b306';
+String _$enabledFeaturesHash() => r'3e7e23a57bfd783ee094a9291b9a6f081f1515a8';

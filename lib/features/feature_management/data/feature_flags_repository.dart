@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
+import '../domain/build_channel.dart';
 import '../domain/feature.dart';
 import '../domain/feature_manifest.dart';
 
@@ -37,13 +38,16 @@ class FeatureFlagsRepository {
 
   /// Returns the currently-enabled feature set.
   ///
-  /// First launch (empty box) → manifest defaults. Subsequent launches
-  /// → exactly the set persisted by [saveEnabled]. Unknown enum names
-  /// (e.g. a feature removed in a later version) are skipped silently
-  /// so a downgrade-then-upgrade does not crash.
-  Future<Set<Feature>> loadEnabled() async {
+  /// First launch (empty box) → the manifest defaults for [channel]
+  /// (#1674). Subsequent launches → exactly the set persisted by
+  /// [saveEnabled]. Unknown enum names (e.g. a feature removed in a
+  /// later version) are skipped silently so a downgrade-then-upgrade
+  /// does not crash.
+  Future<Set<Feature>> loadEnabled([
+    BuildChannel channel = BuildChannel.production,
+  ]) async {
     if (_box.isEmpty) {
-      return _manifest.defaultEnabledSet();
+      return _manifest.defaultEnabledSet(channel);
     }
     final result = <Feature>{};
     final byName = {for (final f in Feature.values) f.name: f};
