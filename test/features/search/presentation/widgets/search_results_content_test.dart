@@ -96,6 +96,30 @@ void main() {
     });
 
     testWidgets(
+        '#1695 — empty state always carries a search CTA, even when the '
+        'nearest shortcut is hidden', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        SearchResultsContent(onGpsRetry: noopRetry),
+        overrides: [
+          ...test.overrides,
+          searchStateProvider.overrideWith(() => _EmptySearchState()),
+          activeProfileProvider.overrideWith(
+            () => _FakeActiveProfile(LandingScreen.cheapest),
+          ),
+        ].cast(),
+      );
+
+      // Shortcut card hidden (cheapest landing) — but the empty state
+      // is no longer a dead screen: an actionable search CTA is shown.
+      expect(find.byType(NearestShortcutCard), findsNothing);
+      expect(find.byKey(const Key('emptySearchCta')), findsOneWidget);
+    });
+
+    testWidgets(
         '#494 — shows NearestShortcutCard when landing screen IS nearest',
         (tester) async {
       final test = standardTestOverrides();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../providers/obd2_connection_state_provider.dart';
 import 'obd2_adapter_picker.dart';
 
@@ -12,12 +13,16 @@ import 'obd2_adapter_picker.dart';
 /// "your car is plugged in" without competing with the
 /// [Obd2StatusDot]'s traffic-light semantics in the global shell.
 ///
-/// When the adapter is not connected (attempting, unreachable,
-/// permission denied, idle) the chip renders zero-size — this keeps
-/// the AppBar quiet and lets the status dot remain the authoritative
-/// "something is wrong" signal.
+/// When an adapter IS paired but not currently connected (attempting,
+/// unreachable, permission denied) the chip renders zero-size — the
+/// [Obd2StatusDot] owns that "something is wrong" signal.
 ///
-/// Tapping opens the adapter picker sheet so the user can re-pair
+/// When NO adapter is paired at all (#1695), the chip instead shows a
+/// discoverable "pair an OBD2 adapter" action: there is no status-dot
+/// signal in that case either, so hiding entirely left pairing with no
+/// entry point on the Consumption screen.
+///
+/// Tapping opens the adapter picker sheet so the user can pair / re-pair
 /// on demand.
 class Obd2StatusChip extends ConsumerWidget {
   const Obd2StatusChip({super.key});
@@ -25,25 +30,49 @@ class Obd2StatusChip extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final snapshot = ref.watch(obd2ConnectionStatusProvider);
-    if (snapshot.state != Obd2ConnectionState.connected) {
-      return const SizedBox.shrink();
-    }
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final name = snapshot.adapterName ?? '';
-    final tooltip = l?.obd2ConnectedTooltip(name) ??
-        'OBD2 connected: $name';
+
+    if (snapshot.state == Obd2ConnectionState.connected) {
+      final name = snapshot.adapterName ?? '';
+      final tooltip = l?.obd2ConnectedTooltip(name) ??
+          'OBD2 connected: $name';
+      return IconButton(
+        key: const Key('obd2StatusChip'),
+        tooltip: tooltip,
+        icon: Icon(
+          Icons.bluetooth_connected,
+          size: 16,
+          color: theme.colorScheme.primary,
+        ),
+        // Shrink the hit region to keep the icon visually compact but
+        // leave the real tap target at 48 dp so
+        // androidTapTargetGuideline still passes.
+        constraints: const BoxConstraints(
+          minWidth: 48,
+          minHeight: 48,
+        ),
+        padding: EdgeInsets.zero,
+        onPressed: () => showObd2AdapterPicker(context),
+      );
+    }
+
+    // #1695 — not connected. When no adapter is paired to the active
+    // vehicle, surface a discoverable "pair adapter" entry; when one IS
+    // paired (transient disconnect) stay quiet and let the status dot
+    // carry the signal.
+    final pairedMac = ref.watch(activeVehicleProfileProvider)?.obd2AdapterMac;
+    if (pairedMac != null && pairedMac.isNotEmpty) {
+      return const SizedBox.shrink();
+    }
     return IconButton(
-      key: const Key('obd2StatusChip'),
-      tooltip: tooltip,
+      key: const Key('obd2PairChip'),
+      tooltip: l?.obd2PairChipTooltip ?? 'Pair an OBD2 adapter',
       icon: Icon(
-        Icons.bluetooth_connected,
+        Icons.bluetooth_searching,
         size: 16,
-        color: theme.colorScheme.primary,
+        color: theme.colorScheme.onSurfaceVariant,
       ),
-      // Shrink the hit region to keep the icon visually compact but
-      // leave the real tap target at 48 dp so
-      // androidTapTargetGuideline still passes.
       constraints: const BoxConstraints(
         minWidth: 48,
         minHeight: 48,

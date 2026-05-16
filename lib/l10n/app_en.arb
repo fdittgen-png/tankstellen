@@ -1437,6 +1437,10 @@
       }
     }
   },
+  "obd2PairChipTooltip": "Pair an OBD2 adapter",
+  "@obd2PairChipTooltip": {
+    "description": "Tooltip on the title-bar OBD2 chip when no adapter is paired yet — tapping opens the adapter picker so pairing has a discoverable entry point (#1695)."
+  },
   "velocityAlertTitle": "{fuelLabel} dropped at nearby stations",
   "@velocityAlertTitle": {
     "description": "Title of the price-drop velocity notification (#579). Fired when multiple nearby stations drop within the lookback window.",

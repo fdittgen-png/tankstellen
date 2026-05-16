@@ -5900,6 +5900,12 @@ abstract class AppLocalizations {
   /// **'OBD2 connected: {adapterName}'**
   String obd2ConnectedTooltip(String adapterName);
 
+  /// Tooltip on the title-bar OBD2 chip when no adapter is paired yet — tapping opens the adapter picker so pairing has a discoverable entry point (#1695).
+  ///
+  /// In en, this message translates to:
+  /// **'Pair an OBD2 adapter'**
+  String get obd2PairChipTooltip;
+
   /// Title of the price-drop velocity notification (#579). Fired when multiple nearby stations drop within the lookback window.
   ///
   /// In en, this message translates to:
