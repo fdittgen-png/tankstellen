@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
@@ -170,6 +171,10 @@ void main() {
         'save-as-defaults button updates the active profile', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      // #1792 — open-only, amenities and brands have no UserProfile
+      // field; they persist device-locally via putSetting.
+      when(() => test.mockStorage.putSetting(any(), any()))
+          .thenAnswer((_) async {});
 
       const initialProfile = UserProfile(
         id: 'p1',
@@ -206,11 +211,18 @@ void main() {
       await tester.tap(saveBtn);
       await tester.pump();
 
+      // Fuel type + radius are profile fields — mirrored into the profile.
       expect(fake.updates, hasLength(1));
       final saved = fake.updates.single;
       expect(saved.preferredFuelType, FuelType.diesel);
       expect(saved.defaultSearchRadius, 15);
-      expect(saved.preferredAmenities, contains(StationAmenity.airPump));
+
+      // #1792 — the amenity set has no profile field; it persists
+      // device-locally instead of on the profile.
+      verify(() => test.mockStorage.putSetting(
+            StorageKeys.defaultAmenities,
+            [StationAmenity.airPump.name],
+          )).called(1);
     });
 
     testWidgets('has a close (X) button that pops the route', (tester) async {

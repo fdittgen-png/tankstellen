@@ -370,7 +370,7 @@ final class OpenOnlyFilterProvider
   }
 }
 
-String _$openOnlyFilterHash() => r'50e083a0306412be1ee048b0d8cc618f7ef8b9c6';
+String _$openOnlyFilterHash() => r'f3a96b5fce2f9948568236cf000e5527e6d63fac';
 
 /// Whether results should be filtered to currently-open stations only.
 /// Toggled from the search criteria screen; consumed by the results list.
@@ -432,7 +432,7 @@ final class SelectedAmenitiesProvider
   }
 }
 
-String _$selectedAmenitiesHash() => r'6ab13fbbedab28a4422a45b315c32865b2cacce3';
+String _$selectedAmenitiesHash() => r'26377546b20e894b6a1c40c26b4979682c50ba80';
 
 /// The set of amenities the user wants stations to provide.
 /// Empty set means "no amenity filter" (all stations pass).

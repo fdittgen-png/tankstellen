@@ -59,7 +59,7 @@ final class SelectedBrandsProvider
   }
 }
 
-String _$selectedBrandsHash() => r'80ae4d8d00fd95b4aa9b7d86167a257f240488b6';
+String _$selectedBrandsHash() => r'894e2b52ebe36fdce1034397db53c1ae4195e059';
 
 /// Manages the set of selected brand names for filtering search results.
 ///
@@ -132,7 +132,7 @@ final class ExcludeHighwayStationsProvider
 }
 
 String _$excludeHighwayStationsHash() =>
-    r'c07895ef69caf31407c10ad9dd0d12171116d781';
+    r'52c32d202ca841c83cb55bd21c609e831f360688';
 
 /// Whether the motorway/highway station filter is active.
 /// When true, stations with stationType == "A" (autoroute) are excluded.

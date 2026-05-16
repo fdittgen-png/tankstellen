@@ -18,6 +18,7 @@ import '../../../route_search/domain/entities/route_info.dart';
 import '../../../route_search/presentation/widgets/route_input.dart';
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../domain/entities/search_mode.dart';
+import '../../providers/brand_filter_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
@@ -104,24 +105,40 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
   }
 
   Future<void> _saveAsDefaults() async {
-    final profile = ref.read(activeProfileProvider);
     final l10n = AppLocalizations.of(context);
-    if (profile == null) {
-      SnackBarHelper.show(
-        context,
-        l10n?.profileNotFound ?? 'No active profile',
-      );
-      return;
-    }
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
     final amenities = ref.read(selectedAmenitiesProvider);
-    final updated = profile.copyWith(
-      preferredFuelType: fuelType,
-      defaultSearchRadius: radius,
-      preferredAmenities: amenities.toList(),
+    final openOnly = ref.read(openOnlyFilterProvider);
+    final brands = ref.read(selectedBrandsProvider);
+    final excludeHighway = ref.read(excludeHighwayStationsProvider);
+
+    // #1792 — the criteria with no UserProfile field of their own
+    // (open-only, amenity set, brand filter) persist device-locally so
+    // the *whole* default set round-trips, not just the profile
+    // subset. This runs regardless of whether a profile is active.
+    final storage = ref.read(storageRepositoryProvider);
+    await storage.putSetting(StorageKeys.defaultOpenOnly, openOnly);
+    await storage.putSetting(
+        StorageKeys.defaultExcludeHighway, excludeHighway);
+    await storage.putSetting(
+      StorageKeys.defaultAmenities,
+      amenities.map((a) => a.name).toList(),
     );
-    await ref.read(activeProfileProvider.notifier).updateProfile(updated);
+    await storage.putSetting(StorageKeys.defaultBrands, brands.toList());
+
+    // Fuel type + radius are profile fields — mirror them into the
+    // active profile so existing profile consumers keep seeing them.
+    final profile = ref.read(activeProfileProvider);
+    if (profile != null) {
+      await ref.read(activeProfileProvider.notifier).updateProfile(
+            profile.copyWith(
+              preferredFuelType: fuelType,
+              defaultSearchRadius: radius,
+            ),
+          );
+    }
+
     if (!mounted) return;
     SnackBarHelper.show(
       context,
