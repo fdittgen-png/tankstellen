@@ -547,6 +547,7 @@ class _StubHighConfidenceDetector extends BrokenMapDetector {
     required BrokenMapBelief prior,
     required DateTime now,
     ReferenceVehicle? vehicle,
+    Future<bool> Function()? awaitUserRev,
   }) async {
     // Reconstruct a Beta posterior with pseudoCount=10 around the
     // requested mean — same shape the production recall path uses.

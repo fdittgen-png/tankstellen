@@ -3387,6 +3387,16 @@ class AppLocalizationsEl extends AppLocalizations {
   String get brokenMapDiagnosticsClearButton => 'Clear';
 
   @override
+  String get brokenMapRevPromptTitle => 'Rev the engine';
+
+  @override
+  String get brokenMapRevPromptBody =>
+      'Briefly blip the throttle so the app can check the MAP sensor responds.';
+
+  @override
+  String get brokenMapRevPromptConfirm => 'Done — I revved';
+
+  @override
   String get calibrationAdvancedTitle => 'Advanced calibration';
 
   @override

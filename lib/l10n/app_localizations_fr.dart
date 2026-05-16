@@ -3416,6 +3416,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get brokenMapDiagnosticsClearButton => 'Clear';
 
   @override
+  String get brokenMapRevPromptTitle => 'Faites monter le régime moteur';
+
+  @override
+  String get brokenMapRevPromptBody =>
+      'Donnez un bref coup d\'accélérateur pour que l\'application vérifie que le capteur MAP réagit.';
+
+  @override
+  String get brokenMapRevPromptConfirm => 'Terminé – régime monté';
+
+  @override
   String get calibrationAdvancedTitle => 'Calibrage avancé';
 
   @override

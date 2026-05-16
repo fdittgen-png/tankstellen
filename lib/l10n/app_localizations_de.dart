@@ -3413,6 +3413,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get brokenMapDiagnosticsClearButton => 'Aufheben';
 
   @override
+  String get brokenMapRevPromptTitle => 'Motor kurz hochdrehen';
+
+  @override
+  String get brokenMapRevPromptBody =>
+      'Tippe kurz aufs Gaspedal, damit die App prüfen kann, ob der MAP-Sensor reagiert.';
+
+  @override
+  String get brokenMapRevPromptConfirm => 'Fertig – hochgedreht';
+
+  @override
   String get calibrationAdvancedTitle => 'Erweiterte Kalibrierung';
 
   @override

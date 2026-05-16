@@ -16,5 +16,8 @@
   "brokenMapDiagnosticsBlocklistHeading": "Gesperrte Adapter",
   "brokenMapDiagnosticsBlocklistEmpty": "Keine Adapter gesperrt.",
   "brokenMapDiagnosticsBlocklistEntry": "{adapter} — als {percent} % defekt markiert",
-  "brokenMapDiagnosticsClearButton": "Aufheben"
+  "brokenMapDiagnosticsClearButton": "Aufheben",
+  "brokenMapRevPromptTitle": "Motor kurz hochdrehen",
+  "brokenMapRevPromptBody": "Tippe kurz aufs Gaspedal, damit die App prüfen kann, ob der MAP-Sensor reagiert.",
+  "brokenMapRevPromptConfirm": "Fertig – hochgedreht"
 }
