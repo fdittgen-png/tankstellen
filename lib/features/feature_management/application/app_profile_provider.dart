@@ -106,5 +106,16 @@ class ActiveAppProfile extends _$ActiveAppProfile {
       await repo.save(detected);
     }
   }
+
+  /// Reconciles the active profile against the *current* resolved
+  /// feature-flag set.
+  ///
+  /// #1808 — reads [enabledFeaturesProvider] through this notifier's
+  /// own [Ref] (a provider ref, valid for the provider's whole
+  /// lifetime), so a caller in a widget doesn't have to carry the flag
+  /// set across an `await` with a `WidgetRef` that may already belong
+  /// to an unmounted element.
+  Future<void> reconcile() =>
+      reconcileWithFlags(ref.read(enabledFeaturesProvider));
 }
 
