@@ -4605,6 +4605,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Adapter konnte nicht verbunden werden. Du kannst es erneut versuchen oder überspringen.';
 
   @override
+  String get onboardingPickUseMode =>
+      'Wähle einen Nutzungsmodus, um fortzufahren.';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Prüfintervall';
 
   @override

@@ -1826,6 +1826,7 @@
   "onboardingObd2ReadingVin": "VIN wird ausgelesen…",
   "onboardingObd2VinReadFailed": "VIN konnte nicht ausgelesen werden — bitte manuell eingeben",
   "onboardingObd2ConnectFailed": "Adapter konnte nicht verbunden werden. Du kannst es erneut versuchen oder überspringen.",
+  "onboardingPickUseMode": "Wähle einen Nutzungsmodus, um fortzufahren.",
   "alertsRadiusFrequencyLabel": "Prüfintervall",
   "alertsRadiusFrequencyDaily": "Einmal täglich",
   "alertsRadiusFrequencyTwiceDaily": "Zweimal täglich",

@@ -8264,6 +8264,12 @@ abstract class AppLocalizations {
   /// **'Couldn\'t connect to the adapter. You can retry or skip.'**
   String get onboardingObd2ConnectFailed;
 
+  /// Error shown when the user taps the onboarding wizard's Next button on the first step without choosing a use mode (#1691).
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a use mode to continue.'**
+  String get onboardingPickUseMode;
+
   /// Label of the per-alert frequency dropdown (#1012 phase 1) — chooses how often the background runner re-evaluates this radius alert.
   ///
   /// In en, this message translates to:

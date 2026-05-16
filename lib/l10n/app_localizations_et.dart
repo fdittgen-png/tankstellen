@@ -4560,6 +4560,9 @@ class AppLocalizationsEt extends AppLocalizations {
       'Couldn\'t connect to the adapter. You can retry or skip.';
 
   @override
+  String get onboardingPickUseMode => 'Pick a use mode to continue.';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Check frequency';
 
   @override
