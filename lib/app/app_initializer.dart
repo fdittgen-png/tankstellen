@@ -97,6 +97,19 @@ class AppInitializer {
     final container = ProviderContainer();
 
     final storage = HiveStorage();
+
+    // #1794 / #1768 — post-first-frame storage work. `initDeferred()`
+    // opens the deep-feature Hive boxes; it is idempotent + cached, so
+    // the post-frame readers below (`_runTripsSyncMerge`, the trip
+    // recovery passes) await the same opens. Cache eviction and the
+    // country/language profile migration each walk an entire box and
+    // are not needed for the first frame, so they run here too.
+    _deferPostFirstFrame(() async {
+      unawaited(HiveBoxes.initDeferred());
+      await CacheManager(storage).evictExpired();
+      await ProfileRepository(storage).migrateProfileCountryLanguage();
+    });
+
     // #795 phase 1 — defer Supabase/TankSync warm-up and community-config
     // asset read until after the first frame. Neither is required for the
     // landing UI and both touch relatively slow I/O (asset bundle decode +
@@ -301,19 +314,17 @@ class AppInitializer {
       return true;
     }());
 
-    // Evict stale cache entries on startup.
-    final storage = HiveStorage();
-    final cacheManager = CacheManager(storage);
-    await cacheManager.evictExpired();
-
-    // Migrate existing profiles to include country/language.
-    final profileRepo = ProfileRepository(storage);
-    await profileRepo.migrateProfileCountryLanguage();
-
     // Safety net: guarantee a default profile always exists (#555).
     // The onboarding wizard calls ensureDefaultProfile() at completion,
     // but if the wizard was ever skipped (e.g., by the #521 hasApiKey
-    // regression), the app would run without any profile.
+    // regression), the app would run without any profile. This stays on
+    // the critical path — the first route depends on a profile existing.
+    //
+    // #1768 — cache eviction and the country/language profile migration
+    // used to run here too; both walk an entire Hive box and neither
+    // result is needed to paint the first frame, so they are deferred
+    // past it (see `run()`'s post-first-frame block).
+    final profileRepo = ProfileRepository(HiveStorage());
     await profileRepo.ensureDefaultProfile();
   }
 
@@ -465,6 +476,9 @@ class AppInitializer {
   /// unchanged on error so a transient network blip never costs the
   /// user their local history view.
   static Future<void> _runTripsSyncMerge() async {
+    // #1794 — `obd2TripHistory` is a deferred box; wait for the
+    // post-first-frame opens before reading it.
+    await HiveBoxes.initDeferred();
     if (TankSyncClient.client == null) return;
     if (!Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) return;
     try {
@@ -537,6 +551,9 @@ class AppInitializer {
   static Future<void> _runActiveTripRecovery(
     ProviderContainer container,
   ) async {
+    // #1794 — the active-trip + trip-history boxes are deferred; wait
+    // for the post-first-frame opens before reading them.
+    await HiveBoxes.initDeferred();
     if (!Hive.isBoxOpen(HiveBoxes.obd2ActiveTrip)) return;
     final activeRepo = ActiveTripRepository(
       box: Hive.box<String>(HiveBoxes.obd2ActiveTrip),
@@ -623,6 +640,9 @@ class AppInitializer {
   static Future<void> _runPausedTripRecovery(
     ProviderContainer container,
   ) async {
+    // #1794 — the paused-trip + trip-history boxes are deferred; wait
+    // for the post-first-frame opens before reading them.
+    await HiveBoxes.initDeferred();
     if (!Hive.isBoxOpen(HiveBoxes.obd2PausedTrips)) return;
     if (!Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) return;
     final pausedRepo = PausedTripRepository(
@@ -772,6 +792,9 @@ class AppInitializer {
     // optimisation; trips still save without it).
     _deferPostFirstFrame(() async {
       try {
+        // #1794 — the aggregator hook reads `obd2TripHistory`, a
+        // deferred box; wait for the post-first-frame opens first.
+        await HiveBoxes.initDeferred();
         final wired = wireAggregatorIntoTripHistory(container);
         if (!wired) {
           debugPrint(
