@@ -120,12 +120,12 @@ class AppInitializer {
     // would only delay `runApp`.
     _deferPostFirstFrame(() async {
       try {
-        final packageInfo = await PackageInfo.fromPlatform();
+        final packageInfo = await _resolvePackageInfo();
         AppConstants.setRuntimeVersion(
           '${packageInfo.version}+${packageInfo.buildNumber}',
         );
       } catch (e, st) {
-        debugPrint('PackageInfo.fromPlatform failed (#570): $e\n$st');
+        debugPrint('PackageInfo resolution failed (#570): $e\n$st');
       }
     });
 
@@ -185,24 +185,34 @@ class AppInitializer {
 
     StartupTimer.instance.mark('pre_run_app');
 
+    // #1769 — Sentry no longer wraps `runApp`; the old wrapper forced
+    // both `SentryFlutter.init` and the package-info round-trip it
+    // needs for the release string onto the cold-start critical path.
+    // The app now paints first and Sentry initialises in the first
+    // post-first-frame microtask. Native crash handlers come up a few
+    // hundred ms later — acceptable, since Sentry only needs to be live
+    // before an error is *reported*, not before first paint.
+    // `_installErrorHandlers` is re-run afterwards so the app's
+    // `errorLogger` pipeline stays the authoritative target, matching
+    // today's behaviour where `_launch` overwrote Sentry's own
+    // integration handlers.
     final dsn = resolveSentryDsn(storage);
     final consentGiven = storage
             .getSetting('consent_error_reporting') as bool? ??
         false;
     if (dsn.isNotEmpty && consentGiven) {
-      final packageInfo = await PackageInfo.fromPlatform();
-      final release =
-          'tankstellen@${packageInfo.version}+${packageInfo.buildNumber}';
-      await SentryFlutter.init(
-        (options) {
+      _deferPostFirstFrame(() async {
+        final packageInfo = await _resolvePackageInfo();
+        await SentryFlutter.init((options) {
           options.dsn = dsn;
           options.tracesSampleRate = 0.2;
           options.environment = 'production';
-          options.release = release;
-          // #1109 — strip PII (emails, lat/lng, tokens, user/request blocks,
-          // long breadcrumb payloads) from every event before it leaves the
-          // device. The scrubber is a pure function so it stays unit-tested
-          // and shared with `TraceUploader`.
+          options.release =
+              'tankstellen@${packageInfo.version}+${packageInfo.buildNumber}';
+          // #1109 — strip PII (emails, lat/lng, tokens, user/request
+          // blocks, long breadcrumb payloads) from every event before
+          // it leaves the device. The scrubber is a pure function so it
+          // stays unit-tested and shared with `TraceUploader`.
           options.beforeSend = (event, hint) {
             try {
               return PiiScrubber.scrubSentryEvent(event);
@@ -211,12 +221,12 @@ class AppInitializer {
               return event;
             }
           };
-        },
-        appRunner: () => _launch(container, appBuilder),
-      );
-    } else {
-      _launch(container, appBuilder);
+        });
+        _installErrorHandlers();
+      });
     }
+
+    _launch(container, appBuilder);
   }
 
   /// Resolves the active Sentry DSN at startup. The user-stored
@@ -233,6 +243,15 @@ class AppInitializer {
     const buildDsn = String.fromEnvironment('SENTRY_DSN');
     return buildDsn;
   }
+
+  /// #1769 — reading package info is a platform-channel round-trip.
+  /// Resolve it once, lazily; the same Future is shared by the
+  /// runtime-version cache and the Sentry release string so neither
+  /// path pays a second round-trip.
+  static Future<PackageInfo>? _packageInfoFuture;
+
+  static Future<PackageInfo> _resolvePackageInfo() =>
+      _packageInfoFuture ??= PackageInfo.fromPlatform();
 
   // ---------------------------------------------------------------------------
   // Phase 1 — bootstrap
@@ -637,17 +656,16 @@ class AppInitializer {
   // Phase 5 — runApp
   // ---------------------------------------------------------------------------
 
-  static void _launch(
-    ProviderContainer container,
-    Widget Function(ProviderContainer container) appBuilder,
-  ) {
-    // #1104 — bind the unified errorLogger to this container so every
-    // call to `errorLogger.log(layer, e, st)` from the foreground
-    // isolate routes through TraceRecorder + Sentry. Background-isolate
-    // callsites never reach this path; they fall through to the Hive
-    // ring buffer (IsolateErrorSpool) and are replayed below.
-    errorLogger.bind(container);
-
+  /// Wires the framework + platform error handlers onto the app's
+  /// [errorLogger] pipeline.
+  ///
+  /// Called from [_launch], and again right after the deferred
+  /// `SentryFlutter.init` (#1769): Sentry's `FlutterErrorIntegration`
+  /// and `OnErrorIntegration` chain themselves onto these hooks during
+  /// init, so re-running this keeps the app's `errorLogger` routing
+  /// authoritative — exactly as `_launch` did when it ran inside
+  /// Sentry's old `appRunner`.
+  static void _installErrorHandlers() {
     // Capture Flutter framework errors (build, layout, paint).
     FlutterError.onError = (details) {
       FlutterError.presentError(details);
@@ -666,6 +684,19 @@ class AppInitializer {
       errorLogger.log(ErrorLayer.other, error, stack);
       return true;
     };
+  }
+
+  static void _launch(
+    ProviderContainer container,
+    Widget Function(ProviderContainer container) appBuilder,
+  ) {
+    // #1104 — bind the unified errorLogger to this container so every
+    // call to `errorLogger.log(layer, e, st)` from the foreground
+    // isolate routes through TraceRecorder + Sentry. Background-isolate
+    // callsites never reach this path; they fall through to the Hive
+    // ring buffer (IsolateErrorSpool) and are replayed below.
+    errorLogger.bind(container);
+    _installErrorHandlers();
 
     // #609 — kick the 2-minute nearest-widget heartbeat so the home-screen
     // widget stays fresh while the app is running. The provider is

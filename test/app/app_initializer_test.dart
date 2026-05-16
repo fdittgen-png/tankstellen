@@ -127,12 +127,40 @@ void main() {
       expect(body, contains('TimeoutException'));
     });
 
-    test('global error handlers are installed inside _launch', () {
-      final body = _extractMethodBody(initSource, 'static void _launch');
-      expect(body, isNotNull);
-      expect(body, contains('FlutterError.onError'));
-      expect(body, contains('PlatformDispatcher.instance.onError'));
-      expect(body, contains('runApp'));
+    test('global error handlers are installed via _launch', () {
+      final launchBody = _extractMethodBody(initSource, 'static void _launch');
+      expect(launchBody, isNotNull);
+      expect(launchBody, contains('_installErrorHandlers'),
+          reason: '_launch must install the global error handlers');
+      expect(launchBody, contains('runApp'));
+
+      // #1769 — the handler wiring lives in its own helper so it can be
+      // re-asserted after the deferred SentryFlutter.init.
+      final handlersBody =
+          _extractMethodBody(initSource, 'static void _installErrorHandlers');
+      expect(handlersBody, isNotNull,
+          reason: '_installErrorHandlers helper must exist');
+      expect(handlersBody, contains('FlutterError.onError'));
+      expect(handlersBody, contains('PlatformDispatcher.instance.onError'));
+    });
+
+    test('PackageInfo.fromPlatform is invoked at most once (#1769)', () {
+      // A platform-channel round-trip — resolve it once and share the
+      // cached Future between the runtime-version cache and Sentry.
+      final hits = 'PackageInfo.fromPlatform('.allMatches(initSource).length;
+      expect(hits, lessThanOrEqualTo(1),
+          reason: 'PackageInfo.fromPlatform() must be called once and the '
+              'Future reused (#1769)');
+    });
+
+    test('Sentry.init no longer wraps runApp via appRunner (#1769)', () {
+      final runBody = _extractMethodBody(initSource, 'static Future<void> run');
+      expect(runBody, isNotNull);
+      expect(runBody, isNot(contains('appRunner')),
+          reason: 'Sentry.init must not wrap runApp via appRunner — that '
+              'forces it onto the cold-start critical path (#1769)');
+      expect(runBody, contains('SentryFlutter.init'),
+          reason: 'Sentry is still initialised, just off the critical path');
     });
   });
 
