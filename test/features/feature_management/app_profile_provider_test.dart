@@ -112,6 +112,29 @@ void main() {
       expect(flags, isNot(contains(Feature.obd2TripRecording)));
     });
 
+    test(
+        '#1765 — selecting medium after basic does not crash; the Medium '
+        'bundle re-enables showConsumptionTab without its obd2 prerequisite',
+        () async {
+      final c = makeContainer();
+      await pumpLoad(c);
+      // Basic excludes showConsumptionTab — after this it is OFF, the
+      // precondition that made the old enable()-per-feature select()
+      // throw `StateError: Cannot enable showConsumptionTab: requires
+      // obd2TripRecording`.
+      await c.read(activeAppProfileProvider.notifier).select(AppProfile.basic);
+      expect(c.read(enabledFeaturesProvider),
+          isNot(contains(Feature.showConsumptionTab)));
+      // Must not throw — the preset bundle is applied atomically.
+      await c
+          .read(activeAppProfileProvider.notifier)
+          .select(AppProfile.medium);
+      final flags = c.read(enabledFeaturesProvider);
+      expect(flags, appProfileBundles[AppProfile.medium]);
+      expect(flags, contains(Feature.showConsumptionTab));
+      expect(flags, isNot(contains(Feature.obd2TripRecording)));
+    });
+
     test('full enables OBD2 stack and loyalty', () async {
       final c = makeContainer();
       await pumpLoad(c);
