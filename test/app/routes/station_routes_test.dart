@@ -1,7 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/app/routes/station_routes.dart';
+import 'package:tankstellen/core/storage/storage_keys.dart';
+import 'package:tankstellen/features/ev/data/repositories/ev_station_repository.dart';
+import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+
+import '../../mocks/mocks.dart';
 
 /// `stationRoutes` is parameterised with a riverpod [Ref] so its
 /// `/ev-station/:id` builder can hydrate a [ChargingStation] from the
@@ -119,6 +125,72 @@ void main() {
           reason: '${r.path} should use the canonical `:id` parameter name',
         );
       }
+    });
+  });
+
+  group('hydrateEvStationById (#1804)', () {
+    const station = ChargingStation(
+      id: 'ocm-987654',
+      name: 'IONITY Pézenas',
+      operator: 'IONITY',
+      latitude: 43.4672,
+      longitude: 3.4242,
+      dist: 1.1,
+      address: 'A75 Aire de Pézenas',
+      postCode: '34120',
+      place: 'Pézenas',
+      totalPoints: 6,
+      isOperational: true,
+    );
+
+    test('returns the station from the EV favorites store when present', () {
+      final storage = MockHiveStorage();
+      when(() => storage.getEvFavoriteStationData('ocm-987654'))
+          .thenReturn(station.toJson());
+      when(() => storage.getSetting(StorageKeys.evStationsCache))
+          .thenReturn(null);
+
+      final result = hydrateEvStationById(
+        'ocm-987654',
+        storage,
+        EvStationRepository(storage),
+      );
+      expect(result?.id, 'ocm-987654');
+    });
+
+    test('falls back to the EV station cache for a non-favorite station', () {
+      final storage = MockHiveStorage();
+      // Not a saved favorite...
+      when(() => storage.getEvFavoriteStationData(any())).thenReturn(null);
+      // ...but seen recently on the map → present in the EV station cache.
+      when(() => storage.getSetting(StorageKeys.evStationsCache))
+          .thenReturn([station.toJson()]);
+
+      final result = hydrateEvStationById(
+        'ocm-987654',
+        storage,
+        EvStationRepository(storage),
+      );
+      expect(
+        result?.id,
+        'ocm-987654',
+        reason: 'a widget / external-URL deep link must open an EV station '
+            'the user has seen even when it is not a saved favorite',
+      );
+    });
+
+    test('returns null when the id is unknown to both stores', () {
+      final storage = MockHiveStorage();
+      when(() => storage.getEvFavoriteStationData(any())).thenReturn(null);
+      when(() => storage.getSetting(StorageKeys.evStationsCache))
+          .thenReturn(<dynamic>[]);
+
+      final result = hydrateEvStationById(
+        'ocm-does-not-exist',
+        storage,
+        EvStationRepository(storage),
+      );
+      expect(result, isNull);
     });
   });
 }
