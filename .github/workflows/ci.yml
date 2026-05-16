@@ -24,33 +24,45 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # #1810 — paths gate. Detects whether a PR touches the dependency set
-  # (`pubspec.yaml` / `pubspec.lock`) so the pubspec-only audit jobs
-  # below (security-scan / license-audit / dependency-check) can skip
-  # when it doesn't. Uses `git diff` against the PR base — same pattern
-  # as the `test` job's affected-test selector — so no new third-party
-  # action is introduced. Non-PR events (master push, weekly schedule)
-  # always resolve to `true` so the audits keep running there.
+  # #1810 / #1813 — paths gate. Detects, for a PR, which downstream
+  # jobs can be skipped because the PR can't affect them:
+  #   - `deps`  → `pubspec.*` changed → run the dependency-audit jobs.
+  #   - `code`  → a file that can affect the app build changed → run
+  #               `build-android`. Test-only / workflow / docs PRs skip.
+  # Uses `git diff` against the PR base — same pattern as the `test`
+  # job's affected-test selector — so no new third-party action is
+  # introduced. Non-PR events (master push, weekly schedule) always
+  # resolve to `true` so every gate keeps running there.
   changes:
     runs-on: ubuntu-latest
     outputs:
       deps: ${{ steps.filter.outputs.deps }}
+      code: ${{ steps.filter.outputs.code }}
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - id: filter
-        name: Detect dependency-set changes
+        name: Detect dependency-set + build-relevant changes
         run: |
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             echo "deps=true" >> "$GITHUB_OUTPUT"
+            echo "code=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
-               | grep -qE '^pubspec\.(yaml|lock)$'; then
+          CHANGED=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          if echo "$CHANGED" | grep -qE '^pubspec\.(yaml|lock)$'; then
             echo "deps=true" >> "$GITHUB_OUTPUT"
           else
             echo "deps=false" >> "$GITHUB_OUTPUT"
+          fi
+          # `code` = at least one changed file that is NOT purely a
+          # test, a workflow, or documentation — i.e. something that
+          # could affect the Android app build.
+          if echo "$CHANGED" | grep -qvE '^(test/|\.github/|docs/)|\.md$'; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "code=false" >> "$GITHUB_OUTPUT"
           fi
 
   analyze:
@@ -383,7 +395,11 @@ jobs:
     # The two jobs share no artefacts; build doesn't consume test
     # output. `analyze` is kept (cheap, fails fast) so we don't pay
     # the Android build cost when static analysis is broken.
-    needs: [analyze]
+    # #1813 — `changes` added so a test-only / workflow / docs PR skips
+    # the build entirely (a skipped job counts as a passing required
+    # check, so `gh pr merge --auto` is unaffected).
+    needs: [analyze, changes]
+    if: ${{ needs.changes.outputs.code == 'true' || github.event_name != 'pull_request' }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-java@v5
@@ -407,6 +423,17 @@ jobs:
           path: build/
           key: ${{ runner.os }}-build-android-${{ hashFiles('pubspec.lock', 'lib/**/*.dart', 'android/**') }}
           restore-keys: ${{ runner.os }}-build-android-
+      # #1813 — cache the Gradle home (downloaded Android dependencies,
+      # the wrapper distribution, and the Gradle build cache). Warm runs
+      # skip re-downloading the Android toolchain — the single biggest
+      # lever on build-android wall-clock.
+      - uses: actions/cache@v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
       # #48 — Decode the release keystore from a GitHub secret into a temp
@@ -414,14 +441,13 @@ jobs:
       # helper reads. The keystore file is written to a runner-local path
       # outside the checkout so it never ends up in an artifact.
       #
-      # Dependabot-triggered runs cannot read repository secrets per
-      # GitHub's "no secrets to bot actors" policy. On those PRs we skip
-      # signing entirely and fall back to a debug build below — still
-      # validates that the deps Dependabot bumped actually compile + link,
-      # without the keystore-decode step exiting non-zero. Regular PRs
-      # and pushes to master use the existing signed-release path.
+      # #1813 — only the release path (master push / tag / weekly
+      # schedule) needs the keystore. PR validation builds an unsigned
+      # debug APK below, so this step — and the Dependabot "no secrets
+      # for bots" edge case it used to guard — is skipped on every
+      # `pull_request` event.
       - name: Decode signing keystore
-        if: github.actor != 'dependabot[bot]'
+        if: github.event_name != 'pull_request'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -440,29 +466,31 @@ jobs:
           echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH" >> "$GITHUB_ENV"
           echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
           echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS" >> "$GITHUB_ENV"
-      - name: Build APK (split per ABI)
-        if: github.actor != 'dependabot[bot]'
-        run: flutter build apk --release --split-per-abi --flavor play
-      - name: Build App Bundle
-        if: github.actor != 'dependabot[bot]'
-        run: flutter build appbundle --release --flavor play
-      # Dependabot smoke build — unsigned debug APK. Confirms the bumped
-      # dependencies still compile + link end-to-end without needing the
-      # release keystore. Branch protection is satisfied because the job
-      # as a whole still completes successfully.
-      - name: Build APK (debug, Dependabot smoke)
-        if: github.actor == 'dependabot[bot]'
+      # #1813 — PR validation builds a single unsigned debug APK: it
+      # compiles + links all Dart and Kotlin (catching the breakage a
+      # PR can realistically introduce) without paying for R8-minified
+      # release output across 3 ABIs plus a separate AAB. The signed
+      # release APK + AAB are built only on master push / tag / the
+      # weekly schedule, where the `release` job actually consumes them.
+      - name: Build APK (debug — PR validation)
+        if: github.event_name == 'pull_request'
         run: flutter build apk --debug --flavor play
+      - name: Build APK (release, split per ABI)
+        if: github.event_name != 'pull_request'
+        run: flutter build apk --release --split-per-abi --flavor play
+      - name: Build App Bundle (release)
+        if: github.event_name != 'pull_request'
+        run: flutter build appbundle --release --flavor play
       - name: Clean up decoded keystore
         if: always()
         run: rm -f "$RUNNER_TEMP/tankstellen-release.jks"
       - uses: actions/upload-artifact@v7
-        if: github.actor != 'dependabot[bot]'
+        if: github.event_name != 'pull_request'
         with:
           name: android-apk
           path: build/app/outputs/flutter-apk/app-*-play-release.apk
       - uses: actions/upload-artifact@v7
-        if: github.actor != 'dependabot[bot]'
+        if: github.event_name != 'pull_request'
         with:
           name: android-aab
           path: build/app/outputs/bundle/playRelease/app-play-release.aab
