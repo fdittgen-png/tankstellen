@@ -130,6 +130,18 @@ jobs:
         if: always()
         run: rm -f "$ASC_API_KEY_FILEPATH"
 
+      # #1777 — retain the obfuscation symbol files (written by
+      # `flutter build ios --split-debug-info` in the Fastfile) so an
+      # obfuscated iOS release crash can be de-obfuscated later.
+      - name: Upload obfuscation symbols
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-debug-symbols
+          path: build/symbols
+          if-no-files-found: warn
+          retention-days: 90
+
       - name: Summary
         if: always()
         run: |

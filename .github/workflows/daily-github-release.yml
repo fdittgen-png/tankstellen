@@ -145,9 +145,13 @@ jobs:
         run: flutter pub get
 
       - name: Build AAB (play flavor)
+        # #1777 — `--obfuscate` strips Dart symbol names from the
+        # release binary; `--split-debug-info` writes the symbol files
+        # needed to de-obfuscate later crash reports (uploaded below).
         run: |
           flutter build appbundle --release --flavor play \
-            --build-number=${{ needs.pre-check.outputs.build_number }}
+            --build-number=${{ needs.pre-check.outputs.build_number }} \
+            --obfuscate --split-debug-info=build/symbols
 
       # Per-ABI APKs were dropped from the public nightly release on
       # purpose — Play App Signing re-signs every Play install with
@@ -172,6 +176,17 @@ jobs:
             build/app/outputs/bundle/playRelease/app-play-release.aab
           if-no-files-found: error
           retention-days: 7
+
+      # #1777 — retain the obfuscation symbol files so an obfuscated
+      # release crash can be de-obfuscated. Kept far longer than the
+      # AAB itself (crash reports arrive over the release's lifetime).
+      - name: Upload obfuscation symbols
+        uses: actions/upload-artifact@v7
+        with:
+          name: android-debug-symbols
+          path: build/symbols
+          if-no-files-found: error
+          retention-days: 90
 
   build-ios:
     needs: pre-check
