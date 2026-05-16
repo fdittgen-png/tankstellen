@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/refuel/unified_search_results_enabled.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -14,15 +13,14 @@ import '../screens/search_criteria_screen.dart';
 import 'nearest_shortcut_card.dart';
 import 'route_results_view.dart';
 import 'search_results_list.dart';
-import 'unified_search_results_view.dart';
 
 /// Renders the result panel of `SearchScreen` based on the current
 /// [SearchMode] and [FuelType]:
 ///
 ///  * Route mode -> [RouteResultsView] inside a `CustomScrollView`
-///  * Otherwise -> [UnifiedSearchResultsView] over the standard
+///  * Otherwise -> [SearchResultsList] over the standard
 ///    `searchStateProvider` `AsyncValue` (shimmer/empty/loaded/error),
-///    rendering fuel and EV results in one combined list
+///    rendering fuel and EV results in one combined mixed list
 ///
 /// Pulled out of `search_screen.dart` so the screen's `_buildResults`
 /// helper drops 50 lines and so the empty/loading/error branches can be
@@ -43,16 +41,6 @@ class SearchResultsContent extends ConsumerWidget {
       return const CustomScrollView(
         slivers: [RouteResultsView()],
       );
-    }
-
-    // #1116 phase 3c — when the unified-search flag is on, the new
-    // mixed fuel + EV view owns the entire results panel (filter chips
-    // + RefuelOptionCard list). The flag is off by default so the
-    // legacy branches below remain the canonical path until the
-    // feature ships.
-    final unifiedEnabled = ref.watch(unifiedSearchResultsEnabledProvider);
-    if (unifiedEnabled) {
-      return const UnifiedSearchResultsView();
     }
 
     // #494 — the nearest-stations shortcut only makes sense for users

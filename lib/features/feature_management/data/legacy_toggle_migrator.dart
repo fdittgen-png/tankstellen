@@ -23,13 +23,6 @@ const String hapticEcoCoachMigratedKey = 'hapticEcoCoachMigrated';
 const String gamificationMigratedKey = 'gamificationMigrated';
 
 /// Settings-box key written once after the legacy
-/// `unifiedSearchResultsEnabled` value has been promoted into the
-/// central feature-flag set (#1373 phase 3f). Persisted in the same
-/// `settings` Hive box as the legacy toggle itself so a single read
-/// tells us whether the migration has already run.
-const String unifiedSearchResultsMigratedKey = 'unifiedSearchResultsMigrated';
-
-/// Settings-box key written once after the legacy
 /// `syncBaselinesEnabled` value has been promoted into the central
 /// feature-flag set (#1373 phase 3e). Persisted in the same
 /// `settings` Hive box as the legacy toggle itself so a single read
@@ -90,12 +83,6 @@ const String showConsumptionTabMigratedKey = 'showConsumptionTabMigrated';
 /// because the legacy value lives on the profile entity rather than
 /// the settings box.
 ///
-/// Phase 3f adds [_migrateUnifiedSearchResults] for the
-/// settings-box-backed `unifiedSearchResultsEnabled` toggle. It
-/// follows the same shape as [_migrateHapticEcoCoach] but with no
-/// prerequisites to cascade-enable (the manifest declares no
-/// `requires:` for [Feature.unifiedSearchResults]).
-///
 /// Phase 3e adds [_migrateSyncBaselines] for the
 /// settings-box-backed `syncBaselinesEnabled` toggle. The manifest
 /// declares [Feature.tankSync] as a hard prerequisite of
@@ -139,11 +126,6 @@ Future<void> migrateLegacyToggles({
   required FeatureManifest manifest,
 }) async {
   await _migrateHapticEcoCoach(
-    settings: settings,
-    featureFlags: featureFlags,
-    manifest: manifest,
-  );
-  await _migrateUnifiedSearchResults(
     settings: settings,
     featureFlags: featureFlags,
     manifest: manifest,
@@ -323,56 +305,6 @@ Future<void> _migrateGamification({
   } catch (e, st) {
     debugPrint(
       'migrateUserProfileToggles: writing $gamificationMigratedKey failed: $e\n$st',
-    );
-  }
-}
-
-Future<void> _migrateUnifiedSearchResults({
-  required Box<dynamic> settings,
-  required FeatureFlagsRepository featureFlags,
-  required FeatureManifest manifest,
-}) async {
-  // Already migrated → idempotent no-op. The user may have toggled
-  // unifiedSearchResults OFF after a previous migration; we must not
-  // re-promote the legacy `true` value.
-  if (settings.get(unifiedSearchResultsMigratedKey) == true) {
-    return;
-  }
-
-  // ignore: deprecated_member_use_from_same_package
-  final legacyValue = settings.get(StorageKeys.unifiedSearchResultsEnabled);
-
-  if (legacyValue == true) {
-    try {
-      final current = await featureFlags.loadEnabled();
-      // Force-enable any manifest-declared prerequisites first per the
-      // dependency graph. [Feature.unifiedSearchResults] currently has
-      // none, so this reduces to {...current, Feature.unifiedSearchResults},
-      // but we keep the spread for symmetry with the precedent — if the
-      // manifest later adds a requirement it won't silently break.
-      final entry = manifest.entryFor(Feature.unifiedSearchResults);
-      final next = <Feature>{
-        ...current,
-        ...entry.requires,
-        Feature.unifiedSearchResults,
-      };
-      await featureFlags.saveEnabled(next);
-    } catch (e, st) {
-      // Don't block startup on a migration failure — the user can
-      // re-toggle from settings if the central state is missing.
-      debugPrint(
-        'migrateLegacyToggles: unifiedSearchResults promote failed: $e\n$st',
-      );
-    }
-  }
-
-  // Always set the flag (even when legacyValue is false / null) so we
-  // never re-read the legacy key on subsequent launches.
-  try {
-    await settings.put(unifiedSearchResultsMigratedKey, true);
-  } catch (e, st) {
-    debugPrint(
-      'migrateLegacyToggles: writing $unifiedSearchResultsMigratedKey failed: $e\n$st',
     );
   }
 }

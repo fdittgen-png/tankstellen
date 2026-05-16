@@ -289,8 +289,6 @@ void main() {
 /// Synthetic in-memory [FeatureFlags] notifier used to drive
 /// external-mutation paths without going through the Hive-backed
 /// repository AND without enforcing the manifest dependency graph.
-/// Mirrors the equivalent test double in
-/// `test/core/refuel/unified_search_results_enabled_test.dart`.
 class _TestFeatureFlags extends FeatureFlags {
   _TestFeatureFlags([Set<Feature>? initial])
       : _initial = initial ?? <Feature>{};

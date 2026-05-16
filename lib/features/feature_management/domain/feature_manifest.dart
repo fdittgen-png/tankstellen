@@ -116,7 +116,6 @@ class FeatureManifest {
   /// - `tankSync`: false (off until user signs in)
   /// - `consumptionAnalytics`: false (no trips → no tab)
   /// - `baselineSync`: false (off until TankSync is enabled)
-  /// - `unifiedSearchResults`: false (kept off pending UX work)
   /// - `priceAlerts`, `priceHistory`, `routePlanning`, `evCharging`: true
   /// - `glideCoach`, `gpsTripPath`: false (future features, opt-in)
   /// - `showFuel`, `showElectric`: true (#1373 phase 3c — both
@@ -168,12 +167,6 @@ class FeatureManifest {
       requires: {Feature.tankSync},
       displayName: 'Baseline sync',
       description: 'Sync driving baselines via TankSync.',
-    ),
-    Feature.unifiedSearchResults: FeatureManifestEntry.allChannels(
-      feature: Feature.unifiedSearchResults,
-      defaultOn: false,
-      displayName: 'Unified search results',
-      description: 'Single result list combining fuel and EV stations.',
     ),
     Feature.priceAlerts: FeatureManifestEntry.allChannels(
       feature: Feature.priceAlerts,

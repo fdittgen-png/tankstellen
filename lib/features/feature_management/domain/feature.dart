@@ -29,9 +29,6 @@ enum Feature {
   /// Driving-baseline sync over TankSync (#769). Requires [tankSync].
   baselineSync,
 
-  /// Unified fuel + EV search results.
-  unifiedSearchResults,
-
   /// Threshold-based price-drop notifications.
   priceAlerts,
 

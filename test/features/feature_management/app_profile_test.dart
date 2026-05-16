@@ -70,10 +70,8 @@ void main() {
       expect(full, contains(Feature.hapticEcoCoach));
       expect(full, contains(Feature.glideCoach));
       expect(full, contains(Feature.gpsTripPath));
-      // Full does NOT mean "every flag on" — `unifiedSearchResults`
-      // and `tflitePricePrediction` stay off until the user opts in
-      // (opinionated UX + off-band model artifact respectively).
-      expect(full, isNot(contains(Feature.unifiedSearchResults)));
+      // Full does NOT mean "every flag on" — `tflitePricePrediction`
+      // stays off until the user opts in (off-band model artifact).
       expect(full, isNot(contains(Feature.tflitePricePrediction)));
     });
 
@@ -115,10 +113,10 @@ void main() {
         () {
       final flags = {
         ...appProfileBundles[AppProfile.basic]!,
-        // `unifiedSearchResults` is in NO preset bundle (opinionated
-        // UX kept off by default) — adding it to Basic drifts the
-        // user off the canonical Basic flag set.
-        Feature.unifiedSearchResults,
+        // `tflitePricePrediction` is in NO preset bundle (off-band
+        // model artifact) — adding it to Basic drifts the user off
+        // the canonical Basic flag set.
+        Feature.tflitePricePrediction,
       };
       expect(detectProfileFromFlags(flags), AppProfile.custom);
     });
@@ -136,9 +134,8 @@ void main() {
     test('returns custom for a flag set that is a strict superset of full', () {
       final flags = {
         ...appProfileBundles[AppProfile.full]!,
-        // Neither of these lands in any preset bundle, so adding them
-        // to Full drifts the user off the canonical Full flag set.
-        Feature.unifiedSearchResults,
+        // `tflitePricePrediction` lands in no preset bundle, so adding
+        // it to Full drifts the user off the canonical Full flag set.
         Feature.tflitePricePrediction,
       };
       expect(detectProfileFromFlags(flags), AppProfile.custom);

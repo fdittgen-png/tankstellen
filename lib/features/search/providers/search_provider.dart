@@ -130,29 +130,14 @@ class SearchState extends _$SearchState {
           );
 
       final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
-      final unified = unifiedSearchEnabled(ref);
-      Future<void>? evFuture;
-      if (unified) {
-        evFuture = beginEvSearch(
-          ref,
-          lat: position.latitude,
-          lng: position.longitude,
-          radiusKm: resolved.radiusKm,
-        );
-      } else {
-        final ev = await dispatchEvIfNeeded(
-          ref: ref,
-          fuelType: resolved.fuelType,
-          lat: position.latitude,
-          lng: position.longitude,
-          radiusKm: resolved.radiusKm,
-        );
-        if (!ref.mounted) return;
-        if (ev != null) {
-          state = ev;
-          return;
-        }
-      }
+      // EV search runs concurrently with the fuel fetch — see
+      // finalizeUnifiedResult for the merge.
+      final evFuture = beginEvSearch(
+        ref,
+        lat: position.latitude,
+        lng: position.longitude,
+        radiusKm: resolved.radiusKm,
+      );
 
       // Reverse-geocode for a postal code (Prix-Carburants + co).
       final addr = await tryReverseGeocode(
@@ -212,29 +197,12 @@ class SearchState extends _$SearchState {
       if (!ref.mounted) return;
 
       final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
-      final unified = unifiedSearchEnabled(ref);
-      Future<void>? evFuture;
-      if (unified) {
-        evFuture = beginEvSearch(
-          ref,
-          lat: coordsResult.data.lat,
-          lng: coordsResult.data.lng,
-          radiusKm: resolved.radiusKm,
-        );
-      } else {
-        final ev = await dispatchEvIfNeeded(
-          ref: ref,
-          fuelType: resolved.fuelType,
-          lat: coordsResult.data.lat,
-          lng: coordsResult.data.lng,
-          radiusKm: resolved.radiusKm,
-        );
-        if (!ref.mounted) return;
-        if (ev != null) {
-          state = ev;
-          return;
-        }
-      }
+      final evFuture = beginEvSearch(
+        ref,
+        lat: coordsResult.data.lat,
+        lng: coordsResult.data.lng,
+        radiusKm: resolved.radiusKm,
+      );
 
       final cityName = await tryReverseGeocode(
         geocoding, coordsResult.data.lat, coordsResult.data.lng,
@@ -302,29 +270,12 @@ class SearchState extends _$SearchState {
       }
 
       final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
-      final unified = unifiedSearchEnabled(ref);
-      Future<void>? evFuture;
-      if (unified) {
-        evFuture = beginEvSearch(
-          ref,
-          lat: lat,
-          lng: lng,
-          radiusKm: resolved.radiusKm,
-        );
-      } else {
-        final ev = await dispatchEvIfNeeded(
-          ref: ref,
-          fuelType: resolved.fuelType,
-          lat: lat,
-          lng: lng,
-          radiusKm: resolved.radiusKm,
-        );
-        if (!ref.mounted) return;
-        if (ev != null) {
-          state = ev;
-          return;
-        }
-      }
+      final evFuture = beginEvSearch(
+        ref,
+        lat: lat,
+        lng: lng,
+        radiusKm: resolved.radiusKm,
+      );
 
       final params = SearchParams(
         lat: lat,

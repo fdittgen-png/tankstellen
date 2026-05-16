@@ -626,9 +626,8 @@ void main() {
 /// graph would normally reject — e.g. autoRecord disabled while
 /// obd2TripRecording is also absent).
 ///
-/// Mirrors the equivalent test doubles in
-/// `test/features/sync/providers/baseline_sync_enabled_provider_test.dart`
-/// and `test/core/refuel/unified_search_results_enabled_test.dart`.
+/// Mirrors the equivalent test double in
+/// `test/features/sync/providers/baseline_sync_enabled_provider_test.dart`.
 class _TestFeatureFlags extends FeatureFlags {
   _TestFeatureFlags([Set<Feature>? initial])
       : _initial = initial ?? <Feature>{};

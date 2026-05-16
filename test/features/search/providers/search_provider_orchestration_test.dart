@@ -15,10 +15,6 @@ import 'package:tankstellen/features/search/providers/search_provider_orchestrat
 /// (#563): pure error classifier, reverse-geocode wrapper, fuel/radius
 /// resolution, and the GPS auto-update side-effect dispatcher.
 ///
-/// `dispatchEvIfNeeded` is intentionally only covered for the non-electric
-/// short-circuit path — the electric path requires a fully wired EV provider
-/// stack and adds no orchestration coverage beyond the short-circuit branch.
-///
 /// The Ref-taking helpers are exercised by wrapping them in throwaway
 /// `Provider`s; reading the provider runs the helper with a real Ref.
 
@@ -409,56 +405,6 @@ void main() {
       await readAutoUpdate(c);
 
       expect(pos.updateCallCount, 1);
-    });
-  });
-
-  group('dispatchEvIfNeeded', () {
-    /// Reads a probe that runs [dispatchEvIfNeeded] for [fuelType] against
-    /// [container]. `eVSearchStateProvider` is intentionally NOT overridden
-    /// so any accidental read on the non-electric branch would explode.
-    Future<AsyncValue<ServiceResult<dynamic>>?> readDispatch(
-      ProviderContainer container, {
-      required FuelType fuelType,
-    }) {
-      final probe = FutureProvider<AsyncValue<ServiceResult<dynamic>>?>(
-        (ref) async => dispatchEvIfNeeded(
-          ref: ref,
-          fuelType: fuelType,
-          lat: 48.85,
-          lng: 2.35,
-          radiusKm: 5.0,
-        ),
-      );
-      return container.read(probe.future);
-    }
-
-    test(
-        'non-electric fuel returns null without touching '
-        'eVSearchStateProvider', () async {
-      final c = ProviderContainer();
-      addTearDown(c.dispose);
-
-      final result = await readDispatch(c, fuelType: FuelType.diesel);
-
-      expect(result, isNull);
-    });
-
-    test('non-electric fuel (e10) also returns null', () async {
-      final c = ProviderContainer();
-      addTearDown(c.dispose);
-
-      final result = await readDispatch(c, fuelType: FuelType.e10);
-
-      expect(result, isNull);
-    });
-
-    test('non-electric fuel (FuelType.all) also returns null', () async {
-      final c = ProviderContainer();
-      addTearDown(c.dispose);
-
-      final result = await readDispatch(c, fuelType: FuelType.all);
-
-      expect(result, isNull);
     });
   });
 }
