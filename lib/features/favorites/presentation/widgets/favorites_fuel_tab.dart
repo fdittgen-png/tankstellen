@@ -6,6 +6,8 @@ import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../ev/domain/entities/charging_station.dart';
+import '../../../search/domain/entities/station.dart';
 import '../../providers/ev_favorites_provider.dart';
 import '../../providers/favorites_provider.dart';
 import 'ev_favorite_card.dart';
@@ -13,6 +15,31 @@ import 'favorite_station_dismissible.dart';
 import 'favorites_loading_view.dart';
 import 'favorites_section_header.dart';
 import 'swipe_tutorial_banner.dart';
+
+/// One row of the favorites list — a section header, a fuel station, or
+/// an EV station. Flattening the two sections into a single typed list
+/// lets the list render lazily via `ListView.builder` (#1763) instead of
+/// constructing every favorite card up front.
+sealed class _FavRow {
+  const _FavRow();
+}
+
+class _HeaderRow extends _FavRow {
+  const _HeaderRow(this.icon, this.label, this.padding);
+  final IconData icon;
+  final String label;
+  final EdgeInsets padding;
+}
+
+class _FuelRow extends _FavRow {
+  const _FuelRow(this.station);
+  final Station station;
+}
+
+class _EvRow extends _FavRow {
+  const _EvRow(this.station);
+  final ChargingStation station;
+}
 
 /// Body of the "Favorites" tab inside `FavoritesScreen`. Renders both fuel
 /// and EV favorites in a single unified list. Uses the merged
@@ -57,6 +84,33 @@ class FavoritesFuelTab extends ConsumerWidget {
         if (result.data.isEmpty && !hasEvFavorites && hasFuelIds) {
           return const FavoritesLoadingView();
         }
+
+        // Flatten both sections into one typed list so `ListView.builder`
+        // can build rows lazily (#1763). Building the row descriptors is
+        // cheap — the station cards themselves are only constructed by
+        // `itemBuilder` for the rows actually on screen.
+        final rows = <_FavRow>[
+          // Fuel stations first (#692) — the app's primary use-case;
+          // EV is a secondary section below.
+          if (result.data.isNotEmpty) ...[
+            if (hasEvFavorites)
+              _HeaderRow(
+                Icons.local_gas_station,
+                l10n?.fuelStationsSection ?? 'Fuel Stations',
+                const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              ),
+            ...result.data.map(_FuelRow.new),
+          ],
+          if (hasEvFavorites) ...[
+            _HeaderRow(
+              Icons.ev_station,
+              l10n?.evChargingSection ?? 'EV Charging',
+              EdgeInsets.fromLTRB(16, result.data.isNotEmpty ? 12 : 8, 16, 4),
+            ),
+            ...evStations.map(_EvRow.new),
+          ],
+        ];
+
         return RefreshIndicator(
           onRefresh: () async {
             await ref.read(favoriteStationsProvider.notifier).loadAndRefresh();
@@ -67,51 +121,37 @@ class FavoritesFuelTab extends ConsumerWidget {
                 ServiceStatusBanner(result: result),
               const SwipeTutorialBanner(),
               Expanded(
-                child: ListView(
-                  children: [
-                    // Fuel stations first (#692) — they're the app's primary
-                    // use-case; EV is a secondary section below.
-                    if (result.data.isNotEmpty) ...[
-                      if (hasEvFavorites)
+                child: ListView.builder(
+                  itemCount: rows.length,
+                  itemBuilder: (context, index) {
+                    final row = rows[index];
+                    return switch (row) {
+                      _HeaderRow(:final icon, :final label, :final padding) =>
                         FavoritesSectionHeader(
-                          icon: Icons.local_gas_station,
-                          label: l10n?.fuelStationsSection ?? 'Fuel Stations',
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                          icon: icon,
+                          label: label,
+                          padding: padding,
                         ),
-                      ...result.data.map(
-                        (station) =>
-                            FavoriteStationDismissible(station: station),
-                      ),
-                    ],
-                    if (hasEvFavorites) ...[
-                      FavoritesSectionHeader(
-                        icon: Icons.ev_station,
-                        label: l10n?.evChargingSection ?? 'EV Charging',
-                        padding: EdgeInsets.fromLTRB(
-                          16,
-                          result.data.isNotEmpty ? 12 : 8,
-                          16,
-                          4,
+                      _FuelRow(:final station) =>
+                        FavoriteStationDismissible(station: station),
+                      _EvRow(:final station) => EvFavoriteCard(
+                          key: ValueKey('ev-${station.id}'),
+                          station: station,
+                          onTap: () =>
+                              context.push('/ev-station', extra: station),
+                          onFavoriteTap: () {
+                            ref
+                                .read(favoritesProvider.notifier)
+                                .remove(station.id);
+                            SnackBarHelper.show(
+                              context,
+                              l10n?.removedFromFavorites ??
+                                  'Removed from favorites',
+                            );
+                          },
                         ),
-                      ),
-                      ...evStations.map((ev) => EvFavoriteCard(
-                            key: ValueKey('ev-${ev.id}'),
-                            station: ev,
-                            onTap: () =>
-                                context.push('/ev-station', extra: ev),
-                            onFavoriteTap: () {
-                              ref
-                                  .read(favoritesProvider.notifier)
-                                  .remove(ev.id);
-                              SnackBarHelper.show(
-                                context,
-                                l10n?.removedFromFavorites ??
-                                    'Removed from favorites',
-                              );
-                            },
-                          )),
-                    ],
-                  ],
+                    };
+                  },
                 ),
               ),
             ],
