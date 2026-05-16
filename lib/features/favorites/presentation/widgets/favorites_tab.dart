@@ -45,8 +45,8 @@ class _EvRow extends _FavRow {
 /// and EV favorites in a single unified list. Uses the merged
 /// [favoritesProvider] for IDs and loads data from [favoriteStationsProvider]
 /// (fuel) and [evFavoriteStationsProvider] (EV).
-class FavoritesFuelTab extends ConsumerWidget {
-  const FavoritesFuelTab({super.key});
+class FavoritesTab extends ConsumerWidget {
+  const FavoritesTab({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

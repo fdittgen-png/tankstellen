@@ -10,7 +10,7 @@ import '../../../../core/widgets/tab_switcher.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/favorites_provider.dart';
 import '../widgets/alerts_tab.dart';
-import '../widgets/favorites_fuel_tab.dart';
+import '../widgets/favorites_tab.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});
@@ -123,7 +123,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
               children: [
                 RepaintBoundary(
                   key: _shareBoundaryKey,
-                  child: const FavoritesFuelTab(),
+                  child: const FavoritesTab(),
                 ),
                 const AlertsTab(),
               ],
