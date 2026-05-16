@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/services/service_providers.dart';
@@ -10,31 +10,44 @@ import '../data/home_widget_service.dart';
 
 part 'nearest_widget_refresh_provider.g.dart';
 
-/// Foreground heartbeat that rebuilds the nearest home-screen widget every
-/// [kNearestWidgetForegroundInterval].
+/// Foreground heartbeat that rebuilds the home-screen widget — both the
+/// favorites and the nearest variants — every
+/// [kNearestWidgetForegroundInterval], once immediately on app open,
+/// and again whenever the app returns to the foreground (#1803).
 ///
 /// WorkManager enforces a 15-minute floor on periodic tasks, so background
 /// refresh alone can't meet the #609 target of "widget feels fresh". This
 /// provider adds a foreground 2-minute tick that kicks the builder while
-/// the app is running. When the app is backgrounded, the provider is
-/// disposed by the framework; the background task takes over.
+/// the app is running.
+///
+/// #1803 — the resume hook is what makes the widget's refresh button
+/// work: that button opens the app (#1801), and the app reaching the
+/// foreground triggers a tick that rebuilds both widget variants.
 ///
 /// Reading the provider once (e.g. from the app's root widget) starts
-/// the tick; the provider owns its own Timer and releases it in onDispose.
+/// the tick; the provider owns its Timer + [AppLifecycleListener] and
+/// releases both in onDispose.
 @Riverpod(keepAlive: true)
 class NearestWidgetRefresh extends _$NearestWidgetRefresh {
   Timer? _timer;
+  AppLifecycleListener? _lifecycle;
 
   @override
   void build() {
     ref.onDispose(() {
       _timer?.cancel();
       _timer = null;
+      _lifecycle?.dispose();
+      _lifecycle = null;
     });
     _timer ??= Timer.periodic(
       kNearestWidgetForegroundInterval,
       (_) => _tick(),
     );
+    // #1803 — refresh again whenever the app returns to the foreground,
+    // so the widget's refresh button (which opens the app, #1801) and
+    // any ordinary resume leave the widget up to date.
+    _lifecycle ??= AppLifecycleListener(onResume: () => unawaited(_tick()));
     // Fire one immediate refresh so the widget reflects the current
     // session as soon as the user opens the app (don't wait two minutes).
     unawaited(_tick());
@@ -44,6 +57,18 @@ class NearestWidgetRefresh extends _$NearestWidgetRefresh {
     try {
       final storage = ref.read(storageRepositoryProvider);
       final stationService = ref.read(stationServiceProvider);
+      // #1803 — refresh the favorites variant too. It's a cheap local
+      // read (favorite ids + their stored prices, no network), so
+      // running it on every tick keeps the favorites widget from going
+      // stale between favorites edits.
+      await HomeWidgetService.updateWidget(
+        storage,
+        profileStorage: storage,
+        settingsStorage: storage,
+        pricePredictor: (stationId, fuelType) => ref.read(
+          pricePredictionProvider(stationId, fuelType),
+        ),
+      );
       await HomeWidgetService.updateNearestWidget(
         storage,
         storage,

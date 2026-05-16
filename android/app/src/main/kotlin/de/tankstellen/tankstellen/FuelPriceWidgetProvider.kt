@@ -2,7 +2,6 @@ package de.tankstellen.tankstellen
 
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 
@@ -26,38 +25,28 @@ class FuelPriceWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        when (intent.action) {
-            StationWidgetRenderer.ACTION_TOGGLE_MODE -> {
-                val id = intent.getIntExtra(
-                    StationWidgetRenderer.EXTRA_APP_WIDGET_ID,
-                    AppWidgetManager.INVALID_APPWIDGET_ID,
+        // #1801 — the refresh icon is now an Activity PendingIntent
+        // (see StationWidgetRenderer), not a broadcast: a
+        // BroadcastReceiver cannot reliably `startActivity` on
+        // Android 10+, so the old ACTION_REFRESH broadcast silently
+        // no-op'd. Only the mode toggle stays a broadcast — it merely
+        // re-renders, which is allowed from onReceive.
+        if (intent.action == StationWidgetRenderer.ACTION_TOGGLE_MODE) {
+            val id = intent.getIntExtra(
+                StationWidgetRenderer.EXTRA_APP_WIDGET_ID,
+                AppWidgetManager.INVALID_APPWIDGET_ID,
+            )
+            if (id != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                StationWidgetRenderer.toggleMode(
+                    context,
+                    id,
+                    StationWidgetRenderer.MODE_FAVORITES,
                 )
-                if (id != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                    StationWidgetRenderer.toggleMode(
-                        context,
-                        id,
-                        StationWidgetRenderer.MODE_FAVORITES,
-                    )
-                    renderAndCommit(
-                        context,
-                        AppWidgetManager.getInstance(context),
-                        id,
-                    )
-                }
-            }
-            StationWidgetRenderer.ACTION_REFRESH -> {
-                val mgr = AppWidgetManager.getInstance(context)
-                val ids = mgr.getAppWidgetIds(
-                    ComponentName(context, FuelPriceWidgetProvider::class.java),
+                renderAndCommit(
+                    context,
+                    AppWidgetManager.getInstance(context),
+                    id,
                 )
-                for (id in ids) renderAndCommit(context, mgr, id)
-                // Open the app so its Riverpod stack can pull fresh prices.
-                val launchIntent =
-                    context.packageManager.getLaunchIntentForPackage(context.packageName)
-                if (launchIntent != null) {
-                    launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    context.startActivity(launchIntent)
-                }
             }
         }
     }

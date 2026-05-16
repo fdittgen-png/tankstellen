@@ -8,45 +8,63 @@ part of 'nearest_widget_refresh_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Foreground heartbeat that rebuilds the nearest home-screen widget every
-/// [kNearestWidgetForegroundInterval].
+/// Foreground heartbeat that rebuilds the home-screen widget — both the
+/// favorites and the nearest variants — every
+/// [kNearestWidgetForegroundInterval], once immediately on app open,
+/// and again whenever the app returns to the foreground (#1803).
 ///
 /// WorkManager enforces a 15-minute floor on periodic tasks, so background
 /// refresh alone can't meet the #609 target of "widget feels fresh". This
 /// provider adds a foreground 2-minute tick that kicks the builder while
-/// the app is running. When the app is backgrounded, the provider is
-/// disposed by the framework; the background task takes over.
+/// the app is running.
+///
+/// #1803 — the resume hook is what makes the widget's refresh button
+/// work: that button opens the app (#1801), and the app reaching the
+/// foreground triggers a tick that rebuilds both widget variants.
 ///
 /// Reading the provider once (e.g. from the app's root widget) starts
-/// the tick; the provider owns its own Timer and releases it in onDispose.
+/// the tick; the provider owns its Timer + [AppLifecycleListener] and
+/// releases both in onDispose.
 
 @ProviderFor(NearestWidgetRefresh)
 final nearestWidgetRefreshProvider = NearestWidgetRefreshProvider._();
 
-/// Foreground heartbeat that rebuilds the nearest home-screen widget every
-/// [kNearestWidgetForegroundInterval].
+/// Foreground heartbeat that rebuilds the home-screen widget — both the
+/// favorites and the nearest variants — every
+/// [kNearestWidgetForegroundInterval], once immediately on app open,
+/// and again whenever the app returns to the foreground (#1803).
 ///
 /// WorkManager enforces a 15-minute floor on periodic tasks, so background
 /// refresh alone can't meet the #609 target of "widget feels fresh". This
 /// provider adds a foreground 2-minute tick that kicks the builder while
-/// the app is running. When the app is backgrounded, the provider is
-/// disposed by the framework; the background task takes over.
+/// the app is running.
+///
+/// #1803 — the resume hook is what makes the widget's refresh button
+/// work: that button opens the app (#1801), and the app reaching the
+/// foreground triggers a tick that rebuilds both widget variants.
 ///
 /// Reading the provider once (e.g. from the app's root widget) starts
-/// the tick; the provider owns its own Timer and releases it in onDispose.
+/// the tick; the provider owns its Timer + [AppLifecycleListener] and
+/// releases both in onDispose.
 final class NearestWidgetRefreshProvider
     extends $NotifierProvider<NearestWidgetRefresh, void> {
-  /// Foreground heartbeat that rebuilds the nearest home-screen widget every
-  /// [kNearestWidgetForegroundInterval].
+  /// Foreground heartbeat that rebuilds the home-screen widget — both the
+  /// favorites and the nearest variants — every
+  /// [kNearestWidgetForegroundInterval], once immediately on app open,
+  /// and again whenever the app returns to the foreground (#1803).
   ///
   /// WorkManager enforces a 15-minute floor on periodic tasks, so background
   /// refresh alone can't meet the #609 target of "widget feels fresh". This
   /// provider adds a foreground 2-minute tick that kicks the builder while
-  /// the app is running. When the app is backgrounded, the provider is
-  /// disposed by the framework; the background task takes over.
+  /// the app is running.
+  ///
+  /// #1803 — the resume hook is what makes the widget's refresh button
+  /// work: that button opens the app (#1801), and the app reaching the
+  /// foreground triggers a tick that rebuilds both widget variants.
   ///
   /// Reading the provider once (e.g. from the app's root widget) starts
-  /// the tick; the provider owns its own Timer and releases it in onDispose.
+  /// the tick; the provider owns its Timer + [AppLifecycleListener] and
+  /// releases both in onDispose.
   NearestWidgetRefreshProvider._()
     : super(
         from: null,
@@ -75,19 +93,25 @@ final class NearestWidgetRefreshProvider
 }
 
 String _$nearestWidgetRefreshHash() =>
-    r'a6630c70cbbb2f0bbed3a1b9ca87ceb64d13723c';
+    r'8aa9324db9553fcdc28a75963a247ff1654a6851';
 
-/// Foreground heartbeat that rebuilds the nearest home-screen widget every
-/// [kNearestWidgetForegroundInterval].
+/// Foreground heartbeat that rebuilds the home-screen widget — both the
+/// favorites and the nearest variants — every
+/// [kNearestWidgetForegroundInterval], once immediately on app open,
+/// and again whenever the app returns to the foreground (#1803).
 ///
 /// WorkManager enforces a 15-minute floor on periodic tasks, so background
 /// refresh alone can't meet the #609 target of "widget feels fresh". This
 /// provider adds a foreground 2-minute tick that kicks the builder while
-/// the app is running. When the app is backgrounded, the provider is
-/// disposed by the framework; the background task takes over.
+/// the app is running.
+///
+/// #1803 — the resume hook is what makes the widget's refresh button
+/// work: that button opens the app (#1801), and the app reaching the
+/// foreground triggers a tick that rebuilds both widget variants.
 ///
 /// Reading the provider once (e.g. from the app's root widget) starts
-/// the tick; the provider owns its own Timer and releases it in onDispose.
+/// the tick; the provider owns its Timer + [AppLifecycleListener] and
+/// releases both in onDispose.
 
 abstract class _$NearestWidgetRefresh extends $Notifier<void> {
   void build();
