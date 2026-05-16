@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/domain/entities/station_amenity.dart';
+import 'package:tankstellen/features/search/domain/search_result_filters.dart';
 import 'package:tankstellen/features/search/presentation/widgets/brand_filter_chips.dart';
 
 import '../../../../helpers/pump_app.dart';

@@ -224,3 +224,162 @@ final class FuelStationsProvider
 }
 
 String _$fuelStationsHash() => r'5238084b6dd78061bafabf616c603bcf7b03077b';
+
+/// The [raw] search results after the ignored / brand / amenity / open
+/// filters and the active sort — memoised (#1762).
+///
+/// The pipeline previously ran inline in `SearchResultsList.build()` and
+/// re-executed on every rebuild. Keyed on the raw result set ([raw]) and
+/// watching the filter / sort providers, it recomputes only when the
+/// result set or a filter / sort input actually changes; an unrelated
+/// rebuild that passes the same `raw` list reads the cached list for
+/// free.
+///
+/// Fuel-specific filters apply only to fuel items; EV items pass through
+/// the filters untouched and are appended after the filtered fuel items
+/// (preserving the legacy fuel-first ordering before the sort).
+
+@ProviderFor(filteredSortedSearchResults)
+final filteredSortedSearchResultsProvider =
+    FilteredSortedSearchResultsFamily._();
+
+/// The [raw] search results after the ignored / brand / amenity / open
+/// filters and the active sort — memoised (#1762).
+///
+/// The pipeline previously ran inline in `SearchResultsList.build()` and
+/// re-executed on every rebuild. Keyed on the raw result set ([raw]) and
+/// watching the filter / sort providers, it recomputes only when the
+/// result set or a filter / sort input actually changes; an unrelated
+/// rebuild that passes the same `raw` list reads the cached list for
+/// free.
+///
+/// Fuel-specific filters apply only to fuel items; EV items pass through
+/// the filters untouched and are appended after the filtered fuel items
+/// (preserving the legacy fuel-first ordering before the sort).
+
+final class FilteredSortedSearchResultsProvider
+    extends
+        $FunctionalProvider<
+          List<SearchResultItem>,
+          List<SearchResultItem>,
+          List<SearchResultItem>
+        >
+    with $Provider<List<SearchResultItem>> {
+  /// The [raw] search results after the ignored / brand / amenity / open
+  /// filters and the active sort — memoised (#1762).
+  ///
+  /// The pipeline previously ran inline in `SearchResultsList.build()` and
+  /// re-executed on every rebuild. Keyed on the raw result set ([raw]) and
+  /// watching the filter / sort providers, it recomputes only when the
+  /// result set or a filter / sort input actually changes; an unrelated
+  /// rebuild that passes the same `raw` list reads the cached list for
+  /// free.
+  ///
+  /// Fuel-specific filters apply only to fuel items; EV items pass through
+  /// the filters untouched and are appended after the filtered fuel items
+  /// (preserving the legacy fuel-first ordering before the sort).
+  FilteredSortedSearchResultsProvider._({
+    required FilteredSortedSearchResultsFamily super.from,
+    required List<SearchResultItem> super.argument,
+  }) : super(
+         retry: null,
+         name: r'filteredSortedSearchResultsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$filteredSortedSearchResultsHash();
+
+  @override
+  String toString() {
+    return r'filteredSortedSearchResultsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<List<SearchResultItem>> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  List<SearchResultItem> create(Ref ref) {
+    final argument = this.argument as List<SearchResultItem>;
+    return filteredSortedSearchResults(ref, argument);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<SearchResultItem> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<SearchResultItem>>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FilteredSortedSearchResultsProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$filteredSortedSearchResultsHash() =>
+    r'276f6a2813fbd035a3bd486b3532695dc06d52bd';
+
+/// The [raw] search results after the ignored / brand / amenity / open
+/// filters and the active sort — memoised (#1762).
+///
+/// The pipeline previously ran inline in `SearchResultsList.build()` and
+/// re-executed on every rebuild. Keyed on the raw result set ([raw]) and
+/// watching the filter / sort providers, it recomputes only when the
+/// result set or a filter / sort input actually changes; an unrelated
+/// rebuild that passes the same `raw` list reads the cached list for
+/// free.
+///
+/// Fuel-specific filters apply only to fuel items; EV items pass through
+/// the filters untouched and are appended after the filtered fuel items
+/// (preserving the legacy fuel-first ordering before the sort).
+
+final class FilteredSortedSearchResultsFamily extends $Family
+    with
+        $FunctionalFamilyOverride<
+          List<SearchResultItem>,
+          List<SearchResultItem>
+        > {
+  FilteredSortedSearchResultsFamily._()
+    : super(
+        retry: null,
+        name: r'filteredSortedSearchResultsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// The [raw] search results after the ignored / brand / amenity / open
+  /// filters and the active sort — memoised (#1762).
+  ///
+  /// The pipeline previously ran inline in `SearchResultsList.build()` and
+  /// re-executed on every rebuild. Keyed on the raw result set ([raw]) and
+  /// watching the filter / sort providers, it recomputes only when the
+  /// result set or a filter / sort input actually changes; an unrelated
+  /// rebuild that passes the same `raw` list reads the cached list for
+  /// free.
+  ///
+  /// Fuel-specific filters apply only to fuel items; EV items pass through
+  /// the filters untouched and are appended after the filtered fuel items
+  /// (preserving the legacy fuel-first ordering before the sort).
+
+  FilteredSortedSearchResultsProvider call(List<SearchResultItem> raw) =>
+      FilteredSortedSearchResultsProvider._(argument: raw, from: this);
+
+  @override
+  String toString() => r'filteredSortedSearchResultsProvider';
+}
