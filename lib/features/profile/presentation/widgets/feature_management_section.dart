@@ -41,6 +41,13 @@ class FeatureManagementSection extends ConsumerWidget {
     final manifest = ref.watch(featureManifestProvider);
     final enabled = ref.watch(enabledFeaturesProvider);
 
+    // #1675 — a feature not available in the current build channel
+    // (e.g. a beta-only feature in a production build) never renders in
+    // the feature-management list.
+    final channel = ref.watch(buildChannelProvider);
+    bool availableInChannel(Feature f) =>
+        manifest.entries[f]?.isAvailableIn(channel) ?? false;
+
     // Build groups in manifest declaration order (#1440). A feature with
     // no `requires` (or whose `requires` does not reference an already-
     // seen parent) becomes a new group; otherwise it is appended to the
@@ -73,7 +80,7 @@ class FeatureManagementSection extends ConsumerWidget {
       // trip recording, so it belongs to the Trajets tier just like
       // glideCoach / gpsTripPath.
       Feature.experimentalOemPids,
-    ];
+    ].where(availableInChannel).toList();
 
     // Filter the regular group rendering: drop the Conso "parent" flags
     // (replaced by the segmented control) AND drop the Conso dependents
@@ -81,13 +88,15 @@ class FeatureManagementSection extends ConsumerWidget {
     // priceAlerts, …) flow through unchanged.
     final filteredGroups = <_FeatureGroup>[
       for (final group in groups)
-        if (!consoModeFlags.contains(group.parent))
+        if (!consoModeFlags.contains(group.parent) &&
+            availableInChannel(group.parent))
           _FeatureGroup(
             parent: group.parent,
             children: [
               for (final c in group.children)
                 if (!consoDependents.contains(c) &&
-                    !consoModeFlags.contains(c))
+                    !consoModeFlags.contains(c) &&
+                    availableInChannel(c))
                   c,
             ],
           ),

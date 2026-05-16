@@ -4,7 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
+import 'package:tankstellen/features/feature_management/domain/build_channel.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
+import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 import 'package:tankstellen/features/profile/presentation/screens/profile_screen.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/feature_management_section.dart';
 
@@ -20,6 +22,23 @@ import '../../../../mocks/mocks.dart';
 /// dependent switches become disabled-with-tooltip via
 /// `isEffectivelyEnabled`, with their stored state preserved so
 /// re-enabling the parent restores the prior surface.
+/// A copy of the default manifest with [f] flipped to a beta-only
+/// feature — available and default-on in beta, absent in production.
+FeatureManifest _manifestWithBetaOnly(Feature f) {
+  final entries = Map<Feature, FeatureManifestEntry>.from(
+      FeatureManifest.defaultManifest.entries);
+  final orig = entries[f]!;
+  entries[f] = FeatureManifestEntry(
+    feature: f,
+    availableChannels: const {BuildChannel.beta},
+    defaultEnabledChannels: const {BuildChannel.beta},
+    displayName: orig.displayName,
+    description: orig.description,
+    requires: orig.requires,
+  );
+  return FeatureManifest(entries);
+}
+
 void main() {
   group('ProfileScreen — Feature management section (#1373 phase 2)', () {
     late MockHiveStorage mockStorage;
@@ -300,6 +319,42 @@ void main() {
       expect(tooltip.message!, contains('OBD2 trip recording'),
           reason: 'tooltip must point the user at the parent they need '
               'to flip back on to make the child reachable.');
+    });
+
+    testWidgets(
+        '#1675 — a beta-only feature is hidden from the list in a '
+        'production build', (tester) async {
+      await pumpApp(tester, const ProfileScreen(), overrides: [
+        ...baseOverrides,
+        featureManifestProvider
+            .overrideWithValue(_manifestWithBetaOnly(Feature.fuelCalculator)),
+        buildChannelProvider.overrideWithValue(BuildChannel.production),
+      ]);
+      await openSection(tester);
+
+      expect(find.byKey(const Key('featureToggle_fuelCalculator')),
+          findsNothing,
+          reason: 'a beta-only feature must not render in a production '
+              'build');
+      // A channel-available feature still renders.
+      expect(find.byKey(const Key('featureToggle_priceAlerts')),
+          findsOneWidget);
+    });
+
+    testWidgets(
+        '#1675 — the same feature is visible in a beta build',
+        (tester) async {
+      await pumpApp(tester, const ProfileScreen(), overrides: [
+        ...baseOverrides,
+        featureManifestProvider
+            .overrideWithValue(_manifestWithBetaOnly(Feature.fuelCalculator)),
+        buildChannelProvider.overrideWithValue(BuildChannel.beta),
+      ]);
+      await openSection(tester);
+
+      expect(find.byKey(const Key('featureToggle_fuelCalculator')),
+          findsOneWidget,
+          reason: 'a beta-only feature must render in a beta build');
     });
   });
 }
