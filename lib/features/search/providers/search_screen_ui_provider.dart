@@ -1,4 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../core/storage/storage_keys.dart';
+import '../../../core/storage/storage_providers.dart';
 import '../../profile/data/models/user_profile.dart';
 import '../../profile/providers/profile_provider.dart';
 import '../../route_search/domain/route_search_strategy.dart';
@@ -78,7 +80,20 @@ class AllPricesViewEnabled extends _$AllPricesViewEnabled {
 @Riverpod(keepAlive: true)
 class OpenOnlyFilter extends _$OpenOnlyFilter {
   @override
-  bool build() => false;
+  bool build() {
+    // #1792 — restore the saved "Save as default values" choice. The
+    // read is defensive: a criteria filter must never crash the search
+    // screen if storage is briefly unavailable (before init / in tests)
+    // — it degrades to the unfiltered default instead.
+    try {
+      final raw = ref
+          .watch(storageRepositoryProvider)
+          .getSetting(StorageKeys.defaultOpenOnly);
+      return raw as bool? ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
 
   void set(bool value) => state = value;
 
@@ -90,7 +105,25 @@ class OpenOnlyFilter extends _$OpenOnlyFilter {
 @Riverpod(keepAlive: true)
 class SelectedAmenities extends _$SelectedAmenities {
   @override
-  Set<StationAmenity> build() => const <StationAmenity>{};
+  Set<StationAmenity> build() {
+    // #1792 — restore the saved default amenity set (stored as enum
+    // names); unknown names from a downgrade are skipped. Defensive:
+    // degrades to no amenity filter if storage is unavailable.
+    try {
+      final raw = ref
+          .watch(storageRepositoryProvider)
+          .getSetting(StorageKeys.defaultAmenities);
+      if (raw is! List) return const <StationAmenity>{};
+      final byName = StationAmenity.values.asNameMap();
+      return raw
+          .whereType<String>()
+          .map((n) => byName[n])
+          .whereType<StationAmenity>()
+          .toSet();
+    } catch (_) {
+      return const <StationAmenity>{};
+    }
+  }
 
   void toggle(StationAmenity amenity) {
     final next = Set<StationAmenity>.from(state);

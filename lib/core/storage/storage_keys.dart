@@ -121,4 +121,15 @@ class StorageKeys {
   /// pick.
   static const String vehicleCatalogReresolveSuggestedPrefix =
       'vehicle_catalog_reresolve_suggested_';
+
+  /// #1792 — device-local "Save as default values" for the search
+  /// criteria that have no `UserProfile` field of their own. Fuel type
+  /// and radius live on the profile; open-only, the amenity set and the
+  /// brand filter persist here so the whole default set round-trips
+  /// when the Search-criteria screen reopens, not just the profile
+  /// subset.
+  static const String defaultOpenOnly = 'default_open_only';
+  static const String defaultAmenities = 'default_amenities';
+  static const String defaultBrands = 'default_brands';
+  static const String defaultExcludeHighway = 'default_exclude_highway';
 }

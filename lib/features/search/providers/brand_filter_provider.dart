@@ -1,5 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/storage/storage_keys.dart';
+import '../../../core/storage/storage_providers.dart';
+
 part 'brand_filter_provider.g.dart';
 
 /// Manages the set of selected brand names for filtering search results.
@@ -11,7 +14,19 @@ part 'brand_filter_provider.g.dart';
 @Riverpod(keepAlive: true)
 class SelectedBrands extends _$SelectedBrands {
   @override
-  Set<String> build() => const {};
+  Set<String> build() {
+    // #1792 — restore the saved default brand selection. Defensive:
+    // degrades to "show all brands" if storage is unavailable.
+    try {
+      final raw = ref
+          .watch(storageRepositoryProvider)
+          .getSetting(StorageKeys.defaultBrands);
+      if (raw is! List) return const {};
+      return raw.whereType<String>().toSet();
+    } catch (_) {
+      return const {};
+    }
+  }
 
   /// Toggle a brand on/off. If toggling off the last brand, reset to show all.
   void toggle(String brand) {
@@ -37,7 +52,18 @@ class SelectedBrands extends _$SelectedBrands {
 @Riverpod(keepAlive: true)
 class ExcludeHighwayStations extends _$ExcludeHighwayStations {
   @override
-  bool build() => false;
+  bool build() {
+    // #1792 — restore the saved "No highway" default. Defensive:
+    // degrades to "include highway stations" if storage is unavailable.
+    try {
+      final raw = ref
+          .watch(storageRepositoryProvider)
+          .getSetting(StorageKeys.defaultExcludeHighway);
+      return raw as bool? ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
 
   void toggle() => state = !state;
 
