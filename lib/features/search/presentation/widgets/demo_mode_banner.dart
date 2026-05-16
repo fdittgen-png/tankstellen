@@ -35,7 +35,12 @@ class DemoModeBanner extends ConsumerWidget {
     if (!country.requiresApiKey) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+        // #1698 \u2014 let the country / provider label wrap instead of
+        // ellipsis-clipping the provider name under large text scaling.
+        // `start` cross-alignment keeps the flag pinned to the first
+        // line when the label spills onto a second.
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(country.flag, style: const TextStyle(fontSize: 14)),
             const SizedBox(width: 6),
@@ -43,7 +48,6 @@ class DemoModeBanner extends ConsumerWidget {
               child: Text(
                 '${country.name} \u2014 ${country.apiProvider}',
                 style: Theme.of(context).textTheme.labelSmall,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

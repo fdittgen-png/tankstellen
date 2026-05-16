@@ -11,31 +11,49 @@ class CompletionStep extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const ShieldIllustration(size: 160),
-          const SizedBox(height: 24),
-          Text(
-            l10n?.onboardingComplete ?? 'All set!',
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
+    // #1698 — the wizard's PageView is NeverScrollable, so this step
+    // owns its scrolling. The illustration + two texts are centred when
+    // they fit and scroll when large text scaling pushes them past the
+    // viewport: `ConstrainedBox(minHeight)` keeps the centred look in
+    // the common case, the SingleChildScrollView absorbs the overflow.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 32,
+                vertical: 16,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const ShieldIllustration(size: 160),
+                  const SizedBox(height: 24),
+                  Text(
+                    l10n?.onboardingComplete ?? 'All set!',
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n?.onboardingCompleteHint ??
+                        'You can change these settings anytime in your '
+                            'profile.',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
-            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 12),
-          Text(
-            l10n?.onboardingCompleteHint ??
-                'You can change these settings anytime in your profile.',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

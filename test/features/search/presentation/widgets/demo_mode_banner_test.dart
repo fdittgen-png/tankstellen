@@ -55,6 +55,43 @@ void main() {
     );
 
     testWidgets(
+      'country info bar wraps instead of clipping under large text (#1698)',
+      (tester) async {
+        // Narrow viewport + 3x text scaling — the old single-line
+        // ellipsis Row clipped the provider name; it must now wrap.
+        tester.view.physicalSize = const Size(300, 600);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final storage = mockHiveStorageOverride();
+
+        await pumpApp(
+          tester,
+          Builder(
+            builder: (context) => MediaQuery(
+              data: MediaQuery.of(context)
+                  .copyWith(textScaler: const TextScaler.linear(3.0)),
+              child: const DemoModeBanner(country: Countries.france),
+            ),
+          ),
+          overrides: [
+            storage.override,
+            activeCountryOverride(Countries.france),
+          ],
+        );
+
+        // The label is still present (not clipped away) and no longer
+        // ellipsis-truncates — it wraps freely instead.
+        final labelFinder = find.textContaining('Prix-Carburants');
+        expect(labelFinder, findsOneWidget);
+        final label = tester.widget<Text>(labelFinder);
+        expect(label.overflow, isNot(TextOverflow.ellipsis));
+        expect(label.maxLines, isNull);
+      },
+    );
+
+    testWidgets(
       'shows nothing when country requires API key and key is configured',
       (tester) async {
         final storage = mockHiveStorageOverride();

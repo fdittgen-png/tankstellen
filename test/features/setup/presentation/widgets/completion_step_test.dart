@@ -28,5 +28,33 @@ void main() {
 
       expect(find.text('Alles bereit!'), findsOneWidget);
     });
+
+    testWidgets('content stays scrollable under large text scaling (#1698)',
+        (tester) async {
+      // A short viewport + 3x text scaling: the shield + headline +
+      // body no longer fit. Before #1698 the centred Column overflowed
+      // (a RenderFlex error fails the test); now the step scrolls.
+      tester.view.physicalSize = const Size(400, 480);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await pumpApp(
+        tester,
+        Builder(
+          builder: (context) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: const TextScaler.linear(3.0)),
+            child: const CompletionStep(),
+          ),
+        ),
+      );
+
+      // No overflow was thrown, and the step is genuinely scrollable —
+      // the headline is reachable by scrolling.
+      expect(find.byType(SingleChildScrollView), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('All set!'), 120);
+      expect(find.text('All set!'), findsOneWidget);
+    });
   });
 }
