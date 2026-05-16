@@ -169,37 +169,44 @@ class SearchResultsList extends ConsumerWidget {
                   return StaggeredFadeIn(
                     key: ValueKey('stagger-${item.id}'),
                     index: index,
-                    // #1771 — the favorite and rating providers are
-                    // watched inside this per-row Consumer, not in the
-                    // parent build. A favorite toggle or rating change
-                    // on one station now rebuilds only that row —
-                    // previously it rebuilt the whole list and re-ran
-                    // the filter/sort pipeline in the parent build.
-                    child: Consumer(
-                      builder: (context, ref, _) {
-                        final isFav =
-                            ref.watch(isFavoriteProvider(item.id));
-                        return switch (item) {
-                          FuelStationResult(:final station) =>
-                            _buildFuelCard(
-                              context: context,
-                              ref: ref,
-                              station: station,
-                              isFavorite: isFav,
-                              allPrices: allPrices,
-                              cheapestMap: cheapestMap,
-                              fuelType: fuelType,
-                              priceRange: priceRange,
-                              profileFuel: profileFuel,
-                            ),
-                          EVStationResult() => EVStationCard(
-                              key: ValueKey('ev-${item.id}'),
-                              result: item,
-                              onTap: () => context.push('/ev-station',
-                                  extra: item.station),
-                            ),
-                        };
-                      },
+                    // #1772 — a RepaintBoundary isolates the card's
+                    // raster from the StaggeredFadeIn opacity tween, so
+                    // the per-row fade-in (and any in-card animation)
+                    // composites a cached layer instead of repainting
+                    // the card on every frame.
+                    child: RepaintBoundary(
+                      // #1771 — the favorite and rating providers are
+                      // watched inside this per-row Consumer, not in
+                      // the parent build. A favorite toggle or rating
+                      // change on one station now rebuilds only that
+                      // row — previously it rebuilt the whole list and
+                      // re-ran the filter/sort pipeline in the parent.
+                      child: Consumer(
+                        builder: (context, ref, _) {
+                          final isFav =
+                              ref.watch(isFavoriteProvider(item.id));
+                          return switch (item) {
+                            FuelStationResult(:final station) =>
+                              _buildFuelCard(
+                                context: context,
+                                ref: ref,
+                                station: station,
+                                isFavorite: isFav,
+                                allPrices: allPrices,
+                                cheapestMap: cheapestMap,
+                                fuelType: fuelType,
+                                priceRange: priceRange,
+                                profileFuel: profileFuel,
+                              ),
+                            EVStationResult() => EVStationCard(
+                                key: ValueKey('ev-${item.id}'),
+                                result: item,
+                                onTap: () => context.push('/ev-station',
+                                    extra: item.station),
+                              ),
+                          };
+                        },
+                      ),
                     ),
                   );
                 },

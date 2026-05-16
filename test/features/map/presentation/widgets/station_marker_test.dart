@@ -64,7 +64,10 @@ void main() {
         SizedBox(
           width: marker.width,
           height: marker.height,
-          child: ((marker.child as Semantics).child as GestureDetector).child,
+          // #1772 — the marker child is wrapped in a RepaintBoundary.
+          child: (((marker.child as RepaintBoundary).child as Semantics)
+                  .child as GestureDetector)
+              .child,
         ),
       );
 
@@ -100,7 +103,10 @@ void main() {
         SizedBox(
           width: marker.width,
           height: marker.height,
-          child: ((marker.child as Semantics).child as GestureDetector).child,
+          // #1772 — the marker child is wrapped in a RepaintBoundary.
+          child: (((marker.child as RepaintBoundary).child as Semantics)
+                  .child as GestureDetector)
+              .child,
         ),
       );
 
@@ -121,7 +127,10 @@ void main() {
         SizedBox(
           width: marker.width,
           height: marker.height,
-          child: ((marker.child as Semantics).child as GestureDetector).child,
+          // #1772 — the marker child is wrapped in a RepaintBoundary.
+          child: (((marker.child as RepaintBoundary).child as Semantics)
+                  .child as GestureDetector)
+              .child,
         ),
       );
 
@@ -143,7 +152,10 @@ void main() {
         SizedBox(
           width: marker.width,
           height: marker.height,
-          child: ((marker.child as Semantics).child as GestureDetector).child,
+          // #1772 — the marker child is wrapped in a RepaintBoundary.
+          child: (((marker.child as RepaintBoundary).child as Semantics)
+                  .child as GestureDetector)
+              .child,
         ),
       );
 
