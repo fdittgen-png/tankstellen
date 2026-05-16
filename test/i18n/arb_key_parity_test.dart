@@ -116,6 +116,10 @@ String _localeFromPath(String p) {
 /// to fail, forcing an explicit decision on new locales.
 const Map<String, int> _baseline = {
   'en': 800,
+  // Pseudo-locale for text-expansion testing (#1699) — generated from
+  // app_en.arb by tool/gen_pseudo_arb.dart, so it always carries the
+  // full template key set. Never shipped in the language picker.
+  'en_XA': 1528,
   'de': 800,
   'fr': 693,
   'bg': 300,
