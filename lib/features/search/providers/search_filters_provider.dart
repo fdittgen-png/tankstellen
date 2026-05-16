@@ -10,6 +10,7 @@ import '../domain/search_result_filters.dart';
 import '../presentation/widgets/sort_selector.dart';
 import 'brand_filter_provider.dart';
 import 'ignored_stations_provider.dart';
+import 'mixed_results_filter_provider.dart';
 import 'search_provider.dart';
 import 'search_screen_ui_provider.dart';
 import 'station_rating_provider.dart';
@@ -84,9 +85,11 @@ List<Station> fuelStations(Ref ref) {
 /// rebuild that passes the same `raw` list reads the cached list for
 /// free.
 ///
-/// Fuel-specific filters apply only to fuel items; EV items pass through
-/// the filters untouched and are appended after the filtered fuel items
-/// (preserving the legacy fuel-first ordering before the sort).
+/// Per-kind filters never cross kinds (#1784): the brand / amenity /
+/// open filters apply only to fuel rows; the EV connector / min-power
+/// filters apply only to EV rows. The `ResultKind` filter then drops a
+/// whole kind when the user narrows to Fuel-only or EV-only. Fuel rows
+/// lead the list, preserving the fuel-first ordering before the sort.
 @riverpod
 List<SearchResultItem> filteredSortedSearchResults(
   Ref ref,
@@ -100,6 +103,9 @@ List<SearchResultItem> filteredSortedSearchResults(
   final sortMode = ref.watch(selectedSortModeProvider);
   final fuelType = ref.watch(selectedFuelTypeProvider);
   final ratings = ref.watch(stationRatingsProvider);
+  final kindFilter = ref.watch(resultKindFilterProvider);
+  final evConnectors = ref.watch(evConnectorFilterProvider);
+  final evMinPower = ref.watch(evMinPowerFilterProvider);
 
   final afterIgnored =
       raw.where((s) => !ignoredIds.contains(s.id)).toList();
@@ -116,9 +122,15 @@ List<SearchResultItem> filteredSortedSearchResults(
     openOnly: openOnly,
   );
   final filteredFuelIds = fuelFiltered.map((s) => s.id).toSet();
+  final evFiltered = applyEvFilters(
+    evItems,
+    connectorTypes: evConnectors,
+    minPowerKw: evMinPower,
+  );
   final filtered = <SearchResultItem>[
-    ...fuelItems.where((r) => filteredFuelIds.contains(r.station.id)),
-    ...evItems,
+    if (kindFilter != ResultKind.ev)
+      ...fuelItems.where((r) => filteredFuelIds.contains(r.station.id)),
+    if (kindFilter != ResultKind.fuel) ...evFiltered,
   ];
 
   return sortSearchResults(filtered, sortMode, fuelType, ratings);

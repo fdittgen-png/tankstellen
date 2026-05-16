@@ -69,4 +69,41 @@ void main() {
       expect(idsOf(sorted), ['ocm-near', 'ocm-mid', 'ocm-far']);
     });
   });
+
+  group('sortSearchResults — mixed fuel + EV list (#1783)', () {
+    final evNear =
+        EVStationResult(testChargingStation.copyWith(id: 'ev-near', dist: 0.5));
+    final evFar =
+        EVStationResult(testChargingStation.copyWith(id: 'ev-far', dist: 4.0));
+
+    test('distance sort interleaves fuel and EV rows by distance', () {
+      // dists — fuelB 1.0, fuelC 2.0, fuelA 3.0; evNear 0.5, evFar 4.0.
+      final mixed = <SearchResultItem>[fuelA, evFar, fuelB, evNear, fuelC];
+      final sorted =
+          sortSearchResults(mixed, SortMode.distance, FuelType.e10, const {});
+      expect(idsOf(sorted), ['ev-near', 'b', 'c', 'a', 'ev-far']);
+    });
+
+    test('price sort ranks fuel rows by price; EV rows are kept', () {
+      // fuel e10 — fuelB 1.70, fuelC 1.80, fuelA 1.90.
+      final mixed = <SearchResultItem>[fuelA, evNear, fuelB, evFar, fuelC];
+      final ids = idsOf(
+        sortSearchResults(mixed, SortMode.price, FuelType.e10, const {}),
+      );
+      // Every row survives the sort.
+      expect(ids.toSet(), {'a', 'b', 'c', 'ev-near', 'ev-far'});
+      // Fuel rows hold their price order relative to one another.
+      expect(ids.indexOf('b'), lessThan(ids.indexOf('c')));
+      expect(ids.indexOf('c'), lessThan(ids.indexOf('a')));
+    });
+
+    test('rating sort leaves EV rows in the list (fall back to distance)',
+        () {
+      final mixed = <SearchResultItem>[fuelA, evNear, fuelB];
+      final ids = idsOf(
+        sortSearchResults(mixed, SortMode.rating, FuelType.e10, const {}),
+      );
+      expect(ids.toSet(), {'a', 'b', 'ev-near'});
+    });
+  });
 }
