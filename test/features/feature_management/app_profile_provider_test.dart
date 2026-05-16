@@ -214,4 +214,36 @@ void main() {
       expect(c.read(activeAppProfileProvider), AppProfile.basic);
     });
   });
+
+  group('reconcile() — #1808', () {
+    test('reconciles against the current flag set without an explicit arg',
+        () async {
+      final c = makeContainer();
+      await pumpLoad(c);
+      await c
+          .read(activeAppProfileProvider.notifier)
+          .select(AppProfile.medium);
+      expect(c.read(activeAppProfileProvider), AppProfile.medium);
+
+      // User flips an off-bundle flag directly on the FeatureFlags
+      // notifier — `enabledFeaturesProvider` now diverges from the preset.
+      await c
+          .read(featureFlagsProvider.notifier)
+          .enable(Feature.unifiedSearchResults);
+
+      // reconcile() reads `enabledFeaturesProvider` through the
+      // notifier's own ref — no flag set passed in — and detects it.
+      await c.read(activeAppProfileProvider.notifier).reconcile();
+      expect(c.read(activeAppProfileProvider), AppProfile.custom);
+    });
+
+    test('is a no-op when the flag set still matches the active preset',
+        () async {
+      final c = makeContainer();
+      await pumpLoad(c);
+      await c.read(activeAppProfileProvider.notifier).select(AppProfile.basic);
+      await c.read(activeAppProfileProvider.notifier).reconcile();
+      expect(c.read(activeAppProfileProvider), AppProfile.basic);
+    });
+  });
 }

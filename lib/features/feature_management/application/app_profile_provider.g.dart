@@ -160,7 +160,7 @@ final class ActiveAppProfileProvider
   }
 }
 
-String _$activeAppProfileHash() => r'11f62d6de9c9c8af25320cc6e3f2279bf98a6a84';
+String _$activeAppProfileHash() => r'12488e4871dca36942cbe08f555511c2606c05be';
 
 /// Active "use mode" profile (#1517).
 ///

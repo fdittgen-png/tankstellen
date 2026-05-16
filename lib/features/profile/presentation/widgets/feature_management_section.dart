@@ -255,17 +255,19 @@ class _ConsoFeatureCard extends ConsumerWidget {
 
   Future<void> _applyConsoMode(WidgetRef ref, ConsoMode next) async {
     final delta = consoModeFlagDelta(next);
+    // #1808 — capture both notifiers before the awaits. The widget's
+    // `ref` must not be touched after an `await`: the user can leave
+    // this screen mid-apply, which unmounts the element and makes any
+    // later `ref.read` throw a disposed-ref StateError.
     final notifier = ref.read(featureFlagsProvider.notifier);
+    final profile = ref.read(activeAppProfileProvider.notifier);
     for (final f in delta.toAdd) {
       await notifier.enable(f);
     }
     for (final f in delta.toRemove) {
       await notifier.disable(f);
     }
-    final newFlags = ref.read(enabledFeaturesProvider);
-    await ref
-        .read(activeAppProfileProvider.notifier)
-        .reconcileWithFlags(newFlags);
+    await profile.reconcile();
   }
 }
 
@@ -678,13 +680,13 @@ Future<void> _toggleAndReconcile(
   Feature feature,
   bool next,
 ) async {
+  // #1808 — capture the profile notifier before the await. The widget
+  // `ref` is unsafe to use once the user has left the screen mid-apply.
+  final profile = ref.read(activeAppProfileProvider.notifier);
   if (next) {
     await notifier.enable(feature);
   } else {
     await notifier.disable(feature);
   }
-  final newFlags = ref.read(enabledFeaturesProvider);
-  await ref
-      .read(activeAppProfileProvider.notifier)
-      .reconcileWithFlags(newFlags);
+  await profile.reconcile();
 }
