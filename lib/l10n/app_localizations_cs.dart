@@ -5132,6 +5132,25 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String get widgetHelpSectionTitle => 'Home-screen widget';
+
+  @override
+  String get widgetHelpIntro =>
+      'Add the SparKilo widget to your home screen to see fuel and charging prices at a glance.';
+
+  @override
+  String get widgetHelpAdd =>
+      'Add it from your launcher\'s widget picker — long-press an empty area of the home screen, choose Widgets, and find SparKilo.';
+
+  @override
+  String get widgetHelpTap =>
+      'Tap a station in the widget to open it in the app. Tap the refresh icon to update prices.';
+
+  @override
+  String get widgetHelpConfigure =>
+      'On Android, long-press the widget and choose Reconfigure to change the profile, colour, and content.';
+
+  @override
   String get widgetVariantDefault => 'Current price only';
 
   @override

@@ -9266,6 +9266,36 @@ abstract class AppLocalizations {
   /// **'{minutes} min so far'**
   String waitTimeElapsedShort(int minutes);
 
+  /// Title of the home-screen widget help section in Settings (#1806).
+  ///
+  /// In en, this message translates to:
+  /// **'Home-screen widget'**
+  String get widgetHelpSectionTitle;
+
+  /// Intro line of the home-screen widget help section in Settings (#1806).
+  ///
+  /// In en, this message translates to:
+  /// **'Add the SparKilo widget to your home screen to see fuel and charging prices at a glance.'**
+  String get widgetHelpIntro;
+
+  /// Help line explaining how to add the home-screen widget (#1806).
+  ///
+  /// In en, this message translates to:
+  /// **'Add it from your launcher\'s widget picker — long-press an empty area of the home screen, choose Widgets, and find SparKilo.'**
+  String get widgetHelpAdd;
+
+  /// Help line explaining the home-screen widget's tap and refresh behaviour (#1806).
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a station in the widget to open it in the app. Tap the refresh icon to update prices.'**
+  String get widgetHelpTap;
+
+  /// Help line explaining how to reconfigure the Android home-screen widget (#1806).
+  ///
+  /// In en, this message translates to:
+  /// **'On Android, long-press the widget and choose Reconfigure to change the profile, colour, and content.'**
+  String get widgetHelpConfigure;
+
   /// Label for the default home-widget content variant — shows just the current pump price (#1121).
   ///
   /// In en, this message translates to:

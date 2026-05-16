@@ -5176,6 +5176,25 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get widgetHelpSectionTitle => 'Homescreen-Widget';
+
+  @override
+  String get widgetHelpIntro =>
+      'Füge das SparKilo-Widget zu deinem Startbildschirm hinzu, um Sprit- und Ladepreise auf einen Blick zu sehen.';
+
+  @override
+  String get widgetHelpAdd =>
+      'Füge es über die Widget-Auswahl deines Launchers hinzu — halte einen leeren Bereich des Startbildschirms gedrückt, wähle „Widgets“ und suche SparKilo.';
+
+  @override
+  String get widgetHelpTap =>
+      'Tippe im Widget auf eine Station, um sie in der App zu öffnen. Tippe auf das Aktualisieren-Symbol, um die Preise zu aktualisieren.';
+
+  @override
+  String get widgetHelpConfigure =>
+      'Halte das Widget unter Android gedrückt und wähle „Neu konfigurieren“, um Profil, Farbe und Inhalt zu ändern.';
+
+  @override
   String get widgetVariantDefault => 'Nur aktueller Preis';
 
   @override

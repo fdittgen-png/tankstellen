@@ -1,0 +1,22 @@
+{
+  "widgetHelpSectionTitle": "Home-screen widget",
+  "@widgetHelpSectionTitle": {
+    "description": "Title of the home-screen widget help section in Settings (#1806)."
+  },
+  "widgetHelpIntro": "Add the SparKilo widget to your home screen to see fuel and charging prices at a glance.",
+  "@widgetHelpIntro": {
+    "description": "Intro line of the home-screen widget help section in Settings (#1806)."
+  },
+  "widgetHelpAdd": "Add it from your launcher's widget picker — long-press an empty area of the home screen, choose Widgets, and find SparKilo.",
+  "@widgetHelpAdd": {
+    "description": "Help line explaining how to add the home-screen widget (#1806)."
+  },
+  "widgetHelpTap": "Tap a station in the widget to open it in the app. Tap the refresh icon to update prices.",
+  "@widgetHelpTap": {
+    "description": "Help line explaining the home-screen widget's tap and refresh behaviour (#1806)."
+  },
+  "widgetHelpConfigure": "On Android, long-press the widget and choose Reconfigure to change the profile, colour, and content.",
+  "@widgetHelpConfigure": {
+    "description": "Help line explaining how to reconfigure the Android home-screen widget (#1806)."
+  }
+}
