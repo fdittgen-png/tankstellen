@@ -4611,7 +4611,8 @@ class AppLocalizationsFr extends AppLocalizations {
       'Connexion impossible — vérifiez l\'adaptateur ou passez l\'étape';
 
   @override
-  String get onboardingPickUseMode => 'Pick a use mode to continue.';
+  String get onboardingPickUseMode =>
+      'Choisissez un mode d\'utilisation pour continuer.';
 
   @override
   String get alertsRadiusFrequencyLabel => 'Fréquence de vérification';

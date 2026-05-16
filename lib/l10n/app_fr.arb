@@ -1378,5 +1378,6 @@
   "discardChangesBody": "Vous avez des modifications non enregistrées. Quitter maintenant les supprimera.",
   "discardChangesConfirm": "Abandonner",
   "discardChangesKeepEditing": "Continuer la modification",
-  "tankSyncSectionSubtitle": "Synchronisation cloud entre vos appareils"
+  "tankSyncSectionSubtitle": "Synchronisation cloud entre vos appareils",
+  "onboardingPickUseMode": "Choisissez un mode d'utilisation pour continuer."
 }
