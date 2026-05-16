@@ -119,4 +119,17 @@ enum Feature {
   /// opt-in experiment gated additionally on the adapter capability tier.
   /// Requires [obd2TripRecording].
   experimentalOemPids,
+
+  /// Scan-to-pay QR reader on the station-detail screen (#1638). Gates
+  /// the "Scan payment QR" AppBar action. Default-on — the action
+  /// already shipped reachable, so the flag preserves current behaviour
+  /// while bringing it under central feature management. No prerequisites.
+  paymentQrScan,
+
+  /// Community price reporting from the station-detail screen (#1638).
+  /// Gates the "Report price" AppBar action that opens the `/report/:id`
+  /// flow. Default-on — the action already shipped reachable, so the
+  /// flag preserves current behaviour while bringing it under central
+  /// feature management. No prerequisites.
+  communityPriceReports,
 }

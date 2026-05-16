@@ -4019,6 +4019,21 @@ class AppLocalizationsFr extends AppLocalizations {
       'Activez d\'abord l\'enregistrement OBD2 des trajets';
 
   @override
+  String get featureLabel_paymentQrScan => 'Scanner le QR de paiement';
+
+  @override
+  String get featureDescription_paymentQrScan =>
+      'Lecteur de QR code de paiement sur la page détail de la station.';
+
+  @override
+  String get featureLabel_communityPriceReports =>
+      'Signalements de prix communautaires';
+
+  @override
+  String get featureDescription_communityPriceReports =>
+      'Signaler le prix d\'une station depuis la page détail de la station.';
+
+  @override
   String get feedbackConsentTitle => 'Envoyer le rapport à GitHub ?';
 
   @override

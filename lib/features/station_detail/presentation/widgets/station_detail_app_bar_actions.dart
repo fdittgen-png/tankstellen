@@ -11,6 +11,8 @@ import '../../../alerts/domain/entities/price_alert.dart';
 import '../../../alerts/presentation/widgets/create_alert_dialog.dart';
 import '../../../alerts/providers/alert_provider.dart';
 import '../../../favorites/providers/favorites_provider.dart';
+import '../../../feature_management/application/feature_flags_provider.dart';
+import '../../../feature_management/domain/feature.dart';
 import '../../../payment/domain/qr_payment_decoder.dart';
 import '../../../payment/presentation/scan_payment_dispatcher.dart';
 import '../../../payment/presentation/widgets/unknown_qr_dialog.dart';
@@ -39,6 +41,7 @@ class StationDetailAppBarActions extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final isFav = ref.watch(isFavoriteProvider(stationId));
+    final enabledFeatures = ref.watch(enabledFeaturesProvider);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -62,16 +65,24 @@ class StationDetailAppBarActions extends ConsumerWidget {
           onPressed: () => _showCreateAlertDialog(context, ref),
           tooltip: l10n?.createAlert ?? 'Create price alert',
         ),
-        IconButton(
-          icon: const Icon(Icons.qr_code_scanner),
-          onPressed: () => _startScanPayment(context),
-          tooltip: l10n?.scanPayment ?? 'Scan payment QR',
-        ),
-        IconButton(
-          icon: const Icon(Icons.flag_outlined),
-          onPressed: () => context.push('/report/$stationId'),
-          tooltip: l10n?.reportPrice ?? 'Report price',
-        ),
+        // #1638 — the scan-payment-QR action is gated on the central
+        // Feature enum so it can be toggled per profile.
+        if (enabledFeatures.contains(Feature.paymentQrScan))
+          IconButton(
+            key: const Key('scan_payment_qr'),
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: () => _startScanPayment(context),
+            tooltip: l10n?.scanPayment ?? 'Scan payment QR',
+          ),
+        // #1638 — the community price-report action is gated on the
+        // central Feature enum so it can be toggled per profile.
+        if (enabledFeatures.contains(Feature.communityPriceReports))
+          IconButton(
+            key: const Key('report_price'),
+            icon: const Icon(Icons.flag_outlined),
+            onPressed: () => context.push('/report/$stationId'),
+            tooltip: l10n?.reportPrice ?? 'Report price',
+          ),
         IconButton(
           icon: AnimatedFavoriteStar(isFavorite: isFav),
           onPressed: () {

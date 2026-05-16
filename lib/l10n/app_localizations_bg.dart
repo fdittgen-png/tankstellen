@@ -3981,6 +3981,20 @@ class AppLocalizationsBg extends AppLocalizations {
       'Enable OBD2 trip recording first';
 
   @override
+  String get featureLabel_paymentQrScan => 'Scan payment QR';
+
+  @override
+  String get featureDescription_paymentQrScan =>
+      'Scan-to-pay QR reader on the station detail screen.';
+
+  @override
+  String get featureLabel_communityPriceReports => 'Community price reports';
+
+  @override
+  String get featureDescription_communityPriceReports =>
+      'Report a station price from the station detail screen.';
+
+  @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
 
   @override

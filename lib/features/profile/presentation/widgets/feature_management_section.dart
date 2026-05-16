@@ -511,6 +511,11 @@ String _featureLabel(AppLocalizations? l, Feature f) {
       return l?.featureLabel_carbonDashboard ?? 'Carbon dashboard';
     case Feature.experimentalOemPids:
       return l?.featureLabel_experimentalOemPids ?? 'Experimental OEM PIDs';
+    case Feature.paymentQrScan:
+      return l?.featureLabel_paymentQrScan ?? 'Scan payment QR';
+    case Feature.communityPriceReports:
+      return l?.featureLabel_communityPriceReports ??
+          'Community price reports';
   }
 }
 
@@ -587,6 +592,12 @@ String _featureDescription(AppLocalizations? l, Feature f) {
       return l?.featureDescription_experimentalOemPids ??
           'Read exact tank litres via manufacturer-specific PIDs on '
               'supported adapters.';
+    case Feature.paymentQrScan:
+      return l?.featureDescription_paymentQrScan ??
+          'Scan-to-pay QR reader on the station detail screen.';
+    case Feature.communityPriceReports:
+      return l?.featureDescription_communityPriceReports ??
+          'Report a station price from the station detail screen.';
   }
 }
 
@@ -638,6 +649,8 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
     case Feature.loyaltyCards:
     case Feature.fuelCalculator:
     case Feature.carbonDashboard:
+    case Feature.paymentQrScan:
+    case Feature.communityPriceReports:
       return 'Prerequisites not met';
   }
 }
