@@ -5,8 +5,10 @@ import '../../../core/error/exceptions.dart';
 import '../../../core/location/user_position_provider.dart';
 import '../../../core/services/geocoding_chain.dart';
 import '../../../core/services/service_result.dart';
+import '../../../core/refuel/unified_search_results_enabled.dart';
 import '../domain/entities/fuel_type.dart';
 import '../domain/entities/search_result_item.dart';
+import '../domain/entities/station.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';
 import '../../profile/providers/profile_provider.dart';
 import 'ev_search_provider.dart';
@@ -116,4 +118,59 @@ AsyncValue<ServiceResult<List<SearchResultItem>>>? classifySearchError(
     return AsyncValue.error(error, stackTrace);
   }
   return AsyncValue.error(error, stackTrace);
+}
+
+/// Whether the unified fuel + EV search-results path is enabled
+/// (#1781, `Feature.unifiedSearchResults`). When `true`, every search
+/// fetches the fuel station service and the EV charging service
+/// concurrently and merges them into one mixed list; when `false` the
+/// legacy electric-vs-fuel branch ([dispatchEvIfNeeded]) applies and a
+/// search returns one kind only.
+bool unifiedSearchEnabled(Ref ref) =>
+    ref.read(unifiedSearchResultsEnabledProvider);
+
+/// Kicks off the EV charging search for [lat]/[lng]/[radiusKm] without
+/// awaiting it, so it runs concurrently with the fuel fetch (#1781).
+///
+/// The returned future completes once [EVSearchState.searchNearby] has
+/// written its state. `searchNearby` captures its own exceptions into
+/// `AsyncValue.error` (including the keyless `NoEvApiKeyException`), so
+/// this future never throws — the outcome is read back from
+/// [eVSearchStateProvider] by [finalizeUnifiedResult].
+Future<void> beginEvSearch(
+  Ref ref, {
+  required double lat,
+  required double lng,
+  required double radiusKm,
+}) {
+  return ref
+      .read(eVSearchStateProvider.notifier)
+      .searchNearby(lat: lat, lng: lng, radiusKm: radiusKm);
+}
+
+/// Awaits the concurrently-started [evFuture] and merges its outcome
+/// with [fuelResult] into the unified [SearchResultItem] feed (#1781 /
+/// #1782).
+///
+/// When [evFuture] is `null` (unified search disabled) the fuel result
+/// is wrapped on its own. Partial-failure-tolerant: an EV-side error is
+/// folded into the merged result's `errors` while the fuel results
+/// still render — see [mergeFuelAndEvResults].
+Future<AsyncValue<ServiceResult<List<SearchResultItem>>>>
+    finalizeUnifiedResult(
+  Ref ref,
+  ServiceResult<List<Station>> fuelResult,
+  Future<void>? evFuture,
+) async {
+  if (evFuture == null) {
+    return AsyncValue.data(wrapFuelResultAsSearchItems(fuelResult));
+  }
+  await evFuture;
+  return AsyncValue.data(
+    ref.read(eVSearchStateProvider).when(
+          data: (ev) => mergeFuelAndEvResults(fuel: fuelResult, ev: ev),
+          loading: () => mergeFuelAndEvResults(fuel: fuelResult),
+          error: (e, _) => mergeFuelAndEvResults(fuel: fuelResult, evError: e),
+        ),
+  );
 }
