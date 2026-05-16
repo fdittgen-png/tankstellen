@@ -48,18 +48,18 @@ class AppLocalizationsLv extends AppLocalizations {
   String get searchButton => 'Meklēt';
 
   @override
-  String get searchCriteriaTitle => 'Search criteria';
+  String get searchCriteriaTitle => 'Meklēšanas kritēriji';
 
   @override
-  String get searchCriteriaOpen => 'Search';
+  String get searchCriteriaOpen => 'Meklēt';
 
   @override
   String searchCriteriaRadiusBadge(String km) {
-    return 'Within $km km';
+    return '$km km rādiusā';
   }
 
   @override
-  String get searchCriteriaTapToSearch => 'Tap to start searching';
+  String get searchCriteriaTapToSearch => 'Pieskarieties, lai sāktu meklēšanu';
 
   @override
   String get noResults => 'Degvielas uzpildes stacijas nav atrastas.';
@@ -149,31 +149,31 @@ class AppLocalizationsLv extends AppLocalizations {
   String get cancel => 'Atcelt';
 
   @override
-  String get countryChangeTitle => 'Switch country?';
+  String get countryChangeTitle => 'Mainīt valsti?';
 
   @override
   String countryChangeBody(String country) {
-    return 'Switching to $country will change:';
+    return 'Pārslēdzoties uz $country, mainīsies:';
   }
 
   @override
-  String get countryChangeCurrency => 'Currency';
+  String get countryChangeCurrency => 'Valūta';
 
   @override
-  String get countryChangeDistance => 'Distance';
+  String get countryChangeDistance => 'Attālums';
 
   @override
-  String get countryChangeVolume => 'Volume';
+  String get countryChangeVolume => 'Tilpums';
 
   @override
-  String get countryChangePricePerUnit => 'Price format';
+  String get countryChangePricePerUnit => 'Cenas formāts';
 
   @override
   String get countryChangeNote =>
-      'Existing favorites and fill-up logs are not rewritten; only new entries use the new units.';
+      'Esošie izlases un uzpildes žurnāli netiek pārrakstīti; tikai jauniem ierakstiem tiek lietotas jaunās mērvienības.';
 
   @override
-  String get countryChangeConfirm => 'Switch';
+  String get countryChangeConfirm => 'Mainīt';
 
   @override
   String get delete => 'Dzēst';
@@ -392,108 +392,109 @@ class AppLocalizationsLv extends AppLocalizations {
   String get reportBug => 'Ziņot par kļūdu / Ieteikt funkciju';
 
   @override
-  String get reportThisIssue => 'Report this issue';
+  String get reportThisIssue => 'Ziņot par problēmu';
 
   @override
-  String get reportAlreadySent => 'You already reported this issue.';
+  String get reportAlreadySent => 'Jūs jau ziņojāt par šo problēmu.';
 
   @override
-  String get reportConsentTitle => 'Report to GitHub?';
+  String get reportConsentTitle => 'Ziņot GitHub?';
 
   @override
   String get reportConsentBody =>
-      'This will open a public GitHub issue with the error details below. No GPS coordinates, API keys, or personal data are included.';
+      'Tiks atvērts publisks GitHub ziņojums ar kļūdas informāciju. GPS koordinātas, API atslēgas vai personas dati netiek iekļauti.';
 
   @override
-  String get reportConsentConfirm => 'Open GitHub';
+  String get reportConsentConfirm => 'Atvērt GitHub';
 
   @override
-  String get reportConsentCancel => 'Cancel';
+  String get reportConsentCancel => 'Atcelt';
 
   @override
-  String get configProfileSection => 'Profile';
+  String get configProfileSection => 'Profils';
 
   @override
-  String get configActiveProfile => 'Active profile';
+  String get configActiveProfile => 'Aktīvais profils';
 
   @override
-  String get configPreferredFuel => 'Preferred fuel';
+  String get configPreferredFuel => 'Vēlamais degvielas veids';
 
   @override
-  String get configCountry => 'Country';
+  String get configCountry => 'Valsts';
 
   @override
-  String get configRouteSegment => 'Route segment';
+  String get configRouteSegment => 'Maršruta posms';
 
   @override
-  String get configApiKeysSection => 'API keys';
+  String get configApiKeysSection => 'API atslēgas';
 
   @override
-  String get configTankerkoenigKey => 'Tankerkoenig API key';
+  String get configTankerkoenigKey => 'Tankerkoenig API atslēga';
 
   @override
-  String get configApiKeyConfigured => 'Configured';
+  String get configApiKeyConfigured => 'Konfigurēta';
 
   @override
-  String get configApiKeyNotSet => 'Not set (demo mode)';
+  String get configApiKeyNotSet => 'Nav iestatīta (demonstrācijas režīms)';
 
   @override
-  String get configApiKeyCommunity => 'Default (community key)';
+  String get configApiKeyCommunity => 'Noklusējums (kopienas atslēga)';
 
   @override
-  String get searchLocationPlaceholder => 'Address, postal code or city';
+  String get searchLocationPlaceholder => 'Adrese, pasta indekss vai pilsēta';
 
   @override
-  String get configEvKey => 'EV charging API key';
+  String get configEvKey => 'EV uzlādes API atslēga';
 
   @override
-  String get configEvKeyCustom => 'Custom key';
+  String get configEvKeyCustom => 'Pielāgota atslēga';
 
   @override
-  String get configEvKeyShared => 'Default (shared)';
+  String get configEvKeyShared => 'Noklusējums (kopīga)';
 
   @override
-  String get configCloudSyncSection => 'Cloud Sync';
+  String get configCloudSyncSection => 'Mākoņa sinhronizācija';
 
   @override
-  String get configTankSyncConnected => 'Connected';
+  String get configTankSyncConnected => 'Savienots';
 
   @override
-  String get configTankSyncDisabled => 'Disabled';
+  String get configTankSyncDisabled => 'Atspējots';
 
   @override
-  String get configAuthMode => 'Auth mode';
+  String get configAuthMode => 'Autentifikācijas veids';
 
   @override
-  String get configAuthEmail => 'Email (persistent)';
+  String get configAuthEmail => 'E-pasts (pastāvīgs)';
 
   @override
-  String get configAuthAnonymous => 'Anonymous (device-only)';
+  String get configAuthAnonymous => 'Anonīms (tikai šī ierīce)';
 
   @override
-  String get configDatabase => 'Database';
+  String get configDatabase => 'Datu bāze';
 
   @override
-  String get configPrivacySummary => 'Privacy summary';
+  String get configPrivacySummary => 'Privātuma kopsavilkums';
 
   @override
   String configPrivacySummarySynced(Object authNote) {
-    return '• Favorites, alerts, and ignored stations are synced to your private database\n• GPS position and API keys never leave your device\n• $authNote';
+    return '• Izlases, brīdinājumi un ignorētās stacijas tiek sinhronizētas ar jūsu privāto datu bāzi\n• GPS atrašanās vieta un API atslēgas nekad neatstāj jūsu ierīci\n• $authNote';
   }
 
   @override
   String get configPrivacySummaryLocal =>
-      '• All data is stored locally on this device only\n• No data is sent to any server\n• API keys encrypted in device secure storage';
+      '• Visi dati tiek glabāti tikai lokāli šajā ierīcē\n• Nav datu, kas tiek sūtīti uz serveri\n• API atslēgas šifrētas ierīces drošajā atmiņā';
 
   @override
-  String get configAuthNoteEmail => 'Email account enables cross-device access';
+  String get configAuthNoteEmail =>
+      'E-pasta konts nodrošina piekļuvi no vairākām ierīcēm';
 
   @override
   String get configAuthNoteAnonymous =>
-      'Anonymous account — data tied to this device';
+      'Anonīms konts — dati saistīti ar šo ierīci';
 
   @override
-  String get configNone => 'None';
+  String get configNone => 'Nav';
 
   @override
   String get privacyPolicy => 'Privātuma politika';
@@ -534,7 +535,7 @@ class AppLocalizationsLv extends AppLocalizations {
       'Demo režīms. Konfigurējiet API atslēgu iestatījumos.';
 
   @override
-  String get demoModeBannerAction => 'Get live prices';
+  String get demoModeBannerAction => 'Iegūt aktuālās cenas';
 
   @override
   String get sortDistance => 'Attālums';
@@ -543,10 +544,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get sortOpen24h => '24h';
 
   @override
-  String get sortRating => 'Rating';
+  String get sortRating => 'Vērtējums';
 
   @override
-  String get sortPriceDistance => 'Price/km';
+  String get sortPriceDistance => 'Cena/km';
 
   @override
   String get cheap => 'lēti';
@@ -1000,21 +1001,23 @@ class AppLocalizationsLv extends AppLocalizations {
   String get allDataDeleted => 'Visi servera dati dzēsti';
 
   @override
-  String get forgetAllSyncedTripsButton => 'Forget all synced trips';
+  String get forgetAllSyncedTripsButton =>
+      'Dzēst visus sinhronizētos braucienus';
 
   @override
-  String get forgetAllSyncedTripsConfirmTitle => 'Forget all synced trips?';
+  String get forgetAllSyncedTripsConfirmTitle =>
+      'Dzēst visus sinhronizētos braucienus?';
 
   @override
   String get forgetAllSyncedTripsConfirmBody =>
-      'Every trip summary and detail blob will be removed from the server. Your local trip history on this device won\'t be affected.\n\nThis action cannot be undone.';
+      'Visi braucienu kopsavilkumi un detaļu dati tiks noņemti no servera. Lokālā braucienu vēsture šajā ierīcē netiks ietekmēta.\n\nŠo darbību nevar atcelt.';
 
   @override
-  String get forgetAllSyncedTripsConfirmAction => 'Forget all';
+  String get forgetAllSyncedTripsConfirmAction => 'Dzēst visu';
 
   @override
   String get forgetAllSyncedTripsSuccess =>
-      'All synced trips removed from server';
+      'Visi sinhronizētie braucieni noņemti no servera';
 
   @override
   String get disconnectConfirm => 'Atvienot TankSync?';
@@ -1062,48 +1065,49 @@ class AppLocalizationsLv extends AppLocalizations {
   String get close => 'Aizvērt';
 
   @override
-  String get account => 'Account';
+  String get account => 'Konts';
 
   @override
-  String get continueAsGuest => 'Continue as guest';
+  String get continueAsGuest => 'Turpināt kā viesis';
 
   @override
-  String get createAccount => 'Create account';
+  String get createAccount => 'Izveidot kontu';
 
   @override
-  String get signIn => 'Sign in';
+  String get signIn => 'Pierakstīties';
 
   @override
-  String get upgradeToEmail => 'Create email account';
+  String get upgradeToEmail => 'Izveidot e-pasta kontu';
 
   @override
-  String get savedRoutes => 'Saved Routes';
+  String get savedRoutes => 'Saglabātie maršruti';
 
   @override
-  String get noSavedRoutes => 'No saved routes';
+  String get noSavedRoutes => 'Nav saglabātu maršrutu';
 
   @override
   String get noSavedRoutesHint =>
-      'Search along a route and save it for quick access later.';
+      'Meklējiet gar maršrutu un saglabājiet to ātrai piekļuvei vēlāk.';
 
   @override
-  String get saveRoute => 'Save route';
+  String get saveRoute => 'Saglabāt maršrutu';
 
   @override
-  String get routeName => 'Route name';
+  String get routeName => 'Maršruta nosaukums';
 
   @override
   String itineraryDeleted(String name) {
-    return '$name deleted';
+    return '$name dzēsts';
   }
 
   @override
   String loadingRoute(String name) {
-    return 'Loading route: $name';
+    return 'Ielādē maršrutu: $name';
   }
 
   @override
-  String get refreshFailed => 'Refresh failed. Please try again.';
+  String get refreshFailed =>
+      'Atjaunināšana neizdevās. Lūdzu, mēģiniet vēlreiz.';
 
   @override
   String get deleteProfileTitle => 'Delete profile?';
@@ -1151,214 +1155,216 @@ class AppLocalizationsLv extends AppLocalizations {
   String get errorUnknown => 'An unexpected error occurred.';
 
   @override
-  String get onboardingWelcomeHint => 'Set up the app in a few quick steps.';
+  String get onboardingWelcomeHint => 'Iestatiet lietotni dažos ātros soļos.';
 
   @override
   String get onboardingApiKeyDescription =>
-      'Register for a free API key, or skip to explore the app with demo data.';
+      'Reģistrējieties bezmaksas API atslēgai vai izlaidiet un izpētiet lietotni ar demonstrācijas datiem.';
 
   @override
-  String get onboardingComplete => 'All set!';
+  String get onboardingComplete => 'Viss gatavs!';
 
   @override
   String get onboardingCompleteHint =>
-      'You can change these settings anytime in your profile.';
+      'Šos iestatījumus varat mainīt jebkurā laikā savā profilā.';
 
   @override
-  String get onboardingBack => 'Back';
+  String get onboardingBack => 'Atpakaļ';
 
   @override
-  String get onboardingNext => 'Next';
+  String get onboardingNext => 'Tālāk';
 
   @override
-  String get onboardingSkip => 'Skip';
+  String get onboardingSkip => 'Izlaist';
 
   @override
-  String get onboardingFinish => 'Get started';
+  String get onboardingFinish => 'Sākt';
 
   @override
   String crossBorderNearby(String country) {
-    return '$country is nearby';
+    return '$country ir tuvumā';
   }
 
   @override
   String crossBorderDistance(int km) {
-    return '~$km km to border';
+    return '~$km km līdz robežai';
   }
 
   @override
   String crossBorderAvgPrice(String price, int count) {
-    return 'Avg here: $price EUR ($count stations)';
+    return 'Vid. šeit: $price EUR ($count stacijas)';
   }
 
   @override
-  String get allPricesView => 'All prices';
+  String get allPricesView => 'Visas cenas';
 
   @override
-  String get compactView => 'Compact';
+  String get compactView => 'Kompakts';
 
   @override
-  String get switchToAllPricesView => 'Switch to all-prices view';
+  String get switchToAllPricesView => 'Pārslēgties uz visu cenu skatu';
 
   @override
-  String get switchToCompactView => 'Switch to compact view';
+  String get switchToCompactView => 'Pārslēgties uz kompakto skatu';
 
   @override
-  String get unavailable => 'N/A';
+  String get unavailable => 'Nav pieejams';
 
   @override
-  String get outOfStock => 'Out of stock';
+  String get outOfStock => 'Nav krājumā';
 
   @override
-  String get gdprTitle => 'Your Privacy';
+  String get gdprTitle => 'Jūsu privātums';
 
   @override
   String get gdprSubtitle =>
-      'This app respects your privacy. Choose which data you want to share. You can change these settings anytime.';
+      'Šī lietotne ciena jūsu privātumu. Izvēlieties, kurus datus vēlaties kopīgot. Šos iestatījumus varat mainīt jebkurā laikā.';
 
   @override
-  String get gdprLocationTitle => 'Location Access';
+  String get gdprLocationTitle => 'Atrašanās vietas piekļuve';
 
   @override
   String get gdprLocationDescription =>
-      'Your coordinates are sent to the fuel price API to find nearby stations. Location data is never stored on a server and is not used for tracking.';
+      'Jūsu koordinātas tiek nosūtītas degvielas cenu API, lai atrastu tuvākās stacijas. Atrašanās vietas dati nekad netiek glabāti serverī un netiek izmantoti izsekošanai.';
 
   @override
   String get gdprLocationShort =>
-      'Find nearby fuel stations using your location';
+      'Atrast tuvākās degvielas stacijas, izmantojot jūsu atrašanās vietu';
 
   @override
-  String get gdprErrorReportingTitle => 'Error Reporting';
+  String get gdprErrorReportingTitle => 'Kļūdu ziņošana';
 
   @override
   String get gdprErrorReportingDescription =>
-      'Anonymous crash reports help improve the app. No personal data is included. Reports are sent via Sentry only when configured.';
+      'Anonīmi avārijas ziņojumi palīdz uzlabot lietotni. Personas dati netiek iekļauti. Ziņojumi tiek sūtīti caur Sentry tikai tad, ja tas ir konfigurēts.';
 
   @override
   String get gdprErrorReportingShort =>
-      'Send anonymous crash reports to improve the app';
+      'Sūtīt anonīmus avārijas ziņojumus lietotnes uzlabošanai';
 
   @override
-  String get gdprCloudSyncTitle => 'Cloud Sync';
+  String get gdprCloudSyncTitle => 'Mākoņa sinhronizācija';
 
   @override
   String get gdprCloudSyncDescription =>
-      'Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.';
+      'Sinhronizējiet izlases un brīdinājumus starp ierīcēm, izmantojot TankSync. Tiek izmantota anonīma autentifikācija. Jūsu dati ir šifrēti pārsūtīšanas laikā.';
 
   @override
-  String get gdprCloudSyncShort => 'Sync favorites and alerts across devices';
+  String get gdprCloudSyncShort =>
+      'Sinhronizēt izlases un brīdinājumus starp ierīcēm';
 
   @override
   String get gdprLegalBasis =>
-      'Legal basis: Art. 6(1)(a) GDPR (Consent). You can withdraw consent anytime in Settings.';
+      'Juridiskais pamats: VDAR 6. panta 1. punkta a) apakšpunkts (piekrišana). Piekrišanu varat atsaukt jebkurā laikā iestatījumos.';
 
   @override
-  String get gdprAcceptAll => 'Accept All';
+  String get gdprAcceptAll => 'Pieņemt visu';
 
   @override
-  String get gdprAcceptSelected => 'Accept Selected';
+  String get gdprAcceptSelected => 'Pieņemt izvēlētos';
 
   @override
   String get gdprSettingsHint =>
-      'You can change your privacy choices at any time.';
+      'Jūs varat mainīt privātuma izvēles jebkurā laikā.';
 
   @override
-  String get routeSaved => 'Route saved!';
+  String get routeSaved => 'Maršruts saglabāts!';
 
   @override
-  String get routeSaveFailed => 'Failed to save route';
+  String get routeSaveFailed => 'Maršruta saglabāšana neizdevās';
 
   @override
-  String get sqlCopied => 'SQL copied to clipboard';
+  String get sqlCopied => 'SQL nokopēts starpliktuvē';
 
   @override
-  String get connectionDataCopied => 'Connection data copied';
+  String get connectionDataCopied => 'Savienojuma dati nokopēti';
 
   @override
-  String get accountDeleted => 'Account deleted. Local data preserved.';
+  String get accountDeleted => 'Konts dzēsts. Lokālie dati saglabāti.';
 
   @override
-  String get switchedToAnonymous => 'Switched to anonymous session';
+  String get switchedToAnonymous => 'Pārslēgts uz anonīmo sesiju';
 
   @override
   String failedToSwitch(String error) {
-    return 'Failed to switch: $error';
+    return 'Pārslēgšanās neizdevās: $error';
   }
 
   @override
-  String get topicUrlCopied => 'Topic URL copied';
+  String get topicUrlCopied => 'Tēmas URL nokopēts';
 
   @override
-  String get testNotificationSent => 'Test notification sent!';
+  String get testNotificationSent => 'Testa paziņojums nosūtīts!';
 
   @override
-  String get testNotificationFailed => 'Failed to send test notification';
+  String get testNotificationFailed => 'Testa paziņojuma nosūtīšana neizdevās';
 
   @override
-  String get pushUpdateFailed => 'Failed to update push notification setting';
+  String get pushUpdateFailed =>
+      'Push paziņojuma iestatījuma atjaunināšana neizdevās';
 
   @override
-  String get connectedAsGuest => 'Connected as guest';
+  String get connectedAsGuest => 'Savienots kā viesis';
 
   @override
-  String get accountCreated => 'Account created!';
+  String get accountCreated => 'Konts izveidots!';
 
   @override
-  String get signedIn => 'Signed in!';
+  String get signedIn => 'Pierakstīšanās veiksmīga!';
 
   @override
   String stationHidden(String name) {
-    return '$name hidden';
+    return '$name paslēpts';
   }
 
   @override
   String removedFromFavoritesName(String name) {
-    return '$name removed from favorites';
+    return '$name noņemts no izlases';
   }
 
   @override
   String invalidApiKey(String error) {
-    return 'Invalid API key: $error';
+    return 'Nederīga API atslēga: $error';
   }
 
   @override
-  String get invalidQrCode => 'Invalid QR code format';
+  String get invalidQrCode => 'Nederīgs QR koda formāts';
 
   @override
   String get invalidQrCodeTankSync =>
-      'Invalid QR code — expected TankSync format';
+      'Nederīgs QR kods — gaidīts TankSync formāts';
 
   @override
-  String get tankSyncConnected => 'TankSync connected!';
+  String get tankSyncConnected => 'TankSync savienots!';
 
   @override
-  String get syncCompleted => 'Sync completed — data refreshed';
+  String get syncCompleted => 'Sinhronizācija pabeigta — dati atjaunināti';
 
   @override
-  String get deviceCodeCopied => 'Device code copied';
+  String get deviceCodeCopied => 'Ierīces kods nokopēts';
 
   @override
-  String get undo => 'Undo';
+  String get undo => 'Atsaukt';
 
   @override
   String invalidPostalCode(String length, String label) {
-    return 'Please enter a valid $length-digit $label';
+    return 'Lūdzu, ievadiet derīgu $length ciparu $label';
   }
 
   @override
-  String get freshnessAgo => 'ago';
+  String get freshnessAgo => 'pirms';
 
   @override
-  String get freshnessStale => 'Stale';
+  String get freshnessStale => 'Novecojis';
 
   @override
   String freshnessBadgeSemantics(String age) {
-    return 'Data freshness: $age';
+    return 'Datu aktualitāte: $age';
   }
 
   @override
   String brandLogoLabel(String brand) {
-    return '$brand logo';
+    return '$brand logotips';
   }
 
   @override
@@ -1366,51 +1372,51 @@ class AppLocalizationsLv extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Rate $count stars',
-      one: 'Rate 1 star',
+      other: 'Novērtēt ar $count zvaigznēm',
+      one: 'Novērtēt ar 1 zvaigzni',
     );
     return '$_temp0';
   }
 
   @override
-  String get passwordStrengthWeak => 'Weak';
+  String get passwordStrengthWeak => 'Vāja';
 
   @override
-  String get passwordStrengthFair => 'Fair';
+  String get passwordStrengthFair => 'Vidēja';
 
   @override
-  String get passwordStrengthStrong => 'Strong';
+  String get passwordStrengthStrong => 'Stipra';
 
   @override
-  String get passwordReqMinLength => 'At least 8 characters';
+  String get passwordReqMinLength => 'Vismaz 8 rakstzīmes';
 
   @override
-  String get passwordReqUppercase => 'At least 1 uppercase letter';
+  String get passwordReqUppercase => 'Vismaz 1 lielais burts';
 
   @override
-  String get passwordReqLowercase => 'At least 1 lowercase letter';
+  String get passwordReqLowercase => 'Vismaz 1 mazais burts';
 
   @override
-  String get passwordReqDigit => 'At least 1 number';
+  String get passwordReqDigit => 'Vismaz 1 cipars';
 
   @override
-  String get passwordReqSpecial => 'At least 1 special character';
+  String get passwordReqSpecial => 'Vismaz 1 īpašā rakstzīme';
 
   @override
-  String get passwordTooWeak => 'Password does not meet all requirements';
+  String get passwordTooWeak => 'Parole neatbilst visām prasībām';
 
   @override
-  String get brandFilterAll => 'All';
+  String get brandFilterAll => 'Visas';
 
   @override
-  String get brandFilterNoHighway => 'No highway';
+  String get brandFilterNoHighway => 'Bez autoceļa';
 
   @override
   String get swipeTutorialMessage =>
-      'Swipe right to navigate, swipe left to remove';
+      'Velciet pa labi, lai navigētu, velciet pa kreisi, lai noņemtu';
 
   @override
-  String get swipeTutorialDismiss => 'Got it';
+  String get swipeTutorialDismiss => 'Sapratu';
 
   @override
   String get alertStatsActive => 'Aktīvas';
@@ -1422,100 +1428,101 @@ class AppLocalizationsLv extends AppLocalizations {
   String get alertStatsThisWeek => 'Šo nedēļu';
 
   @override
-  String get privacyDashboardTitle => 'Privacy Dashboard';
+  String get privacyDashboardTitle => 'Privātuma panelis';
 
   @override
-  String get privacyDashboardSubtitle => 'View, export, or delete your data';
+  String get privacyDashboardSubtitle =>
+      'Skatīt, eksportēt vai dzēst savus datus';
 
   @override
   String get privacyDashboardBanner =>
-      'Your data belongs to you. Here you can see everything this app stores, export it, or delete it.';
+      'Jūsu dati pieder jums. Šeit varat redzēt visu, ko šī lietotne glabā, eksportēt vai dzēst.';
 
   @override
-  String get privacyLocalData => 'Data on this device';
+  String get privacyLocalData => 'Dati šajā ierīcē';
 
   @override
-  String get privacyIgnoredStations => 'Ignored stations';
+  String get privacyIgnoredStations => 'Ignorētās stacijas';
 
   @override
-  String get privacyRatings => 'Station ratings';
+  String get privacyRatings => 'Staciju vērtējumi';
 
   @override
-  String get privacyPriceHistory => 'Price history stations';
+  String get privacyPriceHistory => 'Cenu vēstures stacijas';
 
   @override
-  String get privacyProfiles => 'Search profiles';
+  String get privacyProfiles => 'Meklēšanas profili';
 
   @override
-  String get privacyItineraries => 'Saved routes';
+  String get privacyItineraries => 'Saglabātie maršruti';
 
   @override
-  String get privacyCacheEntries => 'Cache entries';
+  String get privacyCacheEntries => 'Kešatmiņas ieraksti';
 
   @override
-  String get privacyApiKey => 'API key stored';
+  String get privacyApiKey => 'API atslēga glabāta';
 
   @override
-  String get privacyEvApiKey => 'EV API key stored';
+  String get privacyEvApiKey => 'EV API atslēga glabāta';
 
   @override
-  String get privacyEstimatedSize => 'Estimated storage';
+  String get privacyEstimatedSize => 'Aptuvens krātuve';
 
   @override
-  String get privacySyncedData => 'Cloud sync (TankSync)';
+  String get privacySyncedData => 'Mākoņa sinhronizācija (TankSync)';
 
   @override
   String get privacySyncDisabled =>
-      'Cloud sync is disabled. All data stays on this device only.';
+      'Mākoņa sinhronizācija ir atspējota. Visi dati paliek tikai šajā ierīcē.';
 
   @override
-  String get privacySyncMode => 'Sync mode';
+  String get privacySyncMode => 'Sinhronizācijas režīms';
 
   @override
-  String get privacySyncUserId => 'User ID';
+  String get privacySyncUserId => 'Lietotāja ID';
 
   @override
   String get privacySyncDescription =>
-      'When sync is enabled, favorites, alerts, ignored stations, and ratings are also stored on the TankSync server.';
+      'Kad sinhronizācija ir iespējota, izlases, brīdinājumi, ignorētās stacijas un vērtējumi tiek glabāti arī TankSync serverī.';
 
   @override
-  String get privacyViewServerData => 'View server data';
+  String get privacyViewServerData => 'Skatīt servera datus';
 
   @override
-  String get privacyExportButton => 'Export all data as JSON';
+  String get privacyExportButton => 'Eksportēt visus datus kā JSON';
 
   @override
-  String get privacyExportSuccess => 'Data exported to clipboard';
+  String get privacyExportSuccess => 'Dati eksportēti starpliktuvē';
 
   @override
-  String get privacyExportCsvButton => 'Export all data as CSV';
+  String get privacyExportCsvButton => 'Eksportēt visus datus kā CSV';
 
   @override
-  String get privacyExportCsvSuccess => 'CSV data exported to clipboard';
+  String get privacyExportCsvSuccess => 'CSV dati eksportēti starpliktuvē';
 
   @override
-  String get privacyDeleteButton => 'Delete all data';
+  String get privacyDeleteButton => 'Dzēst visus datus';
 
   @override
   String privacyCopyErrorLog(int count) {
-    return 'Copy error log to clipboard ($count)';
+    return 'Kopēt kļūdu žurnālu starpliktuvē ($count)';
   }
 
   @override
-  String get privacyDeleteTitle => 'Delete all data?';
+  String get privacyDeleteTitle => 'Dzēst visus datus?';
 
   @override
   String get privacyDeleteBody =>
-      'This will permanently delete:\n\n- All favorites and station data\n- All search profiles\n- All price alerts\n- All price history\n- All cached data\n- Your API key\n- All app settings\n\nThe app will reset to its initial state. This action cannot be undone.';
+      'Tiks neatgriezeniski dzēsts:\n\n- Visas izlases un staciju dati\n- Visi meklēšanas profili\n- Visi cenu brīdinājumi\n- Visa cenu vēsture\n- Visi kešatmiņas dati\n- Jūsu API atslēga\n- Visi lietotnes iestatījumi\n\nLietotne atiestatīsies uz sākotnējo stāvokli. Šo darbību nevar atcelt.';
 
   @override
-  String get privacyDeleteConfirm => 'Delete everything';
+  String get privacyDeleteConfirm => 'Dzēst visu';
 
   @override
-  String get yes => 'Yes';
+  String get yes => 'Jā';
 
   @override
-  String get no => 'No';
+  String get no => 'Nē';
 
   @override
   String get amenities => 'Amenities';
@@ -1545,26 +1552,26 @@ class AppLocalizationsLv extends AppLocalizations {
   String get amenityEv => 'EV';
 
   @override
-  String get paymentMethods => 'Payment methods';
+  String get paymentMethods => 'Maksājumu veidi';
 
   @override
-  String get paymentMethodCash => 'Cash';
+  String get paymentMethodCash => 'Skaidra nauda';
 
   @override
-  String get paymentMethodCard => 'Card';
+  String get paymentMethodCard => 'Karte';
 
   @override
-  String get paymentMethodContactless => 'Contactless';
+  String get paymentMethodContactless => 'Bezkontakta';
 
   @override
-  String get paymentMethodFuelCard => 'Fuel Card';
+  String get paymentMethodFuelCard => 'Degvielas karte';
 
   @override
-  String get paymentMethodApp => 'App';
+  String get paymentMethodApp => 'Lietotne';
 
   @override
   String payWithApp(String app) {
-    return 'Pay with $app';
+    return 'Maksāt ar $app';
   }
 
   @override
@@ -1574,49 +1581,49 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String ecoScoreTooltip(String avg) {
-    return 'Compared to the rolling average over your last 3 fill-ups ($avg L/100 km).';
+    return 'Salīdzinājumā ar mainīgo vidējo pēdējo 3 uzpilžu laikā ($avg L/100 km).';
   }
 
   @override
   String ecoScoreSemantics(String value, String delta) {
-    return 'Consumption $value L/100 km, $delta versus your rolling average';
+    return 'Patēriņš $value L/100 km, $delta salīdzinājumā ar jūsu mainīgo vidējo';
   }
 
   @override
-  String get drivingMode => 'Driving Mode';
+  String get drivingMode => 'Braukšanas režīms';
 
   @override
-  String get drivingExit => 'Exit';
+  String get drivingExit => 'Iziet';
 
   @override
-  String get drivingNearestStation => 'Nearest';
+  String get drivingNearestStation => 'Tuvākā';
 
   @override
-  String get drivingTapToUnlock => 'Tap to unlock';
+  String get drivingTapToUnlock => 'Pieskarieties, lai atbloķētu';
 
   @override
-  String get drivingSafetyTitle => 'Safety Notice';
+  String get drivingSafetyTitle => 'Drošības paziņojums';
 
   @override
   String get drivingSafetyMessage =>
-      'Do not operate the app while driving. Pull over to a safe location before interacting with the screen. The driver is responsible for safe operation of the vehicle at all times.';
+      'Nelietojiet lietotni braukšanas laikā. Pirms mijiedarbošanās ar ekrānu apstājieties drošā vietā. Vadītājs ir atbildīgs par drošu transportlīdzekļa vadīšanu jebkurā laikā.';
 
   @override
-  String get drivingSafetyAccept => 'I understand';
+  String get drivingSafetyAccept => 'Saprotu';
 
   @override
-  String get voiceAnnouncementsTitle => 'Voice Announcements';
+  String get voiceAnnouncementsTitle => 'Balss paziņojumi';
 
   @override
   String get voiceAnnouncementsDescription =>
-      'Announce nearby cheap stations while driving';
+      'Paziņot par lētākajām tuvākajām stacijām braukšanas laikā';
 
   @override
-  String get voiceAnnouncementsEnabled => 'Enable voice announcements';
+  String get voiceAnnouncementsEnabled => 'Iespējot balss paziņojumus';
 
   @override
   String voiceAnnouncementThreshold(String price) {
-    return 'Only below $price';
+    return 'Tikai zem $price';
   }
 
   @override
@@ -1626,14 +1633,14 @@ class AppLocalizationsLv extends AppLocalizations {
     String fuelType,
     String price,
   ) {
-    return '$station, $distance kilometers ahead, $fuelType $price';
+    return '$station, $distance kilometri priekšā, $fuelType $price';
   }
 
   @override
-  String get voiceAnnouncementProximityRadius => 'Announcement radius';
+  String get voiceAnnouncementProximityRadius => 'Paziņojumu rādiuss';
 
   @override
-  String get voiceAnnouncementCooldown => 'Repeat interval';
+  String get voiceAnnouncementCooldown => 'Atkārtošanas intervāls';
 
   @override
   String get nearestStations => 'Tuvakias degvielas uzpildes stacijas';
@@ -1643,602 +1650,609 @@ class AppLocalizationsLv extends AppLocalizations {
       'Atrodiet tuvakias degvielas uzpildes stacijas pec jusu pasreizejas atrasanas vietas';
 
   @override
-  String get consumptionLogTitle => 'Fuel consumption';
+  String get consumptionLogTitle => 'Degvielas patēriņš';
 
   @override
-  String get consumptionLogMenuTitle => 'Consumption log';
+  String get consumptionLogMenuTitle => 'Patēriņa žurnāls';
 
   @override
   String get consumptionLogMenuSubtitle =>
-      'Track fill-ups and calculate L/100km';
+      'Izsekot uzpildes un aprēķināt L/100km';
 
   @override
-  String get consumptionStatsTitle => 'Consumption stats';
+  String get consumptionStatsTitle => 'Patēriņa statistika';
 
   @override
-  String get addFillUp => 'Add fill-up';
+  String get addFillUp => 'Pievienot uzpildi';
 
   @override
-  String get noFillUpsTitle => 'No fill-ups yet';
+  String get noFillUpsTitle => 'Vēl nav uzpilžu';
 
   @override
   String get noFillUpsSubtitle =>
-      'Log your first fill-up to start tracking consumption.';
+      'Reģistrējiet pirmo uzpildi, lai sāktu izsekot patēriņu.';
 
   @override
-  String get fillUpDate => 'Date';
+  String get fillUpDate => 'Datums';
 
   @override
-  String get liters => 'Liters';
+  String get liters => 'Litri';
 
   @override
-  String get odometerKm => 'Odometer (km)';
+  String get odometerKm => 'Odometrs (km)';
 
   @override
-  String get notesOptional => 'Notes (optional)';
+  String get notesOptional => 'Piezīmes (neobligāti)';
 
   @override
-  String get stationPreFilled => 'Station pre-filled';
+  String get stationPreFilled => 'Stacija iepriekš aizpildīta';
 
   @override
-  String get statAvgConsumption => 'Avg L/100km';
+  String get statAvgConsumption => 'Vid. L/100km';
 
   @override
-  String get statAvgCostPerKm => 'Avg cost/km';
+  String get statAvgCostPerKm => 'Vid. izmaksas/km';
 
   @override
-  String get statTotalLiters => 'Total liters';
+  String get statTotalLiters => 'Kopā litri';
 
   @override
-  String get statTotalSpent => 'Total spent';
+  String get statTotalSpent => 'Kopā iztērēts';
 
   @override
-  String get statFillUpCount => 'Fill-ups';
+  String get statFillUpCount => 'Uzpildes';
 
   @override
-  String get fieldRequired => 'Required';
+  String get fieldRequired => 'Obligāts lauks';
 
   @override
-  String get fieldInvalidNumber => 'Invalid number';
+  String get fieldInvalidNumber => 'Nederīgs skaitlis';
 
   @override
-  String get carbonDashboardTitle => 'Carbon dashboard';
+  String get carbonDashboardTitle => 'Oglekļa panelis';
 
   @override
-  String get carbonEmptyTitle => 'No data yet';
+  String get carbonEmptyTitle => 'Vēl nav datu';
 
   @override
   String get carbonEmptySubtitle =>
-      'Log fill-ups to see your carbon dashboard.';
+      'Reģistrējiet uzpildes, lai redzētu oglekļa paneli.';
 
   @override
-  String get carbonSummaryTotalCost => 'Total cost';
+  String get carbonSummaryTotalCost => 'Kopējās izmaksas';
 
   @override
-  String get carbonSummaryTotalCo2 => 'Total CO2';
+  String get carbonSummaryTotalCo2 => 'Kopējais CO2';
 
   @override
-  String get monthlyCostsTitle => 'Monthly costs';
+  String get monthlyCostsTitle => 'Ikmēneša izmaksas';
 
   @override
-  String get monthlyEmissionsTitle => 'Monthly CO2 emissions';
+  String get monthlyEmissionsTitle => 'Ikmēneša CO2 emisijas';
 
   @override
-  String get vehiclesTitle => 'My vehicles';
+  String get vehiclesTitle => 'Mani transportlīdzekļi';
 
   @override
-  String get vehiclesMenuTitle => 'My vehicles';
+  String get vehiclesMenuTitle => 'Mani transportlīdzekļi';
 
   @override
   String get vehiclesMenuSubtitle =>
-      'Battery, connectors, charging preferences';
+      'Akumulators, savienotāji, uzlādes preferences';
 
   @override
   String get vehiclesEmptyMessage =>
-      'Add your car to filter by connector and estimate charging costs.';
+      'Pievienojiet savu automašīnu, lai filtrētu pēc savienotāja un aprēķinātu uzlādes izmaksas.';
 
   @override
-  String get vehiclesWizardTitle => 'My vehicles (optional)';
+  String get vehiclesWizardTitle => 'Mani transportlīdzekļi (neobligāti)';
 
   @override
   String get vehiclesWizardSubtitle =>
-      'Add your car to pre-fill the consumption log and enable EV connector filters. You can skip this and add vehicles later.';
+      'Pievienojiet savu automašīnu, lai iepriekš aizpildītu patēriņa žurnālu un iespējotu EV savienotāju filtrus. Varat izlaist un pievienot transportlīdzekļus vēlāk.';
 
   @override
-  String get vehiclesWizardNoneYet => 'No vehicle configured yet.';
+  String get vehiclesWizardNoneYet =>
+      'Vēl nav konfigurēts neviens transportlīdzeklis.';
 
   @override
   String vehiclesWizardYoursList(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count vehicles',
-      one: '1 vehicle',
+      other: '$count transportlīdzekļi',
+      one: '1 transportlīdzeklis',
     );
-    return 'You have $_temp0:';
+    return 'Jums ir $_temp0:';
   }
 
   @override
   String get vehiclesWizardSkipHint =>
-      'Skip to finish setup — you can add vehicles anytime from Settings.';
+      'Izlaist, lai pabeigtu iestatīšanu — transportlīdzekļus varat pievienot jebkurā laikā no Iestatījumiem.';
 
   @override
-  String get fillUpVehicleLabel => 'Vehicle';
+  String get fillUpVehicleLabel => 'Transportlīdzeklis';
 
   @override
-  String get fillUpVehicleNone => 'No vehicle';
+  String get fillUpVehicleNone => 'Nav transportlīdzekļa';
 
   @override
-  String get fillUpVehicleRequired => 'Vehicle is required';
+  String get fillUpVehicleRequired => 'Transportlīdzeklis ir obligāts';
 
   @override
-  String get reportScanError => 'Report scan error';
+  String get reportScanError => 'Ziņot par skenēšanas kļūdu';
 
   @override
-  String get pickStationTitle => 'Pick a station';
+  String get pickStationTitle => 'Izvēlieties staciju';
 
   @override
   String get pickStationHelper =>
-      'Start the fill-up from a known station so prices, brand and fuel type fill themselves in.';
+      'Sāciet uzpildi no zināmas stacijas, lai cenas, zīmols un degvielas veids tiku aizpildīti automātiski.';
 
   @override
   String get pickStationEmpty =>
-      'No favorite stations yet — add some from Search or Favorites, or skip and fill in manually.';
+      'Vēl nav izlases staciju — pievienojiet no Meklēšanas vai Izlases, vai izlaidiet un aizpildiet manuāli.';
 
   @override
-  String get pickStationSkip => 'Skip — add without a station';
+  String get pickStationSkip => 'Izlaist — pievienot bez stacijas';
 
   @override
-  String get scanPump => 'Scan pump';
+  String get scanPump => 'Skenēt sūkni';
 
   @override
-  String get scanPayment => 'Scan payment QR';
+  String get scanPayment => 'Skenēt maksājuma QR';
 
   @override
-  String get qrPaymentBeneficiary => 'Beneficiary';
+  String get qrPaymentBeneficiary => 'Saņēmējs';
 
   @override
-  String get qrPaymentAmount => 'Amount';
+  String get qrPaymentAmount => 'Summa';
 
   @override
-  String get qrPaymentEpcTitle => 'SEPA payment';
+  String get qrPaymentEpcTitle => 'SEPA maksājums';
 
   @override
-  String get qrPaymentEpcEmpty => 'No fields decoded';
+  String get qrPaymentEpcEmpty => 'Nav atšifrēto lauku';
 
   @override
-  String get qrPaymentOpenInBank => 'Open in bank app';
+  String get qrPaymentOpenInBank => 'Atvērt bankas lietotnē';
 
   @override
-  String get qrPaymentLaunchFailed => 'No app available to open this code';
+  String get qrPaymentLaunchFailed =>
+      'Nav pieejamas lietotnes šī koda atvēršanai';
 
   @override
-  String get qrPaymentUnknownTitle => 'Unrecognised code';
+  String get qrPaymentUnknownTitle => 'Neatpazīts kods';
 
   @override
-  String get qrPaymentCopyRaw => 'Copy raw text';
+  String get qrPaymentCopyRaw => 'Kopēt neapstrādātu tekstu';
 
   @override
-  String get qrPaymentCopiedRaw => 'Copied to clipboard';
+  String get qrPaymentCopiedRaw => 'Nokopēts starpliktuvē';
 
   @override
-  String get qrPaymentReport => 'Report this scan';
+  String get qrPaymentReport => 'Ziņot par šo skenēšanu';
 
   @override
   String get qrPaymentEpcCopied =>
-      'Bank details copied — paste into your banking app';
+      'Bankas dati nokopēti — ielīmējiet bankas lietotnē';
 
   @override
-  String get qrScannerGuidance => 'Point the camera at a QR code';
+  String get qrScannerGuidance => 'Novirziet kameru uz QR kodu';
 
   @override
   String get qrScannerPermissionDenied =>
-      'Camera access is needed to scan QR codes.';
+      'Kameras piekļuve ir nepieciešama, lai skenētu QR kodus.';
 
   @override
   String get qrScannerPermissionPermanentlyDenied =>
-      'Camera access was denied. Open settings to grant it.';
+      'Kameras piekļuve tika liegta. Atveriet iestatījumus, lai to piešķirtu.';
 
   @override
-  String get qrScannerRetryPermission => 'Try again';
+  String get qrScannerRetryPermission => 'Mēģināt vēlreiz';
 
   @override
-  String get qrScannerOpenSettings => 'Open settings';
+  String get qrScannerOpenSettings => 'Atvērt iestatījumus';
 
   @override
   String get qrScannerTimeout =>
-      'No QR code detected. Move closer or try again.';
+      'QR kods nav atklāts. Tuvieties vai mēģiniet vēlreiz.';
 
   @override
-  String get qrScannerRetry => 'Try again';
+  String get qrScannerRetry => 'Mēģināt vēlreiz';
 
   @override
-  String get torchOn => 'Turn flash on';
+  String get torchOn => 'Ieslēgt zibspuldzi';
 
   @override
-  String get torchOff => 'Turn flash off';
+  String get torchOff => 'Izslēgt zibspuldzi';
 
   @override
-  String get obdNoAdapter => 'No OBD2 adapter in range';
+  String get obdNoAdapter => 'Nav OBD2 adaptera diapazonā';
 
   @override
-  String get obdOdometerUnavailable => 'Could not read odometer';
+  String get obdOdometerUnavailable => 'Nevarēja nolasīt odometru';
 
   @override
   String get obdPermissionDenied =>
-      'Grant Bluetooth permission in system settings';
+      'Piešķiriet Bluetooth atļauju sistēmas iestatījumos';
 
   @override
   String get obdAdapterUnresponsive =>
-      'Adapter didn\'t answer — turn the ignition on and retry';
+      'Adapteris neatbildēja — ieslēdziet aizdedzi un mēģiniet vēlreiz';
 
   @override
-  String get obdPickerTitle => 'Pick an OBD2 adapter';
+  String get obdPickerTitle => 'Izvēlieties OBD2 adapteru';
 
   @override
-  String get obdPickerScanning => 'Scanning for adapters…';
+  String get obdPickerScanning => 'Meklē adapterus…';
 
   @override
-  String get obdPickerConnecting => 'Connecting…';
+  String get obdPickerConnecting => 'Savienojas…';
 
   @override
-  String get themeSettingTitle => 'Theme';
+  String get themeSettingTitle => 'Dizains';
 
   @override
-  String get themeModeLight => 'Light';
+  String get themeModeLight => 'Gaišs';
 
   @override
-  String get themeModeDark => 'Dark';
+  String get themeModeDark => 'Tumšs';
 
   @override
-  String get themeModeSystem => 'Follow system';
+  String get themeModeSystem => 'Sekot sistēmai';
 
   @override
-  String get tripRecordingTitle => 'Recording trip';
+  String get tripRecordingTitle => 'Brauciena ierakstīšana';
 
   @override
-  String get tripSummaryTitle => 'Trip summary';
+  String get tripSummaryTitle => 'Brauciena kopsavilkums';
 
   @override
-  String get tripMetricDistance => 'Distance';
+  String get tripMetricDistance => 'Attālums';
 
   @override
-  String get tripMetricSpeed => 'Speed';
+  String get tripMetricSpeed => 'Ātrums';
 
   @override
-  String get tripMetricFuelUsed => 'Fuel used';
+  String get tripMetricFuelUsed => 'Patērētā degviela';
 
   @override
-  String get tripMetricAvgConsumption => 'Avg';
+  String get tripMetricAvgConsumption => 'Vid.';
 
   @override
-  String get tripMetricElapsed => 'Elapsed';
+  String get tripMetricElapsed => 'Pagājušais laiks';
 
   @override
-  String get tripMetricOdometer => 'Odometer';
+  String get tripMetricOdometer => 'Odometrs';
 
   @override
-  String get tripStop => 'Stop recording';
+  String get tripStop => 'Apturēt ierakstīšanu';
 
   @override
-  String get tripPause => 'Pause';
+  String get tripPause => 'Pauze';
 
   @override
-  String get tripResume => 'Resume';
+  String get tripResume => 'Turpināt';
 
   @override
-  String get tripBannerRecording => 'Recording trip';
+  String get tripBannerRecording => 'Ieraksta braucienu';
 
   @override
-  String get tripBannerPaused => 'Trip paused — tap to resume';
+  String get tripBannerPaused =>
+      'Brauciens pauzēts — pieskarieties, lai turpinātu';
 
   @override
-  String get navConsumption => 'Consumption';
+  String get navConsumption => 'Patēriņš';
 
   @override
-  String get vehicleBaselineSectionTitle => 'Baseline calibration';
+  String get vehicleBaselineSectionTitle => 'Bāzlīnijas kalibrēšana';
 
   @override
   String get vehicleBaselineEmpty =>
-      'No samples yet — start an OBD2 trip to begin learning this vehicle\'s fuel profile.';
+      'Vēl nav paraugu — sāciet OBD2 braucienu, lai sāktu apgūt šī transportlīdzekļa degvielas profilu.';
 
   @override
   String get vehicleBaselineProgress =>
-      'Learned from samples across driving situations.';
+      'Apgūts no paraugiem dažādās braukšanas situācijās.';
 
   @override
-  String get vehicleBaselineReset => 'Reset driving-situation baseline';
+  String get vehicleBaselineReset =>
+      'Atiestatīt braukšanas situācijas bāzlīniju';
 
   @override
   String get vehicleBaselineResetConfirmTitle =>
-      'Reset driving-situation baseline?';
+      'Atiestatīt braukšanas situācijas bāzlīniju?';
 
   @override
   String get vehicleBaselineResetConfirmBody =>
-      'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.';
+      'Tiks dzēsti visi apgūtie paraugi šim transportlīdzeklim. Līdz jauniem braucieniem atgriezīsies aukstās starta noklusējumi.';
 
   @override
-  String get vehicleAdapterSectionTitle => 'OBD2 adapter';
+  String get vehicleAdapterSectionTitle => 'OBD2 adapteris';
 
   @override
   String get vehicleAdapterEmpty =>
-      'No adapter paired. Pair one so the app can reconnect automatically next time.';
+      'Nav savienota adaptera. Savienojiet, lai lietotne varētu automātiski atkārtoti savienoties.';
 
   @override
-  String get vehicleAdapterUnnamed => 'Unknown adapter';
+  String get vehicleAdapterUnnamed => 'Nezināms adapteris';
 
   @override
-  String get vehicleAdapterPair => 'Pair adapter';
+  String get vehicleAdapterPair => 'Savienot adapteru';
 
   @override
-  String get vehicleAdapterForget => 'Forget adapter';
+  String get vehicleAdapterForget => 'Aizmirst adapteru';
 
   @override
-  String get achievementsTitle => 'Achievements';
+  String get achievementsTitle => 'Sasniegumi';
 
   @override
-  String get achievementFirstTrip => 'First trip';
+  String get achievementFirstTrip => 'Pirmais brauciens';
 
   @override
-  String get achievementFirstTripDesc => 'Record your first OBD2 trip.';
+  String get achievementFirstTripDesc => 'Ierakstiet pirmo OBD2 braucienu.';
 
   @override
-  String get achievementFirstFillUp => 'First fill-up';
+  String get achievementFirstFillUp => 'Pirmā uzpilde';
 
   @override
-  String get achievementFirstFillUpDesc => 'Log your first fill-up.';
+  String get achievementFirstFillUpDesc => 'Reģistrējiet pirmo uzpildi.';
 
   @override
-  String get achievementTenTrips => '10 trips';
+  String get achievementTenTrips => '10 braucieni';
 
   @override
-  String get achievementTenTripsDesc => 'Record 10 OBD2 trips.';
+  String get achievementTenTripsDesc => 'Ierakstiet 10 OBD2 braucienus.';
 
   @override
-  String get achievementZeroHarsh => 'Smooth driver';
+  String get achievementZeroHarsh => 'Maigs braucējs';
 
   @override
   String get achievementZeroHarshDesc =>
-      'Complete a trip of 10 km or more with no harsh braking or acceleration.';
+      'Pabeidziet braucienu vismaz 10 km bez asas bremzēšanas vai paātrinājuma.';
 
   @override
-  String get achievementEcoWeek => 'Eco week';
+  String get achievementEcoWeek => 'Eko nedēļa';
 
   @override
   String get achievementEcoWeekDesc =>
-      'Drive 7 consecutive days with at least one smooth trip each day.';
+      'Brauciet 7 dienas pēc kārtas ar vismaz vienu maigo braucienu katru dienu.';
 
   @override
-  String get achievementPriceWin => 'Price win';
+  String get achievementPriceWin => 'Cenas uzvara';
 
   @override
   String get achievementPriceWinDesc =>
-      'Log a fill-up that beats the station\'s 30-day average by 5 % or more.';
+      'Reģistrējiet uzpildi, kas ir par 5 % vai vairāk lētāka nekā stacijas 30 dienu vidējā cena.';
 
   @override
-  String get syncBaselinesToggleTitle => 'Share learned vehicle profiles';
+  String get syncBaselinesToggleTitle =>
+      'Kopīgot apgūtos transportlīdzekļu profilus';
 
   @override
   String get syncBaselinesToggleSubtitle =>
-      'Upload per-vehicle consumption baselines so a second device can reuse them.';
+      'Augšupielādēt patēriņa bāzlīnijas katram transportlīdzeklim, lai cita ierīce varētu tās izmantot.';
 
   @override
-  String get obd2StatusConnected => 'OBD2 adapter: connected';
+  String get obd2StatusConnected => 'OBD2 adapteris: savienots';
 
   @override
-  String get obd2StatusAttempting => 'OBD2 adapter: connecting';
+  String get obd2StatusAttempting => 'OBD2 adapteris: savienojas';
 
   @override
-  String get obd2StatusUnreachable => 'OBD2 adapter: unreachable';
+  String get obd2StatusUnreachable => 'OBD2 adapteris: nesasniedzams';
 
   @override
   String get obd2StatusPermissionDenied =>
-      'OBD2 adapter: Bluetooth permission needed';
+      'OBD2 adapteris: nepieciešama Bluetooth atļauja';
 
   @override
-  String get obd2StatusConnectedBody => 'Ready to record a trip.';
+  String get obd2StatusConnectedBody => 'Gatavs ierakstīt braucienu.';
 
   @override
-  String get obd2StatusAttemptingBody => 'Connecting in the background…';
+  String get obd2StatusAttemptingBody => 'Savienojas fonā…';
 
   @override
   String get obd2StatusUnreachableBody =>
-      'Adapter out of range or already in use by another app.';
+      'Adapteris ārpus diapazona vai jau tiek izmantots citā lietotnē.';
 
   @override
   String get obd2StatusPermissionDeniedBody =>
-      'Grant Bluetooth permission in system settings to reconnect automatically.';
+      'Piešķiriet Bluetooth atļauju sistēmas iestatījumos, lai automātiski atkārtoti savienotos.';
 
   @override
-  String get obd2StatusNoAdapter => 'No adapter paired';
+  String get obd2StatusNoAdapter => 'Nav savienota adaptera';
 
   @override
-  String get obd2StatusForget => 'Forget adapter';
+  String get obd2StatusForget => 'Aizmirst adapteru';
 
   @override
-  String get tripHistoryTitle => 'Trip history';
+  String get tripHistoryTitle => 'Braucienu vēsture';
 
   @override
-  String get tripHistoryEmptyTitle => 'No trips yet';
+  String get tripHistoryEmptyTitle => 'Vēl nav braucienu';
 
   @override
   String get tripHistoryEmptySubtitle =>
-      'Connect an OBD2 adapter and record a trip to start building your driving history.';
+      'Savienojiet OBD2 adapteru un ierakstiet braucienu, lai sāktu veidot braukšanas vēsturi.';
 
   @override
-  String get tripHistoryUnknownDate => 'Unknown date';
+  String get tripHistoryUnknownDate => 'Nezināms datums';
 
   @override
-  String get situationIdle => 'Idle';
+  String get situationIdle => 'Dīkstāvē';
 
   @override
-  String get situationStopAndGo => 'Stop & go';
+  String get situationStopAndGo => 'Apstāšanās & braukšana';
 
   @override
-  String get situationUrban => 'Urban';
+  String get situationUrban => 'Pilsētas';
 
   @override
-  String get situationHighway => 'Highway';
+  String get situationHighway => 'Šosejas';
 
   @override
-  String get situationDecel => 'Decelerating';
+  String get situationDecel => 'Palēninot';
 
   @override
-  String get situationClimbing => 'Climbing / loaded';
+  String get situationClimbing => 'Kāpšana / noslogots';
 
   @override
-  String get situationHardAccel => 'Hard accel';
+  String get situationHardAccel => 'Straujš paātrinājums';
 
   @override
-  String get situationFuelCut => 'Fuel cut — coast';
+  String get situationFuelCut => 'Degvielas pārtraukšana — skriešana';
 
   @override
-  String get tripSaveAsFillUp => 'Save as fill-up';
+  String get tripSaveAsFillUp => 'Saglabāt kā uzpildi';
 
   @override
-  String get tripSaveRecording => 'Save trip';
+  String get tripSaveRecording => 'Saglabāt braucienu';
 
   @override
-  String get tripDiscard => 'Discard';
+  String get tripDiscard => 'Atmest';
 
   @override
   String obdOdometerRead(int km) {
-    return 'Odometer read: $km km';
+    return 'Odometrs nolasīts: $km km';
   }
 
   @override
-  String get vehicleFuelNotSet => 'Not set';
+  String get vehicleFuelNotSet => 'Nav iestatīts';
 
   @override
-  String get wizardVehicleTapToEdit => 'Tap to edit';
+  String get wizardVehicleTapToEdit => 'Pieskarieties, lai rediģētu';
 
   @override
-  String get wizardVehicleDefaultBadge => 'Default';
+  String get wizardVehicleDefaultBadge => 'Noklusējums';
 
   @override
   String get wizardProfileChoiceHint =>
-      'Choose how you want to use the app. You can change this later in Settings.';
+      'Izvēlieties, kā vēlaties izmantot lietotni. To varat mainīt vēlāk Iestatījumos.';
 
   @override
   String get wizardProfileChoiceFooter =>
-      'You can change your choice any time from Settings → Use mode.';
+      'Savu izvēli varat mainīt jebkurā laikā no Iestatījumi → Lietošanas veids.';
 
   @override
-  String get wizardProfileBasicName => 'Basic';
+  String get wizardProfileBasicName => 'Pamata';
 
   @override
   String get wizardProfileBasicDescription =>
-      'Cheapest fuel and EV charging prices nearby. Favorites and price alerts.';
+      'Lētākās degvielas un EV uzlādes cenas tuvumā. Izlases un cenu brīdinājumi.';
 
   @override
-  String get wizardProfileMediumName => 'Medium';
+  String get wizardProfileMediumName => 'Vidējs';
 
   @override
   String get wizardProfileMediumDescription =>
-      'Everything in Basic, plus track your fuel fill-ups and EV charging by hand.';
+      'Viss no Pamata, plus izsekot degvielas uzpildes un EV uzlādi manuāli.';
 
   @override
-  String get wizardProfileFullName => 'Full';
+  String get wizardProfileFullName => 'Pilns';
 
   @override
   String get wizardProfileFullDescription =>
-      'Everything in Medium, plus automatic OBD2 trip recording, driving scores, and loyalty cards.';
+      'Viss no Vidēja, plus automātiska OBD2 braucienu ierakstīšana, braukšanas novērtējumi un lojalitātes kartes.';
 
   @override
-  String get wizardProfileCustomName => 'Custom';
+  String get wizardProfileCustomName => 'Pielāgots';
 
   @override
   String get wizardProfileCustomDescription =>
-      'Your own combination of features. Tweak each toggle below.';
+      'Jūsu pašu funkciju kombinācija. Pielāgojiet katru slēdzi zemāk.';
 
   @override
   String get useModeSectionHint =>
-      'Right-size the app to how you actually use it. Picking a preset enables the matching set of features.';
+      'Pielāgojiet lietotni tam, kā faktiski to izmantojat. Izvēloties sākotnējo iestatījumu, tiek iespējots atbilstošais funkciju kopums.';
 
   @override
   String get useModeCustomSettingsDescription =>
-      'Your feature mix doesn\'t match any preset. Pick one above to overwrite, or keep customising individual features in the section below.';
+      'Jūsu funkciju kombinācija neatbilst nevienam sākotnējam iestatījumam. Izvēlieties vienu augstāk, lai pārrakstītu, vai turpiniet pielāgot atsevišķas funkcijas zemāk esošajā sadaļā.';
 
   @override
   String useModeSwitchedSnack(String profile) {
-    return 'Use mode set to $profile.';
+    return 'Lietošanas veids iestatīts uz $profile.';
   }
 
   @override
-  String get profileDefaultVehicleLabel => 'Default vehicle (optional)';
+  String get profileDefaultVehicleLabel =>
+      'Noklusējuma transportlīdzeklis (neobligāti)';
 
   @override
-  String get profileDefaultVehicleNone => 'No default';
+  String get profileDefaultVehicleNone => 'Nav noklusējuma';
 
   @override
   String get profileFuelFromVehicleHint =>
-      'Fuel type is derived from your default vehicle. Clear the vehicle to pick a fuel directly.';
+      'Degvielas veids tiek iegūts no jūsu noklusējuma transportlīdzekļa. Notīriet transportlīdzekli, lai tieši izvēlētos degvielu.';
 
   @override
-  String get consumptionNoVehicleTitle => 'Add a vehicle first';
+  String get consumptionNoVehicleTitle =>
+      'Vispirms pievienojiet transportlīdzekli';
 
   @override
   String get consumptionNoVehicleBody =>
-      'Fill-ups are attributed to a vehicle. Add your car to start logging consumption.';
+      'Uzpildes tiek attiecinātas uz transportlīdzekli. Pievienojiet savu automašīnu, lai sāktu reģistrēt patēriņu.';
 
   @override
-  String get vehicleAdd => 'Add vehicle';
+  String get vehicleAdd => 'Pievienot transportlīdzekli';
 
   @override
-  String get vehicleAddTitle => 'Add vehicle';
+  String get vehicleAddTitle => 'Pievienot transportlīdzekli';
 
   @override
-  String get vehicleEditTitle => 'Edit vehicle';
+  String get vehicleEditTitle => 'Rediģēt transportlīdzekli';
 
   @override
-  String get vehicleDeleteTitle => 'Delete vehicle?';
+  String get vehicleDeleteTitle => 'Dzēst transportlīdzekli?';
 
   @override
   String vehicleDeleteMessage(String name) {
-    return 'Remove \"$name\" from your profiles?';
+    return 'Noņemt \"$name\" no jūsu profiliem?';
   }
 
   @override
-  String get vehicleNameLabel => 'Name';
+  String get vehicleNameLabel => 'Nosaukums';
 
   @override
-  String get vehicleNameHint => 'e.g. My Tesla Model 3';
+  String get vehicleNameHint => 'piem. Mans Tesla Model 3';
 
   @override
-  String get vehicleTypeCombustion => 'Combustion';
+  String get vehicleTypeCombustion => 'Iekšdedzes';
 
   @override
-  String get vehicleTypeHybrid => 'Hybrid';
+  String get vehicleTypeHybrid => 'Hibrīds';
 
   @override
-  String get vehicleTypeEv => 'Electric';
+  String get vehicleTypeEv => 'Elektriskais';
 
   @override
-  String get vehicleEvSectionTitle => 'Electric';
+  String get vehicleEvSectionTitle => 'Elektriskais';
 
   @override
-  String get vehicleCombustionSectionTitle => 'Combustion';
+  String get vehicleCombustionSectionTitle => 'Iekšdedzes';
 
   @override
-  String get vehicleBatteryLabel => 'Battery capacity (kWh)';
+  String get vehicleBatteryLabel => 'Akumulatora kapacitāte (kWh)';
 
   @override
-  String get vehicleMaxChargeLabel => 'Max charging power (kW)';
+  String get vehicleMaxChargeLabel => 'Maks. uzlādes jauda (kW)';
 
   @override
-  String get vehicleConnectorsLabel => 'Supported connectors';
+  String get vehicleConnectorsLabel => 'Atbalstītie savienotāji';
 
   @override
   String get vehicleMinSocLabel => 'Min SoC %';
 
   @override
-  String get vehicleMaxSocLabel => 'Max SoC %';
+  String get vehicleMaxSocLabel => 'Maks SoC %';
 
   @override
-  String get vehicleTankLabel => 'Tank capacity (L)';
+  String get vehicleTankLabel => 'Tvertnes kapacitāte (L)';
 
   @override
-  String get vehiclePreferredFuelLabel => 'Preferred fuel';
+  String get vehiclePreferredFuelLabel => 'Vēlamā degviela';
 
   @override
   String get connectorType2 => 'Type 2';
@@ -2259,64 +2273,64 @@ class AppLocalizationsLv extends AppLocalizations {
   String get connectorType1 => 'Type 1';
 
   @override
-  String get connectorThreePin => '3-pin';
+  String get connectorThreePin => '3 tapu';
 
   @override
-  String get evShowOnMap => 'Show EV stations';
+  String get evShowOnMap => 'Rādīt EV stacijas';
 
   @override
-  String get evAvailableOnly => 'Available only';
+  String get evAvailableOnly => 'Tikai pieejamās';
 
   @override
-  String get evMinPower => 'Min power';
+  String get evMinPower => 'Min jauda';
 
   @override
-  String get evMaxPower => 'Max power';
+  String get evMaxPower => 'Maks jauda';
 
   @override
-  String get evOperator => 'Operator';
+  String get evOperator => 'Operators';
 
   @override
-  String get evLastUpdate => 'Last update';
+  String get evLastUpdate => 'Pēdējā atjaunināšana';
 
   @override
-  String get evStatusAvailable => 'Available';
+  String get evStatusAvailable => 'Pieejama';
 
   @override
-  String get evStatusOccupied => 'Occupied';
+  String get evStatusOccupied => 'Aizņemta';
 
   @override
-  String get evStatusOutOfOrder => 'Out of order';
+  String get evStatusOutOfOrder => 'Nedarbojas';
 
   @override
-  String get openOnlyFilter => 'Open only';
+  String get openOnlyFilter => 'Tikai atvērtās';
 
   @override
-  String get saveAsDefaults => 'Save as my defaults';
+  String get saveAsDefaults => 'Saglabāt kā manus noklusējumus';
 
   @override
-  String get criteriaSavedToProfile => 'Saved as defaults';
+  String get criteriaSavedToProfile => 'Saglabāts kā noklusējums';
 
   @override
-  String get profileNotFound => 'No active profile';
+  String get profileNotFound => 'Nav aktīva profila';
 
   @override
-  String get updatingFavorites => 'Updating your favorites...';
+  String get updatingFavorites => 'Atjaunina jūsu izlasi...';
 
   @override
-  String get fetchingLatestPrices => 'Fetching the latest prices';
+  String get fetchingLatestPrices => 'Iegūst jaunākās cenas';
 
   @override
-  String get noDataAvailable => 'No data';
+  String get noDataAvailable => 'Nav datu';
 
   @override
-  String get configAndPrivacy => 'Configuration & Privacy';
+  String get configAndPrivacy => 'Konfigurācija un privātums';
 
   @override
-  String get searchToSeeMap => 'Search to see stations on the map';
+  String get searchToSeeMap => 'Meklējiet, lai redzētu stacijas kartē';
 
   @override
-  String get evPowerAny => 'Any';
+  String get evPowerAny => 'Jebkāda';
 
   @override
   String evPowerKw(int kw) {
@@ -2324,464 +2338,471 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
-  String get sectionProfile => 'Profile';
+  String get sectionProfile => 'Profils';
 
   @override
-  String get sectionLocation => 'Location';
+  String get sectionLocation => 'Atrašanās vieta';
 
   @override
-  String get tooltipBack => 'Back';
+  String get tooltipBack => 'Atpakaļ';
 
   @override
-  String get tooltipClose => 'Close';
+  String get tooltipClose => 'Aizvērt';
 
   @override
-  String get tooltipClearSearch => 'Clear search input';
+  String get tooltipClearSearch => 'Notīrīt meklēšanu';
 
   @override
-  String get tooltipUseGps => 'Use GPS location';
+  String get tooltipUseGps => 'Izmantot GPS atrašanās vietu';
 
   @override
-  String get tooltipShowPassword => 'Show password';
+  String get tooltipShowPassword => 'Rādīt paroli';
 
   @override
-  String get tooltipHidePassword => 'Hide password';
+  String get tooltipHidePassword => 'Slēpt paroli';
 
   @override
-  String get evConnectorsLabel => 'Available connectors';
+  String get evConnectorsLabel => 'Pieejamie savienotāji';
 
   @override
-  String get evConnectorsNone => 'No connector information';
+  String get evConnectorsNone => 'Nav savienotāja informācijas';
 
   @override
-  String get switchToEmail => 'Switch to email';
+  String get switchToEmail => 'Pārslēgties uz e-pastu';
 
   @override
   String get switchToEmailSubtitle =>
-      'Keep data, add sign-in from other devices';
+      'Saglabāt datus, pievienot pieteikšanos no citām ierīcēm';
 
   @override
-  String get switchToAnonymousAction => 'Switch to anonymous';
+  String get switchToAnonymousAction => 'Pārslēgties uz anonīmu';
 
   @override
   String get switchToAnonymousSubtitle =>
-      'Keep local data, use new anonymous session';
+      'Saglabāt lokālos datus, izmantot jaunu anonīmu sesiju';
 
   @override
-  String get linkDevice => 'Link device';
+  String get linkDevice => 'Saistīt ierīci';
 
   @override
-  String get shareDatabase => 'Share database';
+  String get shareDatabase => 'Kopīgot datu bāzi';
 
   @override
-  String get disconnectAction => 'Disconnect';
+  String get disconnectAction => 'Atvienot';
 
   @override
-  String get disconnectSubtitle => 'Stop syncing (local data kept)';
+  String get disconnectSubtitle =>
+      'Apturēt sinhronizāciju (lokālie dati saglabāti)';
 
   @override
-  String get deleteAccountAction => 'Delete account';
+  String get deleteAccountAction => 'Dzēst kontu';
 
   @override
-  String get deleteAccountSubtitle => 'Remove all server data permanently';
+  String get deleteAccountSubtitle =>
+      'Neatgriezeniski noņemt visus servera datus';
 
   @override
-  String get localOnly => 'Local only';
+  String get localOnly => 'Tikai lokāli';
 
   @override
   String get localOnlySubtitle =>
-      'Optional: sync favorites, alerts, and ratings across devices';
+      'Neobligāti: sinhronizēt izlases, brīdinājumus un vērtējumus starp ierīcēm';
 
   @override
-  String get setupCloudSync => 'Set up cloud sync';
+  String get setupCloudSync => 'Iestatīt mākoņa sinhronizāciju';
 
   @override
-  String get disconnectTitle => 'Disconnect TankSync?';
+  String get disconnectTitle => 'Atvienot TankSync?';
 
   @override
   String get disconnectBody =>
-      'Cloud sync will be disabled. Your local data (favorites, alerts, history) is preserved on this device. Server data is not deleted.';
+      'Mākoņa sinhronizācija tiks atspējota. Jūsu lokālie dati (izlases, brīdinājumi, vēsture) tiek saglabāti šajā ierīcē. Servera dati netiek dzēsti.';
 
   @override
-  String get deleteAccountTitle => 'Delete account?';
+  String get deleteAccountTitle => 'Dzēst kontu?';
 
   @override
   String get deleteAccountBody =>
-      'This permanently deletes all your data from the server (favorites, alerts, ratings, routes). Local data on this device is preserved.\n\nThis cannot be undone.';
+      'Tiks neatgriezeniski dzēsti visi jūsu dati no servera (izlases, brīdinājumi, vērtējumi, maršruti). Lokālie dati šajā ierīcē tiek saglabāti.\n\nŠo nevar atcelt.';
 
   @override
-  String get switchToAnonymousTitle => 'Switch to anonymous?';
+  String get switchToAnonymousTitle => 'Pārslēgties uz anonīmu?';
 
   @override
   String get switchToAnonymousBody =>
-      'You will be signed out of your email account and continue with a new anonymous session.\n\nYour local data (favorites, alerts) is kept on this device and will be synced to the new anonymous account.';
+      'Jūs tiksiet izrakstīts no sava e-pasta konta un turpināsiet ar jaunu anonīmu sesiju.\n\nJūsu lokālie dati (izlases, brīdinājumi) paliek šajā ierīcē un tiks sinhronizēti ar jauno anonīmo kontu.';
 
   @override
-  String get switchAction => 'Switch';
+  String get switchAction => 'Pārslēgt';
 
   @override
   String get helpBannerCriteria =>
-      'Your profile defaults are pre-filled. Adjust criteria below to refine your search.';
+      'Jūsu profila noklusējumi ir iepriekš aizpildīti. Pielāgojiet kritērijus zemāk, lai precizētu meklēšanu.';
 
   @override
   String get helpBannerAlerts =>
-      'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.';
+      'Iestatiet cenas slieksni stacijai. Jūs saņemsiet paziņojumu, kad cenas nokritīsies zem tā. Pārbaudes notiek ik 30 minūtes.';
 
   @override
   String get helpBannerConsumption =>
-      'Log every fill-up to track your real-world consumption and CO₂ footprint. Swipe left to delete an entry.';
+      'Reģistrējiet katru uzpildi, lai izsekotu reālo patēriņu un CO₂ nospiedumu. Velciet pa kreisi, lai dzēstu ierakstu.';
 
   @override
   String get helpBannerVehicles =>
-      'Add your vehicles so fill-ups and fuel preferences default correctly. The first vehicle becomes your default.';
+      'Pievienojiet savus transportlīdzekļus, lai uzpildes un degvielas preferences tiktu iepriekš aizpildītas pareizi. Pirmais transportlīdzeklis kļūst par noklusējumu.';
 
   @override
-  String get syncNow => 'Sync now';
+  String get syncNow => 'Sinhronizēt tagad';
 
   @override
-  String get onboardingPreferencesTitle => 'Your preferences';
+  String get onboardingPreferencesTitle => 'Jūsu preferences';
 
   @override
-  String get onboardingZipHelper => 'Used when GPS is unavailable';
+  String get onboardingZipHelper => 'Tiek izmantots, ja GPS nav pieejams';
 
   @override
-  String get onboardingRadiusHelper => 'Larger radius = more results';
+  String get onboardingRadiusHelper => 'Lielāks rādiuss = vairāk rezultātu';
 
   @override
   String get onboardingPrivacy =>
-      'These settings are stored only on your device and never shared.';
+      'Šie iestatījumi tiek glabāti tikai jūsu ierīcē un nekad netiek kopīgoti.';
 
   @override
-  String get onboardingLandingTitle => 'Home screen';
+  String get onboardingLandingTitle => 'Sākuma ekrāns';
 
   @override
   String get onboardingLandingHint =>
-      'Choose which screen opens when you launch the app.';
+      'Izvēlieties, kurš ekrāns tiek atvērts, palaižot lietotni.';
 
   @override
   String get iosAutoRecordOnboardingTitle =>
-      'Stay out of the app — but don\'t quit it.';
+      'Neejiet prom no lietotnes — bet neslēdziet to.';
 
   @override
   String get iosAutoRecordOnboardingBullet1Title =>
-      'Open Sparkilo once after each reboot.';
+      'Atveriet Sparkilo vienu reizi pēc katras pārstartēšanas.';
 
   @override
   String get iosAutoRecordOnboardingBullet1Body =>
-      'Apple wakes Sparkilo only after you\'ve opened it at least once since the phone restarted. After that, your trips record automatically.';
+      'Apple aktivizē Sparkilo tikai pēc tam, kad esat to atvēris vismaz vienu reizi kopš tālruņa restartēšanas. Pēc tam jūsu braucieni tiek ierakstīti automātiski.';
 
   @override
   String get iosAutoRecordOnboardingBullet2Title =>
-      'Don\'t swipe Sparkilo away in the app switcher.';
+      'Neizslēdziet Sparkilo lietotņu pārvaldniekā.';
 
   @override
   String get iosAutoRecordOnboardingBullet2Body =>
-      '\"Force-quit\" tells iOS to stop relaunching the app. Your trips will stop recording until you open Sparkilo again.';
+      '\"Piespiedu slēgšana\" liek iOS apturēt lietotnes palaišanu. Braucieni pārstās ierakstīties, kamēr atkal neatversiet Sparkilo.';
 
   @override
   String get iosAutoRecordOnboardingBullet3Title =>
-      'When iOS asks for \"Always\" location, please say yes.';
+      'Kad iOS jautā par \"Vienmēr\" atrašanās vietu, lūdzu sakiet jā.';
 
   @override
   String get iosAutoRecordOnboardingBullet3Body =>
-      'The fallback that records your trip when the OBD2 adapter is slow needs background location. We never share it.';
+      'Rezerves funkcija, kas ieraksta jūsu braucienu, kad OBD2 adapteris ir lēns, nepieciešama fona atrašanās vieta. Mēs to nekad nekopīgojam.';
 
   @override
-  String get scanReceipt => 'Scan receipt';
+  String get scanReceipt => 'Skenēt čeku';
 
   @override
   String get obdConnect => 'OBD-II';
 
   @override
-  String get stationTypeFuel => 'Fuel';
+  String get stationTypeFuel => 'Degviela';
 
   @override
   String get stationTypeEv => 'EV';
 
   @override
-  String get brandFilterHighway => 'Highway';
+  String get brandFilterHighway => 'Autoceļš';
 
   @override
-  String get ratingModeLocal => 'Local';
+  String get ratingModeLocal => 'Lokāls';
 
   @override
-  String get ratingModePrivate => 'Private';
+  String get ratingModePrivate => 'Privāts';
 
   @override
-  String get ratingModeShared => 'Shared';
+  String get ratingModeShared => 'Kopīgots';
 
   @override
-  String get ratingDescLocal => 'Ratings saved on this device only';
+  String get ratingDescLocal => 'Vērtējumi saglabāti tikai šajā ierīcē';
 
   @override
   String get ratingDescPrivate =>
-      'Synced with your database (not visible to others)';
+      'Sinhronizēts ar jūsu datu bāzi (nav redzams citiem)';
 
   @override
-  String get ratingDescShared => 'Visible to all users of your database';
+  String get ratingDescShared => 'Redzams visiem jūsu datu bāzes lietotājiem';
 
   @override
   String get errorNoEvApiKey =>
-      'OpenChargeMap API key not configured. Add one in Settings to search EV charging stations.';
+      'OpenChargeMap API atslēga nav konfigurēta. Pievienojiet vienu Iestatījumos, lai meklētu EV uzlādes stacijas.';
 
   @override
   String errorUpstreamCertExpired(String host) {
-    return 'The data provider ($host) is serving an expired or invalid TLS certificate. The app cannot load data from this source until the provider fixes it. Please contact $host.';
+    return 'Datu sniedzējs ($host) izmanto beidzies vai nederīgs TLS sertifikāts. Lietotne nevar ielādēt datus no šī avota, kamēr sniedzējs to nenovērsīs. Lūdzu, sazinieties ar $host.';
   }
 
   @override
-  String get offlineLabel => 'Offline';
+  String get offlineLabel => 'Bezsaistē';
 
   @override
   String fallbackSummary(String failed, String current) {
-    return '$failed unavailable. Using $current.';
+    return '$failed nav pieejams. Izmanto $current.';
   }
 
   @override
-  String get errorTitleApiKey => 'API key required';
+  String get errorTitleApiKey => 'Nepieciešama API atslēga';
 
   @override
-  String get errorTitleLocation => 'Location unavailable';
+  String get errorTitleLocation => 'Atrašanās vieta nav pieejama';
 
   @override
   String get errorHintNoStations =>
-      'Try increasing the search radius or search a different location.';
+      'Mēģiniet palielināt meklēšanas rādiusu vai meklēt citā vietā.';
 
   @override
-  String get errorHintApiKey => 'Configure your API key in Settings.';
+  String get errorHintApiKey => 'Konfigurējiet API atslēgu Iestatījumos.';
 
   @override
   String get errorHintConnection =>
-      'Check your internet connection and try again.';
+      'Pārbaudiet interneta savienojumu un mēģiniet vēlreiz.';
 
   @override
   String get errorHintRouting =>
-      'Route calculation failed. Check your internet connection and try again.';
+      'Maršruta aprēķins neizdevās. Pārbaudiet interneta savienojumu un mēģiniet vēlreiz.';
 
   @override
   String get errorHintFallback =>
-      'Try again or search by postal code / city name.';
+      'Mēģiniet vēlreiz vai meklējiet pēc pasta indeksa / pilsētas nosaukuma.';
 
   @override
-  String get alertsLoadErrorTitle => 'Couldn\'t load your alerts';
+  String get alertsLoadErrorTitle => 'Nevarēja ielādēt jūsu brīdinājumus';
 
   @override
-  String get alertsBackgroundCheckErrorTitle => 'Alert background check failed';
+  String get alertsBackgroundCheckErrorTitle =>
+      'Brīdinājumu fona pārbaude neizdevās';
 
   @override
-  String get detailsLabel => 'Details';
+  String get detailsLabel => 'Detaļas';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'Noņemt';
 
   @override
-  String get showKey => 'Show key';
+  String get showKey => 'Rādīt atslēgu';
 
   @override
-  String get hideKey => 'Hide key';
+  String get hideKey => 'Slēpt atslēgu';
 
   @override
-  String get syncOptionalTitle => 'TankSync is optional';
+  String get syncOptionalTitle => 'TankSync ir neobligāts';
 
   @override
   String get syncOptionalDescription =>
-      'Your app works fully without cloud sync. TankSync lets you sync favorites, alerts, and ratings across devices using Supabase (free tier available).';
+      'Jūsu lietotne darbojas pilnībā bez mākoņa sinhronizācijas. TankSync ļauj sinhronizēt izlases, brīdinājumus un vērtējumus starp ierīcēm, izmantojot Supabase (pieejams bezmaksas līmenis).';
 
   @override
-  String get syncHowToConnectQuestion => 'How would you like to connect?';
+  String get syncHowToConnectQuestion => 'Kā vēlaties savienoties?';
 
   @override
-  String get syncCreateOwnTitle => 'Create my own database';
+  String get syncCreateOwnTitle => 'Izveidot savu datu bāzi';
 
   @override
   String get syncCreateOwnSubtitle =>
-      'Free Supabase project — we\'ll guide you step by step';
+      'Bezmaksas Supabase projekts — vadīsim jūs soli pa solim';
 
   @override
-  String get syncJoinExistingTitle => 'Join an existing database';
+  String get syncJoinExistingTitle => 'Pievienoties esošai datu bāzei';
 
   @override
   String get syncJoinExistingSubtitle =>
-      'Scan QR code from the database owner or paste credentials';
+      'Skenējiet QR kodu no datu bāzes īpašnieka vai ielīmējiet akreditācijas datus';
 
   @override
-  String get syncChooseAccountType => 'Choose your account type';
+  String get syncChooseAccountType => 'Izvēlieties konta veidu';
 
   @override
-  String get syncAccountTypeAnonymous => 'Anonymous';
+  String get syncAccountTypeAnonymous => 'Anonīms';
 
   @override
   String get syncAccountTypeAnonymousDesc =>
-      'Instant, no email needed. Data tied to this device.';
+      'Tūlītēja piekļuve, nav nepieciešams e-pasts. Dati saistīti ar šo ierīci.';
 
   @override
-  String get syncAccountTypeEmail => 'Email Account';
+  String get syncAccountTypeEmail => 'E-pasta konts';
 
   @override
   String get syncAccountTypeEmailDesc =>
-      'Sign in from any device. Recover data if phone is lost.';
+      'Pierakstieties no jebkuras ierīces. Atgūstiet datus, ja tālrunis tiek pazaudēts.';
 
   @override
-  String get syncHaveAccountSignIn => 'Already have an account? Sign in';
+  String get syncHaveAccountSignIn => 'Jau ir konts? Pierakstīties';
 
   @override
-  String get syncCreateNewAccount => 'Create new account';
+  String get syncCreateNewAccount => 'Izveidot jaunu kontu';
 
   @override
-  String get syncTestConnection => 'Test Connection';
+  String get syncTestConnection => 'Pārbaudīt savienojumu';
 
   @override
-  String get syncTestingConnection => 'Testing...';
+  String get syncTestingConnection => 'Pārbauda...';
 
   @override
-  String get syncConnectButton => 'Connect';
+  String get syncConnectButton => 'Savienoties';
 
   @override
-  String get syncConnectingButton => 'Connecting...';
+  String get syncConnectingButton => 'Savienojas...';
 
   @override
-  String get syncDatabaseReady => 'Database ready!';
+  String get syncDatabaseReady => 'Datu bāze gatava!';
 
   @override
-  String get syncDatabaseNeedsSetup => 'Database needs setup';
+  String get syncDatabaseNeedsSetup => 'Datu bāzei nepieciešama iestatīšana';
 
   @override
-  String get syncTableStatusOk => 'OK';
+  String get syncTableStatusOk => 'Labi';
 
   @override
-  String get syncTableStatusMissing => 'Missing';
+  String get syncTableStatusMissing => 'Trūkst';
 
   @override
   String get syncSqlEditorInstructions =>
-      'Copy the SQL below and run it in your Supabase SQL Editor (Dashboard → SQL Editor → New Query → Paste → Run)';
+      'Kopējiet tālāk esošo SQL un palaidiet to jūsu Supabase SQL redaktorā (Panelis → SQL redaktors → Jauns vaicājums → Ielīmēt → Palaist)';
 
   @override
-  String get syncCopySqlButton => 'Copy SQL to clipboard';
+  String get syncCopySqlButton => 'Kopēt SQL starpliktuvē';
 
   @override
-  String get syncRecheckSchemaButton => 'Re-check schema';
+  String get syncRecheckSchemaButton => 'Atkārtoti pārbaudīt shēmu';
 
   @override
-  String get syncDoneButton => 'Done';
+  String get syncDoneButton => 'Pabeigts';
 
   @override
   String syncSignedInAs(String email) {
-    return 'Signed in as $email';
+    return 'Pierakstījies kā $email';
   }
 
   @override
   String get syncEmailDescription =>
-      'Your data syncs across all devices with this email.';
+      'Jūsu dati tiek sinhronizēti visās ierīcēs ar šo e-pastu.';
 
   @override
-  String get syncSwitchToAnonymousTitle => 'Switch to anonymous';
+  String get syncSwitchToAnonymousTitle => 'Pārslēgties uz anonīmu';
 
   @override
   String get syncSwitchToAnonymousDesc =>
-      'Continue without email, new anonymous session';
+      'Turpināt bez e-pasta, jauna anonīma sesija';
 
   @override
-  String get syncGuestDescription => 'Anonymous, no email needed.';
+  String get syncGuestDescription => 'Anonīms, nav nepieciešams e-pasts.';
 
   @override
-  String get syncOrDivider => 'or';
+  String get syncOrDivider => 'vai';
 
   @override
-  String get syncHowToSyncQuestion => 'How would you like to sync?';
+  String get syncHowToSyncQuestion => 'Kā vēlaties sinhronizēt?';
 
   @override
   String get syncOfflineDescription =>
-      'Your app works fully offline. Cloud sync is optional.';
+      'Jūsu lietotne darbojas pilnībā bezsaistē. Mākoņa sinhronizācija ir neobligāta.';
 
   @override
-  String get syncModeCommunityTitle => 'Sparkilo Community';
+  String get syncModeCommunityTitle => 'Sparkilo kopiena';
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Share favorites & ratings with all users';
+      'Kopīgot izlases un vērtējumus ar visiem lietotājiem';
 
   @override
-  String get syncModePrivateTitle => 'Private Database';
+  String get syncModePrivateTitle => 'Privāta datu bāze';
 
   @override
-  String get syncModePrivateSubtitle => 'Your own Supabase — full data control';
+  String get syncModePrivateSubtitle =>
+      'Jūsu pašu Supabase — pilna datu kontrole';
 
   @override
-  String get syncModeGroupTitle => 'Join a Group';
+  String get syncModeGroupTitle => 'Pievienoties grupai';
 
   @override
-  String get syncModeGroupSubtitle => 'Family or friends shared database';
+  String get syncModeGroupSubtitle => 'Ģimenes vai draugu kopīgā datu bāze';
 
   @override
-  String get syncPrivacyShared => 'Shared';
+  String get syncPrivacyShared => 'Kopīgots';
 
   @override
-  String get syncPrivacyPrivate => 'Private';
+  String get syncPrivacyPrivate => 'Privāts';
 
   @override
-  String get syncPrivacyGroup => 'Group';
+  String get syncPrivacyGroup => 'Grupa';
 
   @override
-  String get syncStayOfflineButton => 'Stay offline';
+  String get syncStayOfflineButton => 'Palikt bezsaistē';
 
   @override
-  String get syncSuccessTitle => 'Successfully connected!';
+  String get syncSuccessTitle => 'Veiksmīgi savienots!';
 
   @override
-  String get syncSuccessDescription => 'Your data will now sync automatically.';
+  String get syncSuccessDescription =>
+      'Jūsu dati tagad tiks sinhronizēti automātiski.';
 
   @override
-  String get syncWizardTitleConnect => 'Connect TankSync';
+  String get syncWizardTitleConnect => 'Savienot TankSync';
 
   @override
-  String get syncSetupTitleYourDatabase => 'Your database';
+  String get syncSetupTitleYourDatabase => 'Jūsu datu bāze';
 
   @override
-  String get syncSetupTitleJoinGroup => 'Join a group';
+  String get syncSetupTitleJoinGroup => 'Pievienoties grupai';
 
   @override
-  String get syncSetupTitleAccount => 'Your account';
+  String get syncSetupTitleAccount => 'Jūsu konts';
 
   @override
-  String get syncWizardBack => 'Back';
+  String get syncWizardBack => 'Atpakaļ';
 
   @override
-  String get syncWizardNext => 'Next';
+  String get syncWizardNext => 'Tālāk';
 
   @override
   String syncWizardStepOfSteps(int current, int total) {
-    return 'Step $current of $total';
+    return 'Solis $current no $total';
   }
 
   @override
-  String get syncWizardCreateSupabaseTitle => 'Create a Supabase project';
+  String get syncWizardCreateSupabaseTitle => 'Izveidojiet Supabase projektu';
 
   @override
   String get syncWizardCreateSupabaseInstructions =>
-      '1. Tap \"Open Supabase\" below\n2. Create a free account (if you don\'t have one)\n3. Click \"New Project\"\n4. Choose a name and region\n5. Wait ~2 minutes for it to start';
+      '1. Pieskarieties \"Atvērt Supabase\" zemāk\n2. Izveidojiet bezmaksas kontu (ja tāda nav)\n3. Noklikšķiniet \"Jauns projekts\"\n4. Izvēlieties nosaukumu un reģionu\n5. Uzgaidiet ~2 minūtes, kamēr tas startē';
 
   @override
-  String get syncWizardOpenSupabase => 'Open Supabase';
+  String get syncWizardOpenSupabase => 'Atvērt Supabase';
 
   @override
-  String get syncWizardEnableAnonTitle => 'Enable Anonymous Sign-ins';
+  String get syncWizardEnableAnonTitle => 'Iespējot anonīmo pierakstīšanos';
 
   @override
   String get syncWizardEnableAnonInstructions =>
-      '1. In your Supabase dashboard:\n   Authentication → Providers\n2. Find \"Anonymous Sign-ins\"\n3. Toggle it ON\n4. Click \"Save\"';
+      '1. Jūsu Supabase panelī:\n   Autentifikācija → Sniedzēji\n2. Atrodiet \"Anonīmā pierakstīšanās\"\n3. Ieslēdziet to\n4. Noklikšķiniet \"Saglabāt\"';
 
   @override
-  String get syncWizardOpenAuthSettings => 'Open Auth Settings';
+  String get syncWizardOpenAuthSettings =>
+      'Atvērt autentifikācijas iestatījumus';
 
   @override
-  String get syncWizardCopyCredentialsTitle => 'Copy your credentials';
+  String get syncWizardCopyCredentialsTitle =>
+      'Kopējiet savus akreditācijas datus';
 
   @override
   String get syncWizardCopyCredentialsInstructions =>
-      '1. Go to Settings → API in your dashboard\n2. Copy the \"Project URL\"\n3. Copy the \"anon public\" key\n4. Paste them below';
+      '1. Ejiet uz Iestatījumi → API jūsu panelī\n2. Kopējiet \"Projekta URL\"\n3. Kopējiet \"anon public\" atslēgu\n4. Ielīmējiet zemāk';
 
   @override
-  String get syncWizardOpenApiSettings => 'Open API Settings';
+  String get syncWizardOpenApiSettings => 'Atvērt API iestatījumus';
 
   @override
   String get syncWizardSupabaseUrlLabel => 'Supabase URL';
@@ -2790,299 +2811,301 @@ class AppLocalizationsLv extends AppLocalizations {
   String get syncWizardSupabaseUrlHint => 'https://your-project.supabase.co';
 
   @override
-  String get syncWizardJoinExistingTitle => 'Join an existing database';
+  String get syncWizardJoinExistingTitle => 'Pievienoties esošai datu bāzei';
 
   @override
-  String get syncWizardScanQrCode => 'Scan QR Code';
+  String get syncWizardScanQrCode => 'Skenēt QR kodu';
 
   @override
   String get syncWizardAskOwnerQr =>
-      'Ask the database owner to show you their QR code\n(Settings → TankSync → Share)';
+      'Lūdziet datu bāzes īpašniekam parādīt viņa QR kodu\n(Iestatījumi → TankSync → Kopīgot)';
 
   @override
   String get syncWizardAskOwnerQrShort =>
-      'Ask the database owner to show their QR code';
+      'Lūdziet datu bāzes īpašniekam parādīt savu QR kodu';
 
   @override
-  String get syncWizardEnterManuallyTitle => 'Enter manually';
+  String get syncWizardEnterManuallyTitle => 'Ievadīt manuāli';
 
   @override
-  String get syncWizardOrEnterManually => 'or enter manually';
+  String get syncWizardOrEnterManually => 'vai ievadīt manuāli';
 
   @override
   String get syncWizardUrlHelperText =>
-      'Whitespace and line breaks removed automatically';
+      'Atstarpes un rindu pārtraukumi tiek noņemti automātiski';
 
   @override
   String get syncCredentialsPrivateHint =>
-      'Enter your Supabase project credentials. You can find them in your dashboard under Settings > API.';
+      'Ievadiet sava Supabase projekta akreditācijas datus. Tos varat atrast panelī sadaļā Iestatījumi > API.';
 
   @override
-  String get syncCredentialsDatabaseUrlLabel => 'Database URL';
+  String get syncCredentialsDatabaseUrlLabel => 'Datu bāzes URL';
 
   @override
-  String get syncCredentialsAccessKeyLabel => 'Access Key';
+  String get syncCredentialsAccessKeyLabel => 'Piekļuves atslēga';
 
   @override
   String get syncCredentialsAccessKeyHint => 'eyJhbGciOiJIUzI1NiIs...';
 
   @override
-  String get authEmailLabel => 'Email';
+  String get authEmailLabel => 'E-pasts';
 
   @override
-  String get authPasswordLabel => 'Password';
+  String get authPasswordLabel => 'Parole';
 
   @override
-  String get authConfirmPasswordLabel => 'Confirm password';
+  String get authConfirmPasswordLabel => 'Apstiprināt paroli';
 
   @override
-  String get authPleaseEnterEmail => 'Please enter your email';
+  String get authPleaseEnterEmail => 'Lūdzu, ievadiet savu e-pastu';
 
   @override
-  String get authInvalidEmail => 'Invalid email address';
+  String get authInvalidEmail => 'Nederīga e-pasta adrese';
 
   @override
-  String get authPasswordsDoNotMatch => 'Passwords do not match';
+  String get authPasswordsDoNotMatch => 'Paroles nesakrīt';
 
   @override
-  String get authConnectAnonymously => 'Connect anonymously';
+  String get authConnectAnonymously => 'Savienoties anonīmi';
 
   @override
-  String get authCreateAccountAndConnect => 'Create account & connect';
+  String get authCreateAccountAndConnect => 'Izveidot kontu un savienoties';
 
   @override
-  String get authSignInAndConnect => 'Sign in & connect';
+  String get authSignInAndConnect => 'Pierakstīties un savienoties';
 
   @override
-  String get authAnonymousSegment => 'Anonymous';
+  String get authAnonymousSegment => 'Anonīms';
 
   @override
-  String get authEmailSegment => 'Email';
+  String get authEmailSegment => 'E-pasts';
 
   @override
   String get authAnonymousDescription =>
-      'Instant access, no email needed. Data tied to this device.';
+      'Tūlītēja piekļuve, nav nepieciešams e-pasts. Dati saistīti ar šo ierīci.';
 
   @override
   String get authEmailDescription =>
-      'Sign in from any device. Recover your data if your phone is lost.';
+      'Pierakstieties no jebkuras ierīces. Atgūstiet savus datus, ja tālrunis tiek pazaudēts.';
 
   @override
   String get authSyncAcrossDevices =>
-      'Sync data automatically across all your devices.';
+      'Automātiski sinhronizēt datus visās jūsu ierīcēs.';
 
   @override
-  String get authNewHereCreateAccount => 'New here? Create account';
+  String get authNewHereCreateAccount => 'Jauns lietotājs? Izveidot kontu';
 
   @override
-  String get ntfyCardTitle => 'Push Notifications (ntfy.sh)';
+  String get ntfyCardTitle => 'Push paziņojumi (ntfy.sh)';
 
   @override
-  String get ntfyEnableTitle => 'Enable ntfy.sh push';
+  String get ntfyEnableTitle => 'Iespējot ntfy.sh push';
 
   @override
-  String get ntfyEnableSubtitle => 'Receive price alerts via ntfy.sh';
+  String get ntfyEnableSubtitle => 'Saņemt cenu brīdinājumus caur ntfy.sh';
 
   @override
-  String get ntfyTopicUrlLabel => 'Topic URL';
+  String get ntfyTopicUrlLabel => 'Tēmas URL';
 
   @override
-  String get ntfyCopyTopicUrlTooltip => 'Copy topic URL';
+  String get ntfyCopyTopicUrlTooltip => 'Kopēt tēmas URL';
 
   @override
-  String get ntfySendTestButton => 'Send test notification';
+  String get ntfySendTestButton => 'Nosūtīt testa paziņojumu';
 
   @override
   String get ntfyFdroidHint =>
-      'Install the ntfy app from F-Droid to receive push notifications on your device.';
+      'Instalējiet ntfy lietotni no F-Droid, lai saņemtu push paziņojumus savā ierīcē.';
 
   @override
   String get ntfyConnectFirstHint =>
-      'Connect TankSync first to enable push notifications.';
+      'Vispirms savienojiet TankSync, lai iespējotu push paziņojumus.';
 
   @override
-  String get linkDeviceScreenTitle => 'Link Device';
+  String get linkDeviceScreenTitle => 'Saistīt ierīci';
 
   @override
-  String get linkDeviceThisDeviceLabel => 'This device';
+  String get linkDeviceThisDeviceLabel => 'Šī ierīce';
 
   @override
   String get linkDeviceShareCodeHint =>
-      'Share this code with your other device:';
+      'Kopīgojiet šo kodu ar savu citu ierīci:';
 
   @override
-  String get linkDeviceNotConnected => 'Not connected';
+  String get linkDeviceNotConnected => 'Nav savienots';
 
   @override
-  String get linkDeviceCopyCodeTooltip => 'Copy code';
+  String get linkDeviceCopyCodeTooltip => 'Kopēt kodu';
 
   @override
-  String get linkDeviceImportSectionTitle => 'Import from another device';
+  String get linkDeviceImportSectionTitle => 'Importēt no citas ierīces';
 
   @override
   String get linkDeviceImportDescription =>
-      'Enter the device code from your other device to import its favorites, alerts, vehicles, and consumption log. Each device keeps its own profile and defaults.';
+      'Ievadiet ierīces kodu no savas citas ierīces, lai importētu tās izlases, brīdinājumus, transportlīdzekļus un patēriņa žurnālu. Katra ierīce saglabā savu profilu un noklusējumus.';
 
   @override
-  String get linkDeviceCodeFieldLabel => 'Device code';
+  String get linkDeviceCodeFieldLabel => 'Ierīces kods';
 
   @override
-  String get linkDeviceCodeFieldHint => 'Paste the UUID from other device';
+  String get linkDeviceCodeFieldHint => 'Ielīmējiet UUID no otras ierīces';
 
   @override
-  String get linkDeviceImportButton => 'Import data';
+  String get linkDeviceImportButton => 'Importēt datus';
 
   @override
-  String get linkDeviceHowItWorksTitle => 'How it works';
+  String get linkDeviceHowItWorksTitle => 'Kā tas darbojas';
 
   @override
   String get linkDeviceHowItWorksBody =>
-      '1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites, alerts, vehicles, and consumption logs\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity and its own profile (preferred fuel, default vehicle, landing screen). Data is merged, not moved.';
+      '1. Ierīcē A: kopējiet ierīces kodu augstāk\n2. Ierīcē B: ielīmējiet to laukā \"Ierīces kods\"\n3. Pieskarieties \"Importēt datus\", lai apvienotu izlases, brīdinājumus, transportlīdzekļus un patēriņa žurnālus\n4. Abām ierīcēm būs visi apvienotie dati\n\nKatra ierīce saglabā savu anonīmo identitāti un savu profilu (vēlamā degviela, noklusējuma transportlīdzeklis, sākuma ekrāns). Dati tiek apvienoti, nevis pārvietoti.';
 
   @override
-  String get vehicleSetActive => 'Set active';
+  String get vehicleSetActive => 'Iestatīt aktīvu';
 
   @override
-  String get swipeHide => 'Hide';
+  String get swipeHide => 'Slēpt';
 
   @override
-  String get evChargingSection => 'EV Charging';
+  String get evChargingSection => 'EV uzlāde';
 
   @override
-  String get fuelStationsSection => 'Fuel Stations';
+  String get fuelStationsSection => 'Degvielas stacijas';
 
   @override
-  String get yourRating => 'Your rating';
+  String get yourRating => 'Jūsu vērtējums';
 
   @override
-  String get noStorageUsed => 'No storage used';
+  String get noStorageUsed => 'Krātuve netiek izmantota';
 
   @override
-  String get aboutReportBug => 'Report a bug / Suggest a feature';
+  String get aboutReportBug => 'Ziņot par kļūdu / Ieteikt funkciju';
 
   @override
-  String get aboutSupportProject => 'Support this project';
+  String get aboutSupportProject => 'Atbalstīt šo projektu';
 
   @override
   String get aboutSupportDescription =>
-      'This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.';
+      'Šī lietotne ir bezmaksas, atvērtā koda un bez reklāmām. Ja tā ir noderīga, apsveriet iespēju atbalstīt izstrādātāju.';
 
   @override
   String get luxembourgRegulatedPricesNotice =>
-      'Luxembourg fuel prices are government-regulated and uniform nationwide.';
+      'Luksemburgas degvielas cenas ir valsts regulētas un vienādas visā valstī.';
 
   @override
-  String get luxembourgFuelUnleaded95 => 'Unleaded 95';
+  String get luxembourgFuelUnleaded95 => 'Bezsvina 95';
 
   @override
-  String get luxembourgFuelUnleaded98 => 'Unleaded 98';
+  String get luxembourgFuelUnleaded98 => 'Bezsvina 98';
 
   @override
-  String get luxembourgFuelDiesel => 'Diesel';
+  String get luxembourgFuelDiesel => 'Dīzelis';
 
   @override
   String get luxembourgFuelLpg => 'LPG';
 
   @override
   String get luxembourgPricesUnavailable =>
-      'Luxembourg regulated prices are unavailable.';
+      'Luksemburgas regulētās cenas nav pieejamas.';
 
   @override
-  String get reportIssueTitle => 'Report a problem';
+  String get reportIssueTitle => 'Ziņot par problēmu';
 
   @override
-  String get enterCorrection => 'Please enter the correction';
+  String get enterCorrection => 'Lūdzu, ievadiet labojumu';
 
   @override
   String get reportNoBackendAvailable =>
-      'The report could not be sent: no reporting service is configured for this country. Enable TankSync in Settings to send community reports.';
+      'Ziņojumu nevarēja nosūtīt: šai valstij nav konfigurēts ziņošanas pakalpojums. Iespējojiet TankSync Iestatījumos, lai nosūtītu kopienas ziņojumus.';
 
   @override
-  String get correctName => 'Correct station name';
+  String get correctName => 'Pareizais stacijas nosaukums';
 
   @override
-  String get correctAddress => 'Correct address';
+  String get correctAddress => 'Pareizā adrese';
 
   @override
-  String get wrongE85Price => 'Wrong E85 price';
+  String get wrongE85Price => 'Nepareiza E85 cena';
 
   @override
-  String get wrongE98Price => 'Wrong Super 98 price';
+  String get wrongE98Price => 'Nepareiza Super 98 cena';
 
   @override
-  String get wrongLpgPrice => 'Wrong LPG price';
+  String get wrongLpgPrice => 'Nepareiza LPG cena';
 
   @override
-  String get wrongStationName => 'Wrong station name';
+  String get wrongStationName => 'Nepareizs stacijas nosaukums';
 
   @override
-  String get wrongStationAddress => 'Wrong address';
+  String get wrongStationAddress => 'Nepareiza adrese';
 
   @override
-  String get independentStation => 'Independent station';
+  String get independentStation => 'Neatkarīga stacija';
 
   @override
-  String get serviceRemindersSection => 'Service reminders';
+  String get serviceRemindersSection => 'Apkopes atgādinājumi';
 
   @override
-  String get serviceRemindersEmpty => 'No reminders yet — pick a preset above.';
+  String get serviceRemindersEmpty =>
+      'Vēl nav atgādinājumu — izvēlieties sākotnējo iestatījumu augstāk.';
 
   @override
-  String get addServiceReminder => 'Add reminder';
+  String get addServiceReminder => 'Pievienot atgādinājumu';
 
   @override
-  String get serviceReminderPresetOil => 'Oil (15,000 km)';
+  String get serviceReminderPresetOil => 'Eļļa (15 000 km)';
 
   @override
-  String get serviceReminderPresetOilLabel => 'Oil change';
+  String get serviceReminderPresetOilLabel => 'Eļļas maiņa';
 
   @override
-  String get serviceReminderPresetTires => 'Tires (20,000 km)';
+  String get serviceReminderPresetTires => 'Riepas (20 000 km)';
 
   @override
-  String get serviceReminderPresetTiresLabel => 'Tires';
+  String get serviceReminderPresetTiresLabel => 'Riepas';
 
   @override
-  String get serviceReminderPresetInspection => 'Inspection (30,000 km)';
+  String get serviceReminderPresetInspection => 'Tehniskā apskate (30 000 km)';
 
   @override
-  String get serviceReminderPresetInspectionLabel => 'Inspection';
+  String get serviceReminderPresetInspectionLabel => 'Tehniskā apskate';
 
   @override
-  String get serviceReminderLabel => 'Label';
+  String get serviceReminderLabel => 'Apzīmējums';
 
   @override
-  String get serviceReminderInterval => 'Interval (km)';
+  String get serviceReminderInterval => 'Intervāls (km)';
 
   @override
-  String get serviceReminderLastService => 'Last service';
+  String get serviceReminderLastService => 'Pēdējā apkope';
 
   @override
-  String get serviceReminderMarkDone => 'Mark as done';
+  String get serviceReminderMarkDone => 'Atzīmēt kā pabeigtu';
 
   @override
-  String get serviceReminderDueTitle => 'Service due';
+  String get serviceReminderDueTitle => 'Apkopes laiks';
 
   @override
   String serviceReminderDueBody(String label, int kmOver) {
-    return '$label is due — $kmOver km past the interval.';
+    return '$label ir pienācis — $kmOver km pāri intervālam.';
   }
 
   @override
   String get southKoreaApiKeyRequired =>
-      'Register at OPINET to get a free API key';
+      'Reģistrējieties OPINET, lai iegūtu bezmaksas API atslēgu';
 
   @override
   String get southKoreaApiProvider => 'OPINET (KNOC)';
 
   @override
-  String get chileApiKeyRequired => 'Register at CNE to get a free API key';
+  String get chileApiKeyRequired =>
+      'Reģistrējieties CNE, lai iegūtu bezmaksas API atslēgu';
 
   @override
   String get chileApiProvider => 'CNE Bencina en Linea';
 
   @override
-  String get vinConfirmTitle => 'Is this your car?';
+  String get vinConfirmTitle => 'Vai šī ir jūsu automašīna?';
 
   @override
   String vinConfirmBody(
@@ -3093,473 +3116,480 @@ class AppLocalizationsLv extends AppLocalizations {
     String cylinders,
     String fuel,
   ) {
-    return '$year $make $model — ${displacement}L, $cylinders-cyl, $fuel';
+    return '$year $make $model — ${displacement}L, $cylinders cilindri, $fuel';
   }
 
   @override
   String get vinPartialInfoNote =>
-      'Partial info (offline). You can edit below.';
+      'Daļēja informācija (bezsaistē). Varat rediģēt zemāk.';
 
   @override
-  String get vinDecodeError => 'Couldn\'t decode this VIN';
+  String get vinDecodeError => 'Nevarēja atšifrēt šo VIN';
 
   @override
-  String get vinInvalidFormat => 'Invalid VIN format';
+  String get vinInvalidFormat => 'Nederīgs VIN formāts';
 
   @override
-  String get obd2PauseBannerTitle => 'OBD2 connection lost — recording paused';
+  String get obd2PauseBannerTitle =>
+      'OBD2 savienojums zaudēts — ierakstīšana apturēta';
 
   @override
-  String get obd2PauseBannerResume => 'Resume recording';
+  String get obd2PauseBannerResume => 'Atsākt ierakstīšanu';
 
   @override
-  String get obd2PauseBannerEnd => 'End recording';
+  String get obd2PauseBannerEnd => 'Beigt ierakstīšanu';
 
   @override
   String veCalibratedTitle(String vehicleName, String percent) {
-    return 'Consumption calibration updated for $vehicleName — accuracy improved by $percent%';
+    return 'Patēriņa kalibrēšana atjaunināta $vehicleName — precizitāte uzlabojusies par $percent%';
   }
 
   @override
-  String get veResetConfirmTitle => 'Reset volumetric efficiency?';
+  String get veResetConfirmTitle => 'Atiestatīt tilpuma efektivitāti?';
 
   @override
   String get veResetConfirmBody =>
-      'This will discard the learned volumetric efficiency (η_v) and restore the default value (0.85). Trip-level fuel-flow estimates will fall back to the manufacturer constant until the calibrator collects new samples from upcoming trips.';
+      'Tiks atceltas apgūtās tilpuma efektivitātes (η_v) vērtības un atjaunota noklusējuma vērtība (0.85). Brauciena degvielas plūsmas aprēķini atgriezīsies pie ražotāja konstantes, līdz kalibrētājs savāks jaunus paraugus no nākamajiem braucieniem.';
 
   @override
-  String get alertsRadiusSectionTitle => 'Radius alerts';
+  String get alertsRadiusSectionTitle => 'Rādiusa brīdinājumi';
 
   @override
-  String get alertsRadiusAdd => 'Add radius alert';
+  String get alertsRadiusAdd => 'Pievienot rādiusa brīdinājumu';
 
   @override
-  String get alertsRadiusEmptyTitle => 'No radius alerts yet';
+  String get alertsRadiusEmptyTitle => 'Vēl nav rādiusa brīdinājumu';
 
   @override
-  String get alertsRadiusEmptyCta => 'Create a radius alert';
+  String get alertsRadiusEmptyCta => 'Izveidot rādiusa brīdinājumu';
 
   @override
-  String get alertsRadiusCreateTitle => 'Create radius alert';
+  String get alertsRadiusCreateTitle => 'Izveidot rādiusa brīdinājumu';
 
   @override
-  String get alertsRadiusLabelHint => 'Label (e.g. Home diesel)';
+  String get alertsRadiusLabelHint => 'Apzīmējums (piem. Mājas dīzelis)';
 
   @override
-  String get alertsRadiusFuelType => 'Fuel type';
+  String get alertsRadiusFuelType => 'Degvielas veids';
 
   @override
-  String get alertsRadiusThreshold => 'Threshold (€/L)';
+  String get alertsRadiusThreshold => 'Slieksnis (€/L)';
 
   @override
-  String get alertsRadiusKm => 'Radius (km)';
+  String get alertsRadiusKm => 'Rādiuss (km)';
 
   @override
-  String get alertsRadiusCenterGps => 'Use my location';
+  String get alertsRadiusCenterGps => 'Izmantot manu atrašanās vietu';
 
   @override
-  String get alertsRadiusCenterPostalCode => 'Postal code';
+  String get alertsRadiusCenterPostalCode => 'Pasta indekss';
 
   @override
-  String get alertsRadiusSave => 'Save';
+  String get alertsRadiusSave => 'Saglabāt';
 
   @override
-  String get alertsRadiusCancel => 'Cancel';
+  String get alertsRadiusCancel => 'Atcelt';
 
   @override
-  String get alertsRadiusDeleteConfirm => 'Delete radius alert?';
+  String get alertsRadiusDeleteConfirm => 'Dzēst rādiusa brīdinājumu?';
 
   @override
   String obd2ConnectedTooltip(String adapterName) {
-    return 'OBD2 connected: $adapterName';
+    return 'OBD2 savienots: $adapterName';
   }
 
   @override
-  String get obd2PairChipTooltip => 'Pair an OBD2 adapter';
+  String get obd2PairChipTooltip => 'Savienot OBD2 adapteru';
 
   @override
   String velocityAlertTitle(String fuelLabel) {
-    return '$fuelLabel dropped at nearby stations';
+    return '$fuelLabel cena kritās tuvākajās stacijās';
   }
 
   @override
   String velocityAlertBody(int stationCount, int maxDropCents) {
-    return '$stationCount stations dropped by up to $maxDropCents¢ in the last hour';
+    return '$stationCount stacijas cena kritās par līdz $maxDropCents¢ pēdējā stundā';
   }
 
   @override
-  String get fillUpSavedSnackbar => 'Fill-up saved';
+  String get fillUpSavedSnackbar => 'Uzpilde saglabāta';
 
   @override
-  String get radiusAlertsEntryTitle => 'Radius alerts & statistics';
+  String get radiusAlertsEntryTitle => 'Rādiusa brīdinājumi un statistika';
 
   @override
   String get radiusAlertsEntrySubtitle =>
-      'Get notified when prices drop near you';
+      'Saņemiet paziņojumu, kad cenas krītas jūsu tuvumā';
 
   @override
-  String get notFoundTitle => 'Page not found';
+  String get notFoundTitle => 'Lapa nav atrasta';
 
   @override
   String notFoundBody(String location) {
-    return '\"$location\" not found.';
+    return '\"$location\" nav atrasts.';
   }
 
   @override
-  String get notFoundHomeButton => 'Home';
+  String get notFoundHomeButton => 'Sākums';
 
   @override
   String get consumptionTabHiddenNotice =>
-      'The Consumption tab was hidden by your profile settings.';
+      'Patēriņa cilne ir paslēpta ar jūsu profila iestatījumiem.';
 
   @override
   String get swipeBetweenTabsHint =>
-      'Tip: swipe left or right to switch between tabs.';
+      'Padoms: velciet pa kreisi vai pa labi, lai pārslēgtos starp cilnēm.';
 
   @override
-  String get discardChangesTitle => 'Discard changes?';
+  String get discardChangesTitle => 'Atmest izmaiņas?';
 
   @override
   String get discardChangesBody =>
-      'You have unsaved changes. Leaving now will discard them.';
+      'Jums ir nesaglabātas izmaiņas. Atstājot tagad, tās tiks atceltas.';
 
   @override
-  String get discardChangesConfirm => 'Discard';
+  String get discardChangesConfirm => 'Atmest';
 
   @override
-  String get discardChangesKeepEditing => 'Keep editing';
+  String get discardChangesKeepEditing => 'Turpināt rediģēt';
 
   @override
-  String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
+  String get tankSyncSectionSubtitle =>
+      'Mākoņa sinhronizācija starp jūsu ierīcēm';
 
   @override
-  String get achievementSmoothDriver => 'Smooth streak';
+  String get achievementSmoothDriver => 'Maigā braukšana sērijā';
 
   @override
   String get achievementSmoothDriverDesc =>
-      'Drive 5 trips in a row with a smooth-driving score of 80 or higher.';
+      'Brauciet 5 braucienus pēc kārtas ar maigās braukšanas novērtējumu 80 vai augstāku.';
 
   @override
-  String get achievementColdStartAware => 'Cold-start aware';
+  String get achievementColdStartAware => 'Aukstās starta apzinātājs';
 
   @override
   String get achievementColdStartAwareDesc =>
-      'Keep a whole month\'s cold-start fuel cost under 2 % of total fuel — combine short trips.';
+      'Uzturiet vesela mēneša aukstās starta degvielas izmaksas zem 2 % no kopējās degvielas — apvienojiet īsos braucienus.';
 
   @override
-  String get achievementHighwayMaster => 'Highway master';
+  String get achievementHighwayMaster => 'Šosejas meistars';
 
   @override
   String get achievementHighwayMasterDesc =>
-      'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.';
+      'Pabeidziet 30 km+ braucienu ar nemainīgu ātrumu un maigās braukšanas novērtējumu 90 vai augstāku.';
 
   @override
-  String get authErrorNoNetwork => 'No network connection. Try again later.';
+  String get authErrorNoNetwork => 'Nav tīkla savienojuma. Mēģiniet vēlāk.';
 
   @override
   String get authErrorInvalidCredentials =>
-      'Invalid email or password. Check your credentials.';
+      'Nepareizs e-pasts vai parole. Pārbaudiet savus akreditācijas datus.';
 
   @override
   String get authErrorUserAlreadyExists =>
-      'This email is already registered. Try signing in instead.';
+      'Šis e-pasts jau ir reģistrēts. Mēģiniet pierakstīties.';
 
   @override
   String get authErrorEmailNotConfirmed =>
-      'Please check your email and confirm your account first.';
+      'Lūdzu, pārbaudiet savu e-pastu un vispirms apstipriniet savu kontu.';
 
   @override
-  String get authErrorGeneric => 'Sign-in failed. Please try again.';
+  String get authErrorGeneric =>
+      'Pierakstīšanās neizdevās. Lūdzu, mēģiniet vēlreiz.';
 
   @override
   String get autoRecordConsentBadgeLabel =>
-      'Background location — for auto-record only';
+      'Fona atrašanās vieta — tikai automātiskai ierakstīšanai';
 
   @override
-  String get autoRecordConsentExplanationTitle => 'About this permission';
+  String get autoRecordConsentExplanationTitle => 'Par šo atļauju';
 
   @override
   String get autoRecordConsentExplanationBody =>
-      'Auto-record needs background location to detect when you start driving while the app is closed. This grant is used only by auto-record — station search and map centering use a separate foreground location grant.';
+      'Automātiskajai ierakstīšanai nepieciešama fona atrašanās vieta, lai noteiktu, kad sākat braukt, kamēr lietotne ir aizvērta. Šī atļauja tiek izmantota tikai automātiskajai ierakstīšanai — staciju meklēšana un kartes centrēšana izmanto atsevišķu priekšplāna atrašanās vietas atļauju.';
 
   @override
-  String get autoRecordConsentExplanationCloseButton => 'Got it';
+  String get autoRecordConsentExplanationCloseButton => 'Sapratu';
 
   @override
-  String get autoRecordConsentExplanationTooltip => 'What does this mean?';
+  String get autoRecordConsentExplanationTooltip => 'Ko tas nozīmē?';
 
   @override
   String get autoRecordConsentRevokeAction =>
-      'Tap to manage in system settings';
+      'Pieskarieties, lai pārvaldītu sistēmas iestatījumos';
 
   @override
-  String get autoRecordSectionTitle => 'Auto-record';
+  String get autoRecordSectionTitle => 'Automātiskā ierakstīšana';
 
   @override
-  String get autoRecordToggleLabel => 'Auto-record trips';
+  String get autoRecordToggleLabel => 'Automātiski ierakstīt braucienus';
 
   @override
   String get autoRecordStatusActiveLabel =>
-      'Auto-record will activate the next time you enter the car.';
+      'Automātiskā ierakstīšana aktivizēsies nākamreiz, kad iesēsieties automašīnā.';
 
   @override
   String get autoRecordStatusNeedsPairingLabel =>
-      'Pair an OBD2 adapter to enable auto-record.';
+      'Savienojiet OBD2 adapteru, lai iespējotu automātisko ierakstīšanu.';
 
   @override
   String get autoRecordStatusNeedsBackgroundLocationLabel =>
-      'Allow background location so auto-record keeps running with the screen off.';
+      'Atļaujiet fona atrašanās vietu, lai automātiskā ierakstīšana turpinātu darboties ar izslēgtu ekrānu.';
 
   @override
-  String get autoRecordStatusPairAdapterCta => 'Pair an adapter';
+  String get autoRecordStatusPairAdapterCta => 'Savienot adapteru';
 
   @override
-  String get autoRecordSpeedThresholdLabel => 'Start speed (km/h)';
+  String get autoRecordSpeedThresholdLabel => 'Starta ātrums (km/h)';
 
   @override
   String get autoRecordSaveDelayLabel =>
-      'Save delay after disconnect (seconds)';
+      'Saglabāšanas aizkave pēc atvienošanas (sekundes)';
 
   @override
-  String get autoRecordPairedAdapterLabel => 'Paired adapter';
+  String get autoRecordPairedAdapterLabel => 'Savienotais adapteris';
 
   @override
   String get autoRecordPairedAdapterNone =>
-      'No adapter paired. Pair one via the OBD2 onboarding first.';
+      'Nav savienota adaptera. Vispirms savienojiet caur OBD2 iestatīšanu.';
 
   @override
-  String get autoRecordBackgroundLocationLabel => 'Background location allowed';
+  String get autoRecordBackgroundLocationLabel =>
+      'Fona atrašanās vieta atļauta';
 
   @override
-  String get autoRecordBackgroundLocationRequest => 'Request permission';
+  String get autoRecordBackgroundLocationRequest => 'Pieprasīt atļauju';
 
   @override
   String get autoRecordBackgroundLocationRationaleTitle =>
-      'Why \"Allow all the time\"?';
+      'Kāpēc \"Vienmēr atļaut\"?';
 
   @override
   String get autoRecordBackgroundLocationRationaleBody =>
-      'Auto-record streams GPS coordinates from the OBD-II foreground service while the screen is off so your trip route stays accurate. Android requires the \"Allow all the time\" option for that to keep working after the device locks.';
+      'Automātiskā ierakstīšana straumē GPS koordinātas no OBD-II priekšplāna pakalpojuma, kad ekrāns ir izslēgts, lai jūsu brauciena maršruts paliek precīzs. Android prasa opciju \"Vienmēr atļaut\", lai tas turpinātu darboties pēc ierīces bloķēšanas.';
 
   @override
-  String get autoRecordBackgroundLocationOpenSettings => 'Open settings';
+  String get autoRecordBackgroundLocationOpenSettings => 'Atvērt iestatījumus';
 
   @override
   String get autoRecordBackgroundLocationForegroundDeniedSnackbar =>
-      'Location permission required';
+      'Nepieciešama atrašanās vietas atļauja';
 
   @override
   String get autoRecordBackgroundLocationRequestFailedSnackbar =>
-      'Could not request background location';
+      'Nevarēja pieprasīt fona atrašanās vietu';
 
   @override
-  String get autoRecordBadgeClearTooltip => 'Clear counter';
+  String get autoRecordBadgeClearTooltip => 'Notīrīt skaitītāju';
 
   @override
   String get autoRecordPairAdapterLinkText =>
-      'Pair an adapter in the section below to enable auto-recording';
+      'Savienojiet adapteru zemāk esošajā sadaļā, lai iespējotu automātisko ierakstīšanu';
 
   @override
-  String get exportBackupTooltip => 'Export backup';
+  String get exportBackupTooltip => 'Eksportēt rezerves kopiju';
 
   @override
-  String get exportBackupReady => 'Backup ready — pick a destination';
+  String get exportBackupReady =>
+      'Rezerves kopija gatava — izvēlieties galamērķi';
 
   @override
-  String get exportBackupFailed => 'Backup export failed — please try again';
+  String get exportBackupFailed =>
+      'Rezerves kopijas eksports neizdevās — lūdzu, mēģiniet vēlreiz';
 
   @override
-  String get brokenMapChipVerifying => 'MAP sensor verifying…';
+  String get brokenMapChipVerifying => 'MAP sensors tiek verificēts…';
 
   @override
-  String get brokenMapChipDisclaimer => 'MAP readings suspicious';
+  String get brokenMapChipDisclaimer => 'MAP rādījumi ir aizdomīgi';
 
   @override
   String get brokenMapSnackbarUnreliable =>
-      'MAP sensor reads incorrectly — fuel readings may be 50–80% too low. Try a different adapter.';
+      'MAP sensors rāda nepareizi — degvielas rādījumi var būt par 50–80% par zemu. Mēģiniet ar citu adapteru.';
 
   @override
   String get brokenMapBannerHardDisable =>
-      'MAP sensor unreliable. Showing fill-up averages instead of live fuel rate.';
+      'MAP sensors neuzticams. Rāda uzpildes vidējos rādījumus, nevis reāllaika degvielas patēriņu.';
 
   @override
   String brokenMapOverlayVerified(String confidence) {
-    return 'MAP sensor: verified ($confidence)';
+    return 'MAP sensors: verificēts ($confidence)';
   }
 
   @override
   String brokenMapOverlayUnverified(String confidence) {
-    return 'MAP sensor: verifying ($confidence)';
+    return 'MAP sensors: verificē ($confidence)';
   }
 
   @override
   String brokenMapOverlaySuspicious(String confidence) {
-    return 'MAP sensor: suspicious ($confidence)';
+    return 'MAP sensors: aizdomīgs ($confidence)';
   }
 
   @override
   String brokenMapOverlayPosterior(String posterior, String margin) {
-    return 'MAP sensor: $posterior% ± $margin%';
+    return 'MAP sensors: $posterior% ± $margin%';
   }
 
   @override
   String brokenMapOverlayPosteriorVerified(String posterior, String margin) {
-    return 'MAP sensor: $posterior% ± $margin% (verified)';
+    return 'MAP sensors: $posterior% ± $margin% (verificēts)';
   }
 
   @override
-  String get brokenMapDiagnosticsCardTitle => 'MAP sensor diagnostics';
+  String get brokenMapDiagnosticsCardTitle => 'MAP sensora diagnostika';
 
   @override
   String brokenMapDiagnosticsBeliefLine(String posterior, String margin) {
-    return 'Broken-MAP confidence: $posterior% ± $margin%';
+    return 'Bojāta MAP ticamība: $posterior% ± $margin%';
   }
 
   @override
   String brokenMapDiagnosticsObservationCount(int count) {
-    return '$count observations recorded';
+    return '$count novērojumi reģistrēti';
   }
 
   @override
-  String get brokenMapDiagnosticsVerifiedBadge => 'Verified clean';
+  String get brokenMapDiagnosticsVerifiedBadge =>
+      'Verificēts kā darboties spējīgs';
 
   @override
   String get brokenMapDiagnosticsBeliefNone =>
-      'This vehicle\'s MAP sensor hasn\'t been observed yet.';
+      'Šī transportlīdzekļa MAP sensors vēl nav novērots.';
 
   @override
-  String get brokenMapDiagnosticsBlocklistHeading => 'Blocklisted adapters';
+  String get brokenMapDiagnosticsBlocklistHeading =>
+      'Bloķēto sarakstā esošie adapteri';
 
   @override
-  String get brokenMapDiagnosticsBlocklistEmpty =>
-      'No adapters are blocklisted.';
+  String get brokenMapDiagnosticsBlocklistEmpty => 'Nav bloķētu adapteru.';
 
   @override
   String brokenMapDiagnosticsBlocklistEntry(String adapter, String percent) {
-    return '$adapter — flagged $percent% broken';
+    return '$adapter — atzīmēts $percent% bojāts';
   }
 
   @override
-  String get brokenMapDiagnosticsClearButton => 'Clear';
+  String get brokenMapDiagnosticsClearButton => 'Notīrīt';
 
   @override
-  String get brokenMapRevPromptTitle => 'Rev the engine';
+  String get brokenMapRevPromptTitle => 'Pagrieziet motoru';
 
   @override
   String get brokenMapRevPromptBody =>
-      'Briefly blip the throttle so the app can check the MAP sensor responds.';
+      'Īsi paspiediet gāzi, lai lietotne varētu pārbaudīt, vai MAP sensors reaģē.';
 
   @override
-  String get brokenMapRevPromptConfirm => 'Done — I revved';
+  String get brokenMapRevPromptConfirm => 'Gatavs — pagriežu';
 
   @override
-  String get calibrationAdvancedTitle => 'Advanced calibration';
+  String get calibrationAdvancedTitle => 'Uzlabotā kalibrēšana';
 
   @override
-  String get calibrationDisplacementLabel => 'Engine displacement (cc)';
+  String get calibrationDisplacementLabel => 'Motora tilpums (cc)';
 
   @override
   String get calibrationVolumetricEfficiencyLabel =>
-      'Volumetric efficiency (η_v)';
+      'Tilpuma efektivitāte (η_v)';
 
   @override
-  String get calibrationAfrLabel => 'Air-to-fuel ratio (AFR)';
+  String get calibrationAfrLabel => 'Gaisa un degvielas attiecība (AFR)';
 
   @override
-  String get calibrationFuelDensityLabel => 'Fuel density (g/L)';
+  String get calibrationFuelDensityLabel => 'Degvielas blīvums (g/L)';
 
   @override
-  String get calibrationSourceDetected => '(detected from VIN)';
+  String get calibrationSourceDetected => '(noteikts no VIN)';
 
   @override
   String calibrationSourceCatalog(String makeModel) {
-    return '(catalog: $makeModel)';
+    return '(katalogs: $makeModel)';
   }
 
   @override
-  String get calibrationSourceDefault => '(default)';
+  String get calibrationSourceDefault => '(noklusējums)';
 
   @override
-  String get calibrationSourceManual => '(manual)';
+  String get calibrationSourceManual => '(manuāls)';
 
   @override
-  String get calibrationResetToDetected => 'Reset to detected value';
+  String get calibrationResetToDetected => 'Atiestatīt uz noteikto vērtību';
 
   @override
   String calibrationLearnerStatusCalibrated(String eta, int samples) {
-    return 'η_v: $eta (calibrated, $samples samples)';
+    return 'η_v: $eta (kalibrēts, $samples paraugi)';
   }
 
   @override
   String calibrationLearnerStatusLearning(String eta, int samples) {
-    return 'η_v: $eta (learning, $samples samples)';
+    return 'η_v: $eta (mācoties, $samples paraugi)';
   }
 
   @override
   String get calibrationLearnerStatusNoSamples =>
-      'η_v: 0.85 (default — no plein-complet yet)';
+      'η_v: 0.85 (noklusējums — vēl nav pilnas uzpildes)';
 
   @override
-  String get calibrationResetLearner => 'Reset learner';
+  String get calibrationResetLearner => 'Atiestatīt mācīšanos';
 
   @override
-  String get calibrationBasisAtkinson => 'Atkinson cycle';
+  String get calibrationBasisAtkinson => 'Atkinson cikls';
 
   @override
-  String get calibrationBasisVnt => 'VNT diesel + DI';
+  String get calibrationBasisVnt => 'VNT dīzelis + DI';
 
   @override
-  String get calibrationBasisTurboDi => 'Turbocharged + DI';
+  String get calibrationBasisTurboDi => 'Turbodzelzceļš + DI';
 
   @override
-  String get calibrationBasisTurbo => 'Turbocharged';
+  String get calibrationBasisTurbo => 'Turbodzelzceļš';
 
   @override
-  String get calibrationBasisNaDi => 'Naturally aspirated + DI';
+  String get calibrationBasisNaDi => 'Dabiskais aspirācijas + DI';
 
   @override
   String calibrationSourceCatalogWithBasis(String makeModel, String basis) {
-    return '(catalog: $makeModel — $basis default)';
+    return '(katalogs: $makeModel — $basis noklusējums)';
   }
 
   @override
   String catalogReresolveSnackbarMessage(String makeModel) {
-    return 'Your $makeModel is marked as diesel but matches a petrol catalog entry. Tap to update.';
+    return 'Jūsu $makeModel ir atzīmēts kā dīzelis, bet atbilst benzīna kataloga ierakstam. Pieskarieties, lai atjauninātu.';
   }
 
   @override
-  String get catalogReresolveSnackbarAction => 'Update';
+  String get catalogReresolveSnackbarAction => 'Atjaunināt';
 
   @override
-  String get consumptionTabFuel => 'Fuel';
+  String get consumptionTabFuel => 'Degviela';
 
   @override
-  String get consumptionTabCharging => 'Charging';
+  String get consumptionTabCharging => 'Uzlāde';
 
   @override
-  String get noChargingLogsTitle => 'No charging logs yet';
+  String get noChargingLogsTitle => 'Vēl nav uzlādes žurnālu';
 
   @override
   String get noChargingLogsSubtitle =>
-      'Log your first charging session to start tracking EUR/100 km and kWh/100 km.';
+      'Reģistrējiet pirmo uzlādes sesiju, lai sāktu izsekot EUR/100 km un kWh/100 km.';
 
   @override
-  String get addChargingLog => 'Log charging';
+  String get addChargingLog => 'Reģistrēt uzlādi';
 
   @override
-  String get addChargingLogTitle => 'Log charging session';
+  String get addChargingLogTitle => 'Reģistrēt uzlādes sesiju';
 
   @override
-  String get chargingKwh => 'Energy (kWh)';
+  String get chargingKwh => 'Enerģija (kWh)';
 
   @override
-  String get chargingCost => 'Total cost';
+  String get chargingCost => 'Kopējās izmaksas';
 
   @override
-  String get chargingTimeMin => 'Charge time (min)';
+  String get chargingTimeMin => 'Uzlādes laiks (min)';
 
   @override
-  String get chargingStationName => 'Station (optional)';
+  String get chargingStationName => 'Stacija (neobligāti)';
 
   @override
   String chargingEurPer100km(String value) {
@@ -3572,152 +3602,156 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
-  String get chargingDerivedHelper => 'Need a previous log to compare';
+  String get chargingDerivedHelper =>
+      'Nepieciešams iepriekšējs žurnāls salīdzināšanai';
 
   @override
-  String get chargingLogButtonLabel => 'Log charging';
+  String get chargingLogButtonLabel => 'Reģistrēt uzlādi';
 
   @override
-  String get chargingCostTrendTitle => 'Charging cost trend';
+  String get chargingCostTrendTitle => 'Uzlādes izmaksu tendence';
 
   @override
-  String get chargingEfficiencyTitle => 'Efficiency (kWh/100 km)';
+  String get chargingEfficiencyTitle => 'Efektivitāte (kWh/100 km)';
 
   @override
-  String get chargingChartsEmpty => 'Not enough data yet';
+  String get chargingChartsEmpty => 'Vēl nav pietiekami datu';
 
   @override
-  String get chargingChartsMonthAxis => 'Month';
+  String get chargingChartsMonthAxis => 'Mēnesis';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Community Wait Times';
+  String get gdprCommunityWaitTimeTitle => 'Kopienas gaidīšanas laiki';
 
   @override
   String get gdprCommunityWaitTimeShort =>
-      'Anonymously share station wait times';
+      'Anonīmi kopīgot degvielas stacijas gaidīšanas laikus';
 
   @override
   String get gdprCommunityWaitTimeDescription =>
-      'Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.';
+      'Anonīmi kopīgot, kad ierašaties un atstājat degvielas staciju, lai lietotne varētu rādīt tipiskos gaidīšanas laikus. Nekādas atrašanās vietas koordinātas netiek augšupielādētas — tikai stacijas ID.';
 
   @override
-  String get consoFeatureGroupTitle => 'Conso';
+  String get consoFeatureGroupTitle => 'Patēriņš';
 
   @override
   String get consoFeatureGroupDescription =>
-      'Track your consumption — manual fill-ups, or automatic OBD2 trip recording.';
+      'Izsekot patēriņu — manuālas uzpildes vai automātiska OBD2 braucienu ierakstīšana.';
 
   @override
-  String get consoModeOff => 'Off';
+  String get consoModeOff => 'Izslēgts';
 
   @override
-  String get consoModeFuel => 'Fuel';
+  String get consoModeFuel => 'Degviela';
 
   @override
-  String get consoModeFuelAndTrips => 'Fuel + Trips';
+  String get consoModeFuelAndTrips => 'Degviela + Braucieni';
 
   @override
   String get consoModeOffDescription =>
-      'No Conso tab and no Conso settings section.';
+      'Nav Patēriņa cilnes un nav Patēriņa iestatījumu sadaļas.';
 
   @override
   String get consoModeFuelDescription =>
-      'Manual fill-ups only. Useful without an OBD2 adapter.';
+      'Tikai manuālas uzpildes. Noderīgi bez OBD2 adaptera.';
 
   @override
   String get consoModeFuelAndTripsDescription =>
-      'Adds automatic OBD2 trip recording. Requires a paired adapter.';
+      'Pievieno automātisku OBD2 braucienu ierakstīšanu. Nepieciešams savienots adapteris.';
 
   @override
-  String get consoSubsectionVehicles => 'My vehicles';
+  String get consoSubsectionVehicles => 'Mani transportlīdzekļi';
 
   @override
-  String get consoSubsectionTrajets => 'Trips (OBD2)';
+  String get consoSubsectionTrajets => 'Braucieni (OBD2)';
 
   @override
-  String get consoSubsectionToggles => 'Driving';
+  String get consoSubsectionToggles => 'Braukšana';
 
   @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count partial fills pending plein complet — not in average',
-      one: '1 partial fill pending plein complet — not in average',
+      other:
+          '$count daļējas uzpildes gaida pilno uzpildi — nav vidējā rādījumā',
+      one: '1 daļēja uzpilde gaida pilno uzpildi — nav vidējā rādījumā',
     );
     return '$_temp0';
   }
 
   @override
   String consumptionStatsCorrectionShareHint(int percent) {
-    return '$percent% of fuel from auto-corrections — review entries';
+    return '$percent% degvielas no automātiskiem labojumiem — pārskatiet ierakstus';
   }
 
   @override
-  String get fillUpCorrectionLabel => 'Auto-correction — tap to edit';
+  String get fillUpCorrectionLabel =>
+      'Automātisks labojums — pieskarieties, lai rediģētu';
 
   @override
-  String get fillUpCorrectionEditTitle => 'Edit auto-correction';
+  String get fillUpCorrectionEditTitle => 'Rediģēt automātisko labojumu';
 
   @override
   String get fillUpCorrectionEditExplainer =>
-      'This entry was auto-generated to close the gap between recorded trips and pumped fuel. Adjust the values if you know the actual figures.';
+      'Šis ieraksts tika automātiski ģenerēts, lai aizpildītu plaisu starp ierakstītajiem braucieniem un iepildīto degvielu. Pielāgojiet vērtības, ja zināt faktiskos skaitļus.';
 
   @override
-  String get fillUpCorrectionDelete => 'Delete correction';
+  String get fillUpCorrectionDelete => 'Dzēst labojumu';
 
   @override
-  String get fillUpCorrectionStation => 'Station name (optional)';
+  String get fillUpCorrectionStation => 'Stacijas nosaukums (neobligāti)';
 
   @override
-  String get greeceApiProvider => 'Paratiritirio Timon (Greece)';
+  String get greeceApiProvider => 'Paratiritirio Timon (Grieķija)';
 
   @override
   String get greeceCommunityApiNotice =>
-      'Powered by the community-maintained fuelpricesgr API';
+      'Nodrošina kopienas uzturēta fuelpricesgr API';
 
   @override
-  String get romaniaApiProvider => 'Monitorul Prețurilor (Romania)';
+  String get romaniaApiProvider => 'Monitorul Prețurilor (Rumānija)';
 
   @override
   String get romaniaScrapingNotice =>
-      'Powered by pretcarburant.ro (Competition Council + ANPC)';
+      'Nodrošina pretcarburant.ro (Konkurences padome + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {
-    return '$country stations $km km away — €$price/L cheaper';
+    return '$country stacijas $km km tālāk — €$price/L lētāk';
   }
 
   @override
-  String get crossBorderTapToSwitch => 'Tap to switch country';
+  String get crossBorderTapToSwitch => 'Pieskarieties, lai mainītu valsti';
 
   @override
-  String get crossBorderDismissTooltip => 'Dismiss';
+  String get crossBorderDismissTooltip => 'Aizvērt';
 
   @override
-  String get insightCardTitle => 'Top wasteful behaviours';
+  String get insightCardTitle => 'Galvenie izšķērdīgākie paradumi';
 
   @override
-  String get insightEmptyState => 'No notable inefficiencies — keep it up!';
+  String get insightEmptyState =>
+      'Neievērojamas neefektivitātes — turpiniet tā!';
 
   @override
   String insightHighRpm(String pctTime, String liters) {
-    return 'Engine over 3000 RPM ($pctTime% of trip): wasted $liters L';
+    return 'Dzinējs virs 3000 RPM ($pctTime% no brauciena): iztērēts $liters L';
   }
 
   @override
   String insightHardAccel(String count, String liters) {
-    return '$count hard accelerations: wasted $liters L';
+    return '$count straujie paātrinājumi: iztērēts $liters L';
   }
 
   @override
   String insightIdling(String pctTime, String liters) {
-    return 'Idling ($pctTime% of trip): wasted $liters L';
+    return 'Dīkstāvē ($pctTime% no brauciena): iztērēts $liters L';
   }
 
   @override
   String insightSubtitlePctOfTrip(String pctTime) {
-    return '$pctTime% of trip';
+    return '$pctTime% no brauciena';
   }
 
   @override
@@ -3727,889 +3761,901 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String insightLowGear(String minutes) {
-    return 'Labouring in low gear ($minutes min)';
+    return 'Braukšana zemā pārnesumā ($minutes min)';
   }
 
   @override
-  String get drivingScoreCardTitle => 'Driving score';
+  String get drivingScoreCardTitle => 'Braukšanas novērtējums';
 
   @override
   String get drivingScoreCardOutOf => '/100';
 
   @override
   String get drivingScoreCardSubtitle =>
-      'Composite score from idling, hard accelerations, hard braking, and high-RPM time. A \'better than X% of past trips\' comparison will land in a follow-up release.';
+      'Kompozīts novērtējums no dīkstāves, straujo paātrinājumu, asas bremzēšanas un augsta RPM laika. Salīdzinājums \"labāks par X% no iepriekšējiem braucieniem\" nāks nākamajā laidienā.';
 
   @override
   String drivingScoreCardSemanticsLabel(String score) {
-    return 'Driving score $score out of 100';
+    return 'Braukšanas novērtējums $score no 100';
   }
 
   @override
-  String get drivingScorePenaltyIdling => 'Idling';
+  String get drivingScorePenaltyIdling => 'Dīkstāvē';
 
   @override
-  String get drivingScorePenaltyHardAccel => 'Hard accelerations';
+  String get drivingScorePenaltyHardAccel => 'Straujie paātrinājumi';
 
   @override
-  String get drivingScorePenaltyHardBrake => 'Hard braking';
+  String get drivingScorePenaltyHardBrake => 'Asā bremzēšana';
 
   @override
-  String get drivingScorePenaltyHighRpm => 'High RPM';
+  String get drivingScorePenaltyHighRpm => 'Augsts RPM';
 
   @override
-  String get drivingScorePenaltyFullThrottle => 'Full throttle';
+  String get drivingScorePenaltyFullThrottle => 'Pilna gāze';
 
   @override
-  String get ecoRouteOption => 'Eco';
+  String get ecoRouteOption => 'Eko';
 
   @override
   String ecoRouteSavings(String liters) {
-    return '≈ $liters L saved';
+    return '≈ $liters L ietaupīts';
   }
 
   @override
   String get ecoRouteHint =>
-      'Smarter drive — favours steady highway over zigzag shortcuts.';
+      'Gudrāks brauciens — dod priekšroku vienmērīgam šosejas braucienam nevis izlocītiem saīsinājumiem.';
 
   @override
-  String get favoritesShareAction => 'Share';
+  String get favoritesShareAction => 'Kopīgot';
 
   @override
   String favoritesShareSubject(String date) {
-    return 'Sparkilo — favourites on $date';
+    return 'Sparkilo — izlase $date';
   }
 
   @override
-  String get favoritesShareError => 'Couldn\'t generate share image';
+  String get favoritesShareError => 'Nevarēja ģenerēt kopīgošanas attēlu';
 
   @override
-  String get featureManagementSectionTitle => 'Feature management';
+  String get featureManagementSectionTitle => 'Funkciju pārvaldība';
 
   @override
   String get featureManagementSectionSubtitle =>
-      'Turn individual features on or off. Some features depend on others — switches are disabled until prerequisites are met.';
+      'Ieslēgt vai izslēgt atsevišķas funkcijas. Dažas funkcijas ir atkarīgas no citām — slēdži ir atspējoti, kamēr priekšnoteikumi nav izpildīti.';
 
   @override
-  String get featureLabel_obd2TripRecording => 'OBD2 trip recording';
+  String get featureLabel_obd2TripRecording => 'OBD2 braucienu ierakstīšana';
 
   @override
   String get featureDescription_obd2TripRecording =>
-      'Capture trips automatically over OBD2.';
+      'Automātiski ierakstīt braucienus caur OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Gamification';
+  String get featureLabel_gamification => 'Spēlifikācija';
 
   @override
   String get featureDescription_gamification =>
-      'Driving scores and earned badges.';
+      'Braukšanas novērtējumi un nopelnītās zīmotnes.';
 
   @override
-  String get featureLabel_hapticEcoCoach => 'Haptic eco-coach';
+  String get featureLabel_hapticEcoCoach => 'Haptiskais eko treneris';
 
   @override
   String get featureDescription_hapticEcoCoach =>
-      'Real-time haptic feedback during a trip.';
+      'Reāllaika haptiskā atgriezeniskā saite brauciena laikā.';
 
   @override
   String get featureLabel_tankSync => 'TankSync';
 
   @override
-  String get featureDescription_tankSync => 'Cross-device sync via Supabase.';
+  String get featureDescription_tankSync =>
+      'Starpierīču sinhronizācija caur Supabase.';
 
   @override
-  String get featureLabel_consumptionAnalytics => 'Consumption analytics';
+  String get featureLabel_consumptionAnalytics => 'Patēriņa analītika';
 
   @override
   String get featureDescription_consumptionAnalytics =>
-      'Fill-up and trip analysis tab.';
+      'Uzpilžu un braucienu analīzes cilne.';
 
   @override
-  String get featureLabel_baselineSync => 'Baseline sync';
+  String get featureLabel_baselineSync => 'Bāzlīnijas sinhronizācija';
 
   @override
   String get featureDescription_baselineSync =>
-      'Sync driving baselines via TankSync.';
+      'Sinhronizēt braukšanas bāzlīnijas caur TankSync.';
 
   @override
-  String get featureLabel_unifiedSearchResults => 'Unified search results';
+  String get featureLabel_unifiedSearchResults =>
+      'Vienotie meklēšanas rezultāti';
 
   @override
   String get featureDescription_unifiedSearchResults =>
-      'Single result list combining fuel and EV stations.';
+      'Viens rezultātu saraksts, kas apvieno degvielas un EV stacijas.';
 
   @override
-  String get featureLabel_priceAlerts => 'Price alerts';
+  String get featureLabel_priceAlerts => 'Cenu brīdinājumi';
 
   @override
   String get featureDescription_priceAlerts =>
-      'Threshold-based price-drop notifications.';
+      'Paziņojumi par cenu kritumu pēc sliekšņa.';
 
   @override
-  String get featureLabel_priceHistory => 'Price history';
+  String get featureLabel_priceHistory => 'Cenu vēsture';
 
   @override
   String get featureDescription_priceHistory =>
-      '30-day price charts on station details.';
+      '30 dienu cenu diagrammas stacijas detaļās.';
 
   @override
-  String get featureLabel_routePlanning => 'Route planning';
+  String get featureLabel_routePlanning => 'Maršruta plānošana';
 
   @override
   String get featureDescription_routePlanning =>
-      'Cheapest stop along your route.';
+      'Lētākā pietura gar jūsu maršrutu.';
 
   @override
-  String get featureLabel_evCharging => 'EV charging';
+  String get featureLabel_evCharging => 'EV uzlāde';
 
   @override
   String get featureDescription_evCharging =>
-      'Charging stations via OpenChargeMap.';
+      'Uzlādes stacijas caur OpenChargeMap.';
 
   @override
-  String get featureLabel_glideCoach => 'Glide-coach';
+  String get featureLabel_glideCoach => 'Slīdēšanas treneris';
 
   @override
   String get featureDescription_glideCoach =>
-      'Hypermiling guidance using OSM traffic signals.';
+      'Hipermīlēšanas vadība, izmantojot OSM satiksmes signālus.';
 
   @override
-  String get featureLabel_gpsTripPath => 'GPS trip path';
+  String get featureLabel_gpsTripPath => 'GPS brauciena ceļš';
 
   @override
   String get featureDescription_gpsTripPath =>
-      'Persist GPS path samples alongside each trip.';
+      'Saglabāt GPS ceļa paraugus kopā ar katru braucienu.';
 
   @override
-  String get featureLabel_autoRecord => 'Auto-record';
+  String get featureLabel_autoRecord => 'Automātiskā ierakstīšana';
 
   @override
   String get featureDescription_autoRecord =>
-      'Automatically start a trip when the OBD2 adapter connects to a moving vehicle.';
+      'Automātiski sākt braucienu, kad OBD2 adapteris savienojas ar kustībā esošu transportlīdzekli.';
 
   @override
-  String get featureLabel_showFuel => 'Show fuel stations';
+  String get featureLabel_showFuel => 'Rādīt degvielas stacijas';
 
   @override
   String get featureDescription_showFuel =>
-      'Display petrol/diesel station results in search and on the map.';
+      'Rādīt benzīna/dīzeļa staciju rezultātus meklēšanā un kartē.';
 
   @override
-  String get featureLabel_showElectric => 'Show charging stations';
+  String get featureLabel_showElectric => 'Rādīt uzlādes stacijas';
 
   @override
   String get featureDescription_showElectric =>
-      'Display EV charging stations in search and on the map.';
+      'Rādīt EV uzlādes stacijas meklēšanā un kartē.';
 
   @override
-  String get featureLabel_showConsumptionTab => 'Consumption tab';
+  String get featureLabel_showConsumptionTab => 'Patēriņa cilne';
 
   @override
   String get featureDescription_showConsumptionTab =>
-      'Show the consumption analytics tab in the bottom navigation.';
+      'Rādīt patēriņa analītikas cilni apakšējā navigācijā.';
 
   @override
   String get featureBlockedEnable_gamification =>
-      'Enable OBD2 trip recording first';
+      'Vispirms iespējojiet OBD2 braucienu ierakstīšanu';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
-      'Enable OBD2 trip recording first';
+      'Vispirms iespējojiet OBD2 braucienu ierakstīšanu';
 
   @override
   String get featureBlockedEnable_consumptionAnalytics =>
-      'Enable OBD2 trip recording first';
+      'Vispirms iespējojiet OBD2 braucienu ierakstīšanu';
 
   @override
-  String get featureBlockedEnable_baselineSync => 'Enable TankSync first';
+  String get featureBlockedEnable_baselineSync =>
+      'Vispirms iespējojiet TankSync';
 
   @override
   String get featureBlockedEnable_glideCoach =>
-      'Enable OBD2 trip recording first';
+      'Vispirms iespējojiet OBD2 braucienu ierakstīšanu';
 
   @override
   String get featureBlockedEnable_gpsTripPath =>
-      'Enable OBD2 trip recording first';
+      'Vispirms iespējojiet OBD2 braucienu ierakstīšanu';
 
   @override
   String get featureBlockedEnable_autoRecord =>
-      'Enable OBD2 trip recording first';
+      'Vispirms iespējojiet OBD2 braucienu ierakstīšanu';
 
   @override
-  String get featureBlockedEnable_showFuel => 'Prerequisites not met';
+  String get featureBlockedEnable_showFuel => 'Priekšnoteikumi nav izpildīti';
 
   @override
-  String get featureBlockedEnable_showElectric => 'Prerequisites not met';
+  String get featureBlockedEnable_showElectric =>
+      'Priekšnoteikumi nav izpildīti';
 
   @override
   String get featureBlockedEnable_showConsumptionTab =>
-      'Enable OBD2 trip recording first';
+      'Vispirms iespējojiet OBD2 braucienu ierakstīšanu';
 
   @override
-  String get featureLabel_tflitePricePrediction => 'TFLite price prediction';
+  String get featureLabel_tflitePricePrediction => 'TFLite cenu prognozēšana';
 
   @override
   String get featureDescription_tflitePricePrediction =>
-      'On-device price forecast model — inference runs locally; features and predictions never leave the device.';
+      'Cenu prognozēšanas modelis ierīcē — secinājumi tiek veikti lokāli; pazīmes un prognozes nekad neatstāj ierīci.';
 
   @override
   String get featureBlockedEnable_tflitePricePrediction =>
-      'Enable price history first';
+      'Vispirms iespējojiet cenu vēsturi';
 
   @override
-  String get featureLabel_fuelCalculator => 'Fuel calculator';
+  String get featureLabel_fuelCalculator => 'Degvielas kalkulators';
 
   @override
   String get featureDescription_fuelCalculator =>
-      'Reachable fuel-cost calculator from the search results.';
+      'Sasniedzamais degvielas izmaksu kalkulators no meklēšanas rezultātiem.';
 
   @override
-  String get featureLabel_carbonDashboard => 'Carbon dashboard';
+  String get featureLabel_carbonDashboard => 'Oglekļa panelis';
 
   @override
   String get featureDescription_carbonDashboard =>
-      'CO2 footprint dashboard reachable from the Consumption tab.';
+      'CO2 nospieduma panelis, kas pieejams no Patēriņa cilnes.';
 
   @override
-  String get featureLabel_experimentalOemPids => 'Experimental OEM PIDs';
+  String get featureLabel_experimentalOemPids => 'Eksperimentālie OEM PID';
 
   @override
   String get featureDescription_experimentalOemPids =>
-      'Read exact tank litres via manufacturer-specific PIDs on supported adapters.';
+      'Nolasīt precīzu tvertnes litru daudzumu, izmantojot ražotājam specifiskus PID uz atbalstītiem adapteriem.';
 
   @override
   String get featureBlockedEnable_experimentalOemPids =>
-      'Enable OBD2 trip recording first';
+      'Vispirms iespējojiet OBD2 braucienu ierakstīšanu';
 
   @override
-  String get featureLabel_paymentQrScan => 'Scan payment QR';
+  String get featureLabel_paymentQrScan => 'Skenēt maksājuma QR';
 
   @override
   String get featureDescription_paymentQrScan =>
-      'Scan-to-pay QR reader on the station detail screen.';
+      'Skenēšana-maksāšanai QR lasītājs stacijas detaļu ekrānā.';
 
   @override
-  String get featureLabel_communityPriceReports => 'Community price reports';
+  String get featureLabel_communityPriceReports => 'Kopienas cenu ziņojumi';
 
   @override
   String get featureDescription_communityPriceReports =>
-      'Report a station price from the station detail screen.';
+      'Ziņot par stacijas cenu no stacijas detaļu ekrāna.';
 
   @override
-  String get feedbackConsentTitle => 'Send report to GitHub?';
+  String get feedbackConsentTitle => 'Nosūtīt ziņojumu uz GitHub?';
 
   @override
   String get feedbackConsentBody =>
-      'This creates a public ticket on our GitHub repository with your photo and the OCR text. No personal data (location, account id) is sent. Continue?';
+      'Tiks izveidota publiska biļete mūsu GitHub repozitorijā ar jūsu fotoattēlu un OCR tekstu. Tiek sūtīti nav nekādi personas dati (atrašanās vieta, konta ID). Turpināt?';
 
   @override
-  String get feedbackConsentContinue => 'Continue';
+  String get feedbackConsentContinue => 'Turpināt';
 
   @override
-  String get feedbackConsentCancel => 'Cancel';
+  String get feedbackConsentCancel => 'Atcelt';
 
   @override
-  String get feedbackConsentLater => 'Later';
+  String get feedbackConsentLater => 'Vēlāk';
 
   @override
-  String get feedbackTokenSectionTitle => 'Bad-scan feedback (GitHub)';
+  String get feedbackTokenSectionTitle =>
+      'Sliktas skenēšanas atsauksmes (GitHub)';
 
   @override
   String get feedbackTokenDescription =>
-      'To automatically open a GitHub ticket from a failed scan, paste a GitHub PAT (`public_repo` scope on the tankstellen repository). Otherwise manual sharing remains available.';
+      'Lai automātiski atvērtu GitHub biļeti no neveiksmīgas skenēšanas, ielīmējiet GitHub PAT (`public_repo` darbības joma uz tankstellen repozitoriju). Pretējā gadījumā manuālā kopīgošana joprojām ir pieejama.';
 
   @override
-  String get feedbackTokenStatusSet => 'Token configured';
+  String get feedbackTokenStatusSet => 'Marķieris konfigurēts';
 
   @override
-  String get feedbackTokenStatusUnset => 'No token';
+  String get feedbackTokenStatusUnset => 'Nav marķiera';
 
   @override
-  String get feedbackTokenSet => 'Set';
+  String get feedbackTokenSet => 'Iestatīt';
 
   @override
-  String get feedbackTokenClear => 'Clear';
+  String get feedbackTokenClear => 'Notīrīt';
 
   @override
   String get feedbackTokenDialogTitle => 'GitHub PAT';
 
   @override
-  String get feedbackTokenFieldLabel => 'Personal Access Token';
+  String get feedbackTokenFieldLabel => 'Personīgās piekļuves marķieris';
 
   @override
-  String get fillUpReconciliationVerifiedBadgeLabel => 'Verified by adapter';
+  String get fillUpReconciliationVerifiedBadgeLabel => 'Verificēts ar adapteru';
 
   @override
   String get fillUpReconciliationVarianceDialogTitle =>
-      'Doesn\'t match adapter reading';
+      'Nesakrīt ar adaptera rādījumu';
 
   @override
   String fillUpReconciliationVarianceDialogBody(String userL, String adapterL) {
-    return 'Your entry: $userL L. Adapter says: $adapterL L (delta from before/after fuel-level capture). Use adapter value?';
+    return 'Jūsu ieraksts: $userL L. Adapteris rāda: $adapterL L (starpība no pirms/pēc degvielas līmeņa uztveršanas). Izmantot adaptera vērtību?';
   }
 
   @override
-  String get fillUpReconciliationVarianceDialogKeepMine => 'Keep my entry';
+  String get fillUpReconciliationVarianceDialogKeepMine =>
+      'Paturēt manu ierakstu';
 
   @override
   String get fillUpReconciliationVarianceDialogUseAdapter =>
-      'Use adapter value';
+      'Izmantot adaptera vērtību';
 
   @override
-  String get scanReceiptNoData => 'No receipt data found — try again';
+  String get scanReceiptNoData => 'Nav atrasti čeka dati — mēģiniet vēlreiz';
 
   @override
   String get scanReceiptSuccess =>
-      'Receipt scanned — verify values. Tap \"Report scan error\" below if anything is off.';
+      'Čeks skenēts — pārbaudiet vērtības. Pieskarieties \"Ziņot par skenēšanas kļūdu\" zemāk, ja kaut kas nav pareizi.';
 
   @override
   String scanReceiptFailed(String error) {
-    return 'Scan failed: $error';
+    return 'Skenēšana neizdevās: $error';
   }
 
   @override
-  String get scanPumpUnreadable => 'Pump display not readable — try again';
+  String get scanPumpUnreadable =>
+      'Sūkņa displejs nav lasāms — mēģiniet vēlreiz';
 
   @override
-  String get scanPumpSuccess => 'Pump display scanned — verify the values.';
+  String get scanPumpSuccess => 'Sūkņa displejs skenēts — pārbaudiet vērtības.';
 
   @override
   String scanPumpFailed(String error) {
-    return 'Pump scan failed: $error';
+    return 'Sūkņa skenēšana neizdevās: $error';
   }
 
   @override
-  String get badScanReportTitle => 'Report a scan error';
+  String get badScanReportTitle => 'Ziņot par skenēšanas kļūdu';
 
   @override
-  String get badScanReportTitleReceipt => 'Report a scan error — Receipt';
+  String get badScanReportTitleReceipt => 'Ziņot par skenēšanas kļūdu — čeks';
 
   @override
   String get badScanReportTitlePumpDisplay =>
-      'Report a scan error — Pump display';
+      'Ziņot par skenēšanas kļūdu — sūkņa displejs';
 
   @override
-  String get pumpScanFailureTitle => 'Display unreadable';
+  String get pumpScanFailureTitle => 'Displejs nav lasāms';
 
   @override
   String get pumpScanFailureBody =>
-      'The scan couldn\'t read the pump display. What would you like to do?';
+      'Skenēšana nevarēja nolasīt sūkņa displeju. Ko vēlaties darīt?';
 
   @override
-  String get pumpScanFailureCorrectManually => 'Correct manually';
+  String get pumpScanFailureCorrectManually => 'Labot manuāli';
 
   @override
-  String get pumpScanFailureReport => 'Report';
+  String get pumpScanFailureReport => 'Ziņot';
 
   @override
-  String get pumpScanFailureRemove => 'Remove photo';
+  String get pumpScanFailureRemove => 'Noņemt fotoattēlu';
 
   @override
   String get badScanReportHint =>
-      'We\'ll share the receipt photo and both sets of values so the next build can learn this layout.';
+      'Mēs kopīgosim čeka fotoattēlu un abas vērtību kopas, lai nākamā versija varētu apgūt šo izkārtojumu.';
 
   @override
-  String get badScanReportShareAction => 'Share report + photo';
+  String get badScanReportShareAction => 'Kopīgot ziņojumu + fotoattēlu';
 
   @override
-  String get badScanReportFieldBrandLayout => 'Brand layout';
+  String get badScanReportFieldBrandLayout => 'Zīmola izkārtojums';
 
   @override
-  String get badScanReportFieldTotal => 'Total';
+  String get badScanReportFieldTotal => 'Kopā';
 
   @override
-  String get badScanReportFieldPricePerLiter => 'Price/L';
+  String get badScanReportFieldPricePerLiter => 'Cena/L';
 
   @override
-  String get badScanReportFieldStation => 'Station';
+  String get badScanReportFieldStation => 'Stacija';
 
   @override
-  String get badScanReportFieldFuel => 'Fuel';
+  String get badScanReportFieldFuel => 'Degviela';
 
   @override
-  String get badScanReportFieldDate => 'Date';
+  String get badScanReportFieldDate => 'Datums';
 
   @override
-  String get badScanReportHeaderField => 'Field';
+  String get badScanReportHeaderField => 'Lauks';
 
   @override
-  String get badScanReportHeaderScanned => 'Scanned';
+  String get badScanReportHeaderScanned => 'Skenēts';
 
   @override
-  String get badScanReportHeaderYouTyped => 'You typed';
+  String get badScanReportHeaderYouTyped => 'Jūs ievadījāt';
 
   @override
-  String get badScanReportCreateTicket => 'Create issue';
+  String get badScanReportCreateTicket => 'Izveidot biļeti';
 
   @override
-  String get badScanReportOpenInBrowser => 'Open in browser';
+  String get badScanReportOpenInBrowser => 'Atvērt pārlūkprogrammā';
 
   @override
-  String get badScanReportFallbackToShare => 'Submission failed — manual share';
+  String get badScanReportFallbackToShare =>
+      'Iesniegšana neizdevās — manuāla kopīgošana';
 
   @override
-  String get fillUpSectionWhatTitle => 'What you filled';
+  String get fillUpSectionWhatTitle => 'Ko jūs uzpildījāt';
 
   @override
-  String get fillUpSectionWhatSubtitle => 'Fuel, amount, price';
+  String get fillUpSectionWhatSubtitle => 'Degviela, daudzums, cena';
 
   @override
-  String get fillUpSectionWhereTitle => 'Where you were';
+  String get fillUpSectionWhereTitle => 'Kur jūs bijāt';
 
   @override
-  String get fillUpSectionWhereSubtitle => 'Station, odometer, notes';
+  String get fillUpSectionWhereSubtitle => 'Stacija, odometrs, piezīmes';
 
   @override
-  String get fillUpImportFromLabel => 'Import from…';
+  String get fillUpImportFromLabel => 'Importēt no…';
 
   @override
-  String get fillUpImportSheetTitle => 'Import fill-up data';
+  String get fillUpImportSheetTitle => 'Importēt uzpildes datus';
 
   @override
-  String get fillUpImportReceiptLabel => 'Receipt';
+  String get fillUpImportReceiptLabel => 'Čeks';
 
   @override
-  String get fillUpImportReceiptDescription =>
-      'Scan a paper receipt with the camera';
+  String get fillUpImportReceiptDescription => 'Skenēt papīra čeku ar kameru';
 
   @override
-  String get fillUpImportPumpLabel => 'Pump display';
+  String get fillUpImportPumpLabel => 'Sūkņa displejs';
 
   @override
   String get fillUpImportPumpDescription =>
-      'Read Betrag / Preis from the pump LCD';
+      'Nolasīt summu / cenu no sūkņa LCD displeja';
 
   @override
-  String get fillUpImportObdLabel => 'OBD-II adapter';
+  String get fillUpImportObdLabel => 'OBD-II adapteris';
 
   @override
   String get fillUpImportObdDescription =>
-      'Read odometer from the OBD-II port over Bluetooth';
+      'Nolasīt odometru no OBD-II porta caur Bluetooth';
 
   @override
-  String get fillUpPricePerLiterLabel => 'Price per liter';
+  String get fillUpPricePerLiterLabel => 'Cena par litru';
 
   @override
-  String get vehicleHeaderPlateLabel => 'Plate';
+  String get vehicleHeaderPlateLabel => 'Numura zīme';
 
   @override
-  String get vehicleHeaderUntitled => 'New vehicle';
+  String get vehicleHeaderUntitled => 'Jauns transportlīdzeklis';
 
   @override
-  String get vehicleSectionIdentityTitle => 'Identity';
+  String get vehicleSectionIdentityTitle => 'Identitāte';
 
   @override
-  String get vehicleSectionIdentitySubtitle => 'Name & VIN';
+  String get vehicleSectionIdentitySubtitle => 'Nosaukums un VIN';
 
   @override
-  String get vehicleSectionDrivetrainTitle => 'Drivetrain';
+  String get vehicleSectionDrivetrainTitle => 'Transmisija';
 
   @override
-  String get vehicleSectionDrivetrainSubtitle => 'How this vehicle moves';
+  String get vehicleSectionDrivetrainSubtitle =>
+      'Kā šis transportlīdzeklis pārvietojas';
 
   @override
-  String get calibrationModeLabel => 'Calibration mode';
+  String get calibrationModeLabel => 'Kalibrēšanas režīms';
 
   @override
-  String get calibrationModeRule => 'Rule-based';
+  String get calibrationModeRule => 'Uz noteikumiem balstīts';
 
   @override
   String get calibrationModeFuzzy => 'Fuzzy';
 
   @override
   String get calibrationModeTooltip =>
-      'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.';
+      'Uz noteikumiem balstīts piešķir katru braukšanas paraugu tieši vienai situācijai. Fuzzy to izplata starp visām pēc atbilstības — gludāk ap 60 km/h vai mainīgiem slīpumiem, bet lēnāk aizpilda visus grozus.';
 
   @override
-  String get profileGamificationToggleTitle => 'Show achievements & scores';
+  String get profileGamificationToggleTitle => 'Rādīt sasniegumus un punktus';
 
   @override
   String get profileGamificationToggleSubtitle =>
-      'When off, badges, scores and trophy icons are hidden across the app.';
+      'Kad izslēgts, visā lietotnē tiek paslēptas zīmotnes, novērtējumi un trofeju ikonas.';
 
   @override
-  String get gpsDiagnosticsTitle => 'GPS sampling diagnostics';
+  String get gpsDiagnosticsTitle => 'GPS paraugu ņemšanas diagnostika';
 
   @override
   String gpsDiagnosticsHeader(String count, String span, int gaps) {
     String _temp0 = intl.Intl.pluralLogic(
       gaps,
       locale: localeName,
-      other: '$gaps gaps',
-      one: '1 gap',
-      zero: 'no gaps',
+      other: '$gaps atstarpēs',
+      one: '1 atstarpē',
+      zero: 'bez atstarpēm',
     );
-    return '$count samples · $span · $_temp0';
+    return '$count paraugi · $span · $_temp0';
   }
 
   @override
   String gpsDiagnosticsCadence(int ms) {
-    return 'Median interval: $ms ms';
+    return 'Vidējais intervāls: $ms ms';
   }
 
   @override
   String get gpsDiagnosticsExplain =>
-      'Captured during recording to verify GPS cadence under phone-sleep.';
+      'Uztverts ierakstīšanas laikā, lai verificētu GPS kadenci tālruņa miega laikā.';
 
   @override
-  String get hapticEcoCoachSectionTitle => 'Driving';
+  String get hapticEcoCoachSectionTitle => 'Braukšana';
 
   @override
-  String get hapticEcoCoachSettingTitle => 'Real-time eco coaching';
+  String get hapticEcoCoachSettingTitle => 'Reāllaika eko trenēšana';
 
   @override
   String get hapticEcoCoachSettingSubtitle =>
-      'Gentle haptic + on-screen tip when you floor it during cruise';
+      'Maiga haptika + ekrāna padoms, kad pilnībā spiedat gāzi kruīza laikā';
 
   @override
   String get hapticEcoCoachSnackBarMessage =>
-      'Easy on the throttle — coasting saves more';
+      'Uzmanīgi ar gāzi — skriešana ietaupa vairāk';
 
   @override
-  String get anonKeyLabel => 'Anon Key';
+  String get anonKeyLabel => 'Anon atslēga';
 
   @override
-  String get anonKeyHideTooltip => 'Hide key';
+  String get anonKeyHideTooltip => 'Slēpt atslēgu';
 
   @override
-  String get anonKeyShowTooltip => 'Show key to verify';
+  String get anonKeyShowTooltip => 'Rādīt atslēgu verificēšanai';
 
   @override
   String anonKeyTooLong(int length) {
-    return 'Key is too long ($length chars) — check for extra text';
+    return 'Atslēga ir pārāk gara ($length rakstzīmes) — pārbaudiet, vai nav papildu teksta';
   }
 
   @override
   String anonKeyLooksCorrect(int length) {
-    return 'Key looks correct ($length chars)';
+    return 'Atslēga izskatās pareizi ($length rakstzīmes)';
   }
 
   @override
   String get anonKeyShouldBeJwt =>
-      'Key should be a JWT (header.payload.signature)';
+      'Atslēgai jābūt JWT (galvene.lietderīga krava.paraksts)';
 
   @override
   String anonKeyMayBeTruncated(int length) {
-    return 'Key may be truncated ($length of ~208 expected chars)';
+    return 'Atslēga var būt saīsināta ($length no ~208 gaidītajām rakstzīmēm)';
   }
 
   @override
-  String get anonKeyExceedsMax => 'Key exceeds maximum length';
+  String get anonKeyExceedsMax => 'Atslēga pārsniedz maksimālo garumu';
 
   @override
-  String get qrShareTitle => 'Share your database';
+  String get qrShareTitle => 'Kopīgot savu datu bāzi';
 
   @override
-  String get qrShareSubtitle => 'Others can scan this QR code to connect';
+  String get qrShareSubtitle => 'Citi var skenēt šo QR kodu, lai savienotos';
 
   @override
-  String get qrShareCopyAsText => 'Copy as text';
+  String get qrShareCopyAsText => 'Kopēt kā tekstu';
 
   @override
-  String get authInfoTitle => 'Why create an account?';
+  String get authInfoTitle => 'Kāpēc izveidot kontu?';
 
   @override
   String get authInfoBenefit1 =>
-      '• Sync favorites, alerts, and saved routes across devices';
+      '• Sinhronizēt izlases, brīdinājumus un saglabātos maršrutus starp ierīcēm';
 
   @override
   String get authInfoBenefit2 =>
-      '• Prepare a route on your phone, use it in your car';
+      '• Sagatavojiet maršrutu savā tālrunī, izmantojiet to savā automašīnā';
 
   @override
-  String get authInfoBenefit3 => '• No data is shared with third parties';
+  String get authInfoBenefit3 => '• Dati netiek kopīgoti ar trešajām pusēm';
 
   @override
-  String get authInfoBenefit4 => '• You can delete your account at any time';
+  String get authInfoBenefit4 => '• Jūs varat dzēst savu kontu jebkurā laikā';
 
   @override
   String get privacyLocalDataEmpty =>
-      'Nothing stored yet. Add a favorite or set a price alert to see entries here.';
+      'Vēl nekas nav saglabāts. Pievienojiet izlasi vai iestatiet cenu brīdinājumu, lai redzētu ierakstus šeit.';
 
   @override
-  String get privacyHideEmptyRows => 'Hide empty rows';
+  String get privacyHideEmptyRows => 'Slēpt tukšās rindas';
 
   @override
   String privacyShowEmptyRows(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Show $count empty rows',
-      one: 'Show $count empty row',
+      other: 'Rādīt $count tukšas rindas',
+      one: 'Rādīt $count tukšu rindu',
     );
     return '$_temp0';
   }
 
   @override
-  String get apiKeySetupTitle => 'API key setup (optional)';
+  String get apiKeySetupTitle => 'API atslēgas iestatīšana (neobligāti)';
 
   @override
   String get apiKeySetupDescription =>
-      'Register for a free API key, or skip to explore the app with demo data.';
+      'Reģistrējieties bezmaksas API atslēgai vai izlaidiet un izpētiet lietotni ar demonstrācijas datiem.';
 
   @override
   String apiKeyRegistrationButton(String provider) {
-    return '$provider Registration';
+    return '$provider reģistrācija';
   }
 
   @override
   String apiKeyTerms(String provider) {
-    return 'By entering an API key you accept the terms of $provider. Data redistribution is prohibited.';
+    return 'Ievadot API atslēgu, jūs pieņemat $provider noteikumus. Datu tālāknodošana ir aizliegta.';
   }
 
   @override
-  String get calculatorDistanceHint => 'e.g. 150';
+  String get calculatorDistanceHint => 'piem. 150';
 
   @override
-  String get calculatorConsumptionHint => 'e.g. 7.0';
+  String get calculatorConsumptionHint => 'piem. 7.0';
 
   @override
-  String get calculatorPriceHint => 'e.g. 1.899';
+  String get calculatorPriceHint => 'piem. 1.899';
 
   @override
-  String get routeStrategyLabel => 'Strategy:';
+  String get routeStrategyLabel => 'Stratēģija:';
 
   @override
-  String get routeStrategyUniform => 'Uniform';
+  String get routeStrategyUniform => 'Vienāda';
 
   @override
-  String get routeStrategyBalanced => 'Balanced';
+  String get routeStrategyBalanced => 'Līdzsvarota';
 
   @override
-  String get glideCoachBetaTitle => 'Glide-coach beta (experimental)';
+  String get glideCoachBetaTitle => 'Slīdēšanas treneris beta (eksperimentāls)';
 
   @override
   String get glideCoachBetaSubtitle =>
-      'Subtle haptic when slowing down ahead of a red light. Off by default — distraction risk.';
+      'Smalka haptika, palēninot pirms sarkanās gaismas. Pēc noklusējuma izslēgts — novēršanas risks.';
 
   @override
-  String get consentSyncTripsTitle => 'Sync trip recordings';
+  String get consentSyncTripsTitle => 'Sinhronizēt braucienu ierakstus';
 
   @override
   String get consentSyncTripsSubtitle =>
-      'Back up OBD2 + GPS trips to TankSync. Cross-device, opt-in.';
+      'Dublēt OBD2 + GPS braucienus ar TankSync. Starpierīču, pēc izvēles.';
 
   @override
   String get consentSyncTripsDisabledHint =>
-      'Enable Cloud Sync above to back up trips.';
+      'Iespējojiet Mākoņa sinhronizāciju augstāk, lai dublētu braucienus.';
 
   @override
-  String get consentHideDetails => 'Hide details';
+  String get consentHideDetails => 'Slēpt detaļas';
 
   @override
-  String get consentShowDetails => 'Show details';
+  String get consentShowDetails => 'Rādīt detaļas';
 
   @override
-  String get dialogOk => 'OK';
+  String get dialogOk => 'Labi';
 
   @override
-  String get invalidLinkTitle => 'Invalid link';
+  String get invalidLinkTitle => 'Nederīga saite';
 
   @override
   String invalidLinkBody(String path) {
-    return 'The link \"$path\" is not valid.';
+    return 'Saite \"$path\" nav derīga.';
   }
 
   @override
-  String get home => 'Home';
+  String get home => 'Sākums';
 
   @override
-  String get loyaltySettingsTitle => 'Fuel club cards';
+  String get loyaltySettingsTitle => 'Degvielas kluba kartes';
 
   @override
   String get loyaltySettingsSubtitle =>
-      'Apply your loyalty discount to displayed prices';
+      'Lietojiet savu lojalitātes atlaidi rādītajām cenām';
 
   @override
-  String get loyaltyMenuTitle => 'Fuel club cards';
+  String get loyaltyMenuTitle => 'Degvielas kluba kartes';
 
   @override
   String get loyaltyMenuSubtitle =>
-      'Apply per-litre discounts from Total, Aral, Shell, …';
+      'Lietojiet par litru atlaides no Total, Aral, Shell, …';
 
   @override
-  String get loyaltyAddCard => 'Add card';
+  String get loyaltyAddCard => 'Pievienot karti';
 
   @override
-  String get loyaltyAddCardSheetTitle => 'Add fuel club card';
+  String get loyaltyAddCardSheetTitle => 'Pievienot degvielas kluba karti';
 
   @override
-  String get loyaltyBrandLabel => 'Brand';
+  String get loyaltyBrandLabel => 'Zīmols';
 
   @override
-  String get loyaltyCardLabelLabel => 'Label (optional)';
+  String get loyaltyCardLabelLabel => 'Apzīmējums (neobligāti)';
 
   @override
-  String get loyaltyDiscountLabel => 'Discount (per litre)';
+  String get loyaltyDiscountLabel => 'Atlaide (par litru)';
 
   @override
-  String get loyaltyDiscountInvalid => 'Enter a positive number';
+  String get loyaltyDiscountInvalid => 'Ievadiet pozitīvu skaitli';
 
   @override
-  String get loyaltyDeleteConfirmTitle => 'Delete card?';
+  String get loyaltyDeleteConfirmTitle => 'Dzēst karti?';
 
   @override
   String get loyaltyDeleteConfirmBody =>
-      'This card will stop applying its discount.';
+      'Šī karte vairs nepiemēros savu atlaidi.';
 
   @override
-  String get loyaltyEmptyTitle => 'No fuel club cards yet';
+  String get loyaltyEmptyTitle => 'Vēl nav degvielas kluba karšu';
 
   @override
   String get loyaltyEmptyBody =>
-      'Add a card to apply your per-litre discount to matching stations automatically.';
+      'Pievienojiet karti, lai automātiski piemērotu savu par litru atlaidi atbilstošajām stacijām.';
 
   @override
   String get loyaltyBadgePrefix => '−';
 
   @override
-  String get maintenanceSignalIdleRpmCreepTitle => 'Idle RPM creep detected';
+  String get maintenanceSignalIdleRpmCreepTitle =>
+      'Noteikta dīkstāves RPM pieauguma tendence';
 
   @override
   String maintenanceSignalIdleRpmCreepBody(String percent, int tripCount) {
-    return 'Idle RPM has crept up by $percent% over your last $tripCount trips. Possible early sign of a clogged air filter or sensor drift.';
+    return 'Dīkstāves RPM ir pieaudzis par $percent% jūsu pēdējo $tripCount braucienu laikā. Iespējama gaisa filtra aizsērēšanas vai sensora novirzīšanās agrīna pazīme.';
   }
 
   @override
   String get maintenanceSignalMafDeviationTitle =>
-      'Possible intake restriction';
+      'Iespējams ieplūdes ierobežojums';
 
   @override
   String maintenanceSignalMafDeviationBody(String percent, int tripCount) {
-    return 'Cruise fuel rate has dropped by $percent% over your last $tripCount trips. Possible sign of a clogged air filter or restricted intake — worth a check-up.';
+    return 'Kruīza degvielas patēriņš ir samazinājies par $percent% jūsu pēdējo $tripCount braucienu laikā. Iespējama gaisa filtra aizsērēšanas vai ierobežotas ieplūdes pazīme — vērts pārbaudīt.';
   }
 
   @override
-  String get maintenanceActionDismiss => 'Dismiss';
+  String get maintenanceActionDismiss => 'Aizvērt';
 
   @override
-  String get maintenanceActionSnooze => 'Snooze 30 days';
+  String get maintenanceActionSnooze => 'Atgādināt pēc 30 dienām';
 
   @override
-  String get consumptionMonthlyInsightsTitle => 'This month vs last month';
+  String get consumptionMonthlyInsightsTitle =>
+      'Šis mēnesis salīdzinājumā ar iepriekšējo';
 
   @override
-  String get consumptionMonthlyTripsLabel => 'Trips';
+  String get consumptionMonthlyTripsLabel => 'Braucieni';
 
   @override
-  String get consumptionMonthlyDriveTimeLabel => 'Drive time';
+  String get consumptionMonthlyDriveTimeLabel => 'Braukšanas laiks';
 
   @override
-  String get consumptionMonthlyDistanceLabel => 'Distance';
+  String get consumptionMonthlyDistanceLabel => 'Attālums';
 
   @override
-  String get consumptionMonthlyAvgConsumptionLabel => 'Avg consumption';
+  String get consumptionMonthlyAvgConsumptionLabel => 'Vidējais patēriņš';
 
   @override
   String get consumptionMonthlyComparisonNotReliable =>
-      'Need at least 3 trips per month for comparison';
+      'Salīdzināšanai nepieciešami vismaz 3 braucieni mēnesī';
 
   @override
-  String get obd2CapabilitySectionTitle => 'Adapter capabilities';
+  String get obd2CapabilitySectionTitle => 'Adaptera iespējas';
 
   @override
-  String get obd2CapabilityStandardOnly => 'Standard';
+  String get obd2CapabilityStandardOnly => 'Standarts';
 
   @override
-  String get obd2CapabilityOemPids => 'OEM PIDs';
+  String get obd2CapabilityOemPids => 'OEM PID';
 
   @override
-  String get obd2CapabilityFullCan => 'Full CAN';
+  String get obd2CapabilityFullCan => 'Pilns CAN';
 
   @override
   String get obd2CapabilityUpgradeHintStandard =>
-      'For exact litres-in-tank on Peugeot/Citroën, the app supports OBDLink MX+/LX/CX (STN chip).';
+      'Precīzam litru daudzumam tvertnē uz Peugeot/Citroën, lietotne atbalsta OBDLink MX+/LX/CX (STN mikroshēma).';
 
   @override
-  String get obd2DebugOverlayEnabledSnack => 'OBD2 diagnostic overlay enabled';
+  String get obd2DebugOverlayEnabledSnack =>
+      'OBD2 diagnostikas pārklājums iespējots';
 
   @override
   String get obd2DebugOverlayDisabledSnack =>
-      'OBD2 diagnostic overlay disabled';
+      'OBD2 diagnostikas pārklājums atspējots';
 
   @override
-  String get obd2DebugOverlayClearButton => 'Clear';
+  String get obd2DebugOverlayClearButton => 'Notīrīt';
 
   @override
-  String get obd2DebugOverlayCloseButton => 'Close';
+  String get obd2DebugOverlayCloseButton => 'Aizvērt';
 
   @override
-  String get obd2DebugOverlayTitle => 'OBD2 breadcrumbs';
+  String get obd2DebugOverlayTitle => 'OBD2 izsekošanas pēdas';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {
-    return 'Couldn\'t reach \'$adapterName\' — pick another adapter';
+    return 'Nevarēja sasniegt \'$adapterName\' — izvēlieties citu adapteru';
   }
 
   @override
-  String get onboardingObd2StepTitle => 'Connect your OBD2 adapter';
+  String get onboardingObd2StepTitle => 'Savienojiet savu OBD2 adapteru';
 
   @override
   String get onboardingObd2StepBody =>
-      'Plug your OBD2 adapter into the car\'s port and turn the ignition on. We\'ll read the VIN and fill in engine details for you.';
+      'Pievienojiet OBD2 adapteru automašīnas portam un ieslēdziet aizdedzi. Mēs nolasīsim VIN un aizpildīsim dzinēja datus jūsu vietā.';
 
   @override
-  String get onboardingObd2ConnectButton => 'Connect adapter';
+  String get onboardingObd2ConnectButton => 'Savienot adapteru';
 
   @override
-  String get onboardingObd2SkipButton => 'Maybe later';
+  String get onboardingObd2SkipButton => 'Varbūt vēlāk';
 
   @override
-  String get onboardingObd2ReadingVin => 'Reading VIN…';
+  String get onboardingObd2ReadingVin => 'Nolasa VIN…';
 
   @override
   String get onboardingObd2VinReadFailed =>
-      'Couldn\'t read VIN — enter manually';
+      'Nevarēja nolasīt VIN — ievadiet manuāli';
 
   @override
   String get onboardingObd2ConnectFailed =>
-      'Couldn\'t connect to the adapter. You can retry or skip.';
+      'Nevarēja savienoties ar adapteru. Varat mēģināt vēlreiz vai izlaist.';
 
   @override
-  String get onboardingPickUseMode => 'Pick a use mode to continue.';
+  String get onboardingPickUseMode =>
+      'Izvēlieties lietošanas veidu, lai turpinātu.';
 
   @override
-  String get alertsRadiusFrequencyLabel => 'Check frequency';
+  String get alertsRadiusFrequencyLabel => 'Pārbaudes biežums';
 
   @override
-  String get alertsRadiusFrequencyDaily => 'Once a day';
+  String get alertsRadiusFrequencyDaily => 'Vienu reizi dienā';
 
   @override
-  String get alertsRadiusFrequencyTwiceDaily => 'Twice a day';
+  String get alertsRadiusFrequencyTwiceDaily => 'Divas reizes dienā';
 
   @override
-  String get alertsRadiusFrequencyThriceDaily => 'Three times a day';
+  String get alertsRadiusFrequencyThriceDaily => 'Trīs reizes dienā';
 
   @override
-  String get alertsRadiusFrequencyFourTimesDaily => 'Four times a day';
+  String get alertsRadiusFrequencyFourTimesDaily => 'Četras reizes dienā';
 
   @override
-  String get radiusAlertPickOnMap => 'Pick on map';
+  String get radiusAlertPickOnMap => 'Izvēlēties kartē';
 
   @override
-  String get radiusAlertMapPickerTitle => 'Pick alert center';
+  String get radiusAlertMapPickerTitle => 'Izvēlieties brīdinājuma centru';
 
   @override
-  String get radiusAlertMapPickerConfirm => 'Confirm';
+  String get radiusAlertMapPickerConfirm => 'Apstiprināt';
 
   @override
-  String get radiusAlertMapPickerCancel => 'Cancel';
+  String get radiusAlertMapPickerCancel => 'Atcelt';
 
   @override
   String get radiusAlertMapPickerHint =>
-      'Drag the map to position the alert center';
+      'Velciet karti, lai novietotu brīdinājuma centru';
 
   @override
-  String get radiusAlertCenterFromMap => 'Map location';
+  String get radiusAlertCenterFromMap => 'Kartes atrašanās vieta';
 
   @override
   String radiusAlertNotificationTitle(String fuelLabel, String label) {
-    return '$fuelLabel near $label';
+    return '$fuelLabel pie $label';
   }
 
   @override
   String radiusAlertNotificationBody(String price, String threshold) {
-    return 'A station is at $price € (target: $threshold €)';
+    return 'Stacija ir pie $price € (mērķis: $threshold €)';
   }
 
   @override
@@ -4619,49 +4665,49 @@ class AppLocalizationsLv extends AppLocalizations {
   String get refuelUnitPerKwh => '/kWh';
 
   @override
-  String get refuelUnitPerSession => '/session';
+  String get refuelUnitPerSession => '/sesija';
 
   @override
-  String get speedConsumptionCardTitle => 'Consumption by speed';
+  String get speedConsumptionCardTitle => 'Patēriņš pēc ātruma';
 
   @override
-  String get speedBandIdleJam => 'Idle / jam';
+  String get speedBandIdleJam => 'Dīkstāvē / sastrēgumā';
 
   @override
-  String get speedBandUrban => 'Urban (10–50)';
+  String get speedBandUrban => 'Pilsētas (10–50)';
 
   @override
-  String get speedBandSuburban => 'Suburban (50–80)';
+  String get speedBandSuburban => 'Piepilsētas (50–80)';
 
   @override
-  String get speedBandRural => 'Rural (80–100)';
+  String get speedBandRural => 'Lauku (80–100)';
 
   @override
-  String get speedBandMotorwaySlow => 'Eco-cruise (100–115)';
+  String get speedBandMotorwaySlow => 'Eko kruīzs (100–115)';
 
   @override
-  String get speedBandMotorway => 'Motorway (115–130)';
+  String get speedBandMotorway => 'Šoseja (115–130)';
 
   @override
-  String get speedBandMotorwayFast => 'Motorway fast (130+)';
+  String get speedBandMotorwayFast => 'Ātrā šoseja (130+)';
 
   @override
   String get speedConsumptionInsufficientData =>
-      'Record 30+ minutes of trips with the OBD2 adapter to unlock the speed/consumption analysis.';
+      'Ierakstiet 30+ minūtes braucienu ar OBD2 adapteru, lai atbloķētu ātruma/patēriņa analīzi.';
 
   @override
   String speedConsumptionTimeShare(int percent) {
-    return '$percent % of driving';
+    return '$percent % no braukšanas';
   }
 
   @override
-  String get speedConsumptionNeedMoreData => 'Need more data';
+  String get speedConsumptionNeedMoreData => 'Nepieciešami vairāk datu';
 
   @override
-  String get splashLoadingLabel => 'Loading Sparkilo';
+  String get splashLoadingLabel => 'Ielādē Sparkilo';
 
   @override
-  String get tankLevelTitle => 'Tank level';
+  String get tankLevelTitle => 'Tvertnes līmenis';
 
   @override
   String tankLevelLitersFormat(String litres) {
@@ -4670,115 +4716,116 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String tankLevelRangeFormat(String kilometres) {
-    return '≈ $kilometres km of range';
+    return '≈ $kilometres km braukšanas';
   }
 
   @override
   String tankLevelLastFillUpFormat(String date, String count) {
-    return 'Last fill-up: $date · $count trip(s) since';
+    return 'Pēdējā uzpilde: $date · $count brauciens(-i) kopš';
   }
 
   @override
-  String get tankLevelMethodObd2 => 'OBD2 measured';
+  String get tankLevelMethodObd2 => 'OBD2 mērīts';
 
   @override
-  String get tankLevelMethodDistanceFallback => 'distance-based estimate';
+  String get tankLevelMethodDistanceFallback => 'uz attālumu balstīts aprēķins';
 
   @override
-  String get tankLevelMethodMixed => 'mixed measurement';
+  String get tankLevelMethodMixed => 'jaukts mērījums';
 
   @override
-  String get tankLevelEmptyNoFillUp => 'Log a fill-up to see your tank level';
+  String get tankLevelEmptyNoFillUp =>
+      'Reģistrējiet uzpildi, lai redzētu tvertnes līmeni';
 
   @override
-  String get tankLevelDetailSheetTitle => 'Trips since last fill-up';
+  String get tankLevelDetailSheetTitle => 'Braucieni kopš pēdējās uzpildes';
 
   @override
-  String get addFillUpIsFullTankLabel => 'Full tank';
+  String get addFillUpIsFullTankLabel => 'Pilna tvertne';
 
   @override
   String get addFillUpIsFullTankSubtitle =>
-      'Tank filled to the brim — uncheck if this was a partial fill';
+      'Tvertne piepildīta līdz malai — noņemiet atzīmi, ja tā bija daļēja uzpilde';
 
   @override
-  String get themeCardTitle => 'Theme';
+  String get themeCardTitle => 'Dizains';
 
   @override
-  String get themeCardSubtitleSystem => 'System';
+  String get themeCardSubtitleSystem => 'Sistēma';
 
   @override
-  String get themeCardSubtitleLight => 'Light';
+  String get themeCardSubtitleLight => 'Gaišs';
 
   @override
-  String get themeCardSubtitleDark => 'Dark';
+  String get themeCardSubtitleDark => 'Tumšs';
 
   @override
-  String get themeSettingsScreenTitle => 'Theme';
+  String get themeSettingsScreenTitle => 'Dizains';
 
   @override
-  String get themeSettingsSystemLabel => 'Follow system';
+  String get themeSettingsSystemLabel => 'Sekot sistēmai';
 
   @override
-  String get themeSettingsLightLabel => 'Light';
+  String get themeSettingsLightLabel => 'Gaišs';
 
   @override
-  String get themeSettingsDarkLabel => 'Dark';
+  String get themeSettingsDarkLabel => 'Tumšs';
 
   @override
   String get themeSettingsSystemDescription =>
-      'Match the current device appearance.';
+      'Atbilst pašreizējam ierīces izskatam.';
 
   @override
   String get themeSettingsLightDescription =>
-      'Bright backgrounds — best for daytime use.';
+      'Gaišs fons — vislabāk izmantošanai dienā.';
 
   @override
   String get themeSettingsDarkDescription =>
-      'Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.';
+      'Tumšs fons — mazāk nogurdina acis naktī un taupo akumulatoru OLED ekrānos.';
 
   @override
-  String get themeSettingsEcoLabel => 'Eco';
+  String get themeSettingsEcoLabel => 'Eko';
 
   @override
   String get themeSettingsEcoDescription =>
-      'The app\'s signature green look — bright and easy to read, with softly green-tinted backgrounds.';
+      'Lietotnes parakstīgais zaļais izskats — gaišs un viegli lasāms ar maigi zaļiem foniem.';
 
   @override
-  String get throttleRpmHistogramTitle => 'How you used the engine';
+  String get throttleRpmHistogramTitle => 'Kā izmantojāt dzinēju';
 
   @override
-  String get throttleRpmHistogramThrottleSection => 'Throttle position';
+  String get throttleRpmHistogramThrottleSection => 'Gāzes pedāļa stāvoklis';
 
   @override
-  String get throttleRpmHistogramRpmSection => 'Engine RPM';
+  String get throttleRpmHistogramRpmSection => 'Dzinēja RPM';
 
   @override
-  String get throttleRpmHistogramThrottleCoast => 'Coast (0–25%)';
+  String get throttleRpmHistogramThrottleCoast => 'Skriešana (0–25%)';
 
   @override
-  String get throttleRpmHistogramThrottleLight => 'Light (25–50%)';
+  String get throttleRpmHistogramThrottleLight => 'Viegls (25–50%)';
 
   @override
-  String get throttleRpmHistogramThrottleFirm => 'Firm (50–75%)';
+  String get throttleRpmHistogramThrottleFirm => 'Vidējs (50–75%)';
 
   @override
-  String get throttleRpmHistogramThrottleWide => 'Wide-open (75–100%)';
+  String get throttleRpmHistogramThrottleWide => 'Pilna gāze (75–100%)';
 
   @override
-  String get throttleRpmHistogramRpmIdle => 'Idle (≤900)';
+  String get throttleRpmHistogramRpmIdle => 'Dīkstāvē (≤900)';
 
   @override
-  String get throttleRpmHistogramRpmCruise => 'Cruise (901–2000)';
+  String get throttleRpmHistogramRpmCruise => 'Kruīzs (901–2000)';
 
   @override
-  String get throttleRpmHistogramRpmSpirited => 'Spirited (2001–3000)';
+  String get throttleRpmHistogramRpmSpirited => 'Aktīvs (2001–3000)';
 
   @override
-  String get throttleRpmHistogramRpmHard => 'Hard (>3000)';
+  String get throttleRpmHistogramRpmHard => 'Intensīvs (>3000)';
 
   @override
   String get throttleRpmHistogramEmpty =>
-      'No throttle or RPM samples in this trip.';
+      'Šajā braucienā nav gāzes pedāļa vai RPM paraugu.';
 
   @override
   String throttleRpmHistogramBarShare(String pct) {
@@ -4786,30 +4833,31 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
-  String get trajetsTabLabel => 'Trips';
+  String get trajetsTabLabel => 'Braucieni';
 
   @override
-  String get trajetsStartRecordingButton => 'Start recording';
+  String get trajetsStartRecordingButton => 'Sākt ierakstīšanu';
 
   @override
-  String get trajetsResumeRecordingButton => 'Resume recording';
+  String get trajetsResumeRecordingButton => 'Turpināt ierakstīšanu';
 
   @override
   String get tripStartProgressConnectingAdapter =>
-      'Connecting to OBD2 adapter…';
+      'Savienojas ar OBD2 adapteru…';
 
   @override
-  String get tripStartProgressReadingVehicleData => 'Reading vehicle data…';
+  String get tripStartProgressReadingVehicleData =>
+      'Nolasa transportlīdzekļa datus…';
 
   @override
-  String get tripStartProgressStartingRecording => 'Starting recording…';
+  String get tripStartProgressStartingRecording => 'Sāk ierakstīšanu…';
 
   @override
-  String get trajetsEmptyStateTitle => 'No trips yet';
+  String get trajetsEmptyStateTitle => 'Vēl nav braucienu';
 
   @override
   String get trajetsEmptyStateBody =>
-      'Tap Start recording to begin logging your drives.';
+      'Pieskarieties Sākt ierakstīšanu, lai sāktu reģistrēt braucienus.';
 
   @override
   String trajetsRowDistance(String km) {
@@ -4827,339 +4875,342 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
-  String get trajetDetailSummaryTitle => 'Summary';
+  String get trajetDetailSummaryTitle => 'Kopsavilkums';
 
   @override
-  String get trajetDetailFieldDate => 'Date';
+  String get trajetDetailFieldDate => 'Datums';
 
   @override
-  String get trajetDetailFieldVehicle => 'Vehicle';
+  String get trajetDetailFieldVehicle => 'Transportlīdzeklis';
 
   @override
-  String get trajetDetailFieldAdapter => 'OBD2 adapter';
+  String get trajetDetailFieldAdapter => 'OBD2 adapteris';
 
   @override
-  String get trajetDetailFieldDistance => 'Distance';
+  String get trajetDetailFieldDistance => 'Attālums';
 
   @override
-  String get trajetDetailFieldDuration => 'Duration';
+  String get trajetDetailFieldDuration => 'Ilgums';
 
   @override
-  String get trajetDetailFieldAvgConsumption => 'Avg consumption';
+  String get trajetDetailFieldAvgConsumption => 'Vidējais patēriņš';
 
   @override
-  String get trajetDetailFieldFuelUsed => 'Fuel used';
+  String get trajetDetailFieldFuelUsed => 'Patērētā degviela';
 
   @override
-  String get trajetDetailFieldFuelCost => 'Fuel cost';
+  String get trajetDetailFieldFuelCost => 'Degvielas izmaksas';
 
   @override
-  String get trajetDetailFieldAvgSpeed => 'Avg speed';
+  String get trajetDetailFieldAvgSpeed => 'Vidējais ātrums';
 
   @override
-  String get trajetDetailFieldMaxSpeed => 'Max speed';
+  String get trajetDetailFieldMaxSpeed => 'Maksimālais ātrums';
 
   @override
   String get trajetDetailFieldValueUnknown => '—';
 
   @override
-  String get trajetDetailChartSpeed => 'Speed (km/h)';
+  String get trajetDetailChartSpeed => 'Ātrums (km/h)';
 
   @override
-  String get trajetDetailChartFuelRate => 'Fuel rate (L/h)';
+  String get trajetDetailChartFuelRate => 'Degvielas patēriņš (L/h)';
 
   @override
   String get trajetDetailChartRpm => 'RPM';
 
   @override
-  String get trajetDetailChartEngineLoad => 'Engine load (%)';
+  String get trajetDetailChartEngineLoad => 'Dzinēja slodze (%)';
 
   @override
-  String get trajetsRowColdStartChip => 'Cold start';
+  String get trajetsRowColdStartChip => 'Aukstais starts';
 
   @override
   String get trajetsRowColdStartTooltip =>
-      'Engine didn\'t reach operating temperature during this trip — fuel consumption was higher than usual.';
+      'Dzinējs šī brauciena laikā nesasniedza darba temperatūru — degvielas patēriņš bija augstāks nekā parasti.';
 
   @override
-  String get trajetDetailChartEmpty => 'No samples recorded';
+  String get trajetDetailChartEmpty => 'Nav ierakstītu paraugu';
 
   @override
-  String get trajetDetailShareAction => 'Share';
+  String get trajetDetailShareAction => 'Kopīgot';
 
   @override
   String trajetDetailShareSubject(String date) {
-    return 'Sparkilo — trip on $date';
+    return 'Sparkilo — brauciens $date';
   }
 
   @override
-  String get trajetDetailShareError => 'Couldn\'t generate share image';
+  String get trajetDetailShareError => 'Nevarēja ģenerēt kopīgošanas attēlu';
 
   @override
-  String get trajetDetailDeleteAction => 'Delete';
+  String get trajetDetailDeleteAction => 'Dzēst';
 
   @override
-  String get trajetDetailDeleteConfirmTitle => 'Delete this trip?';
+  String get trajetDetailDeleteConfirmTitle => 'Dzēst šo braucienu?';
 
   @override
   String get trajetDetailDeleteConfirmBody =>
-      'This trip will be permanently removed from your history.';
+      'Šis brauciens tiks neatgriezeniski noņemts no jūsu vēstures.';
 
   @override
-  String get trajetDetailDeleteConfirmCancel => 'Cancel';
+  String get trajetDetailDeleteConfirmCancel => 'Atcelt';
 
   @override
-  String get trajetDetailDeleteConfirmConfirm => 'Delete';
+  String get trajetDetailDeleteConfirmConfirm => 'Dzēst';
 
   @override
   String get tripRecordingObd2NotResponding =>
-      'OBD2 adapter connected but not returning data. Try a different adapter or check the vehicle\'s diagnostic protocol.';
+      'OBD2 adapteris savienots, bet neatgriež datus. Mēģiniet ar citu adapteru vai pārbaudiet transportlīdzekļa diagnostikas protokolu.';
 
   @override
-  String get tripLengthCardTitle => 'Consumption by trip length';
+  String get tripLengthCardTitle => 'Patēriņš pēc brauciena garuma';
 
   @override
-  String get tripLengthBucketShort => 'Short (<5 km)';
+  String get tripLengthBucketShort => 'Īss (<5 km)';
 
   @override
-  String get tripLengthBucketMedium => 'Medium (5–25 km)';
+  String get tripLengthBucketMedium => 'Vidējs (5–25 km)';
 
   @override
-  String get tripLengthBucketLong => 'Long (>25 km)';
+  String get tripLengthBucketLong => 'Garš (>25 km)';
 
   @override
-  String get tripLengthBucketNeedMoreData => 'Need more data';
+  String get tripLengthBucketNeedMoreData => 'Nepieciešami vairāk datu';
 
   @override
   String tripLengthBucketTripCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count trips',
-      one: '1 trip',
-      zero: 'no trips',
+      other: '$count braucieni',
+      one: '1 brauciens',
+      zero: 'nav braucienu',
     );
     return '$_temp0';
   }
 
   @override
-  String get tripPathCardTitle => 'Trip path';
+  String get tripPathCardTitle => 'Brauciena ceļš';
 
   @override
-  String get tripPathCardSubtitle => 'GPS-recorded route';
+  String get tripPathCardSubtitle => 'GPS ierakstīts maršruts';
 
   @override
-  String get tripPathLegendTitle => 'Consumption';
+  String get tripPathLegendTitle => 'Patēriņš';
 
   @override
-  String get tripPathLegendEfficient => 'Efficient (< 6 L/100km)';
+  String get tripPathLegendEfficient => 'Efektīvs (< 6 L/100km)';
 
   @override
-  String get tripPathLegendBorderline => 'Borderline (6–10 L/100km)';
+  String get tripPathLegendBorderline => 'Robežlīnija (6–10 L/100km)';
 
   @override
-  String get tripPathLegendWasteful => 'Wasteful (≥ 10 L/100km)';
+  String get tripPathLegendWasteful => 'Izšķērdīgs (≥ 10 L/100km)';
 
   @override
   String get tripRecordingPinTooltip =>
-      'Pinning keeps the screen on — uses more battery';
+      'Piespraušana patur ekrānu ieslēgtu — patērē vairāk akumulatora';
 
   @override
-  String get tripRecordingPinSemanticOn => 'Unpin recording form';
+  String get tripRecordingPinSemanticOn => 'Atspraust ierakstīšanas formu';
 
   @override
-  String get tripRecordingPinSemanticOff => 'Pin recording form';
+  String get tripRecordingPinSemanticOff => 'Piespraust ierakstīšanas formu';
 
   @override
-  String get tripRecordingPinHelpTooltip => 'What does pin do?';
+  String get tripRecordingPinHelpTooltip => 'Ko dara piespraušana?';
 
   @override
-  String get tripRecordingPinHelpTitle => 'About pin';
+  String get tripRecordingPinHelpTitle => 'Par piespraušanu';
 
   @override
   String get tripRecordingPinHelpBody =>
-      'Pin keeps the screen on and hides system bars so the form stays readable on a dashboard mount. Tap again to release. Auto-releases when the trip stops.';
+      'Piespraušana patur ekrānu ieslēgtu un paslēpj sistēmas joslas, lai forma paliek lasāma uz paneļa stiprinājuma. Pieskarieties vēlreiz, lai atbrīvotu. Automātiski atbrīvojas, kad brauciens apstājas.';
 
   @override
   String get tripRecordingResumeHintMessage =>
-      'Recording continues in the background. Tap the red banner at the top of any screen to return.';
+      'Ierakstīšana turpinās fonā. Pieskarieties sarkanajam banerim jebkura ekrāna augšdaļā, lai atgrieztos.';
 
   @override
   String get tripBannerOpenFromConsumptionTab =>
-      'Open the active trip from the Conso tab';
+      'Atveriet aktīvo braucienu no Patēriņa cilnes';
 
   @override
   String get tripRecordingUnpinnedWarning =>
-      'Pin the screen to keep GPS active during the trip — Android may throttle GPS during sleep.';
+      'Piespraudiet ekrānu, lai GPS paliek aktīvs brauciena laikā — Android var ierobežot GPS miega laikā.';
 
   @override
-  String get unifiedFilterFuel => 'Fuel';
+  String get unifiedFilterFuel => 'Degviela';
 
   @override
   String get unifiedFilterEv => 'EV';
 
   @override
-  String get unifiedFilterBoth => 'Both';
+  String get unifiedFilterBoth => 'Abi';
 
   @override
-  String get unifiedNoResultsForFilter => 'No results match this filter';
+  String get unifiedNoResultsForFilter =>
+      'Šim filtram nav atbilstošu rezultātu';
 
   @override
-  String get searchFailedSnackbar => 'Search failed — please try again';
+  String get searchFailedSnackbar =>
+      'Meklēšana neizdevās — lūdzu, mēģiniet vēlreiz';
 
   @override
-  String get vinLabel => 'VIN (optional)';
+  String get vinLabel => 'VIN (neobligāti)';
 
   @override
-  String get vinDecodeTooltip => 'Decode VIN';
+  String get vinDecodeTooltip => 'Atšifrēt VIN';
 
   @override
-  String get vinConfirmAction => 'Yes, auto-fill';
+  String get vinConfirmAction => 'Jā, automātiski aizpildīt';
 
   @override
-  String get vinModifyAction => 'Modify manually';
+  String get vinModifyAction => 'Labot manuāli';
 
   @override
-  String get veResetAction => 'Reset volumetric efficiency';
+  String get veResetAction => 'Atiestatīt tilpuma efektivitāti';
 
   @override
-  String get vehicleReadVinFromCarButton => 'Read VIN from car';
+  String get vehicleReadVinFromCarButton => 'Nolasīt VIN no automašīnas';
 
   @override
   String get vehicleReadVinFromCarTooltip =>
-      'Read VIN from the paired OBD2 adapter';
+      'Nolasīt VIN no savienotā OBD2 adaptera';
 
   @override
   String get vehicleReadVinFailedUnsupportedSnackbar =>
-      'VIN not available (Mode 09 PID 02 unsupported on pre-2005 vehicles)';
+      'VIN nav pieejams (9. režīms PID 02 neatbalstīts pirms 2005. gada automašīnās)';
 
   @override
   String get vehicleReadVinFailedGenericSnackbar =>
-      'VIN read failed — please enter manually';
+      'VIN nolasīšana neizdevās — lūdzu, ievadiet manuāli';
 
   @override
   String get vehicleReadVinNoAdapterHint =>
-      'Pair an OBD2 adapter first to read VIN automatically';
+      'Vispirms savienojiet OBD2 adapteru, lai nolasītu VIN automātiski';
 
   @override
-  String get pickerButtonLabel => 'Pick from catalog';
+  String get pickerButtonLabel => 'Izvēlēties no kataloga';
 
   @override
-  String get pickerSearchHint => 'Search make or model';
+  String get pickerSearchHint => 'Meklēt marku vai modeli';
 
   @override
-  String get pickerHelpText => 'Pre-fill from 50+ supported vehicles';
+  String get pickerHelpText =>
+      'Iepriekš aizpildīt no 50+ atbalstītajiem transportlīdzekļiem';
 
   @override
-  String get pickerEmptyResults => 'No matches';
+  String get pickerEmptyResults => 'Nav atbilstību';
 
   @override
-  String get pickerCancel => 'Cancel';
+  String get pickerCancel => 'Atcelt';
 
   @override
-  String get pickerLoading => 'Loading catalog…';
+  String get pickerLoading => 'Ielādē katalogu…';
 
   @override
-  String get vinInfoTooltip => 'What is a VIN?';
+  String get vinInfoTooltip => 'Kas ir VIN?';
 
   @override
-  String get vinInfoSectionWhatTitle => 'What is a VIN?';
+  String get vinInfoSectionWhatTitle => 'Kas ir VIN?';
 
   @override
   String get vinInfoSectionWhatBody =>
-      'The Vehicle Identification Number is a 17-character code unique to your car. It\'s stamped on the chassis and printed on your vehicle registration document.';
+      'Transportlīdzekļa identifikācijas numurs ir 17 rakstzīmju kods, kas ir unikāls jūsu automašīnai. Tas ir iespiedots uz šasijas un drukāts jūsu transportlīdzekļa reģistrācijas dokumentā.';
 
   @override
-  String get vinInfoSectionWhyTitle => 'Why we ask';
+  String get vinInfoSectionWhyTitle => 'Kāpēc mēs jautājam';
 
   @override
   String get vinInfoSectionWhyBody =>
-      'Decoding the VIN auto-fills engine displacement, cylinder count, model year, primary fuel type, and gross weight — saving you from looking up technical specs manually. The OBD2 fuel-rate calculation uses these values to give you accurate consumption numbers.';
+      'VIN atšifrēšana automātiski aizpilda dzinēja tilpumu, cilindru skaitu, modeļa gadu, primāro degvielas veidu un bruto svaru — ietaupa no tehnisko specifikāciju meklēšanas. OBD2 degvielas patēriņa aprēķins izmanto šīs vērtības, lai sniegtu precīzus patēriņa skaitļus.';
 
   @override
-  String get vinInfoSectionPrivacyTitle => 'Privacy';
+  String get vinInfoSectionPrivacyTitle => 'Privātums';
 
   @override
   String get vinInfoSectionPrivacyBody =>
-      'Your VIN is stored only locally in the app\'s encrypted storage — it\'s never uploaded to Sparkilo servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.';
+      'Jūsu VIN tiek glabāts tikai lokāli lietotnes šifrētajā atmiņā — tas nekad netiek augšupielādēts uz Sparkilo serveriem. NHTSA vPIC datu bāze tiek vaicāta ar VIN, bet atgriež tikai anonīmas tehniskas specifikācijas; NHTSA nesaista VIN ar personas datiem. Bez tīkla bezsaistes uzmeklēšana atgriež tikai ražotāju un valsti.';
 
   @override
-  String get vinInfoSectionWhereTitle => 'Where to find it';
+  String get vinInfoSectionWhereTitle => 'Kur to atrast';
 
   @override
   String get vinInfoSectionWhereBody =>
-      'Look through the windshield at the lower-left corner on the driver\'s side, check the driver-side door-frame sticker when the door is open, or read it off your vehicle registration document (card / Carte Grise).';
+      'Skatieties caur vējstiklu vadītāja puses apakšējā kreisajā stūrī, pārbaudiet vadītāja puses durvju rāmja uzlīmi, kad durvis ir atvērtas, vai nolasiet no sava transportlīdzekļa reģistrācijas dokumenta (kartiņa / Carte Grise).';
 
   @override
-  String get vinInfoDismiss => 'Got it';
+  String get vinInfoDismiss => 'Sapratu';
 
   @override
   String get vinConfirmPrivacyNote =>
-      'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Sparkilo servers.';
+      'Mēs uzmeklējām jūsu VIN NHTSA bezmaksas transportlīdzekļu datu bāzē — nekas nosūtīts uz Sparkilo serveriem.';
 
   @override
-  String get gdprVinOnlineDecodeTitle => 'VIN online decode';
+  String get gdprVinOnlineDecodeTitle => 'VIN tiešsaistes atšifrēšana';
 
   @override
   String get gdprVinOnlineDecodeShort =>
-      'Decode the VIN via NHTSA\'s free public service';
+      'Atšifrēt VIN caur NHTSA bezmaksas publisku pakalpojumu';
 
   @override
   String get gdprVinOnlineDecodeDescription =>
-      'When you pair an adapter, your vehicle\'s VIN is read locally to identify the car. Enabling this sends the 17-char VIN to NHTSA\'s free vPIC service to look up additional details (model, engine displacement, fuel type). The VIN is the only data sent — no other information leaves your device.';
+      'Savienojot adapteru, jūsu transportlīdzekļa VIN tiek nolasīts lokāli, lai identificētu automašīnu. Iespējojot šo, 17 rakstzīmju VIN tiek nosūtīts uz NHTSA bezmaksas vPIC pakalpojumu, lai uzmeklētu papildu detaļas (modelis, dzinēja tilpums, degvielas veids). VIN ir vienīgie nosūtītie dati — nekas cits neatstāj jūsu ierīci.';
 
   @override
-  String get vehicleDetectedFromVinBadge => '(detected)';
+  String get vehicleDetectedFromVinBadge => '(noteikts)';
 
   @override
   String vehicleDetectedFromVinSnackbar(String summary) {
-    return 'Detected from VIN: $summary. Apply?';
+    return 'Noteikts no VIN: $summary. Lietot?';
   }
 
   @override
-  String get vehicleDetectedFromVinApply => 'Apply';
+  String get vehicleDetectedFromVinApply => 'Lietot';
 
   @override
   String waitTimeHint(int minutes) {
-    return '~$minutes min wait';
+    return '~$minutes min gaidīšana';
   }
 
   @override
-  String get waitTimeTrackStart => 'Track my wait';
+  String get waitTimeTrackStart => 'Izsekot manu gaidīšanu';
 
   @override
-  String get waitTimeTrackEnd => 'I\'m leaving';
+  String get waitTimeTrackEnd => 'Es aiziet';
 
   @override
   String waitTimeElapsedShort(int minutes) {
-    return '$minutes min so far';
+    return '$minutes min pagājuši';
   }
 
   @override
-  String get widgetHelpSectionTitle => 'Home-screen widget';
+  String get widgetHelpSectionTitle => 'Sākuma ekrāna logrīks';
 
   @override
   String get widgetHelpIntro =>
-      'Add the SparKilo widget to your home screen to see fuel and charging prices at a glance.';
+      'Pievienojiet SparKilo logrīku savam sākuma ekrānam, lai redzētu degvielas un uzlādes cenas uzreiz.';
 
   @override
   String get widgetHelpAdd =>
-      'Add it from your launcher\'s widget picker — long-press an empty area of the home screen, choose Widgets, and find SparKilo.';
+      'Pievienojiet to no palaišanas programmas logrīku izvēlnes — ilgi spiediet tukšu sākuma ekrāna apgabalu, izvēlieties Logrīki un atrodiet SparKilo.';
 
   @override
   String get widgetHelpTap =>
-      'Tap a station in the widget to open it in the app. Tap the refresh icon to update prices.';
+      'Pieskarieties logrīkā stacijai, lai to atvērtu lietotnē. Pieskarieties atjaunināšanas ikonai, lai atjauninātu cenas.';
 
   @override
   String get widgetHelpConfigure =>
-      'On Android, long-press the widget and choose Reconfigure to change the profile, colour, and content.';
+      'Android lietotnē ilgi spiediet logrīku un izvēlieties Pārkonfigurēt, lai mainītu profilu, krāsu un saturu.';
 
   @override
-  String get widgetVariantDefault => 'Current price only';
+  String get widgetVariantDefault => 'Tikai pašreizējā cena';
 
   @override
-  String get widgetVariantPredictive => 'Predictive: best time to fill';
+  String get widgetVariantPredictive => 'Prognozējošs: labākais laiks uzpildei';
 
   @override
-  String get widgetPredictiveNowPrefix => 'now';
+  String get widgetPredictiveNowPrefix => 'tagad';
 }
