@@ -48,18 +48,18 @@ class AppLocalizationsFi extends AppLocalizations {
   String get searchButton => 'Hae';
 
   @override
-  String get searchCriteriaTitle => 'Search criteria';
+  String get searchCriteriaTitle => 'Hakukriteerit';
 
   @override
-  String get searchCriteriaOpen => 'Search';
+  String get searchCriteriaOpen => 'Haku';
 
   @override
   String searchCriteriaRadiusBadge(String km) {
-    return 'Within $km km';
+    return '$km km säteellä';
   }
 
   @override
-  String get searchCriteriaTapToSearch => 'Tap to start searching';
+  String get searchCriteriaTapToSearch => 'Aloita haku napauttamalla';
 
   @override
   String get noResults => 'Asemia ei löytynyt.';
@@ -149,31 +149,31 @@ class AppLocalizationsFi extends AppLocalizations {
   String get cancel => 'Peruuta';
 
   @override
-  String get countryChangeTitle => 'Switch country?';
+  String get countryChangeTitle => 'Vaihda maa?';
 
   @override
   String countryChangeBody(String country) {
-    return 'Switching to $country will change:';
+    return 'Vaihtaminen maahan $country muuttaa:';
   }
 
   @override
-  String get countryChangeCurrency => 'Currency';
+  String get countryChangeCurrency => 'Valuutta';
 
   @override
-  String get countryChangeDistance => 'Distance';
+  String get countryChangeDistance => 'Etäisyys';
 
   @override
-  String get countryChangeVolume => 'Volume';
+  String get countryChangeVolume => 'Tilavuus';
 
   @override
-  String get countryChangePricePerUnit => 'Price format';
+  String get countryChangePricePerUnit => 'Hintamuoto';
 
   @override
   String get countryChangeNote =>
-      'Existing favorites and fill-up logs are not rewritten; only new entries use the new units.';
+      'Olemassa olevia suosikkeja ja tankkauslokeja ei kirjoiteta uudelleen; vain uudet merkinnät käyttävät uusia yksiköitä.';
 
   @override
-  String get countryChangeConfirm => 'Switch';
+  String get countryChangeConfirm => 'Vaihda';
 
   @override
   String get delete => 'Poista';
@@ -392,108 +392,109 @@ class AppLocalizationsFi extends AppLocalizations {
   String get reportBug => 'Ilmoita virheestä / Ehdota ominaisuutta';
 
   @override
-  String get reportThisIssue => 'Report this issue';
+  String get reportThisIssue => 'Ilmoita ongelmasta';
 
   @override
-  String get reportAlreadySent => 'You already reported this issue.';
+  String get reportAlreadySent => 'Olet jo ilmoittanut tästä ongelmasta.';
 
   @override
-  String get reportConsentTitle => 'Report to GitHub?';
+  String get reportConsentTitle => 'Ilmoita GitHubiin?';
 
   @override
   String get reportConsentBody =>
-      'This will open a public GitHub issue with the error details below. No GPS coordinates, API keys, or personal data are included.';
+      'Tämä avaa julkisen GitHub-ilmoituksen alla olevilla virhetiedoilla. Mitään GPS-koordinaatteja, API-avaimia tai henkilötietoja ei sisällytetä.';
 
   @override
-  String get reportConsentConfirm => 'Open GitHub';
+  String get reportConsentConfirm => 'Avaa GitHub';
 
   @override
-  String get reportConsentCancel => 'Cancel';
+  String get reportConsentCancel => 'Peruuta';
 
   @override
-  String get configProfileSection => 'Profile';
+  String get configProfileSection => 'Profiili';
 
   @override
-  String get configActiveProfile => 'Active profile';
+  String get configActiveProfile => 'Aktiivinen profiili';
 
   @override
-  String get configPreferredFuel => 'Preferred fuel';
+  String get configPreferredFuel => 'Ensisijainen polttoaine';
 
   @override
-  String get configCountry => 'Country';
+  String get configCountry => 'Maa';
 
   @override
-  String get configRouteSegment => 'Route segment';
+  String get configRouteSegment => 'Reittijakso';
 
   @override
-  String get configApiKeysSection => 'API keys';
+  String get configApiKeysSection => 'API-avaimet';
 
   @override
-  String get configTankerkoenigKey => 'Tankerkoenig API key';
+  String get configTankerkoenigKey => 'Tankerkoenig API-avain';
 
   @override
-  String get configApiKeyConfigured => 'Configured';
+  String get configApiKeyConfigured => 'Määritetty';
 
   @override
-  String get configApiKeyNotSet => 'Not set (demo mode)';
+  String get configApiKeyNotSet => 'Ei asetettu (demotila)';
 
   @override
-  String get configApiKeyCommunity => 'Default (community key)';
+  String get configApiKeyCommunity => 'Oletus (yhteisöavain)';
 
   @override
-  String get searchLocationPlaceholder => 'Address, postal code or city';
+  String get searchLocationPlaceholder => 'Osoite, postinumero tai kaupunki';
 
   @override
-  String get configEvKey => 'EV charging API key';
+  String get configEvKey => 'Sähköautojen lataus API-avain';
 
   @override
-  String get configEvKeyCustom => 'Custom key';
+  String get configEvKeyCustom => 'Mukautettu avain';
 
   @override
-  String get configEvKeyShared => 'Default (shared)';
+  String get configEvKeyShared => 'Oletus (jaettu)';
 
   @override
-  String get configCloudSyncSection => 'Cloud Sync';
+  String get configCloudSyncSection => 'Pilvisynkronointi';
 
   @override
-  String get configTankSyncConnected => 'Connected';
+  String get configTankSyncConnected => 'Yhdistetty';
 
   @override
-  String get configTankSyncDisabled => 'Disabled';
+  String get configTankSyncDisabled => 'Poistettu käytöstä';
 
   @override
-  String get configAuthMode => 'Auth mode';
+  String get configAuthMode => 'Todennustapa';
 
   @override
-  String get configAuthEmail => 'Email (persistent)';
+  String get configAuthEmail => 'Sähköposti (pysyvä)';
 
   @override
-  String get configAuthAnonymous => 'Anonymous (device-only)';
+  String get configAuthAnonymous => 'Anonyymi (vain laite)';
 
   @override
-  String get configDatabase => 'Database';
+  String get configDatabase => 'Tietokanta';
 
   @override
-  String get configPrivacySummary => 'Privacy summary';
+  String get configPrivacySummary => 'Tietosuojayhteenveto';
 
   @override
   String configPrivacySummarySynced(Object authNote) {
-    return '• Favorites, alerts, and ignored stations are synced to your private database\n• GPS position and API keys never leave your device\n• $authNote';
+    return '• Suosikit, hälytykset ja ohitetut asemat synkronoidaan yksityiseen tietokantaasi\n• GPS-sijainti ja API-avaimet eivät koskaan poistu laitteeltasi\n• $authNote';
   }
 
   @override
   String get configPrivacySummaryLocal =>
-      '• All data is stored locally on this device only\n• No data is sent to any server\n• API keys encrypted in device secure storage';
+      '• Kaikki tiedot tallennetaan vain paikallisesti tälle laitteelle\n• Mitään tietoja ei lähetetä palvelimelle\n• API-avaimet salattu laitteen suojatussa tallennustilassa';
 
   @override
-  String get configAuthNoteEmail => 'Email account enables cross-device access';
+  String get configAuthNoteEmail =>
+      'Sähköpostitili mahdollistaa pääsyn useilta laitteilta';
 
   @override
   String get configAuthNoteAnonymous =>
-      'Anonymous account — data tied to this device';
+      'Anonyymi tili — tiedot sidottu tähän laitteeseen';
 
   @override
-  String get configNone => 'None';
+  String get configNone => 'Ei mitään';
 
   @override
   String get privacyPolicy => 'Tietosuojakäytäntö';
@@ -533,7 +534,7 @@ class AppLocalizationsFi extends AppLocalizations {
   String get demoModeBanner => 'Demotila. Määritä API-avain asetuksissa.';
 
   @override
-  String get demoModeBannerAction => 'Get live prices';
+  String get demoModeBannerAction => 'Hanki live-hinnat';
 
   @override
   String get sortDistance => 'Etäisyys';
@@ -542,10 +543,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get sortOpen24h => '24h';
 
   @override
-  String get sortRating => 'Rating';
+  String get sortRating => 'Arvosana';
 
   @override
-  String get sortPriceDistance => 'Price/km';
+  String get sortPriceDistance => 'Hinta/km';
 
   @override
   String get cheap => 'halpa';
@@ -997,21 +998,22 @@ class AppLocalizationsFi extends AppLocalizations {
   String get allDataDeleted => 'Kaikki palvelintiedot poistettu';
 
   @override
-  String get forgetAllSyncedTripsButton => 'Forget all synced trips';
+  String get forgetAllSyncedTripsButton => 'Unohda kaikki synkronoidut matkat';
 
   @override
-  String get forgetAllSyncedTripsConfirmTitle => 'Forget all synced trips?';
+  String get forgetAllSyncedTripsConfirmTitle =>
+      'Unohda kaikki synkronoidut matkat?';
 
   @override
   String get forgetAllSyncedTripsConfirmBody =>
-      'Every trip summary and detail blob will be removed from the server. Your local trip history on this device won\'t be affected.\n\nThis action cannot be undone.';
+      'Jokainen matkayhteenveto ja yksityiskohtainen tiedosto poistetaan palvelimelta. Laitteellasi oleva paikallinen matkahistoria ei muutu.\n\nTätä toimintoa ei voi peruuttaa.';
 
   @override
-  String get forgetAllSyncedTripsConfirmAction => 'Forget all';
+  String get forgetAllSyncedTripsConfirmAction => 'Unohda kaikki';
 
   @override
   String get forgetAllSyncedTripsSuccess =>
-      'All synced trips removed from server';
+      'Kaikki synkronoidut matkat poistettu palvelimelta';
 
   @override
   String get disconnectConfirm => 'Katkaise TankSync?';
@@ -1059,48 +1061,48 @@ class AppLocalizationsFi extends AppLocalizations {
   String get close => 'Sulje';
 
   @override
-  String get account => 'Account';
+  String get account => 'Tili';
 
   @override
-  String get continueAsGuest => 'Continue as guest';
+  String get continueAsGuest => 'Jatka vieraana';
 
   @override
-  String get createAccount => 'Create account';
+  String get createAccount => 'Luo tili';
 
   @override
-  String get signIn => 'Sign in';
+  String get signIn => 'Kirjaudu sisään';
 
   @override
-  String get upgradeToEmail => 'Create email account';
+  String get upgradeToEmail => 'Luo sähköpostitili';
 
   @override
-  String get savedRoutes => 'Saved Routes';
+  String get savedRoutes => 'Tallennetut reitit';
 
   @override
-  String get noSavedRoutes => 'No saved routes';
+  String get noSavedRoutes => 'Ei tallennettuja reittejä';
 
   @override
   String get noSavedRoutesHint =>
-      'Search along a route and save it for quick access later.';
+      'Hae reitin varrelta ja tallenna se myöhempää käyttöä varten.';
 
   @override
-  String get saveRoute => 'Save route';
+  String get saveRoute => 'Tallenna reitti';
 
   @override
-  String get routeName => 'Route name';
+  String get routeName => 'Reitin nimi';
 
   @override
   String itineraryDeleted(String name) {
-    return '$name deleted';
+    return '$name poistettu';
   }
 
   @override
   String loadingRoute(String name) {
-    return 'Loading route: $name';
+    return 'Ladataan reitti: $name';
   }
 
   @override
-  String get refreshFailed => 'Refresh failed. Please try again.';
+  String get refreshFailed => 'Päivitys epäonnistui. Yritä uudelleen.';
 
   @override
   String get deleteProfileTitle => 'Delete profile?';
@@ -1148,214 +1150,216 @@ class AppLocalizationsFi extends AppLocalizations {
   String get errorUnknown => 'An unexpected error occurred.';
 
   @override
-  String get onboardingWelcomeHint => 'Set up the app in a few quick steps.';
+  String get onboardingWelcomeHint =>
+      'Määritä sovellus muutamassa nopeassa vaiheessa.';
 
   @override
   String get onboardingApiKeyDescription =>
-      'Register for a free API key, or skip to explore the app with demo data.';
+      'Rekisteröidy ilmaiseksi API-avaimelle tai ohita ja tutustu sovellukseen esimerkkitiedoilla.';
 
   @override
-  String get onboardingComplete => 'All set!';
+  String get onboardingComplete => 'Kaikki valmista!';
 
   @override
   String get onboardingCompleteHint =>
-      'You can change these settings anytime in your profile.';
+      'Voit muuttaa näitä asetuksia milloin tahansa profiilissasi.';
 
   @override
-  String get onboardingBack => 'Back';
+  String get onboardingBack => 'Takaisin';
 
   @override
-  String get onboardingNext => 'Next';
+  String get onboardingNext => 'Seuraava';
 
   @override
-  String get onboardingSkip => 'Skip';
+  String get onboardingSkip => 'Ohita';
 
   @override
-  String get onboardingFinish => 'Get started';
+  String get onboardingFinish => 'Aloita';
 
   @override
   String crossBorderNearby(String country) {
-    return '$country is nearby';
+    return '$country on lähellä';
   }
 
   @override
   String crossBorderDistance(int km) {
-    return '~$km km to border';
+    return '~$km km rajalle';
   }
 
   @override
   String crossBorderAvgPrice(String price, int count) {
-    return 'Avg here: $price EUR ($count stations)';
+    return 'Keskim. täällä: $price EUR ($count asemaa)';
   }
 
   @override
-  String get allPricesView => 'All prices';
+  String get allPricesView => 'Kaikki hinnat';
 
   @override
-  String get compactView => 'Compact';
+  String get compactView => 'Kompakti';
 
   @override
-  String get switchToAllPricesView => 'Switch to all-prices view';
+  String get switchToAllPricesView => 'Vaihda kaikkien hintojen näkymään';
 
   @override
-  String get switchToCompactView => 'Switch to compact view';
+  String get switchToCompactView => 'Vaihda kompaktiin näkymään';
 
   @override
   String get unavailable => 'N/A';
 
   @override
-  String get outOfStock => 'Out of stock';
+  String get outOfStock => 'Ei varastossa';
 
   @override
-  String get gdprTitle => 'Your Privacy';
+  String get gdprTitle => 'Tietosuojasi';
 
   @override
   String get gdprSubtitle =>
-      'This app respects your privacy. Choose which data you want to share. You can change these settings anytime.';
+      'Tämä sovellus kunnioittaa yksityisyyttäsi. Valitse, mitä tietoja haluat jakaa. Voit muuttaa näitä asetuksia milloin tahansa.';
 
   @override
-  String get gdprLocationTitle => 'Location Access';
+  String get gdprLocationTitle => 'Sijaintioikeus';
 
   @override
   String get gdprLocationDescription =>
-      'Your coordinates are sent to the fuel price API to find nearby stations. Location data is never stored on a server and is not used for tracking.';
+      'Koordinaattisi lähetetään polttoainehinta-API:lle lähellä olevien asemien löytämiseksi. Sijaintitietoja ei koskaan tallenneta palvelimelle eikä niitä käytetä seurantaan.';
 
   @override
   String get gdprLocationShort =>
-      'Find nearby fuel stations using your location';
+      'Etsi lähellä olevia polttoaineasemia sijaintisi avulla';
 
   @override
-  String get gdprErrorReportingTitle => 'Error Reporting';
+  String get gdprErrorReportingTitle => 'Virheraportointi';
 
   @override
   String get gdprErrorReportingDescription =>
-      'Anonymous crash reports help improve the app. No personal data is included. Reports are sent via Sentry only when configured.';
+      'Anonyymiset kaatumisraportit auttavat parantamaan sovellusta. Henkilötietoja ei sisällytetä. Raportit lähetetään Sentryyn vain kun se on määritetty.';
 
   @override
   String get gdprErrorReportingShort =>
-      'Send anonymous crash reports to improve the app';
+      'Lähetä anonyymiset kaatumisraportit sovelluksen parantamiseksi';
 
   @override
-  String get gdprCloudSyncTitle => 'Cloud Sync';
+  String get gdprCloudSyncTitle => 'Pilvisynkronointi';
 
   @override
   String get gdprCloudSyncDescription =>
-      'Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.';
+      'Synkronoi suosikit ja hälytykset laitteiden välillä TankSyncin avulla. Käyttää anonyymiä todennusta. Tietosi salataan siirrossa.';
 
   @override
-  String get gdprCloudSyncShort => 'Sync favorites and alerts across devices';
+  String get gdprCloudSyncShort =>
+      'Synkronoi suosikit ja hälytykset laitteiden välillä';
 
   @override
   String get gdprLegalBasis =>
-      'Legal basis: Art. 6(1)(a) GDPR (Consent). You can withdraw consent anytime in Settings.';
+      'Oikeusperuste: Art. 6(1)(a) GDPR (Suostumus). Voit peruuttaa suostumuksen milloin tahansa Asetuksissa.';
 
   @override
-  String get gdprAcceptAll => 'Accept All';
+  String get gdprAcceptAll => 'Hyväksy kaikki';
 
   @override
-  String get gdprAcceptSelected => 'Accept Selected';
+  String get gdprAcceptSelected => 'Hyväksy valitut';
 
   @override
   String get gdprSettingsHint =>
-      'You can change your privacy choices at any time.';
+      'Voit muuttaa tietosuojavalintojasi milloin tahansa.';
 
   @override
-  String get routeSaved => 'Route saved!';
+  String get routeSaved => 'Reitti tallennettu!';
 
   @override
-  String get routeSaveFailed => 'Failed to save route';
+  String get routeSaveFailed => 'Reitin tallennus epäonnistui';
 
   @override
-  String get sqlCopied => 'SQL copied to clipboard';
+  String get sqlCopied => 'SQL kopioitu leikepöydälle';
 
   @override
-  String get connectionDataCopied => 'Connection data copied';
+  String get connectionDataCopied => 'Yhteystiedot kopioitu';
 
   @override
-  String get accountDeleted => 'Account deleted. Local data preserved.';
+  String get accountDeleted => 'Tili poistettu. Paikalliset tiedot säilytetty.';
 
   @override
-  String get switchedToAnonymous => 'Switched to anonymous session';
+  String get switchedToAnonymous => 'Vaihdettu anonyymiin istuntoon';
 
   @override
   String failedToSwitch(String error) {
-    return 'Failed to switch: $error';
+    return 'Vaihto epäonnistui: $error';
   }
 
   @override
-  String get topicUrlCopied => 'Topic URL copied';
+  String get topicUrlCopied => 'Aiheen URL kopioitu';
 
   @override
-  String get testNotificationSent => 'Test notification sent!';
+  String get testNotificationSent => 'Testipush lähetetty!';
 
   @override
-  String get testNotificationFailed => 'Failed to send test notification';
+  String get testNotificationFailed => 'Testipushin lähetys epäonnistui';
 
   @override
-  String get pushUpdateFailed => 'Failed to update push notification setting';
+  String get pushUpdateFailed => 'Push-ilmoituksen päivitys epäonnistui';
 
   @override
-  String get connectedAsGuest => 'Connected as guest';
+  String get connectedAsGuest => 'Yhdistetty vieraana';
 
   @override
-  String get accountCreated => 'Account created!';
+  String get accountCreated => 'Tili luotu!';
 
   @override
-  String get signedIn => 'Signed in!';
+  String get signedIn => 'Kirjauduttu sisään!';
 
   @override
   String stationHidden(String name) {
-    return '$name hidden';
+    return '$name piilotettu';
   }
 
   @override
   String removedFromFavoritesName(String name) {
-    return '$name removed from favorites';
+    return '$name poistettu suosikeista';
   }
 
   @override
   String invalidApiKey(String error) {
-    return 'Invalid API key: $error';
+    return 'Virheellinen API-avain: $error';
   }
 
   @override
-  String get invalidQrCode => 'Invalid QR code format';
+  String get invalidQrCode => 'Virheellinen QR-koodimuoto';
 
   @override
   String get invalidQrCodeTankSync =>
-      'Invalid QR code — expected TankSync format';
+      'Virheellinen QR-koodi — odotettiin TankSync-muotoa';
 
   @override
-  String get tankSyncConnected => 'TankSync connected!';
+  String get tankSyncConnected => 'TankSync yhdistetty!';
 
   @override
-  String get syncCompleted => 'Sync completed — data refreshed';
+  String get syncCompleted => 'Synkronointi valmis — tiedot päivitetty';
 
   @override
-  String get deviceCodeCopied => 'Device code copied';
+  String get deviceCodeCopied => 'Laitekoodi kopioitu';
 
   @override
-  String get undo => 'Undo';
+  String get undo => 'Kumoa';
 
   @override
   String invalidPostalCode(String length, String label) {
-    return 'Please enter a valid $length-digit $label';
+    return 'Anna kelvollinen $length-numeroinen $label';
   }
 
   @override
-  String get freshnessAgo => 'ago';
+  String get freshnessAgo => 'sitten';
 
   @override
-  String get freshnessStale => 'Stale';
+  String get freshnessStale => 'Vanhentunut';
 
   @override
   String freshnessBadgeSemantics(String age) {
-    return 'Data freshness: $age';
+    return 'Tietojen tuoreus: $age';
   }
 
   @override
   String brandLogoLabel(String brand) {
-    return '$brand logo';
+    return '$brand-logo';
   }
 
   @override
@@ -1363,51 +1367,51 @@ class AppLocalizationsFi extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Rate $count stars',
-      one: 'Rate 1 star',
+      other: 'Anna $count tähteä',
+      one: 'Anna 1 tähti',
     );
     return '$_temp0';
   }
 
   @override
-  String get passwordStrengthWeak => 'Weak';
+  String get passwordStrengthWeak => 'Heikko';
 
   @override
-  String get passwordStrengthFair => 'Fair';
+  String get passwordStrengthFair => 'Kohtalainen';
 
   @override
-  String get passwordStrengthStrong => 'Strong';
+  String get passwordStrengthStrong => 'Vahva';
 
   @override
-  String get passwordReqMinLength => 'At least 8 characters';
+  String get passwordReqMinLength => 'Vähintään 8 merkkiä';
 
   @override
-  String get passwordReqUppercase => 'At least 1 uppercase letter';
+  String get passwordReqUppercase => 'Vähintään 1 iso kirjain';
 
   @override
-  String get passwordReqLowercase => 'At least 1 lowercase letter';
+  String get passwordReqLowercase => 'Vähintään 1 pieni kirjain';
 
   @override
-  String get passwordReqDigit => 'At least 1 number';
+  String get passwordReqDigit => 'Vähintään 1 numero';
 
   @override
-  String get passwordReqSpecial => 'At least 1 special character';
+  String get passwordReqSpecial => 'Vähintään 1 erikoismerkki';
 
   @override
-  String get passwordTooWeak => 'Password does not meet all requirements';
+  String get passwordTooWeak => 'Salasana ei täytä kaikkia vaatimuksia';
 
   @override
-  String get brandFilterAll => 'All';
+  String get brandFilterAll => 'Kaikki';
 
   @override
-  String get brandFilterNoHighway => 'No highway';
+  String get brandFilterNoHighway => 'Ei moottoritietä';
 
   @override
   String get swipeTutorialMessage =>
-      'Swipe right to navigate, swipe left to remove';
+      'Pyyhkäise oikealle navigoidaksesi, vasemmalle poistaaksesi';
 
   @override
-  String get swipeTutorialDismiss => 'Got it';
+  String get swipeTutorialDismiss => 'Selvä';
 
   @override
   String get alertStatsActive => 'Aktiiviset';
@@ -1419,100 +1423,100 @@ class AppLocalizationsFi extends AppLocalizations {
   String get alertStatsThisWeek => 'Tällä viikolla';
 
   @override
-  String get privacyDashboardTitle => 'Privacy Dashboard';
+  String get privacyDashboardTitle => 'Tietosuojanäkymä';
 
   @override
-  String get privacyDashboardSubtitle => 'View, export, or delete your data';
+  String get privacyDashboardSubtitle => 'Katso, vie tai poista tietosi';
 
   @override
   String get privacyDashboardBanner =>
-      'Your data belongs to you. Here you can see everything this app stores, export it, or delete it.';
+      'Tietosi kuuluvat sinulle. Täällä voit nähdä kaiken, mitä tämä sovellus tallentaa, viedä sen tai poistaa sen.';
 
   @override
-  String get privacyLocalData => 'Data on this device';
+  String get privacyLocalData => 'Tiedot tällä laitteella';
 
   @override
-  String get privacyIgnoredStations => 'Ignored stations';
+  String get privacyIgnoredStations => 'Ohitetut asemat';
 
   @override
-  String get privacyRatings => 'Station ratings';
+  String get privacyRatings => 'Asemien arvostelut';
 
   @override
-  String get privacyPriceHistory => 'Price history stations';
+  String get privacyPriceHistory => 'Hintahistoria-asemat';
 
   @override
-  String get privacyProfiles => 'Search profiles';
+  String get privacyProfiles => 'Hakuprofiilit';
 
   @override
-  String get privacyItineraries => 'Saved routes';
+  String get privacyItineraries => 'Tallennetut reitit';
 
   @override
-  String get privacyCacheEntries => 'Cache entries';
+  String get privacyCacheEntries => 'Välimuistimerkinnät';
 
   @override
-  String get privacyApiKey => 'API key stored';
+  String get privacyApiKey => 'API-avain tallennettu';
 
   @override
-  String get privacyEvApiKey => 'EV API key stored';
+  String get privacyEvApiKey => 'Sähköauto-API-avain tallennettu';
 
   @override
-  String get privacyEstimatedSize => 'Estimated storage';
+  String get privacyEstimatedSize => 'Arvioitu tallennustila';
 
   @override
-  String get privacySyncedData => 'Cloud sync (TankSync)';
+  String get privacySyncedData => 'Pilvisynkronointi (TankSync)';
 
   @override
   String get privacySyncDisabled =>
-      'Cloud sync is disabled. All data stays on this device only.';
+      'Pilvisynkronointi on poistettu käytöstä. Kaikki tiedot pysyvät vain tällä laitteella.';
 
   @override
-  String get privacySyncMode => 'Sync mode';
+  String get privacySyncMode => 'Synkronointitapa';
 
   @override
-  String get privacySyncUserId => 'User ID';
+  String get privacySyncUserId => 'Käyttäjätunnus';
 
   @override
   String get privacySyncDescription =>
-      'When sync is enabled, favorites, alerts, ignored stations, and ratings are also stored on the TankSync server.';
+      'Kun synkronointi on käytössä, suosikit, hälytykset, ohitetut asemat ja arvostelut tallennetaan myös TankSync-palvelimelle.';
 
   @override
-  String get privacyViewServerData => 'View server data';
+  String get privacyViewServerData => 'Tarkastele palvelintietoja';
 
   @override
-  String get privacyExportButton => 'Export all data as JSON';
+  String get privacyExportButton => 'Vie kaikki tiedot JSON-muodossa';
 
   @override
-  String get privacyExportSuccess => 'Data exported to clipboard';
+  String get privacyExportSuccess => 'Tiedot viety leikepöydälle';
 
   @override
-  String get privacyExportCsvButton => 'Export all data as CSV';
+  String get privacyExportCsvButton => 'Vie kaikki tiedot CSV-muodossa';
 
   @override
-  String get privacyExportCsvSuccess => 'CSV data exported to clipboard';
+  String get privacyExportCsvSuccess => 'CSV-tiedot viety leikepöydälle';
 
   @override
-  String get privacyDeleteButton => 'Delete all data';
+  String get privacyDeleteButton => 'Poista kaikki tiedot';
 
   @override
   String privacyCopyErrorLog(int count) {
-    return 'Copy error log to clipboard ($count)';
+    return 'Kopioi virheloki leikepöydälle ($count)';
   }
 
   @override
-  String get privacyDeleteTitle => 'Delete all data?';
+  String get privacyDeleteTitle => 'Poistetaanko kaikki tiedot?';
 
   @override
   String get privacyDeleteBody =>
-      'This will permanently delete:\n\n- All favorites and station data\n- All search profiles\n- All price alerts\n- All price history\n- All cached data\n- Your API key\n- All app settings\n\nThe app will reset to its initial state. This action cannot be undone.';
+      'Tämä poistaa pysyvästi:\n\n- Kaikki suosikit ja asematiedot\n- Kaikki hakuprofiilit\n- Kaikki hintahälytykset\n- Kaikki hintahistoriat\n- Kaikki välimuistin tiedot\n- API-avaimesi\n- Kaikki sovelluksen asetukset\n\nSovellus palautuu alkutilaan. Tätä toimintoa ei voi peruuttaa.';
 
   @override
-  String get privacyDeleteConfirm => 'Delete everything';
+  String get privacyDeleteConfirm => 'Poista kaikki';
 
   @override
-  String get yes => 'Yes';
+  String get yes => 'Kyllä';
 
   @override
-  String get no => 'No';
+  String get no => 'Ei';
 
   @override
   String get amenities => 'Amenities';
@@ -1542,26 +1546,26 @@ class AppLocalizationsFi extends AppLocalizations {
   String get amenityEv => 'EV';
 
   @override
-  String get paymentMethods => 'Payment methods';
+  String get paymentMethods => 'Maksutavat';
 
   @override
-  String get paymentMethodCash => 'Cash';
+  String get paymentMethodCash => 'Käteinen';
 
   @override
-  String get paymentMethodCard => 'Card';
+  String get paymentMethodCard => 'Kortti';
 
   @override
-  String get paymentMethodContactless => 'Contactless';
+  String get paymentMethodContactless => 'Lähimaksu';
 
   @override
-  String get paymentMethodFuelCard => 'Fuel Card';
+  String get paymentMethodFuelCard => 'Polttoainekortti';
 
   @override
-  String get paymentMethodApp => 'App';
+  String get paymentMethodApp => 'Sovellus';
 
   @override
   String payWithApp(String app) {
-    return 'Pay with $app';
+    return 'Maksa sovelluksella $app';
   }
 
   @override
@@ -1571,49 +1575,49 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String ecoScoreTooltip(String avg) {
-    return 'Compared to the rolling average over your last 3 fill-ups ($avg L/100 km).';
+    return 'Verrattuna viimeisten 3 tankkauksen liukuvaan keskiarvoon ($avg L/100 km).';
   }
 
   @override
   String ecoScoreSemantics(String value, String delta) {
-    return 'Consumption $value L/100 km, $delta versus your rolling average';
+    return 'Kulutus $value L/100 km, $delta suhteessa liukuvaan keskiarvoosi';
   }
 
   @override
-  String get drivingMode => 'Driving Mode';
+  String get drivingMode => 'Ajotila';
 
   @override
-  String get drivingExit => 'Exit';
+  String get drivingExit => 'Poistu';
 
   @override
-  String get drivingNearestStation => 'Nearest';
+  String get drivingNearestStation => 'Lähin';
 
   @override
-  String get drivingTapToUnlock => 'Tap to unlock';
+  String get drivingTapToUnlock => 'Napauta lukituksen avaamiseksi';
 
   @override
-  String get drivingSafetyTitle => 'Safety Notice';
+  String get drivingSafetyTitle => 'Turvallisuushuomio';
 
   @override
   String get drivingSafetyMessage =>
-      'Do not operate the app while driving. Pull over to a safe location before interacting with the screen. The driver is responsible for safe operation of the vehicle at all times.';
+      'Älä käytä sovellusta ajon aikana. Pysähdy turvalliseen paikkaan ennen ruudun käyttöä. Kuljettaja on aina vastuussa ajoneuvon turvallisesta käytöstä.';
 
   @override
-  String get drivingSafetyAccept => 'I understand';
+  String get drivingSafetyAccept => 'Ymmärrän';
 
   @override
-  String get voiceAnnouncementsTitle => 'Voice Announcements';
+  String get voiceAnnouncementsTitle => 'Äänilmoitukset';
 
   @override
   String get voiceAnnouncementsDescription =>
-      'Announce nearby cheap stations while driving';
+      'Ilmoita lähellä olevista edullisista asemista ajon aikana';
 
   @override
-  String get voiceAnnouncementsEnabled => 'Enable voice announcements';
+  String get voiceAnnouncementsEnabled => 'Ota äänilmoitukset käyttöön';
 
   @override
   String voiceAnnouncementThreshold(String price) {
-    return 'Only below $price';
+    return 'Vain alle $price';
   }
 
   @override
@@ -1623,14 +1627,14 @@ class AppLocalizationsFi extends AppLocalizations {
     String fuelType,
     String price,
   ) {
-    return '$station, $distance kilometers ahead, $fuelType $price';
+    return '$station, $distance kilometriä edessä, $fuelType $price';
   }
 
   @override
-  String get voiceAnnouncementProximityRadius => 'Announcement radius';
+  String get voiceAnnouncementProximityRadius => 'Ilmoitussäde';
 
   @override
-  String get voiceAnnouncementCooldown => 'Repeat interval';
+  String get voiceAnnouncementCooldown => 'Toistumisväli';
 
   @override
   String get nearestStations => 'Lahimmat asemat';
@@ -1640,590 +1644,588 @@ class AppLocalizationsFi extends AppLocalizations {
       'Loyda lahimmat asemat nykyisella sijainnillasi';
 
   @override
-  String get consumptionLogTitle => 'Fuel consumption';
+  String get consumptionLogTitle => 'Polttoainekulutus';
 
   @override
-  String get consumptionLogMenuTitle => 'Consumption log';
+  String get consumptionLogMenuTitle => 'Kulutuskirjanpito';
 
   @override
   String get consumptionLogMenuSubtitle =>
-      'Track fill-ups and calculate L/100km';
+      'Seuraa tankkauksia ja laske L/100km';
 
   @override
-  String get consumptionStatsTitle => 'Consumption stats';
+  String get consumptionStatsTitle => 'Kulutustilastot';
 
   @override
-  String get addFillUp => 'Add fill-up';
+  String get addFillUp => 'Lisää tankkaus';
 
   @override
-  String get noFillUpsTitle => 'No fill-ups yet';
+  String get noFillUpsTitle => 'Ei vielä tankkauksia';
 
   @override
   String get noFillUpsSubtitle =>
-      'Log your first fill-up to start tracking consumption.';
+      'Kirjaa ensimmäinen tankkauksesi aloittaaksesi kulutuksen seurannan.';
 
   @override
-  String get fillUpDate => 'Date';
+  String get fillUpDate => 'Päivämäärä';
 
   @override
-  String get liters => 'Liters';
+  String get liters => 'Litrat';
 
   @override
-  String get odometerKm => 'Odometer (km)';
+  String get odometerKm => 'Matkamittari (km)';
 
   @override
-  String get notesOptional => 'Notes (optional)';
+  String get notesOptional => 'Muistiinpanot (valinnainen)';
 
   @override
-  String get stationPreFilled => 'Station pre-filled';
+  String get stationPreFilled => 'Asema esitäytetty';
 
   @override
-  String get statAvgConsumption => 'Avg L/100km';
+  String get statAvgConsumption => 'Keskim. L/100km';
 
   @override
-  String get statAvgCostPerKm => 'Avg cost/km';
+  String get statAvgCostPerKm => 'Keskim. kustannus/km';
 
   @override
-  String get statTotalLiters => 'Total liters';
+  String get statTotalLiters => 'Yhteensä litraa';
 
   @override
-  String get statTotalSpent => 'Total spent';
+  String get statTotalSpent => 'Yhteensä käytetty';
 
   @override
-  String get statFillUpCount => 'Fill-ups';
+  String get statFillUpCount => 'Tankkaukset';
 
   @override
-  String get fieldRequired => 'Required';
+  String get fieldRequired => 'Pakollinen';
 
   @override
-  String get fieldInvalidNumber => 'Invalid number';
+  String get fieldInvalidNumber => 'Virheellinen numero';
 
   @override
-  String get carbonDashboardTitle => 'Carbon dashboard';
+  String get carbonDashboardTitle => 'Hiilijalanjälkinäkymä';
 
   @override
-  String get carbonEmptyTitle => 'No data yet';
+  String get carbonEmptyTitle => 'Ei vielä tietoja';
 
   @override
   String get carbonEmptySubtitle =>
-      'Log fill-ups to see your carbon dashboard.';
+      'Kirjaa tankkauksia nähdäksesi hiilijalanjälkinäkymän.';
 
   @override
-  String get carbonSummaryTotalCost => 'Total cost';
+  String get carbonSummaryTotalCost => 'Kokonaiskustannus';
 
   @override
-  String get carbonSummaryTotalCo2 => 'Total CO2';
+  String get carbonSummaryTotalCo2 => 'CO2 yhteensä';
 
   @override
-  String get monthlyCostsTitle => 'Monthly costs';
+  String get monthlyCostsTitle => 'Kuukausittaiset kustannukset';
 
   @override
-  String get monthlyEmissionsTitle => 'Monthly CO2 emissions';
+  String get monthlyEmissionsTitle => 'Kuukausittaiset CO2-päästöt';
 
   @override
-  String get vehiclesTitle => 'My vehicles';
+  String get vehiclesTitle => 'Omat ajoneuvot';
 
   @override
-  String get vehiclesMenuTitle => 'My vehicles';
+  String get vehiclesMenuTitle => 'Omat ajoneuvot';
 
   @override
-  String get vehiclesMenuSubtitle =>
-      'Battery, connectors, charging preferences';
+  String get vehiclesMenuSubtitle => 'Akku, liittimet, latausasetukset';
 
   @override
   String get vehiclesEmptyMessage =>
-      'Add your car to filter by connector and estimate charging costs.';
+      'Lisää autosi suodattaaksesi liittimen mukaan ja arvioidaksesi latauskulut.';
 
   @override
-  String get vehiclesWizardTitle => 'My vehicles (optional)';
+  String get vehiclesWizardTitle => 'Omat ajoneuvot (valinnainen)';
 
   @override
   String get vehiclesWizardSubtitle =>
-      'Add your car to pre-fill the consumption log and enable EV connector filters. You can skip this and add vehicles later.';
+      'Lisää autosi kulutuskirjanpidon esitäyttöä ja sähköauton liitisuodattimia varten. Voit ohittaa tämän ja lisätä ajoneuvoja myöhemmin.';
 
   @override
-  String get vehiclesWizardNoneYet => 'No vehicle configured yet.';
+  String get vehiclesWizardNoneYet => 'Ei vielä yhtään ajoneuvoa.';
 
   @override
   String vehiclesWizardYoursList(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count vehicles',
-      one: '1 vehicle',
+      other: '$count ajoneuvoa',
+      one: '1 ajoneuvo',
     );
-    return 'You have $_temp0:';
+    return 'Sinulla on $_temp0:';
   }
 
   @override
   String get vehiclesWizardSkipHint =>
-      'Skip to finish setup — you can add vehicles anytime from Settings.';
+      'Ohita ja viimeistele asennus — voit lisätä ajoneuvoja milloin tahansa Asetuksista.';
 
   @override
-  String get fillUpVehicleLabel => 'Vehicle';
+  String get fillUpVehicleLabel => 'Ajoneuvo';
 
   @override
-  String get fillUpVehicleNone => 'No vehicle';
+  String get fillUpVehicleNone => 'Ei ajoneuvoa';
 
   @override
-  String get fillUpVehicleRequired => 'Vehicle is required';
+  String get fillUpVehicleRequired => 'Ajoneuvo vaaditaan';
 
   @override
-  String get reportScanError => 'Report scan error';
+  String get reportScanError => 'Ilmoita skannauksesta';
 
   @override
-  String get pickStationTitle => 'Pick a station';
+  String get pickStationTitle => 'Valitse asema';
 
   @override
   String get pickStationHelper =>
-      'Start the fill-up from a known station so prices, brand and fuel type fill themselves in.';
+      'Aloita tankkaus tunnetulta asemalta, jotta hinnat, merkki ja polttoainetyyppi täyttyvät automaattisesti.';
 
   @override
   String get pickStationEmpty =>
-      'No favorite stations yet — add some from Search or Favorites, or skip and fill in manually.';
+      'Ei vielä suosikkiasemia — lisää niitä Hausta tai Suosikeista, tai ohita ja täytä manuaalisesti.';
 
   @override
-  String get pickStationSkip => 'Skip — add without a station';
+  String get pickStationSkip => 'Ohita — lisää ilman asemaa';
 
   @override
-  String get scanPump => 'Scan pump';
+  String get scanPump => 'Skannaa pumppu';
 
   @override
-  String get scanPayment => 'Scan payment QR';
+  String get scanPayment => 'Skannaa maksu-QR';
 
   @override
-  String get qrPaymentBeneficiary => 'Beneficiary';
+  String get qrPaymentBeneficiary => 'Saaja';
 
   @override
-  String get qrPaymentAmount => 'Amount';
+  String get qrPaymentAmount => 'Summa';
 
   @override
-  String get qrPaymentEpcTitle => 'SEPA payment';
+  String get qrPaymentEpcTitle => 'SEPA-maksu';
 
   @override
-  String get qrPaymentEpcEmpty => 'No fields decoded';
+  String get qrPaymentEpcEmpty => 'Ei dekoodattuja kenttiä';
 
   @override
-  String get qrPaymentOpenInBank => 'Open in bank app';
+  String get qrPaymentOpenInBank => 'Avaa pankkisovelluksessa';
 
   @override
-  String get qrPaymentLaunchFailed => 'No app available to open this code';
+  String get qrPaymentLaunchFailed => 'Ei sovellusta tämän koodin avaamiseen';
 
   @override
-  String get qrPaymentUnknownTitle => 'Unrecognised code';
+  String get qrPaymentUnknownTitle => 'Tuntematon koodi';
 
   @override
-  String get qrPaymentCopyRaw => 'Copy raw text';
+  String get qrPaymentCopyRaw => 'Kopioi raakoteksti';
 
   @override
-  String get qrPaymentCopiedRaw => 'Copied to clipboard';
+  String get qrPaymentCopiedRaw => 'Kopioitu leikepöydälle';
 
   @override
-  String get qrPaymentReport => 'Report this scan';
+  String get qrPaymentReport => 'Ilmoita skannauksesta';
 
   @override
   String get qrPaymentEpcCopied =>
-      'Bank details copied — paste into your banking app';
+      'Pankkitiedot kopioitu — liitä pankkisovellukseesi';
 
   @override
-  String get qrScannerGuidance => 'Point the camera at a QR code';
+  String get qrScannerGuidance => 'Osoita kamera QR-koodiin';
 
   @override
   String get qrScannerPermissionDenied =>
-      'Camera access is needed to scan QR codes.';
+      'QR-koodien skannaukseen tarvitaan kameraluupa.';
 
   @override
   String get qrScannerPermissionPermanentlyDenied =>
-      'Camera access was denied. Open settings to grant it.';
+      'Kameraluupa evättiin. Avaa asetukset myöntääksesi sen.';
 
   @override
-  String get qrScannerRetryPermission => 'Try again';
+  String get qrScannerRetryPermission => 'Yritä uudelleen';
 
   @override
-  String get qrScannerOpenSettings => 'Open settings';
+  String get qrScannerOpenSettings => 'Avaa asetukset';
 
   @override
   String get qrScannerTimeout =>
-      'No QR code detected. Move closer or try again.';
+      'QR-koodia ei havaittu. Mene lähemmäs tai yritä uudelleen.';
 
   @override
-  String get qrScannerRetry => 'Try again';
+  String get qrScannerRetry => 'Yritä uudelleen';
 
   @override
-  String get torchOn => 'Turn flash on';
+  String get torchOn => 'Ota salama käyttöön';
 
   @override
-  String get torchOff => 'Turn flash off';
+  String get torchOff => 'Poista salama käytöstä';
 
   @override
-  String get obdNoAdapter => 'No OBD2 adapter in range';
+  String get obdNoAdapter => 'Ei OBD2-sovitinta kantaman sisällä';
 
   @override
-  String get obdOdometerUnavailable => 'Could not read odometer';
+  String get obdOdometerUnavailable => 'Matkamittaria ei voitu lukea';
 
   @override
   String get obdPermissionDenied =>
-      'Grant Bluetooth permission in system settings';
+      'Myönnä Bluetooth-lupa järjestelmäasetuksissa';
 
   @override
   String get obdAdapterUnresponsive =>
-      'Adapter didn\'t answer — turn the ignition on and retry';
+      'Sovitin ei vastannut — käynnistä sytytin ja yritä uudelleen';
 
   @override
-  String get obdPickerTitle => 'Pick an OBD2 adapter';
+  String get obdPickerTitle => 'Valitse OBD2-sovitin';
 
   @override
-  String get obdPickerScanning => 'Scanning for adapters…';
+  String get obdPickerScanning => 'Etsitään sovittimia…';
 
   @override
-  String get obdPickerConnecting => 'Connecting…';
+  String get obdPickerConnecting => 'Yhdistetään…';
 
   @override
-  String get themeSettingTitle => 'Theme';
+  String get themeSettingTitle => 'Teema';
 
   @override
-  String get themeModeLight => 'Light';
+  String get themeModeLight => 'Vaalea';
 
   @override
-  String get themeModeDark => 'Dark';
+  String get themeModeDark => 'Tumma';
 
   @override
-  String get themeModeSystem => 'Follow system';
+  String get themeModeSystem => 'Seuraa järjestelmää';
 
   @override
-  String get tripRecordingTitle => 'Recording trip';
+  String get tripRecordingTitle => 'Tallennetaan matkaa';
 
   @override
-  String get tripSummaryTitle => 'Trip summary';
+  String get tripSummaryTitle => 'Matkan yhteenveto';
 
   @override
-  String get tripMetricDistance => 'Distance';
+  String get tripMetricDistance => 'Etäisyys';
 
   @override
-  String get tripMetricSpeed => 'Speed';
+  String get tripMetricSpeed => 'Nopeus';
 
   @override
-  String get tripMetricFuelUsed => 'Fuel used';
+  String get tripMetricFuelUsed => 'Polttoainetta käytetty';
 
   @override
-  String get tripMetricAvgConsumption => 'Avg';
+  String get tripMetricAvgConsumption => 'Keskim.';
 
   @override
-  String get tripMetricElapsed => 'Elapsed';
+  String get tripMetricElapsed => 'Kulunut aika';
 
   @override
-  String get tripMetricOdometer => 'Odometer';
+  String get tripMetricOdometer => 'Matkamittari';
 
   @override
-  String get tripStop => 'Stop recording';
+  String get tripStop => 'Lopeta tallennus';
 
   @override
-  String get tripPause => 'Pause';
+  String get tripPause => 'Keskeytä';
 
   @override
-  String get tripResume => 'Resume';
+  String get tripResume => 'Jatka';
 
   @override
-  String get tripBannerRecording => 'Recording trip';
+  String get tripBannerRecording => 'Tallennetaan matkaa';
 
   @override
-  String get tripBannerPaused => 'Trip paused — tap to resume';
+  String get tripBannerPaused => 'Matka keskeytetty — napauta jatkaaksesi';
 
   @override
-  String get navConsumption => 'Consumption';
+  String get navConsumption => 'Kulutus';
 
   @override
-  String get vehicleBaselineSectionTitle => 'Baseline calibration';
+  String get vehicleBaselineSectionTitle => 'Perusarvojen kalibrointi';
 
   @override
   String get vehicleBaselineEmpty =>
-      'No samples yet — start an OBD2 trip to begin learning this vehicle\'s fuel profile.';
+      'Ei näytteitä vielä — aloita OBD2-matka oppiaksesi tämän ajoneuvon polttoaineprofiilin.';
 
   @override
-  String get vehicleBaselineProgress =>
-      'Learned from samples across driving situations.';
+  String get vehicleBaselineProgress => 'Opittu näytteistä eri ajotilanteissa.';
 
   @override
-  String get vehicleBaselineReset => 'Reset driving-situation baseline';
+  String get vehicleBaselineReset => 'Nollaa ajotilanteen perusarvo';
 
   @override
   String get vehicleBaselineResetConfirmTitle =>
-      'Reset driving-situation baseline?';
+      'Nollatako ajotilanteen perusarvo?';
 
   @override
   String get vehicleBaselineResetConfirmBody =>
-      'This wipes every learned sample for this vehicle. You\'ll drift back to the cold-start defaults until new trips refill the profile.';
+      'Tämä poistaa kaikki opitut näytteet tälle ajoneuvolle. Palataan kylmäkäynnistyksen oletusarvoihin, kunnes uudet matkat täyttävät profiilin uudelleen.';
 
   @override
-  String get vehicleAdapterSectionTitle => 'OBD2 adapter';
+  String get vehicleAdapterSectionTitle => 'OBD2-sovitin';
 
   @override
   String get vehicleAdapterEmpty =>
-      'No adapter paired. Pair one so the app can reconnect automatically next time.';
+      'Ei paritettu sovitinta. Paritse yksi, jotta sovellus voi yhdistää automaattisesti seuraavalla kerralla.';
 
   @override
-  String get vehicleAdapterUnnamed => 'Unknown adapter';
+  String get vehicleAdapterUnnamed => 'Tuntematon sovitin';
 
   @override
-  String get vehicleAdapterPair => 'Pair adapter';
+  String get vehicleAdapterPair => 'Paritetaan sovitin';
 
   @override
-  String get vehicleAdapterForget => 'Forget adapter';
+  String get vehicleAdapterForget => 'Unohda sovitin';
 
   @override
-  String get achievementsTitle => 'Achievements';
+  String get achievementsTitle => 'Saavutukset';
 
   @override
-  String get achievementFirstTrip => 'First trip';
+  String get achievementFirstTrip => 'Ensimmäinen matka';
 
   @override
-  String get achievementFirstTripDesc => 'Record your first OBD2 trip.';
+  String get achievementFirstTripDesc => 'Tallenna ensimmäinen OBD2-matkasi.';
 
   @override
-  String get achievementFirstFillUp => 'First fill-up';
+  String get achievementFirstFillUp => 'Ensimmäinen tankkaus';
 
   @override
-  String get achievementFirstFillUpDesc => 'Log your first fill-up.';
+  String get achievementFirstFillUpDesc => 'Kirjaa ensimmäinen tankkauksesi.';
 
   @override
-  String get achievementTenTrips => '10 trips';
+  String get achievementTenTrips => '10 matkaa';
 
   @override
-  String get achievementTenTripsDesc => 'Record 10 OBD2 trips.';
+  String get achievementTenTripsDesc => 'Tallenna 10 OBD2-matkaa.';
 
   @override
-  String get achievementZeroHarsh => 'Smooth driver';
+  String get achievementZeroHarsh => 'Tasainen kuljettaja';
 
   @override
   String get achievementZeroHarshDesc =>
-      'Complete a trip of 10 km or more with no harsh braking or acceleration.';
+      'Suorita vähintään 10 km matka ilman äkillistä jarrutusta tai kiihdytystä.';
 
   @override
-  String get achievementEcoWeek => 'Eco week';
+  String get achievementEcoWeek => 'Eko-viikko';
 
   @override
   String get achievementEcoWeekDesc =>
-      'Drive 7 consecutive days with at least one smooth trip each day.';
+      'Aja 7 peräkkäistä päivää vähintään yksi tasainen matka päivässä.';
 
   @override
-  String get achievementPriceWin => 'Price win';
+  String get achievementPriceWin => 'Hintavoitto';
 
   @override
   String get achievementPriceWinDesc =>
-      'Log a fill-up that beats the station\'s 30-day average by 5 % or more.';
+      'Kirjaa tankkaus, joka alittaa aseman 30 päivän keskiarvon 5 % tai enemmän.';
 
   @override
-  String get syncBaselinesToggleTitle => 'Share learned vehicle profiles';
+  String get syncBaselinesToggleTitle => 'Jaa opitut ajoneuvoprofiilit';
 
   @override
   String get syncBaselinesToggleSubtitle =>
-      'Upload per-vehicle consumption baselines so a second device can reuse them.';
+      'Lataa ajoneuvokohtaiset kulutusperusarvot, jotta toinen laite voi käyttää niitä.';
 
   @override
-  String get obd2StatusConnected => 'OBD2 adapter: connected';
+  String get obd2StatusConnected => 'OBD2-sovitin: yhdistetty';
 
   @override
-  String get obd2StatusAttempting => 'OBD2 adapter: connecting';
+  String get obd2StatusAttempting => 'OBD2-sovitin: yhdistetään';
 
   @override
-  String get obd2StatusUnreachable => 'OBD2 adapter: unreachable';
+  String get obd2StatusUnreachable => 'OBD2-sovitin: ei tavoitettavissa';
 
   @override
   String get obd2StatusPermissionDenied =>
-      'OBD2 adapter: Bluetooth permission needed';
+      'OBD2-sovitin: Bluetooth-lupa tarvitaan';
 
   @override
-  String get obd2StatusConnectedBody => 'Ready to record a trip.';
+  String get obd2StatusConnectedBody => 'Valmis tallentamaan matkan.';
 
   @override
-  String get obd2StatusAttemptingBody => 'Connecting in the background…';
+  String get obd2StatusAttemptingBody => 'Yhdistetään taustalla…';
 
   @override
   String get obd2StatusUnreachableBody =>
-      'Adapter out of range or already in use by another app.';
+      'Sovitin kantaman ulkopuolella tai jo käytössä toisessa sovelluksessa.';
 
   @override
   String get obd2StatusPermissionDeniedBody =>
-      'Grant Bluetooth permission in system settings to reconnect automatically.';
+      'Myönnä Bluetooth-lupa järjestelmäasetuksissa yhdistääksesi automaattisesti.';
 
   @override
-  String get obd2StatusNoAdapter => 'No adapter paired';
+  String get obd2StatusNoAdapter => 'Ei paritettu sovitinta';
 
   @override
-  String get obd2StatusForget => 'Forget adapter';
+  String get obd2StatusForget => 'Unohda sovitin';
 
   @override
-  String get tripHistoryTitle => 'Trip history';
+  String get tripHistoryTitle => 'Matkahistoria';
 
   @override
-  String get tripHistoryEmptyTitle => 'No trips yet';
+  String get tripHistoryEmptyTitle => 'Ei vielä matkoja';
 
   @override
   String get tripHistoryEmptySubtitle =>
-      'Connect an OBD2 adapter and record a trip to start building your driving history.';
+      'Yhdistä OBD2-sovitin ja tallenna matka aloittaaksesi ajohistorian rakentamisen.';
 
   @override
-  String get tripHistoryUnknownDate => 'Unknown date';
+  String get tripHistoryUnknownDate => 'Tuntematon päivämäärä';
 
   @override
-  String get situationIdle => 'Idle';
+  String get situationIdle => 'Tyhjäkäynti';
 
   @override
-  String get situationStopAndGo => 'Stop & go';
+  String get situationStopAndGo => 'Pysähtele-jatka';
 
   @override
-  String get situationUrban => 'Urban';
+  String get situationUrban => 'Kaupunki';
 
   @override
-  String get situationHighway => 'Highway';
+  String get situationHighway => 'Moottoritie';
 
   @override
-  String get situationDecel => 'Decelerating';
+  String get situationDecel => 'Hidastuu';
 
   @override
-  String get situationClimbing => 'Climbing / loaded';
+  String get situationClimbing => 'Nousu / kuorma';
 
   @override
-  String get situationHardAccel => 'Hard accel';
+  String get situationHardAccel => 'Voimakas kiihdytys';
 
   @override
-  String get situationFuelCut => 'Fuel cut — coast';
+  String get situationFuelCut => 'Polttoaineen katkaisu — liuku';
 
   @override
-  String get tripSaveAsFillUp => 'Save as fill-up';
+  String get tripSaveAsFillUp => 'Tallenna tankkauksena';
 
   @override
-  String get tripSaveRecording => 'Save trip';
+  String get tripSaveRecording => 'Tallenna matka';
 
   @override
-  String get tripDiscard => 'Discard';
+  String get tripDiscard => 'Hylkää';
 
   @override
   String obdOdometerRead(int km) {
-    return 'Odometer read: $km km';
+    return 'Matkamittari luettu: $km km';
   }
 
   @override
-  String get vehicleFuelNotSet => 'Not set';
+  String get vehicleFuelNotSet => 'Ei asetettu';
 
   @override
-  String get wizardVehicleTapToEdit => 'Tap to edit';
+  String get wizardVehicleTapToEdit => 'Napauta muokataksesi';
 
   @override
-  String get wizardVehicleDefaultBadge => 'Default';
+  String get wizardVehicleDefaultBadge => 'Oletus';
 
   @override
   String get wizardProfileChoiceHint =>
-      'Choose how you want to use the app. You can change this later in Settings.';
+      'Valitse, miten haluat käyttää sovellusta. Voit muuttaa tätä myöhemmin Asetuksissa.';
 
   @override
   String get wizardProfileChoiceFooter =>
-      'You can change your choice any time from Settings → Use mode.';
+      'Voit muuttaa valintaasi milloin tahansa Asetukset → Käyttötapa.';
 
   @override
-  String get wizardProfileBasicName => 'Basic';
+  String get wizardProfileBasicName => 'Perus';
 
   @override
   String get wizardProfileBasicDescription =>
-      'Cheapest fuel and EV charging prices nearby. Favorites and price alerts.';
+      'Lähimmät edulliset polttoaine- ja sähkölataushinnat. Suosikit ja hintahälytykset.';
 
   @override
-  String get wizardProfileMediumName => 'Medium';
+  String get wizardProfileMediumName => 'Keski';
 
   @override
   String get wizardProfileMediumDescription =>
-      'Everything in Basic, plus track your fuel fill-ups and EV charging by hand.';
+      'Kaikki Perustasolta, lisäksi manuaalinen polttoaine- ja lataustankkausten seuranta.';
 
   @override
-  String get wizardProfileFullName => 'Full';
+  String get wizardProfileFullName => 'Täysi';
 
   @override
   String get wizardProfileFullDescription =>
-      'Everything in Medium, plus automatic OBD2 trip recording, driving scores, and loyalty cards.';
+      'Kaikki Keskitasolta, lisäksi automaattinen OBD2-matkojen tallennus, ajopisteet ja kanta-asiakaskortit.';
 
   @override
-  String get wizardProfileCustomName => 'Custom';
+  String get wizardProfileCustomName => 'Mukautettu';
 
   @override
   String get wizardProfileCustomDescription =>
-      'Your own combination of features. Tweak each toggle below.';
+      'Oma yhdistelmäsi ominaisuuksia. Säädä kutakin kytkintä alla.';
 
   @override
   String get useModeSectionHint =>
-      'Right-size the app to how you actually use it. Picking a preset enables the matching set of features.';
+      'Mitoita sovellus todelliseen käyttöön. Esiasetusten valinta aktivoi vastaavan ominaisuusjoukon.';
 
   @override
   String get useModeCustomSettingsDescription =>
-      'Your feature mix doesn\'t match any preset. Pick one above to overwrite, or keep customising individual features in the section below.';
+      'Ominaisuusyhdistelmäsi ei vastaa mitään esiasetusta. Valitse yksi yllä ylikirjoittaaksesi tai jatka yksittäisten ominaisuuksien mukauttamista alla.';
 
   @override
   String useModeSwitchedSnack(String profile) {
-    return 'Use mode set to $profile.';
+    return 'Käyttötavaksi asetettu $profile.';
   }
 
   @override
-  String get profileDefaultVehicleLabel => 'Default vehicle (optional)';
+  String get profileDefaultVehicleLabel => 'Oletusajoneuvo (valinnainen)';
 
   @override
-  String get profileDefaultVehicleNone => 'No default';
+  String get profileDefaultVehicleNone => 'Ei oletusta';
 
   @override
   String get profileFuelFromVehicleHint =>
-      'Fuel type is derived from your default vehicle. Clear the vehicle to pick a fuel directly.';
+      'Polttoainetyyppi on johdettu oletusajoneuvostasi. Tyhjennä ajoneuvo valitaksesi polttoaineen suoraan.';
 
   @override
-  String get consumptionNoVehicleTitle => 'Add a vehicle first';
+  String get consumptionNoVehicleTitle => 'Lisää ensin ajoneuvo';
 
   @override
   String get consumptionNoVehicleBody =>
-      'Fill-ups are attributed to a vehicle. Add your car to start logging consumption.';
+      'Tankkaukset liitetään ajoneuvoon. Lisää autosi aloittaaksesi kulutuksen kirjaamisen.';
 
   @override
-  String get vehicleAdd => 'Add vehicle';
+  String get vehicleAdd => 'Lisää ajoneuvo';
 
   @override
-  String get vehicleAddTitle => 'Add vehicle';
+  String get vehicleAddTitle => 'Lisää ajoneuvo';
 
   @override
-  String get vehicleEditTitle => 'Edit vehicle';
+  String get vehicleEditTitle => 'Muokkaa ajoneuvoa';
 
   @override
-  String get vehicleDeleteTitle => 'Delete vehicle?';
+  String get vehicleDeleteTitle => 'Poistetaanko ajoneuvo?';
 
   @override
   String vehicleDeleteMessage(String name) {
-    return 'Remove \"$name\" from your profiles?';
+    return 'Poistetaanko \"$name\" profiileistasi?';
   }
 
   @override
-  String get vehicleNameLabel => 'Name';
+  String get vehicleNameLabel => 'Nimi';
 
   @override
-  String get vehicleNameHint => 'e.g. My Tesla Model 3';
+  String get vehicleNameHint => 'esim. Oma Tesla Model 3';
 
   @override
-  String get vehicleTypeCombustion => 'Combustion';
+  String get vehicleTypeCombustion => 'Polttomoottori';
 
   @override
-  String get vehicleTypeHybrid => 'Hybrid';
+  String get vehicleTypeHybrid => 'Hybridi';
 
   @override
-  String get vehicleTypeEv => 'Electric';
+  String get vehicleTypeEv => 'Sähköinen';
 
   @override
-  String get vehicleEvSectionTitle => 'Electric';
+  String get vehicleEvSectionTitle => 'Sähköinen';
 
   @override
-  String get vehicleCombustionSectionTitle => 'Combustion';
+  String get vehicleCombustionSectionTitle => 'Polttomoottori';
 
   @override
-  String get vehicleBatteryLabel => 'Battery capacity (kWh)';
+  String get vehicleBatteryLabel => 'Akun kapasiteetti (kWh)';
 
   @override
-  String get vehicleMaxChargeLabel => 'Max charging power (kW)';
+  String get vehicleMaxChargeLabel => 'Maksimilataustehо (kW)';
 
   @override
-  String get vehicleConnectorsLabel => 'Supported connectors';
+  String get vehicleConnectorsLabel => 'Tuetut liittimet';
 
   @override
   String get vehicleMinSocLabel => 'Min SoC %';
@@ -2232,10 +2234,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get vehicleMaxSocLabel => 'Max SoC %';
 
   @override
-  String get vehicleTankLabel => 'Tank capacity (L)';
+  String get vehicleTankLabel => 'Tankin kapasiteetti (L)';
 
   @override
-  String get vehiclePreferredFuelLabel => 'Preferred fuel';
+  String get vehiclePreferredFuelLabel => 'Ensisijainen polttoaine';
 
   @override
   String get connectorType2 => 'Type 2';
@@ -2256,64 +2258,64 @@ class AppLocalizationsFi extends AppLocalizations {
   String get connectorType1 => 'Type 1';
 
   @override
-  String get connectorThreePin => '3-pin';
+  String get connectorThreePin => '3-nastainen';
 
   @override
-  String get evShowOnMap => 'Show EV stations';
+  String get evShowOnMap => 'Näytä sähköasemat';
 
   @override
-  String get evAvailableOnly => 'Available only';
+  String get evAvailableOnly => 'Vain vapaat';
 
   @override
-  String get evMinPower => 'Min power';
+  String get evMinPower => 'Minimitehо';
 
   @override
-  String get evMaxPower => 'Max power';
+  String get evMaxPower => 'Maksimitehо';
 
   @override
-  String get evOperator => 'Operator';
+  String get evOperator => 'Operaattori';
 
   @override
-  String get evLastUpdate => 'Last update';
+  String get evLastUpdate => 'Viimeisin päivitys';
 
   @override
-  String get evStatusAvailable => 'Available';
+  String get evStatusAvailable => 'Vapaa';
 
   @override
-  String get evStatusOccupied => 'Occupied';
+  String get evStatusOccupied => 'Varattu';
 
   @override
-  String get evStatusOutOfOrder => 'Out of order';
+  String get evStatusOutOfOrder => 'Epäkunnossa';
 
   @override
-  String get openOnlyFilter => 'Open only';
+  String get openOnlyFilter => 'Vain avoinna';
 
   @override
-  String get saveAsDefaults => 'Save as my defaults';
+  String get saveAsDefaults => 'Tallenna oletuksiksi';
 
   @override
-  String get criteriaSavedToProfile => 'Saved as defaults';
+  String get criteriaSavedToProfile => 'Tallennettu oletuksiksi';
 
   @override
-  String get profileNotFound => 'No active profile';
+  String get profileNotFound => 'Ei aktiivista profiilia';
 
   @override
-  String get updatingFavorites => 'Updating your favorites...';
+  String get updatingFavorites => 'Päivitetään suosikkejasi...';
 
   @override
-  String get fetchingLatestPrices => 'Fetching the latest prices';
+  String get fetchingLatestPrices => 'Haetaan uusimmat hinnat';
 
   @override
-  String get noDataAvailable => 'No data';
+  String get noDataAvailable => 'Ei tietoja';
 
   @override
-  String get configAndPrivacy => 'Configuration & Privacy';
+  String get configAndPrivacy => 'Asetukset ja tietosuoja';
 
   @override
-  String get searchToSeeMap => 'Search to see stations on the map';
+  String get searchToSeeMap => 'Hae nähdäksesi asemat kartalla';
 
   @override
-  String get evPowerAny => 'Any';
+  String get evPowerAny => 'Mikä tahansa';
 
   @override
   String evPowerKw(int kw) {
@@ -2321,209 +2323,210 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
-  String get sectionProfile => 'Profile';
+  String get sectionProfile => 'Profiili';
 
   @override
-  String get sectionLocation => 'Location';
+  String get sectionLocation => 'Sijainti';
 
   @override
-  String get tooltipBack => 'Back';
+  String get tooltipBack => 'Takaisin';
 
   @override
-  String get tooltipClose => 'Close';
+  String get tooltipClose => 'Sulje';
 
   @override
-  String get tooltipClearSearch => 'Clear search input';
+  String get tooltipClearSearch => 'Tyhjennä hakukenttä';
 
   @override
-  String get tooltipUseGps => 'Use GPS location';
+  String get tooltipUseGps => 'Käytä GPS-sijaintia';
 
   @override
-  String get tooltipShowPassword => 'Show password';
+  String get tooltipShowPassword => 'Näytä salasana';
 
   @override
-  String get tooltipHidePassword => 'Hide password';
+  String get tooltipHidePassword => 'Piilota salasana';
 
   @override
-  String get evConnectorsLabel => 'Available connectors';
+  String get evConnectorsLabel => 'Saatavilla olevat liittimet';
 
   @override
-  String get evConnectorsNone => 'No connector information';
+  String get evConnectorsNone => 'Ei liitintietoja';
 
   @override
-  String get switchToEmail => 'Switch to email';
+  String get switchToEmail => 'Vaihda sähköpostiin';
 
   @override
   String get switchToEmailSubtitle =>
-      'Keep data, add sign-in from other devices';
+      'Säilytä tiedot, lisää sisäänkirjautuminen muista laitteista';
 
   @override
-  String get switchToAnonymousAction => 'Switch to anonymous';
+  String get switchToAnonymousAction => 'Vaihda anonyymiksi';
 
   @override
   String get switchToAnonymousSubtitle =>
-      'Keep local data, use new anonymous session';
+      'Säilytä paikalliset tiedot, käytä uutta anonyymiä istuntoa';
 
   @override
-  String get linkDevice => 'Link device';
+  String get linkDevice => 'Linkitä laite';
 
   @override
-  String get shareDatabase => 'Share database';
+  String get shareDatabase => 'Jaa tietokanta';
 
   @override
-  String get disconnectAction => 'Disconnect';
+  String get disconnectAction => 'Katkaise yhteys';
 
   @override
-  String get disconnectSubtitle => 'Stop syncing (local data kept)';
+  String get disconnectSubtitle =>
+      'Lopeta synkronointi (paikalliset tiedot säilytetään)';
 
   @override
-  String get deleteAccountAction => 'Delete account';
+  String get deleteAccountAction => 'Poista tili';
 
   @override
-  String get deleteAccountSubtitle => 'Remove all server data permanently';
+  String get deleteAccountSubtitle => 'Poista kaikki palvelintiedot pysyvästi';
 
   @override
-  String get localOnly => 'Local only';
+  String get localOnly => 'Vain paikallinen';
 
   @override
   String get localOnlySubtitle =>
-      'Optional: sync favorites, alerts, and ratings across devices';
+      'Valinnainen: synkronoi suosikit, hälytykset ja arvostelut laitteiden välillä';
 
   @override
-  String get setupCloudSync => 'Set up cloud sync';
+  String get setupCloudSync => 'Määritä pilvisynkronointi';
 
   @override
-  String get disconnectTitle => 'Disconnect TankSync?';
+  String get disconnectTitle => 'Katkaistako TankSync?';
 
   @override
   String get disconnectBody =>
-      'Cloud sync will be disabled. Your local data (favorites, alerts, history) is preserved on this device. Server data is not deleted.';
+      'Pilvisynkronointi poistetaan käytöstä. Paikalliset tietosi (suosikit, hälytykset, historia) säilytetään tällä laitteella. Palvelintietoja ei poisteta.';
 
   @override
-  String get deleteAccountTitle => 'Delete account?';
+  String get deleteAccountTitle => 'Poistetaanko tili?';
 
   @override
   String get deleteAccountBody =>
-      'This permanently deletes all your data from the server (favorites, alerts, ratings, routes). Local data on this device is preserved.\n\nThis cannot be undone.';
+      'Tämä poistaa pysyvästi kaikki tietosi palvelimelta (suosikit, hälytykset, arvostelut, reitit). Paikalliset tiedot tällä laitteella säilytetään.\n\nTätä ei voi peruuttaa.';
 
   @override
-  String get switchToAnonymousTitle => 'Switch to anonymous?';
+  String get switchToAnonymousTitle => 'Vaihdettaanko anonyymiksi?';
 
   @override
   String get switchToAnonymousBody =>
-      'You will be signed out of your email account and continue with a new anonymous session.\n\nYour local data (favorites, alerts) is kept on this device and will be synced to the new anonymous account.';
+      'Sinut kirjataan ulos sähköpostitililtäsi ja jatkat uudella anonyymillä istunnolla.\n\nPaikalliset tietosi (suosikit, hälytykset) pysyvät tällä laitteella ja synkronoidaan uudelle anonyymille tilille.';
 
   @override
-  String get switchAction => 'Switch';
+  String get switchAction => 'Vaihda';
 
   @override
   String get helpBannerCriteria =>
-      'Your profile defaults are pre-filled. Adjust criteria below to refine your search.';
+      'Profiilisi oletukset on esitäytetty. Tarkenna hakua alla olevilla kriteereillä.';
 
   @override
   String get helpBannerAlerts =>
-      'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.';
+      'Aseta hintaraja asemalle. Saat ilmoituksen kun hinnat laskevat sen alle. Tarkistukset tehdään 30 minuutin välein.';
 
   @override
   String get helpBannerConsumption =>
-      'Log every fill-up to track your real-world consumption and CO₂ footprint. Swipe left to delete an entry.';
+      'Kirjaa jokainen tankkaus seurataksesi todellista kulutustasi ja CO₂-jalanjälkeäsi. Poista merkintä pyyhkäisemällä vasemmalle.';
 
   @override
   String get helpBannerVehicles =>
-      'Add your vehicles so fill-ups and fuel preferences default correctly. The first vehicle becomes your default.';
+      'Lisää ajoneuvosi, jotta tankkaukset ja polttoainevalinnat täyttyvät oikein. Ensimmäisestä ajoneuvosta tulee oletuksesi.';
 
   @override
-  String get syncNow => 'Sync now';
+  String get syncNow => 'Synkronoi nyt';
 
   @override
-  String get onboardingPreferencesTitle => 'Your preferences';
+  String get onboardingPreferencesTitle => 'Asetuksesi';
 
   @override
-  String get onboardingZipHelper => 'Used when GPS is unavailable';
+  String get onboardingZipHelper => 'Käytetään kun GPS ei ole käytettävissä';
 
   @override
-  String get onboardingRadiusHelper => 'Larger radius = more results';
+  String get onboardingRadiusHelper => 'Suurempi säde = enemmän tuloksia';
 
   @override
   String get onboardingPrivacy =>
-      'These settings are stored only on your device and never shared.';
+      'Nämä asetukset tallennetaan vain laitteellesi eikä niitä koskaan jaeta.';
 
   @override
-  String get onboardingLandingTitle => 'Home screen';
+  String get onboardingLandingTitle => 'Aloitusnäyttö';
 
   @override
   String get onboardingLandingHint =>
-      'Choose which screen opens when you launch the app.';
+      'Valitse, mikä näyttö avautuu kun käynnistät sovelluksen.';
 
   @override
   String get iosAutoRecordOnboardingTitle =>
-      'Stay out of the app — but don\'t quit it.';
+      'Pysy poissa sovelluksesta — mutta älä lopeta sitä.';
 
   @override
   String get iosAutoRecordOnboardingBullet1Title =>
-      'Open Sparkilo once after each reboot.';
+      'Avaa Sparkilo kerran jokaisen uudelleenkäynnistyksen jälkeen.';
 
   @override
   String get iosAutoRecordOnboardingBullet1Body =>
-      'Apple wakes Sparkilo only after you\'ve opened it at least once since the phone restarted. After that, your trips record automatically.';
+      'Apple käynnistää Sparkilon vasta kun olet avannut sen ainakin kerran puhelimen käynnistymisen jälkeen. Sen jälkeen matkasi tallentuvat automaattisesti.';
 
   @override
   String get iosAutoRecordOnboardingBullet2Title =>
-      'Don\'t swipe Sparkilo away in the app switcher.';
+      'Älä pyyhkäise Sparkiloa pois sovelluksenvaihtonäkymästä.';
 
   @override
   String get iosAutoRecordOnboardingBullet2Body =>
-      '\"Force-quit\" tells iOS to stop relaunching the app. Your trips will stop recording until you open Sparkilo again.';
+      '\"Pakko-sulkeminen\" käskee iOS:a lopettamaan sovelluksen uudelleenkäynnistyksen. Matkojesi tallennus pysähtyy kunnes avaat Sparkilon uudelleen.';
 
   @override
   String get iosAutoRecordOnboardingBullet3Title =>
-      'When iOS asks for \"Always\" location, please say yes.';
+      'Kun iOS pyytää \"Aina\"-sijaintia, sano kyllä.';
 
   @override
   String get iosAutoRecordOnboardingBullet3Body =>
-      'The fallback that records your trip when the OBD2 adapter is slow needs background location. We never share it.';
+      'Varajärjestelmä, joka tallentaa matkasi kun OBD2-sovitin on hidas, tarvitsee taustasijainnin. Emme koskaan jaa sitä.';
 
   @override
-  String get scanReceipt => 'Scan receipt';
+  String get scanReceipt => 'Skannaa kuitti';
 
   @override
   String get obdConnect => 'OBD-II';
 
   @override
-  String get stationTypeFuel => 'Fuel';
+  String get stationTypeFuel => 'Polttoaine';
 
   @override
-  String get stationTypeEv => 'EV';
+  String get stationTypeEv => 'Sähköauto';
 
   @override
-  String get brandFilterHighway => 'Highway';
+  String get brandFilterHighway => 'Moottoritie';
 
   @override
-  String get ratingModeLocal => 'Local';
+  String get ratingModeLocal => 'Paikallinen';
 
   @override
-  String get ratingModePrivate => 'Private';
+  String get ratingModePrivate => 'Yksityinen';
 
   @override
-  String get ratingModeShared => 'Shared';
+  String get ratingModeShared => 'Jaettu';
 
   @override
-  String get ratingDescLocal => 'Ratings saved on this device only';
+  String get ratingDescLocal => 'Arvostelut tallennettu vain tälle laitteelle';
 
   @override
   String get ratingDescPrivate =>
-      'Synced with your database (not visible to others)';
+      'Synkronoitu tietokantasi kanssa (ei näkyvissä muille)';
 
   @override
-  String get ratingDescShared => 'Visible to all users of your database';
+  String get ratingDescShared => 'Näkyvissä kaikille tietokantasi käyttäjille';
 
   @override
   String get errorNoEvApiKey =>
-      'OpenChargeMap API key not configured. Add one in Settings to search EV charging stations.';
+      'OpenChargeMap API-avain ei ole määritetty. Lisää se Asetuksissa etsiäksesi sähköautojen latauspisteitä.';
 
   @override
   String errorUpstreamCertExpired(String host) {
-    return 'The data provider ($host) is serving an expired or invalid TLS certificate. The app cannot load data from this source until the provider fixes it. Please contact $host.';
+    return 'Tietopalveluntarjoaja ($host) käyttää vanhentunutta tai virheellistä TLS-sertifikaattia. Sovellus ei voi ladata tietoja tästä lähteestä ennen kuin palveluntarjoaja korjaa sen. Ota yhteyttä $host.';
   }
 
   @override
@@ -2531,254 +2534,258 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String fallbackSummary(String failed, String current) {
-    return '$failed unavailable. Using $current.';
+    return '$failed ei käytettävissä. Käytetään $current.';
   }
 
   @override
-  String get errorTitleApiKey => 'API key required';
+  String get errorTitleApiKey => 'API-avain vaaditaan';
 
   @override
-  String get errorTitleLocation => 'Location unavailable';
+  String get errorTitleLocation => 'Sijainti ei käytettävissä';
 
   @override
   String get errorHintNoStations =>
-      'Try increasing the search radius or search a different location.';
+      'Kokeile kasvattaa hakusädettä tai hae eri sijainnista.';
 
   @override
-  String get errorHintApiKey => 'Configure your API key in Settings.';
+  String get errorHintApiKey => 'Määritä API-avaimesi Asetuksissa.';
 
   @override
   String get errorHintConnection =>
-      'Check your internet connection and try again.';
+      'Tarkista internet-yhteys ja yritä uudelleen.';
 
   @override
   String get errorHintRouting =>
-      'Route calculation failed. Check your internet connection and try again.';
+      'Reittilaskenta epäonnistui. Tarkista internet-yhteys ja yritä uudelleen.';
 
   @override
   String get errorHintFallback =>
-      'Try again or search by postal code / city name.';
+      'Yritä uudelleen tai hae postinumerolla tai kaupungin nimellä.';
 
   @override
-  String get alertsLoadErrorTitle => 'Couldn\'t load your alerts';
+  String get alertsLoadErrorTitle => 'Hälytysten lataaminen epäonnistui';
 
   @override
-  String get alertsBackgroundCheckErrorTitle => 'Alert background check failed';
+  String get alertsBackgroundCheckErrorTitle =>
+      'Hälytysten taustatarkistus epäonnistui';
 
   @override
-  String get detailsLabel => 'Details';
+  String get detailsLabel => 'Tiedot';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'Poista';
 
   @override
-  String get showKey => 'Show key';
+  String get showKey => 'Näytä avain';
 
   @override
-  String get hideKey => 'Hide key';
+  String get hideKey => 'Piilota avain';
 
   @override
-  String get syncOptionalTitle => 'TankSync is optional';
+  String get syncOptionalTitle => 'TankSync on valinnainen';
 
   @override
   String get syncOptionalDescription =>
-      'Your app works fully without cloud sync. TankSync lets you sync favorites, alerts, and ratings across devices using Supabase (free tier available).';
+      'Sovellus toimii täysin ilman pilvisynkronointia. TankSync mahdollistaa suosikkien, hälytysten ja arvostelujen synkronoinnin laitteiden välillä Supabase-palvelun avulla (ilmainen taso saatavilla).';
 
   @override
-  String get syncHowToConnectQuestion => 'How would you like to connect?';
+  String get syncHowToConnectQuestion => 'Miten haluaisit yhdistää?';
 
   @override
-  String get syncCreateOwnTitle => 'Create my own database';
+  String get syncCreateOwnTitle => 'Luo oma tietokanta';
 
   @override
   String get syncCreateOwnSubtitle =>
-      'Free Supabase project — we\'ll guide you step by step';
+      'Ilmainen Supabase-projekti — opastamme sinua vaihe vaiheelta';
 
   @override
-  String get syncJoinExistingTitle => 'Join an existing database';
+  String get syncJoinExistingTitle => 'Liity olemassa olevaan tietokantaan';
 
   @override
   String get syncJoinExistingSubtitle =>
-      'Scan QR code from the database owner or paste credentials';
+      'Skannaa QR-koodi tietokannan omistajalta tai liitä tunnistetiedot';
 
   @override
-  String get syncChooseAccountType => 'Choose your account type';
+  String get syncChooseAccountType => 'Valitse tilin tyyppi';
 
   @override
-  String get syncAccountTypeAnonymous => 'Anonymous';
+  String get syncAccountTypeAnonymous => 'Anonyymi';
 
   @override
   String get syncAccountTypeAnonymousDesc =>
-      'Instant, no email needed. Data tied to this device.';
+      'Välitön, ei sähköpostia tarvita. Tiedot sidottu tähän laitteeseen.';
 
   @override
-  String get syncAccountTypeEmail => 'Email Account';
+  String get syncAccountTypeEmail => 'Sähköpostitili';
 
   @override
   String get syncAccountTypeEmailDesc =>
-      'Sign in from any device. Recover data if phone is lost.';
+      'Kirjaudu sisään mistä laitteesta tahansa. Palauta tiedot puhelimen katoamisen jälkeen.';
 
   @override
-  String get syncHaveAccountSignIn => 'Already have an account? Sign in';
+  String get syncHaveAccountSignIn => 'Onko sinulla jo tili? Kirjaudu sisään';
 
   @override
-  String get syncCreateNewAccount => 'Create new account';
+  String get syncCreateNewAccount => 'Luo uusi tili';
 
   @override
-  String get syncTestConnection => 'Test Connection';
+  String get syncTestConnection => 'Testaa yhteys';
 
   @override
-  String get syncTestingConnection => 'Testing...';
+  String get syncTestingConnection => 'Testataan...';
 
   @override
-  String get syncConnectButton => 'Connect';
+  String get syncConnectButton => 'Yhdistä';
 
   @override
-  String get syncConnectingButton => 'Connecting...';
+  String get syncConnectingButton => 'Yhdistetään...';
 
   @override
-  String get syncDatabaseReady => 'Database ready!';
+  String get syncDatabaseReady => 'Tietokanta valmis!';
 
   @override
-  String get syncDatabaseNeedsSetup => 'Database needs setup';
+  String get syncDatabaseNeedsSetup => 'Tietokanta tarvitsee määrityksen';
 
   @override
   String get syncTableStatusOk => 'OK';
 
   @override
-  String get syncTableStatusMissing => 'Missing';
+  String get syncTableStatusMissing => 'Puuttuu';
 
   @override
   String get syncSqlEditorInstructions =>
-      'Copy the SQL below and run it in your Supabase SQL Editor (Dashboard → SQL Editor → New Query → Paste → Run)';
+      'Kopioi alla oleva SQL ja aja se Supabase SQL-editorissa (Kojelauta → SQL Editor → Uusi kysely → Liitä → Aja)';
 
   @override
-  String get syncCopySqlButton => 'Copy SQL to clipboard';
+  String get syncCopySqlButton => 'Kopioi SQL leikepöydälle';
 
   @override
-  String get syncRecheckSchemaButton => 'Re-check schema';
+  String get syncRecheckSchemaButton => 'Tarkista skeema uudelleen';
 
   @override
-  String get syncDoneButton => 'Done';
+  String get syncDoneButton => 'Valmis';
 
   @override
   String syncSignedInAs(String email) {
-    return 'Signed in as $email';
+    return 'Kirjautunut: $email';
   }
 
   @override
   String get syncEmailDescription =>
-      'Your data syncs across all devices with this email.';
+      'Tietosi synkronoituvat kaikille laitteille tällä sähköpostilla.';
 
   @override
-  String get syncSwitchToAnonymousTitle => 'Switch to anonymous';
+  String get syncSwitchToAnonymousTitle => 'Vaihda anonyymiksi';
 
   @override
   String get syncSwitchToAnonymousDesc =>
-      'Continue without email, new anonymous session';
+      'Jatka ilman sähköpostia, uusi anonyymi istunto';
 
   @override
-  String get syncGuestDescription => 'Anonymous, no email needed.';
+  String get syncGuestDescription => 'Anonyymi, ei sähköpostia tarvita.';
 
   @override
-  String get syncOrDivider => 'or';
+  String get syncOrDivider => 'tai';
 
   @override
-  String get syncHowToSyncQuestion => 'How would you like to sync?';
+  String get syncHowToSyncQuestion => 'Miten haluaisit synkronoida?';
 
   @override
   String get syncOfflineDescription =>
-      'Your app works fully offline. Cloud sync is optional.';
+      'Sovelluksesi toimii täysin offline-tilassa. Pilvisynkronointi on valinnainen.';
 
   @override
-  String get syncModeCommunityTitle => 'Sparkilo Community';
+  String get syncModeCommunityTitle => 'Sparkilo-yhteisö';
 
   @override
   String get syncModeCommunitySubtitle =>
-      'Share favorites & ratings with all users';
+      'Jaa suosikit ja arvostelut kaikkien käyttäjien kanssa';
 
   @override
-  String get syncModePrivateTitle => 'Private Database';
+  String get syncModePrivateTitle => 'Yksityinen tietokanta';
 
   @override
-  String get syncModePrivateSubtitle => 'Your own Supabase — full data control';
+  String get syncModePrivateSubtitle =>
+      'Oma Supabase — täysi hallinta tietoihin';
 
   @override
-  String get syncModeGroupTitle => 'Join a Group';
+  String get syncModeGroupTitle => 'Liity ryhmään';
 
   @override
-  String get syncModeGroupSubtitle => 'Family or friends shared database';
+  String get syncModeGroupSubtitle =>
+      'Perhe tai ystävät jaetulla tietokannalla';
 
   @override
-  String get syncPrivacyShared => 'Shared';
+  String get syncPrivacyShared => 'Jaettu';
 
   @override
-  String get syncPrivacyPrivate => 'Private';
+  String get syncPrivacyPrivate => 'Yksityinen';
 
   @override
-  String get syncPrivacyGroup => 'Group';
+  String get syncPrivacyGroup => 'Ryhmä';
 
   @override
-  String get syncStayOfflineButton => 'Stay offline';
+  String get syncStayOfflineButton => 'Pysy offline-tilassa';
 
   @override
-  String get syncSuccessTitle => 'Successfully connected!';
+  String get syncSuccessTitle => 'Yhdistäminen onnistui!';
 
   @override
-  String get syncSuccessDescription => 'Your data will now sync automatically.';
+  String get syncSuccessDescription =>
+      'Tietosi synkronoituvat nyt automaattisesti.';
 
   @override
-  String get syncWizardTitleConnect => 'Connect TankSync';
+  String get syncWizardTitleConnect => 'Yhdistä TankSync';
 
   @override
-  String get syncSetupTitleYourDatabase => 'Your database';
+  String get syncSetupTitleYourDatabase => 'Tietokantasi';
 
   @override
-  String get syncSetupTitleJoinGroup => 'Join a group';
+  String get syncSetupTitleJoinGroup => 'Liity ryhmään';
 
   @override
-  String get syncSetupTitleAccount => 'Your account';
+  String get syncSetupTitleAccount => 'Tilisi';
 
   @override
-  String get syncWizardBack => 'Back';
+  String get syncWizardBack => 'Takaisin';
 
   @override
-  String get syncWizardNext => 'Next';
+  String get syncWizardNext => 'Seuraava';
 
   @override
   String syncWizardStepOfSteps(int current, int total) {
-    return 'Step $current of $total';
+    return 'Vaihe $current/$total';
   }
 
   @override
-  String get syncWizardCreateSupabaseTitle => 'Create a Supabase project';
+  String get syncWizardCreateSupabaseTitle => 'Luo Supabase-projekti';
 
   @override
   String get syncWizardCreateSupabaseInstructions =>
-      '1. Tap \"Open Supabase\" below\n2. Create a free account (if you don\'t have one)\n3. Click \"New Project\"\n4. Choose a name and region\n5. Wait ~2 minutes for it to start';
+      '1. Napauta alla olevaa \"Avaa Supabase\"\n2. Luo ilmainen tili (jos sinulla ei ole sitä)\n3. Klikkaa \"New Project\"\n4. Valitse nimi ja alue\n5. Odota ~2 minuuttia sen käynnistymistä';
 
   @override
-  String get syncWizardOpenSupabase => 'Open Supabase';
+  String get syncWizardOpenSupabase => 'Avaa Supabase';
 
   @override
-  String get syncWizardEnableAnonTitle => 'Enable Anonymous Sign-ins';
+  String get syncWizardEnableAnonTitle => 'Ota anonyymi kirjautuminen käyttöön';
 
   @override
   String get syncWizardEnableAnonInstructions =>
-      '1. In your Supabase dashboard:\n   Authentication → Providers\n2. Find \"Anonymous Sign-ins\"\n3. Toggle it ON\n4. Click \"Save\"';
+      '1. Supabase-kojelaudassasi:\n   Authentication → Providers\n2. Etsi \"Anonymous Sign-ins\"\n3. Kytke se PÄÄLLE\n4. Klikkaa \"Save\"';
 
   @override
-  String get syncWizardOpenAuthSettings => 'Open Auth Settings';
+  String get syncWizardOpenAuthSettings => 'Avaa todennusasetukset';
 
   @override
-  String get syncWizardCopyCredentialsTitle => 'Copy your credentials';
+  String get syncWizardCopyCredentialsTitle => 'Kopioi tunnistetiedot';
 
   @override
   String get syncWizardCopyCredentialsInstructions =>
-      '1. Go to Settings → API in your dashboard\n2. Copy the \"Project URL\"\n3. Copy the \"anon public\" key\n4. Paste them below';
+      '1. Mene kojelaudassasi Settings → API\n2. Kopioi \"Project URL\"\n3. Kopioi \"anon public\" -avain\n4. Liitä ne alle';
 
   @override
-  String get syncWizardOpenApiSettings => 'Open API Settings';
+  String get syncWizardOpenApiSettings => 'Avaa API-asetukset';
 
   @override
   String get syncWizardSupabaseUrlLabel => 'Supabase URL';
@@ -2787,192 +2794,192 @@ class AppLocalizationsFi extends AppLocalizations {
   String get syncWizardSupabaseUrlHint => 'https://your-project.supabase.co';
 
   @override
-  String get syncWizardJoinExistingTitle => 'Join an existing database';
+  String get syncWizardJoinExistingTitle =>
+      'Liity olemassa olevaan tietokantaan';
 
   @override
-  String get syncWizardScanQrCode => 'Scan QR Code';
+  String get syncWizardScanQrCode => 'Skannaa QR-koodi';
 
   @override
   String get syncWizardAskOwnerQr =>
-      'Ask the database owner to show you their QR code\n(Settings → TankSync → Share)';
+      'Pyydä tietokannan omistajaa näyttämään QR-koodi\n(Asetukset → TankSync → Jaa)';
 
   @override
-  String get syncWizardAskOwnerQrShort =>
-      'Ask the database owner to show their QR code';
+  String get syncWizardAskOwnerQrShort => 'Pyydä omistajaa näyttämään QR-koodi';
 
   @override
-  String get syncWizardEnterManuallyTitle => 'Enter manually';
+  String get syncWizardEnterManuallyTitle => 'Syötä manuaalisesti';
 
   @override
-  String get syncWizardOrEnterManually => 'or enter manually';
+  String get syncWizardOrEnterManually => 'tai syötä manuaalisesti';
 
   @override
   String get syncWizardUrlHelperText =>
-      'Whitespace and line breaks removed automatically';
+      'Välilyönnit ja rivinvaihdot poistetaan automaattisesti';
 
   @override
   String get syncCredentialsPrivateHint =>
-      'Enter your Supabase project credentials. You can find them in your dashboard under Settings > API.';
+      'Anna Supabase-projektisi tunnistetiedot. Löydät ne kojelaudastasi kohdasta Settings > API.';
 
   @override
-  String get syncCredentialsDatabaseUrlLabel => 'Database URL';
+  String get syncCredentialsDatabaseUrlLabel => 'Tietokannan URL';
 
   @override
-  String get syncCredentialsAccessKeyLabel => 'Access Key';
+  String get syncCredentialsAccessKeyLabel => 'Pääsyavain';
 
   @override
   String get syncCredentialsAccessKeyHint => 'eyJhbGciOiJIUzI1NiIs...';
 
   @override
-  String get authEmailLabel => 'Email';
+  String get authEmailLabel => 'Sähköposti';
 
   @override
-  String get authPasswordLabel => 'Password';
+  String get authPasswordLabel => 'Salasana';
 
   @override
-  String get authConfirmPasswordLabel => 'Confirm password';
+  String get authConfirmPasswordLabel => 'Vahvista salasana';
 
   @override
-  String get authPleaseEnterEmail => 'Please enter your email';
+  String get authPleaseEnterEmail => 'Anna sähköpostiosoitteesi';
 
   @override
-  String get authInvalidEmail => 'Invalid email address';
+  String get authInvalidEmail => 'Virheellinen sähköpostiosoite';
 
   @override
-  String get authPasswordsDoNotMatch => 'Passwords do not match';
+  String get authPasswordsDoNotMatch => 'Salasanat eivät täsmää';
 
   @override
-  String get authConnectAnonymously => 'Connect anonymously';
+  String get authConnectAnonymously => 'Yhdistä anonyymisti';
 
   @override
-  String get authCreateAccountAndConnect => 'Create account & connect';
+  String get authCreateAccountAndConnect => 'Luo tili ja yhdistä';
 
   @override
-  String get authSignInAndConnect => 'Sign in & connect';
+  String get authSignInAndConnect => 'Kirjaudu sisään ja yhdistä';
 
   @override
-  String get authAnonymousSegment => 'Anonymous';
+  String get authAnonymousSegment => 'Anonyymi';
 
   @override
-  String get authEmailSegment => 'Email';
+  String get authEmailSegment => 'Sähköposti';
 
   @override
   String get authAnonymousDescription =>
-      'Instant access, no email needed. Data tied to this device.';
+      'Välitön pääsy, ei sähköpostia tarvita. Tiedot sidottu tähän laitteeseen.';
 
   @override
   String get authEmailDescription =>
-      'Sign in from any device. Recover your data if your phone is lost.';
+      'Kirjaudu sisään mistä laitteesta tahansa. Palauta tietosi puhelimen katoamisen jälkeen.';
 
   @override
   String get authSyncAcrossDevices =>
-      'Sync data automatically across all your devices.';
+      'Synkronoi tiedot automaattisesti kaikilla laitteillasi.';
 
   @override
-  String get authNewHereCreateAccount => 'New here? Create account';
+  String get authNewHereCreateAccount => 'Uusi käyttäjä? Luo tili';
 
   @override
-  String get ntfyCardTitle => 'Push Notifications (ntfy.sh)';
+  String get ntfyCardTitle => 'Push-ilmoitukset (ntfy.sh)';
 
   @override
-  String get ntfyEnableTitle => 'Enable ntfy.sh push';
+  String get ntfyEnableTitle => 'Ota ntfy.sh push käyttöön';
 
   @override
-  String get ntfyEnableSubtitle => 'Receive price alerts via ntfy.sh';
+  String get ntfyEnableSubtitle =>
+      'Vastaanota hintahälytykset ntfy.sh:n kautta';
 
   @override
-  String get ntfyTopicUrlLabel => 'Topic URL';
+  String get ntfyTopicUrlLabel => 'Aihe-URL';
 
   @override
-  String get ntfyCopyTopicUrlTooltip => 'Copy topic URL';
+  String get ntfyCopyTopicUrlTooltip => 'Kopioi aihe-URL';
 
   @override
-  String get ntfySendTestButton => 'Send test notification';
+  String get ntfySendTestButton => 'Lähetä testipush';
 
   @override
   String get ntfyFdroidHint =>
-      'Install the ntfy app from F-Droid to receive push notifications on your device.';
+      'Asenna ntfy-sovellus F-Droidista vastaanottaaksesi push-ilmoituksia laitteellesi.';
 
   @override
   String get ntfyConnectFirstHint =>
-      'Connect TankSync first to enable push notifications.';
+      'Yhdistä ensin TankSync ottaaksesi push-ilmoitukset käyttöön.';
 
   @override
-  String get linkDeviceScreenTitle => 'Link Device';
+  String get linkDeviceScreenTitle => 'Linkitä laite';
 
   @override
-  String get linkDeviceThisDeviceLabel => 'This device';
+  String get linkDeviceThisDeviceLabel => 'Tämä laite';
 
   @override
-  String get linkDeviceShareCodeHint =>
-      'Share this code with your other device:';
+  String get linkDeviceShareCodeHint => 'Jaa tämä koodi toiselle laitteellesi:';
 
   @override
-  String get linkDeviceNotConnected => 'Not connected';
+  String get linkDeviceNotConnected => 'Ei yhdistetty';
 
   @override
-  String get linkDeviceCopyCodeTooltip => 'Copy code';
+  String get linkDeviceCopyCodeTooltip => 'Kopioi koodi';
 
   @override
-  String get linkDeviceImportSectionTitle => 'Import from another device';
+  String get linkDeviceImportSectionTitle => 'Tuo toisesta laitteesta';
 
   @override
   String get linkDeviceImportDescription =>
-      'Enter the device code from your other device to import its favorites, alerts, vehicles, and consumption log. Each device keeps its own profile and defaults.';
+      'Anna toisen laitteesi laitekoodi tuodaksesi sen suosikit, hälytykset, ajoneuvot ja kulutuskirjanpidon. Kukin laite säilyttää oman profiilинsa ja oletuksensa.';
 
   @override
-  String get linkDeviceCodeFieldLabel => 'Device code';
+  String get linkDeviceCodeFieldLabel => 'Laitekoodi';
 
   @override
-  String get linkDeviceCodeFieldHint => 'Paste the UUID from other device';
+  String get linkDeviceCodeFieldHint => 'Liitä UUID toiselta laitteelta';
 
   @override
-  String get linkDeviceImportButton => 'Import data';
+  String get linkDeviceImportButton => 'Tuo tiedot';
 
   @override
-  String get linkDeviceHowItWorksTitle => 'How it works';
+  String get linkDeviceHowItWorksTitle => 'Miten se toimii';
 
   @override
   String get linkDeviceHowItWorksBody =>
-      '1. On Device A: copy the device code above\n2. On Device B: paste it in the \"Device code\" field\n3. Tap \"Import data\" to merge favorites, alerts, vehicles, and consumption logs\n4. Both devices will have all combined data\n\nEach device keeps its own anonymous identity and its own profile (preferred fuel, default vehicle, landing screen). Data is merged, not moved.';
+      '1. Laitteella A: kopioi yllä oleva laitekoodi\n2. Laitteella B: liitä se \"Laitekoodi\"-kenttään\n3. Napauta \"Tuo tiedot\" yhdistääksesi suosikit, hälytykset, ajoneuvot ja kulutuslokit\n4. Molemmilla laitteilla on kaikki yhdistetyt tiedot\n\nKukin laite säilyttää oman anonyymiidentiteettinsä ja oman profiilинsa (ensisijainen polttoaine, oletusajoneuvo, aloitusnäyttö). Tiedot yhdistetään, ei siirretä.';
 
   @override
-  String get vehicleSetActive => 'Set active';
+  String get vehicleSetActive => 'Aseta aktiiviseksi';
 
   @override
-  String get swipeHide => 'Hide';
+  String get swipeHide => 'Piilota';
 
   @override
-  String get evChargingSection => 'EV Charging';
+  String get evChargingSection => 'Sähköautojen lataus';
 
   @override
-  String get fuelStationsSection => 'Fuel Stations';
+  String get fuelStationsSection => 'Polttoaineasema';
 
   @override
-  String get yourRating => 'Your rating';
+  String get yourRating => 'Arvostelusi';
 
   @override
-  String get noStorageUsed => 'No storage used';
+  String get noStorageUsed => 'Ei tallennustilaa käytetty';
 
   @override
-  String get aboutReportBug => 'Report a bug / Suggest a feature';
+  String get aboutReportBug => 'Ilmoita virheestä / Ehdota ominaisuutta';
 
   @override
-  String get aboutSupportProject => 'Support this project';
+  String get aboutSupportProject => 'Tue tätä projektia';
 
   @override
   String get aboutSupportDescription =>
-      'This app is free, open source, and has no ads. If you find it useful, consider supporting the developer.';
+      'Tämä sovellus on ilmainen, avoimen lähdekoodin eikä siinä ole mainoksia. Jos pidät siitä hyödyllisenä, harkitse kehittäjän tukemista.';
 
   @override
   String get luxembourgRegulatedPricesNotice =>
-      'Luxembourg fuel prices are government-regulated and uniform nationwide.';
+      'Luxemburgin polttoainehinnat ovat valtion sääntelemiä ja yhtenäiset koko maassa.';
 
   @override
-  String get luxembourgFuelUnleaded95 => 'Unleaded 95';
+  String get luxembourgFuelUnleaded95 => 'Lyijytön 95';
 
   @override
-  String get luxembourgFuelUnleaded98 => 'Unleaded 98';
+  String get luxembourgFuelUnleaded98 => 'Lyijytön 98';
 
   @override
   String get luxembourgFuelDiesel => 'Diesel';
@@ -2982,104 +2989,106 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get luxembourgPricesUnavailable =>
-      'Luxembourg regulated prices are unavailable.';
+      'Luxemburgin säännellyt hinnat eivät ole saatavilla.';
 
   @override
-  String get reportIssueTitle => 'Report a problem';
+  String get reportIssueTitle => 'Ilmoita ongelmasta';
 
   @override
-  String get enterCorrection => 'Please enter the correction';
+  String get enterCorrection => 'Anna korjaus';
 
   @override
   String get reportNoBackendAvailable =>
-      'The report could not be sent: no reporting service is configured for this country. Enable TankSync in Settings to send community reports.';
+      'Raporttia ei voitu lähettää: tälle maalle ei ole määritetty raportointipalvelua. Ota TankSync käyttöön Asetuksissa lähettääksesi yhteisöraportteja.';
 
   @override
-  String get correctName => 'Correct station name';
+  String get correctName => 'Oikea aseman nimi';
 
   @override
-  String get correctAddress => 'Correct address';
+  String get correctAddress => 'Oikea osoite';
 
   @override
-  String get wrongE85Price => 'Wrong E85 price';
+  String get wrongE85Price => 'Virheellinen E85-hinta';
 
   @override
-  String get wrongE98Price => 'Wrong Super 98 price';
+  String get wrongE98Price => 'Virheellinen Super 98 -hinta';
 
   @override
-  String get wrongLpgPrice => 'Wrong LPG price';
+  String get wrongLpgPrice => 'Virheellinen LPG-hinta';
 
   @override
-  String get wrongStationName => 'Wrong station name';
+  String get wrongStationName => 'Virheellinen aseman nimi';
 
   @override
-  String get wrongStationAddress => 'Wrong address';
+  String get wrongStationAddress => 'Virheellinen osoite';
 
   @override
-  String get independentStation => 'Independent station';
+  String get independentStation => 'Riippumaton asema';
 
   @override
-  String get serviceRemindersSection => 'Service reminders';
+  String get serviceRemindersSection => 'Huoltоmuistutukset';
 
   @override
-  String get serviceRemindersEmpty => 'No reminders yet — pick a preset above.';
+  String get serviceRemindersEmpty =>
+      'Ei vielä muistutuksia — valitse esiasetus yllä.';
 
   @override
-  String get addServiceReminder => 'Add reminder';
+  String get addServiceReminder => 'Lisää muistutus';
 
   @override
-  String get serviceReminderPresetOil => 'Oil (15,000 km)';
+  String get serviceReminderPresetOil => 'Öljy (15 000 km)';
 
   @override
-  String get serviceReminderPresetOilLabel => 'Oil change';
+  String get serviceReminderPresetOilLabel => 'Öljynvaihto';
 
   @override
-  String get serviceReminderPresetTires => 'Tires (20,000 km)';
+  String get serviceReminderPresetTires => 'Renkaat (20 000 km)';
 
   @override
-  String get serviceReminderPresetTiresLabel => 'Tires';
+  String get serviceReminderPresetTiresLabel => 'Renkaat';
 
   @override
-  String get serviceReminderPresetInspection => 'Inspection (30,000 km)';
+  String get serviceReminderPresetInspection => 'Katsastus (30 000 km)';
 
   @override
-  String get serviceReminderPresetInspectionLabel => 'Inspection';
+  String get serviceReminderPresetInspectionLabel => 'Katsastus';
 
   @override
-  String get serviceReminderLabel => 'Label';
+  String get serviceReminderLabel => 'Nimike';
 
   @override
-  String get serviceReminderInterval => 'Interval (km)';
+  String get serviceReminderInterval => 'Välimatka (km)';
 
   @override
-  String get serviceReminderLastService => 'Last service';
+  String get serviceReminderLastService => 'Viimeisin huolto';
 
   @override
-  String get serviceReminderMarkDone => 'Mark as done';
+  String get serviceReminderMarkDone => 'Merkitse tehdyksi';
 
   @override
-  String get serviceReminderDueTitle => 'Service due';
+  String get serviceReminderDueTitle => 'Huolto erääntynyt';
 
   @override
   String serviceReminderDueBody(String label, int kmOver) {
-    return '$label is due — $kmOver km past the interval.';
+    return '$label on erääntynyt — $kmOver km yli välimatkan.';
   }
 
   @override
   String get southKoreaApiKeyRequired =>
-      'Register at OPINET to get a free API key';
+      'Rekisteröidy OPINETissä saadaksesi ilmaisen API-avaimen';
 
   @override
   String get southKoreaApiProvider => 'OPINET (KNOC)';
 
   @override
-  String get chileApiKeyRequired => 'Register at CNE to get a free API key';
+  String get chileApiKeyRequired =>
+      'Rekisteröidy CNE:ssä saadaksesi ilmaisen API-avaimen';
 
   @override
   String get chileApiProvider => 'CNE Bencina en Linea';
 
   @override
-  String get vinConfirmTitle => 'Is this your car?';
+  String get vinConfirmTitle => 'Onko tämä autosi?';
 
   @override
   String vinConfirmBody(
@@ -3090,473 +3099,475 @@ class AppLocalizationsFi extends AppLocalizations {
     String cylinders,
     String fuel,
   ) {
-    return '$year $make $model — ${displacement}L, $cylinders-cyl, $fuel';
+    return '$year $make $model — ${displacement}L, $cylinders-syl, $fuel';
   }
 
   @override
   String get vinPartialInfoNote =>
-      'Partial info (offline). You can edit below.';
+      'Osittaiset tiedot (offline). Voit muokata alla.';
 
   @override
-  String get vinDecodeError => 'Couldn\'t decode this VIN';
+  String get vinDecodeError => 'VIN-koodia ei voitu purkaa';
 
   @override
-  String get vinInvalidFormat => 'Invalid VIN format';
+  String get vinInvalidFormat => 'Virheellinen VIN-muoto';
 
   @override
-  String get obd2PauseBannerTitle => 'OBD2 connection lost — recording paused';
+  String get obd2PauseBannerTitle =>
+      'OBD2-yhteys katkesi — tallennus keskeytetty';
 
   @override
-  String get obd2PauseBannerResume => 'Resume recording';
+  String get obd2PauseBannerResume => 'Jatka tallennusta';
 
   @override
-  String get obd2PauseBannerEnd => 'End recording';
+  String get obd2PauseBannerEnd => 'Lopeta tallennus';
 
   @override
   String veCalibratedTitle(String vehicleName, String percent) {
-    return 'Consumption calibration updated for $vehicleName — accuracy improved by $percent%';
+    return 'Kulutuskalibrointi päivitetty ajoneuvolle $vehicleName — tarkkuus parani $percent%';
   }
 
   @override
-  String get veResetConfirmTitle => 'Reset volumetric efficiency?';
+  String get veResetConfirmTitle => 'Nollatako tilavuushyötysuhde?';
 
   @override
   String get veResetConfirmBody =>
-      'This will discard the learned volumetric efficiency (η_v) and restore the default value (0.85). Trip-level fuel-flow estimates will fall back to the manufacturer constant until the calibrator collects new samples from upcoming trips.';
+      'Tämä hylkää opitun tilavuushyötysuhteen (η_v) ja palauttaa oletusarvon (0,85). Matkakohtaiset polttoainevirta-arviot palaavat valmistajan vakioon kunnes kalibraattori kerää uusia näytteitä tulevista matkoista.';
 
   @override
-  String get alertsRadiusSectionTitle => 'Radius alerts';
+  String get alertsRadiusSectionTitle => 'Säde-hälytykset';
 
   @override
-  String get alertsRadiusAdd => 'Add radius alert';
+  String get alertsRadiusAdd => 'Lisää säde-hälytys';
 
   @override
-  String get alertsRadiusEmptyTitle => 'No radius alerts yet';
+  String get alertsRadiusEmptyTitle => 'Ei vielä säde-hälytyksiä';
 
   @override
-  String get alertsRadiusEmptyCta => 'Create a radius alert';
+  String get alertsRadiusEmptyCta => 'Luo säde-hälytys';
 
   @override
-  String get alertsRadiusCreateTitle => 'Create radius alert';
+  String get alertsRadiusCreateTitle => 'Luo säde-hälytys';
 
   @override
-  String get alertsRadiusLabelHint => 'Label (e.g. Home diesel)';
+  String get alertsRadiusLabelHint => 'Nimike (esim. Koti diesel)';
 
   @override
-  String get alertsRadiusFuelType => 'Fuel type';
+  String get alertsRadiusFuelType => 'Polttoainetyyppi';
 
   @override
-  String get alertsRadiusThreshold => 'Threshold (€/L)';
+  String get alertsRadiusThreshold => 'Raja (€/L)';
 
   @override
-  String get alertsRadiusKm => 'Radius (km)';
+  String get alertsRadiusKm => 'Säde (km)';
 
   @override
-  String get alertsRadiusCenterGps => 'Use my location';
+  String get alertsRadiusCenterGps => 'Käytä sijaintiasi';
 
   @override
-  String get alertsRadiusCenterPostalCode => 'Postal code';
+  String get alertsRadiusCenterPostalCode => 'Postinumero';
 
   @override
-  String get alertsRadiusSave => 'Save';
+  String get alertsRadiusSave => 'Tallenna';
 
   @override
-  String get alertsRadiusCancel => 'Cancel';
+  String get alertsRadiusCancel => 'Peruuta';
 
   @override
-  String get alertsRadiusDeleteConfirm => 'Delete radius alert?';
+  String get alertsRadiusDeleteConfirm => 'Poistetaanko säde-hälytys?';
 
   @override
   String obd2ConnectedTooltip(String adapterName) {
-    return 'OBD2 connected: $adapterName';
+    return 'OBD2 yhdistetty: $adapterName';
   }
 
   @override
-  String get obd2PairChipTooltip => 'Pair an OBD2 adapter';
+  String get obd2PairChipTooltip => 'Paritetaan OBD2-sovitin';
 
   @override
   String velocityAlertTitle(String fuelLabel) {
-    return '$fuelLabel dropped at nearby stations';
+    return '$fuelLabel laski lähellä olevilla asemilla';
   }
 
   @override
   String velocityAlertBody(int stationCount, int maxDropCents) {
-    return '$stationCount stations dropped by up to $maxDropCents¢ in the last hour';
+    return '$stationCount asemalla hinta laski jopa $maxDropCents ¢ viimeisen tunnin aikana';
   }
 
   @override
-  String get fillUpSavedSnackbar => 'Fill-up saved';
+  String get fillUpSavedSnackbar => 'Tankkaus tallennettu';
 
   @override
-  String get radiusAlertsEntryTitle => 'Radius alerts & statistics';
+  String get radiusAlertsEntryTitle => 'Säde-hälytykset ja tilastot';
 
   @override
   String get radiusAlertsEntrySubtitle =>
-      'Get notified when prices drop near you';
+      'Saat ilmoituksen kun hinnat laskevat lähellä sinua';
 
   @override
-  String get notFoundTitle => 'Page not found';
+  String get notFoundTitle => 'Sivua ei löydy';
 
   @override
   String notFoundBody(String location) {
-    return '\"$location\" not found.';
+    return '\"$location\" ei löydy.';
   }
 
   @override
-  String get notFoundHomeButton => 'Home';
+  String get notFoundHomeButton => 'Etusivu';
 
   @override
   String get consumptionTabHiddenNotice =>
-      'The Consumption tab was hidden by your profile settings.';
+      'Kulutus-välilehti on piilotettu profiiliasetuksillasi.';
 
   @override
   String get swipeBetweenTabsHint =>
-      'Tip: swipe left or right to switch between tabs.';
+      'Vinkki: vaihda välilehtien välillä pyyhkäisemällä vasemmalle tai oikealle.';
 
   @override
-  String get discardChangesTitle => 'Discard changes?';
+  String get discardChangesTitle => 'Hylätäänkö muutokset?';
 
   @override
   String get discardChangesBody =>
-      'You have unsaved changes. Leaving now will discard them.';
+      'Sinulla on tallentamattomia muutoksia. Poistuminen nyt hylkää ne.';
 
   @override
-  String get discardChangesConfirm => 'Discard';
+  String get discardChangesConfirm => 'Hylkää';
 
   @override
-  String get discardChangesKeepEditing => 'Keep editing';
+  String get discardChangesKeepEditing => 'Jatka muokkaamista';
 
   @override
-  String get tankSyncSectionSubtitle => 'Cloud sync across your devices';
+  String get tankSyncSectionSubtitle => 'Pilvisynkronointi laitteidesi välillä';
 
   @override
-  String get achievementSmoothDriver => 'Smooth streak';
+  String get achievementSmoothDriver => 'Tasainen putki';
 
   @override
   String get achievementSmoothDriverDesc =>
-      'Drive 5 trips in a row with a smooth-driving score of 80 or higher.';
+      'Aja 5 peräkkäistä matkaa tasaisen ajon pisteet 80 tai enemmän.';
 
   @override
-  String get achievementColdStartAware => 'Cold-start aware';
+  String get achievementColdStartAware => 'Kylmäkäynnistystietoinen';
 
   @override
   String get achievementColdStartAwareDesc =>
-      'Keep a whole month\'s cold-start fuel cost under 2 % of total fuel — combine short trips.';
+      'Pidä koko kuukauden kylmäkäynnistyksen polttoainekustannus alle 2 % kokonaispolttoaineesta — yhdistä lyhyet matkat.';
 
   @override
-  String get achievementHighwayMaster => 'Highway master';
+  String get achievementHighwayMaster => 'Moottoritieammattilainen';
 
   @override
   String get achievementHighwayMasterDesc =>
-      'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.';
+      'Suorita vähintään 30 km matka tasaisella nopeudella ja tasaisen ajon pisteet 90 tai enemmän.';
 
   @override
-  String get authErrorNoNetwork => 'No network connection. Try again later.';
+  String get authErrorNoNetwork =>
+      'Ei verkkoyhteyttä. Yritä myöhemmin uudelleen.';
 
   @override
   String get authErrorInvalidCredentials =>
-      'Invalid email or password. Check your credentials.';
+      'Virheellinen sähköposti tai salasana. Tarkista tunnistetietosi.';
 
   @override
   String get authErrorUserAlreadyExists =>
-      'This email is already registered. Try signing in instead.';
+      'Tämä sähköpostiosoite on jo rekisteröity. Kokeile kirjautua sisään.';
 
   @override
   String get authErrorEmailNotConfirmed =>
-      'Please check your email and confirm your account first.';
+      'Tarkista sähköpostisi ja vahvista tilisi ensin.';
 
   @override
-  String get authErrorGeneric => 'Sign-in failed. Please try again.';
+  String get authErrorGeneric => 'Kirjautuminen epäonnistui. Yritä uudelleen.';
 
   @override
   String get autoRecordConsentBadgeLabel =>
-      'Background location — for auto-record only';
+      'Taustanäkymäsijainti — vain automaattiseen tallennukseen';
 
   @override
-  String get autoRecordConsentExplanationTitle => 'About this permission';
+  String get autoRecordConsentExplanationTitle => 'Tietoa tästä luvasta';
 
   @override
   String get autoRecordConsentExplanationBody =>
-      'Auto-record needs background location to detect when you start driving while the app is closed. This grant is used only by auto-record — station search and map centering use a separate foreground location grant.';
+      'Automaattinen tallennus tarvitsee taustasijainnin havaitakseen ajon aloituksen sovelluksen ollessa suljettu. Tätä lupaa käytetään vain automaattiseen tallennukseen — asemahaku ja kartan keskittäminen käyttävät erillistä etusijainnin lupaa.';
 
   @override
-  String get autoRecordConsentExplanationCloseButton => 'Got it';
+  String get autoRecordConsentExplanationCloseButton => 'Selvä';
 
   @override
-  String get autoRecordConsentExplanationTooltip => 'What does this mean?';
+  String get autoRecordConsentExplanationTooltip => 'Mitä tämä tarkoittaa?';
 
   @override
   String get autoRecordConsentRevokeAction =>
-      'Tap to manage in system settings';
+      'Napauta hallitaksesi järjestelmäasetuksissa';
 
   @override
-  String get autoRecordSectionTitle => 'Auto-record';
+  String get autoRecordSectionTitle => 'Automaattinen tallennus';
 
   @override
-  String get autoRecordToggleLabel => 'Auto-record trips';
+  String get autoRecordToggleLabel => 'Tallenna matkat automaattisesti';
 
   @override
   String get autoRecordStatusActiveLabel =>
-      'Auto-record will activate the next time you enter the car.';
+      'Automaattinen tallennus aktivoituu seuraavan kerran kun menet autoon.';
 
   @override
   String get autoRecordStatusNeedsPairingLabel =>
-      'Pair an OBD2 adapter to enable auto-record.';
+      'Paritetaan OBD2-sovitin automaattisen tallennuksen käyttöönottoon.';
 
   @override
   String get autoRecordStatusNeedsBackgroundLocationLabel =>
-      'Allow background location so auto-record keeps running with the screen off.';
+      'Salli taustasijainti jotta automaattinen tallennus toimii näytön ollessa pois päältä.';
 
   @override
-  String get autoRecordStatusPairAdapterCta => 'Pair an adapter';
+  String get autoRecordStatusPairAdapterCta => 'Paritetaan sovitin';
 
   @override
-  String get autoRecordSpeedThresholdLabel => 'Start speed (km/h)';
+  String get autoRecordSpeedThresholdLabel => 'Aloitusnopeus (km/h)';
 
   @override
   String get autoRecordSaveDelayLabel =>
-      'Save delay after disconnect (seconds)';
+      'Tallennusviive yhteyden katkaistua (sekuntia)';
 
   @override
-  String get autoRecordPairedAdapterLabel => 'Paired adapter';
+  String get autoRecordPairedAdapterLabel => 'Paritettu sovitin';
 
   @override
   String get autoRecordPairedAdapterNone =>
-      'No adapter paired. Pair one via the OBD2 onboarding first.';
+      'Ei paritettu sovitinta. Paritetaan ensin OBD2-perehdytyksen kautta.';
 
   @override
-  String get autoRecordBackgroundLocationLabel => 'Background location allowed';
+  String get autoRecordBackgroundLocationLabel =>
+      'Taustanäkymäsijainti sallittu';
 
   @override
-  String get autoRecordBackgroundLocationRequest => 'Request permission';
+  String get autoRecordBackgroundLocationRequest => 'Pyydä lupaa';
 
   @override
   String get autoRecordBackgroundLocationRationaleTitle =>
-      'Why \"Allow all the time\"?';
+      'Miksi \"Aina sallittu\"?';
 
   @override
   String get autoRecordBackgroundLocationRationaleBody =>
-      'Auto-record streams GPS coordinates from the OBD-II foreground service while the screen is off so your trip route stays accurate. Android requires the \"Allow all the time\" option for that to keep working after the device locks.';
+      'Automaattinen tallennus virtaa GPS-koordinaatteja OBD-II:n etualustan palvelusta näytön ollessa pois päältä, jotta matkareittiisi pysyy tarkkana. Android vaatii \"Aina sallittu\" -vaihtoehdon jotta se toimii laitteen lukittua.';
 
   @override
-  String get autoRecordBackgroundLocationOpenSettings => 'Open settings';
+  String get autoRecordBackgroundLocationOpenSettings => 'Avaa asetukset';
 
   @override
   String get autoRecordBackgroundLocationForegroundDeniedSnackbar =>
-      'Location permission required';
+      'Sijaintilupa vaaditaan';
 
   @override
   String get autoRecordBackgroundLocationRequestFailedSnackbar =>
-      'Could not request background location';
+      'Taustasijainnin pyytäminen epäonnistui';
 
   @override
-  String get autoRecordBadgeClearTooltip => 'Clear counter';
+  String get autoRecordBadgeClearTooltip => 'Tyhjennä laskuri';
 
   @override
   String get autoRecordPairAdapterLinkText =>
-      'Pair an adapter in the section below to enable auto-recording';
+      'Paritetaan sovitin alla olevassa osiossa automaattisen tallennuksen ottamiseksi käyttöön';
 
   @override
-  String get exportBackupTooltip => 'Export backup';
+  String get exportBackupTooltip => 'Vie varmuuskopio';
 
   @override
-  String get exportBackupReady => 'Backup ready — pick a destination';
+  String get exportBackupReady => 'Varmuuskopio valmis — valitse kohde';
 
   @override
-  String get exportBackupFailed => 'Backup export failed — please try again';
+  String get exportBackupFailed =>
+      'Varmuuskopion vienti epäonnistui — yritä uudelleen';
 
   @override
-  String get brokenMapChipVerifying => 'MAP sensor verifying…';
+  String get brokenMapChipVerifying => 'MAP-anturi tarkistaa…';
 
   @override
-  String get brokenMapChipDisclaimer => 'MAP readings suspicious';
+  String get brokenMapChipDisclaimer => 'MAP-lukema epäilyttävä';
 
   @override
   String get brokenMapSnackbarUnreliable =>
-      'MAP sensor reads incorrectly — fuel readings may be 50–80% too low. Try a different adapter.';
+      'MAP-anturi lukee väärin — polttoainelukemat voivat olla 50–80 % liian pienet. Kokeile eri sovitinta.';
 
   @override
   String get brokenMapBannerHardDisable =>
-      'MAP sensor unreliable. Showing fill-up averages instead of live fuel rate.';
+      'MAP-anturi epäluotettava. Näytetään tankkauskeskiarvot live-polttoaineprosentin sijaan.';
 
   @override
   String brokenMapOverlayVerified(String confidence) {
-    return 'MAP sensor: verified ($confidence)';
+    return 'MAP-anturi: tarkistettu ($confidence)';
   }
 
   @override
   String brokenMapOverlayUnverified(String confidence) {
-    return 'MAP sensor: verifying ($confidence)';
+    return 'MAP-anturi: tarkistetaan ($confidence)';
   }
 
   @override
   String brokenMapOverlaySuspicious(String confidence) {
-    return 'MAP sensor: suspicious ($confidence)';
+    return 'MAP-anturi: epäilyttävä ($confidence)';
   }
 
   @override
   String brokenMapOverlayPosterior(String posterior, String margin) {
-    return 'MAP sensor: $posterior% ± $margin%';
+    return 'MAP-anturi: $posterior% ± $margin%';
   }
 
   @override
   String brokenMapOverlayPosteriorVerified(String posterior, String margin) {
-    return 'MAP sensor: $posterior% ± $margin% (verified)';
+    return 'MAP-anturi: $posterior% ± $margin% (tarkistettu)';
   }
 
   @override
-  String get brokenMapDiagnosticsCardTitle => 'MAP sensor diagnostics';
+  String get brokenMapDiagnosticsCardTitle => 'MAP-anturin diagnostiikka';
 
   @override
   String brokenMapDiagnosticsBeliefLine(String posterior, String margin) {
-    return 'Broken-MAP confidence: $posterior% ± $margin%';
+    return 'Rikkinäinen MAP-luottamus: $posterior% ± $margin%';
   }
 
   @override
   String brokenMapDiagnosticsObservationCount(int count) {
-    return '$count observations recorded';
+    return '$count havaintoa tallennettu';
   }
 
   @override
-  String get brokenMapDiagnosticsVerifiedBadge => 'Verified clean';
+  String get brokenMapDiagnosticsVerifiedBadge => 'Tarkistettu puhtaaksi';
 
   @override
   String get brokenMapDiagnosticsBeliefNone =>
-      'This vehicle\'s MAP sensor hasn\'t been observed yet.';
+      'Tämän ajoneuvon MAP-anturia ei ole vielä havaittu.';
 
   @override
-  String get brokenMapDiagnosticsBlocklistHeading => 'Blocklisted adapters';
+  String get brokenMapDiagnosticsBlocklistHeading => 'Estetyt sovitimet';
 
   @override
-  String get brokenMapDiagnosticsBlocklistEmpty =>
-      'No adapters are blocklisted.';
+  String get brokenMapDiagnosticsBlocklistEmpty => 'Ei estettyjä sovittimia.';
 
   @override
   String brokenMapDiagnosticsBlocklistEntry(String adapter, String percent) {
-    return '$adapter — flagged $percent% broken';
+    return '$adapter — merkitty $percent% rikkinäiseksi';
   }
 
   @override
-  String get brokenMapDiagnosticsClearButton => 'Clear';
+  String get brokenMapDiagnosticsClearButton => 'Tyhjennä';
 
   @override
-  String get brokenMapRevPromptTitle => 'Rev the engine';
+  String get brokenMapRevPromptTitle => 'Kaasuta moottori';
 
   @override
   String get brokenMapRevPromptBody =>
-      'Briefly blip the throttle so the app can check the MAP sensor responds.';
+      'Paina lyhyesti kaasua jotta sovellus voi tarkistaa MAP-anturin reagoinnin.';
 
   @override
-  String get brokenMapRevPromptConfirm => 'Done — I revved';
+  String get brokenMapRevPromptConfirm => 'Valmis — kaasutus tehty';
 
   @override
-  String get calibrationAdvancedTitle => 'Advanced calibration';
+  String get calibrationAdvancedTitle => 'Edistynyt kalibrointi';
 
   @override
-  String get calibrationDisplacementLabel => 'Engine displacement (cc)';
+  String get calibrationDisplacementLabel => 'Moottorin tilavuus (cc)';
 
   @override
-  String get calibrationVolumetricEfficiencyLabel =>
-      'Volumetric efficiency (η_v)';
+  String get calibrationVolumetricEfficiencyLabel => 'Tilavuushyötysuhde (η_v)';
 
   @override
-  String get calibrationAfrLabel => 'Air-to-fuel ratio (AFR)';
+  String get calibrationAfrLabel => 'Ilma-polttoainesuhde (AFR)';
 
   @override
-  String get calibrationFuelDensityLabel => 'Fuel density (g/L)';
+  String get calibrationFuelDensityLabel => 'Polttoaineen tiheys (g/L)';
 
   @override
-  String get calibrationSourceDetected => '(detected from VIN)';
+  String get calibrationSourceDetected => '(havaittu VIN:stä)';
 
   @override
   String calibrationSourceCatalog(String makeModel) {
-    return '(catalog: $makeModel)';
+    return '(katalogi: $makeModel)';
   }
 
   @override
-  String get calibrationSourceDefault => '(default)';
+  String get calibrationSourceDefault => '(oletus)';
 
   @override
-  String get calibrationSourceManual => '(manual)';
+  String get calibrationSourceManual => '(manuaalinen)';
 
   @override
-  String get calibrationResetToDetected => 'Reset to detected value';
+  String get calibrationResetToDetected => 'Nollaa havaittuun arvoon';
 
   @override
   String calibrationLearnerStatusCalibrated(String eta, int samples) {
-    return 'η_v: $eta (calibrated, $samples samples)';
+    return 'η_v: $eta (kalibroitu, $samples näytettä)';
   }
 
   @override
   String calibrationLearnerStatusLearning(String eta, int samples) {
-    return 'η_v: $eta (learning, $samples samples)';
+    return 'η_v: $eta (oppii, $samples näytettä)';
   }
 
   @override
   String get calibrationLearnerStatusNoSamples =>
-      'η_v: 0.85 (default — no plein-complet yet)';
+      'η_v: 0,85 (oletus — ei plein-complet-tankkausta vielä)';
 
   @override
-  String get calibrationResetLearner => 'Reset learner';
+  String get calibrationResetLearner => 'Nollaa oppija';
 
   @override
-  String get calibrationBasisAtkinson => 'Atkinson cycle';
+  String get calibrationBasisAtkinson => 'Atkinson-sykli';
 
   @override
-  String get calibrationBasisVnt => 'VNT diesel + DI';
+  String get calibrationBasisVnt => 'VNT-diesel + DI';
 
   @override
-  String get calibrationBasisTurboDi => 'Turbocharged + DI';
+  String get calibrationBasisTurboDi => 'Turboahdettu + DI';
 
   @override
-  String get calibrationBasisTurbo => 'Turbocharged';
+  String get calibrationBasisTurbo => 'Turboahdettu';
 
   @override
-  String get calibrationBasisNaDi => 'Naturally aspirated + DI';
+  String get calibrationBasisNaDi => 'Luonnollisesti imuttu + DI';
 
   @override
   String calibrationSourceCatalogWithBasis(String makeModel, String basis) {
-    return '(catalog: $makeModel — $basis default)';
+    return '(katalogi: $makeModel — $basis oletus)';
   }
 
   @override
   String catalogReresolveSnackbarMessage(String makeModel) {
-    return 'Your $makeModel is marked as diesel but matches a petrol catalog entry. Tap to update.';
+    return '$makeModel on merkitty dieseliksi mutta vastaa bensiinimerkinnän katalogiin. Napauta päivittääksesi.';
   }
 
   @override
-  String get catalogReresolveSnackbarAction => 'Update';
+  String get catalogReresolveSnackbarAction => 'Päivitä';
 
   @override
-  String get consumptionTabFuel => 'Fuel';
+  String get consumptionTabFuel => 'Polttoaine';
 
   @override
-  String get consumptionTabCharging => 'Charging';
+  String get consumptionTabCharging => 'Lataus';
 
   @override
-  String get noChargingLogsTitle => 'No charging logs yet';
+  String get noChargingLogsTitle => 'Ei vielä latauslokeja';
 
   @override
   String get noChargingLogsSubtitle =>
-      'Log your first charging session to start tracking EUR/100 km and kWh/100 km.';
+      'Kirjaa ensimmäinen lataustilaisuutesi aloittaaksesi EUR/100 km ja kWh/100 km seurannan.';
 
   @override
-  String get addChargingLog => 'Log charging';
+  String get addChargingLog => 'Kirjaa lataus';
 
   @override
-  String get addChargingLogTitle => 'Log charging session';
+  String get addChargingLogTitle => 'Kirjaa lataustilaisuus';
 
   @override
-  String get chargingKwh => 'Energy (kWh)';
+  String get chargingKwh => 'Energia (kWh)';
 
   @override
-  String get chargingCost => 'Total cost';
+  String get chargingCost => 'Kokonaiskustannus';
 
   @override
-  String get chargingTimeMin => 'Charge time (min)';
+  String get chargingTimeMin => 'Latausaika (min)';
 
   @override
-  String get chargingStationName => 'Station (optional)';
+  String get chargingStationName => 'Asema (valinnainen)';
 
   @override
   String chargingEurPer100km(String value) {
@@ -3569,152 +3580,154 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
-  String get chargingDerivedHelper => 'Need a previous log to compare';
+  String get chargingDerivedHelper => 'Tarvitaan aiempi loki vertailuun';
 
   @override
-  String get chargingLogButtonLabel => 'Log charging';
+  String get chargingLogButtonLabel => 'Kirjaa lataus';
 
   @override
-  String get chargingCostTrendTitle => 'Charging cost trend';
+  String get chargingCostTrendTitle => 'Latauskulujen kehitys';
 
   @override
-  String get chargingEfficiencyTitle => 'Efficiency (kWh/100 km)';
+  String get chargingEfficiencyTitle => 'Tehokkuus (kWh/100 km)';
 
   @override
-  String get chargingChartsEmpty => 'Not enough data yet';
+  String get chargingChartsEmpty => 'Ei vielä riittävästi tietoja';
 
   @override
-  String get chargingChartsMonthAxis => 'Month';
+  String get chargingChartsMonthAxis => 'Kuukausi';
 
   @override
-  String get gdprCommunityWaitTimeTitle => 'Community Wait Times';
+  String get gdprCommunityWaitTimeTitle => 'Yhteisön jonotusajat';
 
   @override
-  String get gdprCommunityWaitTimeShort =>
-      'Anonymously share station wait times';
+  String get gdprCommunityWaitTimeShort => 'Jaa aseman jonotusajat anonyymisti';
 
   @override
   String get gdprCommunityWaitTimeDescription =>
-      'Anonymously share when you arrive at and leave a fuel station so the app can show typical wait times. No location coordinates are uploaded — only the station ID.';
+      'Jaa anonyymisti milloin saavut ja lähdet polttoaineasemalta, jotta sovellus voi näyttää tyypilliset jonotusajat. GPS-koordinaatteja ei ladata — vain aseman tunnus.';
 
   @override
-  String get consoFeatureGroupTitle => 'Conso';
+  String get consoFeatureGroupTitle => 'Kulutus';
 
   @override
   String get consoFeatureGroupDescription =>
-      'Track your consumption — manual fill-ups, or automatic OBD2 trip recording.';
+      'Seuraa kulutustasi — manuaaliset tankkaukset tai automaattinen OBD2-matkojen tallennus.';
 
   @override
-  String get consoModeOff => 'Off';
+  String get consoModeOff => 'Pois';
 
   @override
-  String get consoModeFuel => 'Fuel';
+  String get consoModeFuel => 'Polttoaine';
 
   @override
-  String get consoModeFuelAndTrips => 'Fuel + Trips';
+  String get consoModeFuelAndTrips => 'Polttoaine + Matkat';
 
   @override
   String get consoModeOffDescription =>
-      'No Conso tab and no Conso settings section.';
+      'Ei Kulutus-välilehteä eikä Kulutus-asetusosioita.';
 
   @override
   String get consoModeFuelDescription =>
-      'Manual fill-ups only. Useful without an OBD2 adapter.';
+      'Vain manuaaliset tankkaukset. Hyödyllinen ilman OBD2-sovitinta.';
 
   @override
   String get consoModeFuelAndTripsDescription =>
-      'Adds automatic OBD2 trip recording. Requires a paired adapter.';
+      'Lisää automaattinen OBD2-matkojen tallennus. Vaatii paritetun sovittimen.';
 
   @override
-  String get consoSubsectionVehicles => 'My vehicles';
+  String get consoSubsectionVehicles => 'Omat ajoneuvot';
 
   @override
-  String get consoSubsectionTrajets => 'Trips (OBD2)';
+  String get consoSubsectionTrajets => 'Matkat (OBD2)';
 
   @override
-  String get consoSubsectionToggles => 'Driving';
+  String get consoSubsectionToggles => 'Ajaminen';
 
   @override
   String consumptionStatsOpenWindowBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count partial fills pending plein complet — not in average',
-      one: '1 partial fill pending plein complet — not in average',
+      other:
+          '$count osittaista tankkausta odottaa plein complet — ei mukana keskiarvossa',
+      one:
+          '1 osittainen tankkaus odottaa plein complet — ei mukana keskiarvossa',
     );
     return '$_temp0';
   }
 
   @override
   String consumptionStatsCorrectionShareHint(int percent) {
-    return '$percent% of fuel from auto-corrections — review entries';
+    return '$percent% polttoaineesta automaattikorjauksista — tarkista merkinnät';
   }
 
   @override
-  String get fillUpCorrectionLabel => 'Auto-correction — tap to edit';
+  String get fillUpCorrectionLabel =>
+      'Automaattikorjaus — napauta muokataksesi';
 
   @override
-  String get fillUpCorrectionEditTitle => 'Edit auto-correction';
+  String get fillUpCorrectionEditTitle => 'Muokkaa automaattikorjausta';
 
   @override
   String get fillUpCorrectionEditExplainer =>
-      'This entry was auto-generated to close the gap between recorded trips and pumped fuel. Adjust the values if you know the actual figures.';
+      'Tämä merkintä luotiin automaattisesti kuromaan umpeen tallennettujen matkojen ja pumpatun polttoaineen välinen ero. Muuta arvoja jos tiedät todelliset luvut.';
 
   @override
-  String get fillUpCorrectionDelete => 'Delete correction';
+  String get fillUpCorrectionDelete => 'Poista korjaus';
 
   @override
-  String get fillUpCorrectionStation => 'Station name (optional)';
+  String get fillUpCorrectionStation => 'Aseman nimi (valinnainen)';
 
   @override
-  String get greeceApiProvider => 'Paratiritirio Timon (Greece)';
+  String get greeceApiProvider => 'Paratiritirio Timon (Kreikka)';
 
   @override
-  String get greeceCommunityApiNotice =>
-      'Powered by the community-maintained fuelpricesgr API';
+  String get greeceCommunityApiNotice => 'Yhteisön ylläpitämä fuelpricesgr API';
 
   @override
   String get romaniaApiProvider => 'Monitorul Prețurilor (Romania)';
 
   @override
   String get romaniaScrapingNotice =>
-      'Powered by pretcarburant.ro (Competition Council + ANPC)';
+      'Toteutettu pretcarburant.ro:n avulla (kilpailuneuvosto + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {
-    return '$country stations $km km away — €$price/L cheaper';
+    return '$country:n asemat $km km päässä — €$price/L halvempi';
   }
 
   @override
-  String get crossBorderTapToSwitch => 'Tap to switch country';
+  String get crossBorderTapToSwitch => 'Napauta vaihtaaksesi maata';
 
   @override
-  String get crossBorderDismissTooltip => 'Dismiss';
+  String get crossBorderDismissTooltip => 'Sulje';
 
   @override
-  String get insightCardTitle => 'Top wasteful behaviours';
+  String get insightCardTitle => 'Pahimmat tuhlaukset';
 
   @override
-  String get insightEmptyState => 'No notable inefficiencies — keep it up!';
+  String get insightEmptyState =>
+      'Ei merkittäviä tehottomuuksia — jatka samaan tapaan!';
 
   @override
   String insightHighRpm(String pctTime, String liters) {
-    return 'Engine over 3000 RPM ($pctTime% of trip): wasted $liters L';
+    return 'Moottori yli 3000 RPM ($pctTime% matkasta): hukattu $liters L';
   }
 
   @override
   String insightHardAccel(String count, String liters) {
-    return '$count hard accelerations: wasted $liters L';
+    return '$count voimakasta kiihdytystä: hukattu $liters L';
   }
 
   @override
   String insightIdling(String pctTime, String liters) {
-    return 'Idling ($pctTime% of trip): wasted $liters L';
+    return 'Tyhjäkäynti ($pctTime% matkasta): hukattu $liters L';
   }
 
   @override
   String insightSubtitlePctOfTrip(String pctTime) {
-    return '$pctTime% of trip';
+    return '$pctTime% matkasta';
   }
 
   @override
@@ -3724,889 +3737,895 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String insightLowGear(String minutes) {
-    return 'Labouring in low gear ($minutes min)';
+    return 'Kynsi alhaisella vaihteella ($minutes min)';
   }
 
   @override
-  String get drivingScoreCardTitle => 'Driving score';
+  String get drivingScoreCardTitle => 'Ajopisteet';
 
   @override
   String get drivingScoreCardOutOf => '/100';
 
   @override
   String get drivingScoreCardSubtitle =>
-      'Composite score from idling, hard accelerations, hard braking, and high-RPM time. A \'better than X% of past trips\' comparison will land in a follow-up release.';
+      'Yhdistelmäpisteet tyhjäkäynnistä, voimakkaista kiihdytyksistä, kovasta jarrutuksesta ja korkean RPM:n ajasta. \"Parempi kuin X% aiemmista matkoista\" -vertailu tulee seuraavassa julkaisussa.';
 
   @override
   String drivingScoreCardSemanticsLabel(String score) {
-    return 'Driving score $score out of 100';
+    return 'Ajopisteet $score/100';
   }
 
   @override
-  String get drivingScorePenaltyIdling => 'Idling';
+  String get drivingScorePenaltyIdling => 'Tyhjäkäynti';
 
   @override
-  String get drivingScorePenaltyHardAccel => 'Hard accelerations';
+  String get drivingScorePenaltyHardAccel => 'Voimakkaat kiihdytykset';
 
   @override
-  String get drivingScorePenaltyHardBrake => 'Hard braking';
+  String get drivingScorePenaltyHardBrake => 'Kova jarrutus';
 
   @override
-  String get drivingScorePenaltyHighRpm => 'High RPM';
+  String get drivingScorePenaltyHighRpm => 'Korkea RPM';
 
   @override
-  String get drivingScorePenaltyFullThrottle => 'Full throttle';
+  String get drivingScorePenaltyFullThrottle => 'Täysi kaasu';
 
   @override
-  String get ecoRouteOption => 'Eco';
+  String get ecoRouteOption => 'Eko';
 
   @override
   String ecoRouteSavings(String liters) {
-    return '≈ $liters L saved';
+    return '≈ $liters L säästöä';
   }
 
   @override
   String get ecoRouteHint =>
-      'Smarter drive — favours steady highway over zigzag shortcuts.';
+      'Älykkäämpi ajo — suosii tasaista moottoritietä kiemurtelevien oikoteiden sijaan.';
 
   @override
-  String get favoritesShareAction => 'Share';
+  String get favoritesShareAction => 'Jaa';
 
   @override
   String favoritesShareSubject(String date) {
-    return 'Sparkilo — favourites on $date';
+    return 'Sparkilo — suosikit $date';
   }
 
   @override
-  String get favoritesShareError => 'Couldn\'t generate share image';
+  String get favoritesShareError => 'Jaettavan kuvan luominen epäonnistui';
 
   @override
-  String get featureManagementSectionTitle => 'Feature management';
+  String get featureManagementSectionTitle => 'Ominaisuuksien hallinta';
 
   @override
   String get featureManagementSectionSubtitle =>
-      'Turn individual features on or off. Some features depend on others — switches are disabled until prerequisites are met.';
+      'Ota yksittäisiä ominaisuuksia käyttöön tai poista ne. Jotkin ominaisuudet riippuvat muista — kytkimet ovat pois käytöstä kunnes edellytykset täyttyvät.';
 
   @override
-  String get featureLabel_obd2TripRecording => 'OBD2 trip recording';
+  String get featureLabel_obd2TripRecording => 'OBD2-matkojen tallennus';
 
   @override
   String get featureDescription_obd2TripRecording =>
-      'Capture trips automatically over OBD2.';
+      'Tallenna matkat automaattisesti OBD2:n kautta.';
 
   @override
-  String get featureLabel_gamification => 'Gamification';
+  String get featureLabel_gamification => 'Pelillistäminen';
 
   @override
   String get featureDescription_gamification =>
-      'Driving scores and earned badges.';
+      'Ajopisteet ja ansaitut palkinnot.';
 
   @override
-  String get featureLabel_hapticEcoCoach => 'Haptic eco-coach';
+  String get featureLabel_hapticEcoCoach => 'Haptinen eko-valmentaja';
 
   @override
   String get featureDescription_hapticEcoCoach =>
-      'Real-time haptic feedback during a trip.';
+      'Reaaliaikainen haptinen palaute matkan aikana.';
 
   @override
   String get featureLabel_tankSync => 'TankSync';
 
   @override
-  String get featureDescription_tankSync => 'Cross-device sync via Supabase.';
+  String get featureDescription_tankSync =>
+      'Laitteiden välinen synkronointi Supabasen kautta.';
 
   @override
-  String get featureLabel_consumptionAnalytics => 'Consumption analytics';
+  String get featureLabel_consumptionAnalytics => 'Kulutusanalytiikka';
 
   @override
   String get featureDescription_consumptionAnalytics =>
-      'Fill-up and trip analysis tab.';
+      'Tankkaus- ja matka-analyysivälilehti.';
 
   @override
-  String get featureLabel_baselineSync => 'Baseline sync';
+  String get featureLabel_baselineSync => 'Perusarvojen synkronointi';
 
   @override
   String get featureDescription_baselineSync =>
-      'Sync driving baselines via TankSync.';
+      'Synkronoi ajon perusarvot TankSyncin kautta.';
 
   @override
-  String get featureLabel_unifiedSearchResults => 'Unified search results';
+  String get featureLabel_unifiedSearchResults => 'Yhdistetyt hakutulokset';
 
   @override
   String get featureDescription_unifiedSearchResults =>
-      'Single result list combining fuel and EV stations.';
+      'Yksittäinen tulosluettelo yhdistellen polttoaine- ja sähköasemia.';
 
   @override
-  String get featureLabel_priceAlerts => 'Price alerts';
+  String get featureLabel_priceAlerts => 'Hintahälytykset';
 
   @override
   String get featureDescription_priceAlerts =>
-      'Threshold-based price-drop notifications.';
+      'Rajapohjaiset hintamuutosilmoitukset.';
 
   @override
-  String get featureLabel_priceHistory => 'Price history';
+  String get featureLabel_priceHistory => 'Hintahistoria';
 
   @override
   String get featureDescription_priceHistory =>
-      '30-day price charts on station details.';
+      '30 päivän hintakäyrät aseman tiedoissa.';
 
   @override
-  String get featureLabel_routePlanning => 'Route planning';
+  String get featureLabel_routePlanning => 'Reitin suunnittelu';
 
   @override
   String get featureDescription_routePlanning =>
-      'Cheapest stop along your route.';
+      'Edullisin pysäkki reitillesi.';
 
   @override
-  String get featureLabel_evCharging => 'EV charging';
+  String get featureLabel_evCharging => 'Sähköautojen lataus';
 
   @override
   String get featureDescription_evCharging =>
-      'Charging stations via OpenChargeMap.';
+      'Latausasemat OpenChargeMapin kautta.';
 
   @override
-  String get featureLabel_glideCoach => 'Glide-coach';
+  String get featureLabel_glideCoach => 'Liukuluekovalmentaja';
 
   @override
   String get featureDescription_glideCoach =>
-      'Hypermiling guidance using OSM traffic signals.';
+      'Hypermiling-ohjaus OSM-liikennevaloilla.';
 
   @override
-  String get featureLabel_gpsTripPath => 'GPS trip path';
+  String get featureLabel_gpsTripPath => 'GPS-matkapolku';
 
   @override
   String get featureDescription_gpsTripPath =>
-      'Persist GPS path samples alongside each trip.';
+      'Tallenna GPS-polun näytteet jokaisen matkan yhteydessä.';
 
   @override
-  String get featureLabel_autoRecord => 'Auto-record';
+  String get featureLabel_autoRecord => 'Automaattinen tallennus';
 
   @override
   String get featureDescription_autoRecord =>
-      'Automatically start a trip when the OBD2 adapter connects to a moving vehicle.';
+      'Aloita matka automaattisesti kun OBD2-sovitin yhdistää liikkuvaan ajoneuvoon.';
 
   @override
-  String get featureLabel_showFuel => 'Show fuel stations';
+  String get featureLabel_showFuel => 'Näytä polttoaineasemia';
 
   @override
   String get featureDescription_showFuel =>
-      'Display petrol/diesel station results in search and on the map.';
+      'Näytä bensiini-/dieselasemia haussa ja kartalla.';
 
   @override
-  String get featureLabel_showElectric => 'Show charging stations';
+  String get featureLabel_showElectric => 'Näytä latauspisteitä';
 
   @override
   String get featureDescription_showElectric =>
-      'Display EV charging stations in search and on the map.';
+      'Näytä sähköautojen latauspisteitä haussa ja kartalla.';
 
   @override
-  String get featureLabel_showConsumptionTab => 'Consumption tab';
+  String get featureLabel_showConsumptionTab => 'Kulutus-välilehti';
 
   @override
   String get featureDescription_showConsumptionTab =>
-      'Show the consumption analytics tab in the bottom navigation.';
+      'Näytä kulutusanalytiikkavälilehti alanavigaatiossa.';
 
   @override
   String get featureBlockedEnable_gamification =>
-      'Enable OBD2 trip recording first';
+      'Ota ensin OBD2-matkojen tallennus käyttöön';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
-      'Enable OBD2 trip recording first';
+      'Ota ensin OBD2-matkojen tallennus käyttöön';
 
   @override
   String get featureBlockedEnable_consumptionAnalytics =>
-      'Enable OBD2 trip recording first';
+      'Ota ensin OBD2-matkojen tallennus käyttöön';
 
   @override
-  String get featureBlockedEnable_baselineSync => 'Enable TankSync first';
+  String get featureBlockedEnable_baselineSync => 'Ota ensin TankSync käyttöön';
 
   @override
   String get featureBlockedEnable_glideCoach =>
-      'Enable OBD2 trip recording first';
+      'Ota ensin OBD2-matkojen tallennus käyttöön';
 
   @override
   String get featureBlockedEnable_gpsTripPath =>
-      'Enable OBD2 trip recording first';
+      'Ota ensin OBD2-matkojen tallennus käyttöön';
 
   @override
   String get featureBlockedEnable_autoRecord =>
-      'Enable OBD2 trip recording first';
+      'Ota ensin OBD2-matkojen tallennus käyttöön';
 
   @override
-  String get featureBlockedEnable_showFuel => 'Prerequisites not met';
+  String get featureBlockedEnable_showFuel => 'Edellytykset eivät täyty';
 
   @override
-  String get featureBlockedEnable_showElectric => 'Prerequisites not met';
+  String get featureBlockedEnable_showElectric => 'Edellytykset eivät täyty';
 
   @override
   String get featureBlockedEnable_showConsumptionTab =>
-      'Enable OBD2 trip recording first';
+      'Ota ensin OBD2-matkojen tallennus käyttöön';
 
   @override
-  String get featureLabel_tflitePricePrediction => 'TFLite price prediction';
+  String get featureLabel_tflitePricePrediction => 'TFLite-hintaennuste';
 
   @override
   String get featureDescription_tflitePricePrediction =>
-      'On-device price forecast model — inference runs locally; features and predictions never leave the device.';
+      'Laitteella toimiva hintaennustemalli — päätelmät ajetaan paikallisesti; ominaisuudet ja ennusteet eivät koskaan poistu laitteelta.';
 
   @override
   String get featureBlockedEnable_tflitePricePrediction =>
-      'Enable price history first';
+      'Ota ensin hintahistoria käyttöön';
 
   @override
-  String get featureLabel_fuelCalculator => 'Fuel calculator';
+  String get featureLabel_fuelCalculator => 'Polttoainelaskin';
 
   @override
   String get featureDescription_fuelCalculator =>
-      'Reachable fuel-cost calculator from the search results.';
+      'Saavutettavissa oleva polttoainekustannuslaskin hakutuloksista.';
 
   @override
-  String get featureLabel_carbonDashboard => 'Carbon dashboard';
+  String get featureLabel_carbonDashboard => 'Hiilijalanjälkinäkymä';
 
   @override
   String get featureDescription_carbonDashboard =>
-      'CO2 footprint dashboard reachable from the Consumption tab.';
+      'CO2-jalanjälkinäkymä Kulutus-välilehdeltä saavutettavissa.';
 
   @override
-  String get featureLabel_experimentalOemPids => 'Experimental OEM PIDs';
+  String get featureLabel_experimentalOemPids => 'Kokeelliset OEM-PID:t';
 
   @override
   String get featureDescription_experimentalOemPids =>
-      'Read exact tank litres via manufacturer-specific PIDs on supported adapters.';
+      'Lue tarkka tankin litramäärä valmistajan omien PID-koodien kautta tuetuilla sovittimilla.';
 
   @override
   String get featureBlockedEnable_experimentalOemPids =>
-      'Enable OBD2 trip recording first';
+      'Ota ensin OBD2-matkojen tallennus käyttöön';
 
   @override
-  String get featureLabel_paymentQrScan => 'Scan payment QR';
+  String get featureLabel_paymentQrScan => 'Skannaa maksu-QR';
 
   @override
   String get featureDescription_paymentQrScan =>
-      'Scan-to-pay QR reader on the station detail screen.';
+      'QR-maksujen lukija aseman tietosivulla.';
 
   @override
-  String get featureLabel_communityPriceReports => 'Community price reports';
+  String get featureLabel_communityPriceReports => 'Yhteisön hintaraportit';
 
   @override
   String get featureDescription_communityPriceReports =>
-      'Report a station price from the station detail screen.';
+      'Ilmoita aseman hinta aseman tietosivulta.';
 
   @override
-  String get feedbackConsentTitle => 'Send report to GitHub?';
+  String get feedbackConsentTitle => 'Lähetetäänkö raportti GitHubiin?';
 
   @override
   String get feedbackConsentBody =>
-      'This creates a public ticket on our GitHub repository with your photo and the OCR text. No personal data (location, account id) is sent. Continue?';
+      'Tämä luo julkisen lipun GitHub-repositorioomme kuvasi ja OCR-tekstisi kanssa. Henkilötietoja (sijainti, tilin tunnus) ei lähetetä. Jatketaanko?';
 
   @override
-  String get feedbackConsentContinue => 'Continue';
+  String get feedbackConsentContinue => 'Jatka';
 
   @override
-  String get feedbackConsentCancel => 'Cancel';
+  String get feedbackConsentCancel => 'Peruuta';
 
   @override
-  String get feedbackConsentLater => 'Later';
+  String get feedbackConsentLater => 'Myöhemmin';
 
   @override
-  String get feedbackTokenSectionTitle => 'Bad-scan feedback (GitHub)';
+  String get feedbackTokenSectionTitle => 'Huono skannaus -palaute (GitHub)';
 
   @override
   String get feedbackTokenDescription =>
-      'To automatically open a GitHub ticket from a failed scan, paste a GitHub PAT (`public_repo` scope on the tankstellen repository). Otherwise manual sharing remains available.';
+      'Avataksesi GitHub-liput automaattisesti epäonnistuneista skannauksista, liitä GitHub PAT (`public_repo`-laajuus tankstellen-repositorioon). Muutoin manuaalinen jakaminen on edelleen käytettävissä.';
 
   @override
-  String get feedbackTokenStatusSet => 'Token configured';
+  String get feedbackTokenStatusSet => 'Token määritetty';
 
   @override
-  String get feedbackTokenStatusUnset => 'No token';
+  String get feedbackTokenStatusUnset => 'Ei tokenia';
 
   @override
-  String get feedbackTokenSet => 'Set';
+  String get feedbackTokenSet => 'Aseta';
 
   @override
-  String get feedbackTokenClear => 'Clear';
+  String get feedbackTokenClear => 'Poista';
 
   @override
   String get feedbackTokenDialogTitle => 'GitHub PAT';
 
   @override
-  String get feedbackTokenFieldLabel => 'Personal Access Token';
+  String get feedbackTokenFieldLabel => 'Henkilökohtainen pääsytoken';
 
   @override
-  String get fillUpReconciliationVerifiedBadgeLabel => 'Verified by adapter';
+  String get fillUpReconciliationVerifiedBadgeLabel => 'Sovittimen tarkistama';
 
   @override
   String get fillUpReconciliationVarianceDialogTitle =>
-      'Doesn\'t match adapter reading';
+      'Ei vastaa sovittimen lukemaa';
 
   @override
   String fillUpReconciliationVarianceDialogBody(String userL, String adapterL) {
-    return 'Your entry: $userL L. Adapter says: $adapterL L (delta from before/after fuel-level capture). Use adapter value?';
+    return 'Merkintäsi: $userL L. Sovitin sanoo: $adapterL L (delta ennen/jälkeen polttoainetason mittauksen). Käytetäänkö sovittimen arvoa?';
   }
 
   @override
-  String get fillUpReconciliationVarianceDialogKeepMine => 'Keep my entry';
+  String get fillUpReconciliationVarianceDialogKeepMine =>
+      'Pidä oma merkintäni';
 
   @override
   String get fillUpReconciliationVarianceDialogUseAdapter =>
-      'Use adapter value';
+      'Käytä sovittimen arvoa';
 
   @override
-  String get scanReceiptNoData => 'No receipt data found — try again';
+  String get scanReceiptNoData => 'Kuitista ei löydy tietoja — yritä uudelleen';
 
   @override
   String get scanReceiptSuccess =>
-      'Receipt scanned — verify values. Tap \"Report scan error\" below if anything is off.';
+      'Kuitti skannattu — tarkista arvot. Napauta alla \"Ilmoita skannauksesta\" jos jokin on pielessä.';
 
   @override
   String scanReceiptFailed(String error) {
-    return 'Scan failed: $error';
+    return 'Skannaus epäonnistui: $error';
   }
 
   @override
-  String get scanPumpUnreadable => 'Pump display not readable — try again';
+  String get scanPumpUnreadable =>
+      'Pumpun näyttöä ei voida lukea — yritä uudelleen';
 
   @override
-  String get scanPumpSuccess => 'Pump display scanned — verify the values.';
+  String get scanPumpSuccess => 'Pumpun näyttö skannattu — tarkista arvot.';
 
   @override
   String scanPumpFailed(String error) {
-    return 'Pump scan failed: $error';
+    return 'Pumpun skannaus epäonnistui: $error';
   }
 
   @override
-  String get badScanReportTitle => 'Report a scan error';
+  String get badScanReportTitle => 'Ilmoita skannauksesta';
 
   @override
-  String get badScanReportTitleReceipt => 'Report a scan error — Receipt';
+  String get badScanReportTitleReceipt => 'Ilmoita skannauksesta — Kuitti';
 
   @override
   String get badScanReportTitlePumpDisplay =>
-      'Report a scan error — Pump display';
+      'Ilmoita skannauksesta — Pumpun näyttö';
 
   @override
-  String get pumpScanFailureTitle => 'Display unreadable';
+  String get pumpScanFailureTitle => 'Näyttöä ei voida lukea';
 
   @override
   String get pumpScanFailureBody =>
-      'The scan couldn\'t read the pump display. What would you like to do?';
+      'Skannaus ei voinut lukea pumpun näyttöä. Mitä haluaisit tehdä?';
 
   @override
-  String get pumpScanFailureCorrectManually => 'Correct manually';
+  String get pumpScanFailureCorrectManually => 'Korjaa manuaalisesti';
 
   @override
-  String get pumpScanFailureReport => 'Report';
+  String get pumpScanFailureReport => 'Ilmoita';
 
   @override
-  String get pumpScanFailureRemove => 'Remove photo';
+  String get pumpScanFailureRemove => 'Poista kuva';
 
   @override
   String get badScanReportHint =>
-      'We\'ll share the receipt photo and both sets of values so the next build can learn this layout.';
+      'Jaamme kuitin kuvan ja molemmat arvojoukot, jotta seuraava versio voi oppia tämän asettelun.';
 
   @override
-  String get badScanReportShareAction => 'Share report + photo';
+  String get badScanReportShareAction => 'Jaa raportti + kuva';
 
   @override
-  String get badScanReportFieldBrandLayout => 'Brand layout';
+  String get badScanReportFieldBrandLayout => 'Merkin asettelu';
 
   @override
-  String get badScanReportFieldTotal => 'Total';
+  String get badScanReportFieldTotal => 'Yhteensä';
 
   @override
-  String get badScanReportFieldPricePerLiter => 'Price/L';
+  String get badScanReportFieldPricePerLiter => 'Hinta/L';
 
   @override
-  String get badScanReportFieldStation => 'Station';
+  String get badScanReportFieldStation => 'Asema';
 
   @override
-  String get badScanReportFieldFuel => 'Fuel';
+  String get badScanReportFieldFuel => 'Polttoaine';
 
   @override
-  String get badScanReportFieldDate => 'Date';
+  String get badScanReportFieldDate => 'Päivämäärä';
 
   @override
-  String get badScanReportHeaderField => 'Field';
+  String get badScanReportHeaderField => 'Kenttä';
 
   @override
-  String get badScanReportHeaderScanned => 'Scanned';
+  String get badScanReportHeaderScanned => 'Skannattu';
 
   @override
-  String get badScanReportHeaderYouTyped => 'You typed';
+  String get badScanReportHeaderYouTyped => 'Kirjoitit';
 
   @override
-  String get badScanReportCreateTicket => 'Create issue';
+  String get badScanReportCreateTicket => 'Luo ilmoitus';
 
   @override
-  String get badScanReportOpenInBrowser => 'Open in browser';
+  String get badScanReportOpenInBrowser => 'Avaa selaimessa';
 
   @override
-  String get badScanReportFallbackToShare => 'Submission failed — manual share';
+  String get badScanReportFallbackToShare =>
+      'Lähetys epäonnistui — manuaalinen jakaminen';
 
   @override
-  String get fillUpSectionWhatTitle => 'What you filled';
+  String get fillUpSectionWhatTitle => 'Mitä tankkasite';
 
   @override
-  String get fillUpSectionWhatSubtitle => 'Fuel, amount, price';
+  String get fillUpSectionWhatSubtitle => 'Polttoaine, määrä, hinta';
 
   @override
-  String get fillUpSectionWhereTitle => 'Where you were';
+  String get fillUpSectionWhereTitle => 'Missä olitte';
 
   @override
-  String get fillUpSectionWhereSubtitle => 'Station, odometer, notes';
+  String get fillUpSectionWhereSubtitle => 'Asema, matkamittari, muistiinpanot';
 
   @override
-  String get fillUpImportFromLabel => 'Import from…';
+  String get fillUpImportFromLabel => 'Tuo kohteesta…';
 
   @override
-  String get fillUpImportSheetTitle => 'Import fill-up data';
+  String get fillUpImportSheetTitle => 'Tuo tankkauksen tiedot';
 
   @override
-  String get fillUpImportReceiptLabel => 'Receipt';
+  String get fillUpImportReceiptLabel => 'Kuitti';
 
   @override
-  String get fillUpImportReceiptDescription =>
-      'Scan a paper receipt with the camera';
+  String get fillUpImportReceiptDescription => 'Skannaa paperikuitti kameralla';
 
   @override
-  String get fillUpImportPumpLabel => 'Pump display';
+  String get fillUpImportPumpLabel => 'Pumpun näyttö';
 
   @override
   String get fillUpImportPumpDescription =>
-      'Read Betrag / Preis from the pump LCD';
+      'Lue Betrag / Preis pumpun LCD-näytöltä';
 
   @override
-  String get fillUpImportObdLabel => 'OBD-II adapter';
+  String get fillUpImportObdLabel => 'OBD-II-sovitin';
 
   @override
   String get fillUpImportObdDescription =>
-      'Read odometer from the OBD-II port over Bluetooth';
+      'Lue matkamittari OBD-II-portista Bluetoothin kautta';
 
   @override
-  String get fillUpPricePerLiterLabel => 'Price per liter';
+  String get fillUpPricePerLiterLabel => 'Hinta litralta';
 
   @override
-  String get vehicleHeaderPlateLabel => 'Plate';
+  String get vehicleHeaderPlateLabel => 'Rekisteri';
 
   @override
-  String get vehicleHeaderUntitled => 'New vehicle';
+  String get vehicleHeaderUntitled => 'Uusi ajoneuvo';
 
   @override
-  String get vehicleSectionIdentityTitle => 'Identity';
+  String get vehicleSectionIdentityTitle => 'Tunnistetiedot';
 
   @override
-  String get vehicleSectionIdentitySubtitle => 'Name & VIN';
+  String get vehicleSectionIdentitySubtitle => 'Nimi ja VIN';
 
   @override
-  String get vehicleSectionDrivetrainTitle => 'Drivetrain';
+  String get vehicleSectionDrivetrainTitle => 'Voimansiirto';
 
   @override
-  String get vehicleSectionDrivetrainSubtitle => 'How this vehicle moves';
+  String get vehicleSectionDrivetrainSubtitle => 'Miten ajoneuvo liikkuu';
 
   @override
-  String get calibrationModeLabel => 'Calibration mode';
+  String get calibrationModeLabel => 'Kalibrointitapa';
 
   @override
-  String get calibrationModeRule => 'Rule-based';
+  String get calibrationModeRule => 'Sääntöpohjainen';
 
   @override
-  String get calibrationModeFuzzy => 'Fuzzy';
+  String get calibrationModeFuzzy => 'Sumea';
 
   @override
   String get calibrationModeTooltip =>
-      'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.';
+      'Sääntöpohjainen kohdistaa jokaisen ajonäytteen täsmälleen yhteen tilanteeseen. Sumea jakaa sen kaikkiin niiden sopivuuden mukaan — tasaisempi noin 60 km/h tai muuttuvissa gradienteissa, mutta täyttää kaikki ämpärit hitaammin.';
 
   @override
-  String get profileGamificationToggleTitle => 'Show achievements & scores';
+  String get profileGamificationToggleTitle => 'Näytä saavutukset ja pisteet';
 
   @override
   String get profileGamificationToggleSubtitle =>
-      'When off, badges, scores and trophy icons are hidden across the app.';
+      'Kun pois päältä, palkinnot, pisteet ja trofeekuvakkeet piilotetaan koko sovelluksesta.';
 
   @override
-  String get gpsDiagnosticsTitle => 'GPS sampling diagnostics';
+  String get gpsDiagnosticsTitle => 'GPS-näytteenoton diagnostiikka';
 
   @override
   String gpsDiagnosticsHeader(String count, String span, int gaps) {
     String _temp0 = intl.Intl.pluralLogic(
       gaps,
       locale: localeName,
-      other: '$gaps gaps',
-      one: '1 gap',
-      zero: 'no gaps',
+      other: '$gaps katkosta',
+      one: '1 katkos',
+      zero: 'ei katkoksia',
     );
-    return '$count samples · $span · $_temp0';
+    return '$count näytettä · $span · $_temp0';
   }
 
   @override
   String gpsDiagnosticsCadence(int ms) {
-    return 'Median interval: $ms ms';
+    return 'Mediaaniväli: $ms ms';
   }
 
   @override
   String get gpsDiagnosticsExplain =>
-      'Captured during recording to verify GPS cadence under phone-sleep.';
+      'Kerätty tallennuksen aikana GPS-tahdin tarkistamiseksi puhelimen nukkuessa.';
 
   @override
-  String get hapticEcoCoachSectionTitle => 'Driving';
+  String get hapticEcoCoachSectionTitle => 'Ajaminen';
 
   @override
-  String get hapticEcoCoachSettingTitle => 'Real-time eco coaching';
+  String get hapticEcoCoachSettingTitle => 'Reaaliaikainen eko-valmennus';
 
   @override
   String get hapticEcoCoachSettingSubtitle =>
-      'Gentle haptic + on-screen tip when you floor it during cruise';
+      'Kevyt haptiikka + näyttövinkki kun poljet kaasun pohjaan tasaajossa';
 
   @override
   String get hapticEcoCoachSnackBarMessage =>
-      'Easy on the throttle — coasting saves more';
+      'Pehmeästi kaasulla — liuku säästää enemmän';
 
   @override
-  String get anonKeyLabel => 'Anon Key';
+  String get anonKeyLabel => 'Anonyymi avain';
 
   @override
-  String get anonKeyHideTooltip => 'Hide key';
+  String get anonKeyHideTooltip => 'Piilota avain';
 
   @override
-  String get anonKeyShowTooltip => 'Show key to verify';
+  String get anonKeyShowTooltip => 'Näytä avain tarkistukseen';
 
   @override
   String anonKeyTooLong(int length) {
-    return 'Key is too long ($length chars) — check for extra text';
+    return 'Avain on liian pitkä ($length merkkiä) — tarkista ylimääräinen teksti';
   }
 
   @override
   String anonKeyLooksCorrect(int length) {
-    return 'Key looks correct ($length chars)';
+    return 'Avain näyttää oikealta ($length merkkiä)';
   }
 
   @override
   String get anonKeyShouldBeJwt =>
-      'Key should be a JWT (header.payload.signature)';
+      'Avaimen pitäisi olla JWT (otsikko.hyötykuorma.allekirjoitus)';
 
   @override
   String anonKeyMayBeTruncated(int length) {
-    return 'Key may be truncated ($length of ~208 expected chars)';
+    return 'Avain voi olla katkaistu ($length/~208 odotettua merkkiä)';
   }
 
   @override
-  String get anonKeyExceedsMax => 'Key exceeds maximum length';
+  String get anonKeyExceedsMax => 'Avain ylittää maksimipituuden';
 
   @override
-  String get qrShareTitle => 'Share your database';
+  String get qrShareTitle => 'Jaa tietokantasi';
 
   @override
-  String get qrShareSubtitle => 'Others can scan this QR code to connect';
+  String get qrShareSubtitle =>
+      'Muut voivat skannata tämän QR-koodin yhdistääkseen';
 
   @override
-  String get qrShareCopyAsText => 'Copy as text';
+  String get qrShareCopyAsText => 'Kopioi tekstinä';
 
   @override
-  String get authInfoTitle => 'Why create an account?';
+  String get authInfoTitle => 'Miksi luoda tili?';
 
   @override
   String get authInfoBenefit1 =>
-      '• Sync favorites, alerts, and saved routes across devices';
+      '• Synkronoi suosikit, hälytykset ja tallennetut reitit laitteiden välillä';
 
   @override
   String get authInfoBenefit2 =>
-      '• Prepare a route on your phone, use it in your car';
+      '• Suunnittele reitti puhelimella, käytä sitä autossasi';
 
   @override
-  String get authInfoBenefit3 => '• No data is shared with third parties';
+  String get authInfoBenefit3 => '• Tietoja ei jaeta kolmansille osapuolille';
 
   @override
-  String get authInfoBenefit4 => '• You can delete your account at any time';
+  String get authInfoBenefit4 => '• Voit poistaa tilisi milloin tahansa';
 
   @override
   String get privacyLocalDataEmpty =>
-      'Nothing stored yet. Add a favorite or set a price alert to see entries here.';
+      'Ei vielä tallennettua. Lisää suosikki tai aseta hintahälytys nähdäksesi merkinnät täällä.';
 
   @override
-  String get privacyHideEmptyRows => 'Hide empty rows';
+  String get privacyHideEmptyRows => 'Piilota tyhjät rivit';
 
   @override
   String privacyShowEmptyRows(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Show $count empty rows',
-      one: 'Show $count empty row',
+      other: 'Näytä $count tyhjää riviä',
+      one: 'Näytä $count tyhjä rivi',
     );
     return '$_temp0';
   }
 
   @override
-  String get apiKeySetupTitle => 'API key setup (optional)';
+  String get apiKeySetupTitle => 'API-avaimen asetukset (valinnainen)';
 
   @override
   String get apiKeySetupDescription =>
-      'Register for a free API key, or skip to explore the app with demo data.';
+      'Rekisteröidy ilmaiseksi API-avaimelle tai ohita ja tutustu sovellukseen esimerkkitiedoilla.';
 
   @override
   String apiKeyRegistrationButton(String provider) {
-    return '$provider Registration';
+    return '$provider-rekisteröinti';
   }
 
   @override
   String apiKeyTerms(String provider) {
-    return 'By entering an API key you accept the terms of $provider. Data redistribution is prohibited.';
+    return 'Antamalla API-avaimen hyväksyt $provider:n käyttöehdot. Tietojen uudelleenjakelu on kielletty.';
   }
 
   @override
-  String get calculatorDistanceHint => 'e.g. 150';
+  String get calculatorDistanceHint => 'esim. 150';
 
   @override
-  String get calculatorConsumptionHint => 'e.g. 7.0';
+  String get calculatorConsumptionHint => 'esim. 7,0';
 
   @override
-  String get calculatorPriceHint => 'e.g. 1.899';
+  String get calculatorPriceHint => 'esim. 1,899';
 
   @override
-  String get routeStrategyLabel => 'Strategy:';
+  String get routeStrategyLabel => 'Strategia:';
 
   @override
-  String get routeStrategyUniform => 'Uniform';
+  String get routeStrategyUniform => 'Yhtenäinen';
 
   @override
-  String get routeStrategyBalanced => 'Balanced';
+  String get routeStrategyBalanced => 'Tasapainoinen';
 
   @override
-  String get glideCoachBetaTitle => 'Glide-coach beta (experimental)';
+  String get glideCoachBetaTitle => 'Liukuluekovalmentaja beta (kokeellinen)';
 
   @override
   String get glideCoachBetaSubtitle =>
-      'Subtle haptic when slowing down ahead of a red light. Off by default — distraction risk.';
+      'Hienovarainen haptiikka jarrutettaessa punaisia valoja kohti. Oletuksena pois — hajautumisriski.';
 
   @override
-  String get consentSyncTripsTitle => 'Sync trip recordings';
+  String get consentSyncTripsTitle => 'Synkronoi matkatallenteet';
 
   @override
   String get consentSyncTripsSubtitle =>
-      'Back up OBD2 + GPS trips to TankSync. Cross-device, opt-in.';
+      'Varmuuskopioi OBD2- ja GPS-matkat TankSynciin. Laitteiden välinen, valinnainen.';
 
   @override
   String get consentSyncTripsDisabledHint =>
-      'Enable Cloud Sync above to back up trips.';
+      'Ota pilvisynkronointi käyttöön yllä varmuuskopioidaksesi matkat.';
 
   @override
-  String get consentHideDetails => 'Hide details';
+  String get consentHideDetails => 'Piilota tiedot';
 
   @override
-  String get consentShowDetails => 'Show details';
+  String get consentShowDetails => 'Näytä tiedot';
 
   @override
   String get dialogOk => 'OK';
 
   @override
-  String get invalidLinkTitle => 'Invalid link';
+  String get invalidLinkTitle => 'Virheellinen linkki';
 
   @override
   String invalidLinkBody(String path) {
-    return 'The link \"$path\" is not valid.';
+    return 'Linkki \"$path\" ei ole kelvollinen.';
   }
 
   @override
-  String get home => 'Home';
+  String get home => 'Etusivu';
 
   @override
-  String get loyaltySettingsTitle => 'Fuel club cards';
+  String get loyaltySettingsTitle => 'Polttoainekortit';
 
   @override
   String get loyaltySettingsSubtitle =>
-      'Apply your loyalty discount to displayed prices';
+      'Lisää kanta-asiakasalennuksesi näytettäviin hintoihin';
 
   @override
-  String get loyaltyMenuTitle => 'Fuel club cards';
+  String get loyaltyMenuTitle => 'Polttoainekortit';
 
   @override
   String get loyaltyMenuSubtitle =>
-      'Apply per-litre discounts from Total, Aral, Shell, …';
+      'Lisää litrahinta-alennukset Total, Aral, Shell, …';
 
   @override
-  String get loyaltyAddCard => 'Add card';
+  String get loyaltyAddCard => 'Lisää kortti';
 
   @override
-  String get loyaltyAddCardSheetTitle => 'Add fuel club card';
+  String get loyaltyAddCardSheetTitle => 'Lisää polttoainekortti';
 
   @override
-  String get loyaltyBrandLabel => 'Brand';
+  String get loyaltyBrandLabel => 'Merkki';
 
   @override
-  String get loyaltyCardLabelLabel => 'Label (optional)';
+  String get loyaltyCardLabelLabel => 'Nimike (valinnainen)';
 
   @override
-  String get loyaltyDiscountLabel => 'Discount (per litre)';
+  String get loyaltyDiscountLabel => 'Alennus (per litra)';
 
   @override
-  String get loyaltyDiscountInvalid => 'Enter a positive number';
+  String get loyaltyDiscountInvalid => 'Anna positiivinen luku';
 
   @override
-  String get loyaltyDeleteConfirmTitle => 'Delete card?';
+  String get loyaltyDeleteConfirmTitle => 'Poistetaanko kortti?';
 
   @override
   String get loyaltyDeleteConfirmBody =>
-      'This card will stop applying its discount.';
+      'Tämä kortti lopettaa alennuksen soveltamisen.';
 
   @override
-  String get loyaltyEmptyTitle => 'No fuel club cards yet';
+  String get loyaltyEmptyTitle => 'Ei vielä polttoainekortteja';
 
   @override
   String get loyaltyEmptyBody =>
-      'Add a card to apply your per-litre discount to matching stations automatically.';
+      'Lisää kortti soveltaaksesi litrahinta-alennustasi vastaaviin asemiin automaattisesti.';
 
   @override
   String get loyaltyBadgePrefix => '−';
 
   @override
-  String get maintenanceSignalIdleRpmCreepTitle => 'Idle RPM creep detected';
+  String get maintenanceSignalIdleRpmCreepTitle =>
+      'Tyhjäkäynti-RPM-nousu havaittu';
 
   @override
   String maintenanceSignalIdleRpmCreepBody(String percent, int tripCount) {
-    return 'Idle RPM has crept up by $percent% over your last $tripCount trips. Possible early sign of a clogged air filter or sensor drift.';
+    return 'Tyhjäkäynti-RPM on noussut $percent% viimeisten $tripCount matkan aikana. Mahdollinen varhainen merkki tukkeutuneesta ilmansuodattimesta tai anturin ajautumisesta.';
   }
 
   @override
-  String get maintenanceSignalMafDeviationTitle =>
-      'Possible intake restriction';
+  String get maintenanceSignalMafDeviationTitle => 'Mahdollinen imurajoitus';
 
   @override
   String maintenanceSignalMafDeviationBody(String percent, int tripCount) {
-    return 'Cruise fuel rate has dropped by $percent% over your last $tripCount trips. Possible sign of a clogged air filter or restricted intake — worth a check-up.';
+    return 'Tasainen polttoaineen kulutus on laskenut $percent% viimeisten $tripCount matkan aikana. Mahdollinen merkki tukkeutuneesta ilmansuodattimesta tai rajoittuneesta imusta — kannattaa tarkistaa.';
   }
 
   @override
-  String get maintenanceActionDismiss => 'Dismiss';
+  String get maintenanceActionDismiss => 'Sulje';
 
   @override
-  String get maintenanceActionSnooze => 'Snooze 30 days';
+  String get maintenanceActionSnooze => 'Lykkää 30 päivää';
 
   @override
-  String get consumptionMonthlyInsightsTitle => 'This month vs last month';
+  String get consumptionMonthlyInsightsTitle =>
+      'Tämä kuukausi vs. viime kuukausi';
 
   @override
-  String get consumptionMonthlyTripsLabel => 'Trips';
+  String get consumptionMonthlyTripsLabel => 'Matkat';
 
   @override
-  String get consumptionMonthlyDriveTimeLabel => 'Drive time';
+  String get consumptionMonthlyDriveTimeLabel => 'Ajoaika';
 
   @override
-  String get consumptionMonthlyDistanceLabel => 'Distance';
+  String get consumptionMonthlyDistanceLabel => 'Etäisyys';
 
   @override
-  String get consumptionMonthlyAvgConsumptionLabel => 'Avg consumption';
+  String get consumptionMonthlyAvgConsumptionLabel => 'Keskim. kulutus';
 
   @override
   String get consumptionMonthlyComparisonNotReliable =>
-      'Need at least 3 trips per month for comparison';
+      'Vertailuun tarvitaan vähintään 3 matkaa kuukaudessa';
 
   @override
-  String get obd2CapabilitySectionTitle => 'Adapter capabilities';
+  String get obd2CapabilitySectionTitle => 'Sovittimen ominaisuudet';
 
   @override
-  String get obd2CapabilityStandardOnly => 'Standard';
+  String get obd2CapabilityStandardOnly => 'Standardi';
 
   @override
-  String get obd2CapabilityOemPids => 'OEM PIDs';
+  String get obd2CapabilityOemPids => 'OEM-PID:t';
 
   @override
-  String get obd2CapabilityFullCan => 'Full CAN';
+  String get obd2CapabilityFullCan => 'Täysi CAN';
 
   @override
   String get obd2CapabilityUpgradeHintStandard =>
-      'For exact litres-in-tank on Peugeot/Citroën, the app supports OBDLink MX+/LX/CX (STN chip).';
+      'Peugeot/Citroën-mallien tarkkaan litramäärään tankissa sovellus tukee OBDLink MX+/LX/CX (STN-siru).';
 
   @override
-  String get obd2DebugOverlayEnabledSnack => 'OBD2 diagnostic overlay enabled';
+  String get obd2DebugOverlayEnabledSnack =>
+      'OBD2-diagnostiikkanäyttö käytössä';
 
   @override
   String get obd2DebugOverlayDisabledSnack =>
-      'OBD2 diagnostic overlay disabled';
+      'OBD2-diagnostiikkanäyttö pois käytöstä';
 
   @override
-  String get obd2DebugOverlayClearButton => 'Clear';
+  String get obd2DebugOverlayClearButton => 'Tyhjennä';
 
   @override
-  String get obd2DebugOverlayCloseButton => 'Close';
+  String get obd2DebugOverlayCloseButton => 'Sulje';
 
   @override
-  String get obd2DebugOverlayTitle => 'OBD2 breadcrumbs';
+  String get obd2DebugOverlayTitle => 'OBD2-jäljet';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {
-    return 'Couldn\'t reach \'$adapterName\' — pick another adapter';
+    return 'Ei voitu tavoittaa \'$adapterName\' — valitse toinen sovitin';
   }
 
   @override
-  String get onboardingObd2StepTitle => 'Connect your OBD2 adapter';
+  String get onboardingObd2StepTitle => 'Yhdistä OBD2-sovitin';
 
   @override
   String get onboardingObd2StepBody =>
-      'Plug your OBD2 adapter into the car\'s port and turn the ignition on. We\'ll read the VIN and fill in engine details for you.';
+      'Kytke OBD2-sovitin auton porttiin ja käynnistä sytytin. Luemme VIN-koodin ja täytämme moottorin tiedot puolestasi.';
 
   @override
-  String get onboardingObd2ConnectButton => 'Connect adapter';
+  String get onboardingObd2ConnectButton => 'Yhdistä sovitin';
 
   @override
-  String get onboardingObd2SkipButton => 'Maybe later';
+  String get onboardingObd2SkipButton => 'Ehkä myöhemmin';
 
   @override
-  String get onboardingObd2ReadingVin => 'Reading VIN…';
+  String get onboardingObd2ReadingVin => 'Luetaan VIN-koodia…';
 
   @override
   String get onboardingObd2VinReadFailed =>
-      'Couldn\'t read VIN — enter manually';
+      'VIN-koodia ei voitu lukea — syötä manuaalisesti';
 
   @override
   String get onboardingObd2ConnectFailed =>
-      'Couldn\'t connect to the adapter. You can retry or skip.';
+      'Sovittimeen ei saatu yhteyttä. Voit yrittää uudelleen tai ohittaa.';
 
   @override
-  String get onboardingPickUseMode => 'Pick a use mode to continue.';
+  String get onboardingPickUseMode => 'Valitse käyttötapa jatkaaksesi.';
 
   @override
-  String get alertsRadiusFrequencyLabel => 'Check frequency';
+  String get alertsRadiusFrequencyLabel => 'Tarkistustiheys';
 
   @override
-  String get alertsRadiusFrequencyDaily => 'Once a day';
+  String get alertsRadiusFrequencyDaily => 'Kerran päivässä';
 
   @override
-  String get alertsRadiusFrequencyTwiceDaily => 'Twice a day';
+  String get alertsRadiusFrequencyTwiceDaily => 'Kaksi kertaa päivässä';
 
   @override
-  String get alertsRadiusFrequencyThriceDaily => 'Three times a day';
+  String get alertsRadiusFrequencyThriceDaily => 'Kolme kertaa päivässä';
 
   @override
-  String get alertsRadiusFrequencyFourTimesDaily => 'Four times a day';
+  String get alertsRadiusFrequencyFourTimesDaily => 'Neljä kertaa päivässä';
 
   @override
-  String get radiusAlertPickOnMap => 'Pick on map';
+  String get radiusAlertPickOnMap => 'Valitse kartalta';
 
   @override
-  String get radiusAlertMapPickerTitle => 'Pick alert center';
+  String get radiusAlertMapPickerTitle => 'Valitse hälytyksen keskipiste';
 
   @override
-  String get radiusAlertMapPickerConfirm => 'Confirm';
+  String get radiusAlertMapPickerConfirm => 'Vahvista';
 
   @override
-  String get radiusAlertMapPickerCancel => 'Cancel';
+  String get radiusAlertMapPickerCancel => 'Peruuta';
 
   @override
   String get radiusAlertMapPickerHint =>
-      'Drag the map to position the alert center';
+      'Vedä karttaa asettaaksesi hälytyksen keskipiste';
 
   @override
-  String get radiusAlertCenterFromMap => 'Map location';
+  String get radiusAlertCenterFromMap => 'Karttasijainti';
 
   @override
   String radiusAlertNotificationTitle(String fuelLabel, String label) {
-    return '$fuelLabel near $label';
+    return '$fuelLabel lähellä $label';
   }
 
   @override
   String radiusAlertNotificationBody(String price, String threshold) {
-    return 'A station is at $price € (target: $threshold €)';
+    return 'Asema on hintaan $price € (tavoite: $threshold €)';
   }
 
   @override
@@ -4616,49 +4635,49 @@ class AppLocalizationsFi extends AppLocalizations {
   String get refuelUnitPerKwh => '/kWh';
 
   @override
-  String get refuelUnitPerSession => '/session';
+  String get refuelUnitPerSession => '/lataus';
 
   @override
-  String get speedConsumptionCardTitle => 'Consumption by speed';
+  String get speedConsumptionCardTitle => 'Kulutus nopeuden mukaan';
 
   @override
-  String get speedBandIdleJam => 'Idle / jam';
+  String get speedBandIdleJam => 'Tyhjäkäynti / ruuhka';
 
   @override
-  String get speedBandUrban => 'Urban (10–50)';
+  String get speedBandUrban => 'Kaupunki (10–50)';
 
   @override
-  String get speedBandSuburban => 'Suburban (50–80)';
+  String get speedBandSuburban => 'Esikaupunki (50–80)';
 
   @override
-  String get speedBandRural => 'Rural (80–100)';
+  String get speedBandRural => 'Maaseutu (80–100)';
 
   @override
-  String get speedBandMotorwaySlow => 'Eco-cruise (100–115)';
+  String get speedBandMotorwaySlow => 'Ekokruising (100–115)';
 
   @override
-  String get speedBandMotorway => 'Motorway (115–130)';
+  String get speedBandMotorway => 'Moottoritie (115–130)';
 
   @override
-  String get speedBandMotorwayFast => 'Motorway fast (130+)';
+  String get speedBandMotorwayFast => 'Moottoritie nopea (130+)';
 
   @override
   String get speedConsumptionInsufficientData =>
-      'Record 30+ minutes of trips with the OBD2 adapter to unlock the speed/consumption analysis.';
+      'Tallenna yli 30 minuutin matkat OBD2-sovittimella avataksesi nopeus/kulutus-analyysin.';
 
   @override
   String speedConsumptionTimeShare(int percent) {
-    return '$percent % of driving';
+    return '$percent % ajosta';
   }
 
   @override
-  String get speedConsumptionNeedMoreData => 'Need more data';
+  String get speedConsumptionNeedMoreData => 'Tarvitaan lisää tietoja';
 
   @override
-  String get splashLoadingLabel => 'Loading Sparkilo';
+  String get splashLoadingLabel => 'Ladataan Sparkilo';
 
   @override
-  String get tankLevelTitle => 'Tank level';
+  String get tankLevelTitle => 'Tankin taso';
 
   @override
   String tankLevelLitersFormat(String litres) {
@@ -4667,115 +4686,117 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String tankLevelRangeFormat(String kilometres) {
-    return '≈ $kilometres km of range';
+    return '≈ $kilometres km kantama';
   }
 
   @override
   String tankLevelLastFillUpFormat(String date, String count) {
-    return 'Last fill-up: $date · $count trip(s) since';
+    return 'Viimeisin tankkaus: $date · $count matka(a) sen jälkeen';
   }
 
   @override
-  String get tankLevelMethodObd2 => 'OBD2 measured';
+  String get tankLevelMethodObd2 => 'OBD2-mitattu';
 
   @override
-  String get tankLevelMethodDistanceFallback => 'distance-based estimate';
+  String get tankLevelMethodDistanceFallback => 'etäisyyspohjainen arvio';
 
   @override
-  String get tankLevelMethodMixed => 'mixed measurement';
+  String get tankLevelMethodMixed => 'yhdistelmämittaus';
 
   @override
-  String get tankLevelEmptyNoFillUp => 'Log a fill-up to see your tank level';
+  String get tankLevelEmptyNoFillUp =>
+      'Kirjaa tankkaus nähdäksesi tankin tason';
 
   @override
-  String get tankLevelDetailSheetTitle => 'Trips since last fill-up';
+  String get tankLevelDetailSheetTitle =>
+      'Matkat viimeisen tankkauksen jälkeen';
 
   @override
-  String get addFillUpIsFullTankLabel => 'Full tank';
+  String get addFillUpIsFullTankLabel => 'Täysi tankki';
 
   @override
   String get addFillUpIsFullTankSubtitle =>
-      'Tank filled to the brim — uncheck if this was a partial fill';
+      'Tankki täytetty laitaan — poista valinta jos kyseessä oli osittainen tankkaus';
 
   @override
-  String get themeCardTitle => 'Theme';
+  String get themeCardTitle => 'Teema';
 
   @override
-  String get themeCardSubtitleSystem => 'System';
+  String get themeCardSubtitleSystem => 'Järjestelmä';
 
   @override
-  String get themeCardSubtitleLight => 'Light';
+  String get themeCardSubtitleLight => 'Vaalea';
 
   @override
-  String get themeCardSubtitleDark => 'Dark';
+  String get themeCardSubtitleDark => 'Tumma';
 
   @override
-  String get themeSettingsScreenTitle => 'Theme';
+  String get themeSettingsScreenTitle => 'Teema';
 
   @override
-  String get themeSettingsSystemLabel => 'Follow system';
+  String get themeSettingsSystemLabel => 'Seuraa järjestelmää';
 
   @override
-  String get themeSettingsLightLabel => 'Light';
+  String get themeSettingsLightLabel => 'Vaalea';
 
   @override
-  String get themeSettingsDarkLabel => 'Dark';
+  String get themeSettingsDarkLabel => 'Tumma';
 
   @override
   String get themeSettingsSystemDescription =>
-      'Match the current device appearance.';
+      'Seuraa laitteen nykyistä ulkoasua.';
 
   @override
   String get themeSettingsLightDescription =>
-      'Bright backgrounds — best for daytime use.';
+      'Vaaleat taustat — parhaimmillaan päiväkäytössä.';
 
   @override
   String get themeSettingsDarkDescription =>
-      'Dark backgrounds — easier on the eyes at night and saves battery on OLED screens.';
+      'Tummat taustat — helpompi silmille yöllä ja säästää akkua OLED-näytöillä.';
 
   @override
-  String get themeSettingsEcoLabel => 'Eco';
+  String get themeSettingsEcoLabel => 'Eko';
 
   @override
   String get themeSettingsEcoDescription =>
-      'The app\'s signature green look — bright and easy to read, with softly green-tinted backgrounds.';
+      'Sovelluksen tunnusomainen vihreä ilme — kirkas ja helppolukuinen, pehmeästi vihersävytteiset taustat.';
 
   @override
-  String get throttleRpmHistogramTitle => 'How you used the engine';
+  String get throttleRpmHistogramTitle => 'Miten käytit moottoria';
 
   @override
-  String get throttleRpmHistogramThrottleSection => 'Throttle position';
+  String get throttleRpmHistogramThrottleSection => 'Kaasupoljinasento';
 
   @override
-  String get throttleRpmHistogramRpmSection => 'Engine RPM';
+  String get throttleRpmHistogramRpmSection => 'Moottorin RPM';
 
   @override
-  String get throttleRpmHistogramThrottleCoast => 'Coast (0–25%)';
+  String get throttleRpmHistogramThrottleCoast => 'Liuku (0–25%)';
 
   @override
-  String get throttleRpmHistogramThrottleLight => 'Light (25–50%)';
+  String get throttleRpmHistogramThrottleLight => 'Kevyt (25–50%)';
 
   @override
-  String get throttleRpmHistogramThrottleFirm => 'Firm (50–75%)';
+  String get throttleRpmHistogramThrottleFirm => 'Luja (50–75%)';
 
   @override
-  String get throttleRpmHistogramThrottleWide => 'Wide-open (75–100%)';
+  String get throttleRpmHistogramThrottleWide => 'Täysauki (75–100%)';
 
   @override
-  String get throttleRpmHistogramRpmIdle => 'Idle (≤900)';
+  String get throttleRpmHistogramRpmIdle => 'Tyhjäkäynti (≤900)';
 
   @override
-  String get throttleRpmHistogramRpmCruise => 'Cruise (901–2000)';
+  String get throttleRpmHistogramRpmCruise => 'Kruising (901–2000)';
 
   @override
-  String get throttleRpmHistogramRpmSpirited => 'Spirited (2001–3000)';
+  String get throttleRpmHistogramRpmSpirited => 'Voimakas (2001–3000)';
 
   @override
-  String get throttleRpmHistogramRpmHard => 'Hard (>3000)';
+  String get throttleRpmHistogramRpmHard => 'Kova (>3000)';
 
   @override
   String get throttleRpmHistogramEmpty =>
-      'No throttle or RPM samples in this trip.';
+      'Ei kaasupoljin- tai RPM-näytteitä tällä matkalla.';
 
   @override
   String throttleRpmHistogramBarShare(String pct) {
@@ -4783,30 +4804,31 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
-  String get trajetsTabLabel => 'Trips';
+  String get trajetsTabLabel => 'Matkat';
 
   @override
-  String get trajetsStartRecordingButton => 'Start recording';
+  String get trajetsStartRecordingButton => 'Aloita tallennus';
 
   @override
-  String get trajetsResumeRecordingButton => 'Resume recording';
+  String get trajetsResumeRecordingButton => 'Jatka tallennusta';
 
   @override
   String get tripStartProgressConnectingAdapter =>
-      'Connecting to OBD2 adapter…';
+      'Yhdistetään OBD2-sovittimeen…';
 
   @override
-  String get tripStartProgressReadingVehicleData => 'Reading vehicle data…';
+  String get tripStartProgressReadingVehicleData =>
+      'Luetaan ajoneuvon tietoja…';
 
   @override
-  String get tripStartProgressStartingRecording => 'Starting recording…';
+  String get tripStartProgressStartingRecording => 'Aloitetaan tallennus…';
 
   @override
-  String get trajetsEmptyStateTitle => 'No trips yet';
+  String get trajetsEmptyStateTitle => 'Ei vielä matkoja';
 
   @override
   String get trajetsEmptyStateBody =>
-      'Tap Start recording to begin logging your drives.';
+      'Napauta Aloita tallennus aloittaaksesi ajojen kirjaamisen.';
 
   @override
   String trajetsRowDistance(String km) {
@@ -4824,339 +4846,339 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
-  String get trajetDetailSummaryTitle => 'Summary';
+  String get trajetDetailSummaryTitle => 'Yhteenveto';
 
   @override
-  String get trajetDetailFieldDate => 'Date';
+  String get trajetDetailFieldDate => 'Päivämäärä';
 
   @override
-  String get trajetDetailFieldVehicle => 'Vehicle';
+  String get trajetDetailFieldVehicle => 'Ajoneuvo';
 
   @override
-  String get trajetDetailFieldAdapter => 'OBD2 adapter';
+  String get trajetDetailFieldAdapter => 'OBD2-sovitin';
 
   @override
-  String get trajetDetailFieldDistance => 'Distance';
+  String get trajetDetailFieldDistance => 'Etäisyys';
 
   @override
-  String get trajetDetailFieldDuration => 'Duration';
+  String get trajetDetailFieldDuration => 'Kesto';
 
   @override
-  String get trajetDetailFieldAvgConsumption => 'Avg consumption';
+  String get trajetDetailFieldAvgConsumption => 'Keskim. kulutus';
 
   @override
-  String get trajetDetailFieldFuelUsed => 'Fuel used';
+  String get trajetDetailFieldFuelUsed => 'Polttoainetta käytetty';
 
   @override
-  String get trajetDetailFieldFuelCost => 'Fuel cost';
+  String get trajetDetailFieldFuelCost => 'Polttoainekustannus';
 
   @override
-  String get trajetDetailFieldAvgSpeed => 'Avg speed';
+  String get trajetDetailFieldAvgSpeed => 'Keskim. nopeus';
 
   @override
-  String get trajetDetailFieldMaxSpeed => 'Max speed';
+  String get trajetDetailFieldMaxSpeed => 'Maks. nopeus';
 
   @override
   String get trajetDetailFieldValueUnknown => '—';
 
   @override
-  String get trajetDetailChartSpeed => 'Speed (km/h)';
+  String get trajetDetailChartSpeed => 'Nopeus (km/h)';
 
   @override
-  String get trajetDetailChartFuelRate => 'Fuel rate (L/h)';
+  String get trajetDetailChartFuelRate => 'Polttoaineen kulutus (L/h)';
 
   @override
   String get trajetDetailChartRpm => 'RPM';
 
   @override
-  String get trajetDetailChartEngineLoad => 'Engine load (%)';
+  String get trajetDetailChartEngineLoad => 'Moottorin kuorma (%)';
 
   @override
-  String get trajetsRowColdStartChip => 'Cold start';
+  String get trajetsRowColdStartChip => 'Kylmäkäynnistys';
 
   @override
   String get trajetsRowColdStartTooltip =>
-      'Engine didn\'t reach operating temperature during this trip — fuel consumption was higher than usual.';
+      'Moottori ei saavuttanut käyntölämpöä tällä matkalla — polttoaineen kulutus oli tavallista suurempi.';
 
   @override
-  String get trajetDetailChartEmpty => 'No samples recorded';
+  String get trajetDetailChartEmpty => 'Ei tallennettuja näytteitä';
 
   @override
-  String get trajetDetailShareAction => 'Share';
+  String get trajetDetailShareAction => 'Jaa';
 
   @override
   String trajetDetailShareSubject(String date) {
-    return 'Sparkilo — trip on $date';
+    return 'Sparkilo — matka $date';
   }
 
   @override
-  String get trajetDetailShareError => 'Couldn\'t generate share image';
+  String get trajetDetailShareError => 'Jaettavan kuvan luominen epäonnistui';
 
   @override
-  String get trajetDetailDeleteAction => 'Delete';
+  String get trajetDetailDeleteAction => 'Poista';
 
   @override
-  String get trajetDetailDeleteConfirmTitle => 'Delete this trip?';
+  String get trajetDetailDeleteConfirmTitle => 'Poistetaanko tämä matka?';
 
   @override
   String get trajetDetailDeleteConfirmBody =>
-      'This trip will be permanently removed from your history.';
+      'Tämä matka poistetaan pysyvästi historiastasi.';
 
   @override
-  String get trajetDetailDeleteConfirmCancel => 'Cancel';
+  String get trajetDetailDeleteConfirmCancel => 'Peruuta';
 
   @override
-  String get trajetDetailDeleteConfirmConfirm => 'Delete';
+  String get trajetDetailDeleteConfirmConfirm => 'Poista';
 
   @override
   String get tripRecordingObd2NotResponding =>
-      'OBD2 adapter connected but not returning data. Try a different adapter or check the vehicle\'s diagnostic protocol.';
+      'OBD2-sovitin yhdistetty mutta ei palauta tietoja. Kokeile toista sovitinta tai tarkista ajoneuvon diagnostiikkaprotokolla.';
 
   @override
-  String get tripLengthCardTitle => 'Consumption by trip length';
+  String get tripLengthCardTitle => 'Kulutus matkan pituuden mukaan';
 
   @override
-  String get tripLengthBucketShort => 'Short (<5 km)';
+  String get tripLengthBucketShort => 'Lyhyt (<5 km)';
 
   @override
-  String get tripLengthBucketMedium => 'Medium (5–25 km)';
+  String get tripLengthBucketMedium => 'Keski (5–25 km)';
 
   @override
-  String get tripLengthBucketLong => 'Long (>25 km)';
+  String get tripLengthBucketLong => 'Pitkä (>25 km)';
 
   @override
-  String get tripLengthBucketNeedMoreData => 'Need more data';
+  String get tripLengthBucketNeedMoreData => 'Tarvitaan lisää tietoja';
 
   @override
   String tripLengthBucketTripCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count trips',
-      one: '1 trip',
-      zero: 'no trips',
+      other: '$count matkaa',
+      one: '1 matka',
+      zero: 'ei matkoja',
     );
     return '$_temp0';
   }
 
   @override
-  String get tripPathCardTitle => 'Trip path';
+  String get tripPathCardTitle => 'Matkapolku';
 
   @override
-  String get tripPathCardSubtitle => 'GPS-recorded route';
+  String get tripPathCardSubtitle => 'GPS-tallennettu reitti';
 
   @override
-  String get tripPathLegendTitle => 'Consumption';
+  String get tripPathLegendTitle => 'Kulutus';
 
   @override
-  String get tripPathLegendEfficient => 'Efficient (< 6 L/100km)';
+  String get tripPathLegendEfficient => 'Tehokas (< 6 L/100km)';
 
   @override
-  String get tripPathLegendBorderline => 'Borderline (6–10 L/100km)';
+  String get tripPathLegendBorderline => 'Rajoilla (6–10 L/100km)';
 
   @override
-  String get tripPathLegendWasteful => 'Wasteful (≥ 10 L/100km)';
+  String get tripPathLegendWasteful => 'Tuhlaava (≥ 10 L/100km)';
 
   @override
   String get tripRecordingPinTooltip =>
-      'Pinning keeps the screen on — uses more battery';
+      'Kiinnittäminen pitää näytön päällä — kuluttaa enemmän akkua';
 
   @override
-  String get tripRecordingPinSemanticOn => 'Unpin recording form';
+  String get tripRecordingPinSemanticOn => 'Irrota tallennuslomake';
 
   @override
-  String get tripRecordingPinSemanticOff => 'Pin recording form';
+  String get tripRecordingPinSemanticOff => 'Kiinnitä tallennuslomake';
 
   @override
-  String get tripRecordingPinHelpTooltip => 'What does pin do?';
+  String get tripRecordingPinHelpTooltip => 'Mitä kiinnittäminen tekee?';
 
   @override
-  String get tripRecordingPinHelpTitle => 'About pin';
+  String get tripRecordingPinHelpTitle => 'Tietoa kiinnittämisestä';
 
   @override
   String get tripRecordingPinHelpBody =>
-      'Pin keeps the screen on and hides system bars so the form stays readable on a dashboard mount. Tap again to release. Auto-releases when the trip stops.';
+      'Kiinnittäminen pitää näytön päällä ja piilottaa järjestelmäpalkit jotta lomake pysyy luettavana kojelauta-asennuksessa. Napauta uudelleen vapauttaaksesi. Vapautuu automaattisesti matkan päättyessä.';
 
   @override
   String get tripRecordingResumeHintMessage =>
-      'Recording continues in the background. Tap the red banner at the top of any screen to return.';
+      'Tallennus jatkuu taustalla. Napauta yläosan punaista banneria millä tahansa näytöllä palataksesi.';
 
   @override
   String get tripBannerOpenFromConsumptionTab =>
-      'Open the active trip from the Conso tab';
+      'Avaa aktiivinen matka Kulutus-välilehdeltä';
 
   @override
   String get tripRecordingUnpinnedWarning =>
-      'Pin the screen to keep GPS active during the trip — Android may throttle GPS during sleep.';
+      'Kiinnitä näyttö pitääksesi GPS aktiivisena matkan aikana — Android voi rajoittaa GPS:ää nukkuessa.';
 
   @override
-  String get unifiedFilterFuel => 'Fuel';
+  String get unifiedFilterFuel => 'Polttoaine';
 
   @override
-  String get unifiedFilterEv => 'EV';
+  String get unifiedFilterEv => 'Sähköauto';
 
   @override
-  String get unifiedFilterBoth => 'Both';
+  String get unifiedFilterBoth => 'Molemmat';
 
   @override
-  String get unifiedNoResultsForFilter => 'No results match this filter';
+  String get unifiedNoResultsForFilter => 'Ei tuloksia tälle suodattimelle';
 
   @override
-  String get searchFailedSnackbar => 'Search failed — please try again';
+  String get searchFailedSnackbar => 'Haku epäonnistui — yritä uudelleen';
 
   @override
-  String get vinLabel => 'VIN (optional)';
+  String get vinLabel => 'VIN (valinnainen)';
 
   @override
-  String get vinDecodeTooltip => 'Decode VIN';
+  String get vinDecodeTooltip => 'Pura VIN-koodi';
 
   @override
-  String get vinConfirmAction => 'Yes, auto-fill';
+  String get vinConfirmAction => 'Kyllä, esitäytä';
 
   @override
-  String get vinModifyAction => 'Modify manually';
+  String get vinModifyAction => 'Muokkaa manuaalisesti';
 
   @override
-  String get veResetAction => 'Reset volumetric efficiency';
+  String get veResetAction => 'Nollaa tilavuushyötysuhde';
 
   @override
-  String get vehicleReadVinFromCarButton => 'Read VIN from car';
+  String get vehicleReadVinFromCarButton => 'Lue VIN autosta';
 
   @override
   String get vehicleReadVinFromCarTooltip =>
-      'Read VIN from the paired OBD2 adapter';
+      'Lue VIN paritetulta OBD2-sovittimelta';
 
   @override
   String get vehicleReadVinFailedUnsupportedSnackbar =>
-      'VIN not available (Mode 09 PID 02 unsupported on pre-2005 vehicles)';
+      'VIN ei saatavilla (Mode 09 PID 02 ei tuettu ennen 2005 ajoneuvoja)';
 
   @override
   String get vehicleReadVinFailedGenericSnackbar =>
-      'VIN read failed — please enter manually';
+      'VIN-lukeminen epäonnistui — syötä manuaalisesti';
 
   @override
   String get vehicleReadVinNoAdapterHint =>
-      'Pair an OBD2 adapter first to read VIN automatically';
+      'Paritetaan ensin OBD2-sovitin lukeaksesi VIN:n automaattisesti';
 
   @override
-  String get pickerButtonLabel => 'Pick from catalog';
+  String get pickerButtonLabel => 'Valitse katalogista';
 
   @override
-  String get pickerSearchHint => 'Search make or model';
+  String get pickerSearchHint => 'Hae merkkiä tai mallia';
 
   @override
-  String get pickerHelpText => 'Pre-fill from 50+ supported vehicles';
+  String get pickerHelpText => 'Esitäytä yli 50 tuetulta ajoneuvolta';
 
   @override
-  String get pickerEmptyResults => 'No matches';
+  String get pickerEmptyResults => 'Ei osumia';
 
   @override
-  String get pickerCancel => 'Cancel';
+  String get pickerCancel => 'Peruuta';
 
   @override
-  String get pickerLoading => 'Loading catalog…';
+  String get pickerLoading => 'Ladataan katalogi…';
 
   @override
-  String get vinInfoTooltip => 'What is a VIN?';
+  String get vinInfoTooltip => 'Mikä on VIN?';
 
   @override
-  String get vinInfoSectionWhatTitle => 'What is a VIN?';
+  String get vinInfoSectionWhatTitle => 'Mikä on VIN?';
 
   @override
   String get vinInfoSectionWhatBody =>
-      'The Vehicle Identification Number is a 17-character code unique to your car. It\'s stamped on the chassis and printed on your vehicle registration document.';
+      'Ajoneuvon tunnistenumero on 17-merkkinen koodi, joka on yksilöllinen autollesi. Se on leimattu alustaan ja tulostettu ajoneuvon rekisteröintiasiakirjaan.';
 
   @override
-  String get vinInfoSectionWhyTitle => 'Why we ask';
+  String get vinInfoSectionWhyTitle => 'Miksi kysymme';
 
   @override
   String get vinInfoSectionWhyBody =>
-      'Decoding the VIN auto-fills engine displacement, cylinder count, model year, primary fuel type, and gross weight — saving you from looking up technical specs manually. The OBD2 fuel-rate calculation uses these values to give you accurate consumption numbers.';
+      'VIN-koodin purkaminen täyttää automaattisesti moottorin tilavuuden, sylinteriluvun, mallivuoden, pääpolttoainetyypin ja kokonaismassan — säästäen sinut teknisten tietojen manuaaliselta etsimiseltä. OBD2-polttoaineen kulutuksen laskenta käyttää näitä arvoja tarkan kulutuksen laskemiseksi.';
 
   @override
-  String get vinInfoSectionPrivacyTitle => 'Privacy';
+  String get vinInfoSectionPrivacyTitle => 'Tietosuoja';
 
   @override
   String get vinInfoSectionPrivacyBody =>
-      'Your VIN is stored only locally in the app\'s encrypted storage — it\'s never uploaded to Sparkilo servers. The NHTSA vPIC database is queried with the VIN but returns only anonymous technical specs; NHTSA does not link the VIN to any personal data. Without network, an offline lookup returns manufacturer and country only.';
+      'VIN-koodisi tallennetaan vain paikallisesti sovelluksen salatussa tallennustilassa — sitä ei koskaan ladata Sparkilo-palvelimille. NHTSA vPIC -tietokantaan tehdään kysely VIN:llä mutta se palauttaa vain anonyymiä teknistä tietoa; NHTSA ei yhdistä VIN-koodia henkilötietoihin. Ilman verkkoyhteyttä offline-haku palauttaa vain valmistajan ja maan.';
 
   @override
-  String get vinInfoSectionWhereTitle => 'Where to find it';
+  String get vinInfoSectionWhereTitle => 'Mistä löydät sen';
 
   @override
   String get vinInfoSectionWhereBody =>
-      'Look through the windshield at the lower-left corner on the driver\'s side, check the driver-side door-frame sticker when the door is open, or read it off your vehicle registration document (card / Carte Grise).';
+      'Katso tuulilasin läpi kuljettajan puolen vasempaan alakulmaan, tarkista kuljettajan puolen ovenkarmin tarra oven ollessa auki tai lue se ajoneuvon rekisteröintiasiakirjasta (kortti / Carte Grise).';
 
   @override
-  String get vinInfoDismiss => 'Got it';
+  String get vinInfoDismiss => 'Selvä';
 
   @override
   String get vinConfirmPrivacyNote =>
-      'We looked up your VIN on NHTSA\'s free vehicle database — nothing sent to Sparkilo servers.';
+      'Haimme VIN-koodisi NHTSA:n ilmaisesta ajoneuvotietokannasta — Sparkilo-palvelimille ei lähetetty mitään.';
 
   @override
-  String get gdprVinOnlineDecodeTitle => 'VIN online decode';
+  String get gdprVinOnlineDecodeTitle => 'VIN-verkkopurku';
 
   @override
   String get gdprVinOnlineDecodeShort =>
-      'Decode the VIN via NHTSA\'s free public service';
+      'Pura VIN NHTSA:n ilmaisella julkisella palvelulla';
 
   @override
   String get gdprVinOnlineDecodeDescription =>
-      'When you pair an adapter, your vehicle\'s VIN is read locally to identify the car. Enabling this sends the 17-char VIN to NHTSA\'s free vPIC service to look up additional details (model, engine displacement, fuel type). The VIN is the only data sent — no other information leaves your device.';
+      'Kun paritat sovittimen, ajoneuvosi VIN luetaan paikallisesti auton tunnistamiseksi. Tämän ottaminen käyttöön lähettää 17-merkkisen VIN-koodin NHTSA:n ilmaiseen vPIC-palveluun lisätietojen hakemiseksi (malli, moottorin tilavuus, polttoainetyyppi). VIN on ainoa lähetetty tieto — muuta tietoa ei poistu laitteeltasi.';
 
   @override
-  String get vehicleDetectedFromVinBadge => '(detected)';
+  String get vehicleDetectedFromVinBadge => '(havaittu)';
 
   @override
   String vehicleDetectedFromVinSnackbar(String summary) {
-    return 'Detected from VIN: $summary. Apply?';
+    return 'Havaittu VIN:stä: $summary. Sovelletaanko?';
   }
 
   @override
-  String get vehicleDetectedFromVinApply => 'Apply';
+  String get vehicleDetectedFromVinApply => 'Sovella';
 
   @override
   String waitTimeHint(int minutes) {
-    return '~$minutes min wait';
+    return '~$minutes min odotus';
   }
 
   @override
-  String get waitTimeTrackStart => 'Track my wait';
+  String get waitTimeTrackStart => 'Seuraa odotusaikaani';
 
   @override
-  String get waitTimeTrackEnd => 'I\'m leaving';
+  String get waitTimeTrackEnd => 'Lähden';
 
   @override
   String waitTimeElapsedShort(int minutes) {
-    return '$minutes min so far';
+    return '$minutes min toistaiseksi';
   }
 
   @override
-  String get widgetHelpSectionTitle => 'Home-screen widget';
+  String get widgetHelpSectionTitle => 'Aloitusnäytön widget';
 
   @override
   String get widgetHelpIntro =>
-      'Add the SparKilo widget to your home screen to see fuel and charging prices at a glance.';
+      'Lisää SparKilo-widget aloitusnäytölle nähdäksesi polttoaine- ja lataushinnat yhdellä silmäyksellä.';
 
   @override
   String get widgetHelpAdd =>
-      'Add it from your launcher\'s widget picker — long-press an empty area of the home screen, choose Widgets, and find SparKilo.';
+      'Lisää se käynnistyssovelluksen widget-valitsimesta — paina pitkään aloitusnäytön tyhjää kohtaa, valitse Widgetit ja etsi SparKilo.';
 
   @override
   String get widgetHelpTap =>
-      'Tap a station in the widget to open it in the app. Tap the refresh icon to update prices.';
+      'Napauta asemaa widgetissä avataksesi sen sovelluksessa. Napauta päivityskuvaketta päivittääksesi hinnat.';
 
   @override
   String get widgetHelpConfigure =>
-      'On Android, long-press the widget and choose Reconfigure to change the profile, colour, and content.';
+      'Androidilla paina widgetiä pitkään ja valitse Määritä uudelleen muuttaaksesi profiilia, väriä ja sisältöä.';
 
   @override
-  String get widgetVariantDefault => 'Current price only';
+  String get widgetVariantDefault => 'Vain nykyinen hinta';
 
   @override
-  String get widgetVariantPredictive => 'Predictive: best time to fill';
+  String get widgetVariantPredictive => 'Ennustava: paras tankkausaika';
 
   @override
-  String get widgetPredictiveNowPrefix => 'now';
+  String get widgetPredictiveNowPrefix => 'nyt';
 }
