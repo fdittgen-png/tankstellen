@@ -39,7 +39,7 @@ part 'search_results_list_parts.dart';
 /// Accepts a unified [List<SearchResultItem>] that may contain both
 /// [FuelStationResult] and [EVStationResult]. Fuel-specific features
 /// (price sorting, brand filtering, cheapest flags) apply only to fuel items.
-class SearchResultsList extends ConsumerWidget {
+class SearchResultsList extends ConsumerStatefulWidget {
   final ServiceResult<List<SearchResultItem>> result;
   final VoidCallback onRefresh;
 
@@ -50,7 +50,45 @@ class SearchResultsList extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SearchResultsList> createState() => _SearchResultsListState();
+}
+
+/// #1773 — the whole results list shares ONE fade timeline. Every row
+/// used to own an `AnimatedOpacity` (its own ticker) plus a one-shot
+/// `Timer`; this state hosts the single [AnimationController] the rows
+/// slice into via their per-index `Interval`.
+class _SearchResultsListState extends ConsumerState<SearchResultsList>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _fadeController;
+
+  @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(
+      vsync: this,
+      duration: StaggeredFadeIn.timelineDuration,
+    )..forward();
+  }
+
+  @override
+  void didUpdateWidget(SearchResultsList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // A fresh search → replay the staggered cascade from the top.
+    if (!identical(oldWidget.result, widget.result)) {
+      _fadeController.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final result = widget.result;
+    final onRefresh = widget.onRefresh;
     final l10n = AppLocalizations.of(context);
     final ignoredIds = ref.watch(ignoredStationsProvider);
     final sortMode = ref.watch(selectedSortModeProvider);
@@ -168,6 +206,7 @@ class SearchResultsList extends ConsumerWidget {
                   // filter changes) don't re-trigger it.
                   return StaggeredFadeIn(
                     key: ValueKey('stagger-${item.id}'),
+                    controller: _fadeController,
                     index: index,
                     // #1772 — a RepaintBoundary isolates the card's
                     // raster from the StaggeredFadeIn opacity tween, so
