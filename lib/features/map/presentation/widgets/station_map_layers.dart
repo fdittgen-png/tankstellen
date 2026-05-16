@@ -220,10 +220,54 @@ class _StationMapLayersState extends State<StationMapLayers> {
   /// interfering with the user's first deliberate zoom.
   static const Duration _coldStartResetWindow = Duration(seconds: 3);
 
+  /// #1774 — the marker list and the price range are memoised here and
+  /// recomputed only when `stations` / `selectedFuel` /
+  /// `selectedStationIds` actually change. `MapScreen` watches four
+  /// providers, so without this every unrelated rebuild (or an
+  /// app-resume widget refresh) re-ran `_getPriceRange` over every
+  /// station and rebuilt every `Marker`.
+  late List<Marker> _markers;
+  late (double, double) _priceRange;
+
+  /// Recompute the memoised price range + marker list from the current
+  /// widget inputs.
+  void _recomputeMarkers() {
+    _priceRange =
+        StationMapLayers._getPriceRange(widget.stations, widget.selectedFuel);
+    final ids = widget.selectedStationIds;
+    final hasSelection = ids != null && ids.isNotEmpty;
+    _markers = widget.stations.map((station) {
+      final isPastel = hasSelection && !ids.contains(station.id);
+      return StationMarkerBuilder.build(
+        context,
+        station,
+        widget.selectedFuel,
+        _priceRange.$1,
+        _priceRange.$2,
+        pastel: isPastel,
+      );
+    }).toList();
+  }
+
+  @override
+  void didUpdateWidget(StationMapLayers oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Riverpod hands back the same `stations` / `selectedStationIds`
+    // references until the underlying value changes, so identity
+    // comparison is enough to skip the recompute on an unrelated
+    // `MapScreen` rebuild.
+    if (!identical(oldWidget.stations, widget.stations) ||
+        oldWidget.selectedFuel != widget.selectedFuel ||
+        !identical(oldWidget.selectedStationIds, widget.selectedStationIds)) {
+      _recomputeMarkers();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _tileProvider = RetryNetworkTileProvider(abortObsoleteRequests: false);
+    _recomputeMarkers();
 
     // First-paint reset: kick TileLayer once so any tiles that fetched
     // against the bootstrap camera are dropped + reissued against the
@@ -289,8 +333,6 @@ class _StationMapLayersState extends State<StationMapLayers> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final priceRange = StationMapLayers._getPriceRange(
-        widget.stations, widget.selectedFuel);
 
     return Stack(
       children: [
@@ -400,22 +442,10 @@ class _StationMapLayersState extends State<StationMapLayers> {
                 ),
               ],
             ),
-            // Station markers with clustering
+            // Station markers with clustering. #1774 — `_markers` is
+            // memoised; this builder just places the pre-built list.
             Builder(builder: (ctx) {
-              final hasSelection = widget.selectedStationIds != null &&
-                  widget.selectedStationIds!.isNotEmpty;
-              final markers = widget.stations.map((station) {
-                final isPastel = hasSelection &&
-                    !widget.selectedStationIds!.contains(station.id);
-                return StationMarkerBuilder.build(
-                  ctx,
-                  station,
-                  widget.selectedFuel,
-                  priceRange.$1,
-                  priceRange.$2,
-                  pastel: isPastel,
-                );
-              }).toList();
+              final markers = _markers;
               if (widget.stations.length > 20) {
                 return MarkerClusterLayerWidget(
                   options: MarkerClusterLayerOptions(
