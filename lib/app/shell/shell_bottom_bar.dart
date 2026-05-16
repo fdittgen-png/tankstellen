@@ -40,7 +40,13 @@ class ShellBottomBar extends StatelessWidget {
     // bar on edge-to-edge devices (same class of bug as #520).
     final barHeight = isLandscape ? 48.0 : 64.0;
 
-    return SafeArea(
+    // #1697 — clamp the bar's text scaling so labels grow with the OS
+    // setting but never past what the fixed-height bar can show. Dense
+    // navigation chrome can't absorb a full 3x scale; Material's own
+    // NavigationBar applies the same kind of bound.
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.3,
+      child: SafeArea(
       top: false,
       child: Container(
         height: barHeight,
@@ -62,56 +68,69 @@ class ShellBottomBar extends StatelessWidget {
             final item = items[i];
             final controller = iconControllers[branchForSlot[i]];
 
+            final inkWell = InkWell(
+              onTap: () => onTap(i),
+              splashColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+              highlightColor: Colors.transparent,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ShellBounceIcon(
+                    controller: controller,
+                    selected: selected,
+                    icon: selected ? item.filledIcon : item.outlinedIcon,
+                    iconSize: iconSize,
+                    color: selected
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
+                  if (!isLandscape) ...[
+                    const SizedBox(height: 2),
+                    // #1697 — themed `labelMedium` instead of a fixed
+                    // 10/11 px font. The bar's text scaling is clamped
+                    // (see `MediaQuery.withClampedTextScaling` below) so
+                    // the label grows with the OS text setting up to a
+                    // bound that still fits the fixed-height bar — the
+                    // same approach Material's own NavigationBar takes.
+                    AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
+                      style: (theme.textTheme.labelMedium ?? const TextStyle())
+                          .copyWith(
+                        fontWeight:
+                            selected ? FontWeight.w600 : FontWeight.w400,
+                        color: selected
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.onSurfaceVariant,
+                      ),
+                      child: Text(
+                        item.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            );
+
             return Expanded(
               child: Semantics(
                 label: item.label,
                 button: true,
                 selected: selected,
                 excludeSemantics: true,
-                child: InkWell(
-                  onTap: () => onTap(i),
-                  splashColor:
-                      theme.colorScheme.primary.withValues(alpha: 0.1),
-                  highlightColor: Colors.transparent,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ShellBounceIcon(
-                        controller: controller,
-                        selected: selected,
-                        icon: selected ? item.filledIcon : item.outlinedIcon,
-                        iconSize: iconSize,
-                        color: selected
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurfaceVariant,
-                      ),
-                      if (!isLandscape) ...[
-                        const SizedBox(height: 2),
-                        AnimatedDefaultTextStyle(
-                          duration: const Duration(milliseconds: 200),
-                          style: TextStyle(
-                            fontSize: selected ? 11 : 10,
-                            fontWeight: selected
-                                ? FontWeight.w600
-                                : FontWeight.w400,
-                            color: selected
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.onSurfaceVariant,
-                          ),
-                          child: Text(
-                            item.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
+                // #1697 — landscape drops the label row to keep the bar
+                // compact, so a Tooltip gives sighted users the
+                // destination name on long-press (screen readers
+                // already get it from the Semantics label above).
+                child: isLandscape
+                    ? Tooltip(message: item.label, child: inkWell)
+                    : inkWell,
               ),
             );
           }),
         ),
+      ),
       ),
     );
   }
