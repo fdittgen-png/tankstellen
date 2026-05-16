@@ -44,6 +44,8 @@ dependencies:
   image_picker: ^1.2.2
   google_mlkit_text_recognition: ^0.15.1
   image: ^4.5.0
+  # Disk-cached, decode-at-size network images — brand logos (#1761).
+  cached_network_image: ^3.4.1
 
   # Data Classes
   freezed_annotation: ^3.0.0

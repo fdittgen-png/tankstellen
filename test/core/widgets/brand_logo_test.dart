@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/widgets/brand_logo.dart';
@@ -21,12 +22,13 @@ void main() {
       expect(find.byIcon(Icons.local_gas_station), findsOneWidget);
     });
 
-    testWidgets('attempts to load network image for known brand',
+    testWidgets('uses a disk-cached network image for a known brand',
         (tester) async {
       await pumpApp(tester, const BrandLogo(brand: 'Shell'));
 
-      // Should find an Image widget (network image attempt)
-      expect(find.byType(Image), findsOneWidget);
+      // #1761 — the logo loads through CachedNetworkImage (disk cache +
+      // decode-at-size), not a bare Image.network.
+      expect(find.byType(CachedNetworkImage), findsOneWidget);
     });
 
     testWidgets('respects custom size parameter', (tester) async {
