@@ -7,6 +7,7 @@ import '../../../../core/sync/sync_config.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../data/auth_error_mapper.dart';
 import '../../providers/sync_setup_provider.dart';
+import '../widgets/anon_key_field.dart';
 import '../widgets/auth_form_widget.dart';
 import '../widgets/qr_scanner_screen.dart';
 import '../widgets/sync_credentials_step.dart';
@@ -15,6 +16,7 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../widgets/sync_done_step.dart';
 import '../widgets/sync_mode_step.dart';
+import '../widgets/wizard_create_new.dart';
 
 /// Clean 3-step sync setup: Mode -> Credentials (if needed) -> Auth -> Done.
 ///
@@ -169,6 +171,30 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
               builder: (context, _) {
                 final canContinue = _urlController.text.trim().isNotEmpty &&
                     _keyController.text.trim().isNotEmpty;
+                // #1703 — private mode walks the user through creating
+                // their own Supabase database with the guided wizard
+                // flow instead of a bare credentials form. The guide's
+                // final step still collects the URL + key, so an
+                // experienced user can skip ahead and paste existing
+                // credentials.
+                if (setup.selectedMode == SyncMode.private) {
+                  return WizardCreateNew(
+                    currentStep: setup.createDbStep,
+                    urlController: _urlController,
+                    keyController: _keyController,
+                    keyField: AnonKeyField(
+                      controller: _keyController,
+                      showKey: setup.showKey,
+                      onToggleVisibility: ctrl.toggleKeyVisibility,
+                      onChanged: ctrl.touch,
+                    ),
+                    onBack: ctrl.prevCreateDbStep,
+                    onNext: ctrl.nextCreateDbStep,
+                    onContinue: canContinue
+                        ? () => ctrl.goToStep(SyncSetupStep.auth)
+                        : null,
+                  );
+                }
                 return SyncCredentialsStep(
                   selectedMode: setup.selectedMode,
                   urlController: _urlController,

@@ -63,4 +63,38 @@ void main() {
     expect(s.error, 'nope');
     expect(s.isLoading, isFalse);
   });
+
+  group('createDbStep — guided create-database flow (#1703)', () {
+    test('defaults to 0', () {
+      final c = makeContainer();
+      expect(c.read(syncSetupControllerProvider).createDbStep, 0);
+    });
+
+    test('nextCreateDbStep advances, prevCreateDbStep goes back', () {
+      final c = makeContainer();
+      final ctrl = c.read(syncSetupControllerProvider.notifier);
+      ctrl.nextCreateDbStep();
+      ctrl.nextCreateDbStep();
+      expect(c.read(syncSetupControllerProvider).createDbStep, 2);
+      ctrl.prevCreateDbStep();
+      expect(c.read(syncSetupControllerProvider).createDbStep, 1);
+    });
+
+    test('prevCreateDbStep clamps at 0', () {
+      final c = makeContainer();
+      final ctrl = c.read(syncSetupControllerProvider.notifier);
+      ctrl.prevCreateDbStep();
+      expect(c.read(syncSetupControllerProvider).createDbStep, 0);
+    });
+
+    test('selectMode resets the guided step to 0', () {
+      final c = makeContainer();
+      final ctrl = c.read(syncSetupControllerProvider.notifier);
+      ctrl.nextCreateDbStep();
+      ctrl.nextCreateDbStep();
+      expect(c.read(syncSetupControllerProvider).createDbStep, 2);
+      ctrl.selectMode(SyncMode.private);
+      expect(c.read(syncSetupControllerProvider).createDbStep, 0);
+    });
+  });
 }
