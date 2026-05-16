@@ -3221,6 +3221,19 @@ class AppLocalizationsFr extends AppLocalizations {
       'Astuce : balayez vers la gauche ou la droite pour changer d\'onglet.';
 
   @override
+  String get discardChangesTitle => 'Abandonner les modifications ?';
+
+  @override
+  String get discardChangesBody =>
+      'Vous avez des modifications non enregistrées. Quitter maintenant les supprimera.';
+
+  @override
+  String get discardChangesConfirm => 'Abandonner';
+
+  @override
+  String get discardChangesKeepEditing => 'Continuer la modification';
+
+  @override
   String get achievementSmoothDriver => 'Série souple';
 
   @override

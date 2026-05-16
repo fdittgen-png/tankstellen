@@ -3222,6 +3222,19 @@ class AppLocalizationsDe extends AppLocalizations {
       'Tipp: Wische nach links oder rechts, um zwischen den Tabs zu wechseln.';
 
   @override
+  String get discardChangesTitle => 'Änderungen verwerfen?';
+
+  @override
+  String get discardChangesBody =>
+      'Du hast nicht gespeicherte Änderungen. Wenn du jetzt gehst, gehen sie verloren.';
+
+  @override
+  String get discardChangesConfirm => 'Verwerfen';
+
+  @override
+  String get discardChangesKeepEditing => 'Weiter bearbeiten';
+
+  @override
   String get achievementSmoothDriver => 'Ruhige Serie';
 
   @override

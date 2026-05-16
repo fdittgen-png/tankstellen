@@ -223,6 +223,38 @@ class VehicleFormControllers {
     );
   }
 
+  // #1693 — unsaved-changes tracking for the discard guard.
+  Map<String, String> _baseline = const {};
+
+  Map<String, String> _currentValues() => {
+        'name': nameController.text,
+        'battery': batteryController.text,
+        'maxKw': maxChargingKwController.text,
+        'tank': tankController.text,
+        'fuel': fuelTypeController.text,
+        'minSoc': minSocController.text,
+        'maxSoc': maxSocController.text,
+        'vin': vinController.text,
+      };
+
+  /// Capture the current controller values as the "clean" baseline.
+  /// The screen calls this once the form is populated — after [load]
+  /// for an existing vehicle, or right after construction for a new
+  /// one — so [isDirty] can tell whether the user has edited anything.
+  void snapshotBaseline() => _baseline = _currentValues();
+
+  /// True when any text field differs from the captured baseline.
+  /// Returns false until [snapshotBaseline] has run, so the guard
+  /// never fires spuriously in the pre-load frame.
+  bool get isDirty {
+    if (_baseline.isEmpty) return false;
+    final current = _currentValues();
+    for (final entry in current.entries) {
+      if (_baseline[entry.key] != entry.value) return true;
+    }
+    return false;
+  }
+
   void dispose() {
     nameController.dispose();
     batteryController.dispose();

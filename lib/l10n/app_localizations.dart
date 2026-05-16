@@ -5966,6 +5966,30 @@ abstract class AppLocalizations {
   /// **'Tip: swipe left or right to switch between tabs.'**
   String get swipeBetweenTabsHint;
 
+  /// Title of the confirm dialog shown when the user leaves a form (fill-up, vehicle edit) with unsaved changes (#1693).
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes?'**
+  String get discardChangesTitle;
+
+  /// Body of the unsaved-changes confirm dialog (#1693).
+  ///
+  /// In en, this message translates to:
+  /// **'You have unsaved changes. Leaving now will discard them.'**
+  String get discardChangesBody;
+
+  /// Confirm action on the unsaved-changes dialog — leaves the form and discards the edits (#1693).
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get discardChangesConfirm;
+
+  /// Dismiss action on the unsaved-changes dialog — stays on the form (#1693).
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get discardChangesKeepEditing;
+
   /// Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5).
   ///
   /// In en, this message translates to:
