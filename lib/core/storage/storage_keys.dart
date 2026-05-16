@@ -86,18 +86,6 @@ class StorageKeys {
   static const String tripRecordingResumeHintShown =
       'trip_recording_resume_hint_shown';
 
-  /// #1116 phase 3 — feature flag for the unified fuel + EV search
-  /// results list. Defaults to `false`; flipping it on swaps the
-  /// fuel-only `searchStateProvider` consumption for
-  /// `unifiedSearchResultsProvider`. UI cards land in phase 3b; this
-  /// flag is a no-op until then.
-  @Deprecated(
-    'Migrated to Feature.unifiedSearchResults in #1373 phase 3f; '
-    'kept for one-shot migration read.',
-  )
-  static const String unifiedSearchResultsEnabled =
-      'unified_search_results_enabled';
-
   /// #1395 — toggle that surfaces the in-app OBD2 fuel-rate
   /// diagnostic overlay in release builds. The overlay is always
   /// visible in `kDebugMode`; this flag flips it on for production

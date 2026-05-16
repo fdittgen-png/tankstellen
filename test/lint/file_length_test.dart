@@ -42,7 +42,6 @@ void main() {
     'lib/features/feature_management/data/legacy_toggle_migrator.dart',
     'lib/features/map/presentation/widgets/station_map_layers.dart',
     'lib/features/profile/presentation/widgets/feature_management_section.dart',
-    'lib/features/search/presentation/widgets/refuel_option_card.dart',
     'lib/features/vehicle/domain/entities/vehicle_profile.dart',
     'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart',
     'lib/features/vehicle/presentation/widgets/auto_record_section.dart',

@@ -482,9 +482,6 @@ String _featureLabel(AppLocalizations? l, Feature f) {
       return l?.featureLabel_consumptionAnalytics ?? 'Consumption analytics';
     case Feature.baselineSync:
       return l?.featureLabel_baselineSync ?? 'Baseline sync';
-    case Feature.unifiedSearchResults:
-      return l?.featureLabel_unifiedSearchResults ??
-          'Unified search results';
     case Feature.priceAlerts:
       return l?.featureLabel_priceAlerts ?? 'Price alerts';
     case Feature.priceHistory:
@@ -550,9 +547,6 @@ String _featureDescription(AppLocalizations? l, Feature f) {
     case Feature.baselineSync:
       return l?.featureDescription_baselineSync ??
           'Sync driving baselines via TankSync.';
-    case Feature.unifiedSearchResults:
-      return l?.featureDescription_unifiedSearchResults ??
-          'Single result list combining fuel and EV stations.';
     case Feature.priceAlerts:
       return l?.featureDescription_priceAlerts ??
           'Threshold-based price-drop notifications.';
@@ -649,7 +643,6 @@ String _blockedEnableMessage(AppLocalizations? l, Feature f) {
     // so the function is total in case the manifest changes.
     case Feature.obd2TripRecording:
     case Feature.tankSync:
-    case Feature.unifiedSearchResults:
     case Feature.priceAlerts:
     case Feature.priceHistory:
     case Feature.routePlanning:

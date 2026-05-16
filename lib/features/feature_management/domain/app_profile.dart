@@ -73,8 +73,6 @@ enum AppProfile {
 ///   (all three `requires: {obd2TripRecording}` per the manifest)
 ///
 /// Off in **every** preset (user opts in individually):
-/// - `unifiedSearchResults` (single fuel + EV list — opinionated UX,
-///   not the default)
 /// - `tflitePricePrediction` (model artifact still off-band; #1543)
 const Map<AppProfile, Set<Feature>> appProfileBundles = {
   AppProfile.basic: {

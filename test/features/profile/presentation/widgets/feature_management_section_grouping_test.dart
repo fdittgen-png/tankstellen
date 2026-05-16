@@ -115,28 +115,6 @@ void main() {
       expectChildInGroup(Feature.tankSync, Feature.baselineSync);
     });
 
-    testWidgets(
-        'unifiedSearchResults is a stand-alone group (no children)',
-        (tester) async {
-      await pumpSection(tester);
-
-      // The unifiedSearchResults card exists ...
-      final groupFinder =
-          find.byKey(const Key('featureGroup_unifiedSearchResults'));
-      expect(groupFinder, findsOneWidget);
-
-      // ... and contains exactly one toggle: itself.
-      final togglesInside = find.descendant(
-        of: groupFinder,
-        matching: find.byWidgetPredicate(
-          (w) => w is SwitchListTile,
-        ),
-      );
-      expect(togglesInside, findsOneWidget,
-          reason: 'unifiedSearchResults has no dependents — its card '
-              'must contain exactly one SwitchListTile (itself)');
-    });
-
     testWidgets('segmented control renders above the Trajets-tier dependents',
         (tester) async {
       await pumpSection(tester);

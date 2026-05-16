@@ -5,7 +5,6 @@ import '../../../core/error/exceptions.dart';
 import '../../../core/location/user_position_provider.dart';
 import '../../../core/services/geocoding_chain.dart';
 import '../../../core/services/service_result.dart';
-import '../../../core/refuel/unified_search_results_enabled.dart';
 import '../domain/entities/fuel_type.dart';
 import '../domain/entities/search_result_item.dart';
 import '../domain/entities/station.dart';
@@ -45,32 +44,6 @@ Future<void> autoUpdatePositionIfEnabled(Ref ref) async {
     fuelType: fuelType ?? ref.read(effectiveFuelTypeProvider),
     radiusKm: radiusKm ?? profile?.defaultSearchRadius ?? 10.0,
   );
-}
-
-/// Triggers the EV search path when [fuelType] is electric. Returns
-/// the wrapped EV [ServiceResult] (or `null` if EV state is still
-/// loading) so the caller can write it into its own [AsyncValue]
-/// state. Returns `null` when [fuelType] is not electric so callers
-/// can short-circuit with `if (result == null) ... fuel path`.
-///
-/// Used by every search entry point ([searchByGps], [searchByZipCode],
-/// [searchByCoordinates]) — keeps the EV-vs-fuel branch in one spot.
-Future<AsyncValue<ServiceResult<List<SearchResultItem>>>?> dispatchEvIfNeeded({
-  required Ref ref,
-  required FuelType fuelType,
-  required double lat,
-  required double lng,
-  required double radiusKm,
-}) async {
-  if (fuelType != FuelType.electric) return null;
-  await ref
-      .read(eVSearchStateProvider.notifier)
-      .searchNearby(lat: lat, lng: lng, radiusKm: radiusKm);
-  return ref.read(eVSearchStateProvider).when(
-        data: (r) => AsyncValue.data(wrapEvResultAsSearchItems(r)),
-        loading: () => const AsyncValue.loading(),
-        error: AsyncValue.error,
-      );
 }
 
 /// Reverse-geocodes [lat], [lng] to a human-readable address. Returns
@@ -119,15 +92,6 @@ AsyncValue<ServiceResult<List<SearchResultItem>>>? classifySearchError(
   }
   return AsyncValue.error(error, stackTrace);
 }
-
-/// Whether the unified fuel + EV search-results path is enabled
-/// (#1781, `Feature.unifiedSearchResults`). When `true`, every search
-/// fetches the fuel station service and the EV charging service
-/// concurrently and merges them into one mixed list; when `false` the
-/// legacy electric-vs-fuel branch ([dispatchEvIfNeeded]) applies and a
-/// search returns one kind only.
-bool unifiedSearchEnabled(Ref ref) =>
-    ref.read(unifiedSearchResultsEnabledProvider);
 
 /// Kicks off the EV charging search for [lat]/[lng]/[radiusKm] without
 /// awaiting it, so it runs concurrently with the fuel fetch (#1781).

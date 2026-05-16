@@ -128,14 +128,15 @@ void main() {
           );
         }
       }
-      expect(Feature.values.length, 25,
+      expect(Feature.values.length, 24,
           reason: '#1373 phase 1 shipped 13 features; phase 3d added '
               'autoRecord (14); phase 3c bundled showFuel + showElectric + '
               'showConsumptionTab (17); #1517 added manualConsumption + '
               'loyaltyCards (19); #1543 added tflitePricePrediction (20); '
               '#1613 added fuelCalculator (21) + carbonDashboard (22); '
               '#1615 added experimentalOemPids (23); #1638 added '
-              'paymentQrScan (24) + communityPriceReports (25). '
+              'paymentQrScan + communityPriceReports (25); #1789 removed '
+              'unifiedSearchResults (24). '
               'Update the test if a new feature was added or removed.');
     });
 

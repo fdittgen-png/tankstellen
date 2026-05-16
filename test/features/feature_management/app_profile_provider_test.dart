@@ -189,12 +189,11 @@ void main() {
           .read(activeAppProfileProvider.notifier)
           .select(AppProfile.medium);
       // User toggles a flag that is NOT in any preset bundle —
-      // `unifiedSearchResults` is the canonical off-bundle flag,
-      // kept off by every preset and reserved for explicit user
-      // opt-in.
+      // `tflitePricePrediction` is an off-bundle flag, kept off by
+      // every preset and reserved for explicit user opt-in.
       final next = {
         ...appProfileBundles[AppProfile.medium]!,
-        Feature.unifiedSearchResults,
+        Feature.tflitePricePrediction,
       };
       await c
           .read(activeAppProfileProvider.notifier)
@@ -229,7 +228,7 @@ void main() {
       // notifier — `enabledFeaturesProvider` now diverges from the preset.
       await c
           .read(featureFlagsProvider.notifier)
-          .enable(Feature.unifiedSearchResults);
+          .enable(Feature.tflitePricePrediction);
 
       // reconcile() reads `enabledFeaturesProvider` through the
       // notifier's own ref — no flag set passed in — and detects it.
