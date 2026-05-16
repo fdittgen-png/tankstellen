@@ -130,15 +130,29 @@ class SearchState extends _$SearchState {
           );
 
       final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
-      final ev = await dispatchEvIfNeeded(
-        ref: ref,
-        fuelType: resolved.fuelType,
-        lat: position.latitude,
-        lng: position.longitude,
-        radiusKm: resolved.radiusKm,
-      );
-      if (!ref.mounted) return;
-      if (ev != null) { state = ev; return; }
+      final unified = unifiedSearchEnabled(ref);
+      Future<void>? evFuture;
+      if (unified) {
+        evFuture = beginEvSearch(
+          ref,
+          lat: position.latitude,
+          lng: position.longitude,
+          radiusKm: resolved.radiusKm,
+        );
+      } else {
+        final ev = await dispatchEvIfNeeded(
+          ref: ref,
+          fuelType: resolved.fuelType,
+          lat: position.latitude,
+          lng: position.longitude,
+          radiusKm: resolved.radiusKm,
+        );
+        if (!ref.mounted) return;
+        if (ev != null) {
+          state = ev;
+          return;
+        }
+      }
 
       // Reverse-geocode for a postal code (Prix-Carburants + co).
       final addr = await tryReverseGeocode(
@@ -165,7 +179,9 @@ class SearchState extends _$SearchState {
           .read(stationServiceProvider)
           .searchStations(params, cancelToken: cancelToken);
       if (!ref.mounted) return;
-      state = AsyncValue.data(wrapFuelResultAsSearchItems(result));
+      final finalState = await finalizeUnifiedResult(ref, result, evFuture);
+      if (!ref.mounted) return;
+      state = finalState;
     });
   }
 
@@ -196,15 +212,29 @@ class SearchState extends _$SearchState {
       if (!ref.mounted) return;
 
       final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
-      final ev = await dispatchEvIfNeeded(
-        ref: ref,
-        fuelType: resolved.fuelType,
-        lat: coordsResult.data.lat,
-        lng: coordsResult.data.lng,
-        radiusKm: resolved.radiusKm,
-      );
-      if (!ref.mounted) return;
-      if (ev != null) { state = ev; return; }
+      final unified = unifiedSearchEnabled(ref);
+      Future<void>? evFuture;
+      if (unified) {
+        evFuture = beginEvSearch(
+          ref,
+          lat: coordsResult.data.lat,
+          lng: coordsResult.data.lng,
+          radiusKm: resolved.radiusKm,
+        );
+      } else {
+        final ev = await dispatchEvIfNeeded(
+          ref: ref,
+          fuelType: resolved.fuelType,
+          lat: coordsResult.data.lat,
+          lng: coordsResult.data.lng,
+          radiusKm: resolved.radiusKm,
+        );
+        if (!ref.mounted) return;
+        if (ev != null) {
+          state = ev;
+          return;
+        }
+      }
 
       final cityName = await tryReverseGeocode(
         geocoding, coordsResult.data.lat, coordsResult.data.lng,
@@ -232,14 +262,15 @@ class SearchState extends _$SearchState {
       final adjustedStations =
           recalcDistancesFrom(result.data, ref.read(userPositionProvider));
 
-      state = AsyncValue.data(wrapFuelResultAsSearchItems(
-        mergeGeocodingIntoStationResult(
-          stationResult: result,
-          geocodingErrors: coordsResult.errors,
-          geocodingIsStale: coordsResult.isStale,
-          adjustedStations: adjustedStations,
-        ),
-      ));
+      final fuelResult = mergeGeocodingIntoStationResult(
+        stationResult: result,
+        geocodingErrors: coordsResult.errors,
+        geocodingIsStale: coordsResult.isStale,
+        adjustedStations: adjustedStations,
+      );
+      final finalState = await finalizeUnifiedResult(ref, fuelResult, evFuture);
+      if (!ref.mounted) return;
+      state = finalState;
     });
   }
 
@@ -271,15 +302,29 @@ class SearchState extends _$SearchState {
       }
 
       final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
-      final ev = await dispatchEvIfNeeded(
-        ref: ref,
-        fuelType: resolved.fuelType,
-        lat: lat,
-        lng: lng,
-        radiusKm: resolved.radiusKm,
-      );
-      if (!ref.mounted) return;
-      if (ev != null) { state = ev; return; }
+      final unified = unifiedSearchEnabled(ref);
+      Future<void>? evFuture;
+      if (unified) {
+        evFuture = beginEvSearch(
+          ref,
+          lat: lat,
+          lng: lng,
+          radiusKm: resolved.radiusKm,
+        );
+      } else {
+        final ev = await dispatchEvIfNeeded(
+          ref: ref,
+          fuelType: resolved.fuelType,
+          lat: lat,
+          lng: lng,
+          radiusKm: resolved.radiusKm,
+        );
+        if (!ref.mounted) return;
+        if (ev != null) {
+          state = ev;
+          return;
+        }
+      }
 
       final params = SearchParams(
         lat: lat,
@@ -296,9 +341,10 @@ class SearchState extends _$SearchState {
       final adjustedStations =
           recalcDistancesFrom(result.data, ref.read(userPositionProvider));
 
-      state = AsyncValue.data(
-        wrapFuelResultAsSearchItems(withStations(result, adjustedStations)),
-      );
+      final fuelResult = withStations(result, adjustedStations);
+      final finalState = await finalizeUnifiedResult(ref, fuelResult, evFuture);
+      if (!ref.mounted) return;
+      state = finalState;
     });
   }
 }

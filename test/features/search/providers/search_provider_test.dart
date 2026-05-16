@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/location/location_service.dart';
+import 'package:tankstellen/core/refuel/unified_search_results_enabled.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/services/geocoding_chain.dart';
 import 'package:tankstellen/core/services/service_providers.dart';
@@ -15,6 +16,7 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/ev_search_provider.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
@@ -74,6 +76,68 @@ class _FakeEVSearchState extends EVSearchState {
   }
 }
 
+/// EV fake that returns one charging station, so unified-search tests
+/// can assert the merged feed carries both kinds.
+class _OneStationEVSearchState extends EVSearchState {
+  @override
+  AsyncValue<ServiceResult<List<ChargingStation>>> build() {
+    return AsyncValue.data(ServiceResult(
+      data: const [],
+      source: ServiceSource.openChargeMapApi,
+      fetchedAt: DateTime(2024, 1, 1),
+    ));
+  }
+
+  @override
+  Future<void> searchNearby({
+    required double lat,
+    required double lng,
+    required double radiusKm,
+  }) async {
+    state = AsyncValue.data(ServiceResult(
+      data: const [
+        ChargingStation(
+          id: 'ev-merge-1',
+          name: 'OCM Berlin',
+          latitude: 52.5,
+          longitude: 13.4,
+        ),
+      ],
+      source: ServiceSource.openChargeMapApi,
+      fetchedAt: DateTime(2024, 1, 1),
+    ));
+  }
+}
+
+/// EV fake whose search always fails — models the keyless
+/// `NoEvApiKeyException` case for unified-search partial-failure tests.
+class _FailingEVSearchState extends EVSearchState {
+  @override
+  AsyncValue<ServiceResult<List<ChargingStation>>> build() {
+    return AsyncValue.data(ServiceResult(
+      data: const [],
+      source: ServiceSource.openChargeMapApi,
+      fetchedAt: DateTime(2024, 1, 1),
+    ));
+  }
+
+  @override
+  Future<void> searchNearby({
+    required double lat,
+    required double lng,
+    required double radiusKm,
+  }) async {
+    state = AsyncValue.error(const NoEvApiKeyException(), StackTrace.current);
+  }
+}
+
+/// Forces `Feature.unifiedSearchResults` on without wiring the whole
+/// feature-management stack.
+class _UnifiedOn extends UnifiedSearchResultsEnabled {
+  @override
+  bool build() => true;
+}
+
 void main() {
   late FakeHiveStorage fakeStorage;
   late MockStationService mockStationService;
@@ -116,6 +180,21 @@ void main() {
     ]);
     addTearDown(c.dispose);
     return (c, fakeEv);
+  }
+
+  /// Container for unified-search tests — `Feature.unifiedSearchResults`
+  /// forced on, with a swappable EV fake.
+  ProviderContainer createContainerUnified(EVSearchState evFake) {
+    final c = ProviderContainer(overrides: [
+      hiveStorageProvider.overrideWithValue(fakeStorage),
+      stationServiceProvider.overrideWithValue(mockStationService),
+      geocodingChainProvider.overrideWithValue(mockGeocoding),
+      userPositionProvider.overrideWith(() => _NullUserPosition()),
+      eVSearchStateProvider.overrideWith(() => evFake),
+      unifiedSearchResultsEnabledProvider.overrideWith(_UnifiedOn.new),
+    ]);
+    addTearDown(c.dispose);
+    return c;
   }
 
   const testStation = Station(
@@ -857,6 +936,80 @@ void main() {
       // (it stays in initial state because EV dispatch returned early)
       final state = container.read(searchStateProvider);
       expect(state.value!.data, isEmpty);
+    });
+  });
+
+  group('EV dispatch — unified search (Feature.unifiedSearchResults on)',
+      () {
+    void stubFuel() {
+      when(() => mockStationService.searchStations(any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) async => ServiceResult(
+                data: [testStation],
+                source: ServiceSource.tankerkoenigApi,
+                fetchedAt: DateTime.now(),
+              ));
+    }
+
+    test('fetches fuel AND EV and merges both kinds into one list',
+        () async {
+      stubFuel();
+      final container = createContainerUnified(_OneStationEVSearchState());
+
+      await container.read(searchStateProvider.notifier).searchByCoordinates(
+            lat: 52.52,
+            lng: 13.41,
+            fuelType: FuelType.e10,
+            radiusKm: 7.0,
+          );
+
+      // Fuel service WAS called (not short-circuited by EV dispatch).
+      verify(() => mockStationService.searchStations(
+            any(),
+            cancelToken: any(named: 'cancelToken'),
+          )).called(1);
+      final items = container.read(searchStateProvider).value!.data;
+      expect(items.whereType<FuelStationResult>(), hasLength(1));
+      expect(items.whereType<EVStationResult>(), hasLength(1));
+    });
+
+    test('electric fuel type is no longer EV-exclusive under unified search',
+        () async {
+      stubFuel();
+      final container = createContainerUnified(_OneStationEVSearchState());
+
+      await container.read(searchStateProvider.notifier).searchByCoordinates(
+            lat: 52.52,
+            lng: 13.41,
+            fuelType: FuelType.electric,
+            radiusKm: 7.0,
+          );
+
+      final items = container.read(searchStateProvider).value!.data;
+      // Electric selected, yet fuel stations still appear alongside EV.
+      expect(items.whereType<FuelStationResult>(), hasLength(1));
+      expect(items.whereType<EVStationResult>(), hasLength(1));
+    });
+
+    test('EV failure is tolerated — fuel results survive, error recorded',
+        () async {
+      stubFuel();
+      final container = createContainerUnified(_FailingEVSearchState());
+
+      await container.read(searchStateProvider.notifier).searchByCoordinates(
+            lat: 52.52,
+            lng: 13.41,
+            fuelType: FuelType.e10,
+            radiusKm: 7.0,
+          );
+
+      final result = container.read(searchStateProvider).value!;
+      expect(result.data.whereType<FuelStationResult>(), hasLength(1));
+      expect(result.data.whereType<EVStationResult>(), isEmpty);
+      expect(
+        result.errors.where((e) => e.source == ServiceSource.openChargeMapApi),
+        hasLength(1),
+      );
     });
   });
 
