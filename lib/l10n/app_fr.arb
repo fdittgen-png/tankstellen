@@ -499,6 +499,8 @@
   "freshnessAgo": "il y a",
   "freshnessStale": "Périmé",
   "freshnessBadgeSemantics": "Fraîcheur des données : {age}",
+  "brandLogoLabel": "Logo {brand}",
+  "ratingStarLabel": "{count, plural, =1{Noter 1 étoile} other{Noter {count} étoiles}}",
   "alertStatsActive": "Actives",
   "alertStatsToday": "Aujourd'hui",
   "alertStatsThisWeek": "Cette semaine",

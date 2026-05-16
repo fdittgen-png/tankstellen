@@ -2612,6 +2612,18 @@ abstract class AppLocalizations {
   /// **'Data freshness: {age}'**
   String freshnessBadgeSemantics(String age);
 
+  /// No description provided for @brandLogoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{brand} logo'**
+  String brandLogoLabel(String brand);
+
+  /// No description provided for @ratingStarLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Rate 1 star} other{Rate {count} stars}}'**
+  String ratingStarLabel(int count);
+
   /// No description provided for @passwordStrengthWeak.
   ///
   /// In en, this message translates to:

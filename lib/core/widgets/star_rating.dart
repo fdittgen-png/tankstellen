@@ -1,4 +1,8 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+
+import '../../l10n/app_localizations.dart';
 
 /// Interactive 5-star rating widget.
 class StarRating extends StatelessWidget {
@@ -15,19 +19,34 @@ class StarRating extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    // #1687 — each star is an icon-only tappable affordance. The icon
+    // glyph stays at [starSize], but the tap target is padded out to
+    // at least 48 dp (the Material / WCAG minimum) so it is reliably
+    // hittable. Each star also carries a semantic label so a screen
+    // reader announces the rating action instead of silence.
+    final tapTarget = math.max(48.0, starSize);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
         final starNumber = index + 1;
         final isFilled = rating != null && starNumber <= rating!;
-        return GestureDetector(
-          onTap: () => onRatingChanged(starNumber),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2),
-            child: Icon(
-              isFilled ? Icons.star : Icons.star_border,
-              color: isFilled ? Colors.amber : Colors.grey.shade400,
-              size: starSize,
+        return Semantics(
+          button: true,
+          label: l10n?.ratingStarLabel(starNumber) ?? 'Rate $starNumber stars',
+          child: GestureDetector(
+            onTap: () => onRatingChanged(starNumber),
+            behavior: HitTestBehavior.opaque,
+            child: SizedBox(
+              width: tapTarget,
+              height: tapTarget,
+              child: Center(
+                child: Icon(
+                  isFilled ? Icons.star : Icons.star_border,
+                  color: isFilled ? Colors.amber : Colors.grey.shade400,
+                  size: starSize,
+                ),
+              ),
             ),
           ),
         );

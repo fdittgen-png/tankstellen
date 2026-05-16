@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../utils/brand_logo_mapper.dart';
 
 /// Displays a brand logo for a fuel station, with automatic fallback
@@ -23,11 +24,19 @@ class BrandLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     final url = BrandLogoMapper.logoUrl(brand);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
-    if (url == null) {
-      return _fallbackIcon(theme);
-    }
+    // #1687 — a screen reader previously announced nothing for the
+    // logo on every station card. `image: true` marks it as a
+    // graphic; the label names the brand it depicts.
+    return Semantics(
+      label: l10n?.brandLogoLabel(brand) ?? '$brand logo',
+      image: true,
+      child: url == null ? _fallbackIcon(theme) : _networkLogo(url, theme),
+    );
+  }
 
+  Widget _networkLogo(String url, ThemeData theme) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: Image.network(

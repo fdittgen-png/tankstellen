@@ -53,5 +53,39 @@ void main() {
       expect(renderBox.size.width, 48);
       expect(renderBox.size.height, 48);
     });
+
+    // #1687 — the logo previously carried no Semantics; a screen reader
+    // announced nothing for the brand graphic on every station card.
+    testWidgets('exposes an image semantic label naming the brand',
+        (tester) async {
+      await pumpApp(tester, const BrandLogo(brand: 'Shell'));
+
+      final semantics = tester
+          .widgetList<Semantics>(
+            find.descendant(
+              of: find.byType(BrandLogo),
+              matching: find.byType(Semantics),
+            ),
+          )
+          .first;
+      expect(semantics.properties.label, contains('Shell'));
+      expect(semantics.properties.image, isTrue);
+    });
+
+    testWidgets('fallback-icon path is still labelled', (tester) async {
+      // Unknown brand → fallback icon, but the label must remain.
+      await pumpApp(tester, const BrandLogo(brand: 'UnknownBrand'));
+
+      final semantics = tester
+          .widgetList<Semantics>(
+            find.descendant(
+              of: find.byType(BrandLogo),
+              matching: find.byType(Semantics),
+            ),
+          )
+          .first;
+      expect(semantics.properties.label, contains('UnknownBrand'));
+      expect(semantics.properties.image, isTrue);
+    });
   });
 }

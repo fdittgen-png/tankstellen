@@ -10,17 +10,23 @@ import '../fixtures/stations.dart';
 import '../helpers/mock_providers.dart';
 import '../helpers/pump_app.dart';
 
-/// Verifies that key widgets render without overflow at 1.5x and 2.0x
-/// text scaling, covering the accessibility requirement from issue #76.
+/// Verifies that key widgets render without overflow at 1.5x, 2.0x
+/// and 3.0x text scaling, covering the accessibility requirement from
+/// issues #76 and #1687.
 ///
 /// The tests do NOT assert pixel-perfect layout — they verify that
 /// Flutter's layout engine does not report overflow errors when text
 /// is scaled up, which would manifest as yellow/black striped bars
 /// on real devices.
+///
+/// #1687 — the 3.0x rung is the audit lock for the dense station-card
+/// surfaces (status / cheapest / loyalty badges, amenity + payment
+/// chips): hard-coded `fontSize:` values on those micro-labels must
+/// not overflow their rows at the maximum OS text scale.
 void main() {
   // ─── StationCard ─────────────────────────────────────────────
   group('StationCard text scaling', () {
-    for (final scale in [1.5, 2.0]) {
+    for (final scale in [1.5, 2.0, 3.0]) {
       testWidgets('renders without overflow at ${scale}x', (tester) async {
         await pumpScaledApp(
           tester,
@@ -97,7 +103,7 @@ void main() {
 
   // ─── AllPricesStationCard ────────────────────────────────────
   group('AllPricesStationCard text scaling', () {
-    for (final scale in [1.5, 2.0]) {
+    for (final scale in [1.5, 2.0, 3.0]) {
       testWidgets('renders without overflow at ${scale}x', (tester) async {
         await pumpScaledApp(
           tester,
@@ -118,7 +124,7 @@ void main() {
 
   // ─── SortSelector ───────────────────────────────────────────
   group('SortSelector text scaling', () {
-    for (final scale in [1.5, 2.0]) {
+    for (final scale in [1.5, 2.0, 3.0]) {
       testWidgets('renders without overflow at ${scale}x', (tester) async {
         await pumpScaledApp(
           tester,
@@ -137,7 +143,7 @@ void main() {
 
   // ─── UserPositionBar (with position) ─────────────────────────
   group('UserPositionBar text scaling', () {
-    for (final scale in [1.5, 2.0]) {
+    for (final scale in [1.5, 2.0, 3.0]) {
       testWidgets('renders with known position at ${scale}x',
           (tester) async {
         await pumpScaledApp(
@@ -172,7 +178,7 @@ void main() {
 
   // ─── Station list (multiple cards) ───────────────────────────
   group('Station list text scaling', () {
-    for (final scale in [1.5, 2.0]) {
+    for (final scale in [1.5, 2.0, 3.0]) {
       testWidgets('renders multiple station cards at ${scale}x',
           (tester) async {
         await pumpScaledApp(
@@ -196,7 +202,7 @@ void main() {
 
   // ─── FavoritesScreen empty state ──────────────────────────────
   group('Favorites empty state text scaling', () {
-    for (final scale in [1.5, 2.0]) {
+    for (final scale in [1.5, 2.0, 3.0]) {
       testWidgets('renders empty favorites hint at ${scale}x',
           (tester) async {
         // Simulate the empty-favorites UI (icon + two text widgets)
@@ -233,6 +239,12 @@ void main() {
   });
 
   // ─── Settings-style list tiles ────────────────────────────────
+  // #1687 — capped at 2.0x: this group pumps raw Material `ListTile`s
+  // as a fixture, and `ListTile`'s fixed-height slots overflow at 3.0x
+  // as a framework characteristic unrelated to this app's hard-coded
+  // `fontSize:` values. The app's own settings rows use SettingsMenuTile
+  // / _FoldableSection, not raw ListTile. The 3.0x audit rung applies
+  // to the dense station-card surfaces above.
   group('Settings list tile text scaling', () {
     for (final scale in [1.5, 2.0]) {
       testWidgets('renders typical settings tiles at ${scale}x',
