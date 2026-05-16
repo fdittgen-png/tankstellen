@@ -235,6 +235,60 @@ void main() {
       });
     });
 
+    group('deferred-box opening (#1794)', () {
+      test('init() opens only first-frame-critical boxes; the deep-feature '
+          'boxes move to initDeferred()', () {
+        final source =
+            File('lib/core/storage/hive_boxes.dart').readAsStringSync();
+
+        expect(
+          source.contains('static Future<void> initDeferred()'),
+          isTrue,
+          reason: 'initDeferred() must exist to open the deferred boxes '
+              'after the first frame (#1794)',
+        );
+
+        final initMatch = RegExp(
+          r'static Future<void> init\(\) async \{(.*?)\n  \}',
+          dotAll: true,
+        ).firstMatch(source);
+        expect(initMatch, isNotNull);
+        final initBody = initMatch!.group(1)!;
+
+        // The deep-feature boxes must NOT open in init() — they are
+        // deferred past the first frame.
+        for (final box in [
+          'obd2TripHistory',
+          'obd2ActiveTrip',
+          'obd2PausedTrips',
+          'priceSnapshots',
+          'serviceReminders',
+          'trafficSignalsCache',
+        ]) {
+          expect(
+            initBody.contains(box),
+            isFalse,
+            reason: '$box is a deep-feature box — it must open in '
+                'initDeferred(), not on the first-frame critical path',
+          );
+        }
+
+        // First-frame-critical boxes stay in init().
+        for (final box in [
+          'settings',
+          'featureFlags',
+          'appProfile',
+          'isolateErrorSpool',
+        ]) {
+          expect(
+            initBody.contains(box),
+            isTrue,
+            reason: '$box is first-frame-critical and must stay in init()',
+          );
+        }
+      });
+    });
+
     group('toStringDynamicMap', () {
       test('returns null for null input', () {
         expect(HiveBoxes.toStringDynamicMap(null), isNull);
